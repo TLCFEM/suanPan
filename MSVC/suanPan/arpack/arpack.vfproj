@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject ProjectType="typeStaticLibrary" ProjectCreator="Intel Fortran" Keyword="Static Library" Version="11.0" ProjectIdGuid="{E75FB1D9-6EB8-4C3B-8130-7B1CBE5EA7C1}">
 	<Platforms>
-		<Platform Name="x64"/></Platforms>
+		<Platform Name="x64"/>
+	</Platforms>
 	<Configurations>
-		<Configuration Name="Release|x64" OutputDirectory="..\..\$(ConfigurationName)\Libs\" ConfigurationType="typeStaticLibrary">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" MultiProcessorCompilation="true" Optimization="optimizeFull" Parallelization="true" Preprocess="preprocessYes" EnableEnhancedInstructionSet="codeArchAVX" OpenMP="OpenMPParallelCode" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
-				<Tool Name="VFLibrarianTool"/>
-				<Tool Name="VFResourceCompilerTool"/>
-				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
-				<Tool Name="VFCustomBuildTool"/>
-				<Tool Name="VFPreLinkEventTool"/>
-				<Tool Name="VFPreBuildEventTool"/>
-				<Tool Name="VFPostBuildEventTool"/></Configuration></Configurations>
+		<Configuration Name="Release|x64" UseCompiler="ifortCompiler" OutputDirectory="..\..\$(ConfigurationName)\Libs\" ConfigurationType="typeStaticLibrary">
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" MultiProcessorCompilation="true" Optimization="optimizeFull" Parallelization="true" Preprocess="preprocessYes" EnableEnhancedInstructionSet="codeArchAVX" OpenMP="OpenMPParallelCode" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+			<Tool Name="VFLibrarianTool"/>
+			<Tool Name="VFResourceCompilerTool"/>
+			<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+			<Tool Name="VFCustomBuildTool"/>
+			<Tool Name="VFPreLinkEventTool"/>
+			<Tool Name="VFPreBuildEventTool"/>
+			<Tool Name="VFPostBuildEventTool"/>
+		</Configuration>
+	</Configurations>
 	<Files>
 		<Filter Name="SRC" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath="..\..\..\Toolbox\arpack-src\ccdotc.f"/>
@@ -91,5 +94,7 @@
 		<File RelativePath="..\..\..\Toolbox\arpack-src\zsortc.f"/>
 		<File RelativePath="..\..\..\Toolbox\arpack-src\zstatn.f"/>
 		<File RelativePath="..\..\..\Toolbox\arpack-src\zvout.f"/>
-		<File RelativePath="..\..\..\Toolbox\arpack-src\zzdotc.f"/></Filter></Files>
-	<Globals/></VisualStudioProject>
+		<File RelativePath="..\..\..\Toolbox\arpack-src\zzdotc.f"/></Filter>
+	</Files>
+	<Globals/>
+</VisualStudioProject>

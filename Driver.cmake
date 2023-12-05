@@ -1,8 +1,16 @@
 if (BUILD_SHARED AND USE_MKL)
-    link_directories(${MKLROOT}/lib/intel64)
+    if (EXISTS ${MKLROOT}/lib/intel64)
+        link_directories(${MKLROOT}/lib/intel64)
+    else (EXISTS ${MKLROOT}/lib/intel64)
+        link_directories(${MKLROOT}/lib)
+    endif ()
     if (MKLROOT MATCHES "(oneapi|oneAPI)")
         if (COMPILER_IDENTIFIER MATCHES "linux")
-            find_library(IOMPPATH iomp5 ${MKLROOT}/../../compiler/latest/linux/compiler/lib/intel64_lin)
+            find_library(IOMPPATH iomp5 PATHS
+                    ${MKLROOT}/../../compiler/latest/linux/compiler/lib/intel64_lin
+                    ${MKLROOT}/../../compiler/latest/lib
+                    REQUIRED
+            )
             get_filename_component(IOMPPATH ${IOMPPATH} DIRECTORY)
             link_directories(${IOMPPATH})
             if (USE_INTEL_OPENMP)
@@ -24,7 +32,11 @@ if (BUILD_SHARED AND USE_MKL)
                 link_libraries(impi impicxx)
             endif ()
         elseif (COMPILER_IDENTIFIER MATCHES "vs")
-            find_library(IOMPPATH libiomp5md ${MKLROOT}/../../compiler/latest/windows/compiler/lib/intel64_win)
+            find_library(IOMPPATH libiomp5md PATHS
+                    ${MKLROOT}/../../compiler/latest/windows/compiler/lib/intel64_win
+                    ${MKLROOT}/../../compiler/latest/lib
+                    REQUIRED
+            )
             get_filename_component(IOMPPATH ${IOMPPATH} DIRECTORY)
             link_directories(${IOMPPATH})
             set(DSUFIX "_dll")

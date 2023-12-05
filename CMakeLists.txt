@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.18)
 
 cmake_policy(SET CMP0076 NEW)
 
@@ -292,15 +292,18 @@ elseif (COMPILER_IDENTIFIER MATCHES "win")
         install(FILES ${TBB_FILES} DESTINATION bin)
     endif ()
     if (USE_MKL AND MKLROOT MATCHES "(oneapi|oneAPI)")
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_rt*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_core*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_def*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel_thread.*)
+        file(GLOB MKL_FILES
+                ${MKLROOT}/redist/intel64/mkl_rt*
+                ${MKLROOT}/redist/intel64/mkl_core*
+                ${MKLROOT}/redist/intel64/mkl_def*
+                ${MKLROOT}/redist/intel64/mkl_avx*
+                ${MKLROOT}/redist/intel64/mkl_intel_thread.*
+                ${MKLROOT}/bin/mkl_rt*
+                ${MKLROOT}/bin/mkl_core*
+                ${MKLROOT}/bin/mkl_def*
+                ${MKLROOT}/bin/mkl_avx*
+                ${MKLROOT}/bin/mkl_intel_thread.*
+        )
         install(FILES ${MKL_FILES} DESTINATION bin)
     else ()
         install(FILES Libs/win/libopenblas.dll DESTINATION bin)
@@ -313,28 +316,37 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
     endif ()
     if (USE_MKL AND MKLROOT MATCHES "(oneapi|oneAPI)")
         if (LINK_DYNAMIC_MKL)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_core*)
-            install(FILES ${MKL_FILES} DESTINATION bin)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_def*)
-            install(FILES ${MKL_FILES} DESTINATION bin)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx*)
+            file(GLOB MKL_FILES
+                    ${MKLROOT}/redist/intel64/mkl_core*
+                    ${MKLROOT}/redist/intel64/mkl_def*
+                    ${MKLROOT}/redist/intel64/mkl_avx*
+                    ${MKLROOT}/bin/mkl_core*
+                    ${MKLROOT}/bin/mkl_def*
+                    ${MKLROOT}/bin/mkl_avx*
+            )
             install(FILES ${MKL_FILES} DESTINATION bin)
             if (BUILD_MULTITHREAD)
-                file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_tbb_thread.*)
+                file(GLOB MKL_FILES
+                        ${MKLROOT}/redist/intel64/mkl_tbb_thread.*
+                        ${MKLROOT}/bin/mkl_tbb_thread.*
+                )
                 install(FILES ${MKL_FILES} DESTINATION bin)
             else ()
-                file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel_thread.*)
+                file(GLOB MKL_FILES
+                        ${MKLROOT}/redist/intel64/mkl_intel_thread.*
+                        ${MKLROOT}/bin/mkl_intel_thread.*
+                )
                 install(FILES ${MKL_FILES} DESTINATION bin)
             endif ()
         endif ()
         if (USE_INTEL_OPENMP)
-            find_file(libifcoremd libifcoremd.dll PATHS ${MKLROOT}/../../)
+            find_file(libifcoremd libifcoremd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libifcoremd} DESTINATION bin)
-            find_file(libiomp5md libiomp5md.dll PATHS ${MKLROOT}/../../)
+            find_file(libiomp5md libiomp5md.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libiomp5md} DESTINATION bin)
-            find_file(libmmd libmmd.dll PATHS ${MKLROOT}/../../)
+            find_file(libmmd libmmd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libmmd} DESTINATION bin)
-            find_file(svml_dispmd svml_dispmd.dll PATHS ${MKLROOT}/../../)
+            find_file(svml_dispmd svml_dispmd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${svml_dispmd} DESTINATION bin)
         endif ()
     else ()
