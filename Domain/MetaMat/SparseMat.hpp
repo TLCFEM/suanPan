@@ -50,7 +50,7 @@ public:
 
     void nullify(const uword idx) override {
         this->factored = false;
-        suanpan_for(static_cast<uword>(0), this->triplet_mat.n_elem, [&](const uword I) { if(this->triplet_mat.row(I) == idx || this->triplet_mat.col(I) == idx) this->triplet_mat.val_mem()[I] = T(0); });
+        suanpan::for_each(static_cast<uword>(0), this->triplet_mat.n_elem, [&](const uword I) { if(this->triplet_mat.row(I) == idx || this->triplet_mat.col(I) == idx) this->triplet_mat.val_mem()[I] = T(0); });
     }
 
     [[nodiscard]] T max() const override { return this->triplet_mat.max(); }

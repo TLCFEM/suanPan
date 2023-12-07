@@ -62,7 +62,7 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
             l_irn.set_size(triplet.n_elem);
             l_jrn.set_size(triplet.n_elem);
 
-            suanpan_for(0, static_cast<int>(triplet.n_elem), [&](const int I) {
+            suanpan::for_each(0, static_cast<int>(triplet.n_elem), [&](const int I) {
                 l_irn[I] = static_cast<int>(triplet.row(I) + 1);
                 l_jrn[I] = static_cast<int>(triplet.col(I) + 1);
             });

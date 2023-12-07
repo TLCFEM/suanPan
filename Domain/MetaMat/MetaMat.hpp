@@ -189,14 +189,14 @@ template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
     std::atomic_int code = 0;
 
     if(IterativeSolver::GMRES == setting.iterative_solver)
-        suanpan_for(0llu, B.n_cols, [&](const uword I) {
+        suanpan::for_each(0llu, B.n_cols, [&](const uword I) {
             Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
             const Col<T> sub_b(B.colptr(I), B.n_rows);
             auto col_setting = setting;
             code += GMRES(this, sub_x, sub_b, col_setting);
         });
     else if(IterativeSolver::BICGSTAB == setting.iterative_solver)
-        suanpan_for(0llu, B.n_cols, [&](const uword I) {
+        suanpan::for_each(0llu, B.n_cols, [&](const uword I) {
             Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
             const Col<T> sub_b(B.colptr(I), B.n_rows);
             auto col_setting = setting;

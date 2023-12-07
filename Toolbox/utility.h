@@ -24,24 +24,24 @@
 #include <execution>
 #endif
 
-template<sp_i IT, typename F> void suanpan_for(const IT start, const IT end, F&& FN) {
-#ifdef SUANPAN_MT
-    static tbb::affinity_partitioner ap;
-    tbb::parallel_for(start, end, std::forward<F>(FN), ap);
-#else
-    for(IT I = start; I < end; ++I) FN(I);
-#endif
-}
-
-template<typename T> constexpr T suanpan_max_element(T start, T end) {
-#ifdef __cpp_lib_execution
-    return std::max_element(std::execution::par, start, end);
-#else
-    return std::max_element(start, end);
-#endif
-}
-
 namespace suanpan {
+    template<sp_i IT, typename F> void for_each(const IT start, const IT end, F&& FN) {
+#ifdef SUANPAN_MT
+        static tbb::affinity_partitioner ap;
+        tbb::parallel_for(start, end, std::forward<F>(FN), ap);
+#else
+        for(IT I = start; I < end; ++I) FN(I);
+#endif
+    }
+
+    template<typename T> constexpr T max_element(T start, T end) {
+#ifdef __cpp_lib_execution
+        return std::max_element(std::execution::par, start, end);
+#else
+        return std::max_element(start, end);
+#endif
+    }
+
     template<typename T> [[maybe_unused]] const std::vector<T>& unique(std::vector<T>& container) {
         std::sort(container.begin(), container.end());
         container.erase(std::unique(container.begin(), container.end()), container.end());

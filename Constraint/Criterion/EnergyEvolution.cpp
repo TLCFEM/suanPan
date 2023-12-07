@@ -48,7 +48,7 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
 
     Col<int> state(map.size());
 
-    suanpan_for(0llu, current_energy.n_elem, [&](const uword I) {
+    suanpan::for_each(0llu, current_energy.n_elem, [&](const uword I) {
         if(!D->find<Element>(index[I])) {
             current_energy(I) = 0.;
             state(I) = -1; // not defined
@@ -74,7 +74,7 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
         const auto previous_energy = current_energy;
         current_energy *= weight - 1.;
 
-        suanpan_for(0llu, current_energy.n_elem, [&](const uword I) {
+        suanpan::for_each(0llu, current_energy.n_elem, [&](const uword I) {
             for(const auto J : map[I]) current_energy(I) += previous_energy(J);
             current_energy(I) /= static_cast<double>(map[I].size()) + weight - 1.;
         });

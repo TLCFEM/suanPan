@@ -148,20 +148,20 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
     std::vector JA(n_elem3, 0);
     std::vector IA(n_size3, 0);
 
-    suanpan_for(0, t_stiff.n_elem, [&](const int I) {
+    suanpan::for_each(0, t_stiff.n_elem, [&](const int I) {
         A[I] = t_stiff.val_mem()[I];
         JA[I] = t_stiff.col_mem()[I];
     });
-    suanpan_for(0, t_damping.n_elem, [&](const int I) {
+    suanpan::for_each(0, t_damping.n_elem, [&](const int I) {
         A[I + n_elem1] = t_damping.val_mem()[I];
         JA[I + n_elem1] = t_damping.col_mem()[I];
     });
-    suanpan_for(0, t_mass.n_elem, [&](const int I) {
+    suanpan::for_each(0, t_mass.n_elem, [&](const int I) {
         A[I + n_elem2] = t_mass.val_mem()[I];
         JA[I + n_elem2] = t_mass.col_mem()[I];
     });
 
-    suanpan_for(0, N, [&](const int I) {
+    suanpan::for_each(0, N, [&](const int I) {
         JA[I] = t_stiff.row_mem()[I];
         JA[I + n_size1] = t_damping.row_mem()[I];
         JA[I + n_size2] = t_mass.row_mem()[I];

@@ -75,7 +75,7 @@ template<sp_d data_t, sp_i index_t> class triplet_form final {
     template<sp_d in_dt, sp_i in_it> void copy_to(const std::unique_ptr<in_it[]>& new_row_idx, const std::unique_ptr<in_it[]>& new_col_idx, const std::unique_ptr<in_dt[]>& new_val_idx, const index_t begin, const index_t row_offset, const index_t col_offset, const data_t scalar) const { copy_to(new_row_idx.get(), new_col_idx.get(), new_val_idx.get(), begin, row_offset, col_offset, scalar); }
 
     template<sp_d in_dt, sp_i in_it> void copy_to(in_it* const new_row_idx, in_it* const new_col_idx, in_dt* const new_val_idx, const index_t begin, const index_t row_offset, const index_t col_offset, const data_t scalar) const {
-        suanpan_for(index_t(0), n_elem, [&](const index_t I) {
+        suanpan::for_each(index_t(0), n_elem, [&](const index_t I) {
             new_row_idx[I + begin] = in_it(row_idx[I] + row_offset);
             new_col_idx[I + begin] = in_it(col_idx[I] + col_offset);
             new_val_idx[I + begin] = in_dt(scalar * val_idx[I]);
@@ -108,7 +108,7 @@ template<sp_d data_t, sp_i index_t> class triplet_form final {
     void populate_diagonal() {
         const auto t_elem = std::min(n_rows, n_cols);
         reserve(n_elem + t_elem);
-        suanpan_for(index_t(0), t_elem, [&](const index_t I) {
+        suanpan::for_each(index_t(0), t_elem, [&](const index_t I) {
             row_idx[n_elem + I] = I;
             col_idx[n_elem + I] = I;
             val_idx[n_elem + I] = data_t(0);
@@ -170,7 +170,7 @@ public:
 
     [[nodiscard]] data_t max() const {
         if(is_empty()) return data_t(0);
-        return *suanpan_max_element(val_idx.get(), val_idx.get() + n_elem);
+        return *suanpan::max_element(val_idx.get(), val_idx.get() + n_elem);
     }
 
     void zeros() {
@@ -413,7 +413,7 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort
     index_ptr new_col_idx(new index_t[n_alloc]);
     data_ptr new_val_idx(new data_t[n_alloc]);
 
-    suanpan_for(index_t(0), n_elem, [&](const index_t I) {
+    suanpan::for_each(index_t(0), n_elem, [&](const index_t I) {
         new_row_idx[I] = row_idx[index[I]];
         new_col_idx[I] = col_idx[index[I]];
         new_val_idx[I] = val_idx[index[I]];
@@ -439,7 +439,7 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csc_sort
     index_ptr new_col_idx(new index_t[n_alloc]);
     data_ptr new_val_idx(new data_t[n_alloc]);
 
-    suanpan_for(index_t(0), n_elem, [&](const index_t I) {
+    suanpan::for_each(index_t(0), n_elem, [&](const index_t I) {
         new_row_idx[I] = row_idx[index[I]];
         new_col_idx[I] = col_idx[index[I]];
         new_val_idx[I] = val_idx[index[I]];
@@ -462,7 +462,7 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::assemble
 
     reserve(t_elem);
 
-    suanpan_for(static_cast<uword>(0), in_mat.n_elem, [&](const uword I) {
+    suanpan::for_each(static_cast<uword>(0), in_mat.n_elem, [&](const uword I) {
         row_idx[n_elem + I] = index_t(in_dof(I % in_dof.n_elem));
         col_idx[n_elem + I] = index_t(in_dof(I / in_dof.n_elem));
         val_idx[n_elem + I] = in_mat(I);
@@ -577,7 +577,7 @@ template<sp_d data_t, sp_i index_t> Col<data_t> triplet_form<data_t, index_t>::d
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::diagonal() const {
     auto out_mat = *this;
 
-    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) == out_mat.col(I); });
+    suanpan::for_each(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) == out_mat.col(I); });
 
     return out_mat;
 }
@@ -585,7 +585,7 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<d
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::strictly_upper() const {
     auto out_mat = *this;
 
-    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) < out_mat.col(I); });
+    suanpan::for_each(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) < out_mat.col(I); });
 
     return out_mat;
 }
@@ -593,7 +593,7 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<d
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::strictly_lower() const {
     auto out_mat = *this;
 
-    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) < out_mat.row(I); });
+    suanpan::for_each(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) < out_mat.row(I); });
 
     return out_mat;
 }
@@ -601,7 +601,7 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<d
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::upper() const {
     auto out_mat = *this;
 
-    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) <= out_mat.col(I); });
+    suanpan::for_each(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.row(I) <= out_mat.col(I); });
 
     return out_mat;
 }
@@ -609,7 +609,7 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<d
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> triplet_form<data_t, index_t>::lower() const {
     auto out_mat = *this;
 
-    suanpan_for(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) <= out_mat.row(I); });
+    suanpan::for_each(index_t(0), out_mat.n_elem, [&](const index_t I) { out_mat.val_idx[I] *= out_mat.col(I) <= out_mat.row(I); });
 
     return out_mat;
 }

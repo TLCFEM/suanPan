@@ -40,7 +40,7 @@ void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
 
     BandMat<double> system(np, 1, 1);
 
-    suanpan_for(0llu, np, [&](const uword I) { system.at(I, I) = 2.; });
+    suanpan::for_each(0llu, np, [&](const uword I) { system.at(I, I) = 2.; });
 
     system.at(0llu, 1llu) = 1.;
     system.at(n, nm) = 1.;
@@ -49,7 +49,7 @@ void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
     b(0) = dy(0) / dt(0) / dt(0);
     b(n) = -dy(nm) / dt(nm) / dt(nm);
 
-    suanpan_for(1llu, n, [&](const uword I) {
+    suanpan::for_each(1llu, n, [&](const uword I) {
         const auto J = I - 1llu, K = I + 1llu;
         const auto denom = time(K) - time(J);
         const auto mu = dt(J) / denom;
