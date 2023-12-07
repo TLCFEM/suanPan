@@ -49,7 +49,7 @@ protected:
 
     podarray<float> to_float() {
         podarray<float> f_memory(this->n_elem);
-        suanpan::for_each(0llu, this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
+        suanpan::for_each(this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
         return f_memory;
     }
 
@@ -62,7 +62,7 @@ public:
         : MetaMat<T>(old_mat)
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
-        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { suanpan::for_each(0llu, this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
+        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
 
     DenseMat(DenseMat&&) noexcept = delete;
     DenseMat& operator=(const DenseMat&) = delete;
@@ -84,7 +84,7 @@ public:
 
     [[nodiscard]] Col<T> diag() const override {
         Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
-        suanpan::for_each(0llu, diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
+        suanpan::for_each(diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
         return diag_vec;
     }
 

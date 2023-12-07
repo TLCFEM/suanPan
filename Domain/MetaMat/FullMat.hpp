@@ -50,8 +50,8 @@ public:
 
     void nullify(const uword K) override {
         this->factored = false;
-        suanpan::for_each(0llu, this->n_rows, [&](const uword I) { at(I, K) = T(0); });
-        suanpan::for_each(0llu, this->n_cols, [&](const uword I) { at(K, I) = T(0); });
+        suanpan::for_each(this->n_rows, [&](const uword I) { at(I, K) = T(0); });
+        suanpan::for_each(this->n_cols, [&](const uword I) { at(K, I) = T(0); });
     }
 
     T operator()(const uword in_row, const uword in_col) const override { return this->memory[in_row + in_col * this->n_rows]; }

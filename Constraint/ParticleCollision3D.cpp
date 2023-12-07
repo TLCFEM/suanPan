@@ -38,7 +38,7 @@ int ParticleCollision3D::process_meta(const shared_ptr<DomainBase>& D, const boo
 
     list = std::vector<CellList>(node_size);
 
-    suanpan::for_each(static_cast<size_t>(0), node_size, [&](const size_t I) {
+    suanpan::for_each(node_size, [&](const size_t I) {
         const auto& t_node = node_pool[I];
         if(norm(t_node->get_trial_velocity()) * W->get_incre_time() > space)
             suanpan_warning("The nodal speed seems to be too large.\n");
@@ -53,7 +53,7 @@ int ParticleCollision3D::process_meta(const shared_ptr<DomainBase>& D, const boo
 
     resistance.zeros(W->get_size());
 
-    suanpan::for_each(static_cast<size_t>(0), node_size, [&](const size_t I) {
+    suanpan::for_each(node_size, [&](const size_t I) {
         for(auto J = I + 1; J < node_size; ++J) {
             const auto diff_x = list[J].x - list[I].x;
             if(diff_x > 1) break;

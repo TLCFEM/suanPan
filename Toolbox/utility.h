@@ -25,7 +25,7 @@
 #endif
 
 namespace suanpan {
-    template<sp_i IT, typename F> void for_each(const IT start, const IT end, F&& FN) {
+    template<sp_i IT, std::invocable<IT> F> void for_each(const IT start, const IT end, F&& FN) {
 #ifdef SUANPAN_MT
         static tbb::affinity_partitioner ap;
         tbb::parallel_for(start, end, std::forward<F>(FN), ap);
@@ -33,6 +33,8 @@ namespace suanpan {
         for(IT I = start; I < end; ++I) FN(I);
 #endif
     }
+
+    template<sp_i IT, std::invocable<IT> F> void for_each(const IT end, F&& FN) { return for_each(static_cast<IT>(0), end, std::forward<F>(FN)); }
 
     template<typename T> constexpr T max_element(T start, T end) {
 #ifdef __cpp_lib_execution

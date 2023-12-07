@@ -59,10 +59,10 @@ template<sp_d eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
 
     //! Collect the number of degree of each node.
     uvec E(S, fill::none);
-    suanpan::for_each(0llu, S, [&](const uword I) { E(I) = MEAT.col(I).n_nonzero; });
+    suanpan::for_each(S, [&](const uword I) { E(I) = MEAT.col(I).n_nonzero; });
 
     std::vector<uvec> A(S);
-    suanpan::for_each(0llu, S, [&](const uword K) {
+    suanpan::for_each(S, [&](const uword K) {
         unsigned J = 0;
         uvec IDX(E(K));
         for(auto L = MEAT.begin_col(K); L != MEAT.end_col(K); ++L) IDX(J++) = L.row();
@@ -127,9 +127,9 @@ template<sp_d dt> uvec sort_rcm(const csc_form<dt, uword>& csc_mat) {
 
     //! Collect the number of degree of each node.
     uvec E(S, fill::none);
-    suanpan::for_each(0llu, S, [&](const uword I) { E(I) = csc_mat.col(I + 1) - csc_mat.col(I); });
+    suanpan::for_each(S, [&](const uword I) { E(I) = csc_mat.col(I + 1) - csc_mat.col(I); });
     std::vector<uvec> A(S);
-    suanpan::for_each(0llu, S, [&](const uword I) {
+    suanpan::for_each(S, [&](const uword I) {
         const uvec IDX(csc_mat.row_mem() + csc_mat.col(I), E(I));
         A[I] = IDX(sort_index(E(IDX)));
     });

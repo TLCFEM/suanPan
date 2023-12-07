@@ -20,7 +20,7 @@ TEST_CASE("Simple Scalar Evaluation", "[Utility.Expression]") {
 
     mat test_data = randu(2, 100);
 
-    suanpan::for_each(0llu, test_data.n_cols, [&](const uword I) {
+    suanpan::for_each(test_data.n_cols, [&](const uword I) {
         const auto expression_copy = expression->get_copy();
         const auto &x = test_data(0, I), &y = test_data(1, I);
         const auto f = x * x + y * y + 2. * x * y;
@@ -39,7 +39,7 @@ TEST_CASE("Simple Dot Evaluation", "[Utility.Expression]") {
 
     mat test_data = randu(2, 100);
 
-    suanpan::for_each(0llu, test_data.n_cols, [&](const uword I) {
+    suanpan::for_each(test_data.n_cols, [&](const uword I) {
         const auto expression_copy = expression->get_copy();
         const auto &x = test_data(0, I), &y = test_data(1, I);
         const auto f = x + y;
@@ -57,7 +57,7 @@ TEST_CASE("Simple Vector Evaluation", "[Utility.Expression]") {
 
     mat test_data = randu(3, 100);
 
-    suanpan::for_each(0llu, test_data.n_cols, [&](const uword I) {
+    suanpan::for_each(test_data.n_cols, [&](const uword I) {
         const auto expression_copy = expression->get_copy();
         const auto f = expression_copy->evaluate(test_data.col(I));
         REQUIRE(f.at(0) == Approx(sum(test_data.col(I))));

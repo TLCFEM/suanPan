@@ -53,7 +53,7 @@ void NonviscousNewmark::assemble_matrix() {
     const auto damping_diag = C1 * accu_para;
 
     if(const auto t_scheme = W->get_storage_scheme(); StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(auto I = 0u; I < W->get_size(); ++I) t_stiffness->unsafe_at(I, I) += damping_diag;
-    else suanpan::for_each(0u, W->get_size(), [&](const unsigned I) { t_stiffness->unsafe_at(I, I) += damping_diag; });
+    else suanpan::for_each(W->get_size(), [&](const unsigned I) { t_stiffness->unsafe_at(I, I) += damping_diag; });
 }
 
 void NonviscousNewmark::update_parameter(const double DT) {
