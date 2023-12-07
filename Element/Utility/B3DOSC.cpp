@@ -20,7 +20,7 @@
 #include <Toolbox/tensor.h>
 
 B3DOSC::B3DOSC(const unsigned T, vec&& XYZ)
-    : B3DC(T, std::forward<vec>(XYZ)) {
+    : B3DC(T, std::move(XYZ)) {
     access::rw(sc) = span(7, 9);
     access::rw(sd) = span(10, 12);
 }

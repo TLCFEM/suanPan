@@ -19,22 +19,22 @@
 #include <Section/Section.h>
 
 SectionElement::SectionElement(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, vector<DOF>&& DI)
-    : Element(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, STP, std::forward<vector<DOF>>(DI)) {}
+    : Element(T, NN, ND, std::move(NT), std::move(ST), F, STP, std::move(DI)) {}
 
 SectionElement1D::SectionElement1D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, vector<DOF>&& DI)
-    : SectionElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, SectionType::D1, std::forward<vector<DOF>>(DI)) {}
+    : SectionElement(T, NN, ND, std::move(NT), std::move(ST), F, SectionType::D1, std::move(DI)) {}
 
 SectionElement2D::SectionElement2D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, vector<DOF>&& DI)
-    : SectionElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, SectionType::D2, std::forward<vector<DOF>>(DI)) {}
+    : SectionElement(T, NN, ND, std::move(NT), std::move(ST), F, SectionType::D2, std::move(DI)) {}
 
 SectionElement3D::SectionElement3D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, vector<DOF>&& DI)
-    : SectionElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, SectionType::D3, std::forward<vector<DOF>>(DI)) {}
+    : SectionElement(T, NN, ND, std::move(NT), std::move(ST), F, SectionType::D3, std::move(DI)) {}
 
 SectionNMElement2D::SectionNMElement2D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, vector<DOF>&& DI)
-    : SectionElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, SectionType::NM2D, std::forward<vector<DOF>>(DI)) {}
+    : SectionElement(T, NN, ND, std::move(NT), std::move(ST), F, SectionType::NM2D, std::move(DI)) {}
 
 SectionNMElement3D::SectionNMElement3D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, vector<DOF>&& DI)
-    : SectionElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, SectionType::NM3D, std::forward<vector<DOF>>(DI)) {}
+    : SectionElement(T, NN, ND, std::move(NT), std::move(ST), F, SectionType::NM3D, std::move(DI)) {}
 
 SectionOSElement3D::SectionOSElement3D(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, vector<DOF>&& DI)
-    : SectionElement(T, NN, ND, std::forward<uvec>(NT), std::forward<uvec>(ST), F, SectionType::OS3D, std::forward<vector<DOF>>(DI)) {}
+    : SectionElement(T, NN, ND, std::move(NT), std::move(ST), F, SectionType::OS3D, std::move(DI)) {}

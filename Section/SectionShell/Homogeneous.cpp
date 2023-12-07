@@ -23,7 +23,7 @@
 Homogeneous::IntegrationPoint::IntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
     , factor(F)
-    , s_material(std::forward<unique_ptr<Material>>(M)) {}
+    , s_material(std::move(M)) {}
 
 Homogeneous::IntegrationPoint::IntegrationPoint(const IntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)

@@ -22,7 +22,7 @@ Section3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ, 
     : coor_y(CY)
     , coor_z(CZ)
     , weight(W)
-    , s_material(std::forward<unique_ptr<Material>>(M)) {}
+    , s_material(std::move(M)) {}
 
 void Section3D::initialize_stiffness() {
     initial_stiffness.zeros(3, 3);
@@ -45,7 +45,7 @@ void Section3D::initialize_stiffness() {
 }
 
 Section3D::Section3D(const unsigned T, const unsigned MT, const double A, vec&& E)
-    : Section(T, SectionType::D3, MT, A, std::forward<vec>(E)) {}
+    : Section(T, SectionType::D3, MT, A, std::move(E)) {}
 
 void Section3D::set_characteristic_length(const double L) const {
     Section::set_characteristic_length(L);

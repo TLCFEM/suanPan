@@ -28,7 +28,7 @@ Box3D::Box3D(const unsigned T, const double B, const double H, const double TH, 
     , int_pt_num(S > 20 ? 20 : S) {}
 
 Box3D::Box3D(const unsigned T, vec&& D, const unsigned M, const unsigned S, vec&& EC)
-    : Section3D(T, M, 2. * D(2) * (D(0) + D(1)), std::forward<vec>(EC))
+    : Section3D(T, M, 2. * D(2) * (D(0) + D(1)), std::move(EC))
     , width(D(0))
     , height(D(1))
     , thickness(D(2))

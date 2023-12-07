@@ -27,12 +27,12 @@ const uvec CSMQ8::t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 18, 19, 21, 22}
 const uvec CSMQ8::r_dof{2, 5, 8, 11, 14, 17, 20, 23};
 
 CSMQ8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M)) {}
+    , m_material(std::move(M)) {}
 
 CSMQ8::CSMQ8(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMQ8::initialize(const shared_ptr<DomainBase>& D) {

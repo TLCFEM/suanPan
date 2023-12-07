@@ -18,7 +18,7 @@
 #include "ElementalModal.h"
 
 ElementalModal::ElementalModal(const unsigned T, const double F, const double D, uvec&& ET)
-    : Modifier(T, std::forward<uvec>(ET))
+    : Modifier(T, std::move(ET))
     , cut_off_freq(F * F)
     , damping(2. * D) {}
 

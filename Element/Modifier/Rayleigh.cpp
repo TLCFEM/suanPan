@@ -18,7 +18,7 @@
 #include "Rayleigh.h"
 
 Rayleigh::Rayleigh(const unsigned T, const double A, const double B, const double C, const double D, uvec&& ET)
-    : Modifier(T, std::forward<uvec>(ET))
+    : Modifier(T, std::move(ET))
     , a(A)
     , b(B)
     , c(C)

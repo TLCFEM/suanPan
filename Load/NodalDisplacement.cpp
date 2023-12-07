@@ -21,10 +21,10 @@
 #include <Load/Amplitude/Amplitude.h>
 
 NodalDisplacement::NodalDisplacement(const unsigned T, const unsigned ST, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : Load(T, ST, AT, std::forward<uvec>(N), uvec{D}, L) { enable_displacement_control(); }
+    : Load(T, ST, AT, std::move(N), uvec{D}, L) { enable_displacement_control(); }
 
 NodalDisplacement::NodalDisplacement(const unsigned T, const unsigned ST, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, ST, AT, std::forward<uvec>(N), std::forward<uvec>(D), L) { enable_displacement_control(); }
+    : Load(T, ST, AT, std::move(N), std::move(D), L) { enable_displacement_control(); }
 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
     set_end_step(start_step + 1);

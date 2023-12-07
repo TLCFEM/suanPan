@@ -18,6 +18,6 @@
 #include "Fibre2D.h"
 
 Fibre2D::Fibre2D(const unsigned T, uvec&& ST)
-    : Fibre(T, std::forward<uvec>(ST), SectionType::D2) {}
+    : Fibre(T, std::move(ST), SectionType::D2) {}
 
 unique_ptr<Section> Fibre2D::get_copy() { return make_unique<Fibre2D>(*this); }

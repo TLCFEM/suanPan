@@ -19,7 +19,7 @@
 #include <Recorder/OutputType.h>
 
 Fibre3DOS::Fibre3DOS(const unsigned T, uvec&& ST)
-    : Fibre(T, std::forward<uvec>(ST), SectionType::OS3D) {}
+    : Fibre(T, std::move(ST), SectionType::OS3D) {}
 
 unique_ptr<Section> Fibre3DOS::get_copy() { return make_unique<Fibre3DOS>(*this); }
 

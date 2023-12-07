@@ -22,11 +22,11 @@
 #include <Step/Step.h>
 
 RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F, const unsigned NS)
-    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(N), F, NS)
+    : RigidWallPenalty(T, S, A, std::move(O), std::move(N), F, NS)
     , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
 RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F, const unsigned NS)
-    : RigidWallPenalty(T, S, A, std::forward<vec>(O), std::forward<vec>(E1), std::forward<vec>(E2), F, NS)
+    : RigidWallPenalty(T, S, A, std::move(O), std::move(E1), std::move(E2), F, NS)
     , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
 int RestitutionWallPenalty::initialize(const shared_ptr<DomainBase>& D) {

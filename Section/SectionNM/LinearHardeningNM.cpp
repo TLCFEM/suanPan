@@ -148,11 +148,11 @@ vec LinearHardeningNM::compute_h(const double alpha) const { return {n_size, fil
 vec LinearHardeningNM::compute_dh(const double alpha) const { return compute_h(alpha).transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : isotropic_modulus; }); }
 
 LinearHardeningNM::LinearHardeningNM(const unsigned T, const double EEA, const double EEIS, const double HH, const double KK, const double LD, vec&& YF)
-    : NonlinearNM(T, EEA, EEIS, !suanpan::approx_equal(KK, 0.), LD, std::forward<vec>(YF))
+    : NonlinearNM(T, EEA, EEIS, !suanpan::approx_equal(KK, 0.), LD, std::move(YF))
     , isotropic_modulus(HH)
     , kinematic_modulus(KK) {}
 
 LinearHardeningNM::LinearHardeningNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double HH, const double KK, const double LD, vec&& YF)
-    : NonlinearNM(T, EEA, EEIS, EEIW, !suanpan::approx_equal(KK, 0.), LD, std::forward<vec>(YF))
+    : NonlinearNM(T, EEA, EEIS, EEIW, !suanpan::approx_equal(KK, 0.), LD, std::move(YF))
     , isotropic_modulus(HH)
     , kinematic_modulus(KK) {}

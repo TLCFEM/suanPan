@@ -74,7 +74,7 @@ Rotation3D::Rotation3D(const unsigned T, const unsigned MT, const double I, cons
 
 Rotation3D::Rotation3D(const unsigned T, const unsigned MT, mat&& R)
     : Material3D(T, 0.)
-    , mat_tag(MT) { form_transformation(std::forward<mat>(R)); }
+    , mat_tag(MT) { form_transformation(std::move(R)); }
 
 int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
     mat_obj = D->initialized_material_copy(mat_tag);

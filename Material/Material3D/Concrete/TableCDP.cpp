@@ -96,10 +96,10 @@ podarray<double> TableCDP::compute_compression_backbone(const double kappa) cons
 
 TableCDP::TableCDP(const unsigned T, const double E, const double V, mat&& TT, mat&& CT, mat&& TDT, mat&& CDT, const double AP, const double BC, const double S, const double R)
     : NonlinearCDP(T, E, V, 0., 0., AP, BC, S, R)
-    , t_table(std::forward<mat>(TT))
-    , c_table(std::forward<mat>(CT))
-    , dt_table(std::forward<mat>(TDT))
-    , dc_table(std::forward<mat>(CDT)) {
+    , t_table(std::move(TT))
+    , c_table(std::move(CT))
+    , dt_table(std::move(TDT))
+    , dc_table(std::move(CDT)) {
     t_table.col(0) = abs(t_table.col(0));
     t_table.col(1) = abs(t_table.col(1));
     c_table.col(0) = abs(c_table.col(0));

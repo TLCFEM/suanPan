@@ -23,7 +23,7 @@
 B21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_ptr<Section>&& M)
     : coor(C)
     , weight(W)
-    , b_section(std::forward<unique_ptr<Section>>(M))
+    , b_section(std::move(M))
     , strain_mat(2, 3, fill::zeros) {
     strain_mat(0, 0) = 1.;
     strain_mat(1, 1) = 3. * coor - 1.;
@@ -31,7 +31,7 @@ B21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_
 }
 
 B21H::B21H(const unsigned T, uvec&& N, const unsigned S, const double L, const bool F)
-    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionElement2D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , hinge_length(L > .5 ? .5 : L)
     , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
 

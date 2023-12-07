@@ -35,7 +35,7 @@ extern fs::path SUANPAN_OUTPUT;
  */
 Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
     : Tag(T)
-    , object_tag(std::forward<uvec>(B))
+    , object_tag(std::move(B))
     , variable_type(L)
     , data_pool(object_tag.n_elem)
     , record_time(R)
@@ -44,7 +44,7 @@ Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigne
 
 void Recorder::initialize(const shared_ptr<DomainBase>&) {}
 
-void Recorder::set_object_tag(uvec&& T) { object_tag = std::forward<uvec>(T); }
+void Recorder::set_object_tag(uvec&& T) { object_tag = std::move(T); }
 
 const uvec& Recorder::get_object_tag() const { return object_tag; }
 

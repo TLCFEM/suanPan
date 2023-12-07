@@ -32,7 +32,7 @@ std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
 }
 
 NodeLine::NodeLine(const unsigned T, const unsigned S, const unsigned A, uvec&& N)
-    : Constraint(T, S, A, std::forward<uvec>(N), uvec{1, 2}, 1) { set_connected(true); }
+    : Constraint(T, S, A, std::move(N), uvec{1, 2}, 1) { set_connected(true); }
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
     dof_encoding = get_nodal_active_dof(D);

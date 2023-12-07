@@ -23,7 +23,7 @@ const uword NonlinearHoffman::sa{0};
 const span NonlinearHoffman::sb{1, 6};
 
 NonlinearHoffman::NonlinearHoffman(const unsigned T, vec&& EE, vec&& VV, vec&& SS, const double R)
-    : DataNonlinearHoffman{std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS)}
+    : DataNonlinearHoffman{std::move(EE), std::move(VV), std::move(SS)}
     , Material3D(T, R) { transform::hoffman_projection(yield_stress, proj_a, proj_b); }
 
 int NonlinearHoffman::initialize(const shared_ptr<DomainBase>&) {

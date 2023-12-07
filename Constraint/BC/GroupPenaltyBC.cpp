@@ -20,12 +20,12 @@
 #include <Domain/Group/Group.h>
 
 GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
-    : MultiplierBC(T, S, uvec{}, std::forward<uvec>(D))
-    , groups(std::forward<uvec>(N)) {}
+    : MultiplierBC(T, S, uvec{}, std::move(D))
+    , groups(std::move(N)) {}
 
 GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP)
     : MultiplierBC(T, S, uvec{}, TP)
-    , groups(std::forward<uvec>(N)) {}
+    , groups(std::move(N)) {}
 
 int GroupPenaltyBC::initialize(const shared_ptr<DomainBase>& D) {
     suanpan::unordered_set<uword> tag;

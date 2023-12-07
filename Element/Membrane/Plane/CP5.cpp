@@ -25,10 +25,10 @@
 #include <Toolbox/utility.h>
 
 CP5::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(P))
+    , m_material(std::move(M))
+    , pn_pxy(std::move(P))
     , strain_mat(3, m_size) {
     for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
         strain_mat(0, J) = strain_mat(2, K) = pn_pxy(0, I);
@@ -37,7 +37,7 @@ CP5::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
 }
 
 CP5::CP5(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int CP5::initialize(const shared_ptr<DomainBase>& D) {

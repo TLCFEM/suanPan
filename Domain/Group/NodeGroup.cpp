@@ -22,22 +22,22 @@
 NodeGroup::NodeGroup(const unsigned T, const int D, vec&& R)
     : Group(T)
     , dof(D - 1)
-    , rule(std::forward<vec>(R)) {}
+    , rule(std::move(R)) {}
 
 NodeGroup::NodeGroup(const unsigned T, uvec&& R)
-    : Group(T, std::forward<uvec>(R))
+    : Group(T, std::move(R))
     , dof(-1) {}
 
 NodeGroup::NodeGroup(const unsigned T, vec&& SN, vec&& EN)
     : Group(T)
     , dof(-2)
-    , s_node(std::forward<vec>(SN))
-    , e_node(std::forward<vec>(EN)) {}
+    , s_node(std::move(SN))
+    , e_node(std::move(EN)) {}
 
 NodeGroup::NodeGroup(const unsigned T, vec&& PL)
     : Group(T)
     , dof(-3)
-    , rule(std::forward<vec>(PL)) {}
+    , rule(std::move(PL)) {}
 
 void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
     // generate by direct assignment

@@ -20,7 +20,7 @@
 
 Combine::Combine(const unsigned T, uvec&& TP, const unsigned ST)
     : Amplitude(T, ST)
-    , tag_pool(std::forward<uvec>(TP)) {}
+    , tag_pool(std::move(TP)) {}
 
 void Combine::initialize(const shared_ptr<DomainBase>& D) { for(const auto I : tag_pool) if(D->find<Amplitude>(I)) amp_pool.emplace_back(D->get<Amplitude>(I)); }
 

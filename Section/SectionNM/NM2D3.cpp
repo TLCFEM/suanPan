@@ -24,7 +24,7 @@ vec NM2D3::compute_df(const vec& s, const vec& h) const { return compute_dsf(s, 
 mat NM2D3::compute_ddf(const vec& s, const vec& h) const { return compute_ddsf(s, h); }
 
 NM2D3::NM2D3(const unsigned T, const double EEA, const double EEIS, const double NP, const double MSP, const double CC, const double HH, const double HS, const double HD, vec&& KK, vec&& KB, const double LD, mat&& PS)
-    : SurfaceNM2D(CC, std::forward<mat>(PS))
-    , VAFNM(T, EEA, EEIS, HH, HS, HD, std::forward<vec>(KK), std::forward<vec>(KB), LD, vec{NP, MSP}) {}
+    : SurfaceNM2D(CC, std::move(PS))
+    , VAFNM(T, EEA, EEIS, HH, HS, HD, std::move(KK), std::move(KB), LD, vec{NP, MSP}) {}
 
 unique_ptr<Section> NM2D3::get_copy() { return make_unique<NM2D3>(*this); }

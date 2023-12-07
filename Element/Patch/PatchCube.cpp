@@ -23,12 +23,12 @@
 #include <Toolbox/IntegrationPlan.h>
 
 PatchCube::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , c_material(std::forward<unique_ptr<Material>>(M)) {}
+    , c_material(std::move(M)) {}
 
 PatchCube::PatchCube(const unsigned T, vec&& KX, vec&& KY, vec&& KZ, uvec&& N, const unsigned M)
-    : MaterialPatch3D(T, c_dof, std::forward<uvec>(N), uvec{M}, {KX, KY, KZ}, false)
+    : MaterialPatch3D(T, c_dof, std::move(N), uvec{M}, {KX, KY, KZ}, false)
     , c_node(static_cast<unsigned>(node_encoding.n_elem)) {}
 
 int PatchCube::initialize(const shared_ptr<DomainBase>& D) {

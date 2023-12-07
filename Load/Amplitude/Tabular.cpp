@@ -20,12 +20,12 @@
 
 Tabular::Tabular(const unsigned T, vec&& TI, vec&& M, const unsigned ST)
     : Amplitude(T, ST)
-    , time(std::forward<vec>(TI))
-    , magnitude(std::forward<vec>(M)) {}
+    , time(std::move(TI))
+    , magnitude(std::move(M)) {}
 
 Tabular::Tabular(const unsigned T, string&& P, const unsigned ST)
     : Amplitude(T, ST)
-    , file_name(std::forward<string>(P)) {}
+    , file_name(std::move(P)) {}
 
 void Tabular::initialize(const shared_ptr<DomainBase>& D) {
     if(file_name.empty()) {

@@ -7,7 +7,7 @@ struct System {
     mat A;
 
     explicit System(mat&& AA)
-        : A(std::forward<mat>(AA)) {}
+        : A(std::move(AA)) {}
 
     [[nodiscard]] vec evaluate(const vec& x) const { return A * x; }
 };

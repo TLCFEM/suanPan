@@ -39,7 +39,7 @@ SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istrin
 }
 
 ModifierExample::ModifierExample(const unsigned T, const double A, const double B, uvec&& ET)
-    : Modifier(T, std::forward<uvec>(ET))
+    : Modifier(T, std::move(ET))
     , a(A)
     , b(B) {}
 

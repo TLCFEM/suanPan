@@ -24,12 +24,12 @@
 #include <Toolbox/utility.h>
 
 CSMQ::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M)) {}
+    , m_material(std::move(M)) {}
 
 CSMQ::CSMQ(const unsigned T, uvec&& N, const unsigned M, const unsigned NN, const double TH, const double L)
-    : MaterialElement2D(T, NN, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, NN, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , m_node(NN)
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
@@ -265,7 +265,7 @@ const uvec CSMQ5::t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13};
 const uvec CSMQ5::r_dof{2, 5, 8, 11, 14};
 
 CSMQ5::CSMQ5(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-    : CSMQ(T, std::forward<uvec>(N), M, 5, TH, L) {}
+    : CSMQ(T, std::move(N), M, 5, TH, L) {}
 
 const uvec& CSMQ5::get_translation_dof() { return t_dof; }
 
@@ -275,7 +275,7 @@ const uvec CSMQ6::t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16};
 const uvec CSMQ6::r_dof{2, 5, 8, 11, 14, 17};
 
 CSMQ6::CSMQ6(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-    : CSMQ(T, std::forward<uvec>(N), M, 6, TH, L) {}
+    : CSMQ(T, std::move(N), M, 6, TH, L) {}
 
 const uvec& CSMQ6::get_translation_dof() { return t_dof; }
 
@@ -285,7 +285,7 @@ const uvec CSMQ7::t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 18, 19};
 const uvec CSMQ7::r_dof{2, 5, 8, 11, 14, 17, 20};
 
 CSMQ7::CSMQ7(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-    : CSMQ(T, std::forward<uvec>(N), M, 7, TH, L) {}
+    : CSMQ(T, std::move(N), M, 7, TH, L) {}
 
 const uvec& CSMQ7::get_translation_dof() { return t_dof; }
 

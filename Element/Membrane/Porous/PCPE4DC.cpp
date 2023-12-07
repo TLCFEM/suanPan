@@ -28,13 +28,13 @@ const uvec PCPE4DC::s_dof{0, 1, 4, 5, 8, 9, 12, 13};
 const uvec PCPE4DC::f_dof{2, 3, 6, 7, 10, 11, 14, 15};
 
 PCPE4DC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
+    , m_material(std::move(M))
     , strain_mat(3, 2llu * m_node, fill::zeros) {}
 
 PCPE4DC::PCPE4DC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN, const double KK)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{MS, MF}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false)
     , alpha(AL)
     , porosity(NN)
     , k(KK) {}

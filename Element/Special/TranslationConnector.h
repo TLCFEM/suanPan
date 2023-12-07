@@ -63,13 +63,13 @@ public:
 class TranslationConnector2D final : public TranslationConnector {
 public:
     TranslationConnector2D(const unsigned T, uvec&& N, const double P)
-        : TranslationConnector(T, std::forward<uvec>(N), 2u, P) {}
+        : TranslationConnector(T, std::move(N), 2u, P) {}
 };
 
 class TranslationConnector3D final : public TranslationConnector {
 public:
     TranslationConnector3D(const unsigned T, uvec&& N, const double P)
-        : TranslationConnector(T, std::forward<uvec>(N), 3u, P) {}
+        : TranslationConnector(T, std::move(N), 3u, P) {}
 };
 
 #endif

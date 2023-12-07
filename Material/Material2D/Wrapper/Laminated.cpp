@@ -20,7 +20,7 @@
 
 Laminated::Laminated(const unsigned T, uvec&& MT)
     : Material2D(T, PlaneType::S, 0.)
-    , mat_tag(std::forward<uvec>(MT)) {}
+    , mat_tag(std::move(MT)) {}
 
 int Laminated::initialize(const shared_ptr<DomainBase>& D) {
     auto& t_density = access::rw(density);

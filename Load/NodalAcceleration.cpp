@@ -24,10 +24,10 @@ NodalAcceleration::NodalAcceleration(const unsigned T, const unsigned ST, const 
     : Load(T, ST, AT, {}, uvec{DT}, L) {}
 
 NodalAcceleration::NodalAcceleration(const unsigned T, const unsigned ST, const double L, uvec&& DT, const unsigned AT)
-    : Load(T, ST, AT, {}, std::forward<uvec>(DT), L) {}
+    : Load(T, ST, AT, {}, std::move(DT), L) {}
 
 NodalAcceleration::NodalAcceleration(const unsigned T, const unsigned ST, const double L, uvec&& NT, const unsigned DT, const unsigned AT)
-    : Load(T, ST, AT, std::forward<uvec>(NT), uvec{DT}, L) {}
+    : Load(T, ST, AT, std::move(NT), uvec{DT}, L) {}
 
 int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();

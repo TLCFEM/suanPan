@@ -40,7 +40,7 @@ MultilinearJ2::MultilinearJ2(const unsigned T, const double E, const double V, m
 
     for(unsigned I = 0; I < H.n_rows - 1; ++I) H(I, 2) = (H(I + 1llu, 1) - H(I, 1)) / (H(I + 1llu, 0) - H(I, 0));
 
-    access::rw(backbone) = std::forward<mat>(H);
+    access::rw(backbone) = std::move(H);
 }
 
 unique_ptr<Material> MultilinearJ2::get_copy() { return make_unique<MultilinearJ2>(*this); }

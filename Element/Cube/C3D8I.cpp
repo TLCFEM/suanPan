@@ -23,15 +23,15 @@
 #include <Toolbox/shape.h>
 
 C3D8I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , c_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxyz(std::forward<mat>(P))
+    , c_material(std::move(M))
+    , pn_pxyz(std::move(P))
     , B1(6, c_size, fill::zeros)
     , B2(6, 9, fill::zeros) {}
 
 C3D8I::C3D8I(const unsigned T, uvec&& N, const unsigned M)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false) {}
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false) {}
 
 int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));

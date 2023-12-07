@@ -22,7 +22,7 @@
 
 WilsonPenzienNewmark::WilsonPenzienNewmark(const unsigned T, vec&& DR, const double A, const double B)
     : Newmark(T, A, B)
-    , damping_ratio(std::forward<vec>(DR)) {}
+    , damping_ratio(std::move(DR)) {}
 
 int WilsonPenzienNewmark::initialize() {
     if(SUANPAN_SUCCESS != Newmark::initialize()) return SUANPAN_FAIL;
@@ -101,7 +101,7 @@ int WilsonPenzienNewmark::solve(mat& X, const sp_mat& B) {
 int WilsonPenzienNewmark::solve(mat& X, mat&& B) {
     mat left, right;
 
-    if(SUANPAN_SUCCESS != Newmark::solve(X, std::forward<mat>(B))) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != Newmark::solve(X, std::move(B))) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != Newmark::solve(left, theta)) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != Newmark::solve(right, theta * arma::solve(theta.t() * left + diagmat(1. / C1 / beta), theta.t() * X))) return SUANPAN_FAIL;
 
@@ -113,7 +113,7 @@ int WilsonPenzienNewmark::solve(mat& X, mat&& B) {
 int WilsonPenzienNewmark::solve(mat& X, sp_mat&& B) {
     mat left, right;
 
-    if(SUANPAN_SUCCESS != Newmark::solve(X, std::forward<sp_mat>(B))) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != Newmark::solve(X, std::move(B))) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != Newmark::solve(left, theta)) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != Newmark::solve(right, theta * arma::solve(theta.t() * left + diagmat(1. / C1 / beta), theta.t() * X))) return SUANPAN_FAIL;
 

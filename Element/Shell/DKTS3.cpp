@@ -26,7 +26,7 @@
 DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
     , factor(F)
-    , s_material(std::forward<unique_ptr<Material>>(M)) {}
+    , s_material(std::move(M)) {}
 
 DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
@@ -34,7 +34,7 @@ DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const 
     , s_material(old_obj.s_material == nullptr ? nullptr : old_obj.s_material->get_copy()) {}
 
 DKTS3::IntegrationPoint::IntegrationPoint(vec&& C)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , BM(3, s_size / 2)
     , BP(3, s_size / 2) {}
 
@@ -124,7 +124,7 @@ field<mat> DKTS3::form_transform(const mat& C) {
 }
 
 DKTS3::DKTS3(const unsigned T, uvec&& N, const unsigned M, const double TH, const unsigned IP, const bool NL)
-    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , thickness(TH)
     , num_ip(IP > 20 ? 20 : IP) {}
 

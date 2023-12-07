@@ -80,5 +80,5 @@ mat SurfaceNM3D::compute_ddsf(const vec& s, const vec& h) const {
 }
 
 SurfaceNM3D::SurfaceNM3D(const double CC, mat&& PS)
-    : para_set(PS.empty() ? mat{{1.15, 2., 0., 0.}, {1., 0., 2., 0.}, {1., 0., 0., 4.}, {3.67, 2., 2., 0.}, {3., 6., 0., 2.}, {4.65, 0., 4., 2.}} : std::forward<mat>(PS))
+    : para_set(PS.empty() ? mat{{1.15, 2., 0., 0.}, {1., 0., 2., 0.}, {1., 0., 0., 4.}, {3.67, 2., 2., 0.}, {3., 6., 0., 2.}, {4.65, 0., 4., 2.}} : std::move(PS))
     , c(CC) {}

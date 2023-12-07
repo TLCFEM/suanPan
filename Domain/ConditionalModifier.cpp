@@ -50,8 +50,8 @@ ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, co
     : Tag(T)
     , start_step(std::max(1u, ST))
     , amplitude_tag(AT)
-    , node_encoding(std::forward<uvec>(N))
-    , dof_reference(std::forward<uvec>(D) - 1) {}
+    , node_encoding(std::move(N))
+    , dof_reference(D - 1) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     if(0 == amplitude_tag) magnitude = make_shared<Ramp>(0);

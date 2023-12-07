@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 
 SectionShell::SectionShell(const unsigned T, const unsigned MT, vec&& E)
-    : SectionShellData{MT, std::forward<vec>(E)}
+    : SectionShellData{MT, std::move(E)}
     , Tag(T) {}
 
 void SectionShell::set_initialized(const bool T) const { access::rw(initialized) = T; }

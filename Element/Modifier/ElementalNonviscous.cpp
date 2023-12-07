@@ -20,9 +20,9 @@
 #include <Domain/Group/Group.h>
 
 ElementalNonviscous::ElementalNonviscous(const unsigned T, cx_vec&& M, cx_vec&& S, uvec&& ET)
-    : Modifier(T, std::forward<uvec>(ET))
-    , m(std::forward<cx_vec>(M))
-    , s(std::forward<cx_vec>(S)) {}
+    : Modifier(T, std::move(ET))
+    , m(std::move(M))
+    , s(std::move(S)) {}
 
 int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
     Modifier::initialize(D);
@@ -68,7 +68,7 @@ int ElementalNonviscous::update_status() {
 }
 
 ElementalNonviscousGroup::ElementalNonviscousGroup(const unsigned T, cx_vec&& M, cx_vec&& S, const unsigned GT)
-    : ElementalNonviscous(T, std::forward<cx_vec>(M), std::forward<cx_vec>(S))
+    : ElementalNonviscous(T, std::move(M), std::move(S))
     , group_tag(GT) {}
 
 int ElementalNonviscousGroup::initialize(const shared_ptr<DomainBase>& D) {

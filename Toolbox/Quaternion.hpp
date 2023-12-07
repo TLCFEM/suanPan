@@ -98,7 +98,7 @@ template<typename T> Quaternion<T>::Quaternion(const T R, const Col<T>& I)
 
 template<typename T> Quaternion<T>::Quaternion(const T R, Col<T>&& I)
     : re(R)
-    , im(std::forward<Col<T>>(I)) {}
+    , im(std::move(I)) {}
 
 template<typename T> const T& Quaternion<T>::real() const { return re; }
 

@@ -250,13 +250,13 @@ mat Integrator::solve(const sp_mat& B) {
 
 mat Integrator::solve(mat&& B) {
     mat X;
-    if(solve(X, std::forward<mat>(B)) != SUANPAN_SUCCESS) X.reset();
+    if(solve(X, std::move(B)) != SUANPAN_SUCCESS) X.reset();
     return X;
 }
 
 mat Integrator::solve(sp_mat&& B) {
     mat X;
-    if(solve(X, std::forward<sp_mat>(B)) != SUANPAN_SUCCESS) X.reset();
+    if(solve(X, std::move(B)) != SUANPAN_SUCCESS) X.reset();
     return X;
 }
 
@@ -264,9 +264,9 @@ int Integrator::solve(mat& X, const mat& B) { return database.lock()->get_factor
 
 int Integrator::solve(mat& X, const sp_mat& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, B); }
 
-int Integrator::solve(mat& X, mat&& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, std::forward<mat>(B)); }
+int Integrator::solve(mat& X, mat&& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B)); }
 
-int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, std::forward<sp_mat>(B)); }
+int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B)); }
 
 /**
  * Avoid machine error accumulation.
@@ -367,9 +367,9 @@ int ExplicitIntegrator::solve(mat& X, const mat& B) { return get_domain()->get_f
 
 int ExplicitIntegrator::solve(mat& X, const sp_mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }
 
-int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::forward<mat>(B)); }
+int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::move(B)); }
 
-int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::forward<sp_mat>(B)); }
+int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::move(B)); }
 
 vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw invalid_argument("support velocity cannot be used with explicit integrator"); }
 

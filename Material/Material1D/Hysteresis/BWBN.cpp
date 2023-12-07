@@ -18,7 +18,7 @@
 #include "BWBN.h"
 
 BWBN::BWBN(const unsigned T, vec&& P, const double R)
-    : DataBWBN{std::forward<vec>(P)}
+    : DataBWBN{std::move(P)}
     , Material1D(T, R) {}
 
 int BWBN::initialize(const shared_ptr<DomainBase>&) {

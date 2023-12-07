@@ -23,10 +23,10 @@
 #include <Toolbox/utility.h>
 
 CINP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& PNPXY)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(PNPXY))
+    , m_material(std::move(M))
+    , pn_pxy(std::move(PNPXY))
     , strain_mat(3, m_size, fill::zeros) {}
 
 mat CINP4::compute_mapping(const vec& XY) {
@@ -262,7 +262,7 @@ void CINP4::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) 
 }
 
 CINP4::CINP4(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int CINP4::initialize(const shared_ptr<DomainBase>& D) {

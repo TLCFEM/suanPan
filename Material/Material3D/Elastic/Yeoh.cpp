@@ -63,7 +63,7 @@ vec Yeoh::compute_derivative(const double J1M3, const double J3M1) const {
 }
 
 Yeoh::Yeoh(const unsigned T, vec&& CC, vec&& KK, const double R)
-    : DataYeoh{std::forward<vec>(CC), std::forward<vec>(KK)}
+    : DataYeoh{std::move(CC), std::move(KK)}
     , Material3D(T, R) {}
 
 int Yeoh::initialize(const shared_ptr<DomainBase>&) {

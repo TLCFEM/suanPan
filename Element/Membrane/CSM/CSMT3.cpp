@@ -24,12 +24,12 @@ const uvec CSMT3::t_dof{0, 1, 3, 4, 6, 7};
 const uvec CSMT3::r_dof{2, 5, 8};
 
 CSMT3::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<rowvec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M)) {}
+    , m_material(std::move(M)) {}
 
 CSMT3::CSMT3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMT3::initialize(const shared_ptr<DomainBase>& D) {

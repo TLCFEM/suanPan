@@ -35,6 +35,6 @@ vec TableGurson::compute_hardening(const double plastic_strain) const {
 
 TableGurson::TableGurson(const unsigned T, const double E, const double V, mat&& HARDEN, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
     : NonlinearGurson(T, E, V, Q1, Q2, FN, SN, EN, R)
-    , hardening_table(std::forward<mat>(HARDEN)) {}
+    , hardening_table(std::move(HARDEN)) {}
 
 unique_ptr<Material> TableGurson::get_copy() { return make_unique<TableGurson>(*this); }

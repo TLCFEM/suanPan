@@ -18,7 +18,7 @@
 #include "LinearViscosity.h"
 
 LinearViscosity::LinearViscosity(const unsigned T, const double M, uvec&& ET)
-    : Modifier(T, std::forward<uvec>(ET))
+    : Modifier(T, std::move(ET))
     , mu{M} {}
 
 int LinearViscosity::update_status() {

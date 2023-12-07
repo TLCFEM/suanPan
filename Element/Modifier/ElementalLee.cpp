@@ -18,7 +18,7 @@
 #include "ElementalLee.h"
 
 ElementalLee::ElementalLee(const unsigned T, const double A, uvec&& ET)
-    : Modifier(T, std::forward<uvec>(ET))
+    : Modifier(T, std::move(ET))
     , damping_ratio(std::abs(A)) {}
 
 int ElementalLee::update_status() {

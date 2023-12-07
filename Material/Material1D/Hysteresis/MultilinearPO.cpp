@@ -80,7 +80,7 @@ podarray<double> MultilinearPO::compute_compression_backbone(const double t_stra
 }
 
 MultilinearPO::MultilinearPO(const int T, mat&& TB, mat&& CB, const double R)
-    : DataMultilinearPO{std::forward<mat>(TB), std::forward<mat>(CB)}
+    : DataMultilinearPO{std::move(TB), std::move(CB)}
     , PeakOriented(T, R) {}
 
 int MultilinearPO::initialize(const shared_ptr<DomainBase>&) {

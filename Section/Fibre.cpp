@@ -20,7 +20,7 @@
 
 Fibre::Fibre(const unsigned T, uvec&& FT, const SectionType ST)
     : Section(T, ST, 0)
-    , fibre_tag(std::forward<uvec>(FT)) {}
+    , fibre_tag(std::move(FT)) {}
 
 int Fibre::initialize(const shared_ptr<DomainBase>& D) {
     fibre.clear();

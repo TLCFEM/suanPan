@@ -21,7 +21,7 @@
 #include <sstream>
 
 Converter::Converter(std::string&& OP)
-    : output_path(std::forward<string>(OP)) {}
+    : output_path(std::move(OP)) {}
 
 int Converter::process(std::ifstream& input_file, std::ofstream& output_file) {
     output_file.setf(std::ios::scientific);

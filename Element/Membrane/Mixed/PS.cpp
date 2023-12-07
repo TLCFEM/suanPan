@@ -23,9 +23,9 @@
 #include <Toolbox/utility.h>
 
 PS::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M)) {}
+    , m_material(std::move(M)) {}
 
 mat PS::form_transformation(const mat& jacobian) {
     mat trans_mat(3, 3);
@@ -46,7 +46,7 @@ mat PS::form_transformation(const mat& jacobian) {
 }
 
 PS::PS(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int PS::initialize(const shared_ptr<DomainBase>& D) {

@@ -23,10 +23,10 @@
 #include <Toolbox/utility.h>
 
 CP4I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(P))
+    , m_material(std::move(M))
+    , pn_pxy(std::move(P))
     , B1(3, m_size, fill::zeros)
     , B2(3, 4, fill::zeros) {
     for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
@@ -240,7 +240,7 @@ void CP4I::stack_stiffness_incompatible(mat& K, const mat& D, const mat& N, cons
 }
 
 CP4I::CP4I(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int CP4I::initialize(const shared_ptr<DomainBase>& D) {

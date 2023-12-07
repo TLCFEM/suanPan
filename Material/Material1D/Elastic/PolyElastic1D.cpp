@@ -18,7 +18,7 @@
 #include "PolyElastic1D.h"
 
 PolyElastic1D::PolyElastic1D(const unsigned T, vec&& P, const double R)
-    : DataPolyElastic1D{std::forward<vec>(P)}
+    : DataPolyElastic1D{std::move(P)}
     , Material1D(T, R) {}
 
 int PolyElastic1D::initialize(const shared_ptr<DomainBase>&) {

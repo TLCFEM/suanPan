@@ -21,7 +21,7 @@
 Sequential::Sequential(const unsigned T, uvec&& MT)
     : Material1D(T, 0.)
     , mat_size(MT.n_elem - 1)
-    , mat_tag(std::forward<uvec>(MT)) {}
+    , mat_tag(std::move(MT)) {}
 
 int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     auto& t_density = access::rw(density);

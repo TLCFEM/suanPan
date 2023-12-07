@@ -2270,7 +2270,7 @@ namespace Catch {
 
     ColourImpl::ColourGuard::ColourGuard(Colour::Code code, ColourImpl const* colour)
         : m_colourImpl(colour)
-        , m_code(code) { }
+        , m_code(code) {}
 
     ColourImpl::ColourGuard::ColourGuard(ColourGuard&& rhs) noexcept
         : m_colourImpl(rhs.m_colourImpl)
@@ -2758,7 +2758,7 @@ namespace Catch {
         }
     }
 
-    ExceptionTranslatorRegistry::~ExceptionTranslatorRegistry() { }
+    ExceptionTranslatorRegistry::~ExceptionTranslatorRegistry() {}
 
     void ExceptionTranslatorRegistry::registerTranslator(Detail::unique_ptr<IExceptionTranslator>&& translator) { m_translators.push_back(CATCH_MOVE(translator)); }
 
@@ -3995,7 +3995,7 @@ namespace Catch {
         }
         else if(!result.succeeded()) {
             m_lastAssertionPassed = false;
-            if(result.isOk()) { }
+            if(result.isOk()) {}
             else if(m_activeTestCase->getTestCaseInfo().okToFail()) m_totals.assertions.failedButOk++;
             else m_totals.assertions.failed++;
         }
@@ -5879,7 +5879,7 @@ namespace Catch {
 
         StringMatcherBase::StringMatcherBase(StringRef operation, CasedString const& comparator)
             : m_comparator(comparator)
-            , m_operation(operation) { }
+            , m_operation(operation) {}
 
         std::string StringMatcherBase::describe() const {
             std::string description;
@@ -7913,7 +7913,7 @@ namespace Catch {
         }
     }
 
-    void XmlReporter::assertionStarting(AssertionInfo const&) { }
+    void XmlReporter::assertionStarting(AssertionInfo const&) {}
 
     void XmlReporter::assertionEnded(AssertionStats const& assertionStats) {
         AssertionResult const& result = assertionStats.assertionResult;

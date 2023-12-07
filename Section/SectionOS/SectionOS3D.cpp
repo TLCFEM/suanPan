@@ -31,10 +31,10 @@ SectionOS3D::IntegrationPoint::IntegrationPoint(const double CS, const double PY
     , py(PY)
     , pz(PZ)
     , weight(W)
-    , s_material(std::forward<unique_ptr<Material>>(M)) {}
+    , s_material(std::move(M)) {}
 
 SectionOS3D::SectionOS3D(const unsigned T, const unsigned MT, const double A, vec&& E)
-    : Section(T, SectionType::OS3D, MT, A, std::forward<vec>(E)) {}
+    : Section(T, SectionType::OS3D, MT, A, std::move(E)) {}
 
 void SectionOS3D::set_characteristic_length(const double L) const {
     Section::set_characteristic_length(L);

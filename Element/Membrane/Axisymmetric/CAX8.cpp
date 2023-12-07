@@ -23,9 +23,9 @@
 #include <Toolbox/shape.h>
 
 CAX8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
+    , m_material(std::move(M))
     , strain_mat(4, m_size, fill::zeros) {}
 
 vec CAX8::isoparametric_mapping(const vec& in) {
@@ -46,7 +46,7 @@ vec CAX8::isoparametric_mapping(const vec& in) {
 }
 
 CAX8::CAX8(const unsigned T, uvec&& N, const unsigned M, const bool R, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F)
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F)
     , reduced_scheme(R) {}
 
 int CAX8::initialize(const shared_ptr<DomainBase>& D) {

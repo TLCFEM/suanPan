@@ -22,7 +22,7 @@
 #include <Load/Amplitude/Amplitude.h>
 
 LineUDL::LineUDL(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned DT, const unsigned AT, const uword D)
-    : Load(T, S, AT, std::forward<uvec>(N), uvec{DT}, L)
+    : Load(T, S, AT, std::move(N), uvec{DT}, L)
     , dimension(D) {}
 
 int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
@@ -34,7 +34,7 @@ int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 LineUDL2D::LineUDL2D(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned DT, const unsigned AT)
-    : LineUDL(T, S, L, std::forward<uvec>(N), DT, AT, 2llu) {}
+    : LineUDL(T, S, L, std::move(N), DT, AT, 2llu) {}
 
 int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();
@@ -67,7 +67,7 @@ int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
 }
 
 LineUDL3D::LineUDL3D(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned DT, const unsigned AT)
-    : LineUDL(T, S, L, std::forward<uvec>(N), DT, AT, 3llu) {}
+    : LineUDL(T, S, L, std::move(N), DT, AT, 3llu) {}
 
 int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();

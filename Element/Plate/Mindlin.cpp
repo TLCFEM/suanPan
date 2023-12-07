@@ -26,7 +26,7 @@
 Mindlin::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
     , factor(F)
-    , p_material(std::forward<unique_ptr<Material>>(M)) {}
+    , p_material(std::move(M)) {}
 
 Mindlin::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
@@ -34,11 +34,11 @@ Mindlin::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(cons
     , p_material(old_obj.p_material->get_copy()) {}
 
 Mindlin::IntegrationPoint::IntegrationPoint(vec&& C)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , strain_mat(3, p_size, fill::zeros) {}
 
 Mindlin::Mindlin(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const unsigned IPN)
-    : MaterialElement2D(T, p_node, p_dof, std::forward<uvec>(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, p_node, p_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , thickness(TH)
     , num_section_ip(IPN) {}
 

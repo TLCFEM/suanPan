@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 
 UniversalOS::UniversalOS(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA, uvec&& FB)
-    : StressWrapper(T, BT, MI, std::forward<uvec>(FA), std::forward<uvec>(FB), MaterialType::OS) {}
+    : StressWrapper(T, BT, MI, std::move(FA), std::move(FB), MaterialType::OS) {}
 
 void UniversalOS::print() {
     suanpan_info("An open section material wrapper.\n");

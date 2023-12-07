@@ -20,7 +20,7 @@
 Sine::Sine(const unsigned T, const double L, std::vector<double>&& AA, const unsigned ST)
     : Amplitude(T, ST)
     , period(.5 * L)
-    , amp(std::forward<std::vector<double>>(AA)) {}
+    , amp(std::move(AA)) {}
 
 double Sine::get_amplitude(const double T) {
     const auto step_time = T - start_time;

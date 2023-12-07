@@ -27,12 +27,12 @@ const uvec CSMT6::t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13, 15, 16};
 const uvec CSMT6::r_dof{2, 5, 8, 11, 14, 17};
 
 CSMT6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M)) {}
+    , m_material(std::move(M)) {}
 
 CSMT6::CSMT6(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMT6::initialize(const shared_ptr<DomainBase>& D) {

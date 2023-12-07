@@ -62,7 +62,7 @@ podarray<double> MultilinearOO::compute_compression_backbone(const double t_stra
 }
 
 MultilinearOO::MultilinearOO(const int T, mat&& TB, mat&& CB, const double R)
-    : DataMultilinearOO{std::forward<mat>(TB), std::forward<mat>(CB)}
+    : DataMultilinearOO{std::move(TB), std::move(CB)}
     , OriginOriented(T, R) {}
 
 int MultilinearOO::initialize(const shared_ptr<DomainBase>&) {

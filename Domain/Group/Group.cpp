@@ -22,7 +22,7 @@ Group::Group(const unsigned T)
 
 Group::Group(const unsigned T, uvec&& R)
     : Tag(T)
-    , pool(std::forward<uvec>(R)) {}
+    , pool(std::move(R)) {}
 
 void Group::initialize(const shared_ptr<DomainBase>&) {}
 

@@ -21,7 +21,7 @@
 #include <Domain/Node.h>
 
 FixedLength::FixedLength(const unsigned T, const unsigned S, const unsigned D, uvec&& N)
-    : Constraint(T, S, 0, std::forward<uvec>(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1) { set_connected(true); }
+    : Constraint(T, S, 0, std::move(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1) { set_connected(true); }
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
     dof_encoding = get_nodal_active_dof(D);
@@ -98,19 +98,19 @@ void FixedLength::reset_status() {
 }
 
 MinimumGap::MinimumGap(const unsigned T, const unsigned S, const unsigned D, const double M, uvec&& N)
-    : FixedLength(T, S, D, std::forward<uvec>(N)) {
+    : FixedLength(T, S, D, std::move(N)) {
     access::rw(min_bound) = true;
     access::rw(min_gap) = M * M;
 }
 
 MaximumGap::MaximumGap(const unsigned T, const unsigned S, const unsigned D, const double M, uvec&& N)
-    : FixedLength(T, S, D, std::forward<uvec>(N)) {
+    : FixedLength(T, S, D, std::move(N)) {
     access::rw(max_bound) = true;
     access::rw(max_gap) = M * M;
 }
 
 Sleeve::Sleeve(const unsigned T, const unsigned S, const unsigned D, const double M1, const double M2, uvec&& N)
-    : FixedLength(T, S, D, std::forward<uvec>(N)) {
+    : FixedLength(T, S, D, std::move(N)) {
     access::rw(min_bound) = true;
     access::rw(max_bound) = true;
     access::rw(min_gap) = M1 * M1;

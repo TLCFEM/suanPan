@@ -23,7 +23,7 @@ exprtk::parser<double> Expression::parser; // NOLINT(cppcoreguidelines-interface
 
 Expression::Expression(const unsigned tag, std::vector<std::string>&& variable_string)
     : Tag(tag)
-    , variable_text_list(std::forward<std::vector<std::string>>(variable_string)) {
+    , variable_text_list(std::move(variable_string)) {
     symbol_table.add_constants();
 
     const auto variable_list = suanpan::expression::split(variable_text_list[0]);

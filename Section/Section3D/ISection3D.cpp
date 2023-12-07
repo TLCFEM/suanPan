@@ -21,7 +21,7 @@
 #include <Toolbox/IntegrationPlan.h>
 
 ISection3D::ISection3D(const unsigned T, const double TFW, const double TFT, const double BFW, const double BFT, const double WH, const double WT, const unsigned MT, const unsigned IP, vec&& EC)
-    : Section3D(T, MT, TFW * TFT + BFW * BFT + WH * WT, std::forward<vec>(EC))
+    : Section3D(T, MT, TFW * TFT + BFW * BFT + WH * WT, std::move(EC))
     , top_flange_width(TFW)
     , top_flange_thickness(TFT)
     , bottom_flange_width(BFW)
@@ -31,7 +31,7 @@ ISection3D::ISection3D(const unsigned T, const double TFW, const double TFT, con
     , int_pt_num(IP > 20 ? 20 : IP) {}
 
 ISection3D::ISection3D(const unsigned T, vec&& D, const unsigned MT, const unsigned IP, vec&& EC)
-    : Section3D(T, MT, D(0) * D(1) + D(2) * D(3) + D(4) * D(5), std::forward<vec>(EC))
+    : Section3D(T, MT, D(0) * D(1) + D(2) * D(3) + D(4) * D(5), std::move(EC))
     , top_flange_width(D(0))
     , top_flange_thickness(D(1))
     , bottom_flange_width(D(2))

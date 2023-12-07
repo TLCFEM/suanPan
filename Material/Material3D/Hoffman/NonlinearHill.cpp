@@ -18,4 +18,4 @@
 #include "NonlinearHill.h"
 
 NonlinearHill::NonlinearHill(const unsigned T, vec&& EE, vec&& VV, vec&& S, const double R)
-    : NonlinearHoffman(T, std::forward<vec>(EE), std::forward<vec>(VV), vec{S(0), S(0), S(1), S(1), S(2), S(2), S(3), S(4), S(5)}, R) {}
+    : NonlinearHoffman(T, std::move(EE), std::move(VV), vec{S(0), S(0), S(1), S(1), S(2), S(2), S(3), S(4), S(5)}, R) {}

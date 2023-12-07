@@ -41,7 +41,7 @@ MultilinearMises1D::MultilinearMises1D(const unsigned T, const double E, mat&& H
 
     for(uword I = 0; I < H.n_rows - 1; ++I) H(I, 2) = (H(I + 1, 1) - H(I, 1)) / (H(I + 1, 0) - H(I, 0));
 
-    access::rw(backbone) = std::forward<mat>(H);
+    access::rw(backbone) = std::move(H);
 }
 
 unique_ptr<Material> MultilinearMises1D::get_copy() { return make_unique<MultilinearMises1D>(*this); }

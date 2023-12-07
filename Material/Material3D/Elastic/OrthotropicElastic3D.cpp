@@ -20,8 +20,8 @@
 
 OrthotropicElastic3D::OrthotropicElastic3D(const unsigned T, vec&& E, vec&& P, const double R)
     : Material3D(T, R)
-    , modulus(std::forward<vec>(E))
-    , poissons_ratio(std::forward<vec>(P)) {}
+    , modulus(std::move(E))
+    , poissons_ratio(std::move(P)) {}
 
 int OrthotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
     initial_stiffness = tensor::orthotropic_stiffness(modulus, poissons_ratio);

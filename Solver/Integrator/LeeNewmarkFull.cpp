@@ -319,7 +319,7 @@ void LeeNewmarkFull::assemble_by_mode_four(uword& current_pos, const double mass
 
 LeeNewmarkFull::LeeNewmarkFull(const unsigned T, std::vector<Mode>&& M, const double A, const double B, const StiffnessType ST)
     : LeeNewmarkBase(T, A, B, ST)
-    , damping_mode(std::forward<std::vector<Mode>>(M)) {
+    , damping_mode(std::move(M)) {
     for(auto& [t, p, zeta, omega] : damping_mode)
         switch(t) {
         case Type::T0:

@@ -21,8 +21,8 @@
 
 NonviscousNewmark::NonviscousNewmark(const unsigned T, const double A, const double B, cx_vec&& M, cx_vec&& S)
     : Newmark(T, A, B)
-    , m(std::forward<cx_vec>(M))
-    , s(std::forward<cx_vec>(S)) {}
+    , m(std::move(M))
+    , s(std::move(S)) {}
 
 int NonviscousNewmark::initialize() {
     auto& W = get_domain()->get_factory();

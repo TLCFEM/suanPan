@@ -43,7 +43,7 @@
  * simple as this.
  */
 ElementTemplate::ElementTemplate(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false)
     , thickness(TH) {}
 
 /**

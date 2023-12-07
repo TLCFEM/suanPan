@@ -23,12 +23,12 @@
 #include <Toolbox/utility.h>
 
 PatchQuad::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M)) {}
+    , m_material(std::move(M)) {}
 
 PatchQuad::PatchQuad(const unsigned T, vec&& KX, vec&& KY, uvec&& N, const unsigned M, const double TH)
-    : MaterialPatch2D(T, m_dof, std::forward<uvec>(N), uvec{M}, {KX, KY}, false)
+    : MaterialPatch2D(T, m_dof, std::move(N), uvec{M}, {KX, KY}, false)
     , m_node(static_cast<unsigned>(node_encoding.n_elem))
     , m_size(m_node * m_dof)
     , thickness(TH) {}

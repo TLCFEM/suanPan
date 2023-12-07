@@ -27,7 +27,7 @@ Node::Node(const unsigned T)
 Node::Node(const unsigned T, vec&& C)
     : Tag(T) {
     num_dof = static_cast<unsigned>(C.n_elem);
-    coordinate = std::forward<vec>(C);
+    coordinate = std::move(C);
 }
 
 /**
@@ -50,7 +50,7 @@ Node::Node(const unsigned T, const unsigned D)
 Node::Node(const unsigned T, const unsigned D, vec&& C)
     : Tag(T) {
     num_dof = D;
-    coordinate = std::forward<vec>(C);
+    coordinate = std::move(C);
 }
 
 /**

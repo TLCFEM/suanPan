@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 ReferenceForce::ReferenceForce(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned D)
-    : Load(T, S, 0, std::forward<uvec>(N), uvec{D}, L) {}
+    : Load(T, S, 0, std::move(N), uvec{D}, L) {}
 
 int ReferenceForce::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();

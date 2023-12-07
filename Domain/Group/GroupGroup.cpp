@@ -21,7 +21,7 @@
 
 GroupGroup::GroupGroup(const unsigned T, uvec&& GT)
     : Group(T)
-    , group_tag(std::forward<uvec>(GT)) {}
+    , group_tag(std::move(GT)) {}
 
 void GroupGroup::initialize(const shared_ptr<DomainBase>& D) {
     uword size = 0;

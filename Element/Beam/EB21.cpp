@@ -22,7 +22,7 @@
 #include <Recorder/OutputType.h>
 
 EB21::EB21(const unsigned T, uvec&& N, const double A, const double I, const unsigned M, const bool F)
-    : MaterialElement1D(T, b_node, b_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement1D(T, b_node, b_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::UR3})
     , area(A)
     , moment_inertia(I)
     , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
