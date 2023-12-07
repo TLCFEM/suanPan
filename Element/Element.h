@@ -120,8 +120,8 @@ class Element : protected DataElement, public ElementBase {
     const bool use_group = false;
     const unsigned use_other = 0;
 
-    const MaterialType mat_type;
-    const SectionType sec_type;
+    const MaterialType material_type;
+    const SectionType section_type;
 
     const std::vector<DOF> dof_identifier;
 

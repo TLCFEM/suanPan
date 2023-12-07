@@ -259,8 +259,8 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
-    , mat_type(MTP)
-    , sec_type(SectionType::D0)
+    , material_type(MTP)
+    , section_type(SectionType::D0)
     , dof_identifier(std::move(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
@@ -268,8 +268,8 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
-    , mat_type(MaterialType::D0)
-    , sec_type(STP)
+    , material_type(MaterialType::D0)
+    , section_type(STP)
     , dof_identifier(std::move(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
 
 // for contact elements that use node groups
@@ -279,8 +279,8 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
     , use_group(true)
-    , mat_type(MaterialType::D0)
-    , sec_type(SectionType::D0) {}
+    , material_type(MaterialType::D0)
+    , section_type(SectionType::D0) {}
 
 // for elements that use other elements
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
@@ -289,8 +289,8 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
     , use_other(ET)
-    , mat_type(MaterialType::D0)
-    , sec_type(SectionType::D0) {}
+    , material_type(MaterialType::D0)
+    , section_type(SectionType::D0) {}
 
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity
@@ -358,17 +358,17 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     for(auto& I : node_ptr) if(I.lock()->get_dof_number() < num_dof) I.lock()->set_dof_number(num_dof);
 
     // check if material models are valid
-    if(MaterialType::D0 != mat_type)
+    if(MaterialType::D0 != material_type)
         for(const auto& t_tag : material_tag)
-            if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != mat_type) {
+            if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != material_type) {
                 suanpan_warning("Element {} disabled as material {} cannot be found or type mismatch.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
 
     // check if section models are valid
-    if(SectionType::D0 != sec_type)
+    if(SectionType::D0 != section_type)
         for(const auto& t_tag : section_tag)
-            if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != sec_type) {
+            if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != section_type) {
                 suanpan_warning("Element {} disabled as section {} cannot be found or type mismatch.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
