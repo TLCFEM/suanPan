@@ -359,7 +359,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
 
     // check if material models are valid
     if(MaterialType::D0 != material_type)
-        for(const auto& t_tag : material_tag)
+        for(const auto t_tag : material_tag)
             if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != material_type) {
                 suanpan_warning("Element {} disabled as material {} cannot be found or type mismatch.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
@@ -367,7 +367,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
 
     // check if section models are valid
     if(SectionType::D0 != section_type)
-        for(const auto& t_tag : section_tag)
+        for(const auto t_tag : section_tag)
             if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != section_type) {
                 suanpan_warning("Element {} disabled as section {} cannot be found or type mismatch.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
