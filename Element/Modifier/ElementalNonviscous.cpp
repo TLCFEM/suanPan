@@ -20,12 +20,12 @@
 #include <Domain/Group/Group.h>
 
 ElementalNonviscous::ElementalNonviscous(const unsigned T, cx_vec&& M, cx_vec&& S, uvec&& ET)
-    : Modifier(T, std::move(ET))
-    , m(std::move(M))
-    , s(std::move(S)) {}
+    : ModifierDynamics(T, std::move(ET))
+      , m(std::move(M))
+      , s(std::move(S)) {}
 
 int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
-    Modifier::initialize(D);
+    ModifierDynamics::initialize(D);
 
     factory = D->get_factory();
 
@@ -44,7 +44,8 @@ int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int ElementalNonviscous::update_status() {
-    if(element_pool.empty() || AnalysisType::DYNAMICS != factory.lock()->get_analysis_type()) return SUANPAN_SUCCESS;
+    // shortcircuit as computing complex parameters is expensive
+    if(element_pool.empty()) return SUANPAN_SUCCESS;
 
     const cx_vec t_para = 2. / factory.lock()->get_incre_time() + s;
     const cx_vec s_para = (t_para - 2. * s) / t_para;

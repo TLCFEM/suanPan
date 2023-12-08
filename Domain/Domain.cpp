@@ -1220,7 +1220,7 @@ int Domain::process_criterion() {
 int Domain::process_modifier() {
     auto code = 0;
     // use sequential for_each only
-    for(auto& I : modifier_pond.get()) code += I->update_status();
+    for(auto& I : modifier_pond.get()) if(I->if_apply(shared_from_this())) code += I->update_status();
     return code;
 }
 

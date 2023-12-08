@@ -18,8 +18,8 @@
 #include "LinearViscosity.h"
 
 LinearViscosity::LinearViscosity(const unsigned T, const double M, uvec&& ET)
-    : Modifier(T, std::move(ET))
-    , mu{M} {}
+    : ModifierDynamics(T, std::move(ET))
+      , mu{M} {}
 
 int LinearViscosity::update_status() {
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {

@@ -31,7 +31,7 @@
 #include <Element/Modifier/Modifier.h>
 #include <Domain/Factory.hpp>
 
-class ElementalNonviscous : public Modifier {
+class ElementalNonviscous : public ModifierDynamics {
     const cx_vec m, s;
 
     weak_ptr<Factory<double>> factory;

@@ -55,8 +55,18 @@ public:
 
     virtual int initialize(const shared_ptr<DomainBase>&);
 
+    virtual bool if_apply(const shared_ptr<DomainBase>&);
+
     virtual int update_status() = 0;
 };
+
+class ModifierDynamics : public Modifier {
+public:
+    using Modifier::Modifier;
+
+    bool if_apply(const shared_ptr<DomainBase>&) override;
+};
+
 
 #endif
 

@@ -18,8 +18,8 @@
 #include "ElementalLee.h"
 
 ElementalLee::ElementalLee(const unsigned T, const double A, uvec&& ET)
-    : Modifier(T, std::move(ET))
-    , damping_ratio(std::abs(A)) {}
+    : ModifierDynamics(T, std::move(ET))
+      , damping_ratio(std::abs(A)) {}
 
 int ElementalLee::update_status() {
     const auto real_damping_ratio = damping_ratio < 0. ? default_damping_ratio : damping_ratio;

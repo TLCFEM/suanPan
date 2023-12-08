@@ -30,7 +30,7 @@
 
 #include <Element/Modifier/Modifier.h>
 
-class Rayleigh final : public Modifier {
+class Rayleigh final : public ModifierDynamics {
     const double a, b, c, d;
 
 public:

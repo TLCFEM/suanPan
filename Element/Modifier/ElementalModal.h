@@ -30,7 +30,7 @@
 
 #include <Element/Modifier/Modifier.h>
 
-class ElementalModal final : public Modifier {
+class ElementalModal final : public ModifierDynamics {
     const double cut_off_freq, damping;
 
 public:

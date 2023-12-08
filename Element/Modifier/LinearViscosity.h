@@ -30,7 +30,7 @@
 
 #include <Element/Modifier/Modifier.h>
 
-class LinearViscosity final : public Modifier {
+class LinearViscosity final : public ModifierDynamics {
     const double mu;
 
 public:
