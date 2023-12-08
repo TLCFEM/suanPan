@@ -19,10 +19,10 @@
 
 Rayleigh::Rayleigh(const unsigned T, const double A, const double B, const double C, const double D, uvec&& ET)
     : ModifierDynamics(T, std::move(ET))
-      , a(A)
-      , b(B)
-      , c(C)
-      , d(D) {}
+    , a(A)
+    , b(B)
+    , c(C)
+    , d(D) {}
 
 int Rayleigh::update_status() {
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {

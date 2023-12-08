@@ -21,8 +21,8 @@
 
 ElementalNonviscous::ElementalNonviscous(const unsigned T, cx_vec&& M, cx_vec&& S, uvec&& ET)
     : ModifierDynamics(T, std::move(ET))
-      , m(std::move(M))
-      , s(std::move(S)) {}
+    , m(std::move(M))
+    , s(std::move(S)) {}
 
 int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
     ModifierDynamics::initialize(D);

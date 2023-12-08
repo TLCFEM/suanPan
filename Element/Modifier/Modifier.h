@@ -67,7 +67,6 @@ public:
     bool if_apply(const shared_ptr<DomainBase>&) override;
 };
 
-
 #endif
 
 //! @}

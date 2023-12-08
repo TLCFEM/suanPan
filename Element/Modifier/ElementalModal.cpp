@@ -19,8 +19,8 @@
 
 ElementalModal::ElementalModal(const unsigned T, const double F, const double D, uvec&& ET)
     : ModifierDynamics(T, std::move(ET))
-      , cut_off_freq(F * F)
-      , damping(2. * D) {}
+    , cut_off_freq(F * F)
+    , damping(2. * D) {}
 
 int ElementalModal::update_status() {
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {

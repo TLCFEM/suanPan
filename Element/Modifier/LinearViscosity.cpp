@@ -19,7 +19,7 @@
 
 LinearViscosity::LinearViscosity(const unsigned T, const double M, uvec&& ET)
     : ModifierDynamics(T, std::move(ET))
-      , mu{M} {}
+    , mu{M} {}
 
 int LinearViscosity::update_status() {
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
