@@ -175,7 +175,7 @@ template<sp_d T> class Factory final {
     shared_ptr<MetaMat<T>> global_stiffness = nullptr;  // global stiffness matrix
     shared_ptr<MetaMat<T>> global_geometry = nullptr;   // global geometry matrix
 
-    std::vector<std::mutex> global_mutex = std::vector<std::mutex>(20);
+    std::vector<std::mutex> global_mutex{20};
 
     Col<T> eigenvalue; // eigenvalues
 

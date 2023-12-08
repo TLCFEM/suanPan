@@ -51,16 +51,16 @@ int ElementalNonviscous::update_status() {
     const cx_vec m_para = m / t_para;
     const auto accu_para = accu(m_para).real();
 
-    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
-        const auto t_ele = ele_ptr.lock();
+    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& t_ptr) {
+        const auto t_element = t_ptr.lock();
 
-        if(t_ele->get_current_nonviscous_force().n_cols != s_para.n_elem) return;
+        if(t_element->get_current_nonviscous_force().n_cols != s_para.n_elem) return;
 
-        auto& trial_nonviscous_force = access::rw(t_ele->get_trial_nonviscous_force());
-        trial_nonviscous_force = t_ele->get_current_nonviscous_force() * diagmat(s_para) + (t_ele->get_current_velocity() + t_ele->get_trial_velocity()) * m_para.t();
+        auto& trial_nonviscous_force = access::rw(t_element->get_trial_nonviscous_force());
+        trial_nonviscous_force = t_element->get_current_nonviscous_force() * diagmat(s_para) + (t_element->get_current_velocity() + t_element->get_trial_velocity()) * m_para.t();
 
-        auto& trial_nonviscous = access::rw(t_ele->get_trial_nonviscous());
-        trial_nonviscous.zeros(t_ele->get_total_number(), t_ele->get_total_number());
+        auto& trial_nonviscous = access::rw(t_element->get_trial_nonviscous());
+        trial_nonviscous.zeros(t_element->get_total_number(), t_element->get_total_number());
         trial_nonviscous.diag().fill(accu_para);
     });
 

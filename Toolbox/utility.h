@@ -18,8 +18,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <concepts>
 #include <suanPan.h>
+#include <concepts>
 #ifdef __cpp_lib_execution
 #include <execution>
 #endif
