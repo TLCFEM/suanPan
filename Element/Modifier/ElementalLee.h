@@ -31,7 +31,6 @@
 #include <Element/Modifier/Modifier.h>
 
 class ElementalLee final : public ModifierDynamics {
-    const double default_damping_ratio = .02;
     const double damping_ratio;
 
 public:
