@@ -3016,6 +3016,9 @@
     <ClInclude Include="..\..\..\Material\Material1D\Hysteresis\ComplexHysteresis.h">
       <Filter>Material\Material1D\Hysteresis</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\catch\catch_amalgamated.hpp">
+      <Filter>Z</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

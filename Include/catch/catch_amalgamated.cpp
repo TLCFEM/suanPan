@@ -5,8 +5,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.4.0
-//  Generated: 2023-07-13 13:23:09.554273
+//  Catch v3.5.0
+//  Generated: 2023-12-11 00:51:07.662625
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -42,6 +42,48 @@ namespace Catch {
     }     // namespace Benchmark
 }         // namespace Catch
 
+// Adapted from donated nonius code.
+
+#include <vector>
+
+namespace Catch {
+    namespace Benchmark {
+        namespace Detail {
+            SampleAnalysis analyse(const IConfig& cfg, FDuration* first, FDuration* last) {
+                if(!cfg.benchmarkNoAnalysis()) {
+                    std::vector<double> samples;
+                    samples.reserve(static_cast<size_t>(last - first));
+                    for(auto current = first; current != last; ++current) { samples.push_back(current->count()); }
+
+                    auto analysis = Catch::Benchmark::Detail::analyse_samples(cfg.benchmarkConfidenceInterval(), cfg.benchmarkResamples(), samples.data(), samples.data() + samples.size());
+                    auto outliers = Catch::Benchmark::Detail::classify_outliers(samples.data(), samples.data() + samples.size());
+
+                    auto wrap_estimate = [](Estimate<double> e) { return Estimate<FDuration>{FDuration(e.point), FDuration(e.lower_bound), FDuration(e.upper_bound), e.confidence_interval,}; };
+                    std::vector<FDuration> samples2;
+                    samples2.reserve(samples.size());
+                    for(auto s : samples) { samples2.push_back(FDuration(s)); }
+
+                    return {CATCH_MOVE(samples2), wrap_estimate(analysis.mean), wrap_estimate(analysis.standard_deviation), outliers, analysis.outlier_variance,};
+                }
+                else {
+                    std::vector<FDuration> samples;
+                    samples.reserve(static_cast<size_t>(last - first));
+
+                    FDuration mean = FDuration(0);
+                    int i = 0;
+                    for(auto it = first; it < last; ++it, ++i) {
+                        samples.push_back(FDuration(*it));
+                        mean += FDuration(*it);
+                    }
+                    mean /= i;
+
+                    return SampleAnalysis{CATCH_MOVE(samples), Estimate<FDuration>{mean, mean, mean, 0.0}, Estimate<FDuration>{FDuration(0), FDuration(0), FDuration(0), 0.0}, OutlierClassification{}, 0.0};
+                }
+            }
+        } // namespace Detail
+    }     // namespace Benchmark
+}         // namespace Catch
+
 namespace Catch {
     namespace Benchmark {
         namespace Detail {
@@ -68,7 +110,9 @@ namespace Catch {
 
 // Adapted from donated nonius code.
 
+#include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <numeric>
 #include <random>
@@ -81,7 +125,7 @@ namespace Catch {
     namespace Benchmark {
         namespace Detail {
             namespace {
-                template<typename URng, typename Estimator> static sample resample(URng& rng, unsigned int resamples, std::vector<double>::const_iterator first, std::vector<double>::const_iterator last, Estimator& estimator) {
+                template<typename URng, typename Estimator> static sample resample(URng& rng, unsigned int resamples, double const* first, double const* last, Estimator& estimator) {
                     auto n = static_cast<size_t>(last - first);
                     std::uniform_int_distribution<decltype( n )> dist(0, n - 1);
 
@@ -94,7 +138,7 @@ namespace Catch {
                     for(size_t i = 0; i < resamples; ++i) {
                         resampled.clear();
                         for(size_t s = 0; s < n; ++s) { resampled.push_back(first[static_cast<std::ptrdiff_t>(dist(rng))]); }
-                        const auto estimate = estimator(resampled.begin(), resampled.end());
+                        const auto estimate = estimator(resampled.data(), resampled.data() + resampled.size());
                         out.push_back(estimate);
                     }
                     std::sort(out.begin(), out.end());
@@ -205,13 +249,26 @@ namespace Catch {
                     return p * x;
                 }
 
-                static double standard_deviation(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last) {
+                static double standard_deviation(double const* first, double const* last) {
                     auto m = Catch::Benchmark::Detail::mean(first, last);
                     double variance = std::accumulate(first, last, 0., [m](double a, double b) {
                         double diff = b - m;
                         return a + diff * diff;
                     }) / (last - first);
                     return std::sqrt(variance);
+                }
+
+                static sample jackknife(double (*estimator)(double const*, double const*), double* first, double* last) {
+                    const auto second = first + 1;
+                    sample results;
+                    results.reserve(static_cast<size_t>(last - first));
+
+                    for(auto it = first; it != last; ++it) {
+                        std::iter_swap(it, first);
+                        results.push_back(estimator(second, last));
+                    }
+
+                    return results;
                 }
             } // namespace
         }     // namespace Detail
@@ -221,33 +278,24 @@ namespace Catch {
 namespace Catch {
     namespace Benchmark {
         namespace Detail {
-#if defined( __GNUC__ ) || defined( __clang__ )
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wfloat-equal"
-#endif
-            bool directCompare(double lhs, double rhs) { return lhs == rhs; }
-#if defined( __GNUC__ ) || defined( __clang__ )
-#    pragma GCC diagnostic pop
-#endif
-
-            double weighted_average_quantile(int k, int q, std::vector<double>::iterator first, std::vector<double>::iterator last) {
+            double weighted_average_quantile(int k, int q, double* first, double* last) {
                 auto count = last - first;
                 double idx = (count - 1) * k / static_cast<double>(q);
                 int j = static_cast<int>(idx);
                 double g = idx - j;
                 std::nth_element(first, first + j, last);
                 auto xj = first[j];
-                if(directCompare(g, 0)) { return xj; }
+                if(Catch::Detail::directCompare(g, 0)) { return xj; }
 
                 auto xj1 = *std::min_element(first + (j + 1), last);
                 return xj + g * (xj1 - xj);
             }
 
-            OutlierClassification classify_outliers(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last) {
+            OutlierClassification classify_outliers(double const* first, double const* last) {
                 std::vector<double> copy(first, last);
 
-                auto q1 = weighted_average_quantile(1, 4, copy.begin(), copy.end());
-                auto q3 = weighted_average_quantile(3, 4, copy.begin(), copy.end());
+                auto q1 = weighted_average_quantile(1, 4, copy.data(), copy.data() + copy.size());
+                auto q3 = weighted_average_quantile(3, 4, copy.data(), copy.data() + copy.size());
                 auto iqr = q3 - q1;
                 auto los = q1 - (iqr * 3.);
                 auto lom = q1 - (iqr * 1.5);
@@ -266,7 +314,7 @@ namespace Catch {
                 return o;
             }
 
-            double mean(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last) {
+            double mean(double const* first, double const* last) {
                 auto count = last - first;
                 double sum = 0.;
                 while(first != last) {
@@ -275,6 +323,8 @@ namespace Catch {
                 }
                 return sum / static_cast<double>(count);
             }
+
+            double normal_cdf(double x) { return std::erfc(-x / std::sqrt(2.0)) / 2.0; }
 
             double erfc_inv(double x) { return erf_inv(1.0 - x); }
 
@@ -292,21 +342,55 @@ namespace Catch {
                 return result;
             }
 
-            bootstrap_analysis analyse_samples(double confidence_level, unsigned int n_resamples, std::vector<double>::iterator first, std::vector<double>::iterator last) {
-                CATCH_INTERNAL_START_WARNINGS_SUPPRESSION
-                CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS static std::random_device entropy;
-                CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION
+            Estimate<double> bootstrap(double confidence_level, double* first, double* last, sample const& resample, double (*estimator)(double const*, double const*)) {
+                auto n_samples = last - first;
 
-                auto n = static_cast<int>(last - first); // seriously, one can't use integral types without hell in C++
+                double point = estimator(first, last);
+                // Degenerate case with a single sample
+                if(n_samples == 1) return {point, point, point, confidence_level};
 
+                sample jack = jackknife(estimator, first, last);
+                double jack_mean = mean(jack.data(), jack.data() + jack.size());
+                double sum_squares = 0, sum_cubes = 0;
+                for(double x : jack) {
+                    auto difference = jack_mean - x;
+                    auto square = difference * difference;
+                    auto cube = square * difference;
+                    sum_squares += square;
+                    sum_cubes += cube;
+                }
+
+                double accel = sum_cubes / (6 * std::pow(sum_squares, 1.5));
+                long n = static_cast<long>(resample.size());
+                double prob_n = std::count_if(resample.begin(), resample.end(), [point](double x) { return x < point; }) / static_cast<double>(n);
+                // degenerate case with uniform samples
+                if(Catch::Detail::directCompare(prob_n, 0.)) { return {point, point, point, confidence_level}; }
+
+                double bias = normal_quantile(prob_n);
+                double z1 = normal_quantile((1. - confidence_level) / 2.);
+
+                auto cumn = [n](double x) -> long { return std::lround(normal_cdf(x) * static_cast<double>(n)); };
+                auto a = [bias, accel](double b) { return bias + b / (1. - accel * b); };
+                double b1 = bias + z1;
+                double b2 = bias - z1;
+                double a1 = a(b1);
+                double a2 = a(b2);
+                auto lo = static_cast<size_t>((std::max)(cumn(a1), 0l));
+                auto hi = static_cast<size_t>((std::min)(cumn(a2), n - 1));
+
+                return {point, resample[lo], resample[hi], confidence_level};
+            }
+
+            bootstrap_analysis analyse_samples(double confidence_level, unsigned int n_resamples, double* first, double* last) {
                 auto mean = &Detail::mean;
                 auto stddev = &standard_deviation;
 
 #if defined(CATCH_CONFIG_USE_ASYNC)
-                auto Estimate = [=](double (*f)(std::vector<double>::const_iterator, std::vector<double>::const_iterator)) {
-                    auto seed = entropy();
+                auto Estimate = [=](double (*f)(double const*, double const*)) {
+                    std::random_device rd;
+                    auto seed = rd();
                     return std::async(std::launch::async, [=] {
-                        std::mt19937 rng(seed);
+                        SimplePcg32 rng(seed);
                         auto resampled = resample(rng, n_resamples, first, last, f);
                         return bootstrap(confidence_level, first, last, resampled, f);
                     });
@@ -318,10 +402,10 @@ namespace Catch {
                 auto mean_estimate = mean_future.get();
                 auto stddev_estimate = stddev_future.get();
 #else
-                auto Estimate = [=](double(*f)(std::vector<double>::const_iterator,
-                                               std::vector<double>::const_iterator)) {
-                    auto seed = entropy();
-                    std::mt19937 rng(seed);
+                auto Estimate = [=](double(*f)(double const* , double const*)) {
+                    std::random_device rd;
+                    auto seed = rd();
+                    SimplePcg32 rng( seed );
                     auto resampled = resample(rng, n_resamples, first, last, f);
                     return bootstrap(confidence_level, first, last, resampled, f);
                 };
@@ -330,6 +414,7 @@ namespace Catch {
                 auto stddev_estimate = Estimate(stddev);
 #endif // CATCH_USE_ASYNC
 
+                auto n = static_cast<int>(last - first); // seriously, one can't use integral types without hell in C++
                 double outlier_variance = Detail::outlier_variance(mean_estimate, stddev_estimate, n);
 
                 return {mean_estimate, stddev_estimate, outlier_variance};
@@ -385,9 +470,9 @@ namespace Catch {
     }
 
     namespace literals {
-        Approx operator "" _a(long double val) { return Approx(val); }
+        Approx operator ""_a(long double val) { return Approx(val); }
 
-        Approx operator "" _a(unsigned long long val) { return Approx(val); }
+        Approx operator ""_a(unsigned long long val) { return Approx(val); }
     } // end namespace literals
 
     std::string StringMaker<Catch::Approx>::convert(Catch::Approx const& value) { return value.toString(); }
@@ -1616,7 +1701,7 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
-        static Version version(3, 4, 0, "", 0);
+        static Version version(3, 5, 0, "", 0);
         return version;
     }
 }
@@ -1641,7 +1726,34 @@ namespace Catch {
     } // namespace Generators
 }     // namespace Catch
 
-std::uint32_t Catch::Generators::Detail::getSeed() { return sharedRng()(); }
+#include <random>
+
+namespace Catch {
+    namespace Generators {
+        namespace Detail {
+            std::uint32_t getSeed() { return sharedRng()(); }
+        } // namespace Detail
+
+        struct RandomFloatingGenerator<long double>::PImpl {
+            PImpl(long double a, long double b, uint32_t seed)
+                : rng(seed)
+                , dist(a, b) {}
+
+            Catch::SimplePcg32 rng;
+            std::uniform_real_distribution<long double> dist;
+        };
+
+        RandomFloatingGenerator<long double>::RandomFloatingGenerator(long double a, long double b, std::uint32_t seed)
+            : m_pimpl(Catch::Detail::make_unique<PImpl>(a, b, seed)) { static_cast<void>(next()); }
+
+        RandomFloatingGenerator<long double>::~RandomFloatingGenerator() = default;
+
+        bool RandomFloatingGenerator<long double>::next() {
+            m_current_number = m_pimpl->dist(m_pimpl->rng);
+            return true;
+        }
+    } // namespace Generators
+}     // namespace Catch
 
 namespace Catch {
     IResultCapture::~IResultCapture() = default;
@@ -2710,7 +2822,7 @@ namespace Catch {
             return parsed;
         }
 
-        EnumInfo::~EnumInfo() {}
+        EnumInfo::~EnumInfo() = default;
 
         StringRef EnumInfo::lookup(int value) const {
             for(auto const& valueToName : m_values) { if(valueToName.first == value) return valueToName.second; }
@@ -2751,14 +2863,16 @@ namespace Catch {
 #include <exception>
 
 namespace Catch {
+#if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
     namespace {
         static std::string tryTranslators(std::vector<Detail::unique_ptr<IExceptionTranslator const>> const& translators) {
             if(translators.empty()) { std::rethrow_exception(std::current_exception()); }
             else { return translators[0]->translate(translators.begin() + 1, translators.end()); }
         }
     }
+#endif //!defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
 
-    ExceptionTranslatorRegistry::~ExceptionTranslatorRegistry() {}
+    ExceptionTranslatorRegistry::~ExceptionTranslatorRegistry() = default;
 
     void ExceptionTranslatorRegistry::registerTranslator(Detail::unique_ptr<IExceptionTranslator>&& translator) { m_translators.push_back(CATCH_MOVE(translator)); }
 
@@ -3016,6 +3130,17 @@ namespace Catch {
             std::memcpy(&i, &d, sizeof(d));
             return i;
         }
+
+#if defined( __GNUC__ ) || defined( __clang__ )
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+        bool directCompare(float lhs, float rhs) { return lhs == rhs; }
+
+        bool directCompare(double lhs, double rhs) { return lhs == rhs; }
+#if defined( __GNUC__ ) || defined( __clang__ )
+#    pragma GCC diagnostic pop
+#endif
     } // end namespace Detail
 }     // end namespace Catch
 
@@ -3176,6 +3301,113 @@ namespace Catch {
 }
 
 namespace Catch {
+    void JsonUtils::indent(std::ostream& os, std::uint64_t level) { for(std::uint64_t i = 0; i < level; ++i) { os << "  "; } }
+
+    void JsonUtils::appendCommaNewline(std::ostream& os, bool& should_comma, std::uint64_t level) {
+        if(should_comma) { os << ','; }
+        should_comma = true;
+        os << '\n';
+        indent(os, level);
+    }
+
+    JsonObjectWriter::JsonObjectWriter(std::ostream& os)
+        : JsonObjectWriter{os, 0} {}
+
+    JsonObjectWriter::JsonObjectWriter(std::ostream& os, std::uint64_t indent_level)
+        : m_os{os}
+        , m_indent_level{indent_level} { m_os << '{'; }
+
+    JsonObjectWriter::JsonObjectWriter(JsonObjectWriter&& source)
+        : m_os{source.m_os}
+        , m_indent_level{source.m_indent_level}
+        , m_should_comma{source.m_should_comma}
+        , m_active{source.m_active} { source.m_active = false; }
+
+    JsonObjectWriter::~JsonObjectWriter() {
+        if(!m_active) { return; }
+
+        m_os << '\n';
+        JsonUtils::indent(m_os, m_indent_level);
+        m_os << '}';
+    }
+
+    JsonValueWriter JsonObjectWriter::write(StringRef key) {
+        JsonUtils::appendCommaNewline(m_os, m_should_comma, m_indent_level + 1);
+
+        m_os << '"' << key << "\": ";
+        return JsonValueWriter{m_os, m_indent_level + 1};
+    }
+
+    JsonArrayWriter::JsonArrayWriter(std::ostream& os)
+        : JsonArrayWriter{os, 0} {}
+
+    JsonArrayWriter::JsonArrayWriter(std::ostream& os, std::uint64_t indent_level)
+        : m_os{os}
+        , m_indent_level{indent_level} { m_os << '['; }
+
+    JsonArrayWriter::JsonArrayWriter(JsonArrayWriter&& source)
+        : m_os{source.m_os}
+        , m_indent_level{source.m_indent_level}
+        , m_should_comma{source.m_should_comma}
+        , m_active{source.m_active} { source.m_active = false; }
+
+    JsonArrayWriter::~JsonArrayWriter() {
+        if(!m_active) { return; }
+
+        m_os << '\n';
+        JsonUtils::indent(m_os, m_indent_level);
+        m_os << ']';
+    }
+
+    JsonObjectWriter JsonArrayWriter::writeObject() {
+        JsonUtils::appendCommaNewline(m_os, m_should_comma, m_indent_level + 1);
+        return JsonObjectWriter{m_os, m_indent_level + 1};
+    }
+
+    JsonArrayWriter JsonArrayWriter::writeArray() {
+        JsonUtils::appendCommaNewline(m_os, m_should_comma, m_indent_level + 1);
+        return JsonArrayWriter{m_os, m_indent_level + 1};
+    }
+
+    JsonArrayWriter& JsonArrayWriter::write(bool value) { return writeImpl(value); }
+
+    JsonValueWriter::JsonValueWriter(std::ostream& os)
+        : JsonValueWriter{os, 0} {}
+
+    JsonValueWriter::JsonValueWriter(std::ostream& os, std::uint64_t indent_level)
+        : m_os{os}
+        , m_indent_level{indent_level} {}
+
+    JsonObjectWriter JsonValueWriter::writeObject() && { return JsonObjectWriter{m_os, m_indent_level}; }
+
+    JsonArrayWriter JsonValueWriter::writeArray() && { return JsonArrayWriter{m_os, m_indent_level}; }
+
+    void JsonValueWriter::write(Catch::StringRef value) && { writeImpl(value, true); }
+
+    void JsonValueWriter::write(bool value) && { writeImpl(value ? "true"_sr : "false"_sr, false); }
+
+    void JsonValueWriter::writeImpl(Catch::StringRef value, bool quote) {
+        if(quote) { m_os << '"'; }
+        for(char c : value) {
+            // Escape list taken from https://www.json.org/json-en.html,
+            // string definition.
+            // Note that while forward slash _can_ be escaped, it does
+            // not have to be, if JSON is not further embedded somewhere
+            // where forward slash is meaningful.
+            if(c == '"') { m_os << "\\\""; }
+            else if(c == '\\') { m_os << "\\\\"; }
+            else if(c == '\b') { m_os << "\\b"; }
+            else if(c == '\f') { m_os << "\\f"; }
+            else if(c == '\n') { m_os << "\\n"; }
+            else if(c == '\r') { m_os << "\\r"; }
+            else if(c == '\t') { m_os << "\\t"; }
+            else { m_os << c; }
+        }
+        if(quote) { m_os << '"'; }
+    }
+} // namespace Catch
+
+namespace Catch {
     auto operator <<(std::ostream& os, LazyExpression const& lazyExpr) -> std::ostream& {
         if(lazyExpr.m_isNegated) os << '!';
 
@@ -3207,7 +3439,7 @@ namespace Catch {
 
 #else // ^^ Windows crt debug heap enabled // Windows crt debug heap disabled vv
 
-Catch::LeakDetector::LeakDetector() {}
+Catch::LeakDetector::LeakDetector() = default;
 
 #endif // CATCH_CONFIG_WINDOWS_CRTDBG
 
@@ -3497,6 +3729,15 @@ namespace Catch {
         return std::_isnan(d);
     }
 #endif
+
+#if !defined( CATCH_CONFIG_GLOBAL_NEXTAFTER )
+    float nextafter( float x, float y ) { return std::nextafter( x, y ); }
+    double nextafter( double x, double y ) { return std::nextafter( x, y ); }
+#else
+    float nextafter(float x, float y) { return ::nextafterf(x, y); }
+
+    double nextafter(double x, double y) { return ::nextafter(x, y); }
+#endif
 } // end namespace Catch
 
 namespace Catch {
@@ -3558,10 +3799,10 @@ namespace Catch {
             return static_cast<std::uint32_t>(std::time(nullptr));
 
         case GenerateFrom::Default:
-        case GenerateFrom::RandomDevice:
-            // In theory, a platform could have random_device that returns just
-            // 16 bits. That is still some randomness, so we don't care too much
-            return static_cast<std::uint32_t>(std::random_device{}());
+        case GenerateFrom::RandomDevice: {
+            std::random_device rd;
+            return Detail::fillBitsFrom<std::uint32_t>(rd);
+        }
 
         default: CATCH_ERROR("Unknown generation method");
         }
@@ -3586,6 +3827,7 @@ namespace Catch {
         m_impl->factories["TAP"] = Detail::make_unique<ReporterFactory<TAPReporter>>();
         m_impl->factories["TeamCity"] = Detail::make_unique<ReporterFactory<TeamCityReporter>>();
         m_impl->factories["XML"] = Detail::make_unique<ReporterFactory<XmlReporter>>();
+        m_impl->factories["JSON"] = Detail::make_unique<ReporterFactory<JsonReporter>>();
     }
 
     ReporterRegistry::~ReporterRegistry() = default;
@@ -4005,14 +4247,15 @@ namespace Catch {
 
         if(result.getResultType() != ResultWas::Warning) { m_messageScopes.clear(); }
 
-        // Reset working state
-        resetAssertionInfo();
+        // Reset working state. assertion info will be reset after
+        // populateReaction is run if it is needed
         m_lastResult = CATCH_MOVE(result);
     }
 
     void RunContext::resetAssertionInfo() {
         m_lastAssertionInfo.macroName = StringRef();
         m_lastAssertionInfo.capturedExpression = "{Unknown expression after the reported line}"_sr;
+        m_lastAssertionInfo.resultDisposition = ResultDisposition::Normal;
     }
 
     void RunContext::notifyAssertionStarted(AssertionInfo const& info) { m_reporter->assertionStarting(info); }
@@ -4116,6 +4359,7 @@ namespace Catch {
         AssertionResult result(m_lastAssertionInfo, CATCH_MOVE(tempResult));
 
         assertionEnded(CATCH_MOVE(result));
+        resetAssertionInfo();
 
         handleUnfinishedSections();
 
@@ -4233,6 +4477,7 @@ namespace Catch {
             reportExpr(info, ResultWas::ExpressionFailed, &expr, negated);
             populateReaction(reaction);
         }
+        resetAssertionInfo();
     }
 
     void RunContext::reportExpr(AssertionInfo const& info, ResultWas::OfType resultType, ITransientExpression const* expr, bool negated) {
@@ -4260,6 +4505,7 @@ namespace Catch {
             // considered "OK"
             reaction.shouldSkip = true;
         }
+        resetAssertionInfo();
     }
 
     void RunContext::handleUnexpectedExceptionNotThrown(AssertionInfo const& info, AssertionReaction& reaction) { handleNonExpr(info, Catch::ResultWas::DidntThrowException, reaction); }
@@ -4272,6 +4518,7 @@ namespace Catch {
         AssertionResult assertionResult{info, CATCH_MOVE(data)};
         assertionEnded(CATCH_MOVE(assertionResult));
         populateReaction(reaction);
+        resetAssertionInfo();
     }
 
     void RunContext::populateReaction(AssertionReaction& reaction) {
@@ -4287,6 +4534,7 @@ namespace Catch {
         data.message = "Exception translation was disabled by CATCH_CONFIG_FAST_COMPILE"s;
         AssertionResult assertionResult{info, CATCH_MOVE(data)};
         assertionEnded(CATCH_MOVE(assertionResult));
+        resetAssertionInfo();
     }
 
     void RunContext::handleNonExpr(AssertionInfo const& info, ResultWas::OfType resultType, AssertionReaction& reaction) {
@@ -4298,6 +4546,7 @@ namespace Catch {
         const auto isOk = assertionResult.isOk();
         assertionEnded(CATCH_MOVE(assertionResult));
         if(!isOk) { populateReaction(reaction); }
+        resetAssertionInfo();
     }
 
     IResultCapture& getResultCapture() {
@@ -4538,7 +4787,7 @@ namespace Catch {
 } // namespace Catch
 
 namespace Catch {
-    TagAliasRegistry::~TagAliasRegistry() {}
+    TagAliasRegistry::~TagAliasRegistry() = default;
 
     TagAlias const* TagAliasRegistry::find(std::string const& alias) const {
         auto it = m_registry.find(alias);
@@ -5701,22 +5950,8 @@ namespace Catch {
             return ulpDist <= maxUlpDiff;
         }
 
-#if defined(CATCH_CONFIG_GLOBAL_NEXTAFTER)
-
-        float nextafter(float x, float y) { return ::nextafterf(x, y); }
-
-        double nextafter(double x, double y) { return ::nextafter(x, y); }
-
-#endif // ^^^ CATCH_CONFIG_GLOBAL_NEXTAFTER ^^^
-
         template<typename FP> FP step(FP start, FP direction, uint64_t steps) {
-            for(uint64_t i = 0; i < steps; ++i) {
-#if defined(CATCH_CONFIG_GLOBAL_NEXTAFTER)
-                start = Catch::nextafter(start, direction);
-#else
-        start = std::nextafter(start, direction);
-#endif
-            }
+            for(uint64_t i = 0; i < steps; ++i) { start = Catch::nextafter(start, direction); }
             return start;
         }
 
@@ -5978,7 +6213,7 @@ namespace Catch {
 #include <ostream>
 
 namespace Catch {
-    AutomakeReporter::~AutomakeReporter() {}
+    AutomakeReporter::~AutomakeReporter() = default;
 
     void AutomakeReporter::testCaseEnded(TestCaseStats const& _testCaseStats) {
         // Possible values to emit are PASS, XFAIL, SKIP, FAIL, XPASS and ERROR.
@@ -6215,7 +6450,7 @@ namespace Catch {
         StreamingReporterBase::testRunEnded(_testRunStats);
     }
 
-    CompactReporter::~CompactReporter() {}
+    CompactReporter::~CompactReporter() = default;
 } // end namespace Catch
 
 #include <cstdio>
@@ -6390,6 +6625,8 @@ namespace Catch {
 
         struct RowBreak {};
 
+        struct OutputFlush {};
+
         class Duration {
             enum class Unit {
                 Auto,
@@ -6497,12 +6734,12 @@ namespace Catch {
             }
         }
 
-        template<typename T> friend TablePrinter& operator <<(TablePrinter& tp, T const& value) {
+        template<typename T> friend TablePrinter& operator<<(TablePrinter& tp, T const& value) {
             tp.m_oss << value;
             return tp;
         }
 
-        friend TablePrinter& operator <<(TablePrinter& tp, ColumnBreak) {
+        friend TablePrinter& operator<<(TablePrinter& tp, ColumnBreak) {
             auto colStr = tp.m_oss.str();
             const auto strSize = colStr.size();
             tp.m_oss.str("");
@@ -6520,11 +6757,16 @@ namespace Catch {
             return tp;
         }
 
-        friend TablePrinter& operator <<(TablePrinter& tp, RowBreak) {
+        friend TablePrinter& operator<<(TablePrinter& tp, RowBreak) {
             if(tp.m_currentColumn > 0) {
                 tp.m_os << '\n';
                 tp.m_currentColumn = -1;
             }
+            return tp;
+        }
+
+        friend TablePrinter& operator<<(TablePrinter& tp, OutputFlush) {
+            tp.m_os << std::flush;
             return tp;
         }
     };
@@ -6533,7 +6775,7 @@ namespace Catch {
         : StreamingReporterBase(CATCH_MOVE(config))
         , m_tablePrinter(Detail::make_unique<TablePrinter>(m_stream, [&config]() -> std::vector<ColumnInfo> {
             if(config.fullConfig()->benchmarkNoAnalysis()) { return {{"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, Justification::Left}, {"     samples", 14, Justification::Right}, {"  iterations", 14, Justification::Right}, {"        mean", 14, Justification::Right}}; }
-            else { return {{"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, Justification::Left}, {"samples      mean       std dev", 14, Justification::Right}, {"iterations   low mean   low std dev", 14, Justification::Right}, {"estimated    high mean  high std dev", 14, Justification::Right}}; }
+            else { return {{"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 43, Justification::Left}, {"samples      mean       std dev", 14, Justification::Right}, {"iterations   low mean   low std dev", 14, Justification::Right}, {"est run time high mean  high std dev", 14, Justification::Right}}; }
         }())) {}
 
     ConsoleReporter::~ConsoleReporter() = default;
@@ -6599,7 +6841,8 @@ namespace Catch {
 
     void ConsoleReporter::benchmarkStarting(BenchmarkInfo const& info) {
         (*m_tablePrinter) << info.samples << ColumnBreak() << info.iterations << ColumnBreak();
-        if(!m_config->benchmarkNoAnalysis()) (*m_tablePrinter) << Duration(info.estimatedDuration) << ColumnBreak();
+        if(!m_config->benchmarkNoAnalysis()) { (*m_tablePrinter) << Duration(info.estimatedDuration) << ColumnBreak(); }
+        (*m_tablePrinter) << OutputFlush{};
     }
 
     void ConsoleReporter::benchmarkEnded(BenchmarkStats<> const& stats) {
@@ -7099,6 +7342,320 @@ namespace Catch {
         columns.push_back(SummaryColumn("failed as expected", Colour::ResultExpectedFailure).addRow(totals.testCases.failedButOk).addRow(totals.assertions.failedButOk));
         printSummaryRow(stream, streamColour, "test cases"_sr, columns, 0);
         printSummaryRow(stream, streamColour, "assertions"_sr, columns, 1);
+    }
+} // namespace Catch
+
+//
+
+namespace Catch {
+    namespace {
+        void writeSourceInfo(JsonObjectWriter& writer, SourceLineInfo const& sourceInfo) {
+            auto source_location_writer = writer.write("source-location"_sr).writeObject();
+            source_location_writer.write("filename"_sr).write(sourceInfo.file);
+            source_location_writer.write("line"_sr).write(sourceInfo.line);
+        }
+
+        void writeTags(JsonArrayWriter writer, std::vector<Tag> const& tags) { for(auto const& tag : tags) { writer.write(tag.original); } }
+
+        void writeProperties(JsonArrayWriter writer, TestCaseInfo const& info) {
+            if(info.isHidden()) { writer.write("is-hidden"_sr); }
+            if(info.okToFail()) { writer.write("ok-to-fail"_sr); }
+            if(info.expectedToFail()) { writer.write("expected-to-fail"_sr); }
+            if(info.throws()) { writer.write("throws"_sr); }
+        }
+    } // namespace
+
+    JsonReporter::JsonReporter(ReporterConfig&& config)
+        : StreamingReporterBase{CATCH_MOVE(config)} {
+        m_preferences.shouldRedirectStdOut = true;
+        // TBD: Do we want to report all assertions? XML reporter does
+        //      not, but for machine-parseable reporters I think the answer
+        //      should be yes.
+        m_preferences.shouldReportAllAssertions = true;
+
+        m_objectWriters.emplace(m_stream);
+        m_writers.emplace(Writer::Object);
+        auto& writer = m_objectWriters.top();
+
+        writer.write("version"_sr).write(1);
+
+        {
+            auto metadata_writer = writer.write("metadata"_sr).writeObject();
+            metadata_writer.write("name"_sr).write(m_config->name());
+            metadata_writer.write("rng-seed"_sr).write(m_config->rngSeed());
+            metadata_writer.write("catch2-version"_sr).write(libraryVersion());
+            if(m_config->testSpec().hasFilters()) { metadata_writer.write("filters"_sr).write(m_config->testSpec()); }
+        }
+    }
+
+    JsonReporter::~JsonReporter() {
+        endListing();
+        // TODO: Ensure this closes the top level object, add asserts
+        assert(m_writers.size() == 1 && "Only the top level object should be open");
+        assert(m_writers.top() == Writer::Object);
+        endObject();
+        m_stream << '\n' << std::flush;
+        assert(m_writers.empty());
+    }
+
+    JsonArrayWriter& JsonReporter::startArray() {
+        m_arrayWriters.emplace(m_arrayWriters.top().writeArray());
+        m_writers.emplace(Writer::Array);
+        return m_arrayWriters.top();
+    }
+
+    JsonArrayWriter& JsonReporter::startArray(StringRef key) {
+        m_arrayWriters.emplace(m_objectWriters.top().write(key).writeArray());
+        m_writers.emplace(Writer::Array);
+        return m_arrayWriters.top();
+    }
+
+    JsonObjectWriter& JsonReporter::startObject() {
+        m_objectWriters.emplace(m_arrayWriters.top().writeObject());
+        m_writers.emplace(Writer::Object);
+        return m_objectWriters.top();
+    }
+
+    JsonObjectWriter& JsonReporter::startObject(StringRef key) {
+        m_objectWriters.emplace(m_objectWriters.top().write(key).writeObject());
+        m_writers.emplace(Writer::Object);
+        return m_objectWriters.top();
+    }
+
+    void JsonReporter::endObject() {
+        assert(isInside( Writer::Object ));
+        m_objectWriters.pop();
+        m_writers.pop();
+    }
+
+    void JsonReporter::endArray() {
+        assert(isInside( Writer::Array ));
+        m_arrayWriters.pop();
+        m_writers.pop();
+    }
+
+    bool JsonReporter::isInside(Writer writer) { return !m_writers.empty() && m_writers.top() == writer; }
+
+    void JsonReporter::startListing() {
+        if(!m_startedListing) { startObject("listings"_sr); }
+        m_startedListing = true;
+    }
+
+    void JsonReporter::endListing() {
+        if(m_startedListing) { endObject(); }
+        m_startedListing = false;
+    }
+
+    std::string JsonReporter::getDescription() { return "Outputs listings as JSON. Test listing is Work-in-Progress!"; }
+
+    void JsonReporter::testRunStarting(TestRunInfo const& testInfo) {
+        StreamingReporterBase::testRunStarting(testInfo);
+        endListing();
+
+        assert(isInside( Writer::Object ));
+        startObject("test-run"_sr);
+        startArray("test-cases"_sr);
+    }
+
+    static void writeCounts(JsonObjectWriter&& writer, Counts const& counts) {
+        writer.write("passed"_sr).write(counts.passed);
+        writer.write("failed"_sr).write(counts.failed);
+        writer.write("fail-but-ok"_sr).write(counts.failedButOk);
+        writer.write("skipped"_sr).write(counts.skipped);
+    }
+
+    void JsonReporter::testRunEnded(TestRunStats const& runStats) {
+        assert(isInside( Writer::Array ));
+        // End "test-cases"
+        endArray();
+
+        {
+            auto totals = m_objectWriters.top().write("totals"_sr).writeObject();
+            writeCounts(totals.write("assertions"_sr).writeObject(), runStats.totals.assertions);
+            writeCounts(totals.write("test-cases"_sr).writeObject(), runStats.totals.testCases);
+        }
+
+        // End the "test-run" object
+        endObject();
+    }
+
+    void JsonReporter::testCaseStarting(TestCaseInfo const& tcInfo) {
+        StreamingReporterBase::testCaseStarting(tcInfo);
+
+        assert(isInside( Writer::Array ) && "We should be in the 'test-cases' array");
+        startObject();
+        // "test-info" prelude
+        {
+            auto testInfo = m_objectWriters.top().write("test-info"_sr).writeObject();
+            // TODO: handle testName vs className!!
+            testInfo.write("name"_sr).write(tcInfo.name);
+            writeSourceInfo(testInfo, tcInfo.lineInfo);
+            writeTags(testInfo.write("tags"_sr).writeArray(), tcInfo.tags);
+            writeProperties(testInfo.write("properties"_sr).writeArray(), tcInfo);
+        }
+
+        // Start the array for individual test runs (testCasePartial pairs)
+        startArray("runs"_sr);
+    }
+
+    void JsonReporter::testCaseEnded(TestCaseStats const& tcStats) {
+        StreamingReporterBase::testCaseEnded(tcStats);
+
+        // We need to close the 'runs' array before finishing the test case
+        assert(isInside( Writer::Array ));
+        endArray();
+
+        {
+            auto totals = m_objectWriters.top().write("totals"_sr).writeObject();
+            writeCounts(totals.write("assertions"_sr).writeObject(), tcStats.totals.assertions);
+            // We do not write the test case totals, because there will always be just one test case here.
+            // TODO: overall "result" -> success, skip, fail here? Or in partial result?
+        }
+        // We do not write out stderr/stdout, because we instead wrote those out in partial runs
+
+        // TODO: aborting?
+
+        // And we also close this test case's object
+        assert(isInside( Writer::Object ));
+        endObject();
+    }
+
+    void JsonReporter::testCasePartialStarting(TestCaseInfo const& /*tcInfo*/, uint64_t index) {
+        startObject();
+        m_objectWriters.top().write("run-idx"_sr).write(index);
+        startArray("path"_sr);
+        // TODO: we want to delay most of the printing to the 'root' section
+        // TODO: childSection key name?
+    }
+
+    void JsonReporter::testCasePartialEnded(TestCaseStats const& tcStats, uint64_t /*index*/) {
+        // Fixme: the top level section handles this.
+        //// path object
+        endArray();
+        if(!tcStats.stdOut.empty()) { m_objectWriters.top().write("captured-stdout"_sr).write(tcStats.stdOut); }
+        if(!tcStats.stdErr.empty()) { m_objectWriters.top().write("captured-stderr"_sr).write(tcStats.stdErr); }
+        {
+            auto totals = m_objectWriters.top().write("totals"_sr).writeObject();
+            writeCounts(totals.write("assertions"_sr).writeObject(), tcStats.totals.assertions);
+            // We do not write the test case totals, because there will
+            // always be just one test case here.
+            // TODO: overall "result" -> success, skip, fail here? Or in
+            // partial result?
+        }
+        // TODO: aborting?
+        // run object
+        endObject();
+    }
+
+    void JsonReporter::sectionStarting(SectionInfo const& sectionInfo) {
+        assert(isInside( Writer::Array ) && "Section should always start inside an object");
+        // We want to nest top level sections, even though it shares name
+        // and source loc with the TEST_CASE
+        auto& sectionObject = startObject();
+        sectionObject.write("kind"_sr).write("section"_sr);
+        sectionObject.write("name"_sr).write(sectionInfo.name);
+        writeSourceInfo(m_objectWriters.top(), sectionInfo.lineInfo);
+
+        // TBD: Do we want to create this event lazily? It would become
+        //      rather complex, but we could do it, and it would look
+        //      better for empty sections. OTOH, empty sections should
+        //      be rare.
+        startArray("path"_sr);
+    }
+
+    void JsonReporter::sectionEnded(SectionStats const& /*sectionStats */) {
+        // End the subpath array
+        endArray();
+        // TODO: metadata
+        // TODO: what info do we have here?
+
+        // End the section object
+        endObject();
+    }
+
+    void JsonReporter::assertionStarting(AssertionInfo const& /*assertionInfo*/) {}
+
+    void JsonReporter::assertionEnded(AssertionStats const& assertionStats) {
+        // TODO: There is lot of different things to handle here, but
+        //       we can fill it in later, after we show that the basic
+        //       outline and streaming reporter impl works well enough.
+        //if ( !m_config->includeSuccessfulResults()
+        //    && assertionStats.assertionResult.isOk() ) {
+        //    return;
+        //}
+        assert(isInside( Writer::Array ));
+        auto assertionObject = m_arrayWriters.top().writeObject();
+
+        assertionObject.write("kind"_sr).write("assertion"_sr);
+        writeSourceInfo(assertionObject, assertionStats.assertionResult.getSourceInfo());
+        assertionObject.write("status"_sr).write(assertionStats.assertionResult.isOk());
+        // TODO: handling of result.
+        // TODO: messages
+        // TODO: totals?
+    }
+
+    void JsonReporter::benchmarkPreparing(StringRef name) { (void)name; }
+
+    void JsonReporter::benchmarkStarting(BenchmarkInfo const&) {}
+
+    void JsonReporter::benchmarkEnded(BenchmarkStats<> const&) {}
+
+    void JsonReporter::benchmarkFailed(StringRef error) { (void)error; }
+
+    void JsonReporter::listReporters(std::vector<ReporterDescription> const& descriptions) {
+        startListing();
+
+        auto writer = m_objectWriters.top().write("reporters"_sr).writeArray();
+        for(auto const& desc : descriptions) {
+            auto desc_writer = writer.writeObject();
+            desc_writer.write("name"_sr).write(desc.name);
+            desc_writer.write("description"_sr).write(desc.description);
+        }
+    }
+
+    void JsonReporter::listListeners(std::vector<ListenerDescription> const& descriptions) {
+        startListing();
+
+        auto writer = m_objectWriters.top().write("listeners"_sr).writeArray();
+
+        for(auto const& desc : descriptions) {
+            auto desc_writer = writer.writeObject();
+            desc_writer.write("name"_sr).write(desc.name);
+            desc_writer.write("description"_sr).write(desc.description);
+        }
+    }
+
+    void JsonReporter::listTests(std::vector<TestCaseHandle> const& tests) {
+        startListing();
+
+        auto writer = m_objectWriters.top().write("tests"_sr).writeArray();
+
+        for(auto const& test : tests) {
+            auto desc_writer = writer.writeObject();
+            auto const& info = test.getTestCaseInfo();
+
+            desc_writer.write("name"_sr).write(info.name);
+            desc_writer.write("class-name"_sr).write(info.className);
+            {
+                auto tag_writer = desc_writer.write("tags"_sr).writeArray();
+                for(auto const& tag : info.tags) { tag_writer.write(tag.original); }
+            }
+            writeSourceInfo(desc_writer, info.lineInfo);
+        }
+    }
+
+    void JsonReporter::listTags(std::vector<TagInfo> const& tags) {
+        startListing();
+
+        auto writer = m_objectWriters.top().write("tags"_sr).writeArray();
+        for(auto const& tag : tags) {
+            auto tag_writer = writer.writeObject();
+            {
+                auto aliases_writer = tag_writer.write("aliases"_sr).writeArray();
+                for(auto alias : tag.spellings) { aliases_writer.write(alias); }
+            }
+            tag_writer.write("count"_sr).write(tag.count);
+        }
     }
 } // namespace Catch
 
@@ -7767,7 +8324,7 @@ namespace Catch {
         }
     } // end anonymous namespace
 
-    TeamCityReporter::~TeamCityReporter() {}
+    TeamCityReporter::~TeamCityReporter() = default;
 
     void TeamCityReporter::testRunStarting(TestRunInfo const& runInfo) { m_stream << "##teamcity[testSuiteStarted name='" << escape(runInfo.name) << "']\n"; }
 
@@ -8030,12 +8587,9 @@ namespace Catch {
     void XmlReporter::benchmarkStarting(BenchmarkInfo const& info) { m_xml.writeAttribute("samples"_sr, info.samples).writeAttribute("resamples"_sr, info.resamples).writeAttribute("iterations"_sr, info.iterations).writeAttribute("clockResolution"_sr, info.clockResolution).writeAttribute("estimatedDuration"_sr, info.estimatedDuration).writeComment("All values in nano seconds"_sr); }
 
     void XmlReporter::benchmarkEnded(BenchmarkStats<> const& benchmarkStats) {
-        m_xml.startElement("mean").writeAttribute("value"_sr, benchmarkStats.mean.point.count()).writeAttribute("lowerBound"_sr, benchmarkStats.mean.lower_bound.count()).writeAttribute("upperBound"_sr, benchmarkStats.mean.upper_bound.count()).writeAttribute("ci"_sr, benchmarkStats.mean.confidence_interval);
-        m_xml.endElement();
-        m_xml.startElement("standardDeviation").writeAttribute("value"_sr, benchmarkStats.standardDeviation.point.count()).writeAttribute("lowerBound"_sr, benchmarkStats.standardDeviation.lower_bound.count()).writeAttribute("upperBound"_sr, benchmarkStats.standardDeviation.upper_bound.count()).writeAttribute("ci"_sr, benchmarkStats.standardDeviation.confidence_interval);
-        m_xml.endElement();
-        m_xml.startElement("outliers").writeAttribute("variance"_sr, benchmarkStats.outlierVariance).writeAttribute("lowMild"_sr, benchmarkStats.outliers.low_mild).writeAttribute("lowSevere"_sr, benchmarkStats.outliers.low_severe).writeAttribute("highMild"_sr, benchmarkStats.outliers.high_mild).writeAttribute("highSevere"_sr, benchmarkStats.outliers.high_severe);
-        m_xml.endElement();
+        m_xml.scopedElement("mean").writeAttribute("value"_sr, benchmarkStats.mean.point.count()).writeAttribute("lowerBound"_sr, benchmarkStats.mean.lower_bound.count()).writeAttribute("upperBound"_sr, benchmarkStats.mean.upper_bound.count()).writeAttribute("ci"_sr, benchmarkStats.mean.confidence_interval);
+        m_xml.scopedElement("standardDeviation").writeAttribute("value"_sr, benchmarkStats.standardDeviation.point.count()).writeAttribute("lowerBound"_sr, benchmarkStats.standardDeviation.lower_bound.count()).writeAttribute("upperBound"_sr, benchmarkStats.standardDeviation.upper_bound.count()).writeAttribute("ci"_sr, benchmarkStats.standardDeviation.confidence_interval);
+        m_xml.scopedElement("outliers").writeAttribute("variance"_sr, benchmarkStats.outlierVariance).writeAttribute("lowMild"_sr, benchmarkStats.outliers.low_mild).writeAttribute("lowSevere"_sr, benchmarkStats.outliers.low_severe).writeAttribute("highMild"_sr, benchmarkStats.outliers.high_mild).writeAttribute("highSevere"_sr, benchmarkStats.outliers.high_severe);
         m_xml.endElement();
     }
 

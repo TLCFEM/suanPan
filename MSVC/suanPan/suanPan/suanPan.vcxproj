@@ -758,6 +758,7 @@
     <ClInclude Include="..\..\..\Element\Utility\T3DL.h" />
     <ClInclude Include="..\..\..\Element\Visualisation\vtkBase.h" />
     <ClInclude Include="..\..\..\Element\Visualisation\vtkParser.h" />
+    <ClInclude Include="..\..\..\Include\catch\catch_amalgamated.hpp" />
     <ClInclude Include="..\..\..\Load\Amplitude\Amplitude.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Combine.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\Constant.h" />
