@@ -17,7 +17,7 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
       - name: Golang
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           cache: false
       - name: Prepare
@@ -85,7 +85,7 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
       - name: Golang
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           cache: false
       - name: Prepare
@@ -141,7 +141,7 @@ jobs:
       - name: Clone
         uses: actions/checkout@v4
       - name: Golang
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           cache: false
       - name: Prepare
