@@ -361,7 +361,8 @@ void cli_mode(const shared_ptr<Bead>& model) {
         suanpan_highlight("overview");
         suanpan_info("'.\nTo exit, just type in '");
         suanpan_highlight("exit");
-        suanpan_info("'.\n\n");
+        suanpan_info("'.\n\nThe VS Code extension provides syntax highlighting and autocompletion.\n");
+        suanpan_highlight("https://marketplace.visualstudio.com/items?itemName=tlc.suanpan\n\n");
     }
 
     ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
