@@ -55,6 +55,7 @@ set(mumps_mod
         dana_aux.F
         dana_aux_par.F
         dana_lr.F
+        dfac_mem_dynamic.F
         dfac_asm_master_ELT_m.F
         dfac_asm_master_m.F
         dfac_front_aux.F
@@ -65,7 +66,6 @@ set(mumps_mod
         dfac_front_type2_aux.F
         dfac_sispointers_m.F
         dfac_lr.F
-        dfac_mem_dynamic.F
         dfac_omp_m.F
         dfac_par_m.F
         dfac_sol_l0omp_m.F
@@ -91,6 +91,7 @@ set(mumps_mod
         sana_aux.F
         sana_aux_par.F
         sana_lr.F
+        sfac_mem_dynamic.F
         sfac_asm_master_ELT_m.F
         sfac_asm_master_m.F
         sfac_front_aux.F
@@ -101,7 +102,6 @@ set(mumps_mod
         sfac_front_type2_aux.F
         sfac_sispointers_m.F
         sfac_lr.F
-        sfac_mem_dynamic.F
         sfac_omp_m.F
         sfac_par_m.F
         sfac_sol_l0omp_m.F
@@ -157,24 +157,20 @@ endforeach ()
 set_source_files_properties(dmumps_c.c PROPERTIES COMPILE_DEFINITIONS "MUMPS_ARITH=MUMPS_ARITH_d")
 set_source_files_properties(smumps_c.c PROPERTIES COMPILE_DEFINITIONS "MUMPS_ARITH=MUMPS_ARITH_s")
 
-add_library(mumps_mod_lib OBJECT ${mumps_mod})
-add_library(mumps_f_lib OBJECT ${mumps_f})
+add_library(mumps_f_lib OBJECT ${mumps_mod} ${mumps_f})
 add_library(mumps_c_lib OBJECT ${mumps_c})
 
-add_dependencies(mumps_f_lib mumps_mod_lib)
 add_dependencies(mumps_f_lib metis)
 add_dependencies(mumps_c_lib metis)
 
 if (USE_MPI)
     add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
-            $<TARGET_OBJECTS:mumps_mod_lib>
             $<TARGET_OBJECTS:mumps_f_lib>
             $<TARGET_OBJECTS:mumps_c_lib>)
 else ()
     add_library(mumps_mpi_f_lib OBJECT ${mumps_mpi_f})
     add_library(mumps_mpi_c_lib OBJECT ${mumps_mpi_c})
     add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
-            $<TARGET_OBJECTS:mumps_mod_lib>
             $<TARGET_OBJECTS:mumps_mpi_f_lib>
             $<TARGET_OBJECTS:mumps_mpi_c_lib>
             $<TARGET_OBJECTS:mumps_f_lib>
