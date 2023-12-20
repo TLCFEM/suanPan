@@ -55,35 +55,39 @@ struct DataElement {
     const bool nlgeom = false; // nonlinear geometry switch
 
     bool update_mass = true;       // flag to indicate if update matrix
-    bool update_damping = true;    // flag to indicate if update matrix
+    bool update_viscous = true;    // flag to indicate if update matrix
     bool update_nonviscous = true; // flag to indicate if update matrix
     bool update_stiffness = true;  // flag to indicate if update matrix
     bool update_geometry = true;   // flag to indicate if update matrix
 
-    uvec dof_encoding; // DoF encoding vector
+    bool modify_mass = true;       // flag to indicate if modify matrix
+    bool modify_viscous = true;    // flag to indicate if modify matrix
+    bool modify_nonviscous = true; // flag to indicate if modify matrix
+
+    uvec dof_encoding{}; // DoF encoding vector
 
     mat initial_mass{};       // mass matrix
-    mat initial_damping{};    // damping matrix
+    mat initial_viscous{};    // viscous damping matrix
     mat initial_nonviscous{}; // nonviscous damping matrix
     mat initial_stiffness{};  // stiffness matrix
     mat initial_geometry{};   // geometry matrix
 
     mat trial_mass{};       // mass matrix
-    mat trial_damping{};    // damping matrix
+    mat trial_viscous{};    // viscous damping matrix
     mat trial_nonviscous{}; // nonviscous damping matrix
     mat trial_stiffness{};  // stiffness matrix
     mat trial_geometry{};   // geometry matrix
 
     mat current_mass{};       // mass matrix
-    mat current_damping{};    // damping matrix
+    mat current_viscous{};    // viscous damping matrix
     mat current_nonviscous{}; // nonviscous damping matrix
     mat current_stiffness{};  // stiffness matrix
     mat current_geometry{};   // geometry matrix
 
     vec trial_resistance{};            // resistance vector
     vec current_resistance{};          // resistance vector
-    vec trial_damping_force{};         // damping force
-    vec current_damping_force{};       // damping force
+    vec trial_viscous_force{};         // viscous damping force
+    vec current_viscous_force{};       // viscous damping force
     cx_mat trial_nonviscous_force{};   // nonviscous damping force
     cx_mat current_nonviscous_force{}; // nonviscous damping force
     vec trial_inertial_force{};        // inertial force
@@ -208,10 +212,14 @@ public:
     void update_dof_encoding() override;
 
     [[nodiscard]] bool if_update_mass() const override;
-    [[nodiscard]] bool if_update_damping() const override;
+    [[nodiscard]] bool if_update_viscous() const override;
     [[nodiscard]] bool if_update_nonviscous() const override;
     [[nodiscard]] bool if_update_stiffness() const override;
     [[nodiscard]] bool if_update_geometry() const override;
+
+    [[nodiscard]] bool allow_modify_mass() const override;
+    [[nodiscard]] bool allow_modify_viscous() const override;
+    [[nodiscard]] bool allow_modify_nonviscous() const override;
 
     [[nodiscard]] const uvec& get_dof_encoding() const override;
     [[nodiscard]] const uvec& get_node_encoding() const override;
@@ -253,21 +261,21 @@ public:
     [[nodiscard]] const vec& get_current_traction() const override;
 
     [[nodiscard]] const mat& get_trial_mass() const override;
-    [[nodiscard]] const mat& get_trial_damping() const override;
+    [[nodiscard]] const mat& get_trial_viscous() const override;
     [[nodiscard]] const mat& get_trial_nonviscous() const override;
     [[nodiscard]] const mat& get_trial_stiffness() const override;
     [[nodiscard]] const mat& get_trial_geometry() const override;
     [[nodiscard]] const mat& get_trial_secant() const override;
 
     [[nodiscard]] const mat& get_current_mass() const override;
-    [[nodiscard]] const mat& get_current_damping() const override;
+    [[nodiscard]] const mat& get_current_viscous() const override;
     [[nodiscard]] const mat& get_current_nonviscous() const override;
     [[nodiscard]] const mat& get_current_stiffness() const override;
     [[nodiscard]] const mat& get_current_geometry() const override;
     [[nodiscard]] const mat& get_current_secant() const override;
 
     [[nodiscard]] const mat& get_initial_mass() const override;
-    [[nodiscard]] const mat& get_initial_damping() const override;
+    [[nodiscard]] const mat& get_initial_viscous() const override;
     [[nodiscard]] const mat& get_initial_nonviscous() const override;
     [[nodiscard]] const mat& get_initial_stiffness() const override;
     [[nodiscard]] const mat& get_initial_geometry() const override;

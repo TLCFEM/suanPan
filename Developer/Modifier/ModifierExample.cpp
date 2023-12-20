@@ -49,7 +49,7 @@ int ModifierExample::update_status() {
             mat t_damping(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
             if(a != 0. && !t_ptr->get_current_mass().empty()) t_damping += a * t_ptr->get_current_mass();
             if(b != 0. && !t_ptr->get_current_stiffness().empty()) t_damping += b * t_ptr->get_current_stiffness();
-            access::rw(t_ptr->get_trial_damping()) = t_damping;
+            access::rw(t_ptr->get_trial_viscous()) = t_damping;
             access::rw(t_ptr->get_trial_damping_force()) = t_damping * get_trial_velocity(t_ptr.get());
         }
     });

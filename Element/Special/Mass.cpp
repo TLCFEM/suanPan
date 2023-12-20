@@ -19,7 +19,7 @@
 #include <Domain/DOF.h>
 
 MassBase::MassBase(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)
-    : Element(T, NN, ND, std::move(NT), std::move(DI)) {}
+    : Element(T, NN, ND, std::move(NT), std::move(DI)) { modify_mass = false; }
 
 int MassBase::update_status() { return SUANPAN_SUCCESS; }
 

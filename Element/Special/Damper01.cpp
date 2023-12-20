@@ -23,7 +23,7 @@ Damper01::Damper01(const unsigned T, uvec&& NT, const unsigned D, const unsigned
     : MaterialElement1D(T, d_node, 3 == DIM ? 3 : 2, std::move(NT), uvec{D}, false, 3 == DIM ? vector{DOF::U1, DOF::U2, DOF::U3} : vector{DOF::U1, DOF::U2})
     , d_dof(3 == DIM ? 3 : 2)
     , IS(3 == d_dof ? uvec{0, 1, 2} : uvec{0, 1})
-    , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3}) {}
+    , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3}) { modify_viscous = false; }
 
 int Damper01::initialize(const shared_ptr<DomainBase>& D) {
     damper = D->get<Material>(material_tag(0))->get_copy();
@@ -38,13 +38,13 @@ int Damper01::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(damper->get_current_strain()) = vec{dot(direction_cosine, t_disp(JS) - t_disp(IS))};
     access::rw(damper->get_current_strain_rate()) = vec{dot(direction_cosine, t_vec(JS) - t_vec(IS))};
 
-    initial_damping.set_size(d_size, d_size);
-    initial_damping(IS, IS) = direction_cosine * damper->get_initial_damping() * direction_cosine.t();
-    initial_damping(IS, JS) = -initial_damping(IS, IS);
-    initial_damping(JS, JS) = initial_damping(IS, IS);
-    initial_damping(JS, IS) = initial_damping(IS, JS);
+    initial_viscous.set_size(d_size, d_size);
+    initial_viscous(IS, IS) = direction_cosine * damper->get_initial_damping() * direction_cosine.t();
+    initial_viscous(IS, JS) = -initial_viscous(IS, IS);
+    initial_viscous(JS, JS) = initial_viscous(IS, IS);
+    initial_viscous(JS, IS) = initial_viscous(IS, JS);
 
-    trial_damping = current_damping = initial_damping;
+    trial_viscous = current_viscous = initial_viscous;
 
     if(!damper->get_initial_stiffness().empty()) {
         initial_stiffness.set_size(d_size, d_size);
@@ -66,10 +66,10 @@ int Damper01::update_status() {
     trial_resistance(JS) = direction_cosine * damper->get_trial_stress();
     trial_resistance(IS) = -trial_resistance(JS);
 
-    trial_damping(IS, IS) = direction_cosine * damper->get_trial_damping() * direction_cosine.t();
-    trial_damping(IS, JS) = -trial_damping(IS, IS);
-    trial_damping(JS, JS) = trial_damping(IS, IS);
-    trial_damping(JS, IS) = trial_damping(IS, JS);
+    trial_viscous(IS, IS) = direction_cosine * damper->get_trial_damping() * direction_cosine.t();
+    trial_viscous(IS, JS) = -trial_viscous(IS, IS);
+    trial_viscous(JS, JS) = trial_viscous(IS, IS);
+    trial_viscous(JS, IS) = trial_viscous(IS, JS);
 
     if(!damper->get_trial_stiffness().empty()) {
         trial_stiffness.set_size(d_size, d_size);
@@ -97,14 +97,14 @@ void Damper01::print() {
 int Damper05::update_status() {
     if(const auto t_vec = get_trial_velocity(); SUANPAN_SUCCESS != damper->update_trial_status(0., dot(direction_cosine, t_vec(JS) - t_vec(IS)))) return SUANPAN_FAIL;
 
-    trial_damping_force.set_size(d_size);
-    trial_damping_force(JS) = direction_cosine * damper->get_trial_stress();
-    trial_damping_force(IS) = -trial_damping_force(JS);
+    trial_viscous_force.set_size(d_size);
+    trial_viscous_force(JS) = direction_cosine * damper->get_trial_stress();
+    trial_viscous_force(IS) = -trial_viscous_force(JS);
 
-    trial_damping(IS, IS) = direction_cosine * damper->get_trial_damping() * direction_cosine.t();
-    trial_damping(IS, JS) = -trial_damping(IS, IS);
-    trial_damping(JS, JS) = trial_damping(IS, IS);
-    trial_damping(JS, IS) = trial_damping(IS, JS);
+    trial_viscous(IS, IS) = direction_cosine * damper->get_trial_damping() * direction_cosine.t();
+    trial_viscous(IS, JS) = -trial_viscous(IS, IS);
+    trial_viscous(JS, JS) = trial_viscous(IS, IS);
+    trial_viscous(JS, IS) = trial_viscous(IS, JS);
 
     return SUANPAN_SUCCESS;
 }

@@ -23,13 +23,15 @@ LinearViscosity::LinearViscosity(const unsigned T, const double M, uvec&& ET)
 
 int LinearViscosity::update_status() {
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
-        if(const auto t_ptr = ele_ptr.lock(); nullptr != t_ptr && t_ptr->if_update_damping()) {
-            mat t_damping(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
-            t_damping.diag().fill(mu);
+        const auto t_ptr = ele_ptr.lock();
 
-            access::rw(t_ptr->get_trial_damping()) = t_damping;
-            access::rw(t_ptr->get_trial_damping_force()) = t_damping * get_trial_velocity(t_ptr.get());
-        }
+        if(nullptr == t_ptr || !t_ptr->if_update_viscous() || !t_ptr->allow_modify_viscous()) return;
+
+        mat t_damping(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
+        t_damping.diag().fill(mu);
+
+        access::rw(t_ptr->get_trial_viscous()) = t_damping;
+        access::rw(t_ptr->get_trial_damping_force()) = t_damping * get_trial_velocity(t_ptr.get());
     });
 
     return SUANPAN_SUCCESS;

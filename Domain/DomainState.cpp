@@ -188,12 +188,12 @@ void Domain::assemble_trial_mass() const {
 
 void Domain::assemble_initial_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+                factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
@@ -202,12 +202,12 @@ void Domain::assemble_initial_damping() const {
 
 void Domain::assemble_current_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+                factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
@@ -216,12 +216,12 @@ void Domain::assemble_current_damping() const {
 
 void Domain::assemble_trial_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+                factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 

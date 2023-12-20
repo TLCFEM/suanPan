@@ -55,6 +55,8 @@ int ElementalNonviscous::update_status() {
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& t_ptr) {
         const auto t_element = t_ptr.lock();
 
+        if(nullptr == t_element || !t_element->if_update_nonviscous() || !t_element->allow_modify_nonviscous()) return;
+
         if(t_element->get_current_nonviscous_force().n_cols != s_para.n_elem) return;
 
         auto& trial_nonviscous_force = access::rw(t_element->get_trial_nonviscous_force());

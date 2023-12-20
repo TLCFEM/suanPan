@@ -122,15 +122,15 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
     const uvec f_dof_a{2, 6, 10, 14, 18, 22, 26, 30};
     const uvec f_dof_b{3, 7, 11, 15, 19, 23, 27, 31};
 
-    initial_damping.zeros(m_size, m_size);
-    initial_damping(s_dof_a, s_dof_a) = porosity * porosity / k * meta_a;
-    initial_damping(s_dof_b, s_dof_b) = initial_damping(s_dof_a, s_dof_a);
-    initial_damping(f_dof_a, f_dof_a) = initial_damping(s_dof_a, s_dof_a);
-    initial_damping(f_dof_b, f_dof_b) = initial_damping(s_dof_a, s_dof_a);
-    initial_damping(s_dof_a, f_dof_a) = -initial_damping(s_dof_a, s_dof_a);
-    initial_damping(s_dof_b, f_dof_b) = -initial_damping(s_dof_a, s_dof_a);
-    initial_damping(f_dof_a, s_dof_a) = -initial_damping(s_dof_a, s_dof_a);
-    initial_damping(f_dof_b, s_dof_b) = -initial_damping(s_dof_a, s_dof_a);
+    initial_viscous.zeros(m_size, m_size);
+    initial_viscous(s_dof_a, s_dof_a) = porosity * porosity / k * meta_a;
+    initial_viscous(s_dof_b, s_dof_b) = initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(f_dof_a, f_dof_a) = initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(f_dof_b, f_dof_b) = initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(s_dof_a, f_dof_a) = -initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(s_dof_b, f_dof_b) = -initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(f_dof_a, s_dof_a) = -initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(f_dof_b, s_dof_b) = -initial_viscous(s_dof_a, s_dof_a);
     ConstantDamping(this);
 
     initial_mass.zeros(m_size, m_size);
@@ -156,7 +156,7 @@ int PCPE8DC::update_status() {
         trial_resistance(s_dof) += I.weight * I.strain_mat.t() * I.m_material->get_trial_stress();
     }
 
-    trial_damping_force = trial_damping * get_trial_velocity();
+    trial_viscous_force = trial_viscous * get_trial_velocity();
 
     return SUANPAN_SUCCESS;
 }

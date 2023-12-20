@@ -76,9 +76,9 @@ template<typename T> void suanpan::mass::lumped_scale::apply(Mat<T>& mass, const
 }
 
 template<typename T> void suanpan::damping::rayleigh::apply(const shared_ptr<Element>& element_obj, const T alpha, const T beta, const T zeta, const T eta) {
-    auto& ele_damping = access::rw(element_obj->get_trial_damping());
+    auto& ele_damping = access::rw(element_obj->get_trial_viscous());
 
-    if(auto& ele_force = access::rw(element_obj->get_trial_damping_force()); element_obj->if_update_damping()) {
+    if(auto& ele_force = access::rw(element_obj->get_trial_damping_force()); element_obj->if_update_viscous()) {
         mat damping(element_obj->get_total_number(), element_obj->get_total_number(), fill::zeros);
 
         if(0. != alpha && !element_obj->get_current_mass().is_empty()) damping += alpha * element_obj->get_current_mass();
@@ -115,7 +115,7 @@ template<typename T> void suanpan::damping::elemental::apply(const shared_ptr<El
     const mat theta = t_mass * abs(eig_vec.head_cols(num_mode));
     const mat damping = theta * diagmat(2. * sqrt(abs(eig_val.head(num_mode)) * damping_ratio)) * theta.t();
 
-    access::rw(element_obj->get_trial_damping()) = damping;
+    access::rw(element_obj->get_trial_viscous()) = damping;
 
     access::rw(element_obj->get_trial_damping_force()) = damping * get_trial_velocity(element_obj.get());
 }

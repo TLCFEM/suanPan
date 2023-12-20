@@ -24,19 +24,22 @@ ElementalModal::ElementalModal(const unsigned T, const double F, const double D,
 
 int ElementalModal::update_status() {
     suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
-        if(const auto t_ptr = ele_ptr.lock())
-            if(t_ptr->if_update_damping() && !t_ptr->get_current_mass().empty() && !t_ptr->get_current_stiffness().empty()) {
-                cx_vec eigval;
-                cx_mat eigvec;
-                if(!eig_pair(eigval, eigvec, t_ptr->get_current_stiffness(), t_ptr->get_current_mass())) return;
-                cx_mat t_damping(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
+        const auto t_ptr = ele_ptr.lock();
 
-                const cx_mat theta = t_ptr->get_current_mass() * eigvec;
+        if(nullptr == t_ptr || !t_ptr->if_update_viscous() || !t_ptr->allow_modify_viscous()) return;
 
-                for(uword I = 0; I < eigval.n_elem; ++I) if(abs(eigval(I)) < cut_off_freq) t_damping += theta.col(I) * theta.col(I).t() * damping * sqrt(eigval(I)) / dot(theta.col(I), t_ptr->get_current_mass() * theta.col(I));
+        if(t_ptr->get_current_mass().empty() || t_ptr->get_current_stiffness().empty()) return;
 
-                access::rw(t_ptr->get_trial_damping_force()) = (access::rw(t_ptr->get_trial_damping()) = abs(t_damping)) * get_trial_velocity(t_ptr.get());
-            }
+        cx_vec eigval;
+        cx_mat eigvec;
+        if(!eig_pair(eigval, eigvec, t_ptr->get_current_stiffness(), t_ptr->get_current_mass())) return;
+        cx_mat t_damping(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
+
+        const cx_mat theta = t_ptr->get_current_mass() * eigvec;
+
+        for(uword I = 0; I < eigval.n_elem; ++I) if(abs(eigval(I)) < cut_off_freq) t_damping += theta.col(I) * theta.col(I).t() * damping * sqrt(eigval(I)) / dot(theta.col(I), t_ptr->get_current_mass() * theta.col(I));
+
+        access::rw(t_ptr->get_trial_damping_force()) = (access::rw(t_ptr->get_trial_viscous()) = abs(t_damping)) * get_trial_velocity(t_ptr.get());
     });
 
     return SUANPAN_SUCCESS;
