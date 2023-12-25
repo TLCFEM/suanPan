@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "suanPan --- An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework"
             VALUE "FileVersion", "3.3.0.0"
             VALUE "InternalName", "suanPan"
-            VALUE "LegalCopyright", "Copyright (C) 2017-2023 Theodore Chang https://github.com/TLCFEM/suanPan"
+            VALUE "LegalCopyright", "Copyright (C) 2017-2024 Theodore Chang https://github.com/TLCFEM/suanPan"
             VALUE "OriginalFilename", "suanPan"
             VALUE "ProductName", "suanPan"
             VALUE "ProductVersion", "3.3.0.0"
