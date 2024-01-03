@@ -11,7 +11,7 @@
 
 1. (breaking) revise syntaxes for `ConcreteTsai`, `Concrete21` and `Concrete22` using a more consistent definition
 2. fix tangent stiffness in `ConcreteK4` model [#171](https://github.com/TLCFEM/suanPan/pull/171)
-3. update `OpenBLAS` to version `0.3.25`
+3. update `OpenBLAS` to version `0.3.26`
 4. update `SuperLU` to version `6.0.1`
 5. better `RCM` algorithm that may result in a smaller bandwidth, thus, poentially more efficient solving [#175](https://github.com/TLCFEM/suanPan/pull/175)
 6. update `Armadillo` to version `12.6.7` [#180](https://github.com/TLCFEM/suanPan/pull/180)

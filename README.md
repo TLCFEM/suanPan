@@ -260,7 +260,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.25
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.26
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.3
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.9.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
