@@ -34,7 +34,7 @@ int Optimization::analyze() {
     const auto& D = get_domain().lock();
     auto& G = get_integrator();
 
-    unsigned num_increment = 0;
+    auto num_increment = 0u;
 
     while(true) {
         if(++num_increment > get_max_substep()) {

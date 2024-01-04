@@ -79,7 +79,7 @@ int Static::analyze() {
 
     while(true) {
         // check if the target time point is hit
-        if(remain_time <= 1E-10) return SUANPAN_SUCCESS;
+        if(remain_time <= get_min_step_size()) return SUANPAN_SUCCESS;
         // check if the maximum substep number is hit
         if(++num_increment > get_max_substep()) {
             suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());
