@@ -39,26 +39,30 @@ template<typename T, typename U> concept ArmaContainer = std::is_floating_point_
 template<sp_d T> class MetaMat;
 
 template<sp_d T> class op_add {
-public:
-    shared_ptr<MetaMat<T>> operand_a, operand_b;
+    friend MetaMat<T>;
 
+    shared_ptr<MetaMat<T>> mat_a, mat_b;
+
+public:
     explicit op_add(const shared_ptr<MetaMat<T>>& A)
-        : operand_a(A)
-        , operand_b(nullptr) {}
+        : mat_a(A)
+        , mat_b(nullptr) {}
 
     op_add(const shared_ptr<MetaMat<T>>& A, const shared_ptr<MetaMat<T>>& B)
-        : operand_a(A)
-        , operand_b(B) {}
+        : mat_a(A)
+        , mat_b(B) {}
 };
 
 template<sp_d T> class op_scale {
-public:
-    T operand_a;
-    op_add<T> operand_b;
+    friend MetaMat<T>;
 
+    T scalar;
+    op_add<T> bracket;
+
+public:
     op_scale(const T A, op_add<T>&& B)
-        : operand_a(A)
-        , operand_b(std::forward<op_add<T>>(B)) {}
+        : scalar(A)
+        , bracket(std::forward<op_add<T>>(B)) {}
 };
 
 template<sp_d T> class MetaMat {
@@ -169,6 +173,28 @@ public:
     void operator+=(const shared_ptr<MetaMat>& M) { return this->scale_accu(1., M); }
 
     void operator-=(const shared_ptr<MetaMat>& M) { return this->scale_accu(-1., M); }
+
+    void operator+=(const op_scale<T>& M) {
+        const auto& bracket = M.bracket;
+        if(nullptr != bracket.mat_a) this->scale_accu(M.scalar, bracket.mat_a);
+        if(nullptr != bracket.mat_b) this->scale_accu(M.scalar, bracket.mat_b);
+    }
+
+    void operator-=(const op_scale<T>& M) {
+        const auto& bracket = M.bracket;
+        if(nullptr != bracket.mat_a) this->scale_accu(-M.scalar, bracket.mat_a);
+        if(nullptr != bracket.mat_b) this->scale_accu(-M.scalar, bracket.mat_b);
+    }
+
+    void operator+=(const op_add<T>& M) {
+        if(nullptr != M.mat_a) this->scale_accu(1., M.mat_a);
+        if(nullptr != M.mat_b) this->scale_accu(1., M.mat_b);
+    }
+
+    void operator-=(const op_add<T>& M) {
+        if(nullptr != M.mat_a) this->scale_accu(-1., M.mat_a);
+        if(nullptr != M.mat_b) this->scale_accu(-1., M.mat_b);
+    }
 
     virtual void operator+=(const triplet_form<T, uword>&) = 0;
     virtual void operator-=(const triplet_form<T, uword>&) = 0;
