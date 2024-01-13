@@ -68,18 +68,11 @@ public:
 
     T* memptr() override { throw invalid_argument("not supported"); }
 
-    void operator+=(const shared_ptr<MetaMat<T>>& in_mat) override {
+    void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& in_mat) override {
         if(nullptr == in_mat) return;
         if(!in_mat->triplet_mat.is_empty()) return this->operator+=(in_mat->triplet_mat);
         this->factored = false;
-        for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = t_val;
-    }
-
-    void operator-=(const shared_ptr<MetaMat<T>>& in_mat) override {
-        if(nullptr == in_mat) return;
-        if(!in_mat->triplet_mat.is_empty()) return this->operator-=(in_mat->triplet_mat);
-        this->factored = false;
-        for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = -t_val;
+        for(auto I = 0llu; I < in_mat->n_rows; ++I) for(auto J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = scalar * t_val;
     }
 
     void operator+=(const triplet_form<T, uword>& in_mat) override {

@@ -92,22 +92,15 @@ public:
 
     T* memptr() override { return memory.get(); }
 
-    void operator+=(const shared_ptr<MetaMat<T>>& M) override {
+    void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& M) override {
         if(nullptr == M) return;
         if(!M->triplet_mat.is_empty()) return this->operator+=(M->triplet_mat);
         if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
         this->factored = false;
-        arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
-    }
-
-    void operator-=(const shared_ptr<MetaMat<T>>& M) override {
-        if(nullptr == M) return;
-        if(!M->triplet_mat.is_empty()) return this->operator-=(M->triplet_mat);
-        if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
-        if(nullptr == M->memptr()) return;
-        this->factored = false;
-        arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
+        if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
+        else if(-1. == scalar) arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
+        else for(auto I = 0llu; I < this->n_elem; ++I) memptr()[I] += scalar * M->memptr()[I];
     }
 
     void operator+=(const triplet_form<T, uword>& M) override {

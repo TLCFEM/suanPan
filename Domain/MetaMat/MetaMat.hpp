@@ -36,6 +36,31 @@
 
 template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
 
+template<sp_d T> class MetaMat;
+
+template<sp_d T> class op_add {
+public:
+    shared_ptr<MetaMat<T>> operand_a, operand_b;
+
+    explicit op_add(const shared_ptr<MetaMat<T>>& A)
+        : operand_a(A)
+        , operand_b(nullptr) {}
+
+    op_add(const shared_ptr<MetaMat<T>>& A, const shared_ptr<MetaMat<T>>& B)
+        : operand_a(A)
+        , operand_b(B) {}
+};
+
+template<sp_d T> class op_scale {
+public:
+    T operand_a;
+    op_add<T> operand_b;
+
+    op_scale(const T A, op_add<T>&& B)
+        : operand_a(A)
+        , operand_b(std::forward<op_add<T>>(B)) {}
+};
+
 template<sp_d T> class MetaMat {
 protected:
     bool factored = false;
@@ -139,8 +164,11 @@ public:
     [[nodiscard]] virtual const T* memptr() const = 0;
     virtual T* memptr() = 0;
 
-    virtual void operator+=(const shared_ptr<MetaMat>&) = 0;
-    virtual void operator-=(const shared_ptr<MetaMat>&) = 0;
+    virtual void scale_accu(T, const shared_ptr<MetaMat>&) = 0;
+
+    void operator+=(const shared_ptr<MetaMat>& M) { return this->scale_accu(1., M); }
+
+    void operator-=(const shared_ptr<MetaMat>& M) { return this->scale_accu(-1., M); }
 
     virtual void operator+=(const triplet_form<T, uword>&) = 0;
     virtual void operator-=(const triplet_form<T, uword>&) = 0;
