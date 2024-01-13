@@ -186,16 +186,6 @@ public:
         if(nullptr != bracket.mat_b) this->scale_accu(-M.scalar, bracket.mat_b);
     }
 
-    void operator+=(const op_add<T>& M) {
-        if(nullptr != M.mat_a) this->scale_accu(1., M.mat_a);
-        if(nullptr != M.mat_b) this->scale_accu(1., M.mat_b);
-    }
-
-    void operator-=(const op_add<T>& M) {
-        if(nullptr != M.mat_a) this->scale_accu(-1., M.mat_a);
-        if(nullptr != M.mat_b) this->scale_accu(-1., M.mat_b);
-    }
-
     virtual void operator+=(const triplet_form<T, uword>&) = 0;
     virtual void operator-=(const triplet_form<T, uword>&) = 0;
 
