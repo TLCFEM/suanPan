@@ -60,6 +60,10 @@ template<sp_d T> class op_scale {
     op_add<T> bracket;
 
 public:
+    op_scale(const T A, const shared_ptr<MetaMat<T>>& B)
+        : scalar(A)
+        , bracket(B) {}
+
     op_scale(const T A, op_add<T>&& B)
         : scalar(A)
         , bracket(std::forward<op_add<T>>(B)) {}

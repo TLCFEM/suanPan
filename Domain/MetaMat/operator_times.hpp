@@ -20,7 +20,7 @@
 
 template<sp_d T> op_add<T> operator+(const shared_ptr<MetaMat<T>>& A, const shared_ptr<MetaMat<T>>& B) { return op_add<T>(A, B); }
 
-template<sp_d T> op_scale<T> operator*(const T value, const shared_ptr<MetaMat<T>>& M) { return op_scale<T>(value, op_add<T>(M)); }
+template<sp_d T> op_scale<T> operator*(const T value, const shared_ptr<MetaMat<T>>& M) { return op_scale<T>(value, M); }
 
 template<sp_d T> op_scale<T> operator*(const T value, op_add<T>&& M) { return op_scale<T>(value, std::forward<op_add<T>>(M)); }
 
