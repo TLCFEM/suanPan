@@ -94,7 +94,7 @@ public:
 
     void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& M) override {
         if(nullptr == M) return;
-        if(!M->triplet_mat.is_empty()) return this->operator+=(M->triplet_mat);
+        if(!M->triplet_mat.is_empty()) return this->scale_accu(scalar, M->triplet_mat);
         if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
         this->factored = false;
@@ -103,22 +103,15 @@ public:
         else for(auto I = 0llu; I < this->n_elem; ++I) memptr()[I] += scalar * M->memptr()[I];
     }
 
-    void operator+=(const triplet_form<T, uword>& M) override {
+    void scale_accu(const T scalar, const triplet_form<T, uword>& M) override {
         if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
         this->factored = false;
         const auto row = M.row_mem();
         const auto col = M.col_mem();
         const auto val = M.val_mem();
-        for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
-    }
-
-    void operator-=(const triplet_form<T, uword>& M) override {
-        if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
-        this->factored = false;
-        const auto row = M.row_mem();
-        const auto col = M.col_mem();
-        const auto val = M.val_mem();
-        for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+        if(1. == scalar) for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
+        else if(-1. == scalar) for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+        else for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += scalar * val[I];
     }
 
     void operator*=(const T value) override {
