@@ -100,7 +100,7 @@ public:
         this->factored = false;
         if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
         else if(-1. == scalar) arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
-        else for(auto I = 0llu; I < this->n_elem; ++I) memptr()[I] += scalar * M->memptr()[I];
+        else suanpan::for_each(this->n_elem, [&](const uword I) { memptr()[I] += scalar * M->memptr()[I]; });
     }
 
     void scale_accu(const T scalar, const triplet_form<T, uword>& M) override {
