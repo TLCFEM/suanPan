@@ -15,6 +15,7 @@
 4. update `SuperLU` to version `6.0.1`
 5. better `RCM` algorithm that may result in a smaller bandwidth, thus, poentially more efficient solving [#175](https://github.com/TLCFEM/suanPan/pull/175)
 6. update `Armadillo` to version `12.6.7` [#180](https://github.com/TLCFEM/suanPan/pull/180)
+7. enable lazy evalution and avoid temporary global matrices, faster dynamic analysis [#183](https://github.com/TLCFEM/suanPan/pull/183)
 
 ## version 3.2
 

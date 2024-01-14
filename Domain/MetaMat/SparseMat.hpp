@@ -68,28 +68,18 @@ public:
 
     T* memptr() override { throw invalid_argument("not supported"); }
 
-    void operator+=(const shared_ptr<MetaMat<T>>& in_mat) override {
+    void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& in_mat) override {
         if(nullptr == in_mat) return;
-        if(!in_mat->triplet_mat.is_empty()) return this->operator+=(in_mat->triplet_mat);
+        if(!in_mat->triplet_mat.is_empty()) return this->scale_accu(scalar, in_mat->triplet_mat);
         this->factored = false;
-        for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = t_val;
+        for(auto I = 0llu; I < in_mat->n_rows; ++I) for(auto J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = scalar * t_val;
     }
 
-    void operator-=(const shared_ptr<MetaMat<T>>& in_mat) override {
-        if(nullptr == in_mat) return;
-        if(!in_mat->triplet_mat.is_empty()) return this->operator-=(in_mat->triplet_mat);
+    void scale_accu(const T scalar, const triplet_form<T, uword>& in_mat) override {
         this->factored = false;
-        for(uword I = 0llu; I < in_mat->n_rows; ++I) for(uword J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = -t_val;
-    }
-
-    void operator+=(const triplet_form<T, uword>& in_mat) override {
-        this->factored = false;
-        this->triplet_mat += in_mat;
-    }
-
-    void operator-=(const triplet_form<T, uword>& in_mat) override {
-        this->factored = false;
-        this->triplet_mat -= in_mat;
+        if(1. == scalar) this->triplet_mat += in_mat;
+        else if(-1. == scalar) this->triplet_mat -= in_mat;
+        else this->triplet_mat.assemble(in_mat, 0, 0, scalar);
     }
 
     Mat<T> operator*(const Mat<T>& in_mat) const override { return this->triplet_mat * in_mat; }
