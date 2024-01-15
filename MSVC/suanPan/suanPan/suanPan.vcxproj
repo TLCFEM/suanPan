@@ -504,6 +504,7 @@
     <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkBase.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkFull.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkIterative.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Newmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\NonviscousNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\OALTS.cpp" />
@@ -992,6 +993,7 @@
     <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkBase.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkFull.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkIterative.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Newmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\NonviscousNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\OALTS.h" />
