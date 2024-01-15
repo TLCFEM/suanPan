@@ -6,6 +6,7 @@ set(Integrator
         Integrator/GSSSS.cpp
         Integrator/Integrator.cpp
         Integrator/LeeNewmark.cpp
+        Integrator/LeeNewmarkIterative.cpp
         Integrator/LeeNewmarkBase.cpp
         Integrator/LeeNewmarkFull.cpp
         Integrator/Newmark.cpp
