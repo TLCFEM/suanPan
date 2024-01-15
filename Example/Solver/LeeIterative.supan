@@ -1,0 +1,64 @@
+# A TEST MODEL FOR LEE DAMPING MODEL
+
+node 1 0 0
+node 2 1 0
+
+material Bilinear1D 1 100 1 .05 1. 1E-2
+
+element T2D2 1 1 2 1 1
+element Mass 2 2 100 1
+
+fix2 1 1 1
+fix2 2 2 1 2
+
+hdf5recorder 1 Node U1 2
+hdf5recorder 2 Node RF1 2
+
+step static 1 1
+set ini_step_size .1
+set fixed_step_size 1
+
+displacement 1 0 .012 1 2
+
+converger RelIncreDisp 1 1E-10 3 1
+
+step dynamic 2 6
+set ini_step_size .02
+set fixed_step_size 1
+
+integrator LeeNewmarkIterative 1 .25 .5 \
+.01 4E-3 \
+.01 4E-2 \
+.01 4E-1 \
+.01 4E0 \
+.01 4E1 \
+.01 4E2 \
+.01 4E3 \
+.01 4E4 \
+.01 4E5 \
+.01 4E6
+
+converger RelIncreDisp 2 1E-10 10 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#   1.0805e-02  0.0000e+00
+# Resistance:
+#   8.9047e-01  0.0000e+00
+# Velocity:
+#   2.7074e-03  0.0000e+00
+# Acceleration:
+#  -8.9749e-03  0.0000e+00
+peek node 2
+
+# save recorder 1 2
+
+peek integrator 1
+
+reset
+clear
+exit

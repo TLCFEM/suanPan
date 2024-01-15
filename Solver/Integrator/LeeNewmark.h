@@ -56,7 +56,7 @@ protected:
     shared_ptr<MetaMat<double>> current_geometry = nullptr;
 
 public:
-    explicit LeeNewmark(unsigned, vec&&, vec&&, double, double);
+    LeeNewmark(unsigned, vec&&, vec&&, double, double);
 
     int initialize() override;
 

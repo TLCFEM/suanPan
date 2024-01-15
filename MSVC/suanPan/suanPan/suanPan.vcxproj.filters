@@ -1579,6 +1579,9 @@
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\ComplexHysteresis.cpp">
       <Filter>Material\Material1D\Hysteresis</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkIterative.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -3018,6 +3021,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Include\catch\catch_amalgamated.hpp">
       <Filter>Z</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkIterative.h">
+      <Filter>Solver\Integrator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

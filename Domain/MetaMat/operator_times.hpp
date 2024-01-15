@@ -29,6 +29,11 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& operator+=(const shared_ptr<MetaM
     return M;
 }
 
+template<sp_d T> const unique_ptr<MetaMat<T>>& operator+=(const unique_ptr<MetaMat<T>>& M, const op_scale<T>& A) {
+    M->operator+=(A);
+    return M;
+}
+
 template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, unique_ptr<MetaMat<T>>&& M) {
     if(nullptr == M) return nullptr;
 
