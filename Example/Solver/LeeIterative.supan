@@ -43,18 +43,19 @@ converger RelIncreDisp 2 1E-10 10 1
 analyze
 
 # Node 2:
-# 1.0000 0
+# Coordinate:
+#   1.0000e+00  0.0000e+00
 # Displacement:
-# 0.0102 0
+#   1.0805e-02  0.0000e+00
 # Resistance:
-# 0.8333 0
+#   8.9047e-01  0.0000e+00
 # Velocity:
-# 0.0026 0
+#   2.7074e-03  0.0000e+00
 # Acceleration:
-# -0.0085 0
+#  -8.9749e-03  0.0000e+00
 peek node 2
 
-save recorder 1 2
+# save recorder 1 2
 
 peek integrator 1
 
