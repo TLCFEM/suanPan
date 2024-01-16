@@ -685,27 +685,27 @@ bool Domain::find_step(const unsigned T) const { return step_pond.contains(T); }
 
 void Domain::set_current_step_tag(const unsigned T) { current_step_tag = T; }
 
-void Domain::set_current_converger_tag(const unsigned T) { current_converger_tag = T; }
+void Domain::set_current_converger_tag(const unsigned T) { current_converger_tag = std::make_pair(T, current_step_tag); }
 
-void Domain::set_current_integrator_tag(const unsigned T) { current_integrator_tag = T; }
+void Domain::set_current_integrator_tag(const unsigned T) { current_integrator_tag = std::make_pair(T, current_step_tag); }
 
-void Domain::set_current_solver_tag(const unsigned T) { current_solver_tag = T; }
+void Domain::set_current_solver_tag(const unsigned T) { current_solver_tag = std::make_pair(T, current_step_tag); }
 
 unsigned Domain::get_current_step_tag() { return current_step_tag; }
 
-unsigned Domain::get_current_converger_tag() { return current_converger_tag; }
+std::pair<unsigned, unsigned> Domain::get_current_converger_tag() { return current_converger_tag; }
 
-unsigned Domain::get_current_integrator_tag() { return current_integrator_tag; }
+std::pair<unsigned, unsigned> Domain::get_current_integrator_tag() { return current_integrator_tag; }
 
-unsigned Domain::get_current_solver_tag() { return current_solver_tag; }
+std::pair<unsigned, unsigned> Domain::get_current_solver_tag() { return current_solver_tag; }
 
 const shared_ptr<Step>& Domain::get_current_step() const { return get_step(current_step_tag); }
 
-const shared_ptr<Converger>& Domain::get_current_converger() const { return get_converger(current_converger_tag); }
+const shared_ptr<Converger>& Domain::get_current_converger() const { return get_converger(current_converger_tag.first); }
 
-const shared_ptr<Integrator>& Domain::get_current_integrator() const { return get_integrator(current_integrator_tag); }
+const shared_ptr<Integrator>& Domain::get_current_integrator() const { return get_integrator(current_integrator_tag.first); }
 
-const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag); }
+const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag.first); }
 
 unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
     if(!find<Material>(T)) return nullptr;
