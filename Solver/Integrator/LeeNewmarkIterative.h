@@ -47,11 +47,10 @@ class LeeNewmarkIterative final : public Newmark {
 public:
     LeeNewmarkIterative(unsigned, vec&&, vec&&, double, double);
 
-    void assemble_matrix() override;
-
     [[nodiscard]] int process_constraint() override;
-
     [[nodiscard]] int process_constraint_resistance() override;
+
+    void assemble_matrix() override;
 };
 
 #endif

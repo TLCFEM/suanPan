@@ -42,6 +42,30 @@ LeeNewmarkIterative::LeeNewmarkIterative(const unsigned T, vec&& X, vec&& F, con
     , mass_coef(4. * X % F)
     , stiffness_coef(4. * X / F) {}
 
+int LeeNewmarkIterative::process_constraint() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    auto& t_mass = W->modify_mass();
+    auto& t_stiffness = W->modify_stiffness();
+
+    current_mass.swap(t_mass);
+    current_stiffness.swap(t_stiffness);
+    if(SUANPAN_SUCCESS != Newmark::process_constraint()) return SUANPAN_FAIL;
+    current_mass.swap(t_mass);
+    current_stiffness.swap(t_stiffness);
+
+    update_damping_force();
+
+    return Newmark::process_constraint();
+}
+
+int LeeNewmarkIterative::process_constraint_resistance() {
+    update_damping_force();
+
+    return Newmark::process_constraint_resistance();
+}
+
 void LeeNewmarkIterative::assemble_matrix() {
     const auto D = get_domain();
     auto& W = D->get_factory();
@@ -66,32 +90,4 @@ void LeeNewmarkIterative::assemble_matrix() {
     W->get_stiffness() += C0 * W->get_mass();
 
     W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
-}
-
-int LeeNewmarkIterative::process_constraint() {
-    if(SUANPAN_SUCCESS != Newmark::process_constraint()) return SUANPAN_FAIL;
-
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    auto& t_mass = W->modify_mass();
-    auto& t_stiffness = W->modify_stiffness();
-
-    current_mass.swap(t_mass);
-    current_stiffness.swap(t_stiffness);
-    if(SUANPAN_SUCCESS != Newmark::process_constraint()) return SUANPAN_FAIL;
-    current_mass.swap(t_mass);
-    current_stiffness.swap(t_stiffness);
-
-    update_damping_force();
-
-    return SUANPAN_SUCCESS;
-}
-
-int LeeNewmarkIterative::process_constraint_resistance() {
-    if(SUANPAN_SUCCESS != Newmark::process_constraint_resistance()) return SUANPAN_FAIL;
-
-    update_damping_force();
-
-    return SUANPAN_SUCCESS;
 }
