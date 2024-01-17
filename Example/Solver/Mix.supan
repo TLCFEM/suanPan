@@ -1,0 +1,61 @@
+# A TEST MODEL FOR MIXING INTEGRATORS
+
+node 1 0 0
+node 2 0 1
+
+material MPF 1 100 5 .1 20. 18.5 .15 .01 7. true false .1
+
+section Rectangle2D 1 12 1 1
+
+element B21 1 1 2 1 6 1
+
+mass 2 2 10 1
+
+fix 1 P 1
+
+hdf5recorder 1 Global MMR3
+hdf5recorder 2 Node MMR3 2
+
+amplitude Tabular 1 EZ
+# amplitude Decay 1 10 20
+# amplitude Modulated 1 1 2 3 4 5
+# amplitude Sine 1 10 2
+
+acceleration 2 1 .2 1 2
+
+modifier LumpedScale 1 1
+modifier LumpedSimple 2 2
+modifier Rayleigh 3 .2 .002 .0 .0
+
+step dynamic 1 1
+set ini_step_size 5E-2
+set fixed_step_size true
+
+integrator Newmark 1
+
+converger RelIncreDisp 1 1E-10 4 1
+
+step dynamic 2 1
+set ini_step_size 5E-2
+set fixed_step_size true
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   0.0000e+00  1.0000e+00
+# Displacement:
+#  -9.1020e-02 -1.7617e-03  1.2671e-01
+# Resistance:
+#  -1.8804e+01 -1.2574e-01  3.2045e-03
+# Velocity:
+#  -3.9430e-01 -2.8444e-02  5.3197e-01
+# Acceleration:
+#   1.7920e+00  1.2721e-01 -1.4973e+00
+peek node 2
+
+peek integrator 1
+
+peek amplitude 1
+
+exit
