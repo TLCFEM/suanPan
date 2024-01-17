@@ -5,8 +5,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.5.0
-//  Generated: 2023-12-11 00:51:06.770598
+//  Catch v3.5.2
+//  Generated: 2024-01-15 14:06:34.036475
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -659,6 +659,8 @@ namespace Catch {
         using size_type = std::size_t;
         using const_iterator = const char*;
 
+        static constexpr size_type npos{static_cast<size_type>(-1)};
+
     private:
         static constexpr char const* const s_empty = "";
 
@@ -698,7 +700,7 @@ namespace Catch {
         constexpr auto size() const noexcept -> size_type { return m_size; }
 
         // Returns a substring of [start, start + length).
-        // If start + length > size(), then the substring is [start, start + size()).
+        // If start + length > size(), then the substring is [start, size()).
         // If start > size(), then the substring is empty.
         constexpr StringRef substr(size_type start, size_type length) const noexcept {
             if(start < m_size) {
@@ -1744,10 +1746,10 @@ namespace Catch {
             constexpr auto clock_cost_estimation_time = std::chrono::milliseconds(10);
             constexpr auto clock_cost_estimation_iterations = 10000;
 
-            template<typename Clock> int warmup() { return run_for_at_least<Clock>(std::chrono::duration_cast<IDuration>(warmup_time), warmup_seed, &resolution<Clock>).iterations; }
+            template<typename Clock> int warmup() { return run_for_at_least<Clock>(warmup_time, warmup_seed, &resolution<Clock>).iterations; }
 
             template<typename Clock> EnvironmentEstimate estimate_clock_resolution(int iterations) {
-                auto r = run_for_at_least<Clock>(std::chrono::duration_cast<IDuration>(clock_resolution_estimation_time), iterations, &resolution<Clock>).result;
+                auto r = run_for_at_least<Clock>(clock_resolution_estimation_time, iterations, &resolution<Clock>).result;
                 return {FDuration(mean(r.data(), r.data() + r.size())), classify_outliers(r.data(), r.data() + r.size()),};
             }
 
@@ -1763,7 +1765,7 @@ namespace Catch {
                 };
                 time_clock(1);
                 int iters = clock_cost_estimation_iterations;
-                auto&& r = run_for_at_least<Clock>(std::chrono::duration_cast<IDuration>(clock_cost_estimation_time), iters, time_clock);
+                auto&& r = run_for_at_least<Clock>(clock_cost_estimation_time, iters, time_clock);
                 std::vector<double> times;
                 int nsamples = static_cast<int>(std::ceil(time_limit / r.elapsed));
                 times.reserve(static_cast<size_t>(nsamples));
@@ -3160,129 +3162,6 @@ namespace Catch {
 #ifndef CATCH_REPORTER_SPEC_PARSER_HPP_INCLUDED
 #define CATCH_REPORTER_SPEC_PARSER_HPP_INCLUDED
 
-#ifndef CATCH_CONSOLE_COLOUR_HPP_INCLUDED
-#define CATCH_CONSOLE_COLOUR_HPP_INCLUDED
-
-#include <iosfwd>
-#include <cstdint>
-
-namespace Catch {
-    enum class ColourMode : std::uint8_t;
-    class IStream;
-
-    struct Colour {
-        enum Code {
-            None = 0,
-            White,
-            Red,
-            Green,
-            Blue,
-            Cyan,
-            Yellow,
-            Grey,
-            Bright = 0x10,
-            BrightRed = Bright | Red,
-            BrightGreen = Bright | Green,
-            LightGrey = Bright | Grey,
-            BrightWhite = Bright | White,
-            BrightYellow = Bright | Yellow,
-
-            // By intention
-            FileName = LightGrey,
-            Warning = BrightYellow,
-            ResultError = BrightRed,
-            ResultSuccess = BrightGreen,
-            ResultExpectedFailure = Warning,
-            Error = BrightRed,
-            Success = Green,
-            Skip = LightGrey,
-            OriginalExpression = Cyan,
-            ReconstructedExpression = BrightYellow,
-            SecondaryText = LightGrey,
-            Headers = White
-        };
-    };
-
-    class ColourImpl {
-    protected:
-        //! The associated stream of this ColourImpl instance
-        IStream* m_stream;
-
-    public:
-        ColourImpl(IStream* stream)
-            : m_stream(stream) {}
-
-        //! RAII wrapper around writing specific colour of text using specific
-        //! colour impl into a stream.
-        class ColourGuard {
-            ColourImpl const* m_colourImpl;
-            Colour::Code m_code;
-            bool m_engaged = false;
-
-        public:
-            //! Does **not** engage the guard/start the colour
-            ColourGuard(Colour::Code code, ColourImpl const* colour);
-
-            ColourGuard(ColourGuard const& rhs) = delete;
-            ColourGuard& operator=(ColourGuard const& rhs) = delete;
-
-            ColourGuard(ColourGuard&& rhs) noexcept;
-            ColourGuard& operator=(ColourGuard&& rhs) noexcept;
-
-            //! Removes colour _if_ the guard was engaged
-            ~ColourGuard();
-
-            /**
-             * Explicitly engages colour for given stream.
-             *
-             * The API based on operator<< should be preferred.
-             */
-            ColourGuard& engage(std::ostream& stream) &;
-            /**
-             * Explicitly engages colour for given stream.
-             *
-             * The API based on operator<< should be preferred.
-             */
-            ColourGuard&& engage(std::ostream& stream) &&;
-
-        private:
-            //! Engages the guard and starts using colour
-            friend std::ostream& operator<<(std::ostream& lhs, ColourGuard& guard) {
-                guard.engageImpl(lhs);
-                return lhs;
-            }
-
-            //! Engages the guard and starts using colour
-            friend std::ostream& operator<<(std::ostream& lhs, ColourGuard&& guard) {
-                guard.engageImpl(lhs);
-                return lhs;
-            }
-
-            void engageImpl(std::ostream& stream);
-        };
-
-        virtual ~ColourImpl(); // = default
-        /**
-         * Creates a guard object for given colour and this colour impl
-         *
-         * **Important:**
-         * the guard starts disengaged, and has to be engaged explicitly.
-         */
-        ColourGuard guardColour(Colour::Code colourCode);
-
-    private:
-        virtual void use(Colour::Code colourCode) const = 0;
-    };
-
-    //! Provides ColourImpl based on global config and target compilation platform
-    Detail::unique_ptr<ColourImpl> makeColourImpl(ColourMode colourSelection, IStream* stream);
-
-    //! Checks if specific colour impl has been compiled into the binary
-    bool isColourImplAvailable(ColourMode colourSelection);
-} // end namespace Catch
-
-#endif // CATCH_CONSOLE_COLOUR_HPP_INCLUDED
-
 #include <map>
 #include <string>
 #include <vector>
@@ -3390,7 +3269,7 @@ namespace Catch {
         bool benchmarkNoAnalysis = false;
         unsigned int benchmarkSamples = 100;
         double benchmarkConfidenceInterval = 0.95;
-        unsigned int benchmarkResamples = 100000;
+        unsigned int benchmarkResamples = 100'000;
         std::chrono::milliseconds::rep benchmarkWarmupTime = 100;
 
         Verbosity verbosity = Verbosity::Normal;
@@ -3814,17 +3693,16 @@ namespace Catch {
 
             struct Token {
                 TokenType type;
-                std::string token;
+                StringRef token;
             };
 
             // Abstracts iterators into args as a stream of tokens, with option
             // arguments uniformly handled
             class TokenStream {
-                using Iterator = std::vector<std::string>::const_iterator;
+                using Iterator = std::vector<StringRef>::const_iterator;
                 Iterator it;
                 Iterator itEnd;
                 std::vector<Token> m_tokenBuffer;
-
                 void loadBuffer();
 
             public:
@@ -3877,9 +3755,14 @@ namespace Catch {
 
             template<typename T> class ResultValueBase : public ResultBase {
             public:
-                auto value() const -> T const& {
+                T const& value() const & {
                     enforceOk();
                     return m_value;
+                }
+
+                T&& value() && {
+                    enforceOk();
+                    return CATCH_MOVE(m_value);
                 }
 
             protected:
@@ -3889,13 +3772,26 @@ namespace Catch {
                 ResultValueBase(ResultValueBase const& other)
                     : ResultBase(other) { if(m_type == ResultType::Ok) new(&m_value) T(other.m_value); }
 
+                ResultValueBase(ResultValueBase&& other)
+                    : ResultBase(other) { if(m_type == ResultType::Ok) new(&m_value) T(CATCH_MOVE(other.m_value)); }
+
                 ResultValueBase(ResultType, T const& value)
                     : ResultBase(ResultType::Ok) { new(&m_value) T(value); }
 
-                auto operator=(ResultValueBase const& other) -> ResultValueBase& {
+                ResultValueBase(ResultType, T&& value)
+                    : ResultBase(ResultType::Ok) { new(&m_value) T(CATCH_MOVE(value)); }
+
+                ResultValueBase& operator=(ResultValueBase const& other) {
                     if(m_type == ResultType::Ok) m_value.~T();
                     ResultBase::operator=(other);
                     if(m_type == ResultType::Ok) new(&m_value) T(other.m_value);
+                    return *this;
+                }
+
+                ResultValueBase& operator=(ResultValueBase&& other) {
+                    if(m_type == ResultType::Ok) m_value.~T();
+                    ResultBase::operator=(other);
+                    if(m_type == ResultType::Ok) new(&m_value) T(CATCH_MOVE(other.m_value));
                     return *this;
                 }
 
@@ -3917,7 +3813,7 @@ namespace Catch {
                     : ResultValueBase<T>(other.type())
                     , m_errorMessage(other.errorMessage()) { assert(type() != ResultType::Ok); }
 
-                template<typename U> static auto ok(U const& value) -> BasicResult { return {ResultType::Ok, value}; }
+                template<typename U> static auto ok(U&& value) -> BasicResult { return {ResultType::Ok, CATCH_FORWARD(value)}; }
 
                 static auto ok() -> BasicResult { return {ResultType::Ok}; }
 
@@ -3952,11 +3848,13 @@ namespace Catch {
 
             class ParseState {
             public:
-                ParseState(ParseResultType type, TokenStream const& remainingTokens);
+                ParseState(ParseResultType type, TokenStream remainingTokens);
 
                 ParseResultType type() const { return m_type; }
 
-                TokenStream const& remainingTokens() const { return m_remainingTokens; }
+                TokenStream const& remainingTokens() const & { return m_remainingTokens; }
+
+                TokenStream&& remainingTokens() && { return CATCH_MOVE(m_remainingTokens); }
 
             private:
                 ParseResultType m_type;
@@ -3969,7 +3867,7 @@ namespace Catch {
 
             struct HelpColumns {
                 std::string left;
-                std::string right;
+                StringRef descriptions;
             };
 
             template<typename T> ParserResult convertInto(std::string const& source, T& target) {
@@ -4101,7 +3999,7 @@ namespace Catch {
 
                 virtual auto validate() const -> Result { return Result::ok(); }
 
-                virtual auto parse(std::string const& exeName, TokenStream const& tokens) const -> InternalParseResult = 0;
+                virtual auto parse(std::string const& exeName, TokenStream tokens) const -> InternalParseResult = 0;
                 virtual size_t cardinality() const;
 
                 InternalParseResult parse(Args const& args) const;
@@ -4117,28 +4015,33 @@ namespace Catch {
             protected:
                 Optionality m_optionality = Optionality::Optional;
                 std::shared_ptr<BoundRef> m_ref;
-                std::string m_hint;
-                std::string m_description;
+                StringRef m_hint;
+                StringRef m_description;
 
                 explicit ParserRefImpl(std::shared_ptr<BoundRef> const& ref)
                     : m_ref(ref) {}
 
             public:
-                template<typename LambdaT> ParserRefImpl(accept_many_t, LambdaT const& ref, std::string const& hint)
+                template<typename LambdaT> ParserRefImpl(accept_many_t, LambdaT const& ref, StringRef hint)
                     : m_ref(std::make_shared<BoundManyLambda<LambdaT>>(ref))
                     , m_hint(hint) {}
 
-                template<typename T, typename = typename std::enable_if_t<!Detail::is_unary_function<T>::value>> ParserRefImpl(T& ref, std::string const& hint)
+                template<typename T, typename = typename std::enable_if_t<!Detail::is_unary_function<T>::value>> ParserRefImpl(T& ref, StringRef hint)
                     : m_ref(std::make_shared<BoundValueRef<T>>(ref))
                     , m_hint(hint) {}
 
-                template<typename LambdaT, typename = typename std::enable_if_t<Detail::is_unary_function<LambdaT>::value>> ParserRefImpl(LambdaT const& ref, std::string const& hint)
+                template<typename LambdaT, typename = typename std::enable_if_t<Detail::is_unary_function<LambdaT>::value>> ParserRefImpl(LambdaT const& ref, StringRef hint)
                     : m_ref(std::make_shared<BoundLambda<LambdaT>>(ref))
                     , m_hint(hint) {}
 
-                auto operator()(std::string const& description) -> DerivedT& {
+                DerivedT& operator()(StringRef description) & {
                     m_description = description;
                     return static_cast<DerivedT&>(*this);
+                }
+
+                DerivedT&& operator()(StringRef description) && {
+                    m_description = description;
+                    return static_cast<DerivedT&&>(*this);
                 }
 
                 auto optional() -> DerivedT& {
@@ -4158,7 +4061,7 @@ namespace Catch {
                     else return 1;
                 }
 
-                std::string const& hint() const { return m_hint; }
+                StringRef hint() const { return m_hint; }
             };
         } // namespace detail
 
@@ -4168,13 +4071,13 @@ namespace Catch {
             using ParserRefImpl::ParserRefImpl;
             using ParserBase::parse;
 
-            Detail::InternalParseResult parse(std::string const&, Detail::TokenStream const& tokens) const override;
+            Detail::InternalParseResult parse(std::string const&, Detail::TokenStream tokens) const override;
         };
 
         // A parser for options
         class Opt : public Detail::ParserRefImpl<Opt> {
         protected:
-            std::vector<std::string> m_optNames;
+            std::vector<StringRef> m_optNames;
 
         public:
             template<typename LambdaT> explicit Opt(LambdaT const& ref)
@@ -4182,27 +4085,32 @@ namespace Catch {
 
             explicit Opt(bool& ref);
 
-            template<typename LambdaT, typename = typename std::enable_if_t<Detail::is_unary_function<LambdaT>::value>> Opt(LambdaT const& ref, std::string const& hint)
+            template<typename LambdaT, typename = typename std::enable_if_t<Detail::is_unary_function<LambdaT>::value>> Opt(LambdaT const& ref, StringRef hint)
                 : ParserRefImpl(ref, hint) {}
 
-            template<typename LambdaT> Opt(accept_many_t, LambdaT const& ref, std::string const& hint)
+            template<typename LambdaT> Opt(accept_many_t, LambdaT const& ref, StringRef hint)
                 : ParserRefImpl(accept_many, ref, hint) {}
 
-            template<typename T, typename = typename std::enable_if_t<!Detail::is_unary_function<T>::value>> Opt(T& ref, std::string const& hint)
+            template<typename T, typename = typename std::enable_if_t<!Detail::is_unary_function<T>::value>> Opt(T& ref, StringRef hint)
                 : ParserRefImpl(ref, hint) {}
 
-            auto operator[](std::string const& optName) -> Opt& {
+            Opt& operator[](StringRef optName) & {
                 m_optNames.push_back(optName);
                 return *this;
             }
 
-            std::vector<Detail::HelpColumns> getHelpColumns() const;
+            Opt&& operator[](StringRef optName) && {
+                m_optNames.push_back(optName);
+                return CATCH_MOVE(*this);
+            }
 
-            bool isMatch(std::string const& optToken) const;
+            Detail::HelpColumns getHelpColumns() const;
+
+            bool isMatch(StringRef optToken) const;
 
             using ParserBase::parse;
 
-            Detail::InternalParseResult parse(std::string const&, Detail::TokenStream const& tokens) const override;
+            Detail::InternalParseResult parse(std::string const&, Detail::TokenStream tokens) const override;
 
             Detail::Result validate() const override;
         };
@@ -4221,7 +4129,7 @@ namespace Catch {
 
             // The exe name is not parsed out of the normal tokens, but is
             // handled specially
-            Detail::InternalParseResult parse(std::string const&, Detail::TokenStream const& tokens) const override;
+            Detail::InternalParseResult parse(std::string const&, Detail::TokenStream tokens) const override;
 
             std::string const& name() const { return *m_name; }
 
@@ -4245,14 +4153,28 @@ namespace Catch {
                 return *this;
             }
 
-            auto operator|=(Opt const& opt) -> Parser& {
-                m_options.push_back(opt);
-                return *this;
+            friend Parser& operator|=(Parser& p, Opt const& opt) {
+                p.m_options.push_back(opt);
+                return p;
+            }
+
+            friend Parser& operator|=(Parser& p, Opt&& opt) {
+                p.m_options.push_back(CATCH_MOVE(opt));
+                return p;
             }
 
             Parser& operator|=(Parser const& other);
 
-            template<typename T> auto operator|(T const& other) const -> Parser { return Parser(*this) |= other; }
+            template<typename T> friend Parser operator|(Parser const& p, T&& rhs) {
+                Parser temp(p);
+                temp |= rhs;
+                return temp;
+            }
+
+            template<typename T> friend Parser operator|(Parser&& p, T&& rhs) {
+                p |= CATCH_FORWARD(rhs);
+                return CATCH_MOVE(p);
+            }
 
             std::vector<Detail::HelpColumns> getHelpColumns() const;
 
@@ -4266,21 +4188,23 @@ namespace Catch {
             Detail::Result validate() const override;
 
             using ParserBase::parse;
-            Detail::InternalParseResult parse(std::string const& exeName, Detail::TokenStream const& tokens) const override;
+            Detail::InternalParseResult parse(std::string const& exeName, Detail::TokenStream tokens) const override;
         };
 
-        // Transport for raw args (copied from main args, or supplied via
-        // init list for testing)
+        /**
+         * Wrapper over argc + argv, assumes that the inputs outlive it
+         */
         class Args {
             friend Detail::TokenStream;
-            std::string m_exeName;
-            std::vector<std::string> m_args;
+            StringRef m_exeName;
+            std::vector<StringRef> m_args;
 
         public:
             Args(int argc, char const* const* argv);
-            Args(std::initializer_list<std::string> args);
+            // Helper constructor for testing
+            Args(std::initializer_list<StringRef> args);
 
-            std::string const& exeName() const { return m_exeName; }
+            StringRef exeName() const { return m_exeName; }
         };
 
         // Convenience wrapper for option parser that specifies the help option
@@ -6160,6 +6084,7 @@ namespace Catch {
     };
 
     class ITestInvoker;
+    struct NameAndTags;
 
     enum class TestCaseProperties : uint8_t {
         None = 0,
@@ -6362,7 +6287,7 @@ namespace Catch {
 
 #define CATCH_VERSION_MAJOR 3
 #define CATCH_VERSION_MINOR 5
-#define CATCH_VERSION_PATCH 0
+#define CATCH_VERSION_PATCH 2
 
 #endif // CATCH_VERSION_MACROS_HPP_INCLUDED
 
@@ -6500,11 +6425,6 @@ namespace Catch {
             std::string stringifyImpl() const override { return ::Catch::Detail::stringify(get()); }
 
         public:
-            ~IGenerator() override = default;
-            IGenerator() = default;
-            IGenerator(IGenerator const&) = default;
-            IGenerator& operator=(IGenerator const&) = default;
-
             // Returns the current element of the generator
             //
             // \Precondition The generator is either freshly constructed,
@@ -7067,12 +6987,12 @@ namespace Catch {
 
         using UnsignedIntegerType = Detail::make_unsigned_t<IntegerType>;
 
-        // We store the left range bound converted to internal representation,
-        // because it will be used in computation in the () operator.
+        // Only the left bound is stored, and we store it converted to its
+        // unsigned image. This avoids having to do the conversions inside
+        // the operator(), at the cost of having to do the conversion in
+        // the a() getter. The right bound is only needed in the b() getter,
+        // so we recompute it there from other stored data.
         UnsignedIntegerType m_a;
-        // After initialization, right bound is only used for the b() getter,
-        // so we keep it in the original type.
-        IntegerType m_b;
 
         // How many different values are there in [a, b]. a == b => 1, can be 0 for distribution over all values in the type.
         UnsignedIntegerType m_ab_distance;
@@ -7085,11 +7005,10 @@ namespace Catch {
         // distribution will be reused many times and this is an optimization.
         UnsignedIntegerType m_rejection_threshold = 0;
 
-        // Assumes m_b and m_a are already filled
-        UnsignedIntegerType computeDistance() const {
-            // This overflows and returns 0 if ua == 0 and ub == TYPE_MAX.
+        UnsignedIntegerType computeDistance(IntegerType a, IntegerType b) const {
+            // This overflows and returns 0 if a == 0 and b == TYPE_MAX.
             // We handle that later when generating the number.
-            return transposeTo(m_b) - m_a + 1;
+            return transposeTo(b) - transposeTo(a) + 1;
         }
 
         static UnsignedIntegerType computeRejectionThreshold(UnsignedIntegerType ab_distance) {
@@ -7108,8 +7027,7 @@ namespace Catch {
 
         uniform_integer_distribution(IntegerType a, IntegerType b)
             : m_a(transposeTo(a))
-            , m_b(b)
-            , m_ab_distance(computeDistance())
+            , m_ab_distance(computeDistance(a, b))
             , m_rejection_threshold(computeRejectionThreshold(m_ab_distance)) { assert(a <= b); }
 
         template<typename Generator> result_type operator()(Generator& g) {
@@ -7130,7 +7048,7 @@ namespace Catch {
 
         result_type a() const { return transposeBack(m_a); }
 
-        result_type b() const { return m_b; }
+        result_type b() const { return transposeBack(m_ab_distance + m_a - 1); }
     };
 } // end namespace Catch
 
@@ -7861,6 +7779,129 @@ namespace Catch {
 #endif
 
 #endif // CATCH_CONFIG_UNCAUGHT_EXCEPTIONS_HPP_INCLUDED
+
+#ifndef CATCH_CONSOLE_COLOUR_HPP_INCLUDED
+#define CATCH_CONSOLE_COLOUR_HPP_INCLUDED
+
+#include <iosfwd>
+#include <cstdint>
+
+namespace Catch {
+    enum class ColourMode : std::uint8_t;
+    class IStream;
+
+    struct Colour {
+        enum Code {
+            None = 0,
+            White,
+            Red,
+            Green,
+            Blue,
+            Cyan,
+            Yellow,
+            Grey,
+            Bright = 0x10,
+            BrightRed = Bright | Red,
+            BrightGreen = Bright | Green,
+            LightGrey = Bright | Grey,
+            BrightWhite = Bright | White,
+            BrightYellow = Bright | Yellow,
+
+            // By intention
+            FileName = LightGrey,
+            Warning = BrightYellow,
+            ResultError = BrightRed,
+            ResultSuccess = BrightGreen,
+            ResultExpectedFailure = Warning,
+            Error = BrightRed,
+            Success = Green,
+            Skip = LightGrey,
+            OriginalExpression = Cyan,
+            ReconstructedExpression = BrightYellow,
+            SecondaryText = LightGrey,
+            Headers = White
+        };
+    };
+
+    class ColourImpl {
+    protected:
+        //! The associated stream of this ColourImpl instance
+        IStream* m_stream;
+
+    public:
+        ColourImpl(IStream* stream)
+            : m_stream(stream) {}
+
+        //! RAII wrapper around writing specific colour of text using specific
+        //! colour impl into a stream.
+        class ColourGuard {
+            ColourImpl const* m_colourImpl;
+            Colour::Code m_code;
+            bool m_engaged = false;
+
+        public:
+            //! Does **not** engage the guard/start the colour
+            ColourGuard(Colour::Code code, ColourImpl const* colour);
+
+            ColourGuard(ColourGuard const& rhs) = delete;
+            ColourGuard& operator=(ColourGuard const& rhs) = delete;
+
+            ColourGuard(ColourGuard&& rhs) noexcept;
+            ColourGuard& operator=(ColourGuard&& rhs) noexcept;
+
+            //! Removes colour _if_ the guard was engaged
+            ~ColourGuard();
+
+            /**
+             * Explicitly engages colour for given stream.
+             *
+             * The API based on operator<< should be preferred.
+             */
+            ColourGuard& engage(std::ostream& stream) &;
+            /**
+             * Explicitly engages colour for given stream.
+             *
+             * The API based on operator<< should be preferred.
+             */
+            ColourGuard&& engage(std::ostream& stream) &&;
+
+        private:
+            //! Engages the guard and starts using colour
+            friend std::ostream& operator<<(std::ostream& lhs, ColourGuard& guard) {
+                guard.engageImpl(lhs);
+                return lhs;
+            }
+
+            //! Engages the guard and starts using colour
+            friend std::ostream& operator<<(std::ostream& lhs, ColourGuard&& guard) {
+                guard.engageImpl(lhs);
+                return lhs;
+            }
+
+            void engageImpl(std::ostream& stream);
+        };
+
+        virtual ~ColourImpl(); // = default
+        /**
+         * Creates a guard object for given colour and this colour impl
+         *
+         * **Important:**
+         * the guard starts disengaged, and has to be engaged explicitly.
+         */
+        ColourGuard guardColour(Colour::Code colourCode);
+
+    private:
+        virtual void use(Colour::Code colourCode) const = 0;
+    };
+
+    //! Provides ColourImpl based on global config and target compilation platform
+    Detail::unique_ptr<ColourImpl> makeColourImpl(ColourMode colourSelection, IStream* stream);
+
+    //! Checks if specific colour impl has been compiled into the binary
+    bool isColourImplAvailable(ColourMode colourSelection);
+} // end namespace Catch
+
+#endif // CATCH_CONSOLE_COLOUR_HPP_INCLUDED
 
 #ifndef CATCH_CONSOLE_WIDTH_HPP_INCLUDED
 #define CATCH_CONSOLE_WIDTH_HPP_INCLUDED
@@ -9018,6 +9059,7 @@ namespace Catch {
 #ifndef CATCH_SHARDING_HPP_INCLUDED
 #define CATCH_SHARDING_HPP_INCLUDED
 
+#include <cassert>
 #include <cmath>
 #include <algorithm>
 
@@ -9224,8 +9266,6 @@ namespace Catch {
 
     class TestRegistry : public ITestCaseRegistry {
     public:
-        ~TestRegistry() override = default;
-
         void registerTest(Detail::unique_ptr<TestCaseInfo> testInfo, Detail::unique_ptr<ITestInvoker> testInvoker);
 
         std::vector<TestCaseInfo*> const& getAllInfos() const override;
@@ -9350,7 +9390,7 @@ namespace Catch {
 
         public:
             /**
-             * Iterates "lines" in `Column` and return sthem
+             * Iterates "lines" in `Column` and returns them
              */
             class const_iterator {
                 friend Column;
@@ -9405,20 +9445,39 @@ namespace Catch {
             explicit Column(std::string const& text)
                 : m_string(text) {}
 
-            Column& width(size_t newWidth) {
+            explicit Column(std::string&& text)
+                : m_string(CATCH_MOVE(text)) {}
+
+            Column& width(size_t newWidth) & {
                 assert(newWidth > 0);
                 m_width = newWidth;
                 return *this;
             }
 
-            Column& indent(size_t newIndent) {
+            Column&& width(size_t newWidth) && {
+                assert(newWidth > 0);
+                m_width = newWidth;
+                return CATCH_MOVE(*this);
+            }
+
+            Column& indent(size_t newIndent) & {
                 m_indent = newIndent;
                 return *this;
             }
 
-            Column& initialIndent(size_t newIndent) {
+            Column&& indent(size_t newIndent) && {
+                m_indent = newIndent;
+                return CATCH_MOVE(*this);
+            }
+
+            Column& initialIndent(size_t newIndent) & {
                 m_initialIndent = newIndent;
                 return *this;
+            }
+
+            Column&& initialIndent(size_t newIndent) && {
+                m_initialIndent = newIndent;
+                return CATCH_MOVE(*this);
             }
 
             size_t width() const { return m_width; }
@@ -9429,7 +9488,8 @@ namespace Catch {
 
             friend std::ostream& operator<<(std::ostream& os, Column const& col);
 
-            Columns operator+(Column const& other);
+            friend Columns operator+(Column const& lhs, Column const& rhs);
+            friend Columns operator+(Column&& lhs, Column&& rhs);
         };
 
         //! Creates a column that serves as an empty space of specific width
@@ -9474,8 +9534,10 @@ namespace Catch {
 
             iterator end() const { return {*this, iterator::EndTag()}; }
 
-            Columns& operator+=(Column const& col);
-            Columns operator+(Column const& col);
+            friend Columns& operator+=(Columns& lhs, Column const& rhs);
+            friend Columns& operator+=(Columns& lhs, Column&& rhs);
+            friend Columns operator+(Columns const& lhs, Column const& rhs);
+            friend Columns operator+(Columns&& lhs, Column&& rhs);
 
             friend std::ostream& operator<<(std::ostream& os, Columns const& cols);
         };
@@ -11409,8 +11471,6 @@ namespace Catch {
     public:
         JunitReporter(ReporterConfig&& _config);
 
-        ~JunitReporter() override = default;
-
         static std::string getDescription();
 
         void testRunStarting(TestRunInfo const& runInfo) override;
@@ -11602,8 +11662,6 @@ namespace Catch {
             m_shouldStoreSuccesfulAssertions = false;
         }
 
-        ~SonarQubeReporter() override = default;
-
         static std::string getDescription() {
             using namespace std::string_literals;
             return "Reports test results in the Generic Test Data SonarQube XML format"s;
@@ -11643,8 +11701,6 @@ namespace Catch {
     public:
         TAPReporter(ReporterConfig&& config)
             : StreamingReporterBase(CATCH_MOVE(config)) { m_preferences.shouldReportAllAssertions = true; }
-
-        ~TAPReporter() override = default;
 
         static std::string getDescription() {
             using namespace std::string_literals;
