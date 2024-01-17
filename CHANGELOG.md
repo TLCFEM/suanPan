@@ -17,6 +17,8 @@
 6. update `Armadillo` to version `12.6.7` [#180](https://github.com/TLCFEM/suanPan/pull/180)
 7. enable lazy evalution and avoid temporary global matrices, faster dynamic analysis [#183](https://github.com/TLCFEM/suanPan/pull/183)
 8. bugfixes: [#185](https://github.com/TLCFEM/suanPan/pull/185)
+9. update `Catch2` to version `3.5.2`
+10. update `fmt` to version `10.2.1`
 
 ## version 3.2
 
