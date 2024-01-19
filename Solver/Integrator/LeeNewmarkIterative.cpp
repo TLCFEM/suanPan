@@ -247,7 +247,100 @@ vec LeeNewmarkIterative::update_by_mode_three(double mass_coef, double stiffness
     return damping_force.head(n_block) - current_mass * tmp_b;
 }
 
-vec LeeNewmarkIterative::update_by_mode_four(double, double, int, int, int, int, double) const { return {}; }
+vec LeeNewmarkIterative::update_by_mode_four(const double mass_coef, const double stiffness_coef, const int npr, const int npl, const int npk, const int npm, const double gm) {
+    auto& W = get_domain()->get_factory();
+
+    const sword n_block = W->get_size();
+    const auto n_total = (npr + npl + npk + npm + 2) * n_block;
+
+    init_worker(static_cast<unsigned>(n_total), 2u * (npr + npl + npk + npm) + 8u);
+
+    const auto rs = (2. * npl + 1.) / (2. * npr + 1.);
+    const auto rp = (2. * npm + 1.) / (2. * npk + 1.);
+    const auto nps = npr + npl + 1.;
+    const auto npt = npk + npm + 1.;
+    const auto as = 2. * (1. + rs) * pow(rs, (-1. - npl) / nps);
+    const auto ap = 2. * (1. + rp) * pow(rp, (-1. - npm) / npt);
+    const auto bs = as * pow(rs, 1. / nps);
+    const auto bp = ap * pow(rp, 1. / npt);
+    const auto bgm = .25 * ap * bp * gm;
+
+    const auto m_coef_s = .25 * (1. + gm) * as * mass_coef;
+    const auto m_coef_p = .25 * (1. + gm) * ap * mass_coef;
+    const auto s_coef_s = .25 * (1. + gm) * bs * stiffness_coef;
+    const auto s_coef_p = .25 * (1. + gm) * bp * stiffness_coef;
+
+    sword current_pos = 0;
+
+    vec final_force;
+    vec damping_force(n_total, fill::zeros);
+    damping_force.head(n_block) = current_mass * W->get_trial_velocity() * m_coef_s;
+    vec tmp_a;
+
+    const auto solve_a = [&](const uword middle) {
+        damping_force.subvec(middle, middle + n_block) = damping_force.head(n_block);
+        worker->solve(tmp_a, damping_force);
+        const vec tmp_b = m_coef_s * (tmp_a.head(n_block) + tmp_a.subvec(middle, middle + n_block));
+        final_force = damping_force.head(n_block) - current_mass * tmp_b;
+    };
+
+    const auto solve_b = [&] {
+        worker->solve(tmp_a, damping_force);
+        const vec tmp_b = -m_coef_s * tmp_a.head(n_block);
+        final_force = current_mass * tmp_b;
+    };
+
+    if(0 == npr && 0 == npm) {
+        // eq. 100
+        const auto I = current_pos;
+        const auto J = I + n_block * npl + n_block;
+
+        assemble_mass({I, I, J, J}, {I, J, I, J}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s + m_coef_p / bgm});
+
+        formulate_block(current_pos, {m_coef_s, m_coef_p / bgm}, {s_coef_s, s_coef_p / bgm}, {npl, npk});
+
+        solve_a(J);
+    }
+    else if(0 == npr) {
+        // eq. 98
+        const auto I = current_pos;
+        const auto J = I + n_block * npl + n_block;
+        const auto K = J + n_block * npk + n_block;
+
+        assemble_mass({I, I, J, J, J, K}, {I, J, I, J, K, J}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p, m_coef_p});
+
+        formulate_block(current_pos, {m_coef_s, m_coef_p / bgm, -bgm * m_coef_p}, {s_coef_s, s_coef_p / bgm, -bgm * s_coef_p}, {npl, npk, npm - 1});
+
+        solve_a(J);
+    }
+    else if(0 == npm) {
+        // eq. 97
+        const auto I = current_pos;
+        const auto J = I + n_block * npr;
+        const auto K = J + n_block * npl + n_block;
+
+        assemble_mass({I, I, J, K, K}, {J, K, I, I, K}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p / bgm});
+
+        formulate_block(current_pos, {-m_coef_s, m_coef_s, m_coef_p / bgm}, {-s_coef_s, s_coef_s, s_coef_p / bgm}, {npr - 1, npl, npk});
+
+        solve_b();
+    }
+    else {
+        // eq. 84
+        const auto I = current_pos;
+        const auto J = I + n_block * npr;
+        const auto K = J + n_block * npl + n_block;
+        const auto L = K + n_block * npk + n_block;
+
+        assemble_mass({I, I, J, K, K, L}, {J, K, I, I, L, K}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p, m_coef_p});
+
+        formulate_block(current_pos, {-m_coef_s, m_coef_s, m_coef_p / bgm, -bgm * m_coef_p}, {-s_coef_s, s_coef_s, s_coef_p / bgm, -bgm * s_coef_p}, {npr - 1, npl, npk, npm - 1});
+
+        solve_b();
+    }
+
+    return final_force;
+}
 
 void LeeNewmarkIterative::update_damping_force() {
     auto& W = get_domain()->get_factory();
