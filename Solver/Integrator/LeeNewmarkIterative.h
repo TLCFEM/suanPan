@@ -68,9 +68,12 @@ private:
     void assemble_mass(const std::vector<sword>&, const std::vector<sword>&, const std::vector<double>&) const;
     void assemble_stiffness(const std::vector<sword>&, const std::vector<sword>&, const std::vector<double>&) const;
 
+    void formulate_block(sword&, double, double, int) const;
+    void formulate_block(sword&, const std::vector<double>&, const std::vector<double>&, const std::vector<int>&) const;
+
     [[nodiscard]] vec update_by_mode_zero(double, double) const;
     [[nodiscard]] vec update_by_mode_one(double, double, int);
-    [[nodiscard]] vec update_by_mode_two(double, double, int, int) const;
+    [[nodiscard]] vec update_by_mode_two(double, double, int, int);
     [[nodiscard]] vec update_by_mode_three(double, double, double);
     [[nodiscard]] vec update_by_mode_four(double, double, int, int, int, int, double) const;
 
