@@ -203,6 +203,14 @@ public:
 
     template<ArmaContainer<T> C> int solve(Mat<T>& X, C&& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, std::forward<C>(B)) : this->iterative_solve(X, std::forward<C>(B)); }
 
+    template<ArmaContainer<T> C> Mat<T> solve(C&& B) {
+        Mat<T> X;
+
+        if(SUANPAN_SUCCESS != this->solve(X, std::forward<C>(B))) throw std::runtime_error("fail to solve the system");
+
+        return X;
+    }
+
     [[nodiscard]] virtual int sign_det() const = 0;
 
     void save(const char* name) {

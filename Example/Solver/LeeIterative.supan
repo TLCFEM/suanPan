@@ -28,16 +28,17 @@ set ini_step_size .02
 set fixed_step_size 1
 
 integrator LeeNewmarkIterative 1 .25 .5 \
--type0 .01 4E-3 \
--type0 .01 4E-2 \
--type0 .01 4E-1 \
--type0 .01 4E0 \
--type0 .01 4E1 \
--type0 .01 4E2 \
--type0 .01 4E3 \
--type0 .01 4E4 \
--type0 .01 4E5 \
--type0 .01 4E6
+-type0 .005 1 \
+-type1 .005 1 2 \
+-type1 .01 1 3 \
+-type2 .01 1 2 1 \
+-type2 .01 1 0 1 \
+-type2 .01 1 3 2 \
+-type3 .01 1 .5 \
+-type4 .01 1 0 1 1 0 2. \
+-type4 .01 1 1 1 1 0 2. \
+-type4 .01 1 0 1 1 1 2. \
+-type4 .01 1 1 1 1 1 2.
 
 converger RelIncreDisp 2 1E-10 10 1
 
@@ -47,13 +48,13 @@ analyze
 # Coordinate:
 #   1.0000e+00  0.0000e+00
 # Displacement:
-#   1.0805e-02  0.0000e+00
+#   6.9835e-03  0.0000e+00
 # Resistance:
-#   8.9047e-01  0.0000e+00
+#   5.0835e-01  0.0000e+00
 # Velocity:
-#   2.7074e-03  0.0000e+00
+#   1.7728e-03  0.0000e+00
 # Acceleration:
-#  -8.9749e-03  0.0000e+00
+#  -5.4378e-03  0.0000e+00
 peek node 2
 
 # save recorder 1 2

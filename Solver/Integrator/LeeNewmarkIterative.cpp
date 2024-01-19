@@ -114,9 +114,7 @@ vec LeeNewmarkIterative::update_by_mode_zero(const double mass_coef, const doubl
     const auto kernel = current_mass->make_copy();
     kernel += stiffness_coef / mass_coef * current_stiffness;
     const auto damping_force = current_mass * factory->get_trial_velocity();
-    vec tmp;
-    kernel->solve(tmp, damping_force);
-    return mass_coef * (damping_force - current_mass * tmp);
+    return mass_coef * (damping_force - current_mass * kernel->solve(damping_force));
 }
 
 vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double stiffness_coef, int order) {
@@ -159,10 +157,9 @@ vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double
         assemble_stiffness({J, K, K, L, L}, {K, J, L, K, L}, {stiffness_coefs, stiffness_coefs, stiffness_coef, stiffness_coef, -stiffness_coef});
     }
 
-    vec damping_force(n_total, fill::zeros), tmp_a;
+    vec damping_force(n_total, fill::zeros);
     damping_force.head(n_block) = current_mass * factory->get_trial_velocity();
-    worker->solve(tmp_a, damping_force);
-    const vec tmp_b = -mass_coef * mass_coef * tmp_a.head(n_block);
+    const vec tmp_b = -mass_coef * mass_coef * worker->solve(damping_force).head_rows(n_block);
     return current_mass * tmp_b;
 }
 
@@ -181,7 +178,7 @@ vec LeeNewmarkIterative::update_by_mode_two(double mass_coef, double stiffness_c
 
     sword current_pos{0};
 
-    vec damping_force(n_total, fill::zeros), final_force, tmp_a;
+    vec damping_force(n_total, fill::zeros), final_force;
 
     // eq. 100
     if(0 == npr) {
@@ -190,8 +187,7 @@ vec LeeNewmarkIterative::update_by_mode_two(double mass_coef, double stiffness_c
         formulate_block(current_pos, mass_coef, stiffness_coef, npl);
 
         damping_force.head(n_block) = current_mass * factory->get_trial_velocity() * mass_coef;
-        worker->solve(tmp_a, damping_force);
-        const vec tmp_b = mass_coef * tmp_a.head(n_block);
+        const vec tmp_b = mass_coef * worker->solve(damping_force).head_rows(n_block);
         final_force = damping_force.head(n_block) - current_mass * tmp_b;
     }
     else {
@@ -204,8 +200,7 @@ vec LeeNewmarkIterative::update_by_mode_two(double mass_coef, double stiffness_c
         formulate_block(current_pos, {-mass_coef, mass_coef}, {-stiffness_coef, stiffness_coef}, {npr - 1, npl});
 
         damping_force.head(n_block) = current_mass * factory->get_trial_velocity();
-        worker->solve(tmp_a, damping_force);
-        const vec tmp_b = -mass_coef * mass_coef * tmp_a.head(n_block);
+        const vec tmp_b = -mass_coef * mass_coef * worker->solve(damping_force).head_rows(n_block);
         final_force = current_mass * tmp_b;
     }
 
@@ -226,10 +221,9 @@ vec LeeNewmarkIterative::update_by_mode_three(double mass_coef, double stiffness
     assemble_mass({J, I}, {J, I}, {.25 / gm * mass_coef, mass_coef});
     assemble_stiffness({J, I, I, J}, {J, I, J, I}, {(1. + .25 / gm) * stiffness_coef, stiffness_coef, -stiffness_coef, -stiffness_coef});
 
-    vec damping_force(n_total, fill::zeros), tmp_a;
+    vec damping_force(n_total, fill::zeros);
     damping_force.head(n_block) = current_mass * factory->get_trial_velocity() * mass_coef;
-    worker->solve(tmp_a, damping_force);
-    const vec tmp_b = mass_coef * tmp_a.head(n_block);
+    const vec tmp_b = mass_coef * worker->solve(damping_force).head_rows(n_block);
     return damping_force.head(n_block) - current_mass * tmp_b;
 }
 
@@ -255,19 +249,18 @@ vec LeeNewmarkIterative::update_by_mode_four(const double mass_coef, const doubl
 
     sword current_pos{0};
 
-    vec damping_force(n_total, fill::zeros), final_force, tmp_a;
+    vec damping_force(n_total, fill::zeros), final_force;
     damping_force.head(n_block) = current_mass * factory->get_trial_velocity() * m_coef_s;
 
     const auto solve_a = [&](const uword middle) {
         damping_force.subvec(middle, middle + n_block) = damping_force.head(n_block);
-        worker->solve(tmp_a, damping_force);
+        const vec tmp_a = worker->solve(damping_force);
         const vec tmp_b = m_coef_s * (tmp_a.head(n_block) + tmp_a.subvec(middle, middle + n_block));
         final_force = damping_force.head(n_block) - current_mass * tmp_b;
     };
 
     const auto solve_b = [&] {
-        worker->solve(tmp_a, damping_force);
-        const vec tmp_b = -m_coef_s * tmp_a.head(n_block);
+        const vec tmp_b = -m_coef_s * worker->solve(damping_force).head_rows(n_block);
         final_force = current_mass * tmp_b;
     };
 
@@ -434,5 +427,5 @@ void LeeNewmarkIterative::assemble_matrix() {
 }
 
 void LeeNewmarkIterative::print() {
-    suanpan_info("A Newmark solver using Lee's damping model with iterative solving strategy\n");
+    suanpan_info("A Newmark solver using Lee's damping model with iterative solving strategy.\n");
 }
