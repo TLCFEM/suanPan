@@ -109,7 +109,8 @@ int LeeNewmark::process_constraint() {
     t_stiff->csc_condense();
 
     if(first_iteration) {
-        stiffness->triplet_mat.init((4 * n_damping + 2) * t_stiff->n_elem);
+        const auto [l, u] = factory->get_bandwidth();
+        stiffness->triplet_mat.init((4 * n_damping + 2) * (l + u + 1) * factory->get_size());
 
         initialize_mass(D);
     }
