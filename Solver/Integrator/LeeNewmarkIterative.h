@@ -57,13 +57,24 @@ private:
     shared_ptr<MetaMat<double>> current_mass = nullptr;
     shared_ptr<MetaMat<double>> current_stiffness = nullptr;
 
+    unique_ptr<MetaMat<double>> worker = nullptr;
+
+    void init_worker(unsigned, unsigned);
+
+    void assemble(const shared_ptr<MetaMat<double>>&, uword, uword, double) const;
+
+    void assemble_mass(uword, uword, double) const;
+    void assemble_stiffness(uword, uword, double) const;
+    void assemble_mass(const std::vector<uword>&, const std::vector<uword>&, const std::vector<double>&) const;
+    void assemble_stiffness(const std::vector<uword>&, const std::vector<uword>&, const std::vector<double>&) const;
+
     [[nodiscard]] vec update_by_mode_zero(double, double) const;
     [[nodiscard]] vec update_by_mode_one(double, double, int) const;
     [[nodiscard]] vec update_by_mode_two(double, double, int, int) const;
-    [[nodiscard]] vec update_by_mode_three(double, double, double) const;
+    [[nodiscard]] vec update_by_mode_three(double, double, double);
     [[nodiscard]] vec update_by_mode_four(double, double, int, int, int, int, double) const;
 
-    void update_damping_force() const;
+    void update_damping_force();
 
 public:
     LeeNewmarkIterative(unsigned, std::vector<Mode>&&, double, double);
