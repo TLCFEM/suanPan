@@ -34,6 +34,7 @@
 
 #include "Newmark.h"
 #include <Domain/MetaMat/MetaMat.hpp>
+#include <Domain/Factory.hpp>
 
 class LeeNewmarkIterative final : public Newmark {
 public:
@@ -52,7 +53,11 @@ public:
     };
 
 private:
+    const unsigned n_block{0};
+
     std::vector<Mode> damping_mode;
+
+    shared_ptr<Factory<double>> factory = nullptr;
 
     shared_ptr<MetaMat<double>> current_mass = nullptr;
     shared_ptr<MetaMat<double>> current_stiffness = nullptr;
@@ -82,10 +87,14 @@ private:
 public:
     LeeNewmarkIterative(unsigned, std::vector<Mode>&&, double, double);
 
+    int initialize() override;
+
     [[nodiscard]] int process_constraint() override;
     [[nodiscard]] int process_constraint_resistance() override;
 
     void assemble_matrix() override;
+
+    void print() override;
 };
 
 #endif
