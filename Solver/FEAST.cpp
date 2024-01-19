@@ -69,8 +69,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
     else if(StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) {
         fpm[41] = 0;
 
-        unsigned l, u;
-        W->get_bandwidth(l, u);
+        const auto [l, u] = W->get_bandwidth();
         auto KL = static_cast<int>(l);
         const auto KU = static_cast<int>(u);
         auto LD = KL + KU + 1;

@@ -27,18 +27,20 @@ void LeeNewmark::update_stiffness() const {
             stiffness->triplet_mat.assemble(current_mass->triplet_mat, {J, 0, J}, {J, J, 0}, {mass_coef(I), -mass_coef(I), -C1 * mass_coef(I)});
             stiffness->triplet_mat.assemble(current_stiffness->triplet_mat, J, J, stiffness_coef(I));
         }
-    else
+    else {
+        const auto [low, up] = factory->get_bandwidth();
         for(uword I = 0, J = n_block; I < n_damping; ++I, J += n_block)
-            for(unsigned K = 0; K < n_block; ++K) {
-                const auto M = K + J;
-                for(unsigned L = 0; L < n_block; ++L) {
-                    const auto N = L + J;
+            for(uword L = 0; L < n_block; ++L) {
+                const auto N = L + J;
+                for(uword K = std::max(L, static_cast<uword>(up)) - up; K < std::min(n_block, L + low + 1); ++K) {
+                    const auto M = K + J;
                     sp_d auto t_val = current_mass->operator()(K, L);
                     if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, L) = C1 * (stiffness->at(K, N) = -(stiffness->at(M, N) = mass_coef(I) * t_val));
                     t_val = current_stiffness->operator()(K, L);
                     if(!suanpan::approx_equal(0., t_val)) stiffness->at(M, N) = stiffness_coef(I) * t_val;
                 }
             }
+    }
 }
 
 void LeeNewmark::update_residual() const {

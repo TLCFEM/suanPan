@@ -224,7 +224,7 @@ public:
     [[nodiscard]] bool is_sparse() const;
 
     void set_bandwidth(unsigned, unsigned);
-    void get_bandwidth(unsigned&, unsigned&) const;
+    [[nodiscard]] std::pair<unsigned, unsigned> get_bandwidth() const;
 
     void update_reference_size();
     void set_reference_size(unsigned);
@@ -758,10 +758,7 @@ template<sp_d T> void Factory<T>::set_bandwidth(const unsigned L, const unsigned
     access::rw(initialized) = false;
 }
 
-template<sp_d T> void Factory<T>::get_bandwidth(unsigned& L, unsigned& U) const {
-    L = n_lobw;
-    U = n_upbw;
-}
+template<sp_d T> std::pair<unsigned, unsigned> Factory<T>::get_bandwidth() const { return {n_lobw, n_upbw}; }
 
 template<sp_d T> void Factory<T>::update_reference_size() { n_rfld = static_cast<unsigned>(reference_dof.size()); }
 
