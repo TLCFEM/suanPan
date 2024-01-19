@@ -28,16 +28,16 @@ set ini_step_size .02
 set fixed_step_size 1
 
 integrator LeeNewmarkIterative 1 .25 .5 \
-.01 4E-3 \
-.01 4E-2 \
-.01 4E-1 \
-.01 4E0 \
-.01 4E1 \
-.01 4E2 \
-.01 4E3 \
-.01 4E4 \
-.01 4E5 \
-.01 4E6
+-type0 .01 4E-3 \
+-type0 .01 4E-2 \
+-type0 .01 4E-1 \
+-type0 .01 4E0 \
+-type0 .01 4E1 \
+-type0 .01 4E2 \
+-type0 .01 4E3 \
+-type0 .01 4E4 \
+-type0 .01 4E5 \
+-type0 .01 4E6
 
 converger RelIncreDisp 2 1E-10 10 1
 

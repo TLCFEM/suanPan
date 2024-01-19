@@ -19,8 +19,7 @@
  * @brief A LeeNewmarkIterative class defines a solver using Newmark algorithm with Lee damping model.
  *
  * Remarks:
- *   1. Only Type 0 is implemented.
- *   2. An iterative algorithm is used. The quadratic convergence is lost.
+ *   1. An iterative algorithm is used. The quadratic convergence is lost.
  *
  * @author tlc
  * @date 15/01/2024
@@ -37,15 +36,37 @@
 #include <Domain/MetaMat/MetaMat.hpp>
 
 class LeeNewmarkIterative final : public Newmark {
-    const vec mass_coef, stiffness_coef;
+public:
+    enum class Type {
+        T0,
+        T1,
+        T2,
+        T3,
+        T4
+    };
+
+    struct Mode {
+        Type t;
+        vec p;
+        double zeta, omega;
+    };
+
+private:
+    std::vector<Mode> damping_mode;
 
     shared_ptr<MetaMat<double>> current_mass = nullptr;
     shared_ptr<MetaMat<double>> current_stiffness = nullptr;
 
+    [[nodiscard]] vec update_by_mode_zero(double, double) const;
+    [[nodiscard]] vec update_by_mode_one(double, double, int) const;
+    [[nodiscard]] vec update_by_mode_two(double, double, int, int) const;
+    [[nodiscard]] vec update_by_mode_three(double, double, double) const;
+    [[nodiscard]] vec update_by_mode_four(double, double, int, int, int, int, double) const;
+
     void update_damping_force() const;
 
 public:
-    LeeNewmarkIterative(unsigned, vec&&, vec&&, double, double);
+    LeeNewmarkIterative(unsigned, std::vector<Mode>&&, double, double);
 
     [[nodiscard]] int process_constraint() override;
     [[nodiscard]] int process_constraint_resistance() override;
