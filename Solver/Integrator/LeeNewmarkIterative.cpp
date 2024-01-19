@@ -49,16 +49,16 @@ void LeeNewmarkIterative::assemble_mass(const uword row_shift, const uword col_s
 
 void LeeNewmarkIterative::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(current_stiffness, row_shift, col_shift, scalar); }
 
-void LeeNewmarkIterative::assemble_mass(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const {
+void LeeNewmarkIterative::assemble_mass(const std::vector<sword>& row_shift, const std::vector<sword>& col_shift, const std::vector<double>& scalar) const {
     suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
 
-    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) assemble_mass(row_shift[I], col_shift[I], scalar[I]);
+    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_mass(row_shift[I], col_shift[I], scalar[I]);
 }
 
-void LeeNewmarkIterative::assemble_stiffness(const std::vector<uword>& row_shift, const std::vector<uword>& col_shift, const std::vector<double>& scalar) const {
+void LeeNewmarkIterative::assemble_stiffness(const std::vector<sword>& row_shift, const std::vector<sword>& col_shift, const std::vector<double>& scalar) const {
     suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
 
-    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) assemble_stiffness(row_shift[I], col_shift[I], scalar[I]);
+    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_stiffness(row_shift[I], col_shift[I], scalar[I]);
 }
 
 vec LeeNewmarkIterative::update_by_mode_zero(const double mass_coef, const double stiffness_coef) const {
@@ -72,7 +72,56 @@ vec LeeNewmarkIterative::update_by_mode_zero(const double mass_coef, const doubl
     return mass_coef * (damping_force - current_mass * tmp);
 }
 
-vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double stiffness_coef, const int order) const { return {}; }
+vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double stiffness_coef, int order) {
+    auto& W = get_domain()->get_factory();
+
+    const int64_t n_block = W->get_size();
+    const auto n_total = (2 * order + 1) * n_block;
+
+    init_worker(static_cast<unsigned>(n_total), 3llu + 6llu * order);
+
+    const auto mass_coefs = .5 * mass_coef;           // eq. 10
+    const auto stiffness_coefs = .5 * stiffness_coef; // eq. 10
+
+    auto current_pos = 0ll;
+
+    auto I = -n_block;
+    auto J = current_pos;
+    auto K = current_pos += n_block;
+    auto L = current_pos += n_block;
+    auto M = current_pos += n_block;
+
+    while(order > 1) {
+        // eq. 61
+        assemble_mass({I, J, J, K, L, M}, {J, I, K, J, M, L}, {mass_coef, mass_coef, mass_coefs, mass_coefs, mass_coefs, mass_coefs});
+        assemble_stiffness({K, L, J, K, L, M}, {L, K, K, J, M, L}, {stiffness_coef, stiffness_coef, stiffness_coefs, stiffness_coefs, stiffness_coefs, stiffness_coefs});
+
+        I = current_pos;
+        J = current_pos += n_block;
+        K = current_pos += n_block;
+        L = current_pos += n_block;
+        M = current_pos += n_block;
+        order -= 2;
+    }
+
+    // eq. 3
+    if(order < 1) {
+        assemble_mass({I, J, I, J}, {I, J, J, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
+        assemble_stiffness(J, J, stiffness_coef);
+    }
+    else {
+        // eq. 53
+        assemble_mass({I, J, J, K, L}, {J, I, K, J, L}, {mass_coef, mass_coef, mass_coefs, mass_coefs, -mass_coef});
+        assemble_stiffness({J, K, K, L, L}, {K, J, L, K, L}, {stiffness_coefs, stiffness_coefs, stiffness_coef, stiffness_coef, -stiffness_coef});
+    }
+
+    vec damping_force(n_total, fill::zeros);
+    damping_force.head(n_block) = current_mass * W->get_trial_velocity();
+    vec tmp_a;
+    worker->solve(tmp_a, damping_force);
+    const vec tmp_b = -mass_coef * mass_coef * tmp_a.head(n_block);
+    return current_mass * tmp_b;
+}
 
 vec LeeNewmarkIterative::update_by_mode_two(double, double, int, int) const { return {}; }
 
@@ -82,7 +131,7 @@ vec LeeNewmarkIterative::update_by_mode_three(double mass_coef, double stiffness
     const auto n_block = W->get_size();
     const auto n_total = 2 * n_block;
 
-    init_worker(2 * n_block, 6);
+    init_worker(n_total, 6);
 
     mass_coef *= 1. + gm;      // eq. 30
     stiffness_coef *= 1. + gm; // eq. 30
