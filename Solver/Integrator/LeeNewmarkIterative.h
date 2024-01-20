@@ -19,8 +19,7 @@
  * @brief A LeeNewmarkIterative class defines a solver using Newmark algorithm with Lee damping model.
  *
  * Remarks:
- *   1. Only Type 0 is implemented.
- *   2. An iterative algorithm is used. The quadratic convergence is lost.
+ *   1. An iterative algorithm is used. The quadratic convergence is lost.
  *
  * @author tlc
  * @date 15/01/2024
@@ -35,22 +34,67 @@
 
 #include "Newmark.h"
 #include <Domain/MetaMat/MetaMat.hpp>
+#include <Domain/Factory.hpp>
 
 class LeeNewmarkIterative final : public Newmark {
-    const vec mass_coef, stiffness_coef;
+public:
+    enum class Type {
+        T0,
+        T1,
+        T2,
+        T3,
+        T4
+    };
+
+    struct Mode {
+        Type t;
+        vec p;
+        double zeta, omega;
+    };
+
+private:
+    const unsigned n_block{0};
+
+    std::vector<Mode> damping_mode;
+
+    shared_ptr<Factory<double>> factory = nullptr;
 
     shared_ptr<MetaMat<double>> current_mass = nullptr;
     shared_ptr<MetaMat<double>> current_stiffness = nullptr;
 
-    void update_damping_force() const;
+    unique_ptr<MetaMat<double>> worker = nullptr;
+
+    void init_worker(unsigned, unsigned);
+
+    void assemble(const shared_ptr<MetaMat<double>>&, uword, uword, double) const;
+
+    void assemble_mass(uword, uword, double) const;
+    void assemble_stiffness(uword, uword, double) const;
+    void assemble_mass(const std::vector<sword>&, const std::vector<sword>&, const std::vector<double>&) const;
+    void assemble_stiffness(const std::vector<sword>&, const std::vector<sword>&, const std::vector<double>&) const;
+
+    void formulate_block(sword&, double, double, int) const;
+    void formulate_block(sword&, const std::vector<double>&, const std::vector<double>&, const std::vector<int>&) const;
+
+    [[nodiscard]] vec update_by_mode_zero(double, double) const;
+    [[nodiscard]] vec update_by_mode_one(double, double, int);
+    [[nodiscard]] vec update_by_mode_two(double, double, int, int);
+    [[nodiscard]] vec update_by_mode_three(double, double, double);
+    [[nodiscard]] vec update_by_mode_four(double, double, int, int, int, int, double);
+
+    void update_damping_force();
 
 public:
-    LeeNewmarkIterative(unsigned, vec&&, vec&&, double, double);
+    LeeNewmarkIterative(unsigned, std::vector<Mode>&&, double, double);
+
+    int initialize() override;
 
     [[nodiscard]] int process_constraint() override;
     [[nodiscard]] int process_constraint_resistance() override;
 
     void assemble_matrix() override;
+
+    void print() override;
 };
 
 #endif
