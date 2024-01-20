@@ -253,9 +253,9 @@ vec LeeNewmarkIterative::update_by_mode_four(const double mass_coef, const doubl
     damping_force.head(n_block) = current_mass * factory->get_trial_velocity() * m_coef_s;
 
     const auto solve_a = [&](const uword middle) {
-        damping_force.subvec(middle, middle + n_block) = damping_force.head(n_block);
+        damping_force.subvec(middle, middle + n_block - 1) = damping_force.head(n_block);
         const vec tmp_a = worker->solve(damping_force);
-        const vec tmp_b = m_coef_s * (tmp_a.head(n_block) + tmp_a.subvec(middle, middle + n_block));
+        const vec tmp_b = m_coef_s * (tmp_a.head(n_block) + tmp_a.subvec(middle, middle + n_block - 1));
         final_force = damping_force.head(n_block) - current_mass * tmp_b;
     };
 
