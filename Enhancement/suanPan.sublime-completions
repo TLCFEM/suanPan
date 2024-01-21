@@ -1178,15 +1178,21 @@
     },
     {
       "trigger": "LeeNewmark",
-      "details": "newmark with lee's damping model",
+      "details": "Newmark with lee's damping model",
       "kind": "keyword",
       "contents": "integrator LeeNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency \\omega_p at the peak of each mode"
     },
     {
       "trigger": "LeeNewmarkFull",
-      "details": "newmark with lee's damping model (full mode)",
+      "details": "Newmark with lee's damping model (full mode)",
       "kind": "keyword",
       "contents": "integrator LeeNewmarkFull ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:[7...]}...)\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark method\n# (3) double, beta in Newmark method\n# (4) string, type identifier\n# (5) double, \\zeta_p\n# (6) double, \\omega_p\n# (7...) double/int, parameters associated with the mode"
+    },
+    {
+      "trigger": "LeeNewmarkIterative",
+      "details": "Newmark with lee's damping model (full mode) with iterative solving",
+      "kind": "keyword",
+      "contents": "integrator LeeNewmarkIterative ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:[7...]}...)\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark method\n# (3) double, beta in Newmark method\n# (4) string, type identifier\n# (5) double, \\zeta_p\n# (6) double, \\omega_p\n# (7...) double/int, parameters associated with the mode"
     },
     {
       "trigger": "LineUDL2D",
