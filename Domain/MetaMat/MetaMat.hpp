@@ -199,8 +199,6 @@ public:
 
     virtual void operator*=(T) = 0;
 
-    template<ArmaContainer<T> C> int solve(Mat<T>& X, const C& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, B) : this->iterative_solve(X, B); }
-
     template<ArmaContainer<T> C> int solve(Mat<T>& X, C&& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, std::forward<C>(B)) : this->iterative_solve(X, std::forward<C>(B)); }
 
     template<ArmaContainer<T> C> Mat<T> solve(C&& B) {
