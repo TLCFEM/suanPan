@@ -74,6 +74,7 @@ void LeeNewmarkIterative::formulate_block(sword& current_pos, const double m_coe
     auto K = current_pos += n_block;
 
     while(order > 1) {
+        // eq. 78
         assemble_mass({J, K}, {K, J}, {m_coef, m_coef});
         assemble_stiffness({I, J}, {J, I}, {s_coef, s_coef});
 
@@ -150,8 +151,8 @@ vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double
         order -= 2;
     }
 
-    // eq. 3
     if(order < 1) {
+        // eq. 56
         assemble_mass({I, J, I, J}, {I, J, J, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
         assemble_stiffness(J, J, stiffness_coef);
     }
@@ -184,8 +185,8 @@ vec LeeNewmarkIterative::update_by_mode_two(double mass_coef, double stiffness_c
 
     vec damping_force(n_total, fill::zeros), final_force;
 
-    // eq. 100
     if(0 == npr) {
+        // eq. 73
         assemble_mass(0, 0, mass_coef);
 
         formulate_block(current_pos, mass_coef, stiffness_coef, npl);
@@ -222,6 +223,7 @@ vec LeeNewmarkIterative::update_by_mode_three(double mass_coef, double stiffness
     constexpr auto I = 0;
     const auto J = n_block;
 
+    // eq. 87
     assemble_mass({J, I}, {J, I}, {.25 / gm * mass_coef, mass_coef});
     assemble_stiffness({J, I, I, J}, {J, I, J, I}, {(1. + .25 / gm) * stiffness_coef, stiffness_coef, -stiffness_coef, -stiffness_coef});
 

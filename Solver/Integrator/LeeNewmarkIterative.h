@@ -18,6 +18,9 @@
  * @class LeeNewmarkIterative
  * @brief A LeeNewmarkIterative class defines a solver using Newmark algorithm with Lee damping model.
  *
+ * doi:10.1016/j.compstruc.2020.106423
+ * doi:10.1016/j.compstruc.2021.106663
+ *
  * Remarks:
  *   1. An iterative algorithm is used. The quadratic convergence is lost.
  *
