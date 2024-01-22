@@ -22,16 +22,20 @@
 void LeeNewmarkIterative::init_worker(const unsigned n_dim, const unsigned n_multiplier) {
     const auto [l,u] = factory->get_bandwidth();
 
-    if(SolverType::MUMPS == factory->get_solver_type()) worker = make_unique<SparseMatMUMPS<double>>(n_dim, n_dim, n_multiplier * (l + u + 1) * n_block);
-    else if(SolverType::LIS == factory->get_solver_type()) worker = make_unique<SparseMatLis<double>>(n_dim, n_dim, n_multiplier * (l + u + 1) * n_block);
+    // assume sparsity of the banded matrix is around 20%
+    // this is empirical but helps reduce memory footprint
+    const auto in_elem = n_multiplier * (l + u + 1) * n_block / 5;
+
+    if(SolverType::MUMPS == factory->get_solver_type()) worker = make_unique<SparseMatMUMPS<double>>(n_dim, n_dim, in_elem);
+    else if(SolverType::LIS == factory->get_solver_type()) worker = make_unique<SparseMatLis<double>>(n_dim, n_dim, in_elem);
 #ifdef SUANPAN_MKL
-    else if(SolverType::PARDISO == factory->get_solver_type()) worker = make_unique<SparseMatPARDISO<double>>(n_dim, n_dim, n_multiplier * (l + u + 1) * n_block);
-    else if(SolverType::FGMRES == factory->get_solver_type()) worker = make_unique<SparseMatFGMRES<double>>(n_dim, n_dim, n_multiplier * (l + u + 1) * n_block);
+    else if(SolverType::PARDISO == factory->get_solver_type()) worker = make_unique<SparseMatPARDISO<double>>(n_dim, n_dim, in_elem);
+    else if(SolverType::FGMRES == factory->get_solver_type()) worker = make_unique<SparseMatFGMRES<double>>(n_dim, n_dim, in_elem);
 #endif
 #ifdef SUANPAN_CUDA
-    else if(SolverType::CUDA == factory->get_solver_type()) worker = make_unique<SparseMatCUDA<double>>(n_dim, n_dim, n_multiplier * (l + u + 1) * n_block);
+    else if(SolverType::CUDA == factory->get_solver_type()) worker = make_unique<SparseMatCUDA<double>>(n_dim, n_dim, in_elem);
 #endif
-    else worker = make_unique<SparseMatSuperLU<double>>(n_dim, n_dim, n_multiplier * (l + u + 1) * n_block);
+    else worker = make_unique<SparseMatSuperLU<double>>(n_dim, n_dim, in_elem);
 }
 
 void LeeNewmarkIterative::assemble(const shared_ptr<MetaMat<double>>& in_mat, const uword row_shift, const uword col_shift, const double scalar) const {
