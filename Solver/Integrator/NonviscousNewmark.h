@@ -20,6 +20,8 @@
  *
  * Using exponential function based convolution for global damping model.
  *
+ * Reference: 10.1016/j.ymssp.2024.111156
+ *
  * @author tlc
  * @date 18/03/2023
  * @version 0.1.0
