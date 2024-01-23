@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include <Section/Section.h>
 
 NMB31::NMB31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const bool F)
-    : SectionNMElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionNMElement3D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , orientation_tag(O) {}
 
 int NMB31::initialize(const shared_ptr<DomainBase>& D) {

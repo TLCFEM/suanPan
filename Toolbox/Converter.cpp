@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <sstream>
 
 Converter::Converter(std::string&& OP)
-    : output_path(std::forward<string>(OP)) {}
+    : output_path(std::move(OP)) {}
 
 int Converter::process(std::ifstream& input_file, std::ofstream& output_file) {
     output_file.setf(std::ios::scientific);

@@ -22,6 +22,7 @@ set(M1D
         Material1D/Hysteresis/BilinearPO.cpp
         Material1D/Hysteresis/BoucWen.cpp
         Material1D/Hysteresis/BWBN.cpp
+        Material1D/Hysteresis/ComplexHysteresis.cpp
         Material1D/Hysteresis/CoulombFriction.cpp
         Material1D/Hysteresis/Flag.cpp
         Material1D/Hysteresis/Gap01.cpp

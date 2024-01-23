@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 GroupGroup::GroupGroup(const unsigned T, uvec&& GT)
     : Group(T)
-    , group_tag(std::forward<uvec>(GT)) {}
+    , group_tag(std::move(GT)) {}
 
 void GroupGroup::initialize(const shared_ptr<DomainBase>& D) {
     uword size = 0;

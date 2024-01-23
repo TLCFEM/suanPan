@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ MaterialType ExternalMaterial::get_type(const ExternalMaterialData& D) {
 
 ExternalMaterial::ExternalMaterial(const unsigned T, std::vector<double>&& P, void* H)
     : Material(T, MaterialType::D0, 0.)
-    , constant(std::forward<std::vector<double>>(P))
+    , constant(std::move(P))
     // ReSharper disable once CppFunctionalStyleCast
     , cooker(Interface(H)) {
     data.constant = constant.data();

@@ -21,6 +21,7 @@
 #include "Hysteresis/BilinearPO.h"
 #include "Hysteresis/BoucWen.h"
 #include "Hysteresis/BWBN.h"
+#include "Hysteresis/ComplexHysteresis.h"
 #include "Hysteresis/CoulombFriction.h"
 #include "Hysteresis/Flag.h"
 #include "Hysteresis/Gap01.h"

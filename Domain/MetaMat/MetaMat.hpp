@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,39 @@
 #include "Jacobi.hpp"
 
 template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
+
+template<sp_d T> class MetaMat;
+
+template<sp_d T> class op_add {
+    friend MetaMat<T>;
+
+    shared_ptr<MetaMat<T>> mat_a, mat_b;
+
+public:
+    explicit op_add(const shared_ptr<MetaMat<T>>& A)
+        : mat_a(A)
+        , mat_b(nullptr) {}
+
+    op_add(const shared_ptr<MetaMat<T>>& A, const shared_ptr<MetaMat<T>>& B)
+        : mat_a(A)
+        , mat_b(B) {}
+};
+
+template<sp_d T> class op_scale {
+    friend MetaMat<T>;
+
+    T scalar;
+    op_add<T> bracket;
+
+public:
+    op_scale(const T A, const shared_ptr<MetaMat<T>>& B)
+        : scalar(A)
+        , bracket(B) {}
+
+    op_scale(const T A, op_add<T>&& B)
+        : scalar(A)
+        , bracket(std::forward<op_add<T>>(B)) {}
+};
 
 template<sp_d T> class MetaMat {
 protected:
@@ -139,24 +172,47 @@ public:
     [[nodiscard]] virtual const T* memptr() const = 0;
     virtual T* memptr() = 0;
 
-    virtual void operator+=(const shared_ptr<MetaMat>&) = 0;
-    virtual void operator-=(const shared_ptr<MetaMat>&) = 0;
+    virtual void scale_accu(T, const shared_ptr<MetaMat>&) = 0;
+    virtual void scale_accu(T, const triplet_form<T, uword>&) = 0;
 
-    virtual void operator+=(const triplet_form<T, uword>&) = 0;
-    virtual void operator-=(const triplet_form<T, uword>&) = 0;
+    void operator+=(const shared_ptr<MetaMat>& M) { return this->scale_accu(1., M); }
+
+    void operator-=(const shared_ptr<MetaMat>& M) { return this->scale_accu(-1., M); }
+
+    void operator+=(const op_scale<T>& M) {
+        const auto& bracket = M.bracket;
+        if(nullptr != bracket.mat_a) this->scale_accu(M.scalar, bracket.mat_a);
+        if(nullptr != bracket.mat_b) this->scale_accu(M.scalar, bracket.mat_b);
+    }
+
+    void operator-=(const op_scale<T>& M) {
+        const auto& bracket = M.bracket;
+        if(nullptr != bracket.mat_a) this->scale_accu(-M.scalar, bracket.mat_a);
+        if(nullptr != bracket.mat_b) this->scale_accu(-M.scalar, bracket.mat_b);
+    }
+
+    void operator+=(const triplet_form<T, uword>& M) { return this->scale_accu(1., M); }
+
+    void operator-=(const triplet_form<T, uword>& M) { return this->scale_accu(-1., M); }
 
     virtual Mat<T> operator*(const Mat<T>&) const = 0;
 
     virtual void operator*=(T) = 0;
 
-    template<ArmaContainer<T> C> int solve(Mat<T>& X, const C& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, B) : this->iterative_solve(X, B); }
-
     template<ArmaContainer<T> C> int solve(Mat<T>& X, C&& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, std::forward<C>(B)) : this->iterative_solve(X, std::forward<C>(B)); }
+
+    template<ArmaContainer<T> C> Mat<T> solve(C&& B) {
+        Mat<T> X;
+
+        if(SUANPAN_SUCCESS != this->solve(X, std::forward<C>(B))) throw std::runtime_error("fail to solve the system");
+
+        return X;
+    }
 
     [[nodiscard]] virtual int sign_det() const = 0;
 
     void save(const char* name) {
-        if(!to_mat(*this).save(name))
+        if(!to_mat(*this).save(name, raw_ascii))
             suanpan_error("Cannot save to file \"{}\".\n", name);
     }
 
@@ -189,14 +245,14 @@ template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
     std::atomic_int code = 0;
 
     if(IterativeSolver::GMRES == setting.iterative_solver)
-        suanpan_for(0llu, B.n_cols, [&](const uword I) {
+        suanpan::for_each(B.n_cols, [&](const uword I) {
             Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
             const Col<T> sub_b(B.colptr(I), B.n_rows);
             auto col_setting = setting;
             code += GMRES(this, sub_x, sub_b, col_setting);
         });
     else if(IterativeSolver::BICGSTAB == setting.iterative_solver)
-        suanpan_for(0llu, B.n_cols, [&](const uword I) {
+        suanpan::for_each(B.n_cols, [&](const uword I) {
             Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
             const Col<T> sub_b(B.colptr(I), B.n_rows);
             auto col_setting = setting;

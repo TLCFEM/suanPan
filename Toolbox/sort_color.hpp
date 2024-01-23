@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ template<typename T> std::vector<std::vector<T>> sort_color_wp(const suanpan::gr
 
     uvec weight(num_node, fill::none);
 
-    suanpan_for(static_cast<size_t>(0), node_register.size(), [&](const size_t I) { weight(I) = node_register[I].size(); });
+    suanpan::for_each(node_register.size(), [&](const size_t I) { weight(I) = node_register[I].size(); });
 
     auto comparator = [&](const T A, const T B) { return weight[A] > weight[B]; };
 
@@ -135,7 +135,7 @@ template<typename T> std::vector<std::vector<T>> sort_color_mis(const suanpan::g
 
     uvec weight(num_node, fill::none);
 
-    suanpan_for(static_cast<size_t>(0), node_register.size(), [&](const size_t I) { weight(I) = node_register[I].size(); });
+    suanpan::for_each(node_register.size(), [&](const size_t I) { weight(I) = node_register[I].size(); });
 
     uword counter = num_node;
     for(const auto I : sort_index(weight, "descend").eval()) weight[I] = --counter;

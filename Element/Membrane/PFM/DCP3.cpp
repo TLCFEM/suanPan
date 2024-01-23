@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ const uvec DCP3::u_dof{0, 1, 3, 4, 6, 7};
 const uvec DCP3::d_dof{2, 5, 8};
 
 DCP3::DCP3(const unsigned T, uvec&& NT, const unsigned MT, const double CL, const double RR, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::DMG})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::DMG})
     , release_rate(RR)
     , thickness(TH) { access::rw(characteristic_length) = CL; }
 

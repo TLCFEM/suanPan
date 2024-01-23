@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2017-2023 Theodore Chang
+// Copyright (C) 2017-2024 Theodore Chang
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,11 +19,11 @@
 
 BSplineSurface::BSplineSurface(vec knot_u, vec knot_v, const uword size, field<vec>&& N)
     : dimension(size)
-    , net(std::forward<field<vec>>(N))
+    , net(std::move(N))
     , line_u(std::move(knot_u), size)
     , line_v(std::move(knot_v), size) {}
 
-void BSplineSurface::set_control_polygon(field<vec>&& N) { net = std::forward<field<vec>>(N); }
+void BSplineSurface::set_control_polygon(field<vec>&& N) { net = std::move(N); }
 
 void BSplineSurface::set_control_polygon(const field<vec>& N) { net = N; }
 
@@ -149,10 +149,10 @@ field<mat> BSplineSurface::evaluate_shape_function_derivative(const double u, co
 }
 
 BSplineSurface2D::BSplineSurface2D(vec knot_u, vec knot_v, field<vec>&& N)
-    : BSplineSurface(std::move(knot_u), std::move(knot_v), 2, std::forward<field<vec>>(N)) {}
+    : BSplineSurface(std::move(knot_u), std::move(knot_v), 2, std::move(N)) {}
 
 BSplineSurface3D::BSplineSurface3D(vec knot_u, vec knot_v, field<vec>&& N)
-    : BSplineSurface(std::move(knot_u), std::move(knot_v), 3, std::forward<field<vec>>(N)) {}
+    : BSplineSurface(std::move(knot_u), std::move(knot_v), 3, std::move(N)) {}
 
 BSplineSurface4D::BSplineSurface4D(vec knot_u, vec knot_v, field<vec>&& N)
-    : BSplineSurface(std::move(knot_u), std::move(knot_v), 4, std::forward<field<vec>>(N)) {}
+    : BSplineSurface(std::move(knot_u), std::move(knot_v), 4, std::move(N)) {}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,13 +28,13 @@ const uvec PCPE4DC::s_dof{0, 1, 4, 5, 8, 9, 12, 13};
 const uvec PCPE4DC::f_dof{2, 3, 6, 7, 10, 11, 14, 15};
 
 PCPE4DC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
+    , m_material(std::move(M))
     , strain_mat(3, 2llu * m_node, fill::zeros) {}
 
 PCPE4DC::PCPE4DC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN, const double KK)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{MS, MF}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false)
     , alpha(AL)
     , porosity(NN)
     , k(KK) {}
@@ -122,15 +122,15 @@ int PCPE4DC::initialize(const shared_ptr<DomainBase>& D) {
     const uvec f_dof_a{2, 6, 10, 14};
     const uvec f_dof_b{3, 7, 11, 15};
 
-    initial_damping.zeros(m_size, m_size);
-    initial_damping(s_dof_a, s_dof_a) = porosity * porosity / k * meta_a;
-    initial_damping(s_dof_b, s_dof_b) = initial_damping(s_dof_a, s_dof_a);
-    initial_damping(f_dof_a, f_dof_a) = initial_damping(s_dof_a, s_dof_a);
-    initial_damping(f_dof_b, f_dof_b) = initial_damping(s_dof_a, s_dof_a);
-    initial_damping(s_dof_a, f_dof_a) = -initial_damping(s_dof_a, s_dof_a);
-    initial_damping(s_dof_b, f_dof_b) = -initial_damping(s_dof_a, s_dof_a);
-    initial_damping(f_dof_a, s_dof_a) = -initial_damping(s_dof_a, s_dof_a);
-    initial_damping(f_dof_b, s_dof_b) = -initial_damping(s_dof_a, s_dof_a);
+    initial_viscous.zeros(m_size, m_size);
+    initial_viscous(s_dof_a, s_dof_a) = porosity * porosity / k * meta_a;
+    initial_viscous(s_dof_b, s_dof_b) = initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(f_dof_a, f_dof_a) = initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(f_dof_b, f_dof_b) = initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(s_dof_a, f_dof_a) = -initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(s_dof_b, f_dof_b) = -initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(f_dof_a, s_dof_a) = -initial_viscous(s_dof_a, s_dof_a);
+    initial_viscous(f_dof_b, s_dof_b) = -initial_viscous(s_dof_a, s_dof_a);
     ConstantDamping(this);
 
     initial_mass.zeros(m_size, m_size);
@@ -156,7 +156,7 @@ int PCPE4DC::update_status() {
         trial_resistance(s_dof) += I.weight * I.strain_mat.t() * I.m_material->get_trial_stress();
     }
 
-    trial_damping_force = trial_damping * get_trial_velocity();
+    trial_viscous_force = trial_viscous * get_trial_velocity();
 
     return SUANPAN_SUCCESS;
 }

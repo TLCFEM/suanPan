@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ double PolyJ2::compute_h(const double) const { return 0.; }
 double PolyJ2::compute_dh(const double) const { return 0.; }
 
 PolyJ2::PolyJ2(const unsigned T, const double E, const double V, vec&& H, const double R)
-    : DataPolyJ2{std::forward<vec>(H)}
+    : DataPolyJ2{std::move(H)}
     , NonlinearJ2(T, E, V, R) {}
 
 unique_ptr<Material> PolyJ2::get_copy() { return make_unique<PolyJ2>(*this); }

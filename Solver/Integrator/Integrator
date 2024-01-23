@@ -6,6 +6,7 @@
 #include "GeneralizedAlphaExplicit.h"
 #include "GSSSS.h"
 #include "LeeNewmark.h"
+#include "LeeNewmarkIterative.h"
 #include "LeeNewmarkBase.h"
 #include "LeeNewmarkFull.h"
 #include "Newmark.h"

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Recorder/OutputType.h>
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const bool KK, const double LD, vec&& YF)
-    : DataNonlinearNM{EEA, EEIS, 0., std::forward<vec>(YF)}
+    : DataNonlinearNM{EEA, EEIS, 0., std::move(YF)}
     , SectionNM(T, SectionType::NM2D)
     , yield_diag{yield_force(0), yield_force(1), yield_force(1)}
     , ti([] {
@@ -45,7 +45,7 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
     , ge{5} { access::rw(linear_density) = LD; }
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const bool KK, const double LD, vec&& YF)
-    : DataNonlinearNM{EEA, EEIS, EEIW, std::forward<vec>(YF)}
+    : DataNonlinearNM{EEA, EEIS, EEIW, std::move(YF)}
     , SectionNM(T, SectionType::NM3D)
     , yield_diag{yield_force(0), yield_force(1), yield_force(1), yield_force(2), yield_force(2)}
     , ti([] {

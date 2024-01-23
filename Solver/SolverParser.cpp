@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,27 +82,11 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 
             if(domain->insert(make_shared<LeeNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
         }
-        else if(is_equal(integrator_type, "LeeElementalNewmark")) {
-            vector<double> damping_coef, frequency;
+        else if(is_equal(integrator_type, "LeeNewmarkIterative")) {
+            using LeeMode = LeeNewmarkIterative::Mode;
+            using LeeType = LeeNewmarkIterative::Type;
 
-            while(!command.eof()) {
-                double t_para;
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid damping coefficient is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                damping_coef.emplace_back(t_para);
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid frequency is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                frequency.emplace_back(t_para);
-            }
-
-            if(domain->insert(make_shared<LeeElementalNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
-        }
-        else if(integrator_type.size() >= 14 && is_equal(integrator_type.substr(0, 14), "LeeNewmarkFull")) {
-            vector<LeeNewmarkFull::Mode> modes;
+            vector<LeeMode> modes;
 
             auto omega = 0., zeta = 0., para_a = .0, para_b = .0;
 
@@ -134,6 +118,8 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                 return SUANPAN_SUCCESS;
             };
 
+            auto regularise = [](const double x) { return static_cast<double>(static_cast<unsigned>(x)); };
+
             while(!command.eof()) {
                 string type;
                 if(!get_input(command, type)) {
@@ -142,19 +128,19 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                 }
                 if(is_equal("-type0", type)) {
                     if(SUANPAN_SUCCESS != get_basic_input()) return SUANPAN_SUCCESS;
-                    modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T0, vec{}, zeta, omega});
+                    modes.emplace_back(LeeMode{LeeType::T0, vec{}, zeta, omega});
                 }
                 else if(is_equal("-type1", type)) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
-                    modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T1, vec{static_cast<double>(static_cast<unsigned>(para_a))}, zeta, omega});
+                    modes.emplace_back(LeeMode{LeeType::T1, vec{regularise(para_a)}, zeta, omega});
                 }
                 else if(is_equal("-type2", type)) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
-                    modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T2, vec{static_cast<double>(static_cast<unsigned>(para_a)), static_cast<double>(static_cast<unsigned>(para_b))}, zeta, omega});
+                    modes.emplace_back(LeeMode{LeeType::T2, vec{regularise(para_a), regularise(para_b)}, zeta, omega});
                 }
                 else if(is_equal("-type3", type)) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
-                    modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T3, vec{para_a}, zeta, omega});
+                    modes.emplace_back(LeeMode{LeeType::T3, vec{para_a}, zeta, omega});
                 }
                 else if(is_equal("-type4", type)) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
@@ -163,7 +149,103 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                         suanpan_error("A valid parameter is required.\n");
                         return SUANPAN_SUCCESS;
                     }
-                    modes.emplace_back(LeeNewmarkFull::Mode{LeeNewmarkFull::Type::T4, vec{static_cast<double>(static_cast<unsigned>(para_a)), static_cast<double>(static_cast<unsigned>(para_b)), static_cast<double>(static_cast<unsigned>(para_c)), static_cast<double>(static_cast<unsigned>(para_d)), para_e}, zeta, omega});
+                    modes.emplace_back(LeeMode{LeeType::T4, vec{regularise(para_a), regularise(para_b), regularise(para_c), regularise(para_d), para_e}, zeta, omega});
+                }
+                else {
+                    suanpan_error("A valid type is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+            }
+
+            if(domain->insert(make_shared<LeeNewmarkIterative>(tag, std::move(modes), alpha, beta))) code = 1;
+        }
+        else if(is_equal(integrator_type, "LeeElementalNewmark")) {
+            vector<double> damping_coef, frequency;
+
+            while(!command.eof()) {
+                double t_para;
+                if(!get_input(command, t_para)) {
+                    suanpan_error("A valid damping coefficient is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                damping_coef.emplace_back(t_para);
+                if(!get_input(command, t_para)) {
+                    suanpan_error("A valid frequency is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                frequency.emplace_back(t_para);
+            }
+
+            if(domain->insert(make_shared<LeeElementalNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
+        }
+        else if(integrator_type.size() >= 14 && is_equal(integrator_type.substr(0, 14), "LeeNewmarkFull")) {
+            using LeeMode = LeeNewmarkFull::Mode;
+            using LeeType = LeeNewmarkFull::Type;
+
+            vector<LeeMode> modes;
+
+            auto omega = 0., zeta = 0., para_a = .0, para_b = .0;
+
+            auto get_basic_input = [&] {
+                if(!get_input(command, zeta)) {
+                    suanpan_error("A valid zeta_p is required.\n");
+                    return SUANPAN_FAIL;
+                }
+                if(!get_input(command, omega)) {
+                    suanpan_error("A valid omega_p is required.\n");
+                    return SUANPAN_FAIL;
+                }
+                return SUANPAN_SUCCESS;
+            };
+
+            auto get_first = [&] {
+                if(!get_input(command, para_a)) {
+                    suanpan_error("A valid parameter is required.\n");
+                    return SUANPAN_FAIL;
+                }
+                return SUANPAN_SUCCESS;
+            };
+
+            auto get_second = [&] {
+                if(!get_input(command, para_b)) {
+                    suanpan_error("A valid parameter is required.\n");
+                    return SUANPAN_FAIL;
+                }
+                return SUANPAN_SUCCESS;
+            };
+
+            auto regularise = [](const double x) { return static_cast<double>(static_cast<unsigned>(x)); };
+
+            while(!command.eof()) {
+                string type;
+                if(!get_input(command, type)) {
+                    suanpan_error("A valid type is required.\n");
+                    return SUANPAN_SUCCESS;
+                }
+                if(is_equal("-type0", type)) {
+                    if(SUANPAN_SUCCESS != get_basic_input()) return SUANPAN_SUCCESS;
+                    modes.emplace_back(LeeMode{LeeType::T0, vec{}, zeta, omega});
+                }
+                else if(is_equal("-type1", type)) {
+                    if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
+                    modes.emplace_back(LeeMode{LeeType::T1, vec{regularise(para_a)}, zeta, omega});
+                }
+                else if(is_equal("-type2", type)) {
+                    if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
+                    modes.emplace_back(LeeMode{LeeType::T2, vec{regularise(para_a), regularise(para_b)}, zeta, omega});
+                }
+                else if(is_equal("-type3", type)) {
+                    if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
+                    modes.emplace_back(LeeMode{LeeType::T3, vec{para_a}, zeta, omega});
+                }
+                else if(is_equal("-type4", type)) {
+                    if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
+                    double para_c, para_d, para_e;
+                    if(!get_input(command, para_c) || !get_input(command, para_d) || !get_input(command, para_e)) {
+                        suanpan_error("A valid parameter is required.\n");
+                        return SUANPAN_SUCCESS;
+                    }
+                    modes.emplace_back(LeeMode{LeeType::T4, vec{regularise(para_a), regularise(para_b), regularise(para_c), regularise(para_d), para_e}, zeta, omega});
                 }
                 else {
                     suanpan_error("A valid type is required.\n");

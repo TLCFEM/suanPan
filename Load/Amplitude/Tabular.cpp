@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@
 
 Tabular::Tabular(const unsigned T, vec&& TI, vec&& M, const unsigned ST)
     : Amplitude(T, ST)
-    , time(std::forward<vec>(TI))
-    , magnitude(std::forward<vec>(M)) {}
+    , time(std::move(TI))
+    , magnitude(std::move(M)) {}
 
 Tabular::Tabular(const unsigned T, string&& P, const unsigned ST)
     : Amplitude(T, ST)
-    , file_name(std::forward<string>(P)) {}
+    , file_name(std::move(P)) {}
 
 void Tabular::initialize(const shared_ptr<DomainBase>& D) {
     if(file_name.empty()) {

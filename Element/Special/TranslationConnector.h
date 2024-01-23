@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,13 +63,13 @@ public:
 class TranslationConnector2D final : public TranslationConnector {
 public:
     TranslationConnector2D(const unsigned T, uvec&& N, const double P)
-        : TranslationConnector(T, std::forward<uvec>(N), 2u, P) {}
+        : TranslationConnector(T, std::move(N), 2u, P) {}
 };
 
 class TranslationConnector3D final : public TranslationConnector {
 public:
     TranslationConnector3D(const unsigned T, uvec&& N, const double P)
-        : TranslationConnector(T, std::forward<uvec>(N), 3u, P) {}
+        : TranslationConnector(T, std::move(N), 3u, P) {}
 };
 
 #endif

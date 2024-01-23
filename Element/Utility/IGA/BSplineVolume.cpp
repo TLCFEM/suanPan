@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2017-2023 Theodore Chang
+// Copyright (C) 2017-2024 Theodore Chang
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 
 BSplineVolume::BSplineVolume(vec knot_u, vec knot_v, vec knot_w, const uword size, field<vec>&& N)
     : dimension(size)
-    , net(std::forward<field<vec>>(N))
+    , net(std::move(N))
     , line_u(std::move(knot_u), size)
     , line_v(std::move(knot_v), size)
     , line_w(std::move(knot_w), size) {}
 
-void BSplineVolume::set_control_polygon(field<vec>&& N) { net = std::forward<field<vec>>(N); }
+void BSplineVolume::set_control_polygon(field<vec>&& N) { net = std::move(N); }
 
 void BSplineVolume::set_control_polygon(const field<vec>& N) { net = N; }
 
@@ -180,7 +180,7 @@ field<cube> BSplineVolume::evaluate_shape_function_derivative(const double u, co
 }
 
 BSplineVolume3D::BSplineVolume3D(vec knot_u, vec knot_v, vec knot_w, field<vec>&& N)
-    : BSplineVolume(std::move(knot_u), std::move(knot_v), std::move(knot_w), 3, std::forward<field<vec>>(N)) {}
+    : BSplineVolume(std::move(knot_u), std::move(knot_v), std::move(knot_w), 3, std::move(N)) {}
 
 BSplineVolume4D::BSplineVolume4D(vec knot_u, vec knot_v, vec knot_w, field<vec>&& N)
-    : BSplineVolume(std::move(knot_u), std::move(knot_v), std::move(knot_w), 4, std::forward<field<vec>>(N)) {}
+    : BSplineVolume(std::move(knot_u), std::move(knot_v), std::move(knot_w), 4, std::move(N)) {}

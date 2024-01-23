@@ -49,15 +49,17 @@ fix 3 2 3
 
 step static 1
 
+solver Newton 1
+
+converger RelIncreDisp 1 1E-8 10 1
+
 cload 1 0 100 1 2
 
 step static 2
 
 cload 2 0 100 1 2
 
-converger RelIncreDisp 1 1E-8 10 1
-
-analyze
+analyze --ignore-warning
 
 # 0.0770 -0.0985
 peek node 2

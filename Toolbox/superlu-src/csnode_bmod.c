@@ -36,13 +36,13 @@ at the top-level directory.
 /*! \brief Performs numeric block updates within the relaxed snode. 
  */
 int csnode_bmod(
-	const int jcol,     /* in */
-	const int jsupno,   /* in */
-	const int fsupc,    /* in */
-	complex* dense,     /* in */
-	complex* tempv,     /* working array */
-	GlobalLU_t* Glu,    /* modified */
-	SuperLUStat_t* stat /* output */
+    const int jcol,     /* in */
+    const int jsupno,   /* in */
+    const int fsupc,    /* in */
+    complex* dense,     /* in */
+    complex* tempv,     /* working array */
+    GlobalLU_t* Glu,    /* modified */
+    SuperLUStat_t* stat /* output */
 ) {
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
@@ -54,44 +54,44 @@ int csnode_bmod(
     complex         alpha = {-1.0, 0.0},  beta = {1.0, 0.0};
 #endif
 
-	complex comp_zero = {0.0, 0.0};
-	int luptr, nsupc, nsupr, nrow;
-	int isub, irow, i, iptr;
-	register int ufirst, nextlu;
-	int *lsub, *xlsub;
-	complex* lusup;
-	int* xlusup;
-	flops_t* ops = stat->ops;
+    complex comp_zero = {0.0, 0.0};
+    int nsupc, nsupr, nrow;
+    int_t isub, irow;
+    int_t ufirst, nextlu;
+    int_t *lsub, *xlsub;
+    complex* lusup;
+    int_t *xlusup, luptr;
+    flops_t* ops = stat->ops;
 
-	lsub = Glu->lsub;
-	xlsub = Glu->xlsub;
-	lusup = (complex*)Glu->lusup;
-	xlusup = Glu->xlusup;
+    lsub = Glu->lsub;
+    xlsub = Glu->xlsub;
+    lusup = (complex*)Glu->lusup;
+    xlusup = Glu->xlusup;
 
-	nextlu = xlusup[jcol];
+    nextlu = xlusup[jcol];
 
-	/*
-	 *	Process the supernodal portion of L\U[*,j]
-	 */
-	for(isub = xlsub[fsupc]; isub < xlsub[fsupc + 1]; isub++) {
-		irow = lsub[isub];
-		lusup[nextlu] = dense[irow];
-		dense[irow] = comp_zero;
-		++nextlu;
-	}
+    /*
+     *	Process the supernodal portion of L\U[*,j]
+     */
+    for(isub = xlsub[fsupc]; isub < xlsub[fsupc + 1]; isub++) {
+        irow = lsub[isub];
+        lusup[nextlu] = dense[irow];
+        dense[irow] = comp_zero;
+        ++nextlu;
+    }
 
-	xlusup[jcol + 1] = nextlu; /* Initialize xlusup for next column */
+    xlusup[jcol + 1] = nextlu; /* Initialize xlusup for next column */
 
-	if(fsupc < jcol) {
-		luptr = xlusup[fsupc];
-		nsupr = xlsub[fsupc + 1] - xlsub[fsupc];
-		nsupc = jcol - fsupc;  /* Excluding jcol */
-		ufirst = xlusup[jcol]; /* Points to the beginning of column
+    if(fsupc < jcol) {
+        luptr = xlusup[fsupc];
+        nsupr = xlsub[fsupc + 1] - xlsub[fsupc];
+        nsupc = jcol - fsupc;  /* Excluding jcol */
+        ufirst = xlusup[jcol]; /* Points to the beginning of column
 				   jcol in supernode L\U(jsupno). */
-		nrow = nsupr - nsupc;
+        nrow = nsupr - nsupc;
 
-		ops[TRSV] += 4 * nsupc * (nsupc - 1);
-		ops[GEMV] += 8 * nrow * nsupc;
+        ops[TRSV] += 4 * nsupc * (nsupc - 1);
+        ops[GEMV] += 8 * nrow * nsupc;
 
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
@@ -106,20 +106,19 @@ int csnode_bmod(
 		&lusup[ufirst], &incx, &beta, &lusup[ufirst+nsupc], &incy );
 #endif
 #else
-		clsolve(nsupr, nsupc, &lusup[luptr], &lusup[ufirst]);
-		cmatvec(nsupr, nrow, nsupc, &lusup[luptr + nsupc],
-		        &lusup[ufirst], &tempv[0]);
+        clsolve(nsupr, nsupc, &lusup[luptr], &lusup[ufirst]);
+        cmatvec(nsupr, nrow, nsupc, &lusup[luptr + nsupc], &lusup[ufirst], &tempv[0]);
 
-		/* Scatter tempv[*] into lusup[*] */
-		iptr = ufirst + nsupc;
-		for(i = 0; i < nrow; i++) {
-			c_sub(&lusup[iptr], &lusup[iptr], &tempv[i]);
-			++iptr;
-			tempv[i] = comp_zero;
-		}
+        int_t i, iptr;
+        /* Scatter tempv[*] into lusup[*] */
+        iptr = ufirst + nsupc;
+        for(i = 0; i < nrow; i++) {
+            c_sub(&lusup[iptr], &lusup[iptr], &tempv[i]);
+            ++iptr;
+            tempv[i] = comp_zero;
+        }
 #endif
+    }
 
-	}
-
-	return 0;
+    return 0;
 }

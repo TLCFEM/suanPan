@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 Cosine::Cosine(const unsigned T, const double L, std::vector<double>&& AA, const unsigned ST)
     : Amplitude(T, ST)
     , period(.5 * L)
-    , amp(std::forward<std::vector<double>>(AA)) {}
+    , amp(std::move(AA)) {}
 
 double Cosine::get_amplitude(const double T) {
     const auto step_time = T - start_time;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@
 #include <Domain/Group/Group.h>
 
 ElementalNonviscous::ElementalNonviscous(const unsigned T, cx_vec&& M, cx_vec&& S, uvec&& ET)
-    : Modifier(T, std::forward<uvec>(ET))
-    , m(std::forward<cx_vec>(M))
-    , s(std::forward<cx_vec>(S)) {}
+    : ModifierDynamics(T, std::move(ET))
+    , m(std::move(M))
+    , s(std::move(S)) {}
 
 int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
-    Modifier::initialize(D);
+    ModifierDynamics::initialize(D);
 
     factory = D->get_factory();
 
@@ -44,23 +44,26 @@ int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int ElementalNonviscous::update_status() {
-    if(element_pool.empty() || AnalysisType::DYNAMICS != factory.lock()->get_analysis_type()) return SUANPAN_SUCCESS;
+    // shortcircuit as computing complex parameters is expensive
+    if(element_pool.empty()) return SUANPAN_SUCCESS;
 
     const cx_vec t_para = 2. / factory.lock()->get_incre_time() + s;
     const cx_vec s_para = (t_para - 2. * s) / t_para;
     const cx_vec m_para = m / t_para;
     const auto accu_para = accu(m_para).real();
 
-    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
-        const auto t_ele = ele_ptr.lock();
+    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& t_ptr) {
+        const auto t_element = t_ptr.lock();
 
-        if(t_ele->get_current_nonviscous_force().n_cols != s_para.n_elem) return;
+        if(nullptr == t_element || !t_element->if_update_nonviscous() || !t_element->allow_modify_nonviscous()) return;
 
-        auto& trial_nonviscous_force = access::rw(t_ele->get_trial_nonviscous_force());
-        trial_nonviscous_force = t_ele->get_current_nonviscous_force() * diagmat(s_para) + (t_ele->get_current_velocity() + t_ele->get_trial_velocity()) * m_para.t();
+        if(t_element->get_current_nonviscous_force().n_cols != s_para.n_elem) return;
 
-        auto& trial_nonviscous = access::rw(t_ele->get_trial_nonviscous());
-        trial_nonviscous.zeros(t_ele->get_total_number(), t_ele->get_total_number());
+        auto& trial_nonviscous_force = access::rw(t_element->get_trial_nonviscous_force());
+        trial_nonviscous_force = t_element->get_current_nonviscous_force() * diagmat(s_para) + (t_element->get_current_velocity() + t_element->get_trial_velocity()) * m_para.t();
+
+        auto& trial_nonviscous = access::rw(t_element->get_trial_nonviscous());
+        trial_nonviscous.zeros(t_element->get_total_number(), t_element->get_total_number());
         trial_nonviscous.diag().fill(accu_para);
     });
 
@@ -68,7 +71,7 @@ int ElementalNonviscous::update_status() {
 }
 
 ElementalNonviscousGroup::ElementalNonviscousGroup(const unsigned T, cx_vec&& M, cx_vec&& S, const unsigned GT)
-    : ElementalNonviscous(T, std::forward<cx_vec>(M), std::forward<cx_vec>(S))
+    : ElementalNonviscous(T, std::move(M), std::move(S))
     , group_tag(GT) {}
 
 int ElementalNonviscousGroup::initialize(const shared_ptr<DomainBase>& D) {

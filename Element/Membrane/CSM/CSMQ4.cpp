@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@ const uvec CSMQ4::t_dof{0, 1, 3, 4, 6, 7, 9, 10};
 const uvec CSMQ4::r_dof{2, 5, 8, 11};
 
 CSMQ4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M)) {}
+    , m_material(std::move(M)) {}
 
 CSMQ4::CSMQ4(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMQ4::initialize(const shared_ptr<DomainBase>& D) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 #include <Domain/DomainBase.h>
 
 GroupNodalDisplacement::GroupNodalDisplacement(const unsigned T, const unsigned ST, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : GroupLoad(std::forward<uvec>(N))
+    : GroupLoad(std::move(N))
     , NodalDisplacement(T, ST, L, uvec{}, uvec{D}, AT) {}
 
 GroupNodalDisplacement::GroupNodalDisplacement(const unsigned T, const unsigned ST, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : GroupLoad(std::forward<uvec>(N))
-    , NodalDisplacement(T, ST, L, uvec{}, std::forward<uvec>(D), AT) {}
+    : GroupLoad(std::move(N))
+    , NodalDisplacement(T, ST, L, uvec{}, std::move(D), AT) {}
 
 int GroupNodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
     node_encoding = update_object_tag(D);

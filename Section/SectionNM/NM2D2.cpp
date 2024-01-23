@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ vec NM2D2::compute_df(const vec& s, const vec& h) const { return compute_dsf(s, 
 mat NM2D2::compute_ddf(const vec& s, const vec& h) const { return compute_ddsf(s, h); }
 
 NM2D2::NM2D2(const unsigned T, const double EEA, const double EEIS, const double NP, const double MSP, const double CC, const double HH, const double KK, const double LD, mat&& PS)
-    : SurfaceNM2D(CC, std::forward<mat>(PS))
+    : SurfaceNM2D(CC, std::move(PS))
     , LinearHardeningNM(T, EEA, EEIS, HH, KK, LD, vec{NP, MSP}) {}
 
 unique_ptr<Section> NM2D2::get_copy() { return make_unique<NM2D2>(*this); }

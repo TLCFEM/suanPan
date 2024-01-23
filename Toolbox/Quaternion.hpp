@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ template<typename T> Quaternion<T>::Quaternion(const T R, const Col<T>& I)
 
 template<typename T> Quaternion<T>::Quaternion(const T R, Col<T>&& I)
     : re(R)
-    , im(std::forward<Col<T>>(I)) {}
+    , im(std::move(I)) {}
 
 template<typename T> const T& Quaternion<T>::real() const { return re; }
 

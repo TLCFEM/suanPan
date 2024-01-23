@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ MultilinearElastic1D::MultilinearElastic1D(const unsigned T, mat&& H, const doub
     H.resize(H.n_rows, 3);
     H(0, 2) = H(0, 1) / H(0, 0);
     for(unsigned I = 1; I < H.n_rows; ++I) H(I, 2) = (H(I, 1) - H(I - 1, 1)) / (H(I, 0) - H(I - 1, 0));
-    access::rw(backbone) = std::forward<mat>(H);
+    access::rw(backbone) = std::move(H);
 }
 
 int MultilinearElastic1D::initialize(const shared_ptr<DomainBase>&) {

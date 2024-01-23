@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ int Dynamic::analyze() {
 
     while(true) {
         // check if the target time point is hit
-        if(remain_time <= 1E-10) return SUANPAN_SUCCESS;
+        if(remain_time <= get_min_step_size()) return SUANPAN_SUCCESS;
         // check if the maximum substep number is hit
         if(++num_increment > get_max_substep()) {
             suanpan_warning("The maximum sub-step number {} reached.\n", get_max_substep());

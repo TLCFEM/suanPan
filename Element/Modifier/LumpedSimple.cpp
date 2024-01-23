@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,13 @@
 #include <Element/Utility/MatrixModifier.hpp>
 
 int LumpedSimple::update_status() {
-    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) { if(const auto t_ptr = ele_ptr.lock(); nullptr != t_ptr && t_ptr->if_update_mass() && !t_ptr->get_trial_mass().empty()) suanpan::mass::lumped_simple::apply(access::rw(t_ptr->get_trial_mass())); });
+    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
+        const auto t_ptr = ele_ptr.lock();
+
+        if(nullptr == t_ptr || !t_ptr->if_update_mass() || !t_ptr->allow_modify_mass()) return;
+
+        if(!t_ptr->get_trial_mass().empty()) suanpan::mass::lumped_simple::apply(access::rw(t_ptr->get_trial_mass()));
+    });
 
     return SUANPAN_SUCCESS;
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,16 +23,16 @@ RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const uns
     : Constraint(T, S, A, {}, {}, 0)
     , n_dim(NS)
     , alpha(F)
-    , origin(std::forward<vec>(O))
+    , origin(std::move(O))
     , outer_norm(normalise(N)) {}
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F, const unsigned NS)
     : Constraint(T, S, A, {}, {}, 0)
     , n_dim(NS)
-    , alpha(F)                     // penalty factor
-    , edge_a(E1)                   // 3D vector
-    , edge_b(E2)                   // 3D vector
-    , origin(std::forward<vec>(O)) // 1D, 2D and 3D vectors
+    , alpha(F)             // penalty factor
+    , edge_a(E1)           // 3D vector
+    , edge_b(E2)           // 3D vector
+    , origin(std::move(O)) // 1D, 2D and 3D vectors
     , outer_norm(normalise(cross(E1, E2)))
     , length_a(norm(edge_a))
     , length_b(norm(edge_b)) {}

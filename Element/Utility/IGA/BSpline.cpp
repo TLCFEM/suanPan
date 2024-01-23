@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2017-2023 Theodore Chang
+// Copyright (C) 2017-2024 Theodore Chang
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -50,13 +50,13 @@ uvec IGA::compute_all_element_span(const vec& knot) {
 BSpline::BSpline(vec K, const uword S, field<vec>&& N)
     : dimension(S)
     , knot(std::move(K))
-    , net(std::forward<field<vec>>(N)) {}
+    , net(std::move(N)) {}
 
 uword BSpline::get_order() const { return order; }
 
 uword BSpline::get_number_of_control_points() const { return knot.n_elem - order - 1; }
 
-void BSpline::set_control_polygon(field<vec>&& N) { net = std::forward<field<vec>>(N); }
+void BSpline::set_control_polygon(field<vec>&& N) { net = std::move(N); }
 
 void BSpline::set_control_polygon(const field<vec>& N) { net = N; }
 
@@ -259,10 +259,10 @@ field<vec> BSpline::evaluate_shape_function_derivative(const double u, const fie
 }
 
 BSplineCurve2D::BSplineCurve2D(vec K, field<vec>&& N)
-    : BSpline(std::move(K), 2, std::forward<field<vec>>(N)) {}
+    : BSpline(std::move(K), 2, std::move(N)) {}
 
 BSplineCurve3D::BSplineCurve3D(vec K, field<vec>&& N)
-    : BSpline(std::move(K), 3, std::forward<field<vec>>(N)) {}
+    : BSpline(std::move(K), 3, std::move(N)) {}
 
 BSplineCurve4D::BSplineCurve4D(vec K, field<vec>&& N)
-    : BSpline(std::move(K), 4, std::forward<field<vec>>(N)) {}
+    : BSpline(std::move(K), 4, std::move(N)) {}

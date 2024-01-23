@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Domain/DomainBase.h>
 
 SectionShell::SectionShell(const unsigned T, const unsigned MT, vec&& E)
-    : SectionShellData{MT, std::forward<vec>(E)}
+    : SectionShellData{MT, std::move(E)}
     , Tag(T) {}
 
 void SectionShell::set_initialized(const bool T) const { access::rw(initialized) = T; }

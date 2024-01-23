@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,18 +19,19 @@
 #include <Domain/DomainBase.h>
 #include <Toolbox/tensor.h>
 
-Concrete22::Concrete22(const unsigned T, const double CS, const double TS, const double MCC, const double NCC, const double MTT, const double NTT, const double MP, const double CE, const double TE, const double SS, const double SR, const double R)
+Concrete22::Concrete22(const unsigned T, const double E, const double CS, const double TS, const double NCC, const double NTT, const double MP, const double CE, const double TE, const double SS, const double SR, const double R)
     : Material2D(T, PlaneType::N, R)
-    , concrete_major(0, CS, TS, MCC, NCC, MTT, NTT, MP, CE, TE, R)
-    , concrete_minor(0, CS, TS, MCC, NCC, MTT, NTT, MP, CE, TE, R)
+    , concrete_major(0, E, CS, TS, NCC, NTT, MP, CE, TE, R)
+    , concrete_minor(0, E, CS, TS, NCC, NTT, MP, CE, TE, R)
     , shear_stress(SS)
-    , shear_retention(SR) {}
+    , shear_retention(SR)
+    , elastic_modulus(fabs(E)) {}
 
 int Concrete22::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != concrete_major.initialize_base(D) || SUANPAN_SUCCESS != concrete_major.initialize(D) || SUANPAN_SUCCESS != concrete_minor.initialize_base(D) || SUANPAN_SUCCESS != concrete_minor.initialize(D)) return SUANPAN_FAIL;
 
     initial_stiffness.zeros(3, 3);
-    initial_stiffness(2, 2) = shear_modulus = .5 * (initial_stiffness(0, 0) = initial_stiffness(1, 1) = concrete_major.get_initial_stiffness()(0));
+    initial_stiffness(2, 2) = shear_modulus = .5 * (initial_stiffness(0, 0) = initial_stiffness(1, 1) = elastic_modulus);
 
     trial_stiffness = current_stiffness = initial_stiffness;
 

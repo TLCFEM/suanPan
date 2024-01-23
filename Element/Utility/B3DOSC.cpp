@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Toolbox/tensor.h>
 
 B3DOSC::B3DOSC(const unsigned T, vec&& XYZ)
-    : B3DC(T, std::forward<vec>(XYZ)) {
+    : B3DC(T, std::move(XYZ)) {
     access::rw(sc) = span(7, 9);
     access::rw(sd) = span(10, 12);
 }

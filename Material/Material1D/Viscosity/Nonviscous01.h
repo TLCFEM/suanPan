@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,9 @@
 /**
  * @class Nonviscous01
  * @brief A 1D Viscosity class.
+ *
+ * Reference: 10.1016/j.ymssp.2024.111156
+ *
  * @author tlc
  * @date 28/03/2023
  * @version 0.2.0

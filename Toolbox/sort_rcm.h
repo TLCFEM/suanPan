@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,12 +40,15 @@
 #ifndef RCM_H
 #define RCM_H
 
-#include <Domain/MetaMat/triplet_form.hpp>
 #include <Domain/MetaMat/csc_form.hpp>
+#include <Domain/MetaMat/triplet_form.hpp>
+#include <Toolbox/container.h>
 
 uvec sort_rcm(const std::vector<uvec>&, const uvec&);
 
-template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
+uvec sort_rcm(const std::vector<suanpan::unordered_set<uword>>&);
+
+template<sp_d eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
     suanpan_assert([&] { if(!MEAT.is_square()) throw logic_error("can only be applied to square matrix"); });
 
     wall_clock TM;
@@ -56,10 +59,10 @@ template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
 
     //! Collect the number of degree of each node.
     uvec E(S, fill::none);
-    suanpan_for(0llu, S, [&](const uword I) { E(I) = MEAT.col(I).n_nonzero; });
+    suanpan::for_each(S, [&](const uword I) { E(I) = MEAT.col(I).n_nonzero; });
 
     std::vector<uvec> A(S);
-    suanpan_for(0llu, S, [&](const uword K) {
+    suanpan::for_each(S, [&](const uword K) {
         unsigned J = 0;
         uvec IDX(E(K));
         for(auto L = MEAT.begin_col(K); L != MEAT.end_col(K); ++L) IDX(J++) = L.row();
@@ -116,17 +119,17 @@ template<typename eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
     return R;
 }
 
-template<typename eT> uvec sort_rcm(const Mat<eT>& MEAT) { return sort_rcm(SpMat<eT>(MEAT)); }
+template<sp_d eT> uvec sort_rcm(const Mat<eT>& MEAT) { return sort_rcm(SpMat<eT>(MEAT)); }
 
-template<typename dt> uvec sort_rcm(const csc_form<dt, uword>& csc_mat) {
+template<sp_d dt> uvec sort_rcm(const csc_form<dt, uword>& csc_mat) {
     //! Get the size of the square matrix.
-    auto S = csc_mat.n_cols;
+    const auto S = csc_mat.n_cols;
 
     //! Collect the number of degree of each node.
     uvec E(S, fill::none);
-    suanpan_for(0llu, S, [&](const uword I) { E(I) = csc_mat.col(I + 1) - csc_mat.col(I); });
+    suanpan::for_each(S, [&](const uword I) { E(I) = csc_mat.col(I + 1) - csc_mat.col(I); });
     std::vector<uvec> A(S);
-    suanpan_for(0llu, S, [&](const uword I) {
+    suanpan::for_each(S, [&](const uword I) {
         const uvec IDX(csc_mat.row_mem() + csc_mat.col(I), E(I));
         A[I] = IDX(sort_index(E(IDX)));
     });
@@ -134,11 +137,7 @@ template<typename dt> uvec sort_rcm(const csc_form<dt, uword>& csc_mat) {
     return sort_rcm(A, E);
 }
 
-template<typename dt, typename it> uvec sort_rcm(triplet_form<dt, it>& triplet_mat) {
-    csc_form<dt, uword> csc_mat(triplet_mat);
-
-    return sort_rcm(csc_mat);
-}
+template<sp_d dt, sp_i it> uvec sort_rcm(triplet_form<dt, it>& triplet_mat) { return sort_rcm(csc_form<dt, uword>(triplet_mat)); }
 
 #endif
 

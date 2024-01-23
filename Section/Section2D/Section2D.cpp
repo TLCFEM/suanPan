@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 Section2D::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_ptr<Material>&& M)
     : coor(C)
     , weight(W)
-    , s_material(std::forward<unique_ptr<Material>>(M)) {}
+    , s_material(std::move(M)) {}
 
 void Section2D::initialize_stiffness() {
     initial_stiffness.zeros(2, 2);

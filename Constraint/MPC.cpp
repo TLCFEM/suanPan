@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@
 #include <Load/Amplitude/Amplitude.h>
 
 MPC::MPC(const unsigned T, const unsigned S, const unsigned A, uvec&& N, uvec&& D, vec&& W, const double L)
-    : Constraint(T, S, A, std::forward<uvec>(N), {}, 1)
-    , dof_pool(std::forward<uvec>(D) - 1)
-    , weight_pool(std::forward<vec>(W))
+    : Constraint(T, S, A, std::move(N), {}, 1)
+    , dof_pool(D - 1)
+    , weight_pool(std::move(W))
     , pseudo_load(L) {}
 
 int MPC::initialize(const shared_ptr<DomainBase>& D) {

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2017-2023 Theodore Chang
+// Copyright (C) 2017-2024 Theodore Chang
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -109,10 +109,10 @@ field<mat> NURBSSurface::evaluate_shape_function_derivative(const double u, cons
 }
 
 NURBSSurface2D::NURBSSurface2D(vec knot_u, vec knot_v, field<vec>&& N)
-    : NURBSSurface(std::move(knot_u), std::move(knot_v), 3, std::forward<field<vec>>(N)) {}
+    : NURBSSurface(std::move(knot_u), std::move(knot_v), 3, std::move(N)) {}
 
 NURBSSurface3D::NURBSSurface3D(vec knot_u, vec knot_v, field<vec>&& N)
-    : NURBSSurface(std::move(knot_u), std::move(knot_v), 4, std::forward<field<vec>>(N)) {}
+    : NURBSSurface(std::move(knot_u), std::move(knot_v), 4, std::move(N)) {}
 
 NURBSSurface4D::NURBSSurface4D(vec knot_u, vec knot_v, field<vec>&& N)
-    : NURBSSurface(std::move(knot_u), std::move(knot_v), 5, std::forward<field<vec>>(N)) {}
+    : NURBSSurface(std::move(knot_u), std::move(knot_v), 5, std::move(N)) {}

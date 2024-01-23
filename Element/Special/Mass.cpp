@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Domain/DOF.h>
 
 MassBase::MassBase(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)
-    : Element(T, NN, ND, std::forward<uvec>(NT), std::forward<std::vector<DOF>>(DI)) {}
+    : Element(T, NN, ND, std::move(NT), std::move(DI)) { modify_mass = false; }
 
 int MassBase::update_status() { return SUANPAN_SUCCESS; }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 S4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
     , factor(F)
-    , s_material(std::forward<unique_ptr<Material>>(M)) {}
+    , s_material(std::move(M)) {}
 
 S4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
@@ -34,12 +34,12 @@ S4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const Sec
     , s_material(old_obj.s_material == nullptr ? nullptr : old_obj.s_material->get_copy()) {}
 
 S4::IntegrationPoint::IntegrationPoint(vec&& C)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , BM(3, s_size / 2, fill::zeros)
     , BP(3, s_size / 2, fill::zeros) {}
 
 S4::S4(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool NL)
-    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , thickness(TH) {}
 
 int S4::initialize(const shared_ptr<DomainBase>& D) {

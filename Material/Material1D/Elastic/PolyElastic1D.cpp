@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "PolyElastic1D.h"
 
 PolyElastic1D::PolyElastic1D(const unsigned T, vec&& P, const double R)
-    : DataPolyElastic1D{std::forward<vec>(P)}
+    : DataPolyElastic1D{std::move(P)}
     , Material1D(T, R) {}
 
 int PolyElastic1D::initialize(const shared_ptr<DomainBase>&) {

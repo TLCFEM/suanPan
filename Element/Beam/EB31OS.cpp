@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
 #include <Recorder/OutputType.h>
 
 EB31OS::EB31OS(const unsigned T, uvec&& N, vec&& P, const unsigned O, const bool F)
-    : SectionOSElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{}, F)
+    : SectionOSElement3D(T, b_node, b_dof, std::move(N), uvec{}, F)
     , orientation_tag(O)
-    , property(std::forward<vec>(P)) {}
+    , property(std::move(P)) {}
 
 int EB31OS::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find_orientation(orientation_tag)) {

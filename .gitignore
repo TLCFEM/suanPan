@@ -26,6 +26,7 @@ $RECYCLE.BIN/
 /MSVC/Debug/*
 /MSVC/Release/*
 /MSVC/suanPan/.vs/*
+/MSVC/suanPan/.idea/*
 /MSVC/suanPan/amd/x64/*
 /MSVC/suanPan/arpack/x64/*
 /MSVC/suanPan/ElementExample/x64/*

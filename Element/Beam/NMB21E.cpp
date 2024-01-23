@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <Section/Section.h>
 
 NMB21E::NMB21E(const unsigned T, const unsigned W, uvec&& N, const unsigned S, const bool F)
-    : NMB21(T, std::forward<uvec>(N), S, F)
+    : NMB21(T, std::move(N), S, F)
     , a{1 == W ? 1llu : 2llu}
     , b{1 == W ? uvec{0llu, 2llu} : uvec{0llu, 1llu}} {}
 

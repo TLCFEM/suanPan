@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ const uword NonlinearHoffman::sa{0};
 const span NonlinearHoffman::sb{1, 6};
 
 NonlinearHoffman::NonlinearHoffman(const unsigned T, vec&& EE, vec&& VV, vec&& SS, const double R)
-    : DataNonlinearHoffman{std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS)}
+    : DataNonlinearHoffman{std::move(EE), std::move(VV), std::move(SS)}
     , Material3D(T, R) { transform::hoffman_projection(yield_stress, proj_a, proj_b); }
 
 int NonlinearHoffman::initialize(const shared_ptr<DomainBase>&) {

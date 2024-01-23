@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <Toolbox/IntegrationPlan.h>
 
 Circle3D::Circle3D(const unsigned T, const double R, const unsigned M, const unsigned S, vec&& EC)
-    : Section3D(T, M, R * R * datum::pi, std::forward<vec>(EC))
+    : Section3D(T, M, R * R * datum::pi, std::move(EC))
     , radius(R)
     , int_pt_num(S > 20 ? 20 : S) {}
 

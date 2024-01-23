@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 #include "Modifier.h"
 #include <Domain/DomainBase.h>
+#include <Domain/Factory.hpp>
 
 Modifier::Modifier(const unsigned T, uvec&& ET)
     : Tag(T)
@@ -36,3 +37,7 @@ int Modifier::initialize(const shared_ptr<DomainBase>& D) {
 
     return SUANPAN_SUCCESS;
 }
+
+bool Modifier::if_apply(const shared_ptr<DomainBase>&) { return true; }
+
+bool ModifierDynamics::if_apply(const shared_ptr<DomainBase>& D) { return AnalysisType::DYNAMICS == D->get_factory()->get_analysis_type(); }

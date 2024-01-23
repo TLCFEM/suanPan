@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,9 @@
 /**
  * @class ElementalNonviscous
  * @brief A ElementalNonviscous damping class.
+ *
+ * Reference: 10.1016/j.ymssp.2024.111156
+ *
  * @author tlc
  * @date 02/10/2023
  * @version 0.2.0
@@ -31,7 +34,7 @@
 #include <Element/Modifier/Modifier.h>
 #include <Domain/Factory.hpp>
 
-class ElementalNonviscous : public Modifier {
+class ElementalNonviscous : public ModifierDynamics {
     const cx_vec m, s;
 
     weak_ptr<Factory<double>> factory;

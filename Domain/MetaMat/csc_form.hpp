@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ template<sp_d data_t, sp_i index_t> class csc_form final {
     data_ptr val_idx = nullptr;  // value storage
 
     template<sp_d in_dt, sp_i in_it> void copy_to(in_it* const new_row_idx, in_it* const new_col_ptr, in_dt* const new_val_idx) const {
-        suanpan_for(index_t(0), n_cols + 1, [&](const index_t I) { new_col_ptr[I] = in_it(col_ptr[I]); });
-        suanpan_for(index_t(0), n_elem, [&](const index_t I) {
+        suanpan::for_each(n_cols + 1, [&](const index_t I) { new_col_ptr[I] = in_it(col_ptr[I]); });
+        suanpan::for_each(n_elem, [&](const index_t I) {
             new_row_idx[I] = in_it(row_idx[I]);
             new_val_idx[I] = in_dt(val_idx[I]);
         });
@@ -78,7 +78,7 @@ public:
 
     [[nodiscard]] data_t max() const {
         if(0 == n_elem) return data_t(0);
-        return *suanpan_max_element(val_idx.get(), val_idx.get() + n_elem);
+        return *suanpan::max_element(val_idx.get(), val_idx.get() + n_elem);
     }
 
     void print() const;
@@ -186,7 +186,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csc_form<da
 
     const sp_i auto shift = index_t(base);
 
-    suanpan_for(in_it(0), in_mat.n_elem, [&](const in_it I) {
+    suanpan::for_each(in_mat.n_elem, [&](const in_it I) {
         row_idx[I] = index_t(in_mat.row_idx[I]) + shift;
         val_idx[I] = data_t(in_mat.val_idx[I]);
     });
@@ -209,7 +209,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csc_form<da
 
     init(access::rw(n_elem) = index_t(in_mat.n_elem));
 
-    suanpan_for(in_it(0), in_mat.n_elem, [&](const in_it I) {
+    suanpan::for_each(in_mat.n_elem, [&](const in_it I) {
         row_idx[I] = index_t(in_mat.row_idx[I]);
         val_idx[I] = data_t(in_mat.val_idx[I]);
     });

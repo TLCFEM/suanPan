@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@ const uvec DC3D8::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 
 const uvec DC3D8::d_dof{3, 7, 11, 15, 19, 23, 27, 31};
 
 DC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& N, mat&& P)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , c_material(std::forward<unique_ptr<Material>>(M))
-    , n_mat(std::forward<mat>(N))
-    , pn_mat(std::forward<mat>(P))
+    , c_material(std::move(M))
+    , n_mat(std::move(N))
+    , pn_mat(std::move(P))
     , strain_mat(6, 24) {
     for(auto I = 0u, J = 0u, K = 1u, L = 2u; I < c_node; ++I, J += 3, K += 3, L += 3) {
         strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = pn_mat(0, I);
@@ -40,7 +40,7 @@ DC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
 }
 
 DC3D8::DC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::DMG})
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::DMG})
     , release_rate(RR) { access::rw(characteristic_length) = CL; }
 
 int DC3D8::initialize(const shared_ptr<DomainBase>& D) {

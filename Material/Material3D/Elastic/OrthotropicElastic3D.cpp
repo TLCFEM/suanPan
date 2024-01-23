@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 
 OrthotropicElastic3D::OrthotropicElastic3D(const unsigned T, vec&& E, vec&& P, const double R)
     : Material3D(T, R)
-    , modulus(std::forward<vec>(E))
-    , poissons_ratio(std::forward<vec>(P)) {}
+    , modulus(std::move(E))
+    , poissons_ratio(std::move(P)) {}
 
 int OrthotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
     initial_stiffness = tensor::orthotropic_stiffness(modulus, poissons_ratio);

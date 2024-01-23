@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,16 +41,16 @@
 class Concrete21 final : public Material2D {
     ConcreteTsai concrete_major, concrete_minor;
 
+    const double elastic_modulus;
     double shear_modulus = 0.;
 
 public:
     Concrete21(
         unsigned,   // tag
+        double,     // elastic modulus
         double,     // peak stress in negative
         double,     // crack stress in positive
-        double,     // MC
         double,     // NC
-        double,     // MT
         double,     // NT
         double,     // middle point
         double,     // peak strain in negative

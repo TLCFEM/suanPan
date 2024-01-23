@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,6 +123,7 @@ void LeeNewmarkFull::formulate_block(uword& current_pos, const double m_coef, co
     auto K = current_pos += n_block;
 
     while(order > 1) {
+        // eq. 78
         assemble_mass({J, K}, {K, J}, {m_coef, m_coef});
         assemble_stiffness({I, J}, {J, I}, {s_coef, s_coef});
 
@@ -195,8 +196,8 @@ void LeeNewmarkFull::assemble_by_mode_one(uword& current_pos, const double mass_
         order -= 2;
     }
 
-    // eq. 3
     if(order < 1) {
+        // eq. 56
         assemble_mass({I, J, I, J}, {I, J, J, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
         assemble_stiffness(J, J, stiffness_coef);
 
@@ -221,8 +222,8 @@ void LeeNewmarkFull::assemble_by_mode_two(uword& current_pos, double mass_coef, 
 
     const auto I = current_pos;
 
-    // eq. 100
     if(0 == npr) {
+        // eq. 73
         assemble_mass({0, 0, I, I}, {0, I, 0, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
 
         formulate_block(current_pos, mass_coef, stiffness_coef, npl);
@@ -246,6 +247,7 @@ void LeeNewmarkFull::assemble_by_mode_three(uword& current_pos, double mass_coef
     const auto I = current_pos;
     const auto J = current_pos += n_block;
 
+    // eq. 87
     assemble_mass({J, 0, I, 0, I}, {J, 0, I, I, 0}, {.25 / gm * mass_coef, mass_coef, mass_coef, -mass_coef, -mass_coef});
     assemble_stiffness({J, I, I, J}, {J, I, J, I}, {(1. + .25 / gm) * stiffness_coef, stiffness_coef, -stiffness_coef, -stiffness_coef});
 
@@ -319,7 +321,7 @@ void LeeNewmarkFull::assemble_by_mode_four(uword& current_pos, const double mass
 
 LeeNewmarkFull::LeeNewmarkFull(const unsigned T, std::vector<Mode>&& M, const double A, const double B, const StiffnessType ST)
     : LeeNewmarkBase(T, A, B, ST)
-    , damping_mode(std::forward<std::vector<Mode>>(M)) {
+    , damping_mode(std::move(M)) {
     for(auto& [t, p, zeta, omega] : damping_mode)
         switch(t) {
         case Type::T0:
@@ -523,5 +525,5 @@ int LeeNewmarkFull::process_constraint_resistance() {
 }
 
 void LeeNewmarkFull::print() {
-    suanpan_info("A Newmark solver using Lee's damping model with adjustable bandwidth using {} stiffness. doi: 10.1016/j.compstruc.2020.106423 and 10.1016/j.compstruc.2021.106663\n", stiffness_type == StiffnessType::TRIAL ? "tangent" : stiffness_type == StiffnessType::CURRENT ? "converged" : "initial");
+    suanpan_info("A Newmark solver using Lee's damping model with adjustable bandwidth using {} stiffness. doi:10.1016/j.compstruc.2020.106423 and 10.1016/j.compstruc.2021.106663\n", stiffness_type == StiffnessType::TRIAL ? "tangent" : stiffness_type == StiffnessType::CURRENT ? "converged" : "initial");
 }

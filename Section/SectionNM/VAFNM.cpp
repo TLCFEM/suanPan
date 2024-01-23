@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -152,7 +152,7 @@ vec VAFNM::compute_h(const double alpha) const { return {n_size, fill::value(std
 vec VAFNM::compute_dh(const double alpha) const { return compute_h(alpha).transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : iso_modulus + iso_saturation * iso_decay * exp(-iso_decay * alpha); }); }
 
 VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double HH, const double HS, const double HD, vec&& KK, vec&& KB, const double LD, vec&& YF)
-    : NonlinearNM(T, EEA, EEIS, any(KK) || any(KB), LD, std::forward<vec>(YF))
+    : NonlinearNM(T, EEA, EEIS, any(KK) || any(KB), LD, std::move(YF))
     , iso_modulus(HH)
     , iso_saturation(HS)
     , iso_decay(HD)
@@ -160,7 +160,7 @@ VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double
     , kin_base{KB(0), KB(1), KB(1)} {}
 
 VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double HH, const double HS, const double HD, vec&& KK, vec&& KB, const double LD, vec&& YF)
-    : NonlinearNM(T, EEA, EEIS, EEIW, any(KK) || any(KB), LD, std::forward<vec>(YF))
+    : NonlinearNM(T, EEA, EEIS, EEIW, any(KK) || any(KB), LD, std::move(YF))
     , iso_modulus(HH)
     , iso_saturation(HS)
     , iso_decay(HD)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2537,7 +2537,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        double damping_ratio = -1.;
+        double damping_ratio = .02;
         if(!command.eof() && !get_input(command, damping_ratio)) {
             suanpan_error("A valid damping ratio is required.\n");
             return SUANPAN_SUCCESS;

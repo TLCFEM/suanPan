@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include <Toolbox/utility.h>
 
 CAX3::CAX3(const unsigned T, uvec&& NT, const unsigned MT, const bool R)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, R) {}
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R) {}
 
 int CAX3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));

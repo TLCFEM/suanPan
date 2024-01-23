@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
 #include <Domain/Factory.hpp>
 
 Tie::Tie(const unsigned T, uvec&& N, uvec&& D, vec&& W, const double L, const double P)
-    : Element(T, static_cast<unsigned>(N.size()), static_cast<unsigned>(D.max()), std::forward<uvec>(N), {})
-    , dof_pool(std::forward<uvec>(D))
-    , weight_pool(std::forward<vec>(W))
+    : Element(T, static_cast<unsigned>(N.size()), static_cast<unsigned>(D.max()), std::move(N), {})
+    , dof_pool(std::move(D))
+    , weight_pool(std::move(W))
     , pseudo_load(L)
     , penalty(P) {}
 

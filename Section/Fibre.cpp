@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 Fibre::Fibre(const unsigned T, uvec&& FT, const SectionType ST)
     : Section(T, ST, 0)
-    , fibre_tag(std::forward<uvec>(FT)) {}
+    , fibre_tag(std::move(FT)) {}
 
 int Fibre::initialize(const shared_ptr<DomainBase>& D) {
     fibre.clear();

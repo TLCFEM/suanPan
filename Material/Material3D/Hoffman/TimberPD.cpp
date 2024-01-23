@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 TimberPD::TimberPD(const unsigned T, vec&& EE, vec&& VV, vec&& SS, vec&& HH, const double R)
     : DataTimberPD{HH(1), HH(2), HH(3), HH(4), HH(5), HH(6)}
-    , BilinearHoffman(T, std::forward<vec>(EE), std::forward<vec>(VV), std::forward<vec>(SS), HH(0), R)
+    , BilinearHoffman(T, std::move(EE), std::move(VV), std::move(SS), HH(0), R)
     , hill_t(transform::hill_projection(yield_stress(0), yield_stress(2), yield_stress(4), yield_stress(6), yield_stress(7), yield_stress(8)))
     , hill_c(transform::hill_projection(yield_stress(1), yield_stress(3), yield_stress(5), yield_stress(6), yield_stress(7), yield_stress(8))) {}
 
@@ -110,5 +110,5 @@ vector<vec> TimberPD::record(const OutputType P) {
 }
 
 void TimberPD::print() {
-    suanpan_info("A 3D Timber Model. doi: 10.1016/j.compstruc.2017.09.010\n");
+    suanpan_info("A 3D Timber Model. doi:10.1016/j.compstruc.2017.09.010\n");
 }

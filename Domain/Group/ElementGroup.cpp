@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Element/Element.h>
 
 ElementGroup::ElementGroup(const unsigned T, uvec&& R)
-    : Group(T, std::forward<uvec>(R)) {}
+    : Group(T, std::move(R)) {}
 
 void ElementGroup::initialize(const shared_ptr<DomainBase>& D) {
     if(!pool.empty()) return;

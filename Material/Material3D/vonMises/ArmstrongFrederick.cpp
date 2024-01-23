@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ const double ArmstrongFrederick::root_three_two = sqrt(1.5);
 const mat ArmstrongFrederick::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 ArmstrongFrederick::ArmstrongFrederick(const unsigned T, const double E, const double V, const double Y, const double S, const double H, const double M, vec&& A, vec&& B, const double R)
-    : DataArmstrongFrederick{E, V, Y, S, H, M, std::forward<vec>(A), std::forward<vec>(B)}
+    : DataArmstrongFrederick{E, V, Y, S, H, M, std::move(A), std::move(B)}
     , Material3D(T, R) {}
 
 int ArmstrongFrederick::initialize(const shared_ptr<DomainBase>&) {

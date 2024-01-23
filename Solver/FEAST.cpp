@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,8 +69,7 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
     else if(StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) {
         fpm[41] = 0;
 
-        unsigned l, u;
-        W->get_bandwidth(l, u);
+        const auto [l, u] = W->get_bandwidth();
         auto KL = static_cast<int>(l);
         const auto KU = static_cast<int>(u);
         auto LD = KL + KU + 1;
@@ -148,20 +147,20 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
     std::vector JA(n_elem3, 0);
     std::vector IA(n_size3, 0);
 
-    suanpan_for(0, t_stiff.n_elem, [&](const int I) {
+    suanpan::for_each(t_stiff.n_elem, [&](const int I) {
         A[I] = t_stiff.val_mem()[I];
         JA[I] = t_stiff.col_mem()[I];
     });
-    suanpan_for(0, t_damping.n_elem, [&](const int I) {
+    suanpan::for_each(t_damping.n_elem, [&](const int I) {
         A[I + n_elem1] = t_damping.val_mem()[I];
         JA[I + n_elem1] = t_damping.col_mem()[I];
     });
-    suanpan_for(0, t_mass.n_elem, [&](const int I) {
+    suanpan::for_each(t_mass.n_elem, [&](const int I) {
         A[I + n_elem2] = t_mass.val_mem()[I];
         JA[I + n_elem2] = t_mass.col_mem()[I];
     });
 
-    suanpan_for(0, N, [&](const int I) {
+    suanpan::for_each(N, [&](const int I) {
         JA[I] = t_stiff.row_mem()[I];
         JA[I + n_size1] = t_damping.row_mem()[I];
         JA[I + n_size2] = t_mass.row_mem()[I];

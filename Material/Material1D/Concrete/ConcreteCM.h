@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  *
  * The ConcreteCM class represents a concrete material model based on the Chang & Mander concrete model.
  *
- * doi: 10.1061/(ASCE)0733-9445(1988)114:8(1804)
+ * doi:10.1061/(ASCE)0733-9445(1988)114:8(1804)
  *
  * @author tlc
  * @date 29/07/2020
@@ -33,43 +33,27 @@
 #ifndef CONCRETECM_H
 #define CONCRETECM_H
 
-#include <Material/Material1D/Material1D.h>
+#include <Material/Material1D/Hysteresis/ComplexHysteresis.h>
 
-class ConcreteCM final : public Material1D {
-    enum class Status {
-        NONE,
-        CBACKBONE,
-        TBACKBONE,
-        CUNLOAD,
-        TUNLOAD,
-        CSUBUNLOAD,
-        TSUBUNLOAD,
-        CRELOAD,
-        TRELOAD,
-        CTRANS,
-        TTRANS
-    };
-
-    Status trial_load_status = Status::NONE, current_load_status = Status::NONE;
-
+class ConcreteCM final : public ComplexHysteresis {
     const double c_stress, c_strain, t_stress, t_strain;
 
-    const double elastic_modulus, c_m, c_n, t_m, t_n;
+    const double c_m, c_n, t_m, t_n;
 
     const bool linear_trans;
 
-    [[nodiscard]] podarray<double> compute_compression_backbone(double);
-    [[nodiscard]] podarray<double> compute_tension_backbone(double);
-    [[nodiscard]] podarray<double> compute_compression_unload(double);
-    [[nodiscard]] podarray<double> compute_tension_unload(double);
-    [[nodiscard]] podarray<double> compute_compression_reload(double);
-    [[nodiscard]] podarray<double> compute_tension_reload(double);
-    [[nodiscard]] podarray<double> compute_compression_subunload(double);
-    [[nodiscard]] podarray<double> compute_tension_subunload(double);
+    [[nodiscard]] podarray<double> compute_compression_backbone(double) override;
+    [[nodiscard]] podarray<double> compute_tension_backbone(double) override;
+    [[nodiscard]] podarray<double> compute_compression_unload(double) override;
+    [[nodiscard]] podarray<double> compute_tension_unload(double) override;
+    [[nodiscard]] podarray<double> compute_compression_reload(double) override;
+    [[nodiscard]] podarray<double> compute_tension_reload(double) override;
+    [[nodiscard]] podarray<double> compute_compression_subunload(double) override;
+    [[nodiscard]] podarray<double> compute_tension_subunload(double) override;
     [[nodiscard]] podarray<double> compute_transition(double, double, double, double, double, double, double) const;
 
-    void update_compression_unload(double);
-    void update_tension_unload(double);
+    void update_compression_unload(double) override;
+    void update_tension_unload(double) override;
     void update_connect();
 
 public:
@@ -86,17 +70,9 @@ public:
         double = 0.     // density
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
-
     unique_ptr<Material> get_copy() override;
 
     [[nodiscard]] double get_parameter(ParameterType) const override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 
     void print() override;
 };

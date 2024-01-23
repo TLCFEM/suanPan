@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <Section/Section.h>
 
 T3D2S::T3D2S(const unsigned T, uvec&& N, const unsigned M, const bool F, const bool LS)
-    : SectionElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::U3})
+    : SectionElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::U3})
     , t_trans(F ? make_unique<T3DC>() : make_unique<T3DL>())
     , log_strain(LS) {}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <Material/Material1D/Material1D.h>
 
 T3D2::T3D2(const unsigned T, uvec&& N, const unsigned M, const double A, const bool F, const bool UA, const bool LS)
-    : MaterialElement1D(T, t_node, t_dof, std::forward<uvec>(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::U3})
+    : MaterialElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::U3})
     , area(A)
     , t_trans(F ? make_unique<T3DC>() : make_unique<T3DL>())
     , update_area(UA)

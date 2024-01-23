@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 #include <Material/Material1D/Material1D.h>
 
 TSection3D::TSection3D(const unsigned T, const double TFW, const double TFT, const double WH, const double WT, const unsigned MT, const unsigned IP, vec&& EC)
-    : ISection3D(T, TFW, TFT, 0., 0., WH, WT, MT, IP, std::forward<vec>(EC)) {}
+    : ISection3D(T, TFW, TFT, 0., 0., WH, WT, MT, IP, std::move(EC)) {}
 
 TSection3D::TSection3D(const unsigned T, vec&& D, const unsigned MT, const unsigned IP, vec&& EC)
-    : ISection3D(T, D(0), D(1), 0., 0., D(2), D(3), MT, IP, std::forward<vec>(EC)) {}
+    : ISection3D(T, D(0), D(1), 0., 0., D(2), D(3), MT, IP, std::move(EC)) {}
 
 unique_ptr<Section> TSection3D::get_copy() { return make_unique<TSection3D>(*this); }

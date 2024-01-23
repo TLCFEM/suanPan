@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ template<sp_d data_t, sp_i index_t> class csr_form final {
     data_ptr val_idx = nullptr;  // value storage
 
     template<sp_d in_dt, sp_i in_it> void copy_to(in_it* const new_row_ptr, in_it* const new_col_idx, in_dt* const new_val_idx) const {
-        suanpan_for(index_t(0), n_rows + 1, [&](const index_t I) { new_row_ptr[I] = in_it(row_ptr[I]); });
-        suanpan_for(index_t(0), n_elem, [&](const index_t I) {
+        suanpan::for_each(n_rows + 1, [&](const index_t I) { new_row_ptr[I] = in_it(row_ptr[I]); });
+        suanpan::for_each(n_elem, [&](const index_t I) {
             new_col_idx[I] = in_it(col_idx[I]);
             new_val_idx[I] = in_dt(val_idx[I]);
         });
@@ -72,7 +72,7 @@ public:
 
     [[nodiscard]] data_t max() const {
         if(0 == n_elem) return data_t(0);
-        return *suanpan_max_element(val_idx.get(), val_idx.get() + n_elem);
+        return *suanpan::max_element(val_idx.get(), val_idx.get() + n_elem);
     }
 
     void print() const;
@@ -109,7 +109,7 @@ public:
     Mat<data_t> operator*(const Col<data_t>& in_mat) const {
         Mat<data_t> out_mat = arma::zeros<Mat<data_t>>(in_mat.n_rows, 1);
 
-        suanpan_for(index_t(0), n_rows, [&](const index_t I) { for(auto J = row_ptr[I]; J < row_ptr[I + 1]; ++J) out_mat(I) += val_idx[J] * in_mat(col_idx[J]); });
+        suanpan::for_each(n_rows, [&](const index_t I) { for(auto J = row_ptr[I]; J < row_ptr[I + 1]; ++J) out_mat(I) += val_idx[J] * in_mat(col_idx[J]); });
 
         return out_mat;
     }
@@ -117,7 +117,7 @@ public:
     Mat<data_t> operator*(const Mat<data_t>& in_mat) const {
         Mat<data_t> out_mat = arma::zeros<Mat<data_t>>(in_mat.n_rows, in_mat.n_cols);
 
-        suanpan_for(index_t(0), n_rows, [&](const index_t I) { for(auto J = row_ptr[I]; J < row_ptr[I + 1]; ++J) out_mat.row(I) += val_idx[J] * in_mat.row(col_idx[J]); });
+        suanpan::for_each(n_rows, [&](const index_t I) { for(auto J = row_ptr[I]; J < row_ptr[I + 1]; ++J) out_mat.row(I) += val_idx[J] * in_mat.row(col_idx[J]); });
 
         return out_mat;
     }
@@ -184,7 +184,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csr_form<da
 
     const sp_i auto shift = index_t(base);
 
-    suanpan_for(in_it(0), in_mat.n_elem, [&](const in_it I) {
+    suanpan::for_each(in_mat.n_elem, [&](const in_it I) {
         col_idx[I] = index_t(in_mat.col_idx[I]) + shift;
         val_idx[I] = data_t(in_mat.val_idx[I]);
     });
@@ -207,7 +207,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csr_form<da
 
     init(access::rw(n_elem) = index_t(in_mat.n_elem));
 
-    suanpan_for(in_it(0), in_mat.n_elem, [&](const in_it I) {
+    suanpan::for_each(in_mat.n_elem, [&](const in_it I) {
         col_idx[I] = index_t(in_mat.col_idx[I]);
         val_idx[I] = data_t(in_mat.val_idx[I]);
     });

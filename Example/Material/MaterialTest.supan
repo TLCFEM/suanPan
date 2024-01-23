@@ -1,4 +1,4 @@
-material ConcreteTsai 1 30. 2. 2. 2. 2. 2. .2 2E-3 1E-4
+material ConcreteTsai 1 3E4 30. 2. 2. 2. .2 2E-3 1E-4
 
 materialTest1D 1 -1E-5 200 50 150 380 30 50 450 470 500
 

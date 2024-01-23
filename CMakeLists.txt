@@ -1,6 +1,10 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.18)
 
 cmake_policy(SET CMP0076 NEW)
+
+if (CMAKE_GNUtoMS_VCVARS OR MINGW)
+    set(CMAKE_GNUtoMS ON)
+endif ()
 
 project(suanPan C CXX)
 
@@ -9,9 +13,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-if (CMAKE_GNUtoMS_VCVARS)
-    set(CMAKE_GNUtoMS ON)
-endif ()
 
 include(CheckLanguage)
 check_language(Fortran)
@@ -263,16 +264,21 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         endif ()
     endif ()
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
-        set(ONEAPI_LIB $ENV{ONEAPI_ROOT}/compiler/latest/linux/compiler/lib/intel64_lin)
-        file(GLOB ONEAPI_FILES
-                ${ONEAPI_LIB}/libifcoremt${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libifport${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libimf${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libintlc${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libiomp5${DECOR}*${SUFFIX}
-                ${ONEAPI_LIB}/libsvml${DECOR}*${SUFFIX}
+        set(PATH_LIST
+                $ENV{ONEAPI_ROOT}/compiler/latest/lib #  since 2024
+                $ENV{ONEAPI_ROOT}/compiler/latest/linux/compiler/lib/intel64_lin # prior to 2024
         )
-        install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
+        foreach (PATHA ${PATH_LIST})
+            file(GLOB ONEAPI_FILES
+                    ${PATHA}/libifcoremt${DECOR}*${SUFFIX}
+                    ${PATHA}/libifport${DECOR}*${SUFFIX}
+                    ${PATHA}/libimf${DECOR}*${SUFFIX}
+                    ${PATHA}/libintlc${DECOR}*${SUFFIX}
+                    ${PATHA}/libiomp5${DECOR}*${SUFFIX}
+                    ${PATHA}/libsvml${DECOR}*${SUFFIX}
+            )
+            install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
+        endforeach ()
     endif ()
     if (USE_MAGMA)
         file(GLOB MAGMA_FILES ${MAGMAROOT}/lib/libmagma*.so)
@@ -287,15 +293,18 @@ elseif (COMPILER_IDENTIFIER MATCHES "win")
         install(FILES ${TBB_FILES} DESTINATION bin)
     endif ()
     if (USE_MKL AND MKLROOT MATCHES "(oneapi|oneAPI)")
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_rt*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_core*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_def*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx*)
-        install(FILES ${MKL_FILES} DESTINATION bin)
-        file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel_thread.*)
+        file(GLOB MKL_FILES
+                ${MKLROOT}/redist/intel64/mkl_rt*
+                ${MKLROOT}/redist/intel64/mkl_core*
+                ${MKLROOT}/redist/intel64/mkl_def*
+                ${MKLROOT}/redist/intel64/mkl_avx*
+                ${MKLROOT}/redist/intel64/mkl_intel_thread.*
+                ${MKLROOT}/bin/mkl_rt*
+                ${MKLROOT}/bin/mkl_core*
+                ${MKLROOT}/bin/mkl_def*
+                ${MKLROOT}/bin/mkl_avx*
+                ${MKLROOT}/bin/mkl_intel_thread.*
+        )
         install(FILES ${MKL_FILES} DESTINATION bin)
     else ()
         install(FILES Libs/win/libopenblas.dll DESTINATION bin)
@@ -308,28 +317,37 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
     endif ()
     if (USE_MKL AND MKLROOT MATCHES "(oneapi|oneAPI)")
         if (LINK_DYNAMIC_MKL)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_core*)
-            install(FILES ${MKL_FILES} DESTINATION bin)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_def*)
-            install(FILES ${MKL_FILES} DESTINATION bin)
-            file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_avx*)
+            file(GLOB MKL_FILES
+                    ${MKLROOT}/redist/intel64/mkl_core*
+                    ${MKLROOT}/redist/intel64/mkl_def*
+                    ${MKLROOT}/redist/intel64/mkl_avx*
+                    ${MKLROOT}/bin/mkl_core*
+                    ${MKLROOT}/bin/mkl_def*
+                    ${MKLROOT}/bin/mkl_avx*
+            )
             install(FILES ${MKL_FILES} DESTINATION bin)
             if (BUILD_MULTITHREAD)
-                file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_tbb_thread.*)
+                file(GLOB MKL_FILES
+                        ${MKLROOT}/redist/intel64/mkl_tbb_thread.*
+                        ${MKLROOT}/bin/mkl_tbb_thread.*
+                )
                 install(FILES ${MKL_FILES} DESTINATION bin)
             else ()
-                file(GLOB MKL_FILES ${MKLROOT}/redist/intel64/mkl_intel_thread.*)
+                file(GLOB MKL_FILES
+                        ${MKLROOT}/redist/intel64/mkl_intel_thread.*
+                        ${MKLROOT}/bin/mkl_intel_thread.*
+                )
                 install(FILES ${MKL_FILES} DESTINATION bin)
             endif ()
         endif ()
         if (USE_INTEL_OPENMP)
-            find_file(libifcoremd libifcoremd.dll PATHS ${MKLROOT}/../../)
+            find_file(libifcoremd libifcoremd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libifcoremd} DESTINATION bin)
-            find_file(libiomp5md libiomp5md.dll PATHS ${MKLROOT}/../../)
+            find_file(libiomp5md libiomp5md.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libiomp5md} DESTINATION bin)
-            find_file(libmmd libmmd.dll PATHS ${MKLROOT}/../../)
+            find_file(libmmd libmmd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libmmd} DESTINATION bin)
-            find_file(svml_dispmd svml_dispmd.dll PATHS ${MKLROOT}/../../)
+            find_file(svml_dispmd svml_dispmd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${svml_dispmd} DESTINATION bin)
         endif ()
     else ()
@@ -395,7 +413,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         set(CPACK_PACKAGE_ICON ${ROOT}/Resource/suanPan-ua.svg)
         set(CPACK_PACKAGE_RELEASE 1)
         set(CPACK_PACKAGE_VENDOR "tlcfem")
-        set(CPACK_PACKAGE_VERSION "3.2.0")
+        set(CPACK_PACKAGE_VERSION "3.3.0")
         set(CPACK_PACKAGE_DESCRIPTION "An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework")
         set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/TLCFEM/suanPan")
 

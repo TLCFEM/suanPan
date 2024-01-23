@@ -11,7 +11,6 @@ if (USE_MPI)
             $<TARGET_OBJECTS:amd_obj>
             $<TARGET_OBJECTS:arpack_obj>
             $<TARGET_OBJECTS:feast_obj>
-            $<TARGET_OBJECTS:mumps_mod_lib>
             $<TARGET_OBJECTS:mumps_f_lib>
             $<TARGET_OBJECTS:mumps_c_lib>
     )
@@ -20,7 +19,6 @@ else ()
             $<TARGET_OBJECTS:amd_obj>
             $<TARGET_OBJECTS:arpack_obj>
             $<TARGET_OBJECTS:feast_obj>
-            $<TARGET_OBJECTS:mumps_mod_lib>
             $<TARGET_OBJECTS:mumps_mpi_f_lib>
             $<TARGET_OBJECTS:mumps_mpi_c_lib>
             $<TARGET_OBJECTS:mumps_f_lib>

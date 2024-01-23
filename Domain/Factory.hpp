@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -175,7 +175,7 @@ template<sp_d T> class Factory final {
     shared_ptr<MetaMat<T>> global_stiffness = nullptr;  // global stiffness matrix
     shared_ptr<MetaMat<T>> global_geometry = nullptr;   // global geometry matrix
 
-    std::vector<std::mutex> global_mutex = std::vector<std::mutex>(20);
+    std::vector<std::mutex> global_mutex{20};
 
     Col<T> eigenvalue; // eigenvalues
 
@@ -224,7 +224,7 @@ public:
     [[nodiscard]] bool is_sparse() const;
 
     void set_bandwidth(unsigned, unsigned);
-    void get_bandwidth(unsigned&, unsigned&) const;
+    [[nodiscard]] std::pair<unsigned, unsigned> get_bandwidth() const;
 
     void update_reference_size();
     void set_reference_size(unsigned);
@@ -758,10 +758,7 @@ template<sp_d T> void Factory<T>::set_bandwidth(const unsigned L, const unsigned
     access::rw(initialized) = false;
 }
 
-template<sp_d T> void Factory<T>::get_bandwidth(unsigned& L, unsigned& U) const {
-    L = n_lobw;
-    U = n_upbw;
-}
+template<sp_d T> std::pair<unsigned, unsigned> Factory<T>::get_bandwidth() const { return {n_lobw, n_upbw}; }
 
 template<sp_d T> void Factory<T>::update_reference_size() { n_rfld = static_cast<unsigned>(reference_dof.size()); }
 

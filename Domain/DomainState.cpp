@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,11 @@
 
 #include "Domain.h"
 #include <Constraint/Constraint.h>
+#include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Load/Load.h>
-#include <Domain/Factory.hpp>
+#include <Recorder/Recorder.h>
 
 void Domain::update_current_resistance() const {
     factory->modify_trial_resistance().zeros();
@@ -187,12 +188,12 @@ void Domain::assemble_trial_mass() const {
 
 void Domain::assemble_initial_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_initial_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+                factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
@@ -201,12 +202,12 @@ void Domain::assemble_initial_damping() const {
 
 void Domain::assemble_current_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_current_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+                factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
@@ -215,12 +216,12 @@ void Domain::assemble_current_damping() const {
 
 void Domain::assemble_trial_damping() const {
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_trial_damping(), I->get_dof_encoding(), I->get_dof_mapping());
+                factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
@@ -503,6 +504,8 @@ void Domain::clear_status() {
     suanpan::for_all(node_pond.get(), [](const shared_ptr<Node>& t_node) { t_node->clear_status(); });
     suanpan::for_all(load_pond.get(), [](const shared_ptr<Load>& t_load) { t_load->clear_status(); });
     suanpan::for_all(constraint_pond.get(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->clear_status(); });
+
+    suanpan::for_all(recorder_pond.get(), [](const shared_ptr<Recorder>& t_recorder) { t_recorder->clear_status(); });
 }
 
 void Domain::reset_status() const {

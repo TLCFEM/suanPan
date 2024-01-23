@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,9 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     ColorMethod color_model = ColorMethod::MIS;
 
     unsigned current_step_tag = 0;
-    unsigned current_converger_tag = 0;
-    unsigned current_integrator_tag = 0;
-    unsigned current_solver_tag = 0;
+    std::pair<unsigned, unsigned> current_converger_tag{0, 0};  // current converger tag, current step tag
+    std::pair<unsigned, unsigned> current_integrator_tag{0, 0}; // current integrator tag, current step tag
+    std::pair<unsigned, unsigned> current_solver_tag{0, 0};     // current solver tag, current step tag
 
     ThreadQueue thread_pond;
 
@@ -295,9 +295,9 @@ public:
     void set_current_solver_tag(unsigned) override;
 
     unsigned get_current_step_tag() override;
-    unsigned get_current_converger_tag() override;
-    unsigned get_current_integrator_tag() override;
-    unsigned get_current_solver_tag() override;
+    std::pair<unsigned, unsigned> get_current_converger_tag() override;
+    std::pair<unsigned, unsigned> get_current_integrator_tag() override;
+    std::pair<unsigned, unsigned> get_current_solver_tag() override;
 
     const shared_ptr<Step>& get_current_step() const override;
     const shared_ptr<Converger>& get_current_converger() const override;

@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ const mat SGCMS::mapping = [] {
 SGCMS::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
     , factor(F)
-    , s_material(std::forward<unique_ptr<Material>>(M)) {}
+    , s_material(std::move(M)) {}
 
 SGCMS::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
@@ -40,7 +40,7 @@ SGCMS::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const 
     , s_material(nullptr == old_obj.s_material ? nullptr : old_obj.s_material->get_copy()) {}
 
 SGCMS::IntegrationPoint::IntegrationPoint(vec&& C)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , BP(3, 12, fill::zeros) {}
 
 field<mat> SGCMS::form_plate_transformation(const mat& C) {
@@ -166,7 +166,7 @@ mat SGCMS::form_displacement_dn(const mat& pn_pxy, const mat& pnt_pxy) {
 }
 
 SGCMS::SGCMS(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool NL)
-    : ShellBase(T, s_node, s_dof, std::forward<uvec>(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , thickness(TH) {}
 
 int SGCMS::initialize(const shared_ptr<DomainBase>& D) {

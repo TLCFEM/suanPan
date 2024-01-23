@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@
 #include <suanPan.h>
 
 class Bead;
-class DomainBase;
 
 int process_command(const shared_ptr<Bead>&, istringstream&);
 
@@ -40,28 +39,6 @@ bool normalise_command(string&, string&);
 
 int process_file(const shared_ptr<Bead>&, const char*);
 
-int run_example();
-
-int create_new_domain(const shared_ptr<Bead>&, istringstream&);
-
-int disable_object(const shared_ptr<Bead>&, istringstream&);
-int enable_object(const shared_ptr<Bead>&, istringstream&);
-int erase_object(const shared_ptr<Bead>&, istringstream&);
-
-int save_object(const shared_ptr<DomainBase>&, istringstream&);
-int list_object(const shared_ptr<DomainBase>&, istringstream&);
-int suspend_object(const shared_ptr<DomainBase>&, istringstream&);
-int protect_object(const shared_ptr<DomainBase>&, istringstream&);
-
-int create_new_external_module(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_initial(const shared_ptr<DomainBase>&, istringstream&);
-int create_new_node(const shared_ptr<DomainBase>&, istringstream&);
-
-int set_property(const shared_ptr<DomainBase>&, istringstream&);
-
-int print_info(const shared_ptr<DomainBase>&, istringstream&);
-
-int print_command();
 int execute_command(istringstream&);
 
 #endif

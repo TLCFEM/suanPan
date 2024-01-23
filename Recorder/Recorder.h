@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,6 +80,8 @@ public:
     [[nodiscard]] const std::vector<double>& get_time_pool() const;
 
     virtual void record(const shared_ptr<DomainBase>&) = 0;
+
+    void clear_status();
 
     virtual void save();
 

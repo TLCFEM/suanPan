@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,16 +31,16 @@ mat QE2::mapping = [] {
 }();
 
 QE2::IntegrationPoint::IntegrationPoint(vec&& C, const double F, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , factor(F)
-    , m_material(std::forward<unique_ptr<Material>>(M))
+    , m_material(std::move(M))
     , B(3, m_size, fill::zeros)
     , BI(3, 2, fill::zeros) {}
 
 vec QE2::form_stress_mode(const double X, const double Y) { return vec{0., X, Y, X * Y}; }
 
 QE2::QE2(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int QE2::initialize(const shared_ptr<DomainBase>& D) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
  * approach applies it at somewhere in current step, i.e.,
  * \f$t=t_0+\Delta{}t-\alpha\f$, similar to the generalized midpoint concept.
  *
- * doi: 10.1115/1.2900803
+ * doi:10.1115/1.2900803
  *
  * @author tlc
  * @date 21/10/2017

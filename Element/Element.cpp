@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ void Element::update_kinetic_energy() {
 }
 
 void Element::update_viscous_energy() {
-    if(trial_damping_force.is_empty()) return;
+    if(trial_viscous_force.is_empty()) return;
 
-    viscous_energy += .5 * (current_damping_force.is_empty() ? dot(get_incre_displacement(), trial_damping_force) : dot(get_incre_displacement(), current_damping_force + trial_damping_force));
+    viscous_energy += .5 * (current_viscous_force.is_empty() ? dot(get_incre_displacement(), trial_viscous_force) : dot(get_incre_displacement(), current_viscous_force + trial_viscous_force));
 }
 
 void Element::update_nonviscous_energy() {
@@ -61,9 +61,7 @@ void Element::update_complementary_energy() {
 void Element::update_momentum() {
     if(trial_mass.is_empty()) return;
 
-    const vec t_velocity = get_trial_velocity();
-
-    momentum = trial_mass * t_velocity;
+    momentum = trial_mass * get_trial_velocity();
 }
 
 /**
@@ -243,56 +241,56 @@ vec Element::get_node_current_resistance() const {
 
 std::vector<shared_ptr<Material>> Element::get_material(const shared_ptr<DomainBase>& D) const {
     std::vector<shared_ptr<Material>> material_pool;
-    for(const auto& I : material_tag) material_pool.emplace_back(D->find<Material>(I) ? D->get<Material>(I) : nullptr);
+    for(const auto I : material_tag) material_pool.emplace_back(D->get<Material>(I));
     return material_pool;
 }
 
 std::vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBase>& D) const {
     std::vector<shared_ptr<Section>> section_pool;
-    for(const auto& I : section_tag) section_pool.emplace_back(D->find<Section>(I) ? D->get<Section>(I) : nullptr);
+    for(const auto I : section_tag) section_pool.emplace_back(D->get<Section>(I));
     return section_pool;
 }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)
-    : Element(T, NN, ND, std::forward<uvec>(NT), {}, false, MaterialType::D0, std::forward<std::vector<DOF>>(DI)) {}
+    : Element(T, NN, ND, std::move(NT), {}, false, MaterialType::D0, std::move(DI)) {}
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<DOF>&& DI)
-    : DataElement{std::forward<uvec>(NT), std::forward<uvec>(MT), uvec{}, F, true, true, true, true, true, {}}
+    : DataElement{std::move(NT), std::move(MT), uvec{}, F}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
-    , mat_type(MTP)
-    , sec_type(SectionType::D0)
-    , dof_identifier(std::forward<std::vector<DOF>>(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
+    , material_type(MTP)
+    , section_type(SectionType::D0)
+    , dof_identifier(std::move(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
-    : DataElement{std::forward<uvec>(NT), uvec{}, std::forward<uvec>(ST), F, true, true, true, true, true, {}}
+    : DataElement{std::move(NT), uvec{}, std::move(ST), F}
     , ElementBase(T)
     , num_node(NN)
     , num_dof(ND)
-    , mat_type(MaterialType::D0)
-    , sec_type(STP)
-    , dof_identifier(std::forward<std::vector<DOF>>(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
+    , material_type(MaterialType::D0)
+    , section_type(STP)
+    , dof_identifier(std::move(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
 
 // for contact elements that use node groups
 Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
-    : DataElement{std::forward<uvec>(GT), {}, {}, false, true, true, true, true, true, {}}
+    : DataElement{std::move(GT), {}, {}, false}
     , ElementBase(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
     , use_group(true)
-    , mat_type(MaterialType::D0)
-    , sec_type(SectionType::D0) {}
+    , material_type(MaterialType::D0)
+    , section_type(SectionType::D0) {}
 
 // for elements that use other elements
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
-    : DataElement{{NT}, {}, {}, false, true, true, true, true, true, {}}
+    : DataElement{{NT}, {}, {}, false}
     , ElementBase(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
     , use_other(ET)
-    , mat_type(MaterialType::D0)
-    , sec_type(SectionType::D0) {}
+    , material_type(MaterialType::D0)
+    , section_type(SectionType::D0) {}
 
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity
@@ -320,10 +318,10 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     }
 
     // embedded elements use other elements
-    if(0 != use_other) {
+    if(0u != use_other) {
         if(!D->find<Element>(use_other)) return SUANPAN_FAIL;
 
-        unsigned size = 1;
+        auto size = 1u;
         auto& t_element = D->get<Element>(use_other);
         size += t_element->get_node_number();
         access::rw(num_node) = size;
@@ -336,7 +334,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // first initialization
     access::rw(num_size) = num_node * num_dof;
 
-    if(0 == num_size) return SUANPAN_FAIL;
+    if(0u == num_size) return SUANPAN_FAIL;
 
     dof_encoding.set_size(num_size);
 
@@ -360,17 +358,17 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     for(auto& I : node_ptr) if(I.lock()->get_dof_number() < num_dof) I.lock()->set_dof_number(num_dof);
 
     // check if material models are valid
-    if(MaterialType::D0 != mat_type)
-        for(const auto& t_tag : material_tag)
-            if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != mat_type) {
+    if(MaterialType::D0 != material_type)
+        for(const auto t_tag : material_tag)
+            if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != material_type) {
                 suanpan_warning("Element {} disabled as material {} cannot be found or type mismatch.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
 
     // check if section models are valid
-    if(SectionType::D0 != sec_type)
-        for(const auto& t_tag : section_tag)
-            if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != sec_type) {
+    if(SectionType::D0 != section_type)
+        for(const auto t_tag : section_tag)
+            if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != section_type) {
                 suanpan_warning("Element {} disabled as section {} cannot be found or type mismatch.\n", get_tag(), t_tag);
                 return SUANPAN_FAIL;
             }
@@ -394,10 +392,10 @@ bool Element::is_symmetric() const { return symmetric; }
 bool Element::is_nlgeom() const { return nlgeom; }
 
 void Element::update_dof_encoding() {
-    unsigned idx = 0;
-    for(const auto& tmp_ptr : node_ptr) {
-        auto& node_dof = tmp_ptr.lock()->get_reordered_dof();
-        for(unsigned i = 0; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
+    auto idx = 0u;
+    for(const auto& t_ptr : node_ptr) {
+        auto& node_dof = t_ptr.lock()->get_reordered_dof();
+        for(auto i = 0u; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
     }
 
     dof_mapping.clear();
@@ -406,18 +404,24 @@ void Element::update_dof_encoding() {
     for(auto I = 0llu; I < dof_index.n_elem; ++I) for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
     std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
 
-    if(!dof_identifier.empty()) for(const auto& tmp_ptr : node_ptr) tmp_ptr.lock()->set_dof_identifier(dof_identifier);
+    if(!dof_identifier.empty()) for(const auto& t_ptr : node_ptr) t_ptr.lock()->set_dof_identifier(dof_identifier);
 }
 
 bool Element::if_update_mass() const { return update_mass; }
 
-bool Element::if_update_damping() const { return update_damping; }
+bool Element::if_update_viscous() const { return update_viscous; }
 
 bool Element::if_update_nonviscous() const { return update_nonviscous; }
 
 bool Element::if_update_stiffness() const { return update_stiffness; }
 
 bool Element::if_update_geometry() const { return update_geometry; }
+
+bool Element::allow_modify_mass() const { return modify_mass; }
+
+bool Element::allow_modify_viscous() const { return modify_viscous; }
+
+bool Element::allow_modify_nonviscous() const { return modify_nonviscous; }
 
 const uvec& Element::get_dof_encoding() const { return dof_encoding; }
 
@@ -443,9 +447,9 @@ const vec& Element::get_trial_resistance() const { return trial_resistance; }
 
 const vec& Element::get_current_resistance() const { return current_resistance; }
 
-const vec& Element::get_trial_damping_force() const { return trial_damping_force; }
+const vec& Element::get_trial_damping_force() const { return trial_viscous_force; }
 
-const vec& Element::get_current_damping_force() const { return current_damping_force; }
+const vec& Element::get_current_damping_force() const { return current_viscous_force; }
 
 const cx_mat& Element::get_trial_nonviscous_force() const { return trial_nonviscous_force; }
 
@@ -471,7 +475,7 @@ const vec& Element::get_current_traction() const { return current_traction; }
 
 const mat& Element::get_trial_mass() const { return trial_mass; }
 
-const mat& Element::get_trial_damping() const { return trial_damping; }
+const mat& Element::get_trial_viscous() const { return trial_viscous; }
 
 const mat& Element::get_trial_nonviscous() const { return trial_nonviscous; }
 
@@ -483,7 +487,7 @@ const mat& Element::get_trial_secant() const { return get_trial_stiffness(); }
 
 const mat& Element::get_current_mass() const { return current_mass; }
 
-const mat& Element::get_current_damping() const { return current_damping; }
+const mat& Element::get_current_viscous() const { return current_viscous; }
 
 const mat& Element::get_current_nonviscous() const { return current_nonviscous; }
 
@@ -495,7 +499,7 @@ const mat& Element::get_current_secant() const { return get_current_stiffness();
 
 const mat& Element::get_initial_mass() const { return initial_mass; }
 
-const mat& Element::get_initial_damping() const { return initial_damping; }
+const mat& Element::get_initial_viscous() const { return initial_viscous; }
 
 const mat& Element::get_initial_nonviscous() const { return initial_nonviscous; }
 
@@ -511,15 +515,15 @@ const mat& Element::get_stiffness_container() const { return stiffness_container
 
 int Element::clear_status() {
     if(update_mass) trial_mass = current_mass = initial_mass;
-    if(update_damping) trial_damping = current_damping = initial_damping;
+    if(update_viscous) trial_viscous = current_viscous = initial_viscous;
     if(update_nonviscous) trial_nonviscous = current_nonviscous = initial_nonviscous;
     if(update_stiffness) trial_stiffness = current_stiffness = initial_stiffness;
     if(update_geometry) trial_geometry = current_geometry = initial_geometry;
 
     if(!trial_resistance.is_empty()) trial_resistance.zeros();
     if(!current_resistance.is_empty()) current_resistance.zeros();
-    if(!trial_damping_force.is_empty()) trial_damping_force.zeros();
-    if(!current_damping_force.is_empty()) current_damping_force.zeros();
+    if(!trial_viscous_force.is_empty()) trial_viscous_force.zeros();
+    if(!current_viscous_force.is_empty()) current_viscous_force.zeros();
     if(!trial_nonviscous_force.is_empty()) trial_nonviscous_force.zeros();
     if(!current_nonviscous_force.is_empty()) current_nonviscous_force.zeros();
     if(!trial_inertial_force.is_empty()) trial_inertial_force.zeros();
@@ -549,11 +553,11 @@ int Element::commit_status() {
     update_momentum();
 
     if(update_mass && !trial_mass.is_empty()) current_mass = trial_mass;
-    if(update_damping && !trial_damping.is_empty()) current_damping = trial_damping;
+    if(update_viscous && !trial_viscous.is_empty()) current_viscous = trial_viscous;
     if(update_stiffness && !trial_stiffness.is_empty()) current_stiffness = trial_stiffness;
     if(update_geometry && !trial_geometry.is_empty()) current_geometry = trial_geometry;
     if(!trial_resistance.is_empty()) current_resistance = trial_resistance;
-    if(!trial_damping_force.is_empty()) current_damping_force = trial_damping_force;
+    if(!trial_viscous_force.is_empty()) current_viscous_force = trial_viscous_force;
     if(!trial_nonviscous_force.is_empty()) current_nonviscous_force = trial_nonviscous_force;
     if(!trial_inertial_force.is_empty()) current_inertial_force = trial_inertial_force;
 
@@ -562,12 +566,12 @@ int Element::commit_status() {
 
 int Element::reset_status() {
     if(update_mass && !trial_mass.is_empty()) trial_mass = current_mass;
-    if(update_damping && !trial_damping.is_empty()) trial_damping = current_damping;
+    if(update_viscous && !trial_viscous.is_empty()) trial_viscous = current_viscous;
     if(update_nonviscous && !trial_nonviscous.is_empty()) trial_nonviscous = current_nonviscous;
     if(update_stiffness && !trial_stiffness.is_empty()) trial_stiffness = current_stiffness;
     if(update_geometry && !trial_geometry.is_empty()) trial_geometry = current_geometry;
     if(!trial_resistance.is_empty()) trial_resistance = current_resistance;
-    if(!trial_damping_force.is_empty()) trial_damping_force = current_damping_force;
+    if(!trial_viscous_force.is_empty()) trial_viscous_force = current_viscous_force;
     if(!trial_nonviscous_force.is_empty()) trial_nonviscous_force = current_nonviscous_force;
     if(!trial_inertial_force.is_empty()) trial_inertial_force = current_inertial_force;
 
@@ -619,9 +623,9 @@ void ConstantMass(DataElement* E) {
 }
 
 void ConstantDamping(DataElement* E) {
-    E->update_damping = false;
-    E->current_damping = mat(E->initial_damping.memptr(), E->initial_damping.n_rows, E->initial_damping.n_cols, false, true);
-    E->trial_damping = mat(E->initial_damping.memptr(), E->initial_damping.n_rows, E->initial_damping.n_cols, false, true);
+    E->update_viscous = false;
+    E->current_viscous = mat(E->initial_viscous.memptr(), E->initial_viscous.n_rows, E->initial_viscous.n_cols, false, true);
+    E->trial_viscous = mat(E->initial_viscous.memptr(), E->initial_viscous.n_rows, E->initial_viscous.n_cols, false, true);
 }
 
 void ConstantStiffness(DataElement* E) {

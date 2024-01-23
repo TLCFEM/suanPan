@@ -62,46 +62,45 @@ at the top-level directory.
  */
 
 int zpivotL(
-	const int jcol,     /* in */
-	const double u,     /* in - diagonal pivoting threshold */
-	int* usepr,         /* re-use the pivot sequence given by perm_r/iperm_r */
-	int* perm_r,        /* may be modified */
-	int* iperm_r,       /* in - inverse of perm_r */
-	int* iperm_c,       /* in - used to find diagonal of Pc*A*Pc' */
-	int* pivrow,        /* out */
-	GlobalLU_t* Glu,    /* modified - global LU data structures */
-	SuperLUStat_t* stat /* output */
+    const int jcol,     /* in */
+    const double u,     /* in - diagonal pivoting threshold */
+    int* usepr,         /* re-use the pivot sequence given by perm_r/iperm_r */
+    int* perm_r,        /* may be modified */
+    int* iperm_r,       /* in - inverse of perm_r */
+    int* iperm_c,       /* in - used to find diagonal of Pc*A*Pc' */
+    int* pivrow,        /* out */
+    GlobalLU_t* Glu,    /* modified - global LU data structures */
+    SuperLUStat_t* stat /* output */
 ) {
+    doublecomplex one = {1.0, 0.0};
+    int fsupc;  /* first column in the supernode */
+    int nsupc;  /* no of columns in the supernode */
+    int nsupr;  /* no of rows in the supernode */
+    int_t lptr; /* points to the starting subscript of the supernode */
+    int pivptr, old_pivptr, diag, diagind;
+    double pivmax, rtemp, thresh;
+    doublecomplex temp;
+    doublecomplex* lu_sup_ptr;
+    doublecomplex* lu_col_ptr;
+    int_t* lsub_ptr;
+    int_t isub, icol, k, itemp;
+    int_t *lsub, *xlsub;
+    doublecomplex* lusup;
+    int_t* xlusup;
+    flops_t* ops = stat->ops;
 
-	doublecomplex one = {1.0, 0.0};
-	int fsupc; /* first column in the supernode */
-	int nsupc; /* no of columns in the supernode */
-	int nsupr; /* no of rows in the supernode */
-	int lptr;  /* points to the starting subscript of the supernode */
-	int pivptr, old_pivptr, diag, diagind;
-	double pivmax, rtemp, thresh;
-	doublecomplex temp;
-	doublecomplex* lu_sup_ptr;
-	doublecomplex* lu_col_ptr;
-	int* lsub_ptr;
-	int isub, icol, k, itemp;
-	int *lsub, *xlsub;
-	doublecomplex* lusup;
-	int* xlusup;
-	flops_t* ops = stat->ops;
-
-	/* Initialize pointers */
-	lsub = Glu->lsub;
-	xlsub = Glu->xlsub;
-	lusup = (doublecomplex*)Glu->lusup;
-	xlusup = Glu->xlusup;
-	fsupc = (Glu->xsup)[(Glu->supno)[jcol]];
-	nsupc = jcol - fsupc; /* excluding jcol; nsupc >= 0 */
-	lptr = xlsub[fsupc];
-	nsupr = xlsub[fsupc + 1] - lptr;
-	lu_sup_ptr = &lusup[xlusup[fsupc]]; /* start of the current supernode */
-	lu_col_ptr = &lusup[xlusup[jcol]];  /* start of jcol in the supernode */
-	lsub_ptr = &lsub[lptr];             /* start of row indices of the supernode */
+    /* Initialize pointers */
+    lsub = Glu->lsub;
+    xlsub = Glu->xlsub;
+    lusup = (doublecomplex*)Glu->lusup;
+    xlusup = Glu->xlusup;
+    fsupc = (Glu->xsup)[(Glu->supno)[jcol]];
+    nsupc = jcol - fsupc; /* excluding jcol; nsupc >= 0 */
+    lptr = xlsub[fsupc];
+    nsupr = xlsub[fsupc + 1] - lptr;
+    lu_sup_ptr = &lusup[xlusup[fsupc]]; /* start of the current supernode */
+    lu_col_ptr = &lusup[xlusup[jcol]];  /* start of jcol in the supernode */
+    lsub_ptr = &lsub[lptr];             /* start of row indices of the supernode */
 
 #ifdef DEBUG
 if ( jcol == MIN_COL ) {
@@ -111,80 +110,79 @@ if ( jcol == MIN_COL ) {
 }
 #endif
 
-	/* Determine the largest abs numerical value for partial pivoting;
-	   Also search for user-specified pivot, and diagonal element. */
-	if(*usepr) *pivrow = iperm_r[jcol];
-	diagind = iperm_c[jcol];
-	pivmax = 0.0;
-	pivptr = nsupc;
-	diag = EMPTY;
-	old_pivptr = nsupc;
-	for(isub = nsupc; isub < nsupr; ++isub) {
-		rtemp = z_abs1(&lu_col_ptr[isub]);
-		if(rtemp > pivmax) {
-			pivmax = rtemp;
-			pivptr = isub;
-		}
-		if(*usepr && lsub_ptr[isub] == *pivrow) old_pivptr = isub;
-		if(lsub_ptr[isub] == diagind) diag = isub;
-	}
+    /* Determine the largest abs numerical value for partial pivoting;
+       Also search for user-specified pivot, and diagonal element. */
+    if(*usepr) *pivrow = iperm_r[jcol];
+    diagind = iperm_c[jcol];
+    pivmax = 0.0;
+    pivptr = nsupc;
+    diag = EMPTY;
+    old_pivptr = nsupc;
+    for(isub = nsupc; isub < nsupr; ++isub) {
+        rtemp = z_abs1(&lu_col_ptr[isub]);
+        if(rtemp > pivmax) {
+            pivmax = rtemp;
+            pivptr = isub;
+        }
+        if(*usepr && lsub_ptr[isub] == *pivrow) old_pivptr = isub;
+        if(lsub_ptr[isub] == diagind) diag = isub;
+    }
 
-	/* Test for singularity */
-	if(pivmax == 0.0) {
+    /* Test for singularity */
+    if(pivmax == 0.0) {
 #if 1
-		*pivrow = lsub_ptr[pivptr];
-		perm_r[*pivrow] = jcol;
+        *pivrow = lsub_ptr[pivptr];
+        perm_r[*pivrow] = jcol;
 #else
 	perm_r[diagind] = jcol;
 #endif
-		*usepr = 0;
-		return (jcol + 1);
-	}
+        *usepr = 0;
+        return (jcol + 1);
+    }
 
-	thresh = u * pivmax;
+    thresh = u * pivmax;
 
-	/* Choose appropriate pivotal element by our policy. */
-	if(*usepr) {
-		rtemp = z_abs1(&lu_col_ptr[old_pivptr]);
-		if(rtemp != 0.0 && rtemp >= thresh) pivptr = old_pivptr;
-		else *usepr = 0;
-	}
-	if(*usepr == 0) {
-		/* Use diagonal pivot? */
-		if(diag >= 0) {
-			/* diagonal exists */
-			rtemp = z_abs1(&lu_col_ptr[diag]);
-			if(rtemp != 0.0 && rtemp >= thresh) pivptr = diag;
-		}
-		*pivrow = lsub_ptr[pivptr];
-	}
+    /* Choose appropriate pivotal element by our policy. */
+    if(*usepr) {
+        rtemp = z_abs1(&lu_col_ptr[old_pivptr]);
+        if(rtemp != 0.0 && rtemp >= thresh) pivptr = old_pivptr;
+        else *usepr = 0;
+    }
+    if(*usepr == 0) {
+        /* Use diagonal pivot? */
+        if(diag >= 0) {
+            /* diagonal exists */
+            rtemp = z_abs1(&lu_col_ptr[diag]);
+            if(rtemp != 0.0 && rtemp >= thresh) pivptr = diag;
+        }
+        *pivrow = lsub_ptr[pivptr];
+    }
 
-	/* Record pivot row */
-	perm_r[*pivrow] = jcol;
+    /* Record pivot row */
+    perm_r[*pivrow] = jcol;
 
-	/* Interchange row subscripts */
-	if(pivptr != nsupc) {
-		itemp = lsub_ptr[pivptr];
-		lsub_ptr[pivptr] = lsub_ptr[nsupc];
-		lsub_ptr[nsupc] = itemp;
+    /* Interchange row subscripts */
+    if(pivptr != nsupc) {
+        itemp = lsub_ptr[pivptr];
+        lsub_ptr[pivptr] = lsub_ptr[nsupc];
+        lsub_ptr[nsupc] = itemp;
 
-		/* Interchange numerical values as well, for the whole snode, such 
-		 * that L is indexed the same way as A.
-		  */
-		for(icol = 0; icol <= nsupc; icol++) {
-			itemp = pivptr + icol * nsupr;
-			temp = lu_sup_ptr[itemp];
-			lu_sup_ptr[itemp] = lu_sup_ptr[nsupc + icol * nsupr];
-			lu_sup_ptr[nsupc + icol * nsupr] = temp;
-		}
-	} /* if */
+        /* Interchange numerical values as well, for the whole snode, such 
+         * that L is indexed the same way as A.
+          */
+        for(icol = 0; icol <= nsupc; icol++) {
+            itemp = pivptr + icol * nsupr;
+            temp = lu_sup_ptr[itemp];
+            lu_sup_ptr[itemp] = lu_sup_ptr[nsupc + icol * nsupr];
+            lu_sup_ptr[nsupc + icol * nsupr] = temp;
+        }
+    } /* if */
 
-	/* cdiv operation */
-	ops[FACT] += 10 * (nsupr - nsupc);
+    /* cdiv operation */
+    ops[FACT] += 10 * (nsupr - nsupc);
 
-	z_div(&temp, &one, &lu_col_ptr[nsupc]);
-	for(k = nsupc + 1; k < nsupr; k++)
-		zz_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
+    z_div(&temp, &one, &lu_col_ptr[nsupc]);
+    for(k = nsupc + 1; k < nsupr; k++) zz_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
 
-	return 0;
+    return 0;
 }

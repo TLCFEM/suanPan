@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
  * @class LeeNewmarkFull
  * @brief A LeeNewmarkFull class defines a solver using Newmark algorithm with Lee damping model.
  *
- * doi: 10.1016/j.compstruc.2020.106423
- * doi: 10.1016/j.compstruc.2021.106663
+ * doi:10.1016/j.compstruc.2020.106423
+ * doi:10.1016/j.compstruc.2021.106663
  *
  * @author tlc
  * @date 26/11/2021

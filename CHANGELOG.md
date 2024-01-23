@@ -5,15 +5,35 @@
 1. The `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 2. The `SPIKE` solver may occasionally freeze, to circumvent, try to avoid mixing compilers from different vendors.
 3. The `MUMPS` solver throws segfaults with large matrices.
+4. The `FGMRES` solver requires refinements.
+
+## version 3.3
+
+1. (breaking) revise syntax for `ConcreteTsai`, `Concrete21` and `Concrete22` using a more consistent definition
+2. fix tangent stiffness in `ConcreteK4` model [#171](https://github.com/TLCFEM/suanPan/pull/171)
+3. update `OpenBLAS` to version `0.3.25`
+4. update `SuperLU` to version `6.0.1`
+5. better `RCM` algorithm that may result in a smaller bandwidth, thus, potentially more efficient
+   solving [#175](https://github.com/TLCFEM/suanPan/pull/175)
+6. update `Armadillo` to version `12.6.7` [#180](https://github.com/TLCFEM/suanPan/pull/180)
+7. enable lazy evaluation and avoid temporary global matrices, faster dynamic
+   analysis [#183](https://github.com/TLCFEM/suanPan/pull/183)
+8. bugfixes: [#185](https://github.com/TLCFEM/suanPan/pull/185)
+9. update `Catch2` to version `3.5.2`
+10. update `fmt` to version `10.2.1`
+11. add nonviscous damping: `NonviscousNewmark` (global level integrator), `ElementalNonviscous` (element level
+    modifier) and `Nonviscous01` (material level model)
 
 ## version 3.2
 
 1. revise uniaxial universal damage models [#153](https://github.com/TLCFEM/suanPan/pull/153)
 2. update `OpenBLAS` to version `0.3.24`
 3. add a new uniaxial concrete model `ConcreteK4` [#155](https://github.com/TLCFEM/suanPan/pull/155)
-4. add beam element for arbitrary thin-/thick-walled open/close section with torsion and warping `B31OS` [#159](https://github.com/TLCFEM/suanPan/pull/159)
+4. add beam element for arbitrary thin-/thick-walled open/close section with torsion and
+   warping `B31OS` [#159](https://github.com/TLCFEM/suanPan/pull/159)
 5. better local iteration convergence criterion [#161](https://github.com/TLCFEM/suanPan/pull/161)
-6. `B31OS` and `EB31OS` associated transformations `B3DOSL`, `B3DOSC`; sections, `Fibre3DOS`, `Cell3DOS`; material wrappers `OS146`, `OS146S`
+6. `B31OS` and `EB31OS` associated transformations `B3DOSL`, `B3DOSC`; sections, `Fibre3DOS`, `Cell3DOS`; material
+   wrappers `OS146`, `OS146S`
 7. add elemental damping using Lee's model
 8. support Lode angle in CDPM2 [#163](https://github.com/TLCFEM/suanPan/pull/163)
 9. add `AICN` cubic Newton solver [#165](https://github.com/TLCFEM/suanPan/pull/165)
@@ -139,7 +159,7 @@
 2. add porous media plane strain elements `PCPE4UC`, `PCPE8UC`, `PCPE4DC`, `PCPE8DC`
 3. add N-M interaction enabled beam element `NMB31` and `NMB21`
 4. add N-M interaction enabled section `NM2D1`, `NM3D1` (elastic) and `NM2D2`, `NM3D2` (inelastic)
-5. change Rayleigh damping related syntax to include tangent stiffness term
+5. (breaking) change Rayleigh damping related syntax to include tangent stiffness term
 6. add different stiffness types to `LeeNewmarkFull`, add support of geometry nonlinearity
 7. revise section definition
 8. add `B3DC` corotational formulation support to 3D beams

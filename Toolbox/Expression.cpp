@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ exprtk::parser<double> Expression::parser; // NOLINT(cppcoreguidelines-interface
 
 Expression::Expression(const unsigned tag, std::vector<std::string>&& variable_string)
     : Tag(tag)
-    , variable_text_list(std::forward<std::vector<std::string>>(variable_string)) {
+    , variable_text_list(std::move(variable_string)) {
     symbol_table.add_constants();
 
     const auto variable_list = suanpan::expression::split(variable_text_list[0]);

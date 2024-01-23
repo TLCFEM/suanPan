@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -308,9 +308,9 @@ public:
     virtual void set_current_solver_tag(unsigned) = 0;
 
     virtual unsigned get_current_step_tag() = 0;
-    virtual unsigned get_current_converger_tag() = 0;
-    virtual unsigned get_current_integrator_tag() = 0;
-    virtual unsigned get_current_solver_tag() = 0;
+    virtual std::pair<unsigned, unsigned> get_current_converger_tag() = 0;
+    virtual std::pair<unsigned, unsigned> get_current_integrator_tag() = 0;
+    virtual std::pair<unsigned, unsigned> get_current_solver_tag() = 0;
 
     [[nodiscard]] virtual const shared_ptr<Step>& get_current_step() const = 0;
     [[nodiscard]] virtual const shared_ptr<Converger>& get_current_converger() const = 0;

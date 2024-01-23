@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 
 NonviscousNewmark::NonviscousNewmark(const unsigned T, const double A, const double B, cx_vec&& M, cx_vec&& S)
     : Newmark(T, A, B)
-    , m(std::forward<cx_vec>(M))
-    , s(std::forward<cx_vec>(S)) {}
+    , m(std::move(M))
+    , s(std::move(S)) {}
 
 int NonviscousNewmark::initialize() {
     auto& W = get_domain()->get_factory();
@@ -53,7 +53,7 @@ void NonviscousNewmark::assemble_matrix() {
     const auto damping_diag = C1 * accu_para;
 
     if(const auto t_scheme = W->get_storage_scheme(); StorageScheme::SPARSE == t_scheme || StorageScheme::SPARSESYMM == t_scheme) for(auto I = 0u; I < W->get_size(); ++I) t_stiffness->unsafe_at(I, I) += damping_diag;
-    else suanpan_for(0u, W->get_size(), [&](const unsigned I) { t_stiffness->unsafe_at(I, I) += damping_diag; });
+    else suanpan::for_each(W->get_size(), [&](const unsigned I) { t_stiffness->unsafe_at(I, I) += damping_diag; });
 }
 
 void NonviscousNewmark::update_parameter(const double DT) {

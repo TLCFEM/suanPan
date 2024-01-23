@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
  * @class OALTS
  * @brief A OALTS class defines a solver using OALTS algorithm.
  *
- * doi: 10.1002/nme.6188
+ * doi:10.1002/nme.6188
  *
  * @author tlc
  * @date 05/12/2022

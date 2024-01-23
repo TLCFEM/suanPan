@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,6 @@
 #include "Fibre2D.h"
 
 Fibre2D::Fibre2D(const unsigned T, uvec&& ST)
-    : Fibre(T, std::forward<uvec>(ST), SectionType::D2) {}
+    : Fibre(T, std::move(ST), SectionType::D2) {}
 
 unique_ptr<Section> Fibre2D::get_copy() { return make_unique<Fibre2D>(*this); }

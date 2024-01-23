@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ podarray<double> MultilinearOO::compute_compression_backbone(const double t_stra
 }
 
 MultilinearOO::MultilinearOO(const int T, mat&& TB, mat&& CB, const double R)
-    : DataMultilinearOO{std::forward<mat>(TB), std::forward<mat>(CB)}
+    : DataMultilinearOO{std::move(TB), std::move(CB)}
     , OriginOriented(T, R) {}
 
 int MultilinearOO::initialize(const shared_ptr<DomainBase>&) {

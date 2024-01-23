@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@
 #include <Toolbox/utility.h>
 
 CP6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(P))
+    , m_material(std::move(M))
+    , pn_pxy(std::move(P))
     , strain_mat(3, m_size) {
     for(auto I = 0u, J = 0u, K = 1u; I < m_node; ++I, J += m_dof, K += m_dof) {
         strain_mat(0, J) = strain_mat(2, K) = pn_pxy(0, I);
@@ -36,7 +36,7 @@ CP6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
 }
 
 CP6::CP6(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const bool R)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, R, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int CP6::initialize(const shared_ptr<DomainBase>& D) {

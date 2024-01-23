@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Recorder/OutputType.h>
 
 Fibre3DOS::Fibre3DOS(const unsigned T, uvec&& ST)
-    : Fibre(T, std::forward<uvec>(ST), SectionType::OS3D) {}
+    : Fibre(T, std::move(ST), SectionType::OS3D) {}
 
 unique_ptr<Section> Fibre3DOS::get_copy() { return make_unique<Fibre3DOS>(*this); }
 

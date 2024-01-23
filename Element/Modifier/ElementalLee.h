@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,8 +30,7 @@
 
 #include <Element/Modifier/Modifier.h>
 
-class ElementalLee final : public Modifier {
-    const double default_damping_ratio = .02;
+class ElementalLee final : public ModifierDynamics {
     const double damping_ratio;
 
 public:

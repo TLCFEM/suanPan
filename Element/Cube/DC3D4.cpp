@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ const uvec DC3D4::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14};
 const uvec DC3D4::d_dof{3, 7, 11, 15};
 
 DC3D4::DC3D4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::DMG})
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::DMG})
     , release_rate(RR) { access::rw(characteristic_length) = CL; }
 
 int DC3D4::initialize(const shared_ptr<DomainBase>& D) {

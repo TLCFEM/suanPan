@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@
 #include <Toolbox/shape.h>
 
 CAX4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
+    , m_material(std::move(M))
     , strain_mat(4, m_size, fill::zeros) {}
 
 vec CAX4::isoparametric_mapping(const vec& in) {
@@ -39,7 +39,7 @@ vec CAX4::isoparametric_mapping(const vec& in) {
 }
 
 CAX4::CAX4(const unsigned T, uvec&& N, const unsigned M, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, F) {}
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F) {}
 
 int CAX4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));

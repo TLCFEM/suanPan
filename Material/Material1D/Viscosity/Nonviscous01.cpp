@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include <Step/Step.h>
 
 Nonviscous01::Nonviscous01(const unsigned T, cx_vec&& M, cx_vec&& S)
-    : DataNonviscous01{std::forward<cx_vec>(M), std::forward<cx_vec>(S)}
+    : DataNonviscous01{std::move(M), std::move(S)}
     , Material1D(T, 0.) {}
 
 int Nonviscous01::initialize(const shared_ptr<DomainBase>& D) {

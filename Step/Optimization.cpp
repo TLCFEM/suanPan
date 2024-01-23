@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ int Optimization::analyze() {
     const auto& D = get_domain().lock();
     auto& G = get_integrator();
 
-    unsigned num_increment = 0;
+    auto num_increment = 0u;
 
     while(true) {
         if(++num_increment > get_max_substep()) {

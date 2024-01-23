@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
  * @brief A NonviscousNewmark class defines a solver using Newmark algorithm.
  *
  * Using exponential function based convolution for global damping model.
+ *
+ * Reference: 10.1016/j.ymssp.2024.111156
  *
  * @author tlc
  * @date 18/03/2023

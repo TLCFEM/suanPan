@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@
 #include <Toolbox/utility.h>
 
 CINP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& PNPXY)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxy(std::forward<mat>(PNPXY))
+    , m_material(std::move(M))
+    , pn_pxy(std::move(PNPXY))
     , strain_mat(3, m_size, fill::zeros) {}
 
 mat CINP4::compute_mapping(const vec& XY) {
@@ -262,7 +262,7 @@ void CINP4::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) 
 }
 
 CINP4::CINP4(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int CINP4::initialize(const shared_ptr<DomainBase>& D) {
@@ -346,7 +346,7 @@ vector<vec> CINP4::record(const OutputType P) {
 }
 
 void CINP4::print() {
-    suanpan_info("CINP4 element (doi: 10.1016/0045-7949(84)90019-1) connects: ", node_encoding);
+    suanpan_info("CINP4 element (doi:10.1016/0045-7949(84)90019-1) connects: ", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {

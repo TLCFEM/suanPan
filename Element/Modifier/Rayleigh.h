@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 #include <Element/Modifier/Modifier.h>
 
-class Rayleigh final : public Modifier {
+class Rayleigh final : public ModifierDynamics {
     const double a, b, c, d;
 
 public:

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ mat StressWrapper::form_stiffness(const mat& full_stiffness) const { return full
 
 StressWrapper::StressWrapper(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA, uvec&& FB, const MaterialType MT)
     : Material(T, MT, 0.)
-    , F1(std::forward<uvec>(FA))
-    , F2(std::forward<uvec>(FB))
+    , F1(std::move(FA))
+    , F2(std::move(FB))
     , base_tag(BT)
     , max_iteration(MI) {}
 

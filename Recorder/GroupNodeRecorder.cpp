@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ void GroupNodeRecorder::update_tag(const shared_ptr<DomainBase>& D) {
 
 GroupNodeRecorder::GroupNodeRecorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
     : NodeRecorder(T, {}, L, I, R, H)
-    , groups(std::forward<uvec>(B)) {}
+    , groups(std::move(B)) {}
 
 void GroupNodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
     update_tag(D);

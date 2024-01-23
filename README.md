@@ -258,9 +258,9 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 5.3.0
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.24
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.25
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.3
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.9.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
@@ -269,11 +269,11 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**VTK**](https://vtk.org/) version 9.2.6
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.0
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.7.1
-- [**Armadillo**](http://arma.sourceforge.net/) version 12.6.6
+- [**Armadillo**](http://arma.sourceforge.net/) version 12.6.7
 - [**ensmallen**](https://ensmallen.org/) version 2.20.0
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.2.0
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.4.0
-- [**fmt**](https://github.com/fmtlib/fmt) version 10.1.1
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.5.2
+- [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**whereami**](https://github.com/gpakosz/whereami)
 - [**exprtk**](https://github.com/ArashPartow/exprtk)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,8 +50,8 @@ public:
 
     void nullify(const uword K) override {
         this->factored = false;
-        suanpan_for(0llu, this->n_rows, [&](const uword I) { at(I, K) = T(0); });
-        suanpan_for(0llu, this->n_cols, [&](const uword I) { at(K, I) = T(0); });
+        suanpan::for_each(this->n_rows, [&](const uword I) { at(I, K) = T(0); });
+        suanpan::for_each(this->n_cols, [&](const uword I) { at(K, I) = T(0); });
     }
 
     T operator()(const uword in_row, const uword in_col) const override { return this->memory[in_row + in_col * this->n_rows]; }

@@ -100,7 +100,11 @@ if (USE_MKL)
     add_compile_definitions(SUANPAN_MKL)
     # add_compile_definitions(ARMA_USE_MKL_ALLOC)
     include_directories(${MKLROOT}/include)
-    link_directories(${MKLROOT}/lib/intel64)
+    if (EXISTS ${MKLROOT}/lib/intel64)
+        link_directories(${MKLROOT}/lib/intel64)
+    else (EXISTS ${MKLROOT}/lib/intel64)
+        link_directories(${MKLROOT}/lib)
+    endif ()
     if (USE_MPI)
         add_compile_definitions(SUANPAN_MPI)
         if (USE_INTEL_MPI)
@@ -120,11 +124,19 @@ if (USE_MKL)
     if (USE_INTEL_OPENMP OR COMPILER_IDENTIFIER MATCHES "vs")
         if (MKLROOT MATCHES "(oneapi|oneAPI)")
             if (COMPILER_IDENTIFIER MATCHES "linux")
-                find_library(IOMPPATH iomp5 ${MKLROOT}/../../compiler/latest/linux/compiler/lib/intel64_lin)
+                find_library(IOMPPATH iomp5 PATHS
+                        ${MKLROOT}/../../compiler/latest/linux/compiler/lib/intel64_lin
+                        ${MKLROOT}/../../compiler/latest/lib
+                        REQUIRED
+                )
                 get_filename_component(IOMPPATH ${IOMPPATH} DIRECTORY)
                 link_directories(${IOMPPATH})
             elseif (COMPILER_IDENTIFIER MATCHES "(win|vs)")
-                find_library(IOMPPATH libiomp5md ${MKLROOT}/../../compiler/latest/windows/compiler/lib/intel64_win)
+                find_library(IOMPPATH libiomp5md PATHS
+                        ${MKLROOT}/../../compiler/latest/windows/compiler/lib/intel64_win
+                        ${MKLROOT}/../../compiler/latest/lib
+                        REQUIRED
+                )
                 get_filename_component(IOMPPATH ${IOMPPATH} DIRECTORY)
                 link_directories(${IOMPPATH})
             endif ()
@@ -149,6 +161,11 @@ if (USE_CUDA)
     add_compile_definitions(SUANPAN_CUDA)
     include_directories(${CUDA_INCLUDE_DIRS})
     link_libraries(${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_cusolver_LIBRARY} ${CUDA_cusparse_LIBRARY})
+    if (CUDA_VERSION VERSION_GREATER_EQUAL "12.3")
+        if (COMPILER_IDENTIFIER MATCHES "vs")
+            add_compile_options(/wd4996)
+        endif ()
+    endif ()
 endif ()
 
 if (USE_MAGMA)

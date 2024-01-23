@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,13 +51,13 @@ int Step::initialize() {
     }
 
     if(converger_tag != 0 && t_domain->find_converger(converger_tag)) tester = t_domain->get_converger(converger_tag);
-    else if(t_domain->get_current_converger_tag() != 0) tester = t_domain->get_current_converger();
+    else if(const auto [t_tag, step_tag] = t_domain->get_current_converger_tag(); t_tag != 0 && step_tag <= get_tag()) tester = t_domain->get_current_converger();
 
     if(integrator_tag != 0 && t_domain->find_integrator(integrator_tag)) modifier = t_domain->get_integrator(integrator_tag);
-    else if(t_domain->get_current_integrator_tag() != 0) modifier = t_domain->get_current_integrator();
+    else if(const auto [t_tag, step_tag] = t_domain->get_current_integrator_tag(); t_tag != 0 && step_tag <= get_tag()) modifier = t_domain->get_current_integrator();
 
     if(solver_tag != 0 && t_domain->find_solver(solver_tag)) solver = t_domain->get_solver(solver_tag);
-    else if(t_domain->get_current_solver_tag() != 0) solver = t_domain->get_current_solver();
+    else if(const auto [t_tag, step_tag] = t_domain->get_current_solver_tag(); t_tag != 0 && step_tag <= get_tag()) solver = t_domain->get_current_solver();
 
     if(tester == nullptr) tester = make_shared<RelIncreDisp>();
 

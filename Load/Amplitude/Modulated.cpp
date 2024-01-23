@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 Modulated::Modulated(const unsigned T, const double AA, std::vector<double>&& WW, const unsigned ST)
     : Amplitude(T, ST)
     , amp(AA)
-    , freq(std::forward<std::vector<double>>(WW)) {}
+    , freq(std::move(WW)) {}
 
 double Modulated::get_amplitude(const double T) {
     const auto step_time = T - start_time;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,32 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <concepts>
 #include <suanPan.h>
+#include <concepts>
 #ifdef __cpp_lib_execution
 #include <execution>
 #endif
 
-template<sp_i IT, typename F> void suanpan_for(const IT start, const IT end, F&& FN) {
-#ifdef SUANPAN_MT
-    static tbb::affinity_partitioner ap;
-    tbb::parallel_for(start, end, std::forward<F>(FN), ap);
-#else
-    for(IT I = start; I < end; ++I) FN(I);
-#endif
-}
-
-template<typename T> constexpr T suanpan_max_element(T start, T end) {
-#ifdef __cpp_lib_execution
-    return std::max_element(std::execution::par, start, end);
-#else
-    return std::max_element(start, end);
-#endif
-}
-
 namespace suanpan {
+    template<sp_i IT, std::invocable<IT> F> void for_each(const IT start, const IT end, F&& FN) {
+#ifdef SUANPAN_MT
+        static tbb::affinity_partitioner ap;
+        tbb::parallel_for(start, end, std::forward<F>(FN), ap);
+#else
+        for(IT I = start; I < end; ++I) FN(I);
+#endif
+    }
+
+    template<sp_i IT, std::invocable<IT> F> void for_each(const IT end, F&& FN) { return for_each(static_cast<IT>(0), end, std::forward<F>(FN)); }
+
+    template<typename T> constexpr T max_element(T start, T end) {
+#ifdef __cpp_lib_execution
+        return std::max_element(std::execution::par, start, end);
+#else
+        return std::max_element(start, end);
+#endif
+    }
+
     template<typename T> [[maybe_unused]] const std::vector<T>& unique(std::vector<T>& container) {
         std::sort(container.begin(), container.end());
         container.erase(std::unique(container.begin(), container.end()), container.end());
@@ -142,6 +144,6 @@ bool is_false(const string&);
 
 bool is_integer(const string&);
 
-double perturb(double);
+double perturb(double, double = 1E-5);
 
 #endif

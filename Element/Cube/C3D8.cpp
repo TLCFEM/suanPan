@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,10 +26,10 @@
 const field<vec> C3D8::h_mode{{1., 1., -1., -1., -1., -1., 1., 1.}, {1., -1., -1., 1., -1., 1., 1., -1.}, {1., -1., 1., -1., 1., -1., 1., -1.}, {-1., 1., -1., 1., 1., -1., 1., -1.}};
 
 C3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , c_material(std::forward<unique_ptr<Material>>(M))
-    , pn_pxyz(std::forward<mat>(P))
+    , c_material(std::move(M))
+    , pn_pxyz(std::move(P))
     , strain_mat(6, c_size) {
     for(auto I = 0u, J = 0u, K = 1u, L = 2u; I < c_node; ++I, J += c_dof, K += c_dof, L += c_dof) {
         strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = pn_pxyz(0, I);
@@ -39,7 +39,7 @@ C3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
 }
 
 C3D8::C3D8(const unsigned T, uvec&& N, const unsigned M, const char R, const bool F)
-    : MaterialElement3D(T, c_node, c_dof, std::forward<uvec>(N), uvec{M}, F)
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, F)
     , int_scheme(R)
     , hourglass_control('R' == R) {}
 

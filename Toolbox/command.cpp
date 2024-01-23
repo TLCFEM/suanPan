@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,22 +73,6 @@ int SUANPAN_NUM_NODES = 1;
 fs::path SUANPAN_OUTPUT = fs::current_path();
 extern fs::path SUANPAN_EXE;
 
-void qrcode() {
-    for(constexpr char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
-        if(I == 'S')
-            suanpan_info("\n            ");
-        else if(I == 'W')
-            suanpan_info(" ");
-        else if(I == 'F')
-            suanpan_info("\xE2\x96\x88");
-        else if(I == 'L')
-            suanpan_info("\xE2\x96\x84");
-        else if(I == 'U')
-            suanpan_info("\xE2\x96\x80");
-
-    suanpan_info("\n\n");
-}
-
 int benchmark() {
     constexpr auto N = 50;
     constexpr auto M = 5120;
@@ -120,6 +104,24 @@ int benchmark() {
     pool.wait_for_tasks();
 
     suanpan_info("\nCurrent platform rates (higher is better): {:.2f}.\n", 1E9 / static_cast<double>(duration.count()));
+
+    return SUANPAN_SUCCESS;
+}
+
+int qrcode() {
+    for(constexpr char encode[] = "SLLLLLLLWWWLWWWLWWWLWWWLLLLLLLSFWLLLWFWLUWLWUWLWWFFFWFWLLLWFSFWFFFWFWWFWWFFWWFUFUWWFWFFFWFSFLLLLLFWLWFUFWFUFUFULWFLLLLLFSLLLWLLLLFWWULWWULUUFFLLWWWLWWSULUUFFLWWULFFULFFWWUFLFWLULLFSLUUFWULFWUFLUUFLFFFUULLUULWFLSLUFULULLWUUUWLUULLWUUUFWLFWLFSLFLLLLLWLFWULWWLFFULFUFLWFWFLSLWLWWULLFWLFFULWUFFWWFULLUULFSLULFUFLFFFFLUUFULFUFFFFFFUWUWSLLLLLLLWFLUUWLUWFUUFFWLWFLUFFSFWLLLWFWFFWULWWUWFUWFLLLFUWWLSFWFFFWFWLFWFFULUFULLUWWFFLUUFSFLLLLLFWFFFLUUFLFFUFFFWLFWWFL"; const auto I : encode)
+        if(I == 'S')
+            suanpan_info("\n            ");
+        else if(I == 'W')
+            suanpan_info(" ");
+        else if(I == 'F')
+            suanpan_info("\xE2\x96\x88");
+        else if(I == 'L')
+            suanpan_info("\xE2\x96\x84");
+        else if(I == 'U')
+            suanpan_info("\xE2\x96\x80");
+
+    suanpan_info("\n\n");
 
     return SUANPAN_SUCCESS;
 }
@@ -259,14 +261,13 @@ void perform_upsampling(istringstream& command) {
         return;
     }
 
-    mat result;
+    auto window_size = 8llu;
+    if(!get_optional_input(command, window_size)) {
+        suanpan_error("A valid window size is required.\n");
+        return;
+    }
 
-    if(is_equal(window_type, "Hamming")) result = upsampling<WindowType::Hamming>(file_name, up_rate);
-    else if(is_equal(window_type, "Hann")) result = upsampling<WindowType::Hann>(file_name, up_rate);
-    else if(is_equal(window_type, "Blackman")) result = upsampling<WindowType::Blackman>(file_name, up_rate);
-    else if(is_equal(window_type, "BlackmanNuttall")) result = upsampling<WindowType::BlackmanNuttall>(file_name, up_rate);
-    else if(is_equal(window_type, "BlackmanHarris")) result = upsampling<WindowType::BlackmanHarris>(file_name, up_rate);
-    else if(is_equal(window_type, "FlatTop")) result = upsampling<WindowType::FlatTop>(file_name, up_rate);
+    const mat result = upsampling(window_type, file_name, up_rate, window_size);
 
     if(result.empty())
         suanpan_error("Fail to perform upsampling, please ensure the input is equally spaced and stored in two columns.\n");
@@ -295,7 +296,7 @@ void perform_response_spectrum(istringstream& command) {
         return;
     }
 
-    double interval = 0.;
+    auto interval = 0.;
     if(1llu == motion.n_cols) {
         if(!get_input(command, interval) || interval <= 0.) {
             suanpan_error("A valid sampling interval is required.\n");
@@ -311,7 +312,7 @@ void perform_response_spectrum(istringstream& command) {
             suanpan_warning("Please ensure the ground motion is equally spaced.\n");
     }
 
-    double damping_ratio = 0.;
+    auto damping_ratio = 0.;
     if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
         suanpan_error("A valid damping ratio is required.\n");
         return;
@@ -339,7 +340,7 @@ void perform_sdof_response(istringstream& command) {
         return;
     }
 
-    double interval = 0.;
+    auto interval = 0.;
     if(1llu == motion.n_cols) {
         if(!get_input(command, interval) || interval <= 0.) {
             suanpan_error("A valid sampling interval is required.\n");
@@ -355,13 +356,13 @@ void perform_sdof_response(istringstream& command) {
             suanpan_warning("Please make sure the ground motion is equally spaced.\n");
     }
 
-    double freq = 0.;
+    auto freq = 0.;
     if(!get_input(command, freq) || freq <= 0.) {
         suanpan_error("A valid frequency in hertz is required.\n");
         return;
     }
 
-    double damping_ratio = 0.;
+    auto damping_ratio = 0.;
     if(!get_input(command, damping_ratio) || damping_ratio < 0.) {
         suanpan_error("A valid damping ratio is required.\n");
         return;
@@ -374,336 +375,6 @@ void perform_sdof_response(istringstream& command) {
         suanpan_error("Fail to save to file.\n");
     else
         suanpan_info("Data is saved to file \"{}\".\n", motion_name);
-}
-
-int process_command(const shared_ptr<Bead>& model, istringstream& command) {
-    if(nullptr == model) return SUANPAN_SUCCESS;
-
-    string command_id;
-    if(!get_input(command, command_id)) return SUANPAN_SUCCESS;
-
-    if(is_equal(command_id, "exit") || is_equal(command_id, "quit")) return SUANPAN_EXIT;
-
-    if(is_equal(command_id, "overview")) {
-        overview();
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "file")) {
-        string file_name;
-        if(!get_input(command, file_name)) {
-            suanpan_error("A valid file name is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        return process_file(model, file_name.c_str());
-    }
-
-    if(is_equal(command_id, "domain")) return create_new_domain(model, command);
-
-    if(is_equal(command_id, "enable")) return enable_object(model, command);
-    if(is_equal(command_id, "disable")) return disable_object(model, command);
-    if(is_equal(command_id, "mute")) return disable_object(model, command);
-    if(is_equal(command_id, "erase")) return erase_object(model, command);
-    if(is_equal(command_id, "delete")) return erase_object(model, command);
-    if(is_equal(command_id, "remove")) return erase_object(model, command);
-
-    const auto& domain = get_current_domain(model);
-
-    if(is_equal(command_id, "save")) return save_object(domain, command);
-    if(is_equal(command_id, "list")) return list_object(domain, command);
-    if(is_equal(command_id, "suspend")) return suspend_object(domain, command);
-    if(is_equal(command_id, "protect")) return protect_object(domain, command);
-    if(is_equal(command_id, "set")) return set_property(domain, command);
-
-    if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
-    if(is_equal(command_id, "expression")) return create_new_expression(domain, command);
-    if(is_equal(command_id, "converger")) return create_new_converger(domain, command);
-    if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
-    if(is_equal(command_id, "element")) return create_new_element(domain, command);
-    if(is_equal(command_id, "hdf5recorder")) return create_new_recorder(domain, command, true);
-    if(is_equal(command_id, "import")) return create_new_external_module(domain, command);
-    if(is_equal(command_id, "initial")) return create_new_initial(domain, command);
-    if(is_equal(command_id, "integrator")) return create_new_integrator(domain, command);
-    if(is_equal(command_id, "mass")) return create_new_mass(domain, command);
-    if(is_equal(command_id, "material")) return create_new_material(domain, command);
-    if(is_equal(command_id, "modifier")) return create_new_modifier(domain, command);
-    if(is_equal(command_id, "node")) return create_new_node(domain, command);
-    if(is_equal(command_id, "orientation")) return create_new_orientation(domain, command);
-    if(is_equal(command_id, "plainrecorder")) return create_new_recorder(domain, command, false);
-    if(is_equal(command_id, "recorder")) return create_new_recorder(domain, command);
-    if(is_equal(command_id, "section")) return create_new_section(domain, command);
-    if(is_equal(command_id, "solver")) return create_new_solver(domain, command);
-    if(is_equal(command_id, "step")) return create_new_step(domain, command);
-
-    // groups
-    auto group_handler = [&] {
-        command.seekg(0);
-        return create_new_group(domain, command);
-    };
-
-    if(is_equal(command_id, "group")) return create_new_group(domain, command);
-    if(is_equal(command_id, "nodegroup")) return group_handler();
-    if(is_equal(command_id, "customnodegroup")) return group_handler();
-    if(is_equal(command_id, "elementgroup")) return group_handler();
-    if(is_equal(command_id, "groupgroup")) return group_handler();
-    if(is_equal(command_id, "generate")) return group_handler();
-    if(is_equal(command_id, "generatebyrule")) return group_handler();
-    if(is_equal(command_id, "generatebypoint")) return group_handler();
-    if(is_equal(command_id, "generatebyplane")) return group_handler();
-
-    // loads
-    auto load_handler = [&] {
-        command.seekg(0);
-        return create_new_load(domain, command);
-    };
-
-    if(is_equal(command_id, "load")) return create_new_load(domain, command);
-    if(is_equal(command_id, "acceleration")) return load_handler();
-    if(is_equal(command_id, "bodyforce")) return load_handler();
-    if(is_equal(command_id, "groupbodyforce")) return load_handler();
-    if(is_equal(command_id, "cload")) return load_handler();
-    if(is_equal(command_id, "refload")) return load_handler();
-    if(is_equal(command_id, "refforce")) return load_handler();
-    if(is_equal(command_id, "refereceload")) return load_handler();
-    if(is_equal(command_id, "groupcload")) return load_handler();
-    if(is_equal(command_id, "lineudl2d")) return load_handler();
-    if(is_equal(command_id, "lineudl3d")) return load_handler();
-    if(is_equal(command_id, "disp")) return load_handler();
-    if(is_equal(command_id, "displacement")) return load_handler();
-    if(is_equal(command_id, "dispload")) return load_handler();
-    if(is_equal(command_id, "groupdisp")) return load_handler();
-    if(is_equal(command_id, "groupdisplacement")) return load_handler();
-    if(is_equal(command_id, "groupdispload")) return load_handler();
-    if(is_equal(command_id, "supportdisplacement")) return load_handler();
-    if(is_equal(command_id, "supportvelocity")) return load_handler();
-    if(is_equal(command_id, "supportacceleration")) return load_handler();
-
-    // constraints
-    auto constraint_handler = [&] {
-        command.seekg(0);
-        return create_new_constraint(domain, command);
-    };
-
-    if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
-    if(is_equal(command_id, "fix")) return constraint_handler();
-    if(is_equal(command_id, "penaltybc")) return constraint_handler();
-    if(is_equal(command_id, "grouppenaltybc")) return constraint_handler();
-    if(is_equal(command_id, "fix2")) return constraint_handler();
-    if(is_equal(command_id, "multiplierbc")) return constraint_handler();
-    if(is_equal(command_id, "groupmultiplierbc")) return constraint_handler();
-    if(is_equal(command_id, "fixedlength2d")) return constraint_handler();
-    if(is_equal(command_id, "fixedlength3d")) return constraint_handler();
-    if(is_equal(command_id, "particlecollision2d")) return constraint_handler();
-    if(is_equal(command_id, "particlecollision3d")) return constraint_handler();
-    if(is_equal(command_id, "finiterigidwall") || is_equal(command_id, "finiterigidwallpenalty")) return constraint_handler();
-    if(is_equal(command_id, "finiterigidwallmultiplier")) return constraint_handler();
-    if(is_equal(command_id, "rigidwall") || is_equal(command_id, "rigidwallpenalty")) return constraint_handler();
-    if(is_equal(command_id, "rigidwallmultiplier")) return constraint_handler();
-    if(is_equal(command_id, "restitutionwall") || is_equal(command_id, "restitutionwallpenalty")) return constraint_handler();
-    if(is_equal(command_id, "finiterestitutionwall") || is_equal(command_id, "finiterestitutionwallpenalty")) return constraint_handler();
-    if(is_equal(command_id, "mpc")) return constraint_handler();
-
-    // testers
-    if(is_equal(command_id, "materialtest1d")) return test_material(domain, command, 1);
-    if(is_equal(command_id, "materialtest2d")) return test_material(domain, command, 3);
-    if(is_equal(command_id, "materialtest3d")) return test_material(domain, command, 6);
-    if(is_equal(command_id, "materialtestwithbase3d")) return test_material_with_base3d(domain, command);
-    if(is_equal(command_id, "materialtestbyload1d")) return test_material_by_load(domain, command, 1);
-    if(is_equal(command_id, "materialtestbyload2d")) return test_material_by_load(domain, command, 3);
-    if(is_equal(command_id, "materialtestbyload3d")) return test_material_by_load(domain, command, 6);
-    if(is_equal(command_id, "materialtestbyloadwithbase3d")) return test_material_by_load_with_base3d(domain, command);
-    if(is_equal(command_id, "materialtestbystrainhistory")) return test_material_by_strain_history(domain, command);
-    if(is_equal(command_id, "materialtestbystresshistory")) return test_material_by_stress_history(domain, command);
-
-    if(is_equal(command_id, "sectiontest1d")) return test_section(domain, command, 1);
-    if(is_equal(command_id, "sectiontest2d")) return test_section(domain, command, 2);
-    if(is_equal(command_id, "sectiontest3d")) return test_section(domain, command, 3);
-    if(is_equal(command_id, "sectiontestbydeformationhistory")) return test_section_by_deformation_history(domain, command);
-
-    if(is_equal(command_id, "qrcode")) {
-        qrcode();
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "plot")) return vtk_parser(domain, command);
-
-    if(is_equal(command_id, "peek")) return print_info(domain, command);
-
-    if(is_equal(command_id, "command")) return print_command();
-
-    if(is_equal(command_id, "example")) return run_example();
-
-    if(is_equal(command_id, "precheck")) return model->precheck();
-
-    if(is_equal(command_id, "analyze") || is_equal(command_id, "analyse")) {
-        const auto options = get_remaining(command);
-        if(SUANPAN_WARNING_COUNT > 0 && !if_contain(options, "ignore_warning") && !if_contain(options, "ignore-warning")) {
-            suanpan_warning("There are {} warnings, please fix them first or use `ignore-warning` to ignore them.\n", SUANPAN_WARNING_COUNT);
-            return SUANPAN_SUCCESS;
-        }
-        if(SUANPAN_ERROR_COUNT > 0 && !if_contain(options, "ignore_error") && !if_contain(options, "ignore-error")) {
-            suanpan_warning("There are {} errors, please fix them first or use `ignore-error` to ignore them.\n", SUANPAN_ERROR_COUNT);
-            return SUANPAN_SUCCESS;
-        }
-        const auto code = model->analyze();
-        suanpan_info("\n");
-        return code;
-    }
-
-    if(is_equal(command_id, "fullname")) {
-        suanpan_info("{}\n", SUANPAN_EXE.generic_string());
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "pwd")) {
-        if(command.eof())
-            suanpan_info("{}\n", fs::current_path().generic_string());
-        else if(string path; get_input(command, path)) {
-            std::error_code code;
-            fs::current_path(path, code);
-            if(0 != code.value())
-                suanpan_error("Fail to set path \"{}\"\n", code.category().message(code.value()));
-        }
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "sleep")) {
-        if(auto t = 1000ll; get_optional_input(command, t)) std::this_thread::sleep_for(std::chrono::milliseconds(t));
-        else
-            suanpan_error("A positive integer in milliseconds is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "help")) {
-        print_helper();
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "benchmark")) return benchmark();
-
-    if(is_equal(command_id, "clear")) {
-        domain->wait();
-
-        auto flag = true;
-        for(const auto& t_integrator : domain->get_integrator_pool())
-            if(t_integrator->get_domain() != nullptr) {
-                t_integrator->clear_status();
-                flag = false;
-            }
-
-        if(flag) domain->clear_status();
-
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "reset")) {
-        domain->wait();
-
-        auto flag = true;
-        for(const auto& t_integrator : domain->get_integrator_pool())
-            if(t_integrator->get_domain() != nullptr) {
-                t_integrator->reset_status();
-                flag = false;
-            }
-
-        if(flag) domain->reset_status();
-
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "summary")) {
-        domain->summary();
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "terminal")) {
-        execute_command(command);
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "upsampling")) {
-        perform_upsampling(command);
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "response_spectrum")) {
-        perform_response_spectrum(command);
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "sdof_response")) {
-        perform_sdof_response(command);
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "version")) print_version();
-    else
-        suanpan_error("Command \"{}\" not found.\n", command.str());
-
-    return SUANPAN_SUCCESS;
-}
-
-bool normalise_command(string& all_line, string& command_line) {
-    // if to parse and process immediately
-    auto process = true;
-
-    // clear comment line
-    if(!command_line.empty() && '#' == command_line.front()) command_line.clear();
-    // remove inline comment
-    if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
-    // remove all delimiters
-    for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
-    while(!command_line.empty() && ' ' == command_line.back()) command_line.pop_back();
-    // it is a command spanning multiple lines
-    if(!command_line.empty() && '\\' == command_line.back()) {
-        while(!command_line.empty() && '\\' == command_line.back()) command_line.pop_back();
-        process = false;
-    }
-    all_line.append(command_line);
-
-    return process && !all_line.empty();
-}
-
-int process_file(const shared_ptr<Bead>& model, const char* file_name) {
-    std::vector<string> file_list;
-    file_list.reserve(9);
-
-    string str_name(file_name);
-    file_list.emplace_back(str_name);
-    file_list.emplace_back(str_name + ".supan");
-    file_list.emplace_back(str_name + ".sp");
-
-    suanpan::to_lower(str_name);
-    file_list.emplace_back(str_name);
-    file_list.emplace_back(str_name + ".supan");
-    file_list.emplace_back(str_name + ".sp");
-
-    suanpan::to_upper(str_name);
-    file_list.emplace_back(str_name);
-    file_list.emplace_back(str_name + ".SUPAN");
-    file_list.emplace_back(str_name + ".SP");
-
-    ifstream input_file;
-
-    for(const auto& file : file_list) {
-        input_file.open(fs::path(file));
-        if(input_file.is_open()) break;
-    }
-
-    if(!input_file.is_open()) {
-        suanpan_error("Cannot open the input file \"{}\".\n", fs::path(file_name).generic_string());
-        return SUANPAN_EXIT;
-    }
-
-    string all_line, command_line;
-    while(!getline(input_file, command_line).fail()) {
-        if(!normalise_command(all_line, command_line)) continue;
-        // now process the command
-        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
-        all_line.clear();
-    }
-    return SUANPAN_SUCCESS;
 }
 
 int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
@@ -722,231 +393,6 @@ int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
         if(nullptr != tmp_domain)
             suanpan_info("Domain {} is successfully created.\n", domain_id);
     }
-
-    return SUANPAN_SUCCESS;
-}
-
-int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
-    const auto& domain = get_current_domain(model);
-    if(nullptr == domain) {
-        suanpan_error("A valid domain is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string object_type;
-    if(!get_input(command, object_type)) {
-        suanpan_error("A valid object type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->disable_amplitude(tag);
-    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->disable_constraint(tag);
-    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->disable_converger(tag);
-    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->disable_criterion(tag);
-    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->disable_domain(tag);
-    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->disable_element(tag);
-    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->disable_expression(tag);
-    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->disable_group(tag);
-    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->disable_integrator(tag);
-    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->disable_load(tag);
-    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->disable_material(tag);
-    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->disable_modifier(tag);
-    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->disable_node(tag);
-    else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->disable_orientation(tag);
-    else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->disable_recorder(tag);
-    else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->disable_section(tag);
-    else if(is_equal(object_type, "solver")) while(get_input(command, tag)) domain->disable_solver(tag);
-    else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->disable_step(tag);
-    else if(is_equal(object_type, "print")) SUANPAN_PRINT = false;
-
-    return SUANPAN_SUCCESS;
-}
-
-int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
-    const auto& domain = get_current_domain(model);
-    if(nullptr == domain) {
-        suanpan_error("A valid domain is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string object_type;
-    if(!get_input(command, object_type)) {
-        suanpan_error("A valid object type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->enable_amplitude(tag);
-    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->enable_constraint(tag);
-    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->enable_converger(tag);
-    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->enable_criterion(tag);
-    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->enable_domain(tag);
-    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->enable_element(tag);
-    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->enable_expression(tag);
-    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->enable_group(tag);
-    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->enable_integrator(tag);
-    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->enable_load(tag);
-    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->enable_material(tag);
-    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->enable_modifier(tag);
-    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->enable_node(tag);
-    else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->enable_orientation(tag);
-    else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->enable_recorder(tag);
-    else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->enable_section(tag);
-    else if(is_equal(object_type, "solver")) while(get_input(command, tag)) domain->enable_solver(tag);
-    else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->enable_step(tag);
-    else if(is_equal(object_type, "all")) domain->enable_all();
-    else if(is_equal(object_type, "print")) SUANPAN_PRINT = true;
-
-    return SUANPAN_SUCCESS;
-}
-
-int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
-    const auto& domain = get_current_domain(model);
-    if(nullptr == domain) {
-        suanpan_error("A valid domain is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string object_type;
-    if(!get_input(command, object_type)) {
-        suanpan_error("A valid object type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->erase_amplitude(tag);
-    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->erase_constraint(tag);
-    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->erase_converger(tag);
-    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->erase_criterion(tag);
-    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->erase_domain(tag);
-    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->erase_element(tag);
-    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->erase_expression(tag);
-    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->erase_group(tag);
-    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->erase_integrator(tag);
-    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->erase_load(tag);
-    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->erase_material(tag);
-    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->erase_modifier(tag);
-    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->erase_node(tag);
-    else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->erase_orientation(tag);
-    else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->erase_recorder(tag);
-    else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->erase_section(tag);
-    else if(is_equal(object_type, "solver")) while(get_input(command, tag)) domain->erase_solver(tag);
-    else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->erase_step(tag);
-
-    return SUANPAN_SUCCESS;
-}
-
-int save_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    if(nullptr == domain) {
-        suanpan_error("A valid domain is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string object_id;
-    if(!get_input(command, object_id)) {
-        suanpan_error("A valid object type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(object_id, "Recorder")) {
-        unsigned tag;
-        while(get_input(command, tag)) if(domain->find_recorder(tag)) domain->get_recorder(tag)->save();
-    }
-    else if(is_equal(object_id, "Stiffness")) {
-        string name = "K";
-        if(!command.eof() && !get_input(command, name)) name = "K";
-        if(const auto& stiffness = domain->get_factory()->get_stiffness()) stiffness->save(name.c_str());
-    }
-    else if(is_equal(object_id, "Mass")) {
-        string name = "M";
-        if(!command.eof() && !get_input(command, name)) name = "M";
-        if(const auto& mass = domain->get_factory()->get_mass()) mass->save(name.c_str());
-    }
-    else if(is_equal(object_id, "Damping")) {
-        string name = "C";
-        if(!command.eof() && !get_input(command, name)) name = "C";
-        if(const auto& damping = domain->get_factory()->get_damping()) damping->save(name.c_str());
-    }
-    else if(is_equal(object_id, "Model")) {
-        string name = "Model.h5";
-        if(!command.eof() && !get_input(command, name)) name = "Model.h5";
-        domain->save(name);
-    }
-
-    return SUANPAN_SUCCESS;
-}
-
-int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    if(nullptr == domain) {
-        suanpan_error("A valid domain is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string object_type;
-    if(!get_input(command, object_type)) {
-        suanpan_error("A valid object type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    vector<unsigned> list;
-    if(is_equal(object_type, "amplitude")) for(const auto& I : domain->get_amplitude_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "constraint")) for(const auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "converger")) for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "criterion")) for(const auto& I : domain->get_criterion_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "element")) for(const auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "expression")) for(const auto& I : domain->get_expression_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "group")) for(const auto& I : domain->get_group_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "integrator")) for(const auto& I : domain->get_integrator_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "load")) for(const auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "material")) for(const auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "modifier")) for(const auto& I : domain->get_modifier_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "node")) for(const auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "orientation")) for(const auto& I : domain->get_orientation_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "recorder")) for(const auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "section")) for(const auto& I : domain->get_section_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "solver")) for(const auto& I : domain->get_solver_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "step")) for(const auto& I : domain->get_step_pool()) list.emplace_back(I.second->get_tag());
-
-    suanpan_info("This domain has the following {}s:", object_type);
-    for(const auto I : list)
-        suanpan_info("\t{}", I);
-    suanpan_info(".\n");
-
-    return SUANPAN_SUCCESS;
-}
-
-int suspend_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    if(nullptr == domain) {
-        suanpan_error("A valid domain is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string object_type;
-    if(!get_input(command, object_type)) {
-        suanpan_error("A valid object type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    const auto step_tag = domain->get_current_step_tag();
-
-    if(unsigned tag; is_equal(object_type, "constraint")) while(!command.eof() && get_input(command, tag)) { if(domain->find_constraint(tag)) domain->get_constraint(tag)->set_end_step(step_tag); }
-    else if(is_equal(object_type, "load")) while(!command.eof() && get_input(command, tag)) { if(domain->find_load(tag)) domain->get_load(tag)->set_end_step(step_tag); }
-
-    return SUANPAN_SUCCESS;
-}
-
-int protect_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    if(nullptr == domain) {
-        suanpan_error("A valid domain is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    string object_type;
-    if(!get_input(command, object_type)) {
-        suanpan_error("A valid object type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(unsigned tag; is_equal(object_type, "element")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Element>(tag)) domain->get<Element>(tag)->guard(); }
-    else if(is_equal(object_type, "node")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Node>(tag)) domain->get<Node>(tag)->guard(); }
 
     return SUANPAN_SUCCESS;
 }
@@ -1101,6 +547,271 @@ int create_new_node(const shared_ptr<DomainBase>& domain, istringstream& command
 
     if(!domain->insert(make_shared<Node>(node_id, vec(coor))))
         suanpan_error("Fail to create new node via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
+    const auto& domain = get_current_domain(model);
+    if(nullptr == domain) {
+        suanpan_error("A valid domain is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string object_type;
+    if(!get_input(command, object_type)) {
+        suanpan_error("A valid object type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->disable_amplitude(tag);
+    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->disable_constraint(tag);
+    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->disable_converger(tag);
+    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->disable_criterion(tag);
+    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->disable_domain(tag);
+    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->disable_element(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->disable_expression(tag);
+    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->disable_group(tag);
+    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->disable_integrator(tag);
+    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->disable_load(tag);
+    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->disable_material(tag);
+    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->disable_modifier(tag);
+    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->disable_node(tag);
+    else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->disable_orientation(tag);
+    else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->disable_recorder(tag);
+    else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->disable_section(tag);
+    else if(is_equal(object_type, "solver")) while(get_input(command, tag)) domain->disable_solver(tag);
+    else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->disable_step(tag);
+    else if(is_equal(object_type, "print")) SUANPAN_PRINT = false;
+
+    return SUANPAN_SUCCESS;
+}
+
+int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
+    const auto& domain = get_current_domain(model);
+    if(nullptr == domain) {
+        suanpan_error("A valid domain is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string object_type;
+    if(!get_input(command, object_type)) {
+        suanpan_error("A valid object type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->enable_amplitude(tag);
+    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->enable_constraint(tag);
+    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->enable_converger(tag);
+    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->enable_criterion(tag);
+    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->enable_domain(tag);
+    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->enable_element(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->enable_expression(tag);
+    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->enable_group(tag);
+    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->enable_integrator(tag);
+    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->enable_load(tag);
+    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->enable_material(tag);
+    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->enable_modifier(tag);
+    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->enable_node(tag);
+    else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->enable_orientation(tag);
+    else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->enable_recorder(tag);
+    else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->enable_section(tag);
+    else if(is_equal(object_type, "solver")) while(get_input(command, tag)) domain->enable_solver(tag);
+    else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->enable_step(tag);
+    else if(is_equal(object_type, "all")) domain->enable_all();
+    else if(is_equal(object_type, "print")) SUANPAN_PRINT = true;
+
+    return SUANPAN_SUCCESS;
+}
+
+int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
+    const auto& domain = get_current_domain(model);
+    if(nullptr == domain) {
+        suanpan_error("A valid domain is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string object_type;
+    if(!get_input(command, object_type)) {
+        suanpan_error("A valid object type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(unsigned tag; is_equal(object_type, "amplitude")) while(get_input(command, tag)) domain->erase_amplitude(tag);
+    else if(is_equal(object_type, "constraint")) while(get_input(command, tag)) domain->erase_constraint(tag);
+    else if(is_equal(object_type, "converger")) while(get_input(command, tag)) domain->erase_converger(tag);
+    else if(is_equal(object_type, "criterion")) while(get_input(command, tag)) domain->erase_criterion(tag);
+    else if(is_equal(object_type, "domain")) while(get_input(command, tag)) model->erase_domain(tag);
+    else if(is_equal(object_type, "element")) while(get_input(command, tag)) domain->erase_element(tag);
+    else if(is_equal(object_type, "expression")) while(get_input(command, tag)) domain->erase_expression(tag);
+    else if(is_equal(object_type, "group")) while(get_input(command, tag)) domain->erase_group(tag);
+    else if(is_equal(object_type, "integrator")) while(get_input(command, tag)) domain->erase_integrator(tag);
+    else if(is_equal(object_type, "load")) while(get_input(command, tag)) domain->erase_load(tag);
+    else if(is_equal(object_type, "material")) while(get_input(command, tag)) domain->erase_material(tag);
+    else if(is_equal(object_type, "modifier")) while(get_input(command, tag)) domain->erase_modifier(tag);
+    else if(is_equal(object_type, "node")) while(get_input(command, tag)) domain->erase_node(tag);
+    else if(is_equal(object_type, "orientation")) while(get_input(command, tag)) domain->erase_orientation(tag);
+    else if(is_equal(object_type, "recorder")) while(get_input(command, tag)) domain->erase_recorder(tag);
+    else if(is_equal(object_type, "section")) while(get_input(command, tag)) domain->erase_section(tag);
+    else if(is_equal(object_type, "solver")) while(get_input(command, tag)) domain->erase_solver(tag);
+    else if(is_equal(object_type, "step")) while(get_input(command, tag)) domain->erase_step(tag);
+
+    return SUANPAN_SUCCESS;
+}
+
+int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    if(nullptr == domain) {
+        suanpan_error("A valid domain is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string object_type;
+    if(!get_input(command, object_type)) {
+        suanpan_error("A valid object type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    vector<unsigned> list;
+    if(is_equal(object_type, "amplitude")) for(const auto& I : domain->get_amplitude_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "constraint")) for(const auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "converger")) for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "criterion")) for(const auto& I : domain->get_criterion_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "element")) for(const auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "expression")) for(const auto& I : domain->get_expression_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "group")) for(const auto& I : domain->get_group_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "integrator")) for(const auto& I : domain->get_integrator_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "load")) for(const auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "material")) for(const auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "modifier")) for(const auto& I : domain->get_modifier_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "node")) for(const auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "orientation")) for(const auto& I : domain->get_orientation_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "recorder")) for(const auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "section")) for(const auto& I : domain->get_section_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "solver")) for(const auto& I : domain->get_solver_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "step")) for(const auto& I : domain->get_step_pool()) list.emplace_back(I.second->get_tag());
+
+    suanpan_info("This domain has the following {}s:", object_type);
+    for(const auto I : list)
+        suanpan_info("\t{}", I);
+    suanpan_info(".\n");
+
+    return SUANPAN_SUCCESS;
+}
+
+int protect_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    if(nullptr == domain) {
+        suanpan_error("A valid domain is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string object_type;
+    if(!get_input(command, object_type)) {
+        suanpan_error("A valid object type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(unsigned tag; is_equal(object_type, "element")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Element>(tag)) domain->get<Element>(tag)->guard(); }
+    else if(is_equal(object_type, "node")) while(!command.eof() && get_input(command, tag)) { if(domain->find<Node>(tag)) domain->get<Node>(tag)->guard(); }
+
+    return SUANPAN_SUCCESS;
+}
+
+int save_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    if(nullptr == domain) {
+        suanpan_error("A valid domain is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string object_id;
+    if(!get_input(command, object_id)) {
+        suanpan_error("A valid object type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(object_id, "Recorder")) {
+        unsigned tag;
+        while(get_input(command, tag)) if(domain->find_recorder(tag)) domain->get_recorder(tag)->save();
+    }
+    else if(is_equal(object_id, "Stiffness")) {
+        string name = "K";
+        if(!command.eof() && !get_input(command, name)) name = "K";
+        if(const auto& stiffness = domain->get_factory()->get_stiffness()) stiffness->save(name.c_str());
+    }
+    else if(is_equal(object_id, "Mass")) {
+        string name = "M";
+        if(!command.eof() && !get_input(command, name)) name = "M";
+        if(const auto& mass = domain->get_factory()->get_mass()) mass->save(name.c_str());
+    }
+    else if(is_equal(object_id, "Damping")) {
+        string name = "C";
+        if(!command.eof() && !get_input(command, name)) name = "C";
+        if(const auto& damping = domain->get_factory()->get_damping()) damping->save(name.c_str());
+    }
+    else if(is_equal(object_id, "Model")) {
+        string name = "Model.h5";
+        if(!command.eof() && !get_input(command, name)) name = "Model.h5";
+        domain->save(name);
+    }
+
+    return SUANPAN_SUCCESS;
+}
+
+int suspend_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    if(nullptr == domain) {
+        suanpan_error("A valid domain is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string object_type;
+    if(!get_input(command, object_type)) {
+        suanpan_error("A valid object type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    const auto step_tag = domain->get_current_step_tag();
+
+    if(unsigned tag; is_equal(object_type, "constraint")) while(!command.eof() && get_input(command, tag)) { if(domain->find_constraint(tag)) domain->get_constraint(tag)->set_end_step(step_tag); }
+    else if(is_equal(object_type, "load")) while(!command.eof() && get_input(command, tag)) { if(domain->find_load(tag)) domain->get_load(tag)->set_end_step(step_tag); }
+
+    return SUANPAN_SUCCESS;
+}
+
+int use_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    if(nullptr == domain) {
+        suanpan_error("A valid domain is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    string object_id;
+    if(!get_input(command, object_id)) {
+        suanpan_error("A valid object type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(object_id, "Integrator")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid integrator tag is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(domain->find_integrator(tag)) domain->set_current_integrator_tag(tag);
+    }
+    else if(is_equal(object_id, "Solver")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid solver tag is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(domain->find_solver(tag)) domain->set_current_solver_tag(tag);
+    }
+    else if(is_equal(object_id, "Converger")) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid converger tag is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(domain->find_converger(tag)) domain->set_current_converger_tag(tag);
+    }
 
     return SUANPAN_SUCCESS;
 }
@@ -1417,60 +1128,6 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
     return SUANPAN_SUCCESS;
 }
 
-int run_example() {
-    const auto new_model = make_shared<Bead>();
-
-    suanpan_info("====================================================\n");
-    suanpan_info("-> A Minimum Example: Elastic Truss Under Tension <-\n");
-    suanpan_info("====================================================\n");
-
-    constexpr auto wait_time = 1000;
-
-    auto run_command = [&](const string& command_string) {
-        suanpan_highlight("\t{}\n", command_string);
-        auto command = istringstream(command_string);
-        process_command(new_model, command);
-        std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
-    };
-
-    // node
-    suanpan_info("--> create two nodes at (0,0) and (2,0):\n");
-    run_command("node 1 0 0");
-    run_command("node 2 2 0");
-
-    // material
-    suanpan_info("--> create material model (elastic modulus 52):\n");
-    run_command("material Elastic1D 1 52");
-
-    // element
-    suanpan_info("--> create a truss element connecting nodes 1 and 2:\n");
-    run_command("element T2D2 1 1 2 1 93");
-
-    // boundary condition and load
-    suanpan_info("--> define boundary condition and load:\n");
-    run_command("fix 1 1 1");
-    run_command("fix 2 2 1 2");
-    run_command("displacement 1 0 1.4 1 2");
-
-    // step
-    suanpan_info("--> define a static step:\n");
-    run_command("step static 1");
-
-    // analyze
-    suanpan_info("--> perform the analysis:\n");
-    run_command("analyze");
-
-    // analyze
-    suanpan_info("--> check nodal force (P=UEA/L=1.4*52*93/2=3385.2):\n");
-    run_command("peek node 2");
-
-    // clean up
-    suanpan_info("--> clean up and it's your turn!\n");
-
-    suanpan_info("====================================================\n");
-    return SUANPAN_SUCCESS;
-}
-
 int print_command() {
     suanpan_info("The available first-level commands are listed. Please check online manual for reference. https://tlcfem.github.io/suanPan-manual/latest/\n");
 
@@ -1528,6 +1185,388 @@ int print_command() {
     suanpan_info(format, "upsampling", "upsample the given ground motion with various filters");
     suanpan_info(format, "version", "print version information");
 
+    return SUANPAN_SUCCESS;
+}
+
+int run_example() {
+    const auto new_model = make_shared<Bead>();
+
+    suanpan_info("====================================================\n");
+    suanpan_info("-> A Minimum Example: Elastic Truss Under Tension <-\n");
+    suanpan_info("====================================================\n");
+
+    constexpr auto wait_time = 1000;
+
+    auto run_command = [&](const string& command_string) {
+        suanpan_highlight("\t{}\n", command_string);
+        auto command = istringstream(command_string);
+        process_command(new_model, command);
+        std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
+    };
+
+    // node
+    suanpan_info("--> create two nodes at (0,0) and (2,0):\n");
+    run_command("node 1 0 0");
+    run_command("node 2 2 0");
+
+    // material
+    suanpan_info("--> create material model (elastic modulus 52):\n");
+    run_command("material Elastic1D 1 52");
+
+    // element
+    suanpan_info("--> create a truss element connecting nodes 1 and 2:\n");
+    run_command("element T2D2 1 1 2 1 93");
+
+    // boundary condition and load
+    suanpan_info("--> define boundary condition and load:\n");
+    run_command("fix 1 1 1");
+    run_command("fix 2 2 1 2");
+    run_command("displacement 1 0 1.4 1 2");
+
+    // step
+    suanpan_info("--> define a static step:\n");
+    run_command("step static 1");
+
+    // analyze
+    suanpan_info("--> perform the analysis:\n");
+    run_command("analyze");
+
+    // analyze
+    suanpan_info("--> check nodal force (P=UEA/L=1.4*52*93/2=3385.2):\n");
+    run_command("peek node 2");
+
+    // clean up
+    suanpan_info("--> clean up and it's your turn!\n");
+
+    suanpan_info("====================================================\n");
+    return SUANPAN_SUCCESS;
+}
+
+int process_command(const shared_ptr<Bead>& model, istringstream& command) {
+    if(nullptr == model) return SUANPAN_SUCCESS;
+
+    string command_id;
+    if(!get_input(command, command_id)) return SUANPAN_SUCCESS;
+
+    if(is_equal(command_id, "exit") || is_equal(command_id, "quit")) return SUANPAN_EXIT;
+
+    if(is_equal(command_id, "overview")) {
+        overview();
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "file")) {
+        string file_name;
+        if(!get_input(command, file_name)) {
+            suanpan_error("A valid file name is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        return process_file(model, file_name.c_str());
+    }
+
+    if(is_equal(command_id, "domain")) return create_new_domain(model, command);
+
+    if(is_equal(command_id, "enable")) return enable_object(model, command);
+    if(is_equal(command_id, "disable")) return disable_object(model, command);
+    if(is_equal(command_id, "mute")) return disable_object(model, command);
+    if(is_equal(command_id, "erase")) return erase_object(model, command);
+    if(is_equal(command_id, "delete")) return erase_object(model, command);
+    if(is_equal(command_id, "remove")) return erase_object(model, command);
+
+    const auto& domain = get_current_domain(model);
+
+    if(is_equal(command_id, "list")) return list_object(domain, command);
+    if(is_equal(command_id, "protect")) return protect_object(domain, command);
+    if(is_equal(command_id, "save")) return save_object(domain, command);
+    if(is_equal(command_id, "set")) return set_property(domain, command);
+    if(is_equal(command_id, "suspend")) return suspend_object(domain, command);
+    if(is_equal(command_id, "use")) return use_object(domain, command);
+
+    if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
+    if(is_equal(command_id, "expression")) return create_new_expression(domain, command);
+    if(is_equal(command_id, "converger")) return create_new_converger(domain, command);
+    if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
+    if(is_equal(command_id, "element")) return create_new_element(domain, command);
+    if(is_equal(command_id, "hdf5recorder")) return create_new_recorder(domain, command, true);
+    if(is_equal(command_id, "import")) return create_new_external_module(domain, command);
+    if(is_equal(command_id, "initial")) return create_new_initial(domain, command);
+    if(is_equal(command_id, "integrator")) return create_new_integrator(domain, command);
+    if(is_equal(command_id, "mass")) return create_new_mass(domain, command);
+    if(is_equal(command_id, "material")) return create_new_material(domain, command);
+    if(is_equal(command_id, "modifier")) return create_new_modifier(domain, command);
+    if(is_equal(command_id, "node")) return create_new_node(domain, command);
+    if(is_equal(command_id, "orientation")) return create_new_orientation(domain, command);
+    if(is_equal(command_id, "plainrecorder")) return create_new_recorder(domain, command, false);
+    if(is_equal(command_id, "recorder")) return create_new_recorder(domain, command);
+    if(is_equal(command_id, "section")) return create_new_section(domain, command);
+    if(is_equal(command_id, "solver")) return create_new_solver(domain, command);
+    if(is_equal(command_id, "step")) return create_new_step(domain, command);
+
+    // groups
+    auto group_handler = [&] {
+        command.seekg(0);
+        return create_new_group(domain, command);
+    };
+
+    if(is_equal(command_id, "group")) return create_new_group(domain, command);
+    if(is_equal(command_id, "customnodegroup")) return group_handler();
+    if(is_equal(command_id, "elementgroup")) return group_handler();
+    if(is_equal(command_id, "generate")) return group_handler();
+    if(is_equal(command_id, "generatebyplane")) return group_handler();
+    if(is_equal(command_id, "generatebypoint")) return group_handler();
+    if(is_equal(command_id, "generatebyrule")) return group_handler();
+    if(is_equal(command_id, "groupgroup")) return group_handler();
+    if(is_equal(command_id, "nodegroup")) return group_handler();
+
+    // loads
+    auto load_handler = [&] {
+        command.seekg(0);
+        return create_new_load(domain, command);
+    };
+
+    if(is_equal(command_id, "load")) return create_new_load(domain, command);
+    if(is_equal(command_id, "acceleration")) return load_handler();
+    if(is_equal(command_id, "bodyforce")) return load_handler();
+    if(is_equal(command_id, "cload")) return load_handler();
+    if(is_equal(command_id, "disp")) return load_handler();
+    if(is_equal(command_id, "displacement")) return load_handler();
+    if(is_equal(command_id, "dispload")) return load_handler();
+    if(is_equal(command_id, "groupbodyforce")) return load_handler();
+    if(is_equal(command_id, "groupcload")) return load_handler();
+    if(is_equal(command_id, "groupdisp")) return load_handler();
+    if(is_equal(command_id, "groupdisplacement")) return load_handler();
+    if(is_equal(command_id, "groupdispload")) return load_handler();
+    if(is_equal(command_id, "lineudl2d")) return load_handler();
+    if(is_equal(command_id, "lineudl3d")) return load_handler();
+    if(is_equal(command_id, "refereceload")) return load_handler();
+    if(is_equal(command_id, "refforce")) return load_handler();
+    if(is_equal(command_id, "refload")) return load_handler();
+    if(is_equal(command_id, "supportacceleration")) return load_handler();
+    if(is_equal(command_id, "supportdisplacement")) return load_handler();
+    if(is_equal(command_id, "supportvelocity")) return load_handler();
+
+    // constraints
+    auto constraint_handler = [&] {
+        command.seekg(0);
+        return create_new_constraint(domain, command);
+    };
+
+    if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
+    if(is_equal(command_id, "finiterestitutionwall") || is_equal(command_id, "finiterestitutionwallpenalty")) return constraint_handler();
+    if(is_equal(command_id, "finiterigidwall") || is_equal(command_id, "finiterigidwallpenalty")) return constraint_handler();
+    if(is_equal(command_id, "finiterigidwallmultiplier")) return constraint_handler();
+    if(is_equal(command_id, "fix")) return constraint_handler();
+    if(is_equal(command_id, "fix2")) return constraint_handler();
+    if(is_equal(command_id, "fixedlength2d")) return constraint_handler();
+    if(is_equal(command_id, "fixedlength3d")) return constraint_handler();
+    if(is_equal(command_id, "groupmultiplierbc")) return constraint_handler();
+    if(is_equal(command_id, "grouppenaltybc")) return constraint_handler();
+    if(is_equal(command_id, "mpc")) return constraint_handler();
+    if(is_equal(command_id, "multiplierbc")) return constraint_handler();
+    if(is_equal(command_id, "particlecollision2d")) return constraint_handler();
+    if(is_equal(command_id, "particlecollision3d")) return constraint_handler();
+    if(is_equal(command_id, "penaltybc")) return constraint_handler();
+    if(is_equal(command_id, "restitutionwall") || is_equal(command_id, "restitutionwallpenalty")) return constraint_handler();
+    if(is_equal(command_id, "rigidwall") || is_equal(command_id, "rigidwallpenalty")) return constraint_handler();
+    if(is_equal(command_id, "rigidwallmultiplier")) return constraint_handler();
+
+    // testers
+    if(is_equal(command_id, "materialtest1d")) return test_material(domain, command, 1);
+    if(is_equal(command_id, "materialtest2d")) return test_material(domain, command, 3);
+    if(is_equal(command_id, "materialtest3d")) return test_material(domain, command, 6);
+    if(is_equal(command_id, "materialtestwithbase3d")) return test_material_with_base3d(domain, command);
+    if(is_equal(command_id, "materialtestbyload1d")) return test_material_by_load(domain, command, 1);
+    if(is_equal(command_id, "materialtestbyload2d")) return test_material_by_load(domain, command, 3);
+    if(is_equal(command_id, "materialtestbyload3d")) return test_material_by_load(domain, command, 6);
+    if(is_equal(command_id, "materialtestbyloadwithbase3d")) return test_material_by_load_with_base3d(domain, command);
+    if(is_equal(command_id, "materialtestbystrainhistory")) return test_material_by_strain_history(domain, command);
+    if(is_equal(command_id, "materialtestbystresshistory")) return test_material_by_stress_history(domain, command);
+
+    if(is_equal(command_id, "sectiontest1d")) return test_section(domain, command, 1);
+    if(is_equal(command_id, "sectiontest2d")) return test_section(domain, command, 2);
+    if(is_equal(command_id, "sectiontest3d")) return test_section(domain, command, 3);
+    if(is_equal(command_id, "sectiontestbydeformationhistory")) return test_section_by_deformation_history(domain, command);
+
+    if(is_equal(command_id, "qrcode")) return qrcode();
+
+    if(is_equal(command_id, "plot")) return vtk_parser(domain, command);
+
+    if(is_equal(command_id, "peek")) return print_info(domain, command);
+
+    if(is_equal(command_id, "command")) return print_command();
+
+    if(is_equal(command_id, "example")) return run_example();
+
+    if(is_equal(command_id, "precheck")) return model->precheck();
+
+    if(is_equal(command_id, "analyze") || is_equal(command_id, "analyse")) {
+        const auto options = get_remaining(command);
+        if(SUANPAN_WARNING_COUNT > 0 && !if_contain(options, "ignore_warning") && !if_contain(options, "ignore-warning")) {
+            suanpan_warning("There are {} warnings, please fix them first or use `ignore-warning` to ignore them.\n", SUANPAN_WARNING_COUNT);
+            return SUANPAN_SUCCESS;
+        }
+        if(SUANPAN_ERROR_COUNT > 0 && !if_contain(options, "ignore_error") && !if_contain(options, "ignore-error")) {
+            suanpan_warning("There are {} errors, please fix them first or use `ignore-error` to ignore them.\n", SUANPAN_ERROR_COUNT);
+            return SUANPAN_SUCCESS;
+        }
+        const auto code = model->analyze();
+        suanpan_info("\n");
+        return code;
+    }
+
+    if(is_equal(command_id, "fullname")) {
+        suanpan_info("{}\n", SUANPAN_EXE.generic_string());
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "pwd")) {
+        if(command.eof())
+            suanpan_info("{}\n", fs::current_path().generic_string());
+        else if(string path; get_input(command, path)) {
+            std::error_code code;
+            fs::current_path(path, code);
+            if(0 != code.value())
+                suanpan_error("Fail to set path \"{}\"\n", code.category().message(code.value()));
+        }
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "sleep")) {
+        if(auto t = 1000ll; get_optional_input(command, t)) std::this_thread::sleep_for(std::chrono::milliseconds(t));
+        else
+            suanpan_error("A positive integer in milliseconds is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "help")) {
+        print_helper();
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "benchmark")) return benchmark();
+
+    if(is_equal(command_id, "clear")) {
+        domain->wait();
+
+        auto flag = true;
+        for(const auto& t_integrator : domain->get_integrator_pool())
+            if(t_integrator->get_domain() != nullptr) {
+                t_integrator->clear_status();
+                flag = false;
+            }
+
+        if(flag) domain->clear_status();
+
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "reset")) {
+        domain->wait();
+
+        auto flag = true;
+        for(const auto& t_integrator : domain->get_integrator_pool())
+            if(t_integrator->get_domain() != nullptr) {
+                t_integrator->reset_status();
+                flag = false;
+            }
+
+        if(flag) domain->reset_status();
+
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "summary")) {
+        domain->summary();
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "terminal")) {
+        execute_command(command);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "upsampling")) {
+        perform_upsampling(command);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "response_spectrum")) {
+        perform_response_spectrum(command);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "sdof_response")) {
+        perform_sdof_response(command);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(command_id, "version")) print_version();
+    else
+        suanpan_error("Command \"{}\" not found.\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+bool normalise_command(string& all_line, string& command_line) {
+    // if to parse and process immediately
+    auto process = true;
+
+    // clear comment line
+    if(!command_line.empty() && '#' == command_line.front()) command_line.clear();
+    // remove inline comment
+    if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
+    // remove all delimiters
+    for(auto& c : command_line) if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
+    while(!command_line.empty() && ' ' == command_line.back()) command_line.pop_back();
+    // it is a command spanning multiple lines
+    if(!command_line.empty() && '\\' == command_line.back()) {
+        while(!command_line.empty() && '\\' == command_line.back()) command_line.pop_back();
+        process = false;
+    }
+    all_line.append(command_line);
+
+    return process && !all_line.empty();
+}
+
+int process_file(const shared_ptr<Bead>& model, const char* file_name) {
+    std::vector<string> file_list;
+    file_list.reserve(9);
+
+    string str_name(file_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".supan");
+    file_list.emplace_back(str_name + ".sp");
+
+    suanpan::to_lower(str_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".supan");
+    file_list.emplace_back(str_name + ".sp");
+
+    suanpan::to_upper(str_name);
+    file_list.emplace_back(str_name);
+    file_list.emplace_back(str_name + ".SUPAN");
+    file_list.emplace_back(str_name + ".SP");
+
+    ifstream input_file;
+
+    for(const auto& file : file_list) {
+        input_file.open(fs::path(file));
+        if(input_file.is_open()) break;
+    }
+
+    if(!input_file.is_open()) {
+        suanpan_error("Cannot open the input file \"{}\".\n", fs::path(file_name).generic_string());
+        return SUANPAN_EXIT;
+    }
+
+    string all_line, command_line;
+    while(!getline(input_file, command_line).fail()) {
+        if(!normalise_command(all_line, command_line)) continue;
+        // now process the command
+        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
+        all_line.clear();
+    }
     return SUANPAN_SUCCESS;
 }
 

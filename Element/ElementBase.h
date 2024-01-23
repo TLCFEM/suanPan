@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,10 +92,14 @@ public:
     virtual void update_dof_encoding() = 0;
 
     [[nodiscard]] virtual bool if_update_mass() const = 0;
-    [[nodiscard]] virtual bool if_update_damping() const = 0;
+    [[nodiscard]] virtual bool if_update_viscous() const = 0;
     [[nodiscard]] virtual bool if_update_nonviscous() const = 0;
     [[nodiscard]] virtual bool if_update_stiffness() const = 0;
     [[nodiscard]] virtual bool if_update_geometry() const = 0;
+
+    [[nodiscard]] virtual bool allow_modify_mass() const = 0;
+    [[nodiscard]] virtual bool allow_modify_viscous() const = 0;
+    [[nodiscard]] virtual bool allow_modify_nonviscous() const = 0;
 
     [[nodiscard]] virtual const uvec& get_dof_encoding() const = 0;
     [[nodiscard]] virtual const uvec& get_node_encoding() const = 0;
@@ -137,21 +141,21 @@ public:
     [[nodiscard]] virtual const vec& get_current_traction() const = 0;
 
     [[nodiscard]] virtual const mat& get_trial_mass() const = 0;
-    [[nodiscard]] virtual const mat& get_trial_damping() const = 0;
+    [[nodiscard]] virtual const mat& get_trial_viscous() const = 0;
     [[nodiscard]] virtual const mat& get_trial_nonviscous() const = 0;
     [[nodiscard]] virtual const mat& get_trial_stiffness() const = 0;
     [[nodiscard]] virtual const mat& get_trial_geometry() const = 0;
     [[nodiscard]] virtual const mat& get_trial_secant() const = 0;
 
     [[nodiscard]] virtual const mat& get_current_mass() const = 0;
-    [[nodiscard]] virtual const mat& get_current_damping() const = 0;
+    [[nodiscard]] virtual const mat& get_current_viscous() const = 0;
     [[nodiscard]] virtual const mat& get_current_nonviscous() const = 0;
     [[nodiscard]] virtual const mat& get_current_stiffness() const = 0;
     [[nodiscard]] virtual const mat& get_current_geometry() const = 0;
     [[nodiscard]] virtual const mat& get_current_secant() const = 0;
 
     [[nodiscard]] virtual const mat& get_initial_mass() const = 0;
-    [[nodiscard]] virtual const mat& get_initial_damping() const = 0;
+    [[nodiscard]] virtual const mat& get_initial_viscous() const = 0;
     [[nodiscard]] virtual const mat& get_initial_nonviscous() const = 0;
     [[nodiscard]] virtual const mat& get_initial_stiffness() const = 0;
     [[nodiscard]] virtual const mat& get_initial_geometry() const = 0;

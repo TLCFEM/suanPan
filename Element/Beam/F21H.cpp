@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 F21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_ptr<Section>&& M)
     : coor(C)
     , weight(W)
-    , b_section(std::forward<unique_ptr<Section>>(M))
+    , b_section(std::move(M))
     , B(2, 3, fill::zeros) {
     B(0, 0) = 1.;
     B(1, 1) = .5 * (coor - 1.);
@@ -32,7 +32,7 @@ F21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_
 }
 
 F21H::F21H(const unsigned T, uvec&& N, const unsigned S, const double L, const bool F)
-    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionElement2D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , hinge_length(L > .5 ? .5 : L)
     , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
 
@@ -176,7 +176,7 @@ vector<vec> F21H::record(const OutputType P) {
 }
 
 void F21H::print() {
-    suanpan_info("A 2D force based beam element with lumped plasticity{} doi: https://doi.org/10.1016/0045-7949(95)00103-N \n", nlgeom ? " and corotational formulation." : ".");
+    suanpan_info("A 2D force based beam element with lumped plasticity{} doi:https://doi.org/10.1016/0045-7949(95)00103-N \n", nlgeom ? " and corotational formulation." : ".");
     suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Section:\n");

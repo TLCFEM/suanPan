@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ const span B31::b_span(0, 2);
 B31::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_ptr<Section>&& M)
     : coor(C)
     , weight(W)
-    , b_section(std::forward<unique_ptr<Section>>(M))
+    , b_section(std::move(M))
     , strain_mat(3, 6, fill::zeros) {
     strain_mat(0, 0) = 1.;
     strain_mat(1, 1) = strain_mat(2, 3) = 3. * coor - 1.;
@@ -33,7 +33,7 @@ B31::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
 }
 
 B31::B31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
-    : SectionElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionElement3D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , orientation_tag(O)
     , int_pt_num(P > 20 ? 20 : P) {}
 

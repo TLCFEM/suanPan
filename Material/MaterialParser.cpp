@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -954,10 +954,10 @@ void new_concrete21(unique_ptr<Material>& return_obj, istringstream& command) {
     double input;
     while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
-    if(para.size() == 9) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], 0.);
-    else if(para.size() == 10) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
+    if(para.size() == 8) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], 0.);
+    else if(para.size() == 9) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
     else
-        suanpan_error("9 or 10 double inputs are required.\n");
+        suanpan_error("Eight or nine double inputs are required.\n");
 }
 
 void new_concrete22(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -971,10 +971,10 @@ void new_concrete22(unique_ptr<Material>& return_obj, istringstream& command) {
     double input;
     while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
-    if(para.size() == 11) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10], 0.);
-    else if(para.size() == 12) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10], para[11]);
+    if(para.size() == 10) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], 0.);
+    else if(para.size() == 11) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10]);
     else
-        suanpan_error("11 or 12 double inputs are required.\n");
+        suanpan_error("Ten or eleven double inputs are required.\n");
 }
 
 void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -1002,8 +1002,8 @@ void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    double NC, NT;
-    if(!get_input(command, NC, NT)) {
+    double nc, nt;
+    if(!get_input(command, nc, nt)) {
         suanpan_error("A valid parameter is required.\n");
         return;
     }
@@ -1034,7 +1034,12 @@ void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<ConcreteCM>(tag, elastic_modulus, peak_stress, crack_stress, NC, NT, peak_strain, crack_strain, is_true(linear_trans), density);
+    if(fabs(peak_strain) <= fabs(peak_stress / elastic_modulus) || fabs(crack_strain) <= fabs(crack_stress / elastic_modulus)) {
+        suanpan_error("The secant stiffness at peaks must be smaller than the initial stiffness.\n");
+        return;
+    }
+
+    return_obj = make_unique<ConcreteCM>(tag, elastic_modulus, peak_stress, crack_stress, nc, nt, peak_strain, crack_strain, is_true(linear_trans), density);
 }
 
 void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -1104,16 +1109,16 @@ void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    auto enable_damage = true, enable_crack_closing = true;
+    auto enable_damage = true, enable_crack_closing = true, objective_damage = false;
     if(!command.eof()) {
-        if(!get_input(command, enable_damage, enable_crack_closing)) {
+        if(!get_input(command, enable_damage, enable_crack_closing, objective_damage)) {
             suanpan_error("A valid flag is required.\n");
             return;
         }
-        suanpan_warning("Internal flags are set.\n");
+        suanpan_debug("Internal flags are set.\n");
     }
 
-    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), density, enable_damage, enable_crack_closing);
+    return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), density, enable_damage, enable_crack_closing, objective_damage);
 }
 
 void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -1168,12 +1173,10 @@ void new_concretetsai(unique_ptr<Material>& return_obj, istringstream& command) 
     double input;
     while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
-    if(para.size() == 7) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6]);
-    else if(para.size() == 8) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
+    if(para.size() == 8) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
     else if(para.size() == 9) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
-    else if(para.size() == 10) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9]);
     else
-        suanpan_error("7, 8, 9 or 10 double inputs are required.\n");
+        suanpan_error("Eight or nine double inputs are required.\n");
 }
 
 void new_coulombfriction(unique_ptr<Material>& return_obj, istringstream& command) {

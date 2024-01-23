@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 double Load::multiplier = 1E8;
 
 Load::Load(const unsigned T, const unsigned ST, const unsigned AT, uvec&& NT, uvec&& DT, const double PT)
-    : ConditionalModifier(T, ST, AT, std::forward<uvec>(NT), std::forward<uvec>(DT))
+    : ConditionalModifier(T, ST, AT, std::move(NT), std::move(DT))
     , pattern(PT) {}
 
 void Load::enable_displacement_control() const { access::rw(mpdc_flag) = true; }
@@ -38,7 +38,7 @@ const sp_vec& Load::get_reference_load() const { return reference_load; }
 void set_load_multiplier(const double M) { Load::multiplier = M; }
 
 GroupLoad::GroupLoad(uvec&& N)
-    : groups(std::forward<uvec>(N)) {}
+    : groups(std::move(N)) {}
 
 uvec GroupLoad::update_object_tag(const shared_ptr<DomainBase>& D) const {
     suanpan::unordered_set<uword> tag;

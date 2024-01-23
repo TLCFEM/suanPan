@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,6 @@ double ExpHoffman::compute_dk(const double p_strain) const { return a * b * exp(
 
 ExpHoffman::ExpHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const double A, const double B, const double R)
     : DataExpHoffman{A, B}
-    , NonlinearHoffman(T, std::forward<vec>(E), std::forward<vec>(V), std::forward<vec>(S), R) {}
+    , NonlinearHoffman(T, std::move(E), std::move(V), std::move(S), R) {}
 
 unique_ptr<Material> ExpHoffman::get_copy() { return make_unique<ExpHoffman>(*this); }

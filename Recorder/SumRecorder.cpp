@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <Domain/Node.h>
 
 SumRecorder::SumRecorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
-    : Recorder(T, std::forward<uvec>(B), L, I, R, H) { access::rw(get_data_pool()).resize(1); }
+    : Recorder(T, std::move(B), L, I, R, H) { access::rw(get_data_pool()).resize(1); }
 
 void SumRecorder::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : get_object_tag())

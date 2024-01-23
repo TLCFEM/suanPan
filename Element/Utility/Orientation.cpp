@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ void Orientation::check_element_ptr() const { suanpan_assert([&] { if(element_pt
 
 Orientation::Orientation(const unsigned T, vec&& O)
     : Tag(T)
-    , z_axis(std::forward<vec>(O)) {}
+    , z_axis(std::move(O)) {}
 
 void Orientation::update_axis(const vec& O) { if(O.n_elem == 3) z_axis = O; }
 

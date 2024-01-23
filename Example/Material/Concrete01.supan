@@ -4,7 +4,7 @@ node 1 0 0
 node 2 1 0
 node 3 2 0
 
-material ConcreteTsai 1 30. 2. 2. 2. 2. 2. .2 2E-3 1E-4
+material ConcreteTsai 1 3E4 30. 2. 2. 2. .2 2E-3 1E-4
 
 element T2D2 1 1 2 1 100
 element T2D2 2 2 3 1 100
@@ -29,11 +29,12 @@ converger RelIncreDisp 1 1E-8 10 1
 analyze
 
 # Node 3:
-# 2.0000 0
+# Coordinate:
+#   2.0000e+00  0.0000e+00
 # Displacement:
-# -0.0100 0
+#  -1.0000e-02  0.0000e+00
 # Resistance:
-# -1.7449e+03 0
+#  -1.3514e+03  0.0000e+00
 peek node 3
 
 # save recorder 1 2

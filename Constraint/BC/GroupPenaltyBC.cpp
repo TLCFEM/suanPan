@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@
 #include <Domain/Group/Group.h>
 
 GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
-    : MultiplierBC(T, S, uvec{}, std::forward<uvec>(D))
-    , groups(std::forward<uvec>(N)) {}
+    : MultiplierBC(T, S, uvec{}, std::move(D))
+    , groups(std::move(N)) {}
 
 GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP)
     : MultiplierBC(T, S, uvec{}, TP)
-    , groups(std::forward<uvec>(N)) {}
+    , groups(std::move(N)) {}
 
 int GroupPenaltyBC::initialize(const shared_ptr<DomainBase>& D) {
     suanpan::unordered_set<uword> tag;

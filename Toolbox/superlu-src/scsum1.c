@@ -51,51 +51,43 @@ at the top-level directory.
 </pre>
 */
 double scsum1_slu(int* n, complex* cx, int* incx) {
-	/* System generated locals */
-	int i__1, i__2;
-	float ret_val;
-	/* Builtin functions */
-	double c_abs(complex*);
-	/* Local variables */
-	int i, nincx;
-	float stemp;
+    /* System generated locals */
+    float ret_val;
+    /* Builtin functions */
+    double c_abs(complex*);
+    /* Local variables */
+    int i, nincx;
+    float stemp;
 
 #define CX(I) cx[(I)-1]
 
-	ret_val = 0.f;
-	stemp = 0.f;
-	if(*n <= 0) { return ret_val; }
-	if(*incx == 1) { goto L20; }
+    ret_val = 0.f;
+    stemp = 0.f;
+    if(*n <= 0) { return ret_val; }
+    if(*incx == 1) { goto L20; }
 
-	/*     CODE FOR INCREMENT NOT EQUAL TO 1 */
+    /*     CODE FOR INCREMENT NOT EQUAL TO 1 */
 
-	nincx = *n * *incx;
-	i__1 = nincx;
-	i__2 = *incx;
-	for(i = 1; *incx < 0 ? i >= nincx : i <= nincx; i += *incx) {
+    nincx = *n * *incx;
+    for(i = 1; *incx < 0 ? i >= nincx : i <= nincx; i += *incx) {
+        /*        NEXT LINE MODIFIED. */
 
-		/*        NEXT LINE MODIFIED. */
+        stemp += c_abs(&CX(i));
+        /* L10: */
+    }
+    ret_val = stemp;
+    return ret_val;
 
-		stemp += c_abs(&CX(i));
-		/* L10: */
-	}
-	ret_val = stemp;
-	return ret_val;
+    /*     CODE FOR INCREMENT EQUAL TO 1 */
 
-	/*     CODE FOR INCREMENT EQUAL TO 1 */
+L20: for(i = 1; i <= *n; ++i) {
+        /*        NEXT LINE MODIFIED. */
 
-L20:
-	i__2 = *n;
-	for(i = 1; i <= *n; ++i) {
+        stemp += c_abs(&CX(i));
+        /* L30: */
+    }
+    ret_val = stemp;
+    return ret_val;
 
-		/*        NEXT LINE MODIFIED. */
-
-		stemp += c_abs(&CX(i));
-		/* L30: */
-	}
-	ret_val = stemp;
-	return ret_val;
-
-	/*     End of SCSUM1 */
-
+    /*     End of SCSUM1 */
 } /* scsum1_slu */

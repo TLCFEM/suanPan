@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,8 +93,8 @@ double ConcreteTable::compute_tension_residual(const double reverse_t_strain, co
 
 ConcreteTable::ConcreteTable(const unsigned T, mat&& CT, mat&& TT, const double MP, const double R)
     : SimpleHysteresis(T, MP, R)
-    , c_table(std::forward<mat>(CT))
-    , t_table(std::forward<mat>(TT))
+    , c_table(std::move(CT))
+    , t_table(std::move(TT))
     , c_strain(c_table.col(0)(index_min(c_table.col(1))))
     , t_strain(t_table.col(0)(index_max(t_table.col(1)))) {}
 

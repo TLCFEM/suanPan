@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,9 +55,9 @@ public:
 
     void nullify(const uword K) override {
         this->factored = false;
-        suanpan_for(0llu, K, [&](const uword I) { this->memory[K + (length - I) * I / 2] = T(0); });
+        suanpan::for_each(K, [&](const uword I) { this->memory[K + (length - I) * I / 2] = T(0); });
         const auto t_factor = (length - K) * K / 2;
-        suanpan_for(K, this->n_rows, [&](const uword I) { this->memory[I + t_factor] = T(0); });
+        suanpan::for_each(K, this->n_rows, [&](const uword I) { this->memory[I + t_factor] = T(0); });
     }
 
     T operator()(const uword in_row, const uword in_col) const override { return this->memory[in_row >= in_col ? in_row + (length - in_col) * in_col / 2 : in_col + (length - in_row) * in_row / 2]; }
@@ -87,11 +87,11 @@ template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {
 
     if constexpr(std::is_same_v<T, float>) {
         using E = float;
-        suanpan_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_sspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
+        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_sspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
     }
     else {
         using E = double;
-        suanpan_for(0llu, X.n_cols, [&](const uword I) { arma_fortran(arma_dspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
+        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
     }
 
     return Y;

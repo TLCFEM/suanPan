@@ -48,7 +48,8 @@ integrator LeeNewmarkFull 1 .25 .5 \
 -type4 .01 1 0 1 1 0 2. \
 -type4 .01 1 1 1 1 0 2. \
 -type4 .01 1 0 1 1 1 2. \
--type4 .01 1 1 1 1 1 2.
+-type4 .01 1 1 1 1 1 2. \
+-type4 .01 1 0 0 0 0 2.
 
 converger RelIncreDisp 2 1E-10 10 1
 
@@ -56,15 +57,15 @@ analyze
 
 # Node 2:
 # Coordinate:
-# 1.0000 0
+#   1.0000e+00  0.0000e+00
 # Displacement:
-# 0.0978 0
+#   9.1177e-02  0.0000e+00
 # Resistance:
-# 8.5029 0
+#   7.9966e+00  0.0000e+00
 # Velocity:
-# 0.0327 0
+#   3.1578e-02  0.0000e+00
 # Acceleration:
-# -0.0905 0
+#  -8.5838e-02  0.0000e+00
 peek node 2
 
 # save recorder 1 2 3

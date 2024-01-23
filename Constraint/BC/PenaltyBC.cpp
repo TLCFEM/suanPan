@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
  * \param D `dofs`
  */
 PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
-    : Constraint(T, S, 0, std::forward<uvec>(N), std::forward<uvec>(D), 0) {}
+    : Constraint(T, S, 0, std::move(N), std::move(D), 0) {}
 
 /**
  * \brief the constructor uses predefined TYPE: "XSYMM", "YSYMM", "ZSYMM", "ENCASTRE", "PINNED".
@@ -38,7 +38,7 @@ PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
  * \param TP PenaltyBC TYPE
  */
 PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP)
-    : Constraint(T, S, 0, std::forward<uvec>(N), {}, 0) {
+    : Constraint(T, S, 0, std::move(N), {}, 0) {
     if(is_equal(TP, 'X')) dof_reference = uvec{1, 5, 6};
     else if(is_equal(TP, 'Y')) dof_reference = uvec{2, 4, 6};
     else if(is_equal(TP, 'Z')) dof_reference = uvec{3, 4, 5};

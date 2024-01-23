@@ -556,13 +556,13 @@
       "trigger": "Concrete21",
       "details": "rotating crack concrete material",
       "kind": "type",
-      "contents": "material Concrete21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, compression strength, should be negative but sign insensitive\n# (3) double, tension strength, should be positive but sign insensitive\n# (4) double, MC\n# (5) double, NC\n# (6) double, MT\n# (7) double, NT\n# (8) double, middle point\n# (9) double, strain at compression strength\n# (10) double, strain at tension strength\n# [11] double, density, default: 0.0"
+      "contents": "material Concrete21 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:[10]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, compression strength, should be negative but sign insensitive\n# (4) double, tension strength, should be positive but sign insensitive\n# (5) double, NC\n# (6) double, NT\n# (7) double, middle point\n# (8) double, strain at compression strength\n# (9) double, strain at tension strength\n# [10] double, density, default: 0.0"
     },
     {
       "trigger": "Concrete22",
       "details": "fixed crack concrete material",
       "kind": "type",
-      "contents": "material Concrete22 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:(12)} ${13:[13]}\n# (1) int, unique material tag\n# (2) double, compression strength, should be negative but sign insensitive\n# (3) double, tension strength, should be positive but sign insensitive\n# (4) double, MC\n# (5) double, NC\n# (6) double, MT\n# (7) double, NT\n# (8) double, middle point\n# (9) double, strain at compression strength\n# (10) double, strain at tension strength\n# (11) double, shear stress\n# (12) double, shear retention factor\n# [13] double, density, default: 0.0"
+      "contents": "material Concrete22 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, compression strength, should be negative but sign insensitive\n# (4) double, tension strength, should be positive but sign insensitive\n# (5) double, NC\n# (6) double, NT\n# (7) double, middle point\n# (8) double, strain at compression strength\n# (9) double, strain at tension strength\n# (10) double, shear stress\n# (11) double, shear retention factor\n# [12] double, density, default: 0.0"
     },
     {
       "trigger": "ConcreteCM",
@@ -592,7 +592,7 @@
       "trigger": "ConcreteTsai",
       "details": "uniaxial concrete model using tsai's equation",
       "kind": "type",
-      "contents": "material ConcreteTsai ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, compression strength, should be negative but sign insensitive\n# (3) double, tension strength, should be positive but sign insensitive\n# (4) double, MC\n# (5) double, NC\n# (6) double, MT\n# (7) double, NT\n# (8) double, middle point, typical: 0.2\n# (9) double, strain at compression strength, typical: -2E-3\n# (10) double, strain at tension strength, typical: 1E-4\n# [11] double, density, default: 0.0"
+      "contents": "material ConcreteTsai ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:[10]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, compression strength, should be negative but sign insensitive\n# (4) double, tension strength, should be positive but sign insensitive\n# (5) double, NC\n# (6) double, NT\n# (7) double, middle point, typical: 0.2\n# (8) double, strain at compression strength, typical: -2E-3\n# (9) double, strain at tension strength, typical: 1E-4\n# [10] double, density, default: 0.0"
     },
     {
       "trigger": "Constant",
@@ -1178,15 +1178,21 @@
     },
     {
       "trigger": "LeeNewmark",
-      "details": "newmark with lee's damping model",
+      "details": "Newmark with lee's damping model",
       "kind": "keyword",
       "contents": "integrator LeeNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)}...)\n# (1) int, unique integrator tag\n# (2) double, alpha\n# (3) double, beta\n# (4) double, damping ratio \\zeta_p at the peak of each mode\n# (5) double, circular frequency \\omega_p at the peak of each mode"
     },
     {
       "trigger": "LeeNewmarkFull",
-      "details": "newmark with lee's damping model (full mode)",
+      "details": "Newmark with lee's damping model (full mode)",
       "kind": "keyword",
       "contents": "integrator LeeNewmarkFull ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:[7...]}...)\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark method\n# (3) double, beta in Newmark method\n# (4) string, type identifier\n# (5) double, \\zeta_p\n# (6) double, \\omega_p\n# (7...) double/int, parameters associated with the mode"
+    },
+    {
+      "trigger": "LeeNewmarkIterative",
+      "details": "Newmark with lee's damping model (full mode) with iterative solving",
+      "kind": "keyword",
+      "contents": "integrator LeeNewmarkIterative ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:[7...]}...)\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark method\n# (3) double, beta in Newmark method\n# (4) string, type identifier\n# (5) double, \\zeta_p\n# (6) double, \\omega_p\n# (7...) double/int, parameters associated with the mode"
     },
     {
       "trigger": "LineUDL2D",
@@ -2572,7 +2578,7 @@
       "trigger": "upsampling",
       "details": "upsample a given ground motion using a specific window type",
       "kind": "keyword",
-      "contents": "upsampling ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) string, file name\n# (2) int, upsampling ratio\n# (3) string, window type, one of Hamming, Hann, Blackman, BlackmanNuttall, BlackmanHarris and FlatTop"
+      "contents": "upsampling ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) string, file name\n# (2) int, upsampling ratio\n# (3) string, window type, one of Hamming, Hann, Blackman, BlackmanNuttall, BlackmanHarris and FlatTop\n# [4] int, window length, default: 8"
     },
     {
       "trigger": "version",

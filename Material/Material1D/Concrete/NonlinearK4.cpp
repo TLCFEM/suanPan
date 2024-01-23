@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,12 @@
 #include "NonlinearK4.h"
 #include <Toolbox/utility.h>
 
-int NonlinearK4::compute_plasticity(double& k) {
+int NonlinearK4::compute_plasticity() {
     auto& plastic_strain = trial_history(0);
 
     const auto sign_sigma = suanpan::sign(trial_stress(0));
+
+    auto& k = sign_sigma > 0. ? trial_history(1) : trial_history(2);
 
     const auto backbone_handle = sign_sigma > 0. ? std::mem_fn(&NonlinearK4::compute_tension_backbone) : std::mem_fn(&NonlinearK4::compute_compression_backbone);
     const auto damage_handle = sign_sigma > 0. ? std::mem_fn(&NonlinearK4::compute_tension_damage) : std::mem_fn(&NonlinearK4::compute_compression_damage);
@@ -63,7 +65,7 @@ int NonlinearK4::compute_plasticity(double& k) {
                 const auto damage_factor = 1. - damage(0);
 
                 trial_stiffness *= damage_factor;
-                trial_stiffness -= trial_stress * damage(1) * dgamma;
+                trial_stiffness -= abs(trial_stress) * damage(1) * dgamma;
 
                 trial_stress *= damage_factor;
             }
@@ -103,11 +105,19 @@ void NonlinearK4::compute_crack_close_branch() {
     trial_stress -= elastic_modulus * incre_ep;
 }
 
-NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const bool FD, const bool FC)
+double NonlinearK4::objective_scale(const double a, const double zeta) const {
+    if(!objective_damage) return zeta;
+
+    const auto ratio = a / zeta;
+    return 2. * a / (std::sqrt(1. + 4. / get_characteristic_length() * (ratio * ratio + ratio)) - 1.);
+}
+
+NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const bool FD, const bool FC, const bool OD)
     : DataNonlinearK4{fabs(E), std::min(1., std::max(fabs(H), 1E-4)) * fabs(E)}
     , Material1D(T, R)
     , apply_damage(FD)
-    , apply_crack_closing(FC) {}
+    , apply_crack_closing(FC)
+    , objective_damage(OD) {}
 
 int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
@@ -129,8 +139,8 @@ int NonlinearK4::update_trial_status(const vec& t_strain) {
 
     trial_history = current_history;
     const auto& plastic_strain = trial_history(0);
-    auto& kt = trial_history(1);
-    auto& kc = trial_history(2);
+    // auto& kt = trial_history(1);
+    // auto& kc = trial_history(2);
     const auto& current_kt = current_history(1);
     const auto& current_kk = current_history(3);
 
@@ -138,7 +148,7 @@ int NonlinearK4::update_trial_status(const vec& t_strain) {
 
     if(apply_crack_closing && trial_stress(0) < 0. && incre_strain(0) < 0. && current_kt > current_kk) compute_crack_close_branch();
 
-    return compute_plasticity(trial_stress(0) > 0. ? kt : kc);
+    return compute_plasticity();
 }
 
 int NonlinearK4::clear_status() {
@@ -166,7 +176,7 @@ int NonlinearK4::reset_status() {
 }
 
 void NonlinearK4::print() {
-    suanpan_info("A concrete model. doi: 10.1061/(ASCE)ST.1943-541X.000259\n");
+    suanpan_info("A concrete model. doi:10.1061/(ASCE)ST.1943-541X.000259\n");
     Material1D::print();
 }
 
@@ -179,7 +189,7 @@ vec2 ConcreteK4::compute_compression_backbone(const double k) const {
 }
 
 vec2 ConcreteK4::compute_tension_damage(const double k) const {
-    const auto e_t = f_t / zeta_t;
+    const auto e_t = f_t / objective_scale(hardening_t, zeta_t);
     const auto factor = exp(-k / e_t);
     return vec2{1. - factor, factor / e_t};
 }
@@ -189,13 +199,13 @@ vec2 ConcreteK4::compute_compression_damage(double k) const {
 
     k -= k_peak;
 
-    const auto e_c = f_c / zeta_c;
+    const auto e_c = f_c / objective_scale(hardening_d, zeta_c);
     const auto factor = exp(-k / e_c);
     return vec2{1. - factor, factor / e_c};
 }
 
-ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC)
+ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC, const bool OD)
     : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(E * P(6)), fabs(E * P(7))}
-    , NonlinearK4(T, E, H, R, FD, FC) {}
+    , NonlinearK4(T, E, H, R, FD, FC, OD) {}
 
 unique_ptr<Material> ConcreteK4::get_copy() { return make_unique<ConcreteK4>(*this); }

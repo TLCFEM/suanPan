@@ -2,7 +2,7 @@
 
 node 1 0 0
 
-material ConcreteTsai 1 30. 2. 2. 2. 2. 2. .2 2E-3 1E-4
+material ConcreteTsai 1 3E4 30. 2. 2. 2. .2 2E-3 1E-4
 material MPF 2 2E5 400 .01
 
 material ElasticOS 3 100 .2 ! wrong material type
@@ -42,11 +42,12 @@ converger RelIncreDisp 1 1E-10 20 1
 analyze
 
 # Node 1:
-# 0 0
+# Coordinate:
+#   0.0000e+00  0.0000e+00
 # Displacement:
-# 1.4815e-02 1.0000e-04
+#   1.4699e-02  1.0000e-04
 # Resistance:
-# 1.7817e-06 3.6439e+08
+#   1.3824e-10  3.6347e+08
 peek node 1
 
 peek element 1

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 B21::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_ptr<Section>&& M)
     : coor(C)
     , weight(W)
-    , b_section(std::forward<unique_ptr<Section>>(M))
+    , b_section(std::move(M))
     , strain_mat(2, 3, fill::zeros) {
     strain_mat(0, 0) = 1.;
     strain_mat(1, 1) = 3. * coor - 1.;
@@ -32,7 +32,7 @@ B21::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
 }
 
 B21::B21(const unsigned T, uvec&& N, const unsigned S, const unsigned P, const bool F)
-    : SectionElement2D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionElement2D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , int_pt_num(P > 20 ? 20 : P)
     , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
 

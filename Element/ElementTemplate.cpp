@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
  * simple as this.
  */
 ElementTemplate::ElementTemplate(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false)
     , thickness(TH) {}
 
 /**

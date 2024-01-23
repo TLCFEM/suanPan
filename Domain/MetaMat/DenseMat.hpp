@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ protected:
 
     podarray<float> to_float() {
         podarray<float> f_memory(this->n_elem);
-        suanpan_for(0llu, this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
+        suanpan::for_each(this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
         return f_memory;
     }
 
@@ -62,7 +62,7 @@ public:
         : MetaMat<T>(old_mat)
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
-        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { suanpan_for(0llu, this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
+        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
 
     DenseMat(DenseMat&&) noexcept = delete;
     DenseMat& operator=(const DenseMat&) = delete;
@@ -84,7 +84,7 @@ public:
 
     [[nodiscard]] Col<T> diag() const override {
         Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
-        suanpan_for(0llu, diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
+        suanpan::for_each(diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
         return diag_vec;
     }
 
@@ -92,40 +92,26 @@ public:
 
     T* memptr() override { return memory.get(); }
 
-    void operator+=(const shared_ptr<MetaMat<T>>& M) override {
+    void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& M) override {
         if(nullptr == M) return;
-        if(!M->triplet_mat.is_empty()) return this->operator+=(M->triplet_mat);
+        if(!M->triplet_mat.is_empty()) return this->scale_accu(scalar, M->triplet_mat);
         if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
         this->factored = false;
-        arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
+        if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
+        else if(-1. == scalar) arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
+        else suanpan::for_each(this->n_elem, [&](const uword I) { memptr()[I] += scalar * M->memptr()[I]; });
     }
 
-    void operator-=(const shared_ptr<MetaMat<T>>& M) override {
-        if(nullptr == M) return;
-        if(!M->triplet_mat.is_empty()) return this->operator-=(M->triplet_mat);
-        if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
-        if(nullptr == M->memptr()) return;
-        this->factored = false;
-        arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
-    }
-
-    void operator+=(const triplet_form<T, uword>& M) override {
+    void scale_accu(const T scalar, const triplet_form<T, uword>& M) override {
         if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
         this->factored = false;
         const auto row = M.row_mem();
         const auto col = M.col_mem();
         const auto val = M.val_mem();
-        for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
-    }
-
-    void operator-=(const triplet_form<T, uword>& M) override {
-        if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
-        this->factored = false;
-        const auto row = M.row_mem();
-        const auto col = M.col_mem();
-        const auto val = M.val_mem();
-        for(uword I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+        if(1. == scalar) for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
+        else if(-1. == scalar) for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+        else for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += scalar * val[I];
     }
 
     void operator*=(const T value) override {

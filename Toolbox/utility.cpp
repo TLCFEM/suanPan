@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,4 +128,4 @@ bool is_false(const string& S) { return is_false(S.c_str()); }
 
 bool is_integer(const string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }
 
-double perturb(const double input) { return input * (1. + randu<double>() * 1E-5); }
+double perturb(const double input, const double fraction) { return input * (1. + randu<double>() * fraction); }

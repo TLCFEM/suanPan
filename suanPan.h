@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -211,7 +211,7 @@ namespace suanpan {
     inline std::string pattern(const std::string_view header, const std::string_view& file_name, const std::string_view& format) {
         std::string pattern{header};
         pattern += fs::path(file_name).filename().string();
-        pattern += ":{:<6d}";
+        pattern += ":{} ~> ";
         pattern += format;
         return pattern;
     }
@@ -331,7 +331,8 @@ template<class T> concept sp_d = std::is_floating_point_v<T>;
 template<class T> concept sp_i = std::is_integral_v<T>;
 
 namespace suanpan {
-    template<class IN, class FN> void for_all(IN& from, FN&& func) {
+    template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); }
+    void for_all(IN& from, FN&& func) {
         suanpan_for_each(from.begin(), from.end(), std::forward<FN>(func));
     }
 }

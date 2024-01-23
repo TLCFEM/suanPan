@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ double CustomHoffman::compute_k(const double p_strain) const { return k_expressi
 double CustomHoffman::compute_dk(const double p_strain) const { return k_expression->gradient(p_strain).at(0); }
 
 CustomHoffman::CustomHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const unsigned KT, const double R)
-    : NonlinearHoffman(T, std::forward<vec>(E), std::forward<vec>(V), std::forward<vec>(S), R)
+    : NonlinearHoffman(T, std::move(E), std::move(V), std::move(S), R)
     , k_tag(KT) {}
 
 int CustomHoffman::initialize(const shared_ptr<DomainBase>& D) {

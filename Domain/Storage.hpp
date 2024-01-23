@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -200,6 +200,8 @@ template<typename T> typename Storage<T>::const_iterator cend(const Storage<T>& 
 template<typename T> typename Storage<T>::iterator begin(Storage<T>& S) { return S.begin(); }
 
 template<typename T> typename Storage<T>::iterator end(Storage<T>& S) { return S.end(); }
+
+template<typename T> using dual = std::pair<unsigned, shared_ptr<T>>;
 
 using AmplitudeStorage = Storage<Amplitude>;
 using ExpressionStorage = Storage<Expression>;

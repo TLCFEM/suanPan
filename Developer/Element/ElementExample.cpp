@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::ist
 }
 
 ElementExample::ElementExample(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
-    : Element(T, m_node, m_dof, std::forward<uvec>(NT), uvec{MT}, false, MaterialType::D2, {DOF::U1, DOF::U2})
+    : Element(T, m_node, m_dof, std::move(NT), uvec{MT}, false, MaterialType::D2, {DOF::U1, DOF::U2})
     , thickness(TH) {}
 
 int ElementExample::initialize(const shared_ptr<DomainBase>& D) {

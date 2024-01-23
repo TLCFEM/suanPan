@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ void GroupSumRecorder::update_tag(const shared_ptr<DomainBase>& D) {
 
 GroupSumRecorder::GroupSumRecorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
     : SumRecorder(T, {}, L, I, R, H)
-    , groups(std::forward<uvec>(B)) { access::rw(get_data_pool()).resize(1); }
+    , groups(std::move(B)) { access::rw(get_data_pool()).resize(1); }
 
 void GroupSumRecorder::initialize(const shared_ptr<DomainBase>& D) {
     update_tag(D);

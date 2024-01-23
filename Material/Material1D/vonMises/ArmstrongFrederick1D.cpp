@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <Recorder/OutputType.h>
 
 ArmstrongFrederick1D::ArmstrongFrederick1D(const unsigned T, const double E, const double Y, const double S, const double H, const double M, vec&& A, vec&& B, const double R)
-    : DataArmstrongFrederick1D{E, Y, S, H, M, std::forward<vec>(A), std::forward<vec>(B)}
+    : DataArmstrongFrederick1D{E, Y, S, H, M, std::move(A), std::move(B)}
     , Material1D(T, R) {}
 
 int ArmstrongFrederick1D::initialize(const shared_ptr<DomainBase>&) {

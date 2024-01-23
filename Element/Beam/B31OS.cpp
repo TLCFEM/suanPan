@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 B31OS::IntegrationPoint::IntegrationPoint(const double C, const double W, const double L, unique_ptr<Section>&& M)
     : coor(C)
     , weight(W)
-    , b_section(std::forward<unique_ptr<Section>>(M)) {
+    , b_section(std::move(M)) {
     const auto xp = coor + 1., xm = coor - 1.;
     const auto x3p = 3. * coor + 1., x3m = 3. * coor - 1.;
 
@@ -82,7 +82,7 @@ B31OS::IntegrationPoint::IntegrationPoint(const double C, const double W, const 
 }
 
 B31OS::B31OS(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const unsigned P, const bool F)
-    : SectionOSElement3D(T, b_node, b_dof, std::forward<uvec>(N), uvec{S}, F)
+    : SectionOSElement3D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , orientation_tag(O)
     , int_pt_num(P > 20 ? 20 : P) {}
 

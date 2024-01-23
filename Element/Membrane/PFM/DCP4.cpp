@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,15 +27,15 @@ const uvec DCP4::u_dof{0, 1, 3, 4, 6, 7, 9, 10};
 const uvec DCP4::d_dof{2, 5, 8, 11};
 
 DCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& N, mat&& PNPXY)
-    : coor(std::forward<vec>(C))
+    : coor(std::move(C))
     , weight(W)
-    , m_material(std::forward<unique_ptr<Material>>(M))
-    , n_mat(std::forward<mat>(N))
-    , pn_mat(std::forward<mat>(PNPXY))
+    , m_material(std::move(M))
+    , n_mat(std::move(N))
+    , pn_mat(std::move(PNPXY))
     , b_mat(3, 8, fill::zeros) {}
 
 DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::forward<uvec>(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::DMG})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::DMG})
     , release_rate(RR)
     , thickness(TH) { access::rw(characteristic_length) = CL; }
 

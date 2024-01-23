@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ extern fs::path SUANPAN_OUTPUT;
  */
 Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
     : Tag(T)
-    , object_tag(std::forward<uvec>(B))
+    , object_tag(std::move(B))
     , variable_type(L)
     , data_pool(object_tag.n_elem)
     , record_time(R)
@@ -44,7 +44,7 @@ Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigne
 
 void Recorder::initialize(const shared_ptr<DomainBase>&) {}
 
-void Recorder::set_object_tag(uvec&& T) { object_tag = std::forward<uvec>(T); }
+void Recorder::set_object_tag(uvec&& T) { object_tag = std::move(T); }
 
 const uvec& Recorder::get_object_tag() const { return object_tag; }
 
@@ -65,6 +65,11 @@ void Recorder::insert(const std::vector<vec>& D, const unsigned I) { data_pool[I
 const std::vector<std::vector<std::vector<vec>>>& Recorder::get_data_pool() const { return data_pool; }
 
 const std::vector<double>& Recorder::get_time_pool() const { return time_pool; }
+
+void Recorder::clear_status() {
+    time_pool.clear();
+    data_pool.clear();
+}
 
 void Recorder::save() {
     if(time_pool.empty() || data_pool.empty() || data_pool.cbegin()->empty() || data_pool.cbegin()->cbegin()->empty() || data_pool.cbegin()->cbegin()->cbegin()->is_empty()) return;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ protected:
     shared_ptr<MetaMat<double>> current_geometry = nullptr;
 
 public:
-    explicit LeeNewmark(unsigned, vec&&, vec&&, double, double);
+    LeeNewmark(unsigned, vec&&, vec&&, double, double);
 
     int initialize() override;
 

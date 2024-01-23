@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2017-2023 Theodore Chang
+// Copyright (C) 2017-2024 Theodore Chang
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ field<cube> NURBSVolume::evaluate_shape_function_derivative(const double u, cons
 }
 
 NURBSVolume3D::NURBSVolume3D(vec knot_u, vec knot_v, vec knot_w, field<vec>&& N)
-    : NURBSVolume(std::move(knot_u), std::move(knot_v), std::move(knot_w), 4, std::forward<field<vec>>(N)) {}
+    : NURBSVolume(std::move(knot_u), std::move(knot_v), std::move(knot_w), 4, std::move(N)) {}
 
 NURBSVolume4D::NURBSVolume4D(vec knot_u, vec knot_v, vec knot_w, field<vec>&& N)
-    : NURBSVolume(std::move(knot_u), std::move(knot_v), std::move(knot_w), 5, std::forward<field<vec>>(N)) {}
+    : NURBSVolume(std::move(knot_u), std::move(knot_v), std::move(knot_w), 5, std::move(N)) {}

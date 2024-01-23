@@ -26,6 +26,7 @@ hdf5recorder 1 Node U1 1 2
 step dynamic 1 1
 set ini_step_size 5E-2
 set fixed_step_size true
+set symm_mat 1
 
 converger RelIncreDisp 1 1E-10 4 1
 

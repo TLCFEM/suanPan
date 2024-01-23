@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2023 Theodore Chang
+ * Copyright (C) 2017-2024 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 Sequential::Sequential(const unsigned T, uvec&& MT)
     : Material1D(T, 0.)
     , mat_size(MT.n_elem - 1)
-    , mat_tag(std::forward<uvec>(MT)) {}
+    , mat_tag(std::move(MT)) {}
 
 int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     auto& t_density = access::rw(density);

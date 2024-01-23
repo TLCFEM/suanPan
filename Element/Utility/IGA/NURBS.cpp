@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2017-2023 Theodore Chang
+// Copyright (C) 2017-2024 Theodore Chang
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -97,10 +97,10 @@ field<vec> NURBS::evaluate_shape_function_derivative(const double u, const field
 }
 
 NURBSCurve2D::NURBSCurve2D(vec K, field<vec>&& N)
-    : NURBS(std::move(K), 3, std::forward<field<vec>>(N)) {}
+    : NURBS(std::move(K), 3, std::move(N)) {}
 
 NURBSCurve3D::NURBSCurve3D(vec K, field<vec>&& N)
-    : NURBS(std::move(K), 4, std::forward<field<vec>>(N)) {}
+    : NURBS(std::move(K), 4, std::move(N)) {}
 
 NURBSCurve4D::NURBSCurve4D(vec K, field<vec>&& N)
-    : NURBS(std::move(K), 5, std::forward<field<vec>>(N)) {}
+    : NURBS(std::move(K), 5, std::move(N)) {}
