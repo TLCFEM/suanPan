@@ -204,7 +204,7 @@ public:
     [[nodiscard]] bool is_nonviscous() const;
 
     void set_solver_type(SolverType);
-    [[nodiscard]] SolverType get_solver_type() const;
+    [[nodiscard]] bool contain_solver_type(SolverType) const;
 
     void set_solver_setting(const SolverSetting<double>&);
     [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
@@ -726,7 +726,7 @@ template<sp_d T> bool Factory<T>::is_nonviscous() const { return nonviscous; }
 
 template<sp_d T> void Factory<T>::set_solver_type(const SolverType E) { solver = E; }
 
-template<sp_d T> SolverType Factory<T>::get_solver_type() const { return solver; }
+template<sp_d T> bool Factory<T>::contain_solver_type(const SolverType ST) const { return ST == solver; }
 
 template<sp_d T> void Factory<T>::set_solver_setting(const SolverSetting<double>& SS) { setting = SS; }
 

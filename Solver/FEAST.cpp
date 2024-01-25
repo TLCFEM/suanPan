@@ -208,7 +208,7 @@ int FEAST::initialize() {
 
         return SUANPAN_FAIL;
     }
-    else if((StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) && SolverType::SPIKE != W->get_solver_type()) {
+    else if((StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) && !W->contain_solver_type(SolverType::SPIKE)) {
         suanpan_error("The SPIKE system solver is required for banded storage.\n");
 
         return SUANPAN_FAIL;
