@@ -115,57 +115,20 @@ void LeeNewmarkIterative::formulate_block(sword& current_pos, const std::vector<
     for(size_t I = 0; I < order.size(); ++I) formulate_block(current_pos, m_coef[I], s_coef[I], order[I]);
 }
 
-vec LeeNewmarkIterative::update_by_mode_zero(const double mass_coef, const double stiffness_coef) const {
+vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double stiffness_coef, int order) const {
+    const auto ini_order = order;
     const auto kernel = current_mass->make_copy();
     kernel += stiffness_coef / mass_coef * current_stiffness;
-    const auto damping_force = current_mass * factory->get_trial_velocity();
-    return mass_coef * (damping_force - current_mass * kernel->solve(damping_force));
-}
+    auto damping_force = factory->get_trial_velocity();
 
-vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double stiffness_coef, int order) {
-    const auto n_total = (2 * order + 1) * n_block;
-
-    init_worker(n_total, 3llu + 6llu * order);
-
-    const auto mass_coefs = .5 * mass_coef;           // eq. 10
-    const auto stiffness_coefs = .5 * stiffness_coef; // eq. 10
-
-    sword current_pos{0};
-
-    auto I = -static_cast<sword>(n_block);
-    auto J = current_pos;
-    auto K = current_pos += n_block;
-    auto L = current_pos += n_block;
-    auto M = current_pos += n_block;
-
-    while(order > 1) {
-        // eq. 61
-        assemble_mass({I, J, J, K, L, M}, {J, I, K, J, M, L}, {mass_coef, mass_coef, mass_coefs, mass_coefs, mass_coefs, mass_coefs});
-        assemble_stiffness({K, L, J, K, L, M}, {L, K, K, J, M, L}, {stiffness_coef, stiffness_coef, stiffness_coefs, stiffness_coefs, stiffness_coefs, stiffness_coefs});
-
-        I = current_pos;
-        J = current_pos += n_block;
-        K = current_pos += n_block;
-        L = current_pos += n_block;
-        M = current_pos += n_block;
-        order -= 2;
+    while(true) {
+        damping_force = current_mass * kernel->solve(current_stiffness * damping_force);
+        if(0 > --order) break;
+        damping_force = kernel->solve(damping_force);
     }
 
-    if(order < 1) {
-        // eq. 56
-        assemble_mass({I, J, I, J}, {I, J, J, I}, {mass_coef, mass_coef, mass_coef, mass_coef});
-        assemble_stiffness(J, J, stiffness_coef);
-    }
-    else {
-        // eq. 53
-        assemble_mass({I, J, J, K, L}, {J, I, K, J, L}, {mass_coef, mass_coef, mass_coefs, mass_coefs, -mass_coef});
-        assemble_stiffness({J, K, K, L, L}, {K, J, L, K, L}, {stiffness_coefs, stiffness_coefs, stiffness_coef, stiffness_coef, -stiffness_coef});
-    }
-
-    vec damping_force(n_total, fill::zeros);
-    damping_force.head(n_block) = current_mass * factory->get_trial_velocity();
-    const vec tmp_b = -mass_coef * mass_coef * worker->solve(damping_force).head_rows(n_block);
-    return current_mass * tmp_b;
+    damping_force *= stiffness_coef * pow(4. * stiffness_coef / mass_coef, ini_order);
+    return damping_force;
 }
 
 vec LeeNewmarkIterative::update_by_mode_two(double mass_coef, double stiffness_coef, const int npr, const int npl) {
@@ -327,7 +290,7 @@ void LeeNewmarkIterative::update_damping_force() {
         const auto mass_coef = 4. * zeta * omega, stiffness_coef = 4. * zeta / omega;
         switch(t) {
         case Type::T0:
-            summation += update_by_mode_zero(mass_coef, stiffness_coef);
+            summation += update_by_mode_one(mass_coef, stiffness_coef, 0);
             break;
         case Type::T1:
             summation += update_by_mode_one(mass_coef, stiffness_coef, i(p.front()));
