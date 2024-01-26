@@ -963,6 +963,23 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else
             suanpan_error("A valid solver type is required.\n");
     }
+    else if(is_equal(property_id, "sub_system_solver")) {
+        if(string value; !get_input(command, value))
+            suanpan_error("A valid value is required.\n");
+        else if(is_equal(value, "LAPACK")) t_step->set_sub_system_solver(SolverType::LAPACK);
+        else if(is_equal(value, "SPIKE")) t_step->set_sub_system_solver(SolverType::SPIKE);
+        else if(is_equal(value, "SUPERLU")) t_step->set_sub_system_solver(SolverType::SUPERLU);
+        else if(is_equal(value, "MUMPS")) t_step->set_sub_system_solver(SolverType::MUMPS);
+#ifdef SUANPAN_CUDA
+        else if(is_equal(value, "CUDA")) t_step->set_sub_system_solver(SolverType::CUDA);
+#endif
+#ifdef SUANPAN_MKL
+        else if(is_equal(value, "PARDISO")) t_step->set_sub_system_solver(SolverType::PARDISO);
+        else if(is_equal(value, "FGMRES")) t_step->set_sub_system_solver(SolverType::FGMRES);
+#endif
+        else
+            suanpan_error("A valid solver type is required.\n");
+    }
     else if(is_equal(property_id, "preconditioner")) {
         if(string value; !get_input(command, value))
             suanpan_error("A valid value is required.\n");

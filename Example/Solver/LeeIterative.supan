@@ -26,6 +26,7 @@ step dynamic 2 6
 solver LBFGS 1 50
 set ini_step_size .02
 set fixed_step_size 1
+set sub_system_solver superlu
 
 integrator LeeNewmarkIterative 1 .25 .5 \
 -type0 .005 1 \

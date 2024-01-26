@@ -92,6 +92,8 @@ template<sp_d T> class Factory final {
     SolverType solver = SolverType::LAPACK;
     SolverSetting<T> setting{};
 
+    SolverType sub_solver = SolverType::LAPACK;
+
     T error = T(0); // error produced by certain solvers
 
     Col<T> ninja; // the result from A*X=B
@@ -205,6 +207,9 @@ public:
 
     void set_solver_type(SolverType);
     [[nodiscard]] bool contain_solver_type(SolverType) const;
+
+    void set_sub_solver_type(SolverType);
+    [[nodiscard]] bool contain_sub_solver_type(SolverType) const;
 
     void set_solver_setting(const SolverSetting<double>&);
     [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
@@ -726,7 +731,11 @@ template<sp_d T> bool Factory<T>::is_nonviscous() const { return nonviscous; }
 
 template<sp_d T> void Factory<T>::set_solver_type(const SolverType E) { solver = E; }
 
+template<sp_d T> void Factory<T>::set_sub_solver_type(const SolverType E) { sub_solver = E; }
+
 template<sp_d T> bool Factory<T>::contain_solver_type(const SolverType ST) const { return ST == solver; }
+
+template<sp_d T> bool Factory<T>::contain_sub_solver_type(const SolverType ST) const { return ST == sub_solver; }
 
 template<sp_d T> void Factory<T>::set_solver_setting(const SolverSetting<double>& SS) { setting = SS; }
 
