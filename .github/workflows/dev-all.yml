@@ -152,6 +152,8 @@ jobs:
           wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-macos.tar.gz
           tar xf VTK-9.2.6-macos.tar.gz
           brew install glfw glew
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Compile
         run: |
           go build Checker/updater.go
