@@ -101,6 +101,7 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
+          brew install libomp
           export CC=$(brew --prefix llvm@15)/bin/clang
           export CXX=$(brew --prefix llvm@15)/bin/clang++
           export FC=gfortran-11
