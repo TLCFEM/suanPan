@@ -126,7 +126,7 @@ jobs:
         if: env.COVERAGE == 'ON'
         uses: codecov/codecov-action@v4
         with:
-          gcov: true
+          plugin: gcov
   macos-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
     runs-on: macos-11
