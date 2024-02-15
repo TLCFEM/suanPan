@@ -7,6 +7,10 @@
 3. The `MUMPS` solver throws segfaults with large matrices.
 4. The `FGMRES` solver requires refinements.
 
+## version 3.4
+
+1. update `Armadillo` to version `12.8.0` [#193](https://github.com/TLCFEM/suanPan/pull/193)
+
 ## version 3.3
 
 1. (breaking) revise syntax for `ConcreteTsai`, `Concrete21` and `Concrete22` using a more consistent definition
