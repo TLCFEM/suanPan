@@ -56,7 +56,7 @@ public:
     };
 
 private:
-    const unsigned n_block{0};
+    unsigned n_block{0};
 
     std::vector<Mode> damping_mode;
 

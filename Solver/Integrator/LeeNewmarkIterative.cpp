@@ -342,7 +342,7 @@ int LeeNewmarkIterative::initialize() {
 
     factory = get_domain()->get_factory();
 
-    access::rw(n_block) = factory->get_size();
+    n_block = factory->get_size();
 
     return SUANPAN_SUCCESS;
 }
