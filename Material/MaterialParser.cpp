@@ -2514,7 +2514,14 @@ void new_nonviscous01(unique_ptr<Material>& return_obj, istringstream& command) 
         return;
     }
 
-    return_obj = make_unique<Nonviscous01>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag});
+    auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+
+    if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
+        suanpan_error("The provided kernel does not converge to zero.\n");
+        return;
+    }
+
+    return_obj = make_unique<Nonviscous01>(tag, std::move(m), std::move(s));
 }
 
 void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& command) {
