@@ -39,6 +39,7 @@ parts:
       - -DCMAKE_INSTALL_PREFIX=
       - -DCMAKE_BUILD_TYPE=Release
       - -DBUILD_MULTITHREAD=ON
+      - -DUSE_AVX=OFF
       - -DUSE_HDF5=ON
       - -DUSE_VTK=ON
       - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.2/
