@@ -9,7 +9,7 @@
 
 ## version 3.4
 
-1. update `Armadillo` to version `12.8.0` [#193](https://github.com/TLCFEM/suanPan/pull/193)
+1. update `Armadillo` to version `12.8.1` [#193](https://github.com/TLCFEM/suanPan/pull/193)
 
 ## version 3.3
 
