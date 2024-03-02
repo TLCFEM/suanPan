@@ -106,8 +106,8 @@ details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obt
 ## Installation
 
 Only the 64-bit version is compiled.
-It is assumed that [**AVX**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
-fails, please check if your CPU supports AVX.
+It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
+fails, please check if your CPU supports AVX2.
 Alternatively, you can try the `no-avx` version.
 
 > Check artifacts of [workflows](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml) for the latest binaries.
@@ -203,7 +203,7 @@ A few flavors are available:
    may be missing on server systems
 2. `mkl` --- linear algebra operations are offloaded to MKL, which gives the optimal performance on Intel chips
 3. `openblas` --- linear algebra operations are offloaded to OpenBLAS, which may outperform MKL on AMD platforms
-4. `no-avx` --- AVX support is disabled, useful for older CPUs which do not support AVX instructions
+4. `no-avx` --- AVX2 support is disabled, useful for older CPUs which do not support AVX2 instructions
 
 Advanced users can compile the program from source by themselves to enable GPU based solvers which require
 an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) and/or MAGMA library.

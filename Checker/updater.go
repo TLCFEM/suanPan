@@ -93,8 +93,8 @@ func downloadLatestVersion(versionString string) error {
 	fmt.Printf("      If performance degradation is spotted on your platform, consider switch to `openblas` version.\n")
 	fmt.Printf("  `vtk` uses VTK for visualisation.\n")
 	fmt.Printf("      Visualisation may be useful when it comes to post-processing, but it requires OpenGL support. Please make sure the corresponding packages are installed.\n")
-	fmt.Printf("  `no-avx` disables AVX.\n")
-	fmt.Printf("      For CPUs that do not support AVX, please use this version.\n")
+	fmt.Printf("  `no-avx` disables AVX2.\n")
+	fmt.Printf("      For CPUs that do not support AVX2, please use this version.\n")
 	fmt.Printf("\nDownload the new version:\n")
 
 	var package_array []string
