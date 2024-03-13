@@ -253,6 +253,14 @@ else ()
     set(LIBRARY_TYPE STATIC)
 endif ()
 
+if (USE_AVX512)
+    add_compile_definitions(SUANPAN_AVX512)
+elseif (USE_AVX2)
+    add_compile_definitions(SUANPAN_AVX2)
+elseif (USE_AVX)
+    add_compile_definitions(SUANPAN_AVX)
+endif ()
+
 if (COMPILER_IDENTIFIER MATCHES "vs")
     unset(TEST_COVERAGE CACHE)
 
