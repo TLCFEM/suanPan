@@ -40,7 +40,37 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
-    const auto principal_strain = transform::strain::principal(trial_strain);
+    double ini_phi, ten_fold_phi_diff, p_atm, r_f, cohesion, ref_elastic, n;
+
+    double s1, s3;
+
+    // for elastic modulus
+
+    const auto phi = ini_phi - ten_fold_phi_diff * log10(s3 / p_atm);
+    const auto dphids3 = -ten_fold_phi_diff / (s3 * log(10));
+
+    const auto denom = 1. - sin(phi);
+    const auto max_dev_stress = 2. / r_f * (cohesion * cos(phi) + s3 * sin(phi)) / denom;
+    const auto pmdspphi = 2. / r_f * (s3 * cos(phi) / denom / denom + cohesion / denom);
+    const auto pmdsps3 = 2. / r_f * sin(phi) / denom;
+    const auto dmdsds3 = pmdspphi * dphids3 + pmdsps3;
+
+    const auto dev_stress = s1 - s3;
+    const auto pdsps1 = 1.;
+    const auto pdsps3 = -1.;
+
+    const auto ini_elastic = ref_elastic * pow(s3 / p_atm, n);
+    const auto deids3 = n * ini_elastic / s3;
+
+    const auto pepei = pow(1. - dev_stress / max_dev_stress, 2.);
+    const auto elastic = ini_elastic * pepei;
+    const auto pepds = -2. * ini_elastic * (1. - dev_stress / max_dev_stress) / max_dev_stress;
+    const auto pepmds = 2. * ini_elastic * (1. - dev_stress / max_dev_stress) * dev_stress / max_dev_stress / max_dev_stress;
+
+    const auto peps1 = pepds * pdsps1;
+    const auto peps3 = pepei * deids3 + pepds * pdsps3 + pepmds * dmdsds3;
+
+    // for bulk modulus
 
     return SUANPAN_SUCCESS;
 }
