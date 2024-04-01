@@ -1,6 +1,7 @@
 set(M2D
         Material2D/Concrete21.cpp
         Material2D/Concrete22.cpp
+        Material2D/DuncanSelig.cpp
         Material2D/Elastic/AxisymmetricElastic.cpp
         Material2D/Elastic/Elastic2D.cpp
         Material2D/Material2D.cpp
