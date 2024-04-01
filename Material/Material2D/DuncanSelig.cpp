@@ -20,29 +20,20 @@
 #include <Domain/DomainBase.h>
 #include <Toolbox/tensor.h>
 
-DuncanSelig::DuncanSelig(const unsigned T, const double E, const double R)
-    : Material2D(T, PlaneType::E, R)
-    , elastic_modulus(fabs(E)) {}
+std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
+    // principal stresses
 
-int DuncanSelig::initialize(const shared_ptr<DomainBase>& D) {
-    initial_stiffness.zeros(3, 3);
-    initial_stiffness(2, 2) = shear_modulus = .5 * (initial_stiffness(0, 0) = initial_stiffness(1, 1) = elastic_modulus);
+    const auto center = 0.5 * (trial_stress(0) + trial_stress(1));
+    const auto radius = std::sqrt(std::pow(0.5 * (trial_stress(0) - trial_stress(1)), 2) + std::pow(trial_stress(2), 2));
 
-    trial_stiffness = current_stiffness = initial_stiffness;
+    const rowvec3 dcds = {0.5, 0.5, 0.};
+    const rowvec3 drds = rowvec3{trial_stress(0) - trial_stress(1), trial_stress(1) - trial_stress(0), 4. * trial_stress(2)} / radius * .25;
 
-    return SUANPAN_SUCCESS;
-}
+    const auto s1 = center + radius;
+    const auto s3 = center - radius;
 
-unique_ptr<Material> DuncanSelig::get_copy() { return make_unique<DuncanSelig>(*this); }
-
-int DuncanSelig::update_trial_status(const vec& t_strain) {
-    incre_strain = (trial_strain = t_strain) - current_strain;
-
-    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
-
-    double ini_phi, ten_fold_phi_diff, p_atm, r_f, cohesion, ref_elastic, n;
-
-    double s1, s3;
+    const rowvec3 ds1ds = dcds + drds;
+    const rowvec3 ds3ds = dcds - drds;
 
     // for elastic modulus
 
@@ -71,6 +62,73 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     const auto peps3 = pepei * deids3 + pepds * pdsps3 + pepmds * dmdsds3;
 
     // for bulk modulus
+
+    const auto bulk = ref_bulk * pow(s3 / p_atm, m);
+    const auto pkps3 = m * bulk / s3;
+
+    const rowvec3 deds = peps1 * ds1ds + peps3 * ds3ds;
+    const rowvec3 dkds = pkps3 * ds3ds;
+
+    return {elastic, bulk, deds, dkds};
+}
+
+DuncanSelig::DuncanSelig(const unsigned T, const double R)
+    : Material2D(T, PlaneType::E, R) {}
+
+int DuncanSelig::initialize(const shared_ptr<DomainBase>& D) {
+    initial_stiffness.zeros(3, 3);
+
+    trial_stiffness = current_stiffness = initial_stiffness;
+
+    return SUANPAN_SUCCESS;
+}
+
+unique_ptr<Material> DuncanSelig::get_copy() { return make_unique<DuncanSelig>(*this); }
+
+int DuncanSelig::update_trial_status(const vec& t_strain) {
+    incre_strain = (trial_strain = t_strain) - current_strain;
+
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
+
+    auto ref_error = 0.;
+    vec3 residual, incre;
+    mat33 jacobian;
+
+    auto counter = 0u;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
+        const auto [elastic, bulk, deds, dkds] = compute_moduli();
+
+        const auto factor_a = 3. * bulk * (3. * bulk + elastic);
+        const auto factor_b = 3. * bulk * (3. * bulk - elastic);
+
+        const rowvec3 dfads = (18. * bulk + 3. * elastic) * dkds + 3. * bulk * deds;
+        const rowvec3 dfbds = (18. * bulk - 3. * elastic) * dkds - 3. * bulk * deds;
+
+        residual = (9. * bulk - elastic) * (trial_stress - current_stress);
+
+        residual(0) -= factor_a * incre_strain(0) + factor_b * incre_strain(1);
+        residual(1) -= factor_b * incre_strain(0) + factor_a * incre_strain(1);
+        residual(2) -= 3. * bulk * elastic * incre_strain(2);
+
+        jacobian = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - current_stress) * (9. * dkds - deds);
+        jacobian.row(0) -= incre_strain(0) * dfads + incre_strain(1) * dfbds;
+        jacobian.row(1) -= incre_strain(0) * dfbds + incre_strain(1) * dfads;
+        jacobian.row(2) -= incre_strain(2) * 3. * (bulk * deds + elastic * dkds);
+
+        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
+
+        trial_stress -= incre;
+    }
 
     return SUANPAN_SUCCESS;
 }

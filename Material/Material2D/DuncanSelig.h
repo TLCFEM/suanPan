@@ -34,13 +34,15 @@
 #include <Material/Material2D/Material2D.h>
 
 class DuncanSelig final : public Material2D {
-    const double elastic_modulus;
-    double shear_modulus = 0.;
+    static constexpr unsigned max_iteration = 20u;
+
+    double ini_phi, ten_fold_phi_diff, p_atm, r_f, cohesion, ref_elastic, n, ref_bulk, m;
+
+    std::tuple<double, double, rowvec3, rowvec3> compute_moduli();
 
 public:
     DuncanSelig(
         unsigned,   // tag
-        double,     // elastic modulus
         double = 0. // density
     );
 
