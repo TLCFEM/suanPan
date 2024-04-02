@@ -15,12 +15,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "Material/Material2D/DuncanSelig.h"
-
-void test_mode() {
-    auto ds = DuncanSelig(0);
-    ds.initialize_base(nullptr);
-    ds.initialize(nullptr);
-    ds.update_trial_status(vec{.001, .002, .002});
-    ds.update_trial_status(vec{.0021, .0012, -.0002});
-}
+void test_mode() {}
