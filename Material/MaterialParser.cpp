@@ -1271,6 +1271,24 @@ void new_dhakal(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Dhakal>(tag, mat_tag, y_strain, parameter);
 }
 
+void new_duncanselig(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<DuncanSelig>(tag, density);
+}
+
 void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3413,6 +3431,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
+    else if(is_equal(material_id, "DuncanSelig")) new_duncanselig(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
