@@ -133,7 +133,16 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error / ref_error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+            mat33 right(fill::zeros);
+            right(0, 0) = right(1, 1) = factor_a;
+            right(0, 1) = right(1, 0) = factor_b;
+            right(2, 2) = 3. * bulk * elastic;
+
+            if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
+
+            break;
+        }
 
         trial_stress -= incre;
     }
