@@ -21,14 +21,14 @@
 std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     // principal stresses
 
-    const auto center = .5 * (trial_stress(0) + trial_stress(1));
-    const auto radius = std::sqrt(std::pow(.5 * (trial_stress(0) - trial_stress(1)), 2) + std::pow(trial_stress(2), 2));
+    const auto center = -.5 * (trial_stress(0) + trial_stress(1));
+    const rowvec3 dcds = {-.5, -.5, 0.};
 
-    const rowvec3 dcds = {.5, .5, 0.};
-    const rowvec3 drds = rowvec3{trial_stress(0) - trial_stress(1), trial_stress(1) - trial_stress(0), 4. * trial_stress(2)} / radius * .25;
+    auto radius = std::sqrt(std::pow(.5 * (trial_stress(0) - trial_stress(1)), 2) + std::pow(trial_stress(2), 2));
+    rowvec3 drds(fill::zeros);
+    if(radius > datum::eps) drds = rowvec3{trial_stress(0) - trial_stress(1), trial_stress(1) - trial_stress(0), 4. * trial_stress(2)} / radius * .25;
 
-    const auto s1 = center + radius;
-    const auto s3 = center - radius;
+    const auto s1 = center + radius, s3 = center - radius;
 
     const rowvec3 ds1ds = dcds + drds;
     const rowvec3 ds3ds = dcds - drds;
@@ -45,7 +45,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
         if(phi < 0.) phi = dphids3 = 0.;
     }
 
-    static constexpr auto min_ratio = .001;
+    static constexpr auto min_ratio = .01;
 
     const auto denom = 1. - std::sin(phi);
     auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
@@ -79,6 +79,8 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     const auto peps1 = pepds * pdsps1;
     const auto peps3 = pepei * deids3 + pepds * pdsps3 + pepmds * dmdsds3;
 
+    const rowvec3 deds = peps1 * ds1ds + peps3 * ds3ds;
+
     // for bulk modulus
 
     double bulk, pkps3;
@@ -91,14 +93,27 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
         pkps3 = m * bulk / s3;
     }
 
-    const rowvec3 deds = peps1 * ds1ds + peps3 * ds3ds;
-    const rowvec3 dkds = pkps3 * ds3ds;
+    rowvec3 dkds = pkps3 * ds3ds;
+
+    if(3. * bulk < elastic) {
+        bulk = elastic / 3.;
+        dkds = deds / 3.;
+    }
 
     return {elastic, bulk, deds, dkds};
 }
 
-DuncanSelig::DuncanSelig(const unsigned T, const double R)
-    : Material2D(T, PlaneType::E, R) {}
+DuncanSelig::DuncanSelig(const unsigned T, vec&& P, const double R)
+    : Material2D(T, PlaneType::E, R)
+    , p_atm(P(0))
+    , ref_elastic(P(1))
+    , n(P(2))
+    , ref_bulk(P(3))
+    , m(P(4))
+    , ini_phi(P(5))
+    , ten_fold_phi_diff(P(6))
+    , r_f(P(7))
+    , cohesion(P(8)) {}
 
 int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
     const auto [elastic, bulk, deds, dkds] = compute_moduli();

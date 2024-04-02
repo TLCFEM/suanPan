@@ -1278,6 +1278,12 @@ void new_duncanselig(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
+    auto pool = vec{14.7, 400. * 14.7, .6, 300 * 14.7, .2, .7, .1, .7, .5};
+    if(!get_input(command, pool)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
     auto density = 0.;
     if(command.eof())
         suanpan_debug("Zero density assumed.\n");
@@ -1286,7 +1292,7 @@ void new_duncanselig(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<DuncanSelig>(tag, density);
+    return_obj = make_unique<DuncanSelig>(tag, std::move(pool), density);
 }
 
 void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
