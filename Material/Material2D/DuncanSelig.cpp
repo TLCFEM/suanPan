@@ -34,30 +34,41 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     const rowvec3 ds3ds = dcds - drds;
 
     // for elastic modulus
-
-    auto phi = ini_phi - ten_fold_phi_diff * log10(s3 / p_atm);
-    auto dphids3 = -ten_fold_phi_diff / (s3 * log(10));
-    if(phi < 0.) {
-        phi = 0.;
-        dphids3 = 0.;
-    }
-    else if(phi > ini_phi) {
+    double phi, dphids3;
+    if(s3 < p_atm) {
         phi = ini_phi;
         dphids3 = 0.;
     }
+    else {
+        phi = ini_phi - ten_fold_phi_diff * log10(s3 / p_atm);
+        dphids3 = -ten_fold_phi_diff / (s3 * log(10));
+        if(phi < 0.) phi = dphids3 = 0.;
+    }
 
     const auto denom = 1. - std::sin(phi);
-    const auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
-    const auto pmdspphi = 2. / r_f * (s3 * std::cos(phi) / denom / denom + cohesion / denom);
-    const auto pmdsps3 = 2. / r_f * std::sin(phi) / denom;
-    const auto dmdsds3 = pmdspphi * dphids3 + pmdsps3;
+    auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
+    auto dmdsds3 = 0.;
+    if(max_dev_stress > 0.) {
+        const auto pmdspphi = 2. / r_f * (s3 * std::cos(phi) / denom / denom + cohesion / denom);
+        const auto pmdsps3 = 2. / r_f * std::sin(phi) / denom;
+        dmdsds3 = pmdspphi * dphids3 + pmdsps3;
+    }
 
     const auto dev_stress = s1 - s3;
     const auto pdsps1 = 1.;
     const auto pdsps3 = -1.;
 
-    const auto ini_elastic = ref_elastic * std::pow(s3 / p_atm, n);
-    const auto deids3 = n * ini_elastic / s3;
+    static constexpr auto min_ratio = .01;
+
+    double ini_elastic, deids3;
+    if(s3 < min_ratio * p_atm) {
+        ini_elastic = ref_elastic * std::pow(min_ratio, n);
+        deids3 = 0.;
+    }
+    else {
+        ini_elastic = ref_elastic * std::pow(s3 / p_atm, n);
+        deids3 = n * ini_elastic / s3;
+    }
 
     const auto pepei = std::pow(1. - dev_stress / max_dev_stress, 2.);
     const auto elastic = ini_elastic * pepei;
@@ -69,8 +80,15 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
 
     // for bulk modulus
 
-    const auto bulk = ref_bulk * std::pow(s3 / p_atm, m);
-    const auto pkps3 = m * bulk / s3;
+    double bulk, pkps3;
+    if(s3 < min_ratio * p_atm) {
+        bulk = ref_bulk * std::pow(min_ratio, m);
+        pkps3 = 0.;
+    }
+    else {
+        bulk = ref_bulk * std::pow(s3 / p_atm, m);
+        pkps3 = m * bulk / s3;
+    }
 
     const rowvec3 deds = peps1 * ds1ds + peps3 * ds3ds;
     const rowvec3 dkds = pkps3 * ds3ds;
