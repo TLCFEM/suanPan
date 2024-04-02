@@ -19,7 +19,8 @@
 
 void test_mode() {
     auto ds = DuncanSelig(0);
-    ds.initialize(nullptr);
     ds.initialize_base(nullptr);
-    ds.update_trial_status(vec{.01, .012, .002});
+    ds.initialize(nullptr);
+    ds.update_trial_status(vec{.001, .002, .002});
+    ds.update_trial_status(vec{.0021, .0012, -.0002});
 }

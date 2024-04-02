@@ -45,20 +45,21 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
         if(phi < 0.) phi = dphids3 = 0.;
     }
 
+    static constexpr auto min_ratio = .001;
+
     const auto denom = 1. - std::sin(phi);
     auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
     auto dmdsds3 = 0.;
-    if(max_dev_stress > 0.) {
+    if(max_dev_stress > min_ratio * p_atm) {
         const auto pmdspphi = 2. / r_f * (s3 * std::cos(phi) / denom / denom + cohesion / denom);
         const auto pmdsps3 = 2. / r_f * std::sin(phi) / denom;
         dmdsds3 = pmdspphi * dphids3 + pmdsps3;
     }
+    else max_dev_stress = min_ratio * p_atm;
 
     const auto dev_stress = s1 - s3;
     const auto pdsps1 = 1.;
     const auto pdsps3 = -1.;
-
-    static constexpr auto min_ratio = .01;
 
     double ini_elastic, deids3;
     if(s3 < min_ratio * p_atm) {
@@ -100,7 +101,13 @@ DuncanSelig::DuncanSelig(const unsigned T, const double R)
     : Material2D(T, PlaneType::E, R) {}
 
 int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
+    const auto [elastic, bulk, deds, dkds] = compute_moduli();
+
     initial_stiffness.zeros(3, 3);
+    initial_stiffness(0, 0) = initial_stiffness(1, 1) = 3. * bulk + elastic;
+    initial_stiffness(1, 0) = initial_stiffness(0, 1) = 3. * bulk - elastic;
+    initial_stiffness(2, 2) = elastic;
+    initial_stiffness *= 3. * bulk / (9. * bulk - elastic);
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
@@ -114,7 +121,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
-    trial_stress = current_stress + ref_elastic * incre_strain;
+    trial_stress = current_stress + initial_stiffness * incre_strain;
 
     auto ref_error = 0.;
     vec3 incre;
