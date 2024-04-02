@@ -36,7 +36,7 @@
 class DuncanSelig final : public Material2D {
     static constexpr unsigned max_iteration = 20u;
 
-    double ini_phi, ten_fold_phi_diff, p_atm, r_f, cohesion, ref_elastic, n, ref_bulk, m;
+    double ini_phi = .7, ten_fold_phi_diff = .1, p_atm = 14.7, r_f = .7, cohesion = 0., ref_elastic = 200. * p_atm, n = .6, ref_bulk = 100. * p_atm, m = .2;
 
     std::tuple<double, double, rowvec3, rowvec3> compute_moduli();
 

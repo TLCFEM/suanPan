@@ -16,17 +16,15 @@
  ******************************************************************************/
 
 #include "DuncanSelig.h"
-
 #include <Domain/DomainBase.h>
-#include <Toolbox/tensor.h>
 
 std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     // principal stresses
 
-    const auto center = 0.5 * (trial_stress(0) + trial_stress(1));
-    const auto radius = std::sqrt(std::pow(0.5 * (trial_stress(0) - trial_stress(1)), 2) + std::pow(trial_stress(2), 2));
+    const auto center = .5 * (trial_stress(0) + trial_stress(1));
+    const auto radius = std::sqrt(std::pow(.5 * (trial_stress(0) - trial_stress(1)), 2) + std::pow(trial_stress(2), 2));
 
-    const rowvec3 dcds = {0.5, 0.5, 0.};
+    const rowvec3 dcds = {.5, .5, 0.};
     const rowvec3 drds = rowvec3{trial_stress(0) - trial_stress(1), trial_stress(1) - trial_stress(0), 4. * trial_stress(2)} / radius * .25;
 
     const auto s1 = center + radius;
@@ -37,23 +35,31 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
 
     // for elastic modulus
 
-    const auto phi = ini_phi - ten_fold_phi_diff * log10(s3 / p_atm);
-    const auto dphids3 = -ten_fold_phi_diff / (s3 * log(10));
+    auto phi = ini_phi - ten_fold_phi_diff * log10(s3 / p_atm);
+    auto dphids3 = -ten_fold_phi_diff / (s3 * log(10));
+    if(phi < 0.) {
+        phi = 0.;
+        dphids3 = 0.;
+    }
+    else if(phi > ini_phi) {
+        phi = ini_phi;
+        dphids3 = 0.;
+    }
 
-    const auto denom = 1. - sin(phi);
-    const auto max_dev_stress = 2. / r_f * (cohesion * cos(phi) + s3 * sin(phi)) / denom;
-    const auto pmdspphi = 2. / r_f * (s3 * cos(phi) / denom / denom + cohesion / denom);
-    const auto pmdsps3 = 2. / r_f * sin(phi) / denom;
+    const auto denom = 1. - std::sin(phi);
+    const auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
+    const auto pmdspphi = 2. / r_f * (s3 * std::cos(phi) / denom / denom + cohesion / denom);
+    const auto pmdsps3 = 2. / r_f * std::sin(phi) / denom;
     const auto dmdsds3 = pmdspphi * dphids3 + pmdsps3;
 
     const auto dev_stress = s1 - s3;
     const auto pdsps1 = 1.;
     const auto pdsps3 = -1.;
 
-    const auto ini_elastic = ref_elastic * pow(s3 / p_atm, n);
+    const auto ini_elastic = ref_elastic * std::pow(s3 / p_atm, n);
     const auto deids3 = n * ini_elastic / s3;
 
-    const auto pepei = pow(1. - dev_stress / max_dev_stress, 2.);
+    const auto pepei = std::pow(1. - dev_stress / max_dev_stress, 2.);
     const auto elastic = ini_elastic * pepei;
     const auto pepds = -2. * ini_elastic * (1. - dev_stress / max_dev_stress) / max_dev_stress;
     const auto pepmds = 2. * ini_elastic * (1. - dev_stress / max_dev_stress) * dev_stress / max_dev_stress / max_dev_stress;
@@ -63,7 +69,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
 
     // for bulk modulus
 
-    const auto bulk = ref_bulk * pow(s3 / p_atm, m);
+    const auto bulk = ref_bulk * std::pow(s3 / p_atm, m);
     const auto pkps3 = m * bulk / s3;
 
     const rowvec3 deds = peps1 * ds1ds + peps3 * ds3ds;
@@ -75,7 +81,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
 DuncanSelig::DuncanSelig(const unsigned T, const double R)
     : Material2D(T, PlaneType::E, R) {}
 
-int DuncanSelig::initialize(const shared_ptr<DomainBase>& D) {
+int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
     initial_stiffness.zeros(3, 3);
 
     trial_stiffness = current_stiffness = initial_stiffness;
@@ -90,8 +96,10 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
+    trial_stress = current_stress + ref_elastic * incre_strain;
+
     auto ref_error = 0.;
-    vec3 residual, incre;
+    vec3 incre;
     mat33 jacobian;
 
     auto counter = 0u;
@@ -106,14 +114,14 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         const auto factor_a = 3. * bulk * (3. * bulk + elastic);
         const auto factor_b = 3. * bulk * (3. * bulk - elastic);
 
-        const rowvec3 dfads = (18. * bulk + 3. * elastic) * dkds + 3. * bulk * deds;
-        const rowvec3 dfbds = (18. * bulk - 3. * elastic) * dkds - 3. * bulk * deds;
-
-        residual = (9. * bulk - elastic) * (trial_stress - current_stress);
+        vec3 residual = (9. * bulk - elastic) * (trial_stress - current_stress);
 
         residual(0) -= factor_a * incre_strain(0) + factor_b * incre_strain(1);
         residual(1) -= factor_b * incre_strain(0) + factor_a * incre_strain(1);
         residual(2) -= 3. * bulk * elastic * incre_strain(2);
+
+        const rowvec3 dfads = (18. * bulk + 3. * elastic) * dkds + 3. * bulk * deds;
+        const rowvec3 dfbds = (18. * bulk - 3. * elastic) * dkds - 3. * bulk * deds;
 
         jacobian = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - current_stress) * (9. * dkds - deds);
         jacobian.row(0) -= incre_strain(0) * dfads + incre_strain(1) * dfbds;
@@ -124,7 +132,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
-        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error / ref_error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         trial_stress -= incre;
