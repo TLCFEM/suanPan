@@ -45,7 +45,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
         if(phi < 0.) phi = dphids3 = 0.;
     }
 
-    static constexpr auto min_ratio = .01;
+    static constexpr auto min_ratio = 1.;
 
     const auto denom = 1. - std::sin(phi);
     auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
