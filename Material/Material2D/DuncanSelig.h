@@ -38,6 +38,7 @@ class DuncanSelig final : public Material2D {
 
     static double dev(const vec&);
     static rowvec3 der_dev(const vec&);
+    static mat33 compute_stiffness(double, double);
 
     double p_atm = 14.7;
     double ref_elastic = 400. * p_atm, n = .6;

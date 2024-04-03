@@ -22,10 +22,21 @@ double DuncanSelig::dev(const vec& t_stress) { return std::sqrt(std::pow(t_stres
 
 rowvec3 DuncanSelig::der_dev(const vec& t_stress) { return {t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)}; }
 
+mat33 DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
+    mat33 stiffness(fill::zeros);
+
+    stiffness(0, 0) = stiffness(1, 1) = 3. * bulk + elastic;
+    stiffness(1, 0) = stiffness(0, 1) = 3. * bulk - elastic;
+    stiffness(2, 2) = elastic;
+    stiffness *= 3. * bulk / (9. * bulk - elastic);
+
+    return stiffness;
+}
+
 int DuncanSelig::project_to_surface(double& elastic_portion) {
     const auto max_dev_stress = trial_history(0);
 
-    const vec elastic_stress = initial_stiffness * incre_strain;
+    const vec elastic_stress = trial_stiffness * incre_strain;
 
     auto counter = 0u;
     while(true) {
@@ -154,15 +165,13 @@ DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
 int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
     const auto [elastic, bulk, deds, dkds] = compute_moduli();
 
-    initial_stiffness.zeros(3, 3);
-    initial_stiffness(0, 0) = initial_stiffness(1, 1) = 3. * bulk + elastic;
-    initial_stiffness(1, 0) = initial_stiffness(0, 1) = 3. * bulk - elastic;
-    initial_stiffness(2, 2) = elastic;
-    initial_stiffness *= 3. * bulk / (9. * bulk - elastic);
+    trial_stiffness = current_stiffness = initial_stiffness = compute_stiffness(elastic, bulk);
 
-    trial_stiffness = current_stiffness = initial_stiffness;
+    initialize_history(3);
 
-    initialize_history(1);
+    initial_history(1) = elastic;
+    initial_history(2) = bulk;
+    trial_history = current_history = initial_history;
 
     return SUANPAN_SUCCESS;
 }
@@ -176,9 +185,11 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
     trial_history = current_history;
     auto& max_dev_stress = trial_history(0);
+    auto& last_elastic = trial_history(1);
+    auto& last_bulk = trial_history(2);
 
     // assuming elastic loading/unloading
-    trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
+    trial_stress = current_stress + (trial_stiffness = compute_stiffness(last_elastic, last_bulk)) * incre_strain;
 
     // if elastic response exceeds the maximum deviatoric stress, then the material is considered to be in a plastic state
     if(dev(trial_stress) <= max_dev_stress) return SUANPAN_SUCCESS;
@@ -190,7 +201,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         auto elastic_portion = .5;
         if(SUANPAN_SUCCESS != project_to_surface(elastic_portion)) return SUANPAN_FAIL;
 
-        net_stress = current_stress + initial_stiffness * incre_strain * elastic_portion;
+        net_stress = current_stress + trial_stiffness * incre_strain * elastic_portion;
         net_strain = (1. - elastic_portion) * incre_strain;
     }
 
@@ -234,6 +245,8 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
             max_dev_stress = dev(trial_stress);
+            last_elastic = elastic;
+            last_bulk = bulk;
 
             return SUANPAN_SUCCESS;
         }
