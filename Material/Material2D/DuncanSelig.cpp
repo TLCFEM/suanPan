@@ -113,7 +113,7 @@ DuncanSelig::DuncanSelig(const unsigned T, vec&& P, const double R)
     , ini_phi(P(5))
     , ten_fold_phi_diff(P(6))
     , r_f(P(7))
-    , cohesion(P(8)) {}
+    , cohesion(P(8)) { access::rw(tolerance) = 1E-13; }
 
 int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
     const auto [elastic, bulk, deds, dkds] = compute_moduli();
@@ -136,7 +136,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
-    trial_stress = current_stress + initial_stiffness * incre_strain;
+    trial_stress = current_stress + current_stiffness * incre_strain;
 
     auto ref_error = 0.;
     vec3 incre;
