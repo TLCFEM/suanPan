@@ -20,7 +20,7 @@
 
 double DuncanSelig::dev(const vec& t_stress) { return std::sqrt(std::pow(t_stress(0) - t_stress(1), 2) + std::pow(2. * t_stress(2), 2)); }
 
-rowvec3 DuncanSelig::der_dev(const vec& t_stress) { return rowvec3{t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)}; }
+rowvec3 DuncanSelig::der_dev(const vec& t_stress) { return {t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)}; }
 
 int DuncanSelig::project_to_surface(double& elastic_portion) {
     const auto max_dev_stress = trial_history(0);
@@ -59,8 +59,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
 
     const auto s1 = center + radius, s3 = center - radius;
 
-    const rowvec3 ds1ds = dcds + drds;
-    const rowvec3 ds3ds = dcds - drds;
+    const rowvec3 ds1ds = dcds + drds, ds3ds = dcds - drds;
 
     // for elastic modulus
     double phi, dphids3;
@@ -140,7 +139,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     return {elastic, bulk, deds, dkds};
 }
 
-DuncanSelig::DuncanSelig(const unsigned T, vec&& P, const double R)
+DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
     : Material2D(T, PlaneType::E, R)
     , p_atm(P(0))
     , ref_elastic(P(1))
@@ -234,15 +233,13 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
-            break;
+            max_dev_stress = dev(trial_stress);
+
+            return SUANPAN_SUCCESS;
         }
 
         trial_stress -= incre;
     }
-
-    max_dev_stress = dev(trial_stress);
-
-    return SUANPAN_SUCCESS;
 }
 
 int DuncanSelig::clear_status() {

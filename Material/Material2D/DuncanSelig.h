@@ -51,7 +51,7 @@ class DuncanSelig final : public Material2D {
 public:
     DuncanSelig(
         unsigned,   // tag
-        vec&&,      // parameters
+        const vec&, // parameters
         double = 0. // density
     );
 

@@ -1292,7 +1292,7 @@ void new_duncanselig(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<DuncanSelig>(tag, std::move(pool), density);
+    return_obj = make_unique<DuncanSelig>(tag, pool, density);
 }
 
 void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
