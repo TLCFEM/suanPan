@@ -25,7 +25,7 @@ rowvec3 DuncanSelig::der_dev(const vec& t_stress) { return {t_stress(0) - t_stre
 int DuncanSelig::project_to_surface(double& elastic_portion) {
     const auto max_dev_stress = trial_history(0);
 
-    const vec incre_stress = initial_stiffness * incre_strain;
+    const vec elastic_stress = initial_stiffness * incre_strain;
 
     auto counter = 0u;
     while(true) {
@@ -34,10 +34,10 @@ int DuncanSelig::project_to_surface(double& elastic_portion) {
             return SUANPAN_FAIL;
         }
 
-        const vec t_stress = current_stress + incre_stress * elastic_portion;
+        const vec t_stress = current_stress + elastic_stress * elastic_portion;
         const auto dev_stress = dev(t_stress);
         const auto residual = dev_stress - max_dev_stress;
-        const auto incre = residual * dev_stress / dot(der_dev(t_stress), incre_stress);
+        const auto incre = residual * dev_stress / dot(der_dev(t_stress), elastic_stress);
 
         if(std::abs(incre) < tolerance || (std::abs(residual) < tolerance && counter > 5u)) break;
 
