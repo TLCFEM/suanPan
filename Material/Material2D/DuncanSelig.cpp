@@ -18,15 +18,44 @@
 #include "DuncanSelig.h"
 #include <Domain/DomainBase.h>
 
+double DuncanSelig::dev(const vec& t_stress) { return std::sqrt(std::pow(t_stress(0) - t_stress(1), 2) + std::pow(2. * t_stress(2), 2)); }
+
+rowvec3 DuncanSelig::der_dev(const vec& t_stress) { return rowvec3{t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)}; }
+
+int DuncanSelig::project_to_surface(double& elastic_portion) {
+    const auto max_dev_stress = trial_history(0);
+
+    const vec incre_stress = initial_stiffness * incre_strain;
+
+    auto counter = 0u;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
+        const vec t_stress = current_stress + incre_stress * elastic_portion;
+        const auto dev_stress = dev(t_stress);
+        const auto residual = dev_stress - max_dev_stress;
+        const auto incre = residual * dev_stress / dot(der_dev(t_stress), incre_stress);
+
+        if(std::abs(incre) < tolerance || (std::abs(residual) < tolerance && counter > 5u)) break;
+
+        elastic_portion -= incre;
+    }
+
+    return SUANPAN_SUCCESS;
+}
+
 std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     // principal stresses
 
     const auto center = -.5 * (trial_stress(0) + trial_stress(1));
-    const rowvec3 dcds = {-.5, -.5, 0.};
+    const rowvec3 dcds{-.5, -.5, 0.};
 
-    auto radius = std::sqrt(std::pow(.5 * (trial_stress(0) - trial_stress(1)), 2) + std::pow(trial_stress(2), 2));
+    auto radius = .5 * dev(trial_stress);
     rowvec3 drds(fill::zeros);
-    if(radius > datum::eps) drds = rowvec3{trial_stress(0) - trial_stress(1), trial_stress(1) - trial_stress(0), 4. * trial_stress(2)} / radius * .25;
+    if(radius > datum::eps) drds = der_dev(trial_stress) / radius * .25;
 
     const auto s1 = center + radius, s3 = center - radius;
 
@@ -134,6 +163,8 @@ int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
+    initialize_history(1);
+
     return SUANPAN_SUCCESS;
 }
 
@@ -144,7 +175,25 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
-    trial_stress = current_stress + current_stiffness * incre_strain;
+    trial_history = current_history;
+    auto& max_dev_stress = trial_history(0);
+
+    // assuming elastic loading/unloading
+    trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
+
+    // if elastic response exceeds the maximum deviatoric stress, then the material is considered to be in a plastic state
+    if(dev(trial_stress) <= max_dev_stress) return SUANPAN_SUCCESS;
+
+    vec3 net_stress = current_stress, net_strain = incre_strain;
+
+    if(dev(current_stress) < max_dev_stress) {
+        // project onto the yield surface first
+        auto elastic_portion = .5;
+        if(SUANPAN_SUCCESS != project_to_surface(elastic_portion)) return SUANPAN_FAIL;
+
+        net_stress = current_stress + initial_stiffness * incre_strain * elastic_portion;
+        net_strain = (1. - elastic_portion) * incre_strain;
+    }
 
     auto ref_error = 0.;
     vec3 incre;
@@ -162,19 +211,20 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         const auto factor_a = 3. * bulk * (3. * bulk + elastic);
         const auto factor_b = 3. * bulk * (3. * bulk - elastic);
 
-        vec3 residual = (9. * bulk - elastic) * (trial_stress - current_stress);
+        mat33 right(fill::zeros);
+        right(0, 0) = right(1, 1) = factor_a;
+        right(0, 1) = right(1, 0) = factor_b;
+        right(2, 2) = 3. * bulk * elastic;
 
-        residual(0) -= factor_a * incre_strain(0) + factor_b * incre_strain(1);
-        residual(1) -= factor_b * incre_strain(0) + factor_a * incre_strain(1);
-        residual(2) -= 3. * bulk * elastic * incre_strain(2);
+        const vec3 residual = (9. * bulk - elastic) * (trial_stress - net_stress) - right * net_strain;
 
         const rowvec3 dfads = (18. * bulk + 3. * elastic) * dkds + 3. * bulk * deds;
         const rowvec3 dfbds = (18. * bulk - 3. * elastic) * dkds - 3. * bulk * deds;
 
-        jacobian = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - current_stress) * (9. * dkds - deds);
-        jacobian.row(0) -= incre_strain(0) * dfads + incre_strain(1) * dfbds;
-        jacobian.row(1) -= incre_strain(0) * dfbds + incre_strain(1) * dfads;
-        jacobian.row(2) -= incre_strain(2) * 3. * (bulk * deds + elastic * dkds);
+        jacobian = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - net_stress) * (9. * dkds - deds);
+        jacobian.row(0) -= net_strain(0) * dfads + net_strain(1) * dfbds;
+        jacobian.row(1) -= net_strain(0) * dfbds + net_strain(1) * dfads;
+        jacobian.row(2) -= net_strain(2) * 3. * (bulk * deds + elastic * dkds);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -182,11 +232,6 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error / ref_error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
-            mat33 right(fill::zeros);
-            right(0, 0) = right(1, 1) = factor_a;
-            right(0, 1) = right(1, 0) = factor_b;
-            right(2, 2) = 3. * bulk * elastic;
-
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
             break;
@@ -195,6 +240,8 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         trial_stress -= incre;
     }
 
+    max_dev_stress = dev(trial_stress);
+
     return SUANPAN_SUCCESS;
 }
 
@@ -202,6 +249,7 @@ int DuncanSelig::clear_status() {
     current_strain = trial_strain.zeros();
     current_stress = trial_stress.zeros();
     trial_stiffness = current_stiffness = initial_stiffness;
+    trial_history = current_history = initial_history;
     return SUANPAN_SUCCESS;
 }
 
@@ -209,6 +257,7 @@ int DuncanSelig::commit_status() {
     current_strain = trial_strain;
     current_stress = trial_stress;
     current_stiffness = trial_stiffness;
+    current_history = trial_history;
     return SUANPAN_SUCCESS;
 }
 
@@ -216,6 +265,7 @@ int DuncanSelig::reset_status() {
     trial_strain = current_strain;
     trial_stress = current_stress;
     trial_stiffness = current_stiffness;
+    trial_history = current_history;
     return SUANPAN_SUCCESS;
 }
 
