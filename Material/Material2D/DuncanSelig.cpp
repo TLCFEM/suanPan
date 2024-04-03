@@ -62,7 +62,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     const auto pdsps3 = -1.;
 
     double ini_elastic, deids3;
-    if(s3 < 0.) {
+    if(s3 < -min_ratio * p_atm) {
         ini_elastic = ref_elastic * std::pow(.01, n);
         deids3 = 0.;
     }
@@ -88,7 +88,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     // for bulk modulus
 
     double bulk, pkps3;
-    if(s3 < 0.) {
+    if(s3 < -min_ratio * p_atm) {
         bulk = ref_bulk * std::pow(.01, m);
         pkps3 = 0.;
     }
