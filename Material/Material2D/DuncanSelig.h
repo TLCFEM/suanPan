@@ -47,7 +47,7 @@ class DuncanSelig final : public Material2D {
 
     int project_to_surface(double&);
 
-    std::tuple<double, double, rowvec3, rowvec3> compute_moduli();
+    std::tuple<double, double, double, rowvec3, rowvec3> compute_moduli();
 
 public:
     DuncanSelig(

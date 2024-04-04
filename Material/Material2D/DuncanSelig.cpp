@@ -58,7 +58,7 @@ int DuncanSelig::project_to_surface(double& elastic_portion) {
     return SUANPAN_SUCCESS;
 }
 
-std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
+std::tuple<double, double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     // principal stresses
 
     const auto center = -.5 * (trial_stress(0) + trial_stress(1));
@@ -73,6 +73,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
     const rowvec3 ds1ds = dcds + drds, ds3ds = dcds - drds;
 
     // for elastic modulus
+
     double phi, dphids3;
     if(s3 < p_atm) {
         phi = ini_phi;
@@ -147,7 +148,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_moduli() {
         dkds = deds / 3.;
     }
 
-    return {elastic, bulk, deds, dkds};
+    return {ini_elastic, elastic, bulk, deds, dkds};
 }
 
 DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
@@ -163,7 +164,7 @@ DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
     , cohesion(P(8)) { access::rw(tolerance) = 1E-13; }
 
 int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
-    const auto [elastic, bulk, deds, dkds] = compute_moduli();
+    const auto [ini_elastic, elastic, bulk, deds, dkds] = compute_moduli();
 
     trial_stiffness = current_stiffness = initial_stiffness = compute_stiffness(elastic, bulk);
 
@@ -216,7 +217,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto [elastic, bulk, deds, dkds] = compute_moduli();
+        const auto [ini_elastic, elastic, bulk, deds, dkds] = compute_moduli();
 
         const auto factor_a = 3. * bulk * (3. * bulk + elastic);
         const auto factor_b = 3. * bulk * (3. * bulk - elastic);
@@ -245,7 +246,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
             max_dev_stress = dev(trial_stress);
-            last_elastic = elastic;
+            last_elastic = ini_elastic;
             last_bulk = bulk;
 
             return SUANPAN_SUCCESS;
