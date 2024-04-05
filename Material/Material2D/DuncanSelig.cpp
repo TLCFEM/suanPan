@@ -22,8 +22,8 @@ double DuncanSelig::dev(const vec& t_stress) { return std::sqrt(std::pow(t_stres
 
 rowvec3 DuncanSelig::der_dev(const vec& t_stress) { return {t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)}; }
 
-mat33 DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
-    mat33 stiffness(fill::zeros);
+mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
+    mat stiffness(3, 3, fill::zeros);
 
     stiffness(0, 0) = stiffness(1, 1) = 3. * bulk + elastic;
     stiffness(1, 0) = stiffness(0, 1) = 3. * bulk - elastic;
