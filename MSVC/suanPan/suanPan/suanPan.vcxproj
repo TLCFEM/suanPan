@@ -362,6 +362,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Uniaxial.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Concrete21.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Concrete22.cpp" />
+    <ClCompile Include="..\..\..\Material\Material2D\DuncanSelig.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Elastic\AxisymmetricElastic.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Elastic\Elastic2D.cpp" />
     <ClCompile Include="..\..\..\Material\Material2D\Material2D.cpp" />
@@ -851,6 +852,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Uniaxial.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Concrete21.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Concrete22.h" />
+    <ClInclude Include="..\..\..\Material\Material2D\DuncanSelig.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Elastic\AxisymmetricElastic.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Elastic\Elastic2D.h" />
     <ClInclude Include="..\..\..\Material\Material2D\Material2D.h" />

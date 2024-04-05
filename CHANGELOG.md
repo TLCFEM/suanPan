@@ -10,6 +10,7 @@
 ## version 3.4
 
 1. update `Armadillo` to version `12.8.1` [#193](https://github.com/TLCFEM/suanPan/pull/193)
+2. plane strain Duncan-Selig soil model [#195](https://github.com/TLCFEM/suanPan/pull/195)
 
 ## version 3.3
 

@@ -787,6 +787,12 @@
       "contents": "material Dhakal ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique material tag\n# (2) int, host material tag\n# (3) double, yield strain\n# (4) double, geometry parameter"
     },
     {
+      "trigger": "DuncanSelig",
+      "details": "duncan selig plane strain soil model",
+      "kind": "type",
+      "contents": "material DuncanSelig ${1:(1) ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, reference atmospheric pressure, postive, p_a\n# (3) double, reference elatic modulus, E_r\n# (4) double, elastic modulus exponent, n\n# (5) double, reference bulk modulus, B_r\n# (6) double, bulk modulus exponent, m\n# (7) double, initial friction angle, \\phi_i\n# (8) double, friction angle slope, \\Delta\\phi\n# (9) double, ratio of actual failure to ultimate failure, r_f\n# (10) double, cohesion, c\n# [11] double, density, default: 0.0"
+    },
+    {
       "trigger": "Dynamic",
       "details": "dynamic step",
       "kind": "type",
