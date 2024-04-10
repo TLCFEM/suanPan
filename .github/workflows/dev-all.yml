@@ -131,7 +131,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   macos-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
-    runs-on: macos-11
+    runs-on: macos-13
     timeout-minutes: 100
     strategy:
       matrix:

@@ -76,7 +76,7 @@ jobs:
           prerelease: true
           overwrite: true
   macos-master:
-    runs-on: macos-11
+    runs-on: macos-13
     timeout-minutes: 100
     strategy:
       matrix:
