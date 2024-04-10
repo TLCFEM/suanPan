@@ -18,7 +18,7 @@ RUN cd suanPan/build && cp suanPan*.rpm / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM fedora:38 as runtime
+FROM fedora:40 as runtime
 
 COPY --from=build /suanPan*.rpm /
 
