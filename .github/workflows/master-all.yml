@@ -95,7 +95,8 @@ jobs:
           brew install glfw glew
       - name: Compile
         run: |
-          /usr/local/bin/go build Checker/updater.go
+          brew install go
+          go build Checker/updater.go
           mkdir build && cd build
           brew install libomp
           export CC=$(brew --prefix llvm@15)/bin/clang
