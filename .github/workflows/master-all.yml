@@ -101,6 +101,7 @@ jobs:
           export CC=$(brew --prefix llvm@15)/bin/clang
           export CXX=$(brew --prefix llvm@15)/bin/clang++
           export FC=gfortran-11
+          export CXXFLAGS="-Wl,-ld_classic"
           cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=Release -DUSE_VTK=${{ matrix.vtk }} -DBUILD_MULTITHREAD=ON -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
           make install -j4
       - name: Pack
