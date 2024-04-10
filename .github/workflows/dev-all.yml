@@ -152,7 +152,7 @@ jobs:
           brew install glfw glew
       - name: Compile
         run: |
-          go build Checker/updater.go
+          /usr/local/bin/go build Checker/updater.go
           mkdir build && cd build
           brew install libomp
           if [ "${{ matrix.compiler }}" == "clang" ]; then
