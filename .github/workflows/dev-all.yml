@@ -152,10 +152,9 @@ jobs:
           brew install glfw glew
       - name: Compile
         run: |
-          brew install go
+          brew install go libomp
           go build Checker/updater.go
           mkdir build && cd build
-          brew install libomp
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
