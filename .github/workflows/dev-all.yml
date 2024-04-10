@@ -144,10 +144,6 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
-      - name: Golang
-        uses: actions/setup-go@v5
-        with:
-          cache: false
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |

@@ -84,10 +84,6 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
-      - name: Golang
-        uses: actions/setup-go@v5
-        with:
-          cache: false
       - name: Prepare
         run: |
           echo "SP_TIME=daily-$(date +''%y%m%d'')" >> $GITHUB_ENV
