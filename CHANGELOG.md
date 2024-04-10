@@ -11,6 +11,7 @@
 
 1. update `Armadillo` to version `12.8.2` [#193](https://github.com/TLCFEM/suanPan/pull/193)
 2. plane strain Duncan-Selig soil model [#195](https://github.com/TLCFEM/suanPan/pull/195)
+3. update `Catch2` to version `3.5.4`
 
 ## version 3.3
 

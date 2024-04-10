@@ -5,8 +5,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.5.3
-//  Generated: 2024-03-01 22:05:56.038084
+//  Catch v3.5.4
+//  Generated: 2024-04-10 12:03:46.281848
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -127,7 +127,7 @@ namespace Catch {
             namespace {
                 template<typename URng, typename Estimator> static sample resample(URng& rng, unsigned int resamples, double const* first, double const* last, Estimator& estimator) {
                     auto n = static_cast<size_t>(last - first);
-                    std::uniform_int_distribution<size_t> dist(0, n - 1);
+                    Catch::uniform_integer_distribution<size_t> dist(0, n - 1);
 
                     sample out;
                     out.reserve(resamples);
@@ -604,16 +604,14 @@ namespace Catch {
 
         // Insert the default reporter if user hasn't asked for a specific one
         if(m_data.reporterSpecifications.empty()) {
-            m_data.reporterSpecifications.push_back({
 #if defined( CATCH_CONFIG_DEFAULT_REPORTER )
-                CATCH_CONFIG_DEFAULT_REPORTER,
+            const auto default_spec = CATCH_CONFIG_DEFAULT_REPORTER;
 #else
-                "console",
+            const auto default_spec = "console";
 #endif
-                {},
-                {},
-                {}
-            });
+            auto parsed = parseReporterSpec(default_spec);
+            CATCH_ENFORCE(parsed, "Cannot parse the provided default reporter spec: '" << default_spec << '\'');
+            m_data.reporterSpecifications.push_back(std::move(*parsed));
         }
 
         if(enableBazelEnvSupport()) { readBazelEnvVars(); }
@@ -1703,7 +1701,7 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
-        static Version version(3, 5, 3, "", 0);
+        static Version version(3, 5, 4, "", 0);
         return version;
     }
 }
@@ -4921,6 +4919,8 @@ namespace Catch {
     }
 
     std::vector<TestCaseHandle> const& getAllTestCasesSorted(IConfig const& config) { return getRegistryHub().getTestCaseRegistry().getAllTestsSorted(config); }
+
+    TestRegistry::~TestRegistry() = default;
 
     void TestRegistry::registerTest(Detail::unique_ptr<TestCaseInfo> testInfo, Detail::unique_ptr<ITestInvoker> testInvoker) {
         m_handles.emplace_back(testInfo.get(), testInvoker.get());
