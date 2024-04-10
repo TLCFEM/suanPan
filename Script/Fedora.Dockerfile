@@ -1,4 +1,4 @@
-FROM fedora:36 as build
+FROM fedora:40 as build
 
 RUN dnf upgrade --refresh -y && dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git
 
@@ -18,7 +18,7 @@ RUN cd suanPan/build && cp suanPan*.rpm / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM fedora:38 as runtime
+FROM fedora:40 as runtime
 
 COPY --from=build /suanPan*.rpm /
 

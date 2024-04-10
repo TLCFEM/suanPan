@@ -131,7 +131,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   macos-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
-    runs-on: macos-11
+    runs-on: macos-13
     timeout-minutes: 100
     strategy:
       matrix:
@@ -144,10 +144,6 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
-      - name: Golang
-        uses: actions/setup-go@v5
-        with:
-          cache: false
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
@@ -156,18 +152,18 @@ jobs:
           brew install glfw glew
       - name: Compile
         run: |
+          brew install go libomp
           go build Checker/updater.go
           mkdir build && cd build
-          brew install libomp
+          export CXXFLAGS="-Wl,-ld_classic"
+          export FC=gfortran-11
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
-            export FC=gfortran-11
             cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
           else
             export CC=gcc-11
             export CXX=g++-11
-            export FC=gfortran-11
             cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
           fi
           make install -j4
