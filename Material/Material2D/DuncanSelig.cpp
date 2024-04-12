@@ -215,7 +215,9 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto branch = dev(trial_stress) > max_dev_stress ? &DuncanSelig::compute_plastic_moduli : &DuncanSelig::compute_elastic_moduli;
+        const auto trial_dev_stress = dev(trial_stress);
+
+        const auto branch = trial_dev_stress > max_dev_stress ? &DuncanSelig::compute_plastic_moduli : &DuncanSelig::compute_elastic_moduli;
 
         const auto [elastic, bulk, deds, dkds] = (this->*branch)();
 
@@ -245,7 +247,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
-            max_dev_stress = dev(trial_stress);
+            if(trial_dev_stress > max_dev_stress) max_dev_stress = trial_dev_stress;
 
             return SUANPAN_SUCCESS;
         }
@@ -279,7 +281,7 @@ int DuncanSelig::reset_status() {
 }
 
 void DuncanSelig::print() {
-    suanpan_info("The Duncan-Selig soil model.\n");
+    suanpan_info("The Duncan--Selig soil model.\n");
     suanpan_info("Strain:", current_strain);
     suanpan_info("Stress:", current_stress);
 }
