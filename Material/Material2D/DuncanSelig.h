@@ -45,9 +45,8 @@ class DuncanSelig final : public Material2D {
     double ref_bulk = 300. * p_atm, m = .2;
     double ini_phi = .7, ten_fold_phi_diff = .1, r_f = .7, cohesion = .5;
 
-    int project_to_surface(double&);
-
-    std::tuple<double, double, double, rowvec3, rowvec3> compute_moduli();
+    std::tuple<double, double, rowvec3, rowvec3> compute_elastic_moduli();
+    std::tuple<double, double, rowvec3, rowvec3> compute_plastic_moduli();
 
 public:
     DuncanSelig(
