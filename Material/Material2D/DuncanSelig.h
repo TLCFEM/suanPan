@@ -46,8 +46,8 @@ class DuncanSelig final : public Material2D {
     double ref_bulk = 300. * p_atm, m = .2;
     double ini_phi = .7, ten_fold_phi_diff = .1, r_f = .7, cohesion = .5;
 
-    std::tuple<double, double> compute_elastic(double);
-    std::tuple<double, double> compute_bulk(double);
+    std::tuple<double, double> compute_elastic(double) const;
+    std::tuple<double, double> compute_bulk(double) const;
     std::tuple<double, double, rowvec3, rowvec3> compute_elastic_moduli();
     std::tuple<double, double, rowvec3, rowvec3> compute_plastic_moduli();
 

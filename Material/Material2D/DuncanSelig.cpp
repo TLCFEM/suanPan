@@ -33,7 +33,7 @@ mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
     return stiffness;
 }
 
-std::tuple<double, double> DuncanSelig::compute_elastic(const double s3) {
+std::tuple<double, double> DuncanSelig::compute_elastic(const double s3) const {
     double elastic, deds3;
     if(s3 < -min_ratio * p_atm) {
         elastic = ref_elastic * std::pow(.01, n);
@@ -51,7 +51,7 @@ std::tuple<double, double> DuncanSelig::compute_elastic(const double s3) {
     return {elastic, deds3};
 }
 
-std::tuple<double, double> DuncanSelig::compute_bulk(const double s3) {
+std::tuple<double, double> DuncanSelig::compute_bulk(const double s3) const {
     double bulk, dkds3;
     if(s3 < -min_ratio * p_atm) {
         bulk = ref_bulk * std::pow(.01, m);
