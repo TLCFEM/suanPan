@@ -183,7 +183,7 @@ DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
     , cohesion(P(8)) { access::rw(tolerance) = 1E-13; }
 
 int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
-    const auto [elastic, bulk, deds, dkds] = compute_plastic_moduli();
+    const auto [elastic, bulk, deds, dkds] = compute_elastic_moduli();
 
     trial_stiffness = current_stiffness = initial_stiffness = compute_stiffness(elastic, bulk);
 
