@@ -33,6 +33,42 @@ mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
     return stiffness;
 }
 
+std::tuple<double, double> DuncanSelig::compute_elastic(const double s3) {
+    double elastic, deds3;
+    if(s3 < -min_ratio * p_atm) {
+        elastic = ref_elastic * std::pow(.01, n);
+        deds3 = 0.;
+    }
+    else if(s3 < min_ratio * p_atm) {
+        elastic = ref_elastic * std::pow(min_ratio, n);
+        deds3 = 0.;
+    }
+    else {
+        elastic = ref_elastic * std::pow(s3 / p_atm, n);
+        deds3 = n * elastic / s3;
+    }
+
+    return {elastic, deds3};
+}
+
+std::tuple<double, double> DuncanSelig::compute_bulk(const double s3) {
+    double bulk, dkds3;
+    if(s3 < -min_ratio * p_atm) {
+        bulk = ref_bulk * std::pow(.01, m);
+        dkds3 = 0.;
+    }
+    else if(s3 < min_ratio * p_atm) {
+        bulk = ref_bulk * std::pow(min_ratio, m);
+        dkds3 = 0.;
+    }
+    else {
+        bulk = ref_bulk * std::pow(s3 / p_atm, m);
+        dkds3 = m * bulk / s3;
+    }
+
+    return {bulk, dkds3};
+}
+
 std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_elastic_moduli() {
     // principal stresses
 
@@ -49,39 +85,13 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_elastic_moduli
 
     // for elastic modulus
 
-    static constexpr auto min_ratio = 1.;
-
-    double elastic, deds3;
-    if(s3 < -min_ratio * p_atm) {
-        elastic = ref_elastic * std::pow(.01, n);
-        deds3 = 0.;
-    }
-    else if(s3 < min_ratio * p_atm) {
-        elastic = ref_elastic * std::pow(min_ratio, n);
-        deds3 = 0.;
-    }
-    else {
-        elastic = ref_elastic * std::pow(s3 / p_atm, n);
-        deds3 = n * elastic / s3;
-    }
+    const auto [elastic, deds3] = compute_elastic(s3);
 
     const rowvec3 deds = deds3 * ds3ds;
 
     // for bulk modulus
 
-    double bulk, dkds3;
-    if(s3 < -min_ratio * p_atm) {
-        bulk = ref_bulk * std::pow(.01, m);
-        dkds3 = 0.;
-    }
-    else if(s3 < min_ratio * p_atm) {
-        bulk = ref_bulk * std::pow(min_ratio, m);
-        dkds3 = 0.;
-    }
-    else {
-        bulk = ref_bulk * std::pow(s3 / p_atm, m);
-        dkds3 = m * bulk / s3;
-    }
+    auto [bulk, dkds3] = compute_bulk(s3);
 
     rowvec3 dkds = dkds3 * ds3ds;
 
@@ -120,8 +130,6 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_plastic_moduli
         if(phi < 0.) phi = dphids3 = 0.;
     }
 
-    static constexpr auto min_ratio = 1.;
-
     const auto denom = 1. - std::sin(phi);
     auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
     auto dmdsds3 = 0.;
@@ -136,19 +144,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_plastic_moduli
     const auto pdsps1 = 1.;
     const auto pdsps3 = -1.;
 
-    double ini_elastic, deids3;
-    if(s3 < -min_ratio * p_atm) {
-        ini_elastic = ref_elastic * std::pow(.01, n);
-        deids3 = 0.;
-    }
-    else if(s3 < min_ratio * p_atm) {
-        ini_elastic = ref_elastic * std::pow(min_ratio, n);
-        deids3 = 0.;
-    }
-    else {
-        ini_elastic = ref_elastic * std::pow(s3 / p_atm, n);
-        deids3 = n * ini_elastic / s3;
-    }
+    const auto [ini_elastic, deids3] = compute_elastic(s3);
 
     const auto pepei = std::pow(1. - dev_stress / max_dev_stress, 2.);
     const auto elastic = ini_elastic * pepei;
@@ -162,21 +158,9 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_plastic_moduli
 
     // for bulk modulus
 
-    double bulk, pkps3;
-    if(s3 < -min_ratio * p_atm) {
-        bulk = ref_bulk * std::pow(.01, m);
-        pkps3 = 0.;
-    }
-    else if(s3 < min_ratio * p_atm) {
-        bulk = ref_bulk * std::pow(min_ratio, m);
-        pkps3 = 0.;
-    }
-    else {
-        bulk = ref_bulk * std::pow(s3 / p_atm, m);
-        pkps3 = m * bulk / s3;
-    }
+    auto [bulk, dkds3] = compute_bulk(s3);
 
-    rowvec3 dkds = pkps3 * ds3ds;
+    rowvec3 dkds = dkds3 * ds3ds;
 
     if(3. * bulk < elastic) {
         bulk = elastic / 3.;
