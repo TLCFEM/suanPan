@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+// ReSharper disable IdentifierTypo
 #include "DuncanSelig.h"
 #include <Domain/DomainBase.h>
 
@@ -72,7 +73,7 @@ std::tuple<double, double> DuncanSelig::compute_bulk(const double s3) const {
 std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_elastic_moduli() {
     // principal stresses
 
-    auto radius = .5 * dev(trial_stress);
+    const auto radius = .5 * dev(trial_stress);
     rowvec3 drds(fill::zeros);
     if(radius > datum::eps) drds = der_dev(trial_stress) / radius * .25;
 
@@ -206,7 +207,6 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
     auto ref_error = 0.;
     vec3 incre;
-    mat33 jacobian;
 
     auto counter = 0u;
     while(true) {
@@ -234,7 +234,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         const rowvec3 dfads = (18. * bulk + 3. * elastic) * dkds + 3. * bulk * deds;
         const rowvec3 dfbds = (18. * bulk - 3. * elastic) * dkds - 3. * bulk * deds;
 
-        jacobian = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - current_stress) * (9. * dkds - deds);
+        mat33 jacobian = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - current_stress) * (9. * dkds - deds);
         jacobian.row(0) -= incre_strain(0) * dfads + incre_strain(1) * dfbds;
         jacobian.row(1) -= incre_strain(0) * dfbds + incre_strain(1) * dfads;
         jacobian.row(2) -= incre_strain(2) * 3. * (bulk * deds + elastic * dkds);
