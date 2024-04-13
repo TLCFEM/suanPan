@@ -35,37 +35,19 @@ mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
 }
 
 std::tuple<double, double> DuncanSelig::compute_elastic(const double s3) const {
-    double elastic, deds3;
-    if(s3 < -min_ratio * p_atm) {
-        elastic = ref_elastic * std::pow(.01, n);
-        deds3 = 0.;
-    }
-    else if(s3 < min_ratio * p_atm) {
-        elastic = ref_elastic * std::pow(min_ratio, n);
-        deds3 = 0.;
-    }
-    else {
-        elastic = ref_elastic * std::pow(s3 / p_atm, n);
-        deds3 = n * elastic / s3;
-    }
+    double elastic, deds3 = 0.;
+    if(s3 < -min_ratio * p_atm) elastic = ref_elastic * std::pow(.01, n);
+    else if(s3 < min_ratio * p_atm) elastic = ref_elastic * std::pow(min_ratio, n);
+    else deds3 = n * (elastic = ref_elastic * std::pow(s3 / p_atm, n)) / s3;
 
     return {elastic, deds3};
 }
 
 std::tuple<double, double> DuncanSelig::compute_bulk(const double s3) const {
-    double bulk, dkds3;
-    if(s3 < -min_ratio * p_atm) {
-        bulk = ref_bulk * std::pow(.01, m);
-        dkds3 = 0.;
-    }
-    else if(s3 < min_ratio * p_atm) {
-        bulk = ref_bulk * std::pow(min_ratio, m);
-        dkds3 = 0.;
-    }
-    else {
-        bulk = ref_bulk * std::pow(s3 / p_atm, m);
-        dkds3 = m * bulk / s3;
-    }
+    double bulk, dkds3 = 0.;
+    if(s3 < -min_ratio * p_atm) bulk = ref_bulk * std::pow(.01, m);
+    else if(s3 < min_ratio * p_atm) bulk = ref_bulk * std::pow(min_ratio, m);
+    else dkds3 = m * (bulk = ref_bulk * std::pow(s3 / p_atm, m)) / s3;
 
     return {bulk, dkds3};
 }
@@ -120,16 +102,10 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_plastic_moduli
 
     // for elastic modulus
 
-    double phi, dphids3;
-    if(s3 < p_atm) {
-        phi = ini_phi;
-        dphids3 = 0.;
-    }
-    else {
-        phi = ini_phi - ten_fold_phi_diff * log10(s3 / p_atm);
-        dphids3 = -ten_fold_phi_diff / (s3 * log(10));
-        if(phi < 0.) phi = dphids3 = 0.;
-    }
+    double phi, dphids3 = 0.;
+    if(s3 < p_atm) phi = ini_phi;
+    else if(phi = ini_phi - ten_fold_phi_diff * log10(s3 / p_atm); phi < 0.) phi = 0.;
+    else dphids3 = -ten_fold_phi_diff / (s3 * log(10));
 
     const auto denom = 1. - std::sin(phi);
     auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
