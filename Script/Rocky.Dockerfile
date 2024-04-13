@@ -15,3 +15,5 @@ COPY --from=build /suanPan*.rpm /
 RUN dnf install ./suanPan*.rpm -y
 
 RUN suanPan -v
+
+ENTRYPOINT ["suanPan"]
