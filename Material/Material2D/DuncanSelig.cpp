@@ -135,7 +135,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_plastic_moduli
     auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
     auto dmdsds3 = 0.;
     if(max_dev_stress > min_ratio * p_atm) {
-        const auto pmdspphi = 2. / r_f * (s3 * std::cos(phi) / denom / denom + cohesion / denom);
+        const auto pmdspphi = 2. / r_f * (s3 * std::cos(phi) / denom + cohesion) / denom;
         const auto pmdsps3 = 2. / r_f * std::sin(phi) / denom;
         dmdsds3 = pmdspphi * dphids3 + pmdsps3;
     }
@@ -150,7 +150,7 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_plastic_moduli
     const auto pepei = std::pow(1. - dev_stress / max_dev_stress, 2.);
     const auto elastic = ini_elastic * pepei;
     const auto pepds = -2. * ini_elastic * (1. - dev_stress / max_dev_stress) / max_dev_stress;
-    const auto pepmds = 2. * ini_elastic * (1. - dev_stress / max_dev_stress) * dev_stress / max_dev_stress / max_dev_stress;
+    const auto pepmds = -pepds * dev_stress / max_dev_stress;
 
     const auto peps1 = pepds * pdsps1;
     const auto peps3 = pepei * deids3 + pepds * pdsps3 + pepmds * dmdsds3;
