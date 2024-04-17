@@ -295,7 +295,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     const auto ref_stress = trial_stress;
     const vec ref_strain = (1. - multiplier) * incre_strain;
 
-    auto counter = 0u;
+    counter = 0u;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
