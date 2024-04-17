@@ -41,6 +41,8 @@ class DuncanSelig final : public Material2D {
     static rowvec3 der_dev(const vec&);
     static mat compute_stiffness(double, double);
 
+    using ds_moduli = std::tuple<double, double, rowvec3, rowvec3>;
+
     double p_atm = 14.7;
     double ref_elastic = 400. * p_atm, n = .6;
     double ref_bulk = 300. * p_atm, m = .2;
@@ -48,8 +50,11 @@ class DuncanSelig final : public Material2D {
 
     [[nodiscard]] std::tuple<double, double> compute_elastic(double) const;
     [[nodiscard]] std::tuple<double, double> compute_bulk(double) const;
-    [[nodiscard]] std::tuple<double, double, rowvec3, rowvec3> compute_elastic_moduli();
-    [[nodiscard]] std::tuple<double, double, rowvec3, rowvec3> compute_plastic_moduli();
+    [[nodiscard]] ds_moduli compute_elastic_moduli();
+    [[nodiscard]] ds_moduli compute_plastic_moduli();
+
+    int project_onto_surface(double&);
+    int local_update(const vec&, const vec&, bool);
 
 public:
     DuncanSelig(
