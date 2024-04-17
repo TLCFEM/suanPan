@@ -51,6 +51,8 @@ class DuncanSelig final : public Material2D {
     [[nodiscard]] std::tuple<double, double, rowvec3, rowvec3> compute_elastic_moduli();
     [[nodiscard]] std::tuple<double, double, rowvec3, rowvec3> compute_plastic_moduli();
 
+    int project(double&);
+
 public:
     DuncanSelig(
         unsigned,   // tag
