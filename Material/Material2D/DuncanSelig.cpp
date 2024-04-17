@@ -89,12 +89,12 @@ std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_elastic_moduli
 std::tuple<double, double, rowvec3, rowvec3> DuncanSelig::compute_plastic_moduli() {
     // principal stresses
 
-    const auto center = -.5 * (trial_stress(0) + trial_stress(1));
-    const rowvec3 dcds{-.5, -.5, 0.};
-
-    auto radius = .5 * dev(trial_stress);
+    const auto radius = .5 * dev(trial_stress);
     rowvec3 drds(fill::zeros);
     if(radius > datum::eps) drds = der_dev(trial_stress) / radius * .25;
+
+    const auto center = -.5 * (trial_stress(0) + trial_stress(1));
+    const rowvec3 dcds{-.5, -.5, 0.};
 
     const auto s1 = center + radius, s3 = center - radius;
 
