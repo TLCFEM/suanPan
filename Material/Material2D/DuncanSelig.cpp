@@ -219,9 +219,9 @@ int DuncanSelig::local_update(const vec& ref_stress, const vec& ref_strain, cons
     while(true) {
         if(max_iteration == ++counter) {
             if(two_stage)
-                suanpan_debug("Local iteration cannot converge within {} iterations.\n", max_iteration);
-            else
                 suanpan_error("Local iteration cannot converge within {} iterations.\n", max_iteration);
+            else
+                suanpan_debug("Local iteration cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
