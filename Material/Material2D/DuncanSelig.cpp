@@ -181,14 +181,15 @@ int DuncanSelig::project(double& multiplier) {
         residual.head(3) = (9. * bulk - elastic) * (trial_stress - current_stress) - right * e_strain;
         residual(3) = trial_dev_stress - max_dev_stress;
 
-        const rowvec3 dfads = (18. * bulk + 3. * elastic) * dkds + 3. * bulk * deds;
-        const rowvec3 dfbds = (18. * bulk - 3. * elastic) * dkds - 3. * bulk * deds;
+        const rowvec3 factor_c = 3. * (elastic * dkds + bulk * deds);
+        const rowvec3 dfads = 18. * bulk * dkds + factor_c;
+        const rowvec3 dfbds = 18. * bulk * dkds - factor_c;
 
         mat44 jacobian(fill::zeros);
         jacobian(sa, sa) = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - current_stress) * (9. * dkds - deds);
         jacobian.row(0).head(3) -= e_strain(0) * dfads + e_strain(1) * dfbds;
         jacobian.row(1).head(3) -= e_strain(0) * dfbds + e_strain(1) * dfads;
-        jacobian.row(2).head(3) -= e_strain(2) * 3. * (bulk * deds + elastic * dkds);
+        jacobian.row(2).head(3) -= e_strain(2) * factor_c;
         jacobian(sa, sb) = -right * incre_strain;
         jacobian(sb, sa) = der_dev(trial_stress) / trial_dev_stress;
 
@@ -245,7 +246,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
+            break;
         }
 
         const auto trial_dev_stress = dev(trial_stress);
@@ -264,13 +265,14 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
         const vec3 residual = (9. * bulk - elastic) * (trial_stress - current_stress) - right * incre_strain;
 
-        const rowvec3 dfads = (18. * bulk + 3. * elastic) * dkds + 3. * bulk * deds;
-        const rowvec3 dfbds = (18. * bulk - 3. * elastic) * dkds - 3. * bulk * deds;
+        const rowvec3 factor_c = 3. * (elastic * dkds + bulk * deds);
+        const rowvec3 dfads = 18. * bulk * dkds + factor_c;
+        const rowvec3 dfbds = 18. * bulk * dkds - factor_c;
 
         mat33 jacobian = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - current_stress) * (9. * dkds - deds);
         jacobian.row(0) -= incre_strain(0) * dfads + incre_strain(1) * dfbds;
         jacobian.row(1) -= incre_strain(0) * dfbds + incre_strain(1) * dfads;
-        jacobian.row(2) -= incre_strain(2) * 3. * (bulk * deds + elastic * dkds);
+        jacobian.row(2) -= incre_strain(2) * factor_c;
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -281,6 +283,55 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
             if(trial_dev_stress > max_dev_stress) max_dev_stress = trial_dev_stress;
+
+            return SUANPAN_SUCCESS;
+        }
+
+        trial_stress -= incre;
+    }
+
+    auto multiplier = 1.;
+    if(SUANPAN_SUCCESS != project(multiplier)) return SUANPAN_FAIL;
+    const auto ref_stress = trial_stress;
+    const vec ref_strain = (1. - multiplier) * incre_strain;
+
+    auto counter = 0u;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
+        const auto [elastic, bulk, deds, dkds] = compute_plastic_moduli();
+
+        const auto factor_a = 3. * bulk * (3. * bulk + elastic);
+        const auto factor_b = 3. * bulk * (3. * bulk - elastic);
+
+        mat33 right(fill::zeros);
+        right(0, 0) = right(1, 1) = factor_a;
+        right(0, 1) = right(1, 0) = factor_b;
+        right(2, 2) = 3. * bulk * elastic;
+
+        const vec3 residual = (9. * bulk - elastic) * (trial_stress - ref_stress) - right * ref_strain;
+
+        const rowvec3 factor_c = 3. * (elastic * dkds + bulk * deds);
+        const rowvec3 dfads = 18. * bulk * dkds + factor_c;
+        const rowvec3 dfbds = 18. * bulk * dkds - factor_c;
+
+        mat33 jacobian = (9. * bulk - elastic) * eye(3, 3) + (trial_stress - ref_stress) * (9. * dkds - deds);
+        jacobian.row(0) -= ref_strain(0) * dfads + ref_strain(1) * dfbds;
+        jacobian.row(1) -= ref_strain(0) * dfbds + ref_strain(1) * dfads;
+        jacobian.row(2) -= ref_strain(2) * factor_c;
+
+        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error / ref_error);
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+            if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
+
+            max_dev_stress = dev(trial_stress);
 
             return SUANPAN_SUCCESS;
         }
