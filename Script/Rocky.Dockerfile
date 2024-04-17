@@ -14,6 +14,7 @@ COPY --from=build /suanPan*.rpm /
 
 RUN dnf install ./suanPan*.rpm -y
 
-RUN suanPan -v
+RUN ln -s $(which suanPan) /usr/bin/suanpan
+RUN ln -s $(which suanPan) /usr/bin/sp
 
-ENTRYPOINT ["suanPan"]
+RUN sp -v

@@ -35,6 +35,7 @@ COPY --from=build /suanPan*.deb /
 
 RUN apt-get update -y && apt-get install ./suanPan*.deb -y
 
-RUN suanPan -v
+RUN ln -s $(which suanPan) /usr/bin/suanpan
+RUN ln -s $(which suanPan) /usr/bin/sp
 
-ENTRYPOINT ["suanPan"]
+RUN sp -v
