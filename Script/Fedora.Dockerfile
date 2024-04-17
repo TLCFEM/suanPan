@@ -24,7 +24,7 @@ COPY --from=build /suanPan*.rpm /
 
 RUN dnf upgrade --refresh -y && dnf install ./suanPan*.rpm -y
 
-RUN ln -s $(which suanPan) /usr/bin/suanpan
-RUN ln -s $(which suanPan) /usr/bin/sp
+RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
+RUN ln -s /usr/bin/suanPan /usr/bin/sp
 
 RUN sp -v
