@@ -304,6 +304,9 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     // first try a whole step size local iteration
     if(SUANPAN_SUCCESS == local_update(current_stress, incre_strain, false)) return update_dev_stress();
 
+    // alternatively, directly use the plastic branch
+    // if(SUANPAN_SUCCESS == local_update(current_stress, incre_strain, true)) return update_dev_stress();
+
     // if that fails, mostly likely due to discontinuity of the gradient
     // assume proportional loading, project the stress onto the yield surface using elastic moduli
     auto multiplier = 1.;
