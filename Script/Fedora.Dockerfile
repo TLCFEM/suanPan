@@ -22,7 +22,7 @@ FROM fedora:40 as runtime
 
 COPY --from=build /suanPan*.rpm /
 
-RUN dnf upgrade --refresh -y && dnf install ./suanPan*.rpm -y
+RUN dnf install ./suanPan*.rpm -y && rm ./suanPan*.rpm
 
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
 RUN ln -s /usr/bin/suanPan /usr/bin/sp

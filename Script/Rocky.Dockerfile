@@ -12,7 +12,7 @@ FROM rockylinux:9 as runtime
 
 COPY --from=build /suanPan*.rpm /
 
-RUN dnf install ./suanPan*.rpm -y
+RUN dnf install ./suanPan*.rpm -y && rm ./suanPan*.rpm
 
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
 RUN ln -s /usr/bin/suanPan /usr/bin/sp
