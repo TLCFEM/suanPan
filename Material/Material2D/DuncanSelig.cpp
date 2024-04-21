@@ -251,7 +251,7 @@ int DuncanSelig::local_update(const vec& ref_stress, const vec& ref_strain, cons
 
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
-        suanpan_debug("Local iteration error: {:.5E}.\n", error / ref_error);
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
