@@ -134,8 +134,7 @@ on [Chocolatey](https://chocolatey.org/packages/suanpan), please use the followi
    choco install suanpan
    ```
 
-3. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal)
-   and [Fluent Terminal](https://github.com/felixse/FluentTerminal) for better output display.
+3. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal) for better output display.
 
 The Chocolatey repo available to you may not be up-to-date.
 If the latest version is not available, please try alternatives, such as portable binaries or scoop.
