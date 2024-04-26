@@ -28,6 +28,12 @@
 /* Check which standard library we use. */
 #include <cstddef>
 
+#ifdef __has_include
+#if __has_include(<version>)
+#include <version>
+#endif
+#endif
+
 #include "_export.h"
 
 #if _MSC_VER
@@ -182,7 +188,7 @@
 
 /** __TBB_DYNAMIC_LOAD_ENABLED describes the system possibility to load shared libraries at run time **/
 #ifndef __TBB_DYNAMIC_LOAD_ENABLED
-    #define __TBB_DYNAMIC_LOAD_ENABLED 1
+    #define __TBB_DYNAMIC_LOAD_ENABLED (!__EMSCRIPTEN__)
 #endif
 
 /** __TBB_WIN8UI_SUPPORT enables support of Windows* Store Apps and limit a possibility to load
@@ -195,7 +201,7 @@
 
 /** __TBB_WEAK_SYMBOLS_PRESENT denotes that the system supports the weak symbol mechanism **/
 #ifndef __TBB_WEAK_SYMBOLS_PRESENT
-    #define __TBB_WEAK_SYMBOLS_PRESENT ( !_WIN32 && !__APPLE__ && !__sun && (__TBB_GCC_VERSION >= 40000 || __INTEL_COMPILER ) )
+    #define __TBB_WEAK_SYMBOLS_PRESENT ( !__EMSCRIPTEN__ && !_WIN32 && !__APPLE__ && !__sun && (__TBB_GCC_VERSION >= 40000 || __INTEL_COMPILER ) )
 #endif
 
 /** Presence of compiler features **/
@@ -220,7 +226,7 @@
 /** Library features presence macros **/
 
 #define __TBB_CPP14_INTEGER_SEQUENCE_PRESENT       (__TBB_LANG >= 201402L)
-#define __TBB_CPP17_INVOKE_RESULT_PRESENT          (__TBB_LANG >= 201703L)
+#define __TBB_CPP17_INVOKE_PRESENT                 (__TBB_LANG >= 201703L)
 
 // TODO: Remove the condition(__INTEL_COMPILER > 2021) from the __TBB_CPP17_DEDUCTION_GUIDES_PRESENT
 // macro when this feature start working correctly on this compiler.
@@ -265,7 +271,7 @@
 #if defined(__cpp_impl_three_way_comparison) && defined(__cpp_lib_three_way_comparison)
     #define __TBB_CPP20_COMPARISONS_PRESENT ((__cpp_impl_three_way_comparison >= 201907L) && (__cpp_lib_three_way_comparison >= 201907L))
 #else
-    #define __TBB_CPP20_COMPARISONS_PRESENT __TBB_CPP20_PRESENT
+    #define __TBB_CPP20_COMPARISONS_PRESENT 0
 #endif
 
 #define __TBB_RESUMABLE_TASKS                           (!__TBB_WIN8UI_SUPPORT && !__ANDROID__ && !__QNXNTO__ && (!__linux__ || __GLIBC__))
@@ -373,6 +379,9 @@
 #ifndef __TBB_ARENA_BINDING
     #define __TBB_ARENA_BINDING 1
 #endif
+
+// Thread pinning is not available on macOS*
+#define __TBB_CPUBIND_PRESENT (__TBB_ARENA_BINDING && !__APPLE__)
 
 #ifndef __TBB_ENQUEUE_ENFORCED_CONCURRENCY
     #define __TBB_ENQUEUE_ENFORCED_CONCURRENCY 1
