@@ -38,11 +38,12 @@ template<sp_d T> class BandMat : public DenseMat<T> {
     static T bin;
 
     const uword s_band;
-    const uword m_rows; // memory block layout
 
     int solve_trs(Mat<T>&, Mat<T>&&);
 
 protected:
+    const uword m_rows; // memory block layout
+
     const uword l_band;
     const uword u_band;
 

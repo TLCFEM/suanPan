@@ -3031,6 +3031,9 @@
     <ClInclude Include="..\..\..\Material\Material2D\DuncanSelig.h">
       <Filter>Material\Material2D</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMatMAGMA.hpp">
+      <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />
