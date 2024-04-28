@@ -5,6 +5,7 @@
 
 #include "BandMat.hpp"
 #include "BandMatCUDA.hpp"
+#include "BandMatMAGMA.hpp"
 #include "BandMatSpike.hpp"
 #include "BandSymmMat.hpp"
 #include "FullMat.hpp"

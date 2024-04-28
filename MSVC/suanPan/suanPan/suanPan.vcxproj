@@ -621,6 +621,7 @@
     <ClInclude Include="..\..\..\Domain\Group\NodeGroup.h" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMatCUDA.hpp" />
+    <ClInclude Include="..\..\..\Domain\MetaMat\BandMatMAGMA.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMatSpike.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\BandSymmMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\csc_form.hpp" />

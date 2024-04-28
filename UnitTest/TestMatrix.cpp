@@ -11,21 +11,21 @@ template<typename MT, typename ET, std::invocable T> void test_mat_solve(MT& A, 
 
     // full solve
     A.solve(E, C);
-    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D, "inf") < scaled_tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D, "inf") < scaled_tol);
 
     clear_mat();
 
     // r-value full solve
     A.solve(E, Mat<ET>(C));
-    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D, "inf") < scaled_tol);
 
     // r-value factored solve
     A.solve(E, Mat<ET>(C));
-    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D, "inf") < scaled_tol);
 
     // mixed precision
     A.get_solver_setting().precision = Precision::MIXED;
@@ -35,21 +35,21 @@ template<typename MT, typename ET, std::invocable T> void test_mat_solve(MT& A, 
 
     // full solve
     A.solve(E, C);
-    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D, "inf") < scaled_tol);
 
     // factored solve
     A.solve(E, C);
-    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D, "inf") < scaled_tol);
 
     clear_mat();
 
     // r-value full solve
     A.solve(E, Mat<ET>(C));
-    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D, "inf") < scaled_tol);
 
     // r-value factored solve
     A.solve(E, Mat<ET>(C));
-    REQUIRE(arma::norm<Col<ET>>(E - D) < scaled_tol);
+    REQUIRE(arma::norm<Col<ET>>(E - D, "inf") < scaled_tol);
 }
 
 template<typename ET, std::invocable<u64> F> void test_dense_mat_setup(F new_mat) {
@@ -190,6 +190,10 @@ template<> SparseMatCUDA<double> create_new(const u64 N) { return {N, N}; }
 template<> SparseMatCUDA<float> create_new(const u64 N) { return {N, N}; }
 
 #ifdef SUANPAN_MAGMA
+template<> BandMatMAGMA<double> create_new(const u64 N) { return {N, 3, 3}; }
+
+template<> BandMatMAGMA<float> create_new(const u64 N) { return {N, 3, 3}; }
+
 template<> SparseMatMAGMA<double> create_new(const u64 N) {
     istringstream dummy{"--verbose 1"};
     return {N, N, magma_parse_opts<magma_dopts>(dummy)};
@@ -239,7 +243,8 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<SparseMatCUDA<ET>, T>) title = "Sparse CUDA ";
     else if(std::is_same_v<BandMatCUDA<ET>, T>) title = "Band CUDA ";
 #ifdef SUANPAN_MAGMA
-    else if(std::is_same_v<SparseMatMAGMA<ET>, T>) title = "Magma ";
+    else if(std::is_same_v<BandMatMAGMA<ET>, T>) title = "Band Magma ";
+    else if(std::is_same_v<SparseMatMAGMA<ET>, T>) title = "Sparse Magma ";
 #endif
 #endif
 
@@ -354,13 +359,18 @@ TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(cr
 TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatCUDA<float>>); }
 
 #ifdef SUANPAN_MAGMA
+TEST_CASE("BandMatMAGMA", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatMAGMA<double>>); }
+
+TEST_CASE("BandMatMAGMAFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<BandMatMAGMA<float>>); }
+
 TEST_CASE("SparseMatMAGMA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMAGMA<double>>); }
 
 TEST_CASE("SparseMatMAGMAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMAGMA<float>>); }
 
 TEST_CASE("Large CUDA Sparse", "[Matrix.Benchmark]") {
-    benchmark_mat_setup<SparseMatPARDISO<double>, double>(0x400);
     benchmark_mat_setup<BandSymmMat<double>, double>(0x2976);
+    benchmark_mat_setup<BandMatMAGMA<double>, double>(0x2976);
+    benchmark_mat_setup<SparseMatPARDISO<double>, double>(0x400);
     benchmark_mat_setup<SparseMatMAGMA<double>, double>(0x400);
     benchmark_mat_setup<SparseMatMAGMA<float>, float>(0x400);
 }
@@ -560,6 +570,10 @@ TEST_CASE("Unify SparseMatPARDISO", "[Matrix.Utility]") { test_sparse_mat_unify(
 
 #ifdef SUANPAN_CUDA
 TEST_CASE("Unify SparseMatCUDA", "[Matrix.Utility]") { test_sparse_mat_unify(SparseMatCUDA<double>(10, 10)); }
+
+#ifdef SUANPAN_MAGMA
+TEST_CASE("Unify BandMatMAGMA", "[Matrix.Utility]") { test_dense_mat_unify(BandMatMAGMA<double>(10, 2, 3)); }
+#endif
 #endif
 
 TEST_CASE("Aligned Round", "[Matrix.Utility]") {
