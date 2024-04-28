@@ -85,6 +85,8 @@ template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
     const auto LDDAB = magma_roundup(LDAB, 32);
     const auto LDDB = magma_roundup(LDB, 32);
+    const auto SIZEA = LDDAB * N;
+    const auto SIZEB = LDDB * NRHS;
 
     release();
 
@@ -93,8 +95,8 @@ template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if constexpr(std::is_same_v<T, float>) {
         using E = float;
 
-        magma_smalloc((magmaFloat_ptr*)&APTR, LDDAB * N);
-        magma_smalloc((magmaFloat_ptr*)&BPTR, LDDB * NRHS);
+        magma_smalloc((magmaFloat_ptr*)&APTR, SIZEA);
+        magma_smalloc((magmaFloat_ptr*)&BPTR, SIZEB);
 
         magma_ssetmatrix(LDAB, N, (E*)this->memptr(), LDAB, (magmaFloat_ptr)APTR, LDDAB, queue);
         magma_ssetmatrix(N, NRHS, (E*)B.memptr(), LDB, (magmaFloat_ptr)BPTR, LDDB, queue);
@@ -106,8 +108,8 @@ template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     else if(Precision::FULL == this->setting.precision) {
         using E = double;
 
-        magma_dmalloc((magmaDouble_ptr*)&APTR, LDDAB * N);
-        magma_dmalloc((magmaDouble_ptr*)&BPTR, LDDB * NRHS);
+        magma_dmalloc((magmaDouble_ptr*)&APTR, SIZEA);
+        magma_dmalloc((magmaDouble_ptr*)&BPTR, SIZEB);
 
         magma_dsetmatrix(LDAB, N, (E*)this->memptr(), LDAB, (magmaDouble_ptr)APTR, LDDAB, queue);
         magma_dsetmatrix(N, NRHS, (E*)B.memptr(), LDB, (magmaDouble_ptr)BPTR, LDDB, queue);
@@ -117,8 +119,8 @@ template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         X = std::move(B);
     }
     else {
-        magma_smalloc((magmaFloat_ptr*)&APTR, LDDAB * N);
-        magma_smalloc((magmaFloat_ptr*)&BPTR, LDDB * NRHS);
+        magma_smalloc((magmaFloat_ptr*)&APTR, SIZEA);
+        magma_smalloc((magmaFloat_ptr*)&BPTR, SIZEB);
 
         this->s_memory = this->to_float();
 
