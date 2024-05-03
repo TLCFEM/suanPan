@@ -4,7 +4,7 @@
 
 1. The `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 2. The `SPIKE` solver may occasionally freeze, to circumvent, try to avoid mixing compilers from different vendors.
-3. The `MUMPS` solver throws segfaults with large matrices.
+3. The `MUMPS` solver throws segfaults with large matrices, appears to be quite slow.
 4. The `FGMRES` solver requires refinements.
 
 ## version 3.4
@@ -13,6 +13,7 @@
 2. plane strain Duncan-Selig soil model [#195](https://github.com/TLCFEM/suanPan/pull/195)
 3. update `Catch2` to version `3.5.4`
 4. update `TBB` to version `2021.12.0` [#199](https://github.com/TLCFEM/suanPan/pull/199)
+5. update `MUMPS` to version `5.7.0` [#201](https://github.com/TLCFEM/suanPan/pull/201)
 
 ## version 3.3
 
