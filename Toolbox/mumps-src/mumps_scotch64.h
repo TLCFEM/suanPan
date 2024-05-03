@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.0, released
+ *  on Tue Apr 23 10:25:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -36,13 +36,16 @@ MUMPS_SCOTCH_ORD_64( const MUMPS_INT8 * const  n,
                        MUMPS_INT8 * const  petab,
                  const MUMPS_INT8 * const  pfree,
                        MUMPS_INT8 * const  lentab,
-                       MUMPS_INT8 * const  iwtab,
-                       MUMPS_INT8 * const  nvtab,
-                       MUMPS_INT8 * const  elentab,
-                       MUMPS_INT8 * const  lasttab,
-                       MUMPS_INT  * const  ncmpa,
-                       MUMPS_INT  * const  weightused,
-                       MUMPS_INT  * const  weightrequested );
+              MUMPS_INT8 * const  iwtab,
+              MUMPS_INT8 * const  nvtab,
+              MUMPS_INT8 * const  elentab,
+              MUMPS_INT8 * const  lasttab,
+              MUMPS_INT * const   ncmpa, 
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+              SCOTCH_Context * const contextptr,
+#endif
+              MUMPS_INT  * const  weightused,
+              MUMPS_INT  * const  weightrequested );
 #define MUMPS_SCOTCH_64 \
   F_SYMBOL(scotch_64,SCOTCH_64)
 void MUMPS_CALL
@@ -56,6 +59,9 @@ MUMPS_SCOTCH_64( const MUMPS_INT8 * const  n,
                        MUMPS_INT8 * const  elentab,
                        MUMPS_INT8 * const  lasttab,
                        MUMPS_INT  * const  ncmpa,
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+              SCOTCH_Context * const contextptr,
+#endif
                        MUMPS_INT  * const  weightused,
                        MUMPS_INT  * const  weightrequested );
 #endif

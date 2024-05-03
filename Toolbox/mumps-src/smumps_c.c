@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.0, released
+ *  on Tue Apr 23 10:25:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -43,7 +43,7 @@
  *   CMUMPS_XXX in the code to get rid of any symbol convention annoyance.
  */
 #if MUMPS_ARITH == MUMPS_ARITH_s
-# if defined(UPPER)
+#if defined(UPPER)
 #  define F_SYM_ARITH(lower_case,upper_case) SMUMPS_##upper_case
 # elif defined(Add_)
 #  define F_SYM_ARITH(lower_case,upper_case) smumps_##lower_case##_
@@ -53,35 +53,35 @@
 #  define F_SYM_ARITH(lower_case,upper_case) smumps_##lower_case
 # endif
 #elif MUMPS_ARITH == MUMPS_ARITH_d
-# if defined(UPPER)
-#  define F_SYM_ARITH(lower_case,upper_case) DMUMPS_##upper_case
-# elif defined(Add_)
-#  define F_SYM_ARITH(lower_case,upper_case) dmumps_##lower_case##_
-# elif defined(Add__)
-#  define F_SYM_ARITH(lower_case,upper_case) dmumps_##lower_case##__
-# else
-#  define F_SYM_ARITH(lower_case,upper_case) dmumps_##lower_case
-# endif
+#if defined(UPPER)
+#define F_SYM_ARITH(lower_case, upper_case) DMUMPS_##upper_case
+#elif defined(Add_)
+#define F_SYM_ARITH(lower_case, upper_case) dmumps_##lower_case##_
+#elif defined(Add__)
+#define F_SYM_ARITH(lower_case, upper_case) dmumps_##lower_case##__
+#else
+#define F_SYM_ARITH(lower_case, upper_case) dmumps_##lower_case
+#endif
 #elif MUMPS_ARITH == MUMPS_ARITH_c
-# if defined(UPPER)
-#  define F_SYM_ARITH(lower_case,upper_case) CMUMPS_##upper_case
-# elif defined(Add_)
-#  define F_SYM_ARITH(lower_case,upper_case) cmumps_##lower_case##_
-# elif defined(Add__)
-#  define F_SYM_ARITH(lower_case,upper_case) cmumps_##lower_case##__
-# else
-#  define F_SYM_ARITH(lower_case,upper_case) cmumps_##lower_case
-# endif
+#if defined(UPPER)
+#define F_SYM_ARITH(lower_case, upper_case) CMUMPS_##upper_case
+#elif defined(Add_)
+#define F_SYM_ARITH(lower_case, upper_case) cmumps_##lower_case##_
+#elif defined(Add__)
+#define F_SYM_ARITH(lower_case, upper_case) cmumps_##lower_case##__
+#else
+#define F_SYM_ARITH(lower_case, upper_case) cmumps_##lower_case
+#endif
 #elif MUMPS_ARITH == MUMPS_ARITH_z
-# if defined(UPPER)
-#  define F_SYM_ARITH(lower_case,upper_case) ZMUMPS_##upper_case
-# elif defined(Add_)
-#  define F_SYM_ARITH(lower_case,upper_case) zmumps_##lower_case##_
-# elif defined(Add__)
-#  define F_SYM_ARITH(lower_case,upper_case) zmumps_##lower_case##__
-# else
-#  define F_SYM_ARITH(lower_case,upper_case) zmumps_##lower_case
-# endif
+#if defined(UPPER)
+#define F_SYM_ARITH(lower_case, upper_case) ZMUMPS_##upper_case
+#elif defined(Add_)
+#define F_SYM_ARITH(lower_case, upper_case) zmumps_##lower_case##_
+#elif defined(Add__)
+#define F_SYM_ARITH(lower_case, upper_case) zmumps_##lower_case##__
+#else
+#define F_SYM_ARITH(lower_case, upper_case) zmumps_##lower_case
+#endif
 #endif
 #define MUMPS_F77       \
     F_SYM_ARITH(f77,F77)
@@ -126,6 +126,12 @@ MUMPS_F77( MUMPS_INT      *job,
            MUMPS_INT      *blkvar_avail,
            MUMPS_INT      *perm_in,
            MUMPS_INT      *perm_in_avail,
+           MUMPS_INT      *rowind,
+           MUMPS_INT      *rowind_avail,
+           MUMPS_INT      *colind,
+           MUMPS_INT      *colind_avail,
+           MUMPS_COMPLEX  *pivots,
+           MUMPS_INT      *pivots_avail,
            MUMPS_COMPLEX  *rhs,
            MUMPS_INT      *rhs_avail,
            MUMPS_COMPLEX  *redrhs,
@@ -169,6 +175,7 @@ MUMPS_F77( MUMPS_INT      *job,
            MUMPS_INT      *lsol_loc,
            MUMPS_INT      *nloc_rhs,
            MUMPS_INT      *lrhs_loc,
+           MUMPS_INT      *nsol_loc,
            MUMPS_INT      *schur_mloc,
            MUMPS_INT      *schur_nloc,
            MUMPS_INT      *schur_lld,
@@ -176,16 +183,21 @@ MUMPS_F77( MUMPS_INT      *job,
            MUMPS_INT      *schur_nblock,
            MUMPS_INT      *schur_nprow,
            MUMPS_INT      *schur_npcol,
+           MUMPS_INT      *ld_rhsintr,
            MUMPS_INT      *ooc_tmpdir,
            MUMPS_INT      *ooc_prefix,
            MUMPS_INT      *write_problem,
+#if ! defined(NO_SAVE_RESTORE)
            MUMPS_INT      *save_dir,
            MUMPS_INT      *save_prefix,
+#endif
            MUMPS_INT      *ooc_tmpdirlen,
            MUMPS_INT      *ooc_prefixlen,
            MUMPS_INT      *write_problemlen,
+#if ! defined(NO_SAVE_RESTORE)
            MUMPS_INT      *save_dirlen,
            MUMPS_INT      *save_prefixlen,
+#endif
            MUMPS_INT      *metis_options
            );
 /*
@@ -193,22 +205,48 @@ MUMPS_F77( MUMPS_INT      *job,
  * might also be changed on return by MUMPS_ASSIGN_COLSCA/ROWSCA
  * NB: They are put here because they use MUMPS_REAL and need thus
  * one symbol per arithmetic.
+ * COLSCA_LOC and ROWSCA_LOC are also static. However, they are built
+ * at the end of the factorization and are always out arguments, they
+ * cannot be input.
+ * RHSINTR is the intermediate right-hand side. It is always allocated
+ * by MUMPS, although its content can be set or modified by the user.
+ * But the address of RHSINTR is out.
  */
 #if MUMPS_ARITH == MUMPS_ARITH_s
 # define MUMPS_COLSCA_STATIC SMUMPS_COLSCA_STATIC
 # define MUMPS_ROWSCA_STATIC SMUMPS_ROWSCA_STATIC
+# define MUMPS_COLSCA_LOC_STATIC SMUMPS_COLSCA_LOC_STATIC
+# define MUMPS_ROWSCA_LOC_STATIC SMUMPS_ROWSCA_LOC_STATIC
+# define MUMPS_RHSINTR_STATIC SMUMPS_RHSINTR_STATIC
+# define MUMPS_SINGULAR_VALUES_STATIC SMUMPS_SINGULAR_VALUES_STATIC
 #elif MUMPS_ARITH == MUMPS_ARITH_d
 # define MUMPS_COLSCA_STATIC DMUMPS_COLSCA_STATIC
 # define MUMPS_ROWSCA_STATIC DMUMPS_ROWSCA_STATIC
+# define MUMPS_COLSCA_LOC_STATIC DMUMPS_COLSCA_LOC_STATIC
+# define MUMPS_ROWSCA_LOC_STATIC DMUMPS_ROWSCA_LOC_STATIC
+# define MUMPS_RHSINTR_STATIC DMUMPS_RHSINTR_STATIC
+# define MUMPS_SINGULAR_VALUES_STATIC DMUMPS_SINGULAR_VALUES_STATIC
 #elif MUMPS_ARITH == MUMPS_ARITH_c
 # define MUMPS_COLSCA_STATIC CMUMPS_COLSCA_STATIC
 # define MUMPS_ROWSCA_STATIC CMUMPS_ROWSCA_STATIC
+# define MUMPS_COLSCA_LOC_STATIC CMUMPS_COLSCA_LOC_STATIC
+# define MUMPS_ROWSCA_LOC_STATIC CMUMPS_ROWSCA_LOC_STATIC
+# define MUMPS_RHSINTR_STATIC CMUMPS_RHSINTR_STATIC
+# define MUMPS_SINGULAR_VALUES_STATIC CMUMPS_SINGULAR_VALUES_STATIC
 #elif MUMPS_ARITH == MUMPS_ARITH_z
 # define MUMPS_COLSCA_STATIC ZMUMPS_COLSCA_STATIC
 # define MUMPS_ROWSCA_STATIC ZMUMPS_ROWSCA_STATIC
+# define MUMPS_COLSCA_LOC_STATIC ZMUMPS_COLSCA_LOC_STATIC
+# define MUMPS_ROWSCA_LOC_STATIC ZMUMPS_ROWSCA_LOC_STATIC
+# define MUMPS_RHSINTR_STATIC ZMUMPS_RHSINTR_STATIC
+# define MUMPS_SINGULAR_VALUES_STATIC ZMUMPS_SINGULAR_VALUES_STATIC
 #endif
 static MUMPS_REAL * MUMPS_COLSCA_STATIC;
 static MUMPS_REAL * MUMPS_ROWSCA_STATIC;
+static MUMPS_REAL * MUMPS_COLSCA_LOC_STATIC;
+static MUMPS_REAL * MUMPS_ROWSCA_LOC_STATIC;
+static MUMPS_COMPLEX * MUMPS_RHSINTR_STATIC;
+static MUMPS_REAL * MUMPS_SINGULAR_VALUES_STATIC;
 #define MUMPS_ASSIGN_COLSCA \
     F_SYM_ARITH(assign_colsca,ASSIGN_COLSCA)
 void MUMPS_CALL
@@ -236,6 +274,62 @@ void MUMPS_CALL
 MUMPS_NULLIFY_C_ROWSCA()
 {
   MUMPS_ROWSCA_STATIC = 0;
+}
+#define MUMPS_ASSIGN_COLSCA_LOC \
+    F_SYM_ARITH(assign_colsca_loc,ASSIGN_COLSCA_LOC)
+void MUMPS_CALL
+MUMPS_ASSIGN_COLSCA_LOC(MUMPS_REAL * f77colsca_loc)
+{
+  MUMPS_COLSCA_LOC_STATIC = f77colsca_loc;
+}
+#define MUMPS_NULLIFY_C_COLSCA_LOC \
+    F_SYM_ARITH(nullify_c_colsca_loc,NULLIFY_C_COLSCA_LOC)
+void MUMPS_CALL
+MUMPS_NULLIFY_C_COLSCA_LOC()
+{
+  MUMPS_COLSCA_LOC_STATIC = 0;
+}
+#define MUMPS_ASSIGN_ROWSCA_LOC \
+    F_SYM_ARITH(assign_rowsca_loc,ASSIGN_ROWSCA_LOC)
+void MUMPS_CALL
+MUMPS_ASSIGN_ROWSCA_LOC(MUMPS_REAL * f77rowsca_loc)
+{
+  MUMPS_ROWSCA_LOC_STATIC = f77rowsca_loc;
+}
+#define MUMPS_NULLIFY_C_ROWSCA_LOC \
+    F_SYM_ARITH(nullify_c_rowsca_loc,NULLIFY_C_ROWSCA_LOC)
+void MUMPS_CALL
+MUMPS_NULLIFY_C_ROWSCA_LOC()
+{
+  MUMPS_ROWSCA_LOC_STATIC = 0;
+}
+#define MUMPS_ASSIGN_RHSINTR \
+    F_SYM_ARITH(assign_rhsintr,ASSIGN_RHSINTR)
+void MUMPS_CALL
+MUMPS_ASSIGN_RHSINTR(MUMPS_COMPLEX * f77rhsintr)
+{
+  MUMPS_RHSINTR_STATIC = f77rhsintr;
+}
+#define MUMPS_NULLIFY_C_RHSINTR \
+    F_SYM_ARITH(nullify_c_rhsintr,NULLIFY_C_RHSINTR)
+void MUMPS_CALL
+MUMPS_NULLIFY_C_RHSINTR()
+{
+  MUMPS_RHSINTR_STATIC = 0;
+}
+#define MUMPS_ASSIGN_SINGULAR_VALUES \
+    F_SYM_ARITH(assign_singular_values,ASSIGN_SINGULAR_VALUES)
+void MUMPS_CALL
+MUMPS_ASSIGN_SINGULAR_VALUES(MUMPS_REAL * f77singular_values)
+{
+  MUMPS_SINGULAR_VALUES_STATIC = f77singular_values;
+}
+#define MUMPS_NULLIFY_C_SING_VALUES \
+    F_SYM_ARITH(nullify_c_sing_values,NULLIFY_C_SING_VALUES)
+void MUMPS_CALL
+MUMPS_NULLIFY_C_SING_VALUES()
+{
+  MUMPS_SINGULAR_VALUES_STATIC = 0;
 }
 /* FIXME: move CMUMPS_SET_TMP_PTR to another file */
 #define MUMPS_SET_TMP_PTR \
@@ -287,6 +381,8 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
     MUMPS_INT *perm_in; MUMPS_INT perm_in_avail;
     MUMPS_INT *listvar_schur; MUMPS_INT listvar_schur_avail;
     MUMPS_COMPLEX *schur; MUMPS_INT schur_avail;
+    MUMPS_INT *rowind; MUMPS_INT *colind; MUMPS_COMPLEX *pivots;
+    MUMPS_INT rowind_avail; MUMPS_INT colind_avail; MUMPS_INT pivots_avail;
     MUMPS_COMPLEX *rhs; MUMPS_COMPLEX *redrhs;
     MUMPS_COMPLEX *wk_user; MUMPS_INT wk_user_avail;
     MUMPS_REAL *colsca; MUMPS_REAL *rowsca;
@@ -305,9 +401,11 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
     MUMPS_INT irhs_sparse_avail, isol_loc_avail, irhs_loc_avail;
     MUMPS_INT *info; MUMPS_INT *infog;
     MUMPS_REAL *rinfo; MUMPS_REAL *rinfog;
-    MUMPS_INT ooc_tmpdir[255]; MUMPS_INT ooc_prefix[63];
-    MUMPS_INT write_problem[255];
-    MUMPS_INT save_dir[255]; MUMPS_INT save_prefix[255];
+    MUMPS_INT ooc_tmpdir[1023]; MUMPS_INT ooc_prefix[255];
+    MUMPS_INT write_problem[1023];
+#if ! defined(NO_SAVE_RESTORE)
+    MUMPS_INT save_dir[1023]; MUMPS_INT save_prefix[255];
+#endif
     /* Other local variables */
     MUMPS_INT idummy; MUMPS_INT *idummyp;
     MUMPS_REAL rdummy; MUMPS_REAL *rdummyp;
@@ -315,8 +413,10 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
     /* String lengths to be passed to Fortran by address */
     MUMPS_INT ooc_tmpdirlen;
     MUMPS_INT ooc_prefixlen;
+#if ! defined(NO_SAVE_RESTORE)
     MUMPS_INT save_dirlen;
     MUMPS_INT save_prefixlen;
+#endif
     MUMPS_INT write_problemlen;
     MUMPS_INT *metis_options;
     int i;
@@ -331,50 +431,60 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
      * strictly necessary. */
     MUMPS_COLSCA_STATIC=0;
     MUMPS_ROWSCA_STATIC=0;
+    MUMPS_COLSCA_LOC_STATIC=0;
+    MUMPS_ROWSCA_LOC_STATIC=0;
+    MUMPS_SINGULAR_VALUES_STATIC=0;
     /* Initialize pointers to zero for job == -1 */
     if ( mumps_par->job == -1 )
       { /* job = -1: we just reset all pointers to 0 */
         mumps_par->irn=0; mumps_par->jcn=0; mumps_par->a=0; mumps_par->rhs=0; mumps_par->wk_user=0;
         mumps_par->redrhs=0;
-        mumps_par->eltptr=0; mumps_par->eltvar=0; mumps_par->a_elt=0; mumps_par->blkptr=0; mumps_par->blkvar=0; mumps_par->perm_in=0; mumps_par->sym_perm=0; mumps_par->uns_perm=0; mumps_par->irn_loc=0;mumps_par->jcn_loc=0;mumps_par->a_loc=0; mumps_par->listvar_schur=0;mumps_par->schur=0;mumps_par->mapping=0;mumps_par->pivnul_list=0;mumps_par->colsca=0;mumps_par->colsca_from_mumps=0;mumps_par->rowsca=0;mumps_par->rowsca_from_mumps=0; mumps_par->rhs_sparse=0; mumps_par->irhs_sparse=0; mumps_par->sol_loc=0; mumps_par->rhs_loc=0; mumps_par->irhs_ptr=0; mumps_par->isol_loc=0; mumps_par->irhs_loc=0;
+        mumps_par->rowind=0; mumps_par->colind=0; mumps_par->pivots=0;
+        mumps_par->eltptr=0; mumps_par->eltvar=0; mumps_par->a_elt=0; mumps_par->blkptr=0; mumps_par->blkvar=0; mumps_par->perm_in=0; mumps_par->sym_perm=0; mumps_par->uns_perm=0; mumps_par->irn_loc=0;mumps_par->jcn_loc=0;mumps_par->a_loc=0; mumps_par->listvar_schur=0;mumps_par->schur=0;mumps_par->mapping=0;mumps_par->pivnul_list=0;mumps_par->colsca=0;mumps_par->colsca_from_mumps=0;mumps_par->rowsca=0;mumps_par->rowsca_from_mumps=0; mumps_par->colsca_loc=0; mumps_par->rowsca_loc=0; mumps_par->rhs_sparse=0; mumps_par->irhs_sparse=0; mumps_par->sol_loc=0; mumps_par->rhs_loc=0; mumps_par->irhs_ptr=0; mumps_par->isol_loc=0; mumps_par->irhs_loc=0; mumps_par->rhsintr=0; mumps_par->glob2loc_rhs=0; mumps_par->glob2loc_sol=0; mumps_par->singular_values=0;
         strcpy(mumps_par->ooc_tmpdir,"NAME_NOT_INITIALIZED");
         strcpy(mumps_par->ooc_prefix,"NAME_NOT_INITIALIZED");
         strcpy(mumps_par->write_problem,"NAME_NOT_INITIALIZED");
+#if ! defined(NO_SAVE_RESTORE)
         strcpy(mumps_par->save_dir,"NAME_NOT_INITIALIZED");
         strcpy(mumps_par->save_prefix,"NAME_NOT_INITIALIZED");
+#endif
         strncpy(mumps_par->version_number,MUMPS_VERSION,MUMPS_VERSION_MAX_LEN);
         mumps_par->version_number[MUMPS_VERSION_MAX_LEN+1] = '\0';
         /* Next line initializes scalars to arbitrary values.
          * Some of those will anyway be overwritten during the
          * call to Fortran routine [SDCZ]MUMPS_INIT_PHASE */
-        mumps_par->n=0; mumps_par->nblk=0; mumps_par->nz=0; mumps_par->nnz=0; mumps_par->nz_loc=0; mumps_par->nnz_loc=0; mumps_par->nelt=0;mumps_par->instance_number=0;mumps_par->deficiency=0;mumps_par->lwk_user=0;mumps_par->size_schur=0;mumps_par->lrhs=0; mumps_par->lredrhs=0; mumps_par->nrhs=0; mumps_par->nz_rhs=0; mumps_par->lsol_loc=0; mumps_par->nloc_rhs=0; mumps_par->lrhs_loc=0;
- mumps_par->schur_mloc=0; mumps_par->schur_nloc=0; mumps_par->schur_lld=0; mumps_par->mblock=0; mumps_par->nblock=0; mumps_par->nprow=0; mumps_par->npcol=0;
+        mumps_par->n=0; mumps_par->nblk=0; mumps_par->nz=0; mumps_par->nnz=0; mumps_par->nz_loc=0; mumps_par->nnz_loc=0; mumps_par->nelt=0;mumps_par->instance_number=0;mumps_par->deficiency=0;mumps_par->lwk_user=0;mumps_par->size_schur=0;mumps_par->lrhs=0; mumps_par->lredrhs=0; mumps_par->nrhs=0; mumps_par->nz_rhs=0; mumps_par->lsol_loc=0; mumps_par->nloc_rhs=0; mumps_par->lrhs_loc=0; mumps_par->nsol_loc=0;
+ mumps_par->schur_mloc=0; mumps_par->schur_nloc=0; mumps_par->schur_lld=0; mumps_par->mblock=0; mumps_par->nblock=0; mumps_par->nprow=0; mumps_par->npcol=0; mumps_par->ld_rhsintr=0;
       }
      ooc_tmpdirlen=(int)strlen(mumps_par->ooc_tmpdir);
      ooc_prefixlen=(int)strlen(mumps_par->ooc_prefix);
      write_problemlen=(int)strlen(mumps_par->write_problem);
+#if ! defined(NO_SAVE_RESTORE)
      save_dirlen   =(int)strlen(mumps_par->save_dir);
      save_prefixlen=(int)strlen(mumps_par->save_prefix);
+#endif
     /* Avoid the use of strnlen which may not be
      * available on all systems. Allow strings without
      * \0 at the end, if the file is not found, the
      * Fortran layer is responsible for raising an
      * error.  */
-    if(ooc_tmpdirlen > 255){
-        ooc_tmpdirlen=255;
+    if(ooc_tmpdirlen > 1023){
+        ooc_tmpdirlen=1023;
       }
-    if(ooc_prefixlen > 63){
-        ooc_prefixlen=63;
+    if(ooc_prefixlen > 255){
+        ooc_prefixlen=255;
       }
-    if(write_problemlen > 255){
-        write_problemlen=255;
+    if(write_problemlen > 1023){
+	write_problemlen=1023;
       }
-    if(save_dirlen > 255){
-        save_dirlen=255;
+#if ! defined(NO_SAVE_RESTORE)
+    if(save_dirlen > 1023){
+        save_dirlen=1023;
       }
     if(save_prefixlen > 255){
         save_prefixlen=255;
       }
+#endif
     /*
      * Extract info from the C structure to call the F77 interface. The
      * following macro avoids repeating the same code with risks of errors.
@@ -395,6 +505,9 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
     EXTRACT_POINTERS(irn,idummyp);
     EXTRACT_POINTERS(jcn,idummyp);
     EXTRACT_POINTERS(rhs,cdummyp);
+    EXTRACT_POINTERS(rowind,idummyp);
+    EXTRACT_POINTERS(colind,idummyp);
+    EXTRACT_POINTERS(pivots,cdummyp);
     EXTRACT_POINTERS(wk_user,cdummyp);
     EXTRACT_POINTERS(redrhs,cdummyp);
     EXTRACT_POINTERS(irn_loc,idummyp);
@@ -474,12 +587,14 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
     for(i=0;i<write_problemlen;i++){
       write_problem[i]=(int)mumps_par->write_problem[i];
     }
+#if ! defined(NO_SAVE_RESTORE)
     for(i=0;i<save_dirlen;i++){
       save_dir[i]=(int)mumps_par->save_dir[i];
     }
     for(i=0;i<save_prefixlen;i++){
       save_prefix[i]=(int)mumps_par->save_prefix[i];
     }
+#endif
     metis_options = mumps_par->metis_options;
     /* Call F77 interface */
     MUMPS_F77(&(mumps_par->job), &(mumps_par->sym), &(mumps_par->par), &(mumps_par->comm_fortran),
@@ -488,7 +603,7 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
           &(mumps_par->nz_loc), &(mumps_par->nnz_loc), irn_loc, &irn_loc_avail, jcn_loc, &jcn_loc_avail,
           a_loc, &a_loc_avail,
           &(mumps_par->nelt), eltptr, &eltptr_avail, eltvar, &eltvar_avail, a_elt, &a_elt_avail, blkptr, &blkptr_avail, blkvar, &blkvar_avail,
-          perm_in, &perm_in_avail,
+          perm_in, &perm_in_avail, rowind, &rowind_avail, colind, &colind_avail, pivots, &pivots_avail,
           rhs, &rhs_avail, redrhs, &redrhs_avail, info, rinfo, infog, rinfog,
           &(mumps_par->deficiency), &(mumps_par->lwk_user), &(mumps_par->size_schur), listvar_schur, &listvar_schur_avail, schur,
           &schur_avail, wk_user, &wk_user_avail, colsca, &colsca_avail, rowsca, &rowsca_avail,
@@ -496,7 +611,7 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
           &(mumps_par->lredrhs),
           rhs_sparse, &rhs_sparse_avail, sol_loc, &sol_loc_avail, rhs_loc, &rhs_loc_avail, irhs_sparse,
           &irhs_sparse_avail, irhs_ptr, &irhs_ptr_avail, isol_loc,
-          &isol_loc_avail, irhs_loc, &irhs_loc_avail, &(mumps_par->nz_rhs), &(mumps_par->lsol_loc), &(mumps_par->lrhs_loc), &(mumps_par->nloc_rhs)
+          &isol_loc_avail, irhs_loc, &irhs_loc_avail, &(mumps_par->nz_rhs), &(mumps_par->lsol_loc), &(mumps_par->lrhs_loc), &(mumps_par->nsol_loc), &(mumps_par->nloc_rhs)
           , &(mumps_par->schur_mloc)
           , &(mumps_par->schur_nloc)
           , &(mumps_par->schur_lld)
@@ -504,16 +619,21 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
           , &(mumps_par->nblock)
           , &(mumps_par->nprow)
           , &(mumps_par->npcol)
+          , &(mumps_par->ld_rhsintr)
           , ooc_tmpdir
           , ooc_prefix
           , write_problem
+#if ! defined(NO_SAVE_RESTORE)
           , save_dir
           , save_prefix
+#endif
           , &ooc_tmpdirlen
           , &ooc_prefixlen
           , &write_problemlen
+#if ! defined(NO_SAVE_RESTORE)
           , &save_dirlen
           , &save_prefixlen
+#endif
           , metis_options    
     );
     /*
@@ -532,6 +652,11 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
     /* to get permutations computed during analysis */
     mumps_par->sym_perm=mumps_get_sym_perm();
     mumps_par->uns_perm=mumps_get_uns_perm();
+    /* colsca_loc and rowsca_loc are always out */
+    mumps_par->colsca_loc=MUMPS_COLSCA_LOC_STATIC;
+    mumps_par->rowsca_loc=MUMPS_ROWSCA_LOC_STATIC;
+    /* singular_values is always out */
+    mumps_par->singular_values=MUMPS_SINGULAR_VALUES_STATIC;
     /*
      * colsca/rowsca can either be user data or have been modified
      * within mumps by calls to MUMPS_ASSIGN_COLSCA and/or
@@ -558,6 +683,10 @@ mumps_c(MUMPS_STRUC_C * mumps_par)
     }
     /*
      * Decode OOC_TMPDIR and OOC_PREFIX
+     * This is because they may have been set internally during MUMPS_F77
+#if ! defined(NO_SAVE_RESTORE)
+     * (which is not the case for save_prefix and save_dir)
+#endif
      */
     for(i=0;i<ooc_tmpdirlen;i++){
       mumps_par->ooc_tmpdir[i]=(char)ooc_tmpdir[i];

@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.0, released
+ *  on Tue Apr 23 10:25:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -89,7 +89,7 @@ MUMPS_PARMETIS_VWGT_64(MUMPS_INT8 *first,      MUMPS_INT8 *vertloctab,
 #elif defined(parmetis)
 #  if (IDXTYPEWIDTH == 64)
       *ierr=0;
-     iierr=ParMETIS_V32_NodeND(first, vertloctab, edgeloctab, vwgt, numflag, 
+      iierr=ParMETIS_V32_NodeND(first, vertloctab, edgeloctab, vwgt, numflag, 
                                 NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
                                 order, sizes, &int_comm);
       if(iierr != METIS_OK)
@@ -147,19 +147,19 @@ MUMPS_METIS_KWAY_64(MUMPS_INT8 *n,     MUMPS_INT8 *iptr,
 #else /* METIS >= 5 */
   int ierr;
 #  if (IDXTYPEWIDTH == 64)
-  MUMPS_INT8 ncon, edgecut, options[40];
+  MUMPS_INT8 ncon, edgecut, options[METIS_NOPTIONS];
   ierr=METIS_SetDefaultOptions(options);
-  options[0]  = 0;
   /* Use 1-based fortran numbering */
-  options[17] = 1;
+  options[METIS_OPTION_NUMBERING] = 1;
   ncon        = 1;
-     ierr = METIS_PartGraphKway(n, &ncon, iptr, jcn,
-     NULL, NULL, NULL,
-     k, NULL, NULL, options,
-     &edgecut, part);
+  ierr = METIS_PartGraphKway(n, &ncon, iptr, jcn,
+                             NULL, NULL, NULL,
+                             k, NULL, NULL, options,
+                             &edgecut, part);
 #  else
-     printf("** Error: METIS version >= 4, IDXTYPE WIDTH !=64, but MUMPS_METIS_KWAY_64 was called\n");
-     ierr=1;
+  /* SHOULD NEVER BE REACHED */
+  printf("** Error: METIS version >= 4, IDXTYPE WIDTH !=64, but MUMPS_METIS_KWAY_64 was called\n");
+  ierr=1;
 #  endif
 #endif
   return;
@@ -173,7 +173,8 @@ MUMPS_METIS_KWAY_AB_64(MUMPS_INT8 *n,     MUMPS_INT8 *iptr,
    iptr  -- pointer to the beginning of each node's adjacency list
    jcn   -- jcn[iptr[i]:iptr[i+1]-1] contains the list of neighbors of node i
    k     -- the number of parts
-   part  -- part[i] is the part node i belongs to */
+   part  -- part[i] is the part node i belongs to
+   vwgt  -- weights of the vertices */
 /* SELECTIVE I8 FIXME: add an argument *ierr, check it on exit */
  {
 #if defined(metis4) || defined(parmetis3)
@@ -196,19 +197,19 @@ MUMPS_METIS_KWAY_AB_64(MUMPS_INT8 *n,     MUMPS_INT8 *iptr,
 #else /* METIS >= 5 */
   int ierr;
 #  if (IDXTYPEWIDTH == 64)
-  MUMPS_INT8 ncon, edgecut, options[40];
+  MUMPS_INT8 ncon, edgecut, options[METIS_NOPTIONS];
   ierr=METIS_SetDefaultOptions(options);
-  options[0]  = 0;
   /* Use 1-based fortran numbering */
-  options[17] = 1;
+  options[METIS_OPTION_NUMBERING] = 1;
   ncon        = 1;
-     ierr = METIS_PartGraphKway(n, &ncon, iptr, jcn,
-     vwgt, NULL, NULL,
-     k, NULL, NULL, options,
-     &edgecut, part);
+  ierr = METIS_PartGraphKway(n, &ncon, iptr, jcn,
+                             vwgt, NULL, NULL,
+                             k, NULL, NULL, options,
+                             &edgecut, part);
 #  else
-     printf("** Error: METIS version >= 4, IDXTYPE WIDTH !=64, but MUMPS_METIS_KWAY_AB_64 was called\n");
-     ierr=1;
+  /* SHOULD NEVER BE REACHED */
+  printf("** Error: METIS version >= 4, IDXTYPE WIDTH !=64, but MUMPS_METIS_KWAY_AB_64 was called\n");
+  ierr=1;
 #  endif
 #endif
   return;

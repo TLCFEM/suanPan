@@ -43,6 +43,8 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_asm_master_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_b.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_determinant.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_diag.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_dist_arrowheads_omp.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_distrib_distentry.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_distrib_ELT.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dfac_driver.F"/>
@@ -113,6 +115,7 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_bwd_aux.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_c.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_distrhs.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_distsol.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_driver.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_fwd.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\dsol_fwd_aux.F"/>
@@ -142,7 +145,6 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_print_defined.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_static_mapping.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_type2_blocking.F"/>
-		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_type_size.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_version.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\omp_tps_common_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sana_aux.F"/>
@@ -163,6 +165,8 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_asm_master_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_b.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_determinant.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_diag.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_dist_arrowheads_omp.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_distrib_distentry.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_distrib_ELT.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sfac_driver.F"/>
@@ -225,6 +229,7 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_sol_es.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\smumps_struc_def.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sol_common.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\sol_ds_common_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\somp_tps_m.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\sooc_panel_piv.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\srank_revealing.F"/>
@@ -233,6 +238,7 @@
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_bwd_aux.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_c.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_distrhs.F"/>
+		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_distsol.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_driver.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_fwd.F"/>
 		<File RelativePath="..\..\..\Toolbox\mumps-src\ssol_fwd_aux.F"/>

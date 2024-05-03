@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -13,16 +13,24 @@ C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       MODULE SMUMPS_SOL_ES
       PRIVATE
-      PUBLIC:: PRUNED_SIZE_LOADED
       PUBLIC:: SMUMPS_CHAIN_PRUN_NODES
       PUBLIC:: SMUMPS_CHAIN_PRUN_NODES_STATS
       PUBLIC:: SMUMPS_INITIALIZE_RHS_BOUNDS
       PUBLIC:: SMUMPS_PROPAGATE_RHS_BOUNDS
       PUBLIC:: SMUMPS_TREE_PRUN_NODES
-      PUBLIC:: SMUMPS_TREE_PRUN_NODES_STATS
       PUBLIC:: SMUMPS_SOL_ES_INIT
+#     if defined(STAT_ES_SOLVE)
+      PUBLIC:: SMUMPS_SOL_ES_PRINT_STATS
+#     endif
+      PUBLIC:: SMUMPS_ES_GET_SUM_Nloc
+      PUBLIC:: SMUMPS_ES_NODES_SIZE_AND_FILL
       INTEGER(8), POINTER, DIMENSION(:,:) :: SIZE_OF_BLOCK
-      INTEGER(8) :: PRUNED_SIZE_LOADED
+#     if defined(STAT_ES_SOLVE)
+      DOUBLE PRECISION :: nb_flops,
+     &                    nb_sparse_flops,
+     &                    total_efficiency
+      INTEGER :: total_procs, total_blocks
+#endif
       INCLUDE 'mumps_headers.h'
       CONTAINS
       SUBROUTINE SMUMPS_SOL_ES_INIT(SIZE_OF_BLOCK_ARG, KEEP201)
@@ -34,6 +42,13 @@ C
       ELSE
         NULLIFY(SIZE_OF_BLOCK)
       ENDIF
+#if defined(STAT_ES_SOLVE)
+      nb_flops=0.0d0
+      nb_sparse_flops=0.0d0
+      total_efficiency=0.0d0
+      total_procs=0
+      total_blocks=0
+#endif
       RETURN
       END SUBROUTINE SMUMPS_SOL_ES_INIT
       SUBROUTINE SMUMPS_TREE_PRUN_NODES( 
@@ -50,7 +65,7 @@ C
       INTEGER, INTENT(IN) :: N, KEEP28
       INTEGER, INTENT(IN) :: DAD(KEEP28),NE_STEPS(KEEP28),FRERE(KEEP28)
       INTEGER, INTENT(IN) :: FILS(N), STEP(N)
-      INTEGER, INTENT(IN) :: nodes_RHS(KEEP28),  nb_nodes_RHS
+      INTEGER, INTENT(IN) :: nodes_RHS(:),  nb_nodes_RHS
       INTEGER :: nb_prun_nodes
       INTEGER, OPTIONAL, INTENT(INOUT):: Pruned_List(nb_prun_nodes)
       INTEGER :: nb_prun_roots
@@ -143,15 +158,15 @@ C
       INTEGER, INTENT(IN) :: KEEP28
       INTEGER, INTENT(IN) :: DAD(KEEP28)
       INTEGER, INTENT(IN) :: nb_nodes_RHS
-      INTEGER, INTENT(IN) :: nodes_RHS(nb_nodes_RHS)
-      INTEGER :: nb_prun_nodes
+      INTEGER, INTENT(IN) :: nodes_RHS(max(nb_nodes_RHS,1))
+      INTEGER, INTENT(INOUT) :: nb_prun_nodes
       INTEGER, OPTIONAL, INTENT(INOUT):: Pruned_List(nb_prun_nodes)
-      INTEGER :: nb_prun_roots
+      INTEGER, INTENT(INOUT) :: nb_prun_roots
       INTEGER, OPTIONAL, INTENT(INOUT):: Pruned_Roots(nb_prun_roots)
-      INTEGER :: nb_prun_leaves
+      INTEGER, INTENT(INOUT) :: nb_prun_leaves
       INTEGER, OPTIONAL, INTENT(INOUT):: Pruned_Leaves(nb_prun_leaves)
-      INTEGER :: Pruned_SONS(KEEP28)
-      LOGICAL :: TO_PROCESS(KEEP28)
+      INTEGER, INTENT(OUT) :: Pruned_SONS(KEEP28)
+      LOGICAL, INTENT(OUT) :: TO_PROCESS(KEEP28)
       INTEGER :: IN, I, ISTEP, TMP
       nb_prun_nodes = 0
       nb_prun_roots = 0
@@ -265,6 +280,10 @@ C
      & STEP, N, Pruned_SONS,
      & DAD, RHS_BOUNDS, NSTEPS,
      & MYID, COMM, KEEP485,
+#if defined(STAT_ES_SOLVE)
+     & KEEP46,
+     & IPTR_WORKING, SIZE_IPTR_WORKING, WORKING, SIZE_WORKING,
+#endif
      & IW, LIW, PTRIST, KIXSZ,OOC_FCT_LOC, PHASE, LDLT, K38)
       IMPLICIT NONE
       INCLUDE 'mpif.h'
@@ -275,10 +294,26 @@ C
       INTEGER, INTENT(IN) :: pruned_leaves(nb_pruned_leaves)
       INTEGER, INTENT(IN) :: LIW, IW(LIW), PTRIST(NSTEPS)
       INTEGER, INTENT(IN) :: KIXSZ, OOC_FCT_LOC, PHASE, LDLT, K38
+#     if defined(STAT_ES_SOLVE)
+      INTEGER, INTENT(IN) :: KEEP46 
+      INTEGER, INTENT(IN) :: SIZE_IPTR_WORKING, SIZE_WORKING, 
+     &                       IPTR_WORKING(SIZE_IPTR_WORKING),
+     &                       WORKING(SIZE_WORKING)
+#endif
       INTEGER, INTENT(INOUT):: RHS_BOUNDS(2*NSTEPS)
       INTEGER :: I, node, father, size_pool, next_size_pool
       INTEGER :: IERR
       INTEGER, ALLOCATABLE, DIMENSION(:) :: POOL, NBSONS
+#if defined(STAT_ES_SOLVE)
+      LOGICAL, ALLOCATABLE, DIMENSION(:) :: isleaf
+      INTEGER :: J, NPROCS, proc, allocok
+      LOGICAL :: found
+      DOUBLE PRECISION :: avg_load, efficiency, max_load, effmax
+      DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: proc_flops_buf
+      DOUBLE PRECISION :: proc_block_flops, block_flops
+      INTEGER :: SK38  
+      INTEGER, PARAMETER :: MASTER  = 0
+#endif
       ALLOCATE(POOL(nb_pruned_leaves),
      &         NBSONS(NSTEPS),
      &         STAT=IERR)
@@ -289,6 +324,37 @@ C
       size_pool = nb_pruned_leaves
       POOL = pruned_leaves
       NBSONS = Pruned_SONS
+#     if defined(STAT_ES_SOLVE)
+      NPROCS = SIZE_IPTR_WORKING-1
+      IF((MYID.EQ.MASTER).AND.(KEEP46.EQ.1)) THEN
+        ALLOCATE(isleaf(NSTEPS), STAT=IERR)
+        IF (IERR.NE.0) THEN
+          WRITE(6,*)'Allocation problem in SMUMPS_PROPAGATE_RHS_BOUNDS'
+          CALL MUMPS_ABORT()
+        END IF
+        isleaf = .FALSE.
+        DO I=1,nb_pruned_leaves
+          isleaf(abs(STEP(pruned_leaves(I)))) = .true.
+        END DO
+        proc = 0
+        DO I=1,NPROCS
+          found = .FALSE.
+          J = IPTR_WORKING(I)
+          DO WHILE((J.LE.IPTR_WORKING(I+1)-1).AND.(.NOT.found))
+            IF (isleaf(WORKING(J)))THEN
+              found = .TRUE.            
+            END IF
+            J = J + 1
+          END DO
+          IF(found) THEN
+            proc = proc + 1
+          END IF
+        END DO
+        total_procs = total_procs + proc
+        total_blocks = total_blocks + 1
+        DEALLOCATE(isleaf)
+      END IF
+#     endif
       DO WHILE (size_pool.ne.0)
         next_size_pool =0 
         DO I=1, size_pool 
@@ -314,6 +380,76 @@ C
         size_pool = next_size_pool 
       END DO
       DEALLOCATE(POOL, NBSONS)
+#     if defined(STAT_ES_SOLVE)
+      IF (KEEP46.EQ.1) THEN
+       IF(MYID.EQ.MASTER) THEN
+        block_flops = 0D0
+       END IF
+       proc_block_flops = 0D0
+       IF (K38 .GT. 0) THEN
+        SK38 = STEP(K38)
+       ELSE
+        SK38 = 0
+       END IF
+       DO I=1,NSTEPS
+        IF (RHS_BOUNDS(2*I).NE.0) THEN 
+          IF(PTRIST(I).GT.0) THEN
+            proc_block_flops = proc_block_flops
+     &           + dble(2*(RHS_BOUNDS(2*I) - RHS_BOUNDS(2*I-1) +1))
+     &           * dble(SMUMPS_LOCAL_FACTOR_SIZE(IW, LIW,
+     &             PTRIST(I)+KIXSZ, 
+     &             PHASE,LDLT,I.EQ.SK38))
+          END IF
+        END IF
+       END DO
+       IF(MYID.EQ.MASTER) THEN
+          ALLOCATE(proc_flops_buf(SIZE_IPTR_WORKING-1),stat=allocok)
+          IF(allocok.GT.0) THEN
+             WRITE(6,*)'Allocation problem of proc_flops_buf'
+     &            ,' in SMUMPS_PROPAGATE_RHS_BOUNDS'
+             CALL MUMPS_ABORT()
+          ENDIF
+          proc_flops_buf=0.0d0
+       ELSE 
+          ALLOCATE(proc_flops_buf(1),stat=allocok)
+          IF(allocok.GT.0) THEN
+             WRITE(6,*)'Allocation problem of proc_flops_buf'
+     &            ,' in SMUMPS_PROPAGATE_RHS_BOUNDS'
+             CALL MUMPS_ABORT()
+          ENDIF
+          proc_flops_buf=0.0d0
+       END IF
+       CALL MPI_GATHER(proc_block_flops, 1, MPI_DOUBLE_PRECISION,
+     &       proc_flops_buf, 1, MPI_DOUBLE_PRECISION,
+     &       0, COMM, IERR)
+       CALL MPI_REDUCE(proc_block_flops, block_flops, 1,
+     &  MPI_DOUBLE_PRECISION, MPI_SUM, 0, COMM, IERR)  
+       IF(MYID.EQ.MASTER) THEN                         
+        nb_sparse_flops = nb_sparse_flops+block_flops
+        avg_load = sum(proc_flops_buf)/dble(NPROCS)
+        max_load = maxval(proc_flops_buf)
+        efficiency = 0D0
+        effmax = 0D0
+        DO I=1,NPROCS
+          efficiency= efficiency + (proc_flops_buf(I)-avg_load)**2
+          IF (proc_flops_buf(I)-avg_load.GT.0.0D0) THEN
+            effmax = effmax + (max_load-avg_load)**2
+          ELSE IF (proc_flops_buf(I)-avg_load.LT.0.0D0) THEN
+            effmax = effmax + avg_load**2
+          END IF
+        END DO
+        efficiency = sqrt(efficiency/dble(NPROCS))
+        effmax = sqrt(effmax/dble(NPROCS))
+        IF(effmax.ne.0.0d0) efficiency = efficiency / effmax
+        efficiency = 1.0d0 - efficiency
+        efficiency = efficiency * block_flops 
+        total_efficiency = total_efficiency + efficiency
+        DEALLOCATE(proc_flops_buf)
+       ELSE
+        DEALLOCATE(proc_flops_buf)
+       END IF
+      END IF
+#endif
       RETURN
       END SUBROUTINE SMUMPS_PROPAGATE_RHS_BOUNDS
       INTEGER(8) FUNCTION SMUMPS_LOCAL_FACTOR_SIZE(IW,LIW,PTR,
@@ -340,7 +476,7 @@ C
      &            NPIV*(NPIV-1_8)/2_8 + (NROW-NPIV)*NPIV
           ELSE
             SMUMPS_LOCAL_FACTOR_SIZE =
-     &      NPIV*(NPIV+1_8)/2_8 + (LIELL-NPIV)*NPIV
+     &      NPIV*(NPIV-1_8)/2_8 + (LIELL-NPIV)*NPIV
           ENDIF
         ELSE
           SMUMPS_LOCAL_FACTOR_SIZE =
@@ -348,90 +484,13 @@ C
         END IF
       RETURN
       END FUNCTION SMUMPS_LOCAL_FACTOR_SIZE
-      INTEGER(8) FUNCTION SMUMPS_LOCAL_FACTOR_SIZE_BLR(IW,LIW,PTR,
-     &                                LRSTATUS, IWHANDLER,
-     &                                PHASE, LDLT, IS_ROOT)
-      USE SMUMPS_LR_DATA_M
-      USE SMUMPS_LR_TYPE
-        INTEGER, INTENT(IN) :: LIW, PTR, PHASE, LDLT
-        INTEGER, INTENT(IN) :: LRSTATUS, IWHANDLER
-        INTEGER, INTENT(IN) :: IW(LIW)
-        LOGICAL, INTENT(IN) :: IS_ROOT
-        INTEGER(8) :: NPIV, NROW, FACTOR_SIZE
-        INTEGER :: NB_PANELS, IPANEL, LorU, IBLOCK
-        LOGICAL :: LR_ACTIVATED
-        TYPE(LRB_TYPE), POINTER, DIMENSION(:) :: LRB_PANEL
-        NROW  = int(IW(PTR+2),8)
-        NPIV  = int(IW(PTR+3),8)
-        LR_ACTIVATED=(LRSTATUS.GE.2)
-        IF (LR_ACTIVATED) THEN
-          FACTOR_SIZE = 0_8
-          CALL SMUMPS_BLR_RETRIEVE_NB_PANELS(IWHANDLER, NB_PANELS)
-          IF (LDLT.EQ.0) THEN 
-            LorU = PHASE
-          ELSE
-            LorU = 0
-          ENDIF
-          DO IPANEL=1,NB_PANELS
-            IF (IS_ROOT.AND.IPANEL.EQ.NB_PANELS) THEN
-              CYCLE
-            ENDIF
-            IF (SMUMPS_BLR_EMPTY_PANEL_LORU(IWHANDLER, LorU, IPANEL))
-     &        THEN
-              CYCLE
-            ENDIF
-             CALL SMUMPS_BLR_RETRIEVE_PANEL_LORU(IWHANDLER, LorU,
-     &                       IPANEL, LRB_PANEL)
-            IF (size(LRB_PANEL).GT.0) THEN
-              IF (PHASE.EQ.0) THEN
-                FACTOR_SIZE = FACTOR_SIZE + 
-     &            int(LRB_PANEL(1)%N,8)*(int(LRB_PANEL(1)%N,8)-1_8)/2_8
-              ELSE
-                FACTOR_SIZE = FACTOR_SIZE + 
-     &           int(LRB_PANEL(1)%N,8)*(int(LRB_PANEL(1)%N,8)+1_8)/2_8
-              ENDIF
-            ENDIF
-            DO IBLOCK=1,size(LRB_PANEL)
-              IF (LRB_PANEL(IBLOCK)%ISLR) THEN
-                FACTOR_SIZE = FACTOR_SIZE + int(LRB_PANEL(IBLOCK)%K,8)*
-     &            int(LRB_PANEL(IBLOCK)%M+LRB_PANEL(IBLOCK)%M,8)
-              ELSE
-                FACTOR_SIZE = FACTOR_SIZE +
-     &             int(LRB_PANEL(IBLOCK)%M*LRB_PANEL(IBLOCK)%N,8)
-              ENDIF
-            ENDDO
-          ENDDO
-          SMUMPS_LOCAL_FACTOR_SIZE_BLR = FACTOR_SIZE
-        ELSE
-          SMUMPS_LOCAL_FACTOR_SIZE_BLR = 
-     &      SMUMPS_LOCAL_FACTOR_SIZE(IW, LIW, PTR, PHASE, LDLT, IS_ROOT)
-        ENDIF
-      RETURN
-      END FUNCTION SMUMPS_LOCAL_FACTOR_SIZE_BLR
-      SUBROUTINE SMUMPS_TREE_PRUN_NODES_STATS(MYID, N, KEEP28, KEEP201,
-     &           FR_FACT,
-     &           STEP, Pruned_List, nb_prun_nodes, OOC_FCT_TYPE_LOC)
-      INTEGER, intent(in) :: KEEP28, KEEP201, OOC_FCT_TYPE_LOC, MYID, N
-      INTEGER(8), intent(in) :: FR_FACT
-      INTEGER, intent(in) :: nb_prun_nodes
-      INTEGER, intent(in) :: Pruned_List(nb_prun_nodes)
-      INTEGER, intent(in) :: STEP(N)
-      INTEGER I, ISTEP
-      INTEGER(8) :: Pruned_Size
-      IF (KEEP201 .GT. 0) THEN
-        Pruned_Size = 0_8
-        DO I = 1, nb_prun_nodes
-          ISTEP = STEP(Pruned_List(I))
-          Pruned_Size = Pruned_Size + SIZE_OF_BLOCK
-     &                  (ISTEP, OOC_FCT_TYPE_LOC)
-        ENDDO
-        PRUNED_SIZE_LOADED = PRUNED_SIZE_LOADED +Pruned_Size
-      ENDIF
-      RETURN
-      END SUBROUTINE SMUMPS_TREE_PRUN_NODES_STATS
       SUBROUTINE SMUMPS_CHAIN_PRUN_NODES_STATS
      &                (MYID, N, KEEP28, KEEP201, KEEP485, FR_FACT,
      &                STEP, Pruned_List, nb_prun_nodes, OOC_FCT_TYPE_LOC
+#     if defined(STAT_ES_SOLVE)
+     &                , NRHS, COMM, IW, LIW, PTRIST, KIXSZ, PHASE,
+     &                  LDLT, K38
+#endif     
      & )
       IMPLICIT NONE
       INTEGER, intent(in) :: KEEP28, KEEP201, OOC_FCT_TYPE_LOC, N,
@@ -440,24 +499,203 @@ C
       INTEGER, intent(in) :: nb_prun_nodes, MYID
       INTEGER, intent(in) :: Pruned_List(nb_prun_nodes)
       INTEGER, intent(in) :: STEP(N)
+#if defined(STAT_ES_SOLVE)
+      INTEGER, INTENT(IN):: LIW, COMM, NRHS, LDLT, K38
+      INTEGER, INTENT(IN):: IW(LIW), PTRIST(KEEP28), KIXSZ, PHASE  
+      DOUBLE PRECISION :: proc_block_flops, block_flops
+      INTEGER(8) :: Pruned_Size_ic 
+      INTEGER :: IERR
+      INTEGER :: SK38 
+#endif
       INCLUDE 'mpif.h'
       INTEGER I, ISTEP
       INTEGER(8) :: Pruned_Size
+#if defined(STAT_ES_SOLVE)
+      Pruned_Size_ic = 0_8
+#endif
       Pruned_Size = 0_8
+#if defined(STAT_ES_SOLVE)
+      IF (K38 .GT. 0) THEN
+        SK38 = STEP(K38)
+      ELSE
+        SK38 = 0
+      END IF
+#endif
       DO I = 1, nb_prun_nodes
         ISTEP = STEP(Pruned_List(I))
         IF (KEEP201 .GT. 0) THEN
             Pruned_Size = Pruned_Size + SIZE_OF_BLOCK
      &                    (ISTEP, OOC_FCT_TYPE_LOC)
         ENDIF
+#if       defined(STAT_ES_SOLVE)
+          IF (PTRIST(ISTEP) .GT. 0) THEN
+            Pruned_Size_ic = Pruned_Size_ic + 
+     &               SMUMPS_LOCAL_FACTOR_SIZE(IW, LIW,
+     &               PTRIST(ISTEP)+KIXSZ, 
+     &               PHASE, LDLT,
+     &               ISTEP.EQ.SK38)
+          ENDIF
+#         endif
       ENDDO
-      IF (KEEP201.GT.0) THEN
-        IF (FR_FACT .NE. 0_8) THEN
-          PRUNED_SIZE_LOADED = PRUNED_SIZE_LOADED +Pruned_Size
-        ENDIF
-      ENDIF
+#if defined(STAT_ES_SOLVE)
+      proc_block_flops = dble(2_8*Pruned_Size_ic)*dble(NRHS)
+      CALL MPI_REDUCE(proc_block_flops, block_flops, 1,
+     & MPI_DOUBLE_PRECISION, MPI_SUM, 0, COMM, IERR)
+      IF(MYID.EQ.0) nb_flops = nb_flops + block_flops
+#endif
       RETURN
       END SUBROUTINE SMUMPS_CHAIN_PRUN_NODES_STATS
+#if   defined(STAT_ES_SOLVE)
+      SUBROUTINE SMUMPS_SOL_ES_PRINT_STATS(
+     &                  K212, K235, K237, K485, K497, NZLU8,
+     &                  NRHS, ICNTL27, N, K50, DKEEPS, RINFOGS, MPG)
+      IMPLICIT NONE
+      INTEGER, intent(in)    ::  K212, K235, K237, K485, K497, 
+     &                           NRHS, MPG, ICNTL27, N, K50
+      INTEGER(8), intent(in) :: NZLU8
+      REAL, intent(out)    :: DKEEPS(5), RINFOGS(5)
+      LOGICAL              :: AM1, ES_FWD, ES_BWD, DO_NBSPARSE
+      IF (MPG.LE.0) RETURN
+      AM1         = (K237 .NE. 0)
+      ES_FWD      = (K235 .NE. 0) .AND. (.NOT. AM1)
+      ES_BWD      = (K212 .NE. 0) .AND. (.NOT. AM1)
+      DO_NBSPARSE = (K497.NE.0).AND.(NRHS.GT.1).AND.(ICNTL27.GT.1)
+      IF (AM1) 
+     & WRITE(MPG,'(/A)') ' ** FLOPS SUMMARY during SOLVE AM1 ** '
+      IF ((ES_FWD).AND. (.NOT.ES_BWD)) 
+     & WRITE(MPG,'(/A,A)') ' ** FLOPS SUMMARY during fwd step',
+     &                  ' (exploit RHS sparsity) ** '
+      IF ((.NOT.ES_FWD).AND. (ES_BWD))
+     & WRITE(MPG,'(/A,A)') ' ** FLOPS SUMMARY during bwd step',
+     &                  ' (selected entries in solution) ** '
+      IF ((ES_FWD).AND. (ES_BWD)) 
+     & WRITE(MPG,'(/A,/A)') 
+     & ' ** FLOPS SUMMARY during SOLVE (fwd+bwd steps)',
+     & '    (sparse RHS and selected entries in solution) **'
+      IF (
+     &     (ES_FWD) .AND. (.NOT.ES_BWD)
+     &    .OR.
+     &     (.NOT.ES_FWD) .AND. (ES_BWD)
+     &   ) THEN
+       IF (K50.NE.0) THEN
+         DKEEPS(1)=(real(NZLU8)-real(N))*real(2*NRHS)
+       ELSE
+         DKEEPS(1)=(real(NZLU8)-real(N))*real(NRHS)
+       ENDIF
+      ELSE IF ((ES_FWD).AND.(ES_BWD)) THEN
+       IF (K50.NE.0) THEN
+         DKEEPS(1) = (real(NZLU8)-real(N))*real(4*NRHS)
+       ELSE
+         DKEEPS(1)=(real(NZLU8)-real(N))*real(2*NRHS)
+       ENDIF
+      ENDIF
+      RINFOGS(1) = DKEEPS(1)
+      IF (.NOT.AM1) THEN
+       WRITE(MPG,'(A,F25.1)') 
+     & ' RINFOG(24) FLOPS with dense full rank format  =', DKEEPS(1)
+      ENDIF
+      DKEEPS(2)=real(nb_flops) 
+      IF (DO_NBSPARSE) DKEEPS(4)=real(nb_sparse_flops)
+      IF (DO_NBSPARSE) THEN
+       RINFOGS(2)= DKEEPS(4)
+      ELSE
+       RINFOGS(2)= DKEEPS(2)
+      ENDIF
+      WRITE(MPG,'(A,F25.1)') 
+     & ' RINFOG(25) FLOPS with exploit sparsity (ES)   =', RINFOGS(2)
+      RETURN
+      END SUBROUTINE SMUMPS_SOL_ES_PRINT_STATS
+#endif
+      SUBROUTINE SMUMPS_ES_GET_SUM_Nloc (
+     &           N, Nloc_ITAB, ITAB_loc, COMM,
+     &           SUM_idNloc_8 )
+      IMPLICIT NONE
+      INTEGER, INTENT(IN)  :: N
+#if defined(MUMPS_NOF2003)
+        INTEGER, POINTER :: ITAB_loc (:)
+#else
+        INTEGER, INTENT( IN ), POINTER :: ITAB_loc (:)
+#endif
+      INTEGER, INTENT(IN)  :: Nloc_ITAB
+      INTEGER, INTENT(IN)  :: COMM
+      INTEGER(8)   :: SUM_idNloc_8
+      INCLUDE 'mpif.h'
+      INTEGER I, II, IERR_MPI 
+      INTEGER(8) :: idNloc_8
+      idNloc_8 = 0_8
+      DO I= 1, Nloc_ITAB
+          II = ITAB_loc(I)
+          IF (II.GE.1 .and. II.LE.N) 
+     &    idNloc_8 = idNloc_8 + 1_8
+      ENDDO
+      CALL MPI_ALLREDUCE (idNloc_8, SUM_idNloc_8, 1, 
+     &                  MPI_INTEGER8,
+     &                  MPI_SUM, COMM, IERR_MPI )
+      RETURN
+      END SUBROUTINE SMUMPS_ES_GET_SUM_Nloc
+      SUBROUTINE SMUMPS_ES_NODES_SIZE_AND_FILL (
+     &           fill, 
+     &           N, NSTEPS, KEEP, STEP, Step2node,
+     &           ITAB_loc, Nloc_ITAB, 
+     &           MYID, COMM,
+     &           Pruned_Sons, Lnodes_ITAB
+#if defined(AVOID_MPI_IN_PLACE)
+     &           , TMP_INT_ARRAY
+#endif
+     &           , nodes_ITAB
+     &           )
+      IMPLICIT NONE
+      LOGICAL, INTENT(IN)  :: fill
+      INTEGER, INTENT(IN)  :: N, NSTEPS, KEEP(500) 
+      INTEGER, INTENT(IN)  :: Nloc_ITAB
+      INTEGER, INTENT(IN)  :: STEP(N), Step2node(NSTEPS), 
+     &                        ITAB_loc(max(1,Nloc_ITAB))
+      INTEGER, INTENT(IN)  :: MYID, COMM
+#if defined(AVOID_MPI_IN_PLACE)
+      INTEGER              :: TMP_INT_ARRAY(NSTEPS) 
+#endif
+      INTEGER, INTENT(INOUT) :: Pruned_Sons(NSTEPS), Lnodes_ITAB
+      INTEGER, OPTIONAL, INTENT(OUT) :: nodes_ITAB(max(1,Lnodes_ITAB))
+      INCLUDE 'mpif.h'
+      INTEGER I, II, ISTEP, IERR_MPI, Lnodes_ITAB_loc, INODE_PRINC
+      IF (.NOT.fill) THEN
+        Pruned_SONS = 0
+        DO I= 1, Nloc_ITAB
+          II = ITAB_loc(I)
+          IF (II.GE.1 .and. II.LE.N) THEN
+            ISTEP = abs(STEP(II))
+            IF ( Pruned_SONS(ISTEP) .eq. 0 ) THEN
+              Pruned_SONS(ISTEP) = 1
+            ENDIF
+           ENDIF
+        ENDDO
+#if defined(AVOID_MPI_IN_PLACE)
+        TMP_INT_ARRAY = Pruned_Sons
+#endif
+        CALL MPI_ALLREDUCE(
+#if defined(AVOID_MPI_IN_PLACE)
+     &         TMP_INT_ARRAY, 
+#else
+     &         MPI_IN_PLACE,
+#endif
+     &         Pruned_Sons, NSTEPS, 
+     &         MPI_INTEGER, MPI_SUM, COMM, IERR_MPI)
+        Lnodes_ITAB = 0
+        DO ISTEP=1,NSTEPS
+          if (Pruned_SONS(ISTEP) .NE.0) Lnodes_ITAB=Lnodes_ITAB+1
+        ENDDO
+      ELSE IF (Lnodes_ITAB.GT.0) THEN
+        Lnodes_ITAB_loc = 0
+        DO ISTEP=1,NSTEPS
+          if (Pruned_SONS(ISTEP) .GT. 0) then
+            Lnodes_ITAB_loc=Lnodes_ITAB_loc+1
+            INODE_PRINC = Step2node( ISTEP )
+            nodes_ITAB(Lnodes_ITAB_loc)  = INODE_PRINC
+          endif
+        ENDDO
+      ENDIF
+      RETURN
+      END SUBROUTINE SMUMPS_ES_NODES_SIZE_AND_FILL
       END MODULE SMUMPS_SOL_ES
       SUBROUTINE SMUMPS_PERMUTE_RHS_GS
      &          (LP, LPOK, PROKG, MPG, PERM_STRAT, 

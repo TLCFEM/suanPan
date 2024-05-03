@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -15,7 +15,14 @@ C
       PRIVATE
       PUBLIC :: SMUMPS_INIT_L0_OMP_FACTORS
      &        , SMUMPS_FREE_L0_OMP_FACTORS
+#if ! defined(NO_SAVE_RESTORE)
      &        , SMUMPS_SAVE_RESTORE_L0FACARRAY
+#endif
+#if ! defined(NO_SAVE_RESTORE)
+#endif
+#if ! defined(NO_SAVE_RESTORE)
+      INCLUDE 'mumps_save_restore_modes.h'
+#endif
       CONTAINS
       SUBROUTINE SMUMPS_INIT_L0_OMP_FACTORS(id_L0_OMP_FACTORS)
       USE SMUMPS_STRUC_DEF, ONLY : SMUMPS_L0OMPFAC_T
@@ -48,6 +55,7 @@ C
       ENDIF
       RETURN
       END SUBROUTINE SMUMPS_FREE_L0_OMP_FACTORS
+#if ! defined(NO_SAVE_RESTORE)
       SUBROUTINE SMUMPS_SAVE_RESTORE_L0FACARRAY(L0_OMP_FACTORS
      &                 ,unit,MYID,mode
      &                 ,SIZE_GEST,SIZE_VARIABLES
@@ -59,7 +67,7 @@ C
       IMPLICIT NONE
       TYPE (SMUMPS_L0OMPFAC_T), DIMENSION(:), POINTER :: L0_OMP_FACTORS
       INTEGER,intent(IN)::unit,MYID
-      CHARACTER(len=*),intent(IN) :: mode
+      INTEGER,intent(IN) :: mode
       INTEGER,INTENT(OUT) :: SIZE_GEST
       INTEGER(8),intent(OUT) :: SIZE_VARIABLES
       INTEGER,intent(INOUT):: INFO(2)
@@ -79,7 +87,7 @@ C
       SIZE_GEST_L0FAC_ARRAY_j1=0
       SIZE_VARIABLES_L0FAC_ARRAY_j1=0
       NbRecords = 0
-      IF (trim(mode).EQ."memory_save") THEN
+      IF (mode.EQ.memory_save_mode) THEN
         IF (associated(L0_OMP_FACTORS)) THEN
           NbRecords      = 1 
           SIZE_GEST      = SIZE_INT 
@@ -87,7 +95,7 @@ C
           DO j1=1,size(L0_OMP_FACTORS)
             CALL SMUMPS_SAVE_RESTORE_L0FAC(
      &           L0_OMP_FACTORS(j1)
-     &           ,unit,MYID,"memory_save"
+     &           ,unit,MYID,memory_save_mode
      &           ,SIZE_GEST_L0FAC_ARRAY_j1
      &           ,SIZE_VARIABLES_L0FAC_ARRAY_J1
      &           ,SIZE_INT,SIZE_INT8,SIZE_ARITH_DEP
@@ -105,7 +113,7 @@ C
           SIZE_GEST      = 2*SIZE_INT
           SIZE_VARIABLES = 0
         ENDIF
-      ELSEIF (trim(mode).EQ."save") THEN
+      ELSEIF (mode.EQ.save_mode) THEN
         IF (associated(L0_OMP_FACTORS)) THEN
           NbRecords      = 1 
           SIZE_GEST      = SIZE_INT
@@ -120,7 +128,7 @@ C
           DO j1=1,size(L0_OMP_FACTORS)
             CALL SMUMPS_SAVE_RESTORE_L0FAC(
      &           L0_OMP_FACTORS(j1)
-     &           ,unit,MYID,"save"
+     &           ,unit,MYID,save_mode
      &           ,SIZE_GEST_L0FAC_ARRAY_J1
      &           ,SIZE_VARIABLES_L0FAC_ARRAY_J1
      &           ,SIZE_INT,SIZE_INT8,SIZE_ARITH_DEP
@@ -147,7 +155,7 @@ C
             endif
             IF ( INFO(1) .LT. 0 ) GOTO 100
         ENDIF
-      ELSE IF (trim(mode).EQ."restore") THEN
+      ELSE IF (mode.EQ.restore_mode) THEN
         NULLIFY(L0_OMP_FACTORS)
          read(unit,iostat=err) size_array1
          if(err.ne.0) THEN
@@ -181,7 +189,7 @@ C
            DO j1=1,size(L0_OMP_FACTORS)
              CALL SMUMPS_SAVE_RESTORE_L0FAC(
      &            L0_OMP_FACTORS(j1)
-     &            ,unit,MYID,"restore"
+     &            ,unit,MYID,restore_mode
      &            ,SIZE_GEST_L0FAC_ARRAY_J1
      &            ,SIZE_VARIABLES_L0FAC_ARRAY_J1
      &            ,SIZE_INT, SIZE_INT8, SIZE_ARITH_DEP
@@ -196,19 +204,19 @@ C
            ENDDO
          endif
       ENDIF
-      if(trim(mode).EQ."memory_save") then
+      if(mode.EQ.memory_save_mode) then
          NbSubRecords=int(SIZE_VARIABLES/huge(I4))
          IF(NbSubRecords.GT.0) then
             NbRecords=NbRecords+NbSubRecords
          ENDIF
-      elseif(trim(mode).EQ."save") then
+      elseif(mode.EQ.save_mode) then
          size_written=size_written+SIZE_VARIABLES
      &        +int(SIZE_GEST,kind=8)
 #if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*SIZE_INT*NbRecords,kind=8)
 #endif
-      elseif(trim(mode).EQ."restore") then
+      elseif(mode.EQ.restore_mode) then
          size_allocated=size_allocated+SIZE_VARIABLES
          size_read=size_read+SIZE_VARIABLES
      &        +int(SIZE_GEST,kind=8)
@@ -217,7 +225,7 @@ C
      &        +int(2*SIZE_INT*NbRecords,kind=8)
 #endif
       endif
-      if(trim(mode).EQ."memory_save") then
+      if(mode.EQ.memory_save_mode) then
          SIZE_VARIABLES=SIZE_VARIABLES+SIZE_VARIABLES_L0FAC_ARRAY
          SIZE_GEST=SIZE_GEST+SIZE_GEST_L0FAC_ARRAY
 #if defined(MUMPS_NOF2003)
@@ -239,7 +247,7 @@ C
       IMPLICIT NONE
       TYPE (SMUMPS_L0OMPFAC_T) :: L0_OMP_FACTORS_1THREAD
       INTEGER,intent(IN)::unit,MYID
-      CHARACTER(len=*),intent(IN) :: mode
+      INTEGER,intent(IN) :: mode
       INTEGER,INTENT(OUT) :: Local_SIZE_GEST
       INTEGER(8),intent(OUT) :: Local_SIZE_VARIABLES
       INTEGER,intent(INOUT):: INFO(2)
@@ -252,9 +260,9 @@ C
       Local_SIZE_GEST = 0
       Local_SIZE_VARIABLES = 0_8
       Local_NbRecords = Local_NbRecords+1
-      IF (trim(mode) .EQ. "memory_save") THEN
+      IF (mode .EQ. memory_save_mode) THEN
         Local_SIZE_VARIABLES = Local_SIZE_VARIABLES + SIZE_INT8
-      ELSE IF (trim(mode) .EQ. "save") THEN
+      ELSE IF (mode .EQ. save_mode) THEN
         Local_SIZE_VARIABLES = Local_SIZE_VARIABLES + SIZE_INT8
         WRITE(unit,iostat=err) L0_OMP_FACTORS_1THREAD%LA
         IF (err .NE. 0) THEN
@@ -264,7 +272,7 @@ C
           GOTO 100
         ENDIF
         size_written=size_written+SIZE_INT8
-      ELSE IF (trim(mode) .EQ. "restore") THEN
+      ELSE IF (mode .EQ. restore_mode) THEN
         Local_SIZE_VARIABLES = Local_SIZE_VARIABLES + SIZE_INT8
         READ(unit,iostat=err) L0_OMP_FACTORS_1THREAD%LA
         IF (err .NE. 0) THEN
@@ -275,7 +283,7 @@ C
         ENDIF
         size_read=size_read+SIZE_INT8
       ENDIF
-      IF (trim(mode).EQ."memory_save") THEN
+      IF (mode.EQ.memory_save_mode) THEN
         IF (associated(L0_OMP_FACTORS_1THREAD%A)) THEN
           Local_NbRecords = Local_NbRecords + 2
           Local_SIZE_GEST = Local_SIZE_GEST + SIZE_INT8
@@ -286,7 +294,7 @@ C
           Local_SIZE_GEST = Local_SIZE_GEST + SIZE_INT8
           Local_SIZE_VARIABLES = Local_SIZE_VARIABLES + 0
         ENDIF
-      ELSEIF (trim(mode).EQ."save") THEN
+      ELSEIF (mode.EQ.save_mode) THEN
         IF (associated(L0_OMP_FACTORS_1THREAD%A)) THEN
           Local_NbRecords = Local_NbRecords + 2
           write(unit,iostat=err) int(0,8) 
@@ -317,7 +325,7 @@ C
           endif
           size_written=size_written+SIZE_INT8
         ENDIF
-      ELSEIF (trim(mode).EQ."restore") THEN
+      ELSEIF (mode.EQ.restore_mode) THEN
         NULLIFY(L0_OMP_FACTORS_1THREAD%A)
         READ(unit,iostat=err) itmp
         if(err.ne.0) THEN
@@ -356,15 +364,16 @@ C
         ENDIF
       ENDIF
 #if defined(MUMPS_NOF2003)
-      IF (trim(mode).EQ."memory_save") THEN
+      IF (mode.EQ.memory_save_mode) THEN
         Local_SIZE_GEST = Local_SIZE_GEST+2*SIZE_INT*Local_NbRecords
-      ELSE IF (trim(mode).EQ."save") THEN
+      ELSE IF (mode.EQ.save_mode) THEN
         size_written = size_written+2*SIZE_INT*Local_NbRecords
-      ELSE IF (trim(mode).EQ."restore") THEN
+      ELSE IF (mode.EQ.restore_mode) THEN
         size_read = size_read+2*SIZE_INT*Local_NbRecords
       ENDIF
 #endif
   100 CONTINUE
       RETURN
       END SUBROUTINE SMUMPS_SAVE_RESTORE_L0FAC
+#endif
       END MODULE SMUMPS_FACSOL_L0OMP_M

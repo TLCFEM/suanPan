@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.0, released
+ *  on Tue Apr 23 10:25:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -26,8 +26,8 @@
  *  MUST be called before low_level_init_ooc_c.
  * 
  */
-#define MUMPS_OOC_PREFIX_MAX_LENGTH 63
-#define MUMPS_OOC_TMPDIR_MAX_LENGTH 255
+#define MUMPS_OOC_PREFIX_MAX_LENGTH 255
+#define MUMPS_OOC_TMPDIR_MAX_LENGTH 1023
 static char MUMPS_OOC_STORE_PREFIX[MUMPS_OOC_PREFIX_MAX_LENGTH];
 static MUMPS_INT  MUMPS_OOC_STORE_PREFIXLEN=-1;
 static char MUMPS_OOC_STORE_TMPDIR[MUMPS_OOC_TMPDIR_MAX_LENGTH];
@@ -58,7 +58,7 @@ mumps_convert_2fint_to_longlong( MUMPS_INT *, MUMPS_INT *, long long *);
 void MUMPS_CALL
 MUMPS_LOW_LEVEL_INIT_OOC_C(MUMPS_INT *_myid, MUMPS_INT *total_size_io,MUMPS_INT *size_element,
                            MUMPS_INT *async, MUMPS_INT *k211, MUMPS_INT *nb_file_type,
-                           MUMPS_INT *flag_tab , MUMPS_INT* ierr);
+                           MUMPS_INT *flag_tab , MUMPS_INT *keep255, MUMPS_INT* ierr);
 #define MUMPS_TEST_REQUEST_C \
     F_SYMBOL(test_request_c,TEST_REQUEST_C)
 void MUMPS_CALL
@@ -111,10 +111,6 @@ MUMPS_CLEAN_IO_DATA_C(MUMPS_INT *myid,MUMPS_INT *step,MUMPS_INT *ierr);
     F_SYMBOL(get_max_nb_req_c,GET_MAX_NB_REQ_C)
 void MUMPS_CALL
 MUMPS_GET_MAX_NB_REQ_C(MUMPS_INT *max,MUMPS_INT *ierr);
-#define MUMPS_GET_MAX_FILE_SIZE_C \
-    F_SYMBOL(get_max_file_size_c,GET_MAX_FILE_SIZE_C)
-void MUMPS_CALL
-MUMPS_GET_MAX_FILE_SIZE_C(double * max_ooc_file_size);
 #define MUMPS_OOC_GET_NB_FILES_C \
     F_SYMBOL(ooc_get_nb_files_c,OOC_GET_NB_FILES_C)
 void MUMPS_CALL
@@ -137,7 +133,7 @@ MUMPS_OOC_ALLOC_POINTERS_C(MUMPS_INT *nb_file_type, MUMPS_INT *dim, MUMPS_INT *i
     F_SYMBOL(ooc_init_vars_c,OOC_INIT_VARS_C)
 void MUMPS_CALL
 MUMPS_OOC_INIT_VARS_C(MUMPS_INT *myid_arg, MUMPS_INT *size_element, MUMPS_INT *async,
-                      MUMPS_INT *k211, MUMPS_INT *ierr);
+                      MUMPS_INT *keep211, MUMPS_INT *keep255, MUMPS_INT *ierr);
 #define MUMPS_OOC_START_LOW_LEVEL \
     F_SYMBOL(ooc_start_low_level,OOC_START_LOW_LEVEL)
 void MUMPS_CALL

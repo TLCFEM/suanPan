@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -127,7 +127,7 @@ C
       DOUBLE PRECISION OPASSW, OPELIW
       INTEGER PROCNODE_STEPS( KEEP(28) )
       INTEGER ITLOC( N + KEEP(253) ), FILS( N ), DAD(KEEP(28))
-      DOUBLE PRECISION :: RHS_MUMPS(KEEP(255))
+      DOUBLE PRECISION :: RHS_MUMPS(KEEP8(85))
       INTEGER ND( KEEP(28) ), FRERE( KEEP(28) )
       INTEGER(8), INTENT(IN) :: PTRARW( LPTRAR ), PTRAIW( LPTRAR )
       INTEGER(8), INTENT(IN) :: PTR8ARR(KEEP(193))
@@ -161,8 +161,6 @@ C
       INCLUDE 'mumps_headers.h'
       LOGICAL SKIPLAST_RHS_ROWS, BCP_SYM_NONEMPTY
       INTEGER BBPCBP
-      INTEGER MUMPS_PROCNODE
-      EXTERNAL MUMPS_PROCNODE
       BBPCBP  = 0   
       LP = ICNTL(1)
       IF ( ICNTL(4) .LE. 0 ) LP = -1
@@ -1176,7 +1174,7 @@ C
       INTEGER(8) :: PTRAST(KEEP(28)), PAMASTER(KEEP(28))
       INTEGER PIMASTER(KEEP(28))
       INTEGER ITLOC( N + KEEP(253) )
-      DOUBLE PRECISION :: RHS_MUMPS(KEEP(255))
+      DOUBLE PRECISION :: RHS_MUMPS(KEEP8(85))
       INTEGER COMP, IFLAG, IERROR
       INCLUDE 'mumps_headers.h'
       INTEGER FILS( N ), DAD(KEEP(28))
@@ -1189,20 +1187,19 @@ C
       INTEGER, INTENT(IN) :: PTRDEBARR(KEEP(196))
       INTEGER INTARR(KEEP8(27))
       DOUBLE PRECISION DBLARR(KEEP8(26))
-      INTEGER numroc
-      EXTERNAL numroc
+      INTEGER, EXTERNAL :: MUMPS_NUMROC
       DOUBLE PRECISION ZERO
       PARAMETER( ZERO = 0.0D0 )
       INTEGER(8) :: LREQA_ROOT
       INTEGER LREQI_ROOT, LOCAL_M, LOCAL_N, allocok
       LOGICAL :: EARLYT3ROOTINS
-          LOCAL_M = numroc( root%ROOT_SIZE, root%MBLOCK,
+          LOCAL_M = MUMPS_NUMROC( root%ROOT_SIZE, root%MBLOCK,
      &              root%MYROW, 0, root%NPROW )
           LOCAL_M = max( 1, LOCAL_M )
-          LOCAL_N = numroc( root%ROOT_SIZE, root%NBLOCK,
+          LOCAL_N = MUMPS_NUMROC( root%ROOT_SIZE, root%NBLOCK,
      &              root%MYCOL, 0, root%NPCOL )
           IF (KEEP(253).GT.0) THEN
-            root%RHS_NLOC = numroc( KEEP(253), root%NBLOCK,
+            root%RHS_NLOC = MUMPS_NUMROC( KEEP(253), root%NBLOCK,
      &              root%MYCOL, 0, root%NPCOL )
             root%RHS_NLOC = max(1, root%RHS_NLOC)
           ELSE
@@ -1220,7 +1217,7 @@ C
           IF (KEEP(253).NE.0) THEN
             root%RHS_ROOT = ZERO
             CALL DMUMPS_ASM_RHS_ROOT (  N, FILS, 
-     &           root, KEEP, RHS_MUMPS, 
+     &           root, KEEP, KEEP8, RHS_MUMPS, 
      &           IFLAG, IERROR )
             IF ( IFLAG .LT. 0 ) RETURN
           ENDIF
@@ -1373,14 +1370,15 @@ C
       RETURN
       END SUBROUTINE DMUMPS_ASM_ELT_ROOT
       SUBROUTINE DMUMPS_ASM_RHS_ROOT
-     &           ( N, FILS, root, KEEP, RHS_MUMPS, 
+     &           ( N, FILS, root, KEEP, KEEP8, RHS_MUMPS, 
      &             IFLAG, IERROR )
       USE DMUMPS_STRUC_DEF, ONLY : DMUMPS_ROOT_STRUC
       IMPLICIT NONE
       INTEGER N, KEEP(500), IFLAG, IERROR
+      INTEGER(8) :: KEEP8(150)
       INTEGER FILS(N)
       TYPE (DMUMPS_ROOT_STRUC ) :: root
-      DOUBLE PRECISION :: RHS_MUMPS(KEEP(255))
+      DOUBLE PRECISION :: RHS_MUMPS(KEEP8(85))
       INTEGER JCOL, IPOS_ROOT, JPOS_ROOT,
      &        IROW_GRID, JCOL_GRID, ILOCRHS, JLOCRHS,
      &        INODE

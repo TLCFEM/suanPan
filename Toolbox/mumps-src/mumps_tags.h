@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -99,7 +99,8 @@ C -----------------------------------------
      &        ScatterRhsI,
      &        ScatterRhsR,
      &        DistRhsI,
-     &        DistRhsR
+     &        DistRhsR,
+     &        DistSolR
       PARAMETER( RACINE_SOLVE = 14,
      &           ContVec      = 11,
      &           Master2Slave = 12,
@@ -107,7 +108,8 @@ C -----------------------------------------
      &           ScatterRhsI  = 54,
      &           ScatterRhsR  = 55,
      &           DistRhsI     = 51,
-     &           DistRhsR     = 52)
+     &           DistRhsR     = 52,
+     &           DistSolR     = 58)
       INTEGER, PARAMETER :: TAG_WAKEUP = 53
       INTEGER, PARAMETER :: DIST_RHS_INT    = 56
       INTEGER, PARAMETER :: DIST_RHS_SCALAR = 57

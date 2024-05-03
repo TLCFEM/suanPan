@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -56,7 +56,9 @@ C     ===============
      &          MUMPS_FDM_END_IDX
      &          , MUMPS_FDM_MOD_TO_STRUC
      &          , MUMPS_FDM_STRUC_TO_MOD
+#if ! defined(NO_SAVE_RESTORE)      
      &          , MUMPS_SAVE_RESTORE_FRONT_DATA
+#endif
 C     STACK_FREE_IDX(1:NB_FREE_IDX) holds the NB_FREE_IDX indices
 C                                   of free handlers
 C     STACK_FREE_IDX(NB_FREE_IDX+1:size(STACK_FREE_IDX)) is trash data
@@ -66,6 +68,9 @@ C     STACK_FREE_IDX(NB_FREE_IDX+1:size(STACK_FREE_IDX)) is trash data
         INTEGER, DIMENSION(:), POINTER :: COUNT_ACCESS   => null()
       END TYPE FDM_STRUC_T
       TYPE (FDM_STRUC_T), TARGET, SAVE :: FDM_A, FDM_F
+#if ! defined(NO_SAVE_RESTORE)
+      INCLUDE 'mumps_save_restore_modes.h'
+#endif
       CONTAINS
 C
       SUBROUTINE MUMPS_FDM_INIT(WHAT, INITIAL_SIZE, INFO)
@@ -373,6 +378,7 @@ C
       RETURN
       END SUBROUTINE MUMPS_FDM_SET_ALL_FREE
 C
+#if ! defined(NO_SAVE_RESTORE)
 !     ---------- MUMPS_SAVE_RESTORE_FRONT_DATA ----------------------- !
       SUBROUTINE MUMPS_SAVE_RESTORE_FRONT_DATA(id_FDM_F_ENCODING
      &                 ,unit,MYID,mode
@@ -409,8 +415,8 @@ C
 C     INFO                : copies of of INFO(1) and INFO(2) to allow save/restore of failled instaces
 C      
       CHARACTER, DIMENSION(:), POINTER :: id_FDM_F_ENCODING
-      INTEGER,intent(IN)::unit,MYID
-      CHARACTER(len=*),intent(IN) :: mode
+      INTEGER,intent(IN) :: unit,MYID
+      INTEGER,intent(IN) :: mode
       INTEGER,INTENT(OUT) :: SIZE_GEST
       INTEGER(8),intent(OUT) :: SIZE_VARIABLES
       INTEGER(8),intent(IN) :: TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
@@ -426,32 +432,32 @@ C
       SIZE_VARIABLES_FDM_F=0_8
       SIZE_GEST=0
       SIZE_VARIABLES=0_8
-      if((trim(mode).EQ."memory_save").OR.(trim(mode).EQ."save")) then
+      if((mode.EQ.memory_save_mode).OR.(mode.EQ.save_mode)) then
          call MUMPS_FDM_STRUC_TO_MOD("F",id_FDM_F_ENCODING)
       endif
-      if(trim(mode).EQ."memory_save") then
+      if(mode.EQ.memory_save_mode) then
          CALL MUMPS_SAVE_RESTORE_FDM_STRUC(
      &        FDM_F
-     &        ,unit,MYID,"memory_save"
+     &        ,unit,MYID,memory_save_mode
      &        ,SIZE_GEST_FDM_F
      &        ,SIZE_VARIABLES_FDM_F
      &        ,SIZE_INT,TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
      &        ,size_read,size_allocated,size_written
      &        ,INFO)
-      elseif(trim(mode).EQ."save") then
+      elseif(mode.EQ.save_mode) then
          CALL MUMPS_SAVE_RESTORE_FDM_STRUC(
      &        FDM_F
-     &        ,unit,MYID,"save"
+     &        ,unit,MYID,save_mode
      &        ,SIZE_GEST_FDM_F
      &        ,SIZE_VARIABLES_FDM_F
      &        ,SIZE_INT,TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
      &        ,size_read,size_allocated,size_written
      &        ,INFO)
          IF ( INFO(1) .LT. 0 ) GOTO 100
-      elseif(trim(mode).EQ."restore") then
+      elseif(mode.EQ.restore_mode) then
          CALL MUMPS_SAVE_RESTORE_FDM_STRUC(
      &        FDM_F
-     &        ,unit,MYID,"restore"
+     &        ,unit,MYID,restore_mode
      &        ,SIZE_GEST_FDM_F
      &        ,SIZE_VARIABLES_FDM_F
      &        ,SIZE_INT, TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
@@ -459,7 +465,7 @@ C
      &        ,INFO)
          IF ( INFO(1) .LT. 0 ) GOTO 100
       endif
-      if(trim(mode).EQ."memory_save") then
+      if(mode.EQ.memory_save_mode) then
 C     If the size to write (SIZE_VARIABLES) is greater than 2^31
 C     Subrecords are created which need to be taken into account in
 C     the file size computation
@@ -467,14 +473,14 @@ C     the file size computation
          IF(NbSubRecords.GT.0) then
             NbRecords=NbRecords+NbSubRecords
          ENDIF
-      elseif(trim(mode).EQ."save") then
+      elseif(mode.EQ.save_mode) then
          size_written=size_written+SIZE_VARIABLES
      &        +int(SIZE_GEST,kind=8)
 #if defined(MUMPS_NOF2003)
          size_written=size_written
      &        +int(2*SIZE_INT*NbRecords,kind=8)
 #endif
-      elseif(trim(mode).EQ."restore") then
+      elseif(mode.EQ.restore_mode) then
          size_allocated=size_allocated+SIZE_VARIABLES
          size_read=size_read+SIZE_VARIABLES
      &        +int(SIZE_GEST,kind=8)
@@ -483,7 +489,7 @@ C     the file size computation
      &        +int(2*SIZE_INT*NbRecords,kind=8)
 #endif
       endif
-      if(trim(mode).EQ."memory_save") then
+      if(mode.EQ.memory_save_mode) then
          SIZE_VARIABLES=SIZE_VARIABLES+SIZE_VARIABLES_FDM_F
          SIZE_GEST=SIZE_GEST+SIZE_GEST_FDM_F
 #if defined(MUMPS_NOF2003)
@@ -499,7 +505,7 @@ C        for each record
  100  continue
       RETURN
       END SUBROUTINE MUMPS_SAVE_RESTORE_FRONT_DATA
-!     --------------------------------- MUMPS_SAVE_RESTORE_BLR_STRUC ----------------------------- !
+!     ------------------ MUMPS_SAVE_RESTORE_BLR_STRUC ------------ !
       SUBROUTINE MUMPS_SAVE_RESTORE_FDM_STRUC(FDM_STRUC
      &     ,unit,MYID,mode
      &     ,Local_SIZE_GEST,Local_SIZE_VARIABLES
@@ -511,7 +517,8 @@ C  =======
 C  Purpose
 C  =======
 C
-C     This routine is designed to manage a BLR_STRUC_T structure (save, restore, compute memory)
+C     This routine is designed to manage a BLR_STRUC_T structure 
+C     (save, restore, compute memory)
 C     
 C  ==========
 C  Parameters
@@ -521,8 +528,9 @@ C     BLR_STRUC           : TYPE (BLR_STRUC_T) : the main structure
 C
 C     unit                : The unit of the file to be written or read
 C
-C     mode                : the type of operation to be performed by the routine 
-C                           memory_save  = compute the size of the save file and of the structure
+C     mode                : the type of operation to be performed by 
+C                           the routine memory_save  = compute the 
+C                           size of the save file and of the structure
 C                           save         = save the instace
 C                           restore      = restore the instace
 C
@@ -532,22 +540,23 @@ C     TOTAL_STRUC_SIZE    : size of the structure to be saved or restored
 C
 C     SIZE_INT            : size of an integer      
 C
-C     INFO1/INFO2         : copies of of INFO(1) and INFO(2) to allow save/restore of failled instaces
+C     INFO1/INFO2         : copies of of INFO(1) and INFO(2) to allow 
+C                           save/restore of failled instaces
 C
       TYPE(FDM_STRUC_T) :: FDM_STRUC
       INTEGER,intent(IN)::unit,MYID
-      CHARACTER(len=*),intent(IN) :: mode
+      INTEGER,intent(IN) :: mode
       INTEGER,INTENT(OUT) :: Local_SIZE_GEST
       INTEGER(8),intent(OUT) :: Local_SIZE_VARIABLES
       INTEGER,intent(INOUT):: INFO(2)
       INTEGER,intent(IN):: SIZE_INT
       INTEGER(8),intent(IN) :: TOTAL_FILE_SIZE,TOTAL_STRUC_SIZE
       INTEGER(8),intent(INOUT):: size_read,size_allocated,size_written
-      INTEGER :: NBVARIABLES_FDM_STRUC_T
-      PARAMETER (NBVARIABLES_FDM_STRUC_T = 3)
-      CHARACTER(len=30), dimension(NBVARIABLES_FDM_STRUC_T)::
-     &     VARIABLES_FDM_STRUC_T
-      CHARACTER(len=30) :: TMP_STRING
+C     Done as for mumps_save_restore main structure but here by hand:
+      INTEGER, PARAMETER :: S_NB_FREE_IDX = 1
+      INTEGER, PARAMETER :: S_STACK_FREE_IDX = 2
+      INTEGER, PARAMETER :: S_COUNT_ACCESS = 3
+      INTEGER, PARAMETER :: NBVARIABLES_FDM_STRUC_T = 3
       INTEGER(8),dimension(NBVARIABLES_FDM_STRUC_T)::
      &     SIZE_VARIABLES_FDM_STRUC_T
       INTEGER,dimension(NBVARIABLES_FDM_STRUC_T)::SIZE_GEST_FDM_STRUC_T
@@ -558,9 +567,6 @@ C
       INTEGER:: Local_NbRecords
 #endif
       INTEGER(4) :: I4
-      VARIABLES_FDM_STRUC_T(1)="NB_FREE_IDX"
-      VARIABLES_FDM_STRUC_T(2)="STACK_FREE_IDX"
-      VARIABLES_FDM_STRUC_T(3)="COUNT_ACCESS"
       SIZE_VARIABLES_FDM_STRUC_T(:)=0_8
       SIZE_GEST_FDM_STRUC_T(:)=0
       NbRecords_FDM_STRUC_T(:)=0 
@@ -568,13 +574,12 @@ C
 C     BEGINNING OF THE MAIN LOOP ON ALL VARIABLES OF THE STRUCTURE
 C
       DO i1=1,NBVARIABLES_FDM_STRUC_T 
-         TMP_STRING = VARIABLES_FDM_STRUC_T(i1)
-         SELECT CASE(TMP_STRING)
-         CASE("NB_FREE_IDX")
+         SELECT CASE(i1)
+         CASE(S_NB_FREE_IDX)
             NbRecords_FDM_STRUC_T(i1)=1
-            if(trim(mode).EQ."memory_save") then
+            if(mode.EQ.memory_save_mode) then
                SIZE_VARIABLES_FDM_STRUC_T(i1)=SIZE_INT
-            elseif(trim(mode).EQ."save") then
+            elseif(mode.EQ.save_mode) then
                SIZE_VARIABLES_FDM_STRUC_T(i1)=SIZE_INT
                write(unit,iostat=err) FDM_STRUC%NB_FREE_IDX
                if(err.ne.0) then
@@ -583,7 +588,7 @@ C
      &                 INFO(2))
                endif
                IF ( INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
+            elseif(mode.EQ.restore_mode) then
                SIZE_VARIABLES_FDM_STRUC_T(i1)=SIZE_INT
                read(unit,iostat=err) FDM_STRUC%NB_FREE_IDX
                if(err.ne.0) THEN
@@ -593,9 +598,9 @@ C
                endif 
                IF ( INFO(1) .LT. 0 ) GOTO 100
             endif
-         CASE("STACK_FREE_IDX")
+         CASE(S_STACK_FREE_IDX)
             NbRecords_FDM_STRUC_T(i1)=2
-            if(trim(mode).EQ."memory_save") then
+            if(mode.EQ.memory_save_mode) then
                IF(associated(FDM_STRUC%STACK_FREE_IDX)) THEN
                   SIZE_GEST_FDM_STRUC_T(i1)=SIZE_INT
                   SIZE_VARIABLES_FDM_STRUC_T(i1)=
@@ -604,7 +609,7 @@ C
                   SIZE_GEST_FDM_STRUC_T(i1)=SIZE_INT*2
                   SIZE_VARIABLES_FDM_STRUC_T(i1)=0_8
                ENDIF
-            elseif(trim(mode).EQ."save") then
+            elseif(mode.EQ.save_mode) then
                IF(associated(FDM_STRUC%STACK_FREE_IDX)) THEN
                   SIZE_GEST_FDM_STRUC_T(i1)=SIZE_INT
                   SIZE_VARIABLES_FDM_STRUC_T(i1)=
@@ -636,7 +641,7 @@ C
      &                 INFO(2))
                endif
                IF ( INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
+            elseif(mode.EQ.restore_mode) then
                nullify(FDM_STRUC%STACK_FREE_IDX)
                read(unit,iostat=err) size_array1
                if(err.ne.0) THEN
@@ -670,9 +675,9 @@ C
                endif
                IF ( INFO(1) .LT. 0 ) GOTO 100
             endif
-         CASE("COUNT_ACCESS")
+         CASE(S_COUNT_ACCESS)
             NbRecords_FDM_STRUC_T(i1)=2
-            if(trim(mode).EQ."memory_save") then
+            if(mode.EQ.memory_save_mode) then
                IF(associated(FDM_STRUC%COUNT_ACCESS)) THEN
                   SIZE_GEST_FDM_STRUC_T(i1)=SIZE_INT
                   SIZE_VARIABLES_FDM_STRUC_T(i1)=
@@ -681,7 +686,7 @@ C
                   SIZE_GEST_FDM_STRUC_T(i1)=SIZE_INT*2
                   SIZE_VARIABLES_FDM_STRUC_T(i1)=0_8
                ENDIF
-            elseif(trim(mode).EQ."save") then
+            elseif(mode.EQ.save_mode) then
                IF(associated(FDM_STRUC%COUNT_ACCESS)) THEN
                   SIZE_GEST_FDM_STRUC_T(i1)=SIZE_INT
                   SIZE_VARIABLES_FDM_STRUC_T(i1)=
@@ -713,7 +718,7 @@ C
      &                 INFO(2))
                endif
                IF ( INFO(1) .LT. 0 ) GOTO 100
-            elseif(trim(mode).EQ."restore") then
+            elseif(mode.EQ.restore_mode) then
                nullify(FDM_STRUC%COUNT_ACCESS)
                read(unit,iostat=err) size_array1
                if(err.ne.0) THEN
@@ -749,7 +754,7 @@ C
             endif
          CASE DEFAULT
          END SELECT
-         if(trim(mode).EQ."memory_save") then
+         if(mode.EQ.memory_save_mode) then
 C     If the size to write (SIZE_VARIABLES_FDM_STRUC_T(i1)) is greater than 2^31
 C     Subrecords are created which need to be taken into account in
 C     the file size computation
@@ -758,14 +763,14 @@ C     the file size computation
                NbRecords_FDM_STRUC_T(i1)=NbRecords_FDM_STRUC_T(i1)
      &              +NbSubRecords
             ENDIF
-         elseif(trim(mode).EQ."save") then
+         elseif(mode.EQ.save_mode) then
             size_written=size_written+SIZE_VARIABLES_FDM_STRUC_T(i1)
      &           +int(SIZE_GEST_FDM_STRUC_T(i1),kind=8)
 #if defined(MUMPS_NOF2003)
             size_written=size_written
      &           +int(2*SIZE_INT*NbRecords_FDM_STRUC_T(i1),kind=8)
 #endif
-         elseif(trim(mode).EQ."restore") then
+         elseif(mode.EQ.restore_mode) then
             size_allocated=size_allocated+
      &           SIZE_VARIABLES_FDM_STRUC_T(i1)
             size_read=size_read+SIZE_VARIABLES_FDM_STRUC_T(i1)
@@ -776,7 +781,7 @@ C     the file size computation
 #endif
          endif
       ENDDO
-      if(trim(mode).EQ."memory_save") then
+      if(mode.EQ.memory_save_mode) then
          Local_SIZE_VARIABLES=sum(SIZE_VARIABLES_FDM_STRUC_T)
          Local_SIZE_GEST=sum(SIZE_GEST_FDM_STRUC_T)        
 #if defined(MUMPS_NOF2003)
@@ -787,4 +792,5 @@ C     the file size computation
  100  continue
       RETURN
       END SUBROUTINE MUMPS_SAVE_RESTORE_FDM_STRUC
+#endif       
       END MODULE MUMPS_FRONT_DATA_MGT_M

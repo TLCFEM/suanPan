@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -29,11 +29,10 @@ C
       INTEGER IERR, NPROW, NPCOL, MYROW, MYCOL
       INTEGER LOCAL_N_RHS
       REAL, ALLOCATABLE, DIMENSION( :,: ) ::RHS_PAR
-      EXTERNAL numroc
-      INTEGER  numroc
+      INTEGER, EXTERNAL :: MUMPS_NUMROC
       INTEGER allocok
       CALL blacs_gridinfo( CNTXT_PAR, NPROW, NPCOL, MYROW, MYCOL )
-      LOCAL_N_RHS = numroc(NRHS, NBLOCK, MYCOL, 0, NPCOL)
+      LOCAL_N_RHS = MUMPS_NUMROC(NRHS, NBLOCK, MYCOL, 0, NPCOL)
       LOCAL_N_RHS = max(1,LOCAL_N_RHS)
       ALLOCATE(RHS_PAR(LOCAL_M, LOCAL_N_RHS),stat=allocok)
       IF (allocok > 0 ) THEN

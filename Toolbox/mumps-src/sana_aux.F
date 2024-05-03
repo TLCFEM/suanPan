@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -50,7 +50,7 @@ C
       INTEGER, INTENT(IN)    :: METIS_OPTIONS(40)
 #endif      
       INTEGER, INTENT(IN), OPTIONAL     :: NORIG_ARG
-      INTEGER, INTENT(IN), OPTIONAL     :: SIZEOFBLOCKS(N)
+      INTEGER, INTENT(IN), TARGET, OPTIONAL  :: SIZEOFBLOCKS(N)
       LOGICAL, INTENT(IN), OPTIONAL     :: GCOMP_PROVIDED_IN
       TYPE(COMPACT_GRAPH_T), OPTIONAL   :: GCOMP
       INTEGER, DIMENSION(:), ALLOCATABLE, TARGET :: IWALLOC
@@ -92,10 +92,9 @@ C
       PARAMETER (MINSYM=50)
       INTEGER(8) :: K79REF
       PARAMETER(K79REF=12000000_8)
-      INTEGER, PARAMETER :: LIDUMMY = 1 
-      INTEGER            :: IDUMMY(1)   
       INTEGER MTRANS, COMPRESS,NCMP,IERROR,J,JPERM,NCST
       INTEGER TOTEL 
+      INTEGER NFR
 #if defined(pord)
       INTEGER TOTW
 #endif
@@ -103,6 +102,8 @@ C
 #if defined(scotch) || defined(ptscotch)
       INTEGER WEIGHTREQUESTED
 #endif
+      INTEGER HOW_TO_SPLIT_ROOT, INODE_Scalapack_CAND, 
+     &        NBSONS_Scalapack_CAND
       LOGICAL SCOTCH_SYMBOLIC
       LOGICAL IDENT,SPLITROOT
       LOGICAL FREE_CENTRALIZED_MATRIX
@@ -110,30 +111,20 @@ C
       LOGICAL INPLACE64_GRAPH_COPY, INPLACE64_RESTORE_GRAPH
       INTEGER(8) :: LIW8, NZG8
       DOUBLE PRECISION TIMEB
+      INTEGER, POINTER, DIMENSION(:) :: SIZEOFBLOCKS_PTR
+      INTEGER, TARGET    :: IDUMMY_ARRAY(1)
+      INTEGER            :: LSIZEOFBLOCKS_PTR
+      LOGICAL            :: SIZEOFBLOCKS_AVAIL
       EXTERNAL MUMPS_ANA_H, SMUMPS_ANA_J, 
      &     SMUMPS_ANA_K, SMUMPS_ANA_GNEW,
      &     SMUMPS_ANA_LNEW, SMUMPS_ANA_M
       EXTERNAL SMUMPS_GNEW_SCHUR
       EXTERNAL SMUMPS_LDLT_COMPRESS, SMUMPS_EXPAND_PERMUTATION,
      &     SMUMPS_SET_CONSTRAINTS
-      IF (LIWALLOC.GT.0_8) THEN
-        ALLOCATE( IWALLOC (LIWALLOC), stat = IERR )
-        IF ( IERR .GT. 0 ) THEN
-         INFO( 1 ) = -7
-         CALL MUMPS_SET_IERROR(LIWALLOC,INFO(2))
-         GOTO 90                
-        ENDIF
-      ENDIF
       ALLOCATE( IWL1 (N), stat = IERR )
       IF ( IERR .GT. 0 ) THEN
          INFO( 1 ) = -7
          INFO( 2 ) = N
-         GOTO 90                
-      ENDIF
-      ALLOCATE( IPEALLOC(N+1), stat = IERR )
-      IF ( IERR .GT. 0 ) THEN
-         INFO( 1 ) = -7
-         INFO( 2 ) = (N+1)*KEEP(10)
          GOTO 90                
       ENDIF
       ALLOCATE( PTRAR (N,3), stat = IERR )
@@ -143,6 +134,9 @@ C
          GOTO 90                
       ENDIF
       SCOTCH_SYMBOLIC=(KEEP(270).EQ.0) 
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      SCOTCH_SYMBOLIC=.FALSE.
+#endif
       symmetry      = INFO(8)
       NBQD          = 0
       GCOMP_PROVIDED=.FALSE.
@@ -160,13 +154,6 @@ C
         INFO(2) = 1
         RETURN
       ENDIF
-      IF ( (LIWALLOC.EQ.0_8).AND.(.not.GCOMP_PROVIDED)) THEN
-        INFO(1) = -900
-        WRITE(6,*) " INTERNAL ERROR in MUMPS(ANA_F) ", 
-     &  "LIWALLOC, GCOMP_PROVIDED=", LIWALLOC, GCOMP_PROVIDED
-        INFO(2) = 2
-        RETURN
-      ENDIF
       IF (GCOMP_PROVIDED) THEN
         NZG8 =  GCOMP%NZG
         LIW8 =  NZG8 + int(GCOMP%NG,8)+1_8
@@ -176,9 +163,30 @@ C
           PTRAR(I,2) = int(IPE(I+1)-IPE(I))
          ENDDO
       ELSE
+        IF (LIWALLOC.GT.0_8) THEN
+          ALLOCATE( IWALLOC (LIWALLOC), stat = IERR )
+          IF ( IERR .GT. 0 ) THEN
+           INFO( 1 ) = -7
+           CALL MUMPS_SET_IERROR(LIWALLOC,INFO(2))
+           GOTO 90                
+          ENDIF
+        ENDIF
+        IF ( LIWALLOC.EQ.0_8 ) THEN
+          INFO(1) = -900
+          WRITE(6,*) " INTERNAL ERROR in MUMPS(ANA_F) ", 
+     &    "LIWALLOC, GCOMP_PROVIDED=", LIWALLOC, GCOMP_PROVIDED
+          INFO(2) = 2
+          RETURN
+        ENDIF
         LIW8 =  LIWALLOC
-        NZG8 = NZ8
+        NZG8 =  NZ8
         IW   => IWALLOC(1:LIW8)
+        ALLOCATE( IPEALLOC(N+1), stat = IERR )
+        IF ( IERR .GT. 0 ) THEN
+          INFO( 1 ) = -7
+          INFO( 2 ) = (N+1)*KEEP(10)
+          GOTO 90                
+        ENDIF
         IPE  => IPEALLOC(1:N+1)
       ENDIF
       LP    = ICNTL(1)
@@ -187,6 +195,16 @@ C
       PROK  = ((MP.GT.0).AND.(ICNTL(4).GE.2))
       LDIAG = ICNTL(4)
       COMPRESS_SCHUR = .FALSE.
+      IF (present(SIZEOFBLOCKS)) THEN
+       SIZEOFBLOCKS_PTR => SIZEOFBLOCKS(1:N)
+       LSIZEOFBLOCKS_PTR = N
+       SIZEOFBLOCKS_AVAIL = .TRUE.
+      ELSE
+       SIZEOFBLOCKS_PTR => IDUMMY_ARRAY
+       SIZEOFBLOCKS_AVAIL = .FALSE.
+       LSIZEOFBLOCKS_PTR = 1
+       IDUMMY_ARRAY(1) = -1
+      ENDIF
       IF (PROK) THEN
         IF (present(GCOMP)) THEN
          WRITE(MP,'(A,I10,A,I13,A)') " Processing a graph of size:", N
@@ -228,7 +246,7 @@ C
           WRITE (MP,99999) N, NZG8, LIW8, INFO(1)
           IF (J8.GT.0_8) WRITE (MP,99998) (IRN(I8),ICN(I8),I8=1_8,J8)
         ENDIF
-         K = min0(10,N)
+         K = min(10,N)
          IF (LDIAG.EQ.4) K = N
          IF (IORD.EQ.1 .AND. K.GT.0) THEN
             WRITE (MP,99997) (IKEEP1(I),I=1,K)
@@ -609,7 +627,7 @@ C
      &              PARENT, IWFR8,
      &              PTRAR(1,2), IW, IWL1, IKEEP1,
      &              IKEEP2, NCMPA, INFO, LP, LPOK, KEEP(10),
-     &              INPLACE64_GRAPH_COPY,
+     &              INPLACE64_GRAPH_COPY, INPLACE64_RESTORE_GRAPH,
      &              WEIGHTUSED, WEIGHTREQUESTED, SCOTCH_SYMBOLIC)
                ELSE
                  WRITE(*,*)
@@ -939,9 +957,12 @@ C
                DEALLOCATE(IPQ8)
             ENDIF
             COMPRESS = 0
+           IF ( PROK ) THEN
+              CALL MUMPS_SECDEB( TIMEB )
+           ENDIF
            IF (KEEP(106).EQ.2) THEN
              IF (PROK) THEN
-             WRITE(MP,*) " SYMBOLIC based on column counts "
+             WRITE(MP,'(A)') " SYMBOLIC based on column counts "
              ENDIF
              IF (present(SIZEOFBLOCKS)) THEN
                DO I=1, N
@@ -968,10 +989,10 @@ C
               INFO(1)= -99998
               GOTO 90
            ELSE
-            ALLOCATE( WTEMP ( 2*N ), stat = IERR )
+            ALLOCATE( WTEMP ( 2_8*int(N,8) ), stat = IERR )
             IF ( IERR .GT. 0 ) THEN
                INFO( 1 ) = -7
-               INFO( 2 ) = 2*N
+               CALL MUMPS_SET_IERROR(2_8*int(N,8), INFO(2) )
                GOTO 90          
             ENDIF
             THRESH = -1
@@ -998,6 +1019,11 @@ C
      &           AGG6, PARENT)
             DEALLOCATE(WTEMP)
            ENDIF  
+           IF ( PROK ) THEN
+               CALL MUMPS_SECFIN( TIMEB )
+               WRITE( MP, '(A,F12.4)' )
+     &        ' ELAPSED TIME IN symbolic factorization  =', TIMEB
+           ENDIF
          ELSE
             CALL SMUMPS_ANA_J(N, NZ8, IRN(1), ICN(1), IKEEP1(1), IW(1),
      &           LIW8, IPE(1),
@@ -1027,24 +1053,15 @@ C
          INFO( 2 ) = N
          GOTO 90                
       ENDIF
-      IF (present(SIZEOFBLOCKS)) THEN
-       CALL SMUMPS_ANA_LNEW
+      CALL SMUMPS_ANA_LNEW
      &     (N, PARENT, IWL1, IKEEP1(1), IKEEP2(1), IKEEP3(1),
      &     NFSIZ(1), PTRAR, INFO(6), FILS(1), FRERE(1), 
      &     PTRAR(1,3), NEMIN, WTEMP, KEEP(60),
      &     KEEP(20),KEEP(38),PTRAR(1,2),KEEP(104),IW(1),KEEP(50), 
-     &     ICNTL(13), KEEP(37), KEEP(197), NSLAVES, KEEP(250).EQ.1 
-     &     , .TRUE. , SIZEOFBLOCKS, N
+     &     ICNTL(13), KEEP(37), KEEP(197), NSLAVES, KEEP(250).EQ.1,
+     &     SIZEOFBLOCKS_AVAIL, SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR
+     &     , INODE_Scalapack_CAND, NBSONS_Scalapack_CAND, KEEP(11)
      &      )
-      ELSE
-       CALL SMUMPS_ANA_LNEW
-     &     (N, PARENT, IWL1, IKEEP1(1), IKEEP2(1), IKEEP3(1),
-     &     NFSIZ(1), PTRAR, INFO(6), FILS(1), FRERE(1), 
-     &     PTRAR(1,3), NEMIN, WTEMP, KEEP(60),
-     &     KEEP(20),KEEP(38),PTRAR(1,2),KEEP(104),IW(1),KEEP(50), 
-     &     ICNTL(13), KEEP(37), KEEP(197), NSLAVES, KEEP(250).EQ.1 
-     &     , .FALSE., IDUMMY, LIDUMMY )
-      ENDIF
       DEALLOCATE(WTEMP)
       IF (KEEP(60).NE.0)  THEN
          IF (KEEP(60)==1) THEN
@@ -1077,6 +1094,8 @@ C
       IF ( KEEP(53) .NE. 0 ) THEN
          CALL MUMPS_MAKE1ROOT( N, FRERE(1), FILS(1), NFSIZ(1),
      &                         KEEP(20) )
+         INODE_Scalapack_CAND = KEEP(20)
+         NBSONS_Scalapack_CAND = 1
       END IF
       IF (  (KEEP(48) == 4 .AND. KEEP8(21).GT.0_8)
      &     .OR.
@@ -1091,61 +1110,95 @@ C
       IF (KEEP(210).EQ.1.AND.KEEP8(79).LE.0_8) THEN
         KEEP8(79)=K79REF * int(NSLAVES,8)
       ENDIF
-      IF ( (KEEP(79).EQ.0).OR.(KEEP(79).EQ.2).OR.
+      IF (KEEP(11).EQ.0) THEN
+       IF ( (KEEP(79).EQ.0).OR.(KEEP(79).EQ.2).OR.
      &     (KEEP(79).EQ.3).OR.(KEEP(79).EQ.5).OR.
      &     (KEEP(79).EQ.6)
      &   )  THEN
-       IF (KEEP(210).EQ.1) THEN
-        SPLITROOT = .FALSE. 
-        IF ( KEEP(62).GE.1) THEN
-          IWL1(1) = -1
-          IF (present(SIZEOFBLOCKS)) THEN
-            DO I= 1, N
-               IWL1(I) = SIZEOFBLOCKS(I)
-            ENDDO
-          ENDIF
-          CALL SMUMPS_CUTNODES(N, FRERE(1), FILS(1), NFSIZ(1), 
-     &                       IWL1(1), N, INFO(6),
-     &                       NSLAVES, KEEP,KEEP8, SPLITROOT,
-     &                       MP, LDIAG, INFO(1), INFO(2))
-          IF (INFO(1).LT.0) GOTO 90 
-          IF (PROK) THEN
+        IF (KEEP(210).EQ.1) THEN
+         SPLITROOT = .FALSE. 
+         IF ( KEEP(62).GE.1) THEN
+           CALL SMUMPS_CUTNODES(N, FRERE(1), FILS(1), NFSIZ(1), 
+     &         SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, INFO(6),
+     &         NSLAVES, KEEP,KEEP8, SPLITROOT,
+     &         MP, LDIAG, INFO(1), INFO(2))
+           IF (INFO(1).LT.0) GOTO 90 
+           IF (PROK) THEN
                WRITE(MP,*) " Number of split nodes in pre-splitting=",
      &         KEEP(61)
-          ENDIF
+           ENDIF
+         ENDIF
         ENDIF
        ENDIF
       ENDIF
+      HOW_TO_SPLIT_ROOT = 0 
       SPLITROOT = ICNTL(13) .EQ. -1
+      IF (KEEP(11).GT.1) THEN
+       NFR = NFSIZ(INODE_Scalapack_CAND)
 #if defined(NOSCALAPACK)
-      SPLITROOT = SPLITROOT .OR. NSLAVES.GT.0
+        SPLITROOT = SPLITROOT .OR. 
+     & ( NSLAVES.GT.0.AND. 
+     &   ( REAL(NFR) - REAL(NFR)/REAL(max(2,NSLAVES))
+     &    .GT. REAL(KEEP(9)) )
+     & )
 #else
-      SPLITROOT = SPLITROOT .OR.
-     &            (ICNTL(13).GT.0 .AND. NSLAVES .GT. ICNTL(13))
+        SPLITROOT = SPLITROOT .OR.
+     &  ( ICNTL(13).GT.0 .AND. NSLAVES .GT. ICNTL(13). AND.
+     &    ( REAL(NFR) - REAL(NFR)/REAL(max(2,NSLAVES)) 
+     &     .GT. REAL(KEEP(9)) )
+     &  )
 #endif
-      IF (KEEP(53) .NE. 0) THEN
-         SPLITROOT = .TRUE.
+      ELSE
+#if defined(NOSCALAPACK)
+        SPLITROOT = SPLITROOT .OR. NSLAVES.GT.0
+#else
+        SPLITROOT = SPLITROOT .OR.
+     &            (ICNTL(13).GT.0 .AND. NSLAVES .GT. ICNTL(13)
+     &            )
+#endif
       ENDIF
+      IF (SPLITROOT.AND.KEEP(11).GT.0) HOW_TO_SPLIT_ROOT =1 
+      IF (KEEP(53) .NE. 0) THEN
+         SPLITROOT         = .TRUE.
+         IF (KEEP(11).GT.0) HOW_TO_SPLIT_ROOT = 2
+      ENDIF
+#if defined(NOSCALAPACK)
+#else
+      IF ( KEEP(11).GT.0) THEN 
+        IF (.NOT.SPLITROOT .AND. 
+     &    (KEEP(60).EQ.0).AND.   
+     &    ( (NFSIZ(INODE_Scalapack_CAND).GT.KEEP(37))
+     &     .AND.(ICNTL(13).LE.0) )
+     &    .AND.
+     &    (NBSONS_Scalapack_CAND.GT.KEEP(11)) 
+     &    ) THEN
+          HOW_TO_SPLIT_ROOT = 3
+          SPLITROOT=.TRUE.
+        ENDIF
+      ENDIF
+#endif
       SPLITROOT = (SPLITROOT.AND.( (KEEP(60).EQ.0) ))
       IF (SPLITROOT) THEN
-         IWL1(1) = -1
-         IF (present(SIZEOFBLOCKS)) THEN
-            DO I= 1, N
-               IWL1(I) = SIZEOFBLOCKS(I)
-            ENDDO
-         ENDIF
-         CALL SMUMPS_CUTNODES(N, FRERE(1), FILS(1), NFSIZ(1), 
-     &                    IWL1(1), N, INFO(6),
-     &                    NSLAVES, KEEP,KEEP8, SPLITROOT,
-     &                    MP, LDIAG, INFO(1), INFO(2))
-         IF (INFO(1).LT.0) GOTO 90 
-         IF ( KEEP(53) .NE. 0 ) THEN
-          CALL MUMPS_MAKE1ROOT( N, FRERE(1), FILS(1), NFSIZ(1),
-     &                          KEEP(20) )
-         ENDIF
+        IF (KEEP(11).EQ.0) THEN
+          CALL SMUMPS_CUTNODES(N, FRERE(1), FILS(1), NFSIZ(1), 
+     &              SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, INFO(6),
+     &              NSLAVES, KEEP,KEEP8, SPLITROOT,
+     &              MP, LDIAG, INFO(1), INFO(2))
+          IF (INFO(1).LT.0) GOTO 90 
+          IF ( KEEP(53) .NE. 0 ) THEN
+           CALL MUMPS_MAKE1ROOT( N, FRERE(1), FILS(1), NFSIZ(1),
+     &                           KEEP(20) )
+          ENDIF
+        ELSE
+         CALL SMUMPS_SPLIT_ROOT( NSLAVES, 
+     &            HOW_TO_SPLIT_ROOT, INODE_Scalapack_CAND,
+     &            N, FRERE(1), FILS(1), NFSIZ(1), 
+     &            KEEP(1), KEEP8(1),
+     &            SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, INFO(6))
+        ENDIF
       ENDIF
       IF (LDIAG.GT.2 .AND. MP.GT.0) THEN
-         K = min0(10,N)
+         K = min(10,N)
          IF (LDIAG.EQ.4) K = N
          IF (K.GT.0) WRITE (MP,99987) (NFSIZ(I),I=1,K)
          IF (K.GT.0) WRITE (MP,99989) (FILS(I),I=1,K)
@@ -1242,9 +1295,9 @@ C
  70      CONTINUE
       END IF
       IF (id%KEEP(54) .EQ. 3) THEN
-         CALL MPI_ALLREDUCE(IWORK1(1), NBINCOL(1), id%N,
+         CALL MUMPS_BIGALLREDUCE(.FALSE., IWORK1(1), NBINCOL(1), id%N,
      &        MPI_INTEGER, MPI_SUM, id%COMM, IERR )
-         CALL MPI_ALLREDUCE(IWORK2(1), NBINROW(1), id%N,
+         CALL MUMPS_BIGALLREDUCE(.FALSE., IWORK2(1), NBINROW(1), id%N,
      &        MPI_INTEGER, MPI_SUM, id%COMM, IERR )
          deallocate(IWORK2)
       ELSE
@@ -1255,7 +1308,8 @@ C
       END IF
       RETURN
       END SUBROUTINE SMUMPS_ANA_N_DIST
-      SUBROUTINE SMUMPS_ANA_O( N, NZ, MTRANS, PERM, IKEEPALLOC,
+      SUBROUTINE SMUMPS_ANA_O( N, NZ, MTRANS, PERM,
+     &     IKEEPALLOC, LIKEEPALLOC,
      &     idIRN, idJCN, idA, idROWSCA, idCOLSCA, WORK2, KEEP,
      &     ICNTL, INFO, INFOG )
       IMPLICIT NONE
@@ -1265,7 +1319,8 @@ C
       INTEGER, POINTER, DIMENSION(:) :: idIRN, idJCN
       REAL, POINTER, DIMENSION(:) :: idA
       REAL, POINTER, DIMENSION(:) :: idROWSCA, idCOLSCA
-      INTEGER, TARGET        :: IKEEPALLOC(3*N)
+      INTEGER(8), INTENT(IN) :: LIKEEPALLOC
+      INTEGER, TARGET        :: IKEEPALLOC(LIKEEPALLOC)
       INTEGER, INTENT(INOUT) :: MTRANS
       INTEGER                :: KEEP(500)
       INTEGER, INTENT(IN)    :: ICNTL(60)
@@ -1390,7 +1445,7 @@ C
          NZTOT = NZ
       ENDIF
       ZERODIAG => IKEEPALLOC(1:N) 
-      STR_KER => IKEEPALLOC(N+1:2*N)
+      STR_KER  => IKEEPALLOC(int(N+1,8):2_8*int(N,8))
       CALL SMUMPS_MTRANSI(ICNTL64,CNTL64)
       ICNTL64(1) = ICNTL(1)
       ICNTL64(2) = ICNTL(2)
@@ -1438,7 +1493,8 @@ C
       ALLOCATE( IPQ8(N), IPE(N+1), stat = allocok )
       IF ( allocok .GT. 0 ) THEN
          INFO( 1 ) = -7
-         INFO( 2 ) = (2*N+1)*KEEP(10)
+         CALL MUMPS_SET_IERROR( (2_8*int(N,8)+1_8) * int(KEEP(10),8),
+     &                         INFO(2) )
          GOTO 500               
       ENDIF
       IF (MTRANSLOC.EQ.1) THEN
@@ -1448,8 +1504,8 @@ C
       IF (MTRANSLOC.EQ.3) LDWMIN = max( NZTOT+1_8 , N8+3_8 )
       IF (MTRANSLOC.EQ.4) LDWMIN = 2_8 * N8 + 
      &                             max( NZTOT , N8+3_8 )
-      IF (MTRANSLOC.EQ.5) LDWMIN = 3_8*N8 + NZTOT
-      IF (MTRANSLOC.EQ.6) LDWMIN = 4_8*N8 + NZTOT
+      IF (MTRANSLOC.EQ.5) LDWMIN = 3_8 * N8 + NZTOT
+      IF (MTRANSLOC.EQ.6) LDWMIN = 4_8 * N8 + NZTOT
       LDW   = LDWMIN
       ALLOCATE(S2(LDW), stat=allocok)
       IF (allocok .GT. 0 ) THEN
@@ -1618,7 +1674,7 @@ C
       ENDIF
       DUPPLI = .FALSE.
       NZsave = NZREAL
-      FLAG => IKEEPALLOC(2*N+1:3*N)
+      FLAG => IKEEPALLOC(2_8*int(N,8)+1:3_8*int(N,8))
       IF(MTRANSLOC.NE.1) THEN
          CALL SMUMPS_SUPPRESS_DUPPLI_VAL(N,NZREAL,IPE(1),IW(IRNW),S2,
      &        PERM(1),IPQ8(1))
@@ -1845,8 +1901,8 @@ C
             ICNTL_SYM_MWM(1) = 0
             ICNTL_SYM_MWM(2) = 1
          ENDIF
-         MARKED => IKEEPALLOC(N+1:2*N)
-         FLAG => IKEEPALLOC(2*N+1:3*N)
+         MARKED  => IKEEPALLOC(    int(N,8)+1_8 : 2_8*int(N,8))
+         FLAG    => IKEEPALLOC(2_8*int(N,8)+1_8 : 3_8*int(N,8))
          PIV_OUT => WORK2(1:N)
          IF(MTRANSLOC .LT. 4) THEN
             LSC = 1
@@ -1968,7 +2024,7 @@ C
    30       IP = LWFR
             JP = IPE(IE)
    40       IW(IWFR) = JS
-            MINJS = min0(MINJS,IPS(JS)+0)
+            MINJS = min(MINJS,IPS(JS)+0)
             IWFR = IWFR + 1_8
    50     CONTINUE
    60     IPE(IE) = int(-ME,8)
@@ -2065,7 +2121,7 @@ C
       LBIG = 0
       DO 100 I=1,N
         L1 = IQ(I)
-        LBIG = max0(L1,LBIG)
+        LBIG = max(L1,LBIG)
         IWFR = IWFR + int(L1,8)
         IPE(I) = IWFR - 1_8
   100 CONTINUE
@@ -2183,6 +2239,8 @@ C
      &               CUMUL,KEEP50, ICNTL13, KEEP37, KEEP197, NSLAVES,
      &               ALLOW_AMALG_TINY_NODES 
      &               , BLKON, SIZEOFBLOCKS, LSIZEOFBLOCKS
+     &               , INODE_Scalapack_CAND, NBSONS_Scalapack_CAND
+     &               , KEEP11
      &               )
       IMPLICIT NONE
       INTEGER  N, NSTEPS, KEEP60, KEEP20, KEEP38, KEEP50
@@ -2200,6 +2258,9 @@ C
       LOGICAL, INTENT(IN) :: BLKON
       INTEGER, INTENT(IN) :: LSIZEOFBLOCKS
       INTEGER, INTENT(IN) :: SIZEOFBLOCKS(LSIZEOFBLOCKS) 
+      INTEGER, INTENT(OUT):: INODE_Scalapack_CAND, 
+     &                       NBSONS_Scalapack_CAND
+      INTEGER, INTENT(IN) :: KEEP11
 #if  defined(NOAMALGTOFATHER)
 #else
 #endif
@@ -2208,6 +2269,8 @@ C
       INTEGER INOS,IB,IL
       INTEGER IPERM
       INTEGER MAXNODE
+      INTEGER SIZE_Scalapack_CAND, NBSONS_current_root
+      LOGICAL ROOT_WITH_FEW_SONS
 #if defined(NOAMALGTOFATHER)
       INTEGER INB,INF,INFS,INL,INSW,INT1,NR1
 #else
@@ -2215,6 +2278,10 @@ C
 #endif
       LOGICAL AMALG_TO_father_OK
       AMALG_COUNT = 0
+      INODE_Scalapack_CAND  = -1
+      NBSONS_Scalapack_CAND = -1
+      SIZE_Scalapack_CAND   = -1
+      NBSONS_current_root   = 0
       DO 10 I=1,N
         CUMUL(I)= 0
         IPS(I)  = 0
@@ -2324,6 +2391,16 @@ C
          NR = NR + 1
          IL = N
          NA(N) = 0
+         NBSONS_current_root =0
+         IF (IPS(I).LT.0) THEN
+          IB = -IPS(I)
+          NBSONS_current_root = NBSONS_current_root + 1
+  69      IB =FRERE(IB)
+          IF (IB.GT.0) THEN
+             NBSONS_current_root = NBSONS_current_root + 1
+             GOTO 69
+          ENDIF
+         ENDIF
         ENDIF
         DO 70 L=1,N
           IF (IPS(I).GE.0) EXIT
@@ -2333,8 +2410,14 @@ C
           IL = IL - 1
           NA(IL) = 0
    70   CONTINUE
-#if ! defined(NOAMALGTOFATHER)
         DADI = -IPE(I)  
+        IF (DADI.EQ.0) THEN
+         IF (NV(I) .GT. SIZE_Scalapack_CAND) THEN
+           INODE_Scalapack_CAND = I
+           SIZE_Scalapack_CAND  = NV(I)
+         ENDIF
+        ENDIF
+#if ! defined(NOAMALGTOFATHER)
         IF ( (DADI.NE.0) .AND.
      &      (
      &       (KEEP60.EQ.0).OR.
@@ -2379,9 +2462,25 @@ C
                  AMALG_TO_father_OK = .FALSE.
               ENDIF
            ENDIF
+           ROOT_WITH_FEW_SONS =.TRUE.
+           IF (KEEP11.GT.0) THEN
+             IF (IPE(DADI).EQ.0) THEN
+                IF 
+     &          (NA(IL)+max(NA(IL+1),NBSONS_current_root)
+     &                    .GT.KEEP11)
+     &          ROOT_WITH_FEW_SONS= .FALSE.
+             ELSE
+                IF 
+     &          (NA(IL)+NA(IL+1)+max(NA(N),NBSONS_current_root)
+     &                    .GT.KEEP11)
+     &          ROOT_WITH_FEW_SONS= .FALSE.
+             ENDIF
+           ENDIF
            IF ( (NV(I).GT. 50*NV(DADI)).AND. (NSLAVES.GT.1) 
      &          .AND. (ICNTL13.LE.0)
-     &          .AND. (NV(I).GT. KEEP37) )  THEN
+     &          .AND. (NV(I).GT. KEEP37) 
+     &          .AND. ROOT_WITH_FEW_SONS
+     &        )  THEN
              IF ( ( ACCU / SIZE_DADI_AMALGAMATED ) .LT. 0.2 ) THEN
                AMALG_TO_father_OK = .TRUE.
              ENDIF
@@ -2528,6 +2627,17 @@ C
         ENDIF
   160 CONTINUE
       NSTEPS = IS - 1
+        I = INODE_Scalapack_CAND
+        INOS = -FILS(I)  
+        NBSONS_Scalapack_CAND = 0
+        IF (INOS.GT.0) THEN
+          NBSONS_Scalapack_CAND = NBSONS_Scalapack_CAND+1
+          INO = FRERE(INOS)
+          DO WHILE (INO.GT.0 .AND. INO.LE.N) 
+           NBSONS_Scalapack_CAND = NBSONS_Scalapack_CAND+1
+           INO = FRERE(INO)
+          ENDDO
+        ENDIF
       DO I=1, N
         IF (NV(I).EQ.0) THEN
           FRERE(I) = N+1
@@ -2650,9 +2760,9 @@ C
        WRITE(MPG, 99992) INFO(1), INFO(2),
      &  KEEP8(109), KEEP8(111), INFOG(4),
      &  INFOG(5), KEEP(28), INFOG(32), INFOG(7), KEEP(23), 
-     &  ICNTL(7), ICNTL(13), KEEP(12), 
+     &  ICNTL(7), KEEP(95), ICNTL(13), KEEP(12), 
      &  ITMP,
-     &  ICNTL(18),
+     &  ICNTL(18), KEEP(252), KEEP(494), ICNTL(48),
      &  KEEP(106),
      &  KEEP(56), KEEP(61), RINFOG(1)
        IF (KEEP(95).GT.1)             
@@ -2675,10 +2785,14 @@ C
      &       ' --  (7) Ordering option effectively used       =',I16/
      &       ' ICNTL (6) Maximum transversal option           =',I16/
      &       ' ICNTL (7) Pivot order option                   =',I16/
+     &       ' ICNTL(12) Ordering symmetric indef. matrices   =',I16/
      &       ' ICNTL(13) Parallelism/splitting of root node   =',I16/
      &       ' ICNTL(14) Percentage of memory relaxation      =',I16/
      &       ' ICNTL(15) Analysis by block effectively used   =',I16/
      &       ' ICNTL(18) Distributed input matrix (on if >0)  =',I16/
+     &       ' ICNTL(32) Forward elimination during facto.    =',I16/
+     &       ' ICNTL(35) BLR activation                       =',I16/
+     &       ' ICNTL(48) Tree based multithreading            =',I16/
      &       ' ICNTL(58) Symbolic factorization option        =',I16/
      &       ' Number of level 2 nodes                        =',I16/
      &       ' Number of split nodes                          =',I16/
@@ -2996,6 +3110,138 @@ C
       ENDIF
       RETURN
       END SUBROUTINE SMUMPS_SPLIT_1NODE
+      SUBROUTINE SMUMPS_SPLIT_ROOT
+     & ( NSLAVES, HOW, INODE, N, FRERE, FILS, NFSIZ, KEEP, KEEP8,
+     &   SIZEOFBLOCKS, LSIZEOFBLOCKS, NSTEPS)
+      IMPLICIT NONE
+      INTEGER, INTENT(in)    :: NSLAVES, HOW
+      INTEGER, INTENT(in)    :: INODE, N
+      INTEGER(8), INTENT(in) :: KEEP8(150)
+      INTEGER, INTENT(inout) :: NSTEPS
+      INTEGER, INTENT(inout) :: KEEP(500)
+      INTEGER, INTENT(inout) :: FRERE( N ), FILS( N ), NFSIZ( N )
+      INTEGER, INTENT(IN)    :: LSIZEOFBLOCKS
+      INTEGER, INTENT(IN)    :: SIZEOFBLOCKS(LSIZEOFBLOCKS)
+      LOGICAL    :: BLKON
+      INTEGER(8) :: K79
+      INTEGER I, IN, NPIV, NFRONT
+      INTEGER INODE_SON, INODE_FATH, IN_SON, IN_FATH, IN_GRANDFATH
+      INTEGER NPIV_COMPG, NPIV_SON_COMPG, NPIV_FATH_COMPG
+      INTEGER NPIV_SON, NPIV_FATH, NPIV_TEMP
+      INTEGER, PARAMETER :: K_HOW1 = 4000
+      IF (FRERE(INODE).NE.0) RETURN
+      BLKON = .NOT.(SIZEOFBLOCKS(1).EQ.-1) 
+      K79 = max(KEEP8(79), 4_8)
+      K79 = min(20000_8*20000_8,K79) 
+      IF (KEEP(72).EQ.1) THEN
+          K79 = min(3_8*3_8,K79)
+      ENDIF
+      IF ((HOW.LT.1) .OR. (HOW.GT.3)) THEN
+       RETURN 
+      ENDIF
+      IF (HOW.EQ.2) THEN
+       K79 = min(K79, 121_8*121_8)
+      ENDIF
+      NFRONT = NFSIZ (INODE)
+      NPIV = NFRONT
+      IF (NPIV .LE. 1 ) RETURN
+      IF (BLKON) THEN
+       IN = INODE
+       NPIV_COMPG = 0 
+       DO WHILE( IN > 0 )
+         NPIV_COMPG = NPIV_COMPG + 1
+         IN = FILS( IN )
+       ENDDO
+      ELSE 
+        NPIV_COMPG = NPIV
+      ENDIF
+      IF (HOW.EQ.1) THEN
+        IF ( (NFRONT/2) .LT. K_HOW1 ) RETURN
+        NPIV_FATH = max(NFRONT/max(NSLAVES,2), 1)
+        NPIV_FATH = max(NPIV_FATH, K_HOW1/2)
+        NPIV_FATH = min(NPIV_FATH, max(NFRONT/2,1))
+        NPIV_FATH = min(int(sqrt(real(K79))), NPIV_FATH)
+        NPIV_SON  = NPIV - NPIV_FATH
+      ELSE IF (HOW.EQ.2) THEN
+        NPIV_FATH = min(int(sqrt(real(K79))), int(NPIV/2))
+        NPIV_SON  = NPIV - NPIV_FATH
+      ELSE  
+        NPIV_FATH = max(NFRONT - 3*KEEP(6),1) 
+        NPIV_SON  = NPIV - NPIV_FATH
+      ENDIF
+       INODE_SON = INODE
+       IF (BLKON) THEN
+         NPIV_TEMP       = 0
+         NPIV_SON_COMPG  = 0
+         IN_SON = INODE
+         DO WHILE (IN_SON > 0) 
+           NPIV_TEMP = NPIV_TEMP + SIZEOFBLOCKS(IN_SON)
+           NPIV_SON_COMPG  = NPIV_SON_COMPG +1
+           IF (NPIV_TEMP.GE.NPIV_SON) EXIT
+           IN_SON = FILS( IN_SON )
+         END DO
+         NPIV_FATH_COMPG = NPIV_COMPG - NPIV_SON_COMPG
+         NPIV_SON        = NPIV_TEMP
+         NPIV_FATH       = NPIV - NPIV_SON 
+       ELSE
+         NPIV_SON_COMPG  = NPIV_SON
+         NPIV_FATH_COMPG = NPIV_FATH
+         IN_SON = INODE
+         DO I = 1, NPIV_SON_COMPG - 1
+           IN_SON = FILS( IN_SON )
+         END DO
+       ENDIF
+       IF (NPIV_FATH_COMPG.EQ.0)  RETURN
+       INODE_FATH = FILS( IN_SON )
+       IF ( INODE_FATH .LT. 0 ) THEN
+       write(*,*) 'Error: INODE_FATH < 0 ', INODE_FATH
+       END IF
+       IN_FATH = INODE_FATH
+       DO WHILE ( FILS( IN_FATH ) > 0 )
+         IN_FATH = FILS( IN_FATH )
+       END DO
+       FRERE( INODE_FATH ) = FRERE( INODE_SON )
+       FRERE( INODE_SON  ) = - INODE_FATH
+       FILS ( IN_SON     ) = FILS( IN_FATH )
+       FILS ( IN_FATH    ) = - INODE_SON
+       IN = FRERE( INODE_FATH )
+       DO WHILE ( IN > 0 )
+           IN = FRERE( IN )
+       END DO
+       IF ( IN .eq. 0 )  GO TO 10
+       IN = -IN
+       DO WHILE ( FILS( IN ) > 0 )
+           IN = FILS( IN )
+       END DO
+       IN_GRANDFATH = IN
+       IF ( FILS( IN_GRANDFATH ) .eq. - INODE_SON ) THEN
+           FILS( IN_GRANDFATH ) = -INODE_FATH
+       ELSE
+           IN = IN_GRANDFATH
+           IN = - FILS ( IN )
+           DO WHILE ( FRERE( IN ) > 0 )
+             IF ( FRERE( IN ) .eq. INODE_SON ) THEN
+               FRERE( IN ) = INODE_FATH
+               GOTO 10
+             END IF
+             IN = FRERE( IN )
+           END DO
+           WRITE(*,*) 'ERROR 2 in SPLIT NODE',
+     &          IN_GRANDFATH, IN, FRERE(IN)
+       END IF
+ 10    CONTINUE
+       NFSIZ(INODE_SON) = NFRONT
+       NFSIZ(INODE_FATH) = NFRONT - NPIV_SON
+       KEEP(2) = max( KEEP(2), NFRONT - NPIV_SON )
+       NSTEPS  = NSTEPS + 1
+       IF ( (KEEP(53).EQ.0) .AND. NSLAVES.GT.1) THEN
+         KEEP(38) = INODE_FATH
+       ENDIF
+       IF ( KEEP(53).NE.0 ) THEN
+         KEEP(20) = INODE_FATH
+       ENDIF
+      RETURN
+      END SUBROUTINE SMUMPS_SPLIT_ROOT
       SUBROUTINE SMUMPS_ANA_GNEW
      & (N, NZ, IRN, ICN, IW, LW, IPE, LEN,
      & IQ, FLAG, IWFR,
@@ -3407,7 +3653,7 @@ C
      &         SMUMPS_MTRANSS,SMUMPS_MTRANSW
       INTRINSIC abs,log
       RINF = CNTL(2)
-      RINF2 = huge(RINF2)/real(2*N)
+      RINF2 = huge(RINF2)/real(int(2,8)*int(N,8))
       RINF3 = 0.0E0
       WARN1 = 0
       WARN2 = 0
@@ -3436,12 +3682,12 @@ C
          IF (ICNTL(1).GE.0) WRITE(ICNTL(1),9001) INFO(1),'NE',NE
          GO TO 99
       ENDIF
-      IF (JOB.EQ.1) K = int(4*N +   M,8)
-      IF (JOB.EQ.2) K = int(N + 2*M,8)
-      IF (JOB.EQ.3) K = int(8*N + 2*M + NE,8)
-      IF (JOB.EQ.4) K = int(N + M,8)
-      IF (JOB.EQ.5) K = int(3*N + 2*M,8)
-      IF (JOB.EQ.6) K = int(3*N + 2*M + NE,8)
+      IF (JOB.EQ.1) K = 4_8*int(N,8)+int(M,8)
+      IF (JOB.EQ.2) K = int(N,8) + 2_8*int(M,8)
+      IF (JOB.EQ.3) K = 8_8*int(N,8) + 2*int(M,8) + NE
+      IF (JOB.EQ.4) K = int(N,8) + int(M,8)
+      IF (JOB.EQ.5) K = 3_8*int(N,8) + 2_8*int(M,8)
+      IF (JOB.EQ.6) K = 3_8*int(N,8) + 2_8*int(M,8) + NE
       IF (LIW.LT.K) THEN
          INFO(1) = -4
          CALL MUMPS_SET_IERROR(K,INFO(2))
@@ -3449,11 +3695,11 @@ C
          GO TO 99
       ENDIF
       IF (JOB.GT.1) THEN
-         IF (JOB.EQ.2) K = int(      M,8)
+         IF (JOB.EQ.2) K = int(M,8)
          IF (JOB.EQ.3) K = int(1,8)
-         IF (JOB.EQ.4) K = int(    2*M,8)
-         IF (JOB.EQ.5) K = int(N + 2*M,8)
-         IF (JOB.EQ.6) K = int(N + 3*M,8)
+         IF (JOB.EQ.4) K = 2_8*int(M,8)
+         IF (JOB.EQ.5) K = int(N,8) + 2_8*int(M,8)
+         IF (JOB.EQ.6) K = int(N,8) + 3_8*int(M,8)
          IF (LDW .LT. K) THEN
             INFO(1) = -5
             CALL MUMPS_SET_IERROR(K,INFO(2))
@@ -3510,13 +3756,18 @@ C
             IW(J) = int(IP(J+1) - IP(J))
  10      CONTINUE
          CALL SMUMPS_MTRANSZ(M,N,IRN,NE,IP,IW(1),PERM,NUM,
-     &        IW(N+1),IW(2*N+1),IW(3*N+1),IW(3*N+M+1))
+     &        IW(    int(N,8)+1_8),
+     &        IW(2_8*int(N,8)+1_8),
+     &        IW(3_8*int(N,8)+1_8),
+     &        IW(3_8*int(N,8)+int(M,8)+1_8))
          GO TO 90
       ENDIF
       IF (JOB.EQ.2) THEN
          DW(1) = max(ZERO,CNTL(1))
          CALL SMUMPS_MTRANSB(M,N,NE,IP,IRN,A,PERM,NUM,
-     &        IW(1),IPQ8,IW(N+1),IW(N+M+1),DW,RINF2)
+     &        IW(1),IPQ8,IW(int(N,8)+1_8),
+     &        IW(int(N,8)+int(M,8)+1_8),
+     &        DW,RINF2)
          GO TO 90
       ENDIF
       IF (JOB.EQ.3) THEN
@@ -3525,16 +3776,21 @@ C
  20      CONTINUE
          CALL SMUMPS_MTRANSR(N,NE,IP,IW,A)
          FACT = max(ZERO,CNTL(1))
-         CALL SMUMPS_MTRANSS(M,N,NE,IP,IW(1),A,PERM,NUM,IW(NE+1),
-     &        IW(NE+N+1),IW(NE+2*N+1),IW(NE+3*N+1),IW(NE+4*N+1),
-     &        IW(NE+5*N+1),IW(NE+5*N+M+1),FACT,RINF2)
+         CALL SMUMPS_MTRANSS(M,N,NE,IP,IW(1),A,PERM,NUM,IW(NE+1_8),
+     &        IW(NE+int(N,8)+1_8),IW(NE+2_8*int(N,8)+1_8),
+     &        IW(NE+3_8*int(N,8)+1_8),
+     &        IW(NE+4_8*int(N,8)+1_8),
+     &        IW(NE+5_8*int(N,8)+1_8),
+     &        IW(NE+5_8*int(N,8)+int(M,8)+1_8),
+     &        FACT,RINF2)
          GO TO 90
       ENDIF
       IF ((JOB.EQ.4).OR.(JOB.EQ.5).or.(JOB.EQ.6)) THEN
-           ALLOCATE(IWtemp8(M+N+N), stat=allocok)
+           ALLOCATE(IWtemp8(int(M,8)+int(N,8)+int(N,8)), stat=allocok)
            IF (allocok.GT.0) THEN
              INFOMUMPS(1) = -7
-             INFOMUMPS(2) = M+N+N
+             CALL MUMPS_SET_IERROR( int(M,8)+int(N,8)+int(N,8),
+     &                               INFOMUMPS(2) )
              GOTO 90
            ENDIF
       ENDIF
@@ -3553,9 +3809,10 @@ C
          DW(2)      = RINF3
          IWtemp8(1) = int(JOB,8)
          CALL SMUMPS_MTRANSW(M,N,NE,IP,IRN,A,PERM,NUM,
-     &        IWtemp8(1),IW(1),IWtemp8(N+1),IPQ8,IW(N+1),
-     &        IWtemp8(2*N+1),
-     &        DW(1),DW(M+1),RINF2)
+     &        IWtemp8(1),IW(1),IWtemp8(int(N,8)+1_8),IPQ8,
+     &        IW(int(N,8)+1_8),
+     &        IWtemp8(2_8*int(N,8)+1_8),
+     &        DW(1),DW(int(M,8)+1_8),RINF2)
          DEALLOCATE(IWtemp8)  
          GO TO 90
       ENDIF
@@ -3567,7 +3824,7 @@ C
                DO 60 K = IP(J),IP(J+1)-1_8
                   IF (A(K).GT.FACT) FACT = A(K)
  60            CONTINUE
-               DW(2*M+J) = FACT
+               DW(2_8*int(M,8)+int(J,8)) = FACT
                IF (FACT.NE.ZERO) THEN
                   FACT = log(FACT)
                   IF(FACT .GT. RINF3) RINF3=FACT
@@ -3588,38 +3845,40 @@ C
          ENDIF
          IF (JOB.EQ.6) THEN
             DO 175 K = 1,NE
-               IW(3*N+2*M+K) = IRN(K)
+               IW(3_8*int(N,8)+2_8*int(M,8)+int(K,8)) = IRN(K)
  175        CONTINUE
             DO 61 I = 1,M
-               DW(2*M+N+I) = ZERO
+               DW(2_8*int(M,8)+int(N,8)+int(I,8)) = ZERO
  61         CONTINUE
             DO 63 J = 1,N
                DO 62 K = IP(J),IP(J+1)-1_8
                   I = IRN(K)
-                  IF (A(K).GT.DW(2*M+N+I)) THEN
-                     DW(2*M+N+I) = A(K)
+                  IF (A(K).GT.DW(2_8*int(M,8)+int(N,8)+int(I,8))) THEN
+                     DW(2_8*int(M,8)+int(N,8)+int(I,8)) = A(K)
                   ENDIF
  62            CONTINUE
  63         CONTINUE
             DO 64 I = 1,M
-               IF (DW(2*M+N+I).NE.ZERO) THEN
-                  DW(2*M+N+I) = 1.0E0/DW(2*M+N+I)
+               IF (DW(2_8*int(M,8)+int(N,8)+int(I,8)).NE.ZERO) THEN
+                   DW(2_8*int(M,8)+int(N,8)+int(I,8)) =
+     &                      1.0E0/DW(2_8*int(M,8)+int(N,8)+int(I,8))
                ENDIF
  64         CONTINUE
             DO 66 J = 1,N
                DO 65 K = IP(J),IP(J+1)-1
                   I = IRN(K)
-                  A(K) = DW(2*M+N+I) * A(K)
+                  A(K) = DW(2_8*int(M,8)+int(N,8)+int(I,8)) * A(K)
  65            CONTINUE
  66         CONTINUE
-            CALL SMUMPS_MTRANSR(N,NE,IP,IW(3*N+2*M+1),A)
+            CALL SMUMPS_MTRANSR(N,NE,IP,
+     &           IW(3_8*int(N,8)+2_8*int(M,8)+1_8),A)
             DO 176 J = 1,N
                IF (IP(J).NE.IP(J+1)) THEN
                   FACT = A(IP(J))
                ELSE
                   FACT = ZERO
                ENDIF
-               DW(2*M+J) = FACT
+               DW(2_8*int(M,8)+int(J,8)) = FACT
                IF (FACT.NE.ZERO) THEN
                   FACT = log(FACT)
                   DO 170 K = IP(J),IP(J+1)-1_8
@@ -3643,34 +3902,38 @@ C
          IWtemp8(1) = int(JOB,8)
           IF (JOB.EQ.5) THEN
          CALL SMUMPS_MTRANSW(M,N,NE,IP,IRN,A,PERM,NUM,
-     &        IWtemp8(1),IW(1),IWtemp8(N+1),IPQ8,IW(N+1),
-     &        IWtemp8(2*N+1),
-     &        DW(1),DW(M+1),RINF2)
+     &        IWtemp8(1),IW(1),IWtemp8(int(N,8)+1_8),IPQ8,
+     &        IW(int(N,8)+1_8),
+     &        IWtemp8(2_8*int(N,8)+1_8),
+     &        DW(1),DW(int(M,8)+1_8),RINF2)
          ENDIF
          IF (JOB.EQ.6) THEN
-         CALL SMUMPS_MTRANSW(M,N,NE,IP,IW(3*N+2*M+1),A,PERM,NUM,
-     &        IWtemp8(1),IW(1),IWtemp8(N+1),IPQ8,IW(N+1),
-     &        IWtemp8(2*N+1),
-     &        DW(1),DW(M+1),RINF2)
+         CALL SMUMPS_MTRANSW(M,N,NE,IP,
+     &        IW(3_8*int(N,8)+2_8*int(M,8)+1_8),A,PERM,NUM,
+     &        IWtemp8(1),IW(1),IWtemp8(int(N,8)+1_8),IPQ8,
+     &        IW(int(N,8)+1_8),
+     &        IWtemp8(2_8*int(N,8)+1_8),
+     &        DW(1),DW(int(M,8)+1_8),RINF2)
          ENDIF
          IF ((JOB.EQ.5).or.(JOB.EQ.6)) THEN
           DEALLOCATE(IWtemp8)
          ENDIF
          IF (JOB.EQ.6) THEN
-            DO 79 I = 1,M
-               IF (DW(2*M+N+I).NE.0.0E0) THEN
-                  DW(I) = DW(I) + log(DW(2*M+N+I))
-               ENDIF
- 79         CONTINUE
+           DO 79 I = 1,M
+             IF (DW(2_8*int(M,8)+int(N,8)+int(I,8)).NE.0.0E0) THEN
+               DW(I) = DW(I) + log(DW(2_8*int(M,8)+int(N,8)+int(I,8)))
+             ENDIF
+ 79        CONTINUE
          ENDIF
          IF (NUM.EQ.N) THEN
-            DO 80 J = 1,N
-               IF (DW(2*M+J).NE.ZERO) THEN
-                  DW(M+J) = DW(M+J) - log(DW(2*M+J))
-               ELSE
-                  DW(M+J) = ZERO
-               ENDIF
- 80         CONTINUE
+           DO 80 J = 1,N
+             IF (DW(2_8*int(M,8)+int(J,8)).NE.ZERO) THEN
+               DW(int(M,8)+int(J,8)) = DW(int(M,8)+int(J,8)) -
+     &                                 log(DW(2_8*int(M,8)+int(J,8)))
+             ELSE
+               DW(int(M,8)+int(J,8)) = ZERO
+             ENDIF
+ 80        CONTINUE
          ENDIF
          FACT = 0.5E0*log(RINF2)
          DO 86 I = 1,M
@@ -3706,13 +3969,15 @@ C
                WRITE(ICNTL(3),9032) (PERM(J),J=1,min(10,M))
                IF (JOB.EQ.5 .OR. JOB.EQ.6) THEN
                   WRITE(ICNTL(3),9033) (DW(J),J=1,min(10,M))
-                  WRITE(ICNTL(3),9034) (DW(M+J),J=1,min(10,N))
+                  WRITE(ICNTL(3),9034) (DW(int(M,8)+int(J,8)),
+     &                                  J=1,min(10,N))
                ENDIF
             ELSEIF (ICNTL(4).EQ.1) THEN
                WRITE(ICNTL(3),9032) (PERM(J),J=1,M)
                IF (JOB.EQ.5 .OR. JOB.EQ.6) THEN
                   WRITE(ICNTL(3),9033) (DW(J),J=1,M)
-                  WRITE(ICNTL(3),9034) (DW(M+J),J=1,N)
+                  WRITE(ICNTL(3),9034) (DW(int(M,8)+int(J,8)),
+     &                                  J=1,N)
                ENDIF
             ENDIF
          ENDIF
@@ -3995,6 +4260,7 @@ C
       REAL PEAK
       INTEGER, intent(IN) :: LSIZEOFBLOCKS
       INTEGER, intent(IN) :: SIZEOFBLOCKS(LSIZEOFBLOCKS)
+      CALL MUMPS_SET_K78_83_91 (NSLAVES,KEEP(78),KEEP(83),KEEP(91))
       CALL MUMPS_DISTRIBUTE(N,NSLAVES,
      &     ICNTL,INFOG, NE, NFSIZ,
      &     FRERE, FILS,

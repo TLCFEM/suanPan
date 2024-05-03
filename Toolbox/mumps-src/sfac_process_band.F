@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -46,7 +46,7 @@ C
       INTEGER PTRIST(KEEP(28)), STEP(N), 
      & PIMASTER(KEEP(28)), 
      & ITLOC( N + KEEP(253) )
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER :: ISTEP_TO_INIV2(KEEP(71))
 #if ! defined(NO_FDM_DESCBAND)
       INTEGER IWHANDLER_IN
@@ -124,7 +124,7 @@ C
      &       COMP, LRLUS, KEEP8(67), IFLAG, IERROR
      &     )
         IF ( IFLAG .LT. 0 ) RETURN
-#if defined(MUMPS_ALLOC_FROM_C)
+#if defined(MUMPS_ALLOC_FROM_C) || defined(_CRAYFTN)
         CALL MUMPS_MALLOC_C( TMP_ADDRESS,
      &      LREQCB * int(KEEP(35),8) )
         IF (TMP_ADDRESS .EQ. 0_8) THEN
@@ -145,7 +145,7 @@ C
      &    KEEP8, IFLAG, IERROR,
      &    .TRUE., 
      &    .FALSE. ) 
-#if ! defined(MUMPS_ALLOC_FROM_C)
+#if ! defined(MUMPS_ALLOC_FROM_C) && ! defined(_CRAYFTN)
           CALL MUMPS_ADDR_C( DYNAMIC_CB(1), TMP_ADDRESS )
 #endif
           CALL MUMPS_STOREI8(LREQCB, IW(IWPOSCB+1+XXD))
@@ -289,7 +289,7 @@ C
       INTEGER NELT, LPTRAR
       INTEGER FRTPTR( N+1 ), FRTELT( NELT )
       INTEGER ITLOC( N + KEEP(253) ), FILS( N ), DAD( KEEP(28) )
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER(8), INTENT(IN) :: PTRARW( LPTRAR ), PTRAIW( LPTRAR )
       INTEGER(8), INTENT(IN) :: PTR8ARR(KEEP(193))
       INTEGER, INTENT(IN) :: NINCOLARR(KEEP(194))

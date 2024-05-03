@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -11,11 +11,11 @@ C  released under the CeCILL-C license
 C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
 C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
+#if ! defined(NO_SAVE_RESTORE)
       MODULE SMUMPS_SAVE_RESTORE_FILES
       USE SMUMPS_STRUC_DEF
       IMPLICIT NONE
-      INTEGER :: LEN_SAVE_FILE
-      PARAMETER( LEN_SAVE_FILE = 550)
+      INTEGER, PARAMETER :: LEN_SAVE_FILE = 1318
       CONTAINS
       SUBROUTINE MUMPS_READ_HEADER(fileunit, ierr, size_read, SIZE_INT
      &     ,SIZE_INT8, TOTAL_FILE_SIZE, TOTAL_STRUC_SIZE
@@ -113,10 +113,6 @@ C
         size_read=size_read
      &           +int(2*SIZE_INT*1,kind=8)
 #endif
-#if defined(OOC_VERBOSE)
-        write(*,*) 'First ooc file: ',
-     &   READ_OOC_FIRST_FILE_NAME(1:READ_OOC_FILE_NAME_LENGTH-2)
-#endif
       ENDIF
  100  continue
       RETURN
@@ -202,7 +198,11 @@ C
       INTEGER::supp,tmp_err
       ierr = 0
       tmp_err = 0
-      supp=200+MYID
+      CALL MUMPS_FIND_UNIT(supp)
+      IF ( supp .EQ. -1 ) THEN
+         ierr=-79
+         RETURN
+      ENDIF
       open(UNIT=supp,FILE=SUPPFILE,STATUS='old',
      &     form='unformatted',iostat=tmp_err)
       if (tmp_err.eq.0) THEN
@@ -226,66 +226,83 @@ C
           tmp_err = 0
         endif
       endif
+      RETURN
       END SUBROUTINE MUMPS_CLEAN_SAVED_DATA
       SUBROUTINE SMUMPS_GET_SAVE_FILES(id,SAVE_FILE,INFO_FILE)
       INCLUDE 'mpif.h'
       TYPE (SMUMPS_STRUC),intent(inout) :: id
       CHARACTER(len=LEN_SAVE_FILE),intent(out):: SAVE_FILE, INFO_FILE
       INTEGER::len_save_dir,len_save_prefix
-      CHARACTER(len=255):: tmp_savedir,savedir
-      CHARACTER(len=255):: tmp_saveprefix,saveprefix
+      INTEGER, PARAMETER :: SAVE_PREFIX_MAX_LENGTH =  255
+      INTEGER, PARAMETER :: SAVE_DIR_MAX_LENGTH    = 1023
+      CHARACTER(len=SAVE_DIR_MAX_LENGTH)    :: tmp_save_dir
+      CHARACTER(len=SAVE_DIR_MAX_LENGTH)    :: save_dir
+      CHARACTER(len=SAVE_PREFIX_MAX_LENGTH) :: save_prefix
+      CHARACTER(len=SAVE_PREFIX_MAX_LENGTH) :: tmp_save_prefix
       CHARACTER(len=10):: STRING_MYID
       CHARACTER:: LAST_CHAR_DIR
       INFO_FILE=''
       SAVE_FILE=''
-      tmp_savedir=''
-      tmp_saveprefix=''
+      tmp_save_dir=''
+      tmp_save_prefix=''
       IF(id%SAVE_DIR.EQ."NAME_NOT_INITIALIZED") THEN
-         call mumps_get_save_dir_C(len_save_dir,tmp_savedir)
-         if(tmp_savedir(1:len_save_dir).EQ."NAME_NOT_INITIALIZED") then
-            id%INFO(1) = -77
-            id%INFO(2) = 0 
+         call MUMPS_GET_SAVE_DIR_C(len_save_dir,tmp_save_dir)
+         len_save_dir=min(SAVE_DIR_MAX_LENGTH,len_save_dir)
+         if (len_save_dir > SAVE_DIR_MAX_LENGTH) then
+           id%INFO(1) = -77
+           id%INFO(2) = SAVE_DIR_MAX_LENGTH
+         else if(tmp_save_dir(1:len_save_dir).EQ."NAME_NOT_INITIALIZED")
+     &     then
+           id%INFO(1) = -77
+           id%INFO(2) = 0 
          else
-            savedir=trim(adjustl(tmp_savedir(1:len_save_dir)))
-            len_save_dir=len_trim(savedir(1:len_save_dir))
+           save_dir=trim(adjustl(tmp_save_dir(1:len_save_dir)))
+           len_save_dir=len_trim(save_dir(1:len_save_dir))
          endif
       ELSE
-         savedir=trim(adjustl(id%SAVE_DIR))
-         len_save_dir=len_trim(savedir)
+         save_dir=trim(adjustl(id%SAVE_DIR))
+         len_save_dir=len_trim(save_dir)
       ENDIF
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     id%COMM, id%MYID )
       IF ( id%INFO(1) .LT. 0 ) GOTO 100
       IF(id%SAVE_PREFIX.EQ."NAME_NOT_INITIALIZED") THEN
-         call mumps_get_save_prefix_C(len_save_prefix,tmp_saveprefix)
-         if(tmp_saveprefix(1:len_save_prefix).EQ."NAME_NOT_INITIALIZED")
-     &        then
-            saveprefix="save"
-            len_save_prefix=len_trim(saveprefix)
-         else
-            saveprefix=
-     &           trim(adjustl(tmp_saveprefix(1:len_save_prefix)))
-            len_save_prefix=len_trim(saveprefix(1:len_save_prefix))
-         endif
+        call MUMPS_GET_SAVE_PREFIX_C(len_save_prefix,tmp_save_prefix)
+        len_save_prefix=min(SAVE_PREFIX_MAX_LENGTH,len_save_prefix)
+        if(len_save_prefix.GT.SAVE_PREFIX_MAX_LENGTH) then
+          id%INFO(1)=-77
+          id%INFO(2)=-SAVE_PREFIX_MAX_LENGTH
+        else if(tmp_save_prefix(1:len_save_prefix).EQ.
+     &  "NAME_NOT_INITIALIZED") then
+           save_prefix="save"
+           len_save_prefix=len_trim(save_prefix)
+        else
+           save_prefix=
+     &          trim(adjustl(tmp_save_prefix(1:len_save_prefix)))
+           len_save_prefix=len_trim(save_prefix(1:len_save_prefix))
+        endif
       ELSE
-         saveprefix=trim(adjustl(id%SAVE_PREFIX))
-         len_save_prefix=len_trim(saveprefix)
+        save_prefix=trim(adjustl(id%SAVE_PREFIX))
+        len_save_prefix=len_trim(save_prefix)
       ENDIF
+      CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
+     &     id%COMM, id%MYID )
+      IF ( id%INFO(1) .LT. 0 ) GOTO 100
       write(STRING_MYID,'(I10)') id%MYID
-      LAST_CHAR_DIR=savedir(len_save_dir:len_save_dir)
+      LAST_CHAR_DIR=save_dir(len_save_dir:len_save_dir)
       if(LAST_CHAR_DIR.NE."/") then
-         SAVE_FILE=trim(adjustl(savedir))//"/"
+         SAVE_FILE=trim(adjustl(save_dir))//"/"
       else
-         SAVE_FILE=trim(adjustl(savedir))
+         SAVE_FILE=trim(adjustl(save_dir))
       endif
       INFO_FILE=trim(adjustl(SAVE_FILE))
       SAVE_FILE=trim(adjustl(SAVE_FILE))
-     &     //trim(adjustl(saveprefix))
+     &     //trim(adjustl(save_prefix))
      &     //"_"
      &     //trim(adjustl(STRING_MYID))
      &     //".mumps"
       INFO_FILE=trim(adjustl(INFO_FILE))
-     &        //trim(adjustl(saveprefix))
+     &        //trim(adjustl(save_prefix))
      &        //"_"
      &        //trim(adjustl(STRING_MYID))
      &        //".info"
@@ -318,3 +335,8 @@ C
       ENDIF
       END SUBROUTINE SMUMPS_CHECK_FILE_NAME      
       END MODULE SMUMPS_SAVE_RESTORE_FILES
+#else
+      SUBROUTINE SMUMPS_SAVE_FILES_RETURN()
+      RETURN
+      END SUBROUTINE SMUMPS_SAVE_FILES_RETURN
+#endif

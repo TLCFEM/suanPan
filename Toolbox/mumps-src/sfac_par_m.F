@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -32,6 +32,7 @@ C
 !$    USE OMP_LIB
       USE SMUMPS_DYNAMIC_MEMORY_M, ONLY : 
      &                                    SMUMPS_DM_FREEALLDYNAMICCB
+      USE SMUMPS_BUF, ONLY : SMUMPS_BUF_TEST
       USE SMUMPS_LOAD
       USE SMUMPS_OOC
       USE SMUMPS_FAC_ASM_MASTER_M
@@ -64,7 +65,7 @@ C
       INTEGER LPOOL
       INTEGER PROCNODE_STEPS(KEEP(28))
       INTEGER ITLOC(N+KEEP(253))
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER IW(LIW), NSTK_STEPS(KEEP(28))
       INTEGER(8), INTENT(IN) :: PTRARW(LPTRAR), PTRAIW(LPTRAR)
       INTEGER(8), INTENT(IN) :: PTR8ARR(KEEP(193))
@@ -132,15 +133,31 @@ C
       INTEGER LOCAL_M, LOCAL_N
       INTEGER LRHS_CNTR_MASTER_ROOT, FWD_LOCAL_N_RHS
       LOGICAL ROOT_OWNER
+!$    INTEGER :: NOMP
+!$    INTEGER(8) :: CHUNK8  
+      INTEGER  LIWK_RR, PHASE, MBLOCK, NBLOCK
+      INTEGER(8) :: LWK_RR
+      INTEGER(8) :: I8
+      INTEGER  I, K, KEEP17_LU
+      INTEGER  NOFFNEGPV_ROOT, NTOTPV_ROOT, NB22T1_ROOT, NBTINY_ROOT,
+     &         NULLNEGPV_ROOT,
+     &         DET_EXP_ROOT, DET_SIGN_ROOT, 
+     &         LRecord, Header_ROOT(5)
+      REAL  DET_MANT_ROOT  
+      REAL DKEEP_SAVE(230)
+      REAL, DIMENSION(:), POINTER     :: A_ROOT_SAVE
+      LOGICAL                            :: IS_A_ROOT_SAVE_ALLOCATED
+      INTEGER, DIMENSION(:), ALLOCATABLE :: RECORD_ROOT
+      INTEGER KEEP_SAVE(500)             
+      INTEGER(8) KEEP8_SAVE(150)
       EXTERNAL MUMPS_TYPENODE, MUMPS_PROCNODE
       INTEGER MUMPS_TYPENODE, MUMPS_PROCNODE
-      LOGICAL MUMPS_INSSARBR,MUMPS_ROOTSSARBR
-      EXTERNAL MUMPS_INSSARBR,MUMPS_ROOTSSARBR
+      LOGICAL MUMPS_INSSARBR
+      EXTERNAL MUMPS_INSSARBR
       LOGICAL SMUMPS_POOL_EMPTY
       EXTERNAL SMUMPS_POOL_EMPTY, SMUMPS_EXTRACT_POOL
       LOGICAL STACK_RIGHT_AUTHORIZED
-      INTEGER numroc
-      EXTERNAL numroc
+      INTEGER, EXTERNAL :: MUMPS_NUMROC
       INTEGER JOBASS, ETATASS
       INTEGER(8) :: LAFAC
       INTEGER LIWFAC, STRAT, TYPEFile, NextPiv2beWritten,
@@ -153,13 +170,6 @@ C
       DOUBLE PRECISION :: ROOTTIME
       INTEGER:: ITH
       DOUBLE PRECISION :: DUMMY_FLOP_ESTIM_ACC
-#if defined(multicore_profiling)
-      DOUBLE PRECISION :: LATIME, LFTIME, LSTIME
-      DOUBLE PRECISION :: GATIME, GFTIME, GSTIME
-      GATIME = 0
-      GFTIME = 0
-      GSTIME = 0
-#endif
       DUMMY_FLOP_ESTIM_ACC = 0.0d0
       ITLOC(1:N+KEEP(253)) =0
       ASS_IRECV = MPI_REQUEST_NULL
@@ -169,6 +179,9 @@ C
       NULLIFY(BUFRX)
       IS_BUFRX_ALLOCATED = .FALSE.
       KEEP(143) = -1
+      KEEP17_LU = -1
+      NULLIFY(A_ROOT_SAVE)
+      IS_A_ROOT_SAVE_ALLOCATED = .FALSE.
       IF ( INFO(1) .LT. 0 ) THEN
         GOTO 640
       ENDIF
@@ -235,7 +248,8 @@ C
       SET_IRECV = .TRUE.
       BLOCKING = .FALSE.
       MESSAGE_RECEIVED = .FALSE.
-      CALL SMUMPS_TRY_RECVTREAT(
+      IF ( SLAVEF .GT. 1 ) THEN 
+        CALL SMUMPS_TRY_RECVTREAT(
      &      COMM_LOAD, ASS_IRECV, BLOCKING, SET_IRECV,
      &      MESSAGE_RECEIVED,
      &      MPI_ANY_SOURCE, MPI_ANY_TAG,
@@ -256,7 +270,8 @@ C
      &      STACK_RIGHT_AUTHORIZED
      &               , LRGROUPS
      &       )
-      CALL SMUMPS_LOAD_RECV_MSGS(COMM_LOAD)
+        CALL SMUMPS_LOAD_RECV_MSGS(COMM_LOAD)
+      ENDIF
       IF (MPA.GT.0)
      &   CALL MUMPS_PRINT_STILL_ACTIVE (MYID_NODES, KEEP, 
      &                        dble(DKEEP(17)), 
@@ -299,6 +314,8 @@ C
      &         MYID_NODES,KEEP,KEEP8,N)
             END IF
             GOTO 30
+          ELSE
+            CALL SMUMPS_BUF_TEST()
           ENDIF
       ENDIF
       GO TO 20
@@ -530,8 +547,26 @@ C
           WRITE(*,*) "ERROR 2 in SMUMPS_FAC_PAR", POSELT
           GOTO 635
         ENDIF
+        IF (KEEP(118).GE.40) THEN
+          IOLDPS = PTLUST(STEP(INODE))
+          LRecord = IW(IOLDPS+XXI)
+          IF (allocated(RECORD_ROOT)) DEALLOCATE(RECORD_ROOT)
+          ALLOCATE(RECORD_ROOT(LRecord), stat=IERR)
+          IF (IERR.GT.0) THEN
+            INFO(1)= -13
+            INFO(2)= LRecord
+            IF (LP > 0)
+     &      write(LP,*) "ERROR allocate RECORD_ROOT"
+            GOTO 635
+          ENDIF
+          RECORD_ROOT(1:LRecord) = IW(IOLDPS:IOLDPS+LRecord-1)
+        ENDIF
         CALL SMUMPS_CHANGE_HEADER
      &       ( IW(PTLUST(STEP(INODE))+KEEP(IXSZ)), KEEP(253) )
+        IF (KEEP(118).GE.40) THEN
+          Header_ROOT(1:5) = IW(PTLUST(STEP(INODE))+KEEP(IXSZ):
+     &                        PTLUST(STEP(INODE))+KEEP(IXSZ)+4)
+        ENDIF
         GOTO 200
       END IF
       POSELT = PTRAST(STEP(INODE))
@@ -552,11 +587,6 @@ C
      &           , PERM
      &           )
            IF (INFO(1).LT.0) GOTO 635
-#if defined(multicore_profiling)
-         LFTIME = MPI_WTIME() - LFTIME
-         GFTIME = GFTIME + LFTIME
-         WRITE(*,*)'FAC ',LFTIME
-#endif
       ELSE  
             IW( IOLDPS+4+KEEP(IXSZ) ) = 1
               CALL SMUMPS_FAC1_LDLT( N, INODE,
@@ -575,9 +605,6 @@ C
           ENDIF 
           JOBASS = ETATASS          
           IF (JOBASS.EQ.1) THEN
-#if defined(multicore_profiling)
-              LATIME = MPI_WTIME()
-#endif
               CALL SMUMPS_FAC_ASM_NIV1(COMM_LOAD, ASS_IRECV,
      &        N,INODE,IW,LIW,A,LA,
      &        INFO(1),ND,
@@ -596,11 +623,6 @@ C
      &        JOBASS,ETATASS
      &               , LRGROUPS
      &         )
-#if defined(multicore_profiling)
-         LATIME = MPI_WTIME() - LATIME
-         GATIME = GATIME + LATIME
-         WRITE(*,*)'ASS ',LATIME
-#endif
           ENDIF
           IF (MPA.GT.0)
      &    CALL MUMPS_PRINT_STILL_ACTIVE (MYID_NODES, KEEP, 
@@ -615,9 +637,6 @@ C
       ELSE
         TYPEF = -9999
       END IF
-#if defined(multicore_profiling)
-         LSTIME = MPI_WTIME()
-#endif
       CALL SMUMPS_FAC_STACK( COMM_LOAD, ASS_IRECV,
      &       N,INODE,TYPE,TYPEF,LA,IW,LIW,A,
      &       INFO(1),INFO(2),OPELI,NELVA,NMAXNPIV,
@@ -636,11 +655,6 @@ C
      &               , LRGROUPS
      &       ,DUMMY_FLOP_ESTIM_ACC
      &       )
-#if defined(multicore_profiling)
-         LSTIME = MPI_WTIME() - LSTIME
-         GSTIME = GSTIME + LSTIME
-         WRITE(*,*)'STK ',LSTIME
-#endif
       IF (MPA.GT.0)
      &   CALL MUMPS_PRINT_STILL_ACTIVE (MYID_NODES, KEEP, 
      &                        dble(DKEEP(17)), 
@@ -710,6 +724,7 @@ C
       ENDIF
       GO TO 20
  635  CONTINUE
+      IF (allocated(RECORD_ROOT)) DEALLOCATE(RECORD_ROOT)
       CALL SMUMPS_BDC_ERROR( MYID_NODES, SLAVEF, COMM_NODES, KEEP )
  640  CONTINUE
         CALL SMUMPS_CANCEL_IRECV( INFO(1),
@@ -912,8 +927,8 @@ C
                   CALL MUMPS_PROPINFO( ICNTL, INFO, COMM_NODES,
      &            MYID_NODES)
                   IF (root%yes .AND. INFO(1).GE.0) THEN
-                    FWD_LOCAL_N_RHS = numroc(KEEP(253), root%NBLOCK,
-     &              root%MYCOL, 0, root%NPCOL)
+                    FWD_LOCAL_N_RHS = MUMPS_NUMROC(KEEP(253),
+     &              root%NBLOCK, root%MYCOL, 0, root%NPCOL)
                     FWD_LOCAL_N_RHS = max(1,FWD_LOCAL_N_RHS)
                     CALL SMUMPS_GATHER_ROOT( MYID_NODES,
      &              root%TOT_ROOT_SIZE, KEEP(253),
@@ -939,6 +954,279 @@ C
                    NTOTPV = NTOTPV + NFRONT 
                    NMAXNPIV = max(NMAXNPIV,NFRONT)
                 END IF
+                IF ( KEEP(60) .EQ. 0 ) THEN
+                 IF ( ROOT_OWNER ) THEN
+                  IF (KEEP(118).GE.40) THEN
+                   NOFFNEGPV_ROOT = 0        
+                   NULLNEGPV_ROOT = 0        
+                   NTOTPV_ROOT = 0
+                   NB22T1_ROOT = 0
+                   NBTINY_ROOT = 0
+                   DET_SIGN_ROOT = 1
+                   DET_EXP_ROOT = 0
+                   DET_MANT_ROOT = 1.0E0
+                   DKEEP_SAVE(:) = DKEEP(:)
+                   KEEP_SAVE(:)  = KEEP(:)
+                   KEEP8_SAVE(:) = KEEP8(:)
+                   KEEP_SAVE(201) = 0
+                   IF (KEEP(110).EQ.0) THEN
+                     KEEP_SAVE(110)= 1        
+                     IF (KEEP(118).EQ.40) THEN
+                      IF ((DKEEP(10).LE.0).OR.(DKEEP(10).GT.1)) THEN
+                             DKEEP_SAVE(1) = DKEEP(9)*1E-1
+                      ELSE
+                             DKEEP_SAVE(1) = DKEEP(9)*DKEEP(10) 
+                      ENDIF    
+                     ELSE IF (KEEP(118).EQ.41) THEN
+                        DKEEP_SAVE(1) = DKEEP(9)
+                     ELSE IF (KEEP(118).EQ.42) THEN
+                      IF (DKEEP(13).LT.1)  THEN
+                          DKEEP_SAVE(1) = DKEEP(9)*10 
+                      ELSE
+                         DKEEP_SAVE(1) = DKEEP(9)*DKEEP(13)       
+                      ENDIF
+                     ENDIF  
+                   ELSE 
+                     DKEEP_SAVE(1) = DKEEP(9)
+                   ENDIF 
+                   IS_A_ROOT_SAVE_ALLOCATED = .FALSE.
+                   IF (LRLU.GT.NFRONT8*NFRONT8) THEN
+                     A_ROOT_SAVE  => A(POSFAC:POSFAC+LRLU-1_8)
+                   ELSE
+                    IF (associated(A_ROOT_SAVE)) 
+     &                               DEALLOCATE(A_ROOT_SAVE)
+                    ALLOCATE(A_ROOT_SAVE(NFRONT8*NFRONT8),stat=IERR)
+                    IF (IERR.GT.0) THEN
+                     INFO(1) = -13
+                     CALL MUMPS_SET_IERROR(NFRONT8*NFRONT8, INFO(2) )
+                     IF (LP > 0 )
+     &                 write(LP,*) "ERROR allocating A_ROOT_SAVE ",
+     &                 " of size ", NFRONT*NFRONT
+                     GOTO 735
+                    ENDIF
+                    IS_A_ROOT_SAVE_ALLOCATED = .TRUE.
+                   ENDIF
+!$        NOMP = OMP_GET_MAX_THREADS()
+!$        CHUNK8=int(KEEP(361),8)
+!$OMP     PARALLEL DO PRIVATE(I8) SCHEDULE(STATIC, CHUNK8)
+!$OMP&    IF ( NFRONT8*NFRONT8 > int(KEEP(361),8) .AND. NOMP .GT. 1)
+                   DO I8 =1_8, NFRONT8*NFRONT8
+                       A_ROOT_SAVE(I8) = 
+     &                   A(PTRAST(STEP(KEEP(20)))+I8-1_8)
+                   ENDDO
+                   IW(PTLUST(STEP(INODE))+KEEP(IXSZ): 
+     &                    PTLUST(STEP(INODE))+KEEP(IXSZ)+4)
+     &                 = RECORD_ROOT(KEEP(IXSZ)+1:KEEP(IXSZ)+5)
+                   IW(PTLUST(STEP(INODE))+XXLR) = 0
+                   IF (KEEP(50).EQ.0) THEN
+                    CALL SMUMPS_FAC1_LU_I ( 
+     &               N, INODE, IW, LIW, A_ROOT_SAVE(1),
+     &               NFRONT8*NFRONT8, IPOSROOT, 1_8,
+     &               INFO(1), INFO(2), UU, NOFFNEGPV_ROOT, NTOTPV_ROOT,
+     &               NBTINY_ROOT,
+     &               DET_EXP_ROOT, DET_MANT_ROOT, DET_SIGN_ROOT,
+     &               KEEP_SAVE,KEEP8_SAVE,
+     &               STEP, PROCNODE_STEPS, MYID_NODES, SLAVEF,
+     &               SEUIL, AVOID_DELAYED, ETATASS,
+     &               DKEEP_SAVE(1), PIVNUL_LIST_STRUCT, IWPOS 
+     &               , LRGROUPS
+     &               , PERM
+     &               )
+                    IF (INFO(1).LT.0) THEN
+                     IF (LP.GT.0) 
+     &               write(LP,*) "ERROR after SMUMPS_FAC1_LU ",
+     &               "on the root INFO(1)= ", INFO(1)
+                     GOTO 735
+                    ENDIF 
+                   ELSE
+                    CALL SMUMPS_FAC1_LDLT_I (N,KEEP_SAVE(20),
+     &               IW, LIW, A_ROOT_SAVE(1), NFRONT8*NFRONT8,
+     &               IPOSROOT, 1_8,
+     &               INFO(1), INFO(2), UU,
+     &               NOFFNEGPV_ROOT, NULLNEGPV_ROOT, NTOTPV_ROOT,
+     &               NB22T1_ROOT, NBTINY_ROOT, 
+     &               DET_EXP_ROOT, DET_MANT_ROOT, DET_SIGN_ROOT,
+     &               KEEP_SAVE,KEEP8_SAVE, MYID_NODES, SEUIL, 
+     &               AVOID_DELAYED, ETATASS, DKEEP_SAVE(1),
+     &               PIVNUL_LIST_STRUCT, IWPOS
+     &               , LRGROUPS
+     &               , PERM
+     &               )
+                     IF (INFO(1).LT.0) THEN
+                      IF (LP.GT.0) 
+     &                write(LP,*) "ERROR after SMUMPS_FAC1_LDLT ",
+     &                "on the root INFO(1)= ", INFO(1)
+                      GOTO 735
+                     ENDIF 
+                   ENDIF 
+                   LRecord = IW(IOLDPS+XXI)
+                   IW(PTLUST(STEP(INODE)):
+     &                PTLUST(STEP(INODE))+LRecord-1) = 
+     &                                    RECORD_ROOT(1:LRecord) 
+                   IW(PTLUST(STEP(INODE))+KEEP(IXSZ): 
+     &                PTLUST(STEP(INODE))+KEEP(IXSZ)+4) =
+     &                                          Header_ROOT(1:5)
+                   KEEP17_LU = KEEP_SAVE(109)-KEEP(109)
+                   IF (KEEP_SAVE(109).GT.KEEP(109)) THEN
+                     K = 1
+                     DO I = KEEP(109)+1, KEEP(109)+KEEP17_LU
+                        RECORD_ROOT(K) = 
+     &                          PIVNUL_LIST_STRUCT%PIVNUL_LIST(I)
+                        K = K+1
+                     ENDDO
+                   ENDIF
+                   IF (IS_A_ROOT_SAVE_ALLOCATED) DEALLOCATE(A_ROOT_SAVE)
+                   NULLIFY(A_ROOT_SAVE)
+                   IS_A_ROOT_SAVE_ALLOCATED = .FALSE.
+                   DET_SIGN = DET_SIGN * DET_SIGN_ROOT
+                   DET_EXP  = DET_EXP + DET_EXP_ROOT
+                   CALL SMUMPS_UPDATEDETER ( DET_MANT_ROOT, 
+     &                                       DET_MANT, DET_EXP)
+                   NOFFNEGPV = NOFFNEGPV + NOFFNEGPV_ROOT
+                   NULLNEGPV = NULLNEGPV + NULLNEGPV_ROOT
+                  ENDIF 
+                  LOCAL_M = 0
+                  LOCAL_N = 0
+                  MBLOCK  = 0
+                  NBLOCK  = 0
+                  PHASE   = 1  
+                  CALL SMUMPS_SVD_QR_ESTIM_WK( PHASE,
+     &             MBLOCK, NBLOCK, NFRONT, LOCAL_M, LOCAL_N,
+     &             ROOT_OWNER, KEEP,KEEP8,
+     &             LIWK_RR, LWK_RR )    
+                  LBUFRX             = LWK_RR
+                  IS_BUFRX_ALLOCATED = .FALSE.
+                  IF ( LRLU .GT. LBUFRX ) THEN
+                      BUFRX => A(POSFAC:POSFAC+LBUFRX-1_8)
+                  ELSE
+                      ALLOCATE( BUFRX( LBUFRX ), stat = IERR )
+                      IF (IERR.gt.0) THEN
+                        INFO(1) = -13
+                        CALL MUMPS_SET_IERROR(LBUFRX, INFO(2))
+                        IF (LP.GT.0)
+     &                  write(LP,*) ' Error allocating, real
+     &                        array ','of size ', LBUFRX,
+     &                        ' before SMUMPS_SEQ_FACTO_ROOT_SVD_QR'
+                        GOTO 735
+                      ENDIF
+                      IS_BUFRX_ALLOCATED = .TRUE.
+                  ENDIF
+                 IF (PIVNUL_LIST_STRUCT%SIZE_PIVNUL_LIST .LT. 
+     &               KEEP(109)+NFRONT) THEN
+                  CALL MUMPS_RESIZE_PIVNUL(KEEP, N, PIVNUL_LIST_STRUCT, 
+     &                             KEEP(109)+NFRONT, INFO(1), INFO(2) ) 
+                  IF (INFO(1).LT.0) GOTO 735
+                 ENDIF
+                  CALL SMUMPS_SEQ_FACTO_ROOT_SVD_QR(
+     &                 NFRONT,A(PTRAST(STEP(KEEP(20)))),
+     &                 root,
+     &                 BUFRX(1), int(LBUFRX),
+     &                 KEEP,KEEP8, INFO, LP, DKEEP,
+     &                 GLOBK109, OPELI,
+     &                 PIVNUL_LIST_STRUCT%PIVNUL_LIST(KEEP(109)+1),
+     &                 PIVNUL_LIST_STRUCT%SIZE_PIVNUL_LIST- KEEP(109), 
+     &                 IW(IPOSROOTROWINDICES))
+                  IF (IS_BUFRX_ALLOCATED) DEALLOCATE ( BUFRX )
+                  NULLIFY(BUFRX)
+                  IS_BUFRX_ALLOCATED = .FALSE.
+                  IF (INFO(1).LT.0) GOTO 735
+                  IF (MPA.GT.0)
+     &            CALL MUMPS_PRINT_STILL_ACTIVE (MYID_NODES, KEEP, 
+     &                     dble(DKEEP(17)), 
+     &                     OPELI,
+     &                     OPLAST_PRINTED, MPA)
+                  CALL SMUMPS_UPDATE_PROGRESS( OPELI, KEEP8 )
+                  KEEP(143) = KEEP17_LU
+                  IF (KEEP(118).GE.40) THEN
+                    K = 1 
+                    IF (KEEP(17).GT.0) THEN
+                     DO I = KEEP(109)+1, KEEP(109)+KEEP(17)
+                      IF ( K .GT. KEEP17_LU ) THEN
+                        PIVNUL_LIST_STRUCT%PIVNUL_LIST(I) = -1
+                      ELSE
+                        PIVNUL_LIST_STRUCT%PIVNUL_LIST(I) = 
+     &                                 RECORD_ROOT(K)
+                      ENDIF
+                      K = K+1
+                     ENDDO
+                    ENDIF
+                  ENDIF
+                  IF (allocated(RECORD_ROOT)) DEALLOCATE(RECORD_ROOT)
+                      IF (KEEP(201).EQ.1) THEN 
+                        CALL MUMPS_GETI8(LAFAC, IW(IPOSROOT+XXR))
+                        LIWFAC    = IW(IPOSROOT+XXI)
+                        TYPEFile  = TYPEF_L
+                        NextPiv2beWritten = 1 
+                        MonBloc%INODE    = KEEP(20)   
+                        MonBloc%MASTER   = .TRUE.
+                        MonBloc%Typenode = 3
+                        MonBloc%NCOL     = NFRONT
+                        MonBloc%NROW     = NFRONT
+                        MonBloc%NFS      = NFRONT
+                        MonBloc%Last     = .TRUE.   
+                        MonBloc%LastPiv  = MonBloc%NCOL
+                        MonBloc%LastPanelWritten_L=-9999 
+                        MonBloc%LastPanelWritten_U=-9999 
+                        NULLIFY(MonBloc%INDICES)
+                        STRAT        = STRAT_WRITE_MAX
+                        MonBloc%Last = .TRUE.
+                        LAST_CALL    = .TRUE.
+                        CALL SMUMPS_OOC_IO_LU_PANEL
+     &                                 ( STRAT, TYPEFile,
+     &                                  A(PTRAST(STEP(KEEP(20)))),
+     &                                  LAFAC, MonBloc,
+     &                                  NextPiv2beWritten, IDUMMY,
+     &                                  IW(IPOSROOT), LIWFAC,
+     &                              MYID, KEEP8(31), IERR, LAST_CALL)
+                        IF(IERR.LT.0)THEN
+                        IF (LP > 0)
+     &                  WRITE(LP,*)MYID,
+     &                  ': Error raised in SMUMPS_OOC_IO_LU_PANEL',
+     &                  IERR
+                        INFO(1)=IERR
+                        ENDIF
+                      ELSE IF (KEEP(201).EQ.2) THEN 
+                        KEEP8(31)=KEEP8(31)+NFRONT8*NFRONT8
+                        CALL SMUMPS_NEW_FACTOR(KEEP(20),PTRFAC,
+     &                  KEEP,KEEP8,A,LA, NFRONT8*NFRONT8, IERR)
+                        IF(IERR.LT.0)THEN
+                        WRITE(*,*)MYID,
+     &                  ': Internal error in SMUMPS_NEW_FACTOR',
+     &                  IERR
+                        GOTO 735
+                        ENDIF
+                      ENDIF
+                      ITMP8  =  NFRONT8*NFRONT8
+                      IF(KEEP(201).NE.0)THEN 
+                        IF (PTRFAC(STEP(KEEP(20))).EQ.
+     &                      POSFAC-ITMP8) THEN
+                          POSFAC = POSFAC  - ITMP8
+                          LRLU   = LRLU    + ITMP8
+                          LRLUS  = LRLUS   + ITMP8
+                          KEEP8(69) = KEEP8(69) - ITMP8
+                        ELSE
+                          IF (LP.GT.0) 
+     &                    WRITE(LP,*) "Internal error",
+     &                    POSFAC,NFRONT8,
+     &                    "root KEEP(20) not on top in OOC"
+                          GOTO 735
+                         ENDIF
+                      ENDIF
+                      CALL SMUMPS_LOAD_MEM_UPDATE(.FALSE.,.FALSE.,
+     &                LA-LRLUS,ITMP8,0_8,KEEP,KEEP8,LRLUS)
+                ENDIF
+ 735         CONTINUE
+             CALL MUMPS_PROPINFO( ICNTL, INFO, COMM_NODES, MYID_NODES )
+             IF (INFO(1).LT.0) GOTO 745
+                 CALL MPI_BCAST( KEEP(17), 1, MPI_INTEGER,
+     &                MUMPS_PROCNODE(PROCNODE_STEPS(STEP(KEEP(20))),
+     &                               KEEP(199)),
+     &                COMM_NODES, IERR )
+                 CALL MPI_BCAST( KEEP(143), 1, MPI_INTEGER,
+     &                MUMPS_PROCNODE(PROCNODE_STEPS(STEP(KEEP(20))),
+     &                               KEEP(199)),
+     &                COMM_NODES, IERR )
+                END IF
                 IF (ROOT_OWNER.AND.KEEP(60).NE.0) THEN 
                   ITMP8 = NFRONT8*NFRONT8
                   IF ( PTRFAC(STEP(KEEP(20))) .EQ. POSFAC -
@@ -952,6 +1240,12 @@ C
                   ENDIF
                 ENDIF
             END IF
+            GOTO 750
+ 745  CONTINUE
+            IF (allocated(RECORD_ROOT)) DEALLOCATE(RECORD_ROOT)
+            IF (IS_A_ROOT_SAVE_ALLOCATED) DEALLOCATE(A_ROOT_SAVE)
+            NULLIFY(A_ROOT_SAVE)
+ 750  CONTINUE
             IF (INFO(1).LT.0) GOTO 500
             CALL MUMPS_SECFIN(ROOTTIME)
             DKEEP(99)=real(ROOTTIME)

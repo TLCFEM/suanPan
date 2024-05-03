@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -417,10 +417,10 @@ C
       INTEGER NPIV,
      &        NSLAVES_ref, NSLAVES_max
       REAL WK_MASTER, WK_SLAVE
-      INTEGER  MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN, 
+      INTEGER  MUMPS_BLOC2_GET_NSLAVESMIN, 
      &         MUMPS_BLOC2_GET_NSLAVESMAX
       REAL  MUMPS_BLOC2_COUT
-      EXTERNAL MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN, 
+      EXTERNAL MUMPS_BLOC2_GET_NSLAVESMIN, 
      &         MUMPS_BLOC2_GET_NSLAVESMAX
       EXTERNAL MUMPS_BLOC2_COUT
       IF (NMB_OF_CAND.LE.0) THEN

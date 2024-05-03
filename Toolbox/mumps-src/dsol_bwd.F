@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -13,7 +13,7 @@ C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
       SUBROUTINE DMUMPS_SOL_S(N, A, LA, IW, LIW, W, LWC,
      &    NRHS, 
-     &    RHSCOMP, LRHSCOMP, POSINRHSCOMP_BWD,
+     &    RHSINTR, LRHSINTR, POSINRHSINTR_BWD,
      &    PTRICB, PTRACB, IWCB, LIWW, W2, 
      &    NE_STEPS, STEP,
      &    FRERE, DAD, FILS, IPOOL, LPOOL, PTRIST, PTRFAC, 
@@ -59,8 +59,8 @@ C
       INTEGER BUFR(LBUFR)
       INTEGER ISTEP_TO_INIV2(KEEP(71)), 
      &        TAB_POS_IN_PERE(SLAVEF+2,max(1,KEEP(56)))
-      INTEGER LRHSCOMP, POSINRHSCOMP_BWD(N)
-      DOUBLE PRECISION RHSCOMP(LRHSCOMP,NRHS)
+      INTEGER LRHSINTR, POSINRHSINTR_BWD(N)
+      DOUBLE PRECISION RHSINTR(LRHSINTR,NRHS)
       INTEGER(8), intent(in) :: LRHS_ROOT
       DOUBLE PRECISION RHS_ROOT( LRHS_ROOT )
       LOGICAL, INTENT(in) :: PRUN_BELOW
@@ -124,22 +124,26 @@ C
       ERROR_WAS_BROADCASTED = .FALSE.
       DO_MCAST2_TERMBWD = .FALSE.
       DO WHILE ( NBFINF .NE. 0 .OR. MYLEAF_LEFT .NE. 0 )
-        BLOQ = (  III .EQ. IIPOOL  )
-        CALL DMUMPS_BACKSLV_RECV_AND_TREAT( BLOQ, FLAG, BUFR, LBUFR,
-     &     LBUFR_BYTES, MYID, SLAVEF, COMM,
-     &     N, IWCB, LIWW, POSIWCB,
-     &     W, LWC, POSWCB,
-     &     IIPOOL, NBFINF, PTRICB, PTRACB, INFO,
-     &     IPOOL, LPOOL, PANEL_POS, LPANEL_POS,
-     &     STEP,  FRERE, FILS, PROCNODE_STEPS,
-     &     PLEFTW, KEEP,KEEP8, DKEEP,
-     &     PTRIST, PTRFAC, IW, LIW, A, LA, W2, MYLEAF_LEFT, 
-     &     NRHS, MTYPE, 
-     &     RHSCOMP, LRHSCOMP, POSINRHSCOMP_BWD
-     &     , PRUN_BELOW, TO_PROCESS, SIZE_TO_PROCESS
-     &     , FROM_PP
+        IF ( SLAVEF.EQ.1 ) THEN
+          FLAG = .FALSE.
+        ELSE
+          BLOQ = (  III .EQ. IIPOOL  )
+          CALL DMUMPS_BACKSLV_RECV_AND_TREAT( BLOQ, FLAG, BUFR, LBUFR,
+     &       LBUFR_BYTES, MYID, SLAVEF, COMM,
+     &       N, IWCB, LIWW, POSIWCB,
+     &       W, LWC, POSWCB,
+     &       IIPOOL, NBFINF, PTRICB, PTRACB, INFO,
+     &       IPOOL, LPOOL, PANEL_POS, LPANEL_POS,
+     &       STEP,  FRERE, FILS, PROCNODE_STEPS,
+     &       PLEFTW, KEEP,KEEP8, DKEEP,
+     &       PTRIST, PTRFAC, IW, LIW, A, LA, W2, MYLEAF_LEFT, 
+     &       NRHS, MTYPE, 
+     &       RHSINTR, LRHSINTR, POSINRHSINTR_BWD
+     &       , PRUN_BELOW, TO_PROCESS, SIZE_TO_PROCESS
+     &       , FROM_PP
      &     )
-        IF ( INFO(1) .LT. 0 ) GOTO 340 
+          IF ( INFO(1) .LT. 0 ) GOTO 340 
+        ENDIF
         IF ( .NOT. FLAG ) THEN
           IF (III .NE. IIPOOL) THEN
             INODE = IPOOL(IIPOOL-1)
@@ -161,7 +165,7 @@ C
      &        N, IPOOL, LPOOL, IIPOOL, NBFINF,
      &        A_PTR(1), LA_PTR, IW, LIW, W, LWC, NRHS,
      &        POSWCB, PLEFTW, POSIWCB,
-     &        RHSCOMP, LRHSCOMP, POSINRHSCOMP_BWD,
+     &        RHSINTR, LRHSINTR, POSINRHSINTR_BWD,
      &        PTRICB, PTRACB, IWCB, LIWW, W2, 
      &        NE_STEPS, STEP,
      &        FRERE, FILS, PTRIST, PTRFAC,

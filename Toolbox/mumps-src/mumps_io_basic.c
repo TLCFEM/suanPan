@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.0, released
+ *  on Tue Apr 23 10:25:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -22,36 +22,66 @@
 #  include <pthread.h>
 pthread_mutex_t mumps_io_pwrite_mutex;
 # endif
-/* int* mumps_io_pfile_pointer_array; */
-/* int* mumps_io_current_file; */
-/* #else /\*MUMPS_WIN32*\/ */
-/* FILE** mumps_io_current_file; */
-/* FILE** mumps_io_pfile_pointer_array; */
 #endif /* MUMPS_WIN32 */
-/* mumps_file_struct* mumps_io_pfile_pointer_array;
-   mumps_file_struct* mumps_io_current_file; */
 mumps_file_type* mumps_files = NULL;
-/* int mumps_io_current_file_number; */
 char* mumps_ooc_file_prefix = NULL;
-/* char** mumps_io_pfile_name; */
-/* int mumps_io_current_file_position; */
-/* int mumps_io_write_pos; */
-/* int mumps_io_last_file_opened; */
 MUMPS_INT mumps_elementary_data_size;
 MUMPS_INT mumps_io_is_init_called;
 MUMPS_INT mumps_io_myid;
-MUMPS_INT mumps_io_max_file_size;
-/* int mumps_io_nb_file; */
+MUMPS_OFF_T mumps_io_max_file_size;
 MUMPS_INT mumps_io_flag_async;
 MUMPS_INT mumps_io_k211;
-/* int mumps_flag_open;*/
-MUMPS_INT mumps_directio_flag;
 MUMPS_INT mumps_io_nb_file_type;
 /* Functions */
+MUMPS_INLINE MUMPS_INT mumps_gen_file_info(long long vaddr, MUMPS_OFF_T * pos, MUMPS_INT * file){
+  *file=(MUMPS_INT)(vaddr/(long long)mumps_io_max_file_size);
+  *pos=(MUMPS_OFF_T)(vaddr%(long long)mumps_io_max_file_size);
+  return 0;
+}
+MUMPS_INLINE void mumps_init_max_file_size(MUMPS_OFF_T * mumps_io_max_file_size, MUMPS_INT keep255){
+  int force_small_files;
+  force_small_files=0;
+  /* Check if file size should be < 2GB */
+  if (sizeof(MUMPS_OFF_T)==4){
+    force_small_files=1; /* should not occur */
+  }
+# if defined(MUMPS_WIN32)
+# if ! defined(MUMPS_WINLARGEFILES)
+  force_small_files=1; /* fseek and fwrite use long which is 32-bit */
+# endif
+# else
+  /* lseek and pread/pwrite (WITH_PFUNC) use off_t */
+  if (sizeof(off_t)==4){
+    force_small_files=1;
+  }
+# endif
+  if (keep255 < 0) {
+   *mumps_io_max_file_size=-keep255;
+  }
+  else {
+    if (force_small_files ) { /* 1 or 2 GBytes */
+      if ( keep255 > 2 || keep255 == 0 ){
+        *mumps_io_max_file_size=2;
+        }
+      else {
+        *mumps_io_max_file_size=1;
+        }
+      }
+    else {
+      if ( keep255 == 0 ) {
+        *mumps_io_max_file_size=2;
+        }
+      else {
+        *mumps_io_max_file_size=keep255;
+      }
+    }
+    *mumps_io_max_file_size=*mumps_io_max_file_size*(MUMPS_OFF_T)(1000000000);
+    }
+}
 MUMPS_INT mumps_set_file(MUMPS_INT type,MUMPS_INT file_number_arg){
-  /* Defines the pattern for the file name. The last 6 'X' will be replaced
-     so as to name were unique */
-  char name[351];
+/* Define file name pattern.
+ * Last 6 'X' will be replaced to make file name unique */
+  char name[1300]; /* Larger than prefix(255)+tmpdir(1023)+base_name (20)+\0 (1) */
 #if ! defined(_WIN32)
   MUMPS_INT fd;
   char buf[64]; /* for error message */
@@ -74,17 +104,17 @@ MUMPS_INT mumps_set_file(MUMPS_INT type,MUMPS_INT file_number_arg){
   }
   mumps_io_pfile_pointer_array=(mumps_files+type)->mumps_io_pfile_pointer_array;
   /* 
-     Do change the current file 
-     Careful: both mumps_io_current_file_number and
-              mumps_io_current_file must be changed
+   * Change the current file:
+   * Careful: both mumps_io_current_file_number and
+   *          mumps_io_current_file must be changed
    */
   ((mumps_files+type)->mumps_io_current_file_number)=file_number_arg;
   ((mumps_files+type)->mumps_io_current_file)=mumps_io_pfile_pointer_array+file_number_arg;
   if((mumps_io_pfile_pointer_array+file_number_arg)->is_opened!=0){
     /*
-       The file already exists and is open.
-       The i/o will be performed in the current file (which may not
-       be the last one.
+     * The file already exists and is open.
+     * The i/o will be performed in the current file (which may not
+     * be the last one.
      */
     return 0;
   }
@@ -97,11 +127,12 @@ MUMPS_INT mumps_set_file(MUMPS_INT type,MUMPS_INT file_number_arg){
 #if ! defined(_WIN32)
   strcpy(name,mumps_ooc_file_prefix);
   fd=mkstemp(name);  
-  /* Note that a file name is built by mkstemp and that the file is 
-     opened. fd hold the file descriptor to access it.
-     We want to close the file that will be opened later
-     and might be removed before the end of the processus.
-  */
+  /*
+   * A file name is built by mkstemp and the file
+   * is opened. fd holds the file descriptor to access it.
+   * We want to close the file that will be opened later
+   * and might be removed before the end of the processus.
+   */
   if(fd < 0) {
     sprintf(buf,"File creation failure");
     return mumps_io_sys_error(-90,buf);
@@ -111,19 +142,10 @@ MUMPS_INT mumps_set_file(MUMPS_INT type,MUMPS_INT file_number_arg){
 #else
   sprintf(name,"%s_%d_%d",mumps_ooc_file_prefix,((mumps_files+type)->mumps_io_current_file_number)+1,type);
 #endif
-/*   *(mumps_io_pfile_pointer_array+mumps_io_current_file_number)=fopen(name,"w+"); */
-/*   *(mumps_io_pfile_name+mumps_io_current_file_number)=(char *)malloc((strlen(name)+1)*sizeof(char)); */
-/*   if(*(mumps_io_pfile_name+mumps_io_current_file_number)==NULL){ */
-/*     sprintf(error_str,"Allocation problem in low-level OOC layer\n"); */
-/*     return -13; */
-/*   } */
   strcpy((mumps_io_pfile_pointer_array+(mumps_files+type)->mumps_io_current_file_number)->name,name);
   /* See mumps_io_basic.h for comments on the I/O flags passed to open */
 #if ! defined( MUMPS_WIN32 )
   (mumps_io_pfile_pointer_array+(mumps_files+type)->mumps_io_current_file_number)->file=open(name,(mumps_files+type)->mumps_flag_open,0666); 
-  /* 
-CPA: for LU factor file: 
-(mumps_io_pfile_pointer_array+(mumps_files+type)->mumps_io_current_file_number)->file= open(name, O_WRONLY | O_CREAT | O_TRUNC, 0666); */
   if((mumps_io_pfile_pointer_array+(mumps_files+type)->mumps_io_current_file_number)->file==-1){
     return mumps_io_sys_error(-90,"Unable to open OOC file");
   }
@@ -138,24 +160,20 @@ CPA: for LU factor file:
   if((mumps_files+type)->mumps_io_current_file_number>(mumps_files+type)->mumps_io_last_file_opened){
     (mumps_files+type)->mumps_io_last_file_opened=(mumps_files+type)->mumps_io_current_file_number;
   }
-  /*  if(*(mumps_io_pfile_pointer_array+mumps_io_current_file_number)==NULL) */
   ((mumps_files+type)->mumps_io_current_file)->write_pos=0;
   ((mumps_files+type)->mumps_io_current_file)->is_opened=1;
-  /*  printf("new file created -> num = %d \n", ((mumps_files+type)->mumps_io_last_file_opened));*/
-  /*  printf("new file created %d\n",mumps_io_current_file_number);*/
   return 0;
 }
 void mumps_update_current_file_position(mumps_file_struct* file_arg){
   file_arg->current_pos=file_arg->write_pos;
-/*   mumps_io_current_file_position=mumps_io_write_pos; */
 }
 MUMPS_INT mumps_compute_where_to_write(const double to_be_written,const MUMPS_INT type,long long vaddr,size_t already_written){
-  /* Check if the current file has enough memory to receive the whole block*/
+  /* Check if the current file has enough space to receive the whole block*/
   MUMPS_INT ret_code;
   MUMPS_INT file;
   mumps_file_struct *current_file;
   long long vaddr_loc;
-  MUMPS_INT pos;
+  MUMPS_OFF_T pos;
   /* Virtual address based file management scheme */
   vaddr_loc=vaddr*(long long)mumps_elementary_data_size+(long long)already_written;
   mumps_gen_file_info(vaddr_loc,&pos,&file);
@@ -168,29 +186,24 @@ MUMPS_INT mumps_compute_where_to_write(const double to_be_written,const MUMPS_IN
   mumps_update_current_file_position(current_file);
   return 0;
 }
-MUMPS_INT mumps_prepare_pointers_for_write(double to_be_written,MUMPS_INT * pos_in_file, MUMPS_INT * file_number,const MUMPS_INT type,long long vaddr,size_t already_written){
+MUMPS_INT mumps_prepare_pointers_for_write(double to_be_written, MUMPS_OFF_T * pos_in_file, MUMPS_INT * file_number,const MUMPS_INT type,long long vaddr,size_t already_written){
   MUMPS_INT ret_code;
   ret_code=mumps_compute_where_to_write(to_be_written,type,vaddr,already_written);
   if(ret_code<0){
     return ret_code;
   }
   *pos_in_file=((mumps_files+type)->mumps_io_current_file)->current_pos;
-  /* should be modified to take into account the file arg */
   *file_number=(mumps_files+type)->mumps_io_current_file_number;
   return 0;
 }
-MUMPS_INLINE MUMPS_INT mumps_gen_file_info(long long vaddr, MUMPS_INT * pos, MUMPS_INT * file){
-  *file=(MUMPS_INT)(vaddr/(long long)mumps_io_max_file_size);
-  *pos=(MUMPS_INT)(vaddr%(long long)mumps_io_max_file_size);
-  return 0;
-}
 MUMPS_INT mumps_compute_nb_concerned_files(long long block_size, MUMPS_INT * nb_concerned_files,long long vaddr){
-  MUMPS_INT file,pos,available_size;
+  MUMPS_INT file;
+  MUMPS_OFF_T pos, available_size;
   long long vaddr_loc;
   vaddr_loc=vaddr*(long long)mumps_elementary_data_size;
   mumps_gen_file_info(vaddr_loc,&pos,&file);
   available_size=mumps_io_max_file_size-pos+1;
-  *nb_concerned_files=(MUMPS_INT)my_ceil((double)(my_max(0,((block_size)*(double)(mumps_elementary_data_size))-available_size))/(double)mumps_io_max_file_size)+1;
+  *nb_concerned_files=(MUMPS_INT)my_ceil((double)(my_max(0,((block_size)*(double)(mumps_elementary_data_size))-(double)available_size))/(double)mumps_io_max_file_size)+1;
   return 0;
 }
 MUMPS_INT mumps_io_do_write_block(void * address_block,
@@ -203,14 +216,15 @@ MUMPS_INT mumps_io_do_write_block(void * address_block,
   size_t write_size;
   MUMPS_INT i;
   MUMPS_INT nb_concerned_files=0;
-  MUMPS_INT ret_code,file_number_loc,pos_in_file_loc;
+  MUMPS_INT ret_code,file_number_loc;
+  MUMPS_OFF_T pos_in_file_loc;
   double to_be_written;
 #if ! defined( MUMPS_WIN32 )
   MUMPS_INT* file;
 #else
   FILE** file;
 #endif
-  MUMPS_INT where;
+  MUMPS_OFF_T where;
   void* loc_addr;
   MUMPS_INT type;
   size_t already_written=0;
@@ -219,7 +233,6 @@ MUMPS_INT mumps_io_do_write_block(void * address_block,
   loc_addr=address_block;
   mumps_compute_nb_concerned_files(block_size,&nb_concerned_files,vaddr);
   to_be_written=((double)mumps_elementary_data_size)*((double)(block_size));
-  /*  printf("nb_concerned -> %d | %lf \n",nb_concerned_files,to_be_written); */
   for(i=0;i<nb_concerned_files;i++){
 #if ! defined( MUMPS_WIN32 ) && ! defined (WITHOUT_PTHREAD)
 # ifdef WITH_PFUNC
@@ -273,17 +286,11 @@ MUMPS_INT mumps_io_do_write_block(void * address_block,
     ((mumps_files+type)->mumps_io_current_file)->write_pos=((mumps_files+type)->mumps_io_current_file)->write_pos+((MUMPS_INT)write_size);
     to_be_written=to_be_written-((MUMPS_INT)write_size);
     loc_addr=(void*)((size_t)loc_addr+write_size);
-/*     mumps_io_write_pos=mumps_io_write_pos+((MUMPS_INT)write_size); */
-/*     to_be_written=to_be_written-((MUMPS_INT)write_size); */
-/*     loc_addr=(void*)((size_t)loc_addr+write_size); */
 #else
     /* fread and write */
-    ((mumps_files+type)->mumps_io_current_file)->write_pos=((mumps_files+type)->mumps_io_current_file)->write_pos+((MUMPS_INT)write_size*mumps_elementary_data_size);
+    ((mumps_files+type)->mumps_io_current_file)->write_pos=((mumps_files+type)->mumps_io_current_file)->write_pos+((MUMPS_INT8)write_size*mumps_elementary_data_size);
     to_be_written=to_be_written-((MUMPS_INT)write_size*mumps_elementary_data_size);
     loc_addr=(void*)((size_t)loc_addr+(size_t)((MUMPS_INT)write_size*mumps_elementary_data_size));
-/*     mumps_io_write_pos=mumps_io_write_pos+((MUMPS_INT)write_size*mumps_elementary_data_size); */
-/*     to_be_written=to_be_written-((MUMPS_INT)write_size*mumps_elementary_data_size); */
-/*     loc_addr=(void*)((size_t)loc_addr+(size_t)((MUMPS_INT)write_size*mumps_elementary_data_size)); */
 #endif
 #if ! defined( MUMPS_WIN32 ) && ! defined (WITHOUT_PTHREAD)
 # ifdef WITH_PFUNC
@@ -313,31 +320,23 @@ MUMPS_INT mumps_io_do_read_block(void * address_block,
   FILE** file;
 #endif
   double read_size;
-  MUMPS_INT local_fnum,local_offset;
+  MUMPS_INT local_fnum;
+  MUMPS_OFF_T local_offset;
   void *loc_addr;
   long long vaddr_loc;
   MUMPS_INT type;
   type=*type_arg;
-  /*  if(((double)(*block_size))*((double)(mumps_elementary_data_size))>(double)mumps_io_max_file_size){
-    sprintf(error_str,"Internal error in low-level I/O operation (requested size too big for file system) \n");
-    return -90;
-    }*/
   if(block_size==0){
     return 0;
   }
   read_size=(double)mumps_elementary_data_size*(double)(block_size);
-  /*  if((*file_number<0)&&(read_size<(double)mumps_io_max_file_size)){
-    sprintf(error_str,"Internal error (1) in low level read op\n");
-    return -90;
-    }*/
   loc_addr=address_block;
   vaddr_loc=vaddr*(long long)mumps_elementary_data_size;
   while(read_size>0){
     /* Virtual addressing based management stuff */
     local_fnum=(MUMPS_INT)(vaddr_loc/(long long)mumps_io_max_file_size);
-    local_offset=(MUMPS_INT)(vaddr_loc%(long long)mumps_io_max_file_size);
+    local_offset=(MUMPS_OFF_T)(vaddr_loc%(long long)mumps_io_max_file_size);
     file=&((((mumps_files+type)->mumps_io_pfile_pointer_array)+local_fnum)->file);
-    /* printf("1 read | file -> %d | fnum -> %d | vaddr -> %d \n",*file,local_fnum,(MUMPS_INT)vaddr_loc); */
 #if ! defined( MUMPS_WIN32 )
     if(read_size+(double)local_offset>(double)mumps_io_max_file_size){
       size=(size_t)mumps_io_max_file_size-(size_t)local_offset;
@@ -372,20 +371,11 @@ MUMPS_INT mumps_io_do_read_block(void * address_block,
 }
 MUMPS_INT mumps_free_file_pointers(MUMPS_INT *step){
   MUMPS_INT i,j,bound,ierr;
-/*   Free prefix only for facto  */
+  /* Free prefix only for facto */
   if (*step == 0) free(mumps_ooc_file_prefix);
   if(mumps_files == NULL )
       return 0;
-#if ! defined( MUMPS_WIN32 )
-#endif
   bound=mumps_io_nb_file_type;
-/*   if(*step==0){ */
-/*     /\* factorization *\/ */
-/*     bound=NB_FILE_TYPE_FACTO; */
-/*   }else{ */
-/*     /\* solve *\/ */
-/*     bound=NB_FILE_TYPE_SOLVE; */
-/*   } */
   for(j=0;j<bound;j++){
     if( mumps_files[j].mumps_io_pfile_pointer_array == NULL ) {
       continue;
@@ -402,14 +392,10 @@ MUMPS_INT mumps_free_file_pointers(MUMPS_INT *step){
         return mumps_io_error(-90,"Problem while closing OOC file\n");
       }    
 #endif
-      /*     free(*(mumps_io_pfile_name+i)); */
     }
     free((mumps_files+j)->mumps_io_pfile_pointer_array);
   }
-/*   free(mumps_io_pfile_name); */
   free(mumps_files);
-#if ! defined( MUMPS_WIN32 )
-#endif
   return 0;
 }
 /* Initialize the mumps_file_type structure at <which>th position in
@@ -436,7 +422,7 @@ MUMPS_INT mumps_io_alloc_file_struct(MUMPS_INT* nb,MUMPS_INT which)
   }
   return 0;
 }
-MUMPS_INT mumps_init_file_structure(MUMPS_INT* _myid, long long *total_size_io,MUMPS_INT *size_element,MUMPS_INT *nb_file_type,MUMPS_INT *flag_tab)
+MUMPS_INT mumps_init_file_structure(MUMPS_INT* _myid, long long *total_size_io,MUMPS_INT *size_element,MUMPS_INT *nb_file_type,MUMPS_INT *flag_tab, MUMPS_INT keep255)
 {
   /* Computes the number of files needed. Uses ceil value. */
   MUMPS_INT ierr;
@@ -445,10 +431,9 @@ MUMPS_INT mumps_init_file_structure(MUMPS_INT* _myid, long long *total_size_io,M
 #endif
   MUMPS_INT i,nb;
   MUMPS_INT mumps_io_nb_file;
-  mumps_io_max_file_size=MAX_FILE_SIZE;
+  mumps_init_max_file_size(&mumps_io_max_file_size, keep255);
   mumps_io_nb_file_type=*nb_file_type;
   mumps_io_nb_file=(MUMPS_INT)((((double)(*total_size_io)*1000000)*((double)(*size_element)))/(double)mumps_io_max_file_size)+1;
-  mumps_directio_flag=0;
 #if ! defined( MUMPS_WIN32 )
   mumps_flag_open=0;
 #endif
@@ -512,7 +497,6 @@ MUMPS_INT mumps_init_file_structure(MUMPS_INT* _myid, long long *total_size_io,M
       return ierr;
     }
   }
-  /* Init the current file.*/
   return 0;
 }
 MUMPS_INT mumps_init_file_name(char* mumps_dir,char* mumps_file,
@@ -538,26 +522,15 @@ MUMPS_INT mumps_init_file_name(char* mumps_dir,char* mumps_file,
     tmp_fname[i]=mumps_file[i];
   }
   tmp_fname[i]=0;  
-  if(strcmp(tmp_dir,UNITIALIZED)==0){
+  if(strcmp(tmp_dir,UNINITIALIZED)==0){
     dir_flag=1;
     free(tmp_dir);
     tmp_dir=getenv("MUMPS_OOC_TMPDIR");
     if(tmp_dir==NULL){
-#ifdef _AIX
-# ifndef CINES_
-      tmp_dir=getenv("TMPDIR");
-      if(tmp_dir==NULL){
-        tmp_dir=MUMPS_OOC_DEFAULT_DIR;
-      }
-# else
-      tmp_dir=MUMPS_OOC_DEFAULT_DIR;       
-# endif       
-#else
       tmp_dir=MUMPS_OOC_DEFAULT_DIR;
-#endif      
     }
   }
-  if(strcmp(tmp_fname,UNITIALIZED)==0){
+  if(strcmp(tmp_fname,UNINITIALIZED)==0){
     free(tmp_fname);
     tmp_fname=getenv("MUMPS_OOC_PREFIX");
     file_flag=1;
@@ -622,17 +595,15 @@ MUMPS_INT mumps_io_alloc_pointers(MUMPS_INT* nb_file_type,MUMPS_INT * dim){
   }
   return 0;
 }
-MUMPS_INT mumps_io_init_vars(MUMPS_INT* myid_arg,MUMPS_INT* size_element,MUMPS_INT* async_arg){
+MUMPS_INT mumps_io_init_vars(MUMPS_INT* myid_arg,MUMPS_INT* size_element,MUMPS_INT* async_arg,MUMPS_INT keep255){
 #if ! defined( MUMPS_WIN32 )
   MUMPS_INT mumps_flag_open;
 #endif
   MUMPS_INT i;
-  mumps_io_max_file_size=MAX_FILE_SIZE;
-  mumps_directio_flag=0;
+  mumps_init_max_file_size(&mumps_io_max_file_size, keep255);
 #if ! defined( MUMPS_WIN32 )
   mumps_flag_open=0;
 #endif
-  /* must be changed when we will have more than one file type during solve step */
   for(i=0;i<mumps_io_nb_file_type;i++){
 #if ! defined( MUMPS_WIN32 )
     (mumps_files+i)->mumps_flag_open=mumps_flag_open|O_RDONLY;
@@ -648,11 +619,6 @@ MUMPS_INT mumps_io_init_vars(MUMPS_INT* myid_arg,MUMPS_INT* size_element,MUMPS_I
 MUMPS_INT mumps_io_set_file_name(MUMPS_INT* indice,char* name,MUMPS_INT* length,MUMPS_INT* type){
   MUMPS_INT i;
   i=(*indice)-1;
-/*   *(mumps_io_pfile_name+i)=(char *) malloc((*length)*strlen(name)); */
-/*   if(*(mumps_io_pfile_name+i)==NULL){ */
-/*     sprintf(error_str,"Allocation problem in low-level OOC layer"); */
-/*     return -13; */
-/*   } */
   strcpy((((mumps_files+*type)->mumps_io_pfile_pointer_array)+i)->name,name);
   return 0;  
 }
@@ -706,14 +672,12 @@ MUMPS_INT mumps_io_destroy_pointers_lock(){
 }
 # endif /*WITH_PFUNC*/
 #endif /* _WIN32 && WITHOUT_PTHREAD */
- MUMPS_INT mumps_io_read__(void * file,void * loc_addr,size_t size,MUMPS_INT local_offset,MUMPS_INT type){
-  MUMPS_INT ret_code;
+MUMPS_INT mumps_io_read__(void * file,void * loc_addr,size_t size,MUMPS_OFF_T local_offset,MUMPS_INT type){
+MUMPS_INT ret_code;
 #if ! defined( MUMPS_WIN32 )
-  if(!mumps_directio_flag){
-    ret_code=mumps_io_read_os_buff__(file,loc_addr, size,local_offset);
-    if(ret_code<0){
-      return ret_code;
-    }
+  ret_code=mumps_io_read_os_buff__(file,loc_addr, size,local_offset);
+  if(ret_code<0){
+    return ret_code;
   }
 #else
   ret_code=mumps_io_read_win32__(file,loc_addr, size,local_offset);
@@ -724,13 +688,12 @@ MUMPS_INT mumps_io_destroy_pointers_lock(){
   return 0;
 }
 #if ! defined( MUMPS_WIN32 )
-MUMPS_INT mumps_io_read_os_buff__(void * file,void * loc_addr,size_t size,MUMPS_INT local_offset){
+MUMPS_INT mumps_io_read_os_buff__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset){
   size_t ret_code;
-  /* printf("Read with buff %d %d %d\n",(MUMPS_INT) size, local_offset,*((MUMPS_INT *)file)); */
 # ifdef WITH_PFUNC
-  ret_code=pread(*(MUMPS_INT *)file,loc_addr,size,local_offset);
+  ret_code=pread(*(MUMPS_INT *)file,loc_addr,size,(off_t)local_offset);
 # else
-  lseek(*(MUMPS_INT *)file,(long) local_offset,SEEK_SET);
+  lseek(*(MUMPS_INT *)file, (off_t)local_offset,SEEK_SET);
   ret_code=read(*(MUMPS_INT *)file,loc_addr,size);
 # endif
   if((MUMPS_INT) ret_code==-1){
@@ -740,9 +703,13 @@ MUMPS_INT mumps_io_read_os_buff__(void * file,void * loc_addr,size_t size,MUMPS_
 }
 #endif
 #if defined( MUMPS_WIN32 )
-MUMPS_INT mumps_io_read_win32__(void * file,void * loc_addr,size_t size,MUMPS_INT local_offset){
+MUMPS_INT mumps_io_read_win32__(void * file, void * loc_addr,size_t size, MUMPS_OFF_T local_offset){
   size_t ret_code;
+#if defined(MUMPS_WINLARGEFILES)
+  _fseeki64(*(FILE **)file,local_offset,SEEK_SET); /* expects where to be __int64 */
+#else
   fseek(*(FILE **)file,(long) local_offset,SEEK_SET);
+#endif
   ret_code=fread(loc_addr,mumps_elementary_data_size,size,*(FILE **)file);
   if((ret_code!=size)||(ferror(*(FILE**)file))){
     return mumps_io_error(-90,"Problem with I/O operation\n");
@@ -750,14 +717,12 @@ MUMPS_INT mumps_io_read_win32__(void * file,void * loc_addr,size_t size,MUMPS_IN
   return 0;
 }
 #endif
-MUMPS_INT mumps_io_write__(void *file, void *loc_addr, size_t write_size, MUMPS_INT where,MUMPS_INT type){
+MUMPS_INT mumps_io_write__(void *file, void *loc_addr, size_t write_size, MUMPS_OFF_T where, MUMPS_INT type){
   MUMPS_INT ret_code;
 #if ! defined( MUMPS_WIN32 )
-  if(!mumps_directio_flag){
-    ret_code=mumps_io_write_os_buff__(file,loc_addr, write_size,where);
-    if(ret_code<0){
-      return ret_code;
-    }
+  ret_code=mumps_io_write_os_buff__(file,loc_addr, write_size,where);
+  if(ret_code<0){
+    return ret_code;
   }
 #else
   ret_code=mumps_io_write_win32__(file,loc_addr, write_size,where);
@@ -768,15 +733,14 @@ MUMPS_INT mumps_io_write__(void *file, void *loc_addr, size_t write_size, MUMPS_
   return 0;
 }
 #if ! defined( MUMPS_WIN32 )
-MUMPS_INT mumps_io_write_os_buff__(void *file, void *loc_addr, size_t write_size, MUMPS_INT where){
+MUMPS_INT mumps_io_write_os_buff__(void *file, void *loc_addr, size_t write_size, MUMPS_OFF_T where){
   size_t ret_code;
-  /* printf("write with buff %d %d %d\n",(MUMPS_INT) write_size, where,*((MUMPS_INT *)file)); */
 # ifdef WITH_PFUNC
-  ret_code=pwrite(*(MUMPS_INT *)file,loc_addr,write_size,where);
+  ret_code=pwrite(*(MUMPS_INT *)file,loc_addr,write_size,(off_t)where);
 # else
   /*in this case all the I/O's are made by the I/O thread => we don't
     need to protect the file pointer.*/
-  lseek(*(MUMPS_INT *)file,(long)where,SEEK_SET); 
+  lseek(*(MUMPS_INT *)file,(off_t)where,SEEK_SET); 
   ret_code=write(*(MUMPS_INT *)file,loc_addr,write_size);
 # endif
   if((MUMPS_INT)ret_code==-1){
@@ -788,9 +752,13 @@ MUMPS_INT mumps_io_write_os_buff__(void *file, void *loc_addr, size_t write_size
 }
 #endif
 #if defined( MUMPS_WIN32 )
-MUMPS_INT mumps_io_write_win32__(void *file, void *loc_addr, size_t write_size, MUMPS_INT where){
+MUMPS_INT mumps_io_write_win32__(void *file, void *loc_addr, size_t write_size, MUMPS_OFF_T where){
   size_t ret_code;
-  fseek(*(FILE **)file,(long)where,SEEK_SET);  
+#if defined(MUMPS_WINLARGEFILES)
+  _fseeki64(*(FILE **)file,where,SEEK_SET); /* expects where to be __int64 */
+#else
+  fseek(*(FILE **)file,(long)where,SEEK_SET);
+#endif
   ret_code=fwrite(loc_addr,mumps_elementary_data_size, write_size,*(FILE**)file);
   if((ret_code!=write_size)||(ferror(*(FILE**)file))){
     return mumps_io_error(-90,"Problem with I/O operation\n");
@@ -798,26 +766,3 @@ MUMPS_INT mumps_io_write_win32__(void *file, void *loc_addr, size_t write_size, 
   return 0;
 }
 #endif
-MUMPS_INT mumps_compute_file_size(void *file,size_t *size){
-  /* Compute the size of the file pointed by file and return it in
-     size */
-#if defined(MUMPS_WIN32)
-  /* This works well as soon as we don't use threads under WIN32 */
-  MUMPS_INT ret_code;
-  long pos=0;
-  /* Get the current position */
-  pos=ftell(*(FILE **)file);
-  /* Move the file pointer to the end of the file */
-  fseek(*(FILE **)file,0,SEEK_END);
-  /* Get the current position which is in fact the size */
-  *size=(size_t)ftell(*(FILE **)file);
-  /* Restore the old position */
-  fseek(*(FILE **)file,pos,SEEK_SET);
-#else
-  struct stat file_info;
-  /* fstat does everything :-) */
-  fstat(*(MUMPS_INT *)file, &file_info);
-  *size = (size_t)file_info.st_size;
-#endif
-  return 0;
-}

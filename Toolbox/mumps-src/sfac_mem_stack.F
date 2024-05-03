@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -58,7 +58,7 @@ C
       INTEGER INTARR(KEEP8(27)) 
       INTEGER ITLOC( N + KEEP(253) ), FILS( N ), DAD( KEEP(28) ),
      &        ND( KEEP(28) ), FRERE( KEEP(28) )
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER ISTEP_TO_INIV2(KEEP(71)), 
      &        TAB_POS_IN_PERE(SLAVEF+2,max(1,KEEP(56)))
       INTEGER NELT, LPTRAR
@@ -111,9 +111,8 @@ C
       DOUBLE PRECISION FLOP1, FLOP1_EFFECTIVE
       LOGICAL BLOCKING, SET_IRECV, MESSAGE_RECEIVED
       LOGICAL SSARBR, SSARBR_ROOT, MUMPS_INSSARBR,
-     & MUMPS_IN_OR_ROOT_SSARBR, MUMPS_ROOTSSARBR
-      EXTERNAL MUMPS_INSSARBR, MUMPS_IN_OR_ROOT_SSARBR,
-     & MUMPS_ROOTSSARBR
+     & MUMPS_IN_OR_ROOT_SSARBR
+      EXTERNAL MUMPS_INSSARBR, MUMPS_IN_OR_ROOT_SSARBR
       LP = ICNTL(1)
       IF (ICNTL(4) .LE. 0) LP = -1
       INPLACE = .FALSE.
@@ -123,7 +122,7 @@ C
       NFRONT = IW(IOLDPS+KEEP(IXSZ))
       NPIV   = IW(IOLDPS + 1+KEEP(IXSZ))       
       NMAXNPIV = max(NPIV, NMAXNPIV)
-      NASS   = iabs(IW(IOLDPS + 2+KEEP(IXSZ))) 
+      NASS   = abs(IW(IOLDPS + 2+KEEP(IXSZ))) 
       NSLAVES=  IW(IOLDPS+5+KEEP(IXSZ))
       H_INODE= 6 + NSLAVES + KEEP(IXSZ)
       LCONT = NFRONT - NPIV
@@ -179,9 +178,7 @@ C
       ELSE
         FAC_ENTRIES = ( int(NPIV,8)*int(NPIV+1,8) )/ 2_8
       ENDIF
-      IF ( KEEP(451) .NE. 2 ) THEN
-        FAC_ENTRIES = FAC_ENTRIES + int(NBROW,8) * int(NPIV,8)
-      ENDIF
+      FAC_ENTRIES = FAC_ENTRIES + int(NBROW,8) * int(NPIV,8)
       IF ( KEEP(405) .EQ. 0 ) THEN
         KEEP8(10) = KEEP8(10) + FAC_ENTRIES
         KEEP(429) = KEEP(429) - 1

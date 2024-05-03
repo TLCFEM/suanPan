@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -65,10 +65,12 @@ C
       ENDIF 
       if(allocated(BIG_CUT)) DEALLOCATE(BIG_CUT)
       END SUBROUTINE GET_CUT
-      SUBROUTINE SEP_GROUPING(NV, VLIST, N, NZ, LRGROUPS, NBGROUPS, IW, 
+      SUBROUTINE SEP_GROUPING( NFRONT, KEEP,
+     &   NV, VLIST, N, NZ, LRGROUPS, NBGROUPS, IW, 
      &   LW, IPE, LEN, GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, NODE,
      &   GEN2HALO, K482, K472, K469, SEP_SIZE, MAXSIZE_PARTS,
      &   KEEP10, LP, LPOK, IFLAG, IERROR)
+        INTEGER, INTENT(IN)    :: NFRONT, KEEP(500)
         INTEGER(8), INTENT(IN) :: NZ, LW
         INTEGER, INTENT(IN)    :: NV, N, GROUP_SIZE, HALO_DEPTH
         INTEGER, INTENT(IN)    :: IW(LW), LEN(N), NODE, K482
@@ -84,7 +86,7 @@ C
         INTEGER(8), ALLOCATABLE, DIMENSION(:) :: IPTRHALO
         INTEGER,    ALLOCATABLE, DIMENSION(:) :: PARTS, JCNHALO
         INTEGER(8) :: HALOEDGENBR
-        INTEGER    :: NHALO,
+        INTEGER    :: NHALO, NBG_CAPT,
      &       NBGROUPS_KWAY, I, GROUP_SIZE2, LRGROUPS_SIGN, IERR
         INTEGER    :: MAXSIZE_PARTS_LOC
 #if defined (metis) || defined (parmetis) || defined (metis4) || defined (parmetis3)
@@ -93,7 +95,8 @@ C
 #if defined (scotch) || defined (ptscotch)
         INTEGER :: SCOTCH_IDX_SIZE
 #endif
-        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NV)
+        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NV, 
+     &                       NFRONT, KEEP(35))
         NBGROUPS_KWAY = MAX(
      &                INT(dble(NV+GROUP_SIZE2-1)/dble(GROUP_SIZE2))
      &                ,1)
@@ -187,7 +190,7 @@ C
                WRITE(LP,*) " Internal error in SCOTCH during ",
      &                     " Kway partitioning, SCOTCHFGRAPHPART, " 
                WRITE(LP,*) 
-     &         " also provide METIS package to MUMPS "
+     &         " please also provide METIS package to MUMPS "
              ENDIF
 #endif
           ELSE
@@ -197,16 +200,17 @@ C
           IF (IFLAG.LT.0) GOTO 500
           CALL GET_GLOBAL_GROUPS(PARTS, VLIST, NV, 
      &     NBGROUPS_KWAY, LRGROUPS, N, NBGROUPS, LRGROUPS_SIGN,
-     &     MAXSIZE_PARTS_LOC)
+     &     MAXSIZE_PARTS_LOC, .FALSE., GROUP_SIZE2)
            MAXSIZE_PARTS = max(MAXSIZE_PARTS, MAXSIZE_PARTS_LOC)
         ELSE 
           MAXSIZE_PARTS = max(MAXSIZE_PARTS,NV)
-!$OMP CRITICAL(lrgrouping_cri)
+!$OMP ATOMIC CAPTURE
+          NBG_CAPT = NBGROUPS
+          NBGROUPS = NBGROUPS + 1
+!$OMP END ATOMIC 
           DO I=1,NV
-            LRGROUPS(VLIST(I)) = LRGROUPS_SIGN*(NBGROUPS + 1)
+            LRGROUPS(VLIST(I)) = LRGROUPS_SIGN*(NBG_CAPT + 1)
           END DO
-            NBGROUPS = NBGROUPS + 1
-!$OMP END CRITICAL(lrgrouping_cri)
         END IF
   500   IF (allocated(IPTRHALO)) then
            DEALLOCATE(IPTRHALO)
@@ -219,11 +223,13 @@ C
         ENDIF
         RETURN
       END SUBROUTINE SEP_GROUPING
-      SUBROUTINE SEP_GROUPING_AB (NV, NVEXPANDED, 
+      SUBROUTINE SEP_GROUPING_AB ( NFRONT, KEEP,
+     &   NV, NVEXPANDED, 
      &   VLIST, N, LRGROUPS, NBGROUPS, LUMAT, SIZEOFBLOCKS,
      &   GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, NODE,
      &   GEN2HALO, K482, K472, K469, SEP_SIZE, MAXSIZE_PARTS,
      &   KEEP10, LP, LPOK, IFLAG, IERROR)
+        INTEGER, INTENT(IN)    :: NFRONT, KEEP(500)
         TYPE(LMATRIX_T)        :: LUMAT
         INTEGER, INTENT(IN)    :: NV, NVEXPANDED, 
      &                            N, GROUP_SIZE, HALO_DEPTH
@@ -241,17 +247,20 @@ C
         INTEGER,    ALLOCATABLE, DIMENSION(:) :: PARTS, JCNHALO
         INTEGER,    ALLOCATABLE, DIMENSION(:) :: VWGT
         INTEGER(8) :: HALOEDGENBR
-        INTEGER    :: NHALO,
+        INTEGER    :: NHALO, NBG_CAPT,
      &       NBGROUPS_KWAY, I, GROUP_SIZE2, LRGROUPS_SIGN, IERR
         INTEGER    :: MAXSIZE_PARTS_LOC
         DOUBLE PRECISION       :: COMPRESS_RATIO
+        LOGICAL    :: AB_ACTIVE
 #if defined (metis) || defined (parmetis) || defined (metis4) || defined (parmetis3)
         INTEGER :: METIS_IDX_SIZE
 #endif
 #if defined (scotch) || defined (ptscotch)
         INTEGER :: SCOTCH_IDX_SIZE
 #endif
-        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NVEXPANDED)
+       AB_ACTIVE = (NVEXPANDED.GT.NV)
+        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NVEXPANDED,
+     &                       NFRONT, KEEP(35))
         COMPRESS_RATIO= dble(NVEXPANDED)/dble(NV)
         NBGROUPS_KWAY = MAX(
      &          INT(dble(NVEXPANDED+GROUP_SIZE2-1)/dble(GROUP_SIZE2))
@@ -365,17 +374,18 @@ C
           IF (IFLAG.LT.0) GOTO 500
           CALL GET_GLOBAL_GROUPS(PARTS,VLIST, NV, 
      &     NBGROUPS_KWAY, LRGROUPS, N, NBGROUPS, LRGROUPS_SIGN,
-     &     MAXSIZE_PARTS_LOC)
+     &     MAXSIZE_PARTS_LOC, AB_ACTIVE, GROUP_SIZE2)
            MAXSIZE_PARTS = max( MAXSIZE_PARTS, 
      &                   int(dble(MAXSIZE_PARTS_LOC*COMPRESS_RATIO))  )
         ELSE 
           MAXSIZE_PARTS = max(MAXSIZE_PARTS,NV)
-!$OMP CRITICAL(lrgrouping_cri)
+!$OMP ATOMIC CAPTURE
+          NBG_CAPT = NBGROUPS
+          NBGROUPS = NBGROUPS + 1
+!$OMP END ATOMIC 
           DO I=1,NV
-            LRGROUPS(VLIST(I)) = LRGROUPS_SIGN*(NBGROUPS + 1)
+            LRGROUPS(VLIST(I)) = LRGROUPS_SIGN*(NBG_CAPT + 1)
           END DO
-            NBGROUPS = NBGROUPS + 1
-!$OMP END CRITICAL(lrgrouping_cri)
         END IF
   500   IF (allocated(IPTRHALO)) then
            DEALLOCATE(IPTRHALO)
@@ -495,9 +505,10 @@ C
       END SUBROUTINE GETHALOGRAPH_AB
       SUBROUTINE GET_GLOBAL_GROUPS(PARTS, SEP, NSEP, NPARTS, 
      &                    LRGROUPS, N, NBGROUPS, LRGROUPS_SIGN,
-     &                    MAXSIZE_PARTS_LOC)
-      INTEGER,INTENT(IN) :: NSEP, N, LRGROUPS_SIGN
+     &                    MAXSIZE_PARTS_LOC, AB_ACTIVE, GROUP_SIZE2)
+      INTEGER,INTENT(IN) :: NSEP, N, LRGROUPS_SIGN, GROUP_SIZE2
       INTEGER :: PARTS(:)
+      LOGICAL :: AB_ACTIVE
       INTEGER,DIMENSION(:),INTENT(INOUT) :: SEP 
       INTEGER, INTENT(INOUT) :: NPARTS 
       INTEGER, INTENT(INOUT) :: NBGROUPS
@@ -506,7 +517,7 @@ C
       INTRINSIC maxval
       INTEGER:: I,CNT,NB_PARTS_WITHOUT_SEP_NODE,allocok
       INTEGER:: TARGET_SIZE_KWAY
-      INTEGER:: MAXSIZE_PARTS_LOC_NEW
+      INTEGER:: MAXSIZE_PARTS_LOC_NEW, NBG_CAPT
       INTEGER,DIMENSION(:),ALLOCATABLE::SIZES, RIGHTPART
       INTEGER,DIMENSION(:),ALLOCATABLE::PARTPTR
 #if ! defined(NO_SPLIT_IN_BLRGROUPING)
@@ -522,8 +533,9 @@ C
          write(*,*) "Allocation error in GET_GLOBAL_GROUPS"
          CALL MUMPS_ABORT()
       ENDIF
-      TARGET_SIZE_KWAY  = (NSEP+NPARTS-1) / NPARTS
-      TARGET_SIZE_SPLIT = 2*TARGET_SIZE_KWAY
+      TARGET_SIZE_KWAY  = GROUP_SIZE2
+      TARGET_SIZE_SPLIT = TARGET_SIZE_KWAY
+      IF (AB_ACTIVE) TARGET_SIZE_SPLIT =huge(TARGET_SIZE_SPLIT)
       NB_PARTS_WITHOUT_SEP_NODE = 0
       RIGHTPART     = 0
       SIZES = 0
@@ -549,16 +561,17 @@ C
 #if ! defined(NO_SPLIT_IN_BLRGROUPING)
        IF (MAXSIZE_PARTS_LOC.LT.TARGET_SIZE_SPLIT) THEN
 #endif
-!$OMP    CRITICAL(lrgrouping_cri)
+!$OMP ATOMIC CAPTURE
+         NBG_CAPT = NBGROUPS
+         NBGROUPS = NBGROUPS + NPARTS
+!$OMP END ATOMIC 
          DO I=1,NSEP
           NEWSEP(PARTPTR(PARTS(I))) = SEP(I)  
           LRGROUPS(SEP(I)) = LRGROUPS_SIGN*(RIGHTPART(PARTS(I)) 
-     &      + NBGROUPS)
+     &      + NBG_CAPT)
           PARTPTR(PARTS(I)) = 
      &      PARTPTR(PARTS(I)) + 1
          END DO
-         NBGROUPS = NBGROUPS + NPARTS
-!$OMP    END CRITICAL(lrgrouping_cri)
          SEP = NEWSEP
 #if ! defined(NO_SPLIT_IN_BLRGROUPING)
       ELSE
@@ -572,9 +585,23 @@ C
          DO I=2,NPARTS+1
            PARTPTR(I) = PARTPTR(I-1) + SIZES(I-1)
          ENDDO
-         NB_PARTS_WITH_SPLIT = 0
+         NB_PARTS_WITH_SPLIT   = 0
          MAXSIZE_PARTS_LOC_NEW = 0
-!$OMP    CRITICAL(lrgrouping_cri)
+         DO IP =1, NPARTS
+           NB_SPLIT =   (SIZES(IP) + TARGET_SIZE_SPLIT-1) 
+     &                    / TARGET_SIZE_SPLIT
+           SZ_FINAL     = (SIZES(IP) + NB_SPLIT-1) / NB_SPLIT 
+           NB_PARTS_WITH_SPLIT = NB_PARTS_WITH_SPLIT +
+     &      ( 
+     &         ( (PARTPTR(IP+1) - PARTPTR(IP))+ SZ_FINAL-1 ) /
+     &          SZ_FINAL
+     &      )
+         ENDDO
+!$OMP ATOMIC CAPTURE
+         NBG_CAPT = NBGROUPS
+         NBGROUPS = NBGROUPS + NB_PARTS_WITH_SPLIT
+!$OMP END ATOMIC 
+         NB_PARTS_WITH_SPLIT = 0
          DO IP=1,NPARTS
            NB_SPLIT =   (SIZES(IP) + TARGET_SIZE_SPLIT-1) 
      &                    / TARGET_SIZE_SPLIT
@@ -585,12 +612,10 @@ C
              NB_PARTS_WITH_SPLIT = NB_PARTS_WITH_SPLIT +1
              DO II=I, min(I+SZ_FINAL-1,PARTPTR(IP+1)-1)
                LRGROUPS(SEP(II)) = LRGROUPS_SIGN*(NB_PARTS_WITH_SPLIT
-     &                           + NBGROUPS)
+     &                           + NBG_CAPT)
              ENDDO
            ENDDO
          ENDDO
-         NBGROUPS = NBGROUPS + NB_PARTS_WITH_SPLIT
-!$OMP    END CRITICAL(lrgrouping_cri)
          NPARTS = NB_PARTS_WITH_SPLIT
          MAXSIZE_PARTS_LOC = MAXSIZE_PARTS_LOC_NEW
       ENDIF
@@ -787,7 +812,8 @@ C
      &     LRGROUPS, SYM, ICNTL, HALO_DEPTH, GROUP_SIZE, SEP_SIZE,
      &     K38, K20, K60,
      &     IFLAG, IERROR, K264, K265, K482, K472, MAXFRONT, K10, 
-     &     K54, K142, LPOK, LP, GATHER_MATRIX_ALLOCATED)
+     &     K54, K142, LPOK, LP, GATHER_MATRIX_ALLOCATED,
+     &     KEEP, ND_STEPS)
       IMPLICIT NONE
       INTEGER, INTENT(IN)    :: N, NSTEPS, LNA, SYM,
      &     HALO_DEPTH, SEP_SIZE, GROUP_SIZE
@@ -804,6 +830,7 @@ C
       INTEGER             :: FILS(N), STEP(N), LRGROUPS(N)
       INTEGER, INTENT(IN)    :: K472, MAXFRONT
       LOGICAL, INTENT(INOUT) :: GATHER_MATRIX_ALLOCATED
+      INTEGER, INTENT(IN) :: KEEP(500), ND_STEPS(:)
       INTEGER :: K482_LOC, K38ou20
       INTEGER :: I, F, PV, NV, NLEAVES, NROOTS, PP, C, NF, NODE,
      &     SYMTRY, NBQD, AD
@@ -914,7 +941,8 @@ C
             WORK(NV) = F
             F = FILS(F)
          END DO
-         CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NV)
+         CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NV,
+     &                        ND_STEPS(NODE), KEEP(35))
          IF (NV .GE. GROUP_SIZE2)  THEN
            IF ( (K482_LOC.EQ.3)
      &           .OR.
@@ -926,7 +954,8 @@ C
                END DO
                NBGROUPS = NBGROUPS + (NV-1)/GROUP_SIZE2 + 1
             ELSE
-              CALL SEP_GROUPING(NV, WORK(1), N, NZ8,
+              CALL SEP_GROUPING( ND_STEPS(NODE), KEEP, 
+     &              NV, WORK(1), N, NZ8,
      &              LRGROUPS, NBGROUPS, IW(1), LW, IPE(1), LEN(1),
      &              GROUP_SIZE, HALO_DEPTH, TRACE(1), WORKH(1), NODE,
      &              GEN2HALO(1), K482_LOC, K472, 0, SEP_SIZE, K142,
@@ -986,7 +1015,8 @@ C
      &     FRERE_STEPS, DAD_STEPS, STEP, NA, LNA, LRGROUPS, 
      &     SYM, ICNTL, HALO_DEPTH, GROUP_SIZE, SEP_SIZE, K38, K20,
      &     K60, IFLAG, IERROR, K264, K265, K482, K472, MAXFRONT, K469, 
-     &     K10, K54, K142, LPOK, LP, GATHER_MATRIX_ALLOCATED)
+     &     K10, K54, K142, LPOK, LP, GATHER_MATRIX_ALLOCATED,
+     &     KEEP, ND_STEPS)
       IMPLICIT NONE
       INTEGER, INTENT(IN)    :: N, NSTEPS, LNA, SYM,
      &     HALO_DEPTH, SEP_SIZE, GROUP_SIZE
@@ -1003,12 +1033,13 @@ C
       INTEGER, INTENT(IN) :: K472, K469
       LOGICAL, INTENT(INOUT) :: GATHER_MATRIX_ALLOCATED
       INTEGER, INTENT(OUT)   :: K142
+      INTEGER, INTENT(IN) :: KEEP(500), ND_STEPS(:)
       INTEGER :: K482_LOC,  K469_LOC, K38ou20
       INTEGER :: I, F, PV, NV, NODE,
      &     SYMTRY, NBQD, AD
       LOGICAL :: PVSCHANGED
       INTEGER(8) :: LW, IWFR, NRORM, NIORM
-      INTEGER :: NBGROUPS, NBGROUPS_local
+      INTEGER :: NBGROUPS, NBGROUPS_local, NBG_CAPT
       INTEGER, ALLOCATABLE, DIMENSION (:) :: PVS, WORK
       INTEGER, ALLOCATABLE, DIMENSION (:) :: LEN, IW
       INTEGER(8), ALLOCATABLE, DIMENSION (:) :: IPE, IQ
@@ -1125,7 +1156,7 @@ C
       PVSCHANGED = .FALSE.
       OMP_NUM = 1
 !$    OMP_NUM = omp_get_max_threads()
-      OMP_NUM = min(OMP_NUM,8)
+      OMP_NUM = min(OMP_NUM,5)
 !$OMP PARALLEL PRIVATE(I, NODE, PV, NV, F, GROUP_SIZE2, WORK, IERR_PRIV,
 !$OMP&         WORKH_PRV, TRACE_PRV, GEN2HALO_PRV, NBGROUPS_local
 !$OMP&         )
@@ -1183,28 +1214,34 @@ C
           WORK(NV) = F
           F = FILS(F)
         END DO
-        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NV)
-        IF (NV .GE. GROUP_SIZE2)  THEN
+        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NV,
+     &                        ND_STEPS(NODE), KEEP(35))
+        IF (NV .GE. GROUP_SIZE2
+     &     .AND. NV.GE.int(dble(SEP_SIZE)*dble(1.5))
+     &      )  THEN
           IF ( (K482_LOC.EQ.3)
      &           .OR.
      &         ( (K60.NE.0).AND.(WORK(1).EQ.K38ou20) )
      &        ) 
      &    THEN
-!$OMP CRITICAL(lrgrouping_cri)
-            DO I=1,NV
-              LRGROUPS(WORK(I))=NBGROUPS+1+(I-1)/GROUP_SIZE2
-            END DO
+!$OMP ATOMIC CAPTURE
+            NBG_CAPT = NBGROUPS
             NBGROUPS = NBGROUPS + (NV-1)/GROUP_SIZE2 + 1
-!$OMP END CRITICAL(lrgrouping_cri)
+!$OMP END ATOMIC 
+            DO I=1,NV
+              LRGROUPS(WORK(I))=NBG_CAPT+1+(I-1)/GROUP_SIZE2
+            END DO
           ELSE
             IF (K469_LOC .EQ. 2) THEN
-              CALL SEP_GROUPING(NV, WORK(1), N, NZ8,
+              CALL SEP_GROUPING( ND_STEPS(NODE), KEEP,
+     &              NV, WORK(1), N, NZ8,
      &              LRGROUPS, NBGROUPS, IW(1), LW, IPE(1), LEN(1),
      &              GROUP_SIZE, HALO_DEPTH, TRACE_PRV, WORKH_PRV, 
      &              NODE, GEN2HALO_PRV, K482_LOC, K472, K469_LOC, 
      &              SEP_SIZE, K142, K10, LP, LPOK, IFLAG, IERROR)
             ELSE
-              CALL SEP_GROUPING(NV, WORK(1), N, NZ8,
+              CALL SEP_GROUPING( ND_STEPS(NODE), KEEP,
+     &              NV, WORK(1), N, NZ8,
      &              LRGROUPS, NBGROUPS, IW(1), LW, IPE(1), LEN(1),
      &              GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, 
      &              NODE, GEN2HALO, K482_LOC, K472, K469_LOC, 
@@ -1232,10 +1269,10 @@ C
             ENDDO
           ENDIF
         ELSE
-!$OMP CRITICAL(lrgrouping_cri)
+!$OMP ATOMIC CAPTURE
           NBGROUPS = NBGROUPS + 1
           NBGROUPS_local = NBGROUPS
-!$OMP END CRITICAL(lrgrouping_cri)
+!$OMP END ATOMIC 
           IF (NV .GE. SEP_SIZE) THEN
             DO I = 1, NV
               LRGROUPS( WORK(I) ) = NBGROUPS_local
@@ -1306,7 +1343,8 @@ C
      &     SEP_SIZE, K38, K20,
      &     K60, IFLAG, IERROR, K264, K265, K482, K472, MAXFRONT, K469, 
      &     K10, K54, K142, LPOK, LP, 
-     &     COMM, MYID, NPROCS_ARG
+     &     COMM, MYID, NPROCS_ARG,
+     &     KEEP, ND_STEPS
      &     )
       IMPLICIT NONE
       INCLUDE 'mpif.h'
@@ -1331,13 +1369,14 @@ C
       INTEGER             :: FILS(N), STEP(N), LRGROUPS(N)
       INTEGER, INTENT(IN) :: SIZEOFBLOCKS(N)
       INTEGER, INTENT(IN) :: K472, K469
+      INTEGER, INTENT(IN) :: KEEP(500), ND_STEPS(:)
       INTEGER :: NPROCS
       INTEGER :: K482_LOC,  K469_LOC, K38ou20, K142_GLOB
       INTEGER :: I, F, PV, NV, NVEXPANDED, NODE
       DOUBLE PRECISION    :: COMPRESS_RATIO
       LOGICAL :: PVSCHANGED
       INTEGER :: PVSCHANGED_INT, PVSCHANGED_INT_GLOB, IPROC
-      INTEGER :: NBGROUPS, NBGROUPS_local 
+      INTEGER :: NBGROUPS, NBGROUPS_local, NBG_CAPT
       INTEGER, ALLOCATABLE, DIMENSION (:) :: PVS, WORK
       INTEGER :: NBGROUPS_sent
       INTEGER :: NBNODES_LOC, SIZE_SENT, ISHIFT, 
@@ -1347,7 +1386,7 @@ C
       INTEGER, ALLOCATABLE, DIMENSION (:) :: TRACE_PRV, WORKH_PRV, 
      &                                   GEN2HALO_PRV
       INTEGER :: STEP_SCALAPACK_ROOT
-      INTEGER :: GROUP_SIZE2, IERR, OMP_NUM
+      INTEGER :: GROUP_SIZE2, GROUP_SIZE2_TMP, IERR, OMP_NUM
       INTEGER :: IERR_PRIV 
       LOGICAL :: MAPCOL_PROVIDED
 #if defined(ptscotch) || defined(scotch)     
@@ -1453,10 +1492,10 @@ C
       PVSCHANGED = .FALSE.
       OMP_NUM = 1
 !$    OMP_NUM = omp_get_max_threads()
-      OMP_NUM = min(OMP_NUM,8)
+      OMP_NUM = min(OMP_NUM,5)
 !$OMP PARALLEL PRIVATE(I, NODE, PV, NV, F, GROUP_SIZE2, WORK, IERR_PRIV,
 !$OMP&         WORKH_PRV, TRACE_PRV, GEN2HALO_PRV, NBGROUPS_local,
-!$OMP&         NVEXPANDED, COMPRESS_RATIO, IPROC
+!$OMP&         NVEXPANDED, COMPRESS_RATIO, IPROC, GROUP_SIZE2_TMP
 !$OMP&         )
 !$OMP&         REDUCTION( max : K142)
 !$OMP&         IF (K469_LOC.GT.1) NUM_THREADS(OMP_NUM)
@@ -1522,29 +1561,37 @@ C
           F = FILS(F)
         END DO
         COMPRESS_RATIO = dble(NVEXPANDED)/dble(NV)
-        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NVEXPANDED)
-        IF (NVEXPANDED .GE. GROUP_SIZE2)  THEN
+        CALL COMPUTE_BLR_VCS(K472, GROUP_SIZE2, GROUP_SIZE, NVEXPANDED,
+     &                        ND_STEPS(NODE), KEEP(35))
+        IF (NVEXPANDED .GE. GROUP_SIZE2
+     &     .AND. NVEXPANDED.GE.int(dble(SEP_SIZE)*dble(1.5))
+     &     )  THEN
           IF ( (K482_LOC.EQ.3)
      &           .OR.
      &         ( (K60.NE.0).AND.(WORK(1).EQ.K38ou20) )
      &        ) 
      &    THEN
-            GROUP_SIZE2 = max(int(dble(GROUP_SIZE2)/COMPRESS_RATIO), 1)
-!$OMP CRITICAL(lrgrouping_cri)
+            GROUP_SIZE2_TMP = GROUP_SIZE2
+            GROUP_SIZE2_TMP = max( int(dble(GROUP_SIZE2_TMP)
+     &                             /COMPRESS_RATIO), 1)
+!$OMP ATOMIC CAPTURE
+          NBG_CAPT = NBGROUPS
+          NBGROUPS = NBGROUPS + (NV-1)/GROUP_SIZE2_TMP + 1
+!$OMP END ATOMIC 
             DO I=1,NV
-              LRGROUPS(WORK(I))=NBGROUPS+1+(I-1)/GROUP_SIZE2
+              LRGROUPS(WORK(I))=NBG_CAPT+1+(I-1)/GROUP_SIZE2_TMP
             END DO
-            NBGROUPS = NBGROUPS + (NV-1)/GROUP_SIZE2 + 1
-!$OMP END CRITICAL(lrgrouping_cri)
           ELSE
             IF (K469_LOC .EQ. 2) THEN
-              CALL SEP_GROUPING_AB(NV, NVEXPANDED, WORK(1), N, 
+              CALL SEP_GROUPING_AB(  ND_STEPS(NODE), KEEP,
+     &              NV, NVEXPANDED, WORK(1), N, 
      &              LRGROUPS, NBGROUPS, LUMAT, SIZEOFBLOCKS,
      &              GROUP_SIZE, HALO_DEPTH, TRACE_PRV, WORKH_PRV, 
      &              NODE, GEN2HALO_PRV, K482_LOC, K472, K469_LOC, 
      &              SEP_SIZE, K142, K10, LP, LPOK, IFLAG, IERROR)
             ELSE
-              CALL SEP_GROUPING_AB(NV, NVEXPANDED, WORK(1), N, 
+              CALL SEP_GROUPING_AB(  ND_STEPS(NODE), KEEP,
+     &              NV, NVEXPANDED, WORK(1), N, 
      &              LRGROUPS, NBGROUPS, LUMAT, SIZEOFBLOCKS,
      &              GROUP_SIZE, HALO_DEPTH, TRACE, WORKH, 
      &              NODE, GEN2HALO, K482_LOC, K472, K469_LOC, 
