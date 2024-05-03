@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.0, released
+ *  on Tue Apr 23 10:25:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -13,12 +13,20 @@
  *  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
  *
  */
-#ifdef INTSIZE64
+/* libseq is currently compiled independently of MUMPS
+ * and mumps_c_types.h and default integer size relies
+ * on compilation with -DINTSIZE64
+ */
+
 #include <inttypes.h>
+#ifdef INTSIZE64
 #define LIBSEQ_INT int64_t
+#define LIBSEQ_INT8 int64_t
 #else
 #define LIBSEQ_INT int
+#define LIBSEQ_INT8 int64_t
 #endif
+
 
 #if ! defined(LIBSEQ_CALL)
 #if defined(_WIN32) && ! defined(__MINGW32__)
@@ -45,23 +53,22 @@ extern "C" {
 
 /* This is the minimum to have the C interface to MUMPS work with the
  * C example provided. Other stub functions of the MPI standard may be
- * added if needed. */
+ * added as needed. */
 
 typedef LIBSEQ_INT MPI_Comm; /* Simple type for MPI communicator */
-typedef LIBSEQ_INT MPI_Fint; /* Simple type for MPI communicator */
 static MPI_Comm MPI_COMM_WORLD=(MPI_Comm)0;
 
-LIBSEQ_INT LIBSEQ_CALL MPI_Init(LIBSEQ_INT *pargc, char ***pargv);
-LIBSEQ_INT LIBSEQ_CALL MPI_Comm_rank(MPI_Comm  comm, LIBSEQ_INT  *rank);
-LIBSEQ_INT LIBSEQ_CALL MPI_Finalize(void);
+int LIBSEQ_CALL MPI_Init(int *pargc, char ***pargv);
+int LIBSEQ_CALL MPI_Comm_rank(MPI_Comm  comm, int  *rank);
+int LIBSEQ_CALL MPI_Finalize(void);
 MPI_Comm LIBSEQ_CALL MPI_Comm_f2c(LIBSEQ_INT comm);
 
 /* For MPI_IS_IN_PLACE tests */
-void LIBSEQ_CALL MUMPS_CHECKADDREQUAL(char *a, char*b, LIBSEQ_INT *i);
-void LIBSEQ_CALL MUMPS_CHECKADDREQUAL_(char *a, char*b, LIBSEQ_INT *i);
-void LIBSEQ_CALL mumps_checkaddrequal_(char *a, char*b, LIBSEQ_INT *i);
-void LIBSEQ_CALL mumps_checkaddrequal__(char *a, char*b, LIBSEQ_INT *i);
-double LIBSEQ_CALL MPI_Wtime();
+void LIBSEQ_CALL MUMPS_CHECKADDREQUAL(char *a, char*b, LIBSEQ_INT8 *i);
+void LIBSEQ_CALL MUMPS_CHECKADDREQUAL_(char *a, char*b, LIBSEQ_INT8 *i);
+void LIBSEQ_CALL mumps_checkaddrequal_(char *a, char*b, LIBSEQ_INT8 *i);
+void LIBSEQ_CALL mumps_checkaddrequal__(char *a, char*b, LIBSEQ_INT8 *i);
+double LIBSEQ_CALL MPI_Wtime(void);
 
 #ifdef __cplusplus
 }

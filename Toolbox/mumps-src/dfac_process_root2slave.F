@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -65,7 +65,7 @@ C
       INTEGER, INTENT(IN) :: NINCOLARR(KEEP(194))
       INTEGER, INTENT(IN) :: NINROWARR(KEEP(195))
       INTEGER, INTENT(IN) :: PTRDEBARR(KEEP(196))
-      DOUBLE PRECISION :: RHS_MUMPS(KEEP(255))
+      DOUBLE PRECISION :: RHS_MUMPS(KEEP8(85))
       INTEGER INTARR(KEEP8(27))
       DOUBLE PRECISION DBLARR(KEEP8(26))
       INTEGER ::  allocok
@@ -80,17 +80,17 @@ C
       DOUBLE PRECISION ZERO
       PARAMETER( ZERO = 0.0D0 )
       INCLUDE 'mumps_headers.h'
-      INTEGER numroc, MUMPS_PROCNODE
-      EXTERNAL numroc, MUMPS_PROCNODE
+      INTEGER MUMPS_NUMROC, MUMPS_PROCNODE
+      EXTERNAL MUMPS_NUMROC, MUMPS_PROCNODE
       IROOT = KEEP( 38 )
       root%TOT_ROOT_SIZE = TOT_ROOT_SIZE
       MASTER_OF_ROOT = ( MYID .EQ. 
      &                   MUMPS_PROCNODE( PROCNODE_STEPS(STEP(IROOT)),
      &                   KEEP(199) ) )
-      NEW_LOCAL_M  = numroc( TOT_ROOT_SIZE, root%MBLOCK,
+      NEW_LOCAL_M  = MUMPS_NUMROC( TOT_ROOT_SIZE, root%MBLOCK,
      &               root%MYROW, 0, root%NPROW )
       NEW_LOCAL_M  = max( 1, NEW_LOCAL_M )
-      NEW_LOCAL_N  = numroc( TOT_ROOT_SIZE, root%NBLOCK,
+      NEW_LOCAL_N  = MUMPS_NUMROC( TOT_ROOT_SIZE, root%NBLOCK,
      &               root%MYCOL, 0, root%NPCOL )
       IF ( PTRIST(STEP( IROOT )).GT.0) THEN
         OLD_LOCAL_N = -IW( PTRIST(STEP( IROOT )) + KEEP(IXSZ) )
@@ -275,7 +275,7 @@ C
       ENDIF 
       IF ( NO_OLD_ROOT ) THEN
           IF (KEEP(253) .GT.0) THEN
-            root%RHS_NLOC = numroc( KEEP(253), root%NBLOCK,
+            root%RHS_NLOC = MUMPS_NUMROC( KEEP(253), root%NBLOCK,
      &                      root%MYCOL, 0, root%NPCOL )
             root%RHS_NLOC = max( root%RHS_NLOC, 1 )
           ELSE
@@ -291,8 +291,8 @@ C
           ENDIF
           IF (KEEP(253) .NE. 0) THEN
             root%RHS_ROOT=ZERO
-            CALL DMUMPS_ASM_RHS_ROOT( N, FILS, root, KEEP, RHS_MUMPS,
-     &      IFLAG, IERROR )
+            CALL DMUMPS_ASM_RHS_ROOT( N, FILS, root, KEEP, KEEP8,
+     &      RHS_MUMPS, IFLAG, IERROR )
           ENDIF
       ELSE IF (NEW_LOCAL_M.GT.OLD_LOCAL_M .AND. KEEP(253) .GT.0) THEN
           TMP => root%RHS_ROOT

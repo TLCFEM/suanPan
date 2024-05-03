@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -14,19 +14,23 @@ C
       SUBROUTINE DMUMPS_CREATEPARTVEC(MYID, NUMPROCS, COMM,
      & IRN_loc, JCN_loc, NZ_loc,
      & IPARTVEC, ISZ, OSZ,
-     & IWRK, IWSZ)
+     & IWRK, IWSZ, INUMMY, NOMP_MAX )
+!$    USE OMP_LIB
 C
       IMPLICIT NONE
       EXTERNAL DMUMPS_BUREDUCE
-      INTEGER, INTENT(IN)    :: MYID, NUMPROCS, COMM
+      INTEGER, INTENT(IN)    :: MYID, NUMPROCS, COMM, NOMP_MAX
       INTEGER(8), INTENT(IN) :: NZ_loc 
-      INTEGER, INTENT(IN)    :: IWSZ
+      INTEGER(8), INTENT(IN) :: IWSZ
       INTEGER, INTENT(IN)    :: ISZ, OSZ
       INTEGER, INTENT(IN)    :: IRN_loc(NZ_loc), JCN_loc(NZ_loc)
 C  OUTPUT
 C     IPARTVEC(I) = proc number with largest number of entries 
 C                in row/col I
+C     INUMMY = number of local rows/columns with
+C              at least one local entry (NUMPROCS .NE. 1 only)
       INTEGER, INTENT(OUT) :: IPARTVEC(ISZ)
+      INTEGER, INTENT(OUT) :: INUMMY
 C
 C  INTERNAL WORKING ARRAY
 C     IWRK (1:2*ISZ) is initialized to couples (MYID, Nb of entries
@@ -46,42 +50,87 @@ C     LOCAL VARS
       INTEGER(8) :: I8
       INTEGER OP, IERROR
       INTEGER IR, IC
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
 C
+!$    IF (NOMP_MAX.GT.0) THEN
+!$     NOMP  = omp_get_max_threads()
+!$     CHUNK= max(K361/2, (ISZ+NOMP-1) / NOMP )
+!$    ENDIF
+C
+      INUMMY = 0
       IF(NUMPROCS.NE.1) THEN
 C     CHECK done outsize
 C     IF(IWSZ < 4*ISZ) THEN
 C     CHECK ENDS
          CALL MPI_OP_CREATE(DMUMPS_BUREDUCE, .TRUE., OP, IERROR)
 C     PERFORM THE REDUCTION
-#if defined(WORKAROUNDINTELILP64MPI2INTEGER)
-        CALL DMUMPS_IBUINIT(IWRK, 4*ISZ, int(ISZ,4))
-#else
-        CALL DMUMPS_IBUINIT(IWRK, 4*ISZ, ISZ)
-#endif
 C     WE FIRST ZERO OUT  
+       IF (NOMP_MAX.LE.0) THEN
          DO I=1,ISZ
-            IWRK(2*I-1) = 0
-            IWRK(2*I) = MYID
+            IWRK(2_8*int(I,8)-1_8) = 0
+            IWRK(2_8*int(I,8))     = MYID
          ENDDO
+       ELSE
+!$OMP   PARALLEL DO PRIVATE(I) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.ISZ > K361 )
+         DO I=1,ISZ
+            IWRK(2_8*int(I,8)-1_8) = 0
+            IWRK(2_8*int(I,8))     = MYID
+         ENDDO
+!$OMP   END PARALLEL DO
+       ENDIF
          DO I8=1_8,NZ_loc
             IR = IRN_loc(I8)
             IC = JCN_loc(I8)
             IF((IR.GE.1).AND.(IR.LE.ISZ).AND.
      &           (IC.GE.1).AND.(IC.LE.OSZ)) THEN
-               IWRK(2*IR-1) = IWRK(2*IR-1) + 1
+               IWRK(2_8*int(IR,8)-1_8) = IWRK(2_8*int(IR,8)-1_8) + 1
             ENDIF
          ENDDO
-         CALL MPI_ALLREDUCE(IWRK(1), IWRK(1+2*ISZ), ISZ,
+         CALL MUMPS_BIGALLREDUCE(.FALSE., IWRK(1),
+     &        IWRK(1_8+2_8*int(ISZ,8)), ISZ,
      &        MPI_2INTEGER, OP, COMM, IERROR)      
-         DO I=1,ISZ
-            IPARTVEC(I) = IWRK(2*I+2*ISZ)
-         ENDDO
+C
+        IF (NOMP_MAX.LE.0) THEN
+          DO I=1,ISZ
+             IPARTVEC(I) = IWRK(2_8*int(I,8)+2_8*int(ISZ,8))
+C            Compute INUMMY directly
+             IF ( IPARTVEC(I) .EQ. MYID. OR.
+     &            IWRK(2_8*int(I,8)-1_8) .GT. 0 ) THEN
+               INUMMY=INUMMY+1
+             ENDIF
+          ENDDO
+        ELSE
+!$OMP   PARALLEL DO PRIVATE(I) SCHEDULE(STATIC,CHUNK)
+!$OMP&  IF ( ISZ > K361 .AND. NOMP .GT. 1)
+!$OMP&  REDUCTION(+:INUMMY)
+          DO I=1,ISZ
+             IPARTVEC(I) = IWRK(2_8*int(I,8)+2_8*int(ISZ,8))
+C            Compute INUMMY directly
+             IF ( IPARTVEC(I) .EQ. MYID. OR.
+     &            IWRK(2_8*int(I,8)-1_8) .GT. 0 ) THEN
+               INUMMY=INUMMY+1
+             ENDIF
+          ENDDO
+!$OMP   END PARALLEL DO
+        ENDIF
 C     FREE THE OPERATOR
          CALL MPI_OP_FREE(OP, IERROR)
       ELSE
-         DO I=1,ISZ
-            IPARTVEC(I) = 0
-         ENDDO
+        IF (NOMP_MAX.LE.0) THEN
+          DO I=1,ISZ
+             IPARTVEC(I) = 0
+          ENDDO
+        ELSE
+!$OMP    PARALLEL DO PRIVATE(I) SCHEDULE(STATIC,CHUNK)
+!$OMP&   IF ( ISZ > K361 .AND. NOMP .GT. 1)
+          DO I=1,ISZ
+             IPARTVEC(I) = 0
+          ENDDO
+!$OMP    END PARALLEL DO
+       ENDIF
       ENDIF
       RETURN
       END SUBROUTINE DMUMPS_CREATEPARTVEC
@@ -89,94 +138,17 @@ C
 C     SEPARATOR: Another function begins
 C
 C 
-      SUBROUTINE DMUMPS_FINDNUMMYROWCOL(MYID, NUMPROCS, COMM,
-     &     IRN_loc, JCN_loc, NZ_loc,
-     &     ROWPARTVEC, COLPARTVEC, M, N,
-     &     INUMMYR,
-     &     INUMMYC,     
-     &     IWRK, IWSZ)
-      IMPLICIT NONE
-      INTEGER(8), INTENT(IN) :: NZ_loc
-      INTEGER, INTENT(IN) :: MYID, NUMPROCS, M, N, IWSZ
-      INTEGER, INTENT(IN) :: IRN_loc(NZ_loc), JCN_loc(NZ_loc)
-C     [ROW/COL]PARTVEC(I) holds proc number with largest number of entries 
-C                in row/col I
-      INTEGER, INTENT(IN) :: ROWPARTVEC(M)
-      INTEGER, INTENT(IN) :: COLPARTVEC(N)
-      INTEGER, INTENT(IN) :: COMM
-C
-C  OUTPUT PARAMETERS
-C     INUMMYR < M and INUMMYC < N  (CPA or <= ??)
-C     INUMMYR holds the number of rows allocated to me 
-C             or non empty on my proc
-C     INUMMYC idem with columns
-      INTEGER INUMMYR, INUMMYC
-C
-C  INTERNAL working array
-      INTEGER IWRK(IWSZ)
-C
-C   Local variables
-      INTEGER I, IR, IC
-      INTEGER(8) ::  I8
-C check done outsize     
-C     IF(IWSZ < M) THEN ERROR
-C     IF(IWSZ < N) THEN ERROR
-      INUMMYR = 0
-      INUMMYC = 0
-C     MARK MY ROWS. FIRST COUNT,
-C          IF DYNAMIC MEMORY ALLOCATIOn WILL USED
-C     INUMMYR first counts number of rows affected to me
-C             (that will be centralized on MYID)
-      DO I=1,M
-         IWRK(I) = 0
-         IF(ROWPARTVEC(I).EQ.MYID) THEN
-            IWRK(I)=1
-            INUMMYR = INUMMYR + 1
-         ENDIF
-      ENDDO
-      DO I8=1_8,NZ_loc
-         IR = IRN_loc(I8)
-         IC = JCN_loc(I8)
-         IF((IR.GE.1).AND.(IR.LE.M).AND.
-     &        ((IC.GE.1).AND.(IC.LE.N)) ) THEN
-            IF(IWRK(IR) .EQ. 0) THEN
-               IWRK(IR)= 1
-               INUMMYR = INUMMYR + 1
-            ENDIF
-         ENDIF
-      ENDDO
-C     DO THE SMAME THING FOR COLS
-      DO I=1,N
-         IWRK(I) = 0
-         IF(COLPARTVEC(I).EQ.MYID) THEN
-            IWRK(I)= 1
-            INUMMYC = INUMMYC + 1
-         ENDIF
-      ENDDO
-      DO I8=1_8,NZ_loc
-         IC = JCN_loc(I8)
-         IR = IRN_loc(I8)
-         IF((IR.GE.1).AND.(IR.LE.M).AND.
-     &        ((IC.GE.1).AND.(IC.LE.N)) ) THEN
-            IF(IWRK(IC) .EQ. 0) THEN
-               IWRK(IC)= 1
-               INUMMYC = INUMMYC + 1
-            ENDIF
-         ENDIF
-      ENDDO
-C
-      RETURN
-      END SUBROUTINE DMUMPS_FINDNUMMYROWCOL
       SUBROUTINE DMUMPS_FILLMYROWCOLINDICES(MYID, NUMPROCS,COMM,    
      &     IRN_loc, JCN_loc, NZ_loc,
      &     ROWPARTVEC, COLPARTVEC, M, N,
      &     MYROWINDICES, INUMMYR,
      &     MYCOLINDICES, INUMMYC,     
-     &     IWRK, IWSZ  )
+     &     IWRK, IWSZ, NOMP_MAX  )
+!$    USE OMP_LIB
       IMPLICIT NONE
-      INTEGER(8) :: NZ_loc
-      INTEGER MYID, NUMPROCS, M, N
-      INTEGER INUMMYR, INUMMYC, IWSZ
+      INTEGER(8) :: NZ_loc, IWSZ
+      INTEGER MYID, NUMPROCS, M, N, NOMP_MAX
+      INTEGER INUMMYR, INUMMYC
       INTEGER IRN_loc(NZ_loc), JCN_loc(NZ_loc)
       INTEGER ROWPARTVEC(M)
       INTEGER COLPARTVEC(N)
@@ -188,11 +160,32 @@ C
       INTEGER I, IR, IC, ITMP
       INTEGER(8) :: I8
 C      
+      INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$    IF (NOMP_MAX.GT.0) THEN
+!$     NOMP=omp_get_max_threads()
+C      note that M=N
+!$     CHUNK= max(K361/2, (M+NOMP-1) / NOMP )
+!$    ENDIF
+C      
 C     MARK MY ROWS. 
-      DO I=1,M
-         IWRK(I) = 0
-         IF(ROWPARTVEC(I).EQ.MYID) IWRK(I)=1
-      ENDDO
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,M
+           IWRK(I) = 0
+           IF(ROWPARTVEC(I).EQ.MYID) IWRK(I)=1
+        ENDDO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I) 
+!$OMP&  SCHEDULE(STATIC,CHUNK)
+!$OMP&  IF ( M > K361 .AND. NOMP .GT. 1)
+        DO I=1,M
+           IWRK(I) = 0
+           IF(ROWPARTVEC(I).EQ.MYID) IWRK(I)=1
+        ENDDO
+!$OMP END PARALLEL DO
+      ENDIF
+CTEMP !$OMP  PARALLEL DO PRIVATE(I8,IR,IC) SCHEDULE(STATIC,CHUNK)
+CTEMP !$OMP& IF ( NZ_loc > int(K361,8) .AND. NOMP .GT. 1)
       DO I8=1,NZ_loc
          IR = IRN_loc(I8)         
          IC = JCN_loc(I8)
@@ -201,6 +194,7 @@ C     MARK MY ROWS.
             IF(IWRK(IR) .EQ. 0) IWRK(IR)= 1
          ENDIF
       ENDDO
+CTEMP !$OMP END PARALLEL DO
 C     PUT MY ROWS INTO MYROWINDICES
       ITMP = 1
       DO I=1,M
@@ -212,10 +206,24 @@ C     PUT MY ROWS INTO MYROWINDICES
 C
 C
 C     DO THE SMAME THING FOR COLS
-      DO I=1,N
-         IWRK(I) = 0
-         IF(COLPARTVEC(I).EQ.MYID) IWRK(I)= 1
-      ENDDO
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,N
+           IWRK(I) = 0
+           IF(COLPARTVEC(I).EQ.MYID) IWRK(I)= 1
+        ENDDO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I) 
+!$OMP&  SCHEDULE(STATIC,CHUNK)
+!$OMP&  IF ( N > K361 .AND. NOMP .GT. 1)
+        DO I=1,N
+           IWRK(I) = 0
+           IF(COLPARTVEC(I).EQ.MYID) IWRK(I)= 1
+        ENDDO
+!$OMP END PARALLEL DO
+      ENDIF
+C
+CTEMP !$OMP  PARALLEL DO PRIVATE(I8,IR,IC) SCHEDULE(STATIC,CHUNK)
+CTEMP !$OMP& IF ( NZ_loc > int(K361,8) .AND. NOMP .GT. 1)
       DO I8=1,NZ_loc
          IR = IRN_loc(I8)         
          IC = JCN_loc(I8)
@@ -224,6 +232,7 @@ C     DO THE SMAME THING FOR COLS
             IF(IWRK(IC) .EQ. 0) IWRK(IC)= 1
          ENDIF
       ENDDO
+CTEMP !$OMP END PARALLEL DO
 C     PUT MY ROWS INTO MYROWINDICES
       ITMP = 1
       DO I=1,N
@@ -305,11 +314,12 @@ C
 C     SEPARATOR: Another function begins
 C
       DOUBLE PRECISION FUNCTION DMUMPS_ERRSCALOC(D, TMPD, DSZ,
-     &     INDX, INDXSZ)
+     &     INDX, INDXSZ, NOMP_MAX)
+!$    USE OMP_LIB
 C     THE VAR D IS NOT USED IN COMPUTATIONS.
 C     IT IS THERE FOR READIBLITY OF THE *simScaleAbs.F
       IMPLICIT NONE 
-      INTEGER DSZ, INDXSZ
+      INTEGER, INTENT(IN):: DSZ, INDXSZ, NOMP_MAX
       DOUBLE PRECISION D(DSZ)
       DOUBLE PRECISION TMPD(DSZ)
       INTEGER INDX(INDXSZ)
@@ -319,19 +329,40 @@ C     LOCAL VARS
       INTEGER I, IIND
       DOUBLE PRECISION ERRMAX
       INTRINSIC abs
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
       ERRMAX = -RONE
-      DO I=1,INDXSZ
-         IIND = INDX(I)
-         IF(abs(RONE-TMPD(IIND)).GT.ERRMAX) THEN
-            ERRMAX = abs(RONE-TMPD(IIND))
-         ENDIF
-      ENDDO           
+!$    IF (NOMP_MAX.GT.0) THEN
+!$     NOMP  = OMP_GET_MAX_THREADS()
+!$     CHUNK= max(K361/2, (INDXSZ+NOMP-1) / NOMP )
+!$    ENDIF
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,INDXSZ
+           IIND = INDX(I)
+           IF(abs(RONE-TMPD(IIND)).GT.ERRMAX) THEN
+              ERRMAX = abs(RONE-TMPD(IIND))
+           ENDIF
+        ENDDO           
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I,IIND) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1 .AND. INDXSZ > K361 )
+!$OMP&  REDUCTION(max:ERRMAX)
+        DO I=1,INDXSZ
+           IIND = INDX(I)
+           IF(abs(RONE-TMPD(IIND)).GT.ERRMAX) THEN
+              ERRMAX = abs(RONE-TMPD(IIND))
+           ENDIF
+        ENDDO           
+!$OMP   END PARALLEL DO
+      ENDIF
       DMUMPS_ERRSCALOC = ERRMAX
       RETURN
       END FUNCTION DMUMPS_ERRSCALOC
-      DOUBLE PRECISION FUNCTION DMUMPS_ERRSCA1(D, TMPD, DSZ)
+      DOUBLE PRECISION FUNCTION DMUMPS_ERRSCA1(D, TMPD, DSZ, NOMP_MAX)
+!$    USE OMP_LIB
       IMPLICIT NONE 
-      INTEGER DSZ
+      INTEGER, INTENT(IN):: DSZ, NOMP_MAX
       DOUBLE PRECISION D(DSZ)
       DOUBLE PRECISION TMPD(DSZ)
 C     LOCAL VARS
@@ -340,12 +371,31 @@ C     LOCAL VARS
       INTEGER I
       DOUBLE PRECISION ERRMAX1
       INTRINSIC abs
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
       ERRMAX1 = -RONE
-      DO I=1,DSZ
-         IF(abs(RONE-TMPD(I)).GT.ERRMAX1) THEN
-            ERRMAX1 = abs(RONE-TMPD(I))
-         ENDIF
-      ENDDO
+!$    IF (NOMP_MAX.GT.0) THEN
+!$     NOMP  = OMP_GET_MAX_THREADS()
+!$     CHUNK= max(K361/2, (DSZ+NOMP-1) / NOMP )
+!$    ENDIF
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,DSZ
+           IF(abs(RONE-TMPD(I)).GT.ERRMAX1) THEN
+              ERRMAX1 = abs(RONE-TMPD(I))
+           ENDIF
+        ENDDO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.DSZ > K361 )
+!$OMP&  REDUCTION(max:ERRMAX1)
+        DO I=1,DSZ
+           IF(abs(RONE-TMPD(I)).GT.ERRMAX1) THEN
+              ERRMAX1 = abs(RONE-TMPD(I))
+           ENDIF
+        ENDDO
+!$OMP   END PARALLEL DO
+      ENDIF
       DMUMPS_ERRSCA1 = ERRMAX1
       RETURN
       END FUNCTION DMUMPS_ERRSCA1
@@ -353,9 +403,10 @@ C
 C     SEPARATOR: Another function begins
 C
       SUBROUTINE DMUMPS_UPDATESCALE(D,  TMPD, DSZ,
-     &        INDX, INDXSZ)
+     &        INDX, INDXSZ, NOMP_MAX)
+!$    USE OMP_LIB
       IMPLICIT NONE
-      INTEGER DSZ, INDXSZ
+      INTEGER, INTENT(in) :: DSZ, INDXSZ, NOMP_MAX
       DOUBLE PRECISION D(DSZ)
       DOUBLE PRECISION TMPD(DSZ)
       INTEGER INDX(INDXSZ)
@@ -364,15 +415,34 @@ C     LOCAL VARS
       INTEGER I, IIND
       DOUBLE PRECISION RZERO
       PARAMETER(RZERO=0.0D0)
-      DO I=1,INDXSZ
-         IIND = INDX(I)
-         IF (TMPD(IIND).NE.RZERO) D(IIND) = D(IIND)/sqrt(TMPD(IIND))
-      ENDDO
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$    IF (NOMP_MAX.GT.0) THEN
+!$     NOMP  = OMP_GET_MAX_THREADS()
+!$     CHUNK= max(K361/2, (INDXSZ+NOMP-1) / NOMP )
+!$    ENDIF
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,INDXSZ
+           IIND = INDX(I)
+           IF (TMPD(IIND).NE.RZERO) D(IIND)=D(IIND)/sqrt(TMPD(IIND))
+        ENDDO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I,IIND) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.  INDXSZ> K361 )
+        DO I=1,INDXSZ
+           IIND = INDX(I)
+           IF (TMPD(IIND).NE.RZERO) D(IIND)=D(IIND)/sqrt(TMPD(IIND))
+        ENDDO
+!$OMP   END PARALLEL DO
+      ENDIF
       RETURN
       END SUBROUTINE DMUMPS_UPDATESCALE
-      SUBROUTINE DMUMPS_UPSCALE1(D,  TMPD, DSZ)
+C
+      SUBROUTINE DMUMPS_UPSCALE1(D,  TMPD, DSZ, NOMP_MAX)
+!$    USE OMP_LIB
       IMPLICIT NONE
-      INTEGER DSZ
+      INTEGER, INTENT(IN):: DSZ, NOMP_MAX
       DOUBLE PRECISION D(DSZ)
       DOUBLE PRECISION TMPD(DSZ)
       INTRINSIC sqrt
@@ -380,74 +450,186 @@ C     LOCAL VARS
       INTEGER I
       DOUBLE PRECISION RZERO
       PARAMETER(RZERO=0.0D0)
-      DO I=1,DSZ
-         IF (TMPD(I) .NE. RZERO) D(I) = D(I)/sqrt(TMPD(I))
-      ENDDO
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$    IF (NOMP_MAX.GT.0) THEN
+!$      NOMP  = OMP_GET_MAX_THREADS()
+!$      CHUNK= max(K361/2, (DSZ+NOMP-1) / NOMP )
+!$    ENDIF
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,DSZ
+           IF (TMPD(I) .NE. RZERO) D(I) = D(I)/sqrt(TMPD(I))
+        ENDDO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.  DSZ> K361 )
+        DO I=1,DSZ
+           IF (TMPD(I) .NE. RZERO) D(I) = D(I)/sqrt(TMPD(I))
+        ENDDO
+!$OMP   END PARALLEL DO
+      ENDIF
       RETURN
       END SUBROUTINE DMUMPS_UPSCALE1
 C
 C     SEPARATOR: Another function begins
 C
-      SUBROUTINE DMUMPS_INITREALLST(D, DSZ, INDX, INDXSZ, VAL)
+      SUBROUTINE DMUMPS_INITREALLST(D, DSZ, INDX, INDXSZ, VAL,
+     &                              NOMP_MAX)
+!$    USE OMP_LIB
       IMPLICIT NONE
-      INTEGER DSZ, INDXSZ
+      INTEGER, INTENT(IN):: DSZ, INDXSZ, NOMP_MAX
       DOUBLE PRECISION D(DSZ)
       INTEGER INDX(INDXSZ)
       DOUBLE PRECISION VAL
 C     LOCAL VARS
       INTEGER I, IIND
-      DO I=1,INDXSZ
-         IIND = INDX(I)
-         D(IIND) = VAL
-      ENDDO
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$    IF (NOMP_MAX.GT.0) THEN
+!$     NOMP  = OMP_GET_MAX_THREADS()
+!$     CHUNK= max(K361/2, (INDXSZ+NOMP-1) / NOMP )
+!$    ENDIF
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,INDXSZ
+           IIND = INDX(I)
+           D(IIND) = VAL
+        ENDDO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I,IIND) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.  INDXSZ > K361 )
+        DO I=1,INDXSZ
+           IIND = INDX(I)
+           D(IIND) = VAL
+        ENDDO
+!$OMP   END PARALLEL DO
+      ENDIF
       RETURN
       END SUBROUTINE DMUMPS_INITREALLST
 C
 C     SEPARATOR: Another function begins
 C
-      SUBROUTINE DMUMPS_INVLIST(D, DSZ, INDX, INDXSZ)
-      IMPLICIT NONE
-      INTEGER DSZ, INDXSZ
-      DOUBLE PRECISION D(DSZ)
-      INTEGER INDX(INDXSZ)
-C     LOCALS
-      INTEGER I, IIND
-      DO I=1,INDXSZ
-         IIND  = INDX(I)
-         D(IIND) = 1.0D0/D(IIND)
-      ENDDO
-      RETURN
-      END SUBROUTINE DMUMPS_INVLIST
 C
 C     SEPARATOR: Another function begins
 C
-      SUBROUTINE DMUMPS_INITREAL(D, DSZ, VAL)
+      SUBROUTINE DMUMPS_INITREAL(D, DSZ, VAL, NOMP_MAX)
+!$    USE OMP_LIB
       IMPLICIT NONE
-      INTEGER DSZ
+      INTEGER, INTENT(IN):: DSZ, NOMP_MAX
       DOUBLE PRECISION D(DSZ)
       DOUBLE PRECISION VAL
 C     LOCAL VARS
       INTEGER I
-      DO I=1,DSZ
-         D(I) = VAL
-      ENDDO
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$    IF (NOMP_MAX.GT.0) THEN
+!$     NOMP  = omp_get_max_threads()
+!$     CHUNK= max(K361/2, (DSZ+NOMP-1) / NOMP )
+!$    ENDIF
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,DSZ
+           D(I) = VAL
+        ENDDO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.DSZ > K361 )
+        DO I=1,DSZ
+           D(I) = VAL
+        ENDDO
+!$OMP   END PARALLEL DO
+      ENDIF
       RETURN
       END SUBROUTINE DMUMPS_INITREAL
 C
 C     SEPARATOR: Another function begins
 C
-      SUBROUTINE DMUMPS_ZEROOUT(TMPD, TMPSZ, INDX, INDXSZ)
+      SUBROUTINE DMUMPS_REDUCE_WRK(WRK, N, WRK_TH, NOMP_MAX)
+C     Called only when NOMP_MAX>0
+!$    USE OMP_LIB
       IMPLICIT NONE
-      INTEGER TMPSZ,INDXSZ 
+      INTEGER N,NOMP_MAX
+      DOUBLE PRECISION WRK(N), WRK_TH(N,NOMP_MAX)
+C     LOCAL VAR
+      INTEGER I, IOMP
+      DOUBLE PRECISION DZERO
+      PARAMETER(DZERO=0.0D0)
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$    NOMP  = OMP_GET_MAX_THREADS()
+!$    CHUNK= max(K361/2, (N+NOMP-1) / NOMP )
+!$OMP   PARALLEL DO PRIVATE(I,IOMP) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.  N > K361 )
+      DO I=1,N
+         WRK(I) = DZERO
+         DO IOMP=1,NOMP_MAX
+           WRK(I) = WRK_TH(I,IOMP) +  WRK(I)
+         ENDDO
+      ENDDO      
+!$OMP END PARALLEL DO
+      RETURN
+      END SUBROUTINE DMUMPS_REDUCE_WRK
+      SUBROUTINE DMUMPS_REDUCE_WRK_MPI(WRK, N, WRK_TH, NOMP_MAX, 
+     &           INDX, INDXSZ)
+C     Called only when NOMP_MAX>0
+!$    USE OMP_LIB
+      IMPLICIT NONE
+      INTEGER N,NOMP_MAX,INDXSZ 
+      DOUBLE PRECISION WRK(N), WRK_TH(N,NOMP_MAX)
+      INTEGER INDX(INDXSZ)
+C     LOCAL VAR
+      INTEGER I, J, IOMP
+      DOUBLE PRECISION DZERO
+      PARAMETER(DZERO=0.0D0)
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$      NOMP  = OMP_GET_MAX_THREADS()
+!$      CHUNK= max(K361/2, (INDXSZ+NOMP-1) / NOMP )
+!$OMP   PARALLEL DO PRIVATE(I,J,IOMP) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.  INDXSZ > K361 )
+      DO I=1,INDXSZ
+         J = INDX(I)
+         WRK(J) = DZERO
+         DO IOMP=1,NOMP_MAX
+           WRK(J) = WRK_TH(J,IOMP) + WRK(J)
+         ENDDO
+      ENDDO      
+!$OMP END PARALLEL DO
+      RETURN
+      END SUBROUTINE DMUMPS_REDUCE_WRK_MPI
+      SUBROUTINE DMUMPS_ZEROOUT(TMPD, TMPSZ, INDX, INDXSZ, 
+     &                          NOMP_MAX)
+!$    USE OMP_LIB
+      IMPLICIT NONE
+      INTEGER, INTENT(IN):: TMPSZ,INDXSZ, NOMP_MAX
       DOUBLE PRECISION TMPD(TMPSZ)
       INTEGER INDX(INDXSZ)
 C     LOCAL VAR
       INTEGER I
       DOUBLE PRECISION DZERO
       PARAMETER(DZERO=0.0D0)
-      DO I=1,INDXSZ
-         TMPD(INDX(I)) = DZERO
-      ENDDO      
+!$    INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$    IF (NOMP_MAX.GT.0) THEN
+!$     NOMP  = OMP_GET_MAX_THREADS()
+!$     CHUNK= max(K361/2, (INDXSZ+NOMP-1) / NOMP )
+!$    ENDIF
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,INDXSZ
+           TMPD(INDX(I)) = DZERO
+        ENDDO      
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I) 
+!$OMP&  SCHEDULE(STATIC, CHUNK)
+!$OMP&  IF ( NOMP.GT.1.AND.  INDXSZ > K361 )
+        DO I=1,INDXSZ
+           TMPD(INDX(I)) = DZERO
+        ENDDO      
+!$OMP END PARALLEL DO
+      ENDIF
       RETURN
       END SUBROUTINE DMUMPS_ZEROOUT
 C
@@ -509,7 +691,7 @@ C     SEPARATOR: Another function begins
 C
       SUBROUTINE DMUMPS_IBUINIT(IW, IWSZ, IVAL)
       IMPLICIT NONE
-      INTEGER IWSZ
+      INTEGER(8) :: IWSZ
 #if defined(WORKAROUNDINTELILP64MPI2INTEGER)
       INTEGER(4) IW(IWSZ)
       INTEGER(4) IVAL
@@ -517,8 +699,8 @@ C
       INTEGER IW(IWSZ)
       INTEGER IVAL
 #endif
-      INTEGER I
-      DO I=1,IWSZ
+      INTEGER(8) :: I
+      DO I=1_8,IWSZ
          IW(I)=IVAL
       ENDDO
       RETURN
@@ -535,10 +717,10 @@ C
      &     IWRK,IWRKSZ, SNDSZ, RCVSZ, COMM)
       IMPLICIT NONE
       INTEGER(8), INTENT(IN) :: NZ_loc
-      INTEGER, INTENT(IN)    :: IWRKSZ
+      INTEGER(8), INTENT(IN) :: IWRKSZ
       INTEGER, INTENT(IN) ::  MYID, NUMPROCS, ISZ, OSZ
       INTEGER, INTENT(IN) ::  COMM
-C     When INDX holds row indices O(ther)INDX hold col indices
+C     When INDX holds row indices O(ther)INDX holds col indices
       INTEGER, INTENT(IN) :: INDX(NZ_loc)
       INTEGER, INTENT(IN) :: OINDX(NZ_loc)
 C     On entry IPARTVEC(I) holds proc number with largest number of entries 
@@ -582,7 +764,7 @@ C      IF(ISZ>IWRKSZ) THEN ERROR
          SNDSZ(I) = 0
          RCVSZ(I) = 0
       ENDDO
-      DO I=1,IWRKSZ
+      DO I=1,max(ISZ,OSZ)
          IWRK(I) = 0
       ENDDO
 C
@@ -595,7 +777,7 @@ C     set SNDSZ
             PIND = IPARTVEC(IIND)
             IF(PIND .NE. MYID) THEN
 C              MYID will send row/col IIND to proc PIND 
-C              (PIND has the largest nb of entries in row/con IIND
+C              (PIND has the largest nb of entries in row/col IIND
                IF(IWRK(IIND).EQ.0) THEN
                   IWRK(IIND) = 1
                   SNDSZ(PIND+1) = SNDSZ(PIND+1)+1
@@ -926,18 +1108,22 @@ C     COMMUNICATE THE UPDATED ONES
       SUBROUTINE DMUMPS_CREATEPARTVECSYM(MYID, NUMPROCS, COMM,
      & IRN_loc, JCN_loc, NZ_loc,
      & IPARTVEC, ISZ,
-     & IWRK, IWSZ)
+     & IWRK, IWSZ, INUMMY)
+!$    USE OMP_LIB
       IMPLICIT NONE
       EXTERNAL DMUMPS_BUREDUCE
       INTEGER, INTENT(IN) :: MYID, NUMPROCS, COMM
-      INTEGER(8)          :: NZ_loc
-      INTEGER, INTENT(IN) :: ISZ, IWSZ
+      INTEGER(8)          :: NZ_loc, IWSZ
+      INTEGER, INTENT(IN) :: ISZ
       INTEGER, INTENT(IN) :: IRN_loc(NZ_loc), JCN_loc(NZ_loc)
 C
 C  OUTPUT
 C     IPARTVEC(I) = proc number with largest number of entries 
 C                in row/col I
+C     INUMMY = number of local rows/columns with
+C              at least one local entry (NUMPROCS .NE. 1 only)
       INTEGER, INTENT(OUT) :: IPARTVEC(ISZ)
+      INTEGER, INTENT(OUT) :: INUMMY
 C
 C  INTERNAL WORKING ARRAY
 C     IWRK (1:2*ISZ) is initialized to couples (MYID, Nb of entries
@@ -957,39 +1143,55 @@ C     LOCAL VARS
       INTEGER(8) :: I8
       INTEGER OP, IERROR
       INTEGER IR, IC
+      INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
 C
+      INUMMY = 0
+!$    NOMP=omp_get_max_threads()
+!$    CHUNK= max(K361/2, (ISZ+NOMP-1) / NOMP )
       IF(NUMPROCS.NE.1) THEN
 C     CHECK done outsize
 C     IF(IWSZ < 2*ISZ) THEN
 C     CHECK ENDS
          CALL MPI_OP_CREATE(DMUMPS_BUREDUCE, .TRUE., OP, IERROR)
 C     PERFORM THE REDUCTION
-#if defined(WORKAROUNDINTELILP64MPI2INTEGER)
-         CALL DMUMPS_IBUINIT(IWRK, 4*ISZ, int(ISZ,4))
-#else
-         CALL DMUMPS_IBUINIT(IWRK, 4*ISZ, ISZ)
-#endif
+!$OMP   PARALLEL DO PRIVATE(I) SCHEDULE(STATIC,CHUNK)
+!$OMP&  IF ( ISZ > K361 .AND. NOMP .GT. 1)
          DO I=1,ISZ
-            IWRK(2*I-1) = 0
-            IWRK(2*I) = MYID
+            IWRK(2_8*int(I,8)-1_8) = 0
+            IWRK(2_8*int(I,8)) = MYID
          ENDDO
+!$OMP   END PARALLEL DO
          DO I8=1_8,NZ_loc
             IR = IRN_loc(I8)
             IC = JCN_loc(I8)
             IF((IR.GE.1).AND.(IR.LE.ISZ).AND.
      &           (IC.GE.1).AND.(IC.LE.ISZ)) THEN
-               IWRK(2*IR-1) = IWRK(2*IR-1) + 1
-               IWRK(2*IC-1) = IWRK(2*IC-1) + 1
+               IWRK(2_8*int(IR,8)-1_8) = IWRK(2_8*int(IR,8)-1_8) + 1
+               IWRK(2_8*int(IC,8)-1_8) = IWRK(2_8*int(IC,8)-1_8) + 1
             ENDIF
          ENDDO
-         CALL MPI_ALLREDUCE(IWRK(1), IWRK(1+2*ISZ), ISZ,
+         CALL MUMPS_BIGALLREDUCE(.FALSE.,
+     &        IWRK(1), IWRK(1_8+2_8*int(ISZ,8)), ISZ,
      &        MPI_2INTEGER, OP, COMM, IERROR)      
+C       CHUNK computed in previous // do
+!$OMP   PARALLEL DO PRIVATE(I) SCHEDULE(STATIC,CHUNK)
+!$OMP&  IF ( ISZ > K361 .AND. NOMP .GT. 1)
+!$OMP&  REDUCTION(+:INUMMY)
          DO I=1,ISZ
-            IPARTVEC(I) = IWRK(2*I+2*ISZ)
+            IPARTVEC(I) = IWRK(2_8*int(I,8)+2_8*int(ISZ,8))
+C           Compute INUMMY directly
+            IF ( IPARTVEC(I) .EQ. MYID. OR.
+     &           IWRK(2_8*int(I,8)-1_8) .GT. 0 ) THEN
+              INUMMY=INUMMY+1
+            ENDIF
          ENDDO
+!$OMP   END PARALLEL DO
 C     FREE THE OPERATOR
          CALL MPI_OP_FREE(OP, IERROR)
       ELSE
+!$OMP   PARALLEL DO PRIVATE(I) SCHEDULE(STATIC,CHUNK)
+!$OMP&  IF ( ISZ > K361 .AND. NOMP .GT. 1)
          DO I=1,ISZ
             IPARTVEC(I) = 0
          ENDDO
@@ -1001,7 +1203,7 @@ C     FREE THE OPERATOR
      & IWRK,IWRKSZ, SNDSZ, RCVSZ, COMM)
       IMPLICIT NONE
       INTEGER(8), INTENT(IN) :: NZ_loc 
-      INTEGER, INTENT(IN)    :: IWRKSZ
+      INTEGER(8), INTENT(IN) :: IWRKSZ
       INTEGER, INTENT(IN)    :: MYID, NUMPROCS, ISZ
       INTEGER, INTENT(IN)    :: INDX(NZ_loc), OINDX(NZ_loc)
       INTEGER, INTENT(IN)    :: IPARTVEC(ISZ)
@@ -1044,7 +1246,7 @@ C      IF(ISZ>IWRKSZ) THEN ERROR
          SNDSZ(I) = 0
          RCVSZ(I) = 0
       ENDDO
-      DO I=1,IWRKSZ
+      DO I=1,ISZ
          IWRK(I) = 0
       ENDDO
 C
@@ -1057,7 +1259,7 @@ C     set SNDSZ
             PIND = IPARTVEC(IIND)
             IF(PIND .NE. MYID) THEN
 C              MYID will send row/col IIND to proc PIND 
-C              (PIND has the largest nb of entries in row/con IIND
+C              (PIND has the largest nb of entries in row/col IIND
                IF(IWRK(IIND).EQ.0) THEN
                   IWRK(IIND) = 1
                   SNDSZ(PIND+1) = SNDSZ(PIND+1)+1
@@ -1092,59 +1294,6 @@ C     number of row/col sent by MYID.
       ENDDO
       RETURN
       END SUBROUTINE DMUMPS_NUMVOLSNDRCVSYM
-      SUBROUTINE DMUMPS_FINDNUMMYROWCOLSYM(MYID, NUMPROCS, COMM,
-     &     IRN_loc, JCN_loc, NZ_loc,
-     &     PARTVEC, N,
-     &     INUMMYR,
-     &     IWRK, IWSZ)
-      IMPLICIT NONE
-      INTEGER MYID, NUMPROCS, N
-      INTEGER(8) :: NZ_loc
-      INTEGER IRN_loc(NZ_loc), JCN_loc(NZ_loc)
-      INTEGER PARTVEC(N)
-      INTEGER INUMMYR
-      INTEGER IWSZ
-      INTEGER IWRK(IWSZ)
-      INTEGER COMM
-C
-      INTEGER I, IR, IC
-      INTEGER(8) :: I8
-C check done outsize     
-C     IF(IWSZ < M) THEN ERROR
-C     IF(IWSZ < N) THEN ERROR
-      INUMMYR = 0
-C     MARK MY ROWS. FIRST COUNT,
-C          IF DYNAMIC MEMORY ALLOCATIOn WILL USED
-      DO I=1,N
-         IWRK(I) = 0
-         IF(PARTVEC(I).EQ.MYID) THEN
-            IWRK(I)=1
-            INUMMYR = INUMMYR + 1
-         ENDIF
-      ENDDO
-      DO I8=1_8,NZ_loc
-         IR = IRN_loc(I8)
-         IC = JCN_loc(I8)
-         IF((IR.GE.1).AND.(IR.LE.N).AND.
-     &        ((IC.GE.1).AND.(IC.LE.N))) THEN
-            IF(IWRK(IR) .EQ. 0) THEN
-               IWRK(IR)= 1
-               INUMMYR = INUMMYR + 1
-            ENDIF
-         ENDIF
-         IF((IR.GE.1).AND.(IR.LE.N).AND.
-     &        ((IC.GE.1).AND.(IC.LE.N))) THEN
-            IF(IWRK(IC).EQ.0) THEN
-               IWRK(IC)= 1
-               INUMMYR = INUMMYR + 1
-            ENDIF
-         ENDIF
-      ENDDO
-C     THE SMAME THING APPLIES FOR COLS
-C     No need to do anything
-C
-      RETURN
-      END SUBROUTINE DMUMPS_FINDNUMMYROWCOLSYM
       INTEGER FUNCTION DMUMPS_CHKCONVGLOSYM(D, N, INDXR, INDXRSZ,
      &     EPS, COMM)
       IMPLICIT NONE
@@ -1169,11 +1318,12 @@ C
      &     IRN_loc, JCN_loc, NZ_loc,
      &     PARTVEC, N,
      &     MYROWINDICES, INUMMYR,
-     &     IWRK, IWSZ  )
+     &     IWRK, IWSZ, NOMP_MAX )
+!$    USE OMP_LIB
       IMPLICIT NONE
-      INTEGER MYID, NUMPROCS, N
-      INTEGER(8) :: NZ_loc
-      INTEGER INUMMYR, IWSZ
+      INTEGER MYID, NUMPROCS, N, NOMP_MAX
+      INTEGER(8) :: NZ_loc, IWSZ
+      INTEGER INUMMYR
       INTEGER IRN_loc(NZ_loc), JCN_loc(NZ_loc)
       INTEGER PARTVEC(N)
       INTEGER MYROWINDICES(INUMMYR)
@@ -1182,21 +1332,36 @@ C
 C
       INTEGER I, IR, IC, ITMP
       INTEGER(8) :: I8
+      INTEGER, PARAMETER :: K361 = 2048
+!$    INTEGER NOMP, CHUNK
+!$    IF (NOMP_MAX.GT.0) THEN
+!$      NOMP=omp_get_max_threads()
+!$      CHUNK= max(K361/2, (N+NOMP-1) / NOMP )
+!$    ENDIF
 C      
 C     MARK MY ROWS. 
-      DO I=1,N
-         IWRK(I) = 0
-         IF(PARTVEC(I).EQ.MYID) IWRK(I)=1
-      ENDDO
+      IF (NOMP_MAX.LE.0) THEN
+        DO I=1,N
+           IWRK(I) = 0
+           IF(PARTVEC(I).EQ.MYID) IWRK(I)=1
+        ENDDO
+      ELSE
+!$OMP   PARALLEL DO PRIVATE(I) 
+!$OMP&  SCHEDULE(STATIC,CHUNK)
+!$OMP&  IF ( N > K361 .AND. NOMP .GT. 1)
+        DO I=1,N
+           IWRK(I) = 0
+           IF(PARTVEC(I).EQ.MYID) IWRK(I)=1
+        ENDDO
+!$OMP END PARALLEL DO
+      ENDIF
+C
       DO I8=1_8,NZ_loc
          IR = IRN_loc(I8)   
          IC = JCN_loc(I8)
          IF((IR.GE.1).AND.(IR.LE.N).AND.
      &        ((IC.GE.1).AND.(IC.LE.N))) THEN
             IF(IWRK(IR) .EQ. 0) IWRK(IR)= 1
-         ENDIF
-         IF((IR.GE.1).AND.(IR.LE.N).AND.
-     &        ((IC.GE.1).AND.(IC.LE.N))) THEN
             IF(IWRK(IC) .EQ.0) IWRK(IC)=1
          ENDIF
       ENDDO

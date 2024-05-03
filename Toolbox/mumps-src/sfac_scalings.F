@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -22,54 +22,61 @@ C
       REAL, INTENT(IN) :: ASPK(NZ8)
       REAL COLSCA(*), ROWSCA(*)
       INTEGER(8), INTENT(IN) :: LWK8
-      INTEGER LWK_REAL
+      INTEGER(8), INTENT(IN) :: LWK_REAL
       REAL    WK(LWK8)
       REAL WK_REAL(LWK_REAL)
       INTEGER MPG,LP
-      INTEGER IWNOR
       INTEGER I
-      LOGICAL PROK
+      LOGICAL PROKG
       REAL ONE
       PARAMETER( ONE = 1.0E0 )
       LP      = ICNTL(1)
       MPG     = ICNTL(2)
       MPG    = ICNTL(3)
-      PROK   = ((MPG.GT.0).AND.(ICNTL(4).GE.2))
-      IF (PROK) THEN
+      PROKG  = ((MPG.GT.0).AND.(ICNTL(4).GE.2))
+      IF (PROKG) THEN
         WRITE(MPG,101)
       ELSE
         MPG = 0
       ENDIF
- 101    FORMAT(/' ****** SCALING OF ORIGINAL MATRIX '/)
-        IF (NSCA.EQ.1) THEN
-         IF (PROK)
-     &    WRITE (MPG,*) ' DIAGONAL SCALING '
-        ELSEIF (NSCA.EQ.3) THEN
-         IF (PROK)
+ 101  FORMAT(/' ****** SCALING OF ORIGINAL MATRIX '/)
+      IF (NSCA.EQ.1) THEN
+        IF (PROKG) WRITE (MPG,*) ' DIAGONAL SCALING '
+      ELSEIF (NSCA.EQ.3) THEN
+         IF (PROKG)
      &   WRITE (MPG,*) ' COLUMN SCALING'
-        ELSEIF (NSCA.EQ.4) THEN
-         IF (PROK)
+      ELSEIF (NSCA.EQ.4) THEN
+         IF (PROKG)
      &   WRITE (MPG,*) ' ROW AND COLUMN SCALING (1 Pass)'
-       ENDIF
-        DO 10 I=1,N
-            COLSCA(I) = ONE
-            ROWSCA(I) = ONE
- 10     CONTINUE
-        IF (5*N.GT.LWK_REAL) GOTO 410
-        IWNOR = 1
-          IF (NSCA.EQ.1) THEN
+      ENDIF
+      DO 10 I=1,N
+        COLSCA(I) = ONE
+        ROWSCA(I) = ONE
+ 10   CONTINUE
+      IF (NSCA.EQ.1) THEN
             CALL SMUMPS_FAC_V(N,NZ8,ASPK,IRN,ICN,
-     &        COLSCA,ROWSCA,MPG)
-          ELSEIF (NSCA.EQ.3) THEN
-            CALL SMUMPS_FAC_Y(N,NZ8,ASPK,IRN,ICN,WK_REAL(IWNOR),
+     &      COLSCA,ROWSCA,MPG)
+      ELSEIF (NSCA.EQ.3) THEN
+            IF ( LWK_REAL .LT. int(N,8) ) THEN
+              GOTO 420
+            ENDIF
+            CALL SMUMPS_FAC_Y(N,NZ8,ASPK,IRN,ICN,WK_REAL(1),
      &      COLSCA, MPG)
-          ELSEIF (NSCA.EQ.4) THEN
+      ELSEIF (NSCA.EQ.4) THEN
+            IF ( LWK_REAL .LT. 2_8*int(N,8) ) THEN
+              GOTO 430
+            ENDIF
             CALL SMUMPS_ROWCOL(N,NZ8,IRN,ICN,ASPK,
-     &      WK_REAL(IWNOR),WK_REAL(IWNOR+N),COLSCA,ROWSCA,MPG)
-          ENDIF
+     &      WK_REAL(1),WK_REAL(1+N),COLSCA,ROWSCA,MPG)
+      ENDIF
       GOTO 500
- 410  INFO(1) = -5
-      INFO(2) = 5*N-LWK_REAL
+ 420  INFO(1) = -5
+      CALL MUMPS_SET_IERROR(int(N,8)-LWK_REAL, INFO(2))
+      IF ((LP.GT.0).AND.(ICNTL(4).GE.1))
+     & WRITE(LP,*) '*** ERROR: Not enough space to scale matrix'
+      GOTO 500
+ 430  INFO(1) = -5
+      CALL MUMPS_SET_IERROR(2_8*int(N,8)-LWK_REAL, INFO(2))
       IF ((LP.GT.0).AND.(ICNTL(4).GE.1))
      & WRITE(LP,*) '*** ERROR: Not enough space to scale matrix'
       GOTO 500

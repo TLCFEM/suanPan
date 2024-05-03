@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.0, released
+ *  on Tue Apr 23 10:25:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -21,6 +21,8 @@ static MUMPS_INT * MUMPS_PIVNUL_LIST;
 /* as uns_perm and sym_perm */
 static MUMPS_INT * MUMPS_SYM_PERM;
 static MUMPS_INT * MUMPS_UNS_PERM;
+static MUMPS_INT * MUMPS_GLOB2LOC_RHS;
+static MUMPS_INT * MUMPS_GLOB2LOC_SOL;
 MUMPS_INT*
 mumps_get_mapping()
 {
@@ -80,6 +82,36 @@ void MUMPS_CALL
 MUMPS_NULLIFY_C_UNS_PERM()
 {
     MUMPS_UNS_PERM = 0;
+}
+MUMPS_INT*
+mumps_get_glob2loc_rhs()
+{
+    return MUMPS_GLOB2LOC_RHS;
+}
+void MUMPS_CALL
+MUMPS_ASSIGN_GLOB2LOC_RHS(MUMPS_INT * f77glob2loc_rhs)
+{
+    MUMPS_GLOB2LOC_RHS = f77glob2loc_rhs;
+}
+void MUMPS_CALL
+MUMPS_NULLIFY_C_GLOB2LOC_RHS()
+{
+    MUMPS_GLOB2LOC_RHS = 0;
+}
+MUMPS_INT*
+mumps_get_glob2loc_sol()
+{
+    return MUMPS_GLOB2LOC_SOL;
+}
+void MUMPS_CALL
+MUMPS_ASSIGN_GLOB2LOC_SOL(MUMPS_INT * f77glob2loc_sol)
+{
+    MUMPS_GLOB2LOC_SOL = f77glob2loc_sol;
+}
+void MUMPS_CALL
+MUMPS_NULLIFY_C_GLOB2LOC_SOL()
+{
+    MUMPS_GLOB2LOC_SOL = 0;
 }
 void MUMPS_CALL
 MUMPS_ICOPY_32TO64_64C_IP_C(MUMPS_INT *inouttab, MUMPS_INT8 *sizetab)

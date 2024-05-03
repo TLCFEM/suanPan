@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -51,8 +51,7 @@ C
       INTEGER FWD_LOCAL_N_RHS, FWD_MTYPE 
 #endif
       INCLUDE 'mumps_headers.h'
-      EXTERNAL numroc
-      INTEGER numroc
+      INTEGER, EXTERNAL :: MUMPS_NUMROC
         IF ( .NOT. root%yes ) RETURN
         IF ( KEEP(60) .NE. 0 ) THEN
           IF ((LDLT == 1 .OR. LDLT == 2) .AND. KEEP(60) == 3 ) THEN
@@ -181,7 +180,7 @@ C
      &         LDLT)
         ENDIF
         IF (KEEP(252) .NE. 0) THEN
-          FWD_LOCAL_N_RHS = numroc(KEEP(253), root%NBLOCK,
+          FWD_LOCAL_N_RHS = MUMPS_NUMROC(KEEP(253), root%NBLOCK,
      &                      root%MYCOL, 0, root%NPCOL)
           FWD_LOCAL_N_RHS = max(1,FWD_LOCAL_N_RHS)
           FWD_MTYPE       = 1 

@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -14,7 +14,7 @@ C
       SUBROUTINE DMUMPS_SOL_R(N, A, LA, IW, LIW, WCB, LWCB,
      &    NRHS,
      &    PTRICB, IWCB, LIWCB, 
-     &    RHSCOMP, LRHSCOMP, POSINRHSCOMP_FWD, 
+     &    RHSINTR, LRHSINTR, POSINRHSINTR_FWD, 
      &    STEP,
      &    FRERE, DAD, FILS,
      &    NSTK, IPOOL, LPOOL, PTRIST, PTRFAC, MYLEAF, MYROOT,
@@ -59,8 +59,8 @@ C
       INTEGER IW( LIW ), IWCB( LIWCB )
       INTEGER ISTEP_TO_INIV2(KEEP(71)), 
      &        TAB_POS_IN_PERE(SLAVEF+2,max(1,KEEP(56)))
-      INTEGER, intent(in) ::  POSINRHSCOMP_FWD(N), LRHSCOMP 
-      DOUBLE PRECISION, intent(inout) :: RHSCOMP(LRHSCOMP,NRHS)
+      INTEGER, intent(in) ::  POSINRHSINTR_FWD(N), LRHSINTR 
+      DOUBLE PRECISION, intent(inout) :: RHSINTR(LRHSINTR,NRHS)
       LOGICAL, intent(in) :: FROM_PP
       INTEGER, INTENT( in ) :: LL0_OMP_MAPPING, LL0_OMP_FACTORS
       INTEGER, INTENT( in ) :: L0_OMP_MAPPING( LL0_OMP_MAPPING )
@@ -108,21 +108,25 @@ C
      &          KEEP(208) )
         GOTO 60
       ENDIF
-      BLOQ = ( ( III .EQ. LEAF )
+      IF (SLAVEF .EQ. 1) THEN
+        FLAG = .FALSE.
+      ELSE
+        BLOQ = ( ( III .EQ. LEAF )
      &     )
-      CALL DMUMPS_SOLVE_RECV_AND_TREAT( BLOQ, FLAG,
-     &     BUFR, LBUFR, LBUFR_BYTES,
-     &     MYID, SLAVEF, COMM,
-     &     N, NRHS, IPOOL, LPOOL, LEAF,
-     &     NBFIN, NSTK, IW, LIW, A, LA, PTRIST, PTRFAC,
-     &     IWCB, LIWCB,
-     &     WCB, LWCB, POSWCB,
-     &     PLEFTWCB, POSIWCB,
-     &     PTRICB, INFO, KEEP,KEEP8, DKEEP, STEP,
-     &     PROCNODE_STEPS,
-     &     RHSCOMP, LRHSCOMP, POSINRHSCOMP_FWD
-     &     , FROM_PP
-     &    )
+        CALL DMUMPS_SOLVE_RECV_AND_TREAT( BLOQ, FLAG,
+     &       BUFR, LBUFR, LBUFR_BYTES,
+     &       MYID, SLAVEF, COMM,
+     &       N, NRHS, IPOOL, LPOOL, LEAF,
+     &       NBFIN, NSTK, IW, LIW, A, LA, PTRIST, PTRFAC,
+     &       IWCB, LIWCB,
+     &       WCB, LWCB, POSWCB,
+     &       PLEFTWCB, POSIWCB,
+     &       PTRICB, INFO, KEEP,KEEP8, DKEEP, STEP,
+     &       PROCNODE_STEPS,
+     &       RHSINTR, LRHSINTR, POSINRHSINTR_FWD
+     &       , FROM_PP
+     &      )
+      ENDIF
       IF ( INFO( 1 ) .LT. 0 .OR. NBFIN .EQ. 0 ) GOTO 260
       IF (.not. FLAG) THEN
          IF (III .NE. LEAF) THEN
@@ -158,7 +162,7 @@ C
      &        PTRICB, PTRIST, PTRFAC, PROCNODE_STEPS,
      &        FILS, STEP, FRERE, DAD,
      &        INFO, KEEP,KEEP8, DKEEP, RHS_ROOT, LRHS_ROOT, MTYPE,
-     &        RHSCOMP, LRHSCOMP, POSINRHSCOMP_FWD,
+     &        RHSINTR, LRHSINTR, POSINRHSINTR_FWD,
      &        ISTEP_TO_INIV2, TAB_POS_IN_PERE
      &        , RHS_BOUNDS, LRHS_BOUNDS, DO_NBSPARSE 
      &        , FROM_PP

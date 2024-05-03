@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.0, released
+ *  on Tue Apr 23 10:25:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -21,17 +21,20 @@
 #if defined(scotch) || defined(ptscotch)
 void MUMPS_CALL
 MUMPS_SCOTCH_ORD_64( const MUMPS_INT8 * const  n,        /* in    */
-                 const MUMPS_INT8 * const  iwlen,    /* in    */
-                       MUMPS_INT8 * const  petab,    /* inout */
-                 const MUMPS_INT8 * const  pfree,    /* in    */
-                       MUMPS_INT8 * const  lentab,   /* in (modified in ANA_H) */
-                       MUMPS_INT8 * const  iwtab,    /* in (modified in ANA_H) */
-                       MUMPS_INT8 * const  nvtab,    /* out or inout if weight used on entry   */
-                       MUMPS_INT8 * const  elentab,  /* out permutation on output  */
-                       MUMPS_INT8 * const  lasttab,  /* out   */
-                       MUMPS_INT  * const  ncmpa,    /* out   */
-                       MUMPS_INT  * const  weightused,         /* out   */
-                       MUMPS_INT  * const  weightrequested )   /* in   */
+              const MUMPS_INT8 * const  iwlen,    /* in    */
+                    MUMPS_INT8 * const  petab,    /* inout */
+              const MUMPS_INT8 * const  pfree,    /* in    */
+                    MUMPS_INT8 * const  lentab,   /* in (modified in ANA_H) */
+                    MUMPS_INT8 * const  iwtab,    /* in (modified in ANA_H) */
+                    MUMPS_INT8 * const  nvtab,    /* out or inout if weight used on entry   */
+                    MUMPS_INT8 * const  elentab,  /* out permutation on output  */
+                    MUMPS_INT8 * const  lasttab,  /* out   */
+                    MUMPS_INT  * const  ncmpa,    /* out   */
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+                    SCOTCH_Context * const contextptr,
+#endif
+                    MUMPS_INT * const  weightused,         /* out   */
+                    MUMPS_INT * const  weightrequested )   /* in   */
 {
 /* weightused(out) = weightrequested since it is always used to build graph 
    FIXME it is not exploited on output and could be suppressed from interface 
@@ -43,23 +46,38 @@ MUMPS_SCOTCH_ORD_64( const MUMPS_INT8 * const  n,        /* in    */
 */
   MUMPS_INT8 * vendtab ;                    /* Vertex end array */
   SCOTCH_Graph grafdat;                    /* Graph            */
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+  SCOTCH_Graph grafdat_with_context;
+#endif
   SCOTCH_Strat stratdat;
   MUMPS_INT8 vertnum;
+  int ierr;
   *weightused = *weightrequested;
-  vendtab=malloc(*n * sizeof(MUMPS_INT));
+  vendtab=malloc(*n * sizeof(MUMPS_INT8));
   for (vertnum = 0; vertnum < *n; vertnum ++)
     vendtab[vertnum] = petab[vertnum] + lentab[vertnum];
-  SCOTCH_graphInit        (&grafdat);
+  ierr=SCOTCH_graphInit        (&grafdat);
   if ( *weightrequested == 1 )
   {
-    SCOTCH_graphBuild (&grafdat, 1, *n, (SCOTCH_Num *) petab, (SCOTCH_Num *) vendtab, (SCOTCH_Num *) nvtab, NULL, *iwlen, (SCOTCH_Num *) iwtab, NULL); /* Assume Fortran-based indexing */
+    ierr=SCOTCH_graphBuild (&grafdat, 1, *n, (SCOTCH_Num *) petab, (SCOTCH_Num *) vendtab, (SCOTCH_Num *) nvtab, NULL, *iwlen, (SCOTCH_Num *) iwtab, NULL); /* Assume Fortran-based indexing */
   }
   else
   {
-   SCOTCH_graphBuild (&grafdat, 1, *n, (SCOTCH_Num *) petab, (SCOTCH_Num *) vendtab, NULL, NULL, *iwlen, (SCOTCH_Num *) iwtab, NULL); /* Assume Fortran-based indexing */
+    ierr=SCOTCH_graphBuild (&grafdat, 1, *n, (SCOTCH_Num *) petab, (SCOTCH_Num *) vendtab, NULL, NULL, *iwlen, (SCOTCH_Num *) iwtab, NULL); /* Assume Fortran-based indexing */
   }
-  SCOTCH_stratInit(&stratdat);
+  ierr=SCOTCH_stratInit(&stratdat);
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+  /* Initialize and bind grafdat_with_context */
+  ierr=SCOTCH_graphInit        (&grafdat_with_context);
+  ierr=SCOTCH_contextBindGraph(contextptr, &grafdat, &grafdat_with_context);
+  *ncmpa=SCOTCH_graphOrder(&grafdat_with_context, &stratdat, (SCOTCH_Num *) elentab, (SCOTCH_Num *) lasttab, NULL, NULL, NULL);
+#else
+  /* order grafdat without threads context */
   *ncmpa=SCOTCH_graphOrder(&grafdat, &stratdat, (SCOTCH_Num *) elentab, (SCOTCH_Num *) lasttab, NULL, NULL, NULL);
+#endif
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+  SCOTCH_graphExit(&grafdat_with_context);
+#endif
   SCOTCH_stratExit(&stratdat);
   SCOTCH_graphExit(&grafdat);
   free(vendtab);
@@ -75,6 +93,10 @@ MUMPS_SCOTCH_64( const MUMPS_INT8 * const  n,        /* in    */
                        MUMPS_INT8 * const  elentab,  /* out   */
                        MUMPS_INT8 * const  lasttab,  /* out   */
                        MUMPS_INT  * const  ncmpa,    /* out   */
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+/* FIXME: see how to pass contextptr to esmumps/esmumpsv */
+                    SCOTCH_Context * const contextptr,
+#endif
                        MUMPS_INT  * const  weightused,         /* out   */
                        MUMPS_INT  * const  weightrequested )   /* in   */
 {

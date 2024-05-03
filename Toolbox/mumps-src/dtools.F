@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -638,14 +638,6 @@ C
      & '    Total space in MBytes, OOC factorization     (INFOG(39)):'
      &        ,INFOG(39)
       END IF
-      IF ( PROKG.AND.SUM_OF_PEAKS) THEN
-       WRITE( MPG,'(A,A)') 
-     & ' Estimations with BLR compression of only',
-     & ' Contribution Blocks (CB):'
-       WRITE( MPG,'(A,I6,A) ')
-     & ' ICNTL(39) Estimated compression rate of CB         =', 
-     &   KEEP(465), '/1000'
-      ENDIF
       IF (SUM_OF_PEAKS) THEN
        OOC_STAT  =  0  
        BLR_STRAT =  3  
@@ -686,16 +678,6 @@ C
           LRCB_UD(3) = LRCB_UD(2)/NSLAVES
         ENDIF
        ENDIF
-       IF ( PROKG.AND.SUM_OF_PEAKS ) THEN
-        IF (COMPUTE_MAXAVG) THEN
-         WRITE( MPG,'(A,I12) ')
-     & '    Maximum estim. space in Mbytes, IC facto.    (INFOG(44)):',
-     &        INFOG(44)
-        ENDIF
-        WRITE(MPG,'(A,I12) ')
-     & '    Total space in MBytes, IC factorization      (INFOG(45)):'
-     &        ,INFOG(45)
-       END IF
        OOC_STAT  =  1  
        BLR_STRAT =  3  
        BLR_CASE  =  1  
@@ -735,16 +717,6 @@ C
           OOC_LRCB_UD(3) = OOC_LRCB_UD(2)/NSLAVES
         ENDIF
        ENDIF
-       IF ( PROKG.AND.SUM_OF_PEAKS  ) THEN
-        IF (COMPUTE_MAXAVG) THEN
-         WRITE( MPG,'(A,I12) ')
-     & '    Maximum estim. space in Mbytes, OOC facto.   (INFOG(46)):',
-     &        INFOG(46)
-        ENDIF
-        WRITE(MPG,'(A,I12) ')
-     & '    Total space in MBytes, OOC factorization     (INFOG(47)):'
-     &        ,INFOG(47)
-       END IF
       END IF
       IF ( PROKG.AND.SUM_OF_PEAKS  ) THEN
        WRITE( MPG,'(A,A)') 
@@ -927,7 +899,7 @@ C
       NB_INT = NB_INT + 5_8 * NSTEPS8
       NB_INT = NB_INT + NSTEPS8 + int(KEEP(56),8)*int(NSLAVES+2,8)
         NB_INT = NB_INT + 3_8*N8 + KEEP(280)
-        IF (KEEP(38) .NE. 0) NB_INT = NB_INT + N8
+        IF (KEEP(38) .NE. 0 .AND.I_AM_SLAVE) NB_INT = NB_INT + N8 
       IF (KEEP(23).ne.0 .and. I_AM_MASTER) NB_INT=NB_INT + N8
       IF (KEEP(55).eq.0) THEN
         NB_INT = NB_INT + KEEP(193)*I8OVERI
@@ -1127,9 +1099,6 @@ C
       IF ( .not. ( I_AM_SLAVE .and. I_AM_MASTER .and. KEEP(52) .eq. 0
      &         .and. KEEP(55) .ne. 0 ) ) THEN
         NB_INT  = NB_INT  + KEEP8(27)
-      END IF
-      IF ( I_AM_SLAVE .and. KEEP(38) .ne. 0 ) THEN
-        NB_INT = NB_INT + N8
       END IF
       TEMPI= 0_8
       TEMPR = 0_8
@@ -1971,10 +1940,10 @@ C
      &  NB_INT=NB_INT+size(id%I_AM_CAND)
       IF (associated(id%MEM_DIST)) 
      &  NB_INT=NB_INT+size(id%MEM_DIST)
-      IF (associated(id%POSINRHSCOMP_ROW))
-     &     NB_INT=NB_INT+size(id%POSINRHSCOMP_ROW)
-      IF(id%POSINRHSCOMP_COL_ALLOC.AND.associated(id%POSINRHSCOMP_COL))
-     &     NB_INT=NB_INT+size(id%POSINRHSCOMP_COL)
+      IF (associated(id%GLOB2LOC_RHS))
+     &     NB_INT=NB_INT+size(id%GLOB2LOC_RHS)
+      IF(id%GLOB2LOC_SOL_ALLOC.AND.associated(id%GLOB2LOC_SOL))
+     &     NB_INT=NB_INT+size(id%GLOB2LOC_SOL)
       IF       (associated(id%MEM_SUBTREE))
      &  NB_REAL=NB_REAL+size(id%MEM_SUBTREE)*(id%KEEP(35)/id%KEEP(16))
       IF       (associated(id%MY_ROOT_SBTR))
@@ -2055,12 +2024,16 @@ C
      &     NB_CMPLX=NB_CMPLX+size(id%root%SVD_VT)
       IF (associated(id%root%SINGULAR_VALUES))
      &     NB_REAL=NB_REAL+size(id%root%SINGULAR_VALUES)
-      IF (associated(id%RHSCOMP)) NB_CMPLX = NB_CMPLX + id%KEEP8(25)
+      IF (associated(id%RHSINTR)) NB_CMPLX = NB_CMPLX + id%KEEP8(25)
       IF (associated(id%S))       NB_CMPLX=NB_CMPLX+id%KEEP8(23)
       IF (associated(id%COLSCA).AND.(id%KEEP(52).NE.-1))
      &     NB_REAL=NB_REAL+size(id%COLSCA)
       IF (associated(id%ROWSCA).AND.(id%KEEP(52).NE.-1))
      &     NB_REAL=NB_REAL+size(id%ROWSCA)
+      IF (associated(id%ROWSCA_loc)) 
+     &     NB_REAL=NB_REAL+size(id%ROWSCA_loc)
+      IF (associated(id%COLSCA_loc).AND.id%KEEP(50).EQ.0)
+     &     NB_REAL=NB_REAL+size(id%COLSCA_loc)
       NB_REAL=NB_REAL+size(id%CNTL)
       NB_REAL=NB_REAL+size(id%RINFO)
       NB_REAL=NB_REAL+size(id%RINFOG)
@@ -2083,7 +2056,6 @@ C
       INTEGER(8) :: SHIFT8, HUG8
       INTEGER    :: I, I4SIZE
       IF(int(huge(I4SIZE),8) .EQ. int(huge(HUG8),8)) THEN
-         CALL dcopy(N8, SRC(1), 1, DEST(1), 1)
          CALL dcopy(int(N8), SRC(1), 1, DEST(1), 1)
       ELSE
          HUG8=int(huge(I4SIZE),8)

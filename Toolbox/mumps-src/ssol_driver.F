@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -25,7 +25,7 @@ C  Performs solution phase (solve), Iterative Refinements
 C  and Error analysis.
 C
 C
-C
+c
 C
       USE SMUMPS_BUF
       USE SMUMPS_OOC
@@ -34,7 +34,9 @@ C
      &                           , SMUMPS_BLR_MOD_TO_STRUC
       USE MUMPS_FRONT_DATA_MGT_M, only : MUMPS_FDM_STRUC_TO_MOD,
      &                                   MUMPS_FDM_MOD_TO_STRUC
+#if ! defined(NO_SAVE_RESTORE)
       USE SMUMPS_SAVE_RESTORE
+#endif
 !$    USE OMP_LIB
       IMPLICIT NONE
 C     -------------------
@@ -77,7 +79,10 @@ C
       INTEGER MTYPE, ICNTL21
       LOGICAL LSCAL, POSTPros, GIVSOL
       INTEGER ICNTL10, ICNTL11
-      INTEGER I,IPERM,K,JPERM, J, II, IZ2
+      INTEGER I,K,JPERM, J, II, IZ2
+#if defined(USE_OLD_SCALING)
+      INTEGER IPERM
+#endif
       INTEGER IZ, NZ_THIS_BLOCK, PJ
 C     pointers in IS
       INTEGER LIW
@@ -101,6 +106,7 @@ C
       INTEGER NITREF, NOITER, SOLVET, KASE
 C     Meaningful only with tree pruning and sparse RHS
       LOGICAL INTERLEAVE_PAR, DO_PERMUTE_RHS
+      LOGICAL CALL_NODES_FWD_BWD, FIRST_CALL_NODES_FWD_BWD
 C     true if SMUMPS_SOL_C called during postprocessing
       LOGICAL FROM_PP
 C
@@ -125,17 +131,23 @@ C     ------------------------------------------
 C
       INTEGER, DIMENSION(:), ALLOCATABLE :: MAP_RHS_loc
       INTEGER, DIMENSION(:), POINTER :: IRHS_loc_PTR
-      LOGICAL :: IRHS_loc_PTR_allocated
+      LOGICAL :: IRHS_loc_PTR_ALLOCATED
+      INTEGER(8) :: SUM_idNloc_RHS_8
       REAL, DIMENSION(:), POINTER :: idRHS_loc
       INTEGER(8) :: DIFF_SOL_loc_RHS_loc
       INTEGER(8) :: RHS_loc_size, RHS_loc_shift
       INTEGER(8)  :: NBT
       INTEGER     :: NBCOL, COLSIZE, JBEG_RHS, JEND_RHS, JBEG_NEW,
-     &               NBCOL_INBLOC, IPOS, IPOSRHSCOMP
+     &               NBCOL_INBLOC, IPOS, IPOSRHSINTR
+C     Nb of pruned NE_STEPS, useful for FWD step; and list of root nodes
+      LOGICAL    :: fill
+      INTEGER, DIMENSION(:), ALLOCATABLE ::  Pruned_Sons_FWD, 
+     &                                       Pruned_Sons_BWD
       INTEGER, DIMENSION(:), ALLOCATABLE :: PERM_RHS
-      INTEGER, DIMENSION(:), POINTER :: PTR_POSINRHSCOMP_FWD,
-     &                                  PTR_POSINRHSCOMP_BWD
+      INTEGER, DIMENSION(:), POINTER :: PTR_POSINRHSINTR_FWD,
+     &                                  PTR_POSINRHSINTR_BWD
       REAL, DIMENSION(:), POINTER :: PTR_RHS
+      INTEGER, DIMENSION(:), POINTER :: idIPTR_WORKING, idWORKING
       INTEGER :: SIZE_IPTR_WORKING, SIZE_WORKING
 C     NRHS_NONEMPTY: holds
 C         either the original number of RHS (id%NRHS defined on host)
@@ -191,11 +203,12 @@ C     arrays only used for distributed matrix input
 C     (KEEP(54) .NE. 0).
       REAL,    ALLOCATABLE, DIMENSION(:) :: R_LOCWK54
       REAL, ALLOCATABLE, DIMENSION(:) :: C_LOCWK54
-      INTEGER   :: NBENT_RHSCOMP, NB_FS_RHSCOMP_F,
-     &             NB_FS_RHSCOMP_TOT
+      INTEGER   :: NBENT_RHSINTR, NB_FS_RHSINTR_F,
+     &             NB_FS_RHSINTR_TOT
       INTEGER, DIMENSION(:), ALLOCATABLE :: UNS_PERM_INV
       LOGICAL :: UNS_PERM_INV_NEEDED_INMAINLOOP,
-     &           UNS_PERM_INV_NEEDED_BEFMAINLOOP
+     &           UNS_PERM_INV_NEEDED_BEFMAINLOOP,
+     &           UNS_PERM_INV_NEEDED_ONSLAVES
       INTEGER LIWK_SOLVE, LIWCB
       INTEGER, ALLOCATABLE :: IW1(:), IWK_SOLVE(:), IWCB(:)
       INTEGER ::  LIWK_PTRACB
@@ -214,7 +227,7 @@ C     SCALING issues:
 C       When scaling was performed
 C       RHS holds the solution of the scaled system
 C       The unscaled second member (b0) was given
-C       then we have to scale both rhs adn solution:
+C       then we have to scale both rhs and solution:
 C        A(sca) = LU  = D1*A*D2 , with D2 = COLSCA
 C                                      D1 = ROWSCA
 C        --------------
@@ -222,33 +235,65 @@ C        CASE OF A X =B
 C        --------------
 C         (ICNTL(9)=1 or MTYPE=1)
 C           A*x0 = b0
-C           b(sca) = D1 * b0 = ROWSCA*S(ISTW3)
+C           b(sca) = D1 * b0 = ROWSCA*b0
 C           A(sca) [(D2) **(-1)] x0 = b(sca)
-C           so the computed solution by Check y0 of LU *y0 = b(sca)
-C           is : y0 =[(D2) **(-1)] x0 and so x0= D2*y0 is modified
+C           so the computed solution of LU * x(sca) = b(sca)
+C           is : x(sca) =[(D2) **(-1)] x0 and so x0= D2*x(sca)
 C        --------------
 C        CASE OF AT X =B
 C        --------------
 C         (ICNTL(9).NE.1 or MTYPE=0)
 C           A(sca) = LU  = D1*A*D2
-C           AT*x0 = b0 => D2ATD1 D1-1 x0 = D2b0
-C           b(sca) = D2 * b0 = COLSCA*S(ISTW3)
+C           AT*x0 = b0 => D2*AT*D1 * D1-1 x0 = D2 * b0
+C           b(sca) = D2 * b0 = COLSCA*b0
 C           A(sca)T [(D1) **(-1)] x0 = b(sca)
-C           so the computed solution by Check y0 of LU *y0 = b(sca)
-C           is : y0 =[(D1) **(-1)] x0 and so x0= D1*y0 is modified
+C           so the computed solution of (LU)^T * x(sca) = b(sca)
+C           is : x(sca) =[(D1) **(-1)] x0 and so x0= D1*y0 is modified
 C
-C      In case of distributed RHS we need
-C      scaling information on each processor
+C     In case of distributed RHS or distributed solution we need
+C     scaling information on each processor and this information has
+C     been stored in ROWSCA_loc(1:INFO(23)) and COLSCA_loc(1:INFO(23))
+C     such that:
 C
+C     ----------------
+C     CASE OF A X  = B
+C     ----------------
+C
+C     - the scaling factor of row i of A is stored on the
+C     processor for which GLOB2LOC_RHS(i) > 0 at position
+C     ROWSCA_loc(GLOB2LOC_RHS(i))
+C     
+C     - the scaling factor of column j of A is stored on the
+C     processor for which GLOB2LOC_SOL(j) > 0 at position
+C     COLSCA_loc(GLOB2LOC_SOL(j))
+C
+C     ------------------
+C     CASE OF A^T X  = B
+C     ------------------
+C
+C     - the scaling factor of row i of A^T is stored on the
+C     processor for which GLOB2LOC_RHS(i) > 0 at position
+C     COLSCA_loc(GLOB2LOC_RHS(i))
+C     
+C     - the scaling factor of column j of A^T is stored on the
+C     processor for which GLOB2LOC_SOL(j) > 0 at position
+C     ROWSCA_loc(GLOB2LOC_SOL(j))
+C
+#if defined(USE_OLD_SCALING)
           type scaling_data_t
             SEQUENCE
-            REAL, dimension(:), pointer :: SCALING
-            REAL, dimension(:), pointer :: SCALING_LOC
+            REAL   , dimension(:), pointer :: SCALING
+            REAL   , dimension(:), pointer :: SCALING_LOC
+            INTEGER, dimension(:), pointer :: SCALING_IND
           end type scaling_data_t
-          type (scaling_data_t) :: scaling_data_sol, scaling_data_dr
-C      To scale on the fly during GATHER SOLUTION
+          type (scaling_data_t) :: scaling_data_dr
+          type (scaling_data_t) :: scaling_data_sol
+C      To scale on the fly during GATHER SOLUTION:
           REAL, DIMENSION(:), POINTER :: PT_SCALING
           REAL, TARGET                :: Dummy_SCAL(1)
+#else
+          INTEGER :: ROWORCOL
+#endif
 C
 C  ==================== END OF SCALING related data ================
 C
@@ -273,8 +318,8 @@ C     Interval associated to the subblocks of RHS a node has to process
      &        MASTER_ROOT, MASTER_ROOT_IN_COMM
       INTEGER SIZE_ROOT, LD_REDRHS
       INTEGER(8) :: IPT_RHS_ROOT
-      INTEGER(8) :: IBEG, IBEG_RHSCOMP, KDEC, IBEG_loc, IBEG_REDRHS
-      INTEGER LD_RHSCOMP, NCOL_RHS_loc
+      INTEGER(8) :: IBEG, IBEG_RHSINTR, KDEC, IBEG_loc, IBEG_REDRHS
+      INTEGER NCOL_RHS_loc
       INTEGER LD_RHS_loc, JBEG_RHS_loc
       INTEGER NB_K133, IRANK, TSIZE
       INTEGER KMAX_246_247
@@ -292,8 +337,25 @@ C  Vampir
       INTEGER soln_drive_class, glob_comm_ini, perm_scal_ini, soln_dist,
      &        soln_assem, perm_scal_post
 #endif
-      LOGICAL I_AM_SLAVE, BUILD_POSINRHSCOMP
+      LOGICAL I_AM_SLAVE, BUILD_POSINRHSINTR
       LOGICAL :: BUILD_RHSMAPINFO
+      REAL, TARGET :: RDUMMY_TARGET(1)
+      LOGICAL :: ES_RHSINTR
+      INTEGER, DIMENSION(:), POINTER :: nodes_FWD, nodes_BWD
+C     to manage sparsity: compute target nodes for starting chains
+C     Lnodes_FWD/Lnodes_BWD = -1 => all nodes to be processed
+      INTEGER, DIMENSION(:), POINTER :: nodes_FWD_PTR, nodes_BWD_PTR
+      INTEGER :: Lnodes_FWD, Lnodes_BWD, Lnodes_FWD_PTR, Lnodes_BWD_PTR
+      REAL, POINTER, DIMENSION(:) :: SCALING_loc_FWD
+      REAL, POINTER, DIMENSION(:) :: SCALING_loc_BWD
+      REAL, POINTER, DIMENSION(:) :: SCALING_RHSINTR_BWD
+      REAL, POINTER, DIMENSION(:) :: SCALING_RHSINTR_FWD
+      INTEGER :: LSCALING_RHSINTR_BWD, LSCALING_RHSINTR_FWD
+      LOGICAL :: SCALING_RHSINTR_BWD_ALLOCATED,
+     &           SCALING_RHSINTR_FWD_ALLOCATED,
+     &           BUILD_SCALING_RHSINTR
+C    NSOL_loc will be equal to KEEP(89) in case ICNTL(21)=1
+      INTEGER :: NSOL_loc
       LOGICAL WORK_WCB_ALLOCATED, IS_INIT_OOC_DONE
       LOGICAL :: IS_LR_MOD_TO_STRUC_DONE
       INTEGER :: KEEP350_SAVE
@@ -303,7 +365,6 @@ C  Vampir
       INTEGER  MAT_ALLOC_LOC, MAT_ALLOC
       INTEGER MUMPS_PROCNODE
       EXTERNAL MUMPS_PROCNODE
-      INTEGER(8) :: FILE_SIZE,STRUC_SIZE
 C
 C  First executable statement
 C
@@ -318,9 +379,25 @@ C
       CALL VTFUNCDEF( 'perm_scal_post',soln_drive_class,
      &     perm_scal_post,IERR)
 #endif
+C     Depending on the type of parallelism,
+C     the master can have the role of a slave
+      I_AM_SLAVE = ( id%MYID .ne. MASTER  .OR.
+     &             ( id%MYID .eq. MASTER .AND.
+     &               id%KEEP(46) .eq. 1 ) )
 C     -- The following pointers xxCOPY might be allocated but then
 C     -- the associated xxCOPY_ALLOCATED will be set to
 C     -- enable deallocation
+      SCALING_RHSINTR_FWD_ALLOCATED = .FALSE.
+      SCALING_RHSINTR_BWD_ALLOCATED = .FALSE.
+C     Initialize scalings to possilby pass them as arguments
+C     (e.g. to SMUMPS_DS_ALL2ALL) even on non working host
+C     and/or when LSCAL is false
+      SCALING_RHSINTR_FWD => RDUMMY_TARGET
+      SCALING_RHSINTR_BWD => RDUMMY_TARGET
+      LSCALING_RHSINTR_FWD = 1
+      LSCALING_RHSINTR_BWD = 1
+      SCALING_LOC_FWD => RDUMMY_TARGET
+      SCALING_LOC_BWD => RDUMMY_TARGET
       IRHS_PTR_COPY => IDUMMY_TARGET
       IRHS_PTR_COPY_ALLOCATED = .FALSE.
       IRHS_SPARSE_COPY => IDUMMY_TARGET
@@ -329,10 +406,16 @@ C     -- enable deallocation
       RHS_SPARSE_COPY_ALLOCATED=.FALSE.
       NULLIFY(RHS_IR)
       NULLIFY(WORK_WCB)
+#if defined(USE_OLD_SCALING)
       NULLIFY(scaling_data_dr%SCALING)
       NULLIFY(scaling_data_dr%SCALING_LOC)
+      NULLIFY(scaling_data_dr%SCALING_IND)
       NULLIFY(scaling_data_sol%SCALING)
       NULLIFY(scaling_data_sol%SCALING_LOC)
+      NULLIFY(scaling_data_sol%SCALING_IND)
+#endif
+      NULLIFY(nodes_FWD)
+      NULLIFY(nodes_BWD)
       IRHS_loc_PTR_allocated = .FALSE.
       IS_INIT_OOC_DONE   = .FALSE.
       IS_LR_MOD_TO_STRUC_DONE = .FALSE.
@@ -344,9 +427,6 @@ C     -- enable deallocation
       IS   =>id%IS
       ICNTL=>id%ICNTL
       INFO =>id%INFO
-C      ASPK =>id%A
-C      COLSCA =>id%COLSCA
-C      ROWSCA =>id%ROWSCA
       RINFOG =>id%RINFOG
       LP  = ICNTL( 1 )
       MP  = ICNTL( 2 )
@@ -366,7 +446,7 @@ C      ROWSCA =>id%ROWSCA
       K34_8    = int(KEEP(34), 8)
       K35_8    = int(KEEP(35), 8)
       K16_8    = int(KEEP(16), 8)
-      NBENT_RHSCOMP = 0
+      NBENT_RHSINTR = 0
 C     Used by DISTRIBUTED_SOLUTION to skip empty columns
 C     that are skipped (case of sparse RHS)
       NB_RHSSKIPPED = 0
@@ -375,50 +455,48 @@ C     to free space allocated
       LSCAL              = .FALSE.
       WORK_WCB_ALLOCATED = .FALSE.
       ICNTL21  = -99998  ! will be bcasted later to slaves
-      IBEG_RHSCOMP =-152525_8  ! Should not be used
-      BUILD_POSINRHSCOMP = .TRUE.
+      IBEG_RHSINTR =-152525_8  ! Should not be used
+      BUILD_POSINRHSINTR      = .TRUE.
+C     NSOL_loc, KEEP(212) will be set if ICNTL(21).EQ.2
+      NSOL_loc = 0
+      KEEP(212)= 0
+C     SCALING_RHSINTR was initialized to a dummy array of size 1
+C     on the non working host, no need to reset it at each block
+      BUILD_SCALING_RHSINTR = I_AM_SLAVE
       IBEG_GLOB_DEF = -9888  ! unitialized state
       IEND_GLOB_DEF = -9888  ! unitialized state
       IBEG_ROOT_DEF = -9777  ! unitialized state
       IEND_ROOT_DEF = -9777  ! unitialized state
       IROOT_DEF_RHS_COL1 = -9666 ! unitialized state
-C     Not needed anymore (since new version of gather)
-C     LD_RHSCOMP = max(KEEP(89),1)  ! at the nb of pivots eliminated on
-                                    ! that proc
-      LD_RHSCOMP = 1
-      NB_FS_RHSCOMP_TOT = KEEP(89)
+C     ------------------------------
+C     id%LD_RHSINTR will be set each
+C     time RHSINTR is allocated
+C     ------------------------------
+      NB_FS_RHSINTR_TOT = KEEP(89)
 !     number of FS var of the pruned tree
 !     mapped on this proc
-      NB_FS_RHSCOMP_F = NB_FS_RHSCOMP_TOT
+      NB_FS_RHSINTR_F = NB_FS_RHSINTR_TOT
 C     Save value of KEEP(350), in case of LR solve
 C     KEEP(350) may be overwritten and restored
 C     Old unoptimized version before 5.0.2 not available anymore
       IF (KEEP(350).LE.0) KEEP(350)=1
       IF (KEEP(350).GT.2) KEEP(350)=1
       KEEP350_SAVE = KEEP(350)
-C
-C     Depending on the type of parallelism,
-C     the master can have the role of a slave
-      I_AM_SLAVE = ( id%MYID .ne. MASTER  .OR.
-     &             ( id%MYID .eq. MASTER .AND.
-     &               KEEP(46) .eq. 1 ) )
 C     
 C     Compute the number of integers and nb of reals in the structure
       CALL SMUMPS_SIZE_IN_STRUCT (id, NB_INT, NB_CMPLX, NB_CHAR)
       NB_BYTES = NB_BYTES + NB_INT * K34_8 + NB_CMPLX * K35_8 + NB_CHAR
       NB_BYTES_ON_ENTRY = NB_BYTES !used to check alloc/dealloc count ok
-      CALL SMUMPS_COMPUTE_MEMORY_SAVE(id,FILE_SIZE,STRUC_SIZE)
       NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
 C     ======================================
 C     BEGIN CHECK KEEP ENTRIES AND INTERFACE
 C     ======================================
-C     The checks below used to be in SMUMPS_DRIVER. It is much better
-C     to have them here in SMUMPS_SOL_DRIVER because this enables
-C     more flexibility in the management of priorities between various
-C     checks.
       IF (id%MYID .EQ. MASTER) THEN
-c     subroutine only because called at facto and solve
-          CALL SMUMPS_SET_K221(id)
+C     {
+C         Set ICNTL(26) -> KEEP(221)  (called at facto and solve)
+C         (might be called at facto in case of fwd in facto 
+C          with Schur+reduced RHS requested)
+          CALL SMUMPS_SET_K221(id, .TRUE.)
           id%KEEP(111) = id%ICNTL(25)
 C         For the case of ICNTL(20)=1 one could
 C         switch off exploit sparsity when RHS is too dense.
@@ -433,8 +511,12 @@ C         switch off exploit sparsity when RHS is too dense.
           ELSE
             id%KEEP(248) = 0 !dense RHS
           ENDIF
+C
+C         set ICNTL21 and test for out-of range entries
           ICNTL21      = id%ICNTL(21)
-          IF (ICNTL21 .ne.0.and.ICNTL21.ne.1) ICNTL21=0
+          IF ( ICNTL21.NE.0 .AND. ICNTL21.NE.1
+     &       ) ICNTL21 = 0
+C
           IF ( id%ICNTL(30) .NE.0 ) THEN
 C           A-1 is on
             id%KEEP(237) = 1
@@ -448,25 +530,81 @@ C            Force KEEP(248) accordingly.
              id%KEEP(248)=1
           ENDIF
           IF ((id%KEEP(221).EQ.2 ).AND.(id%KEEP(248).NE.0) ) THEN
-C          -- input RHS is indeed stored in REDRHS and RHSCOMP
-           id%KEEP(248) = 0
+           IF (KEEP(60).NE.0) THEN
+C            -- input RHS is stored in REDRHS and RHSINTR
+             id%KEEP(248) = 0
+           ENDIF
           ENDIF
+C}
+      ENDIF
+C     =============================================================
+C     KEEP(248) and KEEP(221): need be broadcasted
+C     before continuing other checking/settings
+      CALL MPI_BCAST( id%KEEP(221), 1, MPI_INTEGER, MASTER, id%COMM,
+     &                  IERR )
+      CALL MPI_BCAST( id%KEEP(248), 1, MPI_INTEGER, MASTER, id%COMM,
+     &                  IERR )
+      IF (KEEP(248).EQ.-1
+     &  ) THEN
+C{
+        CALL SMUMPS_CHECK_DISTRHS(
+     &       id%Nloc_RHS,
+     &       id%LRHS_loc,
+     &       id%NRHS,
+     &       id%IRHS_loc,
+     &       id%RHS_loc,
+     &       I_AM_SLAVE,
+     &       id%INFO)
+        CALL MUMPS_PROPINFO( id%ICNTL(1),
+     &                      id%INFO(1),
+     &                      id%COMM, id%MYID )
+        IF ( id%INFO(1) .LT. 0 ) GO TO 90
+C         Compute sum of id%Nloc_RHS (without out-of-range)
+C         and store it in SUM_idNloc_RHS_8
+C         (to be used to decide whether exploit sparsity 
+C         is exploited)
+          CALL SMUMPS_ES_GET_SUM_Nloc ( 
+     &             id%N, id%Nloc_RHS, id%IRHS_loc, id%COMM,
+     &             SUM_idNloc_RHS_8 )
+C}
+      ENDIF
+C     ===========================================================
+      IF (id%MYID .EQ. MASTER) THEN
+C     {
           IF ((id%KEEP(221).EQ.2 ).AND.(id%KEEP(235).NE.0) ) THEN
 C          -- input RHS is in fact effectively
-C          -- stored in REDRHS and RHSCOMP
-           id%KEEP(235) = 0
+C          -- stored in REDRHS and/or RHSINTR
+C          (for both Schur and bwd only)
+            id%KEEP(235) = 0
           ENDIF
           IF ( (id%KEEP(248).EQ.0).AND.(id%KEEP(111).EQ.0) ) THEN
 C           RHS is not sparse and thus exploit sparsity is reset to 0
             id%KEEP(235) = 0
           ENDIF
-          IF (KEEP(248) .EQ. -1) THEN
-C           V0 distributed RHS: no ES
-            id%KEEP(235) = 0
+          IF (id%KEEP(248) .EQ. -1
+     &       ) THEN
+            IF (id%KEEP(126).EQ.0)  THEN
+             id%KEEP(235) = 0
+            ELSE IF (id%KEEP(126).EQ.-1)  THEN
+             id%KEEP(235) = 1
+            ELSE IF (id%KEEP(126).GT.0) THEN
+             IF ( SUM_idNloc_RHS_8 .LE. 
+     &        int( 
+     &          (real(id%KEEP(126))/real(1000))*real(id%N)
+     &          , 8)
+     &          ) THEN
+               id%KEEP(235) = 1
+             ELSE
+               id%KEEP(235) = 0
+             ENDIF
+            ELSE
+             id%KEEP(235) = 0
+            ENDIF
           ENDIF
 C         Case of Automatic setting of exploit sparsity (KEEP(235)=-1)
 C         (in MUMPS_DRIVER original value of KEEP(235) is reset)
           IF(id%KEEP(111).NE.0) id%KEEP(235)=0
+          IF(id%KEEP(111).NE.0) id%KEEP(212)=0
 C
           IF (id%KEEP(235).EQ.-1) THEN
             IF (id%KEEP(237).NE.0) THEN
@@ -479,8 +617,10 @@ C            for A-1
             id%KEEP(235)=1
           ENDIF
 C         Setting of KEEP(242) (permute RHS)
-          IF ((KEEP(111).NE.0)) THEN
-C          In the context of null space, the null pivots
+          IF ((KEEP(111).NE.0).OR.(KEEP(248) .EQ. -1)) THEN
+C          In the context of 
+C          - distributed RHS, all columns share the same structure
+C          - null space, the null pivots
 C          are by default permuted to post-order
 C          However for null space there is in this case no need to
 C          permute null pivots since they are already in correct order.
@@ -523,8 +663,8 @@ C           Automatic setting of permute RHS
             ENDIF
 C           }
           ENDIF
-          IF ( (id%KEEP(221).EQ.1 ).AND.(id%KEEP(235).NE.0) ) THEN
-C          -- Do not permute RHS with REDRHS for the time being
+          IF ( id%KEEP(221).NE.0 ) THEN
+C          -- Do not permute RHS with REDRHS/RHSINTR 
             id%KEEP(242) = 0
           ENDIF
           IF (KEEP(242).EQ.0) KEEP(243)=0 ! interleave off
@@ -576,7 +716,10 @@ C
           ELSE
             KEEP(485) = 0 ! FR solve
           ENDIF
+C     }
       ENDIF
+      id%KEEP(401) = 0
+      IF (id%ICNTL(48).EQ.1) id%KEEP(401)=1
 C     Bcast id%KEEP(401) strategy (which
 C     may be switched off or on during solve)
       CALL MPI_BCAST( id%KEEP(401), 1, MPI_INTEGER, MASTER, id%COMM,
@@ -585,16 +728,13 @@ C     may be switched off or on during solve)
      &               id%COMM,IERR)
       CALL MPI_BCAST( id%KEEP(111), 1, MPI_INTEGER, MASTER, id%COMM,
      &                  IERR )
-      CALL MPI_BCAST( id%KEEP(221), 1, MPI_INTEGER, MASTER, id%COMM,
-     &                  IERR )
       CALL MPI_BCAST( id%KEEP(235), 1, MPI_INTEGER, MASTER, id%COMM,
      &                  IERR )
       CALL MPI_BCAST( id%KEEP(237), 1, MPI_INTEGER, MASTER, id%COMM,
      &                  IERR )
       CALL MPI_BCAST( id%KEEP(242), 2, MPI_INTEGER, MASTER, id%COMM,
      &                  IERR )
-      CALL MPI_BCAST( id%KEEP(248), 1, MPI_INTEGER, MASTER, id%COMM,
-     &                  IERR )
+C Allready done   CALL MPI_BCAST( id%KEEP(248), ...)
       CALL MPI_BCAST( id%KEEP(350), 1, MPI_INTEGER, MASTER, id%COMM,
      &                  IERR )
       CALL MPI_BCAST( id%KEEP(485), 1, MPI_INTEGER, MASTER, id%COMM,
@@ -702,7 +842,7 @@ C            Fwd in facto is not compatible with transpose system
              INFO(2) = 9
              IF (LPOK) THEN
                 WRITE(LP,'(A)')
-     &               ' ERROR: Transpose system (ICNTL(9).NE.0) not ',
+     &               ' ERROR: Transpose system (ICNTL(9).NE.1) not ',
      &               ' compatible with forward performed during',
      &               ' factorization (ICNTL(32)=1)'
              ENDIF
@@ -775,27 +915,30 @@ C            Sparse RHS may be due to A-1 (ICNTL(30)
           ENDIF
 C         Entries of A-1 are stored in place of the input sparse RHS
 C         thus no need for RHS to be allocated.
-          IF ( (id%KEEP(237).EQ.0) ) THEN
+          IF (id%KEEP(237).EQ.0)  THEN
              IF ((id%KEEP(248) == 0 .AND.KEEP(221).NE.2)
-     &            .OR. ICNTL21==0) THEN
-C              RHS must be of size N on the master either to
+     &            .OR. 
+     &            (ICNTL21==0.AND.(KEEP(221).NE.1)) 
+     &          )THEN
+C              RHS must be of size N*NRHS on the master either to
 C              store the dense centralized RHS, either to store
 C              the dense centralized solution.
-               CALL SMUMPS_CHECK_DENSE_RHS
-     &         (id%RHS,id%INFO,id%N,id%NRHS,id%LRHS)
-               IF (id%INFO(1) .LT. 0) GOTO 333
+                CALL SMUMPS_CHECK_DENSE_RHS
+     &          (id%RHS,id%INFO,id%N,id%NRHS,id%LRHS)
+                IF (id%INFO(1) .LT. 0) GOTO 333
              ENDIF
           ELSE
-C           Check that the constraint NRHS=N is respected
+C           AM1: check that the constraint NRHS=N is respected
 C           Check for valid sparse RHS structure done
             IF (id%NRHS .NE. id%N) THEN
-              id%INFO(1)=-47
+              id%INFO(1)= -47
               id%INFO(2)=id%NRHS
               GOTO 333
             ENDIF
           ENDIF
-          IF (id%KEEP(248) == 1) THEN
-C           ------------------------------------
+          IF (id%KEEP(248) == 1
+     &       ) THEN
+C{          ------------------------------------
 C           RHS_SPARSE, IRHS_SPARSE and IRHS_PTR
 C           must be allocated of adequate size
 C           ------------------------------------
@@ -868,6 +1011,7 @@ C             Possible in case of dupplicate entries in Sparse RHS
               id%INFO(2)=10
               GOTO 333
             END IF
+C}
           ENDIF
 C         --------------------------------
 C         Set null space options for solve
@@ -881,16 +1025,20 @@ C
 C     --------------------------------------
 C     Check distributed solution vectors
 C     --------------------------------------
-      IF (ICNTL21==1) THEN
-          IF ( I_AM_SLAVE ) THEN
+      IF (ICNTL21 .NE. 0 ) THEN 
+          IF (I_AM_SLAVE) THEN
+            NSOL_loc = id%KEEP(89)
+          ELSE
+            NSOL_loc = 0
+          ENDIF
 C           (I)SOL_loc should be allocated to hold the
 C           distributed solution on exit
-            IF ( id%LSOL_loc < id%KEEP(89) ) THEN
+            IF ( id%LSOL_loc .LT. NSOL_loc ) THEN
               id%INFO(1)= -29
               id%INFO(2)= id%LSOL_loc
               GOTO 333
             ENDIF
-            IF (id%KEEP(89) .NE. 0) THEN
+            IF ( NSOL_loc .GT. 0 ) THEN
               IF ( .not. associated(id%ISOL_loc) )THEN
                 id%INFO(1)=-22
                 id%INFO(2)=13
@@ -901,7 +1049,7 @@ C           distributed solution on exit
                 id%INFO(2)=14
                 GOTO 333
               ENDIF
-              IF (size(id%ISOL_loc) < id%KEEP(89) ) THEN
+              IF (size(id%ISOL_loc) < NSOL_loc ) THEN
                 id%INFO(1)=-22
                 id%INFO(2)=13
                 GOTO 333
@@ -915,7 +1063,7 @@ C             can result in such a situation; (2) the test could be
 C             suppressed if needed but might be still be ok in case
 C             the right-hand side overflows too.
               IF (size(id%SOL_loc) <
-     &              (id%NRHS-1)*id%LSOL_loc+id%KEEP(89)) THEN
+     &              (id%NRHS-1)*id%LSOL_loc+NSOL_loc) THEN
                 id%INFO(1)=-22
                 id%INFO(2)=14
                 GOTO 333
@@ -923,17 +1071,17 @@ C             the right-hand side overflows too.
 #             else
               IF (size(id%SOL_loc,kind=8) <
      &              int(id%NRHS-1,8)*int(id%LSOL_loc,8)+
-     &              int(id%KEEP(89),8)) THEN
+     &              int(NSOL_loc,8)) THEN
                 id%INFO(1)=-22
                 id%INFO(2)=14
                 GOTO 333
               END IF
 #             endif
-            ENDIF
-          ENDIF
-      ENDIF
+            ENDIF ! NSOL_loc > 0
+      ENDIF ! ICNTL21 .NE. 0
       IF (id%MYID .NE. MASTER) THEN
-          IF (id%KEEP(248) == 1) THEN
+          IF (id%KEEP(248) == 1
+     &    ) THEN
 C          RHS should NOT be associated
 C          if I am not master since it is
 C          not even used to store the solution
@@ -958,16 +1106,6 @@ C          not even used to store the solution
              GOTO 333
            END IF
           END IF
-      ENDIF
-      IF (I_AM_SLAVE .AND. id%KEEP(248).EQ.-1) THEN
-        CALL SMUMPS_CHECK_DISTRHS(
-     &       id%Nloc_RHS,
-     &       id%LRHS_loc,
-     &       id%NRHS,
-     &       id%IRHS_loc,
-     &       id%RHS_loc,
-     &       id%INFO)
-        IF (id%INFO(1) .LT. 0) GOTO 333
       ENDIF
 C     Prepare pointers to pass POINTERS(1) to
 C     routines with implicit interfaces which
@@ -995,11 +1133,17 @@ C         so that IRHS_loc_PTR(1) is ok
       ELSE
         idRHS_loc=>CDUMMY_TARGET
       ENDIF
-      IF (I_AM_SLAVE .AND. ICNTL21.EQ.1 .AND.
-     &    KEEP(248) .EQ. -1) THEN  ! Dist RHS and dist solution
+C
+C
+C     Check as soon as solution is distributed
+      IF (I_AM_SLAVE .AND. ICNTL21.NE.0 .AND.
+     &    KEEP(248) .EQ. -1
+     &    ) THEN  ! Dist RHS and dist solution
+C
         IF (associated(id%RHS_loc) .AND.
      &      associated(id%SOL_loc)) THEN
-          IF (id%KEEP(89).GT.0) THEN
+C         NSOL_loc was defined earlier
+          IF (NSOL_loc.GT.0) THEN
 C           ----------------------------------------------------
 C           Check if RHS_loc and SOL_loc point to same object...
 C           id%SOL_loc(1) ok otherwise an error -22/14
@@ -1026,13 +1170,14 @@ C              we raise the error systematically
      &" ** Error RHS_loc and SOL_loc pointers match but LRHS_loc="
      &,id%LRHS_loc, " and LSOL_loc=", id%LSOL_loc
                ENDIF
+               GOTO 333
             ENDIF
           ENDIF
         ENDIF
       ENDIF
       IF (id%MYID.EQ.MASTER) THEN
-C         Do some checks (REDRHS), depending on KEEP(221)
-          CALL SMUMPS_CHECK_REDRHS(id)
+C         Do some checks on KEEP(221) and REDRHS (in case of Schur)
+          CALL SMUMPS_CHECK_K221andREDRHS(id)
       END IF ! MYID.EQ.MASTER
       IF (id%INFO(1) .LT. 0) GOTO 333
 C     -------------------------
@@ -1046,16 +1191,28 @@ C     -------------------------
 C     ====================================
 C     END CHECK INTERFACE AND KEEP ENTRIES
 C     ====================================
-C     ====================================
-C     Process case of NZ_RHS = 0  with
-C     sparse RHS and General Sparse (NOT A-1)
 C     -----------------------------------
       IF ((id%KEEP(248).EQ.1).AND.(id%KEEP(237).EQ.0)) THEN
-C
        CALL MPI_BCAST(id%NZ_RHS,1,MPI_INTEGER,MASTER,
      &               id%COMM,IERR)
+      ENDIF
 C
-       IF (id%NZ_RHS.EQ.0) THEN
+C     =======================================================
+C     BEGIN Test for empty RHS :
+C     sparse RHS and General Sparse (NOT A-1) and  NZ_RHS = 0
+C     OR
+C     Distributed RHS and sum of id%Nloc_RHS 
+C     (without off out-of-range) equal to 0
+C     =======================================================
+      IF 
+     & (
+     &     ( (id%KEEP(248).EQ.1).AND.(id%KEEP(237).EQ.0)
+     &       .AND. (id%NZ_RHS.EQ.0) ) 
+     &     .OR.
+     &     ( (id%KEEP(248).EQ.-1).AND. (SUM_idNloc_RHS_8.EQ.0_8)
+     &     ) 
+     & )  THEN
+C{      
 C       We reset solution to zero and we return
 C       (first freeing working space at label 90)
         IF ((ICNTL21.EQ.1).AND.(I_AM_SLAVE)) THEN
@@ -1075,33 +1232,40 @@ C         Note that LSOL_loc >= KEEP(89)
      &               id%KEEP(1),id%KEEP8(1),
      &               id%IS(1), LIW_PASSED,id%MYID_NODES,
      &               id%N, id%STEP(1), id%PROCNODE_STEPS(1),
-     &               id%NSLAVES, scaling_data_sol, LSCAL
+     &               id%NSLAVES,
+#if defined(USE_OLD_SCALING)
+     &               scaling_data_sol, .FALSE., ! empty RHS, no scaling
+#endif
 C                    For checking only
-     &               , .FALSE., IDUMMY(1), 1
+     &               .FALSE., IDUMMY(1), 1
      &               )
-            DO J=1, id%NRHS
-              DO I=1, KEEP(89)
-                id%SOL_loc((J-1)*id%LSOL_loc + I) =ZERO
-              ENDDO
-            ENDDO
           ENDIF
         ENDIF
-        IF (ICNTL21.NE.1) THEN  ! centralized solution
+C       Solution is null
+        IF (ICNTL21.NE.0) THEN  ! distributed solution
+            DO J=1, id%NRHS
+C             (NSOL_loc=KEEP(89) or id%NSOL_loc, and in case
+C              ICNTL21=1, NSOL_loc is 0 on non-working host)
+              DO I=1, NSOL_loc
+                id%SOL_loc(int(J-1,8)*id%LSOL_loc + I) =ZERO
+              ENDDO
+            ENDDO
+        ENDIF
+        IF (ICNTL21.EQ.0) THEN  ! centralized solution
 C       ----------------------------
 C       RHS reset to zero on master
 C       ----------------------------
-         IF (id%MYID.EQ.MASTER) THEN
+          IF (id%MYID.EQ.MASTER) THEN
             DO J=1, id%NRHS
               DO I=1, id%N
                 id%RHS(int(J-1,8)*int(id%LRHS,8) + int(I,8)) =ZERO
               ENDDO
             ENDDO
-         ENDIF
+          ENDIF
         ENDIF
 C
 C       print solve phase stats if requested
         IF ( PROKG )  THEN
-C          write(6,*) " NZ_RHS is zero "
            WRITE( MPG, 150 )
 C             ICNTL(35) should not been accessed during SOLVE thus
 C             print KEEP(486) value set during factorization
@@ -1117,16 +1281,28 @@ C             print KEEP(486) value set during factorization
 C
 C       --------
         GOTO 90 ! end of solve deallocate what is needed
-C       ====================================
-C       END CHECK INTERFACE AND KEEP ENTRIES
-C       ====================================
-       ENDIF  ! test NZ_RHS.EQ.0
-C      --------
-      ENDIF ! (id%KEEP(248).EQ.1).AND.(id%KEEP(237).EQ.0)
+C}
+      ENDIF  ! test empty RHS (general sparse or Distributed)
+C     =======================================================
+C     END of Test for empty RHS :
+C     =======================================================
+C     ====================================
+C     END CHECK INTERFACE AND KEEP ENTRIES
+C     ====================================
       INTERLEAVE_PAR   =.FALSE.
       DO_PERMUTE_RHS   =.FALSE.
+      CALL_NODES_FWD_BWD       = .FALSE.
+      FIRST_CALL_NODES_FWD_BWD = .FALSE.
+C     Default is no sparsity exploited
+      nodes_FWD_PTR => IDUMMY_TARGET
+      nodes_BWD_PTR => IDUMMY_TARGET
+      Lnodes_FWD = -1
+      Lnodes_BWD = -1
 C
-      IF ((id%KEEP(235).NE.0).or.(id%KEEP(237).NE.0)) THEN
+      IF ((id%KEEP(235).NE.0).or.(id%KEEP(237).NE.0) 
+     &   ) THEN
+         CALL_NODES_FWD_BWD       = .TRUE.
+         FIRST_CALL_NODES_FWD_BWD = .TRUE.
 C        Case of pruned elimination tree or selected entries in A-1
          IF (id%KEEP(237).NE.0.AND.
      &        id%KEEP(248).EQ.0) THEN
@@ -1139,7 +1315,8 @@ C         sparse RHS has been forced to be on.
           ENDIF
           CALL MUMPS_ABORT()
          ENDIF
-C        NBT is inout in MUMPS_REALLOC and should be initialized.
+C        NBT (in Bytes) is inout in MUMPS_REALLOC and 
+C                       should be initialized.
          NBT = 0
 C        -- Allocate Step2node on each proc
          CALL MUMPS_REALLOC(id%Step2node, id%KEEP(28), id%INFO, LP,
@@ -1147,7 +1324,7 @@ C        -- Allocate Step2node on each proc
      &        STRING='id%Step2node (Solve)', MEMCNT=NBT, ERRCODE=-13)
          CALL MUMPS_PROPINFO( ICNTL(1), INFO(1),
      &        id%COMM, id%MYID )
-         IF ( INFO(1).LT.0 ) RETURN
+         IF ( INFO(1).LT.0 ) GOTO 500
 C        -- build Step2node on each proc;
 C        -- this is usefull to have at each step a unique
 C        -- representative node (associated with principal variable of
@@ -1163,26 +1340,37 @@ C          we reuse Step2node computed in a previous solve phase
 C          Step2node is deallocated each time a new analysis is
 C          performed or when job=-2 is called
          ENDIF
-         NB_BYTES = NB_BYTES + NBT*K34_8
+C        --- NBT is the nb of extra bytes allocated
+         NB_BYTES = NB_BYTES + NBT
          NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
-         NB_BYTES_EXTRA = NB_BYTES_EXTRA + NBT * K34_8
+         NB_BYTES_EXTRA = NB_BYTES_EXTRA + NBT 
 C        Mapping information used during solve. In case of several
 C        facto+solve it has to be recomputed.
 C        In case of several solves with the same
 C        facto, it is not recomputed.
-C        It used to compute the interleaving
+C        It is used to compute the interleaving
 C        for A-1, and, in dev_version, passed to sol_c to compute
 C        some stats
          IF((KEEP(235).NE.0).OR.(KEEP(237).NE.0)) THEN
            IF(.NOT.associated(id%IPTR_WORKING)) THEN
              CALL SMUMPS_BUILD_MAPPING_INFO(id)
            END IF
+           idIPTR_WORKING => id%IPTR_WORKING
+           idWORKING => id%WORKING
+         ELSE 
+C           case of selected entries in solution
+C           with no ES during fwd
+            SIZE_WORKING = 1
+            SIZE_IPTR_WORKING = 1
+            idIPTR_WORKING => IDUMMY_TARGET
+            idWORKING => IDUMMY_TARGET
          END IF
       ENDIF
 C
 C     Initialize SIZE_OF_BLOCK from MUMPS_SOL_ES module
-      IF ( I_AM_SLAVE )
-     &  CALL SMUMPS_SOL_ES_INIT(id%OOC_SIZE_OF_BLOCK, id%KEEP(201))
+      IF ( I_AM_SLAVE ) THEN
+        CALL SMUMPS_SOL_ES_INIT(id%OOC_SIZE_OF_BLOCK, id%KEEP(201))
+      ENDIF
       DO_NULL_PIV = .TRUE.
       NBCOL_INBLOC = -9998
       NZ_THIS_BLOCK= -9998
@@ -1190,7 +1378,7 @@ C     Initialize SIZE_OF_BLOCK from MUMPS_SOL_ES module
 c
       IF (id%MYID.EQ.MASTER) THEN ! Compute NRHS_NONEMPTY
 C
-C       -- Sparse RHS does
+C       -- Sparse RHS (general, centralized)
         IF ( KEEP(111)==0 .AND. KEEP(248)==1
      &   ) THEN
 C       -- Note that KEEP(111).NE.0 (null space on)
@@ -1198,8 +1386,9 @@ C       -- and KEEP(248).NE.0 will be made incompatible
 C       -- When computing entries of A-1 (or SparseRHS only)
            NRHS_NONEMPTY = 0
            DO I=1, id%NRHS
-              IF (id%IRHS_PTR(I).LT.id%IRHS_PTR(I+1))
-     &             NRHS_NONEMPTY = NRHS_NONEMPTY+1 !ith col in non empty
+              IF (id%IRHS_PTR(I).LT.id%IRHS_PTR(I+1)) THEN
+                   NRHS_NONEMPTY = NRHS_NONEMPTY+1 !ith col in non empty
+              ENDIF
            ENDDO
            IF (NRHS_NONEMPTY.LE.0) THEN
 C           Internal error: tested before in mumps_driver
@@ -1249,6 +1438,7 @@ C     We work on a maximum of NBRHS at a time.
 C     The leading dimension of RHS is id%LRHS on the host process
 C     and it is set to N on slave processes.
       IF (id%MYID .eq. MASTER) THEN
+C{
         KEEP(84) = ICNTL(27)
 C     Treating ICNTL(27)=0 as if ICNTL(27)=1
         IF(ICNTL(27).EQ.0) KEEP(84)=1
@@ -1264,11 +1454,12 @@ C     Treating ICNTL(27)=0 as if ICNTL(27)=1
           IF (NBRHS .GT. NRHS_NONEMPTY ) NBRHS = NRHS_NONEMPTY
 C
         ENDIF
+C}
       ENDIF
 #if defined(V_T)
       CALL VTBEGIN(glob_comm_ini,IERR)
 #endif
-C     NRHS_NONEMPTY needed on all procs to allocate RHSCOMP on slaves
+C     NRHS_NONEMPTY needed on all procs to allocate RHSINTR on slaves
       CALL MPI_BCAST(NRHS_NONEMPTY,1,MPI_INTEGER,MASTER,
      &               id%COMM,IERR)
       CALL MPI_BCAST(NBRHS,1,MPI_INTEGER,MASTER,
@@ -1344,7 +1535,11 @@ C
             ENDIF
           END IF
         ENDIF
-        LWCB8_MIN = int(NB_K133,8)*int(KEEP(133),8)*int(NBRHS,8)
+CPA2ALL: int(min(NRHS_NONEMPTY,NBRHS),8) instead of NBRHS
+C       LWCB8_MIN = int(NB_K133,8)*int(KEEP(133),8)*int(NBRHS,8)
+        LWCB8_MIN = int(NB_K133,8)*int(KEEP(133),8)*
+     &        int(min(NRHS_NONEMPTY,NBRHS),8)
+C
 C
 C       ---------------------------------------------------------------
 C       Set WK_USER_PROVIDED to true when workspace WK_USER is provided
@@ -1461,12 +1656,12 @@ C       S(LA+1..MAXS) is free workspace
 C              freee space in id%S
                IF (associated(id%S)) THEN
                  DEALLOCATE (id%S) 
-                 NB_BYTES  = NB_BYTES - MAXS 
+                 NB_BYTES  = NB_BYTES - MAXS * K35_8
                ENDIF
                MAXS     = 1_8
                KEEP8(23)= MAXS
                ALLOCATE (id%S(MAXS), stat = allocok)
-               NB_BYTES  = NB_BYTES + MAXS 
+               NB_BYTES  = NB_BYTES + MAXS * K35_8
              ENDIF
            ENDIF
         ELSE
@@ -1539,12 +1734,14 @@ C         Access to OOC data in module during solve
         ENDIF
       ENDIF
       IF (id%MYID.EQ.MASTER) THEN
+C{
         IF ( PROKG )  THEN
           WRITE( MPG, 150 )
 C             ICNTL(35) should not been accessed during SOLVE thus
 C             print KEEP(486) value set during factorization
      &        id%NRHS, NBRHS, ICNTL(9), ICNTL(10), ICNTL(11),
-     &        ICNTL(20), ICNTL(21), ICNTL(30), KEEP(486)
+     &        ICNTL(20), ICNTL(21), ICNTL(30), KEEP(486),
+     &        ICNTL(48)
           IF (KEEP(111).NE.0) THEN
             WRITE (MPG, 151) KEEP(111)
           ENDIF
@@ -1555,11 +1752,9 @@ C             print KEEP(486) value set during factorization
             WRITE (MPG, 153) KEEP(252)
           ENDIF
         ENDIF
-C
 C     ====================================
 C       Define LSCAL, ICNTL10 and ICNTL11
 C     ====================================
-C
         LSCAL = (((KEEP(52) .GT. 0) .AND. (KEEP(52) .LE. 8)) .OR. (
      &    KEEP(52) .EQ. -1) .OR. KEEP(52) .EQ. -2)
         ICNTL10 = ICNTL(10)
@@ -1570,71 +1765,10 @@ C       Values of ICNTL(11) out of range
            IF (PROKG) WRITE(MPG,'(A)')
      &    ' WARNING: ICNTL(11) out of range'
         ENDIF
-        POSTPros = .FALSE.
-        IF (ICNTL11.NE.0 .OR. ICNTL10.NE.0) THEN
-          POSTPros = .TRUE.
-C       FORBID ERROR ANALYSIS AND ITERATIVE REFINEMENT
-C       if there are options that are not compatible
-          IF (KEEP(111).NE.0) THEN
-C       IF WE RETURN A NULL SPACE BASIS or compute entries in A-1
-C        of Fwd in facto
-C       -When only one columns of A-1 is requested then
-C        we could try to reactivate IR even if
-C          -code need be updated
-C          -accuracy could be # when one or more columns are requested
-              IF (PROKG) WRITE(MPG,'(A,A)')
-     &       ' WARNING: Incompatible features: null space basis ',
-     &                ' and Iter. Ref and/or Err. Anal.'
-              POSTPros = .FALSE.
-           ELSE IF ( KEEP(237) .NE.0 ) THEN
-              IF (PROKG) WRITE(MPG,'(A,A)')
-     &       ' WARNING: Incompatible features: AM1',
-     &                ' and Iter. Ref and/or Err. Anal.'
-              POSTPros = .FALSE.
-           ELSE IF ( KEEP(252) .NE.0 ) THEN
-              IF (PROKG) WRITE(MPG,'(A,A)')
-     &       ' WARNING: Incompatible features: Fwd in facto ',
-     &                ' and Iter. Ref and/or Err. Anal.'
-              POSTPros = .FALSE.
-           ELSE IF (KEEP(221).NE.0) THEN
-C       Forbid error analysis and iterative refinement
-C       in case of reduced rhs/solution
-              IF (PROKG) WRITE(MPG,'(A,A)')
-     &       ' WARNING: Incompatible features: reduced RHS ',
-     &       '          and Iter. Ref and/or Err. Anal.'
-              POSTPros = .FALSE.
-            ELSE IF  (NBRHS.GT. 1 .OR. ICNTL(21) .GT. 0) THEN
-C          Forbid error analysis and iterative refinement if
-C       the solution is distributed or
-C       in the case where nrhs > 1
-              IF (PROKG) WRITE(MPG,'(A,A)')
-     &       ' WARNING:  Incompatible features: nrhs>1 or distrib sol',
-     &       '           and Iter. Ref and/or Err. Anal.'
-              POSTPros = .FALSE.
-            ELSE IF ( KEEP(248) .EQ. -1 ) THEN
-C          Forbid error analysis and iterative refinement
-C          in case of distributed RHS
-              IF (PROKG) WRITE(MPG,'(A,A)')
-     &       ' WARNING:  Incompatible features: distrib rhs',
-     &       '           and Iter. Ref and/or Err. Anal.'
-              POSTPros = .FALSE.
-            ENDIF  
-            IF (.NOT.POSTPros) THEN
-              ICNTL11 = 0
-              ICNTL10 = 0
-            ENDIF
-        ENDIF
-C   Write a warning.
-        IF ((ICNTL(10) .NE. 0) .AND. (ICNTL10 .EQ. 0)) THEN
-            IF (PROKG) WRITE(MPG,'(A)')
-     &    ' WARNING: ICNTL(10) treated as if set to 0 '
-        ENDIF
-        IF ((ICNTL(11) .NE. 0)
-     &        .AND.(ICNTL11 .EQ. 0)) THEN
-            IF (PROKG) WRITE(MPG,'(A)')
-     &    ' WARNING: ICNTL(11) treated as if set to 0 '
-        ENDIF
-C     -- end of test master
+        CALL SMUMPS_SET_POSTPros (
+     &                      KEEP(1), ICNTL(1), NBRHS, MPG, PROKG,
+     &                      ICNTL10, ICNTL11, POSTPros)
+C}    -- end of test master
       END IF
       CALL MPI_BCAST(POSTPros,1,MPI_LOGICAL,MASTER,
      &               id%COMM,IERR)
@@ -1689,28 +1823,29 @@ C        allocated, otherwise MAT_ALLOC_LOC = 0
       CALL MPI_REDUCE( MAT_ALLOC_LOC, MAT_ALLOC, 1,
      &                 MPI_INTEGER,
      &                 MPI_MIN, MASTER, id%COMM, IERR)
-      IF ( id%MYID .eq. MASTER ) THEN
+      IF ( POSTPros.and.(id%MYID .eq. MASTER) ) THEN
+C       if postprocessing requested matrix must be allocated
         IF (MAT_ALLOC.EQ.0) THEN
-            IF (KEEP(54).NE.0) THEN
+           IF (KEEP(54).NE.0) THEN
 C           Write on MPG this time (we wrote on MP before in
 C           case of distributed matrix and wrote on MPG already
 C           in case of centralized matrix)
             IF (PROKG) WRITE(MPG,'(A)')
      &      ' WARNING: original distributed matrix is not allocated'
-             ENDIF
-              POSTPros = .FALSE.
-              ICNTL11 = 0
-              ICNTL10 = 0
+           ENDIF
+           POSTPros = .FALSE.
+           ICNTL11 = 0
+           ICNTL10 = 0
 C   Write a warning.
            IF ((ICNTL(10) .NE. 0) .AND. (ICNTL10 .EQ. 0)) THEN
             IF (PROKG) WRITE(MPG,'(A)')
-     &    ' WARNING: ICNTL(10) treated as if set to 0'
+     &      ' WARNING: ICNTL(10) treated as if set to 0'
            ENDIF
            IF ((ICNTL(11) .EQ. 1).OR.(ICNTL(11) .EQ. 2) 
      &        .AND.(ICNTL11 .EQ. 0)) THEN
             IF (PROKG) WRITE(MPG,'(A)')
-     &    ' WARNING: ICNTL(11) treated as if set to 0 '
-          ENDIF
+     &      ' WARNING: ICNTL(11) treated as if set to 0 '
+           ENDIF
         ENDIF
         IF (POSTPros) THEN
             ALLOCATE(SAVERHS(id%N*NBRHS),stat = allocok)
@@ -1750,14 +1885,44 @@ C     --------------------------------------------------
      &               id%COMM,IERR)
       CALL MPI_BCAST(ICNTL11,1,MPI_INTEGER,MASTER,
      &               id%COMM,IERR)
-      CALL MPI_BCAST(ICNTL21,1,MPI_INTEGER,MASTER,
-     &               id%COMM,IERR)
       CALL MPI_BCAST(POSTPros,1,MPI_LOGICAL,MASTER,
      &               id%COMM,IERR)
       CALL MPI_BCAST(LSCAL,1,MPI_LOGICAL,MASTER,
      &               id%COMM,IERR)
       CALL MPI_BCAST(KEEP(237),1,MPI_INTEGER,MASTER,
      &               id%COMM,IERR)
+#if ! defined(USE_OLD_SCALING)
+C     ----------------------------------------------
+C     Initialize SCALING_LOC_FWD and SCALING_LOC_BWD
+C     They corespond to all pivots factorized on a
+C     given MPI process and point to a dummy array
+C     of size 1 on the host of if no pivot was
+C     factorized (KEEP(89))=0
+C     ----------------------------------------------
+      IF (LSCAL .AND. id%KEEP(89) .GT. 0) THEN
+          IF (MTYPE .EQ. 1) THEN
+            SCALING_LOC_FWD => id%ROWSCA_loc
+            SCALING_LOC_BWD => id%COLSCA_loc
+          ELSE
+            SCALING_LOC_FWD => id%COLSCA_loc
+            SCALING_LOC_BWD => id%ROWSCA_loc
+          ENDIF
+      ELSE ! includes non working master on which KEEP(89)=0
+          SCALING_LOC_FWD => RDUMMY_TARGET
+          SCALING_LOC_BWD => RDUMMY_TARGET
+      ENDIF
+C     Remarks related to scalings:
+C     * During postprocessing, one performs solves
+C       with alternatively A and A^T, meaning that
+C       SCALING_LOC_FWD and SCALING_LOC_BWD will
+C       be redefined.
+C     * In case of exploit sparsity, RHSINTR may
+C       have less rows than ROWSCA_loc/COLSCA_loc.
+C       SCALING_RHSINTR_FWD and SCALING_RHSINTR_BWD
+C       will then be extracted from
+C       SCALING_LOC_FWD and SCALING_LOC_BWD thanks
+C       to the subroutine SMUMPS_SCALINGRHSINTR
+#endif
 C     KEEP(248)==1 if not_NullSpace (KEEP(111)=0)
 C           and sparse RHS on input (id%ICNTL(20)/KEEP(248)==1)
 C     (KEEP(248)==1 implies KEEP(111) = 0, otherwise error was raised)
@@ -1967,81 +2132,85 @@ c         --- ALLOCATE outside loop RHS_BOUNDS is needed
 C     --------------------------------------------------
       IF ( I_AM_SLAVE ) THEN
         IF ((KEEP(221).EQ.2 .AND. KEEP(252).EQ.0)) THEN
-C          -- RHSCOMP must have been allocated in
+C          -- RHSINTR must have been allocated in
 C          -- previous solve step (with option KEEP(221)=1)
-           IF (.NOT.associated(id%RHSCOMP)) THEN
+           IF (.NOT.associated(id%RHSINTR)) THEN
              INFO(1) = -35
              INFO(2) = 1
              GOTO 111
            ENDIF
 C          IF ((KEEP(248).EQ.0) .OR. (id%NRHS.EQ.1)) THEN
-C          POSINRHSCOMP_ROW/COL are meaningful and could even be reused
-           IF (.NOT.associated(id%POSINRHSCOMP_ROW) ) ! .OR.
-!    &        .NOT.(id%POSINRHSCOMP_COL_ALLOC))
+C          GLOB2LOC_RHS/SOL are meaningful and could even be reused
+           IF (.NOT.associated(id%GLOB2LOC_RHS) ) ! .OR.
+!    &        .NOT.(id%GLOB2LOC_SOL_ALLOC))
      &     THEN
              INFO(1) = -35
              INFO(2) = 2
              GOTO 111
            ENDIF
-           IF (.not.id%POSINRHSCOMP_COL_ALLOC) THEN
-C             POSINRHSCOMP_COL that is kept from
+           IF (.not.id%GLOB2LOC_SOL_ALLOC) THEN
+C             GLOB2LOC_SOL that is kept from
 C             previous call to solve must then (already)
-C             point to id%POSINRHSCOMP_ROW
-              id%POSINRHSCOMP_COL => id%POSINRHSCOMP_ROW
+C             point to id%GLOB2LOC_RHS
+              id%GLOB2LOC_SOL => id%GLOB2LOC_RHS
            ENDIF
         ELSE
 C         ----------------------
-C         Allocate POSINRHSCOMP_ROW/COL
+C         Allocate GLOB2LOC_RHS/SOL
 C         ----------------------
-C         The size of POSINRHSCOMP arrays
+C         The size of POSINRHSINTR arrays
 C         does not depend on the block of RHS
-C         POSINRHSCOMP_ROW/COL are initialized in the loop of RHS
-          IF (associated(id%POSINRHSCOMP_ROW)) THEN
+C         GLOB2LOC_RHS/SOL are initialized in the loop of RHS
+          IF (associated(id%GLOB2LOC_RHS)) THEN
             NB_BYTES = NB_BYTES -
-     &          int(size(id%POSINRHSCOMP_ROW),8)*K34_8
-            DEALLOCATE(id%POSINRHSCOMP_ROW)
+     &          int(size(id%GLOB2LOC_RHS),8)*K34_8
+            DEALLOCATE(id%GLOB2LOC_RHS)
           ENDIF
-          ALLOCATE (id%POSINRHSCOMP_ROW(id%N), stat = allocok)
+          ALLOCATE (id%GLOB2LOC_RHS(id%N), stat = allocok)
           IF ( allocok .GT. 0 ) THEN
              INFO(1)=-13
              INFO(2)=id%N
              GOTO 111
           END IF
           NB_BYTES = NB_BYTES +
-     &          int(size(id%POSINRHSCOMP_ROW),8)*K34_8
+     &          int(size(id%GLOB2LOC_RHS),8)*K34_8
           NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
-          IF (id%POSINRHSCOMP_COL_ALLOC) THEN
+          IF (id%GLOB2LOC_SOL_ALLOC) THEN
             NB_BYTES = NB_BYTES -
-     &          int(size(id%POSINRHSCOMP_COL),8)*K34_8
-            DEALLOCATE(id%POSINRHSCOMP_COL)
-            NULLIFY(id%POSINRHSCOMP_COL)
-            id%POSINRHSCOMP_COL_ALLOC = .FALSE.
+     &          int(size(id%GLOB2LOC_SOL),8)*K34_8
+            DEALLOCATE(id%GLOB2LOC_SOL)
+            NULLIFY(id%GLOB2LOC_SOL)
+            id%GLOB2LOC_SOL_ALLOC = .FALSE.
           ENDIF
 C
-          IF ((KEEP(50).EQ.0).OR.KEEP(237).NE.0) THEN
-           ALLOCATE (id%POSINRHSCOMP_COL(id%N), stat = allocok)
+          IF ( (KEEP(50).EQ.0).OR.(KEEP(237).NE.0).OR.
+     &         (KEEP(212).NE.0)
+     &       ) THEN
+           ALLOCATE (id%GLOB2LOC_SOL(id%N), stat = allocok)
            IF ( allocok .GT. 0 ) THEN
              INFO(1)=-13
              INFO(2)=id%N
              GOTO 111
            END IF
-           id%POSINRHSCOMP_COL_ALLOC = .TRUE.
+           id%GLOB2LOC_SOL_ALLOC = .TRUE.
            NB_BYTES = NB_BYTES +
-     &          int(size(id%POSINRHSCOMP_COL),8)*K34_8
+     &          int(size(id%GLOB2LOC_SOL),8)*K34_8
            NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
           ELSE
-C          Do no allocate POSINRHSCOMP_COL
-           id%POSINRHSCOMP_COL => id%POSINRHSCOMP_ROW
-           id%POSINRHSCOMP_COL_ALLOC = .FALSE.
+C          Do no allocate GLOB2LOC_SOL
+           id%GLOB2LOC_SOL => id%GLOB2LOC_RHS
+           id%GLOB2LOC_SOL_ALLOC = .FALSE.
           ENDIF
           IF (KEEP(221).NE.2) THEN
-C         -- only in the case of bwd after reduced RHS
-C         -- we have to keep "old" RHSCOMP
-            IF (associated(id%RHSCOMP)) THEN
+C         -- only in the case of bwd after 
+C         -- fwd only (with or without Schur)
+C         -- we have to keep "old" RHSINTR
+            IF (associated(id%RHSINTR)) THEN
              NB_BYTES = NB_BYTES - id%KEEP8(25)*K35_8
-             DEALLOCATE(id%RHSCOMP)
-             NULLIFY(id%RHSCOMP)
-             id%KEEP8(25)=0_8
+             DEALLOCATE(id%RHSINTR)
+             NULLIFY(id%RHSINTR)
+             id%KEEP8(25)  = 0_8
+             id%LD_RHSINTR = 0
             ENDIF
           ENDIF
         ENDIF
@@ -2140,16 +2309,22 @@ C          migrated outside the blocking on the right hand sides.
             UNS_PERM_INV_NEEDED_INMAINLOOP = .TRUE.
       ENDIF
       UNS_PERM_INV_NEEDED_BEFMAINLOOP = .FALSE.
+      IF (KEEP(23) .GT. 0 .AND. MTYPE.EQ.1 .AND. ICNTL21.EQ.2) THEN
+           UNS_PERM_INV_NEEDED_INMAINLOOP = .TRUE.
+      ENDIF
       IF ( KEEP(23) .GT.0 .AND.
      &            MTYPE .NE. 1 .AND. KEEP(248).EQ.-1 ) THEN
 C          Similar to sparse RHS case, we need to modify IRHS_loc
 C          indices in the distributed RHS case. However, we need
-C          UNS_PERM_INV on all processors. But only before theC
+C          UNS_PERM_INV on all processors. But only before the
 C          main loop on the RHS blocks.
            UNS_PERM_INV_NEEDED_BEFMAINLOOP = .TRUE.
       ENDIF
+C
+      UNS_PERM_INV_NEEDED_ONSLAVES = .FALSE.
       IF ( UNS_PERM_INV_NEEDED_INMAINLOOP .OR.
      &     UNS_PERM_INV_NEEDED_BEFMAINLOOP ) THEN
+C          We need UNS_PERM_INV
            ALLOCATE(UNS_PERM_INV(id%N),stat=allocok)
            if (allocok .GT.0 ) THEN
              INFO(1)=-13
@@ -2190,8 +2365,14 @@ C     Propagate errors
 C
 C     UNS_PERM_INV needed on slaves:
       IF ( KEEP(23).NE.0 .AND.
-     &     ( KEEP(237).NE.0 .OR.
-     &     ( MTYPE.NE.1 .AND. KEEP(248).EQ.-1 ) ) ) THEN
+     &     (  KEEP(237).NE.0 .OR.
+     &        ( MTYPE.NE.1 .AND. KEEP(248).EQ.-1 ) .OR.
+     &        ( MTYPE.EQ.1 .AND. ICNTL21.EQ.2)
+     &     ) 
+     &   ) THEN
+        UNS_PERM_INV_NEEDED_ONSLAVES = .TRUE.
+      ENDIF
+      IF (UNS_PERM_INV_NEEDED_ONSLAVES) THEN
 C       Broadcast UNS_PERM_INV
         CALL MPI_BCAST( UNS_PERM_INV,id%N,MPI_INTEGER,MASTER,
      &                  id%COMM,IERR )
@@ -2200,7 +2381,8 @@ C     -------------------------------
 C     BEGIN
 C     Preparation for distributed RHS
 C     -------------------------------
-      IF (I_AM_SLAVE .AND. KEEP(248).EQ.-1) THEN
+      IF (I_AM_SLAVE .AND. KEEP(248).EQ.-1
+     & ) THEN
 C       Distributed RHS case
         ALLOCATE(MAP_RHS_loc(max(id%Nloc_RHS,1)), stat=allocok)
         IF (allocok .GT. 0) THEN
@@ -2210,10 +2392,10 @@ C       Distributed RHS case
         ENDIF
         NB_BYTES = NB_BYTES + max(int(id%Nloc_RHS,8),1_8)*K34_8
       ENDIF
-C     MAP_RHS_loc will be built in the main
-C     loop, when processing the first block.
-C     It requires POSINRHSCOMP to be built.
-      BUILD_RHSMAPINFO = .TRUE.
+C      MAP_RHS_loc will be built in the main
+C      loop, when processing the first block.
+C      It requires POSINRHSINTR to be built.
+       BUILD_RHSMAPINFO = .TRUE.
  20   CONTINUE
       CALL MUMPS_PROPINFO( ICNTL(1), INFO(1),
      &                         id%COMM,id%MYID)
@@ -2223,7 +2405,8 @@ C     transpose system, use MUMPS internal indices
 C     for IRHS_loc_PTR. Done before scaling since
 C     scaling is on permuted matrix
       IF ( I_AM_SLAVE .AND. KEEP(23).GT.0 .AND. KEEP(248).EQ.-1
-     &     .AND. MTYPE.NE.1 ) THEN
+     &     .AND. MTYPE.NE.1 
+     &   ) THEN
           IF (id%Nloc_RHS .GT. 0) THEN
             ALLOCATE(IRHS_loc_PTR(id%Nloc_RHS),stat=allocok)
             IF (allocok.GT.0) THEN
@@ -2254,7 +2437,9 @@ C     to free memory
         ALLOCATE(UNS_PERM_INV(1))  ! to posibly pass it as an argument
         NB_BYTES = NB_BYTES + K34_8
       ENDIF
-      IF (LSCAL .AND. id%KEEP(248).EQ.-1) THEN
+#if defined(USE_OLD_SCALING)
+      IF (LSCAL .AND. id%KEEP(248).EQ.-1
+     &   ) THEN
 C       Scaling done based on original indices
 C       provided by user
         IF (MTYPE == 1) THEN
@@ -2270,6 +2455,7 @@ C         Transpose
      &       NB_BYTES, NB_BYTES_MAX, K16_8, LP, LPOK,
      &       ICNTL(1), INFO(1) )
       ENDIF
+#endif
 C     -------------------------------
 C     END
 C     Preparation for distributed RHS
@@ -2282,9 +2468,11 @@ C     -------------------------------------
 C     BEGIN
 C     Preparation for distributed solution
 C     -------------------------------------
-      IF ( ICNTL21==1 ) THEN
+      IF ( ICNTL21 .NE. 0 ) THEN
+C{
+#if defined(USE_OLD_SCALING)
         IF (LSCAL) THEN
-C         In case of scaling we will need to scale
+C{        In case of scaling we will need to scale
 C         back the sol. Put the values of the scaling
 C         arrays needed to do that on each processor.
           IF (id%MYID.NE.MASTER) THEN
@@ -2308,17 +2496,20 @@ C         arrays needed to do that on each processor.
      &                         id%COMM,id%MYID)
           IF (INFO(1) .LT.0 ) GOTO 90
           IF (I_AM_SLAVE) THEN
-            ALLOCATE(scaling_data_sol%SCALING_LOC(id%KEEP(89)),
-     &               stat=allocok)
+              ALLOCATE(scaling_data_sol%SCALING_LOC(max(1,id%KEEP(89))),
+     &                 stat=allocok)
             IF (allocok > 0) THEN
               IF (LPOK) THEN
                 WRITE(LP,*) 'Error allocating local scaling array'
               ENDIF
               INFO(1)=-13
-              INFO(2)=id%KEEP(89)
+              INFO(2)=max(1,id%KEEP(89))
               GOTO 38
             ENDIF
-            NB_BYTES = NB_BYTES + int(id%KEEP(89),8)*K16_8
+            IF (ICNTL21.NE.0) THEN
+C            Real entries for scaling
+             NB_BYTES = NB_BYTES + int(max(1,id%KEEP(89)),8)*K16_8
+            ENDIF
             NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
           ENDIF ! I_AM_SLAVE
  38       CONTINUE
@@ -2338,11 +2529,17 @@ C         arrays needed to do that on each processor.
      &                       id%COMM,IERR)
               scaling_data_sol%SCALING=>id%ROWSCA
           ENDIF
+C}
         ENDIF ! LSCAL
-        IF ( I_AM_SLAVE ) THEN
-C         ----------------------
+#endif
+        IF ( ICNTL21.EQ.1 .AND. I_AM_SLAVE 
+     &     ) THEN
+C         --------------------------------
 C         Prepare ISOL_loc array
-C         ----------------------
+#if defined(USE_OLD_SCALING)
+C         and on the fly, scaling_data_sol
+#endif
+C         --------------------------------
           LIW_PASSED=max(1,LIW)
 C         Only called if more than 1 pivot
 C         was eliminated by the processor.
@@ -2353,12 +2550,19 @@ C         Note that LSOL_loc >= KEEP(89)
      &               id%KEEP(1),id%KEEP8(1),
      &               id%IS(1), LIW_PASSED,id%MYID_NODES,
      &               id%N, id%STEP(1), id%PROCNODE_STEPS(1),
-     &               id%NSLAVES, scaling_data_sol, LSCAL
+     &               id%NSLAVES,
+#if defined(USE_OLD_SCALING)
+     &               scaling_data_sol, LSCAL,
+#endif
 C                    For checking only
-     &               , (KEEP(248).EQ.-1), IRHS_loc_PTR(1), id%Nloc_RHS
+     &               (KEEP(248).EQ.-1), IRHS_loc_PTR(1), id%Nloc_RHS
      &               )
           ENDIF 
-          IF (id%MYID.NE.MASTER .AND. LSCAL) THEN
+        ENDIF ! I_AM_SLAVE
+#if defined(USE_OLD_SCALING)
+#endif
+#if defined(USE_OLD_SCALING)
+        IF (id%MYID.NE.MASTER .AND. LSCAL) THEN
 C           ---------------------------------
 C           Local (small) scaling arrays have
 C           been built, free temporary copies
@@ -2371,8 +2575,15 @@ C           ---------------------------------
               NULLIFY(id%ROWSCA)
             ENDIF
             NB_BYTES = NB_BYTES - int(id%N,8)*K16_8
-          ENDIF
-        ENDIF ! I_AM_SLAVE
+        ENDIF
+#endif
+C}
+      ENDIF ! ICNTL21 .NE. 0
+      IF (ICNTL21 .EQ.1) THEN
+C       ---------------------------------------------------
+C       Take into account unsymmetric permutation to modify
+C       ISOL_loc, in case ISOL_loc is provided by MUMPS
+C       ---------------------------------------------------
         IF (KEEP(23) .NE. 0 .AND. MTYPE==1) THEN
 C         Broadcast the unsymmetric permutation and
 C         permute the indices in ISOL_loc
@@ -2411,11 +2622,14 @@ C     --------------------------------------
 C     Preparation for distributed solution
 C     END
 C     --------------------------------------
-C     ----------------------------
-C     Preparation for reduced RHS
-C     ----------------------------
-      IF ( ( KEEP(221) .EQ. 1 ) .OR.
+C     ---------------------------------------------
+C     In case of Schur, preparation for reduced RHS
+C     ---------------------------------------------
+      IF ( (KEEP(60).NE.0) .AND. 
+     &    (
+     &     ( KEEP(221) .EQ. 1 ) .OR.
      &     ( KEEP(221) .EQ. 2 )
+     &    )
      &   ) THEN
 C       -- First compute MASTER_ROOT_IN_COMM proc number in
 C          COMM_NODES on which is mapped the master of the root.
@@ -2454,7 +2668,8 @@ C          -- other procs not concerned
          ENDIF
       ENDIF
 C
-      IF ( KEEP(248)==1 ) THEN  ! Sparse RHS (A-1 or general sparse)
+      IF ( KEEP(248)==1 
+     &   ) THEN  ! Sparse RHS (A-1 or general sparse)
 !        JBEG_RHS - current starting column within A-1 or sparse rhs
 !                      set in the loop below and used to obtain the
 !                      global index of the column of the sparse RHS
@@ -2541,9 +2756,9 @@ C     Propagate errors
 c --------------------------
 c --------------------------
       IF (id%NSLAVES .EQ. 1) THEN
-c     - In case of NS/A-1 we may want to permute RHS
-c     - for NS thus is to apply permutation to PIVNUL_LIST
-*     - before starting loop of NBRHS
+C{    - In case of NS/A-1 we may want to permute RHS
+C     - for NS thus is to apply permutation to PIVNUL_LIST
+C     - before starting loop of NBRHS
        IF (DO_PERMUTE_RHS .AND. KEEP(111).NE.0 ) THEN
 C     NOTE:
 C        when host not working both master and slaves have
@@ -2553,13 +2768,13 @@ C        in this case the complete list
      &                 ' not available yet '
             CALL MUMPS_ABORT()
        ENDIF                     ! End Permute_RHS
+C}
       ELSE
          IF (DO_PERMUTE_RHS .AND. KEEP(111).NE.0 ) THEN
             WRITE(*,*) id%MYID, ':INTERNAL ERROR 2 : ',
      &                 ' PERMUTE RHS during null space computation ',
      &                 ' not available yet '
             CALL MUMPS_ABORT()
-C
 C
          ENDIF                  !  End DO_PERMUTE_RHS
          IF (INTERLEAVE_PAR.AND. (KEEP(111).NE.0)) THEN
@@ -2603,8 +2818,8 @@ C          to permute the null column pivot list)
      &            MPI_INTEGER,
      &            MASTER, id%COMM,IERR)
       ENDIF
-C   L0-threads to be activated iff KEEP(401)>0 and KEEP(400)>0
-          IF (KEEP(401) .GT. 0) THEN
+C   L0-threads to be activated iff KEEP(401)=1 and KEEP(400)>0
+          IF (KEEP(401) .EQ. 1) THEN
 C          L0-threads was requested for solve phase
 C          and will be effective only if KEEP(400) >0 
 C          which indicates that L0-threads was 
@@ -2620,7 +2835,7 @@ C               NOMP should be the one from analysis
                 id%INFO(1) = -58
                 id%INFO(2) = KEEP(400)
             IF (LPOK) WRITE(LP,'(A,A,I5,A,I5)')
-     &" FAILURE DETECTED IN SOLVE: #threads for KEEP(401)",
+     &" FAILURE DETECTED IN SOLVE: #threads for ICNTL(48)",
      &" changed from",KEEP(400)," at analysis to", NOMP
               ENDIF
            ENDIF
@@ -2630,6 +2845,7 @@ C}
         CALL SMUMPS_SOL_L0OMP_LI(KEEP(400))
       ENDIF
 C     ==============================
+C     MAIN LOOP:
 C     BLOCKING ON the number of RHS
 C      We work on  a maximum of NBRHS at a time.
 C      the leading dimension of RHS is id%LRHS on master
@@ -2651,14 +2867,16 @@ C     {
 C       ==========================
 C       -- NBRHS     : Original block size
 C       -- BEG_RHS   : Column index of the first RHS in the list of
-C                      non empty RHS (RHS_LOC) to
+C                      non empty RHS (RHS_loc) to
 C                      be processed during this iteration
 C       -- NBRHS_EFF : Effective block size at current iteration
-C          In case of sparse RHS (KEEP(248)==1) NBRHS_EFF only refers to
-C                  non-empty columns and is used to compute NBCOL_INBLOC
-C          -- NBCOL_INBLOC  : the number of columns of sparse RHS needed
-C                        to get NBRHS_EFF non empty columns columns of
-C                        sparse RHS processed at each step
+C                      that we be set to nb of contiguous non empty 
+C                      columns
+C        In case of sparse RHS (KEEP(248)==1) NBRHS_EFF only refers to
+C                non-empty columns and is used to compute NBCOL_INBLOC
+C        -- NBCOL_INBLOC  : the number of columns of sparse RHS needed
+C                      to get NBRHS_EFF non empty columns columns of
+C                      sparse RHS processed at each step
 C
         NBRHS_EFF    = min(NRHS_NONEMPTY-BEG_RHS+1, NBRHS)
 C
@@ -2692,7 +2910,7 @@ C       id%RHS is accessed). Remark that IBEG might still be
 C       overwritten later, in case of general sparse right-hand side
 C       and centralized solution to skip empty columns 
 C       ===========================================================
-        IF (
+        IF  (
 C           slave procs
      &      ( id%MYID .NE. MASTER )
 C       even on master when RHS not allocated
@@ -2736,7 +2954,8 @@ C       ==========================================
 C       Shift empty columns in case of sparse RHS
 C       ==========================================
         IF ( (id%MYID.EQ.MASTER) .AND.
-     &        KEEP(248)==1  ) THEN
+     &        KEEP(248)==1  
+     &     ) THEN
 C         update position of JBEG_RHS on first non-empty
 C         column of this block
           JBEG_RHS = JEND_RHS + 1
@@ -2745,7 +2964,8 @@ C         column of this block
      &          id%IRHS_PTR(PERM_RHS(JBEG_RHS)+1) )
 C             Empty column
               IF ((KEEP(237).EQ.0).AND.(ICNTL21.EQ.0).AND.
-     &              (KEEP(221).NE.1) ) THEN
+     &              (KEEP(221).NE.1) 
+     &           ) THEN
 C                General sparse RHS (NOT A-1) and centralized solution
 C                Set to zero part of the
 C                solution corresponding to empty columns
@@ -2760,7 +2980,8 @@ C                solution corresponding to empty columns
             DO WHILE( id%IRHS_PTR(JBEG_RHS) .EQ.
      &        id%IRHS_PTR(JBEG_RHS+1) )
               IF ((KEEP(237).EQ.0).AND.(ICNTL21.EQ.0).AND.
-     &          (KEEP(221).NE.1) ) THEN
+     &             (KEEP(221).NE.1) 
+     &           ) THEN
 C               Case of general sparse RHS (NOT A-1) and
 C               centralized solution: set to zero part of
 C               the solution corresponding to empty columns
@@ -2770,11 +2991,13 @@ C               the solution corresponding to empty columns
                 ENDDO
               ENDIF
               IF (KEEP(221).EQ.1) THEN
-C               Reduced RHS set to ZERO
-                DO I = 1, id%SIZE_SCHUR
-                  id%REDRHS(int(JBEG_RHS-1,8)*int(LD_REDRHS,8) +
-     &            int(I,8)) =  ZERO
-                ENDDO
+                IF (KEEP(60).NE.0) THEN
+C                 Fwd with Schur: reduced RHS set to ZERO
+                  DO I = 1, id%SIZE_SCHUR
+                    id%REDRHS(int(JBEG_RHS-1,8)*int(LD_REDRHS,8) +
+     &              int(I,8)) =  ZERO
+                  ENDDO
+                ENDIF
               ENDIF
               JBEG_RHS = JBEG_RHS +1
             ENDDO
@@ -2783,7 +3006,7 @@ C         Count nb of RHS columns skipped: useful for
 C         * SMUMPS_DISTRIBUTED_SOLUTION to reset those
 C           columns to zero.
 C         * in case of reduced right-hand side, to set
-C           corresponding entries of RHSCOMP to 0 after
+C           corresponding entries of RHSINTR to 0 after
 C           forward phase.
           NB_RHSSKIPPED = JBEG_RHS - (JEND_RHS + 1)
           IF ((KEEP(248).EQ.1).AND.(KEEP(237).EQ.0)
@@ -2800,7 +3023,8 @@ C           forward phase.
 C
 C       Shift on REDRHS in reduced RHS functionality
 C
-        IF (id%MYID.EQ.MASTER .AND. KEEP(221).NE.0) THEN
+        IF (id%MYID.EQ.MASTER .AND. KEEP(221).NE.0 
+     &       .AND. KEEP(60).NE.0 ) THEN
 C         Initialize IBEG_REDRHS
 C         Note that REDRHS always has id%NRHS Colmuns
           IBEG_REDRHS= int(JBEG_RHS-1,8)*int(LD_REDRHS,8) + 1_8
@@ -2816,11 +3040,12 @@ C
         CALL VTBEGIN(perm_scal_ini,IERR)
 #endif
         IF (id%MYID .eq. MASTER) THEN
-C         ======================
-          IF (KEEP(248)==1) THEN
-C         ======================
+C{        ======================
+          IF (KEEP(248)==1
+     &       ) THEN
+C{        ======================
 C
-C         Sparse RHS format ( A-1 or sparse input format)
+C         Sparse RHS format ( A-1 or sparse centralized input format)
 C         is provided as input by the user (IRHS_SPARSE ...)
 C         --------------------------------------------------
 C         Compute NZ_THIS_BLOCK and NBCOL_INBLOC
@@ -2842,7 +3067,10 @@ C         the first non empty column; then we process a block of
 C         maximum size NBRHS_EFF except if we reach another empty
 C         column. (We are not sure to have a copy allocated
 C         and thus cannot compress on the fly, as done naturally
-C         for A-1).
+C         for A-1)
+C         For A-1 we process NBRHS_EFF non empty columns 
+C         in the bloc that contains NBCOL_INBLOC columns
+C         (empty+non empty)
           STOP_AT_NEXT_EMPTY_COL = .FALSE.
           DO I=JBEG_RHS, id%NRHS
             NBCOL_INBLOC = NBCOL_INBLOC +1
@@ -2863,15 +3091,19 @@ C              --  sparse case (not AM-1)
                STOP_AT_NEXT_EMPTY_COL =.TRUE.
             ENDIF
             IF (COLSIZE.GT.0
+C{
      &      ) THEN
               NBCOL = NBCOL+1
               NZ_THIS_BLOCK = NZ_THIS_BLOCK + COLSIZE
+C}
             ELSE IF (STOP_AT_NEXT_EMPTY_COL) THEN
-C We have reached an empty column with already selected non empty 
-C columns: reduce block size to non empty columns reached so far.
+C{ We have reached an empty column with already selected non empty 
+C  columns: reduce block size to non empty columns reached so far.
               NBCOL_INBLOC = NBCOL_INBLOC -1
+C Note that NBRHS_EFF is udated only on master 
               NBRHS_EFF = NBCOL
               EXIT
+C}
             ENDIF
             IF (NBCOL.EQ.NBRHS_EFF) EXIT
           ENDDO
@@ -3002,9 +3234,16 @@ c    *                   (1:NZ_THIS_BLOCK)
      &          id%IRHS_SPARSE(id%IRHS_PTR(JBEG_RHS):
      &             id%IRHS_PTR(JBEG_RHS)+NZ_THIS_BLOCK-1)
             ENDIF
+#if defined(USE_OLD_SCALING)
+C           Centralized scaling: perform scaling on master
+C           in RHS_SPARSE_COPY
             IF (LSCAL.OR.DO_PERMUTE_RHS.OR.INTERLEAVE_PAR.OR.
      &          (KEEP(237).NE.0)) THEN
-C             if scaling is on or if columns of the RHS are
+#else
+            IF (DO_PERMUTE_RHS.OR.INTERLEAVE_PAR.OR.
+     &          (KEEP(237).NE.0)) THEN
+#endif
+C             if columns of the RHS are
 C             permuted then a copy of RHS_SPARSE is needed.
 C             Also always allocated with A-1,
 c             to enable receiving during mumps_gather_solution
@@ -3036,23 +3275,36 @@ c    *            (1:NZ_THIS_BLOCK)
             IF (DO_PERMUTE_RHS.OR.INTERLEAVE_PAR.OR.
      &          (id%KEEP(237).NE.0)) THEN
               IF (id%KEEP(237).NE.0) THEN
-C               --initialized to one; it might be
-C               modified if scaling is on (one first entry in each col is scaled)
+C               --initialized to one
+#if defined(USE_OLD_SCALING)
+C               it might be modified if scaling is on (one first entry
+C               in each col is scaled)
                 RHS_SPARSE_COPY = ONE
-              ELSE IF (.NOT. LSCAL) THEN
+#else
+C               Local scalings are used: RHSINTR is initialized
+C               directly on the workers and RHS_SPARSE_COPY will
+C               only be used during SMUMPS_GATHER_SOLUTION_AM1.
+#endif
+              ELSE
 C               -- Columns are not contiguous and need be copied one by one
+#if defined(USE_OLD_SCALING)
 C               -- This need not be done if scaling is on because it
 C               -- will done and scaled later.
-                IPOS = 1
-                DO I=JBEG_RHS, JBEG_RHS + NBCOL_INBLOC -1
-                  COLSIZE = id%IRHS_PTR(PERM_RHS(I)+1)
-     &                    - id%IRHS_PTR(PERM_RHS(I))
-                  IF (COLSIZE .EQ. 0) CYCLE
-                  RHS_SPARSE_COPY(IPOS:IPOS+COLSIZE-1) =
-     &            id%RHS_SPARSE(id%IRHS_PTR(PERM_RHS(I)):
-     &            id%IRHS_PTR(PERM_RHS(I)+1) -1)
-                  IPOS = IPOS + COLSIZE
-                ENDDO
+                IF (.NOT. LSCAL) THEN
+#endif
+                  IPOS = 1
+                  DO I=JBEG_RHS, JBEG_RHS + NBCOL_INBLOC -1
+                    COLSIZE = id%IRHS_PTR(PERM_RHS(I)+1)
+     &                      - id%IRHS_PTR(PERM_RHS(I))
+                    IF (COLSIZE .EQ. 0) CYCLE
+                    RHS_SPARSE_COPY(IPOS:IPOS+COLSIZE-1) =
+     &              id%RHS_SPARSE(id%IRHS_PTR(PERM_RHS(I)):
+     &              id%IRHS_PTR(PERM_RHS(I)+1) -1)
+                    IPOS = IPOS + COLSIZE
+                  ENDDO
+#if defined(USE_OLD_SCALING)
+                ENDIF
+#endif
               ENDIF
             ENDIF
 C           =========================
@@ -3087,9 +3339,9 @@ C                 (ii) columns might have been permuted
               ENDIF ! MTYPE.NE.1
             ENDIF ! KEEP(23).NE.0
           ENDIF ! NZ_THIS_BLOCK .NE. 0
-C         -----
+C}        -----
           ENDIF  !  ============ KEEP(248)==1
-C         -----
+C}        -----
         ENDIF   !  (id%MYID .eq. MASTER)
 C
 C =====================  ERROR handling and propagation ================
@@ -3100,16 +3352,29 @@ C =====================  ERROR handling and propagation ================
 C ======================================================================
 C
 C       NBCOL_INBLOC depends on loop
-        IF (KEEP(248)==1) THEN
+        IF (KEEP(248)==1
+     &     ) THEN
             CALL MPI_BCAST( NBCOL_INBLOC,1, MPI_INTEGER,
      &           MASTER, id%COMM,IERR)
         ELSE
           NBCOL_INBLOC = NBRHS_EFF
         ENDIF
         JEND_RHS =JBEG_RHS + NBCOL_INBLOC - 1
+        IF ((KEEP(248).EQ.1).AND.(KEEP(237).EQ.0)) THEN
+C         Only case (in previous block) for which
+C         NBRHS_EFF has been modified only on master
+          ! case of general sparse: in case of empty columns
+          ! modifed version of
+          ! NBRHS_EFF need be broadcasted since it is used
+          ! to update BEG_RHS at the end of the DO WHILE
+            CALL MPI_BCAST( NBRHS_EFF,1, MPI_INTEGER,
+     &           MASTER, id%COMM,IERR)
+            CALL MPI_BCAST(NB_RHSSKIPPED,1,MPI_INTEGER,MASTER,
+     &               id%COMM,IERR)
+        ENDIF
         IF ((KEEP(111).eq.0).AND.(KEEP(252).EQ.0)
      &      .AND.(KEEP(221).NE.2 ).AND.(KEEP(248).EQ.1) ) THEN
-C         ----------------------------
+C{        ----------------------------
 C         -- SPARSE RIGHT-HAND-SIDE
 C         ----------------------------
           CALL MPI_BCAST( NZ_THIS_BLOCK,1, MPI_INTEGER,
@@ -3166,162 +3431,492 @@ C ======================================================================
      &             MPI_INTEGER,
      &             MASTER, id%COMM,IERR)
           ENDIF
+C}
         ENDIF
 C
 C       =========================================================
-C       INITIALIZE POSINRHSCOMP_ROW/COL, RHSCOMP and related data
-C       For distributed RHS, initialize RHSMAPINFO (at 1st block)
+C       INITIALIZE 
+C       - nodes_FWD and nodes_BWD
 C       =========================================================
-        IF ( I_AM_SLAVE ) THEN
-C         --------------------------------------------------
-C         If I am involved in the solve and if
-C         either
-C           no null space comput (keep(111)=0) and sparse rhs
-C         or
-C             null space computation
-C         then
-C           compute POSINRHSCOMP
-C         endif
+        IF (FIRST_CALL_NODES_FWD_BWD) THEN
+C{         First time SMUMPS_NODES_FWD_BWD_SIZE_FILL 
+C          is called allocated Pruned_Sons_FWD
+           IF (allocated(Pruned_Sons_FWD)) THEN 
+             NB_BYTES = NB_BYTES - size(Pruned_Sons_FWD) * K34_8
+             DEALLOCATE(Pruned_Sons_FWD)
+           ENDIF
+           IF (allocated(Pruned_Sons_BWD)) THEN 
+            NB_BYTES = NB_BYTES - size(Pruned_Sons_BWD) * K34_8
+            DEALLOCATE(Pruned_Sons_BWD)
+           ENDIF
+           ALLOCATE (Pruned_Sons_FWD(KEEP(28)),
+     &             Pruned_Sons_BWD(KEEP(28)), 
+     &             stat=allocok)
+           IF (allocok .GT. 0 ) THEN
+            INFO(1)=-13
+            INFO(2)= 2*KEEP(28)
+           ELSE
+            NB_BYTES = NB_BYTES + 
+     &                int(size(Pruned_Sons_FWD),8)*K34_8 +
+     &                int(size(Pruned_Sons_BWD),8)*K34_8 
+            NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
+           ENDIF
+C}
+        ENDIF
+C =====================  ERROR handling and propagation ==============
+        CALL MUMPS_PROPINFO( ICNTL(1), INFO(1),
+     &                       id%COMM,id%MYID)
+        IF (INFO(1) .LT.0 ) GOTO 90
+C=====================================================================
+C       Reset FIRST_CALL_NODES_FWD_BWD for not allocating
+C       (Pruned_Sons_FWD/BWD within loop)
+        FIRST_CALL_NODES_FWD_BWD = .FALSE.
 C
-C         Fwd in facto: in this case only POSINRHSCOMP need be computed
+        IF (CALL_NODES_FWD_BWD) THEN
+C{
+          fill = .FALSE.
+          nodes_FWD_PTR => IDUMMY_TARGET
+          Lnodes_FWD_PTR = 1
+          nodes_BWD_PTR => IDUMMY_TARGET
+          Lnodes_BWD_PTR = 1
+          CALL SMUMPS_NODES_FWD_BWD_SIZE_FILL (
+     &           fill, id%ICNTL(1), 
+     &           id%N, id%KEEP(28),  id%KEEP(1), 
+     &           id%STEP(1), id%Step2node(1),
+     &           IRHS_loc_PTR(1), id%Nloc_RHS,
+     &           IRHS_PTR_COPY(1), NBCOL_INBLOC, IRHS_SPARSE_COPY(1), 
+     &           NZ_THIS_BLOCK, PERM_RHS, size(PERM_RHS), JBEG_RHS,
+     &           UNS_PERM_INV, size(UNS_PERM_INV), ! size 1 if not used
+     &           ICNTL21, 
+     &           id%MYID, id%COMM,
+     &           id%INFO,
+     &           Pruned_Sons_FWD, Pruned_Sons_BWD,
+     &           Lnodes_FWD, Lnodes_BWD
+     &           , nodes_FWD_PTR(1), nodes_BWD_PTR(1)
+     &           , Lnodes_FWD_PTR, Lnodes_BWD_PTR
+     &           )
+C     
+C        ALLOCATE nodes_FWD and nodes_BWD  if needed
 C
-C         (POSINRHSCOMP_ROW/COL indirection arrays should
+          IF (Lnodes_FWD.GT.0) THEN
+C           NBT is inout in MUMPS_REALLOC and should be initialized.
+            NBT = 0
+            CALL MUMPS_REALLOC(nodes_FWD, Lnodes_FWD, id%INFO, LP,
+     &         FORCE=.FALSE.,
+     &         STRING='nodes_FWD', MEMCNT=NBT, ERRCODE=-13)
+            IF (INFO(1).LT.0) GOTO 46
+C
+            nodes_FWD_PTR => nodes_FWD
+            Lnodes_FWD_PTR = Lnodes_FWD
+            NB_BYTES = NB_BYTES + NBT
+            NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
+          ELSE
+            nodes_FWD_PTR => IDUMMY_TARGET
+            Lnodes_FWD_PTR = 1
+          ENDIF
+          IF (Lnodes_BWD.GT.0) THEN
+C           NBT is inout in MUMPS_REALLOC and should be initialized.
+            NBT = 0
+            CALL MUMPS_REALLOC(nodes_BWD, Lnodes_BWD, id%INFO, LP,
+     &         FORCE=.FALSE.,
+     &         STRING='nodes_BWD', MEMCNT=NBT, ERRCODE=-13)
+            IF (INFO(1).LT.0) GOTO 46
+C
+            nodes_BWD_PTR => nodes_BWD
+            Lnodes_BWD_PTR = Lnodes_BWD
+            NB_BYTES = NB_BYTES + NBT
+            NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
+          ELSE
+            nodes_BWD_PTR => IDUMMY_TARGET
+            Lnodes_BWD_PTR = 1
+          ENDIF
+C
+C =====================  ERROR handling and propagation ==============
+ 46       CONTINUE
+          CALL MUMPS_PROPINFO( ICNTL(1), INFO(1),
+     &                         id%COMM,id%MYID)
+          IF (INFO(1) .LT.0 ) GOTO 90
+C=====================================================================
+          IF (Lnodes_FWD.GT.0 .OR. Lnodes_BWD.GT.0) THEN
+C{
+C          we build nodes_FWD_PTR and/or nodes_BWD_PTR
+C          that will be used to prune flops 
+C          and even if one of the steps FWD/BWD does not
+C          lead to pruning (in this case 
+C          POSTINRHS_COMP will not benefit from pruning).
+           fill = .TRUE.
+           CALL SMUMPS_NODES_FWD_BWD_SIZE_FILL (
+     &           fill, id%ICNTL(1), 
+     &           id%N, id%KEEP(28),  id%KEEP(1), 
+     &           id%STEP(1), id%Step2node(1),
+     &           IRHS_loc_PTR(1), id%Nloc_RHS,
+     &           IRHS_PTR_COPY(1), NBCOL_INBLOC, IRHS_SPARSE_COPY(1), 
+     &           NZ_THIS_BLOCK, PERM_RHS, size(PERM_RHS), JBEG_RHS,
+     &           UNS_PERM_INV, size(UNS_PERM_INV), ! size 1 if not used
+     &           ICNTL21, 
+     &           id%MYID, id%COMM,
+     &           id%INFO, 
+     &           Pruned_Sons_FWD, Pruned_Sons_BWD,
+     &           Lnodes_FWD, Lnodes_BWD
+     &           , nodes_FWD_PTR(1), nodes_BWD_PTR(1)
+     &           , Lnodes_FWD_PTR, Lnodes_BWD_PTR
+     &           )
+C}
+          ENDIF
+C         ------------------------------------------------
+C         Update CALL_NODES_FWD_BWD and free workspace if 
+C         not used again in loop of RHS
+C         ------------------------------------------------
+          IF (
+     &          (KEEP(237) .NE. 0).OR.                   ! AM1
+     &          ((KEEP(235) .NE. 0).AND.KEEP(248).NE.-1) ! GS
+     &       ) THEN
+C           target nodes for chain pruning 
+C           need be updated in case of AM1 or General Sparse
+            CALL_NODES_FWD_BWD = .TRUE.
+          ELSE
+C           all other cases including 
+C           distributed RHS and distributed solution 
+            CALL_NODES_FWD_BWD = .FALSE.
+          ENDIF
+          IF (.NOT. CALL_NODES_FWD_BWD
+     &       ) THEN
+C           Not needed anymore in the loop of RHS
+            IF (allocated(Pruned_Sons_FWD)) THEN 
+             NB_BYTES = NB_BYTES - size(Pruned_Sons_FWD) * K34_8
+             DEALLOCATE(Pruned_Sons_FWD)
+            ENDIF
+            IF (allocated(Pruned_Sons_BWD)) THEN 
+             NB_BYTES = NB_BYTES - size(Pruned_Sons_BWD) * K34_8
+             DEALLOCATE(Pruned_Sons_BWD)
+            ENDIF
+C         ELSE
+C           deallocate later
+          ENDIF
+C}
+        ENDIF
+C       =========================================================
+C       INITIALIZE 
+C       - GLOB2LOC_RHS/SOL, RHSINTR and related data
+C       - For distributed RHS, initialize RHSMAPINFO (at 1st block)
+C       =========================================================
+C         
+C         Fwd in facto: in this case we peronrly peonly POSINRHSINTR need be computed
+C
+C         (GLOB2LOC_RHS/SOL indirection arrays should
 C         have been allocated once outside loop)
-C         Compute size of RHSCOMP since it might depend
+C         Compute size of RHSINTR since it might depend
 C            on the process index and of the sparsity of the RHS
 C            if it is exploited.
-C         Initialize POSINRHSCOMP_ROW/COL
+C         Initialize GLOB2LOC_RHS/SOL
 C
-C         Note that LD_RHSCOMP and id%KEEP8(25)
+C         Note that id%LD_RHSINTR and id%KEEP8(25)
 C         are not set on the host in this routine in
 C         the case of a non-working host.
-C         Note that POSINRHSCOMP is now always computed in SOL_DRIVER
+C         Note that POSINRHSINTR is now always computed in SOL_DRIVER
 C         at least during the first block of RHS when sparsity of RHS
 C         is not exploited.
 C         -------------------------------
-C         INITTIALZE POSINRHSCOMP_ROW/COL
+C         INITTIALZE GLOB2LOC_RHS/SOL
 C         -------------------------------
 C
-          IF ( KEEP(221).EQ.2 .AND. KEEP(252).EQ.0
-     &      .AND.  (KEEP(248).NE.1 .OR. (id%NRHS.EQ.1))
-     &      ) THEN
-C           Reduced RHS was already computed during
-C           a previous forward step AND is valid.
-C           By valid we mean:
-C            -no forward in facto  (KEEP(252)==0) during which
-C             POSINRHSCOMP was not computed
-C           AND
-C            -no exploit sparsity with multiple RHS
-C            because in this case POSINRHSCOMP would
-C            be valid only for the last block processed during fwd.
-C           In those cases since we only perform the backward step, we do not
-C           need to compute POSINRHSCOMP
-            BUILD_POSINRHSCOMP = .FALSE.
-          ENDIF
+C       next block ok for Schur only
+        IF ( KEEP(221).EQ.2 .AND. KEEP(252).EQ.0
+     &    .AND.  (KEEP(248).NE.1 .OR. (id%NRHS.EQ.1))
+     &    ) THEN
+C         Reduced RHS (Schur feature) was already computed during
+C         a previous forward step AND is valid.
+C         By valid we mean:
+C          -no forward in facto  (KEEP(252)==0) during which
+C           POSINRHSINTR was not computed
+C         AND
+C          -no exploit sparsity with multiple RHS
+C          because in this case POSINRHSINTR would
+C          be valid only for the last block processed during fwd.
+C         In those cases since we only perform the backward step, 
+c         we do not need to compute POSINRHSINTR
+          BUILD_POSINRHSINTR = .FALSE.
+        ENDIF
 C         ------------------------
-C         INITIALIZE POSINRHSCOMP
+C         INITIALIZE POSINRHSINTR
 C         ------------------------
-          IF (BUILD_POSINRHSCOMP) THEN
-C           -- we first set MTYPE_LOC and
-C           -- reset BUILD_POSINRHSCOMP for next iteration in loop
+        IF (BUILD_POSINRHSINTR) THEN
+C{        -- we first set MTYPE_LOC and
+C         -- reset BUILD_POSINRHSINTR for next iteration in loop
 C
-C           general case only POSINRHSCOMP is computed
-            BUILD_POSINRHSCOMP = .FALSE.
-!           POSINRHSCOMP does not change between blocks
-            MTYPE_LOC = MTYPE
+C         general case only POSINRHSINTR is computed
+          BUILD_POSINRHSINTR = .FALSE.
+!         POSINRHSINTR does not change between blocks
+          MTYPE_LOC = MTYPE
 C
-            IF ( (KEEP(111).NE.0) .OR. (KEEP(237).NE.0) .OR.
+          IF ( (KEEP(111).NE.0) .OR. (KEEP(237).NE.0) .OR.
      &         (KEEP(252).NE.0) ) THEN
 C
-              IF (KEEP(111).NE.0) THEN
-C               -- in the context of null space, we need to
-C               -- build RHSCOMP to skip SOL_R. Therefore
-C               -- we need to know for each concerned
-C               -- row index its position in
-C               -- RHSCOMP
-C               We use row indices, as these are the ones that
-C               were used to detect zero pivots during factorization.
-C               POSINRHSCOMP_ROW will allow to find the (row) index of a
-C               zero in RHSCOMP before calling SMUMPS_SOL_S. Then
-C               SMUMPS_SOL_S uses column indices to build the solution
-C               (corresponding to null space vectors)
-                MTYPE_LOC = 1
-              ELSE IF  (KEEP(252).NE.0) THEN
-C               -- Fwd in facto: since fwd is skipped we need to build POSINRHSCOMP
-                MTYPE_LOC = 1  ! (no transpose)
-C     BUILD_POSINRHSCOMP = .FALSE.  ! POSINRHSCOMP does not change between blocks
-              ELSE
-C               -- A-1 only
-                MTYPE_LOC = MTYPE
-                BUILD_POSINRHSCOMP = .TRUE.
-              ENDIF
+            IF (KEEP(111).NE.0) THEN
+C             -- in the context of null space, we need to
+C             -- build RHSINTR to skip SOL_R. Therefore
+C             -- we need to know for each concerned
+C             -- row index its position in
+C             -- RHSINTR
+C             We use row indices, as these are the ones that
+C             were used to detect zero pivots during factorization.
+C             GLOB2LOC_RHS will allow to find the (row) index of a
+C             zero in RHSINTR before calling SMUMPS_SOL_S. Then
+C             SMUMPS_SOL_S uses column indices to build the solution
+C             (corresponding to null space vectors)
+              MTYPE_LOC = 1
+            ELSE IF  (KEEP(252).NE.0) THEN
+C             -- Fwd in facto: since fwd is skipped we need to build POSINRHSINTR
+              MTYPE_LOC = 1  ! (no transpose)
+            ELSE
+C             -- A-1 only
+              MTYPE_LOC = MTYPE
+              BUILD_POSINRHSINTR = .TRUE.
             ENDIF
-C           -- compute POSINRHSCOMP
-            LIW_PASSED=max(1,LIW)
-            IF (KEEP(237).EQ.0) THEN
-              CALL SMUMPS_BUILD_POSINRHSCOMP(
+          ENDIF
+C         -- compute POSINRHSINTR
+          LIW_PASSED=max(1,LIW)
+          IF ( 
+C                no sparsity at fwd or bwd:
+     &           (Lnodes_FWD.EQ.-1).OR.(Lnodes_BWD.EQ.-1)
+C              
+     &          ) THEN
+C
+C           RHSINTR is not sparse (in the sense that it has N rows
+C           distributed on the MPI procs) and thus POSINRHSINTR
+C           does not change with loop.
+C           Remarks:
+C             1/ sparsity might still be exploited during 
+C                fwd or bwd to reduce the number of operations.
+C             2/ 
+            BUILD_POSINRHSINTR = .FALSE.
+C
+            IF ( I_AM_SLAVE ) THEN
+C{
+              CALL SMUMPS_BUILD_GLOB2LOC(
      &           id%NSLAVES,id%N,
      &           id%MYID_NODES, id%PTLUST_S(1),
      &           id%KEEP(1),id%KEEP8(1),
      &           id%PROCNODE_STEPS(1), id%IS(1), LIW_PASSED,
      &           id%STEP(1),
-     &           id%POSINRHSCOMP_ROW(1), id%POSINRHSCOMP_COL(1),
-     &           id%POSINRHSCOMP_COL_ALLOC,
+     &           id%GLOB2LOC_RHS(1), id%GLOB2LOC_SOL(1),
+     &           id%GLOB2LOC_SOL_ALLOC,
      &           MTYPE_LOC,
-     &           NBENT_RHSCOMP, NB_FS_RHSCOMP_TOT )
-                NB_FS_RHSCOMP_F = NB_FS_RHSCOMP_TOT
-            ELSE
-              CALL SMUMPS_BUILD_POSINRHSCOMP_AM1(
+     &           NBENT_RHSINTR, NB_FS_RHSINTR_TOT )
+                NB_FS_RHSINTR_F = NB_FS_RHSINTR_TOT
+C}
+            ENDIF
+C
+          ELSE 
+C
+C  Note that POSINRHSINTR* need not be recomputed before IR :
+C  because distributed solution => NO IR.
+C
+C           Exploit sparsity in solution and RHS 
+C           (AM1 or (Sparse RHS and solution) )
+C           Since sparsity is exploited during
+C           both fwd and bwd then we need to recompute 
+C           POSINRHSINTR only  when CALL_NODES_FWD_BWD will
+C           be performed at next iteration.
+            IF (CALL_NODES_FWD_BWD) BUILD_POSINRHSINTR = .TRUE.
+C
+            IF ( I_AM_SLAVE ) THEN
+C{
+              CALL SMUMPS_BUILD_GLOB2LOC_NODES_ES(
      &           id%NSLAVES,id%N,
      &           id%MYID_NODES, id%PTLUST_S(1), id%DAD_STEPS(1),
      &           id%KEEP(1),id%KEEP8(1),
      &           id%PROCNODE_STEPS(1), id%IS(1), LIW,
      &           id%STEP(1),
-     &           id%POSINRHSCOMP_ROW(1), id%POSINRHSCOMP_COL(1),
-     &           id%POSINRHSCOMP_COL_ALLOC,
+C
+     &            Lnodes_FWD, Lnodes_BWD,
+     &            nodes_FWD_PTR(1), nodes_BWD_PTR(1),
+C
+     &           id%GLOB2LOC_RHS(1), id%GLOB2LOC_SOL(1),
+     &           id%GLOB2LOC_SOL_ALLOC,
      &           MTYPE_LOC,
-     &           IRHS_PTR_COPY(1), NBCOL_INBLOC, IRHS_SPARSE_COPY(1),
-     &           NZ_THIS_BLOCK,PERM_RHS, size(PERM_RHS) , JBEG_RHS,
-     &           NBENT_RHSCOMP,
-     &           NB_FS_RHSCOMP_F, NB_FS_RHSCOMP_TOT,
-     &            UNS_PERM_INV, size(UNS_PERM_INV) ! size 1 if not used
-     &            )
+     &           NBENT_RHSINTR,
+     &           NB_FS_RHSINTR_F, NB_FS_RHSINTR_TOT
+     &           )
+C}
             ENDIF
-          ENDIF   ! BUILD_POSINRHSCOMP=.TRUE.
-          IF (BUILD_RHSMAPINFO .AND. KEEP(248).EQ.-1) THEN
+          ENDIF
+C}
+        ENDIF   ! BUILD_POSINRHSINTR=.TRUE.
+        IF (BUILD_RHSMAPINFO .AND. KEEP(248).EQ.-1
+     &        ) THEN
 C
 C           Prepare symbolic data for sends.
-C           For the moment: MAP_RHS_loc
+C           For the moment: only MAP_RHS_loc
 C
+C           id%GLOB2LOC_RHS is always associated to the
+C           forward step (with or without transposed system)
+          IF ( I_AM_SLAVE ) THEN
+C{
             CALL MUMPS_SOL_RHSMAPINFO( id%N, id%Nloc_RHS, id%KEEP(89),
-     &            IRHS_loc_PTR(1), MAP_RHS_loc, id%POSINRHSCOMP_ROW(1),
+     &            IRHS_loc_PTR(1), MAP_RHS_loc, id%GLOB2LOC_RHS(1),
      &            id%NSLAVES, id%MYID_NODES,
      &            id%COMM_NODES, id%ICNTL(1), id%INFO(1) )
             BUILD_RHSMAPINFO = .FALSE.
 C           MUMPS_SOL_RHSMAPINFO does not propagate errors
-          ENDIF
+C}
+          ENDIF ! I_AM_SLAVE
         ENDIF
         CALL MUMPS_PROPINFO( ICNTL(1), INFO(1),
      &                   id%COMM,id%MYID)
         IF (INFO(1) .LT.0 ) GOTO 90
+        IF ( BUILD_SCALING_RHSINTR ) THEN
+C{
+          IF (SCALING_RHSINTR_BWD_ALLOCATED) THEN
+            NB_BYTES = NB_BYTES - LSCALING_RHSINTR_BWD * K16_8
+            DEALLOCATE(SCALING_RHSINTR_BWD)
+          ENDIF
+          IF (SCALING_RHSINTR_FWD_ALLOCATED) THEN
+            NB_BYTES = NB_BYTES - LSCALING_RHSINTR_FWD * K16_8
+            DEALLOCATE(SCALING_RHSINTR_FWD)
+          ENDIF
+          NULLIFY(SCALING_RHSINTR_BWD)
+          NULLIFY(SCALING_RHSINTR_FWD)
+          SCALING_RHSINTR_BWD_ALLOCATED = .FALSE.
+          SCALING_RHSINTR_FWD_ALLOCATED = .FALSE.
+          SCALING_RHSINTR_BWD => RDUMMY_TARGET
+          SCALING_RHSINTR_FWD => RDUMMY_TARGET
+          LSCALING_RHSINTR_BWD = 1
+          LSCALING_RHSINTR_FWD = 1
+C         Define or allocate SCALING_RHSINTR if needed:
+          IF (LSCAL .AND. I_AM_SLAVE ) THEN
+            IF (KEEP(221).EQ.2) THEN
+C             In case of sparsity during bwd, we cannot
+C             rely on the value of Lnodes_FWD to know
+C             whether the scaling will match SCALING_LOC
+C             and should thus consider that (Lnodes_FWD.NE.-1)
+              ES_RHSINTR = (Lnodes_BWD.NE.-1)
+            ELSE
+C             sparsity at fwd and at bwd:
+              ES_RHSINTR = (Lnodes_FWD.NE.-1).AND.(Lnodes_BWD.NE.-1)
+            ENDIF
+C           Scaling allocations performed only if needed
+C             Forward or normal solve:
+              IF ( ES_RHSINTR ) THEN
+                LSCALING_RHSINTR_FWD = max(1, NB_FS_RHSINTR_F )
+                ALLOCATE(SCALING_RHSINTR_FWD(LSCALING_RHSINTR_FWD),
+     &                   stat=allocok)
+                IF (allocok .GT. 0) THEN
+                  INFO(1)=-13
+                  INFO(2)=LSCALING_RHSINTR_FWD
+                ELSE
+                  SCALING_RHSINTR_FWD_ALLOCATED = .TRUE.
+                  NB_BYTES = NB_BYTES + LSCALING_RHSINTR_FWD * K16_8
+                ENDIF
+              ELSE
+C               RHSINTR matches SCALING_loc, no need to
+C               allocate and compute a different scaling
+                LSCALING_RHSINTR_FWD = max(1,KEEP(89))
+#if defined(USE_OLD_SCALING)
+#else
+                SCALING_RHSINTR_FWD => SCALING_LOC_FWD
+#endif
+              ENDIF
+              IF (ES_RHSINTR) THEN
+                  LSCALING_RHSINTR_BWD = max(1, NB_FS_RHSINTR_TOT )
+                ALLOCATE(SCALING_RHSINTR_BWD(LSCALING_RHSINTR_BWD),
+     &                   stat=allocok)
+                IF (allocok .GT. 0) THEN
+                  INFO(1)=-13
+                  INFO(2)=LSCALING_RHSINTR_BWD
+                ELSE
+                  SCALING_RHSINTR_BWD_ALLOCATED = .TRUE.
+                  NB_BYTES = NB_BYTES + LSCALING_RHSINTR_BWD * K16_8
+                ENDIF
+              ELSE
+C               RHSINTR matches SCALING_loc, no need to
+C               allocate and compute a different scaling
+                LSCALING_RHSINTR_BWD = max(1,KEEP(89))
+#if defined(USE_OLD_SCALING)
+                SCALING_RHSINTR_BWD => scaling_data_sol%SCALING_LOC
+#else
+                SCALING_RHSINTR_BWD => SCALING_LOC_BWD
+                SCALING_RHSINTR_FWD => SCALING_LOC_FWD
+#endif
+              ENDIF
+          ENDIF
+C}
+        ENDIF
+        CALL MUMPS_PROPINFO( id%ICNTL, id%INFO, id%COMM,id%MYID)
+        IF (id%INFO(1) .LT.0 ) GOTO 90
+        IF (BUILD_SCALING_RHSINTR) THEN
+C{
+          IF ( LSCAL .AND. I_AM_SLAVE. AND. ES_RHSINTR ) THEN
+#if ! defined(USE_OLD_SCALING)
+C             SCALING_RHSINTR_FWD has been allocated and should
+C             now be filled. It is a compressed version of the
+C             local scaling array SCALING_LOC_FWD:
+              IF (MTYPE.eq.0 .AND. KEEP(50).EQ.0) THEN ! tranpose
+                ROWORCOL = 2 ! access 2nd list -- col indices
+              ELSE
+                ROWORCOL = 1 ! access 1st list -- row indices
+              ENDIF
+              CALL SMUMPS_SCALINGRHSINTR(LSCAL, id%N,
+     &             SCALING_LOC_FWD(1),
+     &             SCALING_RHSINTR_FWD(1),
+     &             LSCALING_RHSINTR_FWD, id%GLOB2LOC_RHS(1),
+     &             id%KEEP, ROWORCOL, id%PTLUST_S(1),
+     &             id%IS(1), max(1,LIW),
+     &             id%MYID_NODES, id%STEP(1), id%PROCNODE_STEPS(1),
+     &             id%NSLAVES)
+C             SCALING_RHSINTR_BWD has been allocated and should
+C             now be filled. It is a compressed version of the
+C             local scaling array SCALING_LOC_BWD:
+              IF (MTYPE.eq.1 .AND. KEEP(50).EQ.0) THEN ! no tranpose
+C               access 2nd list corresponding to col indices
+                ROWORCOL = 2 
+              ELSE
+C               access 1st list corresponding to row indices
+                ROWORCOL = 1 
+              ENDIF
+              CALL SMUMPS_SCALINGRHSINTR(LSCAL, id%N,
+     &             SCALING_LOC_BWD(1),
+     &             SCALING_RHSINTR_BWD(1),
+     &             LSCALING_RHSINTR_BWD, id%GLOB2LOC_SOL(1),
+     &             id%KEEP, ROWORCOL, id%PTLUST_S(1),
+     &             id%IS(1), max(1,LIW),
+     &             id%MYID_NODES, id%STEP(1), id%PROCNODE_STEPS(1),
+     &             id%NSLAVES)
+#endif
+#if defined(USE_OLD_SCALING)
+#endif
+          ENDIF
+C         Rebuild SCALING_RHSINTR* next time
+C         only if POSINRHSINTR has to be built
+C         again next time:
+          BUILD_SCALING_RHSINTR= BUILD_POSINRHSINTR
+C}
+        ENDIF
         IF (I_AM_SLAVE) THEN
-          IF (KEEP(221).EQ.1) THEN
-C           we need to save the reduced RHS for all RHS to perform
-C           later the backward phase with an updated reduced RHS
-C           thus we allocate NRHS_NONEMPTY columns in one shot.
-C           Note that RHSCOMP might have been allocated in previous block
-C           and RHSCOMP has been deallocated previous to entering loop on RHS
-            IF (.not. associated(id%RHSCOMP)) THEN
+          IF ((KEEP(221).EQ.1).OR.KEEP(221).EQ.-1) THEN
+C         For the following cases:
+C          -[Schur] we need to save the reduced RHS for all RHS 
+C                 to perform later the backward phase with an
+C                 updated reduced RHS
+C          -[Fwd only] return RHSINTR to user
+C          -KEEP(221)=-1, allocate RHSINTR to enable bwd only step
+C         We need to allocate NRHS_NONEMPTY columns in one shot.
+C         Note that 
+C            -RHSINTR might have been allocated in previous block
+C            -RHSINTR has been deallocated previous to entering 
+C             loop on RHS
+            IF (.not. associated(id%RHSINTR)) THEN
 C             So far we cannot combine this to exploit sparsity
-C             so that NBENT_RHSCOMP will not change in the loop
-C             and can be used to dimension RHSCOMP
+C             so that NBENT_RHSINTR will not change in the loop
+C             and can be used to dimension RHSINTR
+C
 C             Furthermore, during bwd phase the REDRHS provided
 C             by the user might also have a different non empty
 C             column pattern than the sparse RHS provided on input to
 C             this phase: thus we need to allocate id%NRHS columns too.
-              LD_RHSCOMP = max(NBENT_RHSCOMP,1)
-              id%KEEP8(25) = int(LD_RHSCOMP,8)*int(id%NRHS,8)
-              ALLOCATE (id%RHSCOMP(id%KEEP8(25)),  stat = allocok)
+              id%LD_RHSINTR = max(NBENT_RHSINTR,1)
+              id%KEEP8(25) = int(id%LD_RHSINTR,8)*int(id%NRHS,8)
+              ALLOCATE (id%RHSINTR(id%KEEP8(25)),  stat = allocok)
               IF ( allocok .GT. 0 ) THEN
                  INFO(1)=-13
                  CALL MUMPS_SET_IERROR(id%KEEP8(25),INFO(2))
@@ -3332,34 +3927,35 @@ C             this phase: thus we need to allocate id%NRHS columns too.
               NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
             ENDIF
           ENDIF
-          IF ((KEEP(221).NE.1).AND.
+C 
+C
+          IF ((KEEP(221).NE.1).AND. 
      &        ((KEEP(221).NE.2).OR.(KEEP(252).NE.0))
      &       ) THEN
 C           ------------------
-C           Allocate RHSCOMP (case of RHSCOMP allocated at each block of RHS)
+C           Allocate RHSINTR
+C           (case of RHSINTR allocated at each block of RHS)
 C           ------------------
-C           RHSCOMP allocated per block of maximum size NBRHS
-            LD_RHSCOMP = max(NBENT_RHSCOMP, LD_RHSCOMP)
+C           RHSINTR allocated per block of maximum size NBRHS
 C           NBRHS_EFF could be used instead on NBRHS
-            IF (associated(id%RHSCOMP)) THEN
-              IF ( (id%KEEP8(25).LT.int(LD_RHSCOMP,8)*int(NBRHS,8))
-     &          .OR. (KEEP(235).NE.0).OR.(KEEP(237).NE.0) ) THEN
-                ! deallocate and reallocate if:
-                ! _larger array needed
-                ! OR 
-                ! _exploit sparsity/A-1: since size of RHSCOMP 
-                ! is expected to vary much in these cases
-                ! this should improve locality
+            IF (associated(id%RHSINTR)) THEN
+C             RHSINTR already associated for previous
+C             block, check if we can reuse it.
+              id%LD_RHSINTR = max(NBENT_RHSINTR, 1)
+              IF (id%KEEP8(25).LT.int(id%LD_RHSINTR,8)*int(NBRHS,8))
+     &        THEN
+                ! deallocate and reallocate since larger array is needed
                  NB_BYTES = NB_BYTES - id%KEEP8(25)*K35_8
-                 DEALLOCATE(id%RHSCOMP)
-                 NULLIFY(id%RHSCOMP)
-                 id%KEEP8(25)=0_8
+                 DEALLOCATE(id%RHSINTR)
+                 NULLIFY(id%RHSINTR)
+                 id%KEEP8(25)  = 0_8
+                 id%LD_RHSINTR = 0
               ENDIF
             ENDIF
-            IF (.not. associated(id%RHSCOMP)) THEN
-              LD_RHSCOMP = max(NBENT_RHSCOMP, 1)
-              id%KEEP8(25) = int(LD_RHSCOMP,8)*int(NBRHS,8)
-              ALLOCATE (id%RHSCOMP(id%KEEP8(25)),  stat = allocok )
+            IF (.not. associated(id%RHSINTR)) THEN
+              id%LD_RHSINTR = max(NBENT_RHSINTR, 1)
+              id%KEEP8(25) = int(id%LD_RHSINTR,8)*int(NBRHS,8)
+              ALLOCATE (id%RHSINTR(id%KEEP8(25)),  stat = allocok )
               IF ( allocok .GT. 0 ) THEN
                INFO(1)=-13
                CALL MUMPS_SET_IERROR(id%KEEP8(25),INFO(2))
@@ -3369,22 +3965,16 @@ C           NBRHS_EFF could be used instead on NBRHS
               NB_BYTES_MAX = max(NB_BYTES_MAX,NB_BYTES)
             ENDIF
           ENDIF
-          IF (KEEP(221).EQ.2) THEN
-C           RHSCOMP has been allocated (call with KEEP(221).EQ.1)
-C           even in the case fwd in facto
-            ! Not correct: LD_RHSCOMP = LENRHSCOMP/id%NRHS_NONEMPTY
-            LD_RHSCOMP = int(id%KEEP8(25)/int(id%NRHS,8))
-          ENDIF
 C
-C         Shift on RHSCOMP
+C         Shift on RHSINTR
 C
           IF ( KEEP(221).EQ.0 ) THEN
-C            -- RHSCOMP reused in the loop
-             IBEG_RHSCOMP= 1_8
+C            -- RHSINTR reused in the loop
+             IBEG_RHSINTR= 1_8
           ELSE
-C            Initialize IBEG_RHSCOMP
+C            Initialize IBEG_RHSINTR
 C
-             IBEG_RHSCOMP= int(JBEG_RHS-1,8)*int(LD_RHSCOMP,8) + 1_8
+            IBEG_RHSINTR= int(JBEG_RHS-1,8)*int(id%LD_RHSINTR,8)+1_8
           ENDIF
         ENDIF   ! I_AM_SLAVE
 C =====================  ERROR handling and propagation ================
@@ -3398,7 +3988,8 @@ C       ---------------------------
 C       Prepare RHS on master (case
 C       of dense and sparse RHS)
 C       ---------------------------
-        IF (id%MYID .eq. MASTER) THEN
+        IF (id%MYID .eq. MASTER
+     &     ) THEN
 C         =========================
           IF (KEEP(23) .NE. 0) THEN
 C         =========================
@@ -3461,8 +4052,10 @@ C
               ENDDO
             ENDIF
           ENDIF
+#if defined(USE_OLD_SCALING)
 C
 C         RHS is set to scaled right hand side
+C         (case of centralized scaling only)
 C
           IF (LSCAL) THEN
 C           scaling was performed
@@ -3573,6 +4166,7 @@ C                     Original IRHS_PTR must be used to access id%RHS_SPARSE
               ENDIF
             ENDIF  ! KEEP(248)==1
           ENDIF  ! LSCAL
+#endif
         ENDIF  ! id%MYID.EQ.MASTER
 #if defined(V_T)
         CALL VTEND(perm_scal_ini,IERR)
@@ -3581,16 +4175,6 @@ C
 C       Prepare RHS on master
 C       END
 C       =====================
-        IF ((KEEP(248).EQ.1).AND.(KEEP(237).EQ.0)) THEN
-          ! case of general sparse: in case of empty columns
-          ! modifed version of
-          ! NBRHS_EFF need be broadcasted since it is used
-          ! to update BEG_RHS at the end of the DO WHILE
-            CALL MPI_BCAST( NBRHS_EFF,1, MPI_INTEGER,
-     &           MASTER, id%COMM,IERR)
-            CALL MPI_BCAST(NB_RHSSKIPPED,1,MPI_INTEGER,MASTER,
-     &               id%COMM,IERR)
-        ENDIF
 C       -----------------------------------
 C       Two main cases depending on option
 C       for null space computation:
@@ -3607,7 +4191,7 @@ C       -----------------------------------
         TIMESCATTER1=MPI_WTIME()
         IF ((KEEP(111).eq.0).AND.(KEEP(252).EQ.0)
      &        .AND.(KEEP(221).NE.2 )) THEN
-C           ------------------------
+C{          ------------------------
 C           Use RHS provided by user
 C           when not null space and not Fwd in facto
 C           ------------------------
@@ -3618,7 +4202,7 @@ C             ----------------------------
               IF ( .NOT.I_AM_SLAVE ) THEN
 C               -- Master not working
                 CALL SMUMPS_SCATTER_RHS(id%NSLAVES,id%N, id%MYID,
-     &          id%COMM,
+     &          id%COMM, LSCAL, SCALING_LOC_FWD(1),
      &          MTYPE, id%RHS(IBEG), LD_RHS, NBRHS_EFF,
      &          NBRHS_EFF,
      &          C_DUMMY, 1, 1,
@@ -3641,11 +4225,11 @@ C               -- Master not working
                 ENDIF
                 LIW_PASSED = max( LIW, 1 )
                 CALL SMUMPS_SCATTER_RHS(id%NSLAVES,id%N, id%MYID,
-     &          id%COMM,
+     &          id%COMM, LSCAL, SCALING_LOC_FWD(1),
      &          MTYPE, PTR_RHS(IBEG_loc),LD_RHS_loc,NCOL_RHS_loc,
      &          NBRHS_EFF,
-     &          id%RHSCOMP(IBEG_RHSCOMP), LD_RHSCOMP, NBRHS_EFF,
-     &          id%POSINRHSCOMP_ROW(1), NB_FS_RHSCOMP_F,
+     &          id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, NBRHS_EFF,
+     &          id%GLOB2LOC_RHS(1), NB_FS_RHSINTR_F,
 C
      &          id%PTLUST_S(1), id%KEEP(1), id%KEEP8(1),
      &          id%PROCNODE_STEPS(1),
@@ -3673,9 +4257,14 @@ C
      &          IRHS_loc_PTR(1),
      &          idRHS_loc(RHS_loc_shift),
      &          RHS_loc_size,
-     &          id%RHSCOMP(IBEG_RHSCOMP), LD_RHSCOMP,
-     &          id%POSINRHSCOMP_ROW(1), NB_FS_RHSCOMP_F,
-     &          LSCAL, scaling_data_dr,
+     &          id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR,
+     &          id%GLOB2LOC_RHS(1), NB_FS_RHSINTR_F,
+     &          LSCAL,
+#if defined(USE_OLD_SCALING)
+     &          scaling_data_dr,
+#else
+     &          SCALING_RHSINTR_FWD(1), LSCALING_RHSINTR_FWD,
+#endif
      &          LP, LPOK, KEEP(1), NB_BYTES_LOC, INFO(1))
 C               NB_BYTES_LOC were allocated and freed above
                 NB_BYTES_MAX = max(NB_BYTES_MAX,
@@ -3688,14 +4277,20 @@ C               NB_BYTES_LOC were allocated and freed above
 C             ===  KEEP(248)==1 =========
 C             -- SPARSE RIGHT-HAND-SIDE
 C             ----------------------------
-              IF (NZ_THIS_BLOCK > 0) THEN
+              IF (NZ_THIS_BLOCK > 0
+#if ! defined(USE_OLD_SCALING)
+C               For AM1, no need to broadcast RHS_SPARSE
+C               when using local scalings. RHSINTR will
+C               be initialized directly and RHS_SPARSE
+C               is used during SMUMPS_GATHER_SOLUTION_AM1
+     &            .AND. id%KEEP(237) .EQ.0
+#endif
+     &        ) THEN
                 CALL MPI_BCAST(RHS_SPARSE_COPY(1),
      &                     NZ_THIS_BLOCK,
      &                     MPI_REAL,
      &                     MASTER, id%COMM, IERR)
               ENDIF
-C             -- At this point each process has a copy of the
-C             -- sparse RHS. We need to store it into RHSCOMP.
 C
               IF (KEEP(237).NE.0)  THEN
                 IF ( I_AM_SLAVE ) THEN
@@ -3703,37 +4298,43 @@ C                 -----
 C                 case of A-1
 C                 -----
 C                 - Take columns with non-zero entry, say j,
-C                 - to build Ej and store it in RHSCOMP
-                  K=1              ! Column index in RHSCOMP
-                  id%RHSCOMP(1_8:int(NBRHS_EFF,8)*int(LD_RHSCOMP,8))
+C                 - to build Ej and store it in RHSINTR
+                  K=1              ! Column index in RHSINTR
+                  id%RHSINTR(1_8:int(NBRHS_EFF,8)*int(id%LD_RHSINTR,8))
      &            = ZERO
                   IPOS = 1
                   DO I = 1, NBCOL_INBLOC
                     COLSIZE = IRHS_PTR_COPY(I+1) - IRHS_PTR_COPY(I)
                     IF (COLSIZE.GT.0) THEN
                       ! Find global column index J and set
-                      ! column K of RHSCOMP to ej (here IBEG is one)
+                      ! column K of RHSINTR to ej (here IBEG is one)
                       J = I - 1 + JBEG_RHS
                       IF (DO_PERMUTE_RHS.OR.INTERLEAVE_PAR) THEN
                         J = PERM_RHS(J)
                       ENDIF
-                      IPOSRHSCOMP = id%POSINRHSCOMP_ROW(J)
-C                     IF ( (IPOSRHSCOMP.LE.NB_FS_RHSCOMP_F)
-C     &               .AND.(IPOSRHSCOMP.GT.0) ) THEN
-                      IF (IPOSRHSCOMP.GT.0)  THEN
+                      IPOSRHSINTR = id%GLOB2LOC_RHS(J)
+C                     IF ( (IPOSRHSINTR.LE.NB_FS_RHSINTR_F)
+C     &               .AND.(IPOSRHSINTR.GT.0) ) THEN
+                      IF (IPOSRHSINTR.GT.0)  THEN
 C                       Columns J corresponds to ej and thus to variable j
-C                       that is on my proc
-C                       Note that :
-C                       In first entry in column
-C                       we have and MUST have already scaled value of diagonal.
-C                       This need have been done on master because we do not
-C                       have scaling arrays available on slaves.
-C                       Furthermore we know that only one entry is
-C                       needed the diagonal entry (for the forward with A-1).
+C                       that is on my proc.
+C                       We know that only one entry is needed,
+C                       the diagonal entry (for the forward with A-1).
 C
-                        id%RHSCOMP(int(K-1,8)*int(LD_RHSCOMP,8)+
-     &                       int(IPOSRHSCOMP,8)) =
+#if defined(USE_OLD_SCALING)
+                        id%RHSINTR(int(K-1,8)*int(id%LD_RHSINTR,8)+
+     &                       int(IPOSRHSINTR,8)) =
      &                       RHS_SPARSE_COPY(IPOS)
+#else
+                        IF (LSCAL) THEN
+                          id%RHSINTR(int(K-1,8)*int(id%LD_RHSINTR,8)+
+     &                    int(IPOSRHSINTR,8)) =
+     &                    SCALING_RHSINTR_FWD(IPOSRHSINTR)
+                        ELSE
+                          id%RHSINTR(int(K-1,8)*int(id%LD_RHSINTR,8)+
+     &                    int(IPOSRHSINTR,8)) = ONE
+                        ENDIF
+#endif
                       ENDIF               ! End of J on my proc
                       K = K + 1
                       IPOS = IPOS + COLSIZE  ! go to next column
@@ -3752,12 +4353,14 @@ C               -------
 C               --------------
 C               General sparse
 C               --------------
-C               -- reset to zero RHSCOMP for skipped columns (if any)
+C               -- At this point each process has a copy of the
+C               -- sparse RHS. We need to store it into RHSINTR.
+C               -- reset to zero RHSINTR for skipped columns (if any)
                 IF ((KEEP(221).EQ.1).AND.(NB_RHSSKIPPED.GT.0)
      &            .AND.I_AM_SLAVE) THEN
                   DO K = JBEG_RHS-NB_RHSSKIPPED, JBEG_RHS-1
-                    DO I = 1,  LD_RHSCOMP
-                      id%RHSCOMP(int(K-1,8)*int(LD_RHSCOMP,8)
+                    DO I = 1,  id%LD_RHSINTR
+                      id%RHSINTR(int(K-1,8)*int(id%LD_RHSINTR,8)
      &                           + int(I,8)) =  ZERO
                     ENDDO
                   ENDDO
@@ -3765,36 +4368,62 @@ C               -- reset to zero RHSCOMP for skipped columns (if any)
                 IF (I_AM_SLAVE) THEN
                   DO K = 1, NBCOL_INBLOC
 !                   it is equal to NBRHS_EFF in this case
-                    KDEC = int(K-1,8) * int(LD_RHSCOMP,8) +
-     &                     IBEG_RHSCOMP - 1_8
-                    id%RHSCOMP(KDEC+1_8:KDEC+NBENT_RHSCOMP) = ZERO
-                    DO IZ=IRHS_PTR_COPY(K), IRHS_PTR_COPY(K+1)-1
-                      I=IRHS_SPARSE_COPY(IZ)
-                      IPOSRHSCOMP = id%POSINRHSCOMP_ROW(I)
-C                     Since all fully summed variables mapped
-C                     on each proc are stored at the beginning
-C                     of RHSCOMP, we can compare to KEEP(89)
-C                     to know if RHSCOMP should be initialized
-C                     So far the tree has not been pruned to exploit
-C                     sparsity to compress RHSCOMP so we compare to
-C                     NB_FS_RHSCOMP_TOT
-                      IF ( (IPOSRHSCOMP.LE.NB_FS_RHSCOMP_TOT)
-     &                .AND.(IPOSRHSCOMP.GT.0) ) THEN
-C                        ! I is fully summed var mapped on my proc
-                        id%RHSCOMP(KDEC+IPOSRHSCOMP)=
-     &                  id%RHSCOMP(KDEC+IPOSRHSCOMP) +
-     &                  RHS_SPARSE_COPY(IZ)
-                      ENDIF
-                    ENDDO
+                    KDEC = int(K-1,8) * int(id%LD_RHSINTR,8) +
+     &                     IBEG_RHSINTR - 1_8
+                    id%RHSINTR(KDEC+1_8:KDEC+NBENT_RHSINTR) = ZERO
+#if ! defined(USE_OLD_SCALING)
+                    IF (LSCAL) THEN
+                      DO IZ=IRHS_PTR_COPY(K), IRHS_PTR_COPY(K+1)-1
+                        I=IRHS_SPARSE_COPY(IZ)
+                        IPOSRHSINTR = id%GLOB2LOC_RHS(I)
+C                       Since all fully summed variables mapped
+C                       on each proc are stored at the beginning
+C                       of RHSINTR, we can compare to KEEP(89)
+C                       to know if RHSINTR should be initialized
+C                       So far the tree has not been pruned to exploit
+C                       sparsity to compress RHSINTR so we compare to
+C                       NB_FS_RHSINTR_TOT
+                        IF ( (IPOSRHSINTR.LE.NB_FS_RHSINTR_TOT)
+     &                  .AND.(IPOSRHSINTR.GT.0) ) THEN
+C                          ! I is fully summed var mapped on my proc
+                          id%RHSINTR(KDEC+IPOSRHSINTR)=
+     &                    id%RHSINTR(KDEC+IPOSRHSINTR) +
+     &                    RHS_SPARSE_COPY(IZ)
+     &                    * SCALING_RHSINTR_FWD(IPOSRHSINTR)
+                        ENDIF
+                      ENDDO
+                    ELSE
+#endif
+                      DO IZ=IRHS_PTR_COPY(K), IRHS_PTR_COPY(K+1)-1
+                        I=IRHS_SPARSE_COPY(IZ)
+                        IPOSRHSINTR = id%GLOB2LOC_RHS(I)
+C                       Since all fully summed variables mapped
+C                       on each proc are stored at the beginning
+C                       of RHSINTR, we can compare to KEEP(89)
+C                       to know if RHSINTR should be initialized
+C                       So far the tree has not been pruned to exploit
+C                       sparsity to compress RHSINTR so we compare to
+C                       NB_FS_RHSINTR_TOT
+                        IF ( (IPOSRHSINTR.LE.NB_FS_RHSINTR_TOT)
+     &                  .AND.(IPOSRHSINTR.GT.0) ) THEN
+C                          ! I is fully summed var mapped on my proc
+                          id%RHSINTR(KDEC+IPOSRHSINTR)=
+     &                    id%RHSINTR(KDEC+IPOSRHSINTR) +
+     &                    RHS_SPARSE_COPY(IZ)
+                        ENDIF
+                      ENDDO
+#if ! defined(USE_OLD_SCALING)
+                    ENDIF
+#endif
                   ENDDO
                 END IF ! I_AM_SLAVE
               ENDIF ! KEEP(237)
             ENDIF  ! ==== KEEP(248)==1 =====
-C
+C}
         ELSE IF (I_AM_SLAVE) THEN
             ! I_AM_SLAVE AND (null space or Fwd in facto)
             IF (KEEP(111).NE.0) THEN
-C             -----------------------
+C{            -----------------------
 C             Null space computations
 C             -----------------------
 C
@@ -3891,10 +4520,10 @@ C ======================================================================
 C               End IF Exploit Sparsity
               ENDIF
 c
-C             Initialize RHSCOMP to 0  ! to be suppressed
+C             Initialize RHSINTR to 0  ! to be suppressed
               DO K=1, NBRHS_EFF
-                KDEC = int(K-1,8) * int(LD_RHSCOMP,8)
-                id%RHSCOMP(KDEC+1_8:KDEC+int(LD_RHSCOMP,8))=ZERO
+                KDEC = int(K-1,8) * int(id%LD_RHSINTR,8)
+                id%RHSINTR(KDEC+1_8:KDEC+int(id%LD_RHSINTR,8))=ZERO
               END DO
 C             Loop over the columns.
 C             Note that if ( KEEP(220)+KEEP(109)-1 < IBEG_GLOB_DEF
@@ -3909,18 +4538,18 @@ C               step incompatible, do one or the other.
      &               min(IEND_GLOB_DEF,KEEP(220)+KEEP(109)-1)
 C                 Local processor is concerned by I-th column of
 C                 global right-hand side.
-                  JJ= id%POSINRHSCOMP_ROW(id%PIVNUL_LIST(I-KEEP(220)+1))
+                  JJ= id%GLOB2LOC_RHS(id%PIVNUL_LIST(I-KEEP(220)+1))
                   IF (JJ.GT.0) THEN
                     IF (KEEP(50).EQ.0) THEN
                       ! unsymmetric : always set to fixation
-                      id%RHSCOMP( IBEG_RHSCOMP+
-     &                    int(I-IBEG_GLOB_DEF,8)*int(LD_RHSCOMP,8) +
+                      id%RHSINTR( IBEG_RHSINTR+
+     &                    int(I-IBEG_GLOB_DEF,8)*int(id%LD_RHSINTR,8)+
      &                    int(JJ-1,8) ) =
      &                    id%DKEEP(2)
                     ELSE
                       ! Symmetric: always set to one
-                      id%RHSCOMP( IBEG_RHSCOMP+
-     &                int(I-IBEG_GLOB_DEF,8)*int(LD_RHSCOMP,8)+
+                      id%RHSINTR( IBEG_RHSINTR+
+     &                int(I-IBEG_GLOB_DEF,8)*int(id%LD_RHSINTR,8)+
      &                int(JJ-1,8) )=
      &                ONE
                     ENDIF
@@ -3951,9 +4580,10 @@ C               for this set of right-hand sides.
                 IEND_ROOT_DEF = -95999
                 IROOT_DEF_RHS_COL1= 1
               ENDIF
+C}
             ELSE  ! End of null space (test on KEEP(111))
 C             case of Fwd in facto
-C             id%RHSCOMP need not be initialized. It will be set on the fly
+C             id%RHSINTR need not be initialized. It will be set on the fly
 C             to zero for normal fully summed variables of the fronts and
 C             to -1 on the roots for the id%N+KEEP(253) variables added
 C             to the roots.
@@ -3992,7 +4622,7 @@ C             Otherwise, we use workspace in WCB
             LWCB8_SOL_C = LWCB8_SOL_C - LPTR_RHS_ROOT
           ENDIF
         ENDIF
-        IF (KEEP(221) .EQ. 2 ) THEN
+        IF (KEEP(221) .EQ. 2 .AND. KEEP(60).NE.0 ) THEN
 C         Copy/send REDRHS in PTR_RHS_ROOT
 C         (column by column if leading dimension LD_REDRHS
 C         of REDRHS is not equal to SIZE_ROOT).
@@ -4055,13 +4685,13 @@ C         -- other procs are not concerned
           LIW_PASSED = max( LIW, 1 )
           LA_PASSED  = max( LA, 1_8 )
 C
-          IF ((id%KEEP(235).EQ.0).and.(id%KEEP(237).EQ.0) ) THEN
+          IF (Lnodes_FWD.EQ.-1 .AND. Lnodes_BWD.EQ.-1) THEN
 C
-C         --- Normal case : we do not exploit sparsity of the RHS
+C         --- Normal case : we do not exploit sparsity during
+C             foward and backward steps
 C
             FROM_PP = .FALSE.
             NBSPARSE_LOC = (DO_NBSPARSE.AND.NBRHS_EFF.GT.1)
-            PRUNED_SIZE_LOADED = 0_8  ! From SMUMPS_SOL_ES module
             CALL SMUMPS_SOL_C(id%root, id%N, id%S(1), LA_PASSED, IS(1),
      & LIW_PASSED, WORK_WCB(1), LWCB8_SOL_C, IWCB, LIWCB, NBRHS_EFF,
      & id%NA(1),id%LNA,id%NE_STEPS(1), SRW3, MTYPE, ICNTL(1), FROM_PP,
@@ -4072,10 +4702,15 @@ C
      & BUFR(1), LBUFR, LBUFR_BYTES, id%ISTEP_TO_INIV2(1),
      & id%TAB_POS_IN_PERE(1,1), IBEG_ROOT_DEF, IEND_ROOT_DEF,
      & IROOT_DEF_RHS_COL1, PTR_RHS_ROOT(1), LPTR_RHS_ROOT, SIZE_ROOT,
-     & MASTER_ROOT, id%RHSCOMP(IBEG_RHSCOMP), LD_RHSCOMP,
-     & id%POSINRHSCOMP_ROW(1), id%POSINRHSCOMP_COL(1)
+     & MASTER_ROOT, id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR,
+     & id%GLOB2LOC_RHS(1), id%GLOB2LOC_SOL(1)
+     &  , -1, -1,
+     &  IDUMMY(1), IDUMMY(1)
      & , 1, 1, 1, 1, IDUMMY, 1, JDUMMY, KDUMMY, 1, LDUMMY, 1, MDUMMY
      & , 1, 1, NBSPARSE_LOC, PTR_RHS_BOUNDS(1), LPTR_RHS_BOUNDS
+#if defined(STAT_ES_SOLVE)
+     & , IDUMMY, 1, JDUMMY, 1
+#endif
      & , id%IPOOL_B_L0_OMP(1), id%LPOOL_B_L0_OMP, id%IPOOL_A_L0_OMP(1),
      & id%LPOOL_A_L0_OMP, id%L_VIRT_L0_OMP, id%VIRT_L0_OMP(1),
      & id%L_PHYS_L0_OMP, id%PHYS_L0_OMP(1), id%PERM_L0_OMP(1),
@@ -4097,12 +4732,18 @@ C
      & id%DKEEP(1),id%COMM_NODES,id%MYID,id%MYID_NODES,BUFR(1),LBUFR,
      & LBUFR_BYTES, id%ISTEP_TO_INIV2(1), id%TAB_POS_IN_PERE(1,1),
      & IBEG_ROOT_DEF,IEND_ROOT_DEF,IROOT_DEF_RHS_COL1,PTR_RHS_ROOT(1),
-     & LPTR_RHS_ROOT, SIZE_ROOT, MASTER_ROOT, id%RHSCOMP(IBEG_RHSCOMP),
-     & LD_RHSCOMP, id%POSINRHSCOMP_ROW(1), id%POSINRHSCOMP_COL(1),
+     & LPTR_RHS_ROOT, SIZE_ROOT, MASTER_ROOT, id%RHSINTR(IBEG_RHSINTR),
+     & id%LD_RHSINTR, id%GLOB2LOC_RHS(1), id%GLOB2LOC_SOL(1),
+     &  Lnodes_FWD, Lnodes_BWD,
+     &  nodes_FWD_PTR(1), nodes_BWD_PTR(1),
      & NZ_THIS_BLOCK, NBCOL_INBLOC, id%NRHS, JBEG_RHS, id%Step2node(1),
      & id%KEEP(28),IRHS_SPARSE_COPY(1),IRHS_PTR_COPY(1), size(PERM_RHS),
-     & PERM_RHS, size(UNS_PERM_INV), UNS_PERM_INV, NB_FS_RHSCOMP_F,
-     & NB_FS_RHSCOMP_TOT,NBSPARSE_LOC,PTR_RHS_BOUNDS(1),LPTR_RHS_BOUNDS
+     & PERM_RHS, size(UNS_PERM_INV), UNS_PERM_INV, NB_FS_RHSINTR_F,
+     & NB_FS_RHSINTR_TOT,NBSPARSE_LOC,PTR_RHS_BOUNDS(1),LPTR_RHS_BOUNDS
+#if defined(STAT_ES_SOLVE)
+     & ,idIPTR_WORKING(1),SIZE_IPTR_WORKING,idWORKING(1),SIZE_WORKING
+C     & ,id%IPTR_WORKING(1),SIZE_IPTR_WORKING,id%WORKING(1),SIZE_WORKING
+#endif
      & ,id%IPOOL_B_L0_OMP(1),id%LPOOL_B_L0_OMP,id%IPOOL_A_L0_OMP(1),
      & id%LPOOL_A_L0_OMP,id%L_VIRT_L0_OMP,id%VIRT_L0_OMP(1),
      & id%L_PHYS_L0_OMP, id%PHYS_L0_OMP(1), id%PERM_L0_OMP(1),
@@ -4141,7 +4782,8 @@ C       ======================================================
 C       ONLY FORWARD was performed (case of reduced RHS with Schur
 C                               option during factorisation)
 C       ======================================================
-        IF ( KEEP(221) .EQ. 1 ) THEN ! === Begin OF REDUCED RHS ======
+        IF ( (KEEP(60).NE.0) .AND. 
+     &       KEEP(221) .EQ. 1 ) THEN ! === Begin OF REDUCED RHS ======
 C         --------------------------------------
 C         Send (or copy) reduced RHS from PTR_RHS_ROOT located on
 C         MASTER_ROOT_IN_COMM to REDRHS located on MASTER (host node).
@@ -4201,14 +4843,14 @@ C               -- send all in on shot
             ENDIF
 C         -- other procs are not concerned
           ENDIF
-        ENDIF ! ====== END OF REDUCED RHS (Fwd only performed) ======
+        ENDIF ! ===== END OF REDUCED RHS (Schur+Fwd only performed) ==
 C       =======================================================
 C       BACKWARD was PERFORMED
 C       Postprocess solution that is distributed
         IF ( KEEP(221) .NE. 1 ) THEN  ! BACKWARD was PERFORMED
 C       -- KEEP(221).NE.1 => we are sure that backward has been performed
           IF (ICNTL21 == 0) THEN ! CENTRALIZED SOLUTION
-C           ========================================================
+C{          ========================================================
 C           GATHER SOLUTION computed during bwd
 C           Each proc holds the pieces of solution corresponding
 C           to all fully summed variables mapped on that processor
@@ -4252,8 +4894,9 @@ C           Propagate errors
      &                       id%COMM,id%MYID)
 C           Return in case of error.
             IF (INFO(1).LT.0) GO TO 90
+#if defined(USE_OLD_SCALING)
             IF ((id%MYID.NE.MASTER).OR. .NOT.LSCAL) THEN
-             PT_SCALING => Dummy_SCAL
+              PT_SCALING => Dummy_SCAL
             ELSE
               IF (MTYPE.EQ.1) THEN
                 PT_SCALING => id%COLSCA
@@ -4261,11 +4904,12 @@ C           Return in case of error.
                 PT_SCALING => id%ROWSCA
               ENDIF
             ENDIF
+#endif
             LIW_PASSED = max( LIW, 1 )
             TIMEGATHER1=MPI_WTIME()
             IF ( .NOT.I_AM_SLAVE ) THEN
 C             I did not participate to computing part of the solution
-C             (id%RHSCOMP not set/allocate) : receive solution, store
+C             (id%RHSINTR not set/allocate) : receive solution, store
 C             it and scale it.
               IF (KEEP(237).EQ.0) THEN
 C               We need a workspace of minimal size KEEP(247)
@@ -4276,8 +4920,12 @@ C               in order to unpack pieces of the solution.
      &              JDUMMY, id%KEEP(1), id%KEEP8(1),
      &              id%PROCNODE_STEPS(1), IDUMMY, 1,
      &              id%STEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
-     &              CWORK(1), LCWORK,
-     &              LSCAL, PT_SCALING(1), size(PT_SCALING),
+     &              CWORK(1), LCWORK, LSCAL,
+#if defined(USE_OLD_SCALING)
+     &              PT_SCALING(1), size(PT_SCALING),
+#else
+     &              SCALING_LOC_BWD(1), size(SCALING_LOC_BWD),
+#endif
      &              C_DUMMY, 1 , 1, IDUMMY, 1,
      &              PERM_RHS, size(PERM_RHS) ! for sparse permuted RHS
      &              )
@@ -4287,7 +4935,12 @@ C               only gather target entries of A-1
      &              id%MYID, id%COMM, NBRHS_EFF,
      &              C_DUMMY, 1, 1,
      &              id%KEEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
+#if defined(USE_OLD_SCALING)
      &              LSCAL, PT_SCALING(1), size(PT_SCALING)
+#else
+     &              LSCAL, SCALING_RHSINTR_BWD(1),
+     &              size(SCALING_RHSINTR_BWD)
+#endif
 C                   --- A-1 related entries
      &             ,IRHS_PTR_COPY(1), size(IRHS_PTR_COPY),
      &              IRHS_SPARSE_COPY(1), size(IRHS_SPARSE_COPY),
@@ -4318,23 +4971,31 @@ C             compilers would do otherwise
      &          id%PROCNODE_STEPS(1), IS(1), LIW_PASSED,
      &          id%STEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
      &          CWORK(1), LCWORK,
+#if defined(USE_OLD_SCALING)
      &          LSCAL, PT_SCALING(1), size(PT_SCALING),
-     &          id%RHSCOMP(IBEG_RHSCOMP), LD_RHSCOMP, NBRHS_EFF,
-     &          id%POSINRHSCOMP_COL(1), id%N,
+#else
+     &          LSCAL, SCALING_LOC_BWD(1), size(SCALING_LOC_BWD),
+#endif
+     &          id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, NBRHS_EFF,
+     &          id%GLOB2LOC_SOL(1), id%N,
      &          PERM_RHS, size(PERM_RHS) ! For sparse permuted RHS
      &          )
               ELSE ! only gather target entries of A-1
                 CALL SMUMPS_GATHER_SOLUTION_AM1(id%NSLAVES,id%N,
      &          id%MYID, id%COMM, NBRHS_EFF,
-     &          id%RHSCOMP(IBEG_RHSCOMP), LD_RHSCOMP, NBRHS_EFF,
+     &          id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, NBRHS_EFF,
      &          id%KEEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
+#if defined(USE_OLD_SCALING)
      &          LSCAL, PT_SCALING(1), size(PT_SCALING)
+#else
+     &          LSCAL, SCALING_RHSINTR_BWD(1), size(SCALING_RHSINTR_BWD)
+#endif
 C               --- A-1 related entries
      &          , IRHS_PTR_COPY(1), size(IRHS_PTR_COPY),
      &          IRHS_SPARSE_COPY(1), size(IRHS_SPARSE_COPY),
      &          RHS_SPARSE_COPY(1), size(RHS_SPARSE_COPY),
      &          UNS_PERM_INV, size(UNS_PERM_INV),
-     &          id%POSINRHSCOMP_COL(1), id%N, NB_FS_RHSCOMP_TOT
+     &          id%GLOB2LOC_SOL(1), id%N, NB_FS_RHSINTR_TOT
      &          )
               ENDIF
             ENDIF
@@ -4381,32 +5042,46 @@ C                 IZ - Column index in Sparse RHS
               ENDIF
             ENDIF             ! end A-1 on master
 C
-C         -- END of backward was performed with centralized solution
+C}        -- END of backward was performed with centralized solution
           ELSE   ! (KEEP(221).NE.1) .AND.(ICNTL21.NE.0))
 C
 C           BEGIN of backward performed with distributed solution
 C           time local copy + scaling
             TIMECOPYSCALE1=MPI_WTIME()
-C           The non working host should not do this:
-            IF ( I_AM_SLAVE ) THEN
-              LIW_PASSED = max( LIW, 1 )
-C             Only called if more than 1 pivot
-C             was eliminated by the processor.
-C             Note that LSOL_loc >= KEEP(89)
-              IF ( KEEP(89) .GT. 0 ) THEN
-                CALL SMUMPS_DISTRIBUTED_SOLUTION(id%NSLAVES,
-     &          id%N,id%MYID_NODES,
-     &          MTYPE, id%RHSCOMP(IBEG_RHSCOMP), LD_RHSCOMP,
-     &          NBRHS_EFF, id%POSINRHSCOMP_COL(1),
-     &          id%ISOL_loc(1), id%SOL_loc(1), id%NRHS,
-     &          JBEG_RHS-NB_RHSSKIPPED, id%LSOL_loc,
-     &          id%PTLUST_S(1), id%PROCNODE_STEPS(1),
-     &          id%KEEP(1),id%KEEP8(1),
-     &          IS(1), LIW_PASSED,
-     &          id%STEP(1), scaling_data_sol, LSCAL, NB_RHSSKIPPED,
-     &          PERM_RHS, size(PERM_RHS) ) ! For permuted sparse RHS
+C             The non working host should not do this:
+              IF ( I_AM_SLAVE ) THEN
+                LIW_PASSED = max( LIW, 1 )
+C               Only called if more than 1 pivot
+C               was eliminated by the processor.
+C               Note that LSOL_loc >= KEEP(89)
+                IF ( KEEP(89) .GT. 0 ) THEN
+            IF ( LSCAL .AND. id%KEEP(89).GT.0) THEN
+#if defined(USE_OLD_SCALING)
+              SCALING_LOC_BWD => scaling_data_sol%SCALING_LOC
+#else
+              IF (MTYPE.EQ.1) THEN
+                SCALING_LOC_BWD => id%COLSCA_loc
+              ELSE
+                SCALING_LOC_BWD => id%ROWSCA_loc
               ENDIF
+#endif
+            ELSE
+              SCALING_LOC_BWD => RDUMMY_TARGET
             ENDIF
+                  CALL SMUMPS_DISTRIBUTED_SOLUTION(id%NSLAVES,
+     &            id%N,id%MYID_NODES,
+     &            MTYPE, id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR,
+     &            NBRHS_EFF, id%GLOB2LOC_SOL(1),
+     &            id%ISOL_loc(1), id%SOL_loc(1), id%NRHS,
+     &            JBEG_RHS-NB_RHSSKIPPED, id%LSOL_loc,
+     &            id%PTLUST_S(1), id%PROCNODE_STEPS(1),
+     &            id%KEEP(1),id%KEEP8(1),
+     &            IS(1), LIW_PASSED, id%STEP(1),
+     &            SCALING_LOC_BWD(1), size(SCALING_LOC_BWD),
+     &            LSCAL, NB_RHSSKIPPED,
+     &            PERM_RHS, size(PERM_RHS) ) ! For permuted sparse RHS
+                ENDIF
+              ENDIF
             TIMECOPYSCALE2=MPI_WTIME()-TIMECOPYSCALE1+TIMECOPYSCALE2
           ENDIF
 C         === BACKWARD was PERFORMED WITH DISTRIBUTED SOLUTION ===
@@ -4427,7 +5102,7 @@ C         Multiple RHS: apply a fixed number
 C         of iterative refinement steps
 C         ----------------------------------
 C         DO I = 1, ICNTL10
-            write(6,*) ' Internal ERROR 15 in sol_driver '
+            write(6,*) ' Internal error 15 in sol_driver '
 C           Compute residual:  Y <- SAVERHS - A * RHS
 C           Solve RHS <- A^-1 Y, Y modified
 C           Assemble in RHS(REDUCE)
@@ -4435,7 +5110,7 @@ C           RHS <- RHS + Y
 C         END DO
         END IF
         IF (POSTPros) THEN
-C
+C{
 C         SAVERHS holds the original right hand side
 C         Sparse rhs are saved in SAVERHS as dense rhs
 C
@@ -5099,7 +5774,7 @@ C             We have used D only for LCOND1,2
           DEALLOCATE(C_Y)
           DEALLOCATE(R_LOCWK54)
           DEALLOCATE(C_LOCWK54)
-C End POSTPros
+C} End POSTPros
         END IF
 C============================================
 C
@@ -5166,9 +5841,9 @@ C  ========================
 *         print out the solution
           IF ( INFO(1) .GE. 0 .AND. ICNTL(4).GE.3 .AND. ICNTL(3).GT.0)
      &    THEN
-            K = min0(10, id%N)
+            K = min(10, id%N)
             IF (ICNTL(4) .eq. 4 ) K = id%N
-            J = min0(10,NBRHS_EFF)
+            J = min(10,NBRHS_EFF)
             IF (ICNTL(4) .eq. 4 ) J = NBRHS_EFF
             DO II=1, J
               WRITE(ICNTL(3),110) BEG_RHS+II-1
@@ -5192,9 +5867,6 @@ C     }
       ENDDO
 C     END DO WHILE (BEG_RHS.LE.id%NRHS)
 C     =================================
-      IF (KEEP(400) .GT. 0) THEN
-        CALL SMUMPS_SOL_L0OMP_LD(KEEP(400))
-      ENDIF
 C
 C     ========================================================
 C     Reset RHS to zero for all remaining columns that
@@ -5228,14 +5900,14 @@ C     ========================================================
       ENDIF
 C     ========================================================
 C     Reset id%SOL_loc to zero for all remaining columns that
-C     have not been processed because they were emtpy
+C     have not been processed because they were empty
 C     ========================================================
       IF ( I_AM_SLAVE .AND. (ICNTL21.NE.0) .AND.
      &      ( JEND_RHS .LT. id%NRHS ) .AND. KEEP(221).NE.1 ) THEN
         JBEG_NEW = JEND_RHS + 1
         IF (DO_PERMUTE_RHS.OR.INTERLEAVE_PAR) THEN
            DO WHILE ( JBEG_NEW.LE. id%NRHS)
-              DO I=1, KEEP(89)
+              DO I=1, NSOL_loc
                  id%SOL_loc(int(PERM_RHS(JBEG_NEW) -1,8)*
      &                      int(id%LSOL_loc,8)+int(I,8)) = ZERO
               ENDDO
@@ -5244,7 +5916,7 @@ C     ========================================================
         ELSE
 C
            DO WHILE ( JBEG_NEW.LE. id%NRHS)
-            DO I=1, KEEP(89)
+            DO I=1, NSOL_loc
                 id%SOL_loc((JBEG_NEW -1)*id%LSOL_loc + I) = ZERO
             ENDDO
             JBEG_NEW = JBEG_NEW +1
@@ -5253,7 +5925,7 @@ C
       ENDIF
 C
 C     ================================================================
-C     Reset id%RHSCOMP and id%REDRHS to zero for all remaining columns
+C     Reset id%RHSINTR and id%REDRHS to zero for all remaining columns
 C     that have not been processed because they were emtpy
 C     ================================================================
       IF ((KEEP(221).EQ.1) .AND.
@@ -5271,8 +5943,8 @@ C     ================================================================
        IF (I_AM_SLAVE) THEN
            JBEG_NEW = JEND_RHS + 1
            DO WHILE ( JBEG_NEW.LE. id%NRHS)
-            DO I=1,NBENT_RHSCOMP
-              id%RHSCOMP(int(JBEG_NEW -1,8)*int(LD_RHSCOMP,8) +
+            DO I=1,NBENT_RHSINTR
+              id%RHSINTR(int(JBEG_NEW -1,8)*int(id%LD_RHSINTR,8) +
      &                   int(I,8)) =  ZERO
             ENDDO
             JBEG_NEW = JBEG_NEW +1
@@ -5364,9 +6036,43 @@ C
         WRITE( MP, 431 ) id%DKEEP(122)
       END IF
  90   CONTINUE
+      IF (KEEP(400) .GT. 0) THEN
+        CALL SMUMPS_SOL_L0OMP_LD(KEEP(400))
+      ENDIF
       IF (INFO(1) .LT.0 ) THEN
          IF (INFO(1) .EQ. -80) INFO(1) = -81
       ENDIF
+C     -- related to exploit sparsity
+       IF (associated(nodes_FWD)) THEN 
+        NB_BYTES = NB_BYTES - size(nodes_FWD) * K34_8
+        DEALLOCATE(nodes_FWD)
+        NULLIFY(nodes_FWD)
+       ENDIF
+       IF (associated(nodes_BWD)) THEN 
+        NB_BYTES = NB_BYTES - size(nodes_BWD) * K34_8
+        DEALLOCATE(nodes_BWD)
+        NULLIFY(nodes_BWD)
+       ENDIF
+       IF (allocated(Pruned_Sons_FWD)) THEN 
+        NB_BYTES = NB_BYTES - size(Pruned_Sons_FWD) * K34_8
+        DEALLOCATE(Pruned_Sons_FWD)
+       ENDIF
+       IF (allocated(Pruned_Sons_BWD)) THEN 
+        NB_BYTES = NB_BYTES - size(Pruned_Sons_BWD) * K34_8
+        DEALLOCATE(Pruned_Sons_BWD)
+       ENDIF
+      IF (SCALING_RHSINTR_FWD_ALLOCATED) THEN
+        NB_BYTES = NB_BYTES - LSCALING_RHSINTR_FWD * K16_8
+        DEALLOCATE(SCALING_RHSINTR_FWD)
+      ENDIF
+      SCALING_RHSINTR_FWD_ALLOCATED = .FALSE.
+      NULLIFY(SCALING_RHSINTR_FWD)
+      IF (SCALING_RHSINTR_BWD_ALLOCATED) THEN
+        NB_BYTES = NB_BYTES - LSCALING_RHSINTR_BWD * K16_8
+        DEALLOCATE(SCALING_RHSINTR_BWD)
+      ENDIF
+      SCALING_RHSINTR_BWD_ALLOCATED = .FALSE.
+      NULLIFY(SCALING_RHSINTR_BWD)
       IF (KEEP(485) .EQ. 1) THEN
         KEEP(350) = KEEP350_SAVE
         IF (IS_LR_MOD_TO_STRUC_DONE) THEN
@@ -5423,12 +6129,16 @@ C       Free space and reset pointers if needed
          NULLIFY(IRHS_loc_PTR)
          IRHS_loc_PTR_ALLOCATED = .FALSE.
        ENDIF
+#if defined(USE_OLD_SCALING)
        IF (I_AM_SLAVE.AND.LSCAL.AND.KEEP(248).EQ.-1) THEN
-         NB_BYTES = NB_BYTES -
-     &   int(size(scaling_data_dr%SCALING_LOC),8)*K16_8
-         DEALLOCATE(scaling_data_dr%SCALING_LOC)
-         NULLIFY   (scaling_data_dr%SCALING_LOC)
+         IF (associated(scaling_data_dr%SCALING_LOC)) THEN
+           NB_BYTES = NB_BYTES -
+     &     int(size(scaling_data_dr%SCALING_LOC),8)*K16_8
+           DEALLOCATE(scaling_data_dr%SCALING_LOC)
+           NULLIFY   (scaling_data_dr%SCALING_LOC)
+         ENDIF
        ENDIF
+#endif
       IF (allocated(PERM_RHS)) THEN
         NB_BYTES = NB_BYTES - int(size(PERM_RHS),8)*K34_8
         DEALLOCATE(PERM_RHS)
@@ -5500,13 +6210,19 @@ C       Deallocate temporary workspace SRW3
           NB_BYTES = NB_BYTES - int(size(SRW3),8)*K35_8
           DEALLOCATE(SRW3)
         ENDIF
-        IF (LSCAL .AND. ICNTL21==1) THEN
-C         Free local scaling arrays
-          NB_BYTES = NB_BYTES -
-     &              int(size(scaling_data_sol%SCALING_LOC),8)*K16_8
-          DEALLOCATE(scaling_data_sol%SCALING_LOC)
-          NULLIFY(scaling_data_sol%SCALING_LOC)
+#if defined(USE_OLD_SCALING)
+C       Free local scaling arrays
+        IF (LSCAL .AND. ICNTL21 .NE. 0) THEN
+          IF (associated(scaling_data_sol%SCALING_LOC)) THEN
+            NB_BYTES = NB_BYTES -
+     &                 int(size(scaling_data_sol%SCALING_LOC),8)*K16_8
+            DEALLOCATE(scaling_data_sol%SCALING_LOC)
+            NULLIFY(scaling_data_sol%SCALING_LOC)
+          ENDIF
         ENDIF
+#endif
+#if defined(USE_OLD_SCALING)
+#endif
 C       Free memory until next call to SMUMPS
         IF (WK_USER_PROVIDED) THEN
 C         S points to WK_USER provided by user
@@ -5521,29 +6237,39 @@ C         OOC: free space for S that was allocated
           id%KEEP8(23)=0_8
           DEALLOCATE(id%S)
           NULLIFY(id%S)
+        ELSE IF ( associated(id%S) .AND. KEEP8(31) .EQ. 0_8 .AND.
+     &            .NOT. WK_USER_PROVIDED .AND. KEEP(201).EQ.0 ) THEN
+C         In that case, MAXS was allocated of size 1
+C         at the beginning of the solve, free it.
+          DEALLOCATE (id%S) 
+          NULLIFY(id%S)
+          NB_BYTES  = NB_BYTES - KEEP8(23) * K35_8
+          KEEP8(23) = 0_8
         ENDIF
-        IF (KEEP(221).NE.1) THEN
+        IF (KEEP(221).NE.1
+     &     ) THEN
 C       -- After reduction of RHS to Schur variables
 C       -- keep compressed RHS generated during FWD step
 C       -- to be used for future expansion
-         IF (associated(id%RHSCOMP)) THEN
+         IF (associated(id%RHSINTR)) THEN
             NB_BYTES = NB_BYTES - id%KEEP8(25)*K35_8
-            DEALLOCATE(id%RHSCOMP)
-            NULLIFY(id%RHSCOMP)
-            id%KEEP8(25)=0_8
+            DEALLOCATE(id%RHSINTR)
+            NULLIFY(id%RHSINTR)
+            id%KEEP8(25)  = 0_8
+            id%LD_RHSINTR = 0
          ENDIF
-         IF (associated(id%POSINRHSCOMP_ROW)) THEN
+         IF (associated(id%GLOB2LOC_RHS)) THEN
             NB_BYTES = NB_BYTES -
-     &                 int(size(id%POSINRHSCOMP_ROW),8)*K34_8
-            DEALLOCATE(id%POSINRHSCOMP_ROW)
-            NULLIFY(id%POSINRHSCOMP_ROW)
+     &                 int(size(id%GLOB2LOC_RHS),8)*K34_8
+            DEALLOCATE(id%GLOB2LOC_RHS)
+            NULLIFY(id%GLOB2LOC_RHS)
          ENDIF
-         IF (id%POSINRHSCOMP_COL_ALLOC) THEN
+         IF (id%GLOB2LOC_SOL_ALLOC) THEN
             NB_BYTES = NB_BYTES -
-     &                 int(size(id%POSINRHSCOMP_COL),8)*K34_8
-            DEALLOCATE(id%POSINRHSCOMP_COL)
-            NULLIFY(id%POSINRHSCOMP_COL)
-            id%POSINRHSCOMP_COL_ALLOC = .FALSE.
+     &                 int(size(id%GLOB2LOC_SOL),8)*K34_8
+            DEALLOCATE(id%GLOB2LOC_SOL)
+            NULLIFY(id%GLOB2LOC_SOL)
+            id%GLOB2LOC_SOL_ALLOC = .FALSE.
          ENDIF
         ENDIF
         IF ( WORK_WCB_ALLOCATED ) THEN
@@ -5554,6 +6280,24 @@ C       Otherwise, WORK_WCB may point to some
 C       position inside id%S, nullify it
         NULLIFY( WORK_WCB )
       ENDIF
+#if defined(STAT_ES_SOLVE)
+      IF (
+     & (id%MYID.EQ.MASTER).AND.
+     & ( (id%KEEP(235).NE.0).OR.(id%KEEP(212).NE.0) )
+     &   )
+     & THEN
+C       If exploit sparsity then
+C       stats saved in DKEEP(200:204) and
+C       set RINFOG(24), RINFOG(25), RINFOG(26)
+        CALL SMUMPS_SOL_ES_PRINT_STATS( 
+     &      id%KEEP(212), id%KEEP(235), id%KEEP(237),
+     &      id%KEEP(485), id%KEEP(497), 
+     &      id%KEEP8(110),id%NRHS, id%ICNTL(27), id%N, 
+     &      id%KEEP(50), id%DKEEP(200:204),
+     &      id%RINFOG(24:28), MPG)
+      END IF
+#endif
+ 500  CONTINUE
       RETURN
  55   FORMAT (//' ERROR ANALYSIS BEFORE ITERATIVE REFINEMENT')
  100  FORMAT(//' ****** SOLVE & CHECK STEP ********'/)
@@ -5565,7 +6309,7 @@ C       position inside id%S, nullify it
  437  FORMAT('  .. Time in ScaLAPACK root       =   ',F15.6)
  436  FORMAT('  .. Time in backward (bwd) step  =   ',F15.6)
  433  FORMAT(' Time to gather solution(cent.sol)=',F15.6)
- 431  FORMAT(' Time to copy/scale dist. solution=',F15.6)
+ 431  FORMAT(' Time for distributed solution    =',F15.6)
  150  FORMAT(' GLOBAL STATISTICS PRIOR SOLVE PHASE ...........'/
      &        ' Number of right-hand-sides                    =',I12/
      &        ' Blocking factor for multiple rhs              =',I12/
@@ -5575,7 +6319,8 @@ C       position inside id%S, nullify it
      &        '  --- (20)                                     =',I12/
      &        '  --- (21)                                     =',I12/
      &        '  --- (30)                                     =',I12/
-     &        '  --- (35)                                     =',I12
+     &        '  --- (35)                                     =',I12/
+     &        '  --- (48)                                     =',I12
      &        )
  151  FORMAT ('  --- (25)                                     =',I12)
  152  FORMAT ('  --- (26)                                     =',I12)
@@ -5594,6 +6339,7 @@ C       position inside id%S, nullify it
      &       NRHS,
      &       idIRHS_loc,
      &       idRHS_loc,
+     &       I_AM_SLAVE,
      &       INFO)
 C
 C  Purpose:
@@ -5612,6 +6358,7 @@ C
         INTEGER, INTENT( IN ) :: idNloc_RHS
         INTEGER, INTENT( IN ) :: idLRHS_loc
         INTEGER, INTENT( IN ) :: NRHS
+        LOGICAL, INTENT( IN ) :: I_AM_SLAVE
 #if defined(MUMPS_NOF2003)
         INTEGER, POINTER :: idIRHS_loc (:)
         REAL, POINTER :: idRHS_loc  (:)
@@ -5631,6 +6378,14 @@ C  =====================
 C
 C       Quick return if nothing on this proc
         IF (idNloc_RHS .LE. 0) RETURN
+        IF (idNloc_RHS .GT. 0 .AND. .NOT. I_AM_SLAVE) THEN
+C         Nloc_RHS should not be greater than 0
+C         on a non working host because the distribution
+C         of the RHS does not include the non working host.
+          INFO(1)=-55
+          INFO(2)=-idLRHS_loc
+          RETURN
+        ENDIF
 C       Check for leading dimension
         IF (NRHS.NE.1) THEN
           IF ( idLRHS_loc .LT. idNloc_RHS) THEN
@@ -5709,6 +6464,7 @@ C         We force SOLVET to have value either 0 or 1, in order
 C         to be able to test both values, and also, be able to
 C         test whether SOLVET = MTYPE or not.
           IF ( SOLVET.EQ.2 ) SOLVET = 0
+#if defined(USE_OLD_SCALING)
           IF ( LSCAL ) THEN
             IF ( SOLVET .EQ. 1 ) THEN
 C             Apply rowscaling
@@ -5722,19 +6478,31 @@ C             Apply column scaling
               END DO
             END IF
           END IF
+#endif
         END IF ! MYID.EQ.MASTER
 C       ------------------------------
 C       Broadcast SOLVET to the slaves
 C       ------------------------------
         CALL MPI_BCAST( SOLVET, 1, MPI_INTEGER, MASTER,
      &                  id%COMM, IERR)
+#if ! defined(USE_OLD_SCALING)
+        IF (LSCAL .AND. id%KEEP(89) .GT. 0) THEN
+          IF (SOLVET .EQ. 1) THEN
+            SCALING_LOC_FWD => id%ROWSCA_LOC
+          ELSE
+            SCALING_LOC_FWD => id%COLSCA_LOC
+          ENDIF
+        ELSE
+            SCALING_LOC_FWD => RDUMMY_TARGET
+        ENDIF
+#endif
 C       --------------------------------------------
 C       Scatter the right hand side C_Y on all procs
 C       --------------------------------------------
         IF ( .NOT.I_AM_SLAVE ) THEN
 C         -- Master not working
           CALL SMUMPS_SCATTER_RHS(id%NSLAVES,id%N, id%MYID,
-     &      id%COMM,
+     &      id%COMM, LSCAL, SCALING_LOC_FWD(1),
      &      SOLVET, C_Y(1), id%N, 1,
      &      1,
      &      C_DUMMY, 1, 1,
@@ -5745,21 +6513,21 @@ C         -- Master not working
      &      id%ICNTL(1),id%INFO(1))
         ELSE
           IF (SOLVET.EQ.MTYPE) THEN
-C           POSINRHSCOMP_ROW is with respect to the
+C           GLOB2LOC_RHS is with respect to the
 C           original linear system (transposed or not)
-            PTR_POSINRHSCOMP_FWD => id%POSINRHSCOMP_ROW
+            PTR_POSINRHSINTR_FWD => id%GLOB2LOC_RHS
           ELSE
 C           Transposed, use column indices of original
 C           system (ie, col indices of A or A^T)
-            PTR_POSINRHSCOMP_FWD => id%POSINRHSCOMP_COL
+            PTR_POSINRHSINTR_FWD => id%GLOB2LOC_SOL
           ENDIF
           LIW_PASSED = max( LIW, 1 )
           CALL SMUMPS_SCATTER_RHS(id%NSLAVES,id%N, id%MYID,
-     &      id%COMM,
+     &      id%COMM, LSCAL, SCALING_LOC_FWD(1),
      &      SOLVET,  C_Y(1), id%N, 1,
      &      1,
-     &      id%RHSCOMP(IBEG_RHSCOMP), LD_RHSCOMP, 1,
-     &      PTR_POSINRHSCOMP_FWD(1), NB_FS_RHSCOMP_F,
+     &      id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, 1,
+     &      PTR_POSINRHSINTR_FWD(1), NB_FS_RHSINTR_F,
 C
      &      id%PTLUST_S(1), id%KEEP(1), id%KEEP8(1),
      &      id%PROCNODE_STEPS(1),
@@ -5775,11 +6543,11 @@ C
           LIW_PASSED = max( LIW, 1 )
           LA_PASSED = max( LA, 1_8 )
           IF (SOLVET.EQ.MTYPE) THEN
-            PTR_POSINRHSCOMP_FWD => id%POSINRHSCOMP_ROW
-            PTR_POSINRHSCOMP_BWD => id%POSINRHSCOMP_COL
+            PTR_POSINRHSINTR_FWD => id%GLOB2LOC_RHS
+            PTR_POSINRHSINTR_BWD => id%GLOB2LOC_SOL
           ELSE
-            PTR_POSINRHSCOMP_FWD => id%POSINRHSCOMP_COL
-            PTR_POSINRHSCOMP_BWD => id%POSINRHSCOMP_ROW
+            PTR_POSINRHSINTR_FWD => id%GLOB2LOC_SOL
+            PTR_POSINRHSINTR_BWD => id%GLOB2LOC_RHS
           ENDIF
           FROM_PP=.TRUE.
           NBSPARSE_LOC = .FALSE.
@@ -5793,10 +6561,15 @@ C
      & LBUFR_BYTES, id%ISTEP_TO_INIV2(1), id%TAB_POS_IN_PERE(1,1),
 C      Next 3 arguments are not used in this call
      & IBEG_ROOT_DEF,IEND_ROOT_DEF,IROOT_DEF_RHS_COL1, PTR_RHS_ROOT(1),
-     & LPTR_RHS_ROOT, SIZE_ROOT, MASTER_ROOT, id%RHSCOMP(IBEG_RHSCOMP),
-     & LD_RHSCOMP,PTR_POSINRHSCOMP_FWD(1),PTR_POSINRHSCOMP_BWD(1),
+     & LPTR_RHS_ROOT, SIZE_ROOT, MASTER_ROOT, id%RHSINTR(IBEG_RHSINTR),
+     & id%LD_RHSINTR,PTR_POSINRHSINTR_FWD(1),PTR_POSINRHSINTR_BWD(1),
+     & -1, -1,
+     & IDUMMY(1), IDUMMY(1),
      & 1,1,1,1, IDUMMY, 1, JDUMMY, KDUMMY, 1, LDUMMY, 1, MDUMMY, 1,1,
      & NBSPARSE_LOC, PTR_RHS_BOUNDS(1), LPTR_RHS_BOUNDS
+#if defined(STAT_ES_SOLVE)
+     & , IDUMMY, 1, JDUMMY, 1
+#endif
      & , id%IPOOL_B_L0_OMP(1), id%LPOOL_B_L0_OMP, id%IPOOL_A_L0_OMP(1),
      & id%LPOOL_A_L0_OMP, id%L_VIRT_L0_OMP, id%VIRT_L0_OMP(1),
      & id%L_PHYS_L0_OMP, id%PHYS_L0_OMP(1), id%PERM_L0_OMP(1),
@@ -5840,6 +6613,7 @@ C       then necessarily NBRHS_EFF = 1)
 C
 C       === GATHER and SCALE solution ==============
 C
+#if defined(USE_OLD_SCALING)
         IF ((id%MYID.NE.MASTER).OR. .NOT.LSCAL) THEN
           PT_SCALING => Dummy_SCAL
         ELSE
@@ -5849,12 +6623,23 @@ C
             PT_SCALING => id%ROWSCA
           ENDIF
         ENDIF
+#else
+        IF (id%KEEP(89) .EQ. 0 .OR. .NOT. LSCAL) THEN
+          SCALING_LOC_BWD => RDUMMY_TARGET
+        ELSE
+          IF (SOLVET.EQ.1) THEN
+            SCALING_LOC_BWD => id%COLSCA_loc
+          ELSE
+            SCALING_LOC_BWD => id%ROWSCA_loc
+          ENDIF
+        ENDIF
+#endif
         LIW_PASSED = max( LIW, 1 )
 C       Solution computed during SMUMPS_SOL_C has been stored
-C       in id%RHSCOMP and is gathered on the master in C_Y
+C       in id%RHSINTR and is gathered on the master in C_Y
         IF ( .NOT. I_AM_SLAVE ) THEN
 C         I did not participate to computing part of the solution
-C         (id%RHSCOMP not set/allocate) : receive solution, store
+C         (id%RHSINTR not set/allocate) : receive solution, store
 C         it and scale it.
           CALL SMUMPS_GATHER_SOLUTION(id%NSLAVES,id%N,
      &      id%MYID, id%COMM, NBRHS_EFF,
@@ -5863,8 +6648,12 @@ C         it and scale it.
      &      IDUMMY, 1,
      &      id%STEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
      &      CWORK(1), size(CWORK),
+#if defined(USE_OLD_SCALING)
      &      LSCAL, PT_SCALING(1), size(PT_SCALING),
-!     RHSCOMP not on non-working master
+#else
+     &      LSCAL, SCALING_LOC_BWD(1), size(SCALING_LOC_BWD),
+#endif
+!     RHSINTR not on non-working master
      &      C_DUMMY, 1 , 1, IDUMMY, 1,
 !     for sparse permuted RHS on host
      &      PERM_RHS, size(PERM_RHS)
@@ -5878,9 +6667,13 @@ C         it and scale it.
      &      IS(1), LIW_PASSED,
      &      id%STEP(1), BUFR(1), LBUFR, LBUFR_BYTES,
      &      CWORK(1), size(CWORK),
+#if defined(USE_OLD_SCALING)
      &      LSCAL, PT_SCALING(1), size(PT_SCALING),
-     &      id%RHSCOMP(IBEG_RHSCOMP), LD_RHSCOMP, NBRHS_EFF,
-     &      PTR_POSINRHSCOMP_BWD(1), id%N,
+#else
+     &      LSCAL, SCALING_LOC_BWD(1), size(SCALING_LOC_BWD),
+#endif
+     &      id%RHSINTR(IBEG_RHSINTR), id%LD_RHSINTR, NBRHS_EFF,
+     &      PTR_POSINRHSINTR_BWD(1), id%N,
      &      PERM_RHS, size(PERM_RHS)) ! for sparse permuted RHS on host
         ENDIF
         DEALLOCATE( CWORK )

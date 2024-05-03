@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -51,19 +51,22 @@ C***********************************************************************
       RETURN
       END SUBROUTINE MPI_BUFFER_DETACH
       SUBROUTINE MPI_GATHER( SENDBUF, CNT, 
-     &         DATATYPE, RECVBUF, RECCNT, RECTYPE,
+     &         DATATYPE, RECVBUF, RECVCNT, RECTYPE,
      &         ROOT, COMM, IERR )
       IMPLICIT NONE
-      INTEGER CNT, DATATYPE, RECCNT, RECTYPE, ROOT, COMM, IERR
+      INTEGER CNT, DATATYPE, RECVCNT, RECTYPE, ROOT, COMM, IERR
       INTEGER SENDBUF(*), RECVBUF(*)
-      IF ( RECCNT .NE. CNT ) THEN
-        WRITE(*,*) 'ERROR in MPI_GATHER, RECCNT != CNT'
-        STOP
-      ELSE
-        CALL MUMPS_COPY( CNT, SENDBUF, RECVBUF, DATATYPE, IERR )
-        IF ( IERR .NE. 0 ) THEN
-          WRITE(*,*) 'ERROR in MPI_GATHER, DATATYPE=',DATATYPE
+      LOGICAL, EXTERNAL :: MUMPS_IS_IN_PLACE
+      IF (.NOT. MUMPS_IS_IN_PLACE(SENDBUF, CNT)) THEN
+        IF ( RECVCNT .NE. CNT ) THEN
+          WRITE(*,*) 'ERROR in MPI_GATHER, RECVCNT != CNT'
           STOP
+        ELSE
+          CALL MUMPS_COPY( CNT, SENDBUF, RECVBUF, 0, 0, DATATYPE, IERR )
+          IF ( IERR .NE. 0 ) THEN
+            WRITE(*,*) 'ERROR in MPI_GATHER, DATATYPE=',DATATYPE
+            STOP
+          END IF
         END IF
       END IF
       IERR = 0
@@ -71,29 +74,28 @@ C***********************************************************************
       END SUBROUTINE MPI_GATHER
 C***********************************************************************
       SUBROUTINE MPI_GATHERV( SENDBUF, CNT, 
-     &         DATATYPE, RECVBUF, RECCNT, DISPLS, RECTYPE,
+     &         DATATYPE, RECVBUF, RECVCNT, DISPLS, RECTYPE,
      &         ROOT, COMM, IERR )
       IMPLICIT NONE
       INTEGER CNT, DATATYPE, RECTYPE, ROOT, COMM, IERR
-      INTEGER RECCNT(1)
+      INTEGER RECVCNT(1)
       INTEGER SENDBUF(*), RECVBUF(*)
       INTEGER DISPLS(*)
+      LOGICAL, EXTERNAL :: MUMPS_IS_IN_PLACE
 C
-C     Note that DISPLS is ignored in this version. One may
-C     want to copy in reception buffer with a shift DISPLS(1).
-C     This requires passing the offset DISPLS(1) to
-C     "MUMPS_COPY_DATATYPE" routines.
-C
-      IF ( RECCNT(1) .NE. CNT ) THEN
-        WRITE(*,*) 'ERROR in MPI_GATHERV, RECCNT(1) != CNT'
-        STOP
-      ELSE
-        CALL MUMPS_COPY( CNT, SENDBUF, RECVBUF, DATATYPE, IERR )
-        IF ( IERR .NE. 0 ) THEN
-          WRITE(*,*) 'ERROR in MPI_GATHERV, DATATYPE=',DATATYPE
+      IF (.NOT. MUMPS_IS_IN_PLACE(SENDBUF, CNT)) THEN
+        IF ( RECVCNT(1) .NE. CNT ) THEN
+          WRITE(*,*) 'ERROR in MPI_GATHERV, RECVCNT(1) != CNT'
           STOP
+        ELSE
+          CALL MUMPS_COPY( CNT, SENDBUF, RECVBUF, 0, DISPLS(1),
+     &                     DATATYPE, IERR )
+          IF ( IERR .NE. 0 ) THEN
+            WRITE(*,*) 'ERROR in MPI_GATHERV, DATATYPE=',DATATYPE
+            STOP
+          END IF
         END IF
-      END IF
+      ENDIF
       IERR = 0
       RETURN
       END SUBROUTINE MPI_GATHERV
@@ -105,7 +107,7 @@ C***********************************************************************
       INTEGER SENDBUF(*), RECVBUF(*)
       LOGICAL, EXTERNAL :: MUMPS_IS_IN_PLACE
       IF (.NOT. MUMPS_IS_IN_PLACE(SENDBUF, CNT)) THEN
-        CALL MUMPS_COPY( CNT, SENDBUF, RECVBUF, DATATYPE, IERR )
+        CALL MUMPS_COPY( CNT, SENDBUF, RECVBUF, 0, 0, DATATYPE, IERR )
         IF ( IERR .NE. 0 ) THEN
           WRITE(*,*) 'ERROR in MPI_ALLREDUCE, DATATYPE=',DATATYPE
           STOP
@@ -122,7 +124,7 @@ C***********************************************************************
       INTEGER SENDBUF(*), RECVBUF(*)
       LOGICAL, EXTERNAL :: MUMPS_IS_IN_PLACE
       IF (.NOT. MUMPS_IS_IN_PLACE(SENDBUF, CNT)) THEN
-        CALL MUMPS_COPY( CNT, SENDBUF, RECVBUF, DATATYPE, IERR )
+        CALL MUMPS_COPY( CNT, SENDBUF, RECVBUF, 0, 0, DATATYPE, IERR )
         IF ( IERR .NE. 0 ) THEN
           WRITE(*,*) 'ERROR in MPI_REDUCE, DATATYPE=',DATATYPE
           STOP
@@ -132,14 +134,15 @@ C***********************************************************************
       RETURN
       END SUBROUTINE MPI_REDUCE
 C***********************************************************************
-      SUBROUTINE MPI_REDUCE_SCATTER( SENDBUF, RECVBUF, RCVCNT, 
+      SUBROUTINE MPI_REDUCE_SCATTER( SENDBUF, RECVBUF, RECVCNT, 
      &           DATATYPE, OP, COMM, IERR )
       IMPLICIT NONE
-      INTEGER RCVCNT, DATATYPE, OP, COMM, IERR
+      INTEGER RECVCNT, DATATYPE, OP, COMM, IERR
       INTEGER SENDBUF(*), RECVBUF(*)
       LOGICAL, EXTERNAL :: MUMPS_IS_IN_PLACE
-      IF (.NOT. MUMPS_IS_IN_PLACE(SENDBUF, RCVCNT)) THEN
-        CALL MUMPS_COPY( RCVCNT, SENDBUF, RECVBUF, DATATYPE, IERR )
+      IF (.NOT. MUMPS_IS_IN_PLACE(SENDBUF, RECVCNT)) THEN
+        CALL MUMPS_COPY( RECVCNT, SENDBUF, RECVBUF, 0, 0,
+     &                   DATATYPE, IERR )
         IF ( IERR .NE. 0 ) THEN
           WRITE(*,*) 'ERROR in MPI_REDUCE_SCATTER, DATATYPE=',DATATYPE
           STOP
@@ -161,23 +164,56 @@ C***********************************************************************
       IMPLICIT NONE
       INTEGER SENDCNT, SENDTYPE, RECVCNT, RECVTYPE, COMM, IERR
       INTEGER SENDBUF(*), RECVBUF(*)
-      IF ( RECVCNT .NE. SENDCNT ) THEN
-        WRITE(*,*) 'ERROR in MPI_ALLTOALL, RECVCNT != SENDCNT'
-        STOP
-      ELSE IF ( RECVTYPE .NE. SENDTYPE ) THEN
-        WRITE(*,*) 'ERROR in MPI_ALLTOALL, RECVTYPE != SENDTYPE'
-        STOP
-      ELSE
-        CALL MUMPS_COPY( SENDCNT, SENDBUF, RECVBUF, SENDTYPE, IERR )
-        IF ( IERR .NE. 0 ) THEN
-          WRITE(*,*) 'ERROR in MPI_ALLTOALL, SENDTYPE=',SENDTYPE
+      LOGICAL, EXTERNAL :: MUMPS_IS_IN_PLACE
+      IF (.NOT. MUMPS_IS_IN_PLACE(SENDBUF, RECVCNT)) THEN
+        IF ( RECVCNT .NE. SENDCNT ) THEN
+          WRITE(*,*) 'ERROR in MPI_ALLTOALL, RECVCNT != SENDCNT'
           STOP
+        ELSE IF ( RECVTYPE .NE. SENDTYPE ) THEN
+          WRITE(*,*) 'ERROR in MPI_ALLTOALL, RECVTYPE != SENDTYPE'
+          STOP
+        ELSE
+          CALL MUMPS_COPY( SENDCNT, SENDBUF, RECVBUF,
+     &                     0, 0, SENDTYPE, IERR )
+          IF ( IERR .NE. 0 ) THEN
+            WRITE(*,*) 'ERROR in MPI_ALLTOALL, SENDTYPE=',SENDTYPE
+            STOP
+          END IF
         END IF
-      END IF
+      ENDIF
       IERR = 0
       RETURN
       END SUBROUTINE MPI_ALLTOALL
 C***********************************************************************
+      SUBROUTINE MPI_ALLTOALLV( SENDBUF, SENDCNT, SDISPLS, SENDTYPE, 
+     &                         RECVBUF, RECVCNT, RDISPLS, RECVTYPE, 
+     &                         COMM, IERR)
+
+      IMPLICIT NONE
+      INTEGER SENDCNT, SENDTYPE, RECVCNT, RECVTYPE, COMM, IERR
+      INTEGER SENDBUF(*), RECVBUF(*), SDISPLS(*), RDISPLS(*)
+      LOGICAL, EXTERNAL :: MUMPS_IS_IN_PLACE
+      IF (.NOT. MUMPS_IS_IN_PLACE(SENDBUF, RECVCNT)) THEN
+        IF ( RECVCNT .NE. SENDCNT ) THEN
+          WRITE(*,*) 'ERROR in MPI_ALLTOALLV, RECVCNT != SENDCNT'
+          STOP
+        ELSE IF ( RECVTYPE .NE. SENDTYPE ) THEN
+          WRITE(*,*) 'ERROR in MPI_ALLTOALLV, RECVTYPE != SENDTYPE'
+          STOP
+        ELSE
+          CALL MUMPS_COPY( SENDCNT, SENDBUF, RECVBUF,
+     &                     SDISPLS(1), RDISPLS(1), SENDTYPE, IERR )
+          IF ( IERR .NE. 0 ) THEN
+            WRITE(*,*) 'ERROR in MPI_ALLTOALL, SENDTYPE=',SENDTYPE
+            STOP
+          END IF
+        END IF
+      ENDIF
+      IERR = 0
+      RETURN
+      END SUBROUTINE MPI_ALLTOALLV
+C***********************************************************************
+
       SUBROUTINE MPI_ATTR_PUT( COMM, KEY, VAL, IERR )
       IMPLICIT NONE
       INTEGER COMM, KEY, VAL, IERR
@@ -501,6 +537,17 @@ C***********************************************************************
       RETURN
       END SUBROUTINE MPI_TEST
 C***********************************************************************
+      SUBROUTINE MPI_TESTANY( CNT, IREQARRAY, IND, FLAG, STATUS, IERR)
+      IMPLICIT NONE
+      INCLUDE 'mpif.h'
+      LOGICAL FLAG
+      INTEGER IND, IERR, CNT
+      INTEGER IREQARRAY(IND), STATUS(MPI_STATUS_SIZE)
+      FLAG=.FALSE.
+      IERR=0
+      RETURN
+      END SUBROUTINE MPI_TESTANY
+C***********************************************************************
       SUBROUTINE MPI_UNPACK( INBUF, INSIZE, POSITION, OUTBUF, OUTCNT,
      &           DATATYPE, COMM, IERR )
       IMPLICIT NONE
@@ -613,30 +660,32 @@ C  Utilities to copy data
 C
 C***********************************************************************
 
-      SUBROUTINE MUMPS_COPY( CNT, SENDBUF, RECVBUF, DATATYPE, IERR )
+      SUBROUTINE MUMPS_COPY( CNT, SENDBUF, RECVBUF, SS, RS,
+     &                       DATATYPE, IERR )
       IMPLICIT NONE
       INCLUDE 'mpif.h'
-      INTEGER CNT, DATATYPE, IERR
+C     SS/RS: shift for SENDBUF/RECVBUF
+      INTEGER CNT, DATATYPE, IERR, SS, RS
       INTEGER SENDBUF(*), RECVBUF(*)
       IF ( DATATYPE .EQ. MPI_INTEGER ) THEN
-         CALL MUMPS_COPY_INTEGER( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_INTEGER( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSEIF ( DATATYPE .EQ. MPI_LOGICAL ) THEN
-         CALL MUMPS_COPY_LOGICAL( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_LOGICAL( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSE IF ( DATATYPE .EQ. MPI_REAL ) THEN
-         CALL MUMPS_COPY_REAL( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_REAL( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSE IF ( DATATYPE .EQ. MPI_DOUBLE_PRECISION .OR.
      &        DATATYPE .EQ. MPI_REAL8 ) THEN
-         CALL MUMPS_COPY_DOUBLE_PRECISION( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_DOUBLE_PRECISION( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSE IF ( DATATYPE .EQ. MPI_COMPLEX ) THEN
-         CALL MUMPS_COPY_COMPLEX( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_COMPLEX( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSE IF ( DATATYPE .EQ. MPI_DOUBLE_COMPLEX ) THEN
-         CALL MUMPS_COPY_DOUBLE_COMPLEX( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_DOUBLE_COMPLEX( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSE IF ( DATATYPE .EQ. MPI_2DOUBLE_PRECISION) THEN
-         CALL MUMPS_COPY_2DOUBLE_PRECISION( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_2DOUBLE_PRECISION( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSE IF ( DATATYPE .EQ. MPI_2INTEGER) THEN
-         CALL MUMPS_COPY_2INTEGER( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_2INTEGER( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSE IF ( DATATYPE .EQ. MPI_INTEGER8) THEN
-        CALL MUMPS_COPY_INTEGER8( SENDBUF, RECVBUF, CNT )
+      CALL MUMPS_COPY_INTEGER8( SENDBUF, RECVBUF, CNT, SS, RS )
       ELSE
         IERR=1
         RETURN
@@ -645,101 +694,101 @@ C***********************************************************************
       RETURN
       END SUBROUTINE MUMPS_COPY
 
-      SUBROUTINE MUMPS_COPY_INTEGER( S, R, N )
+      SUBROUTINE MUMPS_COPY_INTEGER( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
       INTEGER S(N),R(N)
       INTEGER I
       DO I = 1, N
-        R(I) = S(I)
+        R(I+RS) = S(I+SS)
       END DO
       RETURN
       END SUBROUTINE MUMPS_COPY_INTEGER
-      SUBROUTINE MUMPS_COPY_INTEGER8( S, R, N )
+      SUBROUTINE MUMPS_COPY_INTEGER8( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
       INTEGER(8) S(N),R(N)
       INTEGER I
       DO I = 1, N
-        R(I) = S(I)
+        R(I+RS) = S(I+SS)
       END DO
       RETURN
       END SUBROUTINE MUMPS_COPY_INTEGER8
-      SUBROUTINE MUMPS_COPY_LOGICAL( S, R, N )
+      SUBROUTINE MUMPS_COPY_LOGICAL( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
       LOGICAL S(N),R(N)
       INTEGER I
       DO I = 1, N
-        R(I) = S(I)
+        R(I+RS) = S(I+SS)
       END DO
       RETURN
       END
-      SUBROUTINE MUMPS_COPY_2INTEGER( S, R, N )
+      SUBROUTINE MUMPS_COPY_2INTEGER( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
       INTEGER S(N+N),R(N+N)
       INTEGER I
       DO I = 1, N+N
-        R(I) = S(I)
+        R(I+RS+RS) = S(I+SS+SS)
       END DO
       RETURN
       END SUBROUTINE MUMPS_COPY_2INTEGER
-      SUBROUTINE MUMPS_COPY_REAL( S, R, N )
+      SUBROUTINE MUMPS_COPY_REAL( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
       REAL S(N),R(N)
       INTEGER I
       DO I = 1, N
-        R(I) = S(I)
+        R(I+RS) = S(I+SS)
       END DO
       RETURN
       END
-      SUBROUTINE MUMPS_COPY_2DOUBLE_PRECISION( S, R, N )
+      SUBROUTINE MUMPS_COPY_2DOUBLE_PRECISION( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
       DOUBLE PRECISION S(N+N),R(N+N)
       INTEGER I
       DO I = 1, N+N
-        R(I) = S(I)
+        R(I+RS+RS) = S(I+SS+SS)
       END DO
       RETURN
       END SUBROUTINE MUMPS_COPY_2DOUBLE_PRECISION
-      SUBROUTINE MUMPS_COPY_DOUBLE_PRECISION( S, R, N )
+      SUBROUTINE MUMPS_COPY_DOUBLE_PRECISION( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
       DOUBLE PRECISION S(N),R(N)
       INTEGER I
       DO I = 1, N
-        R(I) = S(I)
+        R(I+RS) = S(I+SS)
       END DO
       RETURN
       END
-      SUBROUTINE MUMPS_COPY_COMPLEX( S, R, N )
+      SUBROUTINE MUMPS_COPY_COMPLEX( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
       COMPLEX S(N),R(N)
       INTEGER I
       DO I = 1, N
-        R(I) = S(I)
+        R(I+RS) = S(I+SS)
       END DO
       RETURN
       END SUBROUTINE MUMPS_COPY_COMPLEX
-      SUBROUTINE MUMPS_COPY_DOUBLE_COMPLEX( S, R, N )
+      SUBROUTINE MUMPS_COPY_DOUBLE_COMPLEX( S, R, N, SS, RS )
       IMPLICIT NONE
-      INTEGER N
+      INTEGER N, SS, RS
 C     DOUBLE COMPLEX S(N),R(N)
       COMPLEX(kind=kind(0.0D0)) :: S(N),R(N)
       INTEGER I
       DO I = 1, N
-        R(I) = S(I)
+        R(I+RS) = S(I+SS)
       END DO
       RETURN
       END
       LOGICAL FUNCTION MUMPS_IS_IN_PLACE( SENDBUF, CNT )
       INTEGER SENDBUF(*), CNT
       INCLUDE 'mpif.h'
-      INTEGER :: I
+      INTEGER(8) :: I
 C     Check address using C code
       MUMPS_IS_IN_PLACE = .FALSE.
       IF ( CNT .GT. 0 ) THEN
@@ -1653,4 +1702,16 @@ C***********************************************************************
         STOP
       RETURN
       END SUBROUTINE descset
+      SUBROUTINE MPI_COMM_CREATE_ERRHANDLER(COMM_ERRHANDLER_FN,
+     & ERRHANDLER, IERROR)
+      IMPLICIT NONE
+      EXTERNAL COMM_ERRHANDLER_FN
+      INTEGER ERRHANDLER, IERROR
+      RETURN
+      END SUBROUTINE MPI_COMM_CREATE_ERRHANDLER
+      SUBROUTINE MPI_ERRHANDLER_FREE(ERRHANDLER, IERROR)
+      IMPLICIT NONE
+      INTEGER ERRHANDLER, IERROR
+      RETURN
+      END SUBROUTINE MPI_ERRHANDLER_FREE
 

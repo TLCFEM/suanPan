@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -143,7 +143,7 @@ C
       LAFAC  = -9999_8  
       XSIZE      = KEEP(IXSZ)
       NFRONT     = IW(IOLDPS+XSIZE)
-      NASS       = iabs(IW(IOLDPS+2+XSIZE))
+      NASS       = abs(IW(IOLDPS+2+XSIZE))
       IW(IOLDPS+3+XSIZE) =  -99999
       LR_ACTIVATED = .FALSE.        
       COMPRESS_PANEL = .FALSE.
@@ -257,7 +257,8 @@ C
      &        NFRONT-NASS, LRGROUPS, NPARTSCB, 
      &        NPARTSASS, BEGS_BLR)
          CALL REGROUPING2(BEGS_BLR, NPARTSASS, NASS, NPARTSCB,
-     &        NFRONT-NASS, KEEP(488), .FALSE., KEEP(472))     
+     &        NFRONT-NASS, KEEP(488), .FALSE., KEEP(472), 
+     &        NFRONT, KEEP(1))     
          NB_BLR = NPARTSASS + NPARTSCB
          call MAX_CLUSTER(BEGS_BLR,NB_BLR,MAXI_CLUSTER)
          MAXI_RANK = KEEP(479)*MAXI_CLUSTER

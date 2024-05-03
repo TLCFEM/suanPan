@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.0, released
+C  on Tue Apr 23 10:25:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -21,7 +21,9 @@ C
       USE MUMPS_MEMORY_MOD
       USE SMUMPS_STRUC_DEF
       USE SMUMPS_STATIC_PTR_M ! For Schur pointer
+#if ! defined(NO_SAVE_RESTORE)
       USE SMUMPS_SAVE_RESTORE
+#endif
 C      
 !$    USE OMP_LIB
 C
@@ -345,6 +347,14 @@ C
 * Values 4, 5, 6 for the parameter JOB can invoke combinations
 * of the three basic operations corresponding to JOB=1, 2 or 3.
 * 
+* JOB = -4 : frees all data structures from the factorization
+* while keeping data structures from the analysis. Can be
+* followed by a JOB = 2 call.
+*
+#if ! defined(NO_SAVE_RESTORE)
+* JOB = -3, 7, 8 : save and restore feature, see userguide
+#endif
+* JOB = 9 : provide suggested data distribution for IRHS_LOC
 C
 *********
 C     --------------------------------------
@@ -584,7 +594,7 @@ C
 !$    INTEGER NOMP, NOMPMIN, NOMPMAX
       INTEGER I, J, MP, LP, MPG, KEEP235SAVE, KEEP242SAVE,
      &        KEEP243SAVE, KEEP495SAVE, KEEP497SAVE,
-     &        KEEP77SAVE, KEEP83SAVE, KEEP91SAVE
+     &        KEEP77SAVE, KEEP78SAVE, KEEP83SAVE, KEEP91SAVE
       INTEGER(8) :: I8
       LOGICAL LANA, LFACTO, LSOLVE, PROK, LPOK, FLAG, PROKG
       LOGICAL NOERRORBEFOREPERM
@@ -599,7 +609,9 @@ C     Local copy of JOB
       INTEGER, DIMENSION(:), ALLOCATABLE :: UNS_PERM_INV
 C     TIMINGS
       DOUBLE PRECISION TIMEG, TIMETOTAL
+#if ! defined(NO_SAVE_RESTORE)
       INTEGER(8) :: FILE_SIZE,STRUC_SIZE
+#endif
       INTEGER:: ICNTL16_LOC
 !$    INTEGER:: PREVIOUS_OMP_THREADS_NUM
       IF (id%JOB .EQ. -200) THEN
@@ -613,12 +625,14 @@ C       JOB=-200 to just suppress the existing OOC files (if any)
 C       before terminating the application and killing all
 C       processes. No checks are performed in this case,
 C       data is not freed and MPI should not be called
-C       (since MPI might no longer work)
+C       (since MPI might no longer work). In particular, there is
+C       no check that the value of JOB is the same on all the
+C       calling MPI processes.
         CALL SMUMPS_OOC_CLEAN_FILES(id,IERR)
         RETURN
       ENDIF
       NOERRORBEFOREPERM = .FALSE.
-      UNS_PERM_DONE = .FALSE.
+      UNS_PERM_DONE     = .FALSE.
       LANA  = .FALSE.
       LFACTO = .FALSE.
       LSOLVE = .FALSE.
@@ -627,6 +641,14 @@ C
 C     Initialize error return codes to 0.
       id%INFO(1) = 0
       id%INFO(2) = 0
+C
+C     Default setting for printing, before ICNTL(1:4) are initialized
+      LP = 6
+      MP = 0
+      MPG = 0
+      LPOK  = .TRUE.
+      PROK  = .FALSE.
+      PROKG = .FALSE.
 C     -----------------------------------
 C     Check that MPI has been initialized
 C     -----------------------------------
@@ -636,7 +658,9 @@ C     -----------------------------------
         id%INFO(2) =   0
         id%INFOG(1) = -23
         id%INFOG(2) =   0
-        WRITE(6,990)
+C       JOB=-1: LPOK is true and LP=6 (see
+C       above) because not set yet by the user
+        IF (LPOK) WRITE(LP,990)
  990  FORMAT(' Unrecoverable Error in SMUMPS initialization: ',
      &       ' MPI is not running.')
         RETURN               
@@ -646,16 +670,8 @@ C     Duplicate user communicator
 C     to avoid communications not
 C     related to SMUMPS
 C     ---------------------------
-       COMM_SAVE = id%COMM
-       CALL MPI_COMM_DUP( COMM_SAVE, id%COMM, IERR )
-C
-C     Default setting for printing
-      LP = 6
-      MP = 0
-      MPG = 0
-      LPOK  = .TRUE.
-      PROK  = .FALSE.
-      PROKG = .FALSE.
+      COMM_SAVE = id%COMM
+      CALL MPI_COMM_DUP( COMM_SAVE, id%COMM, IERR )
       ICNTL16_LOC = 0
 C     -------------------------
 C     Check if value of JOB is
@@ -673,7 +689,11 @@ C     -------------------------
 C   
 C     Check value of JOB and previous value of JOB
 C
+#if ! defined(NO_SAVE_RESTORE)
       IF ((JOB.LT.-3.OR.JOB.EQ.0.OR.JOB.GT.8)
+#else
+      IF ((JOB.LT.-2.OR.JOB.EQ.0.OR.JOB.GT.6) 
+#endif
      &    .AND. JOB.NE.9
      &    .AND. JOB.NE.-4
      &  ) THEN
@@ -695,6 +715,7 @@ C      Warning: non initialized value
         GOTO 499
        END IF
       END IF
+#if ! defined(NO_SAVE_RESTORE)
       IF(JOB.NE.-1) THEN
 C     Always allow JOB=-1
          IF((JOB.GT.-2).AND.(id%KEEP(140).EQ.1)) then
@@ -705,6 +726,7 @@ C     are -2 or -3
             GOTO 499
          END IF
       ENDIF
+#endif
 C     ----------------------------------
 C     Initialize, LANA, LFACTO, LSOLVE
 C     LANA indicates if analysis must be performed
@@ -730,6 +752,7 @@ C       Value defined on MASTER is the reference
      &         IERR )
         IF (LANA) THEN
            KEEP77SAVE = id%KEEP(77)
+           KEEP78SAVE = id%KEEP(78)
            KEEP83SAVE = id%KEEP(83)
            KEEP91SAVE = id%KEEP(91)
            id%KEEP(198) = 0
@@ -786,9 +809,11 @@ C       and factorization:
       ENDIF
 C
       IF (JOB.EQ.-2.OR.JOB.EQ.1.OR.JOB.EQ.2.OR.JOB.EQ.3.OR.
-     &    JOB.EQ.4.OR.JOB.EQ.5.OR.JOB.EQ.6
+     &    JOB.EQ.4.OR.JOB.EQ.5.OR.JOB.EQ.6.OR.JOB.EQ.-4
+#if ! defined(NO_SAVE_RESTORE)
      &     .OR.JOB.EQ.7.OR.JOB.EQ.8.OR.JOB.EQ.-3
-     *     .OR. JOB.EQ.9 ! LATER .OR.JOB.EQ.10
+#endif
+     &     .OR. JOB.EQ.9 
      &     ) THEN
 C       Value of JOB is correct and differnet from -1
 C       ICNTL should have been initialized and can be used
@@ -803,6 +828,10 @@ C       ICNTL should have been initialized and can be used
           FROM_C_INTERFACE_STRING=" from C interface"
         ELSE
           FROM_C_INTERFACE_STRING=" "
+C         and KEEP8(83) to the ddress of ICNTL(50)
+C         Set KEEP8(84) to the address of RINFO(3)
+          CALL MUMPS_ADDR_C( id%ICNTL(50), id%KEEP8(83) )
+          CALL MUMPS_ADDR_C( id%RINFO (3), id%KEEP8(84) )
         ENDIF
 C       -----------------------------
 C       Set the number of threads if required.
@@ -832,10 +861,14 @@ C       -----------------------------
         IF (PROKG) THEN
 C          Print basic information on MUMPS call
            IF (JOB .EQ. -2
+#            if ! defined(NO_SAVE_RESTORE)
      &       .OR. JOB .EQ. 8
+#            endif
      &       ) THEN
 C            N, NELT, NNZ not meaningful
+#            if ! defined(NO_SAVE_RESTORE)
 C            or not defined yet (JOB=8).
+#            endif
              WRITE(MPG,'(/A,A,A,A,I4)') 
      &               'Entering SMUMPS ',
      &               trim(adjustl(id%VERSION_NUMBER)),
@@ -885,11 +918,6 @@ C          MPI and OpenMP information
 99996       FORMAT(/'Advanced settings:'/
      &       '   KEEP(370) Static mapping              =',I10/
      &       '   KEEP(371) Advanced optimizations      =',I10)
-            IF (id%KEEP(401) .GE. 1) THEN
-              WRITE(MPG, 99997) id%KEEP(401)
-            ENDIF
-99997       FORMAT('L0 thread based multithreading setting:'/
-     &       '   KEEP(401) (>=1 : ON)                  =',I10)
             WRITE(MPG, '(A)')
           ENDIF
         ENDIF
@@ -908,18 +936,18 @@ C
 C       ------------------------------------------
 C       Check that we have called (JOB=-2), ie
 C       that the previous JOB is not 1 2 or 3,
+C       or even -1
 C       before calling the initialization routine.
 C       --------------------------------------------
         id%INFO(1)=0
         id%INFO(2)=0
         OLDJOB = id%KEEP( 40 ) + 456789
-        IF ( OLDJOB .EQ. 1 .OR.
+        IF ( OLDJOB .EQ. -1 .OR.
+     &       OLDJOB .EQ. 1 .OR.
      &       OLDJOB .EQ. 2 .OR.
      &       OLDJOB .EQ. 3  ) THEN
-          IF ( id%N > 0 ) THEN
            id%INFO(1)=-3
            id%INFO(2)=JOB
-          ENDIF
         ENDIF
 C       Initialize id%MYID now because it is
 C       required by MUMPS_PROPINFO. id%MYID
@@ -976,6 +1004,7 @@ C
         id%DKEEP(70)=0.0E0
         CALL MUMPS_SECDEB(TIMETOTAL)
       ENDIF
+#if ! defined(NO_SAVE_RESTORE)
 C
 C----------------------------------------------------------------
 C
@@ -1046,6 +1075,7 @@ C
         IF ( id%INFO(1) .LT. 0 ) GOTO 499
         GOTO 500
       ENDIF
+#endif
 C----------------------------------------------------------------
 C
 C     JOB =  9 : fill IRHS_loc
@@ -1076,10 +1106,12 @@ C       Allowed if last factorization failed, i.e. OLDJOB=1
           CALL SMUMPS_FREE_DATA_FACTO(id)
 C         Reset last successful phase
           OLDJOB=min(OLDJOB, 1)
+          id%KEEP(40) = OLDJOB - 456789
         ENDIF
         IF ( id%INFO(1) .LT .0 ) GOTO 499
         GOTO 500
       ENDIF
+C
 C
 C----------------------------------------------------------------
 C
@@ -1168,7 +1200,6 @@ C      refinement and error analysis)
 C     ------------------------------------------
 #if ! defined (LARGEMATRICES)
       NOERRORBEFOREPERM =.TRUE.
-      UNS_PERM_DONE=.FALSE.
       IF (id%MYID .eq. MASTER .AND. id%KEEP(23) .NE. 0) THEN
         IF ( id%JOB .EQ. 2 .OR. id%JOB .EQ. 5 .OR.
      &       (id%JOB .EQ. 3 .AND. (id%ICNTL(10) .NE.0 .OR.
@@ -1238,10 +1269,10 @@ C       ----------------------------
 C
         IF (id%MYID.EQ.MASTER) THEN
 C         Check N, [N]NZ, NELT
-          IF ((id%N.LE.0).OR.((id%N+id%N+id%N)/3.NE.id%N)) THEN
-             id%INFO(1) = -16
-             id%INFO(2) = id%N
-             GOTO 100
+          IF (id%N.LE.0) THEN
+            id%INFO(1) = -16
+            id%INFO(2) = id%N
+            GOTO 100
           END IF
           IF (id%ICNTL(5).NE.1) THEN
 C           Assembled input
@@ -1419,8 +1450,27 @@ C       ANALYSIS PHASE:
         CALL SMUMPS_ANA_DRIVER( id )
 C       restore values
         id%KEEP(77) =  KEEP77SAVE 
+        id%KEEP(78) =  KEEP78SAVE 
         id%KEEP(83) =  KEEP83SAVE
         id%KEEP(91) =  KEEP91SAVE
+#if ! defined(LARGEMATRICES)
+        IF (id%MYID .eq. MASTER .AND. id%KEEP(23) .NE. 0) THEN
+         IF (.not.associated(id%UNS_PERM)) THEN
+C         I may happen 
+C           (for ex in case of error -7 during analysis:
+C           UNS_PERM can be not associated, 
+C           KEEP(23) was set to to automatic choice(=7) and
+C           an error of memory allocation occurs during analysis
+C           before having decided value of KEEP(23))
+C         UNS_PERM not associated and KEEP(23).NE.0
+C         Permuting JCN back does not make sense and KEEP(23) 
+C         should be reset to zero
+          id%KEEP(23) = 0
+         ELSE
+          UNS_PERM_DONE = .TRUE.
+         ENDIF
+        ENDIF
+#endif
 C
 C Check and save scaling option in INFOG(33)
         IF (id%MYID .eq. MASTER) THEN
@@ -1482,6 +1532,7 @@ C
 C-
 C-------------------------------------------------------
       IF ( LFACTO ) THEN
+C{
          IF (id%MYID .eq. MASTER) THEN
             id%DKEEP(91)=0.0E0
             CALL MUMPS_SECDEB(TIMEG)
@@ -1794,13 +1845,18 @@ C
              CALL SMUMPS_CHECK_DENSE_RHS
      &       (id%RHS,id%INFO,id%N,id%NRHS,id%LRHS)
 C            Sets KEEP(221) and do some checks
-             CALL SMUMPS_SET_K221(id)
-             CALL SMUMPS_CHECK_REDRHS(id)
+C            in case of Schur check if reduced RHS 
+C            requested
+              CALL SMUMPS_SET_K221(id,.FALSE.)
+             CALL SMUMPS_CHECK_K221andREDRHS(id)
           ENDIF
  200      CONTINUE
         END IF        ! End of IF (MYID .eq. MASTER)
 C       KEEP(221) was set in SMUMPS_SET_K221 but not broadcast
         CALL MPI_BCAST( id%KEEP(221), 1, MPI_INTEGER, MASTER, id%COMM,
+     &       IERR )
+C       broadcast RR option 
+        CALL MPI_BCAST( id%KEEP(19), 1, MPI_INTEGER, MASTER, id%COMM,
      &       IERR )
 C
 C       Check distributed matrices on all processors.
@@ -1969,6 +2025,7 @@ C
 C       Update last successful step
 C
         id%KEEP(40) = 2 - 456789
+C}
       END IF
 C-------------------------------------------------------
 C-
@@ -2082,26 +2139,13 @@ C       done (no iterative refinement/
 C       error analysis), then we do not
 C       permute JCN back.
 C       -------------------------------
-        IF (id%JOB .NE. 3 .OR. UNS_PERM_DONE) THEN
-         IF (.not.associated(id%UNS_PERM)) THEN
-C         I may happen 
-C           (for ex in case of error -7 during analysis:
-C           UNS_PERM can be not associated, 
-C           KEEP(23) was set to to automatic choice(=7) and
-C           an error of memory allocation occurs during analysis
-C           before having decided value of KEEP(23))
-C         UNS_PERM not associated and KEEP(23).NE.0
-C         Permuting JCN back does not make sense and KEEP(23) 
-C         should be reset to zero
-          id%KEEP(23) = 0
-         ELSE
+        IF (UNS_PERM_DONE) THEN
            DO I8 = 1_8, id%KEEP8(28)
             J=id%JCN(I8)
 C           -- skip out-of range (that are ignored in ANA_O)
             IF (J.LE.0.OR.J.GT.id%N) CYCLE
             id%JCN(I8)=id%UNS_PERM(J)
            END DO
-          ENDIF
         END IF
       END IF
 #endif
@@ -2131,6 +2175,7 @@ C     the next time MUMPS is entered through its C interface.
 C     ------------------------------------------------------------
       NULLIFY(id%SCHUR_CINTERFACE)
 C
+#if ! defined(NO_SAVE_RESTORE)
 *=======================
 * Compute space for save
 *=======================
@@ -2147,6 +2192,7 @@ C
          id%RINFOG(17)=REAL(id%KEEP8(57))/1E6
          id%RINFOG(18)=REAL(id%KEEP8(58))/1E6
       ENDIF
+#endif
 !$    IF (ICNTL16_LOC .GT. 0) THEN
 #if defined(WORKAROUNDINTELILP64OPENMPLIMITATION)
 !$      CALL omp_set_num_threads(int(PREVIOUS_OMP_THREADS_NUM,4))
@@ -2168,8 +2214,8 @@ C
 C     -------------------------
 C     Restore user communicator
 C     -------------------------
-       CALL MPI_COMM_FREE( id%COMM, IERR )
-       id%COMM = COMM_SAVE
+      CALL MPI_COMM_FREE( id%COMM, IERR )
+      id%COMM = COMM_SAVE
       RETURN
 *
 99995 FORMAT (' ** ERROR RETURN ** FROM SMUMPS INFO(1)=', I5)
@@ -2242,7 +2288,7 @@ C        INFOG(2) = MYID
         CALL MPI_BCAST( INFOG(2), 1, MPI_INTEGER, ROOT, COMM, IERR )
       END IF
 C
-C    Make INFOG available on all procs:
+C     Make INFOG available on all procs:
 C
       CALL MPI_BCAST(INFOG(3), SIZE_INFOG-2, MPI_INTEGER,
      &               MASTER, COMM, IERR )
@@ -2279,12 +2325,12 @@ C--------------------------------------------------------------------
             WRITE (LP,991) ICNTL(5),ICNTL(6),ICNTL(7),ICNTL(12),
      &          ICNTL(13),
      &          ICNTL(15),
-     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(48),ICNTL(58)
            ELSE
             WRITE (LP,891) ICNTL(5),ICNTL(6),ICNTL(7),
      &          ICNTL(13),
      &          ICNTL(15),
-     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(48),ICNTL(58)
            ENDIF
            IF ((ICNTL(6).EQ.5).OR.(ICNTL(6).EQ.6).OR.
      &          (ICNTL(12).NE.1) )  THEN
@@ -2293,6 +2339,7 @@ C--------------------------------------------------------------------
            IF (id%ICNTL(19).NE.0)
      &      WRITE(LP,998) id%SIZE_SCHUR
            WRITE (LP,993) ICNTL(14)
+           WRITE (LP,996) ICNTL(56)
          CASE(2);
            WRITE (LP,980) 
            WRITE (LP,981) CNTL(1), CNTL(3), CNTL(4), CNTL(5), CNTL(7)
@@ -2301,21 +2348,34 @@ C--------------------------------------------------------------------
            WRITE (LP,993) ICNTL(14) 
            WRITE (LP,923) ICNTL(24), ICNTL(31), ICNTL(32), ICNTL(33),
      &                    ICNTL(35), ICNTL(36), ICNTL(49)
+           WRITE (LP,996) ICNTL(56)
          CASE(3);
            WRITE (LP,980)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
            WRITE (LP,995)
-     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21)
+     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21),ICNTL(26)
          CASE(4);
            WRITE (LP,980) 
            WRITE (LP,981) CNTL(1), CNTL(3), CNTL(4), CNTL(5), CNTL(7)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
+           IF (id%SYM.EQ.2) THEN
+            WRITE (LP,991) ICNTL(5),ICNTL(6),ICNTL(7),ICNTL(12),
+     &          ICNTL(13),
+     &          ICNTL(15),
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(48),ICNTL(58)
+           ELSE
+            WRITE (LP,891) ICNTL(5),ICNTL(6),ICNTL(7),
+     &          ICNTL(13),
+     &          ICNTL(15),
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(48),ICNTL(58)
+           ENDIF
            WRITE (LP,992) ICNTL(8)
            IF (id%ICNTL(19).NE.0)
      &      WRITE(LP,998) id%SIZE_SCHUR
            WRITE (LP,993) ICNTL(14)
            WRITE (LP,923) ICNTL(24), ICNTL(31), ICNTL(32), ICNTL(33),
      &                    ICNTL(35), ICNTL(36), ICNTL(49)
+           WRITE (LP,996) ICNTL(56)
          CASE(5);
            WRITE (LP,980) 
            WRITE (LP,981) CNTL(1), CNTL(3), CNTL(4), CNTL(5), CNTL(7)
@@ -2324,19 +2384,20 @@ C--------------------------------------------------------------------
             WRITE (LP,991) ICNTL(5),ICNTL(6),ICNTL(7),ICNTL(12),
      &          ICNTL(13),
      &          ICNTL(15),
-     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(48),ICNTL(58)
            ELSE
             WRITE (LP,891) ICNTL(5),ICNTL(6),ICNTL(7),
      &          ICNTL(13),
      &          ICNTL(15),
-     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(48),ICNTL(58)
            ENDIF
            WRITE (LP,992) ICNTL(8)
            WRITE (LP,993) ICNTL(14)
            WRITE (LP,995)
-     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21)
+     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21),ICNTL(26)
            WRITE (LP,923) ICNTL(24), ICNTL(31), ICNTL(32), ICNTL(33),
      &                    ICNTL(35), ICNTL(36), ICNTL(49)
+           WRITE (LP,996) ICNTL(56)
          CASE(6);
            WRITE (LP,980)
            WRITE (LP,981) CNTL(1), CNTL(3), CNTL(4), CNTL(5), CNTL(7)
@@ -2345,27 +2406,28 @@ C--------------------------------------------------------------------
             WRITE (LP,991) ICNTL(5),ICNTL(6),ICNTL(7),ICNTL(12),
      &          ICNTL(13),
      &          ICNTL(15),
-     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(48),ICNTL(58)
            ELSE
             WRITE (LP,891) ICNTL(5),ICNTL(6),ICNTL(7),
      &          ICNTL(13),
      &          ICNTL(15),
-     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(58)
+     &          ICNTL(18),ICNTL(19),ICNTL(22),ICNTL(48),ICNTL(58)
            ENDIF
            IF (id%ICNTL(19).NE.0)
      &      WRITE(LP,998) id%SIZE_SCHUR
            WRITE (LP,992) ICNTL(8)
            WRITE (LP,995)
-     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21)
+     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21), ICNTL(26)
            WRITE (LP,993) ICNTL(14)
            WRITE (LP,923) ICNTL(24), ICNTL(31), ICNTL(32), ICNTL(33),
      &                    ICNTL(35), ICNTL(36), ICNTL(49)
+           WRITE (LP,996) ICNTL(56)
         END SELECT
       ENDIF
  980  FORMAT (/'***********CONTROL PARAMETERS (ICNTL)**************'/)
  981  FORMAT (
      &     ' CNTL(1)   Threshold for numerical pivoting        =',D16.4/
-     &     ' CNTL(3)   Null pivot detection threshold          =',D16.4/
+     &     ' CNTL(3)   Threshold to detect singularities       =',D16.4/
      &     ' CNTL(4)   Threshold for static pivoting           =',D16.4/
      &     ' CNTL(5)   Fixation for null pivots                =',D16.4/
      &     ' CNTL(7)   Dropping threshold for BLR compression  =',D16.4)
@@ -2375,25 +2437,27 @@ C--------------------------------------------------------------------
      &     'ICNTL(3)   Output stream for global information    =',I10/
      &     'ICNTL(4)   Level of printing                       =',I10)
  991  FORMAT (
-     &     'ICNTL(5)   Matrix format  ( keep(55) )             =',I10/
-     &     'ICNTL(6)   Maximum transversal  ( keep(23) )       =',I10/
+     &     'ICNTL(5)   Matrix format                           =',I10/
+     &     'ICNTL(6)   Maximum transversal                     =',I10/
      &     'ICNTL(7)   Ordering                                =',I10/
-     &     'ICNTL(12)  LDLT ordering strat ( keep(95) )        =',I10/
+     &     'ICNTL(12)  LDLT ordering strat                     =',I10/
      &     'ICNTL(13)  Parallel root (0=on, 1=off)             =',I10/
      &     'ICNTL(15)  Analysis by block                       =',I10/
-     &     'ICNTL(18)  Distributed matrix  ( keep(54) )        =',I10/
+     &     'ICNTL(18)  Distributed matrix                      =',I10/
      &     'ICNTL(19)  Schur option ( keep(60) 0=off,else=on ) =',I10/
      &     'ICNTL(22)  Out-of-core option (1=on, off otherwise)=',I10/
+     &     'ICNTL(48)  Tree based multithreading               =',I10/
      &     'ICNTL(58)  Symbolic factorization option           =',I10)
  891  FORMAT (
-     &     'ICNTL(5)   Matrix format  ( keep(55) )             =',I10/
-     &     'ICNTL(6)   Maximum transversal  ( keep(23) )       =',I10/
+     &     'ICNTL(5)   Matrix format                           =',I10/
+     &     'ICNTL(6)   Maximum transversal                     =',I10/
      &     'ICNTL(7)   Ordering                                =',I10/
      &     'ICNTL(13)  Parallel root (0=on, 1=off)             =',I10/
      &     'ICNTL(15)  Analysis by block                       =',I10/
-     &     'ICNTL(18)  Distributed matrix  ( keep(54) )        =',I10/
-     &     'ICNTL(19)  Schur option ( keep(60) 0=off,else=on ) =',I10/
+     &     'ICNTL(18)  Distributed matrix                      =',I10/
+     &     'ICNTL(19)  Schur option ( 0=off,else=on )          =',I10/
      &     'ICNTL(22)  Out-of-core option (1=on, off otherwise)=',I10/
+     &     'ICNTL(48)  Tree based multithreading               =',I10/
      &     'ICNTL(58)  Symbolic factorization option           =',I10)
  992  FORMAT (
      &     'ICNTL(8)   Scaling strategy                        =',I10)
@@ -2407,12 +2471,15 @@ C--------------------------------------------------------------------
      &     'ICNTL(49)  Compact workarray S (end of facto.)     =',I10)
  993  FORMAT (
      &     'ICNTL(14)  Percent of memory increase              =',I10)
+ 996  FORMAT (
+     &     'ICNTL(56)  Null space functionality                =',I10) 
  995  FORMAT (
      &     'ICNTL(9)   Solve A x=b (1) or A''x = b (else)       =',I10/
      &     'ICNTL(10)  Max steps iterative refinement          =',I10/
      &     'ICNTL(11)  Error analysis (1=all,2=some,else=off)  =',I10/
      &     'ICNTL(20)  Den.(0)/sparse(1,2,3)/dist.(10,11) RHS  =',I10/
-     &     'ICNTL(21)  Gathered (0) or distributed(1) solution =',I10)
+     &     'ICNTL(21)  Gathered (0) or distributed(1) solution =',I10/
+     &     'ICNTL(26)  Solution step                           =',I10)
  998  FORMAT (
      &     '           Size of SCHUR matrix (SIZE_SCHUR)       =',I10)
       END SUBROUTINE SMUMPS_PRINT_ICNTL
@@ -2452,11 +2519,13 @@ C--------------------------------------------------------------------
               WRITE (LP,992) KEEP(52)
            ENDIF   
            WRITE (LP,993) KEEP(12)
+           WRITE (LP,996) KEEP(19), KEEP(118)
+           WRITE (LP,994) KEEP(21)
          CASE(3);
            WRITE (LP,980)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4) 
            WRITE (LP,995)
-     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21)
+     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21), ICNTL(26)
          CASE(4);
            WRITE (LP,980) 
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
@@ -2466,8 +2535,11 @@ C--------------------------------------------------------------------
            WRITE (LP,991) KEEP(55),KEEP(23),ICNTL(7),KEEP(95),
      &          ICNTL(13),KEEP(54),KEEP(60),ICNTL(22)
            WRITE (LP,995)
-     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21)
+     &     ICNTL(9),ICNTL(10),ICNTL(11),ICNTL(20),ICNTL(21), ICNTL(26)
            WRITE (LP,993) KEEP(12)
+           WRITE (LP,997) KEEP(53)
+           WRITE (LP,996) KEEP(19), KEEP(118)
+           WRITE (LP,994) KEEP(21)
          CASE(5);
            WRITE (LP,980) 
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
@@ -2481,6 +2553,8 @@ C--------------------------------------------------------------------
               WRITE (LP,992) KEEP(52)
            ENDIF   
            WRITE (LP,993) KEEP(12)
+           WRITE (LP,996) KEEP(19), KEEP(118)
+           WRITE (LP,994) KEEP(21)
          CASE(6);
            WRITE (LP,980)
            WRITE (LP,990) ICNTL(1),ICNTL(2),ICNTL(3),ICNTL(4)
@@ -2494,8 +2568,11 @@ C--------------------------------------------------------------------
               WRITE (LP,992) KEEP(52)
            ENDIF   
            WRITE (LP,995)
-     &     ICNTL(9),ICNTL(10),ICNTL(11),KEEP(248),ICNTL(21)
+     &     ICNTL(9),ICNTL(10),ICNTL(11),KEEP(248),ICNTL(21), ICNTL(26)
            WRITE (LP,993) KEEP(12)
+           WRITE (LP,997) KEEP(53)
+           WRITE (LP,996) KEEP(19), KEEP(118)
+           WRITE (LP,994) KEEP(21)
         END SELECT
       ENDIF
  980  FORMAT (/'******INTERNAL VALUE OF PARAMETERS (ICNTL/KEEP)****'/)
@@ -2522,7 +2599,15 @@ C--------------------------------------------------------------------
      &     'ICNTL(10)  Max steps iterative refinement          =',I10/
      &     'ICNTL(11)  Error analysis ( 0= off, else=on)       =',I10/
      &     'ICNTL(20)  Den.(0)/sparse(1,2,3)/dist.(10,11) RHS  =',I10/
-     &     'ICNTL(21)  Gathered (0) or distributed(1) solution =',I10)
+     &     'ICNTL(21)  Gathered (0) or distributed(1) solution =',I10/
+     &     'ICNTL(26)  Solution step                           =',I10)
+ 997  FORMAT (
+     &     'ICNTL(56)  Null space-analysis      ( keep(53) )   =',I10) 
+ 996  FORMAT (
+     &     'ICNTL(56)  Null space-factorisation ( keep(19) )   =',I10/ 
+     &     'KEEP(118)  Algorithm used for null space           =',I10) 
+ 994  FORMAT (
+     &     'ICNTL(57)  Estimate of null space size ( keep(21) )=',I10)
       END SUBROUTINE SMUMPS_PRINT_KEEP
       SUBROUTINE SMUMPS_CHECK_DENSE_RHS
      &       (idRHS, idINFO, idN, idNRHS, idLRHS)
@@ -2581,7 +2666,7 @@ C           perform the check if minimal size small enough.
       RETURN
       END SUBROUTINE SMUMPS_CHECK_DENSE_RHS
 C
-      SUBROUTINE SMUMPS_SET_K221(id)
+      SUBROUTINE SMUMPS_SET_K221(id,ATSOLVE)
       USE SMUMPS_STRUC_DEF
       IMPLICIT NONE
 C
@@ -2589,21 +2674,30 @@ C     Purpose:
 C     =======
 C
 C     Sets KEEP(221) on master.
-C     Constraint: must be called before SMUMPS_CHECK_REDRHS.
-C     Can be called at factorization or solve phase
+C     [Schur only] must be called before SMUMPS_CHECK_REDRHS 
+C       
+C     Can be called at factorization 
+C     (in case of fwd in facto) or at solve phase
+C     ATSOLVE=.TRUE. if called during solve phase
 C
       TYPE (SMUMPS_STRUC) :: id
+      LOGICAL, INTENT(IN) :: ATSOLVE 
+      LOGICAL :: PROKG
+      INTEGER :: MPG
       INTEGER MASTER
       PARAMETER( MASTER = 0 )
+      MPG = id%ICNTL( 3 )
+      PROKG = ( MPG .GT. 0 .and. id%MYID .eq. MASTER )
+      PROKG = (PROKG.AND.(id%ICNTL(4).GE.2))
       IF (id%MYID.EQ.MASTER) THEN
         id%KEEP(221)=id%ICNTL(26)
-        IF (id%KEEP(221).ne.0 .and. id%KEEP(221) .NE.1
-     &      .AND.id%KEEP(221).ne.2) id%KEEP(221)=0
+        IF (id%KEEP(221).NE.0 .AND. id%KEEP(221) .NE.1
+     &      .AND.id%KEEP(221).NE.2) id%KEEP(221)=0
       ENDIF
       RETURN
       END SUBROUTINE SMUMPS_SET_K221
 C
-      SUBROUTINE SMUMPS_CHECK_REDRHS(id)
+      SUBROUTINE SMUMPS_CHECK_K221andREDRHS(id)
       USE SMUMPS_STRUC_DEF
       IMPLICIT NONE
 C
@@ -2616,17 +2710,22 @@ C  * Constraints:
 C    - Must be called after solve phase.
 C    - KEEP(60) must have been set (ok to check
 C    since KEEP(60) was set during analysis phase)
-C  * Remark that during solve phase, ICNTL(26)=1 is
+C  * Remark that during solve phase, ICNTL(26)#0 is
 C    forbidden in case of fwd in facto.
 C
       TYPE (SMUMPS_STRUC) :: id
       INTEGER MASTER
       PARAMETER( MASTER = 0 )
+C     write(6,*) " Entering SMUMPS_CHECK_K221andREDRHS with : ", 
+C    & " id%JOB, id%KEEP(221), id%KEEP(60), id%SIZE_SCHUR= ", 
+C    & id%JOB, id%KEEP(221), id%KEEP(60), id%SIZE_SCHUR
       IF (id%MYID .EQ. MASTER) THEN
           IF ( id%KEEP(221) == 1 .or. id%KEEP(221) == 2 ) THEN
-            IF (id%KEEP(221) == 2 .and. id%JOB == 2) THEN
-              id%INFO(1)=-35
-              id%INFO(2)=id%KEEP(221)
+            IF (id%KEEP(221) == 2 .and. 
+     &                ( id%JOB .NE.3 )
+     &         ) THEN
+              id%INFO(1)=-33
+              id%INFO(2)=id%JOB
               GOTO 333
             ENDIF
             IF (id%KEEP(221) == 1 .and. id%KEEP(252) == 1
@@ -2637,29 +2736,39 @@ C
             IF ( id%KEEP(60).eq. 0 .or. id%SIZE_SCHUR.EQ.0 ) THEN
               id%INFO(1)=-33
               id%INFO(2)=id%KEEP(221)
+C              write(6,*) " id%KEEP(60), id%SIZE_SCHUR=", 
+C     &            id%KEEP(60), id%SIZE_SCHUR
               GOTO 333
             ENDIF
-            IF ( .NOT. associated( id%REDRHS)) THEN
-              id%INFO(1)=-22
-              id%INFO(2)=15
-              GOTO 333
-            ELSE IF (id%NRHS.EQ.1) THEN
-              IF (size(id%REDRHS) < id%SIZE_SCHUR ) THEN
+            IF ( id%KEEP(60).NE.0 ) THEN
+C           Schur feature
+              IF ( id%SIZE_SCHUR.EQ.0 ) THEN
+                id%INFO(1)=-33
+                id%INFO(2)=id%KEEP(221)
+                GOTO 333
+              ENDIF
+              IF ( .NOT. associated( id%REDRHS)) THEN
+                id%INFO(1)=-22
+                id%INFO(2)=15
+                GOTO 333
+              ELSE IF (id%NRHS.EQ.1) THEN
+                IF (size(id%REDRHS) < id%SIZE_SCHUR ) THEN
+                  id%INFO(1)=-22
+                  id%INFO(2)=15
+                  GOTO 333
+                ENDIF
+              ELSE IF (id%LREDRHS < id%SIZE_SCHUR) THEN
+                id%INFO(1)=-34
+                id%INFO(2)=id%LREDRHS
+                GOTO 333
+              ELSE IF
+     &        (size(id%REDRHS)<
+     &           id%NRHS*id%LREDRHS-id%LREDRHS+id%SIZE_SCHUR)
+     &        THEN
                 id%INFO(1)=-22
                 id%INFO(2)=15
                 GOTO 333
               ENDIF
-            ELSE IF (id%LREDRHS < id%SIZE_SCHUR) THEN
-              id%INFO(1)=-34
-              id%INFO(2)=id%LREDRHS
-              GOTO 333
-            ELSE IF
-     &      (size(id%REDRHS)<
-     &         id%NRHS*id%LREDRHS-id%LREDRHS+id%SIZE_SCHUR)
-     &      THEN
-              id%INFO(1)=-22
-              id%INFO(2)=15
-              GOTO 333
             ENDIF
           ENDIF
       ENDIF
@@ -2668,4 +2777,4 @@ C     Error is not propagated. It should be propagated outside.
 C     The reason to propagate it outside is that there can be
 C     one call to PROPINFO instead of several ones.
       RETURN
-      END SUBROUTINE SMUMPS_CHECK_REDRHS
+      END SUBROUTINE SMUMPS_CHECK_K221andREDRHS
