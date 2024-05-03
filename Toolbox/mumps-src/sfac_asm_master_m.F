@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.0, released
-C  on Tue Apr 23 10:25:09 UTC 2024
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -655,14 +655,6 @@ C
           ELSE
             IACHK = PAMASTER(STEP(ISON))
           ENDIF
-          IF (IS_CB_LR .AND. LEVEL1) THEN
-            POSEL1 = PTRAST(STEP(INODE))
-            CALL SMUMPS_BLR_ASM_NIV1 (A, LA,
-     &           POSEL1, NFRONT, NASS1, SON_IW(ISTCHK+XXF),
-     &           SON_IW, SON_LIW,
-     &           LSTK, NELIM, K1, K1+LSTK-1, KEEP(50),
-     &           KEEP, KEEP8, OPASSW)
-          ENDIF
           IF ( KEEP(50) .eq. 0 ) THEN
             POSEL1 = PTRAST(STEP(INODE)) - NFRONT8
             IF (NFRONT .EQ. LSTK.AND. ISON.EQ.ISON_IN_PLACE
@@ -750,6 +742,14 @@ C
      &          )
               ENDIF
             ENDIF 
+          ENDIF
+          IF (IS_CB_LR .AND. LEVEL1) THEN
+            POSEL1 = PTRAST(STEP(INODE))
+            CALL SMUMPS_BLR_ASM_NIV1 (A, LA,
+     &           POSEL1, NFRONT, NASS1, SON_IW(ISTCHK+XXF),
+     &           SON_IW, SON_LIW,
+     &           LSTK, NELIM, K1, K1+LSTK-1, KEEP(50),
+     &           KEEP, KEEP8, OPASSW)
           ENDIF
   205     IF (LEVEL1) THEN 
            IF (SAME_PROC) ISTCHK = PTRIST(STEP(ISON))

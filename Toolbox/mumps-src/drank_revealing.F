@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.0, released
-C  on Tue Apr 23 10:25:09 UTC 2024
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -385,9 +385,6 @@ C
          CALL dgesvd('A','A',NN,NN,A,LDA,ROOT%SINGULAR_VALUES(1)
      &        ,ROOT%SVD_U(1,1)
      &        ,LDU,ROOT%SVD_VT(1,1),LDVT,WR03,LWR03,IERR)
-      ELSEIF(KEEP(19).EQ.2) THEN
-         ROOT%IPIV(:)=0
-         CALL dgeqpf(NN,NN,A,NN,ROOT%IPIV(1),ROOT%QR_TAU(1),WR03,IERR)
       ENDIF
       IF(IERR.NE.0) THEN
          INFO(1)=-107

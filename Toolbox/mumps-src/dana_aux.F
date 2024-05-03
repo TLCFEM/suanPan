@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.0, released
-C  on Tue Apr 23 10:25:09 UTC 2024
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -2749,7 +2749,7 @@ C
       DOUBLE PRECISION, INTENT(IN)       :: RINFO(40), RINFOG(40)
       INCLUDE 'mpif.h'
       INTEGER MASTER, MPG
-      INTEGER ITMP
+      INTEGER ITMP, ICNTL48_EFF
       PARAMETER( MASTER = 0 )
       MPG = ICNTL(3)
       IF ( MYID.eq.MASTER.and.MPG.GT.0.AND.ICNTL(4).GE.2) THEN
@@ -2757,12 +2757,17 @@ C
        IF (ICNTL(15).EQ.0) THEN
           ITMP = 0
        ENDIF
+       IF (KEEP(400).GT.0) THEN 
+          ICNTL48_EFF=1
+       ELSE
+          ICNTL48_EFF=0
+       ENDIF
        WRITE(MPG, 99992) INFO(1), INFO(2),
      &  KEEP8(109), KEEP8(111), INFOG(4),
      &  INFOG(5), KEEP(28), INFOG(32), INFOG(7), KEEP(23), 
      &  ICNTL(7), KEEP(95), ICNTL(13), KEEP(12), 
      &  ITMP,
-     &  ICNTL(18), KEEP(252), KEEP(494), ICNTL(48),
+     &  ICNTL(18), KEEP(252), KEEP(494), ICNTL48_EFF,
      &  KEEP(106),
      &  KEEP(56), KEEP(61), RINFOG(1)
        IF (KEEP(95).GT.1)             
@@ -2792,7 +2797,7 @@ C
      &       ' ICNTL(18) Distributed input matrix (on if >0)  =',I16/
      &       ' ICNTL(32) Forward elimination during facto.    =',I16/
      &       ' ICNTL(35) BLR activation                       =',I16/
-     &       ' ICNTL(48) Tree based multithreading            =',I16/
+     &       ' ICNTL(48) Tree based multithreading (effective)=',I16/
      &       ' ICNTL(58) Symbolic factorization option        =',I16/
      &       ' Number of level 2 nodes                        =',I16/
      &       ' Number of split nodes                          =',I16/
