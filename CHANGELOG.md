@@ -13,7 +13,7 @@
 2. plane strain Duncan-Selig soil model [#195](https://github.com/TLCFEM/suanPan/pull/195)
 3. update `Catch2` to version `3.5.4`
 4. update `TBB` to version `2021.12.0` [#199](https://github.com/TLCFEM/suanPan/pull/199)
-5. update `MUMPS` to version `5.7.0` [#201](https://github.com/TLCFEM/suanPan/pull/201)
+5. update `MUMPS` to version `5.7.1` [#202](https://github.com/TLCFEM/suanPan/pull/202)
 
 ## version 3.3
 
