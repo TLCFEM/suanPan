@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.0, released
-C  on Tue Apr 23 10:25:09 UTC 2024
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -157,6 +157,7 @@ C     Element matrix entry
       LOGICAL :: BDUMMY
       INTEGER(8) :: K8_33relaxed, K8_34relaxed, K8_35relaxed,
      &              K8_50relaxed
+!$    INTEGER :: NOMP, NOMPMAX, NOMPMIN
       LOGICAL :: SUM_OF_PEAKS
       INTEGER MUMPS_TYPENODE, MUMPS_PROCNODE
       EXTERNAL MUMPS_TYPENODE, MUMPS_PROCNODE
@@ -411,6 +412,22 @@ C     Broadcast KEEP(251,252,253) defined on master so far
       CALL MPI_BCAST( KEEP(251), 3, MPI_INTEGER,MASTER,id%COMM,IERR)
 C
       CALL MPI_BCAST( KEEP(400), 1, MPI_INTEGER,MASTER,id%COMM,IERR)
+!$    IF (id%KEEP(400).GT.0) THEN
+!$       NOMP = OMP_GET_MAX_THREADS()
+!$       CALL MPI_ALLREDUCE(NOMP,NOMPMIN,1,MPI_INTEGER,MPI_MIN,
+!$   &                      id%COMM,IERR)
+!$       CALL MPI_ALLREDUCE(NOMP,NOMPMAX,1,MPI_INTEGER,MPI_MAX,
+!$   &                      id%COMM,IERR)
+!$       IF ( NOMPMIN .NE. NOMPMAX ) THEN
+!$          IF (PROKG) THEN
+!$             WRITE(MPG, '(A,A,I4,A,I4,A)')
+!$   &  '      WARNING tree parallelism (ICNTL(48)) switched off', 
+!$   &  ' because of different number of threads per MPI proc (max ',
+!$   &         NOMPMAX, ', min ', NOMPMIN, ')'
+!$          ENDIF
+!$          KEEP(400) = 0
+!$       END IF
+!$      ENDIF 
       CALL MPI_BCAST( id%KEEP(490), 5, MPI_INTEGER, MASTER,
      &     id%COMM, IERR )
       CALL MPI_BCAST( KEEP(123),1,MPI_INTEGER,MASTER,id%COMM,IERR)

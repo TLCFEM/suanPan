@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.0, released
-C  on Tue Apr 23 10:25:09 UTC 2024
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -78,7 +78,7 @@ C
       LOGICAL PROK, PROKG, LPOK
       INTEGER MTYPE, ICNTL21
       LOGICAL LSCAL, POSTPros, GIVSOL
-      INTEGER ICNTL10, ICNTL11
+      INTEGER ICNTL10, ICNTL11, ICNTL48_EFF
       INTEGER I,K,JPERM, J, II, IZ2
 #if defined(USE_OLD_SCALING)
       INTEGER IPERM
@@ -724,6 +724,14 @@ C     Bcast id%KEEP(401) strategy (which
 C     may be switched off or on during solve)
       CALL MPI_BCAST( id%KEEP(401), 1, MPI_INTEGER, MASTER, id%COMM,
      &                  IERR )
+C     define ICNTL48_EFF on master
+      IF (id%MYID.EQ.MASTER) THEN
+        IF ( (id%KEEP(401).EQ.1). AND. (id%KEEP(400).GT.0) ) THEN
+          ICNTL48_EFF = 1
+        ELSE
+          ICNTL48_EFF = 0
+        ENDIF
+      ENDIF
       CALL MPI_BCAST(MTYPE,1,MPI_INTEGER,MASTER,
      &               id%COMM,IERR)
       CALL MPI_BCAST( id%KEEP(111), 1, MPI_INTEGER, MASTER, id%COMM,
@@ -1266,11 +1274,12 @@ C       ----------------------------
 C
 C       print solve phase stats if requested
         IF ( PROKG )  THEN
-           WRITE( MPG, 150 )
+            WRITE( MPG, 150 )
 C             ICNTL(35) should not been accessed during SOLVE thus
 C             print KEEP(486) value set during factorization
      &        id%NRHS, ICNTL(27), ICNTL(9), ICNTL(10), ICNTL(11),
-     &        ICNTL(20), ICNTL(21), ICNTL(30), KEEP(486)
+     &        ICNTL(20), ICNTL(21), ICNTL(30), KEEP(486), 
+     &        ICNTL48_EFF
            IF (KEEP(221).NE.0) THEN
             WRITE (MPG, 152) KEEP(221)
            ENDIF
@@ -1741,7 +1750,7 @@ C             ICNTL(35) should not been accessed during SOLVE thus
 C             print KEEP(486) value set during factorization
      &        id%NRHS, NBRHS, ICNTL(9), ICNTL(10), ICNTL(11),
      &        ICNTL(20), ICNTL(21), ICNTL(30), KEEP(486),
-     &        ICNTL(48)
+     &        ICNTL48_EFF
           IF (KEEP(111).NE.0) THEN
             WRITE (MPG, 151) KEEP(111)
           ENDIF
@@ -2826,7 +2835,7 @@ C          which indicates that L0-threads was
 C          performed during analysis+factorization
            IF ( KEEP(400) .GT. 0 ) THEN
 C           Check if number of threads is consistent with
-C           the one used during factorization
+C           the one used during factorization for all procs
 C{
             NOMP = 1
 !$          NOMP=omp_get_max_threads()
@@ -2834,11 +2843,16 @@ C{
 C               NOMP should be the one from analysis
                 id%INFO(1) = -58
                 id%INFO(2) = KEEP(400)
-            IF (LPOK) WRITE(LP,'(A,A,I5,A,I5)')
-     &" FAILURE DETECTED IN SOLVE: #threads for ICNTL(48)",
-     &" changed from",KEEP(400)," at analysis to", NOMP
+                IF (LPOK) WRITE(LP,'(A,A,I5,A,I5)')
+     &" FAILURE DETECTED IN SOLVE: #threads for multithreaded",
+     &" tree parallelism changed from",KEEP(400)," at analysis to", 
+     &  NOMP
               ENDIF
            ENDIF
+C          error check
+           CALL MUMPS_PROPINFO( ICNTL(1), INFO(1),
+     &                    id%COMM,id%MYID)
+           IF ( id%INFO(1) .LT. 0 ) GO TO 90
 C}
           ENDIF
       IF (KEEP(400) .GT. 0) THEN
@@ -6320,7 +6334,7 @@ C       set RINFOG(24), RINFOG(25), RINFOG(26)
      &        '  --- (21)                                     =',I12/
      &        '  --- (30)                                     =',I12/
      &        '  --- (35)                                     =',I12/
-     &        '  --- (48)                                     =',I12
+     &        '  --- (48) (effective)                         =',I12
      &        )
  151  FORMAT ('  --- (25)                                     =',I12)
  152  FORMAT ('  --- (26)                                     =',I12)
