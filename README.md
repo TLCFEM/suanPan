@@ -31,11 +31,9 @@ highlighting and autocompletion.***
 
 ## Introduction
 
-[🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for
-applications in fields such as solid mechanics and civil/structural/seismic engineering. The name **suanPan** (in some
-places such as suffix it is also abbreviated as **suPan**) comes from the term *Suan Pan* (算盤), which
-is [Chinese abacus](https://en.wikipedia.org/wiki/Suanpan). **suanPan** is written in modern high-quality C++ code and
-is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
+[🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for applications
+in fields such as solid mechanics and civil/structural/seismic engineering. **suanPan** is written in modern
+high-quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
 
 **suanPan** is partially influenced by popular (non-)commercial FEA packages, such
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)

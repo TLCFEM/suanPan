@@ -13,9 +13,8 @@ version: "3.4"
 website: https://bit.ly/suanpan-doc
 description: |
   [**suanPan**](https://github.com/TLCFEM/suanPan) is a finite element method (FEM) simulation platform for applications
-  in fields such as solid mechanics and civil/structural/seismic engineering. The name **suanPan** comes from the term 
-  *Suan Pan* (算盤), which is [Chinese abacus](https://en.wikipedia.org/wiki/Suanpan). **suanPan** is written in modern 
-  high quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
+  in fields such as solid mechanics and civil/structural/seismic engineering. **suanPan** is written in modern high
+  quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
 architectures:
   - build-on: amd64
 apps:
