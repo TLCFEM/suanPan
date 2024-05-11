@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -45,7 +45,7 @@ C
       INTEGER PTRIST(KEEP(28))
       INTEGER PTLUST(KEEP(28))
       INTEGER STEP(N), PIMASTER(KEEP(28)), ITLOC( N+KEEP(253) )
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER BUFR( LBUFR_BYTES )
       INTEGER IW( LIW )
       INTEGER ND(KEEP(28)), PROCNODE_STEPS(KEEP(28))
@@ -65,8 +65,6 @@ C
       DOUBLE PRECISION OPASSW
         INCLUDE 'mpif.h'
         INTEGER IERR
-        EXTERNAL MUMPS_PROCNODE
-        INTEGER MUMPS_PROCNODE
         INTEGER POSITION, LOCAL_M, LOCAL_N, LREQI
         INTEGER(8) :: LREQA, POS_ROOT
         INTEGER NSUBSET_ROW, NSUBSET_COL, IROOT, ISON, NSUBSET_COL_EFF

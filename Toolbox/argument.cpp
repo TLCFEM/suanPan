@@ -48,7 +48,7 @@ using std::ifstream;
 using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 3;
+constexpr auto SUANPAN_MINOR = 4;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Canopus";
 
@@ -303,7 +303,17 @@ void print_version() {
     suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
     suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
     suanpan_info("suanPan is an open source FEM framework.\n");
-    suanpan_info("    The binary ({}.{}.{}) is compiled on {}.\n", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH, __DATE__);
+    suanpan_info("    The binary ({}.{}.{}) is compiled on {} with the {} instruction set.\n", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH, __DATE__,
+#ifdef SUANPAN_AVX512
+                 "AVX512"
+#elif defined(SUANPAN_AVX2)
+                 "AVX2"
+#elif defined(SUANPAN_AVX)
+                 "AVX"
+#else
+                 "SSE"
+#endif
+    );
     suanpan_info("    The source code of suanPan is hosted on GitHub. https://github.com/TLCFEM/suanPan/\n");
     suanpan_info("    The documentation is hosted on GitHub. https://tlcfem.github.io/suanPan-manual/latest/\n");
 #ifdef SUANPAN_MKL

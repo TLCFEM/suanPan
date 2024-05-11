@@ -92,6 +92,8 @@ template<sp_d T> class Factory final {
     SolverType solver = SolverType::LAPACK;
     SolverSetting<T> setting{};
 
+    SolverType sub_solver = SolverType::LAPACK;
+
     T error = T(0); // error produced by certain solvers
 
     Col<T> ninja; // the result from A*X=B
@@ -204,7 +206,10 @@ public:
     [[nodiscard]] bool is_nonviscous() const;
 
     void set_solver_type(SolverType);
-    [[nodiscard]] SolverType get_solver_type() const;
+    [[nodiscard]] bool contain_solver_type(SolverType) const;
+
+    void set_sub_solver_type(SolverType);
+    [[nodiscard]] bool contain_sub_solver_type(SolverType) const;
 
     void set_solver_setting(const SolverSetting<double>&);
     [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
@@ -726,7 +731,11 @@ template<sp_d T> bool Factory<T>::is_nonviscous() const { return nonviscous; }
 
 template<sp_d T> void Factory<T>::set_solver_type(const SolverType E) { solver = E; }
 
-template<sp_d T> SolverType Factory<T>::get_solver_type() const { return solver; }
+template<sp_d T> void Factory<T>::set_sub_solver_type(const SolverType E) { sub_solver = E; }
+
+template<sp_d T> bool Factory<T>::contain_solver_type(const SolverType ST) const { return ST == solver; }
+
+template<sp_d T> bool Factory<T>::contain_sub_solver_type(const SolverType ST) const { return ST == sub_solver; }
 
 template<sp_d T> void Factory<T>::set_solver_setting(const SolverSetting<double>& SS) { setting = SS; }
 
@@ -1475,34 +1484,37 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
     switch(storage_type) {
     case StorageScheme::FULL:
 #ifdef SUANPAN_CUDA
-        if(SolverType::CUDA == solver) return std::make_unique<FullMatCUDA<T>>(n_size, n_size);
+        if(contain_solver_type(SolverType::CUDA)) return std::make_unique<FullMatCUDA<T>>(n_size, n_size);
 #endif
         return std::make_unique<FullMat<T>>(n_size, n_size);
     case StorageScheme::BAND:
-        if(SolverType::SPIKE == solver) return std::make_unique<BandMatSpike<T>>(n_size, n_lobw, n_upbw);
+        if(contain_solver_type(SolverType::SPIKE)) return std::make_unique<BandMatSpike<T>>(n_size, n_lobw, n_upbw);
+#ifdef SUANPAN_MAGMA
+        if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<BandMatMAGMA<T>>(n_size, n_lobw, n_upbw);
+#endif
         return std::make_unique<BandMat<T>>(n_size, n_lobw, n_upbw);
     case StorageScheme::BANDSYMM:
         return std::make_unique<BandSymmMat<T>>(n_size, n_lobw);
     case StorageScheme::SYMMPACK:
         return std::make_unique<SymmPackMat<T>>(n_size);
     case StorageScheme::SPARSE:
-        if(SolverType::MUMPS == solver) return std::make_unique<SparseMatMUMPS<T>>(n_size, n_size, n_elem);
-        if(SolverType::LIS == solver) return std::make_unique<SparseMatLis<T>>(n_size, n_size, n_elem);
-        if(SolverType::SUPERLU == solver) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+        if(contain_solver_type(SolverType::MUMPS)) return std::make_unique<SparseMatMUMPS<T>>(n_size, n_size, n_elem);
+        if(contain_solver_type(SolverType::LIS)) return std::make_unique<SparseMatLis<T>>(n_size, n_size, n_elem);
+        if(contain_solver_type(SolverType::SUPERLU)) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MKL
-        if(SolverType::PARDISO == solver) return std::make_unique<SparseMatPARDISO<T>>(n_size, n_size, n_elem);
-        if(SolverType::FGMRES == solver) return std::make_unique<SparseMatFGMRES<T>>(n_size, n_size, n_elem);
+        if(contain_solver_type(SolverType::PARDISO)) return std::make_unique<SparseMatPARDISO<T>>(n_size, n_size, n_elem);
+        if(contain_solver_type(SolverType::FGMRES)) return std::make_unique<SparseMatFGMRES<T>>(n_size, n_size, n_elem);
 #endif
 #ifdef SUANPAN_CUDA
-        if(SolverType::CUDA == solver) return std::make_unique<SparseMatCUDA<T>>(n_size, n_size, n_elem);
+        if(contain_solver_type(SolverType::CUDA)) return std::make_unique<SparseMatCUDA<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MAGMA
-        if(SolverType::MAGMA == solver) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, magma_setting);
+        if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, magma_setting);
 #endif
 #endif
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
     case StorageScheme::SPARSESYMM:
 #ifdef SUANPAN_MKL
-        if(SolverType::FGMRES == solver) return std::make_unique<SparseSymmMatFGMRES<T>>(n_size, n_size, n_elem);
+        if(contain_solver_type(SolverType::FGMRES)) return std::make_unique<SparseSymmMatFGMRES<T>>(n_size, n_size, n_elem);
 #endif
         return std::make_unique<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);
     default:

@@ -1271,6 +1271,30 @@ void new_dhakal(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Dhakal>(tag, mat_tag, y_strain, parameter);
 }
 
+void new_duncanselig(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    auto pool = vec{14.7, 400. * 14.7, .6, 300 * 14.7, .2, .7, .1, .7, .5};
+    if(!get_input(command, pool)) {
+        suanpan_error("A valid parameter is required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(command.eof())
+        suanpan_debug("Zero density assumed.\n");
+    else if(!get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<DuncanSelig>(tag, pool, density);
+}
+
 void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -2514,7 +2538,14 @@ void new_nonviscous01(unique_ptr<Material>& return_obj, istringstream& command) 
         return;
     }
 
-    return_obj = make_unique<Nonviscous01>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag});
+    auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+
+    if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
+        suanpan_error("The provided kernel does not converge to zero.\n");
+        return;
+    }
+
+    return_obj = make_unique<Nonviscous01>(tag, std::move(m), std::move(s));
 }
 
 void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3406,6 +3437,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
+    else if(is_equal(material_id, "DuncanSelig")) new_duncanselig(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);

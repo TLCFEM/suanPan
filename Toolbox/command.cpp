@@ -406,7 +406,7 @@ int create_new_external_module(const shared_ptr<DomainBase>& domain, istringstre
     }
 
     auto code = 0;
-    for(const auto& I : domain->get_external_module_pool())
+    for(auto& I : domain->get_external_module_pool())
         if(is_equal(I->library_name, library_name) || I->locate_cpp_module(library_name)) {
             code = 1;
             break;
@@ -672,23 +672,23 @@ int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     }
 
     vector<unsigned> list;
-    if(is_equal(object_type, "amplitude")) for(const auto& I : domain->get_amplitude_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "constraint")) for(const auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "converger")) for(const auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "criterion")) for(const auto& I : domain->get_criterion_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "element")) for(const auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "expression")) for(const auto& I : domain->get_expression_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "group")) for(const auto& I : domain->get_group_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "integrator")) for(const auto& I : domain->get_integrator_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "load")) for(const auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "material")) for(const auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "modifier")) for(const auto& I : domain->get_modifier_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "node")) for(const auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "orientation")) for(const auto& I : domain->get_orientation_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "recorder")) for(const auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "section")) for(const auto& I : domain->get_section_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "solver")) for(const auto& I : domain->get_solver_pool()) list.emplace_back(I->get_tag());
-    else if(is_equal(object_type, "step")) for(const auto& I : domain->get_step_pool()) list.emplace_back(I.second->get_tag());
+    if(is_equal(object_type, "amplitude")) for(auto& I : domain->get_amplitude_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "constraint")) for(auto& I : domain->get_constraint_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "converger")) for(auto& I : domain->get_converger_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "criterion")) for(auto& I : domain->get_criterion_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "element")) for(auto& I : domain->get_element_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "expression")) for(auto& I : domain->get_expression_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "group")) for(auto& I : domain->get_group_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "integrator")) for(auto& I : domain->get_integrator_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "load")) for(auto& I : domain->get_load_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "material")) for(auto& I : domain->get_material_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "modifier")) for(auto& I : domain->get_modifier_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "node")) for(auto& I : domain->get_node_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "orientation")) for(auto& I : domain->get_orientation_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "recorder")) for(auto& I : domain->get_recorder_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "section")) for(auto& I : domain->get_section_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "solver")) for(auto& I : domain->get_solver_pool()) list.emplace_back(I->get_tag());
+    else if(is_equal(object_type, "step")) for(auto& I : domain->get_step_pool()) list.emplace_back(I.second->get_tag());
 
     suanpan_info("This domain has the following {}s:", object_type);
     for(const auto I : list)
@@ -735,17 +735,17 @@ int save_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
     else if(is_equal(object_id, "Stiffness")) {
         string name = "K";
         if(!command.eof() && !get_input(command, name)) name = "K";
-        if(const auto& stiffness = domain->get_factory()->get_stiffness()) stiffness->save(name.c_str());
+        if(auto& stiffness = domain->get_factory()->get_stiffness()) stiffness->save(name.c_str());
     }
     else if(is_equal(object_id, "Mass")) {
         string name = "M";
         if(!command.eof() && !get_input(command, name)) name = "M";
-        if(const auto& mass = domain->get_factory()->get_mass()) mass->save(name.c_str());
+        if(auto& mass = domain->get_factory()->get_mass()) mass->save(name.c_str());
     }
     else if(is_equal(object_id, "Damping")) {
         string name = "C";
         if(!command.eof() && !get_input(command, name)) name = "C";
-        if(const auto& damping = domain->get_factory()->get_damping()) damping->save(name.c_str());
+        if(auto& damping = domain->get_factory()->get_damping()) damping->save(name.c_str());
     }
     else if(is_equal(object_id, "Model")) {
         string name = "Model.h5";
@@ -910,7 +910,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
     if(domain->get_current_step_tag() == 0) return SUANPAN_SUCCESS;
 
-    const auto& t_step = domain->get_current_step();
+    auto& t_step = domain->get_current_step();
 
     if(is_equal(property_id, "fixed_step_size")) {
         string value;
@@ -960,6 +960,23 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "GMRES")) t_step->set_system_solver(IterativeSolver::GMRES);
         else if(is_equal(value, "BICGSTAB")) t_step->set_system_solver(IterativeSolver::BICGSTAB);
         else if(is_equal(value, "NONE")) t_step->set_system_solver(IterativeSolver::NONE);
+        else
+            suanpan_error("A valid solver type is required.\n");
+    }
+    else if(is_equal(property_id, "sub_system_solver")) {
+        if(string value; !get_input(command, value))
+            suanpan_error("A valid value is required.\n");
+        else if(is_equal(value, "LAPACK")) t_step->set_sub_system_solver(SolverType::LAPACK);
+        else if(is_equal(value, "SPIKE")) t_step->set_sub_system_solver(SolverType::SPIKE);
+        else if(is_equal(value, "SUPERLU")) t_step->set_sub_system_solver(SolverType::SUPERLU);
+        else if(is_equal(value, "MUMPS")) t_step->set_sub_system_solver(SolverType::MUMPS);
+#ifdef SUANPAN_CUDA
+        else if(is_equal(value, "CUDA")) t_step->set_sub_system_solver(SolverType::CUDA);
+#endif
+#ifdef SUANPAN_MKL
+        else if(is_equal(value, "PARDISO")) t_step->set_sub_system_solver(SolverType::PARDISO);
+        else if(is_equal(value, "FGMRES")) t_step->set_sub_system_solver(SolverType::FGMRES);
+#endif
         else
             suanpan_error("A valid solver type is required.\n");
     }
@@ -1450,8 +1467,8 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
         domain->wait();
 
         auto flag = true;
-        for(const auto& t_integrator : domain->get_integrator_pool())
-            if(t_integrator->get_domain() != nullptr) {
+        for(auto& t_integrator : domain->get_integrator_pool())
+            if(nullptr != t_integrator->get_domain()) {
                 t_integrator->clear_status();
                 flag = false;
             }
@@ -1465,8 +1482,8 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
         domain->wait();
 
         auto flag = true;
-        for(const auto& t_integrator : domain->get_integrator_pool())
-            if(t_integrator->get_domain() != nullptr) {
+        for(auto& t_integrator : domain->get_integrator_pool())
+            if(nullptr != t_integrator->get_domain()) {
                 t_integrator->reset_status();
                 flag = false;
             }

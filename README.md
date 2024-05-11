@@ -31,11 +31,9 @@ highlighting and autocompletion.***
 
 ## Introduction
 
-[🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for
-applications in fields such as solid mechanics and civil/structural/seismic engineering. The name **suanPan** (in some
-places such as suffix it is also abbreviated as **suPan**) comes from the term *Suan Pan* (算盤), which
-is [Chinese abacus](https://en.wikipedia.org/wiki/Suanpan). **suanPan** is written in modern high-quality C++ code and
-is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
+[🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for applications
+in fields such as solid mechanics and civil/structural/seismic engineering. **suanPan** is written in modern
+high-quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
 
 **suanPan** is partially influenced by popular (non-)commercial FEA packages, such
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
@@ -106,8 +104,8 @@ details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obt
 ## Installation
 
 Only the 64-bit version is compiled.
-It is assumed that [**AVX**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
-fails, please check if your CPU supports AVX.
+It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
+fails, please check if your CPU supports AVX2.
 Alternatively, you can try the `no-avx` version.
 
 > Check artifacts of [workflows](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml) for the latest binaries.
@@ -134,8 +132,7 @@ on [Chocolatey](https://chocolatey.org/packages/suanpan), please use the followi
    choco install suanpan
    ```
 
-3. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal)
-   and [Fluent Terminal](https://github.com/felixse/FluentTerminal) for better output display.
+3. It is recommended to use a modern terminal such as [Windows Terminal](https://github.com/microsoft/terminal) for better output display.
 
 The Chocolatey repo available to you may not be up-to-date.
 If the latest version is not available, please try alternatives, such as portable binaries or scoop.
@@ -203,7 +200,7 @@ A few flavors are available:
    may be missing on server systems
 2. `mkl` --- linear algebra operations are offloaded to MKL, which gives the optimal performance on Intel chips
 3. `openblas` --- linear algebra operations are offloaded to OpenBLAS, which may outperform MKL on AMD platforms
-4. `no-avx` --- AVX support is disabled, useful for older CPUs which do not support AVX instructions
+4. `no-avx` --- AVX2 support is disabled, useful for older CPUs which do not support AVX2 instructions
 
 Advanced users can compile the program from source by themselves to enable GPU based solvers which require
 an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) and/or MAGMA library.
@@ -262,17 +259,17 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.25
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.3
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.9.0
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.12.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
-- [**MUMPS**](https://mumps-solver.org/) version 5.6.0
+- [**MUMPS**](https://mumps-solver.org/) version 5.7.1
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
 - [**VTK**](https://vtk.org/) version 9.2.6
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.0
-- [**MAGMA**](https://icl.utk.edu/magma/) version 2.7.1
-- [**Armadillo**](http://arma.sourceforge.net/) version 12.6.7
+- [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
+- [**Armadillo**](http://arma.sourceforge.net/) version 12.8.3
 - [**ensmallen**](https://ensmallen.org/) version 2.20.0
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2023.2.0
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.5.2
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2024.1.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.5.4
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**whereami**](https://github.com/gpakosz/whereami)
 - [**exprtk**](https://github.com/ArashPartow/exprtk)

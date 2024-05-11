@@ -1,5 +1,6 @@
 #include "Concrete21.h"
 #include "Concrete22.h"
+#include "DuncanSelig.h"
 #include "Elastic/AxisymmetricElastic.h"
 #include "Elastic/Elastic2D.h"
 #include "Material2D.h"

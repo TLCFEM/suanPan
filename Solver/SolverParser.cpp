@@ -304,7 +304,14 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                 return SUANPAN_SUCCESS;
             }
 
-            if(domain->insert(make_shared<NonviscousNewmark>(tag, alpha, beta, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}))) code = 1;
+            auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+
+            if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
+                suanpan_error("The provided kernel does not converge to zero.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            if(domain->insert(make_shared<NonviscousNewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
         }
     }
     else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {

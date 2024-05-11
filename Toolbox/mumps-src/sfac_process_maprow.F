@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -84,7 +84,7 @@ C
       INTEGER LPTRAR, NELT
       INTEGER FRTPTR( N+1 ), FRTELT( NELT )
       INTEGER ITLOC( N+KEEP(253) ), FILS( N ), DAD( KEEP(28) )
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER(8), INTENT(IN) ::  PTRARW( LPTRAR ), PTRAIW( LPTRAR )
       INTEGER(8), INTENT(IN) :: PTR8ARR(KEEP(193))
       INTEGER, INTENT(IN) :: NINCOLARR(KEEP(194))
@@ -573,6 +573,9 @@ C
                    IS_ERROR_BROADCASTED=.TRUE.
                    GOTO 600
                  ENDIF
+                 IF (.NOT. MESSAGE_RECEIVED) THEN
+                   CALL MUMPS_USLEEP(1000)
+                 ENDIF
                END IF
              END IF 
            ENDDO
@@ -708,7 +711,7 @@ C
       INTEGER PROCNODE_STEPS( KEEP(28) )
       INTEGER FRTPTR( N+1 ), FRTELT( NELT )
       INTEGER ITLOC( N+KEEP(253) ), FILS( N ), DAD( KEEP(28) )
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER(8), INTENT(IN) :: PTRARW( LPTRAR ), PTRAIW( LPTRAR )
       INTEGER(8), INTENT(IN) :: PTR8ARR(KEEP(193))
       INTEGER, INTENT(IN) :: NINCOLARR(KEEP(194))
@@ -1350,7 +1353,7 @@ C
       INTEGER, intent(inout) :: ITLOC(N)
       INTEGER, intent(in) :: FRTPTR( N+1 ), FRTELT( NELT )
       DOUBLE PRECISION, intent(inout) :: OPASSW, OPELIW
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER, intent(in) :: KEEP253_LOC, NVSCHUR
       INTEGER, intent(in) :: FILS(N), DAD( KEEP(28) )
       INTEGER(8), intent(in) :: PTRARW( LPTRAR ), PTRAIW( LPTRAR )

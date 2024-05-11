@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -16,8 +16,9 @@ C
      &     JCNhere, A, Ahere, NZ_loc, NNZ_loc, IRN_loc, IRN_lochere,
      &     JCN_loc, JCN_lochere, A_loc, A_lochere, NELT, ELTPTR,
      &     ELTPTRhere,  ELTVAR, ELTVARhere, A_ELT, A_ELThere,
-     &     BLKPTR, BLKPTRhere, BLKVAR, BLKVARhere,
-     &     PERM_IN, PERM_INhere, RHS, RHShere, REDRHS, REDRHShere,
+     &     BLKPTR, BLKPTRhere, BLKVAR, BLKVARhere, PERM_IN, PERM_INhere,
+     &     ROWIND, ROWINDhere, COLIND, COLINDhere, PIVOTS, PIVOTShere,
+     &     RHS, RHShere, REDRHS, REDRHShere,
      &     INFO, RINFO, INFOG, RINFOG, DEFICIENCY, LWK_USER,
      &     SIZE_SCHUR, LISTVAR_SCHUR, LISTVAR_SCHURhere, SCHUR,
      &     SCHURhere, WK_USER, WK_USERhere, COLSCA, COLSCAhere,
@@ -26,31 +27,38 @@ C
      &     RHS_loc, RHS_lochere,
      &     IRHS_SPARSE, IRHS_SPARSEhere, IRHS_PTR, IRHS_PTRhere,
      &     ISOL_loc, ISOL_lochere, IRHS_loc, IRHS_lochere, NZ_RHS,
-     &     LSOL_loc, LRHS_loc, Nloc_RHS,
+     &     LSOL_loc, LRHS_loc, NSOL_loc, Nloc_RHS,
      &     SCHUR_MLOC, SCHUR_NLOC, SCHUR_LLD,
-     &     MBLOCK, NBLOCK, NPROW, NPCOL,  
+     &     MBLOCK, NBLOCK, NPROW, NPCOL, LD_RHSINTR,
      &     OOC_TMPDIR, OOC_PREFIX, WRITE_PROBLEM,
+#if ! defined(NO_SAVE_RESTORE)
      &     SAVE_DIR, SAVE_PREFIX,
+#endif
      &     TMPDIRLEN, PREFIXLEN, WRITE_PROBLEMLEN,
+#if ! defined(NO_SAVE_RESTORE)
      &     SAVE_DIRLEN, SAVE_PREFIXLEN,
+#endif
      &     METIS_OPTIONS
      &     )
       USE SMUMPS_STRUC_DEF
       IMPLICIT NONE
       INTEGER OOC_PREFIX_MAX_LENGTH, OOC_TMPDIR_MAX_LENGTH
       INTEGER PB_MAX_LENGTH
-      PARAMETER(OOC_PREFIX_MAX_LENGTH=63, OOC_TMPDIR_MAX_LENGTH=255)
-      PARAMETER(PB_MAX_LENGTH=255)
-      INTEGER, PARAMETER :: SAVE_DIR_MAX_LENGTH    = 255
+      PARAMETER(OOC_PREFIX_MAX_LENGTH=255, OOC_TMPDIR_MAX_LENGTH=1023)
+      PARAMETER(PB_MAX_LENGTH=1023)
+#if ! defined(NO_SAVE_RESTORE)
+      INTEGER, PARAMETER :: SAVE_DIR_MAX_LENGTH    = 1023
       INTEGER, PARAMETER :: SAVE_PREFIX_MAX_LENGTH = 255
+#endif
       INTEGER JOB, SYM, PAR, COMM_F77, N, NBLK, NZ, NZ_loc, NELT,
      &        DEFICIENCY, LWK_USER, SIZE_SCHUR, INSTANCE_NUMBER,
      &        NRHS, LRHS,
-     &        NZ_RHS, LSOL_loc,Nloc_RHS, LRHS_loc, LREDRHS
+     &        NZ_RHS, LSOL_loc,Nloc_RHS, LRHS_loc, NSOL_loc, LREDRHS
       INTEGER(8) :: NNZ, NNZ_loc
       INTEGER ICNTL(60), INFO(80), INFOG(80), KEEP(500)
       INTEGER SCHUR_MLOC, SCHUR_NLOC, SCHUR_LLD
       INTEGER MBLOCK, NBLOCK, NPROW, NPCOL
+      INTEGER LD_RHSINTR
       INTEGER TMPDIRLEN, PREFIXLEN, WRITE_PROBLEMLEN
       REAL CNTL(15), RINFO(40), RINFOG(40), DKEEP(230)
       INTEGER(8) KEEP8(150)
@@ -61,6 +69,8 @@ C
       INTEGER, TARGET :: ISOL_loc(*), IRHS_loc(*)
       INTEGER, TARGET :: BLKPTR(*), BLKVAR(*)
       REAL, TARGET :: A(*), A_ELT(*), A_loc(*), RHS(*)
+      INTEGER, TARGET :: ROWIND(*), COLIND(*)
+      REAL, TARGET :: PIVOTS(*)
       REAL, TARGET :: WK_USER(*)
       REAL, TARGET :: REDRHS(*)
       REAL, TARGET :: ROWSCA(*), COLSCA(*)
@@ -69,13 +79,15 @@ C
       INTEGER, INTENT(inout) :: OOC_TMPDIR(OOC_TMPDIR_MAX_LENGTH)
       INTEGER, INTENT(inout) :: OOC_PREFIX(OOC_PREFIX_MAX_LENGTH)
       INTEGER, INTENT(in) :: WRITE_PROBLEM(PB_MAX_LENGTH)
+#if ! defined(NO_SAVE_RESTORE)
       INTEGER SAVE_DIRLEN, SAVE_PREFIXLEN
       INTEGER, INTENT(in) :: SAVE_DIR(SAVE_DIR_MAX_LENGTH)
       INTEGER, INTENT(in) :: SAVE_PREFIX(SAVE_PREFIX_MAX_LENGTH)
+#endif
       INTEGER METIS_OPTIONS(40)
       INTEGER IRNhere, JCNhere, Ahere, ELTPTRhere, ELTVARhere,
      &        A_ELThere, BLKPTRhere, BLKVARhere, PERM_INhere,
-     &        WK_USERhere,
+     &        WK_USERhere, ROWINDhere, COLINDhere, PIVOTShere,
      &        RHShere, REDRHShere, IRN_lochere,
      &        JCN_lochere, A_lochere, LISTVAR_SCHURhere,
      &        SCHURhere, COLSCAhere, ROWSCAhere, RHS_SPARSEhere,
@@ -99,9 +111,27 @@ C
       EXTERNAL MUMPS_ASSIGN_MAPPING,
      &         MUMPS_ASSIGN_PIVNUL_LIST,
      &         MUMPS_ASSIGN_SYM_PERM,
-     &         MUMPS_ASSIGN_UNS_PERM
+     &         MUMPS_ASSIGN_UNS_PERM,
+     &         MUMPS_ASSIGN_GLOB2LOC_RHS,
+     &         MUMPS_ASSIGN_GLOB2LOC_SOL
+      EXTERNAL MUMPS_NULLIFY_C_MAPPING,
+     &         MUMPS_NULLIFY_C_PIVNUL_LIST,
+     &         MUMPS_NULLIFY_C_SYM_PERM,
+     &         MUMPS_NULLIFY_C_UNS_PERM,
+     &         MUMPS_NULLIFY_C_GLOB2LOC_RHS,
+     &         MUMPS_NULLIFY_C_GLOB2LOC_SOL
       EXTERNAL SMUMPS_ASSIGN_COLSCA,
-     &         SMUMPS_ASSIGN_ROWSCA
+     &         SMUMPS_ASSIGN_ROWSCA,
+     &         SMUMPS_ASSIGN_ROWSCA_LOC,
+     &         SMUMPS_ASSIGN_COLSCA_LOC,
+     &         SMUMPS_ASSIGN_RHSINTR,
+     &         SMUMPS_ASSIGN_SINGULAR_VALUES
+      EXTERNAL SMUMPS_NULLIFY_C_COLSCA,
+     &         SMUMPS_NULLIFY_C_ROWSCA,
+     &         SMUMPS_NULLIFY_C_ROWSCA_LOC,
+     &         SMUMPS_NULLIFY_C_COLSCA_LOC,
+     &         SMUMPS_NULLIFY_C_RHSINTR,
+     &         SMUMPS_NULLIFY_C_SING_VALUES
       IF (JOB == -1) THEN
         DO I = 1, SMUMPS_STRUC_ARRAY_SIZE
           IF ( .NOT. associated(mumps_par_array(I)%PTR) ) GOTO 10
@@ -175,20 +205,22 @@ C
       CALL MUMPS_ADDR_C( ICNTL(50), mumps_par%KEEP8(83) )
       CALL MUMPS_ADDR_C( RINFO(3), mumps_par%KEEP8(84) )
       mumps_par%METIS_OPTIONS(1:40)=METIS_OPTIONS(1:40)
-      mumps_par%NRHS  = NRHS
-      mumps_par%LRHS  = LRHS
-      mumps_par%LREDRHS = LREDRHS
-      mumps_par%NZ_RHS   = NZ_RHS
-      mumps_par%LSOL_loc = LSOL_loc
-      mumps_par%Nloc_RHS = Nloc_RHS
-      mumps_par%LRHS_loc = LRHS_loc
+      mumps_par%NRHS         = NRHS
+      mumps_par%LRHS         = LRHS
+      mumps_par%LREDRHS      = LREDRHS
+      mumps_par%NZ_RHS       = NZ_RHS
+      mumps_par%LSOL_loc     = LSOL_loc
+      mumps_par%Nloc_RHS     = Nloc_RHS
+      mumps_par%LRHS_loc     = LRHS_loc
+      mumps_par%NSOL_loc     = NSOL_loc
       mumps_par%SCHUR_MLOC   = SCHUR_MLOC
       mumps_par%SCHUR_NLOC   = SCHUR_NLOC
       mumps_par%SCHUR_LLD    = SCHUR_LLD
-      mumps_par%MBLOCK = MBLOCK
-      mumps_par%NBLOCK = NBLOCK
-      mumps_par%NPROW  = NPROW
-      mumps_par%NPCOL  = NPCOL
+      mumps_par%MBLOCK       = MBLOCK
+      mumps_par%NBLOCK       = NBLOCK
+      mumps_par%NPROW        = NPROW
+      mumps_par%NPCOL        = NPCOL
+      mumps_par%LD_RHSINTR   = LD_RHSINTR
       IF ( COMM_F77 .NE. -987654 ) THEN
         mumps_par%COMM = COMM_F77
       ELSE
@@ -225,6 +257,20 @@ C
      &   mumps_par%LISTVAR_SCHUR =>LISTVAR_SCHUR(1:SIZE_SCHUR)
       IF ( SCHURhere /= 0 ) THEN
         mumps_par%SCHUR_CINTERFACE=>SCHUR(1:1)
+      ENDIF
+      IF (ROWINDhere /= 0) THEN
+        mumps_par%ROWIND => ROWIND(1:KEEP(89))
+      ENDIF
+      IF (COLINDhere /= 0) THEN
+        mumps_par%COLIND => COLIND(1:KEEP(89))
+      ENDIF
+      IF (PIVOTShere /= 0) THEN
+        IF (KEEP(50) .EQ.0 .OR.KEEP(50).EQ.1) THEN
+          mumps_par%PIVOTS => PIVOTS(1:KEEP(89))
+        ELSE
+          mumps_par%PIVOTS => PIVOTS(1_8:
+     &                        int(KEEP(89),8)+int(KEEP(89),8))
+        ENDIF
       ENDIF
       IF (NRHS .NE. 1) THEN
         IF ( RHShere /= 0 ) mumps_par%RHS =>
@@ -276,6 +322,7 @@ C
       DO I=WRITE_PROBLEMLEN+1,PB_MAX_LENGTH
         mumps_par%WRITE_PROBLEM(I:I)=' '
       ENDDO
+#if ! defined(NO_SAVE_RESTORE)
       DO I=1,SAVE_DIRLEN
         mumps_par%SAVE_DIR(I:I)=char(SAVE_DIR(I))
       ENDDO
@@ -288,6 +335,7 @@ C
       DO I=SAVE_PREFIXLEN+1,SAVE_PREFIX_MAX_LENGTH
         mumps_par%SAVE_PREFIX(I:I)=' '
       ENDDO
+#endif
       CALL SMUMPS( mumps_par )
       INFO(1:80)=mumps_par%INFO(1:80)
       INFOG(1:80)=mumps_par%INFOG(1:80)
@@ -315,6 +363,7 @@ C
       LSOL_loc   = mumps_par%LSOL_loc
       Nloc_RHS   = mumps_par%Nloc_RHS
       LRHS_loc   = mumps_par%LRHS_loc
+      NSOL_loc   = mumps_par%NSOL_loc
       SIZE_SCHUR = mumps_par%SIZE_SCHUR
       LWK_USER   = mumps_par%LWK_USER
       NELT       = mumps_par%NELT
@@ -326,6 +375,7 @@ C
       NBLOCK     = mumps_par%NBLOCK
       NPROW      = mumps_par%NPROW
       NPCOL      = mumps_par%NPCOL
+      LD_RHSINTR = mumps_par%LD_RHSINTR
       IF ( associated (mumps_par%MAPPING) ) THEN
          CALL MUMPS_ASSIGN_MAPPING(mumps_par%MAPPING(1))
       ELSE
@@ -335,6 +385,12 @@ C
          CALL MUMPS_ASSIGN_PIVNUL_LIST(mumps_par%PIVNUL_LIST(1))
       ELSE
          CALL MUMPS_NULLIFY_C_PIVNUL_LIST()
+      ENDIF
+      IF ( associated (mumps_par%SINGULAR_VALUES) ) THEN
+         CALL SMUMPS_ASSIGN_SINGULAR_VALUES(
+     &                  mumps_par%SINGULAR_VALUES(1))
+      ELSE
+         CALL SMUMPS_NULLIFY_C_SING_VALUES()
       ENDIF
       IF ( associated (mumps_par%SYM_PERM) ) THEN
          CALL MUMPS_ASSIGN_SYM_PERM(mumps_par%SYM_PERM(1))
@@ -346,22 +402,47 @@ C
       ELSE
          CALL MUMPS_NULLIFY_C_UNS_PERM()
       ENDIF
-      IF (associated( mumps_par%COLSCA)) THEN
+      IF ( associated (mumps_par%COLSCA_loc) ) THEN
+         CALL SMUMPS_ASSIGN_COLSCA_LOC(1)
+      ELSE
+         CALL SMUMPS_NULLIFY_C_COLSCA_LOC()
+      ENDIF
+      IF ( associated (mumps_par%ROWSCA_loc) ) THEN
+         CALL SMUMPS_ASSIGN_ROWSCA_LOC(1)
+      ELSE
+         CALL SMUMPS_NULLIFY_C_ROWSCA_LOC()
+      ENDIF
+      IF (associated( mumps_par%COLSCA )) THEN
           CALL SMUMPS_ASSIGN_COLSCA(mumps_par%COLSCA(1))
       ELSE
           CALL SMUMPS_NULLIFY_C_COLSCA()
       ENDIF
-      IF (associated( mumps_par%ROWSCA)) THEN
+      IF (associated( mumps_par%ROWSCA )) THEN
           CALL SMUMPS_ASSIGN_ROWSCA(mumps_par%ROWSCA(1))
       ELSE
           CALL SMUMPS_NULLIFY_C_ROWSCA()
       ENDIF
+      IF (associated( mumps_par%RHSINTR )) THEN
+          CALL SMUMPS_ASSIGN_RHSINTR(mumps_par%RHSINTR(1))
+      ELSE
+          CALL SMUMPS_NULLIFY_C_RHSINTR()
+      ENDIF
+      IF (associated(mumps_par%GLOB2LOC_RHS)) THEN
+          CALL MUMPS_ASSIGN_GLOB2LOC_RHS(mumps_par%GLOB2LOC_RHS(1))
+      ELSE
+          CALL MUMPS_NULLIFY_C_GLOB2LOC_RHS()
+      ENDIF
+      IF (associated(mumps_par%GLOB2LOC_SOL)) THEN
+          CALL MUMPS_ASSIGN_GLOB2LOC_SOL(mumps_par%GLOB2LOC_SOL(1))
+      ELSE
+          CALL MUMPS_NULLIFY_C_GLOB2LOC_SOL()
+      ENDIF
       TMPDIRLEN=len_trim(mumps_par%OOC_TMPDIR)
-      DO I=1,OOC_TMPDIR_MAX_LENGTH
+      DO I=1,TMPDIRLEN
          OOC_TMPDIR(I)=ichar(mumps_par%OOC_TMPDIR(I:I))
       ENDDO
       PREFIXLEN=len_trim(mumps_par%OOC_PREFIX)
-      DO I=1,OOC_PREFIX_MAX_LENGTH
+      DO I=1,PREFIXLEN
          OOC_PREFIX(I)=ichar(mumps_par%OOC_PREFIX(I:I))
       ENDDO
       IF ( JOB == -2 ) THEN

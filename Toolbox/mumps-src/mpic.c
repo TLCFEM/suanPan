@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.1, released
+ *  on Thu May  2 10:15:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -20,24 +20,24 @@ MPI_Comm LIBSEQ_CALL MPI_Comm_f2c(LIBSEQ_INT comm)
   return 0;
 }
 
-LIBSEQ_INT LIBSEQ_CALL MPI_Init(LIBSEQ_INT *pargc, char ***pargv)
+int LIBSEQ_CALL MPI_Init(int *pargc, char ***pargv)
 {
   return 0;
 }
 
-LIBSEQ_INT LIBSEQ_CALL MPI_Comm_rank(MPI_Comm comm, LIBSEQ_INT *rank)
+int LIBSEQ_CALL MPI_Comm_rank(MPI_Comm comm, int *rank)
 {
   *rank=0;
   return 0;
 }
-LIBSEQ_INT LIBSEQ_CALL MPI_Finalize(void)
+int LIBSEQ_CALL MPI_Finalize(void)
 {
    return 0;
 }
 
 /* Internal: for MPI_IS_IN_PLACE tests from Fortran */
 
-void LIBSEQ_CALL MUMPS_CHECKADDREQUAL(char *a, char*b, LIBSEQ_INT *i)
+void LIBSEQ_CALL MUMPS_CHECKADDREQUAL(char *a, char*b, LIBSEQ_INT8 *i)
 {
   if (a - b == 0)
    {
@@ -49,15 +49,15 @@ void LIBSEQ_CALL MUMPS_CHECKADDREQUAL(char *a, char*b, LIBSEQ_INT *i)
    }
 }
 
-void LIBSEQ_CALL MUMPS_CHECKADDREQUAL_(char *a, char*b, LIBSEQ_INT *i)
+void LIBSEQ_CALL MUMPS_CHECKADDREQUAL_(char *a, char*b, LIBSEQ_INT8 *i)
  {
    MUMPS_CHECKADDREQUAL(a,b,i);
  }
-void LIBSEQ_CALL mumps_checkaddrequal_(char *a, char*b, LIBSEQ_INT *i)
+void LIBSEQ_CALL mumps_checkaddrequal_(char *a, char*b, LIBSEQ_INT8 *i)
  {
    MUMPS_CHECKADDREQUAL(a,b,i);
  }
-void LIBSEQ_CALL mumps_checkaddrequal__(char *a, char*b, LIBSEQ_INT *i)
+void LIBSEQ_CALL mumps_checkaddrequal__(char *a, char*b, LIBSEQ_INT8 *i)
  {
    MUMPS_CHECKADDREQUAL(a,b,i);
  }

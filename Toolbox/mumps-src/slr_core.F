@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -41,8 +41,9 @@ C
       SUBROUTINE IS_FRONT_BLR_CANDIDATE(INODE, NIV, NFRONT, NASS, 
      &                    BLRON, K489,
      &                    K490, K491, K492, K20, K60, IDAD, K38,
-     &                    LRSTATUS, K280, LRGROUPS)
-        INTEGER,INTENT(IN) :: INODE, NFRONT, NASS, BLRON, K489, K490,
+     &                    K123, LRSTATUS, K280, LRGROUPS)
+        INTEGER,INTENT(IN) :: INODE, NFRONT, NASS, BLRON, K123,
+     &                        K489, K490,
      &                        K491, K492, NIV, K20, K60, IDAD, K38
         INTEGER,INTENT(OUT):: LRSTATUS 
         INTEGER, INTENT(IN):: K280
@@ -180,8 +181,9 @@ C
         ENDIF
       END SUBROUTINE ALLOC_LRB_FROM_ACC
       SUBROUTINE REGROUPING2(CUT, NPARTSASS, NASS,
-     &                   NPARTSCB, NCB, IBCKSZ, ONLYCB, K472)
-        INTEGER, INTENT(IN) :: IBCKSZ, NASS, NCB
+     &                   NPARTSCB, NCB, IBCKSZ, ONLYCB, K472, 
+     &                   NFRONT, KEEP)
+        INTEGER, INTENT(IN) :: IBCKSZ, NASS, NCB, NFRONT, KEEP(500)
         INTEGER, INTENT(INOUT) :: NPARTSCB, NPARTSASS
         INTEGER, POINTER, DIMENSION(:) :: CUT
         INTEGER, POINTER, DIMENSION(:) :: NEW_CUT
@@ -197,8 +199,9 @@ C
      &          ' not enough memory? memory requested = ' , IERROR
            RETURN
         ENDIF
-        CALL COMPUTE_BLR_VCS(K472, IBCKSZ2, IBCKSZ, NASS)
-        MINSIZE = int(IBCKSZ2 / 2)
+        CALL COMPUTE_BLR_VCS(K472, IBCKSZ2, IBCKSZ, NASS, 
+     &                       NFRONT, KEEP(35))
+        MINSIZE = int(IBCKSZ2 / 3)
         NEW_NPARTSASS = max(NPARTSASS,1)
         IF (.NOT. ONLYCB) THEN
            NEW_CUT(1) = 1
@@ -435,7 +438,6 @@ CC
      &                          Y_RRQR(:,:)
         INTEGER, ALLOCATABLE :: JPVT_RRQR(:)
         INTEGER :: allocok, MREQ
-        REAL, EXTERNAL ::snrm2
         REAL :: ONE, MONE, ZERO
         PARAMETER (ONE = 1.0E0, MONE=-1.0E0)
         PARAMETER (ZERO=0.0E0)
@@ -875,10 +877,10 @@ C     Alloc NOT ok!!
         INTEGER(8), INTENT(IN) :: POSELTT
         INTEGER,intent(in) :: MIDBLK_COMPRESS, KPERCENT_RMB
         REAL, intent(in) :: TOLEPS
-        REAL,    ALLOCATABLE :: RWORK_RRQR(:)
-        REAL, ALLOCATABLE :: WORK_RRQR(:), TAU_RRQR(:)
-        REAL, ALLOCATABLE, DIMENSION(:,:), TARGET :: Q1, R1, 
-     &                                                  Q2, R2
+        REAL,    ALLOCATABLE:: RWORK_RRQR(:)
+        REAL, ALLOCATABLE:: WORK_RRQR(:), TAU_RRQR(:)
+        REAL, ALLOCATABLE, DIMENSION(:,:),TARGET:: Q1, R1,
+     &                                                Q2, R2
         INTEGER, ALLOCATABLE :: JPVT_RRQR(:)
         TYPE(LRB_TYPE)       :: LRB1, LRB2
         INTEGER :: INFO, RANK1, RANK2, RANK, MAXRANK, LWORK

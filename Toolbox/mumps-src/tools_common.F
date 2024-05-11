@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -11,6 +11,100 @@ C  released under the CeCILL-C license
 C  (see doc/CeCILL-C_V1-en.txt, doc/CeCILL-C_V1-fr.txt, and
 C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
+      SUBROUTINE MUMPS_ADJUST_SIZE_LRGROUPS ( STEP, FILS, N, 
+     &           ND_STEPS, NSTEPS, KEEP, 
+     &           LRGROUPS, IFLAG, IERROR)
+!$    USE OMP_LIB
+      USE MUMPS_LR_COMMON,  ONLY : COMPUTE_BLR_VCS
+      IMPLICIT NONE
+      INTEGER, INTENT(IN)    :: N, NSTEPS
+      INTEGER, INTENT(IN)    :: FILS(N), STEP(N), ND_STEPS(NSTEPS)
+      INTEGER, INTENT(INOUT) :: KEEP(500)
+      INTEGER, INTENT(INOUT) :: LRGROUPS(KEEP(280))
+      INTEGER, INTENT(INOUT) :: IFLAG, IERROR
+      INTEGER :: I, NASS, NFRONT, IN, 
+     &           GROUP_SIZE2, NBGROUPS_local, LRGROUPS_SIGN, IG, 
+     &           NBGROUPS, MAXSIZE_GROUPS,
+     &           CurrentGroup, CurrentSize 
+      INTEGER :: OriginalSize, NBSPLIT, SZ_FINAL
+      INTEGER, DIMENSION(:), ALLOCATABLE :: GROUP_SIZE
+      INTEGER  :: allocok
+      IF (KEEP(494).EQ.0) RETURN
+      IF (KEEP(280).NE.N) THEN
+        WRITE(6,*) " Internal error in MUMPS_ADJUST_SIZE_LRGROUPS ",
+     &             "N, KEEP(280) =", N, KEEP(280)
+        RETURN
+      ENDIF
+      NBGROUPS = 0
+      DO I=1, N
+        IN = abs(LRGROUPS(I))
+        IF (IN.GT.NBGROUPS) NBGROUPS=IN
+      END DO
+      ALLOCATE( GROUP_SIZE(NBGROUPS), stat=allocok )
+      IF (allocok > 0) THEN
+        IFLAG  = -7
+        IERROR = NBGROUPS
+        RETURN
+      ENDIF
+      GROUP_SIZE = 0
+      MAXSIZE_GROUPS   = 0
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC,1) 
+!$OMP&         PRIVATE( I, NBGROUPS_local, NASS, IN, NFRONT,
+!$OMP&                  GROUP_SIZE2, CurrentGroup, LRGROUPS_SIGN,
+!$OMP&                  IG, CurrentSize, OriginalSize, NBSPLIT, 
+!$OMP&                  SZ_FINAL
+!$OMP&                )
+!$OMP& REDUCTION(max:MAXSIZE_GROUPS
+!$OMP&                )
+      DO I= 1, N
+        IF (STEP(I).LE.0) CYCLE 
+        NASS = 0
+        IN   = I
+        DO WHILE (IN.GT.0)
+          CurrentGroup = abs(LRGROUPS(IN))
+          GROUP_SIZE(CurrentGroup) = GROUP_SIZE(CurrentGroup) + 1
+          NASS = NASS + 1
+          IN = FILS(IN)
+        ENDDO
+        NFRONT = ND_STEPS(STEP(I))
+        CALL COMPUTE_BLR_VCS(KEEP(472), GROUP_SIZE2, KEEP(488) , 
+     &                       NASS, NFRONT, KEEP(35))
+        IN = I
+        DO WHILE (IN.GT.0)
+          CurrentGroup  = LRGROUPS(IN)
+          OriginalSize  = GROUP_SIZE(abs(CurrentGroup))
+          NBSPLIT = (OriginalSize+GROUP_SIZE2-1)/ GROUP_SIZE2
+          SZ_FINAL = (OriginalSize+NBSPLIT-1)/NBSPLIT
+          MAXSIZE_GROUPS = max(SZ_FINAL, MAXSIZE_GROUPS)
+          IF (CurrentGroup.LT.0) THEN 
+             LRGROUPS_SIGN=-1
+          ELSE
+             LRGROUPS_SIGN=1
+          ENDIF
+          IG             = CurrentGroup 
+          NBGROUPS_local = IG
+          CurrentSize    = 0
+          DO WHILE (IG .eq. CurrentGroup)
+            LRGROUPS(IN) = NBGROUPS_local
+            CurrentSize = CurrentSize + 1
+            IF ( CurrentSize .GT. SZ_FINAL ) THEN
+!$OMP ATOMIC CAPTURE
+              NBGROUPS = NBGROUPS + 1
+              NBGROUPS_local = NBGROUPS
+!$OMP END ATOMIC 
+              NBGROUPS_local = NBGROUPS_local*LRGROUPS_SIGN
+              CurrentSize = 0
+            ENDIF
+            IN = FILS(IN)
+            IF (IN.LE.0) EXIT
+            IG =  LRGROUPS(IN)
+           END DO
+        END DO
+      END DO
+      KEEP(142) = MAXSIZE_GROUPS
+      DEALLOCATE(GROUP_SIZE)
+      RETURN
+      END  SUBROUTINE MUMPS_ADJUST_SIZE_LRGROUPS
       SUBROUTINE MUMPS_STOP_ON_USER_REQUEST( KEEP, KEEP8, ICNTL, INFO,
      &                                       MYID )
       INTEGER    :: INFO(80), KEEP(500), ICNTL(60), MYID
@@ -22,14 +116,6 @@ C
         INFO(2)=MYID
       ENDIF
       RETURN
-      CONTAINS
-        SUBROUTINE MUMPS_ACCESS_ICNTL50_VOLATILE( ICNTL50_out,
-     &                                            ICNTL50_in )
-        INTEGER, VOLATILE :: ICNTL50_in
-        INTEGER, intent(out) :: ICNTL50_out
-        ICNTL50_out=ICNTL50_in
-        RETURN
-        END SUBROUTINE MUMPS_ACCESS_ICNTL50_VOLATILE
       END SUBROUTINE MUMPS_STOP_ON_USER_REQUEST
       SUBROUTINE MUMPS_BUILD_COMM_PARA_ANA (
      &      OPTION, N, COMM, MYID, COMM_NODES, MYID_NODES,
@@ -60,7 +146,7 @@ C
       INTEGER :: WORKERSPERNODE, WORKERSLEFT, WORKERSONMYNODE
       INTEGER, PARAMETER :: MAXNODE_SCOTCH=16, MAXNODE_METIS=64,  
      &                      ROOT=0
-      IF (KEEP(339).GE.5) THEN
+      IF (KEEP(339).NE.0) THEN
         IF (NPROCS.EQ.1) GOTO 100
         IF(N.LE.100) THEN
            WORKERS = 2
@@ -91,11 +177,19 @@ C
      &                  ROOT,  KEEP(411), IERR )
         CALL MPI_BCAST( NNODES, 1, MPI_INTEGER,
      &                  ROOT,  KEEP(411), IERR )
-        WORKERSPERNODE = WORKERS / NNODES
-        WORKERSLEFT    = WORKERS - WORKERSPERNODE*NNODES
-        WORKERSONMYNODE = WORKERSPERNODE
-        IF (NNODES - MYNODEID .LE. WORKERSLEFT ) THEN
-            WORKERSONMYNODE = WORKERSONMYNODE+1
+        IF (WORKERS .LT. NNODES ) THEN
+          IF (MYNODEID .LT. WORKERS ) THEN
+            WORKERSONMYNODE = 1
+          ELSE
+            WORKERSONMYNODE = 0
+          ENDIF
+        ELSE
+          WORKERSPERNODE = WORKERS / NNODES
+          WORKERSLEFT    = WORKERS - WORKERSPERNODE*NNODES
+          WORKERSONMYNODE = WORKERSPERNODE
+          IF (NNODES - MYNODEID .LE. WORKERSLEFT ) THEN
+              WORKERSONMYNODE = WORKERSONMYNODE+1
+          ENDIF
         ENDIF
         NPROCS_PARAORD = WORKERS
         IF ( KEEP(413) .LE. WORKERSONMYNODE - 1 ) THEN
@@ -169,7 +263,6 @@ C
         COMM_PARASYMB           = COMM_PARAORD
         COMM_PARASYMB_ALLOCATED = .FALSE.
       ELSE
-        DO I=1, NPROCS
          IF ((MYID.EQ.0).OR.COMM_PARAORD.NE.MPI_COMM_NULL) THEN
           COLOR = 1
           COMM_PARASYMB_ALLOCATED = .TRUE.
@@ -177,7 +270,6 @@ C
           COLOR = MPI_UNDEFINED
           COMM_PARASYMB_ALLOCATED = .FALSE.
          ENDIF
-        ENDDO
         CALL MPI_COMM_SPLIT( COMM, COLOR, 0, COMM_PARASYMB, IERR )
       ENDIF
  500  CONTINUE
@@ -187,8 +279,12 @@ C
       SUBROUTINE MUMPS_BUILD_PARAORD_to_idCOMM (
      &      COMM, MYID, KEEP, 
      &      COMM_PARASYMB, NPROCS_PARASYMB,
-     &      COMM_PARAORD, NPROCS_PARAORD,  
+     &      COMM_PARAORD,
+     &      NPROCS_PARAORD,  
      &      PARAORD_to_idCOMM, 
+#if defined(AVOID_MPI_IN_PLACE)
+     &      TMP,
+#endif
      &      RKinSYMB_PROC0ORD, 
      &      RKinidCOMM_PROC0SYMB, NPROCS)
       IMPLICIT NONE
@@ -198,16 +294,36 @@ C
      &                        COMM_PARASYMB, NPROCS_PARASYMB 
       INTEGER, INTENT(IN)  :: KEEP(500) 
       INTEGER, INTENT(OUT) :: PARAORD_to_idCOMM(NPROCS_PARAORD)
+#if defined(AVOID_MPI_IN_PLACE)
+      INTEGER              :: TMP(NPROCS_PARAORD) 
+#endif
       INTEGER, INTENT(OUT) :: RKinSYMB_PROC0ORD, RKinidCOMM_PROC0SYMB
       INTEGER  :: idPARAORD, idPARASYMB
       INTEGER  :: IERR
       INTEGER  :: NPROCS
-      PARAORD_to_idCOMM(1:NPROCS_PARAORD)= -1
+#if defined(AVOID_MPI_IN_PLACE)
+      INTEGER :: TMP_INT
+#endif
+#if defined(AVOID_MPI_IN_PLACE)
+      TMP(1:NPROCS_PARAORD)= -1
+#else
+      PARAORD_to_idCOMM(1:NPROCS_PARAORD) = -1
+#endif
       IF (COMM_PARAORD.NE.MPI_COMM_NULL) THEN
         CALL MPI_COMM_RANK (COMM_PARAORD, idPARAORD, IERR)
-        PARAORD_to_idCOMM(idPARAORD+1) = MYID 
+#if defined(AVOID_MPI_IN_PLACE)
+        TMP(idPARAORD+1) = MYID
+#else
+        PARAORD_to_idCOMM(idPARAORD+1) = MYID
+#endif
       ENDIF
-      CALL MPI_ALLREDUCE(MPI_IN_PLACE, PARAORD_to_idCOMM(1), 
+      CALL MPI_ALLREDUCE(
+#if defined(AVOID_MPI_IN_PLACE)
+     &     TMP,
+#else
+     &     MPI_IN_PLACE,
+#endif
+     &     PARAORD_to_idCOMM(1), 
      &     NPROCS_PARAORD, MPI_INTEGER, MPI_MAX, COMM, IERR)
       RKinSYMB_PROC0ORD = -1
       IF (COMM_PARAORD.NE.MPI_COMM_NULL) THEN
@@ -215,15 +331,27 @@ C
         CALL MPI_COMM_RANK (COMM_PARASYMB, idPARASYMB, IERR)
         IF (idPARAORD.EQ.0) RKinSYMB_PROC0ORD = idPARASYMB
       ENDIF
+#if defined(AVOID_MPI_IN_PLACE)
+      TMP_INT = RKinSYMB_PROC0ORD
+      CALL MPI_ALLREDUCE(TMP_INT, RKinSYMB_PROC0ORD, 1,
+     &     MPI_INTEGER, MPI_MAX, COMM, IERR)
+#else
       CALL MPI_ALLREDUCE(MPI_IN_PLACE, RKinSYMB_PROC0ORD, 1,
      &     MPI_INTEGER, MPI_MAX, COMM, IERR)
+#endif
       RKinidCOMM_PROC0SYMB=-1
       IF (COMM_PARASYMB.NE.MPI_COMM_NULL) THEN
         CALL MPI_COMM_RANK (COMM_PARASYMB, idPARASYMB, IERR)
         IF (idPARASYMB.EQ.0) RKinidCOMM_PROC0SYMB = MYID
       ENDIF
+#if defined(AVOID_MPI_IN_PLACE)
+      TMP_INT = RKinidCOMM_PROC0SYMB
+      CALL MPI_ALLREDUCE(TMP_INT, RKinidCOMM_PROC0SYMB, 1,
+     &     MPI_INTEGER, MPI_MAX, COMM, IERR)
+#else
       CALL MPI_ALLREDUCE(MPI_IN_PLACE, RKinidCOMM_PROC0SYMB, 1,
      &     MPI_INTEGER, MPI_MAX, COMM, IERR)
+#endif
       RETURN
       END SUBROUTINE MUMPS_BUILD_PARAORD_to_idCOMM 
       SUBROUTINE MUMPS_FIND_UNIT(IUNIT)
@@ -545,74 +673,6 @@ C
       END DO
       RETURN
       END SUBROUTINE MUMPS_SORT_DOUBLES_DEC
-#if defined (PESSL)
-      SUBROUTINE DESCINIT( DESC, M, N, MB, NB, IRSRC, ICSRC, ICTXT,
-     &                     LLD, INFO )
-      INTEGER            ICSRC, ICTXT, INFO, IRSRC, LLD, M, MB, N, NB
-      INTEGER            DESC( * )
-      INTEGER            BLOCK_CYCLIC_2D, CSRC_, CTXT_, DLEN_, DTYPE_,
-     &                   LLD_, MB_, M_, NB_, N_, RSRC_
-# if defined(DESC8)
-      PARAMETER          ( DLEN_ = 8, DTYPE_ = 1,
-     &                     CTXT_ = 7, M_ = 1, N_ = 2, MB_ = 3, NB_ = 4,
-     &                     RSRC_ = 5, CSRC_ = 6, LLD_ = 8 )
-# else
-      PARAMETER          ( BLOCK_CYCLIC_2D = 1, DLEN_ = 9, DTYPE_ = 1,
-     &                     CTXT_ = 2, M_ = 3, N_ = 4, MB_ = 5, NB_ = 6,
-     &                     RSRC_ = 7, CSRC_ = 8, LLD_ = 9 )
-# endif
-      INTEGER            MYCOL, MYROW, NPCOL, NPROW
-      EXTERNAL           blacs_gridinfo, PXERBLA
-      INTEGER            NUMROC
-      EXTERNAL           NUMROC
-      INTRINSIC          max, min
-      CALL blacs_gridinfo( ICTXT, NPROW, NPCOL, MYROW, MYCOL )
-      INFO = 0
-      IF( M.LT.0 ) THEN
-         INFO = -2
-      ELSE IF( N.LT.0 ) THEN
-         INFO = -3
-      ELSE IF( MB.LT.1 ) THEN
-         INFO = -4
-      ELSE IF( NB.LT.1 ) THEN
-         INFO = -5
-      ELSE IF( IRSRC.LT.0 .OR. IRSRC.GE.NPROW ) THEN
-         INFO = -6
-      ELSE IF( ICSRC.LT.0 .OR. ICSRC.GE.NPCOL ) THEN
-         INFO = -7
-      ELSE IF( NPROW.EQ.-1 ) THEN
-         INFO = -8
-      ELSE IF( LLD.LT.max( 1, numroc( M, MB, MYROW, IRSRC,
-     &                                NPROW ) ) ) THEN
-         INFO = -9
-      END IF
-      IF( INFO.NE.0 )
-     &   CALL PXERBLA( ICTXT, 'DESCINIT', -INFO )
-# ifndef DESC8
-      DESC( DTYPE_ ) = BLOCK_CYCLIC_2D
-# endif
-      DESC( M_ )  = max( 0, M )
-      DESC( N_ )  = max( 0, N )
-      DESC( MB_ ) = max( 1, MB )
-      DESC( NB_ ) = max( 1, NB )
-      DESC( RSRC_ ) = max( 0, min( IRSRC, NPROW-1 ) )
-      DESC( CSRC_ ) = max( 0, min( ICSRC, NPCOL-1 ) )
-      DESC( CTXT_ ) = ICTXT
-      DESC( LLD_ )  = max( LLD, max( 1, numroc( DESC( M_ ), DESC( MB_ ),
-     &                              MYROW, DESC( RSRC_ ), NPROW ) ) )
-      RETURN
-      END SUBROUTINE DESCINIT
-      SUBROUTINE PXERBLA( ICTXT, SRNAME, INFO )
-      INTEGER            ICTXT, INFO
-      CHARACTER*(*)      SRNAME
-      INTEGER            MYCOL, MYROW, NPCOL, NPROW
-      EXTERNAL           blacs_gridinfo
-      CALL blacs_gridinfo( ICTXT, NPROW, NPCOL, MYROW, MYCOL )
-      WRITE( *, FMT = 9999 ) MYROW, MYCOL, SRNAME, INFO
- 9999 FORMAT( '{', I5, ',', I5, '}:  On entry to ', A,
-     &        ' parameter number', I4, ' had an illegal value' )
-      END SUBROUTINE PXERBLA
-#endif
       SUBROUTINE MUMPS_MEM_CENTRALIZE(MYID, COMM, INFO, INFOG, IRANK)
       IMPLICIT NONE
       INTEGER MYID, COMM, IRANK, INFO, INFOG(2)
@@ -1198,8 +1258,6 @@ C
       INTEGER, DIMENSION (:), ALLOCATABLE :: IPOOL,TNSTK
       INTEGER I,II,allocok
       INTEGER NBLEAF,NBROOT,LEAF,IN,INODE,IFATH
-      EXTERNAL MUMPS_TYPENODE
-      INTEGER MUMPS_TYPENODE
       POSTORDER=1
       NBLEAF = NA(1)
       NBROOT = NA(2)
@@ -1363,6 +1421,7 @@ C
       deallocate(MyNAME_TAB)
       END SUBROUTINE MUMPS_GET_PROC_PER_NODE
       SUBROUTINE MUMPS_ICOPY_32TO64 (INTAB, SIZETAB, OUTTAB8)
+      IMPLICIT NONE
       INTEGER, intent(in)     ::  SIZETAB
       INTEGER, intent(in)     ::  INTAB(SIZETAB)
       INTEGER(8), intent(out) ::  OUTTAB8(SIZETAB)
@@ -1373,6 +1432,7 @@ C
       RETURN
       END SUBROUTINE MUMPS_ICOPY_32TO64
       SUBROUTINE MUMPS_ICOPY_32TO64_64C(INTAB, SIZETAB8, OUTTAB8)
+      IMPLICIT NONE
       INTEGER(8), intent(in)  ::  SIZETAB8
       INTEGER, intent(in)     ::  INTAB(SIZETAB8)
       INTEGER(8), intent(out) ::  OUTTAB8(SIZETAB8)
@@ -1387,20 +1447,23 @@ C
 !$OMP END PARALLEL DO
       RETURN
       END SUBROUTINE MUMPS_ICOPY_32TO64_64C
-      SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP(IN_OUT_TAB48, SIZETAB)
-      INTEGER(8), intent(in) :: SIZETAB
-      INTEGER, intent(inout) :: IN_OUT_TAB48(2*SIZETAB)
-      CALL MUMPS_ICOPY_32TO64_64C_IP_REC(IN_OUT_TAB48, SIZETAB)
+      SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP(IN_OUT_TAB48, SIZETAB,
+     &    SIZETABX2 ) 
+      IMPLICIT NONE
+      INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+      INTEGER, intent(inout) :: IN_OUT_TAB48(SIZETABX2)
+      CALL MUMPS_ICOPY_32TO64_64C_IP_REC(IN_OUT_TAB48, SIZETAB,
+     &    SIZETABX2)
       RETURN
       END SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP
       RECURSIVE SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP_REC(
-     &                     IN_OUT_TAB48, SIZETAB)
+     &                     IN_OUT_TAB48, SIZETAB, SIZETABX2)
       IMPLICIT NONE
-      INTEGER(8), intent(in) :: SIZETAB
-      INTEGER :: IN_OUT_TAB48(2*SIZETAB)
+      INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+      INTEGER :: IN_OUT_TAB48(SIZETABX2)
       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
       IF (SIZETAB.LE. 1000_8) THEN
-        CALL MUMPS_ICOPY_32TO64_64C_IP_C(IN_OUT_TAB48(1),
+        CALL MUMPS_ICOPY_32TO64_64C_IP_C(IN_OUT_TAB48,
      &       SIZETAB)
       ELSE
         SIZE2  = SIZETAB / 2
@@ -1410,11 +1473,12 @@ C
         CALL MUMPS_ICOPY_32TO64_64C(IN_OUT_TAB48(IBEG24),
      &                           SIZE2, IN_OUT_TAB48(IBEG28))
         CALL MUMPS_ICOPY_32TO64_64C_IP_REC(IN_OUT_TAB48,
-     &                           SIZE1)
+     &                           SIZE1, 2_8*SIZE1)
       ENDIF
       RETURN
       END SUBROUTINE MUMPS_ICOPY_32TO64_64C_IP_REC
       SUBROUTINE MUMPS_ICOPY_64TO32(INTAB8, SIZETAB, OUTTAB)
+      IMPLICIT NONE
       INTEGER, intent(in) ::  SIZETAB
       INTEGER(8), intent(in) ::  INTAB8(SIZETAB)
       INTEGER, intent(out)   ::  OUTTAB(SIZETAB)
@@ -1425,6 +1489,7 @@ C
       RETURN
       END SUBROUTINE MUMPS_ICOPY_64TO32
       SUBROUTINE MUMPS_ICOPY_64TO32_64C (INTAB8, SIZETAB, OUTTAB)
+      IMPLICIT NONE
       INTEGER(8), intent(in)    ::  SIZETAB
       INTEGER(8), intent(in) ::  INTAB8(SIZETAB)
       INTEGER, intent(out)   ::  OUTTAB(SIZETAB)
@@ -1434,20 +1499,23 @@ C
       ENDDO
       RETURN
       END SUBROUTINE MUMPS_ICOPY_64TO32_64C
-      SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP(IN_OUT_TAB48, SIZETAB)
-      INTEGER(8), intent(in) :: SIZETAB
-      INTEGER, intent(inout) :: IN_OUT_TAB48(2*SIZETAB)
-      CALL MUMPS_ICOPY_64TO32_64C_IP_REC(IN_OUT_TAB48, SIZETAB)
+      SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP(IN_OUT_TAB48, SIZETAB,
+     &                                     SIZETABX2)
+      IMPLICIT NONE
+      INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+      INTEGER, intent(inout) :: IN_OUT_TAB48(SIZETABX2)
+      CALL MUMPS_ICOPY_64TO32_64C_IP_REC(IN_OUT_TAB48, SIZETAB,
+     &                                   SIZETABX2)
       RETURN
       END SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP
       RECURSIVE SUBROUTINE MUMPS_ICOPY_64TO32_64C_IP_REC(
-     &                     IN_OUT_TAB48, SIZETAB)
+     &                     IN_OUT_TAB48, SIZETAB, SIZETABX2)
       IMPLICIT NONE
-      INTEGER(8), intent(in) :: SIZETAB
-      INTEGER :: IN_OUT_TAB48(2*SIZETAB)
+      INTEGER(8), intent(in) :: SIZETAB, SIZETABX2
+      INTEGER :: IN_OUT_TAB48(SIZETABX2)
       INTEGER(8) :: IBEG24, IBEG28, SIZE1, SIZE2
       IF (SIZETAB.LE. 1000_8) THEN
-        CALL MUMPS_ICOPY_64TO32_64C_IP_C(IN_OUT_TAB48(1),
+        CALL MUMPS_ICOPY_64TO32_64C_IP_C(IN_OUT_TAB48,
      &       SIZETAB)
       ELSE
         SIZE2  = SIZETAB / 2
@@ -1455,7 +1523,7 @@ C
         IBEG24 = SIZE1 + 1
         IBEG28 = SIZE1 + SIZE1 + 1_8
         CALL MUMPS_ICOPY_64TO32_64C_IP_REC(IN_OUT_TAB48,
-     &                                        SIZE1)
+     &                                     SIZE1, 2_8*SIZE1)
         CALL MUMPS_ICOPY_64TO32_64C(IN_OUT_TAB48(IBEG28),
      &                           SIZE2, IN_OUT_TAB48(IBEG24))
       ENDIF
@@ -2026,3 +2094,57 @@ C
       TAB_POS(NSLAVES+1)= NCB+1
       NSLAVES_NODE=NSLAVES
       END SUBROUTINE MUMPS_SET_PARTI_REGULAR
+      SUBROUTINE MUMPS_BIGALLREDUCE(IS_IN_PLACE,
+     &           B1, B2, N,
+     &           MPI_TYPE, MPI_OP, COMM, IERR_MPI)
+      IMPLICIT NONE
+      LOGICAL :: IS_IN_PLACE
+      INTEGER :: N, MPI_TYPE, MPI_OP, COMM, IERR_MPI
+      INTEGER :: B1(*), B2(*) 
+      INTEGER, PARAMETER :: CHUNK = 250 000 000
+      INCLUDE 'mpif.h'
+      INTEGER :: I, THISCHUNK
+      INTEGER(8) :: IPOS
+      IF ( MPI_TYPE .NE. MPI_INTEGER .AND. MPI_TYPE .NE. MPI_2INTEGER )
+     &  THEN
+        WRITE(*,*) "Internal error MUMPS_BIGALLREDUCE",MPI_TYPE
+      ENDIF
+      DO I = 1, N, CHUNK
+        THISCHUNK=min(CHUNK, N-I+1)
+        IF ( MPI_TYPE.EQ.MPI_INTEGER) THEN
+                 IPOS = int(I,8)
+        ELSE
+                 IPOS =int(I,8)+int(I,8)-1_8
+        ENDIF
+        IF ( IS_IN_PLACE ) THEN
+          CALL MPI_ALLREDUCE( MPI_IN_PLACE, B2(IPOS), THISCHUNK,
+     &         MPI_TYPE, MPI_OP, COMM, IERR_MPI )
+        ELSE
+          CALL MPI_ALLREDUCE( B1(IPOS), B2(IPOS), THISCHUNK,
+     &         MPI_TYPE, MPI_OP, COMM, IERR_MPI )
+        ENDIF
+      ENDDO
+      RETURN
+      END SUBROUTINE MUMPS_BIGALLREDUCE
+      INTEGER FUNCTION MUMPS_NUMROC(ROOT_SIZE, BLOCK_SIZE,
+     &           MYPROC_ROW, IPROC_ROW1, NPROCS_ROW)
+      IMPLICIT NONE
+      INTEGER :: ROOT_SIZE, BLOCK_SIZE,
+     &           MYPROC_ROW, IPROC_ROW1, NPROCS_ROW
+      INTEGER :: NBLOCKS, EXTRA_FULL_BLOCKS, DIST_IPROC_ROW1, MYNBROWS
+      NBLOCKS = ROOT_SIZE / BLOCK_SIZE
+      MYNBROWS = (NBLOCKS/NPROCS_ROW)*BLOCK_SIZE
+      EXTRA_FULL_BLOCKS = mod(NBLOCKS, NPROCS_ROW)
+      IF (MYPROC_ROW .GE. IPROC_ROW1) THEN
+        DIST_IPROC_ROW1 = MYPROC_ROW - IPROC_ROW1
+      ELSE
+        DIST_IPROC_ROW1 = NPROCS_ROW + MYPROC_ROW - IPROC_ROW1
+      ENDIF
+      IF ( DIST_IPROC_ROW1 .LT. EXTRA_FULL_BLOCKS ) THEN
+        MYNBROWS = MYNBROWS + BLOCK_SIZE
+      ELSE IF ( DIST_IPROC_ROW1 .EQ. EXTRA_FULL_BLOCKS ) THEN
+        MYNBROWS = MYNBROWS + mod(ROOT_SIZE,BLOCK_SIZE)
+      ENDIF
+      MUMPS_NUMROC = MYNBROWS
+      RETURN
+      END FUNCTION MUMPS_NUMROC

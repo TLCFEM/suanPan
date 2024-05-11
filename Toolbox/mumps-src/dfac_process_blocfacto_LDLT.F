@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -70,7 +70,7 @@ C
       INTEGER COMM, MYID
       INTEGER PTLUST_S(KEEP(28)),
      &        ITLOC(N+KEEP(253)), FILS(N), DAD(KEEP(28)), ND(KEEP(28))
-      DOUBLE PRECISION :: RHS_MUMPS(KEEP(255))
+      DOUBLE PRECISION :: RHS_MUMPS(KEEP8(85))
       INTEGER(8), INTENT(IN) :: PTRAIW( LPTRAR ), PTRARW( LPTRAR )
       INTEGER(8), INTENT(IN) :: PTR8ARR(KEEP(193))
       INTEGER, INTENT(IN) :: NINCOLARR(KEEP(194))
@@ -564,8 +564,9 @@ C
           CALL GET_CUT(IW(IOLDPS+HS:IOLDPS+HS+NROW1-1), 0,
      &                    NROW1, LRGROUPS, NPARTSCB, 
      &                    NPARTSASS, BEGS_BLR_LS)
-              CALL REGROUPING2(BEGS_BLR_LS, NPARTSASS, 0, NPARTSCB,
-     &                        NROW1-0, KEEP(488), .TRUE., KEEP(472))
+              CALL REGROUPING2(BEGS_BLR_LS, NPARTSASS, NASS1, NPARTSCB,
+     &                        NROW1-0, KEEP(488), .TRUE., KEEP(472),
+     &                        NCOL1, KEEP(1))
              NB_BLR_LS = NPARTSCB
         ENDIF
         call MAX_CLUSTER(BEGS_BLR_LM,NB_BLR_LM+1,MAXI_CLUSTER_LM)
@@ -579,7 +580,8 @@ C
      &                    NPARTSASS_COL, BEGS_BLR_COL)
           CALL REGROUPING2(BEGS_BLR_COL, NPARTSASS_COL, NASS1, 
      &                     NPARTSCB_COL,
-     &                     NCOL1-NASS1, KEEP(488), .FALSE., KEEP(472))
+     &                     NCOL1-NASS1, KEEP(488), .FALSE., KEEP(472),
+     &                     NCOL1, KEEP(1))
           NB_BLR_COL = NPARTSCB_COL + NPARTSASS_COL
           IF (NPARTSASS_MASTER.NE.NPARTSASS_COL) THEN
              ALLOCATE(BEGS_BLR_COL_TMP(
@@ -996,10 +998,11 @@ C
             END IF
            END DO
            IF ( IERR .eq. -2 ) THEN
-              IF (LP > 0 ) WRITE(LP,*) MYID,
+             IF (LP > 0 ) THEN 
+               WRITE(LP,*) MYID,
      &": FAILURE, SEND BUFFER TOO SMALL DURING
      & DMUMPS_PROCESS_SYM_BLOCFACTO"
-             WRITE(LP,*) "NPIV=", NPIV, "NROW1=",NROW1
+             ENDIF
              IFLAG = -17
              IERROR = 5 * KEEP(34) + NPIV * NROW1 * KEEP(35)
              GOTO 700

@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -31,7 +31,7 @@ C
       INTEGER IW(LIW), ITLOC(N+KEEP(253)), STEP(N),
      &        PTRIST(KEEP(28)), FILS(N)
       INTEGER(8), INTENT(IN) :: PTRARW(NELT+1), PTRAIW(NELT+1)
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER INTARR(KEEP8(27))
       INTEGER FRT_PTR(N+1), FRT_ELT(NELT)
       REAL :: A(LA)
@@ -92,7 +92,7 @@ C
       INTEGER(8), intent(in) :: KEEP8(150)
       INTEGER, intent(inout) :: ITLOC(N+KEEP(253))
       REAL, intent(inout) :: A(LA)
-      REAL, intent(in)    :: RHS_MUMPS(KEEP(255))
+      REAL, intent(in)    :: RHS_MUMPS(KEEP8(85))
       INTEGER, intent(in)    :: INTARR(LINTARR)
       REAL, intent(in)    :: DBLARR(LDBLARR)
       INTEGER, intent(in)    :: FRT_PTR(N+1), FRT_ELT(NELT)
@@ -148,8 +148,9 @@ C
           NB_BLR_LS = NPARTSCB
           call MAX_CLUSTER(BEGS_BLR_LS,NB_BLR_LS+1,MAXI_CLUSTER)
           DEALLOCATE(BEGS_BLR_LS)
-          CALL COMPUTE_BLR_VCS(KEEP(472), IBCKSZ2, KEEP(488), NASS)
-          MINSIZE = int(IBCKSZ2 / 2)
+          CALL COMPUTE_BLR_VCS(KEEP(472), IBCKSZ2, KEEP(488), NASS,
+     &                         NBCOLF, KEEP(35))
+          MINSIZE = int(IBCKSZ2 / 3)
           TOPDIAG = max(2*MINSIZE + MAXI_CLUSTER-1, TOPDIAG)
         ENDIF
 !$      CHUNK = max( KEEP(360)/2,

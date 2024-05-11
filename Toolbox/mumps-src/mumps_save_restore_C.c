@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.1, released
+ *  on Thu May  2 10:15:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -18,6 +18,7 @@
 #include <string.h>
 #include "mumps_save_restore_C.h"
 #include "mumps_common.h"
+#if ! defined(NO_SAVE_RESTORE)
 /* Functions */
 void MUMPS_CALL
 MUMPS_GET_SAVE_DIR_C(MUMPS_INT *len_save_dir, char* save_dir, mumps_ftnlen l1)
@@ -43,10 +44,9 @@ MUMPS_GET_SAVE_PREFIX_C(MUMPS_INT *len_save_prefix, char* save_prefix, mumps_ftn
   *len_save_prefix = strlen(tmp_save_prefix);
   save_prefix = strncpy(save_prefix, tmp_save_prefix, l1); 
 }
+#else
 void MUMPS_CALL
 MUMPS_SAVE_RESTORE_RETURN_C()
 {
-  /*
-  Save/restore feature will be available in the future
-  */
 }
+#endif

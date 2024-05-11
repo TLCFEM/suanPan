@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -152,25 +152,24 @@ C
       NEXP=-NEXP
       RETURN
       END SUBROUTINE SMUMPS_DETER_SCALING_INVERSE
-      SUBROUTINE SMUMPS_DETER_SIGN_PERM(DETER, N, VISITED, PERM)
+      SUBROUTINE SMUMPS_DETER_SIGN_PERM(DETER, N, PERM)
       IMPLICIT NONE
       REAL, intent(inout) :: DETER
       INTEGER, intent(in)    :: N
-      INTEGER, intent(inout) :: VISITED(N)
-      INTEGER, intent(in)    :: PERM(N)
+      INTEGER, intent(inout) :: PERM(N)
       INTEGER I, J, K
       K = 0
       DO I = 1, N
-        IF (VISITED(I) .GT. N) THEN
-          VISITED(I)=VISITED(I)-N-N-1
-          CYCLE
+        IF (PERM(I) .LT. 0) THEN
+          PERM(I)=-PERM(I)
+        ELSE 
+          J = PERM(I)
+          DO WHILE (J.NE.I)
+            PERM(J)=-PERM(J)
+            K = K + 1
+            J = -PERM(J) 
+          ENDDO
         ENDIF
-        J = PERM(I)
-        DO WHILE (J.NE.I)
-          VISITED(J) = VISITED(J) + N + N + 1
-          K = K + 1
-          J = PERM(J)
-        ENDDO
       ENDDO
       IF (mod(K,2).EQ.1) THEN
         DETER = -DETER

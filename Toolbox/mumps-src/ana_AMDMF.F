@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -994,10 +994,6 @@ C
         prev_nbr = 0
         do jidx=1, n
            j = abs(porder(jidx))
-#if defined(check)
-           if (parent(j).eq.0)
-     &     write(6,*) " ========= jidx,j= ", jidx,j," is a rootnode "
-#endif
            if(parent(j) .ne. 0) then
               if (KEEP378.eq.1) then
                if (cc(parent(j)) .lt. 0) then

@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.1, released
+ *  on Thu May  2 10:15:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -198,8 +198,8 @@ MUMPS_LOW_LEVEL_INIT_TMPDIR(MUMPS_INT *dim, char *str, mumps_ftnlen l1)
 /*   mumps_io_last_file_opened=-1; */
 void MUMPS_CALL
 MUMPS_LOW_LEVEL_INIT_OOC_C(MUMPS_INT *_myid, MUMPS_INT *total_size_io, MUMPS_INT *size_element,
-                           MUMPS_INT *async, MUMPS_INT *k211, MUMPS_INT *nb_file_type,
-                           MUMPS_INT *flag_tab, MUMPS_INT *ierr)
+                           MUMPS_INT *async, MUMPS_INT *keep211, MUMPS_INT *nb_file_type,
+                           MUMPS_INT *flag_tab, MUMPS_INT *keep255, MUMPS_INT *ierr )
 {
   char buf[128]; /* for error message */
   MUMPS_INT myid_loc,async_loc,size_element_loc,nb_file_type_loc,*flag_tab_loc;
@@ -237,7 +237,7 @@ MUMPS_LOW_LEVEL_INIT_OOC_C(MUMPS_INT *_myid, MUMPS_INT *total_size_io, MUMPS_INT
 #endif
   total_vol=0;
   mumps_io_flag_async=async_loc;
-  mumps_io_k211=(MUMPS_INT)*k211;
+  mumps_io_k211=(MUMPS_INT)*keep211;
   if (MUMPS_OOC_STORE_PREFIXLEN==-1) {
     *ierr=-92;
     mumps_io_error((MUMPS_INT)*ierr,"Error: prefix not initialized\n");
@@ -261,7 +261,8 @@ MUMPS_LOW_LEVEL_INIT_OOC_C(MUMPS_INT *_myid, MUMPS_INT *total_size_io, MUMPS_INT
    */
   MUMPS_OOC_STORE_PREFIXLEN=-1;
   MUMPS_OOC_STORE_TMPDIRLEN=-1;
-  *ierr=(MUMPS_INT)mumps_init_file_structure(&myid_loc,&total_size_io_loc,&size_element_loc,&nb_file_type_loc,flag_tab_loc);
+  *ierr=(MUMPS_INT)mumps_init_file_structure(&myid_loc,&total_size_io_loc,&size_element_loc,
+		   &nb_file_type_loc,flag_tab_loc,*keep255);
   free(flag_tab_loc);
   if(*ierr<0){
     return;
@@ -447,11 +448,8 @@ MUMPS_LOW_LEVEL_DIRECT_READ(void * address_block,
       if(*ierr<0){
          return;
       }
-    } else {
     }
 #if ! defined(MUMPS_WIN32)
-# if ! defined(WITHOUT_PTHREAD)
-# endif
   gettimeofday(&end_time,NULL);
   mumps_time_spent_in_sync=mumps_time_spent_in_sync+((double)end_time.tv_sec+((double)end_time.tv_usec/1000000))-((double)start_time.tv_sec+((double)start_time.tv_usec/1000000));
 #endif
@@ -463,7 +461,10 @@ void MUMPS_CALL
 MUMPS_CLEAN_IO_DATA_C(MUMPS_INT *myid,MUMPS_INT *step,MUMPS_INT *ierr)
 {
   char buf[64]; /* for error message */
-  MUMPS_INT step_loc,myid_loc,ierr_loc;
+  MUMPS_INT step_loc,myid_loc;
+#if !defined(MUMPS_WIN32) && !defined(WITHOUT_PTHREAD)
+  MUMPS_INT ierr_loc;
+#endif
   step_loc=(MUMPS_INT)*step;
   myid_loc=(MUMPS_INT)*myid;
   if(!mumps_io_is_init_called){
@@ -523,12 +524,6 @@ MUMPS_GET_MAX_NB_REQ_C(MUMPS_INT *max,MUMPS_INT *ierr)
   return;
 }
 void MUMPS_CALL
-MUMPS_GET_MAX_FILE_SIZE_C(double * max_ooc_file_size)
-{
-  *max_ooc_file_size=(double)(MAX_FILE_SIZE);
-  return;
-}
-void MUMPS_CALL
 MUMPS_OOC_GET_NB_FILES_C(const MUMPS_INT *type,MUMPS_INT *nb_files)
 {
   MUMPS_INT type_loc,nb_files_loc;
@@ -576,19 +571,19 @@ MUMPS_OOC_ALLOC_POINTERS_C(MUMPS_INT *nb_file_type,MUMPS_INT *dim,MUMPS_INT *ier
   return;
 }
 void MUMPS_CALL
-MUMPS_OOC_INIT_VARS_C(MUMPS_INT *myid_arg,
-                        MUMPS_INT *size_element,MUMPS_INT *async, MUMPS_INT *k211,
-                        MUMPS_INT *ierr)
+MUMPS_OOC_INIT_VARS_C(MUMPS_INT *myid_arg, MUMPS_INT *size_element, MUMPS_INT *async,
+                      MUMPS_INT *keep211, MUMPS_INT *keep255,
+                      MUMPS_INT *ierr)
 {
   MUMPS_INT size_element_loc,async_loc,myid_arg_loc;
 #if ! defined(MUMPS_WIN32) && ! defined(WITHOUT_PTHREAD)
   mumps_time_spent_in_sync=0;
 #endif
-  mumps_io_k211=(MUMPS_INT)*k211;
+  mumps_io_k211=(MUMPS_INT)*keep211;
   size_element_loc=(MUMPS_INT)*size_element;
   async_loc=(MUMPS_INT)*async;
   myid_arg_loc=(MUMPS_INT)*myid_arg;
-  *ierr=(MUMPS_INT)mumps_io_init_vars(&myid_arg_loc,&size_element_loc,&async_loc);
+  *ierr=(MUMPS_INT)mumps_io_init_vars(&myid_arg_loc,&size_element_loc,&async_loc,*keep255);
   return;
 }
 void MUMPS_CALL

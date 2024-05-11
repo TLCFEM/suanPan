@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -71,7 +71,7 @@ C
       INTEGER(8) :: PTRFAC(KEEP(28))
       INTEGER   PTRIST(KEEP(28)), PTLUST_S(KEEP(28))
       INTEGER   IW1(2*KEEP(28)), ITLOC(N+KEEP(253)), POOL(LPOOL)
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER(8) :: IW2(2*KEEP(28))
       INTEGER   PROCNODE_STEPS(KEEP(28))
       INTEGER   COMM_LOAD, ASS_IRECV
@@ -96,8 +96,8 @@ C
       INTEGER, INTENT (IN) :: LL0_OMP_MAPPING
       INTEGER, INTENT (OUT):: L0_OMP_MAPPING( LL0_OMP_MAPPING )
       INTEGER, INTENT (IN) :: LL0_OMP_FACTORS
-      TYPE(SMUMPS_L0OMPFAC_T), INTENT (OUT) :: L0_OMP_FACTORS(
-     &                                         LL0_OMP_FACTORS )
+      TYPE(SMUMPS_L0OMPFAC_T), INTENT (INOUT) :: L0_OMP_FACTORS(
+     &                                           LL0_OMP_FACTORS )
       INTEGER, INTENT (IN) :: NBSTATS_I4, NBSTATS_I8
       INTEGER, INTENT (IN) :: NBCOLS_I4, NBCOLS_I8
       INTEGER, INTENT (IN) :: I4_L0_OMP(NBSTATS_I4, NBCOLS_I4)
@@ -556,7 +556,7 @@ C
       INTEGER LPOOL
       INTEGER PROCNODE_STEPS(KEEP(28))
       INTEGER ITLOC(N+KEEP(253))
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER IW(LIW), NSTK_STEPS(KEEP(28))
       INTEGER(8), INTENT(IN) :: PTRARW(LPTRAR), PTRAIW(LPTRAR)
       INTEGER(8), INTENT(IN) :: PTR8ARR(KEEP(193))

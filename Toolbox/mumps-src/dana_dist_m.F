@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -80,6 +80,8 @@ C
       INTEGER  ISTEP_TO_INIV2( KEEP(71) )
       LOGICAL  I_AM_CAND(NMB_PAR2)
       INTEGER  CANDIDATES( SLAVEF+1, NMB_PAR2 )
+      INTEGER  PHASE
+      PARAMETER (PHASE=0)
       DOUBLE PRECISION OPSA
       DOUBLE PRECISION OPSA_LOC 
       INTEGER(8) MAX_SIZE_FACTOR
@@ -144,10 +146,15 @@ C
       INTEGER :: FLAG_L0OMP
       PARAMETER (FLAG_L0OMP=-2014)
       INCLUDE 'mumps_headers.h'
+      LOGICAL ROOT_OWNER
+      INTEGER(8) LWK_RR
+      INTEGER LIWK_RR
+      INTEGER IROOT, SIZE_ROOT
       INTEGER WHAT
       INTEGER(4) :: I4
       INTEGER(8) IDUMMY8
-      INTRINSIC min, int, real
+      INTRINSIC min, int
+      INTRINSIC dble
       INTEGER DMUMPS_OOC_GET_PANEL_SIZE
       EXTERNAL DMUMPS_OOC_GET_PANEL_SIZE
       INTEGER MUMPS_PROCNODE, MUMPS_TYPENODE
@@ -410,7 +417,7 @@ C
      &                KEEP(494), 1, KEEP(490),
      &                KEEP(491), KEEP(492),
      &                KEEP(20), KEEP(60), DAD(STEP(INODE)), KEEP(38),
-     &                LRSTATUS, IDUMMY)
+     &                KEEP(123), LRSTATUS, IDUMMY)
       COMPRESS_PANEL = (LRSTATUS.GE.2)
       COMPRESS_CB    = ((LRSTATUS.EQ.1).OR.(LRSTATUS.EQ.3))
       IF (COMPRESS_PANEL.OR.COMPRESS_CB) NBNODES_BLR = NBNODES_BLR+1
@@ -720,9 +727,9 @@ C
              ENDIF
             ENDIF
          ENDIF
-         NIRNEC = max0(NIRNEC,
+         NIRNEC = max(NIRNEC,
      &             NIRADU+ISTKI+SIZECBI+MAXITEMPCB)
-         NIRNEC_OOC = max0(NIRNEC_OOC,
+         NIRNEC_OOC = max(NIRNEC_OOC,
      &             NIRADU_OOC+ISTKI_OOC+SIZECBI+MAXITEMPCB +
      &             (XSIZE_OOC-XSIZE_IC) ) 
          CURRENT_ACTIVE_MEM = ISTKR+SIZECBINFR
@@ -852,7 +859,7 @@ C
      &                KEEP(494), 1, KEEP(490),
      &                KEEP(491), KEEP(492),
      &                KEEP(20), KEEP(60), DAD(STEP(IFSON)), KEEP(38),
-     &                LRSTATUSS, IDUMMY)
+     &                KEEP(123), LRSTATUSS, IDUMMY)
                COMPRESS_CBS   = ((LRSTATUSS.EQ.1).OR.(LRSTATUSS.EQ.3))
                IF (COMPRESS_CBS) THEN
                  K465_8    = int(KEEP(465),8)
@@ -1448,8 +1455,8 @@ C
            LSTKR(ITOP) = SIZECB
            ISTKR = ISTKR + LSTKR(ITOP)
            NRLNEC = max(NRLNEC,NRLADU+ISTKR+MAXTEMPCB)
-           NIRNEC = max0(NIRNEC,NIRADU+ISTKI+MAXITEMPCB)
-           NIRNEC_OOC = max0(NIRNEC_OOC,NIRADU_OOC+ISTKI_OOC+
+           NIRNEC = max(NIRNEC,NIRADU+ISTKI+MAXITEMPCB)
+           NIRNEC_OOC = max(NIRNEC_OOC,NIRADU_OOC+ISTKI_OOC+
      &          MAXITEMPCB + 
      &          (XSIZE_OOC-XSIZE_IC) ) 
            NRLNEC_if_LR_LU    =  max(NRLNEC_if_LR_LU,
@@ -1482,6 +1489,73 @@ C
          ENDIF
       ENDIF 
  115  CONTINUE
+      IF ( KEEP(53) .NE. 0 ) THEN
+        IF ( KEEP(38) .ne. 0 ) THEN
+          IROOT = KEEP( 38 )
+        ELSE
+          IROOT = KEEP( 20 )
+        END IF
+        ROOT_OWNER = ( MYID .eq.
+     &  MUMPS_PROCNODE( PROCNODE(STEP(IROOT)), KEEP(199) ) )
+        SIZE_ROOT = ND(STEP(IROOT))+KEEP(253)
+        CALL DMUMPS_SVD_QR_ESTIM_WK( PHASE, 
+     &       KEEP(51), KEEP(51), SIZE_ROOT,
+     &       LOCAL_M, LOCAL_N, ROOT_OWNER, KEEP,KEEP8,
+     &       LIWK_RR, LWK_RR )
+        IF ( NRLNEC-NRLADU .LT. LWK_RR ) THEN
+          NRLNEC = NRLADU + LWK_RR
+          NRLNEC_if_LR_LU   = NRLNEC_if_LR_LU + LWK_RR
+          NRLNEC_if_LR_CB   = NRLNEC_if_LR_CB + LWK_RR
+          NRLNEC_if_LR_LUCB = NRLNEC_if_LR_LUCB + LWK_RR
+          NRLNEC_ACTIVE     = NRLNEC_ACTIVE     + LWK_RR
+          NRLNECOOC_if_LR_LUCB = NRLNECOOC_if_LR_LUCB  + LWK_RR
+          PEAK_LRLU_UD = 
+     &             max(PEAK_LRLU_UD,
+     &             NRLNEC_if_LR_LU + NRLADULR_UD)
+          PEAK_OOC_LRLU_UD = 
+     &             max(PEAK_OOC_LRLU_UD,
+     &             NRLNEC_ACTIVE + NRLADULR_UD)
+          PEAK_OOC_LRLU_WC = 
+     &             max(PEAK_OOC_LRLU_WC,
+     &             NRLNEC_ACTIVE + NRLADULR_WC)
+          PEAK_LRLUCB_UD = 
+     &             max(PEAK_LRLUCB_UD,
+     &             NRLNEC_if_LR_LUCB + NRLNECLR_LUCB_UD)
+          PEAK_LRLUCB_WC = 
+     &             max(PEAK_LRLUCB_WC,
+     &             NRLNEC_if_LR_LUCB + NRLNECLR_LUCB_WC)
+          PEAK_OOC_LRLUCB_UD = 
+     &             max(PEAK_OOC_LRLUCB_UD,
+     &             NRLNECOOC_if_LR_LUCB + NRLNECLR_LUCB_UD)
+          PEAK_OOC_LRLUCB_WC = 
+     &             max(PEAK_OOC_LRLUCB_WC,
+     &             NRLNECOOC_if_LR_LUCB + NRLNECLR_LUCB_WC)
+          PEAK_LRCB_UD =
+     &             max(PEAK_LRCB_UD,
+     &             NRLNEC_if_LR_CB + NRLNECLR_CB_UD)
+          PEAK_OOC_LRCB_UD =
+     &             max(PEAK_OOC_LRCB_UD,
+     &             NRLNECOOC_if_LR_LUCB + NRLNECLR_CB_UD)
+          IF (ABOVE_L0) THEN
+           PEAK_DYN_LRLU_UD   = max( PEAK_DYN_LRLU_UD,
+     &          SIZECB_UNDER_L0 + NRLADULR_UD )
+           PEAK_DYN_LRCB_UD   = max( PEAK_DYN_LRCB_UD,
+     &          SIZECB_UNDER_L0_IF_LRCB + ISTKR_if_LRCB)
+           PEAK_DYN_LRLUCB_UD = max( PEAK_DYN_LRLUCB_UD,
+     &      SIZECB_UNDER_L0_IF_LRCB + ISTKR_if_LRCB + NRLADULR_UD)
+           PEAK_DYN_LRLU_WC   = max( PEAK_DYN_LRLU_WC,
+     &          SIZECB_UNDER_L0 + NRLADULR_WC)
+           PEAK_DYN_LRLUCB_WC = max( PEAK_DYN_LRLUCB_WC,
+     &          SIZECB_UNDER_L0 + ISTKRLR_CB_WC + NRLADULR_WC)
+          ENDIF
+        END IF
+        IF ( NIRNEC-NIRADU .LT. LIWK_RR ) THEN
+          NIRNEC = NIRADU + LIWK_RR
+        END IF
+        IF ( NIRNEC_OOC-NIRADU_OOC .LT. LIWK_RR ) THEN
+          NIRNEC_OOC = NIRADU_OOC + LIWK_RR
+        END IF
+      END IF
       NRLNEC = max(NRLNEC, NRLADU+int(KEEP(30),8))
       NRLNEC_ACTIVE = max(NRLNEC_ACTIVE, MAX_SIZE_FACTOR+
      &                    int(KEEP(30),8))
@@ -1938,7 +2012,7 @@ C
      &                KEEP(494), 1, KEEP(490),
      &                KEEP(491), KEEP(492),
      &                KEEP(20), KEEP(60), DAD(STEP(INODE)), KEEP(38),
-     &                LRSTATUS, IDUMMY)
+     &                KEEP(123), LRSTATUS, IDUMMY)
       COMPRESS_PANEL = (LRSTATUS.GE.2)
       COMPRESS_CB    = ((LRSTATUS.EQ.1).OR.(LRSTATUS.EQ.3))
       IF (COMPRESS_PANEL.OR.COMPRESS_CB) NBNODES_BLR = NBNODES_BLR+1
@@ -2010,9 +2084,9 @@ C
                NRLADU_if_LR_LU = NRLADU_if_LR_LU + NRLADU_CURRENT
       ENDIF
       SIZECBI        = 2* NCB  + SIZEHEADER
-      NIRNEC = max0(NIRNEC,
+      NIRNEC = max(NIRNEC,
      &             NIRADU+ISTKI+SIZECBI+MAXITEMPCB)
-      NIRNEC_OOC = max0(NIRNEC_OOC,
+      NIRNEC_OOC = max(NIRNEC_OOC,
      &             NIRADU_OOC+ISTKI_OOC+SIZECBI+MAXITEMPCB +
      &             (XSIZE_OOC-XSIZE_IC) ) 
       CURRENT_ACTIVE_MEM = ISTKR+SIZECBINFR
@@ -2243,8 +2317,8 @@ C
            LSTKR(ITOP) = SIZECB
            ISTKR = ISTKR + LSTKR(ITOP)
            NRLNEC = max(NRLNEC,NRLADU+ISTKR)
-           NIRNEC = max0(NIRNEC,NIRADU+ISTKI)
-           NIRNEC_OOC = max0(NIRNEC_OOC,NIRADU_OOC+ISTKI_OOC)
+           NIRNEC = max(NIRNEC,NIRADU+ISTKI)
+           NIRNEC_OOC = max(NIRNEC_OOC,NIRADU_OOC+ISTKI_OOC)
            NRLNEC_if_LR_LU  =  max(NRLNEC_if_LR_LU,
      &                             NRLADU_if_LR_LU+ISTKR)
            LSTKR_if_LRCB(ITOP) = SIZECB_if_LRCB

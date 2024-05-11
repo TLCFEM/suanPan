@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -71,7 +71,7 @@ C
       INTEGER FRTPTR( N+1 ), FRTELT( NELT )
       INTEGER PTLUST_S(KEEP(28)),
      &        ITLOC(N+KEEP(253)), FILS(N), DAD(KEEP(28)), ND(KEEP(28))
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER(8), INTENT(IN) :: PTRAIW( LPTRAR ), PTRARW( LPTRAR )
       INTEGER(8), INTENT(IN) :: PTR8ARR(KEEP(193))
       INTEGER, INTENT(IN) :: NINCOLARR(KEEP(194))
@@ -132,8 +132,6 @@ C
       INTEGER NPARTSASS, NPARTSCB, MAXI_CLUSTER, LWORK,
      &        MAXI_CLUSTER_L, MAXI_CLUSTER_U, MAXI_CLUSTER_COL
       INTEGER  :: allocok
-      INTEGER MUMPS_PROCNODE
-      EXTERNAL MUMPS_PROCNODE
       KEEP_BEGS_BLR_L = .FALSE.
       nullify(BEGS_BLR_L)
       NB_BLR_U = -7654321
@@ -384,8 +382,9 @@ C
           CALL GET_CUT(IW(IOLDPS+HS:IOLDPS+HS+NROW1-1), 0,
      &                    NROW1, LRGROUPS, NPARTSCB, 
      &                    NPARTSASS, BEGS_BLR_L)
-          CALL REGROUPING2(BEGS_BLR_L, NPARTSASS, 0, NPARTSCB,
-     &                        NROW1-0, KEEP(488), .TRUE., KEEP(472))
+          CALL REGROUPING2(BEGS_BLR_L, NPARTSASS, NASS1, NPARTSCB,
+     &                        NROW1-0, KEEP(488), .TRUE., KEEP(472),
+     &                        NCOL1, KEEP(1))
           NB_BLR_L =  NPARTSCB
           IF (IPANEL.EQ.1) THEN
            BEGS_BLR_COL=>BEGS_BLR_U

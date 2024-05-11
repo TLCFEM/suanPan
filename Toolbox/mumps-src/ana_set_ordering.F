@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -55,7 +55,11 @@ C
              IF (NBQD.GE.MAXQD) THEN
                IORD = 6         
              ELSE
+              IF (KEEP(53).GT.0) THEN
+                IORD = 0
+              ELSE
                IORD = 2         
+              ENDIF
              ENDIF
           ELSE
 #if  defined(metis) || defined(parmetis) || defined(metis4) || defined(parmetis3)
@@ -77,7 +81,11 @@ C
             IF (NBQD.GE.MAXQD) THEN
               IORD = 6  
             ELSE
+              IF (KEEP(53).GT.0) THEN
+                IORD = 0
+              ELSE
               IORD = 2   
+              ENDIF
             ENDIF
           ELSE
 #if  defined(metis) || defined(parmetis) || defined(metis4) || defined(parmetis3)

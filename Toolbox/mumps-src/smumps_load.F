@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -793,7 +793,7 @@ C
          CALL SMUMPS_BUF_BROADCAST( WHAT,
      &        COMM_LD, NPROCS,
      &        FUTURE_NIV2,
-     &        dble(MEMORY_MD),dble(0) ,MYID, id%KEEP, IERR  )
+     &        dble(MEMORY_MD),dble(0) ,MYID, id%KEEP(267), IERR )
          WHAT=9
          MEMORY_SENT = dble(LA-MAX_SURF_MASTER)-MAX_SBTR
      &      - max( dble(LA) * dble(3) / dble(100),
@@ -811,7 +811,7 @@ C
      &        COMM_LD, NPROCS,
      &        FUTURE_NIV2,
      &        MEMORY_SENT,
-     &        dble(0),MYID, id%KEEP, IERR  )
+     &        dble(0),MYID, id%KEEP(267), IERR  )
       ENDIF
       RETURN
       END SUBROUTINE SMUMPS_LOAD_INIT
@@ -1907,7 +1907,7 @@ C
         CALL SMUMPS_BUF_BROADCAST( WHAT,
      &         COMM, SLAVEF,
      &               FUTURE_NIV2,
-     &         COST, dble(0), MYID, KEEP, IERR  )
+     &         COST, dble(0), MYID, KEEP(267), IERR  )
         POOL_LAST_COST_SENT = COST
         POOL_MEM(MYID)=COST
         IF ( IERR == -1 )THEN
@@ -1970,7 +1970,7 @@ C
      &           WHAT, COMM, SLAVEF,
      &           FUTURE_NIV2,
      &           dble(MEM_SUBTREE(INDICE_SBTR)), dble(0),
-     &           MYID, KEEP, IERR  )
+     &           MYID, KEEP(267), IERR  )
             IF ( IERR == -1 )THEN
                CALL SMUMPS_LOAD_RECV_MSGS(COMM_LD)
                CALL MUMPS_CHECK_COMM_NODES(COMM_NODES, EXIT_FLAG)
@@ -2000,7 +2000,7 @@ C
                CALL SMUMPS_BUF_BROADCAST(
      &              WHAT, COMM, SLAVEF,
      &              FUTURE_NIV2,
-     &              COST, dble(0), MYID, KEEP, IERR  )
+     &              COST, dble(0), MYID, KEEP(267), IERR  )
                IF ( IERR == -1 )THEN
                   CALL SMUMPS_LOAD_RECV_MSGS(COMM_LD)
                   CALL MUMPS_CHECK_COMM_NODES(COMM_NODES, EXIT_FLAG)
@@ -4648,10 +4648,8 @@ C
       INTEGER J
       DOUBLE PRECISION MEM_COST
       INTEGER NBINSUBTREE,i,NBTOP
-      EXTERNAL SMUMPS_POOL_EMPTY,
-     & MUMPS_IN_OR_ROOT_SSARBR
-      LOGICAL SMUMPS_POOL_EMPTY,
-     & MUMPS_IN_OR_ROOT_SSARBR
+      EXTERNAL MUMPS_IN_OR_ROOT_SSARBR
+      LOGICAL MUMPS_IN_OR_ROOT_SSARBR
       NBINSUBTREE = POOL(LPOOL)
       NBTOP       = POOL(LPOOL - 1)
       IF(KEEP(47).LT.2)THEN
@@ -4755,8 +4753,6 @@ C
       LOGICAL FLAG, EXIT_FLAG
       DOUBLE PRECISION COST
       DOUBLE PRECISION TO_BE_SENT
-      EXTERNAL MUMPS_TYPENODE
-      INTEGER MUMPS_TYPENODE
       IF(FLAG)THEN
          WHAT=17 
          IF(BDC_M2_FLOPS)THEN
@@ -4783,7 +4779,7 @@ C
      &               FUTURE_NIV2,
      &         COST, 
      &         TO_BE_SENT, 
-     &         MYID, KEEP_LOAD, IERR  )
+     &         MYID, KEEP_LOAD(267), IERR  )
       IF ( IERR == -1 )THEN
          CALL SMUMPS_LOAD_RECV_MSGS(COMM_LD)
          CALL MUMPS_CHECK_COMM_NODES(COMM_NODES, EXIT_FLAG)
@@ -4946,8 +4942,6 @@ C
       RECURSIVE SUBROUTINE SMUMPS_PROCESS_NIV2_MEM_MSG(INODE)
       IMPLICIT NONE
       INTEGER INODE
-      EXTERNAL MUMPS_TYPENODE
-      INTEGER MUMPS_TYPENODE
       IF((INODE.EQ.KEEP_LOAD(20)).OR.
      &     (INODE.EQ.KEEP_LOAD(38)))THEN
          RETURN
@@ -4985,8 +4979,6 @@ C
       RECURSIVE SUBROUTINE SMUMPS_PROCESS_NIV2_FLOPS_MSG(INODE)
       IMPLICIT NONE
       INTEGER INODE
-      EXTERNAL MUMPS_TYPENODE
-      INTEGER MUMPS_TYPENODE
       IF((INODE.EQ.KEEP_LOAD(20)).OR.
      &     (INODE.EQ.KEEP_LOAD(38)))THEN
          RETURN

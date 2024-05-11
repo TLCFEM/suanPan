@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -53,19 +53,25 @@ C
       LOGICAL    :: PROK, PROKG, LPOK
       INTEGER N, NORIG
       CONTAINS
-      SUBROUTINE DMUMPS_ANA_F_PAR(id, WORK1, WORK2, NFSIZ, FILS,
+      SUBROUTINE DMUMPS_ANA_F_PAR(id, WORK1, WORK2, LWORK1, LWORK2,
+     &     NFSIZ, FILS,
      &     FRERE, COMM_PARASYMB, LUMAT, SIZEOFBLOCKS, 
      &     COMM_PARAORD, NPROCS_PARAORD, 
      &     RKinSYMB_PROC0ORD)
       USE DMUMPS_STRUC_DEF
       IMPLICIT NONE
       TYPE(DMUMPS_STRUC)   :: id
-      INTEGER, TARGET     :: WORK1(:), WORK2(:)
-      INTEGER, ALLOCATABLE :: FILS(:)
-      INTEGER, POINTER    :: NFSIZ(:), FRERE(:)
-      INTEGER, INTENT(IN) :: COMM_PARASYMB
+      INTEGER, TARGET        :: WORK1(:), WORK2(:)
+      INTEGER(8), INTENT(IN) :: LWORK1, LWORK2
+#if defined(MUMPS_NOF2003)
+      INTEGER, POINTER       :: FILS(:)
+#else
+      INTEGER, ALLOCATABLE   :: FILS(:)
+#endif
+      INTEGER, POINTER       :: NFSIZ(:), FRERE(:)
+      INTEGER, INTENT(IN)    :: COMM_PARASYMB
       TYPE(LMATRIX_T), OPTIONAL       :: LUMAT
-      INTEGER, INTENT(IN), OPTIONAL   :: SIZEOFBLOCKS(id%NBLK)
+      INTEGER, INTENT(IN), TARGET, OPTIONAL   :: SIZEOFBLOCKS(id%NBLK)
       INTEGER, INTENT(IN), OPTIONAL   :: COMM_PARAORD, 
      &                                   NPROCS_PARAORD, 
      &                                   RKinSYMB_PROC0ORD
@@ -78,9 +84,13 @@ C
       INTEGER              :: MYID, NPROCS, IERR, NEMIN, LDIAG
       LOGICAL              :: SPLITROOT
       INTEGER(8), PARAMETER :: K79REF=12000000_8
-      INTEGER, PARAMETER :: LIDUMMY = 1
-      INTEGER :: IDUMMY(1) 
       DOUBLE PRECISION      :: TIMEB
+      INTEGER HOW_TO_SPLIT_ROOT, INODE_Scalapack_CAND, 
+     &        NBSONS_Scalapack_CAND
+      INTEGER, POINTER, DIMENSION(:) :: SIZEOFBLOCKS_PTR
+      INTEGER, TARGET    :: IDUMMY_ARRAY(1)
+      INTEGER            :: LSIZEOFBLOCKS_PTR
+      LOGICAL            :: SIZEOFBLOCKS_AVAIL
       nullify(IPE, NV, NE, NA, NODE, ND, SUBORD, NAMALG, IPS,
      &     CUMUL, SAVEIRN, SAVEJCN)
       CALL MPI_COMM_RANK (COMM_PARASYMB, MYID, IERR)
@@ -99,6 +109,16 @@ C
       PROKG = (MPG.GT.0) .AND. (MYID .EQ. 0)
       LPOK  = (LP.GT.0) .AND. (id%ICNTL(4).GE.1)
       LDIAG = id%ICNTL(4)
+      IF (present(SIZEOFBLOCKS)) THEN
+       SIZEOFBLOCKS_PTR => SIZEOFBLOCKS(1:N)
+       LSIZEOFBLOCKS_PTR = N
+       SIZEOFBLOCKS_AVAIL = .TRUE.
+      ELSE
+       SIZEOFBLOCKS_PTR => IDUMMY_ARRAY
+       SIZEOFBLOCKS_AVAIL = .FALSE.
+       LSIZEOFBLOCKS_PTR = 1
+       IDUMMY_ARRAY(1) = -1
+      ENDIF
       IF (PROKG) THEN
          WRITE(MPG,'(A,I10)') 
      &   " Parallel analysis, processing a graph of size:", N
@@ -121,12 +141,17 @@ C
       CALL DMUMPS_SET_PAR_ORD(id, COMM_PARASYMB, MYID, NPROCS, 
      &     ord, COMM_PARAORD, NPROCS_PARAORD,
      &     RKinSYMB_PROC0ORD)
-      IF (ord%COMM.NE.MPI_COMM_NULL) THEN
-       ord%PERMTAB => WORK1(1        : N)
-       ord%PERITAB => WORK1(N+1   : 2*N)
-       ord%TREETAB => WORK1(2*N+1 : 3*N)
+      IF ( LWORK1 .LT. 3_8 *int(N,8) ) THEN
+         WRITE(LP,*)
+     &      'Insufficient workspace in DMUMPS_ANA_F_PAR' 
+         CALL MUMPS_ABORT()
       ENDIF
-      IF(id%KEEP(54) .NE. 3) THEN
+      IF ( ord%COMM .NE. MPI_COMM_NULL ) THEN
+        ord%PERMTAB => WORK1(         1       : N)
+        ord%PERITAB => WORK1(    int(N,8)+1_8 : 2_8*int(N,8))
+        ord%TREETAB => WORK1(2_8*int(N,8)+1_8 : 3_8*int(N,8))
+      ENDIF
+      IF ( id%KEEP(54) .NE. 3 ) THEN
          IF(MYID.EQ.0) THEN
             SAVEIRN    => id%IRN_loc
             SAVEJCN    => id%JCN_loc
@@ -143,10 +168,10 @@ C
       IF (PROKG) CALL MUMPS_SECDEB( TIMEB )
       IF (id%KEEP(339).GT.0) THEN
         CALL DMUMPS_DO_PAR_ORD(id, MYID, NPROCS, 
-     &                       ord, WORK2, LUMAT, SIZEOFBLOCKS)
+     &       ord, WORK2, LWORK2, LUMAT, SIZEOFBLOCKS)
       ELSE
         CALL DMUMPS_DO_PAR_ORD(id, MYID, NPROCS, 
-     &                       ord, WORK2)
+     &       ord, WORK2, LWORK2)
       ENDIF
       IF (PROKG) THEN
        CALL MUMPS_SECFIN( TIMEB )
@@ -167,11 +192,12 @@ C
       END IF
       ord%SUBSTRAT = 0
       ord%TOPSTRAT = 0
-      IF (id%KEEP(339).GT.1) THEN
-        CALL DMUMPS_PARSYMFACT_LUMAT(id, ord, IPE, NV, WORK2, LUMAT,
+      IF (id%KEEP(339).NE.0) THEN
+        CALL DMUMPS_PARSYMFACT_LUMAT(id, ord, IPE, NV,
+     &                               WORK2, LWORK2, LUMAT,
      &                               SIZEOFBLOCKS)
       ELSE
-        CALL DMUMPS_PARSYMFACT(id, ord, IPE, NV, WORK2)
+        CALL DMUMPS_PARSYMFACT(id, ord, IPE, NV, WORK2, LWORK2)
       ENDIF
       IF(id%KEEP(54) .NE. 3) THEN
          IF(ord%MYID.EQ.0) THEN
@@ -188,32 +214,25 @@ C
       CALL MUMPS_IDEALLOC(ord%FIRST, ord%LAST, MEMCNT=MEMCNT)
       IF (MYID .EQ. 0) THEN
          IPS => WORK1(1:N)
-         NE     => WORK1(N+1   : 2*N)
-         NA     => WORK1(2*N+1 : 3*N)
-         NODE   => WORK2(1        : N  )
-         ND     => WORK2(N+1   : 2*N)
-         SUBORD => WORK2(2*N+1 : 3*N)
-         NAMALG => WORK2(3*N+1 : 4*N)
+         NE     => WORK1(    int(N,8)+1_8 : 2_8*int(N,8))
+         NA     => WORK1(2_8*int(N,8)+1_8 : 3_8*int(N,8))
+         NODE   => WORK2(             1   : N  )
+         ND     => WORK2(    int(N,8)+1_8 : 2_8*int(N,8))
+         SUBORD => WORK2(2_8*int(N,8)+1_8 : 3_8*int(N,8))
+         NAMALG => WORK2(3_8*int(N,8)+1_8 : 4_8*int(N,8))
          CALL MUMPS_REALLOC(CUMUL, N, id%INFO, LP,
      &        STRING='CUMUL', MEMCNT=MEMCNT, ERRCODE=-7)
          IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
          NEMIN  = id%KEEP(1)
-         IF (N.LT.NORIG) THEN
-          CALL DMUMPS_ANA_LNEW(N, IPE(1), NV(1), IPS(1), NE(1),
-     &        NA(1), NFSIZ(1), NODE(1), id%INFOG(6), FILS(1), FRERE(1),
-     &        ND(1), NEMIN, SUBORD(1), id%KEEP(60), id%KEEP(20),
-     &        id%KEEP(38), NAMALG(1), id%KEEP(104), CUMUL(1),
-     &        id%KEEP(50), id%ICNTL(13), id%KEEP(37), id%KEEP(197),
-     &        id%NSLAVES, id%KEEP(250).EQ.1, .TRUE., 
-     &        SIZEOFBLOCKS, N)
-         ELSE
-          CALL DMUMPS_ANA_LNEW(N, IPE(1), NV(1), IPS(1), NE(1),
-     &        NA(1), NFSIZ(1), NODE(1), id%INFOG(6), FILS(1), FRERE(1),
-     &        ND(1), NEMIN, SUBORD(1), id%KEEP(60), id%KEEP(20),
-     &        id%KEEP(38), NAMALG(1), id%KEEP(104), CUMUL(1),
-     &        id%KEEP(50), id%ICNTL(13), id%KEEP(37), id%KEEP(197),
-     &        id%NSLAVES, id%KEEP(250).EQ.1, .FALSE., IDUMMY, LIDUMMY)
-         ENDIF
+         CALL DMUMPS_ANA_LNEW(N, IPE(1), NV(1), IPS(1), NE(1),
+     &       NA(1), NFSIZ(1), NODE(1), id%INFOG(6), FILS(1), FRERE(1),
+     &       ND(1), NEMIN, SUBORD(1), id%KEEP(60), id%KEEP(20),
+     &       id%KEEP(38), NAMALG(1), id%KEEP(104), CUMUL(1),
+     &       id%KEEP(50), id%ICNTL(13), id%KEEP(37), id%KEEP(197),
+     &       id%NSLAVES, id%KEEP(250).EQ.1, SIZEOFBLOCKS_AVAIL, 
+     &       SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR,
+     &       INODE_Scalapack_CAND, NBSONS_Scalapack_CAND, 
+     &       id%KEEP(11))
          CALL MUMPS_DEALLOC(CUMUL, NV, IPE, MEMCNT=MEMCNT)
          CALL DMUMPS_ANA_M(NE(1), ND(1), id%INFOG(6), id%INFOG(5),
      &        id%KEEP(2), id%KEEP(50), id%KEEP8(101), id%KEEP(108),
@@ -221,6 +240,8 @@ C
          IF ( id%KEEP(53) .NE. 0 ) THEN
             CALL MUMPS_MAKE1ROOT(N, FRERE(1), FILS(1), NFSIZ(1),
      &           id%KEEP(20))
+            INODE_Scalapack_CAND  = id%KEEP(20)
+            NBSONS_Scalapack_CAND = 1
          END IF
          IF (  (id%KEEP(48) == 4 .AND. id%KEEP8(21).GT.0_8)
      &        .OR.
@@ -230,49 +251,84 @@ C
             CALL DMUMPS_SET_K821_SURFACE(id%KEEP8(21), id%KEEP(2),
      &           id%KEEP(48), id%KEEP(50), id%NSLAVES)
          END IF
-      IF (id%KEEP(210).LT.1.OR.id%KEEP(210).GT.2) id%KEEP(210)=2
-      IF (id%KEEP(210).EQ.2) id%KEEP8(79)=huge(id%KEEP8(79))
-      IF (id%KEEP(210).EQ.1.AND.id%KEEP8(79).LE.0_8) THEN
-       id%KEEP8(79)=K79REF * int(id%NSLAVES,8)
-      ENDIF
-         IF ( (id%KEEP(79).EQ.0).OR.(id%KEEP(79).EQ.2).OR.
-     &        (id%KEEP(79).EQ.3).OR.(id%KEEP(79).EQ.5).OR.
-     &        (id%KEEP(79).EQ.6)
-     &   )  THEN
-          IF (id%KEEP(210).EQ.1) THEN
+         IF (id%KEEP(210).LT.1.OR.id%KEEP(210).GT.2) id%KEEP(210)=2
+         IF (id%KEEP(210).EQ.2) id%KEEP8(79)=huge(id%KEEP8(79))
+         IF (id%KEEP(210).EQ.1.AND.id%KEEP8(79).LE.0_8) THEN
+          id%KEEP8(79)=K79REF * int(id%NSLAVES,8)
+         ENDIF
+         IF (id%KEEP(11).EQ.0) THEN
+          IF ( (id%KEEP(79).EQ.0).OR.(id%KEEP(79).EQ.2).OR.
+     &         (id%KEEP(79).EQ.3).OR.(id%KEEP(79).EQ.5).OR.
+     &         (id%KEEP(79).EQ.6)
+     &    )  THEN
+           IF (id%KEEP(210).EQ.1) THEN
             SPLITROOT = .FALSE. 
             IF ( id%KEEP(62).GE.1) THEN
-               IDUMMY(1) = -1
                CALL DMUMPS_CUTNODES(N, FRERE(1), FILS(1),
-     &              NFSIZ(1), IDUMMY, LIDUMMY, id%INFOG(6),
-     &              id%NSLAVES, id%KEEP(1), id%KEEP8(1), SPLITROOT,
-     &              MP, LDIAG, id%INFOG(1), id%INFOG(2))
+     &           NFSIZ(1), 
+     &           SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, id%INFOG(6), 
+     &           id%NSLAVES, id%KEEP(1), id%KEEP8(1), SPLITROOT,
+     &           MP, LDIAG, id%INFOG(1), id%INFOG(2))
                IF (id%INFOG(1).LT.0) RETURN
             ENDIF
+           ENDIF
           ENDIF
          ENDIF
-      SPLITROOT = id%ICNTL(13) .EQ. -1
+         HOW_TO_SPLIT_ROOT = 0 
+         SPLITROOT = id%ICNTL(13) .EQ. -1
 #if defined(NOSCALAPACK)
-      SPLITROOT = SPLITROOT .OR. id%NSLAVES.GT.0
+         SPLITROOT = SPLITROOT .OR. id%NSLAVES.GT.0
 #else
-      SPLITROOT = SPLITROOT .OR.
+         SPLITROOT = SPLITROOT .OR.
      &            (id%ICNTL(13).GT.0 .AND. id%NSLAVES.GT.id%ICNTL(13))
 #endif
-      IF (id%KEEP(53) .NE. 0) THEN
-         SPLITROOT = .TRUE.
-      ENDIF
-      SPLITROOT = (SPLITROOT.AND.( (id%KEEP(60).EQ.0) ))
+         IF (SPLITROOT.AND.id%KEEP(11).GT.0) HOW_TO_SPLIT_ROOT =1 
+         IF (id%KEEP(53) .NE. 0) THEN
+           SPLITROOT = .TRUE.
+           IF (id%KEEP(11).GT.0) HOW_TO_SPLIT_ROOT = 2
+         ENDIF
+#if defined(NOSCALAPACK)
+#else
+         IF ( id%KEEP(11).GT.0 .AND. (id%KEEP(339).NE.0) ) THEN 
+           IF (.NOT.SPLITROOT .AND. 
+     &       (id%KEEP(60).EQ.0).AND.   
+     &       ( (NFSIZ(INODE_Scalapack_CAND).GT.id%KEEP(37))
+     &        .AND.(id%ICNTL(13).LE.0) )
+     &       .AND.
+     &       (NBSONS_Scalapack_CAND.GT.id%KEEP(11)) 
+     &       ) THEN
+             HOW_TO_SPLIT_ROOT = 3
+             SPLITROOT=.TRUE.
+           ENDIF
+         ENDIF
+#endif
+         SPLITROOT = (SPLITROOT.AND.( (id%KEEP(60).EQ.0) ))
          IF (SPLITROOT) THEN
-            IDUMMY(1) = -1
+           IF (id%KEEP(339).EQ.0) THEN
             CALL DMUMPS_CUTNODES(N, FRERE(1), FILS(1), NFSIZ(1),
-     &           IDUMMY, LIDUMMY, id%INFOG(6), 
+     &           SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, id%INFOG(6), 
      &           id%NSLAVES, id%KEEP(1), id%KEEP8(1),
      &           SPLITROOT, MP, LDIAG, id%INFOG(1), id%INFOG(2))
-            IF (id%INFOG(1).LT.0) RETURN
-            IF ( id%KEEP(53) .NE. 0 ) THEN
-              CALL MUMPS_MAKE1ROOT(N, FRERE(1), FILS(1), NFSIZ(1),
-     &           id%KEEP(20))
+           ELSE
+            IF (id%KEEP(11).EQ.0) THEN
+              CALL DMUMPS_CUTNODES(N, FRERE(1), FILS(1), NFSIZ(1),
+     &           SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR, id%INFOG(6), 
+     &           id%NSLAVES, id%KEEP(1), id%KEEP8(1),
+     &           SPLITROOT, MP, LDIAG, id%INFOG(1), id%INFOG(2))
+              IF (id%INFOG(1).LT.0) RETURN
+              IF ( id%KEEP(53) .NE. 0 ) THEN
+                CALL MUMPS_MAKE1ROOT(N, FRERE(1), FILS(1), NFSIZ(1),
+     &             id%KEEP(20))
+              END IF
+            ELSE
+              CALL DMUMPS_SPLIT_ROOT( id%NSLAVES,
+     &                    HOW_TO_SPLIT_ROOT, INODE_Scalapack_CAND,
+     &                    N, FRERE(1), FILS(1), NFSIZ(1), 
+     &                    id%KEEP(1), id%KEEP8(1),
+     &                    SIZEOFBLOCKS_PTR(1), LSIZEOFBLOCKS_PTR,
+     &                    id%INFOG(6))
             END IF
+           END IF
          ENDIF
       END IF
       RETURN
@@ -408,13 +464,15 @@ C
        END IF
       ENDIF
       END SUBROUTINE DMUMPS_SET_PAR_ORD
-      SUBROUTINE DMUMPS_DO_PAR_ORD(id, MYID, NPROCS, ord, WORK, LUMAT, 
+      SUBROUTINE DMUMPS_DO_PAR_ORD(id, MYID, NPROCS, ord,
+     &                             WORK, LWORK, LUMAT, 
      &                             SIZEOFBLOCKS)
       IMPLICIT NONE
       TYPE(DMUMPS_STRUC)       :: id
       INTEGER, INTENT(IN)      :: MYID, NPROCS
       TYPE(ORD_TYPE)           :: ord
       INTEGER                  :: WORK(:)
+      INTEGER(8), INTENT(IN)   :: LWORK
       TYPE(LMATRIX_T), OPTIONAL       :: LUMAT
       INTEGER, INTENT(IN), OPTIONAL   :: SIZEOFBLOCKS(N)
 #if defined(parmetis) || defined(parmetis3)
@@ -433,10 +491,11 @@ C
       IF (ord%ORDTOOL .EQ. 1) THEN
 #if defined(ptscotch)
         IF (id%KEEP(339).NE.0) THEN
-         CALL DMUMPS_PTSCOTCH_ORD(id, ord, WORK, GCOMP_DIST,
+         CALL DMUMPS_PTSCOTCH_ORD(id, ord, WORK, LWORK,
+     &                     GCOMP_DIST,
      &                     SIZEOFBLOCKS )
         ELSE
-         CALL DMUMPS_PTSCOTCH_ORD(id, ord, WORK)
+         CALL DMUMPS_PTSCOTCH_ORD(id, ord, WORK, LWORK)
         ENDIF
 #else
          id%INFOG(1) = -38
@@ -447,10 +506,11 @@ C
       ELSE IF (ord%ORDTOOL .EQ. 2) THEN
 #if defined(parmetis) || defined(parmetis3)
          IF (id%KEEP(339).GT.0) THEN
-         CALL DMUMPS_PARMETIS_ORD_LUMAT (id, ord, WORK, GCOMP_DIST,
+         CALL DMUMPS_PARMETIS_ORD_LUMAT (id, ord, WORK, LWORK,
+     &                            GCOMP_DIST,
      &                            SIZEOFBLOCKS)
          ELSE
-           CALL DMUMPS_PARMETIS_ORD(id, ord, WORK)
+           CALL DMUMPS_PARMETIS_ORD(id, ord, WORK, LWORK)
          ENDIF
          IF (id%KEEP(339).EQ.0) THEN
           if(ord%IDO) CALL MPI_COMM_FREE(ord%COMM_PARAORD, IERR)
@@ -468,14 +528,14 @@ C
       RETURN
       END SUBROUTINE DMUMPS_DO_PAR_ORD
 #if defined(parmetis) || defined(parmetis3)
-      SUBROUTINE DMUMPS_PARMETIS_ORD(id, ord, WORK) 
+      SUBROUTINE DMUMPS_PARMETIS_ORD(id, ord, WORK, LWORK) 
       IMPLICIT NONE
-      TYPE(DMUMPS_STRUC)  :: id
-      TYPE(ORD_TYPE)      :: ord
-      INTEGER, TARGET    :: WORK(:)
+      TYPE(DMUMPS_STRUC)      :: id
+      TYPE(ORD_TYPE)          :: ord
+      INTEGER, TARGET         :: WORK(:)
+      INTEGER(8), INTENT (IN) :: LWORK
       INTEGER             :: I, MYID, NPROCS, IERR, BASE, METIS_IDX_SIZE
-      INTEGER, POINTER    :: FIRST(:),
-     &     LAST(:), SWORK(:)
+      INTEGER, POINTER    :: FIRST(:), LAST(:), SWORK(:)
       INTEGER             :: BASEVAL, VERTLOCNBR,
      &     OPTIONS(10)
       INTEGER(8), POINTER :: VERTLOCTAB(:)
@@ -490,7 +550,7 @@ C
       NPROCS          = ord%NPROCS
       IERR            = 0
       SIZE_IDUMMY_PTR = 0
-      IF(size(WORK) .LT. N*3 .OR.size(WORK).LT.NPROCS+1) THEN
+      IF( LWORK.LT. int(N,8)*3_8 .OR. LWORK .LT. int(NPROCS+1,8)) THEN
          WRITE(LP,
      &        '("Insufficient workspace inside DMUMPS_PARMETIS_ORD")')
          CALL MUMPS_ABORT()
@@ -503,14 +563,15 @@ C
       IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
       BASE    = id%NPROCS-id%NSLAVES
       CALL DMUMPS_GRAPH_DIST(id, ord, FIRST,
-     &     LAST, BASE, NPROCS, WORK(1: 2*N), TYPE=2)
+     &     LAST, BASE, NPROCS, WORK(1_8: 2_8*int(N,8)),
+     &     2_8*int(N,8), TYPE=2)
       VERTLOCNBR = LAST(MYID+1)-FIRST(MYID+1) + 1
       CALL MUMPS_I8REALLOC(VERTLOCTAB, VERTLOCNBR+1, id%INFO,
      &        LP, STRING='VERTLOCTAB', MEMCNT=MEMCNT, ERRCODE=-7)
       IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
-      SWORK => WORK(N+1:3*N)
+      SWORK => WORK(int(N+1,8):3_8*int(N,8))
       CALL DMUMPS_BUILD_DIST_GRAPH(id, ord, FIRST, LAST, VERTLOCTAB,
-     &     EDGELOCTAB, SWORK)
+     &     EDGELOCTAB, SWORK, 2_8 * int(N,8))
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     ord%COMM, ord%MYID )
       IF(id%INFO(1).LT.0) GOTO 20
@@ -601,19 +662,20 @@ C
       CALL MUMPS_DEALLOC(ord%RANGTAB, MEMCNT=MEMCNT)
       RETURN
       END SUBROUTINE DMUMPS_PARMETIS_ORD
-      SUBROUTINE DMUMPS_PARMETIS_ORD_LUMAT (id, ord, WORK, GCOMP_DIST,
+      SUBROUTINE DMUMPS_PARMETIS_ORD_LUMAT (id, ord, WORK, LWORK,
+     &                              GCOMP_DIST,
      &                              SIZEOFBLOCKS )
       IMPLICIT NONE
-      TYPE(DMUMPS_STRUC)  :: id
-      TYPE(ORD_TYPE)      :: ord
-      INTEGER, TARGET    :: WORK(:)
+      TYPE(DMUMPS_STRUC)     :: id
+      TYPE(ORD_TYPE)         :: ord
+      INTEGER, TARGET        :: WORK(:)
+      INTEGER(8), INTENT(IN) :: LWORK
       TYPE(COMPACT_GRAPH_T), OPTIONAL       :: GCOMP_DIST
       INTEGER, INTENT(IN), OPTIONAL, TARGET :: SIZEOFBLOCKS(N)
       INTEGER             :: I, MYID, NPROCS, IERR, BASE, METIS_IDX_SIZE
       INTEGER             :: MASTER
       PARAMETER     (MASTER=0)
-      INTEGER, POINTER    :: FIRST(:),
-     &     LAST(:), SWORK(:)
+      INTEGER, POINTER    :: FIRST(:), LAST(:), SWORK(:)
       INTEGER             :: BASEVAL, VERTLOCNBR,
      &     OPTIONS(10)
       INTEGER(8), POINTER :: VERTLOCTAB(:)
@@ -622,13 +684,15 @@ C
       INTEGER, POINTER    :: SIZES(:), ORDER(:)
       INTEGER, POINTER    :: VELOLOCTAB(:)
       INTEGER             :: SIZE_VELOLOCTAB
+      INTEGER, TARGET     :: IDUMMY(1)
       nullify(FIRST, LAST, SWORK, VERTLOCTAB, EDGELOCTAB, RCVCNTS,
-     &      SIZES, ORDER, VELOLOCTAB)
+     &      SIZES, ORDER )
+      VELOLOCTAB      => IDUMMY 
       MYID            = ord%MYID
       NPROCS          = ord%NPROCS
       IERR            = 0
       SIZE_VELOLOCTAB = 0
-      IF(size(WORK) .LT. N*3 .OR.size(WORK).LT.NPROCS+1) THEN
+      IF( LWORK.LT. int(N,8)*3_8 .OR. LWORK .LT. int(NPROCS+1,8)) THEN
          WRITE(LP,
      &        '("Insufficient workspace inside DMUMPS_PARMETIS_ORD")')
          CALL MUMPS_ABORT()
@@ -652,7 +716,7 @@ C
          EDGELOCNBR = GCOMP_DIST%NZG
          VERTLOCTAB => GCOMP_DIST%IPE
          EDGELOCTAB => GCOMP_DIST%ADJ
-         IF (id%KEEP(339).GE.6) THEN
+         IF (id%KEEP(339).NE.0) THEN
           VELOLOCTAB=>SIZEOFBLOCKS(GCOMP_DIST%FIRST:GCOMP_DIST%LAST)
           SIZE_VELOLOCTAB = VERTLOCNBR
          ENDIF
@@ -661,6 +725,12 @@ C
           LAST(I)  = -99
          ENDDO
          BASE = 0
+#if defined(AVOID_MPI_IN_PLACE)
+         CALL MPI_ALLGATHER( GCOMP_DIST%FIRST, 1, MPI_INTEGER,
+     &   FIRST, 1, MPI_INTEGER, ord%COMM_PARAORD, IERR )
+         CALL MPI_ALLGATHER( GCOMP_DIST%LAST, 1, MPI_INTEGER,
+     &   LAST, 1, MPI_INTEGER, ord%COMM_PARAORD, IERR )
+#else
          FIRST(ord%MYID_PARAORD + 1)= GCOMP_DIST%FIRST
          LAST (ord%MYID_PARAORD + 1)= GCOMP_DIST%LAST
          CALL MPI_ALLREDUCE(MPI_IN_PLACE, FIRST(1), 
@@ -669,6 +739,7 @@ C
          CALL MPI_ALLREDUCE(MPI_IN_PLACE, LAST(1),  
      &        ord%NPROCS_PARAORD+1,
      &        MPI_INTEGER, MPI_MAX, ord%COMM_PARAORD, IERR)
+#endif
          DO I=1, ord%NPROCS_PARAORD+1
           IF (FIRST(I).EQ.-99) THEN
             FIRST(I) = GCOMP_DIST%NG+1
@@ -772,14 +843,14 @@ C
       END SUBROUTINE DMUMPS_PARMETIS_ORD_LUMAT
 #endif
 #if defined(ptscotch)
-      SUBROUTINE DMUMPS_PTSCOTCH_ORD(id, ord, WORK, GCOMP_DIST,
+      SUBROUTINE DMUMPS_PTSCOTCH_ORD(id, ord, WORK, LWORK, GCOMP_DIST,
      &                               SIZEOFBLOCKS)
 !$    USE OMP_LIB
       IMPLICIT NONE
-      INCLUDE 'ptscotchf.h'
       TYPE(DMUMPS_STRUC)                :: id
       TYPE(ORD_TYPE)                    :: ord
       INTEGER, TARGET                   :: WORK(:)
+      INTEGER(8), INTENT(IN)            :: LWORK
       TYPE(COMPACT_GRAPH_T), OPTIONAL   :: GCOMP_DIST
       INTEGER, INTENT(IN), OPTIONAL, TARGET:: SIZEOFBLOCKS(N)
       INTEGER                       :: MYID, NPROCS, IERR
@@ -792,8 +863,17 @@ C
       INTEGER, POINTER              :: EDGELOCTAB(:)
       INTEGER, POINTER              :: VELOLOCTAB(:)
       INTEGER                       :: SIZE_VELOLOCTAB
+      INTEGER, TARGET               :: IDUMMY(1)
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      INCLUDE 'scotchf.h' 
+      INTEGER          :: IOMP, NOMP
+      DOUBLE PRECISION :: CONTDAT(SCOTCH_CONTEXTDIM)
+      INTEGER(4)       :: IERR_SCOTCH
+#else
       INTEGER :: PTHREAD_NUMBER, NOMP
-      nullify(FIRST, LAST, SWORK, VERTLOCTAB, EDGELOCTAB, VELOLOCTAB)
+#endif
+      nullify(FIRST, LAST, SWORK, VERTLOCTAB, EDGELOCTAB)
+      VELOLOCTAB => IDUMMY 
       CALL MPI_BARRIER(ord%COMM, IERR)
       MYID            = ord%MYID
       NPROCS          = ord%NPROCS
@@ -804,12 +884,12 @@ C
         EDGELOCNBR = GCOMP_DIST%NZG
         VERTLOCTAB => GCOMP_DIST%IPE
         EDGELOCTAB => GCOMP_DIST%ADJ
-        IF (id%KEEP(339).GE.6) THEN
+        IF (id%KEEP(339).NE.0) THEN
          VELOLOCTAB => SIZEOFBLOCKS(GCOMP_DIST%FIRST:GCOMP_DIST%LAST)
          SIZE_VELOLOCTAB = VERTLOCNBR
         ENDIF
       ELSE
-        IF (size(WORK) .LT. N*3) THEN
+        IF (LWORK .LT. int(N,8)*3_8) THEN
             WRITE(LP,
      &      '("Insufficient workspace inside DMUMPS_PTSCOTCH_ORD")')
             CALL MUMPS_ABORT()
@@ -821,14 +901,15 @@ C
      &     MEMCNT=MEMCNT, ERRCODE=-7)
         IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
         CALL DMUMPS_GRAPH_DIST(id, ord, FIRST,
-     &     LAST, BASE, NPROCS, WORK(1: 2*N), TYPE=2)
+     &     LAST, BASE, NPROCS, WORK(1: 2_8*int(N,8)),
+     &     2_8*int(N,8), TYPE=2)
         VERTLOCNBR = LAST(MYID+1)-FIRST(MYID+1) + 1
         CALL MUMPS_I8REALLOC(VERTLOCTAB, VERTLOCNBR+1, id%INFO,
      &        LP, STRING='VERTLOCTAB', MEMCNT=MEMCNT, ERRCODE=-7)
         IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
-        SWORK => WORK(N+1:3*N)
+        SWORK => WORK(int(N+1,8):3_8*int(N,8))
         CALL DMUMPS_BUILD_DIST_GRAPH(id, ord, FIRST, LAST, VERTLOCTAB,
-     &     EDGELOCTAB, SWORK)
+     &     EDGELOCTAB, SWORK, 2_8*int(N,8))
         CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     ord%COMM, ord%MYID )
         IF ( id%INFO(1) .LT. 0 ) GOTO 11
@@ -845,35 +926,65 @@ C
       IF(MEMCNT .GT. MAXMEM) MAXMEM=MEMCNT
       IF(ord%IDO) THEN
          CALL MUMPS_SCOTCH_INTSIZE(SCOTCH_INT_SIZE)
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+!$OMP PARALLEL PRIVATE(IOMP, IERR_SCOTCH)
+!$OMP SINGLE
+         NOMP=omp_get_num_threads()
+!$OMP END SINGLE
+         IOMP=omp_get_thread_num()
+         IF (IOMP.EQ.0) THEN
+           CALL SCOTCHFCONTEXTINIT(CONTDAT, IERR_SCOTCH)
+           CALL SCOTCHFCONTEXTRANDOMCLONE(CONTDAT, IERR_SCOTCH)
+           CALL SCOTCHFCONTEXTTHREADIMPORT1(CONTDAT, NOMP, IERR_SCOTCH)
+         ENDIF
+!$OMP BARRIER
+         CALL SCOTCHFCONTEXTTHREADIMPORT2(CONTDAT, IOMP, IERR_SCOTCH)
+#else
          NOMP=0
 !$       NOMP=omp_get_max_threads()
          IF (NOMP .GT. 0) THEN
            CALL MUMPS_SCOTCH_GET_PTHREAD_NUMBER (PTHREAD_NUMBER)
            CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (NOMP)
          ENDIF
-         IF(SCOTCH_INT_SIZE.EQ.32) THEN
-           IF (id%KEEP(10).EQ.1) THEN
-            id%INFO(1) = -52
-            id%INFO(2) = 2
+#endif
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+         IF (IOMP.EQ.0) THEN
+#endif
+           IF(SCOTCH_INT_SIZE.EQ.32) THEN
+             IF (id%KEEP(10).EQ.1) THEN
+              id%INFO(1) = -52
+              id%INFO(2) = 2
+             ELSE
+              CALL MUMPS_PTSCOTCH_MIXEDto32(id, ord,
+     &             BASEVAL, 
+     &             VERTLOCNBR, VERTLOCTAB,
+     &             EDGELOCNBR, EDGELOCTAB,
+     &             VELOLOCTAB, SIZE_VELOLOCTAB,
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &             CONTDAT, SCOTCH_CONTEXTDIM,
+#endif
+     &             IERR)
+            ENDIF
            ELSE
-            CALL MUMPS_PTSCOTCH_MIXEDto32(id, ord,
-     &           BASEVAL, 
-     &           VERTLOCNBR, VERTLOCTAB,
-     &           EDGELOCNBR, EDGELOCTAB,
-     &           VELOLOCTAB, SIZE_VELOLOCTAB,
-     &           IERR)
-          ENDIF
-         ELSE
-            CALL MUMPS_PTSCOTCH_MIXEDto64(id, ord,
-     &           BASEVAL, 
-     &           VERTLOCNBR, VERTLOCTAB,
-     &           EDGELOCNBR, EDGELOCTAB,
-     &           VELOLOCTAB, SIZE_VELOLOCTAB,
-     &           IERR)
-         END IF
+              CALL MUMPS_PTSCOTCH_MIXEDto64(id, ord,
+     &             BASEVAL, 
+     &             VERTLOCNBR, VERTLOCTAB,
+     &             EDGELOCNBR, EDGELOCTAB,
+     &             VELOLOCTAB, SIZE_VELOLOCTAB,
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &             CONTDAT, SCOTCH_CONTEXTDIM,
+#endif
+     &             IERR)
+           END IF
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+           CALL SCOTCHFCONTEXTEXIT(CONTDAT)
+         ENDIF 
+!$OMP END PARALLEL
+#else
          IF (NOMP .GT. 0) THEN
            CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (PTHREAD_NUMBER)
          ENDIF
+#endif
       END IF
       IF(IERR.NE.0) THEN
          id%INFO(1:2) = -50
@@ -978,7 +1089,7 @@ C
       HOSTMEM = 12*N 
       NZ4=int(id%KEEP8(28))
       NZ_ROW = 2*(NZ4/N) 
-      IF (id%KEEP(339).GT.2) THEN
+      IF (id%KEEP(339).NE.0) THEN
          NRL = 0
       ELSE
         IF(id%KEEP(46) .EQ. 0) THEN
@@ -1134,7 +1245,7 @@ C
       CALL DMUMPS_MERGESORT(ANODE, AWEIGHTS(1:ANODE), WORK(0:ANODE+1))
       CALL DMUMPS_MERGESWAP(ANODE, WORK(0:ANODE+1), AWEIGHTS(1:ANODE), 
      &     ALIST(1:ANODE))
-      IF (id%KEEP(339).GE.4) THEN
+      IF (id%KEEP(339).NE.0) THEN
        Iprocdeb = ord%NPROCS-ANODE+1
        IF (Iprocdeb.GT.1) THEN
          DO I=1, Iprocdeb-1
@@ -1198,28 +1309,26 @@ C
  90   continue
       RETURN
       END SUBROUTINE DMUMPS_GET_SUBTREES
-      SUBROUTINE DMUMPS_PARSYMFACT(id, ord, GPE, GNV, WORK)  
+      SUBROUTINE DMUMPS_PARSYMFACT(id, ord, GPE, GNV, WORK, LWORK)  
       IMPLICIT NONE
-      TYPE(DMUMPS_STRUC)   :: id
-      TYPE(ORD_TYPE)       :: ord
-      INTEGER, POINTER     :: GPE(:), GNV(:)
-      INTEGER, TARGET      :: WORK(:)
-      TYPE(GRAPH_TYPE)     :: top_graph
-      INTEGER(8), POINTER  :: IPE(:), IPET(:),
-     &     BUF_PE1(:), BUF_PE2(:), TMP1(:)
-      INTEGER, POINTER     :: PE(:),
-     &     LENG(:), I_HALO_MAP(:)
-      INTEGER, POINTER     :: NDENSE(:), LAST(:),
-     &     DEGREE(:), W(:), PERM(:),
-     &     LISTVAR_SCHUR(:), NEXT(:),
-     &     HEAD(:), NV(:), ELEN(:),
-     &     LSTVAR(:)
-      INTEGER, POINTER     :: MYLIST(:),
-     &     LPERM(:),
-     &     LIPERM(:),
-     &     NVT(:), BUF_NV1(:),
-     &     BUF_NV2(:), ROOTPERM(:),
-     &     TMP2(:), BWORK(:), NCLIQUES(:)
+      TYPE(DMUMPS_STRUC)     :: id
+      TYPE(ORD_TYPE)         :: ord
+      INTEGER, POINTER       :: GPE(:), GNV(:)
+      INTEGER, TARGET        :: WORK(:)
+      INTEGER(8), INTENT(IN) :: LWORK
+      TYPE(GRAPH_TYPE)       :: top_graph
+      INTEGER(8), POINTER    :: IPE(:), IPET(:),
+     &                          BUF_PE1(:), BUF_PE2(:), TMP1(:)
+      INTEGER, POINTER       :: PE(:), LENG(:), I_HALO_MAP(:)
+      INTEGER, POINTER       :: NDENSE(:), LAST(:),
+     &                          DEGREE(:), W(:), PERM(:),
+     &                          LISTVAR_SCHUR(:), NEXT(:),
+     &                          HEAD(:), NV(:), ELEN(:),
+     &                          LSTVAR(:)
+      INTEGER, POINTER       :: MYLIST(:), LPERM(:), LIPERM(:),
+     &                          NVT(:), BUF_NV1(:),
+     &                          BUF_NV2(:), ROOTPERM(:),
+     &                          TMP2(:), BWORK(:), NCLIQUES(:)
       INTEGER              :: MYNCLIQUES, MYMAXVARS, ICLIQUES,
      &     TOTNCLIQUES
       INTEGER(8)           :: MYNVARS, TOTNVARS
@@ -1244,14 +1353,14 @@ C
      &     BUF_NV1, BUF_NV2, ROOTPERM, TMP1, TMP2, BWORK)
       MYID   = ord%MYID
       NPROCS = ord%NPROCS
-      IF(size(WORK) .LT. 4*N) THEN
+      IF(LWORK .LT. 4_8*int(N,8)) THEN
          WRITE(LP,*)'Insufficient workspace in DMUMPS_PARSYMFACT'
          CALL MUMPS_ABORT()
       ELSE
-         HEAD => WORK(       1 :   N)
-         ELEN => WORK(  N+1 : 2*N)
-         LENG => WORK(2*N+1 : 3*N)
-         PERM => WORK(3*N+1 : 4*N)
+         HEAD => WORK(              1 :         N    )
+         ELEN => WORK(     int(N,8)+1 : 2_8*int(N,8) )
+         LENG => WORK( 2_8*int(N,8)+1 : 3_8*int(N,8) )
+         PERM => WORK( 3_8*int(N,8)+1 : 4_8*int(N,8) )
       END IF
       CALL DMUMPS_GET_SUBTREES(ord, id)
       CALL MUMPS_IDEALLOC(ord%SON, ord%BROTHER, ord%NW,
@@ -1259,9 +1368,9 @@ C
       NROWS_LOC = ord%LAST(MYID+1)-ord%FIRST(MYID+1)+1
       NRL = NROWS_LOC
       TOPROWS = ord%TOPNODES(2)
-      BWORK => WORK(1 : 2*N)
+      BWORK => WORK(1_8 : 2_8*int(N,8))
       CALL DMUMPS_BUILD_LOC_GRAPH(id, ord, HIDX, IPE, PE, LENG,
-     &     I_HALO_MAP, top_graph, BWORK)
+     &     I_HALO_MAP, top_graph, BWORK, 2_8*int(N,8))
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     ord%COMM, ord%MYID )
       IF(id%INFO(1).lt.0) RETURN
@@ -1359,7 +1468,7 @@ C
      &              PROC, ITAG, ord%COMM, STATUSCLIQUES, IERR)
             END DO
          END DO
-         LPERM => WORK(3*N+1 : 4*N)
+         LPERM => WORK(3_8*int(N,8)+1_8 : 4_8*int(N,8))
          NTVAR   = ord%TOPNODES(2)
          CALL DMUMPS_MAKE_LOC_IDX(id, ord%TOPNODES, LPERM, LIPERM, ord)
          CALL DMUMPS_ASSEMBLE_TOP_GRAPH(id, ord%TOPNODES(2), LPERM,
@@ -1545,7 +1654,7 @@ C
       NULLIFY(HEAD, ELEN, LENG, PERM)
       RETURN
       END SUBROUTINE DMUMPS_PARSYMFACT
-      SUBROUTINE DMUMPS_PARSYMFACT_LUMAT(id, ord, GPE, GNV, WORK, 
+      SUBROUTINE DMUMPS_PARSYMFACT_LUMAT(id, ord, GPE, GNV, WORK, LWORK,
      &                                   LUMAT, SIZEOFBLOCKS)  
       IMPLICIT NONE
       TYPE(DMUMPS_STRUC)   :: id
@@ -1572,7 +1681,7 @@ C
      &     TMP2(:), BWORK(:), NCLIQUES(:), MAPTAB(:)
       INTEGER              :: MYNCLIQUES, MYMAXVARS, ICLIQUES,
      &     TOTNCLIQUES
-      INTEGER(8)           :: MYNVARS, TOTNVARS
+      INTEGER(8)           :: MYNVARS, TOTNVARS, LWORK
       INTEGER(8), POINTER  :: LVARPT(:)
       INTEGER              :: HIDX, TOTEL, 
      &     NCMPA, I, J, SIZE_SCHUR, MYID,
@@ -1594,26 +1703,25 @@ C
      &     BUF_NV1, BUF_NV2, ROOTPERM, TMP1, TMP2, BWORK, MAPTAB)
       MYID   = ord%MYID
       NPROCS = ord%NPROCS
-      IF(size(WORK) .LT. 4*N) THEN
+      IF( LWORK .LT. 4_8*int(N,8) ) THEN
          WRITE(LP,*)
      &      'Insufficient workspace in DMUMPS_PARSYMFACT_LUMAT'
          CALL MUMPS_ABORT()
-      ELSE
-         HEAD => WORK(       1 :   N)
-         ELEN => WORK(  N+1 : 2*N)
-         LENG => WORK(2*N+1 : 3*N)
-         PERM => WORK(3*N+1 : 4*N)
-      END IF
+      ENDIF
+      HEAD => WORK(              1   :         N    )
+      ELEN => WORK(     int(N,8)+1_8 : 2_8*int(N,8) )
+      LENG => WORK( 2_8*int(N,8)+1_8 : 3_8*int(N,8) )
+      PERM => WORK( 3_8*int(N,8)+1_8 : 4_8*int(N,8) )
       CALL DMUMPS_GET_SUBTREES(ord, id)
       CALL MUMPS_IDEALLOC(ord%SON, ord%BROTHER, ord%NW,
      &     ord%RANGTAB, MEMCNT=MEMCNT)
       NROWS_LOC = ord%LAST(MYID+1)-ord%FIRST(MYID+1)+1
       NRL = NROWS_LOC
       TOPROWS = ord%TOPNODES(2)
-      BWORK  => WORK(1 : 2*N)
+      BWORK  => WORK(1_8 : 2_8*int(N,8))
        CALL DMUMPS_LUMAT_TO_LOC_GRAPH(
      &     LUMAT, id, ord, HIDX, IPE, PE, LENG,
-     &     I_HALO_MAP, BWORK)
+     &     I_HALO_MAP, BWORK, 2_8*int(N,8))
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     ord%COMM, ord%MYID )
       IF(id%INFO(1).lt.0) RETURN
@@ -1662,7 +1770,7 @@ C
          IF(HIDX .GT.0) THEN
            NV(1) = -1 
            TOTEL = HIDX
-           IF ((N.LT.NORIG).OR.(id%KEEP(339).GE.4)) THEN
+           IF ((N.LT.NORIG).OR.(id%KEEP(339).NE.0)) THEN
              TOTEL = 0
              DO I=1,NROWS_LOC
                NV(I) = SIZEOFBLOCKS (
@@ -1741,13 +1849,13 @@ C
          END DO
       END IF
       CALL MUMPS_DEALLOC(PE, MEMCNT=MEMCNT) 
-      IF (id%KEEP(339).GT.2) THEN
+      IF (id%KEEP(339).NE.0) THEN
           MAPTAB => WORK(1:N)
           CALL MUMPS_BUILD_TOP_GRAPH (LUMAT, id, ord, top_graph, MAPTAB)
       ENDIF
       IF (MYID.EQ.0) THEN
-        LPERM => WORK(3*N+1 : 4*N)
-        NTVAR   = ord%TOPNODES(2)
+        LPERM => WORK( 3_8*int(N,8)+1_8 : 4_8*int(N,8) )
+        NTVAR = ord%TOPNODES(2)
         CALL DMUMPS_MAKE_LOC_IDX(id, ord%TOPNODES, LPERM, LIPERM, ord)
         CALL DMUMPS_ASSEMBLE_TOP_GRAPH(id, ord%TOPNODES(2), LPERM,
      &        top_graph, TOTNCLIQUES, LSTVAR, LVARPT, IPET, PE,
@@ -1795,7 +1903,7 @@ C
             IF(TGSIZE.GT.0) THEN 
               NVT(1) = -1 
               TOTEL = TGSIZE
-              IF ((N.LT.NORIG).OR.(id%KEEP(339).GE.4)) THEN
+              IF ((N.LT.NORIG).OR.(id%KEEP(339).NE.0)) THEN
                 TOTEL = TOTNCLIQUES
                 DO I=1,NTVAR
                   NVT(I) = SIZEOFBLOCKS( LIPERM(I) )
@@ -1921,7 +2029,7 @@ C
      &     MEMCNT=MEMCNT)
       CALL MUMPS_DEALLOC(LPERM, LIPERM, NVT, MEMCNT=MEMCNT)
       CALL MUMPS_DEALLOC(ROOTPERM, TMP2, MEMCNT=MEMCNT)
-      NULLIFY(HEAD, ELEN, LENG, PERM)
+      NULLIFY(HEAD, ELEN, LENG, PERM, BWORK, MAPTAB, LPERM)
       RETURN
       END SUBROUTINE DMUMPS_PARSYMFACT_LUMAT
       SUBROUTINE DMUMPS_MAKE_LOC_IDX(id, TOPNODES, LPERM, LIPERM, ord)
@@ -2097,13 +2205,14 @@ C
 #endif
 #if defined(ptscotch) || defined(parmetis) || defined(parmetis3)
       SUBROUTINE DMUMPS_BUILD_DIST_GRAPH(id, ord, FIRST, LAST, IPE,
-     &     PE, WORK)
+     &     PE, WORK, LWORK)
       IMPLICIT NONE
       TYPE(DMUMPS_STRUC)      :: id
       TYPE(ORD_TYPE)          :: ord
       INTEGER(8), POINTER     :: IPE(:)
       INTEGER, POINTER        :: FIRST(:), LAST(:), PE(:),
      &     WORK(:)
+      INTEGER(8), INTENT(IN)  :: LWORK
       INTEGER                 :: IERR, MYID, NPROCS
       INTEGER                 :: I, PROC, J, LOC_ROW
       INTEGER(8)              :: LOCNNZ, INNZ, NEW_LOCNNZ, OFFDIAG,
@@ -2130,7 +2239,7 @@ C
       nullify(TSENDI, TSENDJ, RCVBUF, APNT)
       MYID   = ord%MYID
       NPROCS = ord%NPROCS
-      IF(MUMPS_GETSIZE(WORK) .LT. N*2) THEN
+      IF(LWORK .LT. int(N,8)*2_8) THEN
          WRITE(LP,
      &        '("Insufficient workspace inside BUILD_SCOTCH_GRAPH")')
          CALL MUMPS_ABORT()
@@ -2156,8 +2265,8 @@ C
       BUFSIZE = id%KEEP(39)
       LOCNNZ = id%KEEP8(29)
       NROWS_LOC = LAST(MYID+1)-FIRST(MYID+1)+1
-      MAPTAB => WORK(     1 :   N)
-      LENG   => WORK(N+1 : 2*N)
+      MAPTAB => WORK(       1    :         N )
+      LENG   => WORK( int(N+1,8) : 2_8*int(N,8) )
       MAXS = 0
       DO I=1, NPROCS
          IF((LAST(I)-FIRST(I)+1) .GT. MAXS) THEN
@@ -2303,7 +2412,7 @@ C
       END SUBROUTINE DMUMPS_BUILD_DIST_GRAPH
 #endif      
       SUBROUTINE DMUMPS_BUILD_LOC_GRAPH(id, ord, GSIZE, IPE, PE, LENG,
-     &     I_HALO_MAP, top_graph, WORK)
+     &     I_HALO_MAP, top_graph, WORK, LWORK)
       IMPLICIT NONE
       TYPE(DMUMPS_STRUC)   :: id
       TYPE(ORD_TYPE)       :: ord
@@ -2311,6 +2420,7 @@ C
       INTEGER(8), POINTER  :: IPE(:)
       INTEGER, POINTER     :: PE(:), LENG(:),
      &     I_HALO_MAP(:), WORK(:)
+      INTEGER(8), INTENT(in) :: LWORK
       INTEGER              :: GSIZE
       INTEGER                :: IERR, MYID, NPROCS
       INTEGER                :: I, PROC, J, LOC_ROW
@@ -2337,13 +2447,13 @@ C
       nullify(TSENDI, TSENDJ, RCVBUF, APNT)
       MYID   = ord%MYID
       NPROCS = ord%NPROCS
-      IF(MUMPS_GETSIZE(WORK) .LT. N*2) THEN
+      IF( LWORK .LT. int(N,8)*2_8 ) THEN
          WRITE(LP,
      &        '("Insufficient workspace inside BUILD_LOC_GRAPH")')
          CALL MUMPS_ABORT()
       END IF
-      MAPTAB   => WORK(     1 :   N)
-      HALO_MAP => WORK(N+1 : 2*N)
+      MAPTAB   => WORK(      1    :         N   )
+      HALO_MAP => WORK(int(N+1,8) : 2_8*int(N,8))
       CALL MUMPS_I8REALLOC(SNDCNT, NPROCS, id%INFO, LP,
      &     MEMCNT=MEMCNT, ERRCODE=-7)
       CALL MUMPS_I8REALLOC(RCVCNT, NPROCS, id%INFO, LP,
@@ -2625,7 +2735,7 @@ C
       END SUBROUTINE DMUMPS_BUILD_LOC_GRAPH
       SUBROUTINE DMUMPS_LUMAT_TO_LOC_GRAPH 
      &     (LUMAT, id, ord, GSIZE, IPE, PE, LENG,
-     &     I_HALO_MAP, WORK)
+     &     I_HALO_MAP, WORK, LWORK)
       IMPLICIT NONE
       TYPE(LMATRIX_T), INTENT(IN) :: LUMAT
       TYPE(DMUMPS_STRUC)   :: id
@@ -2633,6 +2743,7 @@ C
       INTEGER(8), POINTER  :: IPE(:)
       INTEGER, POINTER     :: PE(:), LENG(:),
      &     I_HALO_MAP(:), WORK(:)
+      INTEGER(8), INTENT(IN) :: LWORK
       INTEGER              :: GSIZE
       INTEGER                :: IERR, MYID, NPROCS
       INTEGER                :: I, PROC, J, LOC_ROW 
@@ -2656,13 +2767,13 @@ C
       nullify( RCVBUF, APNT)
       MYID   = ord%MYID
       NPROCS = ord%NPROCS
-      IF(MUMPS_GETSIZE(WORK) .LT. N) THEN
+      IF ( LWORK .LT.2_8 * int(N,8) ) THEN
          WRITE(LP,
      &   '("Insufficient workspace inside DMUMPS_LUMAT_TO_LOC_GRAPH")')
          CALL MUMPS_ABORT()
       END IF
-      MAPTAB   => WORK(     1 :   N)
-      HALO_MAP => WORK(N+1 : 2*N)
+      MAPTAB   => WORK(       1    :         N   )
+      HALO_MAP => WORK( int(N+1,8) : 2_8*int(N,8))
       CALL MUMPS_I8REALLOC(SNDCNT, NPROCS, id%INFO, LP,
      &     MEMCNT=MEMCNT, ERRCODE=-7)
       CALL MUMPS_I8REALLOC(RCVCNT, NPROCS, id%INFO, LP,
@@ -3121,15 +3232,16 @@ C
       RETURN
       END SUBROUTINE DMUMPS_BUILD_TREE
       SUBROUTINE DMUMPS_GRAPH_DIST(id, ord, FIRST,
-     &     LAST, BASE, NPROCS, WORK, TYPE)
+     &     LAST, BASE, NPROCS, WORK, LWORK, TYPE)
       IMPLICIT NONE
-      TYPE(DMUMPS_STRUC)   :: id
-      TYPE(ORD_TYPE)       :: ord
-      INTEGER              :: FIRST(:), LAST(:), BASE, NPROCS, TYPE
-      INTEGER, TARGET      :: WORK(:)
-      INTEGER, POINTER     :: TMP(:), NZ_ROW(:)
-      INTEGER              :: I, IERR, P, F, J
-      INTEGER(8)           :: LOCNNZ, INNZ, LOCOFFDIAG,
+      TYPE(DMUMPS_STRUC)     :: id
+      TYPE(ORD_TYPE)         :: ord
+      INTEGER                :: FIRST(:), LAST(:), BASE, NPROCS, TYPE
+      INTEGER, TARGET        :: WORK(:)
+      INTEGER(8), INTENT(IN) :: LWORK
+      INTEGER, POINTER       :: TMP(:), NZ_ROW(:)
+      INTEGER                :: I, IERR, P, F, J
+      INTEGER(8)             :: LOCNNZ, INNZ, LOCOFFDIAG,
      &     OFFDIAG, T, SHARE
       DO I=0, BASE-1
          FIRST(I+1) = 0
@@ -3148,8 +3260,12 @@ C
             LAST (BASE+I) = N
          END DO
       ELSE IF (TYPE.EQ.2) THEN
+         IF (LWORK .LT. 2_8*int(N,8)) THEN
+           WRITE(*,*) "Insufficient workspace in DMUMPS_GRAPH_DIST"
+           CALL MUMPS_ABORT()
+         ENDIF
          TMP    => WORK(1:N)
-         NZ_ROW => WORK(N+1:2*N)
+         NZ_ROW => WORK(int(N+1,8):2-8*int(N,8))
          TMP = 0
          LOCOFFDIAG = 0_8
          LOCNNZ = id%KEEP8(29)
@@ -3163,7 +3279,7 @@ C
                END IF
             END IF
          END DO
-         CALL MPI_ALLREDUCE(TMP(1), NZ_ROW(1), N,
+         CALL MUMPS_BIGALLREDUCE(.FALSE., TMP(1), NZ_ROW(1), N,
      &        MPI_INTEGER, MPI_SUM, ord%COMM, IERR)
          CALL MPI_ALLREDUCE(LOCOFFDIAG, OFFDIAG, 1,
      &        MPI_INTEGER8, MPI_SUM, ord%COMM, IERR)
@@ -3266,7 +3382,7 @@ C
       IF (L(N+1) == 0) THEN
          RETURN 
       ELSE
-         L(N+1) = iabs(L(N+1))
+         L(N+1) = abs(L(N+1))
       END IF
  200  CONTINUE
       S = 0
@@ -3353,7 +3469,7 @@ C
       IF (SIZE_VELOLOCTAB.EQ.VERTLOCNBR) THEN
        CALL MUMPS_PARMETIS_VWGT(FIRST(1+BASE), VERTLOCTAB_I4(1),
      &     EDGELOCTAB(1), BASEVAL, OPTIONS(1), ORDER(1),
-     &     SIZES(1), COMM, VELOLOCTAB, IERR)
+     &     SIZES(1), COMM, VELOLOCTAB(1), IERR)
       ELSE
        CALL MUMPS_PARMETIS(FIRST(1+BASE), VERTLOCTAB_I4(1),
      &     EDGELOCTAB(1), BASEVAL, OPTIONS(1), ORDER(1),
@@ -3403,7 +3519,7 @@ C
      &     EDGELOCTAB(1),
      &     BASEVAL, OPTIONS(1),
      &     ORDER(1),
-     &     SIZES(1), COMM, VELOLOCTAB, IERR)
+     &     SIZES(1), COMM, VELOLOCTAB(1), IERR)
        ELSE
         CALL MUMPS_PARMETIS_64(FIRST(1+BASE), VERTLOCTAB(1),
      &     EDGELOCTAB(1),
@@ -3451,7 +3567,7 @@ C
      &     BASEVAL_I8, OPTIONS_I8(1),
 #endif
      &     ORDER_I8(1),
-     &     SIZES_I8(1), COMM, VELOLOCTAB_I8,
+     &     SIZES_I8(1), COMM, VELOLOCTAB_I8(1),
      &     IERR)
        ELSE
         CALL MUMPS_PARMETIS_64(FIRST_I8(1+BASE), VERTLOCTAB(1),
@@ -3496,6 +3612,9 @@ C
      &     VERTLOCNBR, VERTLOCTAB,
      &     EDGELOCNBR, EDGELOCTAB, 
      &     VELOLOCTAB, SIZE_VELOLOCTAB,
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &             CONTDAT, LCONTDAT,
+#endif
      &     IERR)
       IMPLICIT NONE
       INCLUDE 'ptscotchf.h'
@@ -3514,6 +3633,11 @@ C
      &     ORDEDAT(SCOTCH_DORDERDIM), STRADAT(SCOTCH_STRATDIM),
      &     CORDEDAT(SCOTCH_ORDERDIM)
       CHARACTER  STRSTRING*1024
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      INTEGER             :: LCONTDAT
+      DOUBLE PRECISION    :: CONTDAT(LCONTDAT)
+      DOUBLE PRECISION    :: GRAPHDAT_BEFORE_CONTEXT(SCOTCH_DGRAPHDIM)
+#endif
       IF (.NOT.ord%IDO) RETURN
       nullify(VERTLOCTAB_I4)
       CALL MUMPS_REALLOC(VERTLOCTAB_I4, VERTLOCNBR+1, id%INFO, LP,
@@ -3536,7 +3660,14 @@ C
       ELSE
          MYWORKID = -1
       END IF
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      CALL MUMPS_DGRAPHINIT(GRAPHDAT_BEFORE_CONTEXT, ord%COMM_PARAORD,
+     &                      IERR)
+      CALL SCOTCHFCONTEXTBINDDGRAPH(CONTDAT, GRAPHDAT_BEFORE_CONTEXT,
+     &                              GRAPHDAT, IERR)
+#else
       CALL MUMPS_DGRAPHINIT(GRAPHDAT, ord%COMM_PARAORD, IERR)
+#endif
       IF(IERR.NE.0) THEN
          id%INFO(1:2) = -50
       END IF
@@ -3623,8 +3754,11 @@ C
       IF(MYWORKID .EQ. 0) 
      &     CALL SCOTCHFDGRAPHCORDEREXIT(GRAPHDAT, CORDEDAT)
       CALL SCOTCHFDGRAPHORDEREXIT(GRAPHDAT, ORDEDAT)
-      CALL SCOTCHFSTRATEXIT(STRADAT) 
+      CALL SCOTCHFSTRATEXIT(STRADAT)
       CALL SCOTCHFDGRAPHEXIT(GRAPHDAT)
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      CALL SCOTCHFDGRAPHEXIT(GRAPHDAT_BEFORE_CONTEXT)
+#endif
  10   CONTINUE
       CALL MUMPS_DEALLOC(VERTLOCTAB_I4, MEMCNT=MEMCNT)
       RETURN
@@ -3634,6 +3768,9 @@ C
      &     VERTLOCNBR, VERTLOCTAB,
      &     EDGELOCNBR, EDGELOCTAB,
      &     VELOLOCTAB, SIZE_VELOLOCTAB,
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &             CONTDAT, LCONTDAT,
+#endif
      &     IERR)
       IMPLICIT NONE
       INCLUDE 'ptscotchf.h'
@@ -3651,6 +3788,11 @@ C
      &     ORDEDAT(SCOTCH_DORDERDIM), STRADAT(SCOTCH_STRATDIM),
      &     CORDEDAT(SCOTCH_ORDERDIM)
       CHARACTER  STRSTRING*1024
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      INTEGER             :: LCONTDAT
+      DOUBLE PRECISION    :: CONTDAT(LCONTDAT)
+      DOUBLE PRECISION    :: GRAPHDAT_BEFORE_CONTEXT(SCOTCH_DGRAPHDIM)
+#endif
       INTEGER(8), POINTER :: EDGELOCTAB_I8(:), PERMTAB_I8(:),
      &     PERITAB_I8(:), RANGTAB_I8(:), TREETAB_I8(:), VELOLOCTAB_I8(:)
       INTEGER(8)          :: CBLKNBR_I8, VERTLOCNBR_I8, BASEVAL_I8
@@ -3704,7 +3846,14 @@ C
        ENDIF
        BASEVAL_I8    = int(BASEVAL,8)
       ENDIF
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      CALL MUMPS_DGRAPHINIT(GRAPHDAT_BEFORE_CONTEXT, ord%COMM_PARAORD,
+     &                      IERR)
+      CALL SCOTCHFCONTEXTBINDDGRAPH(CONTDAT, GRAPHDAT_BEFORE_CONTEXT,
+     &                              GRAPHDAT, IERR)
+#else
       CALL MUMPS_DGRAPHINIT(GRAPHDAT, ord%COMM_PARAORD, IERR)
+#endif
       IF(IERR.NE.0) THEN
          id%INFO(1:2) = -50
       END IF
@@ -3810,16 +3959,20 @@ C
       CALL MUMPS_PROPINFO( id%ICNTL(1), id%INFO(1),
      &     ord%COMM_PARAORD, ord%MYID_PARAORD )
       IF ( id%INFO(1) .LT. 0 ) GOTO 10
+      IF(MYWORKID .EQ. 0) 
+     &     CALL SCOTCHFDGRAPHCORDEREXIT(GRAPHDAT, CORDEDAT)
       CALL SCOTCHFDGRAPHORDEREXIT(GRAPHDAT, ORDEDAT)
       CALL SCOTCHFSTRATEXIT(STRADAT) 
       CALL SCOTCHFDGRAPHEXIT(GRAPHDAT)
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      CALL SCOTCHFDGRAPHEXIT(GRAPHDAT_BEFORE_CONTEXT)
+#endif
  10   CONTINUE
       IF (id%KEEP(10).NE.1) THEN
        CALL MUMPS_I8DEALLOC(EDGELOCTAB_I8, MEMCNT=MEMCNT)
        IF (SIZE_VELOLOCTAB.GT.0)
      & CALL MUMPS_I8DEALLOC(VELOLOCTAB_I8, MEMCNT=MEMCNT)
        IF(MYWORKID .EQ. 0) THEN
-         CALL SCOTCHFDGRAPHCORDEREXIT(GRAPHDAT, CORDEDAT)
          CALL MUMPS_ICOPY_64TO32(PERMTAB_I8(1),
      &        size(ord%PERMTAB), ord%PERMTAB(1))
          CALL MUMPS_ICOPY_64TO32(PERITAB_I8(1),

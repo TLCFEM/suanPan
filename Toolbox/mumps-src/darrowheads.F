@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -185,10 +185,8 @@ C
       INTEGER    :: INTARR( LINTARR )
       DOUBLE PRECISION    :: DBLARR( LDBLARR )
       DOUBLE PRECISION    :: A( LA )
-      INTEGER MUMPS_PROCNODE, MUMPS_TYPENODE, numroc, 
-     &        MUMPS_TYPESPLIT
-      EXTERNAL MUMPS_PROCNODE, MUMPS_TYPENODE, numroc, 
-     &        MUMPS_TYPESPLIT
+      INTEGER MUMPS_TYPESPLIT
+      EXTERNAL MUMPS_TYPESPLIT
       INTEGER LP
       LOGICAL LPOK
       DOUBLE PRECISION VAL, VAL_SHR
@@ -767,8 +765,6 @@ C
       PARAMETER(MASTER=0)
       INTEGER :: IERR
       INTEGER :: STATUS(MPI_STATUS_SIZE)
-      INTEGER numroc
-      EXTERNAL numroc
       TYPE_PARALL = KEEP(46)
       LP = ICNTL(1)
       LPOK = ( LP .GT. 0 .AND. ICNTL(4) .GE. 1 )
@@ -995,11 +991,11 @@ C
       INTEGER,    INTENT(OUT) :: LOCAL_M, LOCAL_N
       INTEGER(8), INTENT(OUT) :: PTR_ROOT
       INTEGER(8), INTENT(IN)  :: LA
-      INTEGER, EXTERNAL :: numroc
-      LOCAL_M = numroc( root%ROOT_SIZE, root%MBLOCK,
+      INTEGER, EXTERNAL :: MUMPS_NUMROC
+      LOCAL_M = MUMPS_NUMROC( root%ROOT_SIZE, root%MBLOCK,
      &         root%MYROW, 0, root%NPROW )
       LOCAL_M = max( 1, LOCAL_M )
-      LOCAL_N = numroc( root%ROOT_SIZE, root%NBLOCK,
+      LOCAL_N = MUMPS_NUMROC( root%ROOT_SIZE, root%NBLOCK,
      &         root%MYCOL, 0, root%NPCOL )
       PTR_ROOT = LA - int(LOCAL_M,8) * int(LOCAL_N,8) + 1_8
       RETURN

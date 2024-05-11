@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -145,7 +145,8 @@ C
      &           IKEEP2(1), IKEEP1(1) )
       ELSE
        IF (INPLACE64_GRAPH_COPY)  THEN
-          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8(NCMP+1)-1_8)
+          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
+     &    2_8*IPE8(NCMP+1)-2_8) 
        ELSE
          ALLOCATE(IW8(IPE8(NCMP+1)-1_8),
      &             stat=allocok)
@@ -177,11 +178,11 @@ C
        IF (INPLACE64_GRAPH_COPY)  THEN
          CALL METIS_NODEWND(NCMP, IPE8(1), IW(1),FRERE8,
      &           NUMFLAG, OPTIONS_METIS,
-     &           IKEEP2(1), IKEEP1(1) )
+     &           IKEEP28(1), IKEEP18(1) )
        ELSE
          CALL METIS_NODEWND(NCMP, IPE8(1), IW8,FRERE8,
      &           NUMFLAG, OPTIONS_METIS,
-     &           IKEEP2(1), IKEEP1(1) )
+     &           IKEEP28(1), IKEEP18(1) )
        ENDIF
        CALL MUMPS_ICOPY_64TO32(IKEEP18, NCMP, IKEEP1(1))
        CALL MUMPS_ICOPY_64TO32(IKEEP28, NCMP, IKEEP2(1))
@@ -217,7 +218,8 @@ C
      &           IKEEP2(1), IKEEP1(1) )
       ELSE
         IF (INPLACE64_GRAPH_COPY)  THEN
-          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8(NCMP+1)-1_8)
+          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
+     &    2_8*IPE8(NCMP+1)-2_8) 
         ELSE
           ALLOCATE(IW8(IPE8(NCMP+1)-1_8), stat=allocok)
           IF (allocok > 0) THEN
@@ -253,7 +255,8 @@ C
         CALL MUMPS_ICOPY_64TO32(IKEEP28, NCMP, IKEEP2(1))
         IF (INPLACE64_GRAPH_COPY) THEN
          IF (INPLACE64_RESTORE_GRAPH) THEN
-          CALL MUMPS_ICOPY_64TO32_64C_IP(IW(1), IPE8(NCMP+1)-1_8)
+          CALL MUMPS_ICOPY_64TO32_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
+     &    2_8*IPE8(NCMP+1)-2_8) 
          ENDIF
          DEALLOCATE(IKEEP18, IKEEP28)
         ELSE
@@ -288,7 +291,8 @@ C
      &      OPTIONS_METIS, IKEEP2(1), IKEEP1(1) )
       ELSE
         IF (INPLACE64_GRAPH_COPY)  THEN
-          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8(NCMP+1)-1_8)
+          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
+     &    2_8*IPE8(NCMP+1)-2_8) 
         ELSE
           ALLOCATE(IW8(IPE8(NCMP+1)-1_8), stat=allocok)
           IF (allocok > 0) THEN
@@ -328,7 +332,8 @@ C
         CALL MUMPS_ICOPY_64TO32(IKEEP28, NCMP, IKEEP2(1))
         IF (INPLACE64_GRAPH_COPY) THEN
          IF (INPLACE64_RESTORE_GRAPH) THEN
-            CALL MUMPS_ICOPY_64TO32_64C_IP(IW(1), IPE8(NCMP+1)-1_8)
+            CALL MUMPS_ICOPY_64TO32_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
+     &      2_8*IPE8(NCMP+1)-2_8) 
          ENDIF
          DEALLOCATE(FRERE8, IKEEP18, IKEEP28, OPTIONS_METIS8)
         ELSE
@@ -365,7 +370,14 @@ C
       LOGICAL,    INTENT(IN)    :: SCOTCH_SYMBOLIC
       INTEGER, DIMENSION(:), ALLOCATABLE :: IPE
       INTEGER :: allocok
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      INCLUDE 'scotchf.h'
+      INTEGER          :: IOMP, NOMP
+      DOUBLE PRECISION :: CONTDAT(SCOTCH_CONTEXTDIM)
+      INTEGER(4)       :: IERR_SCOTCH
+#else
       INTEGER :: PTHREAD_NUMBER, NOMP
+#endif
       IF (IWFR8 .GE. int(huge(IW),8)) THEN
         INFO(1) = -51
         CALL MUMPS_SET_IERROR(IPE8(NCMP+1), INFO(2))
@@ -380,29 +392,67 @@ C
         RETURN
       ENDIF
       CALL MUMPS_ICOPY_64TO32(IPE8(1),NCMP+1,IPE)
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+!$OMP PARALLEL PRIVATE(IOMP, IERR_SCOTCH)
+!$OMP SINGLE
+      NOMP=omp_get_num_threads()
+!$OMP END SINGLE
+      IOMP=omp_get_thread_num()
+      IF (IOMP.EQ.0) THEN
+        CALL SCOTCHFCONTEXTINIT(CONTDAT, IERR_SCOTCH)
+        CALL SCOTCHFCONTEXTRANDOMCLONE(CONTDAT, IERR_SCOTCH)
+        CALL SCOTCHFCONTEXTTHREADIMPORT1(CONTDAT, NOMP,IERR_SCOTCH)
+      ENDIF
+!$OMP BARRIER
+      CALL SCOTCHFCONTEXTTHREADIMPORT2(CONTDAT, IOMP, IERR_SCOTCH)
+#else
       NOMP=0
 !$    NOMP=omp_get_max_threads()
       IF (NOMP .GT. 0) THEN
         CALL MUMPS_SCOTCH_GET_PTHREAD_NUMBER (PTHREAD_NUMBER)
         CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (NOMP)
       ENDIF
-      IF (SCOTCH_SYMBOLIC) THEN
-         CALL MUMPS_SCOTCH( NCMP, int(LIW8), IPE, int(IWFR8),
+#endif
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      IF (IOMP.EQ.0) THEN
+#endif
+        IF (SCOTCH_SYMBOLIC) THEN
+           CALL MUMPS_SCOTCH( NCMP, int(LIW8), IPE, int(IWFR8),
      &                   PTRAR, IW(1), IWL1, IKEEP1(1),
      &                   IKEEP2(1), NCMPA,
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &                   CONTDAT,
+#endif
      &                   WEIGHTUSED, WEIGHTREQUESTED )
-      ELSE
-         CALL MUMPS_SCOTCH_ORD ( NCMP, int(LIW8), IPE, int(IWFR8),
+        ELSE
+           CALL MUMPS_SCOTCH_ORD ( NCMP, int(LIW8), IPE, int(IWFR8),
      &                   PTRAR, IW(1), IWL1, IKEEP1(1),
      &                   IKEEP2(1), NCMPA,
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &                   CONTDAT,
+#endif
      &                   WEIGHTUSED, WEIGHTREQUESTED )
-      ENDIF
+        ENDIF
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+        CALL SCOTCHFCONTEXTEXIT(CONTDAT)
+      ENDIF 
+!$OMP END PARALLEL
+#else
       IF (NOMP .GT. 0) THEN
         CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (PTHREAD_NUMBER)
+      ENDIF
+#endif
+      IF (NCMPA .NE.0) THEN
+        IF (LPOK) WRITE(LP,*) 
+     &            ' Error on output from SCOTCH, NCMPA=', NCMPA
+        INFO(1) = -88
+        INFO(2) = NCMPA
+        GOTO 500
       ENDIF
       IF (SCOTCH_SYMBOLIC) THEN
          PARENT(1:NCMP)=IPE(1:NCMP)
       ENDIF
+ 500  CONTINUE
       DEALLOCATE(IPE)
       RETURN
       END SUBROUTINE MUMPS_SCOTCH_MIXEDto32
@@ -410,14 +460,14 @@ C
      &           NCMP, LIW8, IPE8, PARENT, IWFR8,
      &           PTRAR, IW, IWL1, IKEEP1,
      &           IKEEP2, NCMPA, INFO, LP, LPOK, KEEP10,
-     &           INPLACE64_GRAPH_COPY,
+     &           INPLACE64_GRAPH_COPY, INPLACE64_RESTORE_GRAPH,
      &           WEIGHTUSED, WEIGHTREQUESTED, SCOTCH_SYMBOLIC)
 !$    USE OMP_LIB
       IMPLICIT NONE
       INTEGER,    INTENT(IN)    :: NCMP
       INTEGER(8), INTENT(IN)    :: LIW8
       INTEGER,    INTENT(OUT)   :: NCMPA
-      INTEGER(8), INTENT(INOUT) :: IPE8(:) 
+      INTEGER(8), INTENT(INOUT), target :: IPE8(:) 
       INTEGER,    INTENT(OUT)   :: PARENT(NCMP)
       INTEGER(8), INTENT(IN)    :: IWFR8
       INTEGER                   :: PTRAR(NCMP)
@@ -430,52 +480,109 @@ C
       LOGICAL,    INTENT(IN)    :: LPOK
       INTEGER,    INTENT(IN)    :: KEEP10
       LOGICAL, INTENT(IN)       :: INPLACE64_GRAPH_COPY
+      LOGICAL, INTENT(IN)       :: INPLACE64_RESTORE_GRAPH
       INTEGER,    INTENT(OUT)   :: WEIGHTUSED
       INTEGER,    INTENT(IN)    :: WEIGHTREQUESTED
       LOGICAL,    INTENT(IN)    :: SCOTCH_SYMBOLIC
       INTEGER(8), DIMENSION(:), ALLOCATABLE :: 
      &                     PTRAR8, IW8, IWL18, IKEEP18,
-     &                     IKEEP28, IPE8_TEMP
-      INTEGER :: allocok
+     &                     IKEEP28
+      INTEGER(8), DIMENSION(:), POINTER :: IPE8_TEMP
+      INTEGER :: allocok, I
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+      INCLUDE 'scotchf.h'
+      INTEGER          :: IOMP, NOMP
+      DOUBLE PRECISION :: CONTDAT(SCOTCH_CONTEXTDIM)
+      INTEGER(4)       :: IERR_SCOTCH
+#else
       INTEGER :: PTHREAD_NUMBER, NOMP
-      ALLOCATE( IPE8_TEMP(NCMP+1), stat=allocok )
-      IF (allocok > 0) THEN
-        IF (LPOK) WRITE(LP,*)
+#endif
+      LOGICAL :: IPE8_TEMP_ALLOCATED
+      IPE8_TEMP_ALLOCATED =.FALSE.
+      NULLIFY(IPE8_TEMP)
+      CALL MUMPS_SCOTCH_WEIGHTUSED (WEIGHTUSED)
+      IF ( (.NOT.SCOTCH_SYMBOLIC) .OR. 
+     &     ( (WEIGHTREQUESTED.EQ.1).AND.(WEIGHTUSED.EQ.0)) 
+     &   ) THEN
+       ALLOCATE( IPE8_TEMP(NCMP+1), stat=allocok )
+       IF (allocok > 0) THEN
+         IF (LPOK) WRITE(LP,*)
      &  "ERROR memory allocation in MUMPS_SCOTCH_MIXEDto64"
         INFO(1) = -7
         INFO(2) = NCMP+1
         RETURN
+       ENDIF
+       IPE8_TEMP_ALLOCATED = .TRUE.
+       DO I=1, NCMP+1
+         IPE8_TEMP(I) = IPE8(I)
+       ENDDO
+      ELSE
+       IPE8_TEMP =>  IPE8(1:NCMP+1)
       ENDIF
-      IPE8_TEMP(1:NCMP+1) = IPE8(1:NCMP+1)
-      NOMP=0
-!$    NOMP=omp_get_max_threads()
       IF (KEEP10.EQ.1) THEN
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+!$OMP   PARALLEL PRIVATE(IOMP, IERR_SCOTCH)
+!$OMP   SINGLE
+        NOMP=omp_get_num_threads()
+!$OMP   END SINGLE
+        IOMP=omp_get_thread_num()
+        IF (IOMP.EQ.0) THEN
+          CALL SCOTCHFCONTEXTINIT(CONTDAT, IERR_SCOTCH)
+          CALL SCOTCHFCONTEXTRANDOMCLONE(CONTDAT, IERR_SCOTCH)
+          CALL SCOTCHFCONTEXTTHREADIMPORT1(CONTDAT, NOMP,IERR_SCOTCH)
+        ENDIF
+!$OMP   BARRIER
+        CALL SCOTCHFCONTEXTTHREADIMPORT2(CONTDAT, IOMP, IERR_SCOTCH)
+#else
+        NOMP=0
+!$      NOMP=omp_get_max_threads()
         IF (NOMP .GT. 0) THEN
           CALL MUMPS_SCOTCH_GET_PTHREAD_NUMBER (PTHREAD_NUMBER)
           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (NOMP)
         ENDIF
-        IF (SCOTCH_SYMBOLIC) THEN
-          CALL MUMPS_SCOTCH_64( NCMP, LIW8,
-     &                        IPE8_TEMP(1), 
-     &                        IWFR8,
-     &                        PTRAR, IW(1), IWL1, IKEEP1(1),
-     &                        IKEEP2(1), NCMPA,
-     &                        WEIGHTUSED, WEIGHTREQUESTED)
-          PARENT(1:NCMP) = int(IPE8_TEMP(1:NCMP))
-        ELSE
-          CALL MUMPS_SCOTCH_ORD_64( NCMP, LIW8,
-     &                        IPE8_TEMP(1), 
-     &                        IWFR8,
-     &                        PTRAR, IW(1), IWL1, IKEEP1(1),
-     &                        IKEEP2(1), NCMPA,
-     &                        WEIGHTUSED, WEIGHTREQUESTED)
-        ENDIF
+#endif
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+        IF (IOMP.EQ.0) THEN
+#endif
+          IF (SCOTCH_SYMBOLIC) THEN
+            CALL MUMPS_SCOTCH_64( NCMP, LIW8,
+     &                          IPE8_TEMP(1), 
+     &                          IWFR8,
+     &                          PTRAR, IW(1), IWL1, IKEEP1(1),
+     &                          IKEEP2(1), NCMPA,
+     &                          WEIGHTUSED, WEIGHTREQUESTED)
+            PARENT(1:NCMP) = int(IPE8_TEMP(1:NCMP))
+          ELSE
+            CALL MUMPS_SCOTCH_ORD_64( NCMP, LIW8,
+     &                          IPE8_TEMP(1), 
+     &                          IWFR8,
+     &                          PTRAR, IW(1), IWL1, IKEEP1(1),
+     &                          IKEEP2(1), NCMPA,
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &                          CONTDAT,
+#endif
+     &                          WEIGHTUSED, WEIGHTREQUESTED)
+          ENDIF
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+          CALL SCOTCHFCONTEXTEXIT(CONTDAT)
+        ENDIF 
+!$OMP   END PARALLEL
+#else
         IF (NOMP .GT. 0) THEN
           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (PTHREAD_NUMBER)
         ENDIF
+#endif
+        IF (NCMPA .NE. 0) THEN
+           IF (LPOK) WRITE(LP,*) 
+     &               ' Error on output from SCOTCH, NCMPA=', NCMPA
+           INFO( 1 ) = -88
+           INFO( 2 ) = NCMPA
+           GOTO 600 
+        ENDIF
       ELSE
         IF (INPLACE64_GRAPH_COPY)  THEN
-          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8_TEMP(NCMP+1)-1_8)
+          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), IPE8_TEMP(NCMP+1)-1_8,
+     &    2_8*IPE8(NCMP+1)-2_8) 
         ELSE
          ALLOCATE( IW8(LIW8), stat=allocok )
          IF (allocok > 0) THEN
@@ -504,61 +611,99 @@ C
         IF (WEIGHTREQUESTED.EQ.1) THEN
          CALL MUMPS_ICOPY_32TO64(IWL1,NCMP,IWL18)
         ENDIF
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+!$OMP   PARALLEL PRIVATE(IOMP, IERR_SCOTCH)
+!$OMP   SINGLE
+        NOMP=omp_get_num_threads()
+!$OMP   END SINGLE
+        IOMP=omp_get_thread_num()
+        IF (IOMP.EQ.0) THEN
+          CALL SCOTCHFCONTEXTINIT(CONTDAT, IERR_SCOTCH)
+          CALL SCOTCHFCONTEXTRANDOMCLONE(CONTDAT, IERR_SCOTCH)
+          CALL SCOTCHFCONTEXTTHREADIMPORT1(CONTDAT, NOMP,IERR_SCOTCH)
+        ENDIF
+!$OMP   BARRIER
+        CALL SCOTCHFCONTEXTTHREADIMPORT2(CONTDAT, IOMP, IERR_SCOTCH)
+#else
+        NOMP=0
+!$      NOMP=omp_get_max_threads()
         IF (NOMP .GT. 0) THEN
           CALL MUMPS_SCOTCH_GET_PTHREAD_NUMBER (PTHREAD_NUMBER)
           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (NOMP)
         ENDIF
-        IF (INPLACE64_GRAPH_COPY) THEN
-         IF (SCOTCH_SYMBOLIC) THEN
-           CALL MUMPS_SCOTCH_64( 
-     &                 int(NCMP,8), LIW8, 
-     &                 IPE8_TEMP(1),         
-     &                 IWFR8,                
-     &                 PTRAR8, IW(1), IWL18, 
-     &                 IKEEP1(1), IKEEP2(1), NCMPA, 
-     &                 WEIGHTUSED,           
-     &                 WEIGHTREQUESTED )     
-         ELSE
-           CALL MUMPS_SCOTCH_ORD_64 (
-     &                 int(NCMP,8), LIW8,    
-     &                 IPE8_TEMP(1),         
-     &                 IWFR8,                
-     &                 PTRAR8, IW(1), IWL18, 
-     &                 IKEEP1(1),            
-     &                 IKEEP2(1), NCMPA, 
-     &                 WEIGHTUSED,           
-     &                 WEIGHTREQUESTED )     
-         ENDIF
-        ELSE
-         IF (SCOTCH_SYMBOLIC) THEN
-           CALL MUMPS_SCOTCH_64( 
-     &                 int(NCMP,8), LIW8,    
-     &                 IPE8_TEMP(1),         
-     &                 IWFR8,                
-     &                 PTRAR8, IW8, IWL18,   
-     &                 IKEEP1(1), IKEEP2(1), NCMPA, 
-     &                 WEIGHTUSED,           
-     &                 WEIGHTREQUESTED )     
-         ELSE
-           CALL MUMPS_SCOTCH_ORD_64( 
-     &                 int(NCMP,8), LIW8,    
-     &                 IPE8_TEMP(1),         
-     &                 IWFR8,                
-     &                 PTRAR8, IW8, IWL18,   
-     &                 IKEEP1(1),            
-     &                 IKEEP2(1), NCMPA, 
-     &                 WEIGHTUSED,           
-     &                 WEIGHTREQUESTED )     
-         ENDIF
-        ENDIF
+#endif
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+        IF (IOMP.EQ.0) THEN
+#endif
+          IF (INPLACE64_GRAPH_COPY) THEN
+            IF (SCOTCH_SYMBOLIC) THEN
+              CALL MUMPS_SCOTCH_64( 
+     &                    int(NCMP,8), LIW8, 
+     &                    IPE8_TEMP(1),         
+     &                    IWFR8,                
+     &                    PTRAR8, IW(1), IWL18, 
+     &                    IKEEP18(1), IKEEP28(1), NCMPA, 
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &                    CONTDAT,
+#endif
+     &                    WEIGHTUSED,           
+     &                    WEIGHTREQUESTED )     
+            ELSE
+              CALL MUMPS_SCOTCH_ORD_64 (
+     &                    int(NCMP,8), LIW8,    
+     &                    IPE8_TEMP(1),         
+     &                    IWFR8,                
+     &                    PTRAR8, IW(1), IWL18, 
+     &                    IKEEP18(1),            
+     &                    IKEEP28(1), NCMPA, 
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &                    CONTDAT,
+#endif
+     &                    WEIGHTUSED,           
+     &                    WEIGHTREQUESTED )     
+            ENDIF
+          ELSE
+            IF (SCOTCH_SYMBOLIC) THEN
+              CALL MUMPS_SCOTCH_64( 
+     &                    int(NCMP,8), LIW8,    
+     &                    IPE8_TEMP(1),         
+     &                    IWFR8,                
+     &                    PTRAR8, IW8, IWL18,   
+     &                    IKEEP18(1), IKEEP28(1), NCMPA, 
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &                    CONTDAT,
+#endif
+     &                    WEIGHTUSED,           
+     &                    WEIGHTREQUESTED )     
+            ELSE
+              CALL MUMPS_SCOTCH_ORD_64( 
+     &                    int(NCMP,8), LIW8,    
+     &                    IPE8_TEMP(1),         
+     &                    IWFR8,                
+     &                    PTRAR8, IW8, IWL18,   
+     &                    IKEEP18(1),            
+     &                    IKEEP28(1), NCMPA, 
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+     &                    CONTDAT,
+#endif
+     &                    WEIGHTUSED,           
+     &                    WEIGHTREQUESTED )     
+            ENDIF
+          ENDIF
+#if defined(MUMPS_SCOTCHIMPORTOMPTHREADS)
+          CALL SCOTCHFCONTEXTEXIT(CONTDAT)
+        ENDIF 
+!$OMP   END PARALLEL
+#else
         IF (NOMP .GT. 0) THEN
           CALL MUMPS_SCOTCH_SET_PTHREAD_NUMBER (PTHREAD_NUMBER)
         ENDIF
-        IF (NCMPA .LT. 0) THEN
+#endif
+        IF (NCMPA .NE. 0) THEN
            IF (LPOK) WRITE(LP,*) 
      &               ' Error on output from SCOTCH, NCMPA=', NCMPA
-           INFO( 1 ) = -9999
-           INFO( 2 ) = 3
+           INFO( 1 ) = -88
+           INFO( 2 ) = NCMPA
            GOTO 500 
         ENDIF
         CALL MUMPS_ICOPY_64TO32(IWL18,NCMP,IWL1)
@@ -566,17 +711,23 @@ C
         CALL MUMPS_ICOPY_64TO32(IKEEP28,NCMP,IKEEP2(1))
         IF (SCOTCH_SYMBOLIC) THEN
          CALL MUMPS_ICOPY_64TO32(IPE8_TEMP(1),NCMP,PARENT)
+        ELSE IF (INPLACE64_GRAPH_COPY) THEN
+          IF (INPLACE64_RESTORE_GRAPH) THEN
+            CALL MUMPS_ICOPY_64TO32_64C_IP(IW(1), IPE8(NCMP+1)-1_8,
+     &      2_8*IPE8(NCMP+1)-2_8) 
+          ENDIF
         ENDIF
  500    CONTINUE
         IF (.NOT.INPLACE64_GRAPH_COPY) THEN
-         IF (ALLOCATED(IW8)) DEALLOCATE(IW8)
+          IF (ALLOCATED(IW8)) DEALLOCATE(IW8)
         ENDIF
         IF (ALLOCATED(PTRAR8)) DEALLOCATE(PTRAR8)
         IF (ALLOCATED(IWL18)) DEALLOCATE(IWL18)
         IF (ALLOCATED(IKEEP18)) DEALLOCATE(IKEEP18)
         IF (ALLOCATED(IKEEP28)) DEALLOCATE(IKEEP28)
       ENDIF
-      IF (ALLOCATED(IPE8_TEMP)) DEALLOCATE(IPE8_TEMP)
+ 600  CONTINUE
+      IF (IPE8_TEMP_ALLOCATED ) DEALLOCATE(IPE8_TEMP)
       RETURN
       END SUBROUTINE MUMPS_SCOTCH_MIXEDto64
 #endif
@@ -921,7 +1072,8 @@ C
         ENDDO
       ELSE
         IF (INPLACE64_GRAPH_COPY)  THEN
-          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), NEDGES8)
+          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), NEDGES8,
+     &    2_8*NEDGES8 ) 
         ELSE
          ALLOCATE(IW8(NEDGES8), stat=allocok)
          IF (allocok > 0) THEN
@@ -1023,7 +1175,8 @@ C
         CALL MUMPS_ICOPY_64TO32(XADJ8(1), NVTX, PARENT)
       ELSE
         IF (INPLACE64_GRAPH_COPY)  THEN
-          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), NEDGES8)
+          CALL MUMPS_ICOPY_32TO64_64C_IP(IW(1), NEDGES8,
+     &    2_8*NEDGES8 ) 
         ELSE
           ALLOCATE(IW8(NEDGES8), stat=allocok)
           IF (allocok > 0) THEN

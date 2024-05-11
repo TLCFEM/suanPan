@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -251,7 +251,7 @@ C
             ENDIF
           ENDIF
           IF ( MOVE2DYNAMIC ) THEN
-#if defined(MUMPS_ALLOC_FROM_C)
+#if defined(MUMPS_ALLOC_FROM_C) || defined(_CRAYFTN)
             CALL MUMPS_MALLOC_C( TMP_ADDRESS,
      &      RCURRENT_SIZE * KEEP(35) )
             IF (TMP_ADDRESS .EQ. 0_8) THEN
@@ -279,7 +279,7 @@ C
      &        LIW-ICURRENT+1, SIZEHOLE, KEEP(IXSZ))
             ENDIF
             CALL MUMPS_STOREI8(RCURRENT_SIZE,IW(ICURRENT+XXD))
-#if defined(MUMPS_ALLOC_FROM_C)
+#if defined(MUMPS_ALLOC_FROM_C) || defined(_CRAYFTN)
             CALL SMUMPS_DM_SET_PTR( TMP_ADDRESS, RCURRENT_SIZE,
      &                              DYNAMIC_CB )
 #else
@@ -438,7 +438,7 @@ C
       LOGICAL, INTENT(IN) :: ATOMIC_UPDATES
       INTEGER(8) :: KEEP8(150)
       INTEGER IDUMMY
-#if defined(MUMPS_ALLOC_FROM_C)
+#if defined(MUMPS_ALLOC_FROM_C) || defined(_CRAYFTN)
       CALL MUMPS_FREE_C(DYNPTR(1))
 #else
       DEALLOCATE(DYNPTR)

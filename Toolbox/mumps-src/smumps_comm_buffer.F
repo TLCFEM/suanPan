@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -13,7 +13,7 @@ C  https://cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 C
         MODULE SMUMPS_BUF
         PRIVATE
-        PUBLIC :: SMUMPS_BUF_TRY_FREE_CB, SMUMPS_BUF_INIT,
+        PUBLIC :: SMUMPS_BUF_INIT,
      &   SMUMPS_BUF_INI_MYID,
      &   SMUMPS_BUF_ALLOC_CB ,       SMUMPS_BUF_DEALL_CB ,
      &   SMUMPS_BUF_ALLOC_SMALL_BUF, SMUMPS_BUF_DEALL_SMALL_BUF,
@@ -52,34 +52,6 @@ C
      &       , SAVE, TARGET :: BUF_MAX_ARRAY
         PUBLIC :: BUF_LMAX_ARRAY, BUF_MAX_ARRAY
       CONTAINS
-        SUBROUTINE SMUMPS_BUF_TRY_FREE_CB()
-        CALL SMUMPS_BUF_TRY_FREE(BUF_CB)
-        RETURN
-        END SUBROUTINE SMUMPS_BUF_TRY_FREE_CB
-        SUBROUTINE SMUMPS_BUF_TRY_FREE(B)
-        IMPLICIT NONE
-        TYPE ( SMUMPS_COMM_BUFFER_TYPE ) :: B
-        INCLUDE 'mpif.h'
-        LOGICAL :: FLAG
-        INTEGER :: IERR_MPI
-        INTEGER :: STATUS(MPI_STATUS_SIZE)
-        IF ( B%HEAD .NE. B%TAIL ) THEN
- 10       CONTINUE
-          CALL MPI_TEST( B%CONTENT( B%HEAD + REQ ), FLAG,
-     &                   STATUS, IERR_MPI )
-          IF ( FLAG ) THEN
-            B%HEAD = B%CONTENT( B%HEAD + NEXT )
-            IF ( B%HEAD .EQ. 0 ) B%HEAD = B%TAIL
-            IF ( B%HEAD .NE. B%TAIL ) GOTO 10
-          END IF
-        END IF
-        IF ( B%HEAD .EQ. B%TAIL ) THEN
-          B%HEAD = 1
-          B%TAIL = 1
-          B%ILASTMSG = 1
-        END iF
-        RETURN
-        END SUBROUTINE SMUMPS_BUF_TRY_FREE
         SUBROUTINE SMUMPS_BUF_INI_MYID( MYID )
         IMPLICIT NONE
         INTEGER MYID
@@ -319,7 +291,7 @@ C
           ENDIF
         ENDIF
         IF (NBROWS_PACKET + NBROWS_ALREADY_SENT.NE.LCONT .AND.
-     &     SIZE_PACK  .LT. SIZE_RBUF_BYTES / 4
+     &     SIZE_PACK  .LT. SIZE_RBUF_BYTES / 10
      &    .AND. 
      &    .NOT. RECV_BUF_SMALLER_THAN_SEND)
      &       THEN
@@ -499,16 +471,16 @@ C
         SUBROUTINE SMUMPS_BUF_SEND_VCB( NRHS_B, NODE1, NODE2, NCB, LDW,
      &             LONG,
      &             IW, W, JBDEB, JBFIN,
-     &             RHSCOMP, NRHS, LRHSCOMP, IPOSINRHSCOMP, NPIV,
+     &             RHSINTR, NRHS, LRHSINTR, IPOSINRHSINTR, NPIV,
      &             KEEP,
      &             DEST, TAG, COMM, IERR )
         IMPLICIT NONE
         INTEGER LDW, DEST, TAG, COMM, IERR
         INTEGER NRHS_B, NODE1, NODE2, NCB, LONG, JBDEB, JBFIN
         INTEGER IW( max( 1, LONG ) )
-        INTEGER, INTENT(IN) :: LRHSCOMP, NRHS, IPOSINRHSCOMP, NPIV
+        INTEGER, INTENT(IN) :: LRHSINTR, NRHS, IPOSINRHSINTR, NPIV
         REAL W( max( 1, LDW * NRHS_B ) )
-        REAL RHSCOMP(LRHSCOMP,NRHS)
+        REAL RHSINTR(LRHSINTR,NRHS)
         INTEGER, INTENT(INOUT) :: KEEP(500)
         INCLUDE 'mpif.h'
         INTEGER :: IERR_MPI
@@ -566,7 +538,7 @@ C
           IF (NODE2.EQ.0) THEN
             DO K=1, NRHS_B
               IF (NPIV.GT.0) THEN
-              CALL MPI_PACK( RHSCOMP(IPOSINRHSCOMP,JBDEB+K-1), NPIV,
+              CALL MPI_PACK( RHSINTR(IPOSINRHSINTR,JBDEB+K-1), NPIV,
      &                          MPI_REAL,
      &                          BUF_CB%CONTENT( IPOS ), SIZE,
      &                          POSITION, COMM, IERR_MPI )
@@ -653,14 +625,13 @@ C
         FLAG = ( B%HEAD == B%TAIL )
         RETURN
         END SUBROUTINE SMUMPS_BUF_EMPTY
-        SUBROUTINE SMUMPS_BUF_SIZE_AVAILABLE( B, SIZE_AV )
+        SUBROUTINE SMUMPS_BUF_FREEREQUESTS( B )
         IMPLICIT NONE
         TYPE ( SMUMPS_COMM_BUFFER_TYPE ) :: B
-        INTEGER SIZE_AV
         INCLUDE 'mpif.h'
-        INTEGER :: IERR_MPI
+        INTEGER :: IERR_MPI, CURRENT, LAST_NOT_FREE, LAST_NOT_FREE_TAIL
         INTEGER :: STATUS(MPI_STATUS_SIZE)
-        LOGICAL :: FLAG
+        LOGICAL :: FLAG, BROADCAST_NOT_FREE
         IF ( B%HEAD .NE. B%TAIL ) THEN
  10       CONTINUE
           CALL MPI_TEST( B%CONTENT( B%HEAD + REQ ), FLAG, STATUS,
@@ -669,6 +640,41 @@ C
             B%HEAD = B%CONTENT( B%HEAD + NEXT )
             IF ( B%HEAD .EQ. 0 ) B%HEAD = B%TAIL
             IF ( B%HEAD .NE. B%TAIL ) GOTO 10
+          ELSE
+            LAST_NOT_FREE = B%HEAD
+            CURRENT = B%CONTENT( LAST_NOT_FREE + NEXT )
+            LAST_NOT_FREE_TAIL = CURRENT
+            BROADCAST_NOT_FREE = B%CONTENT(LAST_NOT_FREE+NEXT).EQ.
+     &                              LAST_NOT_FREE+OVHSIZE 
+            DO WHILE ( CURRENT .NE. 0 )
+              IF (BROADCAST_NOT_FREE) THEN
+                FLAG = .FALSE.
+              ELSE
+                CALL MPI_TEST( B%CONTENT( CURRENT + REQ ), FLAG, STATUS,
+     &                       IERR_MPI )
+              ENDIF
+              IF (FLAG) THEN
+                CURRENT = B%CONTENT( CURRENT + NEXT )
+                B%CONTENT( LAST_NOT_FREE + NEXT ) = CURRENT
+              ELSE
+                LAST_NOT_FREE = CURRENT
+                CURRENT = B%CONTENT( CURRENT + NEXT )
+                IF ( CURRENT .NE. 0 ) THEN
+                  LAST_NOT_FREE_TAIL = CURRENT
+                ELSE
+                  LAST_NOT_FREE_TAIL = B%TAIL
+                ENDIF
+                BROADCAST_NOT_FREE = B%CONTENT(LAST_NOT_FREE+NEXT).EQ.
+     &                               LAST_NOT_FREE+OVHSIZE 
+              ENDIF
+            ENDDO
+            IF ( LAST_NOT_FREE_TAIL .NE. 0 ) THEN
+              B%TAIL = LAST_NOT_FREE_TAIL
+              B%ILASTMSG = LAST_NOT_FREE
+            ELSE IF (B%ILASTMSG .NE. LAST_NOT_FREE) THEN
+              WRITE(*,*) "ABORT", B%ILASTMSG, LAST_NOT_FREE
+              CALL MUMPS_ABORT()
+            ENDIF
           END IF
         END IF
         IF ( B%HEAD .EQ. B%TAIL ) THEN
@@ -676,86 +682,78 @@ C
           B%TAIL = 1
           B%ILASTMSG = 1
         END IF
+        RETURN
+        END SUBROUTINE SMUMPS_BUF_FREEREQUESTS
+        SUBROUTINE SMUMPS_BUF_SIZE_AVAILABLE( B, SIZE_AV, SIZE_AV2 )
+        IMPLICIT NONE
+        TYPE ( SMUMPS_COMM_BUFFER_TYPE ) :: B
+        INTEGER, INTENT(OUT) :: SIZE_AV
+        INTEGER, OPTIONAL, INTENT(OUT) :: SIZE_AV2
+        CALL SMUMPS_BUF_FREEREQUESTS( B )
         IF ( B%HEAD .LE. B%TAIL ) THEN
-           SIZE_AV = max( B%LBUF_INT - B%TAIL, B%HEAD - 2 )
+          SIZE_AV = max( B%LBUF_INT - B%TAIL, B%HEAD - 2 )
+          IF ( B%LBUF_INT - B%TAIL .GT. B%HEAD - 2 ) THEN
+            SIZE_AV  = B%LBUF_INT - B%TAIL
+            IF (present(SIZE_AV2)) SIZE_AV2 = 0
+          ELSE
+            SIZE_AV = B%HEAD - 2
+            IF (present(SIZE_AV2)) SIZE_AV2 = B%LBUF_INT - B%TAIL
+          ENDIF
         ELSE
-           SIZE_AV = B%HEAD - B%TAIL - 1
+          SIZE_AV  = B%HEAD - B%TAIL - 1
+          IF (present(SIZE_AV2)) SIZE_AV2 = 0
         END IF
-        SIZE_AV = min(SIZE_AV - OVHSIZE, SIZE_AV)
+        SIZE_AV = max(0,SIZE_AV - OVHSIZE)
         SIZE_AV = SIZE_AV * SIZEofINT
+        IF (present(SIZE_AV2)) THEN
+          IF (SIZE_AV2 .NE. 0) THEN
+            SIZE_AV = max(0,SIZE_AV2 - OVHSIZE)
+            SIZE_AV2 = SIZE_AV2 * SIZEofINT
+          ENDIF
+        ENDIF
         RETURN
         END SUBROUTINE SMUMPS_BUF_SIZE_AVAILABLE
         SUBROUTINE SMUMPS_BUF_TEST()
-        INTEGER :: IPOS, IREQ, IERR
-        INTEGER, PARAMETER :: IONE=1
-        INTEGER :: MSG_SIZE
-        INTEGER :: DEST2(1)
-        DEST2=-10
-        MSG_SIZE=1
-        CALL BUF_LOOK( BUF_CB, IPOS, IREQ, MSG_SIZE, IERR, 
-     &                 IONE , DEST2,.TRUE.)
+        CALL SMUMPS_BUF_FREEREQUESTS(BUF_CB)
         RETURN
         END SUBROUTINE SMUMPS_BUF_TEST
         SUBROUTINE BUF_LOOK( B, IPOS, IREQ, MSG_SIZE, IERR, 
-     &    NDEST , PDEST, TEST_ONLY)
+     &    NDEST , PDEST )
         IMPLICIT NONE
         TYPE ( SMUMPS_COMM_BUFFER_TYPE ) :: B
         INTEGER, INTENT(IN)        :: MSG_SIZE
         INTEGER, INTENT(OUT)       :: IPOS, IREQ, IERR
-        LOGICAL, INTENT(IN), OPTIONAL :: TEST_ONLY
         INTEGER NDEST
         INTEGER, INTENT(IN)        :: PDEST(max(1,NDEST))
         INCLUDE 'mpif.h'
-        INTEGER :: IERR_MPI
         INTEGER :: MSG_SIZE_INT
         INTEGER :: IBUF
-        LOGICAL :: FLAG
-        INTEGER :: STATUS(MPI_STATUS_SIZE)
         IERR = 0
-        IF ( B%HEAD .NE. B%TAIL ) THEN
- 10       CONTINUE
-          CALL MPI_TEST( B%CONTENT( B%HEAD + REQ ), FLAG, STATUS,
-     &                   IERR_MPI )
-          IF ( FLAG ) THEN
-            B%HEAD = B%CONTENT( B%HEAD + NEXT )
-            IF ( B%HEAD .EQ. 0 ) B%HEAD = B%TAIL
-            IF ( B%HEAD .NE. B%TAIL ) GOTO 10
-          END IF
-        END IF
-        IF ( B%HEAD .EQ. B%TAIL ) THEN
-          B%HEAD = 1
-          B%TAIL = 1
-          B%ILASTMSG = 1
-        END iF
+        CALL SMUMPS_BUF_FREEREQUESTS( B )
         MSG_SIZE_INT = ( MSG_SIZE + ( SIZEofINT - 1 ) ) / SIZEofINT
         MSG_SIZE_INT = MSG_SIZE_INT + OVHSIZE
-        IF (present(TEST_ONLY)) RETURN
-        FLAG = (     ( B%HEAD .LE. B%TAIL )
-     &               .AND. (
-     &                 ( MSG_SIZE_INT .LE. B%LBUF_INT - B%TAIL )
-     &                 .OR. ( MSG_SIZE_INT .LE. B%HEAD - 2 ) ) )
-     &         .OR.
-     &               ( ( B%HEAD .GT. B%TAIL )
-     &               .AND. ( MSG_SIZE_INT .LE. B%HEAD - B%TAIL - 1 ) )
-        IF ( .NOT. FLAG
-     &       ) THEN
-        IERR = -1
         IF ( MSG_SIZE_INT .GT. B%LBUF_INT - 1 ) THEN
-           IERR = -2
-        ENDIF
-        IPOS = -1
-        IREQ = -1
-        RETURN
-      END IF
+          IERR = -2
+          IPOS = -1
+          IREQ = -1
+          RETURN
+        END IF
         IF ( B%HEAD .LE. B%TAIL ) THEN
-          IF ( MSG_SIZE_INT .LE. B%LBUF_INT - B%TAIL + 1 ) THEN
+          IF ( MSG_SIZE_INT .LE. B%LBUF_INT - B%TAIL ) THEN
             IBUF = B%TAIL
-          ELSE IF ( MSG_SIZE_INT .LE. B%HEAD - 1 ) THEN
+          ELSE IF ( MSG_SIZE_INT .LE. B%HEAD - 2 ) THEN
             IBUF = 1
+          ELSE
+            IERR = -1
           END IF
         ELSE
-          IBUF = B%TAIL
+          IF ( MSG_SIZE_INT .LE . B%HEAD - B%TAIL - 1) THEN
+            IBUF = B%TAIL
+          ELSE
+            IERR = -1
+          ENDIF
         END IF
+        IF (IERR .LT. 0) RETURN
         B%CONTENT( B%ILASTMSG + NEXT ) = IBUF
         B%ILASTMSG = IBUF
         B%TAIL = IBUF + MSG_SIZE_INT
@@ -955,7 +953,7 @@ C
           ENDIF
         ENDIF
        IF (NBROWS_PACKET + NBROWS_ALREADY_SENT.NE.NROW .AND.
-     &   SIZE_PACK - SIZE1  .LT. ( SIZE_RBUF_BYTES - SIZE1 ) / 2
+     &   SIZE_PACK - SIZE1  .LT. ( SIZE_RBUF_BYTES - SIZE1 ) / 10
      &  .AND. 
      &   .NOT. RECV_BUF_SMALLER_THAN_SEND)
      &       THEN
@@ -1239,17 +1237,14 @@ C
                SIZE1 = SIZE1+SIZE0
           ENDIF
       ENDIF
-      IF (KEEP(50) .EQ. 0) THEN
-        ONEorTWO = 1
-      ELSE
-        ONEorTWO = 2
-      ENDIF
+      ONEorTWO = 1
       IF (PDEST .EQ.PDEST_MASTER) THEN
         L = 0
       ELSE IF (KEEP(50) .EQ. 0) THEN
         L = LROW
       ELSE
         L = LROW + PERM(1) - LMAP + NBROWS_ALREADY_SENT - 1
+        ONEorTWO=ONEorTWO+1
       ENDIF
       NBINT = 6 + L + 1 
       IF (CB_IS_LR.AND.NBROW.GT.0) THEN
@@ -1269,7 +1264,8 @@ C
      &       SIZE_AV / ( ONEorTWO*SIZEofINT+LROW*SIZEofREAL)
         ELSE
           B = 2 * ONEorTWO + 
-     &      ( 1 + 2 *  LROW + 2 * PERM(1) + 2 * NBROWS_ALREADY_SENT )
+     &      ( -1 + 2 *  LROW + 2 * PERM(1) -2*LMAP
+     &                                  + 2 * NBROWS_ALREADY_SENT )
      &      * SIZEofREAL / SIZEofINT
           NBROWS_PACKET=int((dble(-B)+sqrt((dble(B)*dble(B))+
      &        dble(4)*dble(2)*dble(SIZE_AV)/dble(SIZEofINT) *
@@ -1318,9 +1314,9 @@ C
           MAX_ROW_LENGTH = -99999
           SIZE_REALS = NBROWS_PACKET * LROW
         ELSE
-          SIZE_REALS = (  LROW + PERM(1) + NBROWS_ALREADY_SENT ) *
+          SIZE_REALS = ( LROW + PERM(1) - LMAP + NBROWS_ALREADY_SENT ) *
      &      NBROWS_PACKET + ( NBROWS_PACKET *
-     &     ( NBROWS_PACKET + 1) ) / 2
+     &     ( NBROWS_PACKET - 1) ) / 2
           MAX_ROW_LENGTH = LROW+PERM(1)-LMAP+NBROWS_ALREADY_SENT
      &                 + NBROWS_PACKET-1
         ENDIF
@@ -1346,7 +1342,7 @@ C
       ENDIF
         SIZE_PACK = SIZE1 + SIZE2 + SIZE3
         IF (NBROWS_PACKET + NBROWS_ALREADY_SENT.NE.NBROW .AND.
-     &       SIZE_PACK  .LT. SIZE_RBUF_BYTES / 4 .AND.
+     &       SIZE_PACK  .LT. SIZE_RBUF_BYTES / 10 .AND.
      &    .NOT. RECV_BUF_SMALLER_THAN_SEND .AND.
      &    .NOT. CB_IS_LR)
      &       THEN
@@ -1804,7 +1800,7 @@ C
      &             WIDTH, COMM,
      &             NELIM, NPARTSASS, CURRENT_BLR_PANEL, 
      &             LR_ACTIVATED, BLR_LorU,
-     &
+     &             ICNTL,
      &             IERR )
       USE SMUMPS_LR_TYPE
       IMPLICIT NONE
@@ -1820,19 +1816,28 @@ C
         LOGICAL, intent(in) :: LR_ACTIVATED
         INTEGER, intent(in) :: NELIM, NPARTSASS, CURRENT_BLR_PANEL
         TYPE (LRB_TYPE), DIMENSION(:), intent(in) :: BLR_LorU
+        INTEGER, intent(in) :: ICNTL(60)
         INTEGER, intent(inout) :: IERR
         INCLUDE 'mpif.h'
         INCLUDE 'mumps_tags.h'
         INTEGER :: IERR_MPI
-        INTEGER POSITION, IREQ, IPOS, SIZE1, SIZE2, SIZE3, SIZET,
+        INTEGER POSITION, IREQ, IPOS, SIZE1, SIZE3, SIZET,
      &          IDEST, IPOSMSG, I
+        LOGICAL OVERFLOW
+        INTEGER(8) :: SIZE2_8, SIZE3_8, SIZET_8, SIZE_OVERFLOW
         INTEGER NPIVSENT
         INTEGER SSS
         INTEGER  :: NBMSGS
+        INTEGER :: LP
+        LOGICAL :: LPOK
         INTEGER :: LRELAY_INFO, DEST_BLOCFACTO, TAG_BLOCFACTO
         INTEGER :: LR_ACTIVATED_INT
+        LP  = ICNTL( 1 )
+        LPOK    = ( LP.GT.0 .AND. ICNTL(4).GE.1 )
         IERR = 0
         LRELAY_INFO = 0
+        OVERFLOW = .FALSE.
+        SIZE_OVERFLOW = 0_8
         NBMSGS = NDEST
         IF ( LASTBL ) THEN
           IF ( KEEP(50) .eq. 0 ) THEN
@@ -1855,28 +1860,56 @@ C
      &                          MPI_INTEGER, COMM, SIZE1, IERR_MPI )
           END IF
         END IF
-        SIZE2 = 0
+        SIZE2_8 = 0_8
         CALL MPI_PACK_SIZE( 4, MPI_INTEGER, COMM, SIZE3, IERR_MPI )
-        SIZE2=SIZE2+SIZE3
+        SIZE2_8=SIZE2_8+SIZE3
         IF ( KEEP(50).NE.0 ) THEN
           CALL MPI_PACK_SIZE( 1, MPI_INTEGER, COMM, SIZE3, IERR_MPI )
-          SIZE2=SIZE2+SIZE3
+          SIZE2_8=SIZE2_8+SIZE3
         ENDIF
         IF ((NPIV.GT.0)
      &     ) THEN
           IF (.NOT. LR_ACTIVATED) THEN
-            CALL MPI_PACK_SIZE( NPIV*NCOL, MPI_REAL,
+            SIZE3_8 = int(NPIV,8)*int(NCOL,8)*int(KEEP(35),8)
+            IF (SIZE3_8 .GT. int(huge(SIZE3),8))  THEN
+              OVERFLOW      = .TRUE.
+              SIZE_OVERFLOW = SIZE3_8
+            ELSE
+              CALL MPI_PACK_SIZE( NPIV*NCOL, 
+     &                      MPI_REAL,
      &                      COMM, SIZE3, IERR_MPI )
-            SIZE2 = SIZE2+SIZE3
+              SIZE2_8 = SIZE2_8 + int(SIZE3,8)
+            ENDIF
           ELSE
-            CALL MPI_PACK_SIZE( NPIV*(NPIV+NELIM), MPI_REAL,
+            SIZE3_8 = int(NPIV,8)*int(NPIV+NELIM,8)*int(KEEP(35),8)
+            IF (SIZE3_8 .GT. int(huge(SIZE3),8)) THEN
+              OVERFLOW = .TRUE.
+              SIZE_OVERFLOW = SIZE3_8
+            ELSE
+              CALL MPI_PACK_SIZE( NPIV*(NPIV+NELIM), 
+     &                      MPI_REAL,
      &                      COMM, SIZE3, IERR_MPI )
-            SIZE2 = SIZE2+SIZE3
-              CALL MUMPS_MPI_PACK_SIZE_LR( BLR_LorU, SIZE3, COMM, IERR )
-            SIZE2 = SIZE2+SIZE3
+              SIZE2_8 = SIZE2_8+SIZE3
+            ENDIF
+              CALL MUMPS_MPI_PACK_SIZE_LR( BLR_LorU, SIZE3_8, 
+     &                                     COMM, IERR )
+            SIZE2_8 = SIZE2_8+SIZE3_8
           ENDIF
         ENDIF
-        SIZET = SIZE1 + SIZE2 
+        SIZET_8 = int(SIZE1,8) + SIZE2_8
+        IF (SIZET_8 .GT. int(huge(SIZE3),8)) THEN
+              OVERFLOW      = .TRUE.
+              SIZE_OVERFLOW = SIZET_8
+        ENDIF
+        IF (OVERFLOW) THEN
+          IERR=-3
+          IF (LPOK) WRITE(LP,*)
+     & "Integer overflow message inSMUMPS_BUF_SEND_BLOCFACTO",
+     & "SIZE_OVERFLOW,NPIV,NFRONT,NELIM=",
+     &  SIZE_OVERFLOW, NPIV, NFRONT, NELIM
+          RETURN
+        ENDIF
+        SIZET = int(SIZET_8)
         IF (SIZET.GT.SIZE_RBUF_BYTES) THEN
           SSS = 0 
           IF ( LASTBL ) THEN
@@ -1896,7 +1929,7 @@ C
      &                        MPI_INTEGER, COMM, SSS, IERR_MPI )
            END IF
           END IF
-          SSS = SSS + SIZE2  
+          SSS = SSS + int(SIZE2_8)  
           IF (SSS.GT.SIZE_RBUF_BYTES) THEN
            IERR = -3 
             RETURN
@@ -2043,30 +2076,50 @@ C
         INCLUDE 'mumps_tags.h'
         INTEGER :: IERR_MPI
         INTEGER LR_ACTIVATED_INT
-        INTEGER POSITION, IREQ, IPOS, SIZE1, SIZE2, SIZET,
+        INTEGER POSITION, IREQ, IPOS, SIZE1, SIZET,
      &          IDEST, IPOSMSG, SSS, SSLR
-        IERR = 0
+        INTEGER(8) :: SIZE2_8, SSLR_8, SIZET_8, SIZE_OVERFLOW
+        LOGICAL    :: OVERFLOW
+        IERR          = 0
+        OVERFLOW      = .FALSE.
+        SIZE_OVERFLOW = 0_8
         CALL MPI_PACK_SIZE( 6 + ( NDEST - 1 ) * OVHSIZE,
      &                      MPI_INTEGER, COMM, SIZE1, IERR_MPI )
-        SIZE2  = 0
+        SIZE2_8  = 0_8
         CALL MPI_PACK_SIZE(2, MPI_INTEGER, COMM, SSLR, IERR_MPI )
-        SIZE2=SIZE2+SSLR
+        SIZE2_8 = SIZE2_8 + SSLR
         IF (.NOT. LR_ACTIVATED) THEN
-        CALL MPI_PACK_SIZE( abs(NPIV)*NCOLU, MPI_REAL,
+          SSLR_8 = int(abs(NPIV),8)*int(NCOLU,8)
+          IF (SSLR_8 .GT. int(huge(SSLR),8))  THEN
+              OVERFLOW      = .TRUE.
+              SIZE_OVERFLOW = SSLR_8
+          ELSE
+           CALL MPI_PACK_SIZE( abs(NPIV)*NCOLU, 
+     &                      MPI_REAL,
      &                      COMM, SSLR, IERR_MPI )
-         SIZE2=SIZE2+SSLR
+           SIZE2_8=SIZE2_8 + int(SSLR,8)
+          ENDIF
         ELSE
-          CALL MUMPS_MPI_PACK_SIZE_LR( BLR_LS, SSLR, COMM, IERR )
-          SIZE2=SIZE2+SSLR
+          CALL MUMPS_MPI_PACK_SIZE_LR( BLR_LS, SSLR_8, COMM, IERR )
+          SIZE2_8=SIZE2_8 + SSLR_8
         ENDIF
-        SIZET = SIZE1 + SIZE2
+        SIZET_8 = int(SIZE1,8) + SIZE2_8
+        IF (SIZET_8 .GT. int(huge(SSLR),8)) THEN
+              OVERFLOW      = .TRUE.
+              SIZE_OVERFLOW = SIZET_8
+        ENDIF
+        IF (OVERFLOW) THEN
+          IERR=-3
+          RETURN
+        ENDIF
+        SIZET = int(SIZET_8)
         IF (SIZET.GT.SIZE_RBUF_BYTES) THEN
          CALL MPI_PACK_SIZE( 6 ,
      &                      MPI_INTEGER, COMM, SSS, IERR_MPI )
-         SSS = SSS+SIZE2
-         IF (SSS.GT.SIZE_RBUF_BYTES) THEN
+         SIZE2_8 = int(SSS,8)+SIZE2_8
+         IF (int(SIZE2_8).GT.SIZE_RBUF_BYTES) THEN
            IERR = -2
-      RETURN
+           RETURN
          ENDIF
         END IF
         CALL BUF_LOOK( BUF_CB, IPOS, IREQ, SIZET, IERR, 
@@ -2254,7 +2307,7 @@ C
           ENDIF
           IF (N_PACKET + N_ALREADY_SENT .NE. NSUBSET_ROW - NSUPROW
      &         .AND.
-     &         SIZE_PACK .LT. SIZE_RBUF_BYTES / 4
+     &         SIZE_PACK .LT. SIZE_RBUF_BYTES / 10
      &         .AND. .NOT. RECV_BUF_SMALLER_THAN_SEND)
      &         THEN
              IERR = -1
@@ -2797,11 +2850,11 @@ C
      &             ( WHAT, COMM, NPROCS, 
      &               FUTURE_NIV2,
      &               LOAD, UPD_LOAD,
-     &               MYID, KEEP, IERR)
+     &               MYID, KEEP267, IERR)
         IMPLICIT NONE
         INTEGER COMM, NPROCS, MYID, IERR, WHAT
         DOUBLE PRECISION LOAD,UPD_LOAD
-        INTEGER, INTENT(INOUT) :: KEEP(500)
+        INTEGER, INTENT(INOUT) :: KEEP267
         INCLUDE 'mpif.h'
         INCLUDE 'mumps_tags.h'
         INTEGER :: IERR_MPI
@@ -2870,7 +2923,7 @@ C
         DO I = 0, NPROCS - 1
           IF ( I .NE. MYID .AND. FUTURE_NIV2(I+1) .NE. 0) THEN
             IDEST = IDEST + 1
-            KEEP(267)=KEEP(267)+1
+            KEEP267 = KEEP267 + 1
             CALL MPI_ISEND( BUF_LOAD%CONTENT( IPOSMSG ),
      &                      POSITION, MPI_PACKED, I,
      &                      UPDATE_LOAD, COMM,
@@ -2913,7 +2966,7 @@ C
      &          MPI_INTEGER, COMM,
      &          SIZE, IERR_MPI )
         ELSE
-           CALL MPI_PACK_SIZE( 2 + OVHSIZE, 
+           CALL MPI_PACK_SIZE( 2, 
      &          MPI_INTEGER, COMM,
      &          SIZE, IERR_MPI )
         ENDIF
@@ -3153,22 +3206,23 @@ C
         SIZE_RBUF_BYTES = SMUMPS_LBUFR_BYTES
         RETURN
       END SUBROUTINE SMUMPS_BUF_DIST_IRECV_SIZE
-      SUBROUTINE MUMPS_MPI_PACK_SIZE_LR( BLR_LorU, SIZE_OUT, COMM,
+      SUBROUTINE MUMPS_MPI_PACK_SIZE_LR( BLR_LorU, SIZE_OUT8, COMM,
      &                                   IERR )
       USE SMUMPS_LR_TYPE
-      INTEGER, intent(out) :: SIZE_OUT, IERR
+      INTEGER, intent(out)     :: IERR
+      INTEGER(8), intent(out)  :: SIZE_OUT8
       INTEGER, intent(in)  :: COMM
       TYPE (LRB_TYPE), DIMENSION(:), intent(in) :: BLR_LorU
-      INTEGER :: I, SIZE_LOC, IERR_MPI
+      INTEGER     :: I, SIZE_LOC, IERR_MPI
       INCLUDE 'mpif.h'
-        IERR = 0
-        SIZE_OUT = 0
+        IERR      = 0
+        SIZE_OUT8 = 0_8
         CALL MPI_PACK_SIZE( 1, MPI_INTEGER, COMM, SIZE_LOC,  IERR_MPI )
-        SIZE_OUT = SIZE_OUT + SIZE_LOC
+        SIZE_OUT8 = SIZE_OUT8 + SIZE_LOC
         DO I = 1, size(BLR_LorU)
           CALL MUMPS_MPI_PACK_SIZE_LRB(BLR_LorU(I), SIZE_LOC, COMM, 
      &                                 IERR )
-          SIZE_OUT = SIZE_OUT + SIZE_LOC
+          SIZE_OUT8 = SIZE_OUT8 + SIZE_LOC
         ENDDO
         RETURN
       END SUBROUTINE MUMPS_MPI_PACK_SIZE_LR

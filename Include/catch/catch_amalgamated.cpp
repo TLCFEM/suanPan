@@ -5,8 +5,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.5.2
-//  Generated: 2024-01-15 14:06:36.675713
+//  Catch v3.5.4
+//  Generated: 2024-04-10 12:03:46.281848
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -72,8 +72,8 @@ namespace Catch {
                     FDuration mean = FDuration(0);
                     int i = 0;
                     for(auto it = first; it < last; ++it, ++i) {
-                        samples.push_back(FDuration(*it));
-                        mean += FDuration(*it);
+                        samples.push_back(*it);
+                        mean += *it;
                     }
                     mean /= i;
 
@@ -127,7 +127,7 @@ namespace Catch {
             namespace {
                 template<typename URng, typename Estimator> static sample resample(URng& rng, unsigned int resamples, double const* first, double const* last, Estimator& estimator) {
                     auto n = static_cast<size_t>(last - first);
-                    std::uniform_int_distribution<size_t> dist(0, n - 1);
+                    Catch::uniform_integer_distribution<size_t> dist(0, n - 1);
 
                     sample out;
                     out.reserve(resamples);
@@ -432,7 +432,7 @@ namespace {
 
 namespace Catch {
     Approx::Approx(double value)
-        : m_epsilon(std::numeric_limits<float>::epsilon() * 100.)
+        : m_epsilon(static_cast<double>(std::numeric_limits<float>::epsilon()) * 100.)
         , m_margin(0.0)
         , m_scale(0.0)
         , m_value(value) {}
@@ -604,16 +604,14 @@ namespace Catch {
 
         // Insert the default reporter if user hasn't asked for a specific one
         if(m_data.reporterSpecifications.empty()) {
-            m_data.reporterSpecifications.push_back({
 #if defined( CATCH_CONFIG_DEFAULT_REPORTER )
-                CATCH_CONFIG_DEFAULT_REPORTER,
+            const auto default_spec = CATCH_CONFIG_DEFAULT_REPORTER;
 #else
-                "console",
+            const auto default_spec = "console";
 #endif
-                {},
-                {},
-                {}
-            });
+            auto parsed = parseReporterSpec(default_spec);
+            CATCH_ENFORCE(parsed, "Cannot parse the provided default reporter spec: '" << default_spec << '\'');
+            m_data.reporterSpecifications.push_back(std::move(*parsed));
         }
 
         if(enableBazelEnvSupport()) { readBazelEnvVars(); }
@@ -810,6 +808,7 @@ namespace Catch {
                     m_messages.back().message += " := ";
                     start = pos;
                 }
+            default: ; // noop
             }
         }
         assert(openings.empty() && "Mismatched openings");
@@ -1196,8 +1195,10 @@ namespace Catch {
         StringRef extractFilenamePart(StringRef filename) {
             size_t lastDot = filename.size();
             while(lastDot > 0 && filename[lastDot - 1] != '.') { --lastDot; }
-            --lastDot;
+            // In theory we could have filename without any extension in it
+            if(lastDot == 0) { return StringRef(); }
 
+            --lastDot;
             size_t nameStart = lastDot;
             while(nameStart > 0 && filename[nameStart - 1] != '/' && filename[nameStart - 1] != '\\') { --nameStart; }
 
@@ -1473,13 +1474,13 @@ namespace Catch {
             }
         } // end unnamed namespace
 
-        std::string convertIntoString(StringRef string, bool escape_invisibles) {
+        std::string convertIntoString(StringRef string, bool escapeInvisibles) {
             std::string ret;
             // This is enough for the "don't escape invisibles" case, and a good
             // lower bound on the "escape invisibles" case.
             ret.reserve(string.size() + 2);
 
-            if(!escape_invisibles) {
+            if(!escapeInvisibles) {
                 ret += '"';
                 ret += string;
                 ret += '"';
@@ -1547,6 +1548,7 @@ namespace Catch {
     }
 
     std::string StringMaker<char*>::convert(char* str) {
+        // NOLINT(readability-non-const-parameter)
         if(str) { return Detail::convertIntoString(str); }
         else { return {"{null string}"}; }
     }
@@ -1617,7 +1619,7 @@ namespace Catch {
 
     std::string StringMaker<char>::convert(char c) { return ::Catch::Detail::stringify(static_cast<signed char>(c)); }
 
-    std::string StringMaker<unsigned char>::convert(unsigned char c) { return ::Catch::Detail::stringify(static_cast<char>(c)); }
+    std::string StringMaker<unsigned char>::convert(unsigned char value) { return ::Catch::Detail::stringify(static_cast<char>(value)); }
 
     int StringMaker<float>::precision = 5;
 
@@ -1699,7 +1701,7 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
-        static Version version(3, 5, 2, "", 0);
+        static Version version(3, 5, 4, "", 0);
         return version;
     }
 }
@@ -2253,7 +2255,7 @@ namespace Catch {
             while(std::getline(f, line)) {
                 line = trim(line);
                 if(!line.empty() && !startsWith(line, '#')) {
-                    if(!startsWith(line, '"')) line = '"' + line + '"';
+                    if(!startsWith(line, '"')) line = '"' + CATCH_MOVE(line) + '"';
                     config.testsOrTags.push_back(line);
                     config.testsOrTags.emplace_back(",");
                 }
@@ -2572,14 +2574,14 @@ namespace Catch {
 }     // end namespace Catch
 
 namespace Catch {
-    Detail::unique_ptr<ColourImpl> makeColourImpl(ColourMode implSelection, IStream* stream) {
+    Detail::unique_ptr<ColourImpl> makeColourImpl(ColourMode colourSelection, IStream* stream) {
 #if defined( CATCH_CONFIG_COLOUR_WIN32 )
-        if(implSelection == ColourMode::Win32) { return Detail::make_unique<Win32ColourImpl>(stream); }
+        if(colourSelection == ColourMode::Win32) { return Detail::make_unique<Win32ColourImpl>(stream); }
 #endif
-        if(implSelection == ColourMode::ANSI) { return Detail::make_unique<ANSIColourImpl>(stream); }
-        if(implSelection == ColourMode::None) { return Detail::make_unique<NoColourImpl>(stream); }
+        if(colourSelection == ColourMode::ANSI) { return Detail::make_unique<ANSIColourImpl>(stream); }
+        if(colourSelection == ColourMode::None) { return Detail::make_unique<NoColourImpl>(stream); }
 
-        if(implSelection == ColourMode::PlatformDefault) {
+        if(colourSelection == ColourMode::PlatformDefault) {
 #if defined( CATCH_CONFIG_COLOUR_WIN32 )
             if(Win32ColourImpl::useImplementationForStream(*stream)) { return Detail::make_unique<Win32ColourImpl>(stream); }
 #endif
@@ -2587,7 +2589,7 @@ namespace Catch {
             return Detail::make_unique<NoColourImpl>(stream);
         }
 
-        CATCH_ERROR("Could not create colour impl for selection " << static_cast<int>(implSelection));
+        CATCH_ERROR("Could not create colour impl for selection " << static_cast<int>(colourSelection));
     }
 
     bool isColourImplAvailable(ColourMode colourSelection) {
@@ -2772,7 +2774,11 @@ namespace Catch {
 #endif // Platform
 
 namespace Catch {
-    ITransientExpression::~ITransientExpression() = default;
+    void ITransientExpression::streamReconstructedExpression(std::ostream& os) const {
+        // We can't make this function pure virtual to keep ITransientExpression
+        // constexpr, so we write error message instead
+        os << "Some class derived from ITransientExpression without overriding streamReconstructedExpression";
+    }
 
     void formatReconstructedExpression(std::ostream& os, std::string const& lhs, StringRef op, std::string const& rhs) {
         if(lhs.size() + rhs.size() < 40 && lhs.find('\n') == std::string::npos && rhs.find('\n') == std::string::npos) os << lhs << ' ' << op << ' ' << rhs;
@@ -3311,7 +3317,7 @@ namespace Catch {
         : m_os{os}
         , m_indent_level{indent_level} { m_os << '{'; }
 
-    JsonObjectWriter::JsonObjectWriter(JsonObjectWriter&& source)
+    JsonObjectWriter::JsonObjectWriter(JsonObjectWriter&& source) noexcept
         : m_os{source.m_os}
         , m_indent_level{source.m_indent_level}
         , m_should_comma{source.m_should_comma}
@@ -3339,7 +3345,7 @@ namespace Catch {
         : m_os{os}
         , m_indent_level{indent_level} { m_os << '['; }
 
-    JsonArrayWriter::JsonArrayWriter(JsonArrayWriter&& source)
+    JsonArrayWriter::JsonArrayWriter(JsonArrayWriter&& source) noexcept
         : m_os{source.m_os}
         , m_indent_level{source.m_indent_level}
         , m_should_comma{source.m_should_comma}
@@ -3923,7 +3929,10 @@ namespace Catch {
             auto kv = splitKVPair(parts[i]);
             auto key = kv.key, value = kv.value;
 
-            if(key.empty() || value.empty()) { return {}; }
+            if(key.empty() || value.empty()) {
+                // NOLINT(bugprone-branch-clone)
+                return {};
+            }
             else if(key[0] == 'X') {
                 // This is a reporter-specific option, we don't check these
                 // apart from basic sanity checks
@@ -4703,15 +4712,24 @@ namespace Catch {
     }
 
     bool replaceInPlace(std::string& str, std::string const& replaceThis, std::string const& withThis) {
-        bool replaced = false;
         std::size_t i = str.find(replaceThis);
-        while(i != std::string::npos) {
-            replaced = true;
-            str = str.substr(0, i) + withThis + str.substr(i + replaceThis.size());
-            if(i < str.size() - withThis.size()) i = str.find(replaceThis, i + withThis.size());
+        if(i == std::string::npos) { return false; }
+        std::size_t copyBegin = 0;
+        std::string origStr = CATCH_MOVE(str);
+        str.clear();
+        // There is at least one replacement, so reserve with the best guess
+        // we can make without actually counting the number of occurences.
+        str.reserve(origStr.size() - replaceThis.size() + withThis.size());
+        do {
+            str.append(origStr, copyBegin, i - copyBegin);
+            str += withThis;
+            copyBegin = i + replaceThis.size();
+            if(copyBegin < origStr.size()) i = origStr.find(replaceThis, copyBegin);
             else i = std::string::npos;
         }
-        return replaced;
+        while(i != std::string::npos);
+        if(copyBegin < origStr.size()) { str.append(origStr, copyBegin, origStr.size()); }
+        return true;
     }
 
     std::vector<StringRef> splitStringRef(StringRef str, char delimiter) {
@@ -4901,6 +4919,8 @@ namespace Catch {
     }
 
     std::vector<TestCaseHandle> const& getAllTestCasesSorted(IConfig const& config) { return getRegistryHub().getTestCaseRegistry().getAllTestsSorted(config); }
+
+    TestRegistry::~TestRegistry() = default;
 
     void TestRegistry::registerTest(Detail::unique_ptr<TestCaseInfo> testInfo, Detail::unique_ptr<ITestInvoker> testInvoker) {
         m_handles.emplace_back(testInfo.get(), testInvoker.get());
@@ -6875,8 +6895,8 @@ namespace Catch {
         StreamingReporterBase::testRunEnded(_testRunStats);
     }
 
-    void ConsoleReporter::testRunStarting(TestRunInfo const& _testInfo) {
-        StreamingReporterBase::testRunStarting(_testInfo);
+    void ConsoleReporter::testRunStarting(TestRunInfo const& _testRunInfo) {
+        StreamingReporterBase::testRunStarting(_testRunInfo);
         if(m_config->testSpec().hasFilters()) { m_stream << m_colour->guardColour(Colour::BrightYellow) << "Filters: " << m_config->testSpec() << '\n'; }
         m_stream << "Randomness seeded to: " << getSeed() << '\n';
     }
@@ -6993,8 +7013,7 @@ namespace Catch {
             BySectionInfo(SectionInfo const& other)
                 : m_other(other) {}
 
-            BySectionInfo(BySectionInfo const& other)
-                : m_other(other.m_other) {}
+            BySectionInfo(BySectionInfo const& other) = default;
 
             bool operator()(Detail::unique_ptr<CumulativeReporterBase::SectionNode> const& node) const { return ((node->stats.sectionInfo.name == m_other.name) && (node->stats.sectionInfo.lineInfo == m_other.lineInfo)); }
 
@@ -7455,8 +7474,8 @@ namespace Catch {
 
     std::string JsonReporter::getDescription() { return "Outputs listings as JSON. Test listing is Work-in-Progress!"; }
 
-    void JsonReporter::testRunStarting(TestRunInfo const& testInfo) {
-        StreamingReporterBase::testRunStarting(testInfo);
+    void JsonReporter::testRunStarting(TestRunInfo const& runInfo) {
+        StreamingReporterBase::testRunStarting(runInfo);
         endListing();
 
         assert(isInside( Writer::Object ));
@@ -7715,7 +7734,7 @@ namespace Catch {
 
         static void normalizeNamespaceMarkers(std::string& str) {
             std::size_t pos = str.find("::");
-            while(pos != str.npos) {
+            while(pos != std::string::npos) {
                 str.replace(pos, 2, ".");
                 pos += 1;
                 pos = str.find("::", pos);

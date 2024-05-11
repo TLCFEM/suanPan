@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.1, released
+ *  on Thu May  2 10:15:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -17,6 +17,9 @@
 #define MUMPS_ADDR_H
 #include "mumps_common.h"
 #include "mumps_c_types.h"
+#define MUMPS_INT_SIZE_C \
+        F_SYMBOL(int_size_c, INT_SIZE_C)
+void  MUMPS_CALL MUMPS_INT_SIZE_C(MUMPS_INT8 *i);
 #define MUMPS_SIZE_C \
         F_SYMBOL(size_c, SIZE_C)
 void  MUMPS_CALL MUMPS_SIZE_C(char *a, char *b, MUMPS_INT8 *diff);
@@ -32,4 +35,7 @@ void MUMPS_CALL MUMPS_SETRVAL_ADDR_C(SMUMPS_REAL *val, MUMPS_INT8 *addr);
 #define MUMPS_SETDVAL_ADDR_C \
         F_SYMBOL(setdval_addr_c, SETDVAL_ADDR_C)
 void MUMPS_CALL MUMPS_SETDVAL_ADDR_C(DMUMPS_REAL *val, MUMPS_INT8 *addr);
+#define MUMPS_CLANGAOCC_C \
+        F_SYMBOL(clangaocc_c, CLANGAOCC_C)
+void MUMPS_CALL MUMPS_CLANGAOCC_C(MUMPS_INT8 *i8);
 #endif

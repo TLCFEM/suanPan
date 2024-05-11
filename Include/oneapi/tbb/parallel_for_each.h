@@ -23,6 +23,7 @@
 #include "detail/_task.h"
 #include "detail/_aligned_space.h"
 #include "detail/_small_object_pool.h"
+#include "detail/_utils.h"
 
 #include "parallel_for.h"
 #include "task_group.h" // task_group_context
@@ -41,13 +42,8 @@ class feeder;
 inline namespace d0 {
 
 template <typename Body, typename ItemType, typename FeederItemType>
-concept parallel_for_each_body = requires( const std::remove_reference_t<Body>& body, ItemType&& item ) {
-                                    body(std::forward<ItemType>(item));
-                                 } ||
-                                 requires( const std::remove_reference_t<Body>& body, ItemType&& item,
-                                           tbb::detail::d1::feeder<FeederItemType>& feeder ) {
-                                    body(std::forward<ItemType>(item), feeder);
-};
+concept parallel_for_each_body = std::invocable<const std::remove_reference_t<Body>&, ItemType&&> ||
+                                 std::invocable<const std::remove_reference_t<Body>&, ItemType&&, tbb::detail::d1::feeder<FeederItemType>&>;
 
 } // namespace d0
 #endif // __TBB_CPP20_CONCEPTS_PRESENT
@@ -85,14 +81,14 @@ struct parallel_for_each_operator_selector {
 public:
     template<typename ItemArg, typename FeederArg>
     static auto call(const Body& body, ItemArg&& item, FeederArg*)
-    -> decltype(body(std::forward<ItemArg>(item)), void()) {
+    -> decltype(tbb::detail::invoke(body, std::forward<ItemArg>(item)), void()) {
         #if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
         // Suppression of Microsoft non-standard extension warnings
         #pragma warning (push)
         #pragma warning (disable: 4239)
         #endif
 
-        body(std::forward<ItemArg>(item));
+        tbb::detail::invoke(body, std::forward<ItemArg>(item));
 
         #if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
         #pragma warning (pop)
@@ -101,7 +97,7 @@ public:
 
     template<typename ItemArg, typename FeederArg>
     static auto call(const Body& body, ItemArg&& item, FeederArg* feeder)
-    -> decltype(body(std::forward<ItemArg>(item), *feeder), void()) {
+    -> decltype(tbb::detail::invoke(body, std::forward<ItemArg>(item), *feeder), void()) {
         #if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
         // Suppression of Microsoft non-standard extension warnings
         #pragma warning (push)
@@ -109,7 +105,7 @@ public:
         #endif
         __TBB_ASSERT(feeder, "Feeder was not created but should be");
 
-        body(std::forward<ItemArg>(item), *feeder);
+        tbb::detail::invoke(body, std::forward<ItemArg>(item), *feeder);
 
         #if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
         #pragma warning (pop)
@@ -411,6 +407,34 @@ public:
 template<typename It>
 using tag = typename std::iterator_traits<It>::iterator_category;
 
+#if __TBB_CPP20_PRESENT
+template <typename It>
+struct move_iterator_dispatch_helper {
+    using type = It;
+};
+
+// Until C++23, std::move_iterator::iterator_concept always defines
+// to std::input_iterator_tag and hence std::forward_iterator concept
+// always evaluates to false, so std::move_iterator dispatch should be
+// made according to the base iterator type.
+template <typename It>
+struct move_iterator_dispatch_helper<std::move_iterator<It>> {
+    using type = It;
+};
+
+template <typename It>
+using iterator_tag_dispatch_impl =
+    std::conditional_t<std::random_access_iterator<It>,
+                       std::random_access_iterator_tag,
+                       std::conditional_t<std::forward_iterator<It>,
+                                          std::forward_iterator_tag,
+                                          std::input_iterator_tag>>;
+
+template <typename It>
+using iterator_tag_dispatch =
+    iterator_tag_dispatch_impl<typename move_iterator_dispatch_helper<It>::type>;
+
+#else
 template<typename It>
 using iterator_tag_dispatch = typename
     std::conditional<
@@ -422,10 +446,12 @@ using iterator_tag_dispatch = typename
             std::input_iterator_tag
         >::type
     >::type;
+#endif // __TBB_CPP20_PRESENT
 
 template <typename Body, typename Iterator, typename Item>
-using feeder_is_required = tbb::detail::void_t<decltype(std::declval<const Body>()(std::declval<typename std::iterator_traits<Iterator>::reference>(),
-                                                                                   std::declval<feeder<Item>&>()))>;
+using feeder_is_required = tbb::detail::void_t<decltype(tbb::detail::invoke(std::declval<const Body>(),
+                                                                            std::declval<typename std::iterator_traits<Iterator>::reference>(),
+                                                                            std::declval<feeder<Item>&>()))>;
 
 // Creates feeder object only if the body can accept it
 template <typename Iterator, typename Body, typename Item, typename = void>

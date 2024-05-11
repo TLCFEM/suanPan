@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -16,7 +16,8 @@ C
       IMPLICIT NONE
       PRIVATE
       PUBLIC :: MUMPS_DISTRIBUTE, MUMPS_RETURN_CANDIDATES,
-     &     MUMPS_INIT_ARCH_PARAMETERS,MUMPS_END_ARCH_CV
+     &     MUMPS_INIT_ARCH_PARAMETERS,MUMPS_END_ARCH_CV,
+     &     MUMPS_SET_K78_83_91
       integer,pointer,dimension(:,:),SAVE::cv_cand
       integer,pointer,dimension(:),SAVE::cv_par2_nodes
       integer,SAVE::cv_slavef,cv_nb_niv2,cv_lp,cv_mp
@@ -339,20 +340,34 @@ C
          DV_RATE=0.2D0
        ENDIF
       endif
-      dpkeep102 = dble(cv_keep(102))
+      IF (cv_keep(102) .NE. -1) THEN
+         dpkeep102 = max(dble(cv_keep(102)),dble(100))
+      ELSE 
+        IF(cv_slavef.LT.48)THEN
+           dpkeep102=dble(150)
+        ELSEIF(cv_slavef.LT.128)THEN
+           dpkeep102=dble(150)
+        ELSEIF(cv_slavef.LT.256)THEN
+           dpkeep102=dble(200)
+        ELSEIF(cv_slavef.LT.512)THEN
+           dpkeep102=dble(300)
+        ELSEIF(cv_slavef.GE.512)THEN
+           dpkeep102=dble(400)
+        ENDIF
+      ENDIF
       IF (cv_keep(198).NE.0) THEN
         IF (cv_slavef.LT.3)THEN
-         dpkeep102 = dble(150)
+         dpkeep102 = max(dble(150), dpkeep102)
         ELSEIF (cv_slavef.LT.5)THEN
-         dpkeep102 = dble(200)
+         dpkeep102 = max(dble(200), dpkeep102)
         ELSEIF (cv_slavef.LT.8)THEN
-         dpkeep102 = dble(250)
+         dpkeep102 = max(dble(250), dpkeep102)
         ELSEIF (cv_slavef.LT.32)THEN
-         dpkeep102 = dble(275)
+         dpkeep102 = max(dble(275), dpkeep102)
         ELSEIF (cv_slavef.LT.512)THEN
-         dpkeep102 = dble(300)
+         dpkeep102 = max(dble(300), dpkeep102)
         ELSEIF (cv_slavef.GE.512)THEN
-         dpkeep102 = dble(400)
+         dpkeep102 = max(dble(400), dpkeep102)
         ENDIF
       ENDIF
       subname='ACCEPT_L0'
@@ -655,9 +670,6 @@ C
      &     (npiv.ge.cv_keep(490)).and.(nfront.ge.cv_keep(491))) then
            WRITE(*,*) " *** Temp internal error in MUMPS_CALCNODECOSTS:"
            CALL MUMPS_ABORT()
-           call MUMPS_CALCNODECOSTS_BLR(npiv, nfront, costw, costm,
-     &              cv_keep(471), cv_keep(472), cv_keep(475), 
-     &              cv_keep(488), cv_keep(50))
          else
            if(cv_keep(50).eq.0) then
              costw= 2.0D0*dble(nfront)*dble(npiv)*dble(nfront-npiv-1)
@@ -677,64 +689,6 @@ C
       endif
       return
       end subroutine MUMPS_CALCNODECOSTS
-      SUBROUTINE MUMPS_CALCNODECOSTS_BLR(NPIV, NFRONT, COSTW, COSTM,
-     &                   K471, K472, K475, K488, SYM)
-        INTEGER, INTENT(IN) :: NPIV, NFRONT, SYM, K471, K472, K475, K488
-        DOUBLE PRECISION, INTENT(OUT) :: COSTW, COSTM
-        INTEGER :: IBCKSZ
-        DOUBLE PRECISION :: B,R,M,N
-        M = DBLE(NPIV)
-        N = DBLE(NFRONT)
-        CALL COMPUTE_BLR_VCS(K472, IBCKSZ, K488, NPIV) 
-        B = DBLE(IBCKSZ)
-        B = MIN(B,M)
-        IF (K471.EQ.0) THEN
-          R = 1.0D0
-        ELSEIF (K471.EQ.1) THEN
-          R = SQRT(DBLE(N))
-       ELSE
-          WRITE(*,*) 'Internal error in MUMPS_CALCNODECOSTS_BLR', K471
-          CALL MUMPS_ABORT()
-        ENDIF
-        R = MIN(R,B/2)
-        IF (SYM.EQ.0) THEN
-          COSTW = M/B * B*(B+1.0D0)*(2.0D0*B+1.0D0)/3.0D0
-          IF (K475.EQ.0) THEN
-            COSTW = COSTW + 2.0D0*M/(B*B)*(N-(M+B)/2.0D0) * B*B*B
-          ELSEIF (K475.EQ.1) THEN
-            COSTW = COSTW + M/(B*B)*(N-(M+B)/2.0D0) * B*B*(R+B)
-          ELSEIF (K475.EQ.2) THEN
-            COSTW = COSTW + M/(B*B)*(2.0D0*N-3.0D0*M-2.0D0*B) * B*B*R
-     &                    + (M/B-1.0D0)*M/B*(M/B-1.0D0)/6.0D0 * B*B*B
-          ELSEIF (K475.EQ.3) THEN
-            COSTW = COSTW + 2.0D0*M/(B*B)*(N-(M+B)/2.0D0) * B*B*R
-          ENDIF
-          COSTW = COSTW + 2.0D0*M/(B*B)*(N-(M+B)/2.0D0) * 2.0D0*B*B*R
-          COSTW = COSTW + (4.0D0*B*R*R + 2.0D0*B*B*R) * (
-     &                  (N-M)*(N-M)*M/(B*B*B) 
-     &                + (N-M)/B*(M/B-1.0D0)*M/B 
-     &                + (M/B-1.0D0)*M/B*(2.0D0*M/B-1.0D0)/6.0D0 
-     &       )     
-          COSTM = M*(2.0D0*N-M)/(B*B) * 2.0D0*B*R
-        ELSE
-          COSTW = M/B * B*(B+1.0D0)*(2.0D0*B+1.0D0)/6.0D0
-          IF (K475.EQ.0.OR.K475.EQ.1) THEN
-            COSTW = COSTW + M/(B*B)*(N-(M+B)/2.0D0) * B*B*B
-          ELSEIF (K475.EQ.2) THEN
-            COSTW = COSTW + (N-M)*M/(B*B) * B*B*R
-     &                    + (M/B-1.0D0)*M/B*(M/B-1.0D0)/6.0D0 * B*B*B
-          ELSEIF (K475.EQ.3) THEN
-            COSTW = COSTW + M/(B*B)*(N-(M+B)/2.0D0) * B*B*R
-          ENDIF
-          COSTW = COSTW + M/(B*B)*(N-(M+B)/2.0D0) * 2.0D0*B*B*R
-          COSTW = COSTW + (4.0D0*B*R*R + 2.0D0*B*B*R) * (
-     &                      (N-M)*(N-M)*M/(B*B*B)/2.0D0 
-     &                    + (N-M)/B*(M/B-1.0D0)*M/B/2.0D0 
-     &                    + (M/B-1.0D0)*M/B*(M/B+1.0D0)/6.0D0 
-     &       )     
-          COSTM = M*N/(B*B) * 2.0D0*B*R
-        ENDIF
-      END SUBROUTINE MUMPS_CALCNODECOSTS_BLR
       SUBROUTINE MUMPS_COSTS_BLR_T2_MASTER(NPIV, NFRONT, 
      &                   COSTW, COSTM, K471, K472, K475, K488, SYM)
         INTEGER, INTENT(IN) :: NPIV, NFRONT, SYM, K471, K472, K475, K488
@@ -743,7 +697,8 @@ C
         DOUBLE PRECISION :: B,R,M,N
         M = DBLE(NPIV)
         N = DBLE(NFRONT)
-        CALL COMPUTE_BLR_VCS(K472, IBCKSZ, K488, NPIV) 
+        CALL COMPUTE_BLR_VCS(K472, IBCKSZ, K488, NPIV, 
+     &                       NFRONT, cv_keep(35)) 
         B = DBLE(IBCKSZ)
         B = MIN(B,M)
         IF (K471.EQ.0) THEN
@@ -804,7 +759,8 @@ C
         M = NROW
         N = DBLE(NFRONT)
         P = DBLE(NPIV)
-        CALL COMPUTE_BLR_VCS(K472, IBCKSZ, K488, NPIV) 
+        CALL COMPUTE_BLR_VCS(K472, IBCKSZ, K488, NPIV, 
+     &                       NFRONT, cv_keep(35)) 
         B = DBLE(IBCKSZ)
         B = MIN(B,M)
         IF (K471.EQ.0) THEN
@@ -1412,7 +1368,7 @@ C
          keep48_loc=3
       endif
       if (cv_keep(48).EQ.5) keep48_loc = 5
-      if(npropmap .gt. cv_keep(83)) then
+      if(npropmap .gt. abs(cv_keep(83))) then
          nslaves_max   = MUMPS_BLOC2_GET_NSLAVESMAX(
      &        cv_slavef, keep48_loc, cv_keep8(21),
      &        cv_keep(50), nfront, 
@@ -1451,7 +1407,13 @@ C
             k1 = max(1,kk-1)
             exit
          endif
-         wk_master2 = wk_master / dble(kk)
+         if (cv_keep(50).eq.0) then
+           wk_master2 = (dble(2)/dble(3))*
+     &          dble(npiv2)*dble(npiv2)*dble(npiv2)+
+     &          dble(npiv2)*dble(npiv2)*dble(nfront2-npiv2)
+         else
+           wk_master2 = dble(npiv2)*dble(npiv2)*dble(npiv2)/dble(3)
+         end if
          if (cv_keep(50).eq.0) then
             wk_slave2  = ( dble(npiv2)*dble(nfront2-npiv2) *
      &           dble(2*nfront2-npiv2) ) / dble(nslaves_estim)
@@ -2023,13 +1985,13 @@ C
      &        'Warning in mumps_static_mapping : splitting is set off'
          cv_keep(82) = 0
       endif
-      if(cv_keep(83) .lt. 0) then
+      if(abs(cv_keep(83)) .lt. 0) then
          write(cv_lp,*)
      &        'warning in mumps_static_mapping : keep(83) reset to 0'
          cv_keep(83) = 0
       endif
       if(slavef.gt.1) then
-         cv_mixed_strat_bound = max(cv_keep(78),1)
+         cv_mixed_strat_bound = max(abs(cv_keep(78)),1)
          cv_maxdepth = slavef
       else
          cv_maxdepth = 0
@@ -2376,7 +2338,7 @@ C
          call MUMPS_BIT_SET(procindex,i,ierr)
          if(ierr.ne.0) then
             if(cv_lp.gt.0)write(cv_lp,*)
-     &           'MUMPS_BIT_SET signalled error to',subname
+     &           'MUMPS_BIT_SET signalled error to ',subname
             istat = ierr
             GOTO 999
          end if
@@ -2397,15 +2359,16 @@ C
             call MUMPS_PROPMAP(i,pctr,ierr)
             if(ierr.ne.0) then
             if(cv_lp.gt.0)write(cv_lp,*)
-     &           'PROPMAP signalled error to',subname
+     &           'PROPMAP signalled error to ',subname
                istat = ierr
                GOTO 999
             endif
-            if((cv_keep(24).eq.16).OR.(cv_keep(24).eq.18)) then
+            if( (cv_keep(24).eq.16.OR.cv_keep(24).eq.18)
+     &          .and.cv_keep(77) .ne.0) then
                call MUMPS_MOD_PROPMAP(i,pctr2,ierr)
                if(ierr.ne.0) then
                   if(cv_lp.gt.0)write(cv_lp,*)
-     &           'MOD_PROPMAP signalled error to',subname
+     &           'MOD_PROPMAP signalled error to ',subname
                   istat = ierr
                   GOTO 999
                endif
@@ -3054,12 +3017,6 @@ C
       son=in 
       do while(in.gt.0)
          nmb_sons_inode = nmb_sons_inode + 1
-         if(cv_tcostw(in).le.0.0D0) then
-            if(cv_lp.gt.0)
-     &           write(cv_lp,*)'Subtree costs for ',in,
-     &                         ' should be positive in ',subname
-            goto 999
-         endif
          if (cv_keep(67) .ne. 1) then
            costs_sons = costs_sons + cv_tcostw(in)
          else
@@ -3248,8 +3205,8 @@ C
       DOUBLE PRECISION :: loc_relax
       INTEGER :: depth
       logical force_cand
-      integer MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN
-      external MUMPS_REG_GETKMAX, MUMPS_BLOC2_GET_NSLAVESMIN
+      integer MUMPS_BLOC2_GET_NSLAVESMIN
+      external MUMPS_BLOC2_GET_NSLAVESMIN
       DOUBLE PRECISION Y
       integer nmb_propmap_strict,share2,procsrest,current2
       integer k69onid,nb_free_procs,local_son_indice,nb_procs_for_sons,
@@ -3303,12 +3260,6 @@ C
       son=in 
       do while(in.gt.0)
          nmb_sons_inode = nmb_sons_inode + 1
-         if(cv_tcostw(in).le.0.0D0) then
-            if(cv_lp.gt.0)
-     &           write(cv_lp,*)'Subtree costs for ',in,
-     &                         ' should be positive in ',subname
-            return
-         endif
          if (cv_keep(67) .ne. 1) then
            costs_sons = costs_sons + cv_tcostw(in)
          else
@@ -3406,7 +3357,7 @@ C
             are_sons_treated=.FALSE.
             nb_procs_for_sons=nmb_procs_inode
             nmb_propmap_strict=nmb_procs_inode
-         elseif(nmb_procs_inode .LE. cv_keep(83)) then
+         elseif(nmb_procs_inode .LE. abs(cv_keep(83))) then
             procs4son = cv_prop_map(inode)%ind_proc
             are_sons_treated=.FALSE.
             nb_procs_for_sons=nmb_procs_inode
@@ -3638,7 +3589,7 @@ C
          if( (nmb_sons_inode.ge.nmb_procs_inode).AND.
      &       (nmb_procs_inode.LT.4) ) then
             procs4son = cv_prop_map(inode)%ind_proc
-         elseif(nmb_procs_inode .LE. cv_keep(83)) then
+         elseif(nmb_procs_inode .LE. abs(cv_keep(83))) then
             procs4son = cv_prop_map(inode)%ind_proc
          else
             procs4son = cv_prop_map(in)%ind_proc
@@ -3672,7 +3623,7 @@ C
             else
                min_cand_needed = 0
             endif
-            min_cand_needed = max(min_cand_needed, cv_keep(91))
+            min_cand_needed = max(min_cand_needed, abs(cv_keep(91)))
             if(costs_sons.gt.0.0D0) then
                if (cv_keep(67) .ne.1) then
                  relative_weight=cv_tcostw(in)/costs_sons
@@ -3693,7 +3644,7 @@ C
      &          max(0,nint(relative_weight*(loc_relax-dble(1))*
      &                                   dble(nmb_procs_inode)))
             share2 = max(share2, min_cand_needed -nmb_propmap_strict,
-     &                   (cv_keep(83)/2) - nmb_propmap_strict)
+     &                   (abs(cv_keep(83))/2) - nmb_propmap_strict)
             procsrest=nmb_procs_inode - nmb_propmap_strict
             share2=min(share2,procsrest)
             share2 = 0 
@@ -4334,7 +4285,8 @@ C
       end subroutine MUMPS_RETURN_CANDIDATES
       subroutine MUMPS_INIT_ARCH_PARAMETERS(
      &     total_comm,working_comm,keep69,par,
-     &     nbslaves,mem_distrib,informerr)
+     &     nbslaves,mem_distrib,informerr
+     &)
       implicit none
       include 'mpif.h'
       integer nbslaves
@@ -4402,11 +4354,12 @@ C
             endif
           enddo
         endif
-        if((nb_arch_nodes .eq. 1) .or.
-     &     (nb_arch_nodes .eq. cv_slavef)) then
+      if((nb_arch_nodes .eq. 1) .or.
+     &   (nb_arch_nodes .eq. cv_slavef)
+     &  ) then
          ke69 = 1
-         keep69 = 1
          deallocate(mem_distribtmp)
+         keep69 = 1
          return
       endif
       if (host .eq. 0) then
@@ -4436,6 +4389,32 @@ C
       endif
       return
       end subroutine MUMPS_INIT_ARCH_PARAMETERS
+      subroutine MUMPS_SET_K78_83_91 (NSLAVES, 
+     &                                KEEP78, KEEP83, KEEP91)
+      INTEGER, INTENT(IN)    :: NSLAVES
+      INTEGER, INTENT(INOUT) :: KEEP78, KEEP83, KEEP91
+      IF (KEEP78 .LT. 0) THEN
+        IF (NSLAVES.GT.4) THEN
+          KEEP78=max(
+     &       int(log(real(NSLAVES))/log(real(2))) - 2 
+     &       , 0         )
+          KEEP78 = -KEEP78
+        ELSE
+          KEEP78 = 0   
+        ENDIF
+      ENDIF
+      IF (KEEP83.LT.0) THEN 
+        KEEP83 = min(8,NSLAVES/4)
+        KEEP83 = max(min(4,NSLAVES),max(KEEP83,1))
+        KEEP83 = - KEEP83
+      ENDIF
+      IF (KEEP91.LT.0) THEN 
+        KEEP91  = min(8, NSLAVES)
+        KEEP91  = max(min(4,NSLAVES),min(abs(KEEP83),KEEP91))
+        KEEP91 = - KEEP91
+      ENDIF
+      return
+      end subroutine MUMPS_SET_K78_83_91
       subroutine MUMPS_COMPUTE_NB_ARCH_NODES()
       implicit none
       integer i
@@ -4811,20 +4790,25 @@ C
           KEEP(38) = 0
 #if ! defined(NOSCALAPACK)
         ELSE
-         IROOTTREE=-1
-         SIZEROOT=-1
-         DO I=1,N
-            IF (FRERE(I).EQ.0) THEN
-               NFRONT = ND(I)
-               IF (NFRONT .GT.SIZEROOT) THEN
-                  IROOTTREE = I
-                  SIZEROOT  = NFRONT
-               END IF
-            END IF
-         END DO
-         IF ((IROOTTREE.EQ.-1).OR.(SIZEROOT.EQ.-1)) THEN
-            ISTAT = -1
-            RETURN
+         IF ((KEEP(38).GT.0).AND.(KEEP(38).LE.N)) THEN
+           IROOTTREE = KEEP(38)
+           SIZEROOT  = ND(KEEP(38))
+         ELSE
+           IROOTTREE=-1
+           SIZEROOT=-1
+           DO I=1,N
+              IF (FRERE(I).EQ.0) THEN
+                 NFRONT = ND(I)
+                 IF (NFRONT .GT.SIZEROOT) THEN
+                    IROOTTREE = I
+                    SIZEROOT  = NFRONT
+                 END IF
+              END IF
+           END DO
+           IF ((IROOTTREE.EQ.-1).OR.(SIZEROOT.EQ.-1)) THEN
+              ISTAT = -1
+              RETURN
+           ENDIF
          ENDIF
          IF (SIZEROOT.LE.SLAVEF) THEN
             KEEP(38) = 0
@@ -5129,6 +5113,11 @@ C
           npivsplit(kk) = npiv2
         ENDIF
         if (keep(79) .ge. 1       
+     &    .and. nproc2 .le. 2     
+     &    .and. kk .ne. 1) then   
+          npivsplit(kk)=-npiv2
+          nproc2=nproc 
+        else if (keep(79) .ge. 1       
      &    .and. kk .ne. 1) then   
           if (optimization_strategy .eq. 0) then 
             npivOld = min(npiv - nass,

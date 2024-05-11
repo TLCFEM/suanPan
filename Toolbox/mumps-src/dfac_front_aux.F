@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -129,7 +129,7 @@ C
             ELSE
               IF (J3.EQ.0) GOTO 370
 #if defined(_OPENMP)
-              IF (KEEP(351).EQ.1 .AND. J3.GE.KEEP(360)) THEN
+              IF (J3.GE.KEEP(360)) THEN
                 J1_ini = J1
                 CHUNK = max(KEEP(360)/2,(J3+NOMP-1)/NOMP)
 !$OMP  PARALLEL DO schedule(static, CHUNK)
@@ -289,7 +289,7 @@ C
           ENDIF
         ENDIF
 #endif
-        IF (KEEP(351).EQ.2) THEN
+        IF (KEEP(351).EQ.1) THEN
           MAXFROMN = 0.0D0
           IF (NEL2 > 0) THEN
             IS_MAXFROMN_AVAIL = .TRUE.
@@ -677,6 +677,9 @@ C
         NPIV   = IW(IOLDPS+1+XSIZE)
         IBEG_BLOCK = NPIV
         IF (NASS.EQ.NPIV) GOTO 500
+        IF (KEEP(19).GT.0) THEN
+         GOTO 500
+        ENDIF
         IS_MAXFROMN_AVAIL = .FALSE.
  120    CALL DMUMPS_FAC_H(NFRONT,NASS,IW,LIW,A,LA,
      &     INOPV, NOFFW,
@@ -762,6 +765,7 @@ C
       DOUBLE PRECISION ZERO
       PARAMETER( ZERO = 0.0D0 )
       DOUBLE PRECISION RZERO, RMAX, AMROW, MAX_PREV_in_PARPIV
+      DOUBLE PRECISION RCMAX
       INTEGER(8) :: APOSMAX, APOSROW
       DOUBLE PRECISION       :: RMAX_NORELAX
       DOUBLE PRECISION PIVNUL, ABS_PIVOT
@@ -1006,11 +1010,45 @@ C
             RMAX         = max(RMAX,abs(RMAX_NORELAX))
             IF (ABS_PIVOT .GE. UU*RMAX .AND.
      &          ABS_PIVOT .GT. max(SEUIL,tiny(RMAX))) THEN
+               IF (KEEP(19).GT.0) THEN
+                 IF (LAST_ROW.EQ.NFRONT) THEN
+                   LRLOC = LAST_ROW -KEEP(253)-NVSCHUR
+                 ELSE
+                   LRLOC = LAST_ROW
+                 ENDIF
+                 J1=POSELT+int(IPIV-1,8)+int(NPIV,8)*NFRONT8
+                 J2=POSELT+int(IPIV-1,8)+int(LRLOC-1,8)*NFRONT8
+                 RCMAX = RZERO
+                 DO JJ=J1, J2, NFRONT8
+                   RCMAX = max(abs(A(JJ)),RCMAX)
+                 ENDDO
+                 IF (ABS_PIVOT .GE. UU*RCMAX) THEN
+                   JMAX = IPIV - NPIV
+                   GO TO 380
+                 ENDIF
+               ELSE
                 JMAX = IPIV - NPIV
                 GO TO 380
+               ENDIF
             ENDIF
             IF ( .NOT. (AMROW .GE. UU*RMAX .AND.
      &                  AMROW .GT. max(SEUIL,tiny(RMAX))) ) GO TO 460
+            IF (KEEP(19).GT.0) THEN
+              IF (LAST_ROW.EQ.NFRONT) THEN
+                LRLOC = LAST_ROW -KEEP(253)-NVSCHUR
+              ELSE
+                LRLOC = LAST_ROW
+              ENDIF
+              J1=POSELT+int(NPIV+JMAX-1,8)+int(NPIV,8)*NFRONT8
+              J2=POSELT+int(NPIV+JMAX-1,8)+int(LRLOC-1,8)*NFRONT8
+              RCMAX = RZERO
+              DO JJ=J1, J2, NFRONT8
+                RCMAX = max(abs(A(JJ)),RCMAX)
+              ENDDO
+              IF (.NOT.(AMROW .GE. UU*RCMAX) ) THEN 
+                GO TO 460
+              ENDIF
+            ENDIF 
             NOFFW = NOFFW + 1
   380       CONTINUE
           IF (K206.GE.1) THEN
@@ -1855,10 +1893,6 @@ C
          LPOS1   = POSPV2 + LDA8 - 1_8
          LPOS2   = LPOS1 + 1_8
 #if defined(__ve__)
-#if defined(check)
-         IF (LDA8.NE.NFRONT8) CALL MUMPS_ABORT()
-         IF (NEL2 + NCB1.NE.LAST_ROW-NPIV_NEW) CALL MUMPS_ABORT()
-#endif
          CALL dcopy(LAST_ROW-NPIV_NEW, A(LPOS1), LDA, A(POSPV1+2_8), 1)
          CALL dcopy(LAST_ROW-NPIV_NEW, A(LPOS2), LDA, A(POSPV2+1_8), 1)
 !$       OMP_FLAG = (NEL2+NCB1 > 300)
@@ -2025,21 +2059,6 @@ C
            BLSIZE = LAST_COL_GEMM - IEND_BLOCK
           END IF
           IF ( LAST_COL_GEMM - IEND_BLOCK .GT. 0 ) THEN
-#if defined(SAK_BYROW)
-           DO IROW = IEND_BLOCK+1, LAST_COL_GEMM, BLSIZE
-            Block = min( BLSIZE, LAST_COL_GEMM - IROW + 1 )
-            LPOS = POSELT + int(IROW  - 1,8) * LDA8 +
-     &                      int(IBEG_BLOCK - 1,8)
-            UPOS = POSELT + int(IBEG_BLOCK - 1,8) * LDA8 +
-     &                      int(IROW - 1,8)
-            APOS = POSELT + int(IROW  - 1,8) * LDA8 + 
-     &             int(IEND_BLOCK,8)
-            CALL dgemm( 'N','N', IROW + Block - IEND_BLOCK - 1, 
-     &             Block, NPIV_BLOCK,
-     &                 ALPHA, A( UPOS ), LDA,
-     &                 A( LPOS ), LDA, ONE, A( APOS ), LDA )
-           ENDDO
-#else
            DO IROW = IEND_BLOCK+1, LAST_COL_GEMM, BLSIZE
             Block = min( BLSIZE, LAST_COL_GEMM - IROW + 1 )
             LPOS = POSELT + int( IROW - 1,8) * LDA8 +
@@ -2051,7 +2070,6 @@ C
      &                 NPIV_BLOCK, ALPHA, A( UPOS ), LDA,
      &                 A( LPOS ), LDA, ONE, A( APOS ), LDA )
            END DO
-#endif
           END IF
 #if defined(GEMMT_AVAILABLE)
          END IF 

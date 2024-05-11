@@ -1,6 +1,6 @@
 ﻿Please visit https://tlcfem.github.io/suanPan-manual/latest/ for user manual and examples.
 
-Please ensure your CPU supports AVX. The binary is compiled with AVX. It can only be executed on platforms that support AVX.
+Please ensure your CPU supports AVX2. The binary is compiled with AVX2. It can only be executed on platforms that support AVX2.
 
 Please use a modern terminal such as Windows Terminal and Fluent Terminal for better output display.
 

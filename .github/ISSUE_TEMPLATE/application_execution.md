@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-***The application officially distributed requires AVX support. Please make sure your CPU supports AVX.***
+***The application officially distributed requires AVX2 support. Please make sure your CPU supports AVX2.***
 
 ***If possible, please try to compile the application locally first to see if it executes.***
 

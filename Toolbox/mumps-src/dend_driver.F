@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -323,9 +323,9 @@ C     Allocated at analysis:
         ENDIF
 !     ENDIF
 C     Allocated at analysis:
-      IF (associated(id%MPITOOMP_PROCS_MAP)) THEN
-        DEALLOCATE(id%MPITOOMP_PROCS_MAP)
-        NULLIFY(id%MPITOOMP_PROCS_MAP)
+      IF (associated(id%MTKO_PROCS_MAP)) THEN
+        DEALLOCATE(id%MTKO_PROCS_MAP)
+        NULLIFY(id%MTKO_PROCS_MAP)
       ENDIF
 C     Allocated at analysis:
       IF (associated(id%IPOOL_B_L0_OMP)) THEN
@@ -514,6 +514,16 @@ C     (this includes suppression of OOC files)
         DEALLOCATE(id%PIVNUL_LIST)
         NULLIFY(id%PIVNUL_LIST)
       ENDIF
+      IF (associated(id%ROWSCA_loc)) THEN
+        DEALLOCATE(id%ROWSCA_loc)
+        NULLIFY(id%ROWSCA_loc)
+      ENDIF
+      IF (id%KEEP(50) .EQ. 0) THEN
+        IF (associated(id%COLSCA_loc)) THEN
+          DEALLOCATE(id%COLSCA_loc)
+        ENDIF
+      ENDIF
+      NULLIFY(id%COLSCA_loc)
 C     IPIV is used both for ScaLAPACK and RR
 C     Keep it outside DMUMPS_RR_FREE_POINTERS
       IF (associated(id%root%IPIV))    THEN
@@ -572,19 +582,19 @@ C     Data allocated during solve
 C     ---------------------------
 C
 C     (or for some of it, factorization -- forward during factorization)
-      IF (associated(id%RHSCOMP)) THEN
-        DEALLOCATE(id%RHSCOMP)
-        NULLIFY(id%RHSCOMP)
+      IF (associated(id%RHSINTR)) THEN
+        DEALLOCATE(id%RHSINTR)
+        NULLIFY(id%RHSINTR)
         id%KEEP8(25)=0_8
       ENDIF
-      IF (associated(id%POSINRHSCOMP_ROW)) THEN
-        DEALLOCATE(id%POSINRHSCOMP_ROW)
-        NULLIFY(id%POSINRHSCOMP_ROW)
+      IF (associated(id%GLOB2LOC_RHS)) THEN
+        DEALLOCATE(id%GLOB2LOC_RHS)
+        NULLIFY(id%GLOB2LOC_RHS)
       ENDIF
-      IF (id%POSINRHSCOMP_COL_ALLOC) THEN
-        DEALLOCATE(id%POSINRHSCOMP_COL)
-        NULLIFY(id%POSINRHSCOMP_COL)
-        id%POSINRHSCOMP_COL_ALLOC = .FALSE.
+      IF (id%GLOB2LOC_SOL_ALLOC) THEN
+        DEALLOCATE(id%GLOB2LOC_SOL)
+        NULLIFY(id%GLOB2LOC_SOL)
+        id%GLOB2LOC_SOL_ALLOC = .FALSE.
       ENDIF
 C     Allocated during solve:
 C     (even in case of fwd in facto)
@@ -598,3 +608,39 @@ C     (even in case of fwd in facto)
       END IF
       RETURN
       END SUBROUTINE DMUMPS_FREE_DATA_FACTO
+      SUBROUTINE DMUMPS_FREE_DATA_RHSINTR(id)
+C
+C     Purpose:
+C     -------
+C       Free RHSINTR related data that might 
+C       have been generated after a forward only step (ICNTL(26)=1)
+C     Module depencies
+C     ----------------
+      USE DMUMPS_STRUC_DEF
+      IMPLICIT NONE
+C
+C     Argument:
+C     --------
+C
+C     id is the main MUMPS structure, giving access to all internal
+C     objects allocated by the package.
+C
+      TYPE( DMUMPS_STRUC) :: id
+C
+      IF (associated(id%RHSINTR)) THEN
+        DEALLOCATE(id%RHSINTR)
+        NULLIFY(id%RHSINTR)
+        id%KEEP8(25)=0_8
+        id%LD_RHSINTR = 0
+      ENDIF
+      IF (associated(id%GLOB2LOC_RHS)) THEN
+        DEALLOCATE(id%GLOB2LOC_RHS)
+        NULLIFY(id%GLOB2LOC_RHS)
+      ENDIF
+      IF (id%GLOB2LOC_SOL_ALLOC) THEN
+        DEALLOCATE(id%GLOB2LOC_SOL)
+        NULLIFY(id%GLOB2LOC_SOL)
+        id%GLOB2LOC_SOL_ALLOC = .FALSE.
+      ENDIF
+      RETURN
+      END SUBROUTINE DMUMPS_FREE_DATA_RHSINTR

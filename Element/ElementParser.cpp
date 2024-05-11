@@ -2602,8 +2602,15 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(modifier_type, "ElementalNonviscous")) new_modifier = make_unique<ElementalNonviscous>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}, uvec{ele_tag});
-        else new_modifier = make_unique<ElementalNonviscousGroup>(tag, cx_vec{vec{m_r}, m_imag}, cx_vec{vec{s_r}, s_imag}, ele_tag);
+        auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+
+        if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
+            suanpan_error("The provided kernel does not converge to zero.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(is_equal(modifier_type, "ElementalNonviscous")) new_modifier = make_unique<ElementalNonviscous>(tag, std::move(m), std::move(s), uvec{ele_tag});
+        else new_modifier = make_unique<ElementalNonviscousGroup>(tag, std::move(m), std::move(s), ele_tag);
     }
     else {
         // check if the library is already loaded

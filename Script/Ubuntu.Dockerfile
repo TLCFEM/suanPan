@@ -1,4 +1,4 @@
-FROM ubuntu:jammy as build
+FROM debian:12 as build
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -29,10 +29,13 @@ RUN cd suanPan/build && cp suanPan*.deb / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM ubuntu:jammy as runtime
+FROM debian:12 as runtime
 
 COPY --from=build /suanPan*.deb /
 
-RUN apt-get update -y && apt-get install ./suanPan*.deb -y
+RUN apt-get install ./suanPan*.deb -y && rm ./suanPan*.deb
 
-RUN suanPan -v
+RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
+RUN ln -s /usr/bin/suanPan /usr/bin/sp
+
+RUN sp -v

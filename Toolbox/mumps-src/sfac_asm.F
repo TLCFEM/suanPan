@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -41,7 +41,7 @@ C
       IOLDPS = PTLUST_S(STEP(INODE))
       POSELT = PTRAST(STEP(INODE))
       NFRONT = IW(IOLDPS+KEEP(IXSZ))
-      NASS1  = iabs(IW(IOLDPS + 2+KEEP(IXSZ)))
+      NASS1  = abs(IW(IOLDPS + 2+KEEP(IXSZ)))
       NSLAVES= IW(IOLDPS+5+KEEP(IXSZ))
       IF (KEEP(50).EQ.0) THEN
         LDAFS_PERE = NFRONT
@@ -145,7 +145,7 @@ C
       INTEGER, INTENT(IN) :: NINCOLARR(KEEP(194))
       INTEGER, INTENT(IN) :: NINROWARR(KEEP(195))
       INTEGER, INTENT(IN) :: PTRDEBARR(KEEP(196))
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       REAL :: A(LA)
       INTEGER :: INTARR(KEEP8(27))
       REAL :: DBLARR(KEEP8(26))
@@ -202,7 +202,7 @@ C
       INTEGER NBROWS
       INTEGER IW(LIW), ITLOC(N+KEEP(253)), STEP(N),
      &        PTRIST(KEEP(28))
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INCLUDE 'mumps_headers.h'
       INTEGER IOLDPS, NBCOLF, NBROWF, NSLAVES, HF,
      &        K1,K2,K,J
@@ -238,7 +238,7 @@ C
       INTEGER ROWLIST(NBROWS), COLLIST(NBCOLS)
       INTEGER IW(LIW), ITLOC(N+KEEP(253)), STEP(N),
      &        PTRIST(KEEP(28)), FILS(N)
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER(8) :: PTRAST(KEEP(28))
       REAL A(LA), VALSON(LDA_VALSON,NBROWS)
       DOUBLE PRECISION OPASSW, OPELIW
@@ -609,7 +609,7 @@ C
       INTRINSIC real
       IOLDPS = PTLUST_S(STEP(INODE))
       POSELT = PTRAST(STEP(INODE))
-      NASS1  = iabs(IW(IOLDPS + 2 + KEEP(IXSZ)))
+      NASS1  = abs(IW(IOLDPS + 2 + KEEP(IXSZ)))
       NSLAVES= IW(IOLDPS+5 + KEEP(IXSZ))
       HF      = 6 + NSLAVES + KEEP(IXSZ)
       ISTCHK = PIMASTER(STEP(ISON))
@@ -655,7 +655,7 @@ C
       INTEGER(8), intent(in) :: KEEP8(150)
       INTEGER, intent(inout) :: ITLOC(N+KEEP(253))
       REAL, intent(inout) :: A(LA)
-      REAL, intent(in)    :: RHS_MUMPS(KEEP(255))
+      REAL, intent(in)    :: RHS_MUMPS(KEEP8(85))
       REAL, intent(in)    :: DBLARR(LDBLARR)
       INTEGER, intent(in)    :: INTARR(LINTARR)
       INTEGER, intent(in)    :: FILS(N)
@@ -709,8 +709,9 @@ C
           NB_BLR_LS = NPARTSCB
           call MAX_CLUSTER(BEGS_BLR_LS,NB_BLR_LS+1,MAXI_CLUSTER)
           DEALLOCATE(BEGS_BLR_LS)
-          CALL COMPUTE_BLR_VCS(KEEP(472), IBCKSZ2, KEEP(488), NASS)
-          MINSIZE = int(IBCKSZ2 / 2)
+          CALL COMPUTE_BLR_VCS(KEEP(472), IBCKSZ2, KEEP(488), NASS, 
+     &                         NBCOLF, KEEP(35))
+          MINSIZE = int(IBCKSZ2 / 3)
           TOPDIAG = max(2*MINSIZE + MAXI_CLUSTER-1, TOPDIAG)
         ENDIF
 !$      CHUNK = max( KEEP(360)/2,

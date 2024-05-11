@@ -115,7 +115,7 @@
 
 #if defined(__APPLE__) || defined(__apple_build_version__)
   // NOTE: Apple accelerate framework has broken implementations of functions that return a float value,
-  // NOTE: such as sdot(), slange(), clange(), slansy(), clanhe(), slangb()
+  // NOTE: such as sdot(), slange(), clange(), slansy(), clanhe(), slangb(), snrm2(), sasum()
   #undef  ARMA_BLAS_FLOAT_BUG
   #define ARMA_BLAS_FLOAT_BUG
   
@@ -377,14 +377,11 @@
 
 
 #if defined(__SUNPRO_CC)
-  
   // http://www.oracle.com/technetwork/server-storage/solarisstudio/training/index-jsp-141991.html
   // http://www.oracle.com/technetwork/server-storage/solarisstudio/documentation/cplusplus-faq-355066.html
-  
   #if (__SUNPRO_CC < 0x5140)
     #error "*** newer compiler required ***"
   #endif
-  
 #endif
 
 

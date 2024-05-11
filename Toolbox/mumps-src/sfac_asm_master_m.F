@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -76,7 +76,7 @@ C
      &        FILS(N), FRERE(KEEP(28)), DAD(KEEP(28)),
      &        PTRIST(KEEP(28)), PTLUST(KEEP(28)),
      &        STEP(N), PIMASTER(KEEP(28))
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER(8) :: PTRFAC(KEEP(28)), PTRAST(KEEP(28)),
      &              PAMASTER(KEEP(28))
       INTEGER COMM, NBFIN, SLAVEF, MYID
@@ -193,7 +193,7 @@ C
         ETATASS= 2 
         IOLDPS = PTLUST(STEP(INODE)) 
         NFRONT = IW(IOLDPS + KEEP(IXSZ)) 
-        NASS1  = iabs(IW(IOLDPS + 2 + KEEP(IXSZ)))
+        NASS1  = abs(IW(IOLDPS + 2 + KEEP(IXSZ)))
         ICT11 = IOLDPS + HF - 1 + NFRONT
         SSARBR=MUMPS_INSSARBR(PROCNODE_STEPS(STEP(INODE)),
      &                        KEEP(199))
@@ -246,7 +246,7 @@ C
      &       NUMORG, KEEP(486),
      &       KEEP(489), KEEP(490), KEEP(491), KEEP(492), 
      &       KEEP(20), KEEP(60), DAD(STEP(INODE)), KEEP(38),
-     &       LRSTATUS, KEEP(280), LRGROUPS)
+     &       KEEP(123), LRSTATUS, KEEP(280), LRGROUPS)
       IF (DAD(STEP(INODE)).NE.0) THEN
         IF ( MUMPS_PROCNODE(PROCNODE_STEPS(STEP(DAD(STEP(INODE)))),
      &                                     KEEP(199) )
@@ -384,7 +384,7 @@ C
      &       IOLDPS + HF + 2 * NFRONT, IW, LIW)
       ENDIF
       NCB   = NFRONT - NASS1
-      MAXFRW = max0(MAXFRW, NFRONT)
+      MAXFRW = max(MAXFRW, NFRONT)
       ICT11 = IOLDPS + HF - 1 + NFRONT
       CALL SMUMPS_SET_PARPIVT1 ( INODE, NFRONT, NASS1, KEEP, 
      &                           LR_ACTIVATED, PARPIV_T1) 
@@ -465,8 +465,9 @@ C
             NB_BLR = NPARTSASS + NPARTSCB
          CALL MAX_CLUSTER(BEGS_BLR,NB_BLR,MAXI_CLUSTER)
          DEALLOCATE(BEGS_BLR)
-         CALL COMPUTE_BLR_VCS(KEEP(472), IBCKSZ2, KEEP(488), NASS1)
-         MINSIZE = int(IBCKSZ2 / 2)
+         CALL COMPUTE_BLR_VCS(KEEP(472), IBCKSZ2, KEEP(488), NASS1,
+     &                        NFRONT, KEEP(35))
+         MINSIZE = int(IBCKSZ2 / 3)
          TOPDIAG = max(2*MINSIZE + MAXI_CLUSTER-1,TOPDIAG)
         ENDIF
         IF (ETATASS.EQ.1) THEN
@@ -654,14 +655,6 @@ C
           ELSE
             IACHK = PAMASTER(STEP(ISON))
           ENDIF
-          IF (IS_CB_LR .AND. LEVEL1) THEN
-            POSEL1 = PTRAST(STEP(INODE))
-            CALL SMUMPS_BLR_ASM_NIV1 (A, LA,
-     &           POSEL1, NFRONT, NASS1, SON_IW(ISTCHK+XXF),
-     &           SON_IW, SON_LIW,
-     &           LSTK, NELIM, K1, K1+LSTK-1, KEEP(50),
-     &           KEEP, KEEP8, OPASSW)
-          ENDIF
           IF ( KEEP(50) .eq. 0 ) THEN
             POSEL1 = PTRAST(STEP(INODE)) - NFRONT8
             IF (NFRONT .EQ. LSTK.AND. ISON.EQ.ISON_IN_PLACE
@@ -749,6 +742,14 @@ C
      &          )
               ENDIF
             ENDIF 
+          ENDIF
+          IF (IS_CB_LR .AND. LEVEL1) THEN
+            POSEL1 = PTRAST(STEP(INODE))
+            CALL SMUMPS_BLR_ASM_NIV1 (A, LA,
+     &           POSEL1, NFRONT, NASS1, SON_IW(ISTCHK+XXF),
+     &           SON_IW, SON_LIW,
+     &           LSTK, NELIM, K1, K1+LSTK-1, KEEP(50),
+     &           KEEP, KEEP8, OPASSW)
           ENDIF
   205     IF (LEVEL1) THEN 
            IF (SAME_PROC) ISTCHK = PTRIST(STEP(ISON))
@@ -1077,7 +1078,7 @@ C
      &        STEP(N),
      & PIMASTER(KEEP(28)),
      &        NSTK_S(KEEP(28)), PERM(N)
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER   CAND(SLAVEF+1, max(1,KEEP(56)))
       INTEGER   ISTEP_TO_INIV2(KEEP(71)), 
      &          TAB_POS_IN_PERE(SLAVEF+2,max(1,KEEP(56)))
@@ -1202,7 +1203,7 @@ C
       CALL IS_FRONT_BLR_CANDIDATE(INODE, 2, NFRONT, NASS1, KEEP(486),
      &       KEEP(489), KEEP(490), KEEP(491), KEEP(492), 
      &       KEEP(20), KEEP(60), DAD(STEP(INODE)), KEEP(38),
-     &       LRSTATUS, KEEP(280), LRGROUPS)
+     &       KEEP(123), LRSTATUS, KEEP(280), LRGROUPS)
       COMPRESS_PANEL = (LRSTATUS.GE.2)
       COMPRESS_CB    = ((LRSTATUS.EQ.1).OR.
      &                  (LRSTATUS.EQ.3))
@@ -1452,7 +1453,7 @@ C
      &       NBPANELS_L, NBPANELS_U, NASS1, 
      &       IOLDPS + HF + 2 * NFRONT, IW, LIW)
       ENDIF
-      MAXFRW = max0(MAXFRW, NFRONT)
+      MAXFRW = max(MAXFRW, NFRONT)
       PTLUST(STEP(INODE)) = IOLDPS
       IW(IOLDPS+KEEP(IXSZ))     = NFRONT
       IW(IOLDPS + 1+KEEP(IXSZ)) = 0
@@ -1571,8 +1572,9 @@ C
          NB_BLR = NPARTSASS + NPARTSCB
          CALL MAX_CLUSTER(BEGS_BLR,NB_BLR,MAXI_CLUSTER)
          DEALLOCATE(BEGS_BLR)
-         CALL COMPUTE_BLR_VCS(KEEP(472), IBCKSZ2, KEEP(488), NASS1)
-         MINSIZE = int(IBCKSZ2 / 2)
+         CALL COMPUTE_BLR_VCS(KEEP(472), IBCKSZ2, KEEP(488), NASS1,
+     &                        NFRONT, KEEP(35))
+         MINSIZE = int(IBCKSZ2 / 3)
          TOPDIAG = max(2*MINSIZE + MAXI_CLUSTER-1, TOPDIAG)
         ENDIF
 !$      CHUNK = max(KEEP(360)/2,

@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -17,9 +17,14 @@ C
      &           NRHS_COL, NRHS_loc, LRHS_loc,
      &           MAP_RHS_loc,
      &           IRHS_loc, RHS_loc, RHS_loc_size,
-     &           RHSCOMP, LD_RHSCOMP,
-     &           POSINRHSCOMP_FWD, NB_FS_IN_RHSCOMP,
-     &           LSCAL, scaling_data_dr,
+     &           RHSINTR, LD_RHSINTR,
+     &           POSINRHSINTR_FWD, NB_FS_IN_RHSINTR,
+     &           LSCAL,
+#if defined(USE_OLD_SCALING)
+     &           scaling_data_dr,
+#else
+     &           SCALING_RHSINTR_FWD, LSCALING_RHSINTR_FWD,
+#endif
      &           LP, LPOK, KEEP, NB_BYTES_LOC, INFO )
       USE SMUMPS_STRUC_DEF
 !$    USE OMP_LIB
@@ -32,17 +37,23 @@ C
       INTEGER, INTENT(IN)    :: IRHS_loc(NRHS_loc)
       INTEGER(8), INTENT(IN) :: RHS_loc_size
       REAL, INTENT(IN)    :: RHS_loc(RHS_loc_size)
-      INTEGER, INTENT(IN)    :: NB_FS_IN_RHSCOMP, LD_RHSCOMP
-      INTEGER, INTENT(IN)    :: POSINRHSCOMP_FWD(N)
-      REAL, INTENT(OUT)   :: RHSCOMP(LD_RHSCOMP, NRHS_COL)
+      INTEGER, INTENT(IN)    :: NB_FS_IN_RHSINTR, LD_RHSINTR
+      INTEGER, INTENT(IN)    :: POSINRHSINTR_FWD(N)
+      REAL, INTENT(OUT)   :: RHSINTR(LD_RHSINTR, NRHS_COL)
       INTEGER                :: KEEP(500)
       LOGICAL, INTENT(IN)    :: LSCAL
+#if defined(USE_OLD_SCALING)
       type scaling_data_t
         SEQUENCE
-        REAL, dimension(:), pointer :: SCALING
-        REAL, dimension(:), pointer :: SCALING_LOC
+        REAL,    dimension(:), pointer :: SCALING
+        REAL,    dimension(:), pointer :: SCALING_LOC
+        INTEGER, dimension(:), pointer :: SCALING_IND 
       end type scaling_data_t
       type(scaling_data_t), INTENT(IN) :: scaling_data_dr
+#else
+      INTEGER :: LSCALING_RHSINTR_FWD
+      REAL :: SCALING_RHSINTR_FWD( LSCALING_RHSINTR_FWD )
+#endif
       LOGICAL, INTENT(IN)    :: LPOK
       INTEGER, INTENT(IN)    :: LP      
       INTEGER, INTENT(INOUT) :: INFO(2) 
@@ -72,6 +83,9 @@ C
       INTEGER :: NB_FS_TOUCHED
       INTEGER :: NBROWSTORECV                
       REAL, PARAMETER :: ZERO = 0.0E0
+#if defined(AVOID_MPI_IN_PLACE)
+      INTEGER :: allocoktmp
+#endif
 !$    NOMP = OMP_GET_MAX_THREADS()
       NB_BYTES_LOC = 0_8
       ALLOCATE( NBROWSTOSEND    (NSLAVES),
@@ -81,9 +95,15 @@ C
       IF (allocok > 0) THEN
         INFO(1) = -13
         INFO(2) = NSLAVES+NSLAVES+NRHS_loc
+      ELSE
+        NB_BYTES_LOC = int(2*NSLAVES+NRHS_loc,8)*KEEP(34)
       ENDIF
-      NB_BYTES_LOC = int(2*NSLAVES+NRHS_loc,8)*KEEP(34)
+#if defined(AVOID_MPI_IN_PLACE)
+      allocoktmp=allocok
+      CALL MPI_ALLREDUCE( allocoktmp, allocok, 1,
+#else
       CALL MPI_ALLREDUCE( MPI_IN_PLACE, allocok, 1,
+#endif
      &                    MPI_INTEGER, MPI_SUM,
      &                    COMM_NODES, IERR_MPI )
       IF (allocok .GT. 0) RETURN
@@ -126,7 +146,7 @@ C
      &         IS_SEND_ACTIVE(MAX_ACTIVE_SENDS),
      &         BUFRECI(MAXRECORDS),                
      &         BUFRECR(MAXRECORDS*NRHS_COL),       
-     &         TOUCHED(NB_FS_IN_RHSCOMP),          
+     &         TOUCHED(NB_FS_IN_RHSINTR),          
      &         stat=allocok)
       IF (allocok .GT. 0) THEN
         IF (LP .GT. 0) WRITE(LP, '(A)')
@@ -134,11 +154,11 @@ C
         INFO(1)=-13
         INFO(2)=NRHS_COL*MAXRECORDS*MAX_ACTIVE_SENDS+
      &          3*MAX_ACTIVE_SENDS+MAXRECORDS*(1+NRHS_COL)
-     &          + NB_FS_IN_RHSCOMP
+     &          + NB_FS_IN_RHSINTR
       ENDIF
       NB_BYTES_LOC=NB_BYTES_LOC +
      &  KEEP(34) * ( int(2*MAX_ACTIVE_SENDS,8) + int(MAXRECORDS,8) ) +
-     &  KEEP(34) * (int(MAX_ACTIVE_SENDS,8) + int(NB_FS_IN_RHSCOMP,8)) +
+     &  KEEP(34) * (int(MAX_ACTIVE_SENDS,8) + int(NB_FS_IN_RHSINTR,8)) +
      &  KEEP(35) * (
      &      int( MAXRECORDS,8)*int(NRHS_COL,8)*int(MAX_ACTIVE_SENDS,8)
      &      + int(MAXRECORDS,8) * int(NRHS_COL,8) )
@@ -151,7 +171,7 @@ C
         IS_SEND_ACTIVE(IREQ) = .FALSE.
       ENDDO
       NB_FS_TOUCHED = 0
-      DO IFS = 1, NB_FS_IN_RHSCOMP
+      DO IFS = 1, NB_FS_IN_RHSINTR
         TOUCHED(IFS) = .FALSE.
       ENDDO
       IPROC_MAX=maxloc(NBROWSTOSEND,DIM=1)-1
@@ -214,7 +234,7 @@ C
         INTEGER, INTENT(INOUT) :: BUFRECI_ARG(NBRECORDS) 
         REAL, INTENT(IN) :: BUFRECR_ARG(NBRECORDS,
      &                                     NRHS_COL)
-        INTEGER :: I, K, IRHSCOMP, IFIRSTNOTTOUCHED, ILASTNOTTOUCHED
+        INTEGER :: I, K, IRHSINTR, IFIRSTNOTTOUCHED, ILASTNOTTOUCHED
         IFIRSTNOTTOUCHED = NBRECORDS+1
         ILASTNOTTOUCHED  = 0
         DO I = 1, NBRECORDS
@@ -223,9 +243,9 @@ C
      &      I, BUFRECI(I), BUFRECI(1)
             CALL MUMPS_ABORT()
           ENDIF
-          IRHSCOMP=POSINRHSCOMP_FWD(BUFRECI(I))
-          BUFRECI_ARG(I)=IRHSCOMP
-          IF ( .NOT. TOUCHED(IRHSCOMP) ) THEN
+          IRHSINTR=POSINRHSINTR_FWD(BUFRECI(I))
+          BUFRECI_ARG(I)=IRHSINTR
+          IF ( .NOT. TOUCHED(IRHSINTR) ) THEN
             IFIRSTNOTTOUCHED=min(IFIRSTNOTTOUCHED,I)
             ILASTNOTTOUCHED=max(ILASTNOTTOUCHED,I)
           ENDIF
@@ -234,41 +254,67 @@ C
 !$      OMP_FLAG = ( NRHS_COL.GE.KEEP(362) .AND.
 !$   &               NRHS_COL*NBRECORDS .GE. KEEP(363)/2)
         IF (OMP_FLAG) THEN
-!$OMP PARALLEL DO PRIVATE(I,IRHSCOMP) IF (OMP_FLAG)
+!$OMP PARALLEL DO PRIVATE(I,IRHSINTR)
         DO K = 1, NRHS_COL
           DO I = IFIRSTNOTTOUCHED, ILASTNOTTOUCHED
-            IRHSCOMP=BUFRECI_ARG(I)
-            IF (.NOT. TOUCHED(IRHSCOMP)) THEN
-              RHSCOMP(IRHSCOMP,K)=ZERO
+            IRHSINTR=BUFRECI_ARG(I)
+            IF (.NOT. TOUCHED(IRHSINTR)) THEN
+              RHSINTR(IRHSINTR,K)=ZERO
             ENDIF
           ENDDO
-          DO I = 1, NBRECORDS
-            IRHSCOMP=BUFRECI_ARG(I)
-            RHSCOMP(IRHSCOMP,K) = RHSCOMP(IRHSCOMP,K) +
+#if ! defined(USE_OLD_SCALING)
+          IF (LSCAL) THEN
+            DO I = 1, NBRECORDS
+              IRHSINTR=BUFRECI_ARG(I)
+              RHSINTR(IRHSINTR,K) = RHSINTR(IRHSINTR,K) +
+     &                            SCALING_RHSINTR_FWD(IRHSINTR) *
      &                            BUFRECR_ARG(I,K)
-          ENDDO
+            ENDDO
+          ELSE
+#endif
+            DO I = 1, NBRECORDS
+              IRHSINTR=BUFRECI_ARG(I)
+              RHSINTR(IRHSINTR,K) = RHSINTR(IRHSINTR,K) +
+     &                            BUFRECR_ARG(I,K)
+            ENDDO
+#if ! defined(USE_OLD_SCALING)
+          ENDIF
+#endif
         ENDDO
 !$OMP END PARALLEL DO
         ELSE
-        DO K = 1, NRHS_COL
-          DO I = IFIRSTNOTTOUCHED, ILASTNOTTOUCHED
-            IRHSCOMP=BUFRECI_ARG(I)
-            IF (.NOT. TOUCHED(IRHSCOMP)) THEN
-              RHSCOMP(IRHSCOMP,K)=ZERO
+          DO K = 1, NRHS_COL
+            DO I = IFIRSTNOTTOUCHED, ILASTNOTTOUCHED
+              IRHSINTR=BUFRECI_ARG(I)
+              IF (.NOT. TOUCHED(IRHSINTR)) THEN
+                RHSINTR(IRHSINTR,K)=ZERO
+              ENDIF
+            ENDDO
+#if ! defined(USE_OLD_SCALING)
+            IF ( LSCAL ) THEN
+              DO I = 1, NBRECORDS
+                IRHSINTR=BUFRECI_ARG(I)
+                RHSINTR(IRHSINTR,K) = RHSINTR(IRHSINTR,K) +
+     &                                SCALING_RHSINTR_FWD(IRHSINTR) *
+     &                                BUFRECR_ARG(I,K)
+              ENDDO
+            ELSE
+#endif
+              DO I = 1, NBRECORDS
+                IRHSINTR=BUFRECI_ARG(I)
+                RHSINTR(IRHSINTR,K) = RHSINTR(IRHSINTR,K) +
+     &                                BUFRECR_ARG(I,K)
+              ENDDO
+#if ! defined(USE_OLD_SCALING)
             ENDIF
+#endif
           ENDDO
-          DO I = 1, NBRECORDS
-            IRHSCOMP=BUFRECI_ARG(I)
-            RHSCOMP(IRHSCOMP,K) = RHSCOMP(IRHSCOMP,K) +
-     &                            BUFRECR_ARG(I,K)
-          ENDDO
-        ENDDO
         ENDIF
         DO I = 1, NBRECORDS
-          IRHSCOMP = BUFRECI_ARG(I)
-          IF (.NOT. TOUCHED(IRHSCOMP)) THEN
+          IRHSINTR = BUFRECI_ARG(I)
+          IF (.NOT. TOUCHED(IRHSINTR)) THEN
             NB_FS_TOUCHED = NB_FS_TOUCHED + 1
-            TOUCHED(IRHSCOMP) = .TRUE.
+            TOUCHED(IRHSINTR) = .TRUE.
           ENDIF
         ENDDO
         NBROWSTORECV = NBROWSTORECV - NBRECORDS
@@ -278,7 +324,7 @@ C
         INTEGER :: NBRECORDS, I, K, IFIRSTNOTTOUCHED
         INTEGER :: Iloc       
         INTEGER :: Iglob      
-        INTEGER :: IRHSCOMP   
+        INTEGER :: IRHSINTR   
         INTEGER(8) :: ISHIFT
         IF ( NBROWSTOSEND(MYID_NODES+1) .EQ. 0) THEN
           WRITE(*,*) "Internal error in SMUMPS_DR_ASSEMBLE_LOCAL"
@@ -287,9 +333,9 @@ C
         NBRECORDS=min(MAXRECORDS, NBROWSTOSEND(MYID_NODES+1))
         IFIRSTNOTTOUCHED=NBRECORDS+1
         DO I = 1, NBRECORDS
-          IRHSCOMP = POSINRHSCOMP_FWD(IRHS_loc(
+          IRHSINTR = POSINRHSINTR_FWD(IRHS_loc(
      &               IRHS_loc_sorted(NEXTROWTOSEND(MYID_NODES+1)+I-1)))
-          IF (.NOT. TOUCHED(IRHSCOMP)) THEN
+          IF (.NOT. TOUCHED(IRHSINTR)) THEN
             IFIRSTNOTTOUCHED=I
             EXIT
           ENDIF
@@ -297,57 +343,61 @@ C
         IF (LSCAL) THEN
 !$        OMP_FLAG = (NRHS_COL.GE.KEEP(362) .AND.
 !$   &                NRHS_COL*NBRECORDS .GE. KEEP(363)/2)
-!$OMP PARALLEL DO PRIVATE(K, ISHIFT, I, IRHSCOMP, Iloc, Iglob)
+!$OMP PARALLEL DO PRIVATE(K, ISHIFT, I, IRHSINTR, Iloc, Iglob)
 !$OMP&  FIRSTPRIVATE(NBRECORDS) IF (OMP_FLAG)
           DO K = 1, NRHS_COL
-            ISHIFT = (K-1) * LRHS_loc
+            ISHIFT = int(K-1,8) * int(LRHS_loc,8)
             DO I = IFIRSTNOTTOUCHED, NBRECORDS
-              IRHSCOMP = POSINRHSCOMP_FWD(IRHS_loc(
+              IRHSINTR = POSINRHSINTR_FWD(IRHS_loc(
      &               IRHS_loc_sorted(NEXTROWTOSEND(MYID_NODES+1)+I-1)))
-               IF (.NOT. TOUCHED(IRHSCOMP)) THEN
-                 RHSCOMP(IRHSCOMP,K)=ZERO
+               IF (.NOT. TOUCHED(IRHSINTR)) THEN
+                 RHSINTR(IRHSINTR,K)=ZERO
                ENDIF
             ENDDO
             DO I = 1, NBRECORDS
               Iloc = IRHS_loc_sorted(NEXTROWTOSEND(MYID_NODES+1)+I-1)
               Iglob = IRHS_loc(Iloc)
-              IRHSCOMP = POSINRHSCOMP_FWD(Iglob)
-              RHSCOMP(IRHSCOMP,K) = RHSCOMP(IRHSCOMP,K)+
+              IRHSINTR = POSINRHSINTR_FWD(Iglob)
+              RHSINTR(IRHSINTR,K) = RHSINTR(IRHSINTR,K)+
      &                              RHS_loc(Iloc+ISHIFT)*
+#if defined(USE_OLD_SCALING)
      &                        scaling_data_dr%SCALING_LOC(Iloc)
+#else
+     &                        SCALING_RHSINTR_FWD(IRHSINTR)
+#endif
             ENDDO
           ENDDO
 !$OMP END PARALLEL DO
         ELSE
 !$        OMP_FLAG = (NRHS_COL.GE.KEEP(362) .AND.
 !$   &                NRHS_COL*NBRECORDS .GE. KEEP(363)/2)
-!$OMP PARALLEL DO PRIVATE(K, ISHIFT, I, IRHSCOMP, Iloc, Iglob)
+!$OMP PARALLEL DO PRIVATE(K, ISHIFT, I, IRHSINTR, Iloc, Iglob)
 !$OMP&  FIRSTPRIVATE(NBRECORDS) IF (OMP_FLAG)
           DO K = 1, NRHS_COL
-            ISHIFT = (K-1) * LRHS_loc
+            ISHIFT = int(K-1,8) * int(LRHS_loc,8)
             DO I = IFIRSTNOTTOUCHED, NBRECORDS
-              IRHSCOMP = POSINRHSCOMP_FWD(IRHS_loc(
+              IRHSINTR = POSINRHSINTR_FWD(IRHS_loc(
      &               IRHS_loc_sorted(NEXTROWTOSEND(MYID_NODES+1)+I-1)))
-               IF (.NOT. TOUCHED(IRHSCOMP)) THEN
-                 RHSCOMP(IRHSCOMP,K)=ZERO
+               IF (.NOT. TOUCHED(IRHSINTR)) THEN
+                 RHSINTR(IRHSINTR,K)=ZERO
                ENDIF
             ENDDO
             DO I = 1, NBRECORDS
               Iloc = IRHS_loc_sorted(NEXTROWTOSEND(MYID_NODES+1)+I-1)
               Iglob = IRHS_loc(Iloc)
-              IRHSCOMP = POSINRHSCOMP_FWD(Iglob)
-              RHSCOMP(IRHSCOMP,K) = RHSCOMP(IRHSCOMP,K)+
+              IRHSINTR = POSINRHSINTR_FWD(Iglob)
+              RHSINTR(IRHSINTR,K) = RHSINTR(IRHSINTR,K) +
      &                              RHS_loc(Iloc+ISHIFT)
             ENDDO
           ENDDO
 !$OMP END PARALLEL DO
         ENDIF
         DO I = 1, NBRECORDS
-          IRHSCOMP = POSINRHSCOMP_FWD(IRHS_loc(
+          IRHSINTR = POSINRHSINTR_FWD(IRHS_loc(
      &               IRHS_loc_sorted(NEXTROWTOSEND(MYID_NODES+1)+I-1)))
-          IF (.NOT. TOUCHED(IRHSCOMP)) THEN
+          IF (.NOT. TOUCHED(IRHSINTR)) THEN
             NB_FS_TOUCHED = NB_FS_TOUCHED + 1
-            TOUCHED(IRHSCOMP) = .TRUE.
+            TOUCHED(IRHSINTR) = .TRUE.
           ENDIF
         ENDDO
         NEXTROWTOSEND(MYID_NODES+1)=NEXTROWTOSEND(MYID_NODES+1)+
@@ -425,8 +475,10 @@ C
                 IPOSRHS = int(K-1,8)*int(LRHS_loc,8)
                 Iloc = IRHS_loc_sorted(NEXTROWTOSEND(IPROC_ARG+1)+I-1)
                 BUFR( IPOSBUF + I, IBUF )
-     &                = RHS_loc( IPOSRHS + Iloc ) *
-     &                  scaling_data_dr%SCALING_LOC(Iloc)
+     &                = RHS_loc( IPOSRHS + Iloc )
+#if defined(USE_OLD_SCALING)
+     &                  * scaling_data_dr%SCALING_LOC(Iloc)
+#endif
               ENDDO
             ENDDO
 !$OMP END PARALLEL DO
@@ -466,24 +518,25 @@ C
         END SUBROUTINE SMUMPS_DR_TRY_SEND
         SUBROUTINE SMUMPS_DR_EMPTY_ROWS()
         INTEGER :: K, IFS
-        IF ( NB_FS_TOUCHED .NE. NB_FS_IN_RHSCOMP ) THEN
+        IF ( NB_FS_TOUCHED .NE. NB_FS_IN_RHSINTR ) THEN
 !$        OMP_FLAG = (NRHS_COL .GE. KEEP(362)) .AND.
-!$   &    (NRHS_COL*NB_FS_IN_RHSCOMP >  KEEP(363)/2)
-!$OMP PARALLEL DO FIRSTPRIVATE(NB_FS_IN_RHSCOMP) IF (OMP_FLAG)
+!$   &    (NRHS_COL*NB_FS_IN_RHSINTR >  KEEP(363)/2)
+!$OMP PARALLEL DO FIRSTPRIVATE(NB_FS_IN_RHSINTR)
+!$OMP&    PRIVATE(IFS) IF (OMP_FLAG)
           DO K = 1, NRHS_COL
-            DO IFS = 1, NB_FS_IN_RHSCOMP
+            DO IFS = 1, NB_FS_IN_RHSINTR
               IF ( .NOT. TOUCHED(IFS) ) THEN
-                RHSCOMP( IFS, K) = ZERO
+                RHSINTR( IFS, K) = ZERO
               ENDIF
             ENDDO
-            DO IFS = NB_FS_IN_RHSCOMP +1, LD_RHSCOMP
-              RHSCOMP (IFS, K) = ZERO
+            DO IFS = NB_FS_IN_RHSINTR +1, LD_RHSINTR
+              RHSINTR (IFS, K) = ZERO
             ENDDO
           ENDDO
 !$OMP END PARALLEL DO
         ELSE
 !$        OMP_FLAG = .FALSE.
-!$        CHUNK8 = int(NRHS_COL,8)*int(LD_RHSCOMP-NB_FS_IN_RHSCOMP,8)
+!$        CHUNK8 = int(NRHS_COL,8)*int(LD_RHSINTR-NB_FS_IN_RHSINTR,8)
 !$        CHUNK8 = max(CHUNK8,1_8)
 !$        IF (CHUNK8 .GE. int(KEEP(363),8)) THEN
 !$          OMP_FLAG = .TRUE.
@@ -492,8 +545,8 @@ C
 !$OMP PARALLEL DO COLLAPSE(2) SCHEDULE(STATIC,CHUNK8)
 !$OMP&  IF (OMP_FLAG)
           DO K = 1, NRHS_COL
-            DO IFS = NB_FS_IN_RHSCOMP +1, LD_RHSCOMP
-             RHSCOMP (IFS, K) = ZERO
+            DO IFS = NB_FS_IN_RHSINTR +1, LD_RHSINTR
+             RHSINTR (IFS, K) = ZERO
             ENDDO
           ENDDO
 !$OMP END PARALLEL DO
@@ -523,15 +576,19 @@ C
      &               ( id%MYID .eq. MASTER .AND.
      &                 id%KEEP(46) .eq. 1 ) )
         IF (id%MYID .EQ. MASTER) THEN
-          IF (id%ICNTL(20).EQ.10) THEN
-            ROW_OR_COL_INDICES = 0 
-          ELSE IF (id%ICNTL(20).EQ.11) THEN
-            ROW_OR_COL_INDICES = 1 
-          ELSE 
-            ROW_OR_COL_INDICES = 0 
-          ENDIF
-          IF (id%ICNTL(9) .NE. 1) THEN
-            ROW_OR_COL_INDICES = 1 - ROW_OR_COL_INDICES
+          IF (id%KEEP(50).NE.0) THEN
+            ROW_OR_COL_INDICES = 0
+          ELSE
+            IF (id%ICNTL(20).EQ.10 .OR. id%KEEP(50).EQ.0) THEN
+              ROW_OR_COL_INDICES = 0 
+            ELSE IF (id%ICNTL(20).EQ.11) THEN
+              ROW_OR_COL_INDICES = 1 
+            ELSE 
+              ROW_OR_COL_INDICES = 0 
+            ENDIF
+            IF (id%ICNTL(9) .NE. 1) THEN
+              ROW_OR_COL_INDICES = 1 - ROW_OR_COL_INDICES
+            ENDIF
           ENDIF
           IF (id%KEEP(23).NE.0 .AND. id%ICNTL(9) .NE.1) THEN
             UNS_PERM_TO_BE_DONE = 1
@@ -568,7 +625,8 @@ C
           ELSE
             idIRHS_loc => IDUMMY
           ENDIF
-          CALL MUMPS_BUILD_IRHS_loc(id%MYID_NODES, id%NSLAVES, id%N,
+          CALL MUMPS_GET_INDICES
+     &    (id%MYID_NODES, id%NSLAVES, id%N,
      &    id%PTLUST_S(1), id%KEEP(1), id%KEEP8(1), id%IS(1),
      &    max(1, id%KEEP(32)),
      &    id%STEP(1), id%PROCNODE_STEPS(1), idIRHS_loc(1),

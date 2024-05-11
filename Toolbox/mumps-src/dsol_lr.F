@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -24,20 +24,20 @@ C
      &     LIELL, WCB, LWCB, 
      &     LD_WCBPIV, LD_WCBCB,
      &     PPIV_INIT, PCB_INIT, 
-     &     RHSCOMP, LRHSCOMP, NRHS, 
-     &     POSINRHSCOMP_FWD, JBDEB, JBFIN, 
+     &     RHSINTR, LRHSINTR, NRHS, 
+     &     POSINRHSINTR_FWD, JBDEB, JBFIN, 
      &     MTYPE, KEEP, KEEP8, OOCWRITE_COMPATIBLE_WITH_BLR,
      &     IFLAG, IERROR )
        INTEGER, INTENT(IN) :: INODE, N, IWHDLR, NPIV_GLOBAL, NSLAVES
        INTEGER, INTENT(IN) :: MTYPE, LIELL, KEEP(500)
        INTEGER(8), INTENT(IN) :: KEEP8(150)
-       INTEGER, INTENT(IN) :: LIW, IPOS_INIT, LRHSCOMP
-       INTEGER, INTENT(IN) :: IW(LIW), POSINRHSCOMP_FWD(N)
+       INTEGER, INTENT(IN) :: LIW, IPOS_INIT, LRHSINTR
+       INTEGER, INTENT(IN) :: IW(LIW), POSINRHSINTR_FWD(N)
        INTEGER(8), INTENT(IN) :: LWCB, PPIV_INIT, PCB_INIT
        INTEGER, INTENT(IN) :: LD_WCBPIV, LD_WCBCB, NRHS, JBDEB, JBFIN
        DOUBLE PRECISION, INTENT(INOUT) :: WCB(LWCB)
        INTEGER, INTENT(INOUT) :: IFLAG, IERROR
-       DOUBLE PRECISION, INTENT(INOUT) :: RHSCOMP(LRHSCOMP, NRHS)
+       DOUBLE PRECISION, INTENT(INOUT) :: RHSINTR(LRHSINTR, NRHS)
        LOGICAL, INTENT(IN)    :: OOCWRITE_COMPATIBLE_WITH_BLR
         INTEGER :: I, NPARTSASS, NB_BLR , NELIM, LDADIAG,
      &             DIAGSIZ_DYN, DIAGSIZ_STA, IBEG_BLR, IEND_BLR,
@@ -167,8 +167,8 @@ C
      &  IW, IPOS, LIW, 
      &  DIAG(1), int(size(DIAG),8), 1_8, 
      &  WCB, LWCB, LD_WCBPIV, 
-     &  RHSCOMP, LRHSCOMP, NRHS, 
-     &  POSINRHSCOMP_FWD, JBDEB, JBFIN, 
+     &  RHSINTR, LRHSINTR, NRHS, 
+     &  POSINRHSINTR_FWD, JBDEB, JBFIN, 
      &  MTYPE, KEEP, OOCWRITE_COMPATIBLE_WITH_BLR,
      &  .TRUE.  
      &  )
@@ -381,19 +381,19 @@ C
       SUBROUTINE DMUMPS_SOL_BWD_LR_SU 
      &   ( INODE, IWHDLR, NPIV_GLOBAL, NSLAVES,
      &     LIELL, WCB, LWCB, NRHS_B, PTWCB,
-     &     RHSCOMP, LRHSCOMP, NRHS,
-     &     IPOSINRHSCOMP, JBDEB, 
+     &     RHSINTR, LRHSINTR, NRHS,
+     &     IPOSINRHSINTR, JBDEB, 
      &     MTYPE, KEEP, KEEP8,
      &     IFLAG, IERROR )
        INTEGER, INTENT(IN) :: INODE, IWHDLR, NPIV_GLOBAL, NSLAVES
        INTEGER, INTENT(IN) :: MTYPE, LIELL, KEEP(500)
        INTEGER(8), INTENT(IN) :: KEEP8(150)
-       INTEGER, INTENT(IN) :: IPOSINRHSCOMP, JBDEB, LRHSCOMP, NRHS
+       INTEGER, INTENT(IN) :: IPOSINRHSINTR, JBDEB, LRHSINTR, NRHS
        INTEGER(8), INTENT(IN) :: LWCB, PTWCB
        INTEGER, INTENT(IN) ::  NRHS_B
        INTEGER, INTENT(INOUT) :: IFLAG, IERROR
        DOUBLE PRECISION, INTENT(INOUT) :: WCB(LWCB)
-       DOUBLE PRECISION RHSCOMP(LRHSCOMP,NRHS)
+       DOUBLE PRECISION RHSINTR(LRHSINTR,NRHS)
         INTEGER :: I, NPARTSASS, NB_BLR, LAST_BLR, 
      &             NELIM_PANEL, LD_WCB,
      &             DIAGSIZ_DYN, DIAGSIZ_STA, LDADIAG,
@@ -441,15 +441,15 @@ C
         ENDIF 
         IF (DIAGSIZ_DYN.EQ.0) GOTO 1000
         NELIM_PANEL = DIAGSIZ_STA - DIAGSIZ_DYN
-         IPIV_PANEL = IPOSINRHSCOMP + IBEG_BLR -1
+         IPIV_PANEL = IPOSINRHSINTR + IBEG_BLR -1
          IF ( MTYPE .EQ. 1 .AND. KEEP(50).EQ.0) THEN
           BLR_PANEL => BLR_ARRAY(IWHDLR)%PANELS_U(I)%LRB_PANEL
          ELSE
           BLR_PANEL => BLR_ARRAY(IWHDLR)%PANELS_L(I)%LRB_PANEL
          END IF
         CALL DMUMPS_SOL_BWD_BLR_UPDATE ( 
-     &        RHSCOMP, int(LRHSCOMP,8), NRHS, LRHSCOMP, 
-     &        int(IPOSINRHSCOMP,8), JBDEB,
+     &        RHSINTR, int(LRHSINTR,8), NRHS, LRHSINTR, 
+     &        int(IPOSINRHSINTR,8), JBDEB,
      &        WCB, LWCB, LD_WCB, PWCB, 
      &        int(IPIV_PANEL,8), 
      &        NRHS_B, NPIV_GLOBAL,
@@ -465,26 +465,26 @@ C
              IF (IEND_BLR.EQ.NPIV_GLOBAL) THEN
                CALL dgemm('T', 'N', DIAGSIZ_DYN, NRHS_B, NELIM_PANEL, 
      &              MONE, DIAG(1+DIAGSIZ_DYN), DIAGSIZ_STA,  WCB(PWCB),
-     &              LD_WCB, ONE , RHSCOMP(IPIV_PANEL,JBDEB),LRHSCOMP)
+     &              LD_WCB, ONE , RHSINTR(IPIV_PANEL,JBDEB),LRHSINTR)
              ELSE
                IF (IEND_BLR+1.LE.NPIV_GLOBAL .AND.
      &            IEND_BLR+NELIM_PANEL.GT.NPIV_GLOBAL) THEN
                  CALL dgemm('T', 'N', DIAGSIZ_DYN, NRHS_B,
      &              NPIV_GLOBAL-IEND_BLR, 
      &              MONE, DIAG(1+DIAGSIZ_DYN), DIAGSIZ_STA, 
-     &              RHSCOMP(IPIV_PANEL+DIAGSIZ_DYN,JBDEB), LRHSCOMP,
-     &              ONE, RHSCOMP(IPIV_PANEL,JBDEB), LRHSCOMP)
+     &              RHSINTR(IPIV_PANEL+DIAGSIZ_DYN,JBDEB), LRHSINTR,
+     &              ONE, RHSINTR(IPIV_PANEL,JBDEB), LRHSINTR)
                  CALL dgemm('T', 'N', DIAGSIZ_DYN, NRHS_B,
      &              IEND_BLR+NELIM_PANEL-NPIV_GLOBAL, 
      &              MONE, DIAG(1+DIAGSIZ_DYN+NPIV_GLOBAL-IEND_BLR),
      &              DIAGSIZ_STA, 
      &              WCB(PWCB), LD_WCB,
-     &              ONE, RHSCOMP(IPIV_PANEL,JBDEB), LRHSCOMP)
+     &              ONE, RHSINTR(IPIV_PANEL,JBDEB), LRHSINTR)
                ELSE
                  CALL dgemm('T', 'N', DIAGSIZ_DYN, NRHS_B, NELIM_PANEL, 
      &              MONE, DIAG(1+DIAGSIZ_DYN), DIAGSIZ_STA, 
-     &              RHSCOMP(IPIV_PANEL+DIAGSIZ_DYN,JBDEB), LRHSCOMP,
-     &              ONE, RHSCOMP(IPIV_PANEL,JBDEB), LRHSCOMP)
+     &              RHSINTR(IPIV_PANEL+DIAGSIZ_DYN,JBDEB), LRHSINTR,
+     &              ONE, RHSINTR(IPIV_PANEL,JBDEB), LRHSINTR)
                ENDIF
              ENDIF
            ELSE
@@ -492,27 +492,27 @@ C
                CALL dgemm('N', 'N', DIAGSIZ_DYN, NRHS_B, NELIM_PANEL, 
      &              MONE, DIAG(1+DIAGSIZ_DYN*LDADIAG), DIAGSIZ_DYN, 
      &              WCB(PWCB), LD_WCB, ONE, 
-     &              RHSCOMP(IPIV_PANEL,JBDEB), LRHSCOMP)
+     &              RHSINTR(IPIV_PANEL,JBDEB), LRHSINTR)
              ELSE
                IF (IEND_BLR+1.LE.NPIV_GLOBAL .AND.
      &            IEND_BLR+NELIM_PANEL.GT.NPIV_GLOBAL) THEN
                  CALL dgemm('N', 'N', DIAGSIZ_DYN, NRHS_B,
      &              NPIV_GLOBAL-IEND_BLR, 
      &              MONE, DIAG(1+DIAGSIZ_DYN*LDADIAG), DIAGSIZ_DYN, 
-     &              RHSCOMP(IPIV_PANEL+DIAGSIZ_DYN,JBDEB), LRHSCOMP,
-     &              ONE, RHSCOMP(IPIV_PANEL,JBDEB), LRHSCOMP)
+     &              RHSINTR(IPIV_PANEL+DIAGSIZ_DYN,JBDEB), LRHSINTR,
+     &              ONE, RHSINTR(IPIV_PANEL,JBDEB), LRHSINTR)
                  CALL dgemm('N', 'N', DIAGSIZ_DYN, NRHS_B,
      &              IEND_BLR+NELIM_PANEL-NPIV_GLOBAL, 
      &              MONE, DIAG(1+DIAGSIZ_DYN*LDADIAG +
      &                  (NPIV_GLOBAL-IEND_BLR)*DIAGSIZ_DYN),
      &              DIAGSIZ_DYN, 
      &              WCB(PWCB), LD_WCB,
-     &              ONE, RHSCOMP(IPIV_PANEL,JBDEB), LRHSCOMP)
+     &              ONE, RHSINTR(IPIV_PANEL,JBDEB), LRHSINTR)
                ELSE
                  CALL dgemm('N', 'N', DIAGSIZ_DYN, NRHS_B, NELIM_PANEL, 
      &              MONE, DIAG(1+DIAGSIZ_DYN*LDADIAG), DIAGSIZ_DYN, 
-     &              RHSCOMP(IPIV_PANEL+DIAGSIZ_DYN,JBDEB), LRHSCOMP,
-     &              ONE, RHSCOMP(IPIV_PANEL,JBDEB), LRHSCOMP)
+     &              RHSINTR(IPIV_PANEL+DIAGSIZ_DYN,JBDEB), LRHSINTR,
+     &              ONE, RHSINTR(IPIV_PANEL,JBDEB), LRHSINTR)
                ENDIF
              ENDIF
            ENDIF
@@ -521,7 +521,7 @@ C
          CALL DMUMPS_SOLVE_BWD_LR_TRSOLVE  (
      &         DIAG(1), size(DIAG), DIAGSIZ_DYN, NELIM_PANEL, LIELL,
      &         NRHS_B, WCB, LWCB, 
-     &         RHSCOMP, LRHSCOMP, NRHS,
+     &         RHSINTR, LRHSINTR, NRHS,
      &         IPIV_PANEL, JBDEB, 
      &         MTYPE, KEEP )
  1000 CONTINUE         
@@ -697,24 +697,24 @@ C
       SUBROUTINE DMUMPS_SOLVE_BWD_LR_TRSOLVE (
      &           DIAG, LDIAG, NPIV, NELIM, LIELL,
      &           NRHS_B, W, LWC, 
-     &           RHSCOMP, LRHSCOMP, NRHS,
-     &           PPIVINRHSCOMP, JBDEB, 
+     &           RHSINTR, LRHSINTR, NRHS,
+     &           PPIVINRHSINTR, JBDEB, 
      &           MTYPE, KEEP)
        INTEGER, INTENT(IN) :: MTYPE, LIELL, NPIV, NELIM, KEEP(500)
        INTEGER, INTENT(IN) :: NRHS_B, LDIAG
-       INTEGER, INTENT(IN) :: PPIVINRHSCOMP, JBDEB, LRHSCOMP, NRHS
+       INTEGER, INTENT(IN) :: PPIVINRHSINTR, JBDEB, LRHSINTR, NRHS
        INTEGER(8), INTENT(IN) ::  LWC
        DOUBLE PRECISION, INTENT(IN) :: DIAG(LDIAG)
        DOUBLE PRECISION, INTENT(INOUT) :: W(LWC)
-       DOUBLE PRECISION RHSCOMP(LRHSCOMP,NRHS)
+       DOUBLE PRECISION RHSINTR(LRHSINTR,NRHS)
        INTEGER :: LDAJ
       DOUBLE PRECISION ONE
       PARAMETER (ONE = 1.0D0)
         IF ( MTYPE .eq. 1 ) THEN
          LDAJ =  NPIV + NELIM
          CALL dtrsm('L','L','T','N', NPIV, NRHS_B, ONE, DIAG(1),
-     &              LDAJ, RHSCOMP(PPIVINRHSCOMP,JBDEB), 
-     &              LRHSCOMP)
+     &              LDAJ, RHSINTR(PPIVINRHSINTR,JBDEB), 
+     &              LRHSINTR)
         ELSE
          IF ( KEEP(50) .EQ. 0 ) THEN
            LDAJ=NPIV+NELIM
@@ -722,7 +722,7 @@ C
            LDAJ=NPIV
          ENDIF
          CALL dtrsm('L','U','N','U', NPIV, NRHS_B, ONE, DIAG(1),
-     &            LDAJ, RHSCOMP(PPIVINRHSCOMP,JBDEB), LRHSCOMP)
+     &            LDAJ, RHSINTR(PPIVINRHSINTR,JBDEB), LRHSINTR)
         END IF 
       RETURN
       END SUBROUTINE DMUMPS_SOLVE_BWD_LR_TRSOLVE

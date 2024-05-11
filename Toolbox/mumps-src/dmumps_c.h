@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.1, released
+ *  on Thu May  2 10:15:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -29,7 +29,7 @@ extern "C" {
 
 #ifndef MUMPS_VERSION
 /* Protected in case headers of other arithmetics are included */
-#define MUMPS_VERSION "5.6.0"
+#define MUMPS_VERSION "5.7.1"
 #endif
 #ifndef MUMPS_VERSION_MAX_LEN
 #define MUMPS_VERSION_MAX_LEN 30
@@ -91,12 +91,22 @@ typedef struct {
     MUMPS_INT colsca_from_mumps;
     MUMPS_INT rowsca_from_mumps;
 
+    /* Distributed scaling(out) */
+    DMUMPS_REAL    *colsca_loc;
+    DMUMPS_REAL    *rowsca_loc;
+
+    /* Info after facto */
+    MUMPS_INT      *rowind;
+    MUMPS_INT      *colind;
+    DMUMPS_COMPLEX *pivots;
+
     /* RHS, solution, ouptput data and statistics */
-    DMUMPS_COMPLEX *rhs, *redrhs, *rhs_sparse, *sol_loc, *rhs_loc;
-    MUMPS_INT      *irhs_sparse, *irhs_ptr, *isol_loc, *irhs_loc;
-    MUMPS_INT      nrhs, lrhs, lredrhs, nz_rhs, lsol_loc, nloc_rhs, lrhs_loc;
+    DMUMPS_COMPLEX *rhs, *redrhs, *rhs_sparse, *sol_loc, *rhs_loc, *rhsintr;
+    MUMPS_INT      *irhs_sparse, *irhs_ptr, *isol_loc, *irhs_loc, *glob2loc_rhs, *glob2loc_sol;
+    MUMPS_INT      nrhs, lrhs, lredrhs, nz_rhs, lsol_loc, nloc_rhs, lrhs_loc, nsol_loc;
     MUMPS_INT      schur_mloc, schur_nloc, schur_lld;
     MUMPS_INT      mblock, nblock, nprow, npcol;
+    MUMPS_INT      ld_rhsintr;
     MUMPS_INT      info[80],infog[80];
     DMUMPS_REAL    rinfo[40], rinfog[40];
 
@@ -104,30 +114,33 @@ typedef struct {
     MUMPS_INT      deficiency;
     MUMPS_INT      *pivnul_list;
     MUMPS_INT      *mapping;
+    DMUMPS_REAL    *singular_values;
 
     /* Schur */
     MUMPS_INT      size_schur;
     MUMPS_INT      *listvar_schur;
     DMUMPS_COMPLEX *schur;
 
-    /* Internal parameters */
-    MUMPS_INT      instance_number;
+    /* user workspace */
     DMUMPS_COMPLEX *wk_user;
 
-    /* Version number: length=14 in FORTRAN + 1 for final \0 + 1 for alignment */
+    /* Version number: length=30 in FORTRAN + 1 for final \0 + 1 for alignment */
     char version_number[MUMPS_VERSION_MAX_LEN + 1 + 1];
     /* For out-of-core */
-    char ooc_tmpdir[256];
-    char ooc_prefix[64];
+    char ooc_tmpdir[1024];
+    char ooc_prefix[256];
     /* To save the matrix in matrix market format */
-    char write_problem[256];
+    char write_problem[1024];
     MUMPS_INT      lwk_user;
     /* For save/restore feature */
-    char save_dir[256];
+    char save_dir[1024];
     char save_prefix[256];
 
     /* Metis options */
     MUMPS_INT metis_options[40];
+
+    /* Internal parameters */
+    MUMPS_INT      instance_number;
 } DMUMPS_STRUC_C;
 
 

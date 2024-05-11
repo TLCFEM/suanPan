@@ -1,9 +1,9 @@
 C
-C  This file is part of MUMPS 5.6.0, released
-C  on Wed Apr 19 15:50:57 UTC 2023
+C  This file is part of MUMPS 5.7.1, released
+C  on Thu May  2 10:15:09 UTC 2024
 C
 C
-C  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
 C  Mumps Technologies, University of Bordeaux.
 C
 C  This version of MUMPS is provided to you free of charge. It is
@@ -74,7 +74,7 @@ C
       INTEGER, INTENT(IN) :: NINCOLARR(KEEP(194))
       INTEGER, INTENT(IN) :: NINROWARR(KEEP(195))
       INTEGER, INTENT(IN) :: PTRDEBARR(KEEP(196))
-      REAL :: RHS_MUMPS(KEEP(255))
+      REAL :: RHS_MUMPS(KEEP8(85))
       INTEGER(8) :: PTRAST(KEEP(28))
       INTEGER(8) :: PTRFAC(KEEP(28))
       INTEGER(8) :: PAMASTER(KEEP(28))
@@ -187,7 +187,7 @@ C
       IOLDPS = PTLUST_S(STEP( INODE ))
       POSELT = PTRAST(STEP( INODE ))
       NFRONT = IW(IOLDPS+XSIZE)
-      NASS   = iabs(IW(IOLDPS+2+XSIZE))
+      NASS   = abs(IW(IOLDPS+2+XSIZE))
       LDAFS  = NASS
       IF ((KEEP(219).EQ.1).AND.(KEEP(207).EQ.1).AND.(KEEP(50).EQ.2)
      &   ) THEN
@@ -299,7 +299,8 @@ C
      &        0, LRGROUPS, NPARTSCB, 
      &        NPARTSASS, BEGS_BLR)
          CALL REGROUPING2(BEGS_BLR, NPARTSASS, NASS, NPARTSCB,
-     &        0, KEEP(488), .FALSE., KEEP(472))     
+     &        0, KEEP(488), .FALSE., KEEP(472), 
+     &        NFRONT, KEEP(1))     
          NB_BLR = NPARTSASS + NPARTSCB
          call MAX_CLUSTER(BEGS_BLR,NB_BLR,MAXI_CLUSTER)
          MAXI_RANK = KEEP(479)*MAXI_CLUSTER

@@ -1,10 +1,10 @@
 /*
  *
- *  This file is part of MUMPS 5.6.0, released
- *  on Wed Apr 19 15:50:57 UTC 2023
+ *  This file is part of MUMPS 5.7.1, released
+ *  on Thu May  2 10:15:09 UTC 2024
  *
  *
- *  Copyright 1991-2023 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
+ *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
  *  Mumps Technologies, University of Bordeaux.
  *
  *  This version of MUMPS is provided to you free of charge. It is
@@ -20,4 +20,8 @@
   F_SYMBOL(metis_idxsize,METIS_IDXSIZE)
 void MUMPS_CALL
 MUMPS_METIS_IDXSIZE(MUMPS_INT *metis_idx_size);
+#define MUMPS_METIS_OPTION_NUMBERING \
+  F_SYMBOL(metis_option_numbering,METIS_OPTION_NUMBERING)
+void MUMPS_CALL
+     MUMPS_METIS_OPTION_NUMBERING(MUMPS_INT *i);
 #endif
