@@ -29,6 +29,8 @@
 ***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
 highlighting and autocompletion.***
 
+***Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).***
+
 ## Introduction
 
 [🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for applications
