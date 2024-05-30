@@ -1568,9 +1568,15 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 
     ifstream input_file;
 
+    uintmax_t input_file_size{};
+
     for(const auto& file : file_list) {
-        input_file.open(fs::path(file));
-        if(input_file.is_open()) break;
+        const auto file_path = fs::path(file);
+        input_file.open(file_path);
+        if(input_file.is_open()) {
+            input_file_size = file_size(file_path);
+            break;
+        }
     }
 
     if(!input_file.is_open()) {
@@ -1579,21 +1585,24 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     }
 
     ofstream output_file(get_history_path(), std::ios_base::app | std::ios_base::out);
-    if(output_file.is_open()) output_file << "### start processing --> " << file_name << '\n';
+
+    const auto record_command = output_file.is_open() && input_file_size <= 102400;
+
+    if(record_command) output_file << "### start processing --> " << file_name << '\n';
 
     string all_line, command_line;
     while(!getline(input_file, command_line).fail()) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
-        if(output_file.is_open()) output_file << all_line << '\n';
+        if(record_command) output_file << all_line << '\n';
         if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) {
-            if(output_file.is_open()) output_file << "### Finish processing --> " << file_name << '\n';
+            if(record_command) output_file << "### finish processing --> " << file_name << '\n';
             return SUANPAN_EXIT;
         }
         all_line.clear();
     }
 
-    if(output_file.is_open()) output_file << "### finish processing --> " << file_name << '\n';
+    if(record_command) output_file << "### finish processing --> " << file_name << '\n';
     return SUANPAN_SUCCESS;
 }
 
