@@ -1611,6 +1611,10 @@ int execute_command(istringstream& command) {
     return code;
 }
 
+#ifdef SUANPAN_MSVC
+#pragma warning(disable:4996)
+#endif
+
 fs::path get_history_path() {
 #ifdef SUANPAN_WIN
     // ReSharper disable once CppDeprecatedEntity
