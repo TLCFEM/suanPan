@@ -41,6 +41,8 @@ int process_file(const shared_ptr<Bead>&, const char*);
 
 int execute_command(istringstream&);
 
+fs::path get_history_path();
+
 #endif
 
 //! @}

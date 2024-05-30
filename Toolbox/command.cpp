@@ -63,6 +63,7 @@
 #endif
 
 using std::ifstream;
+using std::ofstream;
 using std::string;
 using std::vector;
 
@@ -1577,13 +1578,22 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         return SUANPAN_EXIT;
     }
 
+    ofstream output_file(get_history_path(), std::ios_base::app | std::ios_base::out);
+    if(output_file.is_open()) output_file << "### start processing --> " << file_name << '\n';
+
     string all_line, command_line;
     while(!getline(input_file, command_line).fail()) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
-        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
+        if(output_file.is_open()) output_file << all_line << '\n';
+        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) {
+            if(output_file.is_open()) output_file << "### Finish processing --> " << file_name << '\n';
+            return SUANPAN_EXIT;
+        }
         all_line.clear();
     }
+
+    if(output_file.is_open()) output_file << "### finish processing --> " << file_name << '\n';
     return SUANPAN_SUCCESS;
 }
 
@@ -1599,4 +1609,17 @@ int execute_command(istringstream& command) {
 #endif
 
     return code;
+}
+
+fs::path get_history_path() {
+#ifdef SUANPAN_WIN
+    // ReSharper disable once CppDeprecatedEntity
+    auto history_path = fs::path(getenv("USERPROFILE")); // NOLINT(concurrency-mt-unsafe, clang-diagnostic-deprecated-declarations)
+#else
+    auto history_path = fs::path(getenv("HOME"));
+#endif
+
+    history_path.append(".suanpan-history.sp");
+
+    return history_path;
 }

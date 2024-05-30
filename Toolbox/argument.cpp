@@ -355,14 +355,7 @@ void print_helper() {
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
-#ifdef SUANPAN_WIN
-    // ReSharper disable once CppDeprecatedEntity
-    auto history_path = fs::path(getenv("USERPROFILE")); // NOLINT(concurrency-mt-unsafe, clang-diagnostic-deprecated-declarations)
-#else
-    auto history_path = fs::path(getenv("HOME"));
-#endif
-
-    history_path.append(".suanpan-history.sp");
+    const auto history_path = get_history_path();
 
     if(!exists(history_path)) {
         suanpan_info("It appears that this is the first time you run ");
