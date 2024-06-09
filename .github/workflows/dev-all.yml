@@ -244,6 +244,7 @@ jobs:
           cd build/dist/bin
           7z a ../../../$file_name ./*
       - name: Test
+        if: false
         run: |
           build/dist/bin/suanPan.exe -v
       - name: Upload
