@@ -26,10 +26,12 @@
 
 [![marketplace](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
 
-***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
-highlighting and autocompletion.***
+> [!IMPORTANT]
+> ***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
+> highlighting and autocompletion.***
 
-***Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).***
+> [!IMPORTANT]
+> ***Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).***
 
 ## Introduction
 
@@ -41,7 +43,9 @@ high-quality C++ code and is targeted to provide an efficient, concise, flexible
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-Please check the documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references. Please star ⭐ the project!
+> [!IMPORTANT]
+> Please check the documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
+> Please star ⭐ the project!
 
 ## Features
 
@@ -110,9 +114,11 @@ It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Exte
 fails, please check if your CPU supports AVX2.
 Alternatively, you can try the `no-avx` version.
 
-> Check artifacts of [workflows](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml) for the latest binaries.
-
 ### Windows
+
+> [!NOTE]
+> It may be necessary to install the VC++ redistributable [package](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+> If the application prompts that some file, such as `msvcp140.dll`, is missing, please install the redistributable package.
 
 #### Binary Package
 
@@ -191,6 +197,17 @@ flatpak install suanPan
 echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 ```
 
+### Docker
+
+It is also possible to compile the package via docker, check the dockerfiles under the `Script` folder, for any
+questions please open an issue.
+
+One can directly pull the image.
+
+```bash
+docker pull tlcfem/suanpan
+```
+
 ### Other Platforms
 
 Precompiled binaries are provided via CI/CD on macOS, Windows, and Ubuntu.
@@ -208,7 +225,9 @@ Advanced users can compile the program from source by themselves to enable GPU b
 an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) and/or MAGMA library.
 
 Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on macOS), it may be required to update/install
-proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu 22.04,
+proper `libstdc++` (or `libc++`) version.
+The easiest way is to install the same compiler.
+For example, on Ubuntu 22.04,
 
 ```bash
 # Ubuntu
@@ -221,9 +240,6 @@ For VTK enabled versions, it may be necessary to install OpenGL.
 # Ubuntu
 sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev libglvnd-dev
 ```
-
-It is also possible to compile the package via docker, check the dockerfiles under the `Script` folder, for any
-questions please open an issue.
 
 ### Automation Related
 
