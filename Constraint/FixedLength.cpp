@@ -132,12 +132,13 @@ int MaxForce::process(const shared_ptr<DomainBase>& D) {
 
     if(0u == num_size) return SUANPAN_SUCCESS;
 
-    trial_flag = true;
-
     vec nodal_resistance(dof_reference.n_elem);
     for(auto I = 0llu; I < nodal_resistance.n_elem; ++I) nodal_resistance(I) = resistance(dof_encoding(I));
 
-    if(norm(nodal_resistance) > max_force) set_multiplier_size(0);
+    if(norm(nodal_resistance) > max_force) {
+        trial_flag = true;
+        set_multiplier_size(0);
+    }
 
     return SUANPAN_SUCCESS;
 }
