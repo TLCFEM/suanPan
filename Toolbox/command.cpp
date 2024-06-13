@@ -1371,6 +1371,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     };
 
     if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
+    if(is_equal(command_id, "embed2d") || is_equal(command_id, "embed3d")) return constraint_handler();
     if(is_equal(command_id, "finiterestitutionwall") || is_equal(command_id, "finiterestitutionwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "finiterigidwall") || is_equal(command_id, "finiterigidwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "finiterigidwallmultiplier")) return constraint_handler();
@@ -1380,14 +1381,20 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "fixedlength3d")) return constraint_handler();
     if(is_equal(command_id, "groupmultiplierbc")) return constraint_handler();
     if(is_equal(command_id, "grouppenaltybc")) return constraint_handler();
+    if(is_equal(command_id, "maxforce2d") || is_equal(command_id, "maxforce3d")) return constraint_handler();
+    if(is_equal(command_id, "maxgap2d") || is_equal(command_id, "maxgap3d")) return constraint_handler();
+    if(is_equal(command_id, "mingap2d") || is_equal(command_id, "mingap3d")) return constraint_handler();
     if(is_equal(command_id, "mpc")) return constraint_handler();
     if(is_equal(command_id, "multiplierbc")) return constraint_handler();
+    if(is_equal(command_id, "nodefacet")) return constraint_handler();
+    if(is_equal(command_id, "nodeline")) return constraint_handler();
     if(is_equal(command_id, "particlecollision2d")) return constraint_handler();
     if(is_equal(command_id, "particlecollision3d")) return constraint_handler();
     if(is_equal(command_id, "penaltybc")) return constraint_handler();
     if(is_equal(command_id, "restitutionwall") || is_equal(command_id, "restitutionwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "rigidwall") || is_equal(command_id, "rigidwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "rigidwallmultiplier")) return constraint_handler();
+    if(is_equal(command_id, "sleeve2d") || is_equal(command_id, "sleeve3d")) return constraint_handler();
 
     // testers
     if(is_equal(command_id, "materialtest1d")) return test_material(domain, command, 1);
