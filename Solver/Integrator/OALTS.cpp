@@ -64,13 +64,11 @@ void OALTS::assemble_matrix() {
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
-    if(if_starting) [[unlikely]]
-    {
+    if(if_starting) [[unlikely]] {
         W->get_stiffness() += 4. / DT / DT * W->get_mass();
         W->get_stiffness() += W->is_nonviscous() ? 2. / DT * (W->get_damping() + W->get_nonviscous()) : 2. / DT * W->get_damping();
     }
-    else [[likely]]
-    {
+    else [[likely]] {
         W->get_stiffness() += P1 * P1 * W->get_mass();
         W->get_stiffness() += W->is_nonviscous() ? P1 * (W->get_damping() + W->get_nonviscous()) : P1 * W->get_damping();
     }
@@ -80,13 +78,11 @@ int OALTS::update_trial_status() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    if(if_starting) [[unlikely]]
-    {
+    if(if_starting) [[unlikely]] {
         W->update_trial_velocity(2. / DT * (W->get_trial_displacement() - W->get_current_displacement()) - W->get_current_velocity());
         W->update_trial_acceleration(2. / DT * (W->get_trial_velocity() - W->get_current_velocity()) - W->get_current_acceleration());
     }
-    else [[likely]]
-    {
+    else [[likely]] {
         W->update_trial_velocity(P1 * W->get_trial_displacement() + P2 * W->get_current_displacement() + P3 * W->get_pre_displacement() - B10 * W->get_current_velocity() - B20 * W->get_pre_velocity());
         W->update_trial_acceleration(P1 * W->get_trial_velocity() + P2 * W->get_current_velocity() + P3 * W->get_pre_velocity() - B10 * W->get_current_acceleration() - B20 * W->get_pre_acceleration());
     }

@@ -69,6 +69,22 @@ public:
     Sleeve(unsigned, unsigned, unsigned, double, double, uvec&&);
 };
 
+class MaxForce final : public FixedLength {
+    const double max_force;
+
+    bool trial_flag = false;
+    bool current_flag = false;
+
+public:
+    MaxForce(unsigned, unsigned, unsigned, double, uvec&&);
+
+    int process(const shared_ptr<DomainBase>&) override;
+
+    void commit_status() override;
+    void clear_status() override;
+    void reset_status() override;
+};
+
 #endif
 
 //! @}

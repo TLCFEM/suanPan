@@ -47,17 +47,17 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
     const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
 
     if(const auto t_gap = accu(square(coor + t_disp)); min_bound && max_bound) {
-        if(0 == num_size && t_gap > min_gap && t_gap < max_gap) return SUANPAN_SUCCESS;
+        if(0u == num_size && t_gap > min_gap && t_gap < max_gap) return SUANPAN_SUCCESS;
 
         auxiliary_load = (2. * std::sqrt(t_gap) < std::sqrt(min_gap) + std::sqrt(max_gap) ? min_gap : max_gap) - dot(coor, coor);
     }
     else if(min_bound && !max_bound) {
-        if(0 == num_size && t_gap > min_gap) return SUANPAN_SUCCESS;
+        if(0u == num_size && t_gap > min_gap) return SUANPAN_SUCCESS;
 
         auxiliary_load = min_gap - dot(coor, coor);
     }
     else if(!min_bound && max_bound) {
-        if(0 == num_size && t_gap < max_gap) return SUANPAN_SUCCESS;
+        if(0u == num_size && t_gap < max_gap) return SUANPAN_SUCCESS;
 
         auxiliary_load = max_gap - dot(coor, coor);
     }
@@ -115,4 +115,45 @@ Sleeve::Sleeve(const unsigned T, const unsigned S, const unsigned D, const doubl
     access::rw(max_bound) = true;
     access::rw(min_gap) = M1 * M1;
     access::rw(max_gap) = M2 * M2;
+}
+
+MaxForce::MaxForce(const unsigned T, const unsigned S, const unsigned D, const double MF, uvec&& N)
+    : FixedLength(T, S, D, std::move(N))
+    , max_force(MF) {}
+
+int MaxForce::process(const shared_ptr<DomainBase>& D) {
+    if(current_flag) {
+        // if already exceeded, the constraint is not triggered
+        set_multiplier_size(0);
+        return SUANPAN_SUCCESS;
+    }
+
+    if(SUANPAN_SUCCESS != FixedLength::process(D)) return SUANPAN_FAIL;
+
+    if(0u == num_size) return SUANPAN_SUCCESS;
+
+    vec nodal_resistance(dof_reference.n_elem);
+    for(auto I = 0llu; I < nodal_resistance.n_elem; ++I) nodal_resistance(I) = resistance(dof_encoding(I));
+
+    if(norm(nodal_resistance) > max_force) {
+        trial_flag = true;
+        set_multiplier_size(0);
+    }
+
+    return SUANPAN_SUCCESS;
+}
+
+void MaxForce::commit_status() {
+    current_flag = trial_flag;
+    return FixedLength::commit_status();
+}
+
+void MaxForce::clear_status() {
+    current_flag = trial_flag = false;
+    return FixedLength::clear_status();
+}
+
+void MaxForce::reset_status() {
+    trial_flag = current_flag;
+    return FixedLength::reset_status();
 }
