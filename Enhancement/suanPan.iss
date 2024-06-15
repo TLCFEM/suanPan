@@ -36,8 +36,8 @@ SetupIconFile=..\Resource\suanPan-3.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-ArchitecturesInstallIn64BitMode=x64
-ArchitecturesAllowed=x64
+ArchitecturesInstallIn64BitMode=win64
+ArchitecturesAllowed=win64
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -48,16 +48,17 @@ Name: "updater"; Description: "Include updater.exe"
 Name: "vcredist"; Description: "Include Microsoft Visual C++ Redistributable *.dll"
 
 [Files]
-Source: "..\..\suanPan\build\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\build\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libiomp5md.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StoragePath}libmmd.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}tbb12.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}tbbmalloc.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}tbbmalloc_proxy.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StoragePath}updater.exe"; DestDir: "{app}"; Flags: ignoreversion; Tasks: updater
-Source: "{#StoragePath}msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
-Source: "{#StoragePath}vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
-Source: "{#StoragePath}vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
+Source: "..\Libs\vs\tbb12.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Libs\vs\tbbmalloc.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Libs\vs\tbbmalloc_proxy.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Checker\updater.exe"; DestDir: "{app}"; Flags: ignoreversion; Tasks: updater
+Source: "..\Libs\vc\msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
+Source: "..\Libs\vc\vcomp140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
+Source: "..\Libs\vc\vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
+Source: "..\Libs\vc\vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion; Tasks: vcredist
 Source: ".\AddAssociation.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\suanPan.sublime-completions"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\suanPan.sublime-syntax"; DestDir: "{app}"; Flags: ignoreversion
