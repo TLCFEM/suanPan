@@ -109,10 +109,11 @@ details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obt
 
 ## Installation
 
-Only the 64-bit version is compiled.
-It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
-fails, please check if your CPU supports AVX2.
-Alternatively, you can try the `no-avx` version.
+> [!WARNING]
+> Only the 64-bit version is compiled.
+> It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
+> fails, please check if your CPU supports AVX2.
+> Alternatively, you can try the `no-avx` version.
 
 ### Windows
 
