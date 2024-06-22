@@ -19,10 +19,6 @@ converger RelIncreDisp 1 1E-4 10 1
 
 analyze
 
-peek node 2
-
-peek element 1
-
 reset
 clear
 exit

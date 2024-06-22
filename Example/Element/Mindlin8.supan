@@ -163,7 +163,13 @@ converger RelIncreDisp 1 1E-10 2 1
 
 analyze
 
-# -5.4091E-03 4.3691E-17 9.8839E-17
+# Node 57:
+# Coordinate:
+#   5.0000e-01  5.0000e-01
+# Displacement:
+#  -5.4091e-03 -4.9166e-15 -4.9388e-16
+# Resistance:
+#  -1.0000e+00 -1.0568e-14  2.1719e-15
 peek node 57
 
 exit

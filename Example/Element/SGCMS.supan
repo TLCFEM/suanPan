@@ -17,11 +17,17 @@ step static 1
 set ini_step_size 1
 set fixed_step_size 1
 
-converger RelIncreDisp 1 1E-8 2 1
+converger RelIncreDisp 1 1E-10 2 1
 
 analyze
 
-# 0.6924 -2.3047 0 0 0 -1.2997
+# Node 3:
+# Coordinate:
+#   2.0000e+00  1.0000e+00  0.0000e+00
+# Displacement:
+#   6.9243e-01 -2.3047e+00  0.0000e+00  0.0000e+00  0.0000e+00 -1.2997e+00
+# Resistance:
+#  -3.3307e-16 -1.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00  0.0000e+00
 peek node 3
 
 peek element 1

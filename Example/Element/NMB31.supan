@@ -37,14 +37,15 @@ set fixed_step_size true
 
 converger RelIncreDisp 1 1E-8 5 1
 
-analyze
+analyze --ignore-warning --ignore-error
 
 # Node 3:
-# 1.0000 2.0000 0
+# Coordinate:
+#   1.0000e+00  2.0000e+00  0.0000e+00
 # Displacement:
-# 0 0 0.0017 -0.0012 -0.0003 0
+#   0.0000e+00  0.0000e+00  1.7367e-03 -1.1577e-03 -2.8935e-04  0.0000e+00
 # Resistance:
-# 0 0 1.0000e+00 -3.7470e-16 0 0
+#   0.0000e+00  0.0000e+00  1.0000e+00 -1.3878e-16  0.0000e+00  0.0000e+00
 peek node 3
 
 peek element 1

@@ -64,7 +64,13 @@ step static 1
 
 analyze
 
-# 20.0424 99.2251 18.1661
+# Node 6:
+# Coordinate:
+#   1.0000e+01  0.0000e+00
+# Displacement:
+#   2.0042e+01  9.9225e+01  1.8166e+01
+# Resistance:
+#   1.0000e+03  4.7632e-12 -7.8408e-12
 peek node 6
 
 peek element 1

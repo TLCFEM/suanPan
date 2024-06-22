@@ -29,8 +29,23 @@ converger RelIncreDisp 1 1E-8 5 1
 
 analyze
 
-# -2.6967e-02 3.2715e-01 4.8652e-01 cload
-# -6.8955e-03 -1.6589e-01 -2.4828e-01 lineudl2d
+# cload
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#  -2.6967e-02  3.2715e-01  4.8652e-01
+# Resistance:
+#   1.5337e-12  1.0000e+01  3.3688e-13
+#
+# lineudl2d
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#  -6.8955e-03 -1.6589e-01 -2.4828e-01
+# Resistance:
+#   9.7470e-15 -5.0000e+00  1.4970e-15
 peek node 2
 
 peek element 1
