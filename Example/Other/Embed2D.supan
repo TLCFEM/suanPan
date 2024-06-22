@@ -31,11 +31,12 @@ converger RelIncreDisp 1 1E-10 10 1
 analyze
 
 # Node 7:
-# 0.5000 0.5000
+# Coordinate:
+#   5.0000e-01  5.0000e-01
 # Displacement:
-# -1.4786e-05 1.9836e-04
+#  -1.4786e-05  1.9836e-04
 # Resistance:
-# -0.0666 0.0195
+#  -6.6591e-02  1.9459e-02
 peek node 7
 
 reset

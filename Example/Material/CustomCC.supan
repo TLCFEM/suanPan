@@ -38,7 +38,7 @@ analyze
 # Displacement:
 #   0.0000e+00  1.4035e-03 -2.0000e-03
 # Resistance:
-#  -3.4627e-13 -1.6073e-13 -1.8623e+03
+#  -5.4515e-13 -3.7589e-13 -1.8623e+03
 peek node 6
 
 peek element 1

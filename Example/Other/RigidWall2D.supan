@@ -28,15 +28,15 @@ analyze
 
 # Node 1:
 # Coordinate:
-# 0 1.0000
+#   0.0000e+00  1.0000e+00
 # Displacement:
-# 0 -0.8956
+#   0.0000e+00 -8.9565e-01
 # Resistance:
-# 0 0
+#   0.0000e+00  0.0000e+00
 # Velocity:
-# 0 1.3396
+#   0.0000e+00  1.3396e+00
 # Acceleration:
-# 0 -1.0000
+#   0.0000e+00 -1.0000e+00
 peek node 1
 
 exit

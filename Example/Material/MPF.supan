@@ -10,23 +10,24 @@ material MPF 2 100 5 .1 20. 18.5 .15 .01 7. true
 element T2D2 1 1 2 1 10
 element T2D2 2 3 2 2 10
 
-fix 1 P 1 3
+fix2 1 P 1 3
 
 step static 1
 set ini_step_size .1
 
 cload 1 0 80 2 2
 
-converger RelIncreDisp 1 1E-8 10 1
+converger RelIncreDisp 1 1E-10 10 1
 
 analyze
 
 # Node 2:
-# 4.0000 0
+# Coordinate:
+#   4.0000e+00  0.0000e+00
 # Displacement:
-# -2.4667 10.6500
+#  -2.4667e+00  1.0650e+01
 # Resistance:
-# 1.0667e-06 8.0000e+01
+#   1.4211e-14  8.0000e+01
 peek node 2
 
 peek element 1 2

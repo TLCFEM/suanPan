@@ -24,6 +24,13 @@ converger LogicOR 3 1 2
 
 analyze
 
+# Node 2:
+# Coordinate:
+#   4.0000e+00  0.0000e+00
+# Displacement:
+#  -8.0000e-01  3.5667e+00
+# Resistance:
+#  -9.5541e-08  1.5000e+02
 peek node 2
 
 peek element 1 2

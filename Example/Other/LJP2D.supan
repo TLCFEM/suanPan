@@ -70,15 +70,15 @@ analyze
 
 # Node 3:
 # Coordinate:
-# -2.4000 -0.8920
+#  -2.4000e+00 -8.9200e-01
 # Displacement:
-# 1.4826 1.3684
+#   1.4826e+00  1.3684e+00
 # Resistance:
-# 0 0
+#   0.0000e+00  0.0000e+00
 # Velocity:
-# 1.6300 1.7174
+#   1.6300e+00  1.7174e+00
 # Acceleration:
-# -0.8358 -1.9236
+#  -8.3582e-01 -1.9236e+00
 peek node 3
 
 # save recorder 1

@@ -167,7 +167,13 @@ converger RelIncreDisp 1 1E-12 50 1
 
 analyze
 
-# 6.0731E-18 6.8028E-01
+# Node 83:
+# Coordinate:
+#   4.0000e+00  5.0000e-01
+# Displacement:
+#  -2.7500e-17  6.8028e-01
+# Resistance:
+#   1.7542e-14  2.0000e+00
 peek node 83
 
 peek element 1

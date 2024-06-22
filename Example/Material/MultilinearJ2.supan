@@ -26,12 +26,17 @@ set fixed_step_size 1
 set ini_step_size 1E-2
 set symm_mat 0
 
-converger RelIncreDisp 1 1E-8 50 1
+converger RelIncreDisp 1 1E-10 50 1
 
 analyze
 
+# Node 7:
+# Coordinate:
+#  -5.0000e+00  5.0000e+00  5.0000e+00
+# Displacement:
+#   3.7500e-02 -3.7500e-02  1.0000e-01
 # Resistance:
-# 4.1942e-05 -4.1942e-05 5.2083e+03
+#   3.4626e-13  1.6967e-13  5.2083e+03
 peek node 5 6 7 8
 
 peek element 1
