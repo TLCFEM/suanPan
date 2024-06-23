@@ -43,14 +43,14 @@ analyze
 
 # peek element 1
 
-# Node 5:
+# Node 7:
 # Coordinate:
-#   5.0000e+00 -5.0000e+00  5.0000e+00
+#  -5.0000e+00  5.0000e+00  5.0000e+00
 # Displacement:
-#   0.0000e+00  0.0000e+00  0.0000e+00
+#   5.1689e-02 -5.1689e-02  0.0000e+00
 # Resistance:
-#  -1.8320e-12  3.9560e-12 -8.6148e+04
-peek node 5
+#   8.0056e-13  2.3996e-12 -8.6148e+04
+peek node 7
 
 # save recorder 1 2
 

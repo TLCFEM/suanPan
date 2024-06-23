@@ -62,7 +62,7 @@ analyze
 # Displacement:
 #   5.9392e+00 -5.5060e+00  6.7793e-01
 # Resistance:
-#  -2.6251e-08 -9.1406e+00  3.5243e-12
+#  -2.5798e-08 -9.1406e+00  3.7517e-12
 peek node 11
 
 peek solver 1
