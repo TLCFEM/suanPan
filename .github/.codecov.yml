@@ -12,6 +12,7 @@ parsers:
 ignore:
   - "**/*Parser.cpp"
   - "Developer"
+  - "Include"
   - "MSVC"
   - "Recorder/OutputType.cpp"
   - "Toolbox/amd-src"
