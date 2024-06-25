@@ -35,6 +35,13 @@ step static 1
 
 analyze
 
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00  0.0000e+00
+# Displacement:
+#  -1.1874e-16 -1.2746e-17  1.0000e+00  0.0000e+00 -1.5000e+00 -1.9119e-17
+# Resistance:
+#  -1.5268e-13 -1.0593e-12  3.6722e+05  0.0000e+00  9.8339e-12  3.1593e-13
 peek node 2
 
 reset

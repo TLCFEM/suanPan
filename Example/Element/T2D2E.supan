@@ -7,6 +7,9 @@ material MPF 1 100 300 .4
 
 element T2D2 1 1 2 1 100 0 0 0 10
 
+element T2D2 4 1 4 1 100 # wrong node
+element T2D2 5 1 2 2 100 # wrong material
+
 fix 1 1 1
 fix 2 2 1 2
 
@@ -18,10 +21,6 @@ cload 1 0 -100 1 2
 converger RelIncreDisp 1 1E-4 10 1
 
 analyze
-
-peek node 2
-
-peek element 1
 
 reset
 clear

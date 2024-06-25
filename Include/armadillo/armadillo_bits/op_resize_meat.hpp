@@ -27,7 +27,7 @@ inline
 void
 op_resize::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_resize>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -54,9 +54,12 @@ inline
 void
 op_resize::apply_mat_inplace(Mat<eT>& A, const uword new_n_rows, const uword new_n_cols)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   if( (A.n_rows == new_n_rows) && (A.n_cols == new_n_cols) )  { return; }
+  
+  arma_conform_check( (A.vec_state == 1) && (new_n_cols != 1), "resize(): requested size is not compatible with column vector layout" );
+  arma_conform_check( (A.vec_state == 2) && (new_n_rows != 1), "resize(): requested size is not compatible with row vector layout"    );
   
   if(A.is_empty())  { A.zeros(new_n_rows, new_n_cols); return; }
   
@@ -74,7 +77,7 @@ inline
 void
 op_resize::apply_mat_noalias(Mat<eT>& out, const Mat<eT>& A, const uword new_n_rows, const uword new_n_cols)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   out.set_size(new_n_rows, new_n_cols);
   
@@ -100,7 +103,7 @@ inline
 void
 op_resize::apply(Cube<typename T1::elem_type>& out, const OpCube<T1,op_resize>& in)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   typedef typename T1::elem_type eT;
   
@@ -128,7 +131,7 @@ inline
 void
 op_resize::apply_cube_inplace(Cube<eT>& A, const uword new_n_rows, const uword new_n_cols, const uword new_n_slices)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   if( (A.n_rows == new_n_rows) && (A.n_cols == new_n_cols) && (A.n_slices == new_n_slices) )  { return; }
   
@@ -148,7 +151,7 @@ inline
 void
 op_resize::apply_cube_noalias(Cube<eT>& out, const Cube<eT>& A, const uword new_n_rows, const uword new_n_cols, const uword new_n_slices)
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   out.set_size(new_n_rows, new_n_cols, new_n_slices);
   

@@ -40,15 +40,16 @@ converger RelIncreDisp 1 1E-11 10 1
 analyze
 
 # Node 2:
-# 1.0000 0
+# Coordinate:
+#   1.0000e+00  0.0000e+00
 # Displacement:
-# -0.0002 0
+#  -1.6600e-04  0.0000e+00
 # Resistance:
-# -0.0690 0
+#  -6.9027e-02  0.0000e+00
 # Velocity:
-# 6.5088e-05 0
+#   6.5088e-05  0.0000e+00
 # Acceleration:
-# 0.0066 0
+#   6.5740e-03  0.0000e+00
 peek node 2
 
 peek material 2 3

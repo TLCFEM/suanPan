@@ -34,11 +34,12 @@ save recorder 1 2
 peek element 1
 
 # Node 3:
-# 2.0000 0
+# Coordinate:
+#   2.0000e+00  0.0000e+00
 # Displacement:
-# 0.0500 0
+#   5.0000e-02  0.0000e+00
 # Resistance:
-# 63.4232 0
+#   6.3423e+01  0.0000e+00
 peek node 3
 
 save recorder 1

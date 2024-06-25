@@ -24,11 +24,11 @@ analyze
 
 # Node 2:
 # Coordinate:
-# 4.0000 0
+#   4.0000e+00  0.0000e+00
 # Displacement:
-# -3.5333 14.8500
+#  -3.5333e+00  1.4850e+01
 # Resistance:
-# 2.8422e-14 1.0000e+02
+#  -5.6843e-14  1.0000e+02
 peek node 2
 
 peek solver 1

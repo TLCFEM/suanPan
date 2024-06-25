@@ -50,6 +50,15 @@ peek element 1
 
 # save recorder 1 2
 
+# Node 3:
+# Coordinate:
+#   0.0000e+00  2.0000e+00
+# Displacement:
+#   0.0000e+00 -2.7000e-02
+# Resistance:
+#   2.1147e+01 -4.6151e+01
+peek node 3 6
+
 reset
 clear
 exit

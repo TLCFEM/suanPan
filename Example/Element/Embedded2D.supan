@@ -20,8 +20,8 @@ element T2D2 3 9 10 2 1
 element Embedded2D 4 1 9 1E6
 element Embedded2D 5 2 10 1E6
 
-fix 1 1 1 4
-fix 2 2 1 2 5 6
+fix2 1 1 1 4
+fix2 2 2 1 2 5 6
 
 cload 1 0 1 1 6 7
 
@@ -33,6 +33,21 @@ converger RelIncreDisp 1 1E-10 50 1
 
 analyze
 
+# Node 9:
+# Coordinate:
+#   5.0000e-01  5.0000e-01
+# Displacement:
+#   9.8000e-05  0.0000e+00
+# Resistance:
+#  -1.3323e-15  0.0000e+00
+# 
+# Node 10:
+# Coordinate:
+#   2.5000e+00  5.0000e-01
+# Displacement:
+#   4.0980e-03  1.0611e-33
+# Resistance:
+#   6.1129e-13 -9.8173e-29
 peek node 9 10 2 3 6 7
 
 reset

@@ -61,7 +61,13 @@ cload 2 0 100 1 2
 
 analyze --ignore-warning
 
-# 0.0770 -0.0985
+# Node 2:
+# Coordinate:
+#   4.0000e+00  0.0000e+00
+# Displacement:
+#   7.6960e-02 -9.8493e-02
+# Resistance:
+#   2.0000e+02 -9.9522e-11
 peek node 2
 
 peek element 2

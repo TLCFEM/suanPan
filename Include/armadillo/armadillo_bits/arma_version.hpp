@@ -21,10 +21,10 @@
 
 
 
-#define ARMA_VERSION_MAJOR 12
-#define ARMA_VERSION_MINOR 8
-#define ARMA_VERSION_PATCH 4
-#define ARMA_VERSION_NAME  "Cortisol Injector"
+#define ARMA_VERSION_MAJOR 14
+#define ARMA_VERSION_MINOR 0
+#define ARMA_VERSION_PATCH 0
+#define ARMA_VERSION_NAME  "Stochastic Parrot"
 
 
 

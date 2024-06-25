@@ -46,11 +46,11 @@ analyze --ignore-error
 # Displacement:
 #   1.0193e-02  0.0000e+00
 # Resistance:
-#   8.2929e-01  0.0000e+00
+#   8.2925e-01  0.0000e+00
 # Velocity:
-#   1.7389e-03  0.0000e+00
+#   1.7307e-03  0.0000e+00
 # Acceleration:
-#  -8.6931e-03  0.0000e+00
+#  -8.6955e-03  0.0000e+00
 peek node 2
 
 peek group 1

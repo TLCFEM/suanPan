@@ -41,6 +41,10 @@ converger RelIncreDisp 1 1E-10 20 1
 
 analyze
 
+peek element 1
+
+# save recorder 1
+
 # Node 1:
 # Coordinate:
 #   0.0000e+00  0.0000e+00
@@ -49,10 +53,6 @@ analyze
 # Resistance:
 #   1.3824e-10  3.6347e+08
 peek node 1
-
-peek element 1
-
-# save recorder 1
 
 reset
 clear

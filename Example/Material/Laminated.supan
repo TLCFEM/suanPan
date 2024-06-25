@@ -33,17 +33,9 @@ peek element 1
 # Coordinate:
 #   1.0000e+00  1.0000e+00
 # Displacement:
-#  -5.4099e-02  5.0000e-02
+#  -1.4211e-02  5.0000e-02
 # Resistance:
-#   5.1781e-16  1.0248e+00
-#
-# Node 4:
-# Coordinate:
-#   0.0000e+00  1.0000e+00
-# Displacement:
-#   0.0000e+00  5.0000e-02
-# Resistance:
-#   1.3181e+00 -7.1328e-01
+#   1.3045e-15  5.3495e+01
 peek node 1 2 3 4
 
 reset

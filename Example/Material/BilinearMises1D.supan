@@ -23,11 +23,12 @@ converger AbsIncreDisp 1 1E-10 10 1
 analyze
 
 # Node 2:
-# 4.0000 0
+# Coordinate:
+#   4.0000e+00  0.0000e+00
 # Displacement:
-# 1.0000 0
+#   1.0000e+00  0.0000e+00
 # Resistance:
-# 30.0000 0
+#   3.0000e+01  0.0000e+00
 peek node 2
 
 reset
