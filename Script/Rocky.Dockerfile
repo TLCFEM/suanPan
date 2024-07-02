@@ -1,4 +1,4 @@
-FROM tlcfem/suanpan-env:latest as build
+FROM tlcfem/suanpan-env:latest AS build
 
 RUN git clone -b dev --depth 1 https://github.com/TLCFEM/suanPan.git
 RUN cd suanPan && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_MULTITHREAD=ON -DUSE_HDF5=ON -DUSE_VTK=ON -DUSE_MKL=ON -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DUSE_INTEL_OPENMP=OFF -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=suanPan-linux-mkl-vtk -DBUILD_PACKAGE=RPM ..
@@ -8,7 +8,7 @@ RUN cd suanPan/build && cp suanPan*.rpm / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM rockylinux:9 as runtime
+FROM rockylinux:9 AS runtime
 
 COPY --from=build /suanPan*.rpm /
 

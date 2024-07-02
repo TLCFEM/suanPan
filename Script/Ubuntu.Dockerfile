@@ -1,4 +1,4 @@
-FROM debian:12 as build
+FROM debian:12 AS build
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -29,7 +29,7 @@ RUN cd suanPan/build && cp suanPan*.deb / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM debian:12 as runtime
+FROM debian:12 AS runtime
 
 COPY --from=build /suanPan*.deb /
 
