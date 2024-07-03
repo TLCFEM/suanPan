@@ -1,0 +1,9 @@
+{
+	"name": "mkl-vtk-cuda",
+	// two iamges are provided
+	// 1. The following contains MKL and VTK
+	// "image": "tlcfem/suanpan-env",
+	// 2. The following contains MKL and VTK and CUDA
+	// "image": "tlcfem/suanpan-env-cuda", 
+	"image": "tlcfem/suanpan-env-cuda"
+}
