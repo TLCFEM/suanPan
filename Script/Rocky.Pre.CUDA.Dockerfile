@@ -1,3 +1,8 @@
+# This Dockerfile is creating a base image for compiling suanPan.
+# It is based on the official NVIDIA CUDA image.
+# Compared to the Rocky.Pre.Dockerfile, it adds the CUDA toolkit.
+# If you need the GPU related solvers, you should use this Dockerfile.
+
 FROM nvidia/cuda:12.5.0-devel-rockylinux9
 
 RUN dnf install -y dnf-plugins-core

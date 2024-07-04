@@ -1,3 +1,7 @@
+# This Dockerfile is creating a base image for compiling suanPan.
+# It preinstalls the MKL library, which is required as a fast linear algebra driver that does the heavy lifting.
+# It installs the VTK library, which is required to generate VTK files for visualization.
+
 FROM rockylinux:9
 
 RUN dnf upgrade --refresh -y && dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git
