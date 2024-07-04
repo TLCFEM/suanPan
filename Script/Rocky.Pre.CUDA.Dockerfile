@@ -11,3 +11,6 @@ RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.2/VTK-9.2.6.tar.gz && tar xf VTK-9.2.6.tar.gz && \
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.2.6 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
+
+RUN useradd -u 1000 nonroot
+USER nonroot
