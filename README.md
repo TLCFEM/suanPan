@@ -285,7 +285,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**VTK**](https://vtk.org/) version 9.2.6
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.0
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
-- [**Armadillo**](http://arma.sourceforge.net/) version 14.0.0
+- [**Armadillo**](http://arma.sourceforge.net/) version 14.0.1
 - [**ensmallen**](https://ensmallen.org/) version 2.21.1
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2024.1.0
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.5.4
