@@ -239,7 +239,7 @@ For VTK enabled versions, it may be necessary to install OpenGL.
 
 ```bash
 # Ubuntu
-sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev libglvnd-dev
+sudo apt install libglvnd-dev
 ```
 
 ### Automation Related
