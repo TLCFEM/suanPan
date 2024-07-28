@@ -23,4 +23,4 @@ jobs:
           context: .
           file: ./Script/Rocky.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/suanpan:latest
+          tags: tlcfem/suanpan:latest
