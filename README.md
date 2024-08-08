@@ -287,7 +287,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
 - [**Armadillo**](http://arma.sourceforge.net/) version 14.0.1
 - [**ensmallen**](https://ensmallen.org/) version 2.21.1
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2024.1.0
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2024.2.1
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.5.4
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**whereami**](https://github.com/gpakosz/whereami)
