@@ -87,7 +87,8 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     // along thickness
     const IntegrationPlan t_plan(1, 3, IntegrationType::GAUSS);
 
-    mat m_stiffness(s_size / 2, s_size / 2, fill::zeros), pnt(2, 8);
+    mat pnt(2, 8);
+    mat::fixed<12, 12> m_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
 
     int_pt.clear();
     int_pt.reserve(m_plan.n_rows);
@@ -142,12 +143,14 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
         for(unsigned J = 0; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
             s_ip.emplace_back(t_eccentricity, .5 * thickness * t_plan(J, 1) * m_plan(I, 2) * det_jacob, mat_proto->get_copy());
-            m_stiffness += s_ip.back().factor * m_ip.BM.t() * mat_stiff * m_ip.BM;
-            p_stiffness += t_eccentricity * t_eccentricity * s_ip.back().factor * m_ip.BP.t() * mat_stiff * m_ip.BP;
+            m_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BM * s_ip.back().factor;
+            p_stiffness += m_ip.BP.t() * mat_stiff * m_ip.BP * s_ip.back().factor * t_eccentricity * t_eccentricity;
+            mp_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BP * s_ip.back().factor * t_eccentricity;
+            pm_stiffness += m_ip.BP.t() * mat_stiff * m_ip.BM * s_ip.back().factor * t_eccentricity;
         }
     }
 
-    transform_from_local_to_global(initial_stiffness = reshuffle(m_stiffness, p_stiffness));
+    transform_from_local_to_global(initial_stiffness = reshuffle(m_stiffness, p_stiffness, mp_stiffness, pm_stiffness));
     trial_stiffness = current_stiffness = initial_stiffness;
 
     return SUANPAN_SUCCESS;
