@@ -37,13 +37,7 @@ vec ShellBase::reshuffle(const vec& membrane_resistance, const vec& plate_resist
     return total_resistance;
 }
 
-mat ShellBase::reshuffle(const mat& membrane_stiffness, const mat& plate_stiffness) {
-    suanpan_assert([&] {
-        if(membrane_stiffness.n_cols != membrane_stiffness.n_rows) throw invalid_argument("size conflicts");
-        if(membrane_stiffness.n_cols != plate_stiffness.n_cols) throw invalid_argument("size conflicts");
-        if(plate_stiffness.n_cols != plate_stiffness.n_rows) throw invalid_argument("size conflicts");
-    });
-
+mat ShellBase::reshuffle(const mat& membrane_stiffness, const mat& plate_stiffness, const mat& mp_stiffness, const mat& pm_stiffness) {
     const auto t_size = 2 * plate_stiffness.n_cols;
 
     mat total_stiffness(t_size, t_size, fill::zeros);
@@ -54,6 +48,8 @@ mat ShellBase::reshuffle(const mat& membrane_stiffness, const mat& plate_stiffne
             const span M(K, K + 2llu);
             total_stiffness(I + m_dof, J + m_dof) = membrane_stiffness(M, N);
             total_stiffness(I + p_dof, J + p_dof) = plate_stiffness(M, N);
+            total_stiffness(I + m_dof, J + p_dof) = mp_stiffness(M, N);
+            total_stiffness(I + p_dof, J + m_dof) = pm_stiffness(M, N);
         }
     }
 

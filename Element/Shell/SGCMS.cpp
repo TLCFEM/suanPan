@@ -283,7 +283,7 @@ int SGCMS::update_status() {
     }
 
     mat33 t_stiffness;
-    mat::fixed<12, 12> m_stiffness(fill::zeros), p_stiffness(fill::zeros);
+    mat::fixed<12, 12> m_stiffness(fill::zeros), p_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
     vec3 t_stress;
     vec::fixed<12> m_resistance(fill::zeros), p_resistance(fill::zeros);
 
@@ -309,10 +309,15 @@ int SGCMS::update_status() {
         }
         p_resistance += I.BP.t() * t_stress;
         p_stiffness += I.BP.t() * t_stiffness * I.BP;
+
+        t_stiffness.zeros();
+        for(const auto& J : I.sec_int_pt) t_stiffness += J.factor * J.eccentricity * J.s_material->get_trial_stiffness();
+        mp_stiffness += I.BM.t() * t_stiffness * I.BP;
+        pm_stiffness += I.BP.t() * t_stiffness * I.BM;
     }
 
     trial_resistance = reshuffle(m_resistance, p_resistance);
-    trial_stiffness = reshuffle(m_stiffness, p_stiffness);
+    trial_stiffness = reshuffle(m_stiffness, p_stiffness, mp_stiffness, pm_stiffness);
 
     if(is_nlgeom()) trial_geometry = transform_to_global_geometry(trial_stiffness, trial_resistance, g_disp);
 
