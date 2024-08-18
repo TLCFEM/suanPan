@@ -21,7 +21,7 @@ $RECYCLE.BIN/
 /build/*
 /Checker/.idea/*
 /Checker/*.exe
-/Checker/update
+/Checker/updater
 /cmake-build*/*
 /Document/*
 /MSVC/Debug/*
