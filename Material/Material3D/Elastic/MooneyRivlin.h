@@ -20,6 +20,10 @@
  *
  * algorithm verified at 24 April 2019 by tlc
  *
+ * [Introduction to Nonlinear Finite Element Analysis](https://doi.org/10.1007/978-1-4419-1746-1)
+ *
+ * Chapter 3.5
+ *
  * @author tlc
  * @date 24/04/2019
  * @version 1.0.0
