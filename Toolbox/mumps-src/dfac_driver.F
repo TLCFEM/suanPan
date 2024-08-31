@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.1, released
-C  on Thu May  2 10:15:09 UTC 2024
+C  This file is part of MUMPS 5.7.3, released
+C  on Mon Jul 15 11:44:21 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -2852,7 +2852,7 @@ C
 C       Store size of receive buffers in DMUMPS_LBUF module
         CALL DMUMPS_BUF_DIST_IRECV_SIZE( DMUMPS_LBUFR_BYTES )
         IF (PROK) THEN
-          WRITE( MP, 170 ) MAXS, MAXIS, id%KEEP8(12), KEEP(15),
+          WRITE( MP, 170 ) MAXS, MAXIS, MAXS_BASE8, KEEP(15),
      &    id%KEEP8(26), id%KEEP8(27), id%KEEP8(11), KEEP(26), KEEP(27)
         ENDIF
       END IF

@@ -93,12 +93,12 @@ Methods in lib/ddcreate.c:
 
 #include "space.h"
 
-
 /*****************************************************************************
 ******************************************************************************/
-domdec_t*
+domdec_t *
 newDomainDecomposition(PORD_INT nvtx, PORD_INT nedges)
-{ domdec_t *dd;
+{
+  domdec_t *dd;
 
   mymalloc(dd, 1, domdec_t);
   mymalloc(dd->vtype, nvtx, PORD_INT);
@@ -110,14 +110,12 @@ newDomainDecomposition(PORD_INT nvtx, PORD_INT nedges)
   dd->cwght[GRAY] = dd->cwght[BLACK] = dd->cwght[WHITE] = 0;
   dd->prev = dd->next = NULL;
 
-  return(dd);
+  return (dd);
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-freeDomainDecomposition(domdec_t *dd)
+void freeDomainDecomposition(domdec_t *dd)
 {
   freeGraph(dd->G);
   free(dd->vtype);
@@ -126,13 +124,12 @@ freeDomainDecomposition(domdec_t *dd)
   free(dd);
 }
 
-
 /*****************************************************************************
 ******************************************************************************/
-void
-printDomainDecomposition(domdec_t *dd)
-{ graph_t *G;
-  PORD_INT   count, u, v, i, istart, istop;
+void printDomainDecomposition(domdec_t *dd)
+{
+  graph_t *G;
+  PORD_INT count, u, v, i, istart, istop;
 
   G = dd->G;
   printf("\n#nodes %d (#domains %d, weight %d), #edges %d, totvwght %d\n",
@@ -140,28 +137,29 @@ printDomainDecomposition(domdec_t *dd)
   printf("partition weights: S %d, B %d, W %d\n", dd->cwght[GRAY],
          dd->cwght[BLACK], dd->cwght[WHITE]);
   for (u = 0; u < G->nvtx; u++)
-   { count = 0;
-     printf("--- adjacency list of node %d (vtype %d, color %d, map %d\n",
-            u, dd->vtype[u], dd->color[u], dd->map[u]);
-     istart = G->xadj[u];
-     istop = G->xadj[u+1];
-     for (i = istart; i < istop; i++)
-      { v = G->adjncy[i];
-        printf("%5d (vtype %2d, color %2d)", v, dd->vtype[v], dd->color[v]);
-        if ((++count % 3) == 0)
-          printf("\n");
-      }
-     if ((count % 3) != 0)
-       printf("\n");
-   }
+  {
+    count = 0;
+    printf("--- adjacency list of node %d (vtype %d, color %d, map %d\n",
+           u, dd->vtype[u], dd->color[u], dd->map[u]);
+    istart = G->xadj[u];
+    istop = G->xadj[u + 1];
+    for (i = istart; i < istop; i++)
+    {
+      v = G->adjncy[i];
+      printf("%5d (vtype %2d, color %2d)", v, dd->vtype[v], dd->color[v]);
+      if ((++count % 3) == 0)
+        printf("\n");
+    }
+    if ((count % 3) != 0)
+      printf("\n");
+  }
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-checkDomainDecomposition(domdec_t *dd)
-{ PORD_INT *xadj, *adjncy, *vwght, *vtype;
+void checkDomainDecomposition(domdec_t *dd)
+{
+  PORD_INT *xadj, *adjncy, *vwght, *vtype;
   PORD_INT err, nvtx, ndom, domwght, dom, multi, u, v, i, istart, istop;
 
   nvtx = dd->G->nvtx;
@@ -176,53 +174,63 @@ checkDomainDecomposition(domdec_t *dd)
 
   ndom = domwght = 0;
   for (u = 0; u < nvtx; u++)
-   { /* check node type */
-     if ((vtype[u] != 1) && (vtype[u] != 2))
-      { printf("ERROR: node %d is neither DOMAIN nor MULTISEC\n", u);
-        err = TRUE;
-      }
-     /* count domains and sum up their weight */
-     if (vtype[u] == 1)
-      { ndom++;
-        domwght += vwght[u];
-      } 
-     /* check number of neighboring domains and multisecs */
-     dom = multi = 0;
-     istart = xadj[u];
-     istop = xadj[u+1];
-     for (i = istart; i < istop; i++)
-      { v = adjncy[i];
-        if (vtype[v] == 1) dom++;
-        if (vtype[v] == 2) multi++;
-      }
-     if ((vtype[u] == 1) && (dom > 0))
-      { printf("ERROR: domain %d is adjacent to other domain\n", u);
-        err = TRUE;
-      }
-     if ((vtype[u] == 2) && (dom < 2))
-      { printf("ERROR: less than 2 domains adjacent to multisec node %d\n", u);
-        err = TRUE;
-      }
-     if ((vtype[u] == 2) && (multi > 0))
-      { printf("ERROR: multisec %d is adjacent to other multisec nodes\n", u);
-        err = TRUE;
-      }
-   }
+  { /* check node type */
+    if ((vtype[u] != 1) && (vtype[u] != 2))
+    {
+      printf("ERROR: node %d is neither DOMAIN nor MULTISEC\n", u);
+      err = TRUE;
+    }
+    /* count domains and sum up their weight */
+    if (vtype[u] == 1)
+    {
+      ndom++;
+      domwght += vwght[u];
+    }
+    /* check number of neighboring domains and multisecs */
+    dom = multi = 0;
+    istart = xadj[u];
+    istop = xadj[u + 1];
+    for (i = istart; i < istop; i++)
+    {
+      v = adjncy[i];
+      if (vtype[v] == 1)
+        dom++;
+      if (vtype[v] == 2)
+        multi++;
+    }
+    if ((vtype[u] == 1) && (dom > 0))
+    {
+      printf("ERROR: domain %d is adjacent to other domain\n", u);
+      err = TRUE;
+    }
+    if ((vtype[u] == 2) && (dom < 2))
+    {
+      printf("ERROR: less than 2 domains adjacent to multisec node %d\n", u);
+      err = TRUE;
+    }
+    if ((vtype[u] == 2) && (multi > 0))
+    {
+      printf("ERROR: multisec %d is adjacent to other multisec nodes\n", u);
+      err = TRUE;
+    }
+  }
   /* check number and weight of domains */
   if ((ndom != dd->ndom) || (domwght != dd->domwght))
-   { printf("ERROR: number/size (%d/%d) of domains does not match with those in"
-            " domain decomp. (%d/%d)\n", ndom, domwght, dd->ndom, dd->domwght);
-     err = TRUE;
-   }
-  if (err) quit();
+  {
+    printf("ERROR: number/size (%d/%d) of domains does not match with those in"
+           " domain decomp. (%d/%d)\n",
+           ndom, domwght, dd->ndom, dd->domwght);
+    err = TRUE;
+  }
+  if (err)
+    quit();
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-buildInitialDomains(graph_t *G, PORD_INT *vtxlist, PORD_INT *vtype, PORD_INT *rep)
-{ PORD_INT *xadj, *adjncy;
+void buildInitialDomains(graph_t *G, PORD_INT *vtxlist, PORD_INT *vtype, PORD_INT *rep)
+{
+  PORD_INT *xadj, *adjncy;
   PORD_INT nvtx, u, v, w, i, j, jstart, jstop;
 
   xadj = G->xadj;
@@ -233,52 +241,60 @@ buildInitialDomains(graph_t *G, PORD_INT *vtxlist, PORD_INT *vtype, PORD_INT *re
      determine initial domains according to the order of nodes in vtxlist
      -------------------------------------------------------------------- */
   for (i = 0; i < nvtx; i++)
-   { u = vtxlist[i];
-     if (vtype[u] == 0)
-      { vtype[u] = 1;
-        jstart = xadj[u];
-        jstop = xadj[u+1];
-        for (j = jstart; j < jstop; j++)
-         { v = adjncy[j];
-           vtype[v] = 2;
-         }
+  {
+    u = vtxlist[i];
+    if (vtype[u] == 0)
+    {
+      vtype[u] = 1;
+      jstart = xadj[u];
+      jstop = xadj[u + 1];
+      for (j = jstart; j < jstop; j++)
+      {
+        v = adjncy[j];
+        vtype[v] = 2;
       }
-   }
+    }
+  }
 
   /* ------------------------------------------------------------
      eliminate all multisecs that are adjacent to only one domain
      ------------------------------------------------------------ */
   for (i = 0; i < nvtx; i++)
-   { u = vtxlist[i];
-     if (vtype[u] == 2)
-      { v = -1;
-        jstart = xadj[u];
-        jstop = xadj[u+1];
-        for (j = jstart; j < jstop; j++)
-         { w = adjncy[j];
-           if (vtype[w] == 1)
-            { if (v == -1)
-                v = rep[w];          /* u adjacent to domain v = rep[w] */
-              else if (v != rep[w])
-               { v = -1;             /* u adjacent to another domain */
-                 break;
-               }
-            }
-         }
-        if (v != -1)                 /* u absorbed by domain v */
-         { vtype[u] = 1;
-           rep[u] = v;
-         }
+  {
+    u = vtxlist[i];
+    if (vtype[u] == 2)
+    {
+      v = -1;
+      jstart = xadj[u];
+      jstop = xadj[u + 1];
+      for (j = jstart; j < jstop; j++)
+      {
+        w = adjncy[j];
+        if (vtype[w] == 1)
+        {
+          if (v == -1)
+            v = rep[w]; /* u adjacent to domain v = rep[w] */
+          else if (v != rep[w])
+          {
+            v = -1; /* u adjacent to another domain */
+            break;
+          }
+        }
       }
-   }
+      if (v != -1) /* u absorbed by domain v */
+      {
+        vtype[u] = 1;
+        rep[u] = v;
+      }
+    }
+  }
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-mergeMultisecs(graph_t *G, PORD_INT *vtype, PORD_INT *rep)
-{ PORD_INT *xadj, *adjncy, *tmp, *queue;
+void mergeMultisecs(graph_t *G, PORD_INT *vtype, PORD_INT *rep)
+{
+  PORD_INT *xadj, *adjncy, *tmp, *queue;
   PORD_INT nvtx, qhead, qtail, flag, keepon, u, v, w, x;
   PORD_INT i, istart, istop, j, jstart, jstop;
 
@@ -300,55 +316,66 @@ mergeMultisecs(graph_t *G, PORD_INT *vtype, PORD_INT *rep)
   flag = 1;
   for (u = 0; u < nvtx; u++)
     if (vtype[u] == 2)
-     { qhead = 0; qtail = 1;
-       queue[0] = u;
-       vtype[u] = -2;
+    {
+      qhead = 0;
+      qtail = 1;
+      queue[0] = u;
+      vtype[u] = -2;
 
-       /* multisec u is the seed of a new cluster, mark all adj. domains */
-       istart = xadj[u];
-       istop = xadj[u+1];
-       for (i = istart; i < istop; i++)
-        { v = adjncy[i];
-          if (vtype[v] == 1)
-            tmp[rep[v]] = flag;
-        }
+      /* multisec u is the seed of a new cluster, mark all adj. domains */
+      istart = xadj[u];
+      istop = xadj[u + 1];
+      for (i = istart; i < istop; i++)
+      {
+        v = adjncy[i];
+        if (vtype[v] == 1)
+          tmp[rep[v]] = flag;
+      }
 
-       /* and now build the cluster */
-       while (qhead != qtail)
-        { v = queue[qhead++];
-          istart = xadj[v];
-          istop = xadj[v+1];
-          for (i = istart; i < istop; i++)
-           { keepon = TRUE;
-             w = adjncy[i];
-             if (vtype[w] == 2)
-              { jstart = xadj[w];
-                jstop = xadj[w+1];
-                for (j = jstart; j < jstop; j++)
-                 { x = adjncy[j];
-                   if ((vtype[x] == 1) && (tmp[rep[x]] == flag))
-                    { keepon = FALSE;
-                      break;
-                    }
-                 }
-                if (keepon)
-                /* multisecs v and w have no domain in common; mark */
-                /* all domains adjacent to w and put w in cluster u */
-                 { for (j = jstart; j < jstop; j++)
-                    { x = adjncy[j];
-                      if (vtype[x] == 1) tmp[rep[x]] = flag;
-                     }
-                    queue[qtail++] = w;
-                    rep[w] = u;
-                    vtype[w] = -2;
-                 }
+      /* and now build the cluster */
+      while (qhead != qtail)
+      {
+        v = queue[qhead++];
+        istart = xadj[v];
+        istop = xadj[v + 1];
+        for (i = istart; i < istop; i++)
+        {
+          keepon = TRUE;
+          w = adjncy[i];
+          if (vtype[w] == 2)
+          {
+            jstart = xadj[w];
+            jstop = xadj[w + 1];
+            for (j = jstart; j < jstop; j++)
+            {
+              x = adjncy[j];
+              if ((vtype[x] == 1) && (tmp[rep[x]] == flag))
+              {
+                keepon = FALSE;
+                break;
               }
-           }
+            }
+            if (keepon)
+            /* multisecs v and w have no domain in common; mark */
+            /* all domains adjacent to w and put w in cluster u */
+            {
+              for (j = jstart; j < jstop; j++)
+              {
+                x = adjncy[j];
+                if (vtype[x] == 1)
+                  tmp[rep[x]] = flag;
+              }
+              queue[qtail++] = w;
+              rep[w] = u;
+              vtype[w] = -2;
+            }
+          }
         }
+      }
 
-       /* clear tmp vector for next round */
-       flag++;
-     }
+      /* clear tmp vector for next round */
+      flag++;
+    }
 
   /* ------------------------------------
      reset vtype and free working storage
@@ -356,18 +383,19 @@ mergeMultisecs(graph_t *G, PORD_INT *vtype, PORD_INT *rep)
   for (u = 0; u < nvtx; u++)
     if (vtype[u] == -2)
       vtype[u] = 2;
-  free(tmp); free(queue);
+  free(tmp);
+  free(queue);
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-domdec_t*
+domdec_t *
 initialDomainDecomposition(graph_t *G, PORD_INT *map, PORD_INT *vtype, PORD_INT *rep)
-{ domdec_t *dd;
-  PORD_INT      *xadj, *adjncy, *vwght, *xadjdd, *adjncydd, *vwghtdd, *vtypedd;
-  PORD_INT      *tmp, *bin, nvtx, nedges, nvtxdd, nedgesdd, ndom, domwght, flag;
-  PORD_INT      i, j, jstart, jstop, u, v, w;
+{
+  domdec_t *dd;
+  PORD_INT *xadj, *adjncy, *vwght, *xadjdd, *adjncydd, *vwghtdd, *vtypedd;
+  PORD_INT *tmp, *bin, nvtx, nedges, nvtxdd, nedgesdd, ndom, domwght, flag;
+  PORD_INT i, j, jstart, jstop, u, v, w;
 
   nvtx = G->nvtx;
   nedges = G->nedges;
@@ -381,9 +409,10 @@ initialDomainDecomposition(graph_t *G, PORD_INT *map, PORD_INT *vtype, PORD_INT 
   mymalloc(tmp, nvtx, PORD_INT);
   mymalloc(bin, nvtx, PORD_INT);
   for (u = 0; u < nvtx; u++)
-   { tmp[u] = -1;
-     bin[u] = -1;
-   }
+  {
+    tmp[u] = -1;
+    bin[u] = -1;
+  }
 
   /* -------------------------------------------------------------
      allocate memory for the dd using upper bounds nvtx and nedges
@@ -398,12 +427,14 @@ initialDomainDecomposition(graph_t *G, PORD_INT *map, PORD_INT *vtype, PORD_INT 
      put all nodes u belonging to representative v in bin[v]
      ------------------------------------------------------- */
   for (u = 0; u < nvtx; u++)
-   { v = rep[u];
-     if (u != v)
-      { bin[u] = bin[v];
-        bin[v] = u;
-      }
-   }
+  {
+    v = rep[u];
+    if (u != v)
+    {
+      bin[u] = bin[v];
+      bin[v] = u;
+    }
+  }
 
   /* ----------------------------------------------
      and now build the initial domain decomposition
@@ -413,35 +444,40 @@ initialDomainDecomposition(graph_t *G, PORD_INT *map, PORD_INT *vtype, PORD_INT 
   ndom = domwght = 0;
   for (u = 0; u < nvtx; u++)
     if (rep[u] == u)
-     { xadjdd[nvtxdd] = nedgesdd;
-       vtypedd[nvtxdd] = vtype[u];
-       vwghtdd[nvtxdd] = 0;
-       tmp[u] = flag;
+    {
+      xadjdd[nvtxdd] = nedgesdd;
+      vtypedd[nvtxdd] = vtype[u];
+      vwghtdd[nvtxdd] = 0;
+      tmp[u] = flag;
 
-       /* find all cluster that are adjacent to u in dom. dec. */
-       v = u;
-       do
-        { map[v] = nvtxdd;
-          vwghtdd[nvtxdd] += vwght[v];
-          jstart = xadj[v];
-          jstop = xadj[v+1];
-          for (j = jstart; j < jstop; j++)
-           { w = adjncy[j];
-             if ((vtype[w] != vtype[u]) && (tmp[rep[w]] != flag))
-              { tmp[rep[w]] = flag;
-                adjncydd[nedgesdd++] = rep[w];
-              }
-           }
-          v = bin[v];
-        } while (v != -1);
-
-       if (vtypedd[nvtxdd] == 1)
-        { ndom++;
-          domwght += vwghtdd[nvtxdd];
+      /* find all cluster that are adjacent to u in dom. dec. */
+      v = u;
+      do
+      {
+        map[v] = nvtxdd;
+        vwghtdd[nvtxdd] += vwght[v];
+        jstart = xadj[v];
+        jstop = xadj[v + 1];
+        for (j = jstart; j < jstop; j++)
+        {
+          w = adjncy[j];
+          if ((vtype[w] != vtype[u]) && (tmp[rep[w]] != flag))
+          {
+            tmp[rep[w]] = flag;
+            adjncydd[nedgesdd++] = rep[w];
+          }
         }
-       nvtxdd++;
-       flag++;
-     }
+        v = bin[v];
+      } while (v != -1);
+
+      if (vtypedd[nvtxdd] == 1)
+      {
+        ndom++;
+        domwght += vwghtdd[nvtxdd];
+      }
+      nvtxdd++;
+      flag++;
+    }
 
   /* --------------------------------------------
      finalize the new domain decomposition object
@@ -461,18 +497,19 @@ initialDomainDecomposition(graph_t *G, PORD_INT *map, PORD_INT *vtype, PORD_INT 
   /* -------------------------------
      free working storage and return
      ------------------------------- */
-  free(tmp); free(bin);
-  return(dd);
+  free(tmp);
+  free(bin);
+  return (dd);
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-domdec_t*
+domdec_t *
 constructDomainDecomposition(graph_t *G, PORD_INT *map)
-{ domdec_t *dd;
-  PORD_INT      *xadj, *adjncy, *vwght, *vtxlist, *vtype, *key, *rep;
-  PORD_INT      nvtx, deg, u, i, istart, istop;
+{
+  domdec_t *dd;
+  PORD_INT *xadj, *adjncy, *vwght, *vtxlist, *vtype, *key, *rep;
+  PORD_INT nvtx, deg, u, i, istart, istop;
 
   nvtx = G->nvtx;
   xadj = G->xadj;
@@ -485,56 +522,60 @@ constructDomainDecomposition(graph_t *G, PORD_INT *map)
   mymalloc(vtxlist, nvtx, PORD_INT);
   mymalloc(key, nvtx, PORD_INT);
   for (u = 0; u < nvtx; u++)
-   { vtxlist[u] = u;
-     istart = xadj[u];
-     istop = xadj[u+1];
-     switch(G->type)
-      { case UNWEIGHTED:
-          deg = istop - istart;
-          break;
-        case WEIGHTED:
-          deg = 0;
-          for (i = istart; i < istop; i++)
-            deg += vwght[adjncy[i]];
-          break;
-        default:
-          fprintf(stderr, "\nError in function constructDomainDecomposition\n"
-               "  unrecognized graph type %d\n", G->type);
-          quit();
-      }
-     key[u] = deg;
-   }
+  {
+    vtxlist[u] = u;
+    istart = xadj[u];
+    istop = xadj[u + 1];
+    switch (G->type)
+    {
+    case UNWEIGHTED:
+      deg = istop - istart;
+      break;
+    case WEIGHTED:
+      deg = 0;
+      for (i = istart; i < istop; i++)
+        deg += vwght[adjncy[i]];
+      break;
+    default:
+      fprintf(stderr, "\nError in function constructDomainDecomposition\n"
+                      "  unrecognized graph type %d\n",
+              G->type);
+      quit();
+    }
+    key[u] = deg;
+  }
   distributionCounting(nvtx, vtxlist, key);
   free(key);
 
-   /* -------------------------------------------------------------
-      build initial domains and cluster multisecs that do not share
-      a common domain
-      ------------------------------------------------------------- */
-   mymalloc(vtype, nvtx, PORD_INT);
-   mymalloc(rep, nvtx, PORD_INT);
-   for (u = 0; u < nvtx; u++)
-    { vtype[u] = 0;
-      rep[u] = u;
-    }
-   buildInitialDomains(G, vtxlist, vtype, rep);
-   mergeMultisecs(G, vtype, rep);
-   free(vtxlist);
+  /* -------------------------------------------------------------
+     build initial domains and cluster multisecs that do not share
+     a common domain
+     ------------------------------------------------------------- */
+  mymalloc(vtype, nvtx, PORD_INT);
+  mymalloc(rep, nvtx, PORD_INT);
+  for (u = 0; u < nvtx; u++)
+  {
+    vtype[u] = 0;
+    rep[u] = u;
+  }
+  buildInitialDomains(G, vtxlist, vtype, rep);
+  mergeMultisecs(G, vtype, rep);
+  free(vtxlist);
 
-   /* --------------------------------------------------
-      finally, build the domain decomposition and return
-      -------------------------------------------------- */
-   dd = initialDomainDecomposition(G, map, vtype, rep);
-   free(vtype); free(rep);
-   return(dd);
+  /* --------------------------------------------------
+     finally, build the domain decomposition and return
+     -------------------------------------------------- */
+  dd = initialDomainDecomposition(G, map, vtype, rep);
+  free(vtype);
+  free(rep);
+  return (dd);
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-computePriorities(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *key, PORD_INT scoretype)
-{ PORD_INT *xadj, *adjncy, *vwght, *marker;
+void computePriorities(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *key, PORD_INT scoretype)
+{
+  PORD_INT *xadj, *adjncy, *vwght, *marker;
   PORD_INT nvtx, nlist, k, weight, deg, u, v, w;
   PORD_INT i, istart, istop, j, jstart, jstop;
 
@@ -545,66 +586,74 @@ computePriorities(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *key, PORD_INT sco
   marker = dd->map;
   nlist = nvtx - dd->ndom;
 
-  switch(scoretype)
-   { case QMRDV:  /* maximal relative decrease of variables in quotient graph */
-       for (k = 0; k < nlist; k++)
-        { u = msvtxlist[k];
-          weight = vwght[u];
-          istart = xadj[u];
-          istop = xadj[u+1];
-          for (i = istart; i < istop; i++)
-            weight += vwght[adjncy[i]];
-          key[u] = weight / vwght[u];
-        }
-       break;
+  switch (scoretype)
+  {
+  case QMRDV: /* maximal relative decrease of variables in quotient graph */
+    for (k = 0; k < nlist; k++)
+    {
+      u = msvtxlist[k];
+      weight = vwght[u];
+      istart = xadj[u];
+      istop = xadj[u + 1];
+      for (i = istart; i < istop; i++)
+        weight += vwght[adjncy[i]];
+      key[u] = weight / vwght[u];
+    }
+    break;
 
-     case QMD:    /* ----------------------- minimum degree in quotient graph */
-       for (k = 0; k < nlist; k++)
-        { u = msvtxlist[k];
-          marker[u] = -1;
+  case QMD: /* ----------------------- minimum degree in quotient graph */
+    for (k = 0; k < nlist; k++)
+    {
+      u = msvtxlist[k];
+      marker[u] = -1;
+    }
+    for (k = 0; k < nlist; k++)
+    {
+      u = msvtxlist[k];
+      marker[u] = u;
+      deg = 0;
+      istart = xadj[u];
+      istop = xadj[u + 1];
+      for (i = istart; i < istop; i++)
+      {
+        v = adjncy[i];
+        jstart = xadj[v];
+        jstop = xadj[v + 1];
+        for (j = jstart; j < jstop; j++)
+        {
+          w = adjncy[j];
+          if (marker[w] != u)
+          {
+            marker[w] = u;
+            deg += vwght[w];
+          }
         }
-       for (k = 0; k < nlist; k++)
-        { u = msvtxlist[k];
-          marker[u] = u;
-          deg = 0;
-          istart = xadj[u];
-          istop = xadj[u+1];
-          for (i = istart; i < istop; i++)
-           { v = adjncy[i];
-             jstart = xadj[v];
-             jstop = xadj[v+1];
-             for (j = jstart; j < jstop; j++)
-              { w = adjncy[j];
-                if (marker[w] != u)
-                 { marker[w] = u;
-                   deg += vwght[w];
-                 }
-              }
-           }
-          key[u] = deg;
-        }
-       break;
+      }
+      key[u] = deg;
+    }
+    break;
 
-     case QRAND:  /* ------------------------------------------------- random */
-       for (k = 0; k < nlist; k++)
-        { u = msvtxlist[k];
-          key[u] = myrandom(nvtx);
-        }
-       break;
+  case QRAND: /* ------------------------------------------------- random */
+    for (k = 0; k < nlist; k++)
+    {
+      u = msvtxlist[k];
+      key[u] = myrandom(nvtx);
+    }
+    break;
 
-     default:
-       fprintf(stderr, "\nError in internal function computePriorities\n"
-            "  unrecognized node selection strategy %d\n", scoretype);
-       quit();
-   }
+  default:
+    fprintf(stderr, "\nError in internal function computePriorities\n"
+                    "  unrecognized node selection strategy %d\n",
+            scoretype);
+    quit();
+  }
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-eliminateMultisecs(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *rep)
-{ PORD_INT *xadj, *adjncy, *vtype;
+void eliminateMultisecs(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *rep)
+{
+  PORD_INT *xadj, *adjncy, *vtype;
   PORD_INT nvtx, nlist, keepon, u, v, w, k, i, istart, istop;
 
   nvtx = dd->G->nvtx;
@@ -617,58 +666,67 @@ eliminateMultisecs(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *rep)
      eliminate multisecs according to the order in msvtxlist
      ------------------------------------------------------- */
   for (k = 0; k < nlist; k++)
-   { u = msvtxlist[k];
-     istart = xadj[u];
-     istop = xadj[u+1];
-     keepon = TRUE;
-     for (i = istart; i < istop; i++)
-      { v = adjncy[i];
-        if (rep[v] != v)        /* domain already absorbed by an eliminated */
-         { keepon = FALSE;      /* multisec => multisec u cannot be deleted */
-           break;
-         }
+  {
+    u = msvtxlist[k];
+    istart = xadj[u];
+    istop = xadj[u + 1];
+    keepon = TRUE;
+    for (i = istart; i < istop; i++)
+    {
+      v = adjncy[i];
+      if (rep[v] != v) /* domain already absorbed by an eliminated */
+      {
+        keepon = FALSE; /* multisec => multisec u cannot be deleted */
+        break;
       }
-     if (keepon)
-      { vtype[u] = 3;
-        for (i = istart; i < istop; i++)
-         { v = adjncy[i];
-           rep[v] = u;
-         }
+    }
+    if (keepon)
+    {
+      vtype[u] = 3;
+      for (i = istart; i < istop; i++)
+      {
+        v = adjncy[i];
+        rep[v] = u;
       }
-   }
+    }
+  }
 
   /* ------------------------------------------------------------
      eliminate all multisecs that are adjacent to only one domain
      ------------------------------------------------------------ */
   for (k = 0; k < nlist; k++)
-   { u = msvtxlist[k];
-     if (vtype[u] == 2)
-      { v = -1;
-        istart = xadj[u];
-        istop = xadj[u+1];
-        for (i = istart; i < istop; i++)
-         { w = adjncy[i];
-           if (v == -1)
-             v = rep[w];          /* u adjacent to domain v = rep[w] */
-           else if (v != rep[w])
-            { v = -1;             /* u adjacent to another domain */
-              break;
-            }
-         }
-        if (v != -1)              /* u absorbed by domain v */
-         { vtype[u] = 4;
-           rep[u] = v;
-         }
+  {
+    u = msvtxlist[k];
+    if (vtype[u] == 2)
+    {
+      v = -1;
+      istart = xadj[u];
+      istop = xadj[u + 1];
+      for (i = istart; i < istop; i++)
+      {
+        w = adjncy[i];
+        if (v == -1)
+          v = rep[w]; /* u adjacent to domain v = rep[w] */
+        else if (v != rep[w])
+        {
+          v = -1; /* u adjacent to another domain */
+          break;
+        }
       }
-   }
+      if (v != -1) /* u absorbed by domain v */
+      {
+        vtype[u] = 4;
+        rep[u] = v;
+      }
+    }
+  }
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-findIndMultisecs(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *rep)
-{ PORD_INT *xadj, *adjncy, *vtype, *tmp, *bin, *checksum, *next, *key;
+void findIndMultisecs(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *rep)
+{
+  PORD_INT *xadj, *adjncy, *vtype, *tmp, *bin, *checksum, *next, *key;
   PORD_INT nvtx, nlist, flag, keepon, deg, chk, ulast, u, v, k, i, istart, istop;
 
   nvtx = dd->G->nvtx;
@@ -686,101 +744,116 @@ findIndMultisecs(domdec_t *dd, PORD_INT *msvtxlist, PORD_INT *rep)
   mymalloc(next, nvtx, PORD_INT);
   mymalloc(key, nvtx, PORD_INT);
   for (u = 0; u < nvtx; u++)
-   { tmp[u] = -1;
-     bin[u] = -1;
-   }
+  {
+    tmp[u] = -1;
+    bin[u] = -1;
+  }
 
   /* -------------------------------------------------------------------
      compute checksums for all unelim./unabsorbed multisecs in msvtxlist
      ------------------------------------------------------------------- */
   flag = 1;
   for (k = 0; k < nlist; k++)
-   { u = msvtxlist[k];
-     if (vtype[u] == 2)
-      { deg = chk = 0;
-        istart = xadj[u];
-        istop = xadj[u+1];
-        for (i = istart; i < istop; i++)
-         { v = adjncy[i];
-           if (tmp[rep[v]] != flag)
-            { tmp[rep[v]] = flag;
-              chk += rep[v];
-              deg++;
-            }
-         }
-        chk = chk % nvtx;
-        checksum[u] = chk;
-        key[u] = deg;
-        next[u] = bin[chk];
-        bin[chk] = u;
-        flag++;
+  {
+    u = msvtxlist[k];
+    if (vtype[u] == 2)
+    {
+      deg = chk = 0;
+      istart = xadj[u];
+      istop = xadj[u + 1];
+      for (i = istart; i < istop; i++)
+      {
+        v = adjncy[i];
+        if (tmp[rep[v]] != flag)
+        {
+          tmp[rep[v]] = flag;
+          chk += rep[v];
+          deg++;
+        }
       }
-   }
+      chk = chk % nvtx;
+      checksum[u] = chk;
+      key[u] = deg;
+      next[u] = bin[chk];
+      bin[chk] = u;
+      flag++;
+    }
+  }
 
   /* ---------------------------------
      merge indistinguishable multisecs
      --------------------------------- */
   for (k = 0; k < nlist; k++)
-   { u = msvtxlist[k];
-     if (vtype[u] == 2)
-      { chk = checksum[u];
-        v = bin[chk];          /* examine all multisecs in bin[hash] */
-        bin[chk] = -1;         /* do this only once */
-        while (v != -1)
-         { istart = xadj[v];
-           istop = xadj[v+1];
-           for (i = istart; i < istop; i++)
-             tmp[rep[adjncy[i]]] = flag;
-           ulast = v;          /* v is principal and u is a potiential */
-           u = next[v];        /* nonprincipal variable */
-           while (u != -1)
-            { keepon = TRUE;
-              if (key[u] != key[v])
+  {
+    u = msvtxlist[k];
+    if (vtype[u] == 2)
+    {
+      chk = checksum[u];
+      v = bin[chk];  /* examine all multisecs in bin[hash] */
+      bin[chk] = -1; /* do this only once */
+      while (v != -1)
+      {
+        istart = xadj[v];
+        istop = xadj[v + 1];
+        for (i = istart; i < istop; i++)
+          tmp[rep[adjncy[i]]] = flag;
+        ulast = v;   /* v is principal and u is a potiential */
+        u = next[v]; /* nonprincipal variable */
+        while (u != -1)
+        {
+          keepon = TRUE;
+          if (key[u] != key[v])
+            keepon = FALSE;
+          if (keepon)
+          {
+            istart = xadj[u];
+            istop = xadj[u + 1];
+            for (i = istart; i < istop; i++)
+              if (tmp[rep[adjncy[i]]] != flag)
+              {
                 keepon = FALSE;
-              if (keepon)
-               { istart = xadj[u];
-                 istop = xadj[u+1];
-                 for (i = istart; i < istop; i++)
-                   if (tmp[rep[adjncy[i]]] != flag)
-                    { keepon = FALSE;
-                      break;
-                    }
-               }
-              if (keepon)           /* found it! mark u as nonprincipal */
-               { rep[u] = v;
-                 /* printf(" >> mapping %d onto %d\n", u, v); */
-                 vtype[u] = 4;
-                 u = next[u];
-                 next[ulast] = u;  /* remove u from bin */
-               }
-              else                 /* failed */
-               { ulast = u;
-                 u = next[u];
-               }
-            }
-           v = next[v];        /* no more variables can be absorbed by v */
-           flag++;             /* clear tmp vector for next round */
-         }
+                break;
+              }
+          }
+          if (keepon) /* found it! mark u as nonprincipal */
+          {
+            rep[u] = v;
+            /* printf(" >> mapping %d onto %d\n", u, v); */
+            vtype[u] = 4;
+            u = next[u];
+            next[ulast] = u; /* remove u from bin */
+          }
+          else /* failed */
+          {
+            ulast = u;
+            u = next[u];
+          }
+        }
+        v = next[v]; /* no more variables can be absorbed by v */
+        flag++;      /* clear tmp vector for next round */
       }
-   }
+    }
+  }
 
   /* --------------------
      free working storage
      -------------------- */
-  free(tmp); free(bin);
-  free(next); free(key);
+  free(tmp);
+  free(bin);
+  free(next);
+  free(key);
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-domdec_t*
-coarserDomainDecomposition(domdec_t* dd1, PORD_INT *rep)
-{ domdec_t *dd2;
-  PORD_INT      *xadjdd1, *adjncydd1, *vwghtdd1, *vtypedd1, *mapdd1;
-  PORD_INT      *xadjdd2, *adjncydd2, *vwghtdd2, *vtypedd2;
-  PORD_INT      *tmp, *bin, nvtxdd1, nedgesdd1, nvtxdd2, nedgesdd2;
-  PORD_INT      ndom, domwght, flag, u, v, w, i, istart, istop;
+domdec_t *
+coarserDomainDecomposition(domdec_t *dd1, PORD_INT *rep)
+{
+  domdec_t *dd2;
+  PORD_INT *xadjdd1, *adjncydd1, *vwghtdd1, *vtypedd1, *mapdd1;
+  PORD_INT *xadjdd2, *adjncydd2, *vwghtdd2, *vtypedd2;
+  PORD_INT *tmp, *bin, nvtxdd1, nedgesdd1, nvtxdd2, nedgesdd2;
+  PORD_INT ndom, domwght, flag, u, v, w, i, istart, istop;
 
   nvtxdd1 = dd1->G->nvtx;
   nedgesdd1 = dd1->G->nedges;
@@ -796,9 +869,10 @@ coarserDomainDecomposition(domdec_t* dd1, PORD_INT *rep)
   mymalloc(tmp, nvtxdd1, PORD_INT);
   mymalloc(bin, nvtxdd1, PORD_INT);
   for (u = 0; u < nvtxdd1; u++)
-   { tmp[u] = -1;
-     bin[u] = -1;
-   }
+  {
+    tmp[u] = -1;
+    bin[u] = -1;
+  }
 
   /* ------------------------------------------------------------
      allocate memory using the upper bounds nvtxdd1 and nedgesdd1
@@ -813,12 +887,14 @@ coarserDomainDecomposition(domdec_t* dd1, PORD_INT *rep)
      put all nodes u belonging to representative v in bin[v]
      ------------------------------------------------------- */
   for (u = 0; u < nvtxdd1; u++)
-   { v = rep[u];
-     if (u != v)
-      { bin[u] = bin[v];
-        bin[v] = u;
-      }
-   }
+  {
+    v = rep[u];
+    if (u != v)
+    {
+      bin[u] = bin[v];
+      bin[v] = u;
+    }
+  }
 
   /* ----------------------------------------------
      and now build the coarser domain decomposition
@@ -828,39 +904,45 @@ coarserDomainDecomposition(domdec_t* dd1, PORD_INT *rep)
   ndom = domwght = 0;
   for (u = 0; u < nvtxdd1; u++)
     if (rep[u] == u)
-     { xadjdd2[nvtxdd2] = nedgesdd2;
-       vwghtdd2[nvtxdd2] = 0;
-       vtypedd2[nvtxdd2] = vtypedd1[u];
-       if (vtypedd2[nvtxdd2] == 3)
-         vtypedd2[nvtxdd2] = 1;
-       tmp[u] = flag;
+    {
+      xadjdd2[nvtxdd2] = nedgesdd2;
+      vwghtdd2[nvtxdd2] = 0;
+      vtypedd2[nvtxdd2] = vtypedd1[u];
+      if (vtypedd2[nvtxdd2] == 3)
+        vtypedd2[nvtxdd2] = 1;
+      tmp[u] = flag;
 
-       /* find all cluster that are adjacent to u in dom. dec. */
-       v = u;
-       do
-        { mapdd1[v] = nvtxdd2;
-          vwghtdd2[nvtxdd2] += vwghtdd1[v];
-          if ((vtypedd1[v] == 1) || (vtypedd1[v] == 2))
-           { istart = xadjdd1[v];
-             istop = xadjdd1[v+1];
-             for (i = istart; i < istop; i++)
-              { w = adjncydd1[i];
-                if (tmp[rep[w]] != flag)
-                 { tmp[rep[w]] = flag;
-                   adjncydd2[nedgesdd2++] = rep[w];
-                 }
-              }
-           }
-          v = bin[v];
-        } while (v != -1);
-
-       if (vtypedd2[nvtxdd2] == 1)
-        { ndom++;
-          domwght += vwghtdd2[nvtxdd2];
+      /* find all cluster that are adjacent to u in dom. dec. */
+      v = u;
+      do
+      {
+        mapdd1[v] = nvtxdd2;
+        vwghtdd2[nvtxdd2] += vwghtdd1[v];
+        if ((vtypedd1[v] == 1) || (vtypedd1[v] == 2))
+        {
+          istart = xadjdd1[v];
+          istop = xadjdd1[v + 1];
+          for (i = istart; i < istop; i++)
+          {
+            w = adjncydd1[i];
+            if (tmp[rep[w]] != flag)
+            {
+              tmp[rep[w]] = flag;
+              adjncydd2[nedgesdd2++] = rep[w];
+            }
+          }
         }
-       nvtxdd2++;
-       flag++;
-     }
+        v = bin[v];
+      } while (v != -1);
+
+      if (vtypedd2[nvtxdd2] == 1)
+      {
+        ndom++;
+        domwght += vwghtdd2[nvtxdd2];
+      }
+      nvtxdd2++;
+      flag++;
+    }
 
   /* --------------------------------------------
      finalize the new domain decomposition object
@@ -887,18 +969,18 @@ coarserDomainDecomposition(domdec_t* dd1, PORD_INT *rep)
   /* -------------------------------
      free working storage and return
      ------------------------------- */
-  free(tmp); free(bin);
-  return(dd2);
+  free(tmp);
+  free(bin);
+  return (dd2);
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-shrinkDomainDecomposition(domdec_t* dd1, PORD_INT scoretype)
-{ domdec_t *dd2;
-  PORD_INT      *msvtxlist, *rep, *key;
-  PORD_INT      nvtxdd1, nlist, u;
+void shrinkDomainDecomposition(domdec_t *dd1, PORD_INT scoretype)
+{
+  domdec_t *dd2;
+  PORD_INT *msvtxlist, *rep, *key;
+  PORD_INT nvtxdd1, nlist, u;
 
   nvtxdd1 = dd1->G->nvtx;
   mymalloc(msvtxlist, nvtxdd1, PORD_INT);
@@ -910,10 +992,11 @@ shrinkDomainDecomposition(domdec_t* dd1, PORD_INT scoretype)
      --------------- */
   nlist = 0;
   for (u = 0; u < nvtxdd1; u++)
-   { if (dd1->vtype[u] == 2)
-       msvtxlist[nlist++] = u;
-     rep[u] = u;
-   }
+  {
+    if (dd1->vtype[u] == 2)
+      msvtxlist[nlist++] = u;
+    rep[u] = u;
+  }
 
   /* -------------------------------------
      compute priorities and sort multisecs

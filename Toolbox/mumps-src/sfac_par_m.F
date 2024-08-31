@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.1, released
-C  on Thu May  2 10:15:09 UTC 2024
+C  This file is part of MUMPS 5.7.3, released
+C  on Mon Jul 15 11:44:21 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -793,8 +793,9 @@ C
                          IF (LP > 0 )
      &                   write(LP,*) ' Error allocating, real array ',
      &                   'of size before SMUMPS_FACTO_ROOT',  LBUFRX
+                   ELSE
+                     IS_BUFRX_ALLOCATED = .TRUE.
                    ENDIF
-                   IS_BUFRX_ALLOCATED = .TRUE.
                ENDIF
                CALL MUMPS_PROPINFO( ICNTL, INFO,
      &              COMM_NODES, MYID_NODES )

@@ -49,18 +49,18 @@ Methods in lib/bucket.c:
 
 #include "space.h"
 
-
 /******************************************************************************
 ******************************************************************************/
-bucket_t*
+bucket_t *
 newBucket(PORD_INT maxbin, PORD_INT maxitem, PORD_INT offset)
-{ bucket_t *bucket;
+{
+  bucket_t *bucket;
 
   mymalloc(bucket, 1, bucket_t);
-  mymalloc(bucket->bin, (maxbin+1), PORD_INT);
-  mymalloc(bucket->next, (maxitem+1), PORD_INT);
-  mymalloc(bucket->last, (maxitem+1), PORD_INT);
-  mymalloc(bucket->key, (maxitem+1), PORD_INT);
+  mymalloc(bucket->bin, (maxbin + 1), PORD_INT);
+  mymalloc(bucket->next, (maxitem + 1), PORD_INT);
+  mymalloc(bucket->last, (maxitem + 1), PORD_INT);
+  mymalloc(bucket->key, (maxitem + 1), PORD_INT);
 
   bucket->maxbin = maxbin;
   bucket->maxitem = maxitem;
@@ -68,14 +68,12 @@ newBucket(PORD_INT maxbin, PORD_INT maxitem, PORD_INT offset)
   bucket->nobj = 0;
   bucket->minbin = MAX_INT;
 
-  return(bucket);
+  return (bucket);
 }
-
 
 /******************************************************************************
 ******************************************************************************/
-void
-freeBucket(bucket_t *bucket)
+void freeBucket(bucket_t *bucket)
 {
   free(bucket->bin);
   free(bucket->next);
@@ -84,38 +82,40 @@ freeBucket(bucket_t *bucket)
   free(bucket);
 }
 
-
 /******************************************************************************
 ******************************************************************************/
-bucket_t*
+bucket_t *
 setupBucket(PORD_INT maxbin, PORD_INT maxitem, PORD_INT offset)
-{ bucket_t *bucket;
-  PORD_INT      i, u;
+{
+  bucket_t *bucket;
+  PORD_INT i, u;
 
   if (offset < 0)
-   { fprintf(stderr, "\nError in function setupBucket\n"
-          "  offset must be >= 0\n");
-     quit();
-   }
+  {
+    fprintf(stderr, "\nError in function setupBucket\n"
+                    "  offset must be >= 0\n");
+    quit();
+  }
 
   bucket = newBucket(maxbin, maxitem, offset);
 
   for (i = 0; i <= maxbin; i++)
     bucket->bin[i] = -1;
   for (u = 0; u <= maxitem; u++)
-    { bucket->next[u] = bucket->last[u] = -1;
-      bucket->key[u] = MAX_INT;
-    }
+  {
+    bucket->next[u] = bucket->last[u] = -1;
+    bucket->key[u] = MAX_INT;
+  }
 
-  return(bucket);
+  return (bucket);
 }
-
 
 /******************************************************************************
 ******************************************************************************/
 PORD_INT
 minBucket(bucket_t *bucket)
-{ PORD_INT *bin, *next, *key, maxbin, minbin, nobj;
+{
+  PORD_INT *bin, *next, *key, maxbin, minbin, nobj;
   PORD_INT item, bestitem, bestkey;
 
   maxbin = bucket->maxbin;
@@ -126,62 +126,72 @@ minBucket(bucket_t *bucket)
   key = bucket->key;
 
   if (nobj > 0)
-   { /* ---------------------------------------------
-        get the first item from leftmost nonempty bin
-        --------------------------------------------- */
-     while (bin[minbin] == -1) minbin++;
-     bucket->minbin = minbin;
-     bestitem = bin[minbin];
-     bestkey = minbin;
+  { /* ---------------------------------------------
+       get the first item from leftmost nonempty bin
+       --------------------------------------------- */
+    while (bin[minbin] == -1)
+      minbin++;
+    bucket->minbin = minbin;
+    bestitem = bin[minbin];
+    bestkey = minbin;
 
-     /* --------------------------------------------------
-        items in bins 0 and maxbin can have different keys
-        => search for item with smallest key
-        -------------------------------------------------- */
-     if ((minbin == 0) || (minbin == maxbin))
-      { item = next[bestitem];
-        while (item != -1)
-         { if (key[item] < bestkey)
-            { bestitem = item;
-              bestkey = key[item];
-            }
-           item = next[item];
-         }
+    /* --------------------------------------------------
+       items in bins 0 and maxbin can have different keys
+       => search for item with smallest key
+       -------------------------------------------------- */
+    if ((minbin == 0) || (minbin == maxbin))
+    {
+      item = next[bestitem];
+      while (item != -1)
+      {
+        if (key[item] < bestkey)
+        {
+          bestitem = item;
+          bestkey = key[item];
+        }
+        item = next[item];
       }
-     /* ---------------------------------
-        return the item with smallest key
-        --------------------------------- */
-     return(bestitem);
-   }
-  else return(-1);
+    }
+    /* ---------------------------------
+       return the item with smallest key
+       --------------------------------- */
+    return (bestitem);
+  }
+  else
+    return (-1);
 }
-
 
 /******************************************************************************
 ******************************************************************************/
-void
-insertBucket(bucket_t *bucket, PORD_INT k, PORD_INT item)
-{ PORD_INT s, nextitem;
+void insertBucket(bucket_t *bucket, PORD_INT k, PORD_INT item)
+{
+  PORD_INT s, nextitem;
 
   /* ------------------------------------
      check whether there are any problems
      ------------------------------------ */
   if (abs(k) >= MAX_INT - bucket->offset - 1)
-   { fprintf(stderr, "\nError in function insertBucket\n"
-          "  key %d too large/small for bucket\n", k);
-     quit();
-   }
+  {
+    fprintf(stderr, "\nError in function insertBucket\n"
+                    "  key %d too large/small for bucket\n",
+            k);
+    quit();
+  }
   if (item > bucket->maxitem)
-   { fprintf(stderr, "\nError in function insertBucket\n"
-          "  item %d too large for bucket (maxitem is %d)\n", item,
-          bucket->maxitem);
-     quit();
-   }
+  {
+    fprintf(stderr, "\nError in function insertBucket\n"
+                    "  item %d too large for bucket (maxitem is %d)\n",
+            item,
+            bucket->maxitem);
+    quit();
+  }
   if (bucket->key[item] != MAX_INT)
-   { fprintf(stderr, "\nError in function insertBucket\n"
-          "  item %d already in bucket\n", item);
-     quit();
-   }
+  {
+    fprintf(stderr, "\nError in function insertBucket\n"
+                    "  item %d already in bucket\n",
+            item);
+    quit();
+  }
 
   /* -------------------------------------
      determine the bin that holds the item
@@ -207,21 +217,22 @@ insertBucket(bucket_t *bucket, PORD_INT k, PORD_INT item)
   bucket->bin[s] = item;
 }
 
-
 /******************************************************************************
 ******************************************************************************/
-void
-removeBucket(bucket_t *bucket, PORD_INT item)
-{ PORD_INT s, nextitem, lastitem;
+void removeBucket(bucket_t *bucket, PORD_INT item)
+{
+  PORD_INT s, nextitem, lastitem;
 
   /* ----------------------------
      check whether item in bucket
      ---------------------------- */
   if (bucket->key[item] == MAX_INT)
-   { fprintf(stderr, "\nError in function removeBucket\n"
-          "  item %d is not in bucket\n", item);
-     quit();
-   }
+  {
+    fprintf(stderr, "\nError in function removeBucket\n"
+                    "  item %d is not in bucket\n",
+            item);
+    quit();
+  }
 
   /* -----------------------
      remove item from bucket
@@ -233,10 +244,11 @@ removeBucket(bucket_t *bucket, PORD_INT item)
   if (lastitem != -1)
     bucket->next[lastitem] = nextitem;
   else
-   { s = max(0, (bucket->key[item] + bucket->offset));
-     s = min(s, bucket->maxbin);
-     bucket->bin[s] = nextitem;
-   }
+  {
+    s = max(0, (bucket->key[item] + bucket->offset));
+    s = min(s, bucket->maxbin);
+    bucket->bin[s] = nextitem;
+  }
 
   /* --------------------------------------------
      decrease nobj and mark item as being removed
