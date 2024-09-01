@@ -32,7 +32,7 @@ Methods in lib/gbisect.c:
       uncoarsening phase by several calls to improveDDSep
     o used options:
        OPTION_MSGLVL, OPTION_NODE_SELECTION3
-      returned timings: 
+      returned timings:
        TIME_INITDOMDEC, TIME_COARSEDOMDEC, TIME_INITSEP, TIME_REFINESEP
 - int smoothBy2Layers(gbisect_t *Gbisect, int *bipartvertex, int *pnX,
                       int black, int white);
@@ -52,12 +52,12 @@ Methods in lib/gbisect.c:
 /* #define DEBUG */
 /* #define BE_CAUTIOUS */
 
-
 /*****************************************************************************
 ******************************************************************************/
-gbisect_t*
+gbisect_t *
 newGbisect(graph_t *G)
-{ gbisect_t *Gbisect;
+{
+  gbisect_t *Gbisect;
 
   mymalloc(Gbisect, 1, gbisect_t);
   mymalloc(Gbisect->color, G->nvtx, PORD_INT);
@@ -67,26 +67,23 @@ newGbisect(graph_t *G)
   Gbisect->cwght[BLACK] = 0;
   Gbisect->cwght[WHITE] = 0;
 
-  return(Gbisect);
+  return (Gbisect);
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-freeGbisect(gbisect_t *Gbisect)
+void freeGbisect(gbisect_t *Gbisect)
 {
   free(Gbisect->color);
   free(Gbisect);
 }
 
-
 /*****************************************************************************
 ******************************************************************************/
-void
-printGbisect(gbisect_t *Gbisect)
-{ graph_t *G;
-  PORD_INT     count, u, v, i, istart, istop;
+void printGbisect(gbisect_t *Gbisect)
+{
+  graph_t *G;
+  PORD_INT count, u, v, i, istart, istop;
 
   G = Gbisect->G;
   printf("\n#nodes %d, #edges %d, totvwght %d\n", G->nvtx, G->nedges >> 1,
@@ -94,28 +91,29 @@ printGbisect(gbisect_t *Gbisect)
   printf("partition weights: S %d, B %d, W %d\n", Gbisect->cwght[GRAY],
          Gbisect->cwght[BLACK], Gbisect->cwght[WHITE]);
   for (u = 0; u < G->nvtx; u++)
-   { count = 0;
-     printf("--- adjacency list of node %d (weight %d, color %d)\n", u,
-            G->vwght[u], Gbisect->color[u]);
-     istart = G->xadj[u];
-     istop = G->xadj[u+1];
-     for (i = istart; i < istop; i++)
-      { v = G->adjncy[i];
-        printf("%5d (color %2d)", v, Gbisect->color[v]);
-        if ((++count % 4) == 0)
-          printf("\n");
-      }
-     if ((count % 4) != 0)
-       printf("\n");
-   }
+  {
+    count = 0;
+    printf("--- adjacency list of node %d (weight %d, color %d)\n", u,
+           G->vwght[u], Gbisect->color[u]);
+    istart = G->xadj[u];
+    istop = G->xadj[u + 1];
+    for (i = istart; i < istop; i++)
+    {
+      v = G->adjncy[i];
+      printf("%5d (color %2d)", v, Gbisect->color[v]);
+      if ((++count % 4) == 0)
+        printf("\n");
+    }
+    if ((count % 4) != 0)
+      printf("\n");
+  }
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-checkSeparator(gbisect_t *Gbisect)
-{ PORD_INT *xadj, *adjncy, *vwght, *color, *cwght;
+void checkSeparator(gbisect_t *Gbisect)
+{
+  PORD_INT *xadj, *adjncy, *vwght, *color, *cwght;
   PORD_INT nvtx, err, checkS, checkB, checkW, a, b, u, v, i, istart, istop;
 
   nvtx = Gbisect->G->nvtx;
@@ -131,57 +129,65 @@ checkSeparator(gbisect_t *Gbisect)
 
   checkS = checkB = checkW = 0;
   for (u = 0; u < nvtx; u++)
-   { istart = xadj[u];
-     istop = xadj[u+1];
-     switch(color[u])
-      { case GRAY:                /* is it a minimal separator? */
-          checkS += vwght[u];
-          a = b = FALSE;
-          for (i = istart; i < istop; i++)
-           { v = adjncy[i];
-             if (color[v] == WHITE) a = TRUE;
-             if (color[v] == BLACK) b = TRUE;
-           }
-          if (!((a) && (b)))
-            printf("WARNING: not a minimal separator (node %d)\n", u);
-          break;
-        case BLACK:               /* is it realy a separator? */
-          checkB += vwght[u];
-          for (i = istart; i < istop; i++)
-           { v = adjncy[i];
-             if (color[v] == WHITE)
-              { printf("ERROR: white node %d adjacent to black node %d\n", u,v);
-                err = TRUE;
-              }
-           }
-          break;
-        case WHITE:
-          checkW += vwght[u];
-          break;
-        default:
-          printf("ERROR: node %d has unrecognized color %d\n", u, color[u]);
-          err = TRUE;
+  {
+    istart = xadj[u];
+    istop = xadj[u + 1];
+    switch (color[u])
+    {
+    case GRAY: /* is it a minimal separator? */
+      checkS += vwght[u];
+      a = b = FALSE;
+      for (i = istart; i < istop; i++)
+      {
+        v = adjncy[i];
+        if (color[v] == WHITE)
+          a = TRUE;
+        if (color[v] == BLACK)
+          b = TRUE;
       }
-   }
+      if (!((a) && (b)))
+        printf("WARNING: not a minimal separator (node %d)\n", u);
+      break;
+    case BLACK: /* is it realy a separator? */
+      checkB += vwght[u];
+      for (i = istart; i < istop; i++)
+      {
+        v = adjncy[i];
+        if (color[v] == WHITE)
+        {
+          printf("ERROR: white node %d adjacent to black node %d\n", u, v);
+          err = TRUE;
+        }
+      }
+      break;
+    case WHITE:
+      checkW += vwght[u];
+      break;
+    default:
+      printf("ERROR: node %d has unrecognized color %d\n", u, color[u]);
+      err = TRUE;
+    }
+  }
 
   /* check cwght[GRAY], cwght[BLACK], cwght[WHITE] */
-  if ((checkS != cwght[GRAY]) || (checkB != cwght[BLACK])
-     || (checkW != cwght[WHITE]))
-   { printf("ERROR in partitioning: checkS %d (S %d), checkB %d (B %d), "
-            "checkW %d (W %d)\n", checkS, cwght[GRAY], checkB, cwght[BLACK],
-             checkW, cwght[WHITE]);
-     err = TRUE;
-   }
-  if (err) quit();
+  if ((checkS != cwght[GRAY]) || (checkB != cwght[BLACK]) || (checkW != cwght[WHITE]))
+  {
+    printf("ERROR in partitioning: checkS %d (S %d), checkB %d (B %d), "
+           "checkW %d (W %d)\n",
+           checkS, cwght[GRAY], checkB, cwght[BLACK],
+           checkW, cwght[WHITE]);
+    err = TRUE;
+  }
+  if (err)
+    quit();
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-constructSeparator(gbisect_t *Gbisect, options_t *options, timings_t *cpus)
-{ domdec_t *dd, *dd2;
-  PORD_INT      *color, *cwght, *map, nvtx, u, i;
+void constructSeparator(gbisect_t *Gbisect, options_t *options, timings_t *cpus)
+{
+  domdec_t *dd, *dd2;
+  PORD_INT *color, *cwght, *map, nvtx, u, i;
 
   nvtx = Gbisect->G->nvtx;
   color = Gbisect->color;
@@ -212,19 +218,21 @@ constructSeparator(gbisect_t *Gbisect, options_t *options, timings_t *cpus)
      --------------------------------------------------- */
   pord_starttimer(cpus[TIME_COARSEDOMDEC]);
   i = 0;
-  while ((dd->ndom > MIN_DOMAINS) && (i < MAX_COARSENING_STEPS)
-         && ((dd->G->nedges >> 1) > dd->G->nvtx))
-   { shrinkDomainDecomposition(dd, options[OPTION_NODE_SELECTION3]);
-     dd = dd->next; i++;
+  while ((dd->ndom > MIN_DOMAINS) && (i < MAX_COARSENING_STEPS) && ((dd->G->nedges >> 1) > dd->G->nvtx))
+  {
+    shrinkDomainDecomposition(dd, options[OPTION_NODE_SELECTION3]);
+    dd = dd->next;
+    i++;
 
 #ifdef BE_CAUTIOUS
-     checkDomainDecomposition(dd);
+    checkDomainDecomposition(dd);
 #endif
 
-     if (options[OPTION_MSGLVL] > 2)
-       printf("\t %2d. dom.dec.: #nodes %d (#domains %d, weight %d), #edges %d"
-              "\n", i, dd->G->nvtx, dd->ndom, dd->domwght, dd->G->nedges >> 1);
-   }
+    if (options[OPTION_MSGLVL] > 2)
+      printf("\t %2d. dom.dec.: #nodes %d (#domains %d, weight %d), #edges %d"
+             "\n",
+             i, dd->G->nvtx, dd->ndom, dd->domwght, dd->G->nedges >> 1);
+  }
   pord_stoptimer(cpus[TIME_COARSEDOMDEC]);
 
   /* -----------------------------------------------
@@ -251,27 +259,28 @@ constructSeparator(gbisect_t *Gbisect, options_t *options, timings_t *cpus)
 
   pord_starttimer(cpus[TIME_REFINESEP]);
   while (dd->prev != NULL)
-   { dd2 = dd->prev;
-     dd2->cwght[GRAY] = dd->cwght[GRAY];
-     dd2->cwght[BLACK] = dd->cwght[BLACK];
-     dd2->cwght[WHITE] = dd->cwght[WHITE];
-     for (u = 0; u < dd2->G->nvtx; u++)
-       dd2->color[u] = dd->color[dd2->map[u]];
-     freeDomainDecomposition(dd);
-     if (dd2->cwght[GRAY] > 0)
-       improveDDSep(dd2);
+  {
+    dd2 = dd->prev;
+    dd2->cwght[GRAY] = dd->cwght[GRAY];
+    dd2->cwght[BLACK] = dd->cwght[BLACK];
+    dd2->cwght[WHITE] = dd->cwght[WHITE];
+    for (u = 0; u < dd2->G->nvtx; u++)
+      dd2->color[u] = dd->color[dd2->map[u]];
+    freeDomainDecomposition(dd);
+    if (dd2->cwght[GRAY] > 0)
+      improveDDSep(dd2);
 
 #ifdef BE_CAUTIOUS
-     checkDDSep(dd2);
+    checkDDSep(dd2);
 #endif
 
-     dd = dd2;
-     i--;
-     if (options[OPTION_MSGLVL] > 2)
-       printf("\t %2d. dom.dec. sep.: S %d, B %d, W %d [cost %7.2f]\n",
-              i, dd->cwght[GRAY], dd->cwght[BLACK], dd->cwght[WHITE],
-              F(dd->cwght[GRAY], dd->cwght[BLACK], dd->cwght[WHITE]));
-   }
+    dd = dd2;
+    i--;
+    if (options[OPTION_MSGLVL] > 2)
+      printf("\t %2d. dom.dec. sep.: S %d, B %d, W %d [cost %7.2f]\n",
+             i, dd->cwght[GRAY], dd->cwght[BLACK], dd->cwght[WHITE],
+             F(dd->cwght[GRAY], dd->cwght[BLACK], dd->cwght[WHITE]));
+  }
   pord_stoptimer(cpus[TIME_REFINESEP]);
 
   /* ---------------------------------
@@ -286,16 +295,16 @@ constructSeparator(gbisect_t *Gbisect, options_t *options, timings_t *cpus)
   free(map);
 }
 
-
 /*****************************************************************************
 ******************************************************************************/
 PORD_INT
 smoothBy2Layers(gbisect_t *Gbisect, PORD_INT *bipartvertex, PORD_INT *pnX,
                 PORD_INT black, PORD_INT white)
-{ gbipart_t *Gbipart;
-  PORD_INT       *xadj, *adjncy, *color, *cwght, *map;
-  PORD_INT       *flow, *rc, *matching, *dmflag, dmwght[6];
-  PORD_INT       nvtx, smoothed, nX, nX2, nY, x, y, u, i, j, jstart, jstop;
+{
+  gbipart_t *Gbipart;
+  PORD_INT *xadj, *adjncy, *color, *cwght, *map;
+  PORD_INT *flow, *rc, *matching, *dmflag, dmwght[6];
+  PORD_INT nvtx, smoothed, nX, nX2, nY, x, y, u, i, j, jstart, jstop;
 
   nvtx = Gbisect->G->nvtx;
   xadj = Gbisect->G->xadj;
@@ -314,52 +323,59 @@ smoothBy2Layers(gbisect_t *Gbisect, PORD_INT *bipartvertex, PORD_INT *pnX,
      ---------------------------------- */
   nY = 0;
   for (i = 0; i < nX; i++)
-   { x = bipartvertex[i];
-     jstart = xadj[x];
-     jstop = xadj[x+1];
-     for (j = jstart; j < jstop; j++)
-      { y = adjncy[j];
-        if (color[y] == black)
-         { bipartvertex[nX+nY++] = y;
-           color[y] = GRAY;
-         }
+  {
+    x = bipartvertex[i];
+    jstart = xadj[x];
+    jstop = xadj[x + 1];
+    for (j = jstart; j < jstop; j++)
+    {
+      y = adjncy[j];
+      if (color[y] == black)
+      {
+        bipartvertex[nX + nY++] = y;
+        color[y] = GRAY;
       }
-   }
-  for (i = nX; i < nX+nY; i++)
-   { y = bipartvertex[i];
-     color[y] = black;
-   }
+    }
+  }
+  for (i = nX; i < nX + nY; i++)
+  {
+    y = bipartvertex[i];
+    color[y] = black;
+  }
 
   /* --------------------------------------------
      compute the Dulmage-Mendelsohn decomposition
      -------------------------------------------- */
   Gbipart = setupBipartiteGraph(Gbisect->G, bipartvertex, nX, nY, map);
 
-  mymalloc(dmflag, (nX+nY), PORD_INT);
-  switch(Gbipart->G->type)
-   { case UNWEIGHTED:
-       mymalloc(matching, (nX+nY), PORD_INT);
-       maximumMatching(Gbipart, matching);
-       DMviaMatching(Gbipart, matching, dmflag, dmwght);
-       free(matching);
-       break;
-     case WEIGHTED:
-       mymalloc(flow, Gbipart->G->nedges, PORD_INT);
-       mymalloc(rc, (nX+nY), PORD_INT);
-       maximumFlow(Gbipart, flow, rc);
-       DMviaFlow(Gbipart, flow, rc, dmflag, dmwght);
-       free(flow);
-       free(rc);
-       break;
-     default:
-       fprintf(stderr, "\nError in function smoothSeparator\n"
-            "  unrecognized bipartite graph type %d\n", Gbipart->G->type);
-       quit();
-   }
+  mymalloc(dmflag, (nX + nY), PORD_INT);
+  switch (Gbipart->G->type)
+  {
+  case UNWEIGHTED:
+    mymalloc(matching, (nX + nY), PORD_INT);
+    maximumMatching(Gbipart, matching);
+    DMviaMatching(Gbipart, matching, dmflag, dmwght);
+    free(matching);
+    break;
+  case WEIGHTED:
+    mymalloc(flow, Gbipart->G->nedges, PORD_INT);
+    mymalloc(rc, (nX + nY), PORD_INT);
+    maximumFlow(Gbipart, flow, rc);
+    DMviaFlow(Gbipart, flow, rc, dmflag, dmwght);
+    free(flow);
+    free(rc);
+    break;
+  default:
+    fprintf(stderr, "\nError in function smoothSeparator\n"
+                    "  unrecognized bipartite graph type %d\n",
+            Gbipart->G->type);
+    quit();
+  }
 
 #ifdef DEBUG
   printf("Dulmage-Mendelsohn decomp. computed\n"
-         "SI %d, SX %d, SR %d, BI %d, BX %d, BR %d\n", dmwght[SI], dmwght[SX],
+         "SI %d, SX %d, SR %d, BI %d, BX %d, BR %d\n",
+         dmwght[SI], dmwght[SX],
          dmwght[SR], dmwght[BI], dmwght[BX], dmwght[BR]);
 #endif
 
@@ -369,25 +385,31 @@ smoothBy2Layers(gbisect_t *Gbisect, PORD_INT *bipartvertex, PORD_INT *pnX,
      black into the separator (black shrinks)
      ----------------------------------------------------------------------- */
   smoothed = FALSE;
-  if (F(cwght[GRAY]-dmwght[SI]+dmwght[BX], cwght[black]-dmwght[BX],
-        cwght[white]+dmwght[SI]) + EPS < F(cwght[GRAY], cwght[black],
-                                           cwght[white]))
-   { smoothed = TRUE;
+  if (F(cwght[GRAY] - dmwght[SI] + dmwght[BX], cwght[black] - dmwght[BX],
+        cwght[white] + dmwght[SI]) +
+          EPS <
+      F(cwght[GRAY], cwght[black],
+        cwght[white]))
+  {
+    smoothed = TRUE;
 
 #ifdef DEBUG
-     printf("exchange SI with BX\n");
+    printf("exchange SI with BX\n");
 #endif
 
-     cwght[white] += dmwght[SI]; cwght[GRAY] -= dmwght[SI];
-     cwght[black] -= dmwght[BX]; cwght[GRAY] += dmwght[BX];
-     for (i = 0; i < nX+nY; i++)
-      { u = bipartvertex[i];
-        if (dmflag[map[u]] == SI)
-          color[u] = white;
-        if (dmflag[map[u]] == BX)
-          color[u] = GRAY;
-      }
-   }
+    cwght[white] += dmwght[SI];
+    cwght[GRAY] -= dmwght[SI];
+    cwght[black] -= dmwght[BX];
+    cwght[GRAY] += dmwght[BX];
+    for (i = 0; i < nX + nY; i++)
+    {
+      u = bipartvertex[i];
+      if (dmflag[map[u]] == SI)
+        color[u] = white;
+      if (dmflag[map[u]] == BX)
+        color[u] = GRAY;
+    }
+  }
 
   /* -----------------------------------------------------------------------
      2nd TEST: try to exchange SR with BR, i.e. nodes in SR are moved from
@@ -396,52 +418,59 @@ smoothBy2Layers(gbisect_t *Gbisect, PORD_INT *bipartvertex, PORD_INT *pnX,
      NOTE: SR is allowed to be exchanged with BR only if SI = BX = 0 or if
            SI has been exchanged with BX (Adj(SR) is a subset of BX u BR)
      ----------------------------------------------------------------------- */
-  if ((F(cwght[GRAY]-dmwght[SR]+dmwght[BR], cwght[black]-dmwght[BR],
-         cwght[white]+dmwght[SR]) + EPS < F(cwght[GRAY], cwght[black],
-                                            cwght[white]))
-      && ((smoothed) || (dmwght[SI] == 0)))
-   { smoothed = TRUE;
+  if ((F(cwght[GRAY] - dmwght[SR] + dmwght[BR], cwght[black] - dmwght[BR],
+         cwght[white] + dmwght[SR]) +
+           EPS <
+       F(cwght[GRAY], cwght[black],
+         cwght[white])) &&
+      ((smoothed) || (dmwght[SI] == 0)))
+  {
+    smoothed = TRUE;
 
 #ifdef DEBUG
-     printf("exchange SR with BR\n");
+    printf("exchange SR with BR\n");
 #endif
 
-     cwght[white] += dmwght[SR]; cwght[GRAY] -= dmwght[SR];
-     cwght[black] -= dmwght[BR]; cwght[GRAY] += dmwght[BR];
-     for (i = 0; i < nX+nY; i++)
-      { u = bipartvertex[i];
-        if (dmflag[map[u]] == SR)
-          color[u] = white;
-        if (dmflag[map[u]] == BR)
-          color[u] = GRAY;
-      }
-   }
+    cwght[white] += dmwght[SR];
+    cwght[GRAY] -= dmwght[SR];
+    cwght[black] -= dmwght[BR];
+    cwght[GRAY] += dmwght[BR];
+    for (i = 0; i < nX + nY; i++)
+    {
+      u = bipartvertex[i];
+      if (dmflag[map[u]] == SR)
+        color[u] = white;
+      if (dmflag[map[u]] == BR)
+        color[u] = GRAY;
+    }
+  }
 
   /* -----------------------------------------------------
      fill bipartvertex with the nodes of the new separator
      ----------------------------------------------------- */
   nX2 = 0;
-  for (i = 0; i < nX+nY; i++)
-   { u = bipartvertex[i];
-     if (color[u] == GRAY)
-       bipartvertex[nX2++] = u;
-   }
+  for (i = 0; i < nX + nY; i++)
+  {
+    u = bipartvertex[i];
+    if (color[u] == GRAY)
+      bipartvertex[nX2++] = u;
+  }
   *pnX = nX2;
 
   /* -------------------------------
      free working storage and return
      ------------------------------- */
-  free(map); free(dmflag);
+  free(map);
+  free(dmflag);
   freeBipartiteGraph(Gbipart);
-  return(smoothed);
+  return (smoothed);
 }
-
 
 /*****************************************************************************
 ******************************************************************************/
-void
-smoothSeparator(gbisect_t *Gbisect, options_t *options)
-{ PORD_INT *xadj, *adjncy, *vwght, *color, *cwght, *bipartvertex;
+void smoothSeparator(gbisect_t *Gbisect, options_t *options)
+{
+  PORD_INT *xadj, *adjncy, *vwght, *color, *cwght, *bipartvertex;
   PORD_INT nvtx, nX, nX2, u, x, y, a, b, i, j, jstart, jstop;
 
   nvtx = Gbisect->G->nvtx;
@@ -462,53 +491,67 @@ smoothSeparator(gbisect_t *Gbisect, options_t *options)
       bipartvertex[nX++] = u;
 
   do
-   { /* ---------------------------------------------------------------
-        minimize the separator (i.e. minimize set X of bipartite graph)
-        --------------------------------------------------------------- */
-     cwght[GRAY] = nX2 = 0;
-     for (i = 0; i < nX; i++)
-      { x = bipartvertex[i];
-        a = b = FALSE;
-        jstart = xadj[x];
-        jstop = xadj[x+1];
-        for (j = jstart; j < jstop; j++)
-         { y = adjncy[j];
-           if (color[y] == WHITE) a = TRUE;
-           if (color[y] == BLACK) b = TRUE;
-         }
-        if ((a) && (!b))
-         { color[x] = WHITE; cwght[WHITE] += vwght[x]; }
-        else if ((!a) && (b))
-         { color[x] = BLACK; cwght[BLACK] += vwght[x]; }
-        else
-         { bipartvertex[nX2++] = x; cwght[GRAY] += vwght[x]; }
+  { /* ---------------------------------------------------------------
+       minimize the separator (i.e. minimize set X of bipartite graph)
+       --------------------------------------------------------------- */
+    cwght[GRAY] = nX2 = 0;
+    for (i = 0; i < nX; i++)
+    {
+      x = bipartvertex[i];
+      a = b = FALSE;
+      jstart = xadj[x];
+      jstop = xadj[x + 1];
+      for (j = jstart; j < jstop; j++)
+      {
+        y = adjncy[j];
+        if (color[y] == WHITE)
+          a = TRUE;
+        if (color[y] == BLACK)
+          b = TRUE;
       }
-     nX = nX2;
+      if ((a) && (!b))
+      {
+        color[x] = WHITE;
+        cwght[WHITE] += vwght[x];
+      }
+      else if ((!a) && (b))
+      {
+        color[x] = BLACK;
+        cwght[BLACK] += vwght[x];
+      }
+      else
+      {
+        bipartvertex[nX2++] = x;
+        cwght[GRAY] += vwght[x];
+      }
+    }
+    nX = nX2;
 
 #ifdef BE_CAUTIOUS
-     checkSeparator(Gbisect);
+    checkSeparator(Gbisect);
 #endif
 
-     /* ------------------------------------------------------------------
-        smooth the unweighted/weighted separator
-        first pair it with the larger set; if unsuccessful try the smaller
-        ------------------------------------------------------------------ */
-     if (cwght[BLACK] >= cwght[WHITE])
-      { a = smoothBy2Layers(Gbisect, bipartvertex, &nX, BLACK, WHITE);
-        if (!a)
-          a = smoothBy2Layers(Gbisect, bipartvertex, &nX, WHITE, BLACK);
-      }
-     else
-      { a = smoothBy2Layers(Gbisect, bipartvertex, &nX, WHITE, BLACK);
-        if (!a)
-          a = smoothBy2Layers(Gbisect, bipartvertex, &nX, BLACK, WHITE);
-      }
-     if ((options[OPTION_MSGLVL] > 2) && (a))
-       printf("\t separator smoothed: S %d, B %d, W %d [cost %7.2f]\n",
-              cwght[GRAY], cwght[BLACK], cwght[WHITE],
-              F(cwght[GRAY], cwght[BLACK], cwght[WHITE])); 
-   } while (a);
-     
+    /* ------------------------------------------------------------------
+       smooth the unweighted/weighted separator
+       first pair it with the larger set; if unsuccessful try the smaller
+       ------------------------------------------------------------------ */
+    if (cwght[BLACK] >= cwght[WHITE])
+    {
+      a = smoothBy2Layers(Gbisect, bipartvertex, &nX, BLACK, WHITE);
+      if (!a)
+        a = smoothBy2Layers(Gbisect, bipartvertex, &nX, WHITE, BLACK);
+    }
+    else
+    {
+      a = smoothBy2Layers(Gbisect, bipartvertex, &nX, WHITE, BLACK);
+      if (!a)
+        a = smoothBy2Layers(Gbisect, bipartvertex, &nX, BLACK, WHITE);
+    }
+    if ((options[OPTION_MSGLVL] > 2) && (a))
+      printf("\t separator smoothed: S %d, B %d, W %d [cost %7.2f]\n",
+             cwght[GRAY], cwght[BLACK], cwght[WHITE],
+             F(cwght[GRAY], cwght[BLACK], cwght[WHITE]));
+  } while (a);
+
   free(bipartvertex);
 }
-

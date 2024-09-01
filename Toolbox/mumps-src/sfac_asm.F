@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.1, released
-C  on Thu May  2 10:15:09 UTC 2024
+C  This file is part of MUMPS 5.7.3, released
+C  on Mon Jul 15 11:44:21 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -816,11 +816,14 @@ C
       IF (PARPIV_T1.EQ.77) THEN
        PARPIV_T1 = 0
       ENDIF
+      NCB = NFRONT-NASS1
+      IF (NCB.EQ.KEEP(253)) THEN
+        PARPIV_T1 = 0
+      ENDIF
       IF (PARPIV_T1.EQ.0) RETURN
       IF ( (PARPIV_T1.EQ.-2).AND.LR_ACTIVATED ) THEN
          PARPIV_T1 = 1
       ENDIF
-      NCB = NFRONT-NASS1
       IF (PARPIV_T1.EQ.-2) THEN
          IF ( 
      &   ( SMUMPS_IS_TRSM_LARGE_ENOUGH ( NASS1, NCB
@@ -835,9 +838,6 @@ C
          ELSE
             PARPIV_T1 = 0
          ENDIF
-      ENDIF
-      IF (NCB.EQ.KEEP(253)) THEN
-       PARPIV_T1 = 0
       ENDIF
       RETURN
       END SUBROUTINE SMUMPS_SET_PARPIVT1 

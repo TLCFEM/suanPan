@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.1, released
-C  on Thu May  2 10:15:09 UTC 2024
+C  This file is part of MUMPS 5.7.3, released
+C  on Mon Jul 15 11:44:21 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -2512,6 +2512,7 @@ C
      &           INODE_PRINC, I, II, JAM1
 #if defined(AVOID_MPI_IN_PLACE)
       INTEGER, DIMENSION(:), ALLOCATABLE ::  TMP_INT_ARRAY
+      INTEGER :: allocok
 #endif
 #if defined(AVOID_MPI_IN_PLACE)
       ALLOCATE(TMP_INT_ARRAY(KEEP(28)), STAT = allocok)

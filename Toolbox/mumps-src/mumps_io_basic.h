@@ -1,7 +1,7 @@
 /*
  *
- *  This file is part of MUMPS 5.7.1, released
- *  on Thu May  2 10:15:09 UTC 2024
+ *  This file is part of MUMPS 5.7.3, released
+ *  on Mon Jul 15 11:44:21 UTC 2024
  *
  *
  *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -128,17 +128,15 @@ MUMPS_INT mumps_io_set_last_file(MUMPS_INT* dim,MUMPS_INT* type);
 MUMPS_INT mumps_io_write__(void *file, void *loc_add, size_t write_size, MUMPS_OFF_T where,MUMPS_INT type);
 #if ! defined (MUMPS_WIN32)
 MUMPS_INT mumps_io_write_os_buff__(void *file, void *loc_add, size_t write_size, MUMPS_OFF_T where);
-MUMPS_INT mumps_io_write_direct_io__(void *file, void *loc_addr, size_t write_size, MUMPS_OFF_T where,MUMPS_INT type);
 MUMPS_INT mumps_io_flush_write__(MUMPS_INT type);
 #else
 MUMPS_INT mumps_io_write_win32__(void *file, void *loc_add, size_t write_size, MUMPS_OFF_T where);
 #endif
-MUMPS_INT mumps_io_read__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset,MUMPS_INT type);
+MUMPS_OFF_T mumps_io_read__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset,MUMPS_INT type);
 #if ! defined (MUMPS_WIN32)
-MUMPS_INT mumps_io_read_os_buff__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset);
-MUMPS_INT mumps_io_read_direct_io__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset,MUMPS_INT type);
+MUMPS_OFF_T mumps_io_read_os_buff__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset);
 #else
-MUMPS_INT mumps_io_read_win32__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset);
+MUMPS_OFF_T mumps_io_read_win32__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset);
 #endif
 #if ! defined (MUMPS_WIN32) && ! defined (WITHOUT_PTHREAD)
 # if defined (WITH_PFUNC)

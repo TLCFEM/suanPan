@@ -281,7 +281,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.3
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.12.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
-- [**MUMPS**](https://mumps-solver.org/) version 5.7.1
+- [**MUMPS**](https://mumps-solver.org/) version 5.7.3
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
 - [**VTK**](https://vtk.org/) version 9.2.6
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5

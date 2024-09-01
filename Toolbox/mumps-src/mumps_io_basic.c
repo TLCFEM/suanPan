@@ -1,7 +1,7 @@
 /*
  *
- *  This file is part of MUMPS 5.7.1, released
- *  on Thu May  2 10:15:09 UTC 2024
+ *  This file is part of MUMPS 5.7.3, released
+ *  on Mon Jul 15 11:44:21 UTC 2024
  *
  *
  *  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -64,7 +64,7 @@ MUMPS_INLINE void mumps_init_max_file_size(MUMPS_OFF_T * mumps_io_max_file_size,
         *mumps_io_max_file_size=2;
         }
       else {
-        *mumps_io_max_file_size=1;
+        *mumps_io_max_file_size=keep255; /* 1 or 2 GBytes */
         }
       }
     else {
@@ -324,6 +324,7 @@ MUMPS_INT mumps_io_do_read_block(void * address_block,
   MUMPS_OFF_T local_offset;
   void *loc_addr;
   long long vaddr_loc;
+  MUMPS_OFF_T size_effectively_read;
   MUMPS_INT type;
   type=*type_arg;
   if(block_size==0){
@@ -332,6 +333,8 @@ MUMPS_INT mumps_io_do_read_block(void * address_block,
   read_size=(double)mumps_elementary_data_size*(double)(block_size);
   loc_addr=address_block;
   vaddr_loc=vaddr*(long long)mumps_elementary_data_size;
+  /* We need to read a total of read_size bytes, possibly
+   * by chunks and possibly from several files */
   while(read_size>0){
     /* Virtual addressing based management stuff */
     local_fnum=(MUMPS_INT)(vaddr_loc/(long long)mumps_io_max_file_size);
@@ -350,16 +353,17 @@ MUMPS_INT mumps_io_do_read_block(void * address_block,
       size=(size_t)(read_size/mumps_elementary_data_size);
     }
 #endif
-    *ierr=mumps_io_read__(file,loc_addr,size,local_offset,type);
-    if(*ierr<0){
+    size_effectively_read=mumps_io_read__(file,loc_addr,size,local_offset,type);
+    if(size_effectively_read<0){ /* an error occurred */
+      *ierr=(MUMPS_INT)size_effectively_read;
       return *ierr;
     }
 #if defined( MUMPS_WIN32 )
-    size=size*mumps_elementary_data_size;
+    size_effectively_read=size_effectively_read*mumps_elementary_data_size;
 #endif
-    vaddr_loc=vaddr_loc+(long long)size;
-    read_size=read_size-(double)size;
-    loc_addr=(void*)((size_t)loc_addr+size);
+    vaddr_loc=vaddr_loc+(long long)size_effectively_read;
+    read_size=read_size-(double)size_effectively_read;
+    loc_addr=(void*)((size_t)loc_addr+size_effectively_read);
     local_fnum++;
     local_offset=0;
     if(local_fnum>(mumps_files+type)->mumps_io_nb_file){
@@ -672,49 +676,45 @@ MUMPS_INT mumps_io_destroy_pointers_lock(){
 }
 # endif /*WITH_PFUNC*/
 #endif /* _WIN32 && WITHOUT_PTHREAD */
-MUMPS_INT mumps_io_read__(void * file,void * loc_addr,size_t size,MUMPS_OFF_T local_offset,MUMPS_INT type){
-MUMPS_INT ret_code;
+/* mumps_io_read__ reads up to size bytes and returns either the number of bytes read, or, in case of error, a negative n error */
+MUMPS_OFF_T mumps_io_read__(void * file,void * loc_addr,size_t size,MUMPS_OFF_T local_offset,MUMPS_INT type){
+MUMPS_OFF_T ret_code;
 #if ! defined( MUMPS_WIN32 )
   ret_code=mumps_io_read_os_buff__(file,loc_addr, size,local_offset);
-  if(ret_code<0){
-    return ret_code;
-  }
 #else
   ret_code=mumps_io_read_win32__(file,loc_addr, size,local_offset);
-  if(ret_code<0){
-    return ret_code;
-  }
 #endif  
-  return 0;
+  return ret_code;
 }
 #if ! defined( MUMPS_WIN32 )
-MUMPS_INT mumps_io_read_os_buff__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset){
-  size_t ret_code;
+MUMPS_OFF_T mumps_io_read_os_buff__(void * file,void * loc_addr,size_t size, MUMPS_OFF_T local_offset){
+  MUMPS_OFF_T ret_code;
 # ifdef WITH_PFUNC
-  ret_code=pread(*(MUMPS_INT *)file,loc_addr,size,(off_t)local_offset);
+  ret_code=(MUMPS_OFF_T)pread(*(MUMPS_INT *)file,loc_addr,size,(off_t)local_offset);
 # else
   lseek(*(MUMPS_INT *)file, (off_t)local_offset,SEEK_SET);
-  ret_code=read(*(MUMPS_INT *)file,loc_addr,size);
+  ret_code=(MUMPS_OFF_T)read(*(MUMPS_INT *)file,loc_addr,size);
 # endif
-  if((MUMPS_INT) ret_code==-1){
-    return mumps_io_sys_error(-90,"Problem with low level read");
+  if(ret_code==-1){
+    return (MUMPS_OFF_T)mumps_io_sys_error(-90,"Problem with low level read");
   }
-  return 0;
+  return ret_code; /* can be smaller than size in case size is large, typically > 2GB */
 }
 #endif
 #if defined( MUMPS_WIN32 )
-MUMPS_INT mumps_io_read_win32__(void * file, void * loc_addr,size_t size, MUMPS_OFF_T local_offset){
-  size_t ret_code;
+MUMPS_OFF_T mumps_io_read_win32__(void * file, void * loc_addr,size_t size, MUMPS_OFF_T local_offset){
+  MUMPS_OFF_T ret_code;
 #if defined(MUMPS_WINLARGEFILES)
   _fseeki64(*(FILE **)file,local_offset,SEEK_SET); /* expects where to be __int64 */
 #else
   fseek(*(FILE **)file,(long) local_offset,SEEK_SET);
 #endif
-  ret_code=fread(loc_addr,mumps_elementary_data_size,size,*(FILE **)file);
-  if((ret_code!=size)||(ferror(*(FILE**)file))){
-    return mumps_io_error(-90,"Problem with I/O operation\n");
+  ret_code=(MUMPS_OFF_T)fread(loc_addr,mumps_elementary_data_size,size,*(FILE **)file);
+  /* with fread, all requested bytes must be read and if this is not the case an error is raised */
+  if((ret_code!=(MUMPS_OFF_T)size)||(ferror(*(FILE**)file))){
+    return (MUMPS_OFF_T)mumps_io_error(-90,"Problem with I/O operation\n");
   }
-  return 0;
+  return ret_code;
 }
 #endif
 MUMPS_INT mumps_io_write__(void *file, void *loc_addr, size_t write_size, MUMPS_OFF_T where, MUMPS_INT type){

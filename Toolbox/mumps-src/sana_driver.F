@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.1, released
-C  on Thu May  2 10:15:09 UTC 2024
+C  This file is part of MUMPS 5.7.3, released
+C  on Mon Jul 15 11:44:21 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -4892,14 +4892,13 @@ C     Choice of symbolic analysis option
 C     ----------------------------------
          IF (id%ICNTL(58).NE.1 .and. id%ICNTL(58).NE.2
      &    .and. id%ICNTL(58).NE.3 .and.  id%ICNTL(58).NE.4 ) THEN
-C        out of range values leads to symbolic based on SYMBQAMD
-            id%KEEP(106)=1
+C           out of range values leads to default
+            id%KEEP(106)=2
          ELSE
             id%KEEP(106)=id%ICNTL(58)
-            IF (id%KEEP(106).GE.4) THEN
-C            option not available 
-             id%KEEP(106)=1
-            ENDIF
+C           Options 3 and 4 not available, reset to default
+            IF (id%KEEP(106).EQ.4) id%KEEP(106)=2
+            IF (id%KEEP(106).EQ.3) id%KEEP(106)=2
          ENDIF
 C     modify input parameters to avoid incompatible
 C     input data between ordering, scaling and maxtrans
