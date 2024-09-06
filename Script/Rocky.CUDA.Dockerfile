@@ -8,7 +8,7 @@ RUN cd suanPan/build && cp suanPan*.rpm / && \
     cd suanPan-linux-mkl-vtk/bin && ./suanPan.sh -v && \
     cd / && ls -al && rm -r suanPan
 
-FROM nvidia/cuda:12.5.1-runtime-rockylinux9
+FROM nvidia/cuda:12.6.1-runtime-rockylinux9
 
 COPY --from=build /suanPan*.rpm /
 
