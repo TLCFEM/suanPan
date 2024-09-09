@@ -202,7 +202,8 @@ endif ()
 if (USE_HDF5)
     add_compile_definitions(SUANPAN_HDF5)
     if (HAVE_VTK)
-        string(REGEX REPLACE "/lib6?4?/cmake/vtk" "/include/vtk" VTK_INCLUDE ${VTK_DIR})
+        string(REGEX REPLACE "/lib6?4?/cmake/vtk" "/include/vtk" VTK_INCLUDE ${VTK_DIR}) # on linux
+        string(REGEX REPLACE "\\\\lib6?4?\\\\cmake\\\\vtk" "\\\\include\\\\vtk" VTK_INCLUDE ${VTK_DIR}) # on windows
         include_directories(${VTK_INCLUDE}/vtkhdf5)
         include_directories(${VTK_INCLUDE}/vtkhdf5/src)
         include_directories(${VTK_INCLUDE}/vtkhdf5/hl/src)
