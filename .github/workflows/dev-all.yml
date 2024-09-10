@@ -251,3 +251,67 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
+  windows-gcc-dev:
+    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+    runs-on: windows-2022
+    timeout-minutes: 100
+    strategy:
+      matrix:
+        build: [ Release ]
+        compiler: [ "MinGW Makefiles" ]
+        vtk: [ ON ]
+        avx: [ ON, OFF ]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Golang
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+      - name: GCC
+        run: |
+          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0posix-18.1.5-11.0.1-msvcrt-r8/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
+          7z x winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
+      - name: VTK
+        if: matrix.vtk == 'ON'
+        run: |
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.3.1-win-gcc.7z
+          7z x VTK-9.3.1-win-gcc.7z -oVTK
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          mkdir build && cd build
+          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.3 -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake --build . --target install --config ${{ matrix.build }} -j 4
+      - name: Pack
+        shell: bash
+        run: |
+          cp updater.exe build/dist/bin
+          file_name="suanPan-win-gcc"
+          if [ "${{ matrix.build }}" == "Debug" ]; then
+            file_name+="-debug"
+          else
+            file_name+="-release"
+          fi
+          file_name+="-openblas"
+          if [ "${{ matrix.avx }}" == "ON" ]; then
+            file_name+="-avx"
+          else
+            file_name+="-no-avx"
+          fi
+          if [ "${{ matrix.vtk }}" == "ON" ]; then
+            file_name+="-vtk"
+          fi
+          file_name+=".7z"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          cd build/dist/bin
+          7z a ../../../$file_name ./*
+      - name: Test
+        run: |
+          build/dist/bin/suanPan.exe -v
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.ARTIFACT }}
+        
