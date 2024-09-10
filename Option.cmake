@@ -91,6 +91,10 @@ if (USE_SUPERLUMT)
     # add_compile_definitions(SUANPAN_SUPERLUMT)
 endif ()
 
+if (FORTRAN_STATUS AND CMAKE_Fortran_COMPILER_ID MATCHES "Intel" AND NOT USE_MKL)
+    message(FATAL_ERROR "Since Intel compilers are used, why not enabling MKL?")
+endif()
+
 if (USE_MKL)
     set(MKLROOT "" CACHE PATH "MKL library path which contains /include and /lib folders.")
     find_file(MKL_HEADER NAMES mkl.h PATHS ${MKLROOT}/include)

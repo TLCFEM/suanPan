@@ -202,6 +202,7 @@ jobs:
         compiler: [ "Visual Studio 17 2022" ]
         vtk: [ ON, OFF ]
         avx: [ ON, OFF ]
+        mkl: [ ON, OFF ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -209,6 +210,22 @@ jobs:
         uses: actions/setup-go@v5
         with:
           cache: false
+      - name: MKL
+        shell: cmd
+        if: matrix.mkl == 'ON'
+        run: |
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a665fc26-bdf1-415f-9fc4-345f257f4fb1/w_onemkl_p_2024.2.1.106_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ea23d696-a77f-4a4a-8996-20d02cdbc48f/w_fortran-compiler_p_2024.2.1.81_offline.exe
+          w_onemkl_p_2024.2.1.106_offline.exe -s -a --silent --eula accept
+          w_fortran-compiler_p_2024.2.1.81_offline.exe -s -a --silent --eula accept
+      - name: FORTRAN
+        shell: bash
+        run: |
+          if [ "${{ matrix.mkl }}" == "ON" ]; then
+            echo 'IFORT="C:/Program Files (x86)/Intel/oneAPI/compiler/2024.2/bin/ifort.exe"' >> "$GITHUB_ENV"
+          else
+            echo 'IFORT=""' >> "$GITHUB_ENV"
+          fi
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
@@ -218,7 +235,10 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+          if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
+            cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
+          }
+          cmake -G "${{ matrix.compiler }}" -DCMAKE_Fortran_COMPILER=${{ env.IFORT }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DMKLROOT="C:/Program Files (x86)/Intel/oneAPI/mkl/latest" -DCMAKE_INSTALL_PREFIX=dist ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash
@@ -230,7 +250,11 @@ jobs:
           else
             file_name+="-release"
           fi
-          file_name+="-openblas"
+          if [ "${{ matrix.mkl }}" == "ON" ]; then
+            file_name+="-mkl"
+          else
+            file_name+="-openblas"
+          fi
           if [ "${{ matrix.avx }}" == "ON" ]; then
             file_name+="-avx"
           else
@@ -239,10 +263,17 @@ jobs:
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
           fi
-          file_name+=".7z"
-          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-          cd build/dist/bin
-          7z a ../../../$file_name ./*
+          if [ "${{ matrix.mkl }}" == "ON" ]; then
+            file_name+=".zip"
+            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+            cd build/dist/bin
+            7z a -tzip ../../../$file_name ./*
+          else
+            file_name+=".7z"
+            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+            cd build/dist/bin
+            7z a ../../../$file_name ./*
+          fi
       - name: Test
         run: |
           build/dist/bin/suanPan.exe -v
