@@ -218,14 +218,6 @@ jobs:
           C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ea23d696-a77f-4a4a-8996-20d02cdbc48f/w_fortran-compiler_p_2024.2.1.81_offline.exe
           w_onemkl_p_2024.2.1.106_offline.exe -s -a --silent --eula accept
           w_fortran-compiler_p_2024.2.1.81_offline.exe -s -a --silent --eula accept
-      - name: FORTRAN
-        shell: bash
-        run: |
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            echo 'IFORT="C:/Program Files (x86)/Intel/oneAPI/compiler/2024.2/bin/ifort.exe"' >> "$GITHUB_ENV"
-          else
-            echo 'IFORT=""' >> "$GITHUB_ENV"
-          fi
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
@@ -238,7 +230,7 @@ jobs:
           if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
             cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
           }
-          cmake -G "${{ matrix.compiler }}" -DCMAKE_Fortran_COMPILER=${{ env.IFORT }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DMKLROOT="C:/Program Files (x86)/Intel/oneAPI/mkl/latest" -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DMKLROOT="C:/Program Files (x86)/Intel/oneAPI/mkl/latest" -DCMAKE_INSTALL_PREFIX=dist ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash

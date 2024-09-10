@@ -2,7 +2,6 @@ import hashlib
 import os
 import shutil
 import sys
-import zipfile
 
 
 def pack(root_folder: str):
