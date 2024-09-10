@@ -6,7 +6,7 @@ on:
     branches: [ dev ]
 jobs:
   ubuntu-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') }} || ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
@@ -130,7 +130,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   macos-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') }} || ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: macos-13
     timeout-minutes: 100
     strategy:
@@ -192,7 +192,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') }} || ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
@@ -274,7 +274,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-gcc-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') }} || ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
