@@ -68,20 +68,9 @@ def pack(root_folder: str):
 
     print("[+] packing archive ...")
 
-    an = "suanPan-win-mkl-vtk"
-
-    pwd = os.getcwd()
-
-    os.chdir(fn)
-    archive = zipfile.ZipFile("../" + an + ".zip", "w", zipfile.ZIP_DEFLATED)
-    for f in os.listdir("."):
-        archive.write(f)
-
-    archive.close()
-
-    os.chdir(pwd)
-
-    with open(an + ".sha256", "w") as hashfile, open(an + ".zip", "rb") as target:
+    with open("suanPan-win-mkl-vtk.sha256", "w") as hashfile, open(
+        "suanPan-win-mkl-vtk.zip", "rb"
+    ) as target:
         hashfile.write(hashlib.sha256(target.read()).hexdigest())
 
     print("[+] packing chocolatey package ...")
