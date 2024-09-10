@@ -308,8 +308,6 @@ jobs:
           7z a ../../../$file_name ./*
       - name: Test
         run: |
-          $env:PATH += ";D:/a/suanPan/suanPan/mingw64/bin"
-          echo $env:PATH
           build/dist/bin/suanPan.exe -v
       - name: Upload
         uses: actions/upload-artifact@v4
