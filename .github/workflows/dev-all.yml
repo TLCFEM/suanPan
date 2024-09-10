@@ -6,7 +6,7 @@ on:
     branches: [ dev ]
 jobs:
   ubuntu-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') }}
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
@@ -130,7 +130,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   macos-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') }}
     runs-on: macos-13
     timeout-minutes: 100
     strategy:
@@ -155,7 +155,6 @@ jobs:
           brew install go libomp
           go build Checker/updater.go
           mkdir build && cd build
-          export CXXFLAGS="-Wl,-ld_classic"
           export FC=gfortran-12
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
@@ -193,7 +192,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
@@ -275,7 +274,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-gcc-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
