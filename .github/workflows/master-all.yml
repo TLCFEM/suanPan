@@ -150,9 +150,16 @@ jobs:
       - name: Prepare
         run: |
           echo ("SP_TIME=daily-"+(get-date -format "yyMMdd")) >> $env:GITHUB_ENV
+      - name: Cache
+        id: cache-intel
+        uses: actions/cache@v4
+        with:
+          path: |
+              C:\Program Files (x86)\Intel\oneAPI\
+          key: windows-2024.2.1
       - name: MKL
         shell: cmd
-        if: matrix.mkl == 'ON'
+        if: matrix.mkl == 'ON' && steps.cache-intel.outputs.cache-hit != 'true'
         run: |
           C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a665fc26-bdf1-415f-9fc4-345f257f4fb1/w_onemkl_p_2024.2.1.106_offline.exe
           C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ea23d696-a77f-4a4a-8996-20d02cdbc48f/w_fortran-compiler_p_2024.2.1.81_offline.exe
