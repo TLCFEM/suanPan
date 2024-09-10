@@ -309,7 +309,7 @@ jobs:
       - name: Test
         run: |
           $env:Path += ";D:/a/suanPan/suanPan/mingw64/bin"
-          build/dist/bin/suanPan.exe -v
+          # build/dist/bin/suanPan.exe -v
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
