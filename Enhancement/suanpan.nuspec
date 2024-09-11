@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>suanpan</id>
-    <version>3.4</version>
+    <version>3.5</version>
     <packageSourceUrl>https://github.com/TLCFEM/suanPan</packageSourceUrl>
     <owners>Theodore Chang</owners>
     <title>suanPan</title>
@@ -18,7 +18,7 @@
     <bugTrackerUrl>https://github.com/TLCFEM/suanPan/issues</bugTrackerUrl>
     <tags>FEM HPC IGA</tags>
     <summary>🧮 An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework</summary>
-    <description>🧮 suanPan is a finite element method (FEM) simulation platform for applications in fields such as solid mechanics and civil/structural/seismic engineering. The name suanPan (in some places such as suffix it is also abbreviated as suPan) comes from the term Suan Pan (算盤), which is Chinese abacus. suanPan is written in modern high quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.</description>
+    <description>🧮 suanPan is a finite element method (FEM) simulation platform for applications in fields such as solid mechanics and civil/structural/seismic engineering. suanPan is written in modern high quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.</description>
     <releaseNotes>Please visit: https://github.com/TLCFEM/suanPan/releases</releaseNotes>
   </metadata>
   <files>

@@ -170,11 +170,11 @@ analyze
 
 # Node 117:
 # Coordinate:
-# 20.0000 5.0000
+#   2.0000e+01  5.0000e+00
 # Displacement:
-# -2.1376e-15 2.0000e+00
+#  -7.7124e-16  2.0000e+00
 # Resistance:
-# -7.8271e-15 6.9464e-01
+#  -2.7756e-16  6.9464e-01
 peek node 117
 
 peek element 1

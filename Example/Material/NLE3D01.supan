@@ -30,6 +30,13 @@ converger RelIncreDisp 1 1E-13 50 1
 
 analyze
 
+# Node 6:
+# Coordinate:
+#   5.0000e+00  5.0000e+00  5.0000e+00
+# Displacement:
+#   0.0000e+00  4.9264e-01 -1.0000e+00
+# Resistance:
+#  -9.6681e-12  4.7223e-12 -1.9876e+04
 peek node 6
 
 # save recorder 1

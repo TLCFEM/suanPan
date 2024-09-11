@@ -35,18 +35,20 @@ step static 1
 analyze
 
 # Node 6:
-# 10.0000 0
+# Coordinate:
+#   1.0000e+01  0.0000e+00
 # Displacement:
-# 1.5000E+01 1.0150E+02
+#   1.5000e+01  1.0150e+02
 # Resistance:
-# 6.3345E-12 1.5000E+02
+#   3.8432e-12  1.5000e+02
 # 
 # Node 12:
-# 10.0000 2.0000
+# Coordinate:
+#   1.0000e+01  2.0000e+00
 # Displacement:
-# -1.5000E+01 1.0150E+02
+#  -1.5000e+01  1.0150e+02
 # Resistance:
-# -6.3380E-12 1.5000E+02
+#  -2.4079e-12  1.5000e+02
 peek node 6 12
 
 peek element 1

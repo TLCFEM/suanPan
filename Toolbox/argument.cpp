@@ -16,20 +16,20 @@
  ******************************************************************************/
 
 #include "argument.h"
+#include <array>
 #include <Include/whereami/whereami.h>
 #include <Step/Bead.h>
 #include <Toolbox/Converter.h>
 #include <Toolbox/command.h>
+#include <Toolbox/revision.h>
 #include <Toolbox/utility.h>
 #include <UnitTest/CatchTest.h>
-#include <array>
-#include "revision.h"
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
 
 #ifdef SUANPAN_MSVC
-#pragma warning(disable:4702 4996)
+#pragma warning(disable:4702)
 #endif
 
 #ifdef SUANPAN_VTK
@@ -48,7 +48,7 @@ using std::ifstream;
 using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 4;
+constexpr auto SUANPAN_MINOR = 5;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Canopus";
 
@@ -355,14 +355,7 @@ void print_helper() {
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
-#ifdef SUANPAN_WIN
-    // ReSharper disable once CppDeprecatedEntity
-    auto history_path = fs::path(getenv("USERPROFILE")); // NOLINT(concurrency-mt-unsafe, clang-diagnostic-deprecated-declarations)
-#else
-    auto history_path = fs::path(getenv("HOME"));
-#endif
-
-    history_path.append(".suanpan-history.sp");
+    const auto history_path = get_history_path();
 
     if(!exists(history_path)) {
         suanpan_info("It appears that this is the first time you run ");

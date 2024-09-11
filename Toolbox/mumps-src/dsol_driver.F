@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.1, released
-C  on Thu May  2 10:15:09 UTC 2024
+C  This file is part of MUMPS 5.7.3, released
+C  on Mon Jul 15 11:44:21 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -4734,6 +4734,16 @@ C
           ELSE
 C           Exploit sparsity of the RHS (all cases)
 C           Remark that JBEG_RHS is already initialized
+#if defined(STAT_ES_SOLVE)
+            SIZE_WORKING = 1
+            SIZE_IPTR_WORKING = 1
+            IF((KEEP(235).NE.0).OR.(KEEP(237).NE.0)) THEN
+              IF(id%MYID.EQ.MASTER) THEN
+                SIZE_WORKING = id%IPTR_WORKING(id%NPROCS+1)-1
+                SIZE_IPTR_WORKING = id%NPROCS+1
+              END IF
+            ENDIF
+#endif
 C
             FROM_PP = .FALSE.
             NBSPARSE_LOC = (DO_NBSPARSE.AND.NBRHS_EFF.GT.1)

@@ -34,7 +34,7 @@ analyze
 # Displacement:
 #  -8.0000e-04  7.8386e-04
 # Resistance:
-#  -4.4910e-01 -1.4752e-13
+#  -4.4910e-01 -1.4796e-13
 # 
 # Node 4:
 # Coordinate:
@@ -42,7 +42,7 @@ analyze
 # Displacement:
 #  -8.0000e-04 -2.2095e-04
 # Resistance:
-#  -8.4607e-01  7.0818e-14
+#  -8.4607e-01  7.0707e-14
 peek node 3 4
 
 reset

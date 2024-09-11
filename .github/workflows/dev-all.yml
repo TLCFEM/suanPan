@@ -4,9 +4,14 @@ on:
     branches: [ dev ]
   pull_request:
     branches: [ dev ]
+env:
+  SP_TIME: ''
+  ARTIFACT: ''
+  IOMP: ''
+  COVERAGE: ''
 jobs:
   ubuntu-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
@@ -41,18 +46,19 @@ jobs:
             wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
             echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           fi
+          sudo apt-get update
           if [ "${{ matrix.mkl }}" == "ON" ]; then
-            sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
+            sudo apt-get install intel-oneapi-mkl-devel
           fi
           if [ "${{ matrix.compiler.c }}" == "icx" ]; then
-            sudo apt-get update && sudo apt-get install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
+            sudo apt-get install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
             echo "IOMP=ON" >> "$GITHUB_ENV"
           else
             echo "IOMP=OFF" >> "$GITHUB_ENV"
           fi
       - name: Dependency
         run: |
-          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils
+          sudo apt-get install libglvnd-dev dpkg-dev xz-utils
           echo "COVERAGE=OFF" >> "$GITHUB_ENV"
       - name: Flag
         if: |
@@ -130,7 +136,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   macos-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: macos-13
     timeout-minutes: 100
     strategy:
@@ -155,15 +161,14 @@ jobs:
           brew install go libomp
           go build Checker/updater.go
           mkdir build && cd build
-          export CXXFLAGS="-Wl,-ld_classic"
-          export FC=gfortran-11
+          export FC=gfortran-12
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
             cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
           else
-            export CC=gcc-11
-            export CXX=g++-11
+            export CC=gcc-12
+            export CXX=g++-12
             cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
           fi
           make install -j4
@@ -193,7 +198,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
@@ -202,6 +207,7 @@ jobs:
         compiler: [ "Visual Studio 17 2022" ]
         vtk: [ ON, OFF ]
         avx: [ ON, OFF ]
+        mkl: [ ON, OFF ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -209,6 +215,14 @@ jobs:
         uses: actions/setup-go@v5
         with:
           cache: false
+      - name: MKL
+        shell: cmd
+        if: matrix.mkl == 'ON'
+        run: |
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a665fc26-bdf1-415f-9fc4-345f257f4fb1/w_onemkl_p_2024.2.1.106_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ea23d696-a77f-4a4a-8996-20d02cdbc48f/w_fortran-compiler_p_2024.2.1.81_offline.exe
+          w_onemkl_p_2024.2.1.106_offline.exe -s -a --silent --eula accept
+          w_fortran-compiler_p_2024.2.1.81_offline.exe -s -a --silent --eula accept
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
@@ -218,13 +232,90 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+          if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
+            cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
+          }
+          cmake -G "${{ matrix.compiler }}" -T fortran=ifx -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DMKLROOT="C:/Program Files (x86)/Intel/oneAPI/mkl/latest" -DCMAKE_INSTALL_PREFIX=dist ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash
         run: |
           cp updater.exe build/dist/bin
           file_name="suanPan-win"
+          if [ "${{ matrix.build }}" == "Debug" ]; then
+            file_name+="-debug"
+          else
+            file_name+="-release"
+          fi
+          if [ "${{ matrix.mkl }}" == "ON" ]; then
+            file_name+="-mkl"
+          else
+            file_name+="-openblas"
+          fi
+          if [ "${{ matrix.avx }}" == "ON" ]; then
+            file_name+="-avx"
+          else
+            file_name+="-no-avx"
+          fi
+          if [ "${{ matrix.vtk }}" == "ON" ]; then
+            file_name+="-vtk"
+          fi
+          if [ "${{ matrix.mkl }}" == "ON" ]; then
+            file_name+=".zip"
+            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+            cd build/dist/bin
+            7z a -tzip ../../../$file_name ./*
+          else
+            file_name+=".7z"
+            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+            cd build/dist/bin
+            7z a ../../../$file_name ./*
+          fi
+      - name: Test
+        run: |
+          build/dist/bin/suanPan.exe -v
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.ARTIFACT }}
+  windows-gcc-dev:
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    runs-on: windows-2022
+    timeout-minutes: 100
+    strategy:
+      matrix:
+        build: [ Release ]
+        compiler: [ "MinGW Makefiles" ]
+        vtk: [ ON ]
+        avx: [ ON, OFF ]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Golang
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+      - name: GCC
+        run: |
+          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0posix-18.1.5-11.0.1-msvcrt-r8/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
+          7z x winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
+      - name: VTK
+        if: matrix.vtk == 'ON'
+        run: |
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.3.1-win-gcc.7z
+          7z x VTK-9.3.1-win-gcc.7z -oVTK
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          mkdir build && cd build
+          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.3 -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake --build . --target install --config ${{ matrix.build }} -j 4
+      - name: Pack
+        shell: bash
+        run: |
+          cp updater.exe build/dist/bin
+          file_name="suanPan-win-gcc"
           if [ "${{ matrix.build }}" == "Debug" ]; then
             file_name+="-debug"
           else
@@ -251,3 +342,4 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
+        

@@ -208,7 +208,7 @@ namespace fs = std::filesystem;
 namespace suanpan {
     inline std::mutex print_mutex;
 
-    inline std::string pattern(const std::string_view header, const std::string_view& file_name, const std::string_view& format) {
+    inline std::string pattern(const std::string_view header, const std::string_view file_name, const std::string_view format) {
         std::string pattern{header};
         pattern += fs::path(file_name).filename().string();
         pattern += ":{} ~> ";

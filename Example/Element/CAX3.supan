@@ -20,18 +20,20 @@ step static 1
 analyze
 
 # Node 2:
-# 1.0000 0
+# Coordinate:
+#   1.0000e+00  0.0000e+00
 # Displacement:
-# 2.3873e-02 -1.3401e-18
+#   2.3873e-02 -5.0213e-18
 # Resistance:
-# 1.0000e+00 -2.9066e-17
+#   1.0000e+00 -2.9066e-17
 # 
 # Node 3:
-# 1.0000 1.0000
+# Coordinate:
+#   1.0000e+00  1.0000e+00
 # Displacement:
-# 0.0239 -0.0053
+#   2.3873e-02 -5.3052e-03
 # Resistance:
-# 1.0000e+00 2.4111e-17
+#   1.0000e+00  1.4202e-17
 peek node 2 3
 
 peek element 1

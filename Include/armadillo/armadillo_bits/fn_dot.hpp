@@ -35,7 +35,7 @@ dot
   const T2& B
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   return op_dot::apply(A,B);
   }
@@ -57,7 +57,7 @@ dot
   const T2& B
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   return op_dot_mixed::apply(A,B);
   }
@@ -79,7 +79,7 @@ norm_dot
   const T2& B
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   return op_norm_dot::apply(A,B);
   }
@@ -106,7 +106,7 @@ cdot
   const T2& B
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   return op_dot::apply(A,B);
   }
@@ -129,7 +129,7 @@ cdot
   const T2& B
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   return op_cdot::apply(A,B);
   }
@@ -153,7 +153,7 @@ dot
   const T2&                B
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   return cdot(A.m, B);
   }
@@ -230,12 +230,12 @@ dot
   const T2& y
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   const SpProxy<T1> pa(x);
   const SpProxy<T2> pb(y);
   
-  arma_debug_assert_same_size(pa.get_n_rows(), pa.get_n_cols(), pb.get_n_rows(), pb.get_n_cols(), "dot()");
+  arma_conform_assert_same_size(pa.get_n_rows(), pa.get_n_cols(), pb.get_n_rows(), pb.get_n_cols(), "dot()");
   
   typedef typename T1::elem_type eT;
   
@@ -287,14 +287,34 @@ dot
   const T2& y
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
+  
+  typedef typename T1::elem_type eT;
+  
+  if(is_SpSubview_col<T2>::value)
+    {
+    // TODO: refactor to use C++17 "if constexpr" to avoid reinterpret_cast shenanigans
+    
+    const SpSubview_col<eT>& yy = reinterpret_cast< const SpSubview_col<eT>& >(y);
+    
+    if(yy.n_rows == yy.m.n_rows)
+      {
+      arma_debug_print("using sparse column vector specialisation");
+      
+      const quasi_unwrap<T1> U(x);
+      
+      arma_conform_assert_same_size(U.M.n_elem, uword(1), yy.n_elem, uword(1), "dot()");
+      
+      yy.m.sync();
+      
+      return dense_sparse_helper::dot(U.M.memptr(), yy.m, yy.aux_col1);
+      }
+    }
   
   const   Proxy<T1> pa(x);
   const SpProxy<T2> pb(y);
   
-  arma_debug_assert_same_size(pa.get_n_rows(), pa.get_n_cols(), pb.get_n_rows(), pb.get_n_cols(), "dot()");
-  
-  typedef typename T1::elem_type eT;
+  arma_conform_assert_same_size(pa.get_n_rows(), pa.get_n_cols(), pb.get_n_rows(), pb.get_n_cols(), "dot()");
   
   eT result = eT(0);
   
@@ -329,7 +349,7 @@ dot
   const T2& y
   )
   {
-  arma_extra_debug_sigprint();
+  arma_debug_sigprint();
   
   // this is commutative
   return dot(y, x);

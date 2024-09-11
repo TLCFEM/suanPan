@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.1, released
-C  on Thu May  2 10:15:09 UTC 2024
+C  This file is part of MUMPS 5.7.3, released
+C  on Mon Jul 15 11:44:21 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -16,12 +16,6 @@ C
       INTEGER, INTENT(IN) :: MPG
       IF (MPG.LE.0) RETURN
       write(MPG,*) "================================================="
-#if defined(MTKO_VERBOSE)
-      write(MPG, *) 
-     & "WARNING: ",
-     & "MUMPS should not be compiled with -DMTKO_VERBOSE",
-     &              " without -DMPI_TO_K_OMP"
-#endif
 #if defined(AFFINITY_VERBOSE)
       write(MPG, *) "MUMPS compiled with option -DAFFINITY_VERBOSE"
 #endif

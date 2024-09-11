@@ -1,6 +1,6 @@
 C
-C  This file is part of MUMPS 5.7.1, released
-C  on Thu May  2 10:15:09 UTC 2024
+C  This file is part of MUMPS 5.7.3, released
+C  on Mon Jul 15 11:44:21 UTC 2024
 C
 C
 C  Copyright 1991-2024 CERFACS, CNRS, ENS Lyon, INP Toulouse, Inria,
@@ -749,6 +749,10 @@ C
      &             max(NRLNEC_if_LR_LUCB,NRLADU_if_LR_LU+
      &             CURRENT_ACTIVE_MEM-ISTKR+ISTKR_if_LRCB+
      &             NRLADU_CURRENT_MISSING)
+           NRLNECOOC_if_LR_LUCB = 
+     &             max(NRLNECOOC_if_LR_LUCB,
+     &             NRLADU_CURRENT+NRLADU_ROOT_3+
+     &             CURRENT_ACTIVE_MEM-ISTKR+ISTKR_if_LRCB)
          ELSE
            NRLNEC_if_LR_CB   = 
      &             max(NRLNEC_if_LR_CB  ,NRLADU+
@@ -757,8 +761,12 @@ C
            NRLNEC_if_LR_LUCB = 
      &             max(NRLNEC_if_LR_LUCB,NRLADU_if_LR_LU+
      &             CURRENT_ACTIVE_MEM-ISTKR+ISTKR_if_LRCB+
-     &             MAXTEMPCB+
-     &             NRLADU_CURRENT_MISSING)
+     &             NRLADU_CURRENT_MISSING+
+     &             MAXTEMPCB)
+           NRLNECOOC_if_LR_LUCB = max(NRLNECOOC_if_LR_LUCB,
+     &             NRLADU_CURRENT+NRLADU_ROOT_3+
+     &             CURRENT_ACTIVE_MEM-ISTKR+ISTKR_if_LRCB+
+     &             MAXTEMPCB)
          ENDIF
          IF (NSTK .NE. 0 .AND. INSSARBR .AND.
      &     KEEP(234).NE.0 .AND. KEEP(55).EQ.0) THEN
@@ -771,10 +779,6 @@ C
            NRLNEC_if_LR_LU = 
      &             max(NRLNEC_if_LR_LU,NRLADU_if_LR_LU+
      &             CURRENT_ACTIVE_MEM+NRLADU_CURRENT_MISSING)
-           NRLNECOOC_if_LR_LUCB = 
-     &             max(NRLNECOOC_if_LR_LUCB,
-     &             NRLADU_CURRENT+NRLADU_ROOT_3+
-     &             CURRENT_ACTIVE_MEM-ISTKR+ISTKR_if_LRCB)
          ELSE
            NRLNEC = max(NRLNEC,NRLADU+CURRENT_ACTIVE_MEM+MAXTEMPCB)
            NRLNEC_ACTIVE = max(NRLNEC_ACTIVE,NRLADU_CURRENT+
@@ -783,9 +787,6 @@ C
      &             max(NRLNEC_if_LR_LU,NRLADU_if_LR_LU+
      &             CURRENT_ACTIVE_MEM+MAXTEMPCB+
      &             NRLADU_CURRENT_MISSING)
-           NRLNECOOC_if_LR_LUCB = max(NRLNECOOC_if_LR_LUCB,
-     &             NRLADU_ROOT_3+CURRENT_ACTIVE_MEM-ISTKR+
-     &             ISTKR_if_LRCB+MAXTEMPCB)
          ENDIF
          NRLNECLR_LUCB_UD =  max(NRLNECLR_LUCB_UD,
      &                           NRLADULR_UD+ISTKRLR_CB_UD)
@@ -2101,6 +2102,10 @@ C
      &             max(NRLNEC_if_LR_LUCB,NRLADU_if_LR_LU+
      &             CURRENT_ACTIVE_MEM-ISTKR+ISTKR_if_LRCB+
      &             NRLADU_CURRENT_MISSING)
+      NRLNECOOC_if_LR_LUCB = 
+     &             max(NRLNECOOC_if_LR_LUCB,
+     &             NRLADU_CURRENT+NRLADU_ROOT_3+
+     &             CURRENT_ACTIVE_MEM-ISTKR+ISTKR_if_LRCB)
       IF (NSTK .NE. 0 .AND. INSSARBR .AND.
      &     KEEP(234).NE.0 .AND. KEEP(55).EQ.0) THEN
           CURRENT_ACTIVE_MEM = CURRENT_ACTIVE_MEM - LSTKR(ITOP)
@@ -2111,10 +2116,6 @@ C
       NRLNEC_if_LR_LU = 
      &             max(NRLNEC_if_LR_LU,NRLADU_if_LR_LU+
      &             CURRENT_ACTIVE_MEM+NRLADU_CURRENT_MISSING)
-      NRLNECOOC_if_LR_LUCB = 
-     &             max(NRLNECOOC_if_LR_LUCB,
-     &             NRLADU_CURRENT+NRLADU_ROOT_3+
-     &             CURRENT_ACTIVE_MEM-ISTKR+ISTKR_if_LRCB)
       NRLNECLR_LUCB_UD =  max(NRLNECLR_LUCB_UD,
      &                           NRLADULR_UD+ISTKRLR_CB_UD)
       NRLNECLR_LUCB_WC =  max(NRLNECLR_LUCB_WC,

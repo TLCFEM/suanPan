@@ -13,21 +13,24 @@
 [![download](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11)](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11)
 [![dev](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml/badge.svg?branch=dev)](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml)
 [![codecov](https://codecov.io/gh/TLCFEM/suanPan/branch/dev/graph/badge.svg?token=65BF9DF697)](https://codecov.io/gh/TLCFEM/suanPan)
-[![codacy](https://app.codacy.com/project/badge/Grade/1ea08c43edf342a8b00b21e585e63503)](https://www.codacy.com/gh/TLCFEM/suanPan/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TLCFEM/suanPan&amp;utm_campaign=Badge_Grade)
+[![Codacy](https://app.codacy.com/project/badge/Grade/1ea08c43edf342a8b00b21e585e63503)](https://app.codacy.com/gh/TLCFEM/suanPan/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/tlcfem/suanpan/badge)](https://www.codefactor.io/repository/github/tlcfem/suanpan)
 [![language](https://img.shields.io/github/languages/count/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan)
 [![language](https://img.shields.io/github/languages/top/TLCFEM/suanPan.svg?color=44cc11&logo=c%2B%2B)](https://github.com/TLCFEM/suanPan)
 [![size](https://img.shields.io/github/languages/code-size/TLCFEM/suanPan.svg?color=44cc11)](https://img.shields.io/github/languages/code-size/TLCFEM/suanPan.svg?color=44cc11)
 [![issues](https://img.shields.io/github/issues/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/issues)
-[![chat](https://badges.gitter.im/suanPan-dev/community.svg)](https://gitter.im/suanPan-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan?ref=badge_shield)
 
 [![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 [![marketplace](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
 
-***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
-highlighting and autocompletion.***
+> [!IMPORTANT]
+> ***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
+> highlighting and autocompletion.***
+
+> [!IMPORTANT]
+> ***Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).***
 
 ## Introduction
 
@@ -39,7 +42,11 @@ high-quality C++ code and is targeted to provide an efficient, concise, flexible
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-Please check the documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references. Please star ⭐ the project!
+> [!IMPORTANT]
+> Please check the documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
+> Please star ⭐ the project!
+
+![Alt](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg "Repobeats analytics image")
 
 ## Features
 
@@ -103,14 +110,17 @@ details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obt
 
 ## Installation
 
-Only the 64-bit version is compiled.
-It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
-fails, please check if your CPU supports AVX2.
-Alternatively, you can try the `no-avx` version.
-
-> Check artifacts of [workflows](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml) for the latest binaries.
+> [!WARNING]
+> Only the 64-bit version is compiled.
+> It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
+> fails, please check if your CPU supports AVX2.
+> Alternatively, you can try the `no-avx` version.
 
 ### Windows
+
+> [!NOTE]
+> It may be necessary to install the VC++ redistributable [package](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+> If the application prompts that some file, such as `msvcp140.dll`, is missing, please install the redistributable package.
 
 #### Binary Package
 
@@ -189,6 +199,17 @@ flatpak install suanPan
 echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 ```
 
+### Docker
+
+It is also possible to compile the package via docker, check the dockerfiles under the `Script` folder, for any
+questions please open an issue.
+
+One can directly pull the image.
+
+```bash
+docker pull tlcfem/suanpan
+```
+
 ### Other Platforms
 
 Precompiled binaries are provided via CI/CD on macOS, Windows, and Ubuntu.
@@ -206,7 +227,9 @@ Advanced users can compile the program from source by themselves to enable GPU b
 an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) and/or MAGMA library.
 
 Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on macOS), it may be required to update/install
-proper `libstdc++` (or `libc++`) version. The easiest way is to install the same compiler. For example, on Ubuntu 22.04,
+proper `libstdc++` (or `libc++`) version.
+The easiest way is to install the same compiler.
+For example, on Ubuntu 22.04,
 
 ```bash
 # Ubuntu
@@ -217,11 +240,8 @@ For VTK enabled versions, it may be necessary to install OpenGL.
 
 ```bash
 # Ubuntu
-sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev libglvnd-dev
+sudo apt install libglvnd-dev
 ```
-
-It is also possible to compile the package via docker, check the dockerfiles under the `Script` folder, for any
-questions please open an issue.
 
 ### Automation Related
 
@@ -257,19 +277,19 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.25
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.28
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.3
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.12.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
-- [**MUMPS**](https://mumps-solver.org/) version 5.7.1
+- [**MUMPS**](https://mumps-solver.org/) version 5.7.3
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
 - [**VTK**](https://vtk.org/) version 9.2.6
-- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.0
+- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
-- [**Armadillo**](http://arma.sourceforge.net/) version 12.8.3
-- [**ensmallen**](https://ensmallen.org/) version 2.20.0
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2024.1.0
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.5.4
+- [**Armadillo**](http://arma.sourceforge.net/) version 14.0.2
+- [**ensmallen**](https://ensmallen.org/) version 2.21.1
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2024.2.1
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.7.0
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**whereami**](https://github.com/gpakosz/whereami)
 - [**exprtk**](https://github.com/ArashPartow/exprtk)

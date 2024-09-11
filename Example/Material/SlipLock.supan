@@ -31,11 +31,12 @@ analyze
 peek element 1
 
 # Node 3:
-# 2.0000 0
+# Coordinate:
+#   2.0000e+00  0.0000e+00
 # Displacement:
-# -0.0020 0
+#  -2.0000e-03  0.0000e+00
 # Resistance:
-# -0.2618 0
+#  -2.6177e-01  0.0000e+00
 peek node 3
 
 reset

@@ -21,6 +21,7 @@ $RECYCLE.BIN/
 /build/*
 /Checker/.idea/*
 /Checker/*.exe
+/Checker/updater
 /cmake-build*/*
 /Document/*
 /MSVC/Debug/*
@@ -46,6 +47,7 @@ $RECYCLE.BIN/
 /MSVC/suanPan/tester.pardiso/x64/*
 /MSVC/suanPan/lis/x64/*
 venv
+.venv
 .cache
 
 # Windows shortcuts

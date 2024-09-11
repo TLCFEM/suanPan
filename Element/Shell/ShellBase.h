@@ -37,7 +37,7 @@ protected:
     static const uvec m_dof, p_dof;
 
     static vec reshuffle(const vec&, const vec&);
-    static mat reshuffle(const mat&, const mat&);
+    static mat reshuffle(const mat&, const mat&, const mat&, const mat&);
 
     mat trans_mat;
 

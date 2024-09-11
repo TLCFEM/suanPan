@@ -23,15 +23,15 @@ analyze
 
 # Node 2:
 # Coordinate:
-# 1.0000 0
+#   1.0000e+00  0.0000e+00
 # Displacement:
-# 0.1745 0
+#   1.7452e-01  0.0000e+00
 # Resistance:
-# 0 0
+#   0.0000e+00  0.0000e+00
 # Velocity:
-# 0.1578 0
+#   1.5782e-01  0.0000e+00
 # Acceleration:
-# 0.0493 0
+#   4.9314e-02  0.0000e+00
 peek node 2
 
 # save recorder 1

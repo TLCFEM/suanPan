@@ -7,6 +7,15 @@
 3. The `MUMPS` solver throws segfaults with large matrices, appears to be quite slow.
 4. The `FGMRES` solver requires refinements.
 
+## version 3.5
+
+1. add `MaxForce` constraint [#204](https://github.com/TLCFEM/suanPan/pull/204)
+2. update `Armadillo` to version `14.0.2`
+3. update `OpenBLAS` to version `0.3.28`
+4. update `Catch2` to version `3.7.0`
+5. revise stiffness matrix formulation in shell elements [#208](https://github.com/TLCFEM/suanPan/pull/208)
+6. add dev containers for easier DE setup
+
 ## version 3.4
 
 1. update `Armadillo` to version `12.8.2` [#193](https://github.com/TLCFEM/suanPan/pull/193)

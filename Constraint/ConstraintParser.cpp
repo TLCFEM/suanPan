@@ -64,6 +64,28 @@ void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command,
     return_obj = make_unique<FixedLength>(tag, 0, dof, uvec{node_i, node_j});
 }
 
+void new_maxforce(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    uword node_i, node_j;
+    if(!get_input(command, node_i) || !get_input(command, node_j)) {
+        suanpan_error("Two valid nodes are required.\n");
+        return;
+    }
+
+    double max_force;
+    if(!get_input(command, max_force)) {
+        suanpan_error("A valid maximum force is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<MaxForce>(tag, 0, dof, max_force, uvec{node_i, node_j});
+}
+
 void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -555,6 +577,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& c
     else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "LinearSpring2D")) new_linearspring(new_constraint, command, 2);
     else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "MaximumForce2D") || is_equal(constraint_id, "MaxForce2D")) new_maxforce(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "MaximumForce3D") || is_equal(constraint_id, "MaxForce3D")) new_maxforce(new_constraint, command, 3);
     else if(is_equal(constraint_id, "MaximumGap2D") || is_equal(constraint_id, "MaxGap2D")) new_maximumgap(new_constraint, command, 2);
     else if(is_equal(constraint_id, "MaximumGap3D") || is_equal(constraint_id, "MaxGap3D")) new_maximumgap(new_constraint, command, 3);
     else if(is_equal(constraint_id, "MinimumGap2D") || is_equal(constraint_id, "MinGap2D")) new_minimumgap(new_constraint, command, 2);

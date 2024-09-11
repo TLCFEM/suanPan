@@ -3,7 +3,7 @@
 node 1 0 0
 node 2 10 0
 
-material MPF 1 1E3 3 .02
+material MPF 1 1E3 3 .2
 
 section Rectangle2D 1 12 1 1 12
 
@@ -33,11 +33,11 @@ analyze
 
 # Node 2:
 # Coordinate:
-# 1.0000e+01 0.0000e+00
+#   1.0000e+01  0.0000e+00
 # Displacement:
-# -3.0158e-18 6.4808e-01 8.3170e-02
+#  -1.8620e-19  3.9760e-01  5.7177e-02
 # Resistance:
-# -3.0316e-15 1.0000e+00 8.9913e-16
+#   4.2654e-17  1.0000e+00  1.2232e-15
 peek node 2
 
 peek element 1

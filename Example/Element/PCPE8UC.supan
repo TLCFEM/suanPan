@@ -29,25 +29,28 @@ set fixed_step_size true
 analyze
 
 # Node 3:
-# 2.0000 2.0000
+# Coordinate:
+#   2.0000e+00  2.0000e+00
 # Displacement:
-# 0 -0.2000
+#   0.0000e+00 -2.0000e-01
 # Resistance:
-# -53.3333 -93.3333
+#  -5.3333e+01 -9.3333e+01
 # 
 # Node 7:
-# 1.0000 2.0000
+# Coordinate:
+#   1.0000e+00  2.0000e+00
 # Displacement:
-# 4.0135e-18 -2.0000e-01
+#   4.6955e-18 -2.0000e-01
 # Resistance:
-# 2.9729e-14 -3.7333e+02
+#  -3.1206e-14 -3.7333e+02
 # 
 # Node 4:
-# 0 2.0000
+# Coordinate:
+#   0.0000e+00  2.0000e+00
 # Displacement:
-# 0 -0.2000
+#   0.0000e+00 -2.0000e-01
 # Resistance:
-# 53.3333 -93.3333
+#   5.3333e+01 -9.3333e+01
 peek node 3 7 4
 
 peek element 1

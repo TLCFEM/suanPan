@@ -23,10 +23,13 @@ url: 'https://tlcfem.github.io/suanPan-manual/latest/'
 keywords:
   - FEM
   - Seismic Engineering
+  - Structural Engineering
+  - Plasticity
+  - Constitutive Modelling
   - Dynamics
   - HPC
   - IGA
   - Solid Mechanics
 license: GPL-3.0
-version: '3.4'
-date-released: '2024-05-11'
+version: '3.5'
+date-released: '2024-09-11'

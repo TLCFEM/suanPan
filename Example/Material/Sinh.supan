@@ -34,27 +34,27 @@ analyze
 
 # Node 2:
 # Coordinate:
-# 1.0000 0
+#   1.0000e+00  0.0000e+00
 # Displacement:
-# 0.3815 0
+#   3.8153e-01  0.0000e+00
 # Resistance:
-# 4.2847e+02 0
+#   4.2847e+02  0.0000e+00
 # Velocity:
-# 26.5382 0
+#   2.6538e+01  0.0000e+00
 # Acceleration:
-# -4.2847e+02 0
+#  -4.2847e+02  0.0000e+00
 # 
 # Node 3:
 # Coordinate:
-# 2.0000 0
+#   2.0000e+00  0.0000e+00
 # Displacement:
-# 0.4516 0
+#   4.5163e-01  0.0000e+00
 # Resistance:
-# 4.0270e+02 0
+#   4.0270e+02  0.0000e+00
 # Velocity:
-# 12.2488 0
+#   1.2249e+01  0.0000e+00
 # Acceleration:
-# -4.0270e+02 0
+#  -4.0270e+02  0.0000e+00
 peek node 2 3
 
 peek element 1 3

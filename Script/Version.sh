@@ -17,6 +17,7 @@ yml_file=$(find ".github/workflows" -name "*.yml")
 for file in $yml_file; do
   if [ -f "$file" ]; then
     sed -i "s/suanPan-[0-9]\.[0-9]\.[0-9]/suanPan-$1\.$2\.$3/g" "$file"
+    sed -i "s/suanpan.[0-9]\.[0-9]\.[0-9]/suanpan.$1\.$2\.$3/g" "$file"
   fi
 done
 

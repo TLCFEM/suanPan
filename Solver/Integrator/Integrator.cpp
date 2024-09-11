@@ -232,7 +232,7 @@ int Integrator::sync_status(const bool only_correct) {
 /**
  * Some algorithms solve a system which differs from the original one.
  * The size of the problem changes thus the computed increment contains additional internal
- * quantities. This methods updates internal quantities stored in those integrators.
+ * quantities. This method updates internal quantities stored in those integrators.
  */
 int Integrator::update_internal(const mat&) { return SUANPAN_SUCCESS; }
 

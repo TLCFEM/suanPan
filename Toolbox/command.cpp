@@ -63,6 +63,7 @@
 #endif
 
 using std::ifstream;
+using std::ofstream;
 using std::string;
 using std::vector;
 
@@ -1135,11 +1136,11 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
     else if(is_equal(object_type, "num_nodes"))
         suanpan_info("SUANPAN_NUM_NODES: {}\n", SUANPAN_NUM_NODES);
     else if(is_equal(object_type, "statistics") || is_equal(object_type, "stats")) {
-        suanpan_info("\nUpdating element trial status used:\n\t{:.5E} s.", domain->stats<Statistics::UpdateStatus>());
-        suanpan_info("\nAssembling global vector used:\n\t{:.5E} s.", domain->stats<Statistics::AssembleVector>());
-        suanpan_info("\nAssembling global system used:\n\t{:.5E} s.", domain->stats<Statistics::AssembleMatrix>());
-        suanpan_info("\nProcessing constraints used:\n\t{:.5E} s.", domain->stats<Statistics::ProcessConstraint>());
-        suanpan_info("\nSolving global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::SolveSystem>());
+        suanpan_info("Updating element trial status used:\n\t{:.5E} s.\n", domain->stats<Statistics::UpdateStatus>());
+        suanpan_info("Assembling global vector used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleVector>());
+        suanpan_info("Assembling global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleMatrix>());
+        suanpan_info("Processing constraints used:\n\t{:.5E} s.\n", domain->stats<Statistics::ProcessConstraint>());
+        suanpan_info("Solving global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::SolveSystem>());
     }
 
     return SUANPAN_SUCCESS;
@@ -1370,6 +1371,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     };
 
     if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
+    if(is_equal(command_id, "embed2d") || is_equal(command_id, "embed3d")) return constraint_handler();
     if(is_equal(command_id, "finiterestitutionwall") || is_equal(command_id, "finiterestitutionwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "finiterigidwall") || is_equal(command_id, "finiterigidwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "finiterigidwallmultiplier")) return constraint_handler();
@@ -1379,14 +1381,19 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "fixedlength3d")) return constraint_handler();
     if(is_equal(command_id, "groupmultiplierbc")) return constraint_handler();
     if(is_equal(command_id, "grouppenaltybc")) return constraint_handler();
+    if(is_equal(command_id, "maxforce2d") || is_equal(command_id, "maxforce3d")) return constraint_handler();
+    if(is_equal(command_id, "maxgap2d") || is_equal(command_id, "maxgap3d")) return constraint_handler();
+    if(is_equal(command_id, "mingap2d") || is_equal(command_id, "mingap3d")) return constraint_handler();
     if(is_equal(command_id, "mpc")) return constraint_handler();
     if(is_equal(command_id, "multiplierbc")) return constraint_handler();
-    if(is_equal(command_id, "particlecollision2d")) return constraint_handler();
-    if(is_equal(command_id, "particlecollision3d")) return constraint_handler();
+    if(is_equal(command_id, "nodefacet")) return constraint_handler();
+    if(is_equal(command_id, "nodeline")) return constraint_handler();
+    if(is_equal(command_id, "particlecollision2d") || is_equal(command_id, "particlecollision3d")) return constraint_handler();
     if(is_equal(command_id, "penaltybc")) return constraint_handler();
     if(is_equal(command_id, "restitutionwall") || is_equal(command_id, "restitutionwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "rigidwall") || is_equal(command_id, "rigidwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "rigidwallmultiplier")) return constraint_handler();
+    if(is_equal(command_id, "sleeve2d") || is_equal(command_id, "sleeve3d")) return constraint_handler();
 
     // testers
     if(is_equal(command_id, "materialtest1d")) return test_material(domain, command, 1);
@@ -1567,9 +1574,15 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 
     ifstream input_file;
 
+    uintmax_t input_file_size{};
+
     for(const auto& file : file_list) {
-        input_file.open(fs::path(file));
-        if(input_file.is_open()) break;
+        const auto file_path = fs::path(file);
+        input_file.open(file_path);
+        if(input_file.is_open()) {
+            input_file_size = file_size(file_path);
+            break;
+        }
     }
 
     if(!input_file.is_open()) {
@@ -1577,13 +1590,25 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         return SUANPAN_EXIT;
     }
 
+    ofstream output_file(get_history_path(), std::ios_base::app | std::ios_base::out);
+
+    const auto record_command = output_file.is_open() && input_file_size <= 102400;
+
+    if(record_command) output_file << "### start processing --> " << file_name << '\n';
+
     string all_line, command_line;
     while(!getline(input_file, command_line).fail()) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
-        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return SUANPAN_EXIT;
+        if(record_command) output_file << all_line << '\n';
+        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) {
+            if(record_command) output_file << "### finish processing --> " << file_name << '\n';
+            return SUANPAN_EXIT;
+        }
         all_line.clear();
     }
+
+    if(record_command) output_file << "### finish processing --> " << file_name << '\n';
     return SUANPAN_SUCCESS;
 }
 
@@ -1599,4 +1624,21 @@ int execute_command(istringstream& command) {
 #endif
 
     return code;
+}
+
+#ifdef SUANPAN_MSVC
+#pragma warning(disable:4996)
+#endif
+
+fs::path get_history_path() {
+#ifdef SUANPAN_WIN
+    // ReSharper disable once CppDeprecatedEntity
+    auto history_path = fs::path(getenv("USERPROFILE")); // NOLINT(concurrency-mt-unsafe, clang-diagnostic-deprecated-declarations)
+#else
+    auto history_path = fs::path(getenv("HOME"));
+#endif
+
+    history_path.append(".suanpan-history.sp");
+
+    return history_path;
 }

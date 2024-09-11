@@ -6,7 +6,7 @@ node 2 10 0 0
 orientation B3DL 1 0. 1. 0.
 orientation B3DOSL 2 0. 0. 1.
 
-material MPF 1 1E2 2E-1 .02
+material MPF 1 1E2 2E-1 .05
 # material Elastic1D 1 10
 
 section Rectangle3D 2 12 1 1
@@ -29,7 +29,7 @@ recorder 5 hdf5 Element BEAME 1
 recorder 6 hdf5 Element BEAMS 1
 
 step static 1
-set ini_step_size 1E-1
+set ini_step_size 1E-2
 set fixed_step_size true
 
 converger RelIncreDisp 1 1E-10 5 1
@@ -38,11 +38,11 @@ analyze
 
 # Node 2:
 # Coordinate:
-# 1.0000e+01 0.0000e+00 0.0000e+00
+#   1.0000e+01  0.0000e+00  0.0000e+00
 # Displacement:
-# 0.0000e+00 3.8990e-01 0.0000e+00 0.0000e+00 0.0000e+00 4.6912e-02
+#   2.3308e-20  6.6023e-02  7.3790e-17  0.0000e+00 -8.9523e-18  8.3042e-03
 # Resistance:
-# 0.0000e+00 1.0000e+00 0.0000e+00 0.0000e+00 0.0000e+00 -3.8021e-12
+#   1.6388e-17  1.0000e+00  1.1449e-18  0.0000e+00  2.4644e-18  8.8606e-16
 peek node 2
 
 peek element 1

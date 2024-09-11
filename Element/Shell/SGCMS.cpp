@@ -236,7 +236,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     // along thickness
     const IntegrationPlan t_plan(1, 3, IntegrationType::GAUSS);
 
-    mat p_stiffness(12, 12, fill::zeros);
+    mat::fixed<12, 12> p_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
 
     for(unsigned I = 0; I < m_plan.n_rows; ++I) {
         auto& c_pt = int_pt.at(I);
@@ -259,11 +259,13 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
         for(unsigned J = 0; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
             c_ip.emplace_back(t_eccentricity, t_weight * t_plan(J, 1), mat_proto->get_copy());
-            p_stiffness += pow(t_eccentricity, 2.) * c_ip.back().factor * c_pt.BP.t() * mat_stiff * c_pt.BP;
+            p_stiffness += c_pt.BP.t() * mat_stiff * c_pt.BP * c_ip.back().factor * pow(t_eccentricity, 2.);
+            mp_stiffness += c_pt.BM.t() * mat_stiff * c_pt.BP * c_ip.back().factor * t_eccentricity;
+            pm_stiffness += c_pt.BP.t() * mat_stiff * c_pt.BM * c_ip.back().factor * t_eccentricity;
         }
     }
 
-    transform_from_local_to_global(initial_stiffness = reshuffle(NT.t() * HT * NT, p_stiffness));
+    transform_from_local_to_global(initial_stiffness = reshuffle(NT.t() * HT * NT, p_stiffness, mp_stiffness, pm_stiffness));
     trial_stiffness = current_stiffness = initial_stiffness;
 
     return SUANPAN_SUCCESS;
@@ -283,7 +285,7 @@ int SGCMS::update_status() {
     }
 
     mat33 t_stiffness;
-    mat::fixed<12, 12> m_stiffness(fill::zeros), p_stiffness(fill::zeros);
+    mat::fixed<12, 12> m_stiffness(fill::zeros), p_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
     vec3 t_stress;
     vec::fixed<12> m_resistance(fill::zeros), p_resistance(fill::zeros);
 
@@ -309,10 +311,15 @@ int SGCMS::update_status() {
         }
         p_resistance += I.BP.t() * t_stress;
         p_stiffness += I.BP.t() * t_stiffness * I.BP;
+
+        t_stiffness.zeros();
+        for(const auto& J : I.sec_int_pt) t_stiffness += J.factor * J.eccentricity * J.s_material->get_trial_stiffness();
+        mp_stiffness += I.BM.t() * t_stiffness * I.BP;
+        pm_stiffness += I.BP.t() * t_stiffness * I.BM;
     }
 
     trial_resistance = reshuffle(m_resistance, p_resistance);
-    trial_stiffness = reshuffle(m_stiffness, p_stiffness);
+    trial_stiffness = reshuffle(m_stiffness, p_stiffness, mp_stiffness, pm_stiffness);
 
     if(is_nlgeom()) trial_geometry = transform_to_global_geometry(trial_stiffness, trial_resistance, g_disp);
 

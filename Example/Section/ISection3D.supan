@@ -29,17 +29,18 @@ converger RelIncreDisp 1 1E-10 20 1
 
 analyze
 
-# Node 1:
-# 0 0 0
-# Displacement:
-# -3.2546e-03 3.0000e-04 -2.8666e-20
-# Resistance:
-# -7.1054e-14 8.2438e+06 -2.9363e-12
-peek node 1
-
 peek element 1 2 3 4
 
 # save recorder 1
+
+# Node 1:
+# Coordinate:
+#   0.0000e+00  0.0000e+00  0.0000e+00
+# Displacement:
+#  -3.2529e-03  3.0000e-04 -9.9023e-20
+# Resistance:
+#   0.0000e+00  8.2439e+06  9.3154e-11
+peek node 1
 
 reset
 clear

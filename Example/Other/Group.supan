@@ -180,20 +180,20 @@ step static 1
 
 analyze
 
-# Node 117:
-# Coordinate:
-# 20.0000 5.0000
-# Displacement:
-# -9.6083e-15 6.7310e+00
-# Resistance:
-# 6.8945e-14 2.0000e+00
-peek node 117
-
 peek element 1
 
 peek group 1 3 4 10
 
 peek recorder 1 2 3
+
+# Node 117:
+# Coordinate:
+#   2.0000e+01  5.0000e+00
+# Displacement:
+#   1.0587e-15  6.7310e+00
+# Resistance:
+#   6.3283e-15  2.0000e+00
+peek node 117
 
 reset
 clear

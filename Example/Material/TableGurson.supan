@@ -36,6 +36,15 @@ converger RelIncreDisp 1 1E-12 10 1
 
 analyze
 
+# Node 11:
+# Coordinate:
+#  -5.0000e+00  5.0000e+00  2.0000e+01
+# Displacement:
+#   1.1275e-01 -1.1275e-01  5.0000e-01
+# Resistance:
+#   1.6028e-16 -1.1344e-14  3.0627e+01
+peek node 11
+
 reset
 clear
 exit

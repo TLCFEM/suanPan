@@ -24,19 +24,19 @@ analyze
 
 # Node 1:
 # Coordinate:
-# 0 0
+#   0.0000e+00  0.0000e+00
 # Displacement:
-# 0 0 0
+#   0.0000e+00  0.0000e+00  0.0000e+00
 # Resistance:
-# 0 -2.4341e+02 -2.4341e+02
+#   0.0000e+00 -2.4341e+02 -2.4341e+02
 # 
 # Node 2:
 # Coordinate:
-# 2.0000 0
+#   2.0000e+00  0.0000e+00
 # Displacement:
-# 0 0.3000 0
+#   0.0000e+00  3.0000e-01  0.0000e+00
 # Resistance:
-# 0 2.4341e+02 -2.4341e+02
+#   0.0000e+00  2.4341e+02 -2.4341e+02
 peek node 1 2
 
 peek element 1

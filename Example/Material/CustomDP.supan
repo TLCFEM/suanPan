@@ -41,7 +41,7 @@ peek element 1
 # Displacement:
 #   0.0000e+00  0.0000e+00 -2.0000e-01
 # Resistance:
-#  -1.0781e-11  1.0775e-11 -4.8162e+02
+#   5.9439e-13 -2.0973e-13 -4.8162e+02
 peek node 5
 
 # save recorder 1

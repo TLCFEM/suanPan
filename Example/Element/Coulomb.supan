@@ -36,6 +36,19 @@ analyze
 
 peek element 2 3
 
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#  -2.4136e+00  0.0000e+00
+# Resistance:
+#  -9.9252e+01  0.0000e+00
+# Velocity:
+#  -2.0120e+01  0.0000e+00
+# Acceleration:
+#   9.9252e+01  0.0000e+00
+peek node 2
+
 reset
 clear
 exit

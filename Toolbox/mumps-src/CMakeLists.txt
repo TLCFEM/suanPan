@@ -2,16 +2,6 @@ cmake_minimum_required(VERSION 3.13.0)
 
 project(mumps C Fortran)
 
-# ifx does not compile properly due to potential memory allocation issues
-if (CMAKE_Fortran_COMPILER MATCHES "ifx")
-    set(CMAKE_Fortran_COMPILER "ifort")
-    if (UNIX)
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -diag-disable=10448")
-    else ()
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /Qdiag-disable:10448")
-    endif ()
-endif ()
-
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
 include_directories(.)

@@ -29,25 +29,28 @@ analyze
 peek element 1
 
 # Node 3:
-# 2.0000 0
+# Coordinate:
+#   2.0000e+00  0.0000e+00
 # Displacement:
-# 0.0200 0
+#   2.0000e-02  0.0000e+00
 # Resistance:
-# -5.7953e-17 5.0265e+00
+#  -6.5018e-16  5.0265e+00
 # 
 # Node 6:
-# 2.0000 1.0000
+# Coordinate:
+#   2.0000e+00  1.0000e+00
 # Displacement:
-# 0.0200 -0.1000
+#   2.0000e-02 -1.0000e-01
 # Resistance:
-# -5.7096e-18 -8.8818e-16
+#  -6.7748e-16  1.7764e-15
 # 
 # Node 9:
-# 2.0000 2.0000
+# Coordinate:
+#   2.0000e+00  2.0000e+00
 # Displacement:
-# 0.0200 -0.2000
+#   2.0000e-02 -2.0000e-01
 # Resistance:
-# -3.9183e-16 -5.0265e+00
+#  -2.9453e-16 -5.0265e+00
 peek node 3 6 9
 
 reset
