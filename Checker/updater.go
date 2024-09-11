@@ -64,8 +64,6 @@ func main() {
 	}
 
 	_ = downloadLatestVersion(newVersion)
-
-	return
 }
 
 func downloadLatestVersion(versionString string) error {
