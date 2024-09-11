@@ -32,28 +32,30 @@ def check_version(_major: int, _minor: int, _patch: int):
     version_list = []
     if sys.platform.startswith('win32'):
         version_list = [
-            "suanPan-win-mkl-vtk.exe",
+            "suanPan-win-mkl-no-avx.zip",
+            "suanPan-win-mkl-vtk-no-avx.zip",
             "suanPan-win-mkl-vtk.zip",
-            "suanPan-win-openblas.7z",
-            "suanPan-win-openblas-vtk.7z",
+            "suanPan-win-mkl.zip",
             "suanPan-win-openblas-no-avx.7z",
-            "suanPan-win-openblas-vtk-no-avx.7z"
+            "suanPan-win-openblas-vtk-no-avx.7z",
+            "suanPan-win-openblas-vtk.7z",
+            "suanPan-win-openblas.7z",
         ]
     elif sys.platform.startswith('linux'):
         version_list = [
-            "suanPan-linux-mkl.tar.gz",
-            "suanPan-linux-mkl-vtk.tar.gz",
-            "suanPan-linux-openblas.tar.gz",
-            "suanPan-linux-openblas-vtk.tar.gz",
             "suanPan-linux-mkl-no-avx.tar.gz",
             "suanPan-linux-mkl-vtk-no-avx.tar.gz",
+            "suanPan-linux-mkl-vtk.tar.gz",
+            "suanPan-linux-mkl.tar.gz",
             "suanPan-linux-openblas-no-avx.tar.gz",
-            "suanPan-linux-openblas-vtk-no-avx.tar.gz"
+            "suanPan-linux-openblas-vtk-no-avx.tar.gz",
+            "suanPan-linux-openblas-vtk.tar.gz",
+            "suanPan-linux-openblas.tar.gz",
         ]
     elif sys.platform.startswith('darwin'):
         version_list = [
+            "suanPan-macos-openblas-vtk.tar.gz",
             "suanPan-macos-openblas.tar.gz",
-            "suanPan-macos-openblas-vtk.tar.gz"
         ]
 
     for index, item in enumerate(version_list):

@@ -99,28 +99,30 @@ func downloadLatestVersion(versionString string) error {
 
 	if cos == "windows" {
 		package_array = []string{
-			"suanPan-win-mkl-vtk.exe",
+			"suanPan-win-mkl-no-avx.zip",
+			"suanPan-win-mkl-vtk-no-avx.zip",
 			"suanPan-win-mkl-vtk.zip",
-			"suanPan-win-openblas.7z",
-			"suanPan-win-openblas-vtk.7z",
+			"suanPan-win-mkl.zip",
 			"suanPan-win-openblas-no-avx.7z",
 			"suanPan-win-openblas-vtk-no-avx.7z",
+			"suanPan-win-openblas-vtk.7z",
+			"suanPan-win-openblas.7z",
 		}
 	} else if cos == "linux" {
 		package_array = []string{
-			"suanPan-linux-mkl.tar.gz",
-			"suanPan-linux-mkl-vtk.tar.gz",
-			"suanPan-linux-openblas.tar.gz",
-			"suanPan-linux-openblas-vtk.tar.gz",
 			"suanPan-linux-mkl-no-avx.tar.gz",
 			"suanPan-linux-mkl-vtk-no-avx.tar.gz",
+			"suanPan-linux-mkl-vtk.tar.gz",
+			"suanPan-linux-mkl.tar.gz",
 			"suanPan-linux-openblas-no-avx.tar.gz",
 			"suanPan-linux-openblas-vtk-no-avx.tar.gz",
+			"suanPan-linux-openblas-vtk.tar.gz",
+			"suanPan-linux-openblas.tar.gz",
 		}
 	} else if cos == "darwin" {
 		package_array = []string{
-			"suanPan-macos-openblas.tar.gz",
 			"suanPan-macos-openblas-vtk.tar.gz",
+			"suanPan-macos-openblas.tar.gz",
 		}
 	}
 
