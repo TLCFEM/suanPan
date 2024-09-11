@@ -7,7 +7,7 @@ on:
 jobs:
   ubuntu-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     strategy:
       matrix:
@@ -41,18 +41,19 @@ jobs:
             wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
             echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           fi
+          sudo apt-get update
           if [ "${{ matrix.mkl }}" == "ON" ]; then
-            sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
+            sudo apt-get install intel-oneapi-mkl-devel
           fi
           if [ "${{ matrix.compiler.c }}" == "icx" ]; then
-            sudo apt-get update && sudo apt-get install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
+            sudo apt-get install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
             echo "IOMP=ON" >> "$GITHUB_ENV"
           else
             echo "IOMP=OFF" >> "$GITHUB_ENV"
           fi
       - name: Dependency
         run: |
-          sudo apt-get update && sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev libglvnd-dev dpkg-dev xz-utils
+          sudo apt-get install libglvnd-dev dpkg-dev xz-utils
           echo "COVERAGE=OFF" >> "$GITHUB_ENV"
       - name: Flag
         if: |
