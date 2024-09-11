@@ -4,6 +4,11 @@ on:
     branches: [ dev ]
   pull_request:
     branches: [ dev ]
+env:
+  SP_TIME: ''
+  ARTIFACT: ''
+  IOMP: ''
+  COVERAGE: ''
 jobs:
   ubuntu-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
