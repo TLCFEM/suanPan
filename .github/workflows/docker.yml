@@ -5,7 +5,7 @@ on:
 jobs:
   ubuntu-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
     steps:
       - name: Clone
