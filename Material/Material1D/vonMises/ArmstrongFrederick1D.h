@@ -41,9 +41,12 @@
 struct DataArmstrongFrederick1D {
     const double elastic_modulus; // elastic modulus
     const double yield;           // yield stress
-    const double saturated;
+    const double saturation;
     const double hardening;
     const double m;
+    const double c;         // strain memory ratio
+    const double w;         // isotropic hardening reduction rate
+    const double reduction; // isotropic hardening reduction
     const vec a, b;
 };
 
@@ -60,6 +63,20 @@ public:
         double,     // saturated stress
         double,     // linear hardening modulus
         double,     // m
+        vec&&,      // a
+        vec&&,      // b
+        double = 0. // density
+    );
+    ArmstrongFrederick1D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // yield stress
+        double,     // saturated stress
+        double,     // linear hardening modulus
+        double,     // m
+        double,     // c
+        double,     // w
+        double,     // reduction
         vec&&,      // a
         vec&&,      // b
         double = 0. // density
