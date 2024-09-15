@@ -209,7 +209,7 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
     return_obj = make_unique<ArmstrongFrederick>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), ai, bi, density);
 }
 
-void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& command) {
+void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& command, const bool memory = false) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -220,6 +220,14 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
     if(!get_optional_input(command, pool)) {
         suanpan_error("Valid inputs are required.\n");
         return;
+    }
+
+    vec nonhardening{.2, 20., 100.};
+    if(memory) {
+        if(!get_optional_input(command, nonhardening)) {
+            suanpan_error("Valid inputs are required.\n");
+            return;
+        }
     }
 
     double para;
@@ -243,7 +251,10 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<ArmstrongFrederick1D>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), ai, bi, density);
+    if(memory)
+        return_obj = make_unique<ArmstrongFrederick1D>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), nonhardening(0), nonhardening(1), nonhardening(2), ai, bi, density);
+    else
+        return_obj = make_unique<ArmstrongFrederick1D>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), ai, bi, density);
 }
 
 void new_axisymmetric(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3393,6 +3404,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
+    else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
     else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
