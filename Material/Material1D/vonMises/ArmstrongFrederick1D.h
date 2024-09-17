@@ -63,17 +63,6 @@ public:
         double,     // saturated stress
         double,     // linear hardening modulus
         double,     // m
-        vec&&,      // a
-        vec&&,      // b
-        double = 0. // density
-    );
-    ArmstrongFrederick1D(
-        unsigned,   // tag
-        double,     // elastic modulus
-        double,     // yield stress
-        double,     // saturated stress
-        double,     // linear hardening modulus
-        double,     // m
         double,     // c
         double,     // w
         double,     // reduction

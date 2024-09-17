@@ -19,10 +19,6 @@
 
 #include <Recorder/OutputType.h>
 
-ArmstrongFrederick1D::ArmstrongFrederick1D(const unsigned T, const double E, const double Y, const double S, const double H, const double M, vec&& A, vec&& B, const double R)
-    : DataArmstrongFrederick1D{E, Y, S, H, M, 0., 0., 0., std::move(A), std::move(B)}
-    , Material1D(T, R) {}
-
 ArmstrongFrederick1D::ArmstrongFrederick1D(const unsigned T, const double E, const double Y, const double S, const double H, const double M, const double C, const double W, const double RS, vec&& A, vec&& B, const double R)
     : DataArmstrongFrederick1D{E, Y, S, H, M, std::max(0., std::min(1., C)), W, RS, std::move(A), std::move(B)}
     , Material1D(T, R) {}

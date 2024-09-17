@@ -216,19 +216,20 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
         return;
     }
 
-    vec pool{2E5, 4E2, 5E2, 0., 1E1};
-    if(!get_optional_input(command, pool)) {
+    vec pa{2E5, 4E2, 5E2, 0., 1E1};
+    if(!get_optional_input(command, pa)) {
         suanpan_error("Valid inputs are required.\n");
         return;
     }
 
-    vec nonhardening{.2, 20., 100.};
+    vec pb{.2, 20., 100.};
     if(memory) {
-        if(!get_optional_input(command, nonhardening)) {
+        if(!get_optional_input(command, pb)) {
             suanpan_error("Valid inputs are required.\n");
             return;
         }
     }
+    else pb.zeros();
 
     double para;
     vector<double> ai, bi, all;
@@ -251,10 +252,7 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
         bi.emplace_back(all.at(I++));
     }
 
-    if(memory)
-        return_obj = make_unique<ArmstrongFrederick1D>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), nonhardening(0), nonhardening(1), nonhardening(2), ai, bi, density);
-    else
-        return_obj = make_unique<ArmstrongFrederick1D>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), ai, bi, density);
+    return_obj = make_unique<ArmstrongFrederick1D>(tag, pa(0), pa(1), pa(2), pa(3), pa(4), pb(0), pb(1), pb(2), ai, bi, density);
 }
 
 void new_axisymmetric(unique_ptr<Material>& return_obj, istringstream& command) {
