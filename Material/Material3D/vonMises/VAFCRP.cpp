@@ -24,8 +24,8 @@
 const double VAFCRP::root_three_two = sqrt(1.5);
 const mat VAFCRP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-VAFCRP::VAFCRP(const unsigned T, const double E, const double V, const double Y, const double S, const double H, const double M, const double MU, const double EP, vec&& A, vec&& B, const double R)
-    : DataVAFCRP{E, V, Y, S, H, M, MU, EP, std::move(A), std::move(B)}
+VAFCRP::VAFCRP(const unsigned T, DataVAFCRP&& D, const double R)
+    : DataVAFCRP(std::move(D))
     , Material3D(T, R) {}
 
 int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {

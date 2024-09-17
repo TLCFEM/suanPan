@@ -41,12 +41,12 @@
 struct DataArmstrongFrederick1D {
     const double elastic_modulus; // elastic modulus
     const double yield;           // yield stress
-    const double saturation;
-    const double hardening;
-    const double m;
-    const double c;         // strain memory ratio
-    const double w;         // isotropic hardening reduction rate
-    const double reduction; // isotropic hardening reduction
+    const double hardening;       // linear isotropic hardening modulus
+    const double saturation;      // saturation stress
+    const double ms;              // saturation rate
+    const double memory;          // strain memory ratio
+    const double reduction;       // isotropic hardening reduction
+    const double mr;              // isotropic hardening reduction rate
     const vec a, b;
 };
 
@@ -57,18 +57,9 @@ class ArmstrongFrederick1D final : protected DataArmstrongFrederick1D, public Ma
 
 public:
     ArmstrongFrederick1D(
-        unsigned,   // tag
-        double,     // elastic modulus
-        double,     // yield stress
-        double,     // saturated stress
-        double,     // linear hardening modulus
-        double,     // m
-        double,     // c
-        double,     // w
-        double,     // reduction
-        vec&&,      // a
-        vec&&,      // b
-        double = 0. // density
+        unsigned,                   // tag
+        DataArmstrongFrederick1D&&, // material data
+        double = 0.                 // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

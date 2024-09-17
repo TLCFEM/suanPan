@@ -42,9 +42,9 @@ struct DataArmstrongFrederick {
     const double elastic_modulus; // elastic modulus
     const double poissons_ratio;  // poisson's ratio
     const double yield;           // yield stress
-    const double saturated;
-    const double hardening;
-    const double m;
+    const double hardening;       // linear isotropic hardening modulus
+    const double saturation;      // saturation stress
+    const double ms;              // saturation rate
     const vec a, b;
 };
 
@@ -62,16 +62,9 @@ class ArmstrongFrederick final : protected DataArmstrongFrederick, public Materi
 
 public:
     ArmstrongFrederick(
-        unsigned,   // tag
-        double,     // elastic modulus
-        double,     // poissons ratio
-        double,     // yield stress
-        double,     // saturated stress
-        double,     // linear hardening modulus
-        double,     // m
-        vec&&,      // a
-        vec&&,      // b
-        double = 0. // density
+        unsigned,                 // tag
+        DataArmstrongFrederick&&, // material data
+        double = 0.               // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

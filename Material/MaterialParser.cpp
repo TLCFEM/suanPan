@@ -179,7 +179,7 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
         return;
     }
 
-    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1};
+    vec pool{2E5, .2, 4E2, 0., 5E2, 1E1};
     if(!get_optional_input(command, pool)) {
         suanpan_error("Valid inputs are required.\n");
         return;
@@ -206,7 +206,7 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<ArmstrongFrederick>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), ai, bi, density);
+    return_obj = make_unique<ArmstrongFrederick>(tag, DataArmstrongFrederick{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), std::move(ai), std::move(bi)}, density);
 }
 
 void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& command, const bool memory = false) {
@@ -216,13 +216,13 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
         return;
     }
 
-    vec pa{2E5, 4E2, 5E2, 0., 1E1};
+    vec pa{2E5, 4E2, 0., 5E2, 1E1};
     if(!get_optional_input(command, pa)) {
         suanpan_error("Valid inputs are required.\n");
         return;
     }
 
-    vec pb{.2, 20., 100.};
+    vec pb{.2, 5E2, 1E1};
     if(memory) {
         if(!get_optional_input(command, pb)) {
             suanpan_error("Valid inputs are required.\n");
@@ -252,7 +252,7 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<ArmstrongFrederick1D>(tag, pa(0), pa(1), pa(2), pa(3), pa(4), pb(0), pb(1), pb(2), ai, bi, density);
+    return_obj = make_unique<ArmstrongFrederick1D>(tag, DataArmstrongFrederick1D{pa(0), pa(1), pa(2), pa(3), pa(4), pb(0), pb(1), pb(2), std::move(ai), std::move(bi)}, density);
 }
 
 void new_axisymmetric(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3173,7 +3173,7 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1, 0., 0.};
+    vec pool{2E5, .2, 4E2, 0., 5E2, 1E1, 0., 0.};
     if(!get_optional_input(command, pool)) {
         suanpan_error("A valid parameter is required.\n");
         return;
@@ -3200,7 +3200,7 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<VAFCRP>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), ai, bi, density);
+    return_obj = make_unique<VAFCRP>(tag, DataVAFCRP{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), std::move(ai), std::move(bi)}, density);
 }
 
 void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3210,7 +3210,7 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec pool{2E5, 4E2, 1E2, 0., 1E1, 0., 0.};
+    vec pool{2E5, 4E2, 0., 1E2, 1E1, 0., 0.};
     if(!get_optional_input(command, pool)) {
         suanpan_error("A valid parameter is required.\n");
         return;
@@ -3237,7 +3237,7 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<VAFCRP1D>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), ai, bi, density);
+    return_obj = make_unique<VAFCRP1D>(tag, DataVAFCRP1D{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), std::move(ai), std::move(bi)}, density);
 }
 
 void new_viscosity01(unique_ptr<Material>& return_obj, istringstream& command) {

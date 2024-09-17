@@ -4,7 +4,7 @@ node 1 0 0
 node 2 4 0
 node 3 0 -3
 
-material ArmstrongFrederick1D 1 2E5 4E2 1E2 2E2 5E2 1E3 1E2
+material ArmstrongFrederick1D 1 2E5 4E2 2E2 1E2 5E2 1E3 1E2
 
 element T2D2 1 1 2 1 10
 element T2D2 2 3 2 1 10

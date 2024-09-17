@@ -41,9 +41,9 @@
 struct DataVAFCRP1D {
     const double elastic_modulus; // elastic modulus
     const double yield;           // yield stress
-    const double saturated;
-    const double hardening;
-    const double m;
+    const double hardening;       // linear isotropic hardening modulus
+    const double saturated;       // saturation stress
+    const double m;               // saturation rate
     const double mu, epsilon;
     const vec a, b;
 };
@@ -58,17 +58,9 @@ class VAFCRP1D final : protected DataVAFCRP1D, public Material1D {
 
 public:
     VAFCRP1D(
-        unsigned,   // tag
-        double,     // elastic modulus
-        double,     // yield stress
-        double,     // saturated stress
-        double,     // linear hardening modulus
-        double,     // m
-        double,     // mu
-        double,     // epsilon
-        vec&&,      // a
-        vec&&,      // b
-        double = 0. // density
+        unsigned,       // tag
+        DataVAFCRP1D&&, // material data
+        double = 0.     // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

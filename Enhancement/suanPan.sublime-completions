@@ -92,21 +92,21 @@
     },
     {
       "trigger": "ArmstrongFrederick",
-      "details": "armstrong frederick material",
+      "details": "armstrong frederick material (v3.6 and later)",
       "kind": "type",
-      "contents": "material ArmstrongFrederick ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[(8) (9)...]} ${10:[10]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, saturated stress\n# (6) double, linear hardening modulus\n# (7) double, m\n# (8) double, a\n# (9) double, b\n# [10] double, density, default: 0.0"
+      "contents": "material ArmstrongFrederick ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[(8) (9)...]} ${10:[10]}\n# the following applies to v3.6 and later only, see documentation for older syntax\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, linear isotropic hardening modulus\n# (6) double, saturation stress\n# (7) double, ms, saturation hardening rate\n# (8) double, a, kinematic hardening parameter\n# (9) double, b, kinematic hardening parameter\n# [10] double, density, default: 0.0"
     },
     {
       "trigger": "ArmstrongFrederick1D",
-      "details": "uniaxial armstrong frederick material",
+      "details": "uniaxial armstrong frederick material (v3.6 and later)",
       "kind": "type",
-      "contents": "material ArmstrongFrederick1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[(7) (8)...]} ${9:[9]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, saturated stress\n# (5) double, linear hardening modulus\n# (6) double, m\n# (7) double, a\n# (8) double, b\n# [9] double, density, default: 0.0"
+      "contents": "material ArmstrongFrederick1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[(7) (8)...]} ${9:[9]}\n# the following applies to v3.6 and later only, see documentation for older syntax\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, linear isotropic hardening modulus\n# (5) double, saturation stress\n# (6) double, ms, saturation hardening rate\n# (7) double, a, kinematic hardening parameter\n# (8) double, b, kinematic hardening parameter\n# [9] double, density, default: 0.0"
     },
     {
       "trigger": "AFCO1D",
-      "details": "uniaxial armstrong frederick material with strain memory",
+      "details": "uniaxial armstrong frederick material with chaboche type strain memory",
       "kind": "type",
-      "contents": "material AFCO1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:[(10) (11)...]} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, saturated stress\n# (5) double, linear hardening modulus\n# (6) double, m\n# (7) double, c\n# (8) double, w\n# (9) double, linear hardening reduction\n# (10) double, a\n# (11) double, b\n# [12] double, density, default: 0.0"
+      "contents": "material AFCO1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:[(10) (11)...]} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, linear isotropic hardening modulus\n# (5) double, saturation stress\n# (6) double, ms, saturation rate\n# (7) double, c, between 0 and 1\n# (8) double, isotropic hardening reduction\n# (9) double, mr, reduction rate\n# (10) double, a, kinematic hardening parameter\n# (11) double, b, kinematic hardening parameter\n# [12] double, density, default: 0.0"
     },
     {
       "trigger": "AsymmElastic1D",
@@ -2120,15 +2120,15 @@
     },
     {
       "trigger": "VAFCRP",
-      "details": "vafcrp material",
+      "details": "vafcrp material (v3.6 and later)",
       "kind": "type",
-      "contents": "material VAFCRP ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} [${10:(10)} ${11:(11)...] ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, saturated stress\n# (6) double, linear hardening modulus\n# (7) double, m\n# (8) double, mu\n# (9) double, epsilon\n# (10) double, a\n# (11) double, b\n# [12] double, density, default: 0.0"
+      "contents": "material VAFCRP ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} [${10:(10)} ${11:(11)...] ${12:[12]}\n# the following applies to v3.6 and later only, see documentation for older syntax\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, linear isotropic hardening modulus\n# (6) double, saturation stress\n# (7) double, ms, saturation rate\n# (8) double, mu, viscosity parameter\n# (9) double, epsilon, viscosity parameter\n# (10) double, a, kinematic hardening parameter\n# (11) double, b, kinematic hardening parameter\n# [12] double, density, default: 0.0"
     },
     {
       "trigger": "VAFCRP1D",
-      "details": "uniaxial vafcrp material",
+      "details": "uniaxial vafcrp material (v3.6 and later)",
       "kind": "type",
-      "contents": "material VAFCRP1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} [${9:(9)} ${10:(10)}...] ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, saturated stress\n# (5) double, linear hardening modulus\n# (6) double, m\n# (7) double, mu\n# (8) double, epsilon\n# (9) double, a\n# (10) double, b\n# [11] double, density, default: 0.0"
+      "contents": "material VAFCRP1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} [${9:(9)} ${10:(10)}...] ${11:[11]}\n# the following applies to v3.6 and later only, see documentation for older syntax\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, linear isotropic hardening modulus\n# (5) double, saturation stress\n# (6) double, ms, saturation rate\n# (7) double, mu, viscosity parameter\n# (8) double, epsilon, viscosity parameter\n# (9) double, a, kinematic hardening parameter\n# (10) double, b, kinematic hardening parameter\n# [11] double, density, default: 0.0"
     },
     {
       "trigger": "Viscosity01",

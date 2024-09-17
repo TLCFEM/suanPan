@@ -68,18 +68,9 @@ class VAFCRP final : protected DataVAFCRP, public Material3D {
 
 public:
     VAFCRP(
-        unsigned,   // tag
-        double,     // elastic modulus
-        double,     // poissons ratio
-        double,     // yield stress
-        double,     // saturated stress
-        double,     // linear hardening modulus
-        double,     // m
-        double,     // mu
-        double,     // epsilon
-        vec&&,      // a
-        vec&&,      // b
-        double = 0. // density
+        unsigned,     // tag
+        DataVAFCRP&&, // material data
+        double = 0.   // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -22,8 +22,8 @@
 
 constexpr double VAFCRP1D::unit_time = 1.;
 
-VAFCRP1D::VAFCRP1D(const unsigned T, const double E, const double Y, const double S, const double H, const double M, const double MU, const double EP, vec&& A, vec&& B, const double R)
-    : DataVAFCRP1D{fabs(E), fabs(Y), fabs(S), H, fabs(M), std::max(0., MU), std::max(0., EP), std::move(A), std::move(B)}
+VAFCRP1D::VAFCRP1D(const unsigned T, DataVAFCRP1D&& D, const double R)
+    : DataVAFCRP1D(std::move(D))
     , Material1D(T, R) { access::rw(tolerance) = 1E-15; }
 
 int VAFCRP1D::initialize(const shared_ptr<DomainBase>& D) {

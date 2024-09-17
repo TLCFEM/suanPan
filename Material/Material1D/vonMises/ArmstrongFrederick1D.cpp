@@ -19,8 +19,8 @@
 
 #include <Recorder/OutputType.h>
 
-ArmstrongFrederick1D::ArmstrongFrederick1D(const unsigned T, const double E, const double Y, const double S, const double H, const double M, const double C, const double W, const double RS, vec&& A, vec&& B, const double R)
-    : DataArmstrongFrederick1D{E, Y, S, H, M, std::max(0., std::min(1., C)), W, RS, std::move(A), std::move(B)}
+ArmstrongFrederick1D::ArmstrongFrederick1D(const unsigned T, DataArmstrongFrederick1D&& D, const double R)
+    : DataArmstrongFrederick1D(std::move(D))
     , Material1D(T, R) {}
 
 int ArmstrongFrederick1D::initialize(const shared_ptr<DomainBase>&) {
@@ -53,7 +53,7 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
     auto& r = trial_history(size + 2);
     auto& theta = trial_history(size + 3);
 
-    auto yield_func = fabs(trial_stress(0) - accu(trial_history.head(size))) - std::max(0., yield + hardening * q + saturation * (1. - exp(-m * q)) - reduction * (1. - exp(-w * r)));
+    auto yield_func = fabs(trial_stress(0) - accu(trial_history.head(size))) - std::max(0., yield + hardening * q + saturation * (1. - exp(-ms * q)) - reduction * (1. - exp(-mr * r)));
 
     if(yield_func < 0.) return SUANPAN_SUCCESS;
 
@@ -68,11 +68,11 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto s_term = saturation * exp(-m * q);
-        const auto r_term = reduction * exp(-w * r);
+        const auto s_term = saturation * exp(-ms * q);
+        const auto r_term = reduction * exp(-mr * r);
 
         auto k = yield + saturation - reduction + hardening * q - s_term + r_term;
-        auto dk = hardening + m * s_term - w * r_term * dr;
+        auto dk = hardening + ms * s_term - mr * r_term * dr;
         if(k < 0.) k = dk = 0.;
 
         auto sum_a = 0., sum_b = 0.;
@@ -106,9 +106,9 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
 
         if(const auto h = fabs(ep - current_theta) - current_r; h > 0.) {
             const auto nh = ep > current_theta ? 1. : -1.;
-            r += c * h;
-            theta += nh * (1. - c) * h;
-            dr = xi > 0. ? c * nh : -c * nh;
+            r += memory * h;
+            theta += nh * (1. - memory) * h;
+            dr = xi > 0. ? memory * nh : -memory * nh;
         }
         else dr = 0.;
     }
