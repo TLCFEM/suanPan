@@ -18,7 +18,6 @@
 #include "VAFCRP.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
 const double VAFCRP::root_three_two = sqrt(1.5);

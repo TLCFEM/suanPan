@@ -18,7 +18,6 @@
 #include "VAFCRP1D.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Recorder/OutputType.h>
 
 constexpr double VAFCRP1D::unit_time = 1.;
 
