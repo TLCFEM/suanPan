@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.7.0
-//  Generated: 2024-08-14 12:04:53.220567
+//  Catch v3.7.1
+//  Generated: 2024-09-17 10:36:40.974985
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -535,10 +535,14 @@ namespace Catch {
         friend void cleanUpContext();
 
     public:
-        IResultCapture* getResultCapture() const { return m_resultCapture; }
-        IConfig const* getConfig() const { return m_config; }
-        void setResultCapture(IResultCapture* resultCapture);
-        void setConfig(IConfig const* config);
+        constexpr IResultCapture* getResultCapture() const {
+            return m_resultCapture;
+        }
+        constexpr IConfig const* getConfig() const { return m_config; }
+        constexpr void setResultCapture(IResultCapture* resultCapture) {
+            m_resultCapture = resultCapture;
+        }
+        constexpr void setConfig(IConfig const* config) { m_config = config; }
     };
 
     Context& getCurrentMutableContext();
@@ -639,7 +643,6 @@ namespace Catch {
 #ifndef CATCH_INTERFACES_CAPTURE_HPP_INCLUDED
 #define CATCH_INTERFACES_CAPTURE_HPP_INCLUDED
 
-#include <chrono>
 #include <string>
 
 #ifndef CATCH_STRINGREF_HPP_INCLUDED
@@ -784,8 +787,10 @@ namespace Catch {
         };
     };
 
-    bool isOk(ResultWas::OfType resultType);
-    bool isJustInfo(int flags);
+    constexpr bool isOk(ResultWas::OfType resultType) {
+        return (resultType & ResultWas::FailureBit) == 0;
+    }
+    constexpr bool isJustInfo(int flags) { return flags == ResultWas::Info; }
 
     // ResultDisposition::Flags enum
     struct ResultDisposition {
@@ -798,11 +803,16 @@ namespace Catch {
         };
     };
 
-    ResultDisposition::Flags operator|(ResultDisposition::Flags lhs, ResultDisposition::Flags rhs);
+    constexpr ResultDisposition::Flags operator|(ResultDisposition::Flags lhs, ResultDisposition::Flags rhs) {
+        return static_cast<ResultDisposition::Flags>(static_cast<int>(lhs) | static_cast<int>(rhs));
+    }
 
-    bool shouldContinueOnFailure(int flags);
-    inline bool isFalseTest(int flags) { return (flags & ResultDisposition::FalseTest) != 0; }
-    bool shouldSuppressFailure(int flags);
+    constexpr bool isFalseTest(int flags) {
+        return (flags & ResultDisposition::FalseTest) != 0;
+    }
+    constexpr bool shouldSuppressFailure(int flags) {
+        return (flags & ResultDisposition::SuppressFail) != 0;
+    }
 
 } // end namespace Catch
 
@@ -1000,7 +1010,7 @@ namespace Catch {
         virtual void handleFatalErrorCondition(StringRef message) = 0;
 
         virtual void handleExpr(AssertionInfo const& info, ITransientExpression const& expr, AssertionReaction& reaction) = 0;
-        virtual void handleMessage(AssertionInfo const& info, ResultWas::OfType resultType, StringRef message, AssertionReaction& reaction) = 0;
+        virtual void handleMessage(AssertionInfo const& info, ResultWas::OfType resultType, std::string&& message, AssertionReaction& reaction) = 0;
         virtual void handleUnexpectedExceptionNotThrown(AssertionInfo const& info, AssertionReaction& reaction) = 0;
         virtual void handleUnexpectedInflightException(AssertionInfo const& info, std::string&& message, AssertionReaction& reaction) = 0;
         virtual void handleIncomplete(AssertionInfo const& info) = 0;
@@ -1230,7 +1240,7 @@ namespace Catch {
             int high_mild = 0;   // 1.5 to 3 times IQR above Q3
             int high_severe = 0; // more than 3 times IQR above Q3
 
-            int total() const {
+            constexpr int total() const {
                 return low_severe + low_mild + high_mild + high_severe;
             }
         };
@@ -3137,12 +3147,12 @@ namespace Catch {
         bool m_isNegated;
 
     public:
-        LazyExpression(bool isNegated)
+        constexpr LazyExpression(bool isNegated)
             : m_isNegated(isNegated) {}
-        LazyExpression(LazyExpression const& other) = default;
+        constexpr LazyExpression(LazyExpression const& other) = default;
         LazyExpression& operator=(LazyExpression const&) = delete;
 
-        explicit operator bool() const {
+        constexpr explicit operator bool() const {
             return m_transientExpression != nullptr;
         }
 
@@ -3850,7 +3860,7 @@ namespace Catch {
     do {                                                                                                                                     \
         Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::StringRef(), resultDisposition); \
         catchAssertionHandler.handleMessage(messageType, (Catch::MessageStream() << __VA_ARGS__ + ::Catch::StreamEndStop()).m_stream.str()); \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                          \
+        catchAssertionHandler.complete();                                                                                                    \
     } while(false)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -5058,6 +5068,9 @@ namespace Catch {
         bool m_isBinaryExpression;
         bool m_result;
 
+    protected:
+        ~ITransientExpression() = default;
+
     public:
         constexpr auto isBinaryExpression() const -> bool { return m_isBinaryExpression; }
         constexpr auto getResult() const -> bool { return m_result; }
@@ -5068,17 +5081,13 @@ namespace Catch {
             : m_isBinaryExpression(isBinaryExpression)
             , m_result(result) {}
 
-        ITransientExpression() = default;
-        ITransientExpression(ITransientExpression const&) = default;
-        ITransientExpression& operator=(ITransientExpression const&) = default;
+        constexpr ITransientExpression(ITransientExpression const&) = default;
+        constexpr ITransientExpression& operator=(ITransientExpression const&) = default;
 
         friend std::ostream& operator<<(std::ostream& out, ITransientExpression const& expr) {
             expr.streamReconstructedExpression(out);
             return out;
         }
-
-    protected:
-        ~ITransientExpression() = default;
     };
 
     void formatReconstructedExpression(std::ostream& os, std::string const& lhs, StringRef op, std::string const& rhs);
@@ -5362,12 +5371,12 @@ namespace Catch {
         }
 
         template<typename T>
-        void handleExpr(ExprLhs<T> const& expr) {
+        constexpr void handleExpr(ExprLhs<T> const& expr) {
             handleExpr(expr.makeUnaryExpr());
         }
         void handleExpr(ITransientExpression const& expr);
 
-        void handleMessage(ResultWas::OfType resultType, StringRef message);
+        void handleMessage(ResultWas::OfType resultType, std::string&& message);
 
         void handleExceptionThrownAsExpected();
         void handleUnexpectedExceptionNotThrown();
@@ -5424,8 +5433,6 @@ namespace Catch {
 
 #endif
 
-#define INTERNAL_CATCH_REACT(handler) handler.complete();
-
 ///////////////////////////////////////////////////////////////////////////////
 #define INTERNAL_CATCH_TEST(macroName, resultDisposition, ...)                                                                                                  \
     do { /* NOLINT(bugprone-infinite-loop) */                                                                                                                   \
@@ -5439,7 +5446,7 @@ namespace Catch {
             CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION                                                                                                            \
         }                                                                                                                                                       \
         INTERNAL_CATCH_CATCH(catchAssertionHandler)                                                                                                             \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                             \
+        catchAssertionHandler.complete();                                                                                                                       \
     } while((void)0, (false) && static_cast<const bool&>(!!(__VA_ARGS__))) // the expression here is never evaluated at runtime but it forces the compiler to give it a look
   // The double negation silences MSVC's C4800 warning, the static_cast forces short-circuit evaluation if the type has overloaded &&.
 
@@ -5467,7 +5474,7 @@ namespace Catch {
         catch(...) {                                                                                                                                            \
             catchAssertionHandler.handleUnexpectedInflightException();                                                                                          \
         }                                                                                                                                                       \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                             \
+        catchAssertionHandler.complete();                                                                                                                       \
     } while(false)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -5488,7 +5495,7 @@ namespace Catch {
             }                                                                                                                                                   \
         else                                                                                                                                                    \
             catchAssertionHandler.handleThrowingCallSkipped();                                                                                                  \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                             \
+        catchAssertionHandler.complete();                                                                                                                       \
     } while(false)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -5512,7 +5519,7 @@ namespace Catch {
             }                                                                                                                                                                                         \
         else                                                                                                                                                                                          \
             catchAssertionHandler.handleThrowingCallSkipped();                                                                                                                                        \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                                                                   \
+        catchAssertionHandler.complete();                                                                                                                                                             \
     } while(false)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -5534,7 +5541,7 @@ namespace Catch {
             }                                                                                                                                                                                          \
         else                                                                                                                                                                                           \
             catchAssertionHandler.handleThrowingCallSkipped();                                                                                                                                         \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                                                                    \
+        catchAssertionHandler.complete();                                                                                                                                                              \
     } while(false)
 
 #endif // CATCH_CONFIG_DISABLE
@@ -5724,7 +5731,7 @@ namespace Catch {
         void (C::*m_testAsMethod)();
 
     public:
-        TestInvokerAsMethod(void (C::*testAsMethod)()) noexcept
+        constexpr TestInvokerAsMethod(void (C::*testAsMethod)()) noexcept
             : m_testAsMethod(testAsMethod) {}
 
         void invoke() const override {
@@ -5746,7 +5753,7 @@ namespace Catch {
         Detail::unique_ptr<C> m_fixture = nullptr;
 
     public:
-        TestInvokerFixture(void (C::*testAsMethod)() const) noexcept
+        constexpr TestInvokerFixture(void (C::*testAsMethod)() const) noexcept
             : m_testAsMethod(testAsMethod) {}
 
         void prepareTestCase() override {
@@ -6900,7 +6907,7 @@ namespace Catch {
         ITestInvoker* m_invoker;
 
     public:
-        TestCaseHandle(TestCaseInfo* info, ITestInvoker* invoker)
+        constexpr TestCaseHandle(TestCaseInfo* info, ITestInvoker* invoker)
             : m_info(info)
             , m_invoker(invoker) {}
 
@@ -6916,7 +6923,9 @@ namespace Catch {
             m_invoker->invoke();
         }
 
-        TestCaseInfo const& getTestCaseInfo() const;
+        constexpr TestCaseInfo const& getTestCaseInfo() const {
+            return *m_info;
+        }
     };
 
     Detail::unique_ptr<TestCaseInfo>
@@ -6973,7 +6982,7 @@ namespace Catch {
         template<typename T>
         class ExceptionTranslator : public IExceptionTranslator {
         public:
-            ExceptionTranslator(std::string (*translateFunction)(T const&))
+            constexpr ExceptionTranslator(std::string (*translateFunction)(T const&))
                 : m_translateFunction(translateFunction) {}
 
             std::string translate(ExceptionTranslators::const_iterator it, ExceptionTranslators::const_iterator itEnd) const override {
@@ -7070,7 +7079,7 @@ namespace Catch {
 
 #define CATCH_VERSION_MAJOR 3
 #define CATCH_VERSION_MINOR 7
-#define CATCH_VERSION_PATCH 0
+#define CATCH_VERSION_PATCH 1
 
 #endif // CATCH_VERSION_MACROS_HPP_INCLUDED
 
@@ -7769,7 +7778,7 @@ namespace Catch {
         struct ExtendedMultResult {
             T upper;
             T lower;
-            bool operator==(ExtendedMultResult const& rhs) const {
+            constexpr bool operator==(ExtendedMultResult const& rhs) const {
                 return upper == rhs.upper && lower == rhs.lower;
             }
         };
@@ -7872,7 +7881,7 @@ namespace Catch {
          * get by simple casting ([0, ..., INT_MAX, INT_MIN, ..., -1])
          */
         template<typename OriginalType, typename UnsignedType>
-        std::enable_if_t<std::is_signed<OriginalType>::value, UnsignedType>
+        constexpr std::enable_if_t<std::is_signed<OriginalType>::value, UnsignedType>
         transposeToNaturalOrder(UnsignedType in) {
             static_assert(
                 sizeof(OriginalType) == sizeof(UnsignedType),
@@ -7889,7 +7898,7 @@ namespace Catch {
         }
 
         template<typename OriginalType, typename UnsignedType>
-        std::enable_if_t<std::is_unsigned<OriginalType>::value, UnsignedType>
+        constexpr std::enable_if_t<std::is_unsigned<OriginalType>::value, UnsignedType>
         transposeToNaturalOrder(UnsignedType in) {
             static_assert(
                 sizeof(OriginalType) == sizeof(UnsignedType),
@@ -7941,25 +7950,25 @@ namespace Catch {
         // distribution will be reused many times and this is an optimization.
         UnsignedIntegerType m_rejection_threshold = 0;
 
-        UnsignedIntegerType computeDistance(IntegerType a, IntegerType b) const {
+        static constexpr UnsignedIntegerType computeDistance(IntegerType a, IntegerType b) {
             // This overflows and returns 0 if a == 0 and b == TYPE_MAX.
             // We handle that later when generating the number.
             return transposeTo(b) - transposeTo(a) + 1;
         }
 
-        static UnsignedIntegerType computeRejectionThreshold(UnsignedIntegerType ab_distance) {
+        static constexpr UnsignedIntegerType computeRejectionThreshold(UnsignedIntegerType ab_distance) {
             // distance == 0 means that we will return all possible values from
             // the type's range, and that we shouldn't reject anything.
             if(ab_distance == 0) { return 0; }
             return (~ab_distance + 1) % ab_distance;
         }
 
-        static UnsignedIntegerType transposeTo(IntegerType in) {
+        static constexpr UnsignedIntegerType transposeTo(IntegerType in) {
             return Detail::transposeToNaturalOrder<IntegerType>(
                 static_cast<UnsignedIntegerType>(in)
             );
         }
-        static IntegerType transposeBack(UnsignedIntegerType in) {
+        static constexpr IntegerType transposeBack(UnsignedIntegerType in) {
             return static_cast<IntegerType>(
                 Detail::transposeToNaturalOrder<IntegerType>(in)
             );
@@ -7968,7 +7977,7 @@ namespace Catch {
     public:
         using result_type = IntegerType;
 
-        uniform_integer_distribution(IntegerType a, IntegerType b)
+        constexpr uniform_integer_distribution(IntegerType a, IntegerType b)
             : m_a(transposeTo(a))
             , m_ab_distance(computeDistance(a, b))
             , m_rejection_threshold(computeRejectionThreshold(m_ab_distance)) {
@@ -7976,7 +7985,7 @@ namespace Catch {
         }
 
         template<typename Generator>
-        result_type operator()(Generator& g) {
+        constexpr result_type operator()(Generator& g) {
             // All possible values of result_type are valid.
             if(m_ab_distance == 0) {
                 return transposeBack(Detail::fillBitsFrom<UnsignedIntegerType>(g));
@@ -7994,8 +8003,8 @@ namespace Catch {
             return transposeBack(m_a + emul.upper);
         }
 
-        result_type a() const { return transposeBack(m_a); }
-        result_type b() const { return transposeBack(m_ab_distance + m_a - 1); }
+        constexpr result_type a() const { return transposeBack(m_a); }
+        constexpr result_type b() const { return transposeBack(m_ab_distance + m_a - 1); }
     };
 
 } // end namespace Catch
@@ -9352,7 +9361,7 @@ namespace Catch {
     namespace Detail {
 
         template<typename ForwardIter, typename Sentinel, typename T, typename Comparator>
-        ForwardIter find_sentinel(ForwardIter start, Sentinel sentinel, T const& value, Comparator cmp) {
+        constexpr ForwardIter find_sentinel(ForwardIter start, Sentinel sentinel, T const& value, Comparator cmp) {
             while(start != sentinel) {
                 if(cmp(*start, value)) { break; }
                 ++start;
@@ -9361,7 +9370,7 @@ namespace Catch {
         }
 
         template<typename ForwardIter, typename Sentinel, typename T, typename Comparator>
-        std::ptrdiff_t count_sentinel(ForwardIter start, Sentinel sentinel, T const& value, Comparator cmp) {
+        constexpr std::ptrdiff_t count_sentinel(ForwardIter start, Sentinel sentinel, T const& value, Comparator cmp) {
             std::ptrdiff_t count = 0;
             while(start != sentinel) {
                 if(cmp(*start, value)) { ++count; }
@@ -9371,7 +9380,7 @@ namespace Catch {
         }
 
         template<typename ForwardIter, typename Sentinel>
-        std::enable_if_t<!std::is_same<ForwardIter, Sentinel>::value, std::ptrdiff_t>
+        constexpr std::enable_if_t<!std::is_same<ForwardIter, Sentinel>::value, std::ptrdiff_t>
         sentinel_distance(ForwardIter iter, const Sentinel sentinel) {
             std::ptrdiff_t dist = 0;
             while(iter != sentinel) {
@@ -9382,12 +9391,12 @@ namespace Catch {
         }
 
         template<typename ForwardIter>
-        std::ptrdiff_t sentinel_distance(ForwardIter first, ForwardIter last) {
+        constexpr std::ptrdiff_t sentinel_distance(ForwardIter first, ForwardIter last) {
             return std::distance(first, last);
         }
 
         template<typename ForwardIter1, typename Sentinel1, typename ForwardIter2, typename Sentinel2, typename Comparator>
-        bool check_element_counts(ForwardIter1 first_1, const Sentinel1 end_1, ForwardIter2 first_2, const Sentinel2 end_2, Comparator cmp) {
+        constexpr bool check_element_counts(ForwardIter1 first_1, const Sentinel1 end_1, ForwardIter2 first_2, const Sentinel2 end_2, Comparator cmp) {
             auto cursor = first_1;
             while(cursor != end_1) {
                 if(find_sentinel(first_1, cursor, *cursor, cmp) ==
@@ -9413,7 +9422,7 @@ namespace Catch {
         }
 
         template<typename ForwardIter1, typename Sentinel1, typename ForwardIter2, typename Sentinel2, typename Comparator>
-        bool is_permutation(ForwardIter1 first_1, const Sentinel1 end_1, ForwardIter2 first_2, const Sentinel2 end_2, Comparator cmp) {
+        constexpr bool is_permutation(ForwardIter1 first_1, const Sentinel1 end_1, ForwardIter2 first_2, const Sentinel2 end_2, Comparator cmp) {
             // TODO: no optimization for stronger iterators, because we would also have to constrain on sentinel vs not sentinel types
             // TODO: Comparator has to be "both sides", e.g. a == b => b == a
             // This skips shared prefix of the two ranges
@@ -10027,7 +10036,7 @@ namespace Catch {
     public: // IResultCapture
         // Assertion handlers
         void handleExpr(AssertionInfo const& info, ITransientExpression const& expr, AssertionReaction& reaction) override;
-        void handleMessage(AssertionInfo const& info, ResultWas::OfType resultType, StringRef message, AssertionReaction& reaction) override;
+        void handleMessage(AssertionInfo const& info, ResultWas::OfType resultType, std::string&& message, AssertionReaction& reaction) override;
         void handleUnexpectedExceptionNotThrown(AssertionInfo const& info, AssertionReaction& reaction) override;
         void handleUnexpectedInflightException(AssertionInfo const& info, std::string&& message, AssertionReaction& reaction) override;
         void handleIncomplete(AssertionInfo const& info) override;
@@ -10768,18 +10777,24 @@ namespace Catch {
 #ifndef CATCH_XMLWRITER_HPP_INCLUDED
 #define CATCH_XMLWRITER_HPP_INCLUDED
 
+#include <cstdint>
 #include <iosfwd>
 #include <vector>
 
 namespace Catch {
-    enum class XmlFormatting {
+    enum class XmlFormatting : std::uint8_t {
         None = 0x00,
         Indent = 0x01,
         Newline = 0x02,
     };
 
-    XmlFormatting operator|(XmlFormatting lhs, XmlFormatting rhs);
-    XmlFormatting operator&(XmlFormatting lhs, XmlFormatting rhs);
+    constexpr XmlFormatting operator|(XmlFormatting lhs, XmlFormatting rhs) {
+        return static_cast<XmlFormatting>(static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
+    }
+
+    constexpr XmlFormatting operator&(XmlFormatting lhs, XmlFormatting rhs) {
+        return static_cast<XmlFormatting>(static_cast<std::uint8_t>(lhs) & static_cast<std::uint8_t>(rhs));
+    }
 
     /**
      * Helper for XML-encoding text (escaping angle brackets, quotes, etc)
@@ -10792,7 +10807,9 @@ namespace Catch {
         enum ForWhat { ForTextNodes,
                        ForAttributes };
 
-        XmlEncode(StringRef str, ForWhat forWhat = ForTextNodes);
+        constexpr XmlEncode(StringRef str, ForWhat forWhat = ForTextNodes)
+            : m_str(str)
+            , m_forWhat(forWhat) {}
 
         void encodeTo(std::ostream& os) const;
 
@@ -10938,7 +10955,7 @@ namespace Catch {
         MatcherT const& m_matcher;
 
     public:
-        MatchExpr(ArgT&& arg, MatcherT const& matcher)
+        constexpr MatchExpr(ArgT&& arg, MatcherT const& matcher)
             : ITransientExpression{true, matcher.match(arg)}
             , // not forwarding arg here on purpose
             m_arg(CATCH_FORWARD(arg))
@@ -10967,7 +10984,8 @@ namespace Catch {
     void handleExceptionMatchExpr(AssertionHandler& handler, StringMatcher const& matcher);
 
     template<typename ArgT, typename MatcherT>
-    auto makeMatchExpr(ArgT&& arg, MatcherT const& matcher) -> MatchExpr<ArgT, MatcherT> {
+    constexpr MatchExpr<ArgT, MatcherT>
+    makeMatchExpr(ArgT&& arg, MatcherT const& matcher) {
         return MatchExpr<ArgT, MatcherT>(CATCH_FORWARD(arg), matcher);
     }
 
@@ -10981,7 +10999,7 @@ namespace Catch {
             catchAssertionHandler.handleExpr(Catch::makeMatchExpr(arg, matcher));                                                                                                              \
         }                                                                                                                                                                                      \
         INTERNAL_CATCH_CATCH(catchAssertionHandler)                                                                                                                                            \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                                                            \
+        catchAssertionHandler.complete();                                                                                                                                                      \
     } while(false)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -10990,7 +11008,10 @@ namespace Catch {
         Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, CATCH_INTERNAL_STRINGIFY(__VA_ARGS__) ", " CATCH_INTERNAL_STRINGIFY(exceptionType) ", " CATCH_INTERNAL_STRINGIFY(matcher), resultDisposition); \
         if(catchAssertionHandler.allowThrows())                                                                                                                                                                                                     \
             try {                                                                                                                                                                                                                                   \
+                CATCH_INTERNAL_START_WARNINGS_SUPPRESSION                                                                                                                                                                                           \
+                CATCH_INTERNAL_SUPPRESS_USELESS_CAST_WARNINGS                                                                                                                                                                                       \
                 static_cast<void>(__VA_ARGS__);                                                                                                                                                                                                     \
+                CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION                                                                                                                                                                                            \
                 catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                                                                                                                                                         \
             }                                                                                                                                                                                                                                       \
             catch(exceptionType const& ex) {                                                                                                                                                                                                        \
@@ -11001,7 +11022,7 @@ namespace Catch {
             }                                                                                                                                                                                                                                       \
         else                                                                                                                                                                                                                                        \
             catchAssertionHandler.handleThrowingCallSkipped();                                                                                                                                                                                      \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                                                                                                                 \
+        catchAssertionHandler.complete();                                                                                                                                                                                                           \
     } while(false)
 
 #endif // CATCH_MATCHERS_IMPL_HPP_INCLUDED
@@ -12031,12 +12052,12 @@ namespace Catch {
 
         public:
             template<typename TargetRangeLike2, typename Equality2>
-            RangeEqualsMatcher(TargetRangeLike2&& range, Equality2&& predicate)
+            constexpr RangeEqualsMatcher(TargetRangeLike2&& range, Equality2&& predicate)
                 : m_desired(CATCH_FORWARD(range))
                 , m_predicate(CATCH_FORWARD(predicate)) {}
 
             template<typename RangeLike>
-            bool match(RangeLike&& rng) const {
+            constexpr bool match(RangeLike&& rng) const {
                 auto rng_start = begin(rng);
                 const auto rng_end = end(rng);
                 auto target_start = begin(m_desired);
@@ -12068,12 +12089,12 @@ namespace Catch {
 
         public:
             template<typename TargetRangeLike2, typename Equality2>
-            UnorderedRangeEqualsMatcher(TargetRangeLike2&& range, Equality2&& predicate)
+            constexpr UnorderedRangeEqualsMatcher(TargetRangeLike2&& range, Equality2&& predicate)
                 : m_desired(CATCH_FORWARD(range))
                 , m_predicate(CATCH_FORWARD(predicate)) {}
 
             template<typename RangeLike>
-            bool match(RangeLike&& rng) const {
+            constexpr bool match(RangeLike&& rng) const {
                 using std::begin;
                 using std::end;
                 return Catch::Detail::is_permutation(begin(m_desired), end(m_desired), begin(rng), end(rng), m_predicate);
@@ -12092,7 +12113,7 @@ namespace Catch {
          * Uses `std::equal_to` to do the comparison
          */
         template<typename RangeLike>
-        std::enable_if_t<!Detail::is_matcher<RangeLike>::value, RangeEqualsMatcher<RangeLike, std::equal_to<>>>
+        constexpr std::enable_if_t<!Detail::is_matcher<RangeLike>::value, RangeEqualsMatcher<RangeLike, std::equal_to<>>>
         RangeEquals(RangeLike&& range) {
             return {CATCH_FORWARD(range), std::equal_to<>{}};
         }
@@ -12104,7 +12125,7 @@ namespace Catch {
          * Uses to provided predicate `predicate` to do the comparisons
          */
         template<typename RangeLike, typename Equality>
-        RangeEqualsMatcher<RangeLike, Equality>
+        constexpr RangeEqualsMatcher<RangeLike, Equality>
         RangeEquals(RangeLike&& range, Equality&& predicate) {
             return {CATCH_FORWARD(range), CATCH_FORWARD(predicate)};
         }
@@ -12116,7 +12137,7 @@ namespace Catch {
          * Uses `std::equal_to` to do the comparison
          */
         template<typename RangeLike>
-        std::enable_if_t<
+        constexpr std::enable_if_t<
             !Detail::is_matcher<RangeLike>::value,
             UnorderedRangeEqualsMatcher<RangeLike, std::equal_to<>>>
         UnorderedRangeEquals(RangeLike&& range) {
@@ -12130,7 +12151,7 @@ namespace Catch {
          * Uses to provided predicate `predicate` to do the comparisons
          */
         template<typename RangeLike, typename Equality>
-        UnorderedRangeEqualsMatcher<RangeLike, Equality>
+        constexpr UnorderedRangeEqualsMatcher<RangeLike, Equality>
         UnorderedRangeEquals(RangeLike&& range, Equality&& predicate) {
             return {CATCH_FORWARD(range), CATCH_FORWARD(predicate)};
         }
@@ -13243,7 +13264,7 @@ namespace Catch {
             : CumulativeReporterBase(CATCH_MOVE(config))
             , xml(m_stream) {
             m_preferences.shouldRedirectStdOut = true;
-            m_preferences.shouldReportAllAssertions = true;
+            m_preferences.shouldReportAllAssertions = false;
             m_shouldStoreSuccesfulAssertions = false;
         }
 

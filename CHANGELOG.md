@@ -10,6 +10,7 @@
 ## version 3.6
 
 1. add `AFCO1D` material with strain memory
+2. update `Catch2` to version `3.7.1`
 
 ## version 3.5
 
