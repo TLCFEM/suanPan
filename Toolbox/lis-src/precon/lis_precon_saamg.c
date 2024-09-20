@@ -91,7 +91,9 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 	LIS_COMMTABLE table;
 	LIS_INT	unsym,sol;
 	LIS_INT	err;
-	LIS_REAL theta; 
+    LIS_REAL theta;
+    LIS_INT converted = LIS_FALSE;
+
 #ifdef USE_MPI
 		LIS_MPI_Fint comm;
 #endif
@@ -107,11 +109,10 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 		err = lis_matrix_convert(A,B);
 		if( err ) return err;
 		solver->A = B;
-		lis_matrix_destroy(B);
-		solver->A = A;
-	}
-	precon->A       = solver->A;
-	precon->is_copy = LIS_FALSE;
+        converted = LIS_TRUE;
+    }
+    precon->A = solver->A;
+    precon->is_copy = LIS_FALSE;
 	A               = precon->A;
 	sol             = solver->options[LIS_OPTIONS_SOLVER];
 	unsym           = solver->options[LIS_OPTIONS_SAAMG_UNSYM];
@@ -176,8 +177,13 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 		}
 #endif
 
-	LIS_DEBUG_FUNC_OUT;
-    return LIS_SUCCESS;
+        if(converted) {
+            lis_matrix_destroy(B);
+            solver->A = A;
+        }
+
+        LIS_DEBUG_FUNC_OUT;
+        return LIS_SUCCESS;
 #else
     LIS_DEBUG_FUNC_IN;
 
