@@ -2929,6 +2929,28 @@ void new_stacked(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Stacked>(tag, uvec(mat_tag));
 }
 
+void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec pool{2E5, 4E2, 2E3, 2E3, 1.};
+    if(!get_optional_input(command, pool)) {
+        suanpan_error("Valid inputs are required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!command.eof() && !get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    return_obj = make_unique<Subloading1D>(tag, DataSubloading1D{pool(0), pool(1), pool(2), pool(3), pool(4)}, density);
+}
+
 void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3500,6 +3522,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
     else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
     else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
+    else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
     else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
