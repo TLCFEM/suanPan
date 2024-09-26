@@ -2936,8 +2936,8 @@ void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) 
         return;
     }
 
-    vec pool{2E5, 4E2, 2E3, 2E3, 1.};
-    if(!get_optional_input(command, pool)) {
+    vec p{2E5, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 1E1, 1E1, .7};
+    if(!get_optional_input(command, p)) {
         suanpan_error("Valid inputs are required.\n");
         return;
     }
@@ -2948,7 +2948,7 @@ void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) 
         return;
     }
 
-    return_obj = make_unique<Subloading1D>(tag, DataSubloading1D{pool(0), pool(1), pool(2), pool(3), pool(4)}, density);
+    return_obj = make_unique<Subloading1D>(tag, DataSubloading1D{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12)}, density);
 }
 
 void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {

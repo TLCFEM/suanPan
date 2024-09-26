@@ -32,15 +32,23 @@
 
 struct DataSubloading1D {
     const double elastic; // elastic modulus
-    const double yield;   // initial yield stress
-    const double isotropic;
-    const double kinematic;
+    const double initial_iso;
+    const double k_iso;
+    const double saturation_iso;
+    const double m_iso;
+    const double initial_kin;
+    const double k_kin;
+    const double saturation_kin;
+    const double m_kin;
     const double u;
+    const double be;
+    const double ce;
+    const double ze;
 };
 
 class Subloading1D final : protected DataSubloading1D, public Material1D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double r_bound = 1E-10;
+    static constexpr double z_bound = 1E-10;
     static const double rate_bound;
 
 public:

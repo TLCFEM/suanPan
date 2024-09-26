@@ -17,7 +17,7 @@
 
 #include "Subloading1D.h"
 
-const double Subloading1D::rate_bound = log(r_bound);
+const double Subloading1D::rate_bound = log(z_bound);
 
 Subloading1D::Subloading1D(const unsigned T, DataSubloading1D&& D, const double R)
     : DataSubloading1D{std::move(D)}
@@ -26,7 +26,7 @@ Subloading1D::Subloading1D(const unsigned T, DataSubloading1D&& D, const double 
 int Subloading1D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic;
 
-    initialize_history(3);
+    initialize_history(4);
 
     return SUANPAN_SUCCESS;
 }
@@ -41,13 +41,14 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
     trial_history = current_history;
-    const auto& current_r = current_history(2);
-    auto& back_stress = trial_history(0);
-    auto& plastic_strain = trial_history(1);
-    auto& r = trial_history(2);
-
-    const auto eta = trial_stress(0) - back_stress;
-    const auto norm_eta = fabs(eta);
+    const auto& current_alpha = current_history(0);
+    const auto& current_d = current_history(1);
+    const auto& current_q = current_history(2);
+    const auto& current_z = current_history(3);
+    auto& alpha = trial_history(0);
+    auto& d = trial_history(1);
+    auto& q = trial_history(2);
+    auto& z = trial_history(3);
 
     auto gamma = 0., ref_error = 0.;
 
@@ -61,15 +62,36 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto iso_stress = yield + isotropic * (plastic_strain + gamma);
-        const auto r_rate = -u * (r > r_bound ? log(r) : rate_bound);
-        residual(0) = norm_eta - (elastic + kinematic) * gamma - r * iso_stress;
-        residual(1) = r - current_r - r_rate * gamma;
+        const auto exp_iso = saturation_iso * exp(-m_iso * q);
+        const auto y = initial_iso + saturation_iso + k_iso * q - exp_iso;
+        const auto dy = k_iso + m_iso * exp_iso;
 
-        jacobian(0, 0) = -elastic - kinematic - r * isotropic;
-        jacobian(0, 1) = -iso_stress;
-        jacobian(1, 0) = -r_rate;
-        jacobian(1, 1) = 1. + gamma * (r > r_bound ? u / r : 0.);
+        const auto exp_kin = saturation_kin * exp(-m_kin * q);
+        const auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
+        const auto da = k_kin + m_kin * exp_kin;
+
+        const auto n = trial_stress(0) - current_alpha / (1. + be * gamma) + (z - 1.) * current_d / (1. + ce * gamma) > 0. ? 1. : -1.;
+
+        auto top = be * gamma * a * n + current_alpha;
+        auto bottom = 1. + be * gamma;
+
+        alpha = top / bottom;
+        const auto dalpha = (be * n * (a + gamma * da) * bottom - top * be) / bottom / bottom;
+
+        top = ce * ze * gamma * y * n + current_d;
+        bottom = 1. + ce * gamma;
+
+        d = top / bottom;
+        const auto dd = (ce * ze * n * (y + gamma * dy) * bottom - top * ce) / bottom / bottom;
+
+        residual(0) = fabs(trial_stress(0) - elastic * gamma * n - alpha + (z - 1.) * d) - z * y;
+        residual(1) = z - current_z + u * gamma * (z < z_bound ? rate_bound : log(z));
+
+        jacobian(0, 0) = n * ((z - 1.) * dd - dalpha) - elastic - z * dy;
+        jacobian(0, 1) = n * d - y;
+
+        jacobian(1, 0) = u * (z < z_bound ? rate_bound : log(z));
+        jacobian(1, 1) = 1. + (z < z_bound ? 0. : u * gamma / z);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -78,23 +100,23 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             if(gamma > 0.) {
-                plastic_strain += gamma;
-                if(eta < 0.) gamma = -gamma;
-                back_stress += kinematic * gamma;
-                trial_stress -= elastic * gamma;
-
+                trial_stress -= elastic * gamma * n;
                 const vec2 right = solve(jacobian, vec2{elastic, 0.});
                 trial_stiffness += elastic * right(0);
             }
-            else r = norm_eta / iso_stress;
-            break;
+            else {
+                trial_history = current_history;
+                gamma = initial_iso + saturation_iso + k_iso * q - saturation_iso * exp(-m_iso * q); // reuse
+                z = (trial_stress(0) - alpha - d) / (n * gamma - d);
+            }
+
+            return SUANPAN_SUCCESS;
         }
 
         gamma -= incre(0);
-        r -= incre(1);
+        z -= incre(1);
+        q = current_q + gamma;
     }
-
-    return SUANPAN_SUCCESS;
 }
 
 int Subloading1D::clear_status() {
