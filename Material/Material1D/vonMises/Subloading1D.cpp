@@ -65,12 +65,20 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         }
 
         const auto exp_iso = saturation_iso * exp(-m_iso * q);
-        const auto y = initial_iso + saturation_iso + k_iso * q - exp_iso;
-        const auto dy = k_iso + m_iso * exp_iso;
+        auto y = initial_iso + saturation_iso + k_iso * q - exp_iso;
+        auto dy = k_iso + m_iso * exp_iso;
+        if(y < 0.) {
+            y = 0.;
+            dy = 0.;
+        }
 
         const auto exp_kin = saturation_kin * exp(-m_kin * q);
-        const auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
-        const auto da = k_kin + m_kin * exp_kin;
+        auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
+        auto da = k_kin + m_kin * exp_kin;
+        if(a < 0.) {
+            a = 0.;
+            da = 0.;
+        }
 
         const auto n = trial_stress(0) - current_alpha / (1. + be * gamma) + (z - 1.) * current_d / (1. + ce * gamma) > 0. ? 1. : -1.;
 
