@@ -55,6 +55,8 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     vec2 residual, incre;
     mat22 jacobian;
 
+    const auto current_rate = .5 * (current_z < z_bound ? rate_bound : log(current_z));
+
     auto counter = 0u;
     while(true) {
         if(max_iteration == ++counter) {
@@ -84,14 +86,16 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         d = top / bottom;
         const auto dd = (ce * ze * n * (y + gamma * dy) * bottom - top * ce) / bottom / bottom;
 
+        const auto avg_rate = .5 * (z < z_bound ? rate_bound : log(z)) + current_rate;
+
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - alpha + (z - 1.) * d) - z * y;
-        residual(1) = z - current_z + u * gamma * (z < z_bound ? rate_bound : log(z));
+        residual(1) = z - current_z + gamma * avg_rate * u;
 
         jacobian(0, 0) = n * ((z - 1.) * dd - dalpha) - elastic - z * dy;
         jacobian(0, 1) = n * d - y;
 
-        jacobian(1, 0) = u * (z < z_bound ? rate_bound : log(z));
-        jacobian(1, 1) = 1. + (z < z_bound ? 0. : u * gamma / z);
+        jacobian(1, 0) = avg_rate * u;
+        jacobian(1, 1) = 1. + (z < z_bound ? 0. : .5 * u * gamma / z);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
