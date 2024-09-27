@@ -9,8 +9,9 @@
 
 ## version 3.6
 
-1. add `AFCO1D` material with strain memory
+1. add `AFCO1D` material with strain memory [#217](https://github.com/TLCFEM/suanPan/pull/217)
 2. update `Catch2` to version `3.7.1`
+3. add `Subloading1D` material [#219](https://github.com/TLCFEM/suanPan/pull/219)
 
 ## version 3.5
 

@@ -4,8 +4,8 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-f DuncanSelig</LocalDebuggerCommandArguments>
-    <LocalDebuggerWorkingDirectory>..\..\..\Example\Material</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>-f Subloading1D</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>..\..\..\.dirty</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
