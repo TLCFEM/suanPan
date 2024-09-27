@@ -107,8 +107,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             if(gamma > 0.) {
                 trial_stress -= elastic * gamma * n;
-                const vec2 right = solve(jacobian, vec2{elastic, 0.});
-                trial_stiffness += elastic * right(0);
+                trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
             }
             else {
                 trial_history = current_history;
