@@ -1,0 +1,8 @@
+material Subloading1D 1 2E5 \
+200 10 50 10 \
+200 10 50 10 \
+4E2 10 10 0.3
+
+materialTest1D 1 1E-4 100 200 200
+
+exit
