@@ -98,6 +98,12 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - alpha + (z - 1.) * d) - z * y;
+
+        if(1u == counter && residual(0) < 0.) {
+            z = (trial_stress(0) - alpha - d) / (n * y - d);
+            return SUANPAN_SUCCESS;
+        }
+
         residual(1) = z - current_z - gamma * avg_rate;
 
         jacobian(0, 0) = n * ((z - 1.) * dd - dalpha) - elastic - z * dy;
