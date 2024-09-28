@@ -17,7 +17,15 @@
 
 #include "Subloading1D.h"
 
-const double Subloading1D::rate_bound = log(z_bound);
+const double Subloading1D::rate_bound = 1. / tan(.5 * datum::pi * z_bound);
+
+vec2 Subloading1D::yield_ratio(const double z) {
+    if(z < z_bound) return {rate_bound, 0.};
+
+    const auto x = .5 * datum::pi * z;
+
+    return {1. / tan(x), -.5 * datum::pi * pow(sin(x), -2.)};
+}
 
 Subloading1D::Subloading1D(const unsigned T, DataSubloading1D&& D, const double R)
     : DataSubloading1D{std::move(D)}
@@ -55,7 +63,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     vec2 residual, incre;
     mat22 jacobian;
 
-    const auto current_rate = .5 * (current_z < z_bound ? rate_bound : log(current_z));
+    const auto current_ratio = yield_ratio(current_z);
 
     auto counter = 0u;
     while(true) {
@@ -88,16 +96,17 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         d = top / bottom;
         const auto dd = (ce * ze * n * (y + gamma * dy) * bottom - top * ce) / bottom / bottom;
 
-        const auto avg_rate = .5 * (z < z_bound ? rate_bound : log(z)) + current_rate;
+        const auto trial_ratio = yield_ratio(z);
+        const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - alpha + (z - 1.) * d) - z * y;
-        residual(1) = z - current_z + gamma * avg_rate * u;
+        residual(1) = z - current_z - gamma * avg_rate;
 
         jacobian(0, 0) = n * ((z - 1.) * dd - dalpha) - elastic - z * dy;
         jacobian(0, 1) = n * d - y;
 
-        jacobian(1, 0) = avg_rate * u;
-        jacobian(1, 1) = 1. + (z < z_bound ? 0. : .5 * u * gamma / z);
+        jacobian(1, 0) = -avg_rate;
+        jacobian(1, 1) = 1. - u * gamma * .5 * trial_ratio(1);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 

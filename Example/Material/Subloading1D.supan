@@ -17,7 +17,7 @@ hdf5recorder 2 Element E 1
 
 fix 1 P 1 3
 
-displacement 1 0 1 2 2
+displacement 1 0 0.2 2 2
 
 step static 1
 set fixed_step_size 1
@@ -32,9 +32,9 @@ analyze
 # Coordinate:
 #   4.0000e+00  0.0000e+00
 # Displacement:
-#  -3.5380e-01  1.0000e+00
+#  -9.4303e-02  2.0000e-01
 # Resistance:
-#   1.1369e-11  1.6075e+03
+#   3.1832e-12  1.5953e+03
 peek node 2
 
 reset
