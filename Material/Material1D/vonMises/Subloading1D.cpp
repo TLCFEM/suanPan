@@ -17,14 +17,12 @@
 
 #include "Subloading1D.h"
 
-const double Subloading1D::rate_bound = 1. / tan(.5 * datum::pi * z_bound);
+const double Subloading1D::rate_bound = -log(z_bound);
 
 vec2 Subloading1D::yield_ratio(const double z) {
     if(z < z_bound) return {rate_bound, 0.};
 
-    const auto x = .5 * datum::pi * z;
-
-    return {1. / tan(x), -.5 * datum::pi * pow(sin(x), -2.)};
+    return {-log(z), -1. / z};
 }
 
 Subloading1D::Subloading1D(const unsigned T, DataSubloading1D&& D, const double R)
