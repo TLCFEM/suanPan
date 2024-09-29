@@ -418,6 +418,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\NonlinearJ2.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\NonlinearPeric.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\PolyJ2.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\SubloadingMetal.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\TableGurson.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\VAFCRP.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.cpp" />
@@ -910,6 +911,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\NonlinearJ2.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\NonlinearPeric.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\PolyJ2.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\SubloadingMetal.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\TableGurson.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\VAFCRP.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Wrapper\Rotation3D.h" />
