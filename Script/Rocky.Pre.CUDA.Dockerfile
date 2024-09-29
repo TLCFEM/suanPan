@@ -5,12 +5,17 @@
 
 FROM nvidia/cuda:12.5.1-devel-rockylinux9
 
+RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
+    echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \
+    echo "baseurl=https://yum.repos.intel.com/oneapi" >> /etc/yum.repos.d/oneAPI.repo && \
+    echo "enabled=1" >> /etc/yum.repos.d/oneAPI.repo && \
+    echo "gpgcheck=1" >> /etc/yum.repos.d/oneAPI.repo && \
+    echo "repo_gpgcheck=1" >> /etc/yum.repos.d/oneAPI.repo && \
+    echo "gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" >> /etc/yum.repos.d/oneAPI.repo
+
 RUN dnf install -y dnf-plugins-core
 RUN dnf config-manager --enable crb
-RUN dnf install -y libglvnd-devel gfortran rpm-build rpm-devel rpmdevtools cmake wget git ninja-build
-
-RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6e00e368-b61d-4f87-a409-9b510c022a37/l_onemkl_p_2024.2.1.105_offline.sh && \
-    sh ./l_onemkl_p_2024.2.1.105_offline.sh -f intel_tmp -a --silent --eula accept && rm -r intel_tmp && rm ./l_onemkl_p_2024.2.1.105_offline.sh
+RUN dnf install -y libglvnd-devel gfortran rpm-build rpm-devel rpmdevtools cmake wget git ninja-build intel-oneapi-mkl-devel
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.2/VTK-9.2.6.tar.gz && tar xf VTK-9.2.6.tar.gz && \
