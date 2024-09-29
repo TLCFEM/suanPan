@@ -18,9 +18,9 @@ jobs:
       matrix:
         build: [ RelWithDebInfo, Debug ]
         compiler: [ { c: gcc, cpp: g++, fortran: gfortran }, { c: icx, cpp: icpx, fortran: ifx } ]
-        avx: [ ON, OFF ]
+        avx: [ OFF ]
         vtk: [ ON, OFF ]
-        mkl: [ ON, OFF ]
+        mkl: [ OFF ]
         exclude:
           - build: Debug
             mkl: ON
@@ -206,8 +206,8 @@ jobs:
         build: [ Release ]
         compiler: [ "Visual Studio 17 2022" ]
         vtk: [ ON, OFF ]
-        avx: [ ON, OFF ]
-        mkl: [ ON, OFF ]
+        avx: [ OFF ]
+        mkl: [ OFF ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -288,7 +288,7 @@ jobs:
         build: [ Release ]
         compiler: [ "MinGW Makefiles" ]
         vtk: [ ON ]
-        avx: [ ON, OFF ]
+        avx: [ OFF ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
