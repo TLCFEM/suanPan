@@ -113,8 +113,8 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
             const auto cc = tensor::stress::double_contraction(eta);
             const auto sqrt_term = sqrt(bb * bb - aa * cc);
 
-            z = (bb + sqrt_term) / aa;
-            if(z < 0. || z > 1.) z = (bb - sqrt_term) / aa;
+            z = (bb - sqrt_term) / aa;
+            if(z < 0. || z > 1.) z = (bb + sqrt_term) / aa;
 
             return SUANPAN_SUCCESS;
         }
