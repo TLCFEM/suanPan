@@ -379,6 +379,8 @@ double tensor::strain::norm(vec&& in) {
     throw invalid_argument("need a valid strain vector");
 }
 
+double tensor::strain::double_contraction(const vec& a) { return double_contraction(a, a); }
+
 double tensor::strain::double_contraction(const vec& a, const vec& b) { return dot(a % b, norm_weight); }
 
 double tensor::strain::double_contraction(vec&& a, vec&& b) { return dot(a % b, norm_weight); }
@@ -448,6 +450,8 @@ double tensor::stress::norm(vec&& in) {
     if(in.n_elem == 3) return arma::norm(in);
     throw invalid_argument("need a valid stress vector");
 }
+
+double tensor::stress::double_contraction(const vec& a) { return double_contraction(a, a); }
 
 double tensor::stress::double_contraction(const vec& a, const vec& b) { return dot(a % b, norm_weight); }
 

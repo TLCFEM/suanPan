@@ -87,6 +87,7 @@ namespace tensor {
         vec to_voigt(const mat&);
         double norm(const vec&);
         double norm(vec&&);
+        double double_contraction(const vec&);
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
     } // namespace strain
@@ -95,6 +96,7 @@ namespace tensor {
         vec to_voigt(const mat&);
         double norm(const vec&);
         double norm(vec&&);
+        double double_contraction(const vec&);
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
     } // namespace stress

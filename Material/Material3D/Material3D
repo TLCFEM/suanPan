@@ -43,6 +43,7 @@
 #include "vonMises/NonlinearJ2.h"
 #include "vonMises/NonlinearPeric.h"
 #include "vonMises/PolyJ2.h"
+#include "vonMises/SubloadingMetal.h"
 #include "vonMises/TableGurson.h"
 #include "vonMises/VAFCRP.h"
 #include "Wrapper/Rotation3D.h"

@@ -70,6 +70,8 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
+        q = current_q + gamma;
+
         const auto exp_iso = saturation_iso * exp(-m_iso * q);
         auto y = initial_iso + saturation_iso + k_iso * q - exp_iso;
         auto dy = k_iso + m_iso * exp_iso;
@@ -133,7 +135,6 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         gamma -= incre(0);
         z -= incre(1);
-        q = current_q + gamma;
     }
 }
 

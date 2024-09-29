@@ -44,6 +44,7 @@ set(M3D
         Material3D/vonMises/NonlinearJ2.cpp
         Material3D/vonMises/NonlinearPeric.cpp
         Material3D/vonMises/PolyJ2.cpp
+        Material3D/vonMises/SubloadingMetal.cpp
         Material3D/vonMises/TableGurson.cpp
         Material3D/vonMises/VAFCRP.cpp
         Material3D/Wrapper/Rotation3D.cpp
