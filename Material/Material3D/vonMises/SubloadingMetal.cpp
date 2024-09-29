@@ -105,9 +105,6 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
         const vec eta = trial_s - gamma * double_shear * n - alpha + (z - 1.) * d;
 
-        const auto trial_ratio = yield_ratio(z);
-        const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
-
         residual(0) = tensor::stress::norm(eta) - root_two_third * z * y;
 
         if(1u == counter && residual(0) < 0.) {
@@ -122,13 +119,16 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        residual(1) = z - current_z - gamma * avg_rate;
+        const auto trial_ratio = yield_ratio(z);
+        const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
+
+        residual(1) = z - current_z - root_two_third * gamma * avg_rate;
 
         jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapgamma) - double_shear - be / bot_alpha * (a + gamma * da - gamma * a * root_two_third * be / bot_alpha) + (z - 1.) * ce * ze / bot_d * (y + gamma * dy - gamma * y * root_two_third * ce / bot_d) - root_two_third * z * dy;
         jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + gamma * ce * ze * y / bot_d - root_two_third * y;
 
-        jacobian(1, 0) = -avg_rate;
-        jacobian(1, 1) = 1. - u * gamma * .5 * trial_ratio(1);
+        jacobian(1, 0) = -root_two_third * avg_rate;
+        jacobian(1, 1) = 1. - root_two_third * gamma * u * .5 * trial_ratio(1);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -136,7 +136,6 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
-            // update
             trial_stress -= gamma * double_shear * n;
 
             mat right(2, 6, fill::zeros);
