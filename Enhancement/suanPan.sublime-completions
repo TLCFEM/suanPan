@@ -1993,6 +1993,18 @@
       "contents": "criterion StrainEnergyEvolution ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique criterion tag\n# (2) int, increment of rejection level in percentage\n# (3) int, target rejection level in percentage\n# [4] double, weight of central element, used in averaging\n# [5] int, number of iterations of averaging\n# [6] int, reactivation rate in percentage\n# [7] double, propagation weight\n# [8] double, tolerance"
     },
     {
+      "trigger": "Subloading1D",
+      "details": "uniaxial subloading surface model for metal",
+      "kind": "type",
+      "contents": "material Subloading1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:(12)} ${13:(13)} ${14:(14)} ${15:[15]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, isotropic initial stress\n# (4) double, isotropic linear hardening modulus\n# (5) double, isotropic saturation stress\n# (6) double, isotropic saturation rate\n# (7) double, kinematic initial stress\n# (8) double, kinematic linear hardening modulus\n# (9) double, kinematic saturation stress\n# (10) double, kinematic saturation rate\n# (11) double, yield ratio evolution rate\n# (12) double, kinematic hardening rate\n# (13) double, elastic core evolution rate\n# (14) double, elastic core size\n# [15] double, density, default: 0.0"
+    },
+    {
+      "trigger": "SubloadingMetal",
+      "details": "3d subloading surface model for metal",
+      "kind": "type",
+      "contents": "material SubloadingMetal ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:(12)} ${13:(13)} ${14:(14)} ${15:(15)} ${16:[16]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poisson's ratio\n# (4) double, isotropic initial stress\n# (5) double, isotropic linear hardening modulus\n# (6) double, isotropic saturation stress\n# (7) double, isotropic saturation rate\n# (8) double, kinematic initial stress\n# (9) double, kinematic linear hardening modulus\n# (10) double, kinematic saturation stress\n# (11) double, kinematic saturation rate\n# (12) double, yield ratio evolution rate\n# (13) double, kinematic hardening rate\n# (14) double, elastic core evolution rate\n# (15) double, elastic core size\n# [16] double, density, default: 0.0"
+    },
+    {
       "trigger": "Substepping",
       "details": "substepping wrapper",
       "kind": "type",
