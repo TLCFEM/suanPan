@@ -150,6 +150,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
         gamma -= incre(0);
         z -= incre(1);
+        if(z > 1.) z = 1. - datum::eps;
     }
 }
 
