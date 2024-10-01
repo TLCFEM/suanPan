@@ -82,34 +82,34 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         auto da = k_kin + m_kin * exp_kin;
         if(a < 0.) a = da = 0.;
 
-        const auto n = trial_stress(0) - current_alpha / (1. + be * gamma) + (z - 1.) * current_d / (1. + ce * gamma) > 0. ? 1. : -1.;
+        const auto n = trial_stress(0) - current_alpha / (1. + be * gamma) + (z - 1.) * y * current_d / (1. + ce * gamma) > 0. ? 1. : -1.;
 
         auto top = be * gamma * a * n + current_alpha;
         auto bottom = 1. + be * gamma;
 
         alpha = top / bottom;
-        const auto dalpha = (be * n * (a + gamma * da) * bottom - top * be) / bottom / bottom;
+        const auto dalpha = (be * n * (a + gamma * da) - top * be / bottom) / bottom;
 
-        top = ce * ze * gamma * y * n + current_d;
+        top = ce * ze * gamma * n + current_d;
         bottom = 1. + ce * gamma;
 
         d = top / bottom;
-        const auto dd = (ce * ze * n * (y + gamma * dy) * bottom - top * ce) / bottom / bottom;
+        const auto dd = (ce * ze * n - top * ce / bottom) / bottom;
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
 
-        residual(0) = fabs(trial_stress(0) - elastic * gamma * n - alpha + (z - 1.) * d) - z * y;
+        residual(0) = fabs(trial_stress(0) - elastic * gamma * n - alpha + (z - 1.) * y * d) - z * y;
 
         if(1u == counter && residual(0) < 0.) {
-            z = (trial_stress(0) - alpha - d) / (n * y - d);
+            z = ((trial_stress(0) - alpha) / y - d) / (n - d);
             return SUANPAN_SUCCESS;
         }
 
         residual(1) = z - current_z - gamma * avg_rate;
 
-        jacobian(0, 0) = n * ((z - 1.) * dd - dalpha) - elastic - z * dy;
-        jacobian(0, 1) = n * d - y;
+        jacobian(0, 0) = n * ((z - 1.) * (dd * y + dy * d) - dalpha) - elastic - z * dy;
+        jacobian(0, 1) = n * y * d - y;
 
         jacobian(1, 0) = -avg_rate;
         jacobian(1, 1) = 1. - u * gamma * .5 * trial_ratio(1);
@@ -120,21 +120,15 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
-            if(gamma > 0.) {
-                trial_stress -= elastic * gamma * n;
-                trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
-            }
-            else {
-                trial_history = current_history;
-                gamma = initial_iso + saturation_iso + k_iso * q - saturation_iso * exp(-m_iso * q); // reuse
-                z = (trial_stress(0) - alpha - d) / (n * gamma - d);
-            }
+            trial_stress -= elastic * gamma * n;
+            trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
 
             return SUANPAN_SUCCESS;
         }
 
         gamma -= incre(0);
         z -= incre(1);
+        if(z > 1.) z = 1. - datum::eps;
     }
 }
 

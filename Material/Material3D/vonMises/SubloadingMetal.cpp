@@ -87,29 +87,29 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         auto da = root_two_third * (k_kin + m_kin * exp_kin);
         if(a < 0.) a = da = 0.;
 
-        const auto bot_alpha = 1. + root_two_third * be * gamma;
-        const auto bot_d = 1. + root_two_third * ce * gamma;
+        const auto bot_alpha = 1. + be * gamma;
+        const auto bot_d = 1. + ce * gamma;
 
-        const vec pzetapz = current_d / bot_d;
-        const vec pzetapgamma = root_two_third * (be / bot_alpha / bot_alpha * current_alpha + ce * (1. - z) / bot_d * pzetapz);
+        const vec pzetapz = y / bot_d * current_d;
+        const vec pzetapgamma = be / bot_alpha / bot_alpha * current_alpha + (z - 1.) * (dy - ce * y / bot_d) / bot_d * current_d;
 
         const vec zeta = trial_s - current_alpha / bot_alpha + (z - 1.) * pzetapz;
         const auto norm_zeta = tensor::stress::norm(zeta);
         const vec n = zeta / norm_zeta;
 
-        vec top_alpha = gamma * be * a * n + current_alpha;
+        vec top_alpha = root_two_third * gamma * be * a * n + current_alpha;
         alpha = top_alpha / bot_alpha;
 
-        vec top_d = gamma * ce * ze * y * n + current_d;
+        vec top_d = root_two_third * gamma * ce * ze * n + current_d;
         d = top_d / bot_d;
 
-        const vec eta = trial_s - gamma * double_shear * n - alpha + (z - 1.) * d;
+        const vec eta = trial_s - gamma * double_shear * n - alpha + (z - 1.) * y * d;
 
         residual(0) = tensor::stress::norm(eta) - root_two_third * z * y;
 
         if(1u == counter && residual(0) < 0.) {
-            const auto aa = tensor::stress::double_contraction(d) - two_third * y * y;
-            const auto bb = -tensor::stress::double_contraction(d, eta);
+            const auto aa = (tensor::stress::double_contraction(d) - two_third) * y * y;
+            const auto bb = -tensor::stress::double_contraction(d, eta) * y;
             const auto cc = tensor::stress::double_contraction(eta);
             const auto sqrt_term = sqrt(bb * bb - aa * cc);
 
@@ -124,8 +124,8 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
         residual(1) = z - current_z - root_two_third * gamma * avg_rate;
 
-        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapgamma) - double_shear - be / bot_alpha * (a + gamma * da - gamma * a * root_two_third * be / bot_alpha) + (z - 1.) * ce * ze / bot_d * (y + gamma * dy - gamma * y * root_two_third * ce / bot_d) - root_two_third * z * dy;
-        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + gamma * ce * ze * y / bot_d - root_two_third * y;
+        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapgamma) - double_shear - root_two_third * (be / bot_alpha * (a + gamma * da - gamma * a * be / bot_alpha) + ce * ze * (1. - z) / bot_d * (y + gamma * dy - gamma * y * ce / bot_d) + z * dy);
+        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + root_two_third * y * (gamma * ce * ze / bot_d - 1.);
 
         jacobian(1, 0) = -root_two_third * avg_rate;
         jacobian(1, 1) = 1. - root_two_third * gamma * u * .5 * trial_ratio(1);
