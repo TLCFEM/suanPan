@@ -97,11 +97,9 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         const auto norm_zeta = tensor::stress::norm(zeta);
         const vec n = zeta / norm_zeta;
 
-        vec top_alpha = root_two_third * gamma * be * n + current_alpha;
-        alpha = top_alpha / bot_alpha;
+        alpha = (root_two_third * gamma * be * n + current_alpha) / bot_alpha;
 
-        vec top_d = root_two_third * gamma * ce * ze * n + current_d;
-        d = top_d / bot_d;
+        d = (root_two_third * gamma * ce * ze * n + current_d) / bot_d;
 
         const vec eta = trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d;
 

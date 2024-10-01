@@ -62,6 +62,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     mat22 jacobian;
 
     const auto current_ratio = yield_ratio(current_z);
+    auto current_n = 0.;
 
     auto counter = 0u;
     while(true) {
@@ -82,19 +83,20 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         auto da = k_kin + m_kin * exp_kin;
         if(a < 0.) a = da = 0.;
 
-        const auto n = trial_stress(0) - a * current_alpha / (1. + be * gamma) + (z - 1.) * y * current_d / (1. + ce * gamma) > 0. ? 1. : -1.;
+        if(1u == counter) current_n = current_stress(0) - a * current_alpha + (current_z - 1.) * y * current_d > 0. ? 1. : -1.;
 
-        auto top = be * gamma * n + current_alpha;
-        auto bottom = 1. + be * gamma;
+        const auto top_alpha = be * gamma * current_n + (2. - be * gamma) * current_alpha;
+        const auto bottom_alpha = 2. + be * gamma;
+        const auto top_d = ce * ze * gamma * current_n + (2. - ce * gamma) * current_d;
+        const auto bottom_d = 2. + ce * gamma;
 
-        alpha = top / bottom;
-        const auto dalpha = (be * n - top * be / bottom) / bottom;
+        const auto n = trial_stress(0) - a * top_alpha / bottom_alpha + (z - 1.) * y * top_d / bottom_d > 0. ? 1. : -1.;
 
-        top = ce * ze * gamma * n + current_d;
-        bottom = 1. + ce * gamma;
+        alpha = (top_alpha + be * gamma * n) / bottom_alpha;
+        const auto dalpha = be * (current_n + n - current_alpha - alpha) / bottom_alpha;
 
-        d = top / bottom;
-        const auto dd = (ce * ze * n - top * ce / bottom) / bottom;
+        d = (top_d + ce * ze * gamma * n) / bottom_d;
+        const auto dd = ce * (ze * (current_n + n) - current_d - d) / bottom_d;
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
