@@ -91,26 +91,27 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         const auto bot_d = 1. + ce * gamma;
 
         const vec pzetapz = y / bot_d * current_d;
-        const vec pzetapgamma = be / bot_alpha / bot_alpha * current_alpha + (z - 1.) * (dy - ce * y / bot_d) / bot_d * current_d;
+        const vec pzetapgamma = (be * a / bot_alpha - da) / bot_alpha * current_alpha + (z - 1.) * (dy - ce * y / bot_d) / bot_d * current_d;
 
-        const vec zeta = trial_s - current_alpha / bot_alpha + (z - 1.) * pzetapz;
+        const vec zeta = trial_s - a / bot_alpha * current_alpha + (z - 1.) * pzetapz;
         const auto norm_zeta = tensor::stress::norm(zeta);
         const vec n = zeta / norm_zeta;
 
-        vec top_alpha = root_two_third * gamma * be * a * n + current_alpha;
+        vec top_alpha = root_two_third * gamma * be * n + current_alpha;
         alpha = top_alpha / bot_alpha;
 
         vec top_d = root_two_third * gamma * ce * ze * n + current_d;
         d = top_d / bot_d;
 
-        const vec eta = trial_s - gamma * double_shear * n - alpha + (z - 1.) * y * d;
+        const vec eta = trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d;
 
         residual(0) = tensor::stress::norm(eta) - root_two_third * z * y;
 
         if(1u == counter && residual(0) < 0.) {
+            const vec ref = trial_s - a * alpha - y * d;
             const auto aa = (tensor::stress::double_contraction(d) - two_third) * y * y;
-            const auto bb = -tensor::stress::double_contraction(d, eta) * y;
-            const auto cc = tensor::stress::double_contraction(eta);
+            const auto bb = -y * tensor::stress::double_contraction(d, ref);
+            const auto cc = tensor::stress::double_contraction(ref);
             const auto sqrt_term = sqrt(bb * bb - aa * cc);
 
             z = (bb - sqrt_term) / aa;

@@ -82,13 +82,13 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         auto da = k_kin + m_kin * exp_kin;
         if(a < 0.) a = da = 0.;
 
-        const auto n = trial_stress(0) - current_alpha / (1. + be * gamma) + (z - 1.) * y * current_d / (1. + ce * gamma) > 0. ? 1. : -1.;
+        const auto n = trial_stress(0) - a * current_alpha / (1. + be * gamma) + (z - 1.) * y * current_d / (1. + ce * gamma) > 0. ? 1. : -1.;
 
-        auto top = be * gamma * a * n + current_alpha;
+        auto top = be * gamma * n + current_alpha;
         auto bottom = 1. + be * gamma;
 
         alpha = top / bottom;
-        const auto dalpha = (be * n * (a + gamma * da) - top * be / bottom) / bottom;
+        const auto dalpha = (be * n - top * be / bottom) / bottom;
 
         top = ce * ze * gamma * n + current_d;
         bottom = 1. + ce * gamma;
@@ -99,16 +99,16 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
 
-        residual(0) = fabs(trial_stress(0) - elastic * gamma * n - alpha + (z - 1.) * y * d) - z * y;
+        residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * alpha + (z - 1.) * y * d) - z * y;
 
         if(1u == counter && residual(0) < 0.) {
-            z = ((trial_stress(0) - alpha) / y - d) / (n - d);
+            z = ((trial_stress(0) - a * alpha) / y - d) / (n - d);
             return SUANPAN_SUCCESS;
         }
 
         residual(1) = z - current_z - gamma * avg_rate;
 
-        jacobian(0, 0) = n * ((z - 1.) * (dd * y + dy * d) - dalpha) - elastic - z * dy;
+        jacobian(0, 0) = n * ((z - 1.) * (dd * y + dy * d) - (a * dalpha + alpha * da)) - elastic - z * dy;
         jacobian(0, 1) = n * y * d - y;
 
         jacobian(1, 0) = -avg_rate;
