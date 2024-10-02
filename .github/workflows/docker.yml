@@ -29,4 +29,6 @@ jobs:
           context: .
           file: ./Script/Rocky.Dockerfile
           push: true
-          tags: tlcfem/suanpan:latest
+          tags: |
+            tlcfem/suanpan:latest
+            ghcr.io/tlcfem/suanpan:latest
