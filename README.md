@@ -205,9 +205,16 @@ It is also possible to compile the package via docker, check the dockerfiles und
 questions please open an issue.
 
 One can directly pull the image.
+Using [Docker Hub](https://hub.docker.com/r/tlcfem/suanpan),
 
 ```bash
 docker pull tlcfem/suanpan
+```
+
+Or using [GitHub Container Registry](https://github.com/TLCFEM/suanPan/pkgs/container/suanpan),
+
+```bash
+docker pull ghcr.io/tlcfem/suanpan
 ```
 
 ### Other Platforms
