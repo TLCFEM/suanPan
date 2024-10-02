@@ -137,12 +137,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             trial_stress -= gamma * double_shear * n;
 
-            mat right(2, 6, fill::zeros);
-            right.row(0) = -n.t();
-
-            const mat left = solve(jacobian, right);
-
-            trial_stiffness -= double_shear * double_shear * n * left.row(0) + double_shear * double_shear * gamma / norm_zeta * (unit_dev_tensor - n * n.t());
+            trial_stiffness -= double_shear * double_shear * gamma / norm_zeta * unit_dev_tensor - double_shear * double_shear * (gamma / norm_zeta + jacobian(1, 1) / det(jacobian)) * n * n.t();
 
             return SUANPAN_SUCCESS;
         }
