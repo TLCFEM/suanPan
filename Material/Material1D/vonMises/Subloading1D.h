@@ -53,6 +53,9 @@ class Subloading1D final : protected DataSubloading1D, public Material1D {
 
     static vec2 yield_ratio(double);
 
+    const double bee = be * sqrt(1.5); // to ensure identical results
+    const double cee = ce * sqrt(1.5); // to ensure identical results
+
 public:
     Subloading1D(
         unsigned,           // tag
