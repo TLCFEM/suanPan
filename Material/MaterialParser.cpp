@@ -2948,7 +2948,13 @@ void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) 
         return;
     }
 
-    return_obj = make_unique<Subloading1D>(tag, DataSubloading1D{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12)}, density);
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12)};
+    if(para.be <= 0. || para.ce <= 0. || para.m_iso <= 0. || para.m_kin <= 0.) {
+        suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+
+    return_obj = make_unique<Subloading1D>(tag, std::move(para), density);
 }
 
 void new_subloadingmetal(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -2970,7 +2976,13 @@ void new_subloadingmetal(unique_ptr<Material>& return_obj, istringstream& comman
         return;
     }
 
-    return_obj = make_unique<SubloadingMetal>(tag, DataSubloadingMetal{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), p(13)}, density);
+    DataSubloadingMetal para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), p(13)};
+    if(para.be <= 0. || para.ce <= 0. || para.m_iso <= 0. || para.m_kin <= 0.) {
+        suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+
+    return_obj = make_unique<SubloadingMetal>(tag, std::move(para), density);
 }
 
 void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
