@@ -56,7 +56,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     auto& q = trial_history(2);
     auto& z = trial_history(3);
 
-    auto gamma = 0., ref_error = 0.;
+    auto gamma = 0., ref_error = 0., elastic_z = 0.;
 
     vec2 residual, incre;
     mat22 jacobian;
@@ -90,16 +90,12 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         alpha = (bee * gamma * n + current_alpha) / bottom_alpha;
         d = (cee * ze * gamma * n + current_d) / bottom_d;
 
+        if(1u == counter) elastic_z = ((trial_stress(0) - a * alpha) / y - d) / (n - d);
+
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * alpha + (z - 1.) * y * d) - z * y;
-
-        if(1u == counter && residual(0) < 0.) {
-            z = ((trial_stress(0) - a * alpha) / y - d) / (n - d);
-            return SUANPAN_SUCCESS;
-        }
-
         residual(1) = z - current_z - gamma * avg_rate;
 
         jacobian(0, 0) = n * ((z - 1.) * (y * cee * (ze * n - d) / bottom_d + d * dy) - (a * bee * (n - alpha) / bottom_alpha + alpha * da)) - elastic - z * dy;
@@ -114,8 +110,14 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
-            trial_stress -= elastic * gamma * n;
-            trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
+            if(gamma > 0.) {
+                trial_stress -= elastic * gamma * n;
+                trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
+            }
+            else {
+                trial_history = current_history;
+                z = elastic_z;
+            }
 
             return SUANPAN_SUCCESS;
         }
@@ -123,6 +125,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         gamma -= incre(0);
         z -= incre(1);
         if(z > 1.) z = 1. - datum::eps;
+        else if(z < 0.) z = 0.;
     }
 }
 

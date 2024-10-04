@@ -61,7 +61,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
     const vec trial_s = tensor::dev(trial_stress);
 
-    auto gamma = 0., ref_error = 0.;
+    auto gamma = 0., ref_error = 0., elastic_z = 0.;
 
     vec2 residual, incre;
     mat22 jacobian;
@@ -101,26 +101,21 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
         d = (root_two_third * gamma * ce * ze * n + current_d) / bot_d;
 
-        const vec eta = trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d;
-
-        residual(0) = tensor::stress::norm(eta) - root_two_third * z * y;
-
-        if(1u == counter && residual(0) < 0.) {
+        if(1u == counter) {
             const vec ref = trial_s - a * alpha - y * d;
             const auto aa = (tensor::stress::double_contraction(d) - two_third) * y * y;
             const auto bb = -y * tensor::stress::double_contraction(d, ref);
             const auto cc = tensor::stress::double_contraction(ref);
             const auto sqrt_term = sqrt(bb * bb - aa * cc);
 
-            z = (bb - sqrt_term) / aa;
-            if(z < 0. || z > 1.) z = (bb + sqrt_term) / aa;
-
-            return SUANPAN_SUCCESS;
+            elastic_z = (bb - sqrt_term) / aa;
+            if(elastic_z < 0. || elastic_z > 1.) elastic_z = (bb + sqrt_term) / aa;
         }
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
 
+        residual(0) = tensor::stress::norm(trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d) - root_two_third * z * y;
         residual(1) = z - current_z - root_two_third * gamma * avg_rate;
 
         jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapgamma) - double_shear - root_two_third * (be / bot_alpha * (a + gamma * da - gamma * a * be / bot_alpha) + ce * ze * (1. - z) / bot_d * (y + gamma * dy - gamma * y * ce / bot_d) + z * dy);
@@ -135,9 +130,15 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
-            trial_stress -= gamma * double_shear * n;
+            if(gamma > 0.) {
+                trial_stress -= gamma * double_shear * n;
 
-            trial_stiffness -= double_shear * double_shear * gamma / norm_zeta * unit_dev_tensor - double_shear * double_shear * (gamma / norm_zeta + jacobian(1, 1) / det(jacobian)) * n * n.t();
+                trial_stiffness -= double_shear * double_shear * gamma / norm_zeta * unit_dev_tensor - double_shear * double_shear * (gamma / norm_zeta + jacobian(1, 1) / det(jacobian)) * n * n.t();
+            }
+            else {
+                trial_history = current_history;
+                z = elastic_z;
+            }
 
             return SUANPAN_SUCCESS;
         }
@@ -145,6 +146,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         gamma -= incre(0);
         z -= incre(1);
         if(z > 1.) z = 1. - datum::eps;
+        else if(z < 0.) z = 0.;
     }
 }
 
