@@ -103,12 +103,12 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
         if(1u == counter) {
             const vec ref = trial_s - a * alpha - y * d;
-            const auto aa = tensor::stress::double_contraction(d) - two_third;
+            const auto aa = two_third - tensor::stress::double_contraction(d);
             const auto bb = tensor::stress::double_contraction(d, ref);
             const auto cc = tensor::stress::double_contraction(ref);
-            const auto sqrt_term = sqrt(bb * bb - aa * cc);
+            const auto sqrt_term = sqrt(bb * bb + aa * cc);
 
-            elastic_z = (-bb - sqrt_term) / aa / y;
+            elastic_z = (bb + sqrt_term) / aa / y;
         }
 
         const auto trial_ratio = yield_ratio(z);
@@ -131,7 +131,6 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             if(gamma > 0.) {
                 trial_stress -= gamma * double_shear * n;
-
                 trial_stiffness -= double_shear * double_shear * gamma / norm_zeta * unit_dev_tensor - double_shear * double_shear * (gamma / norm_zeta + jacobian(1, 1) / det(jacobian)) * n * n.t();
             }
             else {
