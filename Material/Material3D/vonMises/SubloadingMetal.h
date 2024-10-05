@@ -51,7 +51,7 @@ class SubloadingMetal final : protected DataSubloadingMetal, public Material3D {
     static constexpr unsigned max_iteration = 20u;
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
-    static constexpr double z_bound = 1E-7;
+    static constexpr double z_bound = 1E-15;
     static const double rate_bound;
     static const mat unit_dev_tensor;
 

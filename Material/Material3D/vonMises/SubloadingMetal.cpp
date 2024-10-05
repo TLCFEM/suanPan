@@ -62,11 +62,12 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
     const vec trial_s = tensor::dev(trial_stress);
 
     auto gamma = 0., ref_error = 0., elastic_z = 0.;
+    auto start_z = current_z;
 
     vec2 residual, incre;
     mat22 jacobian;
 
-    const auto current_ratio = yield_ratio(current_z);
+    auto current_ratio = yield_ratio(start_z);
 
     auto counter = 0u;
     while(true) {
@@ -109,13 +110,52 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
             const auto sqrt_term = sqrt(bb * bb + aa * cc);
 
             elastic_z = (bb + sqrt_term) / aa / y;
+
+            const auto current_s = tensor::dev(current_stress);
+            const vec incre_s = trial_s - current_s;
+
+            const vec base = current_s - a * alpha - y * d;
+            const auto incre_incre = tensor::stress::double_contraction(incre_s);
+            const auto incre_d = tensor::stress::double_contraction(incre_s, d);
+
+            auto x = .5;
+            auto inner_counter = 0u;
+            while(true) {
+                if(max_iteration == ++inner_counter) {
+                    suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                    return SUANPAN_FAIL;
+                }
+
+                const vec middle = base + x * incre_s;
+                const auto middle_d = tensor::stress::double_contraction(d, middle);
+                const auto tmp_sqrt = sqrt(middle_d * middle_d + aa * tensor::stress::double_contraction(middle));
+                const auto tmp_numerator = middle_d * incre_d + aa * tensor::stress::double_contraction(incre_s, middle);
+                const auto residual_x = tmp_sqrt * incre_d + tmp_numerator;
+                const auto jacobian_x = incre_d * (incre_d + tmp_numerator / tmp_sqrt) + aa * incre_incre;
+                const auto incre_x = residual_x / jacobian_x;
+
+                if(!std::isfinite(incre_x)) break;
+
+                const auto error = fabs(incre_x);
+                if(1u == counter) ref_error = error;
+                suanpan_debug("Local initial yield ratio iteration error: {:.5E}.\n", error);
+                if(error < tolerance * ref_error || ((error < tolerance || fabs(residual_x) < tolerance) && inner_counter > 3u)) {
+                    if(x > 0. && x < 1.) {
+                        current_ratio = yield_ratio(start_z = (middle_d + tmp_sqrt) / aa / y);
+                        suanpan_debug("Initial yield ratio: {:.5E}, revised yield ratio: {:.5E}.\n", current_z, start_z);
+                    }
+                    break;
+                }
+
+                x -= incre_x;
+            }
         }
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
 
         residual(0) = tensor::stress::norm(trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d) - root_two_third * z * y;
-        residual(1) = z - current_z - root_two_third * gamma * avg_rate;
+        residual(1) = z - start_z - root_two_third * gamma * avg_rate;
 
         jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapgamma) - double_shear - root_two_third * (be / bot_alpha * (a + gamma * da - gamma * a * be / bot_alpha) + ce * ze * (1. - z) / bot_d * (y + gamma * dy - gamma * y * ce / bot_d) + z * dy);
         jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + root_two_third * y * (gamma * ce * ze / bot_d - 1.);
