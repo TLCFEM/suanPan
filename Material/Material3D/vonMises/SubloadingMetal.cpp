@@ -103,13 +103,12 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
         if(1u == counter) {
             const vec ref = trial_s - a * alpha - y * d;
-            const auto aa = (tensor::stress::double_contraction(d) - two_third) * y * y;
-            const auto bb = -y * tensor::stress::double_contraction(d, ref);
+            const auto aa = tensor::stress::double_contraction(d) - two_third;
+            const auto bb = tensor::stress::double_contraction(d, ref);
             const auto cc = tensor::stress::double_contraction(ref);
             const auto sqrt_term = sqrt(bb * bb - aa * cc);
 
-            elastic_z = (bb - sqrt_term) / aa;
-            if(elastic_z < 0. || elastic_z > 1.) elastic_z = (bb + sqrt_term) / aa;
+            elastic_z = (-bb - sqrt_term) / aa / y;
         }
 
         const auto trial_ratio = yield_ratio(z);
