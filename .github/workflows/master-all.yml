@@ -8,8 +8,8 @@ env:
   SP_TIME: ''
   ARTIFACT: ''
 jobs:
-  ubuntu-master:
-    runs-on: ubuntu-22.04
+  linux-master:
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     strategy:
       matrix:

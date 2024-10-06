@@ -2,10 +2,11 @@ name: Docker Base Image
 on:
   schedule:
     - cron: '0 5 2 * *'
+  workflow_dispatch:
 jobs:
-  env-image:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
+  ide-image-base:
+    runs-on: self-hosted
+    timeout-minutes: 240
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -23,6 +24,19 @@ jobs:
           file: ./Script/Rocky.Pre.Dockerfile
           push: true
           tags: tlcfem/suanpan-env:latest
+  ide-image-cuda:
+    runs-on: self-hosted
+    timeout-minutes: 240
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
       - name: CUDA
         uses: docker/build-push-action@v6
         with:
