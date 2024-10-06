@@ -61,7 +61,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
     const vec trial_s = tensor::dev(trial_stress);
 
-    auto gamma = 0., ref_error = 0., elastic_z = 0.;
+    auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
 
     vec2 residual, incre;
@@ -109,8 +109,6 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
             const auto cc = tensor::stress::double_contraction(ref);
             const auto sqrt_term = sqrt(bb * bb + aa * cc);
 
-            elastic_z = (bb + sqrt_term) / aa / y;
-
             const auto current_s = tensor::dev(current_stress);
             const vec incre_s = trial_s - current_s;
 
@@ -140,7 +138,12 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
                 if(1u == counter) ref_error = error;
                 suanpan_debug("Local initial yield ratio iteration error: {:.5E}.\n", error);
                 if(error < tolerance * ref_error || ((error < tolerance || fabs(residual_x) < tolerance) && inner_counter > 3u)) {
-                    if(x > 0. && x < 1.) {
+                    if(x >= 1.) {
+                        // elastic unloading
+                        z = (bb + sqrt_term) / aa / y;
+                        return SUANPAN_SUCCESS;
+                    }
+                    if(x > 0.) {
                         current_ratio = yield_ratio(start_z = (middle_d + tmp_sqrt) / aa / y);
                         suanpan_debug("Initial yield ratio: {:.5E}, revised yield ratio: {:.5E}.\n", current_z, start_z);
                     }
@@ -169,15 +172,12 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
-            if(gamma > 0.) {
-                trial_stress -= gamma * double_shear * n;
-                trial_stiffness -= double_shear * double_shear * gamma / norm_zeta * unit_dev_tensor - double_shear * double_shear * (gamma / norm_zeta + jacobian(1, 1) / det(jacobian)) * n * n.t();
+            if(gamma < 0.) {
+                suanpan_error("Somehow the plastic multiplier is negative, likely a bug.\n");
+                return SUANPAN_FAIL;
             }
-            else {
-                trial_history = current_history;
-                z = elastic_z;
-            }
-
+            trial_stress -= gamma * double_shear * n;
+            trial_stiffness -= double_shear * double_shear * gamma / norm_zeta * unit_dev_tensor - double_shear * double_shear * (gamma / norm_zeta + jacobian(1, 1) / det(jacobian)) * n * n.t();
             return SUANPAN_SUCCESS;
         }
 

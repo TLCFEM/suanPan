@@ -56,7 +56,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     auto& q = trial_history(2);
     auto& z = trial_history(3);
 
-    auto gamma = 0., ref_error = 0., elastic_z = 0.;
+    auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
 
     auto current_ratio = yield_ratio(start_z);
@@ -92,8 +92,13 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         d = (cee * ze * gamma * n + current_d) / bottom_d;
 
         if(1u == counter) {
-            elastic_z = ((trial_stress(0) - a * alpha) / y - d) / (n - d);
-            if(const auto s = (y * d + a * alpha - current_stress(0)) / (trial_stress(0) - current_stress(0)); s > 0. && s < 1.) current_ratio = yield_ratio(start_z = 0.);
+            const auto s = (y * d + a * alpha - current_stress(0)) / (trial_stress(0) - current_stress(0));
+            if(s >= 1.) {
+                // elastic unloading
+                z = ((trial_stress(0) - a * alpha) / y - d) / (n - d);
+                return SUANPAN_SUCCESS;
+            }
+            if(s > 0.) current_ratio = yield_ratio(start_z = 0.);
         }
 
         const auto trial_ratio = yield_ratio(z);
@@ -114,15 +119,12 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
-            if(gamma > 0.) {
-                trial_stress -= elastic * gamma * n;
-                trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
+            if(gamma < 0.) {
+                suanpan_error("Somehow the plastic multiplier is negative, likely a bug.\n");
+                return SUANPAN_FAIL;
             }
-            else {
-                trial_history = current_history;
-                z = elastic_z;
-            }
-
+            trial_stress -= elastic * gamma * n;
+            trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
             return SUANPAN_SUCCESS;
         }
 
