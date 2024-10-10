@@ -45,6 +45,7 @@ and [OpenSees](http://opensees.berkeley.edu/).
 
 > [!IMPORTANT]
 > Please check the documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
+> For a summary of available functionalities, see [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
 > Please star ⭐ the project!
 
 ![Alt](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg "Repobeats analytics image")
