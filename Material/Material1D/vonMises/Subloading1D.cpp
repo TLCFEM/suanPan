@@ -32,7 +32,7 @@ Subloading1D::Subloading1D(const unsigned T, DataSubloading1D&& D, const double 
 int Subloading1D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic;
 
-    initialize_history(4);
+    initialize_history(5);
 
     return SUANPAN_SUCCESS;
 }
@@ -55,6 +55,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     auto& d = trial_history(1);
     auto& q = trial_history(2);
     auto& z = trial_history(3);
+    auto& iteration = trial_history(4);
 
     auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
@@ -123,6 +124,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
                 suanpan_error("Somehow the plastic multiplier is negative, likely a bug.\n");
                 return SUANPAN_FAIL;
             }
+            iteration = counter;
             trial_stress -= elastic * gamma * n;
             trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
             return SUANPAN_SUCCESS;

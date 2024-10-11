@@ -35,7 +35,7 @@ SubloadingMetal::SubloadingMetal(const unsigned T, DataSubloadingMetal&& D, cons
 int SubloadingMetal::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic, poissons_ratio);
 
-    initialize_history(14);
+    initialize_history(15);
 
     return SUANPAN_SUCCESS;
 }
@@ -52,12 +52,13 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
     trial_history = current_history;
     const auto& current_q = current_history(0);
     const auto& current_z = current_history(1);
-    const vec current_alpha(&current_history(2), 6, false, true);
-    const vec current_d(&current_history(8), 6, false, true);
+    const vec current_alpha(&current_history(3), 6, false, true);
+    const vec current_d(&current_history(9), 6, false, true);
     auto& q = trial_history(0);
     auto& z = trial_history(1);
-    vec alpha(&trial_history(2), 6, false, true);
-    vec d(&trial_history(8), 6, false, true);
+    auto& iteration = trial_history(2);
+    vec alpha(&trial_history(3), 6, false, true);
+    vec d(&trial_history(9), 6, false, true);
 
     const vec trial_s = tensor::dev(trial_stress);
 
@@ -176,6 +177,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
                 suanpan_error("Somehow the plastic multiplier is negative, likely a bug.\n");
                 return SUANPAN_FAIL;
             }
+            iteration = counter;
             trial_stress -= gamma * double_shear * n;
             trial_stiffness -= double_shear * double_shear * gamma / norm_zeta * unit_dev_tensor - double_shear * double_shear * (gamma / norm_zeta + jacobian(1, 1) / det(jacobian)) * n * n.t();
             return SUANPAN_SUCCESS;
