@@ -30,7 +30,7 @@ vec2 SubloadingMetal::yield_ratio(const double z) {
 
 SubloadingMetal::SubloadingMetal(const unsigned T, DataSubloadingMetal&& D, const double R)
     : DataSubloadingMetal{std::move(D)}
-    , Material3D(T, R) {}
+    , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int SubloadingMetal::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic, poissons_ratio);
@@ -67,8 +67,6 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
     vec2 residual, incre;
     mat22 jacobian;
-
-    auto current_ratio = yield_ratio(start_z);
 
     auto counter = 0u;
     while(true) {
@@ -127,13 +125,16 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
 
                 const vec middle = base + x * incre_s;
                 const auto middle_d = tensor::stress::double_contraction(d, middle);
-                const auto tmp_sqrt = sqrt(middle_d * middle_d + aa * tensor::stress::double_contraction(middle));
+                const auto tmp_sqrt = std::max(datum::eps, sqrt(middle_d * middle_d + aa * tensor::stress::double_contraction(middle)));
                 const auto tmp_numerator = middle_d * incre_d + aa * tensor::stress::double_contraction(incre_s, middle);
                 const auto residual_x = tmp_sqrt * incre_d + tmp_numerator;
-                const auto jacobian_x = incre_d * (incre_d + tmp_numerator / tmp_sqrt) + aa * incre_incre;
-                const auto incre_x = residual_x / jacobian_x;
+                const auto jacobian_x = incre_d * residual_x + tmp_sqrt * aa * incre_incre;
+                const auto incre_x = tmp_sqrt * residual_x / jacobian_x;
 
-                if(!std::isfinite(incre_x)) break;
+                if(!std::isfinite(incre_x)) {
+                    suanpan_error("Infinite number detected.\n");
+                    return SUANPAN_FAIL;
+                }
 
                 const auto error = fabs(incre_x);
                 if(1u == counter) ref_error = error;
@@ -145,8 +146,8 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
                         return SUANPAN_SUCCESS;
                     }
                     if(x > 0.) {
-                        current_ratio = yield_ratio(start_z = (middle_d + tmp_sqrt) / aa / y);
-                        suanpan_debug("Initial yield ratio: {:.5E}, revised yield ratio: {:.5E}.\n", current_z, start_z);
+                        start_z = (middle_d + tmp_sqrt) / aa / y;
+                        suanpan_debug("Initial yield ratio: {:.5E}, corrected yield ratio: {:.5E}.\n", current_z, start_z);
                     }
                     break;
                 }
@@ -156,7 +157,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         }
 
         const auto trial_ratio = yield_ratio(z);
-        const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
+        const auto avg_rate = u * trial_ratio(0);
 
         residual(0) = tensor::stress::norm(trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d) - root_two_third * z * y;
         residual(1) = z - start_z - root_two_third * gamma * avg_rate;
@@ -165,7 +166,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + root_two_third * y * (gamma * ce * ze / bot_d - 1.);
 
         jacobian(1, 0) = -root_two_third * avg_rate;
-        jacobian(1, 1) = 1. - root_two_third * gamma * u * .5 * trial_ratio(1);
+        jacobian(1, 1) = 1. - root_two_third * gamma * u * trial_ratio(1);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 

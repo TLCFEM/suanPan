@@ -60,8 +60,6 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
 
-    auto current_ratio = yield_ratio(start_z);
-
     vec2 residual, incre;
     mat22 jacobian;
 
@@ -99,11 +97,11 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
                 z = ((trial_stress(0) - a * alpha) / y - d) / (n - d);
                 return SUANPAN_SUCCESS;
             }
-            if(s > 0.) current_ratio = yield_ratio(start_z = 0.);
+            if(s > 0.) start_z = 0.;
         }
 
         const auto trial_ratio = yield_ratio(z);
-        const auto avg_rate = u * .5 * (current_ratio(0) + trial_ratio(0));
+        const auto avg_rate = u * trial_ratio(0);
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * alpha + (z - 1.) * y * d) - z * y;
         residual(1) = z - start_z - gamma * avg_rate;
@@ -112,7 +110,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         jacobian(0, 1) = n * y * d - y;
 
         jacobian(1, 0) = -avg_rate;
-        jacobian(1, 1) = 1. - u * gamma * .5 * trial_ratio(1);
+        jacobian(1, 1) = 1. - u * gamma * trial_ratio(1);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
