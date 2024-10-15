@@ -2957,6 +2957,53 @@ void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) 
     return_obj = make_unique<Subloading1D>(tag, std::move(para), density);
 }
 
+void new_multisubloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec p{2E5, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 0.};
+    if(!get_input(command, p)) {
+        suanpan_error("Valid inputs are required.\n");
+        return;
+    }
+
+    std::vector<DataSubloading1D::Saturation> back, core;
+
+    string token;
+    while(!command.eof() && get_input(command, token)) {
+        double a, b;
+        if(is_equal("-back", token)) {
+            if(!get_input(command, a, b)) {
+                suanpan_error("Valid saturation parameters are required.\n");
+                return;
+            }
+            back.emplace_back(a, b);
+        }
+        else if(is_equal("-core", token)) {
+            if(!get_input(command, a, b)) {
+                suanpan_error("Valid saturation parameters are required.\n");
+                return;
+            }
+            core.emplace_back(a, b);
+        }
+        else {
+            suanpan_error("Valid saturation type is required.\n");
+            return;
+        }
+    }
+
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), std::move(back), std::move(core)};
+    if(para.m_iso < 0. || para.m_kin < 0.) {
+        suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+
+    return_obj = make_unique<Subloading1D>(tag, std::move(para), p(10));
+}
+
 void new_subloadingmetal(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3557,6 +3604,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
     else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
     else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
+    else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
     else if(is_equal(material_id, "SubloadingMetal")) new_subloadingmetal(new_material, command);
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
     else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
