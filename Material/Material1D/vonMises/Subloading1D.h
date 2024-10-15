@@ -31,6 +31,23 @@
 #include <Material/Material1D/Material1D.h>
 
 struct DataSubloading1D {
+    class Saturation {
+        static const double root_one_half;
+
+        const double rate, bound;
+
+    public:
+        Saturation(const double R, const double B)
+            : rate(R)
+            , bound(B) {}
+
+        [[nodiscard]] double r() const { return rate * root_one_half; }
+
+        [[nodiscard]] double b() const { return bound; }
+
+        [[nodiscard]] double rb() const { return r() * b(); }
+    };
+
     const double elastic; // elastic modulus
     const double initial_iso;
     const double k_iso;
@@ -41,9 +58,9 @@ struct DataSubloading1D {
     const double saturation_kin;
     const double m_kin;
     const double u;
-    const double be;
-    const double ce;
-    const double ze;
+
+    const std::vector<Saturation> b;
+    const std::vector<Saturation> c;
 };
 
 class Subloading1D final : protected DataSubloading1D, public Material1D {
@@ -52,9 +69,6 @@ class Subloading1D final : protected DataSubloading1D, public Material1D {
     static const double rate_bound;
 
     static vec2 yield_ratio(double);
-
-    const double bee = be * sqrt(1.5); // to ensure identical results
-    const double cee = ce * sqrt(1.5); // to ensure identical results
 
 public:
     Subloading1D(

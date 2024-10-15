@@ -2948,8 +2948,8 @@ void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) 
         return;
     }
 
-    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12)};
-    if(para.be < 0. || para.ce < 0. || para.m_iso < 0. || para.m_kin < 0.) {
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), {{p(10), 1.}}, {{p(11), p(12)}}};
+    if(para.m_iso < 0. || para.m_kin < 0.) {
         suanpan_error("The evolution rate must be positive.\n");
         return;
     }
