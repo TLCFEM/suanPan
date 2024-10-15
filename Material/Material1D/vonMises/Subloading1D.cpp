@@ -47,15 +47,15 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
     trial_history = current_history;
-    const auto& current_alpha = current_history(0);
-    const auto& current_d = current_history(1);
-    const auto& current_q = current_history(2);
-    const auto& current_z = current_history(3);
-    auto& alpha = trial_history(0);
-    auto& d = trial_history(1);
-    auto& q = trial_history(2);
-    auto& z = trial_history(3);
-    auto& iteration = trial_history(4);
+    const auto& current_q = current_history(1);
+    const auto& current_z = current_history(2);
+    const auto& current_alpha = current_history(3);
+    const auto& current_d = current_history(4);
+    auto& iteration = trial_history(0);
+    auto& q = trial_history(1);
+    auto& z = trial_history(2);
+    auto& alpha = trial_history(3);
+    auto& d = trial_history(4);
 
     auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
@@ -100,13 +100,16 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
             if(s > 0.) start_z = 0.;
         }
 
+        const auto dalpha = bee * (n - alpha) / bottom_alpha;
+        const auto dd = cee * (ze * n - d) / bottom_d;
+
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio(0);
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * alpha + (z - 1.) * y * d) - z * y;
         residual(1) = z - start_z - gamma * avg_rate;
 
-        jacobian(0, 0) = n * ((z - 1.) * (y * cee * (ze * n - d) / bottom_d + d * dy) - (a * bee * (n - alpha) / bottom_alpha + alpha * da)) - elastic - z * dy;
+        jacobian(0, 0) = n * ((z - 1.) * (y * dd + d * dy) - (a * dalpha + alpha * da)) - elastic - z * dy;
         jacobian(0, 1) = n * y * d - y;
 
         jacobian(1, 0) = -avg_rate;
