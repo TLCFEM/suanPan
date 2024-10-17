@@ -50,18 +50,19 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
     trial_history = current_history;
-    const auto& current_q = current_history(0);
-    const auto& current_z = current_history(1);
+    const auto& current_q = current_history(1);
+    const auto& current_z = current_history(2);
     const vec current_alpha(&current_history(3), 6, false, true);
     const vec current_d(&current_history(9), 6, false, true);
-    auto& q = trial_history(0);
-    auto& z = trial_history(1);
-    auto& iteration = trial_history(2);
+    auto& iteration = trial_history(0);
+    auto& q = trial_history(1);
+    auto& z = trial_history(2);
     vec alpha(&trial_history(3), 6, false, true);
     vec d(&trial_history(9), 6, false, true);
 
     const vec trial_s = tensor::dev(trial_stress);
 
+    iteration = 0.;
     auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
 

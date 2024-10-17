@@ -60,6 +60,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     vec alpha(&trial_history(3), b.size(), false, true);
     vec d(&trial_history(3 + b.size()), c.size(), false, true);
 
+    iteration = 0.;
     auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
 
