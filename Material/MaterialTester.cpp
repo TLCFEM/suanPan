@@ -158,6 +158,8 @@ mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<u
         }
         if(SUANPAN_FAIL == info) break;
         incre_load = -incre_load;
+        // update trial stiffness to be closer to the correct one
+        obj->update_trial_status(obj->get_trial_strain() + normalise(incre_load) * norm(obj->get_trial_strain()) / 1E4);
     }
 
     obj->print();
