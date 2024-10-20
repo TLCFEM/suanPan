@@ -1,5 +1,5 @@
 name: suanpan
-base: core22
+base: core24
 confinement: strict
 contact: tlcfem@gmail.com
 donation: https://ko-fi.com/suanpan
@@ -15,8 +15,10 @@ description: |
   [**suanPan**](https://github.com/TLCFEM/suanPan) is a finite element method (FEM) simulation platform for applications
   in fields such as solid mechanics and civil/structural/seismic engineering. **suanPan** is written in modern high
   quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
-architectures:
-  - build-on: amd64
+platforms:
+  amd64:
+    build-on: amd64
+    build-for: amd64
 apps:
   suanpan:
     command: bin/suanPan
