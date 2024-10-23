@@ -31,6 +31,21 @@
 #include <Material/Material3D/Material3D.h>
 
 struct DataSubloadingMetal {
+    class Saturation {
+        const double rate, bound;
+
+    public:
+        Saturation(const double R, const double B)
+            : rate(R)
+            , bound(B) {}
+
+        [[nodiscard]] double r() const { return rate; }
+
+        [[nodiscard]] double b() const { return bound; }
+
+        [[nodiscard]] double rb() const { return r() * b(); }
+    };
+
     const double elastic; // elastic modulus
     const double poissons_ratio;
     const double initial_iso;
@@ -42,9 +57,9 @@ struct DataSubloadingMetal {
     const double saturation_kin;
     const double m_kin;
     const double u;
-    const double be;
-    const double ce;
-    const double ze;
+
+    const Saturation b;
+    const Saturation c;
 };
 
 class SubloadingMetal final : protected DataSubloadingMetal, public Material3D {

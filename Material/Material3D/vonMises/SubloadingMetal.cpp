@@ -88,19 +88,19 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         auto da = root_two_third * (k_kin + m_kin * exp_kin);
         if(a < 0.) a = da = 0.;
 
-        const auto bot_alpha = 1. + be * gamma;
-        const auto bot_d = 1. + ce * gamma;
+        const auto bot_alpha = 1. + b.r() * gamma;
+        const auto bot_d = 1. + c.r() * gamma;
 
         const vec pzetapz = y / bot_d * current_d;
-        const vec pzetapgamma = (be * a / bot_alpha - da) / bot_alpha * current_alpha + (z - 1.) * (dy - ce * y / bot_d) / bot_d * current_d;
+        const vec pzetapgamma = (b.r() * a / bot_alpha - da) / bot_alpha * current_alpha + (z - 1.) * (dy - c.r() * y / bot_d) / bot_d * current_d;
 
         const vec zeta = trial_s - a / bot_alpha * current_alpha + (z - 1.) * pzetapz;
         const auto norm_zeta = tensor::stress::norm(zeta);
         const vec n = zeta / norm_zeta;
 
-        alpha = (root_two_third * gamma * be * n + current_alpha) / bot_alpha;
+        alpha = (root_two_third * gamma * b.rb() * n + current_alpha) / bot_alpha;
 
-        d = (root_two_third * gamma * ce * ze * n + current_d) / bot_d;
+        d = (root_two_third * gamma * c.rb() * n + current_d) / bot_d;
 
         if(1u == counter) {
             const vec ref = trial_s - a * alpha - y * d;
@@ -163,8 +163,8 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
         residual(0) = tensor::stress::norm(trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d) - root_two_third * z * y;
         residual(1) = z - start_z - root_two_third * gamma * avg_rate;
 
-        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapgamma) - double_shear - root_two_third * (be / bot_alpha * (a + gamma * da - gamma * a * be / bot_alpha) + ce * ze * (1. - z) / bot_d * (y + gamma * dy - gamma * y * ce / bot_d) + z * dy);
-        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + root_two_third * y * (gamma * ce * ze / bot_d - 1.);
+        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapgamma) - double_shear - root_two_third * (b.rb() / bot_alpha * (a + gamma * da - gamma * a * b.r() / bot_alpha) + c.rb() * (1. - z) / bot_d * (y + gamma * dy - gamma * y * c.r() / bot_d) + z * dy);
+        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + root_two_third * y * (gamma * c.rb() / bot_d - 1.);
 
         jacobian(1, 0) = -root_two_third * avg_rate;
         jacobian(1, 1) = 1. - root_two_third * gamma * u * trial_ratio(1);
