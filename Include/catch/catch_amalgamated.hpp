@@ -11085,8 +11085,7 @@ namespace Catch {
 
             bool match(std::vector<T, AllocMatch> const& v) const override {
                 if(m_comparator.size() != v.size()) return false;
-                for(std::size_t i = 0; i < v.size(); ++i)
-                    if(m_comparator[i] != approx(v[i])) return false;
+                for(std::size_t i = 0; i < v.size(); ++i) if(m_comparator[i] != approx(v[i])) return false;
                 return true;
             }
 

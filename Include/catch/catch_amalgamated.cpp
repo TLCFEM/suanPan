@@ -1415,8 +1415,7 @@ namespace Catch {
         matches.reserve(m_filters.size());
         for(auto const& filter : m_filters) {
             std::vector<TestCaseHandle const*> currentMatches;
-            for(auto const& test : testCases)
-                if(isThrowSafe(test, config) && filter.matches(test.getTestCaseInfo())) currentMatches.emplace_back(&test);
+            for(auto const& test : testCases) if(isThrowSafe(test, config) && filter.matches(test.getTestCaseInfo())) currentMatches.emplace_back(&test);
             matches.push_back(FilterMatch{extractFilterName(filter), currentMatches});
         }
         return matches;
@@ -2044,16 +2043,14 @@ namespace Catch {
             if(!validationResult) return Detail::InternalParseResult(validationResult);
 
             auto token = *tokens;
-            if(token.type != Detail::TokenType::Argument)
-                return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::NoMatch, CATCH_MOVE(tokens)));
+            if(token.type != Detail::TokenType::Argument) return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::NoMatch, CATCH_MOVE(tokens)));
 
             assert(!m_ref->isFlag());
             auto valueRef = static_cast<Detail::BoundValueRefBase*>(m_ref.get());
 
             auto result = valueRef->setValue(static_cast<std::string>(token.token));
             if(!result) return Detail::InternalParseResult(result);
-            else
-                return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::Matched, CATCH_MOVE(++tokens)));
+            else return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::Matched, CATCH_MOVE(++tokens)));
         }
 
         Opt::Opt(bool& ref)
@@ -2088,21 +2085,17 @@ namespace Catch {
                         auto flagRef = static_cast<Detail::BoundFlagRefBase*>(m_ref.get());
                         auto result = flagRef->setFlag(true);
                         if(!result) return Detail::InternalParseResult(result);
-                        if(result.value() == ParseResultType::ShortCircuitAll)
-                            return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), CATCH_MOVE(tokens)));
+                        if(result.value() == ParseResultType::ShortCircuitAll) return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), CATCH_MOVE(tokens)));
                     }
                     else {
                         auto valueRef = static_cast<Detail::BoundValueRefBase*>(m_ref.get());
                         ++tokens;
-                        if(!tokens)
-                            return Detail::InternalParseResult::runtimeError("Expected argument following " + token.token);
+                        if(!tokens) return Detail::InternalParseResult::runtimeError("Expected argument following " + token.token);
                         auto const& argToken = *tokens;
-                        if(argToken.type != Detail::TokenType::Argument)
-                            return Detail::InternalParseResult::runtimeError("Expected argument following " + token.token);
+                        if(argToken.type != Detail::TokenType::Argument) return Detail::InternalParseResult::runtimeError("Expected argument following " + token.token);
                         const auto result = valueRef->setValue(static_cast<std::string>(argToken.token));
                         if(!result) return Detail::InternalParseResult(result);
-                        if(result.value() == ParseResultType::ShortCircuitAll)
-                            return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), CATCH_MOVE(tokens)));
+                        if(result.value() == ParseResultType::ShortCircuitAll) return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), CATCH_MOVE(tokens)));
                     }
                     return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::Matched, CATCH_MOVE(++tokens)));
                 }
@@ -2113,11 +2106,9 @@ namespace Catch {
         Detail::Result Opt::validate() const {
             if(m_optNames.empty()) return Detail::Result::logicError("No options supplied to Opt");
             for(auto const& name : m_optNames) {
-                if(name.empty())
-                    return Detail::Result::logicError("Option name cannot be empty");
+                if(name.empty()) return Detail::Result::logicError("Option name cannot be empty");
 #ifdef CATCH_PLATFORM_WINDOWS
-                if(name[0] != '-' && name[0] != '/')
-                    return Detail::Result::logicError("Option name must begin with '-' or '/'");
+                if(name[0] != '-' && name[0] != '/') return Detail::Result::logicError("Option name must begin with '-' or '/'");
 #else
                 if(name[0] != '-')
                     return Detail::Result::logicError(
@@ -2231,8 +2222,7 @@ namespace Catch {
                 }
 
                 if(result.value().type() == ParseResultType::ShortCircuitAll) return result;
-                if(!tokenParsed)
-                    return Detail::InternalParseResult::runtimeError("Unrecognised token: " + result.value().remainingTokens()->token);
+                if(!tokenParsed) return Detail::InternalParseResult::runtimeError("Unrecognised token: " + result.value().remainingTokens()->token);
             }
             // !TBD Check missing required options
             return result;
@@ -2805,8 +2795,7 @@ namespace Catch {
 
     void formatReconstructedExpression(std::ostream& os, std::string const& lhs, StringRef op, std::string const& rhs) {
         if(lhs.size() + rhs.size() < 40 && lhs.find('\n') == std::string::npos && rhs.find('\n') == std::string::npos) os << lhs << ' ' << op << ' ' << rhs;
-        else
-            os << lhs << '\n' << op << '\n' << rhs;
+        else os << lhs << '\n' << op << '\n' << rhs;
     }
 } // namespace Catch
 
@@ -8228,8 +8217,7 @@ namespace Catch {
             }
 
             if(result.hasMessage()) rss << result.getMessage() << '\n';
-            for(auto const& msg : stats.infoMessages)
-                if(msg.type == ResultWas::Info) rss << msg.message << '\n';
+            for(auto const& msg : stats.infoMessages) if(msg.type == ResultWas::Info) rss << msg.message << '\n';
 
             rss << "at " << result.getSourceInfo();
             xml.writeText(rss.str(), XmlFormatting::Newline);
@@ -8443,8 +8431,7 @@ namespace Catch {
 
             if(result.hasMessage()) textRss << result.getMessage() << '\n';
 
-            for(auto const& msg : stats.infoMessages)
-                if(msg.type == ResultWas::Info) textRss << msg.message << '\n';
+            for(auto const& msg : stats.infoMessages) if(msg.type == ResultWas::Info) textRss << msg.message << '\n';
 
             textRss << "at " << result.getSourceInfo();
             xml.writeText(textRss.str(), XmlFormatting::Newline);
@@ -8737,10 +8724,8 @@ namespace Catch {
     void TeamCityReporter::testCaseEnded(TestCaseStats const& testCaseStats) {
         StreamingReporterBase::testCaseEnded(testCaseStats);
         auto const& testCaseInfo = *testCaseStats.testInfo;
-        if(!testCaseStats.stdOut.empty())
-            m_stream << "##teamcity[testStdOut name='" << escape(testCaseInfo.name) << "' out='" << escape(testCaseStats.stdOut) << "']\n";
-        if(!testCaseStats.stdErr.empty())
-            m_stream << "##teamcity[testStdErr name='" << escape(testCaseInfo.name) << "' out='" << escape(testCaseStats.stdErr) << "']\n";
+        if(!testCaseStats.stdOut.empty()) m_stream << "##teamcity[testStdOut name='" << escape(testCaseInfo.name) << "' out='" << escape(testCaseStats.stdOut) << "']\n";
+        if(!testCaseStats.stdErr.empty()) m_stream << "##teamcity[testStdErr name='" << escape(testCaseInfo.name) << "' out='" << escape(testCaseStats.stdErr) << "']\n";
         m_stream << "##teamcity[testFinished name='" << escape(testCaseInfo.name) << "' duration='" << m_testTimer.getElapsedMilliseconds() << "']\n";
         m_stream.flush();
     }
