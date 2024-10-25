@@ -178,9 +178,9 @@ The snap supports visualisation via VTK and uses Intel MKL for linear algebra.
 The edge channel is in sync with the `dev` branch.
 The stable channel is in sync with the `master` branch.
 
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
+[![snap](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
-[![asciicast](https://asciinema.org/a/491330.svg)](https://asciinema.org/a/491330)
+[![asciicast](Resource/snap.gif)](https://asciinema.org/a/684061)
 
 #### Flatpak
 
