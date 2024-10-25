@@ -149,7 +149,7 @@ on [Chocolatey](https://chocolatey.org/packages/suanpan), please use the followi
 The Chocolatey repo available to you may not be up-to-date.
 If the latest version is not available, please try alternatives, such as portable binaries or scoop.
 
-[![asciicast](https://asciinema.org/a/491350.svg)](https://asciinema.org/a/491350)
+[![choco](Resource/choco.gif)](https://asciinema.org/a/684063)
 
 #### Scoop
 
@@ -180,7 +180,7 @@ The stable channel is in sync with the `master` branch.
 
 [![snap](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
-[![asciicast](Resource/snap.gif)](https://asciinema.org/a/684061)
+[![snap](Resource/snap.gif)](https://asciinema.org/a/684061)
 
 #### Flatpak
 
