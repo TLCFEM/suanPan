@@ -109,6 +109,7 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
             if(s >= 1.) {
                 // elastic unloading
                 zv = ((trial_stress(0) - a * sum_alpha) / y - sum_d) / (n - sum_d);
+                z = zv / current_zv * current_z;
                 return SUANPAN_SUCCESS;
             }
             if(s > 0.) start_z = start_zv = 0.;
@@ -120,17 +121,24 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio(0);
-        const auto power_term = pow(cv * z, m);
+        const auto diff_z = std::max(datum::eps, zv - z);
+        const auto power_term = *incre_time * cv * pow(diff_z, nv - 1);
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (zv - 1.) * y * sum_d) - zv * y;
         residual(1) = z - start_z - gamma * avg_rate;
-        residual(2) = (pow(zv, m) - power_term) * mu * gamma + *incre_time * power_term * pow(std::max(0., zv - z), n);
+        residual(2) = (zv - cv * z) * mu * gamma + z * diff_z * power_term;
 
-        jacobian(0, 0) = n * ((z - 1.) * (y * dd + sum_d * dy) - (a * dalpha + sum_alpha * da)) - elastic - z * dy;
+        jacobian(0, 0) = n * ((zv - 1.) * (y * dd + sum_d * dy) - (a * dalpha + sum_alpha * da)) - elastic - zv * dy;
         jacobian(0, 1) = n * y * sum_d - y;
+        jacobian(0, 2) = 0.;
 
         jacobian(1, 0) = -avg_rate;
-        jacobian(1, 1) = 1. - u * gamma * trial_ratio(1);
+        jacobian(1, 1) = 0.;
+        jacobian(1, 2) = 1. - u * gamma * trial_ratio(1);
+
+        jacobian(2, 0) = (zv - cv * z) * mu;
+        jacobian(2, 1) = mu * gamma + z * nv * power_term;
+        jacobian(2, 2) = (diff_z + z * nv) * power_term - cv * mu * gamma;
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -144,12 +152,13 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
             }
             iteration = counter;
             trial_stress -= elastic * gamma * n;
-            trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
+            trial_stiffness += elastic / det(jacobian) * elastic * det(jacobian.submat(1, 1, 2, 2));
             return SUANPAN_SUCCESS;
         }
 
         gamma -= incre(0);
-        z -= incre(1);
+        zv -= incre(1);
+        z -= incre(2);
         if(z > 1.) z = 1. - datum::eps;
         else if(z < 0.) z = 0.;
     }

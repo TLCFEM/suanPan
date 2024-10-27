@@ -60,7 +60,7 @@ struct DataSubloadingViscous1D {
     const double u;
     const double mu;
     const double cv;
-    const double m, n;
+    const double nv;
 
     const std::vector<Saturation> b;
     const std::vector<Saturation> c;
