@@ -91,7 +91,7 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((fabs(yield_func) < tolerance || error < datum::eps) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || fabs(yield_func) < tolerance) && counter > 5u)) break;
 
         gamma -= incre;
         q -= incre;
