@@ -2957,6 +2957,34 @@ void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) 
     return_obj = make_unique<Subloading1D>(tag, std::move(para), density);
 }
 
+void new_subloadingviscous1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec p{2E5, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 3E2, 10., 4., 1E1, 1E1, .7};
+    if(!get_optional_input(command, p)) {
+        suanpan_error("Valid inputs are required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!command.eof() && !get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    DataSubloadingViscous1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), p(15)}}};
+    if(para.m_iso < 0. || para.m_kin < 0.) {
+        suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+
+    return_obj = make_unique<SubloadingViscous1D>(tag, std::move(para), density);
+}
+
 void new_multisubloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3604,6 +3632,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
     else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
     else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
+    else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
     else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
     else if(is_equal(material_id, "SubloadingMetal")) new_subloadingmetal(new_material, command);
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
