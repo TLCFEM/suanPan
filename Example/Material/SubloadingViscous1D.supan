@@ -7,7 +7,7 @@ node 3 0 -3
 material SubloadingViscous1D 1 2E5 \
 200 0 0 0 \
 100 10 0 0 \
-4E1 300 10 4 \
+4E1 300 2 4 \
 2E1 1E1 0
 
 element T2D2 1 1 2 1 10
@@ -33,9 +33,9 @@ analyze
 # Coordinate:
 #   4.0000e+00  0.0000e+00
 # Displacement:
-#  -4.3715e-02  2.0000e-01
+#  -4.4658e-02  2.0000e-01
 # Resistance:
-#   0.0000e+00  3.2847e+03
+#   5.1364e-09  1.6188e+03
 peek node 2
 
 reset
