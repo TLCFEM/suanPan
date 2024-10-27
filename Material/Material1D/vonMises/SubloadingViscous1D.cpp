@@ -35,7 +35,7 @@ SubloadingViscous1D::SubloadingViscous1D(const unsigned T, DataSubloadingViscous
     , Material1D(T, R) {}
 
 int SubloadingViscous1D::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = D == nullptr ? &unit_time : &D->get_factory()->modify_incre_time();
+    incre_time = nullptr == D ? &unit_time : &D->get_factory()->modify_incre_time();
 
     trial_stiffness = current_stiffness = initial_stiffness = elastic;
 
@@ -69,7 +69,7 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
 
     iteration = 0.;
     auto gamma = 0., ref_error = 0.;
-    auto start_z = current_z, start_zv = current_zv;
+    auto start_z = current_z;
 
     vec3 residual, incre;
     mat33 jacobian;
@@ -112,7 +112,7 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
                 z = zv / current_zv * current_z;
                 return SUANPAN_SUCCESS;
             }
-            if(s > 0.) start_z = start_zv = 0.;
+            if(s > 0.) start_z = 0.;
         }
 
         auto dalpha = 0., dd = 0.;
@@ -121,12 +121,10 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio(0);
-        const auto diff_z = std::max(datum::eps, zv - z);
-        const auto power_term = *incre_time * cv * pow(diff_z, nv - 1);
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (zv - 1.) * y * sum_d) - zv * y;
         residual(1) = z - start_z - gamma * avg_rate;
-        residual(2) = (zv - cv * z) * mu * gamma + z * diff_z * power_term;
+        residual(2) = (zv - cv * z) * mu * gamma;
 
         jacobian(0, 0) = n * ((zv - 1.) * (y * dd + sum_d * dy) - (a * dalpha + sum_alpha * da)) - elastic - zv * dy;
         jacobian(0, 1) = n * y * sum_d - y;
@@ -137,8 +135,18 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
         jacobian(1, 2) = 1. - u * gamma * trial_ratio(1);
 
         jacobian(2, 0) = (zv - cv * z) * mu;
-        jacobian(2, 1) = mu * gamma + z * nv * power_term;
-        jacobian(2, 2) = (diff_z + z * nv) * power_term - cv * mu * gamma;
+        jacobian(2, 1) = mu * gamma;
+        jacobian(2, 2) = -cv * mu * gamma;
+
+        if(zv > z) {
+            const auto diff_z = zv - z;
+            const auto power_term = *incre_time * cv * pow(diff_z, nv - 1);
+
+            residual(2) += z * diff_z * power_term;
+
+            jacobian(2, 1) += z * nv * power_term;
+            jacobian(2, 2) -= (diff_z + z * nv) * power_term;
+        }
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 

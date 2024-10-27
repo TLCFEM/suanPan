@@ -62,8 +62,7 @@ struct DataSubloadingViscous1D {
     const double cv;
     const double nv;
 
-    const std::vector<Saturation> b;
-    const std::vector<Saturation> c;
+    const std::vector<Saturation> b, c;
 };
 
 class SubloadingViscous1D final : protected DataSubloadingViscous1D, public Material1D {
