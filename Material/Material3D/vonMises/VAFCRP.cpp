@@ -28,7 +28,7 @@ VAFCRP::VAFCRP(const unsigned T, DataVAFCRP&& D, const double R)
     , Material3D(T, R) {}
 
 int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = &D->get_factory()->modify_incre_time();
+    incre_time = nullptr == D ? &unit_time : &D->get_factory()->modify_incre_time();
 
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
 

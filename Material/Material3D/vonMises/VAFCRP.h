@@ -54,6 +54,7 @@ struct DataVAFCRP {
 
 class VAFCRP final : protected DataVAFCRP, public Material3D {
     static constexpr unsigned max_iteration = 20u;
+    static constexpr double unit_time = 1.;
     static const double root_three_two;
     static const mat unit_dev_tensor;
 

@@ -19,8 +19,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-constexpr double VAFCRP1D::unit_time = 1.;
-
 VAFCRP1D::VAFCRP1D(const unsigned T, DataVAFCRP1D&& D, const double R)
     : DataVAFCRP1D(std::move(D))
     , Material1D(T, R) { access::rw(tolerance) = 1E-15; }

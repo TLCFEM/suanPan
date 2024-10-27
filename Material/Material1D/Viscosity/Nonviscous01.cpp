@@ -26,7 +26,7 @@ Nonviscous01::Nonviscous01(const unsigned T, cx_vec&& M, cx_vec&& S)
     , Material1D(T, 0.) {}
 
 int Nonviscous01::initialize(const shared_ptr<DomainBase>& D) {
-    if(nullptr != D) incre_time = &D->get_factory()->modify_incre_time();
+    incre_time = nullptr == D ? &unit_time : &D->get_factory()->modify_incre_time();
 
     complex_damping.zeros(m.n_elem);
     s_para.zeros(m.n_elem);
