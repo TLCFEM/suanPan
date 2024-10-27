@@ -140,12 +140,12 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
 
         if(zv > z) {
             const auto diff_z = zv - z;
-            const auto power_term = *incre_time * cv * pow(diff_z, nv - 1);
+            const auto power_term = *incre_time * pow(diff_z, nv - 1);
 
-            residual(2) += z * diff_z * power_term;
+            residual(2) += diff_z * power_term;
 
-            jacobian(2, 1) += z * nv * power_term;
-            jacobian(2, 2) -= (diff_z + z * nv) * power_term;
+            jacobian(2, 1) += nv * power_term;
+            jacobian(2, 2) -= nv * power_term;
         }
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
