@@ -67,7 +67,6 @@ struct DataSubloadingViscous1D {
 
 class SubloadingViscous1D final : protected DataSubloadingViscous1D, public Material1D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double unit_time = 1.;
     static constexpr double z_bound = 1E-15;
     static const double rate_bound;
 
