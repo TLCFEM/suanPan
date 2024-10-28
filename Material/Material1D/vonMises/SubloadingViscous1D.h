@@ -74,8 +74,6 @@ class SubloadingViscous1D final : protected DataSubloadingViscous1D, public Mate
 
     const double* incre_time = nullptr;
 
-    const bool is_viscous = mu > 0. && nv > 0.;
-
 public:
     SubloadingViscous1D(
         unsigned,                  // tag
