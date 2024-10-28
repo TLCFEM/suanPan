@@ -123,10 +123,12 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio(0);
+        const auto power_zv = incre_t * pow(zv, nv - 1.);
+        const auto power_z = incre_t * pow(z, nv - 1.);
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (zv - 1.) * y * sum_d) - zv * y;
         residual(1) = z - start_z - gamma * avg_rate;
-        residual(2) = (zv - cv) * mu * gamma;
+        residual(2) = (zv - cv) * mu * gamma + zv * power_zv - z * power_z;
 
         jacobian(0, 0) = n * ((zv - 1.) * (y * dd + sum_d * dy) - (a * dalpha + sum_alpha * da)) - elastic - zv * dy;
         jacobian(0, 1) = n * y * sum_d - y;
@@ -137,18 +139,8 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
         jacobian(1, 2) = 1. - u * gamma * trial_ratio(1);
 
         jacobian(2, 0) = (zv - cv) * mu;
-        jacobian(2, 1) = mu * gamma;
-        jacobian(2, 2) = 0.;
-
-        if(zv > z) {
-            const auto diff_z = zv - z;
-            const auto power_term = incre_t * pow(diff_z, nv - 1);
-
-            residual(2) += diff_z * power_term;
-
-            jacobian(2, 1) += nv * power_term;
-            jacobian(2, 2) -= nv * power_term;
-        }
+        jacobian(2, 1) = mu * gamma + nv * power_zv;
+        jacobian(2, 2) = -nv * power_z;
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 

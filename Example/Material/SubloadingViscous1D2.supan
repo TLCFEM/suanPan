@@ -1,0 +1,9 @@
+material SubloadingViscous1D 1 2E5 \
+200 0 0 0 \
+100 10 0 0 \
+4E1 300 2 4 \
+2E1 1E1 0
+
+materialTest1D 1 1E-4 100 200 200
+
+exit
