@@ -67,8 +67,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     vec alpha(&trial_history(4), b.size(), false, true);
     vec d(&trial_history(4 + b.size()), c.size(), false, true);
 
-    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
-    const auto norm_mu = mu / incre_t;
+    const auto norm_mu = mu / (incre_time && *incre_time > 0. ? *incre_time : 1.);
 
     iteration = 0.;
     auto gamma = 0., ref_error = 0.;
