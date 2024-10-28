@@ -56,7 +56,6 @@ set(M1D
         Material1D/vonMises/NonlinearGurson1D.cpp
         Material1D/vonMises/NonlinearMises1D.cpp
         Material1D/vonMises/Subloading1D.cpp
-        Material1D/vonMises/SubloadingViscous1D.cpp
         Material1D/vonMises/VAFCRP1D.cpp
         Material1D/Wrapper/Parallel.cpp
         Material1D/Wrapper/Sequential.cpp

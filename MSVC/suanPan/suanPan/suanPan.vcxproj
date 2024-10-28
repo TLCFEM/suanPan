@@ -357,7 +357,6 @@
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\NonlinearGurson1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\NonlinearMises1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\Subloading1D.cpp" />
-    <ClCompile Include="..\..\..\Material\Material1D\vonMises\SubloadingViscous1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\VAFCRP1D.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Parallel.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Sequential.cpp" />
@@ -851,7 +850,6 @@
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\NonlinearGurson1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\NonlinearMises1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\Subloading1D.h" />
-    <ClInclude Include="..\..\..\Material\Material1D\vonMises\SubloadingViscous1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\VAFCRP1D.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Parallel.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Sequential.h" />

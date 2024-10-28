@@ -2948,9 +2948,13 @@ void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) 
         return;
     }
 
-    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), {{p(10), 1.}}, {{p(11), p(12)}}};
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), 1., 0., 0., {{p(10), 1.}}, {{p(11), p(12)}}};
     if(para.m_iso < 0. || para.m_kin < 0.) {
         suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+    if(para.cv < 1.) {
+        suanpan_error("The viscous limit c_v must be greater than unity.\n");
         return;
     }
 
@@ -2964,7 +2968,7 @@ void new_subloadingviscous1d(unique_ptr<Material>& return_obj, istringstream& co
         return;
     }
 
-    vec p{2E5, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 3E2, 10., 4., 1E1, 1E1, .7};
+    vec p{2E5, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 1., 0., 0., 1E1, 1E1, .7};
     if(!get_optional_input(command, p)) {
         suanpan_error("Valid inputs are required.\n");
         return;
@@ -2976,13 +2980,17 @@ void new_subloadingviscous1d(unique_ptr<Material>& return_obj, istringstream& co
         return;
     }
 
-    DataSubloadingViscous1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), p(15)}}};
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), p(15)}}};
     if(para.m_iso < 0. || para.m_kin < 0.) {
         suanpan_error("The evolution rate must be positive.\n");
         return;
     }
+    if(para.cv < 1.) {
+        suanpan_error("The viscous limit c_v must be greater than unity.\n");
+        return;
+    }
 
-    return_obj = make_unique<SubloadingViscous1D>(tag, std::move(para), density);
+    return_obj = make_unique<Subloading1D>(tag, std::move(para), density);
 }
 
 void new_multisubloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3023,9 +3031,13 @@ void new_multisubloading1d(unique_ptr<Material>& return_obj, istringstream& comm
         }
     }
 
-    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), std::move(back), std::move(core)};
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), 1., 0., 0., std::move(back), std::move(core)};
     if(para.m_iso < 0. || para.m_kin < 0.) {
         suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+    if(para.cv < 1.) {
+        suanpan_error("The viscous limit c_v must be greater than unity.\n");
         return;
     }
 
