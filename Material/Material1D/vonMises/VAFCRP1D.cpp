@@ -24,7 +24,7 @@ VAFCRP1D::VAFCRP1D(const unsigned T, DataVAFCRP1D&& D, const double R)
     , Material1D(T, R) { access::rw(tolerance) = 1E-15; }
 
 int VAFCRP1D::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = D == nullptr ? &unit_time : &D->get_factory()->modify_incre_time();
+    if(nullptr != D) incre_time = &D->get_factory()->modify_incre_time();
 
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
 
@@ -47,6 +47,8 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
     auto& p = trial_history(size);
 
     if(fabs(trial_stress(0) - accu(trial_history.head(size))) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
+
+    const auto incre_t = *incre_time > 0. ? *incre_time : 1.;
 
     auto gamma = 0.;
     double xi, jacobian, exp_gamma;
@@ -74,9 +76,9 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
 
         const auto q = fabs(xi = trial_stress(0) - sum_a) - (elastic_modulus + sum_b) * gamma;
 
-        exp_gamma = pow(*incre_time / (*incre_time + mu * gamma), epsilon);
+        exp_gamma = pow(incre_t / (incre_t + mu * gamma), epsilon);
 
-        jacobian = -elastic_modulus - epsilon * mu * q / (*incre_time + mu * gamma);
+        jacobian = -elastic_modulus - epsilon * mu * q / (incre_t + mu * gamma);
 
         if(xi > 0.) for(auto I = 0u; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
         else for(auto I = 0u; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);

@@ -26,7 +26,7 @@ Nonviscous01::Nonviscous01(const unsigned T, cx_vec&& M, cx_vec&& S)
     , Material1D(T, 0.) {}
 
 int Nonviscous01::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = nullptr == D ? &unit_time : &D->get_factory()->modify_incre_time();
+    if(nullptr != D) incre_time = &D->get_factory()->modify_incre_time();
 
     complex_damping.zeros(m.n_elem);
     s_para.zeros(m.n_elem);
@@ -52,9 +52,11 @@ int Nonviscous01::update_trial_status(const vec&, const vec& t_strain_rate) {
 
     if(fabs(incre_strain_rate(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    const cx_vec t_para = 2. + *incre_time * s;
+    const auto incre_t = *incre_time > 0. ? *incre_time : 1.;
+
+    const cx_vec t_para = 2. + incre_t * s;
     s_para = (4. - t_para) / t_para;
-    m_para = *incre_time * m / t_para;
+    m_para = incre_t * m / t_para;
     accu_para = accu(m_para).real();
 
     trial_stress = real(dot(complex_damping, s_para) + accu_para * (current_strain_rate + trial_strain_rate));

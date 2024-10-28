@@ -50,7 +50,6 @@ struct DataVAFCRP1D {
 
 class VAFCRP1D final : protected DataVAFCRP1D, public Material1D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double unit_time = 1.;
 
     const double* incre_time = nullptr;
 
