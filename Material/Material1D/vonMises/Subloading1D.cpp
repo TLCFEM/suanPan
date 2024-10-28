@@ -161,10 +161,10 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         gamma -= incre(0);
         zv -= incre(1);
         z -= incre(2);
-        if(zv < 0.) zv = 0.;
-        else if(is_viscous && zv > cv) zv = cv - datum::eps;
         if(z < 0.) z = 0.;
         else if(z > 1.) z = 1. - datum::eps;
+        if(zv < 0.) zv = 0.;
+        else if(is_viscous && zv > cv * z) zv = cv * z - datum::eps;
     }
 }
 
