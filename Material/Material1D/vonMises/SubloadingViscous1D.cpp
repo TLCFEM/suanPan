@@ -123,12 +123,9 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio(0);
-        const auto power_zv = incre_t * pow(zv, nv - 1.);
-        const auto power_z = incre_t * pow(z, nv - 1.);
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (zv - 1.) * y * sum_d) - zv * y;
         residual(1) = z - start_z - gamma * avg_rate;
-        residual(2) = (zv - cv) * mu * gamma + zv * power_zv - z * power_z;
 
         jacobian(0, 0) = n * ((zv - 1.) * (y * dd + sum_d * dy) - (a * dalpha + sum_alpha * da)) - elastic - zv * dy;
         jacobian(0, 1) = n * y * sum_d - y;
@@ -138,9 +135,23 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
         jacobian(1, 1) = 0.;
         jacobian(1, 2) = 1. - u * gamma * trial_ratio(1);
 
-        jacobian(2, 0) = (zv - cv) * mu;
-        jacobian(2, 1) = mu * gamma + nv * power_zv;
-        jacobian(2, 2) = -nv * power_z;
+        if(is_viscous) {
+            const auto power_zv = incre_t * pow(zv, nv - 1.);
+            const auto power_z = incre_t * pow(z, nv - 1.);
+
+            residual(2) = (zv - cv) * mu * gamma + zv * power_zv - z * power_z;
+
+            jacobian(2, 0) = (zv - cv) * mu;
+            jacobian(2, 1) = mu * gamma + nv * power_zv;
+            jacobian(2, 2) = -nv * power_z;
+        }
+        else {
+            residual(2) = zv - z;
+
+            jacobian(2, 0) = 0.;
+            jacobian(2, 1) = 1.;
+            jacobian(2, 2) = -1.;
+        }
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -161,6 +172,8 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
         gamma -= incre(0);
         zv -= incre(1);
         z -= incre(2);
+        if(zv > cv) zv = cv - datum::eps;
+        else if(zv < 0.) zv = 0.;
         if(z > 1.) z = 1. - datum::eps;
         else if(z < 0.) z = 0.;
     }
@@ -191,6 +204,6 @@ int SubloadingViscous1D::reset_status() {
 }
 
 void SubloadingViscous1D::print() {
-    suanpan_info("A uniaxial combined hardening material using subloading surface model.\n");
+    suanpan_info("A uniaxial combined hardening material using subloading surface model with viscosity.\n");
     Material1D::print();
 }
