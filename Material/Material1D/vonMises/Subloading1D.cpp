@@ -123,7 +123,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio(0);
-        const auto fraction_term = (cv - zv) * norm_mu * gamma + 1.;
+        const auto fraction_term = (cv * z - zv) * norm_mu * gamma + 1.;
         const auto power_term = pow(fraction_term, nv - 1.);
 
         residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (zv - 1.) * y * sum_d) - zv * y;
@@ -138,9 +138,9 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         jacobian(1, 1) = 0.;
         jacobian(1, 2) = 1. - u * gamma * trial_ratio(1);
 
-        jacobian(2, 0) = -z * nv * power_term * (cv - zv) * norm_mu;
+        jacobian(2, 0) = -z * nv * power_term * (cv * z - zv) * norm_mu;
         jacobian(2, 1) = 1. + z * nv * power_term * norm_mu * gamma;
-        jacobian(2, 2) = -fraction_term * power_term;
+        jacobian(2, 2) = -power_term * (fraction_term + z * nv * cv * norm_mu * gamma);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
