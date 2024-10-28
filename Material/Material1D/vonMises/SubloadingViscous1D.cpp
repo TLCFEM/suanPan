@@ -67,6 +67,8 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
     vec alpha(&trial_history(4), b.size(), false, true);
     vec d(&trial_history(4 + b.size()), c.size(), false, true);
 
+    const auto incre_t = *incre_time > 0. ? *incre_time : unit_time;
+
     iteration = 0.;
     auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
@@ -140,7 +142,7 @@ int SubloadingViscous1D::update_trial_status(const vec& t_strain) {
 
         if(zv > z) {
             const auto diff_z = zv - z;
-            const auto power_term = *incre_time * pow(diff_z, nv - 1);
+            const auto power_term = incre_t * pow(diff_z, nv - 1);
 
             residual(2) += diff_z * power_term;
 
