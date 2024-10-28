@@ -52,7 +52,7 @@ int Nonviscous01::update_trial_status(const vec&, const vec& t_strain_rate) {
 
     if(fabs(incre_strain_rate(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    const auto incre_t = *incre_time > 0. ? *incre_time : 1.;
+    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
 
     const cx_vec t_para = 2. + incre_t * s;
     s_para = (4. - t_para) / t_para;

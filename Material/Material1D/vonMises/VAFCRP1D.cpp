@@ -48,7 +48,7 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
 
     if(fabs(trial_stress(0) - accu(trial_history.head(size))) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
 
-    const auto incre_t = *incre_time > 0. ? *incre_time : 1.;
+    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
 
     auto gamma = 0.;
     double xi, jacobian, exp_gamma;

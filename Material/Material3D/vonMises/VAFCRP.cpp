@@ -56,7 +56,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
 
     if(root_three_two * tensor::stress::norm(eta) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
 
-    const auto incre_t = *incre_time > 0. ? *incre_time : 1.;
+    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
 
     vec xi;
     auto gamma = 0., exp_gamma = 1.;

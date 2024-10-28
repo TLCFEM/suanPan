@@ -62,7 +62,7 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
 
     if(residual <= 0.) return SUANPAN_SUCCESS;
 
-    const auto incre_t = *incre_time > 0. ? *incre_time : 1.;
+    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
 
     auto gamma = 0., pow_term = 1., denom = incre_t;
     auto counter = 0u;

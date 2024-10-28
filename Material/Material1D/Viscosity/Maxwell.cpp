@@ -63,7 +63,7 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
     const auto& F1 = spring->get_trial_stress().at(0);
     const auto& F2 = damper->get_trial_stress().at(0);
 
-    const auto incre_t = *incre_time > 0. ? *incre_time : 1.;
+    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
 
     // \beta\Delta{}t
     const auto factor_a = beta * incre_t;
