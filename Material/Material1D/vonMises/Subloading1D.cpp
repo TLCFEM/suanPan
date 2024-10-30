@@ -17,9 +17,6 @@
 
 #include "Subloading1D.h"
 
-#include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
-
 const double DataSubloading1D::Saturation::root_one_half = sqrt(1.5);
 
 const double Subloading1D::rate_bound = -log(z_bound);
@@ -34,12 +31,10 @@ Subloading1D::Subloading1D(const unsigned T, DataSubloading1D&& D, const double 
     : DataSubloading1D{std::move(D)}
     , Material1D(T, R) {}
 
-int Subloading1D::initialize(const shared_ptr<DomainBase>& D) {
-    if(nullptr != D) incre_time = &D->get_factory()->modify_incre_time();
-
+int Subloading1D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic;
 
-    initialize_history(4u + static_cast<unsigned>(b.size() + c.size()));
+    initialize_history(3u + static_cast<unsigned>(b.size() + c.size()));
 
     return SUANPAN_SUCCESS;
 }
@@ -56,25 +51,21 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     trial_history = current_history;
     const auto& current_q = current_history(1);
     const auto& current_z = current_history(2);
-    const auto& current_zv = current_history(3);
     auto& iteration = trial_history(0);
     auto& q = trial_history(1);
     auto& z = trial_history(2);
-    auto& zv = trial_history(3);
 
-    const vec current_alpha(&current_history(4), b.size(), false, true);
-    const vec current_d(&current_history(4 + b.size()), c.size(), false, true);
-    vec alpha(&trial_history(4), b.size(), false, true);
-    vec d(&trial_history(4 + b.size()), c.size(), false, true);
-
-    const auto norm_mu = mu / (incre_time && *incre_time > 0. ? *incre_time : 1.);
+    const vec current_alpha(&current_history(3), b.size(), false, true);
+    const vec current_d(&current_history(3 + b.size()), c.size(), false, true);
+    vec alpha(&trial_history(3), b.size(), false, true);
+    vec d(&trial_history(3 + b.size()), c.size(), false, true);
 
     iteration = 0.;
     auto gamma = 0., ref_error = 0.;
     auto start_z = current_z;
 
-    vec3 residual, incre;
-    mat33 jacobian;
+    vec2 residual, incre;
+    mat22 jacobian;
 
     auto counter = 0u;
     while(true) {
@@ -99,7 +90,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         for(auto I = 0llu; I < b.size(); ++I) bottom_alpha(I) = 1. + b[I].r() * gamma;
         for(auto I = 0llu; I < c.size(); ++I) bottom_d(I) = 1. + c[I].r() * gamma;
 
-        const auto n = trial_stress(0) - a * sum(current_alpha / bottom_alpha) + (zv - 1.) * y * sum(current_d / bottom_d) > 0. ? 1. : -1.;
+        const auto n = trial_stress(0) - a * sum(current_alpha / bottom_alpha) + (z - 1.) * y * sum(current_d / bottom_d) > 0. ? 1. : -1.;
 
         for(auto I = 0llu; I < b.size(); ++I) alpha(I) = (b[I].rb() * gamma * n + current_alpha(I)) / bottom_alpha(I);
         for(auto I = 0llu; I < c.size(); ++I) d(I) = (c[I].rb() * gamma * n + current_d(I)) / bottom_d(I);
@@ -110,8 +101,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
             const auto s = (y * sum_d + a * sum_alpha - current_stress(0)) / (trial_stress(0) - current_stress(0));
             if(s >= 1.) {
                 // elastic unloading
-                zv = ((trial_stress(0) - a * sum_alpha) / y - sum_d) / (n - sum_d);
-                z = zv / current_zv * current_z;
+                z = ((trial_stress(0) - a * sum_alpha) / y - sum_d) / (n - sum_d);
                 return SUANPAN_SUCCESS;
             }
             if(s > 0.) start_z = 0.;
@@ -123,24 +113,15 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio(0);
-        const auto fraction_term = (cv * z - zv) * norm_mu * gamma + 1.;
-        const auto power_term = pow(fraction_term, nv - 1.);
 
-        residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (zv - 1.) * y * sum_d) - zv * y;
+        residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (z - 1.) * y * sum_d) - z * y;
         residual(1) = z - start_z - gamma * avg_rate;
-        residual(2) = zv - fraction_term * power_term * z;
 
-        jacobian(0, 0) = n * ((zv - 1.) * (y * dd + sum_d * dy) - (a * dalpha + sum_alpha * da)) - elastic - zv * dy;
+        jacobian(0, 0) = n * ((z - 1.) * (y * dd + sum_d * dy) - (a * dalpha + sum_alpha * da)) - elastic - z * dy;
         jacobian(0, 1) = n * y * sum_d - y;
-        jacobian(0, 2) = 0.;
 
         jacobian(1, 0) = -avg_rate;
-        jacobian(1, 1) = 0.;
-        jacobian(1, 2) = 1. - u * gamma * trial_ratio(1);
-
-        jacobian(2, 0) = -z * nv * power_term * (cv * z - zv) * norm_mu;
-        jacobian(2, 1) = 1. + z * nv * power_term * norm_mu * gamma;
-        jacobian(2, 2) = -power_term * (fraction_term + z * nv * cv * norm_mu * gamma);
+        jacobian(1, 1) = 1. - u * gamma * trial_ratio(1);
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -154,19 +135,14 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
             }
             iteration = counter;
             trial_stress -= elastic * gamma * n;
-            trial_stiffness += elastic / det(jacobian) * elastic * det(jacobian.submat(1, 1, 2, 2));
+            trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
             return SUANPAN_SUCCESS;
         }
 
         gamma -= incre(0);
-        zv -= incre(1);
-        z -= incre(2);
-        if(z < 0.) z = 0.;
-        else if(z > 1.) z = 1. - datum::eps;
-        if(is_viscous) {
-            if(zv < z) zv = z;
-            else if(zv > cv * z) zv = cv * z - datum::eps;
-        }
+        z -= incre(1);
+        if(z > 1.) z = 1. - datum::eps;
+        else if(z < 0.) z = 0.;
     }
 }
 
@@ -195,6 +171,6 @@ int Subloading1D::reset_status() {
 }
 
 void Subloading1D::print() {
-    suanpan_info("A uniaxial combined hardening material using subloading surface model with optional viscosity.\n");
+    suanpan_info("A uniaxial combined hardening material using subloading surface model.\n");
     Material1D::print();
 }
