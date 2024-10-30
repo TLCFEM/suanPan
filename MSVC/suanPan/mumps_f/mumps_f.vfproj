@@ -5,8 +5,8 @@
 	</Platforms>
 	<Configurations>
 		<Configuration Name="Release|x64" UseCompiler="ifxCompiler" OutputDirectory="..\..\$(ConfigurationName)\Libs\" ConfigurationType="typeStaticLibrary">
-			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" MultiProcessorCompilation="true" Optimization="optimizeFull" Parallelization="true" Preprocess="preprocessYes" PreprocessorDefinitions="Add_;pord;metis;BLR_MT;GEMMT_AVAILABLE" EnableEnhancedInstructionSet="codeArchAVX" OpenMP="OpenMPParallelCode" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
-			<Tool Name="VFLibrarianTool" AdditionalLibraryDirectories="..\..\$(ConfigurationName)\Libs\" AdditionalDependencies="metis.lib"/>
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" MultiProcessorCompilation="true" Optimization="optimizeFull" Parallelization="true" Preprocess="preprocessYes" PreprocessorDefinitions="Add_;pord;BLR_MT;GEMMT_AVAILABLE" EnableEnhancedInstructionSet="codeArchAVX" OpenMP="OpenMPParallelCode" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+			<Tool Name="VFLibrarianTool" AdditionalLibraryDirectories="..\..\$(ConfigurationName)\Libs\"/>
 			<Tool Name="VFResourceCompilerTool"/>
 			<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
 			<Tool Name="VFCustomBuildTool"/>
