@@ -49,18 +49,11 @@ struct DataSubloading1D {
     };
 
     const double elastic; // elastic modulus
-    const double initial_iso;
-    const double k_iso;
-    const double saturation_iso;
-    const double m_iso;
-    const double initial_kin;
-    const double k_kin;
-    const double saturation_kin;
-    const double m_kin;
+    const double initial_iso, k_iso, saturation_iso, m_iso;
+    const double initial_kin, k_kin, saturation_kin, m_kin;
     const double u;
 
-    const std::vector<Saturation> b;
-    const std::vector<Saturation> c;
+    const std::vector<Saturation> b, c;
 };
 
 class Subloading1D final : protected DataSubloading1D, public Material1D {
