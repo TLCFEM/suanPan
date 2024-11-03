@@ -71,8 +71,7 @@ class SubloadingViscous1D final : protected DataSubloadingViscous1D, public Mate
     [[nodiscard]] std::tuple<double, double> isotropic_bound(double) const;
     [[nodiscard]] std::tuple<double, double> kinematic_bound(double) const;
 
-    int pure_plastic(vec&);
-    int partial_unloading(double&, vec&);
+    int partial_loading(double&, vec&, double, double);
 
 public:
     SubloadingViscous1D(
