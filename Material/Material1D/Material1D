@@ -57,4 +57,5 @@
 #include "vonMises/NonlinearGurson1D.h"
 #include "vonMises/NonlinearMises1D.h"
 #include "vonMises/Subloading1D.h"
+#include "vonMises/SubloadingViscous1D.h"
 #include "vonMises/VAFCRP1D.h"

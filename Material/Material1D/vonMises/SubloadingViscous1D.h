@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Subloading1D
- * @brief A Subloading1D material class.
+ * @class SubloadingViscous1D
+ * @brief A SubloadingViscous1D material class.
  * @author tlc
- * @date 24/09/2024
+ * @date 02/11/2024
  * @version 0.1.0
- * @file Subloading1D.h
+ * @file SubloadingViscous1D.h
  * @addtogroup Material-1D
  * @{
  */
 
-#ifndef SUBLOADING1D_H
-#define SUBLOADING1D_H
+#ifndef SUBLOADINGVISCOUS1D_H
+#define SUBLOADINGVISCOUS1D_H
 
 #include <Material/Material1D/Material1D.h>
 
-struct DataSubloading1D {
+struct DataSubloadingViscous1D {
     class Saturation {
         static const double root_one_half;
 
@@ -52,22 +52,33 @@ struct DataSubloading1D {
     const double initial_iso, k_iso, saturation_iso, m_iso;
     const double initial_kin, k_kin, saturation_kin, m_kin;
     const double u;
+    const double cv;
+    const double mu;
+    const double nv;
 
     const std::vector<Saturation> b, c;
 };
 
-class Subloading1D final : protected DataSubloading1D, public Material1D {
+class SubloadingViscous1D final : protected DataSubloadingViscous1D, public Material1D {
     static constexpr unsigned max_iteration = 20u;
     static constexpr double z_bound = 1E-15;
     static const double rate_bound;
 
     static vec2 yield_ratio(double);
 
+    const double* incre_time = nullptr;
+
+    [[nodiscard]] std::tuple<double, double> isotropic_bound(double) const;
+    [[nodiscard]] std::tuple<double, double> kinematic_bound(double) const;
+
+    int pure_plastic(vec&);
+    int partial_unloading(double&, vec&);
+
 public:
-    Subloading1D(
-        unsigned,           // tag
-        DataSubloading1D&&, // data
-        double = 0.         // density
+    SubloadingViscous1D(
+        unsigned,                  // tag
+        DataSubloadingViscous1D&&, // data
+        double = 0.                // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
