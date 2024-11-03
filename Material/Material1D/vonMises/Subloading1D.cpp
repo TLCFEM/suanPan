@@ -304,7 +304,8 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     const auto inter_stress = trial_stress(0);
     trial_stress += remaining_stress;
 
-    if((inter_a * inter_sum_alpha + inter_y * inter_sum_d - inter_stress) / remaining_stress >= 1.) {
+    const auto inter_centre = inter_a * inter_sum_alpha + inter_y * inter_sum_d;
+    if(remaining_stress > 0. ? inter_centre >= trial_stress(0) : inter_centre <= trial_stress(0)) {
         // pure elastic unloading
         const auto inter_n = inter_stress - inter_a * inter_sum_alpha + (inter_z - 1.) * inter_y * inter_sum_d > 0. ? 1. : -1.;
         trial_history(3) = trial_history(2) = ((trial_stress(0) - inter_a * inter_sum_alpha) / inter_y - inter_sum_d) / (inter_n - inter_sum_d);
