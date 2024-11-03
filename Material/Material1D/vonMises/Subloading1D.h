@@ -70,6 +70,12 @@ class Subloading1D final : protected DataSubloading1D, public Material1D {
 
     const bool is_viscous = mu > 0. && nv > 0.;
 
+    [[nodiscard]] std::tuple<double, double> isotropic_bound(double) const;
+    [[nodiscard]] std::tuple<double, double> kinematic_bound(double) const;
+
+    int pure_plastic(vec&);
+    int partial_unloading(double&, vec&);
+
 public:
     Subloading1D(
         unsigned,           // tag
