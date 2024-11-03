@@ -250,7 +250,7 @@ int SubloadingViscous1D::partial_unloading(double& fragment, vec& start_history)
 
 SubloadingViscous1D::SubloadingViscous1D(const unsigned T, DataSubloadingViscous1D&& D, const double R)
     : DataSubloadingViscous1D{std::move(D)}
-    , Material1D(T, R) { access::rw(tolerance) = 1E-13; }
+    , Material1D(T, R) {}
 
 int SubloadingViscous1D::initialize(const shared_ptr<DomainBase>& D) {
     if(nullptr != D) incre_time = &D->get_factory()->modify_incre_time();

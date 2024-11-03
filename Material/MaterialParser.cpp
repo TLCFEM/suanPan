@@ -2981,11 +2981,11 @@ void new_subloadingviscous1d(unique_ptr<Material>& return_obj, istringstream& co
         suanpan_error("The evolution rate must be positive.\n");
         return;
     }
-    if(para.cv < 1.) {
+    if(para.cv <= 1.) {
         suanpan_error("The viscous limit c_v must be greater than unity.\n");
         return;
     }
-    if(para.mu <= 0. && para.nv <= 0.) {
+    if(para.mu <= 0. || para.nv <= 0.) {
         suanpan_error("The viscous parameters mu and nv must be greater than zero.\n");
         return;
     }
