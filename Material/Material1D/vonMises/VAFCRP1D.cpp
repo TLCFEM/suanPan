@@ -45,16 +45,15 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
 
     trial_history = current_history;
     auto& p = trial_history(size);
+    vec beta(&trial_history(0), size, false, true);
 
-    if(fabs(trial_stress(0) - accu(trial_history.head(size))) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
+    if(fabs(trial_stress(0) - accu(beta)) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
 
-    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
+    const auto norm_mu = mu / (incre_time && *incre_time > 0. ? *incre_time : 1.);
 
-    auto gamma = 0.;
-    double xi, jacobian, exp_gamma;
+    auto gamma = 0., ref_error = 1.;
 
     auto counter = 0u;
-    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -67,47 +66,45 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
         auto dk = hardening + m * exp_term;
         if(k < 0.) k = dk = 0.;
 
-        auto sum_a = 0., sum_b = 0.;
-        for(auto I = 0u; I < size; ++I) {
-            const auto denom = 1. + b(I) * gamma;
-            sum_a += trial_history(I) / denom;
-            sum_b += a(I) / denom;
-        }
+        const vec bottom = 1. + b * gamma;
 
-        const auto q = fabs(xi = trial_stress(0) - sum_a) - (elastic_modulus + sum_b) * gamma;
+        const auto xi = trial_stress(0) - accu(beta / bottom);
+        const auto q = fabs(xi) - (elastic_modulus + accu(a / bottom)) * gamma;
 
-        exp_gamma = pow(incre_t / (incre_t + mu * gamma), epsilon);
+        const auto fraction_term = norm_mu * gamma + 1.;
+        const auto power_term = pow(fraction_term, epsilon - 1.);
 
-        jacobian = -elastic_modulus - epsilon * mu * q / (incre_t + mu * gamma);
+        auto jacobian = -elastic_modulus - power_term * (norm_mu * epsilon * k + fraction_term * dk);
 
-        if(xi > 0.) for(auto I = 0u; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
-        else for(auto I = 0u; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
+        if(xi > 0.) jacobian += accu((b % beta - a) / square(bottom));
+        else jacobian -= accu((b % beta + a) / square(bottom));
 
-        const auto residual = q * exp_gamma - k;
-        const auto incre = residual / ((jacobian *= exp_gamma) -= dk);
+        const auto residual = q - fraction_term * power_term * k;
+        const auto incre = residual / jacobian;
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance * yield) && counter > 5u)) {
+            if(xi > 0.) {
+                beta += a * gamma;
+
+                trial_stress -= elastic_modulus * gamma;
+            }
+            else {
+                beta -= a * gamma;
+
+                trial_stress += elastic_modulus * gamma;
+            }
+            beta /= bottom;
+
+            trial_stiffness += elastic_modulus / jacobian * elastic_modulus;
+
+            return SUANPAN_SUCCESS;
+        }
 
         gamma -= incre;
         p -= incre;
     }
-
-    if(xi > 0.) {
-        for(auto I = 0u; I < size; ++I) trial_history(I) = (trial_history(I) + a(I) * gamma) / (1. + b(I) * gamma);
-
-        trial_stress -= elastic_modulus * gamma;
-    }
-    else {
-        for(auto I = 0u; I < size; ++I) trial_history(I) = (trial_history(I) - a(I) * gamma) / (1. + b(I) * gamma);
-
-        trial_stress += elastic_modulus * gamma;
-    }
-
-    trial_stiffness += elastic_modulus / jacobian * elastic_modulus * exp_gamma;
-
-    return SUANPAN_SUCCESS;
 }
 
 int VAFCRP1D::clear_status() {
