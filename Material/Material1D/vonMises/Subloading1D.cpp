@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "Subloading1D.h"
-
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
@@ -100,12 +99,12 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         for(auto I = 0llu; I < b.size(); ++I) bottom_alpha(I) = 1. + b[I].r() * gamma;
         for(auto I = 0llu; I < c.size(); ++I) bottom_d(I) = 1. + c[I].r() * gamma;
 
-        const auto n = trial_stress(0) - a * sum(current_alpha / bottom_alpha) + (z - 1.) * y * sum(current_d / bottom_d) > 0. ? 1. : -1.;
+        const auto n = trial_stress(0) - a * accu(current_alpha / bottom_alpha) + (z - 1.) * y * accu(current_d / bottom_d) > 0. ? 1. : -1.;
 
         for(auto I = 0llu; I < b.size(); ++I) alpha(I) = (b[I].rb() * gamma * n + current_alpha(I)) / bottom_alpha(I);
         for(auto I = 0llu; I < c.size(); ++I) d(I) = (c[I].rb() * gamma * n + current_d(I)) / bottom_d(I);
 
-        const auto sum_alpha = sum(alpha), sum_d = sum(d);
+        const auto sum_alpha = accu(alpha), sum_d = accu(d);
 
         if(1u == counter && !zero_increment) {
             const auto s = (y * sum_d + a * sum_alpha - current_stress(0)) / (trial_stress(0) - current_stress(0));
@@ -163,10 +162,10 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         z -= incre(2);
         if(gamma < 0.) gamma = 0.;
         if(z < 0.) z = 0.;
-        else if(z > 1.) z = 1. - datum::eps;
+        else if(z > 1.) z = 1.;
         if(is_viscous) {
             if(zv < z) zv = z;
-            else if(zv > cv * z) zv = cv * z - datum::eps;
+            else if(zv > cv * z) zv = cv * z;
         }
     }
 }
