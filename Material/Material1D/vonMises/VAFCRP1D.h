@@ -26,8 +26,8 @@
  * algorithm verified at 28 October 2019 by tlc
  *
  * @author tlc
- * @date 28/10/2019
- * @version 1.0.0
+ * @date 03/11/2024
+ * @version 2.0.0
  * @file VAFCRP1D.h
  * @addtogroup Material-1D
  * @{
@@ -54,6 +54,12 @@ class VAFCRP1D final : protected DataVAFCRP1D, public Material1D {
     const double* incre_time = nullptr;
 
     const unsigned size = static_cast<unsigned>(a.size());
+
+    [[nodiscard]] std::tuple<double, double> isotropic_bound(double) const;
+
+    [[nodiscard]] bool is_elastic(double, const vec&) const;
+
+    int partial_loading(const vec&, double);
 
 public:
     VAFCRP1D(

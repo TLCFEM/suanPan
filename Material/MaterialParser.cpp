@@ -3380,7 +3380,13 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<VAFCRP1D>(tag, DataVAFCRP1D{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), std::move(ai), std::move(bi)}, density);
+    DataVAFCRP1D data{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), std::move(ai), std::move(bi)};
+    if(data.mu <= 0. || data.epsilon <= 0.) {
+        suanpan_error("The parameters mu and epsilon must be greater than zero.\n");
+        return;
+    }
+
+    return_obj = make_unique<VAFCRP1D>(tag, std::move(data), density);
 }
 
 void new_viscosity01(unique_ptr<Material>& return_obj, istringstream& command) {
