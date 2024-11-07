@@ -50,6 +50,7 @@ struct DataVAFCRP1D {
 
 class VAFCRP1D final : protected DataVAFCRP1D, public Material1D {
     static constexpr unsigned max_iteration = 20u;
+    static constexpr double middle_point = .5;
 
     const double* incre_time = nullptr;
 
@@ -60,6 +61,7 @@ class VAFCRP1D final : protected DataVAFCRP1D, public Material1D {
     [[nodiscard]] bool is_elastic(double, const vec&) const;
 
     int partial_loading(const vec&, double);
+    int partial_loading(double&, const vec&, double, double);
 
 public:
     VAFCRP1D(

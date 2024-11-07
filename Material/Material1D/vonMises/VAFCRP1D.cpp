@@ -33,7 +33,99 @@ bool VAFCRP1D::is_elastic(const double stress, const vec& history) const {
     return fabs(stress - accu(history.head(size))) < k;
 }
 
+int VAFCRP1D::partial_loading(double& fragment, const vec& start_history, const double start_stress, const double diff_stress) {
+    const auto& start_p = start_history(size);
+    const vec start_beta(&start_history(0), size);
+
+    auto& p = trial_history(size);
+    vec beta(&trial_history(0), size, false, true);
+
+    auto inter_history = start_history;
+    auto& inter_p = inter_history(size);
+    vec inter_beta(&inter_history(0), size, false, true);
+
+    const auto norm_mu = mu / (incre_time && *incre_time > 0. ? *incre_time : 1.);
+
+    auto gamma = 0., ref_error = 1.;
+
+    vec2 residual, incre;
+    mat22 jacobian;
+
+    auto counter = 0u;
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
+        residual.zeros();
+        jacobian.zeros();
+
+        if(fragment > 1.) fragment = 1.;
+
+        const auto inter_gamma = middle_point * gamma;
+
+        p = start_p + gamma;
+        inter_p = start_p + inter_gamma;
+
+        const auto [inter_k, inter_dk] = isotropic_bound(inter_p);
+
+        const vec inter_bottom = 1. + b * inter_gamma;
+
+        const auto inter_trial_stress = start_stress + middle_point * fragment * diff_stress;
+        const auto inter_n = inter_trial_stress > accu(start_beta / inter_bottom) ? 1. : -1.;
+
+        inter_beta = (start_beta + inter_n * inter_gamma * a) / inter_bottom;
+        const auto inter_dbeta = accu((a * inter_n - b % start_beta) / square(inter_bottom));
+
+        beta = (inter_beta - (1. - middle_point) * start_beta) / middle_point;
+
+        const auto inter_stress = inter_trial_stress - inter_n * elastic_modulus * inter_gamma;
+        const auto inter_eta = inter_stress - accu(inter_beta);
+
+        const auto fraction_term = norm_mu * gamma + 1.;
+        const auto power_term = pow(fraction_term, epsilon - 1.);
+
+        residual(0) = fabs(inter_eta) - fraction_term * power_term * inter_k;
+
+        jacobian(0, 0) = -middle_point * (elastic_modulus + inter_n * inter_dbeta) - power_term * (norm_mu * epsilon * inter_k + fraction_term * inter_dk * middle_point);
+
+        if(fragment >= 1.) jacobian(1, 1) = 1.;
+        else {
+            const auto eta = start_stress + fragment * diff_stress - inter_n * elastic_modulus * gamma - accu(beta);
+            const auto n = eta > 0. ? 1. : -1.;
+
+            const auto [k, dk] = isotropic_bound(p);
+
+            residual(1) = fabs(eta) - k;
+
+            jacobian(0, 1) = inter_n * middle_point * diff_stress;
+
+            jacobian(1, 0) = -n * (inter_n * elastic_modulus + inter_dbeta) - dk;
+            jacobian(1, 1) = n * diff_stress;
+        }
+
+        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+
+        const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
+        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance * yield) && counter > 5u)) {
+            trial_stress = start_stress + fragment * diff_stress - inter_n * elastic_modulus * gamma;
+
+            if(fragment >= 1.) trial_stiffness = elastic_modulus + elastic_modulus / jacobian(0, 0) * elastic_modulus;
+
+            return SUANPAN_SUCCESS;
+        }
+
+        gamma -= incre(0);
+        fragment -= incre(1);
+    }
+}
+
 int VAFCRP1D::partial_loading(const vec& start_history, const double start_stress) {
+    if(is_elastic(start_stress, start_history)) return SUANPAN_SUCCESS;
+
     trial_history = start_history;
     auto& p = trial_history(size);
     vec beta(&trial_history(0), size, false, true);
@@ -120,14 +212,15 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + incre_stress;
 
     // pure loading
-    if(const auto current_eta = current_stress(0) - accu(current_history.head(size)); current_eta * incre_stress(0) >= 0. || is_elastic(current_stress(0), current_history)) return is_elastic(trial_stress(0), current_history) ? SUANPAN_SUCCESS : partial_loading(current_history, trial_stress(0));
+    if(const auto current_eta = current_stress(0) - accu(current_history.head(size)); current_eta * incre_stress(0) >= 0. || is_elastic(current_stress(0), current_history)) return partial_loading(current_history, trial_stress(0));
 
-    if(SUANPAN_SUCCESS != partial_loading(current_history, current_stress(0))) return SUANPAN_FAIL;
+    auto fragment = 0.;
+    if(SUANPAN_SUCCESS != partial_loading(fragment, current_history, current_stress(0), incre_stress(0))) return SUANPAN_FAIL;
+    if(fragment >= 1.) return SUANPAN_SUCCESS;
 
-    trial_stress += incre_stress;
-    trial_stiffness = initial_stiffness;
+    trial_stress += (1. - fragment) * incre_stress;
 
-    return is_elastic(trial_stress(0), trial_history) ? SUANPAN_SUCCESS : partial_loading(current_history, current_stress(0) + incre_stress(0));
+    return partial_loading(trial_history, trial_stress(0));
 }
 
 int VAFCRP1D::clear_status() {
