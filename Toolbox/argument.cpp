@@ -181,13 +181,13 @@ void print_header() {
         suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan               |\n");
         suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest  |\n");
         suanpan_info("+-----------------------------------------------------+\n");
-        suanpan_info("|  {} https://gitter.im/suanPan-dev/community         |\n", POOL[randi() % POOL.size()]);
+        suanpan_info("|  {} https://bit.ly/vsc-sp                           |\n", POOL[randi() % POOL.size()]);
     }
     else {
         suanpan_info("|  https://github.com/TLCFEM/suanPan                  |\n");
         suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest     |\n");
         suanpan_info("+-----------------------------------------------------+\n");
-        suanpan_info("|  https://gitter.im/suanPan-dev/community            |\n");
+        suanpan_info("|  https://bit.ly/vsc-sp                              |\n");
     }
     suanpan_info("+-----------------------------------------------------+\n\n");
 }
@@ -335,7 +335,6 @@ void print_version() {
 #ifdef SUANPAN_VTK
     suanpan_info("    The visualisation support is implemented via VTK ({}) library. https://vtk.org/\n", vtkVersion::GetVTKVersion());
 #endif
-    suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community/\n");
     suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n\n");
 }
 
@@ -358,14 +357,15 @@ void cli_mode(const shared_ptr<Bead>& model) {
     const auto history_path = get_history_path();
 
     if(!exists(history_path)) {
-        suanpan_info("It appears that this is the first time you run ");
-        suanpan_highlight("suanPan");
-        suanpan_info(".\nFor a quick introduction, type in '");
+        suanpan_info("To go through a brief introduction, use '");
         suanpan_highlight("overview");
-        suanpan_info("'.\nTo exit, just type in '");
+        suanpan_info("'.\nTo check the build info, use '");
+        suanpan_highlight("version");
+        suanpan_info("'.\nTo exit, type in '");
         suanpan_highlight("exit");
-        suanpan_info("'.\n\nThe VS Code extension provides syntax highlighting and autocompletion.\n");
-        suanpan_highlight("https://bit.ly/vsc-sp\n\n");
+        suanpan_info("' or '");
+        suanpan_highlight("quit");
+        suanpan_info("'.\n\n");
     }
 
     ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
