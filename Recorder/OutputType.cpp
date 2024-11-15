@@ -16,10 +16,6 @@
  ******************************************************************************/
 
 #include "OutputType.h"
-#include <Toolbox/utility.h>
-
-
-OutputType to_token(const std::string& L) { return to_token(L.c_str()); }
 
 int to_index(const OutputType config) {
     if(config == OutputType::S11) return 0;
