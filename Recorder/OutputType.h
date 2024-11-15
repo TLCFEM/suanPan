@@ -18,7 +18,6 @@
 #ifndef OUTPUTTYPE_H
 #define OUTPUTTYPE_H
 
-#include <string>
 #include <magic_enum/magic_enum.hpp>
 
 enum class OutputType {
@@ -259,7 +258,7 @@ enum class OutputType {
 
     // amplitude
     AMP,
-    NL = 256
+    NL
 };
 
 template<> struct magic_enum::customize::enum_range<OutputType> {
@@ -267,9 +266,9 @@ template<> struct magic_enum::customize::enum_range<OutputType> {
     static constexpr int max = 512;
 };
 
-constexpr std::string_view to_name(OutputType L) { return magic_enum::enum_name(L);}
-constexpr OutputType to_token(const char* L) { return magic_enum::enum_cast<OutputType>(L).value_or(OutputType::NL);}
-OutputType to_token(const std::string&);
+constexpr std::string_view to_name(const OutputType L) { return magic_enum::enum_name(L); }
+
+constexpr OutputType to_token(const std::string_view L) { return magic_enum::enum_cast<OutputType>(L).value_or(OutputType::NL); }
 
 const char* to_category(OutputType);
 int to_index(OutputType);
