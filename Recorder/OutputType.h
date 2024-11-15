@@ -266,9 +266,9 @@ template<> struct magic_enum::customize::enum_range<OutputType> {
     static constexpr int max = 512;
 };
 
-constexpr std::string_view to_name(OutputType L) { return magic_enum::enum_name(L); }
+constexpr std::string_view to_name(const OutputType L) { return magic_enum::enum_name(L); }
 
-constexpr OutputType to_token(std::string_view L) { return magic_enum::enum_cast<OutputType>(L).value_or(OutputType::NL); }
+constexpr OutputType to_token(const std::string_view L) { return magic_enum::enum_cast<OutputType>(L).value_or(OutputType::NL); }
 
 const char* to_category(OutputType);
 int to_index(OutputType);
