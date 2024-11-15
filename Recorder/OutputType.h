@@ -19,8 +19,6 @@
 #define OUTPUTTYPE_H
 
 #include <string>
-#define MAGIC_ENUM_RANGE_MIN 0
-#define MAGIC_ENUM_RANGE_MAX 256
 #include <magic_enum/magic_enum.hpp>
 
 enum class OutputType {
@@ -262,6 +260,11 @@ enum class OutputType {
     // amplitude
     AMP,
     NL = 256
+};
+
+template<> struct magic_enum::customize::enum_range<OutputType> {
+    static constexpr int min = 0;
+    static constexpr int max = 512;
 };
 
 constexpr std::string_view to_name(OutputType L) { return magic_enum::enum_name(L);}
