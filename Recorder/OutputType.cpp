@@ -134,6 +134,7 @@ std::string to_category(const OutputType L) {
     if(result == "AR") return "A";
     if(result == "MMR") return "MM";
     if(result == "RM") return "RF";
+    if(result == "DM") return "DF";
     if(result == "IM") return "IF";
     if(result == "GDM") return "GDF";
     if(result == "GIM") return "GIF";
