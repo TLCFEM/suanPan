@@ -1,0 +1,34 @@
+name: Docker Latest
+on:
+  push:
+    branches: [ dev ]
+jobs:
+  linux:
+    if: ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    runs-on: self-hosted
+    timeout-minutes: 60
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Login Docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Script/Rocky.Dockerfile
+          push: true
+          tags: |
+            tlcfem/suanpan:latest
+            ghcr.io/tlcfem/suanpan:latest
