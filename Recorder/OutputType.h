@@ -270,7 +270,8 @@ constexpr std::string_view to_name(const OutputType L) { return magic_enum::enum
 
 constexpr OutputType to_token(const std::string_view L) { return magic_enum::enum_cast<OutputType>(L).value_or(OutputType::NL); }
 
-const char* to_category(OutputType);
+std::string to_category(OutputType);
+
 int to_index(OutputType);
 
 #endif
