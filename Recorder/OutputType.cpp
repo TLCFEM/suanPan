@@ -128,7 +128,7 @@ int to_index(const OutputType config) {
 }
 
 std::string to_category(const OutputType L) {
-    auto result = std::regex_replace(std::string(to_name(L)), std::regex(R"([0-9])"), "");
+    auto result = std::regex_replace(std::string(to_name(L)), std::regex(R"(\d)"), "");
     if(result == "UR") return "U";
     if(result == "VR") return "V";
     if(result == "AR") return "A";
