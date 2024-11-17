@@ -225,17 +225,11 @@ void argument_parser(const int argc, char** argv) {
 
         for(auto I = 1; I < argc; ++I) {
             if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) {
-                if(I + 1 == argc) {
-                    suanpan_error("No input file specified.\n");
-                    return;
-                }
+                if(I + 1 == argc) return suanpan_error("No input file specified.\n");
                 input_file_name = argv[++I];
             }
             else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) {
-                if(I + 1 == argc) {
-                    suanpan_error("No output file specified.\n");
-                    return;
-                }
+                if(I + 1 == argc) return suanpan_error("No output file specified.\n");
                 output_file_name = argv[++I];
             }
             else if(is_equal(argv[I], "-vb") || is_equal(argv[I], "--verbose")) SUANPAN_VERBOSE = true;
