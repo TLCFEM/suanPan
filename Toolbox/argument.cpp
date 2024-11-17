@@ -224,8 +224,20 @@ void argument_parser(const int argc, char** argv) {
         auto strip = false, convert = false, check_new = true;
 
         for(auto I = 1; I < argc; ++I) {
-            if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) input_file_name = argv[++I];
-            else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) output_file_name = argv[++I];
+            if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) {
+                if(I + 1 == argc) {
+                    suanpan_error("No input file specified.\n");
+                    return;
+                }
+                input_file_name = argv[++I];
+            }
+            else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) {
+                if(I + 1 == argc) {
+                    suanpan_error("No output file specified.\n");
+                    return;
+                }
+                output_file_name = argv[++I];
+            }
             else if(is_equal(argv[I], "-vb") || is_equal(argv[I], "--verbose")) SUANPAN_VERBOSE = true;
             else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
             else if(is_equal(argv[I], "-nc") || is_equal(argv[I], "--nocolor")) SUANPAN_COLOR = false;
