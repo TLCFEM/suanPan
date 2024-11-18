@@ -24,13 +24,7 @@ func main() {
 	if err != nil {
 		return
 	}
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			return
-		}
-	}(response.Body)
+	defer response.Body.Close()
 
 	html, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -155,23 +149,13 @@ func downloadLatestVersion(versionString string) error {
 	if err != nil {
 		return err
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			return
-		}
-	}(response.Body)
+	defer response.Body.Close()
 
 	storage, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
-	defer func(storage *os.File) {
-		err := storage.Close()
-		if err != nil {
-			return
-		}
-	}(storage)
+	defer storage.Close()
 
 	_, _ = io.Copy(storage, response.Body)
 
