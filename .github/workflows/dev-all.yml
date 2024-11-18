@@ -132,7 +132,7 @@ jobs:
         if: env.COVERAGE == 'ON'
         uses: codecov/codecov-action@v5
         with:
-          plugin: gcov
+          plugins: gcov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   macos-dev:
