@@ -172,7 +172,7 @@ func downloadLatestVersion(versionString string) error {
 	isArchive = isArchive || strings.HasSuffix(absPath, "7z")
 
 	if isArchive {
-		fmt.Printf("You can manually extract the archive to overwrite the existing folder.")
+		fmt.Printf("You can manually extract the archive to overwrite the existing folder.\n")
 	}
 
 	return nil
