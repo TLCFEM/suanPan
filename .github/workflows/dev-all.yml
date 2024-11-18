@@ -130,7 +130,7 @@ jobs:
           for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
       - name: Report
         if: env.COVERAGE == 'ON'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           plugin: gcov
         env:
