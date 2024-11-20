@@ -301,7 +301,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.7.1
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**whereami**](https://github.com/gpakosz/whereami)
-- [**exprtk**](https://github.com/ArashPartow/exprtk)
+- [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 

@@ -2392,9 +2392,7 @@ namespace exprtk
                case e_colon : return ":";
                case e_eof   : return ";";
                default      : return "UNKNOWN";
-            }
-
-            return "UNKNOWN";
+               }
          }
 
          inline bool is_error() const
