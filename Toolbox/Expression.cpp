@@ -43,7 +43,7 @@ uword Expression::input_size() const { return x.n_elem; }
 
 uword Expression::output_size() const { return 1; }
 
-bool Expression::compile(const std::string_view& expression_string) {
+bool Expression::compile(const std::string_view expression_string) {
     expression.register_symbol_table(symbol_table);
     std::scoped_lock lock{parser_mutex};
     return parser.compile(expression_text = expression_string, expression);
@@ -59,7 +59,7 @@ void Expression::print() {
     suanpan_info("An expression represents \"{}\".", expression_text);
 }
 
-SimpleScalarExpression::SimpleScalarExpression(const unsigned tag, const std::string_view& input_string)
+SimpleScalarExpression::SimpleScalarExpression(const unsigned tag, const std::string_view input_string)
     : Expression(tag, {std::string{input_string}}) {}
 
 unique_ptr<Expression> SimpleScalarExpression::get_copy() const {
@@ -84,7 +84,7 @@ Mat<double> SimpleScalarExpression::gradient(const Col<double>& in_x) {
     return result;
 }
 
-SimpleVectorExpression::SimpleVectorExpression(const unsigned tag, const std::string_view& input_string, const std::string_view& output_string)
+SimpleVectorExpression::SimpleVectorExpression(const unsigned tag, const std::string_view input_string, const std::string_view output_string)
     : Expression(tag, {std::string{input_string}, std::string{output_string}}) {
     const auto variable_list = suanpan::expression::split(variable_text_list[1]);
 
