@@ -2980,7 +2980,7 @@ void new_subloadingviscous1d(unique_ptr<Material>& return_obj, istringstream& co
         return;
     }
 
-    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), p(15)}}};
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), std::min(1. - datum::eps, p(15))}}};
     if(para.m_iso < 0. || para.m_kin < 0.) {
         suanpan_error("The evolution rate must be positive.\n");
         return;
@@ -3063,7 +3063,7 @@ void new_subloadingmetal(unique_ptr<Material>& return_obj, istringstream& comman
         return;
     }
 
-    DataSubloadingMetal para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), {p(11), 1.}, {p(12), p(13)}};
+    DataSubloadingMetal para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), {p(11), 1.}, {p(12), std::min(1. - datum::eps, p(13))}};
     if(para.m_iso < 0. || para.m_kin < 0.) {
         suanpan_error("The evolution rate must be positive.\n");
         return;
