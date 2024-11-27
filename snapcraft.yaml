@@ -43,7 +43,7 @@ parts:
       - -DUSE_AVX2=OFF
       - -DUSE_HDF5=ON
       - -DUSE_VTK=ON
-      - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.2/
+      - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.4/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest
       - -DUSE_INTEL_OPENMP=OFF
@@ -58,10 +58,10 @@ parts:
       - freeglut3-dev
       - libglvnd-dev
     override-build: |
-      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
-      tar xf VTK-9.2.6-linux.tar.gz
-      wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/79153e0f-74d7-45af-b8c2-258941adf58a/intel-onemkl-2025.0.0.940_offline.sh
-      sh ./intel-onemkl-2025.0.0.940_offline.sh -a --silent --eula accept
+      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.0-linux.tar.gz
+      tar xf VTK-9.4.0-linux.tar.gz
+      wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/246ea40e-5aa7-42a4-81fa-0c029dc8650f/intel-onemkl-2025.0.1.16_offline.sh
+      sh ./intel-onemkl-2025.0.1.16_offline.sh -a --silent --eula accept
       craftctl default
     stage-packages:
       - libgfortran5
