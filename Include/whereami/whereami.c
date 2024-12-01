@@ -89,36 +89,30 @@ static int WAI_PREFIX(getModulePath_)(HMODULE module, char* out, int capacity, i
 
         size = GetModuleFileNameW(module, buffer1, sizeof(buffer1) / sizeof(buffer1[0]));
 
-        if(size == 0)
-            break;
+        if(size == 0) break;
         else if(size == (DWORD)(sizeof(buffer1) / sizeof(buffer1[0]))) {
             DWORD size_ = size;
             do {
                 wchar_t* path_;
 
                 path_ = (wchar_t*)WAI_REALLOC(path, sizeof(wchar_t) * size_ * 2);
-                if(!path_)
-                    break;
+                if(!path_) break;
                 size_ *= 2;
                 path = path_;
                 size = GetModuleFileNameW(module, path, size_);
-            } while(size == size_);
+            }
+            while(size == size_);
 
-            if(size == size_)
-                break;
+            if(size == size_) break;
         }
-        else
-            path = buffer1;
+        else path = buffer1;
 
-        if(!_wfullpath(buffer2, path, MAX_PATH))
-            break;
+        if(!_wfullpath(buffer2, path, MAX_PATH)) break;
         length_ = (int)wcslen(buffer2);
         length__ = WideCharToMultiByte(CP_UTF8, 0, buffer2, length_, out, capacity, NULL, NULL);
 
-        if(length__ == 0)
-            length__ = WideCharToMultiByte(CP_UTF8, 0, buffer2, length_, NULL, 0, NULL, NULL);
-        if(length__ == 0)
-            break;
+        if(length__ == 0) length__ = WideCharToMultiByte(CP_UTF8, 0, buffer2, length_, NULL, 0, NULL, NULL);
+        if(length__ == 0) break;
 
         if(length__ <= capacity && dirname_length) {
             int i;
@@ -140,9 +134,7 @@ static int WAI_PREFIX(getModulePath_)(HMODULE module, char* out, int capacity, i
     return ok ? length : -1;
 }
 
-WAI_NOINLINE WAI_FUNCSPEC int WAI_PREFIX(getExecutablePath)(char* out, int capacity, int* dirname_length) {
-    return WAI_PREFIX(getModulePath_)(NULL, out, capacity, dirname_length);
-}
+WAI_NOINLINE WAI_FUNCSPEC int WAI_PREFIX(getExecutablePath)(char* out, int capacity, int* dirname_length) { return WAI_PREFIX(getModulePath_)(NULL, out, capacity, dirname_length); }
 
 WAI_NOINLINE WAI_FUNCSPEC int WAI_PREFIX(getModulePath)(char* out, int capacity, int* dirname_length) {
     HMODULE module;

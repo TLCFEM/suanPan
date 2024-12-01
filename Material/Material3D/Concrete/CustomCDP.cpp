@@ -19,8 +19,8 @@
 #include <Domain/DomainBase.h>
 #include <Toolbox/utility.h>
 
-podarray<double> CustomCDP::compute_tension_backbone(const double kappa) const {
-    auto response = podarray<double>(6);
+vec6 CustomCDP::compute_tension_backbone(const double kappa) const {
+    vec6 response;
     const auto t_response = t_expression->evaluate(kappa);
     for(auto I = 0llu; I < t_response.n_elem; ++I) response(I) = t_response(I);
 
@@ -35,8 +35,8 @@ podarray<double> CustomCDP::compute_tension_backbone(const double kappa) const {
     return response;
 }
 
-podarray<double> CustomCDP::compute_compression_backbone(const double kappa) const {
-    auto response = podarray<double>(6);
+vec6 CustomCDP::compute_compression_backbone(const double kappa) const {
+    vec6 response;
     const auto c_response = c_expression->evaluate(kappa);
     for(auto I = 0llu; I < c_response.n_elem; ++I) response(I) = c_response(I);
 

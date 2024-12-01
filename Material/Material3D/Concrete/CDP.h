@@ -51,8 +51,8 @@ class CDP final : public NonlinearCDP {
     const double a_t, cb_t, f_t;
     const double a_c, cb_c, f_c;
 
-    [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
-    [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
+    [[nodiscard]] vec6 compute_tension_backbone(double) const override;
+    [[nodiscard]] vec6 compute_compression_backbone(double) const override;
 
 public:
     explicit CDP(
