@@ -52,7 +52,11 @@ if (BUILD_SHARED AND USE_MKL)
     endif ()
 else ()
     if (NOT COMPILER_IDENTIFIER MATCHES "vs") # GCC OR CLANG COMPILER
-        link_libraries(pthread gfortran quadmath openblas)
+    find_library(HAS_QUADMATH quadmath)
+    if (HAS_QUADMATH)
+        link_libraries(quadmath)
+    endif ()
+    link_libraries(pthread gfortran openblas)
     else () # MSVC COMPILER
         if (USE_MPI)
             link_libraries(mkl_scalapack_lp64 mkl_blacs_intelmpi_lp64)
