@@ -87,11 +87,11 @@ endif ()
 
 if (NOT CUSTOM_OPENBLAS STREQUAL "")
     link_directories(${CUSTOM_OPENBLAS})
+elseif(USE_SYS_LIB)
+    find_package(OpenBLAS REQUIRED)
 endif ()
 
-if (USE_SYS_LIB)
-    find_package(OpenBLAS REQUIRED)
-else()
+if (NOT USE_SYS_LIB)
     link_directories(Libs/${SP_EXTERNAL_LIB_PATH})
 endif ()
 
