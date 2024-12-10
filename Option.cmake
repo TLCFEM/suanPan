@@ -33,6 +33,7 @@ if (USE_MKL)
     endif ()
 else ()
     set(USE_MPI OFF CACHE BOOL "" FORCE)
+    set(CUSTOM_OPENBLAS "" CACHE PATH "The path that contains the custom OpenBLAS library. If not set, the bundled OpenBLAS will be used.")
 endif ()
 
 set(COMPILER_IDENTIFIER "unknown")
@@ -81,6 +82,10 @@ endif ()
 
 if (USE_MKL AND USE_CUDA)
     option(USE_MAGMA "Enable GPU based global solvers via MAGMA." OFF)
+endif ()
+
+if (NOT CUSTOM_OPENBLAS STREQUAL "")
+    link_directories(${CUSTOM_OPENBLAS})
 endif ()
 
 link_directories(Libs/${SP_EXTERNAL_LIB_PATH})
