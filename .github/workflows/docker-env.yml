@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 240
     strategy:
       matrix:
-        arch: [ amd64, arm64 ]
+        arch: [ amd64 ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
