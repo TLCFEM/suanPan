@@ -7,6 +7,9 @@ jobs:
   ide-image-base:
     runs-on: self-hosted
     timeout-minutes: 240
+    strategy:
+      matrix:
+        arch: [ amd64, arm64 ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -15,13 +18,17 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: QEMU
+        if: ${{ matrix.arch == 'arm64' }}
+        uses: docker/setup-qemu-action@v3
       - name: Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Base
+      - name: Base ${{ matrix.arch }}
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Script/Rocky.Pre.Dockerfile
+          file: ./Script/Rocky.Pre.${{ matrix.arch }}.Dockerfile
+          platforms: linux/${{ matrix.arch }}
           push: true
           tags: tlcfem/suanpan-env:latest
   ide-image-cuda:
