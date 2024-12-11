@@ -1,4 +1,4 @@
-FROM arm64v8/rockylinux:9 AS build
+FROM --platform=arm64 rockylinux:9 AS build
 
 RUN dnf install -y epel-release && crb enable
 RUN dnf install -y gcc g++ gfortran cmake wget git hdf5-devel
