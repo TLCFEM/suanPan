@@ -33,7 +33,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Script/Rocky.${{ matrix.arch }}.Dockerfile
+          file: ./Script/${{ matrix.arch }}/Rocky.Dockerfile
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: |
