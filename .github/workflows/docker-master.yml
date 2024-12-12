@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Script/Rocky.amd64.Dockerfile
+          file: ./Script/amd64/Rocky.Dockerfile
           push: true
           tags: |
             tlcfem/suanpan:stable

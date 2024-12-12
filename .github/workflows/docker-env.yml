@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 240
     strategy:
       matrix:
-        arch: [ amd64 ]
+        arch: [ amd64, arm64 ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -30,7 +30,22 @@ jobs:
           file: ./Script/${{ matrix.arch }}/Rocky.Pre.Dockerfile
           platforms: linux/${{ matrix.arch }}
           push: true
-          tags: tlcfem/suanpan-env:latest
+          tags: tlcfem/suanpan-env:latest-${{ matrix.arch }}
+  ide-image-combine:
+    needs: ide-image-base
+    runs-on: self-hosted
+    steps:
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Combine
+        run: |
+          docker manifest create tlcfem/suanpan-env:latest --amend tlcfem/suanpan-env:latest-amd64 tlcfem/suanpan-env:latest-arm64
+          docker manifest push tlcfem/suanpan-env:latest
   ide-image-cuda:
     runs-on: self-hosted
     timeout-minutes: 240
@@ -48,6 +63,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Script/Rocky.Pre.CUDA.Dockerfile
+          file: ./Script/amd64/Rocky.Pre.CUDA.Dockerfile
           push: true
           tags: tlcfem/suanpan-env-cuda:latest
