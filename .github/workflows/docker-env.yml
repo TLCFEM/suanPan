@@ -6,7 +6,7 @@ on:
 jobs:
   ide-image-base:
     runs-on: self-hosted
-    timeout-minutes: 600
+    timeout-minutes: 6000
     strategy:
       matrix:
         arch: [ amd64, arm64 ]
