@@ -8,7 +8,7 @@ RUN cd suanPan && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -D
 FROM rockylinux:9 AS runtime
 
 RUN dnf install -y epel-release && crb enable
-RUN dnf install -y libgomp hdf5
+RUN dnf install -y libgomp hdf5 libX11
 
 COPY --from=build /tbb-build /tbb-build
 
