@@ -13,6 +13,7 @@
 2. update `Catch2` to version `3.7.1`
 3. add `Subloading1D` material [#219](https://github.com/TLCFEM/suanPan/pull/219)
 4. add `SubloadingMetal` material [#221](https://github.com/TLCFEM/suanPan/pull/221)
+5. add `arm64` build
 
 ## version 3.5
 

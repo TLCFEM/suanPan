@@ -66,6 +66,10 @@ The highlights of **suanPan** are
   containers, smart pointers, and many others.
 - **suanPan** supports simple visualization supported by [VTK](https://vtk.org/).
 
+> [!IMPORTANT]
+> Both `amd64` and `arm64` architectures are supported.
+> Check details on [Docker Hub](https://hub.docker.com/r/tlcfem/suanpan).
+
 ## Quick Start
 
 Execute the application out-of-the-box in terminal on Linux using one of the following commands depending on how the
