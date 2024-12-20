@@ -23,7 +23,7 @@ const mat NonlinearDruckerPrager::unit_x_unit = tensor::unit_tensor2 * tensor::u
 
 NonlinearDruckerPrager::NonlinearDruckerPrager(const unsigned T, const double E, const double V, const double ETAY, const double ETAF, const double XI, const double R)
     : DataNonlinearDruckerPrager{E, V, ETAY, ETAF, XI}
-    , Material3D(T, R) {}
+    , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int NonlinearDruckerPrager::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -69,7 +69,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
         const auto error = fabs(incre_gamma);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance) && counter > 5u)) break;
         plastic_strain = current_history(0) + xi * (gamma += incre_gamma);
     }
 
