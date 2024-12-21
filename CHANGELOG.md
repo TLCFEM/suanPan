@@ -14,6 +14,9 @@
 3. add `Subloading1D` material [#219](https://github.com/TLCFEM/suanPan/pull/219)
 4. add `SubloadingMetal` material [#221](https://github.com/TLCFEM/suanPan/pull/221)
 5. add `arm64` build
+6. update `Armadillo` to version `14.2.2`
+7. update `VTK` to version `9.4.0`
+8. update `HDF5` to version `1.14.5`
 
 ## version 3.5
 
