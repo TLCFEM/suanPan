@@ -58,7 +58,10 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>&, vtkInfo);
 
 #else
 
-inline int vtk_parser(const shared_ptr<DomainBase>&, istringstream&) { return 0; }
+inline int vtk_parser(const shared_ptr<DomainBase>&, istringstream&) {
+    suanpan_warning("Visualisation related functionalities are not available as the current build is not compiled with the VTK support.\n");
+    return 0;
+}
 
 #endif
 
