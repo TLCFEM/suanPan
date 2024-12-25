@@ -56,7 +56,8 @@ html {
         overflow: visible;
     }
 
-    #nav-tree, #side-nav {
+    #nav-tree,
+    #side-nav {
         height: calc(100vh - var(--top-height)) !important;
     }
 
