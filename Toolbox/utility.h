@@ -126,6 +126,8 @@ bool is_equal(int, char);
 bool is_equal(const string&, const char*);
 bool is_equal(const char*, const string&);
 bool is_equal(const string&, const string&);
+bool is_equal(std::string_view, const char*);
+bool is_equal(const char*, std::string_view);
 
 bool if_contain(const string&, const char*);
 bool if_contain(const string&, const string&);

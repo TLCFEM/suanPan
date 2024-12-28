@@ -112,6 +112,10 @@ bool is_equal(const char* A, const string& B) { return is_equal(A, B.c_str()); }
 
 bool is_equal(const string& A, const string& B) { return is_equal(A.c_str(), B.c_str()); }
 
+bool is_equal(const std::string_view A, const char* B) { return is_equal(A.data(), B); }
+
+bool is_equal(const char* A, const std::string_view B) { return is_equal(A, B.data()); }
+
 bool if_contain(const string& A, const char* B) { return A.find(B) != string::npos; }
 
 bool if_contain(const string& A, const string& B) { return A.find(B) != string::npos; }
