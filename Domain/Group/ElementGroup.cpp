@@ -29,7 +29,3 @@ void ElementGroup::initialize(const shared_ptr<DomainBase>& D) {
     pool.set_size(e_pool.size());
     for(uword I = 0; I < pool.n_elem; ++I) pool(I) = e_pool[I]->get_tag();
 }
-
-void ElementGroup::print() {
-    suanpan_info("An element group.\n");
-}

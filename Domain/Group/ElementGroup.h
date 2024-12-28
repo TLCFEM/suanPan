@@ -38,8 +38,6 @@ public:
     ElementGroup(unsigned, uvec&&);
 
     void initialize(const shared_ptr<DomainBase>&) override;
-
-    void print() override;
 };
 
 #endif
