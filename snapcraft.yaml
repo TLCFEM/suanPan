@@ -58,8 +58,8 @@ parts:
       - freeglut3-dev
       - libglvnd-dev
     override-build: |
-      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.0-linux.tar.gz
-      tar xf VTK-9.4.0-linux.tar.gz
+      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-linux.tar.gz
+      tar xf VTK-9.4.1-linux.tar.gz
       wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/246ea40e-5aa7-42a4-81fa-0c029dc8650f/intel-onemkl-2025.0.1.16_offline.sh
       sh ./intel-onemkl-2025.0.1.16_offline.sh -a --silent --eula accept
       craftctl default
