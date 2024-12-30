@@ -1931,7 +1931,7 @@ vec ustsection(const std::string_view type) {
     return {};
 }
 
-vec ushssection(const std::string_view type) {
+vec usrhssection(const std::string_view type) {
     if(is_equal(type, "HSS34X10X1")) return {8.605, 32.600, 0.930};
     if(is_equal(type, "HSS34X10X7/8")) return {8.780, 32.800, 0.814};
     if(is_equal(type, "HSS34X10X3/4")) return {8.955, 32.950, 0.698};
@@ -2460,6 +2460,199 @@ vec ushssection(const std::string_view type) {
     return {};
 }
 
+vec uschssection(const std::string_view type) {
+    if(is_equal(type, "HSS28.000X1.000")) return {14.000, 0.930};
+    if(is_equal(type, "HSS28.000X0.875")) return {14.000, 0.814};
+    if(is_equal(type, "HSS28.000X0.750")) return {14.000, 0.698};
+    if(is_equal(type, "HSS28.000X0.625")) return {14.000, 0.581};
+    if(is_equal(type, "HSS28.000X0.500")) return {14.000, 0.465};
+    if(is_equal(type, "HSS28.000X0.375")) return {14.000, 0.349};
+    if(is_equal(type, "HSS26.000X0.750")) return {13.000, 0.698};
+    if(is_equal(type, "HSS26.000X0.625")) return {13.000, 0.581};
+    if(is_equal(type, "HSS26.000X0.500")) return {13.000, 0.465};
+    if(is_equal(type, "HSS26.000X0.375")) return {13.000, 0.349};
+    if(is_equal(type, "HSS26.000X0.313")) return {13.000, 0.291};
+    if(is_equal(type, "HSS24.000X1.000")) return {12.000, 0.930};
+    if(is_equal(type, "HSS24.000X0.875")) return {12.000, 0.814};
+    if(is_equal(type, "HSS24.000X0.750")) return {12.000, 0.698};
+    if(is_equal(type, "HSS24.000X0.625")) return {12.000, 0.581};
+    if(is_equal(type, "HSS24.000X0.500")) return {12.000, 0.465};
+    if(is_equal(type, "HSS24.000X0.375")) return {12.000, 0.349};
+    if(is_equal(type, "HSS24.000X0.313")) return {12.000, 0.291};
+    if(is_equal(type, "HSS22.000X0.750")) return {11.000, 0.698};
+    if(is_equal(type, "HSS22.000X0.625")) return {11.000, 0.581};
+    if(is_equal(type, "HSS22.000X0.500")) return {11.000, 0.465};
+    if(is_equal(type, "HSS22.000X0.375")) return {11.000, 0.349};
+    if(is_equal(type, "HSS22.000X0.313")) return {11.000, 0.291};
+    if(is_equal(type, "HSS20.000X1.000")) return {10.000, 0.930};
+    if(is_equal(type, "HSS20.000X0.875")) return {10.000, 0.814};
+    if(is_equal(type, "HSS20.000X0.750")) return {10.000, 0.698};
+    if(is_equal(type, "HSS20.000X0.625")) return {10.000, 0.581};
+    if(is_equal(type, "HSS20.000X0.500")) return {10.000, 0.465};
+    if(is_equal(type, "HSS20.000X0.375")) return {10.000, 0.349};
+    if(is_equal(type, "HSS20.000X0.313")) return {10.000, 0.291};
+    if(is_equal(type, "HSS20.000X0.250")) return {10.000, 0.233};
+    if(is_equal(type, "HSS18.000X1.000")) return {9.000, 0.930};
+    if(is_equal(type, "HSS18.000X0.875")) return {9.000, 0.814};
+    if(is_equal(type, "HSS18.000X0.750")) return {9.000, 0.698};
+    if(is_equal(type, "HSS18.000X0.625")) return {9.000, 0.581};
+    if(is_equal(type, "HSS18.000X0.500")) return {9.000, 0.465};
+    if(is_equal(type, "HSS18.000X0.375")) return {9.000, 0.349};
+    if(is_equal(type, "HSS18.000X0.313")) return {9.000, 0.291};
+    if(is_equal(type, "HSS18.000X0.250")) return {9.000, 0.233};
+    if(is_equal(type, "HSS16.000X1.000")) return {8.000, 0.930};
+    if(is_equal(type, "HSS16.000X0.875")) return {8.000, 0.814};
+    if(is_equal(type, "HSS16.000X0.750")) return {8.000, 0.698};
+    if(is_equal(type, "HSS16.000X0.625")) return {8.000, 0.581};
+    if(is_equal(type, "HSS16.000X0.500")) return {8.000, 0.465};
+    if(is_equal(type, "HSS16.000X0.438")) return {8.000, 0.407};
+    if(is_equal(type, "HSS16.000X0.375")) return {8.000, 0.349};
+    if(is_equal(type, "HSS16.000X0.312")) return {8.000, 0.291};
+    if(is_equal(type, "HSS16.000X0.250")) return {8.000, 0.233};
+    if(is_equal(type, "HSS14.000X1.000")) return {7.000, 0.930};
+    if(is_equal(type, "HSS14.000X0.875")) return {7.000, 0.814};
+    if(is_equal(type, "HSS14.000X0.750")) return {7.000, 0.698};
+    if(is_equal(type, "HSS14.000X0.625")) return {7.000, 0.581};
+    if(is_equal(type, "HSS14.000X0.500")) return {7.000, 0.465};
+    if(is_equal(type, "HSS14.000X0.375")) return {7.000, 0.349};
+    if(is_equal(type, "HSS14.000X0.312")) return {7.000, 0.291};
+    if(is_equal(type, "HSS14.000X0.250")) return {7.000, 0.233};
+    if(is_equal(type, "HSS14.000X0.188")) return {7.000, 0.174};
+    if(is_equal(type, "HSS13.375X0.625")) return {6.700, 0.581};
+    if(is_equal(type, "HSS13.375X0.500")) return {6.700, 0.465};
+    if(is_equal(type, "HSS13.375X0.375")) return {6.700, 0.349};
+    if(is_equal(type, "HSS13.375X0.313")) return {6.700, 0.291};
+    if(is_equal(type, "HSS13.375X0.250")) return {6.700, 0.233};
+    if(is_equal(type, "HSS13.375X0.188")) return {6.700, 0.174};
+    if(is_equal(type, "HSS12.750X0.750")) return {6.400, 0.698};
+    if(is_equal(type, "HSS12.750X0.625")) return {6.400, 0.581};
+    if(is_equal(type, "HSS12.750X0.500")) return {6.400, 0.465};
+    if(is_equal(type, "HSS12.750X0.375")) return {6.400, 0.349};
+    if(is_equal(type, "HSS12.750X0.250")) return {6.400, 0.233};
+    if(is_equal(type, "HSS12.750X0.188")) return {6.400, 0.174};
+    if(is_equal(type, "HSS12.000X0.625")) return {6.000, 0.581};
+    if(is_equal(type, "HSS12.000X0.500")) return {6.000, 0.465};
+    if(is_equal(type, "HSS12.000X0.375")) return {6.000, 0.349};
+    if(is_equal(type, "HSS12.000X0.250")) return {6.000, 0.233};
+    if(is_equal(type, "HSS11.750X0.625")) return {5.900, 0.581};
+    if(is_equal(type, "HSS11.750X0.500")) return {5.900, 0.465};
+    if(is_equal(type, "HSS11.750X0.375")) return {5.900, 0.349};
+    if(is_equal(type, "HSS11.750X0.337")) return {5.900, 0.313};
+    if(is_equal(type, "HSS11.750X0.250")) return {5.900, 0.233};
+    if(is_equal(type, "HSS10.750X0.625")) return {5.400, 0.581};
+    if(is_equal(type, "HSS10.750X0.500")) return {5.400, 0.465};
+    if(is_equal(type, "HSS10.750X0.375")) return {5.400, 0.349};
+    if(is_equal(type, "HSS10.750X0.313")) return {5.400, 0.291};
+    if(is_equal(type, "HSS10.750X0.250")) return {5.400, 0.233};
+    if(is_equal(type, "HSS10.750X0.188")) return {5.400, 0.174};
+    if(is_equal(type, "HSS10.000X0.625")) return {5.000, 0.581};
+    if(is_equal(type, "HSS10.000X0.500")) return {5.000, 0.465};
+    if(is_equal(type, "HSS10.000X0.375")) return {5.000, 0.349};
+    if(is_equal(type, "HSS10.000X0.312")) return {5.000, 0.291};
+    if(is_equal(type, "HSS10.000X0.250")) return {5.000, 0.233};
+    if(is_equal(type, "HSS10.000X0.188")) return {5.000, 0.174};
+    if(is_equal(type, "HSS9.625X0.625")) return {4.815, 0.581};
+    if(is_equal(type, "HSS9.625X0.500")) return {4.815, 0.465};
+    if(is_equal(type, "HSS9.625X0.375")) return {4.815, 0.349};
+    if(is_equal(type, "HSS9.625X0.312")) return {4.815, 0.291};
+    if(is_equal(type, "HSS9.625X0.250")) return {4.815, 0.233};
+    if(is_equal(type, "HSS9.625X0.188")) return {4.815, 0.174};
+    if(is_equal(type, "HSS8.625X0.625")) return {4.315, 0.581};
+    if(is_equal(type, "HSS8.625X0.500")) return {4.315, 0.465};
+    if(is_equal(type, "HSS8.625X0.375")) return {4.315, 0.349};
+    if(is_equal(type, "HSS8.625X0.322")) return {4.315, 0.300};
+    if(is_equal(type, "HSS8.625X0.250")) return {4.315, 0.233};
+    if(is_equal(type, "HSS8.625X0.188")) return {4.315, 0.174};
+    if(is_equal(type, "HSS7.500X0.500")) return {3.750, 0.465};
+    if(is_equal(type, "HSS7.500X0.375")) return {3.750, 0.349};
+    if(is_equal(type, "HSS7.500X0.312")) return {3.750, 0.291};
+    if(is_equal(type, "HSS7.500X0.250")) return {3.750, 0.233};
+    if(is_equal(type, "HSS7.500X0.188")) return {3.750, 0.174};
+    if(is_equal(type, "HSS7.000X0.500")) return {3.500, 0.465};
+    if(is_equal(type, "HSS7.000X0.375")) return {3.500, 0.349};
+    if(is_equal(type, "HSS7.000X0.312")) return {3.500, 0.291};
+    if(is_equal(type, "HSS7.000X0.250")) return {3.500, 0.233};
+    if(is_equal(type, "HSS7.000X0.188")) return {3.500, 0.174};
+    if(is_equal(type, "HSS7.000X0.125")) return {3.500, 0.116};
+    if(is_equal(type, "HSS6.875X0.375")) return {3.440, 0.349};
+    if(is_equal(type, "HSS6.875X0.312")) return {3.440, 0.291};
+    if(is_equal(type, "HSS6.875X0.250")) return {3.440, 0.233};
+    if(is_equal(type, "HSS6.875X0.188")) return {3.440, 0.174};
+    if(is_equal(type, "HSS6.625X0.500")) return {3.315, 0.465};
+    if(is_equal(type, "HSS6.625X0.432")) return {3.315, 0.402};
+    if(is_equal(type, "HSS6.625X0.375")) return {3.315, 0.349};
+    if(is_equal(type, "HSS6.625X0.312")) return {3.315, 0.291};
+    if(is_equal(type, "HSS6.625X0.280")) return {3.315, 0.260};
+    if(is_equal(type, "HSS6.625X0.250")) return {3.315, 0.233};
+    if(is_equal(type, "HSS6.625X0.188")) return {3.315, 0.174};
+    if(is_equal(type, "HSS6.625X0.125")) return {3.315, 0.116};
+    if(is_equal(type, "HSS6.000X0.500")) return {3.000, 0.465};
+    if(is_equal(type, "HSS6.000X0.375")) return {3.000, 0.349};
+    if(is_equal(type, "HSS6.000X0.312")) return {3.000, 0.291};
+    if(is_equal(type, "HSS6.000X0.280")) return {3.000, 0.260};
+    if(is_equal(type, "HSS6.000X0.250")) return {3.000, 0.233};
+    if(is_equal(type, "HSS6.000X0.188")) return {3.000, 0.174};
+    if(is_equal(type, "HSS6.000X0.125")) return {3.000, 0.116};
+    if(is_equal(type, "HSS5.563X0.500")) return {2.780, 0.465};
+    if(is_equal(type, "HSS5.563X0.375")) return {2.780, 0.349};
+    if(is_equal(type, "HSS5.563X0.258")) return {2.780, 0.240};
+    if(is_equal(type, "HSS5.563X0.188")) return {2.780, 0.174};
+    if(is_equal(type, "HSS5.563X0.134")) return {2.780, 0.124};
+    if(is_equal(type, "HSS5.500X0.500")) return {2.750, 0.465};
+    if(is_equal(type, "HSS5.500X0.375")) return {2.750, 0.349};
+    if(is_equal(type, "HSS5.500X0.258")) return {2.750, 0.240};
+    if(is_equal(type, "HSS5.000X0.500")) return {2.500, 0.465};
+    if(is_equal(type, "HSS5.000X0.375")) return {2.500, 0.349};
+    if(is_equal(type, "HSS5.000X0.312")) return {2.500, 0.291};
+    if(is_equal(type, "HSS5.000X0.258")) return {2.500, 0.240};
+    if(is_equal(type, "HSS5.000X0.250")) return {2.500, 0.233};
+    if(is_equal(type, "HSS5.000X0.188")) return {2.500, 0.174};
+    if(is_equal(type, "HSS5.000X0.125")) return {2.500, 0.116};
+    if(is_equal(type, "HSS4.500X0.375")) return {2.250, 0.349};
+    if(is_equal(type, "HSS4.500X0.337")) return {2.250, 0.313};
+    if(is_equal(type, "HSS4.500X0.237")) return {2.250, 0.220};
+    if(is_equal(type, "HSS4.500X0.188")) return {2.250, 0.174};
+    if(is_equal(type, "HSS4.500X0.125")) return {2.250, 0.116};
+    if(is_equal(type, "HSS4.000X0.313")) return {2.000, 0.291};
+    if(is_equal(type, "HSS4.000X0.250")) return {2.000, 0.233};
+    if(is_equal(type, "HSS4.000X0.237")) return {2.000, 0.220};
+    if(is_equal(type, "HSS4.000X0.226")) return {2.000, 0.210};
+    if(is_equal(type, "HSS4.000X0.220")) return {2.000, 0.205};
+    if(is_equal(type, "HSS4.000X0.188")) return {2.000, 0.174};
+    if(is_equal(type, "HSS4.000X0.125")) return {2.000, 0.116};
+    if(is_equal(type, "HSS3.500X0.313")) return {1.750, 0.291};
+    if(is_equal(type, "HSS3.500X0.300")) return {1.750, 0.279};
+    if(is_equal(type, "HSS3.500X0.250")) return {1.750, 0.233};
+    if(is_equal(type, "HSS3.500X0.216")) return {1.750, 0.201};
+    if(is_equal(type, "HSS3.500X0.203")) return {1.750, 0.189};
+    if(is_equal(type, "HSS3.500X0.188")) return {1.750, 0.174};
+    if(is_equal(type, "HSS3.500X0.125")) return {1.750, 0.116};
+    if(is_equal(type, "HSS3.000X0.250")) return {1.500, 0.233};
+    if(is_equal(type, "HSS3.000X0.216")) return {1.500, 0.201};
+    if(is_equal(type, "HSS3.000X0.203")) return {1.500, 0.189};
+    if(is_equal(type, "HSS3.000X0.188")) return {1.500, 0.174};
+    if(is_equal(type, "HSS3.000X0.152")) return {1.500, 0.141};
+    if(is_equal(type, "HSS3.000X0.134")) return {1.500, 0.124};
+    if(is_equal(type, "HSS3.000X0.125")) return {1.500, 0.116};
+    if(is_equal(type, "HSS2.875X0.250")) return {1.440, 0.233};
+    if(is_equal(type, "HSS2.875X0.203")) return {1.440, 0.189};
+    if(is_equal(type, "HSS2.875X0.188")) return {1.440, 0.174};
+    if(is_equal(type, "HSS2.875X0.125")) return {1.440, 0.116};
+    if(is_equal(type, "HSS2.500X0.250")) return {1.250, 0.233};
+    if(is_equal(type, "HSS2.500X0.188")) return {1.250, 0.174};
+    if(is_equal(type, "HSS2.500X0.125")) return {1.250, 0.116};
+    if(is_equal(type, "HSS2.375X0.250")) return {1.190, 0.233};
+    if(is_equal(type, "HSS2.375X0.218")) return {1.190, 0.203};
+    if(is_equal(type, "HSS2.375X0.188")) return {1.190, 0.174};
+    if(is_equal(type, "HSS2.375X0.154")) return {1.190, 0.143};
+    if(is_equal(type, "HSS2.375X0.125")) return {1.190, 0.116};
+    if(is_equal(type, "HSS1.900X0.188")) return {0.950, 0.174};
+    if(is_equal(type, "HSS1.900X0.145")) return {0.950, 0.135};
+    if(is_equal(type, "HSS1.900X0.120")) return {0.950, 0.111};
+    if(is_equal(type, "HSS1.660X0.140")) return {0.830, 0.130};
+    return {};
+}
+
 void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
     string type;
     if(!get_input(command, type)) {
@@ -2607,7 +2800,6 @@ void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = nzchsection(type);
 
     if(!dim.is_empty()) {
-        dim[0] -= .5 * dim[1]; // account for centroid
         return_obj = make_unique<CircularHollow2D>(tag, scale * dim, material_id, int_pt, eccentricity);
         return;
     }
@@ -2686,7 +2878,6 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = nzchsection(type);
 
     if(!dim.is_empty()) {
-        dim[0] -= .5 * dim[1]; // account for centroid
         return_obj = make_unique<CircularHollow3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
         return;
     }
@@ -2756,10 +2947,17 @@ void new_us2d(unique_ptr<Section>& return_obj, istringstream& command, const boo
         return;
     }
 
-    dim = ushssection(type);
+    dim = usrhssection(type);
 
     if(!dim.is_empty()) {
         return_obj = make_unique<Box2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+        return;
+    }
+
+    dim = uschssection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<CircularHollow2D>(tag, scale * dim, material_id, int_pt, eccentricity);
         return;
     }
 
@@ -2824,10 +3022,17 @@ void new_us3d(unique_ptr<Section>& return_obj, istringstream& command, const boo
         return;
     }
 
-    dim = ushssection(type);
+    dim = usrhssection(type);
 
     if(!dim.is_empty()) {
         return_obj = make_unique<Box3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+        return;
+    }
+
+    dim = uschssection(type);
+
+    if(!dim.is_empty()) {
+        return_obj = make_unique<CircularHollow3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
         return;
     }
 
