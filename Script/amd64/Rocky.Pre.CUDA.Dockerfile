@@ -13,16 +13,15 @@ RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "repo_gpgcheck=1" >> /etc/yum.repos.d/oneAPI.repo && \
     echo "gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" >> /etc/yum.repos.d/oneAPI.repo
 
-RUN dnf install -y dnf-plugins-core
-RUN dnf config-manager --enable crb
-RUN dnf install -y libglvnd-devel gfortran rpm-build rpm-devel rpmdevtools cmake wget git ninja-build intel-oneapi-mkl-devel
+RUN dnf install -y dnf-plugins-core && \
+    dnf config-manager --enable crb && \
+    dnf install -y libglvnd-devel gfortran rpm-build rpm-devel rpmdevtools cmake wget git ninja-build intel-oneapi-mkl-devel procps sudo
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.4/VTK-9.4.1.tar.gz && tar xf VTK-9.4.1.tar.gz && \
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.4.1 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
-RUN dnf install -y procps
 RUN mkdir magma-build && cd magma-build && \
     wget -q https://icl.utk.edu/projectsfiles/magma/downloads/magma-2.8.0.tar.gz && tar xf magma-2.8.0.tar.gz && \
     source /opt/intel/oneapi/setvars.sh && cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGET="Turing Ampere Hopper" -DBUILD_SHARED_LIBS=OFF -DFORTRAN_CONVENTION="-DADD_" -DBLA_STATIC=ON -DBLA_VENDOR="Intel10_64lp" ./magma-2.8.0 && \
@@ -34,7 +33,6 @@ ARG USER_GID=$USER_UID
 
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && dnf install -y sudo \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
