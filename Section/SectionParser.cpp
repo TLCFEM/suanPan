@@ -1931,7 +1931,7 @@ vec ustsection(const std::string_view type) {
     return {};
 }
 
-vec ushsssection(const std::string_view type) {
+vec ushssection(const std::string_view type) {
     if(is_equal(type, "HSS34X10X1")) return {8.605, 32.600, 0.930};
     if(is_equal(type, "HSS34X10X7/8")) return {8.780, 32.800, 0.814};
     if(is_equal(type, "HSS34X10X3/4")) return {8.955, 32.950, 0.698};
@@ -2607,6 +2607,7 @@ void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = nzchsection(type);
 
     if(!dim.is_empty()) {
+        dim[0] -= .5 * dim[1]; // account for centroid
         return_obj = make_unique<CircularHollow2D>(tag, scale * dim, material_id, int_pt, eccentricity);
         return;
     }
@@ -2614,6 +2615,8 @@ void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = nzrhsection(type);
 
     if(!dim.is_empty()) {
+        dim[0] -= dim[2]; // account for centroid
+        dim[1] -= dim[2]; // account for centroid
         return_obj = make_unique<Box2D>(tag, scale * dim, material_id, int_pt, eccentricity);
         return;
     }
@@ -2621,6 +2624,8 @@ void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = nzshsection(type);
 
     if(!dim.is_empty()) {
+        dim[0] -= dim[2]; // account for centroid
+        dim[1] -= dim[2]; // account for centroid
         return_obj = make_unique<Box2D>(tag, scale * dim, material_id, int_pt, eccentricity);
         return;
     }
@@ -2681,6 +2686,7 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = nzchsection(type);
 
     if(!dim.is_empty()) {
+        dim[0] -= .5 * dim[1]; // account for centroid
         return_obj = make_unique<CircularHollow3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
         return;
     }
@@ -2688,6 +2694,8 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = nzrhsection(type);
 
     if(!dim.is_empty()) {
+        dim[0] -= dim[2]; // account for centroid
+        dim[1] -= dim[2]; // account for centroid
         return_obj = make_unique<Box3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
         return;
     }
@@ -2695,6 +2703,8 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
     dim = nzshsection(type);
 
     if(!dim.is_empty()) {
+        dim[0] -= dim[2]; // account for centroid
+        dim[1] -= dim[2]; // account for centroid
         return_obj = make_unique<Box3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
         return;
     }
@@ -2746,7 +2756,7 @@ void new_us2d(unique_ptr<Section>& return_obj, istringstream& command, const boo
         return;
     }
 
-    dim = ushsssection(type);
+    dim = ushssection(type);
 
     if(!dim.is_empty()) {
         return_obj = make_unique<Box2D>(tag, scale * dim, material_id, int_pt, eccentricity);
@@ -2814,7 +2824,7 @@ void new_us3d(unique_ptr<Section>& return_obj, istringstream& command, const boo
         return;
     }
 
-    dim = ushsssection(type);
+    dim = ushssection(type);
 
     if(!dim.is_empty()) {
         return_obj = make_unique<Box3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
