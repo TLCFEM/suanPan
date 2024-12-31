@@ -5480,1083 +5480,1083 @@
     },
     {
       "trigger": "HEA100",
-      "details": "EU 2D Section HEA100",
+      "details": "EU 2D section HEA100, accuracy: 0.94/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA100",
-      "details": "EU 3D Section HEA100",
+      "details": "EU 3D section HEA100, accuracy: 0.94/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA1000",
-      "details": "EU 2D Section HEA1000",
+      "details": "EU 2D section HEA1000, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEA1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA1000",
-      "details": "EU 3D Section HEA1000",
+      "details": "EU 3D section HEA1000, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA120",
-      "details": "EU 2D Section HEA120",
+      "details": "EU 2D section HEA120, accuracy: 0.95/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA120",
-      "details": "EU 3D Section HEA120",
+      "details": "EU 3D section HEA120, accuracy: 0.95/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA140",
-      "details": "EU 2D Section HEA140",
+      "details": "EU 2D section HEA140, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEA140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA140",
-      "details": "EU 3D Section HEA140",
+      "details": "EU 3D section HEA140, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA160",
-      "details": "EU 2D Section HEA160",
+      "details": "EU 2D section HEA160, accuracy: 0.95/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA160",
-      "details": "EU 3D Section HEA160",
+      "details": "EU 3D section HEA160, accuracy: 0.95/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA180",
-      "details": "EU 2D Section HEA180",
+      "details": "EU 2D section HEA180, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEA180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA180",
-      "details": "EU 3D Section HEA180",
+      "details": "EU 3D section HEA180, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA200",
-      "details": "EU 2D Section HEA200",
+      "details": "EU 2D section HEA200, accuracy: 0.95/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA200",
-      "details": "EU 3D Section HEA200",
+      "details": "EU 3D section HEA200, accuracy: 0.95/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA220",
-      "details": "EU 2D Section HEA220",
+      "details": "EU 2D section HEA220, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEA220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA220",
-      "details": "EU 3D Section HEA220",
+      "details": "EU 3D section HEA220, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA240",
-      "details": "EU 2D Section HEA240",
+      "details": "EU 2D section HEA240, accuracy: 0.95/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA240",
-      "details": "EU 3D Section HEA240",
+      "details": "EU 3D section HEA240, accuracy: 0.95/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA260",
-      "details": "EU 2D Section HEA260",
+      "details": "EU 2D section HEA260, accuracy: 0.94/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA260",
-      "details": "EU 3D Section HEA260",
+      "details": "EU 3D section HEA260, accuracy: 0.94/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA280",
-      "details": "EU 2D Section HEA280",
+      "details": "EU 2D section HEA280, accuracy: 0.95/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA280",
-      "details": "EU 3D Section HEA280",
+      "details": "EU 3D section HEA280, accuracy: 0.95/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA300",
-      "details": "EU 2D Section HEA300",
+      "details": "EU 2D section HEA300, accuracy: 0.94/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA300",
-      "details": "EU 3D Section HEA300",
+      "details": "EU 3D section HEA300, accuracy: 0.94/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA320",
-      "details": "EU 2D Section HEA320",
+      "details": "EU 2D section HEA320, accuracy: 0.95/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA320",
-      "details": "EU 3D Section HEA320",
+      "details": "EU 3D section HEA320, accuracy: 0.95/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA340",
-      "details": "EU 2D Section HEA340",
+      "details": "EU 2D section HEA340, accuracy: 0.95/0.95",
       "kind": "type",
-      "contents": "section EU2D HEA340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA340",
-      "details": "EU 3D Section HEA340",
+      "details": "EU 3D section HEA340, accuracy: 0.95/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA360",
-      "details": "EU 2D Section HEA360",
+      "details": "EU 2D section HEA360, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEA360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA360",
-      "details": "EU 3D Section HEA360",
+      "details": "EU 3D section HEA360, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA400",
-      "details": "EU 2D Section HEA400",
+      "details": "EU 2D section HEA400, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEA400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA400",
-      "details": "EU 3D Section HEA400",
+      "details": "EU 3D section HEA400, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA450",
-      "details": "EU 2D Section HEA450",
+      "details": "EU 2D section HEA450, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEA450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA450",
-      "details": "EU 3D Section HEA450",
+      "details": "EU 3D section HEA450, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA500",
-      "details": "EU 2D Section HEA500",
+      "details": "EU 2D section HEA500, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEA500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA500",
-      "details": "EU 3D Section HEA500",
+      "details": "EU 3D section HEA500, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA550",
-      "details": "EU 2D Section HEA550",
+      "details": "EU 2D section HEA550, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEA550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA550",
-      "details": "EU 3D Section HEA550",
+      "details": "EU 3D section HEA550, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA600",
-      "details": "EU 2D Section HEA600",
+      "details": "EU 2D section HEA600, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEA600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA600",
-      "details": "EU 3D Section HEA600",
+      "details": "EU 3D section HEA600, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA650",
-      "details": "EU 2D Section HEA650",
+      "details": "EU 2D section HEA650, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEA650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA650",
-      "details": "EU 3D Section HEA650",
+      "details": "EU 3D section HEA650, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA700",
-      "details": "EU 2D Section HEA700",
+      "details": "EU 2D section HEA700, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEA700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA700",
-      "details": "EU 3D Section HEA700",
+      "details": "EU 3D section HEA700, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA800",
-      "details": "EU 2D Section HEA800",
+      "details": "EU 2D section HEA800, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEA800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA800",
-      "details": "EU 3D Section HEA800",
+      "details": "EU 3D section HEA800, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEA900",
-      "details": "EU 2D Section HEA900",
+      "details": "EU 2D section HEA900, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEA900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEA900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEA900",
-      "details": "EU 3D Section HEA900",
+      "details": "EU 3D section HEA900, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEA900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEA900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB100",
-      "details": "EU 2D Section HEB100",
+      "details": "EU 2D section HEB100, accuracy: 0.95/0.96",
       "kind": "type",
-      "contents": "section EU2D HEB100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB100",
-      "details": "EU 3D Section HEB100",
+      "details": "EU 3D section HEB100, accuracy: 0.95/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB1000",
-      "details": "EU 2D Section HEB1000",
+      "details": "EU 2D section HEB1000, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB1000",
-      "details": "EU 3D Section HEB1000",
+      "details": "EU 3D section HEB1000, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB120",
-      "details": "EU 2D Section HEB120",
+      "details": "EU 2D section HEB120, accuracy: 0.96/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB120",
-      "details": "EU 3D Section HEB120",
+      "details": "EU 3D section HEB120, accuracy: 0.96/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB140",
-      "details": "EU 2D Section HEB140",
+      "details": "EU 2D section HEB140, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB140",
-      "details": "EU 3D Section HEB140",
+      "details": "EU 3D section HEB140, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB160",
-      "details": "EU 2D Section HEB160",
+      "details": "EU 2D section HEB160, accuracy: 0.96/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB160",
-      "details": "EU 3D Section HEB160",
+      "details": "EU 3D section HEB160, accuracy: 0.96/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB180",
-      "details": "EU 2D Section HEB180",
+      "details": "EU 2D section HEB180, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB180",
-      "details": "EU 3D Section HEB180",
+      "details": "EU 3D section HEB180, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB200",
-      "details": "EU 2D Section HEB200",
+      "details": "EU 2D section HEB200, accuracy: 0.96/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB200",
-      "details": "EU 3D Section HEB200",
+      "details": "EU 3D section HEB200, accuracy: 0.96/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB220",
-      "details": "EU 2D Section HEB220",
+      "details": "EU 2D section HEB220, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB220",
-      "details": "EU 3D Section HEB220",
+      "details": "EU 3D section HEB220, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB240",
-      "details": "EU 2D Section HEB240",
+      "details": "EU 2D section HEB240, accuracy: 0.96/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB240",
-      "details": "EU 3D Section HEB240",
+      "details": "EU 3D section HEB240, accuracy: 0.96/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB260",
-      "details": "EU 2D Section HEB260",
+      "details": "EU 2D section HEB260, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEB260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB260",
-      "details": "EU 3D Section HEB260",
+      "details": "EU 3D section HEB260, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB280",
-      "details": "EU 2D Section HEB280",
+      "details": "EU 2D section HEB280, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEB280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB280",
-      "details": "EU 3D Section HEB280",
+      "details": "EU 3D section HEB280, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB300",
-      "details": "EU 2D Section HEB300",
+      "details": "EU 2D section HEB300, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEB300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB300",
-      "details": "EU 3D Section HEB300",
+      "details": "EU 3D section HEB300, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB320",
-      "details": "EU 2D Section HEB320",
+      "details": "EU 2D section HEB320, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEB320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB320",
-      "details": "EU 3D Section HEB320",
+      "details": "EU 3D section HEB320, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB340",
-      "details": "EU 2D Section HEB340",
+      "details": "EU 2D section HEB340, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D HEB340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB340",
-      "details": "EU 3D Section HEB340",
+      "details": "EU 3D section HEB340, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB360",
-      "details": "EU 2D Section HEB360",
+      "details": "EU 2D section HEB360, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB360",
-      "details": "EU 3D Section HEB360",
+      "details": "EU 3D section HEB360, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB400",
-      "details": "EU 2D Section HEB400",
+      "details": "EU 2D section HEB400, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB400",
-      "details": "EU 3D Section HEB400",
+      "details": "EU 3D section HEB400, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB450",
-      "details": "EU 2D Section HEB450",
+      "details": "EU 2D section HEB450, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB450",
-      "details": "EU 3D Section HEB450",
+      "details": "EU 3D section HEB450, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB500",
-      "details": "EU 2D Section HEB500",
+      "details": "EU 2D section HEB500, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB500",
-      "details": "EU 3D Section HEB500",
+      "details": "EU 3D section HEB500, accuracy: 0.97/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB550",
-      "details": "EU 2D Section HEB550",
+      "details": "EU 2D section HEB550, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB550",
-      "details": "EU 3D Section HEB550",
+      "details": "EU 3D section HEB550, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB600",
-      "details": "EU 2D Section HEB600",
+      "details": "EU 2D section HEB600, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB600",
-      "details": "EU 3D Section HEB600",
+      "details": "EU 3D section HEB600, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB650",
-      "details": "EU 2D Section HEB650",
+      "details": "EU 2D section HEB650, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB650",
-      "details": "EU 3D Section HEB650",
+      "details": "EU 3D section HEB650, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB700",
-      "details": "EU 2D Section HEB700",
+      "details": "EU 2D section HEB700, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEB700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB700",
-      "details": "EU 3D Section HEB700",
+      "details": "EU 3D section HEB700, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB800",
-      "details": "EU 2D Section HEB800",
+      "details": "EU 2D section HEB800, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB800",
-      "details": "EU 3D Section HEB800",
+      "details": "EU 3D section HEB800, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEB900",
-      "details": "EU 2D Section HEB900",
+      "details": "EU 2D section HEB900, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEB900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEB900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEB900",
-      "details": "EU 3D Section HEB900",
+      "details": "EU 3D section HEB900, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D HEB900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEB900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM100",
-      "details": "EU 2D Section HEM100",
+      "details": "EU 2D section HEM100, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D HEM100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM100",
-      "details": "EU 3D Section HEM100",
+      "details": "EU 3D section HEM100, accuracy: 0.98/0.97/0.99",
       "kind": "type",
-      "contents": "section EU3D HEM100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM1000",
-      "details": "EU 2D Section HEM1000",
+      "details": "EU 2D section HEM1000, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM1000",
-      "details": "EU 3D Section HEM1000",
+      "details": "EU 3D section HEM1000, accuracy: 0.98/0.98/0.99",
       "kind": "type",
-      "contents": "section EU3D HEM1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM1000 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM120",
-      "details": "EU 2D Section HEM120",
+      "details": "EU 2D section HEM120, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM120",
-      "details": "EU 3D Section HEM120",
+      "details": "EU 3D section HEM120, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM140",
-      "details": "EU 2D Section HEM140",
+      "details": "EU 2D section HEM140, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM140",
-      "details": "EU 3D Section HEM140",
+      "details": "EU 3D section HEM140, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM160",
-      "details": "EU 2D Section HEM160",
+      "details": "EU 2D section HEM160, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM160",
-      "details": "EU 3D Section HEM160",
+      "details": "EU 3D section HEM160, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM180",
-      "details": "EU 2D Section HEM180",
+      "details": "EU 2D section HEM180, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM180",
-      "details": "EU 3D Section HEM180",
+      "details": "EU 3D section HEM180, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM200",
-      "details": "EU 2D Section HEM200",
+      "details": "EU 2D section HEM200, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM200",
-      "details": "EU 3D Section HEM200",
+      "details": "EU 3D section HEM200, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM220",
-      "details": "EU 2D Section HEM220",
+      "details": "EU 2D section HEM220, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM220",
-      "details": "EU 3D Section HEM220",
+      "details": "EU 3D section HEM220, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM240",
-      "details": "EU 2D Section HEM240",
+      "details": "EU 2D section HEM240, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM240",
-      "details": "EU 3D Section HEM240",
+      "details": "EU 3D section HEM240, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM260",
-      "details": "EU 2D Section HEM260",
+      "details": "EU 2D section HEM260, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM260",
-      "details": "EU 3D Section HEM260",
+      "details": "EU 3D section HEM260, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM260 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM280",
-      "details": "EU 2D Section HEM280",
+      "details": "EU 2D section HEM280, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM280",
-      "details": "EU 3D Section HEM280",
+      "details": "EU 3D section HEM280, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM280 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM300",
-      "details": "EU 2D Section HEM300",
+      "details": "EU 2D section HEM300, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM300",
-      "details": "EU 3D Section HEM300",
+      "details": "EU 3D section HEM300, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM320",
-      "details": "EU 2D Section HEM320",
+      "details": "EU 2D section HEM320, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM320",
-      "details": "EU 3D Section HEM320",
+      "details": "EU 3D section HEM320, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM320 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM340",
-      "details": "EU 2D Section HEM340",
+      "details": "EU 2D section HEM340, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM340",
-      "details": "EU 3D Section HEM340",
+      "details": "EU 3D section HEM340, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM340 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM360",
-      "details": "EU 2D Section HEM360",
+      "details": "EU 2D section HEM360, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM360",
-      "details": "EU 3D Section HEM360",
+      "details": "EU 3D section HEM360, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM400",
-      "details": "EU 2D Section HEM400",
+      "details": "EU 2D section HEM400, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM400",
-      "details": "EU 3D Section HEM400",
+      "details": "EU 3D section HEM400, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM450",
-      "details": "EU 2D Section HEM450",
+      "details": "EU 2D section HEM450, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM450",
-      "details": "EU 3D Section HEM450",
+      "details": "EU 3D section HEM450, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM500",
-      "details": "EU 2D Section HEM500",
+      "details": "EU 2D section HEM500, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM500",
-      "details": "EU 3D Section HEM500",
+      "details": "EU 3D section HEM500, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM550",
-      "details": "EU 2D Section HEM550",
+      "details": "EU 2D section HEM550, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM550",
-      "details": "EU 3D Section HEM550",
+      "details": "EU 3D section HEM550, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM600",
-      "details": "EU 2D Section HEM600",
+      "details": "EU 2D section HEM600, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM600",
-      "details": "EU 3D Section HEM600",
+      "details": "EU 3D section HEM600, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM650",
-      "details": "EU 2D Section HEM650",
+      "details": "EU 2D section HEM650, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM650",
-      "details": "EU 3D Section HEM650",
+      "details": "EU 3D section HEM650, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM650 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM700",
-      "details": "EU 2D Section HEM700",
+      "details": "EU 2D section HEM700, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM700",
-      "details": "EU 3D Section HEM700",
+      "details": "EU 3D section HEM700, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM700 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM800",
-      "details": "EU 2D Section HEM800",
+      "details": "EU 2D section HEM800, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM800",
-      "details": "EU 3D Section HEM800",
+      "details": "EU 3D section HEM800, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM800 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HEM900",
-      "details": "EU 2D Section HEM900",
+      "details": "EU 2D section HEM900, accuracy: 0.98/0.98",
       "kind": "type",
-      "contents": "section EU2D HEM900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D HEM900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "HEM900",
-      "details": "EU 3D Section HEM900",
+      "details": "EU 3D section HEM900, accuracy: 0.98/0.98/1.00",
       "kind": "type",
-      "contents": "section EU3D HEM900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D HEM900 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE100",
-      "details": "EU 2D Section IPE100",
+      "details": "EU 2D section IPE100, accuracy: 0.96/0.95",
       "kind": "type",
-      "contents": "section EU2D IPE100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE100",
-      "details": "EU 3D Section IPE100",
+      "details": "EU 3D section IPE100, accuracy: 0.96/0.95/0.99",
       "kind": "type",
-      "contents": "section EU3D IPE100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE100 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE120",
-      "details": "EU 2D Section IPE120",
+      "details": "EU 2D section IPE120, accuracy: 0.97/0.96",
       "kind": "type",
-      "contents": "section EU2D IPE120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE120",
-      "details": "EU 3D Section IPE120",
+      "details": "EU 3D section IPE120, accuracy: 0.97/0.96/0.99",
       "kind": "type",
-      "contents": "section EU3D IPE120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE120 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE140",
-      "details": "EU 2D Section IPE140",
+      "details": "EU 2D section IPE140, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D IPE140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE140",
-      "details": "EU 3D Section IPE140",
+      "details": "EU 3D section IPE140, accuracy: 0.98/0.97/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE140 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE160",
-      "details": "EU 2D Section IPE160",
+      "details": "EU 2D section IPE160, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D IPE160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE160",
-      "details": "EU 3D Section IPE160",
+      "details": "EU 3D section IPE160, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE160 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE180",
-      "details": "EU 2D Section IPE180",
+      "details": "EU 2D section IPE180, accuracy: 0.97/0.97",
       "kind": "type",
-      "contents": "section EU2D IPE180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE180",
-      "details": "EU 3D Section IPE180",
+      "details": "EU 3D section IPE180, accuracy: 0.97/0.97/0.99",
       "kind": "type",
-      "contents": "section EU3D IPE180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE180 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE200",
-      "details": "EU 2D Section IPE200",
+      "details": "EU 2D section IPE200, accuracy: 0.96/0.95",
       "kind": "type",
-      "contents": "section EU2D IPE200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE200",
-      "details": "EU 3D Section IPE200",
+      "details": "EU 3D section IPE200, accuracy: 0.96/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE200 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE220",
-      "details": "EU 2D Section IPE220",
+      "details": "EU 2D section IPE220, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D IPE220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE220",
-      "details": "EU 3D Section IPE220",
+      "details": "EU 3D section IPE220, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE220 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE240",
-      "details": "EU 2D Section IPE240",
+      "details": "EU 2D section IPE240, accuracy: 0.95/0.94",
       "kind": "type",
-      "contents": "section EU2D IPE240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE240",
-      "details": "EU 3D Section IPE240",
+      "details": "EU 3D section IPE240, accuracy: 0.95/0.94/0.99",
       "kind": "type",
-      "contents": "section EU3D IPE240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE240 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE270",
-      "details": "EU 2D Section IPE270",
+      "details": "EU 2D section IPE270, accuracy: 0.96/0.95",
       "kind": "type",
-      "contents": "section EU2D IPE270 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE270 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE270",
-      "details": "EU 3D Section IPE270",
+      "details": "EU 3D section IPE270, accuracy: 0.96/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE270 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE270 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE300",
-      "details": "EU 2D Section IPE300",
+      "details": "EU 2D section IPE300, accuracy: 0.96/0.96",
       "kind": "type",
-      "contents": "section EU2D IPE300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE300",
-      "details": "EU 3D Section IPE300",
+      "details": "EU 3D section IPE300, accuracy: 0.96/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE300 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE330",
-      "details": "EU 2D Section IPE330",
+      "details": "EU 2D section IPE330, accuracy: 0.96/0.95",
       "kind": "type",
-      "contents": "section EU2D IPE330 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE330 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE330",
-      "details": "EU 3D Section IPE330",
+      "details": "EU 3D section IPE330, accuracy: 0.96/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE330 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE330 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE360",
-      "details": "EU 2D Section IPE360",
+      "details": "EU 2D section IPE360, accuracy: 0.96/0.95",
       "kind": "type",
-      "contents": "section EU2D IPE360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE360",
-      "details": "EU 3D Section IPE360",
+      "details": "EU 3D section IPE360, accuracy: 0.96/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE360 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE400",
-      "details": "EU 2D Section IPE400",
+      "details": "EU 2D section IPE400, accuracy: 0.95/0.95",
       "kind": "type",
-      "contents": "section EU2D IPE400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE400",
-      "details": "EU 3D Section IPE400",
+      "details": "EU 3D section IPE400, accuracy: 0.95/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE400 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE450",
-      "details": "EU 2D Section IPE450",
+      "details": "EU 2D section IPE450, accuracy: 0.96/0.95",
       "kind": "type",
-      "contents": "section EU2D IPE450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE450",
-      "details": "EU 3D Section IPE450",
+      "details": "EU 3D section IPE450, accuracy: 0.96/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE450 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE500",
-      "details": "EU 2D Section IPE500",
+      "details": "EU 2D section IPE500, accuracy: 0.97/0.96",
       "kind": "type",
-      "contents": "section EU2D IPE500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE500",
-      "details": "EU 3D Section IPE500",
+      "details": "EU 3D section IPE500, accuracy: 0.97/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE500 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE550",
-      "details": "EU 2D Section IPE550",
+      "details": "EU 2D section IPE550, accuracy: 0.96/0.95",
       "kind": "type",
-      "contents": "section EU2D IPE550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE550",
-      "details": "EU 3D Section IPE550",
+      "details": "EU 3D section IPE550, accuracy: 0.96/0.95/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE550 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE600",
-      "details": "EU 2D Section IPE600",
+      "details": "EU 2D section IPE600, accuracy: 0.97/0.96",
       "kind": "type",
-      "contents": "section EU2D IPE600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE600",
-      "details": "EU 3D Section IPE600",
+      "details": "EU 3D section IPE600, accuracy: 0.97/0.96/1.00",
       "kind": "type",
-      "contents": "section EU3D IPE600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE600 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "IPE80",
-      "details": "EU 2D Section IPE80",
+      "details": "EU 2D section IPE80, accuracy: 0.98/0.97",
       "kind": "type",
-      "contents": "section EU2D IPE80 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
+      "contents": "section EU2D IPE80 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity, default: 0.0\n"
     },
     {
       "trigger": "IPE80",
-      "details": "EU 3D Section IPE80",
+      "details": "EU 3D section IPE80, accuracy: 0.98/0.97/0.99",
       "kind": "type",
-      "contents": "section EU3D IPE80 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material model tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
+      "contents": "section EU3D IPE80 ${1:(1)} ${2:(2)} ${3:[3]} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, material tag\n# [3] double, scale, default: 1.0\n# [4] int, number of integration points, default: 6\n# [5] double, eccentricity of y axis, default: 0.0\n# [6] double, eccentricity of z axis, default: 0.0\n"
     },
     {
       "trigger": "HP10X42",
