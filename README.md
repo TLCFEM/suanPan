@@ -302,7 +302,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**Armadillo**](http://arma.sourceforge.net/) version 14.2.2
 - [**ensmallen**](https://ensmallen.org/) version 2.21.1
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.0.1
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.7.1
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.8.0
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**whereami**](https://github.com/gpakosz/whereami)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
