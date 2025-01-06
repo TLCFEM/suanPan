@@ -5,8 +5,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.7.1
-//  Generated: 2024-09-17 10:36:45.608896
+//  Catch v3.8.0
+//  Generated: 2025-01-06 00:39:54.679994
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -259,7 +259,7 @@ namespace Catch {
                     double variance = std::accumulate(first, last, 0., [m](double a, double b) {
                         double diff = b - m;
                         return a + diff * diff;
-                    }) / (last - first);
+                    }) / static_cast<double>(last - first);
                     return std::sqrt(variance);
                 }
 
@@ -285,7 +285,7 @@ namespace Catch {
         namespace Detail {
             double weighted_average_quantile(int k, int q, double* first, double* last) {
                 auto count = last - first;
-                double idx = (count - 1) * k / static_cast<double>(q);
+                double idx = static_cast<double>((count - 1) * k) / static_cast<double>(q);
                 int j = static_cast<int>(idx);
                 double g = idx - j;
                 std::nth_element(first, first + j, last);
@@ -367,7 +367,7 @@ namespace Catch {
 
                 double accel = sum_cubes / (6 * std::pow(sum_squares, 1.5));
                 long n = static_cast<long>(resample.size());
-                double prob_n = std::count_if(resample.begin(), resample.end(), [point](double x) { return x < point; }) / static_cast<double>(n);
+                double prob_n = static_cast<double>(std::count_if(resample.begin(), resample.end(), [point](double x) { return x < point; })) / static_cast<double>(n);
                 // degenerate case with uniform samples
                 if(Catch::Detail::directCompare(prob_n, 0.)) { return {point, point, point, confidence_level}; }
 
@@ -1448,7 +1448,7 @@ namespace Catch {
 
     auto Timer::getElapsedMilliseconds() const -> unsigned int { return static_cast<unsigned int>(getElapsedMicroseconds() / 1000); }
 
-    auto Timer::getElapsedSeconds() const -> double { return getElapsedMicroseconds() / 1000000.0; }
+    auto Timer::getElapsedSeconds() const -> double { return static_cast<double>(getElapsedMicroseconds()) / 1000000.0; }
 } // namespace Catch
 
 #include <cmath>
@@ -1460,7 +1460,7 @@ namespace Catch {
             const int hexThreshold = 255;
 
             struct Endianness {
-                enum Arch {
+                enum Arch : uint8_t {
                     Big,
                     Little
                 };
@@ -1716,7 +1716,7 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
-        static Version version(3, 7, 1, "", 0);
+        static Version version(3, 8, 0, "", 0);
         return version;
     }
 } // namespace Catch
@@ -2512,7 +2512,7 @@ namespace Catch {
 
 #endif // Windows/ ANSI/ None
 
-#if defined(CATCH_PLATFORM_LINUX) || defined(CATCH_PLATFORM_MAC)
+#if defined(CATCH_PLATFORM_LINUX) || defined(CATCH_PLATFORM_MAC) || defined(__GLIBC__)
 #define CATCH_INTERNAL_HAS_ISATTY
 #include <unistd.h>
 #endif
@@ -3968,7 +3968,7 @@ namespace Catch {
     SimplePcg32::result_type SimplePcg32::operator()() {
         // prepare the output value
         const uint32_t xorshifted = static_cast<uint32_t>(((m_state >> 18u) ^ m_state) >> 27u);
-        const auto output = rotate_right(xorshifted, m_state >> 59u);
+        const auto output = rotate_right(xorshifted, static_cast<uint32_t>(m_state >> 59u));
 
         // advance state
         m_state = m_state * 6364136223846793005ULL + s_inc;
@@ -6947,7 +6947,7 @@ namespace Catch {
         struct OutputFlush {};
 
         class Duration {
-            enum class Unit {
+            enum class Unit : uint8_t {
                 Auto,
                 Nanoseconds,
                 Microseconds,
@@ -7013,7 +7013,7 @@ namespace Catch {
         };
     } // namespace
 
-    enum class Justification {
+    enum class Justification : uint8_t {
         Left,
         Right
     };
