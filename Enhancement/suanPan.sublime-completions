@@ -238,7 +238,7 @@
       "trigger": "BilinearDP",
       "details": "dp model with bilinear hardening function",
       "kind": "type",
-      "contents": "material BilinearDP ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, \\eta_y\n# (5) double, \\eta_f\n# (6) double, \\xi\n# (7) double, cohesion\n# (8) double, hardening ratio\n# [9] double, density, default: 0.0"
+      "contents": "material BilinearDP ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, \\eta_y\n# (5) double, \\eta_f\n# (6) double, \\xi\n# (7) double, initial cohesion\n# (8) double, hardening modulus\n# [9] double, density, default: 0.0"
     },
     {
       "trigger": "BilinearElastic1D",
