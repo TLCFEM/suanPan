@@ -17,7 +17,8 @@
 6. update `Armadillo` to version `14.2.2`
 7. update `VTK` to version `9.4.0`
 8. update `HDF5` to version `1.14.5`
-9. revise US section database
+9. update `OpenBLAS` to version `0.3.29`
+10. revise US section database
 
 ## version 3.5
 
