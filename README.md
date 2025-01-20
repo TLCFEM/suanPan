@@ -56,7 +56,7 @@ The highlights of **suanPan** are
 
 - **suanPan** is *fast*, both memory and thread safe.
 - **suanPan** is designed based on the [shared memory](https://en.wikipedia.org/wiki/Shared_memory) model and supports
-  parallelism on heterogeneous architectures, for example, multithreaded CPU + optional GPU. The parallelism is
+  parallelism on heterogeneous architectures, for example, multi-core CPU + optional GPU. The parallelism is
   available
   for both element state updating and global matrix assembling.
 - **suanPan** is open source and easy to be extended to incorporate user-defined elements, materials, etc.
