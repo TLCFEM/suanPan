@@ -3044,7 +3044,7 @@ void new_multisubloading1d(unique_ptr<Material>& return_obj, istringstream& comm
     return_obj = make_unique<Subloading1D>(tag, std::move(para), p(10));
 }
 
-void new_subloadingmetal(unique_ptr<Material>& return_obj, istringstream& command) {
+void new_subloading(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -3063,13 +3063,13 @@ void new_subloadingmetal(unique_ptr<Material>& return_obj, istringstream& comman
         return;
     }
 
-    DataSubloadingMetal para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), {p(11), 1.}, {p(12), std::min(1. - datum::eps, p(13))}};
+    DataSubloading para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), {p(11), 1.}, {p(12), std::min(1. - datum::eps, p(13))}};
     if(para.m_iso < 0. || para.m_kin < 0.) {
         suanpan_error("The evolution rate must be positive.\n");
         return;
     }
 
-    return_obj = make_unique<SubloadingMetal>(tag, std::move(para), density);
+    return_obj = make_unique<Subloading>(tag, std::move(para), density);
 }
 
 void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3646,7 +3646,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
     else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
     else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
-    else if(is_equal(material_id, "SubloadingMetal")) new_subloadingmetal(new_material, command);
+    else if(is_equal(material_id, "Subloading")) new_subloading(new_material, command);
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
     else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);

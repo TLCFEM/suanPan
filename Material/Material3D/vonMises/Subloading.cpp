@@ -15,24 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "SubloadingMetal.h"
+#include "Subloading.h"
+
 #include <Toolbox/tensor.h>
 
-const double SubloadingMetal::root_two_third = sqrt(two_third);
-const double SubloadingMetal::rate_bound = -log(z_bound);
-const mat SubloadingMetal::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
+const double Subloading::root_two_third = sqrt(two_third);
+const double Subloading::rate_bound = -log(z_bound);
+const mat Subloading::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-vec2 SubloadingMetal::yield_ratio(const double z) {
+vec2 Subloading::yield_ratio(const double z) {
     if(z < z_bound) return {rate_bound, 0.};
 
     return {-log(z), -1. / z};
 }
 
-SubloadingMetal::SubloadingMetal(const unsigned T, DataSubloadingMetal&& D, const double R)
-    : DataSubloadingMetal{std::move(D)}
+Subloading::Subloading(const unsigned T, DataSubloading&& D, const double R)
+    : DataSubloading{std::move(D)}
     , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
-int SubloadingMetal::initialize(const shared_ptr<DomainBase>&) {
+int Subloading::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic, poissons_ratio);
 
     initialize_history(15);
@@ -40,9 +41,9 @@ int SubloadingMetal::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> SubloadingMetal::get_copy() { return make_unique<SubloadingMetal>(*this); }
+unique_ptr<Material> Subloading::get_copy() { return make_unique<Subloading>(*this); }
 
-int SubloadingMetal::update_trial_status(const vec& t_strain) {
+int Subloading::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
@@ -192,7 +193,7 @@ int SubloadingMetal::update_trial_status(const vec& t_strain) {
     }
 }
 
-int SubloadingMetal::clear_status() {
+int Subloading::clear_status() {
     current_strain.zeros();
     current_stress.zeros();
     current_history = initial_history;
@@ -200,7 +201,7 @@ int SubloadingMetal::clear_status() {
     return reset_status();
 }
 
-int SubloadingMetal::commit_status() {
+int Subloading::commit_status() {
     current_strain = trial_strain;
     current_stress = trial_stress;
     current_history = trial_history;
@@ -208,7 +209,7 @@ int SubloadingMetal::commit_status() {
     return SUANPAN_SUCCESS;
 }
 
-int SubloadingMetal::reset_status() {
+int Subloading::reset_status() {
     trial_strain = current_strain;
     trial_stress = current_stress;
     trial_history = current_history;
@@ -216,6 +217,6 @@ int SubloadingMetal::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void SubloadingMetal::print() {
+void Subloading::print() {
     suanpan_info("A 3D combined hardening material using subloading surface model.\n");
 }

@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class SubloadingMetal
- * @brief A SubloadingMetal material class.
+ * @class Subloading
+ * @brief A Subloading material class.
  * @author tlc
  * @date 29/09/2024
  * @version 0.1.0
- * @file SubloadingMetal.h
+ * @file Subloading.h
  * @addtogroup Material-1D
  * @{
  */
 
-#ifndef SUBLOADINGMETAL_H
-#define SUBLOADINGMETAL_H
+#ifndef SUBLOADING_H
+#define SUBLOADING_H
 
 #include <Material/Material3D/Material3D.h>
 
-struct DataSubloadingMetal {
+struct DataSubloading {
     class Saturation {
         const double rate, bound;
 
@@ -62,7 +62,7 @@ struct DataSubloadingMetal {
     const Saturation c;
 };
 
-class SubloadingMetal final : protected DataSubloadingMetal, public Material3D {
+class Subloading final : protected DataSubloading, public Material3D {
     static constexpr unsigned max_iteration = 20u;
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
@@ -75,10 +75,10 @@ class SubloadingMetal final : protected DataSubloadingMetal, public Material3D {
     const double double_shear = elastic / (1. + poissons_ratio); // double shear modulus
 
 public:
-    SubloadingMetal(
-        unsigned,              // tag
-        DataSubloadingMetal&&, // data
-        double = 0.            // density
+    Subloading(
+        unsigned,         // tag
+        DataSubloading&&, // data
+        double = 0.       // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

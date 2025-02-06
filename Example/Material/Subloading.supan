@@ -1,4 +1,4 @@
-# A TEST MODEL FOR SUBLOADINGMETAL MATERIAL
+# A TEST MODEL FOR SUBLOADING MATERIAL
 
 node 1 5 -5 0
 node 2 5 5 0
@@ -13,7 +13,7 @@ node 10 5 5 20
 node 11 -5 5 20
 node 12 -5 -5 20
 
-material SubloadingMetal 1
+material Subloading 1
 
 element C3D8 1 1 2 3 4 5 6 7 8 1 G
 element C3D8 2 5 6 7 8 9 10 11 12 1 G

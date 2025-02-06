@@ -1588,7 +1588,7 @@
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\Subloading1D.cpp">
       <Filter>Material\Material1D\vonMises</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\vonMises\SubloadingMetal.cpp">
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\Subloading.cpp">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3043,7 +3043,7 @@
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\Subloading1D.h">
       <Filter>Material\Material1D\vonMises</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\vonMises\SubloadingMetal.h">
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\Subloading.h">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClInclude>
   </ItemGroup>

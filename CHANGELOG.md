@@ -12,7 +12,7 @@
 1. add `AFCO1D` material with strain memory [#217](https://github.com/TLCFEM/suanPan/pull/217)
 2. update `Catch2` to version `3.7.1`
 3. add `Subloading1D` material [#219](https://github.com/TLCFEM/suanPan/pull/219)
-4. add `SubloadingMetal` material [#221](https://github.com/TLCFEM/suanPan/pull/221)
+4. add `Subloading~~Metal~~` material [#221](https://github.com/TLCFEM/suanPan/pull/221)
 5. add `arm64` build
 6. update `Armadillo` to version `14.2.3`
 7. update `VTK` to version `9.4.0`
