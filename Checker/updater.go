@@ -80,9 +80,11 @@ func downloadLatestVersion(versionString string) error {
 
 	fmt.Printf("\nPlease note the following:\n")
 	fmt.Printf("  `mkl` uses oneMKL that has the best performance on Intel platforms.\n")
-	fmt.Printf("      Please use `mkl` version if possible.\n")
-	fmt.Printf("  `openblas` uses OpenBLAS that may show better performance on AMD platforms.\n")
-	fmt.Printf("      If performance degradation is spotted on your platform, consider switch to `openblas` version.\n")
+	fmt.Printf("      Please use `mkl` version on Intel platforms.\n")
+	fmt.Printf("  `aocl` uses AMD Optimizing CPU Libraries (AOCL) that has the best performance on AMD platforms.\n")
+	fmt.Printf("      Please use `aocl` version on AMD platforms.\n")
+	fmt.Printf("  `openblas` uses OpenBLAS that is general but does not have the best performance.\n")
+	fmt.Printf("      Always prefer `mkl` and `aocl` versions if they are available.\n")
 	fmt.Printf("  `vtk` uses VTK for visualisation.\n")
 	fmt.Printf("      Visualisation may be useful when it comes to post-processing, but it requires OpenGL support. Please make sure the corresponding packages are installed.\n")
 	fmt.Printf("  `no-avx` disables AVX2.\n")
@@ -108,6 +110,10 @@ func downloadLatestVersion(versionString string) error {
 			"suanPan-linux-mkl-vtk-no-avx.tar.gz",
 			"suanPan-linux-mkl-vtk.tar.gz",
 			"suanPan-linux-mkl.tar.gz",
+			"suanPan-linux-aocl-no-avx.tar.gz",
+			"suanPan-linux-aocl-vtk-no-avx.tar.gz",
+			"suanPan-linux-aocl-vtk.tar.gz",
+			"suanPan-linux-aocl.tar.gz",
 			"suanPan-linux-openblas-no-avx.tar.gz",
 			"suanPan-linux-openblas-vtk-no-avx.tar.gz",
 			"suanPan-linux-openblas-vtk.tar.gz",
