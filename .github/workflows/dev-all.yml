@@ -21,6 +21,7 @@ jobs:
         avx: [ OFF ]
         vtk: [ ON, OFF ]
         mkl: [ OFF ]
+        aocl: [ ON, OFF ]
         exclude:
           - build: Debug
             mkl: ON
@@ -28,6 +29,10 @@ jobs:
             avx: ON
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
             mkl: OFF
+          - compiler: { c: icx, cpp: icpx, fortran: ifx }
+            aocl: ON
+          - mkl: ON
+            aocl: ON
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -80,7 +85,7 @@ jobs:
           fi
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DTEST_COVERAGE=${{ env.COVERAGE }} -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=$MT -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=${{ env.IOMP }} -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DTEST_COVERAGE=${{ env.COVERAGE }} -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=$MT -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=${{ env.IOMP }} -DUSE_AOCL=${{ matrix.aocl }} -DCMAKE_INSTALL_PREFIX=dist ..
           make install -j"$(nproc)" && make package
       - name: Pack
         run: |
@@ -106,6 +111,8 @@ jobs:
           fi
           if [ "${{ matrix.mkl }}" == "ON" ]; then
             file_name+="-mkl"
+          elif [ "${{ matrix.aocl }}" == "ON" ]; then
+            file_name+="-aocl"
           else
             file_name+="-openblas"
           fi
