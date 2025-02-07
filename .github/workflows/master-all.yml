@@ -16,6 +16,10 @@ jobs:
         avx: [ ON, OFF ]
         vtk: [ ON, OFF ]
         mkl: [ ON, OFF ]
+        aocl: [ ON, OFF ]
+        exclude:
+          - mkl: ON
+            aocl: ON
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -44,7 +48,7 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=ON -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=ON -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=dist -DUSE_AOCL=${{ matrix.aocl }} ..
           make install -j"$(nproc)" && make package
       - name: Pack
         run: |
@@ -52,6 +56,8 @@ jobs:
           file_name="suanPan-linux"
           if [ "${{ matrix.mkl }}" == "ON" ]; then
             file_name+="-mkl"
+          elif [ "${{ matrix.aocl }}" == "ON" ]; then
+            file_name+="-aocl"
           else
             file_name+="-openblas"
           fi
