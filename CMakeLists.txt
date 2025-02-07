@@ -194,7 +194,8 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
         if (LINK_DYNAMIC_MKL)
             set(DSUFIX "_dll")
         endif ()
-        set(MKL_LIBS mkl_intel_lp64${DSUFIX} mkl_tbb_thread${DSUFIX} mkl_core${DSUFIX} libiomp5md libifcore svml_disp)
+        # set(MKL_LIBS mkl_intel_lp64${DSUFIX} mkl_tbb_thread${DSUFIX} mkl_core${DSUFIX} libiomp5md libifcore svml_disp)
+        set(MKL_LIBS mkl_intel_lp64${DSUFIX} mkl_intel_thread${DSUFIX} mkl_core${DSUFIX} libiomp5md libifcore svml_disp)
         target_link_libraries(${PROJECT_NAME} ${MKL_LIBS})
         if (USE_MPI)
             if (USE_INTEL_MPI)
@@ -339,18 +340,21 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
             )
             install(FILES ${MKL_FILES} DESTINATION bin)
             if (BUILD_MULTITHREAD)
+                # file(GLOB MKL_FILES
+                #         ${MKLROOT}/redist/intel64/mkl_tbb_thread.*
+                #         ${MKLROOT}/bin/mkl_tbb_thread.*
+                # )
                 file(GLOB MKL_FILES
-                        ${MKLROOT}/redist/intel64/mkl_tbb_thread.*
-                        ${MKLROOT}/bin/mkl_tbb_thread.*
+                        ${MKLROOT}/redist/intel64/mkl_intel_thread.*
+                        ${MKLROOT}/bin/mkl_intel_thread.*
                 )
-                install(FILES ${MKL_FILES} DESTINATION bin)
             else ()
                 file(GLOB MKL_FILES
                         ${MKLROOT}/redist/intel64/mkl_intel_thread.*
                         ${MKLROOT}/bin/mkl_intel_thread.*
                 )
-                install(FILES ${MKL_FILES} DESTINATION bin)
             endif ()
+            install(FILES ${MKL_FILES} DESTINATION bin)
         endif ()
         if (USE_INTEL_OPENMP)
             find_file(libifcoremd libifcoremd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)

@@ -18,7 +18,7 @@
 7. update `VTK` to version `9.4.0`
 8. update `HDF5` to version `1.14.5`
 9. update `OpenBLAS` to version `0.3.29`
-10. revise US section database
+10. revise US and EU section database
 11. add support of `AMD Optimizing CPU Libraries (AOCL)` on linux
 
 ## version 3.5
