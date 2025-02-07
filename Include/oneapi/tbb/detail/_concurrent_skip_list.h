@@ -952,12 +952,12 @@ private:
         array_type prev_nodes;
         array_type curr_nodes;
         size_type new_height = new_node->height();
-        auto comparator = select_comparator(std::integral_constant<bool, allow_multimapping>{});
+        auto compare = select_comparator(std::integral_constant<bool, allow_multimapping>{});
 
         node_ptr head_node = create_head_if_necessary();
 
         for (;;) {
-            fill_prev_curr_arrays(prev_nodes, curr_nodes, new_node, get_key(new_node), comparator, head_node);
+            fill_prev_curr_arrays(prev_nodes, curr_nodes, new_node, get_key(new_node), compare, head_node);
 
             node_ptr prev = prev_nodes[0];
             node_ptr next = curr_nodes[0];
@@ -1001,7 +1001,7 @@ private:
                     }
 
                     for (size_type lev = level; lev != new_height; ++lev ) {
-                        curr_nodes[lev] = internal_find_position(lev, prev_nodes[lev], new_node, comparator);
+                        curr_nodes[lev] = internal_find_position(lev, prev_nodes[lev], new_node, compare);
                     }
                 }
             }

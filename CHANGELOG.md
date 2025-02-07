@@ -20,6 +20,7 @@
 9. update `OpenBLAS` to version `0.3.29`
 10. revise US and EU section database
 11. add support of `AMD Optimizing CPU Libraries (AOCL)` on linux
+12. update `TBB` to version `2022.0.0`
 
 ## version 3.5
 

@@ -292,7 +292,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.12.0
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.0.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
 - [**MUMPS**](https://mumps-solver.org/) version 5.7.3
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
