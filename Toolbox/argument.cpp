@@ -322,11 +322,15 @@ void print_version() {
     );
     suanpan_info("    The source code of suanPan is hosted on GitHub. https://github.com/TLCFEM/suanPan/\n");
     suanpan_info("    The documentation is hosted on GitHub. https://tlcfem.github.io/suanPan-manual/latest/\n");
+    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with {}. http://arma.sourceforge.net/\n", arma_version::as_string(),
 #ifdef SUANPAN_MKL
-    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with Intel MKL. http://arma.sourceforge.net/\n", arma_version::as_string());
+                 "Intel oneAPI Math Kernel Library (MKL)"
+#elif defined(SUANPAN_AOCL)
+                 "AMD Optimizing CPU Libraries (AOCL)"
 #else
-    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with OpenBLAS. http://arma.sourceforge.net/\n", arma_version::as_string());
+                 "OpenBLAS"
 #endif
+    );
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA ({}). https://developer.nvidia.com/about-cuda/\n", CUDA_VERSION);
 #endif

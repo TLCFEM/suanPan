@@ -43,6 +43,7 @@ if (USE_AOCL)
     set(AOCL_BLIS_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libblis-mt.a" CACHE FILEPATH "AOCL libblis path.")
     set(AOCL_FLAME_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libflame.a" CACHE FILEPATH "AOCL libflame path.")
     set(AOCL_UTILS_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libaoclutils.a" CACHE FILEPATH "AOCL libaoclutils path.")
+    add_compile_definitions(SUANPAN_AOCL)
 endif ()
 
 set(COMPILER_IDENTIFIER "unknown")
