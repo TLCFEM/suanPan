@@ -51,6 +51,10 @@ def check_version(_major: int, _minor: int, _patch: int):
             "suanPan-linux-aocl-vtk-no-avx.tar.gz",
             "suanPan-linux-aocl-vtk.tar.gz",
             "suanPan-linux-aocl.tar.gz",
+            "suanPan-linux-openblas-no-avx.tar.gz",
+            "suanPan-linux-openblas-vtk-no-avx.tar.gz",
+            "suanPan-linux-openblas-vtk.tar.gz",
+            "suanPan-linux-openblas.tar.gz",
         ]
     elif sys.platform.startswith('darwin'):
         version_list = [
