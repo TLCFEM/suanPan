@@ -127,11 +127,11 @@ mumps_io_sys_error(MUMPS_INT mumps_errno, const char* desc)
     if( len >= mumps_err_max_len - 1 ) { /* then do not print sys error msg at all */
       len -= 2;
       len = (len >= mumps_err_max_len ) ? mumps_err_max_len - 1 : len;
-      _err = strdup( _desc );
+      _err = _strdup( _desc );
       _err[len] = '\0';
       sprintf(mumps_err, "%s", _err);
     } else {
-      _err = strdup(strerror(errno));
+      _err = _strdup(strerror(errno));
       _err_len = (MUMPS_INT) strlen(_err);
       /* We will use sprintf, so make space for the final '\0' ! */
       if((len + _err_len) >= mumps_err_max_len) {

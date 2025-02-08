@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
         data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
     }
 
-    data->SetName(to_category(config.type));
+    data->SetName(to_category(config.type).c_str());
     data->SetComponentName(0, "1");
     data->SetComponentName(1, "2");
     data->SetComponentName(2, "3");
@@ -179,12 +179,12 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
 
     if(config.store_ptr) {
         grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type));
+        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
         config.grid_ptr = grid;
     }
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type));
+        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
         domain->insert(make_unique<std::future<void>>(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config))));
     }
     else {
@@ -220,7 +220,7 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
         data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
     }
 
-    data->SetName(to_category(config.type));
+    data->SetName(to_category(config.type).c_str());
     data->SetComponentName(0, "1");
     data->SetComponentName(1, "2");
     data->SetComponentName(2, "3");
@@ -252,12 +252,12 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
 
     if(config.store_ptr) {
         grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type));
+        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
         config.grid_ptr = grid;
     }
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type));
+        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
         domain->insert(make_unique<std::future<void>>(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config))));
     }
     else {

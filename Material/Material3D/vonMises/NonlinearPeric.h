@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,6 @@ class NonlinearPeric : protected DataNonlinearPeric, public Material3D {
     static constexpr unsigned max_iteration = 20u;
     static const double root_three_two;
     static const mat unit_dev_tensor;
-    static const double unit_time;
 
     const double shear_modulus = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus
     const double double_shear = 2. * shear_modulus;                            // double shear modulus

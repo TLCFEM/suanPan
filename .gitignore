@@ -49,6 +49,7 @@ $RECYCLE.BIN/
 venv
 .venv
 .cache
+.dirty
 
 # Windows shortcuts
 *.lnk

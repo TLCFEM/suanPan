@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,6 +87,7 @@ namespace tensor {
         vec to_voigt(const mat&);
         double norm(const vec&);
         double norm(vec&&);
+        double double_contraction(const vec&);
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
     } // namespace strain
@@ -95,6 +96,7 @@ namespace tensor {
         vec to_voigt(const mat&);
         double norm(const vec&);
         double norm(vec&&);
+        double double_contraction(const vec&);
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
     } // namespace stress

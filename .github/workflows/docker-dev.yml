@@ -1,0 +1,82 @@
+name: Docker Latest
+on:
+  push:
+    branches: [ dev ]
+jobs:
+  linux-amd64:
+    if: ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    runs-on: self-hosted
+    timeout-minutes: 60
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Login Docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Script/amd64/Rocky.Dockerfile
+          provenance: false
+          push: true
+          tags: |
+            tlcfem/suanpan:amd64
+            ghcr.io/tlcfem/suanpan:latest
+  linux-arm64:
+    if: ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    runs-on: self-hosted
+    timeout-minutes: 600
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Login Docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Script/arm64/Rocky.Dockerfile
+          platforms: linux/arm64
+          provenance: false
+          push: true
+          tags: |
+            tlcfem/suanpan:arm64
+  linux-combine:
+    needs: [ linux-amd64, linux-arm64 ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login Docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Combine
+        run: |
+          docker manifest create tlcfem/suanpan:latest --amend tlcfem/suanpan:amd64 tlcfem/suanpan:arm64
+          docker manifest push tlcfem/suanpan:latest

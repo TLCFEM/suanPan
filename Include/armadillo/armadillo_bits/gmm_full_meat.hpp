@@ -937,7 +937,7 @@ gmm_full<eT>::init_constants(const bool calc_chol)
           Mat<eT>& inv_fcov =  inv_fcovs.slice(g);
     
   //const bool inv_ok = auxlib::inv(tmp_inv, fcov);
-    const bool inv_ok = auxlib::inv_sympd(tmp_inv, fcov);
+    const bool inv_ok = auxlib::inv_sympd(tmp_inv, fcov);  // using inv_sympd() instead of inv() to ensure we can do cholesky decomp via op_chol
     
     eT log_det_val  = eT(0);
     eT log_det_sign = eT(0);
@@ -1087,7 +1087,7 @@ gmm_full<eT>::internal_scalar_log_p(const eT* x) const
       {
       const eT log_val = internal_scalar_log_p(x, g) + log_hefts_mem[g];
       
-      log_sum = log_add_exp(log_sum, log_val);
+      log_sum = priv::internal_log_add_exp(log_sum, log_val);
       }
     
     return log_sum;
@@ -2618,7 +2618,7 @@ gmm_full<eT>::em_generate_acc
     
     for(uword g=1; g < N_gaus; ++g)
       {
-      log_lhood_sum = log_add_exp(log_lhood_sum, gaus_log_lhoods_mem[g]);
+      log_lhood_sum = priv::internal_log_add_exp(log_lhood_sum, gaus_log_lhoods_mem[g]);
       }
     
     progress_log_lhood += log_lhood_sum;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,9 +52,11 @@ int Nonviscous01::update_trial_status(const vec&, const vec& t_strain_rate) {
 
     if(fabs(incre_strain_rate(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    const cx_vec t_para = 2. + *incre_time * s;
+    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
+
+    const cx_vec t_para = 2. + incre_t * s;
     s_para = (4. - t_para) / t_para;
-    m_para = *incre_time * m / t_para;
+    m_para = incre_t * m / t_para;
     accu_para = accu(m_para).real();
 
     trial_stress = real(dot(complex_damping, s_para) + accu_para * (current_strain_rate + trial_strain_rate));

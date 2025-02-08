@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -379,6 +379,8 @@ double tensor::strain::norm(vec&& in) {
     throw invalid_argument("need a valid strain vector");
 }
 
+double tensor::strain::double_contraction(const vec& a) { return double_contraction(a, a); }
+
 double tensor::strain::double_contraction(const vec& a, const vec& b) { return dot(a % b, norm_weight); }
 
 double tensor::strain::double_contraction(vec&& a, vec&& b) { return dot(a % b, norm_weight); }
@@ -448,6 +450,8 @@ double tensor::stress::norm(vec&& in) {
     if(in.n_elem == 3) return arma::norm(in);
     throw invalid_argument("need a valid stress vector");
 }
+
+double tensor::stress::double_contraction(const vec& a) { return double_contraction(a, a); }
 
 double tensor::stress::double_contraction(const vec& a, const vec& b) { return dot(a % b, norm_weight); }
 

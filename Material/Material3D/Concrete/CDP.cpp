@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 
 #include "CDP.h"
 
-podarray<double> CDP::compute_tension_backbone(const double kappa) const {
-    podarray<double> out(6);
+vec6 CDP::compute_tension_backbone(const double kappa) const {
+    vec6 out;
 
     const auto s_phi = sqrt(1. + a_t * (a_t + 2.) * kappa);
     const auto t_phi = (1. + .5 * a_t) / s_phi;
@@ -35,8 +35,8 @@ podarray<double> CDP::compute_tension_backbone(const double kappa) const {
     return out;
 }
 
-podarray<double> CDP::compute_compression_backbone(const double kappa) const {
-    podarray<double> out(6);
+vec6 CDP::compute_compression_backbone(const double kappa) const {
+    vec6 out;
 
     const auto s_phi = sqrt(1. + a_c * (a_c + 2.) * kappa);
     const auto t_phi = (1. + .5 * a_c) / s_phi;

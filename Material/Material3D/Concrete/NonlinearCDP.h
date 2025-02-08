@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,10 +63,10 @@ class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
     const double pfplambda = -3. * alpha * three_alpha_p_bulk - root_three_two * double_shear;
     const double one_minus_alpha = 1. - alpha;
 
-    const vec unit_alpha_p{alpha_p, alpha_p, alpha_p, 0., 0., 0.};
+    const vec6 unit_alpha_p{alpha_p, alpha_p, alpha_p, 0., 0., 0.};
 
-    static double compute_r(const vec&);
-    static vec compute_dr(const vec&);
+    static double compute_r(const vec3&);
+    static vec3 compute_dr(const vec3&);
 
     [[nodiscard]] inline double compute_s(double) const;
 
@@ -83,7 +83,7 @@ class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
      *
      * \return d f \bar{f} \md{d} \md{f} \md{\bar{f}}
      */
-    [[nodiscard]] virtual podarray<double> compute_tension_backbone(double) const = 0;
+    [[nodiscard]] virtual vec6 compute_tension_backbone(double) const = 0;
 
     /**
      * \brief compute compression backbone
@@ -98,7 +98,7 @@ class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
      *
      * \return d f \bar{f} \md{d} \md{f} \md{\bar{f}}
      */
-    [[nodiscard]] virtual podarray<double> compute_compression_backbone(double) const = 0;
+    [[nodiscard]] virtual vec6 compute_compression_backbone(double) const = 0;
 
 public:
     NonlinearCDP(

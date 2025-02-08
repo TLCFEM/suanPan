@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,18 +68,9 @@ class VAFCRP final : protected DataVAFCRP, public Material3D {
 
 public:
     VAFCRP(
-        unsigned,   // tag
-        double,     // elastic modulus
-        double,     // poissons ratio
-        double,     // yield stress
-        double,     // saturated stress
-        double,     // linear hardening modulus
-        double,     // m
-        double,     // mu
-        double,     // epsilon
-        vec&&,      // a
-        vec&&,      // b
-        double = 0. // density
+        unsigned,     // tag
+        DataVAFCRP&&, // material data
+        double = 0.   // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

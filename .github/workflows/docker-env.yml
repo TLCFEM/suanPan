@@ -1,0 +1,69 @@
+name: Docker Base Image
+on:
+  schedule:
+    - cron: '0 5 2 * *'
+  workflow_dispatch:
+jobs:
+  ide-image-base:
+    runs-on: self-hosted
+    timeout-minutes: 6000
+    strategy:
+      matrix:
+        arch: [ amd64, arm64 ]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: QEMU
+        if: ${{ matrix.arch == 'arm64' }}
+        uses: docker/setup-qemu-action@v3
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Base ${{ matrix.arch }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Script/${{ matrix.arch }}/Rocky.Pre.Dockerfile
+          platforms: linux/${{ matrix.arch }}
+          provenance: false
+          push: true
+          tags: tlcfem/suanpan-env:${{ matrix.arch }}
+  ide-image-combine:
+    needs: ide-image-base
+    runs-on: self-hosted
+    steps:
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Combine
+        run: |
+          docker manifest create tlcfem/suanpan-env:latest --amend tlcfem/suanpan-env:amd64 tlcfem/suanpan-env:arm64
+          docker manifest push tlcfem/suanpan-env:latest
+  ide-image-cuda:
+    runs-on: self-hosted
+    timeout-minutes: 240
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: CUDA
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Script/amd64/Rocky.Pre.CUDA.Dockerfile
+          push: true
+          tags: tlcfem/suanpan-env-cuda:latest

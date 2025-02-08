@@ -4,7 +4,7 @@ node 1 0 0
 node 2 1 0
 node 3 2 0
 
-material VAFCRP1D 1 2E2 .1 .1 0. 10. 1. 10. 50. 500. 100. 600.
+material VAFCRP1D 1 2E2 .1 0. .1 10. 1. 10. 50. 500. 100. 600.
 
 element T2D2 1 1 2 1 100
 element T2D2 2 2 3 1 100
@@ -36,6 +36,8 @@ analyze
 # Resistance:
 #  -4.9064e+01  0.0000e+00
 peek node 3
+
+peek element 1
 
 reset
 clear

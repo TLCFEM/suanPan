@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
         const auto error = fabs(incre_gamma);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance) && counter > 5u)) break;
         plastic_strain = current_history(0) + xi * (gamma += incre_gamma);
     }
 
@@ -103,7 +103,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
             const auto error = fabs(incre_gamma);
             if(1u == counter) ref_error = error;
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
+            if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance) && counter > 5u)) break;
             plastic_strain = current_history(0) + xi / eta_yield * (gamma -= incre_gamma);
         }
 

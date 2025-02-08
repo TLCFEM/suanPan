@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ namespace suanpan {
 
     template<typename T> T sign(const T& I) { return (I > T(0)) - (I < T(0)); }
 
-    template<typename T> std::enable_if_t<!std::numeric_limits<T>::is_integer, bool> approx_equal(T x, T y, int ulp = 2) { return fabs(x - y) <= std::numeric_limits<T>::epsilon() * fabs(x + y) * ulp || fabs(x - y) < std::numeric_limits<T>::min(); }
+    template<typename T> bool approx_equal(T x, T y, int ulp = 2) requires (!std::numeric_limits<T>::is_integer) { return fabs(x - y) <= std::numeric_limits<T>::epsilon() * fabs(x + y) * ulp || fabs(x - y) < std::numeric_limits<T>::min(); }
 
     unsigned long long binomial(unsigned long long, unsigned long long);
 
@@ -72,7 +72,7 @@ namespace suanpan {
     string to_lower(string&&);
 
     namespace expression {
-        std::vector<std::pair<string, unsigned>> split(const std::string_view& variable_string);
+        std::vector<std::pair<string, unsigned>> split(std::string_view variable_string);
     } // namespace expression 
 }     // namespace suanpan
 
@@ -126,6 +126,8 @@ bool is_equal(int, char);
 bool is_equal(const string&, const char*);
 bool is_equal(const char*, const string&);
 bool is_equal(const string&, const string&);
+bool is_equal(std::string_view, const char*);
+bool is_equal(const char*, std::string_view);
 
 bool if_contain(const string&, const char*);
 bool if_contain(const string&, const string&);

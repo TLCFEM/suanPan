@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@
 class TableCDP final : public NonlinearCDP {
     mat t_table, c_table, dt_table, dc_table;
 
-    [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
-    [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
+    [[nodiscard]] vec6 compute_tension_backbone(double) const override;
+    [[nodiscard]] vec6 compute_compression_backbone(double) const override;
 
 public:
     TableCDP(

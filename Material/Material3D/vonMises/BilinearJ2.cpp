@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "BilinearJ2.h"
-#include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
 constexpr double BilinearJ2::two_third = 2. / 3.;

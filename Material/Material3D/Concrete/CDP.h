@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,8 +51,8 @@ class CDP final : public NonlinearCDP {
     const double a_t, cb_t, f_t;
     const double a_c, cb_c, f_c;
 
-    [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
-    [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
+    [[nodiscard]] vec6 compute_tension_backbone(double) const override;
+    [[nodiscard]] vec6 compute_compression_backbone(double) const override;
 
 public:
     explicit CDP(

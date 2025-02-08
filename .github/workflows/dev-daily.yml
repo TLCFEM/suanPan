@@ -1,0 +1,52 @@
+name: Daily
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+env:
+  SP_TIME: ''
+  ARTIFACT: ''
+jobs:
+  linux-daily:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        build: [ Debug ]
+        compiler: [ { c: gcc, cpp: g++, fortran: gfortran } ]
+        avx: [ OFF ]
+        vtk: [ OFF ]
+        mkl: [ OFF ]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Golang
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+      - name: Dependency
+        run: |
+          echo "SP_TIME=-$(date +''%y%m%d'')" >> $GITHUB_ENV
+          sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils
+      - name: Compile
+        run: |
+          go build Checker/updater.go
+          mkdir build && cd build
+          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=OFF -DCMAKE_INSTALL_PREFIX=dist ..
+          make install -j"$(nproc)" && make package
+      - name: Pack
+        run: |
+          cp updater build/dist/bin
+          file_name="suanPan-linux-debug-gcc-no-avx-openblas"
+          file_name+="${{ env.SP_TIME }}.tar.gz"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          tar czf $file_name -C build/dist .
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.ARTIFACT }}
+      - name: Test
+        run: |
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
+          ./build/dist/bin/suanPan -v

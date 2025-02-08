@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ string suanpan::to_lower(string&& U) {
     return std::move(U);
 }
 
-std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::string_view& variable_string) {
+std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::string_view variable_string) {
     std::vector<std::string> variable_list;
     auto I = variable_string.cbegin(), J = variable_string.cbegin();
     while(I != variable_string.cend()) {
@@ -111,6 +111,10 @@ bool is_equal(const string& A, const char* B) { return is_equal(A.c_str(), B); }
 bool is_equal(const char* A, const string& B) { return is_equal(A, B.c_str()); }
 
 bool is_equal(const string& A, const string& B) { return is_equal(A.c_str(), B.c_str()); }
+
+bool is_equal(const std::string_view A, const char* B) { return is_equal(A.data(), B); }
+
+bool is_equal(const char* A, const std::string_view B) { return is_equal(A, B.data()); }
 
 bool if_contain(const string& A, const char* B) { return A.find(B) != string::npos; }
 

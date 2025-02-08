@@ -3448,7 +3448,7 @@ Cube<eT>::at_alt(const uword i) const
 
 
 
-//! linear element accessor (treats the cube as a vector); bounds checking not done when ARMA_NO_DEBUG is defined
+//! linear element accessor (treats the cube as a vector); bounds checking not done when ARMA_DONT_CHECK_CONFORMANCE is defined
 template<typename eT>
 arma_inline
 eT&
@@ -3461,7 +3461,7 @@ Cube<eT>::operator() (const uword i)
 
 
 
-//! linear element accessor (treats the cube as a vector); bounds checking not done when ARMA_NO_DEBUG is defined
+//! linear element accessor (treats the cube as a vector); bounds checking not done when ARMA_DONT_CHECK_CONFORMANCE is defined
 template<typename eT>
 arma_inline
 const eT&
@@ -3517,7 +3517,7 @@ Cube<eT>::at(const uword i) const
 
 
 
-//! element accessor; bounds checking not done when ARMA_NO_DEBUG is defined
+//! element accessor; bounds checking not done when ARMA_DONT_CHECK_CONFORMANCE is defined
 template<typename eT>
 arma_inline
 eT&
@@ -3537,7 +3537,7 @@ Cube<eT>::operator() (const uword in_row, const uword in_col, const uword in_sli
 
 
 
-//! element accessor; bounds checking not done when ARMA_NO_DEBUG is defined
+//! element accessor; bounds checking not done when ARMA_DONT_CHECK_CONFORMANCE is defined
 template<typename eT>
 arma_inline
 const eT&
@@ -5412,10 +5412,10 @@ Cube<eT>::fixed<fixed_n_rows, fixed_n_cols, fixed_n_slices>::fixed(const fill::f
   
   mem_setup();
   
-  if(is_same_type<fill_type, fill::fill_zeros>::yes)  { (*this).zeros(); }
-  if(is_same_type<fill_type, fill::fill_ones >::yes)  { (*this).ones();  }
-  if(is_same_type<fill_type, fill::fill_randu>::yes)  { (*this).randu(); }
-  if(is_same_type<fill_type, fill::fill_randn>::yes)  { (*this).randn(); }
+  if(is_same_type<fill_type, fill::fill_zeros>::yes)  { Cube<eT>::zeros(); }
+  if(is_same_type<fill_type, fill::fill_ones >::yes)  { Cube<eT>::ones();  }
+  if(is_same_type<fill_type, fill::fill_randu>::yes)  { Cube<eT>::randu(); }
+  if(is_same_type<fill_type, fill::fill_randn>::yes)  { Cube<eT>::randn(); }
   
   arma_static_check( (is_same_type<fill_type, fill::fill_eye>::yes), "Cube::fixed::fixed(): unsupported fill type" );
   }

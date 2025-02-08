@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,9 +41,12 @@
 struct DataArmstrongFrederick1D {
     const double elastic_modulus; // elastic modulus
     const double yield;           // yield stress
-    const double saturated;
-    const double hardening;
-    const double m;
+    const double hardening;       // linear isotropic hardening modulus
+    const double saturation;      // saturation stress
+    const double ms;              // saturation rate
+    const double memory;          // strain memory ratio
+    const double reduction;       // isotropic hardening reduction
+    const double mr;              // isotropic hardening reduction rate
     const vec a, b;
 };
 
@@ -54,15 +57,9 @@ class ArmstrongFrederick1D final : protected DataArmstrongFrederick1D, public Ma
 
 public:
     ArmstrongFrederick1D(
-        unsigned,   // tag
-        double,     // elastic modulus
-        double,     // yield stress
-        double,     // saturated stress
-        double,     // linear hardening modulus
-        double,     // m
-        vec&&,      // a
-        vec&&,      // b
-        double = 0. // density
+        unsigned,                   // tag
+        DataArmstrongFrederick1D&&, // material data
+        double = 0.                 // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

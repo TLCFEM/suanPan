@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,17 @@
 #include "VAFCRP.h"
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
 const double VAFCRP::root_three_two = sqrt(1.5);
 const mat VAFCRP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-VAFCRP::VAFCRP(const unsigned T, const double E, const double V, const double Y, const double S, const double H, const double M, const double MU, const double EP, vec&& A, vec&& B, const double R)
-    : DataVAFCRP{E, V, Y, S, H, M, MU, EP, std::move(A), std::move(B)}
+VAFCRP::VAFCRP(const unsigned T, DataVAFCRP&& D, const double R)
+    : DataVAFCRP(std::move(D))
     , Material3D(T, R) {}
 
 int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = &D->get_factory()->modify_incre_time();
+    if(nullptr != D) incre_time = &D->get_factory()->modify_incre_time();
 
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
 
@@ -56,6 +55,8 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
     // const auto residual = root_three_two * tensor::stress::norm(eta) - std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)));
 
     if(root_three_two * tensor::stress::norm(eta) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
+
+    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
 
     vec xi;
     auto gamma = 0., exp_gamma = 1.;
@@ -86,12 +87,12 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
         norm_xi = tensor::stress::norm(xi = trial_s - sum_a);
 
         const auto q = root_three_two * (norm_xi - root_six_shear * gamma - sum_b);
-        exp_gamma = pow(*incre_time / (*incre_time + mu * gamma), epsilon);
+        exp_gamma = pow(incre_t / (incre_t + mu * gamma), epsilon);
 
         sum_b = 0.;
         for(unsigned I = 0; I < size; ++I) sum_b += (b(I) / norm_xi * tensor::stress::double_contraction(xi, vec{&trial_history(1 + 6llu * I), 6, false, true}) - a(I)) * pow(1. + b(I) * gamma, -2.);
 
-        jacobian = exp_gamma * (root_three_two * sum_b - three_shear - q * epsilon * mu / (*incre_time + mu * gamma)) - dk;
+        jacobian = exp_gamma * (root_three_two * sum_b - three_shear - q * epsilon * mu / (incre_t + mu * gamma)) - dk;
 
         const auto residual = q * exp_gamma - k;
         const auto incre = residual / jacobian;

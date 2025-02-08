@@ -3,7 +3,6 @@
 #include "DuncanSelig.h"
 #include "Elastic/AxisymmetricElastic.h"
 #include "Elastic/Elastic2D.h"
-#include "Material2D.h"
 #include "Wrapper/Axisymmetric.h"
 #include "Wrapper/Laminated.h"
 #include "Wrapper/PlaneStrain.h"

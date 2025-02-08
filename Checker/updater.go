@@ -24,13 +24,7 @@ func main() {
 	if err != nil {
 		return
 	}
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			return
-		}
-	}(response.Body)
+	defer response.Body.Close()
 
 	html, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -86,9 +80,11 @@ func downloadLatestVersion(versionString string) error {
 
 	fmt.Printf("\nPlease note the following:\n")
 	fmt.Printf("  `mkl` uses oneMKL that has the best performance on Intel platforms.\n")
-	fmt.Printf("      Please use `mkl` version if possible.\n")
-	fmt.Printf("  `openblas` uses OpenBLAS that may show better performance on AMD platforms.\n")
-	fmt.Printf("      If performance degradation is spotted on your platform, consider switch to `openblas` version.\n")
+	fmt.Printf("      Please use `mkl` version on Intel platforms.\n")
+	fmt.Printf("  `aocl` uses AMD Optimizing CPU Libraries (AOCL) that has the best performance on AMD platforms.\n")
+	fmt.Printf("      Please use `aocl` version on AMD platforms.\n")
+	fmt.Printf("  `openblas` uses OpenBLAS that is general but does not have the best performance.\n")
+	fmt.Printf("      Always prefer `mkl` and `aocl` versions if they are available.\n")
 	fmt.Printf("  `vtk` uses VTK for visualisation.\n")
 	fmt.Printf("      Visualisation may be useful when it comes to post-processing, but it requires OpenGL support. Please make sure the corresponding packages are installed.\n")
 	fmt.Printf("  `no-avx` disables AVX2.\n")
@@ -114,6 +110,10 @@ func downloadLatestVersion(versionString string) error {
 			"suanPan-linux-mkl-vtk-no-avx.tar.gz",
 			"suanPan-linux-mkl-vtk.tar.gz",
 			"suanPan-linux-mkl.tar.gz",
+			"suanPan-linux-aocl-no-avx.tar.gz",
+			"suanPan-linux-aocl-vtk-no-avx.tar.gz",
+			"suanPan-linux-aocl-vtk.tar.gz",
+			"suanPan-linux-aocl.tar.gz",
 			"suanPan-linux-openblas-no-avx.tar.gz",
 			"suanPan-linux-openblas-vtk-no-avx.tar.gz",
 			"suanPan-linux-openblas-vtk.tar.gz",
@@ -155,23 +155,13 @@ func downloadLatestVersion(versionString string) error {
 	if err != nil {
 		return err
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			return
-		}
-	}(response.Body)
+	defer response.Body.Close()
 
 	storage, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
-	defer func(storage *os.File) {
-		err := storage.Close()
-		if err != nil {
-			return
-		}
-	}(storage)
+	defer storage.Close()
 
 	_, _ = io.Copy(storage, response.Body)
 
@@ -188,7 +178,7 @@ func downloadLatestVersion(versionString string) error {
 	isArchive = isArchive || strings.HasSuffix(absPath, "7z")
 
 	if isArchive {
-		fmt.Printf("You can manually extract the archive to overwrite the existing folder.")
+		fmt.Printf("You can manually extract the archive to overwrite the existing folder.\n")
 	}
 
 	return nil

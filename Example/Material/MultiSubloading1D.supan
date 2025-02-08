@@ -1,0 +1,13 @@
+material MultiSubloading1D 1 2E5 \
+200 10 50 10 \
+200 10 50 10 \
+8E2 0. \
+-back 10 .6 \
+-back 1E2 .3 \
+-back 5E2 .1 \
+-core 10 .3 \
+-core 1E2 .4
+
+materialTest1D 1 1E-4 100 200 200
+
+exit

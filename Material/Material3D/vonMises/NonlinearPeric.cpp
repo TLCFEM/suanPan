@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,14 +22,13 @@
 
 const double NonlinearPeric::root_three_two = sqrt(1.5);
 const mat NonlinearPeric::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
-constexpr double NonlinearPeric::unit_time = 1.;
 
 NonlinearPeric::NonlinearPeric(const unsigned T, const double E, const double V, const double MU, const double EPS, const double R)
     : DataNonlinearPeric{E, V, MU, EPS}
     , Material3D(T, R) {}
 
 int NonlinearPeric::initialize(const shared_ptr<DomainBase>& D) {
-    incre_time = D == nullptr ? &unit_time : &D->get_factory()->modify_incre_time();
+    if(nullptr != D) incre_time = &D->get_factory()->modify_incre_time();
 
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
 
@@ -63,7 +62,9 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
 
     if(residual <= 0.) return SUANPAN_SUCCESS;
 
-    auto gamma = 0., pow_term = 1., denom = *incre_time;
+    const auto incre_t = incre_time && *incre_time > 0. ? *incre_time : 1.;
+
+    auto gamma = 0., pow_term = 1., denom = incre_t;
     auto counter = 0u;
     auto ref_error = 1.;
     while(true) {
@@ -80,8 +81,8 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((fabs(residual) < tolerance || error < datum::eps) && counter > 5u)) break;
 
         plastic_strain = current_history(0) + (gamma += incre_gamma);
-        denom = *incre_time + mu * gamma;
-        pow_term = pow(*incre_time / denom, epsilon);
+        denom = incre_t + mu * gamma;
+        pow_term = pow(incre_t / denom, epsilon);
         update_isotropic_hardening();
         residual = (eqv_stress - triple_shear * gamma) * pow_term - k;
     }

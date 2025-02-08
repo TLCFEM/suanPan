@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #ifndef OUTPUTTYPE_H
 #define OUTPUTTYPE_H
 
-#include <string>
+#include <magic_enum/magic_enum.hpp>
 
 enum class OutputType {
     // stress
@@ -261,11 +261,17 @@ enum class OutputType {
     NL
 };
 
-const char* to_name(OutputType);
-OutputType to_token(const char*);
-OutputType to_token(const std::string&);
+template<> struct magic_enum::customize::enum_range<OutputType> {
+    static constexpr int min = 0;
+    static constexpr int max = 512;
+};
 
-const char* to_category(OutputType);
+constexpr std::string_view to_name(const OutputType L) { return magic_enum::enum_name(L); }
+
+constexpr OutputType to_token(const std::string_view L) { return magic_enum::enum_cast<OutputType>(L).value_or(OutputType::NL); }
+
+std::string to_category(OutputType);
+
 int to_index(OutputType);
 
 #endif

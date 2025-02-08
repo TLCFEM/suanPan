@@ -2,24 +2,25 @@
 
 <img src="Resource/suanPan-qr-ua.svg" width="150" align="middle"/><img src="Resource/suanPan-ua.svg" width="150" align="middle"/>
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1285221.svg)](https://doi.org/10.5281/zenodo.1285221)
+[![doi](https://zenodo.org/badge/DOI/10.5281/zenodo.1285221.svg)](https://doi.org/10.5281/zenodo.1285221)
 [![license](https://img.shields.io/github/license/TLCFEM/suanPan.svg?color=44cc11)](https://www.gnu.org/licenses/gpl-3.0)
 [![documentation](https://readthedocs.org/projects/suanpan-manual/badge/?version=latest)](https://suanpan-manual.readthedocs.io/?badge=latest)
 [![release](https://img.shields.io/github/release-pre/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/releases)
-[![docker](https://img.shields.io/docker/image-size/tlcfem/suanpan/latest?label=docker&color=44cc11)](https://hub.docker.com/r/tlcfem/suanpan/tags)
 [![suanpan](https://snapcraft.io//suanpan/badge.svg)](https://snapcraft.io/suanpan)
-[![Chocolatey](https://img.shields.io/chocolatey/v/suanpan?color=44cc11)](https://chocolatey.org/packages/suanpan)
-[![Chocolatey](https://img.shields.io/chocolatey/dt/suanpan?color=44cc11&label=choco%20install)](https://chocolatey.org/packages/suanpan)
-[![download](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11)](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11)
+[![choco](https://img.shields.io/chocolatey/v/suanpan?color=44cc11)](https://chocolatey.org/packages/suanpan)
+[![choco](https://img.shields.io/chocolatey/dt/suanpan?color=44cc11&label=choco%20install)](https://chocolatey.org/packages/suanpan)
+[![flathub](https://img.shields.io/flathub/downloads/io.github.tlcfem.suanPan?label=flathub%20install)](https://flathub.org/apps/io.github.tlcfem.suanPan)
+[![github](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11&label=github%20download)](https://github.com/TLCFEM/suanPan/releases)
+[![docker](https://img.shields.io/docker/pulls/tlcfem/suanpan?color=44cc11)](https://hub.docker.com/r/tlcfem/suanpan/tags)
 [![dev](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml/badge.svg?branch=dev)](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml)
 [![codecov](https://codecov.io/gh/TLCFEM/suanPan/branch/dev/graph/badge.svg?token=65BF9DF697)](https://codecov.io/gh/TLCFEM/suanPan)
-[![Codacy](https://app.codacy.com/project/badge/Grade/1ea08c43edf342a8b00b21e585e63503)](https://app.codacy.com/gh/TLCFEM/suanPan/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![CodeFactor](https://www.codefactor.io/repository/github/tlcfem/suanpan/badge)](https://www.codefactor.io/repository/github/tlcfem/suanpan)
+[![codacy](https://app.codacy.com/project/badge/Grade/1ea08c43edf342a8b00b21e585e63503)](https://app.codacy.com/gh/TLCFEM/suanPan/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![codefactor](https://www.codefactor.io/repository/github/tlcfem/suanpan/badge)](https://www.codefactor.io/repository/github/tlcfem/suanpan)
 [![language](https://img.shields.io/github/languages/count/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan)
 [![language](https://img.shields.io/github/languages/top/TLCFEM/suanPan.svg?color=44cc11&logo=c%2B%2B)](https://github.com/TLCFEM/suanPan)
-[![size](https://img.shields.io/github/languages/code-size/TLCFEM/suanPan.svg?color=44cc11)](https://img.shields.io/github/languages/code-size/TLCFEM/suanPan.svg?color=44cc11)
+[![size](https://img.shields.io/github/languages/code-size/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan)
 [![issues](https://img.shields.io/github/issues/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/issues)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan?ref=badge_shield)
+[![fossa](https://app.fossa.com/api/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan?ref=badge_shield)
 
 [![gplv3-or-later](https://www.gnu.org/graphics/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -44,6 +45,7 @@ and [OpenSees](http://opensees.berkeley.edu/).
 
 > [!IMPORTANT]
 > Please check the documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
+> For a summary of available functionalities, see [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
 > Please star ⭐ the project!
 
 ![Alt](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg "Repobeats analytics image")
@@ -54,7 +56,7 @@ The highlights of **suanPan** are
 
 - **suanPan** is *fast*, both memory and thread safe.
 - **suanPan** is designed based on the [shared memory](https://en.wikipedia.org/wiki/Shared_memory) model and supports
-  parallelism on heterogeneous architectures, for example, multithreaded CPU + optional GPU. The parallelism is
+  parallelism on heterogeneous architectures, for example, multi-core CPU + optional GPU. The parallelism is
   available
   for both element state updating and global matrix assembling.
 - **suanPan** is open source and easy to be extended to incorporate user-defined elements, materials, etc.
@@ -63,6 +65,10 @@ The highlights of **suanPan** are
 - **suanPan** utilizes the new language features shipped with the latest standards (C++11 to C++20), such as new STL
   containers, smart pointers, and many others.
 - **suanPan** supports simple visualization supported by [VTK](https://vtk.org/).
+
+> [!IMPORTANT]
+> Both `amd64` and `arm64` architectures are supported.
+> Check details on [Docker Hub](https://hub.docker.com/r/tlcfem/suanpan).
 
 ## Quick Start
 
@@ -147,7 +153,7 @@ on [Chocolatey](https://chocolatey.org/packages/suanpan), please use the followi
 The Chocolatey repo available to you may not be up-to-date.
 If the latest version is not available, please try alternatives, such as portable binaries or scoop.
 
-[![asciicast](https://asciinema.org/a/491350.svg)](https://asciinema.org/a/491350)
+[![choco](Resource/choco.gif)](https://asciinema.org/a/684063)
 
 #### Scoop
 
@@ -176,9 +182,9 @@ The snap supports visualisation via VTK and uses Intel MKL for linear algebra.
 The edge channel is in sync with the `dev` branch.
 The stable channel is in sync with the `master` branch.
 
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
+[![snap](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
-[![asciicast](https://asciinema.org/a/491330.svg)](https://asciinema.org/a/491330)
+[![snap](Resource/snap.gif)](https://asciinema.org/a/684061)
 
 #### Flatpak
 
@@ -205,9 +211,16 @@ It is also possible to compile the package via docker, check the dockerfiles und
 questions please open an issue.
 
 One can directly pull the image.
+Using [Docker Hub](https://hub.docker.com/r/tlcfem/suanpan),
 
 ```bash
 docker pull tlcfem/suanpan
+```
+
+Or using [GitHub Container Registry](https://github.com/TLCFEM/suanPan/pkgs/container/suanpan),
+
+```bash
+docker pull ghcr.io/tlcfem/suanpan
 ```
 
 ### Other Platforms
@@ -277,22 +290,24 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.28
-- [**Lis**](https://www.ssisc.org/lis/) version 2.1.3
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2021.12.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.10.6
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
+- [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.0.0
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
 - [**MUMPS**](https://mumps-solver.org/) version 5.7.3
 - [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
-- [**VTK**](https://vtk.org/) version 9.2.6
+- [**VTK**](https://vtk.org/) version 9.4
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
-- [**Armadillo**](http://arma.sourceforge.net/) version 14.0.2
+- [**Armadillo**](http://arma.sourceforge.net/) version 14.2.3
 - [**ensmallen**](https://ensmallen.org/) version 2.21.1
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2024.2.1
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.7.0
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.0.1
+- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.8.0
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**whereami**](https://github.com/gpakosz/whereami)
-- [**exprtk**](https://github.com/ArashPartow/exprtk)
+- [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
+- [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/)

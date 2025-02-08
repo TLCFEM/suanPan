@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,15 @@
 const double NonlinearCDP::root_three_two = sqrt(1.5);
 const mat NonlinearCDP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-double NonlinearCDP::compute_r(const vec& in) {
+double NonlinearCDP::compute_r(const vec3& in) {
     const auto r = .5 + .5 * accu(in) / accu(abs(in));
     return !std::isfinite(r) || r < 0. ? .0 : r > 1. ? 1. : r;
 }
 
-vec NonlinearCDP::compute_dr(const vec& in) {
+vec3 NonlinearCDP::compute_dr(const vec3& in) {
     const auto g = accu(abs(in));
 
-    vec out = .5 / g * (ones(3) - accu(in) * sign(in) / g);
+    vec3 out = .5 / g * (ones(3) - accu(in) * sign(in) / g);
 
     if(!out.is_finite()) out.zeros();
 
@@ -70,21 +70,21 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
     trial_stress = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain); // 6
 
-    vec principal_stress;    // 3
-    mat principal_direction; // 3x3
+    vec3 principal_stress;     // 3
+    mat33 principal_direction; // 3x3
     if(!eig_sym(principal_stress, principal_direction, tensor::stress::to_tensor(trial_stress), "std")) return SUANPAN_FAIL;
 
     const auto trans = transform::compute_jacobian_nominal_to_principal(principal_direction);
 
     const auto s = tensor::dev(trial_stress);    // 6
     const auto norm_s = tensor::stress::norm(s); // 1
-    vec n = s / norm_s;                          // 6
+    vec6 n = s / norm_s;                         // 6
     if(!n.is_finite()) n.zeros();
 
     const auto ps = tensor::dev(principal_stress); // 3
-    const vec pn = normalise(ps);                  // 3
+    const vec3 pn = normalise(ps);                 // 3
 
-    const vec dsigmadlambda = -double_shear * pn - three_alpha_p_bulk; // 6
+    const vec3 dsigmadlambda = -double_shear * pn - three_alpha_p_bulk; // 3
 
     const auto dgdsigma_t = (pn(2) + alpha_p) / g_t;
     const auto dgdsigma_c = (pn(0) + alpha_p) / g_c;
@@ -94,14 +94,14 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
     const auto const_yield = alpha * accu(principal_stress) + root_three_two * norm_s;
 
-    vec residual(3), incre;
-    mat jacobian(3, 3, fill::zeros);
+    vec3 residual, incre;
+    mat33 jacobian(fill::zeros);
 
-    podarray<double> t_para, c_para;
+    vec6 t_para, c_para;
 
     auto lambda = 0., ref_error = 0.;
     double r, beta;
-    vec dr;
+    vec3 dr;
 
     auto counter = 0u;
     while(true) {
@@ -186,13 +186,13 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     // update trial stress
     trial_stress = transform::compute_jacobian_principal_to_nominal(principal_direction) * new_stress;
 
-    const mat dnde = double_shear / norm_s * (unit_dev_tensor - n * n.t());
+    const mat66 dnde = double_shear / norm_s * (unit_dev_tensor - n * n.t());
 
     // \dfrac{\partial\bar{\sigma}}{\partial\varepsilon^{tr}}
     trial_stiffness -= double_shear * lambda * dnde;
 
-    const rowvec drdsigma = dr.t() * trans;
-    const rowvec prpe = drdsigma * trial_stiffness;
+    const rowvec6 drdsigma = dr.t() * trans;
+    const rowvec6 prpe = drdsigma * trial_stiffness;
 
     // compute local derivatives
     mat left(3, 6);
@@ -209,7 +209,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     // \dfrac{\mathrm{d}\bar{\sigma}}{\mathrm{d}\varepsilon^{tr}}
     trial_stiffness -= (double_shear * n + three_alpha_p_bulk * tensor::unit_tensor2) * dlambdade;
 
-    trial_stiffness = (damage * eye(6, 6) + scale * d_t * damage_c * (1. - s0) * trial_stress * drdsigma) * trial_stiffness + trial_stress * scale * rowvec{recovery * damage_c * t_para(3), damage_t * c_para(3)} * dkappade;
+    trial_stiffness = (damage * eye(6, 6) + scale * d_t * damage_c * (1. - s0) * trial_stress * drdsigma) * trial_stiffness + trial_stress * scale * rowvec2{recovery * damage_c * t_para(3), damage_t * c_para(3)} * dkappade;
 
     trial_stress *= damage;
 

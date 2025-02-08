@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
  *     1. Computational Methods for Plasticity: Theory and Applications
  *        [10.1002/9780470694626](https://doi.org/10.1002/9780470694626)
  *        Chapter 10 Section 10.1
- * 
+ *
  * Note the definition of hardening variable alpha is different from the reference.
  *
  * @author tlc

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ public:
     [[nodiscard]] virtual uword input_size() const;
     [[nodiscard]] virtual uword output_size() const;
 
-    bool compile(const std::string_view&);
+    bool compile(std::string_view);
     static std::string error();
 
     Mat<double> evaluate(double);
@@ -73,7 +73,7 @@ public:
 
 class SimpleScalarExpression final : public Expression {
 public:
-    SimpleScalarExpression(unsigned, const std::string_view&);
+    SimpleScalarExpression(unsigned, std::string_view);
 
     [[nodiscard]] unique_ptr<Expression> get_copy() const override;
 
@@ -86,7 +86,7 @@ class SimpleVectorExpression final : public Expression {
     Col<double> y;
 
 public:
-    SimpleVectorExpression(unsigned, const std::string_view&, const std::string_view&);
+    SimpleVectorExpression(unsigned, std::string_view, std::string_view);
 
     [[nodiscard]] unique_ptr<Expression> get_copy() const override;
 

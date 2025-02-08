@@ -10,17 +10,18 @@ env:
   IOMP: ''
   COVERAGE: ''
 jobs:
-  ubuntu-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+  linux-dev:
+    if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     strategy:
       matrix:
         build: [ RelWithDebInfo, Debug ]
         compiler: [ { c: gcc, cpp: g++, fortran: gfortran }, { c: icx, cpp: icpx, fortran: ifx } ]
-        avx: [ ON, OFF ]
+        avx: [ OFF ]
         vtk: [ ON, OFF ]
-        mkl: [ ON, OFF ]
+        mkl: [ OFF ]
+        aocl: [ ON, OFF ]
         exclude:
           - build: Debug
             mkl: ON
@@ -28,6 +29,10 @@ jobs:
             avx: ON
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
             mkl: OFF
+          - compiler: { c: icx, cpp: icpx, fortran: ifx }
+            aocl: ON
+          - mkl: ON
+            aocl: ON
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -38,8 +43,8 @@ jobs:
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
-          tar xf VTK-9.2.6-linux.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-linux.tar.gz
+          tar xf VTK-9.4.1-linux.tar.gz
       - name: MKL
         run: |
           if [ "${{ matrix.mkl }}" == "ON" ] || [ "${{ matrix.compiler.c }}" == "icx" ]; then
@@ -80,7 +85,7 @@ jobs:
           fi
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DTEST_COVERAGE=${{ env.COVERAGE }} -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=$MT -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=${{ env.IOMP }} -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DTEST_COVERAGE=${{ env.COVERAGE }} -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=$MT -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=${{ env.IOMP }} -DUSE_AOCL=${{ matrix.aocl }} -DCMAKE_INSTALL_PREFIX=dist ..
           make install -j"$(nproc)" && make package
       - name: Pack
         run: |
@@ -106,6 +111,8 @@ jobs:
           fi
           if [ "${{ matrix.mkl }}" == "ON" ]; then
             file_name+="-mkl"
+          elif [ "${{ matrix.aocl }}" == "ON" ]; then
+            file_name+="-aocl"
           else
             file_name+="-openblas"
           fi
@@ -130,13 +137,13 @@ jobs:
           for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
       - name: Report
         if: env.COVERAGE == 'ON'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
-          plugin: gcov
+          plugins: gcov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   macos-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: macos-13
     timeout-minutes: 100
     strategy:
@@ -153,8 +160,8 @@ jobs:
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-macos.tar.gz
-          tar xf VTK-9.2.6-macos.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-macos.tar.gz
+          tar xf VTK-9.4.1-macos.tar.gz
           brew install glfw glew
       - name: Compile
         run: |
@@ -165,11 +172,11 @@ jobs:
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
-            cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+            cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DCMAKE_INSTALL_PREFIX=dist ..
           else
             export CC=gcc-12
             export CXX=g++-12
-            cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.2/ -DCMAKE_INSTALL_PREFIX=dist ..
+            cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DCMAKE_INSTALL_PREFIX=dist ..
           fi
           make install -j4
       - name: Pack
@@ -198,7 +205,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
@@ -206,8 +213,8 @@ jobs:
         build: [ Release ]
         compiler: [ "Visual Studio 17 2022" ]
         vtk: [ ON, OFF ]
-        avx: [ ON, OFF ]
-        mkl: [ ON, OFF ]
+        avx: [ OFF ]
+        mkl: [ OFF ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -219,15 +226,15 @@ jobs:
         shell: cmd
         if: matrix.mkl == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a665fc26-bdf1-415f-9fc4-345f257f4fb1/w_onemkl_p_2024.2.1.106_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ea23d696-a77f-4a4a-8996-20d02cdbc48f/w_fortran-compiler_p_2024.2.1.81_offline.exe
-          w_onemkl_p_2024.2.1.106_offline.exe -s -a --silent --eula accept
-          w_fortran-compiler_p_2024.2.1.81_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bcb40b43-4ca9-4725-9749-4f9fc1e9b97f/intel-onemkl-2025.0.1.15_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/1269b58a-590e-49b1-9f53-beebe171ac56/intel-fortran-compiler-2025.0.4.19_offline.exe
+          intel-onemkl-2025.0.1.15_offline.exe -s -a --silent --eula accept
+          intel-fortran-compiler-2025.0.4.19_offline.exe -s -a --silent --eula accept
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-win.7z
-          7z x VTK-9.2.6-win.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-win.7z
+          7z x VTK-9.4.1-win.7z
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -235,7 +242,7 @@ jobs:
           if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
             cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
           }
-          cmake -G "${{ matrix.compiler }}" -T fortran=ifx -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.2/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DMKLROOT="C:/Program Files (x86)/Intel/oneAPI/mkl/latest" -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -G "${{ matrix.compiler }}" -T fortran=ifx -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DMKLROOT="C:/Program Files (x86)/Intel/oneAPI/mkl/latest" -DCMAKE_INSTALL_PREFIX=dist ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash
@@ -280,7 +287,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-gcc-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') }} && ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
@@ -288,7 +295,7 @@ jobs:
         build: [ Release ]
         compiler: [ "MinGW Makefiles" ]
         vtk: [ ON ]
-        avx: [ ON, OFF ]
+        avx: [ OFF ]
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -303,13 +310,13 @@ jobs:
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.3.1-win-gcc.7z
-          7z x VTK-9.3.1-win-gcc.7z -oVTK
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-win-gcc.7z
+          7z x VTK-9.4.1-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.3 -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 -DCMAKE_INSTALL_PREFIX=dist ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ using std::ifstream;
 using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 5;
+constexpr auto SUANPAN_MINOR = 6;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Canopus";
 
@@ -181,13 +181,13 @@ void print_header() {
         suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan               |\n");
         suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest  |\n");
         suanpan_info("+-----------------------------------------------------+\n");
-        suanpan_info("|  {} https://gitter.im/suanPan-dev/community         |\n", POOL[randi() % POOL.size()]);
+        suanpan_info("|  {} https://bit.ly/vsc-sp                           |\n", POOL[randi() % POOL.size()]);
     }
     else {
         suanpan_info("|  https://github.com/TLCFEM/suanPan                  |\n");
         suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest     |\n");
         suanpan_info("+-----------------------------------------------------+\n");
-        suanpan_info("|  https://gitter.im/suanPan-dev/community            |\n");
+        suanpan_info("|  https://bit.ly/vsc-sp                              |\n");
     }
     suanpan_info("+-----------------------------------------------------+\n\n");
 }
@@ -224,8 +224,14 @@ void argument_parser(const int argc, char** argv) {
         auto strip = false, convert = false, check_new = true;
 
         for(auto I = 1; I < argc; ++I) {
-            if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) input_file_name = argv[++I];
-            else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) output_file_name = argv[++I];
+            if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) {
+                if(I + 1 == argc) return suanpan_error("No input file specified.\n");
+                input_file_name = argv[++I];
+            }
+            else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) {
+                if(I + 1 == argc) return suanpan_error("No output file specified.\n");
+                output_file_name = argv[++I];
+            }
             else if(is_equal(argv[I], "-vb") || is_equal(argv[I], "--verbose")) SUANPAN_VERBOSE = true;
             else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
             else if(is_equal(argv[I], "-nc") || is_equal(argv[I], "--nocolor")) SUANPAN_COLOR = false;
@@ -298,7 +304,7 @@ void argument_parser(const int argc, char** argv) {
 }
 
 void print_version() {
-    suanpan_info("Copyright (C) 2017-2024 Theodore Chang\n\n");
+    suanpan_info("Copyright (C) 2017-2025 Theodore Chang\n\n");
     suanpan_info("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n");
     suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
     suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
@@ -316,11 +322,15 @@ void print_version() {
     );
     suanpan_info("    The source code of suanPan is hosted on GitHub. https://github.com/TLCFEM/suanPan/\n");
     suanpan_info("    The documentation is hosted on GitHub. https://tlcfem.github.io/suanPan-manual/latest/\n");
+    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with {}. http://arma.sourceforge.net/\n", arma_version::as_string(),
 #ifdef SUANPAN_MKL
-    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with Intel MKL. http://arma.sourceforge.net/\n", arma_version::as_string());
+                 "Intel oneAPI Math Kernel Library (MKL)"
+#elif defined(SUANPAN_AOCL)
+                 "AMD Optimizing CPU Libraries (AOCL)"
 #else
-    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with OpenBLAS. http://arma.sourceforge.net/\n", arma_version::as_string());
+                 "OpenBLAS"
 #endif
+    );
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA ({}). https://developer.nvidia.com/about-cuda/\n", CUDA_VERSION);
 #endif
@@ -335,7 +345,6 @@ void print_version() {
 #ifdef SUANPAN_VTK
     suanpan_info("    The visualisation support is implemented via VTK ({}) library. https://vtk.org/\n", vtkVersion::GetVTKVersion());
 #endif
-    suanpan_info("\nPlease join gitter for any feedback. https://gitter.im/suanPan-dev/community/\n");
     suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n\n");
 }
 
@@ -358,14 +367,15 @@ void cli_mode(const shared_ptr<Bead>& model) {
     const auto history_path = get_history_path();
 
     if(!exists(history_path)) {
-        suanpan_info("It appears that this is the first time you run ");
-        suanpan_highlight("suanPan");
-        suanpan_info(".\nFor a quick introduction, type in '");
+        suanpan_info("To go through a brief introduction, use '");
         suanpan_highlight("overview");
-        suanpan_info("'.\nTo exit, just type in '");
+        suanpan_info("'.\nTo check the build info, use '");
+        suanpan_highlight("version");
+        suanpan_info("'.\nTo exit, type in '");
         suanpan_highlight("exit");
-        suanpan_info("'.\n\nThe VS Code extension provides syntax highlighting and autocompletion.\n");
-        suanpan_highlight("https://marketplace.visualstudio.com/items?itemName=tlc.suanpan\n\n");
+        suanpan_info("' or '");
+        suanpan_highlight("quit");
+        suanpan_info("'.\n\n");
     }
 
     ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);

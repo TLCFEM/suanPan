@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,10 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>&, vtkInfo);
 
 #else
 
-inline int vtk_parser(const shared_ptr<DomainBase>&, istringstream&) { return 0; }
+inline int vtk_parser(const shared_ptr<DomainBase>&, istringstream&) {
+    suanpan_warning("Visualisation related functionalities are not available as the current build is not compiled with the VTK support.\n");
+    return 0;
+}
 
 #endif
 

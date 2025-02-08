@@ -1,5 +1,5 @@
 name: suanpan
-base: core22
+base: core24
 confinement: strict
 contact: tlcfem@gmail.com
 donation: https://ko-fi.com/suanpan
@@ -9,14 +9,16 @@ issues: https://github.com/TLCFEM/suanPan/issues
 license: GPL-3.0
 source-code: https://github.com/TLCFEM/suanPan
 summary: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
-version: "3.5"
+version: "3.6"
 website: https://bit.ly/suanpan-doc
 description: |
   [**suanPan**](https://github.com/TLCFEM/suanPan) is a finite element method (FEM) simulation platform for applications
   in fields such as solid mechanics and civil/structural/seismic engineering. **suanPan** is written in modern high
   quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
-architectures:
-  - build-on: amd64
+platforms:
+  amd64:
+    build-on: amd64
+    build-for: amd64
 apps:
   suanpan:
     command: bin/suanPan
@@ -41,7 +43,7 @@ parts:
       - -DUSE_AVX2=OFF
       - -DUSE_HDF5=ON
       - -DUSE_VTK=ON
-      - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.2/
+      - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.4/
       - -DUSE_MKL=ON
       - -DMKLROOT=/opt/intel/oneapi/mkl/latest
       - -DUSE_INTEL_OPENMP=OFF
@@ -56,10 +58,10 @@ parts:
       - freeglut3-dev
       - libglvnd-dev
     override-build: |
-      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.2.6-linux.tar.gz
-      tar xf VTK-9.2.6-linux.tar.gz
-      wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6e00e368-b61d-4f87-a409-9b510c022a37/l_onemkl_p_2024.2.1.105_offline.sh
-      sh ./l_onemkl_p_2024.2.1.105_offline.sh -a --silent --eula accept
+      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-linux.tar.gz
+      tar xf VTK-9.4.1-linux.tar.gz
+      wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/246ea40e-5aa7-42a4-81fa-0c029dc8650f/intel-onemkl-2025.0.1.16_offline.sh
+      sh ./intel-onemkl-2025.0.1.16_offline.sh -a --silent --eula accept
       craftctl default
     stage-packages:
       - libgfortran5

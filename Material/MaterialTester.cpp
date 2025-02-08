@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -158,6 +158,8 @@ mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<u
         }
         if(SUANPAN_FAIL == info) break;
         incre_load = -incre_load;
+        // update trial stiffness to be closer to the correct one
+        obj->update_trial_status(obj->get_trial_strain() + normalise(incre_load) * norm(obj->get_trial_strain()) / 1E4);
     }
 
     obj->print();

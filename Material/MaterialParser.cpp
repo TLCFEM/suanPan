@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
         return;
     }
 
-    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1};
+    vec pool{2E5, .2, 4E2, 0., 5E2, 1E1};
     if(!get_optional_input(command, pool)) {
         suanpan_error("Valid inputs are required.\n");
         return;
@@ -206,21 +206,30 @@ void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& com
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<ArmstrongFrederick>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), ai, bi, density);
+    return_obj = make_unique<ArmstrongFrederick>(tag, DataArmstrongFrederick{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), std::move(ai), std::move(bi)}, density);
 }
 
-void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& command) {
+void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& command, const bool memory = false) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    vec pool{2E5, 4E2, 5E2, 0., 1E1};
-    if(!get_optional_input(command, pool)) {
+    vec pa{2E5, 4E2, 0., 5E2, 1E1};
+    if(!get_optional_input(command, pa)) {
         suanpan_error("Valid inputs are required.\n");
         return;
     }
+
+    vec pb{.2, 5E2, 1E1};
+    if(memory) {
+        if(!get_optional_input(command, pb)) {
+            suanpan_error("Valid inputs are required.\n");
+            return;
+        }
+    }
+    else pb.zeros();
 
     double para;
     vector<double> ai, bi, all;
@@ -243,7 +252,7 @@ void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& c
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<ArmstrongFrederick1D>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), ai, bi, density);
+    return_obj = make_unique<ArmstrongFrederick1D>(tag, DataArmstrongFrederick1D{pa(0), pa(1), pa(2), pa(3), pa(4), pb(0), pb(1), pb(2), std::move(ai), std::move(bi)}, density);
 }
 
 void new_axisymmetric(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -2920,6 +2929,149 @@ void new_stacked(unique_ptr<Material>& return_obj, istringstream& command) {
     return_obj = make_unique<Stacked>(tag, uvec(mat_tag));
 }
 
+void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec p{2E5, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 1E1, 1E1, .7};
+    if(!get_optional_input(command, p)) {
+        suanpan_error("Valid inputs are required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!command.eof() && !get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), 1., 0., 0., {{p(10), 1.}}, {{p(11), std::min(1. - datum::eps, p(12))}}};
+    if(para.m_iso < 0. || para.m_kin < 0.) {
+        suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+    if(para.cv < 1.) {
+        suanpan_error("The viscous limit c_v must be greater than unity.\n");
+        return;
+    }
+
+    return_obj = make_unique<Subloading1D>(tag, std::move(para), density);
+}
+
+void new_subloadingviscous1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec p{2E5, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 1., 0., 0., 1E1, 1E1, .7};
+    if(!get_optional_input(command, p)) {
+        suanpan_error("Valid inputs are required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!command.eof() && !get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), std::min(1. - datum::eps, p(15))}}};
+    if(para.m_iso < 0. || para.m_kin < 0.) {
+        suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+    if(para.cv < 1.) {
+        suanpan_error("The viscous limit c_v must be greater than unity.\n");
+        return;
+    }
+
+    return_obj = make_unique<Subloading1D>(tag, std::move(para), density);
+}
+
+void new_multisubloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec p{2E5, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 0.};
+    if(!get_input(command, p)) {
+        suanpan_error("Valid inputs are required.\n");
+        return;
+    }
+
+    std::vector<DataSubloading1D::Saturation> back, core;
+
+    string token;
+    while(!command.eof() && get_input(command, token)) {
+        double a, b;
+        if(is_equal("-back", token)) {
+            if(!get_input(command, a, b)) {
+                suanpan_error("Valid saturation parameters are required.\n");
+                return;
+            }
+            back.emplace_back(a, b);
+        }
+        else if(is_equal("-core", token)) {
+            if(!get_input(command, a, b)) {
+                suanpan_error("Valid saturation parameters are required.\n");
+                return;
+            }
+            core.emplace_back(a, b);
+        }
+        else {
+            suanpan_error("Valid saturation type is required.\n");
+            return;
+        }
+    }
+
+    DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), 1., 0., 0., std::move(back), std::move(core)};
+    if(para.m_iso < 0. || para.m_kin < 0.) {
+        suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+    if(para.cv < 1.) {
+        suanpan_error("The viscous limit c_v must be greater than unity.\n");
+        return;
+    }
+
+    return_obj = make_unique<Subloading1D>(tag, std::move(para), p(10));
+}
+
+void new_subloading(unique_ptr<Material>& return_obj, istringstream& command) {
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return;
+    }
+
+    vec p{2E5, .3, 2E2, 0., 2E2, 1E1, 2E2, 0., 2E2, 1E1, 1E1, 1E1, 1E1, .7};
+    if(!get_optional_input(command, p)) {
+        suanpan_error("Valid inputs are required.\n");
+        return;
+    }
+
+    auto density = 0.;
+    if(!command.eof() && !get_input(command, density)) {
+        suanpan_error("A valid density is required.\n");
+        return;
+    }
+
+    DataSubloading para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), {p(11), 1.}, {p(12), std::min(1. - datum::eps, p(13))}};
+    if(para.m_iso < 0. || para.m_kin < 0.) {
+        suanpan_error("The evolution rate must be positive.\n");
+        return;
+    }
+
+    return_obj = make_unique<Subloading>(tag, std::move(para), density);
+}
+
 void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -3164,7 +3316,7 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec pool{2E5, .2, 4E2, 5E2, 0., 1E1, 0., 0.};
+    vec pool{2E5, .2, 4E2, 0., 5E2, 1E1, 0., 0.};
     if(!get_optional_input(command, pool)) {
         suanpan_error("A valid parameter is required.\n");
         return;
@@ -3191,7 +3343,7 @@ void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<VAFCRP>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), ai, bi, density);
+    return_obj = make_unique<VAFCRP>(tag, DataVAFCRP{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), std::move(ai), std::move(bi)}, density);
 }
 
 void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3201,7 +3353,7 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
         return;
     }
 
-    vec pool{2E5, 4E2, 1E2, 0., 1E1, 0., 0.};
+    vec pool{2E5, 4E2, 0., 1E2, 1E1, 0., 0.};
     if(!get_optional_input(command, pool)) {
         suanpan_error("A valid parameter is required.\n");
         return;
@@ -3228,7 +3380,7 @@ void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
         bi.emplace_back(all.at(I++));
     }
 
-    return_obj = make_unique<VAFCRP1D>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), ai, bi, density);
+    return_obj = make_unique<VAFCRP1D>(tag, DataVAFCRP1D{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), std::move(ai), std::move(bi)}, density);
 }
 
 void new_viscosity01(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3393,6 +3545,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
+    else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
     else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
@@ -3490,6 +3643,10 @@ int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& com
     else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
     else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
     else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
+    else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
+    else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
+    else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
+    else if(is_equal(material_id, "Subloading")) new_subloading(new_material, command);
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
     else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);

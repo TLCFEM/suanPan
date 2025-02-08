@@ -1,0 +1,49 @@
+name: Docker Stable
+on:
+  push:
+    branches: [ master ]
+jobs:
+  linux-base:
+    if: ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    runs-on: self-hosted
+    timeout-minutes: 600
+    strategy:
+      matrix:
+        arch: [ amd64, arm64 ]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: QEMU
+        if: ${{ matrix.arch == 'arm64' }}
+        uses: docker/setup-qemu-action@v3
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Base ${{ matrix.arch }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Script/${{ matrix.arch }}/Rocky.Dockerfile
+          platforms: linux/${{ matrix.arch }}
+          provenance: false
+          push: true
+          tags: tlcfem/suanpan:stable-${{ matrix.arch }}
+  linux-combine:
+    needs: linux-base
+    runs-on: self-hosted
+    steps:
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Combine
+        run: |
+          docker manifest create tlcfem/suanpan:stable --amend tlcfem/suanpan:stable-amd64 tlcfem/suanpan:stable-arm64
+          docker manifest push tlcfem/suanpan:stable

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 /**
  * @class B3DOSC
  * @brief A B3DOSC class.
- * 
+ *
  * B3DOSC is a corotational transformation for 3D beam elements.
- * 
+ *
  * The implementation is mainly based on de Souza's thesis.
- * 
+ *
  * Force-based Finite Element for Large Displacement Inelastic Analysis of Frames
- * 
+ *
  * @author tlc
  * @date 16/12/2021
  * @version 0.1.0

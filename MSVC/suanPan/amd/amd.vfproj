@@ -4,7 +4,7 @@
 		<Platform Name="x64"/>
 	</Platforms>
 	<Configurations>
-		<Configuration Name="Release|x64" UseCompiler="ifortCompiler" OutputDirectory="..\..\$(ConfigurationName)\Libs\" ConfigurationType="typeStaticLibrary">
+		<Configuration Name="Release|x64" UseCompiler="ifxCompiler" OutputDirectory="..\..\$(ConfigurationName)\Libs\" ConfigurationType="typeStaticLibrary">
 			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" MultiProcessorCompilation="true" Optimization="optimizeFull" Parallelization="true" Preprocess="preprocessYes" EnableEnhancedInstructionSet="codeArchAVX" OpenMP="OpenMPParallelCode" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
 			<Tool Name="VFLibrarianTool"/>
 			<Tool Name="VFResourceCompilerTool"/>
@@ -17,8 +17,9 @@
 	</Configurations>
 	<Files>
 		<Filter Name="SRC" Filter="fi;fd">
-		<File RelativePath="..\..\..\Toolbox\amd-src\amd.f"/>
-		<File RelativePath="..\..\..\Toolbox\amd-src\amdbar.f"/></Filter>
+			<File RelativePath="..\..\..\Toolbox\amd-src\amd.f"/>
+			<File RelativePath="..\..\..\Toolbox\amd-src\amdbar.f"/>
+		</Filter>
 	</Files>
 	<Globals/>
 </VisualStudioProject>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,4 @@ void ElementGroup::initialize(const shared_ptr<DomainBase>& D) {
     const auto& e_pool = D->get_element_pool();
     pool.set_size(e_pool.size());
     for(uword I = 0; I < pool.n_elem; ++I) pool(I) = e_pool[I]->get_tag();
-}
-
-void ElementGroup::print() {
-    suanpan_info("An element group.\n");
 }

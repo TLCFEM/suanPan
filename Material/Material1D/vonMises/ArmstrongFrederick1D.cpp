@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,16 +16,15 @@
  ******************************************************************************/
 
 #include "ArmstrongFrederick1D.h"
-#include <Recorder/OutputType.h>
 
-ArmstrongFrederick1D::ArmstrongFrederick1D(const unsigned T, const double E, const double Y, const double S, const double H, const double M, vec&& A, vec&& B, const double R)
-    : DataArmstrongFrederick1D{E, Y, S, H, M, std::move(A), std::move(B)}
+ArmstrongFrederick1D::ArmstrongFrederick1D(const unsigned T, DataArmstrongFrederick1D&& D, const double R)
+    : DataArmstrongFrederick1D(std::move(D))
     , Material1D(T, R) {}
 
 int ArmstrongFrederick1D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
 
-    initialize_history(1 + size);
+    initialize_history(size + 4);
 
     return SUANPAN_SUCCESS;
 }
@@ -45,14 +44,19 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
     trial_history = current_history;
-    auto& p = trial_history(size);
+    auto& q = trial_history(size);
+    const auto& current_r = current_history(size + 2);
+    const auto& current_theta = current_history(size + 3);
+    auto& ep = trial_history(size + 1);
+    auto& r = trial_history(size + 2);
+    auto& theta = trial_history(size + 3);
 
-    auto yield_func = fabs(trial_stress(0) - accu(trial_history.head(size))) - std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)));
+    auto yield_func = fabs(trial_stress(0) - accu(trial_history.head(size))) - std::max(0., yield + hardening * q + saturation * (1. - exp(-ms * q)) - reduction * (1. - exp(-mr * r)));
 
     if(yield_func < 0.) return SUANPAN_SUCCESS;
 
     auto gamma = 0.;
-    double xi, jacobian;
+    double xi, jacobian, dr = 0.;
 
     auto counter = 0u;
     auto ref_error = 1.;
@@ -62,10 +66,11 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto exp_term = saturated * exp(-m * p);
+        const auto s_term = saturation * exp(-ms * q);
+        const auto r_term = reduction * exp(-mr * r);
 
-        auto k = yield + saturated + hardening * p - exp_term;
-        auto dk = hardening + m * exp_term;
+        auto k = yield + saturation - reduction + hardening * q - s_term + r_term;
+        auto dk = hardening + ms * s_term - mr * r_term * dr;
         if(k < 0.) k = dk = 0.;
 
         auto sum_a = 0., sum_b = 0.;
@@ -86,10 +91,22 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((fabs(yield_func) < tolerance || error < datum::eps) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || fabs(yield_func) < tolerance) && counter > 5u)) break;
 
         gamma -= incre;
-        p -= incre;
+        q -= incre;
+        ep -= xi > 0. ? incre : -incre;
+
+        r = current_r;
+        theta = current_theta;
+
+        if(const auto h = fabs(ep - current_theta) - current_r; h > 0.) {
+            const auto nh = ep > current_theta ? 1. : -1.;
+            r += memory * h;
+            theta += nh * (1. - memory) * h;
+            dr = xi > 0. ? memory * nh : -memory * nh;
+        }
+        else dr = 0.;
     }
 
     if(xi > 0.) {

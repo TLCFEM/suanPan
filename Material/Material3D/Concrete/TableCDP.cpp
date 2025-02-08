@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2024 Theodore Chang
+ * Copyright (C) 2017-2025 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 
 #include "TableCDP.h"
 
-podarray<double> TableCDP::compute_tension_backbone(const double kappa) const {
-    podarray<double> out(6);
+vec6 TableCDP::compute_tension_backbone(const double kappa) const {
+    vec6 out;
 
     if(kappa < dt_table(0, 0)) {
         out(3) = dt_table(0, 1) / dt_table(0, 0); // \md{d}
@@ -52,8 +52,8 @@ podarray<double> TableCDP::compute_tension_backbone(const double kappa) const {
     return out;
 }
 
-podarray<double> TableCDP::compute_compression_backbone(const double kappa) const {
-    podarray<double> out(6);
+vec6 TableCDP::compute_compression_backbone(const double kappa) const {
+    vec6 out;
 
     if(kappa < dc_table(0, 0)) {
         out(3) = dc_table(0, 1) / dc_table(0, 0); // \md{d}

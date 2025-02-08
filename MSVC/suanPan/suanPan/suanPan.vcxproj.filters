@@ -1585,6 +1585,12 @@
     <ClCompile Include="..\..\..\Material\Material2D\DuncanSelig.cpp">
       <Filter>Material\Material2D</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\vonMises\Subloading1D.cpp">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\Subloading.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -3033,6 +3039,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Domain\MetaMat\BandMatMAGMA.hpp">
       <Filter>Domain\MetaMat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\vonMises\Subloading1D.h">
+      <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\Subloading.h">
+      <Filter>Material\Material3D\vonMises</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
