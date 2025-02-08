@@ -114,10 +114,6 @@ func downloadLatestVersion(versionString string) error {
 			"suanPan-linux-aocl-vtk-no-avx.tar.gz",
 			"suanPan-linux-aocl-vtk.tar.gz",
 			"suanPan-linux-aocl.tar.gz",
-			"suanPan-linux-openblas-no-avx.tar.gz",
-			"suanPan-linux-openblas-vtk-no-avx.tar.gz",
-			"suanPan-linux-openblas-vtk.tar.gz",
-			"suanPan-linux-openblas.tar.gz",
 		}
 	} else if cos == "darwin" {
 		package_array = []string{
