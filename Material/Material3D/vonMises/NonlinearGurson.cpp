@@ -120,7 +120,7 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
 
     trial_s /= denom;
 
-    mat left, right(4, 6);
+    mat::fixed<4, 6> left(fill::none), right(fill::none);
 
     right.row(0) = -six_shear / denom * trial_s.t();
     right.row(1) = -2. * gamma * right.row(0) + p * tensor::unit_tensor2.t();
