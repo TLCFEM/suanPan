@@ -62,7 +62,7 @@ int ComplexHysteresis::update_trial_status(const vec& n_strain) {
 
     const auto tension_sign = incre_strain(0) > 0.;
 
-    podarray<double> response(2);
+    vec2 response;
 
     if(Status::CBACKBONE == trial_load_status) {
         if(!tension_sign) response = compute_compression_backbone(trial_strain(0));
