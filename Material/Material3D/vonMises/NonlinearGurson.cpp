@@ -54,8 +54,8 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
     const auto trial_p = tensor::mean3(trial_stress);                    // trial hydrostatic stress
     auto p = trial_p;                                                    // hydrostatic stress
 
-    mat44 jacobian;
-    vec4 incre, residual;
+    mat44 jacobian(fill::none);
+    vec4 incre(fill::none), residual(fill::none);
     auto gamma = 0.;
     double denom;
 
