@@ -17,8 +17,8 @@
 
 #include "SteelBRB.h"
 
-vec SteelBRB::compute_t_yield_stress(const double plastic_strain) const {
-    vec result(2);
+vec2 SteelBRB::compute_t_yield_stress(const double plastic_strain) const {
+    vec2 result;
 
     result(1) = t_const * exp(-plastic_strain / t_scalar);
 
@@ -27,8 +27,8 @@ vec SteelBRB::compute_t_yield_stress(const double plastic_strain) const {
     return result;
 }
 
-vec SteelBRB::compute_c_yield_stress(const double plastic_strain) const {
-    vec result(2);
+vec2 SteelBRB::compute_c_yield_stress(const double plastic_strain) const {
+    vec2 result;
 
     result(1) = c_const * exp(-plastic_strain / c_scalar);
 
