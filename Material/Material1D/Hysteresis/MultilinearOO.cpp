@@ -17,8 +17,8 @@
 
 #include "MultilinearOO.h"
 
-podarray<double> MultilinearOO::compute_tension_backbone(const double t_strain) const {
-    podarray<double> response(2);
+vec2 MultilinearOO::compute_tension_backbone(const double t_strain) const {
+    vec2 response;
 
     uword IDX = 0;
     while(IDX < t_backbone.n_rows && t_backbone(IDX, 0) < t_strain) ++IDX;
@@ -39,8 +39,8 @@ podarray<double> MultilinearOO::compute_tension_backbone(const double t_strain) 
     return response;
 }
 
-podarray<double> MultilinearOO::compute_compression_backbone(const double t_strain) const {
-    podarray<double> response(2);
+vec2 MultilinearOO::compute_compression_backbone(const double t_strain) const {
+    vec2 response;
 
     uword IDX = 0;
     while(IDX < c_backbone.n_rows && c_backbone(IDX, 0) > t_strain) ++IDX;

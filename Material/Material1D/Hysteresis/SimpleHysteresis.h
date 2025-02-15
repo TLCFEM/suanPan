@@ -52,19 +52,19 @@ class SimpleHysteresis : protected DataSimpleHysteresis, public Material1D {
      * \brief to compute the initial reverse point on the opposite branch
      * \return the reverse point (strain, stress)
      */
-    [[nodiscard]] virtual podarray<double> compute_compression_initial_reverse() const = 0;
+    [[nodiscard]] virtual vec2 compute_compression_initial_reverse() const = 0;
     /**
      * \brief to compute the initial reverse point on the opposite branch
      * \return the reverse point (strain, stress)
      */
-    [[nodiscard]] virtual podarray<double> compute_tension_initial_reverse() const = 0;
+    [[nodiscard]] virtual vec2 compute_tension_initial_reverse() const = 0;
 
-    [[nodiscard]] virtual podarray<double> compute_compression_backbone(double) const = 0;
-    [[nodiscard]] virtual podarray<double> compute_tension_backbone(double) const = 0;
+    [[nodiscard]] virtual vec2 compute_compression_backbone(double) const = 0;
+    [[nodiscard]] virtual vec2 compute_tension_backbone(double) const = 0;
     [[nodiscard]] virtual double compute_compression_residual(double, double) const = 0;
     [[nodiscard]] virtual double compute_tension_residual(double, double) const = 0;
-    [[nodiscard]] podarray<double> compute_compression_inner(double) const;
-    [[nodiscard]] podarray<double> compute_tension_inner(double) const;
+    [[nodiscard]] vec2 compute_compression_inner(double) const;
+    [[nodiscard]] vec2 compute_tension_inner(double) const;
 
 public:
     SimpleHysteresis(

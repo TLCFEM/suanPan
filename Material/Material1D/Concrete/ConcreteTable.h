@@ -36,10 +36,10 @@ class ConcreteTable final : public SimpleHysteresis {
 
     const double c_strain, t_strain;
 
-    [[nodiscard]] podarray<double> compute_compression_initial_reverse() const override;
-    [[nodiscard]] podarray<double> compute_tension_initial_reverse() const override;
-    [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
-    [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
+    [[nodiscard]] vec2 compute_compression_initial_reverse() const override;
+    [[nodiscard]] vec2 compute_tension_initial_reverse() const override;
+    [[nodiscard]] vec2 compute_compression_backbone(double) const override;
+    [[nodiscard]] vec2 compute_tension_backbone(double) const override;
     [[nodiscard]] double compute_compression_residual(double, double) const override;
     [[nodiscard]] double compute_tension_residual(double, double) const override;
 

@@ -17,8 +17,8 @@
 
 #include "SimpleHysteresis.h"
 
-podarray<double> SimpleHysteresis::compute_compression_inner(const double t_strain) const {
-    podarray<double> response(2);
+vec2 SimpleHysteresis::compute_compression_inner(const double t_strain) const {
+    vec2 response;
 
     auto& reverse_c_strain = trial_history(2);  // unloading point strain compression side
     auto& reverse_c_stress = trial_history(3);  // unloading point stress compression side
@@ -43,8 +43,8 @@ podarray<double> SimpleHysteresis::compute_compression_inner(const double t_stra
     return response;
 }
 
-podarray<double> SimpleHysteresis::compute_tension_inner(const double t_strain) const {
-    podarray<double> response(2);
+vec2 SimpleHysteresis::compute_tension_inner(const double t_strain) const {
+    vec2 response;
 
     auto& reverse_c_strain = trial_history(2);  // unloading point strain compression side
     auto& reverse_c_stress = trial_history(3);  // unloading point stress compression side
@@ -103,7 +103,7 @@ int SimpleHysteresis::update_trial_status(const vec& t_strain) {
     auto& residual_c_strain = trial_history(6); // residual strain in compression unloading path
     auto& residual_t_strain = trial_history(7); // residual strain in compression unloading path
 
-    podarray<double> response;
+    vec2 response;
 
     if(Status::NONE == current_flag) {
         if(incre_strain(0) > 0.) {

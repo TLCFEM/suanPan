@@ -36,8 +36,8 @@ struct DataMultilinearOO {
 };
 
 class MultilinearOO final : protected DataMultilinearOO, public OriginOriented {
-    [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
-    [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
+    [[nodiscard]] vec2 compute_tension_backbone(double) const override;
+    [[nodiscard]] vec2 compute_compression_backbone(double) const override;
 
 public:
     MultilinearOO(int, mat&&, mat&&, double);
