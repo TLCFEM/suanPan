@@ -74,7 +74,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
         auto dk = 0.;
         k < 0. ? k = 0. : dk = hardening + ms * exp_term;
 
-        vec sum_a(6, fill::zeros);
+        vec6 sum_a(fill::zeros);
         auto sum_b = 0.;
         for(unsigned I = 0; I < size; ++I) {
             const auto denom = 1. + b(I) * gamma;
@@ -103,7 +103,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
 
     const vec u = xi / norm_xi;
 
-    vec sum_c(6, fill::zeros);
+    vec6 sum_c(fill::zeros);
     for(unsigned I = 0; I < size; ++I) {
         vec beta(&trial_history(1 + 6ull * I), 6, false, true);
         sum_c += b(I) * pow(1. + b(I) * gamma, -2.) * (beta - tensor::stress::double_contraction(u, beta) * u);

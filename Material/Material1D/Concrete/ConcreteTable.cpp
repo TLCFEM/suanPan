@@ -17,8 +17,8 @@
 
 #include "ConcreteTable.h"
 
-podarray<double> ConcreteTable::compute_compression_initial_reverse() const {
-    podarray<double> response(2);
+vec2 ConcreteTable::compute_compression_initial_reverse() const {
+    vec2 response;
 
     for(uword I = 0; I < c_table.n_rows; ++I)
         if(c_table(I, 0) != 0.) {
@@ -30,8 +30,8 @@ podarray<double> ConcreteTable::compute_compression_initial_reverse() const {
     return response;
 }
 
-podarray<double> ConcreteTable::compute_tension_initial_reverse() const {
-    podarray<double> response(2);
+vec2 ConcreteTable::compute_tension_initial_reverse() const {
+    vec2 response;
 
     for(uword I = 0; I < t_table.n_rows; ++I)
         if(t_table(I, 0) != 0.) {
@@ -43,8 +43,8 @@ podarray<double> ConcreteTable::compute_tension_initial_reverse() const {
     return response;
 }
 
-podarray<double> ConcreteTable::compute_compression_backbone(const double n_strain) const {
-    podarray<double> response(2);
+vec2 ConcreteTable::compute_compression_backbone(const double n_strain) const {
+    vec2 response;
 
     for(uword I = 0; I < c_table.n_rows; ++I)
         if(c_table(I, 0) < n_strain) {
@@ -65,8 +65,8 @@ podarray<double> ConcreteTable::compute_compression_backbone(const double n_stra
     return response;
 }
 
-podarray<double> ConcreteTable::compute_tension_backbone(const double n_strain) const {
-    podarray<double> response(2);
+vec2 ConcreteTable::compute_tension_backbone(const double n_strain) const {
+    vec2 response;
 
     for(uword I = 0; I < t_table.n_rows; ++I)
         if(t_table(I, 0) > n_strain) {

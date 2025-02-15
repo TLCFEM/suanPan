@@ -21,7 +21,7 @@ ExpGurson::ExpGurson(const unsigned T, const double E, const double V, const dou
     : DataExpGurson{fabs(YS), std::min(1., N)}
     , NonlinearGurson(T, E, V, Q1, Q2, FN, SN, EN, R) {}
 
-vec ExpGurson::compute_hardening(const double plastic_strain) const {
+vec2 ExpGurson::compute_hardening(const double plastic_strain) const {
     auto k = 1.;
     double pow_term;
 
@@ -47,7 +47,7 @@ vec ExpGurson::compute_hardening(const double plastic_strain) const {
 
     pow_term *= n;
 
-    return vec{k, pow_term * para_c / (1. - pow_term)} * yield_stress;
+    return vec2{k, pow_term * para_c / (1. - pow_term)} * yield_stress;
 }
 
 unique_ptr<Material> ExpGurson::get_copy() { return make_unique<ExpGurson>(*this); }

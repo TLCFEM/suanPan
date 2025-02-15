@@ -52,8 +52,8 @@ class SteelBRB final : protected DataSteelBRB, public Material1D {
     const double c_const = (c_saturated_stress - yield_stress) / c_scalar;
     const double t_const = (t_saturated_stress - yield_stress) / t_scalar;
 
-    [[nodiscard]] vec compute_t_yield_stress(double) const;
-    [[nodiscard]] vec compute_c_yield_stress(double) const;
+    [[nodiscard]] vec2 compute_t_yield_stress(double) const;
+    [[nodiscard]] vec2 compute_c_yield_stress(double) const;
 
 public:
     SteelBRB(

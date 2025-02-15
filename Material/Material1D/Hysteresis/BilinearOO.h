@@ -43,8 +43,8 @@ class BilinearOO final : protected DataBilinearOO, public OriginOriented {
     const double t_stress = elastic_modulus * t_strain;
     const double c_stress = elastic_modulus * c_strain;
 
-    [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
-    [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
+    [[nodiscard]] vec2 compute_tension_backbone(double) const override;
+    [[nodiscard]] vec2 compute_compression_backbone(double) const override;
 
 public:
     BilinearOO(

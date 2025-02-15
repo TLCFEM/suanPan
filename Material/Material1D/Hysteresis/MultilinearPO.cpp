@@ -17,8 +17,8 @@
 
 #include "MultilinearPO.h"
 
-podarray<double> MultilinearPO::compute_tension_initial_reverse() const {
-    podarray<double> response(2);
+vec2 MultilinearPO::compute_tension_initial_reverse() const {
+    vec2 response;
 
     response(0) = t_backbone(0, 0);
     response(1) = t_backbone(0, 1);
@@ -26,8 +26,8 @@ podarray<double> MultilinearPO::compute_tension_initial_reverse() const {
     return response;
 }
 
-podarray<double> MultilinearPO::compute_compression_initial_reverse() const {
-    podarray<double> response(2);
+vec2 MultilinearPO::compute_compression_initial_reverse() const {
+    vec2 response;
 
     response(0) = c_backbone(0, 0);
     response(1) = c_backbone(0, 1);
@@ -35,8 +35,8 @@ podarray<double> MultilinearPO::compute_compression_initial_reverse() const {
     return response;
 }
 
-podarray<double> MultilinearPO::compute_tension_backbone(const double t_strain) const {
-    podarray<double> response(2);
+vec2 MultilinearPO::compute_tension_backbone(const double t_strain) const {
+    vec2 response;
 
     uword IDX = 0;
     while(IDX < t_backbone.n_rows && t_backbone(IDX, 0) < t_strain) ++IDX;
@@ -57,8 +57,8 @@ podarray<double> MultilinearPO::compute_tension_backbone(const double t_strain) 
     return response;
 }
 
-podarray<double> MultilinearPO::compute_compression_backbone(const double t_strain) const {
-    podarray<double> response(2);
+vec2 MultilinearPO::compute_compression_backbone(const double t_strain) const {
+    vec2 response;
 
     uword IDX = 0;
     while(IDX < c_backbone.n_rows && c_backbone(IDX, 0) > t_strain) ++IDX;

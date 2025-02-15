@@ -17,8 +17,8 @@
 
 #include "ConcreteExp.h"
 
-podarray<double> ConcreteExp::compute_compression_initial_reverse() const {
-    podarray<double> response(2);
+vec2 ConcreteExp::compute_compression_initial_reverse() const {
+    vec2 response;
 
     response(1) = middle_point * f_c;
     response(0) = response(1) / elastic_modulus;
@@ -26,8 +26,8 @@ podarray<double> ConcreteExp::compute_compression_initial_reverse() const {
     return response;
 }
 
-podarray<double> ConcreteExp::compute_tension_initial_reverse() const {
-    podarray<double> response(2);
+vec2 ConcreteExp::compute_tension_initial_reverse() const {
+    vec2 response;
 
     response(1) = middle_point * f_t;
     response(0) = response(1) / elastic_modulus;
@@ -35,8 +35,8 @@ podarray<double> ConcreteExp::compute_tension_initial_reverse() const {
     return response;
 }
 
-podarray<double> ConcreteExp::compute_compression_backbone(const double n_strain) const {
-    podarray<double> response(2);
+vec2 ConcreteExp::compute_compression_backbone(const double n_strain) const {
+    vec2 response;
 
     response(0) = (response(1) = elastic_modulus) * n_strain;
 
@@ -71,8 +71,8 @@ podarray<double> ConcreteExp::compute_compression_backbone(const double n_strain
     return response;
 }
 
-podarray<double> ConcreteExp::compute_tension_backbone(const double n_strain) const {
-    podarray<double> response(2);
+vec2 ConcreteExp::compute_tension_backbone(const double n_strain) const {
+    vec2 response;
 
     response(0) = (response(1) = elastic_modulus) * n_strain;
 

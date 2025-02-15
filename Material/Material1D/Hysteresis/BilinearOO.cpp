@@ -17,8 +17,8 @@
 
 #include "BilinearOO.h"
 
-podarray<double> BilinearOO::compute_tension_backbone(const double strain) const {
-    podarray<double> response(2);
+vec2 BilinearOO::compute_tension_backbone(const double strain) const {
+    vec2 response;
 
     response(0) = strain > t_strain ? t_stress + (response(1) = t_hardening) * (strain - t_strain) : (response(1) = elastic_modulus) * strain;
 
@@ -30,8 +30,8 @@ podarray<double> BilinearOO::compute_tension_backbone(const double strain) const
     return response;
 }
 
-podarray<double> BilinearOO::compute_compression_backbone(const double strain) const {
-    podarray<double> response(2);
+vec2 BilinearOO::compute_compression_backbone(const double strain) const {
+    vec2 response;
 
     response(0) = strain < c_strain ? c_stress + (response(1) = c_hardening) * (strain - c_strain) : (response(1) = elastic_modulus) * strain;
 

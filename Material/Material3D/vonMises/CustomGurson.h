@@ -38,7 +38,7 @@ class CustomGurson final : public NonlinearGurson {
 
     ResourceHolder<Expression> expression;
 
-    [[nodiscard]] vec compute_hardening(double) const override;
+    [[nodiscard]] vec2 compute_hardening(double) const override;
 
 public:
     CustomGurson(

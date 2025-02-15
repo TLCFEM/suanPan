@@ -56,8 +56,8 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     auto s = trial_s;
     auto p = trial_p;
 
-    mat jacobian(14, 14, fill::none);
-    vec residual(14, fill::none), incre;
+    mat::fixed<14, 14> jacobian(fill::none);
+    vec::fixed<14> residual(fill::none), incre;
 
     jacobian(sa, sa) = 0.;
 

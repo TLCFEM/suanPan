@@ -18,24 +18,24 @@
 #include "ConcreteTsai.h"
 #include <Toolbox/utility.h>
 
-podarray<double> ConcreteTsai::compute_compression_initial_reverse() const {
-    podarray<double> response(2);
+vec2 ConcreteTsai::compute_compression_initial_reverse() const {
+    vec2 response;
 
     response(1) = compute_compression_backbone(response(0) = middle_point * c_strain)(0);
 
     return response;
 }
 
-podarray<double> ConcreteTsai::compute_tension_initial_reverse() const {
-    podarray<double> response(2);
+vec2 ConcreteTsai::compute_tension_initial_reverse() const {
+    vec2 response;
 
     response(1) = compute_tension_backbone(response(0) = middle_point * t_strain)(0);
 
     return response;
 }
 
-podarray<double> ConcreteTsai::compute_compression_backbone(const double n_strain) const {
-    podarray<double> response(2);
+vec2 ConcreteTsai::compute_compression_backbone(const double n_strain) const {
+    vec2 response;
 
     const auto normal_strain = std::max(datum::eps, n_strain / c_strain);
     const auto tmp_a = pow(normal_strain, c_n);
@@ -46,8 +46,8 @@ podarray<double> ConcreteTsai::compute_compression_backbone(const double n_strai
     return response;
 }
 
-podarray<double> ConcreteTsai::compute_tension_backbone(const double n_strain) const {
-    podarray<double> response(2);
+vec2 ConcreteTsai::compute_tension_backbone(const double n_strain) const {
+    vec2 response;
 
     const auto normal_strain = std::max(datum::eps, n_strain / t_strain);
     const auto tmp_a = pow(normal_strain, t_n);

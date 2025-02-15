@@ -31,8 +31,8 @@
 #include <Material/Material1D/Hysteresis/SimpleHysteresis.h>
 
 class OriginOriented : public SimpleHysteresis {
-    [[nodiscard]] podarray<double> compute_compression_initial_reverse() const override;
-    [[nodiscard]] podarray<double> compute_tension_initial_reverse() const override;
+    [[nodiscard]] vec2 compute_compression_initial_reverse() const override;
+    [[nodiscard]] vec2 compute_tension_initial_reverse() const override;
     [[nodiscard]] double compute_compression_residual(double, double) const override;
     [[nodiscard]] double compute_tension_residual(double, double) const override;
 

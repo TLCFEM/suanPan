@@ -17,21 +17,9 @@
 
 #include "OriginOriented.h"
 
-podarray<double> OriginOriented::compute_compression_initial_reverse() const {
-    podarray<double> out(2);
+vec2 OriginOriented::compute_compression_initial_reverse() const { return vec2(fill::zeros); }
 
-    out(1) = out(0) = 0.;
-
-    return out;
-}
-
-podarray<double> OriginOriented::compute_tension_initial_reverse() const {
-    podarray<double> out(2);
-
-    out(1) = out(0) = 0.;
-
-    return out;
-}
+vec2 OriginOriented::compute_tension_initial_reverse() const { return vec2(fill::zeros); }
 
 double OriginOriented::compute_compression_residual(const double, const double) const { return 0.; }
 

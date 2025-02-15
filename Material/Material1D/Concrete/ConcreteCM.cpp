@@ -18,8 +18,8 @@
 #include "ConcreteCM.h"
 #include <Toolbox/utility.h>
 
-podarray<double> ConcreteCM::compute_compression_backbone(const double n_strain) {
-    podarray<double> response(2);
+vec2 ConcreteCM::compute_compression_backbone(const double n_strain) {
+    vec2 response;
 
     suanpan_assert([&] { if(n_strain > 0.) throw invalid_argument("argument is not acceptable"); });
 
@@ -33,8 +33,8 @@ podarray<double> ConcreteCM::compute_compression_backbone(const double n_strain)
     return response;
 }
 
-podarray<double> ConcreteCM::compute_tension_backbone(const double n_strain) {
-    podarray<double> response(2);
+vec2 ConcreteCM::compute_tension_backbone(const double n_strain) {
+    vec2 response;
 
     suanpan_assert([&] { if(n_strain < 0.) throw invalid_argument("argument is not acceptable"); });
 
@@ -48,7 +48,7 @@ podarray<double> ConcreteCM::compute_tension_backbone(const double n_strain) {
     return response;
 }
 
-podarray<double> ConcreteCM::compute_compression_unload(const double n_strain) {
+vec2 ConcreteCM::compute_compression_unload(const double n_strain) {
     const auto& unload_c_strain = trial_history(0);
     const auto& unload_c_stress = trial_history(1);
     const auto& residual_c_strain = trial_history(4);
@@ -57,7 +57,7 @@ podarray<double> ConcreteCM::compute_compression_unload(const double n_strain) {
     const auto& unload_t_stress = trial_history(7);
     const auto& reload_t_stiffness = trial_history(19);
 
-    podarray<double> response;
+    vec2 response;
 
     if(n_strain > unload_t_strain) {
         trial_load_status = Status::TBACKBONE;
@@ -75,7 +75,7 @@ podarray<double> ConcreteCM::compute_compression_unload(const double n_strain) {
     return response;
 }
 
-podarray<double> ConcreteCM::compute_tension_unload(const double n_strain) {
+vec2 ConcreteCM::compute_tension_unload(const double n_strain) {
     const auto& unload_c_strain = trial_history(0);
     const auto& unload_c_stress = trial_history(1);
     const auto& unload_t_strain = trial_history(6);
@@ -84,7 +84,7 @@ podarray<double> ConcreteCM::compute_tension_unload(const double n_strain) {
     const auto& residual_t_stiffness = trial_history(11);
     const auto& reload_c_stiffness = trial_history(18);
 
-    podarray<double> response;
+    vec2 response;
 
     if(n_strain < unload_c_strain) {
         trial_load_status = Status::CBACKBONE;
@@ -102,11 +102,11 @@ podarray<double> ConcreteCM::compute_tension_unload(const double n_strain) {
     return response;
 }
 
-podarray<double> ConcreteCM::compute_compression_reload(const double n_strain) {
+vec2 ConcreteCM::compute_compression_reload(const double n_strain) {
     const auto& unload_c_strain = trial_history(0);
     const auto& reload_c_stiffness = trial_history(18);
 
-    podarray<double> response(2);
+    vec2 response;
 
     if(n_strain < unload_c_strain) {
         trial_load_status = Status::CBACKBONE;
@@ -121,11 +121,11 @@ podarray<double> ConcreteCM::compute_compression_reload(const double n_strain) {
     return response;
 }
 
-podarray<double> ConcreteCM::compute_tension_reload(const double n_strain) {
+vec2 ConcreteCM::compute_tension_reload(const double n_strain) {
     const auto& unload_t_strain = trial_history(6);
     const auto& reload_t_stiffness = trial_history(19);
 
-    podarray<double> response(2);
+    vec2 response;
 
     if(n_strain > unload_t_strain) {
         trial_load_status = Status::TBACKBONE;
@@ -140,12 +140,12 @@ podarray<double> ConcreteCM::compute_tension_reload(const double n_strain) {
     return response;
 }
 
-podarray<double> ConcreteCM::compute_compression_subunload(const double n_strain) {
+vec2 ConcreteCM::compute_compression_subunload(const double n_strain) {
     const auto& reverse_c_strain = trial_history(2);
     const auto& reverse_c_stress = trial_history(3);
     const auto& residual_c_strain = trial_history(4);
 
-    podarray<double> response(2);
+    vec2 response;
 
     if(n_strain > residual_c_strain) response = compute_compression_unload(n_strain);
     else {
@@ -157,12 +157,12 @@ podarray<double> ConcreteCM::compute_compression_subunload(const double n_strain
     return response;
 }
 
-podarray<double> ConcreteCM::compute_tension_subunload(const double n_strain) {
+vec2 ConcreteCM::compute_tension_subunload(const double n_strain) {
     const auto& reverse_t_strain = trial_history(8);
     const auto& reverse_t_stress = trial_history(9);
     const auto& residual_t_strain = trial_history(10);
 
-    podarray<double> response(2);
+    vec2 response;
 
     if(n_strain < residual_t_strain) response = compute_tension_unload(n_strain);
     else {
@@ -174,8 +174,8 @@ podarray<double> ConcreteCM::compute_tension_subunload(const double n_strain) {
     return response;
 }
 
-podarray<double> ConcreteCM::compute_transition(const double EM, const double EA, const double SA, const double KA, const double EB, const double SB, const double KB) const {
-    podarray<double> response(2);
+vec2 ConcreteCM::compute_transition(const double EM, const double EA, const double SA, const double KA, const double EB, const double SB, const double KB) const {
+    vec2 response;
 
     if(fabs(EM - EA) <= 1E-15) {
         response(0) = SA;
