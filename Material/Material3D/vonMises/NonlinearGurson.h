@@ -49,7 +49,7 @@ class NonlinearGurson : protected DataNonlinearGurson, public Material3D {
     const double para_a = 3. * bulk * q1 * q2;
     const double para_b = fn / sn / sqrt(2. * datum::pi);
 
-    [[nodiscard]] virtual vec compute_hardening(double) const = 0;
+    [[nodiscard]] virtual vec2 compute_hardening(double) const = 0;
 
 public:
     NonlinearGurson(

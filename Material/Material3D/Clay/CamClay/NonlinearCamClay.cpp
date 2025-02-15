@@ -52,8 +52,8 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
     auto ini_f = 0., gamma = 0.;
 
-    vec residual(2), incre;
-    mat jacobian(2, 2);
+    vec2 residual, incre;
+    mat22 jacobian;
 
     auto counter = 0u;
     auto rel_error = 1.;

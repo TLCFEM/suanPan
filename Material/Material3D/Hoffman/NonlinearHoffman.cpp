@@ -52,8 +52,8 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
 
     auto gamma = 0., ref_error = 1.;
 
-    vec incre, residual(7);
-    mat jacobian(7, 7);
+    vec7 incre, residual;
+    mat77 jacobian;
 
     auto counter = 0u;
     while(true) {

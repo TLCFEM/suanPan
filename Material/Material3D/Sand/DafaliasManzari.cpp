@@ -64,8 +64,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     double g, pgpe, pgpp;
 
-    vec residual(7, fill::none), incre;
-    mat jacobian(7, 7, fill::eye);
+    vec7 residual(fill::none), incre;
+    mat77 jacobian(fill::eye);
 
     auto counter = 0u;
     auto ref_error = 1.;

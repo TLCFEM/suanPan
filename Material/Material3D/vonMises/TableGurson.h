@@ -34,7 +34,7 @@
 class TableGurson final : public NonlinearGurson {
     const mat hardening_table;
 
-    [[nodiscard]] vec compute_hardening(double) const override;
+    [[nodiscard]] vec2 compute_hardening(double) const override;
 
 public:
     TableGurson(
