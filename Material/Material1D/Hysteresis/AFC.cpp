@@ -18,8 +18,8 @@
 #include "AFC.h"
 #include <Toolbox/utility.h>
 
-podarray<double> AFC::compute_transition(const double TX, const double XS, const double YS, const double ES, const double XF, const double YF, const double EF) {
-    podarray<double> response(2);
+vec2 AFC::compute_transition(const double TX, const double XS, const double YS, const double ES, const double XF, const double YF, const double EF) {
+    vec2 response;
 
     if(fabs(TX - XS) <= datum::eps) {
         response(0) = YS;
