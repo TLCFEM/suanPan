@@ -1,4 +1,3 @@
----
 name: Bug Report
 about: Create a report to help us improve
 title: "[BUG]"
@@ -25,4 +24,3 @@ body:
       placeholder: |
         Add any other context about the problem here.
         If there are any references, please also provide them.
----

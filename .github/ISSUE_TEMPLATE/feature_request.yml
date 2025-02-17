@@ -1,4 +1,3 @@
----
 name: Feature Request
 about: Suggest an idea for this project
 title: "[FEATURE]"
@@ -18,4 +17,3 @@ body:
       placeholder: |
         Please provide any relevant references (papers, thesis, etc.).
         Please provide DOIs and links only to avoid copyright issues.
----
