@@ -17,72 +17,72 @@
 
 #include "ConcreteTable.h"
 
-vec2 ConcreteTable::compute_compression_initial_reverse() const {
-    vec2 response;
+pod2 ConcreteTable::compute_compression_initial_reverse() const {
+    pod2 response;
 
     for(uword I = 0; I < c_table.n_rows; ++I)
         if(c_table(I, 0) != 0.) {
-            response(0) = c_table(I, 0);
-            response(1) = c_table(I, 1);
+            response[0] = c_table(I, 0);
+            response[1] = c_table(I, 1);
             break;
         }
 
     return response;
 }
 
-vec2 ConcreteTable::compute_tension_initial_reverse() const {
-    vec2 response;
+pod2 ConcreteTable::compute_tension_initial_reverse() const {
+    pod2 response;
 
     for(uword I = 0; I < t_table.n_rows; ++I)
         if(t_table(I, 0) != 0.) {
-            response(0) = t_table(I, 0);
-            response(1) = t_table(I, 1);
+            response[0] = t_table(I, 0);
+            response[1] = t_table(I, 1);
             break;
         }
 
     return response;
 }
 
-vec2 ConcreteTable::compute_compression_backbone(const double n_strain) const {
-    vec2 response;
+pod2 ConcreteTable::compute_compression_backbone(const double n_strain) const {
+    pod2 response;
 
     for(uword I = 0; I < c_table.n_rows; ++I)
         if(c_table(I, 0) < n_strain) {
             if(0 == I) {
-                response(1) = c_table(I, 1) / c_table(I, 0);
-                response(0) = n_strain * response(1);
+                response[1] = c_table(I, 1) / c_table(I, 0);
+                response[0] = n_strain * response[1];
             }
             else {
-                response(1) = (c_table(I, 1) - c_table(I - 1, 1)) / (c_table(I, 0) - c_table(I - 1, 0));
-                response(0) = c_table(I - 1, 1) + (n_strain - c_table(I - 1, 0)) * response(1);
+                response[1] = (c_table(I, 1) - c_table(I - 1, 1)) / (c_table(I, 0) - c_table(I - 1, 0));
+                response[0] = c_table(I - 1, 1) + (n_strain - c_table(I - 1, 0)) * response[1];
             }
             return response;
         }
 
-    response(1) = 1E-10;
-    response(0) = c_table(c_table.n_rows - 1, 0);
+    response[1] = 1E-10;
+    response[0] = c_table(c_table.n_rows - 1, 0);
 
     return response;
 }
 
-vec2 ConcreteTable::compute_tension_backbone(const double n_strain) const {
-    vec2 response;
+pod2 ConcreteTable::compute_tension_backbone(const double n_strain) const {
+    pod2 response;
 
     for(uword I = 0; I < t_table.n_rows; ++I)
         if(t_table(I, 0) > n_strain) {
             if(0 == I) {
-                response(1) = t_table(I, 1) / t_table(I, 0);
-                response(0) = n_strain * response(1);
+                response[1] = t_table(I, 1) / t_table(I, 0);
+                response[0] = n_strain * response[1];
             }
             else {
-                response(1) = (t_table(I, 1) - t_table(I - 1, 1)) / (t_table(I, 0) - t_table(I - 1, 0));
-                response(0) = t_table(I - 1, 1) + (n_strain - t_table(I - 1, 0)) * response(1);
+                response[1] = (t_table(I, 1) - t_table(I - 1, 1)) / (t_table(I, 0) - t_table(I - 1, 0));
+                response[0] = t_table(I - 1, 1) + (n_strain - t_table(I - 1, 0)) * response[1];
             }
             return response;
         }
 
-    response(1) = 1E-10;
-    response(0) = t_table(t_table.n_rows - 1, 0);
+    response[1] = 1E-10;
+    response[0] = t_table(t_table.n_rows - 1, 0);
 
     return response;
 }
@@ -106,8 +106,8 @@ int ConcreteTable::initialize(const shared_ptr<DomainBase>&) {
 
 double ConcreteTable::get_parameter(const ParameterType P) const {
     if(ParameterType::ELASTICMODULUS == P) return initial_stiffness(0);
-    if(ParameterType::PEAKSTRAIN == P) return compute_compression_initial_reverse()(0);
-    if(ParameterType::CRACKSTRAIN == P) return compute_tension_initial_reverse()(0);
+    if(ParameterType::PEAKSTRAIN == P) return compute_compression_initial_reverse()[0];
+    if(ParameterType::CRACKSTRAIN == P) return compute_tension_initial_reverse()[0];
     return 0.;
 }
 

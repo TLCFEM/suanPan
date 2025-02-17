@@ -32,14 +32,15 @@
 #include <Material/Material1D/Material1D.h>
 
 class ComplexHysteresis : public Material1D {
-    [[nodiscard]] virtual vec2 compute_compression_backbone(double) = 0;
-    [[nodiscard]] virtual vec2 compute_tension_backbone(double) = 0;
-    [[nodiscard]] virtual vec2 compute_compression_unload(double) = 0;
-    [[nodiscard]] virtual vec2 compute_tension_unload(double) = 0;
-    [[nodiscard]] virtual vec2 compute_compression_reload(double) = 0;
-    [[nodiscard]] virtual vec2 compute_tension_reload(double) = 0;
-    [[nodiscard]] virtual vec2 compute_compression_subunload(double) = 0;
-    [[nodiscard]] virtual vec2 compute_tension_subunload(double) = 0;
+private:
+    [[nodiscard]] virtual pod2 compute_compression_backbone(double) = 0;
+    [[nodiscard]] virtual pod2 compute_tension_backbone(double) = 0;
+    [[nodiscard]] virtual pod2 compute_compression_unload(double) = 0;
+    [[nodiscard]] virtual pod2 compute_tension_unload(double) = 0;
+    [[nodiscard]] virtual pod2 compute_compression_reload(double) = 0;
+    [[nodiscard]] virtual pod2 compute_tension_reload(double) = 0;
+    [[nodiscard]] virtual pod2 compute_compression_subunload(double) = 0;
+    [[nodiscard]] virtual pod2 compute_tension_subunload(double) = 0;
 
     virtual void update_compression_unload(double) = 0;
     virtual void update_tension_unload(double) = 0;

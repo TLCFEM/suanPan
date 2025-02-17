@@ -17,28 +17,28 @@
 
 #include "ConcreteExp.h"
 
-vec2 ConcreteExp::compute_compression_initial_reverse() const {
-    vec2 response;
+pod2 ConcreteExp::compute_compression_initial_reverse() const {
+    pod2 response;
 
-    response(1) = middle_point * f_c;
-    response(0) = response(1) / elastic_modulus;
-
-    return response;
-}
-
-vec2 ConcreteExp::compute_tension_initial_reverse() const {
-    vec2 response;
-
-    response(1) = middle_point * f_t;
-    response(0) = response(1) / elastic_modulus;
+    response[1] = middle_point * f_c;
+    response[0] = response[1] / elastic_modulus;
 
     return response;
 }
 
-vec2 ConcreteExp::compute_compression_backbone(const double n_strain) const {
-    vec2 response;
+pod2 ConcreteExp::compute_tension_initial_reverse() const {
+    pod2 response;
 
-    response(0) = (response(1) = elastic_modulus) * n_strain;
+    response[1] = middle_point * f_t;
+    response[0] = response[1] / elastic_modulus;
+
+    return response;
+}
+
+pod2 ConcreteExp::compute_compression_backbone(const double n_strain) const {
+    pod2 response;
+
+    response[0] = (response[1] = elastic_modulus) * n_strain;
 
     if(n_strain * elastic_modulus >= f_c) return response;
 
@@ -65,16 +65,16 @@ vec2 ConcreteExp::compute_compression_backbone(const double n_strain) const {
         stress -= incre;
     }
 
-    response(0) = stress;
-    response(1) = b_c * (2. * a_c * exp_term - 1. - a_c) * exp_term / jacobian;
+    response[0] = stress;
+    response[1] = b_c * (2. * a_c * exp_term - 1. - a_c) * exp_term / jacobian;
 
     return response;
 }
 
-vec2 ConcreteExp::compute_tension_backbone(const double n_strain) const {
-    vec2 response;
+pod2 ConcreteExp::compute_tension_backbone(const double n_strain) const {
+    pod2 response;
 
-    response(0) = (response(1) = elastic_modulus) * n_strain;
+    response[0] = (response[1] = elastic_modulus) * n_strain;
 
     if(n_strain * elastic_modulus <= f_t) return response;
 
@@ -101,8 +101,8 @@ vec2 ConcreteExp::compute_tension_backbone(const double n_strain) const {
         stress -= incre;
     }
 
-    response(0) = stress;
-    response(1) = b_t * (1. + a_t - 2. * a_t * exp_term) * exp_term / jacobian;
+    response[0] = stress;
+    response[1] = b_t * (1. + a_t - 2. * a_t * exp_term) * exp_term / jacobian;
 
     return response;
 }

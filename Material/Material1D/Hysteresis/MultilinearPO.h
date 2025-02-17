@@ -36,10 +36,10 @@ struct DataMultilinearPO {
 };
 
 class MultilinearPO final : protected DataMultilinearPO, public PeakOriented {
-    [[nodiscard]] vec2 compute_tension_initial_reverse() const override;
-    [[nodiscard]] vec2 compute_compression_initial_reverse() const override;
-    [[nodiscard]] vec2 compute_tension_backbone(double) const override;
-    [[nodiscard]] vec2 compute_compression_backbone(double) const override;
+    [[nodiscard]] pod2 compute_tension_initial_reverse() const override;
+    [[nodiscard]] pod2 compute_compression_initial_reverse() const override;
+    [[nodiscard]] pod2 compute_tension_backbone(double) const override;
+    [[nodiscard]] pod2 compute_compression_backbone(double) const override;
 
 public:
     MultilinearPO(int, mat&&, mat&&, double);
