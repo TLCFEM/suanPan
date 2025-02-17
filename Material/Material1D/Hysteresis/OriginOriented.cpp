@@ -17,9 +17,9 @@
 
 #include "OriginOriented.h"
 
-vec2 OriginOriented::compute_compression_initial_reverse() const { return vec2(fill::zeros); }
+pod2 OriginOriented::compute_compression_initial_reverse() const { return {0., 0.}; }
 
-vec2 OriginOriented::compute_tension_initial_reverse() const { return vec2(fill::zeros); }
+pod2 OriginOriented::compute_tension_initial_reverse() const { return {0., 0.}; }
 
 double OriginOriented::compute_compression_residual(const double, const double) const { return 0.; }
 

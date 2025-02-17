@@ -42,15 +42,15 @@ class ConcreteCM final : public ComplexHysteresis {
 
     const bool linear_trans;
 
-    [[nodiscard]] vec2 compute_compression_backbone(double) override;
-    [[nodiscard]] vec2 compute_tension_backbone(double) override;
-    [[nodiscard]] vec2 compute_compression_unload(double) override;
-    [[nodiscard]] vec2 compute_tension_unload(double) override;
-    [[nodiscard]] vec2 compute_compression_reload(double) override;
-    [[nodiscard]] vec2 compute_tension_reload(double) override;
-    [[nodiscard]] vec2 compute_compression_subunload(double) override;
-    [[nodiscard]] vec2 compute_tension_subunload(double) override;
-    [[nodiscard]] vec2 compute_transition(double, double, double, double, double, double, double) const;
+    [[nodiscard]] pod2 compute_compression_backbone(double) override;
+    [[nodiscard]] pod2 compute_tension_backbone(double) override;
+    [[nodiscard]] pod2 compute_compression_unload(double) override;
+    [[nodiscard]] pod2 compute_tension_unload(double) override;
+    [[nodiscard]] pod2 compute_compression_reload(double) override;
+    [[nodiscard]] pod2 compute_tension_reload(double) override;
+    [[nodiscard]] pod2 compute_compression_subunload(double) override;
+    [[nodiscard]] pod2 compute_tension_subunload(double) override;
+    [[nodiscard]] pod2 compute_transition(double, double, double, double, double, double, double) const;
 
     void update_compression_unload(double) override;
     void update_tension_unload(double) override;

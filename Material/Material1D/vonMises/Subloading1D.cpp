@@ -23,7 +23,7 @@ const double DataSubloading1D::Saturation::root_one_half = sqrt(1.5);
 
 const double Subloading1D::rate_bound = -log(z_bound);
 
-vec2 Subloading1D::yield_ratio(const double z) {
+pod2 Subloading1D::yield_ratio(const double z) {
     if(z < z_bound) return {rate_bound, 0.};
 
     return {-log(z), -1. / z};
@@ -125,7 +125,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         for(auto I = 0llu; I < c.size(); ++I) dd += c[I].r() * (c[I].b() * n - d[I]) / bottom_d[I];
 
         const auto trial_ratio = yield_ratio(z);
-        const auto avg_rate = u * trial_ratio(0);
+        const auto avg_rate = u * trial_ratio[0];
         const auto fraction_term = (cv * z - zv) * norm_mu * gamma + 1.;
         const auto power_term = pow(fraction_term, nv - 1.);
 
@@ -139,7 +139,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         jacobian(1, 0) = -avg_rate;
         jacobian(1, 1) = 0.;
-        jacobian(1, 2) = 1. - u * gamma * trial_ratio(1);
+        jacobian(1, 2) = 1. - u * gamma * trial_ratio[1];
 
         jacobian(2, 0) = -z * nv * power_term * (cv * z - zv) * norm_mu;
         jacobian(2, 1) = 1. + z * nv * power_term * norm_mu * gamma;

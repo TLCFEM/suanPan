@@ -62,7 +62,7 @@ int ComplexHysteresis::update_trial_status(const vec& n_strain) {
 
     const auto tension_sign = incre_strain(0) > 0.;
 
-    vec2 response;
+    pod2 response;
 
     if(Status::CBACKBONE == trial_load_status) {
         if(!tension_sign) response = compute_compression_backbone(trial_strain(0));
@@ -91,8 +91,8 @@ int ComplexHysteresis::update_trial_status(const vec& n_strain) {
                 trial_load_status = Status::CTRANS;
                 inter_strain = current_strain(0);
                 inter_stress = current_stress(0);
-                response(1) = (connect_c_stress - inter_stress) / (residual_c_strain - inter_strain);
-                response(0) = current_stress(0) + incre_strain(0) * response(1);
+                response[1] = (connect_c_stress - inter_stress) / (residual_c_strain - inter_strain);
+                response[0] = current_stress(0) + incre_strain(0) * response[1];
             }
         else {
             reload_c_stiffness = (unload_c_stress - current_stress(0)) / (unload_c_strain - current_strain(0));
@@ -112,8 +112,8 @@ int ComplexHysteresis::update_trial_status(const vec& n_strain) {
                 trial_load_status = Status::TTRANS;
                 inter_strain = current_strain(0);
                 inter_stress = current_stress(0);
-                response(1) = (connect_t_stress - inter_stress) / (residual_t_strain - inter_strain);
-                response(0) = current_stress(0) + incre_strain(0) * response(1);
+                response[1] = (connect_t_stress - inter_stress) / (residual_t_strain - inter_strain);
+                response[0] = current_stress(0) + incre_strain(0) * response[1];
             }
         else {
             reload_t_stiffness = (unload_t_stress - current_stress(0)) / (unload_t_strain - current_strain(0));
@@ -157,29 +157,29 @@ int ComplexHysteresis::update_trial_status(const vec& n_strain) {
                 trial_load_status = Status::TTRANS;
                 inter_strain = current_strain(0);
                 inter_stress = current_stress(0);
-                response(1) = (connect_t_stress - inter_stress) / (residual_t_strain - inter_strain);
-                response(0) = current_stress(0) + incre_strain(0) * response(1);
+                response[1] = (connect_t_stress - inter_stress) / (residual_t_strain - inter_strain);
+                response[0] = current_stress(0) + incre_strain(0) * response[1];
             }
         else if(trial_strain(0) < residual_c_strain) response = compute_tension_unload(trial_strain(0));
         else {
-            response(1) = (connect_c_stress - inter_stress) / (residual_c_strain - inter_strain);
-            response(0) = current_stress(0) + incre_strain(0) * response(1);
+            response[1] = (connect_c_stress - inter_stress) / (residual_c_strain - inter_strain);
+            response[0] = current_stress(0) + incre_strain(0) * response[1];
         }
     }
     else if(Status::TTRANS == trial_load_status) {
         if(tension_sign)
             if(trial_strain(0) > residual_t_strain) response = compute_compression_unload(trial_strain(0));
             else {
-                response(1) = (connect_t_stress - inter_stress) / (residual_t_strain - inter_strain);
-                response(0) = current_stress(0) + incre_strain(0) * response(1);
+                response[1] = (connect_t_stress - inter_stress) / (residual_t_strain - inter_strain);
+                response[0] = current_stress(0) + incre_strain(0) * response[1];
             }
         else if(trial_strain(0) < residual_c_strain) response = compute_tension_unload(trial_strain(0));
         else {
             trial_load_status = Status::CTRANS;
             inter_strain = current_strain(0);
             inter_stress = current_stress(0);
-            response(1) = (connect_c_stress - inter_stress) / (residual_c_strain - inter_strain);
-            response(0) = current_stress(0) + incre_strain(0) * response(1);
+            response[1] = (connect_c_stress - inter_stress) / (residual_c_strain - inter_strain);
+            response[0] = current_stress(0) + incre_strain(0) * response[1];
         }
     }
     else {
@@ -193,8 +193,8 @@ int ComplexHysteresis::update_trial_status(const vec& n_strain) {
         }
     }
 
-    trial_stress = response(0);
-    trial_stiffness = response(1);
+    trial_stress = response[0];
+    trial_stiffness = response[1];
 
     return SUANPAN_SUCCESS;
 }

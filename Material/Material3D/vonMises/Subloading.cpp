@@ -23,7 +23,7 @@ const double Subloading::root_two_third = sqrt(two_third);
 const double Subloading::rate_bound = -log(z_bound);
 const mat Subloading::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-vec2 Subloading::yield_ratio(const double z) {
+pod2 Subloading::yield_ratio(const double z) {
     if(z < z_bound) return {rate_bound, 0.};
 
     return {-log(z), -1. / z};
@@ -159,7 +159,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
         }
 
         const auto trial_ratio = yield_ratio(z);
-        const auto avg_rate = u * trial_ratio(0);
+        const auto avg_rate = u * trial_ratio[0];
 
         residual(0) = tensor::stress::norm(trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d) - root_two_third * z * y;
         residual(1) = z - start_z - root_two_third * gamma * avg_rate;
@@ -168,7 +168,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
         jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + root_two_third * y * (gamma * c.rb() / bot_d - 1.);
 
         jacobian(1, 0) = -root_two_third * avg_rate;
-        jacobian(1, 1) = 1. - root_two_third * gamma * u * trial_ratio(1);
+        jacobian(1, 1) = 1. - root_two_third * gamma * u * trial_ratio[1];
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
