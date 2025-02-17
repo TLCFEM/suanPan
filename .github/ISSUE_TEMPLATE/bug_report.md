@@ -4,17 +4,25 @@ about: Create a report to help us improve
 title: "[BUG]"
 labels: 'bug'
 assignees: ''
-
+body:
+  - type: input
+    attribute:
+      label: Version
+      description: Indicate version tags or 'dev' if using the head of 'dev' branch.
+      validation:
+        required: true
+  - type: textarea
+    attribute:
+      label: Describe the bug
+      placeholder: |
+        A clear and concise description of what the bug is.
+        You can also upload a MWE to reproduce the behaviour.
+      validation:
+        required: true
+  - type: textarea
+    attribute:
+      label: Additional context
+      placeholder: |
+        Add any other context about the problem here.
+        If there are any references, please also provide them.
 ---
-
-**Describe the bug**
-A clear and concise description of what the bug is.
-
-**Expected behaviour**
-A clear and concise description of the expected result should be. It would be even better if there is a theoretical solution or reference.
-
-**To reproduce**
-Please provide a MWE (minimum working example) model. It shall be as simple as possible to help efficiently identify the problem.
-
-**Additional context**
-Add any other context about the problem here. If there are any references, please also provide them.

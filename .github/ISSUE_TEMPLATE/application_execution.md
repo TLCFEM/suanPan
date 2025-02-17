@@ -4,15 +4,26 @@ about: Create a report to help us improve
 title: "[Portability]"
 labels: 'portability'
 assignees: ''
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ***The application officially distributed requires AVX2 support. Please make sure your CPU supports AVX2.***
 
+        ***If possible, please try to compile the application locally first to see if it executes.***
+  - type: dropdown
+    attributes:
+      label: Platform
+      multiple: false
+      options:
+        - linux
+        - windows
+        - macos
+  - type: textarea
+    attribute:
+      label: Issue
+      placeholder: |
+        Please provide a screenshot, etc., that shows the failed execution of the application.
+      validation:
+        required: true
 ---
-
-***The application officially distributed requires AVX2 support. Please make sure your CPU supports AVX2.***
-
-***If possible, please try to compile the application locally first to see if it executes.***
-
-**Platform**
-Please provide platform information, including OS, CPU.
-
-**Issue**
-Please provide a screenshot, etc., that shows the failed execution of the application.
