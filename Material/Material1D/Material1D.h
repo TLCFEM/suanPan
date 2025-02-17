@@ -30,10 +30,8 @@
 #define MATERIAL1D_H
 
 #include <Material/Material.h>
-#include <array>
 
 using std::vector;
-using pod2 = std::array<double, 2>;
 
 class Material1D : public Material {
 public:

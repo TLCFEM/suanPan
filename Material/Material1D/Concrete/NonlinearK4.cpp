@@ -37,12 +37,12 @@ int NonlinearK4::compute_plasticity() {
         }
 
         const auto backbone = backbone_handle(this, k);
-        const auto residual = fabs(trial_stress(0)) - backbone(0);
+        const auto residual = fabs(trial_stress(0)) - backbone[0];
 
         if(1u == counter && residual <= 0.) {
             if(apply_damage) {
                 const auto damage = damage_handle(this, k);
-                const auto damage_factor = 1. - damage(0);
+                const auto damage_factor = 1. - damage[0];
 
                 trial_stress *= damage_factor;
                 trial_stiffness *= damage_factor;
@@ -51,7 +51,7 @@ int NonlinearK4::compute_plasticity() {
             return SUANPAN_SUCCESS;
         }
 
-        const auto jacobian = elastic_modulus + backbone(1);
+        const auto jacobian = elastic_modulus + backbone[1];
         const auto incre = residual / jacobian;
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
@@ -62,10 +62,10 @@ int NonlinearK4::compute_plasticity() {
 
             if(apply_damage) {
                 const auto damage = damage_handle(this, k);
-                const auto damage_factor = 1. - damage(0);
+                const auto damage_factor = 1. - damage[0];
 
                 trial_stiffness *= damage_factor;
-                trial_stiffness -= abs(trial_stress) * damage(1) * dgamma;
+                trial_stiffness -= abs(trial_stress) * damage[1] * dgamma;
 
                 trial_stress *= damage_factor;
             }
@@ -180,28 +180,28 @@ void NonlinearK4::print() {
     Material1D::print();
 }
 
-vec2 ConcreteK4::compute_tension_backbone(const double k) const { return vec2{f_t + hardening_t * k, hardening_t}; }
+pod2 ConcreteK4::compute_tension_backbone(const double k) const { return {f_t + hardening_t * k, hardening_t}; }
 
-vec2 ConcreteK4::compute_compression_backbone(const double k) const {
-    if(k < k_peak) return vec2{f_y + hardening_c * k, hardening_c};
+pod2 ConcreteK4::compute_compression_backbone(const double k) const {
+    if(k < k_peak) return {f_y + hardening_c * k, hardening_c};
 
-    return vec2{f_c + hardening_d * (k - k_peak), hardening_d};
+    return {f_c + hardening_d * (k - k_peak), hardening_d};
 }
 
-vec2 ConcreteK4::compute_tension_damage(const double k) const {
+pod2 ConcreteK4::compute_tension_damage(const double k) const {
     const auto e_t = f_t / objective_scale(hardening_t, zeta_t);
     const auto factor = exp(-k / e_t);
-    return vec2{1. - factor, factor / e_t};
+    return {1. - factor, factor / e_t};
 }
 
-vec2 ConcreteK4::compute_compression_damage(double k) const {
-    if(k < k_peak) return vec2{0., 0.};
+pod2 ConcreteK4::compute_compression_damage(double k) const {
+    if(k < k_peak) return {0., 0.};
 
     k -= k_peak;
 
     const auto e_c = f_c / objective_scale(hardening_d, zeta_c);
     const auto factor = exp(-k / e_c);
-    return vec2{1. - factor, factor / e_c};
+    return {1. - factor, factor / e_c};
 }
 
 ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC, const bool OD)
