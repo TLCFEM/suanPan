@@ -1,25 +1,24 @@
 name: Bug Report
-about: Create a report to help us improve
+description: Create a report to help us improve
 title: "[BUG]"
-labels: 'bug'
-assignees: ''
+labels: ["bug"]
 body:
   - type: input
-    attribute:
+    attributes:
       label: Version
       description: Indicate version tags or 'dev' if using the head of 'dev' branch.
-      validation:
-        required: true
+    validations:
+      required: true
   - type: textarea
-    attribute:
+    attributes:
       label: Describe the bug
       placeholder: |
         A clear and concise description of what the bug is.
         You can also upload a MWE to reproduce the behaviour.
-      validation:
-        required: true
+    validations:
+      required: true
   - type: textarea
-    attribute:
+    attributes:
       label: Additional context
       placeholder: |
         Add any other context about the problem here.

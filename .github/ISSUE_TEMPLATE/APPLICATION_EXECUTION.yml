@@ -1,8 +1,7 @@
 name: Application Execution
-about: Create a report to help us improve
+description: Create a report to help us improve
 title: "[Portability]"
-labels: 'portability'
-assignees: ''
+labels: ["portability"]
 body:
   - type: markdown
     attributes:
@@ -19,9 +18,9 @@ body:
         - windows
         - macos
   - type: textarea
-    attribute:
+    attributes:
       label: Issue
       placeholder: |
         Please provide a screenshot, etc., that shows the failed execution of the application.
-      validation:
-        required: true
+    validations:
+      required: true

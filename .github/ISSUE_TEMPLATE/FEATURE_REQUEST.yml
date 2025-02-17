@@ -1,18 +1,17 @@
 name: Feature Request
-about: Suggest an idea for this project
+description: Suggest an idea for this project
 title: "[FEATURE]"
-labels: 'feature'
-assignees: ''
+labels: ["feature"]
 body:
   - type: textarea
-    attribute:
+    attributes:
       label: Feature
       placeholder: |
         Please provide a concise description of the requested feature and how it would be applied to practical problems.
-      validation:
-        required: true
+    validations:
+      required: true
   - type: textarea
-    attribute:
+    attributes:
       label: References
       placeholder: |
         Please provide any relevant references (papers, thesis, etc.).
