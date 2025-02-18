@@ -17,79 +17,79 @@
 
 #include "TableCDP.h"
 
-vec6 TableCDP::compute_tension_backbone(const double kappa) const {
-    vec6 out;
+pod6 TableCDP::compute_tension_backbone(const double kappa) const {
+    pod6 out;
 
     if(kappa < dt_table(0, 0)) {
-        out(3) = dt_table(0, 1) / dt_table(0, 0); // \md{d}
-        out(0) = kappa * out(3);                  // d
+        out[3] = dt_table(0, 1) / dt_table(0, 0); // \md{d}
+        out[0] = kappa * out[3];                  // d
     }
     else if(kappa > dt_table(dt_table.n_rows - 1, 0)) {
-        out(3) = (1. - dt_table(dt_table.n_rows - 1, 1)) / (1. - dt_table(dt_table.n_rows - 1, 0)); // \md{d}
-        out(0) = std::min(1., 1. - (1. - kappa) * out(3));                                          // d
+        out[3] = (1. - dt_table(dt_table.n_rows - 1, 1)) / (1. - dt_table(dt_table.n_rows - 1, 0)); // \md{d}
+        out[0] = std::min(1., 1. - (1. - kappa) * out[3]);                                          // d
     }
     else
         for(uword I = 1; I < dt_table.n_rows; ++I) {
             if(kappa <= dt_table(I, 0)) {
-                out(3) = (dt_table(I, 1) - dt_table(I - 1, 1)) / (dt_table(I, 0) - dt_table(I - 1, 0));
-                out(0) = out(3) * (kappa - dt_table(I - 1, 0)) + dt_table(I - 1, 1);
+                out[3] = (dt_table(I, 1) - dt_table(I - 1, 1)) / (dt_table(I, 0) - dt_table(I - 1, 0));
+                out[0] = out[3] * (kappa - dt_table(I - 1, 0)) + dt_table(I - 1, 1);
             }
         }
 
-    out(4) = -t_table(t_table.n_rows - 1, 1) / (1. - t_table(t_table.n_rows - 1, 0)); // \md{f}
-    out(1) = std::max(0., (kappa - 1.) * out(4));                                     // f
+    out[4] = -t_table(t_table.n_rows - 1, 1) / (1. - t_table(t_table.n_rows - 1, 0)); // \md{f}
+    out[1] = std::max(0., (kappa - 1.) * out[4]);                                     // f
 
     for(uword I = 1; I < t_table.n_rows; ++I) {
         if(kappa <= t_table(I, 0)) {
-            out(4) = (t_table(I, 1) - t_table(I - 1, 1)) / (t_table(I, 0) - t_table(I - 1, 0));
-            out(1) = out(4) * (kappa - t_table(I - 1, 0)) + t_table(I - 1, 1);
+            out[4] = (t_table(I, 1) - t_table(I - 1, 1)) / (t_table(I, 0) - t_table(I - 1, 0));
+            out[1] = out[4] * (kappa - t_table(I - 1, 0)) + t_table(I - 1, 1);
         }
     }
 
-    out(2) = out(1) / (1. - out(0));                                             // \bar{f}
-    out(5) = ((1. - out(0)) * out(4) + out(1) * out(3)) * pow(1. - out(0), -2.); // \md{\bar{f}}
+    out[2] = out[1] / (1. - out[0]);                                             // \bar{f}
+    out[5] = ((1. - out[0]) * out[4] + out[1] * out[3]) * pow(1. - out[0], -2.); // \md{\bar{f}}
 
     return out;
 }
 
-vec6 TableCDP::compute_compression_backbone(const double kappa) const {
-    vec6 out;
+pod6 TableCDP::compute_compression_backbone(const double kappa) const {
+    pod6 out;
 
     if(kappa < dc_table(0, 0)) {
-        out(3) = dc_table(0, 1) / dc_table(0, 0); // \md{d}
-        out(0) = kappa * out(3);                  // d
+        out[3] = dc_table(0, 1) / dc_table(0, 0); // \md{d}
+        out[0] = kappa * out[3];                  // d
     }
     else if(kappa > dc_table(dc_table.n_rows - 1, 0)) {
-        out(3) = (1. - dc_table(dc_table.n_rows - 1, 1)) / (1. - dc_table(dc_table.n_rows - 1, 0)); // \md{d}
-        out(0) = std::min(1., 1. - (1. - kappa) * out(3));                                          // d
+        out[3] = (1. - dc_table(dc_table.n_rows - 1, 1)) / (1. - dc_table(dc_table.n_rows - 1, 0)); // \md{d}
+        out[0] = std::min(1., 1. - (1. - kappa) * out[3]);                                          // d
     }
     else
         for(uword I = 1; I < dc_table.n_rows; ++I) {
             if(kappa <= dc_table(I, 0)) {
-                out(3) = (dc_table(I, 1) - dc_table(I - 1, 1)) / (dc_table(I, 0) - dc_table(I - 1, 0));
-                out(0) = out(3) * (kappa - dc_table(I - 1, 0)) + dc_table(I - 1, 1);
+                out[3] = (dc_table(I, 1) - dc_table(I - 1, 1)) / (dc_table(I, 0) - dc_table(I - 1, 0));
+                out[0] = out[3] * (kappa - dc_table(I - 1, 0)) + dc_table(I - 1, 1);
             }
         }
 
     for(uword I = 1; I < dc_table.n_rows; ++I) {
         if(kappa <= dc_table(I, 0)) {
-            out(3) = (dc_table(I, 1) - dc_table(I - 1, 1)) / (dc_table(I, 0) - dc_table(I - 1, 0));
-            out(0) = out(3) * (kappa - dc_table(I - 1, 0)) + dc_table(I - 1, 1);
+            out[3] = (dc_table(I, 1) - dc_table(I - 1, 1)) / (dc_table(I, 0) - dc_table(I - 1, 0));
+            out[0] = out[3] * (kappa - dc_table(I - 1, 0)) + dc_table(I - 1, 1);
         }
     }
 
-    out(4) = -c_table(c_table.n_rows - 1, 1) / (1. - c_table(c_table.n_rows - 1, 0)); // \md{f}
-    out(1) = std::min(0., (kappa - 1.) * out(4));                                     // f
+    out[4] = -c_table(c_table.n_rows - 1, 1) / (1. - c_table(c_table.n_rows - 1, 0)); // \md{f}
+    out[1] = std::min(0., (kappa - 1.) * out[4]);                                     // f
 
     for(uword I = 1; I < c_table.n_rows; ++I) {
         if(kappa <= c_table(I, 0)) {
-            out(4) = (c_table(I, 1) - c_table(I - 1, 1)) / (c_table(I, 0) - c_table(I - 1, 0));
-            out(1) = out(4) * (kappa - c_table(I - 1, 0)) + c_table(I - 1, 1);
+            out[4] = (c_table(I, 1) - c_table(I - 1, 1)) / (c_table(I, 0) - c_table(I - 1, 0));
+            out[1] = out[4] * (kappa - c_table(I - 1, 0)) + c_table(I - 1, 1);
         }
     }
 
-    out(2) = out(1) / (1. - out(0));                                             // \bar{f}
-    out(5) = ((1. - out(0)) * out(4) + out(1) * out(3)) * pow(1. - out(0), -2.); // \md{\bar{f}}
+    out[2] = out[1] / (1. - out[0]);                                             // \bar{f}
+    out[5] = ((1. - out[0]) * out[4] + out[1] * out[3]) * pow(1. - out[0], -2.); // \md{\bar{f}}
 
     return out;
 }

@@ -83,7 +83,7 @@ class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
      *
      * \return d f \bar{f} \md{d} \md{f} \md{\bar{f}}
      */
-    [[nodiscard]] virtual vec6 compute_tension_backbone(double) const = 0;
+    [[nodiscard]] virtual pod6 compute_tension_backbone(double) const = 0;
 
     /**
      * \brief compute compression backbone
@@ -98,7 +98,7 @@ class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
      *
      * \return d f \bar{f} \md{d} \md{f} \md{\bar{f}}
      */
-    [[nodiscard]] virtual vec6 compute_compression_backbone(double) const = 0;
+    [[nodiscard]] virtual pod6 compute_compression_backbone(double) const = 0;
 
 public:
     NonlinearCDP(

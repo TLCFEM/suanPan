@@ -34,6 +34,7 @@
 #include <array>
 
 using pod2 = std::array<double, 2>;
+using pod6 = std::array<double, 6>;
 
 enum class MaterialType : unsigned {
     D0 = 0,
