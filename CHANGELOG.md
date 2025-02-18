@@ -7,6 +7,10 @@
 3. The `MUMPS` solver throws segfaults with large matrices, appears to be quite slow.
 4. The `FGMRES` solver requires refinements.
 
+## version 3.7
+
+1. update `Armadillo` to version `14.4.0`
+
 ## version 3.6
 
 1. add `AFCO1D` material with strain memory [#217](https://github.com/TLCFEM/suanPan/pull/217)
