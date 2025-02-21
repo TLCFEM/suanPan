@@ -7,7 +7,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\elapse.c">
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mpi-seq\elapse.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\gbipart.c">
@@ -28,7 +28,7 @@
     <ClCompile Include="..\..\..\Toolbox\mumps-src\minpriority.c">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\mpic.c">
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mpi-seq\mpic.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\multisector.c">

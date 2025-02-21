@@ -14,14 +14,14 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MUMPS_ARITH=MUMPS_ARITH_d;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\mumps-src\dmumps_gpu.c" />
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\elapse.c" />
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mpi-seq\elapse.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\gbipart.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\gbisect.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\gelim.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\graph.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\interface.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\minpriority.c" />
-    <ClCompile Include="..\..\..\Toolbox\mumps-src\mpic.c" />
+    <ClCompile Include="..\..\..\Toolbox\mumps-src\mpi-seq\mpic.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\multisector.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_addr.c" />
     <ClCompile Include="..\..\..\Toolbox\mumps-src\mumps_common.c" />

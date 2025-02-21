@@ -119,31 +119,13 @@ set(mumps_mod
         sstatic_ptr_m.F
         smumps_mpi3_mod.F
 )
-set(mumps_mpi_c elapse.c mpic.c)
-set(mumps_mpi_f mpi.F)
+set(mumps_mpi_c mpi-seq/elapse.c mpi-seq/mpic.c)
+set(mumps_mpi_f mpi-seq/mpi.F)
 
 foreach (mod_src ${mumps_mod})
     foreach (f_src ${mumps_f})
         if (f_src MATCHES ${mod_src})
             list(REMOVE_ITEM mumps_f ${f_src})
-            break()
-        endif ()
-    endforeach ()
-endforeach ()
-
-foreach (mod_src ${mumps_mpi_f})
-    foreach (f_src ${mumps_f})
-        if (f_src MATCHES ${mod_src})
-            list(REMOVE_ITEM mumps_f ${f_src})
-            break()
-        endif ()
-    endforeach ()
-endforeach ()
-
-foreach (mod_src ${mumps_mpi_c})
-    foreach (c_src ${mumps_c})
-        if (c_src MATCHES ${mod_src})
-            list(REMOVE_ITEM mumps_c ${c_src})
             break()
         endif ()
     endforeach ()
