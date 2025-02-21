@@ -135,7 +135,7 @@
 			<File RelativePath="..\..\..\Toolbox\mumps-src\fac_maprow_data_m.F"/>
 			<File RelativePath="..\..\..\Toolbox\mumps-src\front_data_mgt_m.F"/>
 			<File RelativePath="..\..\..\Toolbox\mumps-src\lr_common.F"/>
-			<File RelativePath="..\..\..\Toolbox\mumps-src\mpi.F"/>
+			<File RelativePath="..\..\..\Toolbox\mumps-src\mpi-seq\mpi.F"/>
 			<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_comm_ibcast.F"/>
 			<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_l0_omp_m.F"/>
 			<File RelativePath="..\..\..\Toolbox\mumps-src\mumps_memory_mod.F"/>
