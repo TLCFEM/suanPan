@@ -5,6 +5,7 @@ project(mumps C Fortran)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
 include_directories(.)
+include_directories(mpi-seq)
 
 add_compile_definitions(Add_)
 add_compile_definitions(pord)
