@@ -349,18 +349,24 @@ void print_version() {
 }
 
 void print_helper() {
-    suanpan_highlight("Usage: suanPan [-vb] [-np] [-nc] [-nu] [-f <input_file>] [-o <output_file>]\nOptions:\n");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "v", "version", "check version information");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "h", "help", "print this helper");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "s", "strip", "strip comments out in given ABAQUS input file");
-    // suanpan_info("\t-{:<10}  --{:<20}{}\n", "c", "convert", "partially convert ABAQUS input file into suanPan model script");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "vb", "verbose", "enable debug information in output");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "np", "noprint", "suppress most console output");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "nc", "nocolor", "suppress colors in output");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "nu", "noupdate", "do not check for newer version on startup");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "f", "file", "process model file");
-    suanpan_info("\t-{:<10}  --{:<20}{}\n", "o", "output", "set output file for logging");
-    suanpan_info("\n");
+    static const auto helper_line = "------------------------------------------------------------------------------\n";
+    static const auto helper_format = "\t-{:<6} --{:<12}{}\n";
+
+    suanpan_highlight(helper_line);
+    suanpan_highlight("Usage:\n\tsuanPan [-vb] [-np] [-nc] [-nu] [-f <input_file>] [-o <output_file>]\n");
+    suanpan_highlight(helper_line);
+    suanpan_info("Options:\n");
+    suanpan_info(helper_format, "v", "version", "print version information");
+    suanpan_info(helper_format, "h", "help", "print this helper");
+    suanpan_info(helper_format, "s", "strip", "strip comments out in given ABAQUS input file");
+    // suanpan_info(helper_format, "c", "convert", "partially convert ABAQUS input file into suanPan model script");
+    suanpan_info(helper_format, "vb", "verbose", "enable verbose console output");
+    suanpan_info(helper_format, "np", "noprint", "suppress most console output");
+    suanpan_info(helper_format, "nc", "nocolor", "suppress colors in output");
+    suanpan_info(helper_format, "nu", "noupdate", "do not check for newer version on startup");
+    suanpan_info(helper_format, "f", "file", "process model file");
+    suanpan_info(helper_format, "o", "output", "set output file for logging");
+    suanpan_info(helper_line);
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
