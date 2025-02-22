@@ -40,8 +40,9 @@
 template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {
     const matrix_descr descr;
 
-    podarray<int> ipar;
-    podarray<double> dpar;
+    int ipar[128]{};
+    double dpar[128]{};
+
     podarray<double> work;
 
 protected:
@@ -52,9 +53,7 @@ protected:
 public:
     SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem, const bool in_sym)
         : SparseMat<T>(in_row, in_col, in_elem)
-        , descr{in_sym ? SPARSE_MATRIX_TYPE_SYMMETRIC : SPARSE_MATRIX_TYPE_GENERAL, SPARSE_FILL_MODE_FULL, SPARSE_DIAG_NON_UNIT}
-        , ipar(128)
-        , dpar(128) {}
+        , descr{in_sym ? SPARSE_MATRIX_TYPE_SYMMETRIC : SPARSE_MATRIX_TYPE_GENERAL, SPARSE_FILL_MODE_FULL, SPARSE_DIAG_NON_UNIT} {}
 
     SparseMatBaseFGMRES(const SparseMatBaseFGMRES&) = default;
     SparseMatBaseFGMRES(SparseMatBaseFGMRES&&) noexcept = delete;
@@ -78,7 +77,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
     int request;
 
     for(auto I = 0llu; I < B.n_cols; ++I) {
-        dfgmres_init(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar.memptr(), dpar.memptr(), work.memptr());
+        dfgmres_init(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr());
         if(request != 0) return request;
 
         ipar[8] = 1;
@@ -86,14 +85,14 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
         ipar[11] = 1;
         dpar[0] = this->setting.tolerance;
 
-        dfgmres_check(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar.memptr(), dpar.memptr(), work.memptr());
+        dfgmres_check(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr());
         if(request == -1100) return request;
 
         while(true) {
-            dfgmres(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar.memptr(), dpar.memptr(), work.memptr());
+            dfgmres(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr());
             if(request == 0) {
                 int counter;
-                dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar.memptr(), dpar.memptr(), work.memptr(), &counter);
+                dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr(), &counter);
                 if(request != 0) return request;
                 suanpan_debug("Iteration counter: {}.\n", counter);
                 break;

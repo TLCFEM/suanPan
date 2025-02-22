@@ -33,19 +33,19 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
     auto LWORKL = 2 * NCV * (NCV + 8);
     auto INFO = 0;
 
-    podarray<int> IPARAM(11), IPNTR(14);
+    int IPARAM[11]{}, IPNTR[14]{};
     podarray<double> RESID(N), V(uword(N) * uword(NCV)), WORKD(5 * uword(N)), WORKL(LWORKL);
 
-    IPARAM(0) = 1;    // exact shift
-    IPARAM(2) = 1000; // maximum iteration
-    IPARAM(6) = 4;    // mode 4: K*x=lambda*KG*x
+    IPARAM[0] = 1;    // exact shift
+    IPARAM[2] = 1000; // maximum iteration
+    IPARAM[6] = 4;    // mode 4: K*x=lambda*KG*x
 
     auto SIGMA = -1.;
 
     M += K;
 
     while(99 != IDO) {
-        arma_fortran(arma_dsaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+        arma_fortran(arma_dsaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
         // ReSharper disable once CppEntityAssignedButNoRead
         if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false, true); -1 == IDO) {
             vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
@@ -70,7 +70,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
         return SUANPAN_FAIL;
     }
 
-    suanpan_debug("Arnoldi iteration counter: {}.\n", IPARAM(2));
+    suanpan_debug("Arnoldi iteration counter: {}.\n", IPARAM[2]);
 
     auto RVEC = 1;
     auto HOWMNY = 'A';
@@ -81,7 +81,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
     eigval.set_size(NEV);
     eigvec.set_size(N, NEV);
 
-    arma_fortran(arma_dseupd)(&RVEC, &HOWMNY, SELECT.memptr(), eigval.memptr(), eigvec.memptr(), &LDZ, &SIGMA, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+    arma_fortran(arma_dseupd)(&RVEC, &HOWMNY, SELECT.memptr(), eigval.memptr(), eigvec.memptr(), &LDZ, &SIGMA, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
 
     return INFO;
 }
@@ -99,12 +99,12 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
     auto LWORKL = 3 * NCV * (NCV + 2);
     auto INFO = 0;
 
-    podarray<int> IPARAM(11), IPNTR(14);
+    int IPARAM[11]{}, IPNTR[14]{};
     podarray<double> RESID(N), V(N * uword(NCV)), WORKD(3llu * N), WORKL(LWORKL);
 
-    IPARAM(0) = 1;    // exact shift
-    IPARAM(2) = 1000; // maximum iteration
-    IPARAM(6) = 3;    // mode 3: K*x=lambda*KG*x
+    IPARAM[0] = 1;    // exact shift
+    IPARAM[2] = 1000; // maximum iteration
+    IPARAM[6] = 3;    // mode 3: K*x=lambda*KG*x
 
     auto SIGMAR = 0.;
     auto SIGMAI = 0.;
@@ -112,7 +112,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
     // K += M;
 
     while(99 != IDO) {
-        arma_fortran(arma_dnaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+        arma_fortran(arma_dnaupd)(&IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
         // ReSharper disable once CppEntityAssignedButNoRead
         if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false, true); -1 == IDO) {
             vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
@@ -144,7 +144,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
     podarray<int> SELECT(NCV);
     podarray<double> DR(NEV + 1llu), DI(NEV + 1llu), Z(N * (NEV + 1llu)), WORKEV(3llu * NCV);
 
-    arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), Z.memptr(), &LDZ, &SIGMAR, &SIGMAI, WORKEV.memptr(), &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM.memptr(), IPNTR.memptr(), WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+    arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), Z.memptr(), &LDZ, &SIGMAR, &SIGMAI, WORKEV.memptr(), &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
 
     eigval.set_size(NEV);
     eigvec.set_size(N, NEV);
