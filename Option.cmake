@@ -123,12 +123,6 @@ if (USE_MKL)
     find_package(MKL REQUIRED)
     add_compile_definitions(SUANPAN_MKL)
     # add_compile_definitions(ARMA_USE_MKL_ALLOC)
-    include_directories(${MKLROOT}/include)
-    if (EXISTS ${MKLROOT}/lib/intel64)
-        link_directories(${MKLROOT}/lib/intel64)
-    else (EXISTS ${MKLROOT}/lib/intel64)
-        link_directories(${MKLROOT}/lib)
-    endif ()
     if (USE_MPI)
         add_compile_definitions(SUANPAN_MPI)
         find_package(MPI REQUIRED)
@@ -138,29 +132,6 @@ if (USE_MKL)
     endif ()
     if (COMPILER_IDENTIFIER MATCHES "IntelLLVM")
         set(USE_INTEL_OPENMP ON CACHE BOOL "" FORCE)
-    endif ()
-    if (USE_INTEL_OPENMP OR COMPILER_IDENTIFIER MATCHES "vs")
-        if (MKLROOT MATCHES "(oneapi|oneAPI)")
-            if (COMPILER_IDENTIFIER MATCHES "linux")
-                find_library(IOMPPATH iomp5 PATHS
-                        ${MKLROOT}/../../compiler/latest/linux/compiler/lib/intel64_lin
-                        ${MKLROOT}/../../compiler/latest/lib
-                        REQUIRED
-                )
-                get_filename_component(IOMPPATH ${IOMPPATH} DIRECTORY)
-                link_directories(${IOMPPATH})
-            elseif (COMPILER_IDENTIFIER MATCHES "(win|vs)")
-                find_library(IOMPPATH libiomp5md PATHS
-                        ${MKLROOT}/../../compiler/latest/windows/compiler/lib/intel64_win
-                        ${MKLROOT}/../../compiler/latest/lib
-                        REQUIRED
-                )
-                get_filename_component(IOMPPATH ${IOMPPATH} DIRECTORY)
-                link_directories(${IOMPPATH})
-            endif ()
-        else ()
-            message(FATAL_ERROR "Intel Parallel Studio is not supported, please install Intel oneAPI toolkits.")
-        endif ()
     endif ()
 elseif (FORTRAN_STATUS AND CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     message(WARNING "Since Intel compilers are used, why not enabling MKL?")
