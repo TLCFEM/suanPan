@@ -6,8 +6,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
 file(GLOB ARPACK_SRC "*.f")
 
-include(../../Driver.cmake)
-
 add_library(arpack_obj OBJECT ${ARPACK_SRC})
 
 add_library(${PROJECT_NAME} ${LIBRARY_TYPE} $<TARGET_OBJECTS:arpack_obj>)

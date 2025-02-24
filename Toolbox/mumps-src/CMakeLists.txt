@@ -15,8 +15,6 @@ if (USE_MKL)
     add_compile_definitions(GEMMT_AVAILABLE)
 endif ()
 
-include(../../Driver.cmake)
-
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
 else ()
@@ -141,19 +139,13 @@ add_library(mumps_c_lib OBJECT ${mumps_c})
 add_dependencies(mumps_f_lib metis)
 add_dependencies(mumps_c_lib metis)
 
-if (USE_MPI)
-    add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
-            $<TARGET_OBJECTS:mumps_f_lib>
-            $<TARGET_OBJECTS:mumps_c_lib>)
-else ()
-    add_library(mumps_mpi_f_lib OBJECT ${mumps_mpi_f})
-    add_library(mumps_mpi_c_lib OBJECT ${mumps_mpi_c})
-    add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
-            $<TARGET_OBJECTS:mumps_mpi_f_lib>
-            $<TARGET_OBJECTS:mumps_mpi_c_lib>
-            $<TARGET_OBJECTS:mumps_f_lib>
-            $<TARGET_OBJECTS:mumps_c_lib>)
-endif ()
+add_library(mumps_mpi_f_lib OBJECT ${mumps_mpi_f})
+add_library(mumps_mpi_c_lib OBJECT ${mumps_mpi_c})
+add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
+        $<TARGET_OBJECTS:mumps_mpi_f_lib>
+        $<TARGET_OBJECTS:mumps_mpi_c_lib>
+        $<TARGET_OBJECTS:mumps_f_lib>
+        $<TARGET_OBJECTS:mumps_c_lib>)
 
 target_link_libraries(${PROJECT_NAME} metis)
 
