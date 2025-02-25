@@ -198,7 +198,7 @@ void print_header() {
         suanpan_info(header);
         suanpan_info("|  https://bit.ly/vsc-sp                                           |\n");
     }
-    suanpan_info(header);
+    suanpan_info("{}\n", header);
 }
 
 fs::path whereami(const char* argv) {
