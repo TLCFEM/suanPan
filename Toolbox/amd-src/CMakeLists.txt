@@ -8,6 +8,6 @@ file(GLOB AMD_SRC "*.f")
 
 add_library(amd_obj OBJECT ${AMD_SRC})
 
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE} $<TARGET_OBJECTS:amd_obj>)
+add_library(${PROJECT_NAME} $<TARGET_OBJECTS:amd_obj>)
 
 message(STATUS "AMD Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")

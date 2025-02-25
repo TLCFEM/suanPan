@@ -31,6 +31,6 @@ endif ()
 
 add_library(feast_obj OBJECT ${FEAST_SRC} ${SPIKE_SRC})
 
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE} $<TARGET_OBJECTS:feast_obj>)
+add_library(${PROJECT_NAME} $<TARGET_OBJECTS:feast_obj>)
 
 message(STATUS "FEAST Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")

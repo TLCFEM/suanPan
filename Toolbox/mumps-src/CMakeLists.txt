@@ -141,7 +141,7 @@ add_dependencies(mumps_c_lib metis)
 
 add_library(mumps_mpi_f_lib OBJECT ${mumps_mpi_f})
 add_library(mumps_mpi_c_lib OBJECT ${mumps_mpi_c})
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE}
+add_library(${PROJECT_NAME}
         $<TARGET_OBJECTS:mumps_mpi_f_lib>
         $<TARGET_OBJECTS:mumps_mpi_c_lib>
         $<TARGET_OBJECTS:mumps_f_lib>

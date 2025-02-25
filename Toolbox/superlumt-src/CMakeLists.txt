@@ -20,6 +20,6 @@ else ()
     set_source_files_properties(await.c PROPERTIES COMPILE_FLAGS "-O0")
 endif ()
 
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE} ${SUPERLUMT_SRC})
+add_library(${PROJECT_NAME} ${SUPERLUMT_SRC})
 
 message(STATUS "SUPERLUMT C_FLAGS: ${CMAKE_C_FLAGS}")
