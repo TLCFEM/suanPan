@@ -167,29 +167,38 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
 }
 
 void print_header() {
-    suanpan_info("+-----------------------------------------------------+\n");
-    suanpan_info("|   __        __            suanPan is an open source |\n");
-    suanpan_info("|  /  \\      |  \\              FEM framework (64-bit) |\n");
-    suanpan_info("|  \\__       |__/  __   __         {:>10} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
-    suanpan_info("|     \\ |  | |    |  \\ |  |         by tlc @ {} |\n", SUANPAN_REVISION);
-    suanpan_info("|  \\__/ |__| |    |__X |  |       all rights reserved |\n");
-    suanpan_info("|                              10.5281/zenodo.1285221 |\n");
-    suanpan_info("+-----------------------------------------------------+\n");
+    /***
+     *                            ____
+     *      ___ _   _  __ _ _ __ |  _ \ __ _ _ __
+     *     / __| | | |/ _` | '_ \| |_) / _` | '_ \
+     *     \__ \ |_| | (_| | | | |  __/ (_| | | | |
+     *     |___/\__,_|\__,_|_| |_|_|   \__,_|_| |_|
+     *
+     */
+    static const auto header = "+------------------------------------------------------------------+\n";
+    suanpan_info(header);
+    suanpan_info("|                         ____           suanPan is an open source |\n");
+    suanpan_info("|   ___ _   _  __ _ _ __ |  _ \\ __ _ _ __   FEM framework (64-bit) |\n");
+    suanpan_info("|  / __| | | |/ _` | '_ \\| |_) / _` | '_ \\      {:>10} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+    suanpan_info("|  \\__ \\ |_| | (_| | | | |  __/ (_| | | | |      by tlc @ {} |\n", SUANPAN_REVISION);
+    suanpan_info("|  |___/\\__,_|\\__,_|_| |_|_|   \\__,_|_| |_|    all rights reserved |\n");
+    suanpan_info("|                                           10.5281/zenodo.1285221 |\n");
+    suanpan_info(header);
     if(support_emoji() && SUANPAN_COLOR) {
         static constexpr std::array POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
         arma_rng::set_seed_random();
-        suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan               |\n");
-        suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest  |\n");
-        suanpan_info("+-----------------------------------------------------+\n");
-        suanpan_info("|  {} https://bit.ly/vsc-sp                           |\n", POOL[randi() % POOL.size()]);
+        suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan                            |\n");
+        suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest               |\n");
+        suanpan_info(header);
+        suanpan_info("|  {} https://bit.ly/vsc-sp                                        |\n", POOL[randi() % POOL.size()]);
     }
     else {
-        suanpan_info("|  https://github.com/TLCFEM/suanPan                  |\n");
-        suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest     |\n");
-        suanpan_info("+-----------------------------------------------------+\n");
-        suanpan_info("|  https://bit.ly/vsc-sp                              |\n");
+        suanpan_info("|  https://github.com/TLCFEM/suanPan                               |\n");
+        suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest                  |\n");
+        suanpan_info(header);
+        suanpan_info("|  https://bit.ly/vsc-sp                                           |\n");
     }
-    suanpan_info("+-----------------------------------------------------+\n\n");
+    suanpan_info(header);
 }
 
 fs::path whereami(const char* argv) {
