@@ -80,10 +80,10 @@ int main(int argc, char** argv) {
     if(0 == rank) {
         MPI_Request requests[5];
         MPI_Irecv(&iparm, 64, MPI_INT, 0, 0, parent, &requests[0]);
-        MPI_Irecv(ia.get(), np, MPI_INT, 0, 0, parent, &requests[1]);
-        MPI_Irecv(ja.get(), *nnz, MPI_INT, 0, 0, parent, &requests[2]);
-        MPI_Irecv(a.get(), *nnz, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 0, parent, &requests[3]);
-        MPI_Irecv(b.get(), nb, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 0, parent, &requests[4]);
+        MPI_Irecv(ia.get(), np, MPI_INT, 0, 1, parent, &requests[1]);
+        MPI_Irecv(ja.get(), *nnz, MPI_INT, 0, 2, parent, &requests[2]);
+        MPI_Irecv(a.get(), *nnz, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 3, parent, &requests[3]);
+        MPI_Irecv(b.get(), nb, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 4, parent, &requests[4]);
         MPI_Waitall(5, requests, MPI_STATUSES_IGNORE);
 
         iparm[0] = 1;                      /* Solver default parameters overriden with provided by iparm */

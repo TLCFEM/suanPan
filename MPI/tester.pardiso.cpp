@@ -89,10 +89,10 @@ void run() {
 
     MPI_Request requests[5];
     MPI_Isend(&iparm, 64, MPI_INT, 0, 0, worker, &requests[0]);
-    MPI_Isend(ia.get(), n + 1, MPI_INT, 0, 0, worker, &requests[1]);
-    MPI_Isend(ja.get(), nnz, MPI_INT, 0, 0, worker, &requests[2]);
-    MPI_Isend(a.get(), nnz, MPI_DOUBLE, 0, 0, worker, &requests[3]);
-    MPI_Isend(b.get(), n, MPI_DOUBLE, 0, 0, worker, &requests[4]);
+    MPI_Isend(ia.get(), n + 1, MPI_INT, 0, 1, worker, &requests[1]);
+    MPI_Isend(ja.get(), nnz, MPI_INT, 0, 2, worker, &requests[2]);
+    MPI_Isend(a.get(), nnz, MPI_DOUBLE, 0, 3, worker, &requests[3]);
+    MPI_Isend(b.get(), n, MPI_DOUBLE, 0, 4, worker, &requests[4]);
     MPI_Waitall(5, requests, MPI_STATUSES_IGNORE);
 
     int error = -1;
