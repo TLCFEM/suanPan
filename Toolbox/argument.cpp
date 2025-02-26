@@ -354,7 +354,7 @@ void print_version() {
 #ifdef SUANPAN_VTK
     suanpan_info("    The visualisation support is implemented via VTK ({}) library. https://vtk.org/\n", vtkVersion::GetVTKVersion());
 #endif
-    suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n\n");
+    suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n");
 }
 
 void print_helper() {
