@@ -265,7 +265,7 @@ if (USE_MIMALLOC)
     include(FetchContent)
     FetchContent_Declare(mimalloc
             GIT_REPOSITORY https://github.com/microsoft/mimalloc
-            GIT_TAG v2.1.2)
+            GIT_TAG v2.1.9)
     FetchContent_MakeAvailable(mimalloc)
 endif ()
 
