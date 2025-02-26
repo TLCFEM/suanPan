@@ -40,13 +40,11 @@ include_directories(Include)
 include_directories(Include/metis)
 include_directories(Include/fmt/include)
 
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug Release RelWithDebInfo MinSizeRel")
-
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 set(BUILD_PACKAGE "" CACHE STRING "DEB OR RPM")
 
-option(BUILD_SHARED_LIBS "Build all libraries as shared ones." OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 option(BUILD_DLL_EXAMPLE "Build dynamic linked library examples." OFF)
 option(BUILD_MULTITHREAD "Build with multi-threaded support via TBB." OFF)
 option(USE_SUPERLUMT "Use multi-threaded SuperLU. Note the performance may not be better than the sequential version." OFF)
@@ -86,9 +84,6 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows") # WINDOWS PLATFORM
         set(COMPILER_IDENTIFIER "vs")
         set(SP_EXTERNAL_LIB_PATH "vs")
         add_compile_definitions(_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
-        if (FORTRAN_STATUS)
-            set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-        endif ()
         option(USE_CUDA "Enable GPU based global solvers via CUDA." OFF)
     endif ()
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux") # LINUX PLATFORM

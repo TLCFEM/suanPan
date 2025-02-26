@@ -147,7 +147,11 @@ add_library(${PROJECT_NAME}
         $<TARGET_OBJECTS:mumps_f_lib>
         $<TARGET_OBJECTS:mumps_c_lib>)
 
-target_link_libraries(${PROJECT_NAME} metis)
+if (USE_MPI)
+    add_library(mpi_mumps
+            $<TARGET_OBJECTS:mumps_f_lib>
+            $<TARGET_OBJECTS:mumps_c_lib>)
+endif ()
 
 message(STATUS "MUMPS Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
 message(STATUS "MUMPS C_FLAGS: ${CMAKE_C_FLAGS}")
