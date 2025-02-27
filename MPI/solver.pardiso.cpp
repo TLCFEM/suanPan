@@ -26,9 +26,11 @@ int main(int argc, char** argv) {
     const auto& parent = mpl::inter_communicator::parent();
     const auto all = mpl::communicator(parent, mpl::communicator::order_high);
 
-    int config[8]{};
+    int config[7]{};
+    int iparm[64]{};
 
     all.bcast(0, config);
+    all.bcast(0, iparm);
 
     const auto mtype = &config[0];
     const auto nrhs = &config[1];
@@ -37,12 +39,11 @@ int main(int argc, char** argv) {
     const auto msglvl = &config[4];
     const auto n = &config[5];
     const auto nnz = &config[6];
-    const auto float_type = &config[7];
+
+    const auto float_type = iparm[27];
 
     const auto np = *n + 1;
     const auto nb = *n * *nrhs;
-
-    int iparm[64]{};
 
     std::vector<int> ia(np), ja(*nnz);
     const auto a = std::make_unique<double[]>(*nnz);
@@ -52,32 +53,18 @@ int main(int argc, char** argv) {
     if(0 == comm_world.rank()) {
         mpl::irequest_pool requests;
 
-        requests.push(parent.irecv(iparm, 0, mpl::tag_t{0}));
-        requests.push(parent.irecv(ia.begin(), ia.end(), 0, mpl::tag_t{1}));
-        requests.push(parent.irecv(ja.begin(), ja.end(), 0, mpl::tag_t{2}));
-        if(*float_type > 0) {
-            requests.push(parent.irecv(a.get(), a.get() + *nnz, 0, mpl::tag_t{3}));
-            requests.push(parent.irecv(b.get(), b.get() + nb, 0, mpl::tag_t{4}));
+        requests.push(parent.irecv(ia.begin(), ia.end(), 0, mpl::tag_t{0}));
+        requests.push(parent.irecv(ja.begin(), ja.end(), 0, mpl::tag_t{1}));
+        if(0 == float_type) {
+            requests.push(parent.irecv(a.get(), a.get() + *nnz, 0, mpl::tag_t{2}));
+            requests.push(parent.irecv(b.get(), b.get() + nb, 0, mpl::tag_t{3}));
         }
         else {
-            requests.push(parent.irecv(reinterpret_cast<float*>(a.get()), reinterpret_cast<float*>(a.get()) + *nnz, 0, mpl::tag_t{3}));
-            requests.push(parent.irecv(reinterpret_cast<float*>(b.get()), reinterpret_cast<float*>(b.get()) + nb, 0, mpl::tag_t{4}));
+            requests.push(parent.irecv(reinterpret_cast<float*>(a.get()), reinterpret_cast<float*>(a.get()) + *nnz, 0, mpl::tag_t{2}));
+            requests.push(parent.irecv(reinterpret_cast<float*>(b.get()), reinterpret_cast<float*>(b.get()) + nb, 0, mpl::tag_t{3}));
         }
 
         requests.waitall();
-
-        iparm[0] = 1;                      /* Solver default parameters overriden with provided by iparm */
-        iparm[1] = 2;                      /* Use METIS for fill-in reordering */
-        iparm[5] = 0;                      /* Write solution into x */
-        iparm[7] = 2;                      /* Max number of iterative refinement steps */
-        iparm[9] = 13;                     /* Perturb the pivot elements with 1E-13 */
-        iparm[10] = 1;                     /* Use nonsymmetric permutation and scaling MPS */
-        iparm[12] = 1;                     /* Switch on Maximum Weighted Matching algorithm (default for non-symmetric) */
-        iparm[17] = -1;                    /* Output: Number of nonzeros in the factor LU */
-        iparm[18] = -1;                    /* Output: Mflops for LU factorization */
-        iparm[26] = 0;                     /* Check input data for correctness */
-        if(*float_type < 0) iparm[27] = 1; /* Single precision */
-        iparm[39] = 0;                     /* Input: matrix/rhs/solution stored on master */
     }
 
     int64_t pt[64]{};
@@ -92,7 +79,7 @@ int main(int argc, char** argv) {
         parent.send(error, 0);
         if(0 != error) return error;
 
-        if(*float_type > 0) parent.send(x.get(), x.get() + nb, 0);
+        if(0 == float_type) parent.send(x.get(), x.get() + nb, 0);
         else parent.send(reinterpret_cast<float*>(x.get()), reinterpret_cast<float*>(x.get()) + nb, 0);
 
         return error;

@@ -70,7 +70,7 @@ using std::vector;
 unsigned SUANPAN_WARNING_COUNT = 0;
 unsigned SUANPAN_ERROR_COUNT = 0;
 int SUANPAN_NUM_THREADS = std::max(1, static_cast<int>(std::thread::hardware_concurrency()));
-int SUANPAN_NUM_NODES = 1;
+int SUANPAN_NUM_NODES = 2;
 fs::path SUANPAN_OUTPUT = fs::current_path();
 extern fs::path SUANPAN_EXE;
 

@@ -27,7 +27,19 @@ void run() {
     const auto all = mpl::communicator(worker, mpl::communicator::order_low);
 
     int iparm[64]{};
-    int config[8]{};
+    int config[7]{};
+
+    iparm[0] = 1;   /* Solver default parameters overriden with provided by iparm */
+    iparm[1] = 3;   /* Use METIS for fill-in reordering */
+    iparm[5] = 0;   /* Write solution into x */
+    iparm[7] = 2;   /* Max number of iterative refinement steps */
+    iparm[9] = 13;  /* Perturb the pivot elements with 1E-13 */
+    iparm[10] = 1;  /* Use nonsymmetric permutation and scaling MPS */
+    iparm[12] = 1;  /* Switch on Maximum Weighted Matching algorithm (default for non-symmetric) */
+    iparm[17] = -1; /* Output: Number of nonzeros in the factor LU */
+    iparm[18] = -1; /* Output: Mflops for LU factorization */
+    iparm[26] = 0;  /* Check input data for correctness */
+    iparm[39] = 0;  /* Input: matrix/rhs/solution stored on master */
 
     config[0] = 11; // mtype
     config[1] = 1;  // nrhs
@@ -36,7 +48,6 @@ void run() {
     config[4] = 0;  // msglvl
     config[5] = 5;  // n
     config[6] = 13; // nnz
-    config[7] = 1;
 
     const auto n = config[5];
     const auto nnz = config[6];
@@ -78,14 +89,14 @@ void run() {
     a[12] = -5.0;
 
     all.bcast(0, config);
+    all.bcast(0, iparm);
 
     mpl::irequest_pool requests;
 
-    requests.push(worker.isend(iparm, 0, mpl::tag_t{0}));
-    requests.push(worker.isend(ia.begin(), ia.end(), 0, mpl::tag_t{1}));
-    requests.push(worker.isend(ja.begin(), ja.end(), 0, mpl::tag_t{2}));
-    requests.push(worker.isend(a.begin(), a.end(), 0, mpl::tag_t{3}));
-    requests.push(worker.isend(b.begin(), b.end(), 0, mpl::tag_t{4}));
+    requests.push(worker.isend(ia.begin(), ia.end(), 0, mpl::tag_t{0}));
+    requests.push(worker.isend(ja.begin(), ja.end(), 0, mpl::tag_t{1}));
+    requests.push(worker.isend(a.begin(), a.end(), 0, mpl::tag_t{2}));
+    requests.push(worker.isend(b.begin(), b.end(), 0, mpl::tag_t{3}));
 
     requests.waitall();
 
