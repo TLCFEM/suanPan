@@ -35,4 +35,6 @@ add_library(${PROJECT_NAME} SHARED
         ../../Include/fmt/src/format.cc
 )
 
+add_dependencies(ModifierExample suanPan)
+
 message(STATUS "ModifierExample CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
