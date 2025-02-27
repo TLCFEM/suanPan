@@ -137,7 +137,11 @@ endif ()
 
 if (USE_MPI)
     find_package(MPI REQUIRED)
-    # add_compile_definitions(SUANPAN_MPI)
+    add_compile_definitions(SUANPAN_MPI)
+    include_directories(${MPI_C_INCLUDE_DIRS})
+    if (MPI_C_INCLUDE_DIRS MATCHES "openmpi")
+        set(MKL_MPI openmpi)
+    endif ()
 endif ()
 
 if (USE_MKL)
@@ -482,6 +486,9 @@ add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 
 target_link_libraries(${PROJECT_NAME} Element Material Section Solver)
+if (USE_MPI)
+    target_link_libraries(${PROJECT_NAME} MPI::MPI_C MPI::MPI_CXX MPI::MPI_Fortran)
+endif ()
 
 if (FORTRAN_STATUS)
     message(STATUS "Linking additional amd arpack mumps feast libraries.")
