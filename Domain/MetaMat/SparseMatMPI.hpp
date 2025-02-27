@@ -39,7 +39,7 @@
 extern int SUANPAN_NUM_NODES;
 
 template<sp_d T> class SparseMatMPIPARDISO final : public SparseMat<T> {
-    int iparm[64];
+    int iparm[64]{};
 
 protected:
     using SparseMat<T>::direct_solve;
@@ -48,8 +48,7 @@ protected:
 
 public:
     SparseMatMPIPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem)
-        , iparm{} {
+        : SparseMat<T>(in_row, in_col, in_elem) {
         iparm[34] = 1; // zero-based indexing
     }
 
@@ -68,7 +67,7 @@ template<sp_d T> int SparseMatMPIPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T
     MPI_Comm worker;
     MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, SUANPAN_NUM_NODES, MPI_INFO_NULL, 0, MPI_COMM_SELF, &worker, MPI_ERRCODES_IGNORE);
 
-    int config[8];
+    int config[8]{};
 
     config[0] = 11;   // mtype
     config[1] = nrhs; // nrhs

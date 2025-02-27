@@ -25,7 +25,7 @@
 int main(int argc, char** argv) {
     int error = 0, rank = -1;
     MPI_Comm parent, remote;
-    int config[8];
+    int config[8]{};
 
     const auto mtype = &config[0];
     const auto nrhs = &config[1];
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
     const auto np = *n + 1;
     const auto nb = *n * *nrhs;
 
-    int iparm[64];
+    int iparm[64]{};
 
     ia = std::make_unique<int[]>(np);
     ja = std::make_unique<int[]>(*nnz);
@@ -100,17 +100,17 @@ int main(int argc, char** argv) {
         iparm[39] = 0;                     /* Input: matrix/rhs/solution stored on master */
     }
 
-    int64_t pt[64] = {0};
+    int64_t pt[64]{};
 
     // ReSharper disable once CppVariableCanBeMadeConstexpr
     const int comm = MPI_Comm_c2f(MPI_COMM_WORLD);
 
     int phase = 13;
-    cluster_sparse_solver(&pt, maxfct, mnum, mtype, &phase, n, a.get(), ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, b.get(), x.get(), &comm, &error);
+    cluster_sparse_solver(pt, maxfct, mnum, mtype, &phase, n, a.get(), ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, b.get(), x.get(), &comm, &error);
     if(0 != error) return finalise();
 
     phase = -1;
-    cluster_sparse_solver(&pt, maxfct, mnum, mtype, &phase, n, nullptr, ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, nullptr, nullptr, &comm, &error);
+    cluster_sparse_solver(pt, maxfct, mnum, mtype, &phase, n, nullptr, ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, nullptr, nullptr, &comm, &error);
 
     return finalise();
 }

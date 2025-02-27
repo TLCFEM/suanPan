@@ -26,7 +26,7 @@ void run() {
     constexpr int NUM_NODE = 6;
 
     MPI_Comm worker;
-    MPI_Comm_spawn("./solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &worker, MPI_ERRCODES_IGNORE);
+    MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &worker, MPI_ERRCODES_IGNORE);
 
     int iparm[64]{};
     int config[8]{};

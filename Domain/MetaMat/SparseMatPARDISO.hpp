@@ -47,8 +47,8 @@ template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
     const int msglvl = 0;
 #endif
 
-    int iparm[64];
-    std::int64_t pt[64];
+    int iparm[64]{};
+    std::int64_t pt[64]{};
 
 protected:
     using SparseMat<T>::direct_solve;
@@ -57,9 +57,7 @@ protected:
 
 public:
     SparseMatPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem)
-        , iparm{}
-        , pt{} {
+        : SparseMat<T>(in_row, in_col, in_elem) {
         pardisoinit(pt, &mtype, iparm);
 
         iparm[1] = 3;   // nested dissection algorithm
