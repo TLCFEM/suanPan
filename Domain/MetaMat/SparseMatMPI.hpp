@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class SparseMatMPI
+ * @class SparseMatMPIPARDISO
  * @brief A SparseMatMPI class that holds matrices.
  *
  * * MUMPS uses int.
  *
  * @author tlc
- * @date 14/06/2023
+ * @date 27/02/2025
  * @version 0.1.0
  * @file SparseMatMPI.hpp
  * @addtogroup MetaMat
@@ -34,7 +34,7 @@
 
 #if defined(SUANPAN_MPI) && defined(SUANPAN_MKL)
 
-#include <mpi.h>
+#include <mpl/mpl.hpp>
 
 extern int SUANPAN_NUM_NODES;
 
@@ -64,8 +64,9 @@ template<sp_d T> int SparseMatMPIPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T
     const auto nrhs = static_cast<int>(B.n_cols);
     const auto nnz = static_cast<int>(csr_mat.n_elem);
 
-    MPI_Comm worker;
-    MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, SUANPAN_NUM_NODES, MPI_INFO_NULL, 0, MPI_COMM_SELF, &worker, MPI_ERRCODES_IGNORE);
+    const auto& comm_world{mpl::environment::comm_world()};
+    const auto worker = comm_world.spawn(0, SUANPAN_NUM_NODES, {"solver.pardiso"});
+    const auto all = mpl::communicator(worker, mpl::communicator::order_low);
 
     int config[8]{};
 
@@ -77,28 +78,26 @@ template<sp_d T> int SparseMatMPIPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T
     config[5] = n;    // n
     config[6] = nnz;  // nnz
     config[7] = std::is_same_v<T, double> ? 1 : -1;
-    const auto FLOAT_TYPE = std::is_same_v<T, double> ? MPI_DOUBLE : MPI_FLOAT;
 
-    MPI_Comm remote;
-    MPI_Intercomm_merge(worker, 0, &remote);
-    MPI_Bcast(&config, 8, MPI_INT, 0, remote);
+    all.bcast(0, config);
 
-    MPI_Request requests[5];
-    MPI_Isend(&iparm, 64, MPI_INT, 0, 0, worker, &requests[0]);
-    MPI_Isend(csr_mat.row_mem(), n + 1, MPI_INT, 0, 0, worker, &requests[1]);
-    MPI_Isend(csr_mat.col_mem(), nnz, MPI_INT, 0, 0, worker, &requests[2]);
-    MPI_Isend(csr_mat.val_mem(), nnz, FLOAT_TYPE, 0, 0, worker, &requests[3]);
-    MPI_Isend(B.memptr(), static_cast<int>(B.n_elem), FLOAT_TYPE, 0, 0, worker, &requests[4]);
-    MPI_Waitall(5, requests, MPI_STATUSES_IGNORE);
+    mpl::irequest_pool requests;
+
+    requests.push(worker.isend(iparm, 0, mpl::tag_t{0}));
+    requests.push(worker.isend(csr_mat.row_mem(), csr_mat.row_mem() + n + 1, 0, mpl::tag_t{1}));
+    requests.push(worker.isend(csr_mat.col_mem(), csr_mat.col_mem() + nnz, 0, mpl::tag_t{2}));
+    requests.push(worker.isend(csr_mat.val_mem(), csr_mat.val_mem() + nnz, 0, mpl::tag_t{3}));
+    requests.push(worker.isend(B.begin(), B.end(), 0, mpl::tag_t{4}));
+
+    requests.waitall();
 
     int error = -1;
-    MPI_Recv(&error, 1, MPI_INT, 0, 0, worker, MPI_STATUS_IGNORE);
-    if(0 == error) {
-        MPI_Recv(X.memptr(), static_cast<int>(B.n_elem), FLOAT_TYPE, 0, 0, worker, MPI_STATUS_IGNORE);
-        return SUANPAN_SUCCESS;
-    }
+    worker.recv(error, 0);
+    if(0 != error) return SUANPAN_FAIL;
 
-    return SUANPAN_FAIL;
+    worker.recv(X.begin(), X.end(), 0);
+
+    return SUANPAN_SUCCESS;
 }
 
 #endif

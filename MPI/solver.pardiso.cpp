@@ -18,14 +18,17 @@
 // ReSharper disable IdentifierTypo
 #ifdef SUANPAN_MKL
 
-#include <mpi.h>
 #include <mkl_cluster_sparse_solver.h>
-#include <memory>
+#include <mpl/mpl.hpp>
 
 int main(int argc, char** argv) {
-    int error = 0, rank = -1;
-    MPI_Comm parent, remote;
+    const auto& comm_world{mpl::environment::comm_world()};
+    const auto& parent = mpl::inter_communicator::parent();
+    const auto all = mpl::communicator(parent, mpl::communicator::order_high);
+
     int config[8]{};
+
+    all.bcast(0, config);
 
     const auto mtype = &config[0];
     const auto nrhs = &config[1];
@@ -36,55 +39,32 @@ int main(int argc, char** argv) {
     const auto nnz = &config[6];
     const auto float_type = &config[7];
 
-    std::unique_ptr<int[]> ia, ja;
-    std::unique_ptr<double[]> a, b, x;
-
-    auto finalise = [&] {
-        if(0 == rank) MPI_Send(&error, 1, MPI_INT, 0, 0, parent);
-
-        if(0 != error) MPI_Finalize();
-        else {
-            if(0 == rank) MPI_Send(x.get(), *n * *nrhs, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 0, parent);
-            error = MPI_Finalize();
-        }
-
-        return error;
-    };
-
-    error = MPI_Init(&argc, &argv);
-    if(MPI_SUCCESS != error) return finalise();
-
-    error = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    if(MPI_SUCCESS != error) return finalise();
-
-    error = MPI_Comm_get_parent(&parent);
-    if(MPI_SUCCESS != error) return finalise();
-
-    error = MPI_Intercomm_merge(parent, 0, &remote);
-    if(MPI_SUCCESS != error) return finalise();
-
-    error = MPI_Bcast(&config, 8, MPI_INT, 0, remote);
-    if(MPI_SUCCESS != error) return finalise();
-
     const auto np = *n + 1;
     const auto nb = *n * *nrhs;
 
     int iparm[64]{};
 
-    ia = std::make_unique<int[]>(np);
-    ja = std::make_unique<int[]>(*nnz);
-    a = std::make_unique<double[]>(*nnz);
-    b = std::make_unique<double[]>(nb);
-    x = std::make_unique<double[]>(nb);
+    std::vector<int> ia(np), ja(*nnz);
+    const auto a = std::make_unique<double[]>(*nnz);
+    const auto b = std::make_unique<double[]>(nb);
+    const auto x = std::make_unique<double[]>(nb);
 
-    if(0 == rank) {
-        MPI_Request requests[5];
-        MPI_Irecv(&iparm, 64, MPI_INT, 0, 0, parent, &requests[0]);
-        MPI_Irecv(ia.get(), np, MPI_INT, 0, 1, parent, &requests[1]);
-        MPI_Irecv(ja.get(), *nnz, MPI_INT, 0, 2, parent, &requests[2]);
-        MPI_Irecv(a.get(), *nnz, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 3, parent, &requests[3]);
-        MPI_Irecv(b.get(), nb, *float_type > 0 ? MPI_DOUBLE : MPI_FLOAT, 0, 4, parent, &requests[4]);
-        MPI_Waitall(5, requests, MPI_STATUSES_IGNORE);
+    if(0 == comm_world.rank()) {
+        mpl::irequest_pool requests;
+
+        requests.push(parent.irecv(iparm, 0, mpl::tag_t{0}));
+        requests.push(parent.irecv(ia.begin(), ia.end(), 0, mpl::tag_t{1}));
+        requests.push(parent.irecv(ja.begin(), ja.end(), 0, mpl::tag_t{2}));
+        if(*float_type > 0) {
+            requests.push(parent.irecv(a.get(), a.get() + *nnz, 0, mpl::tag_t{3}));
+            requests.push(parent.irecv(b.get(), b.get() + nb, 0, mpl::tag_t{4}));
+        }
+        else {
+            requests.push(parent.irecv(reinterpret_cast<float*>(a.get()), reinterpret_cast<float*>(a.get()) + *nnz, 0, mpl::tag_t{3}));
+            requests.push(parent.irecv(reinterpret_cast<float*>(b.get()), reinterpret_cast<float*>(b.get()) + nb, 0, mpl::tag_t{4}));
+        }
+
+        requests.waitall();
 
         iparm[0] = 1;                      /* Solver default parameters overriden with provided by iparm */
         iparm[1] = 2;                      /* Use METIS for fill-in reordering */
@@ -102,15 +82,29 @@ int main(int argc, char** argv) {
 
     int64_t pt[64]{};
 
-    // ReSharper disable once CppVariableCanBeMadeConstexpr
-    const int comm = MPI_Comm_c2f(MPI_COMM_WORLD);
+    const int comm = MPI_Comm_c2f(comm_world.native_handle());
+
+    int error = 0;
+
+    auto finalise = [&] {
+        if(0 != comm_world.rank()) return error;
+
+        parent.send(error, 0);
+        if(0 != error) return error;
+
+        if(*float_type > 0) parent.send(x.get(), x.get() + nb, 0);
+        else parent.send(reinterpret_cast<float*>(x.get()), reinterpret_cast<float*>(x.get()) + nb, 0);
+
+        return error;
+    };
 
     int phase = 13;
-    cluster_sparse_solver(pt, maxfct, mnum, mtype, &phase, n, a.get(), ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, b.get(), x.get(), &comm, &error);
+    cluster_sparse_solver(pt, maxfct, mnum, mtype, &phase, n, a.get(), ia.data(), ja.data(), nullptr, nrhs, iparm, msglvl, b.get(), x.get(), &comm, &error);
+
     if(0 != error) return finalise();
 
     phase = -1;
-    cluster_sparse_solver(pt, maxfct, mnum, mtype, &phase, n, nullptr, ia.get(), ja.get(), nullptr, nrhs, iparm, msglvl, nullptr, nullptr, &comm, &error);
+    cluster_sparse_solver(pt, maxfct, mnum, mtype, &phase, n, nullptr, ia.data(), ja.data(), nullptr, nrhs, iparm, msglvl, nullptr, nullptr, &comm, &error);
 
     return finalise();
 }

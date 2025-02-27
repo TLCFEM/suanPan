@@ -17,16 +17,14 @@
 
 #ifdef SUANPAN_MKL
 
-#include <cstdio>
-#include <mpi.h>
-#include <memory>
-#include <iostream>
+#include <mpl/mpl.hpp>
 
 void run() {
-    constexpr int NUM_NODE = 6;
+    constexpr int NUM_NODE = 2;
 
-    MPI_Comm worker;
-    MPI_Comm_spawn("solver.pardiso", MPI_ARGV_NULL, NUM_NODE, MPI_INFO_NULL, 0, MPI_COMM_SELF, &worker, MPI_ERRCODES_IGNORE);
+    const auto& comm_world{mpl::environment::comm_world()};
+    const auto worker = comm_world.spawn(0, NUM_NODE, {"solver.pardiso"});
+    const auto all = mpl::communicator(worker, mpl::communicator::order_low);
 
     int iparm[64]{};
     int config[8]{};
@@ -43,10 +41,8 @@ void run() {
     const auto n = config[5];
     const auto nnz = config[6];
 
-    std::unique_ptr<int[]> ia(new int[n + 1]);
-    std::unique_ptr<int[]> ja(new int[nnz]);
-    std::unique_ptr<double[]> a(new double[nnz]);
-    std::unique_ptr<double[]> b(new double[n]);
+    std::vector<int> ia(n + 1), ja(nnz);
+    std::vector<double> a(nnz), b(n, 1.);
 
     ia[0] = 1;
     ia[1] = 4;
@@ -81,36 +77,30 @@ void run() {
     a[11] = 8.0;
     a[12] = -5.0;
 
-    for(int i = 0; i < n; i++) b[i] = 1.0;
+    all.bcast(0, config);
 
-    MPI_Comm remote;
-    MPI_Intercomm_merge(worker, 0, &remote);
-    MPI_Bcast(&config, 8, MPI_INT, 0, remote);
+    mpl::irequest_pool requests;
 
-    MPI_Request requests[5];
-    MPI_Isend(&iparm, 64, MPI_INT, 0, 0, worker, &requests[0]);
-    MPI_Isend(ia.get(), n + 1, MPI_INT, 0, 1, worker, &requests[1]);
-    MPI_Isend(ja.get(), nnz, MPI_INT, 0, 2, worker, &requests[2]);
-    MPI_Isend(a.get(), nnz, MPI_DOUBLE, 0, 3, worker, &requests[3]);
-    MPI_Isend(b.get(), n, MPI_DOUBLE, 0, 4, worker, &requests[4]);
-    MPI_Waitall(5, requests, MPI_STATUSES_IGNORE);
+    requests.push(worker.isend(iparm, 0, mpl::tag_t{0}));
+    requests.push(worker.isend(ia.begin(), ia.end(), 0, mpl::tag_t{1}));
+    requests.push(worker.isend(ja.begin(), ja.end(), 0, mpl::tag_t{2}));
+    requests.push(worker.isend(a.begin(), a.end(), 0, mpl::tag_t{3}));
+    requests.push(worker.isend(b.begin(), b.end(), 0, mpl::tag_t{4}));
+
+    requests.waitall();
 
     int error = -1;
-    MPI_Recv(&error, 1, MPI_INT, 0, 0, worker, MPI_STATUS_IGNORE);
-    if(0 == error) MPI_Recv(b.get(), n, MPI_DOUBLE, 0, 0, worker, MPI_STATUS_IGNORE);
+    worker.recv(error, 0);
+    if(0 == error) worker.recv(b.begin(), b.end(), 0);
 
-    for(int i = 0; i < n; i++) printf("x[%d] = %f\n", i, b[i]);
+    for(int i = 0; i < n; i++) printf("x[%d] = %+.6f\n", i, b[i]);
 }
 
 int main(int argc, char* argv[]) {
-    MPI_Init(&argc, &argv);
-
-    for(auto I = 0; I < 10; ++I) {
-        std::cout << "run " << I << '\n';
+    for(auto I = 0; I < 4; ++I) {
+        printf("run %d\n", I);
         run();
     }
-
-    MPI_Finalize();
 
     return 0;
 }
