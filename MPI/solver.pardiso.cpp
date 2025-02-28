@@ -24,6 +24,12 @@
 int main(int argc, char** argv) {
     const auto& comm_world{mpl::environment::comm_world()};
     const auto& parent = mpl::inter_communicator::parent();
+
+    if(!parent.is_valid()) {
+        printf("This program must be invoked by the host application.\n");
+        return 0;
+    }
+
     const auto all = mpl::communicator(parent, mpl::communicator::order_high);
 
     int config[7]{};
