@@ -4,7 +4,7 @@ on:
     branches: [ dev ]
 jobs:
   linux-amd64:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.all]') && !contains(github.event.head_commit.message, '[skip.docker]') }}
     runs-on: self-hosted
     timeout-minutes: 60
     steps:
@@ -34,7 +34,7 @@ jobs:
             tlcfem/suanpan:amd64
             ghcr.io/tlcfem/suanpan:latest
   linux-arm64:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.all]') && !contains(github.event.head_commit.message, '[skip.docker]') }}
     runs-on: self-hosted
     timeout-minutes: 600
     steps:
