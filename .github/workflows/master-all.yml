@@ -48,7 +48,7 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=ON -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=dist -DUSE_AOCL=${{ matrix.aocl }} ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=ON -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=dist -DUSE_AOCL=${{ matrix.aocl }} ..
           make install -j"$(nproc)" && make package
       - name: Pack
         run: |
@@ -178,7 +178,7 @@ jobs:
           if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
             cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
           }
-          cmake -T fortran=ifx -DCMAKE_BUILD_TYPE=Release -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=ON -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DMKLROOT="C:/Program Files (x86)/Intel/oneAPI/mkl/latest" -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -T fortran=ifx -DCMAKE_BUILD_TYPE=Release -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=ON -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DCMAKE_INSTALL_PREFIX=dist ..
           cmake --build . --target install --config Release -j 4
       - name: Pack
         shell: bash

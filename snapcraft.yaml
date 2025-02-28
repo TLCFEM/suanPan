@@ -45,7 +45,6 @@ parts:
       - -DUSE_VTK=ON
       - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.4/
       - -DUSE_MKL=ON
-      - -DMKLROOT=/opt/intel/oneapi/mkl/latest
       - -DUSE_INTEL_OPENMP=OFF
       - -DLINK_DYNAMIC_MKL=OFF
     build-packages:
