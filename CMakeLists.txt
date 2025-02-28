@@ -135,7 +135,7 @@ if (USE_SUPERLUMT)
 endif ()
 
 if (USE_MPI)
-    set(MPI_EXECUTABLE_SUFFIX ".mpich")
+    set(MPI_EXECUTABLE_SUFFIX "")
     find_package(MPI REQUIRED)
     add_compile_definitions(SUANPAN_MPI MPICH_SKIP_MPICXX)
     include_directories(${MPI_C_INCLUDE_DIRS})
