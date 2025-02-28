@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
     if(0 == comm_world.rank()) {
         mpl::irequest_pool requests;
 
-        requests.push(parent.irecv(ia.begin(), ia.end(), 0, mpl::tag_t{0}));
-        requests.push(parent.irecv(ja.begin(), ja.end(), 0, mpl::tag_t{1}));
+        requests.push(parent.irecv(ia, 0, mpl::tag_t{0}));
+        requests.push(parent.irecv(ja, 0, mpl::tag_t{1}));
         if(0 == float_type) {
             requests.push(parent.irecv(a.get(), a.get() + *nnz, 0, mpl::tag_t{2}));
             requests.push(parent.irecv(b.get(), b.get() + nb, 0, mpl::tag_t{3}));
