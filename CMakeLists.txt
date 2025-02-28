@@ -149,14 +149,9 @@ endif ()
 
 if (USE_MKL)
     set(MKLROOT "" CACHE PATH "MKL library path which contains /include and /lib folders.")
-    find_file(MKL_HEADER NAMES mkl.h PATHS ${MKLROOT}/include)
-    if (MKL_HEADER MATCHES "MKL_HEADER-NOTFOUND")
-        message(FATAL_ERROR "The <mkl.h> is not found under the path: ${MKLROOT}/include.")
-    endif ()
     if (COMPILER_IDENTIFIER MATCHES "IntelLLVM")
         set(USE_INTEL_OPENMP ON CACHE BOOL "" FORCE)
     endif ()
-    set(MKL_ROOT ${MKLROOT})
     if (NOT LINK_DYNAMIC_MKL)
         set(MKL_LINK static)
     endif ()
@@ -164,9 +159,10 @@ if (USE_MKL)
         set(MKL_THREADING gnu_thread)
     endif ()
     set(MKL_INTERFACE lp64)
-    find_package(MKL REQUIRED)
+    find_package(MKL REQUIRED HINTS ${MKLROOT} "/opt/intel/oneapi/mkl/latest")
     add_compile_definitions(SUANPAN_MKL)
     # add_compile_definitions(ARMA_USE_MKL_ALLOC)
+    message(STATUS "MKL_ROOT: ${MKL_ROOT}")
 elseif (FORTRAN_STATUS AND CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     message(WARNING "Since Intel compilers are used, why not enabling MKL?")
 elseif (USE_AOCL)
@@ -545,21 +541,21 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libtbb*)
         install(PROGRAMS ${TBB_FILES} DESTINATION lib)
     endif ()
-    if (USE_MKL AND MKLROOT MATCHES "(oneapi|oneAPI)")
+    if (USE_MKL AND MKL_ROOT MATCHES "(oneapi|oneAPI)")
         if (LINK_DYNAMIC_MKL)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_core${DECOR}*${SUFFIX})
+            file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_core${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_intel_lp64${DECOR}*${SUFFIX})
+            file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_lp64${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX})
+            file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_avx*${DECOR}*${SUFFIX})
+            file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_avx*${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             if (USE_INTEL_OPENMP)
-                file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_intel_thread${DECOR}*${SUFFIX})
+                file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_thread${DECOR}*${SUFFIX})
                 install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             else ()
-                file(GLOB MKL_FILES ${MKLROOT}/lib/intel64/libmkl_gnu_thread${DECOR}*${SUFFIX})
+                file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_gnu_thread${DECOR}*${SUFFIX})
                 install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             endif ()
         endif ()
@@ -597,18 +593,18 @@ elseif (COMPILER_IDENTIFIER MATCHES "win")
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libtbb*.dll)
         install(FILES ${TBB_FILES} DESTINATION bin)
     endif ()
-    if (USE_MKL AND MKLROOT MATCHES "(oneapi|oneAPI)")
+    if (USE_MKL AND MKL_ROOT MATCHES "(oneapi|oneAPI)")
         file(GLOB MKL_FILES
-                ${MKLROOT}/redist/intel64/mkl_rt*
-                ${MKLROOT}/redist/intel64/mkl_core*
-                ${MKLROOT}/redist/intel64/mkl_def*
-                ${MKLROOT}/redist/intel64/mkl_avx*
-                ${MKLROOT}/redist/intel64/mkl_intel_thread.*
-                ${MKLROOT}/bin/mkl_rt*
-                ${MKLROOT}/bin/mkl_core*
-                ${MKLROOT}/bin/mkl_def*
-                ${MKLROOT}/bin/mkl_avx*
-                ${MKLROOT}/bin/mkl_intel_thread.*
+                ${MKL_ROOT}/redist/intel64/mkl_rt*
+                ${MKL_ROOT}/redist/intel64/mkl_core*
+                ${MKL_ROOT}/redist/intel64/mkl_def*
+                ${MKL_ROOT}/redist/intel64/mkl_avx*
+                ${MKL_ROOT}/redist/intel64/mkl_intel_thread.*
+                ${MKL_ROOT}/bin/mkl_rt*
+                ${MKL_ROOT}/bin/mkl_core*
+                ${MKL_ROOT}/bin/mkl_def*
+                ${MKL_ROOT}/bin/mkl_avx*
+                ${MKL_ROOT}/bin/mkl_intel_thread.*
         )
         install(FILES ${MKL_FILES} DESTINATION bin)
     else ()
@@ -621,31 +617,31 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/tbb*.dll)
         install(FILES ${TBB_FILES} DESTINATION bin)
     endif ()
-    if (USE_MKL AND MKLROOT MATCHES "(oneapi|oneAPI)")
+    if (USE_MKL AND MKL_ROOT MATCHES "(oneapi|oneAPI)")
         if (LINK_DYNAMIC_MKL)
             file(GLOB MKL_FILES
-                    ${MKLROOT}/redist/intel64/mkl_core*
-                    ${MKLROOT}/redist/intel64/mkl_def*
-                    ${MKLROOT}/redist/intel64/mkl_avx*
-                    ${MKLROOT}/bin/mkl_core*
-                    ${MKLROOT}/bin/mkl_def*
-                    ${MKLROOT}/bin/mkl_avx*
+                    ${MKL_ROOT}/redist/intel64/mkl_core*
+                    ${MKL_ROOT}/redist/intel64/mkl_def*
+                    ${MKL_ROOT}/redist/intel64/mkl_avx*
+                    ${MKL_ROOT}/bin/mkl_core*
+                    ${MKL_ROOT}/bin/mkl_def*
+                    ${MKL_ROOT}/bin/mkl_avx*
             )
             install(FILES ${MKL_FILES} DESTINATION bin)
             file(GLOB MKL_FILES
-                    ${MKLROOT}/redist/intel64/mkl_intel_thread.*
-                    ${MKLROOT}/bin/mkl_intel_thread.*
+                    ${MKL_ROOT}/redist/intel64/mkl_intel_thread.*
+                    ${MKL_ROOT}/bin/mkl_intel_thread.*
             )
             install(FILES ${MKL_FILES} DESTINATION bin)
         endif ()
         if (USE_INTEL_OPENMP)
-            find_file(libifcoremd libifcoremd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
+            find_file(libifcoremd libifcoremd.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libifcoremd} DESTINATION bin)
-            find_file(libiomp5md libiomp5md.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
+            find_file(libiomp5md libiomp5md.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libiomp5md} DESTINATION bin)
-            find_file(libmmd libmmd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
+            find_file(libmmd libmmd.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${libmmd} DESTINATION bin)
-            find_file(svml_dispmd svml_dispmd.dll PATHS ${MKLROOT}/../../ ${MKLROOT}/../../compiler/latest/bin/ REQUIRED)
+            find_file(svml_dispmd svml_dispmd.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED)
             install(FILES ${svml_dispmd} DESTINATION bin)
         endif ()
     else ()
