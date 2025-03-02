@@ -94,19 +94,19 @@ Or on Windows,
 First time users can use `overview` command to go through a quick introduction.
 
 ```text
-+-----------------------------------------------------+
-|   __        __            suanPan is an open source |
-|  /  \      |  \              FEM framework (64-bit) |
-|  \__       |__/  __   __         Betelgeuse (2.8.0) |
-|     \ |  | |    |  \ |  |         by tlc @ 10fd6147 |
-|  \__/ |__| |    |__X |  |       all rights reserved |
-|                              10.5281/zenodo.1285221 |
-+-----------------------------------------------------+
-|  https://github.com/TLCFEM/suanPan                  |
-|  https://tlcfem.github.io/suanPan-manual/latest     |
-+-----------------------------------------------------+
-|  https://gitter.im/suanPan-dev/community            |
-+-----------------------------------------------------+
++--------------------------------------------------------+
+|             ____             suanPan is an open source |
+|   ___ _   _|  _ \ __ _ _ __     FEM framework (64-bit) |
+|  / __| | | | |_) / _` | '_ \           Canopus (3.7.0) |
+|  \__ \ |_| |  __/ (_| | | | |        by tlc @ c34df242 |
+|  |___/\__,_|_|   \__,_|_| |_|      all rights reserved |
+|                                 10.5281/zenodo.1285221 |
++--------------------------------------------------------+
+|  https://github.com/TLCFEM/suanPan                     |
+|  https://tlcfem.github.io/suanPan-manual/latest        |
++--------------------------------------------------------+
+|  https://bit.ly/vsc-sp                                 |
++--------------------------------------------------------+
 
 suanPan ~<> overview
 ```
