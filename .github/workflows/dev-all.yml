@@ -63,7 +63,7 @@ jobs:
           fi
       - name: Dependency
         run: |
-          sudo apt-get install libglvnd-dev dpkg-dev xz-utils
+          sudo apt-get install libglvnd-dev dpkg-dev xz-utils lcov
           echo "COVERAGE=OFF" >> "$GITHUB_ENV"
       - name: Flag
         if: |
@@ -134,12 +134,15 @@ jobs:
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
           cd build
           bash ../Script/Coverage.sh .
-          for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' --output-file coverage.info
+          lcov --list coverage.info
       - name: Report
         if: env.COVERAGE == 'ON'
         uses: codecov/codecov-action@v5
         with:
           plugins: gcov
+          files: ./build/coverage.info
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   macos-dev:
