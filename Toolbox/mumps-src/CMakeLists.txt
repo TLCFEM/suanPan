@@ -5,7 +5,6 @@ project(mumps C Fortran)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
 include_directories(.)
-include_directories(mpi-seq)
 
 add_compile_definitions(Add_)
 add_compile_definitions(pord)
@@ -138,6 +137,9 @@ add_library(mumps_c_lib OBJECT ${mumps_c})
 
 add_dependencies(mumps_f_lib metis)
 add_dependencies(mumps_c_lib metis)
+
+target_include_directories(mumps_f_lib PRIVATE mpi-seq)
+target_include_directories(mumps_c_lib PRIVATE mpi-seq)
 
 add_library(mumps_mpi_f_lib OBJECT ${mumps_mpi_f})
 add_library(mumps_mpi_c_lib OBJECT ${mumps_mpi_c})
