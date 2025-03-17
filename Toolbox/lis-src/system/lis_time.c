@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,33 +25,33 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #include <time.h>
 
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>
 #else
-	#include <sys/time.h>
+#include <sys/time.h>
 #endif
 
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 
 /************************************************
@@ -60,23 +60,21 @@
  ************************************************/
 
 #ifdef USE_MPI
-double lis_wtime(void)
-{
-	double etime;
-	
-	etime = MPI_Wtime();
+double lis_wtime(void) {
+    double etime;
 
-	return etime;
+    etime = MPI_Wtime();
+
+    return etime;
 }
 #else
 #ifdef _OPENMP
-double lis_wtime(void)
-{
-	double etime;
-	
-	etime = omp_get_wtime();
+double lis_wtime(void) {
+    double etime;
 
-	return etime;
+    etime = omp_get_wtime();
+
+    return etime;
 }
 #else
 #ifdef WIN32
@@ -90,24 +88,22 @@ double lis_wtime(void) {
 }
 #else
 #ifdef HAVE_CLOCK_GETTIME
-double lis_wtime(void)
-{
-	double etime;
-	struct timespec ts;
+double lis_wtime(void) {
+    double etime;
+    struct timespec ts;
 
-	clock_gettime(CLOCK_REALTIME, &ts);
-	etime = tv.tv_sec + (double)tv.tv_usec*1.0e-9;
-	return etime;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    etime = tv.tv_sec + (double)tv.tv_usec * 1.0e-9;
+    return etime;
 }
 #else
-double lis_wtime(void)
-{
-	double etime;
-	struct timeval tv;
+double lis_wtime(void) {
+    double etime;
+    struct timeval tv;
 
-	gettimeofday(&tv,NULL);
-	etime = tv.tv_sec + (double)tv.tv_usec*1.0e-6;
-	return etime;
+    gettimeofday(&tv, NULL);
+    etime = tv.tv_sec + (double)tv.tv_usec * 1.0e-6;
+    return etime;
 }
 #endif
 #endif
@@ -118,20 +114,15 @@ double lis_wtime(void)
 void lis_date(char* date) {
     SYSTEMTIME now;
     GetLocalTime(&now);
-    sprintf(date, "%04d%02d%02d%02d%02d%02d",
-            now.wYear, now.wMonth, now.wDay,
-            now.wHour, now.wMinute, now.wSecond);
+    sprintf(date, "%04d%02d%02d%02d%02d%02d", now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond);
 }
 #else
-void lis_date(char *date)
-{
-	struct timeval tv;
-	struct tm *tp;
+void lis_date(char* date) {
+    struct timeval tv;
+    struct tm* tp;
 
-	gettimeofday(&tv,NULL);
-	tp = localtime(&tv.tv_sec);
-	sprintf(date, "%04d%02d%02d%02d%02d%02d",
-        tp->tm_year + 1900, tp->tm_mon + 1, tp->tm_mday,
-        tp->tm_hour, tp->tm_min, tp->tm_sec);
+    gettimeofday(&tv, NULL);
+    tp = localtime(&tv.tv_sec);
+    sprintf(date, "%04d%02d%02d%02d%02d%02d", tp->tm_year + 1900, tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec);
 }
 #endif

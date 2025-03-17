@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,27 +25,27 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
-#include <math.h>
 #include <ctype.h>
+#include <math.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -62,57 +62,117 @@
 
 LIS_ESOLVER_EXECUTE lis_esolver_execute[] = {
     NULL,
-    lis_epi, lis_eii, lis_erqi, lis_ecg, lis_ecr, lis_esi, lis_eli, lis_eai, lis_egpi, lis_egii, lis_egrqi, lis_egcg, lis_egcr, lis_egsi, lis_egli, lis_egai
+    lis_epi,
+    lis_eii,
+    lis_erqi,
+    lis_ecg,
+    lis_ecr,
+    lis_esi,
+    lis_eli,
+    lis_eai,
+    lis_egpi,
+    lis_egii,
+    lis_egrqi,
+    lis_egcg,
+    lis_egcr,
+    lis_egsi,
+    lis_egli,
+    lis_egai
 };
 
 #ifdef USE_QUAD_PRECISION
 LIS_ESOLVER_EXECUTE lis_esolver_execute_quad[] = {
-  NULL,
-  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
 LIS_ESOLVER_EXECUTE lis_esolver_execute_switch[] = {
-  NULL,
-  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
 #endif
 
 LIS_ESOLVER_CHECK_PARAMS lis_esolver_check_params[] = {
     NULL,
-    lis_epi_check_params, lis_eii_check_params, lis_erqi_check_params,
-    lis_ecg_check_params, lis_ecr_check_params,
-    lis_esi_check_params, lis_eli_check_params, lis_eai_check_params,
-    lis_egpi_check_params, lis_egii_check_params, lis_egrqi_check_params,
-    lis_egcg_check_params, lis_egcr_check_params, lis_egsi_check_params,
-    lis_egli_check_params, lis_egai_check_params
+    lis_epi_check_params,
+    lis_eii_check_params,
+    lis_erqi_check_params,
+    lis_ecg_check_params,
+    lis_ecr_check_params,
+    lis_esi_check_params,
+    lis_eli_check_params,
+    lis_eai_check_params,
+    lis_egpi_check_params,
+    lis_egii_check_params,
+    lis_egrqi_check_params,
+    lis_egcg_check_params,
+    lis_egcr_check_params,
+    lis_egsi_check_params,
+    lis_egli_check_params,
+    lis_egai_check_params
 };
 
 LIS_ESOLVER_MALLOC_WORK lis_esolver_malloc_work[] = {
     NULL,
-    lis_epi_malloc_work, lis_eii_malloc_work, lis_erqi_malloc_work,
-    lis_ecg_malloc_work, lis_ecr_malloc_work,
-    lis_esi_malloc_work, lis_eli_malloc_work, lis_eai_malloc_work,
-    lis_egpi_malloc_work, lis_egii_malloc_work, lis_egrqi_malloc_work,
-    lis_egcg_malloc_work, lis_egcr_malloc_work, lis_egsi_malloc_work,
-    lis_egli_malloc_work, lis_egai_malloc_work
+    lis_epi_malloc_work,
+    lis_eii_malloc_work,
+    lis_erqi_malloc_work,
+    lis_ecg_malloc_work,
+    lis_ecr_malloc_work,
+    lis_esi_malloc_work,
+    lis_eli_malloc_work,
+    lis_eai_malloc_work,
+    lis_egpi_malloc_work,
+    lis_egii_malloc_work,
+    lis_egrqi_malloc_work,
+    lis_egcg_malloc_work,
+    lis_egcr_malloc_work,
+    lis_egsi_malloc_work,
+    lis_egli_malloc_work,
+    lis_egai_malloc_work
 };
 
-#define LIS_ESOLVER_OPTION_LEN		15
-#define LIS_EPRINT_LEN			 4
-#define LIS_TRUEFALSE_LEN		 2
-#define LIS_ESTORAGE_LEN		11
-#define LIS_PRECISION_LEN		 3
+#define LIS_ESOLVER_OPTION_LEN 15
+#define LIS_EPRINT_LEN 4
+#define LIS_TRUEFALSE_LEN 2
+#define LIS_ESTORAGE_LEN 11
+#define LIS_PRECISION_LEN 3
 
 char* LIS_ESOLVER_OPTNAME[] = {
-    "-emaxiter", "-etol", "-e", "-ss", "-m",
-    "-shift", "-shift_im", "-eprint", "-initx_ones", "-ie",
-    "-ige", "-estorage", "-estorage_block", "-ef", "-rval"
+    "-emaxiter", "-etol", "-e", "-ss", "-m", "-shift", "-shift_im", "-eprint", "-initx_ones", "-ie", "-ige", "-estorage", "-estorage_block", "-ef", "-rval"
 };
 
 LIS_INT LIS_ESOLVER_OPTACT[] = {
-    LIS_EOPTIONS_MAXITER, LIS_EPARAMS_RESID, LIS_EOPTIONS_ESOLVER,
-    LIS_EOPTIONS_SUBSPACE, LIS_EOPTIONS_MODE, LIS_EPARAMS_SHIFT,
-    LIS_EPARAMS_SHIFT_IM, LIS_EOPTIONS_OUTPUT, LIS_EOPTIONS_INITGUESS_ONES,
-    LIS_EOPTIONS_INNER_ESOLVER, LIS_EOPTIONS_INNER_GENERALIZED_ESOLVER,
-    LIS_EOPTIONS_STORAGE, LIS_EOPTIONS_STORAGE_BLOCK, LIS_EOPTIONS_PRECISION,
-    LIS_EOPTIONS_RVAL
+    LIS_EOPTIONS_MAXITER, LIS_EPARAMS_RESID, LIS_EOPTIONS_ESOLVER, LIS_EOPTIONS_SUBSPACE, LIS_EOPTIONS_MODE, LIS_EPARAMS_SHIFT, LIS_EPARAMS_SHIFT_IM, LIS_EOPTIONS_OUTPUT, LIS_EOPTIONS_INITGUESS_ONES, LIS_EOPTIONS_INNER_ESOLVER, LIS_EOPTIONS_INNER_GENERALIZED_ESOLVER, LIS_EOPTIONS_STORAGE, LIS_EOPTIONS_STORAGE_BLOCK, LIS_EOPTIONS_PRECISION, LIS_EOPTIONS_RVAL
 };
 
 char* lis_esolver_atoi[] = {"pi", "ii", "rqi", "cg", "cr", "si", "li", "ai", "gpi", "gii", "grqi", "gcg", "gcr", "gsi", "gli", "gai"};
@@ -262,7 +322,7 @@ LIS_INT lis_esolve(LIS_MATRIX A, LIS_VECTOR x, LIS_SCALAR* evalue0, LIS_ESOLVER 
     LIS_DEBUG_FUNC_IN;
 
     /* call generalized eigensolver */
-    err = lis_gesolve(A,NULL, x, evalue0, esolver);
+    err = lis_gesolve(A, NULL, x, evalue0, esolver);
 
     if(err) {
         esolver->retcode = err;
@@ -300,8 +360,8 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     comm = LIS_COMM_WORLD;
 
     /* begin parameter check */
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_ALL);
-    if(B != NULL) err = lis_matrix_check(B,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_ALL);
+    if(B != NULL) err = lis_matrix_check(B, LIS_MATRIX_CHECK_ALL);
 
     if(err) return err;
     if(x == NULL) {
@@ -326,7 +386,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     mode = esolver->options[LIS_EOPTIONS_MODE];
     emaxiter = esolver->options[LIS_EOPTIONS_MAXITER];
 #ifdef _COMPLEX
-	oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
     oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
 #endif
@@ -344,7 +404,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     }
 
     /*
-    if( niesolver < 1 || niesolver > 6 ) 
+    if( niesolver < 1 || niesolver > 6 )
     {
         LIS_SETERR1(LIS_ERR_ILL_ARG,"Parameter LIS_EOPTIONS_INNER_ESOLVER is %D (Set between 1 to 6)\n", niesolver);
         return LIS_ERR_ILL_ARG;
@@ -390,20 +450,17 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     }
 
 #ifdef USE_QUAD_PRECISION
-		if( eprecision==LIS_PRECISION_QUAD && lis_esolver_execute_quad[nesolver]==NULL )
-		{
-			LIS_SETERR1(LIS_ERR_NOT_IMPLEMENTED,"Quad precision eigensolver %s is not implemented\n",lis_esolvername[nesolver]);
-			return LIS_ERR_NOT_IMPLEMENTED;
-		}
-		else if( eprecision==LIS_PRECISION_SWITCH && lis_esolver_execute_switch[nesolver]==NULL )
-		{
-			LIS_SETERR1(LIS_ERR_NOT_IMPLEMENTED,"Switch esolver %s is not implemented\n",lis_esolvername[nesolver]);
-			return LIS_ERR_NOT_IMPLEMENTED;
-		}
-		if( esolver->options[LIS_EOPTIONS_SWITCH_MAXITER]==-1 )
-		{
-			esolver->options[LIS_EOPTIONS_SWITCH_MAXITER] = emaxiter;
-		}
+    if(eprecision == LIS_PRECISION_QUAD && lis_esolver_execute_quad[nesolver] == NULL) {
+        LIS_SETERR1(LIS_ERR_NOT_IMPLEMENTED, "Quad precision eigensolver %s is not implemented\n", lis_esolvername[nesolver]);
+        return LIS_ERR_NOT_IMPLEMENTED;
+    }
+    else if(eprecision == LIS_PRECISION_SWITCH && lis_esolver_execute_switch[nesolver] == NULL) {
+        LIS_SETERR1(LIS_ERR_NOT_IMPLEMENTED, "Switch esolver %s is not implemented\n", lis_esolvername[nesolver]);
+        return LIS_ERR_NOT_IMPLEMENTED;
+    }
+    if(esolver->options[LIS_EOPTIONS_SWITCH_MAXITER] == -1) {
+        esolver->options[LIS_EOPTIONS_SWITCH_MAXITER] = emaxiter;
+    }
 #endif
 
     err = lis_esolver_check_params[nesolver](esolver);
@@ -417,7 +474,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     if(esolver->evalue) lis_free(esolver->evalue);
     evalue = (LIS_SCALAR*)lis_malloc((ss + 2) * sizeof(LIS_SCALAR), "lis_esolve::evalue");
     if(evalue == NULL) {
-        LIS_SETERR_MEM((ss+2)*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM((ss + 2) * sizeof(LIS_SCALAR));
         esolver->retcode = err;
         return err;
     }
@@ -428,7 +485,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     if(esolver->resid) lis_free(esolver->resid);
     resid = (LIS_REAL*)lis_malloc((ss + 2) * sizeof(LIS_REAL), "lis_esolve::resid");
     if(resid == NULL) {
-        LIS_SETERR_MEM((ss+2)*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM((ss + 2) * sizeof(LIS_SCALAR));
         esolver->retcode = err;
         return err;
     }
@@ -437,7 +494,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     if(esolver->iter) lis_free(esolver->iter);
     iter = (LIS_INT*)lis_malloc((ss + 2) * sizeof(LIS_SCALAR), "lis_esolve::iter");
     if(iter == NULL) {
-        LIS_SETERR_MEM((ss+2)*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM((ss + 2) * sizeof(LIS_SCALAR));
         esolver->retcode = err;
         return err;
     }
@@ -446,7 +503,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     if(esolver->iter2) lis_free(esolver->iter2);
     iter2 = (LIS_INT*)lis_malloc((ss + 2) * sizeof(LIS_SCALAR), "lis_esolve::iter2");
     if(iter2 == NULL) {
-        LIS_SETERR_MEM((ss+2)*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM((ss + 2) * sizeof(LIS_SCALAR));
         esolver->retcode = err;
         return err;
     }
@@ -455,14 +512,12 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
 #ifndef USE_QUAD_PRECISION
     err = lis_vector_duplicate(A, &xx);
 #else
-		if( eprecision==LIS_PRECISION_DOUBLE )
-		{
-			err = lis_vector_duplicate(A,&xx);
-		}
-		else
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,A,&xx);
-		}
+    if(eprecision == LIS_PRECISION_DOUBLE) {
+        err = lis_vector_duplicate(A, &xx);
+    }
+    else {
+        err = lis_vector_duplicateex(LIS_PRECISION_QUAD, A, &xx);
+    }
 #endif
     if(err) {
         esolver->retcode = err;
@@ -473,14 +528,12 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
 #ifndef USE_QUAD_PRECISION
         lis_vector_set_all(1.0, xx);
 #else
-			if( eprecision==LIS_PRECISION_DOUBLE )
-			{
-				lis_vector_set_all(1.0,xx);
-			}
-			else
-			{
-				lis_vector_set_allex_nm(1.0,xx);
-			}
+        if(eprecision == LIS_PRECISION_DOUBLE) {
+            lis_vector_set_all(1.0, xx);
+        }
+        else {
+            lis_vector_set_allex_nm(1.0, xx);
+        }
 #endif
     }
     else {
@@ -488,14 +541,12 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
 #ifndef USE_QUAD_PRECISION
         lis_vector_copy(x, xx);
 #else
-			if( eprecision==LIS_PRECISION_DOUBLE )
-			{
-				lis_vector_copy(x,xx);
-			}
-			else
-			{
-				lis_vector_copyex_nm(x,xx);
-			}
+        if(eprecision == LIS_PRECISION_DOUBLE) {
+            lis_vector_copy(x, xx);
+        }
+        else {
+            lis_vector_copyex_nm(x, xx);
+        }
 #endif
     }
 
@@ -503,7 +554,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     if(esolver->evector) lis_free(esolver->evector);
     evector = (LIS_VECTOR*)lis_malloc((ss + 2) * sizeof(LIS_VECTOR), "lis_esolve::evector");
     if(evector == NULL) {
-        LIS_SETERR_MEM((ss+2)*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM((ss + 2) * sizeof(LIS_VECTOR));
         esolver->retcode = err;
         return err;
     }
@@ -512,7 +563,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     if(esolver->rhistory) lis_free(esolver->rhistory);
     rhistory = (LIS_REAL*)lis_malloc((emaxiter + 2) * sizeof(LIS_REAL), "lis_esolve::rhistory");
     if(rhistory == NULL) {
-        LIS_SETERR_MEM((emaxiter+2)*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM((emaxiter + 2) * sizeof(LIS_SCALAR));
         lis_vector_destroy(xx);
         esolver->retcode = err;
         return err;
@@ -522,7 +573,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     if(estorage > 0 && A->matrix_type != estorage) {
         err = lis_matrix_duplicate(A, &A0);
         if(err) return err;
-        lis_matrix_set_blocksize(A0, eblock, eblock,NULL,NULL);
+        lis_matrix_set_blocksize(A0, eblock, eblock, NULL, NULL);
         lis_matrix_set_type(A0, estorage);
         err = lis_matrix_convert(A, A0);
         if(err) return err;
@@ -549,7 +600,7 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
     esolver->iter2 = iter2;
 
 #ifdef _LONG__DOUBLE
-	if ( output ) lis_printf(comm,"precision             : long double\n");
+    if(output) lis_printf(comm, "precision             : long double\n");
 #else
     if(output) lis_printf(comm, "precision             : %s\n", lis_eprecisionname[eprecision]);
 #endif
@@ -557,8 +608,12 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
 
     if(output) lis_printf(comm, "convergence condition : ||lx-(B^-1)Ax||_2 <= %6.1e * ||lx||_2\n", (double)esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN]);
 
-    if(A->matrix_type == LIS_MATRIX_BSR || A->matrix_type == LIS_MATRIX_BSC) { if(output) lis_printf(comm, "matrix storage format : %s(%D x %D)\n", lis_estoragename[A->matrix_type - 1], eblock, eblock); }
-    else { if(output) lis_printf(comm, "matrix storage format : %s\n", lis_estoragename[A->matrix_type - 1]); }
+    if(A->matrix_type == LIS_MATRIX_BSR || A->matrix_type == LIS_MATRIX_BSC) {
+        if(output) lis_printf(comm, "matrix storage format : %s(%D x %D)\n", lis_estoragename[A->matrix_type - 1], eblock, eblock);
+    }
+    else {
+        if(output) lis_printf(comm, "matrix storage format : %s\n", lis_estoragename[A->matrix_type - 1]);
+    }
 
     time = lis_wtime();
 
@@ -582,18 +637,15 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
 #ifndef USE_QUAD_PRECISION
     err = lis_esolver_execute[nesolver](esolver);
 #else
-		if( eprecision==LIS_PRECISION_DOUBLE )
-		{
-			err = lis_esolver_execute[nesolver](esolver);
-		}
-		else if( eprecision==LIS_PRECISION_QUAD )
-		{
-			err = lis_esolver_execute_quad[nesolver](esolver);
-		}
-		else if( eprecision==LIS_PRECISION_SWITCH )
-		{
-			err = lis_esolver_execute_switch[nesolver](esolver);
-		}
+    if(eprecision == LIS_PRECISION_DOUBLE) {
+        err = lis_esolver_execute[nesolver](esolver);
+    }
+    else if(eprecision == LIS_PRECISION_QUAD) {
+        err = lis_esolver_execute_quad[nesolver](esolver);
+    }
+    else if(eprecision == LIS_PRECISION_SWITCH) {
+        err = lis_esolver_execute_switch[nesolver](esolver);
+    }
 #endif
     esolver->retcode = err;
 
@@ -602,8 +654,12 @@ LIS_INT lis_gesolve(LIS_MATRIX A, LIS_MATRIX B, LIS_VECTOR x, LIS_SCALAR* evalue
 
     esolver->time = lis_wtime() - time;
 
-    if(err) { if(output) lis_printf(comm, "eigensolver status    : %s(code=%D)\n\n", lis_ereturncode[err], err); }
-    else { if(output) lis_printf(comm, "eigensolver status    : normal end\n\n"); }
+    if(err) {
+        if(output) lis_printf(comm, "eigensolver status    : %s(code=%D)\n\n", lis_ereturncode[err], err);
+    }
+    else {
+        if(output) lis_printf(comm, "eigensolver status    : normal end\n\n");
+    }
 
     if(eprecision == LIS_PRECISION_DOUBLE) { esolver->iter2[mode] = esolver->iter[mode]; }
     else if(eprecision == LIS_PRECISION_QUAD) { esolver->iter2[mode] = 0; }
@@ -688,7 +744,7 @@ LIS_INT lis_esolver_set_option2(char* arg1, char* arg2, LIS_ESOLVER esolver) {
                 err = lis_esolver_set_option_print(arg2, esolver);
                 break;
             case LIS_EOPTIONS_INITGUESS_ONES:
-                err = lis_esolver_set_option_truefalse(arg2,LIS_EOPTIONS_INITGUESS_ONES, esolver);
+                err = lis_esolver_set_option_truefalse(arg2, LIS_EOPTIONS_INITGUESS_ONES, esolver);
                 break;
             case LIS_EOPTIONS_INNER_ESOLVER:
                 err = lis_esolver_set_option_iesolver(arg2, esolver);
@@ -700,15 +756,15 @@ LIS_INT lis_esolver_set_option2(char* arg1, char* arg2, LIS_ESOLVER esolver) {
                 err = lis_esolver_set_option_storage(arg2, esolver);
                 break;
             case LIS_EOPTIONS_PRECISION:
-                err = lis_esolver_set_option_eprecision(arg2,LIS_EOPTIONS_PRECISION, esolver);
+                err = lis_esolver_set_option_eprecision(arg2, LIS_EOPTIONS_PRECISION, esolver);
                 break;
             case LIS_EOPTIONS_RVAL:
-                err = lis_esolver_set_option_truefalse(arg2,LIS_EOPTIONS_RVAL, esolver);
+                err = lis_esolver_set_option_truefalse(arg2, LIS_EOPTIONS_RVAL, esolver);
                 break;
             default:
                 if(LIS_ESOLVER_OPTACT[i] < LIS_EOPTIONS_LEN) {
 #ifdef _LONG__LONG
-			      sscanf(arg2, "%lld", &esolver->options[LIS_ESOLVER_OPTACT[i]]);
+                    sscanf(arg2, "%lld", &esolver->options[LIS_ESOLVER_OPTACT[i]]);
 #else
                     sscanf(arg2, "%d", &esolver->options[LIS_ESOLVER_OPTACT[i]]);
 #endif
@@ -741,7 +797,7 @@ LIS_INT lis_esolver_set_option_esolver(char* argv, LIS_ESOLVER esolver) {
 
     if(argv[0] >= '0' && argv[0] <= '9') {
 #ifdef _LONG__LONG
-		sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_ESOLVER]);
+        sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_ESOLVER]);
 #else
         sscanf(argv, "%d", &esolver->options[LIS_EOPTIONS_ESOLVER]);
 #endif
@@ -773,7 +829,7 @@ LIS_INT lis_esolver_set_option_iesolver(char* argv, LIS_ESOLVER esolver) {
 
     if(argv[0] >= '0' && argv[0] <= '9') {
 #ifdef _LONG__LONG
-		sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_INNER_ESOLVER]);
+        sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_INNER_ESOLVER]);
 #else
         sscanf(argv, "%d", &esolver->options[LIS_EOPTIONS_INNER_ESOLVER]);
 #endif
@@ -805,7 +861,7 @@ LIS_INT lis_esolver_set_option_igesolver(char* argv, LIS_ESOLVER esolver) {
 
     if(argv[0] >= '0' && argv[0] <= '9') {
 #ifdef _LONG__LONG
-		sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_INNER_GENERALIZED_ESOLVER]);
+        sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_INNER_GENERALIZED_ESOLVER]);
 #else
         sscanf(argv, "%d", &esolver->options[LIS_EOPTIONS_INNER_GENERALIZED_ESOLVER]);
 #endif
@@ -837,7 +893,7 @@ LIS_INT lis_esolver_set_option_print(char* argv, LIS_ESOLVER esolver) {
 
     if(argv[0] >= '0' && argv[0] <= '3') {
 #ifdef _LONG__LONG
-		sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_OUTPUT]);
+        sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_OUTPUT]);
 #else
         sscanf(argv, "%d", &esolver->options[LIS_EOPTIONS_OUTPUT]);
 #endif
@@ -869,7 +925,7 @@ LIS_INT lis_esolver_set_option_truefalse(char* argv, LIS_INT opt, LIS_ESOLVER es
 
     if(argv[0] >= '0' && argv[0] <= '1') {
 #ifdef _LONG__LONG
-                sscanf(argv, "%lld", &esolver->options[opt]);
+        sscanf(argv, "%lld", &esolver->options[opt]);
 #else
         sscanf(argv, "%d", &esolver->options[opt]);
 #endif
@@ -901,7 +957,7 @@ LIS_INT lis_esolver_set_option_eprecision(char* argv, LIS_INT opt, LIS_ESOLVER e
 
     if(argv[0] >= '0' && argv[0] <= '1') {
 #ifdef _LONG__LONG
-		sscanf(argv, "%lld", &esolver->options[opt]);
+        sscanf(argv, "%lld", &esolver->options[opt]);
 #else
         sscanf(argv, "%d", &esolver->options[opt]);
 #endif
@@ -933,7 +989,7 @@ LIS_INT lis_esolver_set_option_storage(char* argv, LIS_ESOLVER esolver) {
 
     if(argv[0] >= '0' && argv[0] <= '9') {
 #ifdef _LONG__LONG
-		sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_STORAGE]);
+        sscanf(argv, "%lld", &esolver->options[LIS_EOPTIONS_STORAGE]);
 #else
         sscanf(argv, "%d", &esolver->options[LIS_EOPTIONS_STORAGE]);
 #endif
@@ -1122,7 +1178,7 @@ LIS_INT lis_esolver_get_evectors(LIS_ESOLVER esolver, LIS_MATRIX M) {
             lis_matrix_set_value(LIS_INS_VALUE, ii, jj, esolver->evector[j]->value[i], M);
         }
     }
-    lis_matrix_set_type(M,LIS_MATRIX_COO);
+    lis_matrix_set_type(M, LIS_MATRIX_COO);
     lis_matrix_assemble(M);
 
     LIS_DEBUG_FUNC_OUT;

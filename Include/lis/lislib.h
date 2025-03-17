@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -28,17 +28,17 @@
 #define __LISLIB_H__
 
 #include "lis.h"
-#include "lis_precision.h"
-#include "lis_system.h"
-#include "lis_vector.h"
-#include "lis_matrix.h"
-#include "lis_matvec.h"
-#include "lis_precon.h"
-#include "lis_solver.h"
 #include "lis_esolver.h"
 #include "lis_fortran.h"
 #include "lis_io.h"
+#include "lis_matrix.h"
+#include "lis_matvec.h"
 #include "lis_mpi.h"
+#include "lis_precision.h"
+#include "lis_precon.h"
+#include "lis_solver.h"
+#include "lis_system.h"
+#include "lis_vector.h"
 #include "mt19937ar.h"
 
 #endif

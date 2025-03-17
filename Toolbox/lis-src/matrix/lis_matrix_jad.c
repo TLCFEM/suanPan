@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,26 +25,26 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include <math.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -92,7 +92,7 @@ LIS_INT lis_matrix_set_jad(LIS_INT nnz, LIS_INT maxnzr, LIS_INT* perm, LIS_INT* 
         return LIS_SUCCESS;
     }
     else {
-        err = lis_matrix_check(A,LIS_MATRIX_CHECK_SET);
+        err = lis_matrix_check(A, LIS_MATRIX_CHECK_SET);
         if(err) return err;
     }
 #endif
@@ -100,7 +100,7 @@ LIS_INT lis_matrix_set_jad(LIS_INT nnz, LIS_INT maxnzr, LIS_INT* perm, LIS_INT* 
     n = A->n;
     col = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_set_jad::col");
     if(col == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
 
@@ -138,7 +138,7 @@ LIS_INT lis_matrix_setDLU_jad(LIS_INT lnnz, LIS_INT unnz, LIS_INT lmaxnzr, LIS_I
 #else
     if(lis_matrix_is_assembled(A)) return LIS_SUCCESS;
     else {
-        err = lis_matrix_check(A,LIS_MATRIX_CHECK_SET);
+        err = lis_matrix_check(A, LIS_MATRIX_CHECK_SET);
         if(err) return err;
     }
 #endif
@@ -161,13 +161,13 @@ LIS_INT lis_matrix_setDLU_jad(LIS_INT lnnz, LIS_INT unnz, LIS_INT lmaxnzr, LIS_I
     }
     lcol = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_setDLU_jad::lcol");
     if(lcol == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         lis_matrix_DLU_destroy(A);
         return LIS_OUT_OF_MEMORY;
     }
     ucol = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_setDLU_jad::ucol");
     if(ucol == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         lis_matrix_DLU_destroy(A);
         lis_free(lcol);
         return LIS_OUT_OF_MEMORY;
@@ -216,32 +216,32 @@ LIS_INT lis_matrix_malloc_jad(LIS_INT n, LIS_INT nnz, LIS_INT maxnzr, LIS_INT** 
     *index = NULL;
     *value = NULL;
 #ifdef _OPENMP
-		nprocs  = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
 
     *perm = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_malloc_jad::perm");
     if(*perm == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         lis_free2(4, *perm, *ptr, *index, *value);
         return LIS_OUT_OF_MEMORY;
     }
     *ptr = (LIS_INT*)lis_malloc(nprocs * (maxnzr + 1) * sizeof(LIS_INT), "lis_matrix_malloc_jad::ptr");
     if(*ptr == NULL) {
-        LIS_SETERR_MEM(nprocs*(maxnzr+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM(nprocs * (maxnzr + 1) * sizeof(LIS_INT));
         lis_free2(4, *perm, *ptr, *index, *value);
         return LIS_OUT_OF_MEMORY;
     }
     *index = (LIS_INT*)lis_malloc(nnz * sizeof(LIS_INT), "lis_matrix_malloc_jad::index");
     if(*index == NULL) {
-        LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_INT));
         lis_free2(4, *perm, *ptr, *index, *value);
         return LIS_OUT_OF_MEMORY;
     }
     *value = (LIS_SCALAR*)lis_malloc(nnz * sizeof(LIS_SCALAR), "lis_matrix_malloc_jad::value");
     if(*value == NULL) {
-        LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_SCALAR));
         lis_free2(4, *perm, *ptr, *index, *value);
         return LIS_OUT_OF_MEMORY;
     }
@@ -259,17 +259,17 @@ LIS_INT lis_matrix_elements_copy_jad(LIS_INT n, LIS_INT maxnzr, LIS_INT* perm, L
     LIS_DEBUG_FUNC_IN;
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,is,ie,my_rank)
+#pragma omp parallel private(i, j, is, ie, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
@@ -331,7 +331,7 @@ LIS_INT lis_matrix_copy_jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
         }
 
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { diag[i] = Ain->D->value[i]; }
         lis_matrix_elements_copy_jad(n, lmaxnzr, Ain->L->row, Ain->L->ptr, Ain->L->index, Ain->L->value, lperm, lptr, lindex, lvalue);
@@ -378,8 +378,8 @@ LIS_INT lis_matrix_get_diagonal_jad(LIS_MATRIX A, LIS_SCALAR d[]) {
     LIS_INT i, j, k, l;
     LIS_INT n, maxnzr;
 #ifdef _OPENMP
-		LIS_INT is,ie,js,je;
-		LIS_INT nprocs,my_rank;
+    LIS_INT is, ie, js, je;
+    LIS_INT nprocs, my_rank;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -389,37 +389,33 @@ LIS_INT lis_matrix_get_diagonal_jad(LIS_MATRIX A, LIS_SCALAR d[]) {
     k = n;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { d[i] = A->D->value[i]; }
     }
     else {
 #ifdef _OPENMP
-			nprocs = omp_get_max_threads();
-			#pragma omp parallel private(i,j,k,l,is,ie,js,je,my_rank)
-			{
-				my_rank = omp_get_thread_num();
-				LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-				k = ie-is;
-				for(j=0;j<maxnzr;j++)
-				{
-					l  = is;
-					js = A->ptr[my_rank*(maxnzr+1) + j];
-					je = A->ptr[my_rank*(maxnzr+1) + j+1];
-					for(i=js;i<je;i++)
-					{
-						if( A->row[l]==A->index[i] )
-						{
-							d[A->row[l]] = A->value[i];
-							k--;
-							if( k==0 ) goto get_diag_end;
-						}
-						l++;
-					}
-				}
-				get_diag_end:
-				;
-			}
+        nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, j, k, l, is, ie, js, je, my_rank)
+        {
+            my_rank = omp_get_thread_num();
+            LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
+            k = ie - is;
+            for(j = 0; j < maxnzr; j++) {
+                l = is;
+                js = A->ptr[my_rank * (maxnzr + 1) + j];
+                je = A->ptr[my_rank * (maxnzr + 1) + j + 1];
+                for(i = js; i < je; i++) {
+                    if(A->row[l] == A->index[i]) {
+                        d[A->row[l]] = A->value[i];
+                        k--;
+                        if(k == 0) goto get_diag_end;
+                    }
+                    l++;
+                }
+            }
+        get_diag_end:;
+        }
 #else
         for(j = 0; j < maxnzr; j++) {
             l = 0;
@@ -445,8 +441,8 @@ LIS_INT lis_matrix_shift_diagonal_jad(LIS_MATRIX A, LIS_SCALAR sigma) {
     LIS_INT i, j, k, l;
     LIS_INT n, maxnzr;
 #ifdef _OPENMP
-		LIS_INT is,ie,js,je;
-		LIS_INT nprocs,my_rank;
+    LIS_INT is, ie, js, je;
+    LIS_INT nprocs, my_rank;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -456,37 +452,33 @@ LIS_INT lis_matrix_shift_diagonal_jad(LIS_MATRIX A, LIS_SCALAR sigma) {
     k = n;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { A->D->value[i] -= sigma; }
     }
     else {
 #ifdef _OPENMP
-			nprocs = omp_get_max_threads();
-			#pragma omp parallel private(i,j,k,l,is,ie,js,je,my_rank)
-			{
-				my_rank = omp_get_thread_num();
-				LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-				k = ie-is;
-				for(j=0;j<maxnzr;j++)
-				{
-					l  = is;
-					js = A->ptr[my_rank*(maxnzr+1) + j];
-					je = A->ptr[my_rank*(maxnzr+1) + j+1];
-					for(i=js;i<je;i++)
-					{
-						if( A->row[l]==A->index[i] )
-						{
-							A->value[i] -= sigma;
-							k--;
-							if( k==0 ) goto get_diag_end;
-						}
-						l++;
-					}
-				}
-				get_diag_end:
-				;
-			}
+        nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, j, k, l, is, ie, js, je, my_rank)
+        {
+            my_rank = omp_get_thread_num();
+            LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
+            k = ie - is;
+            for(j = 0; j < maxnzr; j++) {
+                l = is;
+                js = A->ptr[my_rank * (maxnzr + 1) + j];
+                je = A->ptr[my_rank * (maxnzr + 1) + j + 1];
+                for(i = js; i < je; i++) {
+                    if(A->row[l] == A->index[i]) {
+                        A->value[i] -= sigma;
+                        k--;
+                        if(k == 0) goto get_diag_end;
+                    }
+                    l++;
+                }
+            }
+        get_diag_end:;
+        }
 #else
         for(j = 0; j < maxnzr; j++) {
             l = 0;
@@ -518,17 +510,17 @@ LIS_INT lis_matrix_scale_jad(LIS_MATRIX A, LIS_SCALAR d[]) {
     n = A->n;
     if(A->is_splited) {
 #ifdef _OPENMP
-			nprocs = omp_get_max_threads();
+        nprocs = omp_get_max_threads();
 #else
         nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-		#pragma omp parallel private(i,j,k,is,ie,js,je,my_rank)
+#pragma omp parallel private(i, j, k, is, ie, js, je, my_rank)
 #endif
         {
 #ifdef _OPENMP
-				my_rank = omp_get_thread_num();
+            my_rank = omp_get_thread_num();
 #else
             my_rank = 0;
 #endif
@@ -557,17 +549,17 @@ LIS_INT lis_matrix_scale_jad(LIS_MATRIX A, LIS_SCALAR d[]) {
     else {
         maxnzr = A->maxnzr;
 #ifdef _OPENMP
-			nprocs = omp_get_max_threads();
+        nprocs = omp_get_max_threads();
 #else
         nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-		#pragma omp parallel private(i,j,k,is,ie,js,je,my_rank)
+#pragma omp parallel private(i, j, k, is, ie, js, je, my_rank)
 #endif
         {
 #ifdef _OPENMP
-				my_rank = omp_get_thread_num();
+            my_rank = omp_get_thread_num();
 #else
             my_rank = 0;
 #endif
@@ -600,17 +592,17 @@ LIS_INT lis_matrix_scale_symm_jad(LIS_MATRIX A, LIS_SCALAR d[]) {
     n = A->n;
     if(A->is_splited) {
 #ifdef _OPENMP
-			nprocs = omp_get_max_threads();
+        nprocs = omp_get_max_threads();
 #else
         nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-		#pragma omp parallel private(i,j,k,is,ie,js,je,my_rank)
+#pragma omp parallel private(i, j, k, is, ie, js, je, my_rank)
 #endif
         {
 #ifdef _OPENMP
-				my_rank = omp_get_thread_num();
+            my_rank = omp_get_thread_num();
 #else
             my_rank = 0;
 #endif
@@ -639,17 +631,17 @@ LIS_INT lis_matrix_scale_symm_jad(LIS_MATRIX A, LIS_SCALAR d[]) {
     else {
         maxnzr = A->maxnzr;
 #ifdef _OPENMP
-			nprocs = omp_get_max_threads();
+        nprocs = omp_get_max_threads();
 #else
         nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-		#pragma omp parallel private(i,j,k,is,ie,js,je,my_rank)
+#pragma omp parallel private(i, j, k, is, ie, js, je, my_rank)
 #endif
         {
 #ifdef _OPENMP
-				my_rank = omp_get_thread_num();
+            my_rank = omp_get_thread_num();
 #else
             my_rank = 0;
 #endif
@@ -683,7 +675,7 @@ LIS_INT lis_matrix_normf_jad(LIS_MATRIX A, LIS_SCALAR* nrm) {
     sum = (LIS_SCALAR)0;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for reduction(+:sum) private(i,j)
+#pragma omp parallel for reduction(+ : sum) private(i, j)
 #endif
         for(i = 0; i < n; i++) {
             sum += A->D->value[i] * A->D->value[i];
@@ -693,7 +685,7 @@ LIS_INT lis_matrix_normf_jad(LIS_MATRIX A, LIS_SCALAR* nrm) {
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for reduction(+:sum) private(i,j)
+#pragma omp parallel for reduction(+ : sum) private(i, j)
 #endif
         for(i = 0; i < n; i++) {
             sum += A->value[i] * A->value[i];
@@ -730,8 +722,8 @@ LIS_INT lis_matrix_split_jad(LIS_MATRIX A) {
     LIS_INT *lperm, *lptr, *lindex;
     LIS_INT *uperm, *uptr, *uindex;
 #ifdef _OPENMP
-		LIS_INT *iw;
-		LIS_INT my_rank,nprocs,is,ie,js,je;
+    LIS_INT* iw;
+    LIS_INT my_rank, nprocs, is, ie, js, je;
 #endif
     LIS_SCALAR *lvalue, *uvalue;
     LIS_MATRIX_DIAG D;
@@ -760,83 +752,76 @@ LIS_INT lis_matrix_split_jad(LIS_MATRIX A) {
 
     liw = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_split_jad::liw");
     if(liw == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     uiw = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_split_jad::uiw");
     if(uiw == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         lis_free2(12, liw, uiw, liw2, uiw2, lperm, lptr, lindex, lvalue, uperm, uptr, uindex, uvalue);
         return LIS_ERR_OUT_OF_MEMORY;
     }
     liw2 = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_split_jad::liw2");
     if(liw2 == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         lis_free2(12, liw, uiw, liw2, uiw2, lperm, lptr, lindex, lvalue, uperm, uptr, uindex, uvalue);
         return LIS_ERR_OUT_OF_MEMORY;
     }
     uiw2 = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_split_jad::uiw2");
     if(uiw2 == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         lis_free2(12, liw, uiw, liw2, uiw2, lperm, lptr, lindex, lvalue, uperm, uptr, uindex, uvalue);
         return LIS_ERR_OUT_OF_MEMORY;
     }
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		iw = (LIS_INT *)lis_malloc((nprocs+1)*LIS_VEC_TMP_PADD*sizeof(LIS_INT),"lis_matrix_split_jad::iw");
-		if( iw==NULL )
-		{
-			LIS_SETERR_MEM((nprocs+1)*LIS_VEC_TMP_PADD*sizeof(LIS_INT));
-			return LIS_OUT_OF_MEMORY;
-		}
-		#pragma omp parallel private(i,j,k,is,ie,js,je,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-			memset(&liw[is],0,(ie-is)*sizeof(LIS_INT));
-			memset(&uiw[is],0,(ie-is)*sizeof(LIS_INT));
-			iw[my_rank*LIS_VEC_TMP_PADD]   = 0;
-			iw[my_rank*LIS_VEC_TMP_PADD+1] = 0;
-			iw[my_rank*LIS_VEC_TMP_PADD+2] = 0;
-			iw[my_rank*LIS_VEC_TMP_PADD+3] = 0;
-			for(j=0;j<maxnzr;j++)
-			{
-				k = is;
-				js = A->ptr[my_rank*(maxnzr+1) + j];
-				je = A->ptr[my_rank*(maxnzr+1) + j+1];
-				for(i=js;i<je;i++)
-				{
-					if( A->index[i]<A->row[k] )
-					{
-						iw[my_rank*LIS_VEC_TMP_PADD+2]++;
-						liw[k]++;
-					}
-					else if( A->index[i]>A->row[k] )
-					{
-						iw[my_rank*LIS_VEC_TMP_PADD+3]++;
-						uiw[k]++;
-					}
-					k++;
-				}
-			}
-			for(i=is;i<ie;i++)
-			{
-				if( iw[my_rank*LIS_VEC_TMP_PADD]<liw[i]   ) iw[my_rank*LIS_VEC_TMP_PADD]   = liw[i];
-				if( iw[my_rank*LIS_VEC_TMP_PADD+1]<uiw[i] ) iw[my_rank*LIS_VEC_TMP_PADD+1] = uiw[i];
-			}
-		}
-		iw[4] = 0;
-		iw[5] = 0;
-		for(i=0;i<nprocs;i++)
-		{
-			if( iw[i*LIS_VEC_TMP_PADD]>lmaxnzr   ) lmaxnzr = iw[i*LIS_VEC_TMP_PADD];
-			if( iw[i*LIS_VEC_TMP_PADD+1]>umaxnzr ) umaxnzr = iw[i*LIS_VEC_TMP_PADD+1];
-			iw[(i+1)*LIS_VEC_TMP_PADD+4] = iw[i*LIS_VEC_TMP_PADD+4] + iw[i*LIS_VEC_TMP_PADD+2];
-			iw[(i+1)*LIS_VEC_TMP_PADD+5] = iw[i*LIS_VEC_TMP_PADD+5] + iw[i*LIS_VEC_TMP_PADD+3];
-		}
-		lnnz = iw[nprocs*LIS_VEC_TMP_PADD+4];
-		unnz = iw[nprocs*LIS_VEC_TMP_PADD+5];
+    nprocs = omp_get_max_threads();
+    iw = (LIS_INT*)lis_malloc((nprocs + 1) * LIS_VEC_TMP_PADD * sizeof(LIS_INT), "lis_matrix_split_jad::iw");
+    if(iw == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * LIS_VEC_TMP_PADD * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+#pragma omp parallel private(i, j, k, is, ie, js, je, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
+        memset(&liw[is], 0, (ie - is) * sizeof(LIS_INT));
+        memset(&uiw[is], 0, (ie - is) * sizeof(LIS_INT));
+        iw[my_rank * LIS_VEC_TMP_PADD] = 0;
+        iw[my_rank * LIS_VEC_TMP_PADD + 1] = 0;
+        iw[my_rank * LIS_VEC_TMP_PADD + 2] = 0;
+        iw[my_rank * LIS_VEC_TMP_PADD + 3] = 0;
+        for(j = 0; j < maxnzr; j++) {
+            k = is;
+            js = A->ptr[my_rank * (maxnzr + 1) + j];
+            je = A->ptr[my_rank * (maxnzr + 1) + j + 1];
+            for(i = js; i < je; i++) {
+                if(A->index[i] < A->row[k]) {
+                    iw[my_rank * LIS_VEC_TMP_PADD + 2]++;
+                    liw[k]++;
+                }
+                else if(A->index[i] > A->row[k]) {
+                    iw[my_rank * LIS_VEC_TMP_PADD + 3]++;
+                    uiw[k]++;
+                }
+                k++;
+            }
+        }
+        for(i = is; i < ie; i++) {
+            if(iw[my_rank * LIS_VEC_TMP_PADD] < liw[i]) iw[my_rank * LIS_VEC_TMP_PADD] = liw[i];
+            if(iw[my_rank * LIS_VEC_TMP_PADD + 1] < uiw[i]) iw[my_rank * LIS_VEC_TMP_PADD + 1] = uiw[i];
+        }
+    }
+    iw[4] = 0;
+    iw[5] = 0;
+    for(i = 0; i < nprocs; i++) {
+        if(iw[i * LIS_VEC_TMP_PADD] > lmaxnzr) lmaxnzr = iw[i * LIS_VEC_TMP_PADD];
+        if(iw[i * LIS_VEC_TMP_PADD + 1] > umaxnzr) umaxnzr = iw[i * LIS_VEC_TMP_PADD + 1];
+        iw[(i + 1) * LIS_VEC_TMP_PADD + 4] = iw[i * LIS_VEC_TMP_PADD + 4] + iw[i * LIS_VEC_TMP_PADD + 2];
+        iw[(i + 1) * LIS_VEC_TMP_PADD + 5] = iw[i * LIS_VEC_TMP_PADD + 5] + iw[i * LIS_VEC_TMP_PADD + 3];
+    }
+    lnnz = iw[nprocs * LIS_VEC_TMP_PADD + 4];
+    unnz = iw[nprocs * LIS_VEC_TMP_PADD + 5];
 #else
     memset(liw, 0, n * sizeof(LIS_INT));
     memset(uiw, 0, n * sizeof(LIS_INT));
@@ -882,74 +867,63 @@ LIS_INT lis_matrix_split_jad(LIS_MATRIX A) {
     }
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		#pragma omp parallel private(i,j,k,is,ie,js,je,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-			memset(&lptr[my_rank*(lmaxnzr+1)],0,(lmaxnzr+1)*sizeof(LIS_INT));
-			memset(&uptr[my_rank*(umaxnzr+1)],0,(umaxnzr+1)*sizeof(LIS_INT));
-			for(i=is;i<ie;i++)
-			{
-				lperm[i] = A->row[i];
-				uperm[i] = A->row[i];
-				for(j=0;j<liw[i];j++)
-				{
-					lptr[my_rank*(lmaxnzr+1) + j+1]++;
-				}
-				for(j=0;j<uiw[i];j++)
-				{
-					uptr[my_rank*(umaxnzr+1) + j+1]++;
-				}
-			}
-			lis_sortr_ii(is,ie-1,liw,lperm);
-			lis_sortr_ii(is,ie-1,uiw,uperm);
-			lptr[my_rank*(lmaxnzr+1)] = iw[my_rank*LIS_VEC_TMP_PADD+4];
-			uptr[my_rank*(umaxnzr+1)] = iw[my_rank*LIS_VEC_TMP_PADD+5];
-			for(j=0;j<lmaxnzr;j++)
-			{
-				lptr[my_rank*(lmaxnzr+1) + j+1] += lptr[my_rank*(lmaxnzr+1) + j];
-			}
-			for(j=0;j<umaxnzr;j++)
-			{
-				uptr[my_rank*(umaxnzr+1) + j+1] += uptr[my_rank*(umaxnzr+1) + j];
-			}
+    nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, j, k, is, ie, js, je, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
+        memset(&lptr[my_rank * (lmaxnzr + 1)], 0, (lmaxnzr + 1) * sizeof(LIS_INT));
+        memset(&uptr[my_rank * (umaxnzr + 1)], 0, (umaxnzr + 1) * sizeof(LIS_INT));
+        for(i = is; i < ie; i++) {
+            lperm[i] = A->row[i];
+            uperm[i] = A->row[i];
+            for(j = 0; j < liw[i]; j++) {
+                lptr[my_rank * (lmaxnzr + 1) + j + 1]++;
+            }
+            for(j = 0; j < uiw[i]; j++) {
+                uptr[my_rank * (umaxnzr + 1) + j + 1]++;
+            }
+        }
+        lis_sortr_ii(is, ie - 1, liw, lperm);
+        lis_sortr_ii(is, ie - 1, uiw, uperm);
+        lptr[my_rank * (lmaxnzr + 1)] = iw[my_rank * LIS_VEC_TMP_PADD + 4];
+        uptr[my_rank * (umaxnzr + 1)] = iw[my_rank * LIS_VEC_TMP_PADD + 5];
+        for(j = 0; j < lmaxnzr; j++) {
+            lptr[my_rank * (lmaxnzr + 1) + j + 1] += lptr[my_rank * (lmaxnzr + 1) + j];
+        }
+        for(j = 0; j < umaxnzr; j++) {
+            uptr[my_rank * (umaxnzr + 1) + j + 1] += uptr[my_rank * (umaxnzr + 1) + j];
+        }
 
-			for(i=is;i<ie;i++)
-			{
-				liw[i]         = 0;
-				uiw[i]         = 0;
-				liw2[lperm[i]] = i;
-				uiw2[uperm[i]] = i;
-			}
-			for(j=0;j<maxnzr;j++)
-			{
-				k = is;
-				for(i=A->ptr[my_rank*(maxnzr+1) + j];i<A->ptr[my_rank*(maxnzr+1) + j+1];i++)
-				{
-					if( A->index[i]<A->row[k] )
-					{
-						kk              = lptr[my_rank*(lmaxnzr+1) + liw[A->row[k]]] + liw2[A->row[k]] - is;
-						liw[A->row[k]]++;
-						lindex[kk]      = A->index[i];
-						lvalue[kk]      = A->value[i];
-					}
-					else if( A->index[i]>A->row[k] )
-					{
-						kk              = uptr[my_rank*(umaxnzr+1) + uiw[A->row[k]]] + uiw2[A->row[k]] - is;
-						uiw[A->row[k]]++;
-						uindex[kk]      = A->index[i];
-						uvalue[kk]      = A->value[i];
-					}
-					else
-					{
-						D->value[A->row[k]] = A->value[i];
-					}
-					k++;
-				}
-			}
-		}
-		lis_free(iw);
+        for(i = is; i < ie; i++) {
+            liw[i] = 0;
+            uiw[i] = 0;
+            liw2[lperm[i]] = i;
+            uiw2[uperm[i]] = i;
+        }
+        for(j = 0; j < maxnzr; j++) {
+            k = is;
+            for(i = A->ptr[my_rank * (maxnzr + 1) + j]; i < A->ptr[my_rank * (maxnzr + 1) + j + 1]; i++) {
+                if(A->index[i] < A->row[k]) {
+                    kk = lptr[my_rank * (lmaxnzr + 1) + liw[A->row[k]]] + liw2[A->row[k]] - is;
+                    liw[A->row[k]]++;
+                    lindex[kk] = A->index[i];
+                    lvalue[kk] = A->value[i];
+                }
+                else if(A->index[i] > A->row[k]) {
+                    kk = uptr[my_rank * (umaxnzr + 1) + uiw[A->row[k]]] + uiw2[A->row[k]] - is;
+                    uiw[A->row[k]]++;
+                    uindex[kk] = A->index[i];
+                    uvalue[kk] = A->value[i];
+                }
+                else {
+                    D->value[A->row[k]] = A->value[i];
+                }
+                k++;
+            }
+        }
+    }
+    lis_free(iw);
 #else
     memset(lptr, 0, (lmaxnzr + 1) * sizeof(LIS_INT));
     memset(uptr, 0, (umaxnzr + 1) * sizeof(LIS_INT));
@@ -1022,8 +996,8 @@ LIS_INT lis_matrix_merge_jad(LIS_MATRIX A) {
     LIS_INT *perm, *ptr, *index, *iw, *iw2;
     LIS_SCALAR* value;
 #ifdef _OPENMP
-		LIS_INT is,js,je,nprocs,my_rank;
-		LIS_INT *iw3;
+    LIS_INT is, js, je, nprocs, my_rank;
+    LIS_INT* iw3;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -1039,67 +1013,59 @@ LIS_INT lis_matrix_merge_jad(LIS_MATRIX A) {
 
     iw = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_merge_jad::iw");
     if(iw == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     iw2 = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_merge_jad::iw2");
     if(iw2 == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         lis_free2(2, iw, iw2);
         return LIS_OUT_OF_MEMORY;
     }
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		iw3 = (LIS_INT *)lis_malloc((nprocs+1)*LIS_VEC_TMP_PADD*sizeof(LIS_INT),"lis_matrix_merge_jad::iw3");
-		if( iw3==NULL )
-		{
-			LIS_SETERR_MEM((nprocs+1)*LIS_VEC_TMP_PADD*sizeof(LIS_INT));
-			return LIS_OUT_OF_MEMORY;
-		}
-		#pragma omp parallel private(i,j,k,is,ie,js,je,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-			iw3[my_rank*LIS_VEC_TMP_PADD]   = 0;
-			iw3[my_rank*LIS_VEC_TMP_PADD+1] = (ie-is);
-			for(i=is;i<ie;i++)
-			{
-				iw[i] = 1;
-			}
-			for(j=0;j<A->L->maxnzr;j++)
-			{
-				k  = is;
-				js = A->L->ptr[my_rank*(A->L->maxnzr+1) + j];
-				je = A->L->ptr[my_rank*(A->L->maxnzr+1) + j+1];
-				for(i=js;i<je;i++)
-				{
-					iw3[my_rank*LIS_VEC_TMP_PADD+1]++;
-					iw[A->L->row[k++]]++;
-				}
-			}
-			for(j=0;j<A->U->maxnzr;j++)
-			{
-				k  = is;
-				js = A->U->ptr[my_rank*(A->U->maxnzr+1) + j];
-				je = A->U->ptr[my_rank*(A->U->maxnzr+1) + j+1];
-				for(i=js;i<je;i++)
-				{
-					iw3[my_rank*LIS_VEC_TMP_PADD+1]++;
-					iw[A->U->row[k++]]++;
-				}
-			}
-			for(i=is;i<ie;i++)
-			{
-				if( iw3[my_rank*LIS_VEC_TMP_PADD]<iw[i] ) iw3[my_rank*LIS_VEC_TMP_PADD] = iw[i];
-			}
-		}
-		maxnzr = 0;
-		iw3[2]  = 0;
-		for(i=0;i<nprocs;i++)
-		{
-			if( iw3[i*LIS_VEC_TMP_PADD]>maxnzr ) maxnzr = iw3[i*LIS_VEC_TMP_PADD];
-			iw3[(i+1)*LIS_VEC_TMP_PADD+2] = iw3[i*LIS_VEC_TMP_PADD+2] + iw3[i*LIS_VEC_TMP_PADD+1];
-		}
+    nprocs = omp_get_max_threads();
+    iw3 = (LIS_INT*)lis_malloc((nprocs + 1) * LIS_VEC_TMP_PADD * sizeof(LIS_INT), "lis_matrix_merge_jad::iw3");
+    if(iw3 == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * LIS_VEC_TMP_PADD * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+#pragma omp parallel private(i, j, k, is, ie, js, je, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
+        iw3[my_rank * LIS_VEC_TMP_PADD] = 0;
+        iw3[my_rank * LIS_VEC_TMP_PADD + 1] = (ie - is);
+        for(i = is; i < ie; i++) {
+            iw[i] = 1;
+        }
+        for(j = 0; j < A->L->maxnzr; j++) {
+            k = is;
+            js = A->L->ptr[my_rank * (A->L->maxnzr + 1) + j];
+            je = A->L->ptr[my_rank * (A->L->maxnzr + 1) + j + 1];
+            for(i = js; i < je; i++) {
+                iw3[my_rank * LIS_VEC_TMP_PADD + 1]++;
+                iw[A->L->row[k++]]++;
+            }
+        }
+        for(j = 0; j < A->U->maxnzr; j++) {
+            k = is;
+            js = A->U->ptr[my_rank * (A->U->maxnzr + 1) + j];
+            je = A->U->ptr[my_rank * (A->U->maxnzr + 1) + j + 1];
+            for(i = js; i < je; i++) {
+                iw3[my_rank * LIS_VEC_TMP_PADD + 1]++;
+                iw[A->U->row[k++]]++;
+            }
+        }
+        for(i = is; i < ie; i++) {
+            if(iw3[my_rank * LIS_VEC_TMP_PADD] < iw[i]) iw3[my_rank * LIS_VEC_TMP_PADD] = iw[i];
+        }
+    }
+    maxnzr = 0;
+    iw3[2] = 0;
+    for(i = 0; i < nprocs; i++) {
+        if(iw3[i * LIS_VEC_TMP_PADD] > maxnzr) maxnzr = iw3[i * LIS_VEC_TMP_PADD];
+        iw3[(i + 1) * LIS_VEC_TMP_PADD + 2] = iw3[i * LIS_VEC_TMP_PADD + 2] + iw3[i * LIS_VEC_TMP_PADD + 1];
+    }
 #else
     for(i = 0; i < n; i++) { iw[i] = 1; }
     for(j = 0; j < A->L->maxnzr; j++) {
@@ -1111,7 +1077,9 @@ LIS_INT lis_matrix_merge_jad(LIS_MATRIX A) {
         for(i = 0; i < ie; i++) { iw[A->U->row[i]]++; }
     }
     maxnzr = 0;
-    for(i = 0; i < n; i++) { if(maxnzr < iw[i]) maxnzr = iw[i]; }
+    for(i = 0; i < n; i++) {
+        if(maxnzr < iw[i]) maxnzr = iw[i];
+    }
 #endif
 
     err = lis_matrix_malloc_jad(n, nnz, maxnzr, &perm, &ptr, &index, &value);
@@ -1121,64 +1089,55 @@ LIS_INT lis_matrix_merge_jad(LIS_MATRIX A) {
     }
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		#pragma omp parallel private(i,j,k,is,ie,js,je,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
-			memset(&ptr[my_rank*(maxnzr+1)],0,(maxnzr+1)*sizeof(LIS_INT));
-			for(i=is;i<ie;i++)
-			{
-				perm[i] = i;
-				for(j=0;j<iw[i];j++)
-				{
-					ptr[my_rank*(maxnzr+1) + j+1]++;
-				}
-			}
-			lis_sortr_ii(is,ie-1,iw,perm);
-			ptr[my_rank*(maxnzr+1)] = iw3[my_rank*LIS_VEC_TMP_PADD+2];
-			for(j=0;j<maxnzr;j++)
-			{
-				ptr[my_rank*(maxnzr+1) + j+1] += ptr[my_rank*(maxnzr+1) + j];
-			}
+    nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, j, k, is, ie, js, je, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
+        memset(&ptr[my_rank * (maxnzr + 1)], 0, (maxnzr + 1) * sizeof(LIS_INT));
+        for(i = is; i < ie; i++) {
+            perm[i] = i;
+            for(j = 0; j < iw[i]; j++) {
+                ptr[my_rank * (maxnzr + 1) + j + 1]++;
+            }
+        }
+        lis_sortr_ii(is, ie - 1, iw, perm);
+        ptr[my_rank * (maxnzr + 1)] = iw3[my_rank * LIS_VEC_TMP_PADD + 2];
+        for(j = 0; j < maxnzr; j++) {
+            ptr[my_rank * (maxnzr + 1) + j + 1] += ptr[my_rank * (maxnzr + 1) + j];
+        }
 
-			for(i=is;i<ie;i++)
-			{
-				iw[i]        = 0;
-				iw2[perm[i]] = i;
-			}
-			for(j=0;j<A->L->maxnzr;j++)
-			{
-				k = is;
-				for(i=A->L->ptr[my_rank*(A->L->maxnzr+1) + j];i<A->L->ptr[my_rank*(A->L->maxnzr+1) + j+1];i++)
-				{
-					kk                 = ptr[my_rank*(maxnzr+1) + iw[A->L->row[k]]] + iw2[A->L->row[k]] - is;
-					iw[A->L->row[k]]++;
-					index[kk]          = A->L->index[i];
-					value[kk]          = A->L->value[i];
-					k++;
-				}
-			}
-			for(i=is;i<ie;i++)
-			{
-				kk         = ptr[my_rank*(maxnzr+1) + iw[i]] + iw2[i] - is;
-				iw[i]++;
-				index[kk]  = i;
-				value[kk]  = A->D->value[i];
-			}
-			for(j=0;j<A->U->maxnzr;j++)
-			{
-				k = is;
-				for(i=A->U->ptr[my_rank*(A->U->maxnzr+1) + j];i<A->U->ptr[my_rank*(A->U->maxnzr+1) + j+1];i++)
-				{
-					kk                 = ptr[my_rank*(maxnzr+1) + iw[A->U->row[k]]] + iw2[A->U->row[k]] - is;
-					iw[A->U->row[k]]++;
-					index[kk]          = A->U->index[i];
-					value[kk]          = A->U->value[i];
-					k++;
-				}
-			}
-		}
+        for(i = is; i < ie; i++) {
+            iw[i] = 0;
+            iw2[perm[i]] = i;
+        }
+        for(j = 0; j < A->L->maxnzr; j++) {
+            k = is;
+            for(i = A->L->ptr[my_rank * (A->L->maxnzr + 1) + j]; i < A->L->ptr[my_rank * (A->L->maxnzr + 1) + j + 1]; i++) {
+                kk = ptr[my_rank * (maxnzr + 1) + iw[A->L->row[k]]] + iw2[A->L->row[k]] - is;
+                iw[A->L->row[k]]++;
+                index[kk] = A->L->index[i];
+                value[kk] = A->L->value[i];
+                k++;
+            }
+        }
+        for(i = is; i < ie; i++) {
+            kk = ptr[my_rank * (maxnzr + 1) + iw[i]] + iw2[i] - is;
+            iw[i]++;
+            index[kk] = i;
+            value[kk] = A->D->value[i];
+        }
+        for(j = 0; j < A->U->maxnzr; j++) {
+            k = is;
+            for(i = A->U->ptr[my_rank * (A->U->maxnzr + 1) + j]; i < A->U->ptr[my_rank * (A->U->maxnzr + 1) + j + 1]; i++) {
+                kk = ptr[my_rank * (maxnzr + 1) + iw[A->U->row[k]]] + iw2[A->U->row[k]] - is;
+                iw[A->U->row[k]]++;
+                index[kk] = A->U->index[i];
+                value[kk] = A->U->value[i];
+                k++;
+            }
+        }
+    }
 #else
     memset(ptr, 0, (maxnzr + 1) * sizeof(LIS_INT));
     for(i = 0; i < n; i++) {
@@ -1244,7 +1203,7 @@ LIS_INT lis_matrix_sort_jad(LIS_MATRIX A) {
         n = A->n;
         if(A->is_splited) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < n; i++) {
                 lis_sort_id(A->L->ptr[i], A->L->ptr[i + 1] - 1, A->L->index, A->L->value);
@@ -1253,7 +1212,7 @@ LIS_INT lis_matrix_sort_jad(LIS_MATRIX A) {
         }
         else {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < n; i++) { lis_sort_id(A->ptr[i], A->ptr[i + 1] - 1, A->index, A->value); }
         }
@@ -1424,7 +1383,7 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     is = Ain->is;
     ie = Ain->ie;
 #ifdef _OPENMP
-		nprocs  = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
@@ -1439,26 +1398,26 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     iw = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::iw");
     if(iw == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     maxnzrpe = (LIS_INT*)lis_malloc(nprocs * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::maxnzrpe");
     if(maxnzrpe == NULL) {
-        LIS_SETERR_MEM(nprocs*sizeof(LIS_INT));
+        LIS_SETERR_MEM(nprocs * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     nnzpe = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::nnzpe");
     if(nnzpe == NULL) {
-        LIS_SETERR_MEM((nprocs+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((nprocs + 1) * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,is,ie,my_rank)
+#pragma omp parallel private(i, is, ie, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
@@ -1466,8 +1425,8 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
         maxnzrpe[my_rank] = 0;
 #ifdef USE_VEC_COMP
-		#pragma cdir nodep
-		#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
         for(i = is; i < ie; i++) {
             iw[i] = Ain->ptr[i + 1] - Ain->ptr[i];
@@ -1487,11 +1446,11 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     /* convert jad */
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,is,ie,js,je,l,my_rank)
+#pragma omp parallel private(i, j, is, ie, js, je, l, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
@@ -1505,18 +1464,16 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
         }
         lis_sortr_ii(is, ie - 1, iw, perm);
 #else
-			lis_sort_jad(is,ie,maxnzr,iw,perm);
-		
-			j = 0;
-			for(i=ie-1;i>=is;i--)
-			{
-				for(;j<iw[i];j++)
-				{
-					ptr[my_rank*(maxnzr+1) + j+1] = i-is+1;
-				}
-				if( iw[i]==maxnzr ) break;
-			}
-			
+        lis_sort_jad(is, ie, maxnzr, iw, perm);
+
+        j = 0;
+        for(i = ie - 1; i >= is; i--) {
+            for(; j < iw[i]; j++) {
+                ptr[my_rank * (maxnzr + 1) + j + 1] = i - is + 1;
+            }
+            if(iw[i] == maxnzr) break;
+        }
+
 #endif
 
         ptr[my_rank * (maxnzr + 1)] = nnzpe[my_rank];
@@ -1533,19 +1490,17 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
             }
         }
 #else
-			for(j=0;j<maxnzr;j++)
-			{
-				js = ptr[my_rank*(maxnzr+1) + j];
-				je = ptr[my_rank*(maxnzr+1) + j+1];
-				#pragma cdir nodep
-				#pragma _NEC ivdep
-				for(i=js;i<je;i++)
-				{
-					l          = Ain->ptr[perm[is+(i-js)]] + j;
-					value[i]   = Ain->value[l];
-					index[i]   = Ain->index[l];
-				}
-			}
+        for(j = 0; j < maxnzr; j++) {
+            js = ptr[my_rank * (maxnzr + 1) + j];
+            je = ptr[my_rank * (maxnzr + 1) + j + 1];
+#pragma cdir nodep
+#pragma _NEC ivdep
+            for(i = js; i < je; i++) {
+                l = Ain->ptr[perm[is + (i - js)]] + j;
+                value[i] = Ain->value[l];
+                index[i] = Ain->index[l];
+            }
+        }
 #endif
     }
 
@@ -1568,149 +1523,137 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 #else
 #undef __FUNC__
 #define __FUNC__ "lis_matrix_convert_csr2jad"
-LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout)
-{
-	LIS_INT i,j,jj,k,kk,l,js,je;
-	LIS_INT err;
-	LIS_INT np,n,nnz,nnz2,maxnzr,maxnzr2,nprocs,my_rank;
-	LIS_INT is,ie,pe;
-	LIS_INT *iw,*maxnzrpe,*nnzpe;
-	LIS_INT *iw2,*maxnzrpe2,*nnzpe2;
-	LIS_INT *perm,*ptr,*index;
-	LIS_INT *perm2,*ptr2,*index2;
-	LIS_SCALAR *value;
-	LIS_SCALAR *value2;
+LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout) {
+    LIS_INT i, j, jj, k, kk, l, js, je;
+    LIS_INT err;
+    LIS_INT np, n, nnz, nnz2, maxnzr, maxnzr2, nprocs, my_rank;
+    LIS_INT is, ie, pe;
+    LIS_INT *iw, *maxnzrpe, *nnzpe;
+    LIS_INT *iw2, *maxnzrpe2, *nnzpe2;
+    LIS_INT *perm, *ptr, *index;
+    LIS_INT *perm2, *ptr2, *index2;
+    LIS_SCALAR* value;
+    LIS_SCALAR* value2;
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	n       = Ain->n;
-	np      = Ain->np;
-	nnz		= Ain->nnz;
-	my_rank = Ain->my_rank;
-	is      = Ain->is;
-	ie      = Ain->ie;
+    n = Ain->n;
+    np = Ain->np;
+    nnz = Ain->nnz;
+    my_rank = Ain->my_rank;
+    is = Ain->is;
+    ie = Ain->ie;
 #ifdef _OPENMP
-		nprocs  = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
-		nprocs  = 1;
+    nprocs = 1;
 #endif
 
-	perm     = NULL;
-	ptr      = NULL;
-	index    = NULL;
-	value    = NULL;
-	iw       = NULL;
-	iw2      = NULL;
-	maxnzrpe = NULL;
-	nnzpe    = NULL;
+    perm = NULL;
+    ptr = NULL;
+    index = NULL;
+    value = NULL;
+    iw = NULL;
+    iw2 = NULL;
+    maxnzrpe = NULL;
+    nnzpe = NULL;
 
-	lis_matrix_split2_csr(Ain);
+    lis_matrix_split2_csr(Ain);
 
-	iw = (LIS_INT *)lis_malloc( n*sizeof(LIS_INT),"lis_matrix_convert_csr2jad::iw" );
-	if( iw==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	iw2 = (LIS_INT *)lis_malloc( n*sizeof(LIS_INT),"lis_matrix_convert_csr2jad::iw2" );
-	if( iw2==NULL )
-	{
-		LIS_SETERR_MEM(n*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	maxnzrpe = (LIS_INT *)lis_malloc( nprocs*sizeof(LIS_INT),"lis_matrix_convert_csr2jad::maxnzrpe" );
-	if( maxnzrpe==NULL )
-	{
-		LIS_SETERR_MEM(nprocs*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	maxnzrpe2 = (LIS_INT *)lis_malloc( nprocs*sizeof(LIS_INT),"lis_matrix_convert_csr2jad::maxnzrpe2" );
-	if( maxnzrpe2==NULL )
-	{
-		LIS_SETERR_MEM(nprocs*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	nnzpe = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_matrix_convert_csr2jad::nnzpe" );
-	if( nnzpe==NULL )
-	{
-		LIS_SETERR_MEM((nprocs+1)*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
-	nnzpe2 = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_matrix_convert_csr2jad::nnzpe2" );
-	if( nnzpe2==NULL )
-	{
-		LIS_SETERR_MEM((nprocs+1)*sizeof(LIS_INT));
-		return LIS_OUT_OF_MEMORY;
-	}
+    iw = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::iw");
+    if(iw == NULL) {
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    iw2 = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::iw2");
+    if(iw2 == NULL) {
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    maxnzrpe = (LIS_INT*)lis_malloc(nprocs * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::maxnzrpe");
+    if(maxnzrpe == NULL) {
+        LIS_SETERR_MEM(nprocs * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    maxnzrpe2 = (LIS_INT*)lis_malloc(nprocs * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::maxnzrpe2");
+    if(maxnzrpe2 == NULL) {
+        LIS_SETERR_MEM(nprocs * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    nnzpe = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::nnzpe");
+    if(nnzpe == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    nnzpe2 = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_matrix_convert_csr2jad::nnzpe2");
+    if(nnzpe2 == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,k,is,ie,jj,my_rank)
+#pragma omp parallel private(i, j, k, is, ie, jj, my_rank)
 #endif
-	{
+    {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
-			my_rank = 0;
+        my_rank = 0;
 #endif
-		LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
+        LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-		maxnzrpe[my_rank]  = 0;
-		maxnzrpe2[my_rank] = 0;
-		for(i=is;i<ie;i++)
-		{
-			iw[i]  = Ain->L->ptr[i+1] - Ain->L->ptr[i];
-			iw2[i] = Ain->U->ptr[i+1] - Ain->U->ptr[i];
-			if( iw[i]  > maxnzrpe[my_rank]  ) maxnzrpe[my_rank]  = iw[i];
-			if( iw2[i] > maxnzrpe2[my_rank] ) maxnzrpe2[my_rank] = iw2[i];
-		}
-		nnzpe[my_rank+1]  = Ain->L->ptr[ie] - Ain->L->ptr[is];
-		nnzpe2[my_rank+1] = Ain->U->ptr[ie] - Ain->U->ptr[is];
-	}
-	maxnzr     = 0;
-	maxnzr2    = 0;
-	nnzpe[0]   = 0;
-	nnzpe2[0]  = 0;
-	for(i=0;i<nprocs;i++)
-	{
-		if( maxnzrpe[i] >  maxnzr  ) maxnzr  = maxnzrpe[i];
-		if( maxnzrpe2[i] > maxnzr2 ) maxnzr2 = maxnzrpe2[i];
-		nnzpe[i+1]  += nnzpe[i];
-		nnzpe2[i+1] += nnzpe2[i];
-	}
-	nnz  = nnzpe[nprocs];
-	nnz2 = nnzpe2[nprocs];
+        maxnzrpe[my_rank] = 0;
+        maxnzrpe2[my_rank] = 0;
+        for(i = is; i < ie; i++) {
+            iw[i] = Ain->L->ptr[i + 1] - Ain->L->ptr[i];
+            iw2[i] = Ain->U->ptr[i + 1] - Ain->U->ptr[i];
+            if(iw[i] > maxnzrpe[my_rank]) maxnzrpe[my_rank] = iw[i];
+            if(iw2[i] > maxnzrpe2[my_rank]) maxnzrpe2[my_rank] = iw2[i];
+        }
+        nnzpe[my_rank + 1] = Ain->L->ptr[ie] - Ain->L->ptr[is];
+        nnzpe2[my_rank + 1] = Ain->U->ptr[ie] - Ain->U->ptr[is];
+    }
+    maxnzr = 0;
+    maxnzr2 = 0;
+    nnzpe[0] = 0;
+    nnzpe2[0] = 0;
+    for(i = 0; i < nprocs; i++) {
+        if(maxnzrpe[i] > maxnzr) maxnzr = maxnzrpe[i];
+        if(maxnzrpe2[i] > maxnzr2) maxnzr2 = maxnzrpe2[i];
+        nnzpe[i + 1] += nnzpe[i];
+        nnzpe2[i + 1] += nnzpe2[i];
+    }
+    nnz = nnzpe[nprocs];
+    nnz2 = nnzpe2[nprocs];
 
-	err = lis_matrix_malloc_jad(n,nnz,maxnzr,&perm,&ptr,&index,&value);
-	if( err )
-	{
-		return err;
-	}
-	err = lis_matrix_malloc_jad(n,nnz2,maxnzr2,&perm2,&ptr2,&index2,&value2);
-	if( err )
-	{
-		return err;
-	}
-	err = lis_matrix_LU_create(Aout);
-	if( err )
-	{
-		lis_free2(7,perm,ptr,index,value,iw,maxnzrpe,nnzpe);
-		return err;
-	}
+    err = lis_matrix_malloc_jad(n, nnz, maxnzr, &perm, &ptr, &index, &value);
+    if(err) {
+        return err;
+    }
+    err = lis_matrix_malloc_jad(n, nnz2, maxnzr2, &perm2, &ptr2, &index2, &value2);
+    if(err) {
+        return err;
+    }
+    err = lis_matrix_LU_create(Aout);
+    if(err) {
+        lis_free2(7, perm, ptr, index, value, iw, maxnzrpe, nnzpe);
+        return err;
+    }
 
-	/* convert jad */
+    /* convert jad */
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,k,is,ie,jj,kk,js,je,l,my_rank)
+#pragma omp parallel private(i, j, k, is, ie, jj, kk, js, je, l, my_rank)
 #endif
-	{
+    {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
-			my_rank = 0;
+        my_rank = 0;
 #endif
-		LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
+        LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-		memset(&ptr[my_rank*(maxnzr+1)],0,(maxnzr+1)*sizeof(LIS_INT));
-		memset(&ptr2[my_rank*(maxnzr2+1)],0,(maxnzr2+1)*sizeof(LIS_INT));
+        memset(&ptr[my_rank * (maxnzr + 1)], 0, (maxnzr + 1) * sizeof(LIS_INT));
+        memset(&ptr2[my_rank * (maxnzr2 + 1)], 0, (maxnzr2 + 1) * sizeof(LIS_INT));
 #if 0
 			for(i=is;i<ie;i++)
 			{
@@ -1728,39 +1671,33 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout)
 			lis_sortr_ii(is,ie-1,iw,perm);
 			lis_sortr_ii(is,ie-1,iw2,perm2);
 #else
-			lis_sort_jad(is,ie,maxnzr,iw,perm);
-			lis_sort_jad(is,ie,maxnzr2,iw2,perm2);
-			
-			j = 0;
-			for(i=ie-1;i>=is;i--)
-			{
-				for(;j<iw[i];j++)
-				{
-					ptr[my_rank*(maxnzr+1) + j+1] = i-is+1;
-				}
-				if( iw[i]==maxnzr ) break;
-			}
-			j = 0;
-			for(i=ie-1;i>=is;i--)
-			{
-				for(;j<iw2[i];j++)
-				{
-					ptr2[my_rank*(maxnzr2+1) + j+1] = i-is+1;
-				}
-				if( iw2[i]==maxnzr2 ) break;
-			}
+        lis_sort_jad(is, ie, maxnzr, iw, perm);
+        lis_sort_jad(is, ie, maxnzr2, iw2, perm2);
+
+        j = 0;
+        for(i = ie - 1; i >= is; i--) {
+            for(; j < iw[i]; j++) {
+                ptr[my_rank * (maxnzr + 1) + j + 1] = i - is + 1;
+            }
+            if(iw[i] == maxnzr) break;
+        }
+        j = 0;
+        for(i = ie - 1; i >= is; i--) {
+            for(; j < iw2[i]; j++) {
+                ptr2[my_rank * (maxnzr2 + 1) + j + 1] = i - is + 1;
+            }
+            if(iw2[i] == maxnzr2) break;
+        }
 #endif
 
-		ptr[my_rank*(maxnzr+1)] = nnzpe[my_rank];
-		ptr2[my_rank*(maxnzr2+1)] = nnzpe2[my_rank];
-		for(j=0;j<maxnzr;j++)
-		{
-			ptr[my_rank*(maxnzr+1) + j+1] += ptr[my_rank*(maxnzr+1) + j];
-		}
-		for(j=0;j<maxnzr2;j++)
-		{
-			ptr2[my_rank*(maxnzr2+1) + j+1] += ptr2[my_rank*(maxnzr2+1) + j];
-		}
+        ptr[my_rank * (maxnzr + 1)] = nnzpe[my_rank];
+        ptr2[my_rank * (maxnzr2 + 1)] = nnzpe2[my_rank];
+        for(j = 0; j < maxnzr; j++) {
+            ptr[my_rank * (maxnzr + 1) + j + 1] += ptr[my_rank * (maxnzr + 1) + j];
+        }
+        for(j = 0; j < maxnzr2; j++) {
+            ptr2[my_rank * (maxnzr2 + 1) + j + 1] += ptr2[my_rank * (maxnzr2 + 1) + j];
+        }
 #if 0
 			for(i=is;i<ie;i++)
 			{
@@ -1786,58 +1723,52 @@ LIS_INT lis_matrix_convert_csr2jad(LIS_MATRIX Ain, LIS_MATRIX Aout)
 				}
 			}
 #else
-			for(j=0;j<maxnzr;j++)
-			{
-				js = ptr[my_rank*(maxnzr+1) + j];
-				je = ptr[my_rank*(maxnzr+1) + j+1];
-				#pragma cdir nodep
-				#pragma _NEC ivdep
-				for(i=js;i<je;i++)
-				{
-					l  = Ain->L->ptr[perm[i-js]] + j;
-					value[i]   = Ain->L->value[l];
-					index[i]   = Ain->L->index[l];
-				}
-			}
-			for(j=0;j<maxnzr2;j++)
-			{
-				js = ptr2[my_rank*(maxnzr2+1) + j];
-				je = ptr2[my_rank*(maxnzr2+1) + j+1];
-				#pragma cdir nodep
-				#pragma _NEC ivdep
-				for(i=js;i<je;i++)
-				{
-					l  = Ain->U->ptr[perm2[i-js]] + j;
-					value2[i]   = Ain->U->value[l];
-					index2[i]   = Ain->U->index[l];
-				}
-			}
+        for(j = 0; j < maxnzr; j++) {
+            js = ptr[my_rank * (maxnzr + 1) + j];
+            je = ptr[my_rank * (maxnzr + 1) + j + 1];
+#pragma cdir nodep
+#pragma _NEC ivdep
+            for(i = js; i < je; i++) {
+                l = Ain->L->ptr[perm[i - js]] + j;
+                value[i] = Ain->L->value[l];
+                index[i] = Ain->L->index[l];
+            }
+        }
+        for(j = 0; j < maxnzr2; j++) {
+            js = ptr2[my_rank * (maxnzr2 + 1) + j];
+            je = ptr2[my_rank * (maxnzr2 + 1) + j + 1];
+#pragma cdir nodep
+#pragma _NEC ivdep
+            for(i = js; i < je; i++) {
+                l = Ain->U->ptr[perm2[i - js]] + j;
+                value2[i] = Ain->U->value[l];
+                index2[i] = Ain->U->index[l];
+            }
+        }
 #endif
-	}
+    }
 
-	err = lis_matrix_set_jad(nnz,maxnzr,perm,ptr,index,value,Aout);
-	if( err )
-	{
-		lis_free2(7,perm,ptr,index,value,iw,maxnzrpe,nnzpe);
-		return err;
-	}
-	Aout->U->maxnzr = maxnzr2;
-	Aout->U->row    = perm2;
-	Aout->U->ptr    = ptr2;
-	Aout->U->index  = index2;
-	Aout->U->value  = value2;
-	err = lis_matrix_assemble(Aout);
-	if( err )
-	{
-		lis_free2(2,iw,nnzpe);
-		lis_matrix_storage_destroy(Aout);
-		return err;
-	}
-	Aout->work = (LIS_SCALAR *)lis_malloc(np*sizeof(LIS_SCALAR));
-	lis_free2(6,iw,nnzpe,maxnzrpe,iw2,nnzpe2,maxnzrpe2);
+    err = lis_matrix_set_jad(nnz, maxnzr, perm, ptr, index, value, Aout);
+    if(err) {
+        lis_free2(7, perm, ptr, index, value, iw, maxnzrpe, nnzpe);
+        return err;
+    }
+    Aout->U->maxnzr = maxnzr2;
+    Aout->U->row = perm2;
+    Aout->U->ptr = ptr2;
+    Aout->U->index = index2;
+    Aout->U->value = value2;
+    err = lis_matrix_assemble(Aout);
+    if(err) {
+        lis_free2(2, iw, nnzpe);
+        lis_matrix_storage_destroy(Aout);
+        return err;
+    }
+    Aout->work = (LIS_SCALAR*)lis_malloc(np * sizeof(LIS_SCALAR));
+    lis_free2(6, iw, nnzpe, maxnzrpe, iw2, nnzpe2, maxnzrpe2);
 
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 }
 #endif
 
@@ -1852,7 +1783,7 @@ LIS_INT lis_matrix_convert_jad2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     LIS_INT *ptr, *index;
     LIS_SCALAR* value;
 #ifdef _OPENMP
-		LIS_INT	nprocs,my_rank;
+    LIS_INT nprocs, my_rank;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -1870,7 +1801,7 @@ LIS_INT lis_matrix_convert_jad2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     iw = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_convert_jad2csr::iw");
     if(iw == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     err = lis_matrix_malloc_csr(n, nnz, &ptr, &index, &value);
@@ -1881,48 +1812,41 @@ LIS_INT lis_matrix_convert_jad2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     /* convert csr */
 #ifdef _OPENMP
-		nprocs  = omp_get_max_threads();
-		ptr[0] = 0;
-		#pragma omp parallel private(i,j,k,is,ie,jj,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			LIS_GET_ISIE(my_rank,nprocs,n,is,ie);
+    nprocs = omp_get_max_threads();
+    ptr[0] = 0;
+#pragma omp parallel private(i, j, k, is, ie, jj, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-			for(i=is;i<ie;i++)
-			{
-				ptr[i+1] = 0;
-			}
-			for(j=0;j<maxnzr;j++)
-			{
-				k = is;
-				for(i=Ain->ptr[my_rank*(maxnzr+1) + j];i<Ain->ptr[my_rank*(maxnzr+1) + j+1];i++)
-				{ 
-					ptr[Ain->row[k]+1]++;
-					k++;
-				}
-			}
-			#pragma omp barrier
-			#pragma omp single
-			for(i=0;i<n;i++)
-			{
-				ptr[i+1] += ptr[i];
-			}
-			for(i=is;i<ie;i++)
-			{
-				iw[i]    = ptr[i];
-			}
-			for(j=0;j<maxnzr;j++)
-			{
-				jj = is;
-				for(i=Ain->ptr[my_rank*(maxnzr+1) + j];i<Ain->ptr[my_rank*(maxnzr+1) + j+1];i++)
-				{
-					k          = iw[Ain->row[jj]]++;
-					value[k]   = Ain->value[i];
-					index[k]   = Ain->index[i];
-					jj++;
-				}
-			}
-		}
+        for(i = is; i < ie; i++) {
+            ptr[i + 1] = 0;
+        }
+        for(j = 0; j < maxnzr; j++) {
+            k = is;
+            for(i = Ain->ptr[my_rank * (maxnzr + 1) + j]; i < Ain->ptr[my_rank * (maxnzr + 1) + j + 1]; i++) {
+                ptr[Ain->row[k] + 1]++;
+                k++;
+            }
+        }
+#pragma omp barrier
+#pragma omp single
+        for(i = 0; i < n; i++) {
+            ptr[i + 1] += ptr[i];
+        }
+        for(i = is; i < ie; i++) {
+            iw[i] = ptr[i];
+        }
+        for(j = 0; j < maxnzr; j++) {
+            jj = is;
+            for(i = Ain->ptr[my_rank * (maxnzr + 1) + j]; i < Ain->ptr[my_rank * (maxnzr + 1) + j + 1]; i++) {
+                k = iw[Ain->row[jj]]++;
+                value[k] = Ain->value[i];
+                index[k] = Ain->index[i];
+                jj++;
+            }
+        }
+    }
 #else
     for(i = 0; i < n + 1; i++) { ptr[i] = 0; }
     for(j = 0; j < maxnzr; j++) {
@@ -1976,15 +1900,15 @@ LIS_INT lis_vector_sort_jad_order(LIS_MATRIX A, LIS_VECTOR v) {
 
     t = (LIS_SCALAR*)lis_malloc(np * sizeof(LIS_SCALAR), "lis_vector_sort_jad_order::t");
     if(t == NULL) {
-        LIS_SETERR_MEM(np*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(np * sizeof(LIS_SCALAR));
         return LIS_OUT_OF_MEMORY;
     }
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { t[i] = v->value[A->row[i]]; }
     lis_free(v->value);
@@ -2008,15 +1932,15 @@ LIS_INT lis_vector_sort_ascending_order(LIS_MATRIX A, LIS_VECTOR v) {
 
     t = (LIS_SCALAR*)lis_malloc(np * sizeof(LIS_SCALAR), "lis_vector_sort_ascending_order::t");
     if(t == NULL) {
-        LIS_SETERR_MEM(np*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(np * sizeof(LIS_SCALAR));
         return LIS_OUT_OF_MEMORY;
     }
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { t[A->row[i]] = v->value[i]; }
     lis_free(v->value);

@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -98,14 +98,12 @@ LIS_INT lis_precon_create_hybrid(LIS_SOLVER solver, LIS_PRECON precon) {
 #ifndef USE_QUAD_PRECISION
     err = lis_vector_duplicate(A, &xx);
 #else
-		if( precision==LIS_PRECISION_DOUBLE )
-		{
-			err = lis_vector_duplicate(A,&xx);
-		}
-		else
-		{
-			err = lis_vector_duplicateex(LIS_PRECISION_QUAD,A,&xx);
-		}
+    if(precision == LIS_PRECISION_DOUBLE) {
+        err = lis_vector_duplicate(A, &xx);
+    }
+    else {
+        err = lis_vector_duplicateex(LIS_PRECISION_QUAD, A, &xx);
+    }
 #endif
     if(err) {
         solver->retcode = err;
@@ -115,7 +113,7 @@ LIS_INT lis_precon_create_hybrid(LIS_SOLVER solver, LIS_PRECON precon) {
     /* create residual history vector */
     rhistory = (LIS_REAL*)lis_malloc((maxiter + 2) * sizeof(LIS_REAL), "lis_precon_create_hybrid::rhistory");
     if(rhistory == NULL) {
-        LIS_SETERR_MEM((maxiter+2)*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM((maxiter + 2) * sizeof(LIS_SCALAR));
         lis_vector_destroy(xx);
         solver->retcode = err;
         return err;
@@ -173,46 +171,40 @@ LIS_INT lis_psolve_hybrid(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
 
     if(solver2->options[LIS_OPTIONS_INITGUESS_ZEROS]) {
 #ifdef USE_QUAD_PRECISION
-		if( solver->precision==LIS_PRECISION_DEFAULT )
-		{
+        if(solver->precision == LIS_PRECISION_DEFAULT) {
 #endif
-        lis_vector_set_all(0, xx);
+            lis_vector_set_all(0, xx);
 #ifdef USE_QUAD_PRECISION
-		}
-		else
-		{
-			lis_vector_set_allex_nm(0,xx);
-		}
+        }
+        else {
+            lis_vector_set_allex_nm(0, xx);
+        }
 #endif
     }
     else {
 #ifdef USE_QUAD_PRECISION
-		if( solver->precision==LIS_PRECISION_DEFAULT )
-		{
+        if(solver->precision == LIS_PRECISION_DEFAULT) {
 #endif
-        lis_vector_copy(B, xx);
+            lis_vector_copy(B, xx);
 #ifdef USE_QUAD_PRECISION
-		}
-		else
-		{
-			lis_vector_copyex_mm(B,xx);
-		}
+        }
+        else {
+            lis_vector_copyex_mm(B, xx);
+        }
 #endif
     }
 
     /* execute solver */
     lis_solver_execute[nsolver](solver2);
 #ifdef USE_QUAD_PRECISION
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
 #endif
-    lis_vector_copy(solver2->x, X);
+        lis_vector_copy(solver2->x, X);
 #ifdef USE_QUAD_PRECISION
-	}
-	else
-	{
-		lis_vector_copyex_mm(solver2->x,X);
-	}
+    }
+    else {
+        lis_vector_copyex_mm(solver2->x, X);
+    }
 #endif
 
     LIS_DEBUG_FUNC_OUT;
@@ -245,46 +237,40 @@ LIS_INT lis_psolveh_hybrid(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
 
     if(solver2->options[LIS_OPTIONS_INITGUESS_ZEROS]) {
 #ifdef USE_QUAD_PRECISION
-		if( solver->precision==LIS_PRECISION_DEFAULT )
-		{
+        if(solver->precision == LIS_PRECISION_DEFAULT) {
 #endif
-        lis_vector_set_all(0, xx);
+            lis_vector_set_all(0, xx);
 #ifdef USE_QUAD_PRECISION
-		}
-		else
-		{
-			lis_vector_set_allex_nm(0,xx);
-		}
+        }
+        else {
+            lis_vector_set_allex_nm(0, xx);
+        }
 #endif
     }
     else {
 #ifdef USE_QUAD_PRECISION
-		if( solver->precision==LIS_PRECISION_DEFAULT )
-		{
+        if(solver->precision == LIS_PRECISION_DEFAULT) {
 #endif
-        lis_vector_copy(B, xx);
+            lis_vector_copy(B, xx);
 #ifdef USE_QUAD_PRECISION
-		}
-		else
-		{
-			lis_vector_copyex_mm(B,xx);
-		}
+        }
+        else {
+            lis_vector_copyex_mm(B, xx);
+        }
 #endif
     }
 
     /* execute solver */
     lis_solver_execute[nsolver](solver2);
 #ifdef USE_QUAD_PRECISION
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
 #endif
-    lis_vector_copy(solver2->x, X);
+        lis_vector_copy(solver2->x, X);
 #ifdef USE_QUAD_PRECISION
-	}
-	else
-	{
-		lis_vector_copyex_mm(solver2->x,X);
-	}
+    }
+    else {
+        lis_vector_copyex_mm(solver2->x, X);
+    }
 #endif
     LIS_MATVEC = lis_matvec;
     LIS_MATVECH = lis_matvech;

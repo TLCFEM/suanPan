@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,26 +25,26 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include <math.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -130,15 +130,15 @@ LIS_INT lis_matrix_elements_copy_csc(LIS_INT np, LIS_INT* ptr, LIS_INT* index, L
     LIS_DEBUG_FUNC_IN;
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j)
+#pragma omp parallel private(i, j)
 #endif
     {
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(i = 0; i < np + 1; i++) { o_ptr[i] = ptr[i]; }
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(i = 0; i < np; i++) {
             for(j = ptr[i]; j < ptr[i + 1]; j++) {
@@ -191,7 +191,7 @@ LIS_INT lis_matrix_copy_csc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
         }
 
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { diag[i] = Ain->D->value[i]; }
         lis_matrix_elements_copy_csr(np, Ain->L->ptr, Ain->L->index, Ain->L->value, lptr, lindex, lvalue);
@@ -242,13 +242,13 @@ LIS_INT lis_matrix_get_diagonal_csc(LIS_MATRIX A, LIS_SCALAR d[]) {
     np = A->np;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
         for(i = 0; i < n; i++) { d[i] = A->D->value[i]; }
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
         for(i = 0; i < np; i++) {
             d[i] = (LIS_SCALAR)0.0;
@@ -277,13 +277,13 @@ LIS_INT lis_matrix_shift_diagonal_csc(LIS_MATRIX A, LIS_SCALAR sigma) {
     np = A->np;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
         for(i = 0; i < n; i++) { A->D->value[i] -= sigma; }
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
         for(i = 0; i < np; i++) {
             for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) {
@@ -310,7 +310,7 @@ LIS_INT lis_matrix_scale_csc(LIS_MATRIX A, LIS_SCALAR d[]) {
     np = A->np;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
         for(i = 0; i < np; i++) {
             A->D->value[i] = 1.0;
@@ -320,9 +320,11 @@ LIS_INT lis_matrix_scale_csc(LIS_MATRIX A, LIS_SCALAR d[]) {
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
-        for(i = 0; i < np; i++) { for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) { A->value[j] *= d[A->index[j]]; } }
+        for(i = 0; i < np; i++) {
+            for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) { A->value[j] *= d[A->index[j]]; }
+        }
     }
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -340,7 +342,7 @@ LIS_INT lis_matrix_scale_symm_csc(LIS_MATRIX A, LIS_SCALAR d[]) {
     np = A->np;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
         for(i = 0; i < np; i++) {
             A->D->value[i] = 1.0;
@@ -350,9 +352,11 @@ LIS_INT lis_matrix_scale_symm_csc(LIS_MATRIX A, LIS_SCALAR d[]) {
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
-        for(i = 0; i < np; i++) { for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) { A->value[j] = A->value[j] * d[i] * d[A->index[j]]; } }
+        for(i = 0; i < np; i++) {
+            for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) { A->value[j] = A->value[j] * d[i] * d[A->index[j]]; }
+        }
     }
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -372,7 +376,7 @@ LIS_INT lis_matrix_normf_csc(LIS_MATRIX A, LIS_SCALAR* nrm) {
     sum = (LIS_SCALAR)0;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for reduction(+:sum) private(i,j)
+#pragma omp parallel for reduction(+ : sum) private(i, j)
 #endif
         for(i = 0; i < np; i++) {
             sum += A->D->value[i] * A->D->value[i];
@@ -382,9 +386,11 @@ LIS_INT lis_matrix_normf_csc(LIS_MATRIX A, LIS_SCALAR* nrm) {
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for reduction(+:sum) private(i,j)
+#pragma omp parallel for reduction(+ : sum) private(i, j)
 #endif
-        for(i = 0; i < np; i++) { for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) { sum += A->value[j] * A->value[j]; } }
+        for(i = 0; i < np; i++) {
+            for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) { sum += A->value[j] * A->value[j]; }
+        }
     }
     *nrm = sqrt(sum);
     LIS_DEBUG_FUNC_OUT;
@@ -416,8 +422,8 @@ LIS_INT lis_matrix_split_csc(LIS_MATRIX A) {
     LIS_SCALAR *lvalue, *uvalue;
     LIS_MATRIX_DIAG D;
 #ifdef _OPENMP
-		LIS_INT kl,ku;
-		LIS_INT *liw,*uiw;
+    LIS_INT kl, ku;
+    LIS_INT *liw, *uiw;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -434,47 +440,39 @@ LIS_INT lis_matrix_split_csc(LIS_MATRIX A) {
     uvalue = NULL;
 
 #ifdef _OPENMP
-		liw = (LIS_INT *)lis_malloc((np+1)*sizeof(LIS_INT),"lis_matrix_split_csc::liw");
-		if( liw==NULL )
-		{
-			LIS_SETERR_MEM((np+1)*sizeof(LIS_INT));
-			return LIS_OUT_OF_MEMORY;
-		}
-		uiw = (LIS_INT *)lis_malloc((np+1)*sizeof(LIS_INT),"lis_matrix_split_csc::uiw");
-		if( uiw==NULL )
-		{
-			LIS_SETERR_MEM((np+1)*sizeof(LIS_INT));
-			lis_free(liw);
-			return LIS_OUT_OF_MEMORY;
-		}
-		#pragma omp parallel for private(i)
-		for(i=0;i<np+1;i++)
-		{
-			liw[i] = 0;
-			uiw[i] = 0;
-		}
-		#pragma omp parallel for private(i,j)
-		for(i=0;i<np;i++)
-		{
-			for(j=A->ptr[i];j<A->ptr[i+1];j++)
-			{
-				if( A->index[j]<i )
-				{
-					liw[i+1]++;
-				}
-				else if( A->index[j]>i )
-				{
-					uiw[i+1]++;
-				}
-			}
-		}
-		for(i=0;i<np;i++)
-		{
-			liw[i+1] += liw[i];
-			uiw[i+1] += uiw[i];
-		}
-		nnzl = liw[np];
-		nnzu = uiw[np];
+    liw = (LIS_INT*)lis_malloc((np + 1) * sizeof(LIS_INT), "lis_matrix_split_csc::liw");
+    if(liw == NULL) {
+        LIS_SETERR_MEM((np + 1) * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    uiw = (LIS_INT*)lis_malloc((np + 1) * sizeof(LIS_INT), "lis_matrix_split_csc::uiw");
+    if(uiw == NULL) {
+        LIS_SETERR_MEM((np + 1) * sizeof(LIS_INT));
+        lis_free(liw);
+        return LIS_OUT_OF_MEMORY;
+    }
+#pragma omp parallel for private(i)
+    for(i = 0; i < np + 1; i++) {
+        liw[i] = 0;
+        uiw[i] = 0;
+    }
+#pragma omp parallel for private(i, j)
+    for(i = 0; i < np; i++) {
+        for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) {
+            if(A->index[j] < i) {
+                liw[i + 1]++;
+            }
+            else if(A->index[j] > i) {
+                uiw[i + 1]++;
+            }
+        }
+    }
+    for(i = 0; i < np; i++) {
+        liw[i + 1] += liw[i];
+        uiw[i + 1] += uiw[i];
+    }
+    nnzl = liw[np];
+    nnzu = uiw[np];
 #else
     for(i = 0; i < np; i++) {
         for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) {
@@ -500,38 +498,32 @@ LIS_INT lis_matrix_split_csc(LIS_MATRIX A) {
     }
 
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
-		for(i=0;i<np+1;i++)
-		{
-			lptr[i] = liw[i];
-			uptr[i] = uiw[i];
-		}
-		#pragma omp parallel for private(i,j,kl,ku)
-		for(i=0;i<np;i++)
-		{
-			kl = lptr[i];
-			ku = uptr[i];
-			for(j=A->ptr[i];j<A->ptr[i+1];j++)
-			{
-				if( A->index[j]<i )
-				{
-					lindex[kl]   = A->index[j];
-					lvalue[kl]   = A->value[j];
-					kl++;
-				}
-				else if( A->index[j]>i )
-				{
-					uindex[ku]   = A->index[j];
-					uvalue[ku]   = A->value[j];
-					ku++;
-				}
-				else
-				{
-					D->value[i] = A->value[j];
-				}
-			}
-		}
-		lis_free2(2,liw,uiw);
+#pragma omp parallel for private(i)
+    for(i = 0; i < np + 1; i++) {
+        lptr[i] = liw[i];
+        uptr[i] = uiw[i];
+    }
+#pragma omp parallel for private(i, j, kl, ku)
+    for(i = 0; i < np; i++) {
+        kl = lptr[i];
+        ku = uptr[i];
+        for(j = A->ptr[i]; j < A->ptr[i + 1]; j++) {
+            if(A->index[j] < i) {
+                lindex[kl] = A->index[j];
+                lvalue[kl] = A->value[j];
+                kl++;
+            }
+            else if(A->index[j] > i) {
+                uindex[ku] = A->index[j];
+                uvalue[ku] = A->value[j];
+                ku++;
+            }
+            else {
+                D->value[i] = A->value[j];
+            }
+        }
+    }
+    lis_free2(2, liw, uiw);
 #else
     nnzl = 0;
     nnzu = 0;
@@ -632,7 +624,7 @@ LIS_INT lis_matrix_sort_csc(LIS_MATRIX A) {
         np = A->np;
         if(A->is_splited) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < np; i++) {
                 lis_sort_id(A->L->ptr[i], A->L->ptr[i + 1] - 1, A->L->index, A->L->value);
@@ -641,7 +633,7 @@ LIS_INT lis_matrix_sort_csc(LIS_MATRIX A) {
         }
         else {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < np; i++) { lis_sort_id(A->ptr[i], A->ptr[i + 1] - 1, A->index, A->value); }
         }
@@ -755,7 +747,7 @@ LIS_INT lis_matrix_convert_csr2csc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     LIS_INT *ptr, *index;
     LIS_SCALAR* value;
 #ifdef _OPENMP
-		LIS_INT my_rank,nprocs;
+    LIS_INT my_rank, nprocs;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -764,7 +756,7 @@ LIS_INT lis_matrix_convert_csr2csc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     np = Ain->np;
     nnz = Ain->nnz;
 #ifdef _OPENMP
-		nprocs  = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #endif
 
     ptr = NULL;
@@ -775,109 +767,95 @@ LIS_INT lis_matrix_convert_csr2csc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     ptr = (LIS_INT*)lis_malloc((np + 1) * sizeof(LIS_INT), "lis_matrix_convert_csr2csc::ptr");
     if(ptr == NULL) {
-        LIS_SETERR_MEM((np+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((np + 1) * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     index = (LIS_INT*)lis_malloc(nnz * sizeof(LIS_INT), "lis_matrix_convert_csr2csc::index");
     if(index == NULL) {
         lis_free2(5, ptr, index, value, iw, iw2);
-        LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     value = (LIS_SCALAR*)lis_malloc(nnz * sizeof(LIS_SCALAR), "lis_matrix_convert_csr2csc::value");
     if(value == NULL) {
         lis_free2(5, ptr, index, value, iw, iw2);
-        LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_SCALAR));
         return LIS_OUT_OF_MEMORY;
     }
     iw = (LIS_INT*)lis_malloc((np + 1) * sizeof(LIS_INT), "lis_matrix_convert_csr2csc::iw");
     if(iw == NULL) {
         lis_free2(5, ptr, index, value, iw, iw2);
-        LIS_SETERR_MEM((np+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((np + 1) * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
 #ifdef _OPENMP
-		iw2 = (LIS_INT *)lis_malloc( nprocs*np*sizeof(LIS_INT),"lis_matrix_convert_csr2csc::iw2" );
-		if( iw2==NULL )
-		{
-			lis_free2(5,ptr,index,value,iw,iw2);
-			LIS_SETERR_MEM(nprocs*np*sizeof(LIS_INT));
-			return LIS_OUT_OF_MEMORY;
-		}
+    iw2 = (LIS_INT*)lis_malloc(nprocs * np * sizeof(LIS_INT), "lis_matrix_convert_csr2csc::iw2");
+    if(iw2 == NULL) {
+        lis_free2(5, ptr, index, value, iw, iw2);
+        LIS_SETERR_MEM(nprocs * np * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
 #endif
 
     /* convert csc */
 #ifdef _OPENMP
-		#pragma omp parallel private(i,j,jj,k,l,my_rank)
-		{
-			my_rank  = omp_get_thread_num();
-			#pragma omp for
-			for(i=0;i<nprocs;i++)
-			{
-				memset( &iw2[i*np], 0, np*sizeof(LIS_INT) );
-			}
-			#pragma omp for
-			for(i=0;i<=np;i++)
-			{
-				ptr[i] = 0;
-			}
-			#pragma omp for
-			for(i=0;i<n;i++)
-			{
-				for(j=Ain->ptr[i];j<Ain->ptr[i+1];j++)
-				{
-					jj = Ain->index[j];
-					iw2[my_rank*np + jj]++;
-				}
-			}
-			#pragma omp for
-			for(j=0;j<np;j++)
-			{
-				k = 0;
-				for(i=0;i<nprocs;i++)
-				{
-					k += iw2[i*np+j];
-				}
-				iw[j] = k;
-			}
-			#pragma omp single
-			for(j=0;j<np;j++)
-			{
-				ptr[j+1] = ptr[j] + iw[j];
-			}
-			#pragma omp for
-			for(j=0;j<np;j++)
-			{
-				k = ptr[j];
-				for(i=0;i<nprocs;i++)
-				{
-					l = iw2[i*np+j];
-					iw2[i*np+j] = k;
-					k = l + k;
-				}
-			}
-			#pragma omp for
-			for(i=0;i<np;i++)
-			{
-				for(j=ptr[i];j<ptr[i+1];j++)
-				{
-					value[j] = 0.0;
-					index[j] = 0;
-				}
-			}
-			#pragma omp for
-			for(i=0;i<n;i++)
-			{
-				for(j=Ain->ptr[i];j<Ain->ptr[i+1];j++)
-				{
-					k        = Ain->index[j];
-					l        = iw2[my_rank*np+k];
-					value[l] = Ain->value[j];
-					index[l] = i;
-					iw2[my_rank*np+k]++;
-				}
-			}
-		}
+#pragma omp parallel private(i, j, jj, k, l, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+#pragma omp for
+        for(i = 0; i < nprocs; i++) {
+            memset(&iw2[i * np], 0, np * sizeof(LIS_INT));
+        }
+#pragma omp for
+        for(i = 0; i <= np; i++) {
+            ptr[i] = 0;
+        }
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            for(j = Ain->ptr[i]; j < Ain->ptr[i + 1]; j++) {
+                jj = Ain->index[j];
+                iw2[my_rank * np + jj]++;
+            }
+        }
+#pragma omp for
+        for(j = 0; j < np; j++) {
+            k = 0;
+            for(i = 0; i < nprocs; i++) {
+                k += iw2[i * np + j];
+            }
+            iw[j] = k;
+        }
+#pragma omp single
+        for(j = 0; j < np; j++) {
+            ptr[j + 1] = ptr[j] + iw[j];
+        }
+#pragma omp for
+        for(j = 0; j < np; j++) {
+            k = ptr[j];
+            for(i = 0; i < nprocs; i++) {
+                l = iw2[i * np + j];
+                iw2[i * np + j] = k;
+                k = l + k;
+            }
+        }
+#pragma omp for
+        for(i = 0; i < np; i++) {
+            for(j = ptr[i]; j < ptr[i + 1]; j++) {
+                value[j] = 0.0;
+                index[j] = 0;
+            }
+        }
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            for(j = Ain->ptr[i]; j < Ain->ptr[i + 1]; j++) {
+                k = Ain->index[j];
+                l = iw2[my_rank * np + k];
+                value[l] = Ain->value[j];
+                index[l] = i;
+                iw2[my_rank * np + k]++;
+            }
+        }
+    }
 #else
     for(i = 0; i < np + 1; i++) iw[i] = 0;
     for(i = 0; i < n; i++) {
@@ -931,7 +909,7 @@ LIS_INT lis_matrix_convert_csc2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     LIS_INT *ptr, *index;
     LIS_SCALAR* value;
 #ifdef _OPENMP
-		LIS_INT nprocs,my_rank;
+    LIS_INT nprocs, my_rank;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -940,7 +918,7 @@ LIS_INT lis_matrix_convert_csc2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     np = Ain->np;
     nnz = Ain->nnz;
 #ifdef _OPENMP
-		nprocs  = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #endif
 
     ptr = NULL;
@@ -953,92 +931,78 @@ LIS_INT lis_matrix_convert_csc2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     if(err) { return err; }
     iw = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_convert_csc2csr::iw");
     if(iw == NULL) {
-        LIS_SETERR_MEM(n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(n * sizeof(LIS_INT));
         lis_free2(5, ptr, index, value, iw, iw2);
         return LIS_OUT_OF_MEMORY;
     }
 #ifdef _OPENMP
-		iw2 = (LIS_INT *)lis_malloc( nprocs*n*sizeof(LIS_INT),"lis_matrix_convert_csc2csr::iw2" );
-		if( iw2==NULL )
-		{
-			lis_free2(5,ptr,index,value,iw,iw2);
-			LIS_SETERR_MEM(nprocs*n*sizeof(LIS_INT));
-			return LIS_OUT_OF_MEMORY;
-		}
+    iw2 = (LIS_INT*)lis_malloc(nprocs * n * sizeof(LIS_INT), "lis_matrix_convert_csc2csr::iw2");
+    if(iw2 == NULL) {
+        lis_free2(5, ptr, index, value, iw, iw2);
+        LIS_SETERR_MEM(nprocs * n * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
 #endif
 
     /* convert csr */
 #ifdef _OPENMP
-		#pragma omp parallel private(i,j,k,jj,l,my_rank)
-		{
-			my_rank  = omp_get_thread_num();
-			#pragma omp for
-			for(i=0;i<nprocs;i++)
-			{
-				memset( &iw2[i*n], 0, n*sizeof(LIS_INT) );
-			}
-			#pragma omp for
-			for(i=0;i<=n;i++)
-			{
-				ptr[i] = 0;
-			}
-			#pragma omp for
-			for(i=0;i<np;i++)
-			{
-				for(j=Ain->ptr[i];j<Ain->ptr[i+1];j++)
-				{
-					jj = Ain->index[j];
-					iw2[my_rank*n + jj]++;
-				}
-			}
-			#pragma omp for
-			for(j=0;j<n;j++)
-			{
-				k = 0;
-				for(i=0;i<nprocs;i++)
-				{
-					k += iw2[i*n+j];
-				}
-				iw[j] = k;
-			}
-			#pragma omp single
-			for(j=0;j<n;j++)
-			{
-				ptr[j+1] = ptr[j] + iw[j];
-			}
-			#pragma omp for
-			for(j=0;j<n;j++)
-			{
-				k = ptr[j];
-				for(i=0;i<nprocs;i++)
-				{
-					l = iw2[i*n+j];
-					iw2[i*n+j] = k;
-					k = l + k;
-				}
-			}
-			#pragma omp for
-			for(i=0;i<n;i++)
-			{
-				for(j=ptr[i];j<ptr[i+1];j++)
-				{
-					value[j] = 0.0;
-					index[j] = 0;
-				}
-			}
-			#pragma omp for
-			for(i=0;i<np;i++)
-			{
-				for(j=Ain->ptr[i];j<Ain->ptr[i+1];j++)
-				{
-					k        = Ain->index[j];
-					l        = iw2[my_rank*n+k];
-					value[l] = Ain->value[j];
-					index[l] = i;
-					iw2[my_rank*n+k]++;
-				}
-			}
-		}
+#pragma omp parallel private(i, j, k, jj, l, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+#pragma omp for
+        for(i = 0; i < nprocs; i++) {
+            memset(&iw2[i * n], 0, n * sizeof(LIS_INT));
+        }
+#pragma omp for
+        for(i = 0; i <= n; i++) {
+            ptr[i] = 0;
+        }
+#pragma omp for
+        for(i = 0; i < np; i++) {
+            for(j = Ain->ptr[i]; j < Ain->ptr[i + 1]; j++) {
+                jj = Ain->index[j];
+                iw2[my_rank * n + jj]++;
+            }
+        }
+#pragma omp for
+        for(j = 0; j < n; j++) {
+            k = 0;
+            for(i = 0; i < nprocs; i++) {
+                k += iw2[i * n + j];
+            }
+            iw[j] = k;
+        }
+#pragma omp single
+        for(j = 0; j < n; j++) {
+            ptr[j + 1] = ptr[j] + iw[j];
+        }
+#pragma omp for
+        for(j = 0; j < n; j++) {
+            k = ptr[j];
+            for(i = 0; i < nprocs; i++) {
+                l = iw2[i * n + j];
+                iw2[i * n + j] = k;
+                k = l + k;
+            }
+        }
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            for(j = ptr[i]; j < ptr[i + 1]; j++) {
+                value[j] = 0.0;
+                index[j] = 0;
+            }
+        }
+#pragma omp for
+        for(i = 0; i < np; i++) {
+            for(j = Ain->ptr[i]; j < Ain->ptr[i + 1]; j++) {
+                k = Ain->index[j];
+                l = iw2[my_rank * n + k];
+                value[l] = Ain->value[j];
+                index[l] = i;
+                iw2[my_rank * n + k]++;
+            }
+        }
+    }
 #else
     for(i = 0; i < n; i++) iw[i] = 0;
     for(i = 0; i < np; i++) {

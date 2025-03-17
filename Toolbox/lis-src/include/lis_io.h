@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -27,7 +27,7 @@
 #ifndef __LIS_MATRIX_IO_H__
 #define __LIS_MATRIX_IO_H__
 
-#define BUFSIZE	1024
+#define BUFSIZE 1024
 #define MM_BANNER "%%MatrixMarket"
 #define MM_MTX "matrix"
 #define MM_VEC "vector"
@@ -37,14 +37,14 @@
 #define MM_DNS 1
 #define MM_TYPE_REAL "real"
 #define MM_TYPE_COMPLEX "complex"
-#define MM_TYPE_GENERAL	"general"
+#define MM_TYPE_GENERAL "general"
 #define MM_TYPE_SYMM "symmetric"
 #define MM_TYPE_HERM "hermitian"
-#define MM_REAL	0
+#define MM_REAL 0
 #define MM_COMPLEX 1
 #define MM_GENERAL 0
-#define MM_SYMM	1
-#define MM_HERM	2
+#define MM_SYMM 1
+#define MM_HERM 2
 
 #define LISBanner "#LIS"
 #define ITBLBanner "#ITBL"
@@ -111,8 +111,7 @@ typedef struct {
 } LIS_MM_MATFMT;
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /****************************/

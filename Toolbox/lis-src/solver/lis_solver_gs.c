@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,26 +25,26 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include <math.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -75,7 +75,7 @@ LIS_INT lis_gs_malloc_work(LIS_SOLVER solver) {
     worklen = NWORK;
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_gs_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(solver->precision == LIS_PRECISION_DEFAULT) {
@@ -156,7 +156,7 @@ LIS_INT lis_gs(LIS_SOLVER solver) {
         /*		lis_matvec(A,x,t);*/
         lis_vector_axpyz(-1, t, b, r);
         lis_vector_nrm2(r, &nrm2);
-        lis_matrix_solve(A, r, t,LIS_MATRIX_LOWER);
+        lis_matrix_solve(A, r, t, LIS_MATRIX_LOWER);
         lis_vector_axpy(1, t, x);
 
         /* convergence check */

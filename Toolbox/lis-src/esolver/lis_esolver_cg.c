@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,36 +25,36 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
 #include <math.h>
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef USE_SSE2
-	#include <emmintrin.h>
+#include <emmintrin.h>
 #endif
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
 /***************************************
  * Conjugate Gradient Method           *
  ***************************************
- x(0)=(1,...,1)^T 
+ x(0)=(1,...,1)^T
  x(0)=x(0)/||x(0)||_2
  ***************************************
  for k=0,1,...
@@ -88,7 +88,7 @@ LIS_INT lis_ecg_malloc_work(LIS_ESOLVER esolver) {
 
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_ecg_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -149,7 +149,7 @@ LIS_INT lis_ecg(LIS_ESOLVER esolver) {
     tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
     output = esolver->options[LIS_EOPTIONS_OUTPUT];
 #ifdef _COMPLEX
-  oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
     oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
 #endif
@@ -160,7 +160,7 @@ LIS_INT lis_ecg(LIS_ESOLVER esolver) {
 
     if(output) {
 #ifdef _COMPLEX
-      lis_printf(comm,"shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
+        lis_printf(comm, "shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
 #else
         lis_printf(comm, "shift                 : %e\n", oshift);
 #endif
@@ -249,7 +249,7 @@ LIS_INT lis_ecg(LIS_ESOLVER esolver) {
 
         /* Rayleigh-Ritz method for I-mu*A on span {w,x(k),x(k-1)} */
 
-        /* solve eigenproblem A_3*x=lambda*B_3*x, 
+        /* solve eigenproblem A_3*x=lambda*B_3*x,
            where A_3 and B_3 are matrices of size 3*3 */
         lis_vector_dot(w, Aw, &A3[0]);
         lis_vector_dot(x, Aw, &A3[3]);
@@ -279,7 +279,7 @@ LIS_INT lis_ecg(LIS_ESOLVER esolver) {
             iter3 = iter3 + 1;
             lis_array_nrm2(3, v3, &nrm2);
             lis_array_scale(3, 1.0 / nrm2, v3);
-            lis_array_matvec(3, B3, v3, B3v3,LIS_INS_VALUE);
+            lis_array_matvec(3, B3, v3, B3v3, LIS_INS_VALUE);
             lis_array_solve(3, A3, B3v3, z3, W3);
             lis_array_dot(3, B3v3, z3, &mu3);
             lis_array_axpyz(3, -mu3, B3v3, z3, q3);
@@ -350,7 +350,7 @@ LIS_INT lis_ecg(LIS_ESOLVER esolver) {
 /*****************************************
  * Generalized Conjugate Gradient Method *
  *****************************************
- x(0)=(1,...,1)^T 
+ x(0)=(1,...,1)^T
  x(0)=x(0)/||x(0)||_2
  *****************************************
  for k=0,1,...
@@ -385,7 +385,7 @@ LIS_INT lis_egcg_malloc_work(LIS_ESOLVER esolver) {
 
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_egcg_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -447,7 +447,7 @@ LIS_INT lis_egcg(LIS_ESOLVER esolver) {
     tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
     output = esolver->options[LIS_EOPTIONS_OUTPUT];
 #ifdef _COMPLEX
-  oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
     oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
 #endif
@@ -458,7 +458,7 @@ LIS_INT lis_egcg(LIS_ESOLVER esolver) {
 
     if(output) {
 #ifdef _COMPLEX
-      lis_printf(comm,"shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
+        lis_printf(comm, "shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
 #else
         lis_printf(comm, "shift                 : %e\n", (double)oshift);
 #endif
@@ -556,7 +556,7 @@ LIS_INT lis_egcg(LIS_ESOLVER esolver) {
 
         /* Rayleigh-Ritz method for B-mu*A on span {w,x(k),x(k-1)} */
 
-        /* solve eigenproblem A_3*x=lambda*B_3*x, 
+        /* solve eigenproblem A_3*x=lambda*B_3*x,
            where A_3 and B_3 are matrices of size 3*3 */
         lis_vector_dot(w, Aw, &A3[0]);
         lis_vector_dot(x, Aw, &A3[3]);
@@ -579,7 +579,7 @@ LIS_INT lis_egcg(LIS_ESOLVER esolver) {
         B3[5] = B3[7];
         lis_vector_dot(p, Bp, &B3[8]);
 
-        /* compute eigenvector v_3 of size 3 using 
+        /* compute eigenvector v_3 of size 3 using
        generalized inverse iteration */
         lis_array_set_all(3, 1.0, v3);
         iter3 = 0;
@@ -587,7 +587,7 @@ LIS_INT lis_egcg(LIS_ESOLVER esolver) {
             iter3 = iter3 + 1;
             lis_array_nrm2(3, v3, &nrm2);
             lis_array_scale(3, 1.0 / nrm2, v3);
-            lis_array_matvec(3, B3, v3, B3v3,LIS_INS_VALUE);
+            lis_array_matvec(3, B3, v3, B3v3, LIS_INS_VALUE);
             lis_array_solve(3, A3, B3v3, z3, W3);
             lis_array_dot(3, B3v3, z3, &mu3);
             lis_array_axpyz(3, -mu3, B3v3, z3, q3);
@@ -660,21 +660,21 @@ LIS_INT lis_egcg(LIS_ESOLVER esolver) {
 /***************************************
  * Conjugate Residual Method           *
  ***************************************
- x(0)=(1,...,1)^T 
+ x(0)=(1,...,1)^T
  x(0)=x(0)/||x(0)||_2
  ***************************************
- lambda=<A*x(0),x(0)>/<x(0),x(0)> 
+ lambda=<A*x(0),x(0)>/<x(0),x(0)>
  r=lambda*x(0)-A*x(0)
  p=r
  for k=0,1,...
-   alpha=(<r,A*p>-lambda*<r,p>) 
+   alpha=(<r,A*p>-lambda*<r,p>)
         /(<A*p,A*p>-2*lambda*<A*p,p>+lambda^2*<p,p>)
-   x(k+1)=x(k)+alpha*p 
+   x(k+1)=x(k)+alpha*p
    lambda=<A*x(k+1),x(k+1)>/<x(k+1),x(k+1)>
-   r=lambda*x(k+1)-A*x(k+1) 
+   r=lambda*x(k+1)-A*x(k+1)
    w=M^-1*r
-   beta=-[<A*w,A*p>-lambda*(<A*w,p>+<A*p,w>)+lambda^2*<w,p>] 
-        /[<A*p,A*p>-2*lambda*<A*p,p>+lambda^2*<p,p>] 
+   beta=-[<A*w,A*p>-lambda*(<A*w,p>+<A*p,w>)+lambda^2*<w,p>]
+        /[<A*p,A*p>-2*lambda*<A*p,p>+lambda^2*<p,p>]
    p=w+beta*p
    A*p=A*w+beta*A*p
    convergence check
@@ -704,7 +704,7 @@ LIS_INT lis_ecr_malloc_work(LIS_ESOLVER esolver) {
 
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_ecr_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -766,7 +766,7 @@ LIS_INT lis_ecr(LIS_ESOLVER esolver) {
     tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
     output = esolver->options[LIS_EOPTIONS_OUTPUT];
 #ifdef _COMPLEX
-  oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
     oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
 #endif
@@ -777,7 +777,7 @@ LIS_INT lis_ecr(LIS_ESOLVER esolver) {
 
     if(output) {
 #ifdef _COMPLEX
-      lis_printf(comm,"shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
+        lis_printf(comm, "shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
 #else
         lis_printf(comm, "shift                 : %e\n", (double)oshift);
 #endif
@@ -838,15 +838,14 @@ LIS_INT lis_ecr(LIS_ESOLVER esolver) {
     while(iter < emaxiter) {
         iter = iter + 1;
 
-        /* alpha=(<r,A*p>-lambda*<r,p>) 
+        /* alpha=(<r,A*p>-lambda*<r,p>)
                 /(<A*p,A*p>-2*lambda*<A*p,p>+lambda^2*<p,p>) */
         lis_vector_dot(r, Ap, &rAp);
         lis_vector_dot(r, p, &rp);
         lis_vector_dot(Ap, Ap, &ApAp);
         lis_vector_dot(p, Ap, &pAp);
         lis_vector_dot(p, p, &pp);
-        alpha = (rAp - lambda * rp)
-            / (ApAp - 2.0 * lambda * pAp + lambda * lambda * pp);
+        alpha = (rAp - lambda * rp) / (ApAp - 2.0 * lambda * pAp + lambda * lambda * pp);
 
         /* x=x+alpha*p */
         lis_vector_axpy(alpha, p, x);
@@ -867,14 +866,13 @@ LIS_INT lis_ecr(LIS_ESOLVER esolver) {
         ptime += lis_wtime() - time;
         lis_matvec(A, w, Aw);
 
-        /* beta=-[<A*w,A*p>-lambda*(<A*w,p>+<A*p.w>)+lambda^2*<w,p>] 
+        /* beta=-[<A*w,A*p>-lambda*(<A*w,p>+<A*p.w>)+lambda^2*<w,p>]
                 /[<A*p,A*p>-2*lambda*<A*p,p>+lambda^2*<p,p>] */
         lis_vector_dot(Aw, Ap, &AwAp);
         lis_vector_dot(p, Aw, &pAw);
         lis_vector_dot(w, Ap, &wAp);
         lis_vector_dot(w, p, &wp);
-        beta = -(AwAp - lambda * (pAw + wAp) + lambda * lambda * wp)
-            / (ApAp - 2.0 * lambda * pAp + lambda * lambda * pp);
+        beta = -(AwAp - lambda * (pAw + wAp) + lambda * lambda * wp) / (ApAp - 2.0 * lambda * pAp + lambda * lambda * pp);
 
         /* p=w+beta*p */
         lis_vector_xpay(w, beta, p);
@@ -926,21 +924,21 @@ LIS_INT lis_ecr(LIS_ESOLVER esolver) {
 /*****************************************
  * Generalized Conjugate Residual Method *
  *****************************************
- x(0)=(1,...,1)^T 
+ x(0)=(1,...,1)^T
  x(0)=x(0)/||x(0)||_2
  *****************************************
- lambda=<A*x(0),B*x(0)>/<B*x(0),B*x(0)> 
+ lambda=<A*x(0),B*x(0)>/<B*x(0),B*x(0)>
  r=lambda*B*x(0)-A*x(0)
  p=r
  for k=0,1,...
-   alpha=(<r,A*p>-lambda*<r,B*p>) 
+   alpha=(<r,A*p>-lambda*<r,B*p>)
         /(<A*p,A*p>-2*lambda*<A*p,B*p>+lambda^2*<B*p,B*p>)
-   x(k+1)=x(k)+alpha*p 
+   x(k+1)=x(k)+alpha*p
    lambda=<A*x(k+1),B*x(k+1)>/<B*x(k+1),B*x(k+1)>
-   r=lambda*B*x(k+1)-A*x(k+1) 
+   r=lambda*B*x(k+1)-A*x(k+1)
    w=M^-1*r
-   beta=-[<A*w,A*p>-lambda*(<A*w,B*p>+<A*p,B*w>)+lambda^2*<B*w,B*p>] 
-        /[<A*p,A*p>-2*lambda*<A*p,B*p>+lambda^2*<B*p,B*p>] 
+   beta=-[<A*w,A*p>-lambda*(<A*w,B*p>+<A*p,B*w>)+lambda^2*<B*w,B*p>]
+        /[<A*p,A*p>-2*lambda*<A*p,B*p>+lambda^2*<B*p,B*p>]
    p=w+beta*p
    A*p=A*w+beta*A*p
    convergence check
@@ -970,7 +968,7 @@ LIS_INT lis_egcr_malloc_work(LIS_ESOLVER esolver) {
 
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_egcr_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -1033,7 +1031,7 @@ LIS_INT lis_egcr(LIS_ESOLVER esolver) {
     tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
     output = esolver->options[LIS_EOPTIONS_OUTPUT];
 #ifdef _COMPLEX
-  oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
     oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
 #endif
@@ -1044,7 +1042,7 @@ LIS_INT lis_egcr(LIS_ESOLVER esolver) {
 
     if(output) {
 #ifdef _COMPLEX
-      lis_printf(comm,"shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
+        lis_printf(comm, "shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
 #else
         lis_printf(comm, "shift                 : %e\n", (double)oshift);
 #endif
@@ -1110,15 +1108,14 @@ LIS_INT lis_egcr(LIS_ESOLVER esolver) {
     while(iter < emaxiter) {
         iter = iter + 1;
 
-        /* alpha=(<r,A*p>-lambda*<r,B*p>) 
+        /* alpha=(<r,A*p>-lambda*<r,B*p>)
                 /(<A*p,A*p>-2*lambda*<A*p,B*p>+lambda^2*<Bp,Bp>) */
         lis_vector_dot(r, Ap, &rAp);
         lis_vector_dot(r, Bp, &rBp);
         lis_vector_dot(Ap, Ap, &ApAp);
         lis_vector_dot(Ap, Bp, &ApBp);
         lis_vector_dot(Bp, Bp, &BpBp);
-        alpha = (rAp - lambda * rBp)
-            / (ApAp - 2.0 * lambda * ApBp + lambda * lambda * BpBp);
+        alpha = (rAp - lambda * rBp) / (ApAp - 2.0 * lambda * ApBp + lambda * lambda * BpBp);
 
         /* x=x+alpha*p */
         lis_vector_axpy(alpha, p, x);
@@ -1141,14 +1138,13 @@ LIS_INT lis_egcr(LIS_ESOLVER esolver) {
         lis_matvec(A, w, Aw);
         lis_matvec(B, w, Bw);
 
-        /* beta=-[<A*w,A*p>-lambda*(<A*w,B*p>+<A*p,B*w>)+lambda^2*<B*w,B*p>] 
+        /* beta=-[<A*w,A*p>-lambda*(<A*w,B*p>+<A*p,B*w>)+lambda^2*<B*w,B*p>]
                 /[<A*p,A*p>-2*lambda*<A*p,B*p>+lambda^2*<B*p,B*p>] */
         lis_vector_dot(Aw, Ap, &AwAp);
         lis_vector_dot(Aw, Bp, &AwBp);
         lis_vector_dot(Ap, Bw, &ApBw);
         lis_vector_dot(Bw, Bp, &BwBp);
-        beta = -(AwAp - lambda * (AwBp + ApBw) + lambda * lambda * BwBp)
-            / (ApAp - 2.0 * lambda * ApBp + lambda * lambda * BpBp);
+        beta = -(AwAp - lambda * (AwBp + ApBw) + lambda * lambda * BwBp) / (ApAp - 2.0 * lambda * ApBp + lambda * lambda * BpBp);
 
         /* p=w+beta*p */
         lis_vector_xpay(w, beta, p);

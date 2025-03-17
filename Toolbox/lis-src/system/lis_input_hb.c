@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,26 +25,26 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
 #include <ctype.h>
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -87,7 +87,7 @@ LIS_INT lis_input_hb(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
         if(A->matrix_type == LIS_MATRIX_JAD) {
             A->work = (LIS_SCALAR*)lis_malloc(A->n * sizeof(LIS_SCALAR), "lis_input_hb::A->work");
             if(A->work == NULL) {
-                LIS_SETERR_MEM(A->n*sizeof(LIS_SCALAR));
+                LIS_SETERR_MEM(A->n * sizeof(LIS_SCALAR));
                 return LIS_OUT_OF_MEMORY;
             }
         }
@@ -161,8 +161,8 @@ LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
     LIS_MATRIX B;
 
 #ifdef USE_MPI
-		MPI_Comm_rank(A->comm,&int_my_rank);
-		my_rank = int_my_rank;
+    MPI_Comm_rank(A->comm, &int_my_rank);
+    my_rank = int_my_rank;
 #else
     my_rank = 0;
 #endif
@@ -190,7 +190,7 @@ LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
     }
     RHSCRD = 0;
 #ifdef _LONG__LONG
-	if( sscanf(buf, "%14lld%14lld%14lld%14lld%14lld", &TOTCRD, &PTRCRD, &INDCRD, &VALCRD, &RHSCRD) < 4 )
+    if(sscanf(buf, "%14lld%14lld%14lld%14lld%14lld", &TOTCRD, &PTRCRD, &INDCRD, &VALCRD, &RHSCRD) < 4)
 #else
     if(sscanf(buf, "%14d%14d%14d%14d%14d", &TOTCRD, &PTRCRD, &INDCRD, &VALCRD, &RHSCRD) < 4)
 #endif
@@ -212,7 +212,7 @@ LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
         return LIS_ERR_FILE_IO;
     }
 #ifdef _LONG__LONG
-	if( sscanf(buf, "%s %lld %lld %lld %lld", mtx, &NROW, &NCOL, &NNZERO, &NELTVL) != 5 )
+    if(sscanf(buf, "%s %lld %lld %lld %lld", mtx, &NROW, &NCOL, &NNZERO, &NELTVL) != 5)
 #else
     if(sscanf(buf, "%s %d %d %d %d", mtx, &NROW, &NCOL, &NNZERO, &NELTVL) != 5)
 #endif
@@ -225,11 +225,10 @@ LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
     MXTYPE_S = mtx[1];
     MXTYPE_T = mtx[2];
 #ifdef _COMPLEX
-	if( mtx[0]!='r' && mtx[0]!='c' )
-	{
-		LIS_SETERR(LIS_ERR_FILE_IO,"Not real or complex\n");
-		return LIS_ERR_FILE_IO;
-	}
+    if(mtx[0] != 'r' && mtx[0] != 'c') {
+        LIS_SETERR(LIS_ERR_FILE_IO, "Not real or complex\n");
+        return LIS_ERR_FILE_IO;
+    }
 #else
     if(mtx[0] != 'r') {
         LIS_SETERR(LIS_ERR_FILE_IO, "Not real\n");
@@ -249,7 +248,7 @@ LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
         return LIS_ERR_FILE_IO;
     }
 #ifdef _LONG__LONG
-	if( my_rank==0 ) printf("matrix size = %lld x %lld (%lld nonzero entries)\n\n",NROW,NCOL,NNZERO);
+    if(my_rank == 0) printf("matrix size = %lld x %lld (%lld nonzero entries)\n\n", NROW, NCOL, NNZERO);
 #else
     if(my_rank == 0) printf("matrix size = %d x %d (%d nonzero entries)\n\n", NROW, NCOL, NNZERO);
 #endif
@@ -280,7 +279,7 @@ LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
             return LIS_ERR_FILE_IO;
         }
 #ifdef _LONG__LONG
-		sscanf(buf, "%s %lld %lld", mtx, &NRHS, &NRHSIX);
+        sscanf(buf, "%s %lld %lld", mtx, &NRHS, &NRHSIX);
 #else
         sscanf(buf, "%s %d %d", mtx, &NRHS, &NRHSIX);
 #endif
@@ -364,18 +363,19 @@ LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
                 k++;
             }
 #ifdef _COMPLEX
-			else if (MXTYPE_F == 'c')
-			  {
-			    strncpy(dat, p, wval); dat[wval] = '\0'; 
-			    re = atof(dat);
-			    p += wval;
-			    strncpy(dat, p, wval); dat[wval] = '\0'; 
-			    im = atof(dat);
-			    p += wval;			    
-			    value[k] = re + im * _Complex_I;
-			    k++;
-			    j++;
-			  }
+            else if(MXTYPE_F == 'c') {
+                strncpy(dat, p, wval);
+                dat[wval] = '\0';
+                re = atof(dat);
+                p += wval;
+                strncpy(dat, p, wval);
+                dat[wval] = '\0';
+                im = atof(dat);
+                p += wval;
+                value[k] = re + im * _Complex_I;
+                k++;
+                j++;
+            }
 #endif
             else {
                 LIS_SETERR_FIO;
@@ -415,7 +415,7 @@ LIS_INT lis_input_hb_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
     if(matrix_type != LIS_MATRIX_CSC) {
         err = lis_matrix_duplicate(A, &B);
         if(err) return err;
-        lis_matrix_set_type(B,LIS_MATRIX_CSR);
+        lis_matrix_set_type(B, LIS_MATRIX_CSR);
         err = lis_matrix_convert_csc2csr(A, B);
         if(err) return err;
         lis_matrix_storage_destroy(A);

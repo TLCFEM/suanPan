@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -27,12 +27,11 @@
 #ifndef __LIS_PRECON_H__
 #define __LIS_PRECON_H__
 
-#define lis_psolve(solver,b,x) lis_psolve_xxx[solver->precon->precon_type](solver,b,x)
-#define lis_psolveh(solver,b,x) lis_psolveh_xxx[solver->precon->precon_type](solver,b,x)
+#define lis_psolve(solver, b, x) lis_psolve_xxx[solver->precon->precon_type](solver, b, x)
+#define lis_psolveh(solver, b, x) lis_psolveh_xxx[solver->precon->precon_type](solver, b, x)
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 extern LIS_INT lis_precon_init(LIS_PRECON precon);
 extern LIS_INT lis_precon_create(LIS_SOLVER solver, LIS_PRECON* precon);

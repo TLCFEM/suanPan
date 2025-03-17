@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -68,7 +68,7 @@ LIS_INT lis_precon_create_adds(LIS_SOLVER solver, LIS_PRECON precon) {
     worklen = 2;
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_precon_create_adds::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_OUT_OF_MEMORY;
     }
     if(solver->precision == LIS_PRECISION_DEFAULT) {
@@ -130,67 +130,61 @@ LIS_INT lis_psolve_adds(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
     ptype = solver->options[LIS_OPTIONS_PRECON];
 
 #ifdef USE_QUAD_PRECISION
-	if( solver->precision==LIS_PRECISION_DEFAULT )
-	{
+    if(solver->precision == LIS_PRECISION_DEFAULT) {
 #endif
-    lis_vector_set_all(0.0, X);
-    lis_vector_copy(B, R);
-    for(k = 0; k < iter + 1; k++) {
-        for(i = n; i < np; i++) { r[i] = 0.0; }
+        lis_vector_set_all(0.0, X);
+        lis_vector_copy(B, R);
+        for(k = 0; k < iter + 1; k++) {
+            for(i = n; i < np; i++) { r[i] = 0.0; }
 
-        lis_psolve_xxx[ptype](solver, R, W);
+            lis_psolve_xxx[ptype](solver, R, W);
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
-        for(i = 0; i < n; i++) { x[i] += w[i]; }
+            for(i = 0; i < n; i++) { x[i] += w[i]; }
 
-        if(k != iter) {
+            if(k != iter) {
+                lis_matvec(precon->A, X, R);
+#ifdef _OPENMP
+#pragma omp parallel for private(i)
+#endif
+                for(i = 0; i < n; i++) { r[i] = b[i] - r[i]; }
+            }
+        }
+#ifdef USE_QUAD_PRECISION
+    }
+    else {
+        lis_vector_set_allex_nm(0.0, X);
+        lis_vector_copyex_mm(B, R);
+        for(k = 0; k < iter + 1; k++) {
+            for(i = n; i < np; i++) {
+                r[i] = 0.0;
+                rl[i] = 0.0;
+            }
+
+            lis_psolve_xxx[ptype](solver, R, W);
+            for(i = 0; i < n; i++) {
+#ifndef USE_SSE2
+                LIS_QUAD_ADD(X->value[i], X->value_lo[i], X->value[i], X->value_lo[i], W->value[i], W->value_lo[i]);
+#else
+                LIS_QUAD_ADD_SSE2(X->value[i], X->value_lo[i], X->value[i], X->value_lo[i], W->value[i], W->value_lo[i]);
+#endif
+                /*				x[i] += w[i];*/
+            }
+
+            if(k == iter) break;
+
             lis_matvec(precon->A, X, R);
-#ifdef _OPENMP
-				#pragma omp parallel for private(i)
+            for(i = 0; i < n; i++) {
+#ifndef USE_SSE2
+                LIS_QUAD_ADD(R->value[i], R->value_lo[i], B->value[i], B->value_lo[i], -R->value[i], -R->value_lo[i]);
+#else
+                LIS_QUAD_ADD_SSE2(R->value[i], R->value_lo[i], B->value[i], B->value_lo[i], -R->value[i], -R->value_lo[i]);
 #endif
-            for(i = 0; i < n; i++) { r[i] = b[i] - r[i]; }
+                /*				r[i] = b[i] - r[i];*/
+            }
         }
     }
-#ifdef USE_QUAD_PRECISION
-		}
-		else
-		{
-			lis_vector_set_allex_nm(0.0,X);
-			lis_vector_copyex_mm(B,R);
-			for(k=0;k<iter+1;k++)
-			{
-				for(i=n;i<np;i++)
-				{
-					r[i] = 0.0;
-					rl[i] = 0.0;
-				}
-
-				lis_psolve_xxx[ptype](solver,R,W);
-				for(i=0;i<n;i++)
-				{
-#ifndef USE_SSE2
-						LIS_QUAD_ADD(X->value[i],X->value_lo[i],X->value[i],X->value_lo[i],W->value[i],W->value_lo[i]);
-#else
-						LIS_QUAD_ADD_SSE2(X->value[i],X->value_lo[i],X->value[i],X->value_lo[i],W->value[i],W->value_lo[i]);
-#endif
-	/*				x[i] += w[i];*/
-				}
-			
-				if(k==iter) break;
-
-				lis_matvec(precon->A,X,R);
-				for(i=0;i<n;i++)
-				{
-#ifndef USE_SSE2
-						LIS_QUAD_ADD(R->value[i],R->value_lo[i],B->value[i],B->value_lo[i],-R->value[i],-R->value_lo[i]);
-#else
-						LIS_QUAD_ADD_SSE2(R->value[i],R->value_lo[i],B->value[i],B->value_lo[i],-R->value[i],-R->value_lo[i]);
-#endif
-	/*				r[i] = b[i] - r[i];*/
-				}
-			}
-		}
 #endif
 
     LIS_DEBUG_FUNC_OUT;
@@ -228,14 +222,14 @@ LIS_INT lis_psolveh_adds(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
 
             lis_psolveh_xxx[ptype](solver, R, W);
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < n; i++) { x[i] += w[i]; }
 
             if(k != iter) {
                 lis_matvech(precon->A, X, R);
 #ifdef _OPENMP
-				#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
                 for(i = 0; i < n; i++) { r[i] = b[i] - r[i]; }
             }

@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -27,58 +27,51 @@
 #ifndef __LIS_MATVEC_H__
 #define __LIS_MATVEC_H__
 
-#define LIS_MATVEC_SENDRECV \
-		if( (A->np+A->pad)>(X->np+X->pad) ) \
-		{ \
-			X->value = (LIS_SCALAR *)lis_realloc(X->value,(A->np+A->pad)*sizeof(LIS_SCALAR)); \
-			if( X->value==NULL ) \
-			{ \
-				LIS_SETERR_MEM((A->np+A->pad)*sizeof(LIS_SCALAR)); \
-				return LIS_ERR_OUT_OF_MEMORY; \
-			} \
-			X->np  = A->np; \
-			X->pad = A->pad; \
-			x = X->value; \
-		} \
-		lis_send_recv(A->commtable,x)
+#define LIS_MATVEC_SENDRECV                                                                   \
+    if((A->np + A->pad) > (X->np + X->pad)) {                                                 \
+        X->value = (LIS_SCALAR*)lis_realloc(X->value, (A->np + A->pad) * sizeof(LIS_SCALAR)); \
+        if(X->value == NULL) {                                                                \
+            LIS_SETERR_MEM((A->np + A->pad) * sizeof(LIS_SCALAR));                            \
+            return LIS_ERR_OUT_OF_MEMORY;                                                     \
+        }                                                                                     \
+        X->np = A->np;                                                                        \
+        X->pad = A->pad;                                                                      \
+        x = X->value;                                                                         \
+    }                                                                                         \
+    lis_send_recv(A->commtable, x)
 
-#define LIS_MATVEC_REALLOC \
-		if( (A->np+A->pad)>(X->np+X->pad) ) \
-		{ \
-			X->value = (LIS_SCALAR *)lis_realloc(X->value,(A->np+A->pad)*sizeof(LIS_SCALAR)); \
-			if( X->value==NULL ) \
-			{ \
-				LIS_SETERR_MEM((A->np+A->pad)*sizeof(LIS_SCALAR)); \
-				return LIS_ERR_OUT_OF_MEMORY; \
-			} \
-			X->np  = A->np; \
-			X->pad = A->pad; \
-			x = X->value; \
-		}
+#define LIS_MATVEC_REALLOC                                                                    \
+    if((A->np + A->pad) > (X->np + X->pad)) {                                                 \
+        X->value = (LIS_SCALAR*)lis_realloc(X->value, (A->np + A->pad) * sizeof(LIS_SCALAR)); \
+        if(X->value == NULL) {                                                                \
+            LIS_SETERR_MEM((A->np + A->pad) * sizeof(LIS_SCALAR));                            \
+            return LIS_ERR_OUT_OF_MEMORY;                                                     \
+        }                                                                                     \
+        X->np = A->np;                                                                        \
+        X->pad = A->pad;                                                                      \
+        x = X->value;                                                                         \
+    }
 
-#define LIS_MATVEC_REDUCE0 \
-		if( (A->np+A->pad)>(Y->np+Y->pad) ) \
-		{ \
-			Y->value = (LIS_SCALAR *)lis_realloc(Y->value,(A->np+A->pad)*sizeof(LIS_SCALAR)); \
-			if( Y->value==NULL ) \
-			{ \
-				LIS_SETERR_MEM((A->np+A->pad)*sizeof(LIS_SCALAR)); \
-				return LIS_ERR_OUT_OF_MEMORY; \
-			} \
-			Y->np  = A->np; \
-			Y->pad = A->pad; \
-			y      = Y->value; \
-		}
+#define LIS_MATVEC_REDUCE0                                                                    \
+    if((A->np + A->pad) > (Y->np + Y->pad)) {                                                 \
+        Y->value = (LIS_SCALAR*)lis_realloc(Y->value, (A->np + A->pad) * sizeof(LIS_SCALAR)); \
+        if(Y->value == NULL) {                                                                \
+            LIS_SETERR_MEM((A->np + A->pad) * sizeof(LIS_SCALAR));                            \
+            return LIS_ERR_OUT_OF_MEMORY;                                                     \
+        }                                                                                     \
+        Y->np = A->np;                                                                        \
+        Y->pad = A->pad;                                                                      \
+        y = Y->value;                                                                         \
+    }
 
-#define LIS_MATVEC_REDUCE lis_reduce(A->commtable,y)
+#define LIS_MATVEC_REDUCE lis_reduce(A->commtable, y)
 
 typedef void (*LIS_MATVEC_XXX)(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]);
 typedef void (*LIS_MATVEC_XXXP)(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
 typedef LIS_INT (*LIS_MATVEC_FUNC)(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y);
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 extern LIS_MATVEC_FUNC LIS_MATVEC;
 extern LIS_MATVEC_FUNC LIS_MATVECH;

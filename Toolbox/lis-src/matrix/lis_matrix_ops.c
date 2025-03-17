@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <math.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -76,7 +76,7 @@ LIS_INT lis_matrix_set_blocksize(LIS_MATRIX A, LIS_INT bnr, LIS_INT bnc, LIS_INT
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     if(bnr <= 0 || bnc <= 0) {
@@ -95,12 +95,12 @@ LIS_INT lis_matrix_set_blocksize(LIS_MATRIX A, LIS_INT bnr, LIS_INT bnc, LIS_INT
         n = A->n;
         conv_row = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_set_blocksize::conv_row");
         if(conv_row == NULL) {
-            LIS_SETERR_MEM(n*sizeof(LIS_INT));
+            LIS_SETERR_MEM(n * sizeof(LIS_INT));
             return LIS_OUT_OF_MEMORY;
         }
         conv_col = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_set_blocksize::conv_col");
         if(conv_col == NULL) {
-            LIS_SETERR_MEM(n*sizeof(LIS_INT));
+            LIS_SETERR_MEM(n * sizeof(LIS_INT));
             lis_free(conv_row);
             return LIS_OUT_OF_MEMORY;
         }
@@ -127,9 +127,9 @@ LIS_INT lis_matrix_convert(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(Ain,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(Ain, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
-    err = lis_matrix_check(Aout,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_check(Aout, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     err = lis_matrix_merge(Ain);
@@ -314,7 +314,7 @@ LIS_INT lis_matrix_convert_self(LIS_SOLVER solver) {
     if(storage > 0 && A->matrix_type != storage) {
         err = lis_matrix_duplicate(A, &B);
         if(err) return err;
-        lis_matrix_set_blocksize(B, block, block,NULL,NULL);
+        lis_matrix_set_blocksize(B, block, block, NULL, NULL);
         lis_matrix_set_type(B, storage);
         err = lis_matrix_convert(A, B);
         if(err) return err;
@@ -330,7 +330,7 @@ LIS_INT lis_matrix_convert_self(LIS_SOLVER solver) {
         if(A->matrix_type == LIS_MATRIX_JAD) {
             A->work = (LIS_SCALAR*)lis_malloc(A->n * sizeof(LIS_SCALAR), "lis_precon_create_bjacobi::A->work");
             if(A->work == NULL) {
-                LIS_SETERR_MEM(A->n*sizeof(LIS_SCALAR));
+                LIS_SETERR_MEM(A->n * sizeof(LIS_SCALAR));
                 return LIS_OUT_OF_MEMORY;
             }
         }
@@ -348,9 +348,9 @@ LIS_INT lis_matrix_copy(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(Ain,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(Ain, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
-    err = lis_matrix_check(Ain,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_check(Ain, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     switch(Ain->matrix_type) {
@@ -404,7 +404,7 @@ LIS_INT lis_matrix_copyDLU(LIS_MATRIX Ain, LIS_MATRIX_DIAG* D, LIS_MATRIX* L, LI
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(Ain,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(Ain, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
     switch(Ain->matrix_type) {
@@ -463,10 +463,10 @@ LIS_INT lis_matrix_axpy(LIS_SCALAR alpha, LIS_MATRIX A, LIS_MATRIX B) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
-    err = lis_matrix_check(B,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(B, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
     switch(A->matrix_type) {
@@ -491,10 +491,10 @@ LIS_INT lis_matrix_xpay(LIS_SCALAR alpha, LIS_MATRIX A, LIS_MATRIX B) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
-    err = lis_matrix_check(B,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(B, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
     switch(A->matrix_type) {
@@ -519,13 +519,13 @@ LIS_INT lis_matrix_axpyz(LIS_SCALAR alpha, LIS_MATRIX A, LIS_MATRIX B, LIS_MATRI
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
-    err = lis_matrix_check(B,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(B, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
-    err = lis_matrix_check(C,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(C, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
     switch(A->matrix_type) {
@@ -557,20 +557,18 @@ LIS_INT lis_matrix_scale(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR D, LIS_INT actio
     lis_matrix_get_diagonal(A, D);
     if(action == LIS_SCALE_SYMM_DIAG) {
 #ifdef USE_MPI
-		if( A->np>D->np )
-		{
-			D->value = (LIS_SCALAR *)lis_realloc(D->value,A->np*sizeof(LIS_SCALAR));
-			if( D->value==NULL )
-			{
-				LIS_SETERR_MEM(A->np*sizeof(LIS_SCALAR));
-				return LIS_OUT_OF_MEMORY;
-			}
-			d = D->value;
-		}
-		lis_send_recv(A->commtable,d);
+        if(A->np > D->np) {
+            D->value = (LIS_SCALAR*)lis_realloc(D->value, A->np * sizeof(LIS_SCALAR));
+            if(D->value == NULL) {
+                LIS_SETERR_MEM(A->np * sizeof(LIS_SCALAR));
+                return LIS_OUT_OF_MEMORY;
+            }
+            d = D->value;
+        }
+        lis_send_recv(A->commtable, d);
 #endif
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < np; i++) { d[i] = 1.0 / sqrt(fabs(d[i])); }
 
@@ -616,7 +614,7 @@ LIS_INT lis_matrix_scale(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR D, LIS_INT actio
     }
     else if(action == LIS_SCALE_JACOBI) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { d[i] = 1.0 / d[i]; }
         switch(A->matrix_type) {
@@ -661,7 +659,7 @@ LIS_INT lis_matrix_scale(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR D, LIS_INT actio
     }
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { b[i] = b[i] * d[i]; }
     A->is_scaled = LIS_TRUE;
@@ -792,10 +790,10 @@ LIS_INT lis_matrix_shift_matrix(LIS_MATRIX A, LIS_MATRIX B, LIS_SCALAR sigma) {
     err = lis_matrix_duplicate(A, &Atmp);
     err = lis_matrix_duplicate(B, &Btmp);
     if(err) return err;
-    lis_matrix_set_type(Atmp,LIS_MATRIX_DNS);
+    lis_matrix_set_type(Atmp, LIS_MATRIX_DNS);
     err = lis_matrix_convert(A, Atmp);
     if(err) return err;
-    lis_matrix_set_type(Btmp,LIS_MATRIX_DNS);
+    lis_matrix_set_type(Btmp, LIS_MATRIX_DNS);
     err = lis_matrix_convert(B, Btmp);
     if(err) return err;
     lis_matrix_axpy_dns(-sigma, Btmp, Atmp);

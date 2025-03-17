@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -55,30 +55,26 @@
 
 #if defined(USE_SAAMG)
 
-extern void F77_FUNC_(finit_data_creation,FINIT_DATA_CREATION)(void *c_data_creation_ptr_bar);
-extern void F77_FUNC_(finit_data_creation_unsym,FINIT_DATA_CREATION_UNSYM)(void *c_data_creation_unsym_ptr_bar);
-extern void F77_FUNC_(finit_v_cycle,FINIT_V_CYCLE)(void *c_v_cycle_ptr_bar);
-extern void F77_FUNC_(finit_clear_matrix,FINIT_CLEAR_MATRIX)(void *c_clear_matrix_ptr_bar);
+extern void F77_FUNC_(finit_data_creation, FINIT_DATA_CREATION)(void* c_data_creation_ptr_bar);
+extern void F77_FUNC_(finit_data_creation_unsym, FINIT_DATA_CREATION_UNSYM)(void* c_data_creation_unsym_ptr_bar);
+extern void F77_FUNC_(finit_v_cycle, FINIT_V_CYCLE)(void* c_v_cycle_ptr_bar);
+extern void F77_FUNC_(finit_clear_matrix, FINIT_CLEAR_MATRIX)(void* c_clear_matrix_ptr_bar);
 
-char *f_data_creation_ptr;
-char *f_data_creation_unsym_ptr;
-char *f_v_cycle_ptr;
-char *f_clear_matrix_ptr;
-void c_data_creation_ptr_bar(char *bar)
-{
-	f_data_creation_ptr = bar;
+char* f_data_creation_ptr;
+char* f_data_creation_unsym_ptr;
+char* f_v_cycle_ptr;
+char* f_clear_matrix_ptr;
+void c_data_creation_ptr_bar(char* bar) {
+    f_data_creation_ptr = bar;
 }
-void c_data_creation_unsym_ptr_bar(char *bar)
-{
-	f_data_creation_unsym_ptr = bar;
+void c_data_creation_unsym_ptr_bar(char* bar) {
+    f_data_creation_unsym_ptr = bar;
 }
-void c_v_cycle_ptr_bar(char *bar)
-{
-	f_v_cycle_ptr = bar;
+void c_v_cycle_ptr_bar(char* bar) {
+    f_v_cycle_ptr = bar;
 }
-void c_clear_matrix_ptr_bar(char *bar)
-{
-	f_clear_matrix_ptr = bar;
+void c_clear_matrix_ptr_bar(char* bar) {
+    f_clear_matrix_ptr = bar;
 }
 #endif
 
@@ -87,37 +83,35 @@ void c_clear_matrix_ptr_bar(char *bar)
 
 LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 #if defined(USE_SAAMG)
-	LIS_MATRIX A,B;
-	LIS_COMMTABLE table;
-	LIS_INT	unsym,sol;
-	LIS_INT	err;
+    LIS_MATRIX A, B;
+    LIS_COMMTABLE table;
+    LIS_INT unsym, sol;
+    LIS_INT err;
     LIS_REAL theta;
     LIS_INT converted = LIS_FALSE;
 
 #ifdef USE_MPI
-		LIS_MPI_Fint comm;
+    LIS_MPI_Fint comm;
 #endif
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	if( solver->A->matrix_type!=LIS_MATRIX_CSR )
-	{
-		A = solver->A;
-		err = lis_matrix_duplicate(A,&B);
-		if( err ) return err;
-		lis_matrix_set_type(B,LIS_MATRIX_CSR);
-		err = lis_matrix_convert(A,B);
-		if( err ) return err;
-		solver->A = B;
+    if(solver->A->matrix_type != LIS_MATRIX_CSR) {
+        A = solver->A;
+        err = lis_matrix_duplicate(A, &B);
+        if(err) return err;
+        lis_matrix_set_type(B, LIS_MATRIX_CSR);
+        err = lis_matrix_convert(A, B);
+        if(err) return err;
+        solver->A = B;
         converted = LIS_TRUE;
     }
     precon->A = solver->A;
     precon->is_copy = LIS_FALSE;
-	A               = precon->A;
-	sol             = solver->options[LIS_OPTIONS_SOLVER];
-	unsym           = solver->options[LIS_OPTIONS_SAAMG_UNSYM];
-	theta           = solver->params[LIS_PARAMS_SAAMG_THETA - LIS_OPTIONS_LEN];
-
+    A = precon->A;
+    sol = solver->options[LIS_OPTIONS_SOLVER];
+    unsym = solver->options[LIS_OPTIONS_SAAMG_UNSYM];
+    theta = solver->params[LIS_PARAMS_SAAMG_THETA - LIS_OPTIONS_LEN];
 
 #if 0
 	if( sol!=LIS_SOLVER_CG && !unsym )
@@ -126,64 +120,43 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 	}
 #endif
 
-	err = lis_vector_duplicate(A,&precon->temp);
-	if( err )
-	{
-		return err;
-	}
-	F77_FUNC_(finit_data_creation,FINIT_DATA_CREATION)(c_data_creation_ptr_bar);
-	F77_FUNC_(finit_data_creation_unsym,FINIT_DATA_CREATION_UNSYM)(c_data_creation_unsym_ptr_bar);
-	F77_FUNC_(finit_v_cycle,FINIT_V_CYCLE)(c_v_cycle_ptr_bar);
-	F77_FUNC_(finit_clear_matrix,FINIT_CLEAR_MATRIX)(c_clear_matrix_ptr_bar);
-	
-	lis_matrix_split(A);
+    err = lis_vector_duplicate(A, &precon->temp);
+    if(err) {
+        return err;
+    }
+    F77_FUNC_(finit_data_creation, FINIT_DATA_CREATION)(c_data_creation_ptr_bar);
+    F77_FUNC_(finit_data_creation_unsym, FINIT_DATA_CREATION_UNSYM)(c_data_creation_unsym_ptr_bar);
+    F77_FUNC_(finit_v_cycle, FINIT_V_CYCLE)(c_v_cycle_ptr_bar);
+    F77_FUNC_(finit_clear_matrix, FINIT_CLEAR_MATRIX)(c_clear_matrix_ptr_bar);
+
+    lis_matrix_split(A);
 
 #ifdef USE_MPI
-		comm = MPI_Comm_c2f(A->comm);
-		lis_send_recv(A->commtable,A->D->value);
-		table = A->commtable;
-		if( !unsym )
-		{
-			(*(void (*)())f_data_creation_ptr)(&A->n,&A->np,&A->L->nnz,&A->U->nnz,
-				A->D->value,A->L->value,A->L->ptr,A->L->index,
-				A->U->value, A->U->ptr, A->U->index,
-				&table->neibpetot, table->neibpe, table->import_ptr,
-				table->import_index, table->export_ptr, table->export_index,
-				&table->imnnz,&table->exnnz,
-				&comm, &precon->level_num,&precon->wsize, &theta);
-		}
-		else
-		{
-			(*(void (*)())f_data_creation_unsym_ptr)(&A->n,&A->np,&A->L->nnz,&A->U->nnz,
-				A->D->value,A->L->value,A->L->ptr,A->L->index,
-				A->U->value, A->U->ptr, A->U->index,
-				&table->neibpetot, table->neibpe, table->import_ptr,
-				table->import_index, table->export_ptr, table->export_index,
-				&table->imnnz,&table->exnnz,
-				&comm, &precon->level_num,&precon->wsize, &theta);
-		}
+    comm = MPI_Comm_c2f(A->comm);
+    lis_send_recv(A->commtable, A->D->value);
+    table = A->commtable;
+    if(!unsym) {
+        (*(void (*)())f_data_creation_ptr)(&A->n, &A->np, &A->L->nnz, &A->U->nnz, A->D->value, A->L->value, A->L->ptr, A->L->index, A->U->value, A->U->ptr, A->U->index, &table->neibpetot, table->neibpe, table->import_ptr, table->import_index, table->export_ptr, table->export_index, &table->imnnz, &table->exnnz, &comm, &precon->level_num, &precon->wsize, &theta);
+    }
+    else {
+        (*(void (*)())f_data_creation_unsym_ptr)(&A->n, &A->np, &A->L->nnz, &A->U->nnz, A->D->value, A->L->value, A->L->ptr, A->L->index, A->U->value, A->U->ptr, A->U->index, &table->neibpetot, table->neibpe, table->import_ptr, table->import_index, table->export_ptr, table->export_index, &table->imnnz, &table->exnnz, &comm, &precon->level_num, &precon->wsize, &theta);
+    }
 #else
-		if( !unsym )
-		{
-			(*(void (*)())f_data_creation_ptr)(&A->n,&A->L->nnz,&A->U->nnz,
-				A->D->value,A->L->value,A->L->ptr,A->L->index,
-				A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
-		}
-		else
-		{
-			(*(void (*)())f_data_creation_unsym_ptr)(&A->n,&A->L->nnz,&A->U->nnz,
-				A->D->value,A->L->value,A->L->ptr,A->L->index,
-				A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
-		}
+    if(!unsym) {
+        (*(void (*)())f_data_creation_ptr)(&A->n, &A->L->nnz, &A->U->nnz, A->D->value, A->L->value, A->L->ptr, A->L->index, A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
+    }
+    else {
+        (*(void (*)())f_data_creation_unsym_ptr)(&A->n, &A->L->nnz, &A->U->nnz, A->D->value, A->L->value, A->L->ptr, A->L->index, A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
+    }
 #endif
 
-        if(converted) {
-            lis_matrix_destroy(B);
-            solver->A = A;
-        }
+    if(converted) {
+        lis_matrix_destroy(B);
+        solver->A = A;
+    }
 
-        LIS_DEBUG_FUNC_OUT;
-        return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 #else
     LIS_DEBUG_FUNC_IN;
 
@@ -201,41 +174,38 @@ LIS_INT lis_precon_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 
 LIS_INT lis_precon_psd_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 #if defined(USE_SAAMG)
-	LIS_MATRIX A,B;
-	LIS_INT	err;
+    LIS_MATRIX A, B;
+    LIS_INT err;
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	if( solver->A->matrix_type!=LIS_MATRIX_CSR )
-	{
-		A = solver->A;
-		err = lis_matrix_duplicate(A,&B);
-		if( err ) return err;
-		lis_matrix_set_type(B,LIS_MATRIX_CSR);
-		err = lis_matrix_convert(A,B);
-		if( err ) return err;
-		solver->A = B;
-		lis_matrix_destroy(B);
-		solver->A = A;
-	}
-	precon->A       = solver->A;
-	precon->is_copy = LIS_FALSE;
-	A               = precon->A;
+    if(solver->A->matrix_type != LIS_MATRIX_CSR) {
+        A = solver->A;
+        err = lis_matrix_duplicate(A, &B);
+        if(err) return err;
+        lis_matrix_set_type(B, LIS_MATRIX_CSR);
+        err = lis_matrix_convert(A, B);
+        if(err) return err;
+        solver->A = B;
+        lis_matrix_destroy(B);
+        solver->A = A;
+    }
+    precon->A = solver->A;
+    precon->is_copy = LIS_FALSE;
+    A = precon->A;
 
+    err = lis_vector_duplicate(A, &precon->temp);
+    if(err) {
+        return err;
+    }
+    F77_FUNC_(finit_data_creation, FINIT_DATA_CREATION)(c_data_creation_ptr_bar);
+    F77_FUNC_(finit_data_creation_unsym, FINIT_DATA_CREATION_UNSYM)(c_data_creation_unsym_ptr_bar);
+    F77_FUNC_(finit_v_cycle, FINIT_V_CYCLE)(c_v_cycle_ptr_bar);
+    F77_FUNC_(finit_clear_matrix, FINIT_CLEAR_MATRIX)(c_clear_matrix_ptr_bar);
 
-	err = lis_vector_duplicate(A,&precon->temp);
-	if( err )
-	{
-		return err;
-	}
-	F77_FUNC_(finit_data_creation,FINIT_DATA_CREATION)(c_data_creation_ptr_bar);
-	F77_FUNC_(finit_data_creation_unsym,FINIT_DATA_CREATION_UNSYM)(c_data_creation_unsym_ptr_bar);
-	F77_FUNC_(finit_v_cycle,FINIT_V_CYCLE)(c_v_cycle_ptr_bar);
-	F77_FUNC_(finit_clear_matrix,FINIT_CLEAR_MATRIX)(c_clear_matrix_ptr_bar);
-	
     lis_matrix_split_create(A);
 
-	LIS_DEBUG_FUNC_OUT;
+    LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 #else
     LIS_DEBUG_FUNC_IN;
@@ -254,22 +224,21 @@ LIS_INT lis_precon_psd_create_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 
 LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 #if defined(USE_SAAMG)
-	LIS_MATRIX A;
-	LIS_COMMTABLE table;
-    LIS_INT	unsym,sol;
-	LIS_INT	err;
-	LIS_REAL theta; 
+    LIS_MATRIX A;
+    LIS_COMMTABLE table;
+    LIS_INT unsym, sol;
+    LIS_INT err;
+    LIS_REAL theta;
 #ifdef USE_MPI
-		LIS_MPI_Fint comm;
+    LIS_MPI_Fint comm;
 #endif
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-    A               = precon->A;
-    sol             = solver->options[LIS_OPTIONS_SOLVER];
-    unsym           = solver->options[LIS_OPTIONS_SAAMG_UNSYM];
-    theta           = solver->params[LIS_PARAMS_SAAMG_THETA - LIS_OPTIONS_LEN];
-
+    A = precon->A;
+    sol = solver->options[LIS_OPTIONS_SOLVER];
+    unsym = solver->options[LIS_OPTIONS_SAAMG_UNSYM];
+    theta = solver->params[LIS_PARAMS_SAAMG_THETA - LIS_OPTIONS_LEN];
 
 #if 0
     if( sol!=LIS_SOLVER_CG && !unsym )
@@ -281,45 +250,25 @@ LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
     lis_matrix_split_update(A);
 
 #ifdef USE_MPI
-		comm = MPI_Comm_c2f(A->comm);
-		lis_send_recv(A->commtable,A->D->value); // this line should probably only be in the "update" version . . .
-		table = A->commtable;
-		if( !unsym )
-		{
-			(*(void (*)())f_data_creation_ptr)(&A->n,&A->np,&A->L->nnz,&A->U->nnz,
-				A->D->value,A->L->value,A->L->ptr,A->L->index,
-				A->U->value, A->U->ptr, A->U->index,
-				&table->neibpetot, table->neibpe, table->import_ptr,
-				table->import_index, table->export_ptr, table->export_index,
-				&table->imnnz,&table->exnnz,
-				&comm, &precon->level_num,&precon->wsize, &theta);
-		}
-		else
-		{
-			(*(void (*)())f_data_creation_unsym_ptr)(&A->n,&A->np,&A->L->nnz,&A->U->nnz,
-				A->D->value,A->L->value,A->L->ptr,A->L->index,
-				A->U->value, A->U->ptr, A->U->index,
-				&table->neibpetot, table->neibpe, table->import_ptr,
-				table->import_index, table->export_ptr, table->export_index,
-				&table->imnnz,&table->exnnz,
-				&comm, &precon->level_num,&precon->wsize, &theta);
-		}
+    comm = MPI_Comm_c2f(A->comm);
+    lis_send_recv(A->commtable, A->D->value); // this line should probably only be in the "update" version . . .
+    table = A->commtable;
+    if(!unsym) {
+        (*(void (*)())f_data_creation_ptr)(&A->n, &A->np, &A->L->nnz, &A->U->nnz, A->D->value, A->L->value, A->L->ptr, A->L->index, A->U->value, A->U->ptr, A->U->index, &table->neibpetot, table->neibpe, table->import_ptr, table->import_index, table->export_ptr, table->export_index, &table->imnnz, &table->exnnz, &comm, &precon->level_num, &precon->wsize, &theta);
+    }
+    else {
+        (*(void (*)())f_data_creation_unsym_ptr)(&A->n, &A->np, &A->L->nnz, &A->U->nnz, A->D->value, A->L->value, A->L->ptr, A->L->index, A->U->value, A->U->ptr, A->U->index, &table->neibpetot, table->neibpe, table->import_ptr, table->import_index, table->export_ptr, table->export_index, &table->imnnz, &table->exnnz, &comm, &precon->level_num, &precon->wsize, &theta);
+    }
 #else
-		if( !unsym )
-		{
-			(*(void (*)())f_data_creation_ptr)(&A->n,&A->L->nnz,&A->U->nnz,
-				A->D->value,A->L->value,A->L->ptr,A->L->index,
-				A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
-		}
-		else
-		{
-			(*(void (*)())f_data_creation_unsym_ptr)(&A->n,&A->L->nnz,&A->U->nnz,
-				A->D->value,A->L->value,A->L->ptr,A->L->index,
-				A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
-		}
+    if(!unsym) {
+        (*(void (*)())f_data_creation_ptr)(&A->n, &A->L->nnz, &A->U->nnz, A->D->value, A->L->value, A->L->ptr, A->L->index, A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
+    }
+    else {
+        (*(void (*)())f_data_creation_unsym_ptr)(&A->n, &A->L->nnz, &A->U->nnz, A->D->value, A->L->value, A->L->ptr, A->L->index, A->U->value, A->U->ptr, A->U->index, &precon->level_num, &theta);
+    }
 #endif
 
-	LIS_DEBUG_FUNC_OUT;
+    LIS_DEBUG_FUNC_OUT;
 #endif
     return LIS_SUCCESS;
 }
@@ -329,29 +278,28 @@ LIS_INT lis_precon_psd_update_saamg(LIS_SOLVER solver, LIS_PRECON precon) {
 
 LIS_INT lis_psolve_saamg(LIS_SOLVER solver, LIS_VECTOR b, LIS_VECTOR x) {
 #if defined(USE_SAAMG)
-	LIS_INT	n;
-	LIS_PRECON precon;
-	LIS_MATRIX A;
+    LIS_INT n;
+    LIS_PRECON precon;
+    LIS_MATRIX A;
 #ifdef USE_MPI
-		LIS_MPI_Fint comm;
+    LIS_MPI_Fint comm;
 #endif
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	precon = solver->precon;
-	A      = solver->A;
+    precon = solver->precon;
+    A = solver->A;
 
 #ifdef USE_MPI
-		comm = MPI_Comm_c2f(A->comm);
-		n = b->np;
-		 (*(void (*)())f_v_cycle_ptr)(b->value,x->value,precon->temp->value,&precon->level_num,
-			 &comm,A->commtable->ws,A->commtable->wr,&n,&precon->wsize);
+    comm = MPI_Comm_c2f(A->comm);
+    n = b->np;
+    (*(void (*)())f_v_cycle_ptr)(b->value, x->value, precon->temp->value, &precon->level_num, &comm, A->commtable->ws, A->commtable->wr, &n, &precon->wsize);
 #else
-		n = b->n;
-		 (*(void (*)())f_v_cycle_ptr)(&n,b->value,x->value,&precon->level_num,precon->temp->value);
+    n = b->n;
+    (*(void (*)())f_v_cycle_ptr)(&n, b->value, x->value, &precon->level_num, precon->temp->value);
 #endif
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 #else
     LIS_DEBUG_FUNC_IN;
 
@@ -367,29 +315,28 @@ LIS_INT lis_psolve_saamg(LIS_SOLVER solver, LIS_VECTOR b, LIS_VECTOR x) {
 
 LIS_INT lis_psolveh_saamg(LIS_SOLVER solver, LIS_VECTOR b, LIS_VECTOR x) {
 #if defined(USE_SAAMG)
-	LIS_INT	n;
-	LIS_PRECON precon;
-	LIS_MATRIX A;
+    LIS_INT n;
+    LIS_PRECON precon;
+    LIS_MATRIX A;
 #ifdef USE_MPI
-		LIS_MPI_Fint comm;
+    LIS_MPI_Fint comm;
 #endif
 
-	LIS_DEBUG_FUNC_IN;
+    LIS_DEBUG_FUNC_IN;
 
-	A      = solver->A;
-	precon = solver->precon;
+    A = solver->A;
+    precon = solver->precon;
 
 #ifdef USE_MPI
-		comm = MPI_Comm_c2f(A->comm);
-		n = b->np;
-		 (*(void (*)())f_v_cycle_ptr)(b->value,x->value,precon->temp->value,&precon->level_num,
-			 &comm,A->commtable->ws,A->commtable->wr,&n,&precon->wsize);
+    comm = MPI_Comm_c2f(A->comm);
+    n = b->np;
+    (*(void (*)())f_v_cycle_ptr)(b->value, x->value, precon->temp->value, &precon->level_num, &comm, A->commtable->ws, A->commtable->wr, &n, &precon->wsize);
 #else
-		n = b->n;
-		 (*(void (*)())f_v_cycle_ptr)(&n,b->value,x->value,&precon->level_num,precon->temp->value);
+    n = b->n;
+    (*(void (*)())f_v_cycle_ptr)(&n, b->value, x->value, &precon->level_num, precon->temp->value);
 #endif
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 #else
     LIS_DEBUG_FUNC_IN;
 

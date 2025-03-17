@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -119,8 +119,8 @@ LIS_INT lis_matrix_check(LIS_MATRIX A, LIS_INT level) {
             LIS_SETERR(LIS_ERR_ILL_ARG, "matrix size is undefined\n");
             return LIS_ERR_ILL_ARG;
         }
-    /* only want this condition satisfied for the case of non-zero number of DOFs */
-    /* on the current process */
+        /* only want this condition satisfied for the case of non-zero number of DOFs */
+        /* on the current process */
         if(A->status == LIS_MATRIX_NULL && A->n > 0) {
             /* as the status is actually changed from ...NULL to ...ASSEMBLING in lis_matrix_set_value, */
             /* ...NULL here really means that the components are undefined, not the type */
@@ -161,12 +161,12 @@ LIS_INT lis_matrix_check(LIS_MATRIX A, LIS_INT level) {
             LIS_SETERR(LIS_ERR_ILL_ARG, "matrix size is undefined\n");
             return LIS_ERR_ILL_ARG;
         }
-    /*        if( A->status==LIS_MATRIX_NULL )*/
+        /*        if( A->status==LIS_MATRIX_NULL )*/
         if(A->status == LIS_MATRIX_NULL && A->n > 0) {
             LIS_SETERR(LIS_ERR_ILL_ARG, "matrix type is undefined\n");
             return LIS_ERR_ILL_ARG;
         }
-    /*        if( A->status<=LIS_MATRIX_ASSEMBLING )*/
+        /*        if( A->status<=LIS_MATRIX_ASSEMBLING )*/
         if(A->status <= LIS_MATRIX_ASSEMBLING && A->n > 0) {
             LIS_SETERR(LIS_ERR_ILL_ARG, "matrix A is assembling\n");
             return LIS_ERR_ILL_ARG;
@@ -197,12 +197,12 @@ LIS_INT lis_matrix_create(LIS_Comm comm, LIS_MATRIX* Amat) {
 
 #ifdef USE_MPI
 #if _DEBUG
-	printf("c_comm = %d f_comm = %d\n",MPI_COMM_WORLD,comm);
+    printf("c_comm = %d f_comm = %d\n", MPI_COMM_WORLD, comm);
 #endif
-		MPI_Comm_size(comm,&int_nprocs);
-		MPI_Comm_rank(comm,&int_my_rank);
-		nprocs = int_nprocs;
-		my_rank = int_my_rank;
+    MPI_Comm_size(comm, &int_nprocs);
+    MPI_Comm_rank(comm, &int_my_rank);
+    nprocs = int_nprocs;
+    my_rank = int_my_rank;
 #else
     nprocs = 1;
     my_rank = 0;
@@ -227,7 +227,7 @@ LIS_INT lis_matrix_set_size(LIS_MATRIX Amat, LIS_INT local_n, LIS_INT global_n) 
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(Amat,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_check(Amat, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     if(global_n > 0 && local_n > global_n) {
@@ -246,15 +246,14 @@ LIS_INT lis_matrix_set_size(LIS_MATRIX Amat, LIS_INT local_n, LIS_INT global_n) 
     }
 #endif
 #ifdef USE_MPI
-	MPI_Comm_size(Amat->comm,&int_nprocs);
-	nprocs = int_nprocs;
+    MPI_Comm_size(Amat->comm, &int_nprocs);
+    nprocs = int_nprocs;
     /* change the logic to something a little more direct, i.e., that will not */
     /* throw an error if local_n=0 . . . */
-	if( global_n>0 && global_n<nprocs )
-	  {
-	    LIS_SETERR2(LIS_ERR_ILL_ARG,"global n(=%D) is smaller than nprocs(=%D)\n",global_n,nprocs);
-	    return LIS_ERR_ILL_ARG;
-	  }
+    if(global_n > 0 && global_n < nprocs) {
+        LIS_SETERR2(LIS_ERR_ILL_ARG, "global n(=%D) is smaller than nprocs(=%D)\n", global_n, nprocs);
+        return LIS_ERR_ILL_ARG;
+    }
 #endif
 
     err = lis_ranges_create(Amat->comm, &local_n, &global_n, &ranges, &is, &ie, &nprocs, &my_rank);
@@ -425,14 +424,14 @@ LIS_INT lis_matrix_duplicate(LIS_MATRIX Ain, LIS_MATRIX* Aout) {
     LIS_INT err;
     LIS_INT nprocs;
 #ifdef USE_MPI
-		LIS_INT i;
-		LIS_INT *ranges;
-		LIS_INT *l2g_map;
+    LIS_INT i;
+    LIS_INT* ranges;
+    LIS_INT* l2g_map;
 #endif
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(Ain,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(Ain, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
     nprocs = Ain->nprocs;
@@ -446,27 +445,25 @@ LIS_INT lis_matrix_duplicate(LIS_MATRIX Ain, LIS_MATRIX* Aout) {
     lis_matrix_init(Aout);
 
 #ifdef USE_MPI
-		l2g_map = (LIS_INT *)lis_malloc( (Ain->np-Ain->n)*sizeof(LIS_INT),"lis_matrix_duplicate::l2g_map" );
-		if( l2g_map==NULL )
-		{
-			LIS_SETERR_MEM((Ain->np-Ain->n)*sizeof(LIS_INT));
-			lis_matrix_destroy(*Aout);
-			*Aout = NULL;
-			return LIS_OUT_OF_MEMORY;
-		}
-		memcpy(l2g_map,Ain->l2g_map,(Ain->np-Ain->n)*sizeof(LIS_INT));
-		ranges = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_matrix_duplicate::range" );
-		if( ranges==NULL )
-		{
-			LIS_SETERR_MEM((nprocs+1)*sizeof(LIS_INT));
-			lis_free(l2g_map);
-			lis_matrix_destroy(*Aout);
-			*Aout = NULL;
-			return LIS_OUT_OF_MEMORY;
-		}
-		for(i=0;i<nprocs+1;i++) ranges[i] = Ain->ranges[i];
-		(*Aout)->ranges      = ranges;
-		(*Aout)->l2g_map     = l2g_map;
+    l2g_map = (LIS_INT*)lis_malloc((Ain->np - Ain->n) * sizeof(LIS_INT), "lis_matrix_duplicate::l2g_map");
+    if(l2g_map == NULL) {
+        LIS_SETERR_MEM((Ain->np - Ain->n) * sizeof(LIS_INT));
+        lis_matrix_destroy(*Aout);
+        *Aout = NULL;
+        return LIS_OUT_OF_MEMORY;
+    }
+    memcpy(l2g_map, Ain->l2g_map, (Ain->np - Ain->n) * sizeof(LIS_INT));
+    ranges = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_matrix_duplicate::range");
+    if(ranges == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * sizeof(LIS_INT));
+        lis_free(l2g_map);
+        lis_matrix_destroy(*Aout);
+        *Aout = NULL;
+        return LIS_OUT_OF_MEMORY;
+    }
+    for(i = 0; i < nprocs + 1; i++) ranges[i] = Ain->ranges[i];
+    (*Aout)->ranges = ranges;
+    (*Aout)->l2g_map = l2g_map;
 #else
     (*Aout)->ranges = NULL;
 #endif
@@ -485,16 +482,15 @@ LIS_INT lis_matrix_duplicate(LIS_MATRIX Ain, LIS_MATRIX* Aout) {
     (*Aout)->is_destroy = Ain->is_destroy;
 
 #ifdef USE_MPI
-	err = lis_commtable_duplicateM(Ain,Aout);
-	if( err )
-	{
-		lis_matrix_destroy(*Aout);
-		*Aout = NULL;
-		return err;
-	}
-	(*Aout)->is_comm   = LIS_TRUE;
-	LIS_DEBUG_FUNC_OUT;
-	return LIS_SUCCESS;
+    err = lis_commtable_duplicateM(Ain, Aout);
+    if(err) {
+        lis_matrix_destroy(*Aout);
+        *Aout = NULL;
+        return err;
+    }
+    (*Aout)->is_comm = LIS_TRUE;
+    LIS_DEBUG_FUNC_OUT;
+    return LIS_SUCCESS;
 #else
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -521,7 +517,7 @@ LIS_INT lis_matrix_get_range(LIS_MATRIX A, LIS_INT* is, LIS_INT* ie) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_SIZE);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_SIZE);
     if(err) return err;
 
     *is = A->is;
@@ -539,7 +535,7 @@ LIS_INT lis_matrix_get_size(LIS_MATRIX A, LIS_INT* local_n, LIS_INT* global_n) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_SIZE);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_SIZE);
     if(err) return err;
 
     *local_n = A->n;
@@ -557,7 +553,7 @@ LIS_INT lis_matrix_get_nnz(LIS_MATRIX A, LIS_INT* nnz) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_SIZE);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_SIZE);
     if(err) return err;
 
     *nnz = A->nnz;
@@ -576,7 +572,7 @@ LIS_INT lis_matrix_assemble(LIS_MATRIX A) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_TYPE);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_TYPE);
     if(err) return err;
 
     matrix_type = A->matrix_type;
@@ -584,11 +580,11 @@ LIS_INT lis_matrix_assemble(LIS_MATRIX A) {
         A->matrix_type = LIS_MATRIX_RCO;
         A->status = LIS_MATRIX_RCO;
 #ifdef USE_MPI
-			err = lis_matrix_g2l(A);
-			if( err ) return err;
-			err = lis_commtable_create(A);
-			if( err ) return err;
-			A->is_comm = LIS_TRUE;
+        err = lis_matrix_g2l(A);
+        if(err) return err;
+        err = lis_commtable_create(A);
+        if(err) return err;
+        A->is_comm = LIS_TRUE;
 #endif
         err = lis_matrix_duplicate(A, &B);
         if(err) return err;
@@ -607,7 +603,7 @@ LIS_INT lis_matrix_assemble(LIS_MATRIX A) {
         if(A->matrix_type == LIS_MATRIX_JAD) {
             A->work = (LIS_SCALAR*)lis_malloc(A->n * sizeof(LIS_SCALAR), "lis_matrix_assemble::A->work");
             if(A->work == NULL) {
-                LIS_SETERR_MEM(A->n*sizeof(LIS_SCALAR));
+                LIS_SETERR_MEM(A->n * sizeof(LIS_SCALAR));
                 return LIS_OUT_OF_MEMORY;
             }
         }
@@ -621,25 +617,22 @@ LIS_INT lis_matrix_assemble(LIS_MATRIX A) {
         if(A->matrix_type == LIS_MATRIX_JAD) {
             A->work = (LIS_SCALAR*)lis_malloc(A->n * sizeof(LIS_SCALAR), "lis_matrix_assemble::A->work");
             if(A->work == NULL) {
-                LIS_SETERR_MEM(A->n*sizeof(LIS_SCALAR));
+                LIS_SETERR_MEM(A->n * sizeof(LIS_SCALAR));
                 return LIS_OUT_OF_MEMORY;
             }
         }
     }
 #ifdef USE_MPI
-		if( !A->is_pmat )
-		{
-			if( A->l2g_map==NULL )
-			{
-				err = lis_matrix_g2l(A);
-				if( err ) return err;
-			}
-			if( A->commtable==NULL )			
-			{
-				err = lis_commtable_create(A);
-				if( err ) return err;
-			}
-		}
+    if(!A->is_pmat) {
+        if(A->l2g_map == NULL) {
+            err = lis_matrix_g2l(A);
+            if(err) return err;
+        }
+        if(A->commtable == NULL) {
+            err = lis_commtable_create(A);
+            if(err) return err;
+        }
+    }
 #endif
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -662,7 +655,7 @@ LIS_INT lis_matrix_set_value(LIS_INT flag, LIS_INT i, LIS_INT j, LIS_SCALAR valu
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_NOT_ASSEMBLED);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_NOT_ASSEMBLED);
     if(err) return err;
 
     n = A->n;
@@ -695,7 +688,7 @@ LIS_INT lis_matrix_set_value(LIS_INT flag, LIS_INT i, LIS_INT j, LIS_SCALAR valu
         if(A->w_nnz == NULL) {
             A->w_nnz = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_set_value::A->w_nnz");
             if(A->w_nnz == NULL) {
-                LIS_SETERR_MEM(n*sizeof(LIS_INT));
+                LIS_SETERR_MEM(n * sizeof(LIS_INT));
                 return LIS_OUT_OF_MEMORY;
             }
             for(k = 0; k < n; k++) A->w_nnz[k] = A->w_annz;
@@ -720,7 +713,9 @@ LIS_INT lis_matrix_set_value(LIS_INT flag, LIS_INT i, LIS_INT j, LIS_SCALAR valu
             return err;
         }
     }
-    for(k = 0; k < A->w_row[i - is]; k++) { if(A->w_index[i - is][k] == j) break; }
+    for(k = 0; k < A->w_row[i - is]; k++) {
+        if(A->w_index[i - is][k] == j) break;
+    }
     if(k < A->w_row[i - is]) {
         if(flag == LIS_INS_VALUE) { A->w_value[i - is][k] = value; }
         else { A->w_value[i - is][k] += value; }
@@ -797,7 +792,9 @@ LIS_INT lis_matrix_set_values(LIS_INT flag, LIS_INT n, LIS_SCALAR value[], LIS_M
     LIS_INT i, j;
     LIS_DEBUG_FUNC_IN;
 
-    for(i = 0; i < n; i++) { for(j = 0; j < n; j++) { lis_matrix_set_value(flag, i, j, value[i * n + j], A); } }
+    for(i = 0; i < n; i++) {
+        for(j = 0; j < n; j++) { lis_matrix_set_value(flag, i, j, value[i * n + j], A); }
+    }
 
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -811,7 +808,7 @@ LIS_INT lis_matrix_set_type(LIS_MATRIX A, LIS_INT matrix_type) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_NOT_ASSEMBLED);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_NOT_ASSEMBLED);
     if(err) return err;
     if(matrix_type < LIS_MATRIX_CSR || matrix_type > LIS_MATRIX_DNS) {
         LIS_SETERR2(LIS_ERR_ILL_ARG, "matrix_type is %D (Set between 1 to %D)\n", matrix_type, LIS_MATRIX_DNS);
@@ -832,7 +829,7 @@ LIS_INT lis_matrix_get_type(LIS_MATRIX A, LIS_INT* matrix_type) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     *matrix_type = A->matrix_type;
@@ -849,7 +846,7 @@ LIS_INT lis_matrix_set_destroyflag(LIS_MATRIX A, LIS_INT flag) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     if(flag) { A->is_destroy = LIS_TRUE; }
@@ -867,7 +864,7 @@ LIS_INT lis_matrix_get_destroyflag(LIS_MATRIX A, LIS_INT* flag) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     *flag = A->is_destroy;
@@ -885,14 +882,14 @@ LIS_INT lis_matrix_malloc(LIS_MATRIX A, LIS_INT nnz_row, LIS_INT nnz[]) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_NOT_ASSEMBLED);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_NOT_ASSEMBLED);
     if(err) return err;
 
     n = A->n;
     if(A->w_nnz == NULL) {
         A->w_nnz = (LIS_INT*)lis_malloc(n * sizeof(LIS_INT), "lis_matrix_malloc::A->w_nnz");
         if(A->w_nnz == NULL) {
-            LIS_SETERR_MEM(n*sizeof(LIS_INT));
+            LIS_SETERR_MEM(n * sizeof(LIS_INT));
             return LIS_OUT_OF_MEMORY;
         }
     }
@@ -900,7 +897,9 @@ LIS_INT lis_matrix_malloc(LIS_MATRIX A, LIS_INT nnz_row, LIS_INT nnz[]) {
         A->w_annz = nnz_row;
         for(k = 0; k < n; k++) A->w_nnz[k] = nnz_row;
     }
-    else { for(k = 0; k < n; k++) A->w_nnz[k] = nnz[k]; }
+    else {
+        for(k = 0; k < n; k++) A->w_nnz[k] = nnz[k];
+    }
 
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -914,7 +913,7 @@ LIS_INT lis_matrix_unset(LIS_MATRIX A) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_SIZE);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_SIZE);
     if(err) return err;
 
     if(A->is_copy) { lis_matrix_storage_destroy(A); }

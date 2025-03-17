@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,27 +25,27 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include <ctype.h>
 #include <math.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -95,7 +95,7 @@ LIS_INT lis_input_mm(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
             if(A->matrix_type == LIS_MATRIX_JAD) {
                 A->work = (LIS_SCALAR*)lis_malloc(A->n * sizeof(LIS_SCALAR), "lis_input_mm::A->work");
                 if(A->work == NULL) {
-                    LIS_SETERR_MEM(A->n*sizeof(LIS_SCALAR));
+                    LIS_SETERR_MEM(A->n * sizeof(LIS_SCALAR));
                     return LIS_OUT_OF_MEMORY;
                 }
             }
@@ -123,7 +123,7 @@ LIS_INT lis_input_mm(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file) {
             if(A->matrix_type == LIS_MATRIX_JAD) {
                 A->work = (LIS_SCALAR*)lis_malloc(A->n * sizeof(LIS_SCALAR), "lis_input_mm::A->work");
                 if(A->work == NULL) {
-                    LIS_SETERR_MEM(A->n*sizeof(LIS_SCALAR));
+                    LIS_SETERR_MEM(A->n * sizeof(LIS_SCALAR));
                     return LIS_OUT_OF_MEMORY;
                 }
             }
@@ -182,13 +182,13 @@ LIS_INT lis_input_mm_vec(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
                 }
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-				if( mmtype==MM_REAL && sscanf(buf, "%lld %lg", &idx, &re) != 2 )
+                if(mmtype == MM_REAL && sscanf(buf, "%lld %lg", &idx, &re) != 2)
 #else
-				if( mmtype==MM_REAL && sscanf(buf, "%d %lg", &idx, &re) != 2 )
+                if(mmtype == MM_REAL && sscanf(buf, "%d %lg", &idx, &re) != 2)
 #endif
 #else
 #ifdef _LONG__LONG
-				if( mmtype==MM_REAL && sscanf(buf, "%lld %lg", &idx, &val) != 2 )
+                if(mmtype == MM_REAL && sscanf(buf, "%lld %lg", &idx, &val) != 2)
 #else
                 if(mmtype == MM_REAL && sscanf(buf, "%d %lg", &idx, &val) != 2)
 #endif
@@ -198,7 +198,7 @@ LIS_INT lis_input_mm_vec(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
                     return LIS_ERR_FILE_IO;
                 }
 #ifdef _LONG__LONG
-				if( mmtype==MM_COMPLEX && sscanf(buf, "%lld %lg %lg", &idx, &re, &im) != 3 )
+                if(mmtype == MM_COMPLEX && sscanf(buf, "%lld %lg %lg", &idx, &re, &im) != 3)
 #else
                 if(mmtype == MM_COMPLEX && sscanf(buf, "%d %lg %lg", &idx, &re, &im) != 3)
 #endif
@@ -211,16 +211,15 @@ LIS_INT lis_input_mm_vec(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             if(idx >= is && idx < ie) {
                 if(mmtype == MM_REAL) {
 #ifdef _COMPLEX
-					b->value[idx-is] = re;
+                    b->value[idx - is] = re;
 #else
                     b->value[idx - is] = val;
 #endif
                 }
 #ifdef _COMPLEX
-				else
-				{
-					b->value[idx-is] = re + im * _Complex_I;
-				}
+                else {
+                    b->value[idx - is] = re + im * _Complex_I;
+                }
 #endif
             }
         }
@@ -247,13 +246,13 @@ LIS_INT lis_input_mm_vec(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
                 }
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-				if( mmtype==MM_REAL && sscanf(buf, "%lld %lg", &idx, &re) != 2 )
+                if(mmtype == MM_REAL && sscanf(buf, "%lld %lg", &idx, &re) != 2)
 #else
-				if( mmtype==MM_REAL && sscanf(buf, "%d %lg", &idx, &re) != 2 )
+                if(mmtype == MM_REAL && sscanf(buf, "%d %lg", &idx, &re) != 2)
 #endif
 #else
 #ifdef _LONG__LONG
-				if( mmtype==MM_REAL && sscanf(buf, "%lld %lg", &idx, &val) != 2 )
+                if(mmtype == MM_REAL && sscanf(buf, "%lld %lg", &idx, &val) != 2)
 #else
                 if(mmtype == MM_REAL && sscanf(buf, "%d %lg", &idx, &val) != 2)
 #endif
@@ -267,16 +266,15 @@ LIS_INT lis_input_mm_vec(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             if(idx >= is && idx < ie) {
                 if(mmtype == MM_REAL) {
 #ifdef _COMPLEX
-					x->value[idx-is] = re;
+                    x->value[idx - is] = re;
 #else
                     x->value[idx - is] = val;
 #endif
                 }
 #ifdef _COMPLEX
-				else
-				{
-					x->value[idx-is] = re + im * _Complex_I;
-				}
+                else {
+                    x->value[idx - is] = re + im * _Complex_I;
+                }
 #endif
             }
         }
@@ -320,15 +318,13 @@ LIS_INT lis_input_mm_banner(FILE* file, LIS_INT* mmfmt, LIS_INT* mmtype, LIS_INT
     }
     if(strncmp(dtype, MM_TYPE_REAL, strlen(MM_TYPE_REAL)) == 0) { *mmtype = MM_REAL; }
 #ifdef _COMPLEX
-	else if( strncmp(dtype, MM_TYPE_COMPLEX, strlen(MM_TYPE_COMPLEX))==0 )
-	{
-		*mmtype = MM_COMPLEX;
-	}
-	else
-	{
-		LIS_SETERR(LIS_ERR_FILE_IO,"Not real or complex\n");
-		return LIS_ERR_FILE_IO;
-	}
+    else if(strncmp(dtype, MM_TYPE_COMPLEX, strlen(MM_TYPE_COMPLEX)) == 0) {
+        *mmtype = MM_COMPLEX;
+    }
+    else {
+        LIS_SETERR(LIS_ERR_FILE_IO, "Not real or complex\n");
+        return LIS_ERR_FILE_IO;
+    }
 #else
     else {
         LIS_SETERR(LIS_ERR_FILE_IO, "Not real\n");
@@ -338,15 +334,13 @@ LIS_INT lis_input_mm_banner(FILE* file, LIS_INT* mmfmt, LIS_INT* mmtype, LIS_INT
     if(strncmp(dstruct, MM_TYPE_GENERAL, strlen(MM_TYPE_GENERAL)) == 0) { *mmstruct = MM_GENERAL; }
     else if(strncmp(dstruct, MM_TYPE_SYMM, strlen(MM_TYPE_SYMM)) == 0) { *mmstruct = MM_SYMM; }
 #ifdef _COMPLEX
-	else if( strncmp(dstruct, MM_TYPE_HERM, strlen(MM_TYPE_HERM))==0)
-	{
-		*mmstruct = MM_HERM;
-	}
-	else
-	{
-		LIS_SETERR(LIS_ERR_FILE_IO,"Not general, symmetric, or Hermitian\n");
-		return LIS_ERR_FILE_IO;
-	}
+    else if(strncmp(dstruct, MM_TYPE_HERM, strlen(MM_TYPE_HERM)) == 0) {
+        *mmstruct = MM_HERM;
+    }
+    else {
+        LIS_SETERR(LIS_ERR_FILE_IO, "Not general, symmetric, or Hermitian\n");
+        return LIS_ERR_FILE_IO;
+    }
 #else
     else {
         LIS_SETERR(LIS_ERR_FILE_IO, "Not general or symmetric\n");
@@ -371,10 +365,9 @@ LIS_INT lis_input_mm_size(FILE* file, LIS_INT* nr, LIS_INT* nc, LIS_INT* nnz, LI
             LIS_SETERR_FIO;
             return LIS_ERR_FILE_IO;
         }
-    }
-    while(buf[0] == '%');
+    } while(buf[0] == '%');
 #ifdef _LONG__LONG
-	err = sscanf(buf, "%lld %lld %lld %lld %lld %lld", nr, nc, nnz, isb, isx, isbin);
+    err = sscanf(buf, "%lld %lld %lld %lld %lld %lld", nr, nc, nnz, isb, isx, isbin);
 #else
     err = sscanf(buf, "%d %d %d %d %d %d", nr, nc, nnz, isb, isx, isbin);
 #endif
@@ -419,7 +412,7 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
     LIS_DEBUG_FUNC_IN;
 
 #ifdef USE_MPI
-		my_rank = A->my_rank;
+    my_rank = A->my_rank;
 #else
     my_rank = 0;
 #endif
@@ -432,7 +425,7 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
     if(err) return err;
 
 #ifdef _LONG__LONG
-	if( my_rank==0 ) printf("matrix size = %lld x %lld (%lld nonzero entries)\n\n",nr,nc,nr*nc);
+    if(my_rank == 0) printf("matrix size = %lld x %lld (%lld nonzero entries)\n\n", nr, nc, nr * nc);
 #else
     if(my_rank == 0) printf("matrix size = %d x %d (%d nonzero entries)\n\n", nr, nc, nr * nc);
 #endif
@@ -463,13 +456,13 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             }
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-			if( mmtype==MM_REAL && sscanf(buf, "%lg", &re) != 1 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lg", &re) != 1)
 #else
-			if( mmtype==MM_REAL && sscanf(buf, "%lg", &re) != 1 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lg", &re) != 1)
 #endif
 #else
 #ifdef _LONG__LONG
-			if( mmtype==MM_REAL && sscanf(buf, "%lg", &val) != 1 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lg", &val) != 1)
 #else
             if(mmtype == MM_REAL && sscanf(buf, "%lg", &val) != 1)
 #endif
@@ -480,7 +473,7 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
                 return LIS_ERR_FILE_IO;
             }
 #ifdef _LONG__LONG
-			if( mmtype==MM_COMPLEX && sscanf(buf, "%lg %lg", &re, &im) != 2 )
+            if(mmtype == MM_COMPLEX && sscanf(buf, "%lg %lg", &re, &im) != 2)
 #else
             if(mmtype == MM_COMPLEX && sscanf(buf, "%lg %lg", &re, &im) != 2)
 #endif
@@ -494,12 +487,12 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
 
     value = (LIS_SCALAR*)lis_malloc(nr * nc * sizeof(LIS_SCALAR), "lis_input_mm_dns::value");
     if(value == NULL) {
-        LIS_SETERR_MEM(nr*nc*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(nr * nc * sizeof(LIS_SCALAR));
         lis_free(value);
         return LIS_OUT_OF_MEMORY;
     }
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < nr * nc; i++) { value[i] = 0.0; }
 
@@ -515,8 +508,7 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             lis_free(value);
             return LIS_ERR_FILE_IO;
         }
-    }
-    while(buf[0] == '%');
+    } while(buf[0] == '%');
 
     for(i = 0; i < nr * nc; i++) {
         if(isbin) {
@@ -536,13 +528,13 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             }
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-			if( mmtype==MM_REAL && sscanf(buf, "%lg", &re) != 1 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lg", &re) != 1)
 #else
-			if( mmtype==MM_REAL && sscanf(buf, "%lg", &re) != 1 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lg", &re) != 1)
 #endif
 #else
 #ifdef _LONG__LONG
-			if( mmtype==MM_REAL && sscanf(buf, "%lg", &val) != 1 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lg", &val) != 1)
 #else
             if(mmtype == MM_REAL && sscanf(buf, "%lg", &val) != 1)
 #endif
@@ -553,7 +545,7 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
                 return LIS_ERR_FILE_IO;
             }
 #ifdef _LONG__LONG
-			if( mmtype==MM_COMPLEX && sscanf(buf, "%lg %lg", &re, &im) != 2 )
+            if(mmtype == MM_COMPLEX && sscanf(buf, "%lg %lg", &re, &im) != 2)
 #else
             if(mmtype == MM_COMPLEX && sscanf(buf, "%lg %lg", &re, &im) != 2)
 #endif
@@ -564,22 +556,21 @@ LIS_INT lis_input_mm_dns(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             }
             if(mmtype == MM_REAL) {
 #ifdef _COMPLEX
-				value[i] = re;
+                value[i] = re;
 #else
                 value[i] = val;
 #endif
             }
 #ifdef _COMPLEX
-			else
-			{
-				value[i] = re + im * _Complex_I;
-			}
+            else {
+                value[i] = re + im * _Complex_I;
+            }
 #endif
         }
     }
 
 #ifdef USE_MPI
-		MPI_Barrier(A->comm);
+    MPI_Barrier(A->comm);
 #endif
 
     err = lis_matrix_set_dns(value, A);
@@ -624,7 +615,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
     LIS_DEBUG_FUNC_IN;
 
 #ifdef USE_MPI
-		my_rank = A->my_rank;
+    my_rank = A->my_rank;
 #else
     my_rank = 0;
 #endif
@@ -637,7 +628,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
     if(err) return err;
 
 #ifdef _LONG__LONG
-	if( my_rank==0 ) printf("matrix size = %lld x %lld (%lld nonzero entries)\n\n",nr,nc,nnz);
+    if(my_rank == 0) printf("matrix size = %lld x %lld (%lld nonzero entries)\n\n", nr, nc, nnz);
 #else
     if(my_rank == 0) printf("matrix size = %d x %d (%d nonzero entries)\n\n", nr, nc, nnz);
 #endif
@@ -652,19 +643,19 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
 
     ptr = (LIS_INT*)lis_malloc((n + 1) * sizeof(LIS_INT), "lis_input_mm_csr::ptr");
     if(ptr == NULL) {
-        LIS_SETERR_MEM((n+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((n + 1) * sizeof(LIS_INT));
         lis_free2(4, ptr, index, value, work);
         return LIS_OUT_OF_MEMORY;
     }
     work = (LIS_INT*)lis_malloc((n + 1) * sizeof(LIS_INT), "lis_input_mm_csr::work");
     if(work == NULL) {
-        LIS_SETERR_MEM((n+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((n + 1) * sizeof(LIS_INT));
         lis_free2(4, ptr, index, value, work);
         return LIS_OUT_OF_MEMORY;
     }
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n + 1; i++) {
         ptr[i] = 0;
@@ -698,13 +689,13 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             }
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-			if( mmtype==MM_REAL && sscanf(buf, "%lld %lld %lg", &ridx, &cidx, &re) != 3 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lld %lld %lg", &ridx, &cidx, &re) != 3)
 #else
-			if( mmtype==MM_REAL && sscanf(buf, "%d %d %lg", &ridx, &cidx, &re) != 3 )
+            if(mmtype == MM_REAL && sscanf(buf, "%d %d %lg", &ridx, &cidx, &re) != 3)
 #endif
 #else
 #ifdef _LONG__LONG
-			if( mmtype==MM_REAL && sscanf(buf, "%lld %lld %lg", &ridx, &cidx, &val) != 3 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lld %lld %lg", &ridx, &cidx, &val) != 3)
 #else
             if(mmtype == MM_REAL && sscanf(buf, "%d %d %lg", &ridx, &cidx, &val) != 3)
 #endif
@@ -715,7 +706,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
                 return LIS_ERR_FILE_IO;
             }
 #ifdef _LONG__LONG
-			if( mmtype==MM_COMPLEX && sscanf(buf, "%lld %lld %lg %lg", &ridx, &cidx, &re, &im) != 4 )
+            if(mmtype == MM_COMPLEX && sscanf(buf, "%lld %lld %lg %lg", &ridx, &cidx, &re, &im) != 4)
 #else
             if(mmtype == MM_COMPLEX && sscanf(buf, "%d %d %lg %lg", &ridx, &cidx, &re, &im) != 4)
 #endif
@@ -728,7 +719,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
         /*		if( val!=0.0 )*/
         {
 #ifdef _COMPLEX
-			if((mmstruct==MM_SYMM || mmstruct==MM_HERM) && ridx!=cidx )
+            if((mmstruct == MM_SYMM || mmstruct == MM_HERM) && ridx != cidx)
 #else
             if(mmstruct == MM_SYMM && ridx != cidx)
 #endif
@@ -742,7 +733,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
     ptr[0] = 0;
     for(i = 0; i < n; i++) {
 #ifdef _COMPLEX
-		if( mmstruct==MM_SYMM || mmstruct==MM_HERM )
+        if(mmstruct == MM_SYMM || mmstruct == MM_HERM)
 #else
         if(mmstruct == MM_SYMM)
 #endif
@@ -755,18 +746,18 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
 
     index = (LIS_INT*)lis_malloc(ptr[n] * sizeof(LIS_INT), "lis_input_mm_csr::index");
     if(index == NULL) {
-        LIS_SETERR_MEM(ptr[n]*sizeof(LIS_INT));
+        LIS_SETERR_MEM(ptr[n] * sizeof(LIS_INT));
         lis_free2(4, ptr, index, value, work);
         return LIS_OUT_OF_MEMORY;
     }
     value = (LIS_SCALAR*)lis_malloc(ptr[n] * sizeof(LIS_SCALAR), "lis_input_mm_csr::value");
     if(value == NULL) {
-        LIS_SETERR_MEM(ptr[n]*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(ptr[n] * sizeof(LIS_SCALAR));
         lis_free2(4, ptr, index, value, work);
         return LIS_OUT_OF_MEMORY;
     }
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
     for(i = 0; i < n; i++) {
         for(j = ptr[i]; j < ptr[i + 1]; j++) {
@@ -787,8 +778,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             lis_free2(4, ptr, index, value, work);
             return LIS_ERR_FILE_IO;
         }
-    }
-    while(buf[0] == '%');
+    } while(buf[0] == '%');
 
     for(i = 0; i < nnz; i++) {
         if(isbin) {
@@ -814,13 +804,13 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             }
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-			if( mmtype==MM_REAL && sscanf(buf, "%lld %lld %lg", &ridx, &cidx, &re) != 3 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lld %lld %lg", &ridx, &cidx, &re) != 3)
 #else
-			if( mmtype==MM_REAL && sscanf(buf, "%d %d %lg", &ridx, &cidx, &re) != 3 )
+            if(mmtype == MM_REAL && sscanf(buf, "%d %d %lg", &ridx, &cidx, &re) != 3)
 #endif
 #else
 #ifdef _LONG__LONG
-			if( mmtype==MM_REAL && sscanf(buf, "%lld %lld %lg", &ridx, &cidx, &val) != 3 )
+            if(mmtype == MM_REAL && sscanf(buf, "%lld %lld %lg", &ridx, &cidx, &val) != 3)
 #else
             if(mmtype == MM_REAL && sscanf(buf, "%d %d %lg", &ridx, &cidx, &val) != 3)
 #endif
@@ -831,7 +821,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
                 return LIS_ERR_FILE_IO;
             }
 #ifdef _LONG__LONG
-			if( mmtype==MM_COMPLEX && sscanf(buf, "%lld %lld %lg %lg", &ridx, &cidx, &re, &im) != 4 )
+            if(mmtype == MM_COMPLEX && sscanf(buf, "%lld %lld %lg %lg", &ridx, &cidx, &re, &im) != 4)
 #else
             if(mmtype == MM_COMPLEX && sscanf(buf, "%d %d %lg %lg", &ridx, &cidx, &re, &im) != 4)
 #endif
@@ -843,7 +833,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
         }
         ridx--;
         cidx--;
-        /*		  
+        /*
         if( ridx==cidx && val==0.0 )
         {
 #ifdef _LONG__LONG
@@ -857,7 +847,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
         /*		if( val!=0.0 )*/
         {
 #ifdef _COMPLEX
-			if((mmstruct==MM_SYMM || mmstruct==MM_HERM) && ridx!=cidx )
+            if((mmstruct == MM_SYMM || mmstruct == MM_HERM) && ridx != cidx)
 #else
             if(mmstruct == MM_SYMM && ridx != cidx)
 #endif
@@ -865,16 +855,15 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
                 if(cidx >= is && cidx < ie) {
                     if(mmtype == MM_REAL) {
 #ifdef _COMPLEX
-					    value[ptr[cidx-is]+work[cidx-is]] = re;
+                        value[ptr[cidx - is] + work[cidx - is]] = re;
 #else
                         value[ptr[cidx - is] + work[cidx - is]] = val;
 #endif
                     }
 #ifdef _COMPLEX
-					else
-					  {
-					    value[ptr[cidx-is]+work[cidx-is]] = re + im * _Complex_I;
-					  }
+                    else {
+                        value[ptr[cidx - is] + work[cidx - is]] = re + im * _Complex_I;
+                    }
 #endif
                     index[ptr[cidx - is] + work[cidx - is]] = ridx;
                     work[cidx - is]++;
@@ -883,20 +872,18 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
             if(ridx >= is && ridx < ie) {
                 if(mmtype == MM_REAL) {
 #ifdef _COMPLEX
-				    value[ptr[ridx-is]+work[ridx-is]] = re;
+                    value[ptr[ridx - is] + work[ridx - is]] = re;
 #else
                     value[ptr[ridx - is] + work[ridx - is]] = val;
 #endif
                 }
 #ifdef _COMPLEX
-				else if( mmstruct==MM_HERM )
-				  {
-				    value[ptr[ridx-is]+work[ridx-is]] = re - im * _Complex_I;
-				  }
-				else 
-				  {
-				    value[ptr[ridx-is]+work[ridx-is]] = re + im * _Complex_I;
-				  }
+                else if(mmstruct == MM_HERM) {
+                    value[ptr[ridx - is] + work[ridx - is]] = re - im * _Complex_I;
+                }
+                else {
+                    value[ptr[ridx - is] + work[ridx - is]] = re + im * _Complex_I;
+                }
 #endif
                 index[ptr[ridx - is] + work[ridx - is]] = cidx;
                 work[ridx - is]++;
@@ -904,7 +891,7 @@ LIS_INT lis_input_mm_csr(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, FILE* file, L
         }
     }
 #ifdef USE_MPI
-		MPI_Barrier(A->comm);
+    MPI_Barrier(A->comm);
 #endif
 
     err = lis_matrix_set_csr(ptr[n], ptr, index, value, A);

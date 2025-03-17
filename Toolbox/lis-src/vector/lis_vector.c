@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <math.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -162,7 +162,7 @@ LIS_INT lis_vector_set_size(LIS_VECTOR vec, LIS_INT local_n, LIS_INT global_n) {
         LIS_SETERR2(LIS_ERR_ILL_ARG, "local n(=%D) or global n(=%D) are less than 0\n", local_n, global_n);
         return LIS_ERR_ILL_ARG;
     }
-    //NEH
+    // NEH
     /*    if( local_n==0 && global_n==0 )*/
     /*    {*/
     /*        LIS_SETERR2(LIS_ERR_ILL_ARG,"local n(=%D) and global n(=%D) are 0\n",local_n,global_n);*/
@@ -177,32 +177,32 @@ LIS_INT lis_vector_set_size(LIS_VECTOR vec, LIS_INT local_n, LIS_INT global_n) {
     if(!precision) {
         vec->value = (LIS_SCALAR*)lis_malloc(local_n * sizeof(LIS_SCALAR), "lis_vector_set_size::vec->value");
         if(NULL == vec->value) {
-            LIS_SETERR_MEM(local_n*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(local_n * sizeof(LIS_SCALAR));
             return LIS_OUT_OF_MEMORY;
         }
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < local_n; i++) { vec->value[i] = 0.0; }
     }
     else {
         vec->value = (LIS_SCALAR*)lis_malloc((2 * local_n + local_n % 2) * sizeof(LIS_SCALAR), "lis_vector_set_size::vec->value");
         if(NULL == vec->value) {
-            LIS_SETERR_MEM((2*local_n+local_n%2)*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM((2 * local_n + local_n % 2) * sizeof(LIS_SCALAR));
             return LIS_OUT_OF_MEMORY;
         }
         vec->value_lo = vec->value + local_n + local_n % 2;
         vec->work = (LIS_SCALAR*)lis_malloc(32 * sizeof(LIS_SCALAR), "lis_vector_set_size::vec->work");
         if(NULL == vec->work) {
-            LIS_SETERR_MEM(32*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(32 * sizeof(LIS_SCALAR));
             return LIS_OUT_OF_MEMORY;
         }
 #ifdef USE_VEC_COMP
-		#pragma cdir nodep
-		#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < local_n; i++) {
             vec->value[i] = 0.0;
@@ -241,7 +241,7 @@ LIS_INT lis_vector_reuse(LIS_VECTOR* vec) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_vector_check(*vec,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(*vec, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     np = (*vec)->np;
@@ -250,7 +250,7 @@ LIS_INT lis_vector_reuse(LIS_VECTOR* vec) {
         if(!precision) {
             (*vec)->value = (LIS_SCALAR*)lis_malloc(np * sizeof(LIS_SCALAR), "lis_vector_reuse::vec->value");
             if(NULL == (*vec)->value) {
-                LIS_SETERR_MEM(np*sizeof(LIS_SCALAR));
+                LIS_SETERR_MEM(np * sizeof(LIS_SCALAR));
                 return LIS_OUT_OF_MEMORY;
             }
             (*vec)->is_copy = LIS_TRUE;
@@ -258,14 +258,14 @@ LIS_INT lis_vector_reuse(LIS_VECTOR* vec) {
         else {
             (*vec)->value = (LIS_SCALAR*)lis_malloc((2 * np + np % 2) * sizeof(LIS_SCALAR), "lis_vector_reuse::vec->value");
             if(NULL == (*vec)->value) {
-                LIS_SETERR_MEM((2*np+np%2)*sizeof(LIS_SCALAR));
+                LIS_SETERR_MEM((2 * np + np % 2) * sizeof(LIS_SCALAR));
                 return LIS_OUT_OF_MEMORY;
             }
             (*vec)->is_copy = LIS_TRUE;
             (*vec)->value_lo = (*vec)->value + np + np % 2;
             (*vec)->work = (LIS_SCALAR*)lis_malloc(32 * sizeof(LIS_SCALAR), "lis_vector_reuse::vec->work");
             if(NULL == (*vec)->work) {
-                LIS_SETERR_MEM(32*sizeof(LIS_SCALAR));
+                LIS_SETERR_MEM(32 * sizeof(LIS_SCALAR));
                 lis_vector_destroy(*vec);
                 *vec = NULL;
                 return LIS_OUT_OF_MEMORY;
@@ -287,7 +287,7 @@ LIS_INT lis_vector_unset(LIS_VECTOR vec) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_vector_check(vec,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(vec, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     if(vec->is_copy) lis_free(vec->value);
@@ -306,7 +306,7 @@ LIS_INT lis_vector_set(LIS_VECTOR vec, LIS_SCALAR* value) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_vector_check(vec,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(vec, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     if(vec->is_destroy) lis_free(vec->value);
@@ -362,7 +362,7 @@ LIS_INT lis_vector_duplicateex(LIS_INT precision, void* A, LIS_VECTOR* vout) {
     LIS_INT nprocs;
     LIS_INT i;
 #ifdef USE_MPI
-		LIS_INT *ranges;
+    LIS_INT* ranges;
 #endif
     LIS_SCALAR* value;
 
@@ -386,21 +386,21 @@ LIS_INT lis_vector_duplicateex(LIS_INT precision, void* A, LIS_VECTOR* vout) {
     if(!precision) {
         value = (LIS_SCALAR*)lis_malloc((np + pad) * sizeof(LIS_SCALAR), "lis_vector_duplicateex::value");
         if(NULL == value) {
-            LIS_SETERR_MEM((np+pad)*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM((np + pad) * sizeof(LIS_SCALAR));
             lis_vector_destroy(*vout);
             *vout = NULL;
             return LIS_OUT_OF_MEMORY;
         }
         (*vout)->value = value;
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < np + pad; i++) { (*vout)->value[i] = 0.0; }
     }
     else {
         value = (LIS_SCALAR*)lis_malloc((2 * (np + pad) + (np + pad) % 2) * sizeof(LIS_SCALAR), "lis_vector_duplicateex::value");
         if(NULL == value) {
-            LIS_SETERR_MEM((2*(np+pad) + (np+pad)%2)*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM((2 * (np + pad) + (np + pad) % 2) * sizeof(LIS_SCALAR));
             lis_vector_destroy(*vout);
             *vout = NULL;
             return LIS_OUT_OF_MEMORY;
@@ -409,17 +409,17 @@ LIS_INT lis_vector_duplicateex(LIS_INT precision, void* A, LIS_VECTOR* vout) {
         (*vout)->value_lo = value + np + pad + (np + pad) % 2;
         (*vout)->work = (LIS_SCALAR*)lis_malloc(32 * sizeof(LIS_SCALAR), "lis_vector_duplicateex::vout->work");
         if(NULL == (*vout)->work) {
-            LIS_SETERR_MEM(32*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(32 * sizeof(LIS_SCALAR));
             lis_vector_destroy(*vout);
             *vout = NULL;
             return LIS_OUT_OF_MEMORY;
         }
 #ifdef USE_VEC_COMP
-		#pragma cdir nodep
-		#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < np + pad; i++) {
             (*vout)->value[i] = 0.0;
@@ -428,16 +428,15 @@ LIS_INT lis_vector_duplicateex(LIS_INT precision, void* A, LIS_VECTOR* vout) {
     }
 
 #ifdef USE_MPI
-		ranges = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_vector_duplicateex::ranges" );
-		if( ranges==NULL )
-		{
-			LIS_SETERR_MEM((nprocs+1)*sizeof(LIS_INT));
-			lis_vector_destroy(*vout);
-			*vout = NULL;
-			return LIS_OUT_OF_MEMORY;
-		}
-		for(i=0;i<nprocs+1;i++) ranges[i] = ((LIS_VECTOR)A)->ranges[i];
-		(*vout)->ranges      = ranges;
+    ranges = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_vector_duplicateex::ranges");
+    if(ranges == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * sizeof(LIS_INT));
+        lis_vector_destroy(*vout);
+        *vout = NULL;
+        return LIS_OUT_OF_MEMORY;
+    }
+    for(i = 0; i < nprocs + 1; i++) ranges[i] = ((LIS_VECTOR)A)->ranges[i];
+    (*vout)->ranges = ranges;
 #else
     (*vout)->ranges = NULL;
 #endif
@@ -486,7 +485,7 @@ LIS_INT lis_vector_set_value0(LIS_INT flag, LIS_INT i, LIS_SCALAR value, LIS_VEC
     if(v->status == LIS_VECTOR_NULL) {
         v->value = (LIS_SCALAR*)lis_malloc(np * sizeof(LIS_SCALAR), "lis_vector_set_value::v->value");
         if(NULL == v->value) {
-            LIS_SETERR_MEM(np*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(np * sizeof(LIS_SCALAR));
             return LIS_OUT_OF_MEMORY;
         }
         v->is_copy = LIS_TRUE;
@@ -523,7 +522,7 @@ LIS_INT lis_vector_set_value(LIS_INT flag, LIS_INT i, LIS_SCALAR value, LIS_VECT
     if(v->status == LIS_VECTOR_NULL) {
         v->value = (LIS_SCALAR*)lis_malloc(np * sizeof(LIS_SCALAR), "lis_vector_set_value::v->value");
         if(NULL == v->value) {
-            LIS_SETERR_MEM(np*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(np * sizeof(LIS_SCALAR));
             return LIS_OUT_OF_MEMORY;
         }
         v->is_copy = LIS_TRUE;
@@ -549,7 +548,7 @@ LIS_INT lis_vector_set_values(LIS_INT flag, LIS_INT count, LIS_INT index[], LIS_
     if(v->status == LIS_VECTOR_NULL) {
         v->value = (LIS_SCALAR*)lis_malloc(np * sizeof(LIS_SCALAR), "lis_vector_set_values::v->value");
         if(NULL == v->value) {
-            LIS_SETERR_MEM(np*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(np * sizeof(LIS_SCALAR));
             return LIS_OUT_OF_MEMORY;
         }
         v->is_copy = LIS_TRUE;
@@ -608,7 +607,7 @@ LIS_INT lis_vector_set_values2(LIS_INT flag, LIS_INT start, LIS_INT count, LIS_S
     if(v->status == LIS_VECTOR_NULL) {
         v->value = (LIS_SCALAR*)lis_malloc(np * sizeof(LIS_SCALAR), "lis_vector_set_values::v->value");
         if(NULL == v->value) {
-            LIS_SETERR_MEM(np*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(np * sizeof(LIS_SCALAR));
             return LIS_OUT_OF_MEMORY;
         }
         v->is_copy = LIS_TRUE;
@@ -661,7 +660,7 @@ LIS_INT lis_vector_get_size(LIS_VECTOR v, LIS_INT* local_n, LIS_INT* global_n) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_vector_check(v,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(v, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     *local_n = v->n;
@@ -679,7 +678,7 @@ LIS_INT lis_vector_get_range(LIS_VECTOR v, LIS_INT* is, LIS_INT* ie) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_vector_check(v,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(v, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     *is = v->is;
@@ -697,7 +696,7 @@ LIS_INT lis_vector_get_value(LIS_VECTOR v, LIS_INT i, LIS_SCALAR* value) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_vector_check(v,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(v, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     is = v->is;
@@ -726,7 +725,7 @@ LIS_INT lis_vector_get_values(LIS_VECTOR v, LIS_INT start, LIS_INT count, LIS_SC
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_vector_check(v,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(v, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     n = v->n;
@@ -754,46 +753,43 @@ LIS_INT lis_vector_get_values(LIS_VECTOR v, LIS_INT start, LIS_INT count, LIS_SC
 
 LIS_INT lis_vector_print(LIS_VECTOR x) {
 #ifdef USE_MPI
-	LIS_INT err,i,ii,is,n,k,nprocs,my_rank;
+    LIS_INT err, i, ii, is, n, k, nprocs, my_rank;
 
-	err = lis_vector_check(x,LIS_VECTOR_CHECK_NULL);
-	if( err ) return err;
+    err = lis_vector_check(x, LIS_VECTOR_CHECK_NULL);
+    if(err) return err;
 
-	nprocs  = x->nprocs;
-	my_rank = x->my_rank;
-	n       = x->n;
-	is      = x->is;
+    nprocs = x->nprocs;
+    my_rank = x->my_rank;
+    n = x->n;
+    is = x->is;
 
-	for(k=0;k<nprocs;k++)
-	{
-		if( k==my_rank )
-		{
-			for(i=0;i<n;i++)
-			{
-				ii = i+is;
-				if( x->origin ) ii++;
+    for(k = 0; k < nprocs; k++) {
+        if(k == my_rank) {
+            for(i = 0; i < n; i++) {
+                ii = i + is;
+                if(x->origin) ii++;
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-				printf("%6lld  (%e, %e)\n",ii,(double)creal(x->value[i]),(double)cimag(x->value[i]));
+                printf("%6lld  (%e, %e)\n", ii, (double)creal(x->value[i]), (double)cimag(x->value[i]));
 #else
-				printf("%6d  (%e, %e)\n",ii,(double)creal(x->value[i]),(double)cimag(x->value[i]));
+                printf("%6d  (%e, %e)\n", ii, (double)creal(x->value[i]), (double)cimag(x->value[i]));
 #endif
 #else
 #ifdef _LONG__LONG
-				printf("%6lld  %e\n",ii,(double)x->value[i]);
+                printf("%6lld  %e\n", ii, (double)x->value[i]);
 #else
-				printf("%6d  %e\n",ii,(double)x->value[i]);
+                printf("%6d  %e\n", ii, (double)x->value[i]);
 #endif
 #endif
-			}
-		}
-		MPI_Barrier(x->comm);
-	}
-	return LIS_SUCCESS;
+            }
+        }
+        MPI_Barrier(x->comm);
+    }
+    return LIS_SUCCESS;
 #else
     LIS_INT err, i, ii, n;
 
-    err = lis_vector_check(x,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(x, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     n = x->n;
@@ -804,13 +800,13 @@ LIS_INT lis_vector_print(LIS_VECTOR x) {
         if(x->precision == LIS_PRECISION_DEFAULT) {
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-			printf("%6lld  (%e, %e)\n",ii,(double)creal(x->value[i]),(double)cimag(x->value[i]));
+            printf("%6lld  (%e, %e)\n", ii, (double)creal(x->value[i]), (double)cimag(x->value[i]));
 #else
-			printf("%6d  (%e, %e)\n",ii,(double)creal(x->value[i]),(double)cimag(x->value[i]));
+            printf("%6d  (%e, %e)\n", ii, (double)creal(x->value[i]), (double)cimag(x->value[i]));
 #endif
 #else
 #ifdef _LONG__LONG
-			printf("%6lld  %e\n",ii,(double)x->value[i]);
+            printf("%6lld  %e\n", ii, (double)x->value[i]);
 #else
             printf("%6d  %e\n", ii, (double)x->value[i]);
 #endif
@@ -819,13 +815,13 @@ LIS_INT lis_vector_print(LIS_VECTOR x) {
         else {
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-			printf("%6lld  %e,%e\n",ii,(double)creal(x->value[i]),(double)x->value_lo[i]);
+            printf("%6lld  %e,%e\n", ii, (double)creal(x->value[i]), (double)x->value_lo[i]);
 #else
-			printf("%6d  %e,%e\n",ii,(double)creal(x->value[i]),(double)x->value_lo[i]);
+            printf("%6d  %e,%e\n", ii, (double)creal(x->value[i]), (double)x->value_lo[i]);
 #endif
 #else
 #ifdef _LONG__LONG
-			printf("%6lld  %e,%e\n",ii,(double)x->value[i],(double)x->value_lo[i]);
+            printf("%6lld  %e,%e\n", ii, (double)x->value[i], (double)x->value_lo[i]);
 #else
             printf("%6d  %e,%e\n", ii, (double)x->value[i], (double)x->value_lo[i]);
 #endif
@@ -842,59 +838,55 @@ LIS_INT lis_vector_print(LIS_VECTOR x) {
 
 LIS_INT lis_vector_scatter(LIS_SCALAR value[], LIS_VECTOR v) {
 #ifdef USE_MPI
-	LIS_INT err,i,is,n,nprocs,my_rank,*sendcounts;
+    LIS_INT err, i, is, n, nprocs, my_rank, *sendcounts;
 
-	err = lis_vector_check(v,LIS_VECTOR_CHECK_NULL);
-	if( err ) return err;
+    err = lis_vector_check(v, LIS_VECTOR_CHECK_NULL);
+    if(err) return err;
 
-	nprocs  = v->nprocs;
-	my_rank = v->my_rank;
-	n       = v->n;
-	is      = v->is;
+    nprocs = v->nprocs;
+    my_rank = v->my_rank;
+    n = v->n;
+    is = v->is;
 
-	sendcounts = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_vector_scatter::sendcounts" );
+    sendcounts = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_vector_scatter::sendcounts");
 
-	for(i=0; i<nprocs; i++)
-	{
-	  sendcounts[i] = v->ranges[i+1] - v->ranges[i];
-	}
+    for(i = 0; i < nprocs; i++) {
+        sendcounts[i] = v->ranges[i + 1] - v->ranges[i];
+    }
 
-	if(my_rank == 0) 
-	{
-	  MPI_Scatterv(&value[0],sendcounts,v->ranges,LIS_MPI_SCALAR,MPI_IN_PLACE,n,LIS_MPI_SCALAR,0,v->comm);
-	}
-	else
-	{
-	  MPI_Scatterv(&value[0],sendcounts,v->ranges,LIS_MPI_SCALAR,&value[is],n,LIS_MPI_SCALAR,0,v->comm);
-	}
+    if(my_rank == 0) {
+        MPI_Scatterv(&value[0], sendcounts, v->ranges, LIS_MPI_SCALAR, MPI_IN_PLACE, n, LIS_MPI_SCALAR, 0, v->comm);
+    }
+    else {
+        MPI_Scatterv(&value[0], sendcounts, v->ranges, LIS_MPI_SCALAR, &value[is], n, LIS_MPI_SCALAR, 0, v->comm);
+    }
 
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
-	for(i=0; i<n; i++)
-	{
-	  v->value[i] = value[i+is];
-	}
+    for(i = 0; i < n; i++) {
+        v->value[i] = value[i + is];
+    }
 
-	return LIS_SUCCESS;
+    return LIS_SUCCESS;
 #else
     LIS_INT err, i, n;
 
-    err = lis_vector_check(v,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(v, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     n = v->n;
 
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { v->value[i] = value[i]; }
 
@@ -907,48 +899,46 @@ LIS_INT lis_vector_scatter(LIS_SCALAR value[], LIS_VECTOR v) {
 
 LIS_INT lis_vector_gather(LIS_VECTOR v, LIS_SCALAR value[]) {
 #ifdef USE_MPI
-	LIS_INT err,i,is,n,nprocs,*recvcounts;
+    LIS_INT err, i, is, n, nprocs, *recvcounts;
 
-	err = lis_vector_check(v,LIS_VECTOR_CHECK_NULL);
-	if( err ) return err;
+    err = lis_vector_check(v, LIS_VECTOR_CHECK_NULL);
+    if(err) return err;
 
-	nprocs  = v->nprocs;
-	n       = v->n;
-	is      = v->is;
+    nprocs = v->nprocs;
+    n = v->n;
+    is = v->is;
 
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
-	for(i=0; i<n; i++)
-	{
-	  value[i+is] = v->value[i];
-	}
-	recvcounts = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_vector_gather::recvcounts" );
-	for(i=0; i<nprocs; i++)
-	{
-	  recvcounts[i] = v->ranges[i+1] - v->ranges[i];
-	}
-	MPI_Allgatherv(MPI_IN_PLACE,n,LIS_MPI_SCALAR,&value[0],recvcounts,v->ranges,LIS_MPI_SCALAR,v->comm);
+    for(i = 0; i < n; i++) {
+        value[i + is] = v->value[i];
+    }
+    recvcounts = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_vector_gather::recvcounts");
+    for(i = 0; i < nprocs; i++) {
+        recvcounts[i] = v->ranges[i + 1] - v->ranges[i];
+    }
+    MPI_Allgatherv(MPI_IN_PLACE, n, LIS_MPI_SCALAR, &value[0], recvcounts, v->ranges, LIS_MPI_SCALAR, v->comm);
 
-	return LIS_SUCCESS;
+    return LIS_SUCCESS;
 #else
     LIS_INT err, i, n;
 
-    err = lis_vector_check(v,LIS_VECTOR_CHECK_NULL);
+    err = lis_vector_check(v, LIS_VECTOR_CHECK_NULL);
     if(err) return err;
 
     n = v->n;
 
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { value[i] = v->value[i]; }
 

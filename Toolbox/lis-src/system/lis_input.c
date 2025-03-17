@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,26 +25,26 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include <ctype.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -73,12 +73,12 @@ LIS_INT lis_input(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, char* filename) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
     if(b != NULL && x != NULL) {
-        err = lis_vector_check(b,LIS_VECTOR_CHECK_NULL);
+        err = lis_vector_check(b, LIS_VECTOR_CHECK_NULL);
         if(err) return err;
-        err = lis_vector_check(x,LIS_VECTOR_CHECK_NULL);
+        err = lis_vector_check(x, LIS_VECTOR_CHECK_NULL);
         if(err) return err;
     }
 
@@ -150,7 +150,7 @@ LIS_INT lis_input(LIS_MATRIX A, LIS_VECTOR b, LIS_VECTOR x, char* filename) {
     }
     fclose(file);
 #ifdef USE_MPI
-	MPI_Barrier(A->comm);
+    MPI_Barrier(A->comm);
 #endif
 
     LIS_DEBUG_FUNC_OUT;
@@ -165,7 +165,7 @@ LIS_INT lis_input_matrix(LIS_MATRIX A, char* filename) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_input(A,NULL,NULL, filename);
+    err = lis_input(A, NULL, NULL, filename);
     if(err) return err;
 
     LIS_DEBUG_FUNC_OUT;
@@ -216,7 +216,7 @@ LIS_INT lis_input_vector(LIS_VECTOR v, char* filename) {
     }
     fclose(file);
 #ifdef USE_MPI
-	MPI_Barrier(comm);
+    MPI_Barrier(comm);
 #endif
     return err;
 }
@@ -258,15 +258,13 @@ LIS_INT lis_input_vector_mm(LIS_VECTOR v, FILE* file) {
     }
     if(strncmp(dtype, MM_TYPE_REAL, strlen(MM_TYPE_REAL)) == 0) { mmtype = MM_REAL; }
 #ifdef _COMPLEX
-	else if( strncmp(dtype, MM_TYPE_COMPLEX, strlen(MM_TYPE_COMPLEX))==0 )
-	{
-		mmtype = MM_COMPLEX;
-	}
-	else
-	{
-		LIS_SETERR(LIS_ERR_FILE_IO,"Not real or complex\n");
-		return LIS_ERR_FILE_IO;
-	}
+    else if(strncmp(dtype, MM_TYPE_COMPLEX, strlen(MM_TYPE_COMPLEX)) == 0) {
+        mmtype = MM_COMPLEX;
+    }
+    else {
+        LIS_SETERR(LIS_ERR_FILE_IO, "Not real or complex\n");
+        return LIS_ERR_FILE_IO;
+    }
 #else
     else {
         LIS_SETERR(LIS_ERR_FILE_IO, "Not real\n");
@@ -285,10 +283,9 @@ LIS_INT lis_input_vector_mm(LIS_VECTOR v, FILE* file) {
             LIS_SETERR_FIO;
             return LIS_ERR_FILE_IO;
         }
-    }
-    while(buf[0] == '%');
+    } while(buf[0] == '%');
 #ifdef _LONG__LONG
-	if( sscanf(buf, "%lld", &n) != 1 )
+    if(sscanf(buf, "%lld", &n) != 1)
 #else
     if(sscanf(buf, "%d", &n) != 1)
 #endif
@@ -309,13 +306,13 @@ LIS_INT lis_input_vector_mm(LIS_VECTOR v, FILE* file) {
         }
 #ifdef _COMPLEX
 #ifdef _LONG__LONG
-		if( mmtype==MM_REAL && sscanf(buf, "%lld %lg", &idx, &re) != 2 )
+        if(mmtype == MM_REAL && sscanf(buf, "%lld %lg", &idx, &re) != 2)
 #else
-		if( mmtype==MM_REAL && sscanf(buf, "%d %lg", &idx, &re) != 2 )
+        if(mmtype == MM_REAL && sscanf(buf, "%d %lg", &idx, &re) != 2)
 #endif
 #else
 #ifdef _LONG__LONG
-		if( mmtype==MM_REAL && sscanf(buf, "%lld %lg", &idx, &val) != 2 )
+        if(mmtype == MM_REAL && sscanf(buf, "%lld %lg", &idx, &val) != 2)
 #else
         if(mmtype == MM_REAL && sscanf(buf, "%d %lg", &idx, &val) != 2)
 #endif
@@ -325,7 +322,7 @@ LIS_INT lis_input_vector_mm(LIS_VECTOR v, FILE* file) {
             return LIS_ERR_FILE_IO;
         }
 #ifdef _LONG__LONG
-		if( mmtype==MM_COMPLEX && sscanf(buf, "%lld %lg %lg", &idx, &re, &im) != 3 )
+        if(mmtype == MM_COMPLEX && sscanf(buf, "%lld %lg %lg", &idx, &re, &im) != 3)
 #else
         if(mmtype == MM_COMPLEX && sscanf(buf, "%d %lg %lg", &idx, &re, &im) != 3)
 #endif
@@ -338,16 +335,15 @@ LIS_INT lis_input_vector_mm(LIS_VECTOR v, FILE* file) {
         if(idx >= is && idx < ie) {
             if(mmtype == MM_REAL) {
 #ifdef _COMPLEX
-				v->value[idx-is] = re;
+                v->value[idx - is] = re;
 #else
                 v->value[idx - is] = val;
 #endif
             }
 #ifdef _COMPLEX
-			else
-			{
-				v->value[idx-is] = re + im * _Complex_I;
-			}	  
+            else {
+                v->value[idx - is] = re + im * _Complex_I;
+            }
 #endif
         }
     }
@@ -369,8 +365,7 @@ LIS_INT lis_input_vector_plain(LIS_VECTOR v, FILE* file) {
     do {
         err = fscanf(file, "%lg", &val);
         if(err == 1) n++;
-    }
-    while(err == 1);
+    } while(err == 1);
     rewind(file);
 
     /* read data */
@@ -459,10 +454,10 @@ LIS_INT lis_input_vector_lis_ascii(LIS_VECTOR v, FILE* file) {
 
     comm = v->comm;
 #ifdef USE_MPI
-	MPI_Comm_size(comm,&int_nprocs);
-	MPI_Comm_rank(comm,&int_my_rank);
-	nprocs = int_nprocs;
-	my_rank = int_my_rank;
+    MPI_Comm_size(comm, &int_nprocs);
+    MPI_Comm_rank(comm, &int_my_rank);
+    nprocs = int_nprocs;
+    my_rank = int_my_rank;
 #else
     nprocs = 1;
     my_rank = 0;
@@ -473,7 +468,7 @@ LIS_INT lis_input_vector_lis_ascii(LIS_VECTOR v, FILE* file) {
         return LIS_ERR_FILE_IO;
     }
 #ifdef _LONG__LONG
-	if( sscanf(cbuf, "%lld",&ibuf[0])!=1 )
+    if(sscanf(cbuf, "%lld", &ibuf[0]) != 1)
 #else
     if(sscanf(cbuf, "%d", &ibuf[0]) != 1)
 #endif
@@ -493,7 +488,7 @@ LIS_INT lis_input_vector_lis_ascii(LIS_VECTOR v, FILE* file) {
         }
         if(cbuf[0] == '#') {
 #ifdef _LONG__LONG
-			if( sscanf(cbuf, "%c %lld %lld",&c, &pe, &ibuf[1])!=3 )
+            if(sscanf(cbuf, "%c %lld %lld", &c, &pe, &ibuf[1]) != 3)
 #else
             if(sscanf(cbuf, "%c %d %d", &c, &pe, &ibuf[1]) != 3)
 #endif
@@ -502,8 +497,7 @@ LIS_INT lis_input_vector_lis_ascii(LIS_VECTOR v, FILE* file) {
                 return LIS_ERR_FILE_IO;
             }
         }
-    }
-    while(pe != my_rank);
+    } while(pe != my_rank);
 
     n = ibuf[1];
     err = lis_vector_set_size(v, 0, n);

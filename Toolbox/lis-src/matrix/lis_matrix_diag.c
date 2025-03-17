@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -92,7 +92,7 @@ LIS_INT lis_matrix_diag_create(LIS_INT local_n, LIS_INT global_n, LIS_Comm comm,
     LIS_INT is, ie;
     LIS_INT* ranges;
 #ifdef USE_MPI
-		LIS_INT i;
+    LIS_INT i;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -120,16 +120,15 @@ LIS_INT lis_matrix_diag_create(LIS_INT local_n, LIS_INT global_n, LIS_Comm comm,
     lis_matrix_diag_init(D);
 
 #ifdef USE_MPI
-		MPI_Comm_size(comm,&nprocs);
-		MPI_Comm_rank(comm,&my_rank);
-		ranges = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_matrix_diag_create::ranges" );
-		if( ranges==NULL )
-		{
-			LIS_SETERR_MEM((nprocs+1)*sizeof(LIS_INT));
-			lis_matrix_diag_destroy(*D);
-			*D = NULL;
-			return LIS_OUT_OF_MEMORY;
-		}
+    MPI_Comm_size(comm, &nprocs);
+    MPI_Comm_rank(comm, &my_rank);
+    ranges = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_matrix_diag_create::ranges");
+    if(ranges == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * sizeof(LIS_INT));
+        lis_matrix_diag_destroy(*D);
+        *D = NULL;
+        return LIS_OUT_OF_MEMORY;
+    }
 #else
     nprocs = 1;
     my_rank = 0;
@@ -137,17 +136,17 @@ LIS_INT lis_matrix_diag_create(LIS_INT local_n, LIS_INT global_n, LIS_Comm comm,
 #endif
 
 #ifdef USE_MPI
-		MPI_Allreduce(&local_n,&i,1,LIS_MPI_INT,MPI_SUM,comm);
-		if( i==0 )
+    MPI_Allreduce(&local_n, &i, 1, LIS_MPI_INT, MPI_SUM, comm);
+    if(i == 0)
 #else
     if(local_n == 0)
 #endif
     {
 #ifdef USE_MPI
-			LIS_GET_ISIE(my_rank,nprocs,global_n,is,ie);
-			local_n = ie-is;
-			MPI_Allgather(&ie,1,LIS_MPI_INT,&ranges[1],1,LIS_MPI_INT,comm);
-			ranges[0] = 0;
+        LIS_GET_ISIE(my_rank, nprocs, global_n, is, ie);
+        local_n = ie - is;
+        MPI_Allgather(&ie, 1, LIS_MPI_INT, &ranges[1], 1, LIS_MPI_INT, comm);
+        ranges[0] = 0;
 #else
         local_n = global_n;
         is = 0;
@@ -156,15 +155,14 @@ LIS_INT lis_matrix_diag_create(LIS_INT local_n, LIS_INT global_n, LIS_Comm comm,
     }
     else {
 #ifdef USE_MPI
-			MPI_Allgather(&local_n,1,LIS_MPI_INT,&ranges[1],1,LIS_MPI_INT,comm);
-			ranges[0] = 0;
-			for(i=0;i<nprocs;i++)
-			{
-				ranges[i+1] += ranges[i];
-			}
-			global_n = ranges[nprocs];
-			is       = ranges[my_rank];
-			ie       = ranges[my_rank+1];
+        MPI_Allgather(&local_n, 1, LIS_MPI_INT, &ranges[1], 1, LIS_MPI_INT, comm);
+        ranges[0] = 0;
+        for(i = 0; i < nprocs; i++) {
+            ranges[i + 1] += ranges[i];
+        }
+        global_n = ranges[nprocs];
+        is = ranges[my_rank];
+        ie = ranges[my_rank + 1];
 #else
         global_n = local_n;
         is = 0;
@@ -175,7 +173,7 @@ LIS_INT lis_matrix_diag_create(LIS_INT local_n, LIS_INT global_n, LIS_Comm comm,
 
     (*D)->value = (LIS_SCALAR*)lis_malloc(local_n * sizeof(LIS_SCALAR), "lis_matrix_diag_create::D->value");
     if(NULL == (*D)->value) {
-        LIS_SETERR_MEM(local_n*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(local_n * sizeof(LIS_SCALAR));
         lis_matrix_diag_destroy(*D);
         *D = NULL;
         return LIS_OUT_OF_MEMORY;
@@ -206,7 +204,9 @@ LIS_INT lis_matrix_diag_destroy(LIS_MATRIX_DIAG D) {
         if(D->value) lis_free(D->value);
         if(D->work) lis_free(D->work);
         if(D->bns) {
-            for(i = 0; i < D->nr; i++) { if(D->v_value[i]) free(D->v_value[i]); }
+            for(i = 0; i < D->nr; i++) {
+                if(D->v_value[i]) free(D->v_value[i]);
+            }
             lis_free2(2, D->bns, D->v_value);
         }
         if(D->ptr) lis_free(D->ptr);
@@ -226,12 +226,12 @@ LIS_INT lis_matrix_diag_duplicate(LIS_MATRIX_DIAG Din, LIS_MATRIX_DIAG* Dout) {
     LIS_INT nprocs;
     LIS_INT i;
 #ifdef USE_MPI
-		LIS_INT *ranges;
+    LIS_INT* ranges;
 #endif
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_diag_check(Din,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_diag_check(Din, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
     nprocs = Din->nprocs;
@@ -245,16 +245,15 @@ LIS_INT lis_matrix_diag_duplicate(LIS_MATRIX_DIAG Din, LIS_MATRIX_DIAG* Dout) {
     lis_matrix_diag_init(Dout);
 
 #ifdef USE_MPI
-		ranges = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_matrix_diag_duplicate::ranges" );
-		if( ranges==NULL )
-		{
-			LIS_SETERR_MEM((nprocs+1)*sizeof(LIS_INT));
-			lis_matrix_diag_destroy(*Dout);
-			*Dout = NULL;
-			return LIS_OUT_OF_MEMORY;
-		}
-		for(i=0;i<nprocs+1;i++) ranges[i] = Din->ranges[i];
-		(*Dout)->ranges      = ranges;
+    ranges = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_matrix_diag_duplicate::ranges");
+    if(ranges == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * sizeof(LIS_INT));
+        lis_matrix_diag_destroy(*Dout);
+        *Dout = NULL;
+        return LIS_OUT_OF_MEMORY;
+    }
+    for(i = 0; i < nprocs + 1; i++) ranges[i] = Din->ranges[i];
+    (*Dout)->ranges = ranges;
 #else
     (*Dout)->ranges = NULL;
 #endif
@@ -262,7 +261,7 @@ LIS_INT lis_matrix_diag_duplicate(LIS_MATRIX_DIAG Din, LIS_MATRIX_DIAG* Dout) {
     if(Din->bns == NULL) {
         (*Dout)->value = (LIS_SCALAR*)lis_malloc(Din->bn * Din->bn * Din->nr * sizeof(LIS_SCALAR), "lis_matrix_diag_duplicate::Dout->value");
         if(NULL == (*Dout)->value) {
-            LIS_SETERR_MEM(Din->bn*Din->bn*Din->nr*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(Din->bn * Din->bn * Din->nr * sizeof(LIS_SCALAR));
             lis_matrix_diag_destroy(*Dout);
             *Dout = NULL;
             return LIS_OUT_OF_MEMORY;
@@ -273,14 +272,14 @@ LIS_INT lis_matrix_diag_duplicate(LIS_MATRIX_DIAG Din, LIS_MATRIX_DIAG* Dout) {
         nr = Din->nr;
         (*Dout)->bns = (LIS_INT*)lis_malloc(nr * sizeof(LIS_INT), "lis_matrix_diag_duplicate::Dout->bns");
         if(NULL == (*Dout)->bns) {
-            LIS_SETERR_MEM(nr*sizeof(LIS_INT));
+            LIS_SETERR_MEM(nr * sizeof(LIS_INT));
             lis_matrix_diag_destroy(*Dout);
             *Dout = NULL;
             return LIS_OUT_OF_MEMORY;
         }
         (*Dout)->v_value = (LIS_SCALAR**)lis_malloc(nr * sizeof(LIS_SCALAR*), "lis_matrix_diag_duplicate::Dout->value");
         if(NULL == (*Dout)->v_value) {
-            LIS_SETERR_MEM(nr*sizeof(LIS_SCALAR *));
+            LIS_SETERR_MEM(nr * sizeof(LIS_SCALAR*));
             lis_matrix_diag_destroy(*Dout);
             *Dout = NULL;
             return LIS_OUT_OF_MEMORY;
@@ -319,12 +318,12 @@ LIS_INT lis_matrix_diag_duplicateM(LIS_MATRIX Ain, LIS_MATRIX_DIAG* Dout) {
     LIS_INT nprocs;
     LIS_INT i, k, t, bnmax;
 #ifdef USE_MPI
-		LIS_INT *ranges;
+    LIS_INT* ranges;
 #endif
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(Ain,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(Ain, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
     nprocs = Ain->nprocs;
@@ -338,16 +337,15 @@ LIS_INT lis_matrix_diag_duplicateM(LIS_MATRIX Ain, LIS_MATRIX_DIAG* Dout) {
     lis_matrix_diag_init(Dout);
 
 #ifdef USE_MPI
-		ranges = (LIS_INT *)lis_malloc( (nprocs+1)*sizeof(LIS_INT),"lis_matrix_diag_duplicateM::ranges" );
-		if( ranges==NULL )
-		{
-			LIS_SETERR_MEM((nprocs+1)*sizeof(LIS_INT));
-			lis_matrix_diag_destroy(*Dout);
-			*Dout = NULL;
-			return LIS_OUT_OF_MEMORY;
-		}
-		for(i=0;i<nprocs+1;i++) ranges[i] = Ain->ranges[i];
-		(*Dout)->ranges      = ranges;
+    ranges = (LIS_INT*)lis_malloc((nprocs + 1) * sizeof(LIS_INT), "lis_matrix_diag_duplicateM::ranges");
+    if(ranges == NULL) {
+        LIS_SETERR_MEM((nprocs + 1) * sizeof(LIS_INT));
+        lis_matrix_diag_destroy(*Dout);
+        *Dout = NULL;
+        return LIS_OUT_OF_MEMORY;
+    }
+    for(i = 0; i < nprocs + 1; i++) ranges[i] = Ain->ranges[i];
+    (*Dout)->ranges = ranges;
 #else
     (*Dout)->ranges = NULL;
 #endif
@@ -358,7 +356,7 @@ LIS_INT lis_matrix_diag_duplicateM(LIS_MATRIX Ain, LIS_MATRIX_DIAG* Dout) {
         k = Ain->nr * Ain->bnr * Ain->bnc;
         (*Dout)->value = (LIS_SCALAR*)lis_malloc(k * sizeof(LIS_SCALAR), "lis_matrix_diag_duplicateM::Dout->value");
         if(NULL == (*Dout)->value) {
-            LIS_SETERR_MEM(k*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(k * sizeof(LIS_SCALAR));
             lis_matrix_diag_destroy(*Dout);
             *Dout = NULL;
             return LIS_OUT_OF_MEMORY;
@@ -370,14 +368,14 @@ LIS_INT lis_matrix_diag_duplicateM(LIS_MATRIX Ain, LIS_MATRIX_DIAG* Dout) {
         nr = Ain->nr;
         (*Dout)->bns = (LIS_INT*)lis_malloc(nr * sizeof(LIS_INT), "lis_matrix_diag_duplicateM::Dout->bns");
         if(NULL == (*Dout)->bns) {
-            LIS_SETERR_MEM(nr*sizeof(LIS_INT));
+            LIS_SETERR_MEM(nr * sizeof(LIS_INT));
             lis_matrix_diag_destroy(*Dout);
             *Dout = NULL;
             return LIS_OUT_OF_MEMORY;
         }
         (*Dout)->v_value = (LIS_SCALAR**)lis_malloc(nr * sizeof(LIS_SCALAR*), "lis_matrix_diag_duplicateM::Dout->value");
         if(NULL == (*Dout)->v_value) {
-            LIS_SETERR_MEM(nr*sizeof(LIS_SCALAR *));
+            LIS_SETERR_MEM(nr * sizeof(LIS_SCALAR*));
             lis_matrix_diag_destroy(*Dout);
             *Dout = NULL;
             return LIS_OUT_OF_MEMORY;
@@ -395,7 +393,7 @@ LIS_INT lis_matrix_diag_duplicateM(LIS_MATRIX Ain, LIS_MATRIX_DIAG* Dout) {
     default:
         (*Dout)->value = (LIS_SCALAR*)lis_malloc(Ain->np * sizeof(LIS_SCALAR), "lis_matrix_diag_duplicateM::Dout->value");
         if(NULL == (*Dout)->value) {
-            LIS_SETERR_MEM(Ain->np*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(Ain->np * sizeof(LIS_SCALAR));
             lis_matrix_diag_destroy(*Dout);
             *Dout = NULL;
             return LIS_OUT_OF_MEMORY;
@@ -427,7 +425,7 @@ LIS_INT lis_matrix_diag_mallocM(LIS_MATRIX A, LIS_SCALAR** diag) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_check(A,LIS_MATRIX_CHECK_ALL);
+    err = lis_matrix_check(A, LIS_MATRIX_CHECK_ALL);
     if(err) return err;
 
     switch(A->matrix_type) {
@@ -435,7 +433,7 @@ LIS_INT lis_matrix_diag_mallocM(LIS_MATRIX A, LIS_SCALAR** diag) {
         k = A->nr * A->bnr * A->bnc;
         *diag = (LIS_SCALAR*)lis_malloc(k * sizeof(LIS_SCALAR), "lis_matrix_diag_mallocM::diag");
         if(NULL == *diag) {
-            LIS_SETERR_MEM(k*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(k * sizeof(LIS_SCALAR));
             *diag = NULL;
             return LIS_OUT_OF_MEMORY;
         }
@@ -443,7 +441,7 @@ LIS_INT lis_matrix_diag_mallocM(LIS_MATRIX A, LIS_SCALAR** diag) {
     default:
         *diag = (LIS_SCALAR*)lis_malloc(A->n * sizeof(LIS_SCALAR), "lis_matrix_diag_mallocM::diag");
         if(NULL == *diag) {
-            LIS_SETERR_MEM(A->n*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(A->n * sizeof(LIS_SCALAR));
             *diag = NULL;
             return LIS_OUT_OF_MEMORY;
         }
@@ -462,7 +460,7 @@ LIS_INT lis_matrix_diag_get_range(LIS_MATRIX_DIAG D, LIS_INT* is, LIS_INT* ie) {
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_diag_check(D,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_diag_check(D, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     *is = D->is;
@@ -480,7 +478,7 @@ LIS_INT lis_matrix_diag_get_size(LIS_MATRIX_DIAG D, LIS_INT* local_n, LIS_INT* g
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_diag_check(D,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_diag_check(D, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     *local_n = D->n;
@@ -500,7 +498,7 @@ LIS_INT lis_matrix_diag_set_blocksize(LIS_MATRIX_DIAG D, LIS_INT bn, LIS_INT* bn
 
     LIS_DEBUG_FUNC_IN;
 
-    err = lis_matrix_diag_check(D,LIS_MATRIX_CHECK_NULL);
+    err = lis_matrix_diag_check(D, LIS_MATRIX_CHECK_NULL);
     if(err) return err;
 
     n = D->n;
@@ -508,7 +506,7 @@ LIS_INT lis_matrix_diag_set_blocksize(LIS_MATRIX_DIAG D, LIS_INT bn, LIS_INT* bn
         nr = 1 + (n - 1) / bn;
         diag = (LIS_SCALAR*)lis_malloc(bn * bn * nr * sizeof(LIS_SCALAR), "lis_matrix_diag_set_blocksize::diag");
         if(NULL == diag) {
-            LIS_SETERR_MEM(bn*bn*nr*sizeof(LIS_SCALAR));
+            LIS_SETERR_MEM(bn * bn * nr * sizeof(LIS_SCALAR));
             return LIS_OUT_OF_MEMORY;
         }
         lis_free(D->value);
@@ -521,14 +519,14 @@ LIS_INT lis_matrix_diag_set_blocksize(LIS_MATRIX_DIAG D, LIS_INT bn, LIS_INT* bn
             lis_free(D->value);
             D->bns = (LIS_INT*)lis_malloc(bn * sizeof(LIS_INT), "lis_matrix_diag_duplicateM::Dout->bns");
             if(NULL == D->bns) {
-                LIS_SETERR_MEM(bn*sizeof(LIS_INT));
+                LIS_SETERR_MEM(bn * sizeof(LIS_INT));
                 lis_matrix_diag_destroy(D);
                 D = NULL;
                 return LIS_OUT_OF_MEMORY;
             }
             D->v_value = (LIS_SCALAR**)lis_malloc(bn * sizeof(LIS_SCALAR*), "lis_matrix_diag_duplicateM::Dout->value");
             if(NULL == D->v_value) {
-                LIS_SETERR_MEM(bn*sizeof(LIS_SCALAR *));
+                LIS_SETERR_MEM(bn * sizeof(LIS_SCALAR*));
                 lis_matrix_diag_destroy(D);
                 D = NULL;
                 return LIS_OUT_OF_MEMORY;
@@ -567,7 +565,7 @@ LIS_INT lis_matrix_diag_copy(LIS_MATRIX_DIAG X, LIS_MATRIX_DIAG Y) {
     }
     if(X->bns) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < nr; i++) {
             bn = X->bns[i] * X->bns[i];
@@ -577,7 +575,7 @@ LIS_INT lis_matrix_diag_copy(LIS_MATRIX_DIAG X, LIS_MATRIX_DIAG Y) {
     else {
         bn = X->bn * X->bn;
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < nr; i++) { memcpy(&y[i * bn], &x[i * bn], bn * sizeof(LIS_SCALAR)); }
     }
@@ -599,7 +597,7 @@ LIS_INT lis_matrix_diag_scale(LIS_SCALAR alpha, LIS_MATRIX_DIAG D) {
     bn = D->bn;
     if(D->bns) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < nr; i++) {
             bn = D->bns[i] * D->bns[i];
@@ -609,13 +607,13 @@ LIS_INT lis_matrix_diag_scale(LIS_SCALAR alpha, LIS_MATRIX_DIAG D) {
     else {
         if(bn == 1) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) { d[i] = alpha * d[i]; }
         }
         else if(bn == 2) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) {
                 d[4 * i] = alpha * d[4 * i];
@@ -626,7 +624,7 @@ LIS_INT lis_matrix_diag_scale(LIS_SCALAR alpha, LIS_MATRIX_DIAG D) {
         }
         else if(bn == 3) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) {
                 d[9 * i] = alpha * d[9 * i];
@@ -642,7 +640,7 @@ LIS_INT lis_matrix_diag_scale(LIS_SCALAR alpha, LIS_MATRIX_DIAG D) {
         }
         else if(bn == 4) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) {
                 d[16 * i] = alpha * d[16 * i];
@@ -666,9 +664,11 @@ LIS_INT lis_matrix_diag_scale(LIS_SCALAR alpha, LIS_MATRIX_DIAG D) {
         else {
             bn = bn * bn;
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
-            for(i = 0; i < nr; i++) { for(j = 0; j < bn; j++) { d[i * bn + j] = alpha * d[i * bn + j]; } }
+            for(i = 0; i < nr; i++) {
+                for(j = 0; j < bn; j++) { d[i * bn + j] = alpha * d[i * bn + j]; }
+            }
         }
     }
     LIS_DEBUG_FUNC_OUT;
@@ -691,7 +691,7 @@ LIS_INT lis_matrix_diag_inverse(LIS_MATRIX_DIAG D) {
     bs = D->bn * D->bn;
     if(D->bns) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,bn)
+#pragma omp parallel for private(i, bn)
 #endif
         for(i = 0; i < nr; i++) {
             bn = D->bns[i];
@@ -701,15 +701,17 @@ LIS_INT lis_matrix_diag_inverse(LIS_MATRIX_DIAG D) {
     else {
         if(bn == 1) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) { d[i] = 1.0 / d[i]; }
         }
         else {
             k = n % bn;
-            if(k != 0) { for(i = bn - 1; i >= k; i--) { d[bs * (nr - 1) + i * (bn + 1)] = 1.0; } }
+            if(k != 0) {
+                for(i = bn - 1; i >= k; i--) { d[bs * (nr - 1) + i * (bn + 1)] = 1.0; }
+            }
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) { lis_array_ge(bn, &d[i * bs]); }
         }
@@ -735,23 +737,23 @@ LIS_INT lis_matrix_diag_matvec(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
     bs = D->bn * D->bn;
     if(D->bns) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,bn)
+#pragma omp parallel for private(i, bn)
 #endif
         for(i = 0; i < nr; i++) {
             bn = D->bns[i];
-            lis_array_matvec(bn, D->v_value[i], &x[i * bn], &y[i * bn],LIS_INS_VALUE);
+            lis_array_matvec(bn, D->v_value[i], &x[i * bn], &y[i * bn], LIS_INS_VALUE);
         }
     }
     else {
         if(bn == 1) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) { y[i] = x[i] * d[i]; }
         }
         else if(bn == 2) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) {
                 y[2 * i] = d[4 * i] * x[2 * i] + d[4 * i + 2] * x[2 * i + 1];
@@ -760,7 +762,7 @@ LIS_INT lis_matrix_diag_matvec(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
         }
         else if(bn == 3) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) {
                 y[3 * i] = d[9 * i] * x[3 * i] + d[9 * i + 3] * x[3 * i + 1] + d[9 * i + 6] * x[3 * i + 2];
@@ -770,7 +772,7 @@ LIS_INT lis_matrix_diag_matvec(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
         }
         else if(bn == 4) {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
             for(i = 0; i < nr; i++) {
                 y[4 * i] = d[16 * i] * x[4 * i] + d[16 * i + 4] * x[4 * i + 1] + d[16 * i + 8] * x[4 * i + 2] + d[16 * i + 12] * x[4 * i + 3];
@@ -781,9 +783,9 @@ LIS_INT lis_matrix_diag_matvec(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
         }
         else {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
-            for(i = 0; i < nr; i++) { lis_array_matvec(bn, &d[i * bs], &x[i * bn], &y[i * bn],LIS_INS_VALUE); }
+            for(i = 0; i < nr; i++) { lis_array_matvec(bn, &d[i * bs], &x[i * bn], &y[i * bn], LIS_INS_VALUE); }
         }
     }
     LIS_DEBUG_FUNC_OUT;
@@ -807,18 +809,18 @@ LIS_INT lis_matrix_diag_matvech(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
     bs = D->bn * D->bn;
     if(D->bns) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,bn)
+#pragma omp parallel for private(i, bn)
 #endif
         for(i = 0; i < nr; i++) {
             bn = D->bns[i];
-            lis_array_matvech(bn, D->v_value[i], &x[i * bn], &y[i * bn],LIS_INS_VALUE);
+            lis_array_matvech(bn, D->v_value[i], &x[i * bn], &y[i * bn], LIS_INS_VALUE);
         }
     }
     else {
 #if 0
 		if( bn==1 )
 		{
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 			for(i=0; i<nr; i++)
 			{
 				y[i] = x[i] * conj(d[i]);
@@ -826,7 +828,7 @@ LIS_INT lis_matrix_diag_matvech(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
 		}
 		else if( bn==2 )
 		{
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 			for(i=0; i<nr; i++)
 			{
 				y[2*i]   = conj(d[4*i])   * x[2*i] + conj(d[4*i+1]) * x[2*i+1];
@@ -835,7 +837,7 @@ LIS_INT lis_matrix_diag_matvech(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
 		}
 		else if( bn==3 )
 		{
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 			for(i=0; i<nr; i++)
 			{
 				y[3*i]   = conj(d[9*i])   * x[3*i] + conj(d[9*i+1]) * x[3*i+1] + conj(d[9*i+2]) * x[3*i+2];
@@ -845,7 +847,7 @@ LIS_INT lis_matrix_diag_matvech(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
 		}
 		else if( bn==4 )
 		{
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 			for(i=0; i<nr; i++)
 			{
 				y[4*i]   = conj(d[16*i]     * x[4*i] + conj(d[16*i+ 1]) * x[4*i+1] + conj(d[16*i+ 2]) * x[4*i+2] + conj(d[16*i+ 3]) * x[4*i+3];
@@ -858,9 +860,9 @@ LIS_INT lis_matrix_diag_matvech(LIS_MATRIX_DIAG D, LIS_VECTOR X, LIS_VECTOR Y) {
 #endif
         {
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
-            for(i = 0; i < nr; i++) { lis_array_matvech(bn, &d[i * bs], &x[i * bn], &y[i * bn],LIS_INS_VALUE); }
+            for(i = 0; i < nr; i++) { lis_array_matvech(bn, &d[i * bs], &x[i * bn], &y[i * bn], LIS_INS_VALUE); }
         }
     }
     LIS_DEBUG_FUNC_OUT;
@@ -882,13 +884,13 @@ LIS_INT lis_matrix_diag_print(LIS_MATRIX_DIAG D) {
             bn = D->bns[k];
             for(i = 0; i < bn; i++) {
 #ifdef _LONG__LONG
-				printf("%4lld (", nn+i);
+                printf("%4lld (", nn + i);
 #else
                 printf("%4d (", nn + i);
 #endif
                 for(j = 0; j < bn; j++) {
 #ifdef _COMPLEX
-					printf("%6.2f %6.2f ", (double)creal(D->v_value[k][j*bn+i]), (double)cimag(D->v_value[k][j*bn+i]));
+                    printf("%6.2f %6.2f ", (double)creal(D->v_value[k][j * bn + i]), (double)cimag(D->v_value[k][j * bn + i]));
 #else
                     printf("%6.2f ", (double)D->v_value[k][j * bn + i]);
 #endif
@@ -904,13 +906,13 @@ LIS_INT lis_matrix_diag_print(LIS_MATRIX_DIAG D) {
         for(k = 0; k < nr; k++) {
             for(i = 0; i < bn; i++) {
 #ifdef _LONG__LONG
-				printf("%4lld (", k*nn+i);
+                printf("%4lld (", k * nn + i);
 #else
                 printf("%4d (", k * nn + i);
 #endif
                 for(j = 0; j < bn; j++) {
 #ifdef _COMPLEX
-					printf("%6.2f %6.2f ", (double)creal(D->value[k*nn + j*bn+i]), (double)cimag(D->value[k*nn + j*bn+i]));
+                    printf("%6.2f %6.2f ", (double)creal(D->value[k * nn + j * bn + i]), (double)cimag(D->value[k * nn + j * bn + i]));
 #else
                     printf("%6.2f ", (double)D->value[k * nn + j * bn + i]);
 #endif

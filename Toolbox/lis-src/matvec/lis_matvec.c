@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -65,72 +65,72 @@ LIS_INT lis_matvec(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y) {
         switch(A->matrix_type) {
         case LIS_MATRIX_CSR:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_csr(A, x, y);
             break;
         case LIS_MATRIX_BSR:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             if(A->bnr <= 4 && A->bnc <= 4) { lis_matvec_bsr_xxx[A->bnr - 1][A->bnc - 1](A, x, y); }
             else { lis_matvec_bsr(A, x, y); }
             break;
         case LIS_MATRIX_CSC:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_csc(A, x, y);
             break;
         case LIS_MATRIX_BSC:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_bsc(A, x, y);
             break;
         case LIS_MATRIX_MSR:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_msr(A, x, y);
             break;
         case LIS_MATRIX_ELL:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_ell(A, x, y);
             break;
         case LIS_MATRIX_DIA:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_dia(A, x, y);
             break;
         case LIS_MATRIX_JAD:
 #ifdef USE_MPI
 #ifndef USE_OVERLAP
-					LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #else
-					LIS_MATVEC_REALLOC;
+            LIS_MATVEC_REALLOC;
 #endif
 #endif
             lis_matvec_jad(A, x, y);
             break;
         case LIS_MATRIX_VBR:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_vbr(A, x, y);
             break;
         case LIS_MATRIX_DNS:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_dns(A, x, y);
             break;
         case LIS_MATRIX_COO:
 #ifdef USE_MPI
-				LIS_MATVEC_SENDRECV;
+            LIS_MATVEC_SENDRECV;
 #endif
             lis_matvec_coo(A, x, y);
             break;
@@ -141,37 +141,34 @@ LIS_INT lis_matvec(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y) {
         }
     }
 #ifdef USE_QUAD_PRECISION
-	else
-	{
-
-		switch( A->matrix_type )
-		{
-		case LIS_MATRIX_CSR:
+    else {
+        switch(A->matrix_type) {
+        case LIS_MATRIX_CSR:
 #ifdef USE_MPI
-				lis_send_recv_mp(A->commtable,X);
+            lis_send_recv_mp(A->commtable, X);
 #endif
 #ifndef USE_FMA2_SSE2
-				lis_matvec_csr_mp(A, X, Y);
+            lis_matvec_csr_mp(A, X, Y);
 #else
-				lis_matvec_csr_mp2(A, X, Y);
+            lis_matvec_csr_mp2(A, X, Y);
 #endif
-			break;
-		case LIS_MATRIX_CSC:
+            break;
+        case LIS_MATRIX_CSC:
 #ifdef USE_MPI
-				lis_send_recv_mp(A->commtable,X);
+            lis_send_recv_mp(A->commtable, X);
 #endif
 #ifndef USE_FMA2_SSE2
-				lis_matvec_csc_mp(A, X, Y);
+            lis_matvec_csc_mp(A, X, Y);
 #else
-				lis_matvec_csc_mp2(A, X, Y);
+            lis_matvec_csc_mp2(A, X, Y);
 #endif
-			break;
-		default:
-			LIS_SETERR_IMP;
-			return LIS_ERR_NOT_IMPLEMENTED;
-			break;
-		}
-	}
+            break;
+        default:
+            LIS_SETERR_IMP;
+            return LIS_ERR_NOT_IMPLEMENTED;
+            break;
+        }
+    }
 #endif
 
     LIS_DEBUG_FUNC_OUT;
@@ -193,101 +190,101 @@ LIS_INT lis_matvech(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y) {
         switch(A->matrix_type) {
         case LIS_MATRIX_CSR:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_csr(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_BSR:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_bsr(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_CSC:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_csc(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_BSC:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_bsc(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_MSR:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_msr(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_ELL:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_ell(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_JAD:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_jad(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_DIA:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_dia(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_VBR:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_vbr(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_DNS:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_dns(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         case LIS_MATRIX_COO:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
             lis_matvech_coo(A, x, y);
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE;
+            LIS_MATVEC_REDUCE;
 #endif
             break;
         default:
@@ -297,42 +294,40 @@ LIS_INT lis_matvech(LIS_MATRIX A, LIS_VECTOR X, LIS_VECTOR Y) {
         }
     }
 #ifdef USE_QUAD_PRECISION
-	else
-	{
-		switch( A->matrix_type )
-		{
-		case LIS_MATRIX_CSR:
+    else {
+        switch(A->matrix_type) {
+        case LIS_MATRIX_CSR:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
 #ifndef USE_FMA2_SSE2
-				lis_matvech_csr_mp(A, X, Y);
+            lis_matvech_csr_mp(A, X, Y);
 #else
-				lis_matvech_csr_mp2(A, X, Y);
+            lis_matvech_csr_mp2(A, X, Y);
 #endif
 #ifdef USE_MPI
-				lis_reduce_mp(A->commtable,Y);
+            lis_reduce_mp(A->commtable, Y);
 #endif
-			break;
-		case LIS_MATRIX_CSC:
+            break;
+        case LIS_MATRIX_CSC:
 #ifdef USE_MPI
-				LIS_MATVEC_REDUCE0;
+            LIS_MATVEC_REDUCE0;
 #endif
 #ifndef USE_FMA2_SSE2
-				lis_matvech_csc_mp(A, X, Y);
+            lis_matvech_csc_mp(A, X, Y);
 #else
-				lis_matvech_csc_mp2(A, X, Y);
+            lis_matvech_csc_mp2(A, X, Y);
 #endif
 #ifdef USE_MPI
-				lis_reduce_mp(A->commtable,Y);
+            lis_reduce_mp(A->commtable, Y);
 #endif
-			break;
-		default:
-			LIS_SETERR_IMP;
-			return LIS_ERR_NOT_IMPLEMENTED;
-			break;
-		}
-	}
+            break;
+        default:
+            LIS_SETERR_IMP;
+            return LIS_ERR_NOT_IMPLEMENTED;
+            break;
+        }
+    }
 #endif
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -354,8 +349,8 @@ LIS_INT lis_matvec_optimize(LIS_MATRIX A, LIS_INT* matrix_type_maxperf) {
     LIS_DEBUG_FUNC_IN;
 
 #ifdef USE_MPI
-	MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
-	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 #else
     nprocs = 1;
     my_rank = 0;
@@ -372,7 +367,7 @@ LIS_INT lis_matvec_optimize(LIS_MATRIX A, LIS_INT* matrix_type_maxperf) {
     iter = (int)(10000000 / A->nnz) + 1;
     flops_maxperf = 0.0;
 #ifdef _LONG__LONG
-	printf("number of iterations = 1e7 / %lld + 1 = %lld\n", A->nnz, iter);
+    printf("number of iterations = 1e7 / %lld + 1 = %lld\n", A->nnz, iter);
 #else
     printf("number of iterations = 1e7 / %d + 1 = %d\n", A->nnz, iter);
 #endif
@@ -388,10 +383,10 @@ LIS_INT lis_matvec_optimize(LIS_MATRIX A, LIS_INT* matrix_type_maxperf) {
 
         for(i = 0; i < iter; i++) {
 #ifdef USE_MPI
-		MPI_Barrier(A1->comm);
-		time = lis_wtime();
-		lis_send_recv(A1->commtable,X->value);
-		commtime += lis_wtime() - time;
+            MPI_Barrier(A1->comm);
+            time = lis_wtime();
+            lis_send_recv(A1->commtable, X->value);
+            commtime += lis_wtime() - time;
 #endif
             time2 = lis_wtime();
             lis_matvec(A1, X, Y);
@@ -404,27 +399,27 @@ LIS_INT lis_matvec_optimize(LIS_MATRIX A, LIS_INT* matrix_type_maxperf) {
 #ifdef USE_MPI
 #ifdef _LONG__DOUBLE
 #ifdef _LONG__LONG
-		printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS, communication = %e sec, communication/computation = %3.3f\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops,commtime,commtime/comptime*100);
+            printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS, communication = %e sec, communication/computation = %3.3f\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops, commtime, commtime / comptime * 100);
 #else
-		printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS, communication = %e sec, communication/computation = %3.3f\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops,commtime,commtime/comptime*100);
+            printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS, communication = %e sec, communication/computation = %3.3f\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops, commtime, commtime / comptime * 100);
 #endif
 #else
 #ifdef _LONG__LONG
-		printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS, communication = %e sec, communication/computation = %3.3f\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops,commtime,commtime/comptime*100);
+            printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS, communication = %e sec, communication/computation = %3.3f\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops, commtime, commtime / comptime * 100);
 #else
-		printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS, communication = %e sec, communication/computation = %3.3f\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops,commtime,commtime/comptime*100);
+            printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS, communication = %e sec, communication/computation = %3.3f\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops, commtime, commtime / comptime * 100);
 #endif
 #endif
 #else
 #ifdef _LONG__DOUBLE
 #ifdef _LONG__LONG
-		printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops);
+            printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops);
 #else
-		printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops);
+            printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops);
 #endif
 #else
 #ifdef _LONG__LONG
-		printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS\n",matrix_type,lis_storagename2[matrix_type-1],comptime,flops);
+            printf("matrix_type = %2lld (%s), computation = %e sec, %8.3f MFLOPS\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops);
 #else
             printf("matrix_type = %2d (%s), computation = %e sec, %8.3f MFLOPS\n", matrix_type, lis_storagename2[matrix_type - 1], comptime, flops);
 #endif

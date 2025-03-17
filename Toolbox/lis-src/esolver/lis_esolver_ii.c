@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,29 +25,29 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
 #include <math.h>
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef USE_SSE2
-	#include <emmintrin.h>
+#include <emmintrin.h>
 #endif
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -89,7 +89,7 @@ LIS_INT lis_eii_malloc_work(LIS_ESOLVER esolver) {
     worklen = NWORK;
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_eii_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -145,7 +145,7 @@ LIS_INT lis_eii(LIS_ESOLVER esolver) {
     emaxiter = esolver->options[LIS_EOPTIONS_MAXITER];
     tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
 #ifdef _COMPLEX
-  oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
     oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
 #endif
@@ -163,7 +163,7 @@ LIS_INT lis_eii(LIS_ESOLVER esolver) {
 
     if(output) {
 #ifdef _COMPLEX
-      lis_printf(comm,"shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));      
+        lis_printf(comm, "shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
 #else
         lis_printf(comm, "shift                 : %e\n", (double)oshift);
 #endif
@@ -267,9 +267,9 @@ LIS_INT lis_eii(LIS_ESOLVER esolver) {
  ***************************************
  for k=1,2,...
    v     = v / ||v||_2
-   w     = B * v 
+   w     = B * v
    v     = v / <v,w>^1/2
-   w     = w / <v,w>^1/2 
+   w     = w / <v,w>^1/2
    y     = A^-1 * w
    theta = <w,y>
    resid = ||y - <v,y> * v||_2 / |<v,y>|
@@ -302,7 +302,7 @@ LIS_INT lis_egii_malloc_work(LIS_ESOLVER esolver) {
     worklen = NWORK;
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_egii_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -358,7 +358,7 @@ LIS_INT lis_egii(LIS_ESOLVER esolver) {
     emaxiter = esolver->options[LIS_EOPTIONS_MAXITER];
     tol = esolver->params[LIS_EPARAMS_RESID - LIS_EOPTIONS_LEN];
 #ifdef _COMPLEX
-  oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
+    oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN] + esolver->params[LIS_EPARAMS_SHIFT_IM - LIS_EOPTIONS_LEN] * _Complex_I;
 #else
     oshift = esolver->params[LIS_EPARAMS_SHIFT - LIS_EOPTIONS_LEN];
 #endif
@@ -378,7 +378,7 @@ LIS_INT lis_egii(LIS_ESOLVER esolver) {
 
     if(output) {
 #ifdef _COMPLEX
-      lis_printf(comm,"shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
+        lis_printf(comm, "shift                 : (%e, %e)\n", (double)creal(oshift), (double)cimag(oshift));
 #else
         lis_printf(comm, "shift                 : %e\n", (double)oshift);
 #endif

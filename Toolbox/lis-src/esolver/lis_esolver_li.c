@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,29 +25,29 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
 #include <math.h>
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef USE_SSE2
-	#include <emmintrin.h>
+#include <emmintrin.h>
 #endif
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -57,22 +57,22 @@
  v(0)    = (0,...,0)^T
  ***************************************
  r = v(0)
- beta(0) = ||r||_2 
+ beta(0) = ||r||_2
  for j=1,2,...
    v(j)      = r / beta(j-1)
    r         = A * v(j)
    r         = r - beta(j-1) * v(j-1)
    alpha(j)  = <v(j), r>
    r         = r - alpha(j) * v(j)
-   reorthogonalization 
+   reorthogonalization
    beta(j)   = ||r||_2
  end for
- compute eigenvalues of a symmetric tridiagonal matrix 
+ compute eigenvalues of a symmetric tridiagonal matrix
  T(j) = ST'(j)S^*, where
      (alpha(1) beta(1)                      )
      (beta(1)  alpha(2)                     )
  T = (               ...                    )
-     (                  alpha(j-1) beta(j-1))                       
+     (                  alpha(j-1) beta(j-1))
      (                  beta(j-1)  alpha(j) )
  compute refined eigenpairs
  ***************************************/
@@ -110,7 +110,7 @@ LIS_INT lis_eli_malloc_work(LIS_ESOLVER esolver) {
     worklen = NWORK + ss;
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_eli_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -237,7 +237,7 @@ LIS_INT lis_eli(LIS_ESOLVER esolver) {
         t[j * ss + j - 1] = t[(j - 1) * ss + j];
     }
 
-    /* compute eigenvalues of a symmetric tridiagonal matrix 
+    /* compute eigenvalues of a symmetric tridiagonal matrix
        T(j) = ST'(j)S^* */
     time0 = lis_wtime();
     lis_array_qr(ss, t, tq, tr, &qriter, &qrerr);
@@ -251,7 +251,7 @@ LIS_INT lis_eli(LIS_ESOLVER esolver) {
         for(i = 0; i < ss; i++) {
             lis_printf(comm, "Lanczos: mode number          = %D\n", i);
 #ifdef _COMPLEX
-	  lis_printf(comm,"Lanczos: Ritz value           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
+            lis_printf(comm, "Lanczos: Ritz value           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
 #else
             lis_printf(comm, "Lanczos: Ritz value           = %e\n", (double)esolver->evalue[i]);
 #endif
@@ -289,7 +289,9 @@ LIS_INT lis_eli(LIS_ESOLVER esolver) {
             evalue0 = esolver->evalue[0];
             iter0 = esolver2->iter[0];
             resid0 = esolver2->resid[0];
-            if(output & LIS_EPRINT_MEM) { for(ic = 0; ic < iter0 + 1; ic++) { esolver->rhistory[ic] = esolver2->rhistory[ic]; } }
+            if(output & LIS_EPRINT_MEM) {
+                for(ic = 0; ic < iter0 + 1; ic++) { esolver->rhistory[ic] = esolver2->rhistory[ic]; }
+            }
             esolver->time = esolver2->time;
             esolver->ptime += esolver2->ptime;
             esolver->itime += esolver2->itime;
@@ -300,7 +302,7 @@ LIS_INT lis_eli(LIS_ESOLVER esolver) {
         if(output) {
             lis_printf(comm, "Lanczos: mode number          = %D\n", i);
 #ifdef _COMPLEX
-	  lis_printf(comm,"Lanczos: eigenvalue           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
+            lis_printf(comm, "Lanczos: eigenvalue           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
 #else
             lis_printf(comm, "Lanczos: eigenvalue           = %e\n", (double)esolver->evalue[i]);
 #endif
@@ -341,16 +343,16 @@ LIS_INT lis_eli(LIS_ESOLVER esolver) {
    r         = r - beta(j-1) * w(j-1)
    alpha(j)  = <v(j), r>
    r         = r - alpha(j) * w(j)
-   reorthogonalization 
+   reorthogonalization
    solve B * q = r for q
    beta(j)   = |<q,r>|^1/2
  end for
- compute eigenvalues of a symmetric tridiagonal matrix 
+ compute eigenvalues of a symmetric tridiagonal matrix
  T(j) = ST'(j)S^*, where
      (alpha(1) beta(1)                      )
      (beta(1)  alpha(2)                     )
  T = (               ...                    )
-     (                  alpha(j-1) beta(j-1))                       
+     (                  alpha(j-1) beta(j-1))
      (                  beta(j-1)  alpha(j) )
  compute refined eigenpairs
  ***************************************/
@@ -389,7 +391,7 @@ LIS_INT lis_egli_malloc_work(LIS_ESOLVER esolver) {
     worklen = NWORK + ss;
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_egli_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -551,7 +553,7 @@ LIS_INT lis_egli(LIS_ESOLVER esolver) {
         t[j * ss + j - 1] = t[(j - 1) * ss + j];
     }
 
-    /* compute eigenvalues of a symmetric tridiagonal matrix 
+    /* compute eigenvalues of a symmetric tridiagonal matrix
        T(j) = ST'(j)S^* */
     time0 = lis_wtime();
     lis_array_qr(ss, t, tq, tr, &qriter, &qrerr);
@@ -565,7 +567,7 @@ LIS_INT lis_egli(LIS_ESOLVER esolver) {
         for(i = 0; i < ss; i++) {
             lis_printf(comm, "Generalized Lanczos: mode number          = %D\n", i);
 #ifdef _COMPLEX
-	  lis_printf(comm,"Generalized Lanczos: Ritz value           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
+            lis_printf(comm, "Generalized Lanczos: Ritz value           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
 #else
             lis_printf(comm, "Generalized Lanczos: Ritz value           = %e\n", (double)esolver->evalue[i]);
 #endif
@@ -597,7 +599,9 @@ LIS_INT lis_egli(LIS_ESOLVER esolver) {
             evalue0 = esolver->evalue[0];
             iter0 = esolver2->iter[0];
             resid0 = esolver2->resid[0];
-            if(output & LIS_EPRINT_MEM) { for(ic = 0; ic < iter0 + 1; ic++) { esolver->rhistory[ic] = esolver2->rhistory[ic]; } }
+            if(output & LIS_EPRINT_MEM) {
+                for(ic = 0; ic < iter0 + 1; ic++) { esolver->rhistory[ic] = esolver2->rhistory[ic]; }
+            }
             esolver->time = esolver2->time;
             esolver->ptime += esolver2->ptime;
             esolver->itime += esolver2->itime;
@@ -608,7 +612,7 @@ LIS_INT lis_egli(LIS_ESOLVER esolver) {
         if(output) {
             lis_printf(comm, "Generalized Lanczos: mode number          = %D\n", i);
 #ifdef _COMPLEX
-	  lis_printf(comm,"Generalized Lanczos: eigenvalue           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
+            lis_printf(comm, "Generalized Lanczos: eigenvalue           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
 #else
             lis_printf(comm, "Generalized Lanczos: eigenvalue           = %e\n", (double)esolver->evalue[i]);
 #endif

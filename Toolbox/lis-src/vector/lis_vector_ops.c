@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,19 +25,19 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <math.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -62,10 +62,10 @@ LIS_INT lis_vector_dot(LIS_VECTOR vx, LIS_VECTOR vy, LIS_SCALAR* value) {
     LIS_SCALAR *x, *y;
     LIS_SCALAR tmp;
 #ifdef _OPENMP
-		LIS_INT nprocs,my_rank;
+    LIS_INT nprocs, my_rank;
 #endif
 #ifdef USE_MPI
-		MPI_Comm comm;
+    MPI_Comm comm;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -81,39 +81,37 @@ LIS_INT lis_vector_dot(LIS_VECTOR vx, LIS_VECTOR vy, LIS_SCALAR* value) {
     x = vx->value;
     y = vy->value;
 #ifdef USE_MPI
-		comm   = vx->comm;
+    comm = vx->comm;
 #endif
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		#pragma omp parallel private(i,tmp,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			tmp     = 0.0;
+    nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, tmp, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        tmp = 0.0;
 #ifdef USE_VEC_COMP
-		    #pragma cdir nodep
+#pragma cdir nodep
 #endif
-			#pragma omp for
-			for(i=0; i<n; i++)
-			{
-				tmp += conj(x[i])*y[i];
-			}
-			lis_vec_tmp[my_rank*LIS_VEC_TMP_PADD] = tmp;
-		}
-		dot = 0.0;
-		for(i=0;i<nprocs;i++)
-		{
-			dot += lis_vec_tmp[i*LIS_VEC_TMP_PADD];
-		}
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            tmp += conj(x[i]) * y[i];
+        }
+        lis_vec_tmp[my_rank * LIS_VEC_TMP_PADD] = tmp;
+    }
+    dot = 0.0;
+    for(i = 0; i < nprocs; i++) {
+        dot += lis_vec_tmp[i * LIS_VEC_TMP_PADD];
+    }
 #else
     dot = 0.0;
 #ifdef USE_VEC_COMP
-	    #pragma cdir nodep
+#pragma cdir nodep
 #endif
     for(i = 0; i < n; i++) { dot += conj(x[i]) * y[i]; }
 #endif
 #ifdef USE_MPI
-		MPI_Allreduce(&dot,&tmp,1,LIS_MPI_SCALAR,MPI_SUM,comm);
-		*value = tmp;
+    MPI_Allreduce(&dot, &tmp, 1, LIS_MPI_SCALAR, MPI_SUM, comm);
+    *value = tmp;
 #else
     *value = dot;
 #endif
@@ -134,10 +132,10 @@ LIS_INT lis_vector_nhdot(LIS_VECTOR vx, LIS_VECTOR vy, LIS_SCALAR* value) {
     LIS_SCALAR *x, *y;
     LIS_SCALAR tmp;
 #ifdef _OPENMP
-		LIS_INT nprocs,my_rank;
+    LIS_INT nprocs, my_rank;
 #endif
 #ifdef USE_MPI
-		MPI_Comm comm;
+    MPI_Comm comm;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -153,39 +151,37 @@ LIS_INT lis_vector_nhdot(LIS_VECTOR vx, LIS_VECTOR vy, LIS_SCALAR* value) {
     x = vx->value;
     y = vy->value;
 #ifdef USE_MPI
-		comm   = vx->comm;
+    comm = vx->comm;
 #endif
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		#pragma omp parallel private(i,tmp,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			tmp     = 0.0;
+    nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, tmp, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        tmp = 0.0;
 #ifdef USE_VEC_COMP
-		    #pragma cdir nodep
+#pragma cdir nodep
 #endif
-			#pragma omp for
-			for(i=0; i<n; i++)
-			{
-				tmp += x[i]*y[i];
-			}
-			lis_vec_tmp[my_rank*LIS_VEC_TMP_PADD] = tmp;
-		}
-		dot = 0.0;
-		for(i=0;i<nprocs;i++)
-		{
-			dot += lis_vec_tmp[i*LIS_VEC_TMP_PADD];
-		}
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            tmp += x[i] * y[i];
+        }
+        lis_vec_tmp[my_rank * LIS_VEC_TMP_PADD] = tmp;
+    }
+    dot = 0.0;
+    for(i = 0; i < nprocs; i++) {
+        dot += lis_vec_tmp[i * LIS_VEC_TMP_PADD];
+    }
 #else
     dot = 0.0;
 #ifdef USE_VEC_COMP
-	    #pragma cdir nodep
+#pragma cdir nodep
 #endif
     for(i = 0; i < n; i++) { dot += x[i] * y[i]; }
 #endif
 #ifdef USE_MPI
-		MPI_Allreduce(&dot,&tmp,1,LIS_MPI_SCALAR,MPI_SUM,comm);
-		*value = tmp;
+    MPI_Allreduce(&dot, &tmp, 1, LIS_MPI_SCALAR, MPI_SUM, comm);
+    *value = tmp;
 #else
     *value = dot;
 #endif
@@ -206,10 +202,10 @@ LIS_INT lis_vector_nrm2(LIS_VECTOR vx, LIS_REAL* value) {
     LIS_SCALAR* x;
     LIS_SCALAR tmp;
 #ifdef _OPENMP
-		LIS_INT nprocs,my_rank;
+    LIS_INT nprocs, my_rank;
 #endif
 #ifdef USE_MPI
-		MPI_Comm comm;
+    MPI_Comm comm;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -218,39 +214,37 @@ LIS_INT lis_vector_nrm2(LIS_VECTOR vx, LIS_REAL* value) {
 
     x = vx->value;
 #ifdef USE_MPI
-		comm   = vx->comm;
+    comm = vx->comm;
 #endif
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		#pragma omp parallel private(i,tmp,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			tmp     = 0.0;
+    nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, tmp, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        tmp = 0.0;
 #ifdef USE_VEC_COMP
-		    #pragma cdir nodep
+#pragma cdir nodep
 #endif
-			#pragma omp for
-			for(i=0; i<n; i++)
-			{
-				tmp += conj(x[i])*x[i];
-			}
-			lis_vec_tmp[my_rank*LIS_VEC_TMP_PADD] = tmp;
-		}
-		dot = 0.0;
-		for(i=0;i<nprocs;i++)
-		{
-			dot += lis_vec_tmp[i*LIS_VEC_TMP_PADD];
-		}
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            tmp += conj(x[i]) * x[i];
+        }
+        lis_vec_tmp[my_rank * LIS_VEC_TMP_PADD] = tmp;
+    }
+    dot = 0.0;
+    for(i = 0; i < nprocs; i++) {
+        dot += lis_vec_tmp[i * LIS_VEC_TMP_PADD];
+    }
 #else
     dot = 0.0;
 #ifdef USE_VEC_COMP
-	    #pragma cdir nodep
+#pragma cdir nodep
 #endif
     for(i = 0; i < n; i++) { dot += conj(x[i]) * x[i]; }
 #endif
 #ifdef USE_MPI
-		MPI_Allreduce(&dot,&tmp,1,LIS_MPI_REAL,MPI_SUM,comm);
-		*value = sqrt(tmp);
+    MPI_Allreduce(&dot, &tmp, 1, LIS_MPI_REAL, MPI_SUM, comm);
+    *value = sqrt(tmp);
 #else
     *value = sqrt(dot);
 #endif
@@ -270,11 +264,11 @@ LIS_INT lis_vector_nrm1(LIS_VECTOR vx, LIS_REAL* value) {
     LIS_SCALAR sum;
     LIS_SCALAR* x;
 #ifdef _OPENMP
-		LIS_INT nprocs,my_rank;
-		LIS_SCALAR tmp;
+    LIS_INT nprocs, my_rank;
+    LIS_SCALAR tmp;
 #endif
 #ifdef USE_MPI
-		MPI_Comm comm;
+    MPI_Comm comm;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -283,37 +277,35 @@ LIS_INT lis_vector_nrm1(LIS_VECTOR vx, LIS_REAL* value) {
 
     x = vx->value;
 #ifdef USE_MPI
-		comm   = vx->comm;
+    comm = vx->comm;
 #endif
     sum = 0.0;
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		#pragma omp parallel private(i,tmp,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			tmp     = 0.0;
+    nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, tmp, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        tmp = 0.0;
 #ifdef USE_VEC_COMP
-		    #pragma cdir nodep
+#pragma cdir nodep
 #endif
-			#pragma omp for
-			for(i=0; i<n; i++)
-			{
-				tmp += fabs(x[i]);
-			}
-			lis_vec_tmp[my_rank*LIS_VEC_TMP_PADD] = tmp;
-		}
-		for(i=0;i<nprocs;i++)
-		{
-			sum += lis_vec_tmp[i*LIS_VEC_TMP_PADD];
-		}
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            tmp += fabs(x[i]);
+        }
+        lis_vec_tmp[my_rank * LIS_VEC_TMP_PADD] = tmp;
+    }
+    for(i = 0; i < nprocs; i++) {
+        sum += lis_vec_tmp[i * LIS_VEC_TMP_PADD];
+    }
 #else
 #ifdef USE_VEC_COMP
-	    #pragma cdir nodep
+#pragma cdir nodep
 #endif
     for(i = 0; i < n; i++) { sum += fabs(x[i]); }
 #endif
 #ifdef USE_MPI
-		MPI_Allreduce(&sum,value,1,LIS_MPI_REAL,MPI_SUM,comm);
+    MPI_Allreduce(&sum, value, 1, LIS_MPI_REAL, MPI_SUM, comm);
 #else
     *value = sum;
 #endif
@@ -334,10 +326,10 @@ LIS_INT lis_vector_nrmi(LIS_VECTOR vx, LIS_REAL* value) {
     LIS_REAL tmp = 0;
 
 #ifdef _OPENMP
-		LIS_INT nprocs,my_rank;
+    LIS_INT nprocs, my_rank;
 #endif
 #ifdef USE_MPI
-		MPI_Comm comm;
+    MPI_Comm comm;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -346,42 +338,40 @@ LIS_INT lis_vector_nrmi(LIS_VECTOR vx, LIS_REAL* value) {
 
     x = vx->value;
 #ifdef USE_MPI
-		comm   = vx->comm;
+    comm = vx->comm;
 #endif
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		#pragma omp parallel private(i,tmp,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			tmp     = 0.0;
+    nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, tmp, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        tmp = 0.0;
 #ifdef USE_VEC_COMP
-		    #pragma cdir nodep
+#pragma cdir nodep
 #endif
-			#pragma omp for
-			for(i=0; i<n; i++)
-			{
-			  if (fabs(x[i]) > tmp) 
-			    {
-				  tmp = fabs(x[i]);
-			    }
-			}
-			lis_vec_tmp[my_rank*LIS_VEC_TMP_PADD] = tmp;
-		}
-		for(i=0;i<nprocs;i++)
-		{
-		  if ((LIS_REAL)lis_vec_tmp[i*LIS_VEC_TMP_PADD] > tmp) 
-		    {
-		      tmp = lis_vec_tmp[i*LIS_VEC_TMP_PADD];
-		    }
-		}
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            if(fabs(x[i]) > tmp) {
+                tmp = fabs(x[i]);
+            }
+        }
+        lis_vec_tmp[my_rank * LIS_VEC_TMP_PADD] = tmp;
+    }
+    for(i = 0; i < nprocs; i++) {
+        if((LIS_REAL)lis_vec_tmp[i * LIS_VEC_TMP_PADD] > tmp) {
+            tmp = lis_vec_tmp[i * LIS_VEC_TMP_PADD];
+        }
+    }
 #else
 #ifdef USE_VEC_COMP
-	    #pragma cdir nodep
+#pragma cdir nodep
 #endif
-    for(i = 0; i < n; i++) { if(fabs(x[i]) > tmp) { tmp = fabs(x[i]); } }
+    for(i = 0; i < n; i++) {
+        if(fabs(x[i]) > tmp) { tmp = fabs(x[i]); }
+    }
 #endif
 #ifdef USE_MPI
-		MPI_Allreduce(&tmp,value,1,LIS_MPI_REAL,MPI_MAX,comm);
+    MPI_Allreduce(&tmp, value, 1, LIS_MPI_REAL, MPI_MAX, comm);
 #else
     *value = tmp;
 #endif
@@ -401,11 +391,11 @@ LIS_INT lis_vector_sum(LIS_VECTOR vx, LIS_SCALAR* value) {
     LIS_SCALAR sum;
     LIS_SCALAR* x;
 #ifdef _OPENMP
-		LIS_INT nprocs,my_rank;
-		LIS_SCALAR tmp;
+    LIS_INT nprocs, my_rank;
+    LIS_SCALAR tmp;
 #endif
 #ifdef USE_MPI
-		MPI_Comm comm;
+    MPI_Comm comm;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -414,37 +404,35 @@ LIS_INT lis_vector_sum(LIS_VECTOR vx, LIS_SCALAR* value) {
 
     x = vx->value;
 #ifdef USE_MPI
-		comm   = vx->comm;
+    comm = vx->comm;
 #endif
     sum = 0.0;
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		#pragma omp parallel private(i,tmp,my_rank)
-		{
-			my_rank = omp_get_thread_num();
-			tmp     = 0.0;
+    nprocs = omp_get_max_threads();
+#pragma omp parallel private(i, tmp, my_rank)
+    {
+        my_rank = omp_get_thread_num();
+        tmp = 0.0;
 #ifdef USE_VEC_COMP
-		    #pragma cdir nodep
+#pragma cdir nodep
 #endif
-			#pragma omp for
-			for(i=0; i<n; i++)
-			{
-				tmp += x[i];
-			}
-			lis_vec_tmp[my_rank*LIS_VEC_TMP_PADD] = tmp;
-		}
-		for(i=0;i<nprocs;i++)
-		{
-			sum += lis_vec_tmp[i*LIS_VEC_TMP_PADD];
-		}
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            tmp += x[i];
+        }
+        lis_vec_tmp[my_rank * LIS_VEC_TMP_PADD] = tmp;
+    }
+    for(i = 0; i < nprocs; i++) {
+        sum += lis_vec_tmp[i * LIS_VEC_TMP_PADD];
+    }
 #else
 #ifdef USE_VEC_COMP
-	    #pragma cdir nodep
+#pragma cdir nodep
 #endif
     for(i = 0; i < n; i++) { sum += x[i]; }
 #endif
 #ifdef USE_MPI
-		MPI_Allreduce(&sum,value,1,LIS_MPI_SCALAR,MPI_SUM,comm);
+    MPI_Allreduce(&sum, value, 1, LIS_MPI_SCALAR, MPI_SUM, comm);
 #else
     *value = sum;
 #endif

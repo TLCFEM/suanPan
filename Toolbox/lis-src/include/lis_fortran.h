@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -44,17 +44,17 @@ typedef long LIS_SCALAR_F;
 #endif
 
 #ifdef USE_MPI
-	#include <mpi.h>
-	typedef MPI_Fint LIS_Comm_f;
+#include <mpi.h>
+typedef MPI_Fint LIS_Comm_f;
 #else
 typedef LIS_INT LIS_Comm_f;
 #endif
 
 #ifdef _WIN64
-#define LIS_V2P(a) (*(long long *)(a))
+#define LIS_V2P(a) (*(long long*)(a))
 #define LIS_P2V(a) ((long long)(a))
 #else
-#define LIS_V2P(a) (*(long *)(a))
+#define LIS_V2P(a) (*(long*)(a))
 #define LIS_P2V(a) ((long)(a))
 #endif
 
@@ -232,7 +232,7 @@ extern LIS_Comm_f lis_comm_world_f;
 #define lis_set_comm_world_f F77_FUNC_(lis_set_comm_world_f, LIS_SET_COMM_WORLD_F)
 #define lis_finitialize_f F77_FUNC_(lis_finitialize_f, LIS_FINITIALIZE_F)
 #define lis_finalize_f F77_FUNC_(lis_finalize_f, LIS_FINALIZE_F)
-#define lis_wtime_f F77_FUNC_(lis_wtime_f , LIS_WTIME_F)
+#define lis_wtime_f F77_FUNC_(lis_wtime_f, LIS_WTIME_F)
 #define CHKERR_f F77_FUNC_(chkerr_f, CHKERR_F)
 #define lis_set_argv_begin_f F77_FUNC_(lis_set_argv_begin_f, LIS_SET_ARGV_BEGIN_F)
 #define lis_set_argv_f F77_FUNC_(lis_set_argv_f, LIS_SET_ARGV_F)
@@ -289,8 +289,7 @@ extern LIS_Comm_f lis_comm_world_f;
 #define lis_vector_is_null_f F77_FUNC_(lis_vector_is_null_f, LIS_VECTOR_IS_NULL_F)
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #ifdef __cplusplus

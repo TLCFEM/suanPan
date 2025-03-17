@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,28 +25,28 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef USE_SSE2
-	#include <emmintrin.h>
+#include <emmintrin.h>
 #endif
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -84,7 +84,7 @@ LIS_INT lis_psolve_jacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
     LIS_PRECON precon;
     LIS_QUAD_DECLAR;
 #ifdef USE_QUAD_PRECISION
-		LIS_SCALAR *xl;
+    LIS_SCALAR* xl;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -100,38 +100,35 @@ LIS_INT lis_psolve_jacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
     b = B->value;
     x = X->value;
 #ifdef USE_QUAD_PRECISION
-		xl = X->value_lo;
+    xl = X->value_lo;
 #endif
 
 #ifdef USE_QUAD_PRECISION
-		if( B->precision==LIS_PRECISION_DEFAULT )
-		{
+    if(B->precision == LIS_PRECISION_DEFAULT) {
 #endif
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
-    for(i = 0; i < n; i++) { x[i] = b[i] * d[i]; }
+        for(i = 0; i < n; i++) { x[i] = b[i] * d[i]; }
 #ifdef USE_QUAD_PRECISION
-		}
-		else
-		{
+    }
+    else {
 #ifdef _OPENMP
 #ifndef USE_SSE2
-				#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
+#pragma omp parallel for private(i, p1, p2, tq, bhi, blo, chi, clo, sh, sl, th, tl, eh, el)
 #else
-				#pragma omp parallel for private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
+#pragma omp parallel for private(i, bh, ch, sh, wh, th, bl, cl, sl, wl, tl, p1, p2, t0, t1, t2, eh)
 #endif
 #endif
-			for(i=0; i<n; i++)
-			{
+        for(i = 0; i < n; i++) {
 #ifndef USE_SSE2
-					LIS_QUAD_MULD(x[i],xl[i],B->value[i],B->value_lo[i],d[i]);
+            LIS_QUAD_MULD(x[i], xl[i], B->value[i], B->value_lo[i], d[i]);
 #else
-					LIS_QUAD_MULD_SSE2(x[i],xl[i],B->value[i],B->value_lo[i],d[i]);
+            LIS_QUAD_MULD_SSE2(x[i], xl[i], B->value[i], B->value_lo[i], d[i]);
 #endif
-				/* x[i] = b[i] * d[i]; */
-			}
-		}
+            /* x[i] = b[i] * d[i]; */
+        }
+    }
 #endif
 
     LIS_DEBUG_FUNC_OUT;
@@ -147,7 +144,7 @@ LIS_INT lis_psolveh_jacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
     LIS_PRECON precon;
     LIS_QUAD_DECLAR;
 #ifdef USE_QUAD_PRECISION
-		LIS_SCALAR *xl;
+    LIS_SCALAR* xl;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -163,38 +160,35 @@ LIS_INT lis_psolveh_jacobi(LIS_SOLVER solver, LIS_VECTOR B, LIS_VECTOR X) {
     b = B->value;
     x = X->value;
 #ifdef USE_QUAD_PRECISION
-		xl = X->value_lo;
+    xl = X->value_lo;
 #endif
 
 #ifdef USE_QUAD_PRECISION
-		if( B->precision==LIS_PRECISION_DEFAULT )
-		{
+    if(B->precision == LIS_PRECISION_DEFAULT) {
 #endif
 #ifdef _OPENMP
-			#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
-    for(i = 0; i < n; i++) { x[i] = b[i] * conj(d[i]); }
+        for(i = 0; i < n; i++) { x[i] = b[i] * conj(d[i]); }
 #ifdef USE_QUAD_PRECISION
-		}
-		else
-		{
+    }
+    else {
 #ifdef _OPENMP
 #ifndef USE_SSE2
-				#pragma omp parallel for private(i,p1,p2,tq,bhi,blo,chi,clo,sh,sl,th,tl,eh,el)
+#pragma omp parallel for private(i, p1, p2, tq, bhi, blo, chi, clo, sh, sl, th, tl, eh, el)
 #else
-				#pragma omp parallel for private(i,bh,ch,sh,wh,th,bl,cl,sl,wl,tl,p1,p2,t0,t1,t2,eh)
+#pragma omp parallel for private(i, bh, ch, sh, wh, th, bl, cl, sl, wl, tl, p1, p2, t0, t1, t2, eh)
 #endif
 #endif
-			for(i=0; i<n; i++)
-			{
+        for(i = 0; i < n; i++) {
 #ifndef USE_SSE2
-			  		LIS_QUAD_MULD(x[i],xl[i],B->value[i],B->value_lo[i],conj(d[i]));
+            LIS_QUAD_MULD(x[i], xl[i], B->value[i], B->value_lo[i], conj(d[i]));
 #else
-					LIS_QUAD_MULD_SSE2(x[i],xl[i],B->value[i],B->value_lo[i],conj(d[i]));
+            LIS_QUAD_MULD_SSE2(x[i], xl[i], B->value[i], B->value_lo[i], conj(d[i]));
 #endif
-				/* x[i] = b[i] * conj(d[i]); */
-			}
-		}
+            /* x[i] = b[i] * conj(d[i]); */
+        }
+    }
 #endif
 
     LIS_DEBUG_FUNC_OUT;

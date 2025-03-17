@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,19 +25,19 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -67,8 +67,8 @@ LIS_INT lis_debug_trace_func(LIS_INT flag, char* func) {
     int argc = 0;
 
 #ifdef USE_MPI
-		MPI_Initialized(&lis_mpi_initialized);
-		if (!lis_mpi_initialized) MPI_Init(&argc, NULL);
+    MPI_Initialized(&lis_mpi_initialized);
+    if(!lis_mpi_initialized) MPI_Init(&argc, NULL);
 #endif
     if(flag) {
         sprintf(buf, "%%%ds : %%s\n", lis_tr_func + 3);
@@ -81,10 +81,9 @@ LIS_INT lis_debug_trace_func(LIS_INT flag, char* func) {
         lis_printf(lis_debug_comm, buf, "OUT", func);
     }
 #ifdef USE_MPI
-		if( strcmp(func,"main")==0 && !flag )
-		{
-			MPI_Finalize();
-		}
+    if(strcmp(func, "main") == 0 && !flag) {
+        MPI_Finalize();
+    }
 #endif
     return LIS_SUCCESS;
 }
@@ -108,7 +107,7 @@ LIS_INT lis_vprintf(const char* mess, va_list vvlist) {
 
     strcpy(str, mess);
 #ifdef _LONG__LONG
-	lis_replace(str,"%D","%lld");
+    lis_replace(str, "%D", "%lld");
 #else
     lis_replace(str, "%D", "%d");
 #endif
@@ -123,9 +122,9 @@ LIS_INT lis_printf(LIS_Comm comm, const char* mess, ...) {
 
 #ifdef USE_MPI
 #ifdef _DEBUG
-	MPI_Barrier(comm);
+    MPI_Barrier(comm);
 #endif
-	MPI_Comm_rank(comm,&my_rank);
+    MPI_Comm_rank(comm, &my_rank);
 #else
     my_rank = 0;
 #endif
@@ -137,7 +136,7 @@ LIS_INT lis_printf(LIS_Comm comm, const char* mess, ...) {
     }
 #ifdef USE_MPI
 #ifdef _DEBUG
-	MPI_Barrier(comm);
+    MPI_Barrier(comm);
 #endif
 #endif
     return LIS_SUCCESS;
@@ -149,7 +148,7 @@ LIS_INT lis_error(const char* file, const char* func, const LIS_INT line, const 
     char str[1024];
 
 #ifdef USE_MPI
-	MPI_Comm_rank(lis_debug_comm,&my_rank);
+    MPI_Comm_rank(lis_debug_comm, &my_rank);
 #else
     my_rank = 0;
 #endif
@@ -172,7 +171,7 @@ void CHKERR(LIS_INT ierr) {
 
 LIS_INT lis_print_rhistory(LIS_Comm comm, LIS_INT iter, LIS_REAL resid) {
 #ifdef _LONG__LONG
-	lis_printf(comm,"iteration: %5lld  relative residual = %e\n", iter, (double)resid);
+    lis_printf(comm, "iteration: %5lld  relative residual = %e\n", iter, (double)resid);
 #else
     lis_printf(comm, "iteration: %5d  relative residual = %E\n", iter, (double)resid);
 #endif

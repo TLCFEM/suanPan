@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,19 +25,19 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <math.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -81,11 +81,11 @@ LIS_INT lis_vector_swap(LIS_VECTOR vx, LIS_VECTOR vy) {
     x = vx->value;
     y = vy->value;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) {
         t = y[i];
@@ -120,11 +120,11 @@ LIS_INT lis_vector_copy(LIS_VECTOR vx, LIS_VECTOR vy) {
     x = vx->value;
     y = vy->value;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { y[i] = x[i]; }
 
@@ -155,11 +155,11 @@ LIS_INT lis_vector_axpy(LIS_SCALAR alpha, LIS_VECTOR vx, LIS_VECTOR vy) {
     x = vx->value;
     y = vy->value;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { y[i] += alpha * x[i]; }
 
@@ -190,11 +190,11 @@ LIS_INT lis_vector_xpay(LIS_VECTOR vx, LIS_SCALAR alpha, LIS_VECTOR vy) {
     x = vx->value;
     y = vy->value;
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
     for(i = 0; i < n; i++) { y[i] = x[i] + alpha * y[i]; }
     LIS_DEBUG_FUNC_OUT;
@@ -225,11 +225,11 @@ LIS_INT lis_vector_axpyz(LIS_SCALAR alpha, LIS_VECTOR vx, LIS_VECTOR vy, LIS_VEC
     y = vy->value;
     z = vz->value;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { z[i] = alpha * x[i] + y[i]; }
     LIS_DEBUG_FUNC_OUT;
@@ -252,11 +252,11 @@ LIS_INT lis_vector_scale(LIS_SCALAR alpha, LIS_VECTOR vx) {
 
     x = vx->value;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { x[i] = alpha * x[i]; }
 
@@ -288,11 +288,11 @@ LIS_INT lis_vector_pmul(LIS_VECTOR vx, LIS_VECTOR vy, LIS_VECTOR vz) {
     y = vy->value;
     z = vz->value;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { z[i] = x[i] * y[i]; }
     LIS_DEBUG_FUNC_OUT;
@@ -323,11 +323,11 @@ LIS_INT lis_vector_pdiv(LIS_VECTOR vx, LIS_VECTOR vy, LIS_VECTOR vz) {
     y = vy->value;
     z = vz->value;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { z[i] = x[i] / y[i]; }
     LIS_DEBUG_FUNC_OUT;
@@ -350,11 +350,11 @@ LIS_INT lis_vector_set_all(LIS_SCALAR alpha, LIS_VECTOR vx) {
 
     x = vx->value;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { x[i] = alpha; }
 
@@ -377,11 +377,11 @@ LIS_INT lis_vector_abs(LIS_VECTOR vx) {
     x = vx->value;
     n = vx->n;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { x[i] = fabs(x[i]); }
     LIS_DEBUG_FUNC_OUT;
@@ -403,11 +403,11 @@ LIS_INT lis_vector_reciprocal(LIS_VECTOR vx) {
     x = vx->value;
     n = vx->n;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { x[i] = 1.0 / x[i]; }
     LIS_DEBUG_FUNC_OUT;
@@ -429,15 +429,15 @@ LIS_INT lis_vector_conjugate(LIS_VECTOR vx) {
     x = vx->value;
     n = vx->n;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) {
 #ifdef _COMPLEX
-		x[i] = conj(x[i]);
+        x[i] = conj(x[i]);
 #endif
     }
     LIS_DEBUG_FUNC_OUT;
@@ -459,11 +459,11 @@ LIS_INT lis_vector_shift(LIS_SCALAR sigma, LIS_VECTOR vx) {
     x = vx->value;
     n = vx->n;
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { x[i] = x[i] - sigma; }
     LIS_DEBUG_FUNC_OUT;

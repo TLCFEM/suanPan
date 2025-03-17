@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -49,8 +49,8 @@ extern "C" {
 #include <quadmath.h>
 #endif
 
-#define _max(a,b) ((a) >= (b) ? (a) : (b))
-#define _min(a,b) ((a) <= (b) ? (a) : (b))
+#define _max(a, b) ((a) >= (b) ? (a) : (b))
+#define _min(a, b) ((a) <= (b) ? (a) : (b))
 
 #define LIS_FMT_AUTO 0
 #define LIS_FMT_PLAIN 1
@@ -111,26 +111,26 @@ extern "C" {
 #define LIS_EOPTIONS_RVAL 12
 
 #define LIS_PARAMS_LEN 15
-#define LIS_PARAMS_RESID LIS_OPTIONS_LEN+0
-#define LIS_PARAMS_OMEGA LIS_OPTIONS_LEN+1
-#define LIS_PARAMS_RELAX LIS_OPTIONS_LEN+2
-#define LIS_PARAMS_DROP LIS_OPTIONS_LEN+3
-#define LIS_PARAMS_ALPHA LIS_OPTIONS_LEN+4
-#define LIS_PARAMS_TAU LIS_OPTIONS_LEN+5
-#define LIS_PARAMS_SIGMA LIS_OPTIONS_LEN+6
-#define LIS_PARAMS_GAMMA LIS_OPTIONS_LEN+7
-#define LIS_PARAMS_SSOR_OMEGA LIS_OPTIONS_LEN+8
-#define LIS_PARAMS_PRESID LIS_OPTIONS_LEN+9
-#define LIS_PARAMS_POMEGA LIS_OPTIONS_LEN+10
-#define LIS_PARAMS_SWITCH_RESID LIS_OPTIONS_LEN+11
-#define LIS_PARAMS_RATE LIS_OPTIONS_LEN+12
-#define LIS_PARAMS_RESID_WEIGHT LIS_OPTIONS_LEN+13
-#define LIS_PARAMS_SAAMG_THETA LIS_OPTIONS_LEN+14
+#define LIS_PARAMS_RESID LIS_OPTIONS_LEN + 0
+#define LIS_PARAMS_OMEGA LIS_OPTIONS_LEN + 1
+#define LIS_PARAMS_RELAX LIS_OPTIONS_LEN + 2
+#define LIS_PARAMS_DROP LIS_OPTIONS_LEN + 3
+#define LIS_PARAMS_ALPHA LIS_OPTIONS_LEN + 4
+#define LIS_PARAMS_TAU LIS_OPTIONS_LEN + 5
+#define LIS_PARAMS_SIGMA LIS_OPTIONS_LEN + 6
+#define LIS_PARAMS_GAMMA LIS_OPTIONS_LEN + 7
+#define LIS_PARAMS_SSOR_OMEGA LIS_OPTIONS_LEN + 8
+#define LIS_PARAMS_PRESID LIS_OPTIONS_LEN + 9
+#define LIS_PARAMS_POMEGA LIS_OPTIONS_LEN + 10
+#define LIS_PARAMS_SWITCH_RESID LIS_OPTIONS_LEN + 11
+#define LIS_PARAMS_RATE LIS_OPTIONS_LEN + 12
+#define LIS_PARAMS_RESID_WEIGHT LIS_OPTIONS_LEN + 13
+#define LIS_PARAMS_SAAMG_THETA LIS_OPTIONS_LEN + 14
 
 #define LIS_EPARAMS_LEN 3
-#define LIS_EPARAMS_RESID LIS_EOPTIONS_LEN+0
-#define LIS_EPARAMS_SHIFT LIS_EOPTIONS_LEN+1
-#define LIS_EPARAMS_SHIFT_IM LIS_EOPTIONS_LEN+2
+#define LIS_EPARAMS_RESID LIS_EOPTIONS_LEN + 0
+#define LIS_EPARAMS_SHIFT LIS_EOPTIONS_LEN + 1
+#define LIS_EPARAMS_SHIFT_IM LIS_EOPTIONS_LEN + 2
 
 #define LIS_OPTIONS_FILE -1
 #define LIS_OPTIONS_HELP -2
@@ -273,16 +273,16 @@ extern "C" {
 #define LIS_MATRIX_LBSR 19
 #define LIS_MATRIX_CDIA 20
 #define LIS_MATRIX_MSC 21
-#define LIS_MATRIX_DECIDING_SIZE -(LIS_MATRIX_RCO+1)
-#define LIS_MATRIX_NULL -(LIS_MATRIX_RCO+2)
+#define LIS_MATRIX_DECIDING_SIZE -(LIS_MATRIX_RCO + 1)
+#define LIS_MATRIX_NULL -(LIS_MATRIX_RCO + 2)
 
 #define LIS_MATRIX_DEFAULT LIS_MATRIX_CSR
 #define LIS_MATRIX_POINT LIS_MATRIX_CSR
 #define LIS_MATRIX_BLOCK LIS_MATRIX_BSR
 
 #if defined(_DEBUG)
-#define LIS_DEBUG_FUNC_IN lis_debug_trace_func(1,__FUNC__)
-#define LIS_DEBUG_FUNC_OUT lis_debug_trace_func(0,__FUNC__)
+#define LIS_DEBUG_FUNC_IN lis_debug_trace_func(1, __FUNC__)
+#define LIS_DEBUG_FUNC_OUT lis_debug_trace_func(0, __FUNC__)
 #else
 #define LIS_DEBUG_FUNC_IN
 #define LIS_DEBUG_FUNC_OUT
@@ -328,7 +328,7 @@ typedef __float128 LIS_REAL;
 #define fabs(x) cabsq(x)
 #define log(x) clogq(x)
 #define conj(x) conjq(x)
-#define pow(x,y) cpowq(x,y)
+#define pow(x, y) cpowq(x, y)
 #define proj(x) cprojq(x)
 #define sin(x) csinq(x)
 #define sinh(x) csinhq(x)
@@ -354,7 +354,7 @@ typedef long double LIS_REAL;
 #define fabs(x) cabsl(x)
 #define log(x) clogl(x)
 #define conj(x) conjl(x)
-#define pow(x,y) cpowl(x,y)
+#define pow(x, y) cpowl(x, y)
 #define proj(x) cprojl(x)
 #define sin(x) csinl(x)
 #define sinh(x) csinhl(x)
@@ -367,22 +367,22 @@ typedef long double LIS_REAL;
 #else
 #ifdef HAVE_QUADMATH_H
 typedef __float128 LIS_SCALAR;
-typedef __float128 LIS_REAL;  
+typedef __float128 LIS_REAL;
 #define sin(x) sinq(x)
 #define cos(x) cosq(x)
 #define tan(x) tanq(x)
 #define asin(x) asinq(x)
 #define acos(x) acosq(x)
 #define atan(x) atanq(x)
-#define atan2(x,y) atan2q((x),(y))
-#define fmod(x,y) fmodq((x),(y))
+#define atan2(x, y) atan2q((x), (y))
+#define fmod(x, y) fmodq((x), (y))
 #define fabs(x) fabsq(x)
 #define sqrt(x) sqrtq(x)
 #define log(x) logq(x)
 #define log10(x) log10q(x)
 #define conj(x) x
 #define exp(x) expq(x)
-#define pow(x,y) powq((x),(y))
+#define pow(x, y) powq((x), (y))
 #define LIS_MPI_SCALAR MPI_LONG_DOUBLE
 #define LIS_MPI_REAL MPI_LONG_DOUBLE
 #else
@@ -394,15 +394,15 @@ typedef long double LIS_REAL;
 #define asin(x) asinl(x)
 #define acos(x) acosl(x)
 #define atan(x) atanl(x)
-#define atan2(x,y) atan2l((x),(y))
-#define fmod(x,y) fmodl((x),(y))
+#define atan2(x, y) atan2l((x), (y))
+#define fmod(x, y) fmodl((x), (y))
 #define fabs(x) fabsl(x)
 #define sqrt(x) sqrtl(x)
 #define log(x) logl(x)
 #define log10(x) log10l(x)
 #define conj(x) x
 #define exp(x) expl(x)
-#define pow(x,y) powl((x),(y))
+#define pow(x, y) powl((x), (y))
 #define LIS_MPI_SCALAR MPI_LONG_DOUBLE
 #define LIS_MPI_REAL MPI_LONG_DOUBLE
 #endif
@@ -427,7 +427,7 @@ typedef double LIS_REAL;
 #define exp(x) cexp(x)
 #define fabs(x) cabs(x)
 #define log(x) clog(x)
-#define pow(x,y) cpow(x,y)
+#define pow(x, y) cpow(x, y)
 #define proj(x) cproj(x)
 #define sin(x) csin(x)
 #define sinh(x) csinh(x)
@@ -457,27 +457,27 @@ typedef unsigned int LIS_UNSIGNED_INT;
 #endif
 
 #ifdef USE_MAIN__
-	#define main MAIN__
+#define main MAIN__
 #endif
 
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 
 #ifdef USE_MPI
-	#include <mpi.h>
-	typedef MPI_Comm LIS_Comm;
-	#define LIS_COMM_WORLD	((LIS_Comm)MPI_COMM_WORLD)
+#include <mpi.h>
+typedef MPI_Comm LIS_Comm;
+#define LIS_COMM_WORLD ((LIS_Comm)MPI_COMM_WORLD)
 #if defined(_LONG__LONG)
-	#define LIS_MPI_INT     MPI_LONG_LONG_INT
-	#define LIS_MPI_Fint    MPI_Fint
+#define LIS_MPI_INT MPI_LONG_LONG_INT
+#define LIS_MPI_Fint MPI_Fint
 #else
-	#define LIS_MPI_INT     MPI_INT
-	#define LIS_MPI_Fint    MPI_Fint
+#define LIS_MPI_INT MPI_INT
+#define LIS_MPI_Fint MPI_Fint
 #endif
 #else
 typedef LIS_INT LIS_Comm;
-#define LIS_COMM_WORLD	((LIS_Comm)0x1)
+#define LIS_COMM_WORLD ((LIS_Comm)0x1)
 #endif
 
 struct LIS_COMMTABLE_STRUCT {
@@ -496,8 +496,8 @@ struct LIS_COMMTABLE_STRUCT {
     LIS_SCALAR* ws;
     LIS_SCALAR* wr;
 #ifdef USE_MPI
-	MPI_Request  *req1,*req2;
-	MPI_Status *sta1,*sta2;
+    MPI_Request *req1, *req2;
+    MPI_Status *sta1, *sta2;
 #endif
 };
 
@@ -802,8 +802,7 @@ typedef struct LIS_PRECON_REGISTER_STRUCT {
 } LIS_PRECON_REGISTER;
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /****************************/
@@ -1046,27 +1045,25 @@ extern LIS_INT lis_printf(LIS_Comm comm, const char* mess, ...);
 #define LIS_OUT_OF_MEMORY 3
 #define LIS_ERR_OUT_OF_MEMORY 3
 #define LIS_MAXITER 4
-#define LIS_ERR_NOT_IMPLEMENTED	5
-#define LIS_ERR_FILE_IO	6
+#define LIS_ERR_NOT_IMPLEMENTED 5
+#define LIS_ERR_FILE_IO 6
 
 #if 1
-#define LIS_GET_ISIE(id,nprocs,n,is,ie) \
-		if( (id) < (n)%(nprocs) ) \
-		{ \
-			(ie) = (n)/(nprocs)+1; \
-			(is) = (ie)*(id); \
-		} \
-		else \
-		{ \
-			(ie) = (n)/(nprocs); \
-			(is) = (ie)*(id) + (n)%(nprocs); \
-		} \
-		(ie) = (ie)+(is);
+#define LIS_GET_ISIE(id, nprocs, n, is, ie)  \
+    if((id) < (n) % (nprocs)) {              \
+        (ie) = (n) / (nprocs) + 1;           \
+        (is) = (ie) * (id);                  \
+    }                                        \
+    else {                                   \
+        (ie) = (n) / (nprocs);               \
+        (is) = (ie) * (id) + (n) % (nprocs); \
+    }                                        \
+    (ie) = (ie) + (is);
 #else
-#define LIS_GET_ISIE(id,nprocs,n,is,ie) \
-		(ie) = (n)/(nprocs)+1; \
-		(is) = (id)*(ie)<((n)+1)?(id)*(ie):(n)+1; \
-		(ie) = (is)+(ie)-1<(n)?(is)+(ie)-1:(n);
+#define LIS_GET_ISIE(id, nprocs, n, is, ie)                 \
+    (ie) = (n) / (nprocs) + 1;                              \
+    (is) = (id) * (ie) < ((n) + 1) ? (id) * (ie) : (n) + 1; \
+    (ie) = (is) + (ie) - 1 < (n) ? (is) + (ie) - 1 : (n);
 #endif
 
 #ifdef __cplusplus

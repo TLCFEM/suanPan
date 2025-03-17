@@ -1,14 +1,14 @@
-/* 
+/*
    A C-program for MT19937, with initialization improved 2002/1/26.
    Coded by Takuji Nishimura and Makoto Matsumoto.
 
-   Before using, initialize the state by using init_genrand(seed)  
+   Before using, initialize the state by using init_genrand(seed)
    or init_by_array(init_key, key_length).
 
    Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
-   All rights reserved.                          
+   All rights reserved.
    Copyright (C) 2005, Mutsuo Saito,
-   All rights reserved.                          
+   All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
@@ -21,8 +21,8 @@
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
-     3. The names of its contributors may not be used to endorse or promote 
-        products derived from this software without specific prior written 
+     3. The names of its contributors may not be used to endorse or promote
+        products derived from this software without specific prior written
         permission.
 
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -43,8 +43,9 @@
    email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
 */
 
-#include <stdio.h>
 #include "mt19937ar.h"
+
+#include <stdio.h>
 
 /************************************************
  * init_genrand
@@ -93,9 +94,8 @@ void init_by_array(unsigned long init_key[], int key_length) {
     j = 0;
     k = (N > key_length ? N : key_length);
     for(; k; k--) {
-        mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * 1664525UL))
-            + init_key[j] + j; /* non linear */
-        mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
+        mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * 1664525UL)) + init_key[j] + j; /* non linear */
+        mt[i] &= 0xffffffffUL;                                                             /* for WORDSIZE > 32 machines */
         i++;
         j++;
         if(i >= N) {
@@ -105,9 +105,8 @@ void init_by_array(unsigned long init_key[], int key_length) {
         if(j >= key_length) j = 0;
     }
     for(k = N - 1; k; k--) {
-        mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * 1566083941UL))
-            - i;               /* non linear */
-        mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
+        mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * 1566083941UL)) - i; /* non linear */
+        mt[i] &= 0xffffffffUL;                                                  /* for WORDSIZE > 32 machines */
         i++;
         if(i >= N) {
             mt[0] = mt[N - 1];

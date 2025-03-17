@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <math.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -248,7 +248,7 @@ LIS_INT lis_array_conjugate(LIS_INT n, LIS_SCALAR* x) {
 
     for(i = 0; i < n; i++) {
 #ifdef _COMPLEX
-      x[i] = conj(x[i]);
+        x[i] = conj(x[i]);
 #endif
     }
 
@@ -344,7 +344,9 @@ LIS_INT lis_array_nrmi(LIS_INT n, LIS_SCALAR* x, LIS_REAL* value) {
     LIS_DEBUG_FUNC_IN;
 
     t = 0.0;
-    for(i = 0; i < n; i++) { if(t < fabs(x[i])) { t = fabs(x[i]); } }
+    for(i = 0; i < n; i++) {
+        if(t < fabs(x[i])) { t = fabs(x[i]); }
+    }
     *value = t;
 
     LIS_DEBUG_FUNC_OUT;
@@ -481,7 +483,7 @@ LIS_INT lis_array_matvech(LIS_INT n, LIS_SCALAR* a, LIS_SCALAR* x, LIS_SCALAR* y
         default:
             for(i = 0; i < n; i++) {
                 t = 0.0;
-                for(j = 0; j < n; j++) { t += conj(a[i*n+j]) * x[j]; }
+                for(j = 0; j < n; j++) { t += conj(a[i * n + j]) * x[j]; }
                 y[i] = t;
             }
             break;
@@ -504,7 +506,7 @@ LIS_INT lis_array_matvech(LIS_INT n, LIS_SCALAR* a, LIS_SCALAR* x, LIS_SCALAR* y
         default:
             for(i = 0; i < n; i++) {
                 t = 0.0;
-                for(j = 0; j < n; j++) { t += conj(a[i*n+j]) * x[j]; }
+                for(j = 0; j < n; j++) { t += conj(a[i * n + j]) * x[j]; }
                 y[i] -= t;
             }
             break;
@@ -527,7 +529,7 @@ LIS_INT lis_array_matvech(LIS_INT n, LIS_SCALAR* a, LIS_SCALAR* x, LIS_SCALAR* y
         default:
             for(i = 0; i < n; i++) {
                 t = 0.0;
-                for(j = 0; j < n; j++) { t += conj(a[i*n+j]) * x[j]; }
+                for(j = 0; j < n; j++) { t += conj(a[i * n + j]) * x[j]; }
                 y[i] += t;
             }
             break;
@@ -633,7 +635,9 @@ LIS_INT lis_array_matmat(LIS_INT n, LIS_SCALAR* a, LIS_SCALAR* b, LIS_SCALAR* c,
         default:
             for(j = 0; j < n; j++) {
                 for(i = 0; i < n; i++) { c[i + j * n] = 0.0; }
-                for(l = 0; l < n; l++) { for(i = 0; i < n; i++) { c[i + j * n] += a[i + l * n] * b[l + j * n]; } }
+                for(l = 0; l < n; l++) {
+                    for(i = 0; i < n; i++) { c[i + j * n] += a[i + l * n] * b[l + j * n]; }
+                }
             }
             break;
         }
@@ -661,7 +665,11 @@ LIS_INT lis_array_matmat(LIS_INT n, LIS_SCALAR* a, LIS_SCALAR* b, LIS_SCALAR* c,
             c[8] -= a[2] * b[6] + a[5] * b[7] + a[8] * b[8];
             break;
         default:
-            for(j = 0; j < n; j++) { for(l = 0; l < n; l++) { for(i = 0; i < n; i++) { c[i + j * n] -= a[i + l * n] * b[l + j * n]; } } }
+            for(j = 0; j < n; j++) {
+                for(l = 0; l < n; l++) {
+                    for(i = 0; i < n; i++) { c[i + j * n] -= a[i + l * n] * b[l + j * n]; }
+                }
+            }
             break;
         }
     }
@@ -688,7 +696,11 @@ LIS_INT lis_array_matmat(LIS_INT n, LIS_SCALAR* a, LIS_SCALAR* b, LIS_SCALAR* c,
             c[8] += a[2] * b[6] + a[5] * b[7] + a[8] * b[8];
             break;
         default:
-            for(j = 0; j < n; j++) { for(l = 0; l < n; l++) { for(i = 0; i < n; i++) { c[i + j * n] += a[i + l * n] * b[l + j * n]; } } }
+            for(j = 0; j < n; j++) {
+                for(l = 0; l < n; l++) {
+                    for(i = 0; i < n; i++) { c[i + j * n] += a[i + l * n] * b[l + j * n]; }
+                }
+            }
             break;
         }
     }
@@ -710,11 +722,25 @@ LIS_INT lis_array_matmat_ns(LIS_INT l, LIS_INT m, LIS_INT n, LIS_SCALAR* a, LIS_
     if(op == LIS_INS_VALUE) {
         for(j = 0; j < m; j++) {
             for(i = 0; i < l; i++) { c[i + j * ldc] = 0.0; }
-            for(k = 0; k < n; k++) { for(i = 0; i < l; i++) { c[i + j * ldc] += a[i + k * lda] * b[k + j * ldb]; } }
+            for(k = 0; k < n; k++) {
+                for(i = 0; i < l; i++) { c[i + j * ldc] += a[i + k * lda] * b[k + j * ldb]; }
+            }
         }
     }
-    else if(op == LIS_SUB_VALUE) { for(j = 0; j < m; j++) { for(k = 0; k < n; k++) { for(i = 0; i < l; i++) { c[i + j * ldc] -= a[i + k * lda] * b[k + j * ldb]; } } } }
-    else { for(j = 0; j < m; j++) { for(k = 0; k < n; k++) { for(i = 0; i < l; i++) { c[i + j * ldc] += a[i + k * lda] * b[k + j * ldb]; } } } }
+    else if(op == LIS_SUB_VALUE) {
+        for(j = 0; j < m; j++) {
+            for(k = 0; k < n; k++) {
+                for(i = 0; i < l; i++) { c[i + j * ldc] -= a[i + k * lda] * b[k + j * ldb]; }
+            }
+        }
+    }
+    else {
+        for(j = 0; j < m; j++) {
+            for(k = 0; k < n; k++) {
+                for(i = 0; i < l; i++) { c[i + j * ldc] += a[i + k * lda] * b[k + j * ldb]; }
+            }
+        }
+    }
 
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -779,10 +805,10 @@ LIS_INT lis_array_solve(LIS_INT n, LIS_SCALAR* a, LIS_SCALAR* b, LIS_SCALAR* x, 
         w[1] *= w[0];
         w[3] -= w[1] * w[2];
         w[3] = 1.0 / w[3];
-    /* forward sub */
+        /* forward sub */
         x[0] = b[0];
         x[1] = b[1] - w[1] * x[0];
-    /* backward sub */
+        /* backward sub */
         x[1] *= w[3];
         x[0] -= w[2] * x[1];
         x[0] *= w[0];
@@ -797,12 +823,12 @@ LIS_INT lis_array_solve(LIS_INT n, LIS_SCALAR* a, LIS_SCALAR* b, LIS_SCALAR* x, 
             }
         }
 
-    /* forward sub */
+        /* forward sub */
         for(i = 0; i < n; i++) {
             x[i] = b[i];
             for(j = 0; j < i; j++) { x[i] -= w[i + j * n] * x[j]; }
         }
-    /* backward sub */
+        /* backward sub */
         for(i = n - 1; i >= 0; i--) {
             for(j = i + 1; j < n; j++) { x[i] -= w[i + j * n] * x[j]; }
             x[i] *= w[i + i * n];

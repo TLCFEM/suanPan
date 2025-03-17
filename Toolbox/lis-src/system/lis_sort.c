@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,20 +25,21 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include "lislib.h"
+
+#include <stdarg.h>
+#include <string.h>
 
 /************************************************
  * lis_sort_i
@@ -58,7 +59,12 @@
  * lis_sort_dd
  ************************************************/
 
-#define lis_swap(a,b,t) {t = a; a = b; b = t;}
+#define lis_swap(a, b, t) \
+    {                     \
+        t = a;            \
+        a = b;            \
+        b = t;            \
+    }
 
 void lis_sort_i(LIS_INT is, LIS_INT ie, LIS_INT* i1) {
     LIS_INT i, j;
@@ -368,16 +374,16 @@ void lis_sort_jad(LIS_INT is, LIS_INT ie, LIS_INT maxnzr, LIS_INT* i1, LIS_INT* 
     iw2 = (LIS_INT*)lis_malloc((maxnzr + 2) * sizeof(LIS_INT), "lis_sort_jad::iw2");
 
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
     for(i = 0; i < maxnzr + 2; i++) { iw[i] = 0; }
     for(i = is; i < ie; i++) { iw[(maxnzr - i1[i]) + 1]++; }
     iw[0] = is;
     for(i = 0; i < maxnzr + 1; i++) { iw[i + 1] += iw[i]; }
 #ifdef USE_VEC_COMP
-	#pragma cdir nodep
-	#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
     for(i = 0; i < maxnzr + 2; i++) { iw2[i] = iw[i]; }
 
@@ -387,8 +393,8 @@ void lis_sort_jad(LIS_INT is, LIS_INT ie, LIS_INT maxnzr, LIS_INT* i1, LIS_INT* 
     }
     for(i = 0; i < maxnzr + 1; i++) {
 #ifdef USE_VEC_COMP
-		#pragma cdir nodep
-		#pragma _NEC ivdep
+#pragma cdir nodep
+#pragma _NEC ivdep
 #endif
         for(j = iw2[i]; j < iw2[i + 1]; j++) { i1[j] = maxnzr - i; }
     }
@@ -413,11 +419,11 @@ void lis_sort_di(LIS_INT is, LIS_INT ie, LIS_SCALAR* d1, LIS_INT* i1) {
     while(i <= j) {
 #ifdef _COMPLEX
 #ifdef _LONG__DOUBLE
-	  while(creall(d1[i]) < creall(v)) { i++; }
-	  while(creall(d1[j]) > creall(v)) { j--; }
+        while(creall(d1[i]) < creall(v)) { i++; }
+        while(creall(d1[j]) > creall(v)) { j--; }
 #else
-	  while(creal(d1[i]) < creal(v)) { i++; }
-	  while(creal(d1[j]) > creal(v)) { j--; }
+        while(creal(d1[i]) < creal(v)) { i++; }
+        while(creal(d1[j]) > creal(v)) { j--; }
 #endif
 #else
         while(d1[i] < v) { i++; }
@@ -451,11 +457,11 @@ void lis_sort_d(LIS_INT is, LIS_INT ie, LIS_SCALAR* d1) {
     while(i <= j) {
 #ifdef _COMPLEX
 #ifdef _LONG__DOUBLE
-	  while(creall(d1[i]) < creall(v)) { i++; }
-	  while(creall(d1[j]) > creall(v)) { j--; }
+        while(creall(d1[i]) < creall(v)) { i++; }
+        while(creall(d1[j]) > creall(v)) { j--; }
 #else
-	  while(creal(d1[i]) < creal(v)) { i++; }
-	  while(creal(d1[j]) > creal(v)) { j--; }
+        while(creal(d1[i]) < creal(v)) { i++; }
+        while(creal(d1[j]) > creal(v)) { j--; }
 #endif
 #else
         while(d1[i] < v) { i++; }
@@ -490,11 +496,11 @@ void lis_sort_dd(LIS_INT is, LIS_INT ie, LIS_SCALAR* d1, LIS_VECTOR* d2) {
     while(i <= j) {
 #ifdef _COMPLEX
 #ifdef _LONG__DOUBLE
-	  while(creall(d1[i]) < creall(v)) { i++; }
-	  while(creall(d1[j]) > creall(v)) { j--; }
+        while(creall(d1[i]) < creall(v)) { i++; }
+        while(creall(d1[j]) > creall(v)) { j--; }
 #else
-	  while(creal(d1[i]) < creal(v)) { i++; }
-	  while(creal(d1[j]) > creal(v)) { j--; }
+        while(creal(d1[i]) < creal(v)) { i++; }
+        while(creal(d1[j]) > creal(v)) { j--; }
 #endif
 #else
         while(d1[i] < v) { i++; }

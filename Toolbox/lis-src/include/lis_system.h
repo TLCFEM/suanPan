@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -29,14 +29,14 @@
 
 #include <stdarg.h>
 
-#define LIS_SETERR(code,mess) lis_error(__FILE__,__FUNC__,__LINE__,code,mess)
-#define LIS_SETERR1(code,mess,a1) lis_error(__FILE__,__FUNC__,__LINE__,code,mess,a1)
-#define LIS_SETERR2(code,mess,a1,a2) lis_error(__FILE__,__FUNC__,__LINE__,code,mess,a1,a2)
-#define LIS_SETERR3(code,mess,a1,a2,a3)	lis_error(__FILE__,__FUNC__,__LINE__,code,mess,a1,a2,a3)
-#define LIS_SETERR4(code,mess,a1,a2,a3,a4) lis_error(__FILE__,__FUNC__,__LINE__,code,mess,a1,a2,a3,a4)
-#define LIS_SETERR_MEM(sz) lis_error(__FILE__,__FUNC__,__LINE__,LIS_ERR_OUT_OF_MEMORY,"malloc size = %D\n",sz)
-#define LIS_SETERR_IMP lis_error(__FILE__,__FUNC__,__LINE__,LIS_ERR_NOT_IMPLEMENTED,"not implemented\n")
-#define LIS_SETERR_FIO lis_error(__FILE__,__FUNC__,__LINE__,LIS_ERR_FILE_IO,"file i/o error\n")
+#define LIS_SETERR(code, mess) lis_error(__FILE__, __FUNC__, __LINE__, code, mess)
+#define LIS_SETERR1(code, mess, a1) lis_error(__FILE__, __FUNC__, __LINE__, code, mess, a1)
+#define LIS_SETERR2(code, mess, a1, a2) lis_error(__FILE__, __FUNC__, __LINE__, code, mess, a1, a2)
+#define LIS_SETERR3(code, mess, a1, a2, a3) lis_error(__FILE__, __FUNC__, __LINE__, code, mess, a1, a2, a3)
+#define LIS_SETERR4(code, mess, a1, a2, a3, a4) lis_error(__FILE__, __FUNC__, __LINE__, code, mess, a1, a2, a3, a4)
+#define LIS_SETERR_MEM(sz) lis_error(__FILE__, __FUNC__, __LINE__, LIS_ERR_OUT_OF_MEMORY, "malloc size = %D\n", sz)
+#define LIS_SETERR_IMP lis_error(__FILE__, __FUNC__, __LINE__, LIS_ERR_NOT_IMPLEMENTED, "not implemented\n")
+#define LIS_SETERR_FIO lis_error(__FILE__, __FUNC__, __LINE__, LIS_ERR_FILE_IO, "file i/o error\n")
 
 typedef struct LIS_ARGS_STRUCT {
     struct LIS_ARGS_STRUCT *next, *prev;
@@ -53,15 +53,14 @@ typedef struct LIS_HASH_STRUCT {
 typedef struct LIS_HASH_STRUCT** LIS_HASHTABLE;
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 extern LIS_ARGS cmd_args;
 extern LIS_SCALAR* lis_vec_tmp;
 extern int lis_mpi_initialized;
 #ifdef USE_MPI
-	extern MPI_Op LIS_MPI_MSUM;
-	extern MPI_Datatype LIS_MPI_MSCALAR;
+extern MPI_Op LIS_MPI_MSUM;
+extern MPI_Datatype LIS_MPI_MSCALAR;
 #endif
 extern void lis_memory_init(void);
 extern void lis_free_mat(LIS_MATRIX A);

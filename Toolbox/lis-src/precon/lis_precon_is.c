@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -74,7 +74,7 @@ LIS_INT lis_precon_create_is(LIS_SOLVER solver, LIS_PRECON precon) {
             A = solver->A;
             err = lis_matrix_duplicate(A, &B);
             if(err) return err;
-            lis_matrix_set_type(B,LIS_MATRIX_CSR);
+            lis_matrix_set_type(B, LIS_MATRIX_CSR);
             err = lis_matrix_convert(A, B);
             if(err) return err;
             lis_matrix_storage_destroy(A);
@@ -107,7 +107,7 @@ LIS_INT lis_precon_create_is(LIS_SOLVER solver, LIS_PRECON precon) {
         A = solver->A;
         err = lis_matrix_duplicate(A, &B);
         if(err) return err;
-        lis_matrix_set_type(B,LIS_MATRIX_CSR);
+        lis_matrix_set_type(B, LIS_MATRIX_CSR);
         err = lis_matrix_convert(A, B);
         if(err) return err;
         lis_matrix_storage_destroy(A);
@@ -182,7 +182,7 @@ LIS_INT lis_precon_create_is_csr(LIS_SOLVER solver, LIS_PRECON precon) {
         k = 0;
         nnzl = 0;
         nnzu = 0;
-        n2 = _min(A->U->ptr[i]+m, A->U->ptr[i+1]);
+        n2 = _min(A->U->ptr[i] + m, A->U->ptr[i + 1]);
         /*
          *  I*A
          */
@@ -204,7 +204,7 @@ LIS_INT lis_precon_create_is_csr(LIS_SOLVER solver, LIS_PRECON precon) {
         for(ja = A->U->ptr[i]; ja < n2; ja++) {
             jj = A->U->index[ja];
 #if USE_MPI
-				if( jj>=n ) break;
+            if(jj >= n) break;
 #endif
             for(jb = A->L->ptr[jj]; jb < A->L->ptr[jj + 1]; jb++) {
                 jcol = A->L->index[jb];
@@ -259,7 +259,7 @@ LIS_INT lis_precon_create_is_csr(LIS_SOLVER solver, LIS_PRECON precon) {
     for(i = 0; i < n; i++) {
         kl = lptr[i];
         ku = uptr[i];
-        n2 = _min(A->U->ptr[i]+m, A->U->ptr[i+1]);
+        n2 = _min(A->U->ptr[i] + m, A->U->ptr[i + 1]);
         /*
          *  I*A
          */
@@ -283,7 +283,7 @@ LIS_INT lis_precon_create_is_csr(LIS_SOLVER solver, LIS_PRECON precon) {
         for(ja = A->U->ptr[i]; ja < n2; ja++) {
             jj = A->U->index[ja];
 #if USE_MPI
-				if( jj>=n ) break;
+            if(jj >= n) break;
 #endif
             val = -w * A->U->value[ja];
             t += val * b->value[jj];
@@ -370,18 +370,18 @@ LIS_INT lis_psolve_is(LIS_SOLVER solver, LIS_VECTOR X, LIS_VECTOR Y) {
     x = X->value;
 
 #ifdef USE_MPI
-		LIS_MATVEC_SENDRECV;
+    LIS_MATVEC_SENDRECV;
 #endif
 #ifdef _OPENMP
-	#pragma omp parallel private(i,jj,j,t)
+#pragma omp parallel private(i, jj, j, t)
 #endif
     {
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(i = 0; i < n; i++) {
             t = 0.0;
-            for(j = A->U->ptr[i]; j < _min(A->U->ptr[i]+m, A->U->ptr[i+1]); j++) {
+            for(j = A->U->ptr[i]; j < _min(A->U->ptr[i] + m, A->U->ptr[i + 1]); j++) {
                 jj = A->U->index[j];
                 t += A->U->value[j] * x[jj];
             }
@@ -403,8 +403,8 @@ LIS_INT lis_psolveh_is(LIS_SOLVER solver, LIS_VECTOR X, LIS_VECTOR Y) {
     LIS_SCALAR w;
     LIS_SCALAR *y, *x;
 #ifdef _OPENMP
-		LIS_INT k,nprocs;
-		LIS_SCALAR *tmp;
+    LIS_INT k, nprocs;
+    LIS_SCALAR* tmp;
 #endif
 
     /*
@@ -423,50 +423,45 @@ LIS_INT lis_psolveh_is(LIS_SOLVER solver, LIS_VECTOR X, LIS_VECTOR Y) {
     x = X->value;
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
-		tmp = (LIS_SCALAR *)lis_malloc( nprocs*np*sizeof(LIS_SCALAR),"lis_psolveh_is::tmp" );
-		#pragma omp parallel private(i,j,t,jj,k)
-		{
-			k = omp_get_thread_num();
-			#pragma omp for
-			for(j=0;j<nprocs;j++)
-			{
-				memset( &tmp[j*np], 0, np*sizeof(LIS_SCALAR) );
-			}
-			#pragma omp for 
-			for(i=0; i<n; i++)
-			{
-				t = x[i];
-				for(j=A->U->ptr[i];j<_min(A->U->ptr[i]+m,A->U->ptr[i+1]);j++)
-				{
-					jj  = k*np+A->U->index[j];
-					tmp[jj] += w*conj(A->U->value[j]) * t;
-				}
-			}
-			#pragma omp for 
-			for(i=0;i<np;i++)
-			{
-				t = 0.0;
-				for(j=0;j<nprocs;j++)
-				{
-					t += tmp[j*np+i];
-				}
-				y[i] = x[i] - t;
-			}
-		}
-		lis_free(tmp);
+    nprocs = omp_get_max_threads();
+    tmp = (LIS_SCALAR*)lis_malloc(nprocs * np * sizeof(LIS_SCALAR), "lis_psolveh_is::tmp");
+#pragma omp parallel private(i, j, t, jj, k)
+    {
+        k = omp_get_thread_num();
+#pragma omp for
+        for(j = 0; j < nprocs; j++) {
+            memset(&tmp[j * np], 0, np * sizeof(LIS_SCALAR));
+        }
+#pragma omp for
+        for(i = 0; i < n; i++) {
+            t = x[i];
+            for(j = A->U->ptr[i]; j < _min(A->U->ptr[i] + m, A->U->ptr[i + 1]); j++) {
+                jj = k * np + A->U->index[j];
+                tmp[jj] += w * conj(A->U->value[j]) * t;
+            }
+        }
+#pragma omp for
+        for(i = 0; i < np; i++) {
+            t = 0.0;
+            for(j = 0; j < nprocs; j++) {
+                t += tmp[j * np + i];
+            }
+            y[i] = x[i] - t;
+        }
+    }
+    lis_free(tmp);
 #else
     for(i = 0; i < np; i++) { y[i] = x[i]; }
     for(i = 0; i < n; i++) {
         t = x[i];
-        for(j = A->U->ptr[i]; j < _min(A->U->ptr[i]+m, A->U->ptr[i+1]); j++) {
+        for(j = A->U->ptr[i]; j < _min(A->U->ptr[i] + m, A->U->ptr[i + 1]); j++) {
             jj = A->U->index[j];
             y[jj] -= w * conj(A->U->value[j]) * t;
         }
     }
 #endif
 #ifdef USE_MPI
-		LIS_MATVEC_REDUCE;
+    LIS_MATVEC_REDUCE;
 #endif
 
     LIS_DEBUG_FUNC_OUT;

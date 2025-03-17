@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,21 +25,22 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 /*#undef malloc*/
 
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include "lislib.h"
+
+#include <stdarg.h>
+#include <string.h>
 
 /************************************************
  * *rpl_malloc
@@ -56,7 +57,7 @@
  ************************************************/
 
 #ifdef _DEBUG
-#define USE_MALLOC_TAG	1
+#define USE_MALLOC_TAG 1
 #endif
 
 #if 1
@@ -72,28 +73,28 @@ typedef struct _malloc_address {
 malloc_address malloc_address_top =
     {&malloc_address_top, &malloc_address_top, NULL, NULL};
 #else
-#define MALLOC_ADDRESS_SIZE	1021
+#define MALLOC_ADDRESS_SIZE 1021
 
 typedef struct _malloc_address {
-  struct _malloc_address *next, *prev;
-  void *address, *real_address;
-  size_t size;
+    struct _malloc_address *next, *prev;
+    void *address, *real_address;
+    size_t size;
 } malloc_address;
 
-malloc_address malloc_address_top = 
-  {&malloc_address_top, &malloc_address_top, NULL, NULL};
+malloc_address malloc_address_top =
+    {&malloc_address_top, &malloc_address_top, NULL, NULL};
 
-malloc_address *malloc_address_table;
+malloc_address* malloc_address_table;
 #endif
 
 /*
 void *malloc ();
- 
+
 void *rpl_malloc( size_t n )
 {
-	if( n == 0 )
-	n = 1;
-	return malloc( n );
+    if( n == 0 )
+    n = 1;
+    return malloc( n );
 }
 */
 
@@ -261,7 +262,7 @@ void lis_free2(LIS_INT n, ...) {
 
     va_start(vvlist, n);
     for(i = 0; i < n; i++) {
-        p = va_arg(vvlist, char *);
+        p = va_arg(vvlist, char*);
         if(p) { lis_free(p); }
     }
     va_end(vvlist);

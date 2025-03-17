@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -69,7 +69,7 @@ void lis_matvec_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     bs = bnr * bnc;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(bi,i,j,t,k)
+#pragma omp parallel for private(bi, i, j, t, k)
 #endif
         for(bi = 0; bi < nr; bi++) {
             k = 0;
@@ -83,7 +83,7 @@ void lis_matvec_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
             }
         }
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j,k,bi,bj,bc)
+#pragma omp parallel for private(i, j, k, bi, bj, bc)
 #endif
         for(bi = 0; bi < nc; bi++) {
             for(bc = A->L->bptr[bi]; bc < A->L->bptr[bi + 1]; bc++) {
@@ -110,11 +110,11 @@ void lis_matvec_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { y[i] = 0.0; }
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j,k,bi,bj,bc)
+#pragma omp parallel for private(i, j, k, bi, bj, bc)
 #endif
         for(bi = 0; bi < nc; bi++) {
             for(bc = A->bptr[bi]; bc < A->bptr[bi + 1]; bc++) {
@@ -138,7 +138,7 @@ void lis_matvec_bsc_1x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
 
     nr = A->nr;
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0)
+#pragma omp parallel for private(i, j, jj, js, je, t0)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -160,7 +160,7 @@ void lis_matvec_bsc_1x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0)
+#pragma omp parallel for private(i, j, jj, js, je, t0)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -183,7 +183,7 @@ void lis_matvec_bsc_1x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0)
+#pragma omp parallel for private(i, j, jj, js, je, t0)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -207,7 +207,7 @@ void lis_matvec_bsc_1x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0)
+#pragma omp parallel for private(i, j, jj, js, je, t0)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -233,7 +233,7 @@ void lis_matvec_bsc_2x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
 
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j,jj,js,je,t0,t1)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1)
 #endif
         for(i = 0; i < nr; i++) {
             t0 = A->D->value[4 * i + 0] * x[2 * i + 0] + A->D->value[4 * i + 2] * x[2 * i + 1];
@@ -262,7 +262,7 @@ void lis_matvec_bsc_2x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j,jj,js,je,t0,t1)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1)
 #endif
         for(i = 0; i < nr; i++) {
             js = A->bptr[i];
@@ -290,7 +290,7 @@ void lis_matvec_bsc_2x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -315,7 +315,7 @@ void lis_matvec_bsc_2x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -344,7 +344,7 @@ void lis_matvec_bsc_2x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -375,7 +375,7 @@ void lis_matvec_bsc_3x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1,t2)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1, t2)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -409,7 +409,7 @@ void lis_matvec_bsc_3x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1,t2,ii)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1, t2, ii)
 #endif
     for(i = 0; i < nr; i++) {
         ii = 3 * i;
@@ -438,7 +438,7 @@ void lis_matvec_bsc_3x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1,t2)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1, t2)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -469,7 +469,7 @@ void lis_matvec_bsc_3x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1,t2)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1, t2)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -506,7 +506,7 @@ void lis_matvec_bsc_4x4(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1,t2,t3)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1, t2, t3)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -549,7 +549,7 @@ void lis_matvec_bsc_4x1(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1,t2,t3)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1, t2, t3)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -580,7 +580,7 @@ void lis_matvec_bsc_4x2(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1,t2,t3)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1, t2, t3)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -615,7 +615,7 @@ void lis_matvec_bsc_4x3(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     nr = A->nr;
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,jj,js,je,t0,t1,t2,t3)
+#pragma omp parallel for private(i, j, jj, js, je, t0, t1, t2, t3)
 #endif
     for(i = 0; i < nr; i++) {
         js = A->bptr[i];
@@ -652,9 +652,9 @@ void lis_matvech_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     LIS_INT nr, nc, bnr, bnc;
     LIS_INT n, np;
 #ifdef _OPENMP
-		LIS_INT nprocs;
-		LIS_SCALAR t;
-		LIS_SCALAR *w;
+    LIS_INT nprocs;
+    LIS_SCALAR t;
+    LIS_SCALAR* w;
 #endif
 
     n = A->n;
@@ -668,7 +668,9 @@ void lis_matvech_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
         for(i = 0; i < n; i++) { y[i] = 0.0; }
         for(bi = 0; bi < nr; bi++) {
             k = bi * bs;
-            for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { y[bi * bnr + j] += conj(A->D->value[k++]) * x[bi * bnr + i]; } }
+            for(j = 0; j < bnc; j++) {
+                for(i = 0; i < bnr; i++) { y[bi * bnr + j] += conj(A->D->value[k++]) * x[bi * bnr + i]; }
+            }
         }
         for(bi = 0; bi < nc; bi++) {
             for(bc = A->L->bptr[bi]; bc < A->L->bptr[bi + 1]; bc++) {
@@ -695,46 +697,39 @@ void lis_matvech_bsc(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     }
     else {
 #ifdef _OPENMP
-			nprocs = omp_get_max_threads();
-			w = (LIS_SCALAR *)lis_malloc( nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_bsc::w" );
+        nprocs = omp_get_max_threads();
+        w = (LIS_SCALAR*)lis_malloc(nprocs * np * sizeof(LIS_SCALAR), "lis_matvech_bsc::w");
 
-			#pragma omp parallel private(bi,bc,bj,i,j,k)
-			{
-				#pragma omp for
-				for(j=0;j<nprocs;j++)
-				{
-					memset( &w[j*np], 0, np*sizeof(LIS_SCALAR) );
-				}
-				#pragma omp for 
-				for(bi=0;bi<nc;bi++)
-				{
-					for(bc=A->bptr[bi];bc<A->bptr[bi+1];bc++)
-					{
-						bj   = A->bindex[bc] * bnr;
-						k    = bc*bs;
-						for(j=0;j<bnc;j++)
-						{
-							for(i=0;i<bnr;i++)
-							{
-								w[bi*bnc+j] += conj(A->value[k]) * x[bj+i];
-								k++;
-							}
-						}
-					}
-				}
-				#pragma omp barrier
-				#pragma omp for 
-				for(i=0;i<np;i++)
-				{
-					t = 0.0;
-					for(j=0;j<nprocs;j++)
-					{
-						t += w[j*np+i];
-					}
-					y[i] = t;
-				}
-			}
-			lis_free(w);
+#pragma omp parallel private(bi, bc, bj, i, j, k)
+        {
+#pragma omp for
+            for(j = 0; j < nprocs; j++) {
+                memset(&w[j * np], 0, np * sizeof(LIS_SCALAR));
+            }
+#pragma omp for
+            for(bi = 0; bi < nc; bi++) {
+                for(bc = A->bptr[bi]; bc < A->bptr[bi + 1]; bc++) {
+                    bj = A->bindex[bc] * bnr;
+                    k = bc * bs;
+                    for(j = 0; j < bnc; j++) {
+                        for(i = 0; i < bnr; i++) {
+                            w[bi * bnc + j] += conj(A->value[k]) * x[bj + i];
+                            k++;
+                        }
+                    }
+                }
+            }
+#pragma omp barrier
+#pragma omp for
+            for(i = 0; i < np; i++) {
+                t = 0.0;
+                for(j = 0; j < nprocs; j++) {
+                    t += w[j * np + i];
+                }
+                y[i] = t;
+            }
+        }
+        lis_free(w);
 #else
         for(i = 0; i < n; i++) { y[i] = 0.0; }
         for(bi = 0; bi < nc; bi++) {

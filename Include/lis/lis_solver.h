@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -33,8 +33,7 @@ typedef LIS_INT (*LIS_SOLVER_EXECUTE)(LIS_SOLVER solver);
 typedef LIS_INT (*LIS_SOLVER_GET_RESIDUAL)(LIS_VECTOR r, LIS_SOLVER solver, LIS_REAL* res);
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 extern LIS_INT lis_solver_init(LIS_SOLVER solver);
 extern LIS_INT lis_solver_work_destroy(LIS_SOLVER solver);

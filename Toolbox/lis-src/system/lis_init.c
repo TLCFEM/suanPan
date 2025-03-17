@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,29 +25,29 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include <ctype.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef USE_SSE2
-	#include <emmintrin.h>
+#include <emmintrin.h>
 #endif
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -65,20 +65,20 @@ int lis_mpi_initialized = LIS_FALSE;
 LIS_SCALAR* lis_vec_tmp = NULL;
 
 #ifdef USE_QUAD_PRECISION
-	#define LIS_QUAD_SCALAR_SIZE 128
-	double *lis_quad_scalar_tmp = NULL;
-	LIS_UNSIGNED_INT lis_x87_fpu_cw = 0;
+#define LIS_QUAD_SCALAR_SIZE 128
+double* lis_quad_scalar_tmp = NULL;
+LIS_UNSIGNED_INT lis_x87_fpu_cw = 0;
 #endif
 
 #ifdef USE_MPI
-#define LIS_MPI_MSCALAR_LEN		2
-	MPI_Op LIS_MPI_MSUM;
-	MPI_Datatype LIS_MPI_MSCALAR;
-	extern void lis_mpi_msum(LIS_QUAD *invec, LIS_QUAD *inoutvec, LIS_INT *len, MPI_Datatype *datatype);
+#define LIS_MPI_MSCALAR_LEN 2
+MPI_Op LIS_MPI_MSUM;
+MPI_Datatype LIS_MPI_MSCALAR;
+extern void lis_mpi_msum(LIS_QUAD* invec, LIS_QUAD* inoutvec, LIS_INT* len, MPI_Datatype* datatype);
 #endif
 
-#define LIS_INIT_OPTIONS_LEN	1
-#define LIS_INIT_OPTIONS_OMPNUMTHREADS		1
+#define LIS_INIT_OPTIONS_LEN 1
+#define LIS_INIT_OPTIONS_OMPNUMTHREADS 1
 
 char* LIS_INIT_OPTNAME[] = {
     "-omp_num_threads"
@@ -98,7 +98,7 @@ LIS_INT LIS_INIT_OPTACT[] = {
 void lis_version(void) {
     LIS_DEBUG_FUNC_IN;
 
-    lis_printf(LIS_COMM_WORLD, "Lis Version %s\n",LIS_VERSION);
+    lis_printf(LIS_COMM_WORLD, "Lis Version %s\n", LIS_VERSION);
 
     LIS_DEBUG_FUNC_OUT;
 }
@@ -149,37 +149,35 @@ LIS_INT lis_initialize(int* argc, char** argv[]) {
     }
 
 #ifdef _OPENMP
-		omp_set_num_threads(nprocs);
-		lis_vec_tmp = (LIS_SCALAR *)lis_malloc( nprocs*LIS_VEC_TMP_PADD*sizeof(LIS_QUAD),"lis_initialize::lis_vec_tmp" );
-		if( lis_vec_tmp==NULL )
-		{
-			LIS_SETERR_MEM(nprocs*LIS_VEC_TMP_PADD*sizeof(LIS_QUAD));
-			return LIS_ERR_OUT_OF_MEMORY;
-		}
+    omp_set_num_threads(nprocs);
+    lis_vec_tmp = (LIS_SCALAR*)lis_malloc(nprocs * LIS_VEC_TMP_PADD * sizeof(LIS_QUAD), "lis_initialize::lis_vec_tmp");
+    if(lis_vec_tmp == NULL) {
+        LIS_SETERR_MEM(nprocs * LIS_VEC_TMP_PADD * sizeof(LIS_QUAD));
+        return LIS_ERR_OUT_OF_MEMORY;
+    }
 #endif
 
 #ifdef USE_QUAD_PRECISION
-		lis_quad_scalar_tmp = (LIS_SCALAR *)lis_malloc( LIS_QUAD_SCALAR_SIZE*sizeof(LIS_SCALAR),"lis_initialize::lis_quad_scalar_tmp" );
-		if( lis_quad_scalar_tmp==NULL )
-		{
-			LIS_SETERR_MEM(LIS_QUAD_SCALAR_SIZE*sizeof(LIS_SCALAR));
-			return LIS_OUT_OF_MEMORY;
-		}
-		lis_quad_x87_fpu_init(&lis_x87_fpu_cw);
+    lis_quad_scalar_tmp = (LIS_SCALAR*)lis_malloc(LIS_QUAD_SCALAR_SIZE * sizeof(LIS_SCALAR), "lis_initialize::lis_quad_scalar_tmp");
+    if(lis_quad_scalar_tmp == NULL) {
+        LIS_SETERR_MEM(LIS_QUAD_SCALAR_SIZE * sizeof(LIS_SCALAR));
+        return LIS_OUT_OF_MEMORY;
+    }
+    lis_quad_x87_fpu_init(&lis_x87_fpu_cw);
 #endif
 
-        for(i = 1; i < (argc ? *argc : 0); i++) {
-            if(strncmp(argv[0][i], "-help", 5) == 0) {
+    for(i = 1; i < (argc ? *argc : 0); i++) {
+        if(strncmp(argv[0][i], "-help", 5) == 0) {
             /*			lis_display();*/
             CHKERR(1);
-            }
-            else if(strncmp(argv[0][i], "-ver", 4) == 0) {
+        }
+        else if(strncmp(argv[0][i], "-ver", 4) == 0) {
             lis_version();
             CHKERR(1);
-            }
         }
+    }
 
-        LIS_DEBUG_FUNC_OUT;
+    LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 }
 
@@ -198,17 +196,17 @@ LIS_INT lis_finalize(void) {
         cmd_args = NULL;
     }
 #ifdef _OPENMP
-		lis_free(lis_vec_tmp);
+    lis_free(lis_vec_tmp);
 #endif
 #ifdef USE_QUAD_PRECISION
-		lis_free(lis_quad_scalar_tmp);
-		lis_quad_x87_fpu_finalize(lis_x87_fpu_cw);
+    lis_free(lis_quad_scalar_tmp);
+    lis_quad_x87_fpu_finalize(lis_x87_fpu_cw);
 #endif
 
     lis_free_all();
 
 #ifdef USE_MPI
-		if (!lis_mpi_initialized) MPI_Finalize();
+    if(!lis_mpi_initialized) MPI_Finalize();
 #endif
 
     LIS_DEBUG_FUNC_OUT;
@@ -357,7 +355,7 @@ LIS_INT lis_args_free(LIS_ARGS args) {
 
 LIS_INT lis_ranges_create(LIS_Comm comm, LIS_INT* local_n, LIS_INT* global_n, LIS_INT** ranges, LIS_INT* is, LIS_INT* ie, LIS_INT* nprocs, LIS_INT* my_rank) {
 #ifdef USE_MPI
-		LIS_INT	i;
+    LIS_INT i;
 #endif
     LIS_INT* tranges;
     int int_nprocs, int_my_rank;
@@ -365,17 +363,16 @@ LIS_INT lis_ranges_create(LIS_Comm comm, LIS_INT* local_n, LIS_INT* global_n, LI
     LIS_DEBUG_FUNC_IN;
 
 #ifdef USE_MPI
-		MPI_Comm_size(comm,&int_nprocs);
-		MPI_Comm_rank(comm,&int_my_rank);
-		*nprocs = int_nprocs;
-		*my_rank = int_my_rank;
+    MPI_Comm_size(comm, &int_nprocs);
+    MPI_Comm_rank(comm, &int_my_rank);
+    *nprocs = int_nprocs;
+    *my_rank = int_my_rank;
 
-		tranges = (LIS_INT *)lis_malloc( (*nprocs+1)*sizeof(LIS_INT),"lis_ranges_create::tranges" );
-		if( tranges==NULL )
-		{
-			LIS_SETERR_MEM((*nprocs+1)*sizeof(LIS_INT));
-			return LIS_OUT_OF_MEMORY;
-		}
+    tranges = (LIS_INT*)lis_malloc((*nprocs + 1) * sizeof(LIS_INT), "lis_ranges_create::tranges");
+    if(tranges == NULL) {
+        LIS_SETERR_MEM((*nprocs + 1) * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
 #else
     *nprocs = 1;
     *my_rank = 0;
@@ -383,17 +380,17 @@ LIS_INT lis_ranges_create(LIS_Comm comm, LIS_INT* local_n, LIS_INT* global_n, LI
 #endif
 
 #ifdef USE_MPI
-		MPI_Allreduce(local_n,&i,1,LIS_MPI_INT,MPI_SUM,comm);
-        if( i==0 )
+    MPI_Allreduce(local_n, &i, 1, LIS_MPI_INT, MPI_SUM, comm);
+    if(i == 0)
 #else
     if(*local_n == 0)
 #endif
     {
 #ifdef USE_MPI
-  		        LIS_GET_ISIE(*my_rank,*nprocs,*global_n,*is,*ie);
-			*local_n = *ie-*is;
-			MPI_Allgather(ie,1,LIS_MPI_INT,&tranges[1],1,LIS_MPI_INT,comm);
-			tranges[0] = 0;
+        LIS_GET_ISIE(*my_rank, *nprocs, *global_n, *is, *ie);
+        *local_n = *ie - *is;
+        MPI_Allgather(ie, 1, LIS_MPI_INT, &tranges[1], 1, LIS_MPI_INT, comm);
+        tranges[0] = 0;
 #else
         *local_n = *global_n;
         *is = 0;
@@ -402,15 +399,14 @@ LIS_INT lis_ranges_create(LIS_Comm comm, LIS_INT* local_n, LIS_INT* global_n, LI
     }
     else {
 #ifdef USE_MPI
-			MPI_Allgather(local_n,1,LIS_MPI_INT,&tranges[1],1,LIS_MPI_INT,comm);
-			tranges[0] = 0;
-			for(i=0;i<*nprocs;i++)
-			{
-				tranges[i+1] += tranges[i];
-			}
-			*global_n = tranges[*nprocs];
-			*is       = tranges[*my_rank];
-			*ie       = tranges[*my_rank+1];
+        MPI_Allgather(local_n, 1, LIS_MPI_INT, &tranges[1], 1, LIS_MPI_INT, comm);
+        tranges[0] = 0;
+        for(i = 0; i < *nprocs; i++) {
+            tranges[i + 1] += tranges[i];
+        }
+        *global_n = tranges[*nprocs];
+        *is = tranges[*my_rank];
+        *ie = tranges[*my_rank + 1];
 #else
         *global_n = *local_n;
         *is = 0;

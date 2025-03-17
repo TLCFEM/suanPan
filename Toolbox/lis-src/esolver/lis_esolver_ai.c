@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,29 +25,29 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
 #include <math.h>
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef USE_SSE2
-	#include <emmintrin.h>
+#include <emmintrin.h>
 #endif
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -67,14 +67,14 @@
    if h(j+1,j) = 0, stop
    v(j+1) = w / h(j+1,j)
  end for
- compute eigenvalues of an upper Hessenberg matrix 
+ compute eigenvalues of an upper Hessenberg matrix
  H(m) = SH'(m)S^*, where
        (h(0,0)   h(0,1)                            )
        (h(1,0)   h(1,1)                            )
        (  0      h(2,1)                            )
    H = (           0   ...                         )
        (                      h(m-3,m-2) h(m-3,m-1))
-       (                      h(m-2,m-2) h(m-2,m-1))                       
+       (                      h(m-2,m-2) h(m-2,m-1))
        (                   0  h(m-1,m-2)   h(m-1)  )
  compute refined eigenpairs
  ***************************************/
@@ -112,7 +112,7 @@ LIS_INT lis_eai_malloc_work(LIS_ESOLVER esolver) {
     worklen = NWORK + ss;
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_eai_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -246,7 +246,7 @@ LIS_INT lis_eai(LIS_ESOLVER esolver) {
             if(output) {
                 lis_printf(comm, "Arnoldi: mode number          = %D\n", i - 1);
 #ifdef _COMPLEX
-	      lis_printf(comm,"Arnoldi: Rits value           = (%e, %e)\n",(double)creal(h[i-1+(i-1)*ss]),(double)cimag(h[i-1+(i-1)*ss]));
+                lis_printf(comm, "Arnoldi: Rits value           = (%e, %e)\n", (double)creal(h[i - 1 + (i - 1) * ss]), (double)cimag(h[i - 1 + (i - 1) * ss]));
 #else
                 lis_printf(comm, "Arnoldi: Ritz value           = %e\n", (double)(h[i - 1 + (i - 1) * ss]));
 #endif
@@ -256,8 +256,7 @@ LIS_INT lis_eai(LIS_ESOLVER esolver) {
 
         /* eigenvalues of 2x2 matrices on the diagonal of H */
         else {
-            D = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) * (h[i - 1 + (i - 1) * ss] + h[i + i * ss])
-                - 4 * (h[i - 1 + (i - 1) * ss] * h[i + i * ss] - h[i - 1 + i * ss] * h[i + (i - 1) * ss]);
+            D = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) * (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) - 4 * (h[i - 1 + (i - 1) * ss] * h[i + i * ss] - h[i - 1 + i * ss] * h[i + (i - 1) * ss]);
             if(D < 0) {
                 if(output) {
                     lis_printf(comm, "Arnoldi: mode number          = %D\n", i - 1);
@@ -266,8 +265,8 @@ LIS_INT lis_eai(LIS_ESOLVER esolver) {
                     lis_printf(comm, "Arnoldi: Ritz value           = (%e, %e)\n", (double)((h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2), (double)-sqrt(-D) / 2);
                 }
 #ifdef _COMPLEX
-	      esolver->evalue[i-1] = (h[i-1+(i-1)*ss]+h[i+i*ss])/2 + sqrt(-D)/2 * _Complex_I;
-	      esolver->evalue[i]   = (h[i-1+(i-1)*ss]+h[i+i*ss])/2 - sqrt(-D)/2 * _Complex_I;
+                esolver->evalue[i - 1] = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2 + sqrt(-D) / 2 * _Complex_I;
+                esolver->evalue[i] = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2 - sqrt(-D) / 2 * _Complex_I;
 #else
                 esolver->evalue[i - 1] = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2;
                 esolver->evalue[i] = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2;
@@ -279,7 +278,7 @@ LIS_INT lis_eai(LIS_ESOLVER esolver) {
                 if(output) {
                     lis_printf(comm, "Arnoldi: mode number          = %D\n", i - 1);
 #ifdef _COMPLEX
-		  lis_printf(comm,"Arnoldi: Ritz value           = (%e, %e)\n",(double)creal(h[i-1+(i-1)*ss]),(double)cimag(h[i-1+(i-1)*ss]));
+                    lis_printf(comm, "Arnoldi: Ritz value           = (%e, %e)\n", (double)creal(h[i - 1 + (i - 1) * ss]), (double)cimag(h[i - 1 + (i - 1) * ss]));
 #else
                     lis_printf(comm, "Arnoldi: Ritz value           = %e\n", (double)(h[i - 1 + (i - 1) * ss]));
 #endif
@@ -322,7 +321,9 @@ LIS_INT lis_eai(LIS_ESOLVER esolver) {
             evalue0 = esolver->evalue[0];
             iter0 = esolver2->iter[0];
             resid0 = esolver2->resid[0];
-            if(output & LIS_EPRINT_MEM) { for(ic = 0; ic < iter0 + 1; ic++) { esolver->rhistory[ic] = esolver2->rhistory[ic]; } }
+            if(output & LIS_EPRINT_MEM) {
+                for(ic = 0; ic < iter0 + 1; ic++) { esolver->rhistory[ic] = esolver2->rhistory[ic]; }
+            }
             esolver->time = esolver2->time;
             esolver->ptime += esolver2->ptime;
             esolver->itime += esolver2->itime;
@@ -333,7 +334,7 @@ LIS_INT lis_eai(LIS_ESOLVER esolver) {
         if(output) {
             lis_printf(comm, "Arnoldi: mode number          = %D\n", i);
 #ifdef _COMPLEX
-	  lis_printf(comm,"Arnoldi: eigenvalue           = (%e, %e)\n", (double)creal(esolver->evalue[i]),(double)cimag(esolver->evalue[i]));
+            lis_printf(comm, "Arnoldi: eigenvalue           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
 #else
             lis_printf(comm, "Arnoldi: eigenvalue           = %e\n", (double)esolver->evalue[i]);
 #endif
@@ -373,14 +374,14 @@ LIS_INT lis_eai(LIS_ESOLVER esolver) {
    if h(j+1,j) = 0, stop
    v(j+1) = w / h(j+1,j)
  end for
- compute eigenvalues of an upper Hessenberg matrix 
+ compute eigenvalues of an upper Hessenberg matrix
  H(m) = SH'(m)S^*, where
        (h(0,0)   h(0,1)                            )
        (h(1,0)   h(1,1)                            )
        (  0      h(2,1)                            )
    H = (           0   ...                         )
        (                      h(m-3,m-2) h(m-3,m-1))
-       (                      h(m-2,m-2) h(m-2,m-1))                       
+       (                      h(m-2,m-2) h(m-2,m-1))
        (                   0  h(m-1,m-2)   h(m-1)  )
  compute refined eigenpairs
  ***************************************/
@@ -419,7 +420,7 @@ LIS_INT lis_egai_malloc_work(LIS_ESOLVER esolver) {
     worklen = NWORK + ss;
     work = (LIS_VECTOR*)lis_malloc(worklen * sizeof(LIS_VECTOR), "lis_egai_malloc_work::work");
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(esolver->eprecision == LIS_PRECISION_DEFAULT) {
@@ -575,7 +576,7 @@ LIS_INT lis_egai(LIS_ESOLVER esolver) {
             if(output) {
                 lis_printf(comm, "Generalized Arnoldi: mode number              = %D\n", i - 1);
 #ifdef _COMPLEX
-	      lis_printf(comm,"Generalized Arnoldi: Ritz value               = (%e, %e)\n",(double)creal(h[i-1+(i-1)*ss]),(double)cimag(h[i-1+(i-1)*ss]));
+                lis_printf(comm, "Generalized Arnoldi: Ritz value               = (%e, %e)\n", (double)creal(h[i - 1 + (i - 1) * ss]), (double)cimag(h[i - 1 + (i - 1) * ss]));
 #else
                 lis_printf(comm, "Generalized Arnoldi: Ritz value               = %e\n", (LIS_REAL)(h[i - 1 + (i - 1) * ss]));
 #endif
@@ -585,8 +586,7 @@ LIS_INT lis_egai(LIS_ESOLVER esolver) {
 
         /* eigenvalues of 2x2 matrices on the diagonal of H */
         else {
-            D = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) * (h[i - 1 + (i - 1) * ss] + h[i + i * ss])
-                - 4 * (h[i - 1 + (i - 1) * ss] * h[i + i * ss] - h[i - 1 + i * ss] * h[i + (i - 1) * ss]);
+            D = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) * (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) - 4 * (h[i - 1 + (i - 1) * ss] * h[i + i * ss] - h[i - 1 + i * ss] * h[i + (i - 1) * ss]);
             if(D < 0) {
                 if(output) {
                     lis_printf(comm, "Generalized Arnoldi: mode number              = %D\n", i - 1);
@@ -595,8 +595,8 @@ LIS_INT lis_egai(LIS_ESOLVER esolver) {
                     lis_printf(comm, "Generalized Arnoldi: Ritz value               = (%e, %e)\n", (double)((h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2), (double)-sqrt(-D) / 2);
                 }
 #ifdef _COMPLEX
-	      esolver->evalue[i-1] = (h[i-1+(i-1)*ss]+h[i+i*ss])/2 + sqrt(-D)/2 * _Complex_I;
-	      esolver->evalue[i]   = (h[i-1+(i-1)*ss]+h[i+i*ss])/2 - sqrt(-D)/2 * _Complex_I;
+                esolver->evalue[i - 1] = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2 + sqrt(-D) / 2 * _Complex_I;
+                esolver->evalue[i] = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2 - sqrt(-D) / 2 * _Complex_I;
 #else
                 esolver->evalue[i - 1] = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2;
                 esolver->evalue[i] = (h[i - 1 + (i - 1) * ss] + h[i + i * ss]) / 2;
@@ -608,7 +608,7 @@ LIS_INT lis_egai(LIS_ESOLVER esolver) {
                 if(output) {
                     lis_printf(comm, "Generalized Arnoldi: mode number              = %D\n", i - 1);
 #ifdef _COMPLEX
-		  lis_printf(comm,"Generalized Arnoldi: Ritz value               = (%e, %e)\n",(double)creal(h[i-1+(i-1)*ss]),(double)cimag(h[i-1+(i-1)*ss]));
+                    lis_printf(comm, "Generalized Arnoldi: Ritz value               = (%e, %e)\n", (double)creal(h[i - 1 + (i - 1) * ss]), (double)cimag(h[i - 1 + (i - 1) * ss]));
 #else
                     lis_printf(comm, "Generalized Arnoldi: Ritz value               = %e\n", (double)(h[i - 1 + (i - 1) * ss]));
 #endif
@@ -645,7 +645,9 @@ LIS_INT lis_egai(LIS_ESOLVER esolver) {
             evalue0 = esolver->evalue[0];
             iter0 = esolver2->iter[0];
             resid0 = esolver2->resid[0];
-            if(output & LIS_EPRINT_MEM) { for(ic = 0; ic < iter0 + 1; ic++) { esolver->rhistory[ic] = esolver2->rhistory[ic]; } }
+            if(output & LIS_EPRINT_MEM) {
+                for(ic = 0; ic < iter0 + 1; ic++) { esolver->rhistory[ic] = esolver2->rhistory[ic]; }
+            }
             esolver->time = esolver2->time;
             esolver->ptime += esolver2->ptime;
             esolver->itime += esolver2->itime;
@@ -656,7 +658,7 @@ LIS_INT lis_egai(LIS_ESOLVER esolver) {
         if(output) {
             lis_printf(comm, "Generalized Arnoldi: mode number          = %D\n", i);
 #ifdef _COMPLEX
-	  lis_printf(comm,"Generalized Arnoldi: eigenvalue           = (%e, %e)\n", (double)creal(esolver->evalue[i]),(double)cimag(esolver->evalue[i]));
+            lis_printf(comm, "Generalized Arnoldi: eigenvalue           = (%e, %e)\n", (double)creal(esolver->evalue[i]), (double)cimag(esolver->evalue[i]));
 #else
             lis_printf(comm, "Generalized Arnoldi: eigenvalue           = %e\n", (double)esolver->evalue[i]);
 #endif

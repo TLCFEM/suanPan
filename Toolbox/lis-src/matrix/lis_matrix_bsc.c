@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,26 +25,26 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include <math.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -78,7 +78,7 @@ LIS_INT lis_matrix_set_bsc(LIS_INT bnr, LIS_INT bnc, LIS_INT bnnz, LIS_INT* bptr
         return LIS_SUCCESS;
     }
     else {
-        err = lis_matrix_check(A,LIS_MATRIX_CHECK_SET);
+        err = lis_matrix_check(A, LIS_MATRIX_CHECK_SET);
         if(err) return err;
     }
 #endif
@@ -121,7 +121,7 @@ LIS_INT lis_matrix_setDLU_bsc(LIS_INT bnr, LIS_INT bnc, LIS_INT lbnnz, LIS_INT u
 #else
     if(lis_matrix_is_assembled(A)) return LIS_SUCCESS;
     else {
-        err = lis_matrix_check(A,LIS_MATRIX_CHECK_SET);
+        err = lis_matrix_check(A, LIS_MATRIX_CHECK_SET);
         if(err) return err;
     }
 #endif
@@ -183,19 +183,19 @@ LIS_INT lis_matrix_malloc_bsc(LIS_INT n, LIS_INT bnr, LIS_INT bnc, LIS_INT bnnz,
 
     *bptr = (LIS_INT*)lis_malloc((nc + 1) * sizeof(LIS_INT), "lis_matrix_malloc_bsc::bptr");
     if(*bptr == NULL) {
-        LIS_SETERR_MEM((nc+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((nc + 1) * sizeof(LIS_INT));
         lis_free2(3, *bptr, *bindex, *value);
         return LIS_FAILS;
     }
     *bindex = (LIS_INT*)lis_malloc(bnnz * sizeof(LIS_INT), "lis_matrix_malloc_bsc::bindex");
     if(*bindex == NULL) {
-        LIS_SETERR_MEM(bnnz*sizeof(LIS_INT));
+        LIS_SETERR_MEM(bnnz * sizeof(LIS_INT));
         lis_free2(3, *bptr, *bindex, *value);
         return LIS_OUT_OF_MEMORY;
     }
     *value = (LIS_SCALAR*)lis_malloc(bnnz * bnr * bnc * sizeof(LIS_SCALAR), "lis_matrix_malloc_bsc::value");
     if(*value == NULL) {
-        LIS_SETERR_MEM(bnnz*bnr*bnc*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(bnnz * bnr * bnc * sizeof(LIS_SCALAR));
         lis_free2(3, *bptr, *bindex, *value);
         return LIS_OUT_OF_MEMORY;
     }
@@ -215,15 +215,15 @@ LIS_INT lis_matrix_elements_copy_bsc(LIS_INT n, LIS_INT bnr, LIS_INT bnc, LIS_IN
     nc = 1 + (n - 1) / bnc;
     bs = bnr * bnc;
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,k)
+#pragma omp parallel private(i, j, k)
 #endif
     {
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(i = 0; i < nc + 1; i++) { o_ptr[i] = ptr[i]; }
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(i = 0; i < nc; i++) {
             for(j = ptr[i]; j < ptr[i + 1]; j++) {
@@ -350,13 +350,13 @@ LIS_INT lis_matrix_convert_csc2bsc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     bptr = (LIS_INT*)lis_malloc((nc + 1) * sizeof(LIS_INT), "lis_matrix_convert_csc2bsc::bptr");
     if(bptr == NULL) {
-        LIS_SETERR_MEM((nc+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((nc + 1) * sizeof(LIS_INT));
         lis_free2(5, bptr, bindex, value, iw, iw2);
         return LIS_OUT_OF_MEMORY;
     }
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
@@ -364,38 +364,35 @@ LIS_INT lis_matrix_convert_csc2bsc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     iw2 = (LIS_INT*)lis_malloc(nprocs * nr * sizeof(LIS_INT), "lis_matrix_convert_csc2bsc::iw2");
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,k,ii,j,bj,kk,ij,jj,kv,jpos,my_rank)
+#pragma omp parallel private(i, k, ii, j, bj, kk, ij, jj, kv, jpos, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
         memset(&iw[my_rank * nr], 0, nr * sizeof(LIS_INT));
 
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(i = 0; i < nc; i++) {
             k = 0;
             kk = bnc * i;
             jj = 0;
 #ifdef USE_MPI
-				for(ii=0;ii+kk<np&&ii<bnc;ii++)
-				{
-					for(j=Ain->ptr[kk+ii];j<Ain->ptr[kk+ii+1];j++)
-					{
-						bj   = Ain->index[j]/bnr;
-						jpos = iw[my_rank*nr + bj];
-						if( jpos==0 )
-						{
-							iw[my_rank*nr + bj] = 1;
-							iw2[my_rank*nr + jj] = bj;
-							jj++;
-						}
-					}
-				}
+            for(ii = 0; ii + kk < np && ii < bnc; ii++) {
+                for(j = Ain->ptr[kk + ii]; j < Ain->ptr[kk + ii + 1]; j++) {
+                    bj = Ain->index[j] / bnr;
+                    jpos = iw[my_rank * nr + bj];
+                    if(jpos == 0) {
+                        iw[my_rank * nr + bj] = 1;
+                        iw2[my_rank * nr + jj] = bj;
+                        jj++;
+                    }
+                }
+            }
 #else
             for(ii = 0; ii + kk < np && ii < bnc; ii++) {
                 for(j = Ain->ptr[kk + ii]; j < Ain->ptr[kk + ii + 1]; j++) {
@@ -425,31 +422,31 @@ LIS_INT lis_matrix_convert_csc2bsc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     bindex = (LIS_INT*)lis_malloc(bnnz * sizeof(LIS_INT), "lis_matrix_convert_csc2bsc::bindex");
     if(bindex == NULL) {
-        LIS_SETERR_MEM((nr+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((nr + 1) * sizeof(LIS_INT));
         lis_free2(5, bptr, bindex, value, iw, iw2);
         return LIS_OUT_OF_MEMORY;
     }
     value = (LIS_SCALAR*)lis_malloc(nnz * sizeof(LIS_SCALAR), "lis_matrix_convert_csc2bsc::value");
     if(value == NULL) {
-        LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_SCALAR));
         lis_free2(5, bptr, bindex, value, iw, iw2);
         return LIS_OUT_OF_MEMORY;
     }
 
     /* convert bsc */
 #ifdef _OPENMP
-	#pragma omp parallel private(bi,i,ii,k,j,bj,jpos,kv,kk,ij,jj,my_rank)
+#pragma omp parallel private(bi, i, ii, k, j, bj, jpos, kv, kk, ij, jj, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
         memset(&iw[my_rank * nr], 0, nr * sizeof(LIS_INT));
 
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(bi = 0; bi < nc; bi++) {
             i = bi * bnc;
@@ -494,8 +491,8 @@ LIS_INT lis_matrix_convert_csc2bsc(LIS_MATRIX Ain, LIS_MATRIX Aout) {
         return err;
     }
 #ifdef USE_MPI
-		Aout->commtable->pad = pad;
-		MPI_Barrier(Ain->comm);
+    Aout->commtable->pad = pad;
+    MPI_Barrier(Ain->comm);
 #endif
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -520,7 +517,7 @@ LIS_INT lis_matrix_convert_bsc2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     bnc = Ain->bnc;
     bs = bnr * bnc;
 #ifdef _OPENMP
-		nprocs  = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
@@ -532,33 +529,41 @@ LIS_INT lis_matrix_convert_bsc2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     iw = (LIS_INT*)lis_malloc(nprocs * n * sizeof(LIS_INT), "lis_matrix_convert_bsc2csr::iw");
     if(iw == NULL) {
-        LIS_SETERR_MEM(nprocs*n*sizeof(LIS_INT));
+        LIS_SETERR_MEM(nprocs * n * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     ptr = (LIS_INT*)lis_malloc((n + 1) * sizeof(LIS_INT), "lis_matrix_convert_bsc2csr::ptr");
     if(ptr == NULL) {
-        LIS_SETERR_MEM((n+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((n + 1) * sizeof(LIS_INT));
         lis_free2(4, ptr, index, value, iw);
         return LIS_OUT_OF_MEMORY;
     }
 
     /* check nnz */
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,bi,bj,my_rank)
+#pragma omp parallel private(i, j, bi, bj, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
         memset(&iw[my_rank * n], 0, n * sizeof(LIS_INT));
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
-        for(bj = 0; bj < nc; bj++) { for(j = 0; j < bnc; j++) { for(bi = Ain->bptr[bj]; bi < Ain->bptr[bj + 1]; bi++) { for(i = 0; i < bnr; i++) { if(Ain->value[bi * bs + j * bnr + i] != (LIS_SCALAR)0.0) { iw[my_rank * n + Ain->bindex[bi] * bnr + i]++; } } } } }
+        for(bj = 0; bj < nc; bj++) {
+            for(j = 0; j < bnc; j++) {
+                for(bi = Ain->bptr[bj]; bi < Ain->bptr[bj + 1]; bi++) {
+                    for(i = 0; i < bnr; i++) {
+                        if(Ain->value[bi * bs + j * bnr + i] != (LIS_SCALAR)0.0) { iw[my_rank * n + Ain->bindex[bi] * bnr + i]++; }
+                    }
+                }
+            }
+        }
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(i = 0; i < n; i++) {
             j = 0;
@@ -574,28 +579,28 @@ LIS_INT lis_matrix_convert_bsc2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     index = (LIS_INT*)lis_malloc(nnz * sizeof(LIS_INT), "lis_matrix_convert_bsc2csr::index");
     if(index == NULL) {
         lis_free2(4, ptr, index, value, iw);
-        LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     value = (LIS_SCALAR*)lis_malloc(nnz * sizeof(LIS_SCALAR), "lis_matrix_convert_bsc2csr::value");
     if(value == NULL) {
         lis_free2(4, ptr, index, value, iw);
-        LIS_SETERR_MEM(nnz*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_SCALAR));
         return LIS_OUT_OF_MEMORY;
     }
 
     /* convert csr */
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,bi,bj,k,l,my_rank)
+#pragma omp parallel private(i, j, bi, bj, k, l, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(i = 0; i < n; i++) {
             k = ptr[i];
@@ -606,7 +611,7 @@ LIS_INT lis_matrix_convert_bsc2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
             }
         }
 #ifdef _OPENMP
-		#pragma omp for
+#pragma omp for
 #endif
         for(bj = 0; bj < nc; bj++) {
             for(j = 0; j < bnc; j++) {
@@ -637,7 +642,7 @@ LIS_INT lis_matrix_convert_bsc2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
         return err;
     }
 #ifdef USE_MPI
-		Aout->commtable->pad = 0;
+    Aout->commtable->pad = 0;
 #endif
     lis_free(iw);
     LIS_DEBUG_FUNC_OUT;
@@ -661,13 +666,15 @@ LIS_INT lis_matrix_get_diagonal_bsc(LIS_MATRIX A, LIS_SCALAR d[]) {
     bs = bnr * bnc;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
-        for(i = 0; i < nr; i++) { for(j = 0; j < bnr; j++) { d[i * bnr + j] = A->D->value[i * bs + j * bnr + j]; } }
+        for(i = 0; i < nr; i++) {
+            for(j = 0; j < bnr; j++) { d[i * bnr + j] = A->D->value[i * bs + j * bnr + j]; }
+        }
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(bi,bj,bjj,i,j,k)
+#pragma omp parallel for private(bi, bj, bjj, i, j, k)
 #endif
         for(bi = 0; bi < nr; bi++) {
             k = 0;
@@ -707,13 +714,15 @@ LIS_INT lis_matrix_shift_diagonal_bsc(LIS_MATRIX A, LIS_SCALAR sigma) {
     bs = bnr * bnc;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
-        for(i = 0; i < nr; i++) { for(j = 0; j < bnr; j++) { A->D->value[i * bs + j * bnr + j] -= sigma; } }
+        for(i = 0; i < nr; i++) {
+            for(j = 0; j < bnr; j++) { A->D->value[i * bs + j * bnr + j] -= sigma; }
+        }
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(bi,bj,bjj,i,j,k)
+#pragma omp parallel for private(bi, bj, bjj, i, j, k)
 #endif
         for(bi = 0; bi < nr; bi++) {
             k = 0;
@@ -754,19 +763,35 @@ LIS_INT lis_matrix_scale_bsc(LIS_MATRIX A, LIS_SCALAR d[]) {
 
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(bi,bj,i,j)
+#pragma omp parallel for private(bi, bj, i, j)
 #endif
         for(bi = 0; bi < nr; bi++) {
-            for(bj = A->L->bptr[bi]; bj < A->L->bptr[bi + 1]; bj++) { for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { A->L->value[bj * bs + j * bnr + i] *= d[bi * bnr + i]; } } }
-            for(bj = A->U->bptr[bi]; bj < A->U->bptr[bi + 1]; bj++) { for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { A->U->value[bj * bs + j * bnr + i] *= d[bi * bnr + i]; } } }
-            for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { A->D->value[bi * bs + j * bnr + i] *= d[bi * bnr + i]; } }
+            for(bj = A->L->bptr[bi]; bj < A->L->bptr[bi + 1]; bj++) {
+                for(j = 0; j < bnc; j++) {
+                    for(i = 0; i < bnr; i++) { A->L->value[bj * bs + j * bnr + i] *= d[bi * bnr + i]; }
+                }
+            }
+            for(bj = A->U->bptr[bi]; bj < A->U->bptr[bi + 1]; bj++) {
+                for(j = 0; j < bnc; j++) {
+                    for(i = 0; i < bnr; i++) { A->U->value[bj * bs + j * bnr + i] *= d[bi * bnr + i]; }
+                }
+            }
+            for(j = 0; j < bnc; j++) {
+                for(i = 0; i < bnr; i++) { A->D->value[bi * bs + j * bnr + i] *= d[bi * bnr + i]; }
+            }
         }
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(bi,bj,i,j)
+#pragma omp parallel for private(bi, bj, i, j)
 #endif
-        for(bi = 0; bi < nr; bi++) { for(bj = A->bptr[bi]; bj < A->bptr[bi + 1]; bj++) { for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { A->value[bj * bs + j * bnr + i] *= d[bi * bnr + i]; } } } }
+        for(bi = 0; bi < nr; bi++) {
+            for(bj = A->bptr[bi]; bj < A->bptr[bi + 1]; bj++) {
+                for(j = 0; j < bnc; j++) {
+                    for(i = 0; i < bnr; i++) { A->value[bj * bs + j * bnr + i] *= d[bi * bnr + i]; }
+                }
+            }
+        }
     }
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
@@ -790,28 +815,36 @@ LIS_INT lis_matrix_scale_symm_bsc(LIS_MATRIX A, LIS_SCALAR d[]) {
 
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(bi,bj,i,j)
+#pragma omp parallel for private(bi, bj, i, j)
 #endif
         for(bi = 0; bi < nr; bi++) {
             for(bj = A->L->bptr[bi]; bj < A->L->bptr[bi + 1]; bj++) {
                 bjj = A->L->bindex[bj];
-                for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { A->L->value[bj * bs + j * bnr + i] *= d[bi * bnr + i] * d[bjj * bnc + j]; } }
+                for(j = 0; j < bnc; j++) {
+                    for(i = 0; i < bnr; i++) { A->L->value[bj * bs + j * bnr + i] *= d[bi * bnr + i] * d[bjj * bnc + j]; }
+                }
             }
             for(bj = A->U->bptr[bi]; bj < A->U->bptr[bi + 1]; bj++) {
                 bjj = A->U->bindex[bj];
-                for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { A->U->value[bj * bs + j * bnr + i] *= d[bi * bnr + i] * d[bjj * bnc + j]; } }
+                for(j = 0; j < bnc; j++) {
+                    for(i = 0; i < bnr; i++) { A->U->value[bj * bs + j * bnr + i] *= d[bi * bnr + i] * d[bjj * bnc + j]; }
+                }
             }
-            for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { A->D->value[bi * bs + j * bnr + i] *= d[bi * bnr + i] * d[bi * bnr + i]; } }
+            for(j = 0; j < bnc; j++) {
+                for(i = 0; i < bnr; i++) { A->D->value[bi * bs + j * bnr + i] *= d[bi * bnr + i] * d[bi * bnr + i]; }
+            }
         }
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(bi,bj,bjj,i,j)
+#pragma omp parallel for private(bi, bj, bjj, i, j)
 #endif
         for(bi = 0; bi < nr; bi++) {
             for(bj = A->bptr[bi]; bj < A->bptr[bi + 1]; bj++) {
                 bjj = A->bindex[bj];
-                for(j = 0; j < bnc; j++) { for(i = 0; i < bnr; i++) { A->value[bj * bs + j * bnr + i] *= d[bi * bnr + i] * d[bjj * bnc + j]; } }
+                for(j = 0; j < bnc; j++) {
+                    for(i = 0; i < bnr; i++) { A->value[bj * bs + j * bnr + i] *= d[bi * bnr + i] * d[bjj * bnc + j]; }
+                }
             }
         }
     }
@@ -839,18 +872,26 @@ LIS_INT lis_matrix_normf_bsc(LIS_MATRIX A, LIS_SCALAR* nrm) {
 
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for reduction(+:sum) private(bi,bj,j)
+#pragma omp parallel for reduction(+ : sum) private(bi, bj, j)
 #endif
         for(bi = 0; bi < nr; bi++) {
-            for(bj = A->L->bptr[bi]; bj < A->L->bptr[bi + 1]; bj++) { for(j = 0; j < bs; j++) { sum += A->L->value[bj + j] * A->L->value[bj + j]; } }
-            for(bj = A->U->bptr[bi]; bj < A->U->bptr[bi + 1]; bj++) { for(j = 0; j < bs; j++) { sum += A->U->value[bj + j] * A->U->value[bj + j]; } }
+            for(bj = A->L->bptr[bi]; bj < A->L->bptr[bi + 1]; bj++) {
+                for(j = 0; j < bs; j++) { sum += A->L->value[bj + j] * A->L->value[bj + j]; }
+            }
+            for(bj = A->U->bptr[bi]; bj < A->U->bptr[bi + 1]; bj++) {
+                for(j = 0; j < bs; j++) { sum += A->U->value[bj + j] * A->U->value[bj + j]; }
+            }
         }
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for reduction(+:sum) private(bi,bj,j)
+#pragma omp parallel for reduction(+ : sum) private(bi, bj, j)
 #endif
-        for(bi = 0; bi < nr; bi++) { for(bj = A->bptr[bi]; bj < A->bptr[bi + 1]; bj++) { for(j = 0; j < bs; j++) { sum += A->value[bj + j] * A->value[bj + j]; } } }
+        for(bi = 0; bi < nr; bi++) {
+            for(bj = A->bptr[bi]; bj < A->bptr[bi + 1]; bj++) {
+                for(j = 0; j < bs; j++) { sum += A->value[bj + j] * A->value[bj + j]; }
+            }
+        }
     }
     *nrm = sqrt(sum);
     LIS_DEBUG_FUNC_OUT;
@@ -869,8 +910,8 @@ LIS_INT lis_matrix_split_bsc(LIS_MATRIX A) {
     LIS_SCALAR *lvalue, *uvalue;
     LIS_MATRIX_DIAG D;
 #ifdef _OPENMP
-		LIS_INT kl,ku;
-		LIS_INT *liw,*uiw;
+    LIS_INT kl, ku;
+    LIS_INT *liw, *uiw;
 #endif
 
     LIS_DEBUG_FUNC_IN;
@@ -896,47 +937,39 @@ LIS_INT lis_matrix_split_bsc(LIS_MATRIX A) {
         return LIS_ERR_NOT_IMPLEMENTED;
     }
 #ifdef _OPENMP
-		liw = (LIS_INT *)lis_malloc((nc+1)*sizeof(LIS_INT),"lis_matrix_split_bsc::liw");
-		if( liw==NULL )
-		{
-			LIS_SETERR_MEM((nc+1)*sizeof(LIS_INT));
-			return LIS_OUT_OF_MEMORY;
-		}
-		uiw = (LIS_INT *)lis_malloc((nc+1)*sizeof(LIS_INT),"lis_matrix_split_bsc::uiw");
-		if( uiw==NULL )
-		{
-			LIS_SETERR_MEM((nc+1)*sizeof(LIS_INT));
-			lis_free(liw);
-			return LIS_OUT_OF_MEMORY;
-		}
-		#pragma omp parallel for private(i)
-		for(i=0;i<nc+1;i++)
-		{
-			liw[i] = 0;
-			uiw[i] = 0;
-		}
-		#pragma omp parallel for private(i,j)
-		for(i=0;i<nc;i++)
-		{
-			for(j=A->bptr[i];j<A->bptr[i+1];j++)
-			{
-				if( A->bindex[j]<i )
-				{
-					liw[i+1]++;
-				}
-				else if( A->bindex[j]>i )
-				{
-					uiw[i+1]++;
-				}
-			}
-		}
-		for(i=0;i<nc;i++)
-		{
-			liw[i+1] += liw[i];
-			uiw[i+1] += uiw[i];
-		}
-		nnzl = liw[nc];
-		nnzu = uiw[nc];
+    liw = (LIS_INT*)lis_malloc((nc + 1) * sizeof(LIS_INT), "lis_matrix_split_bsc::liw");
+    if(liw == NULL) {
+        LIS_SETERR_MEM((nc + 1) * sizeof(LIS_INT));
+        return LIS_OUT_OF_MEMORY;
+    }
+    uiw = (LIS_INT*)lis_malloc((nc + 1) * sizeof(LIS_INT), "lis_matrix_split_bsc::uiw");
+    if(uiw == NULL) {
+        LIS_SETERR_MEM((nc + 1) * sizeof(LIS_INT));
+        lis_free(liw);
+        return LIS_OUT_OF_MEMORY;
+    }
+#pragma omp parallel for private(i)
+    for(i = 0; i < nc + 1; i++) {
+        liw[i] = 0;
+        uiw[i] = 0;
+    }
+#pragma omp parallel for private(i, j)
+    for(i = 0; i < nc; i++) {
+        for(j = A->bptr[i]; j < A->bptr[i + 1]; j++) {
+            if(A->bindex[j] < i) {
+                liw[i + 1]++;
+            }
+            else if(A->bindex[j] > i) {
+                uiw[i + 1]++;
+            }
+        }
+    }
+    for(i = 0; i < nc; i++) {
+        liw[i + 1] += liw[i];
+        uiw[i + 1] += uiw[i];
+    }
+    nnzl = liw[nc];
+    nnzu = uiw[nc];
 #else
     for(i = 0; i < nc; i++) {
         for(j = A->bptr[i]; j < A->bptr[i + 1]; j++) {
@@ -962,38 +995,33 @@ LIS_INT lis_matrix_split_bsc(LIS_MATRIX A) {
     }
 
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
-		for(i=0;i<nc+1;i++)
-		{
-			lptr[i] = liw[i];
-			uptr[i] = uiw[i];
-		}
-		#pragma omp parallel for private(i,j,kl,ku)
-		for(i=0;i<nc;i++)
-		{
-			kl = lptr[i];
-			ku = uptr[i];
-			for(j=A->bptr[i];j<A->bptr[i+1];j++)
-			{
-				if( A->bindex[j]<i )
-				{
-					lindex[kl]   = A->bindex[j];
-					memcpy(&lvalue[bs*kl],&A->value[bs*j],bs*sizeof(LIS_SCALAR));;
-					kl++;
-				}
-				else if( A->bindex[j]>i )
-				{
-					uindex[ku]   = A->bindex[j];
-					memcpy(&uvalue[bs*ku],&A->value[bs*j],bs*sizeof(LIS_SCALAR));
-					ku++;
-				}
-				else
-				{
-					memcpy(&D->value[bs*i],&A->value[bs*j],bs*sizeof(LIS_SCALAR));
-				}
-			}
-		}
-		lis_free2(2,liw,uiw);
+#pragma omp parallel for private(i)
+    for(i = 0; i < nc + 1; i++) {
+        lptr[i] = liw[i];
+        uptr[i] = uiw[i];
+    }
+#pragma omp parallel for private(i, j, kl, ku)
+    for(i = 0; i < nc; i++) {
+        kl = lptr[i];
+        ku = uptr[i];
+        for(j = A->bptr[i]; j < A->bptr[i + 1]; j++) {
+            if(A->bindex[j] < i) {
+                lindex[kl] = A->bindex[j];
+                memcpy(&lvalue[bs * kl], &A->value[bs * j], bs * sizeof(LIS_SCALAR));
+                ;
+                kl++;
+            }
+            else if(A->bindex[j] > i) {
+                uindex[ku] = A->bindex[j];
+                memcpy(&uvalue[bs * ku], &A->value[bs * j], bs * sizeof(LIS_SCALAR));
+                ku++;
+            }
+            else {
+                memcpy(&D->value[bs * i], &A->value[bs * j], bs * sizeof(LIS_SCALAR));
+            }
+        }
+    }
+    lis_free2(2, liw, uiw);
 #else
     nnzl = 0;
     nnzu = 0;
@@ -1003,7 +1031,8 @@ LIS_INT lis_matrix_split_bsc(LIS_MATRIX A) {
         for(j = A->bptr[i]; j < A->bptr[i + 1]; j++) {
             if(A->bindex[j] < i) {
                 lindex[nnzl] = A->bindex[j];
-                memcpy(&lvalue[bs * nnzl], &A->value[bs * j], bs * sizeof(LIS_SCALAR));;
+                memcpy(&lvalue[bs * nnzl], &A->value[bs * j], bs * sizeof(LIS_SCALAR));
+                ;
                 nnzl++;
             }
             else if(A->bindex[j] > i) {
@@ -1071,15 +1100,18 @@ LIS_INT lis_matrix_merge_bsc(LIS_MATRIX A) {
     for(i = 0; i < nc; i++) {
         for(j = A->L->bptr[i]; j < A->L->bptr[i + 1]; j++) {
             bindex[bnnz] = A->L->bindex[j];
-            memcpy(&value[bs * bnnz], &A->L->value[bs * j], bs * sizeof(LIS_SCALAR));;
+            memcpy(&value[bs * bnnz], &A->L->value[bs * j], bs * sizeof(LIS_SCALAR));
+            ;
             bnnz++;
         }
         bindex[bnnz] = i;
-        memcpy(&value[bs * bnnz], &A->D->value[bs * i], bs * sizeof(LIS_SCALAR));;
+        memcpy(&value[bs * bnnz], &A->D->value[bs * i], bs * sizeof(LIS_SCALAR));
+        ;
         bnnz++;
         for(j = A->U->bptr[i]; j < A->U->bptr[i + 1]; j++) {
             bindex[bnnz] = A->U->bindex[j];
-            memcpy(&value[bs * bnnz], &A->U->value[bs * j], bs * sizeof(LIS_SCALAR));;
+            memcpy(&value[bs * bnnz], &A->U->value[bs * j], bs * sizeof(LIS_SCALAR));
+            ;
             bnnz++;
         }
         bptr[i + 1] = bnnz;
@@ -1419,30 +1451,30 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
             break;
         case 2:
             for(i = 0; i < nr; i++) {
-                t0 = conj(A->WD->value[4*i+0]) * x[i * 2] + conj(A->WD->value[4*i+1]) * x[i * 2 + 1];
-                t1 = conj(A->WD->value[4*i+2]) * x[i * 2] + conj(A->WD->value[4*i+3]) * x[i * 2 + 1];
+                t0 = conj(A->WD->value[4 * i + 0]) * x[i * 2] + conj(A->WD->value[4 * i + 1]) * x[i * 2 + 1];
+                t1 = conj(A->WD->value[4 * i + 2]) * x[i * 2] + conj(A->WD->value[4 * i + 3]) * x[i * 2 + 1];
                 x[i * 2 + 0] = t0;
                 x[i * 2 + 1] = t1;
                 for(j = A->U->bptr[i]; j < A->U->bptr[i + 1]; j++) {
                     jj = A->U->bindex[j];
-                    x[jj * 2 + 0] -= conj(A->U->value[j*4+0]) * t0 + A->U->value[j * 4 + 1] * t1;
-                    x[jj * 2 + 1] -= conj(A->U->value[j*4+2]) * t0 + A->U->value[j * 4 + 3] * t1;
+                    x[jj * 2 + 0] -= conj(A->U->value[j * 4 + 0]) * t0 + A->U->value[j * 4 + 1] * t1;
+                    x[jj * 2 + 1] -= conj(A->U->value[j * 4 + 2]) * t0 + A->U->value[j * 4 + 3] * t1;
                 }
             }
             break;
         case 3:
             for(i = 0; i < nr; i++) {
-                t0 = conj(A->WD->value[9*i+0]) * x[i * 3] + conj(A->WD->value[9*i+1]) * x[i * 3 + 1] + conj(A->WD->value[9*i+2]) * x[i * 3 + 2];
-                t1 = conj(A->WD->value[9*i+3]) * x[i * 3] + conj(A->WD->value[9*i+4]) * x[i * 3 + 1] + conj(A->WD->value[9*i+5]) * x[i * 3 + 2];
-                t2 = conj(A->WD->value[9*i+6]) * x[i * 3] + conj(A->WD->value[9*i+7]) * x[i * 3 + 1] + conj(A->WD->value[9*i+8]) * x[i * 3 + 2];
+                t0 = conj(A->WD->value[9 * i + 0]) * x[i * 3] + conj(A->WD->value[9 * i + 1]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 2]) * x[i * 3 + 2];
+                t1 = conj(A->WD->value[9 * i + 3]) * x[i * 3] + conj(A->WD->value[9 * i + 4]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 5]) * x[i * 3 + 2];
+                t2 = conj(A->WD->value[9 * i + 6]) * x[i * 3] + conj(A->WD->value[9 * i + 7]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 8]) * x[i * 3 + 2];
                 x[i * 3] = t0;
                 x[i * 3 + 1] = t1;
                 x[i * 3 + 2] = t2;
                 for(j = A->U->bptr[i]; j < A->U->bptr[i + 1]; j++) {
                     jj = A->U->bindex[j];
-                    x[jj * 3 + 0] -= conj(A->U->value[j*9+0]) * t0 + A->U->value[j * 9 + 1] * t1 + A->U->value[j * 9 + 2] * t2;
-                    x[jj * 3 + 1] -= conj(A->U->value[j*9+3]) * t0 + A->U->value[j * 9 + 4] * t1 + A->U->value[j * 9 + 5] * t2;
-                    x[jj * 3 + 2] -= conj(A->U->value[j*9+6]) * t0 + A->U->value[j * 9 + 7] * t1 + A->U->value[j * 9 + 8] * t2;
+                    x[jj * 3 + 0] -= conj(A->U->value[j * 9 + 0]) * t0 + A->U->value[j * 9 + 1] * t1 + A->U->value[j * 9 + 2] * t2;
+                    x[jj * 3 + 1] -= conj(A->U->value[j * 9 + 3]) * t0 + A->U->value[j * 9 + 4] * t1 + A->U->value[j * 9 + 5] * t2;
+                    x[jj * 3 + 2] -= conj(A->U->value[j * 9 + 6]) * t0 + A->U->value[j * 9 + 7] * t1 + A->U->value[j * 9 + 8] * t2;
                 }
             }
             break;
@@ -1451,7 +1483,7 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
             for(i = 0; i < nr; i++) {
                 for(jj = 0; jj < bnc; jj++) {
                     t0 = 0.0;
-                    for(ii = 0; ii < bnr; ii++) { t0 += conj(A->WD->value[i*bs + jj*bnr+ii]) * x[i * bnr + ii]; }
+                    for(ii = 0; ii < bnr; ii++) { t0 += conj(A->WD->value[i * bs + jj * bnr + ii]) * x[i * bnr + ii]; }
                     w[jj] = t0;
                 }
                 memcpy(&x[i * bnr], w, bnr * sizeof(LIS_SCALAR));
@@ -1459,7 +1491,7 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
                     k = A->U->bindex[j] * bnc;
                     for(jj = 0; jj < bnc; jj++) {
                         t0 = 0.0;
-                        for(ii = 0; ii < bnr; ii++) { t0 += conj(A->U->value[j*bs + jj*bnr+ii]) * w[ii]; }
+                        for(ii = 0; ii < bnr; ii++) { t0 += conj(A->U->value[j * bs + jj * bnr + ii]) * w[ii]; }
                         x[k + jj] -= t0;
                     }
                 }
@@ -1481,30 +1513,30 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
             break;
         case 2:
             for(i = nr - 1; i >= 0; i--) {
-                t0 = conj(A->WD->value[4*i+0]) * x[i * 2] + conj(A->WD->value[4*i+1]) * x[i * 2 + 1];
-                t1 = conj(A->WD->value[4*i+2]) * x[i * 2] + conj(A->WD->value[4*i+3]) * x[i * 2 + 1];
+                t0 = conj(A->WD->value[4 * i + 0]) * x[i * 2] + conj(A->WD->value[4 * i + 1]) * x[i * 2 + 1];
+                t1 = conj(A->WD->value[4 * i + 2]) * x[i * 2] + conj(A->WD->value[4 * i + 3]) * x[i * 2 + 1];
                 x[i * 2 + 0] = t0;
                 x[i * 2 + 1] = t1;
                 for(j = A->L->bptr[i]; j < A->L->bptr[i + 1]; j++) {
                     jj = A->L->bindex[j];
-                    x[jj * 2 + 0] -= conj(A->L->value[j*4+0]) * t0 + conj(A->L->value[j*4+1]) * t1;
-                    x[jj * 2 + 1] -= conj(A->L->value[j*4+2]) * t0 + conj(A->L->value[j*4+3]) * t1;
+                    x[jj * 2 + 0] -= conj(A->L->value[j * 4 + 0]) * t0 + conj(A->L->value[j * 4 + 1]) * t1;
+                    x[jj * 2 + 1] -= conj(A->L->value[j * 4 + 2]) * t0 + conj(A->L->value[j * 4 + 3]) * t1;
                 }
             }
             break;
         case 3:
             for(i = nr - 1; i >= 0; i--) {
-                t0 = conj(A->WD->value[9*i+0]) * x[i * 3] + conj(A->WD->value[9*i+1]) * x[i * 3 + 1] + conj(A->WD->value[9*i+2]) * x[i * 3 + 2];
-                t1 = conj(A->WD->value[9*i+3]) * x[i * 3] + conj(A->WD->value[9*i+4]) * x[i * 3 + 1] + conj(A->WD->value[9*i+5]) * x[i * 3 + 2];
-                t2 = conj(A->WD->value[9*i+6]) * x[i * 3] + conj(A->WD->value[9*i+7]) * x[i * 3 + 1] + conj(A->WD->value[9*i+8]) * x[i * 3 + 2];
+                t0 = conj(A->WD->value[9 * i + 0]) * x[i * 3] + conj(A->WD->value[9 * i + 1]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 2]) * x[i * 3 + 2];
+                t1 = conj(A->WD->value[9 * i + 3]) * x[i * 3] + conj(A->WD->value[9 * i + 4]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 5]) * x[i * 3 + 2];
+                t2 = conj(A->WD->value[9 * i + 6]) * x[i * 3] + conj(A->WD->value[9 * i + 7]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 8]) * x[i * 3 + 2];
                 x[i * 3] = t0;
                 x[i * 3 + 1] = t1;
                 x[i * 3 + 2] = t2;
                 for(j = A->L->bptr[i]; j < A->L->bptr[i + 1]; j++) {
                     jj = A->L->bindex[j];
-                    x[jj * 3 + 0] -= conj(A->L->value[j*9+0]) * t0 + conj(A->L->value[j*9+1]) * t1 + conj(A->L->value[j*9+2]) * t2;
-                    x[jj * 3 + 1] -= conj(A->L->value[j*9+3]) * t0 + conj(A->L->value[j*9+4]) * t1 + conj(A->L->value[j*9+5]) * t2;
-                    x[jj * 3 + 2] -= conj(A->L->value[j*9+6]) * t0 + conj(A->L->value[j*9+7]) * t1 + conj(A->L->value[j*9+8]) * t2;
+                    x[jj * 3 + 0] -= conj(A->L->value[j * 9 + 0]) * t0 + conj(A->L->value[j * 9 + 1]) * t1 + conj(A->L->value[j * 9 + 2]) * t2;
+                    x[jj * 3 + 1] -= conj(A->L->value[j * 9 + 3]) * t0 + conj(A->L->value[j * 9 + 4]) * t1 + conj(A->L->value[j * 9 + 5]) * t2;
+                    x[jj * 3 + 2] -= conj(A->L->value[j * 9 + 6]) * t0 + conj(A->L->value[j * 9 + 7]) * t1 + conj(A->L->value[j * 9 + 8]) * t2;
                 }
             }
             break;
@@ -1513,7 +1545,7 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
             for(i = nr - 1; i >= 0; i--) {
                 for(jj = 0; jj < bnc; jj++) {
                     t0 = 0.0;
-                    for(ii = 0; ii < bnr; ii++) { t0 += conj(A->WD->value[i*bs + jj*bnr+ii]) * x[i * bnr + ii]; }
+                    for(ii = 0; ii < bnr; ii++) { t0 += conj(A->WD->value[i * bs + jj * bnr + ii]) * x[i * bnr + ii]; }
                     w[jj] = t0;
                 }
                 memcpy(&x[i * bnr], w, bnr * sizeof(LIS_SCALAR));
@@ -1521,7 +1553,7 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
                     k = A->L->bindex[j] * bnc;
                     for(jj = 0; jj < bnc; jj++) {
                         t0 = 0.0;
-                        for(ii = 0; ii < bnr; ii++) { t0 += conj(A->L->value[j*bs + jj*bnr+ii]) * w[ii]; }
+                        for(ii = 0; ii < bnr; ii++) { t0 += conj(A->L->value[j * bs + jj * bnr + ii]) * w[ii]; }
                         x[k + jj] -= t0;
                     }
                 }
@@ -1551,50 +1583,50 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
             break;
         case 2:
             for(i = 0; i < nr; i++) {
-                t0 = conj(A->WD->value[4*i+0]) * x[i * 2] + conj(A->WD->value[4*i+1]) * x[i * 2 + 1];
-                t1 = conj(A->WD->value[4*i+2]) * x[i * 2] + conj(A->WD->value[4*i+3]) * x[i * 2 + 1];
+                t0 = conj(A->WD->value[4 * i + 0]) * x[i * 2] + conj(A->WD->value[4 * i + 1]) * x[i * 2 + 1];
+                t1 = conj(A->WD->value[4 * i + 2]) * x[i * 2] + conj(A->WD->value[4 * i + 3]) * x[i * 2 + 1];
                 for(j = A->U->bptr[i]; j < A->U->bptr[i + 1]; j++) {
                     jj = A->U->bindex[j];
-                    x[jj * 2 + 0] -= conj(A->U->value[j*4+0]) * t0 + A->U->value[j * 4 + 1] * t1;
-                    x[jj * 2 + 1] -= conj(A->U->value[j*4+2]) * t0 + A->U->value[j * 4 + 3] * t1;
+                    x[jj * 2 + 0] -= conj(A->U->value[j * 4 + 0]) * t0 + A->U->value[j * 4 + 1] * t1;
+                    x[jj * 2 + 1] -= conj(A->U->value[j * 4 + 2]) * t0 + A->U->value[j * 4 + 3] * t1;
                 }
             }
             for(i = nr - 1; i >= 0; i--) {
-                t0 = conj(A->WD->value[4*i+0]) * x[i * 2] + conj(A->WD->value[4*i+1]) * x[i * 2 + 1];
-                t1 = conj(A->WD->value[4*i+2]) * x[i * 2] + conj(A->WD->value[4*i+3]) * x[i * 2 + 1];
+                t0 = conj(A->WD->value[4 * i + 0]) * x[i * 2] + conj(A->WD->value[4 * i + 1]) * x[i * 2 + 1];
+                t1 = conj(A->WD->value[4 * i + 2]) * x[i * 2] + conj(A->WD->value[4 * i + 3]) * x[i * 2 + 1];
                 x[i * 2 + 0] = t0;
                 x[i * 2 + 1] = t1;
                 for(j = A->L->bptr[i]; j < A->L->bptr[i + 1]; j++) {
                     jj = A->L->bindex[j];
-                    x[jj * 2 + 0] -= conj(A->L->value[j*4+0]) * t0 + A->L->value[j * 4 + 1] * t1;
-                    x[jj * 2 + 1] -= conj(A->L->value[j*4+2]) * t0 + A->L->value[j * 4 + 3] * t1;
+                    x[jj * 2 + 0] -= conj(A->L->value[j * 4 + 0]) * t0 + A->L->value[j * 4 + 1] * t1;
+                    x[jj * 2 + 1] -= conj(A->L->value[j * 4 + 2]) * t0 + A->L->value[j * 4 + 3] * t1;
                 }
             }
             break;
         case 3:
             for(i = 0; i < nr; i++) {
-                t0 = conj(A->WD->value[9*i+0]) * x[i * 3] + conj(A->WD->value[9*i+1]) * x[i * 3 + 1] + conj(A->WD->value[9*i+2]) * x[i * 3 + 2];
-                t1 = conj(A->WD->value[9*i+3]) * x[i * 3] + conj(A->WD->value[9*i+4]) * x[i * 3 + 1] + conj(A->WD->value[9*i+5]) * x[i * 3 + 2];
-                t2 = conj(A->WD->value[9*i+6]) * x[i * 3] + conj(A->WD->value[9*i+7]) * x[i * 3 + 1] + conj(A->WD->value[9*i+8]) * x[i * 3 + 2];
+                t0 = conj(A->WD->value[9 * i + 0]) * x[i * 3] + conj(A->WD->value[9 * i + 1]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 2]) * x[i * 3 + 2];
+                t1 = conj(A->WD->value[9 * i + 3]) * x[i * 3] + conj(A->WD->value[9 * i + 4]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 5]) * x[i * 3 + 2];
+                t2 = conj(A->WD->value[9 * i + 6]) * x[i * 3] + conj(A->WD->value[9 * i + 7]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 8]) * x[i * 3 + 2];
                 for(j = A->U->bptr[i]; j < A->U->bptr[i + 1]; j++) {
                     jj = A->U->bindex[j];
-                    x[jj * 3 + 0] -= conj(A->U->value[j*9+0]) * t0 + conj(A->U->value[j*9+1]) * t1 + conj(A->U->value[j*9+2]) * t2;
-                    x[jj * 3 + 1] -= conj(A->U->value[j*9+3]) * t0 + conj(A->U->value[j*9+4]) * t1 + conj(A->U->value[j*9+5]) * t2;
-                    x[jj * 3 + 2] -= conj(A->U->value[j*9+6]) * t0 + conj(A->U->value[j*9+7]) * t1 + conj(A->U->value[j*9+8]) * t2;
+                    x[jj * 3 + 0] -= conj(A->U->value[j * 9 + 0]) * t0 + conj(A->U->value[j * 9 + 1]) * t1 + conj(A->U->value[j * 9 + 2]) * t2;
+                    x[jj * 3 + 1] -= conj(A->U->value[j * 9 + 3]) * t0 + conj(A->U->value[j * 9 + 4]) * t1 + conj(A->U->value[j * 9 + 5]) * t2;
+                    x[jj * 3 + 2] -= conj(A->U->value[j * 9 + 6]) * t0 + conj(A->U->value[j * 9 + 7]) * t1 + conj(A->U->value[j * 9 + 8]) * t2;
                 }
             }
             for(i = nr - 1; i >= 0; i--) {
-                t0 = conj(A->WD->value[9*i+0]) * x[i * 3] + conj(A->WD->value[9*i+1]) * x[i * 3 + 1] + conj(A->WD->value[9*i+2]) * x[i * 3 + 2];
-                t1 = conj(A->WD->value[9*i+3]) * x[i * 3] + conj(A->WD->value[9*i+4]) * x[i * 3 + 1] + conj(A->WD->value[9*i+5]) * x[i * 3 + 2];
-                t2 = conj(A->WD->value[9*i+6]) * x[i * 3] + conj(A->WD->value[9*i+7]) * x[i * 3 + 1] + conj(A->WD->value[9*i+8]) * x[i * 3 + 2];
+                t0 = conj(A->WD->value[9 * i + 0]) * x[i * 3] + conj(A->WD->value[9 * i + 1]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 2]) * x[i * 3 + 2];
+                t1 = conj(A->WD->value[9 * i + 3]) * x[i * 3] + conj(A->WD->value[9 * i + 4]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 5]) * x[i * 3 + 2];
+                t2 = conj(A->WD->value[9 * i + 6]) * x[i * 3] + conj(A->WD->value[9 * i + 7]) * x[i * 3 + 1] + conj(A->WD->value[9 * i + 8]) * x[i * 3 + 2];
                 x[i * 3] = t0;
                 x[i * 3 + 1] = t1;
                 x[i * 3 + 2] = t2;
                 for(j = A->L->bptr[i]; j < A->L->bptr[i + 1]; j++) {
                     jj = A->L->bindex[j];
-                    x[jj * 3 + 0] -= conj(A->L->value[j*9+0]) * t0 + conj(A->L->value[j*9+1]) * t1 + conj(A->L->value[j*9+2]) * t2;
-                    x[jj * 3 + 1] -= conj(A->L->value[j*9+3]) * t0 + conj(A->L->value[j*9+4]) * t1 + conj(A->L->value[j*9+5]) * t2;
-                    x[jj * 3 + 2] -= conj(A->L->value[j*9+6]) * t0 + conj(A->L->value[j*9+7]) * t1 + conj(A->L->value[j*9+8]) * t2;
+                    x[jj * 3 + 0] -= conj(A->L->value[j * 9 + 0]) * t0 + conj(A->L->value[j * 9 + 1]) * t1 + conj(A->L->value[j * 9 + 2]) * t2;
+                    x[jj * 3 + 1] -= conj(A->L->value[j * 9 + 3]) * t0 + conj(A->L->value[j * 9 + 4]) * t1 + conj(A->L->value[j * 9 + 5]) * t2;
+                    x[jj * 3 + 2] -= conj(A->L->value[j * 9 + 6]) * t0 + conj(A->L->value[j * 9 + 7]) * t1 + conj(A->L->value[j * 9 + 8]) * t2;
                 }
             }
             break;
@@ -1603,14 +1635,14 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
             for(i = 0; i < nr; i++) {
                 for(jj = 0; jj < bnc; jj++) {
                     t0 = 0.0;
-                    for(ii = 0; ii < bnr; ii++) { t0 += conj(A->WD->value[i*bs + jj*bnr+ii]) * x[i * bnr + ii]; }
+                    for(ii = 0; ii < bnr; ii++) { t0 += conj(A->WD->value[i * bs + jj * bnr + ii]) * x[i * bnr + ii]; }
                     w[jj] = t0;
                 }
                 for(j = A->U->bptr[i]; j < A->U->bptr[i + 1]; j++) {
                     k = A->U->bindex[j] * bnc;
                     for(jj = 0; jj < bnc; jj++) {
                         t0 = 0.0;
-                        for(ii = 0; ii < bnr; ii++) { t0 += conj(A->U->value[j*bs + jj*bnr+ii]) * w[ii]; }
+                        for(ii = 0; ii < bnr; ii++) { t0 += conj(A->U->value[j * bs + jj * bnr + ii]) * w[ii]; }
                         x[k + jj] -= t0;
                     }
                 }
@@ -1618,7 +1650,7 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
             for(i = nr - 1; i >= 0; i--) {
                 for(jj = 0; jj < bnc; jj++) {
                     t0 = 0.0;
-                    for(ii = 0; ii < bnr; ii++) { t0 += conj(A->WD->value[i*bs + jj*bnr+ii]) * x[i * bnr + ii]; }
+                    for(ii = 0; ii < bnr; ii++) { t0 += conj(A->WD->value[i * bs + jj * bnr + ii]) * x[i * bnr + ii]; }
                     w[jj] = t0;
                 }
                 memcpy(&x[i * bnr], w, bnr * sizeof(LIS_SCALAR));
@@ -1626,7 +1658,7 @@ LIS_INT lis_matrix_solveh_bsc(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
                     k = A->L->bindex[j] * bnc;
                     for(jj = 0; jj < bnc; jj++) {
                         t0 = 0.0;
-                        for(ii = 0; ii < bnr; ii++) { t0 += conj(A->L->value[j*bs + jj*bnr+ii]) * w[ii]; }
+                        for(ii = 0; ii < bnr; ii++) { t0 += conj(A->L->value[j * bs + jj * bnr + ii]) * w[ii]; }
                         x[k + jj] -= t0;
                     }
                 }

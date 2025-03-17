@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,220 +25,199 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 #ifdef USE_QUAD_PRECISION
 #ifdef _WIN32
-	#include <float.h>
+#include <float.h>
 #endif
 #endif
 #ifdef USE_SSE2
-	#include <emmintrin.h>
+#include <emmintrin.h>
 #endif
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
 #ifdef USE_QUAD_PRECISION
 #undef __FUNC__
 #define __FUNC__ "lis_quad_x87_fpu_init"
-void lis_quad_x87_fpu_init(LIS_UNSIGNED_INT *cw_old)
-{
+void lis_quad_x87_fpu_init(LIS_UNSIGNED_INT* cw_old) {
 #ifdef HAS_X87_FPU
 #ifdef _WIN32
 #ifndef _WIN64
-	LIS_UNSIGNED_INT cw = _control87(0, 0);
-	_control87(0x00010000, 0x00030000);
-	*cw_old = cw;
-	cw = _control87(0, 0);
+    LIS_UNSIGNED_INT cw = _control87(0, 0);
+    _control87(0x00010000, 0x00030000);
+    *cw_old = cw;
+    cw = _control87(0, 0);
 #endif
 #else
-	LIS_INT cw,cw_new;
-	asm volatile ("fnstcw %0":"=m" (cw));
-	cw_new = (cw & ~0x0300) | 0x0200;
-	asm volatile ("fldcw %0": :"m" (cw_new));
-	*cw_old = cw;
+    LIS_INT cw, cw_new;
+    asm volatile("fnstcw %0" : "=m"(cw));
+    cw_new = (cw & ~0x0300) | 0x0200;
+    asm volatile("fldcw %0" : : "m"(cw_new));
+    *cw_old = cw;
 #endif
 #else
-	*cw_old = 0;
+    *cw_old = 0;
 #endif
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_x87_fpu_finalize"
-void lis_quad_x87_fpu_finalize(LIS_UNSIGNED_INT cw)
-{
+void lis_quad_x87_fpu_finalize(LIS_UNSIGNED_INT cw) {
 #ifdef HAS_X87_FPU
 #ifdef _WIN32
 #ifndef _WIN64
     _control87(cw, 0xFFFFFFFF);
 #endif
 #else
-	asm volatile ("fldcw %0": :"m" (cw));
+    asm volatile("fldcw %0" : : "m"(cw));
 #endif
 #endif
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_minus"
-void  lis_quad_minus(LIS_QUAD *a)
-{
-	a->hi = -a->hi;
-	a->lo = -a->lo;
+void lis_quad_minus(LIS_QUAD* a) {
+    a->hi = -a->hi;
+    a->lo = -a->lo;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_zero"
-void  lis_quad_zero(LIS_QUAD *a)
-{
-	a->hi = 0.0;
-	a->lo = 0.0;
+void lis_quad_zero(LIS_QUAD* a) {
+    a->hi = 0.0;
+    a->lo = 0.0;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_one"
-void  lis_quad_one(LIS_QUAD *a)
-{
-	a->hi = 1.0;
-	a->lo = 0.0;
+void lis_quad_one(LIS_QUAD* a) {
+    a->hi = 1.0;
+    a->lo = 0.0;
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_max"
-void  lis_quad_max(LIS_QUAD *a, LIS_QUAD *b, LIS_QUAD *c)
-{
-	if( (a->hi > b->hi) || ((a->hi==b->hi) && (a->lo > b->lo)) )
-	{
-		c->hi = a->hi;
-		c->lo = a->lo;
-	}
-	else
-	{
-		c->hi = b->hi;
-		c->lo = b->lo;
-	}
+void lis_quad_max(LIS_QUAD* a, LIS_QUAD* b, LIS_QUAD* c) {
+    if((a->hi > b->hi) || ((a->hi == b->hi) && (a->lo > b->lo))) {
+        c->hi = a->hi;
+        c->lo = a->lo;
+    }
+    else {
+        c->hi = b->hi;
+        c->lo = b->lo;
+    }
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_min"
-void  lis_quad_min(LIS_QUAD *a, LIS_QUAD *b, LIS_QUAD *c)
-{
-	if( (a->hi < b->hi) || ((a->hi==b->hi) && (a->lo < b->lo)) )
-	{
-		c->hi = a->hi;
-		c->lo = a->lo;
-	}
-	else
-	{
-		c->hi = b->hi;
-		c->lo = b->lo;
-	}
+void lis_quad_min(LIS_QUAD* a, LIS_QUAD* b, LIS_QUAD* c) {
+    if((a->hi < b->hi) || ((a->hi == b->hi) && (a->lo < b->lo))) {
+        c->hi = a->hi;
+        c->lo = a->lo;
+    }
+    else {
+        c->hi = b->hi;
+        c->lo = b->lo;
+    }
 }
-
-
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_add"
-void lis_quad_add(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
-{
-	LIS_QUAD_DECLAR;
+void lis_quad_add(LIS_QUAD* a, const LIS_QUAD* b, const LIS_QUAD* c) {
+    LIS_QUAD_DECLAR;
 
 #ifndef USE_SSE2
-		LIS_QUAD_ADD(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
+    LIS_QUAD_ADD(a->hi, a->lo, b->hi, b->lo, c->hi, c->lo);
 #else
-		LIS_QUAD_ADD_SSE2(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
+    LIS_QUAD_ADD_SSE2(a->hi, a->lo, b->hi, b->lo, c->hi, c->lo);
 #endif
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_sub"
-void lis_quad_sub(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
-{
-	LIS_QUAD_DECLAR;
+void lis_quad_sub(LIS_QUAD* a, const LIS_QUAD* b, const LIS_QUAD* c) {
+    LIS_QUAD_DECLAR;
 
 #ifndef USE_SSE2
-		LIS_QUAD_ADD(a->hi,a->lo,b->hi,b->lo,-c->hi,-c->lo);
+    LIS_QUAD_ADD(a->hi, a->lo, b->hi, b->lo, -c->hi, -c->lo);
 #else
-		LIS_QUAD_ADD_SSE2(a->hi,a->lo,b->hi,b->lo,-c->hi,-c->lo);
+    LIS_QUAD_ADD_SSE2(a->hi, a->lo, b->hi, b->lo, -c->hi, -c->lo);
 #endif
 }
 
-
 #undef __FUNC__
 #define __FUNC__ "lis_quad_mul"
-void lis_quad_mul(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
-{
-	LIS_QUAD_DECLAR;
+void lis_quad_mul(LIS_QUAD* a, const LIS_QUAD* b, const LIS_QUAD* c) {
+    LIS_QUAD_DECLAR;
 
 #ifndef USE_SSE2
-		LIS_QUAD_MUL(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
+    LIS_QUAD_MUL(a->hi, a->lo, b->hi, b->lo, c->hi, c->lo);
 #else
-		LIS_QUAD_MUL_SSE2(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
+    LIS_QUAD_MUL_SSE2(a->hi, a->lo, b->hi, b->lo, c->hi, c->lo);
 #endif
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_mul_dd_d"
- void lis_quad_mul_dd_d(LIS_QUAD *a, const LIS_QUAD *b, const double c)
-{
-	LIS_QUAD_DECLAR;
+void lis_quad_mul_dd_d(LIS_QUAD* a, const LIS_QUAD* b, const double c) {
+    LIS_QUAD_DECLAR;
 
 #ifndef USE_SSE2
-		LIS_QUAD_MULD(a->hi,a->lo,b->hi,b->lo,c);
+    LIS_QUAD_MULD(a->hi, a->lo, b->hi, b->lo, c);
 #else
-		LIS_QUAD_MULD_SSE2(a->hi,a->lo,b->hi,b->lo,c);
+    LIS_QUAD_MULD_SSE2(a->hi, a->lo, b->hi, b->lo, c);
 #endif
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_sqr"
-void lis_quad_sqr(LIS_QUAD *a, const LIS_QUAD *b)
-{
-	LIS_QUAD_DECLAR;
+void lis_quad_sqr(LIS_QUAD* a, const LIS_QUAD* b) {
+    LIS_QUAD_DECLAR;
 
 #ifndef USE_SSE2
-		LIS_QUAD_SQR(a->hi,a->lo,b->hi,b->lo);
+    LIS_QUAD_SQR(a->hi, a->lo, b->hi, b->lo);
 #else
-		LIS_QUAD_SQR_SSE2(a->hi,a->lo,b->hi,b->lo);
+    LIS_QUAD_SQR_SSE2(a->hi, a->lo, b->hi, b->lo);
 #endif
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_div"
-void lis_quad_div(LIS_QUAD *a, const LIS_QUAD *b, const LIS_QUAD *c)
-{
-	LIS_QUAD_DECLAR;
+void lis_quad_div(LIS_QUAD* a, const LIS_QUAD* b, const LIS_QUAD* c) {
+    LIS_QUAD_DECLAR;
 
 #ifndef USE_SSE2
-		LIS_QUAD_DIV(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
+    LIS_QUAD_DIV(a->hi, a->lo, b->hi, b->lo, c->hi, c->lo);
 #else
-		LIS_QUAD_DIV_SSE2(a->hi,a->lo,b->hi,b->lo,c->hi,c->lo);
+    LIS_QUAD_DIV_SSE2(a->hi, a->lo, b->hi, b->lo, c->hi, c->lo);
 #endif
 }
 
 #undef __FUNC__
 #define __FUNC__ "lis_quad_sqrt"
-LIS_INT lis_quad_sqrt(LIS_QUAD *a, const LIS_QUAD *b)
-{
-	LIS_QUAD_DECLAR;
+LIS_INT lis_quad_sqrt(LIS_QUAD* a, const LIS_QUAD* b) {
+    LIS_QUAD_DECLAR;
 
 #ifndef USE_SSE2
-		LIS_QUAD_SQRT(a->hi,a->lo,b->hi,b->lo);
+    LIS_QUAD_SQRT(a->hi, a->lo, b->hi, b->lo);
 #else
-		LIS_QUAD_SQRT_SSE2(a->hi,a->lo,b->hi,b->lo);
+    LIS_QUAD_SQRT_SSE2(a->hi, a->lo, b->hi, b->lo);
 #endif
-	return LIS_SUCCESS;
+    return LIS_SUCCESS;
 }
 #endif

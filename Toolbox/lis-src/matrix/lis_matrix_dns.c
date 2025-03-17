@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,26 +25,26 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
-#include <stdarg.h>
 #include <math.h>
+#include <stdarg.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -90,7 +90,7 @@ LIS_INT lis_matrix_set_dns(LIS_SCALAR* value, LIS_MATRIX A) {
 #else
     if(lis_matrix_is_assembled(A)) return LIS_SUCCESS;
     else {
-        err = lis_matrix_check(A,LIS_MATRIX_CHECK_SET);
+        err = lis_matrix_check(A, LIS_MATRIX_CHECK_SET);
         if(err) return err;
     }
 #endif
@@ -113,7 +113,7 @@ LIS_INT lis_matrix_malloc_dns(LIS_INT n, LIS_INT np, LIS_SCALAR** value) {
 
     *value = (LIS_SCALAR*)lis_malloc(n * np * sizeof(LIS_SCALAR), "lis_matrix_malloc_dns::value");
     if(*value == NULL) {
-        LIS_SETERR_MEM(n*np*sizeof(LIS_SCALAR));
+        LIS_SETERR_MEM(n * np * sizeof(LIS_SCALAR));
         return LIS_OUT_OF_MEMORY;
     }
     LIS_DEBUG_FUNC_OUT;
@@ -130,23 +130,25 @@ LIS_INT lis_matrix_elements_copy_dns(LIS_INT n, LIS_INT np, LIS_SCALAR* value, L
     LIS_DEBUG_FUNC_IN;
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,is,ie,my_rank)
+#pragma omp parallel private(i, j, is, ie, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
         LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-        for(j = 0; j < np; j++) { for(i = is; i < ie; i++) { o_value[j * n + i] = value[j * n + i]; } }
+        for(j = 0; j < np; j++) {
+            for(i = is; i < ie; i++) { o_value[j * n + i] = value[j * n + i]; }
+        }
     }
 
     LIS_DEBUG_FUNC_OUT;
@@ -181,7 +183,7 @@ LIS_INT lis_matrix_copy_dns(LIS_MATRIX Ain, LIS_MATRIX Aout) {
         }
 
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { D->value[i] = Ain->value[i * n + i]; }
         Aout->D = D;
@@ -213,7 +215,7 @@ LIS_INT lis_matrix_get_diagonal_dns(LIS_MATRIX A, LIS_SCALAR d[]) {
 
     n = A->n;
 #ifdef _OPENMP
-	#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
     for(i = 0; i < n; i++) { d[i] = A->value[i * n + i]; }
     LIS_DEBUG_FUNC_OUT;
@@ -233,13 +235,13 @@ LIS_INT lis_matrix_shift_diagonal_dns(LIS_MATRIX A, LIS_SCALAR sigma) {
 
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { A->D->value[i] -= sigma; }
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { A->value[i * n + i] -= sigma; }
     }
@@ -260,28 +262,30 @@ LIS_INT lis_matrix_axpy_dns(LIS_SCALAR alpha, LIS_MATRIX A, LIS_MATRIX B) {
     np = A->np;
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,is,ie,my_rank)
+#pragma omp parallel private(i, j, is, ie, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
         LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-        for(j = 0; j < np; j++) { for(i = is; i < ie; i++) { B->value[j * n + i] += alpha * A->value[j * n + i]; } }
+        for(j = 0; j < np; j++) {
+            for(i = is; i < ie; i++) { B->value[j * n + i] += alpha * A->value[j * n + i]; }
+        }
     }
 
     if(A->is_splited && B->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { B->D->value[i] += alpha * A->D->value[i]; }
     }
@@ -307,28 +311,30 @@ LIS_INT lis_matrix_xpay_dns(LIS_SCALAR alpha, LIS_MATRIX A, LIS_MATRIX B) {
     np = A->np;
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,is,ie,my_rank)
+#pragma omp parallel private(i, j, is, ie, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
         LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-        for(j = 0; j < np; j++) { for(i = is; i < ie; i++) { B->value[j * n + i] = A->value[j * n + i] + alpha * B->value[j * n + i]; } }
+        for(j = 0; j < np; j++) {
+            for(i = is; i < ie; i++) { B->value[j * n + i] = A->value[j * n + i] + alpha * B->value[j * n + i]; }
+        }
     }
 
     if(A->is_splited && B->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { B->D->value[i] = A->D->value[i] + alpha * B->D->value[i]; }
     }
@@ -354,28 +360,30 @@ LIS_INT lis_matrix_axpyz_dns(LIS_SCALAR alpha, LIS_MATRIX A, LIS_MATRIX B, LIS_M
     np = A->np;
 
 #ifdef _OPENMP
-		nprocs = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
 
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,is,ie,my_rank)
+#pragma omp parallel private(i, j, is, ie, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
         LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-        for(j = 0; j < np; j++) { for(i = is; i < ie; i++) { C->value[j * n + i] = alpha * A->value[j * n + i] + B->value[j * n + i]; } }
+        for(j = 0; j < np; j++) {
+            for(i = is; i < ie; i++) { C->value[j * n + i] = alpha * A->value[j * n + i] + B->value[j * n + i]; }
+        }
     }
 
     if(A->is_splited && B->is_splited && C->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i)
+#pragma omp parallel for private(i)
 #endif
         for(i = 0; i < n; i++) { C->D->value[i] = alpha * A->D->value[i] + B->D->value[i]; }
     }
@@ -399,7 +407,9 @@ LIS_INT lis_matrix_scale_dns(LIS_MATRIX A, LIS_SCALAR d[]) {
 
     n = A->n;
     np = A->np;
-    for(j = 0; j < np; j++) { for(i = 0; i < n; i++) { A->value[j * n + i] *= d[i]; } }
+    for(j = 0; j < np; j++) {
+        for(i = 0; i < n; i++) { A->value[j * n + i] *= d[i]; }
+    }
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 }
@@ -415,7 +425,9 @@ LIS_INT lis_matrix_scale_symm_dns(LIS_MATRIX A, LIS_SCALAR d[]) {
 
     n = A->n;
     np = A->np;
-    for(j = 0; j < np; j++) { for(i = 0; i < n; i++) { A->value[j * n + i] *= d[i] * d[j]; } }
+    for(j = 0; j < np; j++) {
+        for(i = 0; i < n; i++) { A->value[j * n + i] *= d[i] * d[j]; }
+    }
     LIS_DEBUG_FUNC_OUT;
     return LIS_SUCCESS;
 }
@@ -434,7 +446,7 @@ LIS_INT lis_matrix_normf_dns(LIS_MATRIX A, LIS_SCALAR* nrm) {
     sum = (LIS_SCALAR)0;
     if(A->is_splited) {
 #ifdef _OPENMP
-		#pragma omp parallel for reduction(+:sum) private(i,j)
+#pragma omp parallel for reduction(+ : sum) private(i, j)
 #endif
         for(i = 0; i < n; i++) {
             sum += A->D->value[i] * A->D->value[i];
@@ -444,7 +456,7 @@ LIS_INT lis_matrix_normf_dns(LIS_MATRIX A, LIS_SCALAR* nrm) {
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for reduction(+:sum) private(i,j)
+#pragma omp parallel for reduction(+ : sum) private(i, j)
 #endif
         for(i = 0; i < n; i++) {
             sum += A->value[i] * A->value[i];
@@ -585,24 +597,24 @@ LIS_INT lis_matrix_solveh_dns(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X, LIS_INT 
     case LIS_MATRIX_LOWER:
         for(i = 0; i < n; i++) {
             x[i] = x[i] * conj(A->WD->value[i]);
-            for(j = i + 1; j < np; j++) { x[j] -= conj(A->value[j*n + i]) * x[i]; }
+            for(j = i + 1; j < np; j++) { x[j] -= conj(A->value[j * n + i]) * x[i]; }
         }
         break;
     case LIS_MATRIX_UPPER:
         for(i = n - 1; i >= 0; i--) {
             x[i] = x[i] * conj(A->WD->value[i]);
-            for(j = 0; j < i; j++) { x[j] -= conj(A->value[j*n + i]) * x[i]; }
+            for(j = 0; j < i; j++) { x[j] -= conj(A->value[j * n + i]) * x[i]; }
         }
         break;
     case LIS_MATRIX_SSOR:
         for(i = 0; i < n; i++) {
             t = x[i] * conj(A->WD->value[i]);
-            for(j = i + 1; j < np; j++) { x[j] -= conj(A->value[j*n + i]) * t; }
+            for(j = i + 1; j < np; j++) { x[j] -= conj(A->value[j * n + i]) * t; }
         }
         for(i = n - 1; i >= 0; i--) {
             t = x[i] * conj(A->WD->value[i]);
             x[i] = t;
-            for(j = 0; j < i; j++) { x[j] -= conj(A->value[j*n + i]) * t; }
+            for(j = 0; j < i; j++) { x[j] -= conj(A->value[j * n + i]) * t; }
         }
         break;
     }
@@ -626,7 +638,7 @@ LIS_INT lis_matrix_convert_csr2dns(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     n = Ain->n;
     np = Ain->np;
 #ifdef _OPENMP
-		nprocs  = omp_get_max_threads();
+    nprocs = omp_get_max_threads();
 #else
     nprocs = 1;
 #endif
@@ -638,18 +650,22 @@ LIS_INT lis_matrix_convert_csr2dns(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     /* convert dns */
 #ifdef _OPENMP
-	#pragma omp parallel private(i,j,is,ie,my_rank)
+#pragma omp parallel private(i, j, is, ie, my_rank)
 #endif
     {
 #ifdef _OPENMP
-			my_rank = omp_get_thread_num();
+        my_rank = omp_get_thread_num();
 #else
         my_rank = 0;
 #endif
         LIS_GET_ISIE(my_rank, nprocs, n, is, ie);
 
-        for(j = 0; j < np; j++) { for(i = is; i < ie; i++) { value[j * n + i] = (LIS_SCALAR)0.0; } }
-        for(i = is; i < ie; i++) { for(j = Ain->ptr[i]; j < Ain->ptr[i + 1]; j++) { value[i + n * Ain->index[j]] = Ain->value[j]; } }
+        for(j = 0; j < np; j++) {
+            for(i = is; i < ie; i++) { value[j * n + i] = (LIS_SCALAR)0.0; }
+        }
+        for(i = is; i < ie; i++) {
+            for(j = Ain->ptr[i]; j < Ain->ptr[i + 1]; j++) { value[i + n * Ain->index[j]] = Ain->value[j]; }
+        }
     }
 
     err = lis_matrix_set_dns(value, Aout);
@@ -688,16 +704,18 @@ LIS_INT lis_matrix_convert_dns2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
 
     ptr = (LIS_INT*)lis_malloc((n + 1) * sizeof(LIS_INT), "lis_matrix_convert_dns2csr::ptr");
     if(ptr == NULL) {
-        LIS_SETERR_MEM((n+1)*sizeof(LIS_INT));
+        LIS_SETERR_MEM((n + 1) * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
 
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j)
+#pragma omp parallel for private(i, j)
 #endif
     for(i = 0; i < n; i++) {
         ptr[i + 1] = 0;
-        for(j = 0; j < np; j++) { if(Ain->value[j * n + i] != (LIS_SCALAR)0.0) { ptr[i + 1]++; } }
+        for(j = 0; j < np; j++) {
+            if(Ain->value[j * n + i] != (LIS_SCALAR)0.0) { ptr[i + 1]++; }
+        }
     }
     ptr[0] = 0;
     for(i = 0; i < n; i++) { ptr[i + 1] += ptr[i]; }
@@ -706,19 +724,19 @@ LIS_INT lis_matrix_convert_dns2csr(LIS_MATRIX Ain, LIS_MATRIX Aout) {
     index = (LIS_INT*)lis_malloc(nnz * sizeof(LIS_INT), "lis_matrix_convert_dns2csr::index");
     if(index == NULL) {
         lis_free2(3, ptr, index, value);
-        LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
     value = (LIS_SCALAR*)lis_malloc(nnz * sizeof(LIS_SCALAR), "lis_matrix_convert_dns2csr::value");
     if(value == NULL) {
         lis_free2(3, ptr, index, value);
-        LIS_SETERR_MEM(nnz*sizeof(LIS_INT));
+        LIS_SETERR_MEM(nnz * sizeof(LIS_INT));
         return LIS_OUT_OF_MEMORY;
     }
 
     /* convert csr */
 #ifdef _OPENMP
-	#pragma omp parallel for private(i,j,k)
+#pragma omp parallel for private(i, j, k)
 #endif
     for(i = 0; i < n; i++) {
         k = ptr[i];

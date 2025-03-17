@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,25 +25,25 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
-#include <string.h>
 #include <math.h>
+#include <string.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -81,9 +81,10 @@ LIS_INT lis_idrs_malloc_work(LIS_SOLVER solver) {
     s = solver->options[LIS_OPTIONS_IDRS_RESTART];
     worklen = NWORK + 3 * s;
     work = (LIS_VECTOR*)lis_malloc(
-        worklen * sizeof(LIS_VECTOR), "lis_idrs_malloc_work::work");
+        worklen * sizeof(LIS_VECTOR), "lis_idrs_malloc_work::work"
+    );
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(solver->precision == LIS_PRECISION_DEFAULT) {
@@ -140,9 +141,10 @@ LIS_INT lis_idr1_malloc_work(LIS_SOLVER solver) {
     s = solver->options[LIS_OPTIONS_IDRS_RESTART];
     worklen = NWORK + 3 * s;
     work = (LIS_VECTOR*)lis_malloc(
-        worklen * sizeof(LIS_VECTOR), "lis_idrs_malloc_work::work");
+        worklen * sizeof(LIS_VECTOR), "lis_idrs_malloc_work::work"
+    );
     if(work == NULL) {
-        LIS_SETERR_MEM(worklen*sizeof(LIS_VECTOR));
+        LIS_SETERR_MEM(worklen * sizeof(LIS_VECTOR));
         return LIS_ERR_OUT_OF_MEMORY;
     }
     if(solver->precision == LIS_PRECISION_DEFAULT) {
@@ -175,8 +177,7 @@ LIS_INT lis_idr1_malloc_work(LIS_SOLVER solver) {
 #undef __FUNC__
 #define __FUNC__ "lis_idrs_omega"
 
-void lis_idrs_omega(LIS_VECTOR t, LIS_VECTOR s, LIS_SCALAR angle, LIS_SCALAR
-                    * om) {
+void lis_idrs_omega(LIS_VECTOR t, LIS_VECTOR s, LIS_SCALAR angle, LIS_SCALAR* om) {
     LIS_SCALAR nt;
     LIS_SCALAR ts;
 
@@ -242,7 +243,7 @@ LIS_INT lis_idr1(LIS_SOLVER solver) {
     dR = &solver->work[4 + 2 * s];
 
     /* Initial Residual */
-    if(lis_solver_get_initial_residual(solver,NULL,NULL, r, &bnrm2)) {
+    if(lis_solver_get_initial_residual(solver, NULL, NULL, r, &bnrm2)) {
         LIS_DEBUG_FUNC_OUT;
         return LIS_SUCCESS;
     }
@@ -262,14 +263,14 @@ lis_vector_copy(r,P[0]);
     lis_matvec(A, dX[0], dR[0]);
 #else
 #ifdef PRE_BOTH
-			time = lis_wtime();
-			lis_psolve_right(solver, r, t);
-			ptime += lis_wtime()-time;
-			lis_matvec(A,t,av);
-			lis_vector_print(av);
-			time = lis_wtime();
-			lis_psolve_left(solver, av, v);
-			ptime += lis_wtime()-time;
+    time = lis_wtime();
+    lis_psolve_right(solver, r, t);
+    ptime += lis_wtime() - time;
+    lis_matvec(A, t, av);
+    lis_vector_print(av);
+    time = lis_wtime();
+    lis_psolve_left(solver, av, v);
+    ptime += lis_wtime() - time;
 #endif
 #endif
 
@@ -326,13 +327,13 @@ lis_idrs_omega(dR[k],r,angle,&om);
         lis_matvec(A, av, t);
 #else
 #ifdef PRE_BOTH
-				time = lis_wtime();
-				lis_psolve_right(solver, v, t);
-				ptime += lis_wtime()-time;
-				lis_matvec(A,t,av);
-				time = lis_wtime();
-				lis_psolve_left(solver, av, t);
-				ptime += lis_wtime()-time;
+        time = lis_wtime();
+        lis_psolve_right(solver, v, t);
+        ptime += lis_wtime() - time;
+        lis_matvec(A, t, av);
+        time = lis_wtime();
+        lis_psolve_left(solver, av, t);
+        ptime += lis_wtime() - time;
 #endif
 #endif
 
@@ -386,7 +387,7 @@ lis_idrs_omega(dR[k],r,angle,&om);
         if(output) {
             if(output & LIS_PRINT_MEM) solver->rhistory[iter] = nrm2;
 #ifdef _LONG__LONG
-			if( output & LIS_PRINT_OUT ) lis_printf(comm,"iteration: %5lld  relative residual = %e\n", iter, (double)nrm2);
+            if(output & LIS_PRINT_OUT) lis_printf(comm, "iteration: %5lld  relative residual = %e\n", iter, (double)nrm2);
 #else
             if(output & LIS_PRINT_OUT) lis_printf(comm, "iteration: %5d  relative residual = %e\n", iter, (double)nrm2);
 #endif
@@ -449,7 +450,7 @@ lis_idrs_omega(dR[k],r,angle,&om);
         if(output) {
             if(output & LIS_PRINT_MEM) solver->rhistory[iter] = nrm2;
 #ifdef _LONG__LONG
-			if( output & LIS_PRINT_OUT ) lis_printf(comm,"iteration: %5lld  relative residual = %e\n", iter, (double)nrm2);
+            if(output & LIS_PRINT_OUT) lis_printf(comm, "iteration: %5lld  relative residual = %e\n", iter, (double)nrm2);
 #else
             if(output & LIS_PRINT_OUT) lis_printf(comm, "iteration: %5d  relative residual = %e\n", iter, (double)nrm2);
 #endif
@@ -520,11 +521,10 @@ LIS_INT lis_idrs(LIS_SOLVER solver) {
     m = (LIS_SCALAR*)lis_malloc(s * sizeof(LIS_SCALAR), "lis_idrs::m");
     c = (LIS_SCALAR*)lis_malloc(s * sizeof(LIS_SCALAR), "lis_idrs::c");
     M = (LIS_SCALAR*)lis_malloc(s * s * sizeof(LIS_SCALAR), "lis_idrs::M");
-    MM = (LIS_SCALAR*)lis_malloc(s * s * sizeof(LIS_SCALAR),
-                                 "lis_idrs::M");
+    MM = (LIS_SCALAR*)lis_malloc(s * s * sizeof(LIS_SCALAR), "lis_idrs::M");
 
     /* Initial Residual */
-    if(lis_solver_get_initial_residual(solver,NULL,NULL, r, &bnrm2)) {
+    if(lis_solver_get_initial_residual(solver, NULL, NULL, r, &bnrm2)) {
         lis_free2(4, m, c, M, MM);
         LIS_DEBUG_FUNC_OUT;
         return LIS_SUCCESS;
@@ -532,7 +532,9 @@ LIS_INT lis_idrs(LIS_SOLVER solver) {
     tol = solver->tol;
 
     init_by_array(init, length);
-    for(k = 0; k < s; k++) { for(i = 0; i < n; i++) { P[k]->value[i] = genrand_real1(); } }
+    for(k = 0; k < s; k++) {
+        for(i = 0; i < n; i++) { P[k]->value[i] = genrand_real1(); }
+    }
     lis_idrs_orth(s, P);
 
     for(k = 0; k < s; k++) {
@@ -558,7 +560,7 @@ LIS_INT lis_idrs(LIS_SOLVER solver) {
         if(output) {
             if(output & LIS_PRINT_MEM) solver->rhistory[k + 1] = nrm2;
 #ifdef _LONG__LONG
-			if( output & LIS_PRINT_OUT ) lis_printf(comm,"iteration: %5lld  relative residual = %e\n", k+1, (double)nrm2);
+            if(output & LIS_PRINT_OUT) lis_printf(comm, "iteration: %5lld  relative residual = %e\n", k + 1, (double)nrm2);
 #else
             if(output & LIS_PRINT_OUT) lis_printf(comm, "iteration: %5d  relative residual = %e\n", k + 1, (double)nrm2);
 #endif
@@ -663,7 +665,7 @@ LIS_INT lis_idrs(LIS_SOLVER solver) {
         if(output) {
             if(output & LIS_PRINT_MEM) solver->rhistory[iter] = nrm2;
 #ifdef _LONG__LONG
-			if( output & LIS_PRINT_OUT ) lis_printf(comm,"iteration: %5lld  relative residual = %e\n", iter, (double)nrm2);
+            if(output & LIS_PRINT_OUT) lis_printf(comm, "iteration: %5lld  relative residual = %e\n", iter, (double)nrm2);
 #else
             if(output & LIS_PRINT_OUT) lis_printf(comm, "iteration: %5d  relative residual = %e\n", iter, (double)nrm2);
 #endif

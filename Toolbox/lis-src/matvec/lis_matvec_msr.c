@@ -7,8 +7,8 @@
    2. Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-   3. Neither the name of the project nor the names of its contributors 
-      may be used to endorse or promote products derived from this software 
+   3. Neither the name of the project nor the names of its contributors
+      may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE SCALABLE SOFTWARE INFRASTRUCTURE PROJECT
@@ -25,10 +25,10 @@
 */
 
 #ifdef HAVE_CONFIG_H
-	#include "lis_config.h"
+#include "lis_config.h"
 #else
 #ifdef HAVE_CONFIG_WIN_H
-	#include "lis_config_win.h"
+#include "lis_config_win.h"
 #endif
 #endif
 
@@ -36,14 +36,14 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef HAVE_MALLOC_H
-        #include <malloc.h>
+#include <malloc.h>
 #endif
 #include <math.h>
 #ifdef _OPENMP
-	#include <omp.h>
+#include <omp.h>
 #endif
 #ifdef USE_MPI
-	#include <mpi.h>
+#include <mpi.h>
 #endif
 #include "lislib.h"
 
@@ -56,7 +56,7 @@ void lis_matvec_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     if(A->is_splited) {
         n = A->n;
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j,js,je,t,jj)
+#pragma omp parallel for private(i, j, js, je, t, jj)
 #endif
         for(i = 0; i < n; i++) {
             t = A->D->value[i] * x[i];
@@ -77,7 +77,7 @@ void lis_matvec_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     }
     else {
 #ifdef _OPENMP
-		#pragma omp parallel for private(i,j,js,je,t,jj)
+#pragma omp parallel for private(i, j, js, je, t, jj)
 #endif
         for(i = 0; i < n; i++) {
             t = A->value[i] * x[i];
@@ -97,8 +97,8 @@ void lis_matvech_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     LIS_INT n, np;
     LIS_SCALAR t;
 #ifdef _OPENMP
-		LIS_INT k,nprocs;
-		LIS_SCALAR *w;
+    LIS_INT k, nprocs;
+    LIS_SCALAR* w;
 #endif
 
     n = A->n;
@@ -124,41 +124,36 @@ void lis_matvech_msr(LIS_MATRIX A, LIS_SCALAR x[], LIS_SCALAR y[]) {
     }
     else {
 #ifdef _OPENMP
-			nprocs = omp_get_max_threads();
-			w = (LIS_SCALAR *)lis_malloc( nprocs*np*sizeof(LIS_SCALAR),"lis_matvech_msr::w" );
-			#pragma omp parallel private(i,j,js,je,t,jj,k)
-			{
-				k = omp_get_thread_num();
-				#pragma omp for
-				for(j=0;j<nprocs;j++)
-				{
-					memset( &w[j*np], 0, np*sizeof(LIS_SCALAR) );
-				}
-				#pragma omp for 
-				for(i=0; i<n; i++)
-				{
-					js = A->index[i];
-					je = A->index[i+1];
-					t = x[i];
-					for(j=js;j<je;j++)
-					{
-						jj  = k*np+A->index[j];
-						w[jj] += conj(A->value[j]) * t;
-					}
-					w[k*np+i] += conj(A->value[i]) * x[i];
-				}
-				#pragma omp for 
-				for(i=0;i<np;i++)
-				{
-					t = 0.0;
-					for(j=0;j<nprocs;j++)
-					{
-						t += w[j*np+i];
-					}
-					y[i] = t;
-				}
-			}
-			lis_free(w);
+        nprocs = omp_get_max_threads();
+        w = (LIS_SCALAR*)lis_malloc(nprocs * np * sizeof(LIS_SCALAR), "lis_matvech_msr::w");
+#pragma omp parallel private(i, j, js, je, t, jj, k)
+        {
+            k = omp_get_thread_num();
+#pragma omp for
+            for(j = 0; j < nprocs; j++) {
+                memset(&w[j * np], 0, np * sizeof(LIS_SCALAR));
+            }
+#pragma omp for
+            for(i = 0; i < n; i++) {
+                js = A->index[i];
+                je = A->index[i + 1];
+                t = x[i];
+                for(j = js; j < je; j++) {
+                    jj = k * np + A->index[j];
+                    w[jj] += conj(A->value[j]) * t;
+                }
+                w[k * np + i] += conj(A->value[i]) * x[i];
+            }
+#pragma omp for
+            for(i = 0; i < np; i++) {
+                t = 0.0;
+                for(j = 0; j < nprocs; j++) {
+                    t += w[j * np + i];
+                }
+                y[i] = t;
+            }
+        }
+        lis_free(w);
 #else
         for(i = 0; i < n; i++) { y[i] = conj(A->value[i]) * x[i]; }
         for(i = 0; i < n; i++) {
