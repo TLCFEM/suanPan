@@ -67,8 +67,10 @@ LIS_INT lis_debug_trace_func(LIS_INT flag, char* func) {
     int argc = 0;
 
 #ifdef USE_MPI
-    MPI_Initialized(&lis_mpi_initialized);
-    if(!lis_mpi_initialized) MPI_Init(&argc, NULL);
+    if(lis_mpi_management) {
+        MPI_Initialized(&lis_mpi_initialized);
+        if(!lis_mpi_initialized) MPI_Init(&argc, NULL);
+    }
 #endif
     if(flag) {
         sprintf(buf, "%%%ds : %%s\n", lis_tr_func + 3);
@@ -81,8 +83,9 @@ LIS_INT lis_debug_trace_func(LIS_INT flag, char* func) {
         lis_printf(lis_debug_comm, buf, "OUT", func);
     }
 #ifdef USE_MPI
-    if(strcmp(func, "main") == 0 && !flag) {
-        MPI_Finalize();
+    if(strcmp(func, "main") == 0 && !flag && lis_mpi_management) {
+        MPI_Finalized(&lis_mpi_initialized);
+        if(!lis_mpi_initialized) MPI_Finalize();
     }
 #endif
     return LIS_SUCCESS;

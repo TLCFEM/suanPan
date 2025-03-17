@@ -39,6 +39,8 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+    lis_do_not_handle_mpi();
+
     lis_initialize(nullptr, nullptr);
 
 #ifdef SUANPAN_DEBUG

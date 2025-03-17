@@ -1017,6 +1017,7 @@ extern LIS_INT lis_esolver_output_rhistory(LIS_ESOLVER esolver, char* filename);
 /* Utilities                */
 /****************************/
 
+extern void lis_do_not_handle_mpi();
 extern LIS_INT lis_initialize(int* argc, char** argv[]);
 extern LIS_INT lis_finalize(void);
 extern double lis_wtime(void);
