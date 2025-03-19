@@ -364,9 +364,15 @@ inline auto& comm_world{mpl::environment::comm_world()};
 
 template<typename T>
     requires std::is_arithmetic_v<T>
-auto bcast_from_root(T& object) { comm_world.bcast(0, object); }
+auto bcast_from_root(T& object) {
+    comm_world.bcast(0, object);
+    return object;
+}
 
-template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) { comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem}); }
+template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) {
+    comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem});
+    return object;
+}
 #else
 
 struct fake_communicator {
@@ -377,7 +383,7 @@ struct fake_communicator {
 
 inline fake_communicator comm_world;
 
-template<typename T> auto bcast_from_root(T&&) {}
+template<typename T> auto bcast_from_root(T&& object) { return object; }
 #endif
 
 #endif
