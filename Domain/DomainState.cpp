@@ -208,6 +208,9 @@ void Domain::assemble_initial_mass() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_mass();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -228,6 +231,9 @@ void Domain::assemble_current_mass() const {
         if(auto req = I->gather(I->get_current_mass()); req.has_value()) requests.push(std::move(req).value());
     requests.waitall();
 #endif
+
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
 
     factory->clear_mass();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -250,6 +256,9 @@ void Domain::assemble_trial_mass() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_mass();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -270,6 +279,9 @@ void Domain::assemble_initial_damping() const {
         if(auto req = I->gather(I->get_initial_viscous()); req.has_value()) requests.push(std::move(req).value());
     requests.waitall();
 #endif
+
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
 
     factory->clear_damping();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -292,6 +304,9 @@ void Domain::assemble_current_damping() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_damping();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -313,6 +328,9 @@ void Domain::assemble_trial_damping() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_damping();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -333,6 +351,9 @@ void Domain::assemble_initial_nonviscous() const {
         if(auto req = I->gather(I->get_initial_nonviscous()); req.has_value()) requests.push(std::move(req).value());
     requests.waitall();
 #endif
+
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
 
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
@@ -356,6 +377,9 @@ void Domain::assemble_current_nonviscous() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -377,6 +401,9 @@ void Domain::assemble_trial_nonviscous() const {
         if(auto req = I->gather(I->get_trial_nonviscous()); req.has_value()) requests.push(std::move(req).value());
     requests.waitall();
 #endif
+
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
 
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
@@ -400,6 +427,9 @@ void Domain::assemble_initial_stiffness() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -421,6 +451,9 @@ void Domain::assemble_current_stiffness() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -441,6 +474,9 @@ void Domain::assemble_trial_stiffness() const {
         if(auto req = I->gather(I->get_trial_stiffness()); req.has_value()) requests.push(std::move(req).value());
     requests.waitall();
 #endif
+
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
 
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -465,6 +501,9 @@ void Domain::assemble_initial_geometry() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_mapping()); }
     else
@@ -487,6 +526,9 @@ void Domain::assemble_current_geometry() const {
         if(auto req = I->gather(I->get_current_geometry()); req.has_value()) requests.push(std::move(req).value());
     requests.waitall();
 #endif
+
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
 
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_mapping()); }
@@ -511,6 +553,9 @@ void Domain::assemble_trial_geometry() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_mapping()); }
     else
@@ -532,6 +577,9 @@ void Domain::assemble_mass_container() const {
     requests.waitall();
 #endif
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
+
     factory->clear_mass();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_mapping());
     else
@@ -552,6 +600,9 @@ void Domain::assemble_stiffness_container() const {
         if(auto req = I->gather(I->get_stiffness_container()); req.has_value()) requests.push(std::move(req).value());
     requests.waitall();
 #endif
+
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_world.rank()) return;
 
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_mapping());
