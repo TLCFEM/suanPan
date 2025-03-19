@@ -264,63 +264,55 @@ mat Integrator::solve(sp_mat&& B) {
 }
 
 int Integrator::solve(mat& X, const mat& B) {
-#ifdef SUANPAN_DISTRIBUTED
-    int info;
+    int info{0};
     if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, B);
-    comm_world.bcast(0, info);
+    bcast_from_root(info);
+
     if(SUANPAN_SUCCESS == info) {
         if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
+
     return info;
-#else
-    return database.lock()->get_factory()->get_stiffness()->solve(X, B);
-#endif
 }
 
 int Integrator::solve(mat& X, const sp_mat& B) {
-#ifdef SUANPAN_DISTRIBUTED
-    int info;
+    int info{0};
     if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, B);
-    comm_world.bcast(0, info);
+    bcast_from_root(info);
+
     if(SUANPAN_SUCCESS == info) {
         if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
+
     return info;
-#else
-    return database.lock()->get_factory()->get_stiffness()->solve(X, B);
-#endif
 }
 
 int Integrator::solve(mat& X, mat&& B) {
-#ifdef SUANPAN_DISTRIBUTED
-    int info;
+    int info{0};
     if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
-    comm_world.bcast(0, info);
+    bcast_from_root(info);
+
     if(SUANPAN_SUCCESS == info) {
         if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
+
     return info;
-#else
-    return database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
-#endif
 }
 
 int Integrator::solve(mat& X, sp_mat&& B) {
-#ifdef SUANPAN_DISTRIBUTED
-    int info;
+    int info{0};
     if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
-    comm_world.bcast(0, info);
+    bcast_from_root(info);
+
     if(SUANPAN_SUCCESS == info) {
         if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
+
     return info;
-#else
-    return database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
-#endif
 }
 
 /**
@@ -419,63 +411,55 @@ void ExplicitIntegrator::update_from_ninja() {
 }
 
 int ExplicitIntegrator::solve(mat& X, const mat& B) {
-#ifdef SUANPAN_DISTRIBUTED
-    int info;
+    int info{0};
     if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, B);
-    comm_world.bcast(0, info);
+    bcast_from_root(info);
+
     if(SUANPAN_SUCCESS == info) {
         if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
+
     return info;
-#else
-    return get_domain()->get_factory()->get_mass()->solve(X, B);
-#endif
 }
 
 int ExplicitIntegrator::solve(mat& X, const sp_mat& B) {
-#ifdef SUANPAN_DISTRIBUTED
-    int info;
+    int info{0};
     if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, B);
-    comm_world.bcast(0, info);
+    bcast_from_root(info);
+
     if(SUANPAN_SUCCESS == info) {
         if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
+
     return info;
-#else
-    return get_domain()->get_factory()->get_mass()->solve(X, B);
-#endif
 }
 
 int ExplicitIntegrator::solve(mat& X, mat&& B) {
-#ifdef SUANPAN_DISTRIBUTED
-    int info;
+    int info{0};
     if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
-    comm_world.bcast(0, info);
+    bcast_from_root(info);
+
     if(SUANPAN_SUCCESS == info) {
         if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
+
     return info;
-#else
-    return get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
-#endif
 }
 
 int ExplicitIntegrator::solve(mat& X, sp_mat&& B) {
-#ifdef SUANPAN_DISTRIBUTED
-    int info;
+    int info{0};
     if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
-    comm_world.bcast(0, info);
+    bcast_from_root(info);
+
     if(SUANPAN_SUCCESS == info) {
         if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
+
     return info;
-#else
-    return get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
-#endif
 }
 
 vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw invalid_argument("support velocity cannot be used with explicit integrator"); }

@@ -257,8 +257,10 @@ namespace suanpan {
 
     template<typename T> std::string format(const Col<T>& in_vec) {
         std::string output;
-        if(std::is_floating_point_v<T>) for(const auto I : in_vec) output += format(" {: 1.4e}", I);
-        else for(const auto I : in_vec) output += format(" {:6d}", I);
+        if(std::is_floating_point_v<T>)
+            for(const auto I : in_vec) output += format(" {: 1.4e}", I);
+        else
+            for(const auto I : in_vec) output += format(" {:6d}", I);
         output += '\n';
         return output;
     }
@@ -286,7 +288,7 @@ namespace suanpan {
         if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::crimson), format_str, fmt::make_format_args(args...));
         else SUANPAN_COUT << fmt::vformat(format_str, fmt::make_format_args(args...));
     }
-}
+} // namespace suanpan
 
 #ifdef SUANPAN_MSVC
 #pragma warning(disable : 4100)
@@ -331,11 +333,12 @@ template<class T> concept sp_d = std::is_same_v<T, float> || std::is_same_v<T, d
 template<class T> concept sp_i = std::is_integral_v<T>;
 
 namespace suanpan {
-    template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); }
+    template<class IN, class FN>
+        requires requires(IN& x) { x.begin(); x.end(); }
     void for_all(IN& from, FN&& func) {
         suanpan_for_each(from.begin(), from.end(), std::forward<FN>(func));
     }
-}
+} // namespace suanpan
 
 #if defined(SUANPAN_CLANG) && !defined(__cpp_lib_ranges)
 // as of clang 13, ranges support is not complete
@@ -359,9 +362,22 @@ template<typename T> concept mpl_data_t = mpl_floating_t<T> || mpl_complex_t<T>;
 
 inline auto& comm_world{mpl::environment::comm_world()};
 
+template<typename T>
+    requires std::is_arithmetic_v<T>
+auto bcast_from_root(T& object) { comm_world.bcast(0, object); }
+
 template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) { comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem}); }
 #else
-template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>&) {}
+
+struct fake_communicator {
+    static constexpr auto rank() { return 0; }
+
+    static constexpr auto size() { return 1; }
+};
+
+inline fake_communicator comm_world;
+
+template<typename T> auto bcast_from_root(T&&) {}
 #endif
 
 #endif
