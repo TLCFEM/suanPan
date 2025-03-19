@@ -327,7 +327,7 @@ using std::istringstream;
 using std::ostringstream;
 using std::string;
 
-template<class T> concept sp_d = std::is_floating_point_v<T>;
+template<class T> concept sp_d = std::is_same_v<T, float> || std::is_same_v<T, double>;
 template<class T> concept sp_i = std::is_integral_v<T>;
 
 namespace suanpan {
@@ -349,5 +349,19 @@ namespace std::ranges {
 #endif
 
 template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
+
+template<typename T> concept mpl_floating_t = std::is_same_v<T, float> || std::is_same_v<T, double>;
+template<typename T> concept mpl_complex_t = std::is_same_v<T, std::complex<typename T::value_type>> && mpl_floating_t<typename T::value_type>;
+template<typename T> concept mpl_data_t = mpl_floating_t<T> || mpl_complex_t<T>;
+
+#ifdef SUANPAN_DISTRIBUTED
+#include <mpl/mpl.hpp>
+
+inline auto& comm_world{mpl::environment::comm_world()};
+
+template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) { comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem}); }
+#else
+template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>&) {}
+#endif
 
 #endif

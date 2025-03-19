@@ -481,6 +481,7 @@ else ()
 endif ()
 
 if (USE_MPI)
+    add_compile_definitions(SUANPAN_DISTRIBUTED)
     add_subdirectory(MPI)
     target_link_libraries(${PROJECT_NAME} MPI::MPI_C MPI::MPI_CXX MPI::MPI_Fortran)
 endif ()
