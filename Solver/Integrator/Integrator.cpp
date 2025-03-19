@@ -260,13 +260,65 @@ mat Integrator::solve(sp_mat&& B) {
     return X;
 }
 
-int Integrator::solve(mat& X, const mat& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, B); }
+int Integrator::solve(mat& X, const mat& B) {
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, B);
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
+    return database.lock()->get_factory()->get_stiffness()->solve(X, B);
+#endif
+}
 
-int Integrator::solve(mat& X, const sp_mat& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, B); }
+int Integrator::solve(mat& X, const sp_mat& B) {
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, B);
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
+    return database.lock()->get_factory()->get_stiffness()->solve(X, B);
+#endif
+}
 
-int Integrator::solve(mat& X, mat&& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B)); }
+int Integrator::solve(mat& X, mat&& B) {
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
+    return database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
+#endif
+}
 
-int Integrator::solve(mat& X, sp_mat&& B) { return database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B)); }
+int Integrator::solve(mat& X, sp_mat&& B) {
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
+    return database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
+#endif
+}
 
 /**
  * Avoid machine error accumulation.
