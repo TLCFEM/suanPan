@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LeeNewmarkBase.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
@@ -89,12 +90,34 @@ int LeeNewmarkBase::update_internal(const mat& t_internal) {
 
 int LeeNewmarkBase::solve(mat& X, const mat& B) {
     stiffness->set_solver_setting(factory->get_solver_setting());
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(stiffness->n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
     return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
+#endif
 }
 
 int LeeNewmarkBase::solve(mat& X, const sp_mat& B) {
     stiffness->set_solver_setting(factory->get_solver_setting());
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(stiffness->n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
     return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
+#endif
 }
 
 int LeeNewmarkBase::solve(mat& X, mat&& B) { return solve(X, B); }
