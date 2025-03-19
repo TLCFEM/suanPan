@@ -16,13 +16,16 @@
  ******************************************************************************/
 
 #include "Integrator.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 Integrator::Integrator(const unsigned T)
     : Tag(T) {}
 
-void Integrator::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() != D.lock()) database = D; }
+void Integrator::set_domain(const weak_ptr<DomainBase>& D) {
+    if(database.lock() != D.lock()) database = D;
+}
 
 shared_ptr<DomainBase> Integrator::get_domain() const { return database.lock(); }
 
@@ -415,13 +418,65 @@ void ExplicitIntegrator::update_from_ninja() {
     W->update_trial_acceleration_by(W->get_ninja());
 }
 
-int ExplicitIntegrator::solve(mat& X, const mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }
+int ExplicitIntegrator::solve(mat& X, const mat& B) {
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, B);
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
+    return get_domain()->get_factory()->get_mass()->solve(X, B);
+#endif
+}
 
-int ExplicitIntegrator::solve(mat& X, const sp_mat& B) { return get_domain()->get_factory()->get_mass()->solve(X, B); }
+int ExplicitIntegrator::solve(mat& X, const sp_mat& B) {
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, B);
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
+    return get_domain()->get_factory()->get_mass()->solve(X, B);
+#endif
+}
 
-int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::move(B)); }
+int ExplicitIntegrator::solve(mat& X, mat&& B) {
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
+    return get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
+#endif
+}
 
-int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::move(B)); }
+int ExplicitIntegrator::solve(mat& X, sp_mat&& B) {
+#ifdef SUANPAN_DISTRIBUTED
+    int info;
+    if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
+    comm_world.bcast(0, info);
+    if(SUANPAN_SUCCESS == info) {
+        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        bcast_from_root(X);
+    }
+    return info;
+#else
+    return get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
+#endif
+}
 
 vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw invalid_argument("support velocity cannot be used with explicit integrator"); }
 
