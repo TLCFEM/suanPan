@@ -17,3 +17,6 @@ add_dependencies(tester.pardiso solver.pardiso)
 add_dependencies(suanPan solver.pardiso)
 
 install(TARGETS solver.pardiso DESTINATION bin)
+
+add_executable(distributed_obj distributed_obj.cpp)
+target_link_libraries(distributed_obj MKL::MKL_SCALAPACK MPI::MPI_C MPI::MPI_CXX MPI::MPI_Fortran)

@@ -34,8 +34,6 @@
 #include "ILU.hpp"
 #include "Jacobi.hpp"
 
-template<typename T, typename U> concept ArmaContainer = std::is_floating_point_v<U> && (std::is_convertible_v<T, Mat<U>> || std::is_convertible_v<T, SpMat<U>>) ;
-
 template<sp_d T> class MetaMat;
 
 template<sp_d T> class op_add {
@@ -199,9 +197,9 @@ public:
 
     virtual void operator*=(T) = 0;
 
-    template<ArmaContainer<T> C> int solve(Mat<T>& X, C&& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, std::forward<C>(B)) : this->iterative_solve(X, std::forward<C>(B)); }
+    template<typename C> requires is_arma_mat<T, C> int solve(Mat<T>& X, C&& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, std::forward<C>(B)) : this->iterative_solve(X, std::forward<C>(B)); }
 
-    template<ArmaContainer<T> C> Mat<T> solve(C&& B) {
+    template<typename C> requires is_arma_mat<T, C> Mat<T> solve(C&& B) {
         Mat<T> X;
 
         if(SUANPAN_SUCCESS != this->solve(X, std::forward<C>(B))) throw std::runtime_error("fail to solve the system");

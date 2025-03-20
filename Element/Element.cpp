@@ -257,25 +257,32 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<DOF>&& DI)
     : DataElement{std::move(NT), std::move(MT), uvec{}, F}
     , ElementBase(T)
+    , Distributed(T)
     , num_node(NN)
     , num_dof(ND)
     , material_type(MTP)
     , section_type(SectionType::D0)
-    , dof_identifier(std::move(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
+    , dof_identifier(std::move(DI)) {
+    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
+}
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
     : DataElement{std::move(NT), uvec{}, std::move(ST), F}
     , ElementBase(T)
+    , Distributed(T)
     , num_node(NN)
     , num_dof(ND)
     , material_type(MaterialType::D0)
     , section_type(STP)
-    , dof_identifier(std::move(DI)) { suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); }); }
+    , dof_identifier(std::move(DI)) {
+    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
+}
 
 // for contact elements that use node groups
 Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
     : DataElement{std::move(GT), {}, {}, false}
     , ElementBase(T)
+    , Distributed(T)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
     , use_group(true)
@@ -286,6 +293,7 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
     : DataElement{{NT}, {}, {}, false}
     , ElementBase(T)
+    , Distributed(ET)
     , num_node(static_cast<unsigned>(-1))
     , num_dof(ND)
     , use_other(ET)

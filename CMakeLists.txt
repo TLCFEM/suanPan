@@ -141,6 +141,7 @@ if (USE_MPI)
     elseif (MPI_C_INCLUDE_DIRS_LOWER MATCHES "mpich")
         set(MKL_MPI mpich)
     endif ()
+    add_compile_definitions(SUANPAN_DISTRIBUTED)
 endif ()
 
 if (USE_MKL)
