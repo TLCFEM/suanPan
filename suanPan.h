@@ -332,10 +332,10 @@ using std::string;
 template<class T> concept sp_d = std::is_same_v<T, float> || std::is_same_v<T, double>;
 template<class T> concept sp_i = std::is_integral_v<T>;
 
+template<typename T, typename U> concept is_arma_mat = sp_d<T> && (std::is_convertible_v<std::remove_cvref_t<U>, Mat<T>> || std::is_convertible_v<std::remove_cvref_t<U>, SpMat<T>>);
+
 namespace suanpan {
-    template<class IN, class FN>
-        requires requires(IN& x) { x.begin(); x.end(); }
-    void for_all(IN& from, FN&& func) {
+    template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); } void for_all(IN& from, FN&& func) {
         suanpan_for_each(from.begin(), from.end(), std::forward<FN>(func));
     }
 } // namespace suanpan
@@ -364,9 +364,7 @@ inline auto& comm_world{mpl::environment::comm_world()};
 inline const auto comm_rank{comm_world.rank()};
 inline const auto comm_size{comm_world.size()};
 
-template<typename T>
-    requires std::is_arithmetic_v<T>
-auto bcast_from_root(T& object) {
+template<typename T> requires std::is_arithmetic_v<T> auto bcast_from_root(T& object) {
     comm_world.bcast(0, object);
     return object;
 }
