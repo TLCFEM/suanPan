@@ -364,7 +364,7 @@ inline auto& comm_world{mpl::environment::comm_world()};
 inline const auto comm_rank{comm_world.rank()};
 inline const auto comm_size{comm_world.size()};
 
-template<typename T> requires std::is_arithmetic_v<T> auto bcast_from_root(T& object) {
+template<typename T> requires std::is_arithmetic_v<T> auto bcast_from_root(T object) {
     comm_world.bcast(0, object);
     return object;
 }
@@ -373,12 +373,19 @@ template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) {
     comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem});
     return object;
 }
+
+template<typename T> requires std::is_arithmetic_v<T> auto allreduce(T object) {
+    comm_world.allreduce(mpl::plus<T>(), object);
+    return object;
+}
 #else
 
 inline constexpr auto comm_rank{0};
 inline constexpr auto comm_size{1};
 
 template<typename T> auto bcast_from_root(T&& object) { return std::forward<T>(object); }
+
+template<typename T> auto allreduce(T&& object) { return std::forward<T>(object); }
 #endif
 
 #endif

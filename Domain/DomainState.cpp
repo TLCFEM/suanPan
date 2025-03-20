@@ -665,7 +665,8 @@ int Domain::update_trial_status() const {
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) {
         if(t_element->is_local) code += t_element->update_status();
     });
-    return code;
+
+    return allreduce(code.load());
 }
 
 int Domain::update_incre_status() const {
@@ -684,7 +685,8 @@ int Domain::update_incre_status() const {
     suanpan::for_all(element_pond.get(), [&](const shared_ptr<Element>& t_element) {
         if(t_element->is_local) code += t_element->update_status();
     });
-    return code;
+
+    return allreduce(code.load());
 }
 
 int Domain::update_current_status() const {
@@ -723,7 +725,7 @@ int Domain::update_current_status() const {
         if(t_element->is_local) code += t_element->update_status();
     });
 
-    if(SUANPAN_SUCCESS != code) {
+    if(SUANPAN_SUCCESS != allreduce(code.load())) {
         suanpan_error("Initial conditions cause significant non-linearity, use an analysis step instead.\n");
         return SUANPAN_FAIL;
     }
