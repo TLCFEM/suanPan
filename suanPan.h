@@ -380,7 +380,7 @@ template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) {
 inline constexpr auto comm_rank{0};
 inline constexpr auto comm_size{1};
 
-template<typename T> auto bcast_from_root(T&& object) { return object; }
+template<typename T> auto bcast_from_root(T&& object) { return std::forward<T>(object); }
 #endif
 
 #endif
