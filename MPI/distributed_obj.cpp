@@ -6,7 +6,7 @@ class Object : public Distributed {
     mat data{-999, -999};
 
 public:
-    Object(int tag)
+    explicit Object(int tag)
         : Distributed(tag) {}
 
     auto generate() {
