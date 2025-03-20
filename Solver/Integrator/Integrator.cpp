@@ -266,12 +266,12 @@ mat Integrator::solve(sp_mat&& B) {
 int Integrator::solve(mat& X, const mat& B) {
     int info{0};
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, B);
+    if(0 == comm_rank) info = database.lock()->get_factory()->get_stiffness()->solve(X, B);
 
     if(SUANPAN_SUCCESS == bcast_from_root(info)) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        if(0 != comm_rank) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
 
@@ -281,12 +281,12 @@ int Integrator::solve(mat& X, const mat& B) {
 int Integrator::solve(mat& X, const sp_mat& B) {
     int info{0};
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, B);
+    if(0 == comm_rank) info = database.lock()->get_factory()->get_stiffness()->solve(X, B);
 
     if(SUANPAN_SUCCESS == bcast_from_root(info)) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        if(0 != comm_rank) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
 
@@ -296,12 +296,12 @@ int Integrator::solve(mat& X, const sp_mat& B) {
 int Integrator::solve(mat& X, mat&& B) {
     int info{0};
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
+    if(0 == comm_rank) info = database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
 
     if(SUANPAN_SUCCESS == bcast_from_root(info)) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        if(0 != comm_rank) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
 
@@ -311,12 +311,12 @@ int Integrator::solve(mat& X, mat&& B) {
 int Integrator::solve(mat& X, sp_mat&& B) {
     int info{0};
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_world.rank()) info = database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
+    if(0 == comm_rank) info = database.lock()->get_factory()->get_stiffness()->solve(X, std::move(B));
 
     if(SUANPAN_SUCCESS == bcast_from_root(info)) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        if(0 != comm_rank) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
 
@@ -421,12 +421,12 @@ void ExplicitIntegrator::update_from_ninja() {
 int ExplicitIntegrator::solve(mat& X, const mat& B) {
     int info{0};
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, B);
+    if(0 == comm_rank) info = get_domain()->get_factory()->get_mass()->solve(X, B);
 
     if(SUANPAN_SUCCESS == bcast_from_root(info)) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        if(0 != comm_rank) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
 
@@ -436,12 +436,12 @@ int ExplicitIntegrator::solve(mat& X, const mat& B) {
 int ExplicitIntegrator::solve(mat& X, const sp_mat& B) {
     int info{0};
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, B);
+    if(0 == comm_rank) info = get_domain()->get_factory()->get_mass()->solve(X, B);
 
     if(SUANPAN_SUCCESS == bcast_from_root(info)) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        if(0 != comm_rank) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
 
@@ -451,12 +451,12 @@ int ExplicitIntegrator::solve(mat& X, const sp_mat& B) {
 int ExplicitIntegrator::solve(mat& X, mat&& B) {
     int info{0};
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
+    if(0 == comm_rank) info = get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
 
     if(SUANPAN_SUCCESS == bcast_from_root(info)) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        if(0 != comm_rank) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
 
@@ -466,12 +466,12 @@ int ExplicitIntegrator::solve(mat& X, mat&& B) {
 int ExplicitIntegrator::solve(mat& X, sp_mat&& B) {
     int info{0};
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_world.rank()) info = get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
+    if(0 == comm_rank) info = get_domain()->get_factory()->get_mass()->solve(X, std::move(B));
 
     if(SUANPAN_SUCCESS == bcast_from_root(info)) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_world.rank()) X.set_size(B.n_rows, B.n_cols);
+        if(0 != comm_rank) X.set_size(B.n_rows, B.n_cols);
         bcast_from_root(X);
     }
 

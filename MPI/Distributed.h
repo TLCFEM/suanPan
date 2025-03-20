@@ -25,7 +25,7 @@
 class Distributed {
     static constexpr int root_rank{0};
 
-    static auto assign_process(const int obj_tag) { return obj_tag % comm_world.size(); }
+    static auto assign_process(const int obj_tag) { return obj_tag % comm_size; }
 
     template<mpl_data_t DT> auto layout(const Mat<DT>& object) { return mpl::contiguous_layout<DT>{object.n_elem}; }
 
@@ -37,7 +37,7 @@ public:
     explicit Distributed(const int obj_tag)
         : tag(obj_tag)
         , process_rank(assign_process(tag))
-        , is_local(comm_world.rank() == process_rank) {}
+        , is_local(comm_rank == process_rank) {}
 
     /**
      * @brief Performs a gather operation on a distributed matrix object.
@@ -51,7 +51,7 @@ public:
      * @return An optional non-blocking request handle for the gather operation.
      */
     template<mpl_data_t DT> std::optional<mpl::irequest> gather(const Mat<DT>& object) {
-        if(root_rank == comm_world.rank()) {
+        if(root_rank == comm_rank) {
             if(!is_local) return comm_world.irecv(const_cast<DT*>(object.memptr()), layout(object), process_rank, mpl::tag_t{tag});
         }
         else if(is_local) return comm_world.isend(object.memptr(), layout(object), root_rank, mpl::tag_t{tag});

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Domain.h"
+
 #include <Constraint/Constraint.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
@@ -32,7 +33,8 @@ void Domain::update_current_resistance() const {
 #endif
 
     factory->modify_trial_resistance().zeros();
-    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -53,7 +55,8 @@ void Domain::update_current_damping_force() const {
 #endif
 
     factory->modify_trial_damping_force().zeros();
-    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -73,7 +76,8 @@ void Domain::update_current_nonviscous_force() const {
 #endif
 
     factory->modify_trial_nonviscous_force().zeros();
-    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -93,7 +97,8 @@ void Domain::update_current_inertial_force() const {
 #endif
 
     factory->modify_trial_inertial_force().zeros();
-    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -113,7 +118,8 @@ void Domain::assemble_resistance() const {
 #endif
 
     auto& trial_resistance = factory->modify_trial_resistance().zeros();
-    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -137,7 +143,8 @@ void Domain::assemble_damping_force() const {
 #endif
 
     auto& trial_damping_force = factory->modify_trial_damping_force().zeros();
-    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -161,7 +168,8 @@ void Domain::assemble_nonviscous_force() const {
 #endif
 
     auto& trial_nonviscous_force = factory->modify_trial_nonviscous_force().zeros();
-    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -185,7 +193,8 @@ void Domain::assemble_inertial_force() const {
 #endif
 
     auto& trial_inertial_force = factory->modify_trial_inertial_force().zeros();
-    if(color_map.empty()) for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -209,10 +218,11 @@ void Domain::assemble_initial_mass() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_mass();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -233,10 +243,11 @@ void Domain::assemble_current_mass() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_mass();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -257,10 +268,11 @@ void Domain::assemble_trial_mass() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_mass();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -281,10 +293,11 @@ void Domain::assemble_initial_damping() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -305,10 +318,11 @@ void Domain::assemble_current_damping() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -329,10 +343,11 @@ void Domain::assemble_trial_damping() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_damping();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -353,11 +368,12 @@ void Domain::assemble_initial_nonviscous() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -378,11 +394,12 @@ void Domain::assemble_current_nonviscous() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -403,11 +420,12 @@ void Domain::assemble_trial_nonviscous() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -428,10 +446,11 @@ void Domain::assemble_initial_stiffness() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_stiffness();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -452,10 +471,11 @@ void Domain::assemble_current_stiffness() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_stiffness();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -476,10 +496,11 @@ void Domain::assemble_trial_stiffness() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_stiffness();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -502,10 +523,13 @@ void Domain::assemble_initial_geometry() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_geometry();
-    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_mapping()); }
+    if(color_map.empty() || is_sparse()) {
+        for(const auto& I : element_pond.get())
+            if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+    }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -528,10 +552,13 @@ void Domain::assemble_current_geometry() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_geometry();
-    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_mapping()); }
+    if(color_map.empty() || is_sparse()) {
+        for(const auto& I : element_pond.get())
+            if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+    }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -554,10 +581,13 @@ void Domain::assemble_trial_geometry() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_geometry();
-    if(color_map.empty() || is_sparse()) { for(const auto& I : element_pond.get()) if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_mapping()); }
+    if(color_map.empty() || is_sparse()) {
+        for(const auto& I : element_pond.get())
+            if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+    }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -578,10 +608,11 @@ void Domain::assemble_mass_container() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_mass();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -602,10 +633,11 @@ void Domain::assemble_stiffness_container() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_world.rank()) return;
+    if(0 != comm_rank) return;
 
     factory->clear_stiffness();
-    if(color_map.empty() || is_sparse()) for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_mapping());
+    if(color_map.empty() || is_sparse())
+        for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_mapping());
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
@@ -711,7 +743,9 @@ int Domain::update_current_status() const {
     return SUANPAN_SUCCESS;
 }
 
-void Domain::stage_status() { suanpan::for_all(constraint_pond.get(), [&](const shared_ptr<Constraint>& t_constraint) { t_constraint->stage(shared_from_this()); }); }
+void Domain::stage_status() {
+    suanpan::for_all(constraint_pond.get(), [&](const shared_ptr<Constraint>& t_constraint) { t_constraint->stage(shared_from_this()); });
+}
 
 void Domain::commit_status() const {
     factory->commit_status();

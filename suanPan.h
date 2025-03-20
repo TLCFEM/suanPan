@@ -361,6 +361,8 @@ template<typename T> concept mpl_data_t = mpl_floating_t<T> || mpl_complex_t<T>;
 #include <mpl/mpl.hpp>
 
 inline auto& comm_world{mpl::environment::comm_world()};
+inline const auto comm_rank{comm_world.rank()};
+inline const auto comm_size{comm_world.size()};
 
 template<typename T>
     requires std::is_arithmetic_v<T>
@@ -375,13 +377,8 @@ template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) {
 }
 #else
 
-struct fake_communicator {
-    static constexpr auto rank() { return 0; }
-
-    static constexpr auto size() { return 1; }
-};
-
-inline fake_communicator comm_world;
+inline constexpr auto comm_rank{0};
+inline constexpr auto comm_size{1};
 
 template<typename T> auto bcast_from_root(T&& object) { return object; }
 #endif
