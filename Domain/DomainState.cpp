@@ -24,6 +24,9 @@
 #include <Load/Load.h>
 #include <Recorder/Recorder.h>
 
+#pragma warning(push)
+#pragma warning(disable : 4127)
+
 void Domain::update_current_resistance() const {
 #ifdef SUANPAN_DISTRIBUTED
     mpl::irequest_pool requests;
@@ -799,3 +802,5 @@ void Domain::reset_status() const {
     suanpan::for_all(load_pond.get(), [](const shared_ptr<Load>& t_load) { t_load->reset_status(); });
     suanpan::for_all(constraint_pond.get(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->reset_status(); });
 }
+
+#pragma warning(pop)

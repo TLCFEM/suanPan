@@ -20,6 +20,9 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+#pragma warning(push)
+#pragma warning(disable : 4127)
+
 Integrator::Integrator(const unsigned T)
     : Tag(T) {}
 
@@ -491,3 +494,5 @@ vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw inv
 vec ExplicitIntegrator::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return get_domain()->get_factory()->get_current_acceleration()(encoding) + incre_acceleration; }
 
 vec ExplicitIntegrator::from_total_acceleration(const vec& total_acceleration, const uvec&) { return total_acceleration; }
+
+#pragma warning(pop)

@@ -20,6 +20,9 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+#pragma warning(push)
+#pragma warning(disable : 4127)
+
 int LeeNewmarkBase::erase_top_left_block() const {
     auto& t_triplet = stiffness->triplet_mat;
 
@@ -161,3 +164,5 @@ void LeeNewmarkBase::reset_status() {
 
     Newmark::reset_status();
 }
+
+#pragma warning(pop)
