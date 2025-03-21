@@ -21,7 +21,7 @@
  * TODO: improve performance by storing factorization and reusing it
  *
  * @author tlc
- * @date 20/01/2021
+ * @date 21/03/2025
  * @version 0.1.0
  * @file SparseMatPARDISO.hpp
  * @addtogroup MetaMat
@@ -34,8 +34,9 @@
 
 #ifdef SUANPAN_MKL
 
-#include <mkl_pardiso.h>
 #include "SparseMat.hpp"
+
+#include <mkl_pardiso.h>
 
 template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
     const int maxfct = 1;
@@ -76,26 +77,16 @@ template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& 
 
     const auto n = static_cast<int>(B.n_rows);
     const auto nrhs = static_cast<int>(B.n_cols);
-    int error;
+    int info;
 
-    auto phase = 12;
-    pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, nullptr, nullptr, &error);
+    auto phase = 13;
+    pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), (void*)X.memptr(), &info);
 
-    if(0 != error) {
-        suanpan_error("Error code {} received.\n", error);
-        return SUANPAN_FAIL;
-    }
-
-    phase = 33;
-    pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), (void*)X.memptr(), &error);
-
-    if(0 != error) {
-        suanpan_error("Error code {} received.\n", error);
-        return SUANPAN_FAIL;
-    }
+    const auto error = info;
+    if(0 != error) suanpan_error("Error code {} received.\n", error);
 
     phase = -1;
-    pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, nullptr, csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, nullptr, nullptr, &error);
+    pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, nullptr, csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, nullptr, nullptr, &info);
 
     return 0 == error ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }

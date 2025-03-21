@@ -34,8 +34,6 @@
 
 #if defined(SUANPAN_MPI) && defined(SUANPAN_MKL)
 
-#include <mpl/mpl.hpp>
-
 extern int SUANPAN_NUM_NODES;
 
 template<sp_d T> class SparseMatMPIPARDISO final : public SparseMat<T> {
@@ -49,18 +47,19 @@ protected:
 public:
     SparseMatMPIPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {
-        iparm[0] = 1;   /* Solver default parameters overriden with provided by iparm */
-        iparm[1] = 3;   /* Use METIS for fill-in reordering */
-        iparm[5] = 0;   /* Write solution into x */
-        iparm[7] = 2;   /* Max number of iterative refinement steps */
-        iparm[9] = 13;  /* Perturb the pivot elements with 1E-13 */
-        iparm[10] = 1;  /* Use nonsymmetric permutation and scaling MPS */
-        iparm[12] = 1;  /* Switch on Maximum Weighted Matching algorithm (default for non-symmetric) */
-        iparm[17] = -1; /* Output: Number of nonzeros in the factor LU */
-        iparm[18] = -1; /* Output: Mflops for LU factorization */
-        iparm[26] = 0;  /* Check input data for correctness */
-        iparm[34] = 1;  /* zero-based indexing */
-        iparm[39] = 0;  /* Input: matrix/rhs/solution stored on master */
+        iparm[0] = 1;                                  // solver default parameters overriden with provided by iparm
+        iparm[1] = 3;                                  // use METIS for fill-in reordering
+        iparm[5] = 0;                                  // write solution into x
+        iparm[7] = 2;                                  // max number of iterative refinement steps
+        iparm[9] = 13;                                 // perturb the pivot elements with 1E-13
+        iparm[10] = 1;                                 // use nonsymmetric permutation and scaling MPS
+        iparm[12] = 1;                                 // switch on Maximum Weighted Matching algorithm (default for non-symmetric)
+        iparm[17] = -1;                                // output: Number of nonzeros in the factor LU
+        iparm[18] = -1;                                // output: Mflops for LU factorization
+        iparm[26] = 0;                                 // check input data for correctness
+        iparm[27] = std::is_same_v<T, double> ? 0 : 1; // use double precision
+        iparm[34] = 1;                                 // zero-based indexing
+        iparm[39] = 0;                                 // input: matrix/rhs/solution stored on master
     }
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatMPIPARDISO>(*this); }
@@ -75,7 +74,6 @@ template<sp_d T> int SparseMatMPIPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T
     const auto nrhs = static_cast<int>(B.n_cols);
     const auto nnz = static_cast<int>(csr_mat.n_elem);
 
-    const auto& comm_world{mpl::environment::comm_world()};
     const auto worker = comm_world.spawn(0, SUANPAN_NUM_NODES, {"solver.pardiso"});
     const auto all = mpl::communicator(worker, mpl::communicator::order_low);
 
@@ -90,10 +88,6 @@ template<sp_d T> int SparseMatMPIPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T
     config[6] = nnz;  // nnz
 
     all.bcast(0, config);
-
-    if(std::is_same_v<T, double>) iparm[27] = 0;
-    else iparm[27] = 1;
-
     all.bcast(0, iparm);
 
     mpl::irequest_pool requests;
