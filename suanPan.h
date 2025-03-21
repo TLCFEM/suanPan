@@ -202,6 +202,40 @@ using namespace arma;
 #include <filesystem>
 namespace fs = std::filesystem;
 
+#ifdef SUANPAN_DISTRIBUTED
+#include <mpl/mpl.hpp>
+
+inline auto& comm_world{mpl::environment::comm_world()};
+inline const auto comm_rank{comm_world.rank()};
+inline const auto comm_size{comm_world.size()};
+
+template<typename T> concept mpl_floating_t = std::is_same_v<T, float> || std::is_same_v<T, double>;
+template<typename T> concept mpl_complex_t = std::is_same_v<T, std::complex<typename T::value_type>> && mpl_floating_t<typename T::value_type>;
+template<typename T> concept mpl_data_t = mpl_floating_t<T> || mpl_complex_t<T>;
+
+template<typename T> requires std::is_arithmetic_v<T> auto bcast_from_root(T object) {
+    comm_world.bcast(0, object);
+    return object;
+}
+
+template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) {
+    comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem});
+    return object;
+}
+
+template<typename T> requires std::is_arithmetic_v<T> auto allreduce(T object) {
+    comm_world.allreduce(mpl::plus<T>(), object);
+    return object;
+}
+#else
+inline constexpr auto comm_rank{0};
+inline constexpr auto comm_size{1};
+
+template<typename T> auto bcast_from_root(T&& object) { return std::forward<T>(object); }
+
+template<typename T> auto allreduce(T&& object) { return std::forward<T>(object); }
+#endif
+
 #include <fmt/color.h>
 #include <mutex>
 
@@ -209,7 +243,13 @@ namespace suanpan {
     inline std::mutex print_mutex;
 
     inline std::string pattern(const std::string_view header, const std::string_view file_name, const std::string_view format) {
-        std::string pattern{header};
+        std::string pattern;
+        if(comm_size > 1) {
+            pattern += "[P";
+            pattern += std::to_string(comm_rank);
+            pattern += "] ";
+        }
+        pattern += header;
         pattern += fs::path(file_name).filename().string();
         pattern += ":{} ~> ";
         pattern += format;
@@ -246,8 +286,11 @@ namespace suanpan {
         else SUANPAN_CFTL << fmt::vformat(pattern("[FATAL] ", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
-    template<typename... T> void info(const std::string_view format_str, const T&... args) {
+    template<typename... T> void info(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
+        std::string format_str;
+        if(comm_size > 1) format_str += "[P" + std::to_string(comm_rank) + "] ";
+        format_str += format_sv;
         const std::scoped_lock lock(print_mutex);
         if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::green_yellow), format_str, fmt::make_format_args(args...));
         else SUANPAN_COUT << fmt::vformat(format_str, fmt::make_format_args(args...));
@@ -267,23 +310,31 @@ namespace suanpan {
 
     template<typename T> void info(const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
-        const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), format(in_vec));
-        else SUANPAN_COUT << format(in_vec);
-    }
-
-    template<typename T> void info(const std::string_view format_str, const Col<T>& in_vec) {
-        if(!SUANPAN_PRINT) return;
-        std::string output = format(format_str);
-        if(format_str.back() != '\t' && format_str.back() != '\n') output += '\n';
+        std::string output;
+        if(comm_size > 1) output += "[P" + std::to_string(comm_rank) + "] ";
         output += format(in_vec);
         const std::scoped_lock lock(print_mutex);
         if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), output);
         else SUANPAN_COUT << output;
     }
 
-    template<typename... T> void highlight(const std::string_view format_str, const T&... args) {
+    template<typename T> void info(const std::string_view format_sv, const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
+        std::string output;
+        if(comm_size > 1) output += "[P" + std::to_string(comm_rank) + "] ";
+        output += format(format_sv);
+        if(format_sv.back() != '\t' && format_sv.back() != '\n') output += '\n';
+        output += format(in_vec);
+        const std::scoped_lock lock(print_mutex);
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), output);
+        else SUANPAN_COUT << output;
+    }
+
+    template<typename... T> void highlight(const std::string_view format_sv, const T&... args) {
+        if(!SUANPAN_PRINT) return;
+        std::string format_str;
+        if(comm_size > 1) format_str += "[P" + std::to_string(comm_rank) + "] ";
+        format_str += format_sv;
         const std::scoped_lock lock(print_mutex);
         if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::crimson), format_str, fmt::make_format_args(args...));
         else SUANPAN_COUT << fmt::vformat(format_str, fmt::make_format_args(args...));
@@ -352,40 +403,5 @@ namespace std::ranges {
 #endif
 
 template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
-
-template<typename T> concept mpl_floating_t = std::is_same_v<T, float> || std::is_same_v<T, double>;
-template<typename T> concept mpl_complex_t = std::is_same_v<T, std::complex<typename T::value_type>> && mpl_floating_t<typename T::value_type>;
-template<typename T> concept mpl_data_t = mpl_floating_t<T> || mpl_complex_t<T>;
-
-#ifdef SUANPAN_DISTRIBUTED
-#include <mpl/mpl.hpp>
-
-inline auto& comm_world{mpl::environment::comm_world()};
-inline const auto comm_rank{comm_world.rank()};
-inline const auto comm_size{comm_world.size()};
-
-template<typename T> requires std::is_arithmetic_v<T> auto bcast_from_root(T object) {
-    comm_world.bcast(0, object);
-    return object;
-}
-
-template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) {
-    comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem});
-    return object;
-}
-
-template<typename T> requires std::is_arithmetic_v<T> auto allreduce(T object) {
-    comm_world.allreduce(mpl::plus<T>(), object);
-    return object;
-}
-#else
-
-inline constexpr auto comm_rank{0};
-inline constexpr auto comm_size{1};
-
-template<typename T> auto bcast_from_root(T&& object) { return std::forward<T>(object); }
-
-template<typename T> auto allreduce(T&& object) { return std::forward<T>(object); }
-#endif
 
 #endif
