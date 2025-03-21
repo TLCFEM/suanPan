@@ -49,7 +49,7 @@ int ArcLength::initialize() {
 
     configure_storage_scheme();
 
-    factory->set_solver_type(sparse_mat ? SolverType::MUMPS : SolverType::LAPACK);
+    factory->set_solver_type(sparse_mat ? SolverType::SUPERLU : SolverType::LAPACK);
 
     factory->set_analysis_type(AnalysisType::STATICS);
 

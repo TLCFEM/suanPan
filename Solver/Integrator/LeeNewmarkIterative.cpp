@@ -26,7 +26,10 @@ void LeeNewmarkIterative::init_worker(const unsigned n_dim, const unsigned n_mul
     // this is empirical but helps reduce memory footprint
     const auto in_elem = n_multiplier * (l + u + 1) * n_block / 5;
 
-    if(factory->contain_sub_solver_type(SolverType::MUMPS)) worker = make_unique<SparseMatMUMPS<double>>(n_dim, n_dim, in_elem);
+    if(factory->contain_sub_solver_type(SolverType::SUPERLU)) worker = make_unique<SparseMatSuperLU<double>>(n_dim, n_dim, in_elem);
+#ifndef SUANPAN_DISTRIBUTED
+    else if(factory->contain_sub_solver_type(SolverType::MUMPS)) worker = make_unique<SparseMatMUMPS<double>>(n_dim, n_dim, in_elem);
+#endif
 #ifdef SUANPAN_MKL
     else if(factory->contain_sub_solver_type(SolverType::PARDISO)) worker = make_unique<SparseMatPARDISO<double>>(n_dim, n_dim, in_elem);
     else if(factory->contain_sub_solver_type(SolverType::FGMRES)) worker = make_unique<SparseMatFGMRES<double>>(n_dim, n_dim, in_elem);

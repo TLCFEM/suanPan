@@ -32,9 +32,10 @@
 #ifndef SPARSEMATMUMPS_HPP
 #define SPARSEMATMUMPS_HPP
 
+#include "SparseMat.hpp"
+
 #include <mumps/dmumps_c.h>
 #include <mumps/smumps_c.h>
-#include "SparseMat.hpp"
 
 template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
     const int sym;
@@ -46,7 +47,7 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
 
     s32_vec l_irn, l_jrn;
 
-    template<bool convert, typename ST,std::invocable<ST*> F, typename COO> int alloc(COO& triplet, ST& mumps_job, F& mumps_c) {
+    template<bool convert, typename ST, std::invocable<ST*> F, typename COO> int alloc(COO& triplet, ST& mumps_job, F& mumps_c) {
         if(this->factored) return 0;
 
         dealloc(mumps_job, mumps_c);
@@ -99,13 +100,13 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
         return mumps_job.info[0];
     }
 
-    template<typename ST,std::invocable<ST*> F> static void dealloc(ST& mumps_job, F& mumps_c) {
+    template<typename ST, std::invocable<ST*> F> static void dealloc(ST& mumps_job, F& mumps_c) {
         if(3 != mumps_job.job) return;
         mumps_job.job = -2;
         mumps_c(&mumps_job);
     }
 
-    template<typename ST,std::invocable<ST*> F> static void run(ST& mumps_job, F& mumps_c) {
+    template<typename ST, std::invocable<ST*> F> static void run(ST& mumps_job, F& mumps_c) {
         mumps_job.job = 3;
         mumps_c(&mumps_job);
     }

@@ -1498,7 +1498,9 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
     case StorageScheme::SYMMPACK:
         return std::make_unique<SymmPackMat<T>>(n_size);
     case StorageScheme::SPARSE:
+#ifndef SUANPAN_DISTRIBUTED
         if(contain_solver_type(SolverType::MUMPS)) return std::make_unique<SparseMatMUMPS<T>>(n_size, n_size, n_elem);
+#endif
         if(contain_solver_type(SolverType::LIS)) return std::make_unique<SparseMatLis<T>>(n_size, n_size, n_elem);
         if(contain_solver_type(SolverType::SUPERLU)) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MKL
@@ -1516,7 +1518,9 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #ifdef SUANPAN_MKL
         if(contain_solver_type(SolverType::FGMRES)) return std::make_unique<SparseSymmMatFGMRES<T>>(n_size, n_size, n_elem);
 #endif
+#ifndef SUANPAN_DISTRIBUTED
         return std::make_unique<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);
+#endif
     default:
         throw invalid_argument("need a proper storage scheme");
     }

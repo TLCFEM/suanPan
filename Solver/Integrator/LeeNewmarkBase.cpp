@@ -69,8 +69,10 @@ int LeeNewmarkBase::initialize() {
 
     trial_internal = current_internal = residual.zeros(n_size);
 
-    if(factory->contain_solver_type(SolverType::MUMPS)) stiffness = make_unique<SparseMatMUMPS<double>>(n_size, n_size);
-    else if(factory->contain_solver_type(SolverType::LIS)) stiffness = make_unique<SparseMatLis<double>>(n_size, n_size);
+    if(factory->contain_solver_type(SolverType::LIS)) stiffness = make_unique<SparseMatLis<double>>(n_size, n_size);
+#ifndef SUANPAN_DISTRIBUTED
+    else if(factory->contain_solver_type(SolverType::MUMPS)) stiffness = make_unique<SparseMatMUMPS<double>>(n_size, n_size);
+#endif
 #ifdef SUANPAN_MKL
     else if(factory->contain_solver_type(SolverType::PARDISO)) stiffness = make_unique<SparseMatPARDISO<double>>(n_size, n_size);
     else if(factory->contain_solver_type(SolverType::FGMRES)) stiffness = make_unique<SparseMatFGMRES<double>>(n_size, n_size);
