@@ -93,16 +93,16 @@ void run() {
 
     mpl::irequest_pool requests;
 
-    requests.push(worker.isend(ia.begin(), ia.end(), 0, mpl::tag_t{0}));
-    requests.push(worker.isend(ja.begin(), ja.end(), 0, mpl::tag_t{1}));
-    requests.push(worker.isend(a.begin(), a.end(), 0, mpl::tag_t{2}));
-    requests.push(worker.isend(b.begin(), b.end(), 0, mpl::tag_t{3}));
+    requests.push(worker.isend(ia, 0, mpl::tag_t{0}));
+    requests.push(worker.isend(ja, 0, mpl::tag_t{1}));
+    requests.push(worker.isend(a, 0, mpl::tag_t{2}));
+    requests.push(worker.isend(b, 0, mpl::tag_t{3}));
 
     requests.waitall();
 
     int error = -1;
     worker.recv(error, 0);
-    if(0 == error) worker.recv(b.begin(), b.end(), 0);
+    if(0 == error) worker.recv(b, 0);
 
     for(int i = 0; i < n; i++) printf("x[%d] = %+.6f\n", i, b[i]);
 }
