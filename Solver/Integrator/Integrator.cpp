@@ -20,8 +20,10 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+#ifdef SUANPAN_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4127)
+#endif
 
 Integrator::Integrator(const unsigned T)
     : Tag(T) {}
@@ -495,4 +497,6 @@ vec ExplicitIntegrator::from_incre_acceleration(const vec& incre_acceleration, c
 
 vec ExplicitIntegrator::from_total_acceleration(const vec& total_acceleration, const uvec&) { return total_acceleration; }
 
+#ifdef SUANPAN_MSVC
 #pragma warning(pop)
+#endif

@@ -29,7 +29,9 @@
 #endif
 
 #ifdef SUANPAN_MSVC
-#pragma warning(disable:4702)
+#pragma warning(push)
+#pragma warning(disable : 4702)
+#pragma warning(disable : 4127)
 #endif
 
 #ifdef SUANPAN_VTK
@@ -100,6 +102,9 @@ bool support_emoji() {
 }
 
 void check_version(const fs::path& path_to_executable) {
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_rank) return;
+
     auto updater_module = path_to_executable.parent_path();
 
 #ifdef SUANPAN_WIN
@@ -167,6 +172,9 @@ void convert_mode(const string& input_file_name, const string& output_file_name)
 }
 
 void print_header() {
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_rank) return;
+
     /***
      *                ____
      *      ___ _   _|  _ \ __ _ _ __
@@ -313,6 +321,9 @@ void argument_parser(const int argc, char** argv) {
 }
 
 void print_version() {
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_rank) return;
+
     suanpan_info("Copyright (C) 2017-2025 Theodore Chang\n\n");
     suanpan_info("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n");
     suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
@@ -358,6 +369,9 @@ void print_version() {
 }
 
 void print_helper() {
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_rank) return;
+
     static const auto helper_line = "------------------------------------------------------------------------------\n";
     static const auto helper_format = "\t-{:<6} --{:<12}{}\n";
 
@@ -381,7 +395,8 @@ void print_helper() {
 void cli_mode(const shared_ptr<Bead>& model) {
     const auto history_path = get_history_path();
 
-    if(!exists(history_path)) {
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(!exists(history_path) and 0 == comm_rank) {
         suanpan_info("To go through a brief introduction, use '");
         suanpan_highlight("overview");
         suanpan_info("'.\nTo check the build info, use '");
@@ -398,7 +413,8 @@ void cli_mode(const shared_ptr<Bead>& model) {
     string all_line;
     while(true) {
         string command_line;
-        suanpan_info("suanPan ~<> ");
+        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+        if(0 == comm_rank) suanpan_info("suanPan ~<> ");
         getline(std::cin, command_line);
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
@@ -407,3 +423,8 @@ void cli_mode(const shared_ptr<Bead>& model) {
         all_line.clear();
     }
 }
+
+#ifdef SUANPAN_MSVC
+#pragma warning(pop)
+#pragma warning(pop)
+#endif

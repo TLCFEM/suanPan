@@ -24,8 +24,10 @@
 #include <Load/Load.h>
 #include <Recorder/Recorder.h>
 
+#ifdef SUANPAN_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4127)
+#endif
 
 void Domain::update_current_resistance() const {
 #ifdef SUANPAN_DISTRIBUTED
@@ -803,4 +805,6 @@ void Domain::reset_status() const {
     suanpan::for_all(constraint_pond.get(), [](const shared_ptr<Constraint>& t_constraint) { t_constraint->reset_status(); });
 }
 
+#ifdef SUANPAN_MSVC
 #pragma warning(pop)
+#endif

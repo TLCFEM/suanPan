@@ -288,12 +288,9 @@ namespace suanpan {
 
     template<typename... T> void info(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
-        std::string format_str;
-        if(comm_size > 1) format_str += "[P" + std::to_string(comm_rank) + "] ";
-        format_str += format_sv;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::green_yellow), format_str, fmt::make_format_args(args...));
-        else SUANPAN_COUT << fmt::vformat(format_str, fmt::make_format_args(args...));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::green_yellow), format_sv, fmt::make_format_args(args...));
+        else SUANPAN_COUT << fmt::vformat(format_sv, fmt::make_format_args(args...));
     }
 
     template<typename... T> std::string format(const std::string_view format_str, const T&... args) { return fmt::vformat(format_str, fmt::make_format_args(args...)); }
@@ -310,19 +307,14 @@ namespace suanpan {
 
     template<typename T> void info(const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
-        std::string output;
-        if(comm_size > 1) output += "[P" + std::to_string(comm_rank) + "] ";
-        output += format(in_vec);
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), output);
-        else SUANPAN_COUT << output;
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), format(in_vec));
+        else SUANPAN_COUT << format(in_vec);
     }
 
     template<typename T> void info(const std::string_view format_sv, const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
-        std::string output;
-        if(comm_size > 1) output += "[P" + std::to_string(comm_rank) + "] ";
-        output += format(format_sv);
+        std::string output{format(format_sv)};
         if(format_sv.back() != '\t' && format_sv.back() != '\n') output += '\n';
         output += format(in_vec);
         const std::scoped_lock lock(print_mutex);
@@ -332,12 +324,9 @@ namespace suanpan {
 
     template<typename... T> void highlight(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
-        std::string format_str;
-        if(comm_size > 1) format_str += "[P" + std::to_string(comm_rank) + "] ";
-        format_str += format_sv;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::crimson), format_str, fmt::make_format_args(args...));
-        else SUANPAN_COUT << fmt::vformat(format_str, fmt::make_format_args(args...));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::crimson), format_sv, fmt::make_format_args(args...));
+        else SUANPAN_COUT << fmt::vformat(format_sv, fmt::make_format_args(args...));
     }
 } // namespace suanpan
 

@@ -1151,6 +1151,16 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
 }
 
 int print_command() {
+#ifdef SUANPAN_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4127)
+#endif
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_rank) return SUANPAN_SUCCESS;
+#ifdef SUANPAN_MSVC
+#pragma warning(pop)
+#endif
+
     suanpan_info("The available first-level commands are listed. Please check online manual for reference. https://tlcfem.github.io/suanPan-manual/latest/\n");
 
     constexpr auto format = "    {:>20}  {}\n";
