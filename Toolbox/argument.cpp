@@ -31,7 +31,6 @@
 #ifdef SUANPAN_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4702)
-#pragma warning(disable : 4127)
 #endif
 
 #ifdef SUANPAN_VTK
@@ -425,6 +424,5 @@ void cli_mode(const shared_ptr<Bead>& model) {
 }
 
 #ifdef SUANPAN_MSVC
-#pragma warning(pop)
 #pragma warning(pop)
 #endif

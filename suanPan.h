@@ -107,6 +107,8 @@
 #define SUANPAN_MSVC
 // cuda unused local function
 #pragma warning(disable : 4505)
+// conditional expression is constant
+#pragma warning(disable : 4127)
 #elif defined(__ICC)
 // __ICC --> Intel C++
 #define SUANPAN_VERSION __ICC
@@ -244,6 +246,7 @@ namespace suanpan {
 
     inline std::string pattern(const std::string_view header, const std::string_view file_name, const std::string_view format) {
         std::string pattern;
+        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         if(comm_size > 1) {
             pattern += "[P";
             pattern += std::to_string(comm_rank);

@@ -20,11 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-#ifdef SUANPAN_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4127)
-#endif
-
 int LeeNewmarkBase::erase_top_left_block() const {
     auto& t_triplet = stiffness->triplet_mat;
 
@@ -168,7 +163,3 @@ void LeeNewmarkBase::reset_status() {
 
     Newmark::reset_status();
 }
-
-#ifdef SUANPAN_MSVC
-#pragma warning(pop)
-#endif
