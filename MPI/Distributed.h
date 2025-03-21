@@ -56,7 +56,7 @@ public:
         return {};
     }
 #else
-    template<mpl_data_t DT> static auto gather(const Mat<DT>&) {}
+    template<typename T> static auto gather(T&&) {}
 #endif
 };
 
