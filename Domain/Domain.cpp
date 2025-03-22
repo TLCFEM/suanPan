@@ -1245,10 +1245,7 @@ void Domain::enable_all() {
     solver_pond.enable();
 }
 
-void Domain::summary() const {
-    suanpan_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials, {} expressions,\n", get_tag(), get_node(), get_element(), get_material(), get_expression());
-    suanpan_info("\t{} loads, {} constraints and {} recorders.\n", get_load(), get_constraint(), get_recorder());
-}
+void Domain::summary() const { suanpan_info("Domain {} contains: {} nodes, {} elements, {} materials, {} expressions, {} loads, {} constraints, {} recorders.\n", get_tag(), get_node(), get_element(), get_material(), get_expression(), get_load(), get_constraint(), get_recorder()); }
 
 void Domain::erase_machine_error(vec& ninja) const { suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; }); }
 
