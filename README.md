@@ -59,6 +59,7 @@ The highlights of **suanPan** are
   parallelism on heterogeneous architectures, for example, multi-core CPU + optional GPU. The parallelism is
   available
   for both element state updating and global matrix assembling.
+- **suanPan** supports [distributed memory](https://en.wikipedia.org/wiki/Distributed_memory) platforms via MPI.
 - **suanPan** is open source and easy to be extended to incorporate user-defined elements, materials, etc.
 - **suanPan** separates the FEA model part from the linear algebra operation part, which significantly reduces the
   complexity and cost of development of new models.
