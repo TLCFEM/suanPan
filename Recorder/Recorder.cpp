@@ -75,6 +75,9 @@ void Recorder::save() {
     if(time_pool.empty() || data_pool.empty() || data_pool.cbegin()->empty() || data_pool.cbegin()->cbegin()->empty() || data_pool.cbegin()->cbegin()->cbegin()->is_empty()) return;
 
     ostringstream file_name;
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
+    if(comm_size > 1) file_name << 'P' << comm_rank << '-';
     file_name << 'R' << get_tag() << '-' << to_name(variable_type);
     const auto origin_name = file_name.str();
 
