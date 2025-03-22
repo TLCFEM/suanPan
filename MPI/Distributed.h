@@ -25,9 +25,9 @@ class Distributed {
 
     static auto assign_process(const int obj_tag) { return obj_tag % comm_size; }
 
-public:
     const int tag, process_rank;
 
+public:
     const bool is_local;
 
     explicit Distributed(const int obj_tag)
