@@ -220,7 +220,7 @@ template<typename T> requires std::is_arithmetic_v<T> auto bcast_from_root(T obj
     return object;
 }
 
-template<mpl_data_t DT> auto bcast_from_root(const Mat<DT>& object) {
+template<mpl_data_t DT> auto& bcast_from_root(const Mat<DT>& object) {
     comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem});
     return object;
 }

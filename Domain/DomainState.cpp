@@ -218,6 +218,7 @@ void Domain::assemble_initial_mass() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_mass();
@@ -243,6 +244,7 @@ void Domain::assemble_current_mass() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_mass();
@@ -268,6 +270,7 @@ void Domain::assemble_trial_mass() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_mass();
@@ -293,6 +296,7 @@ void Domain::assemble_initial_damping() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_damping();
@@ -318,6 +322,7 @@ void Domain::assemble_current_damping() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_damping();
@@ -343,6 +348,7 @@ void Domain::assemble_trial_damping() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_damping();
@@ -368,6 +374,7 @@ void Domain::assemble_initial_nonviscous() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     if(!factory->is_nonviscous()) return;
@@ -394,6 +401,7 @@ void Domain::assemble_current_nonviscous() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     if(!factory->is_nonviscous()) return;
@@ -420,6 +428,7 @@ void Domain::assemble_trial_nonviscous() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     if(!factory->is_nonviscous()) return;
@@ -446,6 +455,7 @@ void Domain::assemble_initial_stiffness() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_stiffness();
@@ -471,6 +481,7 @@ void Domain::assemble_current_stiffness() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_stiffness();
@@ -496,6 +507,7 @@ void Domain::assemble_trial_stiffness() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_stiffness();
@@ -523,6 +535,7 @@ void Domain::assemble_initial_geometry() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_geometry();
@@ -552,6 +565,7 @@ void Domain::assemble_current_geometry() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_geometry();
@@ -581,6 +595,7 @@ void Domain::assemble_trial_geometry() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_geometry();
@@ -608,6 +623,7 @@ void Domain::assemble_mass_container() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_mass();
@@ -633,6 +649,7 @@ void Domain::assemble_stiffness_container() const {
 #endif
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     factory->clear_stiffness();
