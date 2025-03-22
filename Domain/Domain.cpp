@@ -1158,7 +1158,8 @@ int Domain::process_constraint(const bool full) {
     const auto process_handler = full ? std::mem_fn(&Constraint::process) : std::mem_fn(&Constraint::process_resistance);
 
     // constraint, start index, size
-    suanpan::vector<std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>> constraint_register;
+    using register_t = std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>;
+    suanpan::vector<register_t> constraint_register;
 
     std::atomic_int code = 0;
     std::atomic_uint32_t counter = 0;
@@ -1195,7 +1196,7 @@ int Domain::process_constraint(const bool full) {
     auto& t_load = factory->modify_auxiliary_load();
     auto& t_stiffness = factory->modify_auxiliary_stiffness();
 
-    suanpan::for_all(constraint_register, [&](const std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>& t_register) {
+    suanpan::for_all(constraint_register, [&](const register_t& t_register) {
         const auto& t_constraint = t_register.first;
         const auto start = t_register.second[0];
         const auto end = start + t_register.second[1] - 1;
