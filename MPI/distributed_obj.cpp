@@ -3,11 +3,14 @@
 #include <mpl/mpl.hpp>
 
 class Object : public Distributed {
+    const int object_tag;
+
     mat data{-999, -999};
 
 public:
     explicit Object(int tag)
-        : Distributed(tag) {}
+        : Distributed(tag)
+        , object_tag(tag) {}
 
     auto generate() {
         if(is_local) data.fill(fill::randn);
@@ -15,7 +18,7 @@ public:
 
     auto gather_data() { return gather(data); }
 
-    auto print() { printf("Object %d on process %d data: %+.6f %+.6f.\n", tag, mpl::environment::comm_world().rank(), data(0), data(1)); }
+    auto print() { printf("Object %d on process %d data: %+.6f %+.6f.\n", object_tag, mpl::environment::comm_world().rank(), data(0), data(1)); }
 };
 
 int main() {
