@@ -47,19 +47,8 @@ protected:
 public:
     SparseMatMPIPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {
-        iparm[0] = 1;                                  // solver default parameters overriden with provided by iparm
-        iparm[1] = 3;                                  // use METIS for fill-in reordering
-        iparm[5] = 0;                                  // write solution into x
-        iparm[7] = 2;                                  // max number of iterative refinement steps
-        iparm[9] = 13;                                 // perturb the pivot elements with 1E-13
-        iparm[10] = 1;                                 // use nonsymmetric permutation and scaling MPS
-        iparm[12] = 1;                                 // switch on Maximum Weighted Matching algorithm (default for non-symmetric)
-        iparm[17] = -1;                                // output: Number of nonzeros in the factor LU
-        iparm[18] = -1;                                // output: Mflops for LU factorization
-        iparm[26] = 0;                                 // check input data for correctness
         iparm[27] = std::is_same_v<T, double> ? 0 : 1; // use double precision
         iparm[34] = 1;                                 // zero-based indexing
-        iparm[39] = 0;                                 // input: matrix/rhs/solution stored on master
     }
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatMPIPARDISO>(*this); }
@@ -77,15 +66,13 @@ template<sp_d T> int SparseMatMPIPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T
     const auto worker = comm_world.spawn(0, SUANPAN_NUM_NODES, {"solver.pardiso"});
     const auto all = mpl::communicator(worker, mpl::communicator::order_low);
 
-    int config[7]{};
+    int config[5]{};
 
     config[0] = 11;   // mtype
-    config[1] = nrhs; // nrhs
-    config[2] = 1;    // maxfct
-    config[3] = 1;    // mnum
-    config[4] = 0;    // msglvl
-    config[5] = n;    // n
-    config[6] = nnz;  // nnz
+    config[1] = 0;    // msglvl
+    config[2] = n;    // n
+    config[3] = nnz;  // nnz
+    config[4] = nrhs; // nrhs
 
     all.bcast(0, config);
     all.bcast(0, iparm);
