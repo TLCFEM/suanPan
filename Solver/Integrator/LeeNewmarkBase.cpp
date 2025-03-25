@@ -92,36 +92,12 @@ int LeeNewmarkBase::update_internal(const mat& t_internal) {
 
 int LeeNewmarkBase::solve(mat& X, const mat& B) {
     stiffness->set_solver_setting(factory->get_solver_setting());
-
-    int info{0};
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_rank) info = stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
-
-    if(SUANPAN_SUCCESS == bcast_from_root(info)) {
-        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-        // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_rank) X.set_size(stiffness->n_rows, B.n_cols);
-        bcast_from_root(X);
-    }
-
-    return info;
+    return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
 }
 
 int LeeNewmarkBase::solve(mat& X, const sp_mat& B) {
     stiffness->set_solver_setting(factory->get_solver_setting());
-
-    int info{0};
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 == comm_rank) info = stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
-
-    if(SUANPAN_SUCCESS == bcast_from_root(info)) {
-        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-        // ReSharper disable once CppDFAUnreachableCode
-        if(0 != comm_rank) X.set_size(stiffness->n_rows, B.n_cols);
-        bcast_from_root(X);
-    }
-
-    return info;
+    return stiffness->solve(X, resize(B, stiffness->n_rows, B.n_cols));
 }
 
 int LeeNewmarkBase::solve(mat& X, mat&& B) { return solve(X, B); }
