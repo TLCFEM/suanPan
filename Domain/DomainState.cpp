@@ -25,13 +25,6 @@
 #include <Recorder/Recorder.h>
 
 void Domain::update_current_resistance() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_resistance()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
     factory->modify_trial_resistance().zeros();
     if(color_map.empty())
         for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
@@ -47,13 +40,6 @@ void Domain::update_current_resistance() const {
 }
 
 void Domain::update_current_damping_force() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_damping_force()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
     factory->modify_trial_damping_force().zeros();
     if(color_map.empty())
         for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
@@ -68,13 +54,6 @@ void Domain::update_current_damping_force() const {
 }
 
 void Domain::update_current_nonviscous_force() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_nonviscous_force()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
     factory->modify_trial_nonviscous_force().zeros();
     if(color_map.empty())
         for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
@@ -89,13 +68,6 @@ void Domain::update_current_nonviscous_force() const {
 }
 
 void Domain::update_current_inertial_force() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_inertial_force()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
     factory->modify_trial_inertial_force().zeros();
     if(color_map.empty())
         for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
@@ -110,13 +82,6 @@ void Domain::update_current_inertial_force() const {
 }
 
 void Domain::assemble_resistance() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_resistance()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
     auto& trial_resistance = factory->modify_trial_resistance().zeros();
     if(color_map.empty())
         for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
@@ -135,13 +100,6 @@ void Domain::assemble_resistance() const {
 }
 
 void Domain::assemble_damping_force() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_damping_force()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
     auto& trial_damping_force = factory->modify_trial_damping_force().zeros();
     if(color_map.empty())
         for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
@@ -160,13 +118,6 @@ void Domain::assemble_damping_force() const {
 }
 
 void Domain::assemble_nonviscous_force() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_nonviscous_force()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
     auto& trial_nonviscous_force = factory->modify_trial_nonviscous_force().zeros();
     if(color_map.empty())
         for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
@@ -185,13 +136,6 @@ void Domain::assemble_nonviscous_force() const {
 }
 
 void Domain::assemble_inertial_force() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_inertial_force()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
     auto& trial_inertial_force = factory->modify_trial_inertial_force().zeros();
     if(color_map.empty())
         for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
@@ -210,17 +154,6 @@ void Domain::assemble_inertial_force() const {
 }
 
 void Domain::assemble_initial_mass() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_initial_mass()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_mass();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -236,17 +169,6 @@ void Domain::assemble_initial_mass() const {
 }
 
 void Domain::assemble_current_mass() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_mass()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_mass();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -262,17 +184,6 @@ void Domain::assemble_current_mass() const {
 }
 
 void Domain::assemble_trial_mass() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_mass()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_mass();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -288,17 +199,6 @@ void Domain::assemble_trial_mass() const {
 }
 
 void Domain::assemble_initial_damping() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_initial_viscous()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_damping();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -314,17 +214,6 @@ void Domain::assemble_initial_damping() const {
 }
 
 void Domain::assemble_current_damping() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_viscous()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_damping();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -340,17 +229,6 @@ void Domain::assemble_current_damping() const {
 }
 
 void Domain::assemble_trial_damping() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_viscous()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_damping();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -366,17 +244,6 @@ void Domain::assemble_trial_damping() const {
 }
 
 void Domain::assemble_initial_nonviscous() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_initial_nonviscous()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse())
@@ -393,17 +260,6 @@ void Domain::assemble_initial_nonviscous() const {
 }
 
 void Domain::assemble_current_nonviscous() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_nonviscous()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse())
@@ -420,17 +276,6 @@ void Domain::assemble_current_nonviscous() const {
 }
 
 void Domain::assemble_trial_nonviscous() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_nonviscous()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse())
@@ -447,17 +292,6 @@ void Domain::assemble_trial_nonviscous() const {
 }
 
 void Domain::assemble_initial_stiffness() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_initial_stiffness()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -473,17 +307,6 @@ void Domain::assemble_initial_stiffness() const {
 }
 
 void Domain::assemble_current_stiffness() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_stiffness()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -499,17 +322,6 @@ void Domain::assemble_current_stiffness() const {
 }
 
 void Domain::assemble_trial_stiffness() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_stiffness()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -526,17 +338,6 @@ void Domain::assemble_trial_stiffness() const {
 
 void Domain::assemble_initial_geometry() const {
     if(!factory->is_nlgeom()) return;
-
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_initial_geometry()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
 
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) {
@@ -557,17 +358,6 @@ void Domain::assemble_initial_geometry() const {
 void Domain::assemble_current_geometry() const {
     if(!factory->is_nlgeom()) return;
 
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_current_geometry()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) {
         for(const auto& I : element_pond.get())
@@ -587,17 +377,6 @@ void Domain::assemble_current_geometry() const {
 void Domain::assemble_trial_geometry() const {
     if(!factory->is_nlgeom()) return;
 
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_trial_geometry()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) {
         for(const auto& I : element_pond.get())
@@ -615,17 +394,6 @@ void Domain::assemble_trial_geometry() const {
 }
 
 void Domain::assemble_mass_container() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_mass_container()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_mass();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_mapping());
@@ -641,17 +409,6 @@ void Domain::assemble_mass_container() const {
 }
 
 void Domain::assemble_stiffness_container() const {
-#ifdef SUANPAN_DISTRIBUTED
-    mpl::irequest_pool requests;
-    for(auto& I : element_pond.get())
-        if(auto req = I->gather(I->get_stiffness_container()); req.has_value()) requests.push(std::move(req).value());
-    requests.waitall();
-#endif
-
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse())
         for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_mapping());
