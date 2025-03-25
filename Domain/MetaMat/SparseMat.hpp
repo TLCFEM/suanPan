@@ -91,6 +91,8 @@ public:
 
     [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
 
+    void allreduce() override { throw invalid_argument("not supported"); }
+
     void csc_condense() override { this->triplet_mat.csc_condense(); }
 
     void csr_condense() override { this->triplet_mat.csr_condense(); }

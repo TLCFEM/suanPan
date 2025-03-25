@@ -209,6 +209,8 @@ public:
 
     [[nodiscard]] virtual int sign_det() const = 0;
 
+    virtual void allreduce() = 0;
+
     void save(const char* name) {
         if(!to_mat(*this).save(name, raw_ascii))
             suanpan_error("Cannot save to file \"{}\".\n", name);

@@ -25,73 +25,101 @@
 #include <Recorder/Recorder.h>
 
 void Domain::update_current_resistance() const {
-    factory->modify_trial_resistance().zeros();
+    auto& trial_resistance = factory->modify_trial_resistance().zeros();
+
     if(color_map.empty())
-        for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
+                if(I->is_local) factory->assemble_resistance(I->get_current_resistance(), I->get_dof_encoding());
             });
         });
+
+    allreduce(trial_resistance);
 
     factory->commit_resistance();
 }
 
 void Domain::update_current_damping_force() const {
-    factory->modify_trial_damping_force().zeros();
+    auto& trial_damping_force = factory->modify_trial_damping_force().zeros();
+
     if(color_map.empty())
-        for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
+                if(I->is_local) factory->assemble_damping_force(I->get_current_damping_force(), I->get_dof_encoding());
             });
         });
+
+    allreduce(trial_damping_force);
+
     factory->commit_damping_force();
 }
 
 void Domain::update_current_nonviscous_force() const {
-    factory->modify_trial_nonviscous_force().zeros();
+    auto& trial_nonviscous_force = factory->modify_trial_nonviscous_force().zeros();
+
     if(color_map.empty())
-        for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
+                if(I->is_local) factory->assemble_nonviscous_force(real(sum(I->get_current_nonviscous_force(), 1)), I->get_dof_encoding());
             });
         });
+
+    allreduce(trial_nonviscous_force);
+
     factory->commit_nonviscous_force();
 }
 
 void Domain::update_current_inertial_force() const {
-    factory->modify_trial_inertial_force().zeros();
+    auto& trial_inertial_force = factory->modify_trial_inertial_force().zeros();
+
     if(color_map.empty())
-        for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
+                if(I->is_local) factory->assemble_inertial_force(I->get_current_inertial_force(), I->get_dof_encoding());
             });
         });
+
+    allreduce(trial_inertial_force);
+
     factory->commit_inertial_force();
 }
 
 void Domain::assemble_resistance() const {
     auto& trial_resistance = factory->modify_trial_resistance().zeros();
+
     if(color_map.empty())
-        for(const auto& I : element_pond.get()) factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
+                if(I->is_local) factory->assemble_resistance(I->get_trial_resistance(), I->get_dof_encoding());
             });
         });
+
+    allreduce(trial_resistance);
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_resistance(trial_resistance(t_node->get_reordered_dof())); });
 
@@ -101,15 +129,20 @@ void Domain::assemble_resistance() const {
 
 void Domain::assemble_damping_force() const {
     auto& trial_damping_force = factory->modify_trial_damping_force().zeros();
+
     if(color_map.empty())
-        for(const auto& I : element_pond.get()) factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
+                if(I->is_local) factory->assemble_damping_force(I->get_trial_damping_force(), I->get_dof_encoding());
             });
         });
+
+    allreduce(trial_damping_force);
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_damping_force(trial_damping_force(t_node->get_reordered_dof())); });
 
@@ -119,15 +152,20 @@ void Domain::assemble_damping_force() const {
 
 void Domain::assemble_nonviscous_force() const {
     auto& trial_nonviscous_force = factory->modify_trial_nonviscous_force().zeros();
+
     if(color_map.empty())
-        for(const auto& I : element_pond.get()) factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
+                if(I->is_local) factory->assemble_nonviscous_force(real(sum(I->get_trial_nonviscous_force(), 1)), I->get_dof_encoding());
             });
         });
+
+    allreduce(trial_nonviscous_force);
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_nonviscous_force(trial_nonviscous_force(t_node->get_reordered_dof())); });
 
@@ -137,15 +175,20 @@ void Domain::assemble_nonviscous_force() const {
 
 void Domain::assemble_inertial_force() const {
     auto& trial_inertial_force = factory->modify_trial_inertial_force().zeros();
+
     if(color_map.empty())
-        for(const auto& I : element_pond.get()) factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
+                if(I->is_local) factory->assemble_inertial_force(I->get_trial_inertial_force(), I->get_dof_encoding());
             });
         });
+
+    allreduce(trial_inertial_force);
 
     suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_inertial_force(trial_inertial_force(t_node->get_reordered_dof())); });
 
@@ -156,90 +199,108 @@ void Domain::assemble_inertial_force() const {
 void Domain::assemble_initial_mass() const {
     factory->clear_mass();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_mass(I->get_initial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_mass()->allreduce();
     factory->get_mass()->csc_condense();
 }
 
 void Domain::assemble_current_mass() const {
     factory->clear_mass();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_mass(I->get_current_mass(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_mass()->allreduce();
     factory->get_mass()->csc_condense();
 }
 
 void Domain::assemble_trial_mass() const {
     factory->clear_mass();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_mass(I->get_trial_mass(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_mass()->allreduce();
     factory->get_mass()->csc_condense();
 }
 
 void Domain::assemble_initial_damping() const {
     factory->clear_damping();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_damping(I->get_initial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_damping()->allreduce();
     factory->get_damping()->csc_condense();
 }
 
 void Domain::assemble_current_damping() const {
     factory->clear_damping();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_damping(I->get_current_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_damping()->allreduce();
     factory->get_damping()->csc_condense();
 }
 
 void Domain::assemble_trial_damping() const {
     factory->clear_damping();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_damping(I->get_trial_viscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_damping()->allreduce();
     factory->get_damping()->csc_condense();
 }
 
@@ -247,15 +308,18 @@ void Domain::assemble_initial_nonviscous() const {
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_nonviscous(I->get_initial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_nonviscous()->allreduce();
     factory->get_nonviscous()->csc_condense();
 }
 
@@ -263,15 +327,18 @@ void Domain::assemble_current_nonviscous() const {
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_nonviscous(I->get_current_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_nonviscous()->allreduce();
     factory->get_nonviscous()->csc_condense();
 }
 
@@ -279,60 +346,72 @@ void Domain::assemble_trial_nonviscous() const {
     if(!factory->is_nonviscous()) return;
     factory->clear_nonviscous();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_nonviscous(I->get_trial_nonviscous(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_nonviscous()->allreduce();
     factory->get_nonviscous()->csc_condense();
 }
 
 void Domain::assemble_initial_stiffness() const {
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_stiffness(I->get_initial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_stiffness()->allreduce();
     factory->get_stiffness()->csc_condense();
 }
 
 void Domain::assemble_current_stiffness() const {
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_stiffness()->allreduce();
     factory->get_stiffness()->csc_condense();
 }
 
 void Domain::assemble_trial_stiffness() const {
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_stiffness(I->get_trial_stiffness(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_stiffness()->allreduce();
     factory->get_stiffness()->csc_condense();
 }
 
@@ -342,16 +421,17 @@ void Domain::assemble_initial_geometry() const {
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) {
         for(const auto& I : element_pond.get())
-            if(I->is_nlgeom()) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+            if(I->is_nlgeom() && I->is_local) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
     }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_nlgeom() && I->is_local) factory->assemble_geometry(I->get_initial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_geometry()->allreduce();
     factory->get_geometry()->csc_condense();
 }
 
@@ -361,16 +441,17 @@ void Domain::assemble_current_geometry() const {
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) {
         for(const auto& I : element_pond.get())
-            if(I->is_nlgeom()) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+            if(I->is_nlgeom() && I->is_local) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
     }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_nlgeom() && I->is_local) factory->assemble_geometry(I->get_current_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_geometry()->allreduce();
     factory->get_geometry()->csc_condense();
 }
 
@@ -380,46 +461,53 @@ void Domain::assemble_trial_geometry() const {
     factory->clear_geometry();
     if(color_map.empty() || is_sparse()) {
         for(const auto& I : element_pond.get())
-            if(I->is_nlgeom()) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+            if(I->is_nlgeom() && I->is_local) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
     }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_nlgeom() && I->is_local) factory->assemble_geometry(I->get_trial_geometry(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_geometry()->allreduce();
     factory->get_geometry()->csc_condense();
 }
 
 void Domain::assemble_mass_container() const {
     factory->clear_mass();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_mass(I->get_mass_container(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_mass()->allreduce();
     factory->get_mass()->csc_condense();
 }
 
 void Domain::assemble_stiffness_container() const {
     factory->clear_stiffness();
     if(color_map.empty() || is_sparse())
-        for(const auto& I : element_pond.get()) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_mapping());
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_mapping());
+        }
     else
         std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {
                 const auto& I = get_element(tag);
-                factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_mapping());
+                if(I->is_local) factory->assemble_stiffness(I->get_stiffness_container(), I->get_dof_encoding(), I->get_dof_mapping());
             });
         });
 
+    factory->get_stiffness()->allreduce();
     factory->get_stiffness()->csc_condense();
 }
 

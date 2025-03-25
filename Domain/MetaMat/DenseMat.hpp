@@ -125,6 +125,8 @@ public:
         for(unsigned I = 0; I < pivot.n_elem; ++I) if((this->operator()(I, I) < T(0)) ^ (static_cast<int>(I) + 1 != pivot(I))) det_sign = -det_sign;
         return det_sign;
     }
+
+    void allreduce() override { comm_world.allreduce(mpl::plus<T>(), memory.get(), mpl::contiguous_layout<T>{this->n_elem}); }
 };
 
 #endif
