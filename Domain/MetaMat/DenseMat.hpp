@@ -126,7 +126,11 @@ public:
         return det_sign;
     }
 
-    void allreduce() override { comm_world.allreduce(mpl::plus<T>(), memory.get(), mpl::contiguous_layout<T>{this->n_elem}); }
+    void allreduce() override {
+#ifdef SUANPAN_DISTRIBUTED
+        comm_world.allreduce(mpl::plus<T>(), memory.get(), mpl::contiguous_layout<T>{this->n_elem});
+#endif
+    }
 };
 
 #endif
