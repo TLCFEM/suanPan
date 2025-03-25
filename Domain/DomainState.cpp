@@ -428,10 +428,6 @@ int Domain::update_trial_status() const {
     auto& trial_velocity = factory->get_trial_velocity();
     auto& trial_acceleration = factory->get_trial_acceleration();
 
-    bcast_from_root(trial_displacement);
-    bcast_from_root(trial_velocity);
-    bcast_from_root(trial_acceleration);
-
     if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement, trial_velocity, trial_acceleration); });
     else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_trial_status(trial_displacement); });
 
@@ -447,10 +443,6 @@ int Domain::update_incre_status() const {
     auto& incre_displacement = factory->get_incre_displacement();
     auto& incre_velocity = factory->get_incre_velocity();
     auto& incre_acceleration = factory->get_incre_acceleration();
-
-    bcast_from_root(incre_displacement);
-    bcast_from_root(incre_velocity);
-    bcast_from_root(incre_acceleration);
 
     if(AnalysisType::DYNAMICS == factory->get_analysis_type()) suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement, incre_velocity, incre_acceleration); });
     else suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_incre_status(incre_displacement); });
