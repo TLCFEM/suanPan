@@ -229,6 +229,11 @@ template<typename T> requires std::is_arithmetic_v<T> auto allreduce(T object) {
     comm_world.allreduce(mpl::plus<T>(), object);
     return object;
 }
+
+template<mpl_data_t DT> auto& allreduce(const Mat<DT>& object) {
+    comm_world.allreduce(mpl::plus<T>(), const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem});
+    return object;
+}
 #else
 inline constexpr auto comm_rank{0};
 inline constexpr auto comm_size{1};
