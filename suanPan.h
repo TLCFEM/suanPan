@@ -220,13 +220,23 @@ template<typename T> requires std::is_arithmetic_v<T> auto bcast_from_root(T obj
     return object;
 }
 
-template<mpl_data_t DT> auto& bcast_from_root(const Mat<DT>& object) {
-    comm_world.bcast(0, const_cast<DT*>(object.memptr()), mpl::contiguous_layout<DT>{object.n_elem});
+template<mpl_data_t T> auto& bcast_from_root(const Mat<T>& object) {
+    comm_world.bcast(0, const_cast<T*>(object.memptr()), mpl::contiguous_layout<T>{object.n_elem});
     return object;
 }
 
 template<typename T> requires std::is_arithmetic_v<T> auto allreduce(T object) {
     comm_world.allreduce(mpl::plus<T>(), object);
+    return object;
+}
+
+template<mpl_data_t T> auto& allreduce(const Mat<T>& object) {
+    comm_world.allreduce(mpl::plus<T>(), const_cast<T*>(object.memptr()), mpl::contiguous_layout<T>{object.n_elem});
+    return object;
+}
+
+template<mpl_data_t T> auto& reduce(const Mat<T>& object) {
+    comm_world.reduce(mpl::plus<T>(), 0, const_cast<T*>(object.memptr()), mpl::contiguous_layout<T>{object.n_elem});
     return object;
 }
 #else
@@ -236,6 +246,8 @@ inline constexpr auto comm_size{1};
 template<typename T> auto bcast_from_root(T&& object) { return std::forward<T>(object); }
 
 template<typename T> auto allreduce(T&& object) { return std::forward<T>(object); }
+
+template<typename T> auto reduce(T&& object) { return std::forward<T>(object); }
 #endif
 
 #include <fmt/color.h>

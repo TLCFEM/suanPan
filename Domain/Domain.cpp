@@ -1128,8 +1128,6 @@ int Domain::process_load(const bool full) {
         }
     });
 
-    bcast_from_root(trial_load);
-
     factory->update_trial_load(trial_load);
     factory->update_trial_settlement(trial_settlement);
 
@@ -1267,10 +1265,6 @@ void Domain::update_constraint() {
 void Domain::assemble_load_stiffness() {}
 
 void Domain::assemble_constraint_stiffness() {
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppDFAUnreachableCode
-    if(0 != comm_rank) return;
-
     for(auto& I : get_constraint_pool())
         if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding());
 }
