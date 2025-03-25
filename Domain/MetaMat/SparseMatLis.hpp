@@ -94,13 +94,10 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
         // ReSharper restore CppCStyleCast
 
         lis_solve(A, b, x, solver);
-    }
 
-    A->ptr = nullptr;
-    A->index = nullptr;
-    A->value = nullptr;
-    b->value = nullptr;
-    x->value = nullptr;
+        lis_vector_unset(b);
+        lis_vector_unset(x);
+    }
 
     lis_matrix_destroy(A);
     lis_vector_destroy(b);
