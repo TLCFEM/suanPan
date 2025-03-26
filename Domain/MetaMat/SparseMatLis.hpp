@@ -99,6 +99,8 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
         lis_vector_unset(x);
     }
 
+    lis_matrix_unset(A);
+
     lis_matrix_destroy(A);
     lis_vector_destroy(b);
     lis_vector_destroy(x);
