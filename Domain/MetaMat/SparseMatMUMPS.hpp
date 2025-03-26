@@ -45,7 +45,7 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
 
     triplet_form<float, int> s_mat;
 
-    s32_vec l_irn, l_jrn;
+    s32_vec l_irn, l_jcn;
 
     template<bool convert, typename ST, std::invocable<ST*> F, typename COO> int alloc(COO& triplet, ST& mumps_job, F& mumps_c) {
         if(this->factored) return 0;
@@ -61,15 +61,15 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
 
         if constexpr(convert) {
             l_irn.set_size(triplet.n_elem);
-            l_jrn.set_size(triplet.n_elem);
+            l_jcn.set_size(triplet.n_elem);
 
             suanpan::for_each(static_cast<int>(triplet.n_elem), [&](const int I) {
                 l_irn[I] = static_cast<int>(triplet.row(I) + 1);
-                l_jrn[I] = static_cast<int>(triplet.col(I) + 1);
+                l_jcn[I] = static_cast<int>(triplet.col(I) + 1);
             });
 
             mumps_job.irn = l_irn.memptr();
-            mumps_job.jcn = l_jrn.memptr();
+            mumps_job.jcn = l_jcn.memptr();
         }
         else {
             mumps_job.irn = triplet.row_mem();
@@ -177,7 +177,7 @@ public:
         , dmumps_job{other.sym, 1, -1, -987654}
         , smumps_job{other.sym, 1, -1, -987654}
         , l_irn(other.l_irn)
-        , l_jrn(other.l_jrn) {}
+        , l_jcn(other.l_jcn) {}
 
     SparseMatBaseMUMPS(SparseMatBaseMUMPS&&) noexcept = delete;
     SparseMatBaseMUMPS& operator=(const SparseMatBaseMUMPS&) = delete;
