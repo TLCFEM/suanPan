@@ -133,16 +133,9 @@ void Step::set_max_step_size(const double T) { max_step_size = T; }
 
 void Step::set_max_substep(const unsigned M) { max_substep = M; }
 
-void Step::set_system_solver(const SolverType P) {
-    system_solver = P;
-    system_setting.iterative_solver = IterativeSolver::NONE;
-}
-
-void Step::set_system_solver(const IterativeSolver P) { system_setting.iterative_solver = P; }
+void Step::set_system_solver(const SolverType P) { system_solver = P; }
 
 void Step::set_sub_system_solver(const SolverType P) { sub_system_solver = P; }
-
-void Step::set_preconditioner(const PreconditionerType P) { system_setting.preconditioner_type = P; }
 
 void Step::set_precision(const Precision P) { system_setting.precision = P; }
 

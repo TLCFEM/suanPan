@@ -56,10 +56,6 @@ void LeeNewmark::initialize_mass(const shared_ptr<DomainBase>&) {
     // assuming mass does not change
     // otherwise swap and assemble
     current_mass = factory->get_mass()->make_copy();
-    if(if_iterative) {
-        const auto current_mass_max = current_mass->max() * 1E-10;
-        for(uword I = 0llu; I < std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += current_mass_max;
-    }
 }
 
 void LeeNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {
@@ -185,11 +181,6 @@ void LeeElementalNewmark::initialize_mass(const shared_ptr<DomainBase>& D) {
     current_mass.swap(t_mass);
     D->assemble_mass_container();
     current_mass.swap(t_mass);
-
-    if(if_iterative) {
-        const auto current_mass_max = current_mass->max() * 1E-10;
-        for(uword I = 0llu; I < std::min(current_mass->n_rows, current_mass->n_cols); ++I) current_mass->at(I, I) += current_mass_max;
-    }
 }
 
 void LeeElementalNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {

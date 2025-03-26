@@ -120,7 +120,6 @@ public:
     }
 
     [[nodiscard]] int sign_det() const override {
-        if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");
         auto det_sign = 1;
         for(unsigned I = 0; I < pivot.n_elem; ++I) if((this->operator()(I, I) < T(0)) ^ (static_cast<int>(I) + 1 != pivot(I))) det_sign = -det_sign;
         return det_sign;

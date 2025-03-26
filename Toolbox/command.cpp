@@ -960,9 +960,6 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);
         else if(is_equal(value, "FGMRES")) t_step->set_system_solver(SolverType::FGMRES);
 #endif
-        else if(is_equal(value, "GMRES")) t_step->set_system_solver(IterativeSolver::GMRES);
-        else if(is_equal(value, "BICGSTAB")) t_step->set_system_solver(IterativeSolver::BICGSTAB);
-        else if(is_equal(value, "NONE")) t_step->set_system_solver(IterativeSolver::NONE);
         else
             suanpan_error("A valid solver type is required.\n");
     }
@@ -981,17 +978,6 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 #ifdef SUANPAN_MKL
         else if(is_equal(value, "PARDISO")) t_step->set_sub_system_solver(SolverType::PARDISO);
         else if(is_equal(value, "FGMRES")) t_step->set_sub_system_solver(SolverType::FGMRES);
-#endif
-        else
-            suanpan_error("A valid solver type is required.\n");
-    }
-    else if(is_equal(property_id, "preconditioner")) {
-        if(string value; !get_input(command, value))
-            suanpan_error("A valid value is required.\n");
-        else if(is_equal(value, "NONE")) t_step->set_preconditioner(PreconditionerType::NONE);
-        else if(is_equal(value, "JACOBI")) t_step->set_preconditioner(PreconditionerType::JACOBI);
-#ifndef SUANPAN_SUPERLUMT
-        else if(is_equal(value, "ILU")) t_step->set_preconditioner(PreconditionerType::ILU);
 #endif
         else
             suanpan_error("A valid solver type is required.\n");
