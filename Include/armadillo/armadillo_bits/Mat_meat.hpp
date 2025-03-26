@@ -2862,6 +2862,8 @@ Mat<eT>::operator=(const SpSubview<eT>& X)
   
   if(X.n_rows == X.m.n_rows)
     {
+    arma_debug_print("access via arrays");
+    
     X.m.sync();
     
     const uword sv_col_start = X.aux_col1;
@@ -2889,6 +2891,8 @@ Mat<eT>::operator=(const SpSubview<eT>& X)
     }
   else
     {
+    arma_debug_print("access via iterators");
+    
     typename SpSubview<eT>::const_iterator it     = X.begin();
     typename SpSubview<eT>::const_iterator it_end = X.end();
     
@@ -2913,6 +2917,8 @@ Mat<eT>::operator+=(const SpSubview<eT>& X)
   
   if(X.n_rows == X.m.n_rows)
     {
+    arma_debug_print("access via arrays");
+    
     X.m.sync();
     
     const uword sv_col_start = X.aux_col1;
@@ -2940,6 +2946,8 @@ Mat<eT>::operator+=(const SpSubview<eT>& X)
     }
   else
     {
+    arma_debug_print("access via iterators");
+    
     typename SpSubview<eT>::const_iterator it     = X.begin();
     typename SpSubview<eT>::const_iterator it_end = X.end();
     
@@ -2964,6 +2972,8 @@ Mat<eT>::operator-=(const SpSubview<eT>& X)
   
   if(X.n_rows == X.m.n_rows)
     {
+    arma_debug_print("access via arrays");
+    
     X.m.sync();
     
     const uword sv_col_start = X.aux_col1;
@@ -2991,6 +3001,8 @@ Mat<eT>::operator-=(const SpSubview<eT>& X)
     }
   else
     {
+    arma_debug_print("access via iterators");
+    
     typename SpSubview<eT>::const_iterator it     = X.begin();
     typename SpSubview<eT>::const_iterator it_end = X.end();
     
