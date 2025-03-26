@@ -48,7 +48,7 @@ and [OpenSees](http://opensees.berkeley.edu/).
 > For a summary of available functionalities, see [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
 > Please star ⭐ the project!
 
-![Alt](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg "Repobeats analytics image")
+![repobeats analytics](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg)
 
 ## Features
 
