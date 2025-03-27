@@ -80,6 +80,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
 
     ipar[8] = 1;
     ipar[9] = 0;
+    ipar[10] = 1; // use preconditioner
     ipar[11] = 1;
     dpar[0] = this->setting.tolerance;
 
