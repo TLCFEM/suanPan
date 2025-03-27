@@ -48,7 +48,7 @@ void new_zfeast_srcipevx_(char* ijob, int* d, int* N, double* Ze, double* work, 
 void new_zfeast_srcipev_(char* ijob, int* d, int* N, double* Ze, double* work, double* workc, double* Aq, double* Sq, int* fpm, double* epsout, int* loop, double* Emid, double* r, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 
 void new_dfeast_sbgvx_(char* UPLO, int* N, int* kla, double* A, int* LDA, int* klb, double* B, int* LDB, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
-void new_dfeast_sbgv_(char* UPLO, int* N, int* kla, double* A, int* LDA, int* klb, double* B, int* LDB, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
+void new_dfeast_sbgv_(const char* UPLO, int* N, int* kla, double* A, int* LDA, int* klb, double* B, int* LDB, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 void new_dfeast_sbevx_(char* UPLO, int* N, int* kla, double* A, int* LDA, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
 void new_dfeast_sbev_(char* UPLO, int* N, int* kla, double* A, int* LDA, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 void new_zfeast_hbgvx_(char* UPLO, int* N, int* kla, double* A, int* LDA, int* klb, double* B, int* LDB, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
@@ -69,7 +69,7 @@ void new_dfeast_gbevx_(int* N, int* kla, int* kua, double* A, int* LDA, int* fpm
 void new_dfeast_gbev_(int* N, int* kla, int* kua, double* A, int* LDA, int* fpm, double* epsout, int* loop, double* Emid, double* r, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 
 void new_dfeast_sygvx_(char* UPLO, int* N, double* A, int* LDA, double* B, int* LDB, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
-void new_dfeast_sygv_(char* UPLO, int* N, double* A, int* LDA, double* B, int* LDB, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
+void new_dfeast_sygv_(const char* UPLO, int* N, double* A, int* LDA, double* B, int* LDB, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 void new_dfeast_syevx_(char* UPLO, int* N, double* A, int* LDA, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
 void new_dfeast_syev_(char* UPLO, int* N, double* A, int* LDA, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 void new_zfeast_hegvx_(char* UPLO, int* N, double* A, int* LDA, double* B, int* LDB, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
@@ -101,7 +101,7 @@ void new_dfeast_gepevx_(int* d, int* N, double* A, int* LDA, int* fpm, double* e
 void new_dfeast_gepev_(int* d, int* N, double* A, int* LDA, int* fpm, double* epsout, int* loop, double* Emid, double* r, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 
 void new_dfeast_scsrgvx_(char* UPLO, int* N, double* sa, int* isa, int* jsa, double* sb, int* isb, int* jsb, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
-void new_dfeast_scsrgv_(char* UPLO, int* N, double* sa, int* isa, int* jsa, double* sb, int* isb, int* jsb, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
+void new_dfeast_scsrgv_(const char* UPLO, int* N, double* sa, int* isa, int* jsa, double* sb, int* isb, int* jsb, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 void new_dfeast_scsrevx_(char* UPLO, int* N, double* sa, int* isa, int* jsa, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);
 void new_dfeast_scsrev_(char* UPLO, int* N, double* sa, int* isa, int* jsa, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info);
 void new_zfeast_hcsrgvx_(char* UPLO, int* N, double* sa, int* isa, int* jsa, double* sb, int* isb, int* jsb, int* fpm, double* epsout, int* loop, double* Emin, double* Emax, int* M0, double* lambda, double* q, int* mode, double* res, int* info, double* Zne, double* Wne);

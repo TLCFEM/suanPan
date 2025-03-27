@@ -21,8 +21,6 @@
 #include <Solver/Integrator/Integrator.h>
 #include <feast/feast.h>
 
-char FEAST::UPLO = 'F';
-
 int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
     auto& mass = W->get_mass();
     auto& stiffness = W->get_stiffness();
