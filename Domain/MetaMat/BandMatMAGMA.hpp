@@ -33,7 +33,6 @@
 #ifdef SUANPAN_MAGMA
 
 #include "BandMat.hpp"
-#include "magma_v2.h"
 
 template<sp_d T> class BandMatMAGMA final : public BandMat<T> {
     magma_queue_t queue{};

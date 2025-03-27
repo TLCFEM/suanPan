@@ -64,11 +64,8 @@ int Step::initialize() {
     factory = t_domain->get_factory();
 
     factory->set_solver_type(system_solver);
-    factory->set_solver_setting(system_setting);
     factory->set_sub_solver_type(sub_system_solver);
-#ifdef SUANPAN_MAGMA
-    factory->set_solver_setting(magma_setting);
-#endif
+    factory->set_solver_setting(system_setting);
 
     return 0;
 }
@@ -144,6 +141,8 @@ void Step::set_tolerance(const double T) { system_setting.tolerance = T; }
 void Step::set_refinement(const std::uint8_t T) { system_setting.iterative_refinement = T; }
 
 void Step::set_lis_option(const std::string_view T) { system_setting.lis_options = T; }
+
+void Step::set_magma_option(istringstream& T) { system_setting.set_magma_option(T); }
 
 double Step::get_ini_step_size() const { return ini_step_size; }
 

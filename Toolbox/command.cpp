@@ -18,7 +18,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 #include "command.h"
-#include <thread>
+
 #include <Constraint/Constraint.h>
 #include <Constraint/ConstraintParser.h>
 #include <Constraint/Criterion/Criterion.h>
@@ -26,17 +26,17 @@
 #include <Converger/ConvergerParser.h>
 #include <Domain/Domain.h>
 #include <Domain/ExternalModule.h>
-#include <Domain/Node.h>
 #include <Domain/Group/Group.h>
 #include <Domain/Group/GroupParser.h>
+#include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Element/ElementParser.h>
 #include <Element/Modifier/Modifier.h>
 #include <Element/Utility/Orientation.h>
 #include <Element/Visualisation/vtkParser.h>
+#include <Load/Amplitude/Amplitude.h>
 #include <Load/Load.h>
 #include <Load/LoadParser.h>
-#include <Load/Amplitude/Amplitude.h>
 #include <Material/Material.h>
 #include <Material/MaterialParser.h>
 #include <Material/MaterialTester.h>
@@ -45,22 +45,20 @@
 #include <Section/Section.h>
 #include <Section/SectionParser.h>
 #include <Section/SectionTester.h>
+#include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Step/Bead.h>
 #include <Step/Frequency.h>
 #include <Step/Step.h>
 #include <Step/StepParser.h>
-#include <Toolbox/argument.h>
 #include <Toolbox/Expression.h>
 #include <Toolbox/ExpressionParser.h>
+#include <Toolbox/argument.h>
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
-#ifdef SUANPAN_MAGMA
-#include <Domain/MetaMat/SparseMatMAGMA.hpp>
-#endif
+#include <thread>
 
 using std::ifstream;
 using std::ofstream;
@@ -952,7 +950,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
 #ifdef SUANPAN_MAGMA
         else if(is_equal(value, "MAGMA")) {
             t_step->set_system_solver(SolverType::MAGMA);
-            t_step->set_magma_option(magma_parse_opts<magma_dopts>(command));
+            t_step->set_magma_option(command);
         }
 #endif
 #endif

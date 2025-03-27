@@ -36,10 +36,6 @@
 #include <Element/MappingDOF.h>
 #include <Domain/MetaMat/MetaMat>
 
-#ifdef SUANPAN_MAGMA
-#include <magmasparse.h>
-#endif
-
 enum class AnalysisType {
     NONE,
     DISP,
@@ -82,17 +78,12 @@ template<sp_d T> class Factory final {
     AnalysisType analysis_type = AnalysisType::NONE;  // type of analysis
     StorageScheme storage_type = StorageScheme::FULL; // type of analysis
 
-#ifdef SUANPAN_MAGMA
-    magma_dopts magma_setting{};
-#endif
-
     bool nlgeom = false;
     bool nonviscous = false;
 
     SolverType solver = SolverType::LAPACK;
-    SolverSetting<T> setting{};
-
     SolverType sub_solver = SolverType::LAPACK;
+    SolverSetting<T> setting{};
 
     T error = T(0); // error produced by certain solvers
 
@@ -213,12 +204,6 @@ public:
 
     void set_solver_setting(const SolverSetting<double>&);
     [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
-
-#ifdef SUANPAN_MAGMA
-    void set_solver_setting(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
-
-    [[nodiscard]] const magma_dopts& get_magma_setting() const { return magma_setting; }
-#endif
 
     void set_analysis_type(AnalysisType);
     [[nodiscard]] AnalysisType get_analysis_type() const;
@@ -1510,7 +1495,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #ifdef SUANPAN_CUDA
         if(contain_solver_type(SolverType::CUDA)) return std::make_unique<SparseMatCUDA<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MAGMA
-        if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, magma_setting);
+        if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, setting.magma_setting);
 #endif
 #endif
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);

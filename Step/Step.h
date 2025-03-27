@@ -59,13 +59,8 @@ protected:
     const bool sparse_mat = false;
 
     SolverType system_solver = SolverType::LAPACK;
-    SolverSetting<double> system_setting{};
-
     SolverType sub_system_solver = SolverType::LAPACK;
-
-#ifdef SUANPAN_MAGMA
-    magma_dopts magma_setting{};
-#endif
+    SolverSetting<double> system_setting{};
 
     weak_ptr<DomainBase> database;
     shared_ptr<Factory<double>> factory;
@@ -120,9 +115,7 @@ public:
     void set_tolerance(double);
     void set_refinement(std::uint8_t);
     void set_lis_option(std::string_view);
-#ifdef SUANPAN_MAGMA
-    void set_magma_option(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
-#endif
+    void set_magma_option(istringstream&);
 
     [[nodiscard]] double get_ini_step_size() const;
     [[nodiscard]] double get_min_step_size() const;
