@@ -26,6 +26,7 @@
  * @{
  */
 
+// ReSharper disable CppCStyleCast
 #ifndef SPARSEMATLIS_HPP
 #define SPARSEMATLIS_HPP
 
@@ -46,10 +47,15 @@ template<sp_d T> class SparseMatLis final : public SparseMat<T> {
         }
 
     public:
-        explicit lis_vector(const LIS_INT n) {
+        explicit lis_vector(const uword n) {
             lis_vector_create(0, &v);
-            lis_vector_set_size(v, n, 0);
+            lis_vector_set_size(v, static_cast<LIS_INT>(n), 0);
         }
+
+        lis_vector(const lis_vector&) = delete;
+        lis_vector(lis_vector&&) noexcept = delete;
+        lis_vector& operator=(const lis_vector&) = delete;
+        lis_vector& operator=(lis_vector&&) noexcept = delete;
 
         ~lis_vector() {
             unset();
@@ -78,6 +84,11 @@ template<sp_d T> class SparseMatLis final : public SparseMat<T> {
     public:
         explicit lis_matrix(csr_form<LIS_SCALAR, LIS_INT>& A) { set(A); }
 
+        lis_matrix(const lis_matrix&) = delete;
+        lis_matrix(lis_matrix&&) noexcept = delete;
+        lis_matrix& operator=(const lis_matrix&) = delete;
+        lis_matrix& operator=(lis_matrix&&) noexcept = delete;
+
         ~lis_matrix() { unset(); }
 
         auto get() const { return a_mat; }
@@ -98,11 +109,16 @@ template<sp_d T> class SparseMatLis final : public SparseMat<T> {
     public:
         lis_solver() { lis_solver_create(&solver); }
 
+        lis_solver(const lis_solver&) = default;
+        lis_solver(lis_solver&&) noexcept = delete;
+        lis_solver& operator=(const lis_solver&) = delete;
+        lis_solver& operator=(lis_solver&&) noexcept = delete;
+
         ~lis_solver() { lis_solver_destroy(solver); }
 
-        auto set_option(const char* option) { return lis_solver_set_option(option, solver); }
+        auto set_option(const char* option) const { return lis_solver_set_option(option, solver); }
 
-        auto solve(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X) const { return lis_solve(A, B, X, solver); }
+        auto solve(const LIS_MATRIX A, const LIS_VECTOR B, const LIS_VECTOR X) const { return lis_solve(A, B, X, solver); }
     };
 
     lis_solver solver;
@@ -124,16 +140,14 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
     csr_form<double, LIS_INT> csr_mat(this->triplet_mat, SparseBase::ZERO, true);
 
-    lis_matrix A(csr_mat);
+    lis_matrix a(csr_mat);
     lis_vector b(B.n_rows), x(B.n_rows);
 
     solver.set_option(setting.lis_options.c_str());
 
     LIS_INT info = 0;
     for(uword I = 0; I < B.n_cols; ++I) {
-        // ReSharper disable CppCStyleCast
-        info = solver.solve(A.get(), b.set((double*)B.colptr(I)), x.set((double*)X.colptr(I)));
-        // ReSharper restore CppCStyleCast
+        info = solver.solve(a.get(), b.set((double*)B.colptr(I)), x.set((double*)X.colptr(I)));
         if(0 != info) break;
     }
 
