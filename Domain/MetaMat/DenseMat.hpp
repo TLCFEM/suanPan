@@ -56,13 +56,13 @@ protected:
 public:
     DenseMat(const uword in_rows, const uword in_cols, const uword in_elem)
         : MetaMat<T>(in_rows, in_cols, in_elem)
-        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { DenseMat::zeros(); }
+        , memory(new T[this->n_elem]) { DenseMat::zeros(); }
 
     DenseMat(const DenseMat& old_mat)
         : MetaMat<T>(old_mat)
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
-        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
+        , memory(new T[this->n_elem]) { suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
 
     DenseMat(DenseMat&&) noexcept = delete;
     DenseMat& operator=(const DenseMat&) = delete;
