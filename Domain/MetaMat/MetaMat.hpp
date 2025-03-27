@@ -86,7 +86,7 @@ protected:
 
         auto multiplier = norm(B);
 
-        auto counter = 0u;
+        auto counter = std::uint8_t{0};
         while(counter++ < this->setting.iterative_refinement) {
             if(multiplier < this->setting.tolerance) break;
 

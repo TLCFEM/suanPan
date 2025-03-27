@@ -141,7 +141,7 @@ void Step::set_precision(const Precision P) { system_setting.precision = P; }
 
 void Step::set_tolerance(const double T) { system_setting.tolerance = T; }
 
-void Step::set_refinement(const unsigned T) { system_setting.iterative_refinement = T; }
+void Step::set_refinement(const std::uint8_t T) { system_setting.iterative_refinement = T; }
 
 void Step::set_lis_option(const std::string_view T) { system_setting.lis_options = T; }
 

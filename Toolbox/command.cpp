@@ -930,7 +930,7 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         get_input(command, value) ? t_step->set_sparse(is_true(value)) : suanpan_error("A valid value is required.\n");
     }
     else if(is_equal(property_id, "iterative_refinement")) {
-        if(unsigned value; get_input(command, value)) t_step->set_refinement(value);
+        if(std::uint8_t value; get_input(command, value)) t_step->set_refinement(value);
         else
             suanpan_error("A valid value is required.\n");
     }
@@ -940,13 +940,13 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else if(is_equal(value, "LAPACK")) t_step->set_system_solver(SolverType::LAPACK);
         else if(is_equal(value, "SPIKE")) t_step->set_system_solver(SolverType::SPIKE);
         else if(is_equal(value, "SUPERLU")) t_step->set_system_solver(SolverType::SUPERLU);
-#ifndef SUANPAN_DISTRIBUTED
-        else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
-#endif
         else if(is_equal(value, "LIS")) {
             t_step->set_system_solver(SolverType::LIS);
             if(const auto options = get_remaining(command); !options.empty()) t_step->set_lis_option(options);
         }
+#ifndef SUANPAN_DISTRIBUTED
+        else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
+#endif
 #ifdef SUANPAN_CUDA
         else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
 #ifdef SUANPAN_MAGMA
@@ -990,16 +990,10 @@ int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
         else
             suanpan_error("A valid precision is required.\n");
     }
-    else if(is_equal(property_id, "tolerance")) {
+    else if(is_equal(property_id, "tolerance") || is_equal(property_id, "fgmres_tolerance")) {
         double value;
         get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("A valid value is required.\n");
     }
-#ifdef SUANPAN_MKL
-    else if(is_equal(property_id, "fgmres_tolerance")) {
-        double value;
-        get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("A valid value is required.\n");
-    }
-#endif
     else if(is_equal(property_id, "ini_step_size")) {
         double step_time;
         get_input(command, step_time) ? t_step->set_ini_step_size(step_time) : suanpan_error("A valid value is required.\n");
@@ -1138,6 +1132,7 @@ int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
 
 int print_command() {
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppUnreachableCode
     if(0 != comm_rank) return SUANPAN_SUCCESS;
 
     suanpan_info("The available first-level commands are listed. Please check online manual for reference. https://tlcfem.github.io/suanPan-manual/latest/\n");
