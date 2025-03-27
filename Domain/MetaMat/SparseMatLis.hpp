@@ -29,12 +29,83 @@
 #ifndef SPARSEMATLIS_HPP
 #define SPARSEMATLIS_HPP
 
-#include <lis/lislib.h>
 #include "SparseMat.hpp"
 #include "csr_form.hpp"
 
+#include <lis/lislib.h>
+
 template<sp_d T> class SparseMatLis final : public SparseMat<T> {
-    LIS_SOLVER solver = nullptr;
+    class lis_vector final {
+        LIS_VECTOR v{};
+
+        bool is_set = false;
+
+        auto unset() {
+            if(is_set) lis_vector_unset(v);
+            is_set = false;
+        }
+
+    public:
+        explicit lis_vector(const LIS_INT n) {
+            lis_vector_create(0, &v);
+            lis_vector_set_size(v, n, 0);
+        }
+
+        ~lis_vector() {
+            unset();
+            lis_vector_destroy(v);
+        }
+
+        auto set(LIS_SCALAR* value) {
+            unset();
+            is_set = true;
+            lis_vector_set(v, value);
+            return v;
+        }
+    };
+
+    class lis_matrix final {
+        LIS_MATRIX a_mat{};
+
+        bool is_set = false;
+
+        auto unset() {
+            if(is_set) lis_matrix_unset(a_mat);
+            lis_matrix_destroy(a_mat);
+            is_set = false;
+        }
+
+    public:
+        explicit lis_matrix(csr_form<LIS_SCALAR, LIS_INT>& A) { set(A); }
+
+        ~lis_matrix() { unset(); }
+
+        auto get() const { return a_mat; }
+
+        auto set(csr_form<LIS_SCALAR, LIS_INT>& A) {
+            unset();
+            lis_matrix_create(0, &a_mat);
+            lis_matrix_set_size(a_mat, A.n_rows, 0);
+            lis_matrix_set_csr(A.n_elem, A.row_mem(), A.col_mem(), A.val_mem(), a_mat);
+            lis_matrix_assemble(a_mat);
+            is_set = true;
+        }
+    };
+
+    class lis_solver final {
+        LIS_SOLVER solver{};
+
+    public:
+        lis_solver() { lis_solver_create(&solver); }
+
+        ~lis_solver() { lis_solver_destroy(solver); }
+
+        auto set_option(const char* option) { return lis_solver_set_option(option, solver); }
+
+        auto solve(LIS_MATRIX A, LIS_VECTOR B, LIS_VECTOR X) const { return lis_solve(A, B, X, solver); }
+    };
+
+    lis_solver solver;
 
 protected:
     using SparseMat<T>::direct_solve;
@@ -43,23 +114,7 @@ protected:
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
-    SparseMatLis(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem) {
-        lis_solver_create(&solver);
-        lis_solver_set_option("-i fgmres", solver);
-    }
-
-    SparseMatLis(const SparseMatLis& other)
-        : SparseMat<T>(other) {
-        lis_solver_create(&solver);
-        lis_solver_set_option("-i fgmres", solver);
-    }
-
-    SparseMatLis(SparseMatLis&&) noexcept = delete;
-    SparseMatLis& operator=(const SparseMatLis&) = delete;
-    SparseMatLis& operator=(SparseMatLis&&) noexcept = delete;
-
-    ~SparseMatLis() override { lis_solver_destroy(solver); }
+    using SparseMat<T>::SparseMat;
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatLis>(*this); }
 };
@@ -69,43 +124,20 @@ template<sp_d T> int SparseMatLis<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
     csr_form<double, LIS_INT> csr_mat(this->triplet_mat, SparseBase::ZERO, true);
 
-    const sp_i auto n = csr_mat.n_rows;
-    const sp_i auto nnz = csr_mat.n_elem;
+    lis_matrix A(csr_mat);
+    lis_vector b(B.n_rows), x(B.n_rows);
 
-    LIS_MATRIX A;
-    LIS_VECTOR b, x;
+    solver.set_option(setting.lis_options.c_str());
 
-    lis_matrix_create(0, &A);
-    lis_matrix_set_size(A, n, 0);
-    lis_matrix_set_csr(nnz, csr_mat.row_mem(), csr_mat.col_mem(), csr_mat.val_mem(), A);
-    lis_matrix_assemble(A);
-
-    lis_vector_create(0, &b);
-    lis_vector_create(0, &x);
-    lis_vector_set_size(b, n, 0);
-    lis_vector_set_size(x, n, 0);
-
-    lis_solver_set_option(setting.lis_options.c_str(), solver);
-
+    LIS_INT info = 0;
     for(uword I = 0; I < B.n_cols; ++I) {
         // ReSharper disable CppCStyleCast
-        lis_vector_set(b, (double*)B.colptr(I));
-        lis_vector_set(x, (double*)X.colptr(I));
+        info = solver.solve(A.get(), b.set((double*)B.colptr(I)), x.set((double*)X.colptr(I)));
         // ReSharper restore CppCStyleCast
-
-        lis_solve(A, b, x, solver);
-
-        lis_vector_unset(b);
-        lis_vector_unset(x);
+        if(0 != info) break;
     }
 
-    lis_matrix_unset(A);
-
-    lis_matrix_destroy(A);
-    lis_vector_destroy(b);
-    lis_vector_destroy(x);
-
-    return SUANPAN_SUCCESS;
+    return info;
 }
 
 #endif
