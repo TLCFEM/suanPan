@@ -176,8 +176,6 @@ template<> SparseMatMPIPARDISO<float> create_new(const u64 N) { return {N, N}; }
 #endif
 
 template<> SparseMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
-
-template<> SparseSymmMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
 #endif
 
 #ifdef SUANPAN_CUDA
@@ -240,7 +238,6 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     else if(std::is_same_v<SparseMatMPIPARDISO<ET>, T>) title = "MPI PARDISO ";
 #endif
     else if(std::is_same_v<SparseMatFGMRES<ET>, T>) title = "FGMRES ";
-    else if(std::is_same_v<SparseSymmMatFGMRES<ET>, T>) title = "FGMRES Symm ";
 #endif
 #ifdef SUANPAN_CUDA
     else if(std::is_same_v<FullMatCUDA<ET>, T>) title = "Full CUDA ";

@@ -94,6 +94,7 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
             if(0 == request || 4 == request && dpar[6] <= dpar[0]) {
                 MKL_INT counter;
                 dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr(), &counter);
+                suanpan_debug("Converged in {} iterations.\n", counter);
                 break;
             }
             if(1 == request) {
@@ -101,16 +102,16 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
                 // ReSharper disable once CppInitializedValueIsAlwaysRewritten
                 // ReSharper disable once CppEntityAssignedButNoRead
                 vec yn(&work[ipar[22] - 1llu], N, false, true);
+                // ReSharper disable once CppDFAUnusedValue
                 yn = csr_mat * xn;
-                continue;
             }
-            if(3 == request) {
+            else if(3 == request) {
                 const vec xn(&work[ipar[21] - 1llu], N);
                 // ReSharper disable once CppInitializedValueIsAlwaysRewritten
                 // ReSharper disable once CppEntityAssignedButNoRead
                 vec yn(&work[ipar[22] - 1llu], N, false, true);
+                // ReSharper disable once CppDFAUnusedValue
                 yn = xn / precond;
-                continue;
             }
         }
     }
@@ -126,13 +127,7 @@ public:
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
 };
 
-template<sp_d T> class SparseSymmMatFGMRES final : public SparseMatBaseFGMRES<T> {
-public:
-    SparseSymmMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem) {}
-
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseSymmMatFGMRES>(*this); }
-};
+template<sp_d T> using SparseSymmMatFGMRES = SparseMatFGMRES<T>;
 
 #endif
 
