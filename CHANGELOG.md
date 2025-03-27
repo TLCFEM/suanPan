@@ -5,7 +5,6 @@
 1. The `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 2. The `SPIKE` solver may occasionally freeze, to circumvent, try to avoid mixing compilers from different vendors.
 3. The `MUMPS` solver throws segfaults with large matrices, appears to be quite slow.
-4. The `FGMRES` solver requires refinements.
 
 ## version 3.7
 

@@ -19,8 +19,8 @@
  * @brief A SparseMatFGMRES class that holds matrices.
  *
  * @author tlc
- * @date 20/01/2021
- * @version 0.1.0
+ * @date 27/03/2025
+ * @version 0.2.0
  * @file SparseMatFGMRES.hpp
  * @addtogroup MetaMat
  * @{
@@ -32,15 +32,13 @@
 
 #ifdef SUANPAN_MKL
 
-#include <mkl_rci.h>
-#include <mkl_spblas.h>
-#include "csr_form.hpp"
 #include "SparseMat.hpp"
+#include "csr_form.hpp"
+
+#include <mkl_rci.h>
 
 template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {
-    const matrix_descr descr;
-
-    int ipar[128]{};
+    MKL_INT ipar[128]{};
     double dpar[128]{};
 
     podarray<double> work;
@@ -51,9 +49,8 @@ protected:
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
-    SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem, const bool in_sym)
-        : SparseMat<T>(in_row, in_col, in_elem)
-        , descr{in_sym ? SPARSE_MATRIX_TYPE_SYMMETRIC : SPARSE_MATRIX_TYPE_GENERAL, SPARSE_FILL_MODE_FULL, SPARSE_DIAG_NON_UNIT} {}
+    SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem)
+        : SparseMat<T>(in_row, in_col, in_elem) {}
 
     SparseMatBaseFGMRES(const SparseMatBaseFGMRES&) = default;
     SparseMatBaseFGMRES(SparseMatBaseFGMRES&&) noexcept = delete;
@@ -64,7 +61,7 @@ public:
 };
 
 template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
-    const auto N = static_cast<int>(B.n_rows);
+    const auto N = static_cast<MKL_INT>(B.n_rows);
 
     const auto restart = std::min(150, N);
 
@@ -72,47 +69,58 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
 
     X = B;
 
+    const auto precond = this->triplet_mat.diag();
+
     csr_form<T, int> csr_mat(this->triplet_mat);
 
-    int request;
+    MKL_INT request;
+
+    dfgmres_init(&N, nullptr, nullptr, &request, ipar, dpar, work.memptr());
+    if(0 != request) return request;
+
+    ipar[8] = 1;
+    ipar[9] = 0;
+    ipar[11] = 1;
+    dpar[0] = this->setting.tolerance;
 
     for(auto I = 0llu; I < B.n_cols; ++I) {
-        dfgmres_init(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr());
-        if(request != 0) return request;
-
-        ipar[8] = 1;
-        ipar[9] = 0;
-        ipar[11] = 1;
-        dpar[0] = this->setting.tolerance;
-
-        dfgmres_check(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr());
-        if(request == -1100) return request;
-
         while(true) {
             dfgmres(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr());
-            if(request == 0) {
-                int counter;
+            if(-1 == request || -10 == request || -11 == request || -12 == request) {
+                suanpan_error("Error code {} received.\n", request);
+                return -1;
+            }
+            if(0 == request || 4 == request && dpar[6] <= dpar[0]) {
+                MKL_INT counter;
                 dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr(), &counter);
-                if(request != 0) return request;
-                suanpan_debug("Iteration counter: {}.\n", counter);
                 break;
             }
-            if(request != 1) return request;
-            const vec xn(&work[ipar[21] - 1llu], X.n_rows);
-            // ReSharper disable once CppInitializedValueIsAlwaysRewritten
-            // ReSharper disable once CppEntityAssignedButNoRead
-            vec yn(&work[ipar[22] - 1llu], X.n_rows, false, true);
-            yn = csr_mat * xn;
+            if(1 == request) {
+                const vec xn(&work[ipar[21] - 1llu], N);
+                // ReSharper disable once CppInitializedValueIsAlwaysRewritten
+                // ReSharper disable once CppEntityAssignedButNoRead
+                vec yn(&work[ipar[22] - 1llu], N, false, true);
+                yn = csr_mat * xn;
+                continue;
+            }
+            if(3 == request) {
+                const vec xn(&work[ipar[21] - 1llu], N);
+                // ReSharper disable once CppInitializedValueIsAlwaysRewritten
+                // ReSharper disable once CppEntityAssignedButNoRead
+                vec yn(&work[ipar[22] - 1llu], N, false, true);
+                yn = xn / precond;
+                continue;
+            }
         }
     }
 
-    return 0;
+    return request;
 }
 
 template<sp_d T> class SparseMatFGMRES final : public SparseMatBaseFGMRES<T> {
 public:
     SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, false) {}
+        : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem) {}
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
 };
@@ -120,7 +128,7 @@ public:
 template<sp_d T> class SparseSymmMatFGMRES final : public SparseMatBaseFGMRES<T> {
 public:
     SparseSymmMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem, true) {}
+        : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem) {}
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseSymmMatFGMRES>(*this); }
 };
