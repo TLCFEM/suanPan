@@ -37,7 +37,7 @@
 
 #include <mkl_rci.h>
 
-template<sp_d T> class SparseMatFGMRES : public SparseMat<T> {
+template<sp_d T> class SparseMatFGMRES final : public SparseMat<T> {
     MKL_INT ipar[128]{};
     double dpar[128]{};
 
@@ -88,14 +88,14 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
 
     for(auto I = 0llu; I < B.n_cols; ++I) {
         while(true) {
-            dfgmres(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr());
+            dfgmres(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr()); // NOLINT(clang-diagnostic-cast-qual)
             if(-1 == request || -10 == request || -11 == request || -12 == request) {
                 suanpan_error("Error code {} received.\n", request);
                 return -1;
             }
             if(0 == request || 4 == request && dpar[6] <= dpar[0]) {
                 MKL_INT counter;
-                dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr(), &counter);
+                dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr(), &counter); // NOLINT(clang-diagnostic-cast-qual)
                 suanpan_debug("Converged in {} iterations.\n", counter);
                 break;
             }

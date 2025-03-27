@@ -5,7 +5,7 @@
 	</Platforms>
 	<Configurations>
 		<Configuration Name="Release|x64" UseCompiler="ifxCompiler" OutputDirectory="..\..\$(ConfigurationName)\Libs\" ConfigurationType="typeStaticLibrary">
-			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" MultiProcessorCompilation="true" Optimization="optimizeFull" Parallelization="true" Preprocess="preprocessYes" PreprocessorDefinitions="Add_;pord;BLR_MT;GEMMT_AVAILABLE" EnableEnhancedInstructionSet="codeArchAVX" OpenMP="OpenMPParallelCode" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" MultiProcessorCompilation="true" Optimization="optimizeFull" Parallelization="true" Preprocess="preprocessYes" AdditionalIncludeDirectories="../../../Toolbox/mumps-src/mpi-seq" PreprocessorDefinitions="Add_;pord;BLR_MT;GEMMT_AVAILABLE" EnableEnhancedInstructionSet="codeArchAVX" OpenMP="OpenMPParallelCode" FPS4Logicals="true" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
 			<Tool Name="VFLibrarianTool" AdditionalLibraryDirectories="..\..\$(ConfigurationName)\Libs\"/>
 			<Tool Name="VFResourceCompilerTool"/>
 			<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
