@@ -1501,7 +1501,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
     case StorageScheme::SPARSESYMM:
 #ifdef SUANPAN_MKL
-        if(contain_solver_type(SolverType::FGMRES)) return std::make_unique<SparseSymmMatFGMRES<T>>(n_size, n_size, n_elem);
+        if(contain_solver_type(SolverType::FGMRES)) return std::make_unique<SparseMatFGMRES<T>>(n_size, n_size, n_elem);
 #endif
 #ifndef SUANPAN_DISTRIBUTED
         return std::make_unique<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);

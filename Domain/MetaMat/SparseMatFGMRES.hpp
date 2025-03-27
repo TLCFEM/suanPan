@@ -27,8 +27,8 @@
  */
 
 // ReSharper disable CppCStyleCast
-#ifndef SPARSEMATBASEFGMRES_HPP
-#define SPARSEMATBASEFGMRES_HPP
+#ifndef SPARSEMATFGMRES_HPP
+#define SPARSEMATFGMRES_HPP
 
 #ifdef SUANPAN_MKL
 
@@ -37,7 +37,7 @@
 
 #include <mkl_rci.h>
 
-template<sp_d T> class SparseMatBaseFGMRES : public SparseMat<T> {
+template<sp_d T> class SparseMatFGMRES : public SparseMat<T> {
     MKL_INT ipar[128]{};
     double dpar[128]{};
 
@@ -49,20 +49,20 @@ protected:
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
-    SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
+    SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {}
 
-    SparseMatBaseFGMRES(const SparseMatBaseFGMRES&) = default;
-    SparseMatBaseFGMRES(SparseMatBaseFGMRES&&) noexcept = delete;
-    SparseMatBaseFGMRES& operator=(const SparseMatBaseFGMRES&) = delete;
-    SparseMatBaseFGMRES& operator=(SparseMatBaseFGMRES&&) noexcept = delete;
+    SparseMatFGMRES(const SparseMatFGMRES&) = default;
+    SparseMatFGMRES(SparseMatFGMRES&&) noexcept = delete;
+    SparseMatFGMRES& operator=(const SparseMatFGMRES&) = delete;
+    SparseMatFGMRES& operator=(SparseMatFGMRES&&) noexcept = delete;
 
-    ~SparseMatBaseFGMRES() override = default;
+    ~SparseMatFGMRES() override = default;
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatBaseFGMRES>(*this); }
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
 };
 
-template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     const auto N = static_cast<MKL_INT>(B.n_rows);
 
     const auto restart = std::min(150, N);
@@ -120,9 +120,6 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
 
     return request;
 }
-
-template<sp_d T> using SparseMatFGMRES = SparseMatBaseFGMRES<T>;
-template<sp_d T> using SparseSymmMatFGMRES = SparseMatBaseFGMRES<T>;
 
 #endif
 

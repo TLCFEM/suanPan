@@ -272,7 +272,6 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
 #ifdef SUANPAN_MKL
         benchmark_mat_setup<SparseMatPARDISO<double>, double>(I);
         benchmark_mat_setup<SparseMatFGMRES<double>, double>(I);
-        benchmark_mat_setup<SparseSymmMatFGMRES<double>, double>(I);
 #endif
 #ifdef SUANPAN_CUDA
         benchmark_mat_setup<SparseMatCUDA<double>, double>(I);
