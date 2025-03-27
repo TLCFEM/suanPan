@@ -9,7 +9,8 @@
 
 ## version 3.7
 
-1. update `Armadillo` to version `14.4.0`
+1. update `Armadillo` to version `14.4.1`
+2. (breaking) remove general iterative solvers [#250](https://github.com/TLCFEM/suanPan/pull/250)
 
 ## version 3.6
 
