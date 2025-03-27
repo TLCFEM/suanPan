@@ -2812,18 +2812,6 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp">
       <Filter>Domain\MetaMat</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\IterativeSolver.hpp">
-      <Filter>Domain\MetaMat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\Preconditioner.hpp">
-      <Filter>Domain\MetaMat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\ILU.hpp">
-      <Filter>Domain\MetaMat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\Jacobi.hpp">
-      <Filter>Domain\MetaMat</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Element\Beam\NMB21E.h">
       <Filter>Element\Beam</Filter>
     </ClInclude>

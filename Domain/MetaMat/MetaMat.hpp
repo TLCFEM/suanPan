@@ -30,9 +30,7 @@
 #define METAMAT_HPP
 
 #include "triplet_form.hpp"
-#include "IterativeSolver.hpp"
-#include "ILU.hpp"
-#include "Jacobi.hpp"
+#include "SolverSetting.hpp"
 
 template<sp_d T> class MetaMat;
 
@@ -81,10 +79,6 @@ protected:
 
     int direct_solve(Mat<T>& X, SpMat<T>&& B) { return this->direct_solve(X, B); }
 
-    int iterative_solve(Mat<T>&, const Mat<T>&);
-
-    int iterative_solve(Mat<T>& X, const SpMat<T>& B) { return this->iterative_solve(X, Mat<T>(B)); }
-
     template<std::invocable<fmat&> F> int mixed_trs(mat& X, mat&& B, F trs) {
         auto INFO = 0;
 
@@ -92,7 +86,7 @@ protected:
 
         auto multiplier = norm(B);
 
-        auto counter = 0u;
+        auto counter = std::uint8_t{0};
         while(counter++ < this->setting.iterative_refinement) {
             if(multiplier < this->setting.tolerance) break;
 
@@ -148,7 +142,6 @@ public:
     virtual void nullify(uword) = 0;
 
     [[nodiscard]] virtual T max() const = 0;
-    [[nodiscard]] virtual Col<T> diag() const = 0;
 
     /**
      * \brief Access element (read-only), returns zero if out-of-bound
@@ -197,9 +190,11 @@ public:
 
     virtual void operator*=(T) = 0;
 
-    template<typename C> requires is_arma_mat<T, C> int solve(Mat<T>& X, C&& B) { return IterativeSolver::NONE == this->setting.iterative_solver ? this->direct_solve(X, std::forward<C>(B)) : this->iterative_solve(X, std::forward<C>(B)); }
+    template<typename C> requires is_arma_mat<T, C>
+    int solve(Mat<T>& X, C&& B) { return this->direct_solve(X, std::forward<C>(B)); }
 
-    template<typename C> requires is_arma_mat<T, C> Mat<T> solve(C&& B) {
+    template<typename C> requires is_arma_mat<T, C>
+    Mat<T> solve(C&& B) {
         Mat<T> X;
 
         if(SUANPAN_SUCCESS != this->solve(X, std::forward<C>(B))) throw std::runtime_error("fail to solve the system");
@@ -219,49 +214,7 @@ public:
     virtual void csc_condense() {}
 
     virtual void csr_condense() {}
-
-    [[nodiscard]] Col<T> evaluate(const Col<T>& X) const { return this->operator*(X); }
 };
-
-template<sp_d T> int MetaMat<T>::iterative_solve(Mat<T>& X, const Mat<T>& B) {
-    this->csc_condense();
-
-    X.zeros(arma::size(B));
-
-    unique_ptr<Preconditioner<T>> preconditioner;
-    if(PreconditionerType::JACOBI == this->setting.preconditioner_type) preconditioner = std::make_unique<Jacobi<T>>(this->diag());
-#ifndef SUANPAN_SUPERLUMT
-    else if(PreconditionerType::ILU == this->setting.preconditioner_type) {
-        if(this->triplet_mat.is_empty()) preconditioner = std::make_unique<ILU<T>>(to_triplet_form<T, int>(this));
-        else preconditioner = std::make_unique<ILU<T>>(this->triplet_mat);
-    }
-#endif
-    else if(PreconditionerType::NONE == this->setting.preconditioner_type) preconditioner = std::make_unique<UnityPreconditioner<T>>();
-
-    if(SUANPAN_SUCCESS != preconditioner->init()) return SUANPAN_FAIL;
-
-    this->setting.preconditioner = preconditioner.get();
-
-    std::atomic_int code = 0;
-
-    if(IterativeSolver::GMRES == setting.iterative_solver)
-        suanpan::for_each(B.n_cols, [&](const uword I) {
-            Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
-            const Col<T> sub_b(B.colptr(I), B.n_rows);
-            auto col_setting = setting;
-            code += GMRES(this, sub_x, sub_b, col_setting);
-        });
-    else if(IterativeSolver::BICGSTAB == setting.iterative_solver)
-        suanpan::for_each(B.n_cols, [&](const uword I) {
-            Col<T> sub_x(X.colptr(I), X.n_rows, false, true);
-            const Col<T> sub_b(B.colptr(I), B.n_rows);
-            auto col_setting = setting;
-            code += BiCGSTAB(this, sub_x, sub_b, col_setting);
-        });
-    else throw invalid_argument("no proper iterative solver assigned but somehow iterative solving is called");
-
-    return 0 == code ? SUANPAN_SUCCESS : SUANPAN_FAIL;
-}
 
 template<sp_d T> Mat<T> to_mat(const MetaMat<T>& in_mat) {
     Mat<T> out_mat(in_mat.n_rows, in_mat.n_cols);

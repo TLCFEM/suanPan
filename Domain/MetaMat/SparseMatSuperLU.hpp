@@ -274,7 +274,7 @@ template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in
 
         auto multiplier = arma::norm(in_mat);
 
-        auto counter = 0u;
+        auto counter = std::uint8_t{0};
         while(counter++ < this->setting.iterative_refinement) {
             if(multiplier < this->setting.tolerance) break;
 

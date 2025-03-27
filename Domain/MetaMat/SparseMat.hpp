@@ -55,8 +55,6 @@ public:
 
     [[nodiscard]] T max() const override { return this->triplet_mat.max(); }
 
-    [[nodiscard]] Col<T> diag() const override { return this->triplet_mat.diag(); }
-
     T operator()(const uword in_row, const uword in_col) const override { return this->triplet_mat(in_row, in_col); }
 
     T& at(const uword in_row, const uword in_col) override {

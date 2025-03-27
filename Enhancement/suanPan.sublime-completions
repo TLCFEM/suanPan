@@ -187,12 +187,6 @@
       "contents": "orientation B3DOSL ${1:(1)} ${2:(2..4)}\n# (1) int, unique orientation tag\n# (2..4) double, three components of local z axis"
     },
     {
-      "trigger": "BICGSTAB",
-      "details": "bicgstab solver",
-      "kind": "keyword",
-      "contents": "set system_solver BICGSTAB"
-    },
-    {
       "trigger": "BWBN",
       "details": "bouc-wen-baber-noori model",
       "kind": "type",
@@ -1039,12 +1033,6 @@
       "contents": "element GCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
-      "trigger": "GMRES",
-      "details": "gmres solver",
-      "kind": "keyword",
-      "contents": "set system_solver GMRES"
-    },
-    {
       "trigger": "GQ12",
       "details": "quadrilateral with drilling dofs",
       "kind": "type",
@@ -1111,12 +1099,6 @@
       "contents": "section HSection2D ${1:(1)} ${2:(2...7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2...7) double, section dimensions\n# (8) int, material tag\n# [9] int, number of integration points, default: 6\n# [10] double, eccentricity measured from the centre, default: 0.0"
     },
     {
-      "trigger": "ILU",
-      "details": "ilu preconditioner",
-      "kind": "keyword",
-      "contents": "set preconditioner ILU"
-    },
-    {
       "trigger": "ISection2D",
       "details": "2d i-section",
       "kind": "type",
@@ -1139,12 +1121,6 @@
       "details": "3d isotropic elastic material",
       "kind": "type",
       "contents": "material IsotropicElastic3D ${1:(1)} ${2:(2)} ${3:[3]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# [3] double, density, default: 0"
-    },
-    {
-      "trigger": "Jacobi",
-      "details": "jacobi preconditioner",
-      "kind": "keyword",
-      "contents": "set preconditioner Jacobi"
     },
     {
       "trigger": "Joint",
@@ -2488,13 +2464,7 @@
       "trigger": "precision",
       "details": "set solving precision",
       "kind": "keyword",
-      "contents": "set precision ${1:(1)}\n# (1) string, preconditioner type, full or mixed"
-    },
-    {
-      "trigger": "preconditioner",
-      "details": "set preconditioner algorithm",
-      "kind": "keyword",
-      "contents": "set preconditioner ${1:(1)}\n# (1) string, preconditioner type, one of Jacobi, ILU and None"
+      "contents": "set precision ${1:(1)}\n# (1) string, precision type, full or mixed"
     },
     {
       "trigger": "protect",

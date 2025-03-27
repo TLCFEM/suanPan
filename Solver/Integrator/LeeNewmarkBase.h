@@ -35,7 +35,7 @@
 
 class LeeNewmarkBase : public Newmark {
 public:
-    enum class StiffnessType {
+    enum class StiffnessType : std::uint8_t {
         INITIAL,
         CURRENT,
         TRIAL
@@ -47,8 +47,6 @@ protected:
     const StiffnessType stiffness_type;
 
     bool first_iteration = true;
-
-    bool if_iterative = false;
 
     vec current_internal, trial_internal;
 

@@ -17,7 +17,7 @@ step static 1
 set ini_step_size 1E-1
 set fixed_step_size 1
 set sparse_mat 1
-set system_solver PARDISO
+# set system_solver PARDISO
 
 converger RelIncreDisp 1 1E-8 20 1
 

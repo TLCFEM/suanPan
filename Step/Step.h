@@ -115,12 +115,10 @@ public:
     void set_max_step_size(double);
     void set_max_substep(unsigned);
     void set_system_solver(SolverType);
-    void set_system_solver(IterativeSolver);
     void set_sub_system_solver(SolverType);
-    void set_preconditioner(PreconditionerType);
     void set_precision(Precision);
     void set_tolerance(double);
-    void set_refinement(unsigned);
+    void set_refinement(std::uint8_t);
     void set_lis_option(std::string_view);
 #ifdef SUANPAN_MAGMA
     void set_magma_option(const magma_dopts& magma_opt) { magma_setting = magma_opt; }

@@ -349,11 +349,6 @@ LeeNewmarkFull::LeeNewmarkFull(const unsigned T, std::vector<Mode>&& M, const do
 int LeeNewmarkFull::initialize() {
     if(SUANPAN_SUCCESS != LeeNewmarkBase::initialize()) return SUANPAN_FAIL;
 
-    if(if_iterative && PreconditionerType::ILU != factory->get_solver_setting().preconditioner_type) {
-        suanpan_error("Iterative solver with preconditioner other than ILU is not supported, please consider LeeNewmark.\n");
-        return SUANPAN_FAIL;
-    }
-
     if(factory->is_sparse()) return SUANPAN_SUCCESS;
 
     suanpan_error("The sparse storage needs to be enabled via \"set sparse_mat true\".\n");
@@ -423,8 +418,8 @@ int LeeNewmarkFull::process_constraint() {
             case StiffnessType::CURRENT:
                 D->assemble_current_geometry();
                 break;
+            // initial geometry mostly like to be empty but may contain something if initially loaded
             case StiffnessType::INITIAL:
-                // initial geometry mostly like to be empty but may contain something if initially loaded
                 D->assemble_initial_geometry();
                 break;
             }

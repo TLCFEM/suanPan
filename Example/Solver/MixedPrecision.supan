@@ -8,16 +8,15 @@ material Elastic2D 1 12 .1 1E-4
 element CP3 1 1 2 3 1 1
 element CP3 2 1 3 4 1 1
 
-fix2 1 1 1 4
-fix2 2 2 1
+fix 1 1 1 4
+fix 2 2 1
 
 cload 1 0 1 2 2 3
 
 step static 1
-set sparse_mat 1
-set system_solver GMRES
-
-converger RelIncreDisp 1 1E-8 20 1
+set precision mixed
+set tolerance 1E-13
+set iterative_refinement 3
 
 analyze
 
@@ -27,15 +26,15 @@ analyze
 # Displacement:
 #   1.4979e-01  6.4167e-01
 # Resistance:
-#  -4.4409e-16  1.0000e+00
-# 
+#   1.1102e-15  1.0000e+00
+#
 # Node 3:
 # Coordinate:
 #   5.0000e-01  5.0000e-01
 # Displacement:
 #  -1.6646e-01  6.0813e-01
 # Resistance:
-#   0.0000e+00  1.0000e+00
+#  -4.4409e-16  1.0000e+00
 peek node 2 3
 
 reset

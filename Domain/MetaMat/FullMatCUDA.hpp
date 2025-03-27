@@ -147,7 +147,7 @@ template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
         auto multiplier = norm(full_residual);
 
-        auto counter = 0u;
+        auto counter = std::uint8_t{0};
         while(counter++ < this->setting.iterative_refinement) {
             if(multiplier < this->setting.tolerance) break;
 

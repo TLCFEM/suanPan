@@ -195,8 +195,6 @@ public:
     }
 
     [[nodiscard]] int sign_det() const override {
-        if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");
-
         int det_sign;
 
         if constexpr(std::is_same_v<T, float>) det_sign = smumps_job.rinfog[11] < 0.f ? -1 : 1;
