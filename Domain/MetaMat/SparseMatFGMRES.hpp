@@ -49,7 +49,7 @@ protected:
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
-    SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem)
+    SparseMatBaseFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {}
 
     SparseMatBaseFGMRES(const SparseMatBaseFGMRES&) = default;
@@ -58,6 +58,8 @@ public:
     SparseMatBaseFGMRES& operator=(SparseMatBaseFGMRES&&) noexcept = delete;
 
     ~SparseMatBaseFGMRES() override = default;
+
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatBaseFGMRES>(*this); }
 };
 
 template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
@@ -119,15 +121,8 @@ template<sp_d T> int SparseMatBaseFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T
     return request;
 }
 
-template<sp_d T> class SparseMatFGMRES final : public SparseMatBaseFGMRES<T> {
-public:
-    SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMatBaseFGMRES<T>(in_row, in_col, in_elem) {}
-
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
-};
-
-template<sp_d T> using SparseSymmMatFGMRES = SparseMatFGMRES<T>;
+template<sp_d T> using SparseMatFGMRES = SparseMatBaseFGMRES<T>;
+template<sp_d T> using SparseSymmMatFGMRES = SparseMatBaseFGMRES<T>;
 
 #endif
 
