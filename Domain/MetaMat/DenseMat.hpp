@@ -82,12 +82,6 @@ public:
         return max_value;
     }
 
-    [[nodiscard]] Col<T> diag() const override {
-        Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
-        suanpan::for_each(diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
-        return diag_vec;
-    }
-
     [[nodiscard]] const T* memptr() const override { return memory.get(); }
 
     T* memptr() override { return memory.get(); }

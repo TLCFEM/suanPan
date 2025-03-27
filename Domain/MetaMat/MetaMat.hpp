@@ -142,7 +142,6 @@ public:
     virtual void nullify(uword) = 0;
 
     [[nodiscard]] virtual T max() const = 0;
-    [[nodiscard]] virtual Col<T> diag() const = 0;
 
     /**
      * \brief Access element (read-only), returns zero if out-of-bound
