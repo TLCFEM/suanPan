@@ -325,7 +325,7 @@ else ()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
     endif ()
-    
+
     link_libraries(dl pthread gfortran)
 
     find_library(HAS_QUADMATH quadmath)
@@ -333,11 +333,11 @@ else ()
         link_libraries(quadmath)
     endif ()
 
-    if (COMPILER_IDENTIFIER MATCHES "gcc-win")
-        set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -static-libgcc -static-libstdc++")
-        set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -static-libgcc -static-libstdc++")
-        set(CMAKE_Fortran_LINK_FLAGS "${CMAKE_Fortran_LINK_FLAGS} -static-libgfortran -static-libquadmath")
-    endif ()
+    #    if (COMPILER_IDENTIFIER MATCHES "gcc-win")
+    #        set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -static-libgcc -static-libstdc++")
+    #        set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -static-libgcc -static-libstdc++")
+    #        set(CMAKE_Fortran_LINK_FLAGS "${CMAKE_Fortran_LINK_FLAGS} -static-libgfortran -static-libquadmath")
+    #    endif ()
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
         link_libraries(stdc++)
