@@ -210,7 +210,7 @@ template<typename T, typename ET> void benchmark_mat_setup(const int I) {
     const auto C = randu<Col<ET>>(I);
 
     Mat<ET> V(I, 5, fill::ones);
-    V.col(2) += 10 * C;
+    V.col(2) += 10 * C + 10;
 
     auto B = spdiags(V, ivec{-2, -1, 0, +1, +2}, I, I);
 
