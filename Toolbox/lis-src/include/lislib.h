@@ -29,7 +29,6 @@
 
 #include "lis.h"
 #include "lis_esolver.h"
-#include "lis_fortran.h"
 #include "lis_io.h"
 #include "lis_matrix.h"
 #include "lis_matvec.h"

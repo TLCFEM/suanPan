@@ -287,7 +287,7 @@ elseif (USE_AVX)
 endif ()
 
 if (USE_64BIT_INDEXING)
-    add_compile_definitions(ARMA_BLAS_64BIT_INT)
+    add_compile_definitions(SUANSPAN_64BIT_INT)
 endif ()
 
 if (COMPILER_IDENTIFIER MATCHES "vs")

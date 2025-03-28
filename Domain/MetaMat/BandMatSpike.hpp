@@ -30,8 +30,19 @@
 #ifndef BANDMATSPIKE_HPP
 #define BANDMATSPIKE_HPP
 
-#include <feast/spike.h>
 #include "DenseMat.hpp"
+
+extern "C" {
+void spikeinit_(la_it*, la_it*, la_it*);
+void dspike_tune_(la_it*);
+void dspike_gbsv_(la_it*, la_it*, la_it*, la_it*, la_it*, double*, la_it*, double*, la_it*, la_it*);
+void dspike_gbtrf_(la_it*, la_it*, la_it*, la_it*, double*, la_it*, double*, la_it*);
+void dspike_gbtrs_(la_it*, const char*, la_it*, la_it*, la_it*, la_it*, double*, la_it*, double*, double*, la_it*);
+void sspike_tune_(la_it*);
+void sspike_gbsv_(la_it*, la_it*, la_it*, la_it*, la_it*, float*, la_it*, float*, la_it*, la_it*);
+void sspike_gbtrf_(la_it*, la_it*, la_it*, la_it*, float*, la_it*, float*, la_it*);
+void sspike_gbtrs_(la_it*, const char*, la_it*, la_it*, la_it*, la_it*, float*, la_it*, float*, float*, la_it*);
+}
 
 template<sp_d T> class BandMatSpike final : public DenseMat<T> {
     static constexpr char TRAN = 'N';
@@ -42,14 +53,14 @@ template<sp_d T> class BandMatSpike final : public DenseMat<T> {
     const uword u_band;
     const uword m_rows; // memory block layout
 
-    int SPIKE[64]{};
+    la_it SPIKE[64]{};
 
     podarray<T> WORK;
     podarray<float> SWORK;
 
     void init_spike() {
-        auto N = static_cast<int>(this->n_rows);
-        auto KLU = static_cast<int>(std::max(l_band, u_band));
+        auto N = static_cast<la_it>(this->n_rows);
+        auto KLU = static_cast<la_it>(std::max(l_band, u_band));
 
         spikeinit_(SPIKE, &N, &KLU);
 
@@ -79,7 +90,8 @@ public:
     }
 
     T operator()(const uword in_row, const uword in_col) const override {
-        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]
+            return bin = T(0);
         return this->memory[in_row + u_band + in_col * (m_rows - 1)];
     }
 
@@ -89,7 +101,8 @@ public:
     }
 
     T& at(const uword in_row, const uword in_col) override {
-        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]
+            return bin = T(0);
         return this->unsafe_at(in_row, in_col);
     }
 
@@ -103,12 +116,12 @@ template<sp_d T> T BandMatSpike<T>::bin = T(0);
 template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     Mat<T> Y(arma::size(X));
 
-    const auto M = static_cast<int>(this->n_rows);
-    const auto N = static_cast<int>(this->n_cols);
-    const auto KL = static_cast<int>(l_band);
-    const auto KU = static_cast<int>(u_band);
-    const auto LDA = static_cast<int>(m_rows);
-    constexpr auto INC = 1;
+    const auto M = static_cast<la_it>(this->n_rows);
+    const auto N = static_cast<la_it>(this->n_cols);
+    const auto KL = static_cast<la_it>(l_band);
+    const auto KU = static_cast<la_it>(u_band);
+    const auto LDA = static_cast<la_it>(m_rows);
+    constexpr la_it INC = 1;
     T ALPHA = T(1);
     T BETA = T(0);
 
@@ -128,12 +141,12 @@ template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(!this->factored) {
         suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
-        auto INFO = 0;
+        la_it INFO = 0;
 
-        auto N = static_cast<int>(this->n_rows);
-        auto KL = static_cast<int>(l_band);
-        auto KU = static_cast<int>(u_band);
-        auto LDAB = static_cast<int>(m_rows);
+        auto N = static_cast<la_it>(this->n_rows);
+        auto KL = static_cast<la_it>(l_band);
+        auto KU = static_cast<la_it>(u_band);
+        auto LDAB = static_cast<la_it>(m_rows);
         const auto KLU = std::max(l_band, u_band);
         this->factored = true;
 
@@ -163,12 +176,12 @@ template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 }
 
 template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
-    auto N = static_cast<int>(this->n_rows);
-    auto KL = static_cast<int>(l_band);
-    auto KU = static_cast<int>(u_band);
-    auto NRHS = static_cast<int>(B.n_cols);
-    auto LDAB = static_cast<int>(m_rows);
-    auto LDB = static_cast<int>(B.n_rows);
+    auto N = static_cast<la_it>(this->n_rows);
+    auto KL = static_cast<la_it>(l_band);
+    auto KU = static_cast<la_it>(u_band);
+    auto NRHS = static_cast<la_it>(B.n_cols);
+    auto LDAB = static_cast<la_it>(m_rows);
+    auto LDB = static_cast<la_it>(B.n_rows);
 
     if constexpr(std::is_same_v<T, float>) {
         using E = float;

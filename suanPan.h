@@ -42,6 +42,10 @@
 #define ARMA_USE_HDF5
 #endif
 
+#ifdef SUANSPAN_64BIT_INT
+#define ARMA_BLAS_64BIT_INT
+#endif
+
 #ifdef SUANPAN_MAGMA
 #ifndef SUANPAN_CUDA
 #undef SUANPAN_MAGMA

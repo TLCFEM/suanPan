@@ -12,6 +12,7 @@ add_compile_definitions(metis)
 
 if (USE_64BIT_INDEXING)
     add_compile_definitions(MUMPS_INTSIZE64 PORD_INTSIZE64)
+    message(STATUS "Using 64-bit indexing for MUMPS")
 endif ()
 
 if (USE_MKL)

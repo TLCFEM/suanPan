@@ -4,6 +4,11 @@ project(metis C)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
+if (USE_64BIT_INDEXING) 
+    add_compile_definitions(IDXTYPEWIDTH=64)
+    message(STATUS "Using 64-bit indexing for METIS")
+endif()
+
 if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
 else ()

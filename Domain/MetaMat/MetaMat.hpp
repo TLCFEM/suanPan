@@ -32,7 +32,11 @@
 #include "SolverSetting.hpp"
 #include "triplet_form.hpp"
 
-using la_it = int;
+#ifdef SUANSPAN_64BIT_INT
+using la_it = std::int64_t;
+#else
+using la_it = std::int32_t;
+#endif
 
 template<sp_d T> class MetaMat;
 

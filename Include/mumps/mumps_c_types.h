@@ -19,7 +19,7 @@
 
 #include <stdint.h>
 
-#ifdef MUMPS_INTSIZE64
+#ifdef SUANSPAN_64BIT_INT
 #define MUMPS_INT int64_t
 #else
 #define MUMPS_INT int

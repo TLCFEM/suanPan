@@ -30,8 +30,9 @@
  GCC does provides these definitions in stdint.h, but it may require some
  modifications on other architectures.
 --------------------------------------------------------------------------*/
+#ifndef IDXTYPEWIDTH
 #define IDXTYPEWIDTH 32
-
+#endif
 
 /*--------------------------------------------------------------------------
  Specifies the data type that will hold floating-point style information.

@@ -4,6 +4,11 @@ project(lis C)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
+if (USE_64BIT_INDEXING)
+    add_compile_definitions(_LONG__LONG)
+    message(STATUS "Using 64-bit indexing for LIS")
+endif ()
+
 set(CMAKE_C_STANDARD 11)
 
 file(GLOB_RECURSE lis_src **/*.c)
