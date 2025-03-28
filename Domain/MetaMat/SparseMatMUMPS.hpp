@@ -68,11 +68,12 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
     }
 
     auto init_config() {
-        id.icntl[3] = 0;  // level of printing for error, warning, and diagnostic messages
-        id.icntl[9] = 2;  // iterative refinement to the computed solution
-        id.icntl[19] = 0; // dense rhs
-        id.icntl[32] = 1; // determinant
-        id.icntl[34] = 1; // BLR
+        id.icntl[3] = 0;   // level of printing for error, warning, and diagnostic messages
+        id.icntl[9] = 2;   // iterative refinement to the computed solution
+        id.icntl[13] = 50; // percentage increase in the estimated working space
+        id.icntl[19] = 0;  // dense rhs
+        id.icntl[32] = 1;  // determinant
+        id.icntl[34] = 1;  // BLR
     }
 
 protected:
