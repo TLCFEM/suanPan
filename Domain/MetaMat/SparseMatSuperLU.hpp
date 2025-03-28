@@ -30,9 +30,10 @@
 #ifndef SPARSEMATSUPERLU_HPP
 #define SPARSEMATSUPERLU_HPP
 
-#include <superlu-mt/superlu-mt.h>
 #include "SparseMat.hpp"
 #include "csc_form.hpp"
+
+#include <superlu-mt/superlu-mt.h>
 
 template<sp_d T> class SparseMatSuperLU final : public SparseMat<T> {
     SuperMatrix A{}, L{}, U{}, B{};
@@ -56,6 +57,8 @@ template<sp_d T> class SparseMatSuperLU final : public SparseMat<T> {
 
     bool allocated = false;
 
+    auto init_config();
+
     template<sp_d ET> void alloc(csc_form<ET, int>&&);
     void dealloc();
 
@@ -78,10 +81,23 @@ public:
     SparseMatSuperLU& operator=(SparseMatSuperLU&&) noexcept = delete;
     ~SparseMatSuperLU() override;
 
-    void zeros() override;
-
     unique_ptr<MetaMat<T>> make_copy() override;
 };
+
+template<sp_d T> auto SparseMatSuperLU<T>::init_config() {
+#ifndef SUANPAN_SUPERLUMT
+    set_default_options(&options);
+    options.IterRefine = std::is_same_v<T, float> ? superlu::IterRefine_t::SLU_SINGLE : superlu::IterRefine_t::SLU_DOUBLE;
+    options.Equil = superlu::yes_no_t::NO;
+
+    arrayops::fill_zeros(reinterpret_cast<char*>(&stat), sizeof(SuperLUStat_t));
+
+    StatInit(&stat);
+#else
+    StatAlloc(static_cast<int>(this->n_cols), SUANPAN_NUM_THREADS, sp_ienv(1), sp_ienv(2), &stat);
+    StatInit(static_cast<int>(this->n_cols), SUANPAN_NUM_THREADS, &stat);
+#endif
+}
 
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, int>&& in) {
     dealloc();
@@ -169,45 +185,14 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::full_solve(int& fla
 }
 
 template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const uword in_row, const uword in_col, const uword in_elem)
-    : SparseMat<T>(in_row, in_col, in_elem) {
-#ifndef SUANPAN_SUPERLUMT
-    set_default_options(&options);
-    options.IterRefine = std::is_same_v<T, float> ? superlu::IterRefine_t::SLU_SINGLE : superlu::IterRefine_t::SLU_DOUBLE;
-    options.Equil = superlu::yes_no_t::NO;
-
-    arrayops::fill_zeros(reinterpret_cast<char*>(&stat), sizeof(SuperLUStat_t));
-
-    StatInit(&stat);
-#else
-    StatAlloc(static_cast<int>(in_col), SUANPAN_NUM_THREADS, sp_ienv(1), sp_ienv(2), &stat);
-    StatInit(static_cast<int>(in_col), SUANPAN_NUM_THREADS, &stat);
-#endif
-}
+    : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
 template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& other)
-    : SparseMat<T>(other) {
-#ifndef SUANPAN_SUPERLUMT
-    set_default_options(&options);
-    options.IterRefine = std::is_same_v<T, float> ? superlu::IterRefine_t::SLU_SINGLE : superlu::IterRefine_t::SLU_DOUBLE;
-    options.Equil = superlu::yes_no_t::NO;
-
-    arrayops::fill_zeros(reinterpret_cast<char*>(&stat), sizeof(SuperLUStat_t));
-
-    StatInit(&stat);
-#else
-    StatAlloc(static_cast<int>(other.n_cols), SUANPAN_NUM_THREADS, sp_ienv(1), sp_ienv(2), &stat);
-    StatInit(static_cast<int>(other.n_cols), SUANPAN_NUM_THREADS, &stat);
-#endif
-}
+    : SparseMat<T>(other) { init_config(); }
 
 template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
     dealloc();
     StatFree(&stat);
-}
-
-template<sp_d T> void SparseMatSuperLU<T>::zeros() {
-    SparseMat<T>::zeros();
-    dealloc();
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU>(*this); }
@@ -217,82 +202,27 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&&
 
     this->factored = true;
 
+    alloc(csc_form<T, int>(this->triplet_mat));
+
+    wrap_b(in_mat);
+
     auto flag = 0;
 
-    if constexpr(std::is_same_v<T, float>) {
-        alloc(csc_form<float, int>(this->triplet_mat));
+    full_solve<T>(flag);
 
-        wrap_b(in_mat);
-
-        full_solve<float>(flag);
-
-        out_mat = std::move(in_mat);
-    }
-    else if(Precision::FULL == this->setting.precision) {
-        alloc(csc_form<double, int>(this->triplet_mat));
-
-        wrap_b(in_mat);
-
-        full_solve<double>(flag);
-
-        out_mat = std::move(in_mat);
-    }
-    else {
-        alloc(csc_form<float, int>(this->triplet_mat));
-
-        const fmat f_mat(arma::size(in_mat), fill::none);
-
-        wrap_b(f_mat);
-
-        full_solve<float>(flag);
-
-        if(0 == flag) flag = solve_trs(out_mat, std::forward<Mat<T>>(in_mat));
-    }
+    out_mat = std::move(in_mat);
 
     return flag;
 }
 
 template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in_mat) {
+    wrap_b(in_mat);
+
     auto flag = 0;
 
-    if constexpr(std::is_same_v<T, float>) {
-        wrap_b(in_mat);
+    tri_solve<T>(flag);
 
-        tri_solve<float>(flag);
-
-        out_mat = std::move(in_mat);
-    }
-    else if(Precision::FULL == this->setting.precision) {
-        wrap_b(in_mat);
-
-        tri_solve<double>(flag);
-
-        out_mat = std::move(in_mat);
-    }
-    else {
-        out_mat.zeros(arma::size(in_mat));
-
-        auto multiplier = arma::norm(in_mat);
-
-        auto counter = std::uint8_t{0};
-        while(counter++ < this->setting.iterative_refinement) {
-            if(multiplier < this->setting.tolerance) break;
-
-            auto residual = conv_to<fmat>::from(in_mat / multiplier);
-
-            wrap_b(residual);
-
-            tri_solve<float>(flag);
-
-            if(0 != flag) break;
-
-            const mat incre = multiplier * conv_to<mat>::from(residual);
-
-            out_mat += incre;
-
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(in_mat -= this->operator*(incre)));
-        }
-    }
+    out_mat = std::move(in_mat);
 
     return flag;
 }
