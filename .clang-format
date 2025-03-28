@@ -47,7 +47,7 @@ AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: No
 AttributeMacros:
   - __capability
-BinPackArguments: false
+BinPackArguments: true
 BinPackParameters: false
 BitFieldColonSpacing: Both
 BraceWrapping:
