@@ -10,6 +10,10 @@ add_compile_definitions(Add_)
 add_compile_definitions(pord)
 add_compile_definitions(metis)
 
+if (USE_64BIT_INDEXING)
+    add_compile_definitions(MUMPS_INTSIZE64)
+endif ()
+
 if (USE_MKL)
     add_compile_definitions(GEMMT_AVAILABLE)
 endif ()

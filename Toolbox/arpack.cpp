@@ -21,19 +21,19 @@
 #include <Domain/MetaMat/operator_times.hpp>
 
 int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& K, const std::shared_ptr<MetaMat<double>>& M, const unsigned num, const char* form) {
-    auto IDO = 0;
+    blas_int IDO = 0;
     auto BMAT = 'G'; // generalized eigenvalue problem A*x=lambda*M*x
-    auto N = static_cast<int>(K->n_cols);
+    auto N = static_cast<blas_int>(K->n_cols);
     char WHICH[2];
     for(auto I = 0; I < 2; ++I) WHICH[I] = form[I];
-    auto NEV = std::min(static_cast<int>(num), N - 1);
+    auto NEV = std::min(static_cast<blas_int>(num), N - 1);
     auto TOL = 0.;
     auto NCV = std::min(2 * NEV, N);
     auto LDV = N;
     auto LWORKL = 2 * NCV * (NCV + 8);
-    auto INFO = 0;
+    blas_int INFO = 0;
 
-    int IPARAM[11]{}, IPNTR[14]{};
+    blas_int IPARAM[11]{}, IPNTR[14]{};
     podarray<double> RESID(N), V(uword(N) * uword(NCV)), WORKD(5 * uword(N)), WORKL(LWORKL);
 
     IPARAM[0] = 1;    // exact shift
@@ -60,6 +60,7 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
         }
         else if(2 == IDO) {
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
+            // ReSharper disable once CppDFAUnusedValue
             Y = K * X;
         }
         else if(0 != INFO) break;
@@ -72,11 +73,11 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
 
     suanpan_debug("Arnoldi iteration counter: {}.\n", IPARAM[2]);
 
-    auto RVEC = 1;
+    blas_int RVEC = 1;
     auto HOWMNY = 'A';
     auto LDZ = N;
 
-    podarray<int> SELECT(NCV);
+    podarray<blas_int> SELECT(NCV);
 
     eigval.set_size(NEV);
     eigvec.set_size(N, NEV);
@@ -87,19 +88,19 @@ int eig_solve(vec& eigval, mat& eigvec, const std::shared_ptr<MetaMat<double>>& 
 }
 
 int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<double>>& K, const std::shared_ptr<MetaMat<double>>& M, const unsigned num, const char* form) {
-    auto IDO = 0;
+    blas_int IDO = 0;
     auto BMAT = 'G'; // standard eigenvalue problem A*x=lambda*x
-    auto N = static_cast<int>(K->n_rows);
+    auto N = static_cast<blas_int>(K->n_rows);
     char WHICH[2];
     for(auto I = 0; I < 2; ++I) WHICH[I] = form[I];
-    auto NEV = std::min(static_cast<int>(num), N - 2);
+    auto NEV = std::min(static_cast<blas_int>(num), N - 2);
     auto TOL = 0.;
     auto NCV = std::min(std::max(NEV + 3, 2 * NEV + 1), N);
     auto LDV = N;
     auto LWORKL = 3 * NCV * (NCV + 2);
-    auto INFO = 0;
+    blas_int INFO = 0;
 
-    int IPARAM[11]{}, IPNTR[14]{};
+    blas_int IPARAM[11]{}, IPNTR[14]{};
     podarray<double> RESID(N), V(N * uword(NCV)), WORKD(3llu * N), WORKL(LWORKL);
 
     IPARAM[0] = 1;    // exact shift
@@ -127,6 +128,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
         }
         else if(2 == IDO) {
             const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
+            // ReSharper disable once CppDFAUnusedValue
             Y = M * X;
         }
         else if(0 != INFO) break;
@@ -137,11 +139,11 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const std::shared_ptr<MetaMat<doub
         return SUANPAN_FAIL;
     }
 
-    auto RVEC = 1;
+    blas_int RVEC = 1;
     auto HOWMNY = 'A';
     auto LDZ = N;
 
-    podarray<int> SELECT(NCV);
+    podarray<blas_int> SELECT(NCV);
     podarray<double> DR(NEV + 1llu), DI(NEV + 1llu), Z(N * (NEV + 1llu)), WORKEV(3llu * NCV);
 
     arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), Z.memptr(), &LDZ, &SIGMAR, &SIGMAI, WORKEV.memptr(), &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &LDV, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);

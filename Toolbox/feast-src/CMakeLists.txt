@@ -22,7 +22,7 @@ set(SPIKE_SRC
 )
 
 if (USE_MKL)
-    add_definitions(-DMKL)
+    add_compile_definitions(MKL)
 endif ()
 
 if (NOT COMPILER_IDENTIFIER MATCHES "vs") # GNU GCC COMPILER
