@@ -78,7 +78,11 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
 protected:
     int direct_solve(Mat<T>& X, Mat<T>&& B) override {
         if(!this->factored) {
-            coo_mat = triplet_form<T, la_it>(0 == sym ? this->triplet_mat : this->triplet_mat.lower(), SparseBase::ONE, false);
+            if(0 == sym) coo_mat = triplet_form<T, la_it>(this->triplet_mat, SparseBase::ONE, false);
+            else {
+                auto lower_mat = this->triplet_mat.lower();
+                coo_mat = triplet_form<T, la_it>(lower_mat, SparseBase::ONE, false);
+            }
 
             id.n = coo_mat.n_rows;
             id.nnz = coo_mat.n_elem;
@@ -93,7 +97,7 @@ protected:
 
         id.lrhs = B.n_rows;
         id.nrhs = B.n_cols;
-        id.rhs = (entry_t*)B.data;
+        id.rhs = (entry_t*)B.memptr();
 
         perform_job(3);
 
