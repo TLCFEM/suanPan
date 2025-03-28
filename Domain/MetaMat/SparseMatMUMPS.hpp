@@ -67,6 +67,14 @@ template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
         mumps::struc<T>::mumps_c(&id);
     }
 
+    auto init_config() {
+        id.icntl[3] = 0;  // level of printing for error, warning, and diagnostic messages
+        id.icntl[9] = 2;  // iterative refinement to the computed solution
+        id.icntl[19] = 0; // dense rhs
+        id.icntl[32] = 1; // determinant
+        id.icntl[34] = 1; // BLR
+    }
+
 protected:
     int direct_solve(Mat<T>& X, Mat<T>&& B) override {
         if(!this->factored) {
@@ -101,12 +109,16 @@ protected:
 public:
     SparseMatBaseMUMPS(const uword in_row, const uword in_col, const uword in_elem, const int in_sym)
         : SparseMat<T>(in_row, in_col, in_elem)
-        , sym(in_sym) { perform_job(-1); }
+        , sym(in_sym) {
+        perform_job(-1);
+        init_config();
+    }
 
     SparseMatBaseMUMPS(const SparseMatBaseMUMPS& other)
         : SparseMat<T>(other)
         , sym(other.sym) {
         perform_job(-1);
+        init_config();
         this->factored = false;
     }
 
