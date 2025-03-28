@@ -15,428 +15,431 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+// ReSharper disable IdentifierTypo
 #include "ConstraintParser.h"
 #include <Constraint/Constraint>
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Recorder/OutputType.h>
 
-void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bool penalty, const bool group) {
-    unsigned bc_id;
-    if(!get_input(command, bc_id)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+namespace {
+    void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bool penalty, const bool group) {
+        unsigned bc_id;
+        if(!get_input(command, bc_id)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        string dof_id;
+        if(!get_input(command, dof_id)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        const auto bc_type = suanpan::to_lower(dof_id[0]);
+
+        if(!is_equal(bc_type, 'p') && !is_equal(bc_type, 'e') && !is_equal(bc_type, 'x') && !is_equal(bc_type, 'y') && !is_equal(bc_type, 'z') && !is_equal(bc_type, '1') && !is_equal(bc_type, '2') && !is_equal(bc_type, '3') && !is_equal(bc_type, '4') && !is_equal(bc_type, '5') && !is_equal(bc_type, '6') && !is_equal(bc_type, '7')) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        uword obj;
+        std::vector<uword> obj_tag;
+        while(get_input(command, obj)) obj_tag.push_back(obj);
+
+        penalty ? group ? return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : group ? return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type);
     }
 
-    string dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
+    void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uword node_i, node_j;
+        if(!get_input(command, node_i) || !get_input(command, node_j)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        return_obj = make_unique<FixedLength>(tag, 0, dof, uvec{node_i, node_j});
     }
 
-    const auto bc_type = suanpan::to_lower(dof_id[0]);
+    void new_maxforce(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    if(!is_equal(bc_type, 'p') && !is_equal(bc_type, 'e') && !is_equal(bc_type, 'x') && !is_equal(bc_type, 'y') && !is_equal(bc_type, 'z') && !is_equal(bc_type, '1') && !is_equal(bc_type, '2') && !is_equal(bc_type, '3') && !is_equal(bc_type, '4') && !is_equal(bc_type, '5') && !is_equal(bc_type, '6') && !is_equal(bc_type, '7')) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
+        uword node_i, node_j;
+        if(!get_input(command, node_i) || !get_input(command, node_j)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        double max_force;
+        if(!get_input(command, max_force)) {
+            suanpan_error("A valid maximum force is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<MaxForce>(tag, 0, dof, max_force, uvec{node_i, node_j});
     }
 
-    uword obj;
-    std::vector<uword> obj_tag;
-    while(get_input(command, obj)) obj_tag.push_back(obj);
+    void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    penalty ? group ? return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : group ? return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type);
-}
+        uword node_i, node_j;
+        if(!get_input(command, node_i) || !get_input(command, node_j)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
 
-void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        double gap;
+        if(!get_input(command, gap)) {
+            suanpan_error("A valid minimum gap is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<MinimumGap>(tag, 0, dof, gap, uvec{node_i, node_j});
     }
 
-    uword node_i, node_j;
-    if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
+    void new_maximumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uword node_i, node_j;
+        if(!get_input(command, node_i) || !get_input(command, node_j)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        double gap;
+        if(!get_input(command, gap)) {
+            suanpan_error("A valid minimum gap is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<MaximumGap>(tag, 0, dof, gap, uvec{node_i, node_j});
     }
 
-    return_obj = make_unique<FixedLength>(tag, 0, dof, uvec{node_i, node_j});
-}
+    void new_sleeve(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-void new_maxforce(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uword node_i, node_j;
+        if(!get_input(command, node_i) || !get_input(command, node_j)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        double min_gap, max_gap;
+        if(!get_input(command, min_gap)) {
+            suanpan_error("A valid minimum gap is required.\n");
+            return;
+        }
+        if(!get_input(command, max_gap)) {
+            suanpan_error("A valid maximum gap is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Sleeve>(tag, 0, dof, min_gap, max_gap, uvec{node_i, node_j});
     }
 
-    uword node_i, node_j;
-    if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
+    void new_embed(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    double max_force;
-    if(!get_input(command, max_force)) {
-        suanpan_error("A valid maximum force is required.\n");
-        return;
-    }
+        unsigned element_tag;
+        if(!get_input(command, element_tag)) {
+            suanpan_error("A valid element tag is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<MaxForce>(tag, 0, dof, max_force, uvec{node_i, node_j});
-}
-
-void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uword node_i, node_j;
-    if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    double gap;
-    if(!get_input(command, gap)) {
-        suanpan_error("A valid minimum gap is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<MinimumGap>(tag, 0, dof, gap, uvec{node_i, node_j});
-}
-
-void new_maximumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uword node_i, node_j;
-    if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    double gap;
-    if(!get_input(command, gap)) {
-        suanpan_error("A valid minimum gap is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<MaximumGap>(tag, 0, dof, gap, uvec{node_i, node_j});
-}
-
-void new_sleeve(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uword node_i, node_j;
-    if(!get_input(command, node_i) || !get_input(command, node_j)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    double min_gap, max_gap;
-    if(!get_input(command, min_gap)) {
-        suanpan_error("A valid minimum gap is required.\n");
-        return;
-    }
-    if(!get_input(command, max_gap)) {
-        suanpan_error("A valid maximum gap is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Sleeve>(tag, 0, dof, min_gap, max_gap, uvec{node_i, node_j});
-}
-
-void new_embed(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned element_tag;
-    if(!get_input(command, element_tag)) {
-        suanpan_error("A valid element tag is required.\n");
-        return;
-    }
-
-    unsigned node_tag;
-    if(!get_input(command, node_tag)) {
-        suanpan_error("A valid node tag is required.\n");
-        return;
-    }
-
-    if(2 == dof) return_obj = make_unique<Embed2D>(tag, 0, element_tag, node_tag);
-    else return_obj = make_unique<Embed3D>(tag, 0, element_tag, node_tag);
-}
-
-void new_mpc(unique_ptr<Constraint>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned amplitude;
-    if(!get_input(command, amplitude)) {
-        suanpan_error("A valid amplitude tag is required.\n");
-        return;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid magnitude is required.\n");
-        return;
-    }
-
-    std::vector<uword> node_tag, dof_tag;
-    std::vector<double> weight_tag;
-    while(!command.eof()) {
-        double weight;
-        uword dof, node;
-        if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return;
-        node_tag.emplace_back(node);
-        dof_tag.emplace_back(dof);
-        weight_tag.emplace_back(weight);
-    }
-
-    return_obj = make_unique<MPC>(tag, 0, amplitude, uvec(node_tag), uvec(dof_tag), vec(weight_tag), magnitude);
-}
-
-void new_nodeline(unique_ptr<Constraint>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(3);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
+        unsigned node_tag;
+        if(!get_input(command, node_tag)) {
             suanpan_error("A valid node tag is required.\n");
             return;
         }
 
-    return_obj = make_unique<NodeLine>(tag, 0, 0, std::move(node_tag));
-}
-
-void new_nodefacet(unique_ptr<Constraint>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        if(2 == dof) return_obj = make_unique<Embed2D>(tag, 0, element_tag, node_tag);
+        else return_obj = make_unique<Embed3D>(tag, 0, element_tag, node_tag);
     }
 
-    uvec node_tag(4);
-    for(auto& I : node_tag)
-        if(!get_input(command, I)) {
-            suanpan_error("A valid node tag is required.\n");
+    void new_mpc(unique_ptr<Constraint>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
             return;
         }
 
-    return_obj = make_unique<NodeFacet>(tag, 0, 0, std::move(node_tag));
-}
-
-void new_particlecollision(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dim) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    auto space = 1.;
-    if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("A valid spacing is required.\n");
-        return;
-    }
-
-    auto alpha = 1.;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("A valid multiplier is required.\n");
-        return;
-    }
-
-    2 == dim ? return_obj = make_unique<ParticleCollision2D>(tag, 0, space, alpha) : return_obj = make_unique<ParticleCollision3D>(tag, 0, space, alpha);
-}
-
-void new_ljpotential(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    auto space = 1.;
-    if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("A valid spacing is required.\n");
-        return;
-    }
-
-    auto alpha = 1.;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("A valid multiplier is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<LJPotential2D>(tag, 0, space, alpha);
-}
-
-void new_linearspring(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    auto space = 1.;
-    if(!command.eof() && !get_input(command, space)) {
-        suanpan_error("A valid spacing is required.\n");
-        return;
-    }
-
-    auto alpha = 1.;
-    if(!command.eof() && !get_input(command, alpha)) {
-        suanpan_error("A valid multiplier is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<LinearSpring2D>(tag, 0, space, alpha);
-}
-
-void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite, const bool penalty) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    std::vector<double> p;
-    double para;
-    while(!command.eof() && get_input(command, para)) p.emplace_back(para);
-
-    switch(p.size()) {
-    case 2:
-        // 1D origin norm
-        if(penalty) return_obj = make_unique<RigidWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, 1E4);
-        else return_obj = make_unique<RigidWallMultiplier1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, 1E4);
-        break;
-    case 3:
-        // 1D origin norm multiplier
-        if(penalty) return_obj = make_unique<RigidWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2]);
-        else return_obj = make_unique<RigidWallMultiplier1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2]);
-        break;
-    case 4:
-        if(finite) {
-            // 2D origin edge
-            if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, 1E4);
-            else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, 1E4);
+        unsigned amplitude;
+        if(!get_input(command, amplitude)) {
+            suanpan_error("A valid amplitude tag is required.\n");
+            return;
         }
-        else {
-            // 2D origin norm
-            if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), 1E4);
-            else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), 1E4);
-        }
-        break;
-    case 5:
-        if(finite) {
-            // 2D origin edge multiplier
-            if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4]);
-            else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4]);
-        }
-        else {
-            // 2D origin norm multiplier
-            if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4]);
-            else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4]);
-        }
-        break;
-    case 6:
-        // 3D origin norm
-        if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), 1E4);
-        else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), 1E4);
-        break;
-    case 7:
-        // 3D origin norm multiplier
-        if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6]);
-        else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6]);
-        break;
-    case 9:
-        // 3D origin edge edge
-        if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, 1E4);
-        else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, 1E4);
-        break;
-    case 10:
-        // 3D origin edge edge multiplier
-        if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
-        else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
-        break;
-    default: suanpan_error("A valid number of parameters is required.\n");
-    }
-}
 
-void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid magnitude is required.\n");
+            return;
+        }
+
+        std::vector<uword> node_tag, dof_tag;
+        std::vector<double> weight_tag;
+        while(!command.eof()) {
+            double weight;
+            uword dof, node;
+            if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return;
+            node_tag.emplace_back(node);
+            dof_tag.emplace_back(dof);
+            weight_tag.emplace_back(weight);
+        }
+
+        return_obj = make_unique<MPC>(tag, 0, amplitude, uvec(node_tag), uvec(dof_tag), vec(weight_tag), magnitude);
     }
 
-    std::vector<double> p;
-    double para;
-    while(!command.eof() && get_input(command, para)) p.emplace_back(para);
+    void new_nodeline(unique_ptr<Constraint>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    switch(p.size()) {
-    case 3:
-        // 1D origin norm restitution
-        return_obj = make_unique<RestitutionWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2], 1E4);
-        break;
-    case 4:
-        // 1D origin norm restitution multiplier
-        return_obj = make_unique<RestitutionWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2], p[3]);
-        break;
-    case 5:
-        if(finite)
-            // 2D origin edge restitution
-            return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4], 1E4);
-        else
-            // 2D origin norm restitution
-            return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4], 1E4);
-        break;
-    case 6:
-        if(finite)
-            // 2D origin edge restitution multiplier
-            return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4], p[5]);
-        else
-            // 2D origin norm restitution multiplier
-            return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4], p[5]);
-        break;
-    case 7:
-        // 3D origin norm restitution
-        return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6], 1E4);
-        break;
-    case 8:
-        // 3D origin norm restitution multiplier
-        return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6], p[7]);
-        break;
-    case 10:
-        // 3D origin edge edge restitution
-        return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], 1E4);
-        break;
-    case 11:
-        // 3D origin edge edge restitution multiplier
-        return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], p[10]);
-        break;
-    default: suanpan_error("A valid number of parameters is required.\n");
+        uvec node_tag(3);
+        for(auto& I : node_tag)
+            if(!get_input(command, I)) {
+                suanpan_error("A valid node tag is required.\n");
+                return;
+            }
+
+        return_obj = make_unique<NodeLine>(tag, 0, 0, std::move(node_tag));
     }
-}
+
+    void new_nodefacet(unique_ptr<Constraint>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        for(auto& I : node_tag)
+            if(!get_input(command, I)) {
+                suanpan_error("A valid node tag is required.\n");
+                return;
+            }
+
+        return_obj = make_unique<NodeFacet>(tag, 0, 0, std::move(node_tag));
+    }
+
+    void new_particlecollision(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dim) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto space = 1.;
+        if(!command.eof() && !get_input(command, space)) {
+            suanpan_error("A valid spacing is required.\n");
+            return;
+        }
+
+        auto alpha = 1.;
+        if(!command.eof() && !get_input(command, alpha)) {
+            suanpan_error("A valid multiplier is required.\n");
+            return;
+        }
+
+        2 == dim ? return_obj = make_unique<ParticleCollision2D>(tag, 0, space, alpha) : return_obj = make_unique<ParticleCollision3D>(tag, 0, space, alpha);
+    }
+
+    void new_ljpotential(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto space = 1.;
+        if(!command.eof() && !get_input(command, space)) {
+            suanpan_error("A valid spacing is required.\n");
+            return;
+        }
+
+        auto alpha = 1.;
+        if(!command.eof() && !get_input(command, alpha)) {
+            suanpan_error("A valid multiplier is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<LJPotential2D>(tag, 0, space, alpha);
+    }
+
+    void new_linearspring(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto space = 1.;
+        if(!command.eof() && !get_input(command, space)) {
+            suanpan_error("A valid spacing is required.\n");
+            return;
+        }
+
+        auto alpha = 1.;
+        if(!command.eof() && !get_input(command, alpha)) {
+            suanpan_error("A valid multiplier is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<LinearSpring2D>(tag, 0, space, alpha);
+    }
+
+    void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite, const bool penalty) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        std::vector<double> p;
+        double para;
+        while(!command.eof() && get_input(command, para)) p.emplace_back(para);
+
+        switch(p.size()) {
+        case 2:
+            // 1D origin norm
+            if(penalty) return_obj = make_unique<RigidWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, 1E4);
+            else return_obj = make_unique<RigidWallMultiplier1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, 1E4);
+            break;
+        case 3:
+            // 1D origin norm multiplier
+            if(penalty) return_obj = make_unique<RigidWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2]);
+            else return_obj = make_unique<RigidWallMultiplier1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2]);
+            break;
+        case 4:
+            if(finite) {
+                // 2D origin edge
+                if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, 1E4);
+                else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, 1E4);
+            }
+            else {
+                // 2D origin norm
+                if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), 1E4);
+                else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), 1E4);
+            }
+            break;
+        case 5:
+            if(finite) {
+                // 2D origin edge multiplier
+                if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4]);
+                else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4]);
+            }
+            else {
+                // 2D origin norm multiplier
+                if(penalty) return_obj = make_unique<RigidWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4]);
+                else return_obj = make_unique<RigidWallMultiplier2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4]);
+            }
+            break;
+        case 6:
+            // 3D origin norm
+            if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), 1E4);
+            else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), 1E4);
+            break;
+        case 7:
+            // 3D origin norm multiplier
+            if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6]);
+            else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6]);
+            break;
+        case 9:
+            // 3D origin edge edge
+            if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, 1E4);
+            else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, 1E4);
+            break;
+        case 10:
+            // 3D origin edge edge multiplier
+            if(penalty) return_obj = make_unique<RigidWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
+            else return_obj = make_unique<RigidWallMultiplier3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9]);
+            break;
+        default: suanpan_error("A valid number of parameters is required.\n");
+        }
+    }
+
+    void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        std::vector<double> p;
+        double para;
+        while(!command.eof() && get_input(command, para)) p.emplace_back(para);
+
+        switch(p.size()) {
+        case 3:
+            // 1D origin norm restitution
+            return_obj = make_unique<RestitutionWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2], 1E4);
+            break;
+        case 4:
+            // 1D origin norm restitution multiplier
+            return_obj = make_unique<RestitutionWallPenalty1D>(tag, 0, 0, vec{p[0]}, vec{p[1]}, p[2], p[3]);
+            break;
+        case 5:
+            if(finite)
+                // 2D origin edge restitution
+                return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4], 1E4);
+            else
+                // 2D origin norm restitution
+                return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4], 1E4);
+            break;
+        case 6:
+            if(finite)
+                // 2D origin edge restitution multiplier
+                return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, vec{p[2], p[3], 0.}, vec{0., 0., 1.}, p[4], p[5]);
+            else
+                // 2D origin norm restitution multiplier
+                return_obj = make_unique<RestitutionWallPenalty2D>(tag, 0, 0, vec{p[0], p[1]}, normalise(vec{p[2], p[3]}), p[4], p[5]);
+            break;
+        case 7:
+            // 3D origin norm restitution
+            return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6], 1E4);
+            break;
+        case 8:
+            // 3D origin norm restitution multiplier
+            return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, normalise(vec{p[3], p[4], p[5]}), p[6], p[7]);
+            break;
+        case 10:
+            // 3D origin edge edge restitution
+            return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], 1E4);
+            break;
+        case 11:
+            // 3D origin edge edge restitution multiplier
+            return_obj = make_unique<RestitutionWallPenalty3D>(tag, 0, 0, vec{p[0], p[1], p[2]}, vec{p[3], p[4], p[5]}, vec{p[6], p[7], p[8]}, p[9], p[10]);
+            break;
+        default: suanpan_error("A valid number of parameters is required.\n");
+        }
+    }
+} // namespace
 
 int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& command) {
     const auto step_tag = domain->get_current_step_tag();

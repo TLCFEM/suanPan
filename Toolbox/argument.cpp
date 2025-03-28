@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 #include "argument.h"
-#include <array>
+
 #include <Include/whereami/whereami.h>
 #include <Step/Bead.h>
 #include <Toolbox/Converter.h>
@@ -24,6 +24,7 @@
 #include <Toolbox/revision.h>
 #include <Toolbox/utility.h>
 #include <UnitTest/CatchTest.h>
+#include <array>
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
@@ -63,163 +64,165 @@ bool SUANPAN_VERBOSE = false;
 
 fs::path SUANPAN_EXE = "";
 
-bool check_debugger() {
+namespace {
+    bool check_debugger() {
 #ifdef SUANPAN_DEBUG
-    return false;
+        return false;
 #endif
 #ifdef SUANPAN_WIN
-    if(IsDebuggerPresent()) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
+        if(IsDebuggerPresent()) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
 
-    BOOL FLAG = false;
-    if(CheckRemoteDebuggerPresent(GetCurrentProcess(), &FLAG) && FLAG) std::swap(access::rw(datum::eps), access::rw(datum::pi));
+        BOOL FLAG = false;
+        if(CheckRemoteDebuggerPresent(GetCurrentProcess(), &FLAG) && FLAG) std::swap(access::rw(datum::eps), access::rw(datum::pi));
 
-    CONTEXT CTX{};
-    CTX.ContextFlags = CONTEXT_DEBUG_REGISTERS;
-    if(GetThreadContext(GetCurrentThread(), &CTX) && (CTX.Dr0 != 0 || CTX.Dr1 != 0 || CTX.Dr2 != 0 || CTX.Dr3 != 0)) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
+        CONTEXT CTX{};
+        CTX.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+        if(GetThreadContext(GetCurrentThread(), &CTX) && (CTX.Dr0 != 0 || CTX.Dr1 != 0 || CTX.Dr2 != 0 || CTX.Dr3 != 0)) exit(EXIT_SUCCESS); // NOLINT(concurrency-mt-unsafe)
 #elif defined(SUANPAN_UNIX)
 #endif
-    return false;
-}
+        return false;
+    }
 
-bool support_emoji() {
+    bool support_emoji() {
 #ifdef SUANPAN_WIN
-    NTSTATUS (WINAPI *RtlGetVersion)(LPOSVERSIONINFOEXW);
-    OSVERSIONINFOEXW osInfo;
-    const auto nt_module = GetModuleHandleA("ntdll");
-    if(nullptr == nt_module) return false;
-    // ReSharper disable once CppCStyleCast
-    *(FARPROC*)&RtlGetVersion = GetProcAddress(nt_module, "RtlGetVersion");
-    if(nullptr == RtlGetVersion) return false;
+        NTSTATUS(WINAPI * RtlGetVersion)(LPOSVERSIONINFOEXW);
+        OSVERSIONINFOEXW osInfo;
+        const auto nt_module = GetModuleHandleA("ntdll");
+        if(nullptr == nt_module) return false;
+        // ReSharper disable once CppCStyleCast
+        *(FARPROC*)&RtlGetVersion = GetProcAddress(nt_module, "RtlGetVersion");
+        if(nullptr == RtlGetVersion) return false;
 
-    osInfo.dwOSVersionInfoSize = sizeof(osInfo);
-    // ReSharper disable once CppFunctionResultShouldBeUsed
-    RtlGetVersion(&osInfo);
-    return osInfo.dwBuildNumber >= 22000;
+        osInfo.dwOSVersionInfoSize = sizeof(osInfo);
+        // ReSharper disable once CppFunctionResultShouldBeUsed
+        RtlGetVersion(&osInfo);
+        return osInfo.dwBuildNumber >= 22000;
 #else
-    return true;
+        return true;
 #endif
-}
+    }
 
-void check_version(const fs::path& path_to_executable) {
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_rank) return;
+    void check_version(const fs::path& path_to_executable) {
+        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+        if(0 != comm_rank) return;
 
-    auto updater_module = path_to_executable.parent_path();
+        auto updater_module = path_to_executable.parent_path();
 
 #ifdef SUANPAN_WIN
-    updater_module.append("updater.exe");
+        updater_module.append("updater.exe");
 #else
-    updater_module.append("updater");
+        updater_module.append("updater");
 #endif
 
-    if(!exists(updater_module)) return;
+        if(!exists(updater_module)) return;
 
-    auto terminal = istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
+        auto terminal = istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
 
-    execute_command(terminal);
-}
-
-void strip_mode(const string& input_file_name, const string& output_file_name) {
-    ifstream input_file(input_file_name);
-
-    if(!input_file.is_open()) {
-        suanpan_error("Fail to open \"{}\".\n", input_file_name);
-        return;
+        execute_command(terminal);
     }
 
-    ofstream output_file(output_file_name);
+    void strip_mode(const string& input_file_name, const string& output_file_name) {
+        ifstream input_file(input_file_name);
 
-    if(!output_file.is_open()) {
-        suanpan_error("Fail to open \"{}\".\n", output_file_name);
-        return;
+        if(!input_file.is_open()) {
+            suanpan_error("Fail to open \"{}\".\n", input_file_name);
+            return;
+        }
+
+        ofstream output_file(output_file_name);
+
+        if(!output_file.is_open()) {
+            suanpan_error("Fail to open \"{}\".\n", output_file_name);
+            return;
+        }
+
+        output_file.setf(std::ios::scientific);
+        output_file << std::setprecision(3);
+
+        string line;
+
+        while(std::getline(input_file, line)) {
+            if(line.empty() || if_contain(line, "**")) continue;
+
+            for(auto& I : line) I = static_cast<char>(std::tolower(static_cast<int>(I)));
+
+            output_file << line << '\n';
+        }
     }
 
-    output_file.setf(std::ios::scientific);
-    output_file << std::setprecision(3);
+    void convert_mode(const string& input_file_name, const string& output_file_name) {
+        ifstream input_file(input_file_name);
 
-    string line;
+        if(!input_file.is_open()) {
+            suanpan_error("Fail to open \"{}\".\n", input_file_name);
+            return;
+        }
 
-    while(std::getline(input_file, line)) {
-        if(line.empty() || if_contain(line, "**")) continue;
+        ofstream output_file(output_file_name);
 
-        for(auto& I : line) I = static_cast<char>(std::tolower(static_cast<int>(I)));
+        if(!output_file.is_open()) {
+            suanpan_error("Fail to open \"{}\".\n", output_file_name);
+            return;
+        }
 
-        output_file << line << '\n';
-    }
-}
+        const auto pos = output_file_name.find_last_of('/');
 
-void convert_mode(const string& input_file_name, const string& output_file_name) {
-    ifstream input_file(input_file_name);
+        Converter abaqus_converter(string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
 
-    if(!input_file.is_open()) {
-        suanpan_error("Fail to open \"{}\".\n", input_file_name);
-        return;
-    }
-
-    ofstream output_file(output_file_name);
-
-    if(!output_file.is_open()) {
-        suanpan_error("Fail to open \"{}\".\n", output_file_name);
-        return;
+        abaqus_converter.process(input_file, output_file);
     }
 
-    const auto pos = output_file_name.find_last_of('/');
+    void print_header() {
+        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+        if(0 != comm_rank) return;
 
-    Converter abaqus_converter(string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
-
-    abaqus_converter.process(input_file, output_file);
-}
-
-void print_header() {
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_rank) return;
-
-    /***
-     *                ____
-     *      ___ _   _|  _ \ __ _ _ __
-     *     / __| | | | |_) / _` | '_ \
-     *     \__ \ |_| |  __/ (_| | | | |
-     *     |___/\__,_|_|   \__,_|_| |_|
-     *
-     */
-    static constexpr auto header = "+--------------------------------------------------------+\n";
-    suanpan_info(header);
-    suanpan_info("|             ____             suanPan is an open source |\n");
-    suanpan_info("|   ___ _   _|  _ \\ __ _ _ __     FEM framework (64-bit) |\n");
-    suanpan_info("|  / __| | | | |_) / _` | '_ \\        {:>10} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
-    suanpan_info("|  \\__ \\ |_| |  __/ (_| | | | |        by tlc @ {} |\n", SUANPAN_REVISION);
-    suanpan_info("|  |___/\\__,_|_|   \\__,_|_| |_|      all rights reserved |\n");
-    suanpan_info("|                                 10.5281/zenodo.1285221 |\n");
-    suanpan_info(header);
-    if(support_emoji() && SUANPAN_COLOR) {
-        static constexpr std::array POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
-        arma_rng::set_seed_random();
-        suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan                  |\n");
-        suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest     |\n");
+        /***
+         *                ____
+         *      ___ _   _|  _ \ __ _ _ __
+         *     / __| | | | |_) / _` | '_ \
+         *     \__ \ |_| |  __/ (_| | | | |
+         *     |___/\__,_|_|   \__,_|_| |_|
+         *
+         */
+        static constexpr auto header = "+--------------------------------------------------------+\n";
         suanpan_info(header);
-        suanpan_info("|  {} https://bit.ly/vsc-sp                              |\n", POOL[randi() % POOL.size()]);
-    }
-    else {
-        suanpan_info("|  https://github.com/TLCFEM/suanPan                     |\n");
-        suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest        |\n");
+        suanpan_info("|             ____             suanPan is an open source |\n");
+        suanpan_info("|   ___ _   _|  _ \\ __ _ _ __     FEM framework (64-bit) |\n");
+        suanpan_info("|  / __| | | | |_) / _` | '_ \\        {:>10} ({}.{}.{}) |\n", SUANPAN_CODE, SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH);
+        suanpan_info("|  \\__ \\ |_| |  __/ (_| | | | |        by tlc @ {} |\n", SUANPAN_REVISION);
+        suanpan_info("|  |___/\\__,_|_|   \\__,_|_| |_|      all rights reserved |\n");
+        suanpan_info("|                                 10.5281/zenodo.1285221 |\n");
         suanpan_info(header);
-        suanpan_info("|  https://bit.ly/vsc-sp                                 |\n");
+        if(support_emoji() && SUANPAN_COLOR) {
+            static constexpr std::array POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
+            arma_rng::set_seed_random();
+            suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan                  |\n");
+            suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest     |\n");
+            suanpan_info(header);
+            suanpan_info("|  {} https://bit.ly/vsc-sp                              |\n", POOL[randi() % POOL.size()]);
+        }
+        else {
+            suanpan_info("|  https://github.com/TLCFEM/suanPan                     |\n");
+            suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest        |\n");
+            suanpan_info(header);
+            suanpan_info("|  https://bit.ly/vsc-sp                                 |\n");
+        }
+        suanpan_info("{}\n", header);
     }
-    suanpan_info("{}\n", header);
-}
 
-fs::path whereami(const char* argv) {
-    fs::path exe_path(argv);
+    fs::path whereami(const char* argv) {
+        fs::path exe_path(argv);
 
-    if(const auto length = wai_getExecutablePath(nullptr, 0, nullptr); length > 0) {
-        const unique_ptr<char[]> buffer(new char[length + 1]);
-        wai_getExecutablePath(buffer.get(), length, nullptr);
-        buffer[length] = '\0';
-        exe_path = buffer.get();
+        if(const auto length = wai_getExecutablePath(nullptr, 0, nullptr); length > 0) {
+            const unique_ptr<char[]> buffer(new char[length + 1]);
+            wai_getExecutablePath(buffer.get(), length, nullptr);
+            buffer[length] = '\0';
+            exe_path = buffer.get();
+        }
+
+        return weakly_canonical(exe_path);
     }
-
-    return weakly_canonical(exe_path);
-}
+} // namespace
 
 void argument_parser(const int argc, char** argv) {
     if(check_debugger()) return;
@@ -286,7 +289,8 @@ void argument_parser(const int argc, char** argv) {
                 output_file_name += strip ? "_out.inp" : "_out.supan";
             }
 
-            for(auto& I : output_file_name) if('\\' == I) I = '/';
+            for(auto& I : output_file_name)
+                if('\\' == I) I = '/';
 
             return convert ? convert_mode(input_file_name, output_file_name) : strip_mode(input_file_name, output_file_name);
         }
@@ -413,7 +417,8 @@ void cli_mode(const shared_ptr<Bead>& model) {
     while(true) {
         string command_line;
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-        if(0 == comm_rank) suanpan_info("suanPan ~<> ");
+        if(0 == comm_rank)
+            suanpan_info("suanPan ~<> ");
         getline(std::cin, command_line);
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
