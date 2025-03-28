@@ -11,7 +11,7 @@ add_compile_definitions(pord)
 add_compile_definitions(metis)
 
 if (USE_64BIT_INDEXING)
-    add_compile_definitions(MUMPS_INTSIZE64)
+    add_compile_definitions(MUMPS_INTSIZE64 PORD_INTSIZE64)
 endif ()
 
 if (USE_MKL)
