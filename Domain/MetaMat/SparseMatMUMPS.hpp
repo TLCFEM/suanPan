@@ -40,14 +40,18 @@
 
 namespace mumps {
     template<typename> struct struc {};
+
     template<> struct struc<double> {
         using struct_type = DMUMPS_STRUC_C;
         using entry_type = double;
+
         static auto mumps_c(DMUMPS_STRUC_C* ptr) { return dmumps_c(ptr); }
     };
+
     template<> struct struc<float> {
         using struct_type = SMUMPS_STRUC_C;
         using entry_type = float;
+
         static auto mumps_c(SMUMPS_STRUC_C* ptr) { return smumps_c(ptr); }
     };
 } // namespace mumps
@@ -96,8 +100,8 @@ protected:
             this->factored = true;
         }
 
-        id.lrhs = B.n_rows;
-        id.nrhs = B.n_cols;
+        id.lrhs = (la_it)B.n_rows;
+        id.nrhs = (la_it)B.n_cols;
         id.rhs = (entry_t*)B.memptr();
 
         perform_job(3);

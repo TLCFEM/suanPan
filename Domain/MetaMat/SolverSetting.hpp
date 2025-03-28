@@ -18,7 +18,7 @@
 #ifndef SOLVERSETTING_HPP
 #define SOLVERSETTING_HPP
 
-#include <suanPan.h>
+#include <Toolbox/utility.h>
 
 #ifdef SUANPAN_MAGMA
 
@@ -248,6 +248,7 @@ enum class Precision : std::uint8_t {
 template<sp_d data_t> struct SolverSetting {
 #ifdef SUANPAN_MAGMA
     magma_dopts magma_setting{};
+
     auto set_magma_option(istringstream& command) { magma_setting = magma_parse_opts<magma_dopts>(command); }
 #else
     auto set_magma_option(istringstream&) {}
