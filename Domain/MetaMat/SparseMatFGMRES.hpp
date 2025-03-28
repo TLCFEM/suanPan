@@ -52,7 +52,9 @@ public:
     SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {}
 
-    SparseMatFGMRES(const SparseMatFGMRES&) = default;
+    SparseMatFGMRES(const SparseMatFGMRES& other)
+        : SparseMat<T>(other) {}
+
     SparseMatFGMRES(SparseMatFGMRES&&) noexcept = delete;
     SparseMatFGMRES& operator=(const SparseMatFGMRES&) = delete;
     SparseMatFGMRES& operator=(SparseMatFGMRES&&) noexcept = delete;
@@ -75,10 +77,10 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
 
     csr_form<T, int> csr_mat(this->triplet_mat);
 
-    MKL_INT request;
+    MKL_INT info;
 
-    dfgmres_init(&N, nullptr, nullptr, &request, ipar, dpar, work.memptr());
-    if(0 != request) return request;
+    dfgmres_init(&N, nullptr, nullptr, &info, ipar, dpar, work.memptr());
+    if(0 != info) return info;
 
     ipar[8] = 1;
     ipar[9] = 0;
@@ -88,18 +90,18 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
 
     for(auto I = 0llu; I < B.n_cols; ++I) {
         while(true) {
-            dfgmres(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr()); // NOLINT(clang-diagnostic-cast-qual)
-            if(-1 == request || -10 == request || -11 == request || -12 == request) {
-                suanpan_error("Error code {} received.\n", request);
+            dfgmres(&N, (double*)X.colptr(I), (double*)B.colptr(I), &info, ipar, dpar, work.memptr()); // NOLINT(clang-diagnostic-cast-qual)
+            if(-1 == info || -10 == info || -11 == info || -12 == info) {
+                suanpan_error("Error code {} received.\n", info);
                 return -1;
             }
-            if(0 == request || 4 == request && dpar[6] <= dpar[0]) {
+            if(0 == info || 4 == info && dpar[6] <= dpar[0]) {
                 MKL_INT counter;
-                dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &request, ipar, dpar, work.memptr(), &counter); // NOLINT(clang-diagnostic-cast-qual)
+                dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &info, ipar, dpar, work.memptr(), &counter); // NOLINT(clang-diagnostic-cast-qual)
                 suanpan_debug("Converged in {} iterations.\n", counter);
                 break;
             }
-            if(1 == request) {
+            if(1 == info) {
                 const vec xn(&work[ipar[21] - 1llu], N);
                 // ReSharper disable once CppInitializedValueIsAlwaysRewritten
                 // ReSharper disable once CppEntityAssignedButNoRead
@@ -107,7 +109,7 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
                 // ReSharper disable once CppDFAUnusedValue
                 yn = csr_mat * xn;
             }
-            else if(3 == request) {
+            else if(3 == info) {
                 const vec xn(&work[ipar[21] - 1llu], N);
                 // ReSharper disable once CppInitializedValueIsAlwaysRewritten
                 // ReSharper disable once CppEntityAssignedButNoRead
@@ -118,7 +120,7 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
         }
     }
 
-    return request;
+    return info;
 }
 
 #endif

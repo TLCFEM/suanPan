@@ -260,6 +260,7 @@ namespace suanpan {
         std::string pattern;
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         if(comm_size > 1) {
+            // ReSharper disable once CppDFAUnreachableCode
             pattern += "[P";
             pattern += std::to_string(comm_rank);
             pattern += "] ";

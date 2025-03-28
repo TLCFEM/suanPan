@@ -29,8 +29,10 @@
 #ifndef METAMAT_HPP
 #define METAMAT_HPP
 
-#include "triplet_form.hpp"
 #include "SolverSetting.hpp"
+#include "triplet_form.hpp"
+
+using la_it = int;
 
 template<sp_d T> class MetaMat;
 
@@ -218,7 +220,8 @@ public:
 
 template<sp_d T> Mat<T> to_mat(const MetaMat<T>& in_mat) {
     Mat<T> out_mat(in_mat.n_rows, in_mat.n_cols);
-    for(uword J = 0; J < in_mat.n_cols; ++J) for(uword I = 0; I < in_mat.n_rows; ++I) out_mat(I, J) = in_mat(I, J);
+    for(uword J = 0; J < in_mat.n_cols; ++J)
+        for(uword I = 0; I < in_mat.n_rows; ++I) out_mat(I, J) = in_mat(I, J);
     return out_mat;
 }
 
@@ -262,7 +265,8 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> to_triplet_for
     const sp_i auto n_elem = index_t(in_mat->n_elem);
 
     triplet_form<data_t, index_t> out_mat(n_rows, n_cols, n_elem);
-    for(index_t J = 0; J < n_cols; ++J) for(index_t I = 0; I < n_rows; ++I) out_mat.at(I, J) = in_mat->operator()(I, J);
+    for(index_t J = 0; J < n_cols; ++J)
+        for(index_t I = 0; I < n_rows; ++I) out_mat.at(I, J) = in_mat->operator()(I, J);
 
     return out_mat;
 }

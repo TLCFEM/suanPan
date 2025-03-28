@@ -109,7 +109,7 @@ template<sp_d T> class SparseMatLis final : public SparseMat<T> {
     public:
         lis_solver() { lis_solver_create(&solver); }
 
-        lis_solver(const lis_solver&) = default;
+        lis_solver(const lis_solver&) { lis_solver_create(&solver); }
         lis_solver(lis_solver&&) noexcept = delete;
         lis_solver& operator=(const lis_solver&) = delete;
         lis_solver& operator=(lis_solver&&) noexcept = delete;

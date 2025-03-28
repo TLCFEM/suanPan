@@ -29,6 +29,7 @@
  */
 
 // ReSharper disable CppClangTidyClangDiagnosticMissingFieldInitializers
+// ReSharper disable CppCStyleCast
 #ifndef SPARSEMATMUMPS_HPP
 #define SPARSEMATMUMPS_HPP
 
@@ -37,131 +38,62 @@
 #include <mumps/dmumps_c.h>
 #include <mumps/smumps_c.h>
 
+namespace mumps {
+    template<typename> struct struc {};
+    template<> struct struc<double> {
+        using struct_type = DMUMPS_STRUC_C;
+        using entry_type = double;
+        static auto mumps_c(DMUMPS_STRUC_C* ptr) { return dmumps_c(ptr); }
+    };
+    template<> struct struc<float> {
+        using struct_type = SMUMPS_STRUC_C;
+        using entry_type = float;
+        static auto mumps_c(SMUMPS_STRUC_C* ptr) { return smumps_c(ptr); }
+    };
+} // namespace mumps
+
 template<sp_d T> class SparseMatBaseMUMPS : public SparseMat<T> {
-    const int sym;
+    using struct_t = typename mumps::struc<T>::struct_type;
+    using entry_t = typename mumps::struc<T>::entry_type;
 
-    DMUMPS_STRUC_C dmumps_job{sym, 1, -1, -987654};
-    SMUMPS_STRUC_C smumps_job{sym, 1, -1, -987654};
+    const la_it sym;
 
-    triplet_form<float, int> s_mat;
+    struct_t id{sym, 1, -1, -987654};
 
-    s32_vec l_irn, l_jcn;
+    triplet_form<T, la_it> coo_mat;
 
-    template<bool convert, typename ST, std::invocable<ST*> F, typename COO> int alloc(COO& triplet, ST& mumps_job, F& mumps_c) {
-        if(this->factored) return 0;
-
-        dealloc(mumps_job, mumps_c);
-
-        this->factored = true;
-
-        mumps_job.job = -1;
-        mumps_c(&mumps_job);
-
-        triplet.csc_condense();
-
-        if constexpr(convert) {
-            l_irn.set_size(triplet.n_elem);
-            l_jcn.set_size(triplet.n_elem);
-
-            suanpan::for_each(static_cast<int>(triplet.n_elem), [&](const int I) {
-                l_irn[I] = static_cast<int>(triplet.row(I) + 1);
-                l_jcn[I] = static_cast<int>(triplet.col(I) + 1);
-            });
-
-            mumps_job.irn = l_irn.memptr();
-            mumps_job.jcn = l_jcn.memptr();
-        }
-        else {
-            mumps_job.irn = triplet.row_mem();
-            mumps_job.jcn = triplet.col_mem();
-        }
-
-        mumps_job.a = triplet.val_mem();
-
-        mumps_job.n = static_cast<int>(triplet.n_rows);
-        mumps_job.nnz = static_cast<int64_t>(triplet.n_elem);
-
-        mumps_job.icntl[0] = -1;
-        mumps_job.icntl[1] = -1;
-        mumps_job.icntl[2] = -1;
-        mumps_job.icntl[3] = 0;
-        mumps_job.icntl[9] = -2;
-        mumps_job.icntl[13] = 100;
-        mumps_job.icntl[19] = 0; // dense rhs
-        mumps_job.icntl[32] = 1; // determinant
-        mumps_job.icntl[34] = 1; // BLR
-
-        mumps_job.job = 4;
-        mumps_c(&mumps_job);
-
-        if(0 != mumps_job.info[0])
-            suanpan_error("Error code {} received.\n", mumps_job.info[0]);
-
-        return mumps_job.info[0];
-    }
-
-    template<typename ST, std::invocable<ST*> F> static void dealloc(ST& mumps_job, F& mumps_c) {
-        if(3 != mumps_job.job) return;
-        mumps_job.job = -2;
-        mumps_c(&mumps_job);
-    }
-
-    template<typename ST, std::invocable<ST*> F> static void run(ST& mumps_job, F& mumps_c) {
-        mumps_job.job = 3;
-        mumps_c(&mumps_job);
+    auto perform_job(const int job) {
+        id.job = job;
+        mumps::struc<T>::mumps_c(&id);
     }
 
 protected:
-    triplet_form<T, uword> h_mat;
-
     int direct_solve(Mat<T>& X, Mat<T>&& B) override {
-        int INFO;
+        if(!this->factored) {
+            coo_mat = triplet_form<T, la_it>(0 == sym ? this->triplet_mat : this->triplet_mat.lower(), SparseBase::ONE, false);
 
-        auto mat_ptr = 0 == this->sym ? &this->triplet_mat : &h_mat;
+            id.n = coo_mat.n_rows;
+            id.nnz = coo_mat.n_elem;
+            id.irn = coo_mat.row_mem();
+            id.jcn = coo_mat.col_mem();
+            id.a = (entry_t*)coo_mat.val_mem();
 
-        if constexpr(std::is_same_v<T, float>) {
-            if(0 != (INFO = alloc<true>(*mat_ptr, smumps_job, smumps_c))) return INFO;
+            perform_job(4);
 
-            smumps_job.rhs = B.memptr();
-            smumps_job.lrhs = static_cast<int>(B.n_rows);
-            smumps_job.nrhs = static_cast<int>(B.n_cols);
-
-            run(smumps_job, smumps_c);
-
-            X = std::move(B);
-
-            INFO = smumps_job.info[0];
-        }
-        else if(Precision::FULL == this->setting.precision) {
-            if(0 != (INFO = alloc<true>(*mat_ptr, dmumps_job, dmumps_c))) return INFO;
-
-            dmumps_job.rhs = B.memptr();
-            dmumps_job.lrhs = static_cast<int>(B.n_rows);
-            dmumps_job.nrhs = static_cast<int>(B.n_cols);
-
-            run(dmumps_job, dmumps_c);
-
-            X = std::move(B);
-
-            INFO = dmumps_job.info[0];
-        }
-        else {
-            if(!this->factored) s_mat = triplet_form<float, int>(*mat_ptr, SparseBase::ONE, false);
-
-            if(0 != (INFO = alloc<false>(s_mat, smumps_job, smumps_c))) return INFO;
-
-            INFO = this->mixed_trs(X, std::forward<Mat<T>>(B), [&](fmat& residual) {
-                smumps_job.rhs = residual.memptr();
-                smumps_job.lrhs = static_cast<int>(residual.n_rows);
-                smumps_job.nrhs = static_cast<int>(residual.n_cols);
-
-                run(smumps_job, smumps_c);
-
-                return smumps_job.info[0];
-            });
+            this->factored = true;
         }
 
-        return INFO;
+        id.lrhs = B.n_rows;
+        id.nrhs = B.n_cols;
+        id.rhs = (entry_t*)B.data;
+
+        perform_job(3);
+
+        if(id.infog[0] < 0) return SUANPAN_FAIL;
+
+        X = std::move(B);
+
+        return SUANPAN_SUCCESS;
     }
 
     int direct_solve(Mat<T>& X, const Mat<T>& B) override { return this->direct_solve(X, Mat<T>(B)); }
@@ -169,40 +101,22 @@ protected:
 public:
     SparseMatBaseMUMPS(const uword in_row, const uword in_col, const uword in_elem, const int in_sym)
         : SparseMat<T>(in_row, in_col, in_elem)
-        , sym(in_sym) {}
+        , sym(in_sym) { perform_job(-1); }
 
     SparseMatBaseMUMPS(const SparseMatBaseMUMPS& other)
         : SparseMat<T>(other)
-        , sym(other.sym)
-        , dmumps_job{other.sym, 1, -1, -987654}
-        , smumps_job{other.sym, 1, -1, -987654}
-        , l_irn(other.l_irn)
-        , l_jcn(other.l_jcn) {}
+        , sym(other.sym) {
+        perform_job(-1);
+        this->factored = false;
+    }
 
     SparseMatBaseMUMPS(SparseMatBaseMUMPS&&) noexcept = delete;
     SparseMatBaseMUMPS& operator=(const SparseMatBaseMUMPS&) = delete;
     SparseMatBaseMUMPS& operator=(SparseMatBaseMUMPS&&) noexcept = delete;
 
-    ~SparseMatBaseMUMPS() override {
-        dealloc(dmumps_job, dmumps_c);
-        dealloc(smumps_job, smumps_c);
-    }
+    ~SparseMatBaseMUMPS() override { perform_job(-2); }
 
-    void zeros() override {
-        SparseMat<T>::zeros();
-        dealloc(dmumps_job, dmumps_c);
-        dealloc(smumps_job, smumps_c);
-    }
-
-    [[nodiscard]] int sign_det() const override {
-        int det_sign;
-
-        if constexpr(std::is_same_v<T, float>) det_sign = smumps_job.rinfog[11] < 0.f ? -1 : 1;
-        else if(Precision::FULL == this->setting.precision) det_sign = dmumps_job.rinfog[11] < 0. ? -1 : 1;
-        else det_sign = smumps_job.rinfog[11] < 0.f ? -1 : 1;
-
-        return det_sign;
-    }
+    [[nodiscard]] int sign_det() const override { return id.rinfog[11] < entry_t{0} ? -1 : 1; }
 };
 
 template<sp_d T> class SparseMatMUMPS final : public SparseMatBaseMUMPS<T> {
@@ -214,13 +128,6 @@ public:
 };
 
 template<sp_d T> class SparseSymmMatMUMPS final : public SparseMatBaseMUMPS<T> {
-protected:
-    int direct_solve(Mat<T>& X, Mat<T>&& B) override {
-        if(!this->factored) this->h_mat = this->triplet_mat.lower();
-
-        return SparseMatBaseMUMPS<T>::direct_solve(X, std::move(B));
-    }
-
 public:
     SparseSymmMatMUMPS(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMatBaseMUMPS<T>(in_row, in_col, in_elem, 2) {}

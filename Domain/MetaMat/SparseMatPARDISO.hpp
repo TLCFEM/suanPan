@@ -18,7 +18,7 @@
  * @class SparseMatPARDISO
  * @brief A SparseMatPARDISO class that holds matrices.
  *
- * TODO: improve performance by storing factorization and reusing it
+ * TODO: improve performance by storing and reusing factorization
  *
  * @author tlc
  * @date 21/03/2025
@@ -39,26 +39,19 @@
 #include <mkl_pardiso.h>
 
 template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
-    const int maxfct = 1;
-    const int mnum = 1;
-    const int mtype = 11;
+    const la_it maxfct = 1;
+    const la_it mnum = 1;
+    const la_it mtype = 11;
 #ifdef SUANPAN_DEBUG
-    const int msglvl = 1;
+    const la_it msglvl = 1;
 #else
-    const int msglvl = 0;
+    const la_it msglvl = 0;
 #endif
 
-    int iparm[64]{};
+    la_it iparm[64]{};
     std::int64_t pt[64]{};
 
-protected:
-    using SparseMat<T>::direct_solve;
-
-    int direct_solve(Mat<T>&, const Mat<T>&) override;
-
-public:
-    SparseMatPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem) {
+    auto init_config() {
         pardisoinit(pt, &mtype, iparm);
 
         iparm[1] = 3;   // nested dissection algorithm
@@ -67,19 +60,35 @@ public:
         if(std::is_same_v<T, float>) iparm[27] = 1;
     }
 
+protected:
+    using SparseMat<T>::direct_solve;
+
+    int direct_solve(Mat<T>&, const Mat<T>&) override;
+
+public:
+    SparseMatPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
+        : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
+
+    SparseMatPARDISO(const SparseMatPARDISO& other)
+        : SparseMat<T>(other) { init_config(); }
+
+    SparseMatPARDISO(SparseMatPARDISO&&) noexcept = delete;
+    SparseMatPARDISO& operator=(const SparseMatPARDISO&) = delete;
+    SparseMatPARDISO& operator=(SparseMatPARDISO&&) noexcept = delete;
+
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatPARDISO>(*this); }
 };
 
 template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     X.set_size(B.n_rows, B.n_cols);
 
-    csr_form<T, int> csr_mat(this->triplet_mat, SparseBase::ZERO, true);
+    csr_form<T, la_it> csr_mat(this->triplet_mat, SparseBase::ZERO, true);
 
-    const auto n = static_cast<int>(B.n_rows);
-    const auto nrhs = static_cast<int>(B.n_cols);
-    int info;
+    const auto n = static_cast<la_it>(B.n_rows);
+    const auto nrhs = static_cast<la_it>(B.n_cols);
+    la_it info;
 
-    auto phase = 13;
+    la_it phase = 13;
     pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), (void*)X.memptr(), &info);
 
     const auto error = info;

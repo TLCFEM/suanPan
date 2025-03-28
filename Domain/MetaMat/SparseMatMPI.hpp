@@ -39,6 +39,11 @@ extern int SUANPAN_NUM_NODES;
 template<sp_d T> class SparseMatMPIPARDISO final : public SparseMat<T> {
     int iparm[64]{};
 
+    auto init_config() {
+        iparm[27] = std::is_same_v<T, double> ? 0 : 1; // use double precision
+        iparm[34] = 1;                                 // zero-based indexing
+    }
+
 protected:
     using SparseMat<T>::direct_solve;
 
@@ -46,10 +51,7 @@ protected:
 
 public:
     SparseMatMPIPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem) {
-        iparm[27] = std::is_same_v<T, double> ? 0 : 1; // use double precision
-        iparm[34] = 1;                                 // zero-based indexing
-    }
+        : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatMPIPARDISO>(*this); }
 };
