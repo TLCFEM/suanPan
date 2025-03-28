@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
 #include "ElementParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
@@ -23,2428 +25,2430 @@
 
 using std::vector;
 
-void new_allman(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(3);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Three valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(command.eof())
-        suanpan_debug("Unit thickness assumed.\n");
-    else if(!get_input(command, thickness))
-        suanpan_error("A valid thickness is required.\n");
-
-    return_obj = make_unique<Allman>(tag, std::move(node_tag), material_tag, thickness);
-}
-
-void new_b21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!get_optional_input(command, int_pt)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(!get_optional_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    if(0 == which) return_obj = make_unique<B21>(tag, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
-    else return_obj = make_unique<B21E>(tag, which, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
-}
-
-void new_b21h(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    auto elastic_length = .2;
-    if(!command.eof() && !get_input(command, elastic_length)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(!get_optional_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<B21H>(tag, std::move(node_tag), section_id, elastic_length, is_true(nonlinear));
-}
-
-void new_b31(unique_ptr<Element>& return_obj, istringstream& command, const bool if_os) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    unsigned orientation_id;
-    if(!get_input(command, orientation_id)) {
-        suanpan_error("A valid orientation tag is required.\n");
-        return;
-    }
-
-    unsigned int_pt = 6;
-    if(!get_optional_input(command, int_pt)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(!get_optional_input(command, nonlinear)) {
-        suanpan_error("A valid nlgeom switch is required.\n");
-        return;
-    }
-
-    if(if_os) return_obj = make_unique<B31OS>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
-    else return_obj = make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
-}
-
-void new_nmb21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(!get_optional_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    if(0 == which) return_obj = make_unique<NMB21>(tag, std::move(node_tag), section_id, is_true(nonlinear));
-    else return_obj = make_unique<NMB21E>(tag, which, std::move(node_tag), section_id, is_true(nonlinear));
-}
-
-void new_nmb31(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    unsigned orientation_id;
-    if(!get_input(command, orientation_id)) {
-        suanpan_error("A valid orientation tag is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(!get_optional_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<NMB31>(tag, std::move(node_tag), section_id, orientation_id, is_true(nonlinear));
-}
-
-void new_c3d20(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(20);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Twenty valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    string reduced_scheme = "true";
-    if(command.eof())
-        suanpan_debug("Standard Irons 14-point integration scheme assumed.\n");
-    else if(!get_input(command, reduced_scheme))
-        suanpan_error("A valid reduced integration switch is required.\n");
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<C3D20>(tag, std::move(node_tag), material_tag, is_true(reduced_scheme), is_true(nonlinear));
-}
-
-void new_c3d4(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<C3D4>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
-}
-
-void new_c3d8(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Eight valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    string reduced_scheme = "I";
-    if(command.eof())
-        suanpan_debug("Standard 4-point integration scheme assumed.\n");
-    else if(!get_input(command, reduced_scheme))
-        suanpan_error("A valid reduced integration switch is required.\n");
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<C3D8>(tag, std::move(node_tag), material_tag, suanpan::to_upper(reduced_scheme[0]), is_true(nonlinear));
-}
-
-void new_c3d8r(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Eight valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<C3D8>(tag, std::move(node_tag), material_tag, 'R', is_true(nonlinear));
-}
-
-void new_c3d8i(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Eight valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<C3D8I>(tag, std::move(node_tag), material_tag);
-}
-
-void new_cax3(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(3);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Three valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<CAX3>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
-}
-
-void new_cax4(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CAX4>(tag, std::move(node_tag), material_tag, false);
-}
-
-void new_cax8(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Eight valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CAX8>(tag, std::move(node_tag), material_tag, false);
-}
-
-void new_contact2d(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned master_tag, slave_tag;
-    if(!get_input(command, master_tag)) {
-        suanpan_error("A valid master group tag is required.\n");
-        return;
-    }
-    if(!get_input(command, slave_tag)) {
-        suanpan_error("A valid slave group tag is required.\n");
-        return;
-    }
-
-    auto alpha = 1E6;
-    if(!get_optional_input(command, alpha)) {
-        suanpan_error("A valid multiplier is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Contact2D>(tag, master_tag, slave_tag, alpha);
-}
-
-void new_contact3d(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned master_tag, slave_tag;
-    if(!get_input(command, master_tag)) {
-        suanpan_error("A valid master group tag is required.\n");
-        return;
-    }
-    if(!get_input(command, slave_tag)) {
-        suanpan_error("A valid slave group tag is required.\n");
-        return;
-    }
-
-    auto alpha = 1E6;
-    if(!get_optional_input(command, alpha)) {
-        suanpan_error("A valid multiplier is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Contact3D>(tag, master_tag, slave_tag, alpha);
-}
-
-void new_cp3(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(3);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Three valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<CP3>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
-}
-
-void new_cp4(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    string reduced_scheme = "N";
-    if(command.eof())
-        suanpan_debug("Full integration assumed.\n");
-    else if(!get_input(command, reduced_scheme)) {
-        suanpan_error("A valid reduced scheme switch is required.\n");
-        return;
-    }
-
-    string nonlinear = "N";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
-}
-
-void new_cp4i(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CP4I>(tag, std::move(node_tag), material_tag, thickness);
-}
-
-void new_cp4r(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, true, is_true(nonlinear));
-}
-
-void new_cp5(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(5);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Five valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    string nonlinear = "N";
-    if(!command.eof() && !get_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CP5>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
-}
-
-void new_cp6(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(6);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Six valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(!get_optional_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CP6>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
-}
-
-void new_cp7(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(7);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Five valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    string nonlinear = "N";
-    if(!command.eof() && !get_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CP7>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
-}
-
-void new_cp8(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Eight valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    string reduced_scheme = "N";
-    if(!get_optional_input(command, reduced_scheme)) {
-        suanpan_error("A valid reduced integration switch is required.\n");
-        return;
-    }
-
-    string nonlinear = "N";
-    if(!get_optional_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
-}
-
-void new_cpe8(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Eight valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    string reduced_scheme = "N";
-    if(!command.eof() && !get_input(command, reduced_scheme)) {
-        suanpan_error("A valid reduced integration switch is required.\n");
-        return;
-    }
-
-    string nonlinear = "N";
-    if(!command.eof() && !get_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., is_true(reduced_scheme), is_true(nonlinear));
-}
-
-void new_cpe8r(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Eight valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    string nonlinear = "N";
-    if(!command.eof() && !get_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., true, is_true(nonlinear));
-}
-
-void new_cinp4(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CINP4>(tag, std::move(node_tag), material_tag, thickness);
-}
-
-void new_cin3d8(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Eight valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CIN3D8>(tag, std::move(node_tag), material_tag);
-}
-
-void new_csmt3(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(3);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Three valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    auto length = -1.;
-    if(!get_optional_input(command, length)) {
-        suanpan_error("A valid length is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CSMT3>(tag, std::move(node_tag), material_tag, thickness, length);
-}
-
-void new_csmt6(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(6);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Six valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    auto length = -1.;
-    if(!get_optional_input(command, length)) {
-        suanpan_error("A valid length is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<CSMT6>(tag, std::move(node_tag), material_tag, thickness, length);
-}
-
-void new_csmq(unique_ptr<Element>& return_obj, istringstream& command, const unsigned size) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(size);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    auto length = -1.;
-    if(!get_optional_input(command, length)) {
-        suanpan_error("A valid length is required.\n");
-        return;
-    }
-
-    if(4 == size) return_obj = make_unique<CSMQ4>(tag, std::move(node_tag), material_tag, thickness, length);
-    else if(5 == size) return_obj = make_unique<CSMQ5>(tag, std::move(node_tag), material_tag, thickness, length);
-    else if(6 == size) return_obj = make_unique<CSMQ6>(tag, std::move(node_tag), material_tag, thickness, length);
-    else if(7 == size) return_obj = make_unique<CSMQ7>(tag, std::move(node_tag), material_tag, thickness, length);
-    else if(8 == size) return_obj = make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
-}
-
-void new_damper01(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned damper_tag;
-    if(!get_input(command, damper_tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Damper01>(tag, std::move(node_tag), damper_tag, dimension);
-}
-
-void new_damper02(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned damper_tag;
-    if(!get_input(command, damper_tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned spring_tag;
-    if(!get_input(command, spring_tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    string use_matrix = "true";
-    if(!command.eof() && !get_input(command, use_matrix)) {
-        suanpan_error("A valid switch is required.\n");
-        return;
-    }
-
-    unsigned proceed = 0;
-    if(!command.eof() && !get_input(command, proceed)) {
-        suanpan_error("A valid proceed switch is required.\n");
-        return;
-    }
-
-    auto beta = .5;
-    if(!command.eof() && !get_input(command, beta)) {
-        suanpan_error("A valid beta value is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
-}
-
-void new_damper05(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned damper_tag;
-    if(!get_input(command, damper_tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
-}
-
-void new_dc3d4(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    double length;
-    if(!get_input(command, length)) {
-        suanpan_error("A valid characteristic length is required.\n");
-        return;
-    }
-
-    double rate;
-    if(!get_input(command, rate)) {
-        suanpan_error("A valid energy release rate is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate);
-}
-
-void new_dc3d8(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(8);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    double length;
-    if(!get_input(command, length)) {
-        suanpan_error("A valid characteristic length is required.\n");
-        return;
-    }
-
-    double rate;
-    if(!get_input(command, rate)) {
-        suanpan_error("A valid energy release rate is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate);
-}
-
-void new_dcp3(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(3);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Three valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    double length;
-    if(!get_input(command, length)) {
-        suanpan_error("A valid characteristic length is required.\n");
-        return;
-    }
-
-    double rate;
-    if(!get_input(command, rate)) {
-        suanpan_error("A valid energy release rate is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness);
-}
-
-void new_dcp4(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    double length;
-    if(!get_input(command, length)) {
-        suanpan_error("A valid characteristic length is required.\n");
-        return;
-    }
-
-    double rate;
-    if(!get_input(command, rate)) {
-        suanpan_error("A valid energy release rate is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!get_optional_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness);
-}
-
-void new_dkt3(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(3);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Three valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    double thickness;
-    if(!get_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    auto num_ip = 3u;
-    if(!get_optional_input(command, num_ip)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<DKT3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
-}
-
-void new_dkt4(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    double thickness;
-    if(!get_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    auto num_ip = 3u;
-    if(!get_optional_input(command, num_ip)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<DKT4>(tag, std::move(node_tag), material_tag, thickness, num_ip);
-}
-
-void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(3);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Three valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    double thickness;
-    if(!get_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    auto num_ip = 3u;
-    if(!get_optional_input(command, num_ip)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    string nlgeom = "false";
-    if(!get_optional_input(command, nlgeom)) {
-        suanpan_error("A valid nlgeom switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
-}
-
-void new_embedded(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dof) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned element_tag;
-    if(!get_input(command, element_tag)) {
-        suanpan_error("A valid element tag is required.\n");
-        return;
-    }
-
-    unsigned node_tag;
-    if(!get_input(command, node_tag)) {
-        suanpan_error("A valid node tag is required.\n");
-        return;
-    }
-
-    auto alpha = 1E4;
-    if(!get_optional_input(command, alpha)) {
-        suanpan_error("A valid alpha is required.\n");
-        return;
-    }
-
-    if(2 == dof) return_obj = make_unique<Embedded2D>(tag, element_tag, node_tag, alpha);
-    else return_obj = make_unique<Embedded3D>(tag, element_tag, node_tag, alpha);
-}
-
-void new_eb21(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    double area;
-    if(!get_input(command, area)) {
-        suanpan_error("A valid area is required.\n");
-        return;
-    }
-
-    double moment_inertia;
-    if(!get_input(command, moment_inertia)) {
-        suanpan_error("A valid moment of inertia is required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<EB21>(tag, std::move(node_tag), area, moment_inertia, material_tag, is_true(nonlinear));
-}
-
-void new_eb31os(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    vec property(7);
-    if(!get_input(command, property)) {
-        suanpan_error("A valid section/material property is required.\n");
-        return;
-    }
-
-    unsigned orientation;
-    if(!get_input(command, orientation)) {
-        suanpan_error("A valid orientation tag is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<EB31OS>(tag, std::move(node_tag), std::move(property), orientation, is_true(nonlinear));
-}
-
-void new_f21(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    auto int_pt = 6u;
-    if(!get_optional_input(command, int_pt)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    auto nonlinear = 0u;
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<F21>(tag, std::move(node_tag), section_id, int_pt, !!nonlinear);
-}
-
-void new_f21h(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    auto elastic_length = .2;
-    if(!command.eof() && !get_input(command, elastic_length)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    unsigned nonlinear = 0;
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-    return_obj = make_unique<F21H>(tag, std::move(node_tag), section_id, elastic_length, !!nonlinear);
-}
-
-void new_f31(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned section_id;
-    if(!get_input(command, section_id)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
-    }
-
-    unsigned orientation_id;
-    if(!get_input(command, orientation_id)) {
-        suanpan_error("A valid orientation tag is required.\n");
-        return;
-    }
-
-    unsigned int_pt = 5;
-    if(!command.eof() && !get_input(command, int_pt)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    string nonlinear = "false";
-    if(!command.eof() && !get_input(command, nonlinear)) {
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<F31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
-}
-
-void new_gcmq(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(command.eof())
-        suanpan_debug("Unit thickness assumed.\n");
-    else if(!get_input(command, thickness))
-        suanpan_error("A valid thickness is required.\n");
-
-    string int_scheme = "I";
-    if(!command.eof() && !get_input(command, int_scheme))
-        suanpan_error("A valid reduced scheme switch is required.\n");
-
-    return_obj = make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, suanpan::to_upper(int_scheme[0]));
-}
-
-void new_gcmq(unique_ptr<Element>& return_obj, istringstream& command, const char int_type) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(command.eof())
-        suanpan_debug("Unit thickness assumed.\n");
-    else if(!get_input(command, thickness))
-        suanpan_error("A valid thickness is required.\n");
-
-    return_obj = make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
-}
-
-void new_sgcmq(unique_ptr<Element>& return_obj, istringstream& command, const char int_type) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(command.eof())
-        suanpan_debug("Unit thickness assumed.\n");
-    else if(!get_input(command, thickness))
-        suanpan_error("A valid thickness is required.\n");
-
-    return_obj = make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
-}
-
-void new_sgcms(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(!command.eof() && !get_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    string nlgeom = "false";
-    if(!get_optional_input(command, nlgeom)) {
-        suanpan_error("A valid nlgeom switch is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
-}
-
-void new_gq12(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    auto thickness = 1.;
-    if(command.eof())
-        suanpan_debug("Unit thickness assumed.\n");
-    else if(!get_input(command, thickness))
-        suanpan_error("A valid thickness is required.\n");
-
-    return_obj = make_unique<GQ12>(tag, std::move(node_tag), material_tag, thickness);
-}
-
-void new_joint(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    vector<uword> pool;
-    uword material_tag;
-    while(!command.eof() && get_input(command, material_tag)) pool.emplace_back(material_tag);
-
-    return_obj = make_unique<Joint>(tag, std::move(node_tag), std::move(pool));
-}
-
-void new_mass(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned node;
-    if(!get_input(command, node)) {
-        suanpan_error("A valid node tag is required.\n");
-        return;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid magnitude is required.\n");
-        return;
-    }
-
-    unsigned dof;
-    vector<uword> dof_tag;
-    while(!command.eof() && get_input(command, dof)) dof_tag.push_back(dof);
-
-    if(2 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 3) {
-        suanpan_error("At most three dofs are supported.\n");
-        return;
-    }
-    if(3 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 6) {
-        suanpan_error("At most six dofs are supported.\n");
-        return;
-    }
-
-    if(2 == which) return_obj = make_unique<Mass2D>(tag, node, magnitude, uvec(dof_tag));
-    else return_obj = make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
-}
-
-void new_masspoint(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned node;
-    if(!get_input(command, node)) {
-        suanpan_error("A valid node tag is required.\n");
-        return;
-    }
-
-    double translational_magnitude;
-    if(!get_input(command, translational_magnitude)) {
-        suanpan_error("A valid translational magnitude is required.\n");
-        return;
-    }
-
-    if(command.eof()) {
-        if(2 == which) return_obj = make_unique<MassPoint2D>(tag, node, translational_magnitude);
-        else return_obj = make_unique<MassPoint3D>(tag, node, translational_magnitude);
-    }
-    else {
-        double rotational_magnitude;
-        if(!get_input(command, rotational_magnitude)) {
-            suanpan_error("A valid rotational magnitude is required.\n");
+namespace {
+    void new_allman(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
             return;
         }
-        if(2 == which) return_obj = make_unique<MassPoint2D>(tag, node, translational_magnitude, rotational_magnitude);
-        else return_obj = make_unique<MassPoint3D>(tag, node, translational_magnitude, rotational_magnitude);
-    }
-}
 
-void new_mindlin(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
-    }
-
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
-
-    double thickness;
-    if(!get_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
-    }
-
-    unsigned num_ip = 5;
-    if(!command.eof() && !get_input(command, num_ip)) {
-        suanpan_error("A valid number of integration points is required.\n");
-        return;
-    }
-
-    return_obj = make_unique<Mindlin>(tag, std::move(node_tag), material_tag, thickness, num_ip);
-}
-
-void new_mvlem(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
-    }
-
-    unsigned shear_tag;
-    if(!get_input(command, shear_tag)) {
-        suanpan_error("A valid shear material is required.\n");
-        return;
-    }
-
-    double c_height;
-    if(!get_input(command, c_height)) {
-        suanpan_error("A valid c is required.\n");
-        return;
-    }
-
-    vector<double> B, H, R;
-    vector<uword> CT, ST;
-    while(!command.eof()) {
-        double t_value;
-        uword t_tag;
-        if(!get_input(command, t_value)) {
-            suanpan_error("A valid fibre width is required.\n");
+        uvec node_tag(3);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Three valid nodes are required.\n");
             return;
         }
-        B.emplace_back(t_value);
-        if(!get_input(command, t_value)) {
-            suanpan_error("A valid fibre thickness is required.\n");
-            return;
-        }
-        H.emplace_back(t_value);
-        if(!get_input(command, t_value)) {
-            suanpan_error("A valid fibre reinforcement ratio is required.\n");
-            return;
-        }
-        R.emplace_back(t_value);
-        if(!get_input(command, t_tag)) {
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
             suanpan_error("A valid material tag is required.\n");
             return;
         }
-        CT.emplace_back(t_tag);
-        if(!get_input(command, t_tag)) {
+
+        auto thickness = 1.;
+        if(command.eof())
+            suanpan_debug("Unit thickness assumed.\n");
+        else if(!get_input(command, thickness))
+            suanpan_error("A valid thickness is required.\n");
+
+        return_obj = make_unique<Allman>(tag, std::move(node_tag), material_tag, thickness);
+    }
+
+    void new_b21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_id;
+        if(!get_input(command, section_id)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
+
+        unsigned int_pt = 6;
+        if(!get_optional_input(command, int_pt)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(!get_optional_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        if(0 == which) return_obj = make_unique<B21>(tag, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
+        else return_obj = make_unique<B21E>(tag, which, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
+    }
+
+    void new_b21h(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_id;
+        if(!get_input(command, section_id)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
+
+        auto elastic_length = .2;
+        if(!command.eof() && !get_input(command, elastic_length)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(!get_optional_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<B21H>(tag, std::move(node_tag), section_id, elastic_length, is_true(nonlinear));
+    }
+
+    void new_b31(unique_ptr<Element>& return_obj, istringstream& command, const bool if_os) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_id;
+        if(!get_input(command, section_id)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
+
+        unsigned orientation_id;
+        if(!get_input(command, orientation_id)) {
+            suanpan_error("A valid orientation tag is required.\n");
+            return;
+        }
+
+        unsigned int_pt = 6;
+        if(!get_optional_input(command, int_pt)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(!get_optional_input(command, nonlinear)) {
+            suanpan_error("A valid nlgeom switch is required.\n");
+            return;
+        }
+
+        if(if_os) return_obj = make_unique<B31OS>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
+        else return_obj = make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
+    }
+
+    void new_nmb21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_id;
+        if(!get_input(command, section_id)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(!get_optional_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        if(0 == which) return_obj = make_unique<NMB21>(tag, std::move(node_tag), section_id, is_true(nonlinear));
+        else return_obj = make_unique<NMB21E>(tag, which, std::move(node_tag), section_id, is_true(nonlinear));
+    }
+
+    void new_nmb31(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_id;
+        if(!get_input(command, section_id)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
+
+        unsigned orientation_id;
+        if(!get_input(command, orientation_id)) {
+            suanpan_error("A valid orientation tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(!get_optional_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<NMB31>(tag, std::move(node_tag), section_id, orientation_id, is_true(nonlinear));
+    }
+
+    void new_c3d20(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(20);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Twenty valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
             suanpan_error("A valid material tag is required.\n");
             return;
         }
-        ST.emplace_back(t_tag);
+
+        string reduced_scheme = "true";
+        if(command.eof())
+            suanpan_debug("Standard Irons 14-point integration scheme assumed.\n");
+        else if(!get_input(command, reduced_scheme))
+            suanpan_error("A valid reduced integration switch is required.\n");
+
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<C3D20>(tag, std::move(node_tag), material_tag, is_true(reduced_scheme), is_true(nonlinear));
     }
 
-    return_obj = make_unique<MVLEM>(tag, std::move(node_tag), B, H, R, uvec(CT), uvec(ST), shear_tag, c_height);
-}
+    void new_c3d4(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-void new_pcpedc(unique_ptr<Element>& return_obj, istringstream& command, const unsigned node) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<C3D4>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
     }
 
-    uvec node_tag(node);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("{} valid nodes are required.\n", node);
-        return;
+    void new_c3d8(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Eight valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        string reduced_scheme = "I";
+        if(command.eof())
+            suanpan_debug("Standard 4-point integration scheme assumed.\n");
+        else if(!get_input(command, reduced_scheme))
+            suanpan_error("A valid reduced integration switch is required.\n");
+
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<C3D8>(tag, std::move(node_tag), material_tag, suanpan::to_upper(reduced_scheme[0]), is_true(nonlinear));
     }
 
-    unsigned solid_tag;
-    if(!get_input(command, solid_tag)) {
-        suanpan_error("A valid material tag for solid phase is required.\n");
-        return;
-    }
-    unsigned fluid_tag;
-    if(!get_input(command, fluid_tag)) {
-        suanpan_error("A valid material tag for fluid phase is required.\n");
-        return;
-    }
+    void new_c3d8r(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    double alpha, n, k;
-    if(!get_input(command, alpha, n, k)) {
-        suanpan_error("A valid parameter is required.\n");
-        return;
-    }
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Eight valid nodes are required.\n");
+            return;
+        }
 
-    if(4 == node) return_obj = make_unique<PCPE4DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
-    else if(8 == node) return_obj = make_unique<PCPE8DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
-}
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
 
-void new_pcpeuc(unique_ptr<Element>& return_obj, istringstream& command, const unsigned node) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-    uvec node_tag(node);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("{} valid nodes are required.\n", node);
-        return;
+        return_obj = make_unique<C3D8>(tag, std::move(node_tag), material_tag, 'R', is_true(nonlinear));
     }
 
-    unsigned solid_tag;
-    if(!get_input(command, solid_tag)) {
-        suanpan_error("A valid material tag for solid phase is required.\n");
-        return;
-    }
-    unsigned fluid_tag;
-    if(!get_input(command, fluid_tag)) {
-        suanpan_error("A valid material tag for fluid phase is required.\n");
-        return;
-    }
+    void new_c3d8i(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    double alpha, n;
-    if(!get_input(command, alpha, n)) {
-        suanpan_error("A valid parameter is required.\n");
-        return;
-    }
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Eight valid nodes are required.\n");
+            return;
+        }
 
-    if(4 == node) return_obj = make_unique<PCPE4UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
-    else if(8 == node) return_obj = make_unique<PCPE8UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
-}
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
 
-void new_ps(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        return_obj = make_unique<C3D8I>(tag, std::move(node_tag), material_tag);
     }
 
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
+    void new_cax3(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(3);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Three valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<CAX3>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
     }
 
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
+    void new_cax4(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CAX4>(tag, std::move(node_tag), material_tag, false);
     }
 
-    auto thickness = 1.;
-    if(command.eof())
-        suanpan_debug("Unit thickness assumed.\n");
-    else if(!get_input(command, thickness))
-        suanpan_error("A valid thickness is required.\n");
+    void new_cax8(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<PS>(tag, std::move(node_tag), material_tag, thickness);
-}
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Eight valid nodes are required.\n");
+            return;
+        }
 
-void new_qe2(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CAX8>(tag, std::move(node_tag), material_tag, false);
     }
 
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
+    void new_contact2d(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned master_tag, slave_tag;
+        if(!get_input(command, master_tag)) {
+            suanpan_error("A valid master group tag is required.\n");
+            return;
+        }
+        if(!get_input(command, slave_tag)) {
+            suanpan_error("A valid slave group tag is required.\n");
+            return;
+        }
+
+        auto alpha = 1E6;
+        if(!get_optional_input(command, alpha)) {
+            suanpan_error("A valid multiplier is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Contact2D>(tag, master_tag, slave_tag, alpha);
     }
 
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
+    void new_contact3d(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned master_tag, slave_tag;
+        if(!get_input(command, master_tag)) {
+            suanpan_error("A valid master group tag is required.\n");
+            return;
+        }
+        if(!get_input(command, slave_tag)) {
+            suanpan_error("A valid slave group tag is required.\n");
+            return;
+        }
+
+        auto alpha = 1E6;
+        if(!get_optional_input(command, alpha)) {
+            suanpan_error("A valid multiplier is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Contact3D>(tag, master_tag, slave_tag, alpha);
     }
 
-    auto thickness = 1.;
-    if(command.eof())
-        suanpan_debug("Unit thickness assumed.\n");
-    else if(!get_input(command, thickness))
-        suanpan_error("A valid thickness is required.\n");
+    void new_cp3(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<QE2>(tag, std::move(node_tag), material_tag, thickness);
-}
+        uvec node_tag(3);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Three valid nodes are required.\n");
+            return;
+        }
 
-void new_s4(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<CP3>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    uvec node_tag(4);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Four valid nodes are required.\n");
-        return;
+    void new_cp4(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string reduced_scheme = "N";
+        if(command.eof())
+            suanpan_debug("Full integration assumed.\n");
+        else if(!get_input(command, reduced_scheme)) {
+            suanpan_error("A valid reduced scheme switch is required.\n");
+            return;
+        }
+
+        string nonlinear = "N";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
     }
 
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
+    void new_cp4i(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CP4I>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    auto thickness = 1.;
-    if(!command.eof() && !get_input(command, thickness)) {
-        suanpan_error("A valid thickness is required.\n");
-        return;
+    void new_cp4r(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, true, is_true(nonlinear));
     }
 
-    string nlgeom = "false";
-    if(!get_optional_input(command, nlgeom)) {
-        suanpan_error("A valid nlgeom switch is required.\n");
-        return;
+    void new_cp5(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(5);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Five valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string nonlinear = "N";
+        if(!command.eof() && !get_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CP5>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
-}
+    void new_cp6(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-template<typename T> void new_singlesection(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uvec node_tag(6);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Six valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(!get_optional_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CP6>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    unsigned node;
-    if(!get_input(command, node)) {
-        suanpan_error("A valid node tag is required.\n");
-        return;
+    void new_cp7(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(7);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Five valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string nonlinear = "N";
+        if(!command.eof() && !get_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CP7>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    unsigned section_tag;
-    if(!get_input(command, section_tag)) {
-        suanpan_error("A valid section tag is required.\n");
-        return;
+    void new_cp8(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Eight valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string reduced_scheme = "N";
+        if(!get_optional_input(command, reduced_scheme)) {
+            suanpan_error("A valid reduced integration switch is required.\n");
+            return;
+        }
+
+        string nonlinear = "N";
+        if(!get_optional_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
     }
 
-    return_obj = make_unique<T>(tag, node, section_tag);
-}
+    void new_cpe8(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-void new_spring01(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Eight valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        string reduced_scheme = "N";
+        if(!command.eof() && !get_input(command, reduced_scheme)) {
+            suanpan_error("A valid reduced integration switch is required.\n");
+            return;
+        }
+
+        string nonlinear = "N";
+        if(!command.eof() && !get_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., is_true(reduced_scheme), is_true(nonlinear));
     }
 
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
+    void new_cpe8r(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Eight valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "N";
+        if(!command.eof() && !get_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., true, is_true(nonlinear));
     }
 
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
+    void new_cinp4(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CINP4>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    return_obj = make_unique<Spring01>(tag, std::move(node_tag), material_tag);
-}
+    void new_cin3d8(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-void new_spring02(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Eight valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CIN3D8>(tag, std::move(node_tag), material_tag);
     }
 
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
+    void new_csmt3(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(3);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Three valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        auto length = -1.;
+        if(!get_optional_input(command, length)) {
+            suanpan_error("A valid length is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CSMT3>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
+    void new_csmt6(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(6);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Six valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        auto length = -1.;
+        if(!get_optional_input(command, length)) {
+            suanpan_error("A valid length is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<CSMT6>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
-    return_obj = make_unique<Spring02>(tag, std::move(node_tag), material_tag);
-}
+    void new_csmq(unique_ptr<Element>& return_obj, istringstream& command, const unsigned size) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-void new_t2d2(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uvec node_tag(size);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        auto length = -1.;
+        if(!get_optional_input(command, length)) {
+            suanpan_error("A valid length is required.\n");
+            return;
+        }
+
+        if(4 == size) return_obj = make_unique<CSMQ4>(tag, std::move(node_tag), material_tag, thickness, length);
+        else if(5 == size) return_obj = make_unique<CSMQ5>(tag, std::move(node_tag), material_tag, thickness, length);
+        else if(6 == size) return_obj = make_unique<CSMQ6>(tag, std::move(node_tag), material_tag, thickness, length);
+        else if(7 == size) return_obj = make_unique<CSMQ7>(tag, std::move(node_tag), material_tag, thickness, length);
+        else if(8 == size) return_obj = make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
+    void new_damper01(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned damper_tag;
+        if(!get_input(command, damper_tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Damper01>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
+    void new_damper02(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned damper_tag;
+        if(!get_input(command, damper_tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned spring_tag;
+        if(!get_input(command, spring_tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        string use_matrix = "true";
+        if(!command.eof() && !get_input(command, use_matrix)) {
+            suanpan_error("A valid switch is required.\n");
+            return;
+        }
+
+        unsigned proceed = 0;
+        if(!command.eof() && !get_input(command, proceed)) {
+            suanpan_error("A valid proceed switch is required.\n");
+            return;
+        }
+
+        auto beta = .5;
+        if(!command.eof() && !get_input(command, beta)) {
+            suanpan_error("A valid beta value is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
     }
 
-    double area;
-    if(!get_input(command, area)) {
-        suanpan_error("A valid area is required.\n");
-        return;
+    void new_damper05(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned damper_tag;
+        if(!get_input(command, damper_tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
-    string nonlinear = "N", update_area = "N", log_strain = "N";
-    double rigidity = -1.;
+    void new_dc3d4(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Constant area assumed.\n");
-    else if(!get_input(command, update_area))
-        suanpan_error("A valid area switch is required.\n");
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Engineering strain assumed.\n");
-    else if(!get_input(command, log_strain))
-        suanpan_error("A valid engineering strain switch is required.\n");
+        double length;
+        if(!get_input(command, length)) {
+            suanpan_error("A valid characteristic length is required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("No buckling check.\n");
-    else if(!get_input(command, rigidity))
-        suanpan_error("A valid flexural rigidity is required.\n");
+        double rate;
+        if(!get_input(command, rate)) {
+            suanpan_error("A valid energy release rate is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<T2D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain), rigidity);
-}
-
-void new_t2d2s(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        return_obj = make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate);
     }
 
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
+    void new_dc3d8(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double length;
+        if(!get_input(command, length)) {
+            suanpan_error("A valid characteristic length is required.\n");
+            return;
+        }
+
+        double rate;
+        if(!get_input(command, rate)) {
+            suanpan_error("A valid energy release rate is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate);
     }
 
-    unsigned section_tag;
-    if(!get_input(command, section_tag)) {
-        suanpan_error("A valid material/section tag is required.\n");
-        return;
+    void new_dcp3(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(3);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Three valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double length;
+        if(!get_input(command, length)) {
+            suanpan_error("A valid characteristic length is required.\n");
+            return;
+        }
+
+        double rate;
+        if(!get_input(command, rate)) {
+            suanpan_error("A valid energy release rate is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness);
     }
 
-    string nonlinear = "N", log_strain = "N";
+    void new_dcp4(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Engineering strain assumed.\n");
-    else if(!get_input(command, log_strain))
-        suanpan_error("A valid switch to indicate if to use engineering strain is required.\n");
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<T2D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
-}
+        double length;
+        if(!get_input(command, length)) {
+            suanpan_error("A valid characteristic length is required.\n");
+            return;
+        }
 
-void new_t3d2(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        double rate;
+        if(!get_input(command, rate)) {
+            suanpan_error("A valid energy release rate is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness);
     }
 
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
+    void new_dkt3(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(3);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Three valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double thickness;
+        if(!get_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        auto num_ip = 3u;
+        if(!get_optional_input(command, num_ip)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<DKT3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
-    unsigned material_tag;
-    if(!get_input(command, material_tag)) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
+    void new_dkt4(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double thickness;
+        if(!get_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        auto num_ip = 3u;
+        if(!get_optional_input(command, num_ip)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<DKT4>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
-    double area;
-    if(!get_input(command, area)) {
-        suanpan_error("A valid area is required.\n");
-        return;
+    void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(3);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Three valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double thickness;
+        if(!get_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        auto num_ip = 3u;
+        if(!get_optional_input(command, num_ip)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        string nlgeom = "false";
+        if(!get_optional_input(command, nlgeom)) {
+            suanpan_error("A valid nlgeom switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
     }
 
-    string nonlinear = "N", update_area = "N", log_strain = "N";
+    void new_embedded(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dof) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
+        unsigned element_tag;
+        if(!get_input(command, element_tag)) {
+            suanpan_error("A valid element tag is required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Constant area assumed.\n");
-    else if(!get_input(command, update_area))
-        suanpan_error("A valid area switch is required.\n");
+        unsigned node_tag;
+        if(!get_input(command, node_tag)) {
+            suanpan_error("A valid node tag is required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Engineering strain assumed.\n");
-    else if(!get_input(command, log_strain))
-        suanpan_error("A valid engineering strain switch is required.\n");
+        auto alpha = 1E4;
+        if(!get_optional_input(command, alpha)) {
+            suanpan_error("A valid alpha is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<T3D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain));
-}
-
-void new_t3d2s(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        if(2 == dof) return_obj = make_unique<Embedded2D>(tag, element_tag, node_tag, alpha);
+        else return_obj = make_unique<Embedded3D>(tag, element_tag, node_tag, alpha);
     }
 
-    uvec node_tag(2);
-    if(!get_input(command, node_tag)) {
-        suanpan_error("Two valid nodes are required.\n");
-        return;
+    void new_eb21(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        double area;
+        if(!get_input(command, area)) {
+            suanpan_error("A valid area is required.\n");
+            return;
+        }
+
+        double moment_inertia;
+        if(!get_input(command, moment_inertia)) {
+            suanpan_error("A valid moment of inertia is required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<EB21>(tag, std::move(node_tag), area, moment_inertia, material_tag, is_true(nonlinear));
     }
 
-    unsigned section_tag;
-    if(!get_input(command, section_tag)) {
-        suanpan_error("A valid material/section tag is required.\n");
-        return;
+    void new_eb31os(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        vec property(7);
+        if(!get_input(command, property)) {
+            suanpan_error("A valid section/material property is required.\n");
+            return;
+        }
+
+        unsigned orientation;
+        if(!get_input(command, orientation)) {
+            suanpan_error("A valid orientation tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<EB31OS>(tag, std::move(node_tag), std::move(property), orientation, is_true(nonlinear));
     }
 
-    string nonlinear = "N", log_strain = "N";
+    void new_f21(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Linear geometry assumed.\n");
-    else if(!get_input(command, nonlinear))
-        suanpan_error("A valid nonlinear geometry switch is required.\n");
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
 
-    if(command.eof())
-        suanpan_debug("Engineering strain assumed.\n");
-    else if(!get_input(command, log_strain))
-        suanpan_error("A valid switch to indicate if to use engineering strain is required.\n");
+        unsigned section_id;
+        if(!get_input(command, section_id)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<T3D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
-}
+        auto int_pt = 6u;
+        if(!get_optional_input(command, int_pt)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
 
-void new_tie(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        auto nonlinear = 0u;
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<F21>(tag, std::move(node_tag), section_id, int_pt, !!nonlinear);
     }
 
-    double magnitude, penalty;
-    if(!get_input(command, magnitude) || !get_input(command, penalty)) {
-        suanpan_error("A valid magnitude is required.\n");
-        return;
+    void new_f21h(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_id;
+        if(!get_input(command, section_id)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
+
+        auto elastic_length = .2;
+        if(!command.eof() && !get_input(command, elastic_length)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        unsigned nonlinear = 0;
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        return_obj = make_unique<F21H>(tag, std::move(node_tag), section_id, elastic_length, !!nonlinear);
     }
 
-    vector<uword> node_tag, dof_tag;
-    vector<double> weight_tag;
-    while(!command.eof()) {
-        double weight;
-        uword dof;
-        uword node;
-        if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return;
-        node_tag.emplace_back(node);
-        dof_tag.emplace_back(dof);
-        weight_tag.emplace_back(weight);
+    void new_f31(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_id;
+        if(!get_input(command, section_id)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
+
+        unsigned orientation_id;
+        if(!get_input(command, orientation_id)) {
+            suanpan_error("A valid orientation tag is required.\n");
+            return;
+        }
+
+        unsigned int_pt = 5;
+        if(!command.eof() && !get_input(command, int_pt)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        string nonlinear = "false";
+        if(!command.eof() && !get_input(command, nonlinear)) {
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<F31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
     }
 
-    return_obj = make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
-}
+    void new_gcmq(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-void new_translationconnector(unique_ptr<Element>& return_obj, istringstream& command, const unsigned S) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(command.eof())
+            suanpan_debug("Unit thickness assumed.\n");
+        else if(!get_input(command, thickness))
+            suanpan_error("A valid thickness is required.\n");
+
+        string int_scheme = "I";
+        if(!command.eof() && !get_input(command, int_scheme))
+            suanpan_error("A valid reduced scheme switch is required.\n");
+
+        return_obj = make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, suanpan::to_upper(int_scheme[0]));
     }
 
-    uvec nodes(3);
-    if(!get_input(command, nodes)) {
-        suanpan_error("Three valid nodes are required.\n");
-        return;
+    void new_gcmq(unique_ptr<Element>& return_obj, istringstream& command, const char int_type) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(command.eof())
+            suanpan_debug("Unit thickness assumed.\n");
+        else if(!get_input(command, thickness))
+            suanpan_error("A valid thickness is required.\n");
+
+        return_obj = make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
     }
 
-    double penalty;
-    if(!get_input(command, penalty)) {
-        suanpan_error("A valid penalty is required.\n");
-        return;
+    void new_sgcmq(unique_ptr<Element>& return_obj, istringstream& command, const char int_type) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(command.eof())
+            suanpan_debug("Unit thickness assumed.\n");
+        else if(!get_input(command, thickness))
+            suanpan_error("A valid thickness is required.\n");
+
+        return_obj = make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
     }
 
-    if(2u == S) return_obj = make_unique<TranslationConnector2D>(tag, std::move(nodes), penalty);
-    else return_obj = make_unique<TranslationConnector3D>(tag, std::move(nodes), penalty);
-}
+    void new_sgcms(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-void new_patchquad(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!command.eof() && !get_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string nlgeom = "false";
+        if(!get_optional_input(command, nlgeom)) {
+            suanpan_error("A valid nlgeom switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
     }
 
-    vector<uword> node_tag;
-    vector<double> knot_x, knot_y;
-    auto material_tag = -1;
-    auto thickness = 1.;
+    void new_gq12(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    while(!command.eof()) {
-        if(string parameter; get_input(command, parameter)) {
-            ignore_whitespace(command);
-            if(uword node; is_equal(parameter, "-node"))
-                while(command.peek() != '-' && get_input(command, node)) {
-                    node_tag.emplace_back(node);
-                    ignore_whitespace(command);
-                }
-            else if(double knot; is_equal(parameter, "-knotx"))
-                while(command.peek() != '-' && get_input(command, knot)) {
-                    knot_x.emplace_back(knot);
-                    ignore_whitespace(command);
-                }
-            else if(is_equal(parameter, "-knoty"))
-                while(command.peek() != '-' && get_input(command, knot)) {
-                    knot_y.emplace_back(knot);
-                    ignore_whitespace(command);
-                }
-            else if(is_equal(parameter, "-material")) {
-                if(!get_input(command, material_tag)) {
-                    suanpan_error("A valid material tag is required.\n");
-                    return;
-                }
-                ignore_whitespace(command);
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(command.eof())
+            suanpan_debug("Unit thickness assumed.\n");
+        else if(!get_input(command, thickness))
+            suanpan_error("A valid thickness is required.\n");
+
+        return_obj = make_unique<GQ12>(tag, std::move(node_tag), material_tag, thickness);
+    }
+
+    void new_joint(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        vector<uword> pool;
+        uword material_tag;
+        while(!command.eof() && get_input(command, material_tag)) pool.emplace_back(material_tag);
+
+        return_obj = make_unique<Joint>(tag, std::move(node_tag), std::move(pool));
+    }
+
+    void new_mass(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned node;
+        if(!get_input(command, node)) {
+            suanpan_error("A valid node tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid magnitude is required.\n");
+            return;
+        }
+
+        unsigned dof;
+        vector<uword> dof_tag;
+        while(!command.eof() && get_input(command, dof)) dof_tag.push_back(dof);
+
+        if(2 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 3) {
+            suanpan_error("At most three dofs are supported.\n");
+            return;
+        }
+        if(3 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 6) {
+            suanpan_error("At most six dofs are supported.\n");
+            return;
+        }
+
+        if(2 == which) return_obj = make_unique<Mass2D>(tag, node, magnitude, uvec(dof_tag));
+        else return_obj = make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
+    }
+
+    void new_masspoint(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned node;
+        if(!get_input(command, node)) {
+            suanpan_error("A valid node tag is required.\n");
+            return;
+        }
+
+        double translational_magnitude;
+        if(!get_input(command, translational_magnitude)) {
+            suanpan_error("A valid translational magnitude is required.\n");
+            return;
+        }
+
+        if(command.eof()) {
+            if(2 == which) return_obj = make_unique<MassPoint2D>(tag, node, translational_magnitude);
+            else return_obj = make_unique<MassPoint3D>(tag, node, translational_magnitude);
+        }
+        else {
+            double rotational_magnitude;
+            if(!get_input(command, rotational_magnitude)) {
+                suanpan_error("A valid rotational magnitude is required.\n");
+                return;
             }
-            else if(is_equal(parameter, "-thickness")) {
-                if(!get_input(command, thickness)) {
-                    suanpan_error("A valid thickness is required.\n");
-                    return;
-                }
-                ignore_whitespace(command);
-            }
+            if(2 == which) return_obj = make_unique<MassPoint2D>(tag, node, translational_magnitude, rotational_magnitude);
+            else return_obj = make_unique<MassPoint3D>(tag, node, translational_magnitude, rotational_magnitude);
         }
     }
 
-    if(node_tag.empty()) {
-        suanpan_error("A valid node tags is required.\n");
-        return;
-    }
-    if(knot_x.empty() || knot_y.empty()) {
-        suanpan_error("A valid knot vector is required.\n");
-        return;
-    }
-    if(-1 == material_tag) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
+    void new_mindlin(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double thickness;
+        if(!get_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        unsigned num_ip = 5;
+        if(!command.eof() && !get_input(command, num_ip)) {
+            suanpan_error("A valid number of integration points is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Mindlin>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
-    return_obj = make_unique<PatchQuad>(tag, std::move(knot_x), std::move(knot_y), std::move(node_tag), static_cast<unsigned>(material_tag), thickness);
-}
+    void new_mvlem(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-void new_patchcube(unique_ptr<Element>& return_obj, istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned shear_tag;
+        if(!get_input(command, shear_tag)) {
+            suanpan_error("A valid shear material is required.\n");
+            return;
+        }
+
+        double c_height;
+        if(!get_input(command, c_height)) {
+            suanpan_error("A valid c is required.\n");
+            return;
+        }
+
+        vector<double> B, H, R;
+        vector<uword> CT, ST;
+        while(!command.eof()) {
+            double t_value;
+            uword t_tag;
+            if(!get_input(command, t_value)) {
+                suanpan_error("A valid fibre width is required.\n");
+                return;
+            }
+            B.emplace_back(t_value);
+            if(!get_input(command, t_value)) {
+                suanpan_error("A valid fibre thickness is required.\n");
+                return;
+            }
+            H.emplace_back(t_value);
+            if(!get_input(command, t_value)) {
+                suanpan_error("A valid fibre reinforcement ratio is required.\n");
+                return;
+            }
+            R.emplace_back(t_value);
+            if(!get_input(command, t_tag)) {
+                suanpan_error("A valid material tag is required.\n");
+                return;
+            }
+            CT.emplace_back(t_tag);
+            if(!get_input(command, t_tag)) {
+                suanpan_error("A valid material tag is required.\n");
+                return;
+            }
+            ST.emplace_back(t_tag);
+        }
+
+        return_obj = make_unique<MVLEM>(tag, std::move(node_tag), B, H, R, uvec(CT), uvec(ST), shear_tag, c_height);
     }
 
-    vector<uword> node_tag;
-    vector<double> knot_x, knot_y, knot_z;
-    auto material_tag = -1;
+    void new_pcpedc(unique_ptr<Element>& return_obj, istringstream& command, const unsigned node) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    while(!command.eof()) {
-        if(string parameter; get_input(command, parameter)) {
-            ignore_whitespace(command);
-            if(uword node; is_equal(parameter, "-node"))
-                while(command.peek() != '-' && get_input(command, node)) {
-                    node_tag.emplace_back(node);
-                    ignore_whitespace(command);
-                }
-            else if(double knot; is_equal(parameter, "-knotx"))
-                while(command.peek() != '-' && get_input(command, knot)) {
-                    knot_x.emplace_back(knot);
-                    ignore_whitespace(command);
-                }
-            else if(is_equal(parameter, "-knoty"))
-                while(command.peek() != '-' && get_input(command, knot)) {
-                    knot_y.emplace_back(knot);
-                    ignore_whitespace(command);
-                }
-            else if(is_equal(parameter, "-knotz"))
-                while(command.peek() != '-' && get_input(command, knot)) {
-                    knot_z.emplace_back(knot);
-                    ignore_whitespace(command);
-                }
-            else if(is_equal(parameter, "-material")) {
-                if(!get_input(command, material_tag)) {
-                    suanpan_error("A valid material tag is required.\n");
-                    return;
-                }
+        uvec node_tag(node);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("{} valid nodes are required.\n", node);
+            return;
+        }
+
+        unsigned solid_tag;
+        if(!get_input(command, solid_tag)) {
+            suanpan_error("A valid material tag for solid phase is required.\n");
+            return;
+        }
+        unsigned fluid_tag;
+        if(!get_input(command, fluid_tag)) {
+            suanpan_error("A valid material tag for fluid phase is required.\n");
+            return;
+        }
+
+        double alpha, n, k;
+        if(!get_input(command, alpha, n, k)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        if(4 == node) return_obj = make_unique<PCPE4DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
+        else if(8 == node) return_obj = make_unique<PCPE8DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
+    }
+
+    void new_pcpeuc(unique_ptr<Element>& return_obj, istringstream& command, const unsigned node) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(node);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("{} valid nodes are required.\n", node);
+            return;
+        }
+
+        unsigned solid_tag;
+        if(!get_input(command, solid_tag)) {
+            suanpan_error("A valid material tag for solid phase is required.\n");
+            return;
+        }
+        unsigned fluid_tag;
+        if(!get_input(command, fluid_tag)) {
+            suanpan_error("A valid material tag for fluid phase is required.\n");
+            return;
+        }
+
+        double alpha, n;
+        if(!get_input(command, alpha, n)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        if(4 == node) return_obj = make_unique<PCPE4UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
+        else if(8 == node) return_obj = make_unique<PCPE8UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
+    }
+
+    void new_ps(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(command.eof())
+            suanpan_debug("Unit thickness assumed.\n");
+        else if(!get_input(command, thickness))
+            suanpan_error("A valid thickness is required.\n");
+
+        return_obj = make_unique<PS>(tag, std::move(node_tag), material_tag, thickness);
+    }
+
+    void new_qe2(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(command.eof())
+            suanpan_debug("Unit thickness assumed.\n");
+        else if(!get_input(command, thickness))
+            suanpan_error("A valid thickness is required.\n");
+
+        return_obj = make_unique<QE2>(tag, std::move(node_tag), material_tag, thickness);
+    }
+
+    void new_s4(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!command.eof() && !get_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        string nlgeom = "false";
+        if(!get_optional_input(command, nlgeom)) {
+            suanpan_error("A valid nlgeom switch is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
+    }
+
+    template<typename T> void new_singlesection(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned node;
+        if(!get_input(command, node)) {
+            suanpan_error("A valid node tag is required.\n");
+            return;
+        }
+
+        unsigned section_tag;
+        if(!get_input(command, section_tag)) {
+            suanpan_error("A valid section tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<T>(tag, node, section_tag);
+    }
+
+    void new_spring01(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Spring01>(tag, std::move(node_tag), material_tag);
+    }
+
+    void new_spring02(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<Spring02>(tag, std::move(node_tag), material_tag);
+    }
+
+    void new_t2d2(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double area;
+        if(!get_input(command, area)) {
+            suanpan_error("A valid area is required.\n");
+            return;
+        }
+
+        string nonlinear = "N", update_area = "N", log_strain = "N";
+        double rigidity = -1.;
+
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        if(command.eof())
+            suanpan_debug("Constant area assumed.\n");
+        else if(!get_input(command, update_area))
+            suanpan_error("A valid area switch is required.\n");
+
+        if(command.eof())
+            suanpan_debug("Engineering strain assumed.\n");
+        else if(!get_input(command, log_strain))
+            suanpan_error("A valid engineering strain switch is required.\n");
+
+        if(command.eof())
+            suanpan_debug("No buckling check.\n");
+        else if(!get_input(command, rigidity))
+            suanpan_error("A valid flexural rigidity is required.\n");
+
+        return_obj = make_unique<T2D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain), rigidity);
+    }
+
+    void new_t2d2s(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_tag;
+        if(!get_input(command, section_tag)) {
+            suanpan_error("A valid material/section tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "N", log_strain = "N";
+
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        if(command.eof())
+            suanpan_debug("Engineering strain assumed.\n");
+        else if(!get_input(command, log_strain))
+            suanpan_error("A valid switch to indicate if to use engineering strain is required.\n");
+
+        return_obj = make_unique<T2D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
+    }
+
+    void new_t3d2(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double area;
+        if(!get_input(command, area)) {
+            suanpan_error("A valid area is required.\n");
+            return;
+        }
+
+        string nonlinear = "N", update_area = "N", log_strain = "N";
+
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        if(command.eof())
+            suanpan_debug("Constant area assumed.\n");
+        else if(!get_input(command, update_area))
+            suanpan_error("A valid area switch is required.\n");
+
+        if(command.eof())
+            suanpan_debug("Engineering strain assumed.\n");
+        else if(!get_input(command, log_strain))
+            suanpan_error("A valid engineering strain switch is required.\n");
+
+        return_obj = make_unique<T3D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain));
+    }
+
+    void new_t3d2s(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(2);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Two valid nodes are required.\n");
+            return;
+        }
+
+        unsigned section_tag;
+        if(!get_input(command, section_tag)) {
+            suanpan_error("A valid material/section tag is required.\n");
+            return;
+        }
+
+        string nonlinear = "N", log_strain = "N";
+
+        if(command.eof())
+            suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear))
+            suanpan_error("A valid nonlinear geometry switch is required.\n");
+
+        if(command.eof())
+            suanpan_debug("Engineering strain assumed.\n");
+        else if(!get_input(command, log_strain))
+            suanpan_error("A valid switch to indicate if to use engineering strain is required.\n");
+
+        return_obj = make_unique<T3D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
+    }
+
+    void new_tie(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double magnitude, penalty;
+        if(!get_input(command, magnitude) || !get_input(command, penalty)) {
+            suanpan_error("A valid magnitude is required.\n");
+            return;
+        }
+
+        vector<uword> node_tag, dof_tag;
+        vector<double> weight_tag;
+        while(!command.eof()) {
+            double weight;
+            uword dof;
+            uword node;
+            if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return;
+            node_tag.emplace_back(node);
+            dof_tag.emplace_back(dof);
+            weight_tag.emplace_back(weight);
+        }
+
+        return_obj = make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
+    }
+
+    void new_translationconnector(unique_ptr<Element>& return_obj, istringstream& command, const unsigned S) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec nodes(3);
+        if(!get_input(command, nodes)) {
+            suanpan_error("Three valid nodes are required.\n");
+            return;
+        }
+
+        double penalty;
+        if(!get_input(command, penalty)) {
+            suanpan_error("A valid penalty is required.\n");
+            return;
+        }
+
+        if(2u == S) return_obj = make_unique<TranslationConnector2D>(tag, std::move(nodes), penalty);
+        else return_obj = make_unique<TranslationConnector3D>(tag, std::move(nodes), penalty);
+    }
+
+    void new_patchquad(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        vector<uword> node_tag;
+        vector<double> knot_x, knot_y;
+        auto material_tag = -1;
+        auto thickness = 1.;
+
+        while(!command.eof()) {
+            if(string parameter; get_input(command, parameter)) {
                 ignore_whitespace(command);
+                if(uword node; is_equal(parameter, "-node"))
+                    while(command.peek() != '-' && get_input(command, node)) {
+                        node_tag.emplace_back(node);
+                        ignore_whitespace(command);
+                    }
+                else if(double knot; is_equal(parameter, "-knotx"))
+                    while(command.peek() != '-' && get_input(command, knot)) {
+                        knot_x.emplace_back(knot);
+                        ignore_whitespace(command);
+                    }
+                else if(is_equal(parameter, "-knoty"))
+                    while(command.peek() != '-' && get_input(command, knot)) {
+                        knot_y.emplace_back(knot);
+                        ignore_whitespace(command);
+                    }
+                else if(is_equal(parameter, "-material")) {
+                    if(!get_input(command, material_tag)) {
+                        suanpan_error("A valid material tag is required.\n");
+                        return;
+                    }
+                    ignore_whitespace(command);
+                }
+                else if(is_equal(parameter, "-thickness")) {
+                    if(!get_input(command, thickness)) {
+                        suanpan_error("A valid thickness is required.\n");
+                        return;
+                    }
+                    ignore_whitespace(command);
+                }
             }
         }
+
+        if(node_tag.empty()) {
+            suanpan_error("A valid node tags is required.\n");
+            return;
+        }
+        if(knot_x.empty() || knot_y.empty()) {
+            suanpan_error("A valid knot vector is required.\n");
+            return;
+        }
+        if(-1 == material_tag) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<PatchQuad>(tag, std::move(knot_x), std::move(knot_y), std::move(node_tag), static_cast<unsigned>(material_tag), thickness);
     }
 
-    if(node_tag.empty()) {
-        suanpan_error("A valid node tags is required.\n");
-        return;
-    }
-    if(knot_x.empty() || knot_y.empty() || knot_z.empty()) {
-        suanpan_error("A valid knot vector is required.\n");
-        return;
-    }
-    if(-1 == material_tag) {
-        suanpan_error("A valid material tag is required.\n");
-        return;
-    }
+    void new_patchcube(unique_ptr<Element>& return_obj, istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
+        vector<uword> node_tag;
+        vector<double> knot_x, knot_y, knot_z;
+        auto material_tag = -1;
+
+        while(!command.eof()) {
+            if(string parameter; get_input(command, parameter)) {
+                ignore_whitespace(command);
+                if(uword node; is_equal(parameter, "-node"))
+                    while(command.peek() != '-' && get_input(command, node)) {
+                        node_tag.emplace_back(node);
+                        ignore_whitespace(command);
+                    }
+                else if(double knot; is_equal(parameter, "-knotx"))
+                    while(command.peek() != '-' && get_input(command, knot)) {
+                        knot_x.emplace_back(knot);
+                        ignore_whitespace(command);
+                    }
+                else if(is_equal(parameter, "-knoty"))
+                    while(command.peek() != '-' && get_input(command, knot)) {
+                        knot_y.emplace_back(knot);
+                        ignore_whitespace(command);
+                    }
+                else if(is_equal(parameter, "-knotz"))
+                    while(command.peek() != '-' && get_input(command, knot)) {
+                        knot_z.emplace_back(knot);
+                        ignore_whitespace(command);
+                    }
+                else if(is_equal(parameter, "-material")) {
+                    if(!get_input(command, material_tag)) {
+                        suanpan_error("A valid material tag is required.\n");
+                        return;
+                    }
+                    ignore_whitespace(command);
+                }
+            }
+        }
+
+        if(node_tag.empty()) {
+            suanpan_error("A valid node tags is required.\n");
+            return;
+        }
+        if(knot_x.empty() || knot_y.empty() || knot_z.empty()) {
+            suanpan_error("A valid knot vector is required.\n");
+            return;
+        }
+        if(-1 == material_tag) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        return_obj = make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
+    }
 }
 
 int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command) {
@@ -2774,7 +2778,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& comm
     else if(is_equal(element_id, "TranslationConnector3D")) new_translationconnector(new_element, command, 3u);
     else load::object(new_element, domain, element_id, command);
 
-    if(new_element == nullptr || !domain->insert(std::move(new_element)))
+    if(nullptr == new_element || !domain->insert(std::move(new_element)))
         suanpan_error("Fail to create new element via \"{}\".\n", command.str());
 
     return 0;
