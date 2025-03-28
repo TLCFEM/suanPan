@@ -207,15 +207,12 @@ template<> SparseMatMAGMA<float> create_new(const u64 N) {
 #endif
 
 template<typename T, typename ET> void benchmark_mat_setup(const int I) {
-    auto B = sprandu<SpMat<ET>>(I, I, .2);
-    B = B + B.t() + speye<SpMat<ET>>(I, I) * 1E1;
-
-    std::vector<std::tuple<uword, uword>> to_erase;
-    to_erase.reserve(B.n_nonzero);
-    for(auto J = B.begin(); J != B.end(); ++J) if(std::abs(static_cast<int>(J.row()) - static_cast<int>(J.col())) > 3) to_erase.emplace_back(std::tuple{J.row(), J.col()});
-    for(const auto& [row, col] : to_erase) B.at(row, col) = 0.;
-
     const auto C = randu<Col<ET>>(I);
+
+    Mat<ET> V(I, 5, fill::ones);
+    V.col(2) += 10 * C;
+
+    auto B = spdiags(V, ivec{-2, -1, 0, +1, +2}, I, I);
 
     auto A = create_new<T>(I);
 
