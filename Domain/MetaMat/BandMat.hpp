@@ -93,12 +93,12 @@ template<sp_d T> T BandMat<T>::bin = T(0);
 template<sp_d T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) const {
     Mat<T> Y(arma::size(X));
 
-    const auto M = static_cast<int>(this->n_rows);
-    const auto N = static_cast<int>(this->n_cols);
-    const auto KL = static_cast<int>(l_band);
-    const auto KU = static_cast<int>(u_band);
-    const auto LDA = static_cast<int>(m_rows);
-    constexpr auto INC = 1;
+    const auto M = static_cast<blas_int>(this->n_rows);
+    const auto N = static_cast<blas_int>(this->n_cols);
+    const auto KL = static_cast<blas_int>(l_band);
+    const auto KU = static_cast<blas_int>(u_band);
+    const auto LDA = static_cast<blas_int>(m_rows);
+    constexpr blas_int INC = 1;
     T ALPHA = T(1);
     T BETA = T(0);
 
@@ -119,14 +119,14 @@ template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
     suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
-    auto INFO = 0;
+    blas_int INFO = 0;
 
-    auto N = static_cast<int>(this->n_rows);
-    const auto KL = static_cast<int>(l_band);
-    const auto KU = static_cast<int>(u_band);
-    const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDAB = static_cast<int>(m_rows);
-    const auto LDB = static_cast<int>(B.n_rows);
+    auto N = static_cast<blas_int>(this->n_rows);
+    const auto KL = static_cast<blas_int>(l_band);
+    const auto KU = static_cast<blas_int>(u_band);
+    const auto NRHS = static_cast<blas_int>(B.n_cols);
+    const auto LDAB = static_cast<blas_int>(m_rows);
+    const auto LDB = static_cast<blas_int>(B.n_rows);
     this->pivot.zeros(N);
     this->factored = true;
 
@@ -153,14 +153,14 @@ template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 }
 
 template<sp_d T> int BandMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
-    auto INFO = 0;
+    blas_int INFO = 0;
 
-    const auto N = static_cast<int>(this->n_rows);
-    const auto KL = static_cast<int>(l_band);
-    const auto KU = static_cast<int>(u_band);
-    const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDAB = static_cast<int>(m_rows);
-    const auto LDB = static_cast<int>(B.n_rows);
+    const auto N = static_cast<blas_int>(this->n_rows);
+    const auto KL = static_cast<blas_int>(l_band);
+    const auto KU = static_cast<blas_int>(u_band);
+    const auto NRHS = static_cast<blas_int>(B.n_cols);
+    const auto LDAB = static_cast<blas_int>(m_rows);
+    const auto LDB = static_cast<blas_int>(B.n_rows);
 
     if constexpr(std::is_same_v<T, float>) {
         using E = float;

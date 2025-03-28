@@ -67,13 +67,13 @@ public:
 template<sp_d T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) const {
     Mat<T> C(arma::size(B));
 
-    const auto M = static_cast<int>(this->n_rows);
-    const auto N = static_cast<int>(this->n_cols);
+    const auto M = static_cast<blas_int>(this->n_rows);
+    const auto N = static_cast<blas_int>(this->n_cols);
 
     T ALPHA = T(1), BETA = T(0);
 
     if(1 == B.n_cols) {
-        constexpr auto INC = 1;
+        constexpr blas_int INC = 1;
 
         if constexpr(std::is_same_v<T, float>) {
             using E = float;
@@ -85,7 +85,7 @@ template<sp_d T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) const {
         }
     }
     else {
-        const auto K = static_cast<int>(B.n_cols);
+        const auto K = static_cast<blas_int>(B.n_cols);
 
         if constexpr(std::is_same_v<T, float>) {
             using E = float;
@@ -105,11 +105,11 @@ template<sp_d T> int FullMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
     suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
-    auto INFO = 0;
+    blas_int INFO = 0;
 
-    auto N = static_cast<int>(this->n_rows);
-    const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDB = static_cast<int>(B.n_rows);
+    auto N = static_cast<blas_int>(this->n_rows);
+    const auto NRHS = static_cast<blas_int>(B.n_cols);
+    const auto LDB = static_cast<blas_int>(B.n_rows);
     this->pivot.zeros(N);
     this->factored = true;
 
@@ -136,11 +136,11 @@ template<sp_d T> int FullMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 }
 
 template<sp_d T> int FullMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
-    auto INFO = 0;
+    blas_int INFO = 0;
 
-    const auto N = static_cast<int>(this->n_rows);
-    const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDB = static_cast<int>(B.n_rows);
+    const auto N = static_cast<blas_int>(this->n_rows);
+    const auto NRHS = static_cast<blas_int>(B.n_cols);
+    const auto LDB = static_cast<blas_int>(B.n_rows);
 
     if constexpr(std::is_same_v<T, float>) {
         using E = float;

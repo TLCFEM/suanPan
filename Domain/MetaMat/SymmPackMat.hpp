@@ -80,8 +80,8 @@ template<sp_d T> T SymmPackMat<T>::bin = T(0);
 template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {
     auto Y = Mat<T>(arma::size(X), fill::none);
 
-    const auto N = static_cast<int>(this->n_rows);
-    constexpr auto INC = 1;
+    const auto N = static_cast<blas_int>(this->n_rows);
+    constexpr blas_int INC = 1;
     T ALPHA = T(1);
     T BETA = T(0);
 
@@ -102,11 +102,11 @@ template<sp_d T> int SymmPackMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
     suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
-    auto INFO = 0;
+    blas_int INFO = 0;
 
-    const auto N = static_cast<int>(this->n_rows);
-    const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDB = static_cast<int>(B.n_rows);
+    const auto N = static_cast<blas_int>(this->n_rows);
+    const auto NRHS = static_cast<blas_int>(B.n_cols);
+    const auto LDB = static_cast<blas_int>(B.n_rows);
     this->factored = true;
 
     if constexpr(std::is_same_v<T, float>) {
@@ -132,11 +132,11 @@ template<sp_d T> int SymmPackMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 }
 
 template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
-    auto INFO = 0;
+    blas_int INFO = 0;
 
-    const auto N = static_cast<int>(this->n_rows);
-    const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDB = static_cast<int>(B.n_rows);
+    const auto N = static_cast<blas_int>(this->n_rows);
+    const auto NRHS = static_cast<blas_int>(B.n_cols);
+    const auto LDB = static_cast<blas_int>(B.n_rows);
 
     if constexpr(std::is_same_v<T, float>) {
         using E = float;

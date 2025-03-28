@@ -42,7 +42,7 @@ protected:
 
     int direct_solve(Mat<T>& X, const Mat<T>& B) override { return this->direct_solve(X, Mat<T>(B)); }
 
-    podarray<int> pivot;
+    podarray<blas_int> pivot;
     podarray<float> s_memory; // float storage used in mixed precision algorithm
 
     std::unique_ptr<T[]> memory = nullptr;
