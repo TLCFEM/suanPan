@@ -1,28 +1,24 @@
-#include "MetaMat.hpp"
-
-#include "DenseMat.hpp"
-#include "SparseMat.hpp"
-
-#include "BandMat.hpp"
-#include "BandMatCUDA.hpp"
-#include "BandMatMAGMA.hpp"
-#include "BandMatSpike.hpp"
-#include "BandSymmMat.hpp"
-#include "FullMat.hpp"
-#include "FullMatCUDA.hpp"
-#include "SparseMatCUDA.hpp"
-#include "SparseMatFGMRES.hpp"
-#include "SparseMatLis.hpp"
-#include "SparseMatMAGMA.hpp"
-#include "SparseMatMPI.hpp"
-#include "SparseMatMUMPS.hpp"
-#include "SparseMatPARDISO.hpp"
-#include "SparseMatSuperLU.hpp"
-#include "SymmPackMat.hpp"
+#pragma once
 
 // my sparse implementation
 #include "csc_form.hpp"
 #include "csr_form.hpp"
-#include "triplet_form.hpp"
 
+// global matrix storage
+#include "Dense.Single/BandMat.hpp"
+#include "Dense.Single/BandMatCUDA.hpp"
+#include "Dense.Single/BandMatMAGMA.hpp"
+#include "Dense.Single/BandMatSpike.hpp"
+#include "Dense.Single/BandSymmMat.hpp"
+#include "Dense.Single/FullMat.hpp"
+#include "Dense.Single/FullMatCUDA.hpp"
+#include "Dense.Single/SymmPackMat.hpp"
+#include "Sparse.Cluster/SparseMatMPI.hpp"
+#include "Sparse.Single/SparseMatCUDA.hpp"
+#include "Sparse.Single/SparseMatFGMRES.hpp"
+#include "Sparse.Single/SparseMatMAGMA.hpp"
+#include "Sparse.Single/SparseMatPARDISO.hpp"
+#include "Sparse.Single/SparseMatSuperLU.hpp"
+
+// misc operation
 #include "operator_times.hpp"

@@ -1028,9 +1028,7 @@ namespace {
                 t_step->set_system_solver(SolverType::LIS);
                 if(const auto options = get_remaining(command); !options.empty()) t_step->set_lis_option(options);
             }
-#ifndef SUANPAN_DISTRIBUTED
             else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
-#endif
 #ifdef SUANPAN_CUDA
             else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
 #ifdef SUANPAN_MAGMA
@@ -1053,9 +1051,11 @@ namespace {
             else if(is_equal(value, "LAPACK")) t_step->set_sub_system_solver(SolverType::LAPACK);
             else if(is_equal(value, "SPIKE")) t_step->set_sub_system_solver(SolverType::SPIKE);
             else if(is_equal(value, "SUPERLU")) t_step->set_sub_system_solver(SolverType::SUPERLU);
-#ifndef SUANPAN_DISTRIBUTED
+            else if(is_equal(value, "LIS")) {
+                t_step->set_sub_system_solver(SolverType::LIS);
+                if(const auto options = get_remaining(command); !options.empty()) t_step->set_lis_option(options);
+            }
             else if(is_equal(value, "MUMPS")) t_step->set_sub_system_solver(SolverType::MUMPS);
-#endif
 #ifdef SUANPAN_CUDA
             else if(is_equal(value, "CUDA")) t_step->set_sub_system_solver(SolverType::CUDA);
 #endif

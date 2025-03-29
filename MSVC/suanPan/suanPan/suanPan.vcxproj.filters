@@ -1746,9 +1746,6 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp">
       <Filter>Domain\MetaMat</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatMUMPS.hpp">
-      <Filter>Domain\MetaMat</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatSuperLU.hpp">
       <Filter>Domain\MetaMat</Filter>
     </ClInclude>
@@ -2952,9 +2949,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\misc.h">
       <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\SparseMatLis.hpp">
-      <Filter>Domain\MetaMat</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\TimberPD.h">
       <Filter>Material\Material3D\Hoffman</Filter>
