@@ -34,6 +34,8 @@
 
 #if defined(SUANPAN_MPI) && defined(SUANPAN_MKL)
 
+#include "../SparseMat.hpp"
+
 extern int SUANPAN_NUM_NODES;
 
 template<sp_d T> class SparseMatMPIPARDISO final : public SparseMat<T> {
