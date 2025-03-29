@@ -333,6 +333,10 @@ TEST_CASE("Large Sparse Solve Type", "[Matrix.Benchmark]") {
     for(auto I = 0x1000; I < 0x5000; I *= 2) {
         benchmark_mat_setup<BandMat<double>, double>(I);
         benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
+#ifdef SUANPAN_MKL
+        benchmark_mat_setup<SparseMatPARDISO<double>, double>(I);
+        benchmark_mat_setup<SparseMatFGMRES<double>, double>(I);
+#endif
     }
 }
 

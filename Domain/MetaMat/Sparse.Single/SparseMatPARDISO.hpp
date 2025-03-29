@@ -41,12 +41,7 @@
 template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
     static constexpr la_it negone{-1}, PARDISO_ANA_FACT{12}, PARDISO_SOLVE{33}, PARDISO_RELEASE{-1};
 
-    const la_it maxfct{1}, mnum{1}, mtype{11};
-#ifdef SUANPAN_DEBUG
-    const la_it msglvl{1};
-#else
-    const la_it msglvl{0};
-#endif
+    const la_it maxfct{1}, mnum{1}, mtype{11}, msglvl{SUANPAN_VERBOSE ? 1 : 0};
 
     la_it iparm[64]{};
     std::int64_t pt[64]{};
