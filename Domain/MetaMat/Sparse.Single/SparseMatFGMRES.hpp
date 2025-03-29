@@ -32,8 +32,8 @@
 
 #ifdef SUANPAN_MKL
 
-#include "SparseMat.hpp"
-#include "csr_form.hpp"
+#include "../SparseMat.hpp"
+#include "../csr_form.hpp"
 
 #include <mkl_rci.h>
 

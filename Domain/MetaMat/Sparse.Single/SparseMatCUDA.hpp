@@ -34,10 +34,11 @@
 
 #ifdef SUANPAN_CUDA
 
+#include "../SparseMat.hpp"
+#include "../csr_form.hpp"
+
 #include <cusolverSp.h>
 #include <cusparse.h>
-#include "SparseMat.hpp"
-#include "csr_form.hpp"
 
 template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     cusolverSpHandle_t handle = nullptr;

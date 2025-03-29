@@ -30,7 +30,7 @@
 #ifndef SYMMPACKMAT_HPP
 #define SYMMPACKMAT_HPP
 
-#include "DenseMat.hpp"
+#include "../DenseMat.hpp"
 
 template<sp_d T> class SymmPackMat final : public DenseMat<T> {
     static constexpr char UPLO = 'L';

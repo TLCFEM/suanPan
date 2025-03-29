@@ -30,7 +30,7 @@
 #ifndef FULLMAT_HPP
 #define FULLMAT_HPP
 
-#include "DenseMat.hpp"
+#include "../DenseMat.hpp"
 
 template<sp_d T> class FullMat : public DenseMat<T> {
     static constexpr char TRAN = 'N';

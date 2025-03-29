@@ -30,7 +30,7 @@
 #ifndef BANDMATSPIKE_HPP
 #define BANDMATSPIKE_HPP
 
-#include "DenseMat.hpp"
+#include "../DenseMat.hpp"
 
 extern "C" {
 void spikeinit_(la_it*, la_it*, la_it*);

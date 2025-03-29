@@ -30,8 +30,8 @@
 #ifndef SPARSEMATSUPERLU_HPP
 #define SPARSEMATSUPERLU_HPP
 
-#include "SparseMat.hpp"
-#include "csc_form.hpp"
+#include "../SparseMat.hpp"
+#include "../csc_form.hpp"
 
 #include <superlu-mt/superlu-mt.h>
 

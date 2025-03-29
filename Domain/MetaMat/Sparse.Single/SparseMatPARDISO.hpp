@@ -34,7 +34,7 @@
 
 #ifdef SUANPAN_MKL
 
-#include "SparseMat.hpp"
+#include "../SparseMat.hpp"
 
 #include <mkl_pardiso.h>
 

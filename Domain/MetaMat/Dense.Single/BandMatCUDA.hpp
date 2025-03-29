@@ -32,10 +32,11 @@
 
 #ifdef SUANPAN_CUDA
 
+#include "../csr_form.hpp"
 #include "BandMat.hpp"
+
 #include <cusolverSp.h>
 #include <cusparse.h>
-#include "csr_form.hpp"
 
 template<sp_d T> class BandMatCUDA final : public BandMat<T> {
     cusolverSpHandle_t handle = nullptr;

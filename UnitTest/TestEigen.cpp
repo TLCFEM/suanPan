@@ -1,15 +1,16 @@
-#include <Domain/MetaMat/FullMat.hpp>
+#include "CatchHeader.h"
+
+#include <Domain/MetaMat/Dense.Single/FullMat.hpp>
 #include <Toolbox/arpack.h>
 #include <Toolbox/utility.h>
-#include "CatchHeader.h"
 
 TEST_CASE("Eigensolver", "[Utility.Eigen]") {
     constexpr auto N = 100;
-    constexpr auto Q = 6;
 
     const vec D = regspace(1, 1, N);
 
     for(auto L = 0; L < N; ++L) {
+        constexpr auto Q = 6;
         const mat P = orth(randn(D.n_elem, D.n_elem));
 
         mat K = P * diagmat(D) * P.t();

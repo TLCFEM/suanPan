@@ -16,8 +16,9 @@
  ******************************************************************************/
 
 #include "TabularSpline.h"
+
 #include <Domain/DomainBase.h>
-#include <Domain/MetaMat/BandMat.hpp>
+#include <Domain/MetaMat/Dense.Single/BandMat.hpp>
 
 void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
     Tabular::initialize(D);
