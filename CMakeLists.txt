@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.18)
 
 cmake_policy(SET CMP0076 NEW)
 
+project(suanPan C CXX)
+
 if (CMAKE_GNUtoMS_VCVARS OR MINGW)
     set(CMAKE_GNUtoMS ON)
 endif ()
-
-project(suanPan C CXX)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
