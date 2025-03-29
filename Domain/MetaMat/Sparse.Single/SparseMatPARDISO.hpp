@@ -39,25 +39,61 @@
 #include <mkl_pardiso.h>
 
 template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
-    const la_it maxfct = 1;
-    const la_it mnum = 1;
-    const la_it mtype = 11;
+    static constexpr la_it negone{-1}, PARDISO_ANA_FACT{12}, PARDISO_SOLVE{33}, PARDISO_RELEASE{-1};
+
+    const la_it maxfct{1}, mnum{1}, mtype{11};
 #ifdef SUANPAN_DEBUG
-    const la_it msglvl = 1;
+    const la_it msglvl{1};
 #else
-    const la_it msglvl = 0;
+    const la_it msglvl{0};
 #endif
 
     la_it iparm[64]{};
     std::int64_t pt[64]{};
 
-    auto init_config() {
-        pardisoinit(pt, &mtype, iparm);
+    csr_form<T, la_it> csr_mat{};
 
-        iparm[1] = 3;   // nested dissection algorithm
-        iparm[23] = 10; // parallel factorization
-        iparm[34] = 1;  // zero-based indexing
-        if(std::is_same_v<T, float>) iparm[27] = 1;
+    bool is_allocated{false};
+
+    auto init_config() {
+        if constexpr(sizeof(la_it) == 4) pardisoinit(pt, &mtype, iparm);
+
+        if constexpr(std::is_same_v<T, float>) iparm[27] = 1;
+    }
+
+    auto alloc() {
+        dealloc();
+        is_allocated = true;
+
+        csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);
+
+        la_it info{-1};
+        if constexpr(sizeof(la_it) == 8) {
+            using E = long long;
+            pardiso_64(pt, (E*)&maxfct, (E*)&mnum, (E*)&mtype, (E*)&PARDISO_ANA_FACT, (E*)&csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, (E*)&negone, iparm, (E*)&msglvl, nullptr, nullptr, (E*)&info);
+        }
+        else if constexpr(sizeof(la_it) == 4) {
+            using E = int;
+            pardiso(pt, (E*)&maxfct, (E*)&mnum, (E*)&mtype, (E*)&PARDISO_ANA_FACT, (E*)&csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, (E*)&negone, iparm, (E*)&msglvl, nullptr, nullptr, (E*)&info);
+        }
+        return info;
+    }
+
+    auto dealloc() {
+        if(!is_allocated) return;
+        is_allocated = false;
+
+        la_it info{-1};
+        if constexpr(sizeof(la_it) == 8) {
+            using E = long long;
+            pardiso_64(pt, (E*)&maxfct, (E*)&mnum, (E*)&mtype, (E*)&PARDISO_RELEASE, (E*)&negone, nullptr, nullptr, nullptr, nullptr, (E*)&negone, (E*)iparm, (E*)&msglvl, nullptr, nullptr, (E*)&info);
+        }
+        else if constexpr(sizeof(la_it) == 4) {
+            using E = int;
+            pardiso(pt, (E*)&maxfct, (E*)&mnum, (E*)&mtype, (E*)&PARDISO_RELEASE, (E*)&negone, nullptr, nullptr, nullptr, nullptr, (E*)&negone, (E*)iparm, (E*)&msglvl, nullptr, nullptr, (E*)&info);
+        }
+
+        for(auto& i : pt) i = 0;
     }
 
 protected:
@@ -70,34 +106,49 @@ public:
         : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
     SparseMatPARDISO(const SparseMatPARDISO& other)
-        : SparseMat<T>(other) { init_config(); }
+        : SparseMat<T>(other) {
+        init_config();
+        this->factored = false;
+    }
 
     SparseMatPARDISO(SparseMatPARDISO&&) noexcept = delete;
     SparseMatPARDISO& operator=(const SparseMatPARDISO&) = delete;
     SparseMatPARDISO& operator=(SparseMatPARDISO&&) noexcept = delete;
 
+    ~SparseMatPARDISO() override { dealloc(); }
+
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatPARDISO>(*this); }
 };
 
 template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
+    if(!this->factored) {
+        if(const auto info = alloc(); 0 != info) {
+            suanpan_error("Error code {} received.\n", info);
+            return SUANPAN_FAIL;
+        }
+        this->factored = true;
+    }
+
     X.set_size(B.n_rows, B.n_cols);
 
-    csr_form<T, la_it> csr_mat(this->triplet_mat, SparseBase::ZERO, true);
+    const la_it nrhs{static_cast<la_it>(B.n_cols)};
 
-    const auto n = static_cast<la_it>(B.n_rows);
-    const auto nrhs = static_cast<la_it>(B.n_cols);
-    la_it info;
+    la_it info{-1};
+    if constexpr(sizeof(la_it) == 8) {
+        using E = long long;
+        pardiso_64(pt, (E*)&maxfct, (E*)&mnum, (E*)&mtype, (E*)&PARDISO_SOLVE, (E*)&csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, (E*)&nrhs, iparm, (E*)&msglvl, (void*)B.memptr(), X.memptr(), (E*)&info);
+    }
+    else if constexpr(sizeof(la_it) == 4) {
+        using E = int;
+        pardiso(pt, (E*)&maxfct, (E*)&mnum, (E*)&mtype, (E*)&PARDISO_SOLVE, (E*)&csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, (E*)&nrhs, iparm, (E*)&msglvl, (void*)B.memptr(), X.memptr(), (E*)&info);
+    }
 
-    la_it phase = 13;
-    pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, (void*)csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), (void*)X.memptr(), &info);
+    if(0 != info) {
+        suanpan_error("Error code {} received.\n", info);
+        return SUANPAN_FAIL;
+    }
 
-    const auto error = info;
-    if(0 != error) suanpan_error("Error code {} received.\n", error);
-
-    phase = -1;
-    pardiso(pt, &maxfct, &mnum, &mtype, &phase, &n, nullptr, csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, nullptr, nullptr, &info);
-
-    return 0 == error ? SUANPAN_SUCCESS : SUANPAN_FAIL;
+    return SUANPAN_SUCCESS;
 }
 
 #endif

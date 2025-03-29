@@ -188,7 +188,10 @@ template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const uword in_row, const
     : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
 template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& other)
-    : SparseMat<T>(other) { init_config(); }
+    : SparseMat<T>(other) {
+    init_config();
+    this->factored = false;
+}
 
 template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
     dealloc();
