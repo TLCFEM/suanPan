@@ -29,56 +29,10 @@
 #ifndef SORT_COLOR_HPP
 #define SORT_COLOR_HPP
 
-#include <set>
 #include "container.h"
 #include "utility.h"
-#include "metis/metis.h"
 
-template<typename T> auto sort_color_metis(suanpan::graph<T>& element_register, const int num_color, const char method) {
-    wall_clock timer;
-    timer.tic();
-
-    const auto element_size = element_register.size();
-
-    std::atomic num_edges = 0llu;
-    suanpan::for_all(element_register, [&](const suanpan::set<T>& element) { num_edges += element.size(); });
-
-    std::vector<idx_t> xadj;
-    xadj.reserve(element_size + 1llu);
-    xadj.emplace_back(0);
-    std::vector<idx_t> adjncy;
-    adjncy.reserve(num_edges);
-
-    for(const auto& element : element_register) {
-        adjncy.insert(adjncy.end(), element.begin(), element.end());
-        xadj.emplace_back(xadj.back() + static_cast<idx_t>(element.size()));
-    }
-
-    auto nvtxs = static_cast<idx_t>(element_size);
-    idx_t ncon = 1;
-    auto nparts = static_cast<idx_t>(num_color);
-    idx_t edgecut = 0;
-
-    std::vector<int> part(nvtxs);
-
-    idx_t* vsize = nullptr;
-    real_t* tpwgts = nullptr;
-    real_t* ubvec = nullptr;
-
-    idx_t options[METIS_NOPTIONS];
-    METIS_SetDefaultOptions(options);
-#ifdef SUANPAN_DEBUG
-    options[METIS_OPTION_DBGLVL] = METIS_DBG_INFO | METIS_DBG_TIME;
-#endif
-    options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL;
-
-    if('K' == method) METIS_PartGraphKway(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
-    else METIS_PartGraphRecursive(&nvtxs, &ncon, xadj.data(), adjncy.data(), nullptr, vsize, nullptr, &nparts, tpwgts, ubvec, options, &edgecut, part.data());
-
-    suanpan_debug("Coloring algorithm takes {:.5E} seconds.\n", timer.toc());
-
-    return part;
-}
+#include <set>
 
 template<typename T> std::vector<std::vector<T>> sort_color_wp(const suanpan::graph<T>& node_register) {
     wall_clock timer;
