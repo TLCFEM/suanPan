@@ -1,5 +1,6 @@
-#include <Domain/MetaMat/MetaMat>
 #include "CatchHeader.h"
+
+#include <Domain/MetaMat/MetaMat>
 
 namespace {
     template<typename MT, typename ET, std::invocable T> void test_mat_solve(MT& A, const Mat<ET>& D, const Col<ET>& C, T clear_mat) {
@@ -143,14 +144,6 @@ namespace {
 
     template<> SparseMatSuperLU<double> create_new(const u64 N) { return {N, N}; }
 
-#ifndef SUANPAN_DISTRIBUTED
-    template<> SparseMatMUMPS<double> create_new(const u64 N) { return {N, N}; }
-
-    template<> SparseSymmMatMUMPS<double> create_new(const u64 N) { return {N, N}; }
-
-    template<> SparseMatMUMPS<float> create_new(const u64 N) { return {N, N}; }
-#endif
-
     template<> FullMat<float> create_new(const u64 N) { return {N, N}; }
 
     template<> SymmPackMat<float> create_new(const u64 N) { return SymmPackMat<float>{N}; }
@@ -162,8 +155,6 @@ namespace {
     template<> BandSymmMat<float> create_new(const u64 N) { return {N, 3}; }
 
     template<> SparseMatSuperLU<float> create_new(const u64 N) { return {N, N}; }
-
-    template<> SparseMatLis<double> create_new(const u64 N) { return {N, N}; }
 
 #ifdef SUANPAN_MKL
     template<> SparseMatPARDISO<double> create_new(const u64 N) { return {N, N}; }
@@ -224,11 +215,6 @@ namespace {
         else if(std::is_same_v<BandMat<ET>, T>) title = "Band ";
         else if(std::is_same_v<BandMatSpike<ET>, T>) title = "BandSpike ";
         else if(std::is_same_v<BandSymmMat<ET>, T>) title = "BandSymm ";
-#ifndef SUANPAN_DISTRIBUTED
-        else if(std::is_same_v<SparseMatMUMPS<ET>, T>) title = "MUMPS ";
-        else if(std::is_same_v<SparseSymmMatMUMPS<ET>, T>) title = "MUMPS Symm ";
-#endif
-        else if(std::is_same_v<SparseMatLis<ET>, T>) title = "Lis ";
         else if(std::is_same_v<SparseMatSuperLU<ET>, T>) title = "SuperLU ";
 #ifdef SUANPAN_MKL
         else if(std::is_same_v<SparseMatPARDISO<ET>, T>) title = "PARDISO ";
@@ -312,10 +298,6 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
         benchmark_mat_setup<BandMat<double>, double>(I);
         benchmark_mat_setup<BandMatSpike<double>, double>(I);
         benchmark_mat_setup<BandSymmMat<double>, double>(I);
-#ifndef SUANPAN_DISTRIBUTED
-        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
-        benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
-#endif
         benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
 #ifdef SUANPAN_MKL
         benchmark_mat_setup<SparseMatPARDISO<double>, double>(I);
@@ -343,11 +325,6 @@ TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
         benchmark_mat_setup<BandMat<double>, double>(I);
         benchmark_mat_setup<BandMatSpike<double>, double>(I);
         benchmark_mat_setup<BandSymmMat<double>, double>(I);
-#ifndef SUANPAN_DISTRIBUTED
-        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
-        benchmark_mat_setup<SparseSymmMatMUMPS<double>, double>(I);
-#endif
-        benchmark_mat_setup<SparseMatLis<double>, double>(I);
         benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
     }
 }
@@ -355,10 +332,6 @@ TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
 TEST_CASE("Large Sparse Solve Type", "[Matrix.Benchmark]") {
     for(auto I = 0x1000; I < 0x5000; I *= 2) {
         benchmark_mat_setup<BandMat<double>, double>(I);
-#ifndef SUANPAN_DISTRIBUTED
-        benchmark_mat_setup<SparseMatMUMPS<double>, double>(I);
-#endif
-        benchmark_mat_setup<SparseMatLis<double>, double>(I);
         benchmark_mat_setup<SparseMatSuperLU<double>, double>(I);
     }
 }
@@ -386,14 +359,6 @@ TEST_CASE("BandSymmMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(cr
 TEST_CASE("SparseMatSuperLU", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatSuperLU<double>>); }
 
 TEST_CASE("SparseMatSuperLUFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatSuperLU<float>>); }
-
-#ifndef SUANPAN_DISTRIBUTED
-TEST_CASE("SparseMatMUMPS", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMUMPS<double>>); }
-
-TEST_CASE("SparseMatMUMPSFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMUMPS<float>>); }
-#endif
-
-TEST_CASE("SparseMatLis", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatLis<double>>); }
 
 #ifdef SUANPAN_MKL
 TEST_CASE("SparseMatPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatPARDISO<double>>); }
@@ -568,10 +533,6 @@ TEST_CASE("Unify BandMatSpike", "[Matrix.Utility]") { test_dense_mat_unify(BandM
 TEST_CASE("Unify SymmPackMat", "[Matrix.Utility]") { test_dense_mat_unify(SymmPackMat<double>(10)); }
 
 TEST_CASE("Unify SparseMatSuperLU", "[Matrix.Utility]") { test_sparse_mat_unify(SparseMatSuperLU<double>(10, 10)); }
-
-#ifndef SUANPAN_DISTRIBUTED
-TEST_CASE("Unify SparseMatMUMPS", "[Matrix.Utility]") { test_sparse_mat_unify(SparseMatMUMPS<double>(10, 10)); }
-#endif
 
 #ifdef SUANPAN_MKL
 TEST_CASE("Unify SparseMatPARDISO", "[Matrix.Utility]") { test_sparse_mat_unify(SparseMatPARDISO<double>(10, 10)); }

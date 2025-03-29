@@ -17,7 +17,6 @@
 
 #include <Toolbox/argument.h>
 #include <suanPan.h>
-#include <lis/lislib.h>
 
 #ifdef SUANPAN_WIN
 #include <Windows.h>
@@ -39,18 +38,12 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    lis_do_not_handle_mpi();
-
-    lis_initialize(nullptr, nullptr);
-
 #ifdef SUANPAN_DEBUG
     argument_parser(argc, argv);
 #else
     try { argument_parser(argc, argv); }
     catch(const std::bad_alloc&) { suanpan_fatal("The current platform does not have sufficient memory to perform the analysis.\n"); } catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
 #endif
-
-    lis_finalize();
 
     return std::atexit(mkl_free_buffers);
 }
