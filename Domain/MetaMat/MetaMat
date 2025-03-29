@@ -1,7 +1,4 @@
-#include "MetaMat.hpp"
-
-#include "DenseMat.hpp"
-#include "SparseMat.hpp"
+#pragma once
 
 #include "BandMat.hpp"
 #include "BandMatCUDA.hpp"
@@ -12,10 +9,8 @@
 #include "FullMatCUDA.hpp"
 #include "SparseMatCUDA.hpp"
 #include "SparseMatFGMRES.hpp"
-#include "SparseMatLis.hpp"
 #include "SparseMatMAGMA.hpp"
 #include "SparseMatMPI.hpp"
-#include "SparseMatMUMPS.hpp"
 #include "SparseMatPARDISO.hpp"
 #include "SparseMatSuperLU.hpp"
 #include "SymmPackMat.hpp"

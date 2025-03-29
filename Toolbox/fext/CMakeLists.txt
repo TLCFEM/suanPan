@@ -4,22 +4,8 @@ project(fext Fortran)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
-if (USE_MPI)
-    add_library(${PROJECT_NAME}
-            $<TARGET_OBJECTS:amd_obj>
-            $<TARGET_OBJECTS:arpack_obj>
-            $<TARGET_OBJECTS:feast_obj>
-    )
-else ()
-    add_library(${PROJECT_NAME}
-            $<TARGET_OBJECTS:amd_obj>
-            $<TARGET_OBJECTS:arpack_obj>
-            $<TARGET_OBJECTS:feast_obj>
-            $<TARGET_OBJECTS:mumps_mpi_f_lib>
-            $<TARGET_OBJECTS:mumps_mpi_c_lib>
-            $<TARGET_OBJECTS:mumps_f_lib>
-            $<TARGET_OBJECTS:mumps_c_lib>
-    )
-
-    target_link_libraries(${PROJECT_NAME} metis)
-endif ()
+add_library(${PROJECT_NAME}
+        $<TARGET_OBJECTS:amd_obj>
+        $<TARGET_OBJECTS:arpack_obj>
+        $<TARGET_OBJECTS:feast_obj>
+)
