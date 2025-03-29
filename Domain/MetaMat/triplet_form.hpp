@@ -196,6 +196,23 @@ public:
 
     data_t& at(index_t, index_t);
 
+    /**
+     * @brief Adjusts the size of the container by reserving space and updating the element count.
+     *
+     * This function reserves memory for the specified number of elements and updates the internal
+     * element count to match the provided value.
+     *
+     * This function is dangerous and should be used with caution.
+     * It does not initialize the new elements, and the caller needs to fill them with valid data.
+     * Otherwise, the behavior is undefined.
+     *
+     * @param in_elem The number of elements to reserve and set as the new size.
+     */
+    void hack_size(const index_t in_elem) {
+        reserve(in_elem);
+        access::rw(n_elem) = in_elem;
+    }
+
     void print() const;
 
     void csr_sort();

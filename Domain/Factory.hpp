@@ -693,7 +693,7 @@ template<sp_d T> unsigned Factory<T>::get_size() const { return n_size; }
 
 template<sp_d T> void Factory<T>::set_entry(const uword N) {
     n_elem = N;
-    if(n_elem > std::numeric_limits<int>::max()) throw invalid_argument("too many elements");
+    if(n_elem > std::numeric_limits<la_it>::max()) throw invalid_argument("too many elements");
 }
 
 template<sp_d T> uword Factory<T>::get_entry() const { return n_elem; }
