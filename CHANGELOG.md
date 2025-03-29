@@ -4,12 +4,12 @@
 
 1. The `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
 2. The `SPIKE` solver may occasionally freeze, to circumvent, try to avoid mixing compilers from different vendors.
-3. The `MUMPS` solver throws segfaults with large matrices, appears to be quite slow.
 
 ## version 3.7
 
 1. update `Armadillo` to version `14.4.1`
 2. (breaking) remove general iterative solvers [#250](https://github.com/TLCFEM/suanPan/pull/250)
+3. remove `MUMPS` and `lis` solvers for single-node binaries
 
 ## version 3.6
 
