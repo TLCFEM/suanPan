@@ -211,7 +211,6 @@ void Domain::assemble_initial_mass() const {
         });
 
     factory->get_mass()->allreduce();
-    factory->get_mass()->csc_condense();
 }
 
 void Domain::assemble_current_mass() const {
@@ -229,7 +228,6 @@ void Domain::assemble_current_mass() const {
         });
 
     factory->get_mass()->allreduce();
-    factory->get_mass()->csc_condense();
 }
 
 void Domain::assemble_trial_mass() const {
@@ -247,7 +245,6 @@ void Domain::assemble_trial_mass() const {
         });
 
     factory->get_mass()->allreduce();
-    factory->get_mass()->csc_condense();
 }
 
 void Domain::assemble_initial_damping() const {
@@ -265,7 +262,6 @@ void Domain::assemble_initial_damping() const {
         });
 
     factory->get_damping()->allreduce();
-    factory->get_damping()->csc_condense();
 }
 
 void Domain::assemble_current_damping() const {
@@ -283,7 +279,6 @@ void Domain::assemble_current_damping() const {
         });
 
     factory->get_damping()->allreduce();
-    factory->get_damping()->csc_condense();
 }
 
 void Domain::assemble_trial_damping() const {
@@ -301,7 +296,6 @@ void Domain::assemble_trial_damping() const {
         });
 
     factory->get_damping()->allreduce();
-    factory->get_damping()->csc_condense();
 }
 
 void Domain::assemble_initial_nonviscous() const {
@@ -320,7 +314,6 @@ void Domain::assemble_initial_nonviscous() const {
         });
 
     factory->get_nonviscous()->allreduce();
-    factory->get_nonviscous()->csc_condense();
 }
 
 void Domain::assemble_current_nonviscous() const {
@@ -339,7 +332,6 @@ void Domain::assemble_current_nonviscous() const {
         });
 
     factory->get_nonviscous()->allreduce();
-    factory->get_nonviscous()->csc_condense();
 }
 
 void Domain::assemble_trial_nonviscous() const {
@@ -358,7 +350,6 @@ void Domain::assemble_trial_nonviscous() const {
         });
 
     factory->get_nonviscous()->allreduce();
-    factory->get_nonviscous()->csc_condense();
 }
 
 void Domain::assemble_initial_stiffness() const {
@@ -376,7 +367,6 @@ void Domain::assemble_initial_stiffness() const {
         });
 
     factory->get_stiffness()->allreduce();
-    factory->get_stiffness()->csc_condense();
 }
 
 void Domain::assemble_current_stiffness() const {
@@ -394,7 +384,6 @@ void Domain::assemble_current_stiffness() const {
         });
 
     factory->get_stiffness()->allreduce();
-    factory->get_stiffness()->csc_condense();
 }
 
 void Domain::assemble_trial_stiffness() const {
@@ -412,7 +401,6 @@ void Domain::assemble_trial_stiffness() const {
         });
 
     factory->get_stiffness()->allreduce();
-    factory->get_stiffness()->csc_condense();
 }
 
 void Domain::assemble_initial_geometry() const {
@@ -432,7 +420,6 @@ void Domain::assemble_initial_geometry() const {
         });
 
     factory->get_geometry()->allreduce();
-    factory->get_geometry()->csc_condense();
 }
 
 void Domain::assemble_current_geometry() const {
@@ -452,7 +439,6 @@ void Domain::assemble_current_geometry() const {
         });
 
     factory->get_geometry()->allreduce();
-    factory->get_geometry()->csc_condense();
 }
 
 void Domain::assemble_trial_geometry() const {
@@ -472,7 +458,6 @@ void Domain::assemble_trial_geometry() const {
         });
 
     factory->get_geometry()->allreduce();
-    factory->get_geometry()->csc_condense();
 }
 
 void Domain::assemble_mass_container() const {
@@ -490,7 +475,6 @@ void Domain::assemble_mass_container() const {
         });
 
     factory->get_mass()->allreduce();
-    factory->get_mass()->csc_condense();
 }
 
 void Domain::assemble_stiffness_container() const {
@@ -508,7 +492,6 @@ void Domain::assemble_stiffness_container() const {
         });
 
     factory->get_stiffness()->allreduce();
-    factory->get_stiffness()->csc_condense();
 }
 
 int Domain::update_trial_status() const {

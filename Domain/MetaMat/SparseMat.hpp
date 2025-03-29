@@ -90,6 +90,7 @@ public:
     [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
 
     void allreduce() override {
+        csc_condense();
 #ifdef SUANPAN_DISTRIBUTED
         throw invalid_argument("not supported");
 #endif
