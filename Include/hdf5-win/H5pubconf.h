@@ -196,7 +196,7 @@
 /* #undef H5_HAVE_LIBCURL */
 
 /* Define to 1 if you have the `dl' library (-ldl). */
-/* #undef H5_HAVE_LIBDL */
+#define H5_HAVE_LIBDL 1
 
 /* Proceed to build with libhdfs */
 /* #undef H5_HAVE_LIBHDFS */
