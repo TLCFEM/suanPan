@@ -289,6 +289,7 @@ endif ()
 
 if (SP_ENABLE_64BIT_INDEXING)
     add_compile_definitions(SUANSPAN_64BIT_INT)
+    add_compile_definitions(EZP_INT64)
 endif ()
 
 if (COMPILER_IDENTIFIER MATCHES "vs")
