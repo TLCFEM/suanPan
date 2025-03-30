@@ -204,15 +204,15 @@ jobs:
           if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
             cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
           }
-          cmake -T fortran=ifx \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=dist \
-          -DSP_BUILD_PARALLEL=ON \
-          -DSP_ENABLE_AVX2=${{ matrix.avx }} \
-          -DSP_ENABLE_MKL=${{ matrix.mkl }} \
-          -DSP_ENABLE_SHARED_MKL=OFF \
-          -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          cmake -T fortran=ifx `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_INSTALL_PREFIX=dist `
+          -DSP_BUILD_PARALLEL=ON `
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} `
+          -DSP_ENABLE_MKL=${{ matrix.mkl }} `
+          -DSP_ENABLE_SHARED_MKL=OFF `
+          -DSP_ENABLE_VTK=${{ matrix.vtk }} `
+          -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ `
           ..
           cmake --build . --target install --config Release -j 4
       - name: Pack
@@ -322,16 +322,16 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -G "MinGW Makefiles" \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe \
-          -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe \
-          -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe \
-          -DCMAKE_INSTALL_PREFIX=dist \
-          -DSP_BUILD_PARALLEL=ON \
-          -DSP_ENABLE_AVX2=${{ matrix.avx }} \
-          -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 \
+          cmake -G "MinGW Makefiles" `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe `
+          -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe `
+          -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
+          -DCMAKE_INSTALL_PREFIX=dist `
+          -DSP_BUILD_PARALLEL=ON `
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} `
+          -DSP_ENABLE_VTK=${{ matrix.vtk }} `
+          -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 `
           ..
           cmake --build . --target install --config Release -j 4
       - name: Pack
