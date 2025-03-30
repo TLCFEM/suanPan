@@ -190,7 +190,7 @@ jobs:
           brew install go libomp
           go build Checker/updater.go
           mkdir build && cd build
-          export FC=gfortran-12
+          export FC=gfortran-13
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
@@ -204,8 +204,8 @@ jobs:
             -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
             ..
           else
-            export CC=gcc-12
-            export CXX=g++-12
+            export CC=gcc-13
+            export CXX=g++-13
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_INSTALL_PREFIX=dist \
@@ -352,8 +352,8 @@ jobs:
           cache: false
       - name: GCC
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0posix-18.1.5-11.0.1-msvcrt-r8/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
-          7z x winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.3.0posix-11.0.1-ucrt-r1/winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
+          7z x winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |

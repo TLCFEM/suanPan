@@ -126,7 +126,7 @@ jobs:
           mkdir build && cd build
           export CC=$(brew --prefix llvm@15)/bin/clang
           export CXX=$(brew --prefix llvm@15)/bin/clang++
-          export FC=gfortran-12
+          export FC=gfortran-13
           cmake \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
@@ -311,8 +311,8 @@ jobs:
       - name: Prepare
         run: |
           echo ("SP_TIME=daily-"+(get-date -format "yyMMdd")) >> $env:GITHUB_ENV
-          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0posix-18.1.5-11.0.1-msvcrt-r8/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
-          7z x winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.3.0posix-11.0.1-ucrt-r1/winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
+          7z x winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |

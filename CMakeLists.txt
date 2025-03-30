@@ -212,6 +212,7 @@ if (SP_ENABLE_MAGMA)
 endif ()
 
 if (SP_ENABLE_VTK)
+    unset(ENV{VTK_DIR})
     find_package(VTK PATHS ${VTK_PATH})
     if (NOT VTK_FOUND)
         set(VTK_PATH "" CACHE PATH "VTK library path which contains /include folder.")
