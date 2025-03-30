@@ -28,8 +28,8 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
+#include <Distributed.h>
 #include <Element/ElementBase.h>
-#include <MPI/Distributed.h>
 
 enum class MaterialType : unsigned;
 enum class SectionType : unsigned;
