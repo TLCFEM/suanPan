@@ -87,7 +87,22 @@ jobs:
           fi
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} -DSP_ENABLE_AVX2=${{ matrix.avx }} -DSP_BUILD_PARALLEL=$MT -DSP_ENABLE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DSP_ENABLE_MKL=${{ matrix.mkl }} -DSP_ENABLE_SHARED_MKL=OFF -DSP_ENABLE_IOMP=${{ env.IOMP }} -DSP_ENABLE_AOCL=${{ matrix.aocl }} -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+          -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} \
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
+          -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
+          -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_BUILD_PARALLEL=$MT \
+          -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} \
+          -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
+          -DSP_ENABLE_IOMP=${{ env.IOMP }} \
+          -DSP_ENABLE_MKL=${{ matrix.mkl }} \
+          -DSP_ENABLE_SHARED_MKL=OFF \
+          -DSP_ENABLE_VTK=${{ matrix.vtk }} \
+          -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          ..
           make install -j"$(nproc)" && make package
       - name: Pack
         run: |
@@ -179,11 +194,24 @@ jobs:
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
-            cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DSP_ENABLE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DCMAKE_INSTALL_PREFIX=dist ..
+            cmake \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_INSTALL_PREFIX=dist \
+            -DSP_ENABLE_VTK=${{ matrix.vtk }} \
+            -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+            ..
           else
             export CC=gcc-12
             export CXX=g++-12
-            cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DSP_ENABLE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DCMAKE_INSTALL_PREFIX=dist ..
+            cmake \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -DCMAKE_INSTALL_PREFIX=dist \
+            -DSP_ENABLE_VTK=${{ matrix.vtk }} \
+            -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+            ..
           fi
           make install -j4
       - name: Pack
@@ -251,7 +279,15 @@ jobs:
           if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
             cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
           }
-          cmake -G "${{ matrix.compiler }}" -T fortran=ifx -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DSP_ENABLE_AVX2=${{ matrix.avx }} -DSP_ENABLE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ -DSP_ENABLE_MKL=${{ matrix.mkl }} -DSP_ENABLE_SHARED_MKL=OFF -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -G "${{ matrix.compiler }}" -T fortran=ifx \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+          -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} \
+          -DSP_ENABLE_MKL=${{ matrix.mkl }} \
+          -DSP_ENABLE_SHARED_MKL=OFF \
+          -DSP_ENABLE_VTK=${{ matrix.vtk }} \
+          -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash
@@ -327,7 +363,16 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe -DSP_ENABLE_AVX2=${{ matrix.avx }} -DSP_ENABLE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -G "${{ matrix.compiler }}" \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+          -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe \
+          -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe \
+          -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe \
+          -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} \
+          -DSP_ENABLE_VTK=${{ matrix.vtk }} \
+          -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 \
+          ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash
