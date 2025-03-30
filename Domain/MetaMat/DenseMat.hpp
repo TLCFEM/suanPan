@@ -56,7 +56,10 @@ protected:
 public:
     DenseMat(const uword in_rows, const uword in_cols, const uword in_elem)
         : MetaMat<T>(in_rows, in_cols, in_elem)
-        , memory(new T[this->n_elem]) { DenseMat::zeros(); }
+        , memory(new T[this->n_elem]) {
+        if(in_elem > std::numeric_limits<la_it>::max()) throw std::runtime_error("size exceeds maximum limit");
+        DenseMat::zeros();
+    }
 
     DenseMat(const DenseMat& old_mat)
         : MetaMat<T>(old_mat)
