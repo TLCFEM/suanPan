@@ -501,6 +501,7 @@ else ()
 endif ()
 
 if (USE_MPI)
+    target_include_directories(${PROJECT_NAME} PRIVATE Include/ezp/mpl)
     target_link_libraries(${PROJECT_NAME} MPI::MPI_C MPI::MPI_CXX MPI::MPI_Fortran)
 endif ()
 
@@ -509,7 +510,7 @@ if (USE_MIMALLOC)
     include(FetchContent)
     FetchContent_Declare(mimalloc
             GIT_REPOSITORY https://github.com/microsoft/mimalloc
-            GIT_TAG v2.1.9)
+            GIT_TAG v2.2.3)
     FetchContent_MakeAvailable(mimalloc)
     add_dependencies(${PROJECT_NAME} mimalloc)
 endif ()
