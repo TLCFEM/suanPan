@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Golang
         uses: actions/setup-go@v5
         with:
@@ -95,6 +97,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Prepare
         run: |
           echo "SP_TIME=daily-$(date +''%y%m%d'')" >> $GITHUB_ENV
@@ -151,6 +155,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Golang
         uses: actions/setup-go@v5
         with:
@@ -267,6 +273,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Golang
         uses: actions/setup-go@v5
         with:

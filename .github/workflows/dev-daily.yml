@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Golang
         uses: actions/setup-go@v5
         with:
