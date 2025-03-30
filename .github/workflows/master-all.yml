@@ -162,10 +162,10 @@ jobs:
         shell: cmd
         if: matrix.mkl == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bcb40b43-4ca9-4725-9749-4f9fc1e9b97f/intel-onemkl-2025.0.1.15_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/1269b58a-590e-49b1-9f53-beebe171ac56/intel-fortran-compiler-2025.0.4.19_offline.exe
-          intel-onemkl-2025.0.1.15_offline.exe -s -a --silent --eula accept
-          intel-fortran-compiler-2025.0.4.19_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9c567fd-df1c-4477-9030-682c66058324/intel-onemkl-2025.1.0.802_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/9962ffec-17a2-4135-94e5-acc3995e0c49/intel-fortran-compiler-2025.1.0.602_offline.exe
+          intel-onemkl-2025.1.0.802_offline.exe -s -a --silent --eula accept
+          intel-fortran-compiler-2025.1.0.602_offline.exe -s -a --silent --eula accept
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
