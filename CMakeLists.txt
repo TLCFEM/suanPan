@@ -37,7 +37,6 @@ execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h W
 
 include_directories(${ROOT})
 include_directories(Include)
-include_directories(Include/metis)
 include_directories(Include/fmt/include)
 
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
@@ -143,6 +142,7 @@ if (USE_MPI)
         set(MKL_MPI mpich)
     endif ()
     add_compile_definitions(SUANPAN_DISTRIBUTED)
+    include_directories(Include/ezp/mpl)
 endif ()
 
 if (USE_MKL)
@@ -501,7 +501,6 @@ else ()
 endif ()
 
 if (USE_MPI)
-    target_include_directories(${PROJECT_NAME} PRIVATE Include/ezp/mpl)
     target_link_libraries(${PROJECT_NAME} MPI::MPI_C MPI::MPI_CXX MPI::MPI_Fortran)
 endif ()
 
