@@ -48,13 +48,10 @@ parts:
       - -DSP_ENABLE_VTK=ON
       - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.4/
     build-packages:
-      - freeglut3-dev
       - g++
       - gcc
       - gfortran
       - libglvnd-dev
-      - mesa-common-dev
-      - mesa-utils
       - wget
     override-build: |
       wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-linux.tar.gz
