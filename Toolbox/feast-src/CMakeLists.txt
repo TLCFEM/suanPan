@@ -21,7 +21,7 @@ set(SPIKE_SRC
         spike-src/zspike_smp.f90
 )
 
-if (USE_MKL)
+if (SP_ENABLE_MKL)
     add_compile_definitions(MKL)
 endif ()
 

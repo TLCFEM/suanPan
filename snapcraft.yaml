@@ -37,25 +37,25 @@ parts:
     plugin: cmake
     cmake-generator: Ninja
     cmake-parameters:
-      - -DCMAKE_INSTALL_PREFIX=
       - -DCMAKE_BUILD_TYPE=Release
-      - -DBUILD_MULTITHREAD=ON
-      - -DUSE_AVX2=OFF
-      - -DUSE_HDF5=ON
-      - -DUSE_VTK=ON
+      - -DCMAKE_INSTALL_PREFIX=
+      - -DSP_BUILD_PARALLEL=ON
+      - -DSP_ENABLE_AVX2=OFF
+      - -DSP_ENABLE_HDF5=ON
+      - -DSP_ENABLE_IOMP=OFF
+      - -DSP_ENABLE_MKL=ON
+      - -DSP_ENABLE_SHARED_MKL=OFF
+      - -DSP_ENABLE_VTK=ON
       - -DVTK_DIR=$CRAFT_PART_BUILD/lib/cmake/vtk-9.4/
-      - -DUSE_MKL=ON
-      - -DUSE_INTEL_OPENMP=OFF
-      - -DLINK_DYNAMIC_MKL=OFF
     build-packages:
-      - gcc
+      - freeglut3-dev
       - g++
+      - gcc
       - gfortran
-      - wget
+      - libglvnd-dev
       - mesa-common-dev
       - mesa-utils
-      - freeglut3-dev
-      - libglvnd-dev
+      - wget
     override-build: |
       wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-linux.tar.gz
       tar xf VTK-9.4.1-linux.tar.gz
@@ -65,15 +65,15 @@ parts:
     stage-packages:
       - libgfortran5
       - libgl1
+      - libglvnd0
       - libglx0
       - libgomp1
       - libice6
+      - libopengl0
       - libquadmath0
       - libsm6
       - libx11-6
-      - libxt6
-      - libglvnd0
-      - libopengl0
       - libxau6
       - libxcb1
       - libxdmcp6
+      - libxt6
