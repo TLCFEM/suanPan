@@ -190,7 +190,7 @@ jobs:
           brew install go libomp
           go build Checker/updater.go
           mkdir build && cd build
-          export FC=gfortran-13
+          export FC=gfortran-12
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
@@ -204,8 +204,8 @@ jobs:
             -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
             ..
           else
-            export CC=gcc-13
-            export CXX=g++-13
+            export CC=gcc-12
+            export CXX=g++-12
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_INSTALL_PREFIX=dist \
