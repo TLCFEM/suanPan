@@ -59,3 +59,10 @@ parts:
       wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/dc93af13-2b3f-40c3-a41b-2bc05a707a80/intel-onemkl-2025.1.0.803_offline.sh
       sh ./intel-onemkl-2025.1.0.803_offline.sh -a --silent --eula accept
       craftctl default
+    stage-packages:
+      - libgfortran5
+      - libgomp1
+      - libx11-6
+      - libxau6
+      - libxcb1
+      - libxdmcp6
