@@ -28,7 +28,7 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
-#include <Distributed.h>
+#include <Element/Distributed.h>
 #include <Element/ElementBase.h>
 
 enum class MaterialType : unsigned;
