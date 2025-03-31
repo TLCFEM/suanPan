@@ -94,7 +94,7 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, 
     dealloc();
 
     t_row = std::vector<int>(in.row_mem(), in.row_mem() + in.n_elem);
-    t_col = std::vector<int>(in.col_mem(), in.col_mem() + in.n_elem);
+    t_col = std::vector<int>(in.col_mem(), in.col_mem() + in.n_cols + 1);
     t_val = std::vector<ET>(in.val_mem(), in.val_mem() + in.n_elem);
 
     if constexpr(std::is_same_v<ET, double>) {
