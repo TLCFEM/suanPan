@@ -383,18 +383,18 @@ void get_perm_c(int_t ispec, SuperMatrix* A, int_t* perm_c)
         return;
     case 1: /* Minimum degree ordering on A'*A */
         getata(m, n, Astore->nnz, Astore->colptr, Astore->rowind, &bnz, &b_colptr, &b_rowind);
-        printf("Use minimum degree ordering on A'*A.\n");
         t = SuperLU_timer_() - t;
 #if (PRNTlevel >= 1)
+        printf("Use minimum degree ordering on A'*A.\n");
         printf("Form A'*A time = %8.3f\n", t);
 #endif
         break;
     case 2: /* Minimum degree ordering on A'+A */
         if(m != n) SUPERLU_ABORT("Matrix is not square");
         at_plus_a(n, Astore->nnz, Astore->colptr, Astore->rowind, &bnz, &b_colptr, &b_rowind);
-        printf("Use minimum degree ordering on A'+A.\n");
         t = SuperLU_timer_() - t;
 #if (PRNTlevel >= 1)
+        printf("Use minimum degree ordering on A'+A.\n");
         printf("Form A'+A time = %8.3f\n", t);
 #endif
         break;

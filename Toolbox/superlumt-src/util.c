@@ -386,6 +386,7 @@ void PrintStat(Gstat_t* Gstat) {
 
     utime = Gstat->utime;
     ops = Gstat->ops;
+#if (PRNTlevel == 1)
     printf("Factor time  = %8.2f\n", utime[FACT]);
     if(utime[FACT] != 0.0)
         printf("Factor flops = %e\tMflops = %8.2f\n", ops[FACT], ops[FACT] * 1e-6 / utime[FACT]);
@@ -393,6 +394,7 @@ void PrintStat(Gstat_t* Gstat) {
     printf("Solve time   = %8.2f\n", utime[SOLVE]);
     if(utime[SOLVE] != 0.0)
         printf("Solve flops = %e\tMflops = %8.2f\n", ops[SOLVE], ops[SOLVE] * 1e-6 / utime[SOLVE]);
+#endif
 }
 
 void StatFree(Gstat_t* Gstat) {
