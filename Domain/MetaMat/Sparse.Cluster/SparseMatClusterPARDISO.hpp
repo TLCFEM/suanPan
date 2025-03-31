@@ -40,8 +40,6 @@ template<sp_d T, ezp::matrix_type mtype> class SparseMatBaseClusterPARDISO final
 
     int solve_full(Mat<T>&);
 
-    int solve_trs(Mat<T>&);
-
 protected:
     int direct_solve(Mat<T>& X, Mat<T>&& B) override { return this->solve_full(X = std::move(B)); }
 
@@ -56,16 +54,16 @@ public:
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnarrowing"
 template<sp_d T, ezp::matrix_type mtype> int SparseMatBaseClusterPARDISO<T, mtype>::solve_full(Mat<T>& X) {
-    if(this->factored) return solve_trs(X);
+    if(this->factored) return solver.solve({X.n_rows, X.n_cols, X.memptr()});
 
     this->factored = true;
 
-    csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);
+    csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ZERO, true);
+
+    solver.iparm_zero_based_indexing(1);
 
     return solver.solve({csr_mat.n_rows, csr_mat.n_elem, csr_mat.row_mem(), csr_mat.col_mem(), csr_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
 }
-
-template<sp_d T, ezp::matrix_type mtype> int SparseMatBaseClusterPARDISO<T, mtype>::solve_trs(Mat<T>& X) { return solver.solve({X.n_rows, X.n_cols, X.memptr()}); }
 #pragma GCC diagnostic pop
 
 template<sp_d T> using SparseMatClusterPARDISO = SparseMatBaseClusterPARDISO<T, ezp::matrix_type::real_and_nonsymmetric>;
