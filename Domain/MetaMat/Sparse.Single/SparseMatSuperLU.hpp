@@ -48,7 +48,7 @@ template<sp_d T> class SparseMatSuperLU final : public SparseMat<T> {
     Gstat_t stat{};
 #endif
 
-    std::vector<ET> t_val;
+    std::vector<T> t_val;
     std::vector<int> t_row, t_col, perm_r, perm_c;
 
     bool allocated = false;
