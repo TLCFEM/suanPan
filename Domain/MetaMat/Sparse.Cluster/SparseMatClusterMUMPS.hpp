@@ -53,7 +53,7 @@ public:
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnarrowing"
-template<sp_d T, int sym> int SparseMatBaseClusterMUMPS<T, sym>::solve_full(Mat<T>& X) {
+template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sym>::solve_full(Mat<T>& X) {
     la_it info{-1};
 
     if(this->factored) info = solver.solve({X.n_rows, X.n_cols, X.memptr()});
