@@ -87,6 +87,9 @@ template<sp_d T> auto SparseMatSuperLU<T>::init_config() {
     options.Equil = superlu::yes_no_t::NO;
 
     StatInit(&stat);
+#else
+    StatAlloc(static_cast<int>(this->n_cols), SUANPAN_NUM_THREADS, sp_ienv(1), sp_ienv(2), &stat);
+    StatInit(static_cast<int>(this->n_cols), SUANPAN_NUM_THREADS, &stat);
 #endif
 }
 
@@ -172,9 +175,7 @@ template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& o
 
 template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
     dealloc();
-#ifndef SUANPAN_SUPERLUMT
     StatFree(&stat);
-#endif
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU>(*this); }
