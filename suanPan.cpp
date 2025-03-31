@@ -44,6 +44,8 @@ int main(int argc, char** argv) {
 
 #ifdef SUANPAN_DISTRIBUTED
     ezp::blacs_env<>::do_not_manage_mpi();
+
+    if(1 == comm_size) suanpan_highlight("The current MPI environment only has one process.\n");
 #endif
 
 #ifdef SUANPAN_DEBUG
