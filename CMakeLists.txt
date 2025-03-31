@@ -288,6 +288,7 @@ if (SP_ENABLE_64BIT_INDEXING)
 endif ()
 
 if (SP_ENABLE_SUPERLUMT)
+    message(WARNING "The multithreaded version tends to be slow, it is not recommended to use it.")
     add_compile_definitions(SUANPAN_SUPERLUMT)
 endif ()
 
