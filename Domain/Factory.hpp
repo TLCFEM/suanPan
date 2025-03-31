@@ -1477,7 +1477,9 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
     case StorageScheme::BANDSYMM:
         return std::make_unique<BandSymmMatCluster<T>>(n_size, n_lobw);
     case StorageScheme::SPARSE:
+        return std::make_unique<SparseMatClusterPARDISO<T>>(n_size, n_size, n_elem);
     case StorageScheme::SPARSESYMM:
+        return std::make_unique<SparseSymmMatClusterPARDISO<T>>(n_size, n_size, n_elem);
     default:
         throw invalid_argument("need a proper storage scheme");
     }
