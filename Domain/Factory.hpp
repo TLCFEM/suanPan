@@ -1500,8 +1500,11 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
         return std::make_unique<BandSymmMat<T>>(n_size, n_lobw);
     case StorageScheme::SYMMPACK:
         return std::make_unique<SymmPackMat<T>>(n_size);
-    case StorageScheme::SPARSE:
     case StorageScheme::SPARSESYMM:
+#ifdef SUANPAN_MKL
+        if(contain_solver_type(SolverType::PARDISO)) return std::make_unique<SparseSymmMatPARDISO<T>>(n_size, n_size, n_elem);
+#endif
+    case StorageScheme::SPARSE:
         if(contain_solver_type(SolverType::SUPERLU)) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MKL
         if(contain_solver_type(SolverType::PARDISO)) return std::make_unique<SparseMatPARDISO<T>>(n_size, n_size, n_elem);

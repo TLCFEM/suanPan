@@ -38,10 +38,10 @@
 
 #include <mkl_pardiso.h>
 
-template<sp_d T> class SparseMatPARDISO final : public SparseMat<T> {
+template<sp_d T, la_it MT> class SparseMatBasePARDISO final : public SparseMat<T> {
     static constexpr la_it negone{-1}, PARDISO_ANA_FACT{12}, PARDISO_SOLVE{33}, PARDISO_RELEASE{-1};
 
-    const la_it maxfct{1}, mnum{1}, mtype{11}, msglvl{SUANPAN_VERBOSE ? 1 : 0};
+    const la_it maxfct{1}, mnum{1}, mtype{MT}, msglvl{SUANPAN_VERBOSE ? 1 : 0};
 
     la_it iparm[64]{};
     std::int64_t pt[64]{};
@@ -97,25 +97,25 @@ protected:
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
-    SparseMatPARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
+    SparseMatBasePARDISO(const uword in_row, const uword in_col, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
-    SparseMatPARDISO(const SparseMatPARDISO& other)
+    SparseMatBasePARDISO(const SparseMatBasePARDISO& other)
         : SparseMat<T>(other) {
         init_config();
         this->factored = false;
     }
 
-    SparseMatPARDISO(SparseMatPARDISO&&) noexcept = delete;
-    SparseMatPARDISO& operator=(const SparseMatPARDISO&) = delete;
-    SparseMatPARDISO& operator=(SparseMatPARDISO&&) noexcept = delete;
+    SparseMatBasePARDISO(SparseMatBasePARDISO&&) noexcept = delete;
+    SparseMatBasePARDISO& operator=(const SparseMatBasePARDISO&) = delete;
+    SparseMatBasePARDISO& operator=(SparseMatBasePARDISO&&) noexcept = delete;
 
-    ~SparseMatPARDISO() override { dealloc(); }
+    ~SparseMatBasePARDISO() override { dealloc(); }
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatPARDISO>(*this); }
+    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatBasePARDISO>(*this); }
 };
 
-template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
+template<sp_d T, la_it MT> int SparseMatBasePARDISO<T, MT>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     if(!this->factored) {
         if(const auto info = alloc(); 0 != info) {
             suanpan_error("Error code {} received.\n", info);
@@ -145,6 +145,9 @@ template<sp_d T> int SparseMatPARDISO<T>::direct_solve(Mat<T>& X, const Mat<T>& 
 
     return SUANPAN_SUCCESS;
 }
+
+template<sp_d T> using SparseMatPARDISO = SparseMatBasePARDISO<T, 11>;
+template<sp_d T> using SparseSymmMatPARDISO = SparseMatBasePARDISO<T, -2>;
 
 #endif
 
