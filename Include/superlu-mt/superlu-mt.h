@@ -1,11 +1,16 @@
 #ifndef SUPERLU_MT_H
 #define SUPERLU_MT_H
 
+#ifdef SP_ENABLE_64BIT_INDEXING
+typedef long long superlu_int_t;
+#else
+typedef int superlu_int_t;
+#endif
+typedef float flops_t;
+
 #ifndef SUANPAN_SUPERLUMT
 
 using superlu::Dtype_t;
-using superlu::GlobalLU_t;
-using superlu::mem_usage_t;
 using superlu::Mtype_t;
 using superlu::Stype_t;
 using superlu::superlu_options_t;
@@ -15,13 +20,6 @@ using superlu::SuperMatrix;
 #else
 
 extern int SUANPAN_NUM_THREADS;
-
-#ifdef SP_ENABLE_64BIT_INDEXING
-typedef long long superlu_int_t;
-#else
-typedef int superlu_int_t;
-#endif
-typedef float flops_t;
 
 typedef enum {
     SLU_NC,
