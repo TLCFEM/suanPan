@@ -13,12 +13,18 @@
 #include "Dense.Single/FullMat.hpp"
 #include "Dense.Single/FullMatCUDA.hpp"
 #include "Dense.Single/SymmPackMat.hpp"
-#include "Sparse.Cluster/SparseMatMPI.hpp"
 #include "Sparse.Single/SparseMatCUDA.hpp"
 #include "Sparse.Single/SparseMatFGMRES.hpp"
 #include "Sparse.Single/SparseMatMAGMA.hpp"
 #include "Sparse.Single/SparseMatPARDISO.hpp"
 #include "Sparse.Single/SparseMatSuperLU.hpp"
+
+#ifdef SUANPAN_DISTRIBUTED
+#include "Dense.Cluster/BandMatCluster.hpp"
+#include "Dense.Cluster/BandSymmMatCluster.hpp"
+#include "Dense.Cluster/FullMatCluster.hpp"
+#include "Sparse.Cluster/SparseMatClusterPARDISO.hpp"
+#endif
 
 // misc operation
 #include "operator_times.hpp"

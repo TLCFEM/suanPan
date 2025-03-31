@@ -28,6 +28,10 @@ extern "C" void mkl_free_buffers();
 void mkl_free_buffers() {}
 #endif
 
+#ifdef SUANPAN_DISTRIBUTED
+#include <ezp/ezp/abstract/traits.hpp>
+#endif
+
 // ReSharper disable once CppParameterMayBeConst
 int main(int argc, char** argv) {
 #ifdef SUANPAN_WIN
@@ -36,6 +40,10 @@ int main(int argc, char** argv) {
 #endif
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
+#endif
+
+#ifdef SUANPAN_DISTRIBUTED
+    ezp::blacs_env<>::do_not_manage_mpi();
 #endif
 
 #ifdef SUANPAN_DEBUG

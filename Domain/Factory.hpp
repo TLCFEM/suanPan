@@ -1466,6 +1466,24 @@ template<sp_d T> void Factory<T>::print() const {
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
+#ifdef SUANPAN_DISTRIBUTED
+    switch(storage_type) {
+    case StorageScheme::FULL:
+        return std::make_unique<FullMatCluster<T>>(n_size, n_size);
+    case StorageScheme::SYMMPACK:
+        return std::make_unique<FullSymmMatCluster<T>>(n_size, n_size);
+    case StorageScheme::BAND:
+        return std::make_unique<BandMatCluster<T>>(n_size, n_lobw, n_upbw);
+    case StorageScheme::BANDSYMM:
+        return std::make_unique<BandSymmMatCluster<T>>(n_size, n_lobw);
+    case StorageScheme::SPARSE:
+        return std::make_unique<SparseMatClusterPARDISO<T>>(n_size, n_size, n_elem);
+    case StorageScheme::SPARSESYMM:
+        return std::make_unique<SparseSymmMatClusterPARDISO<T>>(n_size, n_size, n_elem);
+    default:
+        throw invalid_argument("need a proper storage scheme");
+    }
+#else
     switch(storage_type) {
     case StorageScheme::FULL:
 #ifdef SUANPAN_CUDA
@@ -1499,6 +1517,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
     default:
         throw invalid_argument("need a proper storage scheme");
     }
+#endif
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_matrix_container() {
