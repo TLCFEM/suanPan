@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -22,17 +22,36 @@ at the top-level directory.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
 #include "slu_mt_machines.h"
 
-/* Macros */
+/***********************************************************************
+ * Macros
+ ***********************************************************************/
+/*
+ * You can support older version of SuperLU_MT
+ * At compile-time, you can catch the new release as:
+ *   #ifdef SUPERLU_MT_MAJOR_VERSION == 4
+ *       use the new interface
+ *   #else
+ *       use the old interface
+ *   #endif
+ * Versions 3.x and earlier do not include a #define'd version numbers.
+ */
+#define SUPERLU_MT_MAJOR_VERSION 4
+#define SUPERLU_MT_MINOR_VERSION 0
+#define SUPERLU_MT_PATCH_VERSION 0
+
 #ifndef USER_ABORT
 #define USER_ABORT(msg) superlu_abort_and_exit(msg)
 #endif
 
-#define SUPERLU_ABORT(err_msg) \
- { char msg[256];\
-   sprintf(msg,"%s at line %d in file %s\n",err_msg,__LINE__, __FILE__);\
-   USER_ABORT(msg); }
+#define SUPERLU_ABORT(err_msg)                                                   \
+    {                                                                            \
+        char msg[256];                                                           \
+        sprintf(msg, "%s at line %d in file %s\n", err_msg, __LINE__, __FILE__); \
+        USER_ABORT(msg);                                                         \
+    }
 
 #ifndef USER_MALLOC
 #define USER_MALLOC(size) superlu_malloc(size)
@@ -46,80 +65,84 @@ at the top-level directory.
 
 #define SUPERLU_FREE(addr) USER_FREE(addr)
 
-#define MAX(x, y) 	   ( (x) > (y) ? (x) : (y) )
-#define MIN(x, y) 	   ( (x) < (y) ? (x) : (y) )
-#define SUPERLU_MAX(x, y)  ( (x) > (y) ? (x) : (y) )
-#define SUPERLU_MIN(x, y)  ( (x) < (y) ? (x) : (y) )
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define SUPERLU_MAX(x, y) ((x) > (y) ? (x) : (y))
+#define SUPERLU_MIN(x, y) ((x) < (y) ? (x) : (y))
 
 /*********************************************************
  * Macros used for easy access of sparse matrix entries. *
  *********************************************************/
-#define L_SUB_START(col)     ( Lstore->rowind_colbeg[col] )
-#define L_SUB_END(col)       ( Lstore->rowind_colend[col] )
-#define L_SUB(ptr)           ( Lstore->rowind[ptr] )
-#define L_NZ_START(col)      ( Lstore->nzval_colbeg[col] )
-#define L_NZ_END(col)        ( Lstore->nzval_colend[col] )
-#define L_FST_SUPC(superno)  ( Lstore->sup_to_colbeg[superno] )
-#define L_LAST_SUPC(superno) ( Lstore->sup_to_colend[superno] )
-#define U_NZ_START(col)      ( Ustore->colbeg[col] )
-#define U_NZ_END(col)        ( Ustore->colend[col] )
-#define U_SUB(ptr)           ( Ustore->rowind[ptr] )
+#define L_SUB_START(col) (Lstore->rowind_colbeg[col])
+#define L_SUB_END(col) (Lstore->rowind_colend[col])
+#define L_SUB(ptr) (Lstore->rowind[ptr])
+#define L_NZ_START(col) (Lstore->nzval_colbeg[col])
+#define L_NZ_END(col) (Lstore->nzval_colend[col])
+#define L_FST_SUPC(superno) (Lstore->sup_to_colbeg[superno])
+#define L_LAST_SUPC(superno) (Lstore->sup_to_colend[superno])
+#define U_NZ_START(col) (Ustore->colbeg[col])
+#define U_NZ_END(col) (Ustore->colend[col])
+#define U_SUB(ptr) (Ustore->rowind[ptr])
 
-#define SUPER_REP(s)    ( xsup_end[s]-1 )
-#define SUPER_FSUPC(s)  ( xsup[s] )
-#define SINGLETON(s)    ( (xsup_end[s] - xsup[s]) == 1 )
-#define ISPRUNED(j)     ( ispruned[j] )
-#define STATE(j)        ( pxgstrf_shared->pan_status[j].state )
-#define DADPANEL(j)     ( etree[j + pxgstrf_shared->pan_status[j].size-1] )
+#define SUPER_REP(s) (xsup_end[s] - 1)
+#define SUPER_FSUPC(s) (xsup[s])
+#define SINGLETON(s) ((xsup_end[s] - xsup[s]) == 1)
+#define ISPRUNED(j) (ispruned[j])
+#define STATE(j) (pxgstrf_shared->pan_status[j].state)
+#define DADPANEL(j) (etree[j + pxgstrf_shared->pan_status[j].size - 1])
 
 #ifdef PROFILE
-#define TIC(t)          t = SuperLU_timer_()
-#define TOC(t2, t1)     t2 = SuperLU_timer_() - t1
+#define TIC(t) t = SuperLU_timer_()
+#define TOC(t2, t1) t2 = SuperLU_timer_() - t1
 #else
 #define TIC(t)
 #define TOC(t2, t1)
 #endif
 
-/* 
- * Constants 
+/*
+ * Constants
  */
-#define EMPTY	(-1)
-#define FALSE	0
-#define TRUE	1
+#define EMPTY (-1)
+#define FALSE 0
+#define TRUE 1
 
 /**********************
   Enumerated constants
   *********************/
-typedef enum { NO, YES } yes_no_t;
+typedef enum { NO,
+               YES } yes_no_t;
+typedef enum { NOTRANS,
+               TRANS,
+               CONJ } trans_t;
+typedef enum { DOFACT,
+               EQUILIBRATE,
+               FACTORED } fact_t;
+typedef enum { NATURAL,
+               MMD_ATA,
+               MMD_AT_PLUS_A,
+               COLAMD,
+               METIS_AT_PLUS_A,
+               PARMETIS,
+               MY_PERMC } colperm_t;
+typedef enum { NOEQUIL,
+               ROW,
+               COL,
+               BOTH } equed_t;
+typedef enum { LUSUP,
+               UCOL,
+               LSUB,
+               USUB } MemType;
 
-typedef enum { NOTRANS, TRANS, CONJ } trans_t;
-
-typedef enum { DOFACT, EQUILIBRATE, FACTORED } fact_t;
-
-typedef enum {
-	NATURAL,
-	MMD_ATA,
-	MMD_AT_PLUS_A,
-	COLAMD,
-	METIS_AT_PLUS_A,
-	PARMETIS,
-	MY_PERMC
-} colperm_t;
-
-typedef enum { NOEQUIL, ROW, COL, BOTH } equed_t;
-
-typedef enum { LUSUP, UCOL, LSUB, USUB } MemType;
-
-/* Number of marker arrays used in the symbolic factorization, 
+/* Number of marker arrays used in the symbolic factorization,
    each of size nrow. */
-#define NO_MARKER     3
+#define NO_MARKER 3
 
-#define LOCOL    70
-#define HICOL    78
-#define BADROW   44
-#define BADCOL   35
-#define BADPAN   BADCOL
-#define BADREP   35
+#define LOCOL 70
+#define HICOL 78
+#define BADROW 44
+#define BADCOL 35
+#define BADPAN BADCOL
+#define BADREP 35
 
 /*
  * Type definitions
@@ -127,40 +150,40 @@ typedef enum { LUSUP, UCOL, LSUB, USUB } MemType;
 typedef float flops_t;
 typedef unsigned char Logical;
 
-#if ( MACH==DEC || MACH==PTHREAD )
+#if (MACH == DEC || MACH == PTHREAD)
 #include <pthread.h>
 typedef pthread_mutex_t mutex_t;
-#elif ( MACH==SGI || MACH==ORIGIN )
+#elif (MACH == SGI || MACH == ORIGIN)
 typedef int mutex_t;
-#elif ( MACH==CRAY_PVP || MACH==OPENMP )
+#elif (MACH == CRAY_PVP || MACH == OPENMP)
 typedef int mutex_t;
 #endif
 
 typedef enum {
-	RELAX,
-	COLPERM,
-	ETREE,
-	EQUIL,
-	FINDDOMAIN,
-	FACT,
-	DFS,
-	FLOAT,
-	TRSV,
-	GEMV,
-	RCOND,
-	TRISOLVE,
-	SOLVE,
-	REFINE,
-	FERR,
-	NPHASES
+    RELAX,
+    COLPERM,
+    ETREE,
+    EQUIL,
+    FINDDOMAIN,
+    FACT,
+    DFS,
+    FLOAT,
+    TRSV,
+    GEMV,
+    RCOND,
+    TRISOLVE,
+    SOLVE,
+    REFINE,
+    FERR,
+    NPHASES
 } PhaseType;
 
-/* 
+/*
  * *********************************************************************
- * The superlumt_options_t structure contains the shared variables used 
+ * The superlumt_options_t structure contains the shared variables used
  * for factorization, which are passed to each thread.
  * *********************************************************************
- * 
+ *
  * nprocs (int)
  *        Number of processes (or threads) to be spawned and used to perform
  *        the LU factorization by pdgstrf().
@@ -201,8 +224,8 @@ typedef enum {
  * diag_pivot_thresh (double)
  *        Diagonal pivoting threshold. At step j of the Gaussian elimination,
  *        if abs(A_jj) >= diag_pivot_thresh * (max_(i>=j) abs(A_ij)),
- *        use A_jj as pivot, else use A_ij with maximum magnitude. 
- *        0 <= diag_pivot_thresh <= 1. The default value is 1, 
+ *        use A_jj as pivot, else use A_ij with maximum magnitude.
+ *        0 <= diag_pivot_thresh <= 1. The default value is 1,
  *        corresponding to partial pivoting.
  *
  * drop_tol (double) (NOT IMPLEMENTED)
@@ -223,8 +246,8 @@ typedef enum {
  *        Specifies whether to print solver's statistics.
  *
  * perm_c (int*) dimension A->ncol
- *	  Column permutation vector, which defines the 
- *        permutation matrix Pc; perm_c[i] = j means column i of A is 
+ *	  Column permutation vector, which defines the
+ *        permutation matrix Pc; perm_c[i] = j means column i of A is
  *        in position j in A*Pc.
  *        When search for diagonal, perm_c[*] is applied to the
  *        row subscripts of A, so that diagonal threshold pivoting
@@ -270,33 +293,33 @@ typedef enum {
  *
  */
 typedef struct {
-	int_t nprocs;
-	fact_t fact;
-	trans_t trans;
-	yes_no_t refact;
-	int_t panel_size;
-	int_t relax;
-	double diag_pivot_thresh;
-	double drop_tol;
-	colperm_t ColPerm;
-	yes_no_t usepr;
-	yes_no_t SymmetricMode;
-	yes_no_t PrintStat;
+    int_t nprocs;
+    fact_t fact;
+    trans_t trans;
+    yes_no_t refact;
+    int_t panel_size;
+    int_t relax;
+    double diag_pivot_thresh;
+    double drop_tol;
+    colperm_t ColPerm;
+    yes_no_t usepr;
+    yes_no_t SymmetricMode;
+    yes_no_t PrintStat;
 
-	/* The following arrays are persistent during repeated factorizations. */
-	int_t* perm_c;
-	int_t* perm_r;
-	void* work;
-	int_t lwork;
+    /* The following arrays are persistent during repeated factorizations. */
+    int_t* perm_c;
+    int_t* perm_r;
+    void* work;
+    int_t lwork;
 
-	/* The following structural arrays are computed internally by 
-	   sp_colorder(). The user needs to allocate space on input.
-	   These 3 arrays are computed in the first factorization, and are 
-	   re-used in the subsequent factors of the matrices with the same
-	   nonzero structure. */
-	int_t* etree;
-	int_t* colcnt_h;
-	int_t* part_super_h;
+    /* The following structural arrays are computed internally by
+       sp_colorder(). The user needs to allocate space on input.
+       These 3 arrays are computed in the first factorization, and are
+       re-used in the subsequent factors of the matrices with the same
+       nonzero structure. */
+    int_t* etree;
+    int_t* colcnt_h;
+    int_t* part_super_h;
 } superlumt_options_t;
 
 /* ----------------------------------------------
@@ -305,102 +328,104 @@ typedef struct {
 
 /* The statistics to be kept by each processor. */
 typedef struct {
-	int_t panels;    /* number of panels taken */
-	float fcops;     /* factor floating-point operations */
-	double fctime;   /* factor time */
-	int_t skedwaits; /* how many times the processor fails to get a task */
-	double skedtime; /* time spent in the scheduler */
-	double cs_time;  /* time spent in the critical sections */
-	double spintime; /* spin-wait time */
-	int_t pruned;
-	int_t unpruned;
+    int_t panels;    /* number of panels taken */
+    float fcops;     /* factor floating-point operations */
+    double fctime;   /* factor time */
+    int_t skedwaits; /* how many times the processor fails to get a task */
+    double skedtime; /* time spent in the scheduler */
+    double cs_time;  /* time spent in the critical sections */
+    double spintime; /* spin-wait time */
+    int_t pruned;
+    int_t unpruned;
 } procstat_t;
 
 /* Statistics about each panel. */
 
 typedef struct {
-	int_t size;       /* size of the panel */
-	int_t pnum;       /* which processor grabs this panel */
-	double starttime; /* at waht time this panel is assigned to a proc */
-	double fctime;    /* factorization time */
-	float flopcnt;    /* floating-point operations */
-	int_t pipewaits;  /* how many times the panel waited during pipelining */
-	double spintime;  /* spin waiting time during pipelining */
+    int_t size;       /* size of the panel */
+    int_t pnum;       /* which processor grabs this panel */
+    double starttime; /* at waht time this panel is assigned to a proc */
+    double fctime;    /* factorization time */
+    float flopcnt;    /* floating-point operations */
+    int_t pipewaits;  /* how many times the panel waited during pipelining */
+    double spintime;  /* spin waiting time during pipelining */
 } panstat_t;
 
 /* How was a panel selected by the scheduler */
-typedef enum { NOPIPE, DADPAN, PIPE } how_selected_t;
+typedef enum { NOPIPE,
+               DADPAN,
+               PIPE } how_selected_t;
 
 /* Headers for 4 types of dynamatically managed memory */
 typedef struct e_node {
-	int_t size; /* length of the memory that has been used */
-	void* mem;  /* pointer to the new malloc'd store */
+    int_t size; /* length of the memory that has been used */
+    void* mem;  /* pointer to the new malloc'd store */
 } ExpHeader;
 
 /* The structure to keep track of memory usage. */
 typedef struct {
-	float for_lu;
-	float total_needed;
-	int_t expansions;
+    float for_lu;
+    float total_needed;
+    int_t expansions;
 } superlu_memusage_t;
 
 typedef struct {
-	flops_t flops;
-	int_t nzs;
-	double fctime;
+    flops_t flops;
+    int_t nzs;
+    double fctime;
 } stat_relax_t;
 
 typedef struct {
-	flops_t flops;
-	int_t nzs;
-	double fctime;
+    flops_t flops;
+    int_t nzs;
+    double fctime;
 } stat_col_t;
 
 typedef struct {
-	int_t ncols;
-	flops_t flops;
-	int_t nzs;
-	double fctime;
+    int_t ncols;
+    flops_t flops;
+    int_t nzs;
+    double fctime;
 } stat_snode_t;
 
 /* -------------------------------------------------------------------
    The definitions below are used to simulate parallel execution time.
    ------------------------------------------------------------------- */
 typedef struct {
-	float est;  /* earliest (possible) start time of the panel */
-	float pdiv; /* time in flops spent in the (inner) panel factorization */
+    float est;  /* earliest (possible) start time of the panel */
+    float pdiv; /* time in flops spent in the (inner) panel factorization */
 } cp_panel_t;
 
 typedef struct {
-	float eft;  /* earliest finishing time */
-	float pmod; /* pmod update to the ancestor panel */
+    float eft;  /* earliest finishing time */
+    float pmod; /* pmod update to the ancestor panel */
 } desc_eft_t;
 
 /* All statistics. */
 typedef struct {
-	int_t* panel_histo; /* Panel size distribution */
-	double* utime;
-	flops_t* ops;
-	procstat_t* procstat;
-	panstat_t* panstat;
-	int_t num_panels;
-	float dom_flopcnt;
-	float flops_last_P_panels;
-	/**/
-	stat_relax_t* stat_relax;
-	stat_col_t* stat_col;
-	stat_snode_t* stat_snode;
-	int_t* panhows;
-	cp_panel_t* cp_panel;            /* panels on the critical path */
-	desc_eft_t* desc_eft;            /* all we need to know from descendants */
-	int_t *cp_firstkid, *cp_nextkid; /* linked list of children */
-	int_t* height;
-	float* flops_by_height;
+    int_t* panel_histo; /* Panel size distribution */
+    double* utime;
+    flops_t* ops;
+    procstat_t* procstat;
+    panstat_t* panstat;
+    int_t num_panels;
+    float dom_flopcnt;
+    float flops_last_P_panels;
+    /**/
+    stat_relax_t* stat_relax;
+    stat_col_t* stat_col;
+    stat_snode_t* stat_snode;
+    int_t* panhows;
+    cp_panel_t* cp_panel;            /* panels on the critical path */
+    desc_eft_t* desc_eft;            /* all we need to know from descendants */
+    int_t *cp_firstkid, *cp_nextkid; /* linked list of children */
+    int_t* height;
+    float* flops_by_height;
 } Gstat_t;
 
 struct Branch {
-	int_t root, first_desc, which_bin;
-	struct Branch* next;
+    int_t root, first_desc, which_bin;
+    struct Branch* next;
 };
 
 #if 0
@@ -429,8 +454,8 @@ int_t     lda_blas_n;
 flops_t *gemv_ops;      /* flops distribution on (m,n) */
 flops_t *trsv_ops;      /* flops distribution on n */
 
-#define i_trsv_ops(i)      trsv_ops[i]
-#define ij_gemv_ops(i,j)   gemv_ops[j*lda_blas_m + i]
+#define i_trsv_ops(i) trsv_ops[i]
+#define ij_gemv_ops(i, j) gemv_ops[j * lda_blas_m + i]
 
 #endif
 
@@ -442,17 +467,26 @@ flops_t *trsv_ops;      /* flops distribution on n */
 extern "C" {
 #endif
 
+extern void sp_colorder(SuperMatrix*, int_t*, superlumt_options_t*, SuperMatrix*);
+extern int sp_coletree(
+    int_t* acolst, int_t* acolend, /* column start and end past 1 */
+    int_t* arow,                   /* row indices of A */
+    int_t nr,
+    int_t nc,     /* dimension of A */
+    int_t* parent /* parent in elim tree */
+);
+extern int sp_symetree(int_t*, int_t*, int_t*, int_t, int_t*);
+extern int cholnzcnt(int_t neqns, int_t* xadj, int_t* adjncy, int_t* perm, int_t* invp, int_t* etpar, int_t* colcnt, int_t* nlnz, int_t* part_super_L);
 extern int cpp_defs();
 extern int xerbla_(char*, int*);
 extern void superlu_abort_and_exit(char*);
 extern void* superlu_malloc(size_t);
 extern void superlu_free(void*);
 extern void PrintStat(Gstat_t*);
-extern int_t ParallelProfile(const int_t, const int_t, const int_t,
-                             const int_t procs, Gstat_t*);
+extern int_t ParallelProfile(const int_t, const int_t, const int_t, const int_t procs, Gstat_t*);
 
 #ifdef __cplusplus
-	   }
+}
 #endif
 
 #endif /* __SUPERLU_UTIL */

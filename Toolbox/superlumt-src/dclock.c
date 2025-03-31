@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -18,15 +18,14 @@ at the top-level directory.
  *
  */
 
-#ifdef _WIN32
+#ifdef WIN32
 
-#include <Windows.h>
-
+#include <windows.h>
 double dclock() {
-	LARGE_INTEGER time, frequency;
-	QueryPerformanceCounter(&time);
-	QueryPerformanceFrequency(&frequency);
-	return ((double)time.QuadPart / (double)frequency.QuadPart);
+    LARGE_INTEGER time, frequency;
+    QueryPerformanceCounter(&time);
+    QueryPerformanceFrequency(&frequency);
+    return ((double)time.QuadPart / (double)frequency.QuadPart);
 }
 
 /* double dclock()
@@ -34,9 +33,11 @@ double dclock() {
     return (double)clock() / (double)CLOCKS_PER_SEC;
     } */
 
-double usertimer_() { return dclock(); }
+double usertimer_() {
+    return dclock();
+}
 
-#else  /* default to unix */
+#else /* default to unix */
 
 #include <sys/types.h>
 #include <sys/times.h>
@@ -47,38 +48,36 @@ double usertimer_() { return dclock(); }
 #define CLK_TCK 60
 #endif
 
-double usertimer_()
-{
+double usertimer_() {
     struct tms use;
     double tmp;
     int clocks_per_sec = sysconf(_SC_CLK_TCK);
 
-    times ( &use );
+    times(&use);
     tmp = use.tms_utime;
     tmp += use.tms_stime;
     return (double)(tmp) / clocks_per_sec;
 }
 
 double extract(tv)
-struct timeval *tv;
+struct timeval* tv;
 {
-  double tmp;
+    double tmp;
 
-  tmp = tv->tv_sec;
-  tmp += tv->tv_usec/1.0e6;
+    tmp = tv->tv_sec;
+    tmp += tv->tv_usec / 1.0e6;
 
-  return(tmp);
+    return (tmp);
 }
 
-double dclock()
-{
+double dclock() {
     struct timeval tp;
     struct timezone tzp;
 
     /* wall-clock time */
-    gettimeofday(&tp,&tzp);
+    gettimeofday(&tp, &tzp);
 
-    return(extract(&tp));
+    return (extract(&tp));
 }
 
 #endif

@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -20,129 +20,127 @@ at the top-level directory.
 #include <math.h>
 #include "slu_mt_ddefs.h"
 
-void dgscon(char* norm, SuperMatrix* L, SuperMatrix* U,
-            double anorm, double* rcond, int_t* info) {
-	/*
-	    Purpose   
-	    =======   
-	
-	    DGSCON estimates the reciprocal of the condition number of a general 
-	    real matrix A, in either the 1-norm or the infinity-norm, using   
-	    the LU factorization computed by DGETRF.   
-	
-	    An estimate is obtained for norm(inv(A)), and the reciprocal of the   
-	    condition number is computed as   
-	       RCOND = 1 / ( norm(A) * norm(inv(A)) ).   
-	
-	    See supermatrix.h for the definition of 'SuperMatrix' structure.
-	 
-	    Arguments   
-	    =========   
-	
-	    NORM    (input) char*
-	            Specifies whether the 1-norm condition number or the   
-	            infinity-norm condition number is required:   
-	            = '1' or 'O':  1-norm;   
-	            = 'I':         Infinity-norm.
-		    
-	    L       (input) SuperMatrix*
-	            The factor L from the factorization Pr*A*Pc=L*U as computed by
-	            dgstrf(). Use compressed row subscripts storage for supernodes,
-	            i.e., L has types: Stype = SLU_SCP, Dtype = SLU_D, Mtype = SLU_TRLU.
-	 
-	    U       (input) SuperMatrix*
-	            The factor U from the factorization Pr*A*Pc=L*U as computed by
-	            dgstrf(). Use column-wise storage scheme, i.e., U has types:
-	            Stype = SLU_NCP, Dtype = SLU_D, Mtype = SLU_TRU.
-		    
-	    ANORM   (input) double
-	            If NORM = '1' or 'O', the 1-norm of the original matrix A.   
-	            If NORM = 'I', the infinity-norm of the original matrix A.
-		    
-	    RCOND   (output) double*
-	            The reciprocal of the condition number of the matrix A,   
-	            computed as RCOND = 1/(norm(A) * norm(inv(A))).
-		    
-	    INFO    (output) int_t*
-	            = 0:  successful exit   
-	            < 0:  if INFO = -i, the i-th argument had an illegal value   
-	
-	    ===================================================================== 
-	*/
+void dgscon(char* norm, SuperMatrix* L, SuperMatrix* U, double anorm, double* rcond, int_t* info) {
+    /*
+        Purpose
+        =======
 
-	/* Local variables */
-	int_t kase, kase1, onenrm;
-	int i;
-	double ainvnm;
-	double* work;
-	int_t* iwork;
-	extern int_t drscl_(int_t*, double*, double*, int_t*);
+        DGSCON estimates the reciprocal of the condition number of a general
+        real matrix A, in either the 1-norm or the infinity-norm, using
+        the LU factorization computed by DGETRF.
 
-	extern int_t dlacon_(int_t*, double*, double*, int_t*, double*, int_t*);
+        An estimate is obtained for norm(inv(A)), and the reciprocal of the
+        condition number is computed as
+           RCOND = 1 / ( norm(A) * norm(inv(A)) ).
 
-	/* Test the input parameters. */
-	*info = 0;
-	onenrm = *(unsigned char*)norm == '1' || lsame_(norm, "O");
-	if(! onenrm && ! lsame_(norm, "I")) *info = -1;
-	else if(L->nrow < 0 || L->nrow != L->ncol ||
-		L->Stype != SLU_SCP || L->Dtype != SLU_D || L->Mtype != SLU_TRLU)
-		*info = -2;
-	else if(U->nrow < 0 || U->nrow != U->ncol ||
-		U->Stype != SLU_NCP || U->Dtype != SLU_D || U->Mtype != SLU_TRU)
-		*info = -3;
-	if(*info != 0) {
-		i = -(*info);
-		xerbla_("dgscon", &i);
-		return;
-	}
+        See supermatrix.h for the definition of 'SuperMatrix' structure.
 
-	/* Quick return if possible */
-	*rcond = 0.;
-	if(L->nrow == 0 || U->nrow == 0) {
-		*rcond = 1.;
-		return;
-	}
+        Arguments
+        =========
 
-	work = doubleCalloc(3 * L->nrow);
-	iwork = intMalloc(L->nrow);
+        NORM    (input) char*
+                Specifies whether the 1-norm condition number or the
+                infinity-norm condition number is required:
+                = '1' or 'O':  1-norm;
+                = 'I':         Infinity-norm.
 
-	if(!work || !iwork)
-		SUPERLU_ABORT("Malloc fails for work arrays in dgscon.");
+        L       (input) SuperMatrix*
+                The factor L from the factorization Pr*A*Pc=L*U as computed by
+                dgstrf(). Use compressed row subscripts storage for supernodes,
+                i.e., L has types: Stype = SLU_SCP, Dtype = SLU_D, Mtype = SLU_TRLU.
 
-	/* Estimate the norm of inv(A). */
-	ainvnm = 0.;
-	if(onenrm) kase1 = 1;
-	else kase1 = 2;
-	kase = 0;
+        U       (input) SuperMatrix*
+                The factor U from the factorization Pr*A*Pc=L*U as computed by
+                dgstrf(). Use column-wise storage scheme, i.e., U has types:
+                Stype = SLU_NCP, Dtype = SLU_D, Mtype = SLU_TRU.
 
-	do {
-		dlacon_(&L->nrow, &work[L->nrow], &work[0], &iwork[0], &ainvnm, &kase);
+        ANORM   (input) double
+                If NORM = '1' or 'O', the 1-norm of the original matrix A.
+                If NORM = 'I', the infinity-norm of the original matrix A.
 
-		if(kase == 0) break;
+        RCOND   (output) double*
+                The reciprocal of the condition number of the matrix A,
+                computed as RCOND = 1/(norm(A) * norm(inv(A))).
 
-		if(kase == kase1) {
-			/* Multiply by inv(L). */
-			sp_dtrsv("Lower", "No transpose", "Unit", L, U, &work[0], info);
+        INFO    (output) int_t*
+                = 0:  successful exit
+                < 0:  if INFO = -i, the i-th argument had an illegal value
 
-			/* Multiply by inv(U). */
-			sp_dtrsv("Upper", "No transpose", "Non-unit", L, U, &work[0], info);
-		}
-		else {
+        =====================================================================
+    */
 
-			/* Multiply by inv(U'). */
-			sp_dtrsv("Upper", "Transpose", "Non-unit", L, U, &work[0], info);
+    /* Local variables */
+    int_t kase, kase1, onenrm;
+    int i;
+    double ainvnm;
+    double* work;
+    int_t* iwork;
+    extern int_t drscl_(int_t*, double*, double*, int_t*);
 
-			/* Multiply by inv(L'). */
-			sp_dtrsv("Lower", "Transpose", "Unit", L, U, &work[0], info);
-		}
-	}
-	while(kase != 0);
+    extern int_t dlacon_(int_t*, double*, double*, int_t*, double*, int_t*);
 
-	/* Compute the estimate of the reciprocal condition number. */
-	if(ainvnm != 0.) *rcond = (1. / ainvnm) / anorm;
+    /* Test the input parameters. */
+    *info = 0;
+    onenrm = *(unsigned char*)norm == '1' || lsame_(norm, "O");
+    if(!onenrm && !lsame_(norm, "I")) *info = -1;
+    else if(L->nrow < 0 || L->nrow != L->ncol ||
+            L->Stype != SLU_SCP || L->Dtype != SLU_D || L->Mtype != SLU_TRLU)
+        *info = -2;
+    else if(U->nrow < 0 || U->nrow != U->ncol ||
+            U->Stype != SLU_NCP || U->Dtype != SLU_D || U->Mtype != SLU_TRU)
+        *info = -3;
+    if(*info != 0) {
+        i = -(*info);
+        xerbla_("dgscon", &i);
+        return;
+    }
 
-	SUPERLU_FREE(work);
-	SUPERLU_FREE(iwork);
-	return;
+    /* Quick return if possible */
+    *rcond = 0.;
+    if(L->nrow == 0 || U->nrow == 0) {
+        *rcond = 1.;
+        return;
+    }
+
+    work = doubleCalloc(3 * L->nrow);
+    iwork = intMalloc(L->nrow);
+
+    if(!work || !iwork)
+        SUPERLU_ABORT("Malloc fails for work arrays in dgscon.");
+
+    /* Estimate the norm of inv(A). */
+    ainvnm = 0.;
+    if(onenrm) kase1 = 1;
+    else kase1 = 2;
+    kase = 0;
+
+    do {
+        dlacon_(&L->nrow, &work[L->nrow], &work[0], &iwork[0], &ainvnm, &kase);
+
+        if(kase == 0) break;
+
+        if(kase == kase1) {
+            /* Multiply by inv(L). */
+            sp_dtrsv("Lower", "No transpose", "Unit", L, U, &work[0], info);
+
+            /* Multiply by inv(U). */
+            sp_dtrsv("Upper", "No transpose", "Non-unit", L, U, &work[0], info);
+        }
+        else {
+            /* Multiply by inv(U'). */
+            sp_dtrsv("Upper", "Transpose", "Non-unit", L, U, &work[0], info);
+
+            /* Multiply by inv(L'). */
+            sp_dtrsv("Lower", "Transpose", "Unit", L, U, &work[0], info);
+        }
+
+    } while(kase != 0);
+
+    /* Compute the estimate of the reciprocal condition number. */
+    if(ainvnm != 0.) *rcond = (1. / ainvnm) / anorm;
+
+    SUPERLU_FREE(work);
+    SUPERLU_FREE(iwork);
+    return;
 
 } /* dgscon */

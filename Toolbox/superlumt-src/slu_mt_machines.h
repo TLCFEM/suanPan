@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -22,13 +22,13 @@ at the top-level directory.
 #ifndef __SUPERLU_MACHINES /* allow multiple inclusions */
 #define __SUPERLU_MACHINES
 
-#define PTHREAD         0
-#define OPENMP		1
-#define SGI	        2
-#define ORIGIN	        3
-#define DEC	        4
-#define CRAY_PVP	5
-#define SUN             6
+#define PTHREAD 0
+#define OPENMP 1
+#define SGI 2
+#define ORIGIN 3
+#define DEC 4
+#define CRAY_PVP 5
+#define SUN 6
 
 #ifdef __PTHREAD
 #define MACH PTHREAD
@@ -39,23 +39,23 @@ at the top-level directory.
 #endif
 
 #ifdef __SOLARIS
-#define MACH SUN 
+#define MACH SUN
 #endif
 
 #ifdef __SGI
-#define MACH SGI 
+#define MACH SGI
 #endif
 
 #ifdef __ORIGIN
-#define MACH ORIGIN 
+#define MACH ORIGIN
 #endif
 
 #ifdef __DEC
-#define MACH DEC 
+#define MACH DEC
 #endif
 
 #ifdef __CRAY
-#define MACH CRAY_PVP 
+#define MACH CRAY_PVP
 #endif
 
 #endif /* __SUPERLU_MACHINES */
