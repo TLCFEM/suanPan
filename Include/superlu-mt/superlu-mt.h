@@ -137,13 +137,14 @@ extern "C" {
 #endif
 
 int sp_ienv(int);
-void* superlu_malloc(size_t);
-void superlu_free(void*);
+
 void get_perm_c(int, SuperMatrix*, int*);
+
 void pdgssv(int, SuperMatrix*, int*, int*, SuperMatrix*, SuperMatrix*, SuperMatrix*, int*);
 void psgssv(int, SuperMatrix*, int*, int*, SuperMatrix*, SuperMatrix*, SuperMatrix*, int*);
 void dgstrs(trans_t, SuperMatrix*, SuperMatrix*, int*, int*, SuperMatrix*, Gstat_t*, int*);
 void sgstrs(trans_t, SuperMatrix*, SuperMatrix*, int*, int*, SuperMatrix*, Gstat_t*, int*);
+
 void Destroy_SuperMatrix_Store(SuperMatrix*);
 void Destroy_CompCol_NCP(SuperMatrix*);
 void Destroy_SuperNode_SCP(SuperMatrix*);

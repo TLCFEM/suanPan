@@ -48,12 +48,8 @@ template<sp_d T> class SparseMatSuperLU final : public SparseMat<T> {
     Gstat_t stat{};
 #endif
 
-    void* t_val = nullptr;
-    int* t_row = nullptr;
-    int* t_col = nullptr;
-
-    int* perm_r = nullptr;
-    int* perm_c = nullptr;
+    std::vector<ET> t_val;
+    std::vector<int> t_row, t_col, perm_r, perm_c;
 
     bool allocated = false;
 
@@ -97,24 +93,21 @@ template<sp_d T> auto SparseMatSuperLU<T>::init_config() {
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, int>&& in) {
     dealloc();
 
-    t_val = superlu_malloc(sizeof(ET) * in.n_elem);
-    for(auto I = 0; I < in.n_elem; ++I) ((ET*)t_val)[I] = in.val_mem()[I];
-    t_row = (int*)superlu_malloc(sizeof(int) * in.n_elem);
-    for(auto I = 0; I < in.n_elem; ++I) t_row[I] = in.row_mem()[I];
-    t_col = (int*)superlu_malloc(sizeof(int) * in.n_elem);
-    for(auto I = 0; I < in.n_elem; ++I) t_col[I] = in.col_mem()[I];
+    t_row = std::vector<int>(in.row_mem(), in.row_mem() + in.n_elem);
+    t_col = std::vector<int>(in.col_mem(), in.col_mem() + in.n_elem);
+    t_val = std::vector<ET>(in.val_mem(), in.val_mem() + in.n_elem);
 
     if constexpr(std::is_same_v<ET, double>) {
         using E = double;
-        dCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_D, Mtype_t::SLU_GE);
+        dCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val.data(), t_row.data(), t_col.data(), Stype_t::SLU_NC, Dtype_t::SLU_D, Mtype_t::SLU_GE);
     }
     else {
         using E = float;
-        sCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val, t_row, t_col, Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
+        sCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val.data(), t_row.data(), t_col.data(), Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
     }
 
-    perm_r = (int*)superlu_malloc(sizeof(int) * (this->n_rows + 1));
-    perm_c = (int*)superlu_malloc(sizeof(int) * (this->n_cols + 1));
+    perm_r = std::vector<int>(this->n_rows + 1);
+    perm_c = std::vector<int>(this->n_cols + 1);
 
     allocated = true;
 }
@@ -130,12 +123,6 @@ template<sp_d T> void SparseMatSuperLU<T>::dealloc() {
     Destroy_SuperNode_Matrix(&L);
     Destroy_CompCol_Matrix(&U);
 #endif
-
-    if(t_val) superlu_free(t_val);
-    if(t_row) superlu_free(t_row);
-    if(t_col) superlu_free(t_col);
-    if(perm_r) superlu_free(perm_r);
-    if(perm_c) superlu_free(perm_c);
 
     allocated = false;
 }
@@ -153,10 +140,10 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::wrap_b(const Mat<ET
 
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::tri_solve(int& flag) {
 #ifdef SUANPAN_SUPERLUMT
-    if(std::is_same_v<ET, float>) sgstrs(NOTRANS, &L, &U, perm_c, perm_r, &B, &stat, &flag);
-    else dgstrs(NOTRANS, &L, &U, perm_c, perm_r, &B, &stat, &flag);
+    if(std::is_same_v<ET, float>) sgstrs(NOTRANS, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
+    else dgstrs(NOTRANS, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
 #else
-    superlu::gstrs<ET>(options.Trans, &L, &U, perm_c, perm_r, &B, &stat, &flag);
+    superlu::gstrs<ET>(options.Trans, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
 #endif
 
     Destroy_SuperMatrix_Store(&B);
@@ -164,11 +151,11 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::tri_solve(int& flag
 
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::full_solve(int& flag) {
 #ifdef SUANPAN_SUPERLUMT
-    get_perm_c(ordering_num, &A, perm_c);
-    if(std::is_same_v<ET, float>) psgssv(SUANPAN_NUM_THREADS, &A, perm_c, perm_r, &L, &U, &B, &flag);
-    else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c, perm_r, &L, &U, &B, &flag);
+    get_perm_c(ordering_num, &A, perm_c.data());
+    if(std::is_same_v<ET, float>) psgssv(SUANPAN_NUM_THREADS, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &flag);
+    else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &flag);
 #else
-    superlu::gssv<ET>(&options, &A, perm_c, perm_r, &L, &U, &B, &stat, &flag);
+    superlu::gssv<ET>(&options, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &stat, &flag);
 #endif
 
     Destroy_SuperMatrix_Store(&B);
