@@ -161,10 +161,10 @@ namespace {
 
     template<> SparseMatPARDISO<float> create_new(const u64 N) { return {N, N}; }
 
-#ifdef SUANPAN_MPI
-    template<> SparseMatMPIPARDISO<double> create_new(const u64 N) { return {N, N}; }
+#ifdef SUANPAN_DISTRIBUTED
+    template<> SparseMatClusterPARDISO<double> create_new(const u64 N) { return {N, N}; }
 
-    template<> SparseMatMPIPARDISO<float> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatClusterPARDISO<float> create_new(const u64 N) { return {N, N}; }
 #endif
 
     template<> SparseMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
@@ -218,8 +218,10 @@ namespace {
         else if(std::is_same_v<SparseMatSuperLU<ET>, T>) title = "SuperLU ";
 #ifdef SUANPAN_MKL
         else if(std::is_same_v<SparseMatPARDISO<ET>, T>) title = "PARDISO ";
-#ifdef SUANPAN_MPI
-        else if(std::is_same_v<SparseMatMPIPARDISO<ET>, T>) title = "MPI PARDISO ";
+#ifdef SUANPAN_DISTRIBUTED
+        else if(std::is_same_v<SparseMatClusterPARDISO<ET>, T>) title = "Cluster PARDISO ";
+        else if(std::is_same_v<SparseSymmMatClusterPARDISO<ET>, T>) title = "Cluster Symm PARDISO ";
+        else if(std::is_same_v<SparseSPDMatClusterPARDISO<ET>, T>) title = "Cluster SPD PARDISO ";
 #endif
         else if(std::is_same_v<SparseMatFGMRES<ET>, T>) title = "FGMRES ";
 #endif
@@ -371,8 +373,8 @@ TEST_CASE("SparseMatPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<fl
 
 TEST_CASE("SparseMatFGMRES", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatFGMRES<double>>); }
 
-#ifdef SUANPAN_MPI
-TEST_CASE("SparseMatMPIPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatMPIPARDISO<double>>); }
+#ifdef SUANPAN_DISTRIBUTED
+TEST_CASE("SparseMatClusterPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatClusterPARDISO<double>>); }
 #endif
 #endif
 
