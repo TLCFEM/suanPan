@@ -54,15 +54,21 @@ public:
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnarrowing"
 template<sp_d T, ezp::matrix_type mtype> int SparseMatBaseClusterPARDISO<T, mtype>::solve_full(Mat<T>& X) {
-    if(this->factored) return solver.solve({X.n_rows, X.n_cols, X.memptr()});
+    la_it info{-1};
 
-    this->factored = true;
+    if(this->factored) info = solver.solve({X.n_rows, X.n_cols, X.memptr()});
+    else {
+        this->factored = true;
 
-    csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ZERO, true);
+        csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);
 
-    solver.iparm_zero_based_indexing(1);
+        info = solver.solve({csr_mat.n_rows, csr_mat.n_elem, csr_mat.row_mem(), csr_mat.col_mem(), csr_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
+    }
 
-    return solver.solve({csr_mat.n_rows, csr_mat.n_elem, csr_mat.row_mem(), csr_mat.col_mem(), csr_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
+    if(0 == info) bcast_from_root(X);
+    else suanpan_error("Error code {} received.\n", info);
+
+    return info;
 }
 #pragma GCC diagnostic pop
 
