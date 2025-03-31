@@ -105,7 +105,14 @@ namespace {
 
             REQUIRE(arma::norm<Col<ET>>(A * C - B * C) < tol);
 
-            test_mat_solve(A, spsolve(B, C), C, clear_mat);
+            test_mat_solve(A, spsolve(B, C,
+#ifdef SUANPAN_SUPERLUMT
+                                      "lapack"
+#else
+                                      "superlu"
+#endif
+                              ),
+                           C, clear_mat);
         }
     }
 
@@ -237,10 +244,17 @@ namespace {
 
         title += "N=" + std::to_string(I) + " NZ=" + std::to_string(B.n_nonzero) + " NE=" + std::to_string(A.n_elem);
 
-        benchmark_mat_solve(std::move(title), A, C, spsolve(B, C).eval(), [&] {
-            A.zeros();
-            for(auto J = B.begin(); J != B.end(); ++J) A.at(J.col(), J.row()) = *J;
-        });
+        benchmark_mat_solve(std::move(title), A, C, spsolve(B, C,
+#ifdef SUANPAN_SUPERLUMT
+                                                            "lapack"
+#else
+                                                            "superlu"
+#endif
+                                                    ),
+                            [&] {
+                                A.zeros();
+                                for(auto J = B.begin(); J != B.end(); ++J) A.at(J.col(), J.row()) = *J;
+                            });
     }
 
     template<typename T> void test_dense_mat_unify(T A) {
