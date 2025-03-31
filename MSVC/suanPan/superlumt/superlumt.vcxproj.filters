@@ -28,12 +28,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\csp_blas2.c">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\creadrb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\creadhb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\cpivotgrowth.c">
       <Filter>SRC</Filter>
     </ClCompile>
@@ -76,12 +70,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\zsp_blas2.c">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zreadrb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zreadhb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\zpivotgrowth.c">
       <Filter>SRC</Filter>
     </ClCompile>
@@ -122,12 +110,6 @@
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\ssp_blas2.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sreadrb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sreadhb.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\spivotgrowth.c">
@@ -491,12 +473,6 @@
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dsp_blas2.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dreadrb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dreadhb.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dpivotgrowth.c">

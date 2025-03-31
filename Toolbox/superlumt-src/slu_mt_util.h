@@ -22,7 +22,9 @@ at the top-level directory.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef _WIN32
 #include <getopt.h>
+#endif
 #include "slu_mt_machines.h"
 
 /***********************************************************************

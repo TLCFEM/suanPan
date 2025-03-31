@@ -18,7 +18,7 @@ at the top-level directory.
  *
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <windows.h>
 double dclock() {
