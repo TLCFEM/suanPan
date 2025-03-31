@@ -90,29 +90,19 @@ template<sp_d T> auto SparseMatSuperLU<T>::init_config() {
     options.IterRefine = std::is_same_v<T, float> ? superlu::IterRefine_t::SLU_SINGLE : superlu::IterRefine_t::SLU_DOUBLE;
     options.Equil = superlu::yes_no_t::NO;
 
-    arrayops::fill_zeros(reinterpret_cast<char*>(&stat), sizeof(SuperLUStat_t));
-
     StatInit(&stat);
-#else
-    StatAlloc(static_cast<int>(this->n_cols), SUANPAN_NUM_THREADS, sp_ienv(1), sp_ienv(2), &stat);
-    StatInit(static_cast<int>(this->n_cols), SUANPAN_NUM_THREADS, &stat);
 #endif
 }
 
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, int>&& in) {
     dealloc();
 
-    auto t_size = sizeof(ET) * in.n_elem;
-    t_val = superlu_malloc(t_size);
-    memcpy(t_val, (void*)in.val_mem(), t_size);
-
-    t_size = sizeof(int) * in.n_elem;
-    t_row = (int*)superlu_malloc(t_size);
-    memcpy(t_row, (void*)in.row_mem(), t_size);
-
-    t_size = sizeof(int) * (in.n_cols + 1llu);
-    t_col = (int*)superlu_malloc(t_size);
-    memcpy(t_col, (void*)in.col_mem(), t_size);
+    t_val = superlu_malloc(sizeof(ET) * in.n_elem);
+    for(auto I = 0; I < in.n_elem; ++I) ((ET*)t_val)[I] = in.val_mem()[I];
+    t_row = (int*)superlu_malloc(sizeof(int) * in.n_elem);
+    for(auto I = 0; I < in.n_elem; ++I) t_row[I] = in.row_mem()[I];
+    t_col = (int*)superlu_malloc(sizeof(int) * in.n_elem);
+    for(auto I = 0; I < in.n_elem; ++I) t_col[I] = in.col_mem()[I];
 
     if constexpr(std::is_same_v<ET, double>) {
         using E = double;
@@ -195,7 +185,9 @@ template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& o
 
 template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
     dealloc();
+#ifndef SUANPAN_SUPERLUMT
     StatFree(&stat);
+#endif
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU>(*this); }
