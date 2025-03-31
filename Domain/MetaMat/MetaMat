@@ -20,5 +20,9 @@
 #include "Sparse.Single/SparseMatPARDISO.hpp"
 #include "Sparse.Single/SparseMatSuperLU.hpp"
 
+#ifdef SUANPAN_DISTRIBUTED
+#include "Dense.Cluster/BandMatCluster.hpp"
+#endif
+
 // misc operation
 #include "operator_times.hpp"
