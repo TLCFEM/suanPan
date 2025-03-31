@@ -1473,6 +1473,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
     case StorageScheme::BANDSYMM:
         return std::make_unique<BandSymmMatCluster<T>>(n_size, n_lobw);
     case StorageScheme::FULL:
+        return std::make_unique<FullMatCluster<T>>(n_size, n_size);
     case StorageScheme::SYMMPACK:
     case StorageScheme::SPARSE:
     case StorageScheme::SPARSESYMM:

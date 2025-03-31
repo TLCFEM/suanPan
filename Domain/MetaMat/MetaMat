@@ -23,6 +23,7 @@
 #ifdef SUANPAN_DISTRIBUTED
 #include "Dense.Cluster/BandMatCluster.hpp"
 #include "Dense.Cluster/BandSymmMatCluster.hpp"
+#include "Dense.Cluster/FullMatCluster.hpp"
 #endif
 
 // misc operation
