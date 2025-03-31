@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include <Toolbox/argument.h>
-#include <suanPan.h>
 
 #ifdef SUANPAN_WIN
 #include <Windows.h>
