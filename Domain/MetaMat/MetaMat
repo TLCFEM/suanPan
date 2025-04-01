@@ -23,6 +23,7 @@
 #include "Dense.Cluster/BandMatCluster.hpp"
 #include "Dense.Cluster/BandSymmMatCluster.hpp"
 #include "Dense.Cluster/FullMatCluster.hpp"
+#include "Sparse.Cluster/SparseMatClusterMUMPS.hpp"
 #include "Sparse.Cluster/SparseMatClusterPARDISO.hpp"
 #endif
 
