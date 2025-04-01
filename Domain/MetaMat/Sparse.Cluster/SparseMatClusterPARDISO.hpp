@@ -60,7 +60,20 @@ template<sp_d T, ezp::matrix_type mtype> int SparseMatBaseClusterPARDISO<T, mtyp
     else {
         this->factored = true;
 
-        csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);
+        solver.iparm_default_value(1);
+        solver.iparm_reducing_ordering(2);
+        solver.iparm_iterative_refinement(2);
+        solver.iparm_pivoting_perturbation(std::is_same_v<T, double> ? 14 : 7);
+        solver.iparm_weighted_matching(1);
+
+        if(ezp::matrix_type::real_and_nonsymmetric == mtype) {
+            csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);
+            solver.iparm_scaling(1);
+        }
+        else {
+            auto half_mat = this->triplet_mat.upper();
+            csr_mat = csr_form<T, la_it>(half_mat, SparseBase::ONE, true);
+        }
 
         info = solver.solve({csr_mat.n_rows, csr_mat.n_elem, csr_mat.row_mem(), csr_mat.col_mem(), csr_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
     }
