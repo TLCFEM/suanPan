@@ -140,7 +140,7 @@ void Step::set_tolerance(const double T) { system_setting.tolerance = T; }
 
 void Step::set_refinement(const std::uint8_t T) { system_setting.iterative_refinement = T; }
 
-void Step::set_lis_option(const std::string_view T) { system_setting.lis_options = T; }
+void Step::set_lis_option(const std::string_view T) { system_setting.set_lis_option(T); }
 
 void Step::set_magma_option(istringstream& T) { system_setting.set_magma_option(T); }
 
