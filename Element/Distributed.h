@@ -53,7 +53,7 @@ public:
         }
         else if(is_local) return comm_world.isend(object.memptr(), mpl::contiguous_layout<DT>{object.n_elem}, root_rank, mpl::tag_t{tag});
 
-        return {};
+        return std::nullopt;
     }
 #else
     template<typename T> static auto gather(T&&) {}
