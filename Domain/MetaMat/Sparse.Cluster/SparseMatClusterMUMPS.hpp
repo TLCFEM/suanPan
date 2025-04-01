@@ -37,6 +37,7 @@ template<sp_d T, ezp::symmetric_pattern sym> class SparseMatBaseClusterMUMPS fin
     ezp::mumps<T, la_it> solver{sym, ezp::parallel_mode::no_host};
 
     std::vector<la_it> row_mem, col_mem;
+    std::vector<T> val_mem;
 
     int solve_full(Mat<T>&);
 
@@ -62,16 +63,35 @@ template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sy
     else {
         this->factored = true;
 
-        auto& coo_mat = this->triplet_mat;
+        const auto copy_idx = [&](const auto& coo_mat) {
+            const auto plus_one = [](const auto v) { return v + 1; };
 
-        const auto plus_one = [](const auto v) { return v + 1; };
+            row_mem.resize(coo_mat.n_elem);
+            col_mem.resize(coo_mat.n_elem);
+            std::transform(coo_mat.row_mem(), coo_mat.row_mem() + coo_mat.n_elem, row_mem.begin(), plus_one);
+            std::transform(coo_mat.col_mem(), coo_mat.col_mem() + coo_mat.n_elem, col_mem.begin(), plus_one);
+        };
 
-        row_mem.resize(coo_mat.n_elem);
-        col_mem.resize(coo_mat.n_elem);
-        std::transform(coo_mat.row_mem(), coo_mat.row_mem() + coo_mat.n_elem, row_mem.begin(), plus_one);
-        std::transform(coo_mat.col_mem(), coo_mat.col_mem() + coo_mat.n_elem, col_mem.begin(), plus_one);
+        if(sym == ezp::symmetric_pattern::unsymmetric) {
+            auto& coo_mat = this->triplet_mat;
 
-        info = solver.solve({coo_mat.n_rows, coo_mat.n_elem, row_mem.data(), col_mem.data(), coo_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
+            if(0 == comm_rank) copy_idx(coo_mat);
+
+            info = solver.solve({coo_mat.n_rows, coo_mat.n_elem, row_mem.data(), col_mem.data(), coo_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
+        }
+        else {
+            // for symmetric matrices, MUMPS takes half the matrix
+            auto coo_mat = this->triplet_mat.lower();
+            coo_mat.csc_condense();
+
+            if(0 == comm_rank) {
+                val_mem = std::vector<T>(coo_mat.val_mem(), coo_mat.val_mem() + coo_mat.n_elem);
+
+                copy_idx(coo_mat);
+            }
+
+            info = solver.solve({coo_mat.n_rows, coo_mat.n_elem, row_mem.data(), col_mem.data(), val_mem.data()}, {X.n_rows, X.n_cols, X.memptr()});
+        }
     }
 
     if(0 == info) bcast_from_root(X);
