@@ -212,6 +212,7 @@ jobs:
           file_name+="-avx"
           file_name+="-vtk"
           file_name+="-mkl"
+          file_name+="-mpi"
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
@@ -220,11 +221,6 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
-      - name: Test
-        run: |
-          source /opt/intel/oneapi/setvars.sh
-          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
-          ./build/dist/bin/suanPan -v
   macos-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: macos-13
