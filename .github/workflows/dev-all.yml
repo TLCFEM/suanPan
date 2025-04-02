@@ -162,6 +162,69 @@ jobs:
           files: ./build/coverage.info
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  linux-dev-mpi:
+    needs:  linux-dev
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Golang
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+      - name: Depedency
+        run: |
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-linux.tar.gz
+          tar xf VTK-9.4.1-linux.tar.gz
+          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt-get update
+          sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel
+          sudo apt-get install libglvnd-dev dpkg-dev xz-utils lcov
+      - name: Compile
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          go build Checker/updater.go
+          mkdir build && cd build
+          cmake \
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_BUILD_PARALLEL=ON \
+          -DSP_ENABLE_64BIT_INDEXING=ON \
+          -DSP_ENABLE_AVX2=ON \
+          -DSP_ENABLE_IOMP=OFF \
+          -DSP_ENABLE_MKL=ON \
+          -DSP_ENABLE_MPI=ON \
+          -DSP_ENABLE_SHARED_MKL=OFF \
+          -DSP_ENABLE_VTK=ON \
+          -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          ..
+          make install -j"$(nproc)" && make package
+      - name: Pack
+        run: |
+          cp updater build/dist/bin
+          file_name="suanPan-linux"
+          file_name+="-release"
+          file_name+="-gcc"
+          file_name+="-avx"
+          file_name+="-vtk"
+          file_name+="-mkl"
+          file_name+=".tar.gz"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          tar czf $file_name -C build/dist .
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.ARTIFACT }}
+      - name: Test
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
+          ./build/dist/bin/suanPan -v
   macos-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: macos-13
