@@ -116,12 +116,12 @@ template<sp_d T> T BandMatSpike<T>::bin = T(0);
 template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     Mat<T> Y(arma::size(X));
 
-    const auto M = static_cast<la_it>(this->n_rows);
-    const auto N = static_cast<la_it>(this->n_cols);
-    const auto KL = static_cast<la_it>(l_band);
-    const auto KU = static_cast<la_it>(u_band);
-    const auto LDA = static_cast<la_it>(m_rows);
-    constexpr la_it INC = 1;
+    const auto M = static_cast<blas_int>(this->n_rows);
+    const auto N = static_cast<blas_int>(this->n_cols);
+    const auto KL = static_cast<blas_int>(l_band);
+    const auto KU = static_cast<blas_int>(u_band);
+    const auto LDA = static_cast<blas_int>(m_rows);
+    constexpr blas_int INC = 1;
     T ALPHA = T(1);
     T BETA = T(0);
 
