@@ -203,14 +203,8 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
 
     if(const auto scheme = W->get_storage_scheme(); StorageScheme::FULL == scheme) new_dfeast_sygv_(&UPLO, &N, stiffness->memptr(), &N, mass->memptr(), &N, fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
     else if(StorageScheme::SPARSE == scheme || StorageScheme::SPARSESYMM == scheme) {
-        auto fs = std::async([&] {
-            auto triplet_k = to_triplet_form<double, la_it>(stiffness);
-            return csr_form<double, la_it>(triplet_k, SparseBase::ONE);
-        });
-        auto fm = std::async([&] {
-            auto triplet_m = to_triplet_form<double, la_it>(mass);
-            return csr_form<double, la_it>(triplet_m, SparseBase::ONE);
-        });
+        auto fs = std::async([&] { return csr_form<double, la_it>(to_triplet_form<double, la_it>(stiffness), SparseBase::ONE); });
+        auto fm = std::async([&] { return csr_form<double, la_it>(to_triplet_form<double, la_it>(mass), SparseBase::ONE); });
 
         auto t_stiff = fs.get();
         auto t_mass = fm.get();
@@ -270,18 +264,9 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
 
     la_it P = 2;
 
-    auto fk = std::async([&] {
-        auto triplet_k = to_triplet_form<double, la_it>(W->get_stiffness());
-        return csr_form<double, la_it>(triplet_k, SparseBase::ONE);
-    });
-    auto fd = std::async([&] {
-        auto triplet_d = to_triplet_form<double, la_it>(W->get_damping());
-        return csr_form<double, la_it>(triplet_d, SparseBase::ONE);
-    });
-    auto fm = std::async([&] {
-        auto triplet_m = to_triplet_form<double, la_it>(W->get_mass());
-        return csr_form<double, la_it>(triplet_m, SparseBase::ONE);
-    });
+    auto fk = std::async([&] { return csr_form<double, la_it>(to_triplet_form<double, la_it>(W->get_stiffness()), SparseBase::ONE); });
+    auto fd = std::async([&] { return csr_form<double, la_it>(to_triplet_form<double, la_it>(W->get_damping()), SparseBase::ONE); });
+    auto fm = std::async([&] { return csr_form<double, la_it>(to_triplet_form<double, la_it>(W->get_mass()), SparseBase::ONE); });
 
     const auto t_stiff = fk.get();
     const auto t_damping = fd.get();

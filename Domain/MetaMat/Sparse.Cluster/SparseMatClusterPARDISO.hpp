@@ -70,10 +70,7 @@ template<sp_d T, ezp::matrix_type mtype> int SparseMatBaseClusterPARDISO<T, mtyp
             csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);
             solver.iparm_scaling(1);
         }
-        else {
-            auto half_mat = this->triplet_mat.upper();
-            csr_mat = csr_form<T, la_it>(half_mat, SparseBase::ONE, true);
-        }
+        else csr_mat = csr_form<T, la_it>(this->triplet_mat.upper(), SparseBase::ONE, true);
 
         info = solver.solve({csr_mat.n_rows, csr_mat.n_elem, csr_mat.row_mem(), csr_mat.col_mem(), csr_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
     }

@@ -144,6 +144,9 @@ public:
     template<sp_d in_dt> explicit triplet_form(const SpMat<in_dt>&);
     template<sp_d in_dt, sp_i in_it> explicit triplet_form(triplet_form<in_dt, in_it>&, SparseBase = SparseBase::ZERO, bool = false);
 
+    template<sp_d in_dt, sp_i in_it> explicit triplet_form(triplet_form<in_dt, in_it>&& in_mat, const SparseBase in_base = SparseBase::ZERO, const bool in_full = false)
+        : triplet_form(in_mat, in_base, in_full) {}
+
     [[nodiscard]] const index_t* row_mem() const { return row_idx.get(); }
 
     [[nodiscard]] const index_t* col_mem() const { return col_idx.get(); }

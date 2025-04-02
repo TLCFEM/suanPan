@@ -65,8 +65,7 @@ template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sy
         if(sym == ezp::symmetric_pattern::unsymmetric) coo_mat = triplet_form<T, la_it>(this->triplet_mat, SparseBase::ONE, false);
         else {
             // for symmetric matrices, MUMPS takes half the matrix
-            auto half_mat = this->triplet_mat.lower();
-            coo_mat = triplet_form<T, la_it>(half_mat, SparseBase::ONE, false);
+            coo_mat = triplet_form<T, la_it>(this->triplet_mat.lower(), SparseBase::ONE, false);
         }
 
         info = solver.solve({coo_mat.n_rows, coo_mat.n_elem, coo_mat.row_mem(), coo_mat.col_mem(), coo_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
