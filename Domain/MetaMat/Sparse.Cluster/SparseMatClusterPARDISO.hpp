@@ -36,7 +36,7 @@
 template<sp_d T, ezp::matrix_type mtype> class SparseMatBaseClusterPARDISO final : public SparseMat<T> {
     csr_form<T, la_it> csr_mat{};
 
-    ezp::pardiso<T, la_it> solver{mtype, ezp::message_level::no_output};
+    ezp::pardiso<T, la_it> solver{mtype, ezp::no_output};
 
     int solve_full(Mat<T>&);
 
@@ -82,9 +82,9 @@ template<sp_d T, ezp::matrix_type mtype> int SparseMatBaseClusterPARDISO<T, mtyp
 }
 #pragma GCC diagnostic pop
 
-template<sp_d T> using SparseMatClusterPARDISO = SparseMatBaseClusterPARDISO<T, ezp::matrix_type::real_and_nonsymmetric>;
-template<sp_d T> using SparseSymmMatClusterPARDISO = SparseMatBaseClusterPARDISO<T, ezp::matrix_type::real_and_symmetric_indefinite>;
-template<sp_d T> using SparseSPDMatClusterPARDISO = SparseMatBaseClusterPARDISO<T, ezp::matrix_type::real_and_symmetric_positive_definite>;
+template<sp_d T> using SparseMatClusterPARDISO = SparseMatBaseClusterPARDISO<T, ezp::real_and_nonsymmetric>;
+template<sp_d T> using SparseSymmMatClusterPARDISO = SparseMatBaseClusterPARDISO<T, ezp::real_and_symmetric_indefinite>;
+template<sp_d T> using SparseSPDMatClusterPARDISO = SparseMatBaseClusterPARDISO<T, ezp::real_and_symmetric_positive_definite>;
 
 #endif
 

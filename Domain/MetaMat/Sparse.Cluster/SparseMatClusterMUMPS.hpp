@@ -34,7 +34,7 @@
 #include <ezp/ezp/mumps.hpp>
 
 template<sp_d T, ezp::symmetric_pattern sym> class SparseMatBaseClusterMUMPS final : public SparseMat<T> {
-    ezp::mumps<T, la_it> solver{sym, ezp::parallel_mode::no_host};
+    ezp::mumps<T, la_it> solver{sym, ezp::no_host};
 
     triplet_form<T, la_it> coo_mat;
 
@@ -78,9 +78,9 @@ template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sy
 }
 #pragma GCC diagnostic pop
 
-template<sp_d T> using SparseMatClusterMUMPS = SparseMatBaseClusterMUMPS<T, ezp::symmetric_pattern::unsymmetric>;
-template<sp_d T> using SparseSymmMatClusterMUMPS = SparseMatBaseClusterMUMPS<T, ezp::symmetric_pattern::symmetric_indefinite>;
-template<sp_d T> using SparseSPDMatClusterMUMPS = SparseMatBaseClusterMUMPS<T, ezp::symmetric_pattern::symmetric_positive_definite>;
+template<sp_d T> using SparseMatClusterMUMPS = SparseMatBaseClusterMUMPS<T, ezp::unsymmetric>;
+template<sp_d T> using SparseSymmMatClusterMUMPS = SparseMatBaseClusterMUMPS<T, ezp::symmetric_indefinite>;
+template<sp_d T> using SparseSPDMatClusterMUMPS = SparseMatBaseClusterMUMPS<T, ezp::symmetric_positive_definite>;
 
 #endif
 
