@@ -123,7 +123,7 @@ template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
         this->s_memory = this->to_float();
 
-        this->mixed_trs(X, std::forward<Mat<T>>(B), [&](fmat& residual) {
+        this->mixed_trs(X, std::move(B), [&](fmat& residual) {
             // todo: avoid copy
             magma_ssetmatrix(LDAB, N, this->s_memory.memptr(), LDAB, (magmaFloat_ptr)APTR, LDDAB, queue);
             magma_ssetmatrix(N, NRHS, residual.memptr(), LDB, (magmaFloat_ptr)BPTR, LDDB, queue);

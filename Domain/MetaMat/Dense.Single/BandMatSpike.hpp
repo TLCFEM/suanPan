@@ -172,7 +172,7 @@ template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         }
     }
 
-    return this->solve_trs(X, std::forward<Mat<T>>(B));
+    return this->solve_trs(X, std::move(B));
 }
 
 template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
@@ -194,7 +194,7 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         X = std::move(B);
     }
     else
-        this->mixed_trs(X, std::forward<Mat<T>>(B), [&](fmat& residual) {
+        this->mixed_trs(X, std::move(B), [&](fmat& residual) {
             sspike_gbtrs_(SPIKE, &TRAN, &N, &KL, &KU, &NRHS, this->s_memory.memptr(), &LDAB, SWORK.memptr(), residual.memptr(), &LDB);
             return 0;
         });

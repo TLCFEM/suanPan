@@ -643,17 +643,17 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(cons
 
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(triplet_form<data_t, index_t>&& mat_a, triplet_form<data_t, index_t>&& mat_b) {
     mat_a += mat_b;
-    return std::forward<triplet_form<data_t, index_t>>(mat_a);
+    return std::move(mat_a);
 }
 
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(const triplet_form<data_t, index_t>& mat_a, triplet_form<data_t, index_t>&& mat_b) {
     mat_b += mat_a;
-    return std::forward<triplet_form<data_t, index_t>>(mat_b);
+    return std::move(mat_b);
 }
 
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(triplet_form<data_t, index_t>&& mat_a, const triplet_form<data_t, index_t>& mat_b) {
     mat_a += mat_b;
-    return std::forward<triplet_form<data_t, index_t>>(mat_a);
+    return std::move(mat_a);
 }
 
 #endif

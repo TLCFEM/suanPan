@@ -366,7 +366,7 @@ template<sp_d T> int SparseMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
         magma_smtransfer(dx_f, &x_f, Magma_DEV, Magma_CPU, queue);
 
-        X = std::forward<Mat<float>>(B);
+        X = std::move(B);
         magma_svcopy(x_f, &b_rows, &b_cols, X.memptr(), queue);
     }
     else {
@@ -388,7 +388,7 @@ template<sp_d T> int SparseMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
         magma_dmtransfer(dx_d, &x_d, Magma_DEV, Magma_CPU, queue);
 
-        X = std::forward<Mat<double>>(B);
+        X = std::move(B);
         magma_dvcopy(x_d, &b_rows, &b_cols, X.memptr(), queue);
     }
 

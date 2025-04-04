@@ -105,7 +105,7 @@ template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) const {
 }
 
 template<sp_d T> int BandSymmMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
-    if(this->factored) return this->solve_trs(X, std::forward<Mat<T>>(B));
+    if(this->factored) return this->solve_trs(X, std::move(B));
 
     suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
 
@@ -131,7 +131,7 @@ template<sp_d T> int BandSymmMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     else {
         this->s_memory = this->to_float();
         arma_fortran(arma_spbtrf)(&UPLO, &N, &KD, this->s_memory.memptr(), &LDAB, &INFO);
-        if(0 == INFO) INFO = this->solve_trs(X, std::forward<Mat<T>>(B));
+        if(0 == INFO) INFO = this->solve_trs(X, std::move(B));
     }
 
     if(0 != INFO)
@@ -160,7 +160,7 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
         X = std::move(B);
     }
     else
-        this->mixed_trs(X, std::forward<Mat<T>>(B), [&](fmat& residual) {
+        this->mixed_trs(X, std::move(B), [&](fmat& residual) {
             arma_fortran(arma_spbtrs)(&UPLO, &N, &KD, &NRHS, this->s_memory.memptr(), &LDAB, residual.memptr(), &LDB, &INFO);
             return INFO;
         });

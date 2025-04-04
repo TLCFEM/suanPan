@@ -68,7 +68,7 @@ public:
 
     op_scale(const T A, op_add<T>&& B)
         : scalar(A)
-        , bracket(std::forward<op_add<T>>(B)) {}
+        , bracket(std::move(B)) {}
 };
 
 template<sp_d T> class MetaMat {

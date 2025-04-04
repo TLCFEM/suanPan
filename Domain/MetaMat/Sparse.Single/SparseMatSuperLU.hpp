@@ -181,7 +181,7 @@ template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
 template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU>(*this); }
 
 template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&& in_mat) {
-    if(this->factored) return solve_trs(out_mat, std::forward<Mat<T>>(in_mat));
+    if(this->factored) return solve_trs(out_mat, std::move(in_mat));
 
     this->factored = true;
 
