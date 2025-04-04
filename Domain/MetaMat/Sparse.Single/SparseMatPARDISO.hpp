@@ -39,7 +39,6 @@
 extern "C" {
 void pardisoinit(void* pt, const la_it* mtype, la_it* iparm);
 void pardiso(void* pt, const la_it* maxfct, const la_it* mnum, const la_it* mtype, const la_it* phase, const la_it* n, const void* a, const la_it* ia, const la_it* ja, la_it* perm, const la_it* nrhs, la_it* iparm, const la_it* msglvl, void* b, void* x, la_it* error);
-void pardiso_64(void* pt, const la_it* maxfct, const la_it* mnum, const la_it* mtype, const la_it* phase, const la_it* n, const void* a, const la_it* ia, const la_it* ja, la_it* perm, const la_it* nrhs, la_it* iparm, const la_it* msglvl, void* b, void* x, la_it* error);
 }
 
 template<sp_d T, la_it MT> class SparseMatBasePARDISO final : public SparseMat<T> {
@@ -55,7 +54,7 @@ template<sp_d T, la_it MT> class SparseMatBasePARDISO final : public SparseMat<T
     bool is_allocated{false};
 
     auto init_config() {
-        if constexpr(sizeof(la_it) == 4) pardisoinit(pt, &mtype, iparm);
+        pardisoinit(pt, &mtype, iparm);
 
         if constexpr(std::is_same_v<T, float>) iparm[27] = 1;
     }
@@ -67,12 +66,8 @@ template<sp_d T, la_it MT> class SparseMatBasePARDISO final : public SparseMat<T
         csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);
 
         la_it info{-1};
-        if constexpr(sizeof(la_it) == 8) {
-            pardiso_64(pt, &maxfct, &mnum, &mtype, &PARDISO_ANA_FACT, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &negone, iparm, &msglvl, nullptr, nullptr, &info);
-        }
-        else if constexpr(sizeof(la_it) == 4) {
-            pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_ANA_FACT, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &negone, iparm, &msglvl, nullptr, nullptr, &info);
-        }
+        pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_ANA_FACT, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &negone, iparm, &msglvl, nullptr, nullptr, &info);
+
         return info;
     }
 
@@ -81,8 +76,7 @@ template<sp_d T, la_it MT> class SparseMatBasePARDISO final : public SparseMat<T
         is_allocated = false;
 
         la_it info{-1};
-        if constexpr(sizeof(la_it) == 8) pardiso_64(pt, &maxfct, &mnum, &mtype, &PARDISO_RELEASE, &negone, nullptr, nullptr, nullptr, nullptr, &negone, iparm, &msglvl, nullptr, nullptr, &info);
-        else if constexpr(sizeof(la_it) == 4) pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_RELEASE, &negone, nullptr, nullptr, nullptr, nullptr, &negone, iparm, &msglvl, nullptr, nullptr, &info);
+        pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_RELEASE, &negone, nullptr, nullptr, nullptr, nullptr, &negone, iparm, &msglvl, nullptr, nullptr, &info);
 
         for(auto& i : pt) i = 0;
     }
@@ -125,8 +119,7 @@ template<sp_d T, la_it MT> int SparseMatBasePARDISO<T, MT>::direct_solve(Mat<T>&
     const la_it nrhs{static_cast<la_it>(B.n_cols)};
 
     la_it info{-1};
-    if constexpr(sizeof(la_it) == 8) pardiso_64(pt, &maxfct, &mnum, &mtype, &PARDISO_SOLVE, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), X.memptr(), &info);
-    else if constexpr(sizeof(la_it) == 4) pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_SOLVE, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), X.memptr(), &info);
+    pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_SOLVE, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), X.memptr(), &info);
 
     if(0 != info) {
         suanpan_error("Error code {} received.\n", info);
