@@ -6,18 +6,23 @@
 
 // global matrix storage
 #include "Dense.Single/BandMat.hpp"
-#include "Dense.Single/BandMatCUDA.hpp"
 #include "Dense.Single/BandMatMAGMA.hpp"
 #include "Dense.Single/BandMatSpike.hpp"
 #include "Dense.Single/BandSymmMat.hpp"
 #include "Dense.Single/FullMat.hpp"
-#include "Dense.Single/FullMatCUDA.hpp"
 #include "Dense.Single/SymmPackMat.hpp"
-#include "Sparse.Single/SparseMatCUDA.hpp"
 #include "Sparse.Single/SparseMatFGMRES.hpp"
-#include "Sparse.Single/SparseMatMAGMA.hpp"
 #include "Sparse.Single/SparseMatPARDISO.hpp"
 #include "Sparse.Single/SparseMatSuperLU.hpp"
+
+#ifdef SUANPAN_CUDA
+#include "Dense.Single/BandMatCUDA.hpp"
+#include "Dense.Single/FullMatCUDA.hpp"
+#include "Sparse.Single/SparseMatCUDA.hpp"
+#ifdef SUANPAN_MAGMA
+#include "Sparse.Single/SparseMatMAGMA.hpp"
+#endif
+#endif
 
 #ifdef SUANPAN_DISTRIBUTED
 #include "Dense.Cluster/BandMatCluster.hpp"

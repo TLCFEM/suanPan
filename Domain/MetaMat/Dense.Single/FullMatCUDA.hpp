@@ -30,8 +30,6 @@
 #ifndef FULLMATCUDA_HPP
 #define FULLMATCUDA_HPP
 
-#ifdef SUANPAN_CUDA
-
 #include <cuda_runtime.h>
 #include <cusolverDn.h>
 #include "FullMat.hpp"
@@ -194,8 +192,6 @@ template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
     return 0;
 }
-
-#endif
 
 #endif
 

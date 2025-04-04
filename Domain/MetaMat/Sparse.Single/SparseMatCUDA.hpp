@@ -32,8 +32,6 @@
 #ifndef SPARSEMATCUDA_HPP
 #define SPARSEMATCUDA_HPP
 
-#ifdef SUANPAN_CUDA
-
 #include "../SparseMat.hpp"
 #include "../csr_form.hpp"
 
@@ -186,8 +184,6 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
 
     return 0 == code ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
-
-#endif
 
 #endif
 

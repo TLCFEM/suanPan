@@ -30,8 +30,6 @@
 #ifndef BANDMATCUDA_HPP
 #define BANDMATCUDA_HPP
 
-#ifdef SUANPAN_CUDA
-
 #include "../csr_form.hpp"
 #include "BandMat.hpp"
 
@@ -149,8 +147,6 @@ template<sp_d T> int BandMatCUDA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
     return INFO;
 }
-
-#endif
 
 #endif
 

@@ -247,9 +247,13 @@ enum class Precision : std::uint8_t {
 
 template<sp_d data_t> struct SolverSetting {
 #ifdef SUANPAN_MAGMA
-    magma_dopts magma_setting{};
+    magma_dopts magma_d_setting{};
+    magma_sopts magma_s_setting{};
 
-    auto set_magma_option(istringstream& command) { magma_setting = magma_parse_opts<magma_dopts>(command); }
+    auto set_magma_option(istringstream& command) {
+        if constexpr(std::is_same_v<data_t, double>) magma_d_setting = magma_parse_opts<magma_dopts>(command);
+        else magma_s_setting = magma_parse_opts<magma_sopts>(command);
+    }
 #else
     auto set_magma_option(istringstream&) {}
 #endif

@@ -1521,7 +1521,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #ifdef SUANPAN_CUDA
         if(contain_solver_type(SolverType::CUDA)) return std::make_unique<SparseMatCUDA<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MAGMA
-        if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, setting.magma_setting);
+        if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, std::is_same_v<T, double> ? magma_opt_t{setting.magma_d_setting} : magma_opt_t{setting.magma_s_setting});
 #endif
 #endif
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);

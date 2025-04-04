@@ -34,11 +34,11 @@
 #ifndef SPARSEMATMAGMA_HPP
 #define SPARSEMATMAGMA_HPP
 
-#ifdef SUANPAN_MAGMA
-
 #include "SparseMat.hpp"
 
 #include <variant>
+
+using magma_opt_t = std::variant<magma_dopts, magma_sopts>;
 
 template<sp_d T> class SparseMatMAGMA final : public SparseMat<T> {
     magma_dopts dopts;
@@ -68,7 +68,7 @@ protected:
     int direct_solve(Mat<T>&, Mat<T>&&) override;
 
 public:
-    SparseMatMAGMA(const uword in_row, const uword in_col, const std::variant<magma_dopts, magma_sopts>& in_opts, const uword in_elem = 0)
+    SparseMatMAGMA(const uword in_row, const uword in_col, const magma_opt_t& in_opts, const uword in_elem = 0)
         : SparseMat<T>(in_row, in_col, in_elem) {
         magma_init();
         if(SUANPAN_VERBOSE) magma_print_environment();
@@ -180,8 +180,6 @@ template<sp_d T> int SparseMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
     return SUANPAN_SUCCESS;
 }
-
-#endif
 
 #endif
 
