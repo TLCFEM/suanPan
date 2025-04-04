@@ -30,9 +30,9 @@
 #ifndef BANDMATMAGMA_HPP
 #define BANDMATMAGMA_HPP
 
-#ifdef SUANPAN_MAGMA
-
 #include "BandMat.hpp"
+
+#include <magma_v2.h>
 
 template<sp_d T> class BandMatMAGMA final : public BandMat<T> {
     magma_queue_t queue{};
@@ -144,8 +144,6 @@ template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
     return INFO;
 }
-
-#endif
 
 #endif
 

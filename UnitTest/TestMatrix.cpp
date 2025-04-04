@@ -194,13 +194,15 @@ namespace {
     template<> BandMatMAGMA<float> create_new(const u64 N) { return {N, 3, 3}; }
 
     template<> SparseMatMAGMA<double> create_new(const u64 N) {
-        istringstream dummy{"--verbose 1"};
-        return {N, N, magma_parse_opts<magma_dopts>(dummy)};
+        SparseMatMAGMA<double> t_mat{N, N};
+        t_mat.set_solver_setting({"--verbose 1"});
+        return t_mat;
     }
 
     template<> SparseMatMAGMA<float> create_new(const u64 N) {
-        istringstream dummy{"--verbose 1"};
-        return {N, N, magma_parse_opts<magma_sopts>(dummy)};
+        SparseMatMAGMA<double> t_mat{N, N};
+        t_mat.set_solver_setting({"--verbose 1"});
+        return t_mat;
     }
 #endif
 #endif

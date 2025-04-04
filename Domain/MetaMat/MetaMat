@@ -6,7 +6,6 @@
 
 // global matrix storage
 #include "Dense.Single/BandMat.hpp"
-#include "Dense.Single/BandMatMAGMA.hpp"
 #include "Dense.Single/BandMatSpike.hpp"
 #include "Dense.Single/BandSymmMat.hpp"
 #include "Dense.Single/FullMat.hpp"
@@ -20,6 +19,7 @@
 #include "Dense.Single/FullMatCUDA.hpp"
 #include "Sparse.Single/SparseMatCUDA.hpp"
 #ifdef SUANPAN_MAGMA
+#include "Dense.Single/BandMatMAGMA.hpp"
 #include "Sparse.Single/SparseMatMAGMA.hpp"
 #endif
 #endif
