@@ -195,13 +195,13 @@ namespace {
 
     template<> SparseMatMAGMA<double> create_new(const u64 N) {
         SparseMatMAGMA<double> t_mat{N, N};
-        t_mat.set_solver_setting({"--verbose 1"});
+        t_mat.set_solver_setting({.option = "--verbose 1"});
         return t_mat;
     }
 
     template<> SparseMatMAGMA<float> create_new(const u64 N) {
-        SparseMatMAGMA<double> t_mat{N, N};
-        t_mat.set_solver_setting({"--verbose 1"});
+        SparseMatMAGMA<float> t_mat{N, N};
+        t_mat.set_solver_setting({.option = "--verbose 1"});
         return t_mat;
     }
 #endif

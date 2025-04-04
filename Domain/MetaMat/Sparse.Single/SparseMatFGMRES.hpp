@@ -30,8 +30,6 @@
 #ifndef SPARSEMATFGMRES_HPP
 #define SPARSEMATFGMRES_HPP
 
-#ifdef SUANPAN_MKL
-
 #include "../SparseMat.hpp"
 #include "../csr_form.hpp"
 
@@ -122,8 +120,6 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
 
     return info;
 }
-
-#endif
 
 #endif
 

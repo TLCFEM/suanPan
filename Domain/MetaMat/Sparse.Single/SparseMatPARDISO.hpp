@@ -18,8 +18,6 @@
  * @class SparseMatPARDISO
  * @brief A SparseMatPARDISO class that holds matrices.
  *
- * TODO: improve performance by storing and reusing factorization
- *
  * @author tlc
  * @date 21/03/2025
  * @version 0.1.0
@@ -31,8 +29,6 @@
 // ReSharper disable CppCStyleCast
 #ifndef SPARSEMATPARDISO_HPP
 #define SPARSEMATPARDISO_HPP
-
-#ifdef SUANPAN_MKL
 
 #include "../SparseMat.hpp"
 
@@ -134,8 +130,6 @@ template<sp_d T, la_it MT> int SparseMatBasePARDISO<T, MT>::direct_solve(Mat<T>&
 
 template<sp_d T> using SparseMatPARDISO = SparseMatBasePARDISO<T, 11>;
 template<sp_d T> using SparseSymmMatPARDISO = SparseMatBasePARDISO<T, -2>;
-
-#endif
 
 #endif
 
