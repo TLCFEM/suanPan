@@ -1092,9 +1092,6 @@
     <ClCompile Include="..\..\..\Toolbox\utility.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\CatchTest.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestMode.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
@@ -2507,9 +2504,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\utility.h">
       <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UnitTest\CatchTest.h">
-      <Filter>UnitTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\suanPan.h" />
     <ClInclude Include="..\..\..\Material\Material1D\Viscosity\Kelvin.h">
