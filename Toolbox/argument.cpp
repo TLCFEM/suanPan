@@ -24,6 +24,7 @@
 #include <Toolbox/revision.h>
 #include <Toolbox/utility.h>
 #include <UnitTest/CatchTest.h>
+#include <argparse/argparse.hpp>
 #include <array>
 #ifdef SUANPAN_WIN
 #include <Windows.h>
@@ -65,6 +66,7 @@ bool SUANPAN_VERBOSE = false;
 fs::path SUANPAN_EXE = "";
 
 namespace {
+    // ReSharper disable once CppDFAConstantFunctionResult
     bool check_debugger() {
 #ifdef SUANPAN_DEBUG
         return false;
@@ -104,6 +106,7 @@ namespace {
 
     void check_version(const fs::path& path_to_executable) {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+        // ReSharper disable once CppDFAUnreachableCode
         if(0 != comm_rank) return;
 
         auto updater_module = path_to_executable.parent_path();
@@ -174,6 +177,7 @@ namespace {
 
     void print_header() {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+        // ReSharper disable once CppDFAUnreachableCode
         if(0 != comm_rank) return;
 
         /***
@@ -193,6 +197,7 @@ namespace {
         suanpan_info("|  |___/\\__,_|_|   \\__,_|_| |_|      all rights reserved |\n");
         suanpan_info("|                                 10.5281/zenodo.1285221 |\n");
         suanpan_info(header);
+        // ReSharper disable once CppDFAConstantConditions
         if(support_emoji() && SUANPAN_COLOR) {
             static constexpr std::array POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
             arma_rng::set_seed_random();
@@ -225,54 +230,62 @@ namespace {
 } // namespace
 
 void argument_parser(const int argc, char** argv) {
+    // ReSharper disable once CppDFAUnreachableCode
+    // ReSharper disable once CppDFAConstantConditions
     if(check_debugger()) return;
 
     if(0 == argc) return;
 
     SUANPAN_EXE = whereami(argv[0]);
 
-    string input_file_name;
-    const auto buffer_backup = SUANPAN_COUT.rdbuf();
+    argparse::ArgumentParser program("suanPan", fmt::format("{}.{}.{}", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH), argparse::default_arguments::none);
+    program.add_argument("-ctest", "--catch2test").help("run bundled catch2 tests and exit").flag();
+    program.add_argument("-h", "--help").help("show help message and exit").flag();
+    program.add_argument("-nc", "--no-color").help("suppress colors in terminal output").flag();
+    program.add_argument("-np", "--no-print").help("suppress (most) terminal output").flag();
+    program.add_argument("-nu", "--no-update").help("skip new version check on startup").flag();
+    program.add_argument("-t", "--test").help("enter test mode to run test code, mainly for quick debugging during development").flag();
+    program.add_argument("-v", "--version").help("show version information and exit").flag();
+    program.add_argument("-vb", "--verbose").help("enable verbose terminal output").flag();
+
+    auto& group = program.add_mutually_exclusive_group();
+    group.add_argument("-s", "--strip").help("DO NOT USE").flag();
+    group.add_argument("-c", "--convert").help("DO NOT USE").flag();
+
+    program.add_argument("-f", "--input", "--input-file").help("path to the input analysis file").metavar("FILE_NAME");
+    program.add_argument("-o", "--output", "--output-file").help("path to the file for terminal output redirection").metavar("FILE_NAME");
 
     wall_clock T;
     T.tic();
 
     if(argc > 1) {
-        ofstream output_file;
-        string output_file_name;
-        auto strip = false, convert = false, check_new = true;
-
-        for(auto I = 1; I < argc; ++I) {
-            if(is_equal(argv[I], "-f") || is_equal(argv[I], "--file")) {
-                if(I + 1 == argc) return suanpan_error("No input file specified.\n");
-                input_file_name = argv[++I];
-            }
-            else if(is_equal(argv[I], "-o") || is_equal(argv[I], "--output")) {
-                if(I + 1 == argc) return suanpan_error("No output file specified.\n");
-                output_file_name = argv[++I];
-            }
-            else if(is_equal(argv[I], "-vb") || is_equal(argv[I], "--verbose")) SUANPAN_VERBOSE = true;
-            else if(is_equal(argv[I], "-np") || is_equal(argv[I], "--noprint")) SUANPAN_PRINT = false;
-            else if(is_equal(argv[I], "-nc") || is_equal(argv[I], "--nocolor")) SUANPAN_COLOR = false;
-            else if(is_equal(argv[I], "-nu") || is_equal(argv[I], "--noupdate")) check_new = false;
-            else if(is_equal(argv[I], "-v") || is_equal(argv[I], "--version")) return print_version();
-            else if(is_equal(argv[I], "-h") || is_equal(argv[I], "--help")) return print_helper();
-            else if(is_equal(argv[I], "-t") || is_equal(argv[I], "--test")) return test_mode();
-            else if(is_equal(argv[I], "-ctest") || is_equal(argv[I], "--catch2test")) {
-                catchtest_main(argc, argv);
-                return;
-            }
-            else if(is_equal(argv[I], "-s") || is_equal(argv[I], "--strip")) {
-                strip = true;
-                convert = false;
-            }
-            else if(is_equal(argv[I], "-c") || is_equal(argv[I], "--convert")) {
-                convert = true;
-                strip = false;
-            }
+        try {
+            program.parse_args(argc, argv);
+        }
+        catch(const std::exception& err) {
+            suanpan_error("Fail to parse arguments: {}.\n", err.what());
+            return;
         }
 
-        if(check_new) check_version(SUANPAN_EXE);
+        if(program.get<bool>("-ctest")) return catchtest_main(argc, argv);
+        if(program.get<bool>("-h")) {
+            // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+            if(0 == comm_rank) suanpan_highlight("{}", program.help().str());
+            return;
+        }
+        if(program.get<bool>("-t")) return test_mode();
+        if(program.get<bool>("-v")) return print_version();
+
+        SUANPAN_PRINT = !program.get<bool>("-np");
+        SUANPAN_COLOR = !program.get<bool>("-nc");
+        SUANPAN_VERBOSE = program.get<bool>("-vb");
+
+        if(!program.get<bool>("-nu")) check_version(SUANPAN_EXE);
+
+        const auto strip = program.get<bool>("-s"), convert = program.get<bool>("-c");
+
+        const auto input_file_name = program.present("-f").value_or("");
+        auto output_file_name = program.present("-o").value_or("");
 
         if(strip || convert) {
             if(input_file_name.empty()) return;
@@ -294,6 +307,10 @@ void argument_parser(const int argc, char** argv) {
 
             return convert ? convert_mode(input_file_name, output_file_name) : strip_mode(input_file_name, output_file_name);
         }
+
+        const auto buffer_backup = SUANPAN_COUT.rdbuf();
+
+        ofstream output_file;
 
         if(!output_file_name.empty()) {
             output_file.open(output_file_name);
@@ -325,6 +342,7 @@ void argument_parser(const int argc, char** argv) {
 
 void print_version() {
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
     suanpan_info("Copyright (C) 2017-2025 Theodore Chang\n\n");
@@ -371,34 +389,11 @@ void print_version() {
     suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n");
 }
 
-void print_helper() {
-    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    if(0 != comm_rank) return;
-
-    static const auto helper_line = "------------------------------------------------------------------------------\n";
-    static const auto helper_format = "\t-{:<6} --{:<12}{}\n";
-
-    suanpan_highlight(helper_line);
-    suanpan_highlight("Usage:\n\tsuanPan [-vb] [-np] [-nc] [-nu] [-f <input_file>] [-o <output_file>]\n");
-    suanpan_highlight(helper_line);
-    suanpan_info("Options:\n");
-    suanpan_info(helper_format, "v", "version", "print version information");
-    suanpan_info(helper_format, "h", "help", "print this helper");
-    suanpan_info(helper_format, "s", "strip", "strip comments out in given ABAQUS input file");
-    // suanpan_info(helper_format, "c", "convert", "partially convert ABAQUS input file into suanPan model script");
-    suanpan_info(helper_format, "vb", "verbose", "enable verbose console output");
-    suanpan_info(helper_format, "np", "noprint", "suppress most console output");
-    suanpan_info(helper_format, "nc", "nocolor", "suppress colors in output");
-    suanpan_info(helper_format, "nu", "noupdate", "do not check for newer version on startup");
-    suanpan_info(helper_format, "f", "file", "process model file");
-    suanpan_info(helper_format, "o", "output", "set output file for logging");
-    suanpan_info(helper_line);
-}
-
 void cli_mode(const shared_ptr<Bead>& model) {
     const auto history_path = get_history_path();
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppRedundantBooleanExpressionArgument
     if(!exists(history_path) and 0 == comm_rank) {
         suanpan_info("To go through a brief introduction, use '");
         suanpan_highlight("overview");

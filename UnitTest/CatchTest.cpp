@@ -2,7 +2,7 @@
 #include <Toolbox/utility.h>
 #include "CatchHeader.h"
 
-int catchtest_main(const int argc, char** argv) {
+void catchtest_main(const int argc, char** argv) {
     for(auto I = 1; I < argc; ++I) {
         constexpr auto t_argv = "";
         bool flag = false;
@@ -11,5 +11,5 @@ int catchtest_main(const int argc, char** argv) {
         if(flag) break;
     }
 
-    return Catch::Session().run(argc, argv);
+    Catch::Session().run(argc, argv);
 }

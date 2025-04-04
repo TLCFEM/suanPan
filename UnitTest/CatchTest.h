@@ -18,6 +18,6 @@
 #ifndef CATCHTEST_H
 #define CATCHTEST_H
 
-int catchtest_main(int, char**);
+void catchtest_main(int, char**);
 
 #endif
