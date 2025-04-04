@@ -56,7 +56,7 @@ public:
 template<sp_d T> int SparseMatClusterLIS<T>::solve_full(Mat<T>& X) {
     la_it info{-1};
 
-    solver.set_option(this->setting.lis_options.c_str());
+    solver.set_option(this->setting.option.c_str());
 
     if(this->factored) info = solver.solve({X.n_rows, X.n_cols, X.memptr()});
     else {

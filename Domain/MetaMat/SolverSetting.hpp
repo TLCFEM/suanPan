@@ -253,20 +253,25 @@ template<sp_d data_t> struct SolverSetting {
 #else
     auto set_magma_option(istringstream&) {}
 #endif
-    string lis_options = "-i fgmres -p ilu";
+    string option{};
     data_t tolerance = std::is_same_v<data_t, float> ? 1E-7f : 1E-14;
     std::uint8_t iterative_refinement = 5;
     Precision precision = Precision::FULL;
 
-    auto set_lis_option(const std::string_view command) {
+    auto set_lis_option(istringstream& command) {
         static constexpr auto max_length = 1024;
 
-        if(command.empty()) return;
-        if(std::any_of(command.begin(), command.end(), [](const char c) { return !std::isspace(c); })) lis_options = command;
-        if(lis_options.length() < max_length) return;
+        const auto sub_command = get_remaining(command);
 
-        const auto pos = lis_options.find_last_of(" \t\n\r", max_length);
-        lis_options = lis_options.substr(0, pos == std::string::npos ? max_length : pos);
+        if(sub_command.empty()) {
+            option = "-i fgmres -p ilu";
+            return;
+        }
+        if(std::any_of(sub_command.begin(), sub_command.end(), [](const char c) { return !std::isspace(c); })) option = sub_command;
+        if(option.length() < max_length) return;
+
+        const auto pos = option.find_last_of(" \t\n\r", max_length);
+        option = option.substr(0, pos == std::string::npos ? max_length : pos);
     }
 };
 

@@ -114,7 +114,7 @@ public:
     void set_precision(Precision);
     void set_tolerance(double);
     void set_refinement(std::uint8_t);
-    void set_lis_option(std::string_view);
+    void set_lis_option(istringstream&);
     void set_magma_option(istringstream&);
 
     [[nodiscard]] double get_ini_step_size() const;

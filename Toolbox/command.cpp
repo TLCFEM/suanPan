@@ -1026,7 +1026,7 @@ namespace {
             else if(is_equal(value, "SUPERLU")) t_step->set_system_solver(SolverType::SUPERLU);
             else if(is_equal(value, "LIS")) {
                 t_step->set_system_solver(SolverType::LIS);
-                if(const auto options = get_remaining(command); !options.empty()) t_step->set_lis_option(options);
+                t_step->set_lis_option(command);
             }
             else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
 #ifdef SUANPAN_CUDA
@@ -1053,7 +1053,7 @@ namespace {
             else if(is_equal(value, "SUPERLU")) t_step->set_sub_system_solver(SolverType::SUPERLU);
             else if(is_equal(value, "LIS")) {
                 t_step->set_sub_system_solver(SolverType::LIS);
-                if(const auto options = get_remaining(command); !options.empty()) t_step->set_lis_option(options);
+                t_step->set_lis_option(command);
             }
             else if(is_equal(value, "MUMPS")) t_step->set_sub_system_solver(SolverType::MUMPS);
 #ifdef SUANPAN_CUDA
