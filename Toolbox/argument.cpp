@@ -229,8 +229,10 @@ namespace {
     }
 
     bool catchtest_main(const int argc, char** argv) {
+        static constexpr auto empty_arg = "";
         for(auto I = 1; I < argc; ++I)
             if(is_equal(argv[I], "-ct") || is_equal(argv[I], "--catch2test")) {
+                for(auto J = 1; J <= I; ++J) argv[J] = const_cast<char*>(empty_arg);
                 Catch::Session().run(argc, argv);
                 return true;
             }
