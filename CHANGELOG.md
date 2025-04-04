@@ -12,6 +12,7 @@
 3. remove `MUMPS` and `lis` solvers for single-node binaries
 4. update `MinGW-w64` with UCRT and GCC 13.3.0, see SDK [link](https://github.com/brechtsanders/winlibs_mingw/releases/download/13.3.0posix-11.0.1-ucrt-r1/winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z)
 5. add cluster support [#253](https://github.com/TLCFEM/suanPan/pull/253)
+6. (breaking) refactor argument parser, some arguments are changed [#257](https://github.com/TLCFEM/suanPan/pull/257)
 
 ## version 3.6
 

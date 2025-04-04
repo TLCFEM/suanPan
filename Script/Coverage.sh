@@ -46,7 +46,7 @@ done
   ./suanPan -nc -vb -t
   ./suanPan -nc -vb -np -t
   ./suanPan -v
-  ./suanPan -ctest ~"Large Mixed Precision" ~"Large Sparse Solve Type"
+  ./suanPan -ct ~"Large Mixed Precision" ~"Large Sparse Solve Type"
   ./suanPan -c -f ../Example/Misc/Converter/TEST.inp
   ./suanPan -s -f ../Example/Misc/Converter/TEST.inp
 } >>"$log_file"

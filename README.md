@@ -286,29 +286,30 @@ to `~/.local/share/applications`.
 
 Additional libraries used in **suanPan** are listed as follows.
 
-- [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**SPIKE**](http://www.spike-solver.org/) version 1.0
-- [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
-- [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
-- [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
-- [**MUMPS**](https://mumps-solver.org/) version 5.7.3
-- [**METIS**](https://github.com/KarypisLab/METIS) version 5.1.0
-- [**VTK**](https://vtk.org/) version 9.4
-- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5
-- [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
-- [**Armadillo**](http://arma.sourceforge.net/) version 14.4.1
-- [**ensmallen**](https://ensmallen.org/) version 2.21.1
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.0.1
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.0
+- [**ARPACK**](https://github.com/opencollab/arpack-ng)
+- [**Armadillo**](http://arma.sourceforge.net/) version 14.4.1
+- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.8.0
-- [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
-- [**whereami**](https://github.com/gpakosz/whereami)
+- [**FEAST**](http://www.feast-solver.org/) version 4.0
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
+- [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
+- [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
+- [**METIS**](https://github.com/KarypisLab/METIS) version 5.1.0
+- [**MUMPS**](https://mumps-solver.org/) version 5.7.3
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
+- [**SPIKE**](http://www.spike-solver.org/) version 1.0
+- [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
+- [**VTK**](https://vtk.org/) version 9.4
+- [**argparse**](https://github.com/p-ranav/argparse)
+- [**ensmallen**](https://ensmallen.org/) version 2.21.1
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
+- [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.0.1
+- [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/)
