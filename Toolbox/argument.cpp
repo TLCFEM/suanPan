@@ -239,21 +239,22 @@ void argument_parser(const int argc, char** argv) {
     SUANPAN_EXE = whereami(argv[0]);
 
     argparse::ArgumentParser program("suanPan", fmt::format("{}.{}.{}", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH), argparse::default_arguments::none);
+    program.add_argument("-h", "--help").help("show this help message and exit").flag();
+    program.add_argument("-v", "--version").help("show version information and exit").flag();
+    program.add_argument("-t", "--test").help("run predefined test code and exit, mainly for quick debugging during development").flag();
     program.add_argument("-ctest", "--catch2test").help("run bundled catch2 tests and exit").flag();
-    program.add_argument("-h", "--help").help("show help message and exit").flag();
+
     program.add_argument("-nc", "--no-color").help("suppress colors in terminal output").flag();
     program.add_argument("-np", "--no-print").help("suppress (most) terminal output").flag();
     program.add_argument("-nu", "--no-update").help("skip new version check on startup").flag();
-    program.add_argument("-t", "--test").help("enter test mode to run test code, mainly for quick debugging during development").flag();
-    program.add_argument("-v", "--version").help("show version information and exit").flag();
-    program.add_argument("-vb", "--verbose").help("enable verbose terminal output").flag();
+    program.add_argument("-vb", "--verbose").help("enable (very) verbose terminal output").flag();
 
     auto& group = program.add_mutually_exclusive_group();
-    group.add_argument("-s", "--strip").help("DO NOT USE").flag();
-    group.add_argument("-c", "--convert").help("DO NOT USE").flag();
+    group.add_argument("-s", "--strip").help("!!!DO NOT USE!!!").flag();
+    group.add_argument("-c", "--convert").help("!!!DO NOT USE!!!").flag();
 
-    program.add_argument("-f", "--input", "--input-file").help("path to the input analysis file").metavar("FILE_NAME");
-    program.add_argument("-o", "--output", "--output-file").help("path to the file for terminal output redirection").metavar("FILE_NAME");
+    program.add_argument("-f", "--input", "--input-file").help("specify path to the file containing input analysis").metavar("INPUT_FILE_PATH");
+    program.add_argument("-o", "--output", "--output-file").help("specify path to the file for terminal output redirection").metavar("OUTPUT_FILE_PATH");
 
     wall_clock T;
     T.tic();
@@ -267,18 +268,18 @@ void argument_parser(const int argc, char** argv) {
             return;
         }
 
+        SUANPAN_PRINT = !program.get<bool>("-np");
+        SUANPAN_COLOR = !program.get<bool>("-nc");
+        SUANPAN_VERBOSE = program.get<bool>("-vb");
+
         if(program.get<bool>("-ctest")) return catchtest_main(argc, argv);
         if(program.get<bool>("-h")) {
             // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-            if(0 == comm_rank) suanpan_highlight("{}", program.help().str());
+            if(0 == comm_rank) suanpan_info("{}", program.help().str());
             return;
         }
         if(program.get<bool>("-t")) return test_mode();
         if(program.get<bool>("-v")) return print_version();
-
-        SUANPAN_PRINT = !program.get<bool>("-np");
-        SUANPAN_COLOR = !program.get<bool>("-nc");
-        SUANPAN_VERBOSE = program.get<bool>("-vb");
 
         if(!program.get<bool>("-nu")) check_version(SUANPAN_EXE);
 

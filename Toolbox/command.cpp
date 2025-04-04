@@ -1241,7 +1241,6 @@ namespace {
         suanpan_info(format, "fullname", "print the full path of the program");
         suanpan_info(format, "group", "define groups via various rules");
         suanpan_info(format, "hdf5recorder", "define recorders using hdf5 format");
-        suanpan_info(format, "help", "print the help information");
         suanpan_info(format, "import", "import external modules");
         suanpan_info(format, "initial", "define initial conditions for nodes and materials");
         suanpan_info(format, "integrator", "define time integration algorithms");
@@ -1533,11 +1532,6 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
         if(auto t = 1000ll; get_optional_input(command, t)) std::this_thread::sleep_for(std::chrono::milliseconds(t));
         else
             suanpan_error("A positive integer in milliseconds is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(command_id, "help")) {
-        print_helper();
         return SUANPAN_SUCCESS;
     }
 
