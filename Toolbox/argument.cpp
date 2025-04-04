@@ -23,7 +23,7 @@
 #include <Toolbox/command.h>
 #include <Toolbox/revision.h>
 #include <Toolbox/utility.h>
-#include <UnitTest/CatchTest.h>
+#include <UnitTest/CatchHeader.h>
 #include <argparse/argparse.hpp>
 #include <array>
 #ifdef SUANPAN_WIN
@@ -227,6 +227,16 @@ namespace {
 
         return weakly_canonical(exe_path);
     }
+
+    bool catchtest_main(const int argc, char** argv) {
+        for(auto I = 1; I < argc; ++I)
+            if(is_equal(argv[I], "-ct") || is_equal(argv[I], "--catch2test")) {
+                Catch::Session().run(argc, argv);
+                return true;
+            }
+
+        return false;
+    }
 } // namespace
 
 void argument_parser(const int argc, char** argv) {
@@ -238,11 +248,12 @@ void argument_parser(const int argc, char** argv) {
 
     SUANPAN_EXE = whereami(argv[0]);
 
+    if(catchtest_main(argc, argv)) return;
+
     argparse::ArgumentParser program("suanPan", fmt::format("{}.{}.{}", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH), argparse::default_arguments::none);
     program.add_argument("-h", "--help").help("show this help message and exit").flag();
     program.add_argument("-v", "--version").help("show version information and exit").flag();
     program.add_argument("-t", "--test").help("run predefined test code and exit, mainly for quick debugging during development").flag();
-    program.add_argument("-ctest", "--catch2test").help("run bundled catch2 tests and exit").flag();
 
     program.add_argument("-nc", "--no-color").help("suppress colors in terminal output").flag();
     program.add_argument("-np", "--no-print").help("suppress (most) terminal output").flag();
@@ -272,7 +283,6 @@ void argument_parser(const int argc, char** argv) {
         SUANPAN_COLOR = !program.get<bool>("-nc");
         SUANPAN_VERBOSE = program.get<bool>("-vb");
 
-        if(program.get<bool>("-ctest")) return catchtest_main(argc, argv);
         if(program.get<bool>("-h")) {
             // ReSharper disable once CppIfCanBeReplacedByConstexprIf
             if(0 == comm_rank) suanpan_info("{}", program.help().str());
