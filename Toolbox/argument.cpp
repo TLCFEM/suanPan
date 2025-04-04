@@ -264,7 +264,7 @@ void argument_parser(const int argc, char** argv) {
             program.parse_args(argc, argv);
         }
         catch(const std::exception& err) {
-            suanpan_error("Fail to parse arguments: {}.\n", err.what());
+            suanpan_error("Fail to parse arguments: {}\n", err.what());
             return;
         }
 
