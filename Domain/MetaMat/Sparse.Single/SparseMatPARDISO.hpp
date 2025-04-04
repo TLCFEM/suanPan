@@ -63,7 +63,10 @@ template<sp_d T, la_it MT> class SparseMatBasePARDISO final : public SparseMat<T
         dealloc();
         is_allocated = true;
 
-        csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);
+        // ReSharper disable CppDFAConstantConditions
+        // ReSharper disable once CppDFAUnreachableCode
+        csr_mat = csr_form<T, la_it>(1 == mtype || 11 == mtype ? this->triplet_mat : this->triplet_mat.upper(), SparseBase::ONE, true);
+        // ReSharper restore CppDFAConstantConditions
 
         la_it info{-1};
         pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_ANA_FACT, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &negone, iparm, &msglvl, nullptr, nullptr, &info);
