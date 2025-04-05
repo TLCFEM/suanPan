@@ -394,7 +394,10 @@ void print_version() {
     suanpan_info("    The GPCPU solvers are provided by MAGMA ({}.{}.{}). https://icl.utk.edu/magma/\n", major, minor, micro);
 #endif
 #ifdef SUANPAN_MT
-    suanpan_info("    The parallelisation support is implemented via TBB ({}) library. https://github.com/oneapi-src/oneTBB/\n", TBB_runtime_interface_version());
+    suanpan_info("    The shared-memory parallelism support is implemented via TBB ({}) library. https://github.com/oneapi-src/oneTBB/\n", TBB_runtime_interface_version());
+#endif
+#ifdef SUANPAN_DISTRIBUTED
+    suanpan_info("    The distributed-memory parallelism (MPI on clusters) support is enabled.\n");
 #endif
 #ifdef SUANPAN_VTK
     suanpan_info("    The visualisation support is implemented via VTK ({}) library. https://vtk.org/\n", vtkVersion::GetVTKVersion());
