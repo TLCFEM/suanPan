@@ -148,7 +148,9 @@ if (SP_ENABLE_MKL)
     if (COMPILER_IDENTIFIER MATCHES "IntelLLVM")
         set(SP_ENABLE_IOMP ON CACHE BOOL "" FORCE)
     endif ()
-    if (NOT SP_ENABLE_SHARED_MKL)
+    if (COMPILER_IDENTIFIER MATCHES "win")
+        set(MKL_LINK sdl)
+    elseif (NOT SP_ENABLE_SHARED_MKL)
         set(MKL_LINK static)
     endif ()
     if (NOT SP_ENABLE_IOMP AND LINUX)
@@ -414,9 +416,7 @@ else ()
 endif ()
 
 if (SP_ENABLE_MKL)
-    if (COMPILER_IDENTIFIER MATCHES "win")
-        link_libraries(mkl_rt)
-    elseif (SP_ENABLE_MPI)
+    if (SP_ENABLE_MPI)
         link_libraries(MKL::MKL_SCALAPACK)
     else ()
         link_libraries(MKL::MKL)
@@ -632,10 +632,9 @@ elseif (COMPILER_IDENTIFIER MATCHES "win")
                 ${MKL_ROOT}/bin/mkl_intel_thread.*
         )
         install(FILES ${MKL_FILES} DESTINATION bin)
-    else ()
-        file(GLOB DLL_FILES Libs/win/lib*.dll)
-        install(FILES ${DLL_FILES} DESTINATION bin)
     endif ()
+    file(GLOB DLL_FILES Libs/${SP_EXTERNAL_LIB_PATH}/lib*.dll)
+    install(FILES ${DLL_FILES} DESTINATION bin)
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
     install(FILES Enhancement/AddAssociation.bat DESTINATION bin)
     if (SP_BUILD_PARALLEL OR SP_ENABLE_MKL)
@@ -648,13 +647,10 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
                     ${MKL_ROOT}/redist/intel64/mkl_core*
                     ${MKL_ROOT}/redist/intel64/mkl_def*
                     ${MKL_ROOT}/redist/intel64/mkl_avx*
+                    ${MKL_ROOT}/redist/intel64/mkl_intel_thread.*
                     ${MKL_ROOT}/bin/mkl_core*
                     ${MKL_ROOT}/bin/mkl_def*
                     ${MKL_ROOT}/bin/mkl_avx*
-            )
-            install(FILES ${MKL_FILES} DESTINATION bin)
-            file(GLOB MKL_FILES
-                    ${MKL_ROOT}/redist/intel64/mkl_intel_thread.*
                     ${MKL_ROOT}/bin/mkl_intel_thread.*
             )
             install(FILES ${MKL_FILES} DESTINATION bin)
