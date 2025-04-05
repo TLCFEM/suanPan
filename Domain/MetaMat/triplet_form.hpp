@@ -449,6 +449,19 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::save(con
     file.close();
 }
 
+/**
+ * @brief Sorts the COO format into the CSR (Compressed Sparse Row) order.
+ *
+ * This function ensures that the COO representation of the matrix is sorted
+ * by row indices and then by column indices within each row.
+ *
+ * @tparam data_t The data type of the matrix values.
+ * @tparam index_t The data type of the matrix indices.
+ *
+ * @note After calling this function:
+ * - The triplet form will be sorted.
+ * - Need to further call `condense()` to remove duplicate entries.
+ */
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort() {
     if(csr_sorted) return;
 
@@ -475,6 +488,19 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort
     csc_sorted = false;
 }
 
+/**
+ * @brief Sorts the COO format into the CSC (Compressed Sparse Column) order.
+ *
+ * This function ensures that the COO representation of the matrix is sorted
+ * by column indices and then by row indices within each column.
+ *
+ * @tparam data_t The data type of the matrix values.
+ * @tparam index_t The data type of the matrix indices.
+ *
+ * @note After calling this function:
+ * - The triplet form will be sorted.
+ * - Need to further call `condense()` to remove duplicate entries.
+ */
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csc_sort() {
     if(csc_sorted) return;
 
