@@ -33,4 +33,10 @@ add_library(feast_obj OBJECT ${FEAST_SRC} ${SPIKE_SRC})
 
 add_library(${PROJECT_NAME} $<TARGET_OBJECTS:feast_obj>)
 
+if (SP_ENABLE_MPI)
+    add_library(feast_mpi_obj OBJECT ${FEAST_SRC} ${SPIKE_SRC})
+    target_compile_definitions(feast_mpi_obj PRIVATE MPI)
+    add_library(pfeast $<TARGET_OBJECTS:feast_mpi_obj>)
+endif ()
+
 message(STATUS "FEAST Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
