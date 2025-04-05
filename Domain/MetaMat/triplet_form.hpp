@@ -218,6 +218,8 @@ public:
 
     void print() const;
 
+    void save(std::string_view) const;
+
     void csr_sort();
     void csc_sort();
 
@@ -277,11 +279,13 @@ public:
 
     triplet_form operator+(const triplet_form& in_mat) const {
         triplet_form copy = *this;
+        // ReSharper disable once CppDFAUnusedValue
         return copy += in_mat;
     }
 
     triplet_form operator-(const triplet_form& in_mat) const {
         triplet_form copy = *this;
+        // ReSharper disable once CppDFAUnusedValue
         return copy -= in_mat;
     }
 
@@ -419,6 +423,30 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::print() 
     }
     for(index_t I = 0; I < n_elem; ++I)
         suanpan_info("({}, {}) ===> {:+.8E}\n", row_idx[I], col_idx[I], val_idx[I]);
+}
+
+/**
+ * @brief Saves the triplet form matrix to a file.
+ *
+ * This function writes the matrix data stored in triplet form to a file.
+ * The file will contain the number of rows, columns, and non-zero elements
+ * on the first line, followed by the row indices, column indices, and values
+ * of the non-zero elements on subsequent lines.
+ * This follows the Matrix Market (MTX) format.
+ *
+ * @tparam data_t The data type of the matrix values.
+ * @tparam index_t The data type of the row and column indices.
+ * @param file_name The name of the file to save the matrix to.
+ *
+ * @note If the file cannot be opened, the function will return without
+ * performing any operation.
+ */
+template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::save(const std::string_view file_name) const {
+    std::ofstream file(file_name.data());
+    if(!file.is_open()) return;
+    file << suanpan::format("{} {} {}\n", n_rows, n_cols, n_elem);
+    for(index_t I = 0; I < n_elem; ++I) file << suanpan::format("{} {} {}\n", row_idx[I], col_idx[I], val_idx[I]);
+    file.close();
 }
 
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort() {
