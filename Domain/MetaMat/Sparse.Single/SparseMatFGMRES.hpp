@@ -64,10 +64,10 @@ public:
 
 template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     const auto N = static_cast<MKL_INT>(B.n_rows);
+    // ReSharper disable once CppRedundantCastExpression
+    const auto R = std::min(static_cast<MKL_INT>(150), N);
 
-    const auto restart = std::min(static_cast<MKL_INT>(150), N);
-
-    work.zeros((2 * restart + 1) * N + restart * (restart + 9) / 2 + 1);
+    work.zeros((2 * R + 1) * N + R * (R + 9) / 2 + 1);
 
     X = B;
 
@@ -100,18 +100,18 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
                 break;
             }
             if(1 == info) {
-                const vec xn(&work[ipar[21] - 1llu], N);
+                const vec xn(&work[ipar[21] - 1], N);
                 // ReSharper disable once CppInitializedValueIsAlwaysRewritten
                 // ReSharper disable once CppEntityAssignedButNoRead
-                vec yn(&work[ipar[22] - 1llu], N, false, true);
+                vec yn(&work[ipar[22] - 1], N, false, true);
                 // ReSharper disable once CppDFAUnusedValue
                 yn = csr_mat * xn;
             }
             else if(3 == info) {
-                const vec xn(&work[ipar[21] - 1llu], N);
+                const vec xn(&work[ipar[21] - 1], N);
                 // ReSharper disable once CppInitializedValueIsAlwaysRewritten
                 // ReSharper disable once CppEntityAssignedButNoRead
-                vec yn(&work[ipar[22] - 1llu], N, false, true);
+                vec yn(&work[ipar[22] - 1], N, false, true);
                 // ReSharper disable once CppDFAUnusedValue
                 yn = xn / precond;
             }

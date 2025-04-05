@@ -81,6 +81,16 @@ public:
         , u_band(in_u)
         , m_rows(in_l + in_u + 1) { init_spike(); }
 
+    BandMatSpike(const BandMatSpike& other)
+        : DenseMat<T>(other)
+        , l_band(other.l_band)
+        , u_band(other.u_band)
+        , m_rows(other.m_rows) { init_spike(); }
+
+    BandMatSpike(BandMatSpike&&) noexcept = delete;
+    BandMatSpike& operator=(const BandMatSpike&) = delete;
+    BandMatSpike& operator=(BandMatSpike&&) noexcept = delete;
+
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMatSpike>(*this); }
 
     void nullify(const uword K) override {
