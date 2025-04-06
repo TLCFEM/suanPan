@@ -124,15 +124,19 @@ if (NOT SP_ENABLE_SYSLIB)
 endif ()
 
 if (SP_ENABLE_MPI)
-    set(MPI_EXECUTABLE_SUFFIX "")
     find_package(MPI REQUIRED)
     add_compile_definitions(SUANPAN_MPI MPICH_SKIP_MPICXX)
+    get_filename_component(MPI_ROOT_DIR ${MPIEXEC_EXECUTABLE} DIRECTORY)
+    file(GLOB MPI_VERSION_FILE
+        "${MPI_ROOT_DIR}/mpichversion"
+        "${MPI_ROOT_DIR}/ompi_info"
+        "${MPI_ROOT_DIR}/impi_info"
+    )
     include_directories(${MPI_C_INCLUDE_DIRS})
-    string(TOLOWER "${MPI_C_INCLUDE_DIRS}" MPI_C_INCLUDE_DIRS_LOWER)
     if (NOT MKL_MPI)
-        if (MPI_C_INCLUDE_DIRS_LOWER MATCHES "openmpi")
+        if (MPI_VERSION_FILE MATCHES "ompi_info")
             set(MKL_MPI openmpi)
-        elseif (MPI_C_INCLUDE_DIRS_LOWER MATCHES "mpich")
+        elseif (MPI_VERSION_FILE MATCHES "mpichversion")
             set(MKL_MPI mpich)
         endif ()
     endif ()
