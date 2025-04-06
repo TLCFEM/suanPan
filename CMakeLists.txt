@@ -358,7 +358,7 @@ else ()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -Xpreprocessor -fopenmp")
     else ()
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions -fopenmp")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fopenmp")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-parentheses -fexceptions -fopenmp")
     endif ()
 
     if (SP_ENABLE_AVX512)

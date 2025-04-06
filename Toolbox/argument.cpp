@@ -91,8 +91,11 @@ namespace {
         OSVERSIONINFOEXW osInfo;
         const auto nt_module = GetModuleHandleA("ntdll");
         if(nullptr == nt_module) return false;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
         // ReSharper disable once CppCStyleCast
         *(FARPROC*)&RtlGetVersion = GetProcAddress(nt_module, "RtlGetVersion");
+#pragma GCC diagnostic pop
         if(nullptr == RtlGetVersion) return false;
 
         osInfo.dwOSVersionInfoSize = sizeof(osInfo);

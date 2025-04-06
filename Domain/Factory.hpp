@@ -1510,7 +1510,10 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
         return std::make_unique<SymmPackMat<T>>(n_size);
     case StorageScheme::SPARSESYMM:
 #ifdef SUANPAN_MKL
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
         if(contain_solver_type(SolverType::PARDISO)) return std::make_unique<SparseSymmMatPARDISO<T>>(n_size, n_size, n_elem);
+#pragma GCC diagnostic pop
 #endif
     case StorageScheme::SPARSE:
         if(contain_solver_type(SolverType::SUPERLU)) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
