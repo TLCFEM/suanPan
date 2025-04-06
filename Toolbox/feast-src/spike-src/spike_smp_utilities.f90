@@ -49,7 +49,7 @@ subroutine spikeinit(spm,n,klu)
 use omp_lib
 implicit none
 integer, dimension(64) :: spm
-integer :: n,klu
+integer :: n, klu, max_threads
 !integer, external :: omp_get_max_threads
 !=========================================================================
 !  Braegan Spring - Eric Polizzi - 2018
@@ -95,8 +95,8 @@ integer :: n,klu
 !24 =  #one-thread partitions
 !25  = total #threads available
 ! ---------
-
-call spikeinit_nthread(spm,n,klu,OMP_GET_MAX_THREADS())
+max_threads = OMP_GET_MAX_THREADS()
+call spikeinit_nthread(spm, n, klu, max_threads)
 
 end subroutine spikeinit
 
