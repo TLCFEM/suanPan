@@ -391,6 +391,8 @@ TEST_CASE("SparseMatFGMRES", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(
 
 #ifdef SUANPAN_DISTRIBUTED
 TEST_CASE("SparseMatClusterPARDISO", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatClusterPARDISO<double>>); }
+
+TEST_CASE("SparseMatClusterPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatClusterPARDISO<float>>); }
 #endif
 #endif
 
