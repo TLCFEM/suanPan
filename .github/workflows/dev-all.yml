@@ -137,6 +137,9 @@ jobs:
           else
             file_name+="-openblas"
           fi
+          if [ "${{ matrix.longint }}" == "ON" ]; then
+            file_name+="-64bit"
+          fi
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
