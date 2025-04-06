@@ -22,6 +22,7 @@ jobs:
         vtk: [ ON, OFF ]
         mkl: [ OFF ]
         aocl: [ ON, OFF ]
+        longint: [ ON, OFF ]
         exclude:
           - build: Debug
             mkl: ON
@@ -32,6 +33,8 @@ jobs:
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
             aocl: ON
           - mkl: ON
+            aocl: ON
+          - longint: ON
             aocl: ON
     steps:
       - name: Clone
@@ -94,6 +97,7 @@ jobs:
           -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_PARALLEL=$MT \
+          -DSP_ENABLE_64BIT_INDEXING=${{ matrix.longint }} \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
           -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
@@ -155,7 +159,7 @@ jobs:
           lcov --remove coverage.info '/usr/*' --output-file coverage.info
           lcov --list coverage.info
       - name: Report
-        if: env.COVERAGE == 'ON'
+        if: ${{ hashFiles('./build/coverage.info') != '' }}
         uses: codecov/codecov-action@v5
         with:
           plugins: gcov
