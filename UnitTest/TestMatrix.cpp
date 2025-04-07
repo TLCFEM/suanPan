@@ -143,11 +143,11 @@ namespace {
 
     template<> SymmPackMat<double> create_new(const u64 N) { return SymmPackMat<double>{N}; }
 
-    template<> BandMat<double> create_new(const u64 N) { return {N, 3, 3}; }
+    template<> BandMat<double> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
 
-    template<> BandMatSpike<double> create_new(const u64 N) { return {N, N / 10, N / 10}; }
+    template<> BandMatSpike<double> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
 
-    template<> BandSymmMat<double> create_new(const u64 N) { return {N, 3}; }
+    template<> BandSymmMat<double> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu)}; }
 
     template<> SparseMatSuperLU<double> create_new(const u64 N) { return {N, N}; }
 
@@ -155,11 +155,11 @@ namespace {
 
     template<> SymmPackMat<float> create_new(const u64 N) { return SymmPackMat<float>{N}; }
 
-    template<> BandMat<float> create_new(const u64 N) { return {N, 3, 3}; }
+    template<> BandMat<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
 
-    template<> BandMatSpike<float> create_new(const u64 N) { return {N, N / 10, N / 10}; }
+    template<> BandMatSpike<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
 
-    template<> BandSymmMat<float> create_new(const u64 N) { return {N, 3}; }
+    template<> BandSymmMat<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu)}; }
 
     template<> SparseMatSuperLU<float> create_new(const u64 N) { return {N, N}; }
 
