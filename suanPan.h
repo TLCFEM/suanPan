@@ -109,6 +109,8 @@
 #define SUANPAN_VERSION _MSC_FULL_VER
 #define SUANPAN_COMPILER "MSVC"
 #define SUANPAN_MSVC
+// unknown pragma 'GCC'
+#pragma warning(disable : 4068)
 // cuda unused local function
 #pragma warning(disable : 4505)
 // conditional expression is constant
