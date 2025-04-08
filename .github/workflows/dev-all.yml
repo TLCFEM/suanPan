@@ -424,7 +424,7 @@ jobs:
         if: matrix.vtk == 'ON'
         run: |
           C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-win-gcc.7z
-          7z x VTK-9.4.1-win-gcc.7z -oVTK
+          7z x VTK-9.4.2-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go
