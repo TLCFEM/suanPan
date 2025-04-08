@@ -47,6 +47,8 @@ void sspike_gbtrs_(la_it*, const char*, la_it*, la_it*, la_it*, la_it*, float*, 
 template<sp_d T> class BandMatSpike final : public DenseMat<T> {
     static constexpr char TRAN = 'N';
 
+    static la_it SPROTO, DPROTO;
+
     static T bin;
 
     const uword l_band;
@@ -64,7 +66,9 @@ template<sp_d T> class BandMatSpike final : public DenseMat<T> {
 
         spikeinit_(SPIKE, &N, &KLU);
 
-        std::is_same_v<T, float> ? sspike_tune_(SPIKE) : dspike_tune_(SPIKE);
+        SPIKE[6] = std::is_same_v<T, float> ? SPROTO : DPROTO;
+        SPIKE[4] = SPIKE[6] + SPIKE[6] / 2 + 10;
+        SPIKE[3] = SPIKE[4] / 2;
     }
 
     int solve_trs(Mat<T>&, Mat<T>&&);
@@ -120,6 +124,18 @@ public:
 
     [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
 };
+
+template<sp_d T> la_it BandMatSpike<T>::SPROTO = [] {
+    la_it PROTO[64]{};
+    sspike_tune_(PROTO);
+    return PROTO[6];
+}();
+
+template<sp_d T> la_it BandMatSpike<T>::DPROTO = [] {
+    la_it PROTO[64]{};
+    dspike_tune_(PROTO);
+    return PROTO[6];
+}();
 
 template<sp_d T> T BandMatSpike<T>::bin = T(0);
 
