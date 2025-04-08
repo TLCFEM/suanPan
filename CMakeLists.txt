@@ -125,7 +125,7 @@ endif ()
 
 if (SP_ENABLE_MPI)
     if (SP_ENABLE_64BIT_INDEXING)
-        message(NOTICE "64-bit indexing is enabled, please make sure the linear algebra driver is compiled using 64-bit integer as well.")
+        message(NOTICE "64-bit indexing is enabled, please make sure the MPI is compiled using 64-bit integer as well.")
     endif ()
     add_compile_definitions(SUANPAN_MPI MPICH_SKIP_MPICXX)
     find_package(MPI REQUIRED COMPONENTS C Fortran)
