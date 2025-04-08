@@ -124,8 +124,8 @@ if (NOT SP_ENABLE_SYSLIB)
 endif ()
 
 if (SP_ENABLE_MPI)
-    find_package(MPI REQUIRED)
-    add_compile_definitions(SUANPAN_MPI MPICH_SKIP_MPICXX)
+add_compile_definitions(SUANPAN_MPI MPICH_SKIP_MPICXX)
+    find_package(MPI REQUIRED COMPONENTS C Fortran)
     get_filename_component(MPI_ROOT_DIR ${MPIEXEC_EXECUTABLE} DIRECTORY)
     file(GLOB MPI_VERSION_FILE
         "${MPI_ROOT_DIR}/mpichversion"
@@ -512,7 +512,7 @@ else ()
 endif ()
 
 if (SP_ENABLE_MPI)
-    target_link_libraries(${PROJECT_NAME} MPI::MPI_C MPI::MPI_CXX MPI::MPI_Fortran)
+    target_link_libraries(${PROJECT_NAME} MPI::MPI_C MPI::MPI_Fortran)
 endif ()
 
 if (SP_ENABLE_MIMALLOC)
