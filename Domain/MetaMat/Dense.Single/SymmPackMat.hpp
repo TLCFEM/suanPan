@@ -73,6 +73,8 @@ public:
     }
 
     Mat<T> operator*(const Mat<T>&) const override;
+
+    [[nodiscard]] int sign_det() const override { return 1; }
 };
 
 template<sp_d T> T SymmPackMat<T>::bin = T(0);

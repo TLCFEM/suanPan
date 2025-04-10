@@ -208,7 +208,7 @@ public:
         return X;
     }
 
-    [[nodiscard]] virtual int sign_det() const = 0;
+    [[nodiscard]] virtual int sign_det() const { throw std::runtime_error("not supported"); }
 
     virtual void allreduce() = 0;
 

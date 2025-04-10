@@ -89,8 +89,6 @@ public:
         this->triplet_mat *= scalar;
     }
 
-    [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
-
     void allreduce() override {
 #ifdef SUANPAN_DISTRIBUTED
         const auto coo_elem = this->triplet_mat.n_elem;

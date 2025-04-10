@@ -121,8 +121,6 @@ public:
     }
 
     Mat<T> operator*(const Mat<T>&) const override;
-
-    [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
 };
 
 template<sp_d T> la_it BandMatSpike<T>::SPROTO = [] {

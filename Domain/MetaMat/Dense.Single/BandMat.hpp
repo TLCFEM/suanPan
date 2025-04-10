@@ -86,6 +86,13 @@ public:
     }
 
     Mat<T> operator*(const Mat<T>&) const override;
+
+    [[nodiscard]] int sign_det() const override {
+        auto det_sign = 1;
+        for(unsigned I = 0; I < this->pivot.n_elem; ++I)
+            if((this->operator()(I, I) < T(0)) ^ (static_cast<int>(I) + 1 != this->pivot(I))) det_sign = -det_sign;
+        return det_sign;
+    }
 };
 
 template<sp_d T> T BandMat<T>::bin = T(0);

@@ -49,6 +49,8 @@ public:
     using SparseMat<T>::SparseMat;
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatBaseClusterMUMPS>(*this); }
+
+    [[nodiscard]] int sign_det() const override { return solver.det() > T(0) ? 1 : -1; }
 };
 
 #pragma GCC diagnostic push
@@ -57,6 +59,7 @@ template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sy
     auto info{-1};
 
     solver.icntl_printing_level(SUANPAN_VERBOSE ? 1 : 0);
+    solver.icntl_determinant_computation(1);
 
     if(this->factored) info = solver.solve({X.n_rows, X.n_cols, X.memptr()});
     else {
