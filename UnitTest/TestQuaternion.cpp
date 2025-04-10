@@ -1,6 +1,8 @@
 #include <Toolbox/Quaternion.hpp>
 #include "CatchHeader.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfree-nonheap-object"
 TEST_CASE("Quaternion Basic Function", "[Utility.Quaternion]") {
     const Quaternion A(2., 3., 4., 5.);
     const Quaternion B(1., -2., 6., 3.);
@@ -59,3 +61,4 @@ TEST_CASE("Rodrigues Rotation", "[Utility.Rodrigues]") {
         REQUIRE(norm((B.inv() * A).to_pseudo()) < 1E-10);
     }
 }
+#pragma GCC diagnostic pop
