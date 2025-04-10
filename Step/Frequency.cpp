@@ -27,6 +27,10 @@ Frequency::Frequency(const unsigned T, const unsigned N, const char TP)
     , eigen_type(TP) {}
 
 int Frequency::initialize() {
+#ifdef SUANPAN_DISTRIBUTED
+    suanpan_warning("Frequency analysis currently does not support distributed computation thus it will be conducted on each node.\n");
+#endif
+
     configure_storage_scheme();
 
     factory->set_analysis_type(AnalysisType::EIGEN);

@@ -27,6 +27,11 @@ ArcLength::ArcLength(const unsigned T)
     : Step(T, 0.) {}
 
 int ArcLength::initialize() {
+#ifdef SUANPAN_DISTRIBUTED
+    suanpan_error("Arc-length analysis currently does not support distributed computation.\n");
+    return SUANPAN_FAIL;
+#endif
+
     const auto t_domain = database.lock();
 
     // converger

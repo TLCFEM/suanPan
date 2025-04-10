@@ -27,6 +27,10 @@ Buckle::Buckle(const unsigned T)
     : Static(T, 1.) {}
 
 int Buckle::initialize() {
+#ifdef SUANPAN_DISTRIBUTED
+    suanpan_warning("Buckling analysis currently does not support distributed computation thus it will be conducted on each node.\n");
+#endif
+
     const auto t_domain = database.lock();
 
     // converger
