@@ -34,9 +34,9 @@
 #include <ezp/ezp/mumps.hpp>
 
 template<sp_d T, ezp::symmetric_pattern sym> class SparseMatBaseClusterMUMPS final : public SparseMat<T> {
-    ezp::mumps<T, la_it> solver{sym, ezp::no_host};
+    ezp::mumps<T, int> solver{sym, ezp::no_host};
 
-    triplet_form<T, la_it> coo_mat;
+    triplet_form<T, int> coo_mat;
 
     int solve_full(Mat<T>&);
 
@@ -54,7 +54,7 @@ public:
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnarrowing"
 template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sym>::solve_full(Mat<T>& X) {
-    la_it info{-1};
+    auto info{-1};
 
     solver.icntl_printing_level(SUANPAN_VERBOSE ? 1 : 0);
 
@@ -62,9 +62,9 @@ template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sy
     else {
         this->factored = true;
 
-        if(sym == ezp::symmetric_pattern::unsymmetric) coo_mat = triplet_form<T, la_it>(this->triplet_mat, SparseBase::ONE, false);
+        if(sym == ezp::symmetric_pattern::unsymmetric) coo_mat = triplet_form<T, int>(this->triplet_mat, SparseBase::ONE, false);
         // for symmetric matrices, MUMPS takes half the matrix
-        else coo_mat = triplet_form<T, la_it>(this->triplet_mat.lower(), SparseBase::ONE, false);
+        else coo_mat = triplet_form<T, int>(this->triplet_mat.lower(), SparseBase::ONE, false);
 
         info = solver.solve({coo_mat.n_rows, coo_mat.n_elem, coo_mat.row_mem(), coo_mat.col_mem(), coo_mat.val_mem()}, {X.n_rows, X.n_cols, X.memptr()});
     }
