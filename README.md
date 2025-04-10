@@ -54,18 +54,12 @@ and [OpenSees](http://opensees.berkeley.edu/).
 
 The highlights of **suanPan** are
 
-- **suanPan** is *fast*, both memory and thread safe.
-- **suanPan** is designed based on the [shared memory](https://en.wikipedia.org/wiki/Shared_memory) model and supports
-  parallelism on heterogeneous architectures, for example, multi-core CPU + optional GPU. The parallelism is
-  available
-  for both element state updating and global matrix assembling.
-- **suanPan** supports [distributed memory](https://en.wikipedia.org/wiki/Distributed_memory) platforms via MPI.
-- **suanPan** is open source and easy to be extended to incorporate user-defined elements, materials, etc.
-- **suanPan** separates the FEA model part from the linear algebra operation part, which significantly reduces the
-  complexity and cost of development of new models.
-- **suanPan** utilizes the new language features shipped with the latest standards (C++11 to C++20), such as new STL
-  containers, smart pointers, and many others.
-- **suanPan** supports simple visualization supported by [VTK](https://vtk.org/).
+- ✅ ***fast***, memory and thread safe
+- ✅ [shared memory](https://en.wikipedia.org/wiki/Shared_memory) parallelism support
+- ✅ [distributed memory](https://en.wikipedia.org/wiki/Distributed_memory) parallelism support
+- ✅ a rich collection of elements, material models, time integration methods, etc.
+- ✅ open source and easy to be extended
+- ✅ modern language features
 
 > [!IMPORTANT]
 > Both `amd64` and `arm64` architectures are supported.
