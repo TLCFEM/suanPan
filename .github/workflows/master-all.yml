@@ -125,6 +125,7 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
+          source /opt/intel/oneapi/setvars.sh
           cmake \
           -DCMAKE_BUILD_TYPE=RelWithDebInfo \
           -DCMAKE_INSTALL_PREFIX=dist \
@@ -147,6 +148,7 @@ jobs:
           file_name+="-vtk"
           file_name+="-mpi"
           file_name+="-no-avx"
+          file_name+="-64bit"
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
