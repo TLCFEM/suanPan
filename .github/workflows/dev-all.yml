@@ -22,7 +22,6 @@ jobs:
         vtk: [ ON, OFF ]
         mkl: [ OFF ]
         aocl: [ ON, OFF ]
-        longint: [ ON, OFF ]
         exclude:
           - build: Debug
             mkl: ON
@@ -33,8 +32,6 @@ jobs:
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
             aocl: ON
           - mkl: ON
-            aocl: ON
-          - longint: ON
             aocl: ON
     steps:
       - name: Clone
@@ -97,7 +94,6 @@ jobs:
           -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_PARALLEL=$MT \
-          -DSP_ENABLE_64BIT_INDEXING=${{ matrix.longint }} \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
           -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
@@ -136,9 +132,6 @@ jobs:
             file_name+="-aocl"
           else
             file_name+="-openblas"
-          fi
-          if [ "${{ matrix.longint }}" == "ON" ]; then
-            file_name+="-64bit"
           fi
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
