@@ -58,7 +58,7 @@ public:
 template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sym>::solve_full(Mat<T>& X) {
     auto info{-1};
 
-    solver.icntl_printing_level(SUANPAN_VERBOSE ? 1 : 0);
+    solver.icntl_printing_level(SUANPAN_VERBOSE ? 2 : 0);
     solver.icntl_determinant_computation(1);
 
     if(this->factored) info = solver.solve({X.n_rows, X.n_cols, X.memptr()});
