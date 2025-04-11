@@ -206,9 +206,6 @@ if (SP_ENABLE_CUDA)
     add_compile_definitions(SUANPAN_CUDA)
     include_directories(${CUDA_INCLUDE_DIRS})
     link_libraries(${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_cusolver_LIBRARY} ${CUDA_cusparse_LIBRARY})
-    if (CUDA_VERSION VERSION_GREATER_EQUAL "12.3" AND COMPILER_IDENTIFIER MATCHES "vs")
-        add_compile_options(/wd4996)
-    endif ()
     if (SP_ENABLE_MAGMA)
         set(MAGMAROOT "" CACHE PATH "Magma library path which contains /include and /lib folders.")
         find_file(MAGMA_HEADER NAMES magma.h PATHS ${MAGMAROOT}/include)
@@ -304,7 +301,7 @@ endif ()
 if (COMPILER_IDENTIFIER MATCHES "vs")
     unset(SP_ENABLE_CODECOV CACHE)
 
-    add_compile_options(/wd4068 /wd4996)
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/wd4068 /wd4996>)
 
     link_directories(Libs/win)
 
