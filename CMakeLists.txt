@@ -301,15 +301,13 @@ endif ()
 if (COMPILER_IDENTIFIER MATCHES "vs")
     unset(SP_ENABLE_CODECOV CACHE)
 
-    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/wd4068 /wd4996>)
-
     link_directories(Libs/win)
 
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP /openmp")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /openmp /EHsc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /openmp /EHsc /wd4068 /wd4996")
 
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /nowarn /MP /Qopenmp /Qparallel /fpp /names:lowercase /assume:underscore /libs:dll /threads")
     if (SP_ENABLE_64BIT_INDEXING)

@@ -2,8 +2,8 @@
 
 ## known issues
 
-1. The `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
-2. The `SPIKE` solver may occasionally freeze, to circumvent, try to avoid mixing compilers from different vendors.
+1. Eigenanalysis does not support distributed computation.
+2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
 ## version 3.7
 
