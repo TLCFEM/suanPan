@@ -307,6 +307,8 @@ endif ()
 if (COMPILER_IDENTIFIER MATCHES "vs")
     unset(SP_ENABLE_CODECOV CACHE)
 
+    add_compile_options(/wd4068 /wd4996)
+
     link_directories(Libs/win)
 
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
