@@ -22,18 +22,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlu-src\zsnode_bmod.c">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\zreadtriple.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\zreadrb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\zreadMM.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\zreadhb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlu-src\zpruneL.c">
       <Filter>SRC</Filter>
     </ClCompile>
@@ -125,18 +113,6 @@
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlu-src\ssnode_bmod.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\sreadtriple.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\sreadrb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\sreadMM.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\sreadhb.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlu-src\spruneL.c">
@@ -358,18 +334,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlu-src\dsnode_bmod.c">
       <Filter>SRC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\dreadtriple.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\dreadrb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\dreadMM.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\dreadhb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlu-src\dpruneL.c">
       <Filter>SRC</Filter>
     </ClCompile>
@@ -464,18 +428,6 @@
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlu-src\csnode_bmod.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\creadtriple.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\creadrb.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\creadMM.c">
-      <Filter>SRC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\creadhb.c">
       <Filter>SRC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\superlu-src\cpruneL.c">
