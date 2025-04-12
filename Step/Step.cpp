@@ -39,7 +39,7 @@ int Step::initialize() {
 
     if(sparse_mat) {
         // LAPACK and SPIKE are for dense only
-        if(SolverType::LAPACK == system_solver || SolverType::SPIKE == system_solver) system_solver = SolverType::MUMPS;
+        if(SolverType::LAPACK == system_solver || SolverType::SPIKE == system_solver) system_solver = SolverType::SUPERLU;
     }
     else if(!symm_mat && band_mat) {
         // only LAPACK and SPIKE are supported
@@ -64,11 +64,8 @@ int Step::initialize() {
     factory = t_domain->get_factory();
 
     factory->set_solver_type(system_solver);
-    factory->set_solver_setting(system_setting);
     factory->set_sub_solver_type(sub_system_solver);
-#ifdef SUANPAN_MAGMA
-    factory->set_solver_setting(magma_setting);
-#endif
+    factory->set_solver_setting(system_setting);
 
     return 0;
 }
@@ -133,24 +130,19 @@ void Step::set_max_step_size(const double T) { max_step_size = T; }
 
 void Step::set_max_substep(const unsigned M) { max_substep = M; }
 
-void Step::set_system_solver(const SolverType P) {
-    system_solver = P;
-    system_setting.iterative_solver = IterativeSolver::NONE;
-}
-
-void Step::set_system_solver(const IterativeSolver P) { system_setting.iterative_solver = P; }
+void Step::set_system_solver(const SolverType P) { system_solver = P; }
 
 void Step::set_sub_system_solver(const SolverType P) { sub_system_solver = P; }
-
-void Step::set_preconditioner(const PreconditionerType P) { system_setting.preconditioner_type = P; }
 
 void Step::set_precision(const Precision P) { system_setting.precision = P; }
 
 void Step::set_tolerance(const double T) { system_setting.tolerance = T; }
 
-void Step::set_refinement(const unsigned T) { system_setting.iterative_refinement = T; }
+void Step::set_refinement(const std::uint8_t T) { system_setting.iterative_refinement = T; }
 
-void Step::set_lis_option(const std::string_view T) { system_setting.lis_options = T; }
+void Step::set_lis_option(istringstream& T) { system_setting.set_lis_option(T); }
+
+void Step::set_magma_option(istringstream& T) { system_setting.set_magma_option(T); }
 
 double Step::get_ini_step_size() const { return ini_step_size; }
 

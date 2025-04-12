@@ -39,10 +39,10 @@ struct DataConcreteExp {
 class ConcreteExp final : protected DataConcreteExp, public SimpleHysteresis {
     static constexpr unsigned max_iteration = 20u;
 
-    [[nodiscard]] podarray<double> compute_compression_initial_reverse() const override;
-    [[nodiscard]] podarray<double> compute_tension_initial_reverse() const override;
-    [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
-    [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
+    [[nodiscard]] pod2 compute_compression_initial_reverse() const override;
+    [[nodiscard]] pod2 compute_tension_initial_reverse() const override;
+    [[nodiscard]] pod2 compute_compression_backbone(double) const override;
+    [[nodiscard]] pod2 compute_tension_backbone(double) const override;
     [[nodiscard]] double compute_compression_residual(double, double) const override;
     [[nodiscard]] double compute_tension_residual(double, double) const override;
 

@@ -1,5 +1,4 @@
 target_sources(${PROJECT_NAME} PRIVATE
-        CatchTest.cpp
         TestColoring.cpp
         TestEigen.cpp
         TestExpression.cpp

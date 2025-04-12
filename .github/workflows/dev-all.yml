@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Golang
         uses: actions/setup-go@v5
         with:
@@ -43,8 +45,8 @@ jobs:
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-linux.tar.gz
-          tar xf VTK-9.4.1-linux.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-linux.tar.gz
+          tar xf VTK-9.4.2-linux.tar.gz
       - name: MKL
         run: |
           if [ "${{ matrix.mkl }}" == "ON" ] || [ "${{ matrix.compiler.c }}" == "icx" ]; then
@@ -63,7 +65,7 @@ jobs:
           fi
       - name: Dependency
         run: |
-          sudo apt-get install libglvnd-dev dpkg-dev xz-utils
+          sudo apt-get install libglvnd-dev dpkg-dev xz-utils lcov
           echo "COVERAGE=OFF" >> "$GITHUB_ENV"
       - name: Flag
         if: |
@@ -85,7 +87,22 @@ jobs:
           fi
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DTEST_COVERAGE=${{ env.COVERAGE }} -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=$MT -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DMKLROOT=/opt/intel/oneapi/mkl/latest/ -DLINK_DYNAMIC_MKL=OFF -DUSE_INTEL_OPENMP=${{ env.IOMP }} -DUSE_AOCL=${{ matrix.aocl }} -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+          -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} \
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
+          -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
+          -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_BUILD_PARALLEL=$MT \
+          -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} \
+          -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
+          -DSP_ENABLE_IOMP=${{ env.IOMP }} \
+          -DSP_ENABLE_MKL=${{ matrix.mkl }} \
+          -DSP_ENABLE_SHARED_MKL=OFF \
+          -DSP_ENABLE_VTK=${{ matrix.vtk }} \
+          -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          ..
           make install -j"$(nproc)" && make package
       - name: Pack
         run: |
@@ -134,14 +151,76 @@ jobs:
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
           cd build
           bash ../Script/Coverage.sh .
-          for SRC in `find . | egrep '\.o'`; do gcov -n $SRC > /dev/null; done
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' --output-file coverage.info
+          lcov --list coverage.info
       - name: Report
-        if: env.COVERAGE == 'ON'
+        if: ${{ hashFiles('./build/coverage.info') != '' }}
         uses: codecov/codecov-action@v5
         with:
           plugins: gcov
+          files: ./build/coverage.info
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  linux-dev-mpi:
+    needs:  linux-dev
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Golang
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+      - name: Depedency
+        run: |
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-linux.tar.gz
+          tar xf VTK-9.4.2-linux.tar.gz
+          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt-get update
+          sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel
+          sudo apt-get install libglvnd-dev dpkg-dev xz-utils lcov
+      - name: Compile
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          go build Checker/updater.go
+          mkdir build && cd build
+          cmake \
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_BUILD_PARALLEL=ON \
+          -DSP_ENABLE_64BIT_INDEXING=ON \
+          -DSP_ENABLE_AVX2=ON \
+          -DSP_ENABLE_IOMP=OFF \
+          -DSP_ENABLE_MKL=ON \
+          -DSP_ENABLE_MPI=ON \
+          -DSP_ENABLE_SHARED_MKL=OFF \
+          -DSP_ENABLE_VTK=ON \
+          -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          ..
+          make install -j"$(nproc)" && make package
+      - name: Pack
+        run: |
+          cp updater build/dist/bin
+          file_name="suanPan-linux"
+          file_name+="-release"
+          file_name+="-gcc"
+          file_name+="-avx"
+          file_name+="-vtk"
+          file_name+="-mkl"
+          file_name+="-mpi"
+          file_name+=".tar.gz"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          tar czf $file_name -C build/dist .
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ${{ env.ARTIFACT }}
   macos-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: macos-13
@@ -157,11 +236,13 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-macos.tar.gz
-          tar xf VTK-9.4.1-macos.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-macos.tar.gz
+          tar xf VTK-9.4.2-macos.tar.gz
           brew install glfw glew
       - name: Compile
         run: |
@@ -172,11 +253,24 @@ jobs:
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
-            cmake -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DCMAKE_INSTALL_PREFIX=dist ..
+            cmake \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_INSTALL_PREFIX=dist \
+            -DSP_ENABLE_VTK=${{ matrix.vtk }} \
+            -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+            ..
           else
             export CC=gcc-12
             export CXX=g++-12
-            cmake -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ -DCMAKE_INSTALL_PREFIX=dist ..
+            cmake \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -DCMAKE_INSTALL_PREFIX=dist \
+            -DSP_ENABLE_VTK=${{ matrix.vtk }} \
+            -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+            ..
           fi
           make install -j4
       - name: Pack
@@ -218,6 +312,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Golang
         uses: actions/setup-go@v5
         with:
@@ -226,15 +322,15 @@ jobs:
         shell: cmd
         if: matrix.mkl == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bcb40b43-4ca9-4725-9749-4f9fc1e9b97f/intel-onemkl-2025.0.1.15_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/1269b58a-590e-49b1-9f53-beebe171ac56/intel-fortran-compiler-2025.0.4.19_offline.exe
-          intel-onemkl-2025.0.1.15_offline.exe -s -a --silent --eula accept
-          intel-fortran-compiler-2025.0.4.19_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9c567fd-df1c-4477-9030-682c66058324/intel-onemkl-2025.1.0.802_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/9962ffec-17a2-4135-94e5-acc3995e0c49/intel-fortran-compiler-2025.1.0.602_offline.exe
+          intel-onemkl-2025.1.0.802_offline.exe -s -a --silent --eula accept
+          intel-fortran-compiler-2025.1.0.602_offline.exe -s -a --silent --eula accept
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-win.7z
-          7z x VTK-9.4.1-win.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-win.7z
+          7z x VTK-9.4.2-win.7z
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -242,7 +338,15 @@ jobs:
           if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
             cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
           }
-          cmake -G "${{ matrix.compiler }}" -T fortran=ifx -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ -DUSE_MKL=${{ matrix.mkl }} -DLINK_DYNAMIC_MKL=OFF -DMKLROOT="C:/Program Files (x86)/Intel/oneAPI/mkl/latest" -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -G "${{ matrix.compiler }}" -T fortran=ifx `
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }} `
+          -DCMAKE_INSTALL_PREFIX=dist `
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} `
+          -DSP_ENABLE_MKL=${{ matrix.mkl }} `
+          -DSP_ENABLE_SHARED_MKL=OFF `
+          -DSP_ENABLE_VTK=${{ matrix.vtk }} `
+          -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ `
+          ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash
@@ -299,24 +403,35 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Golang
         uses: actions/setup-go@v5
         with:
           cache: false
       - name: GCC
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0posix-18.1.5-11.0.1-msvcrt-r8/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
-          7z x winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.3.0posix-11.0.1-ucrt-r1/winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
+          7z x winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.1-win-gcc.7z
-          7z x VTK-9.4.1-win-gcc.7z -oVTK
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-win-gcc.7z
+          7z x VTK-9.4.2-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -G "${{ matrix.compiler }}" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe -DUSE_AVX2=${{ matrix.avx }} -DUSE_VTK=${{ matrix.vtk }} -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake -G "${{ matrix.compiler }}" `
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }} `
+          -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe `
+          -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe `
+          -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
+          -DCMAKE_INSTALL_PREFIX=dist `
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} `
+          -DSP_ENABLE_VTK=${{ matrix.vtk }} `
+          -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 `
+          ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
         shell: bash

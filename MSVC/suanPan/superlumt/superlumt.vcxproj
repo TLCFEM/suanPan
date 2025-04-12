@@ -110,8 +110,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\cmyblas2.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\colamd.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\cpivotgrowth.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\creadhb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\creadrb.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\csp_blas2.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\csp_blas3.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dclock.c" />
@@ -126,8 +124,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dlaqgs.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dmyblas2.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dpivotgrowth.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dreadhb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\dreadrb.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dsp_blas2.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dsp_blas3.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\dzsum1.c" />
@@ -249,8 +245,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_coletree.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_colorder.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\sp_ienv.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sreadhb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\sreadrb.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\ssp_blas2.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\ssp_blas3.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\superlu_timer.c" />
@@ -265,8 +259,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\zlaqgs.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\zmyblas2.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\zpivotgrowth.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zreadhb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlumt-src\zreadrb.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\zsp_blas2.c" />
     <ClCompile Include="..\..\..\Toolbox\superlumt-src\zsp_blas3.c" />
   </ItemGroup>

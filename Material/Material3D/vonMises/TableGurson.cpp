@@ -17,8 +17,8 @@
 
 #include "TableGurson.h"
 
-vec TableGurson::compute_hardening(const double plastic_strain) const {
-    vec response(2);
+vec2 TableGurson::compute_hardening(const double plastic_strain) const {
+    vec2 response;
 
     for(uword I = 1; I < hardening_table.n_rows; ++I)
         if(hardening_table(I, 0) > plastic_strain) {

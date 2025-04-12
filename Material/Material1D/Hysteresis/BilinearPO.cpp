@@ -17,43 +17,43 @@
 
 #include "BilinearPO.h"
 
-podarray<double> BilinearPO::compute_compression_initial_reverse() const {
-    podarray<double> response(2);
+pod2 BilinearPO::compute_compression_initial_reverse() const {
+    pod2 response;
 
-    response(1) = (response(0) = c_strain) * initial_stiffness(0);
-
-    return response;
-}
-
-podarray<double> BilinearPO::compute_tension_initial_reverse() const {
-    podarray<double> response(2);
-
-    response(1) = (response(0) = t_strain) * initial_stiffness(0);
+    response[1] = (response[0] = c_strain) * initial_stiffness(0);
 
     return response;
 }
 
-podarray<double> BilinearPO::compute_tension_backbone(const double strain) const {
-    podarray<double> response(2);
+pod2 BilinearPO::compute_tension_initial_reverse() const {
+    pod2 response;
 
-    response(0) = strain > t_strain ? t_stress + (response(1) = t_hardening) * (strain - t_strain) : (response(1) = elastic_modulus) * strain;
+    response[1] = (response[0] = t_strain) * initial_stiffness(0);
 
-    if(response(0) < 0.) {
-        response(0) = 0.;
-        response(1) = 1E-10;
+    return response;
+}
+
+pod2 BilinearPO::compute_tension_backbone(const double strain) const {
+    pod2 response;
+
+    response[0] = strain > t_strain ? t_stress + (response[1] = t_hardening) * (strain - t_strain) : (response[1] = elastic_modulus) * strain;
+
+    if(response[0] < 0.) {
+        response[0] = 0.;
+        response[1] = 1E-10;
     }
 
     return response;
 }
 
-podarray<double> BilinearPO::compute_compression_backbone(const double strain) const {
-    podarray<double> response(2);
+pod2 BilinearPO::compute_compression_backbone(const double strain) const {
+    pod2 response;
 
-    response(0) = strain < c_strain ? c_stress + (response(1) = c_hardening) * (strain - c_strain) : (response(1) = elastic_modulus) * strain;
+    response[0] = strain < c_strain ? c_stress + (response[1] = c_hardening) * (strain - c_strain) : (response[1] = elastic_modulus) * strain;
 
-    if(response(0) > 0.) {
-        response(0) = 0.;
-        response(1) = 1E-10;
+    if(response[0] > 0.) {
+        response[0] = 0.;
+        response[1] = 1E-10;
     }
 
     return response;

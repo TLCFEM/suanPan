@@ -28,6 +28,7 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
+#include <Element/Distributed.h>
 #include <Element/ElementBase.h>
 
 enum class MaterialType : unsigned;
@@ -114,7 +115,7 @@ struct DataElement {
     const double characteristic_length = 1.;
 };
 
-class Element : protected DataElement, public ElementBase {
+class Element : protected DataElement, public ElementBase, public Distributed {
     const unsigned num_node;                      // number of nodes
     const unsigned num_dof;                       // number of DoFs
     const unsigned num_size = num_dof * num_node; // number of size

@@ -38,7 +38,7 @@ int CustomGurson::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearGurson::initialize(D);
 }
 
-vec CustomGurson::compute_hardening(const double plastic_strain) const { return expression->evaluate(plastic_strain); }
+vec2 CustomGurson::compute_hardening(const double plastic_strain) const { return expression->evaluate(plastic_strain); }
 
 unique_ptr<Material> CustomGurson::get_copy() { return make_unique<CustomGurson>(*this); }
 

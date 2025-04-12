@@ -76,6 +76,8 @@ public:
     };
 
 private:
+    using vec18 = vec::fixed<18>;
+
     static constexpr unsigned max_iteration = 20u;
     static const double sqrt_six;
     static const double sqrt_three_two;
@@ -86,8 +88,8 @@ private:
 
     const DamageType damage_type = DamageType::ANISOTROPIC;
 
-    void compute_plasticity(double, double, double, double, vec&) const;
-    int compute_damage(double, double, double, double, double, vec&);
+    void compute_plasticity(double, double, double, double, vec18&) const;
+    int compute_damage(double, double, double, double, double, vec18&);
     int compute_damage_factor(double, double, double, double, double&, vec&) const;
 
 public:

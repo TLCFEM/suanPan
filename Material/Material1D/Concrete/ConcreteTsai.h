@@ -37,10 +37,10 @@ class ConcreteTsai final : public SimpleHysteresis {
     const double c_stress, c_strain, c_m, c_n;
     const double t_stress, t_strain, t_m, t_n;
 
-    [[nodiscard]] podarray<double> compute_compression_initial_reverse() const override;
-    [[nodiscard]] podarray<double> compute_tension_initial_reverse() const override;
-    [[nodiscard]] podarray<double> compute_compression_backbone(double) const override;
-    [[nodiscard]] podarray<double> compute_tension_backbone(double) const override;
+    [[nodiscard]] pod2 compute_compression_initial_reverse() const override;
+    [[nodiscard]] pod2 compute_tension_initial_reverse() const override;
+    [[nodiscard]] pod2 compute_compression_backbone(double) const override;
+    [[nodiscard]] pod2 compute_tension_backbone(double) const override;
     [[nodiscard]] double compute_compression_residual(double, double) const override;
     [[nodiscard]] double compute_tension_residual(double, double) const override;
 

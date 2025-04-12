@@ -97,7 +97,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     vec3 residual, incre;
     mat33 jacobian(fill::zeros);
 
-    vec6 t_para, c_para;
+    pod6 t_para, c_para;
 
     auto lambda = 0., ref_error = 0.;
     double r, beta;
@@ -115,9 +115,9 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
         const auto tension_flag = max_stress > 0.;
 
-        beta = -one_minus_alpha * c_para(2) / t_para(2) - alpha - 1.;
+        beta = -one_minus_alpha * c_para[2] / t_para[2] - alpha - 1.;
 
-        residual(0) = const_yield + pfplambda * lambda + one_minus_alpha * c_para(2);
+        residual(0) = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2];
 
         if(tension_flag) residual(0) += beta * max_stress;
 
@@ -132,29 +132,29 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        const auto t_term = t_para(1) * dgdsigma_t;
-        const auto c_term = c_para(1) * dgdsigma_c;
+        const auto t_term = t_para[1] * dgdsigma_t;
+        const auto c_term = c_para[1] * dgdsigma_c;
 
         residual(1) = r * t_term * lambda + current_kappa_t - kappa_t;
         residual(2) = (c_term - r * c_term) * lambda + current_kappa_c - kappa_c;
 
         if(tension_flag) {
             jacobian(0, 0) = pfplambda + beta * dsigmadlambda(2);
-            const auto tmp_term = one_minus_alpha * max_stress / t_para(2);
-            jacobian(0, 1) = tmp_term * c_para(2) / t_para(2) * t_para(5);
-            jacobian(0, 2) = (one_minus_alpha - tmp_term) * c_para(5);
+            const auto tmp_term = one_minus_alpha * max_stress / t_para[2];
+            jacobian(0, 1) = tmp_term * c_para[2] / t_para[2] * t_para[5];
+            jacobian(0, 2) = (one_minus_alpha - tmp_term) * c_para[5];
         }
         else {
             jacobian(0, 0) = pfplambda;
             jacobian(0, 1) = 0.;
-            jacobian(0, 2) = one_minus_alpha * c_para(5);
+            jacobian(0, 2) = one_minus_alpha * c_para[5];
         }
 
         const auto dlambda = r + lambda * dot(dr = compute_dr(new_stress), dsigmadlambda);
         jacobian(1, 0) = t_term * dlambda;
         jacobian(2, 0) = c_term - c_term * dlambda;
-        jacobian(1, 1) = r * lambda * dgdsigma_t * t_para(4) - 1.;
-        jacobian(2, 2) = (lambda - r * lambda) * dgdsigma_c * c_para(4) - 1.;
+        jacobian(1, 1) = r * lambda * dgdsigma_t * t_para[4] - 1.;
+        jacobian(2, 2) = (lambda - r * lambda) * dgdsigma_c * c_para[4] - 1.;
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
@@ -173,8 +173,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     }
 
     // update damage indices
-    d_t = t_para(0);
-    d_c = c_para(0);
+    d_t = t_para[0];
+    d_c = c_para[0];
     // update plastic strain
     plastic_strain += lambda * (n % tensor::stress::norm_weight + unit_alpha_p);
 
@@ -197,8 +197,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     // compute local derivatives
     mat left(3, 6);
     left.row(0) = 3. * alpha * bulk * tensor::unit_tensor2.t() + root_three_two * double_shear * n.t();
-    left.row(1) = t_para(1) * lambda * (r / g_t * trans.row(2) * dnde + dgdsigma_t * prpe);
-    left.row(2) = c_para(1) * lambda * ((1. - r) / g_c * trans.row(0) * dnde - dgdsigma_c * prpe);
+    left.row(1) = t_para[1] * lambda * (r / g_t * trans.row(2) * dnde + dgdsigma_t * prpe);
+    left.row(2) = c_para[1] * lambda * ((1. - r) / g_c * trans.row(0) * dnde - dgdsigma_c * prpe);
 
     if(max_stress > 0.) left.row(0) += beta * trans.row(2) * trial_stiffness;
 
@@ -209,7 +209,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     // \dfrac{\mathrm{d}\bar{\sigma}}{\mathrm{d}\varepsilon^{tr}}
     trial_stiffness -= (double_shear * n + three_alpha_p_bulk * tensor::unit_tensor2) * dlambdade;
 
-    trial_stiffness = (damage * eye(6, 6) + scale * d_t * damage_c * (1. - s0) * trial_stress * drdsigma) * trial_stiffness + trial_stress * scale * rowvec2{recovery * damage_c * t_para(3), damage_t * c_para(3)} * dkappade;
+    trial_stiffness = (damage * eye(6, 6) + scale * d_t * damage_c * (1. - s0) * trial_stress * drdsigma) * trial_stiffness + trial_stress * scale * rowvec2{recovery * damage_c * t_para[3], damage_t * c_para[3]} * dkappade;
 
     trial_stress *= damage;
 

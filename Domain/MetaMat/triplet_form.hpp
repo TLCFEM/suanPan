@@ -144,6 +144,9 @@ public:
     template<sp_d in_dt> explicit triplet_form(const SpMat<in_dt>&);
     template<sp_d in_dt, sp_i in_it> explicit triplet_form(triplet_form<in_dt, in_it>&, SparseBase = SparseBase::ZERO, bool = false);
 
+    template<sp_d in_dt, sp_i in_it> explicit triplet_form(triplet_form<in_dt, in_it>&& in_mat, const SparseBase in_base = SparseBase::ZERO, const bool in_full = false)
+        : triplet_form(in_mat, in_base, in_full) {}
+
     [[nodiscard]] const index_t* row_mem() const { return row_idx.get(); }
 
     [[nodiscard]] const index_t* col_mem() const { return col_idx.get(); }
@@ -196,7 +199,26 @@ public:
 
     data_t& at(index_t, index_t);
 
+    /**
+     * @brief Adjusts the size of the container by reserving space and updating the element count.
+     *
+     * This function reserves memory for the specified number of elements and updates the internal
+     * element count to match the provided value.
+     *
+     * This function is dangerous and should be used with caution.
+     * It does not initialize the new elements, and the caller needs to fill them with valid data.
+     * Otherwise, the behavior is undefined.
+     *
+     * @param in_elem The number of elements to reserve and set as the new size.
+     */
+    void hack_size(const index_t in_elem) {
+        reserve(in_elem);
+        access::rw(n_elem) = in_elem;
+    }
+
     void print() const;
+
+    void save(std::string_view) const;
 
     void csr_sort();
     void csc_sort();
@@ -257,11 +279,13 @@ public:
 
     triplet_form operator+(const triplet_form& in_mat) const {
         triplet_form copy = *this;
+        // ReSharper disable once CppDFAUnusedValue
         return copy += in_mat;
     }
 
     triplet_form operator-(const triplet_form& in_mat) const {
         triplet_form copy = *this;
+        // ReSharper disable once CppDFAUnusedValue
         return copy -= in_mat;
     }
 
@@ -401,6 +425,43 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::print() 
         suanpan_info("({}, {}) ===> {:+.8E}\n", row_idx[I], col_idx[I], val_idx[I]);
 }
 
+/**
+ * @brief Saves the triplet form matrix to a file.
+ *
+ * This function writes the matrix data stored in triplet form to a file.
+ * The file will contain the number of rows, columns, and non-zero elements
+ * on the first line, followed by the row indices, column indices, and values
+ * of the non-zero elements on subsequent lines.
+ * This follows the Matrix Market (MTX) format.
+ *
+ * @tparam data_t The data type of the matrix values.
+ * @tparam index_t The data type of the row and column indices.
+ * @param file_name The name of the file to save the matrix to.
+ *
+ * @note If the file cannot be opened, the function will return without
+ * performing any operation.
+ */
+template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::save(const std::string_view file_name) const {
+    std::ofstream file(file_name.data());
+    if(!file.is_open()) return;
+    file << suanpan::format("{} {} {}\n", n_rows, n_cols, n_elem);
+    for(index_t I = 0; I < n_elem; ++I) file << suanpan::format("{} {} {}\n", row_idx[I], col_idx[I], val_idx[I]);
+    file.close();
+}
+
+/**
+ * @brief Sorts the COO format into the CSR (Compressed Sparse Row) order.
+ *
+ * This function ensures that the COO representation of the matrix is sorted
+ * by row indices and then by column indices within each row.
+ *
+ * @tparam data_t The data type of the matrix values.
+ * @tparam index_t The data type of the matrix indices.
+ *
+ * @note After calling this function:
+ * - The triplet form will be sorted.
+ * - Need to further call `condense()` to remove duplicate entries.
+ */
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort() {
     if(csr_sorted) return;
 
@@ -427,6 +488,19 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csr_sort
     csc_sorted = false;
 }
 
+/**
+ * @brief Sorts the COO format into the CSC (Compressed Sparse Column) order.
+ *
+ * This function ensures that the COO representation of the matrix is sorted
+ * by column indices and then by row indices within each column.
+ *
+ * @tparam data_t The data type of the matrix values.
+ * @tparam index_t The data type of the matrix indices.
+ *
+ * @note After calling this function:
+ * - The triplet form will be sorted.
+ * - Need to further call `condense()` to remove duplicate entries.
+ */
 template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::csc_sort() {
     if(csc_sorted) return;
 
@@ -570,7 +644,8 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<
 
 template<sp_d data_t, sp_i index_t> Col<data_t> triplet_form<data_t, index_t>::diag() const {
     Col<data_t> diag_vec(std::min(n_rows, n_cols), fill::zeros);
-    for(index_t I = 0; I < n_elem; ++I) if(row(I) == col(I)) diag_vec(row(I)) += val(I);
+    for(index_t I = 0; I < n_elem; ++I)
+        if(row(I) == col(I)) diag_vec(row(I)) += val(I);
     return diag_vec;
 }
 
@@ -622,17 +697,17 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(cons
 
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(triplet_form<data_t, index_t>&& mat_a, triplet_form<data_t, index_t>&& mat_b) {
     mat_a += mat_b;
-    return std::forward<triplet_form<data_t, index_t>>(mat_a);
+    return std::move(mat_a);
 }
 
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(const triplet_form<data_t, index_t>& mat_a, triplet_form<data_t, index_t>&& mat_b) {
     mat_b += mat_a;
-    return std::forward<triplet_form<data_t, index_t>>(mat_b);
+    return std::move(mat_b);
 }
 
 template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(triplet_form<data_t, index_t>&& mat_a, const triplet_form<data_t, index_t>& mat_b) {
     mat_a += mat_b;
-    return std::forward<triplet_form<data_t, index_t>>(mat_a);
+    return std::move(mat_a);
 }
 
 #endif

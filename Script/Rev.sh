@@ -18,7 +18,7 @@ SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
 cd "$SCRIPT_DIR" || exit
 
 # sleep random time to avoid git conflict in parallel execution
-sleep $((RANDOM % 4)).$(((RANDOM % 10) + 1))s
+sleep $((RANDOM % 4)).$(((RANDOM % 10) + 1))
 
 git_rev=$(git rev-parse --short=8 HEAD)
 

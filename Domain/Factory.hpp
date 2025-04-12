@@ -36,10 +36,6 @@
 #include <Element/MappingDOF.h>
 #include <Domain/MetaMat/MetaMat>
 
-#ifdef SUANPAN_MAGMA
-#include <magmasparse.h>
-#endif
-
 enum class AnalysisType {
     NONE,
     DISP,
@@ -82,17 +78,12 @@ template<sp_d T> class Factory final {
     AnalysisType analysis_type = AnalysisType::NONE;  // type of analysis
     StorageScheme storage_type = StorageScheme::FULL; // type of analysis
 
-#ifdef SUANPAN_MAGMA
-    magma_dopts magma_setting{};
-#endif
-
     bool nlgeom = false;
     bool nonviscous = false;
 
     SolverType solver = SolverType::LAPACK;
-    SolverSetting<T> setting{};
-
     SolverType sub_solver = SolverType::LAPACK;
+    SolverSetting<T> setting{};
 
     T error = T(0); // error produced by certain solvers
 
@@ -213,12 +204,6 @@ public:
 
     void set_solver_setting(const SolverSetting<double>&);
     [[nodiscard]] const SolverSetting<double>& get_solver_setting() const;
-
-#ifdef SUANPAN_MAGMA
-    void set_solver_setting(const magma_dopts& magma_opt) { magma_setting = magma_opt; }
-
-    [[nodiscard]] const magma_dopts& get_magma_setting() const { return magma_setting; }
-#endif
 
     void set_analysis_type(AnalysisType);
     [[nodiscard]] AnalysisType get_analysis_type() const;
@@ -708,7 +693,7 @@ template<sp_d T> unsigned Factory<T>::get_size() const { return n_size; }
 
 template<sp_d T> void Factory<T>::set_entry(const uword N) {
     n_elem = N;
-    if(n_elem > std::numeric_limits<int>::max()) throw invalid_argument("too many elements");
+    if(n_elem > std::numeric_limits<la_it>::max()) throw invalid_argument("too many elements");
 }
 
 template<sp_d T> uword Factory<T>::get_entry() const { return n_elem; }
@@ -1481,6 +1466,32 @@ template<sp_d T> void Factory<T>::print() const {
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
+#ifdef SUANPAN_DISTRIBUTED
+    switch(storage_type) {
+    case StorageScheme::FULL:
+        return std::make_unique<FullMatCluster<T>>(n_size, n_size);
+    case StorageScheme::SYMMPACK:
+        return std::make_unique<FullSymmMatCluster<T>>(n_size, n_size);
+    case StorageScheme::BAND:
+        return std::make_unique<BandMatCluster<T>>(n_size, n_lobw, n_upbw);
+    case StorageScheme::BANDSYMM:
+        return std::make_unique<BandSymmMatCluster<T>>(n_size, n_lobw);
+    case StorageScheme::SPARSE:
+#ifdef SUANPAN_MKL
+        if(contain_solver_type(SolverType::PARDISO)) return std::make_unique<SparseMatClusterPARDISO<T>>(n_size, n_size, n_elem);
+#endif
+        if(contain_solver_type(SolverType::LIS)) return std::make_unique<SparseMatClusterLIS<T>>(n_size, n_size, n_elem);
+        return std::make_unique<SparseMatClusterMUMPS<T>>(n_size, n_size, n_elem);
+    case StorageScheme::SPARSESYMM:
+#ifdef SUANPAN_MKL
+        if(contain_solver_type(SolverType::PARDISO)) return std::make_unique<SparseSymmMatClusterPARDISO<T>>(n_size, n_size, n_elem);
+#endif
+        if(contain_solver_type(SolverType::LIS)) return std::make_unique<SparseMatClusterLIS<T>>(n_size, n_size, n_elem);
+        return std::make_unique<SparseSymmMatClusterMUMPS<T>>(n_size, n_size, n_elem);
+    default:
+        throw invalid_argument("need a proper storage scheme");
+    }
+#else
     switch(storage_type) {
     case StorageScheme::FULL:
 #ifdef SUANPAN_CUDA
@@ -1497,10 +1508,14 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
         return std::make_unique<BandSymmMat<T>>(n_size, n_lobw);
     case StorageScheme::SYMMPACK:
         return std::make_unique<SymmPackMat<T>>(n_size);
+    case StorageScheme::SPARSESYMM:
+#ifdef SUANPAN_MKL
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+        if(contain_solver_type(SolverType::PARDISO)) return std::make_unique<SparseSymmMatPARDISO<T>>(n_size, n_size, n_elem);
+#pragma GCC diagnostic pop
+#endif
     case StorageScheme::SPARSE:
-        if(contain_solver_type(SolverType::MUMPS)) return std::make_unique<SparseMatMUMPS<T>>(n_size, n_size, n_elem);
-        if(contain_solver_type(SolverType::LIS)) return std::make_unique<SparseMatLis<T>>(n_size, n_size, n_elem);
-        if(contain_solver_type(SolverType::SUPERLU)) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MKL
         if(contain_solver_type(SolverType::PARDISO)) return std::make_unique<SparseMatPARDISO<T>>(n_size, n_size, n_elem);
         if(contain_solver_type(SolverType::FGMRES)) return std::make_unique<SparseMatFGMRES<T>>(n_size, n_size, n_elem);
@@ -1508,18 +1523,14 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #ifdef SUANPAN_CUDA
         if(contain_solver_type(SolverType::CUDA)) return std::make_unique<SparseMatCUDA<T>>(n_size, n_size, n_elem);
 #ifdef SUANPAN_MAGMA
-        if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, magma_setting);
+        if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, n_elem);
 #endif
 #endif
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
-    case StorageScheme::SPARSESYMM:
-#ifdef SUANPAN_MKL
-        if(contain_solver_type(SolverType::FGMRES)) return std::make_unique<SparseSymmMatFGMRES<T>>(n_size, n_size, n_elem);
-#endif
-        return std::make_unique<SparseSymmMatMUMPS<T>>(n_size, n_size, n_elem);
     default:
         throw invalid_argument("need a proper storage scheme");
     }
+#endif
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_matrix_container() {

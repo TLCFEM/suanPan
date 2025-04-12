@@ -15,236 +15,240 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+// ReSharper disable StringLiteralTypo
+// ReSharper disable IdentifierTypo
 #include "LoadParser.h"
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Load/Load>
 #include <Toolbox/resampling.h>
 
-void new_acceleration(unique_ptr<Load>& return_obj, istringstream& command) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+namespace {
+    void new_acceleration(unique_ptr<Load>& return_obj, istringstream& command) {
+        unsigned load_id;
+        if(!get_input(command, load_id)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned amplitude_id;
+        if(!get_input(command, amplitude_id)) {
+            suanpan_error("A valid amplitude tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid load magnitude is required.\n");
+            return;
+        }
+
+        unsigned dof_id;
+        if(!get_input(command, dof_id)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        uword node_id;
+        vector<uword> node_pool;
+        while(get_input(command, node_id)) node_pool.emplace_back(node_id);
+
+        return_obj = make_unique<NodalAcceleration>(load_id, 0, magnitude, uvec(node_pool), dof_id, amplitude_id);
     }
 
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("A valid amplitude tag is required.\n");
-        return;
+    void new_bodyforce(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+        unsigned load_id;
+        if(!get_input(command, load_id)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned amplitude_id;
+        if(!get_input(command, amplitude_id)) {
+            suanpan_error("A valid amplitude tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid load magnitude is required.\n");
+            return;
+        }
+
+        unsigned dof_id;
+        if(!get_input(command, dof_id)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        unsigned element;
+        vector<uword> element_tag;
+        while(get_input(command, element)) element_tag.push_back(element);
+
+        flag ? return_obj = make_unique<GroupBodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id) : return_obj = make_unique<BodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id);
     }
 
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid load magnitude is required.\n");
-        return;
+    void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+        unsigned load_id;
+        if(!get_input(command, load_id)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned amplitude_id;
+        if(!get_input(command, amplitude_id)) {
+            suanpan_error("A valid amplitude tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid load magnitude is required.\n");
+            return;
+        }
+
+        unsigned dof_id;
+        if(!get_input(command, dof_id)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        unsigned node;
+        vector<uword> node_tag;
+        while(get_input(command, node)) node_tag.push_back(node);
+
+        flag ? return_obj = make_unique<GroupNodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
     }
 
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
+    void new_refload(unique_ptr<Load>& return_obj, istringstream& command) {
+        unsigned load_id;
+        if(!get_input(command, load_id)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        if(unsigned amplitude_id; !get_input(command, amplitude_id)) {
+            suanpan_error("A valid amplitude tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid load magnitude is required.\n");
+            return;
+        }
+
+        unsigned dof_id;
+        if(!get_input(command, dof_id)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        unsigned node;
+        vector<uword> node_tag;
+        while(get_input(command, node)) node_tag.push_back(node);
+
+        return_obj = make_unique<ReferenceForce>(load_id, 0, magnitude, uvec(node_tag), dof_id);
     }
 
-    uword node_id;
-    vector<uword> node_pool;
-    while(get_input(command, node_id)) node_pool.emplace_back(node_id);
+    void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const unsigned dimension) {
+        unsigned load_id;
+        if(!get_input(command, load_id)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    return_obj = make_unique<NodalAcceleration>(load_id, 0, magnitude, uvec(node_pool), dof_id, amplitude_id);
-}
+        unsigned amplitude_id;
+        if(!get_input(command, amplitude_id)) {
+            suanpan_error("A valid amplitude tag is required.\n");
+            return;
+        }
 
-void new_bodyforce(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid load magnitude is required.\n");
+            return;
+        }
+
+        unsigned dof_id;
+        if(!get_input(command, dof_id)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        unsigned node;
+        vector<uword> node_tag;
+        while(get_input(command, node)) node_tag.push_back(node);
+
+        2 == dimension ? return_obj = make_unique<LineUDL2D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<LineUDL3D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
     }
 
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("A valid amplitude tag is required.\n");
-        return;
+    void new_displacement(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+        unsigned load_id;
+        if(!get_input(command, load_id)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned amplitude_id;
+        if(!get_input(command, amplitude_id)) {
+            suanpan_error("A valid amplitude tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid load magnitude is required.\n");
+            return;
+        }
+
+        unsigned dof_id;
+        if(!get_input(command, dof_id)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        unsigned node;
+        vector<uword> node_tag;
+        while(get_input(command, node)) node_tag.push_back(node);
+
+        flag ? return_obj = make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
     }
 
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid load magnitude is required.\n");
-        return;
+    void new_supportmotion(unique_ptr<Load>& return_obj, istringstream& command, const unsigned flag) {
+        unsigned load_id;
+        if(!get_input(command, load_id)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned amplitude_id;
+        if(!get_input(command, amplitude_id)) {
+            suanpan_error("A valid amplitude tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid load magnitude is required.\n");
+            return;
+        }
+
+        unsigned dof_id;
+        if(!get_input(command, dof_id)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        unsigned node;
+        vector<uword> node_tag;
+        while(get_input(command, node)) node_tag.push_back(node);
+
+        if(0 == flag) return_obj = make_unique<SupportDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        else if(1 == flag) return_obj = make_unique<SupportVelocity>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        else return_obj = make_unique<SupportAcceleration>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
     }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
-    }
-
-    unsigned element;
-    vector<uword> element_tag;
-    while(get_input(command, element)) element_tag.push_back(element);
-
-    flag ? return_obj = make_unique<GroupBodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id) : return_obj = make_unique<BodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id);
-}
-
-void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("A valid amplitude tag is required.\n");
-        return;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid load magnitude is required.\n");
-        return;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    flag ? return_obj = make_unique<GroupNodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-}
-
-void new_refload(unique_ptr<Load>& return_obj, istringstream& command) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    if(unsigned amplitude_id; !get_input(command, amplitude_id)) {
-        suanpan_error("A valid amplitude tag is required.\n");
-        return;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid load magnitude is required.\n");
-        return;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    return_obj = make_unique<ReferenceForce>(load_id, 0, magnitude, uvec(node_tag), dof_id);
-}
-
-void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const unsigned dimension) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("A valid amplitude tag is required.\n");
-        return;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid load magnitude is required.\n");
-        return;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    2 == dimension ? return_obj = make_unique<LineUDL2D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<LineUDL3D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-}
-
-void new_displacement(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("A valid amplitude tag is required.\n");
-        return;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid load magnitude is required.\n");
-        return;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    flag ? return_obj = make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-}
-
-void new_supportmotion(unique_ptr<Load>& return_obj, istringstream& command, const unsigned flag) {
-    unsigned load_id;
-    if(!get_input(command, load_id)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
-    unsigned amplitude_id;
-    if(!get_input(command, amplitude_id)) {
-        suanpan_error("A valid amplitude tag is required.\n");
-        return;
-    }
-
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid load magnitude is required.\n");
-        return;
-    }
-
-    unsigned dof_id;
-    if(!get_input(command, dof_id)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return;
-    }
-
-    unsigned node;
-    vector<uword> node_tag;
-    while(get_input(command, node)) node_tag.push_back(node);
-
-    if(0 == flag) return_obj = make_unique<SupportDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-    else if(1 == flag) return_obj = make_unique<SupportVelocity>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-    else return_obj = make_unique<SupportAcceleration>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-}
+} // namespace
 
 int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& command) {
     string amplitude_type;

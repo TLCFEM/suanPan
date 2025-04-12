@@ -36,7 +36,7 @@ public:
     ResourceHolder() = default;
 
     explicit ResourceHolder(std::unique_ptr<T>&& obj)
-        : object(std::forward<std::unique_ptr<T>>(obj)) {}
+        : object(std::move(obj)) {}
 
     ResourceHolder& operator=(const std::shared_ptr<T>& original_object) {
         object = original_object->get_copy();
@@ -44,7 +44,7 @@ public:
     }
 
     ResourceHolder& operator=(std::unique_ptr<T>&& original_object) {
-        object = std::forward<std::unique_ptr<T>>(original_object);
+        object = std::move(original_object);
         return *this;
     }
 

@@ -26,10 +26,10 @@ keywords:
   - Structural Engineering
   - Plasticity
   - Constitutive Modelling
-  - Dynamics
+  - Nonlinear Dynamics
   - HPC
   - IGA
   - Solid Mechanics
 license: GPL-3.0
-version: '3.6'
-date-released: '2025-02-08'
+version: '3.7'
+date-released: '2025-04-12'

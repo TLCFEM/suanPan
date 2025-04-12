@@ -18,35 +18,35 @@
 #ifndef SOLVERSETTING_HPP
 #define SOLVERSETTING_HPP
 
-#include "Preconditioner.hpp"
+#include <Toolbox/utility.h>
 
-enum class Precision {
+enum class Precision : std::uint8_t {
     MIXED,
     FULL
 };
 
-enum class IterativeSolver {
-    BICGSTAB,
-    GMRES,
-    NONE
-};
-
-enum class PreconditionerType {
-    ILU,
-    JACOBI,
-    NONE
-};
-
 template<sp_d data_t> struct SolverSetting {
-    int restart = 20;
-    int max_iteration = 200;
-    data_t tolerance = std::is_same_v<data_t, float> ? 1E-6f : 1E-14;
-    unsigned iterative_refinement = 5;
+    string option{};
+    data_t tolerance = std::is_same_v<data_t, float> ? 1E-7f : 1E-14;
+    std::uint8_t iterative_refinement = 5;
     Precision precision = Precision::FULL;
-    IterativeSolver iterative_solver = IterativeSolver::NONE;
-    PreconditionerType preconditioner_type = PreconditionerType::JACOBI;
-    Preconditioner<data_t>* preconditioner = nullptr;
-    string lis_options{};
+
+    auto set_magma_option(istringstream& command) { option = get_remaining(command); }
+    auto set_lis_option(istringstream& command) {
+        static constexpr auto max_length = 1024;
+
+        const auto sub_command = get_remaining(command);
+
+        if(sub_command.empty()) {
+            option = "-i fgmres -p ilu";
+            return;
+        }
+        if(std::any_of(sub_command.begin(), sub_command.end(), [](const char c) { return !std::isspace(c); })) option = sub_command;
+        if(option.length() < max_length) return;
+
+        const auto pos = option.find_last_of(" \t\n\r", max_length);
+        option = option.substr(0, pos == std::string::npos ? max_length : pos);
+    }
 };
 
 #endif

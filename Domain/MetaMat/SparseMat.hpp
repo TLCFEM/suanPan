@@ -55,8 +55,6 @@ public:
 
     [[nodiscard]] T max() const override { return this->triplet_mat.max(); }
 
-    [[nodiscard]] Col<T> diag() const override { return this->triplet_mat.diag(); }
-
     T operator()(const uword in_row, const uword in_col) const override { return this->triplet_mat(in_row, in_col); }
 
     T& at(const uword in_row, const uword in_col) override {
@@ -72,7 +70,9 @@ public:
         if(nullptr == in_mat) return;
         if(!in_mat->triplet_mat.is_empty()) return this->scale_accu(scalar, in_mat->triplet_mat);
         this->factored = false;
-        for(auto I = 0llu; I < in_mat->n_rows; ++I) for(auto J = 0llu; J < in_mat->n_cols; ++J) if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = scalar * t_val;
+        for(auto I = 0llu; I < in_mat->n_rows; ++I)
+            for(auto J = 0llu; J < in_mat->n_cols; ++J)
+                if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = scalar * t_val;
     }
 
     void scale_accu(const T scalar, const triplet_form<T, uword>& in_mat) override {
@@ -89,7 +89,33 @@ public:
         this->triplet_mat *= scalar;
     }
 
-    [[nodiscard]] int sign_det() const override { throw invalid_argument("not supported"); }
+    void allreduce() override {
+#ifdef SUANPAN_DISTRIBUTED
+        const auto coo_elem = this->triplet_mat.n_elem;
+        std::vector<uword> dist_elem(comm_size);
+        comm_world.allgather(coo_elem, dist_elem.data());
+        this->triplet_mat.hack_size(std::accumulate(dist_elem.begin(), dist_elem.end(), uword{0}));
+
+        mpl::irequest_pool requests;
+
+        auto accu_elem = coo_elem;
+        for(auto comm_n = 0; comm_n < comm_size; ++comm_n)
+            if(comm_n == comm_rank) {
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.row_mem(), mpl::contiguous_layout<uword>{coo_elem}));
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.col_mem(), mpl::contiguous_layout<uword>{coo_elem}));
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.val_mem(), mpl::contiguous_layout<T>{coo_elem}));
+            }
+            else {
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.row_mem() + accu_elem, mpl::contiguous_layout<uword>{dist_elem[comm_n]}));
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.col_mem() + accu_elem, mpl::contiguous_layout<uword>{dist_elem[comm_n]}));
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.val_mem() + accu_elem, mpl::contiguous_layout<T>{dist_elem[comm_n]}));
+                accu_elem += dist_elem[comm_n];
+            }
+
+        requests.waitall();
+#endif
+        csc_condense();
+    }
 
     void csc_condense() override { this->triplet_mat.csc_condense(); }
 

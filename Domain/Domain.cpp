@@ -1156,7 +1156,8 @@ int Domain::process_constraint(const bool full) {
     const auto process_handler = full ? std::mem_fn(&Constraint::process) : std::mem_fn(&Constraint::process_resistance);
 
     // constraint, start index, size
-    suanpan::vector<std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>> constraint_register;
+    using register_t = std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>;
+    suanpan::vector<register_t> constraint_register;
 
     std::atomic_int code = 0;
     std::atomic_uint32_t counter = 0;
@@ -1193,7 +1194,7 @@ int Domain::process_constraint(const bool full) {
     auto& t_load = factory->modify_auxiliary_load();
     auto& t_stiffness = factory->modify_auxiliary_stiffness();
 
-    suanpan::for_all(constraint_register, [&](const std::pair<shared_ptr<Constraint>, std::array<unsigned, 2>>& t_register) {
+    suanpan::for_all(constraint_register, [&](const register_t& t_register) {
         const auto& t_constraint = t_register.first;
         const auto start = t_register.second[0];
         const auto end = start + t_register.second[1] - 1;
@@ -1243,10 +1244,7 @@ void Domain::enable_all() {
     solver_pond.enable();
 }
 
-void Domain::summary() const {
-    suanpan_info("Domain {} contains:\n\t{} nodes, {} elements, {} materials, {} expressions,\n", get_tag(), get_node(), get_element(), get_material(), get_expression());
-    suanpan_info("\t{} loads, {} constraints and {} recorders.\n", get_load(), get_constraint(), get_recorder());
-}
+void Domain::summary() const { suanpan_info("Domain {} contains: {} nodes, {} elements, {} materials, {} expressions, {} loads, {} constraints, {} recorders.\n", get_tag(), get_node(), get_element(), get_material(), get_expression(), get_load(), get_constraint(), get_recorder()); }
 
 void Domain::erase_machine_error(vec& ninja) const { suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; }); }
 
@@ -1266,6 +1264,9 @@ void Domain::update_constraint() {
 
 void Domain::assemble_load_stiffness() {}
 
-void Domain::assemble_constraint_stiffness() { for(auto& I : get_constraint_pool()) if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding()); }
+void Domain::assemble_constraint_stiffness() {
+    for(auto& I : get_constraint_pool())
+        if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding());
+}
 
 void Domain::save(string) {}

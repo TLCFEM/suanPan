@@ -26,7 +26,7 @@ const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
 const mat CDPM2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-void CDPM2::compute_plasticity(const double lode, const double s, const double p, const double kp, vec& data) const {
+void CDPM2::compute_plasticity(const double lode, const double s, const double p, const double kp, vec18& data) const {
     auto& f = data(0);
     auto& pfps = data(1);
     auto& pfpp = data(2);
@@ -136,7 +136,7 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     }
 }
 
-int CDPM2::compute_damage(const double gamma, const double s, const double p, const double kp, const double ac, vec& data) {
+int CDPM2::compute_damage(const double gamma, const double s, const double p, const double kp, const double ac, vec18& data) {
     const auto gs = data(4);
     const auto gp = data(5);
     const auto gg = data(6);
@@ -422,12 +422,14 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     auto ini_f = 0.;
     auto gamma = 0., s = trial_s, p = trial_p;
 
-    mat jacobian(4, 4, fill::none), left(4, 6, fill::zeros);
+    mat44 jacobian(fill::none);
     jacobian(0, 0) = 0.;
 
-    vec residual(4), incre;
+    vec4 residual, incre;
 
-    vec data(18);
+    mat::fixed<4, 6> left(fill::zeros);
+
+    vec18 data(fill::zeros);
     const auto& f = data(0);
     const auto& pfps = data(1);
     const auto& pfpp = data(2);
@@ -536,7 +538,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
             trial_stress = s * n + p * tensor::unit_tensor2;
 
-            mat right(4, 6, fill::none);
+            mat::fixed<4, 6> right(fill::none);
 
             right.row(0) = -pfpl * dlde;
             right.row(1) = double_shear * unit_n.t() * unit_dev_tensor;

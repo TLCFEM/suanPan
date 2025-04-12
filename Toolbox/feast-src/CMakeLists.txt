@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.18)
 
 project(feast Fortran)
 
@@ -21,11 +21,9 @@ set(SPIKE_SRC
         spike-src/zspike_smp.f90
 )
 
-if (USE_MKL)
-    add_definitions(-DMKL)
+if (SP_ENABLE_MKL)
+    add_compile_definitions(MKL)
 endif ()
-
-include(../../Driver.cmake)
 
 if (NOT COMPILER_IDENTIFIER MATCHES "vs") # GNU GCC COMPILER
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none -ffixed-line-length-none")
@@ -33,6 +31,12 @@ endif ()
 
 add_library(feast_obj OBJECT ${FEAST_SRC} ${SPIKE_SRC})
 
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE} $<TARGET_OBJECTS:feast_obj>)
+add_library(${PROJECT_NAME} $<TARGET_OBJECTS:feast_obj>)
+
+if (SP_ENABLE_MPI)
+    add_library(feast_mpi_obj OBJECT ${FEAST_SRC} ${SPIKE_SRC})
+    target_compile_definitions(feast_mpi_obj PRIVATE MPI)
+    add_library(pfeast $<TARGET_OBJECTS:feast_mpi_obj>)
+endif ()
 
 message(STATUS "FEAST Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")

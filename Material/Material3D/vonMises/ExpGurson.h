@@ -40,7 +40,7 @@ class ExpGurson final : protected DataExpGurson, public NonlinearGurson {
 
     const double para_c = 3. * elastic_modulus / (2. + 2. * poissons_ratio) / yield_stress;
 
-    [[nodiscard]] vec compute_hardening(double) const override;
+    [[nodiscard]] vec2 compute_hardening(double) const override;
 
 public:
     ExpGurson(

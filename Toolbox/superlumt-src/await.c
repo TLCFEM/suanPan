@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -19,11 +19,11 @@ at the top-level directory.
 #include "slu_mt_ddefs.h"
 
 int_t await(volatile int_t* status) {
-	register int_t i, j, k, randnum;
+    register int_t i, j, k, randnum;
 
-	/* randnum = ( random() & 0xff ); */
-	randnum = 0;
-	while(*status);
+    /* randnum = ( random() & 0xff ); */
+    randnum = 0;
+    while(*status);
 #if 0
     {
 	/* Length better be adaptive to the number of processors */
@@ -34,5 +34,5 @@ int_t await(volatile int_t* status) {
 	}
     }
 #endif
-	return 0;
+    return 0;
 }

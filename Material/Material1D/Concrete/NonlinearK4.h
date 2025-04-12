@@ -40,11 +40,11 @@ class NonlinearK4 : protected DataNonlinearK4, public Material1D {
 
     const bool apply_damage, apply_crack_closing, objective_damage;
 
-    [[nodiscard]] virtual vec2 compute_tension_backbone(double) const = 0;
-    [[nodiscard]] virtual vec2 compute_compression_backbone(double) const = 0;
+    [[nodiscard]] virtual pod2 compute_tension_backbone(double) const = 0;
+    [[nodiscard]] virtual pod2 compute_compression_backbone(double) const = 0;
 
-    [[nodiscard]] virtual vec2 compute_tension_damage(double) const = 0;
-    [[nodiscard]] virtual vec2 compute_compression_damage(double) const = 0;
+    [[nodiscard]] virtual pod2 compute_tension_damage(double) const = 0;
+    [[nodiscard]] virtual pod2 compute_compression_damage(double) const = 0;
 
     int compute_plasticity();
     void compute_crack_close_branch();
@@ -84,11 +84,11 @@ struct DataConcreteK4 {
 };
 
 class ConcreteK4 final : protected DataConcreteK4, public NonlinearK4 {
-    [[nodiscard]] vec2 compute_tension_backbone(double) const override;
-    [[nodiscard]] vec2 compute_compression_backbone(double) const override;
+    [[nodiscard]] pod2 compute_tension_backbone(double) const override;
+    [[nodiscard]] pod2 compute_compression_backbone(double) const override;
 
-    [[nodiscard]] vec2 compute_tension_damage(double) const override;
-    [[nodiscard]] vec2 compute_compression_damage(double) const override;
+    [[nodiscard]] pod2 compute_tension_damage(double) const override;
+    [[nodiscard]] pod2 compute_compression_damage(double) const override;
 
 public:
     ConcreteK4(

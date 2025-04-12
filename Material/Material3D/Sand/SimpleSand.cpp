@@ -56,8 +56,8 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     auto s = trial_s;
     auto p = trial_p;
 
-    mat jacobian(14, 14, fill::none);
-    vec residual(14, fill::none), incre;
+    mat::fixed<14, 14> jacobian(fill::none);
+    vec::fixed<14> residual(fill::none), incre(fill::none);
 
     jacobian(sa, sa) = 0.;
 
@@ -126,7 +126,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     trial_stress = s + p * tensor::unit_tensor2;
 
-    mat left(14, 6, fill::none), right;
+    mat::fixed<14, 6> left(fill::none), right(fill::none);
 
     left.row(sa).zeros();
     left.row(sb) = (bulk - bulk * a * gamma * alpha_d * nd * v0) * tensor::unit_tensor2.t();

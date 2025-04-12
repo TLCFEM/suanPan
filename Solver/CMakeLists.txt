@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.18)
 
 project(Solver)
 
@@ -18,7 +18,7 @@ add_library(${PROJECT_NAME} STATIC
         ${Integrator}
 )
 
-if (HAVE_VTK)
+if (SP_ENABLE_VTK)
     target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES})
     if (VTK_VERSION VERSION_LESS "8.90.0")
         include(${VTK_USE_FILE})

@@ -18,18 +18,18 @@
 #include "AFC.h"
 #include <Toolbox/utility.h>
 
-podarray<double> AFC::compute_transition(const double TX, const double XS, const double YS, const double ES, const double XF, const double YF, const double EF) {
-    podarray<double> response(2);
+pod2 AFC::compute_transition(const double TX, const double XS, const double YS, const double ES, const double XF, const double YF, const double EF) {
+    pod2 response;
 
     if(fabs(TX - XS) <= datum::eps) {
-        response(0) = YS;
-        response(1) = ES;
+        response[0] = YS;
+        response[1] = ES;
         return response;
     }
 
     if(fabs(TX - XF) <= datum::eps) {
-        response(0) = YF;
-        response(1) = EF;
+        response[0] = YF;
+        response[1] = EF;
         return response;
     }
 
@@ -40,10 +40,10 @@ podarray<double> AFC::compute_transition(const double TX, const double XS, const
     const auto R = (EF - ESEC) / TB;
     const auto TD = TB * pow(std::max(fabs(TC / TA), datum::eps), R);
 
-    response(0) = YS + TC * (ES + TD);
-    response(1) = ES + (R + 1.) * TD;
+    response[0] = YS + TC * (ES + TD);
+    response[1] = ES + (R + 1.) * TD;
 
-    suanpan_assert([&] { if(!std::isfinite(response(0)) || !std::isfinite(response(1))) throw invalid_argument("infinite numbers detected"); });
+    suanpan_assert([&] { if(!std::isfinite(response[0]) || !std::isfinite(response[1])) throw invalid_argument("infinite numbers detected"); });
 
     return response;
 }
@@ -68,8 +68,8 @@ void AFC::compute_degradation(const double yield_strain, const double stiffness)
 
         const auto response = compute_transition(trial_strain(0), s_strain, s_stress, s_stiffness, e_strain, e_stress, e_stiffness);
 
-        trial_stress = response(0);
-        trial_stiffness = response(1);
+        trial_stress = response[0];
+        trial_stiffness = response[1];
     }
 }
 

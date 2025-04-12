@@ -861,7 +861,9 @@ namespace arma
   #endif
   }
 
-#include "armadillo_shadow"
+  namespace arma {
+#include "ext_def_lapack.hpp"
+  }
 
 #include "armadillo_bits/compiler_setup_post.hpp"
 

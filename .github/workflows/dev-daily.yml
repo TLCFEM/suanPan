@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Golang
         uses: actions/setup-go@v5
         with:
@@ -32,7 +34,15 @@ jobs:
         run: |
           go build Checker/updater.go
           mkdir build && cd build
-          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DUSE_AVX2=${{ matrix.avx }} -DBUILD_MULTITHREAD=OFF -DCMAKE_INSTALL_PREFIX=dist ..
+          cmake \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+          -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} \
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
+          -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
+          -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_BUILD_PARALLEL=OFF \
+          -DSP_ENABLE_AVX2=${{ matrix.avx }} \
+          ..
           make install -j"$(nproc)" && make package
       - name: Pack
         run: |

@@ -74,5 +74,6 @@ else
         fi
         ;;
     esac
+    export PATH=$PATH:$CURRENT_PATH
     "$CURRENT_PATH/suanPan" "$@"
 fi

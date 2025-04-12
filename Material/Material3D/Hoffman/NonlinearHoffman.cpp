@@ -52,8 +52,8 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
 
     auto gamma = 0., ref_error = 1.;
 
-    vec incre, residual(7);
-    mat jacobian(7, 7);
+    vec7 incre(fill::none), residual(fill::none);
+    mat77 jacobian(fill::none);
 
     auto counter = 0u;
     while(true) {
@@ -91,7 +91,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) {
             plastic_strain += gamma * n_mid;
 
-            mat left, right(7, 6, fill::zeros);
+            mat::fixed<7, 6> left(fill::none), right(fill::zeros);
             right.rows(sb) = initial_stiffness;
 
             if(!solve(left, jacobian, right)) return SUANPAN_FAIL;

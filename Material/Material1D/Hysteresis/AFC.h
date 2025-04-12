@@ -45,7 +45,7 @@ struct DataAFC {
 };
 
 class AFC final : protected DataAFC, public Material1D {
-    static podarray<double> compute_transition(double, double, double, double, double, double, double);
+    static pod2 compute_transition(double, double, double, double, double, double, double);
     void compute_degradation(double, double);
 
 public:

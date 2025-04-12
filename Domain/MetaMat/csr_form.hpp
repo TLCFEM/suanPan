@@ -99,6 +99,9 @@ public:
 
     template<sp_d in_dt, sp_i in_it> explicit csr_form(triplet_form<in_dt, in_it>&, SparseBase = SparseBase::ZERO, bool = false);
 
+    template<sp_d in_dt, sp_i in_it> explicit csr_form(triplet_form<in_dt, in_it>&& in_mat, const SparseBase in_base = SparseBase::ZERO, const bool in_full = false)
+        : csr_form(in_mat, in_base, in_full) {}
+
     template<sp_d in_dt, sp_i in_it> csr_form& operator=(triplet_form<in_dt, in_it>&);
 
     data_t operator()(const index_t in_row, const index_t in_col) const {

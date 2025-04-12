@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LeeNewmarkBase.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
@@ -65,8 +66,7 @@ int LeeNewmarkBase::initialize() {
 
     trial_internal = current_internal = residual.zeros(n_size);
 
-    if(factory->contain_solver_type(SolverType::MUMPS)) stiffness = make_unique<SparseMatMUMPS<double>>(n_size, n_size);
-    else if(factory->contain_solver_type(SolverType::LIS)) stiffness = make_unique<SparseMatLis<double>>(n_size, n_size);
+    if(factory->contain_solver_type(SolverType::SUPERLU)) stiffness = make_unique<SparseMatSuperLU<double>>(n_size, n_size);
 #ifdef SUANPAN_MKL
     else if(factory->contain_solver_type(SolverType::PARDISO)) stiffness = make_unique<SparseMatPARDISO<double>>(n_size, n_size);
     else if(factory->contain_solver_type(SolverType::FGMRES)) stiffness = make_unique<SparseMatFGMRES<double>>(n_size, n_size);
@@ -75,8 +75,6 @@ int LeeNewmarkBase::initialize() {
     else if(factory->contain_solver_type(SolverType::CUDA)) stiffness = make_unique<SparseMatCUDA<double>>(n_size, n_size);
 #endif
     else stiffness = make_unique<SparseMatSuperLU<double>>(n_size, n_size);
-
-    if_iterative = factory->get_solver_setting().iterative_solver != IterativeSolver::NONE;
 
     return SUANPAN_SUCCESS;
 }

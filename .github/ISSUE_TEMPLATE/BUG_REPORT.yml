@@ -1,0 +1,25 @@
+name: Bug Report
+description: Create a report to help us improve
+title: "[BUG]"
+labels: ["bug"]
+body:
+  - type: input
+    attributes:
+      label: Version
+      description: Indicate version tags or 'dev' if using the head of 'dev' branch.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      placeholder: |
+        A clear and concise description of what the bug is.
+        You can also upload a MWE to reproduce the behaviour.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      placeholder: |
+        Add any other context about the problem here.
+        If there are any references, please also provide them.

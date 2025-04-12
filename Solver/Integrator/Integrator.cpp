@@ -16,13 +16,16 @@
  ******************************************************************************/
 
 #include "Integrator.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 Integrator::Integrator(const unsigned T)
     : Tag(T) {}
 
-void Integrator::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() != D.lock()) database = D; }
+void Integrator::set_domain(const weak_ptr<DomainBase>& D) {
+    if(database.lock() != D.lock()) database = D;
+}
 
 shared_ptr<DomainBase> Integrator::get_domain() const { return database.lock(); }
 

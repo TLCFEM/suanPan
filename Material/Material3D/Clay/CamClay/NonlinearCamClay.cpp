@@ -52,8 +52,8 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
     auto ini_f = 0., gamma = 0.;
 
-    vec residual(2), incre;
-    mat jacobian(2, 2);
+    vec2 residual(fill::none), incre(fill::none);
+    mat22 jacobian(fill::none);
 
     auto counter = 0u;
     auto rel_error = 1.;
@@ -92,7 +92,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
         if(1u == counter) rel_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * rel_error || (inf_norm(residual) < tolerance * ini_f && counter > 5u)) {
-            mat left(6, 2);
+            mat::fixed<6, 2> left(fill::none);
 
             rel_error = 2. * bulk / square_b; // reuse variable
             left.col(0) = rel_error * rel_p * tensor::unit_tensor2 + six_shear / denom * (trial_s *= square_m / denom);

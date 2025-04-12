@@ -474,9 +474,9 @@ Mat<eT>::Mat(const char* text)
   
   init( std::string(text) );
   }
-  
-  
-  
+
+
+
 //! create the matrix from a textual description
 template<typename eT>
 inline
@@ -489,8 +489,8 @@ Mat<eT>::operator=(const char* text)
   
   return *this;
   }
-  
-  
+
+
 
 //! create the matrix from a textual description
 template<typename eT>
@@ -508,9 +508,9 @@ Mat<eT>::Mat(const std::string& text)
   
   init(text);
   }
-  
-  
-  
+
+
+
 //! create the matrix from a textual description
 template<typename eT>
 inline
@@ -2862,6 +2862,8 @@ Mat<eT>::operator=(const SpSubview<eT>& X)
   
   if(X.n_rows == X.m.n_rows)
     {
+    arma_debug_print("access via arrays");
+    
     X.m.sync();
     
     const uword sv_col_start = X.aux_col1;
@@ -2889,6 +2891,8 @@ Mat<eT>::operator=(const SpSubview<eT>& X)
     }
   else
     {
+    arma_debug_print("access via iterators");
+    
     typename SpSubview<eT>::const_iterator it     = X.begin();
     typename SpSubview<eT>::const_iterator it_end = X.end();
     
@@ -2913,6 +2917,8 @@ Mat<eT>::operator+=(const SpSubview<eT>& X)
   
   if(X.n_rows == X.m.n_rows)
     {
+    arma_debug_print("access via arrays");
+    
     X.m.sync();
     
     const uword sv_col_start = X.aux_col1;
@@ -2940,6 +2946,8 @@ Mat<eT>::operator+=(const SpSubview<eT>& X)
     }
   else
     {
+    arma_debug_print("access via iterators");
+    
     typename SpSubview<eT>::const_iterator it     = X.begin();
     typename SpSubview<eT>::const_iterator it_end = X.end();
     
@@ -2964,6 +2972,8 @@ Mat<eT>::operator-=(const SpSubview<eT>& X)
   
   if(X.n_rows == X.m.n_rows)
     {
+    arma_debug_print("access via arrays");
+    
     X.m.sync();
     
     const uword sv_col_start = X.aux_col1;
@@ -2991,6 +3001,8 @@ Mat<eT>::operator-=(const SpSubview<eT>& X)
     }
   else
     {
+    arma_debug_print("access via iterators");
+    
     typename SpSubview<eT>::const_iterator it     = X.begin();
     typename SpSubview<eT>::const_iterator it_end = X.end();
     
@@ -5185,6 +5197,14 @@ Mat<eT>::Mat(const eOp<T1, eop_type>& X)
   
   init_cold();
   
+  if(is_same_type<eop_type, eop_pow>::value)
+    {
+    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    
+    if(               X.aux == eT(2)   )  { eop_square::apply(*this, reinterpret_cast< const eOp<T1, eop_square>& >(X)); return; }
+    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply(*this, reinterpret_cast< const eOp<T1, eop_sqrt  >& >(X)); return; }
+    }
+  
   eop_type::apply(*this, X);
   }
 
@@ -5207,6 +5227,14 @@ Mat<eT>::operator=(const eOp<T1, eop_type>& X)
   
   init_warm(X.get_n_rows(), X.get_n_cols());
   
+  if(is_same_type<eop_type, eop_pow>::value)
+    {
+    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    
+    if(               X.aux == eT(2)   )  { eop_square::apply(*this, reinterpret_cast< const eOp<T1, eop_square>& >(X)); return *this; }
+    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply(*this, reinterpret_cast< const eOp<T1, eop_sqrt  >& >(X)); return *this; }
+    }
+  
   eop_type::apply(*this, X);
   
   return *this;
@@ -5228,6 +5256,14 @@ Mat<eT>::operator+=(const eOp<T1, eop_type>& X)
   
   if(bad_alias)  { const Mat<eT> tmp(X); return (*this).operator+=(tmp); }
   
+  if(is_same_type<eop_type, eop_pow>::value)
+    {
+    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    
+    if(               X.aux == eT(2)   )  { eop_square::apply_inplace_plus(*this, reinterpret_cast< const eOp<T1, eop_square>& >(X)); return *this; }
+    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_plus(*this, reinterpret_cast< const eOp<T1, eop_sqrt  >& >(X)); return *this; }
+    }
+  
   eop_type::apply_inplace_plus(*this, X);
   
   return *this;
@@ -5248,6 +5284,14 @@ Mat<eT>::operator-=(const eOp<T1, eop_type>& X)
   const bool bad_alias = (eOp<T1, eop_type>::proxy_type::has_subview  &&  X.P.is_alias(*this));
   
   if(bad_alias)  { const Mat<eT> tmp(X); return (*this).operator-=(tmp); }
+  
+  if(is_same_type<eop_type, eop_pow>::value)
+    {
+    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    
+    if(               X.aux == eT(2)   )  { eop_square::apply_inplace_minus(*this, reinterpret_cast< const eOp<T1, eop_square>& >(X)); return *this; }
+    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_minus(*this, reinterpret_cast< const eOp<T1, eop_sqrt  >& >(X)); return *this; }
+    }
   
   eop_type::apply_inplace_minus(*this, X);
   
@@ -5287,6 +5331,14 @@ Mat<eT>::operator%=(const eOp<T1, eop_type>& X)
   
   if(bad_alias)  { const Mat<eT> tmp(X); return (*this).operator%=(tmp); }
   
+  if(is_same_type<eop_type, eop_pow>::value)
+    {
+    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    
+    if(               X.aux == eT(2)   )  { eop_square::apply_inplace_schur(*this, reinterpret_cast< const eOp<T1, eop_square>& >(X)); return *this; }
+    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_schur(*this, reinterpret_cast< const eOp<T1, eop_sqrt  >& >(X)); return *this; }
+    }
+  
   eop_type::apply_inplace_schur(*this, X);
   
   return *this;
@@ -5307,6 +5359,14 @@ Mat<eT>::operator/=(const eOp<T1, eop_type>& X)
   const bool bad_alias = (eOp<T1, eop_type>::proxy_type::has_subview  &&  X.P.is_alias(*this));
   
   if(bad_alias)  { const Mat<eT> tmp(X); return (*this).operator/=(tmp); }
+  
+  if(is_same_type<eop_type, eop_pow>::value)
+    {
+    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    
+    if(               X.aux == eT(2)   )  { eop_square::apply_inplace_div(*this, reinterpret_cast< const eOp<T1, eop_square>& >(X)); return *this; }
+    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_div(*this, reinterpret_cast< const eOp<T1, eop_sqrt  >& >(X)); return *this; }
+    }
   
   eop_type::apply_inplace_div(*this, X);
   

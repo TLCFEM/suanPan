@@ -70,7 +70,7 @@ class Subloading final : protected DataSubloading, public Material3D {
     static const double rate_bound;
     static const mat unit_dev_tensor;
 
-    static vec2 yield_ratio(double);
+    static pod2 yield_ratio(double);
 
     const double double_shear = elastic / (1. + poissons_ratio); // double shear modulus
 

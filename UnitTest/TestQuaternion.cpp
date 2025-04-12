@@ -1,3 +1,5 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfree-nonheap-object"
 #include <Toolbox/Quaternion.hpp>
 #include "CatchHeader.h"
 
@@ -59,3 +61,4 @@ TEST_CASE("Rodrigues Rotation", "[Utility.Rodrigues]") {
         REQUIRE(norm((B.inv() * A).to_pseudo()) < 1E-10);
     }
 }
+#pragma GCC diagnostic pop

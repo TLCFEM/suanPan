@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Login
         uses: docker/login-action@v3
         with:

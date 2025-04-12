@@ -48,23 +48,18 @@ and [OpenSees](http://opensees.berkeley.edu/).
 > For a summary of available functionalities, see [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
 > Please star ⭐ the project!
 
-![Alt](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg "Repobeats analytics image")
+![repobeats analytics](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg)
 
 ## Features
 
 The highlights of **suanPan** are
 
-- **suanPan** is *fast*, both memory and thread safe.
-- **suanPan** is designed based on the [shared memory](https://en.wikipedia.org/wiki/Shared_memory) model and supports
-  parallelism on heterogeneous architectures, for example, multi-core CPU + optional GPU. The parallelism is
-  available
-  for both element state updating and global matrix assembling.
-- **suanPan** is open source and easy to be extended to incorporate user-defined elements, materials, etc.
-- **suanPan** separates the FEA model part from the linear algebra operation part, which significantly reduces the
-  complexity and cost of development of new models.
-- **suanPan** utilizes the new language features shipped with the latest standards (C++11 to C++20), such as new STL
-  containers, smart pointers, and many others.
-- **suanPan** supports simple visualization supported by [VTK](https://vtk.org/).
+- ✅ ***fast***, memory and thread safe
+- ✅ [shared memory](https://en.wikipedia.org/wiki/Shared_memory) parallelism support
+- ✅ [distributed memory](https://en.wikipedia.org/wiki/Distributed_memory) parallelism support
+- ✅ a rich collection of elements, material models, time integration methods, etc.
+- ✅ open source and easy to be extended
+- ✅ modern language features
 
 > [!IMPORTANT]
 > Both `amd64` and `arm64` architectures are supported.
@@ -94,19 +89,19 @@ Or on Windows,
 First time users can use `overview` command to go through a quick introduction.
 
 ```text
-+-----------------------------------------------------+
-|   __        __            suanPan is an open source |
-|  /  \      |  \              FEM framework (64-bit) |
-|  \__       |__/  __   __         Betelgeuse (2.8.0) |
-|     \ |  | |    |  \ |  |         by tlc @ 10fd6147 |
-|  \__/ |__| |    |__X |  |       all rights reserved |
-|                              10.5281/zenodo.1285221 |
-+-----------------------------------------------------+
-|  https://github.com/TLCFEM/suanPan                  |
-|  https://tlcfem.github.io/suanPan-manual/latest     |
-+-----------------------------------------------------+
-|  https://gitter.im/suanPan-dev/community            |
-+-----------------------------------------------------+
++--------------------------------------------------------+
+|             ____             suanPan is an open source |
+|   ___ _   _|  _ \ __ _ _ __     FEM framework (64-bit) |
+|  / __| | | | |_) / _` | '_ \           Canopus (3.7.0) |
+|  \__ \ |_| |  __/ (_| | | | |        by tlc @ c34df242 |
+|  |___/\__,_|_|   \__,_|_| |_|      all rights reserved |
+|                                 10.5281/zenodo.1285221 |
++--------------------------------------------------------+
+|  https://github.com/TLCFEM/suanPan                     |
+|  https://tlcfem.github.io/suanPan-manual/latest        |
++--------------------------------------------------------+
+|  https://bit.ly/vsc-sp                                 |
++--------------------------------------------------------+
 
 suanPan ~<> overview
 ```
@@ -285,29 +280,30 @@ to `~/.local/share/applications`.
 
 Additional libraries used in **suanPan** are listed as follows.
 
-- [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**SPIKE**](http://www.spike-solver.org/) version 1.0
-- [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
-- [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 3.1
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
-- [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.0.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
-- [**MUMPS**](https://mumps-solver.org/) version 5.7.3
-- [**METIS**](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) version 5.1.0
-- [**VTK**](https://vtk.org/) version 9.4
-- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5
-- [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
-- [**Armadillo**](http://arma.sourceforge.net/) version 14.2.3
-- [**ensmallen**](https://ensmallen.org/) version 2.21.1
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.0.1
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.0
+- [**ARPACK**](https://github.com/opencollab/arpack-ng)
+- [**Armadillo**](http://arma.sourceforge.net/) version 14.4.1
+- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.8.0
-- [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
-- [**whereami**](https://github.com/gpakosz/whereami)
+- [**FEAST**](http://www.feast-solver.org/) version 4.0
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
+- [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
+- [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
+- [**METIS**](https://github.com/KarypisLab/METIS) version 5.1.0
+- [**MUMPS**](https://mumps-solver.org/) version 5.7.3
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
+- [**SPIKE**](http://www.spike-solver.org/) version 1.0
+- [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
+- [**VTK**](https://vtk.org/) version 9.4
+- [**argparse**](https://github.com/p-ranav/argparse)
+- [**ensmallen**](https://ensmallen.org/) version 2.21.1
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
+- [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.0.1
+- [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
 Those libraries may depend on other libraries such as [zlib](https://zlib.net/)

@@ -2,10 +2,17 @@
 
 ## known issues
 
-1. The `MKL` includes outdated `FEAST`, the external names in `FEAST` library are modified to avoid linking error.
-2. The `SPIKE` solver may occasionally freeze, to circumvent, try to avoid mixing compilers from different vendors.
-3. The `MUMPS` solver throws segfaults with large matrices, appears to be quite slow.
-4. The `FGMRES` solver requires refinements.
+1. Eigenanalysis does not support distributed computation.
+2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
+
+## version 3.7
+
+1. update `Armadillo` to version `14.4.1`
+2. (breaking) remove general iterative solvers [#250](https://github.com/TLCFEM/suanPan/pull/250)
+3. remove `MUMPS` and `lis` solvers for single-node binaries
+4. update `MinGW-w64` with UCRT and GCC 13.3.0, see SDK [link](https://github.com/brechtsanders/winlibs_mingw/releases/download/13.3.0posix-11.0.1-ucrt-r1/winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z)
+5. add cluster support [#253](https://github.com/TLCFEM/suanPan/pull/253)
+6. (breaking) refactor argument parser, some arguments are changed [#257](https://github.com/TLCFEM/suanPan/pull/257)
 
 ## version 3.6
 

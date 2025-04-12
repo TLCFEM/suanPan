@@ -42,7 +42,7 @@ protected:
 
     int direct_solve(Mat<T>& X, const Mat<T>& B) override { return this->direct_solve(X, Mat<T>(B)); }
 
-    podarray<int> pivot;
+    podarray<blas_int> pivot;
     podarray<float> s_memory; // float storage used in mixed precision algorithm
 
     std::unique_ptr<T[]> memory = nullptr;
@@ -56,13 +56,16 @@ protected:
 public:
     DenseMat(const uword in_rows, const uword in_cols, const uword in_elem)
         : MetaMat<T>(in_rows, in_cols, in_elem)
-        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { DenseMat::zeros(); }
+        , memory(new T[this->n_elem]) {
+        if(in_elem > std::numeric_limits<la_it>::max()) throw std::runtime_error("matrix size exceeds limit, please enable 64-bit indexing");
+        DenseMat::zeros();
+    }
 
     DenseMat(const DenseMat& old_mat)
         : MetaMat<T>(old_mat)
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
-        , memory(std::unique_ptr<T[]>(new T[this->n_elem])) { suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
+        , memory(new T[this->n_elem]) { suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
 
     DenseMat(DenseMat&&) noexcept = delete;
     DenseMat& operator=(const DenseMat&) = delete;
@@ -80,12 +83,6 @@ public:
         T max_value = T(1);
         for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
         return max_value;
-    }
-
-    [[nodiscard]] Col<T> diag() const override {
-        Col<T> diag_vec(std::min(this->n_rows, this->n_cols), fill::none);
-        suanpan::for_each(diag_vec.n_elem, [&](const uword I) { diag_vec(I) = this->operator()(I, I); });
-        return diag_vec;
     }
 
     [[nodiscard]] const T* memptr() const override { return memory.get(); }
@@ -119,11 +116,10 @@ public:
         arrayops::inplace_mul(memptr(), value, this->n_elem);
     }
 
-    [[nodiscard]] int sign_det() const override {
-        if(IterativeSolver::NONE != this->setting.iterative_solver) throw invalid_argument("analysis requires the sign of determinant but iterative solver does not support it");
-        auto det_sign = 1;
-        for(unsigned I = 0; I < pivot.n_elem; ++I) if((this->operator()(I, I) < T(0)) ^ (static_cast<int>(I) + 1 != pivot(I))) det_sign = -det_sign;
-        return det_sign;
+    void allreduce() override {
+#ifdef SUANPAN_DISTRIBUTED
+        comm_world.allreduce(mpl::plus<T>(), memory.get(), mpl::contiguous_layout<T>{this->n_elem});
+#endif
     }
 };
 

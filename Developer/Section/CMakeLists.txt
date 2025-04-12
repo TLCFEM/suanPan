@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.18)
 
 project(SectionExample CXX)
 
@@ -14,13 +14,6 @@ if (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-U,_SUANPAN_PRINT")
 endif ()
 
-if (COMPILER_IDENTIFIER MATCHES "vs")
-    link_libraries(libopenblas)
-else ()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-    link_libraries(openblas)
-endif ()
-
 link_libraries(suanPan)
 
 add_library(${PROJECT_NAME} SHARED
@@ -30,5 +23,7 @@ add_library(${PROJECT_NAME} SHARED
         ../../Section/Section.cpp
         ../../Include/fmt/src/format.cc
 )
+
+add_dependencies(SectionExample suanPan)
 
 message(STATUS "SectionExample CXX_FLAGS: ${CMAKE_CXX_FLAGS}")

@@ -1,10 +1,8 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.18)
 
 project(superlu C)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
-
-include(../../Driver.cmake)
 
 file(GLOB SUPERLU_SRC "*.c")
 

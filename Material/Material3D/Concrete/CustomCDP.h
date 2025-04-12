@@ -52,8 +52,8 @@ class CustomCDP final : public NonlinearCDP {
 
     ResourceHolder<Expression> t_expression, c_expression;
 
-    [[nodiscard]] vec6 compute_tension_backbone(double) const override;
-    [[nodiscard]] vec6 compute_compression_backbone(double) const override;
+    [[nodiscard]] pod6 compute_tension_backbone(double) const override;
+    [[nodiscard]] pod6 compute_compression_backbone(double) const override;
 
 public:
     CustomCDP(

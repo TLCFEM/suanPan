@@ -15,7 +15,7 @@ cload 1 0 1 2 2 3
 
 step static 1
 set sparse_mat 1
-set system_solver FGMRES
+# set system_solver FGMRES
 
 converger RelIncreDisp 1 1E-8 20 1
 

@@ -22,7 +22,7 @@ template<sp_d T> op_add<T> operator+(const shared_ptr<MetaMat<T>>& A, const shar
 
 template<sp_d T> op_scale<T> operator*(const T value, const shared_ptr<MetaMat<T>>& M) { return op_scale<T>(value, M); }
 
-template<sp_d T> op_scale<T> operator*(const T value, op_add<T>&& M) { return op_scale<T>(value, std::forward<op_add<T>>(M)); }
+template<sp_d T> op_scale<T> operator*(const T value, op_add<T>&& M) { return op_scale<T>(value, std::move(M)); }
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& operator+=(const shared_ptr<MetaMat<T>>& M, const op_scale<T>& A) {
     M->operator+=(A);
@@ -38,7 +38,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, unique_ptr<Meta
     if(nullptr == M) return nullptr;
 
     M->operator*=(value);
-    return std::forward<unique_ptr<MetaMat<T>>>(M);
+    return std::move(M);
 }
 
 //template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, const shared_ptr<MetaMat<T>>& M) {
@@ -66,12 +66,12 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& operator*=(const shared_ptr<MetaM
 
 template<sp_d T> unique_ptr<MetaMat<T>> operator+(const shared_ptr<MetaMat<T>>& A, unique_ptr<MetaMat<T>>&& B) {
     B->operator+=(A);
-    return std::forward<unique_ptr<MetaMat<T>>>(B);
+    return std::move(B);
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> operator+(unique_ptr<MetaMat<T>>&& A, unique_ptr<MetaMat<T>>&& B) {
-    A->operator+=(std::forward<unique_ptr<MetaMat<T>>>(B));
-    return std::forward<unique_ptr<MetaMat<T>>>(A);
+    A->operator+=(std::move(B));
+    return std::move(A);
 }
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& operator+=(const shared_ptr<MetaMat<T>>& M, const shared_ptr<MetaMat<T>>& A) {
@@ -80,7 +80,7 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& operator+=(const shared_ptr<MetaM
 }
 
 template<sp_d T> const shared_ptr<MetaMat<T>>& operator+=(const shared_ptr<MetaMat<T>>& M, unique_ptr<MetaMat<T>>&& A) {
-    M->operator+=(std::forward<unique_ptr<MetaMat<T>>>(A));
+    M->operator+=(std::move(A));
     return M;
 }
 

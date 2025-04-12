@@ -34,7 +34,7 @@ template<sp_d T> class Factory;
 using LongFactory = Factory<double>;
 
 class FEAST final : public Solver {
-    static char UPLO;
+    static constexpr char UPLO = 'F';
 
     const bool quadratic = false;
 

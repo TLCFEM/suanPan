@@ -19,34 +19,34 @@
 #include <Domain/DomainBase.h>
 #include <Toolbox/utility.h>
 
-vec6 CustomCDP::compute_tension_backbone(const double kappa) const {
-    vec6 response;
+pod6 CustomCDP::compute_tension_backbone(const double kappa) const {
+    pod6 response;
     const auto t_response = t_expression->evaluate(kappa);
-    for(auto I = 0llu; I < t_response.n_elem; ++I) response(I) = t_response(I);
+    for(auto I = 0llu; I < t_response.n_elem; ++I) response[I] = t_response(I);
 
-    if(response(1) < 0.) {
-        response(1) = -response(1);
-        response(4) = -response(4);
+    if(response[1] < 0.) {
+        response[1] = -response[1];
+        response[4] = -response[4];
     }
-    if(response(2) < 0.) {
-        response(2) = -response(2);
-        response(5) = -response(5);
+    if(response[2] < 0.) {
+        response[2] = -response[2];
+        response[5] = -response[5];
     }
     return response;
 }
 
-vec6 CustomCDP::compute_compression_backbone(const double kappa) const {
-    vec6 response;
+pod6 CustomCDP::compute_compression_backbone(const double kappa) const {
+    pod6 response;
     const auto c_response = c_expression->evaluate(kappa);
-    for(auto I = 0llu; I < c_response.n_elem; ++I) response(I) = c_response(I);
+    for(auto I = 0llu; I < c_response.n_elem; ++I) response[I] = c_response(I);
 
-    if(response(1) > 0.) {
-        response(1) = -response(1);
-        response(4) = -response(4);
+    if(response[1] > 0.) {
+        response[1] = -response[1];
+        response[4] = -response[4];
     }
-    if(response(2) > 0.) {
-        response(2) = -response(2);
-        response(5) = -response(5);
+    if(response[2] > 0.) {
+        response[2] = -response[2];
+        response[5] = -response[5];
     }
     return response;
 }

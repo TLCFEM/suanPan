@@ -16,8 +16,6 @@
  ******************************************************************************/
 
 #include <Toolbox/argument.h>
-#include <suanPan.h>
-#include <lis/lislib.h>
 
 #ifdef SUANPAN_WIN
 #include <Windows.h>
@@ -27,6 +25,10 @@
 extern "C" void mkl_free_buffers();
 #else
 void mkl_free_buffers() {}
+#endif
+
+#ifdef SUANPAN_DISTRIBUTED
+#include <ezp/ezp/abstract/traits.hpp>
 #endif
 
 // ReSharper disable once CppParameterMayBeConst
@@ -39,7 +41,11 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    lis_initialize(nullptr, nullptr);
+#ifdef SUANPAN_DISTRIBUTED
+    ezp::blacs_env<>::do_not_manage_mpi();
+
+    if(1 == comm_size) suanpan_highlight("The current MPI environment only has one process.\n");
+#endif
 
 #ifdef SUANPAN_DEBUG
     argument_parser(argc, argv);
@@ -47,8 +53,6 @@ int main(int argc, char** argv) {
     try { argument_parser(argc, argv); }
     catch(const std::bad_alloc&) { suanpan_fatal("The current platform does not have sufficient memory to perform the analysis.\n"); } catch(const std::exception& e) { suanpan_fatal("Some unexpected error happens: {}, please file a bug report via https://github.com/TLCFEM/suanPan/issues.\n", e.what()); }
 #endif
-
-    lis_finalize();
 
     return std::atexit(mkl_free_buffers);
 }

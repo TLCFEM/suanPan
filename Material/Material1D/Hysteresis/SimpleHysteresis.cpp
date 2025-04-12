@@ -17,8 +17,8 @@
 
 #include "SimpleHysteresis.h"
 
-podarray<double> SimpleHysteresis::compute_compression_inner(const double t_strain) const {
-    podarray<double> response(2);
+pod2 SimpleHysteresis::compute_compression_inner(const double t_strain) const {
+    pod2 response;
 
     auto& reverse_c_strain = trial_history(2);  // unloading point strain compression side
     auto& reverse_c_stress = trial_history(3);  // unloading point stress compression side
@@ -28,23 +28,23 @@ podarray<double> SimpleHysteresis::compute_compression_inner(const double t_stra
     auto& residual_t_strain = trial_history(7); // residual strain in compression unloading path
 
     if(t_strain < residual_c_strain) {
-        response(1) = reverse_c_stress / (reverse_c_strain - residual_c_strain);
-        response(0) = response(1) * (t_strain - residual_c_strain);
+        response[1] = reverse_c_stress / (reverse_c_strain - residual_c_strain);
+        response[0] = response[1] * (t_strain - residual_c_strain);
     }
     else if(const auto middle_strain = (1. - middle_point) * residual_t_strain + middle_point * reverse_t_strain; t_strain < middle_strain) {
-        response(1) = middle_point * reverse_t_stress / (middle_strain - residual_c_strain);
-        response(0) = response(1) * (t_strain - residual_c_strain);
+        response[1] = middle_point * reverse_t_stress / (middle_strain - residual_c_strain);
+        response[0] = response[1] * (t_strain - residual_c_strain);
     }
     else {
-        response(1) = reverse_t_stress / (reverse_t_strain - residual_t_strain);
-        response(0) = response(1) * (t_strain - residual_t_strain);
+        response[1] = reverse_t_stress / (reverse_t_strain - residual_t_strain);
+        response[0] = response[1] * (t_strain - residual_t_strain);
     }
 
     return response;
 }
 
-podarray<double> SimpleHysteresis::compute_tension_inner(const double t_strain) const {
-    podarray<double> response(2);
+pod2 SimpleHysteresis::compute_tension_inner(const double t_strain) const {
+    pod2 response;
 
     auto& reverse_c_strain = trial_history(2);  // unloading point strain compression side
     auto& reverse_c_stress = trial_history(3);  // unloading point stress compression side
@@ -54,16 +54,16 @@ podarray<double> SimpleHysteresis::compute_tension_inner(const double t_strain) 
     auto& residual_t_strain = trial_history(7); // residual strain in compression unloading path
 
     if(t_strain > residual_t_strain) {
-        response(1) = reverse_t_stress / (reverse_t_strain - residual_t_strain);
-        response(0) = response(1) * (t_strain - residual_t_strain);
+        response[1] = reverse_t_stress / (reverse_t_strain - residual_t_strain);
+        response[0] = response[1] * (t_strain - residual_t_strain);
     }
     else if(const auto middle_strain = (1. - middle_point) * residual_c_strain + middle_point * reverse_c_strain; t_strain > middle_strain) {
-        response(1) = middle_point * reverse_c_stress / (middle_strain - residual_t_strain);
-        response(0) = response(1) * (t_strain - residual_t_strain);
+        response[1] = middle_point * reverse_c_stress / (middle_strain - residual_t_strain);
+        response[0] = response[1] * (t_strain - residual_t_strain);
     }
     else {
-        response(1) = reverse_c_stress / (reverse_c_strain - residual_c_strain);
-        response(0) = response(1) * (t_strain - residual_c_strain);
+        response[1] = reverse_c_stress / (reverse_c_strain - residual_c_strain);
+        response[0] = response[1] * (t_strain - residual_c_strain);
     }
 
     return response;
@@ -81,11 +81,11 @@ int SimpleHysteresis::update_trial_status(const vec& t_strain) {
     if(current_history.is_empty() || !any(current_history)) {
         current_history.zeros(8);
         auto point = compute_compression_initial_reverse();
-        current_history(2) = point(0);
-        current_history(3) = point(1);
+        current_history(2) = point[0];
+        current_history(3) = point[1];
         point = compute_tension_initial_reverse();
-        current_history(4) = point(0);
-        current_history(5) = point(1);
+        current_history(4) = point[0];
+        current_history(5) = point[1];
         initial_history = current_history;
     }
     else if(current_history.size() != 8) {
@@ -103,7 +103,7 @@ int SimpleHysteresis::update_trial_status(const vec& t_strain) {
     auto& residual_c_strain = trial_history(6); // residual strain in compression unloading path
     auto& residual_t_strain = trial_history(7); // residual strain in compression unloading path
 
-    podarray<double> response;
+    pod2 response;
 
     if(Status::NONE == current_flag) {
         if(incre_strain(0) > 0.) {
@@ -178,8 +178,8 @@ int SimpleHysteresis::update_trial_status(const vec& t_strain) {
         }
     }
 
-    trial_stress = response(0);
-    trial_stiffness = response(1);
+    trial_stress = response[0];
+    trial_stiffness = response[1];
 
     suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
 

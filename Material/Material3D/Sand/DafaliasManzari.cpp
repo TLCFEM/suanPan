@@ -116,7 +116,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     if(norm_eta + m * p < 0.) {
         trial_stress = s + p * tensor::unit_tensor2;
 
-        mat left(7, 6, fill::none), right;
+        mat::fixed<7, 6> left(fill::none), right(fill::none);
 
         left.row(sa) = pr * (incre_ev * pgpe + g) * tensor::unit_tensor2.t();
         left.rows(sb) = 2. * pgpe * incre_ed * tensor::unit_tensor2.t() + 2. * g * unit_dev_tensor;
@@ -330,7 +330,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     trial_stress = s + p * tensor::unit_tensor2;
 
-    mat left(20, 6, fill::none), right;
+    mat::fixed<20, 6> left(fill::none), right(fill::none);
 
     left.row(si).zeros();
     left.row(sj) = pr * (pgpe * (incre_ev - gamma * d) + g - g * gamma * pdpe) * tensor::unit_tensor2.t();
