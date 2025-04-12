@@ -51,7 +51,7 @@ using std::ifstream;
 using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 7;
+constexpr auto SUANPAN_MINOR = 8;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Canopus";
 
