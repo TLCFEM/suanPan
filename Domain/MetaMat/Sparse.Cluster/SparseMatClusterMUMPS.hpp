@@ -50,7 +50,7 @@ public:
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatBaseClusterMUMPS>(*this); }
 
-    [[nodiscard]] int sign_det() const override { return solver.det().real() > T(0) ? 1 : -1; }
+    [[nodiscard]] int sign_det() const override { return solver.sign_det(); }
 };
 
 #pragma GCC diagnostic push
