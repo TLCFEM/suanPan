@@ -60,6 +60,7 @@ template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sy
 
     solver.icntl_printing_level(SUANPAN_VERBOSE ? 2 : 0);
     solver.icntl_determinant_computation(1);
+    solver.icntl_symmetric_permutation(4); // use pord, metis seems to be slow
 
     if(this->factored) info = solver.solve({X.n_rows, X.n_cols, X.memptr()});
     else {
