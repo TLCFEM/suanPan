@@ -1028,18 +1028,24 @@ namespace {
                 t_step->set_system_solver(SolverType::LIS);
                 t_step->set_lis_option(command);
             }
-            else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
+            else if(is_equal(value, "MUMPS")) {
+                t_step->set_system_solver(SolverType::MUMPS);
+                t_step->set_option(command);
+            }
 #ifdef SUANPAN_CUDA
             else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
 #ifdef SUANPAN_MAGMA
             else if(is_equal(value, "MAGMA")) {
                 t_step->set_system_solver(SolverType::MAGMA);
-                t_step->set_magma_option(command);
+                t_step->set_option(command);
             }
 #endif
 #endif
 #ifdef SUANPAN_MKL
-            else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);
+            else if(is_equal(value, "PARDISO")) {
+                t_step->set_system_solver(SolverType::PARDISO);
+                t_step->set_option(command);
+            }
             else if(is_equal(value, "FGMRES")) t_step->set_system_solver(SolverType::FGMRES);
 #endif
             else
@@ -1055,12 +1061,18 @@ namespace {
                 t_step->set_sub_system_solver(SolverType::LIS);
                 t_step->set_lis_option(command);
             }
-            else if(is_equal(value, "MUMPS")) t_step->set_sub_system_solver(SolverType::MUMPS);
+            else if(is_equal(value, "MUMPS")) {
+                t_step->set_sub_system_solver(SolverType::MUMPS);
+                t_step->set_option(command);
+            }
 #ifdef SUANPAN_CUDA
             else if(is_equal(value, "CUDA")) t_step->set_sub_system_solver(SolverType::CUDA);
 #endif
 #ifdef SUANPAN_MKL
-            else if(is_equal(value, "PARDISO")) t_step->set_sub_system_solver(SolverType::PARDISO);
+            else if(is_equal(value, "PARDISO")) {
+                t_step->set_sub_system_solver(SolverType::PARDISO);
+                t_step->set_option(command);
+            }
             else if(is_equal(value, "FGMRES")) t_step->set_sub_system_solver(SolverType::FGMRES);
 #endif
             else

@@ -115,7 +115,7 @@ public:
     void set_tolerance(double);
     void set_refinement(std::uint8_t);
     void set_lis_option(istringstream&);
-    void set_magma_option(istringstream&);
+    void set_option(istringstream&);
 
     [[nodiscard]] double get_ini_step_size() const;
     [[nodiscard]] double get_min_step_size() const;

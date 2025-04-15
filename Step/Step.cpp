@@ -142,7 +142,7 @@ void Step::set_refinement(const std::uint8_t T) { system_setting.iterative_refin
 
 void Step::set_lis_option(istringstream& T) { system_setting.set_lis_option(T); }
 
-void Step::set_magma_option(istringstream& T) { system_setting.set_magma_option(T); }
+void Step::set_option(istringstream& T) { system_setting.set_option(T); }
 
 double Step::get_ini_step_size() const { return ini_step_size; }
 

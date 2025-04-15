@@ -31,7 +31,7 @@
 
 #include "../SparseMat.hpp"
 
-#include <ezp/ezp/mumps.hpp>
+#include <ezp/ezp/mumps.parser.hpp>
 
 template<sp_d T, ezp::symmetric_pattern sym> class SparseMatBaseClusterMUMPS final : public SparseMat<T> {
     ezp::mumps<T, int> solver{sym, ezp::no_host};
@@ -61,6 +61,7 @@ template<sp_d T, ezp::symmetric_pattern sym> int SparseMatBaseClusterMUMPS<T, sy
     solver.icntl_printing_level(SUANPAN_VERBOSE ? 2 : 0);
     solver.icntl_determinant_computation(1);
     solver.icntl_symmetric_permutation(4); // use pord, metis seems to be slow
+    ezp::mumps_set(this->setting.option, solver);
 
     if(this->factored) info = solver.solve({X.n_rows, X.n_cols, X.memptr()});
     else {
