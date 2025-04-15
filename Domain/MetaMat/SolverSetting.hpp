@@ -31,7 +31,7 @@ template<sp_d data_t> struct SolverSetting {
     std::uint8_t iterative_refinement = 5;
     Precision precision = Precision::FULL;
 
-    auto set_magma_option(istringstream& command) { option = get_remaining(command); }
+    auto set_option(istringstream& command) { option = get_remaining(command); }
     auto set_lis_option(istringstream& command) {
         static constexpr auto max_length = 1024;
 
