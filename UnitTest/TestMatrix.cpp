@@ -178,8 +178,6 @@ namespace {
 #endif
 
 #ifdef SUANPAN_CUDA
-    template<> BandMatCUDA<double> create_new(const u64 N) { return {N, 3, 3}; }
-
     template<> FullMatCUDA<double> create_new(const u64 N) { return {N, N}; }
 
     template<> FullMatCUDA<float> create_new(const u64 N) { return {N, N}; }
@@ -189,19 +187,19 @@ namespace {
     template<> SparseMatCUDA<float> create_new(const u64 N) { return {N, N}; }
 
 #ifdef SUANPAN_MAGMA
-    template<> BandMatMAGMA<double> create_new(const u64 N) { return {N, 3, 3}; }
+    template<> BandMatMAGMA<double> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
 
-    template<> BandMatMAGMA<float> create_new(const u64 N) { return {N, 3, 3}; }
+    template<> BandMatMAGMA<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
 
     template<> SparseMatMAGMA<double> create_new(const u64 N) {
         SparseMatMAGMA<double> t_mat{N, N};
-        t_mat.set_solver_setting({.option = "--verbose 1"});
+        t_mat.set_solver_setting({.option = "--verbose 1 --precond ILU --solver GMRES"});
         return t_mat;
     }
 
     template<> SparseMatMAGMA<float> create_new(const u64 N) {
         SparseMatMAGMA<float> t_mat{N, N};
-        t_mat.set_solver_setting({.option = "--verbose 1"});
+        t_mat.set_solver_setting({.option = "--verbose 1 --precond ILU --solver GMRES"});
         return t_mat;
     }
 #endif
@@ -237,7 +235,6 @@ namespace {
 #ifdef SUANPAN_CUDA
         else if(std::is_same_v<FullMatCUDA<ET>, T>) title = "Full CUDA ";
         else if(std::is_same_v<SparseMatCUDA<ET>, T>) title = "Sparse CUDA ";
-        else if(std::is_same_v<BandMatCUDA<ET>, T>) title = "Band CUDA ";
 #ifdef SUANPAN_MAGMA
         else if(std::is_same_v<BandMatMAGMA<ET>, T>) title = "Band Magma ";
         else if(std::is_same_v<SparseMatMAGMA<ET>, T>) title = "Sparse Magma ";
@@ -323,20 +320,12 @@ TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
 #endif
 #ifdef SUANPAN_CUDA
         benchmark_mat_setup<SparseMatCUDA<double>, double>(I);
-        benchmark_mat_setup<BandMatCUDA<double>, double>(I);
 #endif
     }
 #ifdef SUANPAN_CUDA
     for(auto I = 0x0100; I < 0x2000; I *= 2) benchmark_mat_setup<FullMatCUDA<double>, double>(I);
 #endif
 }
-
-#ifdef SUANPAN_CUDA
-TEST_CASE("Large BandMatCUDA", "[Matrix.Benchmark]") {
-    benchmark_mat_setup<BandMatCUDA<double>, double>(0x1000);
-    benchmark_mat_setup<BandMat<double>, double>(0x1000);
-}
-#endif
 
 TEST_CASE("Large Mixed Precision", "[Matrix.Benchmark]") {
     for(auto I = 0x400; I < 0x500; I *= 2) {
@@ -397,8 +386,6 @@ TEST_CASE("SparseMatClusterPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_s
 #endif
 
 #ifdef SUANPAN_CUDA
-TEST_CASE("BandMatCUDA", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatCUDA<double>>); }
-
 TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatCUDA<double>>); }
 
 TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatCUDA<float>>); }
@@ -413,11 +400,13 @@ TEST_CASE("SparseMatMAGMA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(c
 TEST_CASE("SparseMatMAGMAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatMAGMA<float>>); }
 
 TEST_CASE("Large CUDA Sparse", "[Matrix.Benchmark]") {
-    benchmark_mat_setup<BandSymmMat<double>, double>(0x2976);
-    benchmark_mat_setup<BandMatMAGMA<double>, double>(0x2976);
-    benchmark_mat_setup<SparseMatPARDISO<double>, double>(0x400);
-    benchmark_mat_setup<SparseMatMAGMA<double>, double>(0x400);
-    benchmark_mat_setup<SparseMatMAGMA<float>, float>(0x400);
+    for(auto I = 0x4000; I < 0x10000; I *= 2) {
+        benchmark_mat_setup<BandSymmMat<double>, double>(I);
+        benchmark_mat_setup<BandMatMAGMA<double>, double>(I);
+        benchmark_mat_setup<SparseMatPARDISO<double>, double>(I);
+        benchmark_mat_setup<SparseMatMAGMA<double>, double>(I);
+        benchmark_mat_setup<SparseMatCUDA<double>, double>(I);
+    }
 }
 #endif
 #endif
