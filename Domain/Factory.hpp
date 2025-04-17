@@ -85,7 +85,7 @@ template<sp_d T> class Factory final {
     SolverType sub_solver = SolverType::LAPACK;
     SolverSetting<T> setting{};
 
-    T error = T(0); // error produced by certain solvers
+    T error{0}; // error produced by certain solvers
 
     Col<T> ninja; // the result from A*X=B
     Col<T> sushi; // modified right-hand side B
@@ -102,16 +102,16 @@ template<sp_d T> class Factory final {
     SpCol<T> trial_constraint_resistance;
     SpCol<T> current_constraint_resistance;
 
-    T trial_time = T(0);   // global trial (pseudo) time
-    T incre_time = T(0);   // global incremental (pseudo) time
-    T current_time = T(0); // global current (pseudo) time
-    T pre_time = T(0);     // global previous (pseudo) time
+    T trial_time{0};   // global trial (pseudo) time
+    T incre_time{0};   // global incremental (pseudo) time
+    T current_time{0}; // global current (pseudo) time
+    T pre_time{0};     // global previous (pseudo) time
 
-    T strain_energy = T(0);
-    T kinetic_energy = T(0);
-    T viscous_energy = T(0);
-    T nonviscous_energy = T(0);
-    T complementary_energy = T(0);
+    T strain_energy{0};
+    T kinetic_energy{0};
+    T viscous_energy{0};
+    T nonviscous_energy{0};
+    T complementary_energy{0};
     Col<T> momentum;
 
     Col<T> trial_load_factor;      // global trial load factor
@@ -756,10 +756,7 @@ template<sp_d T> std::pair<unsigned, unsigned> Factory<T>::get_bandwidth() const
 
 template<sp_d T> void Factory<T>::update_reference_size() { n_rfld = static_cast<unsigned>(reference_dof.size()); }
 
-template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
-    if(S == n_rfld) return;
-    n_rfld = S;
-}
+template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) { n_rfld = S; }
 
 template<sp_d T> unsigned Factory<T>::get_reference_size() const { return n_rfld; }
 
@@ -1501,8 +1498,8 @@ template<sp_d T> void Factory<T>::print() const {
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
-#ifdef SUANPAN_DISTRIBUTED
     switch(storage_type) {
+#ifdef SUANPAN_DISTRIBUTED
     case StorageScheme::FULL:
         return std::make_unique<FullMatCluster<T>>(n_size, n_size);
     case StorageScheme::SYMMPACK:
@@ -1523,11 +1520,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #endif
         if(contain_solver_type(SolverType::LIS)) return std::make_unique<SparseMatClusterLIS<T>>(n_size, n_size, n_elem);
         return std::make_unique<SparseSymmMatClusterMUMPS<T>>(n_size, n_size, n_elem);
-    default:
-        throw invalid_argument("need a proper storage scheme");
-    }
 #else
-    switch(storage_type) {
     case StorageScheme::FULL:
 #ifdef SUANPAN_CUDA
         if(contain_solver_type(SolverType::CUDA)) return std::make_unique<FullMatCUDA<T>>(n_size, n_size);
@@ -1562,10 +1555,10 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #endif
 #endif
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+#endif
     default:
         throw invalid_argument("need a proper storage scheme");
     }
-#endif
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_matrix_container() {
