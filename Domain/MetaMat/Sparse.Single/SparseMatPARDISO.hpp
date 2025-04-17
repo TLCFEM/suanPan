@@ -115,7 +115,7 @@ template<sp_d T, la_it MT> int SparseMatBasePARDISO<T, MT>::direct_solve(Mat<T>&
 
     X.set_size(B.n_rows, B.n_cols);
 
-    const la_it nrhs{static_cast<la_it>(B.n_cols)};
+    const auto nrhs{static_cast<la_it>(B.n_cols)};
 
     la_it info{-1};
     pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_SOLVE, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), X.memptr(), &info);
