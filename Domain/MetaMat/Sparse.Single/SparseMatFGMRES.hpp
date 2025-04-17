@@ -69,7 +69,7 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
 
     work.zeros((2 * R + 1) * N + R * (R + 9) / 2 + 1);
 
-    X = B;
+    X.zeros(B.n_rows, B.n_cols);
 
     const auto precond = this->triplet_mat.diag();
 
