@@ -31,10 +31,10 @@
 #ifndef FACTORY_HPP
 #define FACTORY_HPP
 
-#include <future>
-#include <Toolbox/container.h>
-#include <Element/MappingDOF.h>
 #include <Domain/MetaMat/MetaMat>
+#include <Element/MappingDOF.h>
+#include <Toolbox/container.h>
+#include <future>
 
 enum class AnalysisType {
     NONE,
@@ -1166,27 +1166,49 @@ template<sp_d T> void Factory<T>::commit_pre_status() {
 
 template<sp_d T> void Factory<T>::commit_pre_time() { pre_time = current_time; }
 
-template<sp_d T> void Factory<T>::commit_pre_load_factor() { if(!current_load_factor.is_empty()) pre_load_factor = current_load_factor; }
+template<sp_d T> void Factory<T>::commit_pre_load_factor() {
+    if(!current_load_factor.is_empty()) pre_load_factor = current_load_factor;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_load() { if(!current_load.is_empty()) pre_load = current_load; }
+template<sp_d T> void Factory<T>::commit_pre_load() {
+    if(!current_load.is_empty()) pre_load = current_load;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_settlement() { if(!current_settlement.is_empty()) pre_settlement = current_settlement; }
+template<sp_d T> void Factory<T>::commit_pre_settlement() {
+    if(!current_settlement.is_empty()) pre_settlement = current_settlement;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_resistance() { if(!current_resistance.is_empty()) pre_resistance = current_resistance; }
+template<sp_d T> void Factory<T>::commit_pre_resistance() {
+    if(!current_resistance.is_empty()) pre_resistance = current_resistance;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_damping_force() { if(!current_damping_force.is_empty()) pre_damping_force = current_damping_force; }
+template<sp_d T> void Factory<T>::commit_pre_damping_force() {
+    if(!current_damping_force.is_empty()) pre_damping_force = current_damping_force;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_nonviscous_force() { if(!current_nonviscous_force.is_empty()) pre_nonviscous_force = current_nonviscous_force; }
+template<sp_d T> void Factory<T>::commit_pre_nonviscous_force() {
+    if(!current_nonviscous_force.is_empty()) pre_nonviscous_force = current_nonviscous_force;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_inertial_force() { if(!current_inertial_force.is_empty()) pre_inertial_force = current_inertial_force; }
+template<sp_d T> void Factory<T>::commit_pre_inertial_force() {
+    if(!current_inertial_force.is_empty()) pre_inertial_force = current_inertial_force;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_displacement() { if(!current_displacement.is_empty()) pre_displacement = current_displacement; }
+template<sp_d T> void Factory<T>::commit_pre_displacement() {
+    if(!current_displacement.is_empty()) pre_displacement = current_displacement;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_velocity() { if(!current_velocity.is_empty()) pre_velocity = current_velocity; }
+template<sp_d T> void Factory<T>::commit_pre_velocity() {
+    if(!current_velocity.is_empty()) pre_velocity = current_velocity;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_acceleration() { if(!current_acceleration.is_empty()) pre_acceleration = current_acceleration; }
+template<sp_d T> void Factory<T>::commit_pre_acceleration() {
+    if(!current_acceleration.is_empty()) pre_acceleration = current_acceleration;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_temperature() { if(!current_temperature.is_empty()) pre_temperature = current_temperature; }
+template<sp_d T> void Factory<T>::commit_pre_temperature() {
+    if(!current_temperature.is_empty()) pre_temperature = current_temperature;
+}
 
 template<sp_d T> void Factory<T>::clear_status() {
     access::rw(initialized) = false;
@@ -1393,15 +1415,25 @@ template<sp_d T> void Factory<T>::clear_eigen() {
     if(!eigenvector.is_empty()) eigenvector.zeros();
 }
 
-template<sp_d T> void Factory<T>::clear_mass() { if(global_mass != nullptr) global_mass->zeros(); }
+template<sp_d T> void Factory<T>::clear_mass() {
+    if(global_mass != nullptr) global_mass->zeros();
+}
 
-template<sp_d T> void Factory<T>::clear_damping() { if(global_damping != nullptr) global_damping->zeros(); }
+template<sp_d T> void Factory<T>::clear_damping() {
+    if(global_damping != nullptr) global_damping->zeros();
+}
 
-template<sp_d T> void Factory<T>::clear_nonviscous() { if(global_nonviscous != nullptr) global_nonviscous->zeros(); }
+template<sp_d T> void Factory<T>::clear_nonviscous() {
+    if(global_nonviscous != nullptr) global_nonviscous->zeros();
+}
 
-template<sp_d T> void Factory<T>::clear_stiffness() { if(global_stiffness != nullptr) global_stiffness->zeros(); }
+template<sp_d T> void Factory<T>::clear_stiffness() {
+    if(global_stiffness != nullptr) global_stiffness->zeros();
+}
 
-template<sp_d T> void Factory<T>::clear_geometry() { if(global_geometry != nullptr) global_geometry->zeros(); }
+template<sp_d T> void Factory<T>::clear_geometry() {
+    if(global_geometry != nullptr) global_geometry->zeros();
+}
 
 template<sp_d T> void Factory<T>::clear_auxiliary() {
     n_mpc = 0;
@@ -1442,8 +1474,11 @@ template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, cons
 template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) {
     if(EM.is_empty()) return;
 
-    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) for(const auto [g_row, g_col, l_row, l_col] : MAP) GM->unsafe_at(g_row, g_col) += EM(l_row, l_col);
-    else for(auto I = 0llu; I < EI.n_elem; ++I) for(auto J = 0llu; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
+    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type)
+        for(const auto [g_row, g_col, l_row, l_col] : MAP) GM->unsafe_at(g_row, g_col) += EM(l_row, l_col);
+    else
+        for(auto I = 0llu; I < EI.n_elem; ++I)
+            for(auto J = 0llu; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
 }
 
 template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_mass, EM, EI, MAP); }
