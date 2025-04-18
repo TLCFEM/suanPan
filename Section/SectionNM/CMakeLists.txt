@@ -1,16 +1,16 @@
-set(SNM
-        SectionNM/SectionNM.cpp
-        SectionNM/SectionNM2D.cpp
-        SectionNM/SectionNM3D.cpp
-        SectionNM/NonlinearNM.cpp
-        SectionNM/LinearHardeningNM.cpp
-        SectionNM/VAFNM.cpp
-        SectionNM/SurfaceNM2D.cpp
-        SectionNM/SurfaceNM3D.cpp
-        SectionNM/NM2D1.cpp
-        SectionNM/NM2D2.cpp
-        SectionNM/NM2D3.cpp
-        SectionNM/NM3D1.cpp
-        SectionNM/NM3D2.cpp
-        SectionNM/NM3D3.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        LinearHardeningNM.cpp
+        NM2D1.cpp
+        NM2D2.cpp
+        NM2D3.cpp
+        NM3D1.cpp
+        NM3D2.cpp
+        NM3D3.cpp
+        NonlinearNM.cpp
+        SectionNM.cpp
+        SectionNM2D.cpp
+        SectionNM3D.cpp
+        SurfaceNM2D.cpp
+        SurfaceNM3D.cpp
+        VAFNM.cpp
 )

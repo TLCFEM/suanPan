@@ -1,10 +1,10 @@
-set(Modifier
-        Modifier/ElementalLee.cpp
-        Modifier/ElementalModal.cpp
-        Modifier/ElementalNonviscous.cpp
-        Modifier/LinearViscosity.cpp
-        Modifier/LumpedScale.cpp
-        Modifier/LumpedSimple.cpp
-        Modifier/Modifier.cpp
-        Modifier/Rayleigh.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        ElementalLee.cpp
+        ElementalModal.cpp
+        ElementalNonviscous.cpp
+        LinearViscosity.cpp
+        LumpedScale.cpp
+        LumpedSimple.cpp
+        Modifier.cpp
+        Rayleigh.cpp
 )

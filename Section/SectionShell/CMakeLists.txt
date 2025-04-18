@@ -1,4 +1,4 @@
-set(SS
-        SectionShell/SectionShell.cpp
-        SectionShell/Homogeneous.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        Homogeneous.cpp
+        SectionShell.cpp
 )

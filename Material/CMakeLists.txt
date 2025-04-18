@@ -1,24 +1,13 @@
-cmake_minimum_required(VERSION 3.18)
+add_subdirectory(Material1D)
+add_subdirectory(Material2D)
+add_subdirectory(Material3D)
+add_subdirectory(MaterialOS)
+add_subdirectory(Special)
 
-project(Material)
-
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../Libs)
-
-include(Material1D/CMakeLists.txt)
-include(Material2D/CMakeLists.txt)
-include(Material3D/CMakeLists.txt)
-include(MaterialOS/CMakeLists.txt)
-include(Special/CMakeLists.txt)
-
-add_library(${PROJECT_NAME} STATIC
+target_sources(${PROJECT_NAME} PRIVATE
         ExternalMaterial.cpp
         Material.cpp
-        MaterialTester.cpp
         MaterialParser.cpp
         MaterialTemplate.cpp
-        ${M1D}
-        ${M2D}
-        ${M3D}
-        ${MOS}
-        ${MS}
+        MaterialTester.cpp
 )

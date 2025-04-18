@@ -1,11 +1,11 @@
-set(S3D
-        Section3D/Box3D.cpp
-        Section3D/Cell3D.cpp
-        Section3D/Circle3D.cpp
-        Section3D/CircularHollow3D.cpp
-        Section3D/Fibre3D.cpp
-        Section3D/ISection3D.cpp
-        Section3D/Rectangle3D.cpp
-        Section3D/Section3D.cpp
-        Section3D/TSection3D.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        Box3D.cpp
+        Cell3D.cpp
+        Circle3D.cpp
+        CircularHollow3D.cpp
+        Fibre3D.cpp
+        ISection3D.cpp
+        Rectangle3D.cpp
+        Section3D.cpp
+        TSection3D.cpp
 )
