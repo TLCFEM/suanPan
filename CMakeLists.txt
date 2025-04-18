@@ -436,14 +436,6 @@ add_executable(${PROJECT_NAME}
         Include/fmt/src/format.cc
         Include/whereami/whereami.c
         Include/catch/catch_amalgamated.cpp
-        Constraint/CMakeLists.txt
-        Database/CMakeLists.txt
-        Domain/CMakeLists.txt
-        Load/CMakeLists.txt
-        Recorder/CMakeLists.txt
-        Step/CMakeLists.txt
-        Toolbox/CMakeLists.txt
-        UnitTest/CMakeLists.txt
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
@@ -468,17 +460,18 @@ add_subdirectory(Constraint)
 add_subdirectory(Converger)
 add_subdirectory(Database)
 add_subdirectory(Domain)
-add_subdirectory(Element)
 add_subdirectory(Load)
-add_subdirectory(Material)
 add_subdirectory(Recorder)
-add_subdirectory(Section)
 add_subdirectory(Solver)
 add_subdirectory(Step)
 add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 
-target_link_libraries(${PROJECT_NAME} Element Material Section Solver)
+add_subdirectory(Element)
+add_subdirectory(Material)
+add_subdirectory(Section)
+
+target_link_libraries(${PROJECT_NAME} Element Material Section)
 
 if (FORTRAN_STATUS)
     message(STATUS "Linking additional amd arpack feast libraries.")
