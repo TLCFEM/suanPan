@@ -1032,7 +1032,8 @@ int Domain::initialize_reference() {
     // need to initialize it for updating of load factor
     const auto ref_dof = to_uvec(factory->get_reference_dof());
 
-    if(ref_dof.is_empty()) return SUANPAN_SUCCESS;
+    // eigenanalysis does not initialise displacement vectors
+    if(ref_dof.is_empty() || AnalysisType::EIGEN == factory->get_analysis_type()) return SUANPAN_SUCCESS;
 
     factory->initialize_settlement();
     // check in current displacement in case it is nonzero
