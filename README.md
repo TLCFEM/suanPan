@@ -57,13 +57,10 @@ The highlights of **suanPan** are
 - ✅ ***fast***, memory and thread safe
 - ✅ [shared memory](https://en.wikipedia.org/wiki/Shared_memory) parallelism support
 - ✅ [distributed memory](https://en.wikipedia.org/wiki/Distributed_memory) parallelism support
-- ✅ a rich collection of elements, material models, time integration methods, etc.
-- ✅ open source and easy to be extended
+- ✅ multi-architecture (`amd64` and `arm64`) [support](https://hub.docker.com/r/tlcfem/suanpan)
+- ✅ rich collection of elements, materials, time integration methods, etc.
+- ✅ open source and easy to extend
 - ✅ modern language features
-
-> [!IMPORTANT]
-> Both `amd64` and `arm64` architectures are supported.
-> Check details on [Docker Hub](https://hub.docker.com/r/tlcfem/suanpan).
 
 ## Quick Start
 
