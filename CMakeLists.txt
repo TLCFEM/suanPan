@@ -17,10 +17,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 include(CheckLanguage)
 check_language(Fortran)
 if (CMAKE_Fortran_COMPILER)
-    set(FORTRAN_STATUS TRUE)
     enable_language(Fortran)
-else ()
-    set(FORTRAN_STATUS FALSE)
 endif ()
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
@@ -105,8 +102,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
         set(COMPILER_IDENTIFIER "clang-mac")
         include_directories("/usr/local/include" "/usr/local/opt/llvm/include" "/usr/local/opt/libomp/include")
         link_directories("/usr/local/lib" "/usr/local/opt/llvm/lib" "/usr/local/opt/libomp/lib/")
-        message(STATUS "On macOS, make sure llvm and libomp are installed.")
-        message(STATUS "brew install llvm libomp")
+        message(STATUS "On macOS, make sure `llvm` and `libomp` are installed.")
     endif ()
 endif ()
 
@@ -174,7 +170,7 @@ if (SP_ENABLE_MKL)
     add_compile_definitions(SUANPAN_MKL)
     add_compile_definitions(EZP_MKL)
     # add_compile_definitions(ARMA_USE_MKL_ALLOC)
-elseif (FORTRAN_STATUS AND CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     message(WARNING "Since Intel compilers are used, why not enabling MKL?")
 else ()
     if (SP_ENABLE_64BIT_INDEXING)
@@ -433,18 +429,15 @@ endif ()
 
 add_executable(${PROJECT_NAME}
         suanPan.cpp
+        Include/catch/catch_amalgamated.cpp
         Include/fmt/src/format.cc
         Include/whereami/whereami.c
-        Include/catch/catch_amalgamated.cpp
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
 
-if (COMPILER_IDENTIFIER MATCHES "vs")
-    target_link_options(${PROJECT_NAME} PRIVATE /NODEFAULTLIB:LIBCMT)
-endif ()
-
 if (MSVC)
+    target_link_options(${PROJECT_NAME} PRIVATE "/NODEFAULTLIB:LIBCMT")
     target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
 elseif (MINGW)
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wa,-mbig-obj")
@@ -470,7 +463,7 @@ add_subdirectory(Step)
 add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 
-if (FORTRAN_STATUS)
+if (CMAKE_Fortran_COMPILER)
     message(STATUS "Linking additional amd arpack feast libraries.")
     add_subdirectory(Toolbox/amd-src)
     add_subdirectory(Toolbox/arpack-src)
@@ -661,7 +654,7 @@ endif ()
 message(STATUS "Flags and Dirs:")
 message(STATUS "suanPan C_FLAGS: ${CMAKE_C_FLAGS}")
 message(STATUS "suanPan CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-if (FORTRAN_STATUS)
+if (CMAKE_Fortran_COMPILER)
     message(STATUS "suanPan Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
 endif ()
 
