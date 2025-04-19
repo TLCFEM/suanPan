@@ -2983,9 +2983,6 @@
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\Subloading.h">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\Sparse.Single\SparseMatPARDISO.hpp">
-      <Filter>Domain\MetaMat</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />

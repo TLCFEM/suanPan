@@ -627,7 +627,6 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\MetaMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\operator_times.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp" />
-    <ClInclude Include="..\..\..\Domain\MetaMat\Sparse.Single\SparseMatPARDISO.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\triplet_form.hpp" />
     <ClInclude Include="..\..\..\Domain\Node.h" />
