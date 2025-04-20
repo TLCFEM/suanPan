@@ -35,6 +35,8 @@ int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::sh
 
 int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
 
+int eig_solve(cx_vec&, const std::shared_ptr<MetaMat<double>>&, unsigned);
+
 #endif
 
 //! @}
