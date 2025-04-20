@@ -58,17 +58,17 @@ int Ramm::analyze() {
         // solve reference displacement
         if(SUANPAN_SUCCESS != G->solve(disp_a, G->get_reference_load())) return SUANPAN_FAIL;
 
-        if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
+        if(0 != W->get_mpc()) {
             mat right, kernel;
             auto& border = W->get_auxiliary_stiffness();
             if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
             auto& aux_lambda = W->modify_auxiliary_lambda();
-            if(!solve(aux_lambda, kernel = border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            if(!solve(aux_lambda, kernel = border.t() * right, border.t() * samurai - G->get_auxiliary_residual())) return SUANPAN_FAIL;
             samurai -= right * aux_lambda;
-            disp_a -= right * solve(kernel, border.t() * disp_a.head_rows(n_size));
+            disp_a -= right * solve(kernel, border.t() * disp_a);
         }
 
-        if(0 < counter) t_lambda = -dot(disp_ref, samurai) / dot(disp_ref, disp_a);
+        if(0u < counter) t_lambda = -dot(disp_ref, samurai) / dot(disp_ref, disp_a);
         else {
             t_lambda = arc_length / sqrt(dot(disp_a, disp_a) + 1.);
 
