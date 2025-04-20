@@ -24,12 +24,12 @@
 using mat_ptr = std::shared_ptr<MetaMat<double>>;
 
 int eig_solve(vec& eigval, mat& eigvec, const mat_ptr& K, const mat_ptr& M, const unsigned num, const char* WHICH) {
-    static auto BMAT = 'G'; // generalized eigenvalue problem A*x=lambda*B*x
+    static auto BMAT{'G'}; // generalized eigenvalue problem A*x=lambda*B*x
 
-    blas_int IDO = 0, INFO = 0;
+    blas_int IDO{0}, INFO{0};
     auto N = static_cast<blas_int>(K->n_cols);
     auto NEV = std::min(static_cast<blas_int>(num), N - 1);
-    auto TOL = 0.;
+    auto TOL{0.};
     auto NCV = std::min(3 * NEV, N); // use a larger NCV to ensure convergence
     auto LWORKL = 2 * NCV * (NCV + 8);
 
@@ -73,9 +73,9 @@ int eig_solve(vec& eigval, mat& eigvec, const mat_ptr& K, const mat_ptr& M, cons
 
     suanpan_debug("Arnoldi iteration counter: {}.\n", IPARAM[2]);
 
-    static blas_int RVEC = 1;
-    static auto HOWMNY = 'A';
-    static auto SIGMA = -1.;
+    static blas_int RVEC{1};
+    static auto HOWMNY{'A'};
+    static auto SIGMA{-1.};
 
     podarray<blas_int> SELECT(NCV);
 
@@ -88,12 +88,12 @@ int eig_solve(vec& eigval, mat& eigvec, const mat_ptr& K, const mat_ptr& M, cons
 }
 
 int eig_solve(cx_vec& eigval, cx_mat& eigvec, const mat_ptr& K, const mat_ptr& M, const unsigned num, const char* WHICH) {
-    static auto BMAT = 'G'; // generalized eigenvalue problem A*x=lambda*B*x
+    static auto BMAT{'G'}; // generalized eigenvalue problem A*x=lambda*B*x
 
-    blas_int IDO = 0, INFO = 0;
+    blas_int IDO{0}, INFO{0};
     auto N = static_cast<blas_int>(K->n_rows);
     auto NEV = std::min(static_cast<blas_int>(num), N - 2);
-    auto TOL = 0.;
+    auto TOL{0.};
     auto NCV = std::min(std::max(NEV + 3, 3 * NEV + 1), N); // use a larger NCV to ensure convergence
     auto LWORKL = 3 * NCV * (NCV + 2);
 
@@ -133,14 +133,14 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const mat_ptr& K, const mat_ptr& M
 
     suanpan_debug("Arnoldi iteration counter: {}.\n", IPARAM[2]);
 
-    static blas_int RVEC = 1;
-    static auto HOWMNY = 'A';
-    static auto SIGMAR = 0., SIGMAI = 0.;
+    static blas_int RVEC{1};
+    static auto HOWMNY{'A'};
+    static auto SIGMA{0.};
 
     podarray<blas_int> SELECT(NCV);
     podarray<double> DR(NEV + 1llu), DI(NEV + 1llu), Z(N * (NEV + 1llu)), WORKEV(3llu * NCV);
 
-    arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), Z.memptr(), &N, &SIGMAR, &SIGMAI, WORKEV.memptr(), &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+    arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), Z.memptr(), &N, &SIGMA, &SIGMA, WORKEV.memptr(), &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
 
     eigval.set_size(NEV);
     eigvec.set_size(N, NEV);
@@ -167,10 +167,10 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const mat_ptr& K, const mat_ptr& M
 }
 
 int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const unsigned num) {
-    static auto BMAT = 'I';             // standard eigenvalue problem A*x=lambda*x
+    static auto BMAT{'I'};              // standard eigenvalue problem A*x=lambda*x
     static constexpr auto WHICH = "SR"; // smallest real part
 
-    blas_int IDO = 0, INFO = 0;
+    blas_int IDO{0}, INFO{0};
     auto N = static_cast<blas_int>(K->n_rows);
     auto NEV = std::min(static_cast<blas_int>(num), N - 2);
     double TOL = std::numeric_limits<float>::epsilon();
@@ -180,9 +180,9 @@ int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const u
     blas_int IPARAM[11]{}, IPNTR[14]{};
     podarray<double> RESID(N), V(N * uword(NCV)), WORKD(3llu * N), WORKL(LWORKL);
 
-    IPARAM[0] = 1;    // exact shift
-    IPARAM[2] = 1000; // maximum iteration
-    IPARAM[6] = 1;    // mode 1: A*x=lambda*x
+    IPARAM[0] = 1;                           // exact shift
+    IPARAM[2] = std::min(blas_int{1000}, N); // maximum iteration
+    IPARAM[6] = 1;                           // mode 1: A*x=lambda*x
 
     while(99 != IDO) {
         arma_fortran(arma_dnaupd)(&IDO, &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
@@ -199,14 +199,14 @@ int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const u
 
     suanpan_debug("Arnoldi iteration counter: {}.\n", IPARAM[2]);
 
-    static blas_int RVEC = 0;
-    static auto HOWMNY = 'A';
-    static auto SIGMAR = 0., SIGMAI = 0.;
+    static blas_int RVEC{0};
+    static auto HOWMNY{'A'};
+    static auto SIGMA{0.};
 
     podarray<blas_int> SELECT(NCV);
     podarray<double> DR(NEV + 1llu), DI(NEV + 1llu), WORKEV(3llu * NCV);
 
-    arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), nullptr, &N, &SIGMAR, &SIGMAI, WORKEV.memptr(), &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+    arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), nullptr, &N, &SIGMA, &SIGMA, WORKEV.memptr(), &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
 
     eigval.set_size(NEV);
 
