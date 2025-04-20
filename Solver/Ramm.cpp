@@ -16,10 +16,19 @@
  ******************************************************************************/
 
 #include "Ramm.h"
+
 #include <Converger/Converger.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
+#include <Toolbox/arpack.h>
+
+int Ramm::sign_det() {
+    auto& t_stiffness = get_integrator()->get_domain()->get_factory()->get_stiffness();
+    cx_vec eig_val;
+    eig_solve(eig_val, t_stiffness, std::min(10u, unsigned(log2(t_stiffness->n_rows)) + 1u));
+    return std::any_of(eig_val.cbegin(), eig_val.cend(), [](const auto& e) { return e.real() <= 0.; }) ? -1 : 1;
+}
 
 int Ramm::analyze() {
     auto& C = get_converger();
@@ -36,6 +45,7 @@ int Ramm::analyze() {
 
     // iteration counter
     auto counter = 0u;
+    // auto direction = 0;
 
     while(true) {
         set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
@@ -52,6 +62,8 @@ int Ramm::analyze() {
         if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
         // process constraints
         if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+
+        // if(0u == counter) direction = sign_det();
 
         // solve ninja
         if(SUANPAN_SUCCESS != G->solve(samurai, G->get_displacement_residual())) return SUANPAN_FAIL;

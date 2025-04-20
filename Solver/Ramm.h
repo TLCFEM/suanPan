@@ -33,6 +33,8 @@
 class Ramm final : public Solver {
     double arc_length = 1.;
 
+    int sign_det();
+
 public:
     using Solver::Solver;
 
