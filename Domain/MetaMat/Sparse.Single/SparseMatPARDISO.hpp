@@ -105,8 +105,10 @@ public:
 };
 
 template<sp_d T, la_it MT> int SparseMatBasePARDISO<T, MT>::direct_solve(Mat<T>& X, const Mat<T>& B) {
+    la_it info{-1};
+
     if(!this->factored) {
-        if(const auto info = alloc(); 0 != info) {
+        if(info = alloc(); 0 != info) {
             suanpan_error("Error code {} received.\n", info);
             return SUANPAN_FAIL;
         }
@@ -117,7 +119,6 @@ template<sp_d T, la_it MT> int SparseMatBasePARDISO<T, MT>::direct_solve(Mat<T>&
 
     const auto nrhs{static_cast<la_it>(B.n_cols)};
 
-    la_it info{-1};
     pardiso(pt, &maxfct, &mnum, &mtype, &PARDISO_SOLVE, &csr_mat.n_rows, csr_mat.val_mem(), csr_mat.row_mem(), csr_mat.col_mem(), nullptr, &nrhs, iparm, &msglvl, (void*)B.memptr(), X.memptr(), &info);
 
     if(0 != info) {
