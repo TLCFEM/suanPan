@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Arnoldi.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
@@ -49,7 +50,7 @@ int Arnoldi::analyze() {
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
     const shared_ptr t_mass = W->get_mass()->make_copy();
-    const auto factor = 1E-12 * t_mass->max();
+    const auto factor = std::max(datum::eps, 1E-12 * t_mass->max());
     for(auto I = 0llu; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
 
     return eig_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
