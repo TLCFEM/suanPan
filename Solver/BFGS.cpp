@@ -58,33 +58,53 @@ int BFGS::analyze() {
         return SUANPAN_SUCCESS;
     };
 
+    wall_clock t_clock;
+
     while(true) {
         set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
 
+        t_clock.tic();
         // update for nodes and elements
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-        // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
-        // assemble resistance
+        D->update<Statistics::UpdateStatus>(t_clock.toc());
+
+        t_clock.tic();
         G->assemble_resistance();
+        D->update<Statistics::AssembleVector>(t_clock.toc());
 
         if(0 == counter) {
+            t_clock.tic();
             // assemble stiffness for the first iteration
             G->assemble_matrix();
+            D->update<Statistics::AssembleMatrix>(t_clock.toc());
+
+            t_clock.tic();
             // process loads and constraints
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
+            t_clock.tic();
+
             // indicate the global matrix has been assembled
             G->set_matrix_assembled_switch(true);
             // solve the system and commit current displacement increment
             if(SUANPAN_SUCCESS != G->solve(samurai, residual = G->get_force_residual())) return SUANPAN_FAIL;
             // deal with mpc
             if(SUANPAN_SUCCESS != adjust_for_mpc()) return SUANPAN_FAIL;
+
+            D->update<Statistics::SolveSystem>(t_clock.toc());
         }
         else {
+            t_clock.tic();
             // process resistance of loads and constraints
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
+            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
+            t_clock.tic();
+
             // clear temporary factor container
             alpha.clear();
             alpha.reserve(hist_ninja.size());
@@ -108,6 +128,8 @@ int BFGS::analyze() {
             if(SUANPAN_SUCCESS != adjust_for_mpc()) return SUANPAN_FAIL;
             // left side loop
             for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) samurai += (alpha[J] - dot(hist_residual[I], samurai) / hist_factor[I]) * hist_ninja[I];
+
+            D->update<Statistics::SolveSystem>(t_clock.toc());
         }
 
         // commit current displacement increment
