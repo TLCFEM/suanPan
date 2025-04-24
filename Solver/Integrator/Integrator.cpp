@@ -21,7 +21,7 @@
 #include <Domain/Factory.hpp>
 
 Integrator::Integrator(const unsigned T)
-    : Tag(T) {}
+    : UniqueTag(T) {}
 
 void Integrator::set_domain(const weak_ptr<DomainBase>& D) {
     if(database.lock() != D.lock()) database = D;

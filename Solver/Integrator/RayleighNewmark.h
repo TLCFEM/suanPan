@@ -49,7 +49,7 @@ class RayleighNewmark final : public Newmark {
     const double damping_eta;
 
 public:
-    explicit RayleighNewmark(unsigned, double, double, double, double, double, double);
+    RayleighNewmark(unsigned, double, double, double, double, double, double);
 
     void assemble_resistance() override;
 };

@@ -22,10 +22,10 @@
 #include <Toolbox/utility.h>
 
 Node::Node(const unsigned T)
-    : Tag(T) {}
+    : UniqueTag(T) {}
 
 Node::Node(const unsigned T, vec&& C)
-    : Tag(T) {
+    : UniqueTag(T) {
     num_dof = static_cast<unsigned>(C.n_elem);
     coordinate = std::move(C);
 }
@@ -36,7 +36,7 @@ Node::Node(const unsigned T, vec&& C)
  * \param D `num_dof`
  */
 Node::Node(const unsigned T, const unsigned D)
-    : Tag(T) {
+    : UniqueTag(T) {
     num_dof = D;
     coordinate.zeros(D);
 }
@@ -48,7 +48,7 @@ Node::Node(const unsigned T, const unsigned D)
  * \param C `coordinate`
  */
 Node::Node(const unsigned T, const unsigned D, vec&& C)
-    : Tag(T) {
+    : UniqueTag(T) {
     num_dof = D;
     coordinate = std::move(C);
 }

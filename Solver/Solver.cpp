@@ -22,7 +22,7 @@
 #include <Step/Step.h>
 
 Solver::Solver(const unsigned T)
-    : Tag(T) {}
+    : UniqueTag(T) {}
 
 int Solver::initialize() {
     if(nullptr == converger) {

@@ -195,12 +195,6 @@ public:
         unsigned, // other element tag
         unsigned  // node tag
     );
-    Element(const Element&) = delete;            // copy forbidden
-    Element(Element&&) = delete;                 // move forbidden
-    Element& operator=(const Element&) = delete; // assign forbidden
-    Element& operator=(Element&&) = delete;      // assign forbidden
-
-    ~Element() override = default;
 
     int initialize_base(const shared_ptr<DomainBase>&) final;
 

@@ -39,7 +39,7 @@ class Section;
 enum class OutputType;
 enum class DOF : unsigned short;
 
-class ElementBase : public Tag, public vtkBase {
+class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_strain_energy() = 0;
     virtual void update_kinetic_energy() = 0;
     virtual void update_viscous_energy() = 0;
@@ -71,14 +71,7 @@ protected:
 
 public:
     explicit ElementBase(const unsigned T)
-        : Tag(T) {}
-
-    ElementBase(const ElementBase&) = delete;            // copy forbidden
-    ElementBase(ElementBase&&) = delete;                 // move forbidden
-    ElementBase& operator=(const ElementBase&) = delete; // assign forbidden
-    ElementBase& operator=(ElementBase&&) = delete;      // assign forbidden
-
-    ~ElementBase() override = default;
+        : UniqueTag(T) {}
 
     virtual int initialize_base(const shared_ptr<DomainBase>&) = 0;
     virtual int initialize(const shared_ptr<DomainBase>&) = 0;

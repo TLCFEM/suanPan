@@ -18,7 +18,7 @@
 #include "Database.h"
 
 Database::Database(const unsigned T)
-    : Tag(T) {}
+    : CopiableTag(T) {}
 
 void Database::set_domain(const shared_ptr<DomainBase>& D) { domain = D; }
 

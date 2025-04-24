@@ -22,7 +22,7 @@ std::mutex Expression::parser_mutex;
 exprtk::parser<double> Expression::parser; // NOLINT(cppcoreguidelines-interfaces-global-init)
 
 Expression::Expression(const unsigned tag, std::vector<std::string>&& variable_string)
-    : Tag(tag)
+    : UniqueTag(tag)
     , variable_text_list(std::move(variable_string)) {
     symbol_table.add_constants();
 

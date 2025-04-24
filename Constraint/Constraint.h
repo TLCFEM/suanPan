@@ -60,12 +60,6 @@ public:
         uvec&&,   // dof tags
         unsigned  // size of multiplier
     );
-    Constraint(const Constraint&) = delete;            // copy forbidden
-    Constraint(Constraint&&) = delete;                 // move forbidden
-    Constraint& operator=(const Constraint&) = delete; // assign forbidden
-    Constraint& operator=(Constraint&&) = delete;      // assign forbidden
-
-    ~Constraint() override = default;
 
     const sp_vec& get_resistance() const;
     const sp_mat& get_stiffness() const;

@@ -35,12 +35,11 @@
 
 class DomainBase;
 
-class Criterion : public Tag {
+class Criterion : public CopiableTag {
     unsigned step_tag;
 
 public:
     explicit Criterion(unsigned = 0, unsigned = 0);
-    ~Criterion() override = default;
 
     void set_step_tag(unsigned);
     [[nodiscard]] unsigned get_step_tag() const;

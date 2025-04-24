@@ -18,10 +18,10 @@
 #include "Group.h"
 
 Group::Group(const unsigned T)
-    : Tag(T) {}
+    : UniqueTag(T) {}
 
 Group::Group(const unsigned T, uvec&& R)
-    : Tag(T)
+    : UniqueTag(T)
     , pool(std::move(R)) {}
 
 void Group::initialize(const shared_ptr<DomainBase>&) {}

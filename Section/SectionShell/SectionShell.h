@@ -65,7 +65,7 @@ struct SectionShellData {
     mat trial_plate_stiffness{};
 };
 
-class SectionShell : protected SectionShellData, public Tag {
+class SectionShell : protected SectionShellData, public CopiableTag {
     const bool symmetric = false;
     const bool initialized = false;
 
@@ -75,12 +75,6 @@ public:
         unsigned = 0,    // material tag
         vec&& = {0., 0.} // eccentricity
     );
-    SectionShell(const SectionShell&) = default;           // default copy ctor
-    SectionShell(SectionShell&&) = delete;                 // move forbidden
-    SectionShell& operator=(const SectionShell&) = delete; // assign forbidden
-    SectionShell& operator=(SectionShell&&) = delete;      // assign forbidden
-
-    ~SectionShell() override = default;
 
     virtual int initialize(const shared_ptr<DomainBase>&) = 0;
 

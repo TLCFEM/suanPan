@@ -27,7 +27,7 @@
  * \param P `print_flag`
  */
 Converger::Converger(const unsigned T, const double E, const unsigned M, const bool P)
-    : Tag(T)
+    : CopiableTag(T)
     , tolerance(E)
     , max_iteration(M)
     , print_flag(P) {}

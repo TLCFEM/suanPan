@@ -101,16 +101,10 @@ enum class Statistics : size_t {
     SolveSystem
 };
 
-class DomainBase : public Tag {
+class DomainBase : public UniqueTag {
 public:
     explicit DomainBase(const unsigned T)
-        : Tag(T) {}
-
-    DomainBase(const DomainBase&) = delete;            // copy forbidden
-    DomainBase(DomainBase&&) = delete;                 // move forbidden
-    DomainBase& operator=(const DomainBase&) = delete; // assign forbidden
-    DomainBase& operator=(DomainBase&&) = delete;      // assign forbidden
-    ~DomainBase() override = default;
+        : UniqueTag(T) {}
 
     virtual void set_factory(const shared_ptr<LongFactory>&) = 0;
     [[nodiscard]] virtual const shared_ptr<LongFactory>& get_factory() const = 0;

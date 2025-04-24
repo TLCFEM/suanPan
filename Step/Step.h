@@ -36,7 +36,7 @@ class Solver;
 class Converger;
 class Integrator;
 
-class Step : public Tag {
+class Step : public UniqueTag {
     double time_period = 1.0; // time period
 
     double time_left = time_period;
@@ -72,11 +72,6 @@ protected:
 
 public:
     explicit Step(unsigned = 0, double = 1.);
-    Step(const Step&) = delete;
-    Step(Step&&) noexcept = delete;
-    Step& operator=(const Step&) = delete;
-    Step& operator=(Step&&) noexcept = delete;
-    ~Step() override = default;
 
     virtual int initialize();
 

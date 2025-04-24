@@ -48,7 +48,7 @@ enum class IntegratorType {
     Explicit
 };
 
-class Integrator : public Tag {
+class Integrator : public UniqueTag {
     bool time_step_switch = true;
     bool matrix_assembled_switch = false;
 
@@ -56,11 +56,6 @@ class Integrator : public Tag {
 
 public:
     explicit Integrator(unsigned = 0);
-    Integrator(const Integrator&) = delete;            // copy forbidden
-    Integrator(Integrator&&) = delete;                 // move forbidden
-    Integrator& operator=(const Integrator&) = delete; // assign forbidden
-    Integrator& operator=(Integrator&&) = delete;      // assign forbidden
-    ~Integrator() override = default;
 
     void set_domain(const weak_ptr<DomainBase>&);
     [[nodiscard]] shared_ptr<DomainBase> get_domain() const;

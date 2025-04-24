@@ -77,7 +77,7 @@ struct NodeData {
     vec trial_acceleration;     // trial acceleration
 };
 
-class Node final : protected NodeData, public Tag {
+class Node final : protected NodeData, public UniqueTag {
     bool initialized = false;
 
     std::mutex node_mutex;
@@ -89,11 +89,6 @@ public:
     Node(unsigned, vec&&);
     Node(unsigned, unsigned);
     Node(unsigned, unsigned, vec&&);
-    Node(const Node&) = delete;            // copy forbidden
-    Node(Node&&) = delete;                 // move forbidden
-    Node& operator=(const Node&) = delete; // assign forbidden
-    Node& operator=(Node&&) = delete;      // assign forbidden
-    ~Node() override = default;
 
     void initialize(const shared_ptr<DomainBase>&);
 

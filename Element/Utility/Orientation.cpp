@@ -21,7 +21,7 @@
 void Orientation::check_element_ptr() const { suanpan_assert([&] { if(element_ptr == nullptr) throw logic_error("need to set element pointer first"); }); }
 
 Orientation::Orientation(const unsigned T, vec&& O)
-    : Tag(T)
+    : CopiableTag(T)
     , z_axis(std::move(O)) {}
 
 void Orientation::update_axis(const vec& O) { if(O.n_elem == 3) z_axis = O; }

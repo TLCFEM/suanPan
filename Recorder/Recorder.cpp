@@ -34,7 +34,7 @@ extern fs::path SUANPAN_OUTPUT;
  * \param H if to use hdf5 format
  */
 Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
-    : Tag(T)
+    : UniqueTag(T)
     , object_tag(std::move(B))
     , variable_type(L)
     , data_pool(object_tag.n_elem)

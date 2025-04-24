@@ -64,7 +64,7 @@ protected:
     int erase_top_left_block() const;
 
 public:
-    explicit LeeNewmarkBase(unsigned, double, double, StiffnessType = StiffnessType::CURRENT);
+    LeeNewmarkBase(unsigned, double, double, StiffnessType = StiffnessType::CURRENT);
 
     int initialize() override;
 

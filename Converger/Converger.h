@@ -41,7 +41,7 @@
 
 class DomainBase;
 
-class Converger : public Tag {
+class Converger : public CopiableTag {
     weak_ptr<DomainBase> database; /**< pointer to DomainBase */
 
     double tolerance; /**< tolerance */
@@ -60,11 +60,6 @@ protected:
 
 public:
     explicit Converger(unsigned = 0, double = 1E-8, unsigned = 10, bool = false);
-    Converger(const Converger&) = default;
-    Converger(Converger&&) = default;
-    Converger& operator=(const Converger&) = delete;
-    Converger& operator=(Converger&&) = delete;
-    ~Converger() override = default;
 
     virtual int initialize();
 

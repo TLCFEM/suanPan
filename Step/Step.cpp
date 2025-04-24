@@ -31,7 +31,7 @@ void Step::configure_storage_scheme() const {
 }
 
 Step::Step(const unsigned T, const double P)
-    : Tag(T)
+    : UniqueTag(T)
     , time_period(P) {}
 
 int Step::initialize() {

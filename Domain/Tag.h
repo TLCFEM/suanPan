@@ -63,4 +63,26 @@ public:
     virtual void print();
 };
 
+class CopiableTag : public Tag {
+public:
+    using Tag::Tag;
+
+    CopiableTag(const CopiableTag&) = default;
+    CopiableTag(CopiableTag&&) = delete;
+    CopiableTag& operator=(const CopiableTag&) = delete;
+    CopiableTag& operator=(CopiableTag&&) = delete;
+    ~CopiableTag() override = default;
+};
+
+class UniqueTag : public Tag {
+public:
+    using Tag::Tag;
+
+    UniqueTag(const UniqueTag&) = delete;
+    UniqueTag(UniqueTag&&) = delete;
+    UniqueTag& operator=(const UniqueTag&) = delete;
+    UniqueTag& operator=(UniqueTag&&) = delete;
+    ~UniqueTag() override = default;
+};
+
 #endif

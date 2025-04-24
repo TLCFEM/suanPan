@@ -22,7 +22,7 @@
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
     : DataSection{MT, ST, EC.head(2), A}
-    , Tag(T) {}
+    , CopiableTag(T) {}
 
 SectionType Section::get_section_type() const { return section_type; }
 

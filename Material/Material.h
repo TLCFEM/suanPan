@@ -113,7 +113,7 @@ struct DataMaterial {
     mat trial_inertial{};   // inertial matrix
 };
 
-class Material : protected DataMaterial, protected DataCoupleMaterial, public Tag {
+class Material : protected DataMaterial, protected DataCoupleMaterial, public CopiableTag {
     const bool initialized = false;
     const bool symmetric = false;
     const bool support_couple = false; // indicate if the material supports couple stress theory
@@ -130,12 +130,6 @@ public:
         MaterialType = MaterialType::D0, // material type
         double = 0.                      // density
     );
-    Material(const Material&) = default;
-    Material(Material&&) = delete;                 // move forbidden
-    Material& operator=(const Material&) = delete; // assign forbidden
-    Material& operator=(Material&&) = delete;      // assign forbidden
-
-    ~Material() override = default;
 
     [[nodiscard]] double get_density() const;
     [[nodiscard]] MaterialType get_material_type() const;

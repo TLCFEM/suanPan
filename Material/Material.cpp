@@ -22,7 +22,7 @@
 Material::Material(const unsigned T, const MaterialType MT, const double D)
     : DataMaterial{fabs(D), MT}
     , DataCoupleMaterial{}
-    , Tag(T) {}
+    , CopiableTag(T) {}
 
 double Material::get_density() const { return density; }
 
