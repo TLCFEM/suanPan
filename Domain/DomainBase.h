@@ -39,8 +39,6 @@
 #include <Domain/Tag.h>
 #include <Toolbox/container.h>
 
-using std::future;
-
 template<sp_d T> class Factory;
 class Amplitude;
 class Expression;
@@ -83,17 +81,17 @@ using StepQueue = std::map<unsigned, shared_ptr<Step>>;
 
 using LongFactory = Factory<double>;
 
-enum class ColorMethod {
+enum class ColorMethod : std::uint8_t {
     OFF,
     WP,
     MIS
 };
 
-enum class ModalAttribute : size_t {
+enum class ModalAttribute : std::uint8_t {
     LinearSystem
 };
 
-enum class Statistics : size_t {
+enum class Statistics : std::uint8_t {
     UpdateStatus,
     AssembleVector,
     AssembleMatrix,
@@ -109,7 +107,7 @@ public:
     virtual void set_factory(const shared_ptr<LongFactory>&) = 0;
     [[nodiscard]] virtual const shared_ptr<LongFactory>& get_factory() const = 0;
 
-    virtual bool insert(const shared_ptr<future<void>>&) = 0;
+    virtual bool insert(const shared_ptr<std::future<void>>&) = 0;
 
     virtual void wait() = 0;
 

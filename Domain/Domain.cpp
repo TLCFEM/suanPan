@@ -55,7 +55,7 @@ void Domain::set_factory(const shared_ptr<LongFactory>& F) {
 
 const shared_ptr<LongFactory>& Domain::get_factory() const { return factory; }
 
-bool Domain::insert(const shared_ptr<future<void>>& T) {
+bool Domain::insert(const shared_ptr<std::future<void>>& T) {
     thread_pond.emplace_back(T);
     return true;
 }
