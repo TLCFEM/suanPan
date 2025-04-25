@@ -52,7 +52,10 @@ int Static::initialize() {
             flag = true;
             break;
         }
-    if(nullptr == solver) flag ? solver = std::make_shared<MPDC>() : solver = std::make_shared<Newton>();
+    if(nullptr == solver) {
+        if(flag) solver = std::make_shared<MPDC>();
+        else solver = std::make_shared<Newton>();
+    }
     else if(flag && nullptr == std::dynamic_pointer_cast<MPDC>(solver)) {
         suanpan_warning("Wrong solver assigned, using MPDC instead.\n");
         solver = std::make_shared<MPDC>();
