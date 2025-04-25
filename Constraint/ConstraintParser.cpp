@@ -45,7 +45,14 @@ namespace {
 
         const auto obj_tag = get_remaining<uword>(command);
 
-        penalty ? group ? return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : group ? return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type);
+        if(penalty) {
+            if(group) return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type);
+            else return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type);
+        }
+        else {
+            if(group) return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type);
+            else return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type);
+        }
     }
 
     void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {

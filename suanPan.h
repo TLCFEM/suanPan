@@ -265,6 +265,7 @@ namespace suanpan {
     inline std::string pattern(const std::string_view header, const std::string_view file_name, const std::string_view format) {
         std::string pattern;
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+        // ReSharper disable once CppDFAConstantConditions
         if(comm_size > 1) {
             // ReSharper disable once CppDFAUnreachableCode
             pattern += "[P";
