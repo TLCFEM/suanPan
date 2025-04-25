@@ -28,6 +28,7 @@
 #ifndef ELEMENTBASE_H
 #define ELEMENTBASE_H
 
+#include <Domain/DOF.h>
 #include <Domain/Tag.h>
 #include <Element/MappingDOF.h>
 #include <Element/Visualisation/vtkBase.h>
@@ -37,7 +38,6 @@ class DomainBase;
 class Material;
 class Section;
 enum class OutputType;
-enum class DOF : std::uint8_t;
 
 class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_strain_energy() = 0;

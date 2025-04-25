@@ -28,7 +28,6 @@
 #ifndef SECTIONELEMENT_H
 #define SECTIONELEMENT_H
 
-#include <Domain/DOF.h>
 #include <Element/Element.h>
 
 class SectionElement : public Element {

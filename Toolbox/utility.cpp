@@ -37,27 +37,23 @@ char suanpan::to_upper(const char U) { return static_cast<char>(std::toupper(sta
 
 char suanpan::to_lower(const char L) { return static_cast<char>(std::tolower(static_cast<int>(L))); }
 
-void suanpan::to_upper(string& U) {
+void suanpan::to_upper(std::string& U) {
     std::ranges::for_each(U, [](char& C) { C = static_cast<char>(std::toupper(static_cast<int>(C))); });
 }
 
-void suanpan::to_lower(string& U) {
+void suanpan::to_lower(std::string& U) {
     std::ranges::for_each(U, [](char& C) { C = static_cast<char>(std::tolower(static_cast<int>(C))); });
 }
 
-string suanpan::to_upper(const string& U) {
-    string C(U);
-
+std::string suanpan::to_upper(const std::string& U) {
+    std::string C(U);
     to_upper(C);
-
     return C;
 }
 
-string suanpan::to_lower(const string& U) {
-    string C(U);
-
+std::string suanpan::to_lower(const std::string& U) {
+    std::string C(U);
     to_lower(C);
-
     return C;
 }
 

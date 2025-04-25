@@ -28,7 +28,6 @@
 #ifndef MATERIALELEMENT_H
 #define MATERIALELEMENT_H
 
-#include <Domain/DOF.h>
 #include <Element/Element.h>
 
 class MaterialElement : public Element {
