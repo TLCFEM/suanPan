@@ -71,7 +71,7 @@ public:
 };
 
 template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     auto INFO = 0;
 

@@ -62,9 +62,9 @@ public:
         return this->triplet_mat.at(in_row, in_col);
     }
 
-    [[nodiscard]] const T* memptr() const override { throw invalid_argument("not supported"); }
+    [[nodiscard]] const T* memptr() const override { throw std::invalid_argument("not supported"); }
 
-    T* memptr() override { throw invalid_argument("not supported"); }
+    T* memptr() override { throw std::invalid_argument("not supported"); }
 
     void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& in_mat) override {
         if(nullptr == in_mat) return;

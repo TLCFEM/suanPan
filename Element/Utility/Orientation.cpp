@@ -18,7 +18,9 @@
 #include "Orientation.h"
 #include <Element/Element.h>
 
-void Orientation::check_element_ptr() const { suanpan_assert([&] { if(element_ptr == nullptr) throw logic_error("need to set element pointer first"); }); }
+void Orientation::check_element_ptr() const {
+    suanpan_assert([&] { if(element_ptr == nullptr) throw std::logic_error("need to set element pointer first"); });
+}
 
 Orientation::Orientation(const unsigned T, vec&& O)
     : CopiableTag(T)
@@ -70,6 +72,6 @@ mat Orientation::to_global_geometry_mat(mat&& in) const { return to_global_geome
 
 mat Orientation::to_global_stiffness_mat(mat&& in) const { return to_global_stiffness_mat(in); }
 
-mat Orientation::to_global_mass_mat(const mat&) const { throw logic_error("not implemented.\n"); }
+mat Orientation::to_global_mass_mat(const mat&) const { throw std::logic_error("not implemented.\n"); }
 
-mat Orientation::to_global_geometry_mat(const mat&) const { throw logic_error("not applicable to linear formulation.\n"); }
+mat Orientation::to_global_geometry_mat(const mat&) const { throw std::logic_error("not applicable to linear formulation.\n"); }

@@ -107,7 +107,7 @@ public:
     [[nodiscard]] virtual unsigned get_total_number() const = 0;
 
     virtual void clear_node_ptr() = 0;
-    [[nodiscard]] virtual const std::vector<weak_ptr<Node>>& get_node_ptr() const = 0;
+    [[nodiscard]] virtual const std::vector<std::weak_ptr<Node>>& get_node_ptr() const = 0;
 
     [[nodiscard]] virtual vec get_incre_displacement() const = 0;
     [[nodiscard]] virtual vec get_incre_velocity() const = 0;

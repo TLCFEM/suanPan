@@ -163,7 +163,7 @@ template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
 
 template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(!this->factored) {
-        suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+        suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
         la_it INFO = 0;
 

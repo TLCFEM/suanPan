@@ -94,7 +94,7 @@ int SectionShell::update_incre_status(const vec& m_strain, const vec& p_strain) 
 
 int SectionShell::update_incre_status(const vec& m_strain, const vec& p_strain, const vec& m_strain_rate, const vec& p_strain_rate) { return update_trial_status(current_membrane_strain + m_strain, current_plate_strain + p_strain, current_membrane_strain_rate + m_strain_rate, current_plate_strain_rate + p_strain_rate); }
 
-int SectionShell::update_trial_status(const vec&, const vec&) { throw invalid_argument("hidden method update_trial_status() called"); }
+int SectionShell::update_trial_status(const vec&, const vec&) { throw std::invalid_argument("hidden method update_trial_status() called"); }
 
 int SectionShell::update_trial_status(const vec& m_strain, const vec& p_strain, const vec& m_strain_rate, const vec& p_strain_rate) {
     trial_membrane_strain_rate = m_strain_rate;

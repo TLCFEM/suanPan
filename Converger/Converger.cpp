@@ -61,13 +61,15 @@ unsigned Converger::get_max_iteration() const { return max_iteration; }
  * \brief method to set `DomainBase`.
  * \param D `DomainBase`
  */
-void Converger::set_domain(const weak_ptr<DomainBase>& D) { if(database.lock() != D.lock()) database = D; }
+void Converger::set_domain(const std::weak_ptr<DomainBase>& D) {
+    if(database.lock() != D.lock()) database = D;
+}
 
 /**
  * \brief method to return `DomainBase`.
  * \return `DomainBase`
  */
-const weak_ptr<DomainBase>& Converger::get_domain() const { return database; }
+const std::weak_ptr<DomainBase>& Converger::get_domain() const { return database; }
 
 /**
  * \brief method to set `error`.

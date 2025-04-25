@@ -23,7 +23,7 @@ ElementalModal::ElementalModal(const unsigned T, const double F, const double D,
     , damping(2. * D) {}
 
 int ElementalModal::update_status() {
-    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
+    suanpan::for_all(element_pool, [&](const std::weak_ptr<Element>& ele_ptr) {
         const auto t_ptr = ele_ptr.lock();
 
         if(nullptr == t_ptr || !t_ptr->if_update_viscous() || !t_ptr->allow_modify_viscous()) return;
@@ -37,7 +37,8 @@ int ElementalModal::update_status() {
 
         const cx_mat theta = t_ptr->get_current_mass() * eigvec;
 
-        for(uword I = 0; I < eigval.n_elem; ++I) if(abs(eigval(I)) < cut_off_freq) t_damping += theta.col(I) * theta.col(I).t() * damping * sqrt(eigval(I)) / dot(theta.col(I), t_ptr->get_current_mass() * theta.col(I));
+        for(uword I = 0; I < eigval.n_elem; ++I)
+            if(abs(eigval(I)) < cut_off_freq) t_damping += theta.col(I) * theta.col(I).t() * damping * sqrt(eigval(I)) / dot(theta.col(I), t_ptr->get_current_mass() * theta.col(I));
 
         access::rw(t_ptr->get_trial_damping_force()) = (access::rw(t_ptr->get_trial_viscous()) = abs(t_damping)) * get_trial_velocity(t_ptr.get());
     });

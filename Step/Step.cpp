@@ -70,9 +70,9 @@ int Step::initialize() {
     return 0;
 }
 
-void Step::set_domain(const weak_ptr<DomainBase>& D) { database = D; }
+void Step::set_domain(const std::weak_ptr<DomainBase>& D) { database = D; }
 
-const weak_ptr<DomainBase>& Step::get_domain() const { return database; }
+const std::weak_ptr<DomainBase>& Step::get_domain() const { return database; }
 
 void Step::set_factory(const shared_ptr<Factory<double>>& F) { factory = F; }
 

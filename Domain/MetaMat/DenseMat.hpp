@@ -92,7 +92,7 @@ public:
     void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& M) override {
         if(nullptr == M) return;
         if(!M->triplet_mat.is_empty()) return this->scale_accu(scalar, M->triplet_mat);
-        if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
+        if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw std::invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
         this->factored = false;
         if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
@@ -101,7 +101,7 @@ public:
     }
 
     void scale_accu(const T scalar, const triplet_form<T, uword>& M) override {
-        if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
+        if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw std::invalid_argument("size mismatch");
         this->factored = false;
         const auto row = M.row_mem();
         const auto col = M.col_mem();

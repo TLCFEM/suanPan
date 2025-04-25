@@ -36,13 +36,13 @@
 
 class Contact3D final : public Element {
     struct SlaveNode {
-        weak_ptr<Node> node;
+        std::weak_ptr<Node> node;
         uvec local_span;
         vec position;
     };
 
     struct MasterNode {
-        weak_ptr<Node> node;
+        std::weak_ptr<Node> node;
         uvec local_span;
         vec position;
         vec outer_norm;

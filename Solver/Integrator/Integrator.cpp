@@ -23,7 +23,7 @@
 Integrator::Integrator(const unsigned T)
     : UniqueTag(T) {}
 
-void Integrator::set_domain(const weak_ptr<DomainBase>& D) {
+void Integrator::set_domain(const std::weak_ptr<DomainBase>& D) {
     if(database.lock() != D.lock()) database = D;
 }
 
@@ -370,7 +370,7 @@ int ExplicitIntegrator::solve(mat& X, mat&& B) { return get_domain()->get_factor
 
 int ExplicitIntegrator::solve(mat& X, sp_mat&& B) { return get_domain()->get_factory()->get_mass()->solve(X, std::move(B)); }
 
-vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw invalid_argument("support velocity cannot be used with explicit integrator"); }
+vec ExplicitIntegrator::from_incre_velocity(const vec&, const uvec&) { throw std::invalid_argument("support velocity cannot be used with explicit integrator"); }
 
 vec ExplicitIntegrator::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return get_domain()->get_factory()->get_current_acceleration()(encoding) + incre_acceleration; }
 

@@ -145,7 +145,7 @@ class Element : protected DataElement, public ElementBase, public Distributed {
     void update_momentum() override;
 
 protected:
-    std::vector<weak_ptr<Node>> node_ptr; // node pointers
+    std::vector<std::weak_ptr<Node>> node_ptr; // node pointers
 
     [[nodiscard]] mat get_coordinate(unsigned) const override;
 
@@ -229,7 +229,7 @@ public:
     [[nodiscard]] unsigned get_total_number() const override;
 
     void clear_node_ptr() override;
-    [[nodiscard]] const std::vector<weak_ptr<Node>>& get_node_ptr() const override;
+    [[nodiscard]] const std::vector<std::weak_ptr<Node>>& get_node_ptr() const override;
 
     [[nodiscard]] vec get_incre_displacement() const override;
     [[nodiscard]] vec get_incre_velocity() const override;

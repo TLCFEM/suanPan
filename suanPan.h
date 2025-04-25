@@ -377,15 +377,9 @@ inline void suanpan_assert(const std::function<void()>& F) {
 
 using std::shared_ptr;
 using std::unique_ptr;
-using std::weak_ptr;
 
 using std::make_shared;
 using std::make_unique;
-
-using std::exception;
-using std::invalid_argument;
-using std::logic_error;
-using std::out_of_range;
 
 using std::istringstream;
 using std::ostringstream;

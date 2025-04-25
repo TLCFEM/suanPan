@@ -693,7 +693,7 @@ template<sp_d T> unsigned Factory<T>::get_size() const { return n_size; }
 
 template<sp_d T> void Factory<T>::set_entry(const uword N) {
     n_elem = N;
-    if(n_elem > std::numeric_limits<la_it>::max()) throw invalid_argument("too many elements");
+    if(n_elem > std::numeric_limits<la_it>::max()) throw std::invalid_argument("too many elements");
 }
 
 template<sp_d T> uword Factory<T>::get_entry() const { return n_elem; }
@@ -1557,7 +1557,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
 #endif
     default:
-        throw invalid_argument("need a proper storage scheme");
+        throw std::invalid_argument("need a proper storage scheme");
     }
 }
 

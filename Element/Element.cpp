@@ -263,7 +263,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , material_type(MTP)
     , section_type(SectionType::D0)
     , dof_identifier(std::move(DI)) {
-    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
+    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
 }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
@@ -275,7 +275,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , material_type(MaterialType::D0)
     , section_type(STP)
     , dof_identifier(std::move(DI)) {
-    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw invalid_argument("size of dof identifier must meet number of dofs"); });
+    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
 }
 
 // for contact elements that use node groups
@@ -449,7 +449,7 @@ unsigned Element::get_total_number() const { return num_size; }
 
 void Element::clear_node_ptr() { node_ptr.clear(); }
 
-const std::vector<weak_ptr<Node>>& Element::get_node_ptr() const { return node_ptr; }
+const std::vector<std::weak_ptr<Node>>& Element::get_node_ptr() const { return node_ptr; }
 
 const vec& Element::get_trial_resistance() const { return trial_resistance; }
 

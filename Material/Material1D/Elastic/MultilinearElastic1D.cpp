@@ -19,7 +19,7 @@
 
 MultilinearElastic1D::MultilinearElastic1D(const unsigned T, mat&& H, const double R)
     : Material1D(T, R) {
-    if(H.n_cols != 2) throw invalid_argument("there should be exact two columns.\n");
+    if(H.n_cols != 2) throw std::invalid_argument("there should be exact two columns.\n");
     H.resize(H.n_rows, 3);
     H(0, 2) = H(0, 1) / H(0, 0);
     for(unsigned I = 1; I < H.n_rows; ++I) H(I, 2) = (H(I, 1) - H(I - 1, 1)) / (H(I, 0) - H(I - 1, 0));

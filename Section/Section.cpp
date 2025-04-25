@@ -134,7 +134,7 @@ int Section::update_incre_status(const vec& i_deformation) { return update_trial
 
 int Section::update_incre_status(const vec& i_deformation, const vec& i_deformation_rate) { return update_trial_status(current_deformation + i_deformation, current_deformation_rate + i_deformation_rate); }
 
-int Section::update_trial_status(const vec&) { throw invalid_argument("hidden method called"); }
+int Section::update_trial_status(const vec&) { throw std::invalid_argument("hidden method called"); }
 
 int Section::update_trial_status(const vec& t_deformation, const vec&) { return update_trial_status(t_deformation); }
 

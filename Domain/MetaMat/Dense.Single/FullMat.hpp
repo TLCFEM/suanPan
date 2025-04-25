@@ -110,7 +110,7 @@ template<sp_d T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) const {
 template<sp_d T> int FullMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::move(B));
 
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     blas_int INFO = 0;
 

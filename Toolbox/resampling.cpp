@@ -66,7 +66,7 @@ vec fir_low_pass(const uword s, const double f, vec (*window)(uword)) {
 }
 
 vec fir_high_pass(const uword s, const double f, vec (*window)(uword)) {
-    suanpan_assert([&] { if(0 != s % 2) throw invalid_argument("order must be even"); });
+    suanpan_assert([&] { if(0 != s % 2) throw std::invalid_argument("order must be even"); });
 
     const auto sp = s + 1;
 
@@ -87,7 +87,7 @@ vec fir_high_pass(const uword s, const double f, vec (*window)(uword)) {
 }
 
 vec fir_band_pass(const uword s, const double fa, const double fb, vec (*window)(uword)) {
-    suanpan_assert([&] { if(fb <= fa) throw invalid_argument("frequencies must be [0 < fa < fb < 1]"); });
+    suanpan_assert([&] { if(fb <= fa) throw std::invalid_argument("frequencies must be [0 < fa < fb < 1]"); });
 
     const auto sp = s + 1;
 
@@ -109,8 +109,8 @@ vec fir_band_pass(const uword s, const double fa, const double fb, vec (*window)
 
 vec fir_band_stop(const uword s, const double fa, const double fb, vec (*window)(uword)) {
     suanpan_assert([&] {
-        if(0 != s % 2) throw invalid_argument("order must be even");
-        if(fb <= fa) throw invalid_argument("frequencies must be [0 < fa < fb < 1]");
+        if(0 != s % 2) throw std::invalid_argument("order must be even");
+        if(fb <= fa) throw std::invalid_argument("frequencies must be [0 < fa < fb < 1]");
     });
 
     const auto sp = s + 1;

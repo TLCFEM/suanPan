@@ -132,7 +132,7 @@ namespace transform {
     mat eigen_to_tensile_derivative(const vec&, const mat&);
 
     template<typename T> Mat<T> skew_symm(const Mat<T>& R) {
-        suanpan_assert([&] { if(R.n_elem != 3) throw invalid_argument("need 3 element vector"); });
+        suanpan_assert([&] { if(R.n_elem != 3) throw std::invalid_argument("need 3 element vector"); });
 
         Mat<T> S(3, 3, fill::zeros);
 
@@ -183,7 +183,7 @@ namespace transform {
                 }
         }
 
-        throw invalid_argument("need either rotation vector or matrix");
+        throw std::invalid_argument("need either rotation vector or matrix");
     }
 
     template<typename T> Col<T> to_pseudo(const Mat<T>& R) {

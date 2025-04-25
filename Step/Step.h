@@ -62,7 +62,7 @@ protected:
     SolverType sub_system_solver = SolverType::LAPACK;
     SolverSetting<double> system_setting{};
 
-    weak_ptr<DomainBase> database;
+    std::weak_ptr<DomainBase> database;
     shared_ptr<Factory<double>> factory;
     shared_ptr<Solver> solver;
     shared_ptr<Converger> tester;
@@ -77,8 +77,8 @@ public:
 
     virtual int analyze() = 0;
 
-    void set_domain(const weak_ptr<DomainBase>&);
-    [[nodiscard]] const weak_ptr<DomainBase>& get_domain() const;
+    void set_domain(const std::weak_ptr<DomainBase>&);
+    [[nodiscard]] const std::weak_ptr<DomainBase>& get_domain() const;
 
     void set_factory(const shared_ptr<Factory<double>>&);
     [[nodiscard]] const shared_ptr<Factory<double>>& get_factory() const;

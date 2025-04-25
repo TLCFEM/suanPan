@@ -37,7 +37,7 @@ class Modifier : public UniqueTag {
 protected:
     uvec element_tag;
 
-    std::vector<weak_ptr<Element>> element_pool;
+    std::vector<std::weak_ptr<Element>> element_pool;
 
 public:
     explicit Modifier(

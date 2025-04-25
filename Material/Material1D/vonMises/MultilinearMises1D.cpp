@@ -34,7 +34,7 @@ double MultilinearMises1D::compute_dh(const double) const { return 0.; }
 MultilinearMises1D::MultilinearMises1D(const unsigned T, const double E, mat&& H, const double R)
     : DataMultilinearMises1D{}
     , NonlinearMises1D(T, E, R) {
-    if(H(0, 0) != 0. || H.n_cols != 2) throw invalid_argument("first strain should be zero and there should be exact two columns");
+    if(H(0, 0) != 0. || H.n_cols != 2) throw std::invalid_argument("first strain should be zero and there should be exact two columns");
 
     H.resize(H.n_rows, 3);
     H(H.n_rows - 1, 2) = 0.;

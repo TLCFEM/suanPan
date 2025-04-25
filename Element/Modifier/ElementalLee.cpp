@@ -22,7 +22,7 @@ ElementalLee::ElementalLee(const unsigned T, const double A, uvec&& ET)
     , damping_ratio(std::abs(A)) {}
 
 int ElementalLee::update_status() {
-    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
+    suanpan::for_all(element_pool, [&](const std::weak_ptr<Element>& ele_ptr) {
         const auto t_ptr = ele_ptr.lock();
 
         if(nullptr == t_ptr || !t_ptr->if_update_viscous() || !t_ptr->allow_modify_viscous()) return;

@@ -249,7 +249,7 @@ public:
     template<sp_d in_dt, sp_i in_it> void assemble(const triplet_form<in_dt, in_it>&, index_t, index_t, data_t);
 
     template<sp_d in_dt, sp_i in_it> void assemble(const triplet_form<in_dt, in_it>& in_mat, const std::vector<index_t>& row_shift, const std::vector<index_t>& col_shift, const std::vector<data_t>& scalar) {
-        suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
+        suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw std::invalid_argument("size mismatch detected"); });
 
         reserve(n_elem + index_t(scalar.size()) * index_t(in_mat.n_elem));
 
@@ -406,7 +406,7 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> triplet_for
 }
 
 template<sp_d data_t, sp_i index_t> data_t& triplet_form<data_t, index_t>::at(const index_t row, const index_t col) {
-    suanpan_assert([&] { if(row >= n_rows || col >= n_cols) throw invalid_argument("inconsistent size"); });
+    suanpan_assert([&] { if(row >= n_rows || col >= n_cols) throw std::invalid_argument("inconsistent size"); });
 
     invalidate_sorting_flag();
     reserve(n_elem + 1);

@@ -53,7 +53,7 @@ mat GCMQ::form_enhanced_strain(const vec& coor, const int num_enhanced_mode) {
         poly(2, 1) = poly(0, 0) = 3. * X * X - 1.;
         poly(2, 0) = poly(1, 1) = 3. * Y * Y - 1.;
     }
-    else throw invalid_argument("not supported");
+    else throw std::invalid_argument("not supported");
 
     return poly;
 }

@@ -110,7 +110,7 @@ template<sp_d T, typename solver_t> Mat<T> FullMatBaseCluster<T, solver_t>::oper
 template<sp_d T, typename solver_t> int FullMatBaseCluster<T, solver_t>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::move(B));
 
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     this->factored = true;
 

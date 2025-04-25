@@ -22,7 +22,7 @@ const uvec ShellBase::m_dof{0, 1, 5};
 const uvec ShellBase::p_dof{2, 3, 4};
 
 vec ShellBase::reshuffle(const vec& membrane_resistance, const vec& plate_resistance) {
-    suanpan_assert([&] { if(membrane_resistance.n_elem != plate_resistance.n_elem) throw invalid_argument("size conflicts"); });
+    suanpan_assert([&] { if(membrane_resistance.n_elem != plate_resistance.n_elem) throw std::invalid_argument("size conflicts"); });
 
     const auto t_size = 2 * plate_resistance.n_elem;
 
@@ -98,7 +98,7 @@ vec& ShellBase::transform_from_global_to_local(vec& displacement) const {
 }
 
 mat& ShellBase::transform_from_local_to_global(mat& stiffness) const {
-    suanpan_assert([&] { if(stiffness.n_cols != stiffness.n_rows) throw invalid_argument("size conflicts"); });
+    suanpan_assert([&] { if(stiffness.n_cols != stiffness.n_rows) throw std::invalid_argument("size conflicts"); });
 
     mat global_trans(size(stiffness), fill::zeros);
     for(auto I = 0llu, J = 2llu; I < stiffness.n_cols; I += 3llu, J += 3llu) {

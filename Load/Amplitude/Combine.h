@@ -33,7 +33,7 @@
 
 class Combine final : public Amplitude {
     const uvec tag_pool;
-    std::vector<weak_ptr<Amplitude>> amp_pool;
+    std::vector<std::weak_ptr<Amplitude>> amp_pool;
 
 public:
     Combine(unsigned, uvec&&, unsigned);

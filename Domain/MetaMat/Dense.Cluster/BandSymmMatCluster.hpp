@@ -121,7 +121,7 @@ template<sp_d T> Mat<T> BandSymmMatCluster<T>::operator*(const Mat<T>& X) const 
 template<sp_d T> int BandSymmMatCluster<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::move(B));
 
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     this->factored = true;
 

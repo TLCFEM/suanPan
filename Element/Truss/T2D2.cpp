@@ -74,7 +74,7 @@ int T2D2::update_status() {
         return SUANPAN_FAIL;
     }
 
-    suanpan_assert([&] { if(!trial_stiffness.is_finite() || !trial_resistance.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_stiffness.is_finite() || !trial_resistance.is_finite()) throw std::invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }

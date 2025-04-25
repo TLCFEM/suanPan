@@ -52,12 +52,12 @@ class Integrator : public UniqueTag {
     bool time_step_switch = true;
     bool matrix_assembled_switch = false;
 
-    weak_ptr<DomainBase> database;
+    std::weak_ptr<DomainBase> database;
 
 public:
     explicit Integrator(unsigned = 0);
 
-    void set_domain(const weak_ptr<DomainBase>&);
+    void set_domain(const std::weak_ptr<DomainBase>&);
     [[nodiscard]] shared_ptr<DomainBase> get_domain() const;
 
     virtual int initialize();

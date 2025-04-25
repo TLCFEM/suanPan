@@ -37,7 +37,7 @@
 class ElementalNonviscous : public ModifierDynamics {
     const cx_vec m, s;
 
-    weak_ptr<Factory<double>> factory;
+    std::weak_ptr<Factory<double>> factory;
 
 public:
     ElementalNonviscous(unsigned, cx_vec&&, cx_vec&&, uvec&& = {});

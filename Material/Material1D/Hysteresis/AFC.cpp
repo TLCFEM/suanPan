@@ -43,7 +43,7 @@ pod2 AFC::compute_transition(const double TX, const double XS, const double YS, 
     response[0] = YS + TC * (ES + TD);
     response[1] = ES + (R + 1.) * TD;
 
-    suanpan_assert([&] { if(!std::isfinite(response[0]) || !std::isfinite(response[1])) throw invalid_argument("infinite numbers detected"); });
+    suanpan_assert([&] { if(!std::isfinite(response[0]) || !std::isfinite(response[1])) throw std::invalid_argument("infinite numbers detected"); });
 
     return response;
 }

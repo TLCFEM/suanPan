@@ -56,13 +56,13 @@ void LeeNewmarkIterative::assemble_mass(const uword row_shift, const uword col_s
 void LeeNewmarkIterative::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(current_stiffness, row_shift, col_shift, scalar); }
 
 void LeeNewmarkIterative::assemble_mass(const std::vector<sword>& row_shift, const std::vector<sword>& col_shift, const std::vector<double>& scalar) const {
-    suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
+    suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw std::invalid_argument("size mismatch detected"); });
 
     for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_mass(row_shift[I], col_shift[I], scalar[I]);
 }
 
 void LeeNewmarkIterative::assemble_stiffness(const std::vector<sword>& row_shift, const std::vector<sword>& col_shift, const std::vector<double>& scalar) const {
-    suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw invalid_argument("size mismatch detected"); });
+    suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw std::invalid_argument("size mismatch detected"); });
 
     for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_stiffness(row_shift[I], col_shift[I], scalar[I]);
 }
@@ -109,7 +109,7 @@ void LeeNewmarkIterative::formulate_block(sword& current_pos, const double m_coe
 }
 
 void LeeNewmarkIterative::formulate_block(sword& current_pos, const std::vector<double>& m_coef, const std::vector<double>& s_coef, const std::vector<int>& order) const {
-    suanpan_assert([&] { if(order.size() != m_coef.size() || order.size() != s_coef.size()) throw invalid_argument("size mismatch detected"); });
+    suanpan_assert([&] { if(order.size() != m_coef.size() || order.size() != s_coef.size()) throw std::invalid_argument("size mismatch detected"); });
 
     for(size_t I = 0; I < order.size(); ++I) formulate_block(current_pos, m_coef[I], s_coef[I], order[I]);
 }
