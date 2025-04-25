@@ -126,7 +126,7 @@ namespace {
     }
 
     void overview() {
-        const auto new_model = make_shared<Bead>();
+        const auto new_model = std::make_shared<Bead>();
 
         auto guide_command = [&](const string& target) {
             while(true) {
@@ -388,7 +388,7 @@ namespace {
         if(auto& tmp_domain = get_domain(model, domain_id); nullptr != tmp_domain)
             suanpan_info("Switch to domain {}.\n", domain_id);
         else {
-            tmp_domain = make_shared<Domain>(domain_id);
+            tmp_domain = std::make_shared<Domain>(domain_id);
             if(nullptr != tmp_domain)
                 suanpan_info("Domain {} is successfully created.\n", domain_id);
         }
@@ -411,7 +411,7 @@ namespace {
                 break;
             }
 
-        if(0 == code) domain->insert(make_shared<ExternalModule>(library_name));
+        if(0 == code) domain->insert(std::make_shared<ExternalModule>(library_name));
 
         return SUANPAN_SUCCESS;
     }
@@ -545,7 +545,7 @@ namespace {
         double X;
         while(get_input(command, X)) coor.push_back(X);
 
-        if(!domain->insert(make_shared<Node>(node_id, vec(coor))))
+        if(!domain->insert(std::make_shared<Node>(node_id, vec(coor))))
             suanpan_error("Fail to create new node via \"{}\".\n", command.str());
 
         return SUANPAN_SUCCESS;
@@ -1289,7 +1289,7 @@ namespace {
     }
 
     int run_example() {
-        const auto new_model = make_shared<Bead>();
+        const auto new_model = std::make_shared<Bead>();
 
         suanpan_info("====================================================\n");
         suanpan_info("-> A Minimum Example: Elastic Truss Under Tension <-\n");

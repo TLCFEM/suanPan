@@ -47,12 +47,12 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<Frequency>(tag, eigen_number, suanpan::to_upper(type)))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Frequency>(tag, eigen_number, suanpan::to_upper(type)))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "Buckling") || is_equal(step_type, "Buckle")) {
-        if(domain->insert(make_shared<Buckle>(tag))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Buckle>(tag))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
@@ -62,7 +62,7 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
             suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(make_shared<Optimization>(tag, time))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Optimization>(tag, time))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
@@ -72,7 +72,7 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
             suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(make_shared<Static>(tag, time))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Static>(tag, time))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
@@ -82,7 +82,7 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
             suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(make_shared<Dynamic>(tag, time, IntegratorType::Implicit))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Dynamic>(tag, time, IntegratorType::Implicit))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
@@ -92,12 +92,12 @@ int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command
             suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(make_shared<Dynamic>(tag, time, IntegratorType::Explicit))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Dynamic>(tag, time, IntegratorType::Explicit))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
     else if(is_equal(step_type, "ArcLength")) {
-        if(domain->insert(make_shared<ArcLength>(tag))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<ArcLength>(tag))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Fail to create new step via \"{}\".\n", command.str());
     }

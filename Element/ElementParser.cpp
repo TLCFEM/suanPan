@@ -2429,7 +2429,7 @@ int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command
         return SUANPAN_SUCCESS;
     }
 
-    domain->insert(make_shared<Mass3D>(tag, node, magnitude, uvec(dof_tag)));
+    domain->insert(std::make_shared<Mass3D>(tag, node, magnitude, uvec(dof_tag)));
 
     return SUANPAN_SUCCESS;
 }
@@ -2556,7 +2556,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             }
 
         // not loaded then try load it
-        if(!code && domain->insert(make_shared<ExternalModule>(modifier_type))) code = true;
+        if(!code && domain->insert(std::make_shared<ExternalModule>(modifier_type))) code = true;
 
         // if loaded find corresponding function
         if(code)
@@ -2591,10 +2591,10 @@ int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& 
         return SUANPAN_SUCCESS;
     }
 
-    if(is_equal(file_type, "B3DL")) domain->insert(make_shared<B3DL>(tag, std::move(xyz)));
-    else if(is_equal(file_type, "B3DC")) domain->insert(make_shared<B3DC>(tag, std::move(xyz)));
-    else if(is_equal(file_type, "B3DOSL")) domain->insert(make_shared<B3DOSL>(tag, std::move(xyz)));
-    else if(is_equal(file_type, "B3DOSC")) domain->insert(make_shared<B3DOSC>(tag, std::move(xyz)));
+    if(is_equal(file_type, "B3DL")) domain->insert(std::make_shared<B3DL>(tag, std::move(xyz)));
+    else if(is_equal(file_type, "B3DC")) domain->insert(std::make_shared<B3DC>(tag, std::move(xyz)));
+    else if(is_equal(file_type, "B3DOSL")) domain->insert(std::make_shared<B3DOSL>(tag, std::move(xyz)));
+    else if(is_equal(file_type, "B3DOSC")) domain->insert(std::make_shared<B3DOSC>(tag, std::move(xyz)));
 
     return SUANPAN_SUCCESS;
 }

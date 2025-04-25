@@ -37,11 +37,11 @@ int Static::initialize() {
     if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 
     // integrator
-    modifier = make_shared<Integrator>();
+    modifier = std::make_shared<Integrator>();
     modifier->set_domain(t_domain);
 
     // converger
-    if(nullptr == tester) tester = make_shared<AbsIncreDisp>();
+    if(nullptr == tester) tester = std::make_shared<AbsIncreDisp>();
     tester->set_domain(t_domain);
 
     // solver
@@ -52,10 +52,10 @@ int Static::initialize() {
             flag = true;
             break;
         }
-    if(nullptr == solver) flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
+    if(nullptr == solver) flag ? solver = std::make_shared<MPDC>() : solver = std::make_shared<Newton>();
     else if(flag && nullptr == std::dynamic_pointer_cast<MPDC>(solver)) {
         suanpan_warning("Wrong solver assigned, using MPDC instead.\n");
-        solver = make_shared<MPDC>();
+        solver = std::make_shared<MPDC>();
     }
 
     solver->set_integrator(modifier);

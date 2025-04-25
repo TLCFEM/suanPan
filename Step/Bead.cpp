@@ -19,7 +19,7 @@
 #include <Domain/Domain.h>
 #include <Step/Step.h>
 
-Bead::Bead() { insert(make_shared<Domain>(1)); }
+Bead::Bead() { insert(std::make_shared<Domain>(1)); }
 
 bool Bead::insert(const shared_ptr<DomainBase>& D) { return domain_pool.insert(D); }
 
@@ -27,7 +27,7 @@ void Bead::erase_domain(const unsigned T) {
     if(domain_pool.find(T)) {
         domain_pool.erase(T);
         if(domain_pool.size() == 0) {
-            insert(make_shared<Domain>(1));
+            insert(std::make_shared<Domain>(1));
             set_current_domain_tag(1);
             suanpan_info("Remove the last domain and switch to default one.\n");
         }

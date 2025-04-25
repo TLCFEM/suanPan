@@ -96,7 +96,7 @@ template<typename T> void load::object(unique_ptr<T>& new_object, const shared_p
 
     // not loaded then try load it
     // if loaded find corresponding function
-    if(loaded || domain->insert(make_shared<ExternalModule>(id)))
+    if(loaded || domain->insert(std::make_shared<ExternalModule>(id)))
         for(const auto& I : domain->get_external_module_pool()) {
             if(I->locate_cpp_module(id)) I->new_object(new_object, command);
             if(new_object != nullptr) break;

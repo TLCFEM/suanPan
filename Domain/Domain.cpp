@@ -41,7 +41,7 @@
 
 Domain::Domain(const unsigned T)
     : DomainBase(T)
-    , factory(make_shared<Factory<double>>())
+    , factory(std::make_shared<Factory<double>>())
     , attribute(10, false) {}
 
 Domain::~Domain() { for(const auto& I : thread_pond) I->get(); }

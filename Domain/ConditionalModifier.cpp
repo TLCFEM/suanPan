@@ -54,11 +54,8 @@ ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, co
     , dof_reference(D - 1) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
-    if(0 == amplitude_tag) magnitude = make_shared<Ramp>(0);
-    else {
-        magnitude = D->get<Amplitude>(amplitude_tag);
-        if(nullptr == magnitude || !magnitude->is_active()) magnitude = make_shared<Ramp>(0);
-    }
+    magnitude = D->get<Amplitude>(amplitude_tag);
+    if(nullptr == magnitude || !magnitude->is_active()) magnitude = std::make_shared<Ramp>(0);
 
     auto start_time = 0.;
     for(const auto& [t_tag, t_step] : D->get_step_pool()) {

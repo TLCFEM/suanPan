@@ -452,8 +452,8 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(criterion_type, "LogicCriterionAND")) domain->insert(make_shared<LogicCriterionAND>(tag, step_tag, tag_a, tag_b));
-        else if(is_equal(criterion_type, "LogicCriterionOR")) domain->insert(make_shared<LogicCriterionOR>(tag, step_tag, tag_a, tag_b));
+        if(is_equal(criterion_type, "LogicCriterionAND")) domain->insert(std::make_shared<LogicCriterionAND>(tag, step_tag, tag_a, tag_b));
+        else if(is_equal(criterion_type, "LogicCriterionOR")) domain->insert(std::make_shared<LogicCriterionOR>(tag, step_tag, tag_a, tag_b));
 
         return SUANPAN_SUCCESS;
     }
@@ -495,7 +495,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        domain->insert(make_shared<StrainEnergyEvolution>(tag, step_tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance));
+        domain->insert(std::make_shared<StrainEnergyEvolution>(tag, step_tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance));
 
         return SUANPAN_SUCCESS;
     }
@@ -512,7 +512,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        domain->insert(make_shared<MaxHistory>(tag, step_tag, to_token(type), limit));
+        domain->insert(std::make_shared<MaxHistory>(tag, step_tag, to_token(type), limit));
 
         return SUANPAN_SUCCESS;
     }
@@ -535,10 +535,10 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
         return SUANPAN_SUCCESS;
     }
 
-    if(is_equal(criterion_type, "MaxDisplacement")) domain->insert(make_shared<MaxDisplacement>(tag, step_tag, node, dof, limit));
-    else if(is_equal(criterion_type, "MinDisplacement")) domain->insert(make_shared<MinDisplacement>(tag, step_tag, node, dof, limit));
-    else if(is_equal(criterion_type, "MaxResistance")) domain->insert(make_shared<MaxResistance>(tag, step_tag, node, dof, limit));
-    else if(is_equal(criterion_type, "MinResistance")) domain->insert(make_shared<MinResistance>(tag, step_tag, node, dof, limit));
+    if(is_equal(criterion_type, "MaxDisplacement")) domain->insert(std::make_shared<MaxDisplacement>(tag, step_tag, node, dof, limit));
+    else if(is_equal(criterion_type, "MinDisplacement")) domain->insert(std::make_shared<MinDisplacement>(tag, step_tag, node, dof, limit));
+    else if(is_equal(criterion_type, "MaxResistance")) domain->insert(std::make_shared<MaxResistance>(tag, step_tag, node, dof, limit));
+    else if(is_equal(criterion_type, "MinResistance")) domain->insert(std::make_shared<MinResistance>(tag, step_tag, node, dof, limit));
 
     return SUANPAN_SUCCESS;
 }

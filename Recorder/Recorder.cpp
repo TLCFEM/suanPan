@@ -74,7 +74,7 @@ void Recorder::clear_status() {
 void Recorder::save() {
     if(time_pool.empty() || data_pool.empty() || data_pool.cbegin()->empty() || data_pool.cbegin()->cbegin()->empty() || data_pool.cbegin()->cbegin()->cbegin()->is_empty()) return;
 
-    ostringstream file_name;
+    std::ostringstream file_name;
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     // ReSharper disable once CppDFAUnreachableCode
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
@@ -110,7 +110,7 @@ void Recorder::save() {
 
             hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
 
-            ostringstream dataset_name;
+            std::ostringstream dataset_name;
             dataset_name << origin_name.c_str();
             dataset_name << object_tag(idx++);
 
@@ -137,7 +137,7 @@ void Recorder::save() {
                 for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(I, L++) = J[K];
             }
 
-            ostringstream dataset_name;
+            std::ostringstream dataset_name;
             dataset_name << (SUANPAN_OUTPUT / origin_name).generic_string();
             dataset_name << object_tag(idx++);
 

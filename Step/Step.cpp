@@ -59,7 +59,7 @@ int Step::initialize() {
     if(solver_tag != 0 && t_domain->find_solver(solver_tag)) solver = t_domain->get_solver(solver_tag);
     else if(const auto [t_tag, step_tag] = t_domain->get_current_solver_tag(); t_tag != 0 && step_tag <= get_tag()) solver = t_domain->get_current_solver();
 
-    if(tester == nullptr) tester = make_shared<RelIncreDisp>();
+    if(nullptr == tester) tester = std::make_shared<RelIncreDisp>();
 
     factory = t_domain->get_factory();
 

@@ -336,7 +336,7 @@ void argument_parser(const int argc, char** argv) {
         }
 
         print_header();
-        const auto model = make_shared<Bead>();
+        const auto model = std::make_shared<Bead>();
         if(input_file_name.empty()) cli_mode(model);
         else if(process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
             if(output_file.is_open()) {
@@ -349,7 +349,7 @@ void argument_parser(const int argc, char** argv) {
     else {
         check_version(SUANPAN_EXE);
         print_header();
-        const auto model = make_shared<Bead>();
+        const auto model = std::make_shared<Bead>();
         cli_mode(model);
     }
 

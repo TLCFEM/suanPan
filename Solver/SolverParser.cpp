@@ -48,7 +48,9 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             }
         }
 
-        if(is_equal(integrator_type, "Newmark")) { if(domain->insert(make_shared<Newmark>(tag, alpha, beta))) code = 1; }
+        if(is_equal(integrator_type, "Newmark")) {
+            if(domain->insert(std::make_shared<Newmark>(tag, alpha, beta))) code = 1;
+        }
         else if(is_equal(integrator_type, "RayleighNewmark")) {
             vec p(4, fill::zeros);
             auto idx = 0llu;
@@ -61,12 +63,12 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             if(suanpan::approx_equal(sum(p), 0.))
                 suanpan_warning("It seems all parameters are zeros, either the inputs are wrong or consider use plain Newmark.\n");
 
-            if(domain->insert(make_shared<RayleighNewmark>(tag, alpha, beta, p(0), p(1), p(2), p(3)))) code = 1;
+            if(domain->insert(std::make_shared<RayleighNewmark>(tag, alpha, beta, p(0), p(1), p(2), p(3)))) code = 1;
         }
         else if(is_equal(integrator_type, "LeeNewmark")) {
             const auto [damping_coef, frequency] = get_remaining<double, double>(command);
 
-            if(domain->insert(make_shared<LeeNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
+            if(domain->insert(std::make_shared<LeeNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
         }
         else if(is_equal(integrator_type, "LeeNewmarkIterative")) {
             using LeeMode = LeeNewmarkIterative::Mode;
@@ -143,12 +145,12 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                 }
             }
 
-            if(domain->insert(make_shared<LeeNewmarkIterative>(tag, std::move(modes), alpha, beta))) code = 1;
+            if(domain->insert(std::make_shared<LeeNewmarkIterative>(tag, std::move(modes), alpha, beta))) code = 1;
         }
         else if(is_equal(integrator_type, "LeeElementalNewmark")) {
             const auto [damping_coef, frequency] = get_remaining<double, double>(command);
 
-            if(domain->insert(make_shared<LeeElementalNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
+            if(domain->insert(std::make_shared<LeeElementalNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
         }
         else if(integrator_type.size() >= 14 && is_equal(integrator_type.substr(0, 14), "LeeNewmarkFull")) {
             using LeeMode = LeeNewmarkFull::Mode;
@@ -225,12 +227,18 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                 }
             }
 
-            if(is_equal(integrator_type, "LeeNewmarkFullTrial")) { if(domain->insert(make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::TRIAL))) code = 1; }
-            else if(is_equal(integrator_type, "LeeNewmarkFullCurrent") || is_equal(integrator_type, "LeeNewmarkFull")) { if(domain->insert(make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::CURRENT))) code = 1; }
-            else if(is_equal(integrator_type, "LeeNewmarkFullInitial")) { if(domain->insert(make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::INITIAL))) code = 1; }
+            if(is_equal(integrator_type, "LeeNewmarkFullTrial")) {
+                if(domain->insert(std::make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::TRIAL))) code = 1;
+            }
+            else if(is_equal(integrator_type, "LeeNewmarkFullCurrent") || is_equal(integrator_type, "LeeNewmarkFull")) {
+                if(domain->insert(std::make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::CURRENT))) code = 1;
+            }
+            else if(is_equal(integrator_type, "LeeNewmarkFullInitial")) {
+                if(domain->insert(std::make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::INITIAL))) code = 1;
+            }
         }
         else if(is_equal(integrator_type, "WilsonPenzienNewmark")) {
-            if(domain->insert(make_shared<WilsonPenzienNewmark>(tag, get_remaining<double>(command), alpha, beta))) code = 1;
+            if(domain->insert(std::make_shared<WilsonPenzienNewmark>(tag, get_remaining<double>(command), alpha, beta))) code = 1;
         }
         else if(is_equal(integrator_type, "NonviscousNewmark")) {
             const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
@@ -248,15 +256,15 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                 return SUANPAN_SUCCESS;
             }
 
-            if(domain->insert(make_shared<NonviscousNewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
+            if(domain->insert(std::make_shared<NonviscousNewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
         }
     }
     else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {
         const auto pool = get_remaining<double>(command);
 
-        if(pool.empty() && domain->insert(make_shared<GeneralizedAlpha>(tag, .5))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(1 == pool.size() && domain->insert(make_shared<GeneralizedAlpha>(tag, std::min(std::max(0., pool[0]), 1.)))) code = 1;
-        else if(2 == pool.size() && domain->insert(make_shared<GeneralizedAlpha>(tag, pool[0], pool[1]))) code = 1;
+        if(pool.empty() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, .5))) code = 1; // NOLINT(bugprone-branch-clone)
+        else if(1 == pool.size() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, std::min(std::max(0., pool[0]), 1.)))) code = 1;
+        else if(2 == pool.size() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, pool[0], pool[1]))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSU0")) {
         vec pool(3);
@@ -267,7 +275,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                 return SUANPAN_SUCCESS;
             }
 
-        if(domain->insert(make_shared<GSSSSU0>(tag, std::move(pool)))) code = 1;
+        if(domain->insert(std::make_shared<GSSSSU0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSV0")) {
         vec pool(3);
@@ -278,7 +286,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
                 return SUANPAN_SUCCESS;
             }
 
-        if(domain->insert(make_shared<GSSSSV0>(tag, std::move(pool)))) code = 1;
+        if(domain->insert(std::make_shared<GSSSSV0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSOptimal")) {
         auto radius = .5;
@@ -287,7 +295,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<GSSSSOptimal>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<GSSSSOptimal>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "OALTS")) {
         auto radius = .5;
@@ -296,7 +304,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<OALTS>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<OALTS>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheTwoStep")) {
         auto radius = 0.;
@@ -313,7 +321,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         }
         if(gamma <= 0. || gamma >= 1.) gamma = .5;
 
-        if(domain->insert(make_shared<BatheTwoStep>(tag, radius, gamma))) code = 1;
+        if(domain->insert(std::make_shared<BatheTwoStep>(tag, radius, gamma))) code = 1;
     }
     else if(is_equal(integrator_type, "Tchamwa")) {
         auto radius = .5;
@@ -322,7 +330,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<Tchamwa>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<Tchamwa>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheExplicit")) {
         auto radius = .5;
@@ -331,7 +339,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
     else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
         auto radius = .5;
@@ -340,7 +348,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<GeneralizedAlphaExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<GeneralizedAlphaExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
 
     if(1 == code) {
@@ -367,8 +375,12 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
     }
 
     auto code = 0;
-    if(is_equal(solver_type, "Newton")) { if(domain->insert(make_shared<Newton>(tag))) code = 1; }
-    else if(is_equal(solver_type, "modifiedNewton") || is_equal(solver_type, "mNewton")) { if(domain->insert(make_shared<Newton>(tag, true))) code = 1; }
+    if(is_equal(solver_type, "Newton")) {
+        if(domain->insert(std::make_shared<Newton>(tag))) code = 1;
+    }
+    else if(is_equal(solver_type, "modifiedNewton") || is_equal(solver_type, "mNewton")) {
+        if(domain->insert(std::make_shared<Newton>(tag, true))) code = 1;
+    }
     else if(is_equal(solver_type, "AICN")) {
         auto length = 1.;
         if(!command.eof() && !get_input(command, length)) {
@@ -376,9 +388,11 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<AICN>(tag, length))) code = 1;
+        if(domain->insert(std::make_shared<AICN>(tag, length))) code = 1;
     }
-    else if(is_equal(solver_type, "BFGS")) { if(domain->insert(make_shared<BFGS>(tag))) code = 1; }
+    else if(is_equal(solver_type, "BFGS")) {
+        if(domain->insert(std::make_shared<BFGS>(tag))) code = 1;
+    }
     else if(is_equal(solver_type, "LBFGS")) {
         auto max_history = 20;
         if(!command.eof() && !get_input(command, max_history)) {
@@ -386,7 +400,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<BFGS>(tag, max_history))) code = 1;
+        if(domain->insert(std::make_shared<BFGS>(tag, max_history))) code = 1;
     }
     else if(is_equal(solver_type, "FEAST") || is_equal(solver_type, "QuadraticFEAST")) {
         unsigned eigen_number;
@@ -407,10 +421,14 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& comma
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(make_shared<FEAST>(tag, eigen_number, centre, radius, is_equal(solver_type, "QuadraticFEAST")))) code = 1;
+        if(domain->insert(std::make_shared<FEAST>(tag, eigen_number, centre, radius, is_equal(solver_type, "QuadraticFEAST")))) code = 1;
     }
-    else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) { if(domain->insert(make_shared<MPDC>(tag))) code = 1; }
-    else if(is_equal(solver_type, "Ramm")) { if(domain->insert(make_shared<Ramm>(tag))) code = 1; }
+    else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) {
+        if(domain->insert(std::make_shared<MPDC>(tag))) code = 1;
+    }
+    else if(is_equal(solver_type, "Ramm")) {
+        if(domain->insert(std::make_shared<Ramm>(tag))) code = 1;
+    }
     else
         suanpan_error("Cannot identify the solver type.\n");
 
