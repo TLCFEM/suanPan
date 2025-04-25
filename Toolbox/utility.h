@@ -64,15 +64,15 @@ namespace suanpan {
     char to_upper(char);
     char to_lower(char);
 
-    void to_upper(string&);
-    void to_lower(string&);
-    string to_upper(const string&);
-    string to_lower(const string&);
-    string to_upper(string&&);
-    string to_lower(string&&);
+    void to_upper(std::string&);
+    void to_lower(std::string&);
+    std::string to_upper(const std::string&);
+    std::string to_lower(const std::string&);
+    std::string to_upper(std::string&&);
+    std::string to_lower(std::string&&);
 
     namespace expression {
-        std::vector<std::pair<string, unsigned>> split(std::string_view variable_string);
+        std::vector<std::pair<std::string, unsigned>> split(std::string_view variable_string);
     } // namespace expression 
 }     // namespace suanpan
 
@@ -185,20 +185,20 @@ template<typename T1, typename T2, typename T3, typename T4, typename T5> auto g
     return std::make_tuple(O1, O2, O3, O4, O5);
 }
 
-string get_remaining(istringstream&);
+std::string get_remaining(istringstream&);
 
 bool is_equal(const char*, const char*);
 bool is_equal(char, char);
 bool is_equal(int, char);
-bool is_equal(const string&, const char*);
-bool is_equal(const char*, const string&);
-bool is_equal(const string&, const string&);
+bool is_equal(const std::string&, const char*);
+bool is_equal(const char*, const std::string&);
+bool is_equal(const std::string&, const std::string&);
 bool is_equal(std::string_view, const char*);
 bool is_equal(const char*, std::string_view);
 
-bool if_contain(const string&, const char*);
-bool if_contain(const string&, const string&);
-bool if_contain(string&&, string&&);
+bool if_contain(const std::string&, const char*);
+bool if_contain(const std::string&, const std::string&);
+bool if_contain(std::string&&, std::string&&);
 
 template<std::equality_comparable T> std::pair<bool, std::int64_t> if_contain(const std::vector<T>& container, const T target) {
     auto position = std::find(container.begin(), container.end(), target);
@@ -208,10 +208,10 @@ template<std::equality_comparable T> std::pair<bool, std::int64_t> if_contain(co
 
 bool is_true(const char*);
 bool is_false(const char*);
-bool is_true(const string&);
-bool is_false(const string&);
+bool is_true(const std::string&);
+bool is_false(const std::string&);
 
-bool is_integer(const string&);
+bool is_integer(const std::string&);
 
 double perturb(double, double = 1E-5);
 

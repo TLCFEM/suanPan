@@ -56,17 +56,17 @@ string suanpan::to_lower(const string& U) {
     return C;
 }
 
-string suanpan::to_upper(string&& U) {
+std::string suanpan::to_upper(std::string&& U) {
     to_upper(U);
     return std::move(U);
 }
 
-string suanpan::to_lower(string&& U) {
+std::string suanpan::to_lower(std::string&& U) {
     to_lower(U);
     return std::move(U);
 }
 
-std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::string_view variable_string) {
+std::vector<std::pair<std::string, unsigned>> suanpan::expression::split(const std::string_view variable_string) {
     std::vector<std::string> variable_list;
     auto I = variable_string.cbegin(), J = variable_string.cbegin();
     while(I != variable_string.cend()) {
@@ -81,7 +81,7 @@ std::vector<std::pair<string, unsigned>> suanpan::expression::split(const std::s
 
     if(variable_list.empty() || is_integer(variable_list.front())) return {};
 
-    std::vector<std::pair<string, unsigned>> variable_size_list;
+    std::vector<std::pair<std::string, unsigned>> variable_size_list;
     for(const auto& variable : variable_list)
         if(is_integer(variable)) variable_size_list.back().second = std::stoi(variable);
         else variable_size_list.emplace_back(variable, 1);
@@ -95,7 +95,7 @@ void ignore_whitespace(istringstream& I) {
         else break;
 }
 
-string get_remaining(istringstream& I) {
+std::string get_remaining(istringstream& I) {
     if(const auto pos = I.tellg(); -1 != pos) return I.str().substr(pos);
     return {};
 }
@@ -106,30 +106,30 @@ bool is_equal(const char A, const char B) { return tolower(static_cast<int>(A)) 
 
 bool is_equal(const int A, const char B) { return tolower(A) == tolower(static_cast<int>(B)); }
 
-bool is_equal(const string& A, const char* B) { return is_equal(A.c_str(), B); }
+bool is_equal(const std::string& A, const char* B) { return is_equal(A.c_str(), B); }
 
-bool is_equal(const char* A, const string& B) { return is_equal(A, B.c_str()); }
+bool is_equal(const char* A, const std::string& B) { return is_equal(A, B.c_str()); }
 
-bool is_equal(const string& A, const string& B) { return is_equal(A.c_str(), B.c_str()); }
+bool is_equal(const std::string& A, const std::string& B) { return is_equal(A.c_str(), B.c_str()); }
 
 bool is_equal(const std::string_view A, const char* B) { return is_equal(A.data(), B); }
 
 bool is_equal(const char* A, const std::string_view B) { return is_equal(A, B.data()); }
 
-bool if_contain(const string& A, const char* B) { return A.find(B) != string::npos; }
+bool if_contain(const std::string& A, const char* B) { return A.find(B) != std::string::npos; }
 
-bool if_contain(const string& A, const string& B) { return A.find(B) != string::npos; }
+bool if_contain(const std::string& A, const std::string& B) { return A.find(B) != std::string::npos; }
 
-bool if_contain(string&& A, string&& B) { return if_contain(A, B); }
+bool if_contain(std::string&& A, std::string&& B) { return if_contain(A, B); }
 
 bool is_true(const char* S) { return is_equal(S, "On") || is_equal(S, "True") || is_equal(S, "T") || is_equal(S, "1") || is_equal(S, "Yes") || is_equal(S, "Y"); }
 
 bool is_false(const char* S) { return is_equal(S, "Off") || is_equal(S, "False") || is_equal(S, "F") || is_equal(S, "0") || is_equal(S, "No") || is_equal(S, "N"); }
 
-bool is_true(const string& S) { return is_true(S.c_str()); }
+bool is_true(const std::string& S) { return is_true(S.c_str()); }
 
-bool is_false(const string& S) { return is_false(S.c_str()); }
+bool is_false(const std::string& S) { return is_false(S.c_str()); }
 
-bool is_integer(const string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }
+bool is_integer(const std::string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }
 
 double perturb(const double input, const double fraction) { return input * (1. + randu<double>() * fraction); }

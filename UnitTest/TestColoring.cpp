@@ -82,11 +82,11 @@ TEST_CASE("Coloring Basic", "[Utility.Coloring]") {
 TEST_CASE("Coloring WP", "[Utility.Coloring]") {
     for(auto N = 16; N < 512; N *= 2)
         for(auto D = 1; D < 8; D *= 2)
-            BENCHMARK(string("Graph Size " + std::to_string(N) + " Density " + std::to_string(D)).c_str()) { color_graph(N, D * 1E-2, sort_color_wp); };
+            BENCHMARK(std::string("Graph Size " + std::to_string(N) + " Density " + std::to_string(D)).c_str()) { color_graph(N, D * 1E-2, sort_color_wp); };
 }
 
 TEST_CASE("Coloring MIS", "[Utility.Coloring]") {
     for(auto N = 16; N < 512; N *= 2)
         for(auto D = 1; D < 8; D *= 2)
-            BENCHMARK(string("Graph Size " + std::to_string(N) + " Density " + std::to_string(D)).c_str()) { color_graph(N, D * 1E-2, sort_color_mis); };
+            BENCHMARK(std::string("Graph Size " + std::to_string(N) + " Density " + std::to_string(D)).c_str()) { color_graph(N, D * 1E-2, sort_color_mis); };
 }

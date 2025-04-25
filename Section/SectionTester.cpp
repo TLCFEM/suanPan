@@ -120,7 +120,7 @@ int test_section_by_deformation_history(const shared_ptr<DomainBase>& domain, is
         return SUANPAN_SUCCESS;
     }
 
-    string history_file;
+    std::string history_file;
     if(!get_input(command, history_file)) {
         suanpan_error("A valid history file name is required.\n");
         return SUANPAN_SUCCESS;

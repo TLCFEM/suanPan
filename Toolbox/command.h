@@ -35,7 +35,7 @@ class Bead;
 
 int process_command(const shared_ptr<Bead>&, istringstream&);
 
-bool normalise_command(string&, string&);
+bool normalise_command(std::string&, std::string&);
 
 int process_file(const shared_ptr<Bead>&, const char*);
 

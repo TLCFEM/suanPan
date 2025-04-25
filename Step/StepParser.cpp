@@ -22,7 +22,7 @@
 #include <Solver/Integrator/Integrator.h>
 
 int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string step_type;
+    std::string step_type;
     if(!get_input(command, step_type)) {
         suanpan_error("A valid step type is required.\n");
         return SUANPAN_SUCCESS;

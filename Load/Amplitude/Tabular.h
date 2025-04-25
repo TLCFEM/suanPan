@@ -32,7 +32,7 @@
 #include <Load/Amplitude/Amplitude.h>
 
 class Tabular : public Amplitude {
-    const string file_name;
+    const std::string file_name;
 
 protected:
     vec time;      // time
@@ -40,7 +40,7 @@ protected:
 
 public:
     Tabular(unsigned, vec&&, vec&&, unsigned);
-    Tabular(unsigned, string&&, unsigned);
+    Tabular(unsigned, std::string&&, unsigned);
 
     void initialize(const shared_ptr<DomainBase>&) override;
 

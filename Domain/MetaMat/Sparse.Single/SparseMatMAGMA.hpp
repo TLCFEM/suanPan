@@ -67,11 +67,11 @@ template<typename T> T magma_parse_opts(istringstream& command) requires(std::is
 
     int basic = 0;
 
-    string token;
+    std::string token;
     // ReSharper disable StringLiteralTypo
     while(get_input(command, token)) {
         if(is_equal(token, "--mscale")) {
-            if(string scale; get_input(command, scale)) {
+            if(std::string scale; get_input(command, scale)) {
                 if(is_equal("NOSCALE", scale)) opts.scaling = Magma_NOSCALE;
                 else if(is_equal("UNITDIAG", scale)) opts.scaling = Magma_UNITDIAG;
                 else if(is_equal("UNITROW", scale)) opts.scaling = Magma_UNITROW;
@@ -81,7 +81,7 @@ template<typename T> T magma_parse_opts(istringstream& command) requires(std::is
             }
         }
         else if(is_equal(token, "--solver")) {
-            if(string solver; get_input(command, solver)) {
+            if(std::string solver; get_input(command, solver)) {
                 if(is_equal("CG", solver)) opts.solver_par.solver = Magma_PCGMERGE;
                 else if(is_equal("PCG", solver)) opts.solver_par.solver = Magma_PCGMERGE;
                 else if(is_equal("BICG", solver)) opts.solver_par.solver = Magma_PBICG;
@@ -109,7 +109,7 @@ template<typename T> T magma_parse_opts(istringstream& command) requires(std::is
             }
         }
         else if(is_equal(token, "--precond")) {
-            if(string solver; get_input(command, solver)) {
+            if(std::string solver; get_input(command, solver)) {
                 if(is_equal("CG", solver)) opts.precond_par.solver = Magma_CGMERGE;
                 else if(is_equal("PCG", solver)) opts.precond_par.solver = Magma_PCG;
                 else if(is_equal("BICGSTAB", solver)) opts.precond_par.solver = Magma_BICGSTABMERGE;
@@ -141,7 +141,7 @@ template<typename T> T magma_parse_opts(istringstream& command) requires(std::is
             }
         }
         else if(is_equal(token, "--trisolver")) {
-            if(string solver; get_input(command, solver)) {
+            if(std::string solver; get_input(command, solver)) {
                 if(is_equal("CG", solver)) opts.precond_par.trisolver = Magma_CGMERGE;
                 else if(is_equal("BICGSTAB", solver)) opts.precond_par.trisolver = Magma_BICGSTABMERGE;
                 else if(is_equal("QMR", solver)) opts.precond_par.trisolver = Magma_QMRMERGE;

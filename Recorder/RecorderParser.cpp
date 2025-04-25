@@ -21,7 +21,7 @@
 #include <Toolbox/utility.h>
 
 int process_recorder_command(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned tag, const bool use_hdf5) {
-    string object_type;
+    std::string object_type;
     if(!get_input(command, object_type)) {
         suanpan_error("A valid object type is required.\n");
         return SUANPAN_SUCCESS;
@@ -33,7 +33,7 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, istringstream
         return SUANPAN_SUCCESS;
     }
 
-    string variable_type;
+    std::string variable_type;
     if(!is_equal(object_type, "Amplitude") && !get_input(command, variable_type)) {
         suanpan_error("A valid recorder type is required.\n");
         return SUANPAN_SUCCESS;
@@ -45,7 +45,7 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, istringstream
 
     auto interval = 1u;
     if(is_equal(command.peek(), 'e') || is_equal(command.peek(), 'i')) {
-        string tmp_string;
+        std::string tmp_string;
         get_input(command, tmp_string);
         if(!get_input(command, interval)) return SUANPAN_SUCCESS;
     }
@@ -56,7 +56,7 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, istringstream
         return SUANPAN_SUCCESS;
     }
     if(is_equal(object_type, "Visualisation")) {
-        string para;
+        std::string para;
         auto width = 6u;
         auto scale = 1.;
         while(!command.eof() && get_input(command, para))
@@ -112,7 +112,7 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& com
         return SUANPAN_SUCCESS;
     }
 
-    string file_type;
+    std::string file_type;
     if(!get_input(command, file_type)) {
         suanpan_error("A valid object type is required.\n");
         return SUANPAN_SUCCESS;

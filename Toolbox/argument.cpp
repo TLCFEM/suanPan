@@ -127,7 +127,7 @@ namespace {
         execute_command(terminal);
     }
 
-    void strip_mode(const string& input_file_name, const string& output_file_name) {
+    void strip_mode(const std::string& input_file_name, const std::string& output_file_name) {
         ifstream input_file(input_file_name);
 
         if(!input_file.is_open()) {
@@ -145,7 +145,7 @@ namespace {
         output_file.setf(std::ios::scientific);
         output_file << std::setprecision(3);
 
-        string line;
+        std::string line;
 
         while(std::getline(input_file, line)) {
             if(line.empty() || if_contain(line, "**")) continue;
@@ -156,7 +156,7 @@ namespace {
         }
     }
 
-    void convert_mode(const string& input_file_name, const string& output_file_name) {
+    void convert_mode(const std::string& input_file_name, const std::string& output_file_name) {
         ifstream input_file(input_file_name);
 
         if(!input_file.is_open()) {
@@ -173,7 +173,7 @@ namespace {
 
         const auto pos = output_file_name.find_last_of('/');
 
-        Converter abaqus_converter(string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
+        Converter abaqus_converter(std::string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
 
         abaqus_converter.process(input_file, output_file);
     }
@@ -311,9 +311,9 @@ void argument_parser(const int argc, char** argv) {
 
                 auto found = output_file_name.rfind(".inp");
 
-                if(string::npos == found) found = output_file_name.rfind(".INP");
+                if(std::string::npos == found) found = output_file_name.rfind(".INP");
 
-                if(string::npos != found) output_file_name.erase(found, 4);
+                if(std::string::npos != found) output_file_name.erase(found, 4);
 
                 output_file_name += strip ? "_out.inp" : "_out.supan";
             }
@@ -427,9 +427,9 @@ void cli_mode(const shared_ptr<Bead>& model) {
 
     ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
 
-    string all_line;
+    std::string all_line;
     while(true) {
-        string command_line;
+        std::string command_line;
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         if(0 == comm_rank)
             suanpan_info("suanPan ~<> ");

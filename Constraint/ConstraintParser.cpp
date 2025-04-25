@@ -30,7 +30,7 @@ namespace {
             return;
         }
 
-        string dof_id;
+        std::string dof_id;
         if(!get_input(command, dof_id)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
@@ -440,7 +440,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
         return SUANPAN_SUCCESS;
     }
 
-    string criterion_type;
+    std::string criterion_type;
     if(!get_input(command, criterion_type)) {
         suanpan_error("A valid criterion type is required.\n");
         return SUANPAN_SUCCESS;
@@ -508,7 +508,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
     }
 
     if(is_equal(criterion_type, "MaxHistory")) {
-        string type;
+        std::string type;
         double limit;
         if(!get_input(command, type)) {
             suanpan_error("A valid type is required.\n");
@@ -551,7 +551,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
 }
 
 int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string constraint_id;
+    std::string constraint_id;
     if(!get_input(command, constraint_id)) {
         suanpan_error("A valid constraint type is required.\n");
         return SUANPAN_SUCCESS;

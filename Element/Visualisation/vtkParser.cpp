@@ -47,7 +47,7 @@ VTK_MODULE_INIT(vtkRenderingFreeType) // NOLINT(cppcoreguidelines-special-member
 vtkInfo vtk_process(istringstream& command) {
     vtkInfo config;
 
-    string keyword;
+    std::string keyword;
 
     while(!command.eof() && get_input(command, keyword))
         if(is_equal(keyword, "scale") && !get_input(command, config.scale)) config.scale = 1.;
@@ -142,7 +142,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     auto& t_node_pool = domain->get_node_pool();
     auto& t_element_pool = domain->get_element_pool();
 
-    config.title_name = "Plotting Nodal Quantity " + string(to_name(config.type));
+    config.title_name = "Plotting Nodal Quantity " + std::string(to_name(config.type));
 
     auto max_node = static_cast<unsigned>(t_node_pool.size());
     for(const auto& I : t_node_pool) max_node = std::max(max_node, I->get_tag());
@@ -203,7 +203,7 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
     auto& t_node_pool = domain->get_node_pool();
     auto& t_element_pool = domain->get_element_pool();
 
-    config.title_name = "Plotting Element Quantity " + string(to_name(config.type));
+    config.title_name = "Plotting Element Quantity " + std::string(to_name(config.type));
 
     auto max_node = static_cast<unsigned>(t_node_pool.size());
     for(const auto& I : t_node_pool) max_node = std::max(max_node, I->get_tag());

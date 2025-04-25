@@ -38,8 +38,8 @@ struct vtkInfo {
     unsigned font_size = 8;
     int canvas_size[2] = {500, 500};
     bool save_file = false;
-    string file_name;
-    string title_name;
+    std::string file_name;
+    std::string title_name;
     bool colorbar = true;
     int material_type = -1;
     bool store_ptr = false;

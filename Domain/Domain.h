@@ -409,7 +409,7 @@ public:
 
     double stats(const Statistics T) const override { return statistics[static_cast<size_t>(T)]; }
 
-    void save(string) override;
+    void save(std::string) override;
 };
 
 #endif

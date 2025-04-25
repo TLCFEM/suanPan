@@ -1270,4 +1270,4 @@ void Domain::assemble_constraint_stiffness() {
         if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding());
 }
 
-void Domain::save(string) {}
+void Domain::save(std::string) {}

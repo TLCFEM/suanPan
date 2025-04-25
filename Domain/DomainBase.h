@@ -426,7 +426,7 @@ public:
 
     [[nodiscard]] virtual double stats(Statistics) const = 0;
 
-    virtual void save(string) = 0;
+    virtual void save(std::string) = 0;
 };
 
 template<typename T> bool DomainBase::erase(unsigned) { throw std::invalid_argument("unsupported"); }

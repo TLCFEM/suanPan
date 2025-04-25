@@ -227,7 +227,7 @@ namespace {
 } // namespace
 
 int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string amplitude_type;
+    std::string amplitude_type;
     if(!get_input(command, amplitude_type)) {
         suanpan_error("A valid amplitude type is required.\n");
         return SUANPAN_SUCCESS;
@@ -242,7 +242,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     if(const auto step_tag = domain->get_current_step_tag(); is_equal(amplitude_type, "Constant")) domain->insert(std::make_shared<Constant>(tag, step_tag));
     else if(is_equal(amplitude_type, "Ramp")) domain->insert(std::make_shared<Ramp>(tag, step_tag));
     else if(is_equal(amplitude_type, "Tabular")) {
-        string file_name;
+        std::string file_name;
         if(!get_input(command, file_name)) {
             suanpan_error("A valid file is required.\n");
             return SUANPAN_SUCCESS;
@@ -256,7 +256,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
                 return SUANPAN_SUCCESS;
             }
 
-            string window_type = "Hamming";
+            std::string window_type = "Hamming";
             if(!get_optional_input(command, window_type)) {
                 suanpan_error("A valid window type is required.\n");
                 return SUANPAN_SUCCESS;
@@ -279,7 +279,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
         }
     }
     else if(is_equal(amplitude_type, "TabularSpline")) {
-        string file_name;
+        std::string file_name;
         if(!get_input(command, file_name)) {
             suanpan_error("A valid file is required.\n");
             return SUANPAN_SUCCESS;
@@ -325,7 +325,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
         else if(is_equal(amplitude_type, "Cosine")) domain->insert(std::make_shared<Cosine>(tag, W, get_remaining<double>(command), step_tag));
     }
     else if(is_equal(amplitude_type, "NZStrongMotion")) {
-        string name;
+        std::string name;
         if(!get_input(command, name)) {
             suanpan_error("A valid name is required.\n");
             return SUANPAN_SUCCESS;
@@ -338,7 +338,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
 }
 
 int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string load_id;
+    std::string load_id;
     if(!get_input(command, load_id)) {
         suanpan_error("A valid load type is required.\n");
         return SUANPAN_SUCCESS;

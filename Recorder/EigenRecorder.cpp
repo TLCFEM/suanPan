@@ -53,7 +53,7 @@ void EigenRecorder::save() {
 
 #ifdef SUANPAN_HDF5
     if(if_hdf5()) {
-        const string file_name = "Eigenvalue.h5";
+        const std::string file_name = "Eigenvalue.h5";
 
         const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 

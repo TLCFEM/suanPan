@@ -37,7 +37,7 @@ using constraint_creator = void (*)(unique_ptr<Constraint>&, istringstream&);
 
 using external_handler = void (*)(ExternalMaterialData*, int*);
 
-bool ExternalModule::locate_module(string module_name) {
+bool ExternalModule::locate_module(std::string module_name) {
     if(ext_library == nullptr) return false;
 
     suanpan::to_lower(module_name);
@@ -51,7 +51,7 @@ bool ExternalModule::locate_module(string module_name) {
     return ext_creator != nullptr;
 }
 
-ExternalModule::ExternalModule(string L)
+ExternalModule::ExternalModule(std::string L)
     : library_name(std::move(L)) {
 #ifdef SUANPAN_WIN
     auto file_name = library_name + ".dll";
@@ -99,9 +99,9 @@ ExternalModule::~ExternalModule() {
 #endif
 }
 
-bool ExternalModule::locate_c_module(const string& module_name) { return locate_module(module_name + "_handler"); }
+bool ExternalModule::locate_c_module(const std::string& module_name) { return locate_module(module_name + "_handler"); }
 
-bool ExternalModule::locate_cpp_module(const string& module_name) { return locate_module("new_" + module_name); }
+bool ExternalModule::locate_cpp_module(const std::string& module_name) { return locate_module("new_" + module_name); }
 
 void ExternalModule::new_object(unique_ptr<Element>& return_obj, istringstream& command) const { (element_creator(ext_creator))(return_obj, command); }
 

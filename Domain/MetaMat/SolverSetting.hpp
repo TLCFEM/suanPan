@@ -26,7 +26,7 @@ enum class Precision : std::uint8_t {
 };
 
 template<sp_d data_t> struct SolverSetting {
-    string option{};
+    std::string option{};
     data_t tolerance = std::is_same_v<data_t, float> ? 1E-7f : 1E-14;
     std::uint8_t iterative_refinement = 5;
     Precision precision = Precision::FULL;

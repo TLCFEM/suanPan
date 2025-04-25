@@ -175,7 +175,7 @@ template<> vec fir_band_stop<WindowType::BlackmanHarris>(const uword s, const do
 
 template<> vec fir_band_stop<WindowType::FlatTop>(const uword s, const double fa, const double fb) { return fir_band_stop(s, fa, fb, flat_top); }
 
-mat upsampling(const string& window_type, const string& file_name, const uword up_rate, const uword window_size) {
+mat upsampling(const std::string& window_type, const std::string& file_name, const uword up_rate, const uword window_size) {
     mat result;
 
     if(is_equal(window_type, "Hamming")) result = upsampling<WindowType::Hamming>(file_name, up_rate, window_size);

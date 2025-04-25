@@ -23,7 +23,7 @@
 #include <Toolbox/utility.h>
 
 int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string converger_id;
+    std::string converger_id;
     if(!get_input(command, converger_id)) {
         suanpan_error("A valid converger type is required.\n");
         return SUANPAN_SUCCESS;
@@ -62,7 +62,7 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        string print_flag = "false";
+        std::string print_flag = "false";
         if(!command.eof() && !get_input(command, print_flag)) {
             suanpan_error("A valid print flag is required.\n");
             return SUANPAN_SUCCESS;

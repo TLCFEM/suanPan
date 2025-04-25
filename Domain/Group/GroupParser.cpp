@@ -54,7 +54,7 @@ void new_elementgroup(unique_ptr<Group>& return_obj, istringstream& command) {
 }
 
 void new_generate(unique_ptr<Group>& return_obj, istringstream& command) {
-    string type;
+    std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid type is required.\n");
         return;
@@ -102,7 +102,7 @@ void new_generate(unique_ptr<Group>& return_obj, istringstream& command) {
 }
 
 void new_generatebyrule(unique_ptr<Group>& return_obj, istringstream& command) {
-    if(string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
+    if(std::string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
         suanpan_error("A valid type is required.\n");
         return;
     }
@@ -123,7 +123,7 @@ void new_generatebyrule(unique_ptr<Group>& return_obj, istringstream& command) {
 }
 
 void new_generatebyplane(unique_ptr<Group>& return_obj, istringstream& command) {
-    if(string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
+    if(std::string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
         suanpan_error("A valid type is required.\n");
         return;
     }
@@ -142,7 +142,7 @@ void new_generatebyplane(unique_ptr<Group>& return_obj, istringstream& command) 
 }
 
 void new_generatebypoint(unique_ptr<Group>& return_obj, istringstream& command) {
-    if(string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
+    if(std::string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
         suanpan_error("A valid type is required.\n");
         return;
     }
@@ -173,7 +173,7 @@ void new_groupgroup(unique_ptr<Group>& return_obj, istringstream& command) {
 }
 
 int create_new_group(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string group_id;
+    std::string group_id;
     if(!get_input(command, group_id)) {
         suanpan_error("A valid group type is required.\n");
         return SUANPAN_SUCCESS;

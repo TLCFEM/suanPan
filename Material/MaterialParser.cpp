@@ -1004,7 +1004,7 @@ namespace {
             return;
         }
 
-        string linear_trans = "false";
+        std::string linear_trans = "false";
         if(!command.eof() && !get_input(command, linear_trans)) {
             suanpan_error("A valid transition switch is required.\n");
             return;
@@ -1112,7 +1112,7 @@ namespace {
             return;
         }
 
-        string c_name, t_name;
+        std::string c_name, t_name;
         if(!get_input(command, t_name, c_name)) {
             suanpan_error("A valid parameter is required.\n");
             return;
@@ -2160,7 +2160,7 @@ namespace {
             return;
         }
 
-        string matrix = "false";
+        std::string matrix = "false";
         if(!command.eof() && !get_input(command, matrix)) {
             suanpan_error("A valid algorithm switch is required.\n");
             return;
@@ -2272,13 +2272,13 @@ namespace {
             return;
         }
 
-        string iso = "false";
+        std::string iso = "false";
         if(!command.eof() && !get_input(command, iso)) {
             suanpan_error("A valid isotropic hardening switch is required.\n");
             return;
         }
 
-        string con = "false";
+        std::string con = "false";
         if(!command.eof() && !get_input(command, con)) {
             suanpan_error("A valid constant radius switch is required.\n");
             return;
@@ -2302,7 +2302,7 @@ namespace {
 
         mat t_backbone, c_backbone;
 
-        string name;
+        std::string name;
         if(!get_input(command, name) || !t_backbone.load(name, raw_ascii) || t_backbone.empty()) {
             suanpan_error("A valid tension backbone file is required.\n");
             return;
@@ -2333,7 +2333,7 @@ namespace {
 
         mat t_backbone, c_backbone;
 
-        string name;
+        std::string name;
         if(!get_input(command, name) || !t_backbone.load(name, raw_ascii) || t_backbone.empty()) {
             suanpan_error("A valid tension backbone file is required.\n");
             return;
@@ -2908,7 +2908,7 @@ namespace {
 
         std::vector<DataSubloading1D::Saturation> back, core;
 
-        string token;
+        std::string token;
         while(!command.eof() && get_input(command, token)) {
             double a, b;
             if(is_equal("-back", token)) {
@@ -3094,7 +3094,7 @@ namespace {
         mat c_table, t_table, dc_table, dt_table;
 
         auto check_file = [&](mat& table) {
-            string table_name;
+            std::string table_name;
             if(!get_input(command, table_name)) {
                 suanpan_error("A valid parameter is required.\n");
                 return false;
@@ -3133,7 +3133,7 @@ namespace {
         double para;
         while(!command.eof() && idx < 2) if(get_input(command, para)) para_pool(idx++) = para;
 
-        string table_name;
+        std::string table_name;
         if(!get_input(command, table_name)) {
             suanpan_error("A valid parameter is required.\n");
             return;
@@ -3410,7 +3410,7 @@ namespace {
 }
 
 int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string material_id;
+    std::string material_id;
     if(!get_input(command, material_id)) {
         suanpan_error("A valid material type is required.\n");
         return 0;

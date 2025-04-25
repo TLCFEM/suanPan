@@ -2624,7 +2624,7 @@ vec uschssection(const std::string_view type) {
 }
 
 void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
+    std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
         return;
@@ -2671,7 +2671,7 @@ void new_eu2d(unique_ptr<Section>& return_obj, istringstream& command) {
 }
 
 void new_eu3d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
+    std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
         return;
@@ -2724,7 +2724,7 @@ void new_eu3d(unique_ptr<Section>& return_obj, istringstream& command) {
 }
 
 void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
+    std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
         return;
@@ -2796,7 +2796,7 @@ void new_nz2d(unique_ptr<Section>& return_obj, istringstream& command) {
 }
 
 void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
-    string type;
+    std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
         return;
@@ -2874,7 +2874,7 @@ void new_nz3d(unique_ptr<Section>& return_obj, istringstream& command) {
 }
 
 void new_us2d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
-    string type;
+    std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
         return;
@@ -2943,7 +2943,7 @@ void new_us2d(unique_ptr<Section>& return_obj, istringstream& command, const boo
 }
 
 void new_us3d(unique_ptr<Section>& return_obj, istringstream& command, const bool recenter) {
-    string type;
+    std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
         return;
@@ -3018,7 +3018,7 @@ void new_us3d(unique_ptr<Section>& return_obj, istringstream& command, const boo
 }
 
 int create_new_section(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string section_id;
+    std::string section_id;
     if(!get_input(command, section_id)) {
         suanpan_error("A valid section type is required.\n");
         return 0;

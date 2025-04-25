@@ -116,7 +116,7 @@ namespace {
         }
     }
 
-    template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(string&& title, MT& A, const Col<ET>& C, const Mat<ET>& E, T&& clear_mat) {
+    template<typename MT, typename ET, std::invocable T> void benchmark_mat_solve(std::string&& title, MT& A, const Col<ET>& C, const Mat<ET>& E, T&& clear_mat) {
         constexpr auto tol = std::numeric_limits<ET>::epsilon() * 1000;
         const auto scaled_tol = static_cast<ET>(C.n_elem) * tol;
 
@@ -215,7 +215,7 @@ namespace {
 
         auto A = create_new<T>(I);
 
-        string title;
+        std::string title;
 
         if(std::is_same_v<FullMat<ET>, T>) title = "Full ";
         else if(std::is_same_v<SymmPackMat<ET>, T>) title = "SymmPack ";
@@ -454,7 +454,7 @@ TEST_CASE("Benchmark Triplet Assembly", "[Matrix.Sparse]") {
     REQUIRE(B.n_elem == NNZ);
 
     for(auto J = 2; J != REPEAT; J *= 2)
-        BENCHMARK(string("Assemble " + std::to_string(J)).c_str()) {
+        BENCHMARK(std::string("Assemble " + std::to_string(J)).c_str()) {
             triplet_form<double, uword> C(N + REPEAT, N + REPEAT, B.n_elem * REPEAT);
 
             for(auto I = 0; I < J; ++I) C.assemble(B, I, I, randu<double>());

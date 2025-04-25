@@ -419,7 +419,7 @@ int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istrin
         return SUANPAN_SUCCESS;
     }
 
-    string history_file;
+    std::string history_file;
     if(!get_input(command, history_file)) {
         suanpan_error("A valid history file name is required.\n");
         return SUANPAN_SUCCESS;
@@ -444,7 +444,7 @@ int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istrin
         return SUANPAN_SUCCESS;
     }
 
-    string history_file;
+    std::string history_file;
     if(!get_input(command, history_file)) {
         suanpan_error("A valid history file name is required.\n");
         return SUANPAN_SUCCESS;

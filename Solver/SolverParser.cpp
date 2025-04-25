@@ -22,7 +22,7 @@
 #include <Toolbox/utility.h>
 
 int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string integrator_type;
+    std::string integrator_type;
     if(!get_input(command, integrator_type)) {
         suanpan_error("A valid integrator type is required.\n");
         return SUANPAN_SUCCESS;
@@ -35,7 +35,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
     }
 
     auto code = 0;
-    if(if_contain(suanpan::to_upper(cref(integrator_type)), suanpan::to_upper(string("Newmark")))) {
+    if(if_contain(suanpan::to_upper(cref(integrator_type)), suanpan::to_upper(std::string("Newmark")))) {
         auto alpha = .25, beta = .5;
         if(!command.eof()) {
             if(!get_input(command, alpha)) {
@@ -109,7 +109,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             auto regularise = [](const double x) { return static_cast<double>(static_cast<unsigned>(x)); };
 
             while(!command.eof()) {
-                string type;
+                std::string type;
                 if(!get_input(command, type)) {
                     suanpan_error("A valid type is required.\n");
                     return SUANPAN_SUCCESS;
@@ -191,7 +191,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             auto regularise = [](const double x) { return static_cast<double>(static_cast<unsigned>(x)); };
 
             while(!command.eof()) {
-                string type;
+                std::string type;
                 if(!get_input(command, type)) {
                     suanpan_error("A valid type is required.\n");
                     return SUANPAN_SUCCESS;
@@ -362,7 +362,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
 }
 
 int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string solver_type;
+    std::string solver_type;
     if(!get_input(command, solver_type)) {
         suanpan_error("A valid solver type is required.\n");
         return SUANPAN_SUCCESS;

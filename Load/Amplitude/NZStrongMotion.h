@@ -32,7 +32,7 @@
 #include <Load/Amplitude/Amplitude.h>
 
 class NZStrongMotion final : public Amplitude {
-    const string file_name;
+    const std::string file_name;
     vec magnitude; // magnitude
 public:
     NZStrongMotion(unsigned, const char*, unsigned = 0);

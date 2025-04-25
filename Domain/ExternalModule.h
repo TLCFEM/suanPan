@@ -46,20 +46,20 @@ class ExternalModule {
     void* ext_library = nullptr;
     void* ext_creator = nullptr;
 
-    bool locate_module(string);
+    bool locate_module(std::string);
 
 public:
-    const string library_name;
+    const std::string library_name;
 
-    explicit ExternalModule(string);
+    explicit ExternalModule(std::string);
     ExternalModule(const ExternalModule&) = delete;
     ExternalModule(ExternalModule&&) = delete;
     ExternalModule& operator=(const ExternalModule&) = delete;
     ExternalModule& operator=(ExternalModule&&) = delete;
     ~ExternalModule();
 
-    bool locate_c_module(const string&);
-    bool locate_cpp_module(const string&);
+    bool locate_c_module(const std::string&);
+    bool locate_cpp_module(const std::string&);
 
     void new_object(unique_ptr<Element>&, istringstream&) const;
     void new_object(unique_ptr<Load>&, istringstream&) const;
@@ -82,10 +82,10 @@ public:
 
 class load {
 public:
-    template<typename T> static void object(unique_ptr<T>&, const shared_ptr<DomainBase>&, const string&, istringstream&);
+    template<typename T> static void object(unique_ptr<T>&, const shared_ptr<DomainBase>&, const std::string&, istringstream&);
 };
 
-template<typename T> void load::object(unique_ptr<T>& new_object, const shared_ptr<DomainBase>& domain, const string& id, istringstream& command) {
+template<typename T> void load::object(unique_ptr<T>& new_object, const shared_ptr<DomainBase>& domain, const std::string& id, istringstream& command) {
     // check if the library is already loaded
     auto loaded = false;
     for(const auto& I : domain->get_external_module_pool())

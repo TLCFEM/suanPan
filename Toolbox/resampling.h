@@ -109,7 +109,7 @@ template<WindowType T> vec upsampling(const vec& in, const uword up_rate, const 
     return conv(out, coef, "same");
 }
 
-template<WindowType T> mat upsampling(const string& file_name, const uword up_rate, const uword window_size) {
+template<WindowType T> mat upsampling(const std::string& file_name, const uword up_rate, const uword window_size) {
     mat ext_data;
     if(std::error_code code; !fs::exists(file_name, code) || !ext_data.load(file_name, raw_ascii) || ext_data.empty() || ext_data.n_cols < 2) {
         ext_data.reset();
@@ -136,6 +136,6 @@ template<WindowType T> mat upsampling(const string& file_name, const uword up_ra
     return result;
 }
 
-mat upsampling(const string&, const string&, uword, uword = 8llu);
+mat upsampling(const std::string&, const std::string&, uword, uword = 8llu);
 
 #endif

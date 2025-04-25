@@ -77,7 +77,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(!get_optional_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -112,7 +112,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(!get_optional_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -152,7 +152,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(!get_optional_input(command, nonlinear)) {
             suanpan_error("A valid nlgeom switch is required.\n");
             return;
@@ -181,7 +181,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(!get_optional_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -216,7 +216,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(!get_optional_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -244,13 +244,13 @@ namespace {
             return;
         }
 
-        string reduced_scheme = "true";
+        std::string reduced_scheme = "true";
         if(command.eof())
             suanpan_debug("Standard Irons 14-point integration scheme assumed.\n");
         else if(!get_input(command, reduced_scheme))
             suanpan_error("A valid reduced integration switch is required.\n");
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -278,7 +278,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -306,13 +306,13 @@ namespace {
             return;
         }
 
-        string reduced_scheme = "I";
+        std::string reduced_scheme = "I";
         if(command.eof())
             suanpan_debug("Standard 4-point integration scheme assumed.\n");
         else if(!get_input(command, reduced_scheme))
             suanpan_error("A valid reduced integration switch is required.\n");
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -340,7 +340,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -390,7 +390,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -520,7 +520,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -554,7 +554,7 @@ namespace {
             return;
         }
 
-        string reduced_scheme = "N";
+        std::string reduced_scheme = "N";
         if(command.eof())
             suanpan_debug("Full integration assumed.\n");
         else if(!get_input(command, reduced_scheme)) {
@@ -562,7 +562,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "N";
+        std::string nonlinear = "N";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear)) {
@@ -626,7 +626,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -660,7 +660,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "N";
+        std::string nonlinear = "N";
         if(!command.eof() && !get_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -694,7 +694,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(!get_optional_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -728,7 +728,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "N";
+        std::string nonlinear = "N";
         if(!command.eof() && !get_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -762,13 +762,13 @@ namespace {
             return;
         }
 
-        string reduced_scheme = "N";
+        std::string reduced_scheme = "N";
         if(!get_optional_input(command, reduced_scheme)) {
             suanpan_error("A valid reduced integration switch is required.\n");
             return;
         }
 
-        string nonlinear = "N";
+        std::string nonlinear = "N";
         if(!get_optional_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -796,13 +796,13 @@ namespace {
             return;
         }
 
-        string reduced_scheme = "N";
+        std::string reduced_scheme = "N";
         if(!command.eof() && !get_input(command, reduced_scheme)) {
             suanpan_error("A valid reduced integration switch is required.\n");
             return;
         }
 
-        string nonlinear = "N";
+        std::string nonlinear = "N";
         if(!command.eof() && !get_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -830,7 +830,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "N";
+        std::string nonlinear = "N";
         if(!command.eof() && !get_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -1042,7 +1042,7 @@ namespace {
             return;
         }
 
-        string use_matrix = "true";
+        std::string use_matrix = "true";
         if(!command.eof() && !get_input(command, use_matrix)) {
             suanpan_error("A valid switch is required.\n");
             return;
@@ -1332,7 +1332,7 @@ namespace {
             return;
         }
 
-        string nlgeom = "false";
+        std::string nlgeom = "false";
         if(!get_optional_input(command, nlgeom)) {
             suanpan_error("A valid nlgeom switch is required.\n");
             return;
@@ -1401,7 +1401,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -1435,7 +1435,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
@@ -1543,7 +1543,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "false";
+        std::string nonlinear = "false";
         if(!command.eof() && !get_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
             return;
@@ -1577,7 +1577,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        string int_scheme = "I";
+        std::string int_scheme = "I";
         if(!command.eof() && !get_input(command, int_scheme))
             suanpan_error("A valid reduced scheme switch is required.\n");
 
@@ -1665,7 +1665,7 @@ namespace {
             return;
         }
 
-        string nlgeom = "false";
+        std::string nlgeom = "false";
         if(!get_optional_input(command, nlgeom)) {
             suanpan_error("A valid nlgeom switch is required.\n");
             return;
@@ -1999,7 +1999,7 @@ namespace {
             return;
         }
 
-        string nlgeom = "false";
+        std::string nlgeom = "false";
         if(!get_optional_input(command, nlgeom)) {
             suanpan_error("A valid nlgeom switch is required.\n");
             return;
@@ -2099,7 +2099,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "N", update_area = "N", log_strain = "N";
+        std::string nonlinear = "N", update_area = "N", log_strain = "N";
         double rigidity = -1.;
 
         if(command.eof())
@@ -2144,7 +2144,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "N", log_strain = "N";
+        std::string nonlinear = "N", log_strain = "N";
 
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
@@ -2184,7 +2184,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "N", update_area = "N", log_strain = "N";
+        std::string nonlinear = "N", update_area = "N", log_strain = "N";
 
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
@@ -2223,7 +2223,7 @@ namespace {
             return;
         }
 
-        string nonlinear = "N", log_strain = "N";
+        std::string nonlinear = "N", log_strain = "N";
 
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
@@ -2292,7 +2292,7 @@ namespace {
         auto thickness = 1.;
 
         while(!command.eof()) {
-            if(string parameter; get_input(command, parameter)) {
+            if(std::string parameter; get_input(command, parameter)) {
                 ignore_whitespace(command);
                 if(uword node; is_equal(parameter, "-node"))
                     while(command.peek() != '-' && get_input(command, node)) {
@@ -2354,7 +2354,7 @@ namespace {
         auto material_tag = -1;
 
         while(!command.eof()) {
-            if(string parameter; get_input(command, parameter)) {
+            if(std::string parameter; get_input(command, parameter)) {
                 ignore_whitespace(command);
                 if(uword node; is_equal(parameter, "-node"))
                     while(command.peek() != '-' && get_input(command, node)) {
@@ -2435,7 +2435,7 @@ int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command
 }
 
 int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string modifier_type;
+    std::string modifier_type;
     if(!get_input(command, modifier_type)) {
         suanpan_error("A valid modifier type is required.\n");
         return SUANPAN_SUCCESS;
@@ -2573,7 +2573,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 }
 
 int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string file_type;
+    std::string file_type;
     if(!get_input(command, file_type)) {
         suanpan_error("A valid type is required.\n");
         return SUANPAN_SUCCESS;
@@ -2600,7 +2600,7 @@ int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& 
 }
 
 int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string element_id;
+    std::string element_id;
     if(!get_input(command, element_id)) {
         suanpan_error("A valid element type is required.\n");
         return SUANPAN_SUCCESS;
