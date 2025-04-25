@@ -47,7 +47,7 @@ class DKT4 final : public MaterialElement2D {
 
         vec coor;
         mat strain_mat;
-        vector<SectionIntegrationPoint> sec_int_pt;
+        std::vector<SectionIntegrationPoint> sec_int_pt;
         explicit IntegrationPoint(vec&&);
     };
 
@@ -56,7 +56,7 @@ class DKT4 final : public MaterialElement2D {
     const double thickness;
     const unsigned num_section_ip;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     static field<mat> form_transform(const mat&);
 
@@ -76,7 +76,7 @@ public:
     int commit_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

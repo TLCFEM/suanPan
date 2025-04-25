@@ -32,8 +32,6 @@
 
 #include <Material/Material.h>
 
-using std::vector;
-
 class MaterialOS : public Material {
 public:
     MaterialOS(

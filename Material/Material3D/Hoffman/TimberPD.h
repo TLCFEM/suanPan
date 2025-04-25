@@ -62,7 +62,7 @@ public:
 
     int update_trial_status(const vec&) override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 };

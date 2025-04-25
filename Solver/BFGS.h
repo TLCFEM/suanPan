@@ -44,13 +44,10 @@
 #include <Solver/Solver.h>
 #include <deque>
 
-using std::deque;
-using std::vector;
-
 class BFGS final : public Solver {
-    deque<vec> hist_ninja, hist_residual;
-    deque<double> hist_factor;
-    vector<double> alpha;
+    std::deque<vec> hist_ninja, hist_residual;
+    std::deque<double> hist_factor;
+    std::vector<double> alpha;
 
     const unsigned max_hist;
 

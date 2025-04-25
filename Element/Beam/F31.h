@@ -53,7 +53,7 @@ class F31 final : public SectionElement3D {
 
     const double length = 0., torsion_stiff = 0.;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     unique_ptr<Orientation> b_trans;
 
@@ -80,7 +80,7 @@ public:
     int commit_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

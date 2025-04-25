@@ -31,8 +31,6 @@
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/ResourceHolder.h>
 
-using std::array;
-
 class Axisymmetric final : public Material2D {
     static const uvec F;
 
@@ -58,7 +56,7 @@ public:
     int commit_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 };

@@ -23,8 +23,6 @@
 #include <Element/Element>
 #include <Toolbox/utility.h>
 
-using std::vector;
-
 namespace {
     void new_allman(unique_ptr<Element>& return_obj, istringstream& command) {
         unsigned tag;
@@ -1717,7 +1715,7 @@ namespace {
             return;
         }
 
-        vector<uword> pool;
+        std::vector<uword> pool;
         uword material_tag;
         while(!command.eof() && get_input(command, material_tag)) pool.emplace_back(material_tag);
 
@@ -1744,7 +1742,7 @@ namespace {
         }
 
         unsigned dof;
-        vector<uword> dof_tag;
+        std::vector<uword> dof_tag;
         while(!command.eof() && get_input(command, dof)) dof_tag.push_back(dof);
 
         if(2 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 3) {
@@ -1853,8 +1851,8 @@ namespace {
             return;
         }
 
-        vector<double> B, H, R;
-        vector<uword> CT, ST;
+        std::vector<double> B, H, R;
+        std::vector<uword> CT, ST;
         while(!command.eof()) {
             double t_value;
             uword t_tag;
@@ -2289,8 +2287,8 @@ namespace {
             return;
         }
 
-        vector<uword> node_tag, dof_tag;
-        vector<double> weight_tag;
+        std::vector<uword> node_tag, dof_tag;
+        std::vector<double> weight_tag;
         while(!command.eof()) {
             double weight;
             uword dof;
@@ -2334,8 +2332,8 @@ namespace {
             return;
         }
 
-        vector<uword> node_tag;
-        vector<double> knot_x, knot_y;
+        std::vector<uword> node_tag;
+        std::vector<double> knot_x, knot_y;
         auto material_tag = -1;
         auto thickness = 1.;
 
@@ -2397,8 +2395,8 @@ namespace {
             return;
         }
 
-        vector<uword> node_tag;
-        vector<double> knot_x, knot_y, knot_z;
+        std::vector<uword> node_tag;
+        std::vector<double> knot_x, knot_y, knot_z;
         auto material_tag = -1;
 
         while(!command.eof()) {
@@ -2471,7 +2469,7 @@ int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command
     }
 
     unsigned dof;
-    vector<uword> dof_tag;
+    std::vector<uword> dof_tag;
     while(get_input(command, dof)) dof_tag.push_back(dof);
 
     if(*std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 6) {
@@ -2494,7 +2492,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
     unique_ptr<Modifier> new_modifier = nullptr;
 
     auto get_element_pool = [&] {
-        vector<uword> element_tag;
+        std::vector<uword> element_tag;
         unsigned e_tag;
         while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
 
@@ -2586,7 +2584,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        vector<double> m_r, s_r, m_i, s_i;
+        std::vector<double> m_r, s_r, m_i, s_i;
 
         while(!command.eof()) {
             double t_m_r, t_m_i, t_s_r, t_s_i;

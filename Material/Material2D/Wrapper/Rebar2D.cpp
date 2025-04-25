@@ -91,8 +91,8 @@ int Rebar2D::reset_status() {
     return rebar_x->reset_status() + rebar_y->reset_status();
 }
 
-vector<vec> Rebar2D::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Rebar2D::record(const OutputType P) {
+    std::vector<vec> data;
 
     for(const auto& I : rebar_x->record(P)) data.emplace_back(I);
     for(const auto& I : rebar_y->record(P)) data.emplace_back(I);

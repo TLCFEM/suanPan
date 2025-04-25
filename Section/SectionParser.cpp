@@ -400,7 +400,7 @@ void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    vector<uword> tag_vector;
+    std::vector<uword> tag_vector;
     while(!command.eof())
         if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
         else {
@@ -418,7 +418,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    vector<uword> tag_vector;
+    std::vector<uword> tag_vector;
     while(!command.eof())
         if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
         else {
@@ -436,7 +436,7 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command, const 
         return;
     }
 
-    vector<uword> tag_vector;
+    std::vector<uword> tag_vector;
     while(!command.eof())
         if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
         else {
@@ -811,7 +811,7 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    vector<double> para_set;
+    std::vector<double> para_set;
     double para;
     while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
@@ -846,7 +846,7 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    vector<double> para_set;
+    std::vector<double> para_set;
     double para;
     while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 
@@ -876,7 +876,7 @@ void new_nmk(unique_ptr<Section>& return_obj, istringstream& command, const unsi
         return;
     }
 
-    vector<double> para_set;
+    std::vector<double> para_set;
     double para;
     while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
 

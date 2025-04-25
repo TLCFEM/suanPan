@@ -42,7 +42,7 @@
 
 class DomainBase;
 enum class OutputType;
-enum class DOF : unsigned short;
+enum class DOF : std::uint8_t;
 
 struct NodeData {
     unsigned num_dof = 0; // number of DoFs

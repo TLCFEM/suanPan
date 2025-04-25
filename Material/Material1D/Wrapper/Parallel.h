@@ -39,7 +39,7 @@
 class Parallel final : public Material1D {
     const uvec mat_tag;
 
-    vector<ResourceHolder<Material>> mat_pool;
+    std::vector<ResourceHolder<Material>> mat_pool;
 
 public:
     Parallel(
@@ -57,7 +57,7 @@ public:
     int commit_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 };

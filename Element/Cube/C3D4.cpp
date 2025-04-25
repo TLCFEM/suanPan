@@ -138,7 +138,7 @@ int C3D4::clear_status() { return c_material->clear_status(); }
 
 int C3D4::reset_status() { return c_material->reset_status(); }
 
-vector<vec> C3D4::record(const OutputType P) { return c_material->record(P); }
+std::vector<vec> C3D4::record(const OutputType P) { return c_material->record(P); }
 
 void C3D4::print() {
     suanpan_info("C3D4 element connects:", node_encoding);

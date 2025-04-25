@@ -51,7 +51,7 @@ class C3D8 final : public MaterialElement3D {
 
     mat hourglass;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     C3D8(
@@ -72,7 +72,7 @@ public:
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

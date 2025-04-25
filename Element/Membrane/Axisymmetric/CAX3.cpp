@@ -84,7 +84,7 @@ int CAX3::clear_status() { return m_material->clear_status(); }
 
 int CAX3::reset_status() { return m_material->reset_status(); }
 
-vector<vec> CAX3::record(const OutputType P) { return m_material->record(P); }
+std::vector<vec> CAX3::record(const OutputType P) { return m_material->record(P); }
 
 void CAX3::print() {
     suanpan_info("CAX3 element connects:", node_encoding);

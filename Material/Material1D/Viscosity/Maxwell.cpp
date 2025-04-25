@@ -175,7 +175,7 @@ int Maxwell::reset_status() {
     return spring->reset_status() + damper->reset_status();
 }
 
-vector<vec> Maxwell::record(const OutputType P) {
+std::vector<vec> Maxwell::record(const OutputType P) {
     if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) return {current_stress};
     if(OutputType::ED == P) return {damper->get_current_strain()};
     if(OutputType::VD == P) return {damper->get_current_strain_rate()};

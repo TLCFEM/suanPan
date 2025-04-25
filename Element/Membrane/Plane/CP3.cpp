@@ -246,7 +246,7 @@ int CP3::clear_status() { return m_material->clear_status(); }
 
 int CP3::reset_status() { return m_material->reset_status(); }
 
-vector<vec> CP3::record(const OutputType P) { return m_material->record(P); }
+std::vector<vec> CP3::record(const OutputType P) { return m_material->record(P); }
 
 void CP3::print() {
     suanpan_info("CP3 element connects nodes:", node_encoding);

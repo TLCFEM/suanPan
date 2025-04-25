@@ -569,7 +569,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     mat principal_direction; // 3x3
     if(!eig_sym(principal_stress, principal_direction, tensor::stress::to_tensor(trial_stress), "std")) return SUANPAN_FAIL;
 
-    vector<uword> tp, cp;
+    std::vector<uword> tp, cp;
     tp.reserve(3);
     cp.reserve(3);
     for(auto I = 0llu; I < 3llu; ++I)
@@ -666,7 +666,7 @@ int CDPM2::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> CDPM2::record(const OutputType P) {
+std::vector<vec> CDPM2::record(const OutputType P) {
     if(P == OutputType::DT) return {vec{current_history(16)}};
     if(P == OutputType::DC) return {vec{current_history(17)}};
 

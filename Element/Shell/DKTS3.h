@@ -47,7 +47,7 @@ class DKTS3 final : public ShellBase {
 
         vec coor;
         mat BM, BP;
-        vector<SectionIntegrationPoint> sec_int_pt;
+        std::vector<SectionIntegrationPoint> sec_int_pt;
         explicit IntegrationPoint(vec&&);
     };
 
@@ -56,7 +56,7 @@ class DKTS3 final : public ShellBase {
     const double thickness;
     const unsigned num_ip;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     static mat form_coor(const mat&);
     static field<mat> form_transform(const mat&);
@@ -79,7 +79,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

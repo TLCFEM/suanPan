@@ -35,8 +35,6 @@ enum class OutputType;
 class DomainBase;
 class Material;
 
-using std::vector;
-
 struct SectionShellData {
     const unsigned material_tag; // material tag
 
@@ -123,7 +121,7 @@ public:
     virtual int commit_status() = 0;
     virtual int reset_status() = 0;
 
-    virtual vector<vec> record(OutputType);
+    virtual std::vector<vec> record(OutputType);
 };
 
 namespace suanpan {

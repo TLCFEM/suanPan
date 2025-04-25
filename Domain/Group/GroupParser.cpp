@@ -23,8 +23,6 @@
 #include <Domain/Group/NodeGroup.h>
 #include <Toolbox/utility.h>
 
-using std::vector;
-
 void new_nodegroup(unique_ptr<Group>& return_obj, istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
@@ -32,7 +30,7 @@ void new_nodegroup(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    vector<uword> pool;
+    std::vector<uword> pool;
     get_input(command, pool);
 
     return_obj = make_unique<NodeGroup>(tag, pool);
@@ -55,7 +53,7 @@ void new_elementgroup(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    vector<uword> pool;
+    std::vector<uword> pool;
     get_input(command, pool);
 
     return_obj = make_unique<ElementGroup>(tag, pool);
@@ -94,7 +92,7 @@ void new_generate(unique_ptr<Group>& return_obj, istringstream& command) {
     if(start == end) interval = 1;
     else if(start < end && interval < 0 || start > end && interval > 0) interval = -interval;
 
-    vector<uword> tag_pool;
+    std::vector<uword> tag_pool;
 
     tag_pool.reserve(std::max(1, (end - start) / interval + 1));
 
@@ -127,7 +125,7 @@ void new_generatebyrule(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    vector<double> pool;
+    std::vector<double> pool;
     get_input(command, pool);
 
     return_obj = make_unique<NodeGroup>(tag, dof, pool);
@@ -145,7 +143,7 @@ void new_generatebyplane(unique_ptr<Group>& return_obj, istringstream& command) 
         return;
     }
 
-    vector<double> pool;
+    std::vector<double> pool;
     get_input(command, pool);
 
     if(pool.empty()) return;
@@ -165,14 +163,14 @@ void new_generatebypoint(unique_ptr<Group>& return_obj, istringstream& command) 
         return;
     }
 
-    vector<double> pool;
+    std::vector<double> pool;
     get_input(command, pool);
 
     if(pool.size() % 2 != 0) return;
 
     const auto size = static_cast<long long>(pool.size()) / 2;
 
-    return_obj = make_unique<NodeGroup>(tag, vector(pool.begin(), pool.begin() + size), vector(pool.end() - size, pool.end()));
+    return_obj = make_unique<NodeGroup>(tag, std::vector(pool.begin(), pool.begin() + size), std::vector(pool.end() - size, pool.end()));
 }
 
 void new_groupgroup(unique_ptr<Group>& return_obj, istringstream& command) {
@@ -182,7 +180,7 @@ void new_groupgroup(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    vector<uword> pool;
+    std::vector<uword> pool;
     get_input(command, pool);
 
     return_obj = make_unique<GroupGroup>(tag, pool);

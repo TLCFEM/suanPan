@@ -28,7 +28,7 @@ Patch::Patch(field<vec>&& KT)
 }
 
 uvec Patch::get_number_of_control_points() const {
-    vector<uword> number;
+    std::vector<uword> number;
     for(const auto& I : knot_pool) number.emplace_back(I.n_elem - IGA::compute_order(I) - 1);
     return number;
 }

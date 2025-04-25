@@ -86,7 +86,7 @@ void Elastic2D::print() {
     suanpan_info("Stress:", current_stress);
 }
 
-vector<vec> Elastic2D::record(const OutputType P) {
+std::vector<vec> Elastic2D::record(const OutputType P) {
     const auto sigma_33 = elastic_modulus * poissons_ratio / (1. + poissons_ratio) / (1. - 2. * poissons_ratio) * (trial_strain(0) + trial_strain(1));
 
     if(P == OutputType::MISES) {

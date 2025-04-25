@@ -22,7 +22,7 @@
 Material2D::Material2D(const unsigned T, const PlaneType PT, const double R)
     : Material(T, MaterialType::D2, R) { access::rw(plane_type) = PT; }
 
-vector<vec> Material2D::record(const OutputType P) {
+std::vector<vec> Material2D::record(const OutputType P) {
     if(P == OutputType::SP) return {transform::stress::principal(current_stress)};
     if(P == OutputType::S11) return {vec{current_stress(0)}};
     if(P == OutputType::S22) return {vec{current_stress(1)}};

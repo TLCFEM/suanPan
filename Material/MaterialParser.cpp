@@ -24,8 +24,6 @@
 #include <Material/Material>
 #include <Toolbox/utility.h>
 
-using std::vector;
-
 namespace {
     void new_afc01(unique_ptr<Material>& return_obj, istringstream& command) {
         unsigned tag;
@@ -188,7 +186,7 @@ namespace {
             return;
         }
 
-        vector<double> ai, bi, all;
+        std::vector<double> ai, bi, all;
         double para;
         while(!command.eof())
             if(get_input(command, para)) all.emplace_back(para);
@@ -235,7 +233,7 @@ namespace {
         else pb.zeros();
 
         double para;
-        vector<double> ai, bi, all;
+        std::vector<double> ai, bi, all;
         while(!command.eof())
             if(get_input(command, para)) all.emplace_back(para);
             else {
@@ -722,7 +720,7 @@ namespace {
         }
 
         double para;
-        vector<double> pool;
+        std::vector<double> pool;
         pool.reserve(6);
 
         while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
@@ -750,7 +748,7 @@ namespace {
         }
 
         double para;
-        vector<double> pool;
+        std::vector<double> pool;
         pool.reserve(6);
 
         while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
@@ -859,7 +857,7 @@ namespace {
             return;
         }
 
-        vector<double> pool;
+        std::vector<double> pool;
         pool.reserve(6);
         while(!command.eof()) if(double para; get_input(command, para)) pool.emplace_back(para);
 
@@ -962,7 +960,7 @@ namespace {
             return;
         }
 
-        vector<double> para;
+        std::vector<double> para;
         double input;
         while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
@@ -979,7 +977,7 @@ namespace {
             return;
         }
 
-        vector<double> para;
+        std::vector<double> para;
         double input;
         while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
@@ -1181,7 +1179,7 @@ namespace {
             return;
         }
 
-        vector<double> para;
+        std::vector<double> para;
         double input;
         while(!command.eof() && get_input(command, input)) para.emplace_back(input);
 
@@ -2181,7 +2179,7 @@ namespace {
         }
 
         uword c_value;
-        vector<uword> mat_tag;
+        std::vector<uword> mat_tag;
         while(!command.eof() && get_input(command, c_value)) mat_tag.emplace_back(c_value);
 
         return_obj = make_unique<Laminated>(tag, uvec(mat_tag));
@@ -2396,7 +2394,7 @@ namespace {
             return;
         }
 
-        vector<double> e, s, all;
+        std::vector<double> e, s, all;
         while(!command.eof())
             if(double para; get_input(command, para)) all.emplace_back(para);
             else {
@@ -2444,7 +2442,7 @@ namespace {
             return;
         }
 
-        vector<double> p_strain, p_stress;
+        std::vector<double> p_strain, p_stress;
         while(!command.eof()) {
             double c_value;
             if(!get_input(command, c_value)) {
@@ -2481,7 +2479,7 @@ namespace {
             return;
         }
 
-        vector<double> p_strain, p_stress;
+        std::vector<double> p_strain, p_stress;
         while(!command.eof()) {
             double c_value;
             if(!get_input(command, c_value)) {
@@ -2530,7 +2528,7 @@ namespace {
             return;
         }
 
-        vector<double> m_r, s_r, m_i, s_i;
+        std::vector<double> m_r, s_r, m_i, s_i;
 
         while(!command.eof()) {
             double a, b, c, d;
@@ -2647,7 +2645,7 @@ namespace {
             return;
         }
 
-        vector<uword> m_pool;
+        std::vector<uword> m_pool;
         while(!command.eof()) if(uword m_tag; get_input(command, m_tag)) m_pool.emplace_back(m_tag);
 
         return_obj = make_unique<Parallel>(tag, uvec(m_pool));
@@ -2720,7 +2718,7 @@ namespace {
             return;
         }
 
-        vector<double> p_para;
+        std::vector<double> p_para;
         while(!command.eof()) {
             double c_value;
             if(!get_input(command, c_value)) {
@@ -2758,7 +2756,7 @@ namespace {
             return;
         }
 
-        vector<double> p_para;
+        std::vector<double> p_para;
         while(!command.eof()) {
             double c_value;
             if(!get_input(command, c_value)) {
@@ -2867,7 +2865,7 @@ namespace {
             return;
         }
 
-        vector<uword> m_pool;
+        std::vector<uword> m_pool;
         while(!command.eof()) if(uword m_tag; get_input(command, m_tag)) m_pool.emplace_back(m_tag);
 
         if(1 == m_pool.size()) {
@@ -2926,7 +2924,7 @@ namespace {
         }
 
         uword c_value;
-        vector<uword> mat_tag;
+        std::vector<uword> mat_tag;
         while(!command.eof() && get_input(command, c_value)) mat_tag.emplace_back(c_value);
 
         return_obj = make_unique<Stacked>(tag, uvec(mat_tag));
@@ -3142,7 +3140,7 @@ namespace {
             return;
         }
 
-        vector<double> pool;
+        std::vector<double> pool;
         pool.reserve(10);
         while(!command.eof()) if(double para; get_input(command, para)) pool.emplace_back(para);
 
@@ -3325,7 +3323,7 @@ namespace {
             return;
         }
 
-        vector<double> ai, bi, all;
+        std::vector<double> ai, bi, all;
         double para;
         while(!command.eof())
             if(get_input(command, para)) all.emplace_back(para);
@@ -3362,7 +3360,7 @@ namespace {
             return;
         }
 
-        vector<double> ai, bi, all;
+        std::vector<double> ai, bi, all;
         double para;
         while(!command.eof())
             if(get_input(command, para)) all.emplace_back(para);
@@ -3518,17 +3516,14 @@ namespace {
         }
 
         double para;
-        vector<double> pool;
+        std::vector<double> pool;
 
         while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
         const auto t_size = static_cast<long long>(pool.size());
         const auto h_size = t_size / 2;
 
-        auto A0 = vector(pool.begin(), pool.begin() + h_size);
-        auto A1 = vector(pool.begin() + h_size, pool.begin() + 2 * h_size);
-
-        return_obj = make_unique<Yeoh>(tag, std::move(A0), std::move(A1), t_size % 2 == 0 ? 0. : pool.back());
+        return_obj = make_unique<Yeoh>(tag, std::vector(pool.begin(), pool.begin() + h_size), std::vector(pool.begin() + h_size, pool.begin() + 2 * h_size), t_size % 2 == 0 ? 0. : pool.back());
     }
 }
 

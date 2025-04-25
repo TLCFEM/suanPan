@@ -91,7 +91,7 @@ int Kelvin::reset_status() {
     return spring->reset_status() + damper->reset_status();
 }
 
-vector<vec> Kelvin::record(const OutputType P) {
+std::vector<vec> Kelvin::record(const OutputType P) {
     if(OutputType::S == P) return {current_stress};
     if(OutputType::E == P) return {current_strain};
     if(OutputType::V == P) return {current_strain_rate};

@@ -76,7 +76,7 @@ int EB21::reset_status() {
     return b_material->reset_status();
 }
 
-vector<vec> EB21::record(const OutputType P) {
+std::vector<vec> EB21::record(const OutputType P) {
     if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
     if(P == OutputType::BEAMS) return {vec{local_stiff * b_trans->to_local_vec(get_current_displacement())}};
 

@@ -86,7 +86,7 @@ int T3D2::reset_status() {
     return t_material->reset_status();
 }
 
-vector<vec> T3D2::record(const OutputType P) { return t_material->record(P); }
+std::vector<vec> T3D2::record(const OutputType P) { return t_material->record(P); }
 
 void T3D2::print() {
     suanpan_info("A 3D truss element with ");

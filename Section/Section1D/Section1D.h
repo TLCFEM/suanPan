@@ -33,8 +33,6 @@
 #include <Material/Material.h>
 #include <Toolbox/ResourceHolder.h>
 
-using std::vector;
-
 class Section1D : public Section {
 protected:
     ResourceHolder<Material> s_material;

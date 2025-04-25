@@ -97,7 +97,7 @@ int T2D2::reset_status() {
     return t_material->reset_status();
 }
 
-vector<vec> T2D2::record(const OutputType P) { return t_material->record(P); }
+std::vector<vec> T2D2::record(const OutputType P) { return t_material->record(P); }
 
 void T2D2::print() {
     suanpan_info("A 2D truss element with ");

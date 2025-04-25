@@ -50,7 +50,7 @@ class PatchQuad final : public MaterialPatch2D {
 
     const double thickness;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     PatchQuad(
@@ -70,7 +70,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 };

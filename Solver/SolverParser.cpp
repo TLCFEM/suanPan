@@ -64,7 +64,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             if(domain->insert(make_shared<RayleighNewmark>(tag, alpha, beta, p(0), p(1), p(2), p(3)))) code = 1;
         }
         else if(is_equal(integrator_type, "LeeNewmark")) {
-            vector<double> damping_coef, frequency;
+            std::vector<double> damping_coef, frequency;
 
             while(!command.eof()) {
                 double t_para;
@@ -86,7 +86,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             using LeeMode = LeeNewmarkIterative::Mode;
             using LeeType = LeeNewmarkIterative::Type;
 
-            vector<LeeMode> modes;
+            std::vector<LeeMode> modes;
 
             auto omega = 0., zeta = 0., para_a = .0, para_b = .0;
 
@@ -160,7 +160,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             if(domain->insert(make_shared<LeeNewmarkIterative>(tag, std::move(modes), alpha, beta))) code = 1;
         }
         else if(is_equal(integrator_type, "LeeElementalNewmark")) {
-            vector<double> damping_coef, frequency;
+            std::vector<double> damping_coef, frequency;
 
             while(!command.eof()) {
                 double t_para;
@@ -182,7 +182,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             using LeeMode = LeeNewmarkFull::Mode;
             using LeeType = LeeNewmarkFull::Type;
 
-            vector<LeeMode> modes;
+            std::vector<LeeMode> modes;
 
             auto omega = 0., zeta = 0., para_a = .0, para_b = .0;
 
@@ -258,7 +258,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             else if(is_equal(integrator_type, "LeeNewmarkFullInitial")) { if(domain->insert(make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::INITIAL))) code = 1; }
         }
         else if(is_equal(integrator_type, "WilsonPenzienNewmark")) {
-            vector<double> damping_coef;
+            std::vector<double> damping_coef;
 
             while(!command.eof()) {
                 double t_para;
@@ -272,7 +272,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             if(domain->insert(make_shared<WilsonPenzienNewmark>(tag, damping_coef, alpha, beta))) code = 1;
         }
         else if(is_equal(integrator_type, "NonviscousNewmark")) {
-            vector<double> m_r, s_r, m_i, s_i;
+            std::vector<double> m_r, s_r, m_i, s_i;
 
             while(!command.eof()) {
                 double t_para;
@@ -315,7 +315,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         }
     }
     else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {
-        vector<double> pool;
+        std::vector<double> pool;
         pool.reserve(2);
 
         double para;

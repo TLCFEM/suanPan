@@ -33,8 +33,6 @@
 #include <Material/Material.h>
 #include <Toolbox/ResourceHolder.h>
 
-using std::vector;
-
 class Section3D : public Section {
 protected:
     struct IntegrationPoint {
@@ -43,7 +41,7 @@ protected:
         IntegrationPoint(double, double, double, unique_ptr<Material>&&);
     };
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     void initialize_stiffness();
 

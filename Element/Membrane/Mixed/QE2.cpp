@@ -204,8 +204,8 @@ int QE2::reset_status() {
 
 mat QE2::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> QE2::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> QE2::record(const OutputType P) {
+    std::vector<vec> data;
 
     if(P == OutputType::E) for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
     else if(P == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);

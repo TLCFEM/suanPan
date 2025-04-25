@@ -48,7 +48,7 @@ class MVLEM final : public MaterialElement1D {
 
     mat trans_mat;
 
-    vector<Fibre> axial_spring;
+    std::vector<Fibre> axial_spring;
 
     const unsigned shear_spring_tag;
 
@@ -56,15 +56,15 @@ class MVLEM final : public MaterialElement1D {
 
 public:
     MVLEM(
-        unsigned,              // tag
-        uvec&&,                // node tag
-        const vector<double>&, // width
-        const vector<double>&, // thickness
-        const vector<double>&, // reinforcement ratio
-        uvec&&,                // concrete material tags
-        uvec&&,                // steel material tags
-        unsigned,              // shear spring tag
-        double                 // shear spring height
+        unsigned,                   // tag
+        uvec&&,                     // node tag
+        const std::vector<double>&, // width
+        const std::vector<double>&, // thickness
+        const std::vector<double>&, // reinforcement ratio
+        uvec&&,                     // concrete material tags
+        uvec&&,                     // steel material tags
+        unsigned,                   // shear spring tag
+        double                      // shear spring height
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -75,7 +75,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

@@ -62,7 +62,6 @@
 
 using std::ifstream;
 using std::ofstream;
-using std::string;
 using std::vector;
 
 unsigned SUANPAN_WARNING_COUNT = 0;
@@ -437,7 +436,7 @@ namespace {
                 return SUANPAN_SUCCESS;
             }
 
-            vector<double> para;
+            std::vector<double> para;
             while(!command.eof())
                 if(double input; get_input(command, input)) para.emplace_back(input);
 
@@ -542,7 +541,7 @@ namespace {
             return SUANPAN_SUCCESS;
         }
 
-        vector<double> coor;
+        std::vector<double> coor;
         double X;
         while(get_input(command, X)) coor.push_back(X);
 
@@ -726,7 +725,7 @@ namespace {
             return SUANPAN_SUCCESS;
         }
 
-        vector<unsigned> list;
+        std::vector<unsigned> list;
         if(is_equal(object_type, "amplitude"))
             for(auto& I : domain->get_amplitude_pool()) list.emplace_back(I->get_tag());
         else if(is_equal(object_type, "constraint"))

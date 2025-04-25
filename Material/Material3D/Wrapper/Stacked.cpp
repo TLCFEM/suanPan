@@ -88,8 +88,8 @@ int Stacked::reset_status() {
     return code;
 }
 
-vector<vec> Stacked::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Stacked::record(const OutputType P) {
+    std::vector<vec> data;
 
     auto max_size = 0llu;
     for(const auto& I : mat_pool)

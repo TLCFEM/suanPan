@@ -93,7 +93,7 @@ int Nonviscous01::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> Nonviscous01::record(const OutputType P) {
+std::vector<vec> Nonviscous01::record(const OutputType P) {
     if(OutputType::V == P) return {current_strain_rate};
 
     return Material1D::record(P);

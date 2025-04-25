@@ -146,8 +146,8 @@ int PCPE4UC::reset_status() {
 
 mat PCPE4UC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> PCPE4UC::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> PCPE4UC::record(const OutputType P) {
+    std::vector<vec> data;
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();

@@ -43,7 +43,7 @@ class CIN3D8 final : public MaterialElement3D {
 
     static constexpr unsigned c_node = 8, c_dof = 3, c_size = c_dof * c_node;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     static mat compute_mapping(const vec&);
     static mat compute_n(const vec&);
@@ -64,7 +64,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

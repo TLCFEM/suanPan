@@ -45,7 +45,7 @@ class Homogeneous final : public SectionShell {
         ~IntegrationPoint() = default;
     };
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     Homogeneous(

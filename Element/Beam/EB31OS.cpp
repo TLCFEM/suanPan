@@ -127,7 +127,7 @@ int EB31OS::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> EB31OS::record(const OutputType P) {
+std::vector<vec> EB31OS::record(const OutputType P) {
     if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
     if(P == OutputType::BEAMS) return {vec{local_stiff * b_trans->to_local_vec(get_current_displacement())}};
 

@@ -25,7 +25,7 @@ MVLEM::Fibre::Fibre(const double B, const double H, const double R)
     , c_area(B * H * (1. - R))
     , s_area(B * H * R) {}
 
-MVLEM::MVLEM(const unsigned T, uvec&& NT, const vector<double>& B, const vector<double>& H, const vector<double>& R, uvec&& CRT, uvec&& STT, const unsigned SST, const double CH)
+MVLEM::MVLEM(const unsigned T, uvec&& NT, const std::vector<double>& B, const std::vector<double>& H, const std::vector<double>& R, uvec&& CRT, uvec&& STT, const unsigned SST, const double CH)
     : MaterialElement1D(T, b_node, b_dof, std::move(NT), join_cols(CRT, STT), false, {DOF::U1, DOF::U2, DOF::UR3})
     , shear_height(CH)
     , shear_spring_tag(SST) {
@@ -204,8 +204,8 @@ int MVLEM::reset_status() {
     return code;
 }
 
-vector<vec> MVLEM::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> MVLEM::record(const OutputType P) {
+    std::vector<vec> data;
     for(const auto& I : axial_spring) {
         append_to(data, I.c_material->record(P));
         append_to(data, I.s_material->record(P));

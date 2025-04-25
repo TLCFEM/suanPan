@@ -35,7 +35,7 @@
 class Patch {
 protected:
     const field<vec> knot_pool;
-    vector<uvec> element_span;
+    std::vector<uvec> element_span;
 
 public:
     explicit Patch(field<vec>&&);

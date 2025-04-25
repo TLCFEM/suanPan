@@ -64,7 +64,7 @@ int Spring01::clear_status() { return s_material->clear_status(); }
 
 int Spring01::reset_status() { return s_material->reset_status(); }
 
-vector<vec> Spring01::record(const OutputType P) { return s_material->record(P); }
+std::vector<vec> Spring01::record(const OutputType P) { return s_material->record(P); }
 
 void Spring01::print() {
     suanpan_info("A spring element that uses displacement as basic quantity. The material model used shall be based on displacement-force relationship.\n");

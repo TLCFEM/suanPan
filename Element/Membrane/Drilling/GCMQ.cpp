@@ -201,8 +201,8 @@ int GCMQ::reset_status() {
 
 mat GCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> GCMQ::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> GCMQ::record(const OutputType P) {
+    std::vector<vec> data;
 
     if(P == OutputType::S) for(const auto& I : int_pt) data.emplace_back(I.poly_stress * current_alpha);
     else if(P == OutputType::S11) for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(0) * current_alpha);
