@@ -1715,11 +1715,7 @@ namespace {
             return;
         }
 
-        std::vector<uword> pool;
-        uword material_tag;
-        while(!command.eof() && get_input(command, material_tag)) pool.emplace_back(material_tag);
-
-        return_obj = make_unique<Joint>(tag, std::move(node_tag), std::move(pool));
+        return_obj = make_unique<Joint>(tag, std::move(node_tag), get_remaining<uword>(command));
     }
 
     void new_mass(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
@@ -1741,9 +1737,7 @@ namespace {
             return;
         }
 
-        unsigned dof;
-        std::vector<uword> dof_tag;
-        while(!command.eof() && get_input(command, dof)) dof_tag.push_back(dof);
+        const auto dof_tag = get_remaining<uword>(command);
 
         if(2 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 3) {
             suanpan_error("At most three dofs are supported.\n");
@@ -1851,39 +1845,9 @@ namespace {
             return;
         }
 
-        std::vector<double> B, H, R;
-        std::vector<uword> CT, ST;
-        while(!command.eof()) {
-            double t_value;
-            uword t_tag;
-            if(!get_input(command, t_value)) {
-                suanpan_error("A valid fibre width is required.\n");
-                return;
-            }
-            B.emplace_back(t_value);
-            if(!get_input(command, t_value)) {
-                suanpan_error("A valid fibre thickness is required.\n");
-                return;
-            }
-            H.emplace_back(t_value);
-            if(!get_input(command, t_value)) {
-                suanpan_error("A valid fibre reinforcement ratio is required.\n");
-                return;
-            }
-            R.emplace_back(t_value);
-            if(!get_input(command, t_tag)) {
-                suanpan_error("A valid material tag is required.\n");
-                return;
-            }
-            CT.emplace_back(t_tag);
-            if(!get_input(command, t_tag)) {
-                suanpan_error("A valid material tag is required.\n");
-                return;
-            }
-            ST.emplace_back(t_tag);
-        }
+        const auto [B, H, R, CT, ST] = get_remaining<double, double, double, uword, uword>(command);
 
-        return_obj = make_unique<MVLEM>(tag, std::move(node_tag), B, H, R, uvec(CT), uvec(ST), shear_tag, c_height);
+        return_obj = make_unique<MVLEM>(tag, std::move(node_tag), B, H, R, CT, ST, shear_tag, c_height);
     }
 
     void new_pcpedc(unique_ptr<Element>& return_obj, istringstream& command, const unsigned node) {
@@ -2287,17 +2251,7 @@ namespace {
             return;
         }
 
-        std::vector<uword> node_tag, dof_tag;
-        std::vector<double> weight_tag;
-        while(!command.eof()) {
-            double weight;
-            uword dof;
-            uword node;
-            if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return;
-            node_tag.emplace_back(node);
-            dof_tag.emplace_back(dof);
-            weight_tag.emplace_back(weight);
-        }
+        const auto [node_tag, dof_tag, weight_tag] = get_remaining<uword, uword, double>(command);
 
         return_obj = make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
     }
@@ -2468,9 +2422,7 @@ int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command
         return SUANPAN_SUCCESS;
     }
 
-    unsigned dof;
-    std::vector<uword> dof_tag;
-    while(get_input(command, dof)) dof_tag.push_back(dof);
+    const auto dof_tag = get_remaining<uword>(command);
 
     if(*std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 6) {
         suanpan_error("At most six dofs are supported.\n");
@@ -2491,14 +2443,6 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
 
     unique_ptr<Modifier> new_modifier = nullptr;
 
-    auto get_element_pool = [&] {
-        std::vector<uword> element_tag;
-        unsigned e_tag;
-        while(!command.eof() && get_input(command, e_tag)) element_tag.emplace_back(e_tag);
-
-        return uvec(element_tag);
-    };
-
     if(is_equal(modifier_type, "LumpedSimple")) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -2506,7 +2450,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<LumpedSimple>(tag, get_element_pool());
+        new_modifier = make_unique<LumpedSimple>(tag, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "LumpedScale")) {
         unsigned tag;
@@ -2515,7 +2459,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<LumpedScale>(tag, get_element_pool());
+        new_modifier = make_unique<LumpedScale>(tag, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "Rayleigh")) {
         unsigned tag;
@@ -2530,7 +2474,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<Rayleigh>(tag, a, b, c, d, get_element_pool());
+        new_modifier = make_unique<Rayleigh>(tag, a, b, c, d, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "ElementalLee")) {
         unsigned tag;
@@ -2545,7 +2489,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<ElementalLee>(tag, damping_ratio, get_element_pool());
+        new_modifier = make_unique<ElementalLee>(tag, damping_ratio, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "LinearViscosity")) {
         unsigned tag;
@@ -2560,7 +2504,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<LinearViscosity>(tag, mu, get_element_pool());
+        new_modifier = make_unique<LinearViscosity>(tag, mu, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "ElementalModal")) {
         unsigned tag;
@@ -2575,7 +2519,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<ElementalModal>(tag, a, b, get_element_pool());
+        new_modifier = make_unique<ElementalModal>(tag, a, b, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "ElementalNonviscous") || is_equal(modifier_type, "ElementalNonviscousGroup")) {
         unsigned tag, ele_tag;
@@ -2584,19 +2528,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
             return SUANPAN_SUCCESS;
         }
 
-        std::vector<double> m_r, s_r, m_i, s_i;
-
-        while(!command.eof()) {
-            double t_m_r, t_m_i, t_s_r, t_s_i;
-            if(!get_input(command, t_m_r, t_m_i, t_s_r, t_s_i)) {
-                suanpan_error("A valid damping coefficient is required.\n");
-                return SUANPAN_SUCCESS;
-            }
-            m_r.emplace_back(t_m_r);
-            m_i.emplace_back(t_m_i);
-            s_r.emplace_back(t_s_r);
-            s_i.emplace_back(t_s_i);
-        }
+        const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
         auto m_imag = vec{m_i}, s_imag = vec{s_i};
         if(accu(m_imag) + accu(s_imag) > 1E-10) {

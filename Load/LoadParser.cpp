@@ -49,11 +49,7 @@ namespace {
             return;
         }
 
-        uword node_id;
-        std::vector<uword> node_pool;
-        while(get_input(command, node_id)) node_pool.emplace_back(node_id);
-
-        return_obj = make_unique<NodalAcceleration>(load_id, 0, magnitude, uvec(node_pool), dof_id, amplitude_id);
+        return_obj = make_unique<NodalAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_bodyforce(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
@@ -81,11 +77,7 @@ namespace {
             return;
         }
 
-        unsigned element;
-        std::vector<uword> element_tag;
-        while(get_input(command, element)) element_tag.push_back(element);
-
-        flag ? return_obj = make_unique<GroupBodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id) : return_obj = make_unique<BodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id);
+        flag ? return_obj = make_unique<GroupBodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id) : return_obj = make_unique<BodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
@@ -113,11 +105,7 @@ namespace {
             return;
         }
 
-        unsigned node;
-        std::vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        flag ? return_obj = make_unique<GroupNodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        flag ? return_obj = make_unique<GroupNodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id) : return_obj = make_unique<NodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_refload(unique_ptr<Load>& return_obj, istringstream& command) {
@@ -144,11 +132,7 @@ namespace {
             return;
         }
 
-        unsigned node;
-        std::vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        return_obj = make_unique<ReferenceForce>(load_id, 0, magnitude, uvec(node_tag), dof_id);
+        return_obj = make_unique<ReferenceForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id);
     }
 
     void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const unsigned dimension) {
@@ -176,11 +160,7 @@ namespace {
             return;
         }
 
-        unsigned node;
-        std::vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        2 == dimension ? return_obj = make_unique<LineUDL2D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<LineUDL3D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        2 == dimension ? return_obj = make_unique<LineUDL2D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id) : return_obj = make_unique<LineUDL3D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_displacement(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
@@ -208,11 +188,7 @@ namespace {
             return;
         }
 
-        unsigned node;
-        std::vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        flag ? return_obj = make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        flag ? return_obj = make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id) : return_obj = make_unique<NodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_supportmotion(unique_ptr<Load>& return_obj, istringstream& command, const unsigned flag) {
@@ -240,13 +216,9 @@ namespace {
             return;
         }
 
-        unsigned node;
-        std::vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        if(0 == flag) return_obj = make_unique<SupportDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-        else if(1 == flag) return_obj = make_unique<SupportVelocity>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-        else return_obj = make_unique<SupportAcceleration>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        if(0 == flag) return_obj = make_unique<SupportDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else if(1 == flag) return_obj = make_unique<SupportVelocity>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = make_unique<SupportAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 } // namespace
 
@@ -327,10 +299,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
         domain->insert(make_shared<Linear>(tag, A, step_tag));
     }
     else if(is_equal(amplitude_type, "Combine")) {
-        std::vector<uword> tag_pool;
-        uword t_tag;
-        while(get_input(command, t_tag)) tag_pool.emplace_back(t_tag);
-        domain->insert(make_shared<Combine>(tag, uvec(tag_pool), step_tag));
+        domain->insert(make_shared<Combine>(tag, get_remaining<uword>(command), step_tag));
     }
     else if(is_equal(amplitude_type, "Custom")) {
         unsigned expression;
@@ -347,13 +316,9 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        double amp;
-        std::vector<double> A;
-        while(get_input(command, amp)) A.emplace_back(amp);
-
-        if(is_equal(amplitude_type, "Modulated")) domain->insert(make_shared<Modulated>(tag, W, std::move(A), step_tag));
-        else if(is_equal(amplitude_type, "Sine")) domain->insert(make_shared<Sine>(tag, W, std::move(A), step_tag));
-        else if(is_equal(amplitude_type, "Cosine")) domain->insert(make_shared<Cosine>(tag, W, std::move(A), step_tag));
+        if(is_equal(amplitude_type, "Modulated")) domain->insert(make_shared<Modulated>(tag, W, get_remaining<double>(command), step_tag));
+        else if(is_equal(amplitude_type, "Sine")) domain->insert(make_shared<Sine>(tag, W, get_remaining<double>(command), step_tag));
+        else if(is_equal(amplitude_type, "Cosine")) domain->insert(make_shared<Cosine>(tag, W, get_remaining<double>(command), step_tag));
     }
     else if(is_equal(amplitude_type, "NZStrongMotion")) {
         string name;

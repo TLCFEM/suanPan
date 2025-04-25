@@ -400,15 +400,7 @@ void new_fibre1d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    std::vector<uword> tag_vector;
-    while(!command.eof())
-        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
-        else {
-            suanpan_error("A valid parameter is required.\n");
-            return;
-        }
-
-    return_obj = make_unique<Fibre1D>(tag, std::move(tag_vector));
+    return_obj = make_unique<Fibre1D>(tag, get_remaining<uword>(command));
 }
 
 void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -418,15 +410,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, istringstream& command) {
         return;
     }
 
-    std::vector<uword> tag_vector;
-    while(!command.eof())
-        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
-        else {
-            suanpan_error("A valid parameter is required.\n");
-            return;
-        }
-
-    return_obj = make_unique<Fibre2D>(tag, std::move(tag_vector));
+    return_obj = make_unique<Fibre2D>(tag, get_remaining<uword>(command));
 }
 
 void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command, const bool if_os) {
@@ -436,16 +420,8 @@ void new_fibre3d(unique_ptr<Section>& return_obj, istringstream& command, const 
         return;
     }
 
-    std::vector<uword> tag_vector;
-    while(!command.eof())
-        if(uword section_tag; get_input(command, section_tag)) tag_vector.emplace_back(section_tag);
-        else {
-            suanpan_error("A valid parameter is required.\n");
-            return;
-        }
-
-    if(if_os) return_obj = make_unique<Fibre3DOS>(tag, std::move(tag_vector));
-    else return_obj = make_unique<Fibre3D>(tag, std::move(tag_vector));
+    if(if_os) return_obj = make_unique<Fibre3DOS>(tag, get_remaining<uword>(command));
+    else return_obj = make_unique<Fibre3D>(tag, get_remaining<uword>(command));
 }
 
 void new_hsection2d(unique_ptr<Section>& return_obj, istringstream& command) {
@@ -811,9 +787,7 @@ void new_nm2d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    std::vector<double> para_set;
-    double para;
-    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
+    const auto para_set = get_remaining<double>(command);
 
     if(para_set.size() % 3 != 0) {
         suanpan_error("A valid parameter set is required.\n");
@@ -846,9 +820,7 @@ void new_nm3d(unique_ptr<Section>& return_obj, istringstream& command, const uns
         return;
     }
 
-    std::vector<double> para_set;
-    double para;
-    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
+    const auto para_set = get_remaining<double>(command);
 
     if(para_set.size() % 4 != 0) {
         suanpan_error("A valid parameter set is required.\n");
@@ -876,9 +848,7 @@ void new_nmk(unique_ptr<Section>& return_obj, istringstream& command, const unsi
         return;
     }
 
-    std::vector<double> para_set;
-    double para;
-    while(!command.eof() && get_input(command, para)) para_set.emplace_back(para);
+    const auto para_set = get_remaining<double>(command);
 
     const auto p_size = 13u == size ? 3 : 4;
 

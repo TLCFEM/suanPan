@@ -64,21 +64,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             if(domain->insert(make_shared<RayleighNewmark>(tag, alpha, beta, p(0), p(1), p(2), p(3)))) code = 1;
         }
         else if(is_equal(integrator_type, "LeeNewmark")) {
-            std::vector<double> damping_coef, frequency;
-
-            while(!command.eof()) {
-                double t_para;
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid damping coefficient is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                damping_coef.emplace_back(t_para);
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid frequency is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                frequency.emplace_back(t_para);
-            }
+            const auto [damping_coef, frequency] = get_remaining<double, double>(command);
 
             if(domain->insert(make_shared<LeeNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
         }
@@ -160,21 +146,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             if(domain->insert(make_shared<LeeNewmarkIterative>(tag, std::move(modes), alpha, beta))) code = 1;
         }
         else if(is_equal(integrator_type, "LeeElementalNewmark")) {
-            std::vector<double> damping_coef, frequency;
-
-            while(!command.eof()) {
-                double t_para;
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid damping coefficient is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                damping_coef.emplace_back(t_para);
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid frequency is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                frequency.emplace_back(t_para);
-            }
+            const auto [damping_coef, frequency] = get_remaining<double, double>(command);
 
             if(domain->insert(make_shared<LeeElementalNewmark>(tag, damping_coef, frequency, alpha, beta))) code = 1;
         }
@@ -258,45 +230,10 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
             else if(is_equal(integrator_type, "LeeNewmarkFullInitial")) { if(domain->insert(make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::INITIAL))) code = 1; }
         }
         else if(is_equal(integrator_type, "WilsonPenzienNewmark")) {
-            std::vector<double> damping_coef;
-
-            while(!command.eof()) {
-                double t_para;
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid damping coefficient is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                damping_coef.emplace_back(t_para);
-            }
-
-            if(domain->insert(make_shared<WilsonPenzienNewmark>(tag, damping_coef, alpha, beta))) code = 1;
+            if(domain->insert(make_shared<WilsonPenzienNewmark>(tag, get_remaining<double>(command), alpha, beta))) code = 1;
         }
         else if(is_equal(integrator_type, "NonviscousNewmark")) {
-            std::vector<double> m_r, s_r, m_i, s_i;
-
-            while(!command.eof()) {
-                double t_para;
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid damping coefficient is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                m_r.emplace_back(t_para);
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid damping coefficient is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                m_i.emplace_back(t_para);
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid damping coefficient is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                s_r.emplace_back(t_para);
-                if(!get_input(command, t_para)) {
-                    suanpan_error("A valid damping coefficient is required.\n");
-                    return SUANPAN_SUCCESS;
-                }
-                s_i.emplace_back(t_para);
-            }
+            const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
             auto m_imag = vec{m_i}, s_imag = vec{s_i};
             if(accu(m_imag) + accu(s_imag) > 1E-10) {
@@ -315,11 +252,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
         }
     }
     else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {
-        std::vector<double> pool;
-        pool.reserve(2);
-
-        double para;
-        while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
+        const auto pool = get_remaining<double>(command);
 
         if(pool.empty() && domain->insert(make_shared<GeneralizedAlpha>(tag, .5))) code = 1; // NOLINT(bugprone-branch-clone)
         else if(1 == pool.size() && domain->insert(make_shared<GeneralizedAlpha>(tag, std::min(std::max(0., pool[0]), 1.)))) code = 1;

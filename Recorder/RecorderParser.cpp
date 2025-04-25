@@ -77,9 +77,7 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, istringstream
         return SUANPAN_SUCCESS;
     }
 
-    unsigned s_object_tag;
-    std::vector<uword> object_tag;
-    while(!command.eof() && get_input(command, s_object_tag)) object_tag.emplace_back(s_object_tag);
+    const auto object_tag = get_remaining<uword>(command);
 
     if(is_equal(object_type, "Node") && !domain->insert(make_shared<NodeRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, true, use_hdf5)))
         suanpan_error("Fail to create new node recorder.\n");

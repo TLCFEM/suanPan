@@ -30,10 +30,7 @@ void new_nodegroup(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    std::vector<uword> pool;
-    get_input(command, pool);
-
-    return_obj = make_unique<NodeGroup>(tag, pool);
+    return_obj = make_unique<NodeGroup>(tag, get_remaining<uword>(command));
 }
 
 void new_customnodegroup(unique_ptr<Group>& return_obj, istringstream& command) {
@@ -53,10 +50,7 @@ void new_elementgroup(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    std::vector<uword> pool;
-    get_input(command, pool);
-
-    return_obj = make_unique<ElementGroup>(tag, pool);
+    return_obj = make_unique<ElementGroup>(tag, get_remaining<uword>(command));
 }
 
 void new_generate(unique_ptr<Group>& return_obj, istringstream& command) {
@@ -125,10 +119,7 @@ void new_generatebyrule(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    std::vector<double> pool;
-    get_input(command, pool);
-
-    return_obj = make_unique<NodeGroup>(tag, dof, pool);
+    return_obj = make_unique<NodeGroup>(tag, dof, get_remaining<double>(command));
 }
 
 void new_generatebyplane(unique_ptr<Group>& return_obj, istringstream& command) {
@@ -143,8 +134,7 @@ void new_generatebyplane(unique_ptr<Group>& return_obj, istringstream& command) 
         return;
     }
 
-    std::vector<double> pool;
-    get_input(command, pool);
+    const auto pool = get_remaining<double>(command);
 
     if(pool.empty()) return;
 
@@ -163,8 +153,7 @@ void new_generatebypoint(unique_ptr<Group>& return_obj, istringstream& command) 
         return;
     }
 
-    std::vector<double> pool;
-    get_input(command, pool);
+    const auto pool = get_remaining<double>(command);
 
     if(pool.size() % 2 != 0) return;
 
@@ -180,10 +169,7 @@ void new_groupgroup(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    std::vector<uword> pool;
-    get_input(command, pool);
-
-    return_obj = make_unique<GroupGroup>(tag, pool);
+    return_obj = make_unique<GroupGroup>(tag, get_remaining<uword>(command));
 }
 
 int create_new_group(const shared_ptr<DomainBase>& domain, istringstream& command) {

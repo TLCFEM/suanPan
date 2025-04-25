@@ -186,14 +186,7 @@ namespace {
             return;
         }
 
-        std::vector<double> ai, bi, all;
-        double para;
-        while(!command.eof())
-            if(get_input(command, para)) all.emplace_back(para);
-            else {
-                suanpan_error("Valid inputs are required.\n");
-                return;
-            }
+        const auto all = get_remaining<double>(command);
 
         auto size = all.size();
         auto density = 0.;
@@ -202,12 +195,13 @@ namespace {
             density = all.back();
         }
 
+        std::vector<double> ai, bi;
         for(size_t I = 0; I < size;) {
             ai.emplace_back(all.at(I++));
             bi.emplace_back(all.at(I++));
         }
 
-        return_obj = make_unique<ArmstrongFrederick>(tag, DataArmstrongFrederick{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), std::move(ai), std::move(bi)}, density);
+        return_obj = make_unique<ArmstrongFrederick>(tag, DataArmstrongFrederick{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), ai, bi}, density);
     }
 
     void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& command, const bool memory = false) {
@@ -232,14 +226,7 @@ namespace {
         }
         else pb.zeros();
 
-        double para;
-        std::vector<double> ai, bi, all;
-        while(!command.eof())
-            if(get_input(command, para)) all.emplace_back(para);
-            else {
-                suanpan_error("Valid inputs are required.\n");
-                return;
-            }
+        const auto all = get_remaining<double>(command);
 
         auto size = all.size();
         auto density = 0.;
@@ -248,12 +235,13 @@ namespace {
             density = all.back();
         }
 
+        std::vector<double> ai, bi;
         for(size_t I = 0; I < size;) {
             ai.emplace_back(all.at(I++));
             bi.emplace_back(all.at(I++));
         }
 
-        return_obj = make_unique<ArmstrongFrederick1D>(tag, DataArmstrongFrederick1D{pa(0), pa(1), pa(2), pa(3), pa(4), pb(0), pb(1), pb(2), std::move(ai), std::move(bi)}, density);
+        return_obj = make_unique<ArmstrongFrederick1D>(tag, DataArmstrongFrederick1D{pa(0), pa(1), pa(2), pa(3), pa(4), pb(0), pb(1), pb(2), ai, bi}, density);
     }
 
     void new_axisymmetric(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -719,11 +707,7 @@ namespace {
             return;
         }
 
-        double para;
-        std::vector<double> pool;
-        pool.reserve(6);
-
-        while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
+        auto pool = get_remaining<double>(command);
 
         if(3 == pool.size()) {
             pool.insert(pool.end(), pool.begin() + 1, pool.begin() + 3);
@@ -747,11 +731,7 @@ namespace {
             return;
         }
 
-        double para;
-        std::vector<double> pool;
-        pool.reserve(6);
-
-        while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
+        auto pool = get_remaining<double>(command);
 
         if(3 == pool.size()) {
             pool.insert(pool.end(), pool.begin() + 1, pool.begin() + 3);
@@ -857,9 +837,7 @@ namespace {
             return;
         }
 
-        std::vector<double> pool;
-        pool.reserve(6);
-        while(!command.eof()) if(double para; get_input(command, para)) pool.emplace_back(para);
+        auto pool = get_remaining<double>(command);
 
         if(5 == pool.size()) pool.emplace_back(0.);
 
@@ -960,9 +938,7 @@ namespace {
             return;
         }
 
-        std::vector<double> para;
-        double input;
-        while(!command.eof() && get_input(command, input)) para.emplace_back(input);
+        const auto para = get_remaining<double>(command);
 
         if(para.size() == 8) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], 0.);
         else if(para.size() == 9) return_obj = make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
@@ -977,9 +953,7 @@ namespace {
             return;
         }
 
-        std::vector<double> para;
-        double input;
-        while(!command.eof() && get_input(command, input)) para.emplace_back(input);
+        const auto para = get_remaining<double>(command);
 
         if(para.size() == 10) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], 0.);
         else if(para.size() == 11) return_obj = make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10]);
@@ -1179,9 +1153,7 @@ namespace {
             return;
         }
 
-        std::vector<double> para;
-        double input;
-        while(!command.eof() && get_input(command, input)) para.emplace_back(input);
+        const auto para = get_remaining<double>(command);
 
         if(para.size() == 8) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
         else if(para.size() == 9) return_obj = make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
@@ -2178,11 +2150,7 @@ namespace {
             return;
         }
 
-        uword c_value;
-        std::vector<uword> mat_tag;
-        while(!command.eof() && get_input(command, c_value)) mat_tag.emplace_back(c_value);
-
-        return_obj = make_unique<Laminated>(tag, uvec(mat_tag));
+        return_obj = make_unique<Laminated>(tag, get_remaining<uword>(command));
     }
 
     void new_maxwell(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -2394,13 +2362,7 @@ namespace {
             return;
         }
 
-        std::vector<double> e, s, all;
-        while(!command.eof())
-            if(double para; get_input(command, para)) all.emplace_back(para);
-            else {
-                suanpan_error("Valid inputs are required.\n");
-                return;
-            }
+        const auto all = get_remaining<double>(command);
 
         auto size = all.size();
         auto density = 0.;
@@ -2409,6 +2371,7 @@ namespace {
             density = all.back();
         }
 
+        std::vector<double> e, s;
         for(size_t I = 0; I < size;) {
             e.emplace_back(all.at(I++));
             s.emplace_back(all.at(I++));
@@ -2442,20 +2405,7 @@ namespace {
             return;
         }
 
-        std::vector<double> p_strain, p_stress;
-        while(!command.eof()) {
-            double c_value;
-            if(!get_input(command, c_value)) {
-                suanpan_error("A valid plastic strain is required.\n");
-                return;
-            }
-            p_strain.emplace_back(c_value);
-            if(!get_input(command, c_value)) {
-                suanpan_error("A valid plastic stress is required.\n");
-                return;
-            }
-            p_stress.emplace_back(c_value);
-        }
+        const auto [p_strain, p_stress] = get_remaining<double, double>(command);
 
         return_obj = make_unique<MultilinearJ2>(tag, elastic_modulus, poissons_ratio, join_rows(vec{p_strain}, vec{p_stress}), density);
     }
@@ -2479,20 +2429,7 @@ namespace {
             return;
         }
 
-        std::vector<double> p_strain, p_stress;
-        while(!command.eof()) {
-            double c_value;
-            if(!get_input(command, c_value)) {
-                suanpan_error("A valid plastic strain is required.\n");
-                return;
-            }
-            p_strain.emplace_back(c_value);
-            if(!get_input(command, c_value)) {
-                suanpan_error("A valid plastic stress is required.\n");
-                return;
-            }
-            p_stress.emplace_back(c_value);
-        }
+        const auto [p_strain, p_stress] = get_remaining<double, double>(command);
 
         return_obj = make_unique<MultilinearMises1D>(tag, elastic_modulus, join_rows(vec{p_strain}, vec{p_stress}), density);
     }
@@ -2528,19 +2465,7 @@ namespace {
             return;
         }
 
-        std::vector<double> m_r, s_r, m_i, s_i;
-
-        while(!command.eof()) {
-            double a, b, c, d;
-            if(!get_input(command, a, b, c, d)) {
-                suanpan_error("A valid damping coefficient is required.\n");
-                return;
-            }
-            m_r.emplace_back(a);
-            m_i.emplace_back(b);
-            s_r.emplace_back(c);
-            s_i.emplace_back(d);
-        }
+        const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
         auto m_imag = vec{m_i}, s_imag = vec{s_i};
         if(accu(m_imag) + accu(s_imag) > 1E-10) {
@@ -2645,10 +2570,7 @@ namespace {
             return;
         }
 
-        std::vector<uword> m_pool;
-        while(!command.eof()) if(uword m_tag; get_input(command, m_tag)) m_pool.emplace_back(m_tag);
-
-        return_obj = make_unique<Parallel>(tag, uvec(m_pool));
+        return_obj = make_unique<Parallel>(tag, get_remaining<uword>(command));
     }
 
     void new_planestrain(unique_ptr<Material>& return_obj, istringstream& command, const unsigned type) {
@@ -2718,17 +2640,7 @@ namespace {
             return;
         }
 
-        std::vector<double> p_para;
-        while(!command.eof()) {
-            double c_value;
-            if(!get_input(command, c_value)) {
-                suanpan_error("Valid parameters are required.\n");
-                return;
-            }
-            p_para.emplace_back(c_value);
-        }
-
-        return_obj = make_unique<PolyElastic1D>(tag, vec{p_para}, 0.);
+        return_obj = make_unique<PolyElastic1D>(tag, get_remaining<double>(command), 0.);
     }
 
     void new_polyj2(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -2756,22 +2668,14 @@ namespace {
             return;
         }
 
-        std::vector<double> p_para;
-        while(!command.eof()) {
-            double c_value;
-            if(!get_input(command, c_value)) {
-                suanpan_error("A valid plastic strain is required.\n");
-                return;
-            }
-            p_para.emplace_back(c_value);
-        }
+        const auto pool = get_remaining<double>(command);
 
-        if(p_para.size() < 3) {
+        if(pool.size() < 3) {
             suanpan_error("At least two valid parameters for hardening are required.\n");
             return;
         }
 
-        return_obj = make_unique<PolyJ2>(tag, elastic_modulus, poissons_ratio, p_para, density);
+        return_obj = make_unique<PolyJ2>(tag, elastic_modulus, poissons_ratio, pool, density);
     }
 
     void new_rambergosgood(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -2865,15 +2769,14 @@ namespace {
             return;
         }
 
-        std::vector<uword> m_pool;
-        while(!command.eof()) if(uword m_tag; get_input(command, m_tag)) m_pool.emplace_back(m_tag);
+        const auto pool = get_remaining<uword>(command);
 
-        if(1 == m_pool.size()) {
+        if(1 == pool.size()) {
             suanpan_error("At least two material models are required.\n");
             return;
         }
 
-        return_obj = make_unique<Sequential>(tag, uvec(m_pool));
+        return_obj = make_unique<Sequential>(tag, pool);
     }
 
     void new_sliplock(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -2923,11 +2826,7 @@ namespace {
             return;
         }
 
-        uword c_value;
-        std::vector<uword> mat_tag;
-        while(!command.eof() && get_input(command, c_value)) mat_tag.emplace_back(c_value);
-
-        return_obj = make_unique<Stacked>(tag, uvec(mat_tag));
+        return_obj = make_unique<Stacked>(tag, get_remaining<uword>(command));
     }
 
     void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3140,9 +3039,7 @@ namespace {
             return;
         }
 
-        std::vector<double> pool;
-        pool.reserve(10);
-        while(!command.eof()) if(double para; get_input(command, para)) pool.emplace_back(para);
+        auto pool = get_remaining<double>(command);
 
         if(6 == pool.size()) {
             pool.insert(pool.end(), pool.begin() + 3, pool.begin() + 6);
@@ -3323,14 +3220,7 @@ namespace {
             return;
         }
 
-        std::vector<double> ai, bi, all;
-        double para;
-        while(!command.eof())
-            if(get_input(command, para)) all.emplace_back(para);
-            else {
-                suanpan_error("Valid inputs are required.\n");
-                return;
-            }
+        const auto all = get_remaining<double>(command);
 
         auto size = all.size();
         auto density = 0.;
@@ -3339,12 +3229,13 @@ namespace {
             density = all.back();
         }
 
+        std::vector<double> ai, bi;
         for(size_t I = 0; I < size;) {
             ai.emplace_back(all.at(I++));
             bi.emplace_back(all.at(I++));
         }
 
-        return_obj = make_unique<VAFCRP>(tag, DataVAFCRP{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), std::move(ai), std::move(bi)}, density);
+        return_obj = make_unique<VAFCRP>(tag, DataVAFCRP{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), ai, bi}, density);
     }
 
     void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3360,14 +3251,7 @@ namespace {
             return;
         }
 
-        std::vector<double> ai, bi, all;
-        double para;
-        while(!command.eof())
-            if(get_input(command, para)) all.emplace_back(para);
-            else {
-                suanpan_error("Valid inputs are required.\n");
-                return;
-            }
+        const auto all = get_remaining<double>(command);
 
         auto size = all.size();
         auto density = 0.;
@@ -3376,12 +3260,13 @@ namespace {
             density = all.back();
         }
 
+        std::vector<double> ai, bi;
         for(size_t I = 0; I < size;) {
             ai.emplace_back(all.at(I++));
             bi.emplace_back(all.at(I++));
         }
 
-        return_obj = make_unique<VAFCRP1D>(tag, DataVAFCRP1D{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), std::move(ai), std::move(bi)}, density);
+        return_obj = make_unique<VAFCRP1D>(tag, DataVAFCRP1D{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), ai, bi}, density);
     }
 
     void new_viscosity01(unique_ptr<Material>& return_obj, istringstream& command) {
@@ -3515,10 +3400,7 @@ namespace {
             return;
         }
 
-        double para;
-        std::vector<double> pool;
-
-        while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
+        const auto pool = get_remaining<double>(command);
 
         const auto t_size = static_cast<long long>(pool.size());
         const auto h_size = t_size / 2;

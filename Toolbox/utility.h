@@ -84,12 +84,6 @@ template<typename T> bool get_input(istringstream& I, Col<T>& O) {
     return code;
 }
 
-template<typename T> bool get_input(istringstream& I, std::vector<T>& O) {
-    T value;
-    while(get_input(I, value)) O.emplace_back(value);
-    return true;
-}
-
 template<typename T, typename... U> bool get_input(istringstream& I, T& O, U&... R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
 
 template<typename T> T get_input(istringstream& I) {
@@ -116,6 +110,79 @@ template<typename T, typename... U> bool get_optional_input(istringstream& I, T&
     if(I.eof()) return true;
 
     return static_cast<bool>(I >> O) ? get_optional_input(I, R...) : false;
+}
+
+template<typename T> auto get_remaining(istringstream& I) {
+    std::vector<T> O;
+    T value;
+    while(get_input(I, value)) O.emplace_back(value);
+    return O;
+}
+
+template<typename T1, typename T2> auto get_remaining(istringstream& I) {
+    std::vector<T1> O1;
+    std::vector<T2> O2;
+    T1 V1;
+    T2 V2;
+    while(get_input(I, V1, V2)) {
+        O1.emplace_back(V1);
+        O2.emplace_back(V2);
+    }
+    return std::make_tuple(O1, O2);
+}
+
+template<typename T1, typename T2, typename T3> auto get_remaining(istringstream& I) {
+    std::vector<T1> O1;
+    std::vector<T2> O2;
+    std::vector<T3> O3;
+    T1 V1;
+    T2 V2;
+    T3 V3;
+    while(get_input(I, V1, V2, V3)) {
+        O1.emplace_back(V1);
+        O2.emplace_back(V2);
+        O3.emplace_back(V3);
+    }
+    return std::make_tuple(O1, O2, O3);
+}
+
+template<typename T1, typename T2, typename T3, typename T4> auto get_remaining(istringstream& I) {
+    std::vector<T1> O1;
+    std::vector<T2> O2;
+    std::vector<T3> O3;
+    std::vector<T4> O4;
+    T1 V1;
+    T2 V2;
+    T3 V3;
+    T4 V4;
+    while(get_input(I, V1, V2, V3, V4)) {
+        O1.emplace_back(V1);
+        O2.emplace_back(V2);
+        O3.emplace_back(V3);
+        O4.emplace_back(V4);
+    }
+    return std::make_tuple(O1, O2, O3, O4);
+}
+
+template<typename T1, typename T2, typename T3, typename T4, typename T5> auto get_remaining(istringstream& I) {
+    std::vector<T1> O1;
+    std::vector<T2> O2;
+    std::vector<T3> O3;
+    std::vector<T4> O4;
+    std::vector<T5> O5;
+    T1 V1;
+    T2 V2;
+    T3 V3;
+    T4 V4;
+    T5 V5;
+    while(get_input(I, V1, V2, V3, V4, V5)) {
+        O1.emplace_back(V1);
+        O2.emplace_back(V2);
+        O3.emplace_back(V3);
+        O4.emplace_back(V4);
+        O5.emplace_back(V5);
+    }
+    return std::make_tuple(O1, O2, O3, O4, O5);
 }
 
 string get_remaining(istringstream&);

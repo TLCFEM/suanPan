@@ -43,9 +43,7 @@ namespace {
             return;
         }
 
-        uword obj;
-        std::vector<uword> obj_tag;
-        while(get_input(command, obj)) obj_tag.push_back(obj);
+        const auto obj_tag = get_remaining<uword>(command);
 
         penalty ? group ? return_obj = make_unique<GroupPenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<PenaltyBC>(bc_id, 0, uvec(obj_tag), bc_type) : group ? return_obj = make_unique<GroupMultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type) : return_obj = make_unique<MultiplierBC>(bc_id, 0, uvec(obj_tag), bc_type);
     }
@@ -200,16 +198,7 @@ namespace {
             return;
         }
 
-        std::vector<uword> node_tag, dof_tag;
-        std::vector<double> weight_tag;
-        while(!command.eof()) {
-            double weight;
-            uword dof, node;
-            if(!get_input(command, node) || !get_input(command, dof) || !get_input(command, weight)) return;
-            node_tag.emplace_back(node);
-            dof_tag.emplace_back(dof);
-            weight_tag.emplace_back(weight);
-        }
+        const auto [node_tag, dof_tag, weight_tag] = get_remaining<uword, uword, double>(command);
 
         return_obj = make_unique<MPC>(tag, 0, amplitude, uvec(node_tag), uvec(dof_tag), vec(weight_tag), magnitude);
     }
@@ -321,9 +310,7 @@ namespace {
             return;
         }
 
-        std::vector<double> p;
-        double para;
-        while(!command.eof() && get_input(command, para)) p.emplace_back(para);
+        const auto p = get_remaining<double>(command);
 
         switch(p.size()) {
         case 2:
@@ -391,9 +378,7 @@ namespace {
             return;
         }
 
-        std::vector<double> p;
-        double para;
-        while(!command.eof() && get_input(command, para)) p.emplace_back(para);
+        const auto p = get_remaining<double>(command);
 
         switch(p.size()) {
         case 3:
