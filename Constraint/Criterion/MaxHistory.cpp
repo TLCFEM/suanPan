@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "MaxHistory.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Element.h>
 

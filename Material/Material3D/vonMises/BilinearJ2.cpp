@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "BilinearJ2.h"
+
 #include <Toolbox/tensor.h>
 
 constexpr double BilinearJ2::two_third = 2. / 3.;

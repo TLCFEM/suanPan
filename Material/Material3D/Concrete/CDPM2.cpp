@@ -17,10 +17,11 @@
 
 // ReSharper disable IdentifierTypo
 #include "CDPM2.h"
+
 #include <Recorder/OutputType.h>
+#include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
-#include <Toolbox/ridders.hpp>
 
 const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);

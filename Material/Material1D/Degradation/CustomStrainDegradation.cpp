@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomStrainDegradation.h"
+
 #include <Domain/DomainBase.h>
 
 vec CustomStrainDegradation::compute_positive_degradation(const double t_strain) const { return positive_expression->evaluate(t_strain); }

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearGurson.h"
+
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 

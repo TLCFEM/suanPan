@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomNodeGroup.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 
@@ -40,7 +41,8 @@ void CustomNodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto input_size = expression->input_size();
 
-    for(auto& I : D->get_node_pool()) if(as_scalar(expression->evaluate(resize(I->get_coordinate(), input_size, 1llu))) > 0.5) pond.emplace_back(I->get_tag());
+    for(auto& I : D->get_node_pool())
+        if(as_scalar(expression->evaluate(resize(I->get_coordinate(), input_size, 1llu))) > 0.5) pond.emplace_back(I->get_tag());
 
     suanpan_sort(pond.begin(), pond.end());
 

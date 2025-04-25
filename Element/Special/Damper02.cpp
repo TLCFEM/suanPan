@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Damper02.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Viscosity/Maxwell.h>
 

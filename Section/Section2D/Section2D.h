@@ -29,8 +29,8 @@
 #ifndef SECTION2D_H
 #define SECTION2D_H
 
-#include <Section/Section.h>
 #include <Material/Material.h>
+#include <Section/Section.h>
 #include <Toolbox/ResourceHolder.h>
 
 class Section2D : public Section {

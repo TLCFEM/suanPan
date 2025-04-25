@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomElastic1D.h"
+
 #include <Domain/DomainBase.h>
 
 CustomElastic1D::CustomElastic1D(const unsigned T, const unsigned ET, const double R)

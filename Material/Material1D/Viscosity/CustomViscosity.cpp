@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomViscosity.h"
+
 #include <Domain/DomainBase.h>
 
 double CustomViscosity::compute_du(const double strain, const double strain_rate) const { return expression->evaluate(vec{strain, strain_rate}).at(1); }

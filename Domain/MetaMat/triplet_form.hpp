@@ -193,7 +193,8 @@ public:
     }
 
     data_t operator()(const index_t row, const index_t col) const {
-        for(index_t I = 0; I < n_elem; ++I) if(row == row_idx[I] && col == col_idx[I]) return val_idx[I];
+        for(index_t I = 0; I < n_elem; ++I)
+            if(row == row_idx[I] && col == col_idx[I]) return val_idx[I];
         return access::rw(bin) = 0.;
     }
 

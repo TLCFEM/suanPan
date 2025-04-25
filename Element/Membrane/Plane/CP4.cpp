@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CP4.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
@@ -234,7 +235,8 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
         b2(3) = ele_coor(2, 0) - ele_coor(0, 0);
         vec gamma = 2. * area * h_mode - dot(h_mode, ele_coor.col(0)) * b1 - dot(h_mode, ele_coor.col(1)) * b2;
         mat t_hourglassing = gamma * gamma.t();
-        for(unsigned I = 0, K = 0, M = 1; I < m_node; ++I, K += m_dof, M += m_dof) for(unsigned J = 0, L = 0, N = 1; J < m_node; ++J, L += m_dof, N += m_dof) hourglassing(M, N) = hourglassing(K, L) = t_hourglassing(I, J);
+        for(unsigned I = 0, K = 0, M = 1; I < m_node; ++I, K += m_dof, M += m_dof)
+            for(unsigned J = 0, L = 0, N = 1; J < m_node; ++J, L += m_dof, N += m_dof) hourglassing(M, N) = hourglassing(K, L) = t_hourglassing(I, J);
     }
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
@@ -261,7 +263,8 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
             const auto t_factor = t_density * I.weight * thickness;
-            for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = J, M = L; K < m_node; ++K, M += m_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
+            for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
+                for(auto K = J, M = L; K < m_node; ++K, M += m_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
         }
         for(auto I = 0u, K = 1u; I < m_size; I += m_dof, K += m_dof) {
             initial_mass(K, K) = initial_mass(I, I);
@@ -273,7 +276,8 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
     body_force.zeros(m_size, m_dof);
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * thickness * compute_shape_function(I.coor, 0);
-        for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = 0llu; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
+        for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
+            for(auto K = 0llu; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;

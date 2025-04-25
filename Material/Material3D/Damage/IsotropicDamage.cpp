@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "IsotropicDamage.h"
+
 #include <Domain/DomainBase.h>
 
 IsotropicDamage::IsotropicDamage(const unsigned T, const unsigned MT)

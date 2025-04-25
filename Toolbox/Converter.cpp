@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Converter.h"
+
 #include <Toolbox/utility.h>
 #include <iomanip>
 #include <sstream>
@@ -286,8 +287,7 @@ int Converter::process_node_set(std::ifstream& input_file, std::ofstream& output
                     int tag;
                     auto tmp_str = clean(line);
                     while(get_input(tmp_str, tag)) output_file << ' ' << tag;
-                }
-                while(input_file.peek() != '*' && getline(input_file, line));
+                } while(input_file.peek() != '*' && getline(input_file, line));
             output_file << '\n';
         }
 
@@ -314,8 +314,7 @@ int Converter::process_element_set(std::ifstream& input_file, std::ofstream& out
                     int tag;
                     auto tmp_str = clean(line);
                     while(get_input(tmp_str, tag)) output_file << ' ' << tag;
-                }
-                while(input_file.peek() != '*' && getline(input_file, line));
+                } while(input_file.peek() != '*' && getline(input_file, line));
             output_file << '\n';
         }
 
@@ -369,8 +368,7 @@ bool Converter::getline(std::istream& in, std::string& out) const {
     do {
         std::getline(in, out);
         if(in.fail()) return false;
-    }
-    while(out.empty());
+    } while(out.empty());
 
     for(auto& I : out) I = static_cast<char>(std::tolower(static_cast<int>(I)));
 
@@ -378,7 +376,8 @@ bool Converter::getline(std::istream& in, std::string& out) const {
 }
 
 std::istringstream Converter::clean(std::string line) {
-    for(auto& c : line) if(',' == c) c = ' ';
+    for(auto& c : line)
+        if(',' == c) c = ' ';
 
     return std::istringstream(line);
 }

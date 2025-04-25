@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SimpleSand.h"
+
 #include <Toolbox/tensor.h>
 
 const span SimpleSand::sc(2, 7);

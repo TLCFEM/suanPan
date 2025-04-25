@@ -1,7 +1,8 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfree-nonheap-object"
-#include <Toolbox/Quaternion.hpp>
 #include "CatchHeader.h"
+
+#include <Toolbox/Quaternion.hpp>
 
 TEST_CASE("Quaternion Basic Function", "[Utility.Quaternion]") {
     const Quaternion A(2., 3., 4., 5.);

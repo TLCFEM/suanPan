@@ -35,7 +35,8 @@ vec SurfaceNM3D::differentiate(const mat& weight, uword location, const uword or
     weight_out(location) = weight(location) - static_cast<double>(order);
 
     if(static_cast<int>(weight_out(location)) < 0) weight_out.zeros();
-    else for(auto I = static_cast<uword>(weight(location)); I > static_cast<uword>(weight_out(location)); --I) weight_out(0) *= static_cast<double>(I);
+    else
+        for(auto I = static_cast<uword>(weight(location)); I > static_cast<uword>(weight_out(location)); --I) weight_out(0) *= static_cast<double>(I);
 
     return weight_out;
 }
@@ -58,7 +59,8 @@ vec SurfaceNM3D::compute_dsf(const vec& s, const vec& h) const {
 
     vec df(3, fill::zeros);
 
-    for(auto I = 0llu; I < para_set.n_rows; ++I) for(auto J = 0llu; J < df.n_elem; ++J) df(J) += evaluate(p, ms, mw, differentiate(para_set.row(I), J, 1));
+    for(auto I = 0llu; I < para_set.n_rows; ++I)
+        for(auto J = 0llu; J < df.n_elem; ++J) df(J) += evaluate(p, ms, mw, differentiate(para_set.row(I), J, 1));
 
     return df / h;
 }

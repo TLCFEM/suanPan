@@ -29,6 +29,7 @@
 #define CUSTOMVISCOSITY_H
 
 #include "NonlinearViscosity.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 

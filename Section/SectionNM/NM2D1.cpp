@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NM2D1.h"
+
 #include <Domain/DomainBase.h>
 
 NM2D1::NM2D1(const unsigned T, const double EEA, const double EEIS, const double LD)

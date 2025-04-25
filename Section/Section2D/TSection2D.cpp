@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "TSection2D.h"
+
 #include <Material/Material1D/Material1D.h>
 
 TSection2D::TSection2D(const unsigned T, const double TFW, const double TFT, const double WH, const double WT, const unsigned MT, const unsigned IP, const double EC)

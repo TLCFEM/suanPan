@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SolverParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Solver/Solver>
 #include <Step/Step.h>

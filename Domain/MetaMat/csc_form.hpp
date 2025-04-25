@@ -108,19 +108,23 @@ public:
     template<sp_d in_dt, sp_i in_it> csc_form& operator=(triplet_form<in_dt, in_it>&);
 
     data_t operator()(const index_t in_row, const index_t in_col) const {
-        if(in_row < n_rows && in_col < n_cols) for(auto I = col_ptr[in_col]; I < col_ptr[in_col + 1]; ++I) if(in_row == row_idx[I]) return val_idx[I];
+        if(in_row < n_rows && in_col < n_cols)
+            for(auto I = col_ptr[in_col]; I < col_ptr[in_col + 1]; ++I)
+                if(in_row == row_idx[I]) return val_idx[I];
         return access::rw(bin) = data_t(0);
     }
 
     Mat<data_t> operator*(const Col<data_t>& in_mat) const {
         Mat<data_t> out_mat = arma::zeros<Mat<data_t>>(in_mat.n_rows, 1);
-        for(index_t I = 0; I < n_cols; ++I) for(auto J = col_ptr[I]; J < col_ptr[I + 1]; ++J) out_mat(row_idx[J]) += val_idx[J] * in_mat(I);
+        for(index_t I = 0; I < n_cols; ++I)
+            for(auto J = col_ptr[I]; J < col_ptr[I + 1]; ++J) out_mat(row_idx[J]) += val_idx[J] * in_mat(I);
         return out_mat;
     }
 
     Mat<data_t> operator*(const Mat<data_t>& in_mat) const {
         Mat<data_t> out_mat = arma::zeros<Mat<data_t>>(in_mat.n_rows, in_mat.n_cols);
-        for(index_t I = 0; I < n_cols; ++I) for(auto J = col_ptr[I]; J < col_ptr[I + 1]; ++J) out_mat.row(row_idx[J]) += val_idx[J] * in_mat.row(I);
+        for(index_t I = 0; I < n_cols; ++I)
+            for(auto J = col_ptr[I]; J < col_ptr[I + 1]; ++J) out_mat.row(row_idx[J]) += val_idx[J] * in_mat.row(I);
         return out_mat;
     }
 };

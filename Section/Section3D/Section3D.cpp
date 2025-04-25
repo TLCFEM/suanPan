@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Section3D.h"
+
 #include <Material/Material.h>
 
 Section3D::IntegrationPoint::IntegrationPoint(const double CY, const double CZ, const double W, unique_ptr<Material>&& M)

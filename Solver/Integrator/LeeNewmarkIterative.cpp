@@ -16,11 +16,12 @@
  ******************************************************************************/
 
 #include "LeeNewmarkIterative.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 void LeeNewmarkIterative::init_worker(const unsigned n_dim, const unsigned n_multiplier) {
-    const auto [l,u] = factory->get_bandwidth();
+    const auto [l, u] = factory->get_bandwidth();
 
     // assume sparsity of the banded matrix is around 20%
     // this is empirical but helps reduce memory footprint
@@ -58,13 +59,15 @@ void LeeNewmarkIterative::assemble_stiffness(const uword row_shift, const uword 
 void LeeNewmarkIterative::assemble_mass(const std::vector<sword>& row_shift, const std::vector<sword>& col_shift, const std::vector<double>& scalar) const {
     suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw std::invalid_argument("size mismatch detected"); });
 
-    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_mass(row_shift[I], col_shift[I], scalar[I]);
+    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I)
+        if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_mass(row_shift[I], col_shift[I], scalar[I]);
 }
 
 void LeeNewmarkIterative::assemble_stiffness(const std::vector<sword>& row_shift, const std::vector<sword>& col_shift, const std::vector<double>& scalar) const {
     suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw std::invalid_argument("size mismatch detected"); });
 
-    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I) if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_stiffness(row_shift[I], col_shift[I], scalar[I]);
+    for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I)
+        if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_stiffness(row_shift[I], col_shift[I], scalar[I]);
 }
 
 void LeeNewmarkIterative::formulate_block(sword& current_pos, const double m_coef, const double s_coef, int order) const {

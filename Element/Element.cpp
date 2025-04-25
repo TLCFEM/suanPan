@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Element.h"
+
 #include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Group/Group.h>
@@ -303,7 +304,8 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity
     if(node_ptr.size() == num_node) {
-        for(const auto& I : node_ptr) if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
+        for(const auto& I : node_ptr)
+            if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
         return SUANPAN_SUCCESS;
     }
 
@@ -322,7 +324,8 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         auto& n_encoding = access::rw(node_encoding);
         n_encoding.zeros(num_node);
         counter = 0;
-        for(const auto& I : pool) for(const auto J : *I) n_encoding(counter++) = J;
+        for(const auto& I : pool)
+            for(const auto J : *I) n_encoding(counter++) = J;
     }
 
     // embedded elements use other elements
@@ -363,7 +366,8 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} disabled as inactive nodes used.\n", get_tag());
         return SUANPAN_FAIL;
     }
-    for(auto& I : node_ptr) if(I.lock()->get_dof_number() < num_dof) I.lock()->set_dof_number(num_dof);
+    for(auto& I : node_ptr)
+        if(I.lock()->get_dof_number() < num_dof) I.lock()->set_dof_number(num_dof);
 
     // check if material models are valid
     if(MaterialType::D0 != material_type)
@@ -409,10 +413,12 @@ void Element::update_dof_encoding() {
     dof_mapping.clear();
     dof_mapping.reserve(num_size);
     const uvec dof_index = sort_index(dof_encoding), dof_reordered = dof_encoding(dof_index);
-    for(auto I = 0llu; I < dof_index.n_elem; ++I) for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
+    for(auto I = 0llu; I < dof_index.n_elem; ++I)
+        for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
     std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
 
-    if(!dof_identifier.empty()) for(const auto& t_ptr : node_ptr) t_ptr.lock()->set_dof_identifier(dof_identifier);
+    if(!dof_identifier.empty())
+        for(const auto& t_ptr : node_ptr) t_ptr.lock()->set_dof_identifier(dof_identifier);
 }
 
 bool Element::if_update_mass() const { return update_mass; }

@@ -16,10 +16,11 @@
  ******************************************************************************/
 
 #include "StepParser.h"
+
 #include <Domain/DomainBase.h>
+#include <Solver/Integrator/Integrator.h>
 #include <Step/Step>
 #include <Toolbox/utility.h>
-#include <Solver/Integrator/Integrator.h>
 
 int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command) {
     std::string step_type;

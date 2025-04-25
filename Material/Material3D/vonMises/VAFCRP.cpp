@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "VAFCRP.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Toolbox/tensor.h>

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Parallel.h"
+
 #include <Domain/DomainBase.h>
 
 Parallel::Parallel(const unsigned T, uvec&& MT)

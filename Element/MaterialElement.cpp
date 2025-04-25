@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "MaterialElement.h"
+
 #include <Material/Material.h>
 
 MaterialElement::MaterialElement(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<DOF>&& DI)

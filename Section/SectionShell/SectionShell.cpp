@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SectionShell.h"
+
 #include <Domain/DomainBase.h>
 
 SectionShell::SectionShell(const unsigned T, const unsigned MT, vec&& E)

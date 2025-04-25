@@ -18,6 +18,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 #include "DafaliasManzari.h"
+
 #include <Toolbox/tensor.h>
 
 const span DafaliasManzari::sb(1, 6);

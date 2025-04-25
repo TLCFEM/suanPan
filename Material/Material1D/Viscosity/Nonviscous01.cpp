@@ -16,9 +16,10 @@
  ******************************************************************************/
 
 #include "Nonviscous01.h"
-#include <Recorder/OutputType.h>
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
+#include <Recorder/OutputType.h>
 #include <Step/Step.h>
 
 Nonviscous01::Nonviscous01(const unsigned T, cx_vec&& M, cx_vec&& S)

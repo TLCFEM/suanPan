@@ -35,9 +35,9 @@
 #ifndef DOMAINBASE_H
 #define DOMAINBASE_H
 
-#include <future>
 #include <Domain/Tag.h>
 #include <Toolbox/container.h>
+#include <future>
 
 template<sp_d T> class Factory;
 class Amplitude;
@@ -631,7 +631,8 @@ template<typename T> bool DomainBase::find(unsigned) { throw std::invalid_argume
 template<typename T> bool DomainBase::find(uword) { throw std::invalid_argument("unsupported"); }
 
 template<typename T> bool DomainBase::find(const uvec& P) {
-    for(auto I : P) if(!find<T>(I)) return false;
+    for(auto I : P)
+        if(!find<T>(I)) return false;
 
     return true;
 }

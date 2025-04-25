@@ -68,7 +68,8 @@ public:
     }
 
     T& at(const uword in_row, const uword in_col) override {
-        if(in_row < in_col) [[unlikely]] return bin = T(0);
+        if(in_row < in_col) [[unlikely]]
+            return bin = T(0);
         return this->unsafe_at(in_row, in_col);
     }
 

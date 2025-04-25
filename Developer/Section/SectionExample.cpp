@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SectionExample.h"
+
 #include <Toolbox/utility.h>
 
 SUANPAN_EXPORT void new_sectionexample(unique_ptr<Section>& return_obj, istringstream& command) {

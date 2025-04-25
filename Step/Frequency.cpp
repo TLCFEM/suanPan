@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Frequency.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Solver/Arnoldi.h>

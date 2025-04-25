@@ -33,8 +33,8 @@
 #ifndef SECTIONOS3D_H
 #define SECTIONOS3D_H
 
-#include <Section/Section.h>
 #include <Material/Material.h>
+#include <Section/Section.h>
 #include <Toolbox/ResourceHolder.h>
 
 class SectionOS3D : public Section {

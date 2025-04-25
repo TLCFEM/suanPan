@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "C3D4.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
@@ -53,7 +54,8 @@ int C3D4::initialize(const shared_ptr<DomainBase>& D) {
 
     if(const auto t_density = c_material->get_density() * volume; t_density > 0.) {
         initial_mass.zeros(c_size, c_size);
-        for(auto I = 0u, K = 0u; I < c_node; ++I, K += c_dof) for(auto J = I, L = K; J < c_node; ++J, L += c_dof) initial_mass(K, L) += t_density * n(I) * n(J);
+        for(auto I = 0u, K = 0u; I < c_node; ++I, K += c_dof)
+            for(auto J = I, L = K; J < c_node; ++J, L += c_dof) initial_mass(K, L) += t_density * n(I) * n(J);
         for(auto I = 0u, K = 1u; I < c_size; I += c_dof, K += c_dof) {
             initial_mass(K, K) = initial_mass(I, I);
             for(auto J = I + c_dof, L = K + c_dof; J < c_size; J += c_dof, L += c_dof) initial_mass(J, I) = initial_mass(K, L) = initial_mass(L, K) = initial_mass(I, J);
@@ -62,7 +64,8 @@ int C3D4::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     body_force.zeros(c_size, c_dof);
-    for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) = n(J);
+    for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
+        for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) = n(J);
 
     return SUANPAN_SUCCESS;
 }

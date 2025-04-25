@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Stacked.h"
+
 #include <Domain/DomainBase.h>
 
 Stacked::Stacked(const unsigned T, uvec&& MT)

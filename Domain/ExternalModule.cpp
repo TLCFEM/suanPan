@@ -17,6 +17,7 @@
 
 // ReSharper disable CppFunctionalStyleCast
 #include "ExternalModule.h"
+
 #include <Material/ExternalMaterial.h>
 #include <algorithm>
 

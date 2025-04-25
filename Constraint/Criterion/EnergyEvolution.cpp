@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "EnergyEvolution.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Element.h>
 #include <Step/Step.h>

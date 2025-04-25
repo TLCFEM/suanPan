@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Kelvin.h"
+
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 

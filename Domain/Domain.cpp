@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Domain.h"
+
 #include <Constraint/Constraint.h>
 #include <Constraint/Criterion/Criterion.h>
 #include <Converger/Converger.h>
@@ -34,9 +35,9 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Step/ArcLength.h>
+#include <Toolbox/Expression.h>
 #include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
-#include <Toolbox/Expression.h>
 #include <numeric>
 
 Domain::Domain(const unsigned T)
@@ -44,7 +45,9 @@ Domain::Domain(const unsigned T)
     , factory(std::make_shared<Factory<double>>())
     , attribute(10, false) {}
 
-Domain::~Domain() { for(const auto& I : thread_pond) I->get(); }
+Domain::~Domain() {
+    for(const auto& I : thread_pond) I->get();
+}
 
 void Domain::set_factory(const shared_ptr<LongFactory>& F) {
     if(factory == F) return;
@@ -60,7 +63,9 @@ bool Domain::insert(const shared_ptr<std::future<void>>& T) {
     return true;
 }
 
-void Domain::wait() { for(const auto& thread : thread_pond) thread->wait(); }
+void Domain::wait() {
+    for(const auto& thread : thread_pond) thread->wait();
+}
 
 bool Domain::insert(const shared_ptr<ExternalModule>& E) {
     external_module_pond.emplace_back(E);
@@ -788,8 +793,10 @@ std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_c
         element_tag++;
     };
 
-    if(all_elements) for(auto& [t_tag, t_element] : element_pond) populate(t_element);
-    else for(auto& t_element : element_pond.get()) populate(t_element);
+    if(all_elements)
+        for(auto& [t_tag, t_element] : element_pond) populate(t_element);
+    else
+        for(auto& t_element : element_pond.get()) populate(t_element);
 
     suanpan::graph<unsigned> element_register(element_tag);
 
@@ -1222,11 +1229,14 @@ int Domain::process_criterion() {
 int Domain::process_modifier() {
     auto code = 0;
     // use sequential for_each only
-    for(auto& I : modifier_pond.get()) if(I->if_apply(shared_from_this())) code += I->update_status();
+    for(auto& I : modifier_pond.get())
+        if(I->if_apply(shared_from_this())) code += I->update_status();
     return code;
 }
 
-void Domain::record() { suanpan::for_all(recorder_pond.get(), [&](const shared_ptr<Recorder>& t_recorder) { t_recorder->record(shared_from_this()); }); }
+void Domain::record() {
+    suanpan::for_all(recorder_pond.get(), [&](const shared_ptr<Recorder>& t_recorder) { t_recorder->record(shared_from_this()); });
+}
 
 void Domain::enable_all() {
     updated = false;
@@ -1247,7 +1257,9 @@ void Domain::enable_all() {
 
 void Domain::summary() const { suanpan_info("Domain {} contains: {} nodes, {} elements, {} materials, {} expressions, {} loads, {} constraints, {} recorders.\n", get_tag(), get_node(), get_element(), get_material(), get_expression(), get_load(), get_constraint(), get_recorder()); }
 
-void Domain::erase_machine_error(vec& ninja) const { suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; }); }
+void Domain::erase_machine_error(vec& ninja) const {
+    suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; });
+}
 
 void Domain::update_load() {}
 

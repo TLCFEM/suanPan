@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Rectangle2D.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 #include <Toolbox/IntegrationPlan.h>

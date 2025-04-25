@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "AbsIncreDisp.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 

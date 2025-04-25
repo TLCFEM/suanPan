@@ -16,9 +16,10 @@
  ******************************************************************************/
 
 #include "Solver.h"
+
 #include <Converger/Converger.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Domain/DomainBase.h>
+#include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
 Solver::Solver(const unsigned T)

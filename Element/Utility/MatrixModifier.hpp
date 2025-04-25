@@ -52,7 +52,7 @@ namespace suanpan {
             template<typename T> static void apply(const shared_ptr<Element>&, T);
         };
     } // namespace damping
-}     // namespace suanpan
+} // namespace suanpan
 
 template<typename T> void suanpan::mass::lumped_simple::apply(Mat<T>& mass) { mass = diagmat(sum(mass)); }
 

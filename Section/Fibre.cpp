@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Fibre.h"
+
 #include <Domain/DomainBase.h>
 
 Fibre::Fibre(const unsigned T, uvec&& FT, const SectionType ST)

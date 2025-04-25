@@ -29,8 +29,8 @@
 #ifndef NM3D2_H
 #define NM3D2_H
 
-#include "SurfaceNM3D.h"
 #include "LinearHardeningNM.h"
+#include "SurfaceNM3D.h"
 
 class NM3D2 final : protected SurfaceNM3D, public LinearHardeningNM {
 protected:

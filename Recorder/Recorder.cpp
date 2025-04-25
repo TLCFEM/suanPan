@@ -98,14 +98,16 @@ void Recorder::save() {
             if(s_data_pool.empty()) continue;
 
             auto max_size = 0llu;
-            for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
+            for(const auto& I : s_data_pool[0])
+                if(I.n_elem > max_size) max_size = I.n_elem;
 
             mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size(), fill::zeros);
 
             for(size_t I = 0; I < time_pool.size(); ++I) {
                 data_to_write(0, I) = time_pool[I];
                 unsigned L = 1;
-                for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
+                for(const auto& J : s_data_pool[I])
+                    for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
             }
 
             hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
@@ -127,14 +129,16 @@ void Recorder::save() {
             if(s_data_pool.empty()) continue;
 
             auto max_size = 0llu;
-            for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
+            for(const auto& I : s_data_pool[0])
+                if(I.n_elem > max_size) max_size = I.n_elem;
 
             mat data_to_write(time_pool.size(), s_data_pool.cbegin()->size() * max_size + 1, fill::zeros);
 
             for(size_t I = 0; I < time_pool.size(); ++I) {
                 data_to_write(I, 0) = time_pool[I];
                 auto L = 1u;
-                for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(I, L++) = J[K];
+                for(const auto& J : s_data_pool[I])
+                    for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(I, L++) = J[K];
             }
 
             std::ostringstream dataset_name;

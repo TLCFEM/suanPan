@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ConcreteTsai.h"
+
 #include <Toolbox/utility.h>
 
 pod2 ConcreteTsai::compute_compression_initial_reverse() const {

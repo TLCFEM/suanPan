@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ModifierExample.h"
+
 #include <Toolbox/utility.h>
 
 SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istringstream& command) {
@@ -31,11 +32,7 @@ SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istrin
         return;
     }
 
-    std::vector<uword> element_tag;
-    unsigned e_tag;
-    while(!command.eof()) if(get_input(command, e_tag)) element_tag.emplace_back(e_tag);
-
-    return_obj = make_unique<ModifierExample>(tag, a, b, element_tag);
+    return_obj = make_unique<ModifierExample>(tag, a, b, get_remaining<uword>(command));
 }
 
 ModifierExample::ModifierExample(const unsigned T, const double A, const double B, uvec&& ET)

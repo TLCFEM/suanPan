@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearJ2.h"
+
 #include <Toolbox/tensor.h>
 
 const double NonlinearJ2::root_two_third = sqrt(two_third);

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SlipLock.h"
+
 #include <Toolbox/utility.h>
 
 SlipLock::SlipLock(const unsigned T, const double E, const double Y, const double H, const double R, const double D)

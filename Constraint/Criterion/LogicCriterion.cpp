@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LogicCriterion.h"
+
 #include <Domain/DomainBase.h>
 
 LogicCriterion::LogicCriterion(const unsigned T, const unsigned ST, const unsigned TA, const unsigned TB)

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Material.h"
+
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 

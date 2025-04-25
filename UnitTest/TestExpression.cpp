@@ -1,4 +1,5 @@
 #include "CatchHeader.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/utility.h>
 

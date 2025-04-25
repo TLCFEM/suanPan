@@ -30,9 +30,10 @@
 #ifndef FULLMATCUDA_HPP
 #define FULLMATCUDA_HPP
 
+#include "FullMat.hpp"
+
 #include <cuda_runtime.h>
 #include <cusolverDn.h>
-#include "FullMat.hpp"
 
 template<sp_d T> class FullMatCUDA final : public FullMat<T> {
     cusolverDnHandle_t handle = nullptr;

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SectionOS3D.h"
+
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
 

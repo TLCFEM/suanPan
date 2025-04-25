@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NM3D1.h"
+
 #include <Domain/DomainBase.h>
 
 NM3D1::NM3D1(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double LD)

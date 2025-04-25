@@ -29,8 +29,8 @@
 #define ELEMENTBASE_H
 
 #include <Domain/Tag.h>
-#include <Element/Visualisation/vtkBase.h>
 #include <Element/MappingDOF.h>
+#include <Element/Visualisation/vtkBase.h>
 
 class Node;
 class DomainBase;

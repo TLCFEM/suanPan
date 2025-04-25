@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Expression.h"
+
 #include <Toolbox/utility.h>
 
 std::mutex Expression::parser_mutex;

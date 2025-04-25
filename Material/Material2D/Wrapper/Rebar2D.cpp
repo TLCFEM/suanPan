@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Rebar2D.h"
+
 #include <Domain/DomainBase.h>
 
 Rebar2D::Rebar2D(const unsigned T, const unsigned XT, const unsigned YT, const double RX, const double RY)

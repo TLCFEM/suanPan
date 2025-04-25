@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Concrete22.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/tensor.h>
 

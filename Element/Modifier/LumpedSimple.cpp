@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LumpedSimple.h"
+
 #include <Element/Utility/MatrixModifier.hpp>
 
 int LumpedSimple::update_status() {

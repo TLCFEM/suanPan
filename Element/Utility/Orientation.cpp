@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Orientation.h"
+
 #include <Element/Element.h>
 
 void Orientation::check_element_ptr() const {
@@ -26,7 +27,9 @@ Orientation::Orientation(const unsigned T, vec&& O)
     : CopiableTag(T)
     , z_axis(std::move(O)) {}
 
-void Orientation::update_axis(const vec& O) { if(O.n_elem == 3) z_axis = O; }
+void Orientation::update_axis(const vec& O) {
+    if(O.n_elem == 3) z_axis = O;
+}
 
 void Orientation::set_element_ptr(const Element* E) {
     element_ptr = E;

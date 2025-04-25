@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "VisualisationRecorder.h"
+
 #include <Domain/DomainBase.h>
 
 extern fs::path SUANPAN_OUTPUT;

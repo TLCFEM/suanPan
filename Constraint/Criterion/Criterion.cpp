@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Criterion.h"
+
 #include <Domain/DomainBase.h>
 
 Criterion::Criterion(const unsigned T, const unsigned ST)

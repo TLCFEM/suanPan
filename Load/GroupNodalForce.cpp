@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GroupNodalForce.h"
+
 #include <Domain/DomainBase.h>
 
 GroupNodalForce::GroupNodalForce(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned D, const unsigned AT)

@@ -19,7 +19,8 @@ TEST_CASE("Eigensolver", "[Utility.Eigen]") {
 
         auto KK = std::make_shared<FullMat<double>>(D.n_elem, D.n_elem);
 
-        for(auto I = 0llu; I < D.n_elem; ++I) for(auto J = 0llu; J < D.n_elem; ++J) KK->at(J, I) = K(J, I);
+        for(auto I = 0llu; I < D.n_elem; ++I)
+            for(auto J = 0llu; J < D.n_elem; ++J) KK->at(J, I) = K(J, I);
 
         auto MM = std::make_shared<FullMat<double>>(D.n_elem, D.n_elem);
 

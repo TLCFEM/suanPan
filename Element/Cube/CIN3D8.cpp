@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CIN3D8.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
@@ -176,7 +177,8 @@ int CIN3D8::initialize(const shared_ptr<DomainBase>& D) {
         for(const auto& I : int_pt) {
             const auto n_int = compute_n(I.coor);
             const auto t_factor = t_density * I.weight;
-            for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) for(auto K = J, M = L; K < c_node; ++K, M += c_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
+            for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
+                for(auto K = J, M = L; K < c_node; ++K, M += c_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
         }
         for(unsigned I = 0, K = 1, L = 2; I < c_size; I += c_dof, K += c_dof, L += c_dof) {
             initial_mass(K, K) = initial_mass(L, L) = initial_mass(I, I);
@@ -188,7 +190,8 @@ int CIN3D8::initialize(const shared_ptr<DomainBase>& D) {
     body_force.zeros(c_size, c_dof);
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * compute_n(I.coor);
-        for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
+        for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
+            for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;

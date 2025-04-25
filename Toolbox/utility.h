@@ -18,8 +18,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <suanPan.h>
 #include <concepts>
+#include <suanPan.h>
 #ifdef __cpp_lib_execution
 #include <execution>
 #endif
@@ -57,7 +57,7 @@ namespace suanpan {
 
     template<typename T> T sign(const T& I) { return (I > T(0)) - (I < T(0)); }
 
-    template<typename T> bool approx_equal(T x, T y, int ulp = 2) requires (!std::numeric_limits<T>::is_integer) { return fabs(x - y) <= std::numeric_limits<T>::epsilon() * fabs(x + y) * ulp || fabs(x - y) < std::numeric_limits<T>::min(); }
+    template<typename T> bool approx_equal(T x, T y, int ulp = 2) requires(!std::numeric_limits<T>::is_integer) { return fabs(x - y) <= std::numeric_limits<T>::epsilon() * fabs(x + y) * ulp || fabs(x - y) < std::numeric_limits<T>::min(); }
 
     unsigned long long binomial(unsigned long long, unsigned long long);
 
@@ -73,8 +73,8 @@ namespace suanpan {
 
     namespace expression {
         std::vector<std::pair<std::string, unsigned>> split(std::string_view variable_string);
-    } // namespace expression 
-}     // namespace suanpan
+    } // namespace expression
+} // namespace suanpan
 
 template<typename T> bool get_input(istringstream& I, T& O) { return static_cast<bool>(I >> O); }
 

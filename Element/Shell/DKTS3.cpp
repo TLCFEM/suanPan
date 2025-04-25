@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "DKTS3.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Plate/DKT3.h>
 #include <Material/Material.h>
@@ -204,7 +205,8 @@ int DKTS3::update_status() {
     for(const auto& I : int_pt) {
         const vec m_strain = I.BM * m_disp, p_strain = I.BP * p_disp;
 
-        for(const auto& J : I.sec_int_pt) if(J.s_material->update_trial_status(m_strain + J.eccentricity * p_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+        for(const auto& J : I.sec_int_pt)
+            if(J.s_material->update_trial_status(m_strain + J.eccentricity * p_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
         t_stress.zeros();
         t_stiffness.zeros();
@@ -243,25 +245,29 @@ int DKTS3::update_status() {
 
 int DKTS3::commit_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->commit_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.s_material->commit_status();
     return code;
 }
 
 int DKTS3::clear_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->clear_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.s_material->clear_status();
     return code;
 }
 
 int DKTS3::reset_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->reset_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.s_material->reset_status();
     return code;
 }
 
 std::vector<vec> DKTS3::record(const OutputType P) {
     std::vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) append_to(data, J.s_material->record(P));
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) append_to(data, J.s_material->record(P));
     return data;
 }
 

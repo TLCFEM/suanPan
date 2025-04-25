@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Allman.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/shape.h>
@@ -117,7 +118,8 @@ int Allman::initialize(const shared_ptr<DomainBase>& D) {
         for(const auto& I : int_pt) {
             const rowvec n_int = shape::triangle(I.coor, 0) * inv_coor;
             const auto t_factor = t_density * I.weight;
-            for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = J, P = L; K < m_node; ++K, P += m_dof) initial_mass(L, P) += t_factor * n_int(J) * n_int(K);
+            for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
+                for(auto K = J, P = L; K < m_node; ++K, P += m_dof) initial_mass(L, P) += t_factor * n_int(J) * n_int(K);
         }
         for(unsigned I = 0, K = 1; I < m_size; I += m_dof, K += m_dof) {
             initial_mass(K, K) = initial_mass(I, I);

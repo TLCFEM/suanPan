@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomGurson.h"
+
 #include <Domain/DomainBase.h>
 
 CustomGurson::CustomGurson(const unsigned T, const unsigned ET, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)

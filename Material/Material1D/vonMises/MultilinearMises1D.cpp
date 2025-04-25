@@ -18,12 +18,14 @@
 #include "MultilinearMises1D.h"
 
 double MultilinearMises1D::compute_k(const double p_strain) const {
-    for(uword I = 1; I < backbone.n_rows; ++I) if(p_strain <= backbone(I, 0)) return backbone(I - 1, 1) + backbone(I - 1, 2) * (p_strain - backbone(I - 1, 0));
+    for(uword I = 1; I < backbone.n_rows; ++I)
+        if(p_strain <= backbone(I, 0)) return backbone(I - 1, 1) + backbone(I - 1, 2) * (p_strain - backbone(I - 1, 0));
     return backbone(backbone.n_rows - 1, 1);
 }
 
 double MultilinearMises1D::compute_dk(const double p_strain) const {
-    for(uword I = 1; I < backbone.n_rows; ++I) if(p_strain <= backbone(I, 0)) return backbone(I - 1, 2);
+    for(uword I = 1; I < backbone.n_rows; ++I)
+        if(p_strain <= backbone(I, 0)) return backbone(I - 1, 2);
     return 0.;
 }
 

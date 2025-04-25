@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "MaterialExample.h"
+
 #include <Toolbox/utility.h>
 
 SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>& return_obj, istringstream& command) {

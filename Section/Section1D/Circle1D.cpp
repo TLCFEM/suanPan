@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Circle1D.h"
+
 #include <Material/Material.h>
 
 Circle1D::Circle1D(const unsigned T, const double B, const unsigned M)

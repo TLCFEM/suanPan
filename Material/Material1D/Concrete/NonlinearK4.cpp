@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearK4.h"
+
 #include <Toolbox/utility.h>
 
 int NonlinearK4::compute_plasticity() {

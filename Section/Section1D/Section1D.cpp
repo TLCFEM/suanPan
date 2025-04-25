@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Section1D.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 

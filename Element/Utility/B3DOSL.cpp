@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B3DOSL.h"
+
 #include <Element/Element.h>
 
 const span B3DOSL::sa(0, 2), B3DOSL::sb(3, 5), B3DOSL::sc(7, 9), B3DOSL::sd(10, 12);

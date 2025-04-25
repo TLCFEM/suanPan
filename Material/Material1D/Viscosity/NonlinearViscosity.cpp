@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearViscosity.h"
+
 #include <Recorder/OutputType.h>
 
 NonlinearViscosity::NonlinearViscosity(const unsigned T, const double A, const double L)

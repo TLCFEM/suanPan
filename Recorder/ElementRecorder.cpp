@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ElementRecorder.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>

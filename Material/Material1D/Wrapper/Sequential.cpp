@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Sequential.h"
+
 #include <Domain/DomainBase.h>
 
 Sequential::Sequential(const unsigned T, uvec&& MT)

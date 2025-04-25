@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ArmstrongFrederick.h"
+
 #include <Toolbox/tensor.h>
 
 const double ArmstrongFrederick::root_three_two = sqrt(1.5);

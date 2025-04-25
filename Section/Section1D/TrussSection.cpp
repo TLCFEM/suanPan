@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "TrussSection.h"
+
 #include <Material/Material1D/Material1D.h>
 
 TrussSection::TrussSection(const unsigned T, const double A, const unsigned M)

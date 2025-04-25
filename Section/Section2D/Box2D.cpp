@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Box2D.h"
+
 #include <Material/Material1D/Material1D.h>
 
 Box2D::Box2D(const unsigned T, const double B, const double H, const double TH, const unsigned M, const unsigned S, const double EC)

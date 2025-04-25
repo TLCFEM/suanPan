@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "MaterialTester.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 #include <Toolbox/misc.h>

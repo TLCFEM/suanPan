@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Rectangle1D.h"
+
 #include <Material/Material.h>
 
 Rectangle1D::Rectangle1D(const unsigned T, const double B, const double H, const unsigned M)

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PlaneStrain.h"
+
 #include <Domain/DomainBase.h>
 
 const uvec PlaneStrain::F{0, 1, 3};

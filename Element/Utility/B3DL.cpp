@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B3DL.h"
+
 #include <Element/Element.h>
 
 OrientationType B3DL::get_orientation_type() const { return OrientationType::B3D; }

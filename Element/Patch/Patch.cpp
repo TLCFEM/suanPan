@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Patch.h"
+
 #include <Element/Utility/IGA/BSpline.h>
 #include <Material/Material.h>
 #include <Section/Section.h>

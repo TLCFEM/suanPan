@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CAX4.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>

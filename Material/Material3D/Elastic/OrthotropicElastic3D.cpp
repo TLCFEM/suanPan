@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "OrthotropicElastic3D.h"
+
 #include <Toolbox/tensor.h>
 
 OrthotropicElastic3D::OrthotropicElastic3D(const unsigned T, vec&& E, vec&& P, const double R)

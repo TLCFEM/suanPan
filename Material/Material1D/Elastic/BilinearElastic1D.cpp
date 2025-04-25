@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "BilinearElastic1D.h"
+
 #include <Toolbox/utility.h>
 
 BilinearElastic1D::BilinearElastic1D(const unsigned T, const double E, const double Y, const double H, const double R, const double D)

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomHoffman.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/utility.h>
 

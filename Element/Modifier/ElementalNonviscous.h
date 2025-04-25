@@ -31,8 +31,8 @@
 #ifndef ELEMENTALNONVISCOUS_H
 #define ELEMENTALNONVISCOUS_H
 
-#include <Element/Modifier/Modifier.h>
 #include <Domain/Factory.hpp>
+#include <Element/Modifier/Modifier.h>
 
 class ElementalNonviscous : public ModifierDynamics {
     const cx_vec m, s;

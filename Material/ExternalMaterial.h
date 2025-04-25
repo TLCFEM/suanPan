@@ -50,8 +50,9 @@
 #ifndef EXTERNALMATERIAL_H
 #define EXTERNALMATERIAL_H
 
-#include <Material/Material.h>
 #include "ExternalMaterialData.h"
+
+#include <Material/Material.h>
 
 class ExternalMaterial final : public Material {
     static MaterialType get_type(const ExternalMaterialData&);

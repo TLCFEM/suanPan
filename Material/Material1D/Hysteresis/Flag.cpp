@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Flag.h"
+
 #include <Toolbox/utility.h>
 
 Flag::Flag(const unsigned T, const double E, const double YT, const double RT, const double HT, const double YC, const double RC, const double HC, const double D)

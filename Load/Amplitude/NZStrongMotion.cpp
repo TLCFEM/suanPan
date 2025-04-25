@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NZStrongMotion.h"
+
 #include <Domain/DomainBase.h>
 
 NZStrongMotion::NZStrongMotion(const unsigned T, const char* P, const unsigned ST)

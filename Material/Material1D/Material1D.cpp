@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Material1D.h"
+
 #include <Recorder/OutputType.h>
 
 Material1D::Material1D(const unsigned T, const double D)

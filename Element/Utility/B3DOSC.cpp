@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B3DOSC.h"
+
 #include <Element/Element.h>
 #include <Toolbox/tensor.h>
 

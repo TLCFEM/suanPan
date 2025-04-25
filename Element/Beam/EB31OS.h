@@ -53,7 +53,7 @@ public:
         unsigned,    // tag
         uvec&&,      // node tags
         vec&&,       // properties
-        unsigned,    // orientation tag 
+        unsigned,    // orientation tag
         bool = false // nonlinear geometry switch
     );
 

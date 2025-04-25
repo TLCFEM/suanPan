@@ -17,6 +17,7 @@
 
 // ReSharper disable CppClangTidyClangDiagnosticDocumentationUnknownCommand
 #include "NLE3D01.h"
+
 #include <Toolbox/tensor.h>
 
 /**

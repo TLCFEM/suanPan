@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Subloading1D.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 

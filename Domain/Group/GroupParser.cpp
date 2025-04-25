@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GroupParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Group/ElementGroup.h>

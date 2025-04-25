@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SectionElement.h"
+
 #include <Section/Section.h>
 
 SectionElement::SectionElement(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)

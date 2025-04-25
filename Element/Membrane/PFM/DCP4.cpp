@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "DCP4.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
@@ -78,7 +79,8 @@ int DCP4::initialize(const shared_ptr<DomainBase>& D) {
         initial_mass.zeros(m_size, m_size);
         for(const auto& I : int_pt) {
             const auto t_factor = t_density * I.weight * thickness;
-            for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = J, M = L; K < m_node; ++K, M += m_dof) initial_mass(L, M) += t_factor * I.n_mat(J) * I.n_mat(K);
+            for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
+                for(auto K = J, M = L; K < m_node; ++K, M += m_dof) initial_mass(L, M) += t_factor * I.n_mat(J) * I.n_mat(K);
         }
         for(auto I = 0u, K = 1u; I < m_size; I += m_dof, K += m_dof) {
             initial_mass(K, K) = initial_mass(I, I);

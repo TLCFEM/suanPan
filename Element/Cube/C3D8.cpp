@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "C3D8.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
@@ -57,10 +58,12 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(vec{0., 0., 0.}, 1);
         const mat pn_pxy = solve(pn * ele_coor, pn).t();
         auto gamma = h_mode;
-        for(auto I = 0; I < 3; ++I) for(auto J = 0; J < 4; ++J) gamma(J) -= dot(h_mode(J), ele_coor.col(I)) * pn_pxy.col(I);
+        for(auto I = 0; I < 3; ++I)
+            for(auto J = 0; J < 4; ++J) gamma(J) -= dot(h_mode(J), ele_coor.col(I)) * pn_pxy.col(I);
         mat t_hourglassing(8, 8, fill::zeros);
         for(const auto& I : gamma) t_hourglassing += I * I.t();
-        for(unsigned I = 0, K = 0; I < c_node; ++I, K += c_dof) for(unsigned J = 0, L = 0; J < c_node; ++J, L += c_dof) hourglass(K + 2llu, L + 2llu) = hourglass(K + 1llu, L + 1llu) = hourglass(K, L) = t_hourglassing(I, J);
+        for(unsigned I = 0, K = 0; I < c_node; ++I, K += c_dof)
+            for(unsigned J = 0, L = 0; J < c_node; ++J, L += c_dof) hourglass(K + 2llu, L + 2llu) = hourglass(K + 1llu, L + 1llu) = hourglass(K, L) = t_hourglassing(I, J);
     }
 
     initial_stiffness.zeros(c_size, c_size);
@@ -83,7 +86,8 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
             const auto t_factor = t_density * I.weight;
-            for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) for(auto K = J, M = L; K < c_node; ++K, M += c_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
+            for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
+                for(auto K = J, M = L; K < c_node; ++K, M += c_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
         }
         for(auto I = 0u, K = 1u, L = 2u; I < c_size; I += c_dof, K += c_dof, L += c_dof) {
             initial_mass(K, K) = initial_mass(L, L) = initial_mass(I, I);
@@ -95,7 +99,8 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
     body_force.zeros(c_size, c_dof);
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * shape::cube(I.coor, 0, c_node);
-        for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
+        for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
+            for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;

@@ -37,7 +37,9 @@ field<vec> NURBSSurface::evaluate_point_derivative(const double u, const double 
     for(auto k = 0ll; k <= du; ++k)
         for(auto l = 0ll; l <= dv; ++l) {
             ders(k, l) = point(k, l);
-            for(auto i = 0ll; i <= k; ++i) for(auto j = 0ll; j <= l; ++j) if(i != 0 || j != 0) ders(k, l) -= binomial_mat(k, i) * binomial_mat(l, j) * point(i, j).back() * ders(k - i, l - j);
+            for(auto i = 0ll; i <= k; ++i)
+                for(auto j = 0ll; j <= l; ++j)
+                    if(i != 0 || j != 0) ders(k, l) -= binomial_mat(k, i) * binomial_mat(l, j) * point(i, j).back() * ders(k - i, l - j);
             ders(k, l) /= point(0, 0).back();
         }
 
@@ -51,7 +53,9 @@ mat NURBSSurface::evaluate_shape_function(const double u, const double v, const 
 
     auto sum = 0.;
 
-    for(auto I = 0llu; I < shape.n_rows; ++I) for(auto J = 0llu; J < shape.n_cols; ++J) if(!polygon(I, J).empty()) sum += shape(I, J) * polygon(I, J).back();
+    for(auto I = 0llu; I < shape.n_rows; ++I)
+        for(auto J = 0llu; J < shape.n_cols; ++J)
+            if(!polygon(I, J).empty()) sum += shape(I, J) * polygon(I, J).back();
 
     return shape / sum;
 }
@@ -85,7 +89,8 @@ field<mat> NURBSSurface::evaluate_shape_function_derivative(const double u, cons
         for(auto j = 0llu; j <= q; ++j)
             if(const auto vind = vspan + j - q; !polygon(uind, vind).empty()) {
                 sum += uders(0, i) * vders(0, j) * polygon(uind, vind).back();
-                for(auto k = 0; k <= du; ++k) for(auto l = 0; l <= dv; ++l) shape(k, l)(uind, vind) = uders(k, i) * vders(l, j) * polygon(uind, vind).back();
+                for(auto k = 0; k <= du; ++k)
+                    for(auto l = 0; l <= dv; ++l) shape(k, l)(uind, vind) = uders(k, i) * vders(l, j) * polygon(uind, vind).back();
             }
     }
 
@@ -98,7 +103,8 @@ field<mat> NURBSSurface::evaluate_shape_function_derivative(const double u, cons
                         auto weight_sum = 0.;
                         for(auto m = 0llu; m <= p; ++m) {
                             const auto uind = uspan + m - p;
-                            for(auto n = 0llu; n <= q; ++n) if(const auto vind = vspan + n - q; !polygon(uind, vind).empty()) weight_sum += polygon(uind, vind).back() * uders(k, m) * vders(l, n);
+                            for(auto n = 0llu; n <= q; ++n)
+                                if(const auto vind = vspan + n - q; !polygon(uind, vind).empty()) weight_sum += polygon(uind, vind).back() * uders(k, m) * vders(l, n);
                         }
                         t_shape -= binomial_mat(i, k) * binomial_mat(j, l) * weight_sum * shape(i - k, j - l);
                     }

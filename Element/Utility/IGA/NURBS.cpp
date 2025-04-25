@@ -16,6 +16,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "NURBS.h"
+
 #include "Toolbox/utility.h"
 
 void NURBSBase::initialize_binomial(const sword d) const {
@@ -25,7 +26,8 @@ void NURBSBase::initialize_binomial(const sword d) const {
 
     t_mat.set_size(d + 1, d + 1);
 
-    for(auto i = 0ll; i <= d; ++i) for(auto j = 0ll; j <= i; ++j) t_mat(i, j) = static_cast<double>(suanpan::binomial(i, j));
+    for(auto i = 0ll; i <= d; ++i)
+        for(auto j = 0ll; j <= i; ++j) t_mat(i, j) = static_cast<double>(suanpan::binomial(i, j));
 }
 
 vec NURBS::evaluate_point(const double u, const field<vec>& polygon) const {
@@ -58,7 +60,8 @@ vec NURBS::evaluate_shape_function(const double u, const field<vec>& polygon) co
 
     auto sum = 0.;
 
-    for(auto I = 0llu; I < shape.n_rows; ++I) for(auto J = 0llu; J < shape.n_cols; ++J) sum += shape(I, J) * polygon(I, J).back();
+    for(auto I = 0llu; I < shape.n_rows; ++I)
+        for(auto J = 0llu; J < shape.n_cols; ++J) sum += shape(I, J) * polygon(I, J).back();
 
     return shape / sum;
 }
@@ -87,7 +90,8 @@ field<vec> NURBS::evaluate_shape_function_derivative(const double u, const field
         auto& t_shape = shape(i);
         for(auto j = 1ll; j <= i; ++j) {
             auto factor = 0.;
-            for(auto k = 0llu; k <= order; ++k) if(const auto sind = span + k - order; !polygon(sind).empty()) factor += ders(j, k) * polygon(sind).back();
+            for(auto k = 0llu; k <= order; ++k)
+                if(const auto sind = span + k - order; !polygon(sind).empty()) factor += ders(j, k) * polygon(sind).back();
             t_shape -= binomial_mat(i, j) * factor * shape(i - j);
         }
         t_shape /= sum;

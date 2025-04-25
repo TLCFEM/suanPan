@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "utility.h"
+
 #include <suanPan.h>
 
 unsigned long long suanpan::binomial(unsigned long long n, unsigned long long k) {
@@ -36,9 +37,13 @@ char suanpan::to_upper(const char U) { return static_cast<char>(std::toupper(sta
 
 char suanpan::to_lower(const char L) { return static_cast<char>(std::tolower(static_cast<int>(L))); }
 
-void suanpan::to_upper(string& U) { std::ranges::for_each(U, [](char& C) { C = static_cast<char>(std::toupper(static_cast<int>(C))); }); }
+void suanpan::to_upper(string& U) {
+    std::ranges::for_each(U, [](char& C) { C = static_cast<char>(std::toupper(static_cast<int>(C))); });
+}
 
-void suanpan::to_lower(string& U) { std::ranges::for_each(U, [](char& C) { C = static_cast<char>(std::tolower(static_cast<int>(C))); }); }
+void suanpan::to_lower(string& U) {
+    std::ranges::for_each(U, [](char& C) { C = static_cast<char>(std::tolower(static_cast<int>(C))); });
+}
 
 string suanpan::to_upper(const string& U) {
     string C(U);

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GlobalMassRecorder.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
@@ -23,7 +24,8 @@
 void GlobalMassRecorder::assemble_mass(const mat& EM, const uvec& EC, mat& GM) {
     if(EM.is_empty()) return;
 
-    for(unsigned I = 0; I < EC.n_elem; ++I) for(unsigned J = 0; J < EC.n_elem; ++J) GM(EC(J), EC(I)) += EM(J, I);
+    for(unsigned I = 0; I < EC.n_elem; ++I)
+        for(unsigned J = 0; J < EC.n_elem; ++J) GM(EC(J), EC(I)) += EM(J, I);
 }
 
 GlobalMassRecorder::GlobalMassRecorder(const unsigned T, const unsigned I, const bool R, const bool H)
@@ -39,7 +41,8 @@ void GlobalMassRecorder::record(const shared_ptr<DomainBase>& D) {
 
     vec mass(S * S, fill::zeros);
 
-    if(mat g_mass(mass.memptr(), S, S, false, true); C.empty()) for(const auto& I : D->get_element_pool()) assemble_mass(I->get_current_mass(), I->get_dof_encoding(), g_mass);
+    if(mat g_mass(mass.memptr(), S, S, false, true); C.empty())
+        for(const auto& I : D->get_element_pool()) assemble_mass(I->get_current_mass(), I->get_dof_encoding(), g_mass);
     else
         std::ranges::for_each(C, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {

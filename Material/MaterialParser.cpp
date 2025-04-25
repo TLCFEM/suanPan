@@ -19,6 +19,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 #include "MaterialParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Material/Material>
@@ -3089,7 +3090,8 @@ namespace {
 
         auto idx = 0;
         double para;
-        while(!command.eof() && idx < 2) if(get_input(command, para)) para_pool(idx++) = para;
+        while(!command.eof() && idx < 2)
+            if(get_input(command, para)) para_pool(idx++) = para;
 
         mat c_table, t_table, dc_table, dt_table;
 
@@ -3115,7 +3117,8 @@ namespace {
         if(!check_file(dc_table)) return;
         if(!check_file(dt_table)) return;
 
-        while(!command.eof() && idx < 6) if(get_input(command, para)) para_pool(idx++) = para;
+        while(!command.eof() && idx < 6)
+            if(get_input(command, para)) para_pool(idx++) = para;
 
         return_obj = make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5));
     }
@@ -3131,7 +3134,8 @@ namespace {
 
         auto idx = 0;
         double para;
-        while(!command.eof() && idx < 2) if(get_input(command, para)) para_pool(idx++) = para;
+        while(!command.eof() && idx < 2)
+            if(get_input(command, para)) para_pool(idx++) = para;
 
         std::string table_name;
         if(!get_input(command, table_name)) {
@@ -3145,7 +3149,8 @@ namespace {
             return;
         }
 
-        while(!command.eof() && idx < 8) if(get_input(command, para)) para_pool(idx++) = para;
+        while(!command.eof() && idx < 8)
+            if(get_input(command, para)) para_pool(idx++) = para;
 
         return_obj = make_unique<TableGurson>(tag, para_pool(0), para_pool(1), std::move(hardening_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
     }
@@ -3407,7 +3412,7 @@ namespace {
 
         return_obj = make_unique<Yeoh>(tag, std::vector(pool.begin(), pool.begin() + h_size), std::vector(pool.begin() + h_size, pool.begin() + 2 * h_size), t_size % 2 == 0 ? 0. : pool.back());
     }
-}
+} // namespace
 
 int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& command) {
     std::string material_id;

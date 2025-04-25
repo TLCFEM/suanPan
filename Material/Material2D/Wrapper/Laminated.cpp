@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Laminated.h"
+
 #include <Domain/DomainBase.h>
 
 Laminated::Laminated(const unsigned T, uvec&& MT)

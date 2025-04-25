@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Bead.h"
+
 #include <Domain/Domain.h>
 #include <Step/Step.h>
 
@@ -62,7 +63,8 @@ int Bead::precheck() {
                 if(SUANPAN_SUCCESS != t_step->initialize()) return SUANPAN_FAIL;
             }
 
-    for(const auto& [d_tag, t_domain] : domain_pool) if(t_domain->is_active()) t_domain->clear_status();
+    for(const auto& [d_tag, t_domain] : domain_pool)
+        if(t_domain->is_active()) t_domain->clear_status();
 
     return SUANPAN_SUCCESS;
 }

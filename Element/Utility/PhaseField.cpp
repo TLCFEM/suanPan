@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PhaseField.h"
+
 #include <Toolbox/tensor.h>
 
 void PhaseField::commit_status(const unique_ptr<Material>& mat_obj) {

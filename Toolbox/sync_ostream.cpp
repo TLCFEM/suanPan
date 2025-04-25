@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "sync_ostream.h"
+
 #include <mutex>
 
 namespace suanpan {

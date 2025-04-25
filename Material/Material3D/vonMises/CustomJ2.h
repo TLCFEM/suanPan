@@ -30,6 +30,7 @@
 #define CUSTOMJ2_H
 
 #include "NonlinearJ2.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 

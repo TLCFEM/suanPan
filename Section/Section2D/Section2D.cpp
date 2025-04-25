@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Section2D.h"
+
 #include <Material/Material.h>
 
 Section2D::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_ptr<Material>&& M)

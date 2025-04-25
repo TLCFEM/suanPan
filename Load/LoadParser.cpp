@@ -18,6 +18,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 #include "LoadParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Load/Load>

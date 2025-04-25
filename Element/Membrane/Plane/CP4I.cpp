@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CP4I.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -283,7 +284,8 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
         for(const auto& I : int_pt) {
             const auto n_int = compute_shape_function(I.coor, 0);
             const auto t_factor = t_density * I.weight;
-            for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = J, M = L; K < m_node; ++K, M += m_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
+            for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
+                for(auto K = J, M = L; K < m_node; ++K, M += m_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
         }
         for(auto I = 0u, K = 1u; I < m_size; I += m_dof, K += m_dof) {
             initial_mass(K, K) = initial_mass(I, I);

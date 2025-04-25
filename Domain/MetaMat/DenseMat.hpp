@@ -65,7 +65,9 @@ public:
         : MetaMat<T>(old_mat)
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
-        , memory(new T[this->n_elem]) { suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
+        , memory(new T[this->n_elem]) {
+        suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; });
+    }
 
     DenseMat(DenseMat&&) noexcept = delete;
     DenseMat& operator=(const DenseMat&) = delete;
@@ -81,7 +83,8 @@ public:
 
     [[nodiscard]] T max() const override {
         T max_value = T(1);
-        for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
+        for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I)
+            if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
         return max_value;
     }
 
@@ -106,9 +109,12 @@ public:
         const auto row = M.row_mem();
         const auto col = M.col_mem();
         const auto val = M.val_mem();
-        if(1. == scalar) for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
-        else if(-1. == scalar) for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
-        else for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += scalar * val[I];
+        if(1. == scalar)
+            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
+        else if(-1. == scalar)
+            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+        else
+            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += scalar * val[I];
     }
 
     void operator*=(const T value) override {

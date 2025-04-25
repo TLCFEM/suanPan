@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NodeGroup.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 
@@ -93,7 +94,8 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
         }
     else
         // generate by polynomial curve fitting
-        for(auto& I : D->get_node_pool()) if(auto& J = I->get_coordinate(); static_cast<int>(J.n_elem) > dof && fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= 1E-12) pond.emplace_back(I->get_tag());
+        for(auto& I : D->get_node_pool())
+            if(auto& J = I->get_coordinate(); static_cast<int>(J.n_elem) > dof && fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= 1E-12) pond.emplace_back(I->get_tag());
 
     suanpan_sort(pond.begin(), pond.end());
 

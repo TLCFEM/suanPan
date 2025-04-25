@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "RecorderParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Recorder/Recorder>
 #include <Toolbox/utility.h>

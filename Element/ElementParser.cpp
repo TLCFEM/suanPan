@@ -18,6 +18,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 #include "ElementParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Element/Element>
@@ -2401,7 +2402,7 @@ namespace {
 
         return_obj = make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
     }
-}
+} // namespace
 
 int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command) {
     unsigned tag;

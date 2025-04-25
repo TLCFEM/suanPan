@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "VAFCRP1D.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "EB31OS.h"
+
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 

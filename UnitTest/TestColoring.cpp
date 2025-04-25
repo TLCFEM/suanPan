@@ -1,5 +1,6 @@
-#include <Toolbox/sort_color.hpp>
 #include "CatchHeader.h"
+
+#include <Toolbox/sort_color.hpp>
 
 auto tiny_graph() {
     suanpan::graph<unsigned> graph;

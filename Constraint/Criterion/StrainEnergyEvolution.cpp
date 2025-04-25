@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "StrainEnergyEvolution.h"
+
 #include <Element/Element.h>
 
 StrainEnergyEvolution::StrainEnergyEvolution(const unsigned T, const unsigned ST, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)

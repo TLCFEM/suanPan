@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ExpressionParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/Expression.h>
 #include <Toolbox/utility.h>

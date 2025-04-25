@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomStressDegradation.h"
+
 #include <Domain/DomainBase.h>
 
 vec CustomStressDegradation::compute_positive_degradation(const double t_stress) const { return positive_expression->evaluate(t_stress); }

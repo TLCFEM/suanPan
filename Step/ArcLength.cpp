@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ArcLength.h"
+
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/Domain.h>
 #include <Domain/Factory.hpp>

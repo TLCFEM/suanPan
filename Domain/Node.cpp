@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Node.h"
+
 #include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>

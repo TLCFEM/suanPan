@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Rotation3D.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/Quaternion.hpp>
 

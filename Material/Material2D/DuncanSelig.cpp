@@ -17,6 +17,7 @@
 
 // ReSharper disable IdentifierTypo
 #include "DuncanSelig.h"
+
 #include <Domain/DomainBase.h>
 
 double DuncanSelig::dev(const vec& t_stress) { return std::sqrt(std::pow(t_stress(0) - t_stress(1), 2) + std::pow(2. * t_stress(2), 2)); }

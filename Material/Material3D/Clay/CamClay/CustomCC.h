@@ -30,6 +30,7 @@
 #define CUSTOMCC_H
 
 #include "NonlinearCamClay.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 

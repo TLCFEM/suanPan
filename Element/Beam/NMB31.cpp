@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NMB31.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B3DL.h>
 #include <Recorder/OutputType.h>

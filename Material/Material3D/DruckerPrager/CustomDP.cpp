@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomDP.h"
+
 #include <Domain/DomainBase.h>
 
 double CustomDP::compute_c(const double p_strain) const { return c_expression->evaluate(p_strain).at(0); }

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Buckle.h"
+
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>

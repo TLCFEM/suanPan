@@ -71,7 +71,8 @@ public:
     }
 
     T operator()(const uword in_row, const uword in_col) const override {
-        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]
+            return bin = T(0);
         return this->memory[in_row + s_band + in_col * (m_rows - 1)];
     }
 
@@ -81,7 +82,8 @@ public:
     }
 
     T& at(const uword in_row, const uword in_col) override {
-        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]
+            return bin = T(0);
         return this->unsafe_at(in_row, in_col);
     }
 

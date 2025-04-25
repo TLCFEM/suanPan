@@ -30,6 +30,7 @@
 #define CUSTOMGURSON1D_H
 
 #include "NonlinearGurson1D.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 

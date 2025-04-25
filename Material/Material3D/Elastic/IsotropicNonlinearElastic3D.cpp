@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "IsotropicNonlinearElastic3D.h"
+
 #include <Toolbox/tensor.h>
 
 const mat IsotropicNonlinearElastic3D::unit_dev_tensor = two_third * tensor::unit_deviatoric_tensor4();

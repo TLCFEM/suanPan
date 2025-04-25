@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "DKT3.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -178,25 +179,29 @@ int DKT3::update_status() {
 
 int DKT3::clear_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.p_material->clear_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.p_material->clear_status();
     return code;
 }
 
 int DKT3::commit_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.p_material->commit_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.p_material->commit_status();
     return code;
 }
 
 int DKT3::reset_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.p_material->reset_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.p_material->reset_status();
     return code;
 }
 
 std::vector<vec> DKT3::record(const OutputType P) {
     std::vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) append_to(data, J.p_material->record(P));
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) append_to(data, J.p_material->record(P));
     return data;
 }
 

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "UniversalOS.h"
+
 #include <Domain/DomainBase.h>
 
 UniversalOS::UniversalOS(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA, uvec&& FB)
@@ -91,4 +92,6 @@ int OS146S::reset_status() {
 
 std::vector<vec> OS146S::record(const OutputType P) { return base->record(P); }
 
-void OS146S::print() { if(base) base->print(); }
+void OS146S::print() {
+    if(base) base->print();
+}

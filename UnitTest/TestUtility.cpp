@@ -1,7 +1,8 @@
+#include "CatchHeader.h"
+
 #include <Toolbox/sync_ostream.h>
 #include <Toolbox/utility.h>
 #include <thread>
-#include "CatchHeader.h"
 
 TEST_CASE("Binomial Compute Basic Function", "[Utility.Binomial]") {
     REQUIRE(165 == suanpan::binomial(11, 3));

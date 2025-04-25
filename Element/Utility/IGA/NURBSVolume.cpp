@@ -35,7 +35,10 @@ field<vec> NURBSVolume::evaluate_point_derivative(const double u, const double v
         for(auto m = 0ll; m <= d; ++m) {
             for(auto n = 0ll; n <= d; ++n) {
                 auto& t_ders = ders(l, m, n) = point(l, m, n);
-                for(auto i = 0ll; i <= l; ++i) for(auto j = 0ll; j <= m; ++j) for(auto k = 0ll; k <= n; ++k) if(i != 0 || j != 0 || k != 0) t_ders -= binomial_mat(l, i) * binomial_mat(m, j) * binomial_mat(n, k) * point(i, j, k).back() * ders(l - i, m - j, n - k);
+                for(auto i = 0ll; i <= l; ++i)
+                    for(auto j = 0ll; j <= m; ++j)
+                        for(auto k = 0ll; k <= n; ++k)
+                            if(i != 0 || j != 0 || k != 0) t_ders -= binomial_mat(l, i) * binomial_mat(m, j) * binomial_mat(n, k) * point(i, j, k).back() * ders(l - i, m - j, n - k);
                 t_ders /= point(0, 0, 0).back();
             }
         }
@@ -51,7 +54,10 @@ cube NURBSVolume::evaluate_shape_function(const double u, const double v, const 
 
     auto sum = 0.;
 
-    for(auto I = 0llu; I < shape.n_rows; ++I) for(auto J = 0llu; J < shape.n_cols; ++J) for(auto K = 0llu; K < shape.n_slices; ++K) if(!polygon(I, J, K).empty()) sum += shape(I, J, K) * polygon(I, J, K).back();
+    for(auto I = 0llu; I < shape.n_rows; ++I)
+        for(auto J = 0llu; J < shape.n_cols; ++J)
+            for(auto K = 0llu; K < shape.n_slices; ++K)
+                if(!polygon(I, J, K).empty()) sum += shape(I, J, K) * polygon(I, J, K).back();
 
     return shape / sum;
 }
@@ -94,7 +100,9 @@ field<cube> NURBSVolume::evaluate_shape_function_derivative(const double u, cons
             for(auto k = 0llu; k <= r; ++k)
                 if(const auto wind = wspan + k - r; !polygon(uind, vind, wind).empty()) {
                     sum += uders(0, i) * vders(0, j) * wders(0, k) * polygon(uind, vind, wind).back();
-                    for(auto l = 0; l <= du; ++l) for(auto m = 0; m <= dv; ++m) for(auto n = 0; n <= dw; ++n) shape(l, m, n)(uind, vind, wind) = uders(l, i) * vders(m, j) * wders(n, k) * polygon(uind, vind, wind).back();
+                    for(auto l = 0; l <= du; ++l)
+                        for(auto m = 0; m <= dv; ++m)
+                            for(auto n = 0; n <= dw; ++n) shape(l, m, n)(uind, vind, wind) = uders(l, i) * vders(m, j) * wders(n, k) * polygon(uind, vind, wind).back();
                 }
         }
     }

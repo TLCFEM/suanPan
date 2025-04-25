@@ -34,19 +34,19 @@
 enum class MaterialType : unsigned;
 enum class SectionType : unsigned;
 
-//struct StateElement {
-//    mat mass{};
-//    mat damping{};
-//    mat stiffness{};
-//    mat geometry{};
+// struct StateElement {
+//     mat mass{};
+//     mat damping{};
+//     mat stiffness{};
+//     mat geometry{};
 //
-//    vec resistance{};
-//    vec damping_force{};
-//    vec inertial_force{};
+//     vec resistance{};
+//     vec damping_force{};
+//     vec inertial_force{};
 //
-//    vec body_force{};
-//    vec traction{};
-//};
+//     vec body_force{};
+//     vec traction{};
+// };
 
 struct DataElement {
     const uvec node_encoding; // node encoding

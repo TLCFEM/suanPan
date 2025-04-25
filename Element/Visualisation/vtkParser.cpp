@@ -19,11 +19,11 @@
 
 // ReSharper disable StringLiteralTypo
 #include "vtkParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Toolbox/utility.h>
-
 #include <vtkAutoInit.h>
 VTK_MODULE_INIT(vtkRenderingOpenGL2)  // NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 VTK_MODULE_INIT(vtkInteractionStyle)  // NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
@@ -234,7 +234,8 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
     auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
-        if(-1 != config.material_type) if(const auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) return;
+        if(-1 != config.material_type)
+            if(const auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) return;
         t_element->SetDeformation(node, config.scale);
         auto& t_encoding = t_element->get_node_encoding();
         counter(t_encoding) += 1.;

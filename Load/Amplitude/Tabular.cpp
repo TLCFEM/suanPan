@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Tabular.h"
+
 #include <Domain/DomainBase.h>
 
 Tabular::Tabular(const unsigned T, vec&& TI, vec&& M, const unsigned ST)

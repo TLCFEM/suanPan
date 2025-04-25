@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "MVLEM.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 
@@ -104,7 +105,8 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
     initial_stiffness(2, 2) += shear_height_a * t_a;
     initial_stiffness(5, 5) += shear_height_b * t_b;
 
-    for(auto I = 0; I < 5; ++I) for(auto J = I + 1; J < 6; ++J) initial_stiffness(J, I) = initial_stiffness(I, J);
+    for(auto I = 0; I < 5; ++I)
+        for(auto J = I + 1; J < 6; ++J) initial_stiffness(J, I) = initial_stiffness(I, J);
 
     trial_stiffness = current_stiffness = initial_stiffness = trans_mat.t() * initial_stiffness * trans_mat;
 
@@ -171,7 +173,8 @@ int MVLEM::update_status() {
     trial_stiffness(2, 2) += shear_height_a * t_d;
     trial_stiffness(5, 5) += shear_height_b * t_e;
 
-    for(auto I = 0; I < 5; ++I) for(auto J = I + 1; J < 6; ++J) trial_stiffness(J, I) = trial_stiffness(I, J);
+    for(auto I = 0; I < 5; ++I)
+        for(auto J = I + 1; J < 6; ++J) trial_stiffness(J, I) = trial_stiffness(I, J);
 
     // transform back to the global coordinate system
     trial_stiffness = trans_mat.t() * trial_stiffness * trans_mat;

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ConcreteCM.h"
+
 #include <Toolbox/utility.h>
 
 pod2 ConcreteCM::compute_compression_backbone(const double n_strain) {

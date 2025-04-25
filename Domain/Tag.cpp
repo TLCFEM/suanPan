@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Tag.h"
+
 #include <Toolbox/utility.h>
 
 Tag::Tag(const unsigned T)

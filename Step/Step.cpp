@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Step.h"
+
 #include <Converger/RelIncreDisp.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>

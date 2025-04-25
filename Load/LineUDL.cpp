@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LineUDL.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
@@ -28,7 +29,8 @@ LineUDL::LineUDL(const unsigned T, const unsigned S, const double L, uvec&& N, c
 int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
     if(node_encoding.n_elem % 2 != 0) return SUANPAN_FAIL;
 
-    for(const auto I : node_encoding) if(const auto& t_node = D->get<Node>(I); t_node->get_reordered_dof().size() < dimension || t_node->get_coordinate().size() < dimension) return SUANPAN_FAIL;
+    for(const auto I : node_encoding)
+        if(const auto& t_node = D->get<Node>(I); t_node->get_reordered_dof().size() < dimension || t_node->get_coordinate().size() < dimension) return SUANPAN_FAIL;
 
     return Load::initialize(D);
 }

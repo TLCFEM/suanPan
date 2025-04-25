@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Material2D.h"
+
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 

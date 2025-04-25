@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Joint.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 

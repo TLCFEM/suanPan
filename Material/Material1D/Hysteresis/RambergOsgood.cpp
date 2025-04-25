@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "RambergOsgood.h"
+
 #include <Toolbox/utility.h>
 
 RambergOsgood::RambergOsgood(const unsigned T, const double E, const double Y, const double O, const double N, const double R)

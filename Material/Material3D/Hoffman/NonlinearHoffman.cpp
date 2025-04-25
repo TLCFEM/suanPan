@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearHoffman.h"
+
 #include <Toolbox/tensor.h>
 
 const double NonlinearHoffman::root_two_third = sqrt(2. / 3.);

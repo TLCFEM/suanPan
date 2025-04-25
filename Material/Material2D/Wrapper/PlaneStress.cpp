@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PlaneStress.h"
+
 #include <Domain/DomainBase.h>
 
 PlaneStress::PlaneStress(const unsigned T, const unsigned BT, const unsigned MI)

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Axisymmetric.h"
+
 #include <Domain/DomainBase.h>
 
 const uvec Axisymmetric::F{0, 1, 2, 3};

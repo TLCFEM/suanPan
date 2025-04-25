@@ -17,6 +17,7 @@
 
 // ReSharper disable IdentifierTypo
 #include "NonlinearNM.h"
+
 #include <Recorder/OutputType.h>
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const bool KK, const double LD, vec&& YF)

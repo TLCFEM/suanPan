@@ -41,11 +41,12 @@
 #ifndef LBFGS_HPP
 #define LBFGS_HPP
 
-#include <suanPan.h>
 #include <deque>
+#include <suanPan.h>
 
 template<typename T> concept Differentiable = requires(T t, const vec& x) {
-    t.evaluate_residual(x); t.evaluate_jacobian(x);
+    t.evaluate_residual(x);
+    t.evaluate_jacobian(x);
 };
 
 class LBFGS final {

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "DC3D4.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>

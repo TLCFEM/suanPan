@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "AFC.h"
+
 #include <Toolbox/utility.h>
 
 pod2 AFC::compute_transition(const double TX, const double XS, const double YS, const double ES, const double XF, const double YF, const double EF) {

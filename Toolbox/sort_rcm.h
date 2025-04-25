@@ -111,7 +111,8 @@ template<sp_d eT> uvec sort_rcm(const SpMat<eT>& MEAT) {
         //! sorted, we can simply push in. When the loop is finished, move IDXB to
         //! next position, which may have another root or the children of current
         //! root.
-        for(const auto& IDX : A[R(IDXB--)]) if(!M[IDX]) M[R(IDXC--) = IDX] = true;
+        for(const auto& IDX : A[R(IDXB--)])
+            if(!M[IDX]) M[R(IDXC--) = IDX] = true;
     }
 
     suanpan_debug("RCM algorithm takes {:.5E} seconds.\n", TM.toc());

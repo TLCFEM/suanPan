@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "WilsonPenzienNewmark.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Toolbox/arpack.h>
