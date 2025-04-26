@@ -3,13 +3,12 @@ target_sources(${PROJECT_NAME} PRIVATE
         arpack.cpp
         command.cpp
         Converter.cpp
-        IntegrationPlan.cpp
-        sort_rcm.cpp
-        sync_ostream.cpp
-        tensor.cpp
-        utility.cpp
-        resampling.cpp
         Expression.cpp
         ExpressionParser.cpp
+        IntegrationPlan.cpp
         misc.cpp
+        resampling.cpp
+        sort_rcm.cpp
+        tensor.cpp
+        utility.cpp
 )
