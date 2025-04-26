@@ -28,7 +28,7 @@ double Fluid::get_parameter(const ParameterType P) const {
     return 0.;
 }
 
-unique_ptr<Material> Fluid::get_copy() { return make_unique<Fluid>(*this); }
+unique_ptr<Material> Fluid::get_copy() { return std::make_unique<Fluid>(*this); }
 
 int Fluid::update_trial_status(const vec&) { return SUANPAN_SUCCESS; }
 

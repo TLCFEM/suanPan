@@ -54,7 +54,7 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Cell3DOS::get_copy() { return make_unique<Cell3DOS>(*this); }
+unique_ptr<Section> Cell3DOS::get_copy() { return std::make_unique<Cell3DOS>(*this); }
 
 void Cell3DOS::print() {
     suanpan_info("A 3D open section cell.\n");

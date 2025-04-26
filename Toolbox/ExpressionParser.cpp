@@ -58,7 +58,7 @@ void new_simplescalar(unique_ptr<Expression>& return_obj, std::istringstream& co
 
     if(SUANPAN_SUCCESS != check_file(expression)) return;
 
-    return_obj = make_unique<SimpleScalarExpression>(tag, variable_list);
+    return_obj = std::make_unique<SimpleScalarExpression>(tag, variable_list);
 
     if(!return_obj->compile(expression)) {
         suanpan_error("Fail to parse \"{}\", error: {}.\n", expression, return_obj->error());
@@ -87,7 +87,7 @@ void new_simplevector(unique_ptr<Expression>& return_obj, std::istringstream& co
 
     if(SUANPAN_SUCCESS != check_file(expression)) return;
 
-    return_obj = make_unique<SimpleVectorExpression>(tag, input_list, output_list);
+    return_obj = std::make_unique<SimpleVectorExpression>(tag, input_list, output_list);
 
     if(!return_obj->compile(expression)) {
         suanpan_error("Fail to parse \"{}\", error: {}.\n", expression, return_obj->error());

@@ -66,7 +66,7 @@ int CustomJ2::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearJ2::initialize(D);
 }
 
-unique_ptr<Material> CustomJ2::get_copy() { return make_unique<CustomJ2>(*this); }
+unique_ptr<Material> CustomJ2::get_copy() { return std::make_unique<CustomJ2>(*this); }
 
 void CustomJ2::print() {
     suanpan_info("A 3D J2 hardening model with custom hardening rules.\n");

@@ -44,7 +44,7 @@ int Subloading1D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Subloading1D::get_copy() { return make_unique<Subloading1D>(*this); }
+unique_ptr<Material> Subloading1D::get_copy() { return std::make_unique<Subloading1D>(*this); }
 
 int Subloading1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

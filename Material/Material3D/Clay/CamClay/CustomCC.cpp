@@ -43,7 +43,7 @@ int CustomCC::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearCamClay::initialize(D);
 }
 
-unique_ptr<Material> CustomCC::get_copy() { return make_unique<CustomCC>(*this); }
+unique_ptr<Material> CustomCC::get_copy() { return std::make_unique<CustomCC>(*this); }
 
 void CustomCC::print() {
     suanpan_info("A 3D Cam-Clay model using custom hardening.\n");

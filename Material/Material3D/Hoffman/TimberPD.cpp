@@ -35,7 +35,7 @@ int TimberPD::initialize(const shared_ptr<DomainBase>& D) {
     return BilinearHoffman::initialize(D);
 }
 
-unique_ptr<Material> TimberPD::get_copy() { return make_unique<TimberPD>(*this); }
+unique_ptr<Material> TimberPD::get_copy() { return std::make_unique<TimberPD>(*this); }
 
 int TimberPD::update_trial_status(const vec& t_strain) {
     if(SUANPAN_SUCCESS != BilinearHoffman::update_trial_status(t_strain)) return SUANPAN_FAIL;

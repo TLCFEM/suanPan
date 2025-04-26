@@ -25,4 +25,4 @@ ExpHoffman::ExpHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const double
     : DataExpHoffman{A, B}
     , NonlinearHoffman(T, std::move(E), std::move(V), std::move(S), R) {}
 
-unique_ptr<Material> ExpHoffman::get_copy() { return make_unique<ExpHoffman>(*this); }
+unique_ptr<Material> ExpHoffman::get_copy() { return std::make_unique<ExpHoffman>(*this); }

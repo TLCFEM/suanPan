@@ -59,4 +59,4 @@ int CustomStrainDegradation::initialize(const shared_ptr<DomainBase>& D) {
     return StrainDegradation::initialize(D);
 }
 
-unique_ptr<Material> CustomStrainDegradation::get_copy() { return make_unique<CustomStrainDegradation>(*this); }
+unique_ptr<Material> CustomStrainDegradation::get_copy() { return std::make_unique<CustomStrainDegradation>(*this); }

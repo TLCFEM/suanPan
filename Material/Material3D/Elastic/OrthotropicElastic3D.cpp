@@ -32,7 +32,7 @@ int OrthotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> OrthotropicElastic3D::get_copy() { return make_unique<OrthotropicElastic3D>(*this); }
+unique_ptr<Material> OrthotropicElastic3D::get_copy() { return std::make_unique<OrthotropicElastic3D>(*this); }
 
 int OrthotropicElastic3D::update_trial_status(const vec& t_strain) {
     trial_stress = trial_stiffness * (trial_strain = t_strain);

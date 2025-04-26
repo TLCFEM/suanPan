@@ -57,7 +57,7 @@ int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> HSection2D::get_copy() { return make_unique<HSection2D>(*this); }
+unique_ptr<Section> HSection2D::get_copy() { return std::make_unique<HSection2D>(*this); }
 
 void HSection2D::print() {
     suanpan_info("A 2D H-shape section.\n");

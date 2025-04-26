@@ -46,7 +46,7 @@ int Rebar3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Rebar3D::get_copy() { return make_unique<Rebar3D>(*this); }
+unique_ptr<Material> Rebar3D::get_copy() { return std::make_unique<Rebar3D>(*this); }
 
 int Rebar3D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;

@@ -49,7 +49,7 @@ int Parallel::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Parallel::get_copy() { return make_unique<Parallel>(*this); }
+unique_ptr<Material> Parallel::get_copy() { return std::make_unique<Parallel>(*this); }
 
 int Parallel::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

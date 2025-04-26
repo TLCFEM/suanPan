@@ -206,7 +206,7 @@ unsigned B3DC::nodal_size() const { return 6u; }
 
 bool B3DC::is_nlgeom() const { return true; }
 
-unique_ptr<Orientation> B3DC::get_copy() { return make_unique<B3DC>(*this); }
+unique_ptr<Orientation> B3DC::get_copy() { return std::make_unique<B3DC>(*this); }
 
 void B3DC::commit_status() {
     current_n = trial_n;

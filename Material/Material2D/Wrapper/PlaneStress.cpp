@@ -22,7 +22,7 @@
 PlaneStress::PlaneStress(const unsigned T, const unsigned BT, const unsigned MI)
     : StressWrapper(T, BT, MI, uvec{0, 1, 3}, uvec{2, 4, 5}, MaterialType::D2) { access::rw(plane_type) = PlaneType::S; }
 
-unique_ptr<Material> PlaneStress::get_copy() { return make_unique<PlaneStress>(*this); }
+unique_ptr<Material> PlaneStress::get_copy() { return std::make_unique<PlaneStress>(*this); }
 
 void PlaneStress::print() {
     suanpan_info("A plane stress wrapper.\n");

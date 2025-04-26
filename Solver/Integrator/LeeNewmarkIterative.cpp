@@ -27,15 +27,15 @@ void LeeNewmarkIterative::init_worker(const unsigned n_dim, const unsigned n_mul
     // this is empirical but helps reduce memory footprint
     const auto in_elem = n_multiplier * (l + u + 1) * n_block / 5;
 
-    if(factory->contain_sub_solver_type(SolverType::SUPERLU)) worker = make_unique<SparseMatSuperLU<double>>(n_dim, n_dim, in_elem);
+    if(factory->contain_sub_solver_type(SolverType::SUPERLU)) worker = std::make_unique<SparseMatSuperLU<double>>(n_dim, n_dim, in_elem);
 #ifdef SUANPAN_MKL
-    else if(factory->contain_sub_solver_type(SolverType::PARDISO)) worker = make_unique<SparseMatPARDISO<double>>(n_dim, n_dim, in_elem);
-    else if(factory->contain_sub_solver_type(SolverType::FGMRES)) worker = make_unique<SparseMatFGMRES<double>>(n_dim, n_dim, in_elem);
+    else if(factory->contain_sub_solver_type(SolverType::PARDISO)) worker = std::make_unique<SparseMatPARDISO<double>>(n_dim, n_dim, in_elem);
+    else if(factory->contain_sub_solver_type(SolverType::FGMRES)) worker = std::make_unique<SparseMatFGMRES<double>>(n_dim, n_dim, in_elem);
 #endif
 #ifdef SUANPAN_CUDA
-    else if(factory->contain_sub_solver_type(SolverType::CUDA)) worker = make_unique<SparseMatCUDA<double>>(n_dim, n_dim, in_elem);
+    else if(factory->contain_sub_solver_type(SolverType::CUDA)) worker = std::make_unique<SparseMatCUDA<double>>(n_dim, n_dim, in_elem);
 #endif
-    else worker = make_unique<SparseMatSuperLU<double>>(n_dim, n_dim, in_elem);
+    else worker = std::make_unique<SparseMatSuperLU<double>>(n_dim, n_dim, in_elem);
 }
 
 void LeeNewmarkIterative::assemble(const shared_ptr<MetaMat<double>>& in_mat, const uword row_shift, const uword col_shift, const double scalar) const {

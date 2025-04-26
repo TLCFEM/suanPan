@@ -41,7 +41,7 @@ int Nonviscous01::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Nonviscous01::get_copy() { return make_unique<Nonviscous01>(*this); }
+unique_ptr<Material> Nonviscous01::get_copy() { return std::make_unique<Nonviscous01>(*this); }
 
 int Nonviscous01::update_trial_status(const vec&) {
     suanpan_error("Receives strain only from the associated element.\n");

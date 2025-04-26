@@ -24,7 +24,7 @@ Rectangle1D::Rectangle1D(const unsigned T, const double B, const double H, const
     , width(B)
     , height(H) {}
 
-unique_ptr<Section> Rectangle1D::get_copy() { return make_unique<Rectangle1D>(*this); }
+unique_ptr<Section> Rectangle1D::get_copy() { return std::make_unique<Rectangle1D>(*this); }
 
 void Rectangle1D::print() {
     suanpan_info("A uniaxial rectangle section with width {:.3E} and height {:.3E}.\nMaterial: ", width, height);

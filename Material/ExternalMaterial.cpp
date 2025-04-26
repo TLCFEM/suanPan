@@ -97,7 +97,7 @@ void ExternalMaterial::initialize_history(unsigned) {}
 
 void ExternalMaterial::set_initial_history(const vec&) {}
 
-unique_ptr<Material> ExternalMaterial::get_copy() { return make_unique<ExternalMaterial>(*this); }
+unique_ptr<Material> ExternalMaterial::get_copy() { return std::make_unique<ExternalMaterial>(*this); }
 
 int ExternalMaterial::update_trial_status(const vec& t_strain) {
     if(-1 == data.t_strain) return SUANPAN_FAIL;

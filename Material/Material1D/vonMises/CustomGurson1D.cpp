@@ -41,7 +41,7 @@ int CustomGurson1D::initialize(const shared_ptr<DomainBase>& D) {
 
 vec CustomGurson1D::compute_hardening(const double plastic_strain) const { return expression->evaluate(plastic_strain); }
 
-unique_ptr<Material> CustomGurson1D::get_copy() { return make_unique<CustomGurson1D>(*this); }
+unique_ptr<Material> CustomGurson1D::get_copy() { return std::make_unique<CustomGurson1D>(*this); }
 
 void CustomGurson1D::print() {
     suanpan_info("A uniaxial Gurson model using custom hardening rule.\n");

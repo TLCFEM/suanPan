@@ -153,7 +153,7 @@ namespace {
 
         const auto redirect = [&] {
             buffer_backup = SUANPAN_COUT.rdbuf();
-            buffer_tmp = make_unique<std::stringbuf>();
+            buffer_tmp = std::make_unique<std::stringbuf>();
             SUANPAN_COUT.rdbuf(buffer_tmp.get());
         };
         const auto restore = [&] {

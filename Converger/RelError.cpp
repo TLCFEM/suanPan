@@ -30,7 +30,7 @@
 RelError::RelError(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelError::get_copy() { return make_unique<RelError>(*this); }
+unique_ptr<Converger> RelError::get_copy() { return std::make_unique<RelError>(*this); }
 
 /**
  * \brief Method to return `conv_flag`.

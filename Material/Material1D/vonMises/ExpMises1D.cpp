@@ -29,4 +29,4 @@ ExpMises1D::ExpMises1D(const unsigned T, const double E, const double Y, const d
     : DataExpMises1D{fabs(Y), fabs(A), fabs(B), fabs(C)}
     , NonlinearMises1D(T, E, R) {}
 
-unique_ptr<Material> ExpMises1D::get_copy() { return make_unique<ExpMises1D>(*this); }
+unique_ptr<Material> ExpMises1D::get_copy() { return std::make_unique<ExpMises1D>(*this); }

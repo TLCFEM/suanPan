@@ -47,7 +47,7 @@ int Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Rebar2D::get_copy() { return make_unique<Rebar2D>(*this); }
+unique_ptr<Material> Rebar2D::get_copy() { return std::make_unique<Rebar2D>(*this); }
 
 int Rebar2D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;

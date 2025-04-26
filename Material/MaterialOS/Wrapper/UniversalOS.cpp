@@ -32,7 +32,7 @@ void UniversalOS::print() {
 OS146::OS146(const unsigned T, const unsigned BT, const unsigned MI)
     : UniversalOS(T, BT, MI, uvec{0, 3, 5}, uvec{1, 2, 4}) {}
 
-unique_ptr<Material> OS146::get_copy() { return make_unique<OS146>(*this); }
+unique_ptr<Material> OS146::get_copy() { return std::make_unique<OS146>(*this); }
 
 OS146S::OS146S(const unsigned T, const unsigned BT, const double G)
     : Material(T, MaterialType::OS)
@@ -56,7 +56,7 @@ int OS146S::initialize(const shared_ptr<DomainBase>& D) {
 
 double OS146S::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
 
-unique_ptr<Material> OS146S::get_copy() { return make_unique<OS146S>(*this); }
+unique_ptr<Material> OS146S::get_copy() { return std::make_unique<OS146S>(*this); }
 
 int OS146S::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;

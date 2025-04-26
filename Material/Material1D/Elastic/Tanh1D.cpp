@@ -27,7 +27,7 @@ int Tanh1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Tanh1D::get_copy() { return make_unique<Tanh1D>(*this); }
+unique_ptr<Material> Tanh1D::get_copy() { return std::make_unique<Tanh1D>(*this); }
 
 int Tanh1D::update_trial_status(const vec& t_strain) {
     trial_stress = elastic_modulus * arma::tanh(trial_strain = t_strain);

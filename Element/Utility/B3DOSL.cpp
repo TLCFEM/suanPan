@@ -23,7 +23,7 @@ const span B3DOSL::sa(0, 2), B3DOSL::sb(3, 5), B3DOSL::sc(7, 9), B3DOSL::sd(10, 
 
 OrientationType B3DOSL::get_orientation_type() const { return OrientationType::B3DOS; }
 
-unique_ptr<Orientation> B3DOSL::get_copy() { return make_unique<B3DOSL>(*this); }
+unique_ptr<Orientation> B3DOSL::get_copy() { return std::make_unique<B3DOSL>(*this); }
 
 vec B3DOSL::to_local_vec(const vec& g_disp) const {
     vec t_disp = g_disp;

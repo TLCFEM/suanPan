@@ -33,7 +33,7 @@ int IsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
 
 double IsotropicElastic3D::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> IsotropicElastic3D::get_copy() { return make_unique<IsotropicElastic3D>(*this); }
+unique_ptr<Material> IsotropicElastic3D::get_copy() { return std::make_unique<IsotropicElastic3D>(*this); }
 
 int IsotropicElastic3D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;

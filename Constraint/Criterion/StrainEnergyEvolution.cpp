@@ -22,4 +22,4 @@
 StrainEnergyEvolution::StrainEnergyEvolution(const unsigned T, const unsigned ST, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
     : EnergyEvolution(T, ST, IL, FL, WT, IT, RR, PW, TL) { get_energy = &Element::get_strain_energy; }
 
-unique_ptr<Criterion> StrainEnergyEvolution::get_copy() { return make_unique<StrainEnergyEvolution>(*this); }
+unique_ptr<Criterion> StrainEnergyEvolution::get_copy() { return std::make_unique<StrainEnergyEvolution>(*this); }

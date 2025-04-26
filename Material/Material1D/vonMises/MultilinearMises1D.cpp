@@ -46,7 +46,7 @@ MultilinearMises1D::MultilinearMises1D(const unsigned T, const double E, mat&& H
     access::rw(backbone) = std::move(H);
 }
 
-unique_ptr<Material> MultilinearMises1D::get_copy() { return make_unique<MultilinearMises1D>(*this); }
+unique_ptr<Material> MultilinearMises1D::get_copy() { return std::make_unique<MultilinearMises1D>(*this); }
 
 void MultilinearMises1D::print() {
     suanpan_info("A uniaxial multilinear hardening material using J2 plasticity and associated flow rule.\n");

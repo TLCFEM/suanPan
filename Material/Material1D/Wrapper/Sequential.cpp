@@ -48,7 +48,7 @@ int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Sequential::get_copy() { return make_unique<Sequential>(*this); }
+unique_ptr<Material> Sequential::get_copy() { return std::make_unique<Sequential>(*this); }
 
 int Sequential::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

@@ -379,8 +379,6 @@ inline void suanpan_assert(const std::function<void()>& F) {
 using std::shared_ptr;
 using std::unique_ptr;
 
-using std::make_unique;
-
 template<class T> concept sp_d = std::is_same_v<T, float> || std::is_same_v<T, double>;
 template<class T> concept sp_i = std::is_integral_v<T>;
 

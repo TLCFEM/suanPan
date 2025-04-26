@@ -32,7 +32,7 @@ SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, std::i
         return;
     }
 
-    return_obj = make_unique<ModifierExample>(tag, a, b, get_remaining<uword>(command));
+    return_obj = std::make_unique<ModifierExample>(tag, a, b, get_remaining<uword>(command));
 }
 
 ModifierExample::ModifierExample(const unsigned T, const double A, const double B, uvec&& ET)

@@ -50,7 +50,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = make_unique<Allman>(tag, std::move(node_tag), material_tag, thickness);
+        return_obj = std::make_unique<Allman>(tag, std::move(node_tag), material_tag, thickness);
     }
 
     void new_b21(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
@@ -84,8 +84,8 @@ namespace {
             return;
         }
 
-        if(0 == which) return_obj = make_unique<B21>(tag, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
-        else return_obj = make_unique<B21E>(tag, which, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
+        if(0 == which) return_obj = std::make_unique<B21>(tag, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
+        else return_obj = std::make_unique<B21E>(tag, which, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
     }
 
     void new_b21h(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -119,7 +119,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<B21H>(tag, std::move(node_tag), section_id, elastic_length, is_true(nonlinear));
+        return_obj = std::make_unique<B21H>(tag, std::move(node_tag), section_id, elastic_length, is_true(nonlinear));
     }
 
     void new_b31(unique_ptr<Element>& return_obj, std::istringstream& command, const bool if_os) {
@@ -159,8 +159,8 @@ namespace {
             return;
         }
 
-        if(if_os) return_obj = make_unique<B31OS>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
-        else return_obj = make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
+        if(if_os) return_obj = std::make_unique<B31OS>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
+        else return_obj = std::make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
     }
 
     void new_nmb21(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
@@ -188,8 +188,8 @@ namespace {
             return;
         }
 
-        if(0 == which) return_obj = make_unique<NMB21>(tag, std::move(node_tag), section_id, is_true(nonlinear));
-        else return_obj = make_unique<NMB21E>(tag, which, std::move(node_tag), section_id, is_true(nonlinear));
+        if(0 == which) return_obj = std::make_unique<NMB21>(tag, std::move(node_tag), section_id, is_true(nonlinear));
+        else return_obj = std::make_unique<NMB21E>(tag, which, std::move(node_tag), section_id, is_true(nonlinear));
     }
 
     void new_nmb31(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -223,7 +223,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<NMB31>(tag, std::move(node_tag), section_id, orientation_id, is_true(nonlinear));
+        return_obj = std::make_unique<NMB31>(tag, std::move(node_tag), section_id, orientation_id, is_true(nonlinear));
     }
 
     void new_c3d20(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -257,7 +257,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<C3D20>(tag, std::move(node_tag), material_tag, is_true(reduced_scheme), is_true(nonlinear));
+        return_obj = std::make_unique<C3D20>(tag, std::move(node_tag), material_tag, is_true(reduced_scheme), is_true(nonlinear));
     }
 
     void new_c3d4(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -285,7 +285,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<C3D4>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
+        return_obj = std::make_unique<C3D4>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
     }
 
     void new_c3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -319,7 +319,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<C3D8>(tag, std::move(node_tag), material_tag, suanpan::to_upper(reduced_scheme[0]), is_true(nonlinear));
+        return_obj = std::make_unique<C3D8>(tag, std::move(node_tag), material_tag, suanpan::to_upper(reduced_scheme[0]), is_true(nonlinear));
     }
 
     void new_c3d8r(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -347,7 +347,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<C3D8>(tag, std::move(node_tag), material_tag, 'R', is_true(nonlinear));
+        return_obj = std::make_unique<C3D8>(tag, std::move(node_tag), material_tag, 'R', is_true(nonlinear));
     }
 
     void new_c3d8i(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -369,7 +369,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<C3D8I>(tag, std::move(node_tag), material_tag);
+        return_obj = std::make_unique<C3D8I>(tag, std::move(node_tag), material_tag);
     }
 
     void new_cax3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -397,7 +397,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<CAX3>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
+        return_obj = std::make_unique<CAX3>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
     }
 
     void new_cax4(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -419,7 +419,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CAX4>(tag, std::move(node_tag), material_tag, false);
+        return_obj = std::make_unique<CAX4>(tag, std::move(node_tag), material_tag, false);
     }
 
     void new_cax8(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -441,7 +441,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CAX8>(tag, std::move(node_tag), material_tag, false);
+        return_obj = std::make_unique<CAX8>(tag, std::move(node_tag), material_tag, false);
     }
 
     void new_contact2d(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -467,7 +467,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Contact2D>(tag, master_tag, slave_tag, alpha);
+        return_obj = std::make_unique<Contact2D>(tag, master_tag, slave_tag, alpha);
     }
 
     void new_contact3d(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -493,7 +493,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Contact3D>(tag, master_tag, slave_tag, alpha);
+        return_obj = std::make_unique<Contact3D>(tag, master_tag, slave_tag, alpha);
     }
 
     void new_cp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -527,7 +527,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<CP3>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
+        return_obj = std::make_unique<CP3>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
     void new_cp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -571,7 +571,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
+        return_obj = std::make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
     }
 
     void new_cp4i(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -599,7 +599,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CP4I>(tag, std::move(node_tag), material_tag, thickness);
+        return_obj = std::make_unique<CP4I>(tag, std::move(node_tag), material_tag, thickness);
     }
 
     void new_cp4r(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -633,7 +633,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, true, is_true(nonlinear));
+        return_obj = std::make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, true, is_true(nonlinear));
     }
 
     void new_cp5(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -667,7 +667,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CP5>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
+        return_obj = std::make_unique<CP5>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
     void new_cp6(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -701,7 +701,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CP6>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
+        return_obj = std::make_unique<CP6>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
     void new_cp7(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -735,7 +735,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CP7>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
+        return_obj = std::make_unique<CP7>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
     void new_cp8(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -775,7 +775,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
+        return_obj = std::make_unique<CP8>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
     }
 
     void new_cpe8(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -809,7 +809,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., is_true(reduced_scheme), is_true(nonlinear));
+        return_obj = std::make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., is_true(reduced_scheme), is_true(nonlinear));
     }
 
     void new_cpe8r(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -837,7 +837,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., true, is_true(nonlinear));
+        return_obj = std::make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., true, is_true(nonlinear));
     }
 
     void new_cinp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -865,7 +865,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CINP4>(tag, std::move(node_tag), material_tag, thickness);
+        return_obj = std::make_unique<CINP4>(tag, std::move(node_tag), material_tag, thickness);
     }
 
     void new_cin3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -887,7 +887,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CIN3D8>(tag, std::move(node_tag), material_tag);
+        return_obj = std::make_unique<CIN3D8>(tag, std::move(node_tag), material_tag);
     }
 
     void new_csmt3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -921,7 +921,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CSMT3>(tag, std::move(node_tag), material_tag, thickness, length);
+        return_obj = std::make_unique<CSMT3>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
     void new_csmt6(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -955,7 +955,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<CSMT6>(tag, std::move(node_tag), material_tag, thickness, length);
+        return_obj = std::make_unique<CSMT6>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
     void new_csmq(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned size) {
@@ -989,11 +989,11 @@ namespace {
             return;
         }
 
-        if(4 == size) return_obj = make_unique<CSMQ4>(tag, std::move(node_tag), material_tag, thickness, length);
-        else if(5 == size) return_obj = make_unique<CSMQ5>(tag, std::move(node_tag), material_tag, thickness, length);
-        else if(6 == size) return_obj = make_unique<CSMQ6>(tag, std::move(node_tag), material_tag, thickness, length);
-        else if(7 == size) return_obj = make_unique<CSMQ7>(tag, std::move(node_tag), material_tag, thickness, length);
-        else if(8 == size) return_obj = make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
+        if(4 == size) return_obj = std::make_unique<CSMQ4>(tag, std::move(node_tag), material_tag, thickness, length);
+        else if(5 == size) return_obj = std::make_unique<CSMQ5>(tag, std::move(node_tag), material_tag, thickness, length);
+        else if(6 == size) return_obj = std::make_unique<CSMQ6>(tag, std::move(node_tag), material_tag, thickness, length);
+        else if(7 == size) return_obj = std::make_unique<CSMQ7>(tag, std::move(node_tag), material_tag, thickness, length);
+        else if(8 == size) return_obj = std::make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
     void new_damper01(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
@@ -1015,7 +1015,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Damper01>(tag, std::move(node_tag), damper_tag, dimension);
+        return_obj = std::make_unique<Damper01>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
     void new_damper02(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
@@ -1061,7 +1061,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
+        return_obj = std::make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
     }
 
     void new_damper05(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
@@ -1083,7 +1083,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
+        return_obj = std::make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
     void new_dc3d4(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1117,7 +1117,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate);
+        return_obj = std::make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate);
     }
 
     void new_dc3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1151,7 +1151,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate);
+        return_obj = std::make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate);
     }
 
     void new_dcp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1191,7 +1191,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness);
+        return_obj = std::make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness);
     }
 
     void new_dcp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1231,7 +1231,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness);
+        return_obj = std::make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness);
     }
 
     void new_dkt3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1265,7 +1265,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<DKT3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
+        return_obj = std::make_unique<DKT3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
     void new_dkt4(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1299,7 +1299,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<DKT4>(tag, std::move(node_tag), material_tag, thickness, num_ip);
+        return_obj = std::make_unique<DKT4>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
     void new_dkts3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1339,7 +1339,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
+        return_obj = std::make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
     }
 
     void new_embedded(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dof) {
@@ -1367,8 +1367,8 @@ namespace {
             return;
         }
 
-        if(2 == dof) return_obj = make_unique<Embedded2D>(tag, element_tag, node_tag, alpha);
-        else return_obj = make_unique<Embedded3D>(tag, element_tag, node_tag, alpha);
+        if(2 == dof) return_obj = std::make_unique<Embedded2D>(tag, element_tag, node_tag, alpha);
+        else return_obj = std::make_unique<Embedded3D>(tag, element_tag, node_tag, alpha);
     }
 
     void new_eb21(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1408,7 +1408,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<EB21>(tag, std::move(node_tag), area, moment_inertia, material_tag, is_true(nonlinear));
+        return_obj = std::make_unique<EB21>(tag, std::move(node_tag), area, moment_inertia, material_tag, is_true(nonlinear));
     }
 
     void new_eb31os(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1442,7 +1442,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<EB31OS>(tag, std::move(node_tag), std::move(property), orientation, is_true(nonlinear));
+        return_obj = std::make_unique<EB31OS>(tag, std::move(node_tag), std::move(property), orientation, is_true(nonlinear));
     }
 
     void new_f21(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1476,7 +1476,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<F21>(tag, std::move(node_tag), section_id, int_pt, !!nonlinear);
+        return_obj = std::make_unique<F21>(tag, std::move(node_tag), section_id, int_pt, !!nonlinear);
     }
 
     void new_f21h(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1510,7 +1510,7 @@ namespace {
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = make_unique<F21H>(tag, std::move(node_tag), section_id, elastic_length, !!nonlinear);
+        return_obj = std::make_unique<F21H>(tag, std::move(node_tag), section_id, elastic_length, !!nonlinear);
     }
 
     void new_f31(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1550,7 +1550,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<F31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
+        return_obj = std::make_unique<F31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
     }
 
     void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1582,7 +1582,7 @@ namespace {
         if(!command.eof() && !get_input(command, int_scheme))
             suanpan_error("A valid reduced scheme switch is required.\n");
 
-        return_obj = make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, suanpan::to_upper(int_scheme[0]));
+        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, suanpan::to_upper(int_scheme[0]));
     }
 
     void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
@@ -1610,7 +1610,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
+        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
     }
 
     void new_sgcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
@@ -1638,7 +1638,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
+        return_obj = std::make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
     }
 
     void new_sgcms(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1672,7 +1672,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
+        return_obj = std::make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
     }
 
     void new_gq12(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1700,7 +1700,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = make_unique<GQ12>(tag, std::move(node_tag), material_tag, thickness);
+        return_obj = std::make_unique<GQ12>(tag, std::move(node_tag), material_tag, thickness);
     }
 
     void new_joint(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1716,7 +1716,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Joint>(tag, std::move(node_tag), get_remaining<uword>(command));
+        return_obj = std::make_unique<Joint>(tag, std::move(node_tag), get_remaining<uword>(command));
     }
 
     void new_mass(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
@@ -1749,8 +1749,8 @@ namespace {
             return;
         }
 
-        if(2 == which) return_obj = make_unique<Mass2D>(tag, node, magnitude, uvec(dof_tag));
-        else return_obj = make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
+        if(2 == which) return_obj = std::make_unique<Mass2D>(tag, node, magnitude, uvec(dof_tag));
+        else return_obj = std::make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
     }
 
     void new_masspoint(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
@@ -1773,8 +1773,8 @@ namespace {
         }
 
         if(command.eof()) {
-            if(2 == which) return_obj = make_unique<MassPoint2D>(tag, node, translational_magnitude);
-            else return_obj = make_unique<MassPoint3D>(tag, node, translational_magnitude);
+            if(2 == which) return_obj = std::make_unique<MassPoint2D>(tag, node, translational_magnitude);
+            else return_obj = std::make_unique<MassPoint3D>(tag, node, translational_magnitude);
         }
         else {
             double rotational_magnitude;
@@ -1782,8 +1782,8 @@ namespace {
                 suanpan_error("A valid rotational magnitude is required.\n");
                 return;
             }
-            if(2 == which) return_obj = make_unique<MassPoint2D>(tag, node, translational_magnitude, rotational_magnitude);
-            else return_obj = make_unique<MassPoint3D>(tag, node, translational_magnitude, rotational_magnitude);
+            if(2 == which) return_obj = std::make_unique<MassPoint2D>(tag, node, translational_magnitude, rotational_magnitude);
+            else return_obj = std::make_unique<MassPoint3D>(tag, node, translational_magnitude, rotational_magnitude);
         }
     }
 
@@ -1818,7 +1818,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Mindlin>(tag, std::move(node_tag), material_tag, thickness, num_ip);
+        return_obj = std::make_unique<Mindlin>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
     void new_mvlem(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1848,7 +1848,7 @@ namespace {
 
         const auto [B, H, R, CT, ST] = get_remaining<double, double, double, uword, uword>(command);
 
-        return_obj = make_unique<MVLEM>(tag, std::move(node_tag), B, H, R, CT, ST, shear_tag, c_height);
+        return_obj = std::make_unique<MVLEM>(tag, std::move(node_tag), B, H, R, CT, ST, shear_tag, c_height);
     }
 
     void new_pcpedc(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned node) {
@@ -1881,8 +1881,8 @@ namespace {
             return;
         }
 
-        if(4 == node) return_obj = make_unique<PCPE4DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
-        else if(8 == node) return_obj = make_unique<PCPE8DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
+        if(4 == node) return_obj = std::make_unique<PCPE4DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
+        else if(8 == node) return_obj = std::make_unique<PCPE8DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
     }
 
     void new_pcpeuc(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned node) {
@@ -1915,8 +1915,8 @@ namespace {
             return;
         }
 
-        if(4 == node) return_obj = make_unique<PCPE4UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
-        else if(8 == node) return_obj = make_unique<PCPE8UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
+        if(4 == node) return_obj = std::make_unique<PCPE4UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
+        else if(8 == node) return_obj = std::make_unique<PCPE8UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
     }
 
     void new_ps(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1944,7 +1944,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = make_unique<PS>(tag, std::move(node_tag), material_tag, thickness);
+        return_obj = std::make_unique<PS>(tag, std::move(node_tag), material_tag, thickness);
     }
 
     void new_qe2(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1972,7 +1972,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = make_unique<QE2>(tag, std::move(node_tag), material_tag, thickness);
+        return_obj = std::make_unique<QE2>(tag, std::move(node_tag), material_tag, thickness);
     }
 
     void new_s4(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2006,7 +2006,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
+        return_obj = std::make_unique<S4>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
     }
 
     template<typename T> void new_singlesection(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2028,7 +2028,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<T>(tag, node, section_tag);
+        return_obj = std::make_unique<T>(tag, node, section_tag);
     }
 
     void new_spring01(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2050,7 +2050,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Spring01>(tag, std::move(node_tag), material_tag);
+        return_obj = std::make_unique<Spring01>(tag, std::move(node_tag), material_tag);
     }
 
     void new_spring02(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2072,7 +2072,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<Spring02>(tag, std::move(node_tag), material_tag);
+        return_obj = std::make_unique<Spring02>(tag, std::move(node_tag), material_tag);
     }
 
     void new_t2d2(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2123,7 +2123,7 @@ namespace {
         else if(!get_input(command, rigidity))
             suanpan_error("A valid flexural rigidity is required.\n");
 
-        return_obj = make_unique<T2D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain), rigidity);
+        return_obj = std::make_unique<T2D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain), rigidity);
     }
 
     void new_t2d2s(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2157,7 +2157,7 @@ namespace {
         else if(!get_input(command, log_strain))
             suanpan_error("A valid switch to indicate if to use engineering strain is required.\n");
 
-        return_obj = make_unique<T2D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
+        return_obj = std::make_unique<T2D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
     }
 
     void new_t3d2(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2202,7 +2202,7 @@ namespace {
         else if(!get_input(command, log_strain))
             suanpan_error("A valid engineering strain switch is required.\n");
 
-        return_obj = make_unique<T3D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain));
+        return_obj = std::make_unique<T3D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain));
     }
 
     void new_t3d2s(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2236,7 +2236,7 @@ namespace {
         else if(!get_input(command, log_strain))
             suanpan_error("A valid switch to indicate if to use engineering strain is required.\n");
 
-        return_obj = make_unique<T3D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
+        return_obj = std::make_unique<T3D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
     }
 
     void new_tie(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2254,7 +2254,7 @@ namespace {
 
         const auto [node_tag, dof_tag, weight_tag] = get_remaining<uword, uword, double>(command);
 
-        return_obj = make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
+        return_obj = std::make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
     }
 
     void new_translationconnector(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned S) {
@@ -2276,8 +2276,8 @@ namespace {
             return;
         }
 
-        if(2u == S) return_obj = make_unique<TranslationConnector2D>(tag, std::move(nodes), penalty);
-        else return_obj = make_unique<TranslationConnector3D>(tag, std::move(nodes), penalty);
+        if(2u == S) return_obj = std::make_unique<TranslationConnector2D>(tag, std::move(nodes), penalty);
+        else return_obj = std::make_unique<TranslationConnector3D>(tag, std::move(nodes), penalty);
     }
 
     void new_patchquad(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2340,7 +2340,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<PatchQuad>(tag, std::move(knot_x), std::move(knot_y), std::move(node_tag), static_cast<unsigned>(material_tag), thickness);
+        return_obj = std::make_unique<PatchQuad>(tag, std::move(knot_x), std::move(knot_y), std::move(node_tag), static_cast<unsigned>(material_tag), thickness);
     }
 
     void new_patchcube(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2400,7 +2400,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
+        return_obj = std::make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
     }
 } // namespace
 
@@ -2451,7 +2451,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<LumpedSimple>(tag, get_remaining<uword>(command));
+        new_modifier = std::make_unique<LumpedSimple>(tag, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "LumpedScale")) {
         unsigned tag;
@@ -2460,7 +2460,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<LumpedScale>(tag, get_remaining<uword>(command));
+        new_modifier = std::make_unique<LumpedScale>(tag, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "Rayleigh")) {
         unsigned tag;
@@ -2475,7 +2475,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<Rayleigh>(tag, a, b, c, d, get_remaining<uword>(command));
+        new_modifier = std::make_unique<Rayleigh>(tag, a, b, c, d, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "ElementalLee")) {
         unsigned tag;
@@ -2490,7 +2490,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<ElementalLee>(tag, damping_ratio, get_remaining<uword>(command));
+        new_modifier = std::make_unique<ElementalLee>(tag, damping_ratio, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "LinearViscosity")) {
         unsigned tag;
@@ -2505,7 +2505,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<LinearViscosity>(tag, mu, get_remaining<uword>(command));
+        new_modifier = std::make_unique<LinearViscosity>(tag, mu, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "ElementalModal")) {
         unsigned tag;
@@ -2520,7 +2520,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
             return SUANPAN_SUCCESS;
         }
 
-        new_modifier = make_unique<ElementalModal>(tag, a, b, get_remaining<uword>(command));
+        new_modifier = std::make_unique<ElementalModal>(tag, a, b, get_remaining<uword>(command));
     }
     else if(is_equal(modifier_type, "ElementalNonviscous") || is_equal(modifier_type, "ElementalNonviscousGroup")) {
         unsigned tag, ele_tag;
@@ -2544,8 +2544,8 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(modifier_type, "ElementalNonviscous")) new_modifier = make_unique<ElementalNonviscous>(tag, std::move(m), std::move(s), uvec{ele_tag});
-        else new_modifier = make_unique<ElementalNonviscousGroup>(tag, std::move(m), std::move(s), ele_tag);
+        if(is_equal(modifier_type, "ElementalNonviscous")) new_modifier = std::make_unique<ElementalNonviscous>(tag, std::move(m), std::move(s), uvec{ele_tag});
+        else new_modifier = std::make_unique<ElementalNonviscousGroup>(tag, std::move(m), std::move(s), ele_tag);
     }
     else {
         // check if the library is already loaded

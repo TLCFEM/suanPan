@@ -285,7 +285,7 @@ int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> DuncanSelig::get_copy() { return make_unique<DuncanSelig>(*this); }
+unique_ptr<Material> DuncanSelig::get_copy() { return std::make_unique<DuncanSelig>(*this); }
 
 int DuncanSelig::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

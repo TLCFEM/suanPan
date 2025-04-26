@@ -24,7 +24,7 @@ T2D2::T2D2(const unsigned T, uvec&& N, const unsigned M, const double A, const b
     : MaterialElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2})
     , area(A)
     , rigidity(FR)
-    , t_trans(F ? make_unique<T2DC>() : make_unique<T2DL>())
+    , t_trans(F ? std::make_unique<T2DC>() : std::make_unique<T2DL>())
     , update_area(UA)
     , log_strain(LS) {}
 

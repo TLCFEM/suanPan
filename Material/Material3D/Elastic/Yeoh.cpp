@@ -74,7 +74,7 @@ int Yeoh::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Yeoh::get_copy() { return make_unique<Yeoh>(*this); }
+unique_ptr<Material> Yeoh::get_copy() { return std::make_unique<Yeoh>(*this); }
 
 // takes green strain as input
 int Yeoh::update_trial_status(const vec& t_strain) {

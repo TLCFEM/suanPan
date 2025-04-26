@@ -42,7 +42,7 @@ int Rotation2D::initialize(const shared_ptr<DomainBase>& D) {
 
 double Rotation2D::get_parameter(const ParameterType P) const { return mat_obj->get_parameter(P); }
 
-unique_ptr<Material> Rotation2D::get_copy() { return make_unique<Rotation2D>(*this); }
+unique_ptr<Material> Rotation2D::get_copy() { return std::make_unique<Rotation2D>(*this); }
 
 int Rotation2D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;

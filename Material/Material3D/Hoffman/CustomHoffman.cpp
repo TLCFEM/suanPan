@@ -49,7 +49,7 @@ int CustomHoffman::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearHoffman::initialize(D);
 }
 
-unique_ptr<Material> CustomHoffman::get_copy() { return make_unique<CustomHoffman>(*this); }
+unique_ptr<Material> CustomHoffman::get_copy() { return std::make_unique<CustomHoffman>(*this); }
 
 void CustomHoffman::print() {
     suanpan_info("A 3D nonlinear Hoffman model using custom hardening function.\n");

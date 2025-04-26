@@ -21,7 +21,7 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
-unique_ptr<Criterion> MaxResistance::get_copy() { return make_unique<MaxResistance>(*this); }
+unique_ptr<Criterion> MaxResistance::get_copy() { return std::make_unique<MaxResistance>(*this); }
 
 int MaxResistance::process(const shared_ptr<DomainBase>& D) {
     const auto& t_vec = D->get_node(node)->get_reordered_dof();

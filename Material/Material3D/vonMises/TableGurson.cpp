@@ -37,4 +37,4 @@ TableGurson::TableGurson(const unsigned T, const double E, const double V, mat&&
     : NonlinearGurson(T, E, V, Q1, Q2, FN, SN, EN, R)
     , hardening_table(std::move(HARDEN)) {}
 
-unique_ptr<Material> TableGurson::get_copy() { return make_unique<TableGurson>(*this); }
+unique_ptr<Material> TableGurson::get_copy() { return std::make_unique<TableGurson>(*this); }

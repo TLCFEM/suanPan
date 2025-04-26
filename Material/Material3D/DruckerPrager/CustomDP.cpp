@@ -43,7 +43,7 @@ int CustomDP::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearDruckerPrager::initialize(D);
 }
 
-unique_ptr<Material> CustomDP::get_copy() { return make_unique<CustomDP>(*this); }
+unique_ptr<Material> CustomDP::get_copy() { return std::make_unique<CustomDP>(*this); }
 
 void CustomDP::print() {
     suanpan_info("A 3D nonlinear model using Drucker-Prager yielding criterion with custom cohesion function.\n");

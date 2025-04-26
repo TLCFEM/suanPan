@@ -35,7 +35,7 @@ void T2DC::update_transformation() {
 
 bool T2DC::is_nlgeom() const { return true; }
 
-unique_ptr<Orientation> T2DC::get_copy() { return make_unique<T2DC>(*this); }
+unique_ptr<Orientation> T2DC::get_copy() { return std::make_unique<T2DC>(*this); }
 
 mat T2DC::to_global_geometry_mat(const mat& l_mat) const {
     auto g_mat = to_global_stiffness_mat(-l_mat);

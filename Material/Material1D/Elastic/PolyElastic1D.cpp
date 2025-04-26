@@ -27,7 +27,7 @@ int PolyElastic1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> PolyElastic1D::get_copy() { return make_unique<PolyElastic1D>(*this); }
+unique_ptr<Material> PolyElastic1D::get_copy() { return std::make_unique<PolyElastic1D>(*this); }
 
 int PolyElastic1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

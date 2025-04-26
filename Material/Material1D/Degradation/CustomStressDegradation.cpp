@@ -59,4 +59,4 @@ int CustomStressDegradation::initialize(const shared_ptr<DomainBase>& D) {
     return StressDegradation::initialize(D);
 }
 
-unique_ptr<Material> CustomStressDegradation::get_copy() { return make_unique<CustomStressDegradation>(*this); }
+unique_ptr<Material> CustomStressDegradation::get_copy() { return std::make_unique<CustomStressDegradation>(*this); }

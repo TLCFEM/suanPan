@@ -31,7 +31,7 @@ void new_nodegroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
         return;
     }
 
-    return_obj = make_unique<NodeGroup>(tag, get_remaining<uword>(command));
+    return_obj = std::make_unique<NodeGroup>(tag, get_remaining<uword>(command));
 }
 
 void new_customnodegroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
@@ -41,7 +41,7 @@ void new_customnodegroup(unique_ptr<Group>& return_obj, std::istringstream& comm
         return;
     }
 
-    return_obj = make_unique<CustomNodeGroup>(tag, expression);
+    return_obj = std::make_unique<CustomNodeGroup>(tag, expression);
 }
 
 void new_elementgroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
@@ -51,7 +51,7 @@ void new_elementgroup(unique_ptr<Group>& return_obj, std::istringstream& command
         return;
     }
 
-    return_obj = make_unique<ElementGroup>(tag, get_remaining<uword>(command));
+    return_obj = std::make_unique<ElementGroup>(tag, get_remaining<uword>(command));
 }
 
 void new_generate(unique_ptr<Group>& return_obj, std::istringstream& command) {
@@ -96,10 +96,10 @@ void new_generate(unique_ptr<Group>& return_obj, std::istringstream& command) {
         start += interval;
     }
 
-    return_obj = make_unique<NodeGroup>(tag, tag_pool);
+    return_obj = std::make_unique<NodeGroup>(tag, tag_pool);
 
-    if(is_equal(type, "nodegroup")) return_obj = make_unique<NodeGroup>(tag, tag_pool);
-    else if(is_equal(type, "elementgroup")) return_obj = make_unique<ElementGroup>(tag, tag_pool);
+    if(is_equal(type, "nodegroup")) return_obj = std::make_unique<NodeGroup>(tag, tag_pool);
+    else if(is_equal(type, "elementgroup")) return_obj = std::make_unique<ElementGroup>(tag, tag_pool);
 }
 
 void new_generatebyrule(unique_ptr<Group>& return_obj, std::istringstream& command) {
@@ -120,7 +120,7 @@ void new_generatebyrule(unique_ptr<Group>& return_obj, std::istringstream& comma
         return;
     }
 
-    return_obj = make_unique<NodeGroup>(tag, dof, get_remaining<double>(command));
+    return_obj = std::make_unique<NodeGroup>(tag, dof, get_remaining<double>(command));
 }
 
 void new_generatebyplane(unique_ptr<Group>& return_obj, std::istringstream& command) {
@@ -139,7 +139,7 @@ void new_generatebyplane(unique_ptr<Group>& return_obj, std::istringstream& comm
 
     if(pool.empty()) return;
 
-    return_obj = make_unique<NodeGroup>(tag, pool);
+    return_obj = std::make_unique<NodeGroup>(tag, pool);
 }
 
 void new_generatebypoint(unique_ptr<Group>& return_obj, std::istringstream& command) {
@@ -160,7 +160,7 @@ void new_generatebypoint(unique_ptr<Group>& return_obj, std::istringstream& comm
 
     const auto size = static_cast<long long>(pool.size()) / 2;
 
-    return_obj = make_unique<NodeGroup>(tag, std::vector(pool.begin(), pool.begin() + size), std::vector(pool.end() - size, pool.end()));
+    return_obj = std::make_unique<NodeGroup>(tag, std::vector(pool.begin(), pool.begin() + size), std::vector(pool.end() - size, pool.end()));
 }
 
 void new_groupgroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
@@ -170,7 +170,7 @@ void new_groupgroup(unique_ptr<Group>& return_obj, std::istringstream& command) 
         return;
     }
 
-    return_obj = make_unique<GroupGroup>(tag, get_remaining<uword>(command));
+    return_obj = std::make_unique<GroupGroup>(tag, get_remaining<uword>(command));
 }
 
 int create_new_group(const shared_ptr<DomainBase>& domain, std::istringstream& command) {

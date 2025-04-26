@@ -48,4 +48,4 @@ Dhakal::Dhakal(const unsigned T, const unsigned MT, const double EY, const doubl
     : DataDhakal{-fabs(EY), -fabs(EY) * std::max(55. - 2.3 * fabs(PP), 7.), std::min(1., std::max(1.1 - .016 * fabs(PP), .2))}
     , StrainDegradation(T, MT) {}
 
-unique_ptr<Material> Dhakal::get_copy() { return make_unique<Dhakal>(*this); }
+unique_ptr<Material> Dhakal::get_copy() { return std::make_unique<Dhakal>(*this); }

@@ -77,4 +77,4 @@ CDP::CDP(const unsigned T, const double E, const double V, const double ST, cons
     }
 }
 
-unique_ptr<Material> CDP::get_copy() { return make_unique<CDP>(*this); }
+unique_ptr<Material> CDP::get_copy() { return std::make_unique<CDP>(*this); }

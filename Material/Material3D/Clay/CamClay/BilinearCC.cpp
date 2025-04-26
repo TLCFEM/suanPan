@@ -25,7 +25,7 @@ BilinearCC::BilinearCC(const unsigned T, const double E, const double V, const d
     : DataBilinearCC{A, K}
     , NonlinearCamClay(T, E, V, B, M, P, R) {}
 
-unique_ptr<Material> BilinearCC::get_copy() { return make_unique<BilinearCC>(*this); }
+unique_ptr<Material> BilinearCC::get_copy() { return std::make_unique<BilinearCC>(*this); }
 
 void BilinearCC::print() {
     suanpan_info("A 3D Cam-Clay model using linear hardening.\n");

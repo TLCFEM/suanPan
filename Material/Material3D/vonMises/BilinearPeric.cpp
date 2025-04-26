@@ -25,4 +25,4 @@ BilinearPeric::BilinearPeric(const unsigned T, const double E, const double V, c
     : DataBilinearPeric{Y, H}
     , NonlinearPeric(T, E, V, MU, EPS, R) {}
 
-unique_ptr<Material> BilinearPeric::get_copy() { return make_unique<BilinearPeric>(*this); }
+unique_ptr<Material> BilinearPeric::get_copy() { return std::make_unique<BilinearPeric>(*this); }

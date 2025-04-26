@@ -30,7 +30,7 @@
 AbsDisp::AbsDisp(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> AbsDisp::get_copy() { return make_unique<AbsDisp>(*this); }
+unique_ptr<Converger> AbsDisp::get_copy() { return std::make_unique<AbsDisp>(*this); }
 
 bool AbsDisp::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();

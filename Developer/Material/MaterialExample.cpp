@@ -62,7 +62,7 @@ SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>& return_obj, std::i
         return;
     }
 
-    return_obj = make_unique<MaterialExample>(tag, elastic_modulus, yield_stress, hardening_ratio, beta, density);
+    return_obj = std::make_unique<MaterialExample>(tag, elastic_modulus, yield_stress, hardening_ratio, beta, density);
 }
 
 /**
@@ -115,15 +115,15 @@ int MaterialExample::initialize(const shared_ptr<DomainBase>&) {
 }
 
 /**
- * \brief The `get_copy()` method should always be implemented with `make_unique`.
+ * \brief The `get_copy()` method should always be implemented with `std::make_unique`.
  * In case the model defines other memory management, developers may need to further
- * provide a copy ctor to make `make_unique` work.
+ * provide a copy ctor to make `std::make_unique` work.
  *
  * **!!!NEVER DO A MANUAL COPY OF DATA IN THIS METHOD!!!**
  *
  * \return a copy of material model
  */
-unique_ptr<Material> MaterialExample::get_copy() { return make_unique<MaterialExample>(*this); }
+unique_ptr<Material> MaterialExample::get_copy() { return std::make_unique<MaterialExample>(*this); }
 
 /**
  * \brief There are two states we are managing at any time point.

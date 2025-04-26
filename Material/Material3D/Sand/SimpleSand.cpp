@@ -35,7 +35,7 @@ int SimpleSand::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> SimpleSand::get_copy() { return make_unique<SimpleSand>(*this); }
+unique_ptr<Material> SimpleSand::get_copy() { return std::make_unique<SimpleSand>(*this); }
 
 double SimpleSand::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 

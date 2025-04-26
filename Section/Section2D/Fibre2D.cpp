@@ -20,4 +20,4 @@
 Fibre2D::Fibre2D(const unsigned T, uvec&& ST)
     : Fibre(T, std::move(ST), SectionType::D2) {}
 
-unique_ptr<Section> Fibre2D::get_copy() { return make_unique<Fibre2D>(*this); }
+unique_ptr<Section> Fibre2D::get_copy() { return std::make_unique<Fibre2D>(*this); }

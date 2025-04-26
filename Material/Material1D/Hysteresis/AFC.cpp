@@ -86,7 +86,7 @@ int AFC::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> AFC::get_copy() { return make_unique<AFC>(*this); }
+unique_ptr<Material> AFC::get_copy() { return std::make_unique<AFC>(*this); }
 
 int AFC::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

@@ -30,7 +30,7 @@
 AbsIncreAcc::AbsIncreAcc(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> AbsIncreAcc::get_copy() { return make_unique<AbsIncreAcc>(*this); }
+unique_ptr<Converger> AbsIncreAcc::get_copy() { return std::make_unique<AbsIncreAcc>(*this); }
 
 /**
  * \brief Method to return `conv_flag`.

@@ -50,7 +50,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<NodalAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        return_obj = std::make_unique<NodalAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_bodyforce(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -78,8 +78,8 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = make_unique<GroupBodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = make_unique<BodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<BodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_cload(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -107,8 +107,8 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = make_unique<GroupNodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = make_unique<NodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<NodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_refload(unique_ptr<Load>& return_obj, std::istringstream& command) {
@@ -135,7 +135,7 @@ namespace {
             return;
         }
 
-        return_obj = make_unique<ReferenceForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id);
+        return_obj = std::make_unique<ReferenceForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id);
     }
 
     void new_lineudl(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned dimension) {
@@ -163,8 +163,8 @@ namespace {
             return;
         }
 
-        if(2 == dimension) return_obj = make_unique<LineUDL2D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = make_unique<LineUDL3D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(2 == dimension) return_obj = std::make_unique<LineUDL2D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<LineUDL3D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_displacement(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -192,8 +192,8 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = make_unique<NodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<NodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_supportmotion(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned flag) {
@@ -221,9 +221,9 @@ namespace {
             return;
         }
 
-        if(0 == flag) return_obj = make_unique<SupportDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else if(1 == flag) return_obj = make_unique<SupportVelocity>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = make_unique<SupportAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<SupportAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 } // namespace
 

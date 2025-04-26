@@ -29,7 +29,7 @@ void B2DL::form_trans_mat(const vec& d_cosine) {
     trans_mat(1, 2) = trans_mat(2, 5) = 1.;
 }
 
-unique_ptr<Orientation> B2DL::get_copy() { return make_unique<B2DL>(*this); }
+unique_ptr<Orientation> B2DL::get_copy() { return std::make_unique<B2DL>(*this); }
 
 void B2DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;

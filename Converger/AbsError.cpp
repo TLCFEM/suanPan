@@ -30,7 +30,7 @@
 AbsError::AbsError(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> AbsError::get_copy() { return make_unique<AbsError>(*this); }
+unique_ptr<Converger> AbsError::get_copy() { return std::make_unique<AbsError>(*this); }
 
 /**
  * \brief Method to return `conv_flag`.

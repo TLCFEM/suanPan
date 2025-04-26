@@ -45,7 +45,7 @@ int Rectangle3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Rectangle3D::get_copy() { return make_unique<Rectangle3D>(*this); }
+unique_ptr<Section> Rectangle3D::get_copy() { return std::make_unique<Rectangle3D>(*this); }
 
 void Rectangle3D::print() {
     suanpan_info("A 3D rectangular section.\n");

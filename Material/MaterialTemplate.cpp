@@ -24,7 +24,7 @@ int MaterialTemplate::initialize(const shared_ptr<DomainBase>&) { return SUANPAN
 
 double MaterialTemplate::get_parameter(const ParameterType) const { return 0.; }
 
-unique_ptr<Material> MaterialTemplate::get_copy() { return make_unique<MaterialTemplate>(*this); }
+unique_ptr<Material> MaterialTemplate::get_copy() { return std::make_unique<MaterialTemplate>(*this); }
 
 int MaterialTemplate::update_trial_status(const vec&) { return 0; }
 

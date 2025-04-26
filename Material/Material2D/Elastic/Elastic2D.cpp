@@ -56,7 +56,7 @@ void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
 
 double Elastic2D::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> Elastic2D::get_copy() { return make_unique<Elastic2D>(*this); }
+unique_ptr<Material> Elastic2D::get_copy() { return std::make_unique<Elastic2D>(*this); }
 
 int Elastic2D::update_trial_status(const vec& t_strain) {
     trial_stress = trial_stiffness * (trial_strain = t_strain);

@@ -24,7 +24,7 @@
 
 NMB21::NMB21(const unsigned T, uvec&& N, const unsigned S, const bool R)
     : SectionNMElement2D(T, b_node, b_dof, std::move(N), uvec{S}, R)
-    , b_trans(R ? make_unique<B2DC>() : make_unique<B2DL>()) {}
+    , b_trans(R ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
 
 int NMB21::initialize(const shared_ptr<DomainBase>& D) {
     b_trans->set_element_ptr(this);

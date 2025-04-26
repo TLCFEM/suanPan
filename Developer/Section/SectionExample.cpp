@@ -38,7 +38,7 @@ SUANPAN_EXPORT void new_sectionexample(unique_ptr<Section>& return_obj, std::ist
         return;
     }
 
-    return_obj = make_unique<SectionExample>(tag, edge, elastic_modulus);
+    return_obj = std::make_unique<SectionExample>(tag, edge, elastic_modulus);
 }
 
 SectionExample::SectionExample(const unsigned T, const double S, const double E)
@@ -56,7 +56,7 @@ int SectionExample::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> SectionExample::get_copy() { return make_unique<SectionExample>(*this); }
+unique_ptr<Section> SectionExample::get_copy() { return std::make_unique<SectionExample>(*this); }
 
 int SectionExample::update_trial_status(const vec& t_deformation) {
     trial_deformation = t_deformation;

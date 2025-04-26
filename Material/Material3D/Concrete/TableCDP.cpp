@@ -125,4 +125,4 @@ TableCDP::TableCDP(const unsigned T, const double E, const double V, mat&& TT, m
     c_table.col(0) = holder;
 }
 
-unique_ptr<Material> TableCDP::get_copy() { return make_unique<TableCDP>(*this); }
+unique_ptr<Material> TableCDP::get_copy() { return std::make_unique<TableCDP>(*this); }

@@ -35,7 +35,7 @@ void T3DC::update_transformation() {
 
 bool T3DC::is_nlgeom() const { return true; }
 
-unique_ptr<Orientation> T3DC::get_copy() { return make_unique<T3DC>(*this); }
+unique_ptr<Orientation> T3DC::get_copy() { return std::make_unique<T3DC>(*this); }
 
 mat T3DC::to_global_geometry_mat(const mat& l_mat) const {
     auto g_mat = to_global_stiffness_mat(-l_mat);

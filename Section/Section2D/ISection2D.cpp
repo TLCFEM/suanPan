@@ -66,7 +66,7 @@ int ISection2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> ISection2D::get_copy() { return make_unique<ISection2D>(*this); }
+unique_ptr<Section> ISection2D::get_copy() { return std::make_unique<ISection2D>(*this); }
 
 void ISection2D::print() {
     suanpan_info("A 2D I-shape section with following integration points.\n");

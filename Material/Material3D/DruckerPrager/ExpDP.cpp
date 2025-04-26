@@ -31,7 +31,7 @@ ExpDP::ExpDP(const unsigned T, const double E, const double V, const double ETAY
     : DataExpDP({PA <= 1. ? CO : CO * 4. * PA / pow(1. + PA, 2.), PA, PB})
     , NonlinearDruckerPrager(T, E, V, ETAY, ETAF, XI, R) {}
 
-unique_ptr<Material> ExpDP::get_copy() { return make_unique<ExpDP>(*this); }
+unique_ptr<Material> ExpDP::get_copy() { return std::make_unique<ExpDP>(*this); }
 
 void ExpDP::print() {
     suanpan_info("A 3D exponential hardening model using Drucker-Prager yielding criterion.\n");

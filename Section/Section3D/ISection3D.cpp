@@ -66,7 +66,7 @@ int ISection3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> ISection3D::get_copy() { return make_unique<ISection3D>(*this); }
+unique_ptr<Section> ISection3D::get_copy() { return std::make_unique<ISection3D>(*this); }
 
 void ISection3D::print() {
     suanpan_info("A 3D I-shape section with following integration points.\n");

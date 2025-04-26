@@ -30,7 +30,7 @@
 RelIncreEnergy::RelIncreEnergy(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelIncreEnergy::get_copy() { return make_unique<RelIncreEnergy>(*this); }
+unique_ptr<Converger> RelIncreEnergy::get_copy() { return std::make_unique<RelIncreEnergy>(*this); }
 
 bool RelIncreEnergy::is_converged(const unsigned counter) {
     const auto D = get_domain().lock();

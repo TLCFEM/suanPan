@@ -29,7 +29,7 @@ int SlipLock::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> SlipLock::get_copy() { return make_unique<SlipLock>(*this); }
+unique_ptr<Material> SlipLock::get_copy() { return std::make_unique<SlipLock>(*this); }
 
 int SlipLock::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

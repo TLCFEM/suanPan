@@ -28,7 +28,7 @@ int Elastic1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Elastic1D::get_copy() { return make_unique<Elastic1D>(*this); }
+unique_ptr<Material> Elastic1D::get_copy() { return std::make_unique<Elastic1D>(*this); }
 
 int Elastic1D::update_trial_status(const vec& t_strain) {
     trial_stress = elastic_modulus * (trial_strain = t_strain);

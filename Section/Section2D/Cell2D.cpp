@@ -38,7 +38,7 @@ int Cell2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Cell2D::get_copy() { return make_unique<Cell2D>(*this); }
+unique_ptr<Section> Cell2D::get_copy() { return std::make_unique<Cell2D>(*this); }
 
 void Cell2D::print() {
     suanpan_info("A 2D section that represents a small cell.\n");

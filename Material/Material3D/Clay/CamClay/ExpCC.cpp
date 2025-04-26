@@ -25,7 +25,7 @@ ExpCC::ExpCC(const unsigned T, const double E, const double V, const double B, c
     : DataExpCC{A, VR, LAMBDA, KAPPA}
     , NonlinearCamClay(T, E, V, B, M, P, R) {}
 
-unique_ptr<Material> ExpCC::get_copy() { return make_unique<ExpCC>(*this); }
+unique_ptr<Material> ExpCC::get_copy() { return std::make_unique<ExpCC>(*this); }
 
 void ExpCC::print() {
     suanpan_info("A 3D Cam-Clay model using exponential hardening.\n");

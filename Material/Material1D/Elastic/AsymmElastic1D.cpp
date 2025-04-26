@@ -27,7 +27,7 @@ int AsymmElastic1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> AsymmElastic1D::get_copy() { return make_unique<AsymmElastic1D>(*this); }
+unique_ptr<Material> AsymmElastic1D::get_copy() { return std::make_unique<AsymmElastic1D>(*this); }
 
 int AsymmElastic1D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;
