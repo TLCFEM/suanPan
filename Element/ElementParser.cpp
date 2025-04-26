@@ -25,7 +25,7 @@
 #include <Toolbox/utility.h>
 
 namespace {
-    void new_allman(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_allman(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -53,7 +53,7 @@ namespace {
         return_obj = make_unique<Allman>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    void new_b21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+    void new_b21(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -88,7 +88,7 @@ namespace {
         else return_obj = make_unique<B21E>(tag, which, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
     }
 
-    void new_b21h(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_b21h(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -122,7 +122,7 @@ namespace {
         return_obj = make_unique<B21H>(tag, std::move(node_tag), section_id, elastic_length, is_true(nonlinear));
     }
 
-    void new_b31(unique_ptr<Element>& return_obj, istringstream& command, const bool if_os) {
+    void new_b31(unique_ptr<Element>& return_obj, std::istringstream& command, const bool if_os) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -163,7 +163,7 @@ namespace {
         else return_obj = make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
     }
 
-    void new_nmb21(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+    void new_nmb21(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -192,7 +192,7 @@ namespace {
         else return_obj = make_unique<NMB21E>(tag, which, std::move(node_tag), section_id, is_true(nonlinear));
     }
 
-    void new_nmb31(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_nmb31(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -226,7 +226,7 @@ namespace {
         return_obj = make_unique<NMB31>(tag, std::move(node_tag), section_id, orientation_id, is_true(nonlinear));
     }
 
-    void new_c3d20(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_c3d20(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -260,7 +260,7 @@ namespace {
         return_obj = make_unique<C3D20>(tag, std::move(node_tag), material_tag, is_true(reduced_scheme), is_true(nonlinear));
     }
 
-    void new_c3d4(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_c3d4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -288,7 +288,7 @@ namespace {
         return_obj = make_unique<C3D4>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
     }
 
-    void new_c3d8(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_c3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -322,7 +322,7 @@ namespace {
         return_obj = make_unique<C3D8>(tag, std::move(node_tag), material_tag, suanpan::to_upper(reduced_scheme[0]), is_true(nonlinear));
     }
 
-    void new_c3d8r(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_c3d8r(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -350,7 +350,7 @@ namespace {
         return_obj = make_unique<C3D8>(tag, std::move(node_tag), material_tag, 'R', is_true(nonlinear));
     }
 
-    void new_c3d8i(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_c3d8i(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -372,7 +372,7 @@ namespace {
         return_obj = make_unique<C3D8I>(tag, std::move(node_tag), material_tag);
     }
 
-    void new_cax3(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cax3(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -400,7 +400,7 @@ namespace {
         return_obj = make_unique<CAX3>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
     }
 
-    void new_cax4(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cax4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -422,7 +422,7 @@ namespace {
         return_obj = make_unique<CAX4>(tag, std::move(node_tag), material_tag, false);
     }
 
-    void new_cax8(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cax8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -444,7 +444,7 @@ namespace {
         return_obj = make_unique<CAX8>(tag, std::move(node_tag), material_tag, false);
     }
 
-    void new_contact2d(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_contact2d(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -470,7 +470,7 @@ namespace {
         return_obj = make_unique<Contact2D>(tag, master_tag, slave_tag, alpha);
     }
 
-    void new_contact3d(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_contact3d(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -496,7 +496,7 @@ namespace {
         return_obj = make_unique<Contact3D>(tag, master_tag, slave_tag, alpha);
     }
 
-    void new_cp3(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -530,7 +530,7 @@ namespace {
         return_obj = make_unique<CP3>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    void new_cp4(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -574,7 +574,7 @@ namespace {
         return_obj = make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
     }
 
-    void new_cp4i(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cp4i(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -602,7 +602,7 @@ namespace {
         return_obj = make_unique<CP4I>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    void new_cp4r(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cp4r(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -636,7 +636,7 @@ namespace {
         return_obj = make_unique<CP4>(tag, std::move(node_tag), material_tag, thickness, true, is_true(nonlinear));
     }
 
-    void new_cp5(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cp5(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -670,7 +670,7 @@ namespace {
         return_obj = make_unique<CP5>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    void new_cp6(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cp6(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -704,7 +704,7 @@ namespace {
         return_obj = make_unique<CP6>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    void new_cp7(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cp7(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -738,7 +738,7 @@ namespace {
         return_obj = make_unique<CP7>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    void new_cp8(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cp8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -778,7 +778,7 @@ namespace {
         return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, thickness, is_true(reduced_scheme), is_true(nonlinear));
     }
 
-    void new_cpe8(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cpe8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -812,7 +812,7 @@ namespace {
         return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., is_true(reduced_scheme), is_true(nonlinear));
     }
 
-    void new_cpe8r(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cpe8r(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -840,7 +840,7 @@ namespace {
         return_obj = make_unique<CP8>(tag, std::move(node_tag), material_tag, 1., true, is_true(nonlinear));
     }
 
-    void new_cinp4(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cinp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -868,7 +868,7 @@ namespace {
         return_obj = make_unique<CINP4>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    void new_cin3d8(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_cin3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -890,7 +890,7 @@ namespace {
         return_obj = make_unique<CIN3D8>(tag, std::move(node_tag), material_tag);
     }
 
-    void new_csmt3(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_csmt3(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -924,7 +924,7 @@ namespace {
         return_obj = make_unique<CSMT3>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
-    void new_csmt6(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_csmt6(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -958,7 +958,7 @@ namespace {
         return_obj = make_unique<CSMT6>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
-    void new_csmq(unique_ptr<Element>& return_obj, istringstream& command, const unsigned size) {
+    void new_csmq(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned size) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -996,7 +996,7 @@ namespace {
         else if(8 == size) return_obj = make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
-    void new_damper01(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
+    void new_damper01(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1018,7 +1018,7 @@ namespace {
         return_obj = make_unique<Damper01>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
-    void new_damper02(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
+    void new_damper02(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1064,7 +1064,7 @@ namespace {
         return_obj = make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
     }
 
-    void new_damper05(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dimension) {
+    void new_damper05(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1086,7 +1086,7 @@ namespace {
         return_obj = make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
-    void new_dc3d4(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_dc3d4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1120,7 +1120,7 @@ namespace {
         return_obj = make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate);
     }
 
-    void new_dc3d8(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_dc3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1154,7 +1154,7 @@ namespace {
         return_obj = make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate);
     }
 
-    void new_dcp3(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_dcp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1194,7 +1194,7 @@ namespace {
         return_obj = make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness);
     }
 
-    void new_dcp4(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_dcp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1234,7 +1234,7 @@ namespace {
         return_obj = make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness);
     }
 
-    void new_dkt3(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_dkt3(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1268,7 +1268,7 @@ namespace {
         return_obj = make_unique<DKT3>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
-    void new_dkt4(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_dkt4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1302,7 +1302,7 @@ namespace {
         return_obj = make_unique<DKT4>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
-    void new_dkts3(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_dkts3(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1342,7 +1342,7 @@ namespace {
         return_obj = make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
     }
 
-    void new_embedded(unique_ptr<Element>& return_obj, istringstream& command, const unsigned dof) {
+    void new_embedded(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dof) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1371,7 +1371,7 @@ namespace {
         else return_obj = make_unique<Embedded3D>(tag, element_tag, node_tag, alpha);
     }
 
-    void new_eb21(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_eb21(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1411,7 +1411,7 @@ namespace {
         return_obj = make_unique<EB21>(tag, std::move(node_tag), area, moment_inertia, material_tag, is_true(nonlinear));
     }
 
-    void new_eb31os(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_eb31os(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1445,7 +1445,7 @@ namespace {
         return_obj = make_unique<EB31OS>(tag, std::move(node_tag), std::move(property), orientation, is_true(nonlinear));
     }
 
-    void new_f21(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_f21(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1479,7 +1479,7 @@ namespace {
         return_obj = make_unique<F21>(tag, std::move(node_tag), section_id, int_pt, !!nonlinear);
     }
 
-    void new_f21h(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_f21h(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1513,7 +1513,7 @@ namespace {
         return_obj = make_unique<F21H>(tag, std::move(node_tag), section_id, elastic_length, !!nonlinear);
     }
 
-    void new_f31(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_f31(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1553,7 +1553,7 @@ namespace {
         return_obj = make_unique<F31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
     }
 
-    void new_gcmq(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1585,7 +1585,7 @@ namespace {
         return_obj = make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, suanpan::to_upper(int_scheme[0]));
     }
 
-    void new_gcmq(unique_ptr<Element>& return_obj, istringstream& command, const char int_type) {
+    void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1613,7 +1613,7 @@ namespace {
         return_obj = make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
     }
 
-    void new_sgcmq(unique_ptr<Element>& return_obj, istringstream& command, const char int_type) {
+    void new_sgcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1641,7 +1641,7 @@ namespace {
         return_obj = make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
     }
 
-    void new_sgcms(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_sgcms(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1675,7 +1675,7 @@ namespace {
         return_obj = make_unique<SGCMS>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
     }
 
-    void new_gq12(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_gq12(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1703,7 +1703,7 @@ namespace {
         return_obj = make_unique<GQ12>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    void new_joint(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_joint(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1719,7 +1719,7 @@ namespace {
         return_obj = make_unique<Joint>(tag, std::move(node_tag), get_remaining<uword>(command));
     }
 
-    void new_mass(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+    void new_mass(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1753,7 +1753,7 @@ namespace {
         else return_obj = make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
     }
 
-    void new_masspoint(unique_ptr<Element>& return_obj, istringstream& command, const unsigned which) {
+    void new_masspoint(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1787,7 +1787,7 @@ namespace {
         }
     }
 
-    void new_mindlin(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_mindlin(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1821,7 +1821,7 @@ namespace {
         return_obj = make_unique<Mindlin>(tag, std::move(node_tag), material_tag, thickness, num_ip);
     }
 
-    void new_mvlem(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_mvlem(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1851,7 +1851,7 @@ namespace {
         return_obj = make_unique<MVLEM>(tag, std::move(node_tag), B, H, R, CT, ST, shear_tag, c_height);
     }
 
-    void new_pcpedc(unique_ptr<Element>& return_obj, istringstream& command, const unsigned node) {
+    void new_pcpedc(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned node) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1885,7 +1885,7 @@ namespace {
         else if(8 == node) return_obj = make_unique<PCPE8DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
     }
 
-    void new_pcpeuc(unique_ptr<Element>& return_obj, istringstream& command, const unsigned node) {
+    void new_pcpeuc(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned node) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1919,7 +1919,7 @@ namespace {
         else if(8 == node) return_obj = make_unique<PCPE8UC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n);
     }
 
-    void new_ps(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_ps(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1947,7 +1947,7 @@ namespace {
         return_obj = make_unique<PS>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    void new_qe2(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_qe2(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1975,7 +1975,7 @@ namespace {
         return_obj = make_unique<QE2>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    void new_s4(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_s4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2009,7 +2009,7 @@ namespace {
         return_obj = make_unique<S4>(tag, std::move(node_tag), material_tag, thickness, is_true(nlgeom));
     }
 
-    template<typename T> void new_singlesection(unique_ptr<Element>& return_obj, istringstream& command) {
+    template<typename T> void new_singlesection(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2031,7 +2031,7 @@ namespace {
         return_obj = make_unique<T>(tag, node, section_tag);
     }
 
-    void new_spring01(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_spring01(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2053,7 +2053,7 @@ namespace {
         return_obj = make_unique<Spring01>(tag, std::move(node_tag), material_tag);
     }
 
-    void new_spring02(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_spring02(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2075,7 +2075,7 @@ namespace {
         return_obj = make_unique<Spring02>(tag, std::move(node_tag), material_tag);
     }
 
-    void new_t2d2(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_t2d2(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2126,7 +2126,7 @@ namespace {
         return_obj = make_unique<T2D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain), rigidity);
     }
 
-    void new_t2d2s(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_t2d2s(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2160,7 +2160,7 @@ namespace {
         return_obj = make_unique<T2D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
     }
 
-    void new_t3d2(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_t3d2(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2205,7 +2205,7 @@ namespace {
         return_obj = make_unique<T3D2>(tag, std::move(node_tag), material_tag, area, is_true(nonlinear), is_true(update_area), is_true(log_strain));
     }
 
-    void new_t3d2s(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_t3d2s(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2239,7 +2239,7 @@ namespace {
         return_obj = make_unique<T3D2S>(tag, std::move(node_tag), section_tag, is_true(nonlinear), is_true(log_strain));
     }
 
-    void new_tie(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_tie(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2257,7 +2257,7 @@ namespace {
         return_obj = make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
     }
 
-    void new_translationconnector(unique_ptr<Element>& return_obj, istringstream& command, const unsigned S) {
+    void new_translationconnector(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned S) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2280,7 +2280,7 @@ namespace {
         else return_obj = make_unique<TranslationConnector3D>(tag, std::move(nodes), penalty);
     }
 
-    void new_patchquad(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_patchquad(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2343,7 +2343,7 @@ namespace {
         return_obj = make_unique<PatchQuad>(tag, std::move(knot_x), std::move(knot_y), std::move(node_tag), static_cast<unsigned>(material_tag), thickness);
     }
 
-    void new_patchcube(unique_ptr<Element>& return_obj, istringstream& command) {
+    void new_patchcube(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2404,7 +2404,7 @@ namespace {
     }
 } // namespace
 
-int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_mass(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -2435,7 +2435,7 @@ int create_new_mass(const shared_ptr<DomainBase>& domain, istringstream& command
     return SUANPAN_SUCCESS;
 }
 
-int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string modifier_type;
     if(!get_input(command, modifier_type)) {
         suanpan_error("A valid modifier type is required.\n");
@@ -2573,7 +2573,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, istringstream& com
     return SUANPAN_SUCCESS;
 }
 
-int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_orientation(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string file_type;
     if(!get_input(command, file_type)) {
         suanpan_error("A valid type is required.\n");
@@ -2600,7 +2600,7 @@ int create_new_orientation(const shared_ptr<DomainBase>& domain, istringstream& 
     return SUANPAN_SUCCESS;
 }
 
-int create_new_element(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string element_id;
     if(!get_input(command, element_id)) {
         suanpan_error("A valid element type is required.\n");

@@ -109,8 +109,8 @@ public:
     void set_precision(Precision);
     void set_tolerance(double);
     void set_refinement(std::uint8_t);
-    void set_lis_option(istringstream&);
-    void set_option(istringstream&);
+    void set_lis_option(std::istringstream&);
+    void set_option(std::istringstream&);
 
     [[nodiscard]] double get_ini_step_size() const;
     [[nodiscard]] double get_min_step_size() const;

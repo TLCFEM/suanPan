@@ -44,7 +44,7 @@ VTK_MODULE_INIT(vtkRenderingFreeType) // NOLINT(cppcoreguidelines-special-member
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 
-vtkInfo vtk_process(istringstream& command) {
+vtkInfo vtk_process(std::istringstream& command) {
     vtkInfo config;
 
     std::string keyword;
@@ -125,7 +125,7 @@ void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&& grid, const vtkInfo config)
     suanpan_debug("Plot is written to file \"{}\".\n", config.file_name);
 }
 
-int vtk_parser(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int vtk_parser(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     auto plot_info = vtk_process(command);
     if(!plot_info.on_deformed) plot_info.scale = 0.;
 

@@ -285,7 +285,7 @@ mat material_tester_by_stress_history(const unique_ptr<Material>& obj, const mat
     return response;
 }
 
-int test_material(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned size) {
+int test_material(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned size) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
         suanpan_error("A valid material tag is required.\n");
@@ -315,7 +315,7 @@ int test_material(const shared_ptr<DomainBase>& domain, istringstream& command, 
     return SUANPAN_SUCCESS;
 }
 
-int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int test_material_with_base3d(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
         suanpan_error("A valid material tag is required.\n");
@@ -349,7 +349,7 @@ int test_material_with_base3d(const shared_ptr<DomainBase>& domain, istringstrea
     return SUANPAN_SUCCESS;
 }
 
-int test_material_by_load(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned size) {
+int test_material_by_load(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned size) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
         suanpan_error("A valid material tag is required.\n");
@@ -379,7 +379,7 @@ int test_material_by_load(const shared_ptr<DomainBase>& domain, istringstream& c
     return SUANPAN_SUCCESS;
 }
 
-int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
         suanpan_error("A valid material tag is required.\n");
@@ -413,7 +413,7 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, istr
     return SUANPAN_SUCCESS;
 }
 
-int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
         suanpan_error("A valid material tag is required.\n");
@@ -438,7 +438,7 @@ int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, istrin
     return SUANPAN_SUCCESS;
 }
 
-int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     unsigned material_tag;
     if(!get_input(command, material_tag)) {
         suanpan_error("A valid material tag is required.\n");

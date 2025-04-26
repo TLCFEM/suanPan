@@ -22,7 +22,7 @@
 #include <Step/Step.h>
 #include <Toolbox/utility.h>
 
-int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string converger_id;
     if(!get_input(command, converger_id)) {
         suanpan_error("A valid converger type is required.\n");

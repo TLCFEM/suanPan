@@ -26,7 +26,7 @@
 #include <Toolbox/utility.h>
 
 namespace {
-    void new_afc01(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_afc01(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -77,7 +77,7 @@ namespace {
         return_obj = make_unique<AFC>(tag, elastic_modulus, t_yield_stress, t_hardening, t_unloading, c_yield_stress, c_hardening, c_unloading, 0., density);
     }
 
-    void new_afc02(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_afc02(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -115,7 +115,7 @@ namespace {
         return_obj = make_unique<AFC>(tag, elastic_modulus, t_yield_stress, t_hardening, t_unloading, t_yield_stress, t_hardening, t_unloading, 0., density);
     }
 
-    void new_afc03(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_afc03(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -174,7 +174,7 @@ namespace {
         return_obj = make_unique<AFC>(tag, elastic_modulus, t_yield_stress, t_hardening, t_unloading, c_yield_stress, c_hardening, c_unloading, degrade, density);
     }
 
-    void new_armstrongfrederick(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_armstrongfrederick(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -205,7 +205,7 @@ namespace {
         return_obj = make_unique<ArmstrongFrederick>(tag, DataArmstrongFrederick{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), ai, bi}, density);
     }
 
-    void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, istringstream& command, const bool memory = false) {
+    void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, std::istringstream& command, const bool memory = false) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -245,7 +245,7 @@ namespace {
         return_obj = make_unique<ArmstrongFrederick1D>(tag, DataArmstrongFrederick1D{pa(0), pa(1), pa(2), pa(3), pa(4), pb(0), pb(1), pb(2), ai, bi}, density);
     }
 
-    void new_axisymmetric(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_axisymmetric(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -261,7 +261,7 @@ namespace {
         return_obj = make_unique<Axisymmetric>(tag, full_tag);
     }
 
-    void new_axisymmetricelastic(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_axisymmetricelastic(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -291,7 +291,7 @@ namespace {
         return_obj = make_unique<AxisymmetricElastic>(tag, elastic_modulus, poissons_ratio, density);
     }
 
-    void new_bilinear1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinear1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -339,7 +339,7 @@ namespace {
         return_obj = make_unique<Bilinear1D>(tag, elastic_modulus, yield_stress, hardening_ratio, beta, density);
     }
 
-    void new_bilinearcc(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearcc(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -389,7 +389,7 @@ namespace {
         return_obj = make_unique<BilinearCC>(tag, elastic_modulus, poissons_ratio, beta, m, pt, a, a_slope, density);
     }
 
-    void new_bilineardp(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilineardp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -439,7 +439,7 @@ namespace {
         return_obj = make_unique<BilinearDP>(tag, elastic_modulus, poissons_ratio, eta_yield, eta_flow, xi, cohesion, cohesion_slope, density);
     }
 
-    void new_customdp(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -487,7 +487,7 @@ namespace {
         return_obj = make_unique<CustomDP>(tag, elastic_modulus, poissons_ratio, eta_yield, eta_flow, xi, expression, density);
     }
 
-    void new_bilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearelastic1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -525,7 +525,7 @@ namespace {
         return_obj = make_unique<BilinearElastic1D>(tag, elastic_modulus, yield_stress, hardening_ratio, 0., density);
     }
 
-    void new_nle1d01(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_nle1d01(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -567,7 +567,7 @@ namespace {
         return_obj = make_unique<BilinearElastic1D>(tag, elastic_modulus, yield_stress, hardening_ratio, radius, density);
     }
 
-    void new_bilinearhoffman(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearhoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -611,7 +611,7 @@ namespace {
         return_obj = make_unique<BilinearHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
     }
 
-    void new_bilinearj2(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -663,7 +663,7 @@ namespace {
         return_obj = make_unique<BilinearJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, hardening_ratio, beta, density);
     }
 
-    void new_bilinearmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearmises1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -701,7 +701,7 @@ namespace {
         return_obj = make_unique<BilinearMises1D>(tag, elastic_modulus, yield_stress, hardening_ratio, density);
     }
 
-    void new_bilinearoo(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearoo(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -725,7 +725,7 @@ namespace {
         return_obj = make_unique<BilinearOO>(tag, pool[0], pool[1], pool[2], pool[3], pool[4], pool[5]);
     }
 
-    void new_bilinearpo(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearpo(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -749,7 +749,7 @@ namespace {
         return_obj = make_unique<BilinearPO>(tag, pool[0], pool[1], pool[2], pool[3], pool[4], pool[5]);
     }
 
-    void new_bilinearperic(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearperic(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -801,7 +801,7 @@ namespace {
         return_obj = make_unique<BilinearPeric>(tag, elastic_modulus, poissons_ratio, yield_stress, hardening, mu, epsilon, density);
     }
 
-    void new_blatzko(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_blatzko(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -831,7 +831,7 @@ namespace {
         return_obj = make_unique<BlatzKo>(tag, elastic_modulus, poissons_ratio, density);
     }
 
-    void new_boucwen(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_boucwen(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -850,7 +850,7 @@ namespace {
         return_obj = make_unique<BoucWen>(tag, pool);
     }
 
-    void new_bwbn(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bwbn(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -867,7 +867,7 @@ namespace {
         return_obj = make_unique<BWBN>(tag, para_pool.head(16), para_pool(16));
     }
 
-    void new_cdp(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_cdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -884,7 +884,7 @@ namespace {
         return_obj = make_unique<CDP>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13));
     }
 
-    void new_customcdp(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customcdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -906,7 +906,7 @@ namespace {
         return_obj = make_unique<CustomCDP>(tag, expressions(0), expressions(1), pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7));
     }
 
-    void new_cdpm2(unique_ptr<Material>& return_obj, istringstream& command, const CDPM2::DamageType damage_type) {
+    void new_cdpm2(unique_ptr<Material>& return_obj, std::istringstream& command, const CDPM2::DamageType damage_type) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -932,7 +932,7 @@ namespace {
         return_obj = make_unique<CDPM2>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13), damage_type, para_pool(14));
     }
 
-    void new_concrete21(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_concrete21(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -947,7 +947,7 @@ namespace {
             suanpan_error("Eight or nine double inputs are required.\n");
     }
 
-    void new_concrete22(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_concrete22(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -962,7 +962,7 @@ namespace {
             suanpan_error("Ten or eleven double inputs are required.\n");
     }
 
-    void new_concretecm(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_concretecm(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1027,7 +1027,7 @@ namespace {
         return_obj = make_unique<ConcreteCM>(tag, elastic_modulus, peak_stress, crack_stress, nc, nt, peak_strain, crack_strain, is_true(linear_trans), density);
     }
 
-    void new_concreteexp(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_concreteexp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1067,7 +1067,7 @@ namespace {
         return_obj = make_unique<ConcreteExp>(tag, elastic_modulus, f_t, a_t, g_t, f_c, a_c, g_c, middle_point, density);
     }
 
-    void new_concretek4(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_concretek4(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1106,7 +1106,7 @@ namespace {
         return_obj = make_unique<ConcreteK4>(tag, elastic_modulus, hardening, std::move(pool), density, enable_damage, enable_crack_closing, objective_damage);
     }
 
-    void new_concretetable(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_concretetable(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1147,7 +1147,7 @@ namespace {
         return_obj = make_unique<ConcreteTable>(tag, -abs(c_table), abs(t_table), m_point, density);
     }
 
-    void new_concretetsai(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_concretetsai(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1162,7 +1162,7 @@ namespace {
             suanpan_error("Eight or nine double inputs are required.\n");
     }
 
-    void new_coulombfriction(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_coulombfriction(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1178,7 +1178,7 @@ namespace {
         return_obj = make_unique<CoulombFriction>(tag, max_friction, factor);
     }
 
-    void new_customelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customelastic1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1200,7 +1200,7 @@ namespace {
         return_obj = make_unique<CustomElastic1D>(tag, expression_tag, density);
     }
 
-    void new_custommises1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_custommises1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1228,7 +1228,7 @@ namespace {
         return_obj = make_unique<CustomMises1D>(tag, elastic_modulus, k_tag, h_tag, density);
     }
 
-    void new_dhakal(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_dhakal(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1254,7 +1254,7 @@ namespace {
         return_obj = make_unique<Dhakal>(tag, mat_tag, y_strain, parameter);
     }
 
-    void new_duncanselig(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_duncanselig(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1278,7 +1278,7 @@ namespace {
         return_obj = make_unique<DuncanSelig>(tag, pool, density);
     }
 
-    void new_sinh1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_sinh1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1302,7 +1302,7 @@ namespace {
         return_obj = make_unique<Sinh1D>(tag, elastic_modulus, density);
     }
 
-    void new_tanh1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_tanh1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1326,7 +1326,7 @@ namespace {
         return_obj = make_unique<Tanh1D>(tag, elastic_modulus, density);
     }
 
-    void new_timberpd(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_timberpd(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1368,7 +1368,7 @@ namespace {
         return_obj = make_unique<TimberPD>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), std::move(para), density);
     }
 
-    void new_asymmelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_asymmelastic1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1392,7 +1392,7 @@ namespace {
         return_obj = make_unique<AsymmElastic1D>(tag, t_elastic_modulus, c_elastic_modulus, density);
     }
 
-    void new_elastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_elastic1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1416,7 +1416,7 @@ namespace {
         return_obj = make_unique<Elastic1D>(tag, elastic_modulus, density);
     }
 
-    void new_elastic2d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_elastic2d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1454,7 +1454,7 @@ namespace {
         return_obj = make_unique<Elastic2D>(tag, elastic_modulus, poissons_ratio, density, material_type == 0 ? PlaneType::S : PlaneType::E);
     }
 
-    void new_expcc(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_expcc(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1512,7 +1512,7 @@ namespace {
         return_obj = make_unique<ExpCC>(tag, elastic_modulus, poissons_ratio, beta, m, pt, a0, e0, lambda, kappa, density);
     }
 
-    void new_customcc(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customcc(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1560,7 +1560,7 @@ namespace {
         return_obj = make_unique<CustomCC>(tag, elastic_modulus, poissons_ratio, beta, m, pt, expression, density);
     }
 
-    void new_expdp(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_expdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1606,7 +1606,7 @@ namespace {
         return_obj = make_unique<ExpDP>(tag, elastic_modulus, poissons_ratio, eta_yield, eta_flow, xi, cohesion, cohesion_a, cohesion_b, density);
     }
 
-    void new_expgurson(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_expgurson(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1622,7 +1622,7 @@ namespace {
         return_obj = make_unique<ExpGurson>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
     }
 
-    void new_customgurson(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customgurson(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag, expression_tag;
         if(!get_input(command, tag, expression_tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1638,7 +1638,7 @@ namespace {
         return_obj = make_unique<CustomGurson>(tag, expression_tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
     }
 
-    void new_expgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_expgurson1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1654,7 +1654,7 @@ namespace {
         return_obj = make_unique<ExpGurson1D>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9));
     }
 
-    void new_customgurson1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customgurson1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag, expression_tag;
         if(!get_input(command, tag, expression_tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1670,7 +1670,7 @@ namespace {
         return_obj = make_unique<CustomGurson1D>(tag, expression_tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
     }
 
-    void new_exphoffman(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_exphoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1716,7 +1716,7 @@ namespace {
         return_obj = make_unique<ExpHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
     }
 
-    void new_customhoffman(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customhoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1758,7 +1758,7 @@ namespace {
         return_obj = make_unique<CustomHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
     }
 
-    void new_expj2(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_expj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1796,7 +1796,7 @@ namespace {
         return_obj = make_unique<ExpJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, a, b, density);
     }
 
-    void new_customj2(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1830,7 +1830,7 @@ namespace {
         return_obj = make_unique<CustomJ2>(tag, elastic_modulus, poissons_ratio, k_tag, h_tag, density);
     }
 
-    void new_expmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_expmises1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1862,7 +1862,7 @@ namespace {
         return_obj = make_unique<ExpMises1D>(tag, elastic_modulus, yield_stress, a, b, c, density);
     }
 
-    void new_dafaliasmanzari(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_dafaliasmanzari(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1878,7 +1878,7 @@ namespace {
         return_obj = make_unique<DafaliasManzari>(tag, p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), p(13), p(14), p(15), p(16), p(17));
     }
 
-    void new_flag01(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_flag01(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1922,7 +1922,7 @@ namespace {
         return_obj = make_unique<Flag>(tag, elastic_modulus, yield_stress, residual, hardening_ratio, density);
     }
 
-    void new_flag02(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_flag02(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1982,7 +1982,7 @@ namespace {
         return_obj = make_unique<Flag>(tag, elastic_modulus, t_yield_stress, t_residual, t_hardening_ratio, c_yield_stress, c_residual, c_hardening_ratio, density);
     }
 
-    void new_fluid(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_fluid(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2004,7 +2004,7 @@ namespace {
         return_obj = make_unique<Fluid>(tag, bulk_modulus, density);
     }
 
-    void new_gap01(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_gap01(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2038,7 +2038,7 @@ namespace {
         return_obj = make_unique<Gap01>(tag, elastic_modulus, yield_stress, gap_strain, density);
     }
 
-    void new_isotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_isotropicelastic3d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2068,7 +2068,7 @@ namespace {
         return_obj = make_unique<IsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, density);
     }
 
-    void new_elasticos(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_elasticos(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2098,7 +2098,7 @@ namespace {
         return_obj = make_unique<ElasticOS>(tag, elastic_modulus, poissons_ratio, density);
     }
 
-    void new_kelvin(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_kelvin(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2114,7 +2114,7 @@ namespace {
         return_obj = make_unique<Kelvin>(tag, damper_tag, spring_tag);
     }
 
-    void new_lineardamage(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_lineardamage(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2144,7 +2144,7 @@ namespace {
         return_obj = make_unique<LinearDamage>(tag, mat_tag, value(0), value(1), value(2));
     }
 
-    void new_laminated(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_laminated(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2154,7 +2154,7 @@ namespace {
         return_obj = make_unique<Laminated>(tag, get_remaining<uword>(command));
     }
 
-    void new_maxwell(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_maxwell(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag, damper_tag, spring_tag;
         if(!get_input(command, tag, damper_tag, spring_tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2182,7 +2182,7 @@ namespace {
         return_obj = make_unique<Maxwell>(tag, damper_tag, spring_tag, is_true(matrix), proceed, beta);
     }
 
-    void new_mooneyrivlin(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_mooneyrivlin(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2218,7 +2218,7 @@ namespace {
         return_obj = make_unique<MooneyRivlin>(tag, bulk_modulus, a10, a01, density);
     }
 
-    void new_mpf(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_mpf(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2294,7 +2294,7 @@ namespace {
         return_obj = make_unique<MPF>(tag, elastic_modulus, yield_stress, hardening_ratio, R0, A1, A2, A3, A4, is_true(iso), is_true(con), density);
     }
 
-    void new_multilinearoo(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_multilinearoo(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2325,7 +2325,7 @@ namespace {
         return_obj = make_unique<MultilinearOO>(tag, abs(t_backbone), -abs(c_backbone), density);
     }
 
-    void new_multilinearpo(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_multilinearpo(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2356,7 +2356,7 @@ namespace {
         return_obj = make_unique<MultilinearPO>(tag, abs(t_backbone), -abs(c_backbone), density);
     }
 
-    void new_multilinearelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_multilinearelastic1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2381,7 +2381,7 @@ namespace {
         return_obj = make_unique<MultilinearElastic1D>(tag, join_rows(vec{e}, vec{s}), density);
     }
 
-    void new_multilinearj2(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_multilinearj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2411,7 +2411,7 @@ namespace {
         return_obj = make_unique<MultilinearJ2>(tag, elastic_modulus, poissons_ratio, join_rows(vec{p_strain}, vec{p_stress}), density);
     }
 
-    void new_multilinearmises1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_multilinearmises1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2435,7 +2435,7 @@ namespace {
         return_obj = make_unique<MultilinearMises1D>(tag, elastic_modulus, join_rows(vec{p_strain}, vec{p_stress}), density);
     }
 
-    void new_nle3d01(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_nle3d01(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2459,7 +2459,7 @@ namespace {
         return_obj = make_unique<NLE3D01>(tag, pool(0), pool(1), pool(2), pool(3), density);
     }
 
-    void new_nonviscous01(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_nonviscous01(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2484,7 +2484,7 @@ namespace {
         return_obj = make_unique<Nonviscous01>(tag, std::move(m), std::move(s));
     }
 
-    void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_orthotropicelastic3d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2514,7 +2514,7 @@ namespace {
         return_obj = make_unique<OrthotropicElastic3D>(tag, std::move(modulus), std::move(poissons_ratio), density);
     }
 
-    void new_paraboliccc(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_paraboliccc(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2564,7 +2564,7 @@ namespace {
         return_obj = make_unique<ParabolicCC>(tag, elastic_modulus, poissons_ratio, beta, m, pt, a, a_slope, density);
     }
 
-    void new_parallel(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_parallel(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2574,7 +2574,7 @@ namespace {
         return_obj = make_unique<Parallel>(tag, get_remaining<uword>(command));
     }
 
-    void new_planestrain(unique_ptr<Material>& return_obj, istringstream& command, const unsigned type) {
+    void new_planestrain(unique_ptr<Material>& return_obj, std::istringstream& command, const unsigned type) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2590,7 +2590,7 @@ namespace {
         return_obj = make_unique<PlaneStrain>(tag, full_tag, type);
     }
 
-    template<typename T> void new_wrapper(unique_ptr<Material>& return_obj, istringstream& command) {
+    template<typename T> void new_wrapper(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2612,7 +2612,7 @@ namespace {
         return_obj = make_unique<T>(tag, full_tag, max_iteration);
     }
 
-    void new_os146s(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_os146s(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2634,7 +2634,7 @@ namespace {
         return_obj = make_unique<OS146S>(tag, full_tag, shear_modulus);
     }
 
-    void new_polyelastic1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_polyelastic1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2644,7 +2644,7 @@ namespace {
         return_obj = make_unique<PolyElastic1D>(tag, get_remaining<double>(command), 0.);
     }
 
-    void new_polyj2(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_polyj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2679,7 +2679,7 @@ namespace {
         return_obj = make_unique<PolyJ2>(tag, elastic_modulus, poissons_ratio, pool, density);
     }
 
-    void new_rambergosgood(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_rambergosgood(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2719,7 +2719,7 @@ namespace {
         return_obj = make_unique<RambergOsgood>(tag, elastic_modulus, yield_stress, offset, n, density);
     }
 
-    void new_rebar2d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_rebar2d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2741,7 +2741,7 @@ namespace {
         return_obj = make_unique<Rebar2D>(tag, major_tag, minor_tag, major_ratio, minor_ratio);
     }
 
-    void new_rebar3d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_rebar3d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2763,7 +2763,7 @@ namespace {
         return_obj = make_unique<Rebar3D>(tag, tag_x, tag_y, tag_z, ratio_x, ratio_y, ratio_z);
     }
 
-    void new_sequential(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_sequential(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2780,7 +2780,7 @@ namespace {
         return_obj = make_unique<Sequential>(tag, pool);
     }
 
-    void new_sliplock(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_sliplock(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2820,7 +2820,7 @@ namespace {
         return_obj = make_unique<SlipLock>(tag, elastic_modulus, yield_strain, hardening_ratio, R0, density);
     }
 
-    void new_stacked(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_stacked(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2830,7 +2830,7 @@ namespace {
         return_obj = make_unique<Stacked>(tag, get_remaining<uword>(command));
     }
 
-    void new_subloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_subloading1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2862,7 +2862,7 @@ namespace {
         return_obj = make_unique<Subloading1D>(tag, std::move(para), density);
     }
 
-    void new_subloadingviscous1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_subloadingviscous1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2894,7 +2894,7 @@ namespace {
         return_obj = make_unique<Subloading1D>(tag, std::move(para), density);
     }
 
-    void new_multisubloading1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_multisubloading1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2945,7 +2945,7 @@ namespace {
         return_obj = make_unique<Subloading1D>(tag, std::move(para), p(10));
     }
 
-    void new_subloading(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_subloading(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2973,7 +2973,7 @@ namespace {
         return_obj = make_unique<Subloading>(tag, std::move(para), density);
     }
 
-    void new_substepping(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_substepping(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2995,7 +2995,7 @@ namespace {
         return_obj = make_unique<Substepping>(tag, material_tag, max_iteration);
     }
 
-    void new_rotation2d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_rotation2d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3017,7 +3017,7 @@ namespace {
         return_obj = make_unique<Rotation2D>(tag, full_tag, a);
     }
 
-    void new_simplesand(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_simplesand(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3033,7 +3033,7 @@ namespace {
         return_obj = make_unique<SimpleSand>(tag, pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), pool(8), pool(9), pool(10), pool(11), pool(12));
     }
 
-    void new_steelbrb(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_steelbrb(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3057,7 +3057,7 @@ namespace {
         return_obj = make_unique<SteelBRB>(tag, pool);
     }
 
-    void new_rotation3d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_rotation3d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3079,7 +3079,7 @@ namespace {
         return_obj = make_unique<Rotation3D>(tag, full_tag, a, b, c);
     }
 
-    void new_tablecdp(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_tablecdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3123,7 +3123,7 @@ namespace {
         return_obj = make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5));
     }
 
-    void new_tablegurson(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_tablegurson(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3155,7 +3155,7 @@ namespace {
         return_obj = make_unique<TableGurson>(tag, para_pool(0), para_pool(1), std::move(hardening_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
     }
 
-    void new_trilinearstraindegradation(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_trilinearstraindegradation(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3185,7 +3185,7 @@ namespace {
         return_obj = make_unique<TrilinearStrainDegradation>(tag, mat_tag, s_strain, e_strain, e_damage);
     }
 
-    void new_customdegradation(unique_ptr<Material>& return_obj, istringstream& command, const bool if_strain) {
+    void new_customdegradation(unique_ptr<Material>& return_obj, std::istringstream& command, const bool if_strain) {
         unsigned tag, mat_tag, p_expression_tag, n_expression_tag;
         if(!get_input(command, tag, mat_tag, p_expression_tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3202,7 +3202,7 @@ namespace {
         else return_obj = make_unique<CustomStressDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
     }
 
-    void new_trivial(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_trivial(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3212,7 +3212,7 @@ namespace {
         return_obj = make_unique<Trivial>(tag);
     }
 
-    void new_vafcrp(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_vafcrp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3243,7 +3243,7 @@ namespace {
         return_obj = make_unique<VAFCRP>(tag, DataVAFCRP{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), ai, bi}, density);
     }
 
-    void new_vafcrp1d(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_vafcrp1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3274,7 +3274,7 @@ namespace {
         return_obj = make_unique<VAFCRP1D>(tag, DataVAFCRP1D{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), ai, bi}, density);
     }
 
-    void new_viscosity01(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_viscosity01(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3302,7 +3302,7 @@ namespace {
         return_obj = make_unique<Viscosity01>(tag, alpha, damping, limit);
     }
 
-    void new_viscosity02(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_viscosity02(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3360,7 +3360,7 @@ namespace {
         return_obj = make_unique<Viscosity02>(tag, alpha, damping_a, damping_b, damping_c, damping_d, gap_a, gap_b, limit);
     }
 
-    void new_bilinearviscosity(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_bilinearviscosity(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3388,7 +3388,7 @@ namespace {
         return_obj = make_unique<BilinearViscosity>(tag, damping, yield_stress, hardening);
     }
 
-    void new_customviscosity(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_customviscosity(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag, expression_tag;
         if(!get_input(command, tag, expression_tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3398,7 +3398,7 @@ namespace {
         return_obj = make_unique<CustomViscosity>(tag, expression_tag);
     }
 
-    void new_yeoh(unique_ptr<Material>& return_obj, istringstream& command) {
+    void new_yeoh(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -3414,7 +3414,7 @@ namespace {
     }
 } // namespace
 
-int create_new_material(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string material_id;
     if(!get_input(command, material_id)) {
         suanpan_error("A valid material type is required.\n");

@@ -90,13 +90,13 @@ std::vector<std::pair<std::string, unsigned>> suanpan::expression::split(const s
     return variable_size_list;
 }
 
-void ignore_whitespace(istringstream& I) {
+void ignore_whitespace(std::istringstream& I) {
     while(true)
         if(const auto peek_value = I.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) I.ignore();
         else break;
 }
 
-std::string get_remaining(istringstream& I) {
+std::string get_remaining(std::istringstream& I) {
     if(const auto pos = I.tellg(); -1 != pos) return I.str().substr(pos);
     return {};
 }

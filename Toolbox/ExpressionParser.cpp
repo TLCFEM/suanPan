@@ -37,7 +37,7 @@ int check_file(std::string& expression) {
     return SUANPAN_SUCCESS;
 }
 
-void new_simplescalar(unique_ptr<Expression>& return_obj, istringstream& command) {
+void new_simplescalar(unique_ptr<Expression>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid expression tag is required.\n");
@@ -66,7 +66,7 @@ void new_simplescalar(unique_ptr<Expression>& return_obj, istringstream& command
     }
 }
 
-void new_simplevector(unique_ptr<Expression>& return_obj, istringstream& command) {
+void new_simplevector(unique_ptr<Expression>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid expression tag is required.\n");
@@ -95,7 +95,7 @@ void new_simplevector(unique_ptr<Expression>& return_obj, istringstream& command
     }
 }
 
-int create_new_expression(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_expression(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string expression_type;
     if(!get_input(command, expression_type)) {
         suanpan_error("A valid expression type is required.\n");

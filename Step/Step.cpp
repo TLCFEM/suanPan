@@ -141,9 +141,9 @@ void Step::set_tolerance(const double T) { system_setting.tolerance = T; }
 
 void Step::set_refinement(const std::uint8_t T) { system_setting.iterative_refinement = T; }
 
-void Step::set_lis_option(istringstream& T) { system_setting.set_lis_option(T); }
+void Step::set_lis_option(std::istringstream& T) { system_setting.set_lis_option(T); }
 
-void Step::set_option(istringstream& T) { system_setting.set_option(T); }
+void Step::set_option(std::istringstream& T) { system_setting.set_option(T); }
 
 double Step::get_ini_step_size() const { return ini_step_size; }
 

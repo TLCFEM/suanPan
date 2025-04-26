@@ -122,7 +122,7 @@ namespace {
 
         if(!exists(updater_module)) return;
 
-        auto terminal = istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
+        auto terminal = std::istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
 
         execute_command(terminal);
     }
@@ -437,7 +437,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(output_file.is_open()) output_file << all_line << '\n';
-        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return;
+        if(std::istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return;
         all_line.clear();
     }
 }

@@ -22,7 +22,7 @@
 #include <Step/Step>
 #include <Toolbox/utility.h>
 
-int create_new_step(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string step_type;
     if(!get_input(command, step_type)) {
         suanpan_error("A valid step type is required.\n");

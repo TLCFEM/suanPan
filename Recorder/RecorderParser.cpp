@@ -21,7 +21,7 @@
 #include <Recorder/Recorder>
 #include <Toolbox/utility.h>
 
-int process_recorder_command(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned tag, const bool use_hdf5) {
+int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
     std::string object_type;
     if(!get_input(command, object_type)) {
         suanpan_error("A valid object type is required.\n");
@@ -106,7 +106,7 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, istringstream
     return SUANPAN_SUCCESS;
 }
 
-int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -122,7 +122,7 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& com
     return process_recorder_command(domain, command, tag, is_equal(file_type[0], 'h'));
 }
 
-int create_new_recorder(const shared_ptr<DomainBase>& domain, istringstream& command, const bool use_hdf5) {
+int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream& command, const bool use_hdf5) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");

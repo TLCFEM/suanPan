@@ -39,7 +39,7 @@
 #include <magma_v2.h>
 #include <magmasparse.h>
 
-template<typename T> T magma_parse_opts(istringstream& command) requires(std::is_same_v<T, magma_dopts> || std::is_same_v<T, magma_sopts>) {
+template<typename T> T magma_parse_opts(std::istringstream& command) requires(std::is_same_v<T, magma_dopts> || std::is_same_v<T, magma_sopts>) {
     T opts;
 
     using ET = decltype(opts.solver_par.atol);
@@ -285,7 +285,7 @@ public:
         magma_init();
         if(SUANPAN_VERBOSE) magma_print_environment();
         magma_queue_create(0, &queue);
-        istringstream command(this->setting.option);
+        std::istringstream command(this->setting.option);
         if constexpr(std::is_same_v<T, float>) {
             sopts = magma_parse_opts<magma_sopts>(command);
             magma_ssolverinfo_init(&sopts.solver_par, &sopts.precond_par, queue);
@@ -325,7 +325,7 @@ template<sp_d T> SparseMatMAGMA<T>::SparseMatMAGMA(const SparseMatMAGMA& other)
     : SparseMat<T>(other)
     , csr_mat(other.csr_mat) {
     magma_queue_create(0, &queue);
-    istringstream command(this->setting.option);
+    std::istringstream command(this->setting.option);
     if constexpr(std::is_same_v<T, float>) {
         sopts = magma_parse_opts<magma_sopts>(command);
         magma_ssolverinfo_init(&sopts.solver_par, &sopts.precond_par, queue);

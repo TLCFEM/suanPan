@@ -381,8 +381,6 @@ using std::unique_ptr;
 
 using std::make_unique;
 
-using std::istringstream;
-
 template<class T> concept sp_d = std::is_same_v<T, float> || std::is_same_v<T, double>;
 template<class T> concept sp_i = std::is_integral_v<T>;
 

@@ -25,7 +25,7 @@
 #include <Toolbox/resampling.h>
 
 namespace {
-    void new_acceleration(unique_ptr<Load>& return_obj, istringstream& command) {
+    void new_acceleration(unique_ptr<Load>& return_obj, std::istringstream& command) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -53,7 +53,7 @@ namespace {
         return_obj = make_unique<NodalAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_bodyforce(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    void new_bodyforce(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -82,7 +82,7 @@ namespace {
         else return_obj = make_unique<BodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    void new_cload(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -111,7 +111,7 @@ namespace {
         else return_obj = make_unique<NodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_refload(unique_ptr<Load>& return_obj, istringstream& command) {
+    void new_refload(unique_ptr<Load>& return_obj, std::istringstream& command) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -138,7 +138,7 @@ namespace {
         return_obj = make_unique<ReferenceForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id);
     }
 
-    void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const unsigned dimension) {
+    void new_lineudl(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned dimension) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -167,7 +167,7 @@ namespace {
         else return_obj = make_unique<LineUDL3D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_displacement(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    void new_displacement(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -196,7 +196,7 @@ namespace {
         else return_obj = make_unique<NodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_supportmotion(unique_ptr<Load>& return_obj, istringstream& command, const unsigned flag) {
+    void new_supportmotion(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -227,7 +227,7 @@ namespace {
     }
 } // namespace
 
-int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string amplitude_type;
     if(!get_input(command, amplitude_type)) {
         suanpan_error("A valid amplitude type is required.\n");
@@ -338,7 +338,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
     return SUANPAN_SUCCESS;
 }
 
-int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string load_id;
     if(!get_input(command, load_id)) {
         suanpan_error("A valid load type is required.\n");

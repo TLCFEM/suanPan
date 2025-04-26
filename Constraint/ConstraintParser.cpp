@@ -24,7 +24,7 @@
 #include <Recorder/OutputType.h>
 
 namespace {
-    void new_bc(unique_ptr<Constraint>& return_obj, istringstream& command, const bool penalty, const bool group) {
+    void new_bc(unique_ptr<Constraint>& return_obj, std::istringstream& command, const bool penalty, const bool group) {
         unsigned bc_id;
         if(!get_input(command, bc_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -56,7 +56,7 @@ namespace {
         }
     }
 
-    void new_fixedlength(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+    void new_fixedlength(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -72,7 +72,7 @@ namespace {
         return_obj = make_unique<FixedLength>(tag, 0, dof, uvec{node_i, node_j});
     }
 
-    void new_maxforce(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+    void new_maxforce(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -94,7 +94,7 @@ namespace {
         return_obj = make_unique<MaxForce>(tag, 0, dof, max_force, uvec{node_i, node_j});
     }
 
-    void new_minimumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+    void new_minimumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -116,7 +116,7 @@ namespace {
         return_obj = make_unique<MinimumGap>(tag, 0, dof, gap, uvec{node_i, node_j});
     }
 
-    void new_maximumgap(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+    void new_maximumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -138,7 +138,7 @@ namespace {
         return_obj = make_unique<MaximumGap>(tag, 0, dof, gap, uvec{node_i, node_j});
     }
 
-    void new_sleeve(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+    void new_sleeve(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -164,7 +164,7 @@ namespace {
         return_obj = make_unique<Sleeve>(tag, 0, dof, min_gap, max_gap, uvec{node_i, node_j});
     }
 
-    void new_embed(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dof) {
+    void new_embed(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -187,7 +187,7 @@ namespace {
         else return_obj = make_unique<Embed3D>(tag, 0, element_tag, node_tag);
     }
 
-    void new_mpc(unique_ptr<Constraint>& return_obj, istringstream& command) {
+    void new_mpc(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -211,7 +211,7 @@ namespace {
         return_obj = make_unique<MPC>(tag, 0, amplitude, uvec(node_tag), uvec(dof_tag), vec(weight_tag), magnitude);
     }
 
-    void new_nodeline(unique_ptr<Constraint>& return_obj, istringstream& command) {
+    void new_nodeline(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -228,7 +228,7 @@ namespace {
         return_obj = make_unique<NodeLine>(tag, 0, 0, std::move(node_tag));
     }
 
-    void new_nodefacet(unique_ptr<Constraint>& return_obj, istringstream& command) {
+    void new_nodefacet(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -245,7 +245,7 @@ namespace {
         return_obj = make_unique<NodeFacet>(tag, 0, 0, std::move(node_tag));
     }
 
-    void new_particlecollision(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned dim) {
+    void new_particlecollision(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dim) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -267,7 +267,7 @@ namespace {
         2 == dim ? return_obj = make_unique<ParticleCollision2D>(tag, 0, space, alpha) : return_obj = make_unique<ParticleCollision3D>(tag, 0, space, alpha);
     }
 
-    void new_ljpotential(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
+    void new_ljpotential(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -289,7 +289,7 @@ namespace {
         return_obj = make_unique<LJPotential2D>(tag, 0, space, alpha);
     }
 
-    void new_linearspring(unique_ptr<Constraint>& return_obj, istringstream& command, const unsigned) {
+    void new_linearspring(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -311,7 +311,7 @@ namespace {
         return_obj = make_unique<LinearSpring2D>(tag, 0, space, alpha);
     }
 
-    void new_rigidwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite, const bool penalty) {
+    void new_rigidwall(unique_ptr<Constraint>& return_obj, std::istringstream& command, const bool finite, const bool penalty) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -380,7 +380,7 @@ namespace {
         }
     }
 
-    void new_restitutionwall(unique_ptr<Constraint>& return_obj, istringstream& command, const bool finite) {
+    void new_restitutionwall(unique_ptr<Constraint>& return_obj, std::istringstream& command, const bool finite) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -436,7 +436,7 @@ namespace {
     }
 } // namespace
 
-int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     const auto step_tag = domain->get_current_step_tag();
     if(0u == step_tag) {
         suanpan_error("A valid step is required.\n");
@@ -553,7 +553,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, istringstream& co
     return SUANPAN_SUCCESS;
 }
 
-int create_new_constraint(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string constraint_id;
     if(!get_input(command, constraint_id)) {
         suanpan_error("A valid constraint type is required.\n");

@@ -76,50 +76,50 @@ namespace suanpan {
     } // namespace expression
 } // namespace suanpan
 
-template<typename T> bool get_input(istringstream& I, T& O) { return static_cast<bool>(I >> O); }
+template<typename T> bool get_input(std::istringstream& I, T& O) { return static_cast<bool>(I >> O); }
 
-template<typename T> bool get_input(istringstream& I, Col<T>& O) {
+template<typename T> bool get_input(std::istringstream& I, Col<T>& O) {
     auto code = true;
     for(auto& P : O) code &= static_cast<bool>(I >> P);
     return code;
 }
 
-template<typename T, typename... U> bool get_input(istringstream& I, T& O, U&... R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
+template<typename T, typename... U> bool get_input(std::istringstream& I, T& O, U&... R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
 
-template<typename T> T get_input(istringstream& I) {
+template<typename T> T get_input(std::istringstream& I) {
     T O;
     I >> O;
     return O;
 }
 
-void ignore_whitespace(istringstream&);
+void ignore_whitespace(std::istringstream&);
 
-template<typename T> bool get_optional_input(istringstream& I, T& O) {
+template<typename T> bool get_optional_input(std::istringstream& I, T& O) {
     if(I.eof()) return true;
 
     return static_cast<bool>(I >> O);
 }
 
-template<typename T> bool get_optional_input(istringstream& I, Col<T>& O) {
+template<typename T> bool get_optional_input(std::istringstream& I, Col<T>& O) {
     auto code = true;
     for(auto& P : O) code &= I.eof() ? true : static_cast<bool>(I >> P);
     return code;
 }
 
-template<typename T, typename... U> bool get_optional_input(istringstream& I, T& O, U&... R) {
+template<typename T, typename... U> bool get_optional_input(std::istringstream& I, T& O, U&... R) {
     if(I.eof()) return true;
 
     return static_cast<bool>(I >> O) ? get_optional_input(I, R...) : false;
 }
 
-template<typename T> auto get_remaining(istringstream& I) {
+template<typename T> auto get_remaining(std::istringstream& I) {
     std::vector<T> O;
     T value;
     while(get_input(I, value)) O.emplace_back(value);
     return O;
 }
 
-template<typename T1, typename T2> auto get_remaining(istringstream& I) {
+template<typename T1, typename T2> auto get_remaining(std::istringstream& I) {
     std::vector<T1> O1;
     std::vector<T2> O2;
     T1 V1;
@@ -131,7 +131,7 @@ template<typename T1, typename T2> auto get_remaining(istringstream& I) {
     return std::make_tuple(O1, O2);
 }
 
-template<typename T1, typename T2, typename T3> auto get_remaining(istringstream& I) {
+template<typename T1, typename T2, typename T3> auto get_remaining(std::istringstream& I) {
     std::vector<T1> O1;
     std::vector<T2> O2;
     std::vector<T3> O3;
@@ -146,7 +146,7 @@ template<typename T1, typename T2, typename T3> auto get_remaining(istringstream
     return std::make_tuple(O1, O2, O3);
 }
 
-template<typename T1, typename T2, typename T3, typename T4> auto get_remaining(istringstream& I) {
+template<typename T1, typename T2, typename T3, typename T4> auto get_remaining(std::istringstream& I) {
     std::vector<T1> O1;
     std::vector<T2> O2;
     std::vector<T3> O3;
@@ -164,7 +164,7 @@ template<typename T1, typename T2, typename T3, typename T4> auto get_remaining(
     return std::make_tuple(O1, O2, O3, O4);
 }
 
-template<typename T1, typename T2, typename T3, typename T4, typename T5> auto get_remaining(istringstream& I) {
+template<typename T1, typename T2, typename T3, typename T4, typename T5> auto get_remaining(std::istringstream& I) {
     std::vector<T1> O1;
     std::vector<T2> O2;
     std::vector<T3> O3;
@@ -185,7 +185,7 @@ template<typename T1, typename T2, typename T3, typename T4, typename T5> auto g
     return std::make_tuple(O1, O2, O3, O4, O5);
 }
 
-std::string get_remaining(istringstream&);
+std::string get_remaining(std::istringstream&);
 
 bool is_equal(const char*, const char*);
 bool is_equal(char, char);

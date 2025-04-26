@@ -22,7 +22,7 @@
 #include <Step/Step.h>
 #include <Toolbox/utility.h>
 
-int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string integrator_type;
     if(!get_input(command, integrator_type)) {
         suanpan_error("A valid integrator type is required.\n");
@@ -362,7 +362,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, istringstream& c
     return SUANPAN_SUCCESS;
 }
 
-int create_new_solver(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string solver_type;
     if(!get_input(command, solver_type)) {
         suanpan_error("A valid solver type is required.\n");

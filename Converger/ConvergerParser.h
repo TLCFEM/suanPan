@@ -18,10 +18,10 @@
 #ifndef CONVERGERPARSER_H
 #define CONVERGERPARSER_H
 
-#include <suanPan.h>
+#include <memory>
 
 class DomainBase;
 
-int create_new_converger(const shared_ptr<DomainBase>&, istringstream&);
+int create_new_converger(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
