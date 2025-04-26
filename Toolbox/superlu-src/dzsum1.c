@@ -50,43 +50,55 @@ at the top-level directory.
 
     ===================================================================== 
 </pre>
-*/
-double dzsum1_slu(int* n, doublecomplex* cx, int* incx) {
-    /* Builtin functions */
-    double z_abs(doublecomplex*);
+*/  
+double dzsum1_slu(int *n, doublecomplex *cx, int *incx)
+{
 
+    /* Builtin functions */
+    double z_abs(doublecomplex *);
+    
     /* Local variables */
     int i, nincx;
     double stemp;
 
+
 #define CX(I) cx[(I)-1]
 
     stemp = 0.;
-    if(*n <= 0) { return stemp; }
-    if(*incx == 1) { goto L20; }
+    if (*n <= 0) {
+	return stemp;
+    }
+    if (*incx == 1) {
+	goto L20;
+    }
 
     /*     CODE FOR INCREMENT NOT EQUAL TO 1 */
 
     nincx = *n * *incx;
-    for(i = 1; *incx < 0 ? i >= nincx : i <= nincx; i += *incx) {
-        /*        NEXT LINE MODIFIED. */
+    for (i = 1; *incx < 0 ? i >= nincx : i <= nincx; i += *incx) {
 
-        stemp += z_abs(&CX(i));
-        /* L10: */
+	/*        NEXT LINE MODIFIED. */
+
+	stemp += z_abs(&CX(i));
+/* L10: */
     }
-
+    
     return stemp;
 
     /*     CODE FOR INCREMENT EQUAL TO 1 */
 
-L20: for(i = 1; i <= *n; ++i) {
-        /*        NEXT LINE MODIFIED. */
+L20:
+    for (i = 1; i <= *n; ++i) {
 
-        stemp += z_abs(&CX(i));
-        /* L30: */
+	/*        NEXT LINE MODIFIED. */
+
+	stemp += z_abs(&CX(i));
+/* L30: */
     }
-
+    
     return stemp;
 
     /*     End of DZSUM1 */
+
 } /* dzsum1_slu */
+

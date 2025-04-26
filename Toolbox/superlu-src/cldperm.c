@@ -13,16 +13,20 @@ at the top-level directory.
  * \brief Finds a row permutation so that the matrix has large entries on the diagonal
  *
  * <pre>
- * -- SuperLU routine (version 4.0) --
+ * -- SuperLU routine (version 7.0.0) --
  * Lawrence Berkeley National Laboratory.
  * June 30, 2009
+ * August 2024
  * </pre>
  */
 
 #include "slu_cdefs.h"
 
 extern int_t mc64id_(int_t*);
-extern int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int_t* num, int* cperm, int_t* liw, int_t* iw, int_t* ldw, double* dw, int_t* icntl, int_t* info);
+extern int_t mc64ad_(int_t *job, int_t *n, int_t *ne, int_t *ip,
+                     int_t *irn, double *a, int_t *num, int *cperm,
+	             int_t *liw, int_t *iw, int_t *ldw, double *dw,
+		     int_t *icntl, int_t *info);
 
 /*! \brief
  *
@@ -71,7 +75,7 @@ extern int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, dou
  * colptr (input) int*, of size n+1
  *        The pointers to the beginning of each column in ADJNCY.
  *
- * nzval  (input) complex*, of size nnz
+ * nzval  (input) singlecomplex*, of size nnz
  *        The nonzero values of the matrix. nzval[k] is the value of
  *        the entry corresponding to adjncy[k].
  *        It is not used if job = 1.
@@ -89,31 +93,35 @@ extern int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, dou
  * </pre>
  */
 
-int cldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[], complex nzval[], int* perm, float u[], float v[]) {
+int
+cldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[],
+	singlecomplex nzval[], int *perm, float u[], float v[])
+{
     int_t i, num;
     int_t icntl[10], info[10];
     int_t liw, ldw, *iw;
-    double* dw;
-    double* nzval_d = (double*)SUPERLU_MALLOC(nnz * sizeof(double));
+    double *dw;
+    double *nzval_d = (double *) SUPERLU_MALLOC(nnz * sizeof(double));
 
 #if ( DEBUGlevel>=1 )
     CHECK_MALLOC("Enter cldperm()");
 #endif
-    liw = 5 * n;
-    if(job == 3) liw = 10 * n + nnz;
-    if(!(iw = intMalloc(liw))) ABORT("Malloc fails for iw[]");
-    ldw = 3 * n + nnz;
-    if(!(dw = (double*)SUPERLU_MALLOC(ldw * sizeof(double)))) ABORT("Malloc fails for dw[]");
-
+    liw = 5*n;
+    if ( job == 3 ) liw = 10*n + nnz;
+    if ( !(iw = intMalloc(liw)) ) ABORT("Malloc fails for iw[]");
+    ldw = 3*n + nnz;
+    if ( !(dw = (double*) SUPERLU_MALLOC(ldw * sizeof(double))) )
+          ABORT("Malloc fails for dw[]");
+	    
     /* Increment one to get 1-based indexing. */
-    for(i = 0; i <= n; ++i) ++colptr[i];
-    for(i = 0; i < nnz; ++i) ++adjncy[i];
+    for (i = 0; i <= n; ++i) ++colptr[i];
+    for (i = 0; i < nnz; ++i) ++adjncy[i];
 #if ( DEBUGlevel>=2 )
-    printf("LDPERM(): n %d, nnz %d\n", n, nnz);
+    printf("LDPERM(): n %d, nnz %lld\n", n, (long long) nnz);
     slu_PrintInt10("colptr", n+1, colptr);
     slu_PrintInt10("adjncy", nnz, adjncy);
 #endif
-
+	
     /* 
      * NOTE:
      * =====
@@ -138,30 +146,30 @@ int cldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[], complex n
 #endif
 
     int_t ljob = job, ln = n;
-
-    for(i = 0; i < nnz; ++i) nzval_d[i] = c_abs1(&nzval[i]);
-    mc64ad_(&ljob, &ln, &nnz, colptr, adjncy, nzval_d, &num, perm, &liw, iw, &ldw, dw, icntl, info);
+    
+    for (i = 0; i < nnz; ++i) nzval_d[i] = c_abs1(&nzval[i]);
+    mc64ad_(&ljob, &ln, &nnz, colptr, adjncy, nzval_d, &num, perm,
+	    &liw, iw, &ldw, dw, icntl, info);
 
 #if ( DEBUGlevel>=2 )
     slu_PrintInt10("perm", n, perm);
-    printf(".. After MC64AD info %lld\tsize of matching %d\n", (long long)info[0], num);
+    printf(".. After MC64AD info %lld\tsize of matching %lld\n", (long long)info[0], (long long) num);
 #endif
-    if(info[0] == 1) {
-        /* Structurally singular */
-        printf(".. The last %d permutations:\n", (int)(n - num));
-        slu_PrintInt10("perm", n - num, &perm[num]);
+    if ( info[0] == 1 ) { /* Structurally singular */
+        printf(".. The last %d permutations:\n", (int)(n-num));
+	slu_PrintInt10("perm", n-num, &perm[num]);
     }
 
     /* Restore to 0-based indexing. */
-    for(i = 0; i <= n; ++i) --colptr[i];
-    for(i = 0; i < nnz; ++i) --adjncy[i];
-    for(i = 0; i < n; ++i) --perm[i];
+    for (i = 0; i <= n; ++i) --colptr[i];
+    for (i = 0; i < nnz; ++i) --adjncy[i];
+    for (i = 0; i < n; ++i) --perm[i];
 
-    if(job == 5)
-        for(i = 0; i < n; ++i) {
-            u[i] = dw[i];
-            v[i] = dw[n + i];
-        }
+    if ( job == 5 )
+        for (i = 0; i < n; ++i) {
+	    u[i] = dw[i];
+	    v[i] = dw[n+i];
+	}
 
     SUPERLU_FREE(iw);
     SUPERLU_FREE(dw);

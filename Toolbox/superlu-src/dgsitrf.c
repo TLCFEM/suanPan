@@ -13,9 +13,10 @@ at the top-level directory.
  * \brief Computes an ILU factorization of a general sparse matrix
  *
  * <pre>
- * -- SuperLU routine (version 4.1) --
+ * -- SuperLU routine (version 7.0.0) --
  * Lawrence Berkeley National Laboratory.
  * June 30, 2009
+ * August 2024
  *
  * </pre>
  */
@@ -183,117 +184,124 @@ int num_drop_L;
  * </pre>
  */
 
-void dgsitrf(
-    superlu_options_t* options, SuperMatrix* A, int relax, int panel_size, int* etree, void* work, int_t lwork, int* perm_c, int* perm_r, SuperMatrix* L, SuperMatrix* U, GlobalLU_t* Glu, /* persistent to facilitate multiple factorizations */
-    SuperLUStat_t* stat, int_t* info
-) {
+void
+dgsitrf(superlu_options_t *options, SuperMatrix *A, int relax, int panel_size,
+	int *etree, void *work, int_t lwork, int *perm_c, int *perm_r,
+	SuperMatrix *L, SuperMatrix *U, 
+    	GlobalLU_t *Glu, /* persistent to facilitate multiple factorizations */
+	SuperLUStat_t *stat, int_t *info)
+{
     /* Local working arrays */
-    NCPformat* Astore;
-    int* iperm_r = NULL; /* inverse of perm_r; used when
+    NCPformat *Astore;
+    int       *iperm_r = NULL; /* inverse of perm_r; used when
 				  options->Fact == SamePattern_SameRowPerm */
-    int* iperm_c;        /* inverse of perm_c */
-    int *swap, *iswap;   /* swap is used to store the row permutation
+    int       *iperm_c; /* inverse of perm_c */
+    int       *swap, *iswap; /* swap is used to store the row permutation
 				during the factorization. Initially, it is set
-				to iperm_c (row indeces of Pc*A*Pc').
+				to iperm_c (row indices of Pc*A*Pc').
 				iswap is the inverse of swap. After the
 				factorization, it is equal to perm_r. */
-    int* iwork;
-    double* dwork;
-    int *segrep, *repfnz, *parent;
-    int_t* xplore;
-    int* panel_lsub; /* dense[]/panel_lsub[] pair forms a w-wide SPA */
-    int* marker;
-    int* marker_relax;
-    double *dense, *tempv;
-    int *relax_end, *relax_fsupc;
-    double* a;
-    int_t* asub;
-    int_t *xa_begin, *xa_end;
-    int *xsup, *supno;
-    int_t *xlsub, *xlusup, *xusub;
-    int_t nzlumax;
-    double* amax;
-    double drop_sum;
-    double alpha, omega; /* used in MILU, mimicing DRIC */
-    double* dwork2;      /* used by the second dropping rule */
+    int       *iwork;
+    double   *dwork;
+    int       *segrep, *repfnz, *parent;
+    int_t     *xplore;
+    int       *panel_lsub; /* dense[]/panel_lsub[] pair forms a w-wide SPA */
+    int       *marker;
+    int       *marker_relax;
+    double    *dense, *tempv;
+    int       *relax_end, *relax_fsupc;
+    double    *a;
+    int_t     *asub;
+    int_t     *xa_begin, *xa_end;
+    int       *xsup, *supno;
+    int_t     *xlsub, *xlusup, *xusub;
+    int_t     nzlumax;
+    double    *amax; 
+    double    drop_sum;
+    double alpha, omega;  /* used in MILU, mimicking DRIC */
+    double    *dwork2;	   /* used by the second dropping rule */
 
     /* Local scalars */
-    fact_t fact = options->Fact;
-    double diag_pivot_thresh = options->DiagPivotThresh;
-    double drop_tol = options->ILU_DropTol; /* tau */
-    double fill_ini = options->ILU_FillTol; /* tau^hat */
-    double gamma = options->ILU_FillFactor;
-    int drop_rule = options->ILU_DropRule;
-    milu_t milu = options->ILU_MILU;
-    double fill_tol;
-    int pivrow; /* pivotal row number in the original matrix A */
-    int nseg1;  /* no of segments in U-column above panel row jcol */
-    int nseg;   /* no of segments in each U-column */
+    fact_t    fact = options->Fact;
+    double    diag_pivot_thresh = options->DiagPivotThresh;
+    double    drop_tol = options->ILU_DropTol; /* tau */
+    double    fill_ini = options->ILU_FillTol; /* tau^hat */
+    double    gamma = options->ILU_FillFactor;
+    int       drop_rule = options->ILU_DropRule;
+    milu_t    milu = options->ILU_MILU;
+    double    fill_tol;
+    int       pivrow;	/* pivotal row number in the original matrix A */
+    int       nseg1;	/* no of segments in U-column above panel row jcol */
+    int       nseg;	/* no of segments in each U-column */
     register int jcol, jj;
-    register int kcol; /* end column of a relaxed snode */
+    register int kcol;	/* end column of a relaxed snode */
     register int icol;
-    int_t i, k, iinfo;
-    int m, n, min_mn, jsupno, fsupc;
-    int_t new_next, nextlu, nextu;
-    int w_def; /* upper bound on panel width */
-    int usepr, iperm_r_allocated = 0;
-    int_t nnzL, nnzU;
-    int* panel_histo = stat->panel_histo;
-    flops_t* ops = stat->ops;
+    int_t     i, k, iinfo;
+    int       m, n, min_mn, jsupno, fsupc;
+    int_t     new_next, nextlu, nextu;
+    int       w_def;	/* upper bound on panel width */
+    int       usepr, iperm_r_allocated = 0;
+    int_t     nnzL, nnzU;
+    int       *panel_histo = stat->panel_histo;
+    flops_t   *ops = stat->ops;
 
-    int last_drop; /* the last column which the dropping rules applied */
-    int quota;
-    int nnzAj; /* number of nonzeros in A(:,1:j) */
-    int nnzLj, nnzUj;
-    double tol_L = drop_tol, tol_U = drop_tol;
+    int       last_drop;/* the last column which the dropping rules applied */
+    int       quota;
+    int       nnzAj;	/* number of nonzeros in A(:,1:j) */
+    int       nnzLj, nnzUj;
+    double    tol_L = drop_tol, tol_U = drop_tol;
     double zero = 0.0;
     double one = 1.0;
 
-    /* Executable */
-    iinfo = 0;
-    m = A->nrow;
-    n = A->ncol;
-    min_mn = SUPERLU_MIN(m, n);
-    Astore = A->Store;
-    a = Astore->nzval;
-    asub = Astore->rowind;
+    /* Executable */	   
+    iinfo    = 0;
+    m	     = A->nrow;
+    n	     = A->ncol;
+    min_mn   = SUPERLU_MIN(m, n);
+    Astore   = A->Store;
+    a	     = Astore->nzval;
+    asub     = Astore->rowind;
     xa_begin = Astore->colbeg;
-    xa_end = Astore->colend;
+    xa_end   = Astore->colend;
 
     /* Allocate storage common to the factor routines */
-    *info = dLUMemInit(fact, work, lwork, m, n, Astore->nnz, panel_size, gamma, L, U, Glu, &iwork, &dwork);
-    if(*info) return;
+    *info = dLUMemInit(fact, work, lwork, m, n, Astore->nnz, panel_size,
+		       gamma, L, U, Glu, &iwork, &dwork);
+    if ( *info ) return;
 
-    xsup = Glu->xsup;
-    supno = Glu->supno;
-    xlsub = Glu->xlsub;
-    xlusup = Glu->xlusup;
-    xusub = Glu->xusub;
+    xsup    = Glu->xsup;
+    supno   = Glu->supno;
+    xlsub   = Glu->xlsub;
+    xlusup  = Glu->xlusup;
+    xusub   = Glu->xusub;
 
-    int_t* xprune;
-    SetIWork(m, n, panel_size, iwork, &segrep, &parent, &xplore, &repfnz, &panel_lsub, &xprune, &marker);
+    int_t *xprune;
+    SetIWork(m, n, panel_size, iwork, &segrep, &parent, &xplore,
+	     &repfnz, &panel_lsub, &xprune, &marker);
     marker_relax = int32Malloc(m);
     SUPERLU_FREE(xprune); /* not used in ILU */
-
+    
     dSetRWork(m, panel_size, dwork, &dense, &tempv);
 
     usepr = (fact == SamePattern_SameRowPerm);
-    if(usepr) {
-        /* Compute the inverse of perm_r */
-        iperm_r = (int*)int32Malloc(m);
-        for(k = 0; k < m; ++k) iperm_r[perm_r[k]] = k;
-        iperm_r_allocated = 1;
+    if ( usepr ) {
+	/* Compute the inverse of perm_r */
+	iperm_r = (int *) int32Malloc(m);
+	for (k = 0; k < m; ++k) iperm_r[perm_r[k]] = k;
+	iperm_r_allocated = 1;
     }
 
-    iperm_c = (int*)int32Malloc(n);
-    for(k = 0; k < n; ++k) iperm_c[perm_c[k]] = k;
-    swap = (int*)intMalloc(n);
-    for(k = 0; k < n; k++) swap[k] = iperm_c[k];
-    iswap = (int*)intMalloc(n);
-    for(k = 0; k < n; k++) iswap[k] = perm_c[k];
-    amax = (double*)SUPERLU_MALLOC(panel_size * sizeof(double));
-    if(drop_rule & DROP_SECONDARY) dwork2 = SUPERLU_MALLOC(n * sizeof(double));
-    else dwork2 = NULL;
+    iperm_c = (int *) int32Malloc(n);
+    for (k = 0; k < n; ++k) iperm_c[perm_c[k]] = k;
+    swap = (int *)intMalloc(n);
+    for (k = 0; k < n; k++) swap[k] = iperm_c[k];
+    iswap = (int *)intMalloc(n);
+    for (k = 0; k < n; k++) iswap[k] = perm_c[k];
+    amax = (double *) SUPERLU_MALLOC(panel_size * sizeof(double));
+    if (drop_rule & DROP_SECONDARY)
+	dwork2 = SUPERLU_MALLOC(n * sizeof(double));
+    else
+	dwork2 = NULL;
 
     nnzAj = 0;
     nnzLj = 0;
@@ -302,20 +310,23 @@ void dgsitrf(
     alpha = pow((double)n, -1.0 / options->ILU_MILU_Dim);
 
     /* Identify relaxed snodes */
-    relax_end = (int*)intMalloc(n);
-    relax_fsupc = (int*)intMalloc(n);
-    if(options->SymmetricMode == YES) ilu_heap_relax_snode(n, etree, relax, marker, relax_end, relax_fsupc);
-    else ilu_relax_snode(n, etree, relax, marker, relax_end, relax_fsupc);
+    relax_end = (int *) intMalloc(n);
+    relax_fsupc = (int *) intMalloc(n);
+    if ( options->SymmetricMode == YES )
+	ilu_heap_relax_snode(n, etree, relax, marker, relax_end, relax_fsupc);
+    else
+	ilu_relax_snode(n, etree, relax, marker, relax_end, relax_fsupc);
 
-    ifill(perm_r, m, EMPTY);
-    ifill(marker, m * NO_MARKER, EMPTY);
+    ifill (perm_r, m, SLU_EMPTY);
+    ifill (marker, m * NO_MARKER, SLU_EMPTY);
     supno[0] = -1;
-    xsup[0] = xlsub[0] = xusub[0] = xlusup[0] = 0;
-    w_def = panel_size;
+    xsup[0]  = xlsub[0] = xusub[0] = xlusup[0] = 0;
+    w_def    = panel_size;
 
     /* Mark the rows used by relaxed supernodes */
-    ifill(marker_relax, m, EMPTY);
-    i = mark_relax(m, relax_end, relax_fsupc, xa_begin, xa_end, asub, marker_relax);
+    ifill (marker_relax, m, SLU_EMPTY);
+    i = mark_relax(m, relax_end, relax_fsupc, xa_begin, xa_end,
+	         asub, marker_relax);
 #if ( PRNTlevel >= 1)
     printf("%d relaxed supernodes.\n", (int)i);
 #endif
@@ -325,275 +336,338 @@ void dgsitrf(
      *	   (a) a relaxed supernode at the bottom of the etree, or
      *	   (b) panel_size contiguous columns, defined by the user
      */
-    for(jcol = 0; jcol < min_mn;) {
-        if(relax_end[jcol] != EMPTY) {
-            /* start of a relaxed snode */
-            kcol = relax_end[jcol]; /* end of the relaxed snode */
-            panel_histo[kcol - jcol + 1]++;
+    for (jcol = 0; jcol < min_mn; ) {
 
-            /* Drop small rows in the previous supernode. */
-            if(jcol > 0 && jcol < last_drop) {
-                int first = xsup[supno[jcol - 1]];
-                int last = jcol - 1;
-                int quota;
+	if ( relax_end[jcol] != SLU_EMPTY ) { /* start of a relaxed snode */
+	    kcol = relax_end[jcol];	  /* end of the relaxed snode */
+	    panel_histo[kcol-jcol+1]++;
 
-                /* Compute the quota */
-                if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
-                else if(drop_rule & DROP_COLUMN) {
-                    int i;
-                    quota = 0;
-                    for(i = first; i <= last; i++) quota += xa_end[i] - xa_begin[i];
-                    quota = gamma * quota * (m - first) / m;
-                }
-                else if(drop_rule & DROP_AREA) quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
-                else quota = m * n;
-                fill_tol = pow(fill_ini, 1.0 - 0.5 * (first + last) / min_mn);
+	    /* Drop small rows in the previous supernode. */
+	    if (jcol > 0 && jcol < last_drop) {
+		int first = xsup[supno[jcol - 1]];
+		int last = jcol - 1;
+		int quota;
 
-                /* Drop small rows */
-                i = ilu_ddrop_row(options, first, last, tol_L, quota, &nnzLj, &fill_tol, Glu, tempv, dwork2, 0);
-                /* Reset the parameters */
-                if(drop_rule & DROP_DYNAMIC) {
-                    if(gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) < nnzLj) tol_L = SUPERLU_MIN(1.0, tol_L * 2.0);
-                    else tol_L = SUPERLU_MAX(drop_tol, tol_L * 0.5);
-                }
-                if(fill_tol < 0) iinfo -= (int)fill_tol;
+		/* Compute the quota */
+		if (drop_rule & DROP_PROWS)
+		    quota = gamma * Astore->nnz / m * (m - first) / m
+			    * (last - first + 1);
+		else if (drop_rule & DROP_COLUMN) {
+		    int i;
+		    quota = 0;
+		    for (i = first; i <= last; i++)
+			quota += xa_end[i] - xa_begin[i];
+		    quota = gamma * quota * (m - first) / m;
+		} else if (drop_rule & DROP_AREA)
+		    quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m)
+			    - nnzLj;
+		else
+		    quota = m * n;
+		fill_tol = pow(fill_ini, 1.0 - 0.5 * (first + last) / min_mn);
+
+		/* Drop small rows */
+		i = ilu_ddrop_row(options, first, last, tol_L, quota, &nnzLj,
+				  &fill_tol, Glu, tempv, dwork2, 0);
+		/* Reset the parameters */
+		if (drop_rule & DROP_DYNAMIC) {
+		    if (gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m)
+			     < nnzLj)
+			tol_L = SUPERLU_MIN(1.0, tol_L * 2.0);
+		    else
+			tol_L = SUPERLU_MAX(drop_tol, tol_L * 0.5);
+		}
+		if (fill_tol < 0) iinfo -= (int)fill_tol;
 #ifdef DEBUG
 		num_drop_L += i * (last - first + 1);
 #endif
-            }
+	    }
 
-            /* --------------------------------------
-             * Factorize the relaxed supernode(jcol:kcol)
-             * -------------------------------------- */
-            /* Determine the union of the row structure of the snode */
-            if((*info = ilu_dsnode_dfs(jcol, kcol, asub, xa_begin, xa_end, marker, Glu)) != 0) return;
+	    /* --------------------------------------
+	     * Factorize the relaxed supernode(jcol:kcol)
+	     * -------------------------------------- */
+	    /* Determine the union of the row structure of the snode */
+	    if ( (*info = ilu_dsnode_dfs(jcol, kcol, asub, xa_begin, xa_end,
+					 marker, Glu)) != 0 )
+		return;
 
-            nextu = xusub[jcol];
-            nextlu = xlusup[jcol];
-            jsupno = supno[jcol];
-            fsupc = xsup[jsupno];
-            new_next = nextlu + (xlsub[fsupc + 1] - xlsub[fsupc]) * (kcol - jcol + 1);
-            nzlumax = Glu->nzlumax;
-            while(new_next > nzlumax) { if((*info = dLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu))) return; }
+	    nextu    = xusub[jcol];
+	    nextlu   = xlusup[jcol];
+	    jsupno   = supno[jcol];
+	    fsupc    = xsup[jsupno];
+	    new_next = nextlu + (xlsub[fsupc+1]-xlsub[fsupc])*(kcol-jcol+1);
+	    nzlumax = Glu->nzlumax;
+	    while ( new_next > nzlumax ) {
+		if ((*info = dLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu)))
+		    return;
+	    }
 
-            for(icol = jcol; icol <= kcol; icol++) {
-                xusub[icol + 1] = nextu;
+	    for (icol = jcol; icol <= kcol; icol++) {
+		xusub[icol+1] = nextu;
 
-                amax[0] = 0.0;
-                /* Scatter into SPA dense[*] */
-                for(k = xa_begin[icol]; k < xa_end[icol]; k++) {
-                    register double tmp = fabs(a[k]);
-                    if(tmp > amax[0]) amax[0] = tmp;
-                    dense[asub[k]] = a[k];
-                }
-                nnzAj += xa_end[icol] - xa_begin[icol];
-                if(amax[0] == 0.0) {
-                    amax[0] = fill_ini;
+		amax[0] = 0.0;
+		/* Scatter into SPA dense[*] */
+		for (k = xa_begin[icol]; k < xa_end[icol]; k++) {
+		    register double tmp = fabs(a[k]);
+		    if (tmp > amax[0]) amax[0] = tmp;
+		    dense[asub[k]] = a[k];
+		}
+		nnzAj += xa_end[icol] - xa_begin[icol];
+		if (amax[0] == 0.0) {
+		    amax[0] = fill_ini;
 #if ( PRNTlevel >= 1)
 		    printf("Column %d is entirely zero!\n", icol);
 		    fflush(stdout);
 #endif
-                }
+		}
 
-                /* Numeric update within the snode */
-                dsnode_bmod(icol, jsupno, fsupc, dense, tempv, Glu, stat);
+		/* Numeric update within the snode */
+		dsnode_bmod(icol, jsupno, fsupc, dense, tempv, Glu, stat);
 
-                if(usepr) pivrow = iperm_r[icol];
-                fill_tol = pow(fill_ini, 1.0 - (double)icol / (double)min_mn);
-                if((*info = ilu_dpivotL(icol, diag_pivot_thresh, &usepr, perm_r, iperm_c[icol], swap, iswap, marker_relax, &pivrow, amax[0] * fill_tol, milu, zero, Glu, stat))) {
-                    iinfo++;
-                    marker[pivrow] = kcol;
-                }
-            }
+		if (usepr) pivrow = iperm_r[icol];
+		fill_tol = pow(fill_ini, 1.0 - (double)icol / (double)min_mn);
+		if ( (*info = ilu_dpivotL(icol, diag_pivot_thresh, &usepr,
+					  perm_r, iperm_c[icol], swap, iswap,
+					  marker_relax, &pivrow,
+                                          amax[0] * fill_tol, milu, zero,
+                                          Glu, stat)) ) {
+		    iinfo++;
+		    marker[pivrow] = kcol;
+		}
 
-            jcol = kcol + 1;
-        }
-        else {
-            /* Work on one panel of panel_size columns */
+	    }
 
-            /* Adjust panel_size so that a panel won't overlap with the next
-             * relaxed snode.
-             */
-            panel_size = w_def;
-            for(k = jcol + 1; k < SUPERLU_MIN(jcol+panel_size, min_mn); k++)
-                if(relax_end[k] != EMPTY) {
-                    panel_size = k - jcol;
-                    break;
-                }
-            if(k == min_mn) panel_size = min_mn - jcol;
-            panel_histo[panel_size]++;
+	    jcol = kcol + 1;
 
-            /* symbolic factor on a panel of columns */
-            ilu_dpanel_dfs(m, panel_size, jcol, A, perm_r, &nseg1, dense, amax, panel_lsub, segrep, repfnz, marker, parent, xplore, Glu);
+	} else { /* Work on one panel of panel_size columns */
 
-            /* numeric sup-panel updates in topological order */
-            dpanel_bmod(m, panel_size, jcol, nseg1, dense, tempv, segrep, repfnz, Glu, stat);
+	    /* Adjust panel_size so that a panel won't overlap with the next
+	     * relaxed snode.
+	     */
+	    panel_size = w_def;
+	    for (k = jcol + 1; k < SUPERLU_MIN(jcol+panel_size, min_mn); k++)
+		if ( relax_end[k] != SLU_EMPTY ) {
+		    panel_size = k - jcol;
+		    break;
+		}
+	    if ( k == min_mn ) panel_size = min_mn - jcol;
+	    panel_histo[panel_size]++;
 
-            /* Sparse LU within the panel, and below panel diagonal */
-            for(jj = jcol; jj < jcol + panel_size; jj++) {
-                k = (jj - jcol) * m; /* column index for w-wide arrays */
+	    /* symbolic factor on a panel of columns */
+	    ilu_dpanel_dfs(m, panel_size, jcol, A, perm_r, &nseg1,
+                          dense, amax, panel_lsub, segrep, repfnz,
+                          marker, parent, xplore, Glu);
 
-                nseg = nseg1; /* Begin after all the panel segments */
+	    /* numeric sup-panel updates in topological order */
+	    dpanel_bmod(m, panel_size, jcol, nseg1, dense,
+			tempv, segrep, repfnz, Glu, stat);
 
-                nnzAj += xa_end[jj] - xa_begin[jj];
+	    /* Sparse LU within the panel, and below panel diagonal */
+	    for (jj = jcol; jj < jcol + panel_size; jj++) {
 
-                if((*info = ilu_dcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k], segrep, &repfnz[k], marker, parent, xplore, Glu))) return;
+		k = (jj - jcol) * m; /* column index for w-wide arrays */
 
-                /* Numeric updates */
-                if((*info = dcolumn_bmod(jj, (nseg - nseg1), &dense[k], tempv, &segrep[nseg1], &repfnz[k], jcol, Glu, stat)) != 0) return;
+		nseg = nseg1;	/* Begin after all the panel segments */
 
-                /* Make a fill-in position if the column is entirely zero */
-                if(xlsub[jj + 1] == xlsub[jj]) {
-                    register int i, row;
-                    int_t nextl;
-                    int_t nzlmax = Glu->nzlmax;
-                    int_t* lsub = Glu->lsub;
-                    int* marker2 = marker + 2 * m;
+		nnzAj += xa_end[jj] - xa_begin[jj];
 
-                    /* Allocate memory */
-                    nextl = xlsub[jj] + 1;
-                    if(nextl >= nzlmax) {
-                        int error = dLUMemXpand(jj, nextl, LSUB, &nzlmax, Glu);
-                        if(error) {
-                            *info = error;
-                            return;
-                        }
-                        lsub = Glu->lsub;
-                    }
-                    xlsub[jj + 1]++;
-                    assert(xlusup[jj]==xlusup[jj+1]);
-                    xlusup[jj + 1]++;
-                    ((double*)Glu->lusup)[xlusup[jj]] = zero;
+		if ((*info = ilu_dcolumn_dfs(m, jj, perm_r, &nseg,
+					     &panel_lsub[k], segrep, &repfnz[k],
+					     marker, parent, xplore, Glu)))
+		    return;
 
-                    /* Choose a row index (pivrow) for fill-in */
-                    for(i = jj; i < n; i++) if(marker_relax[swap[i]] <= jj) break;
-                    row = swap[i];
-                    marker2[row] = jj;
-                    lsub[xlsub[jj]] = row;
+		/* Numeric updates */
+		if ((*info = dcolumn_bmod(jj, (nseg - nseg1), &dense[k],
+					  tempv, &segrep[nseg1], &repfnz[k],
+					  jcol, Glu, stat)) != 0) return;
+
+		/* Make a fill-in position if the column is entirely zero */
+		if (xlsub[jj + 1] == xlsub[jj]) {
+		    register int i, row;
+		    int_t nextl;
+		    int_t nzlmax = Glu->nzlmax;
+		    int_t *lsub = Glu->lsub;
+		    int *marker2 = marker + 2 * m;
+
+		    /* Allocate memory */
+		    nextl = xlsub[jj] + 1;
+		    if (nextl >= nzlmax) {
+			int error = dLUMemXpand(jj, nextl, LSUB, &nzlmax, Glu);
+			if (error) { *info = error; return; }
+			lsub = Glu->lsub;
+		    }
+		    xlsub[jj + 1]++;
+		    assert(xlusup[jj]==xlusup[jj+1]);
+		    xlusup[jj + 1]++;
+		    ((double *) Glu->lusup)[xlusup[jj]] = zero;
+
+		    /* Choose a row index (pivrow) for fill-in */
+		    for (i = jj; i < n; i++)
+			if (marker_relax[swap[i]] <= jj) break;
+		    row = swap[i];
+		    marker2[row] = jj;
+		    lsub[xlsub[jj]] = row;
 #ifdef DEBUG
 		    printf("Fill col %d.\n", (int)jj);
 		    fflush(stdout);
 #endif
+		}
+
+		/* Computer the quota */
+		if (drop_rule & DROP_PROWS)
+		    quota = gamma * Astore->nnz / m * jj / m;
+		else if (drop_rule & DROP_COLUMN)
+		    quota = gamma * (xa_end[jj] - xa_begin[jj]) *
+			    (jj + 1) / m;
+		else if (drop_rule & DROP_AREA)
+		    quota = gamma * 0.9 * nnzAj * 0.5 - nnzUj;
+		else
+		    quota = m;
+
+		/* Copy the U-segments to ucol[*] and drop small entries */
+		if ((*info = ilu_dcopy_to_ucol(jj, nseg, segrep, &repfnz[k],
+					       perm_r, &dense[k], drop_rule,
+					       milu, amax[jj - jcol] * tol_U,
+					       quota, &drop_sum, &nnzUj, Glu,
+					       dwork2)) != 0)
+		    return;
+
+		/* Reset the dropping threshold if required */
+		if (drop_rule & DROP_DYNAMIC) {
+		    if (gamma * 0.9 * nnzAj * 0.5 < nnzLj)
+			tol_U = SUPERLU_MIN(1.0, tol_U * 2.0);
+		    else
+			tol_U = SUPERLU_MAX(drop_tol, tol_U * 0.5);
+		}
+
+		if (drop_sum != zero)
+		{
+		    if (drop_sum > zero)
+			omega = SUPERLU_MIN(2.0 * (1.0 - alpha)
+				* amax[jj - jcol] / drop_sum, one);
+		    else
+			omega = SUPERLU_MAX(2.0 * (1.0 - alpha)
+				* amax[jj - jcol] / drop_sum, -one);
+		    drop_sum *= omega;
                 }
+		if (usepr) pivrow = iperm_r[jj];
+		fill_tol = pow(fill_ini, 1.0 - (double)jj / (double)min_mn);
+		if ( (*info = ilu_dpivotL(jj, diag_pivot_thresh, &usepr, perm_r,
+					  iperm_c[jj], swap, iswap,
+					  marker_relax, &pivrow,
+					  amax[jj - jcol] * fill_tol, milu,
+					  drop_sum, Glu, stat)) ) {
+		    iinfo++;
+		    marker[m + pivrow] = jj;
+		    marker[2 * m + pivrow] = jj;
+		}
 
-                /* Computer the quota */
-                if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * jj / m;
-                else if(drop_rule & DROP_COLUMN) quota = gamma * (xa_end[jj] - xa_begin[jj]) * (jj + 1) / m;
-                else if(drop_rule & DROP_AREA) quota = gamma * 0.9 * nnzAj * 0.5 - nnzUj;
-                else quota = m;
+		/* Reset repfnz[] for this column */
+		resetrep_col (nseg, segrep, &repfnz[k]);
 
-                /* Copy the U-segments to ucol[*] and drop small entries */
-                if((*info = ilu_dcopy_to_ucol(jj, nseg, segrep, &repfnz[k], perm_r, &dense[k], drop_rule, milu, amax[jj - jcol] * tol_U, quota, &drop_sum, &nnzUj, Glu, dwork2)) != 0) return;
+		/* Start a new supernode, drop the previous one */
+		if (jj > 0 && supno[jj] > supno[jj - 1] && jj < last_drop) {
+		    int first = xsup[supno[jj - 1]];
+		    int last = jj - 1;
+		    int quota;
 
-                /* Reset the dropping threshold if required */
-                if(drop_rule & DROP_DYNAMIC) {
-                    if(gamma * 0.9 * nnzAj * 0.5 < nnzLj) tol_U = SUPERLU_MIN(1.0, tol_U * 2.0);
-                    else tol_U = SUPERLU_MAX(drop_tol, tol_U * 0.5);
-                }
+		    /* Compute the quota */
+		    if (drop_rule & DROP_PROWS)
+			quota = gamma * Astore->nnz / m * (m - first) / m
+				* (last - first + 1);
+		    else if (drop_rule & DROP_COLUMN) {
+			int i;
+			quota = 0;
+			for (i = first; i <= last; i++)
+			    quota += xa_end[i] - xa_begin[i];
+			quota = gamma * quota * (m - first) / m;
+		    } else if (drop_rule & DROP_AREA)
+			quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0)
+				/ m) - nnzLj;
+		    else
+			quota = m * n;
+		    fill_tol = pow(fill_ini, 1.0 - 0.5 * (first + last) /
+			    (double)min_mn);
 
-                if(drop_sum != zero) {
-                    if(drop_sum > zero) omega = SUPERLU_MIN(2.0 * (1.0 - alpha) * amax[jj - jcol] / drop_sum, one);
-                    else omega = SUPERLU_MAX(2.0 * (1.0 - alpha) * amax[jj - jcol] / drop_sum, -one);
-                    drop_sum *= omega;
-                }
-                if(usepr) pivrow = iperm_r[jj];
-                fill_tol = pow(fill_ini, 1.0 - (double)jj / (double)min_mn);
-                if((*info = ilu_dpivotL(jj, diag_pivot_thresh, &usepr, perm_r, iperm_c[jj], swap, iswap, marker_relax, &pivrow, amax[jj - jcol] * fill_tol, milu, drop_sum, Glu, stat))) {
-                    iinfo++;
-                    marker[m + pivrow] = jj;
-                    marker[2 * m + pivrow] = jj;
-                }
+		    /* Drop small rows */
+		    i = ilu_ddrop_row(options, first, last, tol_L, quota,
+				      &nnzLj, &fill_tol, Glu, tempv, dwork2,
+				      1);
 
-                /* Reset repfnz[] for this column */
-                resetrep_col(nseg, segrep, &repfnz[k]);
-
-                /* Start a new supernode, drop the previous one */
-                if(jj > 0 && supno[jj] > supno[jj - 1] && jj < last_drop) {
-                    int first = xsup[supno[jj - 1]];
-                    int last = jj - 1;
-                    int quota;
-
-                    /* Compute the quota */
-                    if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
-                    else if(drop_rule & DROP_COLUMN) {
-                        int i;
-                        quota = 0;
-                        for(i = first; i <= last; i++) quota += xa_end[i] - xa_begin[i];
-                        quota = gamma * quota * (m - first) / m;
-                    }
-                    else if(drop_rule & DROP_AREA) quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
-                    else quota = m * n;
-                    fill_tol = pow(fill_ini, 1.0 - 0.5 * (first + last) / (double)min_mn);
-
-                    /* Drop small rows */
-                    i = ilu_ddrop_row(options, first, last, tol_L, quota, &nnzLj, &fill_tol, Glu, tempv, dwork2, 1);
-
-                    /* Reset the parameters */
-                    if(drop_rule & DROP_DYNAMIC) {
-                        if(gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) < nnzLj) tol_L = SUPERLU_MIN(1.0, tol_L * 2.0);
-                        else tol_L = SUPERLU_MAX(drop_tol, tol_L * 0.5);
-                    }
-                    if(fill_tol < 0) iinfo -= (int)fill_tol;
+		    /* Reset the parameters */
+		    if (drop_rule & DROP_DYNAMIC) {
+			if (gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m)
+				< nnzLj)
+			    tol_L = SUPERLU_MIN(1.0, tol_L * 2.0);
+			else
+			    tol_L = SUPERLU_MAX(drop_tol, tol_L * 0.5);
+		    }
+		    if (fill_tol < 0) iinfo -= (int)fill_tol;
 #ifdef DEBUG
 		    num_drop_L += i * (last - first + 1);
 #endif
-                } /* if start a new supernode */
-            }     /* for */
+		} /* if start a new supernode */
 
-            jcol += panel_size; /* Move to the next panel */
-        }                       /* else */
-    }                           /* for */
+	    } /* for */
+
+	    jcol += panel_size; /* Move to the next panel */
+
+	} /* else */
+
+    } /* for */
 
     *info = iinfo;
 
-    if(m > n) {
-        k = 0;
-        for(i = 0; i < m; ++i)
-            if(perm_r[i] == EMPTY) {
-                perm_r[i] = n + k;
-                ++k;
-            }
+    if ( m > n ) {
+	k = 0;
+	for (i = 0; i < m; ++i)
+	    if ( perm_r[i] == SLU_EMPTY ) {
+		perm_r[i] = n + k;
+		++k;
+	    }
     }
 
     ilu_countnz(min_mn, &nnzL, &nnzU, Glu);
     fixupL(min_mn, perm_r, Glu);
 
     dLUWorkFree(iwork, dwork, Glu); /* Free work space and compress storage */
-    SUPERLU_FREE(xplore);
-    SUPERLU_FREE(marker_relax);
+    SUPERLU_FREE (xplore);
+    SUPERLU_FREE (marker_relax);
 
-    if(fact == SamePattern_SameRowPerm) {
-        /* L and U structures may have changed due to possibly different
-           pivoting, even though the storage is available.
-           There could also be memory expansions, so the array locations
-           may have changed, */
-        ((SCformat*)L->Store)->nnz = nnzL;
-        ((SCformat*)L->Store)->nsuper = Glu->supno[n];
-        ((SCformat*)L->Store)->nzval = (double*)Glu->lusup;
-        ((SCformat*)L->Store)->nzval_colptr = Glu->xlusup;
-        ((SCformat*)L->Store)->rowind = Glu->lsub;
-        ((SCformat*)L->Store)->rowind_colptr = Glu->xlsub;
-        ((NCformat*)U->Store)->nnz = nnzU;
-        ((NCformat*)U->Store)->nzval = (double*)Glu->ucol;
-        ((NCformat*)U->Store)->rowind = Glu->usub;
-        ((NCformat*)U->Store)->colptr = Glu->xusub;
-    }
-    else {
-        dCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL, (double*)Glu->lusup, Glu->xlusup, Glu->lsub, Glu->xlsub, Glu->supno, Glu->xsup, SLU_SC, SLU_D, SLU_TRLU);
-        dCreate_CompCol_Matrix(U, min_mn, min_mn, nnzU, (double*)Glu->ucol, Glu->usub, Glu->xusub, SLU_NC, SLU_D, SLU_TRU);
+    if ( fact == SamePattern_SameRowPerm ) {
+	/* L and U structures may have changed due to possibly different
+	   pivoting, even though the storage is available.
+	   There could also be memory expansions, so the array locations
+	   may have changed, */
+	((SCformat *)L->Store)->nnz = nnzL;
+	((SCformat *)L->Store)->nsuper = Glu->supno[n];
+	((SCformat *)L->Store)->nzval = (double *) Glu->lusup;
+	((SCformat *)L->Store)->nzval_colptr = Glu->xlusup;
+	((SCformat *)L->Store)->rowind = Glu->lsub;
+	((SCformat *)L->Store)->rowind_colptr = Glu->xlsub;
+	((NCformat *)U->Store)->nnz = nnzU;
+	((NCformat *)U->Store)->nzval = (double *) Glu->ucol;
+	((NCformat *)U->Store)->rowind = Glu->usub;
+	((NCformat *)U->Store)->colptr = Glu->xusub;
+    } else {
+	dCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL,
+              (double *) Glu->lusup, Glu->xlusup,
+              Glu->lsub, Glu->xlsub, Glu->supno, Glu->xsup,
+	      SLU_SC, SLU_D, SLU_TRLU);
+	dCreate_CompCol_Matrix(U, min_mn, min_mn, nnzU,
+	      (double *) Glu->ucol, Glu->usub, Glu->xusub,
+	      SLU_NC, SLU_D, SLU_TRU);
     }
 
     ops[FACT] += ops[TRSV] + ops[GEMV];
     stat->expansions = --(Glu->num_expansions);
 
-    if(iperm_r_allocated)
-        SUPERLU_FREE(iperm_r);
-    SUPERLU_FREE(iperm_c);
-    SUPERLU_FREE(relax_end);
-    SUPERLU_FREE(swap);
-    SUPERLU_FREE(iswap);
-    SUPERLU_FREE(relax_fsupc);
-    SUPERLU_FREE(amax);
-    if(dwork2)
-        SUPERLU_FREE(dwork2);
+    if ( iperm_r_allocated ) SUPERLU_FREE (iperm_r);
+    SUPERLU_FREE (iperm_c);
+    SUPERLU_FREE (relax_end);
+    SUPERLU_FREE (swap);
+    SUPERLU_FREE (iswap);
+    SUPERLU_FREE (relax_fsupc);
+    SUPERLU_FREE (amax);
+    if ( dwork2 ) SUPERLU_FREE (dwork2);
+
 }

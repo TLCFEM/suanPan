@@ -28,28 +28,31 @@ at the top-level directory.
  * </pre>
  */
 int mark_relax(
-    int n,            /* order of the matrix A */
-    int* relax_end,   /* last column in a relaxed supernode.
+	int n,		    /* order of the matrix A */
+	const int *relax_end,     /* last column in a relaxed supernode.
 			     * if j-th column starts a relaxed supernode,
 			     * relax_end[j] represents the last column of
 			     * this supernode. */
-    int* relax_fsupc, /* first column in a relaxed supernode.
+	const int *relax_fsupc,   /* first column in a relaxed supernode.
 			     * relax_fsupc[j] represents the first column of
 			     * j-th supernode. */
-    int_t* xa_begin,  /* Astore->colbeg */
-    int_t* xa_end,    /* Astore->colend */
-    int_t* asub,      /* row index of A */
-    int* marker       /* marker[j] is the maximum column index if j-th
-			     * row belongs to a relaxed supernode. */
-) {
+	const int_t *xa_begin,    /* Astore->colbeg */
+	const int_t *xa_end,	    /* Astore->colend */
+	const int_t *asub,	    /* row index of A */
+	int   *marker	    /* marker[j] is the maximum column index if j-th
+			     * row belongs to a relaxed supernode. */ )
+{
     register int jcol, kcol;
     register int_t i, j;
     int_t k;
 
-    for(i = 0; i < n && relax_fsupc[i] != EMPTY; i++) {
-        jcol = relax_fsupc[i];  /* first column */
-        kcol = relax_end[jcol]; /* last column */
-        for(j = jcol; j <= kcol; j++) for(k = xa_begin[j]; k < xa_end[j]; k++) marker[asub[k]] = jcol;
+    for (i = 0; i < n && relax_fsupc[i] != SLU_EMPTY; i++)
+    {
+	jcol = relax_fsupc[i];	/* first column */
+	kcol = relax_end[jcol]; /* last column */
+	for (j = jcol; j <= kcol; j++)
+	    for (k = xa_begin[j]; k < xa_end[j]; k++)
+		marker[asub[k]] = jcol;
     }
     return i;
 }

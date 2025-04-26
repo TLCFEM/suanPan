@@ -291,7 +291,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
 - [**VTK**](https://vtk.org/) version 9.4
 - [**argparse**](https://github.com/p-ranav/argparse)

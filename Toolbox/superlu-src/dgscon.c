@@ -13,10 +13,11 @@ at the top-level directory.
  * \brief Estimates reciprocal of the condition number of a general matrix
  * 
  * <pre>
- * -- SuperLU routine (version 5.0) --
+ * -- SuperLU routine (version 7.0.0) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
  * and Lawrence Berkeley National Lab.
  * July 25, 2015
+ * August 2024
  *
  * Modified from lapack routines DGECON.
  * </pre> 
@@ -37,7 +38,7 @@ at the top-level directory.
  *
  *   DGSCON estimates the reciprocal of the condition number of a general 
  *   real matrix A, in either the 1-norm or the infinity-norm, using   
- *   the LU factorization computed by DGETRF.   *
+ *   the LU factorization computed by DGSTRF.   *
  *
  *   An estimate is obtained for norm(inv(A)), and the reciprocal of the   
  *   condition number is computed as   
@@ -80,75 +81,91 @@ at the top-level directory.
  * </pre>
  */
 
-void dgscon(char* norm, SuperMatrix* L, SuperMatrix* U, double anorm, double* rcond, SuperLUStat_t* stat, int* info) {
+void
+dgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
+       double anorm, double *rcond, SuperLUStat_t *stat, int *info)
+{
+
+
     /* Local variables */
-    int kase, kase1, onenrm;
+    int    kase, kase1, onenrm;
     double ainvnm;
-    double* work;
-    int* iwork;
-    int isave[3];
-    extern int drscl_(int*, double*, double*, int*);
+    double *work;
+    int    *iwork;
+    int    isave[3];
+    extern int drscl_(int *, double *, double *, int *);
 
-    extern int dlacon2_(int*, double*, double*, int*, double*, int*, int []);
+    extern int dlacon2_(int *, double *, double *, int *, double *, int *, int []);
 
+    
     /* Test the input parameters. */
     *info = 0;
-    onenrm = *(unsigned char*)norm == '1' || strncmp(norm, "O", 1) == 0;
-    if(!onenrm && strncmp(norm, "I", 1) != 0) *info = -1;
-    else if(L->nrow < 0 || L->nrow != L->ncol || L->Stype != SLU_SC || L->Dtype != SLU_D || L->Mtype != SLU_TRLU) *info = -2;
-    else if(U->nrow < 0 || U->nrow != U->ncol || U->Stype != SLU_NC || U->Dtype != SLU_D || U->Mtype != SLU_TRU) *info = -3;
-    if(*info != 0) {
-        int ii = -(*info);
-        input_error("dgscon", &ii);
-        return;
+    onenrm = *(unsigned char *)norm == '1' || strncmp(norm, "O", 1)==0;
+    if (! onenrm && strncmp(norm, "I", 1)!=0) *info = -1;
+    else if (L->nrow < 0 || L->nrow != L->ncol ||
+             L->Stype != SLU_SC || L->Dtype != SLU_D || L->Mtype != SLU_TRLU)
+	 *info = -2;
+    else if (U->nrow < 0 || U->nrow != U->ncol ||
+             U->Stype != SLU_NC || U->Dtype != SLU_D || U->Mtype != SLU_TRU) 
+	*info = -3;
+    if (*info != 0) {
+	int ii = -(*info);
+	input_error("dgscon", &ii);
+	return;
     }
 
     /* Quick return if possible */
     *rcond = 0.;
-    if(L->nrow == 0 || U->nrow == 0) {
-        *rcond = 1.;
-        return;
+    if ( L->nrow == 0 || U->nrow == 0) {
+	*rcond = 1.;
+	return;
     }
 
-    work = doubleCalloc(3 * L->nrow);
-    iwork = int32Malloc(L->nrow);
+    work = doubleCalloc( 3*L->nrow );
+    iwork = int32Malloc( L->nrow );
 
-    if(!work || !iwork) ABORT("Malloc fails for work arrays in dgscon.");
 
+    if ( !work || !iwork )
+	ABORT("Malloc fails for work arrays in dgscon.");
+    
     /* Estimate the norm of inv(A). */
     ainvnm = 0.;
-    if(onenrm) kase1 = 1;
+    if ( onenrm ) kase1 = 1;
     else kase1 = 2;
     kase = 0;
 
     int nrow = L->nrow;
 
     do {
-        dlacon2_(&nrow, &work[L->nrow], &work[0], &iwork[0], &ainvnm, &kase, isave);
+	dlacon2_(&nrow, &work[L->nrow], &work[0], &iwork[0], &ainvnm, &kase, isave);
 
-        if(kase == 0) break;
+	if (kase == 0) break;
 
-        if(kase == kase1) {
-            /* Multiply by inv(L). */
-            sp_dtrsv("L", "No trans", "Unit", L, U, &work[0], stat, info);
+	if (kase == kase1) {
+	    /* Multiply by inv(L). */
+	    sp_dtrsv("L", "No trans", "Unit", L, U, &work[0], stat, info);
 
-            /* Multiply by inv(U). */
-            sp_dtrsv("U", "No trans", "Non-unit", L, U, &work[0], stat, info);
-        }
-        else {
-            /* Multiply by inv(U'). */
-            sp_dtrsv("U", "Transpose", "Non-unit", L, U, &work[0], stat, info);
+	    /* Multiply by inv(U). */
+	    sp_dtrsv("U", "No trans", "Non-unit", L, U, &work[0], stat, info);
+	    
+	} else {
 
-            /* Multiply by inv(L'). */
-            sp_dtrsv("L", "Transpose", "Unit", L, U, &work[0], stat, info);
-        }
-    }
-    while(kase != 0);
+	    /* Multiply by inv(U'). */
+	    sp_dtrsv("U", "Transpose", "Non-unit", L, U, &work[0], stat, info);
+
+	    /* Multiply by inv(L'). */
+	    sp_dtrsv("L", "Transpose", "Unit", L, U, &work[0], stat, info);
+	    
+	}
+
+    } while ( kase != 0 );
 
     /* Compute the estimate of the reciprocal condition number. */
-    if(ainvnm != 0.) *rcond = (1. / ainvnm) / anorm;
+    if (ainvnm != 0.) *rcond = (1. / ainvnm) / anorm;
 
-    SUPERLU_FREE(work);
-    SUPERLU_FREE(iwork);
+    SUPERLU_FREE (work);
+    SUPERLU_FREE (iwork);
     return;
+
 } /* dgscon */
+

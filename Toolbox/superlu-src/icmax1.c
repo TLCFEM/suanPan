@@ -51,13 +51,14 @@ at the top-level directory.
    ===================================================================== 
   </pre>
 */
-int icmax1_slu(int* n, complex* cx, int* incx) {
-    /*
-           NEXT LINE IS THE ONLY MODIFICATION.   
+int icmax1_slu(int *n, singlecomplex *cx, int *incx)
+{
+/*
+       NEXT LINE IS THE ONLY MODIFICATION.   
+
     
-        
-       Parameter adjustments   
-           Function Body */
+   Parameter adjustments   
+       Function Body */
     /* System generated locals */
     int ret_val;
     float r__1;
@@ -65,38 +66,55 @@ int icmax1_slu(int* n, complex* cx, int* incx) {
     float smax;
     int i, ix;
 
+
 #define CX(I) cx[(I)-1]
 
-    ret_val = 0;
-    if(*n < 1) { return ret_val; }
-    ret_val = 1;
-    if(*n == 1) { return ret_val; }
-    if(*incx == 1) { goto L30; }
 
-    /*     CODE FOR INCREMENT NOT EQUAL TO 1 */
+    ret_val = 0;
+    if (*n < 1) {
+	return ret_val;
+    }
+    ret_val = 1;
+    if (*n == 1) {
+	return ret_val;
+    }
+    if (*incx == 1) {
+	goto L30;
+    }
+
+/*     CODE FOR INCREMENT NOT EQUAL TO 1 */
 
     ix = 1;
     smax = (r__1 = CX(1).r, fabs(r__1));
     ix += *incx;
-    for(i = 2; i <= *n; ++i) {
-        if((r__1 = CX(ix).r, fabs(r__1)) <= smax) { goto L10; }
-        ret_val = i;
-        smax = (r__1 = CX(ix).r, fabs(r__1));
-    L10: ix += *incx;
-        /* L20: */
+    for (i = 2; i <= *n; ++i) {
+	if ((r__1 = CX(ix).r, fabs(r__1)) <= smax) {
+	    goto L10;
+	}
+	ret_val = i;
+	smax = (r__1 = CX(ix).r, fabs(r__1));
+L10:
+	ix += *incx;
+/* L20: */
     }
     return ret_val;
 
-    /*     CODE FOR INCREMENT EQUAL TO 1 */
+/*     CODE FOR INCREMENT EQUAL TO 1 */
 
-L30: smax = (r__1 = CX(1).r, fabs(r__1));
-    for(i = 2; i <= *n; ++i) {
-        if((r__1 = CX(i).r, fabs(r__1)) <= smax) { goto L40; }
-        ret_val = i;
-        smax = (r__1 = CX(i).r, fabs(r__1));
-    L40: ;
+L30:
+    smax = (r__1 = CX(1).r, fabs(r__1));
+    for (i = 2; i <= *n; ++i) {
+	if ((r__1 = CX(i).r, fabs(r__1)) <= smax) {
+	    goto L40;
+	}
+	ret_val = i;
+	smax = (r__1 = CX(i).r, fabs(r__1));
+L40:
+	;
     }
     return ret_val;
 
-    /*     End of ICMAX1 */
+/*     End of ICMAX1 */
+
 } /* icmax1_slu */
+

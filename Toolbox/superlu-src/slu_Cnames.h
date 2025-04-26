@@ -29,6 +29,7 @@ at the top-level directory.
 #ifndef __SUPERLU_CNAMES /* allow multiple inclusions */
 #define __SUPERLU_CNAMES
 
+
 #define ADD_       0
 #define ADD__      1
 #define NOCHANGE   2
@@ -60,6 +61,7 @@ at the top-level directory.
 #ifndef F77_CALL_C
 #define F77_CALL_C  ADD_
 #endif
+
 
 #if (F77_CALL_C == ADD_)
 /*
@@ -118,6 +120,8 @@ at the top-level directory.
 #define dgemm_    dgemm__
 #define dtrsm_    dtrsm__
 
+#define cdotc_    cdotc__
+#define dcabs1_   dcabs1__
 #define cswap_    cswap__
 #define caxpy_    caxpy__
 #define scasum_   scasum__
@@ -134,6 +138,7 @@ at the top-level directory.
 #define chemv_    chemv__
 #define cher2_    cher2__
 
+#define zdotc_    zdotc__
 #define zswap_    zswap__
 #define zaxpy_    zaxpy__
 #define dzasum_   dzasum__
@@ -260,6 +265,7 @@ at the top-level directory.
 #define c_fortran_zgssv_ C_FORTRAN_ZGSSV
 #endif
 
+
 #if (F77_CALL_C == OLD_CRAY)
 /*
  * These defines set up the naming scheme required to have a fortran 77
@@ -352,6 +358,7 @@ at the top-level directory.
 #define c_fortran_zgssv_ C_FORTRAN_ZGSSV
 #endif
 
+
 #if (F77_CALL_C == NOCHANGE)
 /*
  * These defines set up the naming scheme required to have a fortran 77
@@ -443,5 +450,6 @@ at the top-level directory.
 #define c_fortran_cgssv_ c_fortran_cgssv
 #define c_fortran_zgssv_ c_fortran_zgssv
 #endif
+
 
 #endif /* __SUPERLU_CNAMES */

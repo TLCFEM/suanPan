@@ -85,12 +85,14 @@ at the top-level directory.
  * </pre>
  */
 
-int slacon2_(int* n, float* v, float* x, int* isgn, float* est, int* kase, int isave[3]) {
+int
+slacon2_(int *n, float *v, float *x, int *isgn, float *est, int *kase, int isave[3])
+{
     /* Table of constant values */
     int c__1 = 1;
-    float zero = 0.0;
-    float one = 1.0;
-
+    float      zero = 0.0;
+    float      one = 1.0;
+    
     /* Local variables */
     int jlast;
     float altsgn, estold;
@@ -101,41 +103,39 @@ int slacon2_(int* n, float* v, float* x, int* isgn, float* est, int* kase, int i
     extern float SASUM(int *, float *, int *);
     extern int SCOPY(int *, float *, int *, float *, int *);
 #else
-    extern int isamax_(int*, float*, int*);
-    extern float sasum_(int*, float*, int*);
-    extern int scopy_(int*, float*, int*, float*, int*);
+    extern int isamax_(int *, float *, int *);
+    extern float sasum_(int *, float *, int *);
+    extern void scopy_(int *, float *, int *, float *, int *);
 #endif
 #define d_sign(a, b) (b >= 0 ? fabs(a) : -fabs(a))    /* Copy sign */
 #define i_dnnt(a) \
 	( a>=0 ? floor(a+.5) : -floor(.5-a) ) /* Round to nearest integer */
 
-    if(*kase == 0) {
-        for(i = 0; i < *n; ++i) { x[i] = 1. / (float)(*n); }
-        *kase = 1;
-        isave[0] = 1; /* jump = 1; */
-        return 0;
+    if ( *kase == 0 ) {
+	for (i = 0; i < *n; ++i) {
+	    x[i] = 1. / (float) (*n);
+	}
+	*kase = 1;
+	isave[0] = 1;	/* jump = 1; */
+	return 0;
     }
 
-    switch(isave[0]) {
-    case 1:
-        goto L20;
-    case 2:
-        goto L40;
-    case 3:
-        goto L70;
-    case 4:
-        goto L110;
-    case 5:
-        goto L140;
+    switch (isave[0]) {
+	case 1:  goto L20;
+	case 2:  goto L40;
+	case 3:  goto L70;
+	case 4:  goto L110;
+	case 5:  goto L140;
     }
 
     /*     ................ ENTRY   (isave[0] == 1)   
 	   FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X. */
-L20: if(*n == 1) {
-        v[0] = x[0];
-        *est = fabs(v[0]);
-        /*        ... QUIT */
-        goto L150;
+  L20:
+    if (*n == 1) {
+	v[0] = x[0];
+	*est = fabs(v[0]);
+	/*        ... QUIT */
+	goto L150;
     }
 #ifdef _CRAY
     *est = SASUM(n, x, &c__1);
@@ -143,12 +143,12 @@ L20: if(*n == 1) {
     *est = sasum_(n, x, &c__1);
 #endif
 
-    for(i = 0; i < *n; ++i) {
-        x[i] = d_sign(one, x[i]);
-        isgn[i] = i_dnnt(x[i]);
+    for (i = 0; i < *n; ++i) {
+	x[i] = d_sign(one, x[i]);
+	isgn[i] = i_dnnt(x[i]);
     }
     *kase = 2;
-    isave[0] = 2; /* jump = 2; */
+    isave[0] = 2;  /* jump = 2; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 2)   
@@ -157,16 +157,17 @@ L40:
 #ifdef _CRAY
     isave[1] = ISAMAX(n, &x[0], &c__1);  /* j */
 #else
-    isave[1] = isamax_(n, &x[0], &c__1); /* j */
+    isave[1] = isamax_(n, &x[0], &c__1);  /* j */
 #endif
-    --isave[1];   /* --j; */
+    --isave[1];  /* --j; */
     isave[2] = 2; /* iter = 2; */
 
     /*     MAIN LOOP - ITERATIONS 2,3,...,ITMAX. */
-L50: for(i = 0; i < *n; ++i) x[i] = zero;
+L50:
+    for (i = 0; i < *n; ++i) x[i] = zero;
     x[isave[1]] = one;
     *kase = 1;
-    isave[0] = 3; /* jump = 3; */
+    isave[0] = 3;  /* jump = 3; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 3)   
@@ -184,47 +185,51 @@ L70:
     *est = sasum_(n, v, &c__1);
 #endif
 
-    for(i = 0; i < *n; ++i) if(i_dnnt(d_sign(one, x[i])) != isgn[i]) goto L90;
+    for (i = 0; i < *n; ++i)
+	if (i_dnnt(d_sign(one, x[i])) != isgn[i])
+	    goto L90;
 
     /*     REPEATED SIGN VECTOR DETECTED, HENCE ALGORITHM HAS CONVERGED. */
     goto L120;
 
 L90:
     /*     TEST FOR CYCLING. */
-    if(*est <= estold) goto L120;
+    if (*est <= estold) goto L120;
 
-    for(i = 0; i < *n; ++i) {
-        x[i] = d_sign(one, x[i]);
-        isgn[i] = i_dnnt(x[i]);
+    for (i = 0; i < *n; ++i) {
+	x[i] = d_sign(one, x[i]);
+	isgn[i] = i_dnnt(x[i]);
     }
     *kase = 2;
-    isave[0] = 4; /* jump = 4; */
+    isave[0] = 4;  /* jump = 4; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 4)
-	   X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X. */
-L110: jlast = isave[1]; /* j; */
+	   X HAS BEEN OVERWRITTEN BY TRANSPOSE(A)*X. */
+L110:
+    jlast = isave[1];  /* j; */
 #ifdef _CRAY
     isave[1] = ISAMAX(n, &x[0], &c__1);/* j */
 #else
-    isave[1] = isamax_(n, &x[0], &c__1); /* j */
+    isave[1] = isamax_(n, &x[0], &c__1);  /* j */
 #endif
-    isave[1] = isave[1] - 1; /* --j; */
-    if(x[jlast] != fabs(x[isave[1]]) && isave[2] < 5) {
-        isave[2] = isave[2] + 1; /* ++iter; */
-        goto L50;
+    isave[1] = isave[1] - 1;  /* --j; */
+    if (x[jlast] != fabs(x[isave[1]]) && isave[2] < 5) {
+	isave[2] = isave[2] + 1;  /* ++iter; */
+	goto L50;
     }
 
     /*     ITERATION COMPLETE.  FINAL STAGE. */
-L120: altsgn = 1.;
-    for(i = 1; i <= *n; ++i) {
-        x[i - 1] = altsgn * ((float)(i - 1) / (float)(*n - 1) + 1.);
-        altsgn = -altsgn;
+L120:
+    altsgn = 1.;
+    for (i = 1; i <= *n; ++i) {
+	x[i-1] = altsgn * ((float)(i - 1) / (float)(*n - 1) + 1.);
+	altsgn = -altsgn;
     }
     *kase = 1;
-    isave[0] = 5; /* jump = 5; */
+    isave[0] = 5;  /* jump = 5; */
     return 0;
-
+    
     /*     ................ ENTRY   (isave[0] = 5)   
 	   X HAS BEEN OVERWRITTEN BY A*X. */
 L140:
@@ -233,15 +238,17 @@ L140:
 #else
     temp = sasum_(n, x, &c__1) / (float)(*n * 3) * 2.;
 #endif
-    if(temp > *est) {
+    if (temp > *est) {
 #ifdef _CRAY
 	SCOPY(n, &x[0], &c__1, &v[0], &c__1);
 #else
-        scopy_(n, &x[0], &c__1, &v[0], &c__1);
+	scopy_(n, &x[0], &c__1, &v[0], &c__1);
 #endif
-        *est = temp;
+	*est = temp;
     }
 
-L150: *kase = 0;
+L150:
+    *kase = 0;
     return 0;
+
 } /* slacon2_ */

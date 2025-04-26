@@ -47,11 +47,11 @@ at the top-level directory.
  *   N      (input) INT
  *          The order of the matrix.  N >= 1.   
  *
- *   V      (workspace) COMPLEX PRECISION array, dimension (N)   
+ *   V      (workspace) SINGLE COMPLEX PRECISION array, dimension (N)   
  *          On the final return, V = A*W,  where  EST = norm(V)/norm(W)   
  *          (W is not returned).   
  *
- *   X      (input/output) COMPLEX PRECISION array, dimension (N)   
+ *   X      (input/output) SINGLE COMPLEX PRECISION array, dimension (N)   
  *          On an intermediate return, X should be overwritten by   
  *                A * X,   if KASE=1,   
  *                A' * X,  if KASE=2,
@@ -86,84 +86,85 @@ at the top-level directory.
  * </pre>
  */
 
-int clacon2_(int* n, complex* v, complex* x, float* est, int* kase, int isave[3]) {
+int
+clacon2_(int *n, singlecomplex *v, singlecomplex *x, float *est, int *kase, int isave[3])
+{
     /* Table of constant values */
     int c__1 = 1;
-    complex zero = {0.0, 0.0};
-    complex one = {1.0, 0.0};
+    singlecomplex      zero = {0.0, 0.0};
+    singlecomplex      one = {1.0, 0.0};
 
     /* System generated locals */
     float d__1;
-
+    
     /* Local variables */
     int jlast;
     float altsgn, estold;
     int i;
     float temp;
     float safmin;
-    extern float smach(char*);
-    extern int icmax1_slu(int*, complex*, int*);
-    extern double scsum1_slu(int*, complex*, int*);
-    extern int ccopy_(int*, complex*, int*, complex*, int*);
+    extern float smach(char *);
+    extern int icmax1_slu(int *, singlecomplex *, int *);
+    extern double scsum1_slu(int *, singlecomplex *, int *);
+    extern void ccopy_(int *, singlecomplex *, int *, singlecomplex *, int *);
 
     safmin = smach("Safe minimum");
-    if(*kase == 0) {
-        for(i = 0; i < *n; ++i) {
-            x[i].r = 1. / (float)(*n);
-            x[i].i = 0.;
-        }
-        *kase = 1;
-        isave[0] = 1; /* jump = 1; */
-        return 0;
+    if ( *kase == 0 ) {
+	for (i = 0; i < *n; ++i) {
+	    x[i].r = 1. / (float) (*n);
+	    x[i].i = 0.;
+	}
+	*kase = 1;
+	isave[0] = 1;	/* jump = 1; */
+	return 0;
     }
 
-    switch(isave[0]) {
-    case 1:
-        goto L20;
-    case 2:
-        goto L40;
-    case 3:
-        goto L70;
-    case 4:
-        goto L110;
-    case 5:
-        goto L140;
+    switch (isave[0]) {
+	case 1:  goto L20;
+	case 2:  goto L40;
+	case 3:  goto L70;
+	case 4:  goto L110;
+	case 5:  goto L140;
     }
 
     /*     ................ ENTRY   (isave[0] == 1)   
 	   FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X. */
-L20: if(*n == 1) {
-        v[0] = x[0];
-        *est = c_abs(&v[0]);
-        /*        ... QUIT */
-        goto L150;
+  L20:
+    if (*n == 1) {
+	v[0] = x[0];
+	*est = c_abs(&v[0]);
+	/*        ... QUIT */
+	goto L150;
     }
     *est = scsum1_slu(n, x, &c__1);
 
-    for(i = 0; i < *n; ++i) {
-        d__1 = c_abs(&x[i]);
-        if(d__1 > safmin) {
-            d__1 = 1 / d__1;
-            x[i].r *= d__1;
-            x[i].i *= d__1;
-        }
-        else { x[i] = one; }
+    for (i = 0; i < *n; ++i) {
+	d__1 = c_abs(&x[i]);
+	if (d__1 > safmin) {
+	    d__1 = 1 / d__1;
+	    x[i].r *= d__1;
+	    x[i].i *= d__1;
+	} else {
+	    x[i] = one;
+	}
     }
     *kase = 2;
-    isave[0] = 2; /* jump = 2; */
+    isave[0] = 2;  /* jump = 2; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 2)   
 	   FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY TRANSPOSE(A)*X. */
-L40: isave[1] = icmax1_slu(n, &x[0], &c__1); /* j */
-    --isave[1];                              /* --j; */
-    isave[2] = 2;                            /* iter = 2; */
+L40:
+    isave[1] = icmax1_slu(n, &x[0], &c__1);  /* j */
+    --isave[1];  /* --j; */
+    isave[2] = 2; /* iter = 2; */
 
     /*     MAIN LOOP - ITERATIONS 2,3,...,ITMAX. */
-L50: for(i = 0; i < *n; ++i) x[i] = zero;
+L50:
+    for (i = 0; i < *n; ++i) x[i] = zero;
     x[isave[1]] = one;
     *kase = 1;
-    isave[0] = 3; /* jump = 3; */
+    isave[0] = 3;  /* jump = 3; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 3)   
@@ -177,56 +178,63 @@ L70:
     estold = *est;
     *est = scsum1_slu(n, v, &c__1);
 
-    /* L90: */
-    /*     TEST FOR CYCLING. */
-    if(*est <= estold) goto L120;
 
-    for(i = 0; i < *n; ++i) {
-        d__1 = c_abs(&x[i]);
-        if(d__1 > safmin) {
-            d__1 = 1 / d__1;
-            x[i].r *= d__1;
-            x[i].i *= d__1;
-        }
-        else { x[i] = one; }
+L90:
+    /*     TEST FOR CYCLING. */
+    if (*est <= estold) goto L120;
+
+    for (i = 0; i < *n; ++i) {
+	d__1 = c_abs(&x[i]);
+	if (d__1 > safmin) {
+	    d__1 = 1 / d__1;
+	    x[i].r *= d__1;
+	    x[i].i *= d__1;
+	} else {
+	    x[i] = one;
+	}
     }
     *kase = 2;
-    isave[0] = 4; /* jump = 4; */
+    isave[0] = 4;  /* jump = 4; */
     return 0;
 
     /*     ................ ENTRY   (isave[0] == 4)
-	   X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X. */
-L110: jlast = isave[1];                     /* j; */
+	   X HAS BEEN OVERWRITTEN BY TRANSPOSE(A)*X. */
+L110:
+    jlast = isave[1];  /* j; */
     isave[1] = icmax1_slu(n, &x[0], &c__1); /* j */
-    isave[1] = isave[1] - 1;                /* --j; */
-    if(x[jlast].r != (d__1 = x[isave[1]].r, fabs(d__1)) && isave[2] < 5) {
-        isave[2] = isave[2] + 1; /* ++iter; */
-        goto L50;
+    isave[1] = isave[1] - 1;  /* --j; */
+    if (x[jlast].r != (d__1 = x[isave[1]].r, fabs(d__1)) && isave[2] < 5) {
+	isave[2] = isave[2] + 1;  /* ++iter; */
+	goto L50;
     }
 
     /*     ITERATION COMPLETE.  FINAL STAGE. */
-L120: altsgn = 1.;
-    for(i = 1; i <= *n; ++i) {
-        x[i - 1].r = altsgn * ((float)(i - 1) / (float)(*n - 1) + 1.);
-        x[i - 1].i = 0.;
-        altsgn = -altsgn;
+L120:
+    altsgn = 1.;
+    for (i = 1; i <= *n; ++i) {
+	x[i-1].r = altsgn * ((float)(i - 1) / (float)(*n - 1) + 1.);
+	x[i-1].i = 0.;
+	altsgn = -altsgn;
     }
     *kase = 1;
-    isave[0] = 5; /* jump = 5; */
+    isave[0] = 5;  /* jump = 5; */
     return 0;
-
+    
     /*     ................ ENTRY   (isave[0] = 5)   
 	   X HAS BEEN OVERWRITTEN BY A*X. */
-L140: temp = scsum1_slu(n, x, &c__1) / (float)(*n * 3) * 2.;
-    if(temp > *est) {
+L140:
+    temp = scsum1_slu(n, x, &c__1) / (float)(*n * 3) * 2.;
+    if (temp > *est) {
 #ifdef _CRAY
 	CCOPY(n, &x[0], &c__1, &v[0], &c__1);
 #else
-        ccopy_(n, &x[0], &c__1, &v[0], &c__1);
+	ccopy_(n, &x[0], &c__1, &v[0], &c__1);
 #endif
-        *est = temp;
+	*est = temp;
     }
 
-L150: *kase = 0;
+L150:
+    *kase = 0;
     return 0;
+
 } /* clacon2_ */
