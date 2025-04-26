@@ -4,9 +4,6 @@
 /* Enable metis */
 /* #undef HAVE_METIS */
 
-/* Enable colamd */
-/* #undef HAVE_COLAMD */
-
 /* enable 64bit index mode */
 // #define XSDK_INDEX_SIZE 64
 

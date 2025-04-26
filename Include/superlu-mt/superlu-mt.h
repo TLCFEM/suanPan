@@ -1,11 +1,13 @@
 #ifndef SUPERLU_MT_H
 #define SUPERLU_MT_H
 
-#ifdef SP_ENABLE_64BIT_INDEXING
-typedef long long superlu_int_t;
-#else
+// superlu still needs lp64 version of BLAS
+// #ifdef SUANSPAN_64BIT_INT
+// typedef long long superlu_int_t;
+// #else
+// typedef int superlu_int_t;
+// #endif
 typedef int superlu_int_t;
-#endif
 typedef float flops_t;
 
 #ifndef SUANPAN_SUPERLUMT
