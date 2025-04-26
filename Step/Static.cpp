@@ -47,19 +47,19 @@ int Static::initialize() {
 
     // solver
     // automatically enable displacement controlled solver
-    auto flag = false;
-    for(const auto& I : t_domain->get_load_pool())
-        if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
-            flag = true;
-            break;
-        }
+    const auto has_disp = std::ranges::any_of(t_domain->get_load_pool(), [&](const shared_ptr<Load>& I) { return I->if_displacement_control() && I->get_start_step() == get_tag(); });
+
     if(nullptr == solver) {
-        if(flag) solver = std::make_shared<MPDC>();
+        if(has_disp) solver = std::make_shared<MPDC>();
         else solver = std::make_shared<Newton>();
     }
-    else if(flag && nullptr == std::dynamic_pointer_cast<MPDC>(solver)) {
-        suanpan_warning("Wrong solver assigned, using MPDC instead.\n");
+    else if(const auto disp_solver = std::dynamic_pointer_cast<MPDC>(solver); has_disp && !disp_solver) {
+        suanpan_warning("The current step contains active displacement load(s), automatically switching to the displacement-controlled solver.\n");
         solver = std::make_shared<MPDC>();
+    }
+    else if(!has_disp && disp_solver) {
+        suanpan_warning("The current step contains no active displacement load(s), automatically switching to the force-controlled solver.\n");
+        solver = std::make_shared<Newton>();
     }
 
     solver->set_integrator(modifier);

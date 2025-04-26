@@ -1,0 +1,39 @@
+# A TEST MODEL FOR NEWTON MATERIAL
+
+node 1 0 0
+node 2 4 0
+node 3 0 -3
+
+material MPF 1 100 5 .1
+material MPF 2 100 5 .1 20. 18.5 .15 .01 7. true
+
+element T2D2 1 1 2 1 10
+element T2D2 2 3 2 2 10
+
+fix 1 P 1 3
+
+step static 1
+# automatic switch to Newton due to lack of displacement loads
+solver MPDC 1
+set ini_step_size .1
+
+cload 1 0 100 2 2
+
+converger RelIncreDisp 1 1E-10 4 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   4.0000e+00  0.0000e+00
+# Displacement:
+#  -3.5333e+00  1.4850e+01
+# Resistance:
+#  -5.6843e-14  1.0000e+02
+peek node 2
+
+peek solver 1
+
+reset
+clear
+exit

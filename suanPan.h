@@ -397,6 +397,8 @@ namespace std::ranges {
 
     template<class IN, class FN> FN for_each(IN& from, FN&& func) { return std::for_each(from.begin(), from.end(), std::forward<FN>(func)); }
 
+    template<class IN, class FN> bool any_of(const IN& from, FN&& func) { return std::any_of(from.cbegin(), from.cend(), std::forward<FN>(func)); }
+
     template<class IN, class OUT> OUT copy(IN& from, OUT to) { return std::copy(from.begin(), from.end(), to); }
 } // namespace std::ranges
 #endif
