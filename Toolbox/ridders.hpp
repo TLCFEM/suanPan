@@ -20,6 +20,21 @@
 
 #include <suanPan.h>
 
+/**
+ * @brief Implements Ridders' method for finding the root of a function.
+ *
+ * Ridders' method is a root-finding algorithm that combines the bisection method
+ * with an exponential interpolation to achieve quadratic convergence under ideal conditions.
+ *
+ * @tparam T A callable type that takes a double as input and returns a double.
+ * @param func The function for which the root is to be found. It must be callable with a double argument.
+ * @param x1 The first initial guess for the root.
+ * @param f1 The value of the function at x1 (i.e., func(x1)).
+ * @param x2 The second initial guess for the root.
+ * @param f2 The value of the function at x2 (i.e., func(x2)).
+ * @param tolerance The tolerance for the root-finding process.
+ * @return The estimated root of the function within the specified tolerance.
+ */
 template<std::invocable<double> T> double ridders(const T& func, double x1, double f1, double x2, double f2, const double tolerance) {
     double target;
 
