@@ -295,7 +295,6 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
 - [**VTK**](https://vtk.org/) version 9.4
 - [**argparse**](https://github.com/p-ranav/argparse)
-- [**ensmallen**](https://ensmallen.org/) version 2.21.1
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
