@@ -1,6 +1,7 @@
 #include "CatchHeader.h"
 
 #include <Toolbox/LBFGS.hpp>
+#include <Toolbox/brent.hpp>
 #include <Toolbox/ridders.hpp>
 
 class Quadratic {
@@ -26,4 +27,12 @@ TEST_CASE("Ridders Solver", "[Utility.Solver]") {
     const auto root = ridders(fn, 0., fn(0.), 4., fn(4.), datum::eps);
 
     REQUIRE_THAT(fn(root), Catch::Matchers::WithinAbs(0., datum::eps));
+}
+
+TEST_CASE("Brent Solver", "[Utility.Solver]") {
+    auto fn = [](const double x) { return std::pow(x - 1., 3); };
+
+    const auto root = brent(fn, 0., 4., 1E-12);
+
+    REQUIRE_THAT(fn(root), Catch::Matchers::WithinAbs(0., 1E-12));
 }
