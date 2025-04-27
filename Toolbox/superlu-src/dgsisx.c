@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -29,11 +29,11 @@ at the top-level directory.
  *
  * DGSISX computes an approximate solutions of linear equations
  * A*X=B or A'*X=B, using the ILU factorization from dgsitrf().
- * An estimation of the condition number is provided. 
+ * An estimation of the condition number is provided.
  * The routine performs the following steps:
  *
  *   1. If A is stored column-wise (A->Stype = SLU_NC):
- *  
+ *
  *	1.1. If options->Equil = YES or options->RowPerm = LargeDiag_MC64, scaling
  *	     factors are computed to equilibrate the system:
  *	     options->Trans = NOTRANS:
@@ -226,7 +226,7 @@ at the top-level directory.
  *
  *         If options->RowPerm = LargeDiag_MC64, MC64 is used to scale and permute
  *            the matrix to an I-matrix, that is A is modified as follows:
- *            P*Dr*A*Dc has entries of modulus 1 on the diagonal and 
+ *            P*Dr*A*Dc has entries of modulus 1 on the diagonal and
  *            off-diagonal entries of modulus at most 1. P is a permutation
  *            obtained from MC64.
  *            If MC64 fails, dgsequ() is used to equilibrate the system,
@@ -244,11 +244,11 @@ at the top-level directory.
  *	   is already in postorder.
  *
  *	   If A->Stype = SLU_NR, column permutation vector of size A->nrow,
- *	   which describes permutation of columns of transpose(A) 
+ *	   which describes permutation of columns of transpose(A)
  *	   (rows of A) as described above.
  *
  * perm_r  (input/output) int*
- *	   If A->Stype = SLU_NC, row permutation vector of size A->nrow, 
+ *	   If A->Stype = SLU_NC, row permutation vector of size A->nrow,
  *	   which defines the permutation matrix Pr, and is determined
  *	   by MC64 first then followed by partial pivoting.
  *         perm_r[i] = j means row i of A is in position j in Pr*A.
@@ -276,7 +276,7 @@ at the top-level directory.
  *	   = 'N': No equilibration.
  *	   = 'R': Row equilibration, i.e., A was premultiplied by diag(R).
  *	   = 'C': Column equilibration, i.e., A was postmultiplied by diag(C).
- *	   = 'B': Both row and column equilibration, i.e., A was replaced 
+ *	   = 'B': Both row and column equilibration, i.e., A was replaced
  *		  by diag(R)*A*diag(C).
  *	   If options->Fact = FACTORED, equed is an input argument,
  *	   otherwise it is an output argument.
@@ -400,336 +400,329 @@ at the top-level directory.
  * </pre>
  */
 
-void
-dgsisx(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
-       int *etree, char *equed, double *R, double *C,
-       SuperMatrix *L, SuperMatrix *U, void *work, int_t lwork,
-       SuperMatrix *B, SuperMatrix *X,
-       double *recip_pivot_growth, double *rcond,
-       GlobalLU_t *Glu, mem_usage_t *mem_usage, SuperLUStat_t *stat, int_t *info)
-{
+void dgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r, int* etree, char* equed, double* R, double* C, SuperMatrix* L, SuperMatrix* U, void* work, int_t lwork, SuperMatrix* B, SuperMatrix* X, double* recip_pivot_growth, double* rcond, GlobalLU_t* Glu, mem_usage_t* mem_usage, SuperLUStat_t* stat, int_t* info) {
+    DNformat *Bstore, *Xstore;
+    double *Bmat, *Xmat;
+    int ldb, ldx, nrhs, n;
+    SuperMatrix* AA; /* A in SLU_NC format used by the factorization routine.*/
+    SuperMatrix AC;  /* Matrix postmultiplied by Pc */
+    int colequ, equil, nofact, notran, rowequ, permc_spec, mc64;
+    trans_t trant;
+    char norm[1];
+    int_t i, j;
+    double amax, anorm, bignum, smlnum, colcnd, rowcnd, rcmax, rcmin;
+    int relax, panel_size, info1;
+    double t0; /* temporary time */
+    double* utime;
 
-    DNformat  *Bstore, *Xstore;
-    double    *Bmat, *Xmat;
-    int       ldb, ldx, nrhs, n;
-    SuperMatrix *AA;/* A in SLU_NC format used by the factorization routine.*/
-    SuperMatrix AC; /* Matrix postmultiplied by Pc */
-    int       colequ, equil, nofact, notran, rowequ, permc_spec, mc64;
-    trans_t   trant;
-    char      norm[1];
-    int_t     i, j;
-    double    amax, anorm, bignum, smlnum, colcnd, rowcnd, rcmax, rcmin;
-    int       relax, panel_size, info1;
-    double    t0;      /* temporary time */
-    double    *utime;
-
-    int *perm = NULL; /* permutation returned from MC64 */
+    int* perm = NULL; /* permutation returned from MC64 */
 
     /* External functions */
-    extern double dlangs(char *, SuperMatrix *);
+    extern double dlangs(char*, SuperMatrix*);
 
     Bstore = B->Store;
     Xstore = X->Store;
-    Bmat   = Bstore->nzval;
-    Xmat   = Xstore->nzval;
-    ldb    = Bstore->lda;
-    ldx    = Xstore->lda;
-    nrhs   = B->ncol;
-    n      = B->nrow;
+    Bmat = Bstore->nzval;
+    Xmat = Xstore->nzval;
+    ldb = Bstore->lda;
+    ldx = Xstore->lda;
+    nrhs = B->ncol;
+    n = B->nrow;
 
     *info = 0;
     nofact = (options->Fact != FACTORED);
     equil = (options->Equil == YES);
     notran = (options->Trans == NOTRANS);
     mc64 = (options->RowPerm == LargeDiag_MC64);
-    if ( nofact ) {
-	*(unsigned char *)equed = 'N';
-	rowequ = FALSE;
-	colequ = FALSE;
-    } else {
-	rowequ = strncmp(equed, "R", 1)==0 || strncmp(equed, "B", 1)==0;
-	colequ = strncmp(equed, "C", 1)==0 || strncmp(equed, "B", 1)==0;
-	smlnum = dmach("Safe minimum");  /* lamch_("Safe minimum"); */
-	bignum = 1. / smlnum;
+    if(nofact) {
+        *(unsigned char*)equed = 'N';
+        rowequ = FALSE;
+        colequ = FALSE;
+    }
+    else {
+        rowequ = strncmp(equed, "R", 1) == 0 || strncmp(equed, "B", 1) == 0;
+        colequ = strncmp(equed, "C", 1) == 0 || strncmp(equed, "B", 1) == 0;
+        smlnum = dmach("Safe minimum"); /* lamch_("Safe minimum"); */
+        bignum = 1. / smlnum;
     }
 
     /* Test the input parameters */
-    if ( (options->Fact != DOFACT && options->Fact != SamePattern &&
-	  options->Fact != SamePattern_SameRowPerm &&
-	  options->Fact != FACTORED) ||
-	 (options->Trans != NOTRANS && options->Trans != TRANS && 
-	  options->Trans != CONJ) ||
-	 (options->Equil != NO && options->Equil != YES) )
-	*info = -1;
-    else if ( A->nrow != A->ncol || A->nrow < 0 ||
-	      (A->Stype != SLU_NC && A->Stype != SLU_NR) ||
-	      A->Dtype != SLU_D || A->Mtype != SLU_GE )
-	*info = -2;
-    else if ( options->Fact == FACTORED &&
-	     !(rowequ || colequ || strncmp(equed, "N", 1)==0) )
-	*info = -6;
+    if((options->Fact != DOFACT && options->Fact != SamePattern &&
+        options->Fact != SamePattern_SameRowPerm &&
+        options->Fact != FACTORED) ||
+       (options->Trans != NOTRANS && options->Trans != TRANS &&
+        options->Trans != CONJ) ||
+       (options->Equil != NO && options->Equil != YES))
+        *info = -1;
+    else if(A->nrow != A->ncol || A->nrow < 0 ||
+            (A->Stype != SLU_NC && A->Stype != SLU_NR) ||
+            A->Dtype != SLU_D || A->Mtype != SLU_GE)
+        *info = -2;
+    else if(options->Fact == FACTORED &&
+            !(rowequ || colequ || strncmp(equed, "N", 1) == 0))
+        *info = -6;
     else {
-	if (rowequ) {
-	    rcmin = bignum;
-	    rcmax = 0.;
-	    for (j = 0; j < A->nrow; ++j) {
-		rcmin = SUPERLU_MIN(rcmin, R[j]);
-		rcmax = SUPERLU_MAX(rcmax, R[j]);
-	    }
-	    if (rcmin <= 0.) *info = -7;
-	    else if ( A->nrow > 0)
-		rowcnd = SUPERLU_MAX(rcmin,smlnum) / SUPERLU_MIN(rcmax,bignum);
-	    else rowcnd = 1.;
-	}
-	if (colequ && *info == 0) {
-	    rcmin = bignum;
-	    rcmax = 0.;
-	    for (j = 0; j < A->nrow; ++j) {
-		rcmin = SUPERLU_MIN(rcmin, C[j]);
-		rcmax = SUPERLU_MAX(rcmax, C[j]);
-	    }
-	    if (rcmin <= 0.) *info = -8;
-	    else if (A->nrow > 0)
-		colcnd = SUPERLU_MAX(rcmin,smlnum) / SUPERLU_MIN(rcmax,bignum);
-	    else colcnd = 1.;
-	}
-	if (*info == 0) {
-	    if ( lwork < -1 ) *info = -12;
-	    else if ( B->ncol < 0 || Bstore->lda < SUPERLU_MAX(0, A->nrow) ||
-		      B->Stype != SLU_DN || B->Dtype != SLU_D || 
-		      B->Mtype != SLU_GE )
-		*info = -13;
-	    else if ( X->ncol < 0 || Xstore->lda < SUPERLU_MAX(0, A->nrow) ||
-		      (B->ncol != 0 && B->ncol != X->ncol) ||
-		      X->Stype != SLU_DN ||
-		      X->Dtype != SLU_D || X->Mtype != SLU_GE )
-		*info = -14;
-	}
+        if(rowequ) {
+            rcmin = bignum;
+            rcmax = 0.;
+            for(j = 0; j < A->nrow; ++j) {
+                rcmin = SUPERLU_MIN(rcmin, R[j]);
+                rcmax = SUPERLU_MAX(rcmax, R[j]);
+            }
+            if(rcmin <= 0.) *info = -7;
+            else if(A->nrow > 0)
+                rowcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
+            else rowcnd = 1.;
+        }
+        if(colequ && *info == 0) {
+            rcmin = bignum;
+            rcmax = 0.;
+            for(j = 0; j < A->nrow; ++j) {
+                rcmin = SUPERLU_MIN(rcmin, C[j]);
+                rcmax = SUPERLU_MAX(rcmax, C[j]);
+            }
+            if(rcmin <= 0.) *info = -8;
+            else if(A->nrow > 0)
+                colcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
+            else colcnd = 1.;
+        }
+        if(*info == 0) {
+            if(lwork < -1) *info = -12;
+            else if(B->ncol < 0 || Bstore->lda < SUPERLU_MAX(0, A->nrow) ||
+                    B->Stype != SLU_DN || B->Dtype != SLU_D ||
+                    B->Mtype != SLU_GE)
+                *info = -13;
+            else if(X->ncol < 0 || Xstore->lda < SUPERLU_MAX(0, A->nrow) ||
+                    (B->ncol != 0 && B->ncol != X->ncol) ||
+                    X->Stype != SLU_DN ||
+                    X->Dtype != SLU_D || X->Mtype != SLU_GE)
+                *info = -14;
+        }
     }
-    if (*info != 0) {
-	int ii = -(*info);
-	input_error("dgsisx", &ii);
-	return;
+    if(*info != 0) {
+        int ii = -(*info);
+        input_error("dgsisx", &ii);
+        return;
     }
 
     /* Initialization for factor parameters */
     panel_size = sp_ienv(1);
-    relax      = sp_ienv(2);
+    relax = sp_ienv(2);
 
     utime = stat->utime;
 
     /* Convert A to SLU_NC format when necessary. */
-    if ( A->Stype == SLU_NR ) {
-	NRformat *Astore = A->Store;
-	AA = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
-	dCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz,
-			       Astore->nzval, Astore->colind, Astore->rowptr,
-			       SLU_NC, A->Dtype, A->Mtype);
-	if ( notran ) { /* Reverse the transpose argument. */
-	    trant = TRANS;
-	    notran = 0;
-	} else {
-	    trant = NOTRANS;
-	    notran = 1;
-	}
-    } else { /* A->Stype == SLU_NC */
-	trant = options->Trans;
-	AA = A;
+    if(A->Stype == SLU_NR) {
+        NRformat* Astore = A->Store;
+        AA = (SuperMatrix*)SUPERLU_MALLOC(sizeof(SuperMatrix));
+        dCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz, Astore->nzval, Astore->colind, Astore->rowptr, SLU_NC, A->Dtype, A->Mtype);
+        if(notran) { /* Reverse the transpose argument. */
+            trant = TRANS;
+            notran = 0;
+        }
+        else {
+            trant = NOTRANS;
+            notran = 1;
+        }
+    }
+    else { /* A->Stype == SLU_NC */
+        trant = options->Trans;
+        AA = A;
     }
 
-    if ( nofact ) {
-	register int i, j;
-	NCformat *Astore = AA->Store;
-	int_t nnz = Astore->nnz;
-	int_t *colptr = Astore->colptr;
-	int_t *rowind = Astore->rowind;
-	double *nzval = (double *)Astore->nzval;
+    if(nofact) {
+        register int i, j;
+        NCformat* Astore = AA->Store;
+        int_t nnz = Astore->nnz;
+        int_t* colptr = Astore->colptr;
+        int_t* rowind = Astore->rowind;
+        double* nzval = (double*)Astore->nzval;
 
-	if ( mc64 ) {
-	    t0 = SuperLU_timer_();
-	    if ((perm = int32Malloc(n)) == NULL)
-		ABORT("SUPERLU_MALLOC fails for perm[]");
+        if(mc64) {
+            t0 = SuperLU_timer_();
+            if((perm = int32Malloc(n)) == NULL)
+                ABORT("SUPERLU_MALLOC fails for perm[]");
 
-	    info1 = dldperm(5, n, nnz, colptr, rowind, nzval, perm, R, C);
+            info1 = dldperm(5, n, nnz, colptr, rowind, nzval, perm, R, C);
 
-	    if (info1 != 0) { /* MC64 fails, call dgsequ() later */
-		mc64 = 0;
-		SUPERLU_FREE(perm);
-		perm = NULL;
-	    } else {
-	        if ( equil ) {
-	            rowequ = colequ = 1;
-		    for (i = 0; i < n; i++) {
-		        R[i] = exp(R[i]);
-		        C[i] = exp(C[i]);
-		    }
-		    /* scale the matrix */
-		    for (j = 0; j < n; j++) {
-		        for (i = colptr[j]; i < colptr[j + 1]; i++) {
-			    nzval[i] *= R[rowind[i]] * C[j];
-		        }
-		    }
-	            *equed = 'B';
+            if(info1 != 0) { /* MC64 fails, call dgsequ() later */
+                mc64 = 0;
+                SUPERLU_FREE(perm);
+                perm = NULL;
+            }
+            else {
+                if(equil) {
+                    rowequ = colequ = 1;
+                    for(i = 0; i < n; i++) {
+                        R[i] = exp(R[i]);
+                        C[i] = exp(C[i]);
+                    }
+                    /* scale the matrix */
+                    for(j = 0; j < n; j++) {
+                        for(i = colptr[j]; i < colptr[j + 1]; i++) {
+                            nzval[i] *= R[rowind[i]] * C[j];
+                        }
+                    }
+                    *equed = 'B';
                 }
 
                 /* permute the matrix */
-		for (j = 0; j < n; j++) {
-		    for (i = colptr[j]; i < colptr[j + 1]; i++) {
-			/*nzval[i] *= R[rowind[i]] * C[j];*/
-			rowind[i] = perm[rowind[i]];
-		    }
-		}
-	    }
-	    utime[EQUIL] = SuperLU_timer_() - t0;
-	}
-
-	if ( mc64==0 && equil ) { /* Only perform equilibration, no row perm */
-	    t0 = SuperLU_timer_();
-	    /* Compute row and column scalings to equilibrate the matrix A. */
-	    dgsequ(AA, R, C, &rowcnd, &colcnd, &amax, &info1);
-
-	    if ( info1 == 0 ) {
-		/* Equilibrate matrix A. */
-		dlaqgs(AA, R, C, rowcnd, colcnd, amax, equed);
-		rowequ = strncmp(equed, "R", 1)==0 || strncmp(equed, "B", 1)==0;
-		colequ = strncmp(equed, "C", 1)==0 || strncmp(equed, "B", 1)==0;
-	    }
-	    utime[EQUIL] = SuperLU_timer_() - t0;
-	}
-    }
-
-
-    if ( nofact ) {
-	
-	t0 = SuperLU_timer_();
-	/*
-	 * Gnet column permutation vector perm_c[], according to permc_spec:
-	 *   permc_spec = NATURAL:  natural ordering 
-	 *   permc_spec = MMD_AT_PLUS_A: minimum degree on structure of A'+A
-	 *   permc_spec = MMD_ATA:  minimum degree on structure of A'*A
-	 *   permc_spec = COLAMD:   approximate minimum degree column ordering
-	 *   permc_spec = MY_PERMC: the ordering already supplied in perm_c[]
-	 */
-	permc_spec = options->ColPerm;
-	if ( permc_spec != MY_PERMC && options->Fact == DOFACT )
-	    get_perm_c(permc_spec, AA, perm_c);
-	utime[COLPERM] = SuperLU_timer_() - t0;
-
-	t0 = SuperLU_timer_();
-	sp_preorder(options, AA, perm_c, etree, &AC);
-	utime[ETREE] = SuperLU_timer_() - t0;
-
-	/* Compute the LU factorization of A*Pc. */
-	t0 = SuperLU_timer_();
-	dgsitrf(options, &AC, relax, panel_size, etree, work, lwork,
-                perm_c, perm_r, L, U, Glu, stat, info);
-	utime[FACT] = SuperLU_timer_() - t0;
-
-	if ( lwork == -1 ) {
-	    mem_usage->total_needed = *info - A->ncol;
-	    return;
-	}
-
-	if ( mc64 ) { /* Fold MC64's perm[] into perm_r[]. */
-	    NCformat *Astore = AA->Store;
-	    int_t nnz = Astore->nnz, *rowind = Astore->rowind;
-	    int *perm_tmp, *iperm;
-	    if ((perm_tmp = int32Malloc(2*n)) == NULL)
-		ABORT("SUPERLU_MALLOC fails for perm_tmp[]");
-	    iperm = perm_tmp + n;
-	    for (i = 0; i < n; ++i) perm_tmp[i] = perm_r[perm[i]];
-	    for (i = 0; i < n; ++i) {
-		perm_r[i] = perm_tmp[i];
-		iperm[perm[i]] = i;
-	    }
-
-	    /* Restore A's original row indices. */
-	    for (i = 0; i < nnz; ++i) rowind[i] = iperm[rowind[i]];
-
-	    SUPERLU_FREE(perm); /* MC64 permutation */
-	    SUPERLU_FREE(perm_tmp);
-	}
-    }
-
-    if ( options->PivotGrowth ) {
-	if ( *info > 0 ) return;
-
-	/* Compute the reciprocal pivot growth factor *recip_pivot_growth. */
-	*recip_pivot_growth = dPivotGrowth(A->ncol, AA, perm_c, L, U);
-    }
-
-    if ( options->ConditionNumber ) {
-	/* Estimate the reciprocal of the condition number of A. */
-	t0 = SuperLU_timer_();
-	if ( notran ) {
-	    *(unsigned char *)norm = '1';
-	} else {
-	    *(unsigned char *)norm = 'I';
-	}
-	anorm = dlangs(norm, AA);
-	dgscon(norm, L, U, anorm, rcond, stat, &info1);
-	utime[RCOND] = SuperLU_timer_() - t0;
-    }
-
-    if ( nrhs > 0 ) { /* Solve the system */
-
-	/* Scale and permute the right-hand side if equilibration
-           and permutation from MC64 were performed. */
-	if ( notran ) {
-	    if ( rowequ ) {
-		for (j = 0; j < nrhs; ++j)
-		    for (i = 0; i < n; ++i)
-		        Bmat[i + j*ldb] *= R[i];
-	    }
-	} else if ( colequ ) {
-	    for (j = 0; j < nrhs; ++j)
-		for (i = 0; i < n; ++i) {
-	            Bmat[i + j*ldb] *= C[i];
-		}
-	}
-
-	/* Compute the solution matrix X. */
-	for (j = 0; j < nrhs; j++)  /* Save a copy of the right hand sides */
-	    for (i = 0; i < B->nrow; i++)
-		Xmat[i + j*ldx] = Bmat[i + j*ldb];
-
-	t0 = SuperLU_timer_();
-	dgstrs (trant, L, U, perm_c, perm_r, X, stat, &info1);
-	utime[SOLVE] = SuperLU_timer_() - t0;
-
-	/* Transform the solution matrix X to a solution of the original
-	   system. */
-	if ( notran ) {
-	    if ( colequ ) {
-		for (j = 0; j < nrhs; ++j)
-		    for (i = 0; i < n; ++i) {
-                        Xmat[i + j*ldx] *= C[i];
+                for(j = 0; j < n; j++) {
+                    for(i = colptr[j]; i < colptr[j + 1]; i++) {
+                        /*nzval[i] *= R[rowind[i]] * C[j];*/
+                        rowind[i] = perm[rowind[i]];
                     }
-	    }
-	} else { /* transposed system */
-	    if ( rowequ ) {
-	        for (j = 0; j < nrhs; ++j)
-		    for (i = 0; i < A->nrow; ++i) {
-              	        Xmat[i + j*ldx] *= R[i];
+                }
+            }
+            utime[EQUIL] = SuperLU_timer_() - t0;
+        }
+
+        if(mc64 == 0 && equil) { /* Only perform equilibration, no row perm */
+            t0 = SuperLU_timer_();
+            /* Compute row and column scalings to equilibrate the matrix A. */
+            dgsequ(AA, R, C, &rowcnd, &colcnd, &amax, &info1);
+
+            if(info1 == 0) {
+                /* Equilibrate matrix A. */
+                dlaqgs(AA, R, C, rowcnd, colcnd, amax, equed);
+                rowequ = strncmp(equed, "R", 1) == 0 || strncmp(equed, "B", 1) == 0;
+                colequ = strncmp(equed, "C", 1) == 0 || strncmp(equed, "B", 1) == 0;
+            }
+            utime[EQUIL] = SuperLU_timer_() - t0;
+        }
+    }
+
+    if(nofact) {
+        t0 = SuperLU_timer_();
+        /*
+         * Gnet column permutation vector perm_c[], according to permc_spec:
+         *   permc_spec = NATURAL:  natural ordering
+         *   permc_spec = MMD_AT_PLUS_A: minimum degree on structure of A'+A
+         *   permc_spec = MMD_ATA:  minimum degree on structure of A'*A
+         *   permc_spec = COLAMD:   approximate minimum degree column ordering
+         *   permc_spec = MY_PERMC: the ordering already supplied in perm_c[]
+         */
+        permc_spec = options->ColPerm;
+        if(permc_spec != MY_PERMC && options->Fact == DOFACT)
+            get_perm_c(permc_spec, AA, perm_c);
+        utime[COLPERM] = SuperLU_timer_() - t0;
+
+        t0 = SuperLU_timer_();
+        sp_preorder(options, AA, perm_c, etree, &AC);
+        utime[ETREE] = SuperLU_timer_() - t0;
+
+        /* Compute the LU factorization of A*Pc. */
+        t0 = SuperLU_timer_();
+        dgsitrf(options, &AC, relax, panel_size, etree, work, lwork, perm_c, perm_r, L, U, Glu, stat, info);
+        utime[FACT] = SuperLU_timer_() - t0;
+
+        if(lwork == -1) {
+            mem_usage->total_needed = *info - A->ncol;
+            return;
+        }
+
+        if(mc64) { /* Fold MC64's perm[] into perm_r[]. */
+            NCformat* Astore = AA->Store;
+            int_t nnz = Astore->nnz, *rowind = Astore->rowind;
+            int *perm_tmp, *iperm;
+            if((perm_tmp = int32Malloc(2 * n)) == NULL)
+                ABORT("SUPERLU_MALLOC fails for perm_tmp[]");
+            iperm = perm_tmp + n;
+            for(i = 0; i < n; ++i) perm_tmp[i] = perm_r[perm[i]];
+            for(i = 0; i < n; ++i) {
+                perm_r[i] = perm_tmp[i];
+                iperm[perm[i]] = i;
+            }
+
+            /* Restore A's original row indices. */
+            for(i = 0; i < nnz; ++i) rowind[i] = iperm[rowind[i]];
+
+            SUPERLU_FREE(perm); /* MC64 permutation */
+            SUPERLU_FREE(perm_tmp);
+        }
+    }
+
+    if(options->PivotGrowth) {
+        if(*info > 0) return;
+
+        /* Compute the reciprocal pivot growth factor *recip_pivot_growth. */
+        *recip_pivot_growth = dPivotGrowth(A->ncol, AA, perm_c, L, U);
+    }
+
+    if(options->ConditionNumber) {
+        /* Estimate the reciprocal of the condition number of A. */
+        t0 = SuperLU_timer_();
+        if(notran) {
+            *(unsigned char*)norm = '1';
+        }
+        else {
+            *(unsigned char*)norm = 'I';
+        }
+        anorm = dlangs(norm, AA);
+        dgscon(norm, L, U, anorm, rcond, stat, &info1);
+        utime[RCOND] = SuperLU_timer_() - t0;
+    }
+
+    if(nrhs > 0) { /* Solve the system */
+
+        /* Scale and permute the right-hand side if equilibration
+               and permutation from MC64 were performed. */
+        if(notran) {
+            if(rowequ) {
+                for(j = 0; j < nrhs; ++j)
+                    for(i = 0; i < n; ++i)
+                        Bmat[i + j * ldb] *= R[i];
+            }
+        }
+        else if(colequ) {
+            for(j = 0; j < nrhs; ++j)
+                for(i = 0; i < n; ++i) {
+                    Bmat[i + j * ldb] *= C[i];
+                }
+        }
+
+        /* Compute the solution matrix X. */
+        for(j = 0; j < nrhs; j++) /* Save a copy of the right hand sides */
+            for(i = 0; i < B->nrow; i++)
+                Xmat[i + j * ldx] = Bmat[i + j * ldb];
+
+        t0 = SuperLU_timer_();
+        dgstrs(trant, L, U, perm_c, perm_r, X, stat, &info1);
+        utime[SOLVE] = SuperLU_timer_() - t0;
+
+        /* Transform the solution matrix X to a solution of the original
+           system. */
+        if(notran) {
+            if(colequ) {
+                for(j = 0; j < nrhs; ++j)
+                    for(i = 0; i < n; ++i) {
+                        Xmat[i + j * ldx] *= C[i];
                     }
-	    }
-	}
+            }
+        }
+        else { /* transposed system */
+            if(rowequ) {
+                for(j = 0; j < nrhs; ++j)
+                    for(i = 0; i < A->nrow; ++i) {
+                        Xmat[i + j * ldx] *= R[i];
+                    }
+            }
+        }
 
     } /* end if nrhs > 0 */
 
-    if ( options->ConditionNumber ) {
-	/* The matrix is singular to working precision. */
-	/* if ( *rcond < dlamch_("E") && *info == 0) *info = A->ncol + 1; */
-	if ( *rcond < dmach("E") && *info == 0) *info = A->ncol + 1;
+    if(options->ConditionNumber) {
+        /* The matrix is singular to working precision. */
+        /* if ( *rcond < dlamch_("E") && *info == 0) *info = A->ncol + 1; */
+        if(*rcond < dmach("E") && *info == 0) *info = A->ncol + 1;
     }
 
-    if ( nofact ) {
-	ilu_dQuerySpace(L, U, mem_usage);
-	Destroy_CompCol_Permuted(&AC);
+    if(nofact) {
+        ilu_dQuerySpace(L, U, mem_usage);
+        Destroy_CompCol_Permuted(&AC);
     }
-    if ( A->Stype == SLU_NR ) {
-	Destroy_SuperMatrix_Store(AA);
-	SUPERLU_FREE(AA);
+    if(A->Stype == SLU_NR) {
+        Destroy_SuperMatrix_Store(AA);
+        SUPERLU_FREE(AA);
     }
-
 }

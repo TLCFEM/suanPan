@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -18,12 +18,12 @@ at the top-level directory.
  * and Lawrence Berkeley National Lab.
  * October 15, 2003
  * August 2024
- * 
+ *
  * Copyright (c) 1994 by Xerox Corporation.  All rights reserved.
  *
  * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY
  * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
- * 
+ *
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
@@ -31,7 +31,6 @@ at the top-level directory.
  * the code was modified is included with the above copyright notice.
  * </pre>
  */
-
 
 #include "slu_zdefs.h"
 
@@ -46,7 +45,7 @@ at the top-level directory.
  * The factorization has the form
  *     Pr * A = L * U
  * where Pr is a row permutation matrix, L is lower triangular with unit
- * diagonal elements (lower trapezoidal if A->nrow > A->ncol), and U is upper 
+ * diagonal elements (lower trapezoidal if A->nrow > A->ncol), and U is upper
  * triangular (upper trapezoidal if A->nrow < A->ncol).
  *
  * See supermatrix.h for the definition of 'SuperMatrix' structure.
@@ -93,8 +92,8 @@ at the top-level directory.
  *               *info; no other side effects.
  *
  * perm_c   (input) int*, dimension (A->ncol)
- *	    Column permutation vector, which defines the 
- *          permutation matrix Pc; perm_c[i] = j means column i of A is 
+ *	    Column permutation vector, which defines the
+ *          permutation matrix Pc; perm_c[i] = j means column i of A is
  *          in position j in A*Pc.
  *          When searching for diagonal, perm_c[*] is applied to the
  *          row subscripts of A, so that diagonal threshold pivoting
@@ -111,18 +110,18 @@ at the top-level directory.
  *          Otherwise, perm_r is output argument;
  *
  * L        (output) SuperMatrix*
- *          The factor L from the factorization Pr*A=L*U; use compressed row 
- *          subscripts storage for supernodes, i.e., L has type: 
+ *          The factor L from the factorization Pr*A=L*U; use compressed row
+ *          subscripts storage for supernodes, i.e., L has type:
  *          Stype = SLU_SC, Dtype = SLU_Z, Mtype = SLU_TRLU.
  *
  * U        (output) SuperMatrix*
  *	    The factor U from the factorization Pr*A*Pc=L*U. Use column-wise
- *          storage scheme, i.e., U has types: Stype = SLU_NC, 
+ *          storage scheme, i.e., U has types: Stype = SLU_NC,
  *          Dtype = SLU_Z, Mtype = SLU_TRU.
  *
  * Glu      (input/output) GlobalLU_t *
  *          If options->Fact == SamePattern_SameRowPerm, it is an input;
- *              The matrix A will be factorized assuming that a 
+ *              The matrix A will be factorized assuming that a
  *              factorization of a matrix with the same sparsity pattern
  *              and similar numerical values was performed prior to this one.
  *              Therefore, this factorization will reuse both row and column
@@ -149,41 +148,41 @@ at the top-level directory.
  *
  * ======================================================================
  *
- * Local Working Arrays: 
+ * Local Working Arrays:
  * ======================
  *   m = number of rows in the matrix
  *   n = number of columns in the matrix
  *
- *   xprune[0:n-1]: xprune[*] points to locations in subscript 
- *	vector lsub[*]. For column i, xprune[i] denotes the point where 
- *	structural pruning begins. I.e. only xlsub[i],..,xprune[i]-1 need 
+ *   xprune[0:n-1]: xprune[*] points to locations in subscript
+ *	vector lsub[*]. For column i, xprune[i] denotes the point where
+ *	structural pruning begins. I.e. only xlsub[i],..,xprune[i]-1 need
  *	to be traversed for symbolic factorization.
  *
- *   marker[0:3*m-1]: marker[i] = j means that node i has been 
+ *   marker[0:3*m-1]: marker[i] = j means that node i has been
  *	reached when working on column j.
  *	Storage: relative to original row subscripts
- *	NOTE: There are 3 of them: marker/marker1 are used for panel dfs, 
+ *	NOTE: There are 3 of them: marker/marker1 are used for panel dfs,
  *	      see zpanel_dfs.c; marker2 is used for inner-factorization,
  *            see zcolumn_dfs.c.
  *
  *   parent[0:m-1]: parent vector used during dfs
  *      Storage: relative to new row subscripts
  *
- *   xplore[0:m-1]: xplore[i] gives the location of the next (dfs) 
+ *   xplore[0:m-1]: xplore[i] gives the location of the next (dfs)
  *	unexplored neighbor of i in lsub[*]
  *
  *   segrep[0:nseg-1]: contains the list of supernodal representatives
- *	in topological order of the dfs. A supernode representative is the 
+ *	in topological order of the dfs. A supernode representative is the
  *	last column of a supernode.
  *      The maximum size of segrep[] is n.
  *
- *   repfnz[0:W*m-1]: for a nonzero segment U[*,j] that ends at a 
- *	supernodal representative r, repfnz[r] is the location of the first 
+ *   repfnz[0:W*m-1]: for a nonzero segment U[*,j] that ends at a
+ *	supernodal representative r, repfnz[r] is the location of the first
  *	nonzero in this segment.  It is also used during the dfs: repfnz[r]>0
  *	indicates the supernode r has been explored.
- *	NOTE: There are W of them, each used for one column of a panel. 
+ *	NOTE: There are W of them, each used for one column of a panel.
  *
- *   panel_lsub[0:W*m-1]: temporary for the nonzeros row indices below 
+ *   panel_lsub[0:W*m-1]: temporary for the nonzeros row indices below
  *      the panel diagonal. These are filled in during zpanel_dfs(), and are
  *      used later in the inner LU factorization within the panel.
  *	panel_lsub[]/dense[] pair forms the SPA data structure.
@@ -197,214 +196,194 @@ at the top-level directory.
  * </pre>
  */
 
-void
-zgstrf (superlu_options_t *options, SuperMatrix *A,
-        int relax, int panel_size, int *etree, void *work, int_t lwork,
-        int *perm_c, int *perm_r, SuperMatrix *L, SuperMatrix *U,
-    	GlobalLU_t *Glu, /* persistent to facilitate multiple factorizations */
-        SuperLUStat_t *stat, int_t *info)
-{
+void zgstrf(superlu_options_t* options, SuperMatrix* A, int relax, int panel_size, int* etree, void* work, int_t lwork, int* perm_c, int* perm_r, SuperMatrix* L, SuperMatrix* U, GlobalLU_t* Glu, /* persistent to facilitate multiple factorizations */
+            SuperLUStat_t* stat,
+            int_t* info) {
     /* Local working arrays */
-    NCPformat *Astore;
-    int       *iperm_r = NULL; /* inverse of perm_r; used when 
-                                  options->Fact == SamePattern_SameRowPerm */
-    int       *iperm_c; /* inverse of perm_c */
-    int       *iwork;
-    doublecomplex    *zwork;
-    int	      *segrep, *repfnz, *parent;
-    int	      *panel_lsub; /* dense[]/panel_lsub[] pair forms a w-wide SPA */
-    int_t     *xprune, *xplore;
-    int	      *marker;
-    doublecomplex    *dense, *tempv;
-    int       *relax_end;
-    doublecomplex    *a;
-    int_t     *asub, *xa_begin, *xa_end;
-    int_t     *xlsub, *xlusup, *xusub;
-    int       *xsup, *supno;
-    int_t     nzlumax;
-    double fill_ratio = sp_ienv(6);  /* estimated fill ratio */
+    NCPformat* Astore;
+    int* iperm_r = NULL; /* inverse of perm_r; used when
+                            options->Fact == SamePattern_SameRowPerm */
+    int* iperm_c;        /* inverse of perm_c */
+    int* iwork;
+    doublecomplex* zwork;
+    int *segrep, *repfnz, *parent;
+    int* panel_lsub; /* dense[]/panel_lsub[] pair forms a w-wide SPA */
+    int_t *xprune, *xplore;
+    int* marker;
+    doublecomplex *dense, *tempv;
+    int* relax_end;
+    doublecomplex* a;
+    int_t *asub, *xa_begin, *xa_end;
+    int_t *xlsub, *xlusup, *xusub;
+    int *xsup, *supno;
+    int_t nzlumax;
+    double fill_ratio = sp_ienv(6); /* estimated fill ratio */
 
     /* Local scalars */
-    fact_t    fact = options->Fact;
-    double    diag_pivot_thresh = options->DiagPivotThresh;
-    int       pivrow;   /* pivotal row number in the original matrix A */
-    int       nseg1;	/* no of segments in U-column above panel row jcol */
-    int       nseg;	/* no of segments in each U-column */
+    fact_t fact = options->Fact;
+    double diag_pivot_thresh = options->DiagPivotThresh;
+    int pivrow; /* pivotal row number in the original matrix A */
+    int nseg1;  /* no of segments in U-column above panel row jcol */
+    int nseg;   /* no of segments in each U-column */
     register int jcol, jj;
-    register int kcol;	/* end column of a relaxed snode */
+    register int kcol; /* end column of a relaxed snode */
     register int icol;
-    int_t     i, k, iinfo, new_next, nextlu, nextu;
-    int       m, n, min_mn, jsupno, fsupc;
-    int       w_def;	/* upper bound on panel width */
-    int       usepr, iperm_r_allocated = 0;
-    int_t     nnzL, nnzU;
-    int       *panel_histo = stat->panel_histo;
-    flops_t   *ops = stat->ops;
+    int_t i, k, iinfo, new_next, nextlu, nextu;
+    int m, n, min_mn, jsupno, fsupc;
+    int w_def; /* upper bound on panel width */
+    int usepr, iperm_r_allocated = 0;
+    int_t nnzL, nnzU;
+    int* panel_histo = stat->panel_histo;
+    flops_t* ops = stat->ops;
 
-    iinfo    = 0;
-    m        = A->nrow;
-    n        = A->ncol;
-    min_mn   = SUPERLU_MIN(m, n);
-    Astore   = A->Store;
-    a        = Astore->nzval;
-    asub     = Astore->rowind;
+    iinfo = 0;
+    m = A->nrow;
+    n = A->ncol;
+    min_mn = SUPERLU_MIN(m, n);
+    Astore = A->Store;
+    a = Astore->nzval;
+    asub = Astore->rowind;
     xa_begin = Astore->colbeg;
-    xa_end   = Astore->colend;
+    xa_end = Astore->colend;
 
     /* Allocate storage common to the factor routines */
-    *info = zLUMemInit(fact, work, lwork, m, n, Astore->nnz,
-                       panel_size, fill_ratio, L, U, Glu, &iwork, &zwork);
-    if ( *info ) return;
-    
-    xsup    = Glu->xsup;
-    supno   = Glu->supno;
-    xlsub   = Glu->xlsub;
-    xlusup  = Glu->xlusup;
-    xusub   = Glu->xusub;
-    
-    SetIWork(m, n, panel_size, iwork, &segrep, &parent, &xplore,
-	     &repfnz, &panel_lsub, &xprune, &marker);
+    *info = zLUMemInit(fact, work, lwork, m, n, Astore->nnz, panel_size, fill_ratio, L, U, Glu, &iwork, &zwork);
+    if(*info) return;
+
+    xsup = Glu->xsup;
+    supno = Glu->supno;
+    xlsub = Glu->xlsub;
+    xlusup = Glu->xlusup;
+    xusub = Glu->xusub;
+
+    SetIWork(m, n, panel_size, iwork, &segrep, &parent, &xplore, &repfnz, &panel_lsub, &xprune, &marker);
     zSetRWork(m, panel_size, zwork, &dense, &tempv);
-    
+
     usepr = (fact == SamePattern_SameRowPerm);
-    if ( usepr ) {
-	/* Compute the inverse of perm_r */
-	iperm_r = (int *) int32Malloc(m);
-	for (k = 0; k < m; ++k) iperm_r[perm_r[k]] = k;
-	iperm_r_allocated = 1;
+    if(usepr) {
+        /* Compute the inverse of perm_r */
+        iperm_r = (int*)int32Malloc(m);
+        for(k = 0; k < m; ++k) iperm_r[perm_r[k]] = k;
+        iperm_r_allocated = 1;
     }
-    iperm_c = (int *) int32Malloc(n);
-    for (k = 0; k < n; ++k) iperm_c[perm_c[k]] = k;
+    iperm_c = (int*)int32Malloc(n);
+    for(k = 0; k < n; ++k) iperm_c[perm_c[k]] = k;
 
     /* Identify relaxed snodes */
-    relax_end = (int *) intMalloc(n);
-    if ( options->SymmetricMode == YES ) {
-        heap_relax_snode(n, etree, relax, marker, relax_end); 
-    } else {
-        relax_snode(n, etree, relax, marker, relax_end); 
+    relax_end = (int*)intMalloc(n);
+    if(options->SymmetricMode == YES) {
+        heap_relax_snode(n, etree, relax, marker, relax_end);
     }
-    
-    ifill (perm_r, m, SLU_EMPTY);
-    ifill (marker, m * NO_MARKER, SLU_EMPTY);
-    supno[0] = -1;
-    xsup[0]  = xlsub[0] = xusub[0] = xlusup[0] = 0;
-    w_def    = panel_size;
+    else {
+        relax_snode(n, etree, relax, marker, relax_end);
+    }
 
-    /* 
-     * Work on one "panel" at a time. A panel is one of the following: 
+    ifill(perm_r, m, SLU_EMPTY);
+    ifill(marker, m * NO_MARKER, SLU_EMPTY);
+    supno[0] = -1;
+    xsup[0] = xlsub[0] = xusub[0] = xlusup[0] = 0;
+    w_def = panel_size;
+
+    /*
+     * Work on one "panel" at a time. A panel is one of the following:
      *	   (a) a relaxed supernode at the bottom of the etree, or
      *	   (b) panel_size contiguous columns, defined by the user
      */
-    for (jcol = 0; jcol < min_mn; ) {
+    for(jcol = 0; jcol < min_mn;) {
+        if(relax_end[jcol] != SLU_EMPTY) { /* start of a relaxed snode */
+            kcol = relax_end[jcol];        /* end of the relaxed snode */
+            panel_histo[kcol - jcol + 1]++;
 
-	if ( relax_end[jcol] != SLU_EMPTY ) { /* start of a relaxed snode */
-   	    kcol = relax_end[jcol];	  /* end of the relaxed snode */
-	    panel_histo[kcol-jcol+1]++;
+            /* --------------------------------------
+             * Factorize the relaxed supernode(jcol:kcol)
+             * -------------------------------------- */
+            /* Determine the union of the row structure of the snode */
+            if((*info = zsnode_dfs(jcol, kcol, asub, xa_begin, xa_end, xprune, marker, Glu)) != 0)
+                return;
 
-	    /* --------------------------------------
-	     * Factorize the relaxed supernode(jcol:kcol) 
-	     * -------------------------------------- */
-	    /* Determine the union of the row structure of the snode */
-	    if ( (*info = zsnode_dfs(jcol, kcol, asub, xa_begin, xa_end,
-				    xprune, marker, Glu)) != 0 )
-		return;
+            nextu = xusub[jcol];
+            nextlu = xlusup[jcol];
+            jsupno = supno[jcol];
+            fsupc = xsup[jsupno];
+            new_next = nextlu + (xlsub[fsupc + 1] - xlsub[fsupc]) * (kcol - jcol + 1);
+            nzlumax = Glu->nzlumax;
+            while(new_next > nzlumax) {
+                if((*info = zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu)))
+                    return;
+            }
 
-            nextu    = xusub[jcol];
-	    nextlu   = xlusup[jcol];
-	    jsupno   = supno[jcol];
-	    fsupc    = xsup[jsupno];
-	    new_next = nextlu + (xlsub[fsupc+1]-xlsub[fsupc])*(kcol-jcol+1);
-	    nzlumax = Glu->nzlumax;
-	    while ( new_next > nzlumax ) {
-		if ( (*info = zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu)) )
-		    return;
-	    }
-    
-	    for (icol = jcol; icol<= kcol; icol++) {
-		xusub[icol+1] = nextu;
-		
-    		/* Scatter into SPA dense[*] */
-    		for (k = xa_begin[icol]; k < xa_end[icol]; k++)
-        	    dense[asub[k]] = a[k];
+            for(icol = jcol; icol <= kcol; icol++) {
+                xusub[icol + 1] = nextu;
 
-	       	/* Numeric update within the snode */
-	        zsnode_bmod(icol, jsupno, fsupc, dense, tempv, Glu, stat);
+                /* Scatter into SPA dense[*] */
+                for(k = xa_begin[icol]; k < xa_end[icol]; k++)
+                    dense[asub[k]] = a[k];
 
-		if ( (*info = zpivotL(icol, diag_pivot_thresh, &usepr, perm_r,
-				      iperm_r, iperm_c, &pivrow, Glu, stat)) )
-		    if ( iinfo == 0 ) iinfo = *info;
-		
-#if ( DEBUGlevel>=2 )
-		zprint_lu_col("[1]: ", icol, pivrow, xprune, Glu);
+                /* Numeric update within the snode */
+                zsnode_bmod(icol, jsupno, fsupc, dense, tempv, Glu, stat);
+
+                if((*info = zpivotL(icol, diag_pivot_thresh, &usepr, perm_r, iperm_r, iperm_c, &pivrow, Glu, stat)))
+                    if(iinfo == 0) iinfo = *info;
+
+#if (DEBUGlevel >= 2)
+                zprint_lu_col("[1]: ", icol, pivrow, xprune, Glu);
 #endif
+            }
 
-	    }
+            jcol = icol;
+        }
+        else { /* Work on one panel of panel_size columns */
 
-	    jcol = icol;
+            /* Adjust panel_size so that a panel won't overlap with the next
+             * relaxed snode.
+             */
+            panel_size = w_def;
+            for(k = jcol + 1; k < SUPERLU_MIN(jcol + panel_size, min_mn); k++)
+                if(relax_end[k] != SLU_EMPTY) {
+                    panel_size = k - jcol;
+                    break;
+                }
+            if(k == min_mn) panel_size = min_mn - jcol;
+            panel_histo[panel_size]++;
 
-	} else { /* Work on one panel of panel_size columns */
-	    
-	    /* Adjust panel_size so that a panel won't overlap with the next 
-	     * relaxed snode.
-	     */
-	    panel_size = w_def;
-	    for (k = jcol + 1; k < SUPERLU_MIN(jcol+panel_size, min_mn); k++) 
-		if ( relax_end[k] != SLU_EMPTY ) {
-		    panel_size = k - jcol;
-		    break;
-		}
-	    if ( k == min_mn ) panel_size = min_mn - jcol;
-	    panel_histo[panel_size]++;
+            /* symbolic factor on a panel of columns */
+            zpanel_dfs(m, panel_size, jcol, A, perm_r, &nseg1, dense, panel_lsub, segrep, repfnz, xprune, marker, parent, xplore, Glu);
 
-	    /* symbolic factor on a panel of columns */
-	    zpanel_dfs(m, panel_size, jcol, A, perm_r, &nseg1,
-		      dense, panel_lsub, segrep, repfnz, xprune,
-		      marker, parent, xplore, Glu);
-	    
-	    /* numeric sup-panel updates in topological order */
-	    zpanel_bmod(m, panel_size, jcol, nseg1, dense,
-		        tempv, segrep, repfnz, Glu, stat);
-	    
-	    /* Sparse LU within the panel, and below panel diagonal */
-    	    for ( jj = jcol; jj < jcol + panel_size; jj++) {
- 		k = (jj - jcol) * m; /* column index for w-wide arrays */
+            /* numeric sup-panel updates in topological order */
+            zpanel_bmod(m, panel_size, jcol, nseg1, dense, tempv, segrep, repfnz, Glu, stat);
 
-		nseg = nseg1;	/* Begin after all the panel segments */
+            /* Sparse LU within the panel, and below panel diagonal */
+            for(jj = jcol; jj < jcol + panel_size; jj++) {
+                k = (jj - jcol) * m; /* column index for w-wide arrays */
 
-	    	if ((*info = zcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k],
-					segrep, &repfnz[k], xprune, marker,
-					parent, xplore, Glu)) != 0) return;
+                nseg = nseg1; /* Begin after all the panel segments */
 
-	      	/* Numeric updates */
-	    	if ((*info = zcolumn_bmod(jj, (nseg - nseg1), &dense[k],
-					 tempv, &segrep[nseg1], &repfnz[k],
-					 jcol, Glu, stat)) != 0) return;
-		
-	        /* Copy the U-segments to ucol[*] */
-		if ((*info = zcopy_to_ucol(jj, nseg, segrep, &repfnz[k],
-					  perm_r, &dense[k], Glu)) != 0)
-		    return;
+                if((*info = zcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k], segrep, &repfnz[k], xprune, marker, parent, xplore, Glu)) != 0) return;
 
-	    	if ( (*info = zpivotL(jj, diag_pivot_thresh, &usepr, perm_r,
-				      iperm_r, iperm_c, &pivrow, Glu, stat)) )
-		    if ( iinfo == 0 ) iinfo = *info;
+                /* Numeric updates */
+                if((*info = zcolumn_bmod(jj, (nseg - nseg1), &dense[k], tempv, &segrep[nseg1], &repfnz[k], jcol, Glu, stat)) != 0) return;
 
-		/* Prune columns (0:jj-1) using column jj */
-	    	zpruneL(jj, perm_r, pivrow, nseg, segrep,
-                        &repfnz[k], xprune, Glu);
+                /* Copy the U-segments to ucol[*] */
+                if((*info = zcopy_to_ucol(jj, nseg, segrep, &repfnz[k], perm_r, &dense[k], Glu)) != 0)
+                    return;
 
-		/* Reset repfnz[] for this column */
-	    	resetrep_col (nseg, segrep, &repfnz[k]);
-		
-#if ( DEBUGlevel>=2 )
-		zprint_lu_col("[2]: ", jj, pivrow, xprune, Glu);
+                if((*info = zpivotL(jj, diag_pivot_thresh, &usepr, perm_r, iperm_r, iperm_c, &pivrow, Glu, stat)))
+                    if(iinfo == 0) iinfo = *info;
+
+                /* Prune columns (0:jj-1) using column jj */
+                zpruneL(jj, perm_r, pivrow, nseg, segrep, &repfnz[k], xprune, Glu);
+
+                /* Reset repfnz[] for this column */
+                resetrep_col(nseg, segrep, &repfnz[k]);
+
+#if (DEBUGlevel >= 2)
+                zprint_lu_col("[2]: ", jj, pivrow, xprune, Glu);
 #endif
+            }
 
-	    }
+            jcol += panel_size; /* Move to the next panel */
 
-   	    jcol += panel_size;	/* Move to the next panel */
-
-	} /* else */
+        } /* else */
 
     } /* for */
 
@@ -415,18 +394,17 @@ zgstrf (superlu_options_t *options, SuperMatrix *A,
        pivots have been completed for rows < k
        Now fill in the pivots for rows k to m */
     k = iinfo == 0 ? n : (int)iinfo - 1;
-    if (m > k) {
+    if(m > k) {
         /* if k == m, then all the row permutations are complete and
            we can short circuit looking through the rest of the vector */
-        for (i = 0; i < m && k < m; ++i) {
-            if (perm_r[i] == SLU_EMPTY) {
+        for(i = 0; i < m && k < m; ++i) {
+            if(perm_r[i] == SLU_EMPTY) {
                 perm_r[i] = k;
                 ++k;
             }
-
         }
     }
-    
+
     countnz(min_mn, xprune, &nnzL, &nnzU, Glu);
     fixupL(min_mn, perm_r, Glu);
 
@@ -434,36 +412,31 @@ zgstrf (superlu_options_t *options, SuperMatrix *A,
     SUPERLU_FREE(xplore);
     SUPERLU_FREE(xprune);
 
-    if ( fact == SamePattern_SameRowPerm ) {
+    if(fact == SamePattern_SameRowPerm) {
         /* L and U structures may have changed due to possibly different
-	   pivoting, even though the storage is available.
-	   There could also be memory expansions, so the array locations
+       pivoting, even though the storage is available.
+       There could also be memory expansions, so the array locations
            may have changed, */
-        ((SCformat *)L->Store)->nnz = nnzL;
-	((SCformat *)L->Store)->nsuper = Glu->supno[n];
-	((SCformat *)L->Store)->nzval = (doublecomplex *) Glu->lusup;
-	((SCformat *)L->Store)->nzval_colptr = Glu->xlusup;
-	((SCformat *)L->Store)->rowind = Glu->lsub;
-	((SCformat *)L->Store)->rowind_colptr = Glu->xlsub;
-	((NCformat *)U->Store)->nnz = nnzU;
-	((NCformat *)U->Store)->nzval = (doublecomplex *) Glu->ucol;
-	((NCformat *)U->Store)->rowind = Glu->usub;
-	((NCformat *)U->Store)->colptr = Glu->xusub;
-    } else {
-        zCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL, 
-	      (doublecomplex *) Glu->lusup, Glu->xlusup, 
-              Glu->lsub, Glu->xlsub, Glu->supno, Glu->xsup,
-              SLU_SC, SLU_Z, SLU_TRLU);
-    	zCreate_CompCol_Matrix(U, min_mn, min_mn, nnzU, 
-	      (doublecomplex *) Glu->ucol, Glu->usub, Glu->xusub,
-              SLU_NC, SLU_Z, SLU_TRU);
+        ((SCformat*)L->Store)->nnz = nnzL;
+        ((SCformat*)L->Store)->nsuper = Glu->supno[n];
+        ((SCformat*)L->Store)->nzval = (doublecomplex*)Glu->lusup;
+        ((SCformat*)L->Store)->nzval_colptr = Glu->xlusup;
+        ((SCformat*)L->Store)->rowind = Glu->lsub;
+        ((SCformat*)L->Store)->rowind_colptr = Glu->xlsub;
+        ((NCformat*)U->Store)->nnz = nnzU;
+        ((NCformat*)U->Store)->nzval = (doublecomplex*)Glu->ucol;
+        ((NCformat*)U->Store)->rowind = Glu->usub;
+        ((NCformat*)U->Store)->colptr = Glu->xusub;
     }
-    
-    ops[FACT] += ops[TRSV] + ops[GEMV];	
-    stat->expansions = --(Glu->num_expansions);
-    
-    if ( iperm_r_allocated ) SUPERLU_FREE (iperm_r);
-    SUPERLU_FREE (iperm_c);
-    SUPERLU_FREE (relax_end);
+    else {
+        zCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL, (doublecomplex*)Glu->lusup, Glu->xlusup, Glu->lsub, Glu->xlsub, Glu->supno, Glu->xsup, SLU_SC, SLU_Z, SLU_TRLU);
+        zCreate_CompCol_Matrix(U, min_mn, min_mn, nnzU, (doublecomplex*)Glu->ucol, Glu->usub, Glu->xusub, SLU_NC, SLU_Z, SLU_TRU);
+    }
 
+    ops[FACT] += ops[TRSV] + ops[GEMV];
+    stat->expansions = --(Glu->num_expansions);
+
+    if(iperm_r_allocated) SUPERLU_FREE(iperm_r);
+    SUPERLU_FREE(iperm_c);
+    SUPERLU_FREE(relax_end);
 }
