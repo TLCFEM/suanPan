@@ -24,7 +24,7 @@
 
 BFGS::BFGS(const unsigned T, const unsigned MH)
     : Solver(T)
-    , max_hist(std::max(1u, MH)) {}
+    , max_hist(MH) {}
 
 int BFGS::analyze() {
     auto& C = get_converger();
@@ -35,6 +35,7 @@ int BFGS::analyze() {
     suanpan_highlight(">> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
 
     const auto max_iteration = C->get_max_iteration();
+    const auto max_storage = 0 == max_hist ? W->get_size() : std::min(max_hist, W->get_size());
 
     // iteration counter
     auto counter = 0u;
@@ -160,7 +161,7 @@ int BFGS::analyze() {
         if(D->get_attribute(ModalAttribute::LinearSystem)) return G->sync_status(false);
 
         // check if the maximum record number is hit (L-BFGS)
-        if(counter > max_hist) {
+        if(counter > max_storage) {
             hist_ninja.pop_front();
             hist_residual.pop_front();
             hist_factor.pop_front();
