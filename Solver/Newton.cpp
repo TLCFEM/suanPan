@@ -48,37 +48,33 @@ int Newton::analyze() {
     while(true) {
         set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
 
-        // update for nodes and elements
         t_clock.tic();
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-        // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         D->update<Statistics::UpdateStatus>(t_clock.toc());
-        // assemble resistance
+
         t_clock.tic();
         G->assemble_resistance();
         D->update<Statistics::AssembleVector>(t_clock.toc());
 
         if((initial_stiffness && counter != 0) || constant_matrix()) {
-            // some loads may have resistance
             t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
-            // some constraints may have resistance
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
             D->update<Statistics::ProcessConstraint>(t_clock.toc());
         }
         else {
             // first iteration
-            // assemble stiffness
+
             t_clock.tic();
             G->assemble_matrix();
             D->update<Statistics::AssembleMatrix>(t_clock.toc());
-            // process loads
+
             t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
-            // process constraints
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
             D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
             // indicate the global matrix has been assembled
             G->set_matrix_assembled_switch(true);
         }
@@ -161,8 +157,7 @@ void Newton::print() {
 double AICN::amplification(const vec& x, const vec& r) const {
     const auto hessian_norm = dot(x, r);
     if(hessian_norm <= 0.) return 0.;
-    const auto root_norm = l_est * std::sqrt(hessian_norm);
-    const auto amp = (std::sqrt(1. + 2. * root_norm) - 1.) / root_norm;
+    const auto amp = 2. / (std::sqrt(1. + 2. * l_est * std::sqrt(hessian_norm)) + 1.);
     return std::isfinite(amp) ? amp : 0.;
 }
 
