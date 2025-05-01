@@ -64,8 +64,6 @@ int Newton::analyze() {
             D->update<Statistics::ProcessConstraint>(t_clock.toc());
         }
         else {
-            // first iteration
-
             t_clock.tic();
             G->assemble_matrix();
             D->update<Statistics::AssembleMatrix>(t_clock.toc());
