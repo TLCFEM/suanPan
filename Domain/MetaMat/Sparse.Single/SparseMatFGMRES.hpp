@@ -59,7 +59,7 @@ public:
 template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
     X.zeros(B.n_rows, B.n_cols);
 
-    csr_form<T, int> csr_mat(this->triplet_mat);
+    csr_form<T, la_it> csr_mat(this->triplet_mat);
 
     const auto precond = this->triplet_mat.diag();
 
