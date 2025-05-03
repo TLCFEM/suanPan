@@ -18,21 +18,20 @@
  * @class BFGS
  * @brief The (L-)BFGS class defines a solver using BFGS iteration method.
  *
- * The BFGS method is a rank two quasi--Newton method which has a super linear
- * convergence rate. The (L-)BFGS class supports both conventional BFGS and
- * L-BFGS method which uses limited history information.
+ * The BFGS method is a rank two quasi-Newton method which has a super-linear
+ * convergence rate.
+ * The (L-)BFGS class supports both conventional BFGS and L-BFGS method
+ * which uses limited history information.
  *
- * \f{gather}{
- * K_{n+1}^{-1}=\left(I-\dfrac{\Delta{}UR^T}{R^T\Delta{}U}\right)K_n^{-1}\left(I-\dfrac{R\Delta{}U^T}{R^T\Delta{}U}\right)+\dfrac{\Delta{}U\Delta{}U^T}{R^T\Delta{}U}.
- * \f}
+ * The Algorithm 7.4 is implemented.
  *
- * The \f$I\f$ is identity matrix. The \f$\Delta{}U\f$ is current displacement
- * increment. The \f$R\f$ is current residual. For brevity, in both terms, the
- * subscript \f$n\f$ representing current step is dropped.
+ * References:
+ *
+ * 1. [Numerical Optimization](https://doi.org/10.1007/978-0-387-40065-5)
  *
  * @author tlc
- * @date 06/07/2018
- * @version 0.3.0
+ * @date 03/05/2025
+ * @version 0.4.0
  * @file BFGS.h
  * @addtogroup Solver
  * @{
@@ -45,14 +44,14 @@
 #include <deque>
 
 class BFGS final : public Solver {
-    std::deque<vec> hist_ninja, hist_residual;
-    std::deque<double> hist_factor;
-    std::vector<double> alpha;
+    std::deque<vec> hist_s, hist_y;
+    std::deque<double> hist_rho;
+    std::vector<double> hist_alpha;
 
     const unsigned max_hist;
 
 public:
-    explicit BFGS(unsigned = 0, unsigned = 0);
+    explicit BFGS(unsigned = 0, unsigned = 20);
 
     int analyze() override;
 
