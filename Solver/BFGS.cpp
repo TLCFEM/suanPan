@@ -79,7 +79,7 @@ int BFGS::analyze() {
             // indicate the global matrix has been assembled
             G->set_matrix_assembled_switch(true);
 
-            if(0 != W->get_mpc()) {
+            if(0 != W->get_multiplier_size()) {
                 suanpan_error("(L-)BFGS solver does not support constraints implemented via the Lagrange multiplier method.\n");
                 return SUANPAN_FAIL;
             }

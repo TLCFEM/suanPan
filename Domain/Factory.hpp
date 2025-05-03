@@ -72,7 +72,7 @@ template<sp_d T> class Factory final {
     unsigned n_upbw = 0;               // up bandwidth
     unsigned n_sfbw = n_lobw + n_upbw; // matrix storage offset
     unsigned n_rfld = 0;               // reference load size
-    unsigned n_mpc = 0;                // multipoint constraint size
+    unsigned n_multiplier = 0;         // multiplier constraint size
     uword n_elem = 0;
 
     AnalysisType analysis_type = AnalysisType::NONE;  // type of analysis
@@ -258,7 +258,7 @@ public:
 
     void update_sushi_by(const Col<T>&);
 
-    void set_mpc(unsigned);
+    void set_multiplier_size(unsigned);
 
     void set_reference_load(const SpMat<T>&);
 
@@ -328,7 +328,7 @@ public:
     const Col<T>& get_ninja() const;
     const Col<T>& get_sushi() const;
 
-    [[nodiscard]] unsigned get_mpc() const;
+    [[nodiscard]] unsigned get_multiplier_size() const;
 
     const SpMat<T>& get_reference_load() const;
 
@@ -927,12 +927,12 @@ template<sp_d T> void Factory<T>::set_sushi(const Col<T>& S) { sushi = S; }
 
 template<sp_d T> void Factory<T>::update_sushi_by(const Col<T>& S) { sushi += S; }
 
-template<sp_d T> void Factory<T>::set_mpc(const unsigned S) {
-    n_mpc = S;
-    auxiliary_encoding.zeros(n_mpc);
-    auxiliary_resistance.zeros(n_mpc);
-    auxiliary_load.zeros(n_mpc);
-    auxiliary_stiffness.zeros(n_size, n_mpc);
+template<sp_d T> void Factory<T>::set_multiplier_size(const unsigned S) {
+    n_multiplier = S;
+    auxiliary_encoding.zeros(n_multiplier);
+    auxiliary_resistance.zeros(n_multiplier);
+    auxiliary_load.zeros(n_multiplier);
+    auxiliary_stiffness.zeros(n_size, n_multiplier);
 }
 
 template<sp_d T> void Factory<T>::set_reference_load(const SpMat<T>& L) { reference_load = L; }
@@ -955,7 +955,7 @@ template<sp_d T> const Col<T>& Factory<T>::get_ninja() const { return ninja; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_sushi() const { return sushi; }
 
-template<sp_d T> unsigned Factory<T>::get_mpc() const { return n_mpc; }
+template<sp_d T> unsigned Factory<T>::get_multiplier_size() const { return n_multiplier; }
 
 template<sp_d T> const SpMat<T>& Factory<T>::get_reference_load() const { return reference_load; }
 
@@ -1433,7 +1433,7 @@ template<sp_d T> void Factory<T>::clear_geometry() {
 }
 
 template<sp_d T> void Factory<T>::clear_auxiliary() {
-    n_mpc = 0;
+    n_multiplier = 0;
     auxiliary_load.reset();
     auxiliary_stiffness.set_size(n_size, 0);
     auxiliary_resistance.reset();

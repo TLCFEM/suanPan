@@ -1186,7 +1186,7 @@ int Domain::process_constraint(const bool full) {
         }
     });
 
-    factory->set_mpc(counter);
+    factory->set_multiplier_size(counter);
 
     if(0 == counter) return code;
 

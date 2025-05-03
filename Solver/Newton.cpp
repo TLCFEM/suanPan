@@ -100,7 +100,7 @@ int Newton::analyze() {
         if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
 
         // deal with mpc
-        if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
+        if(const auto n_size = W->get_size(); 0 != W->get_multiplier_size()) {
             auto& border = W->get_auxiliary_stiffness();
             mat right;
             if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;

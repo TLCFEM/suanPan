@@ -72,7 +72,7 @@ int Ramm::analyze() {
         // solve reference displacement
         if(SUANPAN_SUCCESS != G->solve(disp_a, G->get_reference_load())) return SUANPAN_FAIL;
 
-        if(0 != W->get_mpc()) {
+        if(0 != W->get_multiplier_size()) {
             mat right, kernel;
             auto& border = W->get_auxiliary_stiffness();
             if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
