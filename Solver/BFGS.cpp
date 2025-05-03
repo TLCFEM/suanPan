@@ -109,12 +109,7 @@ int BFGS::analyze() {
             samurai = residual;
             // perform two-step recursive loop
             // right side loop
-            for(auto J = static_cast<int>(hist_rho.size()) - 1; J >= 0; --J) {
-                // compute and commit alpha
-                hist_alpha.emplace_back(dot(hist_s[J], samurai) / hist_rho[J]);
-                // update ninja
-                samurai -= hist_alpha.back() * hist_y[J];
-            }
+            for(auto J = static_cast<int>(hist_rho.size()) - 1; J >= 0; --J) samurai -= hist_alpha.emplace_back(dot(hist_s[J], samurai) / hist_rho[J]) * hist_y[J];
             // apply the Hessian from the factorization in the first iteration
             samurai = G->solve(samurai);
             // left side loop
