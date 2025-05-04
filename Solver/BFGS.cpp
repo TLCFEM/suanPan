@@ -109,11 +109,11 @@ int BFGS::analyze() {
             samurai = residual;
             // perform two-step recursive loop
             // right side loop
-            for(auto J = static_cast<int>(hist_rho.size()) - 1; J >= 0; --J) samurai -= hist_alpha.emplace_back(dot(hist_s[J], samurai) / hist_rho[J]) * hist_y[J];
+            for(auto J = static_cast<int>(hist_rho.size()) - 1; J >= 0; --J) samurai -= hist_alpha.emplace_back(dot(hist_s[J], samurai)) / hist_rho[J] * hist_y[J];
             // apply the Hessian from the factorization in the first iteration
             samurai = G->solve(samurai);
             // left side loop
-            for(size_t I = 0, J = hist_rho.size() - 1; I < hist_rho.size(); ++I, --J) samurai += (hist_alpha[J] - dot(hist_y[I], samurai) / hist_rho[I]) * hist_s[I];
+            for(size_t I = 0, J = hist_rho.size() - 1; I < hist_rho.size(); ++I, --J) samurai += (hist_alpha[J] - dot(hist_y[I], samurai)) / hist_rho[I] * hist_s[I];
 
             D->update<Statistics::SolveSystem>(t_clock.toc());
         }
