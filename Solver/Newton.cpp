@@ -101,12 +101,12 @@ int Newton::analyze() {
 
         // deal with mpc
         if(const auto n_size = W->get_size(); 0 != W->get_multiplier_size()) {
-            auto& border = W->get_auxiliary_stiffness();
-            mat right;
-            if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
             auto& aux_lambda = W->modify_auxiliary_lambda();
-            if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-            samurai -= right * aux_lambda;
+            auto& aux_border = W->get_auxiliary_stiffness();
+            mat aux_right;
+            if(SUANPAN_SUCCESS != G->solve(aux_right, aux_border)) return SUANPAN_FAIL;
+            if(!solve(aux_lambda, aux_border.t() * aux_right.head_rows(n_size), aux_border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            samurai -= aux_right * aux_lambda;
         }
 
         D->update<Statistics::SolveSystem>(t_clock.toc());

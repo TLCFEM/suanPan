@@ -73,13 +73,13 @@ int Ramm::analyze() {
         if(SUANPAN_SUCCESS != G->solve(disp_a, G->get_reference_load())) return SUANPAN_FAIL;
 
         if(0 != W->get_multiplier_size()) {
-            mat right, kernel;
-            auto& border = W->get_auxiliary_stiffness();
-            if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
             auto& aux_lambda = W->modify_auxiliary_lambda();
-            if(!solve(aux_lambda, kernel = border.t() * right, border.t() * samurai - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-            samurai -= right * aux_lambda;
-            disp_a -= right * solve(kernel, border.t() * disp_a);
+            auto& aux_border = W->get_auxiliary_stiffness();
+            mat aux_right, aux_kernel;
+            if(SUANPAN_SUCCESS != G->solve(aux_right, aux_border)) return SUANPAN_FAIL;
+            if(!solve(aux_lambda, aux_kernel = aux_border.t() * aux_right, aux_border.t() * samurai - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            samurai -= aux_right * aux_lambda;
+            disp_a -= aux_right * solve(aux_kernel, aux_border.t() * disp_a);
         }
 
         if(0u < counter) t_lambda = -dot(disp_ref, samurai) / dot(disp_ref, disp_a);

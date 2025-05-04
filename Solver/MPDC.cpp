@@ -83,13 +83,13 @@ int MPDC::analyze() {
         if(SUANPAN_SUCCESS != G->solve(disp_a, G->get_reference_load())) return SUANPAN_FAIL;
 
         if(const auto n_size = W->get_size(); 0 != W->get_multiplier_size()) {
-            mat right, kernel;
-            auto& border = W->get_auxiliary_stiffness();
-            if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
             auto& aux_lambda = W->modify_auxiliary_lambda();
-            if(!solve(aux_lambda, kernel = border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-            samurai -= right * aux_lambda;
-            disp_a -= right * solve(kernel, border.t() * disp_a.head_rows(n_size));
+            auto& aux_border = W->get_auxiliary_stiffness();
+            mat aux_right, aux_kernel;
+            if(SUANPAN_SUCCESS != G->solve(aux_right, aux_border)) return SUANPAN_FAIL;
+            if(!solve(aux_lambda, aux_kernel = aux_border.t() * aux_right.head_rows(n_size), aux_border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            samurai -= aux_right * aux_lambda;
+            disp_a -= aux_right * solve(aux_kernel, aux_border.t() * disp_a.head_rows(n_size));
         }
 
         const vec incre_lambda = solve(mat(disp_a.rows(idx)), W->get_trial_settlement()(idx) - G->get_trial_displacement()(idx) - samurai.rows(idx));
