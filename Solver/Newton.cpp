@@ -97,7 +97,8 @@ int Newton::analyze() {
             return flag;
         }
 
-        if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
+        if(0u < counter)
+            if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
 
         // deal with mpc
         if(const auto n_size = W->get_size(); 0 != W->get_multiplier_size()) {
