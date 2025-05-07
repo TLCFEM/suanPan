@@ -106,9 +106,11 @@ template<col_sketching T> mat frequent_col_directions(T&& target, unsigned l) {
     return U.head_cols(l);
 }
 
-template<typename T> requires row_sketching<std::remove_cvref_t<T>*> mat frequent_row_directions(T&& target, unsigned l) { return frequent_row_directions(&target, l); }
+template<typename T> concept row_sketching_obj = row_sketching<std::remove_cvref_t<T>*>;
+template<typename T> concept col_sketching_obj = col_sketching<std::remove_cvref_t<T>*>;
 
-template<typename T> requires col_sketching<std::remove_cvref_t<T>*> mat frequent_col_directions(T&& target, unsigned l) { return frequent_col_directions(&target, l); }
+template<row_sketching_obj T> mat frequent_row_directions(T&& target, unsigned l) { return frequent_row_directions(&target, l); }
+template<col_sketching_obj T> mat frequent_col_directions(T&& target, unsigned l) { return frequent_col_directions(&target, l); }
 
 #endif
 

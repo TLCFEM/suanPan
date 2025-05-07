@@ -44,15 +44,15 @@ TEST_CASE("Color Print", "[Utility.Print]") {
 }
 
 TEST_CASE("Sketching Matrix", "[Utility.Matrix]") {
-    mat A(1000, 200, fill::randu);
+    mat A(2000, 400, fill::randu);
     const mat ATA = A.t() * A;
     const auto norm = norm2est(ATA);
 
-    auto B = frequent_row_directions(A, 71);
+    auto B = frequent_row_directions(A, 37);
     suanpan_info("{:.5e}\n", norm2est(ATA - B.t() * B) / norm);
 
     inplace_trans(A);
 
-    B = frequent_col_directions(A, 71);
+    B = frequent_col_directions(A, 37);
     suanpan_info("{:.5e}\n", norm2est(ATA - B * B.t()) / norm);
 }
