@@ -20,12 +20,18 @@
 
 #include <suanPan.h>
 
-template<typename T> mat frequent_row_directions(T&& target, unsigned l) {
-    l = std::max(1u, std::min(l, static_cast<unsigned>(target.n_rows / 2)));
+template<typename T> requires requires(T t, const uword col) {
+    t->n_rows;
+    t->n_cols;
+    t->head_rows(col);
+    t->tail_rows(col);
+    t->rows(col, col);
+} mat frequent_row_directions(T&& target, unsigned l) {
+    l = std::max(1u, std::min(l, static_cast<unsigned>(target->n_rows / 2)));
 
     auto current = 2 * l; // how many rows processed
 
-    mat sketch = target.head_rows(current), V;
+    mat sketch = target->head_rows(current), V;
 
     const auto process = [&] {
         mat U;
@@ -34,16 +40,16 @@ template<typename T> mat frequent_row_directions(T&& target, unsigned l) {
         for(auto I = 0u; I < l; ++I) V.col(I) *= std::sqrt((s(I) + s(l)) * (s(I) - s(l)));
     };
 
-    while(current < target.n_rows) {
+    while(current < target->n_rows) {
         process();
 
         const auto next = current + l;
-        if(next > target.n_rows) {
-            const auto remaining = target.n_rows - current;
-            sketch.set_size(l + remaining, target.n_cols);
-            sketch.tail_rows(remaining) = target.tail_rows(remaining);
+        if(next > target->n_rows) {
+            const auto remaining = target->n_rows - current;
+            sketch.set_size(l + remaining, target->n_cols);
+            sketch.tail_rows(remaining) = target->tail_rows(remaining);
         }
-        else sketch.tail_rows(l) = target.rows(current, next - 1);
+        else sketch.tail_rows(l) = target->rows(current, next - 1);
         current = next;
 
         sketch.head_rows(l) = V.head_cols(l).t();
@@ -54,12 +60,18 @@ template<typename T> mat frequent_row_directions(T&& target, unsigned l) {
     return V.head_cols(l).t();
 }
 
-template<typename T> mat frequent_col_directions(T&& target, unsigned l) {
-    l = std::max(1u, std::min(l, static_cast<unsigned>(target.n_cols / 2)));
+template<typename T> requires requires(T t, const uword col) {
+    t->n_rows;
+    t->n_cols;
+    t->head_cols(col);
+    t->tail_cols(col);
+    t->cols(col, col);
+} mat frequent_col_directions(T&& target, unsigned l) {
+    l = std::max(1u, std::min(l, static_cast<unsigned>(target->n_cols / 2)));
 
     auto current = 2 * l; // how many cols processed
 
-    mat sketch = target.head_cols(current), U;
+    mat sketch = target->head_cols(current), U;
 
     const auto process = [&] {
         mat V;
@@ -68,16 +80,16 @@ template<typename T> mat frequent_col_directions(T&& target, unsigned l) {
         for(auto I = 0u; I < l; ++I) U.col(I) *= std::sqrt((s(I) + s(l)) * (s(I) - s(l)));
     };
 
-    while(current < target.n_cols) {
+    while(current < target->n_cols) {
         process();
 
         const auto next = current + l;
-        if(next > target.n_cols) {
-            const auto remaining = target.n_cols - current;
-            sketch.set_size(target.n_rows, l + remaining);
-            sketch.tail_cols(remaining) = target.tail_cols(remaining);
+        if(next > target->n_cols) {
+            const auto remaining = target->n_cols - current;
+            sketch.set_size(target->n_rows, l + remaining);
+            sketch.tail_cols(remaining) = target->tail_cols(remaining);
         }
-        else sketch.tail_cols(l) = target.cols(current, next - 1);
+        else sketch.tail_cols(l) = target->cols(current, next - 1);
         current = next;
 
         sketch.head_cols(l) = U.head_cols(l);
@@ -87,6 +99,22 @@ template<typename T> mat frequent_col_directions(T&& target, unsigned l) {
 
     return U.head_cols(l);
 }
+
+template<typename T> requires requires(T t, const uword col) {
+    t.n_rows;
+    t.n_cols;
+    t.head_rows(col);
+    t.tail_rows(col);
+    t.rows(col, col);
+} mat frequent_row_directions(T&& target, unsigned l) { return frequent_row_directions(&target, l); }
+
+template<typename T> requires requires(T t, const uword col) {
+    t.n_rows;
+    t.n_cols;
+    t.head_cols(col);
+    t.tail_cols(col);
+    t.cols(col, col);
+} mat frequent_col_directions(T&& target, unsigned l) { return frequent_col_directions(&target, l); }
 
 #endif
 
