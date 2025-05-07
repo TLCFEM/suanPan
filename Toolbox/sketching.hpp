@@ -20,13 +20,16 @@
 
 #include <suanPan.h>
 
-template<typename T> requires requires(T t, const uword col) {
+template<typename T> concept row_sketching = requires(T t, const uword col) {
+    *t;
     t->n_rows;
     t->n_cols;
     t->head_rows(col);
     t->tail_rows(col);
     t->rows(col, col);
-} mat frequent_row_directions(T&& target, unsigned l) {
+};
+
+template<row_sketching T> mat frequent_row_directions(T&& target, unsigned l) {
     l = std::max(1u, std::min(l, static_cast<unsigned>(target->n_rows / 2)));
 
     auto current = 2 * l; // how many rows processed
@@ -60,13 +63,16 @@ template<typename T> requires requires(T t, const uword col) {
     return V.head_cols(l).t();
 }
 
-template<typename T> requires requires(T t, const uword col) {
+template<typename T> concept col_sketching = requires(T t, const uword col) {
+    *t;
     t->n_rows;
     t->n_cols;
     t->head_cols(col);
     t->tail_cols(col);
     t->cols(col, col);
-} mat frequent_col_directions(T&& target, unsigned l) {
+};
+
+template<col_sketching T> mat frequent_col_directions(T&& target, unsigned l) {
     l = std::max(1u, std::min(l, static_cast<unsigned>(target->n_cols / 2)));
 
     auto current = 2 * l; // how many cols processed
@@ -100,21 +106,9 @@ template<typename T> requires requires(T t, const uword col) {
     return U.head_cols(l);
 }
 
-template<typename T> requires requires(T t, const uword col) {
-    t.n_rows;
-    t.n_cols;
-    t.head_rows(col);
-    t.tail_rows(col);
-    t.rows(col, col);
-} mat frequent_row_directions(T&& target, unsigned l) { return frequent_row_directions(&target, l); }
+template<typename T> requires row_sketching<std::remove_cvref_t<T>*> mat frequent_row_directions(T&& target, unsigned l) { return frequent_row_directions(&target, l); }
 
-template<typename T> requires requires(T t, const uword col) {
-    t.n_rows;
-    t.n_cols;
-    t.head_cols(col);
-    t.tail_cols(col);
-    t.cols(col, col);
-} mat frequent_col_directions(T&& target, unsigned l) { return frequent_col_directions(&target, l); }
+template<typename T> requires col_sketching<std::remove_cvref_t<T>*> mat frequent_col_directions(T&& target, unsigned l) { return frequent_col_directions(&target, l); }
 
 #endif
 
