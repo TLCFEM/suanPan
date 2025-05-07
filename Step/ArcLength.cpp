@@ -20,7 +20,6 @@
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/Domain.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Ramm.h>
 

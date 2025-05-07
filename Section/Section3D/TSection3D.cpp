@@ -17,8 +17,6 @@
 
 #include "TSection3D.h"
 
-#include <Material/Material1D/Material1D.h>
-
 TSection3D::TSection3D(const unsigned T, const double TFW, const double TFT, const double WH, const double WT, const unsigned MT, const unsigned IP, vec&& EC)
     : ISection3D(T, TFW, TFT, 0., 0., WH, WT, MT, IP, std::move(EC)) {}
 

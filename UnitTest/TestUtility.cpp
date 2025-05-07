@@ -2,7 +2,6 @@
 
 #include <Toolbox/sketching.hpp>
 #include <Toolbox/utility.h>
-#include <thread>
 
 TEST_CASE("Binomial Compute Basic Function", "[Utility.Binomial]") {
     REQUIRE(165 == suanpan::binomial(11, 3));

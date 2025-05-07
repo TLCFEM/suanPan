@@ -10,7 +10,7 @@
 #include "Utility/Utility"
 #include "Visualisation/Visualisation"
 
-#include "MappingDOF.h"
+// main
 #include "Element.h"
 #include "MaterialElement.h"
 #include "SectionElement.h"
