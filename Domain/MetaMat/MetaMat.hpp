@@ -149,6 +149,8 @@ public:
 
     [[nodiscard]] virtual T max() const = 0;
 
+    [[nodiscard]] virtual SpMat<T> extract_col(uword) = 0;
+
     /**
      * \brief Access element (read-only), returns zero if out-of-bound
      * \return value
@@ -220,6 +222,17 @@ public:
     virtual void csc_condense() {}
 
     virtual void csr_condense() {}
+
+    [[nodiscard]] auto cols(const uword begin_col, const uword end_col) {
+        if(begin_col > end_col || end_col >= n_cols) throw std::invalid_argument("wrong inputs: begin_col > end_col || end_col >= n_cols");
+
+        SpMat<T> output(n_rows, end_col - begin_col + 1);
+        for(auto I = begin_col, J = decltype(I){0}; I <= end_col; ++I, ++J) output.col(J) = this->extract_col(I);
+        return output;
+    }
+
+    [[nodiscard]] auto head_cols(const uword col_count) { return this->cols(0, col_count - 1); }
+    [[nodiscard]] auto tail_cols(const uword col_count) { return this->cols(n_cols - col_count, n_cols - 1); }
 };
 
 template<sp_d T> Mat<T> to_mat(const MetaMat<T>& in_mat) {

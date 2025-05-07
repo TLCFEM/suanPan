@@ -275,6 +275,11 @@ if (SP_BUILD_PARALLEL)
     endif ()
 endif ()
 
+if (CMAKE_BUILD_TYPE MATCHES "Rel")
+    add_compile_definitions(ARMA_WARN_LEVEL=1)
+    add_compile_definitions(ARMA_DONT_CHECK_CONFORMANCE)
+endif ()
+
 if (BUILD_SHARED_LIBS)
     message(STATUS "BUILD SHARED LIBRARY")
 else ()

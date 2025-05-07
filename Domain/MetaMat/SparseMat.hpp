@@ -50,10 +50,12 @@ public:
 
     void nullify(const uword idx) override {
         this->factored = false;
-        suanpan::for_each(this->triplet_mat.n_elem, [&](const uword I) { if(this->triplet_mat.row(I) == idx || this->triplet_mat.col(I) == idx) this->triplet_mat.val_mem()[I] = T(0); });
+        this->triplet_mat.nullify(idx);
     }
 
     [[nodiscard]] T max() const override { return this->triplet_mat.max(); }
+
+    [[nodiscard]] SpMat<T> extract_col(const uword idx) override { return this->triplet_mat.extract_col(idx); }
 
     T operator()(const uword in_row, const uword in_col) const override { return this->triplet_mat(in_row, in_col); }
 

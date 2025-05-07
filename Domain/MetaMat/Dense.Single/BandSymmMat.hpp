@@ -57,9 +57,17 @@ public:
 
     void nullify(const uword K) override {
         this->factored = false;
-        suanpan::for_each(std::max(band, K) - band, K, [&](const uword I) { this->memory[K - I + I * m_rows] = T(0); });
+        suanpan::for_each(std::max(K, band) - band, K, [&](const uword I) { this->memory[K - I + I * m_rows] = T(0); });
         const auto t_factor = K * m_rows - K;
         suanpan::for_each(K, std::min(this->n_rows, K + band + 1), [&](const uword I) { this->memory[I + t_factor] = T(0); });
+    }
+
+    [[nodiscard]] SpMat<T> extract_col(const uword K) override {
+        SpMat<T> output(this->n_rows, 1);
+        for(auto I = std::max(K, band) - band; I < K; ++I) output.at(I, 0) = this->memory[K - I + I * m_rows];
+        const auto t_factor = K * m_rows - K;
+        for(auto I = K; I < std::min(this->n_rows, K + band + 1); ++I) output.at(I, 0) = this->memory[I + t_factor];
+        return output;
     }
 
     T operator()(const uword in_row, const uword in_col) const override {

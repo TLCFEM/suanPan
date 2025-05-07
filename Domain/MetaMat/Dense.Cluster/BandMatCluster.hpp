@@ -71,6 +71,12 @@ public:
         suanpan::for_each(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { this->memory[2 * u_band + l_band + K + 2 * I * (l_band + u_band)] = T(0); });
     }
 
+    [[nodiscard]] SpMat<T> extract_col(const uword K) override {
+        SpMat<T> output(this->n_rows, 1);
+        for(auto I = std::max(K, u_band) - u_band; I < std::min(this->n_rows, K + l_band + 1); ++I) output.at(I, 0) = this->memory[2 * u_band + l_band + I + 2 * K * (l_band + u_band)];
+        return output;
+    }
+
     T operator()(const uword in_row, const uword in_col) const override {
         const auto pos = indexer(in_row, in_col);
         if(pos < 0) [[unlikely]]
