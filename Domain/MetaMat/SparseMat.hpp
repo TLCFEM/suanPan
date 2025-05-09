@@ -55,8 +55,6 @@ public:
 
     [[nodiscard]] T max() const override { return this->triplet_mat.max(); }
 
-    [[nodiscard]] SpMat<T> extract_col(const uword idx) override { return this->triplet_mat.extract_col(idx); }
-
     T operator()(const uword in_row, const uword in_col) const override { return this->triplet_mat(in_row, in_col); }
 
     T& at(const uword in_row, const uword in_col) override {

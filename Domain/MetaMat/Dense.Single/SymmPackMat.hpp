@@ -60,14 +60,6 @@ public:
         suanpan::for_each(K, this->n_rows, [&](const uword I) { this->memory[I + t_factor] = T(0); });
     }
 
-    [[nodiscard]] SpMat<T> extract_col(const uword K) override {
-        SpMat<T> output(this->n_rows, 1);
-        for(uword I{0}; I < K; ++I) output.at(I, 0) = this->memory[K + (length - I) * I / 2];
-        const auto t_factor = (length - K) * K / 2;
-        for(auto I = K; I < this->n_rows; ++I) output.at(I, 0) = this->memory[I + t_factor];
-        return output;
-    }
-
     T operator()(const uword in_row, const uword in_col) const override { return this->memory[in_row >= in_col ? in_row + (length - in_col) * in_col / 2 : in_col + (length - in_row) * in_row / 2]; }
 
     T& unsafe_at(const uword in_row, const uword in_col) override {

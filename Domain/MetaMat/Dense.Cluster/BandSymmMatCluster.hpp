@@ -69,13 +69,6 @@ public:
         suanpan::for_each(K, std::min(this->n_rows, K + band + 1), [&](const uword I) { this->memory[indexer(I, K)] = T(0); });
     }
 
-    [[nodiscard]] SpMat<T> extract_col(const uword K) override {
-        SpMat<T> output(this->n_rows, 1);
-        for(auto I = std::max(K, band) - band; I < K; ++I) output.at(I, 0) = this->memory[indexer(K, I)];
-        for(auto I = K; I < std::min(this->n_rows, K + band + 1); ++I) output.at(I, 0) = this->memory[indexer(I, K)];
-        return output;
-    }
-
     T operator()(const uword in_row, const uword in_col) const override {
         const auto pos = indexer(in_row, in_col);
         if(pos < 0) [[unlikely]]

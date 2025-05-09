@@ -54,12 +54,6 @@ public:
         suanpan::for_each(this->n_cols, [&](const uword I) { this->at(K, I) = T(0); });
     }
 
-    [[nodiscard]] SpMat<T> extract_col(const uword K) override {
-        SpMat<T> output(this->n_rows, 1);
-        for(uword I{0}; I < this->n_rows; ++I) output.at(I, 0) = this->operator()(I, K);
-        return output;
-    }
-
     T operator()(const uword in_row, const uword in_col) const override { return this->memory[in_row + in_col * this->n_rows]; }
 
     T& at(const uword in_row, const uword in_col) override {

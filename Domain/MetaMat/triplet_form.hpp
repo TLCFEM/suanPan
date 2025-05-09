@@ -206,17 +206,6 @@ public:
         });
     }
 
-    [[nodiscard]] auto extract_col(const index_t idx) {
-        csc_condense();
-
-        SpMat<data_t> output(n_rows, 1);
-        for(index_t I{0}; I < n_elem; ++I) {
-            if(col(I) > idx) break;
-            if(col(I) == idx) output.at(row(I), 0) = val(I);
-        }
-        return output;
-    }
-
     /**
      * @brief Adjusts the size of the container by reserving space and updating the element count.
      *
