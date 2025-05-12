@@ -43,7 +43,7 @@ class Tag {
 public:
     explicit Tag(unsigned = 0);
     Tag(const Tag&) = default;
-    Tag(Tag&&) = default;
+    Tag(Tag&&) noexcept = default;
     Tag& operator=(const Tag&) = delete;
     Tag& operator=(Tag&&) = delete;
     virtual ~Tag() = default;

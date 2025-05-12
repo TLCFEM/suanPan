@@ -93,9 +93,9 @@ public:
     SparseMatCUDA(const SparseMatCUDA& other)
         : SparseMat<T>(other) { acquire(); }
 
-    SparseMatCUDA(SparseMatCUDA&&) noexcept = delete;
+    SparseMatCUDA(SparseMatCUDA&&) = delete;
     SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;
-    SparseMatCUDA& operator=(SparseMatCUDA&&) noexcept = delete;
+    SparseMatCUDA& operator=(SparseMatCUDA&&) = delete;
 
     ~SparseMatCUDA() override {
         release();

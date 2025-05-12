@@ -107,9 +107,9 @@ public:
 
     Storage() = default;
     Storage(const Storage&) = delete;
-    Storage(Storage&&) noexcept = delete;
+    Storage(Storage&&) = delete;
     Storage& operator=(const Storage&) = delete;
-    Storage& operator=(Storage&&) noexcept = delete;
+    Storage& operator=(Storage&&) = delete;
     ~Storage() = default;
 
     const_iterator cbegin() const;

@@ -43,9 +43,9 @@ public:
         unsigned    // interval
     );
     FrameRecorder(const FrameRecorder&) = delete;
-    FrameRecorder(FrameRecorder&&) noexcept = delete;
+    FrameRecorder(FrameRecorder&&) = delete;
     FrameRecorder& operator=(const FrameRecorder&) = delete;
-    FrameRecorder& operator=(FrameRecorder&&) noexcept = delete;
+    FrameRecorder& operator=(FrameRecorder&&) = delete;
     ~FrameRecorder() override;
 
     void record(const shared_ptr<DomainBase>&) override;

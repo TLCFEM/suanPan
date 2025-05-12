@@ -91,9 +91,9 @@ public:
         , u_band(other.u_band)
         , m_rows(other.m_rows) { init_spike(); }
 
-    BandMatSpike(BandMatSpike&&) noexcept = delete;
+    BandMatSpike(BandMatSpike&&) = delete;
     BandMatSpike& operator=(const BandMatSpike&) = delete;
-    BandMatSpike& operator=(BandMatSpike&&) noexcept = delete;
+    BandMatSpike& operator=(BandMatSpike&&) = delete;
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMatSpike>(*this); }
 

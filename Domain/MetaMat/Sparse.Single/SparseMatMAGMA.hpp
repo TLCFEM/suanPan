@@ -297,9 +297,9 @@ public:
     }
 
     SparseMatMAGMA(const SparseMatMAGMA&);
-    SparseMatMAGMA(SparseMatMAGMA&&) noexcept = default;
+    SparseMatMAGMA(SparseMatMAGMA&&) = delete;
     SparseMatMAGMA& operator=(const SparseMatMAGMA&) = delete;
-    SparseMatMAGMA& operator=(SparseMatMAGMA&&) noexcept = delete;
+    SparseMatMAGMA& operator=(SparseMatMAGMA&&) = delete;
 
     ~SparseMatMAGMA() override {
         magma_smfree(&dx_f, queue);

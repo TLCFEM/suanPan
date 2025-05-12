@@ -41,7 +41,7 @@ class S4 final : public ShellBase {
             SectionIntegrationPoint(const SectionIntegrationPoint&);
             SectionIntegrationPoint(SectionIntegrationPoint&&) noexcept = default;
             SectionIntegrationPoint& operator=(const SectionIntegrationPoint&) = delete;
-            SectionIntegrationPoint& operator=(SectionIntegrationPoint&&) noexcept = delete;
+            SectionIntegrationPoint& operator=(SectionIntegrationPoint&&) = delete;
             ~SectionIntegrationPoint() = default;
         };
 

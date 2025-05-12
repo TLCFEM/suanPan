@@ -47,9 +47,9 @@ public:
     SparseMatFGMRES(const SparseMatFGMRES& other)
         : SparseMat<T>(other) {}
 
-    SparseMatFGMRES(SparseMatFGMRES&&) noexcept = delete;
+    SparseMatFGMRES(SparseMatFGMRES&&) = delete;
     SparseMatFGMRES& operator=(const SparseMatFGMRES&) = delete;
-    SparseMatFGMRES& operator=(SparseMatFGMRES&&) noexcept = delete;
+    SparseMatFGMRES& operator=(SparseMatFGMRES&&) = delete;
 
     ~SparseMatFGMRES() override = default;
 

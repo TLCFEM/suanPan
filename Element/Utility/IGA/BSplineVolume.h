@@ -43,7 +43,7 @@ protected:
 public:
     explicit BSplineVolume(vec, vec, vec, uword, field<vec>&& = {});
     BSplineVolume(const BSplineVolume&) = default;
-    BSplineVolume(BSplineVolume&&) = default;
+    BSplineVolume(BSplineVolume&&) noexcept = default;
     BSplineVolume& operator=(const BSplineVolume&) = delete;
     BSplineVolume& operator=(BSplineVolume&&) = delete;
     virtual ~BSplineVolume() = default;

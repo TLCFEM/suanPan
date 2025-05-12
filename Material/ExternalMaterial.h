@@ -72,9 +72,9 @@ public:
         void*                  // handler pointer
     );
     ExternalMaterial(const ExternalMaterial&);
-    ExternalMaterial(ExternalMaterial&&) noexcept = delete;
+    ExternalMaterial(ExternalMaterial&&) = delete;
     ExternalMaterial& operator=(const ExternalMaterial&) = delete;
-    ExternalMaterial& operator=(ExternalMaterial&&) noexcept = delete;
+    ExternalMaterial& operator=(ExternalMaterial&&) = delete;
     ~ExternalMaterial() override;
 
     bool validate();

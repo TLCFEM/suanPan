@@ -93,9 +93,9 @@ public:
     FullMatCUDA(const FullMatCUDA& other)
         : FullMat<T>(other) { acquire(); }
 
-    FullMatCUDA(FullMatCUDA&&) noexcept = delete;
+    FullMatCUDA(FullMatCUDA&&) = delete;
     FullMatCUDA& operator=(const FullMatCUDA&) = delete;
-    FullMatCUDA& operator=(FullMatCUDA&&) noexcept = delete;
+    FullMatCUDA& operator=(FullMatCUDA&&) = delete;
 
     ~FullMatCUDA() override { release(); }
 

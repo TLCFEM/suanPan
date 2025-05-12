@@ -43,7 +43,7 @@ protected:
 public:
     explicit BSplineSurface(vec, vec, uword, field<vec>&& = {});
     BSplineSurface(const BSplineSurface&) = default;
-    BSplineSurface(BSplineSurface&&) = default;
+    BSplineSurface(BSplineSurface&&) noexcept = default;
     BSplineSurface& operator=(const BSplineSurface&) = delete;
     BSplineSurface& operator=(BSplineSurface&&) = delete;
     virtual ~BSplineSurface() = default;

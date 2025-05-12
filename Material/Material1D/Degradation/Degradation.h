@@ -46,9 +46,9 @@ public:
         unsigned  // material tag
     );
     Degradation(const Degradation&);
-    Degradation(Degradation&&) noexcept = delete;
+    Degradation(Degradation&&) = delete;
     Degradation& operator=(const Degradation&) = delete;
-    Degradation& operator=(Degradation&&) noexcept = delete;
+    Degradation& operator=(Degradation&&) = delete;
     ~Degradation() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;

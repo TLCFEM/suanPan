@@ -124,9 +124,9 @@ public:
         , n_elem(in_elem) {}
 
     MetaMat(const MetaMat&) = default;
-    MetaMat(MetaMat&&) noexcept = delete;
+    MetaMat(MetaMat&&) = delete;
     MetaMat& operator=(const MetaMat&) = delete;
-    MetaMat& operator=(MetaMat&&) noexcept = delete;
+    MetaMat& operator=(MetaMat&&) = delete;
     virtual ~MetaMat() = default;
 
     void set_solver_setting(const SolverSetting<T>& SS) { setting = SS; }

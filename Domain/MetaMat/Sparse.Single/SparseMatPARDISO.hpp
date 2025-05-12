@@ -95,9 +95,9 @@ public:
         this->factored = false;
     }
 
-    SparseMatBasePARDISO(SparseMatBasePARDISO&&) noexcept = delete;
+    SparseMatBasePARDISO(SparseMatBasePARDISO&&) = delete;
     SparseMatBasePARDISO& operator=(const SparseMatBasePARDISO&) = delete;
-    SparseMatBasePARDISO& operator=(SparseMatBasePARDISO&&) noexcept = delete;
+    SparseMatBasePARDISO& operator=(SparseMatBasePARDISO&&) = delete;
 
     ~SparseMatBasePARDISO() override { dealloc(); }
 

@@ -72,9 +72,9 @@ protected:
 public:
     SparseMatSuperLU(uword, uword, uword = 0);
     SparseMatSuperLU(const SparseMatSuperLU&);
-    SparseMatSuperLU(SparseMatSuperLU&&) noexcept = delete;
+    SparseMatSuperLU(SparseMatSuperLU&&) = delete;
     SparseMatSuperLU& operator=(const SparseMatSuperLU&) = delete;
-    SparseMatSuperLU& operator=(SparseMatSuperLU&&) noexcept = delete;
+    SparseMatSuperLU& operator=(SparseMatSuperLU&&) = delete;
     ~SparseMatSuperLU() override;
 
     unique_ptr<MetaMat<T>> make_copy() override;

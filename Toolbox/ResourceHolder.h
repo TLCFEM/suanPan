@@ -54,7 +54,7 @@ public:
     ResourceHolder(ResourceHolder&& old_holder) noexcept { object = std::move(old_holder.object); }
 
     ResourceHolder& operator=(const ResourceHolder&) = delete;
-    ResourceHolder& operator=(ResourceHolder&&) noexcept = delete;
+    ResourceHolder& operator=(ResourceHolder&&) = delete;
     ~ResourceHolder() = default;
 
     T* operator->() const { return object.get(); }

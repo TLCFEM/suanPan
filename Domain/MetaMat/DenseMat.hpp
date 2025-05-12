@@ -69,9 +69,9 @@ public:
         suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; });
     }
 
-    DenseMat(DenseMat&&) noexcept = delete;
+    DenseMat(DenseMat&&) = delete;
     DenseMat& operator=(const DenseMat&) = delete;
-    DenseMat& operator=(DenseMat&&) noexcept = delete;
+    DenseMat& operator=(DenseMat&&) = delete;
     ~DenseMat() override = default;
 
     [[nodiscard]] bool is_empty() const override { return 0 == this->n_elem; }

@@ -58,9 +58,9 @@ public:
     BandMatMAGMA(const BandMatMAGMA& other)
         : BandMat<T>(other) { magma_queue_create(0, &queue); }
 
-    BandMatMAGMA(BandMatMAGMA&&) noexcept = delete;
+    BandMatMAGMA(BandMatMAGMA&&) = delete;
     BandMatMAGMA& operator=(const BandMatMAGMA&) = delete;
-    BandMatMAGMA& operator=(BandMatMAGMA&&) noexcept = delete;
+    BandMatMAGMA& operator=(BandMatMAGMA&&) = delete;
 
     ~BandMatMAGMA() override {
         release();
