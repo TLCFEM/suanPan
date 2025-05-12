@@ -191,17 +191,9 @@ namespace {
 
     template<> BandMatMAGMA<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
 
-    template<> SparseMatMAGMA<double> create_new(const u64 N) {
-        SparseMatMAGMA<double> t_mat{N, N};
-        t_mat.set_solver_setting({.option = "--verbose 1 --precond ILU --solver GMRES"});
-        return t_mat;
-    }
+    template<> SparseMatMAGMA<double> create_new(const u64 N) { return {N, N}; }
 
-    template<> SparseMatMAGMA<float> create_new(const u64 N) {
-        SparseMatMAGMA<float> t_mat{N, N};
-        t_mat.set_solver_setting({.option = "--verbose 1 --precond ILU --solver GMRES"});
-        return t_mat;
-    }
+    template<> SparseMatMAGMA<float> create_new(const u64 N) { return {N, N}; }
 #endif
 #endif
 
@@ -406,6 +398,11 @@ TEST_CASE("Large CUDA Sparse", "[Matrix.Benchmark]") {
         benchmark_mat_setup<SparseMatPARDISO<double>, double>(I);
         benchmark_mat_setup<SparseMatMAGMA<double>, double>(I);
         benchmark_mat_setup<SparseMatCUDA<double>, double>(I);
+        benchmark_mat_setup<BandSymmMat<float>, float>(I);
+        benchmark_mat_setup<BandMatMAGMA<float>, float>(I);
+        benchmark_mat_setup<SparseMatPARDISO<float>, float>(I);
+        benchmark_mat_setup<SparseMatMAGMA<float>, float>(I);
+        benchmark_mat_setup<SparseMatCUDA<float>, float>(I);
     }
 }
 #endif
