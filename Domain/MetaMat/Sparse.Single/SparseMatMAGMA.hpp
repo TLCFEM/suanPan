@@ -270,11 +270,11 @@ namespace suanpan::detail::magma {
 
         if(opts.solver_par.solver == Magma_PCG || opts.solver_par.solver == Magma_PCGMERGE) {
             if(opts.precond_par.solver == Magma_ILU) opts.precond_par.solver = Magma_ICC;
-            if(opts.precond_par.solver == Magma_PARILU) opts.precond_par.solver = Magma_PARIC;
+            else if(opts.precond_par.solver == Magma_PARILU) opts.precond_par.solver = Magma_PARIC;
         }
         if(opts.output_format == Magma_CSR5) {
             if(opts.solver_par.solver == Magma_CGMERGE) opts.solver_par.solver = Magma_CG;
-            if(opts.solver_par.solver == Magma_PCGMERGE) opts.solver_par.solver = Magma_PCG;
+            else if(opts.solver_par.solver == Magma_PCGMERGE) opts.solver_par.solver = Magma_PCG;
         }
     }
 } // namespace suanpan::detail::magma
@@ -347,8 +347,8 @@ template<sp_d T> int SparseMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     auto b_rows = static_cast<magma_index_t>(B.n_rows), b_cols = static_cast<magma_index_t>(B.n_cols);
 
     if(!this->factored) {
-        csr_mat = csr_form<T, magma_index_t>(this->triplet_mat, SparseBase::ZERO);
         this->factored = true;
+        csr_mat = csr_form<T, magma_index_t>(this->triplet_mat, SparseBase::ZERO);
         magma_s::csrset(csr_mat.n_rows, csr_mat.n_cols, csr_mat.row_mem(), csr_mat.col_mem(), csr_mat.val_mem(), &A_host, queue);
         magma_s::mtransfer(A_host, &A_device, Magma_CPU, Magma_DEV, queue);
     }
