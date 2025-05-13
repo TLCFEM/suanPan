@@ -141,7 +141,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
     if constexpr(std::is_same_v<T, float>) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(this->triplet_mat.n_elem), descr, (float*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (float*)&d_b + I, float(this->setting.tolerance), 3, (float*)&d_x + I, &singularity);
+        for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (float*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (float*)&d_b + I, float(this->setting.tolerance), 3, (float*)&d_x + I, &singularity);
 
         X.set_size(arma::size(B));
 
@@ -152,7 +152,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
     else if(Precision::FULL == this->setting.precision) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpDcsrlsvqr(handle, int(this->n_rows), int(this->triplet_mat.n_elem), descr, (double*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (double*)&d_b + I, this->setting.tolerance, 3, (double*)&d_x + I, &singularity);
+        for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpDcsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (double*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (double*)&d_b + I, this->setting.tolerance, 3, (double*)&d_x + I, &singularity);
 
         X.set_size(arma::size(B));
 
@@ -176,7 +176,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
             d_b.copy_from(residual.memptr(), stream);
 
             code = 0;
-            for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(this->triplet_mat.n_elem), descr, (float*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (float*)&d_b + I, float(this->setting.tolerance), 3, (float*)&d_x + I, &singularity);
+            for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (float*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (float*)&d_b + I, float(this->setting.tolerance), 3, (float*)&d_x + I, &singularity);
             if(0 != code) break;
 
             d_x.copy_to(residual.memptr(), stream);
