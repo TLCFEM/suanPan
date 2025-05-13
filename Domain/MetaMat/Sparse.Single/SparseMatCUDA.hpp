@@ -49,7 +49,7 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     public:
         size_t size{};
 
-        cuda_ptr(const size_t in_size = 0)
+        explicit cuda_ptr(const size_t in_size = 0)
             : size(in_size) {
             if(size > 0) cudaMalloc(&ptr, size);
         }
