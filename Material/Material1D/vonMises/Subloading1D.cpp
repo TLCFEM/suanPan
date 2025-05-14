@@ -49,7 +49,8 @@ unique_ptr<Material> Subloading1D::get_copy() { return std::make_unique<Subloadi
 int Subloading1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    const auto zero_increment = fabs(incre_strain(0)) <= datum::eps;
+    const auto abs_incre_strain = std::fabs(incre_strain(0));
+    const auto zero_increment = abs_incre_strain <= datum::eps;
 
     if(!is_viscous && zero_increment) return SUANPAN_SUCCESS;
 
@@ -130,7 +131,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         const auto fraction_term = (cv * z - zv) * norm_mu * gamma + 1.;
         const auto power_term = pow(fraction_term, nv - 1.);
 
-        residual(0) = fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (z - 1.) * y * sum_d) - zv * y;
+        residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (z - 1.) * y * sum_d) - zv * y;
         residual(1) = z - start_z - gamma * avg_rate;
         residual(2) = zv - fraction_term * power_term * z;
 
@@ -162,6 +163,8 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         zv -= incre(1);
         z -= incre(2);
         if(gamma < 0.) gamma = 0.;
+        else
+            while(gamma > abs_incre_strain) gamma *= .5;
         if(z < 0.) z = 0.;
         else if(z > 1.) z = 1.;
         if(is_viscous) {
