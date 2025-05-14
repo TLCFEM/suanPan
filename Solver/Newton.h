@@ -35,6 +35,9 @@ class Newton : public Solver {
 
     [[nodiscard]] virtual double amplification(const vec&, const vec&) const { return 0.; }
 
+protected:
+    double inner_product = 0.;
+
 public:
     explicit Newton(unsigned = 0, bool = false);
 

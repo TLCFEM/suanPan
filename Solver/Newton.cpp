@@ -39,6 +39,8 @@ int Newton::analyze() {
     // iteration counter
     auto counter = 0u;
 
+    inner_product = datum::eps;
+
     vec samurai, pre_samurai;
 
     auto aitken = false;
@@ -96,6 +98,8 @@ int Newton::analyze() {
             suanpan_error("Error code {} received.\n", flag);
             return flag;
         }
+
+        inner_product = std::max(inner_product, dot(samurai, residual));
 
         if(0u < counter)
             if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
@@ -156,8 +160,11 @@ void Newton::print() {
 double AICN::amplification(const vec& x, const vec& r) const {
     const auto hessian_norm = dot(x, r);
     if(hessian_norm <= 0.) return 0.;
-    const auto amp = 2. / (std::sqrt(1. + 2. * l_est * std::sqrt(hessian_norm)) + 1.);
-    return std::isfinite(amp) ? amp : 0.;
+
+    static constexpr auto ratio = .9;
+    static constexpr auto factor = 2. / ratio * (1. / ratio - 1.);
+
+    return 2. / (std::sqrt(1. + 2. * std::max(l_est, factor / std::sqrt(inner_product)) * std::sqrt(hessian_norm)) + 1.);
 }
 
 AICN::AICN(const unsigned T, const double L)
