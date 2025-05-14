@@ -99,7 +99,7 @@ int Newton::analyze() {
             return flag;
         }
 
-        inner_product = std::max(inner_product, dot(samurai, residual));
+        inner_product = std::max(inner_product, std::fabs(dot(samurai, residual)));
 
         if(0u < counter)
             if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
