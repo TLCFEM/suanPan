@@ -46,7 +46,8 @@ unique_ptr<Material> Subloading::get_copy() { return std::make_unique<Subloading
 int Subloading::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
+    const auto norm_incre_strain = norm(incre_strain);
+    if(norm_incre_strain <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
@@ -188,6 +189,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
 
         gamma -= incre(0);
         z -= incre(1);
+        while(gamma > norm_incre_strain) gamma *= .5;
         if(z > 1.) z = 1. - datum::eps;
         else if(z < 0.) z = 0.;
     }
