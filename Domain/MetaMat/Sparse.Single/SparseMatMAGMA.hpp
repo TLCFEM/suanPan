@@ -34,7 +34,7 @@
 #ifndef SPARSEMATMAGMA_HPP
 #define SPARSEMATMAGMA_HPP
 
-#include "SparseMat.hpp"
+#include "../SparseMat.hpp"
 
 #include <magma_v2.h>
 #include <magmasparse.h>
@@ -287,12 +287,15 @@ template<sp_d T> class SparseMatMAGMA final : public SparseMat<T> {
 
     csr_form<T, magma_index_t> csr_mat;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
     mat_t A_host{Magma_CSR, Magma_CPU};
     mat_t A_device{Magma_CSR, Magma_DEV};
     mat_t b_host{Magma_DENSE, Magma_CPU};
     mat_t b_device{Magma_DENSE, Magma_DEV};
     mat_t x_host{Magma_DENSE, Magma_CPU};
     mat_t x_device{Magma_DENSE, Magma_DEV};
+#pragma GCC diagnostic pop
 
     opt_t opts{};
 
