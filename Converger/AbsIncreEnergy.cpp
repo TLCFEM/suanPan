@@ -35,7 +35,7 @@ unique_ptr<Converger> AbsIncreEnergy::get_copy() { return std::make_unique<AbsIn
 bool AbsIncreEnergy::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    set_error(fabs(dot(W->get_ninja(), get_residual())));
+    set_error(std::fabs(dot(W->get_ninja(), get_residual())));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())

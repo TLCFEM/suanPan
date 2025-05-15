@@ -26,7 +26,7 @@ TranslationConnector::TranslationConnector(const unsigned T, uvec&& N, const uns
     , sa(2u == c_dof ? span(0, 1) : span(0, 2))
     , sb(2u == c_dof ? span(2, 3) : span(3, 5))
     , sc(2u == c_dof ? span(4, 5) : span(6, 8))
-    , alpha(fabs(P)) {}
+    , alpha(std::fabs(P)) {}
 
 int TranslationConnector::initialize(const shared_ptr<DomainBase>&) {
     const mat coor = get_coordinate(c_dof).t();

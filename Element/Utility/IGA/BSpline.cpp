@@ -75,7 +75,7 @@ uvec BSpline::get_all_element_span() const { return IGA::compute_all_element_spa
 uword BSpline::evaluate_span(const double u) const {
     const auto n = knot.n_elem - order - 2llu;
 
-    if(fabs(u - knot(n + 1)) <= 1E-14) return n;
+    if(std::fabs(u - knot(n + 1)) <= 1E-14) return n;
 
     auto low = order, high = n + 1;
 

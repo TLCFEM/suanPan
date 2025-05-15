@@ -54,7 +54,7 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
             if(diff_x > 1) break;
             const auto diff_y = list[J].y - list[I].y;
             if(diff_x == 1 && diff_y > 1) break;
-            if(abs(diff_y) > 1) continue;
+            if(std::abs(diff_y) > 1) continue;
             apply_contact(D, D->get<Node>(list[I].tag), D->get<Node>(list[J].tag), full);
         }
     });

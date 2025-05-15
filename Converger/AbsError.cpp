@@ -39,7 +39,7 @@ unique_ptr<Converger> AbsError::get_copy() { return std::make_unique<AbsError>(*
 bool AbsError::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    set_error(fabs(W->get_error()));
+    set_error(std::fabs(W->get_error()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())

@@ -66,7 +66,7 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
 
     const auto sum_energy = accu(current_energy);
 
-    if(fabs(sum_energy - total_energy) < tolerance * total_energy) return SUANPAN_EXIT;
+    if(std::fabs(sum_energy - total_energy) < tolerance * total_energy) return SUANPAN_EXIT;
 
     total_energy = sum_energy;
 

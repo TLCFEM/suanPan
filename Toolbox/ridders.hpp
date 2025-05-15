@@ -44,7 +44,7 @@ template<std::invocable<double> T> double ridders(const T& func, double x1, doub
 
         const auto x3 = .5 * (x1 + x2);
         const auto f3 = func(x3);
-        if(std::fabs(f3) < tolerance || fabs(x2 - x1) < tolerance) {
+        if(std::fabs(f3) < tolerance || std::fabs(x2 - x1) < tolerance) {
             target = x3;
             break;
         }

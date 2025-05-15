@@ -36,7 +36,7 @@ bool RelIncreEnergy::is_converged(const unsigned counter) {
     const auto D = get_domain().lock();
     auto& W = D->get_factory();
 
-    const auto energy = fabs(dot(W->get_ninja(), get_residual()));
+    const auto energy = std::fabs(dot(W->get_ninja(), get_residual()));
     if(0u == counter) ref_energy = energy;
     set_error(energy / ref_energy);
     set_conv_flag(get_tolerance() > get_error());

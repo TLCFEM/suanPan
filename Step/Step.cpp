@@ -122,7 +122,7 @@ void Step::set_ini_step_size(const double T) {
         ini_step_size = T > time_period ? time_period : T;
         if(const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1; t_iteration > static_cast<int>(max_substep) && max_substep != 0) set_max_substep(t_iteration);
     }
-    else ini_step_size = fabs(T); // for arc-length control
+    else ini_step_size = std::fabs(T); // for arc-length control
 }
 
 void Step::set_min_step_size(const double T) { min_step_size = T; }

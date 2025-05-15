@@ -39,7 +39,7 @@ unique_ptr<Converger> RelError::get_copy() { return std::make_unique<RelError>(*
 bool RelError::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    const auto rel_error = fabs(W->get_error()) / inf_norm(W->get_trial_displacement());
+    const auto rel_error = std::fabs(W->get_error()) / inf_norm(W->get_trial_displacement());
     set_error(std::isfinite(rel_error) ? rel_error : 1.);
     set_conv_flag(get_tolerance() > get_error());
 
