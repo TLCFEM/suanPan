@@ -220,5 +220,5 @@ int Subloading::reset_status() {
 }
 
 void Subloading::print() {
-    suanpan_info("A 3D combined hardening material using subloading surface model.\n");
+    suanpan_info("A 3D combined hardening material using subloading surface model. doi:10.1007/s00707-025-04339-0\n");
 }
