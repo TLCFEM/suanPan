@@ -80,12 +80,12 @@ int Subloading::update_trial_status(const vec& t_strain) {
 
         q = current_q + root_two_third * gamma;
 
-        const auto exp_iso = saturation_iso * exp(-m_iso * q);
+        const auto exp_iso = saturation_iso * std::exp(-m_iso * q);
         auto y = initial_iso + saturation_iso + k_iso * q - exp_iso;
         auto dy = root_two_third * (k_iso + m_iso * exp_iso);
         if(y < 0.) y = dy = 0.;
 
-        const auto exp_kin = saturation_kin * exp(-m_kin * q);
+        const auto exp_kin = saturation_kin * std::exp(-m_kin * q);
         auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
         auto da = root_two_third * (k_kin + m_kin * exp_kin);
         if(a < 0.) a = da = 0.;
@@ -109,7 +109,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
             const auto aa = two_third - tensor::stress::double_contraction(d);
             const auto bb = tensor::stress::double_contraction(d, ref);
             const auto cc = tensor::stress::double_contraction(ref);
-            const auto sqrt_term = sqrt(bb * bb + aa * cc);
+            const auto sqrt_term = std::sqrt(bb * bb + aa * cc);
 
             const auto current_s = tensor::dev(current_stress);
             const vec incre_s = trial_s - current_s;
@@ -128,7 +128,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
 
                 const vec middle = base + x * incre_s;
                 const auto middle_d = tensor::stress::double_contraction(d, middle);
-                const auto tmp_sqrt = std::max(datum::eps, sqrt(middle_d * middle_d + aa * tensor::stress::double_contraction(middle)));
+                const auto tmp_sqrt = std::max(datum::eps, std::sqrt(middle_d * middle_d + aa * tensor::stress::double_contraction(middle)));
                 const auto tmp_numerator = middle_d * incre_d + aa * tensor::stress::double_contraction(incre_s, middle);
                 const auto residual_x = tmp_sqrt * incre_d + tmp_numerator;
                 const auto jacobian_x = incre_d * residual_x + tmp_sqrt * aa * incre_incre;
@@ -139,10 +139,10 @@ int Subloading::update_trial_status(const vec& t_strain) {
                     return SUANPAN_FAIL;
                 }
 
-                const auto error = fabs(incre_x);
-                if(1u == counter) ref_error = error;
+                const auto error = std::fabs(incre_x);
+                if(1u == inner_counter) ref_error = error;
                 suanpan_debug("Local initial yield ratio iteration error: {:.5E}.\n", error);
-                if(error < tolerance * ref_error || ((error < tolerance || fabs(residual_x) < tolerance) && inner_counter > 3u)) {
+                if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual_x) < tolerance) && inner_counter > 3u)) {
                     if(x >= 1.) {
                         // elastic unloading
                         z = (bb + sqrt_term) / aa / y;
