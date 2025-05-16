@@ -335,7 +335,7 @@ jobs:
           ls -halt
           if [ "${{ github.event_name }}" == "push" ]; then
             choco apikey --key ${{ secrets.CHOCO_KEY }} --source https://push.chocolatey.org/
-            choco push suanpan.3.7.1.nupkg --source https://push.chocolatey.org/
+            choco push suanpan.3.8.0.nupkg --source https://push.chocolatey.org/
           fi
       - name: Release SHA256
         if: matrix.mkl == 'ON' && matrix.vtk == 'ON' && matrix.avx == 'ON'
@@ -354,8 +354,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanpan.3.7.1.nupkg
-          asset_name: suanpan.3.7.1.nupkg
+          file: suanpan.3.8.0.nupkg
+          asset_name: suanpan.3.8.0.nupkg
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
