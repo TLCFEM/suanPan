@@ -553,18 +553,17 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         endif ()
     endif ()
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
-        set(PATH_LIST
+        foreach (ONEAPI_PATH
                 $ENV{ONEAPI_ROOT}/compiler/latest/lib #  since 2024
                 $ENV{ONEAPI_ROOT}/compiler/latest/linux/compiler/lib/intel64_lin # prior to 2024
         )
-        foreach (PATHA ${PATH_LIST})
             file(GLOB ONEAPI_FILES
-                    ${PATHA}/libifcoremt${DECOR}*${SUFFIX}
-                    ${PATHA}/libifport${DECOR}*${SUFFIX}
-                    ${PATHA}/libimf${DECOR}*${SUFFIX}
-                    ${PATHA}/libintlc${DECOR}*${SUFFIX}
-                    ${PATHA}/libiomp5${DECOR}*${SUFFIX}
-                    ${PATHA}/libsvml${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libifcoremt${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libifport${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libimf${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libintlc${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libiomp5${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libsvml${DECOR}*${SUFFIX}
             )
             install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
         endforeach ()
