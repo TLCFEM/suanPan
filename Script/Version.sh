@@ -24,13 +24,13 @@ done
 # inno setup
 file_name="Enhancement/suanPan.iss"
 if [ -f $file_name ]; then
-  sed -i "s/#define MyAppVersion \"[0-9]\.[0-9]\"/#define MyAppVersion \"$1\.$2\"/g" $file_name
+  sed -i "s/#define MyAppVersion \"[0-9]\.[0-9]\.[0-9]\"/#define MyAppVersion \"$1\.$2\.$3\"/g" $file_name
 fi
 
 # chocolatey
 file_name="Enhancement/suanpan.nuspec"
 if [ -f $file_name ]; then
-  sed -i "s/<version>[0-9]\.[0-9]<\/version>/<version>$1\.$2<\/version>/g" $file_name
+  sed -i "s/<version>[0-9]\.[0-9]\.[0-9]<\/version>/<version>$1\.$2\.$3<\/version>/g" $file_name
 fi
 
 # msvc
@@ -57,5 +57,11 @@ fi
 # snapcraft
 file_name="snapcraft.yaml"
 if [ -f $file_name ]; then
-  sed -i "s/version: \"[0-9]\.[0-9]\"/version: \"$1\.$2\"/g" $file_name
+  sed -i "s/version: \"[0-9]\.[0-9]\.[0-9]\"/version: \"$1\.$2\.$3\"/g" $file_name
+fi
+
+# citation
+file_name="CITATION.cff"
+if [ -f $file_name ]; then
+  sed -i "s/version: \"[0-9]\.[0-9]\.[0-9]\"/version: \"$1\.$2\.$3\"/g" $file_name
 fi

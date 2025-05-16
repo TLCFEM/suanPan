@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "suanPan"
-#define MyAppVersion "3.8"
+#define MyAppVersion "3.7.1"
 #define MyAppPublisher "Theodore Chang"
 #define MyAppURL "https://github.com/TLCFEM/suanPan"
 #define MyAppExeName "suanPan.exe"
