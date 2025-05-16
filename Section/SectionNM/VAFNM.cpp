@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "VAFNM.h"
+
 #include <Toolbox/utility.h>
 
 int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
@@ -149,7 +150,9 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
 
 vec VAFNM::compute_h(const double alpha) const { return {n_size, fill::value(std::max(datum::eps, 1. + iso_modulus * alpha + iso_saturation - iso_saturation * exp(-iso_decay * alpha)))}; }
 
-vec VAFNM::compute_dh(const double alpha) const { return compute_h(alpha).transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : iso_modulus + iso_saturation * iso_decay * exp(-iso_decay * alpha); }); }
+vec VAFNM::compute_dh(const double alpha) const {
+    return compute_h(alpha).transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : iso_modulus + iso_saturation * iso_decay * exp(-iso_decay * alpha); });
+}
 
 VAFNM::VAFNM(const unsigned T, const double EEA, const double EEIS, const double HH, const double HS, const double HD, vec&& KK, vec&& KB, const double LD, vec&& YF)
     : NonlinearNM(T, EEA, EEIS, any(KK) || any(KB), LD, std::move(YF))

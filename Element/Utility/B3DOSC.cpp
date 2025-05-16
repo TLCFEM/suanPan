@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B3DOSC.h"
+
 #include <Element/Element.h>
 #include <Toolbox/tensor.h>
 
@@ -117,7 +118,7 @@ void B3DOSC::update_transformation() {
 
 unsigned B3DOSC::nodal_size() const { return 7u; }
 
-unique_ptr<Orientation> B3DOSC::get_copy() { return make_unique<B3DOSC>(*this); }
+unique_ptr<Orientation> B3DOSC::get_copy() { return std::make_unique<B3DOSC>(*this); }
 
 vec B3DOSC::to_local_vec(const vec&) const { return {elongation, theta(2), theta(5), theta(1), theta(4), theta(0), theta(3), theta(6), theta(7)}; }
 

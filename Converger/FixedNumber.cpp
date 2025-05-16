@@ -26,7 +26,7 @@
 FixedNumber::FixedNumber(const unsigned T, const unsigned M, const bool P)
     : Converger(T, 1., M, P) {}
 
-unique_ptr<Converger> FixedNumber::get_copy() { return make_unique<FixedNumber>(*this); }
+unique_ptr<Converger> FixedNumber::get_copy() { return std::make_unique<FixedNumber>(*this); }
 
 bool FixedNumber::is_converged(const unsigned counter) {
     if(is_print())

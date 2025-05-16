@@ -29,61 +29,57 @@
 #define MATERIALELEMENT_H
 
 #include <Element/Element.h>
-#include <Domain/DOF.h>
-
-using std::array;
-using std::vector;
 
 class MaterialElement : public Element {
 public:
     MaterialElement(
-        unsigned,     // tag
-        unsigned,     // number of nodes
-        unsigned,     // number of dofs
-        uvec&&,       // node encoding
-        uvec&&,       // material tags
-        bool,         // nonlinear geometry switch
-        MaterialType, // material type
-        vector<DOF>&& // dof identifier
-    );
-};
-
-class MaterialElement1D : public MaterialElement {
-public:
-    MaterialElement1D(
-        unsigned,     // tag
-        unsigned,     // number of nodes
-        unsigned,     // number of dofs
-        uvec&&,       // node encoding
-        uvec&&,       // material tags
-        bool,         // nonlinear geometry switch
-        vector<DOF>&& // dof identifier
-    );
-};
-
-class MaterialElement2D : public MaterialElement {
-public:
-    MaterialElement2D(
         unsigned,          // tag
         unsigned,          // number of nodes
         unsigned,          // number of dofs
         uvec&&,            // node encoding
         uvec&&,            // material tags
         bool,              // nonlinear geometry switch
-        vector<DOF>&& = {} // dof identifier
+        MaterialType,      // material type
+        std::vector<DOF>&& // dof identifier
+    );
+};
+
+class MaterialElement1D : public MaterialElement {
+public:
+    MaterialElement1D(
+        unsigned,          // tag
+        unsigned,          // number of nodes
+        unsigned,          // number of dofs
+        uvec&&,            // node encoding
+        uvec&&,            // material tags
+        bool,              // nonlinear geometry switch
+        std::vector<DOF>&& // dof identifier
+    );
+};
+
+class MaterialElement2D : public MaterialElement {
+public:
+    MaterialElement2D(
+        unsigned,               // tag
+        unsigned,               // number of nodes
+        unsigned,               // number of dofs
+        uvec&&,                 // node encoding
+        uvec&&,                 // material tags
+        bool,                   // nonlinear geometry switch
+        std::vector<DOF>&& = {} // dof identifier
     );
 };
 
 class MaterialElement3D : public MaterialElement {
 public:
     MaterialElement3D(
-        unsigned,                                   // tag
-        unsigned,                                   // number of nodes
-        unsigned,                                   // number of dofs
-        uvec&&,                                     // node encoding
-        uvec&&,                                     // material tags
-        bool,                                       // nonlinear geometry switch
-        vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3} // dof identifier
+        unsigned,                                        // tag
+        unsigned,                                        // number of nodes
+        unsigned,                                        // number of dofs
+        uvec&&,                                          // node encoding
+        uvec&&,                                          // material tags
+        bool,                                            // nonlinear geometry switch
+        std::vector<DOF>&& = {DOF::U1, DOF::U2, DOF::U3} // dof identifier
     );
 };
 

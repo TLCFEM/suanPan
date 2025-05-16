@@ -1,15 +1,15 @@
-set(Special
-        Special/Contact2D.cpp
-        Special/Contact3D.cpp
-        Special/Damper01.cpp
-        Special/Damper02.cpp
-        Special/Embedded.cpp
-        Special/Joint.cpp
-        Special/Mass.cpp
-        Special/SingleSection2D.cpp
-        Special/SingleSection3D.cpp
-        Special/Spring01.cpp
-        Special/Spring02.cpp
-        Special/Tie.cpp
-        Special/TranslationConnector.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        Contact2D.cpp
+        Contact3D.cpp
+        Damper01.cpp
+        Damper02.cpp
+        Embedded.cpp
+        Joint.cpp
+        Mass.cpp
+        SingleSection2D.cpp
+        SingleSection3D.cpp
+        Spring01.cpp
+        Spring02.cpp
+        Tie.cpp
+        TranslationConnector.cpp
 )

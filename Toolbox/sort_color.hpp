@@ -111,8 +111,7 @@ template<typename T> std::vector<std::vector<T>> sort_color_mis(const suanpan::g
             color.emplace_back(node_to_color);
             degree.erase(node_to_color);
             for(auto neighbour : node_register[node_to_color]) degree_copy.erase(neighbour);
-        }
-        while(!degree_copy.empty());
+        } while(!degree_copy.empty());
     }
 
     for(auto& color : color_map) color.shrink_to_fit();

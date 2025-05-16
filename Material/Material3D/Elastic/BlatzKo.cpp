@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "BlatzKo.h"
+
 #include <Toolbox/tensor.h>
 
 const vec BlatzKo::weight{2., 2., 2., 1., 1., 1.};
@@ -33,7 +34,7 @@ int BlatzKo::initialize(const shared_ptr<DomainBase>&) {
 
 double BlatzKo::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> BlatzKo::get_copy() { return make_unique<BlatzKo>(*this); }
+unique_ptr<Material> BlatzKo::get_copy() { return std::make_unique<BlatzKo>(*this); }
 
 // takes green strain as input
 int BlatzKo::update_trial_status(const vec& t_strain) {

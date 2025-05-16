@@ -62,7 +62,6 @@
 
 using std::ifstream;
 using std::ofstream;
-using std::string;
 using std::vector;
 
 unsigned SUANPAN_WARNING_COUNT = 0;
@@ -127,11 +126,11 @@ namespace {
     }
 
     void overview() {
-        const auto new_model = make_shared<Bead>();
+        const auto new_model = std::make_shared<Bead>();
 
-        auto guide_command = [&](const string& target) {
+        auto guide_command = [&](const std::string& target) {
             while(true) {
-                string command_line;
+                std::string command_line;
                 suanpan_highlight("overview -> ");
                 getline(std::cin, command_line);
                 if(is_equal(command_line, "q")) {
@@ -139,7 +138,7 @@ namespace {
                     return SUANPAN_EXIT;
                 }
                 if(is_equal(command_line, target)) {
-                    istringstream tmp_str(command_line);
+                    std::istringstream tmp_str(command_line);
                     const auto code = process_command(new_model, tmp_str);
                     suanpan_highlight("overview -> [Press Enter to Continue]");
                     getline(std::cin, command_line);
@@ -154,7 +153,7 @@ namespace {
 
         const auto redirect = [&] {
             buffer_backup = SUANPAN_COUT.rdbuf();
-            buffer_tmp = make_unique<std::stringbuf>();
+            buffer_tmp = std::make_unique<std::stringbuf>();
             SUANPAN_COUT.rdbuf(buffer_tmp.get());
         };
         const auto restore = [&] {
@@ -246,8 +245,8 @@ namespace {
         guide_command("q");
     }
 
-    void perform_upsampling(istringstream& command) {
-        string file_name;
+    void perform_upsampling(std::istringstream& command) {
+        std::string file_name;
         uword up_rate;
 
         if(!get_input(command, file_name, up_rate)) {
@@ -255,7 +254,7 @@ namespace {
             return;
         }
 
-        string window_type = "Hamming";
+        std::string window_type = "Hamming";
         if(!get_optional_input(command, window_type)) {
             suanpan_error("A valid window type is required.\n");
             return;
@@ -278,8 +277,8 @@ namespace {
             suanpan_info("Data is saved to file \"{}\".\n", file_name);
     }
 
-    void perform_response_spectrum(istringstream& command) {
-        string motion_name, period_name;
+    void perform_response_spectrum(std::istringstream& command) {
+        std::string motion_name, period_name;
         if(!get_input(command, motion_name, period_name)) {
             suanpan_error("Valid file names for ground motion and period vector are required.\n");
             return;
@@ -327,8 +326,8 @@ namespace {
             suanpan_info("Data is saved to file \"{}\".\n", motion_name);
     }
 
-    void perform_sdof_response(istringstream& command) {
-        string motion_name;
+    void perform_sdof_response(std::istringstream& command) {
+        std::string motion_name;
         if(!get_input(command, motion_name)) {
             suanpan_error("A valid file name for ground motion is required.\n");
             return;
@@ -377,7 +376,7 @@ namespace {
             suanpan_info("Data is saved to file \"{}\".\n", motion_name);
     }
 
-    int create_new_domain(const shared_ptr<Bead>& model, istringstream& command) {
+    int create_new_domain(const shared_ptr<Bead>& model, std::istringstream& command) {
         unsigned domain_id;
         if(!get_input(command, domain_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -389,7 +388,7 @@ namespace {
         if(auto& tmp_domain = get_domain(model, domain_id); nullptr != tmp_domain)
             suanpan_info("Switch to domain {}.\n", domain_id);
         else {
-            tmp_domain = make_shared<Domain>(domain_id);
+            tmp_domain = std::make_shared<Domain>(domain_id);
             if(nullptr != tmp_domain)
                 suanpan_info("Domain {} is successfully created.\n", domain_id);
         }
@@ -397,8 +396,8 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int create_new_external_module(const shared_ptr<DomainBase>& domain, istringstream& command) {
-        string library_name;
+    int create_new_external_module(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+        std::string library_name;
 
         if(!get_input(command, library_name)) {
             suanpan_error("A valid module name is required.\n");
@@ -412,20 +411,20 @@ namespace {
                 break;
             }
 
-        if(0 == code) domain->insert(make_shared<ExternalModule>(library_name));
+        if(0 == code) domain->insert(std::make_shared<ExternalModule>(library_name));
 
         return SUANPAN_SUCCESS;
     }
 
-    int create_new_initial(const shared_ptr<DomainBase>& domain, istringstream& command) {
-        string variable_type;
+    int create_new_initial(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+        std::string variable_type;
         if(!get_input(command, variable_type)) {
             suanpan_error("A valid variable type is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         if(is_equal("material", variable_type)) {
-            string state_type;
+            std::string state_type;
             if(!get_input(command, state_type)) {
                 suanpan_error("A valid state type is required.\n");
                 return SUANPAN_SUCCESS;
@@ -437,7 +436,7 @@ namespace {
                 return SUANPAN_SUCCESS;
             }
 
-            vector<double> para;
+            std::vector<double> para;
             while(!command.eof())
                 if(double input; get_input(command, input)) para.emplace_back(input);
 
@@ -535,31 +534,31 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int create_new_node(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    int create_new_node(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
         unsigned node_id;
         if(!get_input(command, node_id)) {
             suanpan_error("A valid tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        vector<double> coor;
+        std::vector<double> coor;
         double X;
         while(get_input(command, X)) coor.push_back(X);
 
-        if(!domain->insert(make_shared<Node>(node_id, vec(coor))))
+        if(!domain->insert(std::make_shared<Node>(node_id, vec(coor))))
             suanpan_error("Fail to create new node via \"{}\".\n", command.str());
 
         return SUANPAN_SUCCESS;
     }
 
-    int disable_object(const shared_ptr<Bead>& model, istringstream& command) {
+    int disable_object(const shared_ptr<Bead>& model, std::istringstream& command) {
         const auto& domain = get_current_domain(model);
         if(nullptr == domain) {
             suanpan_error("A valid domain is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        string object_type;
+        std::string object_type;
         if(!get_input(command, object_type)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
@@ -606,14 +605,14 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int enable_object(const shared_ptr<Bead>& model, istringstream& command) {
+    int enable_object(const shared_ptr<Bead>& model, std::istringstream& command) {
         const auto& domain = get_current_domain(model);
         if(nullptr == domain) {
             suanpan_error("A valid domain is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        string object_type;
+        std::string object_type;
         if(!get_input(command, object_type)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
@@ -661,14 +660,14 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int erase_object(const shared_ptr<Bead>& model, istringstream& command) {
+    int erase_object(const shared_ptr<Bead>& model, std::istringstream& command) {
         const auto& domain = get_current_domain(model);
         if(nullptr == domain) {
             suanpan_error("A valid domain is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        string object_type;
+        std::string object_type;
         if(!get_input(command, object_type)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
@@ -714,19 +713,19 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int list_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    int list_object(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
         if(nullptr == domain) {
             suanpan_error("A valid domain is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        string object_type;
+        std::string object_type;
         if(!get_input(command, object_type)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        vector<unsigned> list;
+        std::vector<unsigned> list;
         if(is_equal(object_type, "amplitude"))
             for(auto& I : domain->get_amplitude_pool()) list.emplace_back(I->get_tag());
         else if(is_equal(object_type, "constraint"))
@@ -770,13 +769,13 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int protect_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    int protect_object(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
         if(nullptr == domain) {
             suanpan_error("A valid domain is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        string object_type;
+        std::string object_type;
         if(!get_input(command, object_type)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
@@ -794,13 +793,13 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int save_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    int save_object(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
         if(nullptr == domain) {
             suanpan_error("A valid domain is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        string object_id;
+        std::string object_id;
         if(!get_input(command, object_id)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
@@ -812,22 +811,22 @@ namespace {
                 if(domain->find_recorder(tag)) domain->get_recorder(tag)->save();
         }
         else if(is_equal(object_id, "Stiffness")) {
-            string name = "K";
+            std::string name = "K";
             if(!command.eof() && !get_input(command, name)) name = "K";
             if(auto& stiffness = domain->get_factory()->get_stiffness()) stiffness->save(name.c_str());
         }
         else if(is_equal(object_id, "Mass")) {
-            string name = "M";
+            std::string name = "M";
             if(!command.eof() && !get_input(command, name)) name = "M";
             if(auto& mass = domain->get_factory()->get_mass()) mass->save(name.c_str());
         }
         else if(is_equal(object_id, "Damping")) {
-            string name = "C";
+            std::string name = "C";
             if(!command.eof() && !get_input(command, name)) name = "C";
             if(auto& damping = domain->get_factory()->get_damping()) damping->save(name.c_str());
         }
         else if(is_equal(object_id, "Model")) {
-            string name = "Model.h5";
+            std::string name = "Model.h5";
             if(!command.eof() && !get_input(command, name)) name = "Model.h5";
             domain->save(name);
         }
@@ -835,13 +834,13 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int suspend_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    int suspend_object(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
         if(nullptr == domain) {
             suanpan_error("A valid domain is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        string object_type;
+        std::string object_type;
         if(!get_input(command, object_type)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
@@ -861,13 +860,13 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int use_object(const shared_ptr<DomainBase>& domain, istringstream& command) {
+    int use_object(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
         if(nullptr == domain) {
             suanpan_error("A valid domain is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        string object_id;
+        std::string object_id;
         if(!get_input(command, object_id)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
@@ -901,15 +900,15 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int set_property(const shared_ptr<DomainBase>& domain, istringstream& command) {
-        string property_id;
+    int set_property(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+        std::string property_id;
         if(!get_input(command, property_id)) {
             suanpan_error("A valid property type is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         if(is_equal(property_id, "output_folder")) {
-            string value;
+            std::string value;
 
             if(!get_input(command, value)) {
                 suanpan_error("A valid value is required.\n");
@@ -951,14 +950,14 @@ namespace {
             return SUANPAN_SUCCESS;
         }
         if(is_equal(property_id, "screen_output")) {
-            if(string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
+            if(std::string value; get_input(command, value)) SUANPAN_PRINT = is_true(value);
             else
                 suanpan_error("A valid value is required.\n");
 
             return SUANPAN_SUCCESS;
         }
         if(is_equal(property_id, "verbose_output")) {
-            if(string value; get_input(command, value)) SUANPAN_VERBOSE = is_true(value);
+            if(std::string value; get_input(command, value)) SUANPAN_VERBOSE = is_true(value);
             else
                 suanpan_error("A valid value is required.\n");
 
@@ -966,7 +965,7 @@ namespace {
         }
 
         if(is_equal(property_id, "color_model")) {
-            if(string value; !get_input(command, value))
+            if(std::string value; !get_input(command, value))
                 suanpan_error("A valid value is required.\n");
             else if(is_equal("WP", value)) domain->set_color_model(ColorMethod::WP);
             else if(is_equal("MIS", value)) domain->set_color_model(ColorMethod::MIS);
@@ -998,19 +997,19 @@ namespace {
         auto& t_step = domain->get_current_step();
 
         if(is_equal(property_id, "fixed_step_size")) {
-            string value;
+            std::string value;
             get_input(command, value) ? t_step->set_fixed_step_size(is_true(value)) : suanpan_error("A valid value is required.\n");
         }
         else if(is_equal(property_id, "symm_mat")) {
-            string value;
+            std::string value;
             get_input(command, value) ? t_step->set_symm(is_true(value)) : suanpan_error("A valid value is required.\n");
         }
         else if(is_equal(property_id, "band_mat")) {
-            string value;
+            std::string value;
             get_input(command, value) ? t_step->set_band(is_true(value)) : suanpan_error("A valid value is required.\n");
         }
         else if(is_equal(property_id, "sparse_mat")) {
-            string value;
+            std::string value;
             get_input(command, value) ? t_step->set_sparse(is_true(value)) : suanpan_error("A valid value is required.\n");
         }
         else if(is_equal(property_id, "iterative_refinement")) {
@@ -1019,7 +1018,7 @@ namespace {
                 suanpan_error("A valid value is required.\n");
         }
         else if(is_equal(property_id, "system_solver")) {
-            if(string value; !get_input(command, value))
+            if(std::string value; !get_input(command, value))
                 suanpan_error("A valid value is required.\n");
             else if(is_equal(value, "LAPACK")) t_step->set_system_solver(SolverType::LAPACK);
             else if(is_equal(value, "SPIKE")) t_step->set_system_solver(SolverType::SPIKE);
@@ -1028,25 +1027,31 @@ namespace {
                 t_step->set_system_solver(SolverType::LIS);
                 t_step->set_lis_option(command);
             }
-            else if(is_equal(value, "MUMPS")) t_step->set_system_solver(SolverType::MUMPS);
+            else if(is_equal(value, "MUMPS")) {
+                t_step->set_system_solver(SolverType::MUMPS);
+                t_step->set_option(command);
+            }
 #ifdef SUANPAN_CUDA
             else if(is_equal(value, "CUDA")) t_step->set_system_solver(SolverType::CUDA);
 #ifdef SUANPAN_MAGMA
             else if(is_equal(value, "MAGMA")) {
                 t_step->set_system_solver(SolverType::MAGMA);
-                t_step->set_magma_option(command);
+                t_step->set_option(command);
             }
 #endif
 #endif
 #ifdef SUANPAN_MKL
-            else if(is_equal(value, "PARDISO")) t_step->set_system_solver(SolverType::PARDISO);
+            else if(is_equal(value, "PARDISO")) {
+                t_step->set_system_solver(SolverType::PARDISO);
+                t_step->set_option(command);
+            }
             else if(is_equal(value, "FGMRES")) t_step->set_system_solver(SolverType::FGMRES);
 #endif
             else
                 suanpan_error("A valid solver type is required.\n");
         }
         else if(is_equal(property_id, "sub_system_solver")) {
-            if(string value; !get_input(command, value))
+            if(std::string value; !get_input(command, value))
                 suanpan_error("A valid value is required.\n");
             else if(is_equal(value, "LAPACK")) t_step->set_sub_system_solver(SolverType::LAPACK);
             else if(is_equal(value, "SPIKE")) t_step->set_sub_system_solver(SolverType::SPIKE);
@@ -1055,19 +1060,25 @@ namespace {
                 t_step->set_sub_system_solver(SolverType::LIS);
                 t_step->set_lis_option(command);
             }
-            else if(is_equal(value, "MUMPS")) t_step->set_sub_system_solver(SolverType::MUMPS);
+            else if(is_equal(value, "MUMPS")) {
+                t_step->set_sub_system_solver(SolverType::MUMPS);
+                t_step->set_option(command);
+            }
 #ifdef SUANPAN_CUDA
             else if(is_equal(value, "CUDA")) t_step->set_sub_system_solver(SolverType::CUDA);
 #endif
 #ifdef SUANPAN_MKL
-            else if(is_equal(value, "PARDISO")) t_step->set_sub_system_solver(SolverType::PARDISO);
+            else if(is_equal(value, "PARDISO")) {
+                t_step->set_sub_system_solver(SolverType::PARDISO);
+                t_step->set_option(command);
+            }
             else if(is_equal(value, "FGMRES")) t_step->set_sub_system_solver(SolverType::FGMRES);
 #endif
             else
                 suanpan_error("A valid solver type is required.\n");
         }
         else if(is_equal(property_id, "precision")) {
-            if(string value; !get_input(command, value))
+            if(std::string value; !get_input(command, value))
                 suanpan_error("A valid value is required.\n");
             else if(is_equal(value, "DOUBLE") || is_equal(value, "FULL")) t_step->set_precision(Precision::FULL);
             else if(is_equal(value, "SINGLE") || is_equal(value, "MIXED")) t_step->set_precision(Precision::MIXED);
@@ -1107,8 +1118,8 @@ namespace {
         return SUANPAN_SUCCESS;
     }
 
-    int print_info(const shared_ptr<DomainBase>& domain, istringstream& command) {
-        string object_type;
+    int print_info(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+        std::string object_type;
         if(!get_input(command, object_type)) {
             suanpan_error("A valid object type is required.\n");
             return SUANPAN_SUCCESS;
@@ -1278,7 +1289,7 @@ namespace {
     }
 
     int run_example() {
-        const auto new_model = make_shared<Bead>();
+        const auto new_model = std::make_shared<Bead>();
 
         suanpan_info("====================================================\n");
         suanpan_info("-> A Minimum Example: Elastic Truss Under Tension <-\n");
@@ -1286,9 +1297,9 @@ namespace {
 
         constexpr auto wait_time = 1000;
 
-        auto run_command = [&](const string& command_string) {
+        auto run_command = [&](const std::string& command_string) {
             suanpan_highlight("\t{}\n", command_string);
-            auto command = istringstream(command_string);
+            auto command = std::istringstream(command_string);
             process_command(new_model, command);
             std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
         };
@@ -1332,10 +1343,10 @@ namespace {
     }
 } // namespace
 
-int process_command(const shared_ptr<Bead>& model, istringstream& command) {
+int process_command(const shared_ptr<Bead>& model, std::istringstream& command) {
     if(nullptr == model) return SUANPAN_SUCCESS;
 
-    string command_id;
+    std::string command_id;
     if(!get_input(command, command_id)) return SUANPAN_SUCCESS;
 
     if(is_equal(command_id, "exit") || is_equal(command_id, "quit")) return SUANPAN_EXIT;
@@ -1346,7 +1357,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     }
 
     if(is_equal(command_id, "file")) {
-        string file_name;
+        std::string file_name;
         if(!get_input(command, file_name)) {
             suanpan_error("A valid file name is required.\n");
             return SUANPAN_SUCCESS;
@@ -1519,7 +1530,7 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     if(is_equal(command_id, "pwd")) {
         if(command.eof())
             suanpan_info("{}\n", fs::current_path().generic_string());
-        else if(string path; get_input(command, path)) {
+        else if(std::string path; get_input(command, path)) {
             std::error_code code;
             fs::current_path(path, code);
             if(0 != code.value())
@@ -1599,14 +1610,14 @@ int process_command(const shared_ptr<Bead>& model, istringstream& command) {
     return SUANPAN_SUCCESS;
 }
 
-bool normalise_command(string& all_line, string& command_line) {
+bool normalise_command(std::string& all_line, std::string& command_line) {
     // if to parse and process immediately
     auto process = true;
 
     // clear comment line
     if(!command_line.empty() && '#' == command_line.front()) command_line.clear();
     // remove inline comment
-    if(const auto if_comment = command_line.find('!'); string::npos != if_comment) command_line.erase(if_comment);
+    if(const auto if_comment = command_line.find('!'); std::string::npos != if_comment) command_line.erase(if_comment);
     // remove all delimiters
     for(auto& c : command_line)
         if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
@@ -1622,10 +1633,10 @@ bool normalise_command(string& all_line, string& command_line) {
 }
 
 int process_file(const shared_ptr<Bead>& model, const char* file_name) {
-    std::vector<string> file_list;
+    std::vector<std::string> file_list;
     file_list.reserve(9);
 
-    string str_name(file_name);
+    std::string str_name(file_name);
     file_list.emplace_back(str_name);
     file_list.emplace_back(str_name + ".supan");
     file_list.emplace_back(str_name + ".sp");
@@ -1664,12 +1675,12 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 
     if(record_command) output_file << "### start processing --> " << file_name << '\n';
 
-    string all_line, command_line;
+    std::string all_line, command_line;
     while(!getline(input_file, command_line).fail()) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(record_command) output_file << all_line << '\n';
-        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) {
+        if(std::istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) {
             if(record_command) output_file << "### finish processing --> " << file_name << '\n';
             return SUANPAN_EXIT;
         }
@@ -1680,7 +1691,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     return SUANPAN_SUCCESS;
 }
 
-int execute_command(istringstream& command) {
+int execute_command(std::istringstream& command) {
 #ifdef SUANPAN_MSVC
     std::wstringstream terminal_command;
     terminal_command << command.str().substr(command.tellg()).c_str();

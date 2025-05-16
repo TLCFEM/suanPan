@@ -16,16 +16,17 @@
  ******************************************************************************/
 
 #include "Dynamic.h"
+
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Load/GroupNodalDisplacement.h>
 #include <Solver/BFGS.h>
 #include <Solver/Integrator/LeeNewmarkBase.h>
+#include <Solver/Integrator/Tchamwa.h>
 #include <Solver/MPDC.h>
 #include <Solver/Newton.h>
 #include <Solver/Ramm.h>
-#include <Solver/Integrator/Tchamwa.h>
 
 Dynamic::Dynamic(const unsigned T, const double P, const IntegratorType AT)
     : Step(T, P)
@@ -41,13 +42,13 @@ int Dynamic::initialize() {
     if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 
     // converger
-    if(nullptr == tester) tester = make_shared<AbsIncreDisp>();
+    if(nullptr == tester) tester = std::make_shared<AbsIncreDisp>();
     tester->set_domain(t_domain);
 
     // integrator
     if(nullptr == modifier) {
-        if(IntegratorType::Implicit == analysis_type) modifier = make_shared<Newmark>();
-        else modifier = make_shared<Tchamwa>(0, .8);
+        if(IntegratorType::Implicit == analysis_type) modifier = std::make_shared<Newmark>();
+        else modifier = std::make_shared<Tchamwa>(0, .8);
     }
     else if(IntegratorType::Implicit == analysis_type) {
         if(IntegratorType::Implicit != modifier->type()) {
@@ -63,7 +64,7 @@ int Dynamic::initialize() {
 
     // solver
     // avoid arc length solver
-    if(nullptr != solver) if(std::dynamic_pointer_cast<Ramm>(solver)) solver = nullptr;
+    if(std::dynamic_pointer_cast<Ramm>(solver)) solver = nullptr;
     // automatically enable displacement controlled solver
     if(nullptr == solver) {
         auto flag = false;
@@ -72,7 +73,8 @@ int Dynamic::initialize() {
                 flag = true;
                 break;
             }
-        flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
+        if(flag) solver = std::make_shared<MPDC>();
+        else solver = std::make_shared<Newton>();
     }
 
     if(std::dynamic_pointer_cast<BFGS>(solver) && std::dynamic_pointer_cast<LeeNewmarkBase>(modifier)) {

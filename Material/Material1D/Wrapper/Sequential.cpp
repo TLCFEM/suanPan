@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Sequential.h"
+
 #include <Domain/DomainBase.h>
 
 Sequential::Sequential(const unsigned T, uvec&& MT)
@@ -47,7 +48,7 @@ int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Sequential::get_copy() { return make_unique<Sequential>(*this); }
+unique_ptr<Material> Sequential::get_copy() { return std::make_unique<Sequential>(*this); }
 
 int Sequential::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -124,8 +125,8 @@ int Sequential::reset_status() {
     return code;
 }
 
-vector<vec> Sequential::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Sequential::record(const OutputType P) {
+    std::vector<vec> data;
 
     auto max_size = 0llu;
     for(const auto& I : mat_pool)

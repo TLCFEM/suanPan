@@ -1,0 +1,51 @@
+# A TEST MODEL FOR FIXEDLENGTH2D
+
+node 1 0 0
+node 2 1 0
+node 3 1 -1
+node 4 2 -1
+
+material Elastic1D 1 10
+
+element EB21 1 1 2 12 1 1 1
+element EB21 2 3 4 12 1 1 1
+
+fix2 1 P 1 4
+
+constraint FixedLength2D 2 2 3
+
+refload 1 0 1 2 2
+
+step arclength 1
+set ini_step_size .4
+set min_step_size .1
+set max_step_size .5
+
+criterion MaxDisplacement 1 2 2 .1
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#  -2.6874e-03  1.0637e-01  1.5938e-01
+# Resistance:
+#   1.7194e-02  3.1980e+00 -2.6645e-15
+#
+# Node 3:
+# Coordinate:
+#   1.0000e+00 -1.0000e+00
+# Displacement:
+#   2.6882e-03  1.0638e-01 -1.5940e-01
+# Resistance:
+#  -1.7194e-02  3.1984e+00  3.9968e-15
+peek node 2 3
+
+peek element 1
+
+reset
+clear
+exit

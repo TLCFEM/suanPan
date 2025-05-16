@@ -53,7 +53,7 @@ int BilinearOO::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> BilinearOO::get_copy() { return make_unique<BilinearOO>(*this); }
+unique_ptr<Material> BilinearOO::get_copy() { return std::make_unique<BilinearOO>(*this); }
 
 void BilinearOO::print() {
     suanpan_info("A bilinear origin oriented hysteresis model.\n");

@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -26,10 +26,10 @@ at the top-level directory.
 int num_drop_U;
 #endif
 
-extern void ccopy_(int*, complex [], int*, complex [], int*);
+extern void ccopy_(int*, singlecomplex[], int*, singlecomplex[], int*);
 
 #if 0
-static complex *A;  /* used in _compare_ only */
+static singlecomplex *A;  /* used in _compare_ only */
 static int _compare_(const void *a, const void *b)
 {
     register int *x = (int *)a, *y = (int *)b;
@@ -41,21 +41,21 @@ static int _compare_(const void *a, const void *b)
 #endif
 
 int ilu_ccopy_to_ucol(
-    int jcol,        /* in */
-    int nseg,        /* in */
-    int* segrep,     /* in */
-    int* repfnz,     /* in */
-    int* perm_r,     /* in */
-    complex* dense,  /* modified - reset to zero on return */
-    int drop_rule,   /* in */
-    milu_t milu,     /* in */
-    double drop_tol, /* in */
-    int quota,       /* maximum nonzero entries allowed */
-    complex* sum,    /* out - the sum of dropped entries */
-    int* nnzUj,      /* in - out */
-    GlobalLU_t* Glu, /* modified */
-    float* work      /* working space with minimum size n,
-				    * used by the second dropping rule */
+    int jcol,             /* in */
+    int nseg,             /* in */
+    int* segrep,          /* in */
+    int* repfnz,          /* in */
+    int* perm_r,          /* in */
+    singlecomplex* dense, /* modified - reset to zero on return */
+    int drop_rule,        /* in */
+    milu_t milu,          /* in */
+    double drop_tol,      /* in */
+    int quota,            /* maximum nonzero entries allowed */
+    singlecomplex* sum,   /* out - the sum of dropped entries */
+    int* nnzUj,           /* in - out */
+    GlobalLU_t* Glu,      /* modified */
+    float* work           /* working space with minimum size n,
+                           * used by the second dropping rule */
 ) {
     /*
      * Gather from SPA dense[*] to global ucol[*].
@@ -67,26 +67,28 @@ int ilu_ccopy_to_ucol(
     int_t new_next, nextu, mem_error;
     int *xsup, *supno;
     int_t *lsub, *xlsub;
-    complex* ucol;
+    singlecomplex* ucol;
     int_t *usub, *xusub;
     int_t nzumax;
     int m; /* number of entries in the nonzero U-segments */
     register float d_max = 0.0, d_min = 1.0 / smach("Safe minimum");
     register double tmp;
-    complex zero = {0.0, 0.0};
+    singlecomplex zero = {0.0, 0.0};
     int i_1 = 1;
 
     xsup = Glu->xsup;
     supno = Glu->supno;
     lsub = Glu->lsub;
     xlsub = Glu->xlsub;
-    ucol = (complex*)Glu->ucol;
+    ucol = (singlecomplex*)Glu->ucol;
     usub = Glu->usub;
     xusub = Glu->xusub;
     nzumax = Glu->nzumax;
 
     *sum = zero;
-    if(drop_rule == NODROP) { drop_tol = -1.0, quota = Glu->n; }
+    if(drop_rule == NODROP) {
+        drop_tol = -1.0, quota = Glu->n;
+    }
 
     jsupno = supno[jcol];
     nextu = xusub[jcol];
@@ -95,11 +97,9 @@ int ilu_ccopy_to_ucol(
         krep = segrep[k--];
         ksupno = supno[krep];
 
-        if(ksupno != jsupno) {
-            /* Should go into ucol[] */
+        if(ksupno != jsupno) { /* Should go into ucol[] */
             kfnz = repfnz[krep];
-            if(kfnz != EMPTY) {
-                /* Nonzero U-segment */
+            if(kfnz != SLU_EMPTY) { /* Nonzero U-segment */
 
                 fsupc = xsup[ksupno];
                 isub = xlsub[fsupc] + kfnz - fsupc;
@@ -107,9 +107,11 @@ int ilu_ccopy_to_ucol(
 
                 new_next = nextu + segsze;
                 while(new_next > nzumax) {
-                    if((mem_error = cLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu)) != 0) return (mem_error);
+                    if((mem_error = cLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu)) != 0)
+                        return (mem_error);
                     ucol = Glu->ucol;
-                    if((mem_error = cLUMemXpand(jcol, nextu, USUB, &nzumax, Glu)) != 0) return (mem_error);
+                    if((mem_error = cLUMemXpand(jcol, nextu, USUB, &nzumax, Glu)) != 0)
+                        return (mem_error);
                     usub = Glu->usub;
                     lsub = Glu->lsub;
                 }
@@ -129,23 +131,26 @@ int ilu_ccopy_to_ucol(
                     else {
                         switch(milu) {
                         case SMILU_1:
-                        case SMILU_2: c_add(sum, sum, &dense[irow]);
+                        case SMILU_2:
+                            c_add(sum, sum, &dense[irow]);
                             break;
                         case SMILU_3:
                             /* *sum += fabs(dense[irow]);*/
                             sum->r += tmp;
                             break;
-                        case SILU: default:
+                        case SILU:
+                        default:
                             break;
                         }
 #ifdef DEBUG
-			num_drop_U++;
+                        num_drop_U++;
 #endif
                     }
                     dense[irow] = zero;
                 }
             }
         }
+
     } /* for each segment... */
 
     xusub[jcol + 1] = nextu; /* Close U[*,jcol] */
@@ -178,12 +183,14 @@ int ilu_ccopy_to_ucol(
             if(c_abs1(&ucol[i]) <= tol) {
                 switch(milu) {
                 case SMILU_1:
-                case SMILU_2: c_add(sum, sum, &ucol[i]);
+                case SMILU_2:
+                    c_add(sum, sum, &ucol[i]);
                     break;
                 case SMILU_3:
                     sum->r += tmp;
                     break;
-                case SILU: default:
+                case SILU:
+                default:
                     break;
                 }
                 ucol[i] = ucol[m0];
@@ -191,7 +198,7 @@ int ilu_ccopy_to_ucol(
                 m0--;
                 m--;
 #ifdef DEBUG
-		num_drop_U++;
+                num_drop_U++;
 #endif
                 xusub[jcol + 1]--;
                 continue;

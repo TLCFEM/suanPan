@@ -35,11 +35,9 @@
 #ifndef DOMAINBASE_H
 #define DOMAINBASE_H
 
-#include <future>
 #include <Domain/Tag.h>
 #include <Toolbox/container.h>
-
-using std::future;
+#include <future>
 
 template<sp_d T> class Factory;
 class Amplitude;
@@ -83,17 +81,17 @@ using StepQueue = std::map<unsigned, shared_ptr<Step>>;
 
 using LongFactory = Factory<double>;
 
-enum class ColorMethod {
+enum class ColorMethod : std::uint8_t {
     OFF,
     WP,
     MIS
 };
 
-enum class ModalAttribute : size_t {
+enum class ModalAttribute : std::uint8_t {
     LinearSystem
 };
 
-enum class Statistics : size_t {
+enum class Statistics : std::uint8_t {
     UpdateStatus,
     AssembleVector,
     AssembleMatrix,
@@ -101,21 +99,15 @@ enum class Statistics : size_t {
     SolveSystem
 };
 
-class DomainBase : public Tag {
+class DomainBase : public UniqueTag {
 public:
     explicit DomainBase(const unsigned T)
-        : Tag(T) {}
-
-    DomainBase(const DomainBase&) = delete;            // copy forbidden
-    DomainBase(DomainBase&&) = delete;                 // move forbidden
-    DomainBase& operator=(const DomainBase&) = delete; // assign forbidden
-    DomainBase& operator=(DomainBase&&) = delete;      // assign forbidden
-    ~DomainBase() override = default;
+        : UniqueTag(T) {}
 
     virtual void set_factory(const shared_ptr<LongFactory>&) = 0;
     [[nodiscard]] virtual const shared_ptr<LongFactory>& get_factory() const = 0;
 
-    virtual bool insert(const shared_ptr<future<void>>&) = 0;
+    virtual bool insert(const shared_ptr<std::future<void>>&) = 0;
 
     virtual void wait() = 0;
 
@@ -434,10 +426,10 @@ public:
 
     [[nodiscard]] virtual double stats(Statistics) const = 0;
 
-    virtual void save(string) = 0;
+    virtual void save(std::string) = 0;
 };
 
-template<typename T> bool DomainBase::erase(unsigned) { throw invalid_argument("unsupported"); }
+template<typename T> bool DomainBase::erase(unsigned) { throw std::invalid_argument("unsupported"); }
 
 template<> inline bool DomainBase::erase<Amplitude>(const unsigned T) { return erase_amplitude(T); }
 
@@ -475,9 +467,9 @@ template<> inline bool DomainBase::erase<Solver>(const unsigned T) { return eras
 
 template<> inline bool DomainBase::erase<Step>(const unsigned T) { return erase_step(T); }
 
-template<typename T> const shared_ptr<T>& DomainBase::get(unsigned) { throw invalid_argument("unsupported"); }
+template<typename T> const shared_ptr<T>& DomainBase::get(unsigned) { throw std::invalid_argument("unsupported"); }
 
-template<typename T> const shared_ptr<T>& DomainBase::get(uword) { throw invalid_argument("unsupported"); }
+template<typename T> const shared_ptr<T>& DomainBase::get(uword) { throw std::invalid_argument("unsupported"); }
 
 template<typename T> std::vector<shared_ptr<T>> DomainBase::get(const uvec& P) {
     std::vector<shared_ptr<T>> output;
@@ -560,7 +552,7 @@ template<> inline const shared_ptr<Solver>& DomainBase::get<Solver>(const unsign
 
 template<> inline const shared_ptr<Step>& DomainBase::get<Step>(const unsigned T) { return get_step(T); }
 
-template<typename T> const std::vector<shared_ptr<T>>& DomainBase::get_pool() { throw invalid_argument("unsupported"); }
+template<typename T> const std::vector<shared_ptr<T>>& DomainBase::get_pool() { throw std::invalid_argument("unsupported"); }
 
 template<> inline const std::vector<shared_ptr<Amplitude>>& DomainBase::get_pool<Amplitude>() { return get_amplitude_pool(); }
 
@@ -596,7 +588,7 @@ template<> inline const std::vector<shared_ptr<Section>>& DomainBase::get_pool<S
 
 template<> inline const std::vector<shared_ptr<Solver>>& DomainBase::get_pool<Solver>() { return get_solver_pool(); }
 
-template<typename T> size_t DomainBase::get() { throw invalid_argument("unsupported"); }
+template<typename T> size_t DomainBase::get() { throw std::invalid_argument("unsupported"); }
 
 template<> inline size_t DomainBase::get<Amplitude>() { return get_amplitude(); }
 
@@ -634,12 +626,13 @@ template<> inline size_t DomainBase::get<Solver>() { return get_solver(); }
 
 template<> inline size_t DomainBase::get<Step>() { return get_step(); }
 
-template<typename T> bool DomainBase::find(unsigned) { throw invalid_argument("unsupported"); }
+template<typename T> bool DomainBase::find(unsigned) { throw std::invalid_argument("unsupported"); }
 
-template<typename T> bool DomainBase::find(uword) { throw invalid_argument("unsupported"); }
+template<typename T> bool DomainBase::find(uword) { throw std::invalid_argument("unsupported"); }
 
 template<typename T> bool DomainBase::find(const uvec& P) {
-    for(auto I : P) if(!find<T>(I)) return false;
+    for(auto I : P)
+        if(!find<T>(I)) return false;
 
     return true;
 }

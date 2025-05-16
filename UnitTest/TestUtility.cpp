@@ -1,7 +1,7 @@
-#include <Toolbox/sync_ostream.h>
-#include <Toolbox/utility.h>
-#include <thread>
 #include "CatchHeader.h"
+
+#include <Toolbox/sketching.hpp>
+#include <Toolbox/utility.h>
 
 TEST_CASE("Binomial Compute Basic Function", "[Utility.Binomial]") {
     REQUIRE(165 == suanpan::binomial(11, 3));
@@ -33,29 +33,6 @@ TEST_CASE("Matrix Allocation", "[Utility.Matrix]") {
     };
 }
 
-TEST_CASE("Sync Stream", "[Utility.Print]") {
-    auto task_a = [] {
-        auto counter = 0;
-        while(++counter < 10) {
-            sync_ostream(std::cout) << "TASK A: " << 1.2345 << "ABCDE" << '\n';
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-    };
-    auto task_b = [] {
-        auto counter = 0;
-        while(++counter < 10) {
-            sync_ostream(std::cout) << "TASK B: " << 9.8765 << "OPQRS" << '\n';
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-    };
-
-    auto thread_a = std::thread(task_a);
-    auto thread_b = std::thread(task_b);
-
-    thread_a.join();
-    thread_b.join();
-}
-
 TEST_CASE("Color Print", "[Utility.Print]") {
     suanpan_info("TEST.\n");
     suanpan_highlight("TEST.\n");
@@ -64,4 +41,18 @@ TEST_CASE("Color Print", "[Utility.Print]") {
     suanpan_error("TEST.\n");
     suanpan_fatal("TEST.\n");
     suanpan_info("TEST.\n", vec{1, 2, 3});
+}
+
+TEST_CASE("Sketching Matrix", "[Utility.Matrix]") {
+    mat A(2000, 400, fill::randu);
+    const mat ATA = A.t() * A;
+    const auto norm = norm2est(ATA);
+
+    auto B = frequent_row_directions(A, 37);
+    suanpan_info("{:.5e}\n", norm2est(ATA - B.t() * B) / norm);
+
+    inplace_trans(A);
+
+    B = frequent_col_directions(A, 37);
+    suanpan_info("{:.5e}\n", norm2est(ATA - B * B.t()) / norm);
 }

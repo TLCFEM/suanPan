@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LinearDamage.h"
+
 #include <Toolbox/tensor.h>
 
 const double LinearDamage::root_two_third = sqrt(2. / 3.);
@@ -67,4 +68,4 @@ void LinearDamage::compute_damage() {
     }
 }
 
-unique_ptr<Material> LinearDamage::get_copy() { return make_unique<LinearDamage>(*this); }
+unique_ptr<Material> LinearDamage::get_copy() { return std::make_unique<LinearDamage>(*this); }

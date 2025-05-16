@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "Expression.h"
+
 #include <Toolbox/utility.h>
 
 std::mutex Expression::parser_mutex;
 exprtk::parser<double> Expression::parser; // NOLINT(cppcoreguidelines-interfaces-global-init)
 
 Expression::Expression(const unsigned tag, std::vector<std::string>&& variable_string)
-    : Tag(tag)
+    : UniqueTag(tag)
     , variable_text_list(std::move(variable_string)) {
     symbol_table.add_constants();
 
@@ -63,7 +64,7 @@ SimpleScalarExpression::SimpleScalarExpression(const unsigned tag, const std::st
     : Expression(tag, {std::string{input_string}}) {}
 
 unique_ptr<Expression> SimpleScalarExpression::get_copy() const {
-    auto copy = make_unique<SimpleScalarExpression>(get_tag(), variable_text_list[0]);
+    auto copy = std::make_unique<SimpleScalarExpression>(get_tag(), variable_text_list[0]);
     if(!expression_text.empty()) copy->compile(expression_text);
     return copy;
 }
@@ -94,7 +95,7 @@ SimpleVectorExpression::SimpleVectorExpression(const unsigned tag, const std::st
 }
 
 unique_ptr<Expression> SimpleVectorExpression::get_copy() const {
-    auto copy = make_unique<SimpleVectorExpression>(get_tag(), variable_text_list[0], variable_text_list[1]);
+    auto copy = std::make_unique<SimpleVectorExpression>(get_tag(), variable_text_list[0], variable_text_list[1]);
     if(!expression_text.empty()) copy->compile(expression_text);
     return copy;
 }

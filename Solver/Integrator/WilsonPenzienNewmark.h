@@ -39,7 +39,7 @@ class WilsonPenzienNewmark final : public Newmark {
     vec beta;
 
 public:
-    explicit WilsonPenzienNewmark(unsigned, vec&&, double = .25, double = .5);
+    WilsonPenzienNewmark(unsigned, vec&&, double = .25, double = .5);
 
     int initialize() override;
 

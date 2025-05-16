@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -11,7 +11,7 @@ at the top-level directory.
 
 /*! @file dmyblas2.c
  * \brief Level 2 Blas operations
- * 
+ *
  * <pre>
  * -- SuperLU routine (version 2.0) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
@@ -31,8 +31,8 @@ at the top-level directory.
 
 /*! \brief Solves a dense UNIT lower triangular system
  *
- *  The unit lower 
- * triangular matrix is stored in a 2D array M(1:nrow,1:ncol). 
+ *  The unit lower
+ * triangular matrix is stored in a 2D array M(1:nrow,1:ncol).
  * The solution will be returned in the rhs vector.
  */
 void dlsolve(int ldm, int ncol, double* M, double* rhs) {
@@ -44,8 +44,7 @@ void dlsolve(int ldm, int ncol, double* M, double* rhs) {
 
     M0 = &M[0];
 
-    while(firstcol < ncol - 7) {
-        /* Do 8 columns */
+    while(firstcol < ncol - 7) { /* Do 8 columns */
         Mki0 = M0 + 1;
         Mki1 = Mki0 + ldm + 1;
         Mki2 = Mki1 + ldm + 1;
@@ -73,13 +72,13 @@ void dlsolve(int ldm, int ncol, double* M, double* rhs) {
         rhs[++firstcol] = x7;
         ++firstcol;
 
-        for(k = firstcol; k < ncol; k++) rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++ - x2 * *Mki2++ - x3 * *Mki3++ - x4 * *Mki4++ - x5 * *Mki5++ - x6 * *Mki6++ - x7 * *Mki7++;
+        for(k = firstcol; k < ncol; k++)
+            rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++ - x2 * *Mki2++ - x3 * *Mki3++ - x4 * *Mki4++ - x5 * *Mki5++ - x6 * *Mki6++ - x7 * *Mki7++;
 
         M0 += 8 * ldm + 8;
     }
 
-    while(firstcol < ncol - 3) {
-        /* Do 4 columns */
+    while(firstcol < ncol - 3) { /* Do 4 columns */
         Mki0 = M0 + 1;
         Mki1 = Mki0 + ldm + 1;
         Mki2 = Mki1 + ldm + 1;
@@ -95,13 +94,13 @@ void dlsolve(int ldm, int ncol, double* M, double* rhs) {
         rhs[++firstcol] = x3;
         ++firstcol;
 
-        for(k = firstcol; k < ncol; k++) rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++ - x2 * *Mki2++ - x3 * *Mki3++;
+        for(k = firstcol; k < ncol; k++)
+            rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++ - x2 * *Mki2++ - x3 * *Mki3++;
 
         M0 += 4 * ldm + 4;
     }
 
-    if(firstcol < ncol - 1) {
-        /* Do 2 columns */
+    if(firstcol < ncol - 1) { /* Do 2 columns */
         Mki0 = M0 + 1;
         Mki1 = Mki0 + ldm + 1;
 
@@ -111,12 +110,13 @@ void dlsolve(int ldm, int ncol, double* M, double* rhs) {
         rhs[++firstcol] = x1;
         ++firstcol;
 
-        for(k = firstcol; k < ncol; k++) rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++;
+        for(k = firstcol; k < ncol; k++)
+            rhs[k] = rhs[k] - x0 * *Mki0++ - x1 * *Mki1++;
     }
 }
 
 /*! \brief Solves a dense upper triangular system
- * 
+ *
  * The upper triangular matrix is
  * stored in a 2-dim array M(1:ldm,1:ncol). The solution will be returned
  * in the rhs vector.
@@ -131,14 +131,15 @@ void dusolve(int ldm, int ncol, double* M, double* rhs) {
         xj = rhs[jcol] / M[jcol + jcol * ldm]; /* M(jcol, jcol) */
         rhs[jcol] = xj;
 
-        for(irow = 0; irow < jcol; irow++) rhs[irow] -= xj * M[irow + jcol * ldm]; /* M(irow, jcol) */
+        for(irow = 0; irow < jcol; irow++)
+            rhs[irow] -= xj * M[irow + jcol * ldm]; /* M(irow, jcol) */
 
         jcol--;
     }
 }
 
 /*! \brief Performs a dense matrix-vector multiply: Mxvec = Mxvec + M * vec.
- * 
+ *
  * The input matrix is M(1:nrow,1:ncol); The product is returned in Mxvec[].
  */
 void dmatvec(int ldm, int nrow, int ncol, double* M, double* vec, double* Mxvec) {
@@ -149,8 +150,7 @@ void dmatvec(int ldm, int nrow, int ncol, double* M, double* vec, double* Mxvec)
     int k;
 
     M0 = &M[0];
-    while(firstcol < ncol - 7) {
-        /* Do 8 columns */
+    while(firstcol < ncol - 7) { /* Do 8 columns */
 
         Mki0 = M0;
         Mki1 = Mki0 + ldm;
@@ -170,13 +170,13 @@ void dmatvec(int ldm, int nrow, int ncol, double* M, double* vec, double* Mxvec)
         vi6 = vec[firstcol++];
         vi7 = vec[firstcol++];
 
-        for(k = 0; k < nrow; k++) Mxvec[k] += vi0 * *Mki0++ + vi1 * *Mki1++ + vi2 * *Mki2++ + vi3 * *Mki3++ + vi4 * *Mki4++ + vi5 * *Mki5++ + vi6 * *Mki6++ + vi7 * *Mki7++;
+        for(k = 0; k < nrow; k++)
+            Mxvec[k] += vi0 * *Mki0++ + vi1 * *Mki1++ + vi2 * *Mki2++ + vi3 * *Mki3++ + vi4 * *Mki4++ + vi5 * *Mki5++ + vi6 * *Mki6++ + vi7 * *Mki7++;
 
         M0 += 8 * ldm;
     }
 
-    while(firstcol < ncol - 3) {
-        /* Do 4 columns */
+    while(firstcol < ncol - 3) { /* Do 4 columns */
 
         Mki0 = M0;
         Mki1 = Mki0 + ldm;
@@ -187,17 +187,18 @@ void dmatvec(int ldm, int nrow, int ncol, double* M, double* vec, double* Mxvec)
         vi1 = vec[firstcol++];
         vi2 = vec[firstcol++];
         vi3 = vec[firstcol++];
-        for(k = 0; k < nrow; k++) Mxvec[k] += vi0 * *Mki0++ + vi1 * *Mki1++ + vi2 * *Mki2++ + vi3 * *Mki3++;
+        for(k = 0; k < nrow; k++)
+            Mxvec[k] += vi0 * *Mki0++ + vi1 * *Mki1++ + vi2 * *Mki2++ + vi3 * *Mki3++;
 
         M0 += 4 * ldm;
     }
 
-    while(firstcol < ncol) {
-        /* Do 1 column */
+    while(firstcol < ncol) { /* Do 1 column */
 
         Mki0 = M0;
         vi0 = vec[firstcol++];
-        for(k = 0; k < nrow; k++) Mxvec[k] += vi0 * *Mki0++;
+        for(k = 0; k < nrow; k++)
+            Mxvec[k] += vi0 * *Mki0++;
 
         M0 += ldm;
     }

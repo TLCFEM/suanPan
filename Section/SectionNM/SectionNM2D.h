@@ -40,7 +40,9 @@ class SectionNM2D : protected DataSectionNM2D, public SectionNM {
 public:
     SectionNM2D(
         unsigned, // tag
-        double, double, double
+        double,
+        double,
+        double
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -54,8 +54,8 @@ public:
 
     void nullify(const uword K) override {
         this->factored = false;
-        suanpan::for_each(this->n_rows, [&](const uword I) { at(I, K) = T(0); });
-        suanpan::for_each(this->n_cols, [&](const uword I) { at(K, I) = T(0); });
+        suanpan::for_each(this->n_rows, [&](const uword I) { this->at(I, K) = T(0); });
+        suanpan::for_each(this->n_cols, [&](const uword I) { this->at(K, I) = T(0); });
     }
 
     T operator()(const uword in_row, const uword in_col) const override { return this->memory[in_row + in_col * this->n_rows]; }
@@ -110,7 +110,7 @@ template<sp_d T, typename solver_t> Mat<T> FullMatBaseCluster<T, solver_t>::oper
 template<sp_d T, typename solver_t> int FullMatBaseCluster<T, solver_t>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::move(B));
 
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     this->factored = true;
 

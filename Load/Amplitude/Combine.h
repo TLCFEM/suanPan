@@ -31,11 +31,9 @@
 
 #include <Load/Amplitude/Amplitude.h>
 
-using std::vector;
-
 class Combine final : public Amplitude {
     const uvec tag_pool;
-    vector<weak_ptr<Amplitude>> amp_pool;
+    std::vector<std::weak_ptr<Amplitude>> amp_pool;
 
 public:
     Combine(unsigned, uvec&&, unsigned);

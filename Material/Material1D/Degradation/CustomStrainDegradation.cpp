@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomStrainDegradation.h"
+
 #include <Domain/DomainBase.h>
 
 vec CustomStrainDegradation::compute_positive_degradation(const double t_strain) const { return positive_expression->evaluate(t_strain); }
@@ -58,4 +59,4 @@ int CustomStrainDegradation::initialize(const shared_ptr<DomainBase>& D) {
     return StrainDegradation::initialize(D);
 }
 
-unique_ptr<Material> CustomStrainDegradation::get_copy() { return make_unique<CustomStrainDegradation>(*this); }
+unique_ptr<Material> CustomStrainDegradation::get_copy() { return std::make_unique<CustomStrainDegradation>(*this); }

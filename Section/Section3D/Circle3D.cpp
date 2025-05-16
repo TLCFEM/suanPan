@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Circle3D.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -45,7 +46,7 @@ int Circle3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Circle3D::get_copy() { return make_unique<Circle3D>(*this); }
+unique_ptr<Section> Circle3D::get_copy() { return std::make_unique<Circle3D>(*this); }
 
 void Circle3D::print() {
     suanpan_info("A 3D circular section.\n");

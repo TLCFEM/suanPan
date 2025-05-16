@@ -1,5 +1,5 @@
-set(SOS
-        SectionOS/SectionOS3D.cpp
-        SectionOS/Cell3DOS.cpp
-        SectionOS/Fibre3DOS.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        Cell3DOS.cpp
+        Fibre3DOS.cpp
+        SectionOS3D.cpp
 )

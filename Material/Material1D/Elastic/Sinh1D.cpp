@@ -27,7 +27,7 @@ int Sinh1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Sinh1D::get_copy() { return make_unique<Sinh1D>(*this); }
+unique_ptr<Material> Sinh1D::get_copy() { return std::make_unique<Sinh1D>(*this); }
 
 int Sinh1D::update_trial_status(const vec& t_strain) {
     trial_stress = elastic_modulus * arma::sinh(trial_strain = t_strain);

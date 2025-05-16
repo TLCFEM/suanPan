@@ -71,7 +71,8 @@ public:
     }
 
     T operator()(const uword in_row, const uword in_col) const override {
-        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]
+            return bin = T(0);
         return this->memory[in_row + s_band + in_col * (m_rows - 1)];
     }
 
@@ -81,7 +82,8 @@ public:
     }
 
     T& at(const uword in_row, const uword in_col) override {
-        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]] return bin = T(0);
+        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]
+            return bin = T(0);
         return this->unsafe_at(in_row, in_col);
     }
 
@@ -124,7 +126,7 @@ template<sp_d T> Mat<T> BandMat<T>::operator*(const Mat<T>& X) const {
 template<sp_d T> int BandMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::move(B));
 
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     blas_int INFO = 0;
 

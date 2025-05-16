@@ -1312,9 +1312,6 @@
     <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Recorder\RecorderParser.cpp">
       <Filter>Recorder</Filter>
     </ClCompile>
@@ -2695,9 +2692,6 @@
     <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h">
       <Filter>Solver\Integrator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\sync_ostream.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Recorder\RecorderParser.h">
       <Filter>Recorder</Filter>
     </ClInclude>
@@ -2982,9 +2976,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\Subloading.h">
       <Filter>Material\Material3D\vonMises</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\MetaMat\Sparse.Single\SparseMatPARDISO.hpp">
-      <Filter>Domain\MetaMat</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

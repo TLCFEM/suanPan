@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NodalDisplacement.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Load/Amplitude/Amplitude.h>

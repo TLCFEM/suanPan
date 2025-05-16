@@ -26,7 +26,7 @@
 #ifndef DOF_H
 #define DOF_H
 
-enum class DOF : unsigned short {
+enum class DOF : std::uint8_t {
     NONE,
     U1,
     // displacement in x direction
@@ -41,7 +41,7 @@ enum class DOF : unsigned short {
     UR3,
     // rotation in z direction
     DMG,
-    //damage
+    // damage
     P,
     // pressure
     T,

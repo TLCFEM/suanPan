@@ -16,12 +16,11 @@
  ******************************************************************************/
 
 #include "TrussSection.h"
-#include <Material/Material1D/Material1D.h>
 
 TrussSection::TrussSection(const unsigned T, const double A, const unsigned M)
     : Section1D(T, M, A) {}
 
-unique_ptr<Section> TrussSection::get_copy() { return make_unique<TrussSection>(*this); }
+unique_ptr<Section> TrussSection::get_copy() { return std::make_unique<TrussSection>(*this); }
 
 void TrussSection::print() {
     suanpan_info("A uniaxial generalized section with an area of {:.3E}.\n", area);

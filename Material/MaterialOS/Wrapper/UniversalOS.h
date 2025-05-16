@@ -36,7 +36,8 @@ public:
         unsigned, // tag
         unsigned, // 3D material tag
         unsigned, // max iteration
-        uvec&&, uvec&&
+        uvec&&,
+        uvec&&
     );
 
     void print() override;

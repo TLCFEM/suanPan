@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Kelvin.h"
+
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 
@@ -38,7 +39,7 @@ int Kelvin::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Kelvin::get_copy() { return make_unique<Kelvin>(*this); }
+unique_ptr<Material> Kelvin::get_copy() { return std::make_unique<Kelvin>(*this); }
 
 int Kelvin::update_trial_status(const vec&) {
     suanpan_error("Receives strain only from the associated element.\n");
@@ -91,7 +92,7 @@ int Kelvin::reset_status() {
     return spring->reset_status() + damper->reset_status();
 }
 
-vector<vec> Kelvin::record(const OutputType P) {
+std::vector<vec> Kelvin::record(const OutputType P) {
     if(OutputType::S == P) return {current_stress};
     if(OutputType::E == P) return {current_strain};
     if(OutputType::V == P) return {current_strain_rate};

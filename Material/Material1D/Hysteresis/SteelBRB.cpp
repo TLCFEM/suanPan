@@ -49,7 +49,7 @@ int SteelBRB::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> SteelBRB::get_copy() { return make_unique<SteelBRB>(*this); }
+unique_ptr<Material> SteelBRB::get_copy() { return std::make_unique<SteelBRB>(*this); }
 
 int SteelBRB::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

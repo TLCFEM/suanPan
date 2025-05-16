@@ -18,13 +18,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 #include "LoadParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Load/Load>
 #include <Toolbox/resampling.h>
 
 namespace {
-    void new_acceleration(unique_ptr<Load>& return_obj, istringstream& command) {
+    void new_acceleration(unique_ptr<Load>& return_obj, std::istringstream& command) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -49,14 +50,10 @@ namespace {
             return;
         }
 
-        uword node_id;
-        vector<uword> node_pool;
-        while(get_input(command, node_id)) node_pool.emplace_back(node_id);
-
-        return_obj = make_unique<NodalAcceleration>(load_id, 0, magnitude, uvec(node_pool), dof_id, amplitude_id);
+        return_obj = std::make_unique<NodalAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_bodyforce(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    void new_bodyforce(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -81,14 +78,11 @@ namespace {
             return;
         }
 
-        unsigned element;
-        vector<uword> element_tag;
-        while(get_input(command, element)) element_tag.push_back(element);
-
-        flag ? return_obj = make_unique<GroupBodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id) : return_obj = make_unique<BodyForce>(load_id, 0, magnitude, uvec(element_tag), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<BodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_cload(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    void new_cload(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -113,14 +107,11 @@ namespace {
             return;
         }
 
-        unsigned node;
-        vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        flag ? return_obj = make_unique<GroupNodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalForce>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<NodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_refload(unique_ptr<Load>& return_obj, istringstream& command) {
+    void new_refload(unique_ptr<Load>& return_obj, std::istringstream& command) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -144,14 +135,10 @@ namespace {
             return;
         }
 
-        unsigned node;
-        vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        return_obj = make_unique<ReferenceForce>(load_id, 0, magnitude, uvec(node_tag), dof_id);
+        return_obj = std::make_unique<ReferenceForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id);
     }
 
-    void new_lineudl(unique_ptr<Load>& return_obj, istringstream& command, const unsigned dimension) {
+    void new_lineudl(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned dimension) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -176,14 +163,11 @@ namespace {
             return;
         }
 
-        unsigned node;
-        vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        2 == dimension ? return_obj = make_unique<LineUDL2D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<LineUDL3D>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        if(2 == dimension) return_obj = std::make_unique<LineUDL2D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<LineUDL3D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_displacement(unique_ptr<Load>& return_obj, istringstream& command, const bool flag) {
+    void new_displacement(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -208,14 +192,11 @@ namespace {
             return;
         }
 
-        unsigned node;
-        vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        flag ? return_obj = make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id) : return_obj = make_unique<NodalDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<NodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
-    void new_supportmotion(unique_ptr<Load>& return_obj, istringstream& command, const unsigned flag) {
+    void new_supportmotion(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -240,18 +221,14 @@ namespace {
             return;
         }
 
-        unsigned node;
-        vector<uword> node_tag;
-        while(get_input(command, node)) node_tag.push_back(node);
-
-        if(0 == flag) return_obj = make_unique<SupportDisplacement>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-        else if(1 == flag) return_obj = make_unique<SupportVelocity>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
-        else return_obj = make_unique<SupportAcceleration>(load_id, 0, magnitude, uvec(node_tag), dof_id, amplitude_id);
+        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<SupportAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 } // namespace
 
-int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string amplitude_type;
+int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string amplitude_type;
     if(!get_input(command, amplitude_type)) {
         suanpan_error("A valid amplitude type is required.\n");
         return SUANPAN_SUCCESS;
@@ -263,16 +240,16 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
         return SUANPAN_SUCCESS;
     }
 
-    if(const auto step_tag = domain->get_current_step_tag(); is_equal(amplitude_type, "Constant")) domain->insert(make_shared<Constant>(tag, step_tag));
-    else if(is_equal(amplitude_type, "Ramp")) domain->insert(make_shared<Ramp>(tag, step_tag));
+    if(const auto step_tag = domain->get_current_step_tag(); is_equal(amplitude_type, "Constant")) domain->insert(std::make_shared<Constant>(tag, step_tag));
+    else if(is_equal(amplitude_type, "Ramp")) domain->insert(std::make_shared<Ramp>(tag, step_tag));
     else if(is_equal(amplitude_type, "Tabular")) {
-        string file_name;
+        std::string file_name;
         if(!get_input(command, file_name)) {
             suanpan_error("A valid file is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(command.eof()) domain->insert(make_shared<Tabular>(tag, std::move(file_name), step_tag));
+        if(command.eof()) domain->insert(std::make_shared<Tabular>(tag, std::move(file_name), step_tag));
         else {
             uword up_rate;
             if(!get_input(command, up_rate)) {
@@ -280,7 +257,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
                 return SUANPAN_SUCCESS;
             }
 
-            string window_type = "Hamming";
+            std::string window_type = "Hamming";
             if(!get_optional_input(command, window_type)) {
                 suanpan_error("A valid window type is required.\n");
                 return SUANPAN_SUCCESS;
@@ -299,16 +276,16 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
                 return SUANPAN_SUCCESS;
             }
 
-            domain->insert(make_shared<Tabular>(tag, result.col(0), result.col(1), step_tag));
+            domain->insert(std::make_shared<Tabular>(tag, result.col(0), result.col(1), step_tag));
         }
     }
     else if(is_equal(amplitude_type, "TabularSpline")) {
-        string file_name;
+        std::string file_name;
         if(!get_input(command, file_name)) {
             suanpan_error("A valid file is required.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(make_shared<TabularSpline>(tag, std::move(file_name), step_tag));
+        domain->insert(std::make_shared<TabularSpline>(tag, std::move(file_name), step_tag));
     }
     else if(is_equal(amplitude_type, "Decay")) {
         double A, TD;
@@ -316,7 +293,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
             suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(make_shared<Decay>(tag, A, TD, step_tag));
+        domain->insert(std::make_shared<Decay>(tag, A, TD, step_tag));
     }
     else if(is_equal(amplitude_type, "Linear")) {
         double A;
@@ -324,13 +301,10 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
             suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(make_shared<Linear>(tag, A, step_tag));
+        domain->insert(std::make_shared<Linear>(tag, A, step_tag));
     }
     else if(is_equal(amplitude_type, "Combine")) {
-        vector<uword> tag_pool;
-        uword t_tag;
-        while(get_input(command, t_tag)) tag_pool.emplace_back(t_tag);
-        domain->insert(make_shared<Combine>(tag, uvec(tag_pool), step_tag));
+        domain->insert(std::make_shared<Combine>(tag, get_remaining<uword>(command), step_tag));
     }
     else if(is_equal(amplitude_type, "Custom")) {
         unsigned expression;
@@ -338,7 +312,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
             suanpan_error("A valid expression tag is required.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(make_shared<CustomAmplitude>(tag, expression, step_tag));
+        domain->insert(std::make_shared<CustomAmplitude>(tag, expression, step_tag));
     }
     else if(is_equal(amplitude_type, "Modulated") || is_equal(amplitude_type, "Sine") || is_equal(amplitude_type, "Cosine")) {
         double W;
@@ -347,29 +321,25 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        double amp;
-        vector<double> A;
-        while(get_input(command, amp)) A.emplace_back(amp);
-
-        if(is_equal(amplitude_type, "Modulated")) domain->insert(make_shared<Modulated>(tag, W, std::move(A), step_tag));
-        else if(is_equal(amplitude_type, "Sine")) domain->insert(make_shared<Sine>(tag, W, std::move(A), step_tag));
-        else if(is_equal(amplitude_type, "Cosine")) domain->insert(make_shared<Cosine>(tag, W, std::move(A), step_tag));
+        if(is_equal(amplitude_type, "Modulated")) domain->insert(std::make_shared<Modulated>(tag, W, get_remaining<double>(command), step_tag));
+        else if(is_equal(amplitude_type, "Sine")) domain->insert(std::make_shared<Sine>(tag, W, get_remaining<double>(command), step_tag));
+        else if(is_equal(amplitude_type, "Cosine")) domain->insert(std::make_shared<Cosine>(tag, W, get_remaining<double>(command), step_tag));
     }
     else if(is_equal(amplitude_type, "NZStrongMotion")) {
-        string name;
+        std::string name;
         if(!get_input(command, name)) {
             suanpan_error("A valid name is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        domain->insert(make_shared<NZStrongMotion>(tag, name.c_str(), step_tag));
+        domain->insert(std::make_shared<NZStrongMotion>(tag, name.c_str(), step_tag));
     }
 
     return SUANPAN_SUCCESS;
 }
 
-int create_new_load(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string load_id;
+int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string load_id;
     if(!get_input(command, load_id)) {
         suanpan_error("A valid load type is required.\n");
         return SUANPAN_SUCCESS;

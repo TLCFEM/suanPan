@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "VAFCRP1D.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
@@ -33,7 +34,7 @@ int VAFCRP1D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> VAFCRP1D::get_copy() { return make_unique<VAFCRP1D>(*this); }
+unique_ptr<Material> VAFCRP1D::get_copy() { return std::make_unique<VAFCRP1D>(*this); }
 
 double VAFCRP1D::get_parameter(const ParameterType P) const {
     if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;

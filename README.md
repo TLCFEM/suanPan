@@ -57,13 +57,10 @@ The highlights of **suanPan** are
 - ✅ ***fast***, memory and thread safe
 - ✅ [shared memory](https://en.wikipedia.org/wiki/Shared_memory) parallelism support
 - ✅ [distributed memory](https://en.wikipedia.org/wiki/Distributed_memory) parallelism support
-- ✅ a rich collection of elements, material models, time integration methods, etc.
-- ✅ open source and easy to be extended
+- ✅ multi-architecture (`amd64` and `arm64`) [support](https://hub.docker.com/r/tlcfem/suanpan)
+- ✅ rich collection of elements, materials, time integration methods, etc.
+- ✅ open source and easy to extend
 - ✅ modern language features
-
-> [!IMPORTANT]
-> Both `amd64` and `arm64` architectures are supported.
-> Check details on [Docker Hub](https://hub.docker.com/r/tlcfem/suanpan).
 
 ## Quick Start
 
@@ -280,7 +277,7 @@ to `~/.local/share/applications`.
 
 Additional libraries used in **suanPan** are listed as follows.
 
-- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.0
+- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.1
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**Armadillo**](http://arma.sourceforge.net/) version 14.4.1
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5
@@ -294,11 +291,10 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
-- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 6.0.1
+- [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
 - [**VTK**](https://vtk.org/) version 9.4
 - [**argparse**](https://github.com/p-ranav/argparse)
-- [**ensmallen**](https://ensmallen.org/) version 2.21.1
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7

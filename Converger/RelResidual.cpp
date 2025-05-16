@@ -20,7 +20,7 @@
 RelResidual::RelResidual(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelResidual::get_copy() { return make_unique<RelResidual>(*this); }
+unique_ptr<Converger> RelResidual::get_copy() { return std::make_unique<RelResidual>(*this); }
 
 bool RelResidual::is_converged(const unsigned counter) {
     const auto residual = inf_norm(get_residual());

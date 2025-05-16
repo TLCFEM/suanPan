@@ -16,10 +16,11 @@
  ******************************************************************************/
 
 #include "MultiplierBC.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Step/Step.h>
 #include <Solver/Integrator/Integrator.h>
+#include <Step/Step.h>
 
 /**
  * \brief method to apply the BC to the system.

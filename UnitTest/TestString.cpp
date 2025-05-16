@@ -1,5 +1,6 @@
-#include <Toolbox/utility.h>
 #include "CatchHeader.h"
+
+#include <Toolbox/utility.h>
 
 TEST_CASE("String Compare", "[Utility.String]") {
     const std::string A = "logic";

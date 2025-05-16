@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Joint.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 
@@ -70,8 +71,8 @@ int Joint::reset_status() {
     return code;
 }
 
-vector<vec> Joint::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Joint::record(const OutputType P) {
+    std::vector<vec> data;
     for(const auto& I : j_material) append_to(data, I->record(P));
     return data;
 }

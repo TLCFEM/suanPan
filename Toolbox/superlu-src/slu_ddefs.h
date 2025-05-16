@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -11,26 +11,27 @@ at the top-level directory.
 
 /*! @file slu_ddefs.h
  * \brief Header file for real operations
- * 
- * <pre> 
- * -- SuperLU routine (version 4.1) --
+ *
+ * <pre>
+ * -- SuperLU routine (version 7.0.0) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
  * and Lawrence Berkeley National Lab.
  * November, 2010
- * 
+ * August 2024
+ *
  * Global data structures used in LU factorization -
- * 
- *   nsuper: #supernodes = nsuper + 1, numbered [0, nsuper].
+ *
+ *   nsuper: \#supernodes = nsuper + 1, numbered [0, nsuper].
  *   (xsup,supno): supno[i] is the supernode no to which i belongs;
  *	xsup(s) points to the beginning of the s-th supernode.
  *	e.g.   supno 0 1 2 2 3 3 3 4 4 4 4 4   (n=12)
  *	        xsup 0 1 2 4 7 12
- *	Note: dfs will be performed on supernode rep. relative to the new 
+ *	Note: dfs will be performed on supernode rep. relative to the new
  *	      row pivoting ordering
  *
  *   (xlsub,lsub): lsub[*] contains the compressed subscript of
  *	rectangular supernodes; xlsub[j] points to the starting
- *	location of the j-th column in lsub[*]. Note that xlsub 
+ *	location of the j-th column in lsub[*]. Note that xlsub
  *	is indexed by column.
  *	Storage: original row subscripts
  *
@@ -54,7 +55,7 @@ at the top-level directory.
  *	values.
  *
  *	The last column structures (for pruning) will be removed
- *	after the numercial LU factorization phase.
+ *	after the numerical LU factorization phase.
  *
  *   (xlusup,lusup): lusup[*] contains the numerical values of the
  *	rectangular supernodes; xlusup[j] points to the starting
@@ -101,20 +102,30 @@ extern "C" {
 #endif
 
 /*! \brief Driver routines */
-extern void dgssv(superlu_options_t*, SuperMatrix*, int*, int*, SuperMatrix*, SuperMatrix*, SuperMatrix*, SuperLUStat_t*, int_t* info);
-extern void dgssvx(superlu_options_t*, SuperMatrix*, int*, int*, int*, char*, double*, double*, SuperMatrix*, SuperMatrix*, void*, int_t lwork, SuperMatrix*, SuperMatrix*, double*, double*, double*, double*, GlobalLU_t*, mem_usage_t*, SuperLUStat_t*, int_t* info);
+extern void
+dgssv(superlu_options_t*, SuperMatrix*, int*, int*, SuperMatrix*, SuperMatrix*, SuperMatrix*, SuperLUStat_t*, int_t* info);
+extern void
+dgssvx(superlu_options_t*, SuperMatrix*, int*, int*, int*, char*, double*, double*, SuperMatrix*, SuperMatrix*, void*, int_t lwork, SuperMatrix*, SuperMatrix*, double*, double*, double*, double*, GlobalLU_t*, mem_usage_t*, SuperLUStat_t*, int_t* info);
 /* ILU */
-extern void dgsisv(superlu_options_t*, SuperMatrix*, int*, int*, SuperMatrix*, SuperMatrix*, SuperMatrix*, SuperLUStat_t*, int*);
-extern void dgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r, int* etree, char* equed, double* R, double* C, SuperMatrix* L, SuperMatrix* U, void* work, int_t lwork, SuperMatrix* B, SuperMatrix* X, double* recip_pivot_growth, double* rcond, GlobalLU_t* Glu, mem_usage_t* mem_usage, SuperLUStat_t* stat, int_t* info);
+extern void
+dgsisv(superlu_options_t*, SuperMatrix*, int*, int*, SuperMatrix*, SuperMatrix*, SuperMatrix*, SuperLUStat_t*, int*);
+extern void
+dgsisx(superlu_options_t* options, SuperMatrix* A, int* perm_c, int* perm_r, int* etree, char* equed, double* R, double* C, SuperMatrix* L, SuperMatrix* U, void* work, int_t lwork, SuperMatrix* B, SuperMatrix* X, double* recip_pivot_growth, double* rcond, GlobalLU_t* Glu, mem_usage_t* mem_usage, SuperLUStat_t* stat, int_t* info);
 
 /*! \brief Supernodal LU factor related */
-extern void dCreate_CompCol_Matrix(SuperMatrix*, int, int, int_t, double*, int_t*, int_t*, Stype_t, Dtype_t, Mtype_t);
-extern void dCreate_CompRow_Matrix(SuperMatrix*, int, int, int_t, double*, int_t*, int_t*, Stype_t, Dtype_t, Mtype_t);
+extern void
+dCreate_CompCol_Matrix(SuperMatrix*, int, int, int_t, double*, int_t*, int_t*, Stype_t, Dtype_t, Mtype_t);
+extern void
+dCreate_CompRow_Matrix(SuperMatrix*, int, int, int_t, double*, int_t*, int_t*, Stype_t, Dtype_t, Mtype_t);
 extern void dCompRow_to_CompCol(int, int, int_t, double*, int_t*, int_t*, double**, int_t**, int_t**);
-extern void dCopy_CompCol_Matrix(SuperMatrix*, SuperMatrix*);
-extern void dCreate_Dense_Matrix(SuperMatrix*, int, int, double*, int, Stype_t, Dtype_t, Mtype_t);
-extern void dCreate_SuperNode_Matrix(SuperMatrix*, int, int, int_t, double*, int_t*, int_t*, int_t*, int*, int*, Stype_t, Dtype_t, Mtype_t);
-extern void dCopy_Dense_Matrix(int, int, double*, int, double*, int);
+extern void
+dCopy_CompCol_Matrix(SuperMatrix*, SuperMatrix*);
+extern void
+dCreate_Dense_Matrix(SuperMatrix*, int, int, double*, int, Stype_t, Dtype_t, Mtype_t);
+extern void
+dCreate_SuperNode_Matrix(SuperMatrix*, int, int, int_t, double*, int_t*, int_t*, int_t*, int*, int*, Stype_t, Dtype_t, Mtype_t);
+extern void
+dCopy_Dense_Matrix(int, int, double*, int, double*, int);
 
 extern void dallocateA(int, int_t, double**, int_t**, int_t**);
 extern void dgstrf(superlu_options_t*, SuperMatrix*, int, int, int*, void*, int_t, int*, int*, SuperMatrix*, SuperMatrix*, GlobalLU_t*, SuperLUStat_t*, int_t* info);
@@ -130,10 +141,10 @@ extern void dpruneL(const int, const int*, const int, const int, const int*, con
 extern void dreadmt(int*, int*, int_t*, double**, int_t**, int_t**);
 extern void dGenXtrue(int, int, double*, int);
 extern void dFillRHS(trans_t, int, double*, int, SuperMatrix*, SuperMatrix*);
-extern void dgstrs(trans_t, SuperMatrix*, SuperMatrix*, int*, int*, SuperMatrix*, SuperLUStat_t*, int*);
+extern void dgstrs(trans_t, SuperMatrix*, SuperMatrix*, const int*, const int*, SuperMatrix*, SuperLUStat_t*, int*);
 /* ILU */
 extern void dgsitrf(superlu_options_t*, SuperMatrix*, int, int, int*, void*, int_t, int*, int*, SuperMatrix*, SuperMatrix*, GlobalLU_t*, SuperLUStat_t*, int_t* info);
-extern int dldperm(int, int, int_t, int_t [], int_t [], double [], int [], double [], double []);
+extern int dldperm(int, int, int_t, int_t[], int_t[], double[], int[], double[], double[]);
 extern int ilu_dsnode_dfs(const int, const int, const int_t*, const int_t*, const int_t*, int*, GlobalLU_t*);
 extern void ilu_dpanel_dfs(const int, const int, const int, SuperMatrix*, int*, int*, double*, double*, int*, int*, int*, int*, int*, int_t*, GlobalLU_t*);
 extern int ilu_dcolumn_dfs(const int, const int, int*, int*, int*, int*, int*, int*, int*, int_t*, GlobalLU_t*);
@@ -182,22 +193,24 @@ extern void dPrint_CompCol_Matrix(char*, SuperMatrix*);
 extern void dPrint_SuperNode_Matrix(char*, SuperMatrix*);
 extern void dPrint_Dense_Matrix(char*, SuperMatrix*);
 extern void dprint_lu_col(char*, int, int, int_t*, GlobalLU_t*);
-extern int print_double_vec(char*, int, double*);
+extern int print_double_vec(const char*, int, const double*);
 extern void dcheck_tempv(int, double*);
 
 /*! \brief BLAS */
 
-extern int dgemm_(const char*, const char*, const int*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*);
-extern int dtrsv_(char*, char*, char*, int*, double*, int*, double*, int*);
-extern int dtrsm_(char*, char*, char*, char*, int*, int*, double*, double*, int*, double*, int*);
-extern int dgemv_(char*, int*, int*, double*, double* a, int*, double*, int*, double*, double*, int*);
+extern void dcopy_(int*, double*, int*, double*, int*);
+extern void daxpy_(int*, double*, double*, int*, double*, int*);
+extern void dgemm_(const char*, const char*, const int*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*);
+extern void dtrsv_(char*, char*, char*, int*, double*, int*, double*, int*);
+extern void dtrsm_(char*, char*, char*, char*, int*, int*, double*, double*, int*, double*, int*);
+extern void dgemv_(char*, int*, int*, double*, double* a, int*, double*, int*, double*, double*, int*);
 
 extern void dusolve(int, int, double*, double*);
 extern void dlsolve(int, int, double*, double*);
 extern void dmatvec(int, int, int, double*, double*, double*);
 
 #ifdef __cplusplus
-  }
+}
 #endif
 
 #endif /* __SUPERLU_dSP_DEFS */

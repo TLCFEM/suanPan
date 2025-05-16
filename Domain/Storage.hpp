@@ -107,9 +107,9 @@ public:
 
     Storage() = default;
     Storage(const Storage&) = delete;
-    Storage(Storage&&) noexcept = delete;
+    Storage(Storage&&) = delete;
     Storage& operator=(const Storage&) = delete;
-    Storage& operator=(Storage&&) noexcept = delete;
+    Storage& operator=(Storage&&) = delete;
     ~Storage() = default;
 
     const_iterator cbegin() const;
@@ -167,9 +167,13 @@ template<typename T> bool Storage<T>::erase(const unsigned L) {
 #endif
 }
 
-template<typename T> void Storage<T>::enable(const unsigned L) { if(find(L)) pond[L]->enable(); }
+template<typename T> void Storage<T>::enable(const unsigned L) {
+    if(find(L)) pond[L]->enable();
+}
 
-template<typename T> void Storage<T>::disable(const unsigned L) { if(find(L)) pond[L]->disable(); }
+template<typename T> void Storage<T>::disable(const unsigned L) {
+    if(find(L)) pond[L]->disable();
+}
 
 template<typename T> void Storage<T>::update() {
     reset();
@@ -179,7 +183,9 @@ template<typename T> void Storage<T>::update() {
         else bait.insert(tag);
 }
 
-template<typename T> void Storage<T>::enable() { for(const auto& I : pond) I.second->enable(); }
+template<typename T> void Storage<T>::enable() {
+    for(const auto& I : pond) I.second->enable();
+}
 
 template<typename T> void Storage<T>::reset() {
     fish.clear();

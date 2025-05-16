@@ -181,7 +181,7 @@ int SimpleHysteresis::update_trial_status(const vec& t_strain) {
     trial_stress = response[0];
     trial_stiffness = response[1];
 
-    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw std::invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }

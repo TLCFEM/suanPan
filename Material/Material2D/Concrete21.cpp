@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Concrete21.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/tensor.h>
 
@@ -36,7 +37,7 @@ int Concrete21::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Concrete21::get_copy() { return make_unique<Concrete21>(*this); }
+unique_ptr<Material> Concrete21::get_copy() { return std::make_unique<Concrete21>(*this); }
 
 double Concrete21::get_parameter(const ParameterType P) const { return concrete_major.get_parameter(P); }
 

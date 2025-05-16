@@ -11,7 +11,7 @@ RUN git clone --depth 1 --branch v0.3.29 https://github.com/OpenMathLib/OpenBLAS
 
 # part 2: tbb
 RUN mkdir tbb-build && cd tbb-build && \
-    git clone --depth 1 --branch v2021.12.0 https://github.com/oneapi-src/oneTBB.git && \
+    git clone --depth 1 --branch v2022.1.0 https://github.com/oneapi-src/oneTBB.git && \
     cmake -DCMAKE_BUILD_TYPE=Release -DTBB_TEST=OFF ./oneTBB && cmake --build . --target install --config Release --parallel "$(nproc)"
 
 # part 3: vtk

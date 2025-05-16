@@ -30,6 +30,7 @@
 #define CUSTOMSTRAINDEGRADATION_H
 
 #include "Degradation.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 

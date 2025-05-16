@@ -16,9 +16,10 @@
  ******************************************************************************/
 
 #include "ModifierExample.h"
+
 #include <Toolbox/utility.h>
 
-SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istringstream& command) {
+SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -31,11 +32,7 @@ SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, istrin
         return;
     }
 
-    std::vector<uword> element_tag;
-    unsigned e_tag;
-    while(!command.eof()) if(get_input(command, e_tag)) element_tag.emplace_back(e_tag);
-
-    return_obj = make_unique<ModifierExample>(tag, a, b, element_tag);
+    return_obj = std::make_unique<ModifierExample>(tag, a, b, get_remaining<uword>(command));
 }
 
 ModifierExample::ModifierExample(const unsigned T, const double A, const double B, uvec&& ET)
@@ -44,7 +41,7 @@ ModifierExample::ModifierExample(const unsigned T, const double A, const double 
     , b(B) {}
 
 int ModifierExample::update_status() {
-    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
+    suanpan::for_all(element_pool, [&](const std::weak_ptr<Element>& ele_ptr) {
         if(const auto t_ptr = ele_ptr.lock()) {
             mat t_damping(t_ptr->get_total_number(), t_ptr->get_total_number(), fill::zeros);
             if(a != 0. && !t_ptr->get_current_mass().empty()) t_damping += a * t_ptr->get_current_mass();

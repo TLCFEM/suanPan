@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B21H.h"
+
 #include <Domain/DomainBase.h>
 #include <Section/Section.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -33,7 +34,7 @@ B21H::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_
 B21H::B21H(const unsigned T, uvec&& N, const unsigned S, const double L, const bool F)
     : SectionElement2D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , hinge_length(L > .5 ? .5 : L)
-    , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
+    , b_trans(F ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
 
 int B21H::initialize(const shared_ptr<DomainBase>& D) {
     auto& section_proto = D->get<Section>(section_tag(0));
@@ -118,8 +119,8 @@ int B21H::reset_status() {
     return code;
 }
 
-vector<vec> B21H::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> B21H::record(const OutputType P) {
+    std::vector<vec> data;
     append_to(data, int_pt[0].b_section->record(P));
     append_to(data, int_pt[1].b_section->record(P));
     for(const auto& I : elastic_int_pt) append_to(data, I.b_section->record(P));

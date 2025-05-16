@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Concrete22.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/tensor.h>
 
@@ -42,7 +43,7 @@ int Concrete22::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Concrete22::get_copy() { return make_unique<Concrete22>(*this); }
+unique_ptr<Material> Concrete22::get_copy() { return std::make_unique<Concrete22>(*this); }
 
 double Concrete22::get_parameter(const ParameterType P) const { return concrete_major.get_parameter(P); }
 
@@ -111,7 +112,7 @@ int Concrete22::update_trial_status(const vec& t_strain) {
     // const vec elastic_stress = current_stiffness * trial_strain;
     // trial_stiffness = current_stiffness + trial_stress * trial_stress.t() / dot(trial_stress, trial_strain) - elastic_stress * elastic_stress.t() / dot(trial_strain, elastic_stress);
 
-    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw std::invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }

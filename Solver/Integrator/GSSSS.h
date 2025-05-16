@@ -47,7 +47,7 @@ protected:
     double C0{0.}, C1{0.}, C2{0.}, C3{0.}, C4{0.}, XD{0.}, XV{0.}, XA{0.};
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    template<typename T> void generate_constants(double, double, double) { throw invalid_argument("need a proper scheme"); }
+    template<typename T> void generate_constants(double, double, double) { throw std::invalid_argument("need a proper scheme"); }
 
 public:
     explicit GSSSS(unsigned);

@@ -29,7 +29,7 @@ int BWBN::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> BWBN::get_copy() { return make_unique<BWBN>(*this); }
+unique_ptr<Material> BWBN::get_copy() { return std::make_unique<BWBN>(*this); }
 
 int BWBN::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

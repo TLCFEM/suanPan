@@ -29,7 +29,7 @@ int ArmstrongFrederick1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> ArmstrongFrederick1D::get_copy() { return make_unique<ArmstrongFrederick1D>(*this); }
+unique_ptr<Material> ArmstrongFrederick1D::get_copy() { return std::make_unique<ArmstrongFrederick1D>(*this); }
 
 double ArmstrongFrederick1D::get_parameter(const ParameterType P) const {
     if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
@@ -84,8 +84,10 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
 
         jacobian = -elastic_modulus - dk;
 
-        if(xi > 0.) for(auto I = 0u; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
-        else for(auto I = 0u; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
+        if(xi > 0.)
+            for(auto I = 0u; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
+        else
+            for(auto I = 0u; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
 
         const auto incre = yield_func / jacobian;
         const auto error = fabs(incre);

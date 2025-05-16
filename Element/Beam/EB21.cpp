@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "EB21.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B2DC.h>
 #include <Material/Material1D/Material1D.h>
@@ -25,7 +26,7 @@ EB21::EB21(const unsigned T, uvec&& N, const double A, const double I, const uns
     : MaterialElement1D(T, b_node, b_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::UR3})
     , area(A)
     , moment_inertia(I)
-    , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
+    , b_trans(F ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
 
 int EB21::initialize(const shared_ptr<DomainBase>& D) {
     b_trans->set_element_ptr(this);
@@ -76,7 +77,7 @@ int EB21::reset_status() {
     return b_material->reset_status();
 }
 
-vector<vec> EB21::record(const OutputType P) {
+std::vector<vec> EB21::record(const OutputType P) {
     if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
     if(P == OutputType::BEAMS) return {vec{local_stiff * b_trans->to_local_vec(get_current_displacement())}};
 

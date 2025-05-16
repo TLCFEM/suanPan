@@ -53,7 +53,7 @@ public:
         unsigned,    // tag
         uvec&&,      // node tags
         vec&&,       // properties
-        unsigned,    // orientation tag 
+        unsigned,    // orientation tag
         bool = false // nonlinear geometry switch
     );
 
@@ -65,7 +65,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

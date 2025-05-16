@@ -18,7 +18,7 @@
 #ifndef MAPPINGDOF_H
 #define MAPPINGDOF_H
 
-#include <Domain/Tag.h>
+#include <suanPan.h>
 
 struct MappingDOF {
     uword g_row, g_col;

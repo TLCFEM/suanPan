@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Substepping.h"
+
 #include <Domain/DomainBase.h>
 
 Substepping::Substepping(const unsigned T, const unsigned MT, const unsigned MI)
@@ -41,7 +42,7 @@ int Substepping::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Substepping::get_copy() { return make_unique<Substepping>(*this); }
+unique_ptr<Material> Substepping::get_copy() { return std::make_unique<Substepping>(*this); }
 
 double Substepping::get_parameter(const ParameterType P) const { return current_mat_obj->get_parameter(P); }
 
@@ -82,7 +83,9 @@ void Substepping::set_initial_history(const vec& H) {
 
 std::vector<vec> Substepping::record(const OutputType P) { return current_mat_obj->record(P); }
 
-void Substepping::print() { if(current_mat_obj) current_mat_obj->print(); }
+void Substepping::print() {
+    if(current_mat_obj) current_mat_obj->print();
+}
 
 int Substepping::update_trial_status(const vec& t_strain) {
     incre_strain = t_strain - current_mat_obj->get_current_strain();

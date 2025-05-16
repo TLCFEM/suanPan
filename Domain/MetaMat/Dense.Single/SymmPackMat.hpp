@@ -68,7 +68,8 @@ public:
     }
 
     T& at(const uword in_row, const uword in_col) override {
-        if(in_row < in_col) [[unlikely]] return bin = T(0);
+        if(in_row < in_col) [[unlikely]]
+            return bin = T(0);
         return this->unsafe_at(in_row, in_col);
     }
 
@@ -102,7 +103,7 @@ template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {
 template<sp_d T> int SymmPackMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::move(B));
 
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     blas_int INFO = 0;
 

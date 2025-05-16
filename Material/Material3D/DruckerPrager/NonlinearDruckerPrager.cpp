@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearDruckerPrager.h"
+
 #include <Toolbox/tensor.h>
 
 const mat NonlinearDruckerPrager::unit_dev_tensor = tensor::unit_deviatoric_tensor4();

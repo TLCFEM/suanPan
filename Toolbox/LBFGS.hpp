@@ -41,20 +41,18 @@
 #ifndef LBFGS_HPP
 #define LBFGS_HPP
 
-#include <suanPan.h>
 #include <deque>
-
-using std::deque;
-using std::vector;
+#include <suanPan.h>
 
 template<typename T> concept Differentiable = requires(T t, const vec& x) {
-    t.evaluate_residual(x); t.evaluate_jacobian(x);
+    t.evaluate_residual(x);
+    t.evaluate_jacobian(x);
 };
 
 class LBFGS final {
-    deque<vec> hist_ninja, hist_residual;
-    deque<double> hist_factor;
-    vector<double> alpha;
+    std::deque<vec> hist_ninja, hist_residual;
+    std::deque<double> hist_factor;
+    std::vector<double> alpha;
 
     const unsigned max_hist;
     const unsigned max_iteration;

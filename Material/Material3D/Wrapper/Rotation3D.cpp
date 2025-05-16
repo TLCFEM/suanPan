@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Rotation3D.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/Quaternion.hpp>
 
@@ -91,7 +92,7 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Rotation3D::get_copy() { return make_unique<Rotation3D>(*this); }
+unique_ptr<Material> Rotation3D::get_copy() { return std::make_unique<Rotation3D>(*this); }
 
 double Rotation3D::get_parameter(const ParameterType P) const { return mat_obj->get_parameter(P); }
 
@@ -129,4 +130,4 @@ int Rotation3D::reset_status() {
     return mat_obj->reset_status();
 }
 
-vector<vec> Rotation3D::record(const OutputType P) { return mat_obj->record(P); }
+std::vector<vec> Rotation3D::record(const OutputType P) { return mat_obj->record(P); }

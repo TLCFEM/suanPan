@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "RelIncreDisp.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 RelIncreDisp::RelIncreDisp(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelIncreDisp::get_copy() { return make_unique<RelIncreDisp>(*this); }
+unique_ptr<Converger> RelIncreDisp::get_copy() { return std::make_unique<RelIncreDisp>(*this); }
 
 bool RelIncreDisp::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();

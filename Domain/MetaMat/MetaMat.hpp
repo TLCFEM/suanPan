@@ -85,7 +85,7 @@ protected:
 
     int direct_solve(Mat<T>& X, SpMat<T>&& B) { return this->direct_solve(X, B); }
 
-    template<std::invocable<fmat&> F> int mixed_trs(mat& X, mat&& B, F trs) {
+    template<std::invocable<fmat&> F> int mixed_trs(mat& X, mat&& B, F&& trs) {
         auto INFO = 0;
 
         X = arma::zeros(size(B));
@@ -104,7 +104,7 @@ protected:
 
             X += incre;
 
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(B -= this->operator*(incre)));
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(B -= this->operator*(incre)));
         }
 
         return INFO;
@@ -124,9 +124,9 @@ public:
         , n_elem(in_elem) {}
 
     MetaMat(const MetaMat&) = default;
-    MetaMat(MetaMat&&) noexcept = delete;
+    MetaMat(MetaMat&&) = delete;
     MetaMat& operator=(const MetaMat&) = delete;
-    MetaMat& operator=(MetaMat&&) noexcept = delete;
+    MetaMat& operator=(MetaMat&&) = delete;
     virtual ~MetaMat() = default;
 
     void set_solver_setting(const SolverSetting<T>& SS) { setting = SS; }

@@ -1,18 +1,18 @@
-set(Integrator
-        Integrator/BatheExplicit.cpp
-        Integrator/BatheTwoStep.cpp
-        Integrator/GeneralizedAlpha.cpp
-        Integrator/GeneralizedAlphaExplicit.cpp
-        Integrator/GSSSS.cpp
-        Integrator/Integrator.cpp
-        Integrator/LeeNewmark.cpp
-        Integrator/LeeNewmarkIterative.cpp
-        Integrator/LeeNewmarkBase.cpp
-        Integrator/LeeNewmarkFull.cpp
-        Integrator/Newmark.cpp
-        Integrator/NonviscousNewmark.cpp
-        Integrator/OALTS.cpp
-        Integrator/RayleighNewmark.cpp
-        Integrator/Tchamwa.cpp
-        Integrator/WilsonPenzienNewmark.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        BatheExplicit.cpp
+        BatheTwoStep.cpp
+        GeneralizedAlpha.cpp
+        GeneralizedAlphaExplicit.cpp
+        GSSSS.cpp
+        Integrator.cpp
+        LeeNewmark.cpp
+        LeeNewmarkBase.cpp
+        LeeNewmarkFull.cpp
+        LeeNewmarkIterative.cpp
+        Newmark.cpp
+        NonviscousNewmark.cpp
+        OALTS.cpp
+        RayleighNewmark.cpp
+        Tchamwa.cpp
+        WilsonPenzienNewmark.cpp
 )

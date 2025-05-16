@@ -1,21 +1,22 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
 */
 
-/*! @file 
+/*! @file
  * \brief Finds a row permutation so that the matrix has large entries on the diagonal
  *
  * <pre>
- * -- SuperLU routine (version 4.0) --
+ * -- SuperLU routine (version 7.0.0) --
  * Lawrence Berkeley National Laboratory.
  * June 30, 2009
+ * August 2024
  * </pre>
  */
 
@@ -42,7 +43,7 @@ extern int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, dou
  *              permuted matrix has as many entries on its diagonal as
  *              possible. The values on the diagonal are of arbitrary size.
  *              HSL subroutine MC21A/AD is used for this.
- *        = 2 : Compute a row permutation of the matrix so that the smallest 
+ *        = 2 : Compute a row permutation of the matrix so that the smallest
  *              value on the diagonal of the permuted matrix is maximized.
  *        = 3 : Compute a row permutation of the matrix so that the smallest
  *              value on the diagonal of the permuted matrix is maximized.
@@ -52,9 +53,9 @@ extern int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, dou
  *              of the diagonal entries of the permuted matrix is maximized.
  *        = 5 : Compute a row permutation of the matrix so that the product
  *              of the diagonal entries of the permuted matrix is maximized
- *              and vectors to scale the matrix so that the nonzero diagonal 
- *              entries of the permuted matrix are one in absolute value and 
- *              all the off-diagonal entries are less than or equal to one in 
+ *              and vectors to scale the matrix so that the nonzero diagonal
+ *              entries of the permuted matrix are one in absolute value and
+ *              all the off-diagonal entries are less than or equal to one in
  *              absolute value.
  *        Restriction: 1 <= JOB <= 5.
  *
@@ -81,10 +82,10 @@ extern int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, dou
  *        original matrix is in row j of the permuted matrix.
  *
  * u      (output) double*, of size n
- *        If job = 5, the natural logarithms of the row scaling factors. 
+ *        If job = 5, the natural logarithms of the row scaling factors.
  *
  * v      (output) double*, of size n
- *        If job = 5, the natural logarithms of the column scaling factors. 
+ *        If job = 5, the natural logarithms of the column scaling factors.
  *        The scaled matrix B has entries b_ij = a_ij * exp(u_i + v_j).
  * </pre>
  */
@@ -96,25 +97,26 @@ int zldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[], doublecom
     double* dw;
     double* nzval_d = (double*)SUPERLU_MALLOC(nnz * sizeof(double));
 
-#if ( DEBUGlevel>=1 )
+#if (DEBUGlevel >= 1)
     CHECK_MALLOC("Enter zldperm()");
 #endif
     liw = 5 * n;
     if(job == 3) liw = 10 * n + nnz;
     if(!(iw = intMalloc(liw))) ABORT("Malloc fails for iw[]");
     ldw = 3 * n + nnz;
-    if(!(dw = (double*)SUPERLU_MALLOC(ldw * sizeof(double)))) ABORT("Malloc fails for dw[]");
+    if(!(dw = (double*)SUPERLU_MALLOC(ldw * sizeof(double))))
+        ABORT("Malloc fails for dw[]");
 
     /* Increment one to get 1-based indexing. */
     for(i = 0; i <= n; ++i) ++colptr[i];
     for(i = 0; i < nnz; ++i) ++adjncy[i];
-#if ( DEBUGlevel>=2 )
-    printf("LDPERM(): n %d, nnz %d\n", n, nnz);
-    slu_PrintInt10("colptr", n+1, colptr);
+#if (DEBUGlevel >= 2)
+    printf("LDPERM(): n %d, nnz %lld\n", n, (long long)nnz);
+    slu_PrintInt10("colptr", n + 1, colptr);
     slu_PrintInt10("adjncy", nnz, adjncy);
 #endif
 
-    /* 
+    /*
      * NOTE:
      * =====
      *
@@ -142,12 +144,11 @@ int zldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[], doublecom
     for(i = 0; i < nnz; ++i) nzval_d[i] = z_abs1(&nzval[i]);
     mc64ad_(&ljob, &ln, &nnz, colptr, adjncy, nzval_d, &num, perm, &liw, iw, &ldw, dw, icntl, info);
 
-#if ( DEBUGlevel>=2 )
+#if (DEBUGlevel >= 2)
     slu_PrintInt10("perm", n, perm);
-    printf(".. After MC64AD info %lld\tsize of matching %d\n", (long long)info[0], num);
+    printf(".. After MC64AD info %lld\tsize of matching %lld\n", (long long)info[0], (long long)num);
 #endif
-    if(info[0] == 1) {
-        /* Structurally singular */
+    if(info[0] == 1) { /* Structurally singular */
         printf(".. The last %d permutations:\n", (int)(n - num));
         slu_PrintInt10("perm", n - num, &perm[num]);
     }
@@ -167,7 +168,7 @@ int zldperm(int job, int n, int_t nnz, int_t colptr[], int_t adjncy[], doublecom
     SUPERLU_FREE(dw);
     SUPERLU_FREE(nzval_d);
 
-#if ( DEBUGlevel>=1 )
+#if (DEBUGlevel >= 1)
     CHECK_MALLOC("Exit zldperm()");
 #endif
 

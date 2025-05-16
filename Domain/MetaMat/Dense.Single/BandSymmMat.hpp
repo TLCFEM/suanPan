@@ -57,13 +57,14 @@ public:
 
     void nullify(const uword K) override {
         this->factored = false;
-        suanpan::for_each(std::max(band, K) - band, K, [&](const uword I) { this->memory[K - I + I * m_rows] = T(0); });
+        suanpan::for_each(std::max(K, band) - band, K, [&](const uword I) { this->memory[K - I + I * m_rows] = T(0); });
         const auto t_factor = K * m_rows - K;
         suanpan::for_each(K, std::min(this->n_rows, K + band + 1), [&](const uword I) { this->memory[I + t_factor] = T(0); });
     }
 
     T operator()(const uword in_row, const uword in_col) const override {
-        if(in_row > band + in_col || in_col > in_row + band) [[unlikely]] return bin = T(0);
+        if(in_row > band + in_col || in_col > in_row + band) [[unlikely]]
+            return bin = T(0);
         return this->memory[in_row > in_col ? in_row - in_col + in_col * m_rows : in_col - in_row + in_row * m_rows];
     }
 
@@ -73,7 +74,8 @@ public:
     }
 
     T& at(const uword in_row, const uword in_col) override {
-        if(in_row > band + in_col || in_row < in_col) [[unlikely]] return bin = T(0);
+        if(in_row > band + in_col || in_row < in_col) [[unlikely]]
+            return bin = T(0);
         return this->unsafe_at(in_row, in_col);
     }
 
@@ -109,7 +111,7 @@ template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) const {
 template<sp_d T> int BandSymmMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(this->factored) return this->solve_trs(X, std::move(B));
 
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     blas_int INFO = 0;
 

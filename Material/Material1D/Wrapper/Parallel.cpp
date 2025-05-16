@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Parallel.h"
+
 #include <Domain/DomainBase.h>
 
 Parallel::Parallel(const unsigned T, uvec&& MT)
@@ -48,7 +49,7 @@ int Parallel::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Parallel::get_copy() { return make_unique<Parallel>(*this); }
+unique_ptr<Material> Parallel::get_copy() { return std::make_unique<Parallel>(*this); }
 
 int Parallel::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -112,8 +113,8 @@ int Parallel::reset_status() {
     return code;
 }
 
-vector<vec> Parallel::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Parallel::record(const OutputType P) {
+    std::vector<vec> data;
 
     auto max_size = 0llu;
     for(const auto& I : mat_pool)

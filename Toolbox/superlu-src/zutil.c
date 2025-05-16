@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -22,7 +22,7 @@ at the top-level directory.
  *
  * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY
  * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
- * 
+ *
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
@@ -76,12 +76,14 @@ void zCopy_CompCol_Matrix(SuperMatrix* A, SuperMatrix* B) {
     B->Stype = A->Stype;
     B->Dtype = A->Dtype;
     B->Mtype = A->Mtype;
-    B->nrow = A->nrow;;
+    B->nrow = A->nrow;
+    ;
     B->ncol = ncol = A->ncol;
     Astore = (NCformat*)A->Store;
     Bstore = (NCformat*)B->Store;
     Bstore->nnz = nnz = Astore->nnz;
-    for(i = 0; i < nnz; ++i) ((doublecomplex*)Bstore->nzval)[i] = ((doublecomplex*)Astore->nzval)[i];
+    for(i = 0; i < nnz; ++i)
+        ((doublecomplex*)Bstore->nzval)[i] = ((doublecomplex*)Astore->nzval)[i];
     for(i = 0; i < nnz; ++i) Bstore->rowind[i] = Astore->rowind[i];
     for(i = 0; i <= ncol; ++i) Bstore->colptr[i] = Astore->colptr[i];
 }
@@ -106,7 +108,9 @@ void zCopy_Dense_Matrix(int M, int N, doublecomplex* X, int ldx, doublecomplex* 
      */
     int i, j;
 
-    for(j = 0; j < N; ++j) for(i = 0; i < M; ++i) Y[i + j * ldy] = X[i + j * ldx];
+    for(j = 0; j < N; ++j)
+        for(i = 0; i < M; ++i)
+            Y[i + j * ldy] = X[i + j * ldx];
 }
 
 void zCreate_SuperNode_Matrix(SuperMatrix* L, int m, int n, int_t nnz, doublecomplex* nzval, int_t* nzval_colptr, int_t* rowind, int_t* rowind_colptr, int* col_to_sup, int* sup_to_col, Stype_t stype, Dtype_t dtype, Mtype_t mtype) {
@@ -143,7 +147,8 @@ void zCompRow_to_CompCol(int m, int n, int_t nnz, doublecomplex* a, int_t* colin
     marker = (int_t*)intCalloc(n);
 
     /* Get counts of each column of A, and set up column pointers */
-    for(i = 0; i < m; ++i) for(j = rowptr[i]; j < rowptr[i + 1]; ++j) ++marker[colind[j]];
+    for(i = 0; i < m; ++i)
+        for(j = rowptr[i]; j < rowptr[i + 1]; ++j) ++marker[colind[j]];
     (*colptr)[0] = 0;
     for(j = 0; j < n; ++j) {
         (*colptr)[j + 1] = (*colptr)[j] + marker[j];
@@ -221,13 +226,15 @@ void zPrint_SuperNode_Matrix(char* what, SuperMatrix* A) {
     printf("\nnzval_colptr: ");
     for(i = 0; i <= n; ++i) printf("%lld  ", (long long)Astore->nzval_colptr[i]);
     printf("\nrowind: ");
-    for(i = 0; i < Astore->rowind_colptr[n]; ++i) printf("%lld  ", (long long)Astore->rowind[i]);
+    for(i = 0; i < Astore->rowind_colptr[n]; ++i)
+        printf("%lld  ", (long long)Astore->rowind[i]);
     printf("\nrowind_colptr: ");
     for(i = 0; i <= n; ++i) printf("%lld  ", (long long)Astore->rowind_colptr[i]);
     printf("\ncol_to_sup: ");
     for(i = 0; i < n; ++i) printf("%d  ", col_to_sup[i]);
     printf("\nsup_to_col: ");
-    for(i = 0; i <= Astore->nsuper + 1; ++i) printf("%d  ", sup_to_col[i]);
+    for(i = 0; i <= Astore->nsuper + 1; ++i)
+        printf("%d  ", sup_to_col[i]);
     printf("\n");
     fflush(stdout);
 }
@@ -275,7 +282,8 @@ void zprint_lu_col(char* msg, int jcol, int pivrow, int_t* xprune, GlobalLU_t* G
     printf("col %d: pivrow %d, supno %d, xprune %lld\n", jcol, pivrow, supno[jcol], (long long)xprune[jcol]);
 
     printf("\tU-col:\n");
-    for(i = xusub[jcol]; i < xusub[jcol + 1]; i++) printf("\t%d%10.4f, %10.4f\n", (int)usub[i], ucol[i].r, ucol[i].i);
+    for(i = xusub[jcol]; i < xusub[jcol + 1]; i++)
+        printf("\t%d%10.4f, %10.4f\n", (int)usub[i], ucol[i].r, ucol[i].i);
     printf("\tL-col in rectangular snode:\n");
     fsupc = xsup[supno[jcol]]; /* first col of the snode */
     i = xlsub[fsupc];
@@ -288,7 +296,7 @@ void zprint_lu_col(char* msg, int jcol, int pivrow, int_t* xprune, GlobalLU_t* G
     fflush(stdout);
 }
 
-/*! \brief Check whether tempv[] == 0. This should be true before and after calling any numeric routines, i.e., "panel_bmod" and "column_bmod". 
+/*! \brief Check whether tempv[] == 0. This should be true before and after calling any numeric routines, i.e., "panel_bmod" and "column_bmod".
  */
 void zcheck_tempv(int n, doublecomplex* tempv) {
     int i;
@@ -320,8 +328,8 @@ void zFillRHS(trans_t trans, int nrhs, doublecomplex* x, int ldx, SuperMatrix* A
     int ldc;
     char transc[1];
 
-    //Astore = A->Store;
-    //Aval   = (doublecomplex *) Astore->nzval;
+    // Astore = A->Store;
+    // Aval   = (doublecomplex *) Astore->nzval;
     Bstore = B->Store;
     rhs = Bstore->nzval;
     ldc = Bstore->lda;
@@ -339,7 +347,7 @@ void zfill(doublecomplex* a, int alen, doublecomplex dval) {
     for(i = 0; i < alen; i++) a[i] = dval;
 }
 
-/*! \brief Check the inf-norm of the error vector 
+/*! \brief Check the inf-norm of the error vector
  */
 void zinf_norm_error(int nrhs, SuperMatrix* X, doublecomplex* xtrue) {
     DNformat* Xstore;
@@ -365,7 +373,7 @@ void zinf_norm_error(int nrhs, SuperMatrix* X, doublecomplex* xtrue) {
 }
 
 /*! \brief Print performance of the code. */
-void zPrintPerf(SuperMatrix* L, SuperMatrix* U, mem_usage_t* mem_usage, double rpg, double rcond, double* ferr, double* berr, char* equed, SuperLUStat_t* stat) {
+void zPrintPerf(SuperMatrix* L, SuperMatrix* U, mem_usage_t* mem_usage, double rpg, double rcond, double* ferr, const double* berr, const char* equed, SuperLUStat_t* stat) {
     SCformat* Lstore;
     NCformat* Ustore;
     double* utime;
@@ -374,9 +382,11 @@ void zPrintPerf(SuperMatrix* L, SuperMatrix* U, mem_usage_t* mem_usage, double r
     utime = stat->utime;
     ops = stat->ops;
 
-    if(utime[FACT] != 0.) printf("Factor flops = %e\tMflops = %8.2f\n", ops[FACT], ops[FACT] * 1e-6 / utime[FACT]);
+    if(utime[FACT] != 0.)
+        printf("Factor flops = %e\tMflops = %8.2f\n", ops[FACT], ops[FACT] * 1e-6 / utime[FACT]);
     printf("Identify relaxed snodes	= %8.2f\n", utime[RELAX]);
-    if(utime[SOLVE] != 0.) printf("Solve flops = %.0f, Mflops = %8.2f\n", ops[SOLVE], ops[SOLVE] * 1e-6 / utime[SOLVE]);
+    if(utime[SOLVE] != 0.)
+        printf("Solve flops = %.0f, Mflops = %8.2f\n", ops[SOLVE], ops[SOLVE] * 1e-6 / utime[SOLVE]);
 
     Lstore = (SCformat*)L->Store;
     Ustore = (NCformat*)U->Store;
@@ -394,7 +404,7 @@ void zPrintPerf(SuperMatrix* L, SuperMatrix* U, mem_usage_t* mem_usage, double r
     printf("NUM:\t%e\t%e\t%e\t%e\t%s\n", rpg, rcond, ferr[0], berr[0], equed);
 }
 
-int print_doublecomplex_vec(char* what, int n, doublecomplex* vec) {
+int print_doublecomplex_vec(const char* what, int n, const doublecomplex* vec) {
     int i;
     printf("%s: n %d\n", what, n);
     for(i = 0; i < n; ++i) printf("%d\t%f%f\n", i, vec[i].r, vec[i].i);

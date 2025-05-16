@@ -50,7 +50,7 @@ public:
 
     void nullify(const uword idx) override {
         this->factored = false;
-        suanpan::for_each(this->triplet_mat.n_elem, [&](const uword I) { if(this->triplet_mat.row(I) == idx || this->triplet_mat.col(I) == idx) this->triplet_mat.val_mem()[I] = T(0); });
+        this->triplet_mat.nullify(idx);
     }
 
     [[nodiscard]] T max() const override { return this->triplet_mat.max(); }
@@ -62,9 +62,9 @@ public:
         return this->triplet_mat.at(in_row, in_col);
     }
 
-    [[nodiscard]] const T* memptr() const override { throw invalid_argument("not supported"); }
+    [[nodiscard]] const T* memptr() const override { throw std::invalid_argument("not supported"); }
 
-    T* memptr() override { throw invalid_argument("not supported"); }
+    T* memptr() override { throw std::invalid_argument("not supported"); }
 
     void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& in_mat) override {
         if(nullptr == in_mat) return;

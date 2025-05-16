@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearCDP.h"
+
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
@@ -240,7 +241,7 @@ int NonlinearCDP::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> NonlinearCDP::record(const OutputType P) {
+std::vector<vec> NonlinearCDP::record(const OutputType P) {
     if(P == OutputType::DT) return {vec{current_history(0)}};
     if(P == OutputType::DC) return {vec{current_history(1)}};
 

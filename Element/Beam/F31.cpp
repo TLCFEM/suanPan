@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "F31.h"
+
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 #include <Section/Section.h>
@@ -156,11 +157,11 @@ int F31::reset_status() {
     return code;
 }
 
-vector<vec> F31::record(const OutputType P) {
+std::vector<vec> F31::record(const OutputType P) {
     if(P == OutputType::BEAME) return {current_local_deformation};
     if(P == OutputType::BEAMS) return {current_local_resistance};
 
-    vector<vec> data;
+    std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
     return data;
 }

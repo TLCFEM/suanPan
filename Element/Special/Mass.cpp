@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Mass.h"
+
 #include <Domain/DOF.h>
 
 MassBase::MassBase(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)

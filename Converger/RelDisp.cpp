@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "RelDisp.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 RelDisp::RelDisp(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelDisp::get_copy() { return make_unique<RelDisp>(*this); }
+unique_ptr<Converger> RelDisp::get_copy() { return std::make_unique<RelDisp>(*this); }
 
 bool RelDisp::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();

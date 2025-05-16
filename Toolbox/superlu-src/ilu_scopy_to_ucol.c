@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -26,7 +26,7 @@ at the top-level directory.
 int num_drop_U;
 #endif
 
-extern void scopy_(int*, float [], int*, float [], int*);
+extern void scopy_(int*, float[], int*, float[], int*);
 
 #if 0
 static float *A;  /* used in _compare_ only */
@@ -55,7 +55,7 @@ int ilu_scopy_to_ucol(
     int* nnzUj,      /* in - out */
     GlobalLU_t* Glu, /* modified */
     float* work      /* working space with minimum size n,
-				    * used by the second dropping rule */
+                      * used by the second dropping rule */
 ) {
     /*
      * Gather from SPA dense[*] to global ucol[*].
@@ -86,7 +86,9 @@ int ilu_scopy_to_ucol(
     nzumax = Glu->nzumax;
 
     *sum = zero;
-    if(drop_rule == NODROP) { drop_tol = -1.0, quota = Glu->n; }
+    if(drop_rule == NODROP) {
+        drop_tol = -1.0, quota = Glu->n;
+    }
 
     jsupno = supno[jcol];
     nextu = xusub[jcol];
@@ -95,11 +97,9 @@ int ilu_scopy_to_ucol(
         krep = segrep[k--];
         ksupno = supno[krep];
 
-        if(ksupno != jsupno) {
-            /* Should go into ucol[] */
+        if(ksupno != jsupno) { /* Should go into ucol[] */
             kfnz = repfnz[krep];
-            if(kfnz != EMPTY) {
-                /* Nonzero U-segment */
+            if(kfnz != SLU_EMPTY) { /* Nonzero U-segment */
 
                 fsupc = xsup[ksupno];
                 isub = xlsub[fsupc] + kfnz - fsupc;
@@ -107,9 +107,11 @@ int ilu_scopy_to_ucol(
 
                 new_next = nextu + segsze;
                 while(new_next > nzumax) {
-                    if((mem_error = sLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu)) != 0) return (mem_error);
+                    if((mem_error = sLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu)) != 0)
+                        return (mem_error);
                     ucol = Glu->ucol;
-                    if((mem_error = sLUMemXpand(jcol, nextu, USUB, &nzumax, Glu)) != 0) return (mem_error);
+                    if((mem_error = sLUMemXpand(jcol, nextu, USUB, &nzumax, Glu)) != 0)
+                        return (mem_error);
                     usub = Glu->usub;
                     lsub = Glu->lsub;
                 }
@@ -136,17 +138,19 @@ int ilu_scopy_to_ucol(
                             /* *sum += fabs(dense[irow]);*/
                             *sum += tmp;
                             break;
-                        case SILU: default:
+                        case SILU:
+                        default:
                             break;
                         }
 #ifdef DEBUG
-			num_drop_U++;
+                        num_drop_U++;
 #endif
                     }
                     dense[irow] = zero;
                 }
             }
         }
+
     } /* for each segment... */
 
     xusub[jcol + 1] = nextu; /* Close U[*,jcol] */
@@ -184,7 +188,8 @@ int ilu_scopy_to_ucol(
                 case SMILU_3:
                     *sum += fabs(ucol[i]);
                     break;
-                case SILU: default:
+                case SILU:
+                default:
                     break;
                 }
                 ucol[i] = ucol[m0];
@@ -192,7 +197,7 @@ int ilu_scopy_to_ucol(
                 m0--;
                 m--;
 #ifdef DEBUG
-		num_drop_U++;
+                num_drop_U++;
 #endif
                 xusub[jcol + 1]--;
                 continue;

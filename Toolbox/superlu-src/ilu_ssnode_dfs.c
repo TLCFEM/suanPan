@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -67,12 +67,12 @@ int ilu_ssnode_dfs(
         for(k = xa_begin[i]; k < xa_end[i]; k++) {
             krow = asub[k];
             kmark = marker[krow];
-            if(kmark != kcol) {
-                /* First time visit krow */
+            if(kmark != kcol) { /* First time visit krow */
                 marker[krow] = kcol;
                 lsub[nextl++] = krow;
                 if(nextl >= nzlmax) {
-                    if((mem_error = sLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu)) != 0) return (mem_error);
+                    if((mem_error = sLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu)) != 0)
+                        return (mem_error);
                     lsub = Glu->lsub;
                 }
             }
@@ -81,7 +81,8 @@ int ilu_ssnode_dfs(
     }
 
     /* Supernode > 1 */
-    if(jcol < kcol) for(i = jcol + 1; i <= kcol; i++) xlsub[i] = nextl;
+    if(jcol < kcol)
+        for(i = jcol + 1; i <= kcol; i++) xlsub[i] = nextl;
 
     xsup[nsuper + 1] = kcol + 1;
     supno[kcol + 1] = nsuper;

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Mindlin.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
@@ -121,25 +122,29 @@ int Mindlin::update_status() {
 
 int Mindlin::commit_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.p_material->commit_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.p_material->commit_status();
     return code;
 }
 
 int Mindlin::clear_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.p_material->clear_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.p_material->clear_status();
     return code;
 }
 
 int Mindlin::reset_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.p_material->reset_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.p_material->reset_status();
     return code;
 }
 
-vector<vec> Mindlin::record(const OutputType P) {
-    vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) append_to(data, J.p_material->record(P));
+std::vector<vec> Mindlin::record(const OutputType P) {
+    std::vector<vec> data;
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) append_to(data, J.p_material->record(P));
     return data;
 }
 

@@ -30,6 +30,7 @@
 #define CUSTOMHOFFMAN_H
 
 #include "NonlinearHoffman.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 

@@ -29,7 +29,7 @@ int Bilinear1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Bilinear1D::get_copy() { return make_unique<Bilinear1D>(*this); }
+unique_ptr<Material> Bilinear1D::get_copy() { return std::make_unique<Bilinear1D>(*this); }
 
 int Bilinear1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

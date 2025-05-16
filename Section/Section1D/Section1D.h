@@ -29,11 +29,9 @@
 #ifndef SECTION1D_H
 #define SECTION1D_H
 
-#include <Section/Section.h>
 #include <Material/Material.h>
+#include <Section/Section.h>
 #include <Toolbox/ResourceHolder.h>
-
-using std::vector;
 
 class Section1D : public Section {
 protected:

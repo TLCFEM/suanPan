@@ -1,4 +1,5 @@
 #include "CatchHeader.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/utility.h>
 
@@ -14,7 +15,7 @@ TEST_CASE("Variable Split", "[Utility.Expression]") {
 }
 
 TEST_CASE("Simple Scalar Evaluation", "[Utility.Expression]") {
-    const auto expression = make_unique<SimpleScalarExpression>(0, "x|y");
+    const auto expression = std::make_unique<SimpleScalarExpression>(0, "x|y");
 
     REQUIRE(expression->compile("x^2+y^2+2*x*y") == true);
 
@@ -33,7 +34,7 @@ TEST_CASE("Simple Scalar Evaluation", "[Utility.Expression]") {
 }
 
 TEST_CASE("Simple Dot Evaluation", "[Utility.Expression]") {
-    const auto expression = make_unique<SimpleScalarExpression>(0, "x|2");
+    const auto expression = std::make_unique<SimpleScalarExpression>(0, "x|2");
 
     REQUIRE(expression->compile("sum(x)") == true);
 
@@ -51,7 +52,7 @@ TEST_CASE("Simple Dot Evaluation", "[Utility.Expression]") {
 }
 
 TEST_CASE("Simple Vector Evaluation", "[Utility.Expression]") {
-    const auto expression = make_unique<SimpleVectorExpression>(0, "x|3", "\"y|2\"");
+    const auto expression = std::make_unique<SimpleVectorExpression>(0, "x|3", "\"y|2\"");
 
     REQUIRE(expression->compile("y[0]:=x[0]+x[1]+x[2];y[1]:=x[0]*x[1]*x[2];") == true);
 

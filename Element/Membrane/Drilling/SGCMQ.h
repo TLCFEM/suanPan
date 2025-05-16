@@ -54,7 +54,7 @@ protected:
 
     const char scheme;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     static vec form_diff_coor(const mat&);
     static mat form_drilling_n(const vec&, const vec&);
@@ -83,7 +83,7 @@ public:
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

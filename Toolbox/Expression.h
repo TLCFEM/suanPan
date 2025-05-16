@@ -31,7 +31,7 @@
 #include <Domain/Tag.h>
 #include <exprtk/exprtk.hpp>
 
-class Expression : public Tag {
+class Expression : public UniqueTag {
     static std::mutex parser_mutex;
     static exprtk::parser<double> parser;
 
@@ -48,11 +48,6 @@ protected:
 
 public:
     Expression(unsigned, std::vector<std::string>&&);
-    Expression(const Expression&) = delete;
-    Expression(Expression&&) noexcept = delete;
-    Expression& operator=(const Expression&) = delete;
-    Expression& operator=(Expression&&) noexcept = delete;
-    ~Expression() override = default;
 
     [[nodiscard]] virtual unique_ptr<Expression> get_copy() const = 0;
 

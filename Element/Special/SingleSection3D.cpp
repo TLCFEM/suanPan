@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SingleSection3D.h"
+
 #include <Domain/DomainBase.h>
 #include <Section/Section.h>
 

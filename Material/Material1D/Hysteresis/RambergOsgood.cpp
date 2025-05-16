@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "RambergOsgood.h"
+
 #include <Toolbox/utility.h>
 
 RambergOsgood::RambergOsgood(const unsigned T, const double E, const double Y, const double O, const double N, const double R)
@@ -30,7 +31,7 @@ int RambergOsgood::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> RambergOsgood::get_copy() { return make_unique<RambergOsgood>(*this); }
+unique_ptr<Material> RambergOsgood::get_copy() { return std::make_unique<RambergOsgood>(*this); }
 
 int RambergOsgood::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

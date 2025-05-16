@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Tabular.h"
+
 #include <Domain/DomainBase.h>
 
 Tabular::Tabular(const unsigned T, vec&& TI, vec&& M, const unsigned ST)
@@ -23,7 +24,7 @@ Tabular::Tabular(const unsigned T, vec&& TI, vec&& M, const unsigned ST)
     , time(std::move(TI))
     , magnitude(std::move(M)) {}
 
-Tabular::Tabular(const unsigned T, string&& P, const unsigned ST)
+Tabular::Tabular(const unsigned T, std::string&& P, const unsigned ST)
     : Amplitude(T, ST)
     , file_name(std::move(P)) {}
 

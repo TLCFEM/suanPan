@@ -29,7 +29,7 @@ class DomainBase;
 
 class vtkUnstructuredGrid;
 
-int vtk_parser(const shared_ptr<DomainBase>&, istringstream&);
+int vtk_parser(const shared_ptr<DomainBase>&, std::istringstream&);
 
 struct vtkInfo {
     OutputType type = OutputType::U;
@@ -38,15 +38,15 @@ struct vtkInfo {
     unsigned font_size = 8;
     int canvas_size[2] = {500, 500};
     bool save_file = false;
-    string file_name;
-    string title_name;
+    std::string file_name;
+    std::string title_name;
     bool colorbar = true;
     int material_type = -1;
     bool store_ptr = false;
     vtkSmartPointer<vtkUnstructuredGrid> grid_ptr;
 };
 
-vtkInfo vtk_process(istringstream&);
+vtkInfo vtk_process(std::istringstream&);
 
 void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>&, const vtkInfo&);
 
@@ -58,7 +58,7 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>&, vtkInfo);
 
 #else
 
-inline int vtk_parser(const shared_ptr<DomainBase>&, istringstream&) {
+inline int vtk_parser(const shared_ptr<DomainBase>&, std::istringstream&) {
     suanpan_warning("Visualisation related functionalities are not available as the current build is not compiled with the VTK support.\n");
     return 0;
 }

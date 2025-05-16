@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Ramm.h"
+
 #include <Converger/Converger.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
@@ -24,7 +25,8 @@
 int Ramm::analyze() {
     auto& C = get_converger();
     auto& G = get_integrator();
-    auto& W = G->get_domain()->get_factory();
+    const auto D = G->get_domain();
+    auto& W = D->get_factory();
 
     suanpan_highlight(">> Current Load Level: {:+.5f}; Arc Length {:.3e}.\n", W->get_trial_load_factor().at(0), arc_length);
 
@@ -34,41 +36,53 @@ int Ramm::analyze() {
 
     vec samurai, disp_a, disp_ref;
 
+    wall_clock t_clock;
+
     // iteration counter
     auto counter = 0u;
 
     while(true) {
         set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
 
+        t_clock.tic();
         // update for nodes and elements
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-        // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
-        // assemble resistance
+        D->update<Statistics::UpdateStatus>(t_clock.toc());
+
+        t_clock.tic();
         G->assemble_resistance();
-        // assemble stiffness
+        D->update<Statistics::AssembleVector>(t_clock.toc());
+
+        t_clock.tic();
         G->assemble_matrix();
+        D->update<Statistics::AssembleMatrix>(t_clock.toc());
+
+        t_clock.tic();
         // process loads
         if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
         // process constraints
         if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+        D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
+        t_clock.tic();
 
         // solve ninja
         if(SUANPAN_SUCCESS != G->solve(samurai, G->get_displacement_residual())) return SUANPAN_FAIL;
         // solve reference displacement
         if(SUANPAN_SUCCESS != G->solve(disp_a, G->get_reference_load())) return SUANPAN_FAIL;
 
-        if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
-            mat right, kernel;
-            auto& border = W->get_auxiliary_stiffness();
-            if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
+        if(0 != W->get_multiplier_size()) {
             auto& aux_lambda = W->modify_auxiliary_lambda();
-            if(!solve(aux_lambda, kernel = border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-            samurai -= right * aux_lambda;
-            disp_a -= right * solve(kernel, border.t() * disp_a.head_rows(n_size));
+            auto& aux_border = W->get_auxiliary_stiffness();
+            mat aux_right, aux_kernel;
+            if(SUANPAN_SUCCESS != G->solve(aux_right, aux_border)) return SUANPAN_FAIL;
+            if(!solve(aux_lambda, aux_kernel = aux_border.t() * aux_right, aux_border.t() * samurai - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            samurai -= aux_right * aux_lambda;
+            disp_a -= aux_right * solve(aux_kernel, aux_border.t() * disp_a);
         }
 
-        if(0 < counter) t_lambda = -dot(disp_ref, samurai) / dot(disp_ref, disp_a);
+        if(0u < counter) t_lambda = -dot(disp_ref, samurai) / dot(disp_ref, disp_a);
         else {
             t_lambda = arc_length / sqrt(dot(disp_a, disp_a) + 1.);
 
@@ -80,6 +94,8 @@ int Ramm::analyze() {
         disp_ref = disp_a;
 
         samurai += disp_a * t_lambda;
+
+        D->update<Statistics::SolveSystem>(t_clock.toc());
 
         // avoid machine error accumulation
         G->erase_machine_error(samurai);

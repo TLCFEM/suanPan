@@ -18,12 +18,14 @@
 #include "MultilinearMises1D.h"
 
 double MultilinearMises1D::compute_k(const double p_strain) const {
-    for(uword I = 1; I < backbone.n_rows; ++I) if(p_strain <= backbone(I, 0)) return backbone(I - 1, 1) + backbone(I - 1, 2) * (p_strain - backbone(I - 1, 0));
+    for(uword I = 1; I < backbone.n_rows; ++I)
+        if(p_strain <= backbone(I, 0)) return backbone(I - 1, 1) + backbone(I - 1, 2) * (p_strain - backbone(I - 1, 0));
     return backbone(backbone.n_rows - 1, 1);
 }
 
 double MultilinearMises1D::compute_dk(const double p_strain) const {
-    for(uword I = 1; I < backbone.n_rows; ++I) if(p_strain <= backbone(I, 0)) return backbone(I - 1, 2);
+    for(uword I = 1; I < backbone.n_rows; ++I)
+        if(p_strain <= backbone(I, 0)) return backbone(I - 1, 2);
     return 0.;
 }
 
@@ -34,7 +36,7 @@ double MultilinearMises1D::compute_dh(const double) const { return 0.; }
 MultilinearMises1D::MultilinearMises1D(const unsigned T, const double E, mat&& H, const double R)
     : DataMultilinearMises1D{}
     , NonlinearMises1D(T, E, R) {
-    if(H(0, 0) != 0. || H.n_cols != 2) throw invalid_argument("first strain should be zero and there should be exact two columns");
+    if(H(0, 0) != 0. || H.n_cols != 2) throw std::invalid_argument("first strain should be zero and there should be exact two columns");
 
     H.resize(H.n_rows, 3);
     H(H.n_rows - 1, 2) = 0.;
@@ -44,7 +46,7 @@ MultilinearMises1D::MultilinearMises1D(const unsigned T, const double E, mat&& H
     access::rw(backbone) = std::move(H);
 }
 
-unique_ptr<Material> MultilinearMises1D::get_copy() { return make_unique<MultilinearMises1D>(*this); }
+unique_ptr<Material> MultilinearMises1D::get_copy() { return std::make_unique<MultilinearMises1D>(*this); }
 
 void MultilinearMises1D::print() {
     suanpan_info("A uniaxial multilinear hardening material using J2 plasticity and associated flow rule.\n");

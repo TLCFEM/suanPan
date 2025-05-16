@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NodeGroup.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 
@@ -58,19 +59,19 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
             const vec e_point(e_node.mem, size);
             const vec m_point(J.mem, size);
 
-            if(const auto denom = e_point(0) - s_point(0); fabs(denom) >= 1E-8) {
+            if(const auto denom = e_point(0) - s_point(0); std::fabs(denom) >= 1E-8) {
                 if(const auto T = (m_point(0) - s_point(0)) / denom; T >= 0. && T <= 1.) {
                     // on inclined line
                     auto flag = true;
                     for(uword K = 1; K < size; ++K)
-                        if(fabs((T * ((e_point(K) - s_point(K))) - m_point(K) + s_point(K))) > 1E-8) {
+                        if(std::fabs((T * ((e_point(K) - s_point(K))) - m_point(K) + s_point(K))) > 1E-8) {
                             flag = false;
                             break;
                         }
                     if(flag) pond.emplace_back(I->get_tag());
                 }
             }
-            else if(fabs(m_point(0) - .5 * (e_point(0) + s_point(0))) < 1E-8) {
+            else if(std::fabs(m_point(0) - .5 * (e_point(0) + s_point(0))) < 1E-8) {
                 // on vertical line
                 auto flag = true;
                 for(uword K = 1; K < size; ++K)
@@ -89,11 +90,12 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 
             if(0 == size) continue;
 
-            if(const vec part(rule.mem, size), m_point(J.mem, size); fabs(dot(part, m_point) + rule.back()) <= 1E-8) pond.emplace_back(I->get_tag());
+            if(const vec part(rule.mem, size), m_point(J.mem, size); std::fabs(dot(part, m_point) + rule.back()) <= 1E-8) pond.emplace_back(I->get_tag());
         }
     else
         // generate by polynomial curve fitting
-        for(auto& I : D->get_node_pool()) if(auto& J = I->get_coordinate(); static_cast<int>(J.n_elem) > dof && fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= 1E-12) pond.emplace_back(I->get_tag());
+        for(auto& I : D->get_node_pool())
+            if(auto& J = I->get_coordinate(); static_cast<int>(J.n_elem) > dof && std::fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= 1E-12) pond.emplace_back(I->get_tag());
 
     suanpan_sort(pond.begin(), pond.end());
 

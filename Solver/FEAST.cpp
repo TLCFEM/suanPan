@@ -209,6 +209,11 @@ int FEAST::linear_solve(const shared_ptr<LongFactory>& W) const {
         auto t_stiff = fs.get();
         auto t_mass = fm.get();
 
+        if(0 == t_mass.n_elem) {
+            suanpan_error("The global mass matrix is empty, check if the element type supports mass and density settings.\n");
+            return SUANPAN_FAIL;
+        }
+
         new_dfeast_scsrgv_(&UPLO, &N, t_stiff.val_mem(), t_stiff.row_mem(), t_stiff.col_mem(), t_mass.val_mem(), t_mass.row_mem(), t_mass.col_mem(), fpm.data(), &input[3], &output[0], &input[1], &input[2], &output[1], E.data(), X.data(), &output[2], R.data(), &output[3]);
     }
     else if(StorageScheme::BAND == scheme || StorageScheme::BANDSYMM == scheme) {

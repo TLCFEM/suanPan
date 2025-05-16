@@ -16,11 +16,12 @@
  ******************************************************************************/
 
 #include "ExpressionParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/Expression.h>
 #include <Toolbox/utility.h>
 
-int check_file(string& expression) {
+int check_file(std::string& expression) {
     if(!fs::exists(expression)) return SUANPAN_SUCCESS;
 
     const std::ifstream file(expression);
@@ -36,20 +37,20 @@ int check_file(string& expression) {
     return SUANPAN_SUCCESS;
 }
 
-void new_simplescalar(unique_ptr<Expression>& return_obj, istringstream& command) {
+void new_simplescalar(unique_ptr<Expression>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid expression tag is required.\n");
         return;
     }
 
-    string variable_list;
+    std::string variable_list;
     if(!get_input(command, variable_list)) {
         suanpan_error("A valid vertical bar separated variable list is required.\n");
         return;
     }
 
-    string expression;
+    std::string expression;
     if(!get_input(command, expression)) {
         suanpan_error("A valid expression or expression file name is required.\n");
         return;
@@ -57,7 +58,7 @@ void new_simplescalar(unique_ptr<Expression>& return_obj, istringstream& command
 
     if(SUANPAN_SUCCESS != check_file(expression)) return;
 
-    return_obj = make_unique<SimpleScalarExpression>(tag, variable_list);
+    return_obj = std::make_unique<SimpleScalarExpression>(tag, variable_list);
 
     if(!return_obj->compile(expression)) {
         suanpan_error("Fail to parse \"{}\", error: {}.\n", expression, return_obj->error());
@@ -65,20 +66,20 @@ void new_simplescalar(unique_ptr<Expression>& return_obj, istringstream& command
     }
 }
 
-void new_simplevector(unique_ptr<Expression>& return_obj, istringstream& command) {
+void new_simplevector(unique_ptr<Expression>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid expression tag is required.\n");
         return;
     }
 
-    string input_list, output_list;
+    std::string input_list, output_list;
     if(!get_input(command, input_list, output_list)) {
         suanpan_error("A valid vertical bar separated variable list is required.\n");
         return;
     }
 
-    string expression;
+    std::string expression;
     if(!get_input(command, expression)) {
         suanpan_error("A valid expression or expression file name is required.\n");
         return;
@@ -86,7 +87,7 @@ void new_simplevector(unique_ptr<Expression>& return_obj, istringstream& command
 
     if(SUANPAN_SUCCESS != check_file(expression)) return;
 
-    return_obj = make_unique<SimpleVectorExpression>(tag, input_list, output_list);
+    return_obj = std::make_unique<SimpleVectorExpression>(tag, input_list, output_list);
 
     if(!return_obj->compile(expression)) {
         suanpan_error("Fail to parse \"{}\", error: {}.\n", expression, return_obj->error());
@@ -94,8 +95,8 @@ void new_simplevector(unique_ptr<Expression>& return_obj, istringstream& command
     }
 }
 
-int create_new_expression(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string expression_type;
+int create_new_expression(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string expression_type;
     if(!get_input(command, expression_type)) {
         suanpan_error("A valid expression type is required.\n");
         return SUANPAN_SUCCESS;

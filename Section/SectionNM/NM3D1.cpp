@@ -16,12 +16,13 @@
  ******************************************************************************/
 
 #include "NM3D1.h"
+
 #include <Domain/DomainBase.h>
 
 NM3D1::NM3D1(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double LD)
     : SectionNM3D(T, EEA, EEIS, EEIW, LD) {}
 
-unique_ptr<Section> NM3D1::get_copy() { return make_unique<NM3D1>(*this); }
+unique_ptr<Section> NM3D1::get_copy() { return std::make_unique<NM3D1>(*this); }
 
 int NM3D1::update_trial_status(const vec& t_deformation) {
     trial_resistance = trial_stiffness * (trial_deformation = t_deformation);

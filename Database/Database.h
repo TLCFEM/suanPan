@@ -30,12 +30,11 @@
 
 class DomainBase;
 
-class Database : public Tag {
+class Database : public CopiableTag {
     shared_ptr<DomainBase> domain = nullptr;
 
 public:
     explicit Database(unsigned = 0);
-    ~Database() override = default;
 
     void set_domain(const shared_ptr<DomainBase>& D);
     [[nodiscard]] const shared_ptr<DomainBase>& get_domain() const;

@@ -50,7 +50,7 @@ class B31OS final : public SectionOSElement3D {
 
     const double length{0.};
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     unique_ptr<Orientation> b_trans;
 
@@ -72,7 +72,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

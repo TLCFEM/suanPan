@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Laminated.h"
+
 #include <Domain/DomainBase.h>
 
 Laminated::Laminated(const unsigned T, uvec&& MT)
@@ -43,7 +44,7 @@ int Laminated::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Laminated::get_copy() { return make_unique<Laminated>(*this); }
+unique_ptr<Material> Laminated::get_copy() { return std::make_unique<Laminated>(*this); }
 
 int Laminated::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;
@@ -86,8 +87,8 @@ int Laminated::reset_status() {
     return code;
 }
 
-vector<vec> Laminated::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Laminated::record(const OutputType P) {
+    std::vector<vec> data;
 
     auto max_size = 0llu;
     for(const auto& I : mat_pool)

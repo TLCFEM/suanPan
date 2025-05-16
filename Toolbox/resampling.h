@@ -43,7 +43,7 @@ vec fir_high_pass(uword, double, vec (*)(uword));
 vec fir_band_pass(uword, double, double, vec (*)(uword));
 vec fir_band_stop(uword, double, double, vec (*)(uword));
 
-template<WindowType T> vec fir_low_pass(uword, double) { throw invalid_argument("unknown window type"); }
+template<WindowType T> vec fir_low_pass(uword, double) { throw std::invalid_argument("unknown window type"); }
 
 template<> vec fir_low_pass<WindowType::Hamming>(uword, double);
 
@@ -57,7 +57,7 @@ template<> vec fir_low_pass<WindowType::BlackmanHarris>(uword, double);
 
 template<> vec fir_low_pass<WindowType::FlatTop>(uword, double);
 
-template<WindowType T> vec fir_high_pass(uword, double) { throw invalid_argument("unknown window type"); }
+template<WindowType T> vec fir_high_pass(uword, double) { throw std::invalid_argument("unknown window type"); }
 
 template<> vec fir_high_pass<WindowType::Hamming>(uword, double);
 
@@ -71,7 +71,7 @@ template<> vec fir_high_pass<WindowType::BlackmanHarris>(uword, double);
 
 template<> vec fir_high_pass<WindowType::FlatTop>(uword, double);
 
-template<WindowType T> vec fir_band_pass(uword, double, double) { throw invalid_argument("unknown window type"); }
+template<WindowType T> vec fir_band_pass(uword, double, double) { throw std::invalid_argument("unknown window type"); }
 
 template<> vec fir_band_pass<WindowType::Hamming>(uword, double, double);
 
@@ -85,7 +85,7 @@ template<> vec fir_band_pass<WindowType::BlackmanHarris>(uword, double, double);
 
 template<> vec fir_band_pass<WindowType::FlatTop>(uword, double, double);
 
-template<WindowType T> vec fir_band_stop(uword, double, double) { throw invalid_argument("unknown window type"); }
+template<WindowType T> vec fir_band_stop(uword, double, double) { throw std::invalid_argument("unknown window type"); }
 
 template<> vec fir_band_stop<WindowType::Hamming>(uword, double, double);
 
@@ -109,7 +109,7 @@ template<WindowType T> vec upsampling(const vec& in, const uword up_rate, const 
     return conv(out, coef, "same");
 }
 
-template<WindowType T> mat upsampling(const string& file_name, const uword up_rate, const uword window_size) {
+template<WindowType T> mat upsampling(const std::string& file_name, const uword up_rate, const uword window_size) {
     mat ext_data;
     if(std::error_code code; !fs::exists(file_name, code) || !ext_data.load(file_name, raw_ascii) || ext_data.empty() || ext_data.n_cols < 2) {
         ext_data.reset();
@@ -136,6 +136,6 @@ template<WindowType T> mat upsampling(const string& file_name, const uword up_ra
     return result;
 }
 
-mat upsampling(const string&, const string&, uword, uword = 8llu);
+mat upsampling(const std::string&, const std::string&, uword, uword = 8llu);
 
 #endif

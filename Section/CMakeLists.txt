@@ -1,20 +1,13 @@
-cmake_minimum_required(VERSION 3.18)
+add_subdirectory(Section1D)
+add_subdirectory(Section2D)
+add_subdirectory(Section3D)
+add_subdirectory(SectionNM)
+add_subdirectory(SectionOS)
+add_subdirectory(SectionShell)
 
-project(Section)
-
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../Libs)
-
-include(Section1D/CMakeLists.txt)
-include(Section2D/CMakeLists.txt)
-include(Section3D/CMakeLists.txt)
-include(SectionNM/CMakeLists.txt)
-include(SectionOS/CMakeLists.txt)
-include(SectionShell/CMakeLists.txt)
-
-add_library(${PROJECT_NAME} STATIC
-        Section.cpp
+target_sources(${PROJECT_NAME} PRIVATE
         Fibre.cpp
+        Section.cpp
         SectionParser.cpp
         SectionTester.cpp
-        ${S1D} ${S2D} ${S3D} ${SNM} ${SOS} ${SS}
 )

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "VisualisationRecorder.h"
+
 #include <Domain/DomainBase.h>
 
 extern fs::path SUANPAN_OUTPUT;
@@ -38,7 +39,7 @@ void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>
 #ifdef SUANPAN_VTK
     if(!if_perform_record()) return;
 
-    ostringstream file_name;
+    std::ostringstream file_name;
 
     file_name << 'R' << get_tag() << '-' << to_name(get_variable_type()) << '-' << std::setw(static_cast<int>(width)) << std::setfill('0') << ++total_counter << ".vtk";
 

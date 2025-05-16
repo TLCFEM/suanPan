@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Stacked.h"
+
 #include <Domain/DomainBase.h>
 
 Stacked::Stacked(const unsigned T, uvec&& MT)
@@ -43,7 +44,7 @@ int Stacked::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Stacked::get_copy() { return make_unique<Stacked>(*this); }
+unique_ptr<Material> Stacked::get_copy() { return std::make_unique<Stacked>(*this); }
 
 int Stacked::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -88,8 +89,8 @@ int Stacked::reset_status() {
     return code;
 }
 
-vector<vec> Stacked::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Stacked::record(const OutputType P) {
+    std::vector<vec> data;
 
     auto max_size = 0llu;
     for(const auto& I : mat_pool)

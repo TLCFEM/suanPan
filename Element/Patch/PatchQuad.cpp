@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PatchQuad.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Utility/IGA/NURBSSurface.h>
 #include <Material/Material2D/Material2D.h>
@@ -91,11 +92,13 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
                 }
                 initial_stiffness += t_factor * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
 
-                for(auto M = 0u, L = 0u; M < m_node; ++M, L += m_dof) for(auto N = 0llu; N < m_dof; ++N) body_force(L + N, N) += t_factor * ders(0, 0)(M);
+                for(auto M = 0u, L = 0u; M < m_node; ++M, L += m_dof)
+                    for(auto N = 0llu; N < m_dof; ++N) body_force(L + N, N) += t_factor * ders(0, 0)(M);
 
                 if(t_density > 0.) {
                     t_factor *= t_density;
-                    for(auto M = 0llu; M < m_node; ++M) for(auto N = M; N < m_node; ++N) initial_mass(m_dof * M, m_dof * N) += t_factor * ders(0, 0)(M) * ders(0, 0)(N);
+                    for(auto M = 0llu; M < m_node; ++M)
+                        for(auto N = M; N < m_node; ++N) initial_mass(m_dof * M, m_dof * N) += t_factor * ders(0, 0)(M) * ders(0, 0)(N);
                 }
             }
         }
@@ -146,8 +149,8 @@ int PatchQuad::reset_status() {
     return code;
 }
 
-vector<vec> PatchQuad::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> PatchQuad::record(const OutputType P) {
+    std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }

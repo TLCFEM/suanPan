@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomElastic1D.h"
+
 #include <Domain/DomainBase.h>
 
 CustomElastic1D::CustomElastic1D(const unsigned T, const unsigned ET, const double R)
@@ -40,7 +41,7 @@ int CustomElastic1D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> CustomElastic1D::get_copy() { return make_unique<CustomElastic1D>(*this); }
+unique_ptr<Material> CustomElastic1D::get_copy() { return std::make_unique<CustomElastic1D>(*this); }
 
 int CustomElastic1D::update_trial_status(const vec& t_strain) {
     trial_stress = expression->evaluate(trial_strain = t_strain);

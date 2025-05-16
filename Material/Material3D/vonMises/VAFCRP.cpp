@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "VAFCRP.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Toolbox/tensor.h>
@@ -37,7 +38,7 @@ int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> VAFCRP::get_copy() { return make_unique<VAFCRP>(*this); }
+unique_ptr<Material> VAFCRP::get_copy() { return std::make_unique<VAFCRP>(*this); }
 
 double VAFCRP::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
@@ -99,7 +100,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre;
         p -= incre;

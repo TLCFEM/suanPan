@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -13,16 +13,17 @@ at the top-level directory.
  * \brief Computes an LU factorization of a general sparse matrix
  *
  * <pre>
- * -- SuperLU routine (version 3.0) --
+ * -- SuperLU routine (version 7.0.0) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
  * and Lawrence Berkeley National Lab.
  * October 15, 2003
- * 
+ * August 2024
+ *
  * Copyright (c) 1994 by Xerox Corporation.  All rights reserved.
  *
  * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY
  * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
- * 
+ *
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
@@ -44,7 +45,7 @@ at the top-level directory.
  * The factorization has the form
  *     Pr * A = L * U
  * where Pr is a row permutation matrix, L is lower triangular with unit
- * diagonal elements (lower trapezoidal if A->nrow > A->ncol), and U is upper 
+ * diagonal elements (lower trapezoidal if A->nrow > A->ncol), and U is upper
  * triangular (upper trapezoidal if A->nrow < A->ncol).
  *
  * See supermatrix.h for the definition of 'SuperMatrix' structure.
@@ -91,8 +92,8 @@ at the top-level directory.
  *               *info; no other side effects.
  *
  * perm_c   (input) int*, dimension (A->ncol)
- *	    Column permutation vector, which defines the 
- *          permutation matrix Pc; perm_c[i] = j means column i of A is 
+ *	    Column permutation vector, which defines the
+ *          permutation matrix Pc; perm_c[i] = j means column i of A is
  *          in position j in A*Pc.
  *          When searching for diagonal, perm_c[*] is applied to the
  *          row subscripts of A, so that diagonal threshold pivoting
@@ -109,18 +110,18 @@ at the top-level directory.
  *          Otherwise, perm_r is output argument;
  *
  * L        (output) SuperMatrix*
- *          The factor L from the factorization Pr*A=L*U; use compressed row 
- *          subscripts storage for supernodes, i.e., L has type: 
+ *          The factor L from the factorization Pr*A=L*U; use compressed row
+ *          subscripts storage for supernodes, i.e., L has type:
  *          Stype = SLU_SC, Dtype = SLU_C, Mtype = SLU_TRLU.
  *
  * U        (output) SuperMatrix*
  *	    The factor U from the factorization Pr*A*Pc=L*U. Use column-wise
- *          storage scheme, i.e., U has types: Stype = SLU_NC, 
+ *          storage scheme, i.e., U has types: Stype = SLU_NC,
  *          Dtype = SLU_C, Mtype = SLU_TRU.
  *
  * Glu      (input/output) GlobalLU_t *
  *          If options->Fact == SamePattern_SameRowPerm, it is an input;
- *              The matrix A will be factorized assuming that a 
+ *              The matrix A will be factorized assuming that a
  *              factorization of a matrix with the same sparsity pattern
  *              and similar numerical values was performed prior to this one.
  *              Therefore, this factorization will reuse both row and column
@@ -147,41 +148,41 @@ at the top-level directory.
  *
  * ======================================================================
  *
- * Local Working Arrays: 
+ * Local Working Arrays:
  * ======================
  *   m = number of rows in the matrix
  *   n = number of columns in the matrix
  *
- *   xprune[0:n-1]: xprune[*] points to locations in subscript 
- *	vector lsub[*]. For column i, xprune[i] denotes the point where 
- *	structural pruning begins. I.e. only xlsub[i],..,xprune[i]-1 need 
+ *   xprune[0:n-1]: xprune[*] points to locations in subscript
+ *	vector lsub[*]. For column i, xprune[i] denotes the point where
+ *	structural pruning begins. I.e. only xlsub[i],..,xprune[i]-1 need
  *	to be traversed for symbolic factorization.
  *
- *   marker[0:3*m-1]: marker[i] = j means that node i has been 
+ *   marker[0:3*m-1]: marker[i] = j means that node i has been
  *	reached when working on column j.
  *	Storage: relative to original row subscripts
- *	NOTE: There are 3 of them: marker/marker1 are used for panel dfs, 
+ *	NOTE: There are 3 of them: marker/marker1 are used for panel dfs,
  *	      see cpanel_dfs.c; marker2 is used for inner-factorization,
  *            see ccolumn_dfs.c.
  *
  *   parent[0:m-1]: parent vector used during dfs
  *      Storage: relative to new row subscripts
  *
- *   xplore[0:m-1]: xplore[i] gives the location of the next (dfs) 
+ *   xplore[0:m-1]: xplore[i] gives the location of the next (dfs)
  *	unexplored neighbor of i in lsub[*]
  *
  *   segrep[0:nseg-1]: contains the list of supernodal representatives
- *	in topological order of the dfs. A supernode representative is the 
+ *	in topological order of the dfs. A supernode representative is the
  *	last column of a supernode.
  *      The maximum size of segrep[] is n.
  *
- *   repfnz[0:W*m-1]: for a nonzero segment U[*,j] that ends at a 
- *	supernodal representative r, repfnz[r] is the location of the first 
+ *   repfnz[0:W*m-1]: for a nonzero segment U[*,j] that ends at a
+ *	supernodal representative r, repfnz[r] is the location of the first
  *	nonzero in this segment.  It is also used during the dfs: repfnz[r]>0
  *	indicates the supernode r has been explored.
- *	NOTE: There are W of them, each used for one column of a panel. 
+ *	NOTE: There are W of them, each used for one column of a panel.
  *
- *   panel_lsub[0:W*m-1]: temporary for the nonzeros row indices below 
+ *   panel_lsub[0:W*m-1]: temporary for the nonzeros row indices below
  *      the panel diagonal. These are filled in during cpanel_dfs(), and are
  *      used later in the inner LU factorization within the panel.
  *	panel_lsub[]/dense[] pair forms the SPA data structure.
@@ -195,24 +196,23 @@ at the top-level directory.
  * </pre>
  */
 
-void cgstrf(
-    superlu_options_t* options, SuperMatrix* A, int relax, int panel_size, int* etree, void* work, int_t lwork, int* perm_c, int* perm_r, SuperMatrix* L, SuperMatrix* U, GlobalLU_t* Glu, /* persistent to facilitate multiple factorizations */
-    SuperLUStat_t* stat, int_t* info
-) {
+void cgstrf(superlu_options_t* options, SuperMatrix* A, int relax, int panel_size, int* etree, void* work, int_t lwork, int* perm_c, int* perm_r, SuperMatrix* L, SuperMatrix* U, GlobalLU_t* Glu, /* persistent to facilitate multiple factorizations */
+            SuperLUStat_t* stat,
+            int_t* info) {
     /* Local working arrays */
     NCPformat* Astore;
-    int* iperm_r = NULL; /* inverse of perm_r; used when 
-                                  options->Fact == SamePattern_SameRowPerm */
+    int* iperm_r = NULL; /* inverse of perm_r; used when
+                            options->Fact == SamePattern_SameRowPerm */
     int* iperm_c;        /* inverse of perm_c */
     int* iwork;
-    complex* cwork;
+    singlecomplex* cwork;
     int *segrep, *repfnz, *parent;
     int* panel_lsub; /* dense[]/panel_lsub[] pair forms a w-wide SPA */
     int_t *xprune, *xplore;
     int* marker;
-    complex *dense, *tempv;
+    singlecomplex *dense, *tempv;
     int* relax_end;
-    complex* a;
+    singlecomplex* a;
     int_t *asub, *xa_begin, *xa_end;
     int_t *xlsub, *xlusup, *xusub;
     int *xsup, *supno;
@@ -271,31 +271,35 @@ void cgstrf(
 
     /* Identify relaxed snodes */
     relax_end = (int*)intMalloc(n);
-    if(options->SymmetricMode == YES) { heap_relax_snode(n, etree, relax, marker, relax_end); }
-    else { relax_snode(n, etree, relax, marker, relax_end); }
+    if(options->SymmetricMode == YES) {
+        heap_relax_snode(n, etree, relax, marker, relax_end);
+    }
+    else {
+        relax_snode(n, etree, relax, marker, relax_end);
+    }
 
-    ifill(perm_r, m, EMPTY);
-    ifill(marker, m * NO_MARKER, EMPTY);
+    ifill(perm_r, m, SLU_EMPTY);
+    ifill(marker, m * NO_MARKER, SLU_EMPTY);
     supno[0] = -1;
     xsup[0] = xlsub[0] = xusub[0] = xlusup[0] = 0;
     w_def = panel_size;
 
-    /* 
-     * Work on one "panel" at a time. A panel is one of the following: 
+    /*
+     * Work on one "panel" at a time. A panel is one of the following:
      *	   (a) a relaxed supernode at the bottom of the etree, or
      *	   (b) panel_size contiguous columns, defined by the user
      */
     for(jcol = 0; jcol < min_mn;) {
-        if(relax_end[jcol] != EMPTY) {
-            /* start of a relaxed snode */
-            kcol = relax_end[jcol]; /* end of the relaxed snode */
+        if(relax_end[jcol] != SLU_EMPTY) { /* start of a relaxed snode */
+            kcol = relax_end[jcol];        /* end of the relaxed snode */
             panel_histo[kcol - jcol + 1]++;
 
             /* --------------------------------------
-             * Factorize the relaxed supernode(jcol:kcol) 
+             * Factorize the relaxed supernode(jcol:kcol)
              * -------------------------------------- */
             /* Determine the union of the row structure of the snode */
-            if((*info = csnode_dfs(jcol, kcol, asub, xa_begin, xa_end, xprune, marker, Glu)) != 0) return;
+            if((*info = csnode_dfs(jcol, kcol, asub, xa_begin, xa_end, xprune, marker, Glu)) != 0)
+                return;
 
             nextu = xusub[jcol];
             nextlu = xlusup[jcol];
@@ -303,35 +307,39 @@ void cgstrf(
             fsupc = xsup[jsupno];
             new_next = nextlu + (xlsub[fsupc + 1] - xlsub[fsupc]) * (kcol - jcol + 1);
             nzlumax = Glu->nzlumax;
-            while(new_next > nzlumax) { if((*info = cLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu))) return; }
+            while(new_next > nzlumax) {
+                if((*info = cLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu)))
+                    return;
+            }
 
             for(icol = jcol; icol <= kcol; icol++) {
                 xusub[icol + 1] = nextu;
 
                 /* Scatter into SPA dense[*] */
-                for(k = xa_begin[icol]; k < xa_end[icol]; k++) dense[asub[k]] = a[k];
+                for(k = xa_begin[icol]; k < xa_end[icol]; k++)
+                    dense[asub[k]] = a[k];
 
                 /* Numeric update within the snode */
                 csnode_bmod(icol, jsupno, fsupc, dense, tempv, Glu, stat);
 
-                if((*info = cpivotL(icol, diag_pivot_thresh, &usepr, perm_r, iperm_r, iperm_c, &pivrow, Glu, stat))) if(iinfo == 0) iinfo = *info;
+                if((*info = cpivotL(icol, diag_pivot_thresh, &usepr, perm_r, iperm_r, iperm_c, &pivrow, Glu, stat)))
+                    if(iinfo == 0) iinfo = *info;
 
-#if ( DEBUGlevel>=2 )
-		cprint_lu_col("[1]: ", icol, pivrow, xprune, Glu);
+#if (DEBUGlevel >= 2)
+                cprint_lu_col("[1]: ", icol, pivrow, xprune, Glu);
 #endif
             }
 
             jcol = icol;
         }
-        else {
-            /* Work on one panel of panel_size columns */
+        else { /* Work on one panel of panel_size columns */
 
-            /* Adjust panel_size so that a panel won't overlap with the next 
+            /* Adjust panel_size so that a panel won't overlap with the next
              * relaxed snode.
              */
             panel_size = w_def;
-            for(k = jcol + 1; k < SUPERLU_MIN(jcol+panel_size, min_mn); k++)
-                if(relax_end[k] != EMPTY) {
+            for(k = jcol + 1; k < SUPERLU_MIN(jcol + panel_size, min_mn); k++)
+                if(relax_end[k] != SLU_EMPTY) {
                     panel_size = k - jcol;
                     break;
                 }
@@ -356,9 +364,11 @@ void cgstrf(
                 if((*info = ccolumn_bmod(jj, (nseg - nseg1), &dense[k], tempv, &segrep[nseg1], &repfnz[k], jcol, Glu, stat)) != 0) return;
 
                 /* Copy the U-segments to ucol[*] */
-                if((*info = ccopy_to_ucol(jj, nseg, segrep, &repfnz[k], perm_r, &dense[k], Glu)) != 0) return;
+                if((*info = ccopy_to_ucol(jj, nseg, segrep, &repfnz[k], perm_r, &dense[k], Glu)) != 0)
+                    return;
 
-                if((*info = cpivotL(jj, diag_pivot_thresh, &usepr, perm_r, iperm_r, iperm_c, &pivrow, Glu, stat))) if(iinfo == 0) iinfo = *info;
+                if((*info = cpivotL(jj, diag_pivot_thresh, &usepr, perm_r, iperm_r, iperm_c, &pivrow, Glu, stat)))
+                    if(iinfo == 0) iinfo = *info;
 
                 /* Prune columns (0:jj-1) using column jj */
                 cpruneL(jj, perm_r, pivrow, nseg, segrep, &repfnz[k], xprune, Glu);
@@ -366,24 +376,33 @@ void cgstrf(
                 /* Reset repfnz[] for this column */
                 resetrep_col(nseg, segrep, &repfnz[k]);
 
-#if ( DEBUGlevel>=2 )
-		cprint_lu_col("[2]: ", jj, pivrow, xprune, Glu);
+#if (DEBUGlevel >= 2)
+                cprint_lu_col("[2]: ", jj, pivrow, xprune, Glu);
 #endif
             }
 
             jcol += panel_size; /* Move to the next panel */
-        }                       /* else */
-    }                           /* for */
+
+        } /* else */
+
+    } /* for */
 
     *info = iinfo;
 
-    if(m > n) {
-        k = 0;
-        for(i = 0; i < m; ++i)
-            if(perm_r[i] == EMPTY) {
-                perm_r[i] = n + k;
+    /* Complete perm_r[] for rank-deficient or tall-skinny matrices */
+    /* k is the rank of U
+       pivots have been completed for rows < k
+       Now fill in the pivots for rows k to m */
+    k = iinfo == 0 ? n : (int)iinfo - 1;
+    if(m > k) {
+        /* if k == m, then all the row permutations are complete and
+           we can short circuit looking through the rest of the vector */
+        for(i = 0; i < m && k < m; ++i) {
+            if(perm_r[i] == SLU_EMPTY) {
+                perm_r[i] = k;
                 ++k;
             }
+        }
     }
 
     countnz(min_mn, xprune, &nnzL, &nnzU, Glu);
@@ -395,30 +414,29 @@ void cgstrf(
 
     if(fact == SamePattern_SameRowPerm) {
         /* L and U structures may have changed due to possibly different
-	   pivoting, even though the storage is available.
-	   There could also be memory expansions, so the array locations
+       pivoting, even though the storage is available.
+       There could also be memory expansions, so the array locations
            may have changed, */
         ((SCformat*)L->Store)->nnz = nnzL;
         ((SCformat*)L->Store)->nsuper = Glu->supno[n];
-        ((SCformat*)L->Store)->nzval = (complex*)Glu->lusup;
+        ((SCformat*)L->Store)->nzval = (singlecomplex*)Glu->lusup;
         ((SCformat*)L->Store)->nzval_colptr = Glu->xlusup;
         ((SCformat*)L->Store)->rowind = Glu->lsub;
         ((SCformat*)L->Store)->rowind_colptr = Glu->xlsub;
         ((NCformat*)U->Store)->nnz = nnzU;
-        ((NCformat*)U->Store)->nzval = (complex*)Glu->ucol;
+        ((NCformat*)U->Store)->nzval = (singlecomplex*)Glu->ucol;
         ((NCformat*)U->Store)->rowind = Glu->usub;
         ((NCformat*)U->Store)->colptr = Glu->xusub;
     }
     else {
-        cCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL, (complex*)Glu->lusup, Glu->xlusup, Glu->lsub, Glu->xlsub, Glu->supno, Glu->xsup, SLU_SC, SLU_C, SLU_TRLU);
-        cCreate_CompCol_Matrix(U, min_mn, min_mn, nnzU, (complex*)Glu->ucol, Glu->usub, Glu->xusub, SLU_NC, SLU_C, SLU_TRU);
+        cCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL, (singlecomplex*)Glu->lusup, Glu->xlusup, Glu->lsub, Glu->xlsub, Glu->supno, Glu->xsup, SLU_SC, SLU_C, SLU_TRLU);
+        cCreate_CompCol_Matrix(U, min_mn, min_mn, nnzU, (singlecomplex*)Glu->ucol, Glu->usub, Glu->xusub, SLU_NC, SLU_C, SLU_TRU);
     }
 
     ops[FACT] += ops[TRSV] + ops[GEMV];
     stat->expansions = --(Glu->num_expansions);
 
-    if(iperm_r_allocated)
-        SUPERLU_FREE(iperm_r);
+    if(iperm_r_allocated) SUPERLU_FREE(iperm_r);
     SUPERLU_FREE(iperm_c);
     SUPERLU_FREE(relax_end);
 }

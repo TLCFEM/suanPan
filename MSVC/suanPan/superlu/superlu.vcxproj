@@ -120,10 +120,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlu-src\cpivotgrowth.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\cpivotL.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\cpruneL.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\creadhb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\creadMM.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\creadrb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\creadtriple.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\csnode_bmod.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\csnode_dfs.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\csp_blas2.c" />
@@ -156,10 +152,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlu-src\dpivotgrowth.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\dpivotL.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\dpruneL.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\dreadhb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\dreadMM.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\dreadrb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\dreadtriple.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\dsnode_bmod.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\dsnode_dfs.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\dsp_blas2.c" />
@@ -233,10 +225,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlu-src\sp_coletree.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\sp_ienv.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\sp_preorder.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\sreadhb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\sreadMM.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\sreadrb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\sreadtriple.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\ssnode_bmod.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\ssnode_dfs.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\ssp_blas2.c" />
@@ -268,10 +256,6 @@
     <ClCompile Include="..\..\..\Toolbox\superlu-src\zpivotgrowth.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\zpivotL.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\zpruneL.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\zreadhb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\zreadMM.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\zreadrb.c" />
-    <ClCompile Include="..\..\..\Toolbox\superlu-src\zreadtriple.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\zsnode_bmod.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\zsnode_dfs.c" />
     <ClCompile Include="..\..\..\Toolbox\superlu-src\zsp_blas2.c" />

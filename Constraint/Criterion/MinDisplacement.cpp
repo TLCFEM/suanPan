@@ -16,11 +16,12 @@
  ******************************************************************************/
 
 #include "MinDisplacement.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
-unique_ptr<Criterion> MinDisplacement::get_copy() { return make_unique<MinDisplacement>(*this); }
+unique_ptr<Criterion> MinDisplacement::get_copy() { return std::make_unique<MinDisplacement>(*this); }
 
 int MinDisplacement::process(const shared_ptr<DomainBase>& D) {
     const auto& t_vec = D->get_node(node)->get_reordered_dof();

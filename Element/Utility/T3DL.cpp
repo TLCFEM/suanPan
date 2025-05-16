@@ -16,12 +16,13 @@
  ******************************************************************************/
 
 #include "T3DL.h"
+
 #include <Element/Element.h>
 
 const span T3DL::IS(0, 2);
 const span T3DL::JS(3, 5);
 
-unique_ptr<Orientation> T3DL::get_copy() { return make_unique<T3DL>(*this); }
+unique_ptr<Orientation> T3DL::get_copy() { return std::make_unique<T3DL>(*this); }
 
 void T3DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;

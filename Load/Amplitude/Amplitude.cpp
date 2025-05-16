@@ -18,7 +18,7 @@
 #include "Amplitude.h"
 
 Amplitude::Amplitude(const unsigned T, const unsigned ST)
-    : Tag(T)
+    : UniqueTag(T)
     , start_step(ST) {}
 
 void Amplitude::initialize(const shared_ptr<DomainBase>&) {}

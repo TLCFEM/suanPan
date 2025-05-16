@@ -23,8 +23,8 @@ RUN mkdir vtk-build && cd vtk-build && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 RUN mkdir magma-build && cd magma-build && \
-    wget -q https://icl.utk.edu/projectsfiles/magma/downloads/magma-2.8.0.tar.gz && tar xf magma-2.8.0.tar.gz && \
-    source /opt/intel/oneapi/setvars.sh && cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGET="Turing Ampere Hopper" -DBUILD_SHARED_LIBS=OFF -DFORTRAN_CONVENTION="-DADD_" -DBLA_STATIC=ON -DBLA_VENDOR="Intel10_64lp" ./magma-2.8.0 && \
+    wget -q https://icl.utk.edu/projectsfiles/magma/downloads/magma-2.9.0.tar.gz && tar xf magma-2.9.0.tar.gz && \
+    source /opt/intel/oneapi/setvars.sh && cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGET="Turing Ampere Hopper" -DBUILD_SHARED_LIBS=OFF -DFORTRAN_CONVENTION="-DADD_" -DBLA_STATIC=ON -DBLA_VENDOR="Intel10_64lp" ./magma-2.9.0 && \
     make install -j"$(nproc)" && cd .. && rm -r magma-build
 
 ARG USERNAME=nonroot

@@ -107,7 +107,7 @@ namespace shape {
 template<typename T> T area::triangle(const Mat<T>& EC) { return .5 * (EC(0, 0) * (EC(1, 1) - EC(2, 1)) + EC(1, 0) * (EC(2, 1) - EC(0, 1)) + EC(2, 0) * (EC(0, 1) - EC(1, 1))); }
 
 template<typename T> T area::shoelace(const Mat<T>& C) {
-    suanpan_assert([&] { if(2 != C.n_cols) throw invalid_argument("need two columns"); });
+    suanpan_assert([&] { if(2 != C.n_cols) throw std::invalid_argument("need two columns"); });
 
     const auto S = C.n_rows;
     Mat<T> E = arma::resize(C, S + 1, C.n_cols);
@@ -184,7 +184,7 @@ template<typename T> Col<T> shape::beam(const T int_pts, const unsigned order, c
 template<typename T> Mat<T> shape::triangle(const Col<T>& int_pts, const unsigned order) {
     Mat<T> N;
 
-    if(order != 0 && order != 1) throw invalid_argument("order needs to be either 0 or 1");
+    if(order != 0 && order != 1) throw std::invalid_argument("order needs to be either 0 or 1");
 
     N.zeros(order + 1llu, 6);
 
@@ -208,8 +208,8 @@ template<typename T> Mat<T> shape::triangle(const Col<T>& int_pts, const unsigne
 template<typename T> Mat<T> shape::quad(const Mat<T>& int_pts, const unsigned order, const unsigned num_node) {
     Mat<T> N;
 
-    if(order != 0 && order != 1) throw invalid_argument("order needs to be either 0 or 1");
-    if(num_node < 4 || num_node > 8) throw invalid_argument("number of nodes must between 4 and 8");
+    if(order != 0 && order != 1) throw std::invalid_argument("order needs to be either 0 or 1");
+    if(num_node < 4 || num_node > 8) throw std::invalid_argument("number of nodes must between 4 and 8");
 
     N.zeros(order + 1llu, num_node);
 
@@ -322,7 +322,7 @@ template<typename T> Mat<T> shape::cube(const Mat<T>& int_pts, const unsigned or
 
     if(order == 0) N.zeros(1, num_node);
     else if(order == 1) N.zeros(3, num_node);
-    else throw invalid_argument("order needs to be either 0 or 1");
+    else throw std::invalid_argument("order needs to be either 0 or 1");
 
     const auto& X = int_pts(0);
     const auto& Y = int_pts(1);
@@ -469,7 +469,7 @@ template<typename T> Mat<T> shape::cube(const Mat<T>& int_pts, const unsigned or
         return N;
     }
 
-    throw invalid_argument("not supported");
+    throw std::invalid_argument("not supported");
 }
 
 template<typename T> Mat<T> shape::stress(const T X, const T Y, const unsigned S) {
@@ -591,13 +591,13 @@ template<typename T> Mat<T> shape::linear_stress(T X, T Y) {
 }
 
 template<typename T> Mat<T> shape::plate::triangle(const Col<T>& int_pts, const unsigned order, const unsigned num_node, const Mat<T>& nodes) {
-    suanpan_assert([&] { if(order > 1 || (num_node != 3 && num_node != 6) || (nodes.n_cols != 2) || nodes.n_rows < 3) throw invalid_argument("not supported"); });
+    suanpan_assert([&] { if(order > 1 || (num_node != 3 && num_node != 6) || (nodes.n_cols != 2) || nodes.n_rows < 3) throw std::invalid_argument("not supported"); });
 
     Mat<T> N;
 
     if(order == 0) N.zeros(1, 3llu * num_node);
     else if(order == 1) N.zeros(3, 3llu * num_node);
-    else throw invalid_argument("order needs to be either 0 or 1");
+    else throw std::invalid_argument("order needs to be either 0 or 1");
 
     Mat<T> TEMP(3, 3);
     TEMP.row(0).fill(1.);
@@ -676,7 +676,7 @@ template<typename T> Mat<T> shape::plate::quad(const Col<T>& int_pts, const unsi
 
     if(order == 0) N.zeros(1, 3llu * num_node);
     else if(order == 1) N.zeros(2, 6llu * num_node);
-    else throw invalid_argument("order needs to be either 0 or 1");
+    else throw std::invalid_argument("order needs to be either 0 or 1");
 
     const auto& X = int_pts(0);
     const auto& Y = int_pts(1);

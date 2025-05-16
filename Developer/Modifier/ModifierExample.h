@@ -39,7 +39,7 @@ public:
     int update_status() override;
 };
 
-SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>&, istringstream&);
+SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>&, std::istringstream&);
 
 #endif
 

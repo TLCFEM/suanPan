@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Rebar2D.h"
+
 #include <Domain/DomainBase.h>
 
 Rebar2D::Rebar2D(const unsigned T, const unsigned XT, const unsigned YT, const double RX, const double RY)
@@ -46,7 +47,7 @@ int Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Rebar2D::get_copy() { return make_unique<Rebar2D>(*this); }
+unique_ptr<Material> Rebar2D::get_copy() { return std::make_unique<Rebar2D>(*this); }
 
 int Rebar2D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;
@@ -91,8 +92,8 @@ int Rebar2D::reset_status() {
     return rebar_x->reset_status() + rebar_y->reset_status();
 }
 
-vector<vec> Rebar2D::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Rebar2D::record(const OutputType P) {
+    std::vector<vec> data;
 
     for(const auto& I : rebar_x->record(P)) data.emplace_back(I);
     for(const auto& I : rebar_y->record(P)) data.emplace_back(I);

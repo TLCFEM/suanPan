@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -25,23 +25,24 @@ int cfill_diag(int n, NCformat* Astore)
 /* fill explicit zeros on the diagonal entries, so that the matrix is not
    structurally singular. */
 {
-    complex* nzval = (complex*)Astore->nzval;
+    singlecomplex* nzval = (singlecomplex*)Astore->nzval;
     int_t* rowind = Astore->rowind;
     int_t* colptr = Astore->colptr;
     int_t nnz = colptr[n];
     int fill = 0;
-    complex* nzval_new;
-    complex zero = {0.0, 0.0};
+    singlecomplex* nzval_new;
+    singlecomplex zero = {0.0, 0.0};
     int_t* rowind_new;
     int i, j, diag;
 
     for(i = 0; i < n; i++) {
         diag = -1;
-        for(j = colptr[i]; j < colptr[i + 1]; j++) if(rowind[j] == i) diag = j;
+        for(j = colptr[i]; j < colptr[i + 1]; j++)
+            if(rowind[j] == i) diag = j;
         if(diag < 0) fill++;
     }
     if(fill) {
-        nzval_new = complexMalloc(nnz + fill);
+        nzval_new = singlecomplexMalloc(nnz + fill);
         rowind_new = intMalloc(nnz + fill);
         fill = 0;
         for(i = 0; i < n; i++) {
@@ -69,23 +70,24 @@ int cfill_diag(int n, NCformat* Astore)
 int cdominate(int n, NCformat* Astore)
 /* make the matrix diagonally dominant */
 {
-    complex* nzval = (complex*)Astore->nzval;
+    singlecomplex* nzval = (singlecomplex*)Astore->nzval;
     int_t* rowind = Astore->rowind;
     int_t* colptr = Astore->colptr;
     int_t nnz = colptr[n];
     int fill = 0;
-    complex* nzval_new;
+    singlecomplex* nzval_new;
     int_t* rowind_new;
     int_t i, j, diag;
     double s;
 
     for(i = 0; i < n; i++) {
         diag = -1;
-        for(j = colptr[i]; j < colptr[i + 1]; j++) if(rowind[j] == i) diag = j;
+        for(j = colptr[i]; j < colptr[i + 1]; j++)
+            if(rowind[j] == i) diag = j;
         if(diag < 0) fill++;
     }
     if(fill) {
-        nzval_new = complexMalloc(nnz + fill);
+        nzval_new = singlecomplexMalloc(nnz + fill);
         rowind_new = intMalloc(nnz + fill);
         fill = 0;
         for(i = 0; i < n; i++) {

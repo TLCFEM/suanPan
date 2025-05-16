@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomViscosity.h"
+
 #include <Domain/DomainBase.h>
 
 double CustomViscosity::compute_du(const double strain, const double strain_rate) const { return expression->evaluate(vec{strain, strain_rate}).at(1); }
@@ -44,4 +45,4 @@ int CustomViscosity::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearViscosity::initialize(D);
 }
 
-unique_ptr<Material> CustomViscosity::get_copy() { return make_unique<CustomViscosity>(*this); }
+unique_ptr<Material> CustomViscosity::get_copy() { return std::make_unique<CustomViscosity>(*this); }

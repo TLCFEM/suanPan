@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomMises1D.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/utility.h>
 
@@ -65,4 +66,4 @@ int CustomMises1D::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearMises1D::initialize(D);
 }
 
-unique_ptr<Material> CustomMises1D::get_copy() { return make_unique<CustomMises1D>(*this); }
+unique_ptr<Material> CustomMises1D::get_copy() { return std::make_unique<CustomMises1D>(*this); }

@@ -23,7 +23,8 @@ mat tensor::isotropic_stiffness(const double modulus, const double poissons_rati
 
     mat stiffness(6, 6, fill::zeros);
 
-    for(auto I = 0; I < 3; ++I) for(auto J = 0; J < 3; ++J) stiffness(I, J) = lambda;
+    for(auto I = 0; I < 3; ++I)
+        for(auto J = 0; J < 3; ++J) stiffness(I, J) = lambda;
     for(auto I = 0; I < 3; ++I) stiffness(I, I) += 2. * shear_modulus;
 
     stiffness(3, 3) = stiffness(4, 4) = stiffness(5, 5) = shear_modulus;
@@ -59,7 +60,8 @@ mat tensor::unit_deviatoric_tensor4() {
 
     T(3, 3) = T(4, 4) = T(5, 5) = .5;
 
-    for(auto I = 0; I < 3; ++I) for(auto J = 0; J < 3; ++J) T(I, J) = I == J ? 2. / 3. : -1. / 3.;
+    for(auto I = 0; I < 3; ++I)
+        for(auto J = 0; J < 3; ++J) T(I, J) = I == J ? 2. / 3. : -1. / 3.;
 
     return T;
 }
@@ -89,7 +91,7 @@ mat tensor::unit_symmetric_tensor4() {
 double tensor::strain::invariant1(const vec& E) {
     if(E.n_elem == 3 || E.n_elem == 6) return E(0) + E(1) + E(2);
 
-    throw invalid_argument("need a valid strain vector");
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 /**
@@ -101,7 +103,7 @@ double tensor::strain::invariant2(const vec& E) {
     if(E.n_elem == 3) return -E(0) * E(1) - E(1) * E(2) - E(2) * E(0);
     if(E.n_elem == 6) return -E(0) * E(1) - E(1) * E(2) - E(2) * E(0) + .25 * (E(3) * E(3) + E(4) * E(4) + E(5) * E(5));
 
-    throw invalid_argument("need a valid strain vector");
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 /**
@@ -113,7 +115,7 @@ double tensor::strain::invariant3(const vec& E) {
     if(E.n_elem == 3) return prod(E);
     if(E.n_elem == 6) return E(0) * E(1) * E(2) + .25 * (E(3) * E(4) * E(5) - E(0) * E(4) * E(4) - E(1) * E(5) * E(5) - E(2) * E(3) * E(3));
 
-    throw invalid_argument("need a valid strain vector");
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 /**
@@ -124,7 +126,7 @@ double tensor::strain::invariant3(const vec& E) {
 double tensor::stress::invariant1(const vec& S) {
     if(S.n_elem == 3 || S.n_elem == 6) return S(0) + S(1) + S(2);
 
-    throw invalid_argument("need a valid stress vector");
+    throw std::invalid_argument("need a valid stress vector");
 }
 
 /**
@@ -136,7 +138,7 @@ double tensor::stress::invariant2(const vec& S) {
     if(S.n_elem == 3) return -S(0) * S(1) - S(1) * S(2) - S(2) * S(0);
     if(S.n_elem == 6) return -S(0) * S(1) - S(1) * S(2) - S(2) * S(0) + S(3) * S(3) + S(4) * S(4) + S(5) * S(5);
 
-    throw invalid_argument("need a valid stress vector");
+    throw std::invalid_argument("need a valid stress vector");
 }
 
 /**
@@ -148,7 +150,7 @@ double tensor::stress::invariant3(const vec& S) {
     if(S.n_elem == 3) return prod(S);
     if(S.n_elem == 6) return S(0) * S(1) * S(2) + 2. * S(3) * S(4) * S(5) - S(0) * S(4) * S(4) - S(1) * S(5) * S(5) - S(2) * S(3) * S(3);
 
-    throw invalid_argument("need a valid stress vector");
+    throw std::invalid_argument("need a valid stress vector");
 }
 
 double tensor::strain::lode(vec E) {
@@ -157,7 +159,7 @@ double tensor::strain::lode(vec E) {
     if(3 == E.n_elem) return std::max(-1., std::min(1., sqrt(54.) * prod(normalise(E))));
     if(6 == E.n_elem) return std::max(-1., std::min(1., sqrt(54.) * det(to_tensor(E) / norm(E))));
 
-    throw invalid_argument("need a valid strain vector");
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 double tensor::stress::lode(vec S) {
@@ -166,11 +168,11 @@ double tensor::stress::lode(vec S) {
     if(3 == S.n_elem) return std::max(-1., std::min(1., sqrt(54.) * prod(normalise(S))));
     if(6 == S.n_elem) return std::max(-1., std::min(1., sqrt(54.) * det(to_tensor(S) / norm(S))));
 
-    throw invalid_argument("need a valid stress vector");
+    throw std::invalid_argument("need a valid stress vector");
 }
 
 vec tensor::stress::lode_der(vec S) {
-    if(6 != S.n_elem) throw invalid_argument("need a valid stress vector");
+    if(6 != S.n_elem) throw std::invalid_argument("need a valid stress vector");
 
     const auto term = 2. / 3. * invariant2(S = dev(S));
 
@@ -183,7 +185,7 @@ vec tensor::stress::lode_der(vec S) {
  * \return trace of tensor
  */
 double tensor::trace2(const vec& S) {
-    suanpan_assert([&] { if(S.n_elem < 2) throw invalid_argument("need a valid vector"); });
+    suanpan_assert([&] { if(S.n_elem < 2) throw std::invalid_argument("need a valid vector"); });
 
     return S(0) + S(1);
 }
@@ -194,7 +196,7 @@ double tensor::trace2(const vec& S) {
  * \return trace of tensor
  */
 double tensor::trace3(const vec& S) {
-    suanpan_assert([&] { if(S.n_elem < 3) throw invalid_argument("need a valid vector"); });
+    suanpan_assert([&] { if(S.n_elem < 3) throw std::invalid_argument("need a valid vector"); });
 
     return S(0) + S(1) + S(2);
 }
@@ -213,7 +215,7 @@ vec tensor::dev(vec&& S) {
 }
 
 mat tensor::dev(const mat& in) {
-    suanpan_assert([&] { if(in.n_rows != in.n_cols) throw invalid_argument("need square matrix"); });
+    suanpan_assert([&] { if(in.n_rows != in.n_cols) throw std::invalid_argument("need square matrix"); });
 
     auto out = in;
     out.diag() -= mean(out.diag());
@@ -221,7 +223,7 @@ mat tensor::dev(const mat& in) {
 }
 
 mat tensor::dev(mat&& in) {
-    suanpan_assert([&] { if(in.n_rows != in.n_cols) throw invalid_argument("need square matrix"); });
+    suanpan_assert([&] { if(in.n_rows != in.n_cols) throw std::invalid_argument("need square matrix"); });
 
     in.diag() -= mean(in.diag());
     return std::move(in);
@@ -298,7 +300,7 @@ mat tensor::strain::to_green(mat&& gradient) {
         const mat t_gradient(gradient.memptr(), 2, 2);
         return .5 * (t_gradient.t() * t_gradient - eye(size(t_gradient)));
     }
-    throw invalid_argument("need a valid strain vector");
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 mat tensor::strain::to_green(const mat& gradient) {
@@ -310,7 +312,7 @@ mat tensor::strain::to_green(const mat& gradient) {
         const mat t_gradient(gradient.memptr(), 2, 2);
         return .5 * (t_gradient.t() * t_gradient - eye(size(t_gradient)));
     }
-    throw invalid_argument("need a valid strain vector");
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 mat tensor::strain::to_tensor(const vec& in_strain) {
@@ -335,7 +337,7 @@ mat tensor::strain::to_tensor(const vec& in_strain) {
         return out_strain;
     }
 
-    throw invalid_argument("need a valid stress vector");
+    throw std::invalid_argument("need a valid stress vector");
 }
 
 vec tensor::strain::to_voigt(const mat& in_strain) {
@@ -364,19 +366,19 @@ vec tensor::strain::to_voigt(const mat& in_strain) {
         return out_strain;
     }
 
-    throw invalid_argument("need a valid strain tensor");
+    throw std::invalid_argument("need a valid strain tensor");
 }
 
 double tensor::strain::norm(const vec& in) {
     if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
     if(in.n_elem == 3) return arma::norm(in);
-    throw invalid_argument("need a valid strain vector");
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 double tensor::strain::norm(vec&& in) {
     if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
     if(in.n_elem == 3) return arma::norm(in);
-    throw invalid_argument("need a valid strain vector");
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 double tensor::strain::double_contraction(const vec& a) { return double_contraction(a, a); }
@@ -407,7 +409,7 @@ mat tensor::stress::to_tensor(const vec& in_stress) {
         return out_stress;
     }
 
-    throw invalid_argument("need a valid stress vector");
+    throw std::invalid_argument("need a valid stress vector");
 }
 
 vec tensor::stress::to_voigt(const mat& in_stress) {
@@ -436,19 +438,19 @@ vec tensor::stress::to_voigt(const mat& in_stress) {
         return out_stress;
     }
 
-    throw invalid_argument("need a valid stress tensor");
+    throw std::invalid_argument("need a valid stress tensor");
 }
 
 double tensor::stress::norm(const vec& in) {
     if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
     if(in.n_elem == 3) return arma::norm(in);
-    throw invalid_argument("need a valid stress vector");
+    throw std::invalid_argument("need a valid stress vector");
 }
 
 double tensor::stress::norm(vec&& in) {
     if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
     if(in.n_elem == 3) return arma::norm(in);
-    throw invalid_argument("need a valid stress vector");
+    throw std::invalid_argument("need a valid stress vector");
 }
 
 double tensor::stress::double_contraction(const vec& a) { return double_contraction(a, a); }
@@ -543,7 +545,7 @@ mat transform::compute_jacobian_nominal_to_principal(const mat& in) {
         return out;
     }
 
-    throw invalid_argument("need a valid tensor");
+    throw std::invalid_argument("need a valid tensor");
 }
 
 mat transform::compute_jacobian_principal_to_nominal(const mat& in) {
@@ -577,7 +579,7 @@ mat transform::compute_jacobian_principal_to_nominal(const mat& in) {
         return out;
     }
 
-    throw invalid_argument("need a valid tensor");
+    throw std::invalid_argument("need a valid tensor");
 }
 
 mat transform::eigen_to_tensor_base(const mat& eig_vec) {
@@ -599,7 +601,8 @@ mat transform::eigen_to_tensor_base(const mat& eig_vec) {
 
 mat transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
     vec principal_tensile_stress(principal_stress.n_elem, fill::zeros);
-    for(auto I = 0llu; I < principal_stress.n_elem; ++I) if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
+    for(auto I = 0llu; I < principal_stress.n_elem; ++I)
+        if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
 
     return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;
 }
@@ -615,7 +618,8 @@ mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const ma
 
     std::vector<uword> tp;
     tp.reserve(principal_stress.n_elem);
-    for(auto I = 0llu; I < principal_stress.n_elem; ++I) if(principal_stress(I) > 0.) tp.emplace_back(I);
+    for(auto I = 0llu; I < principal_stress.n_elem; ++I)
+        if(principal_stress(I) > 0.) tp.emplace_back(I);
 
     const uvec pattern = tp;
 
@@ -627,7 +631,7 @@ mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const ma
 }
 
 vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes) {
-    suanpan_assert([&] { if(nodes.n_cols != 2 || nodes.n_rows != 3) throw invalid_argument("need 3 by 2 mat"); });
+    suanpan_assert([&] { if(nodes.n_cols != 2 || nodes.n_rows != 3) throw std::invalid_argument("need 3 by 2 mat"); });
 
     vec a_coord(3);
     a_coord(0) = 1.;
@@ -642,7 +646,7 @@ vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes
 }
 
 double transform::strain::angle(const vec& strain) {
-    suanpan_assert([&] { if(strain.n_elem != 3) throw invalid_argument("need 2D strain in Voigt form"); });
+    suanpan_assert([&] { if(strain.n_elem != 3) throw std::invalid_argument("need 2D strain in Voigt form"); });
 
     return .5 * std::atan2(strain(2), strain(0) - strain(1));
 }
@@ -674,7 +678,7 @@ vec transform::strain::principal(const vec& strain) {
 }
 
 vec transform::strain::rotate(const vec& strain, const double theta) {
-    suanpan_assert([&] { if(strain.n_elem != 3) throw invalid_argument("need 2D strain in Voigt form"); });
+    suanpan_assert([&] { if(strain.n_elem != 3) throw std::invalid_argument("need 2D strain in Voigt form"); });
 
     return trans(theta) * strain;
 }
@@ -729,5 +733,5 @@ mat transform::beam::global_to_local(const double cos, const double sin, const d
  */
 mat transform::beam::global_to_local(const vec& direction_cosine, const double length) {
     if(direction_cosine.n_elem == 2) return global_to_local(direction_cosine(0), direction_cosine(1), length);
-    throw logic_error("direction cosine must contains two or three elements.\n");
+    throw std::logic_error("direction cosine must contains two or three elements.\n");
 }

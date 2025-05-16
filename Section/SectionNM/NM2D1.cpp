@@ -16,12 +16,13 @@
  ******************************************************************************/
 
 #include "NM2D1.h"
+
 #include <Domain/DomainBase.h>
 
 NM2D1::NM2D1(const unsigned T, const double EEA, const double EEIS, const double LD)
     : SectionNM2D(T, EEA, EEIS, LD) {}
 
-unique_ptr<Section> NM2D1::get_copy() { return make_unique<NM2D1>(*this); }
+unique_ptr<Section> NM2D1::get_copy() { return std::make_unique<NM2D1>(*this); }
 
 int NM2D1::update_trial_status(const vec& t_deformation) {
     trial_resistance = trial_stiffness * (trial_deformation = t_deformation);

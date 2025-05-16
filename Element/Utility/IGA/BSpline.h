@@ -54,7 +54,7 @@ protected:
 public:
     BSpline(vec, uword, field<vec>&& = {});
     BSpline(const BSpline&) = default;
-    BSpline(BSpline&&) = default;
+    BSpline(BSpline&&) noexcept = default;
     BSpline& operator=(const BSpline&) = delete;
     BSpline& operator=(BSpline&&) = delete;
     virtual ~BSpline() = default;

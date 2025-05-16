@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PlaneStrain.h"
+
 #include <Domain/DomainBase.h>
 
 const uvec PlaneStrain::F{0, 1, 3};
@@ -43,7 +44,7 @@ int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
 
 double PlaneStrain::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
 
-unique_ptr<Material> PlaneStrain::get_copy() { return make_unique<PlaneStrain>(*this); }
+unique_ptr<Material> PlaneStrain::get_copy() { return std::make_unique<PlaneStrain>(*this); }
 
 int PlaneStrain::update_trial_status(const vec& t_strain) {
     vec full_strain(6, fill::zeros);
@@ -81,7 +82,7 @@ int PlaneStrain::reset_status() {
     return base->reset_status();
 }
 
-vector<vec> PlaneStrain::record(const OutputType P) { return base->record(P); }
+std::vector<vec> PlaneStrain::record(const OutputType P) { return base->record(P); }
 
 void PlaneStrain::print() {
     suanpan_info("A plane strain wrapper.\n");

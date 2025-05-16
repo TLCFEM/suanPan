@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ElementalNonviscous.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Group/Group.h>
 
@@ -29,13 +30,13 @@ int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
 
     factory = D->get_factory();
 
-    if(std::any_of(element_pool.cbegin(), element_pool.cend(), [](const weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
+    if(std::any_of(element_pool.cbegin(), element_pool.cend(), [](const std::weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
         suanpan_error("Repeated element tags are detected, modifier {} is disabled.\n", get_tag());
         element_pool.clear();
         return SUANPAN_FAIL;
     }
 
-    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& ele_ptr) {
+    suanpan::for_all(element_pool, [&](const std::weak_ptr<Element>& ele_ptr) {
         const auto t_ele = ele_ptr.lock();
         access::rw(t_ele->get_current_nonviscous_force()).zeros(t_ele->get_total_number(), m.n_elem);
     });
@@ -52,7 +53,7 @@ int ElementalNonviscous::update_status() {
     const cx_vec m_para = m / t_para;
     const auto accu_para = accu(m_para).real();
 
-    suanpan::for_all(element_pool, [&](const weak_ptr<Element>& t_ptr) {
+    suanpan::for_all(element_pool, [&](const std::weak_ptr<Element>& t_ptr) {
         const auto t_element = t_ptr.lock();
 
         if(nullptr == t_element || !t_element->if_update_nonviscous() || !t_element->allow_modify_nonviscous()) return;

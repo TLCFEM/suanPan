@@ -35,8 +35,6 @@ enum class OutputType;
 class DomainBase;
 class Material;
 
-using std::vector;
-
 struct SectionShellData {
     const unsigned material_tag; // material tag
 
@@ -65,7 +63,7 @@ struct SectionShellData {
     mat trial_plate_stiffness{};
 };
 
-class SectionShell : protected SectionShellData, public Tag {
+class SectionShell : protected SectionShellData, public CopiableTag {
     const bool symmetric = false;
     const bool initialized = false;
 
@@ -75,12 +73,6 @@ public:
         unsigned = 0,    // material tag
         vec&& = {0., 0.} // eccentricity
     );
-    SectionShell(const SectionShell&) = default;           // default copy ctor
-    SectionShell(SectionShell&&) = delete;                 // move forbidden
-    SectionShell& operator=(const SectionShell&) = delete; // assign forbidden
-    SectionShell& operator=(SectionShell&&) = delete;      // assign forbidden
-
-    ~SectionShell() override = default;
 
     virtual int initialize(const shared_ptr<DomainBase>&) = 0;
 
@@ -129,7 +121,7 @@ public:
     virtual int commit_status() = 0;
     virtual int reset_status() = 0;
 
-    virtual vector<vec> record(OutputType);
+    virtual std::vector<vec> record(OutputType);
 };
 
 namespace suanpan {

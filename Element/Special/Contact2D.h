@@ -35,14 +35,14 @@
 
 class Contact2D final : public Element {
     struct MasterNode {
-        weak_ptr<Node> node;
+        std::weak_ptr<Node> node;
         vec position;
         vec axis;
         vec norm;
     };
 
     struct SlaveNode {
-        weak_ptr<Node> node;
+        std::weak_ptr<Node> node;
         vec position;
     };
 

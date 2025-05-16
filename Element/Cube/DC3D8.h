@@ -49,7 +49,7 @@ class DC3D8 final : public MaterialElement3D {
 
     const double release_rate;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     DC3D8(
@@ -68,7 +68,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

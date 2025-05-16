@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B31.h"
+
 #include <Domain/DomainBase.h>
 #include <Section/Section.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -128,8 +129,8 @@ int B31::reset_status() {
     return code;
 }
 
-vector<vec> B31::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> B31::record(const OutputType P) {
+    std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
     return data;
 }

@@ -1,39 +1,36 @@
-/*! \file
+/*
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
 */
 
-/*! @file superlu_timer.c
- * \brief Returns the time used
+/*! \file
+ * \brief Timer functions to record the time used
  *
- * <pre>
- * Purpose
- * ======= 
- * 
  * Returns the time in seconds used by the process.
  *
- * Note: the timer function call is machine dependent. Use conditional
+ * \note the timer function call is machine dependent. Use conditional
  *       compilation to choose the appropriate function.
- * </pre>
+ *
+ * \ingroup Common
  */
 
 #undef USE_TIMES
 
 #ifdef SUN
 /*
- * 	It uses the system call gethrtime(3C), which is accurate to 
- *	nanoseconds. 
-*/
+ * 	It uses the system call gethrtime(3C), which is accurate to
+ *	nanoseconds.
+ */
 #include <sys/time.h>
 
 double SuperLU_timer_() {
-    return ( (double)gethrtime() / 1e9 );
+    return ((double)gethrtime() / 1e9);
 }
 
 #elif _WIN32
@@ -47,7 +44,7 @@ double SuperLU_timer_() {
     return ((double)t) / CLOCKS_PER_SEC;
 }
 
-#elif defined( USE_TIMES )
+#elif defined(USE_TIMES)
 
 #ifndef NO_TIMER
 #include <sys/types.h>
@@ -57,9 +54,10 @@ double SuperLU_timer_() {
 #endif
 
 /*! \brief Timer function
- */ 
-double SuperLU_timer_()
-{
+ *
+ * \return The time in seconds used by the process.
+ */
+double SuperLU_timer_() {
 #ifdef NO_TIMER
     /* no sys/times.h on WIN32 */
     double tmp;
@@ -69,7 +67,7 @@ double SuperLU_timer_()
     double tmp;
     int clocks_per_sec = sysconf(_SC_CLK_TCK);
 
-    times ( &use );
+    times(&use);
     tmp = use.tms_utime;
     tmp += use.tms_stime;
 #endif
@@ -82,13 +80,14 @@ double SuperLU_timer_()
 #include <stdlib.h>
 
 /*! \brief Timer function
- */ 
-double SuperLU_timer_(void)
-{
+ *
+ * \return The time in seconds used by the process.
+ */
+double SuperLU_timer_(void) {
     struct timeval tp;
     double tmp;
     gettimeofday(&tp, NULL);
-    tmp = tp.tv_sec + tp.tv_usec/1000000.0;
+    tmp = tp.tv_sec + tp.tv_usec / 1000000.0;
     return (tmp);
 }
 

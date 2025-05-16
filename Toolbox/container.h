@@ -29,10 +29,10 @@
 #include <suanPan.h>
 
 #ifdef SUANPAN_MT
-#include <oneapi/tbb/concurrent_set.h>
 #include <oneapi/tbb/concurrent_map.h>
-#include <oneapi/tbb/concurrent_unordered_set.h>
+#include <oneapi/tbb/concurrent_set.h>
 #include <oneapi/tbb/concurrent_unordered_map.h>
+#include <oneapi/tbb/concurrent_unordered_set.h>
 
 namespace suanpan {
     template<typename T> using vector = tbb::concurrent_vector<T>;
@@ -42,12 +42,12 @@ namespace suanpan {
     template<typename T, typename D> using unordered_map = tbb::concurrent_unordered_map<T, D, std::hash<T>>;
 
     template<typename T> using graph = vector<set<T>>;
-}
+} // namespace suanpan
 #else
-#include <set>
 #include <map>
-#include <unordered_set>
+#include <set>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace suanpan {
     template<typename T> using vector = std::vector<T>;
@@ -57,7 +57,7 @@ namespace suanpan {
     template<typename T, typename D> using unordered_map = std::unordered_map<T, D>;
 
     template<typename T> using graph = vector<set<T>>;
-}
+} // namespace suanpan
 #endif
 
 template<sp_i T> uvec to_uvec(const suanpan::set<T>& in) {

@@ -43,7 +43,7 @@ class Mindlin final : public MaterialElement2D {
 
         vec coor;
         mat strain_mat;
-        vector<SectionIntegrationPoint> sec_int_pt;
+        std::vector<SectionIntegrationPoint> sec_int_pt;
         explicit IntegrationPoint(vec&&);
     };
 
@@ -52,7 +52,7 @@ class Mindlin final : public MaterialElement2D {
     const double thickness;
     const unsigned num_section_ip;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     mat penalty_stiffness;
 
@@ -73,7 +73,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

@@ -1,5 +1,6 @@
-#include <Toolbox/resampling.h>
 #include "CatchHeader.h"
+
+#include <Toolbox/resampling.h>
 
 TEST_CASE("GCD", "[Utility.Sampling]") {
     REQUIRE(gcd(20, 10) == 10);

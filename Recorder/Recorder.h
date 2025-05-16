@@ -32,7 +32,7 @@
 
 class DomainBase;
 
-class Recorder : public Tag {
+class Recorder : public UniqueTag {
     uvec object_tag;
     OutputType variable_type;
     std::vector<double> time_pool;                        // recorded data
@@ -56,11 +56,6 @@ public:
         bool,       // if to record time
         bool        // if to use hdf5
     );
-    Recorder(const Recorder&) = delete;
-    Recorder(Recorder&&) = delete;                 // move forbidden
-    Recorder& operator=(const Recorder&) = delete; // assign forbidden
-    Recorder& operator=(Recorder&&) = delete;      // assign forbidden
-    ~Recorder() override = default;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 

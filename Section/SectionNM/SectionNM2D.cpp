@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SectionNM2D.h"
+
 #include <Domain/DomainBase.h>
 
 SectionNM2D::SectionNM2D(const unsigned T, const double EEA, const double EEIS, const double LD)

@@ -30,6 +30,7 @@
 #define CUSTOMGURSON_H
 
 #include "NonlinearGurson.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 
@@ -45,7 +46,7 @@ public:
         unsigned,   // tag
         unsigned,   // expression tag
         double,     // elastic modulus
-        double,     // poisson's ratio 
+        double,     // poisson's ratio
         double,     // q1
         double,     // q2
         double,     // fn

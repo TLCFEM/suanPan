@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NodeFacet.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/NodeHelper.hpp>

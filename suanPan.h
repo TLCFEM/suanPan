@@ -265,6 +265,7 @@ namespace suanpan {
     inline std::string pattern(const std::string_view header, const std::string_view file_name, const std::string_view format) {
         std::string pattern;
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+        // ReSharper disable once CppDFAConstantConditions
         if(comm_size > 1) {
             // ReSharper disable once CppDFAUnreachableCode
             pattern += "[P";
@@ -377,19 +378,6 @@ inline void suanpan_assert(const std::function<void()>& F) {
 
 using std::shared_ptr;
 using std::unique_ptr;
-using std::weak_ptr;
-
-using std::make_shared;
-using std::make_unique;
-
-using std::exception;
-using std::invalid_argument;
-using std::logic_error;
-using std::out_of_range;
-
-using std::istringstream;
-using std::ostringstream;
-using std::string;
 
 template<class T> concept sp_d = std::is_same_v<T, float> || std::is_same_v<T, double>;
 template<class T> concept sp_i = std::is_integral_v<T>;
@@ -408,6 +396,8 @@ namespace std::ranges {
     template<class IN, class OUT, class FN> OUT transform(IN& from, OUT to, FN&& func) { return std::transform(from.begin(), from.end(), to, std::forward<FN>(func)); }
 
     template<class IN, class FN> FN for_each(IN& from, FN&& func) { return std::for_each(from.begin(), from.end(), std::forward<FN>(func)); }
+
+    template<class IN, class FN> bool any_of(const IN& from, FN&& func) { return std::any_of(from.cbegin(), from.cend(), std::forward<FN>(func)); }
 
     template<class IN, class OUT> OUT copy(IN& from, OUT to) { return std::copy(from.begin(), from.end(), to); }
 } // namespace std::ranges

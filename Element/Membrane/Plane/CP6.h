@@ -47,7 +47,7 @@ class CP6 final : public MaterialElement2D {
 
     double area = 0.; // area
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     CP6(
@@ -66,7 +66,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

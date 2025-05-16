@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Contact3D.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Group/Group.h>
@@ -185,7 +186,8 @@ int Contact3D::update_status() {
     trial_stiffness.zeros(get_total_number(), get_total_number());
     trial_resistance.zeros(get_total_number());
 
-    for(auto& I : master) for(auto& J : slave) check_contact(I, J);
+    for(auto& I : master)
+        for(auto& J : slave) check_contact(I, J);
 
     trial_stiffness *= alpha;
     trial_resistance *= alpha;

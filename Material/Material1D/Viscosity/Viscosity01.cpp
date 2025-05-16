@@ -27,4 +27,4 @@ Viscosity01::Viscosity01(const unsigned T, const double A, const double C, const
     : DataViscosity01{fabs(C)}
     , NonlinearViscosity(T, A, L) {}
 
-unique_ptr<Material> Viscosity01::get_copy() { return make_unique<Viscosity01>(*this); }
+unique_ptr<Material> Viscosity01::get_copy() { return std::make_unique<Viscosity01>(*this); }

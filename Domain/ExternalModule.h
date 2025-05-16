@@ -46,46 +46,46 @@ class ExternalModule {
     void* ext_library = nullptr;
     void* ext_creator = nullptr;
 
-    bool locate_module(string);
+    bool locate_module(std::string);
 
 public:
-    const string library_name;
+    const std::string library_name;
 
-    explicit ExternalModule(string);
+    explicit ExternalModule(std::string);
     ExternalModule(const ExternalModule&) = delete;
     ExternalModule(ExternalModule&&) = delete;
     ExternalModule& operator=(const ExternalModule&) = delete;
     ExternalModule& operator=(ExternalModule&&) = delete;
     ~ExternalModule();
 
-    bool locate_c_module(const string&);
-    bool locate_cpp_module(const string&);
+    bool locate_c_module(const std::string&);
+    bool locate_cpp_module(const std::string&);
 
-    void new_object(unique_ptr<Element>&, istringstream&) const;
-    void new_object(unique_ptr<Load>&, istringstream&) const;
-    void new_object(unique_ptr<Material>&, istringstream&) const;
-    void new_object(unique_ptr<Section>&, istringstream&) const;
-    void new_object(unique_ptr<Solver>&, istringstream&) const;
-    void new_object(unique_ptr<Amplitude>&, istringstream&) const;
-    void new_object(unique_ptr<Modifier>&, istringstream&) const;
-    void new_object(unique_ptr<Constraint>&, istringstream&) const;
+    void new_object(unique_ptr<Element>&, std::istringstream&) const;
+    void new_object(unique_ptr<Load>&, std::istringstream&) const;
+    void new_object(unique_ptr<Material>&, std::istringstream&) const;
+    void new_object(unique_ptr<Section>&, std::istringstream&) const;
+    void new_object(unique_ptr<Solver>&, std::istringstream&) const;
+    void new_object(unique_ptr<Amplitude>&, std::istringstream&) const;
+    void new_object(unique_ptr<Modifier>&, std::istringstream&) const;
+    void new_object(unique_ptr<Constraint>&, std::istringstream&) const;
 
-    void new_adapter(unique_ptr<Element>&, istringstream&) const;
-    void new_adapter(unique_ptr<Load>&, istringstream&) const;
-    void new_adapter(unique_ptr<Material>&, istringstream&) const;
-    void new_adapter(unique_ptr<Section>&, istringstream&) const;
-    void new_adapter(unique_ptr<Solver>&, istringstream&) const;
-    void new_adapter(unique_ptr<Amplitude>&, istringstream&) const;
-    void new_adapter(unique_ptr<Modifier>&, istringstream&) const;
-    void new_adapter(unique_ptr<Constraint>&, istringstream&) const;
+    void new_adapter(unique_ptr<Element>&, std::istringstream&) const;
+    void new_adapter(unique_ptr<Load>&, std::istringstream&) const;
+    void new_adapter(unique_ptr<Material>&, std::istringstream&) const;
+    void new_adapter(unique_ptr<Section>&, std::istringstream&) const;
+    void new_adapter(unique_ptr<Solver>&, std::istringstream&) const;
+    void new_adapter(unique_ptr<Amplitude>&, std::istringstream&) const;
+    void new_adapter(unique_ptr<Modifier>&, std::istringstream&) const;
+    void new_adapter(unique_ptr<Constraint>&, std::istringstream&) const;
 };
 
 class load {
 public:
-    template<typename T> static void object(unique_ptr<T>&, const shared_ptr<DomainBase>&, const string&, istringstream&);
+    template<typename T> static void object(unique_ptr<T>&, const shared_ptr<DomainBase>&, const std::string&, std::istringstream&);
 };
 
-template<typename T> void load::object(unique_ptr<T>& new_object, const shared_ptr<DomainBase>& domain, const string& id, istringstream& command) {
+template<typename T> void load::object(unique_ptr<T>& new_object, const shared_ptr<DomainBase>& domain, const std::string& id, std::istringstream& command) {
     // check if the library is already loaded
     auto loaded = false;
     for(const auto& I : domain->get_external_module_pool())
@@ -96,7 +96,7 @@ template<typename T> void load::object(unique_ptr<T>& new_object, const shared_p
 
     // not loaded then try load it
     // if loaded find corresponding function
-    if(loaded || domain->insert(make_shared<ExternalModule>(id)))
+    if(loaded || domain->insert(std::make_shared<ExternalModule>(id)))
         for(const auto& I : domain->get_external_module_pool()) {
             if(I->locate_cpp_module(id)) I->new_object(new_object, command);
             if(new_object != nullptr) break;

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NodeBasedCriterion.h"
+
 #include <Domain/DomainBase.h>
 
 NodeBasedCriterion::NodeBasedCriterion(const unsigned T, const unsigned ST, const unsigned NT, const unsigned DT, const double MA)

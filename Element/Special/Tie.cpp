@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Tie.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 

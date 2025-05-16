@@ -31,10 +31,10 @@
 #ifndef FACTORY_HPP
 #define FACTORY_HPP
 
-#include <future>
-#include <Toolbox/container.h>
-#include <Element/MappingDOF.h>
 #include <Domain/MetaMat/MetaMat>
+#include <Element/MappingDOF.h>
+#include <Toolbox/container.h>
+#include <future>
 
 enum class AnalysisType {
     NONE,
@@ -72,7 +72,7 @@ template<sp_d T> class Factory final {
     unsigned n_upbw = 0;               // up bandwidth
     unsigned n_sfbw = n_lobw + n_upbw; // matrix storage offset
     unsigned n_rfld = 0;               // reference load size
-    unsigned n_mpc = 0;                // multipoint constraint size
+    unsigned n_multiplier = 0;         // multiplier constraint size
     uword n_elem = 0;
 
     AnalysisType analysis_type = AnalysisType::NONE;  // type of analysis
@@ -85,7 +85,7 @@ template<sp_d T> class Factory final {
     SolverType sub_solver = SolverType::LAPACK;
     SolverSetting<T> setting{};
 
-    T error = T(0); // error produced by certain solvers
+    T error{0}; // error produced by certain solvers
 
     Col<T> ninja; // the result from A*X=B
     Col<T> sushi; // modified right-hand side B
@@ -102,16 +102,16 @@ template<sp_d T> class Factory final {
     SpCol<T> trial_constraint_resistance;
     SpCol<T> current_constraint_resistance;
 
-    T trial_time = T(0);   // global trial (pseudo) time
-    T incre_time = T(0);   // global incremental (pseudo) time
-    T current_time = T(0); // global current (pseudo) time
-    T pre_time = T(0);     // global previous (pseudo) time
+    T trial_time{0};   // global trial (pseudo) time
+    T incre_time{0};   // global incremental (pseudo) time
+    T current_time{0}; // global current (pseudo) time
+    T pre_time{0};     // global previous (pseudo) time
 
-    T strain_energy = T(0);
-    T kinetic_energy = T(0);
-    T viscous_energy = T(0);
-    T nonviscous_energy = T(0);
-    T complementary_energy = T(0);
+    T strain_energy{0};
+    T kinetic_energy{0};
+    T viscous_energy{0};
+    T nonviscous_energy{0};
+    T complementary_energy{0};
     Col<T> momentum;
 
     Col<T> trial_load_factor;      // global trial load factor
@@ -258,7 +258,7 @@ public:
 
     void update_sushi_by(const Col<T>&);
 
-    void set_mpc(unsigned);
+    void set_multiplier_size(unsigned);
 
     void set_reference_load(const SpMat<T>&);
 
@@ -328,7 +328,7 @@ public:
     const Col<T>& get_ninja() const;
     const Col<T>& get_sushi() const;
 
-    [[nodiscard]] unsigned get_mpc() const;
+    [[nodiscard]] unsigned get_multiplier_size() const;
 
     const SpMat<T>& get_reference_load() const;
 
@@ -693,7 +693,7 @@ template<sp_d T> unsigned Factory<T>::get_size() const { return n_size; }
 
 template<sp_d T> void Factory<T>::set_entry(const uword N) {
     n_elem = N;
-    if(n_elem > std::numeric_limits<la_it>::max()) throw invalid_argument("too many elements");
+    if(n_elem > std::numeric_limits<la_it>::max()) throw std::invalid_argument("too many elements");
 }
 
 template<sp_d T> uword Factory<T>::get_entry() const { return n_elem; }
@@ -756,10 +756,7 @@ template<sp_d T> std::pair<unsigned, unsigned> Factory<T>::get_bandwidth() const
 
 template<sp_d T> void Factory<T>::update_reference_size() { n_rfld = static_cast<unsigned>(reference_dof.size()); }
 
-template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) {
-    if(S == n_rfld) return;
-    n_rfld = S;
-}
+template<sp_d T> void Factory<T>::set_reference_size(const unsigned S) { n_rfld = S; }
 
 template<sp_d T> unsigned Factory<T>::get_reference_size() const { return n_rfld; }
 
@@ -930,12 +927,12 @@ template<sp_d T> void Factory<T>::set_sushi(const Col<T>& S) { sushi = S; }
 
 template<sp_d T> void Factory<T>::update_sushi_by(const Col<T>& S) { sushi += S; }
 
-template<sp_d T> void Factory<T>::set_mpc(const unsigned S) {
-    n_mpc = S;
-    auxiliary_encoding.zeros(n_mpc);
-    auxiliary_resistance.zeros(n_mpc);
-    auxiliary_load.zeros(n_mpc);
-    auxiliary_stiffness.zeros(n_size, n_mpc);
+template<sp_d T> void Factory<T>::set_multiplier_size(const unsigned S) {
+    n_multiplier = S;
+    auxiliary_encoding.zeros(n_multiplier);
+    auxiliary_resistance.zeros(n_multiplier);
+    auxiliary_load.zeros(n_multiplier);
+    auxiliary_stiffness.zeros(n_size, n_multiplier);
 }
 
 template<sp_d T> void Factory<T>::set_reference_load(const SpMat<T>& L) { reference_load = L; }
@@ -958,7 +955,7 @@ template<sp_d T> const Col<T>& Factory<T>::get_ninja() const { return ninja; }
 
 template<sp_d T> const Col<T>& Factory<T>::get_sushi() const { return sushi; }
 
-template<sp_d T> unsigned Factory<T>::get_mpc() const { return n_mpc; }
+template<sp_d T> unsigned Factory<T>::get_multiplier_size() const { return n_multiplier; }
 
 template<sp_d T> const SpMat<T>& Factory<T>::get_reference_load() const { return reference_load; }
 
@@ -1166,27 +1163,49 @@ template<sp_d T> void Factory<T>::commit_pre_status() {
 
 template<sp_d T> void Factory<T>::commit_pre_time() { pre_time = current_time; }
 
-template<sp_d T> void Factory<T>::commit_pre_load_factor() { if(!current_load_factor.is_empty()) pre_load_factor = current_load_factor; }
+template<sp_d T> void Factory<T>::commit_pre_load_factor() {
+    if(!current_load_factor.is_empty()) pre_load_factor = current_load_factor;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_load() { if(!current_load.is_empty()) pre_load = current_load; }
+template<sp_d T> void Factory<T>::commit_pre_load() {
+    if(!current_load.is_empty()) pre_load = current_load;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_settlement() { if(!current_settlement.is_empty()) pre_settlement = current_settlement; }
+template<sp_d T> void Factory<T>::commit_pre_settlement() {
+    if(!current_settlement.is_empty()) pre_settlement = current_settlement;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_resistance() { if(!current_resistance.is_empty()) pre_resistance = current_resistance; }
+template<sp_d T> void Factory<T>::commit_pre_resistance() {
+    if(!current_resistance.is_empty()) pre_resistance = current_resistance;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_damping_force() { if(!current_damping_force.is_empty()) pre_damping_force = current_damping_force; }
+template<sp_d T> void Factory<T>::commit_pre_damping_force() {
+    if(!current_damping_force.is_empty()) pre_damping_force = current_damping_force;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_nonviscous_force() { if(!current_nonviscous_force.is_empty()) pre_nonviscous_force = current_nonviscous_force; }
+template<sp_d T> void Factory<T>::commit_pre_nonviscous_force() {
+    if(!current_nonviscous_force.is_empty()) pre_nonviscous_force = current_nonviscous_force;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_inertial_force() { if(!current_inertial_force.is_empty()) pre_inertial_force = current_inertial_force; }
+template<sp_d T> void Factory<T>::commit_pre_inertial_force() {
+    if(!current_inertial_force.is_empty()) pre_inertial_force = current_inertial_force;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_displacement() { if(!current_displacement.is_empty()) pre_displacement = current_displacement; }
+template<sp_d T> void Factory<T>::commit_pre_displacement() {
+    if(!current_displacement.is_empty()) pre_displacement = current_displacement;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_velocity() { if(!current_velocity.is_empty()) pre_velocity = current_velocity; }
+template<sp_d T> void Factory<T>::commit_pre_velocity() {
+    if(!current_velocity.is_empty()) pre_velocity = current_velocity;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_acceleration() { if(!current_acceleration.is_empty()) pre_acceleration = current_acceleration; }
+template<sp_d T> void Factory<T>::commit_pre_acceleration() {
+    if(!current_acceleration.is_empty()) pre_acceleration = current_acceleration;
+}
 
-template<sp_d T> void Factory<T>::commit_pre_temperature() { if(!current_temperature.is_empty()) pre_temperature = current_temperature; }
+template<sp_d T> void Factory<T>::commit_pre_temperature() {
+    if(!current_temperature.is_empty()) pre_temperature = current_temperature;
+}
 
 template<sp_d T> void Factory<T>::clear_status() {
     access::rw(initialized) = false;
@@ -1393,18 +1412,28 @@ template<sp_d T> void Factory<T>::clear_eigen() {
     if(!eigenvector.is_empty()) eigenvector.zeros();
 }
 
-template<sp_d T> void Factory<T>::clear_mass() { if(global_mass != nullptr) global_mass->zeros(); }
+template<sp_d T> void Factory<T>::clear_mass() {
+    if(global_mass != nullptr) global_mass->zeros();
+}
 
-template<sp_d T> void Factory<T>::clear_damping() { if(global_damping != nullptr) global_damping->zeros(); }
+template<sp_d T> void Factory<T>::clear_damping() {
+    if(global_damping != nullptr) global_damping->zeros();
+}
 
-template<sp_d T> void Factory<T>::clear_nonviscous() { if(global_nonviscous != nullptr) global_nonviscous->zeros(); }
+template<sp_d T> void Factory<T>::clear_nonviscous() {
+    if(global_nonviscous != nullptr) global_nonviscous->zeros();
+}
 
-template<sp_d T> void Factory<T>::clear_stiffness() { if(global_stiffness != nullptr) global_stiffness->zeros(); }
+template<sp_d T> void Factory<T>::clear_stiffness() {
+    if(global_stiffness != nullptr) global_stiffness->zeros();
+}
 
-template<sp_d T> void Factory<T>::clear_geometry() { if(global_geometry != nullptr) global_geometry->zeros(); }
+template<sp_d T> void Factory<T>::clear_geometry() {
+    if(global_geometry != nullptr) global_geometry->zeros();
+}
 
 template<sp_d T> void Factory<T>::clear_auxiliary() {
-    n_mpc = 0;
+    n_multiplier = 0;
     auxiliary_load.reset();
     auxiliary_stiffness.set_size(n_size, 0);
     auxiliary_resistance.reset();
@@ -1442,8 +1471,11 @@ template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, cons
 template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) {
     if(EM.is_empty()) return;
 
-    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type) for(const auto [g_row, g_col, l_row, l_col] : MAP) GM->unsafe_at(g_row, g_col) += EM(l_row, l_col);
-    else for(auto I = 0llu; I < EI.n_elem; ++I) for(auto J = 0llu; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
+    if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type)
+        for(const auto [g_row, g_col, l_row, l_col] : MAP) GM->unsafe_at(g_row, g_col) += EM(l_row, l_col);
+    else
+        for(auto I = 0llu; I < EI.n_elem; ++I)
+            for(auto J = 0llu; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
 }
 
 template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_mass, EM, EI, MAP); }
@@ -1466,8 +1498,8 @@ template<sp_d T> void Factory<T>::print() const {
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
-#ifdef SUANPAN_DISTRIBUTED
     switch(storage_type) {
+#ifdef SUANPAN_DISTRIBUTED
     case StorageScheme::FULL:
         return std::make_unique<FullMatCluster<T>>(n_size, n_size);
     case StorageScheme::SYMMPACK:
@@ -1488,11 +1520,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #endif
         if(contain_solver_type(SolverType::LIS)) return std::make_unique<SparseMatClusterLIS<T>>(n_size, n_size, n_elem);
         return std::make_unique<SparseSymmMatClusterMUMPS<T>>(n_size, n_size, n_elem);
-    default:
-        throw invalid_argument("need a proper storage scheme");
-    }
 #else
-    switch(storage_type) {
     case StorageScheme::FULL:
 #ifdef SUANPAN_CUDA
         if(contain_solver_type(SolverType::CUDA)) return std::make_unique<FullMatCUDA<T>>(n_size, n_size);
@@ -1527,10 +1555,10 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #endif
 #endif
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
-    default:
-        throw invalid_argument("need a proper storage scheme");
-    }
 #endif
+    default:
+        throw std::invalid_argument("need a proper storage scheme");
+    }
 }
 
 template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_matrix_container() {

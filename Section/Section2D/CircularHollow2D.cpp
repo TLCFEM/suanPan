@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CircularHollow2D.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -53,7 +54,7 @@ int CircularHollow2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> CircularHollow2D::get_copy() { return make_unique<CircularHollow2D>(*this); }
+unique_ptr<Section> CircularHollow2D::get_copy() { return std::make_unique<CircularHollow2D>(*this); }
 
 void CircularHollow2D::print() {
     suanpan_info("A 2D circular hollow section.\n");

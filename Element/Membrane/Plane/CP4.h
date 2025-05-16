@@ -53,7 +53,7 @@ class CP4 final : public MaterialElement2D {
 
     const bool reduced_scheme;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     mat hourglassing;
 
@@ -79,7 +79,7 @@ public:
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

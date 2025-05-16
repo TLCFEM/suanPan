@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SectionTester.h"
+
 #include <Domain/DomainBase.h>
 #include <Section/Section.h>
 #include <Toolbox/misc.h>
@@ -85,7 +86,7 @@ mat section_tester_by_deformation_history(const unique_ptr<Section>& obj, const 
     return response;
 }
 
-int test_section(const shared_ptr<DomainBase>& domain, istringstream& command, const unsigned size) {
+int test_section(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned size) {
     unsigned section_tag;
     if(!get_input(command, section_tag)) {
         suanpan_error("A valid section tag is required.\n");
@@ -113,14 +114,14 @@ int test_section(const shared_ptr<DomainBase>& domain, istringstream& command, c
     return SUANPAN_SUCCESS;
 }
 
-int test_section_by_deformation_history(const shared_ptr<DomainBase>& domain, istringstream& command) {
+int test_section_by_deformation_history(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     unsigned section_tag;
     if(!get_input(command, section_tag)) {
         suanpan_error("A valid section tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
-    string history_file;
+    std::string history_file;
     if(!get_input(command, history_file)) {
         suanpan_error("A valid history file name is required.\n");
         return SUANPAN_SUCCESS;

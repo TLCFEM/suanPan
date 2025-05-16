@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LinearHardeningNM.h"
+
 #include <Toolbox/utility.h>
 
 int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian) {
@@ -145,7 +146,9 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian) {
 
 vec LinearHardeningNM::compute_h(const double alpha) const { return {n_size, fill::value(std::max(datum::eps, 1. + isotropic_modulus * alpha))}; }
 
-vec LinearHardeningNM::compute_dh(const double alpha) const { return compute_h(alpha).transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : isotropic_modulus; }); }
+vec LinearHardeningNM::compute_dh(const double alpha) const {
+    return compute_h(alpha).transform([&](const double h) { return suanpan::approx_equal(h, datum::eps) ? 0. : isotropic_modulus; });
+}
 
 LinearHardeningNM::LinearHardeningNM(const unsigned T, const double EEA, const double EEIS, const double HH, const double KK, const double LD, vec&& YF)
     : NonlinearNM(T, EEA, EEIS, !suanpan::approx_equal(KK, 0.), LD, std::move(YF))

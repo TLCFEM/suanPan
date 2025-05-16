@@ -41,13 +41,13 @@ template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, unique_ptr<Meta
     return std::move(M);
 }
 
-//template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, const shared_ptr<MetaMat<T>>& M) {
-//    if(nullptr == M) return nullptr;
+// template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, const shared_ptr<MetaMat<T>>& M) {
+//     if(nullptr == M) return nullptr;
 //
-//    auto N = M->make_copy();
-//    N->operator*=(value);
-//    return N;
-//}
+//     auto N = M->make_copy();
+//     N->operator*=(value);
+//     return N;
+// }
 
 template<sp_d T> Mat<T> operator*(const shared_ptr<MetaMat<T>>& M, const Mat<T>& A) { return M->operator*(A); }
 
@@ -58,11 +58,11 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& operator*=(const shared_ptr<MetaM
     return M;
 }
 
-//template<sp_d T> unique_ptr<MetaMat<T>> operator+(const shared_ptr<MetaMat<T>>& A, const shared_ptr<MetaMat<T>>& B) {
-//    auto M = B->make_copy();
-//    M->operator+=(A);
-//    return M;
-//}
+// template<sp_d T> unique_ptr<MetaMat<T>> operator+(const shared_ptr<MetaMat<T>>& A, const shared_ptr<MetaMat<T>>& B) {
+//     auto M = B->make_copy();
+//     M->operator+=(A);
+//     return M;
+// }
 
 template<sp_d T> unique_ptr<MetaMat<T>> operator+(const shared_ptr<MetaMat<T>>& A, unique_ptr<MetaMat<T>>&& B) {
     B->operator+=(A);

@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -13,9 +13,10 @@ at the top-level directory.
  * \brief Computes an ILU factorization of a general sparse matrix
  *
  * <pre>
- * -- SuperLU routine (version 4.1) --
+ * -- SuperLU routine (version 7.0.0) --
  * Lawrence Berkeley National Laboratory.
  * June 30, 2009
+ * August 2024
  *
  * </pre>
  */
@@ -113,7 +114,7 @@ int num_drop_L;
  *
  * Glu      (input/output) GlobalLU_t *
  *          If options->Fact == SamePattern_SameRowPerm, it is an input;
- *              The matrix A will be factorized assuming that a 
+ *              The matrix A will be factorized assuming that a
  *              factorization of a matrix with the same sparsity pattern
  *              and similar numerical values was performed prior to this one.
  *              Therefore, this factorization will reuse both row and column
@@ -183,20 +184,19 @@ int num_drop_L;
  * </pre>
  */
 
-void zgsitrf(
-    superlu_options_t* options, SuperMatrix* A, int relax, int panel_size, int* etree, void* work, int_t lwork, int* perm_c, int* perm_r, SuperMatrix* L, SuperMatrix* U, GlobalLU_t* Glu, /* persistent to facilitate multiple factorizations */
-    SuperLUStat_t* stat, int_t* info
-) {
+void zgsitrf(superlu_options_t* options, SuperMatrix* A, int relax, int panel_size, int* etree, void* work, int_t lwork, int* perm_c, int* perm_r, SuperMatrix* L, SuperMatrix* U, GlobalLU_t* Glu, /* persistent to facilitate multiple factorizations */
+             SuperLUStat_t* stat,
+             int_t* info) {
     /* Local working arrays */
     NCPformat* Astore;
     int* iperm_r = NULL; /* inverse of perm_r; used when
-				  options->Fact == SamePattern_SameRowPerm */
+            options->Fact == SamePattern_SameRowPerm */
     int* iperm_c;        /* inverse of perm_c */
     int *swap, *iswap;   /* swap is used to store the row permutation
-				during the factorization. Initially, it is set
-				to iperm_c (row indeces of Pc*A*Pc').
-				iswap is the inverse of swap. After the
-				factorization, it is equal to perm_r. */
+            during the factorization. Initially, it is set
+            to iperm_c (row indices of Pc*A*Pc').
+            iswap is the inverse of swap. After the
+            factorization, it is equal to perm_r. */
     int* iwork;
     doublecomplex* zwork;
     int *segrep, *repfnz, *parent;
@@ -215,7 +215,7 @@ void zgsitrf(
     int_t nzlumax;
     double* amax;
     doublecomplex drop_sum;
-    double alpha, omega; /* used in MILU, mimicing DRIC */
+    double alpha, omega; /* used in MILU, mimicking DRIC */
     double* dwork2;      /* used by the second dropping rule */
 
     /* Local scalars */
@@ -293,8 +293,10 @@ void zgsitrf(
     iswap = (int*)intMalloc(n);
     for(k = 0; k < n; k++) iswap[k] = perm_c[k];
     amax = (double*)SUPERLU_MALLOC(panel_size * sizeof(double));
-    if(drop_rule & DROP_SECONDARY) dwork2 = SUPERLU_MALLOC(n * sizeof(double));
-    else dwork2 = NULL;
+    if(drop_rule & DROP_SECONDARY)
+        dwork2 = SUPERLU_MALLOC(n * sizeof(double));
+    else
+        dwork2 = NULL;
 
     nnzAj = 0;
     nnzLj = 0;
@@ -305,19 +307,21 @@ void zgsitrf(
     /* Identify relaxed snodes */
     relax_end = (int*)intMalloc(n);
     relax_fsupc = (int*)intMalloc(n);
-    if(options->SymmetricMode == YES) ilu_heap_relax_snode(n, etree, relax, marker, relax_end, relax_fsupc);
-    else ilu_relax_snode(n, etree, relax, marker, relax_end, relax_fsupc);
+    if(options->SymmetricMode == YES)
+        ilu_heap_relax_snode(n, etree, relax, marker, relax_end, relax_fsupc);
+    else
+        ilu_relax_snode(n, etree, relax, marker, relax_end, relax_fsupc);
 
-    ifill(perm_r, m, EMPTY);
-    ifill(marker, m * NO_MARKER, EMPTY);
+    ifill(perm_r, m, SLU_EMPTY);
+    ifill(marker, m * NO_MARKER, SLU_EMPTY);
     supno[0] = -1;
     xsup[0] = xlsub[0] = xusub[0] = xlusup[0] = 0;
     w_def = panel_size;
 
     /* Mark the rows used by relaxed supernodes */
-    ifill(marker_relax, m, EMPTY);
+    ifill(marker_relax, m, SLU_EMPTY);
     i = mark_relax(m, relax_end, relax_fsupc, xa_begin, xa_end, asub, marker_relax);
-#if ( PRNTlevel >= 1)
+#if (PRNTlevel >= 1)
     printf("%d relaxed supernodes.\n", (int)i);
 #endif
 
@@ -327,9 +331,8 @@ void zgsitrf(
      *	   (b) panel_size contiguous columns, defined by the user
      */
     for(jcol = 0; jcol < min_mn;) {
-        if(relax_end[jcol] != EMPTY) {
-            /* start of a relaxed snode */
-            kcol = relax_end[jcol]; /* end of the relaxed snode */
+        if(relax_end[jcol] != SLU_EMPTY) { /* start of a relaxed snode */
+            kcol = relax_end[jcol];        /* end of the relaxed snode */
             panel_histo[kcol - jcol + 1]++;
 
             /* Drop small rows in the previous supernode. */
@@ -339,15 +342,19 @@ void zgsitrf(
                 int quota;
 
                 /* Compute the quota */
-                if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
+                if(drop_rule & DROP_PROWS)
+                    quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
                 else if(drop_rule & DROP_COLUMN) {
                     int i;
                     quota = 0;
-                    for(i = first; i <= last; i++) quota += xa_end[i] - xa_begin[i];
+                    for(i = first; i <= last; i++)
+                        quota += xa_end[i] - xa_begin[i];
                     quota = gamma * quota * (m - first) / m;
                 }
-                else if(drop_rule & DROP_AREA) quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
-                else quota = m * n;
+                else if(drop_rule & DROP_AREA)
+                    quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
+                else
+                    quota = m * n;
                 fill_tol = pow(fill_ini, 1.0 - 0.5 * (first + last) / min_mn);
 
                 /* Drop small rows */
@@ -355,12 +362,14 @@ void zgsitrf(
                 i = ilu_zdrop_row(options, first, last, tol_L, quota, &nnzLj, &fill_tol, Glu, dtempv, dwork2, 0);
                 /* Reset the parameters */
                 if(drop_rule & DROP_DYNAMIC) {
-                    if(gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) < nnzLj) tol_L = SUPERLU_MIN(1.0, tol_L * 2.0);
-                    else tol_L = SUPERLU_MAX(drop_tol, tol_L * 0.5);
+                    if(gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) < nnzLj)
+                        tol_L = SUPERLU_MIN(1.0, tol_L * 2.0);
+                    else
+                        tol_L = SUPERLU_MAX(drop_tol, tol_L * 0.5);
                 }
                 if(fill_tol < 0) iinfo -= (int)fill_tol;
 #ifdef DEBUG
-		num_drop_L += i * (last - first + 1);
+                num_drop_L += i * (last - first + 1);
 #endif
             }
 
@@ -368,7 +377,8 @@ void zgsitrf(
              * Factorize the relaxed supernode(jcol:kcol)
              * -------------------------------------- */
             /* Determine the union of the row structure of the snode */
-            if((*info = ilu_zsnode_dfs(jcol, kcol, asub, xa_begin, xa_end, marker, Glu)) != 0) return;
+            if((*info = ilu_zsnode_dfs(jcol, kcol, asub, xa_begin, xa_end, marker, Glu)) != 0)
+                return;
 
             nextu = xusub[jcol];
             nextlu = xlusup[jcol];
@@ -376,7 +386,10 @@ void zgsitrf(
             fsupc = xsup[jsupno];
             new_next = nextlu + (xlsub[fsupc + 1] - xlsub[fsupc]) * (kcol - jcol + 1);
             nzlumax = Glu->nzlumax;
-            while(new_next > nzlumax) { if((*info = zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu))) return; }
+            while(new_next > nzlumax) {
+                if((*info = zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu)))
+                    return;
+            }
 
             for(icol = jcol; icol <= kcol; icol++) {
                 xusub[icol + 1] = nextu;
@@ -391,9 +404,9 @@ void zgsitrf(
                 nnzAj += xa_end[icol] - xa_begin[icol];
                 if(amax[0] == 0.0) {
                     amax[0] = fill_ini;
-#if ( PRNTlevel >= 1)
-		    printf("Column %d is entirely zero!\n", icol);
-		    fflush(stdout);
+#if (PRNTlevel >= 1)
+                    printf("Column %d is entirely zero!\n", icol);
+                    fflush(stdout);
 #endif
                 }
 
@@ -410,15 +423,14 @@ void zgsitrf(
 
             jcol = kcol + 1;
         }
-        else {
-            /* Work on one panel of panel_size columns */
+        else { /* Work on one panel of panel_size columns */
 
             /* Adjust panel_size so that a panel won't overlap with the next
              * relaxed snode.
              */
             panel_size = w_def;
-            for(k = jcol + 1; k < SUPERLU_MIN(jcol+panel_size, min_mn); k++)
-                if(relax_end[k] != EMPTY) {
+            for(k = jcol + 1; k < SUPERLU_MIN(jcol + panel_size, min_mn); k++)
+                if(relax_end[k] != SLU_EMPTY) {
                     panel_size = k - jcol;
                     break;
                 }
@@ -439,7 +451,8 @@ void zgsitrf(
 
                 nnzAj += xa_end[jj] - xa_begin[jj];
 
-                if((*info = ilu_zcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k], segrep, &repfnz[k], marker, parent, xplore, Glu))) return;
+                if((*info = ilu_zcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k], segrep, &repfnz[k], marker, parent, xplore, Glu)))
+                    return;
 
                 /* Numeric updates */
                 if((*info = zcolumn_bmod(jj, (nseg - nseg1), &dense[k], tempv, &segrep[nseg1], &repfnz[k], jcol, Glu, stat)) != 0) return;
@@ -463,38 +476,47 @@ void zgsitrf(
                         lsub = Glu->lsub;
                     }
                     xlsub[jj + 1]++;
-                    assert(xlusup[jj]==xlusup[jj+1]);
+                    assert(xlusup[jj] == xlusup[jj + 1]);
                     xlusup[jj + 1]++;
                     ((doublecomplex*)Glu->lusup)[xlusup[jj]] = zero;
 
                     /* Choose a row index (pivrow) for fill-in */
-                    for(i = jj; i < n; i++) if(marker_relax[swap[i]] <= jj) break;
+                    for(i = jj; i < n; i++)
+                        if(marker_relax[swap[i]] <= jj) break;
                     row = swap[i];
                     marker2[row] = jj;
                     lsub[xlsub[jj]] = row;
 #ifdef DEBUG
-		    printf("Fill col %d.\n", (int)jj);
-		    fflush(stdout);
+                    printf("Fill col %d.\n", (int)jj);
+                    fflush(stdout);
 #endif
                 }
 
                 /* Computer the quota */
-                if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * jj / m;
-                else if(drop_rule & DROP_COLUMN) quota = gamma * (xa_end[jj] - xa_begin[jj]) * (jj + 1) / m;
-                else if(drop_rule & DROP_AREA) quota = gamma * 0.9 * nnzAj * 0.5 - nnzUj;
-                else quota = m;
+                if(drop_rule & DROP_PROWS)
+                    quota = gamma * Astore->nnz / m * jj / m;
+                else if(drop_rule & DROP_COLUMN)
+                    quota = gamma * (xa_end[jj] - xa_begin[jj]) *
+                            (jj + 1) / m;
+                else if(drop_rule & DROP_AREA)
+                    quota = gamma * 0.9 * nnzAj * 0.5 - nnzUj;
+                else
+                    quota = m;
 
                 /* Copy the U-segments to ucol[*] and drop small entries */
-                if((*info = ilu_zcopy_to_ucol(jj, nseg, segrep, &repfnz[k], perm_r, &dense[k], drop_rule, milu, amax[jj - jcol] * tol_U, quota, &drop_sum, &nnzUj, Glu, dwork2)) != 0) return;
+                if((*info = ilu_zcopy_to_ucol(jj, nseg, segrep, &repfnz[k], perm_r, &dense[k], drop_rule, milu, amax[jj - jcol] * tol_U, quota, &drop_sum, &nnzUj, Glu, dwork2)) != 0)
+                    return;
 
                 /* Reset the dropping threshold if required */
                 if(drop_rule & DROP_DYNAMIC) {
-                    if(gamma * 0.9 * nnzAj * 0.5 < nnzLj) tol_U = SUPERLU_MIN(1.0, tol_U * 2.0);
-                    else tol_U = SUPERLU_MAX(drop_tol, tol_U * 0.5);
+                    if(gamma * 0.9 * nnzAj * 0.5 < nnzLj)
+                        tol_U = SUPERLU_MIN(1.0, tol_U * 2.0);
+                    else
+                        tol_U = SUPERLU_MAX(drop_tol, tol_U * 0.5);
                 }
 
-                if(drop_sum.r != 0.0 && drop_sum.i != 0.0) {
-                    omega = SUPERLU_MIN(2.0*(1.0-alpha)/z_abs1(&drop_sum), 1.0);
+                if(drop_sum.r != 0.0 || drop_sum.i != 0.0) {
+                    omega = SUPERLU_MIN(2.0 * (1.0 - alpha) / z_abs1(&drop_sum), 1.0);
                     zd_mult(&drop_sum, &drop_sum, omega);
                 }
                 if(usepr) pivrow = iperm_r[jj];
@@ -515,15 +537,19 @@ void zgsitrf(
                     int quota;
 
                     /* Compute the quota */
-                    if(drop_rule & DROP_PROWS) quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
+                    if(drop_rule & DROP_PROWS)
+                        quota = gamma * Astore->nnz / m * (m - first) / m * (last - first + 1);
                     else if(drop_rule & DROP_COLUMN) {
                         int i;
                         quota = 0;
-                        for(i = first; i <= last; i++) quota += xa_end[i] - xa_begin[i];
+                        for(i = first; i <= last; i++)
+                            quota += xa_end[i] - xa_begin[i];
                         quota = gamma * quota * (m - first) / m;
                     }
-                    else if(drop_rule & DROP_AREA) quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
-                    else quota = m * n;
+                    else if(drop_rule & DROP_AREA)
+                        quota = gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) - nnzLj;
+                    else
+                        quota = m * n;
                     fill_tol = pow(fill_ini, 1.0 - 0.5 * (first + last) / (double)min_mn);
 
                     /* Drop small rows */
@@ -532,26 +558,31 @@ void zgsitrf(
 
                     /* Reset the parameters */
                     if(drop_rule & DROP_DYNAMIC) {
-                        if(gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) < nnzLj) tol_L = SUPERLU_MIN(1.0, tol_L * 2.0);
-                        else tol_L = SUPERLU_MAX(drop_tol, tol_L * 0.5);
+                        if(gamma * nnzAj * (1.0 - 0.5 * (last + 1.0) / m) < nnzLj)
+                            tol_L = SUPERLU_MIN(1.0, tol_L * 2.0);
+                        else
+                            tol_L = SUPERLU_MAX(drop_tol, tol_L * 0.5);
                     }
                     if(fill_tol < 0) iinfo -= (int)fill_tol;
 #ifdef DEBUG
-		    num_drop_L += i * (last - first + 1);
+                    num_drop_L += i * (last - first + 1);
 #endif
                 } /* if start a new supernode */
-            }     /* for */
+
+            } /* for */
 
             jcol += panel_size; /* Move to the next panel */
-        }                       /* else */
-    }                           /* for */
+
+        } /* else */
+
+    } /* for */
 
     *info = iinfo;
 
     if(m > n) {
         k = 0;
         for(i = 0; i < m; ++i)
-            if(perm_r[i] == EMPTY) {
+            if(perm_r[i] == SLU_EMPTY) {
                 perm_r[i] = n + k;
                 ++k;
             }
@@ -588,14 +619,12 @@ void zgsitrf(
     ops[FACT] += ops[TRSV] + ops[GEMV];
     stat->expansions = --(Glu->num_expansions);
 
-    if(iperm_r_allocated)
-        SUPERLU_FREE(iperm_r);
+    if(iperm_r_allocated) SUPERLU_FREE(iperm_r);
     SUPERLU_FREE(iperm_c);
     SUPERLU_FREE(relax_end);
     SUPERLU_FREE(swap);
     SUPERLU_FREE(iswap);
     SUPERLU_FREE(relax_fsupc);
     SUPERLU_FREE(amax);
-    if(dwork2)
-        SUPERLU_FREE(dwork2);
+    if(dwork2) SUPERLU_FREE(dwork2);
 }

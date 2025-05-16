@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GroupGroup.h"
+
 #include <Domain/DomainBase.h>
 #include <Toolbox/utility.h>
 
@@ -38,7 +39,8 @@ void GroupGroup::initialize(const shared_ptr<DomainBase>& D) {
     std::vector<uword> pond;
     pond.reserve(size);
 
-    for(const auto& I : ocean) for(auto J : *I) pond.emplace_back(J);
+    for(const auto& I : ocean)
+        for(auto J : *I) pond.emplace_back(J);
 
     pool = suanpan::unique(pond);
 }

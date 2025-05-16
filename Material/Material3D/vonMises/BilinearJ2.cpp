@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "BilinearJ2.h"
+
 #include <Toolbox/tensor.h>
 
 constexpr double BilinearJ2::two_third = 2. / 3.;
@@ -34,7 +35,7 @@ int BilinearJ2::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> BilinearJ2::get_copy() { return make_unique<BilinearJ2>(*this); }
+unique_ptr<Material> BilinearJ2::get_copy() { return std::make_unique<BilinearJ2>(*this); }
 
 double BilinearJ2::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 

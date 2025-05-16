@@ -1,12 +1,12 @@
-set(S2D
-        Section2D/Box2D.cpp
-        Section2D/Cell2D.cpp
-        Section2D/Circle2D.cpp
-        Section2D/CircularHollow2D.cpp
-        Section2D/Fibre2D.cpp
-        Section2D/HSection2D.cpp
-        Section2D/ISection2D.cpp
-        Section2D/Rectangle2D.cpp
-        Section2D/Section2D.cpp
-        Section2D/TSection2D.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        Box2D.cpp
+        Cell2D.cpp
+        Circle2D.cpp
+        CircularHollow2D.cpp
+        Fibre2D.cpp
+        HSection2D.cpp
+        ISection2D.cpp
+        Rectangle2D.cpp
+        Section2D.cpp
+        TSection2D.cpp
 )

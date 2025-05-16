@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "MooneyRivlin.h"
+
 #include <Toolbox/tensor.h>
 
 const vec MooneyRivlin::weight{2., 2., 2., 1., 1., 1.};
@@ -44,7 +45,7 @@ int MooneyRivlin::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> MooneyRivlin::get_copy() { return make_unique<MooneyRivlin>(*this); }
+unique_ptr<Material> MooneyRivlin::get_copy() { return std::make_unique<MooneyRivlin>(*this); }
 
 // takes green strain as input
 int MooneyRivlin::update_trial_status(const vec& t_strain) {

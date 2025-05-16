@@ -74,7 +74,7 @@ struct DataSection {
     mat trial_geometry{};   // geometry matrix
 };
 
-class Section : protected DataSection, public Tag {
+class Section : protected DataSection, public CopiableTag {
     const bool initialized = false;
     const bool symmetric = false;
 
@@ -86,12 +86,6 @@ public:
         double = 0.,                   // area
         vec&& = {0., 0.}               // eccentricity
     );
-    Section(const Section&) = default;           // default copy ctor
-    Section(Section&&) = delete;                 // move forbidden
-    Section& operator=(const Section&) = delete; // assign forbidden
-    Section& operator=(Section&&) = delete;      // assign forbidden
-
-    ~Section() override = default;
 
     [[nodiscard]] SectionType get_section_type() const;
     [[nodiscard]] double get_area() const;

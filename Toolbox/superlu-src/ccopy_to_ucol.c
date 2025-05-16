@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -33,15 +33,15 @@ at the top-level directory.
 #include "slu_cdefs.h"
 
 int ccopy_to_ucol(
-    int jcol,       /* in */
-    int nseg,       /* in */
-    int* segrep,    /* in */
-    int* repfnz,    /* in */
-    int* perm_r,    /* in */
-    complex* dense, /* modified - reset to zero on return */
-    GlobalLU_t* Glu /* modified */
+    int jcol,             /* in */
+    int nseg,             /* in */
+    int* segrep,          /* in */
+    int* repfnz,          /* in */
+    int* perm_r,          /* in */
+    singlecomplex* dense, /* modified - reset to zero on return */
+    GlobalLU_t* Glu       /* modified */
 ) {
-    /* 
+    /*
      * Gather from SPA dense[*] to global ucol[*].
      */
     int ksub, krep, ksupno;
@@ -50,16 +50,16 @@ int ccopy_to_ucol(
     int_t isub, nextu, new_next, mem_error;
     int *xsup, *supno;
     int_t *lsub, *xlsub;
-    complex* ucol;
+    singlecomplex* ucol;
     int_t *usub, *xusub;
     int_t nzumax;
-    complex zero = {0.0, 0.0};
+    singlecomplex zero = {0.0, 0.0};
 
     xsup = Glu->xsup;
     supno = Glu->supno;
     lsub = Glu->lsub;
     xlsub = Glu->xlsub;
-    ucol = (complex*)Glu->ucol;
+    ucol = (singlecomplex*)Glu->ucol;
     usub = Glu->usub;
     xusub = Glu->xusub;
     nzumax = Glu->nzumax;
@@ -71,11 +71,9 @@ int ccopy_to_ucol(
         krep = segrep[k--];
         ksupno = supno[krep];
 
-        if(ksupno != jsupno) {
-            /* Should go into ucol[] */
+        if(ksupno != jsupno) { /* Should go into ucol[] */
             kfnz = repfnz[krep];
-            if(kfnz != EMPTY) {
-                /* Nonzero U-segment */
+            if(kfnz != SLU_EMPTY) { /* Nonzero U-segment */
 
                 fsupc = xsup[ksupno];
                 isub = xlsub[fsupc] + kfnz - fsupc;
@@ -85,7 +83,7 @@ int ccopy_to_ucol(
                 while(new_next > nzumax) {
                     mem_error = cLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu);
                     if(mem_error) return (mem_error);
-                    ucol = (complex*)Glu->ucol;
+                    ucol = (singlecomplex*)Glu->ucol;
                     mem_error = cLUMemXpand(jcol, nextu, USUB, &nzumax, Glu);
                     if(mem_error) return (mem_error);
                     usub = Glu->usub;
@@ -102,6 +100,7 @@ int ccopy_to_ucol(
                 }
             }
         }
+
     } /* for each segment... */
 
     xusub[jcol + 1] = nextu; /* Close U[*,jcol] */

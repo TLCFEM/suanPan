@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ConcreteTsai.h"
+
 #include <Toolbox/utility.h>
 
 pod2 ConcreteTsai::compute_compression_initial_reverse() const {
@@ -87,4 +88,4 @@ double ConcreteTsai::get_parameter(const ParameterType P) const {
     return 0.;
 }
 
-unique_ptr<Material> ConcreteTsai::get_copy() { return make_unique<ConcreteTsai>(*this); }
+unique_ptr<Material> ConcreteTsai::get_copy() { return std::make_unique<ConcreteTsai>(*this); }

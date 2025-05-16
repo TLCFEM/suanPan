@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "AFC.h"
+
 #include <Toolbox/utility.h>
 
 pod2 AFC::compute_transition(const double TX, const double XS, const double YS, const double ES, const double XF, const double YF, const double EF) {
@@ -43,7 +44,7 @@ pod2 AFC::compute_transition(const double TX, const double XS, const double YS, 
     response[0] = YS + TC * (ES + TD);
     response[1] = ES + (R + 1.) * TD;
 
-    suanpan_assert([&] { if(!std::isfinite(response[0]) || !std::isfinite(response[1])) throw invalid_argument("infinite numbers detected"); });
+    suanpan_assert([&] { if(!std::isfinite(response[0]) || !std::isfinite(response[1])) throw std::invalid_argument("infinite numbers detected"); });
 
     return response;
 }
@@ -85,7 +86,7 @@ int AFC::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> AFC::get_copy() { return make_unique<AFC>(*this); }
+unique_ptr<Material> AFC::get_copy() { return std::make_unique<AFC>(*this); }
 
 int AFC::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

@@ -35,7 +35,10 @@ class NM3D1 final : public SectionNM3D {
 public:
     NM3D1(
         unsigned, // tag
-        double, double, double, double
+        double,
+        double,
+        double,
+        double
     );
 
     unique_ptr<Section> get_copy() override;

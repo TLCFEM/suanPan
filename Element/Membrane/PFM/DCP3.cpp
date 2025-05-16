@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "DCP3.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
@@ -113,7 +114,7 @@ int DCP3::clear_status() {
 
 int DCP3::reset_status() { return m_material->reset_status(); }
 
-vector<vec> DCP3::record(const OutputType P) {
+std::vector<vec> DCP3::record(const OutputType P) {
     if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
 
     return m_material->record(P);

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Degradation.h"
+
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 
@@ -126,7 +127,7 @@ int StrainDegradation::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> StrainDegradation::record(const OutputType P) {
+std::vector<vec> StrainDegradation::record(const OutputType P) {
     if(OutputType::DT == P) return {vec{compute_positive_degradation(current_history(0))(0)}};
     if(OutputType::DC == P) return {vec{compute_negative_degradation(current_history(1))(0)}};
 
@@ -192,7 +193,7 @@ int StressDegradation::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> StressDegradation::record(const OutputType P) {
+std::vector<vec> StressDegradation::record(const OutputType P) {
     if(OutputType::DT == P) return {vec{compute_positive_degradation(current_history(0))(0)}};
     if(OutputType::DC == P) return {vec{compute_negative_degradation(current_history(1))(0)}};
 

@@ -43,7 +43,7 @@ class Tag {
 public:
     explicit Tag(unsigned = 0);
     Tag(const Tag&) = default;
-    Tag(Tag&&) = default;
+    Tag(Tag&&) noexcept = default;
     Tag& operator=(const Tag&) = delete;
     Tag& operator=(Tag&&) = delete;
     virtual ~Tag() = default;
@@ -61,6 +61,28 @@ public:
     [[nodiscard]] bool is_guarded() const;
 
     virtual void print();
+};
+
+class CopiableTag : public Tag {
+public:
+    using Tag::Tag;
+
+    CopiableTag(const CopiableTag&) = default;
+    CopiableTag(CopiableTag&&) = delete;
+    CopiableTag& operator=(const CopiableTag&) = delete;
+    CopiableTag& operator=(CopiableTag&&) = delete;
+    ~CopiableTag() override = default;
+};
+
+class UniqueTag : public Tag {
+public:
+    using Tag::Tag;
+
+    UniqueTag(const UniqueTag&) = delete;
+    UniqueTag(UniqueTag&&) = delete;
+    UniqueTag& operator=(const UniqueTag&) = delete;
+    UniqueTag& operator=(UniqueTag&&) = delete;
+    ~UniqueTag() override = default;
 };
 
 #endif

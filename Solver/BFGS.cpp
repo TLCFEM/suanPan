@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "BFGS.h"
+
 #include <Converger/Converger.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
@@ -23,7 +24,7 @@
 
 BFGS::BFGS(const unsigned T, const unsigned MH)
     : Solver(T)
-    , max_hist(std::max(1u, MH)) {}
+    , max_hist(MH) {}
 
 int BFGS::analyze() {
     auto& C = get_converger();
@@ -33,86 +34,93 @@ int BFGS::analyze() {
 
     suanpan_highlight(">> Current Analysis Time: {:.5f}.\n", W->get_trial_time());
 
+    const auto n_size = W->get_size();
+
     const auto max_iteration = C->get_max_iteration();
+    const auto max_storage = 0 == max_hist ? n_size : std::min(max_hist, n_size);
 
     // iteration counter
     auto counter = 0u;
 
-    // lambda alias
-    auto& aux_lambda = W->modify_auxiliary_lambda();
     vec samurai, residual;
 
     // clear container
-    hist_ninja.clear();
-    hist_residual.clear();
-    hist_factor.clear();
+    hist_s.clear();
+    hist_y.clear();
+    hist_rho.clear();
 
-    auto adjust_for_mpc = [&] {
-        if(0 == W->get_mpc()) return SUANPAN_SUCCESS;
-        const auto n_size = W->get_size();
-        auto& border = W->get_auxiliary_stiffness();
-        mat right;
-        if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
-        if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-        samurai -= right * aux_lambda;
-        return SUANPAN_SUCCESS;
-    };
+    wall_clock t_clock;
 
     while(true) {
         set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
 
+        t_clock.tic();
         // update for nodes and elements
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-        // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
-        // assemble resistance
+        D->update<Statistics::UpdateStatus>(t_clock.toc());
+
+        t_clock.tic();
         G->assemble_resistance();
+        D->update<Statistics::AssembleVector>(t_clock.toc());
 
         if(0 == counter) {
+            t_clock.tic();
             // assemble stiffness for the first iteration
             G->assemble_matrix();
+            D->update<Statistics::AssembleMatrix>(t_clock.toc());
+
+            t_clock.tic();
             // process loads and constraints
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
             // indicate the global matrix has been assembled
             G->set_matrix_assembled_switch(true);
+
+            if(0 != W->get_multiplier_size()) {
+                suanpan_error("(L-)BFGS solver does not support constraints implemented via the Lagrange multiplier method.\n");
+                return SUANPAN_FAIL;
+            }
+
+            t_clock.tic();
             // solve the system and commit current displacement increment
             if(SUANPAN_SUCCESS != G->solve(samurai, residual = G->get_force_residual())) return SUANPAN_FAIL;
-            // deal with mpc
-            if(SUANPAN_SUCCESS != adjust_for_mpc()) return SUANPAN_FAIL;
+            D->update<Statistics::SolveSystem>(t_clock.toc());
         }
         else {
+            t_clock.tic();
             // process resistance of loads and constraints
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
+            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
+            t_clock.tic();
+
             // clear temporary factor container
-            alpha.clear();
-            alpha.reserve(hist_ninja.size());
+            hist_alpha.clear();
+            hist_alpha.reserve(hist_s.size());
             // complete residual increment
-            hist_residual.back() -= residual = G->get_force_residual();
+            hist_y.back() -= residual = G->get_force_residual();
             // commit current factor after obtaining residual
-            hist_factor.emplace_back(dot(hist_ninja.back(), hist_residual.back()));
+            hist_rho.emplace_back(dot(hist_s.back(), hist_y.back()));
             // copy current residual to ninja
             samurai = residual;
             // perform two-step recursive loop
             // right side loop
-            for(auto J = static_cast<int>(hist_factor.size()) - 1; J >= 0; --J) {
-                // compute and commit alpha
-                alpha.emplace_back(dot(hist_ninja[J], samurai) / hist_factor[J]);
-                // update ninja
-                samurai -= alpha.back() * hist_residual[J];
-            }
+            for(auto J = static_cast<int>(hist_rho.size()) - 1; J >= 0; --J) samurai -= hist_alpha.emplace_back(dot(hist_s[J], samurai)) / hist_rho[J] * hist_y[J];
             // apply the Hessian from the factorization in the first iteration
             samurai = G->solve(samurai);
-            // deal with mpc
-            if(SUANPAN_SUCCESS != adjust_for_mpc()) return SUANPAN_FAIL;
             // left side loop
-            for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) samurai += (alpha[J] - dot(hist_residual[I], samurai) / hist_factor[I]) * hist_ninja[I];
+            for(size_t I = 0, J = hist_rho.size() - 1; I < hist_rho.size(); ++I, --J) samurai += (hist_alpha[J] - dot(hist_y[I], samurai)) / hist_rho[I] * hist_s[I];
+
+            D->update<Statistics::SolveSystem>(t_clock.toc());
         }
 
         // commit current displacement increment
-        hist_ninja.emplace_back(samurai);     // complete
-        hist_residual.emplace_back(residual); // part of residual increment
+        hist_s.emplace_back(samurai);  // complete
+        hist_y.emplace_back(residual); // part of residual increment
 
         // avoid machine error accumulation
         G->erase_machine_error(samurai);
@@ -137,10 +145,10 @@ int BFGS::analyze() {
         if(D->get_attribute(ModalAttribute::LinearSystem)) return G->sync_status(false);
 
         // check if the maximum record number is hit (L-BFGS)
-        if(counter > max_hist) {
-            hist_ninja.pop_front();
-            hist_residual.pop_front();
-            hist_factor.pop_front();
+        if(counter > max_storage) {
+            hist_s.pop_front();
+            hist_y.pop_front();
+            hist_rho.pop_front();
         }
     }
 }

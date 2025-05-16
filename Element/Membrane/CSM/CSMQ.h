@@ -49,7 +49,7 @@ class CSMQ : public MaterialElement2D {
 
     const double thickness;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     virtual const uvec& get_translation_dof() = 0;
     virtual const uvec& get_rotation_dof() = 0;
@@ -74,7 +74,7 @@ public:
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ConditionalModifier.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Load/Amplitude/Ramp.h>
@@ -28,7 +29,8 @@ uvec ConditionalModifier::get_nodal_active_dof(const shared_ptr<DomainBase>& D) 
     for(const auto I : node_encoding)
         if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
             auto& t_dof = t_node->get_reordered_dof();
-            for(const auto J : dof_reference) if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
+            for(const auto J : dof_reference)
+                if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
         }
 
     return active_dof;
@@ -40,25 +42,23 @@ uvec ConditionalModifier::get_all_nodal_active_dof(const shared_ptr<DomainBase>&
 
     for(const auto& I : D->get_node_pool()) {
         auto& t_dof = I->get_reordered_dof();
-        for(const auto J : dof_reference) if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
+        for(const auto J : dof_reference)
+            if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
     }
 
     return active_dof;
 }
 
 ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D)
-    : Tag(T)
+    : UniqueTag(T)
     , start_step(std::max(1u, ST))
     , amplitude_tag(AT)
     , node_encoding(std::move(N))
     , dof_reference(D - 1) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
-    if(0 == amplitude_tag) magnitude = make_shared<Ramp>(0);
-    else {
-        magnitude = D->get<Amplitude>(amplitude_tag);
-        if(nullptr == magnitude || !magnitude->is_active()) magnitude = make_shared<Ramp>(0);
-    }
+    magnitude = D->get<Amplitude>(amplitude_tag);
+    if(nullptr == magnitude || !magnitude->is_active()) magnitude = std::make_shared<Ramp>(0);
 
     auto start_time = 0.;
     for(const auto& [t_tag, t_step] : D->get_step_pool()) {

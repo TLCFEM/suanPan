@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Optimization.h"
+
 #include <Domain/DomainBase.h>
 #include <Solver/Integrator/Integrator.h>
 

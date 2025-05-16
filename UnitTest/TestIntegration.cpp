@@ -1,5 +1,6 @@
-#include <Toolbox/IntegrationPlan.h>
 #include "CatchHeader.h"
+
+#include <Toolbox/IntegrationPlan.h>
 
 double test_integration(const IntegrationPlan& plan, double (*func)(double)) {
     double result = 0.;

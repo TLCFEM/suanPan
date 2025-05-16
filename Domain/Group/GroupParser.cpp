@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GroupParser.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Group/CustomNodeGroup.h>
 #include <Domain/Group/ElementGroup.h>
@@ -23,46 +24,38 @@
 #include <Domain/Group/NodeGroup.h>
 #include <Toolbox/utility.h>
 
-using std::vector;
-
-void new_nodegroup(unique_ptr<Group>& return_obj, istringstream& command) {
+void new_nodegroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    vector<uword> pool;
-    get_input(command, pool);
-
-    return_obj = make_unique<NodeGroup>(tag, pool);
+    return_obj = std::make_unique<NodeGroup>(tag, get_remaining<uword>(command));
 }
 
-void new_customnodegroup(unique_ptr<Group>& return_obj, istringstream& command) {
+void new_customnodegroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
     unsigned tag, expression;
     if(!get_input(command, tag, expression)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    return_obj = make_unique<CustomNodeGroup>(tag, expression);
+    return_obj = std::make_unique<CustomNodeGroup>(tag, expression);
 }
 
-void new_elementgroup(unique_ptr<Group>& return_obj, istringstream& command) {
+void new_elementgroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    vector<uword> pool;
-    get_input(command, pool);
-
-    return_obj = make_unique<ElementGroup>(tag, pool);
+    return_obj = std::make_unique<ElementGroup>(tag, get_remaining<uword>(command));
 }
 
-void new_generate(unique_ptr<Group>& return_obj, istringstream& command) {
-    string type;
+void new_generate(unique_ptr<Group>& return_obj, std::istringstream& command) {
+    std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid type is required.\n");
         return;
@@ -94,7 +87,7 @@ void new_generate(unique_ptr<Group>& return_obj, istringstream& command) {
     if(start == end) interval = 1;
     else if(start < end && interval < 0 || start > end && interval > 0) interval = -interval;
 
-    vector<uword> tag_pool;
+    std::vector<uword> tag_pool;
 
     tag_pool.reserve(std::max(1, (end - start) / interval + 1));
 
@@ -103,14 +96,14 @@ void new_generate(unique_ptr<Group>& return_obj, istringstream& command) {
         start += interval;
     }
 
-    return_obj = make_unique<NodeGroup>(tag, tag_pool);
+    return_obj = std::make_unique<NodeGroup>(tag, tag_pool);
 
-    if(is_equal(type, "nodegroup")) return_obj = make_unique<NodeGroup>(tag, tag_pool);
-    else if(is_equal(type, "elementgroup")) return_obj = make_unique<ElementGroup>(tag, tag_pool);
+    if(is_equal(type, "nodegroup")) return_obj = std::make_unique<NodeGroup>(tag, tag_pool);
+    else if(is_equal(type, "elementgroup")) return_obj = std::make_unique<ElementGroup>(tag, tag_pool);
 }
 
-void new_generatebyrule(unique_ptr<Group>& return_obj, istringstream& command) {
-    if(string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
+void new_generatebyrule(unique_ptr<Group>& return_obj, std::istringstream& command) {
+    if(std::string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
         suanpan_error("A valid type is required.\n");
         return;
     }
@@ -127,14 +120,11 @@ void new_generatebyrule(unique_ptr<Group>& return_obj, istringstream& command) {
         return;
     }
 
-    vector<double> pool;
-    get_input(command, pool);
-
-    return_obj = make_unique<NodeGroup>(tag, dof, pool);
+    return_obj = std::make_unique<NodeGroup>(tag, dof, get_remaining<double>(command));
 }
 
-void new_generatebyplane(unique_ptr<Group>& return_obj, istringstream& command) {
-    if(string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
+void new_generatebyplane(unique_ptr<Group>& return_obj, std::istringstream& command) {
+    if(std::string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
         suanpan_error("A valid type is required.\n");
         return;
     }
@@ -145,16 +135,15 @@ void new_generatebyplane(unique_ptr<Group>& return_obj, istringstream& command) 
         return;
     }
 
-    vector<double> pool;
-    get_input(command, pool);
+    const auto pool = get_remaining<double>(command);
 
     if(pool.empty()) return;
 
-    return_obj = make_unique<NodeGroup>(tag, pool);
+    return_obj = std::make_unique<NodeGroup>(tag, pool);
 }
 
-void new_generatebypoint(unique_ptr<Group>& return_obj, istringstream& command) {
-    if(string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
+void new_generatebypoint(unique_ptr<Group>& return_obj, std::istringstream& command) {
+    if(std::string type; !get_input(command, type) || !is_equal(type, "nodegroup")) {
         suanpan_error("A valid type is required.\n");
         return;
     }
@@ -165,31 +154,27 @@ void new_generatebypoint(unique_ptr<Group>& return_obj, istringstream& command) 
         return;
     }
 
-    vector<double> pool;
-    get_input(command, pool);
+    const auto pool = get_remaining<double>(command);
 
     if(pool.size() % 2 != 0) return;
 
     const auto size = static_cast<long long>(pool.size()) / 2;
 
-    return_obj = make_unique<NodeGroup>(tag, vector(pool.begin(), pool.begin() + size), vector(pool.end() - size, pool.end()));
+    return_obj = std::make_unique<NodeGroup>(tag, std::vector(pool.begin(), pool.begin() + size), std::vector(pool.end() - size, pool.end()));
 }
 
-void new_groupgroup(unique_ptr<Group>& return_obj, istringstream& command) {
+void new_groupgroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
         return;
     }
 
-    vector<uword> pool;
-    get_input(command, pool);
-
-    return_obj = make_unique<GroupGroup>(tag, pool);
+    return_obj = std::make_unique<GroupGroup>(tag, get_remaining<uword>(command));
 }
 
-int create_new_group(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string group_id;
+int create_new_group(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string group_id;
     if(!get_input(command, group_id)) {
         suanpan_error("A valid group type is required.\n");
         return SUANPAN_SUCCESS;

@@ -20,4 +20,4 @@
 Fibre3D::Fibre3D(const unsigned T, uvec&& ST)
     : Fibre(T, std::move(ST), SectionType::D3) {}
 
-unique_ptr<Section> Fibre3D::get_copy() { return make_unique<Fibre3D>(*this); }
+unique_ptr<Section> Fibre3D::get_copy() { return std::make_unique<Fibre3D>(*this); }

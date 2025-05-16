@@ -38,7 +38,7 @@
 class DomainBase;
 class Amplitude;
 
-class ConditionalModifier : public Tag {
+class ConditionalModifier : public UniqueTag {
 protected:
     const bool initialized = false;
 

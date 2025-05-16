@@ -33,29 +33,23 @@
 #include "../SparseMat.hpp"
 #include "../csr_form.hpp"
 
-#include <mkl_rci.h>
+#include <Toolbox/fgmres.hpp>
 
 template<sp_d T> class SparseMatFGMRES final : public SparseMat<T> {
-    MKL_INT ipar[128]{};
-    double dpar[128]{};
-
-    podarray<double> work;
-
 protected:
     using SparseMat<T>::direct_solve;
 
     int direct_solve(Mat<T>&, const Mat<T>&) override;
 
 public:
-    SparseMatFGMRES(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem) {}
+    using SparseMat<T>::SparseMat;
 
     SparseMatFGMRES(const SparseMatFGMRES& other)
         : SparseMat<T>(other) {}
 
-    SparseMatFGMRES(SparseMatFGMRES&&) noexcept = delete;
+    SparseMatFGMRES(SparseMatFGMRES&&) = delete;
     SparseMatFGMRES& operator=(const SparseMatFGMRES&) = delete;
-    SparseMatFGMRES& operator=(SparseMatFGMRES&&) noexcept = delete;
+    SparseMatFGMRES& operator=(SparseMatFGMRES&&) = delete;
 
     ~SparseMatFGMRES() override = default;
 
@@ -63,62 +57,17 @@ public:
 };
 
 template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
-    const auto N = static_cast<MKL_INT>(B.n_rows);
-    // ReSharper disable once CppRedundantCastExpression
-    const auto R = std::min(static_cast<MKL_INT>(150), N);
+    X.zeros(B.n_rows, B.n_cols);
 
-    work.zeros((2 * R + 1) * N + R * (R + 9) / 2 + 1);
-
-    X = B;
+    csr_form<T, la_it> csr_mat(this->triplet_mat);
 
     const auto precond = this->triplet_mat.diag();
 
-    csr_form<T, int> csr_mat(this->triplet_mat);
+    Col<int> info(B.n_cols);
 
-    MKL_INT info;
+    for(auto I = 0llu; I < B.n_cols; ++I) info[I] = fgmres_solve(csr_mat, precond, X.colptr(I), (double*)B.colptr(I), this->setting.tolerance);
 
-    dfgmres_init(&N, nullptr, nullptr, &info, ipar, dpar, work.memptr());
-    if(0 != info) return info;
-
-    ipar[8] = 1;
-    ipar[9] = 0;
-    ipar[10] = 1; // use preconditioner
-    ipar[11] = 1;
-    dpar[0] = this->setting.tolerance;
-
-    for(auto I = 0llu; I < B.n_cols; ++I) {
-        while(true) {
-            dfgmres(&N, (double*)X.colptr(I), (double*)B.colptr(I), &info, ipar, dpar, work.memptr()); // NOLINT(clang-diagnostic-cast-qual)
-            if(-1 == info || -10 == info || -11 == info || -12 == info) {
-                suanpan_error("Error code {} received.\n", info);
-                return -1;
-            }
-            if(0 == info || 4 == info && dpar[6] <= dpar[0]) {
-                MKL_INT counter;
-                dfgmres_get(&N, (double*)X.colptr(I), (double*)B.colptr(I), &info, ipar, dpar, work.memptr(), &counter); // NOLINT(clang-diagnostic-cast-qual)
-                suanpan_debug("Converged in {} iterations.\n", counter);
-                break;
-            }
-            if(1 == info) {
-                const vec xn(&work[ipar[21] - 1], N);
-                // ReSharper disable once CppInitializedValueIsAlwaysRewritten
-                // ReSharper disable once CppEntityAssignedButNoRead
-                vec yn(&work[ipar[22] - 1], N, false, true);
-                // ReSharper disable once CppDFAUnusedValue
-                yn = csr_mat * xn;
-            }
-            else if(3 == info) {
-                const vec xn(&work[ipar[21] - 1], N);
-                // ReSharper disable once CppInitializedValueIsAlwaysRewritten
-                // ReSharper disable once CppEntityAssignedButNoRead
-                vec yn(&work[ipar[22] - 1], N, false, true);
-                // ReSharper disable once CppDFAUnusedValue
-                yn = xn / precond;
-            }
-        }
-    }
-
-    return info;
+    return info.min();
 }
 
 #endif

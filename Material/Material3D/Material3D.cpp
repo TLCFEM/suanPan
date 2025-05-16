@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "Material3D.h"
+
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
 Material3D::Material3D(const unsigned T, const double R)
     : Material(T, MaterialType::D3, R) {}
 
-vector<vec> Material3D::record(const OutputType P) {
+std::vector<vec> Material3D::record(const OutputType P) {
     if(P == OutputType::S11) return {vec{current_stress(0)}};
     if(P == OutputType::S22) return {vec{current_stress(1)}};
     if(P == OutputType::S33) return {vec{current_stress(2)}};

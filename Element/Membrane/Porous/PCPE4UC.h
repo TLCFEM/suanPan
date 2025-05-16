@@ -50,7 +50,7 @@ class PCPE4UC final : public MaterialElement2D {
 
     mat meta_k;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     PCPE4UC(
@@ -72,7 +72,7 @@ public:
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

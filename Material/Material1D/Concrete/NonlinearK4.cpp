@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearK4.h"
+
 #include <Toolbox/utility.h>
 
 int NonlinearK4::compute_plasticity() {
@@ -208,4 +209,4 @@ ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P
     : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(E * P(6)), fabs(E * P(7))}
     , NonlinearK4(T, E, H, R, FD, FC, OD) {}
 
-unique_ptr<Material> ConcreteK4::get_copy() { return make_unique<ConcreteK4>(*this); }
+unique_ptr<Material> ConcreteK4::get_copy() { return std::make_unique<ConcreteK4>(*this); }

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PCPE8DC.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
@@ -181,14 +182,15 @@ int PCPE8DC::reset_status() {
 
 mat PCPE8DC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> PCPE8DC::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> PCPE8DC::record(const OutputType P) {
+    std::vector<vec> data;
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
         for(const auto& I : int_pt) data.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
     }
-    else for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    else
+        for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 
     return data;
 }

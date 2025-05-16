@@ -105,7 +105,9 @@ public:
     template<sp_d in_dt, sp_i in_it> csr_form& operator=(triplet_form<in_dt, in_it>&);
 
     data_t operator()(const index_t in_row, const index_t in_col) const {
-        if(in_row < n_rows && in_col < n_cols) for(auto I = row_ptr[in_row]; I < row_ptr[in_row + 1]; ++I) if(in_col == col_idx[I]) return val_idx[I];
+        if(in_row < n_rows && in_col < n_cols)
+            for(auto I = row_ptr[in_row]; I < row_ptr[in_row + 1]; ++I)
+                if(in_col == col_idx[I]) return val_idx[I];
         return access::rw(bin) = data_t(0);
     }
 
@@ -177,6 +179,28 @@ template<sp_d data_t, sp_i index_t> void csr_form<data_t, index_t>::print() cons
     }
 }
 
+/**
+ * @brief Constructs a CSR (Compressed Sparse Row) representation of a sparse matrix from a triplet-form matrix.
+ *
+ * @tparam data_t The data type of the values in the sparse matrix.
+ * @tparam index_t The data type of the indices in the sparse matrix.
+ * @tparam in_dt The data type of the input triplet-form matrix values.
+ * @tparam in_it The data type of the input triplet-form matrix indices.
+ * @param in_mat The input matrix in triplet form.
+ * @param base The base for indexing (e.g., 0 for zero-based indexing, 1 for one-based indexing).
+ * @param full A boolean flag indicating whether to include all diagonal entries.
+ *
+ * @details This constructor initializes the CSR representation of a sparse matrix by converting
+ * the input triplet-form matrix. Depending on the `full` parameter, it either fully condenses
+ * the triplet-form matrix or performs a partial condensation. The row pointers, column indices,
+ * and values are computed and stored in the CSR format. The indexing is adjusted based on the
+ * specified base (0 or 1).
+ *
+ * Some sparse solvers require the presence of all diagonal entries in the matrix, even if some are zeros.
+ * The flag `full` indicates whether to include all diagonal entries in the CSR representation.
+ * This is useful to stamp out some weird segfaults.
+ *
+ */
 template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csr_form<data_t, index_t>::csr_form(triplet_form<in_dt, in_it>& in_mat, const SparseBase base, const bool full)
     : n_rows(index_t(in_mat.n_rows))
     , n_cols(index_t(in_mat.n_cols)) {

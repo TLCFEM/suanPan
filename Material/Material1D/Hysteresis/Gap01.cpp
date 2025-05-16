@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Gap01.h"
+
 #include <Toolbox/utility.h>
 
 Gap01::Gap01(const unsigned T, const double E, const double Y, const double G, const double R)
@@ -30,7 +31,7 @@ int Gap01::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Gap01::get_copy() { return make_unique<Gap01>(*this); }
+unique_ptr<Material> Gap01::get_copy() { return std::make_unique<Gap01>(*this); }
 
 int Gap01::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

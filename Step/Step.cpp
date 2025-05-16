@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Step.h"
+
 #include <Converger/RelIncreDisp.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
@@ -31,7 +32,7 @@ void Step::configure_storage_scheme() const {
 }
 
 Step::Step(const unsigned T, const double P)
-    : Tag(T)
+    : UniqueTag(T)
     , time_period(P) {}
 
 int Step::initialize() {
@@ -59,7 +60,7 @@ int Step::initialize() {
     if(solver_tag != 0 && t_domain->find_solver(solver_tag)) solver = t_domain->get_solver(solver_tag);
     else if(const auto [t_tag, step_tag] = t_domain->get_current_solver_tag(); t_tag != 0 && step_tag <= get_tag()) solver = t_domain->get_current_solver();
 
-    if(tester == nullptr) tester = make_shared<RelIncreDisp>();
+    if(nullptr == tester) tester = std::make_shared<RelIncreDisp>();
 
     factory = t_domain->get_factory();
 
@@ -70,9 +71,9 @@ int Step::initialize() {
     return 0;
 }
 
-void Step::set_domain(const weak_ptr<DomainBase>& D) { database = D; }
+void Step::set_domain(const std::weak_ptr<DomainBase>& D) { database = D; }
 
-const weak_ptr<DomainBase>& Step::get_domain() const { return database; }
+const std::weak_ptr<DomainBase>& Step::get_domain() const { return database; }
 
 void Step::set_factory(const shared_ptr<Factory<double>>& F) { factory = F; }
 
@@ -121,7 +122,7 @@ void Step::set_ini_step_size(const double T) {
         ini_step_size = T > time_period ? time_period : T;
         if(const auto t_iteration = static_cast<int>(floor(time_period / ini_step_size)) + 1; t_iteration > static_cast<int>(max_substep) && max_substep != 0) set_max_substep(t_iteration);
     }
-    else ini_step_size = fabs(T); // for arc-length control
+    else ini_step_size = std::fabs(T); // for arc-length control
 }
 
 void Step::set_min_step_size(const double T) { min_step_size = T; }
@@ -140,9 +141,9 @@ void Step::set_tolerance(const double T) { system_setting.tolerance = T; }
 
 void Step::set_refinement(const std::uint8_t T) { system_setting.iterative_refinement = T; }
 
-void Step::set_lis_option(istringstream& T) { system_setting.set_lis_option(T); }
+void Step::set_lis_option(std::istringstream& T) { system_setting.set_lis_option(T); }
 
-void Step::set_magma_option(istringstream& T) { system_setting.set_magma_option(T); }
+void Step::set_option(std::istringstream& T) { system_setting.set_option(T); }
 
 double Step::get_ini_step_size() const { return ini_step_size; }
 

@@ -38,8 +38,6 @@
 
 #include <Material/Material.h>
 
-using std::vector;
-
 class Material2D : public Material {
 public:
     Material2D(
@@ -48,7 +46,7 @@ public:
         double     // density
     );
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 };
 
 #endif

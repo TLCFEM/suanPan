@@ -30,6 +30,7 @@
 #define RIGIDWALLPENALTY_H
 
 #include "Constraint.h"
+
 #include <Domain/NodeHelper.hpp>
 
 class RigidWallPenalty : public Constraint {

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "T2D2.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
@@ -23,7 +24,7 @@ T2D2::T2D2(const unsigned T, uvec&& N, const unsigned M, const double A, const b
     : MaterialElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2})
     , area(A)
     , rigidity(FR)
-    , t_trans(F ? make_unique<T2DC>() : make_unique<T2DL>())
+    , t_trans(F ? std::make_unique<T2DC>() : std::make_unique<T2DL>())
     , update_area(UA)
     , log_strain(LS) {}
 
@@ -74,7 +75,7 @@ int T2D2::update_status() {
         return SUANPAN_FAIL;
     }
 
-    suanpan_assert([&] { if(!trial_stiffness.is_finite() || !trial_resistance.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_stiffness.is_finite() || !trial_resistance.is_finite()) throw std::invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }
@@ -97,7 +98,7 @@ int T2D2::reset_status() {
     return t_material->reset_status();
 }
 
-vector<vec> T2D2::record(const OutputType P) { return t_material->record(P); }
+std::vector<vec> T2D2::record(const OutputType P) { return t_material->record(P); }
 
 void T2D2::print() {
     suanpan_info("A 2D truss element with ");

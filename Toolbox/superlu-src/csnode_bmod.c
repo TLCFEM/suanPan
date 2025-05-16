@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -22,7 +22,7 @@ at the top-level directory.
  *
  * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY
  * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
- * 
+ *
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
@@ -33,39 +33,39 @@ at the top-level directory.
 
 #include "slu_cdefs.h"
 
-/*! \brief Performs numeric block updates within the relaxed snode. 
+/*! \brief Performs numeric block updates within the relaxed snode.
  */
 int csnode_bmod(
-    const int jcol,     /* in */
-    const int jsupno,   /* in */
-    const int fsupc,    /* in */
-    complex* dense,     /* in */
-    complex* tempv,     /* working array */
-    GlobalLU_t* Glu,    /* modified */
-    SuperLUStat_t* stat /* output */
+    const int jcol,       /* in */
+    const int jsupno,     /* in */
+    const int fsupc,      /* in */
+    singlecomplex* dense, /* in */
+    singlecomplex* tempv, /* working array */
+    GlobalLU_t* Glu,      /* modified */
+    SuperLUStat_t* stat   /* output */
 ) {
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
     _fcd ftcs1 = _cptofcd("L", strlen("L")),
-	 ftcs2 = _cptofcd("N", strlen("N")),
-	 ftcs3 = _cptofcd("U", strlen("U"));
+         ftcs2 = _cptofcd("N", strlen("N")),
+         ftcs3 = _cptofcd("U", strlen("U"));
 #endif
-    int            incx = 1, incy = 1;
-    complex         alpha = {-1.0, 0.0},  beta = {1.0, 0.0};
+    int incx = 1, incy = 1;
+    singlecomplex alpha = {-1.0, 0.0}, beta = {1.0, 0.0};
 #endif
 
-    complex comp_zero = {0.0, 0.0};
+    singlecomplex comp_zero = {0.0, 0.0};
     int nsupc, nsupr, nrow;
     int_t isub, irow;
     int_t ufirst, nextlu;
     int_t *lsub, *xlsub;
-    complex* lusup;
+    singlecomplex* lusup;
     int_t *xlusup, luptr;
     flops_t* ops = stat->ops;
 
     lsub = Glu->lsub;
     xlsub = Glu->xlsub;
-    lusup = (complex*)Glu->lusup;
+    lusup = (singlecomplex*)Glu->lusup;
     xlusup = Glu->xlusup;
 
     nextlu = xlusup[jcol];
@@ -87,7 +87,7 @@ int csnode_bmod(
         nsupr = xlsub[fsupc + 1] - xlsub[fsupc];
         nsupc = jcol - fsupc;  /* Excluding jcol */
         ufirst = xlusup[jcol]; /* Points to the beginning of column
-				   jcol in supernode L\U(jsupno). */
+                      jcol in supernode L\U(jsupno). */
         nrow = nsupr - nsupc;
 
         ops[TRSV] += 4 * nsupc * (nsupc - 1);
@@ -95,15 +95,11 @@ int csnode_bmod(
 
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
-	CTRSV( ftcs1, ftcs2, ftcs3, &nsupc, &lusup[luptr], &nsupr, 
-	      &lusup[ufirst], &incx );
-	CGEMV( ftcs2, &nrow, &nsupc, &alpha, &lusup[luptr+nsupc], &nsupr, 
-		&lusup[ufirst], &incx, &beta, &lusup[ufirst+nsupc], &incy );
+        CTRSV(ftcs1, ftcs2, ftcs3, &nsupc, &lusup[luptr], &nsupr, &lusup[ufirst], &incx);
+        CGEMV(ftcs2, &nrow, &nsupc, &alpha, &lusup[luptr + nsupc], &nsupr, &lusup[ufirst], &incx, &beta, &lusup[ufirst + nsupc], &incy);
 #else
-	ctrsv_( "L", "N", "U", &nsupc, &lusup[luptr], &nsupr, 
-	      &lusup[ufirst], &incx );
-	cgemv_( "N", &nrow, &nsupc, &alpha, &lusup[luptr+nsupc], &nsupr, 
-		&lusup[ufirst], &incx, &beta, &lusup[ufirst+nsupc], &incy );
+        ctrsv_("L", "N", "U", &nsupc, &lusup[luptr], &nsupr, &lusup[ufirst], &incx);
+        cgemv_("N", &nrow, &nsupc, &alpha, &lusup[luptr + nsupc], &nsupr, &lusup[ufirst], &incx, &beta, &lusup[ufirst + nsupc], &incy);
 #endif
 #else
         clsolve(nsupr, nsupc, &lusup[luptr], &lusup[ufirst]);

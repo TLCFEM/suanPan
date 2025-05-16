@@ -34,7 +34,7 @@ extern fs::path SUANPAN_OUTPUT;
  * \param H if to use hdf5 format
  */
 Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
-    : Tag(T)
+    : UniqueTag(T)
     , object_tag(std::move(B))
     , variable_type(L)
     , data_pool(object_tag.n_elem)
@@ -74,7 +74,7 @@ void Recorder::clear_status() {
 void Recorder::save() {
     if(time_pool.empty() || data_pool.empty() || data_pool.cbegin()->empty() || data_pool.cbegin()->cbegin()->empty() || data_pool.cbegin()->cbegin()->cbegin()->is_empty()) return;
 
-    ostringstream file_name;
+    std::ostringstream file_name;
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     // ReSharper disable once CppDFAUnreachableCode
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
@@ -89,7 +89,7 @@ void Recorder::save() {
 
         const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-        string group_name = "/";
+        std::string group_name = "/";
         group_name += origin_name;
 
         const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -98,19 +98,21 @@ void Recorder::save() {
             if(s_data_pool.empty()) continue;
 
             auto max_size = 0llu;
-            for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
+            for(const auto& I : s_data_pool[0])
+                if(I.n_elem > max_size) max_size = I.n_elem;
 
             mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size(), fill::zeros);
 
             for(size_t I = 0; I < time_pool.size(); ++I) {
                 data_to_write(0, I) = time_pool[I];
                 unsigned L = 1;
-                for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
+                for(const auto& J : s_data_pool[I])
+                    for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
             }
 
             hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
 
-            ostringstream dataset_name;
+            std::ostringstream dataset_name;
             dataset_name << origin_name.c_str();
             dataset_name << object_tag(idx++);
 
@@ -127,17 +129,19 @@ void Recorder::save() {
             if(s_data_pool.empty()) continue;
 
             auto max_size = 0llu;
-            for(const auto& I : s_data_pool[0]) if(I.n_elem > max_size) max_size = I.n_elem;
+            for(const auto& I : s_data_pool[0])
+                if(I.n_elem > max_size) max_size = I.n_elem;
 
             mat data_to_write(time_pool.size(), s_data_pool.cbegin()->size() * max_size + 1, fill::zeros);
 
             for(size_t I = 0; I < time_pool.size(); ++I) {
                 data_to_write(I, 0) = time_pool[I];
                 auto L = 1u;
-                for(const auto& J : s_data_pool[I]) for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(I, L++) = J[K];
+                for(const auto& J : s_data_pool[I])
+                    for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(I, L++) = J[K];
             }
 
-            ostringstream dataset_name;
+            std::ostringstream dataset_name;
             dataset_name << (SUANPAN_OUTPUT / origin_name).generic_string();
             dataset_name << object_tag(idx++);
 

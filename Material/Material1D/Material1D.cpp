@@ -16,12 +16,13 @@
  ******************************************************************************/
 
 #include "Material1D.h"
+
 #include <Recorder/OutputType.h>
 
 Material1D::Material1D(const unsigned T, const double D)
     : Material(T, MaterialType::D1, D) { set_symmetric(true); }
 
-vector<vec> Material1D::record(const OutputType P) {
+std::vector<vec> Material1D::record(const OutputType P) {
     if(P == OutputType::S11) return {current_stress};
     if(P == OutputType::E11) return {current_strain};
 

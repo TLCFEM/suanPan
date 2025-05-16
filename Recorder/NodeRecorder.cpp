@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NodeRecorder.h"
+
 #include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
@@ -74,19 +75,22 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
         auto& damping_force = D->get_factory()->get_current_damping_force();
         if(damping_force.empty()) return;
 
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({damping_force(t_node->get_reordered_dof())}, I);
+        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
+            if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({damping_force(t_node->get_reordered_dof())}, I);
     }
     else if(OutputType::GIF == get_variable_type()) {
         auto& inertial_force = D->get_factory()->get_current_inertial_force();
         if(inertial_force.empty()) return;
 
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({inertial_force(t_node->get_reordered_dof())}, I);
+        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
+            if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({inertial_force(t_node->get_reordered_dof())}, I);
     }
     else if(OutputType::MM == get_variable_type()) {
         auto& momentum = D->get_factory()->get_momentum();
         if(momentum.empty()) return;
 
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({momentum(t_node->get_reordered_dof())}, I);
+        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
+            if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({momentum(t_node->get_reordered_dof())}, I);
     }
     else if(OutputType::GDF1 == get_variable_type()) insert_damping_force(0);
     else if(OutputType::GDF2 == get_variable_type()) insert_damping_force(1);
@@ -106,7 +110,9 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
     else if(OutputType::MM4 == get_variable_type() || OutputType::MMR1 == get_variable_type()) insert_momentum(DOF::UR1);
     else if(OutputType::MM5 == get_variable_type() || OutputType::MMR2 == get_variable_type()) insert_momentum(DOF::UR2);
     else if(OutputType::MM6 == get_variable_type() || OutputType::MMR3 == get_variable_type()) insert_momentum(DOF::UR3);
-    else for(unsigned I = 0; I < obj_tag.n_elem; ++I) if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert(t_node->record(get_variable_type()), I);
+    else
+        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
+            if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert(t_node->record(get_variable_type()), I);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }

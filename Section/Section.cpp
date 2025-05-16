@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "Section.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
     : DataSection{MT, ST, EC.head(2), A}
-    , Tag(T) {}
+    , CopiableTag(T) {}
 
 SectionType Section::get_section_type() const { return section_type; }
 
@@ -134,7 +135,7 @@ int Section::update_incre_status(const vec& i_deformation) { return update_trial
 
 int Section::update_incre_status(const vec& i_deformation, const vec& i_deformation_rate) { return update_trial_status(current_deformation + i_deformation, current_deformation_rate + i_deformation_rate); }
 
-int Section::update_trial_status(const vec&) { throw invalid_argument("hidden method called"); }
+int Section::update_trial_status(const vec&) { throw std::invalid_argument("hidden method called"); }
 
 int Section::update_trial_status(const vec& t_deformation, const vec&) { return update_trial_status(t_deformation); }
 

@@ -33,18 +33,13 @@
 
 class DomainBase;
 
-class Group : public Tag {
+class Group : public UniqueTag {
 protected:
     uvec pool;
 
 public:
     explicit Group(unsigned);
     Group(unsigned, uvec&&);
-    Group(const Group&) = delete;            // copy forbidden
-    Group(Group&&) = delete;                 // move forbidden
-    Group& operator=(const Group&) = delete; // assign forbidden
-    Group& operator=(Group&&) = delete;      // assign forbidden
-    ~Group() override = default;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 

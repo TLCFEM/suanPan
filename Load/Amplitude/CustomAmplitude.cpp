@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomAmplitude.h"
+
 #include <Domain/DomainBase.h>
 
 CustomAmplitude::CustomAmplitude(const unsigned T, const unsigned ET, const unsigned ST)

@@ -540,7 +540,6 @@
     <ClCompile Include="..\..\..\Toolbox\misc.cpp" />
     <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
-    <ClCompile Include="..\..\..\Toolbox\sync_ostream.cpp" />
     <ClCompile Include="..\..\..\Toolbox\tensor.cpp" />
     <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp" />
@@ -627,7 +626,6 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\MetaMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\operator_times.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp" />
-    <ClInclude Include="..\..\..\Domain\MetaMat\Sparse.Single\SparseMatPARDISO.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\triplet_form.hpp" />
     <ClInclude Include="..\..\..\Domain\Node.h" />
@@ -1022,7 +1020,6 @@
     <ClInclude Include="..\..\..\Toolbox\shape.h" />
     <ClInclude Include="..\..\..\Toolbox\sort_color.hpp" />
     <ClInclude Include="..\..\..\Toolbox\sort_rcm.h" />
-    <ClInclude Include="..\..\..\Toolbox\sync_ostream.h" />
     <ClInclude Include="..\..\..\Toolbox\tensor.h" />
     <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp" />
     <ClInclude Include="..\..\..\Toolbox\utility.h" />

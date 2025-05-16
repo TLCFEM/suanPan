@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SGCMS.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
 #include <Recorder/OutputType.h>
@@ -292,7 +293,8 @@ int SGCMS::update_status() {
     for(const auto& I : int_pt) {
         const vec m_strain = I.BM * m_disp, p_strain = I.BP * p_disp;
 
-        for(const auto& J : I.sec_int_pt) if(J.s_material->update_trial_status(m_strain + J.eccentricity * p_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+        for(const auto& J : I.sec_int_pt)
+            if(J.s_material->update_trial_status(m_strain + J.eccentricity * p_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
         t_stress.zeros();
         t_stiffness.zeros();
@@ -331,25 +333,29 @@ int SGCMS::update_status() {
 
 int SGCMS::commit_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->commit_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.s_material->commit_status();
     return code;
 }
 
 int SGCMS::clear_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->clear_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.s_material->clear_status();
     return code;
 }
 
 int SGCMS::reset_status() {
     auto code = 0;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) code += J.s_material->reset_status();
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) code += J.s_material->reset_status();
     return code;
 }
 
-vector<vec> SGCMS::record(const OutputType P) {
-    vector<vec> data;
-    for(const auto& I : int_pt) for(const auto& J : I.sec_int_pt) append_to(data, J.s_material->record(P));
+std::vector<vec> SGCMS::record(const OutputType P) {
+    std::vector<vec> data;
+    for(const auto& I : int_pt)
+        for(const auto& J : I.sec_int_pt) append_to(data, J.s_material->record(P));
     return data;
 }
 

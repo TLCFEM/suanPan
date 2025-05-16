@@ -41,8 +41,8 @@
 
 class DomainBase;
 
-class Converger : public Tag {
-    weak_ptr<DomainBase> database; /**< pointer to DomainBase */
+class Converger : public CopiableTag {
+    std::weak_ptr<DomainBase> database; /**< pointer to DomainBase */
 
     double tolerance; /**< tolerance */
 
@@ -60,11 +60,6 @@ protected:
 
 public:
     explicit Converger(unsigned = 0, double = 1E-8, unsigned = 10, bool = false);
-    Converger(const Converger&) = default;
-    Converger(Converger&&) = default;
-    Converger& operator=(const Converger&) = delete;
-    Converger& operator=(Converger&&) = delete;
-    ~Converger() override = default;
 
     virtual int initialize();
 
@@ -76,8 +71,8 @@ public:
     void set_max_iteration(unsigned);
     [[nodiscard]] unsigned get_max_iteration() const;
 
-    void set_domain(const weak_ptr<DomainBase>&);
-    [[nodiscard]] const weak_ptr<DomainBase>& get_domain() const;
+    void set_domain(const std::weak_ptr<DomainBase>&);
+    [[nodiscard]] const std::weak_ptr<DomainBase>& get_domain() const;
 
     virtual void set_error(double);
     [[nodiscard]] double get_error() const;

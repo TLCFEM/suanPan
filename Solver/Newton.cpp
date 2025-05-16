@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Newton.h"
+
 #include <Converger/Converger.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
@@ -38,6 +39,8 @@ int Newton::analyze() {
     // iteration counter
     auto counter = 0u;
 
+    inner_product = datum::eps;
+
     vec samurai, pre_samurai;
 
     auto aitken = false;
@@ -47,37 +50,31 @@ int Newton::analyze() {
     while(true) {
         set_step_amplifier(sqrt(max_iteration / (counter + 1.)));
 
-        // update for nodes and elements
         t_clock.tic();
         if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
-        // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         D->update<Statistics::UpdateStatus>(t_clock.toc());
-        // assemble resistance
+
         t_clock.tic();
         G->assemble_resistance();
         D->update<Statistics::AssembleVector>(t_clock.toc());
 
         if((initial_stiffness && counter != 0) || constant_matrix()) {
-            // some loads may have resistance
             t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
-            // some constraints may have resistance
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
             D->update<Statistics::ProcessConstraint>(t_clock.toc());
         }
         else {
-            // first iteration
-            // assemble stiffness
             t_clock.tic();
             G->assemble_matrix();
             D->update<Statistics::AssembleMatrix>(t_clock.toc());
-            // process loads
+
             t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
-            // process constraints
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
             D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
             // indicate the global matrix has been assembled
             G->set_matrix_assembled_switch(true);
         }
@@ -102,16 +99,19 @@ int Newton::analyze() {
             return flag;
         }
 
-        if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
+        inner_product = std::max(inner_product, std::fabs(dot(samurai, residual)));
+
+        if(0u < counter)
+            if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
 
         // deal with mpc
-        if(const auto n_size = W->get_size(); 0 != W->get_mpc()) {
-            auto& border = W->get_auxiliary_stiffness();
-            mat right;
-            if(SUANPAN_SUCCESS != G->solve(right, border)) return SUANPAN_FAIL;
+        if(const auto n_size = W->get_size(); 0 != W->get_multiplier_size()) {
             auto& aux_lambda = W->modify_auxiliary_lambda();
-            if(!solve(aux_lambda, border.t() * right.head_rows(n_size), border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
-            samurai -= right * aux_lambda;
+            auto& aux_border = W->get_auxiliary_stiffness();
+            mat aux_right;
+            if(SUANPAN_SUCCESS != G->solve(aux_right, aux_border)) return SUANPAN_FAIL;
+            if(!solve(aux_lambda, aux_border.t() * aux_right.head_rows(n_size), aux_border.t() * samurai.head(n_size) - G->get_auxiliary_residual())) return SUANPAN_FAIL;
+            samurai -= aux_right * aux_lambda;
         }
 
         D->update<Statistics::SolveSystem>(t_clock.toc());
@@ -160,9 +160,11 @@ void Newton::print() {
 double AICN::amplification(const vec& x, const vec& r) const {
     const auto hessian_norm = dot(x, r);
     if(hessian_norm <= 0.) return 0.;
-    const auto root_norm = l_est * std::sqrt(hessian_norm);
-    const auto amp = (std::sqrt(1. + 2. * root_norm) - 1.) / root_norm;
-    return std::isfinite(amp) ? amp : 0.;
+
+    static constexpr auto ratio = .9;
+    static constexpr auto factor = 2. / ratio * (1. / ratio - 1.);
+
+    return 2. / (std::sqrt(1. + 2. * std::max(l_est, factor / std::sqrt(inner_product)) * std::sqrt(hessian_norm)) + 1.);
 }
 
 AICN::AICN(const unsigned T, const double L)

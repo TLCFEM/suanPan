@@ -1,19 +1,19 @@
 /* mc64ad.f -- translated by f2c (version 20100827).
    You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
+    on Microsoft Windows system, link with libf2c.lib;
+    on Linux or Unix systems, link with .../path/to/libf2c.a -lm
+    or, if you install libf2c.a in a standard place, with -lf2c -lm
+    -- in that order, at the end of the command line, as in
+        cc *.o -lf2c -lm
+    Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
 
-		http://www.netlib.org/f2c/libf2c.zip
+        http://www.netlib.org/f2c/libf2c.zip
 */
 
 #include "slu_ddefs.h"
 
 #define abs(a) ((a) >= 0) ? (a) : -(a)
-#define min(a,b) ((a) < (b)) ? (a) : (b)
+#define min(a, b) ((a) < (b)) ? (a) : (b)
 
 #if 0
 /* Table of constant values */
@@ -49,8 +49,7 @@ static int_t c__2 = 2;
 /* None of the comments from the Copyright notice up to and including this */
 /* one shall be removed or altered in any way. */
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64id_(int_t* icntl) {
+/* Subroutine */ int_t mc64id_(int_t* icntl) {
     int_t i__;
 
     /* *** Copyright (c) 1999  Council for the Central Laboratory of the */
@@ -86,7 +85,7 @@ int_t mc64id_(int_t* icntl) {
     /*     If it is negative, these messages are suppressed. */
 
     /*    ICNTL(4) has default value 0. */
-    /*     If left at the defaut value, the incoming data is checked for */
+    /*     If left at the default value, the incoming data is checked for */
     /*     out-of-range indices and duplicates.  Setting ICNTL(4) to any */
     /*     other will avoid the checks but is likely to cause problems */
     /*     later if out-of-range indices or duplicates are present. */
@@ -111,8 +110,7 @@ int_t mc64id_(int_t* icntl) {
 } /* mc64id_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int_t* num, int* cperm, int_t* liw, int_t* iw, int_t* ldw, double* dw, int_t* icntl, int_t* info) {
+/* Subroutine */ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int_t* num, int* cperm, int_t* liw, int_t* iw, int_t* ldw, double* dw, int_t* icntl, int_t* info) {
     /* System generated locals */
     int_t i__1, i__2;
     double d__1, d__2;
@@ -124,7 +122,11 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
     int_t i__, j, k;
     double fact, rinf;
 
-    extern /* Subroutine */ int_t mc21ad_(int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*), mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* num, int_t* jperm, int_t* pr, int_t* q, int_t* l, double* d__), mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a), mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* numx, int_t* w, int_t* len, int_t* lenl, int_t* lenh, int_t* fc, int_t* iw, int_t* iw4), mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* num, int_t* jperm, int_t* out, int_t* pr, int_t* q, int_t* l, double* u, double* d__);
+    extern /* Subroutine */ int_t mc21ad_(int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*),
+        mc64bd_(int_t * n, int_t * ne, int_t * ip, int_t * irn, double* a, int* iperm, int_t* num, int_t* jperm, int_t* pr, int_t* q, int_t* l, double* d__),
+        mc64rd_(int_t * n, int_t * ne, int_t * ip, int_t * irn, double* a),
+        mc64sd_(int_t * n, int_t * ne, int_t * ip, int_t * irn, double* a, int* iperm, int_t* numx, int_t* w, int_t* len, int_t* lenl, int_t* lenh, int_t* fc, int_t* iw, int_t* iw4),
+        mc64wd_(int_t * n, int_t * ne, int_t * ip, int_t * irn, double* a, int* iperm, int_t* num, int_t* jperm, int_t* out, int_t* pr, int_t* q, int_t* l, double* u, double* d__);
 
     /* *** Copyright (c) 1999  Council for the Central Laboratory of the */
     /*     Research Councils                                             *** */
@@ -323,46 +325,84 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
     if(*job < 1 || *job > 5) {
         info[1] = -1;
         info[2] = *job;
-        if(icntl[1] >= 0) { printf(" ****** Error in MC64A/AD. INFO(1) = %2d" " because JOB = %d\n", (int)info[1], (int)*job); }
+        if(icntl[1] >= 0) {
+            printf(" ****** Error in MC64A/AD. INFO(1) = %2d"
+                   " because JOB = %d\n",
+                   (int)info[1], (int)*job);
+        }
         goto L99;
     }
     /* Check value of N */
     if(*n < 1) {
         info[1] = -2;
         info[2] = *n;
-        if(icntl[1] >= 0) { printf(" ****** Error in MC64A/AD. INFO(1) = %2d" " because N = %d\n", (int)info[1], (int)*job); }
+        if(icntl[1] >= 0) {
+            printf(" ****** Error in MC64A/AD. INFO(1) = %2d"
+                   " because N = %d\n",
+                   (int)info[1], (int)*job);
+        }
         goto L99;
     }
     /* Check value of NE */
     if(*ne < 1) {
         info[1] = -3;
         info[2] = *ne;
-        if(icntl[1] >= 0) { printf(" ****** Error in MC64A/AD. INFO(1) = %2d" " because NE = %d\n", (int)info[1], (int)*job); }
+        if(icntl[1] >= 0) {
+            printf(" ****** Error in MC64A/AD. INFO(1) = %2d"
+                   " because NE = %d\n",
+                   (int)info[1], (int)*job);
+        }
         goto L99;
     }
     /* Check LIW */
-    if(*job == 1) { k = *n * 5; }
-    if(*job == 2) { k = *n << 2; }
-    if(*job == 3) { k = *n * 10 + *ne; }
-    if(*job == 4) { k = *n * 5; }
-    if(*job == 5) { k = *n * 5; }
+    if(*job == 1) {
+        k = *n * 5;
+    }
+    if(*job == 2) {
+        k = *n << 2;
+    }
+    if(*job == 3) {
+        k = *n * 10 + *ne;
+    }
+    if(*job == 4) {
+        k = *n * 5;
+    }
+    if(*job == 5) {
+        k = *n * 5;
+    }
     if(*liw < k) {
         info[1] = -4;
         info[2] = k;
-        if(icntl[1] >= 0) { printf(" ****** Error in MC64A/AD. INFO(1) = %2d" " LIW too small, must be at least %8d\n", (int)info[1], (int)k); }
+        if(icntl[1] >= 0) {
+            printf(" ****** Error in MC64A/AD. INFO(1) = %2d"
+                   " LIW too small, must be at least %8d\n",
+                   (int)info[1], (int)k);
+        }
         goto L99;
     }
     /* Check LDW */
     /* If JOB = 1, do not check */
     if(*job > 1) {
-        if(*job == 2) { k = *n; }
-        if(*job == 3) { k = *ne; }
-        if(*job == 4) { k = (*n << 1) + *ne; }
-        if(*job == 5) { k = *n * 3 + *ne; }
+        if(*job == 2) {
+            k = *n;
+        }
+        if(*job == 3) {
+            k = *ne;
+        }
+        if(*job == 4) {
+            k = (*n << 1) + *ne;
+        }
+        if(*job == 5) {
+            k = *n * 3 + *ne;
+        }
         if(*ldw < k) {
             info[1] = -5;
             info[2] = k;
-            if(icntl[1] >= 0) { printf(" ****** Error in MC64A/AD. INFO(1) = %2d" " LDW too small, must be at least %8d\n", (int)info[1], (int)k); }
+            if(icntl[1] >= 0) {
+                printf(" ****** Error in MC64A/AD. INFO(1) = %2d"
+                       " LDW too small, must be at least %8d\n",
+                       (int)info[1], (int)k);
+            }
             goto L99;
         }
     }
@@ -382,17 +422,28 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
                 if(i__ < 1 || i__ > *n) {
                     info[1] = -6;
                     info[2] = j;
-                    if(icntl[1] >= 0) { printf(" ****** Error in MC64A/AD. INFO(1) = %2d Column %8d" " contains an entry with invalid row index %8d\n", (int)info[1], (int)j, (int)i__); }
+                    if(icntl[1] >= 0) {
+                        printf(" ****** Error in MC64A/AD. INFO(1) = %2d Column %8d"
+                               " contains an entry with invalid row index %8d\n",
+                               (int)info[1], (int)j, (int)i__);
+                    }
                     goto L99;
                 }
                 /* Check for repeated row indices within a column */
                 if(iw[i__] == j) {
                     info[1] = -7;
                     info[2] = j;
-                    if(icntl[1] >= 0) { printf(" ****** Error in MC64A/AD. INFO(1) = %2d" "        Column %8d" " contains two or more entries with row index %8d\n", (int)info[1], (int)j, (int)i__); }
+                    if(icntl[1] >= 0) {
+                        printf(" ****** Error in MC64A/AD. INFO(1) = %2d"
+                               "        Column %8d"
+                               " contains two or more entries with row index %8d\n",
+                               (int)info[1], (int)j, (int)i__);
+                    }
                     goto L99;
                 }
-                else { iw[i__] = j; }
+                else {
+                    iw[i__] = j;
+                }
                 /* L4: */
             }
             /* L6: */
@@ -400,7 +451,9 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
     }
     /* Print diagnostics on input */
     if(icntl[3] >= 0) {
-        printf("  ****** Input parameters for MC64A/AD: JOB = %8d," " N = %d, NE = %8d\n", (int)*job, (int)*n, (int)*ne);
+        printf("  ****** Input parameters for MC64A/AD: JOB = %8d,"
+               " N = %d, NE = %8d\n",
+               (int)*job, (int)*n, (int)*ne);
         printf(" IP(1:N+1)   = ");
         for(j = 1; j <= (*n + 1); ++j) {
             printf("%8d", (int)ip[j]);
@@ -435,7 +488,7 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
             iw[j] = ip[j + 1] - ip[j];
             /* L10: */
         }
-        /* IW(N+1:5N) is workspace */
+/* IW(N+1:5N) is workspace */
 #if 0
 	mc21ad_(n, &irn[1], ne, &ip[1], &iw[1], &cperm[1], num, &iw[*n+1]);
 #else
@@ -470,7 +523,9 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
             fact = 0.;
             i__2 = ip[j + 1] - 1;
             for(k = ip[j]; k <= i__2; ++k) {
-                if((d__1 = a[k], abs(d__1)) > fact) { fact = (d__2 = a[k], abs(d__2)); }
+                if((d__1 = a[k], abs(d__1)) > fact) {
+                    fact = (d__2 = a[k], abs(d__2));
+                }
                 /* L30: */
             }
             i__2 = ip[j + 1] - 1;
@@ -491,16 +546,26 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
             i__2 = ip[j + 1] - 1;
             for(k = ip[j]; k <= i__2; ++k) {
                 dw[*n * 3 + k] = (d__1 = a[k], abs(d__1));
-                if(dw[*n * 3 + k] > fact) { fact = dw[*n * 3 + k]; }
+                if(dw[*n * 3 + k] > fact) {
+                    fact = dw[*n * 3 + k];
+                }
                 /* L60: */
             }
             dw[(*n << 1) + j] = fact;
-            if(fact != 0.) { fact = log(fact); }
-            else { fact = rinf / *n; }
+            if(fact != 0.) {
+                fact = log(fact);
+            }
+            else {
+                fact = rinf / *n;
+            }
             i__2 = ip[j + 1] - 1;
             for(k = ip[j]; k <= i__2; ++k) {
-                if(dw[*n * 3 + k] != 0.) { dw[*n * 3 + k] = fact - log(dw[*n * 3 + k]); }
-                else { dw[*n * 3 + k] = rinf / *n; }
+                if(dw[*n * 3 + k] != 0.) {
+                    dw[*n * 3 + k] = fact - log(dw[*n * 3 + k]);
+                }
+                else {
+                    dw[*n * 3 + k] = rinf / *n;
+                }
                 /* L70: */
             }
             /* L75: */
@@ -510,8 +575,12 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
         if(*num == *n) {
             i__1 = *n;
             for(j = 1; j <= i__1; ++j) {
-                if(dw[(*n << 1) + j] != 0.) { dw[*n + j] -= log(dw[(*n << 1) + j]); }
-                else { dw[*n + j] = 0.; }
+                if(dw[(*n << 1) + j] != 0.) {
+                    dw[*n + j] -= log(dw[(*n << 1) + j]);
+                }
+                else {
+                    dw[*n + j] = 0.;
+                }
                 /* L80: */
             }
         }
@@ -519,21 +588,32 @@ int_t mc64ad_(int_t* job, int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a,
         fact = log(rinf) * .5f;
         i__1 = *n;
         for(j = 1; j <= i__1; ++j) {
-            if(dw[j] < fact && dw[*n + j] < fact) { goto L86; }
+            if(dw[j] < fact && dw[*n + j] < fact) {
+                goto L86;
+            }
             info[1] = 2;
             goto L90;
-        L86: ;
+        L86:;
         }
         /*       GO TO 90 */
     }
-L90: if(info[1] == 0 && *num < *n) {
+L90:
+    if(info[1] == 0 && *num < *n) {
         /* Matrix is structurally singular, return with warning */
         info[1] = 1;
-        if(icntl[2] >= 0) { printf(" ****** Warning from MC64A/AD. INFO(1) = %2d" " The matrix is structurally singular.\n", (int)info[1]); }
+        if(icntl[2] >= 0) {
+            printf(" ****** Warning from MC64A/AD. INFO(1) = %2d"
+                   " The matrix is structurally singular.\n",
+                   (int)info[1]);
+        }
     }
     if(info[1] == 2) {
         /* Scaling factors are large, return with warning */
-        if(icntl[2] >= 0) { printf(" ****** Warning from MC64A/AD. INFO(1) = %2d\n" "        Some scaling factors may be too large.\n", (int)info[1]); }
+        if(icntl[2] >= 0) {
+            printf(" ****** Warning from MC64A/AD. INFO(1) = %2d\n"
+                   "        Some scaling factors may be too large.\n",
+                   (int)info[1]);
+        }
     }
     /* Print diagnostics on output */
     if(icntl[3] >= 0) {
@@ -558,13 +638,13 @@ L90: if(info[1] == 0 && *num < *n) {
             printf("\n");
         }
     }
-    /* Return from subroutine. */
-L99: return 0;
+/* Return from subroutine. */
+L99:
+    return 0;
 } /* mc64ad_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* num, int_t* jperm, int_t* pr, int_t* q, int_t* l, double* d__) {
+/* Subroutine */ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* num, int_t* jperm, int_t* pr, int_t* q, int_t* l, double* d__) {
     /* System generated locals */
     int_t i__1, i__2, i__3;
     double d__1, d__2, d__3;
@@ -585,7 +665,10 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
     double dnew;
     int_t jord, qlen, idum, jdum;
     double rinf;
-    extern /* Subroutine */ int_t mc64dd_(int_t*, int_t*, int_t*, double*, int_t*, int_t*), mc64ed_(int_t*, int_t*, int_t*, double*, int_t*, int_t*), mc64fd_(int_t*, int_t*, int_t*, int_t*, double*, int_t*, int_t*);
+    extern /* Subroutine */ int_t
+    mc64dd_(int_t*, int_t*, int_t*, double*, int_t*, int_t*),
+        mc64ed_(int_t*, int_t*, int_t*, double*, int_t*, int_t*),
+        mc64fd_(int_t*, int_t*, int_t*, int_t*, double*, int_t*, int_t*);
 
     /* *** Copyright (c) 1999  Council for the Central Laboratory of the */
     /*     Research Councils                                             *** */
@@ -646,30 +729,40 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
         for(k = ip[j]; k <= i__2; ++k) {
             i__ = irn[k];
             ai = (d__1 = a[k], abs(d__1));
-            if(ai > d__[i__]) { d__[i__] = ai; }
-            if(jperm[j] != 0) { goto L30; }
+            if(ai > d__[i__]) {
+                d__[i__] = ai;
+            }
+            if(jperm[j] != 0) {
+                goto L30;
+            }
             if(ai >= bv) {
                 a0 = bv;
-                if(iperm[i__] != 0) { goto L30; }
+                if(iperm[i__] != 0) {
+                    goto L30;
+                }
                 jperm[j] = i__;
                 iperm[i__] = j;
                 ++(*num);
             }
             else {
-                if(ai <= a0) { goto L30; }
+                if(ai <= a0) {
+                    goto L30;
+                }
                 a0 = ai;
                 i0 = i__;
             }
-        L30: ;
+        L30:;
         }
         if(a0 != -1. && a0 < bv) {
             bv = a0;
-            if(iperm[i0] != 0) { goto L20; }
+            if(iperm[i0] != 0) {
+                goto L20;
+            }
             iperm[i0] = j;
             jperm[j] = i0;
             ++(*num);
         }
-    L20: ;
+    L20:;
     }
     /* Update BV with smallest of all the largest maximum absolute values */
     /* of the rows. */
@@ -680,42 +773,60 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
         bv = min(d__1, d__2);
         /* L25: */
     }
-    if(*num == *n) { goto L1000; }
+    if(*num == *n) {
+        goto L1000;
+    }
     /* Rescan unassigned columns; improve initial assignment */
     i__1 = *n;
     for(j = 1; j <= i__1; ++j) {
-        if(jperm[j] != 0) { goto L95; }
+        if(jperm[j] != 0) {
+            goto L95;
+        }
         i__2 = ip[j + 1] - 1;
         for(k = ip[j]; k <= i__2; ++k) {
             i__ = irn[k];
             ai = (d__1 = a[k], abs(d__1));
-            if(ai < bv) { goto L50; }
-            if(iperm[i__] == 0) { goto L90; }
+            if(ai < bv) {
+                goto L50;
+            }
+            if(iperm[i__] == 0) {
+                goto L90;
+            }
             jj = iperm[i__];
             kk1 = pr[jj];
             kk2 = ip[jj + 1] - 1;
-            if(kk1 > kk2) { goto L50; }
+            if(kk1 > kk2) {
+                goto L50;
+            }
             i__3 = kk2;
             for(kk = kk1; kk <= i__3; ++kk) {
                 ii = irn[kk];
-                if(iperm[ii] != 0) { goto L70; }
-                if((d__1 = a[kk], abs(d__1)) >= bv) { goto L80; }
-            L70: ;
+                if(iperm[ii] != 0) {
+                    goto L70;
+                }
+                if((d__1 = a[kk], abs(d__1)) >= bv) {
+                    goto L80;
+                }
+            L70:;
             }
             pr[jj] = kk2 + 1;
-        L50: ;
+        L50:;
         }
         goto L95;
-    L80: jperm[jj] = ii;
+    L80:
+        jperm[jj] = ii;
         iperm[ii] = jj;
         pr[jj] = kk + 1;
-    L90: ++(*num);
+    L90:
+        ++(*num);
         jperm[j] = i__;
         iperm[i__] = j;
         pr[j] = k + 1;
-    L95: ;
+    L95:;
     }
-    if(*num == *n) { goto L1000; }
+    if(*num == *n) {
+        goto L1000;
+    }
     /* Prepare for main loop */
     i__1 = *n;
     for(i__ = 1; i__ <= i__1; ++i__) {
@@ -727,7 +838,9 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
     /* algorithm for solving the single source shortest path problem */
     i__1 = *n;
     for(jord = 1; jord <= i__1; ++jord) {
-        if(jperm[jord] != 0) { goto L100; }
+        if(jperm[jord] != 0) {
+            goto L100;
+        }
         qlen = 0;
         low = *n + 1;
         up = *n + 1;
@@ -743,13 +856,17 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
         for(k = ip[j]; k <= i__2; ++k) {
             i__ = irn[k];
             dnew = (d__1 = a[k], abs(d__1));
-            if(csp >= dnew) { goto L115; }
+            if(csp >= dnew) {
+                goto L115;
+            }
             if(iperm[i__] == 0) {
                 /* Row I is unassigned; update shortest path info */
                 csp = dnew;
                 isp = i__;
                 jsp = j;
-                if(csp >= bv) { goto L160; }
+                if(csp >= bv) {
+                    goto L160;
+                }
             }
             else {
                 d__[i__] = dnew;
@@ -767,15 +884,19 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
                 jj = iperm[i__];
                 pr[jj] = j;
             }
-        L115: ;
+        L115:;
         }
         i__2 = *num;
         for(jdum = 1; jdum <= i__2; ++jdum) {
             /* If Q2 is empty, extract new rows from Q */
             if(low == up) {
-                if(qlen == 0) { goto L160; }
+                if(qlen == 0) {
+                    goto L160;
+                }
                 i__ = q[1];
-                if(csp >= d__[i__]) { goto L160; }
+                if(csp >= d__[i__]) {
+                    goto L160;
+                }
                 bv = d__[i__];
                 i__3 = *n;
                 for(idum = 1; idum <= i__3; ++idum) {
@@ -783,15 +904,20 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
                     l[i__] = 0;
                     --low;
                     q[low] = i__;
-                    if(qlen == 0) { goto L153; }
+                    if(qlen == 0) {
+                        goto L153;
+                    }
                     i__ = q[1];
-                    if(d__[i__] != bv) { goto L153; }
+                    if(d__[i__] != bv) {
+                        goto L153;
+                    }
                     /* L152: */
                 }
                 /* End of dummy loop; this point is never reached */
             }
-            /* Move row Q0 */
-        L153: --up;
+        /* Move row Q0 */
+        L153:
+            --up;
             q0 = q[up];
             dq0 = d__[q0];
             l[q0] = up;
@@ -801,25 +927,35 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             for(k = ip[j]; k <= i__3; ++k) {
                 i__ = irn[k];
                 /* Update D(I) */
-                if(l[i__] >= up) { goto L155; }
+                if(l[i__] >= up) {
+                    goto L155;
+                }
                 /* Computing MIN */
                 d__2 = dq0, d__3 = (d__1 = a[k], abs(d__1));
                 dnew = min(d__2, d__3);
-                if(csp >= dnew) { goto L155; }
+                if(csp >= dnew) {
+                    goto L155;
+                }
                 if(iperm[i__] == 0) {
                     /* Row I is unassigned; update shortest path info */
                     csp = dnew;
                     isp = i__;
                     jsp = j;
-                    if(csp >= bv) { goto L160; }
+                    if(csp >= bv) {
+                        goto L160;
+                    }
                 }
                 else {
                     di = d__[i__];
-                    if(di >= bv || di >= dnew) { goto L155; }
+                    if(di >= bv || di >= dnew) {
+                        goto L155;
+                    }
                     d__[i__] = dnew;
                     if(dnew >= bv) {
                         /* Delete row I from Q (if necessary); add row I to Q2 */
-                        if(di != -1.) { mc64fd_(&l[i__], &qlen, n, &q[1], &d__[1], &l[1], &c__1); }
+                        if(di != -1.) {
+                            mc64fd_(&l[i__], &qlen, n, &q[1], &d__[1], &l[1], &c__1);
+                        }
                         l[i__] = 0;
                         --low;
                         q[low] = i__;
@@ -836,12 +972,15 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
                     jj = iperm[i__];
                     pr[jj] = j;
                 }
-            L155: ;
+            L155:;
             }
             /* L150: */
         }
-        /* If CSP = MINONE, no augmenting path is found */
-    L160: if(csp == -1.) { goto L190; }
+    /* If CSP = MINONE, no augmenting path is found */
+    L160:
+        if(csp == -1.) {
+            goto L190;
+        }
         /* Update bottleneck value */
         bv = min(bv, csp);
         /* Find augmenting path by tracing backward in PR; update IPERM,JPERM */
@@ -854,12 +993,15 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             jperm[j] = i__;
             iperm[i__] = j;
             j = pr[j];
-            if(j == -1) { goto L190; }
+            if(j == -1) {
+                goto L190;
+            }
             i__ = i0;
             /* L170: */
         }
-        /* End of dummy loop; this point is never reached */
-    L190: i__2 = *n;
+    /* End of dummy loop; this point is never reached */
+    L190:
+        i__2 = *n;
         for(kk = up; kk <= i__2; ++kk) {
             i__ = q[kk];
             d__[i__] = -1.;
@@ -879,11 +1021,13 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             l[i__] = 0;
             /* L193: */
         }
-    L100: ;
+    L100:;
     }
     /* End of main loop */
     /* BV is bottleneck value of final matching */
-    if(*num == *n) { goto L1000; }
+    if(*num == *n) {
+        goto L1000;
+    }
     /* Matrix is structurally singular, complete IPERM. */
     /* JPERM, PR are work arrays */
     i__1 = *n;
@@ -907,18 +1051,20 @@ int_t mc64bd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
     k = 0;
     i__1 = *n;
     for(i__ = 1; i__ <= i__1; ++i__) {
-        if(jperm[i__] != 0) { goto L320; }
+        if(jperm[i__] != 0) {
+            goto L320;
+        }
         ++k;
         jdum = pr[k];
         iperm[jdum] = i__;
-    L320: ;
+    L320:;
     }
-L1000: return 0;
+L1000:
+    return 0;
 } /* mc64bd_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64dd_(int_t* i__, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway) {
+/* Subroutine */ int_t mc64dd_(int_t* i__, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway) {
     /* System generated locals */
     int_t i__1;
 
@@ -953,10 +1099,14 @@ int_t mc64dd_(int_t* i__, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway
     if(*iway == 1) {
         i__1 = *n;
         for(idum = 1; idum <= i__1; ++idum) {
-            if(pos <= 1) { goto L20; }
+            if(pos <= 1) {
+                goto L20;
+            }
             posk = pos / 2;
             qk = q[posk];
-            if(di <= d__[qk]) { goto L20; }
+            if(di <= d__[qk]) {
+                goto L20;
+            }
             q[pos] = qk;
             l[qk] = pos;
             pos = posk;
@@ -967,10 +1117,14 @@ int_t mc64dd_(int_t* i__, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway
     else {
         i__1 = *n;
         for(idum = 1; idum <= i__1; ++idum) {
-            if(pos <= 1) { goto L20; }
+            if(pos <= 1) {
+                goto L20;
+            }
             posk = pos / 2;
             qk = q[posk];
-            if(di >= d__[qk]) { goto L20; }
+            if(di >= d__[qk]) {
+                goto L20;
+            }
             q[pos] = qk;
             l[qk] = pos;
             pos = posk;
@@ -978,15 +1132,15 @@ int_t mc64dd_(int_t* i__, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway
         }
         /* End of dummy loop; this point is never reached */
     }
-    /* End of dummy if; this point is never reached */
-L20: q[pos] = *i__;
+/* End of dummy if; this point is never reached */
+L20:
+    q[pos] = *i__;
     l[*i__] = pos;
     return 0;
 } /* mc64dd_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64ed_(int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway) {
+/* Subroutine */ int_t mc64ed_(int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway) {
     /* System generated locals */
     int_t i__1;
 
@@ -1023,7 +1177,9 @@ int_t mc64ed_(int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iwa
         i__1 = *n;
         for(idum = 1; idum <= i__1; ++idum) {
             posk = pos << 1;
-            if(posk > *qlen) { goto L20; }
+            if(posk > *qlen) {
+                goto L20;
+            }
             dk = d__[q[posk]];
             if(posk < *qlen) {
                 dr = d__[q[posk + 1]];
@@ -1032,7 +1188,9 @@ int_t mc64ed_(int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iwa
                     dk = dr;
                 }
             }
-            if(di >= dk) { goto L20; }
+            if(di >= dk) {
+                goto L20;
+            }
             /* Exchange old last element with larger priority child */
             q[pos] = q[posk];
             l[q[pos]] = pos;
@@ -1045,7 +1203,9 @@ int_t mc64ed_(int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iwa
         i__1 = *n;
         for(idum = 1; idum <= i__1; ++idum) {
             posk = pos << 1;
-            if(posk > *qlen) { goto L20; }
+            if(posk > *qlen) {
+                goto L20;
+            }
             dk = d__[q[posk]];
             if(posk < *qlen) {
                 dr = d__[q[posk + 1]];
@@ -1054,7 +1214,9 @@ int_t mc64ed_(int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iwa
                     dk = dr;
                 }
             }
-            if(di <= dk) { goto L20; }
+            if(di <= dk) {
+                goto L20;
+            }
             /* Exchange old last element with smaller child */
             q[pos] = q[posk];
             l[q[pos]] = pos;
@@ -1063,15 +1225,15 @@ int_t mc64ed_(int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iwa
         }
         /* End of dummy loop; this point is never reached */
     }
-    /* End of dummy if; this point is never reached */
-L20: q[pos] = i__;
+/* End of dummy if; this point is never reached */
+L20:
+    q[pos] = i__;
     l[i__] = pos;
     return 0;
 } /* mc64ed_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64fd_(int_t* pos0, int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway) {
+/* Subroutine */ int_t mc64fd_(int_t* pos0, int_t* qlen, int_t* n, int_t* q, double* d__, int_t* l, int_t* iway) {
     /* System generated locals */
     int_t i__1;
 
@@ -1112,22 +1274,29 @@ int_t mc64fd_(int_t* pos0, int_t* qlen, int_t* n, int_t* q, double* d__, int_t* 
     if(*iway == 1) {
         i__1 = *n;
         for(idum = 1; idum <= i__1; ++idum) {
-            if(pos <= 1) { goto L20; }
+            if(pos <= 1) {
+                goto L20;
+            }
             posk = pos / 2;
             qk = q[posk];
-            if(di <= d__[qk]) { goto L20; }
+            if(di <= d__[qk]) {
+                goto L20;
+            }
             q[pos] = qk;
             l[qk] = pos;
             pos = posk;
             /* L10: */
         }
-        /* End of dummy loop; this point is never reached */
-    L20: q[pos] = i__;
+    /* End of dummy loop; this point is never reached */
+    L20:
+        q[pos] = i__;
         l[i__] = pos;
         i__1 = *n;
         for(idum = 1; idum <= i__1; ++idum) {
             posk = pos << 1;
-            if(posk > *qlen) { goto L40; }
+            if(posk > *qlen) {
+                goto L40;
+            }
             dk = d__[q[posk]];
             if(posk < *qlen) {
                 dr = d__[q[posk + 1]];
@@ -1136,7 +1305,9 @@ int_t mc64fd_(int_t* pos0, int_t* qlen, int_t* n, int_t* q, double* d__, int_t* 
                     dk = dr;
                 }
             }
-            if(di >= dk) { goto L40; }
+            if(di >= dk) {
+                goto L40;
+            }
             qk = q[posk];
             q[pos] = qk;
             l[qk] = pos;
@@ -1148,22 +1319,29 @@ int_t mc64fd_(int_t* pos0, int_t* qlen, int_t* n, int_t* q, double* d__, int_t* 
     else {
         i__1 = *n;
         for(idum = 1; idum <= i__1; ++idum) {
-            if(pos <= 1) { goto L34; }
+            if(pos <= 1) {
+                goto L34;
+            }
             posk = pos / 2;
             qk = q[posk];
-            if(di >= d__[qk]) { goto L34; }
+            if(di >= d__[qk]) {
+                goto L34;
+            }
             q[pos] = qk;
             l[qk] = pos;
             pos = posk;
             /* L32: */
         }
-        /* End of dummy loop; this point is never reached */
-    L34: q[pos] = i__;
+    /* End of dummy loop; this point is never reached */
+    L34:
+        q[pos] = i__;
         l[i__] = pos;
         i__1 = *n;
         for(idum = 1; idum <= i__1; ++idum) {
             posk = pos << 1;
-            if(posk > *qlen) { goto L40; }
+            if(posk > *qlen) {
+                goto L40;
+            }
             dk = d__[q[posk]];
             if(posk < *qlen) {
                 dr = d__[q[posk + 1]];
@@ -1172,7 +1350,9 @@ int_t mc64fd_(int_t* pos0, int_t* qlen, int_t* n, int_t* q, double* d__, int_t* 
                     dk = dr;
                 }
             }
-            if(di <= dk) { goto L40; }
+            if(di <= dk) {
+                goto L40;
+            }
             qk = q[posk];
             q[pos] = qk;
             l[qk] = pos;
@@ -1181,15 +1361,15 @@ int_t mc64fd_(int_t* pos0, int_t* qlen, int_t* n, int_t* q, double* d__, int_t* 
         }
         /* End of dummy loop; this point is never reached */
     }
-    /* End of dummy if; this point is never reached */
-L40: q[pos] = i__;
+/* End of dummy if; this point is never reached */
+L40:
+    q[pos] = i__;
     l[i__] = pos;
     return 0;
 } /* mc64fd_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a) {
+/* Subroutine */ int_t mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a) {
     /* System generated locals */
     int_t i__1, i__2, i__3;
 
@@ -1224,34 +1404,46 @@ int_t mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a) {
     i__1 = *n;
     for(j = 1; j <= i__1; ++j) {
         len = ip[j + 1] - ip[j];
-        if(len <= 1) { goto L100; }
+        if(len <= 1) {
+            goto L100;
+        }
         ipj = ip[j];
         /* Sort array roughly with partial quicksort */
-        if(len < 15) { goto L400; }
+        if(len < 15) {
+            goto L400;
+        }
         todo[0] = ipj;
         todo[1] = ipj + len;
         td = 2;
-    L500: first = todo[td - 2];
+    L500:
+        first = todo[td - 2];
         last = todo[td - 1];
         /* KEY is the smallest of two values present in interval [FIRST,LAST) */
         key = a[(first + last) / 2];
         i__2 = last - 1;
         for(k = first; k <= i__2; ++k) {
             ha = a[k];
-            if(ha == key) { goto L475; }
-            if(ha > key) { goto L470; }
+            if(ha == key) {
+                goto L475;
+            }
+            if(ha > key) {
+                goto L470;
+            }
             key = ha;
             goto L470;
-        L475: ;
+        L475:;
         }
         /* Only one value found in interval, so it is already sorted */
         td += -2;
         goto L425;
-        /* Reorder interval [FIRST,LAST) such that entries before MID are gt KEY */
-    L470: mid = first;
+    /* Reorder interval [FIRST,LAST) such that entries before MID are gt KEY */
+    L470:
+        mid = first;
         i__2 = last - 1;
         for(k = first; k <= i__2; ++k) {
-            if(a[k] <= key) { goto L450; }
+            if(a[k] <= key) {
+                goto L450;
+            }
             ha = a[mid];
             a[mid] = a[k];
             a[k] = ha;
@@ -1259,7 +1451,7 @@ int_t mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a) {
             irn[mid] = irn[k];
             irn[k] = hi;
             ++mid;
-        L450: ;
+        L450:;
         }
         /* Both subintervals [FIRST,MID), [MID,LAST) are nonempty */
         /* Stack the longest of the two subintervals first */
@@ -1276,14 +1468,20 @@ int_t mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a) {
             todo[td - 2] = mid;
         }
         td += 2;
-    L425: if(td == 0) { goto L400; }
+    L425:
+        if(td == 0) {
+            goto L400;
+        }
         /* There is still work to be done */
-        if(todo[td - 1] - todo[td - 2] >= 15) { goto L500; }
+        if(todo[td - 1] - todo[td - 2] >= 15) {
+            goto L500;
+        }
         /* Next interval is already short enough for straightforward insertion */
         td += -2;
         goto L425;
-        /* Complete sorting with straightforward insertion */
-    L400: i__2 = ipj + len - 1;
+    /* Complete sorting with straightforward insertion */
+    L400:
+        i__2 = ipj + len - 1;
         for(r__ = ipj + 1; r__ <= i__2; ++r__) {
             if(a[r__ - 1] < a[r__]) {
                 ha = a[r__];
@@ -1306,16 +1504,15 @@ int_t mc64rd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a) {
                 a[ipj] = ha;
                 irn[ipj] = hi;
             }
-        L200: ;
+        L200:;
         }
-    L100: ;
+    L100:;
     }
     return 0;
 } /* mc64rd_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* numx, int_t* w, int_t* len, int_t* lenl, int_t* lenh, int_t* fc, int_t* iw, int_t* iw4) {
+/* Subroutine */ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* numx, int_t* w, int_t* len, int_t* lenl, int_t* lenh, int_t* fc, int_t* iw, int_t* iw4) {
     /* System generated locals */
     int_t i__1, i__2, i__3, i__4;
 
@@ -1323,7 +1520,9 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
     int_t i__, j, k, l, ii, mod, cnt, num;
     double bval, bmin, bmax, rinf;
     int_t nval, wlen, idum1, idum2, idum3;
-    extern /* Subroutine */ int_t mc64qd_(int_t*, int_t*, int_t*, int_t*, int_t*, double*, int_t*, double*), mc64ud_(int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*);
+    extern /* Subroutine */ int_t
+    mc64qd_(int_t*, int_t*, int_t*, int_t*, int_t*, double*, int_t*, double*),
+        mc64ud_(int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*, int_t*);
 
     /* *** Copyright (c) 1999  Council for the Central Laboratory of the */
     /*     Research Councils                                             *** */
@@ -1413,10 +1612,14 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             bval = 0.f;
             i__2 = ip[j + 1] - 1;
             for(k = ip[j]; k <= i__2; ++k) {
-                if(a[k] > bval) { bval = a[k]; }
+                if(a[k] > bval) {
+                    bval = a[k];
+                }
                 /* L25: */
             }
-            if(bval < bmax) { bmax = bval; }
+            if(bval < bmax) {
+                bmax = bval;
+            }
             /* L30: */
         }
         bmax *= 1.001f;
@@ -1435,17 +1638,22 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
         len[j] = l;
         i__2 = ip[j + 1] - 1;
         for(k = ip[j]; k <= i__2; ++k) {
-            if(a[k] < bmax) { goto L46; }
+            if(a[k] < bmax) {
+                goto L46;
+            }
             /* L45: */
         }
         /* Column J is empty or all entries are ge BMAX */
         k = ip[j + 1];
-    L46: lenl[j] = k - ip[j];
+    L46:
+        lenl[j] = k - ip[j];
         /* Add J to W if LENL(J) ne LENH(J) */
-        if(lenl[j] == l) { goto L48; }
+        if(lenl[j] == l) {
+            goto L48;
+        }
         ++wlen;
         w[wlen] = j;
-    L48: ;
+    L48:;
     }
     /* Main loop */
     i__1 = *ne;
@@ -1461,30 +1669,41 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             i__2 = *ne;
             for(idum2 = 1; idum2 <= i__2; ++idum2) {
                 bmin = bval;
-                if(bmax == bmin) { goto L99; }
+                if(bmax == bmin) {
+                    goto L99;
+                }
                 /* Find splitting value BVAL */
                 mc64qd_(&ip[1], &lenl[1], &len[1], &w[1], &wlen, &a[1], &nval, &bval);
-                if(nval <= 1) { goto L99; }
+                if(nval <= 1) {
+                    goto L99;
+                }
                 /* Set LEN such that all matrix entries with value lt BVAL are */
                 /* discarded. Store old LEN in LENH. Do this for all columns W(K). */
                 /* Each step, either K is incremented or WLEN is decremented. */
                 k = 1;
                 i__3 = *n;
                 for(idum3 = 1; idum3 <= i__3; ++idum3) {
-                    if(k > wlen) { goto L71; }
+                    if(k > wlen) {
+                        goto L71;
+                    }
                     j = w[k];
                     i__4 = ip[j] + lenl[j];
                     for(ii = ip[j] + len[j] - 1; ii >= i__4; --ii) {
-                        if(a[ii] >= bval) { goto L60; }
+                        if(a[ii] >= bval) {
+                            goto L60;
+                        }
                         i__ = irn[ii];
-                        if(iw[i__] != j) { goto L55; }
+                        if(iw[i__] != j) {
+                            goto L55;
+                        }
                         /* Remove entry from matching */
                         iw[i__] = 0;
                         --num;
                         fc[*n - num] = j;
-                    L55: ;
+                    L55:;
                     }
-                L60: lenh[j] = len[j];
+                L60:
+                    lenh[j] = len[j];
                     /* IP(J)+LEN(J)-1 is last entry in column ge BVAL */
                     len[j] = ii - ip[j] + 1;
                     /* If LENH(J) = LENL(J), remove J from W */
@@ -1492,15 +1711,21 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
                         w[k] = w[wlen];
                         --wlen;
                     }
-                    else { ++k; }
+                    else {
+                        ++k;
+                    }
                     /* L70: */
                 }
-            L71: if(num < *numx) { goto L81; }
+            L71:
+                if(num < *numx) {
+                    goto L81;
+                }
                 /* L80: */
             }
-            /* End of dummy loop; this point is never reached */
-            /* Set mode for next call to MC64U/UD */
-        L81: mod = 1;
+        /* End of dummy loop; this point is never reached */
+        /* Set mode for next call to MC64U/UD */
+        L81:
+            mod = 1;
         }
         else {
             /* We do not have a maximum matching in IW. */
@@ -1510,41 +1735,54 @@ int_t mc64sd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             /*          IF (BMAX .EQ. BMIN) GO TO 99 */
             /* Find splitting value BVAL */
             mc64qd_(&ip[1], &len[1], &lenh[1], &w[1], &wlen, &a[1], &nval, &bval);
-            if(nval == 0 || bval == bmin) { goto L99; }
+            if(nval == 0 || bval == bmin) {
+                goto L99;
+            }
             /* Set LEN such that all matrix entries with value ge BVAL are */
             /* inside matrix. Store old LEN in LENL. Do this for all columns W(K). */
             /* Each step, either K is incremented or WLEN is decremented. */
             k = 1;
             i__2 = *n;
             for(idum3 = 1; idum3 <= i__2; ++idum3) {
-                if(k > wlen) { goto L88; }
+                if(k > wlen) {
+                    goto L88;
+                }
                 j = w[k];
                 i__3 = ip[j] + lenh[j] - 1;
                 for(ii = ip[j] + len[j]; ii <= i__3; ++ii) {
-                    if(a[ii] < bval) { goto L86; }
+                    if(a[ii] < bval) {
+                        goto L86;
+                    }
                     /* L85: */
                 }
-            L86: lenl[j] = len[j];
+            L86:
+                lenl[j] = len[j];
                 len[j] = ii - ip[j];
                 if(lenl[j] == lenh[j]) {
                     w[k] = w[wlen];
                     --wlen;
                 }
-                else { ++k; }
+                else {
+                    ++k;
+                }
                 /* L87: */
             }
-            /* End of dummy loop; this point is never reached */
-            /* Set mode for next call to MC64U/UD */
-        L88: mod = 0;
+        /* End of dummy loop; this point is never reached */
+        /* Set mode for next call to MC64U/UD */
+        L88:
+            mod = 0;
         }
         ++cnt;
         mc64ud_(&cnt, &mod, n, &irn[1], ne, &ip[1], &len[1], &fc[1], &iw[1], &num, numx, &iw4[1], &iw4[*n + 1], &iw4[(*n << 1) + 1], &iw4[*n * 3 + 1]);
         /* IW contains maximum matching of length NUM */
         /* L90: */
     }
-    /* End of dummy loop; this point is never reached */
-    /* BMIN is bottleneck value of final matching */
-L99: if(*numx == *n) { goto L1000; }
+/* End of dummy loop; this point is never reached */
+/* BMIN is bottleneck value of final matching */
+L99:
+    if(*numx == *n) {
+        goto L1000;
+    }
     /* The matrix is structurally singular, complete IPERM */
     /* W, IW are work arrays */
     i__1 = *n;
@@ -1568,18 +1806,20 @@ L99: if(*numx == *n) { goto L1000; }
     k = 0;
     i__1 = *n;
     for(j = 1; j <= i__1; ++j) {
-        if(w[j] != 0) { goto L320; }
+        if(w[j] != 0) {
+            goto L320;
+        }
         ++k;
         idum1 = iw[k];
         iperm[idum1] = j;
-    L320: ;
+    L320:;
     }
-L1000: return 0;
+L1000:
+    return 0;
 } /* mc64sd_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64qd_(int_t* ip, int_t* lenl, int_t* lenh, int_t* w, int_t* wlen, double* a, int_t* nval, double* val) {
+/* Subroutine */ int_t mc64qd_(int_t* ip, int_t* lenl, int_t* lenh, int_t* w, int_t* wlen, double* a, int_t* nval, double* val) {
     /* System generated locals */
     int_t i__1, i__2, i__3;
 
@@ -1633,7 +1873,9 @@ int_t mc64qd_(int_t* ip, int_t* lenl, int_t* lenh, int_t* w, int_t* wlen, double
             else {
                 /* Check presence of HA in SPLIT */
                 for(s = *nval; s >= 1; --s) {
-                    if(split[s - 1] == ha) { goto L15; }
+                    if(split[s - 1] == ha) {
+                        goto L15;
+                    }
                     if(split[s - 1] > ha) {
                         pos = s + 1;
                         goto L21;
@@ -1641,8 +1883,9 @@ int_t mc64qd_(int_t* ip, int_t* lenl, int_t* lenh, int_t* w, int_t* wlen, double
                     /* L20: */
                 }
                 pos = 1;
-                /* The insertion */
-            L21: i__3 = pos;
+            /* The insertion */
+            L21:
+                i__3 = pos;
                 for(s = *nval; s >= i__3; --s) {
                     split[s] = split[s - 1];
                     /* L22: */
@@ -1651,24 +1894,29 @@ int_t mc64qd_(int_t* ip, int_t* lenl, int_t* lenh, int_t* w, int_t* wlen, double
                 ++(*nval);
             }
             /* Exit loop if XX values are found */
-            if(*nval == 10) { goto L11; }
-        L15: ;
+            if(*nval == 10) {
+                goto L11;
+            }
+        L15:;
         }
         /* L10: */
     }
-    /* Determine VAL */
-L11: if(*nval > 0) { *val = split[(*nval + 1) / 2 - 1]; }
+/* Determine VAL */
+L11:
+    if(*nval > 0) {
+        *val = split[(*nval + 1) / 2 - 1];
+    }
     return 0;
 } /* mc64qd_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64ud_(int_t* id, int_t* mod, int_t* n, int_t* irn, int_t* lirn, int_t* ip, int_t* lenc, int_t* fc, int_t* iperm, int_t* num, int_t* numx, int_t* pr, int_t* arp, int_t* cv, int_t* out) {
+/* Subroutine */ int_t mc64ud_(int_t* id, int_t* mod, int_t* n, int_t* irn, int_t* lirn, int_t* ip, int_t* lenc, int_t* fc, int_t* iperm, int_t* num, int_t* numx, int_t* pr, int_t* arp, int_t* cv, int_t* out) {
     /* System generated locals */
     int_t i__1, i__2, i__3, i__4;
 
     /* Local variables */
-    int_t i__, j, k, j1, ii, kk, id0, id1, in1, in2, nfc, num0, num1, num2, jord, last;
+    int_t i__, j, k, j1, ii, kk, id0, id1, in1, in2, nfc, num0, num1, num2,
+        jord, last;
 
     /* *** Copyright (c) 1999  Council for the Central Laboratory of the */
     /*     Research Councils                                             *** */
@@ -1752,31 +2000,40 @@ int_t mc64ud_(int_t* id, int_t* mod, int_t* n, int_t* irn, int_t* lirn, int_t* i
         i__2 = jord;
         for(k = 1; k <= i__2; ++k) {
             /* Look for a cheap assignment */
-            if(arp[j] >= lenc[j]) { goto L30; }
+            if(arp[j] >= lenc[j]) {
+                goto L30;
+            }
             in1 = ip[j] + arp[j];
             in2 = ip[j] + lenc[j] - 1;
             i__3 = in2;
             for(ii = in1; ii <= i__3; ++ii) {
                 i__ = irn[ii];
-                if(iperm[i__] == 0) { goto L80; }
+                if(iperm[i__] == 0) {
+                    goto L80;
+                }
                 /* L20: */
             }
             /* No cheap assignment in row */
             arp[j] = lenc[j];
-            /* Begin looking for assignment chain starting with row J */
-        L30: out[j] = lenc[j] - 1;
+        /* Begin looking for assignment chain starting with row J */
+        L30:
+            out[j] = lenc[j] - 1;
             /* Inner loop.  Extends chain by one or backtracks */
             i__3 = jord;
             for(kk = 1; kk <= i__3; ++kk) {
                 in1 = out[j];
-                if(in1 < 0) { goto L50; }
+                if(in1 < 0) {
+                    goto L50;
+                }
                 in2 = ip[j] + lenc[j] - 1;
                 in1 = in2 - in1;
                 /* Forward scan */
                 i__4 = in2;
                 for(ii = in1; ii <= i__4; ++ii) {
                     i__ = irn[ii];
-                    if(cv[i__] == id1) { goto L40; }
+                    if(cv[i__] == id1) {
+                        goto L40;
+                    }
                     /* Column J has not yet been accessed during this pass */
                     j1 = j;
                     j = iperm[i__];
@@ -1784,10 +2041,11 @@ int_t mc64ud_(int_t* id, int_t* mod, int_t* n, int_t* irn, int_t* lirn, int_t* i
                     pr[j] = j1;
                     out[j1] = in2 - ii - 1;
                     goto L70;
-                L40: ;
+                L40:;
                 }
-                /* Backtracking step. */
-            L50: j1 = pr[j];
+            /* Backtracking step. */
+            L50:
+                j1 = pr[j];
                 if(j1 == -1) {
                     /* No augmenting path exists for column J. */
                     ++nfc;
@@ -1802,37 +2060,42 @@ int_t mc64ud_(int_t* id, int_t* mod, int_t* n, int_t* irn, int_t* lirn, int_t* i
                 j = j1;
                 /* L60: */
             }
-            /* End of dummy loop; this point is never reached */
-        L70: ;
-        }
         /* End of dummy loop; this point is never reached */
-        /* New assignment is made. */
-    L80: iperm[i__] = j;
+        L70:;
+        }
+    /* End of dummy loop; this point is never reached */
+    /* New assignment is made. */
+    L80:
+        iperm[i__] = j;
         arp[j] = ii - ip[j] + 1;
         ++(*num);
         i__2 = jord;
         for(k = 1; k <= i__2; ++k) {
             j = pr[j];
-            if(j == -1) { goto L95; }
+            if(j == -1) {
+                goto L95;
+            }
             ii = ip[j] + lenc[j] - out[j] - 2;
             i__ = irn[ii];
             iperm[i__] = j;
             /* L90: */
         }
-        /* End of dummy loop; this point is never reached */
-    L95: if(*num == num1) {
+    /* End of dummy loop; this point is never reached */
+    L95:
+        if(*num == num1) {
             /* A matching of maximum size NUM1 is found */
             last = jord;
             goto L101;
         }
 
-    L100: ;
+    L100:;
     }
     /* All unassigned columns have been considered */
     last = *n;
-    /* Now, a transversal is computed or is not possible. */
-    /* Complete FC before returning. */
-L101: i__1 = *n;
+/* Now, a transversal is computed or is not possible. */
+/* Complete FC before returning. */
+L101:
+    i__1 = *n;
     for(jord = last + 1; jord <= i__1; ++jord) {
         ++nfc;
         fc[nfc] = fc[jord - num0];
@@ -1843,8 +2106,7 @@ L101: i__1 = *n;
 } /* mc64ud_ */
 
 /* ********************************************************************** */
-/* Subroutine */
-int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* num, int_t* jperm, int_t* out, int_t* pr, int_t* q, int_t* l, double* u, double* d__) {
+/* Subroutine */ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm, int_t* num, int_t* jperm, int_t* out, int_t* pr, int_t* q, int_t* l, double* u, double* d__) {
     /* System generated locals */
     int_t i__1, i__2, i__3, c__2 = 2;
 
@@ -1861,7 +2123,10 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
     double dmin__, dnew;
     int_t jord, qlen, jdum;
     double rinf;
-    extern /* Subroutine */ int_t mc64dd_(int_t*, int_t*, int_t*, double*, int_t*, int_t*), mc64ed_(int_t*, int_t*, int_t*, double*, int_t*, int_t*), mc64fd_(int_t*, int_t*, int_t*, int_t*, double*, int_t*, int_t*);
+    extern /* Subroutine */ int_t
+    mc64dd_(int_t*, int_t*, int_t*, double*, int_t*, int_t*),
+        mc64ed_(int_t*, int_t*, int_t*, double*, int_t*, int_t*),
+        mc64fd_(int_t*, int_t*, int_t*, int_t*, double*, int_t*, int_t*);
 
     /* *** Copyright (c) 1999  Council for the Central Laboratory of the */
     /*     Research Councils                                             *** */
@@ -1931,84 +2196,117 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
         i__2 = ip[j + 1] - 1;
         for(k = ip[j]; k <= i__2; ++k) {
             i__ = irn[k];
-            if(a[k] > u[i__]) { goto L20; }
+            if(a[k] > u[i__]) {
+                goto L20;
+            }
             u[i__] = a[k];
             iperm[i__] = j;
             l[i__] = k;
-        L20: ;
+        L20:;
         }
         /* L30: */
     }
     i__1 = *n;
     for(i__ = 1; i__ <= i__1; ++i__) {
         j = iperm[i__];
-        if(j == 0) { goto L40; }
+        if(j == 0) {
+            goto L40;
+        }
         /* Row I is not empty */
         iperm[i__] = 0;
-        if(jperm[j] != 0) { goto L40; }
+        if(jperm[j] != 0) {
+            goto L40;
+        }
         /* Assignment of column J to row I */
         ++(*num);
         iperm[i__] = j;
         jperm[j] = l[i__];
-    L40: ;
+    L40:;
     }
-    if(*num == *n) { goto L1000; }
+    if(*num == *n) {
+        goto L1000;
+    }
     /* Scan unassigned columns; improve assignment */
     i__1 = *n;
     for(j = 1; j <= i__1; ++j) {
         /* JPERM(J) ne 0 iff column J is already assigned */
-        if(jperm[j] != 0) { goto L95; }
+        if(jperm[j] != 0) {
+            goto L95;
+        }
         k1 = ip[j];
         k2 = ip[j + 1] - 1;
         /* Continue only if column J is not empty */
-        if(k1 > k2) { goto L95; }
+        if(k1 > k2) {
+            goto L95;
+        }
         vj = rinf;
         i__2 = k2;
         for(k = k1; k <= i__2; ++k) {
             i__ = irn[k];
             di = a[k] - u[i__];
-            if(di > vj) { goto L50; }
-            if(di < vj || di == rinf) { goto L55; }
-            if(iperm[i__] != 0 || iperm[i0] == 0) { goto L50; }
-        L55: vj = di;
+            if(di > vj) {
+                goto L50;
+            }
+            if(di < vj || di == rinf) {
+                goto L55;
+            }
+            if(iperm[i__] != 0 || iperm[i0] == 0) {
+                goto L50;
+            }
+        L55:
+            vj = di;
             i0 = i__;
             k0 = k;
-        L50: ;
+        L50:;
         }
         d__[j] = vj;
         k = k0;
         i__ = i0;
-        if(iperm[i__] == 0) { goto L90; }
+        if(iperm[i__] == 0) {
+            goto L90;
+        }
         i__2 = k2;
         for(k = k0; k <= i__2; ++k) {
             i__ = irn[k];
-            if(a[k] - u[i__] > vj) { goto L60; }
+            if(a[k] - u[i__] > vj) {
+                goto L60;
+            }
             jj = iperm[i__];
             /* Scan remaining part of assigned column JJ */
             kk1 = pr[jj];
             kk2 = ip[jj + 1] - 1;
-            if(kk1 > kk2) { goto L60; }
+            if(kk1 > kk2) {
+                goto L60;
+            }
             i__3 = kk2;
             for(kk = kk1; kk <= i__3; ++kk) {
                 ii = irn[kk];
-                if(iperm[ii] > 0) { goto L70; }
-                if(a[kk] - u[ii] <= d__[jj]) { goto L80; }
-            L70: ;
+                if(iperm[ii] > 0) {
+                    goto L70;
+                }
+                if(a[kk] - u[ii] <= d__[jj]) {
+                    goto L80;
+                }
+            L70:;
             }
             pr[jj] = kk2 + 1;
-        L60: ;
+        L60:;
         }
         goto L95;
-    L80: jperm[jj] = kk;
+    L80:
+        jperm[jj] = kk;
         iperm[ii] = jj;
         pr[jj] = kk + 1;
-    L90: ++(*num);
+    L90:
+        ++(*num);
         jperm[j] = k;
         iperm[i__] = j;
         pr[j] = k + 1;
-    L95: ;
+    L95:;
     }
-    if(*num == *n) { goto L1000; }
+    if(*num == *n) {
+        goto L1000;
+    }
     /* Prepare for main loop */
     i__1 = *n;
     for(i__ = 1; i__ <= i__1; ++i__) {
@@ -2020,7 +2318,9 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
     /* algorithm for solving the single source shortest path problem */
     i__1 = *n;
     for(jord = 1; jord <= i__1; ++jord) {
-        if(jperm[jord] != 0) { goto L100; }
+        if(jperm[jord] != 0) {
+            goto L100;
+        }
         /* JORD is next unmatched column */
         /* DMIN is the length of shortest path in the tree */
         dmin__ = rinf;
@@ -2038,19 +2338,23 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
         for(k = ip[j]; k <= i__2; ++k) {
             i__ = irn[k];
             dnew = a[k] - u[i__];
-            if(dnew >= csp) { goto L115; }
+            if(dnew >= csp) {
+                goto L115;
+            }
             if(iperm[i__] == 0) {
                 csp = dnew;
                 isp = k;
                 jsp = j;
             }
             else {
-                if(dnew < dmin__) { dmin__ = dnew; }
+                if(dnew < dmin__) {
+                    dmin__ = dnew;
+                }
                 d__[i__] = dnew;
                 ++qlen;
                 q[qlen] = k;
             }
-        L115: ;
+        L115:;
         }
         /* Initialize heap Q and Q2 with rows held in Q(1:QLEN) */
         q0 = qlen;
@@ -2077,30 +2381,42 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             jj = iperm[i__];
             out[jj] = k;
             pr[jj] = j;
-        L120: ;
+        L120:;
         }
         i__2 = *num;
         for(jdum = 1; jdum <= i__2; ++jdum) {
             /* If Q2 is empty, extract rows from Q */
             if(low == up) {
-                if(qlen == 0) { goto L160; }
+                if(qlen == 0) {
+                    goto L160;
+                }
                 i__ = q[1];
-                if(d__[i__] >= csp) { goto L160; }
+                if(d__[i__] >= csp) {
+                    goto L160;
+                }
                 dmin__ = d__[i__];
-            L152: mc64ed_(&qlen, n, &q[1], &d__[1], &l[1], &c__2);
+            L152:
+                mc64ed_(&qlen, n, &q[1], &d__[1], &l[1], &c__2);
                 --low;
                 q[low] = i__;
                 l[i__] = low;
-                if(qlen == 0) { goto L153; }
+                if(qlen == 0) {
+                    goto L153;
+                }
                 i__ = q[1];
-                if(d__[i__] > dmin__) { goto L153; }
+                if(d__[i__] > dmin__) {
+                    goto L153;
+                }
                 goto L152;
             }
-            /* Q0 is row whose distance D(Q0) to the root is smallest */
-        L153: q0 = q[up - 1];
+        /* Q0 is row whose distance D(Q0) to the root is smallest */
+        L153:
+            q0 = q[up - 1];
             dq0 = d__[q0];
             /* Exit loop if path to Q0 is longer than the shortest augmenting path */
-            if(dq0 >= csp) { goto L160; }
+            if(dq0 >= csp) {
+                goto L160;
+            }
             --up;
             /* Scan column that matches with row Q0 */
             j = iperm[q0];
@@ -2108,11 +2424,15 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             i__3 = ip[j + 1] - 1;
             for(k = ip[j]; k <= i__3; ++k) {
                 i__ = irn[k];
-                if(l[i__] >= up) { goto L155; }
+                if(l[i__] >= up) {
+                    goto L155;
+                }
                 /* DNEW is new cost */
                 dnew = vj + a[k] - u[i__];
                 /* Do not update D(I) if DNEW ge cost of shortest path */
-                if(dnew >= csp) { goto L155; }
+                if(dnew >= csp) {
+                    goto L155;
+                }
                 if(iperm[i__] == 0) {
                     /* Row I is unmatched; update shortest path info */
                     csp = dnew;
@@ -2122,11 +2442,17 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
                 else {
                     /* Row I is matched; do not update D(I) if DNEW is larger */
                     di = d__[i__];
-                    if(di <= dnew) { goto L155; }
-                    if(l[i__] >= low) { goto L155; }
+                    if(di <= dnew) {
+                        goto L155;
+                    }
+                    if(l[i__] >= low) {
+                        goto L155;
+                    }
                     d__[i__] = dnew;
                     if(dnew <= dmin__) {
-                        if(l[i__] != 0) { mc64fd_(&l[i__], &qlen, n, &q[1], &d__[1], &l[1], &c__2); }
+                        if(l[i__] != 0) {
+                            mc64fd_(&l[i__], &qlen, n, &q[1], &d__[1], &l[1], &c__2);
+                        }
                         --low;
                         q[low] = i__;
                         l[i__] = low;
@@ -2143,12 +2469,15 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
                     out[jj] = k;
                     pr[jj] = j;
                 }
-            L155: ;
+            L155:;
             }
             /* L150: */
         }
-        /* If CSP = RINF, no augmenting path is found */
-    L160: if(csp == rinf) { goto L190; }
+    /* If CSP = RINF, no augmenting path is found */
+    L160:
+        if(csp == rinf) {
+            goto L190;
+        }
         /* Find augmenting path by tracing backward in PR; update IPERM,JPERM */
         ++(*num);
         i__ = irn[isp];
@@ -2158,7 +2487,9 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
         i__2 = *num;
         for(jdum = 1; jdum <= i__2; ++jdum) {
             jj = pr[j];
-            if(jj == -1) { goto L180; }
+            if(jj == -1) {
+                goto L180;
+            }
             k = out[j];
             i__ = irn[k];
             iperm[i__] = jj;
@@ -2166,15 +2497,17 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             j = jj;
             /* L170: */
         }
-        /* End of dummy loop; this point is never reached */
-        /* Update U for rows in Q(UP:N) */
-    L180: i__2 = *n;
+    /* End of dummy loop; this point is never reached */
+    /* Update U for rows in Q(UP:N) */
+    L180:
+        i__2 = *n;
         for(kk = up; kk <= i__2; ++kk) {
             i__ = q[kk];
             u[i__] = u[i__] + d__[i__] - csp;
             /* L185: */
         }
-    L190: i__2 = *n;
+    L190:
+        i__2 = *n;
         for(kk = low; kk <= i__2; ++kk) {
             i__ = q[kk];
             d__[i__] = rinf;
@@ -2188,19 +2521,28 @@ int_t mc64wd_(int_t* n, int_t* ne, int_t* ip, int_t* irn, double* a, int* iperm,
             l[i__] = 0;
             /* L193: */
         }
-    L100: ;
+    L100:;
     }
-    /* End of main loop */
-    /* Set dual column variable in D(1:N) */
-L1000: i__1 = *n;
+/* End of main loop */
+/* Set dual column variable in D(1:N) */
+L1000:
+    i__1 = *n;
     for(j = 1; j <= i__1; ++j) {
         k = jperm[j];
-        if(k != 0) { d__[j] = a[k] - u[irn[k]]; }
-        else { d__[j] = 0.; }
-        if(iperm[j] == 0) { u[j] = 0.; }
+        if(k != 0) {
+            d__[j] = a[k] - u[irn[k]];
+        }
+        else {
+            d__[j] = 0.;
+        }
+        if(iperm[j] == 0) {
+            u[j] = 0.;
+        }
         /* L200: */
     }
-    if(*num == *n) { goto L1100; }
+    if(*num == *n) {
+        goto L1100;
+    }
     /* The matrix is structurally singular, complete IPERM. */
     /* JPERM, OUT are work arrays */
     i__1 = *n;
@@ -2224,11 +2566,14 @@ L1000: i__1 = *n;
     k = 0;
     i__1 = *n;
     for(j = 1; j <= i__1; ++j) {
-        if(jperm[j] != 0) { goto L320; }
+        if(jperm[j] != 0) {
+            goto L320;
+        }
         ++k;
         jdum = out[k];
         iperm[jdum] = j;
-    L320: ;
+    L320:;
     }
-L1100: return 0;
+L1100:
+    return 0;
 } /* mc64wd_ */

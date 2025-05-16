@@ -30,6 +30,7 @@
 #define CUSTOMNODEGROUP_H
 
 #include "Group.h"
+
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 

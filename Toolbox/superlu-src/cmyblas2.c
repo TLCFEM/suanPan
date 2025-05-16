@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -11,7 +11,7 @@ at the top-level directory.
 
 /*! @file cmyblas2.c
  * \brief Level 2 Blas operations
- * 
+ *
  * <pre>
  * -- SuperLU routine (version 2.0) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
@@ -31,22 +31,21 @@ at the top-level directory.
 #include "slu_scomplex.h"
 
 /*! \brief Solves a dense UNIT lower triangular system
- * 
- * The unit lower 
- * triangular matrix is stored in a 2D array M(1:nrow,1:ncol). 
+ *
+ * The unit lower
+ * triangular matrix is stored in a 2D array M(1:nrow,1:ncol).
  * The solution will be returned in the rhs vector.
  */
-void clsolve(int ldm, int ncol, complex* M, complex* rhs) {
+void clsolve(int ldm, int ncol, singlecomplex* M, singlecomplex* rhs) {
     int k;
-    complex x0, x1, x2, x3, temp;
-    complex* M0;
-    complex *Mki0, *Mki1, *Mki2, *Mki3;
+    singlecomplex x0, x1, x2, x3, temp;
+    singlecomplex* M0;
+    singlecomplex *Mki0, *Mki1, *Mki2, *Mki3;
     register int firstcol = 0;
 
     M0 = &M[0];
 
-    while(firstcol < ncol - 3) {
-        /* Do 4 columns */
+    while(firstcol < ncol - 3) { /* Do 4 columns */
         Mki0 = M0 + 1;
         Mki1 = Mki0 + ldm + 1;
         Mki2 = Mki1 + ldm + 1;
@@ -55,16 +54,16 @@ void clsolve(int ldm, int ncol, complex* M, complex* rhs) {
         x0 = rhs[firstcol];
         cc_mult(&temp, &x0, Mki0);
         Mki0++;
-        c_sub(&x1, &rhs[firstcol+1], &temp);
+        c_sub(&x1, &rhs[firstcol + 1], &temp);
         cc_mult(&temp, &x0, Mki0);
         Mki0++;
-        c_sub(&x2, &rhs[firstcol+2], &temp);
+        c_sub(&x2, &rhs[firstcol + 2], &temp);
         cc_mult(&temp, &x1, Mki1);
         Mki1++;
         c_sub(&x2, &x2, &temp);
         cc_mult(&temp, &x0, Mki0);
         Mki0++;
-        c_sub(&x3, &rhs[firstcol+3], &temp);
+        c_sub(&x3, &rhs[firstcol + 3], &temp);
         cc_mult(&temp, &x1, Mki1);
         Mki1++;
         c_sub(&x3, &x3, &temp);
@@ -95,15 +94,14 @@ void clsolve(int ldm, int ncol, complex* M, complex* rhs) {
         M0 += 4 * ldm + 4;
     }
 
-    if(firstcol < ncol - 1) {
-        /* Do 2 columns */
+    if(firstcol < ncol - 1) { /* Do 2 columns */
         Mki0 = M0 + 1;
         Mki1 = Mki0 + ldm + 1;
 
         x0 = rhs[firstcol];
         cc_mult(&temp, &x0, Mki0);
         Mki0++;
-        c_sub(&x1, &rhs[firstcol+1], &temp);
+        c_sub(&x1, &rhs[firstcol + 1], &temp);
 
         rhs[++firstcol] = x1;
         ++firstcol;
@@ -119,14 +117,14 @@ void clsolve(int ldm, int ncol, complex* M, complex* rhs) {
     }
 }
 
-/*! \brief Solves a dense upper triangular system. 
+/*! \brief Solves a dense upper triangular system.
  *
  * The upper triangular matrix is
  * stored in a 2-dim array M(1:ldm,1:ncol). The solution will be returned
  * in the rhs vector.
  */
-void cusolve(int ldm, int ncol, complex* M, complex* rhs) {
-    complex xj, temp;
+void cusolve(int ldm, int ncol, singlecomplex* M, singlecomplex* rhs) {
+    singlecomplex xj, temp;
     int jcol, j, irow;
 
     jcol = ncol - 1;
@@ -136,7 +134,7 @@ void cusolve(int ldm, int ncol, complex* M, complex* rhs) {
         rhs[jcol] = xj;
 
         for(irow = 0; irow < jcol; irow++) {
-            cc_mult(&temp, &xj, &M[irow+jcol*ldm]); /* M(irow, jcol) */
+            cc_mult(&temp, &xj, &M[irow + jcol * ldm]); /* M(irow, jcol) */
             c_sub(&rhs[irow], &rhs[irow], &temp);
         }
 
@@ -148,17 +146,16 @@ void cusolve(int ldm, int ncol, complex* M, complex* rhs) {
  *
  * The input matrix is M(1:nrow,1:ncol); The product is returned in Mxvec[].
  */
-void cmatvec(int ldm, int nrow, int ncol, complex* M, complex* vec, complex* Mxvec) {
-    complex vi0, vi1, vi2, vi3;
-    complex *M0, temp;
-    complex *Mki0, *Mki1, *Mki2, *Mki3;
+void cmatvec(int ldm, int nrow, int ncol, singlecomplex* M, singlecomplex* vec, singlecomplex* Mxvec) {
+    singlecomplex vi0, vi1, vi2, vi3;
+    singlecomplex *M0, temp;
+    singlecomplex *Mki0, *Mki1, *Mki2, *Mki3;
     register int firstcol = 0;
     int k;
 
     M0 = &M[0];
 
-    while(firstcol < ncol - 3) {
-        /* Do 4 columns */
+    while(firstcol < ncol - 3) { /* Do 4 columns */
         Mki0 = M0;
         Mki1 = Mki0 + ldm;
         Mki2 = Mki1 + ldm;
@@ -186,8 +183,7 @@ void cmatvec(int ldm, int nrow, int ncol, complex* M, complex* vec, complex* Mxv
         M0 += 4 * ldm;
     }
 
-    while(firstcol < ncol) {
-        /* Do 1 column */
+    while(firstcol < ncol) { /* Do 1 column */
         Mki0 = M0;
         vi0 = vec[firstcol++];
         for(k = 0; k < nrow; k++) {

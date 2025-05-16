@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomGurson.h"
+
 #include <Domain/DomainBase.h>
 
 CustomGurson::CustomGurson(const unsigned T, const unsigned ET, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
@@ -40,7 +41,7 @@ int CustomGurson::initialize(const shared_ptr<DomainBase>& D) {
 
 vec2 CustomGurson::compute_hardening(const double plastic_strain) const { return expression->evaluate(plastic_strain); }
 
-unique_ptr<Material> CustomGurson::get_copy() { return make_unique<CustomGurson>(*this); }
+unique_ptr<Material> CustomGurson::get_copy() { return std::make_unique<CustomGurson>(*this); }
 
 void CustomGurson::print() {
     suanpan_info("A Gurson model.\n");

@@ -66,7 +66,7 @@ public:
 
     void print() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 };
 
 #endif

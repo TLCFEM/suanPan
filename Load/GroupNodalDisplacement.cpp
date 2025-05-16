@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GroupNodalDisplacement.h"
+
 #include <Domain/DomainBase.h>
 
 GroupNodalDisplacement::GroupNodalDisplacement(const unsigned T, const unsigned ST, const double L, uvec&& N, const unsigned D, const unsigned AT)

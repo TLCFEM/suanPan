@@ -65,11 +65,13 @@ public:
         : MetaMat<T>(old_mat)
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
-        , memory(new T[this->n_elem]) { suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; }); }
+        , memory(new T[this->n_elem]) {
+        suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; });
+    }
 
-    DenseMat(DenseMat&&) noexcept = delete;
+    DenseMat(DenseMat&&) = delete;
     DenseMat& operator=(const DenseMat&) = delete;
-    DenseMat& operator=(DenseMat&&) noexcept = delete;
+    DenseMat& operator=(DenseMat&&) = delete;
     ~DenseMat() override = default;
 
     [[nodiscard]] bool is_empty() const override { return 0 == this->n_elem; }
@@ -81,7 +83,8 @@ public:
 
     [[nodiscard]] T max() const override {
         T max_value = T(1);
-        for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I) if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
+        for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I)
+            if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
         return max_value;
     }
 
@@ -92,7 +95,7 @@ public:
     void scale_accu(const T scalar, const shared_ptr<MetaMat<T>>& M) override {
         if(nullptr == M) return;
         if(!M->triplet_mat.is_empty()) return this->scale_accu(scalar, M->triplet_mat);
-        if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw invalid_argument("size mismatch");
+        if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw std::invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
         this->factored = false;
         if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
@@ -101,14 +104,17 @@ public:
     }
 
     void scale_accu(const T scalar, const triplet_form<T, uword>& M) override {
-        if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw invalid_argument("size mismatch");
+        if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw std::invalid_argument("size mismatch");
         this->factored = false;
         const auto row = M.row_mem();
         const auto col = M.col_mem();
         const auto val = M.val_mem();
-        if(1. == scalar) for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
-        else if(-1. == scalar) for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
-        else for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += scalar * val[I];
+        if(1. == scalar)
+            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
+        else if(-1. == scalar)
+            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+        else
+            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += scalar * val[I];
     }
 
     void operator*=(const T value) override {

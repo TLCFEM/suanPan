@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "SectionNM3D.h"
+
 #include <Domain/DomainBase.h>
 
 SectionNM3D::SectionNM3D(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double LD)

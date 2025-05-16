@@ -32,8 +32,6 @@
 
 #include <Material/Material.h>
 
-using std::vector;
-
 class Material3D : public Material {
 public:
     Material3D(
@@ -41,7 +39,7 @@ public:
         double    // density
     );
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 };
 
 #endif

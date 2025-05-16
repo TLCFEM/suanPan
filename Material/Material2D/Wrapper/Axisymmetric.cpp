@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Axisymmetric.h"
+
 #include <Domain/DomainBase.h>
 
 const uvec Axisymmetric::F{0, 1, 2, 3};
@@ -41,7 +42,7 @@ int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
 
 double Axisymmetric::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
 
-unique_ptr<Material> Axisymmetric::get_copy() { return make_unique<Axisymmetric>(*this); }
+unique_ptr<Material> Axisymmetric::get_copy() { return std::make_unique<Axisymmetric>(*this); }
 
 int Axisymmetric::update_trial_status(const vec& t_strain) {
     vec full_strain(6, fill::zeros);
@@ -78,7 +79,7 @@ int Axisymmetric::reset_status() {
     return base->reset_status();
 }
 
-vector<vec> Axisymmetric::record(const OutputType P) { return base->record(P); }
+std::vector<vec> Axisymmetric::record(const OutputType P) { return base->record(P); }
 
 void Axisymmetric::print() {
     suanpan_info("An axisymmetric wrapper.\n");

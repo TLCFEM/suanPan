@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -13,16 +13,17 @@ at the top-level directory.
  * \brief Performs numerical pivoting
  *
  * <pre>
- * -- SuperLU routine (version 3.0) --
+ * -- SuperLU routine (version 7.0.0) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
  * and Lawrence Berkeley National Lab.
  * October 15, 2003
+ * August 2024
  *
  * Copyright (c) 1994 by Xerox Corporation.  All rights reserved.
  *
  * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY
  * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
- * 
+ *
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
@@ -53,7 +54,7 @@ at the top-level directory.
  *           pivot row = j;
  *       ELSE
  *           pivot row = m;
- * 
+ *
  *   Note: If you absolutely want to use a given pivot order, then set u=0.0.
  *
  *   Return value: 0      success;
@@ -72,27 +73,27 @@ int cpivotL(
     GlobalLU_t* Glu,    /* modified - global LU data structures */
     SuperLUStat_t* stat /* output */
 ) {
-    complex one = {1.0, 0.0};
+    singlecomplex one = {1.0, 0.0};
     int fsupc;  /* first column in the supernode */
     int nsupc;  /* no of columns in the supernode */
     int nsupr;  /* no of rows in the supernode */
     int_t lptr; /* points to the starting subscript of the supernode */
     int pivptr, old_pivptr, diag, diagind;
     float pivmax, rtemp, thresh;
-    complex temp;
-    complex* lu_sup_ptr;
-    complex* lu_col_ptr;
+    singlecomplex temp;
+    singlecomplex* lu_sup_ptr;
+    singlecomplex* lu_col_ptr;
     int_t* lsub_ptr;
     int_t isub, icol, k, itemp;
     int_t *lsub, *xlsub;
-    complex* lusup;
+    singlecomplex* lusup;
     int_t* xlusup;
     flops_t* ops = stat->ops;
 
     /* Initialize pointers */
     lsub = Glu->lsub;
     xlsub = Glu->xlsub;
-    lusup = (complex*)Glu->lusup;
+    lusup = (singlecomplex*)Glu->lusup;
     xlusup = Glu->xlusup;
     fsupc = (Glu->xsup)[(Glu->supno)[jcol]];
     nsupc = jcol - fsupc; /* excluding jcol; nsupc >= 0 */
@@ -103,11 +104,11 @@ int cpivotL(
     lsub_ptr = &lsub[lptr];             /* start of row indices of the supernode */
 
 #ifdef DEBUG
-if ( jcol == MIN_COL ) {
-    printf("Before cdiv: col %d\n", jcol);
-    for (k = nsupc; k < nsupr; k++) 
-	printf("  lu[%d] %f\n", lsub_ptr[k], lu_col_ptr[k]);
-}
+    if(jcol == MIN_COL) {
+        printf("Before cdiv: col %d\n", jcol);
+        for(k = nsupc; k < nsupr; k++)
+            printf("  lu[%d] %f\n", lsub_ptr[k], lu_col_ptr[k]);
+    }
 #endif
 
     /* Determine the largest abs numerical value for partial pivoting;
@@ -116,7 +117,7 @@ if ( jcol == MIN_COL ) {
     diagind = iperm_c[jcol];
     pivmax = 0.0;
     pivptr = nsupc;
-    diag = EMPTY;
+    diag = SLU_EMPTY;
     old_pivptr = nsupc;
     for(isub = nsupc; isub < nsupr; ++isub) {
         rtemp = c_abs1(&lu_col_ptr[isub]);
@@ -130,11 +131,12 @@ if ( jcol == MIN_COL ) {
 
     /* Test for singularity */
     if(pivmax == 0.0) {
-#if 1
-        *pivrow = lsub_ptr[pivptr];
-        perm_r[*pivrow] = jcol;
-#else
-	perm_r[diagind] = jcol;
+#if 0
+        // There is no valid pivot.
+        // jcol represents the rank of U, 
+        // report the rank, let dgstrf handle the pivot
+	*pivrow = lsub_ptr[pivptr];
+	perm_r[*pivrow] = jcol;
 #endif
         *usepr = 0;
         return (jcol + 1);
@@ -145,13 +147,14 @@ if ( jcol == MIN_COL ) {
     /* Choose appropriate pivotal element by our policy. */
     if(*usepr) {
         rtemp = c_abs1(&lu_col_ptr[old_pivptr]);
-        if(rtemp != 0.0 && rtemp >= thresh) pivptr = old_pivptr;
-        else *usepr = 0;
+        if(rtemp != 0.0 && rtemp >= thresh)
+            pivptr = old_pivptr;
+        else
+            *usepr = 0;
     }
     if(*usepr == 0) {
         /* Use diagonal pivot? */
-        if(diag >= 0) {
-            /* diagonal exists */
+        if(diag >= 0) { /* diagonal exists */
             rtemp = c_abs1(&lu_col_ptr[diag]);
             if(rtemp != 0.0 && rtemp >= thresh) pivptr = diag;
         }
@@ -167,9 +170,9 @@ if ( jcol == MIN_COL ) {
         lsub_ptr[pivptr] = lsub_ptr[nsupc];
         lsub_ptr[nsupc] = itemp;
 
-        /* Interchange numerical values as well, for the whole snode, such 
+        /* Interchange numerical values as well, for the whole snode, such
          * that L is indexed the same way as A.
-          */
+         */
         for(icol = 0; icol <= nsupc; icol++) {
             itemp = pivptr + icol * nsupr;
             temp = lu_sup_ptr[itemp];
@@ -182,7 +185,8 @@ if ( jcol == MIN_COL ) {
     ops[FACT] += 10 * (nsupr - nsupc);
 
     c_div(&temp, &one, &lu_col_ptr[nsupc]);
-    for(k = nsupc + 1; k < nsupr; k++) cc_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
+    for(k = nsupc + 1; k < nsupr; k++)
+        cc_mult(&lu_col_ptr[k], &lu_col_ptr[k], &temp);
 
     return 0;
 }

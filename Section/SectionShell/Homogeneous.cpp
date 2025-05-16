@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Homogeneous.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -60,7 +61,7 @@ int Homogeneous::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<SectionShell> Homogeneous::get_copy() { return make_unique<Homogeneous>(*this); }
+unique_ptr<SectionShell> Homogeneous::get_copy() { return std::make_unique<Homogeneous>(*this); }
 
 int Homogeneous::update_trial_status(const vec& m_strain, const vec& p_strain) {
     trial_membrane_strain = m_strain;

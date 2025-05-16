@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "BilinearElastic1D.h"
+
 #include <Toolbox/utility.h>
 
 BilinearElastic1D::BilinearElastic1D(const unsigned T, const double E, const double Y, const double H, const double R, const double D)
@@ -28,7 +29,7 @@ int BilinearElastic1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> BilinearElastic1D::get_copy() { return make_unique<BilinearElastic1D>(*this); }
+unique_ptr<Material> BilinearElastic1D::get_copy() { return std::make_unique<BilinearElastic1D>(*this); }
 
 int BilinearElastic1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

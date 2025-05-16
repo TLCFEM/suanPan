@@ -43,7 +43,7 @@ class CAX4 final : public MaterialElement2D {
 
     static constexpr unsigned m_node = 4, m_dof = 2, m_size = m_dof * m_node;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     static vec isoparametric_mapping(const vec&);
 
@@ -63,7 +63,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

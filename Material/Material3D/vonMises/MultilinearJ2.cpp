@@ -18,12 +18,14 @@
 #include "MultilinearJ2.h"
 
 double MultilinearJ2::compute_k(const double p_strain) const {
-    for(unsigned I = 1; I < backbone.n_rows; ++I) if(p_strain <= backbone(I, 0)) return backbone(I - 1, 1) + backbone(I - 1, 2) * (p_strain - backbone(I - 1, 0));
+    for(unsigned I = 1; I < backbone.n_rows; ++I)
+        if(p_strain <= backbone(I, 0)) return backbone(I - 1, 1) + backbone(I - 1, 2) * (p_strain - backbone(I - 1, 0));
     return backbone(backbone.n_rows - 1, 1);
 }
 
 double MultilinearJ2::compute_dk(const double p_strain) const {
-    for(unsigned I = 1; I < backbone.n_rows; ++I) if(p_strain <= backbone(I, 0)) return backbone(I - 1, 2);
+    for(unsigned I = 1; I < backbone.n_rows; ++I)
+        if(p_strain <= backbone(I, 0)) return backbone(I - 1, 2);
     return 0.;
 }
 
@@ -33,7 +35,7 @@ double MultilinearJ2::compute_dh(const double) const { return 0.; }
 
 MultilinearJ2::MultilinearJ2(const unsigned T, const double E, const double V, mat&& H, const double R)
     : NonlinearJ2(T, E, V, R) {
-    if(H(0, 0) != 0. || H.n_cols != 2) throw invalid_argument("first strain should be zero and there should be exact two columns");
+    if(H(0, 0) != 0. || H.n_cols != 2) throw std::invalid_argument("first strain should be zero and there should be exact two columns");
 
     H.resize(H.n_rows, 3);
     H(H.n_rows - 1, 2) = 0.;
@@ -43,7 +45,7 @@ MultilinearJ2::MultilinearJ2(const unsigned T, const double E, const double V, m
     access::rw(backbone) = std::move(H);
 }
 
-unique_ptr<Material> MultilinearJ2::get_copy() { return make_unique<MultilinearJ2>(*this); }
+unique_ptr<Material> MultilinearJ2::get_copy() { return std::make_unique<MultilinearJ2>(*this); }
 
 void MultilinearJ2::print() {
     suanpan_info("A 3D multilinear hardening model.\nE = {:.4E}\t\\sigma_y = {:.4E}.\n", elastic_modulus, backbone(0, 1));

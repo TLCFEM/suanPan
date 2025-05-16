@@ -1,5 +1,5 @@
-set(Plate
-        Plate/Mindlin.cpp
-        Plate/DKT3.cpp
-        Plate/DKT4.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        DKT3.cpp
+        DKT4.cpp
+        Mindlin.cpp
 )

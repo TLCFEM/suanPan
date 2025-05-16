@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Static.h"
+
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
@@ -37,25 +38,28 @@ int Static::initialize() {
     if(SUANPAN_SUCCESS != t_domain->restart()) return SUANPAN_FAIL;
 
     // integrator
-    modifier = make_shared<Integrator>();
+    modifier = std::make_shared<Integrator>();
     modifier->set_domain(t_domain);
 
     // converger
-    if(nullptr == tester) tester = make_shared<AbsIncreDisp>();
+    if(nullptr == tester) tester = std::make_shared<AbsIncreDisp>();
     tester->set_domain(t_domain);
 
     // solver
     // automatically enable displacement controlled solver
-    auto flag = false;
-    for(const auto& I : t_domain->get_load_pool())
-        if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
-            flag = true;
-            break;
-        }
-    if(nullptr == solver) flag ? solver = make_shared<MPDC>() : solver = make_shared<Newton>();
-    else if(flag && nullptr == std::dynamic_pointer_cast<MPDC>(solver)) {
-        suanpan_warning("Wrong solver assigned, using MPDC instead.\n");
-        solver = make_shared<MPDC>();
+    const auto has_disp = std::ranges::any_of(t_domain->get_load_pool(), [&](const shared_ptr<Load>& I) { return I->if_displacement_control() && I->get_start_step() == get_tag(); });
+
+    if(nullptr == solver) {
+        if(has_disp) solver = std::make_shared<MPDC>();
+        else solver = std::make_shared<Newton>();
+    }
+    else if(const auto disp_solver = std::dynamic_pointer_cast<MPDC>(solver); has_disp && !disp_solver) {
+        suanpan_warning("The current step contains active displacement load(s), automatically switching to the displacement-controlled solver.\n");
+        solver = std::make_shared<MPDC>();
+    }
+    else if(!has_disp && disp_solver) {
+        suanpan_warning("The current step contains no active displacement load(s), automatically switching to the force-controlled solver.\n");
+        solver = std::make_shared<Newton>();
     }
 
     solver->set_integrator(modifier);

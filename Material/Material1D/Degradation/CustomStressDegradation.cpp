@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CustomStressDegradation.h"
+
 #include <Domain/DomainBase.h>
 
 vec CustomStressDegradation::compute_positive_degradation(const double t_stress) const { return positive_expression->evaluate(t_stress); }
@@ -58,4 +59,4 @@ int CustomStressDegradation::initialize(const shared_ptr<DomainBase>& D) {
     return StressDegradation::initialize(D);
 }
 
-unique_ptr<Material> CustomStressDegradation::get_copy() { return make_unique<CustomStressDegradation>(*this); }
+unique_ptr<Material> CustomStressDegradation::get_copy() { return std::make_unique<CustomStressDegradation>(*this); }

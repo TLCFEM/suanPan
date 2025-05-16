@@ -17,10 +17,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 include(CheckLanguage)
 check_language(Fortran)
 if (CMAKE_Fortran_COMPILER)
-    set(FORTRAN_STATUS TRUE)
     enable_language(Fortran)
-else ()
-    set(FORTRAN_STATUS FALSE)
 endif ()
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
@@ -67,9 +64,11 @@ else ()
     set(SP_OPENBLAS_PATH "" CACHE PATH "Manually assign the path to the OpenBLAS library, if not set, the bundled version will be used.")
 endif ()
 if (SP_ENABLE_AOCL)
-    set(AOCL_BLIS_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libblis-mt.a" CACHE FILEPATH "AOCL libblis path.")
-    set(AOCL_FLAME_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libflame.a" CACHE FILEPATH "AOCL libflame path.")
-    set(AOCL_UTILS_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libaoclutils.a" CACHE FILEPATH "AOCL libaoclutils path.")
+    set(AOCL_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libaocl.a" CACHE FILEPATH "AOCL all-in-one library path.")
+    if (NOT AOCL_PATH MATCHES "aocl")
+        message(FATAL_ERROR "Please point AOCL_PATH to the all-in-one library file of AOCL.")
+    endif ()
+    add_compile_definitions(SUANPAN_AOCL)
 endif ()
 
 set(COMPILER_IDENTIFIER "unknown")
@@ -105,8 +104,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
         set(COMPILER_IDENTIFIER "clang-mac")
         include_directories("/usr/local/include" "/usr/local/opt/llvm/include" "/usr/local/opt/libomp/include")
         link_directories("/usr/local/lib" "/usr/local/opt/llvm/lib" "/usr/local/opt/libomp/lib/")
-        message(STATUS "On macOS, make sure llvm and libomp are installed.")
-        message(STATUS "brew install llvm libomp")
+        message(STATUS "On macOS, make sure `llvm` and `libomp` are installed.")
     endif ()
 endif ()
 
@@ -174,38 +172,16 @@ if (SP_ENABLE_MKL)
     add_compile_definitions(SUANPAN_MKL)
     add_compile_definitions(EZP_MKL)
     # add_compile_definitions(ARMA_USE_MKL_ALLOC)
-elseif (FORTRAN_STATUS AND CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     message(WARNING "Since Intel compilers are used, why not enabling MKL?")
-else ()
-    if (SP_ENABLE_64BIT_INDEXING)
-        message(NOTICE "64-bit indexing is enabled, please make sure the linear algebra driver is compiled using 64-bit integer as well.")
-    endif ()
-    if (SP_ENABLE_AOCL)
-        if (NOT AOCL_BLIS_PATH MATCHES "blis")
-            message(FATAL_ERROR "Please point AOCL_BLIS_PATH to the library file of BLIS.")
-        endif ()
-        if (NOT AOCL_FLAME_PATH MATCHES "flame")
-            message(FATAL_ERROR "Please point AOCL_FLAME_PATH to the library file of FLAME.")
-        endif ()
-        if (NOT AOCL_UTILS_PATH MATCHES "aoclutils")
-            message(FATAL_ERROR "Please point AOCL_UTILS_PATH to the library file of AOCL Utils.")
-        endif ()
-        add_compile_definitions(SUANPAN_AOCL)
-    endif ()
+elseif (SP_ENABLE_64BIT_INDEXING)
+    message(NOTICE "64-bit indexing is enabled, please make sure the linear algebra driver is compiled using 64-bit integer as well.")
 endif ()
 
 if (SP_ENABLE_CUDA)
-    if (POLICY CMP0146)
-        cmake_policy(SET CMP0146 OLD)
-    endif ()
-    find_package(CUDA PATHS ${CUDA_PATH})
-    if (NOT CUDA_FOUND)
-        set(CUDA_PATH "" CACHE PATH "CUDA library path that contains /include folder.")
-        message(FATAL_ERROR "CUDA library is not found, please indicate its path.")
-    endif ()
+    find_package(CUDAToolkit REQUIRED)
+    link_libraries(CUDA::cudart_static CUDA::cublas_static CUDA::cusolver_static CUDA::cusparse_static)
     add_compile_definitions(SUANPAN_CUDA)
-    include_directories(${CUDA_INCLUDE_DIRS})
-    link_libraries(${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_cusolver_LIBRARY} ${CUDA_cusparse_LIBRARY})
     if (SP_ENABLE_MAGMA)
         set(MAGMAROOT "" CACHE PATH "Magma library path which contains /include and /lib folders.")
         find_file(MAGMA_HEADER NAMES magma.h PATHS ${MAGMAROOT}/include)
@@ -277,6 +253,11 @@ if (SP_BUILD_PARALLEL)
             link_libraries(tbbmalloc tbbmalloc_proxy)
         endif ()
     endif ()
+endif ()
+
+if (CMAKE_BUILD_TYPE MATCHES "Rel")
+    add_compile_definitions(ARMA_WARN_LEVEL=1)
+    add_compile_definitions(ARMA_DONT_CHECK_CONFORMANCE)
 endif ()
 
 if (BUILD_SHARED_LIBS)
@@ -423,7 +404,7 @@ if (SP_ENABLE_MKL)
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
     link_libraries(libopenblas)
 elseif (SP_ENABLE_AOCL)
-    link_libraries(${AOCL_FLAME_PATH} ${AOCL_BLIS_PATH} ${AOCL_UTILS_PATH})
+    link_libraries(${AOCL_PATH})
 else ()
     link_libraries(openblas)
     if (COMPILER_IDENTIFIER MATCHES "linux")
@@ -433,26 +414,15 @@ endif ()
 
 add_executable(${PROJECT_NAME}
         suanPan.cpp
+        Include/catch/catch_amalgamated.cpp
         Include/fmt/src/format.cc
         Include/whereami/whereami.c
-        Include/catch/catch_amalgamated.cpp
-        Constraint/CMakeLists.txt
-        Database/CMakeLists.txt
-        Domain/CMakeLists.txt
-        Load/CMakeLists.txt
-        Recorder/CMakeLists.txt
-        Step/CMakeLists.txt
-        Toolbox/CMakeLists.txt
-        UnitTest/CMakeLists.txt
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
 
-if (COMPILER_IDENTIFIER MATCHES "vs")
-    target_link_options(${PROJECT_NAME} PRIVATE /NODEFAULTLIB:LIBCMT)
-endif ()
-
 if (MSVC)
+    target_link_options(${PROJECT_NAME} PRIVATE "/NODEFAULTLIB:LIBCMT")
     target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
 elseif (MINGW)
     target_compile_options(${PROJECT_NAME} PRIVATE "-Wa,-mbig-obj")
@@ -478,9 +448,7 @@ add_subdirectory(Step)
 add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 
-target_link_libraries(${PROJECT_NAME} Element Material Section Solver)
-
-if (FORTRAN_STATUS)
+if (CMAKE_Fortran_COMPILER)
     message(STATUS "Linking additional amd arpack feast libraries.")
     add_subdirectory(Toolbox/amd-src)
     add_subdirectory(Toolbox/arpack-src)
@@ -565,19 +533,22 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         if (SP_ENABLE_SHARED_MKL)
             file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_core${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_lp64${DECOR}*${SUFFIX})
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_avx*${DECOR}*${SUFFIX})
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
+            if (SP_ENABLE_64BIT_INDEXING)
+                file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_ilp64${DECOR}*${SUFFIX})
+            else ()
+                file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_lp64${DECOR}*${SUFFIX})
+            endif ()
+            install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             if (SP_ENABLE_IOMP)
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_thread${DECOR}*${SUFFIX})
-                install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             else ()
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_gnu_thread${DECOR}*${SUFFIX})
-                install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             endif ()
+            install(PROGRAMS ${MKL_FILES} DESTINATION lib)
         endif ()
         if (SP_ENABLE_IOMP)
             file(GLOB MKL_FILES ${IOMPPATH}/libiomp5${DECOR}*${SUFFIX})
@@ -585,18 +556,17 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         endif ()
     endif ()
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
-        set(PATH_LIST
+        foreach (ONEAPI_PATH
                 $ENV{ONEAPI_ROOT}/compiler/latest/lib #  since 2024
                 $ENV{ONEAPI_ROOT}/compiler/latest/linux/compiler/lib/intel64_lin # prior to 2024
         )
-        foreach (PATHA ${PATH_LIST})
             file(GLOB ONEAPI_FILES
-                    ${PATHA}/libifcoremt${DECOR}*${SUFFIX}
-                    ${PATHA}/libifport${DECOR}*${SUFFIX}
-                    ${PATHA}/libimf${DECOR}*${SUFFIX}
-                    ${PATHA}/libintlc${DECOR}*${SUFFIX}
-                    ${PATHA}/libiomp5${DECOR}*${SUFFIX}
-                    ${PATHA}/libsvml${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libifcoremt${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libifport${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libimf${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libintlc${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libiomp5${DECOR}*${SUFFIX}
+                    ${ONEAPI_PATH}/libsvml${DECOR}*${SUFFIX}
             )
             install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib)
         endforeach ()
@@ -650,16 +620,10 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
             )
             install(FILES ${MKL_FILES} DESTINATION bin)
         endif ()
-        if (SP_ENABLE_IOMP)
-            find_file(libifcoremd libifcoremd.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED)
-            install(FILES ${libifcoremd} DESTINATION bin)
-            find_file(libiomp5md libiomp5md.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED)
-            install(FILES ${libiomp5md} DESTINATION bin)
-            find_file(libmmd libmmd.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED)
-            install(FILES ${libmmd} DESTINATION bin)
-            find_file(svml_dispmd svml_dispmd.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED)
-            install(FILES ${svml_dispmd} DESTINATION bin)
-        endif ()
+        foreach (IOMP_DLL libifcoremd libiomp5md libmmd svml_dispmd)
+            find_file(IOMP_${IOMP_DLL} ${IOMP_DLL}.dll PATHS ${MKL_ROOT}/../../ ${MKL_ROOT}/../../compiler/latest/bin/ REQUIRED NO_DEFAULT_PATH)
+            install(FILES ${IOMP_${IOMP_DLL}} DESTINATION bin)
+        endforeach ()
     else ()
         file(GLOB DLL_FILES Libs/win/lib*.dll)
         install(FILES ${DLL_FILES} DESTINATION bin)
@@ -671,7 +635,7 @@ endif ()
 message(STATUS "Flags and Dirs:")
 message(STATUS "suanPan C_FLAGS: ${CMAKE_C_FLAGS}")
 message(STATUS "suanPan CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-if (FORTRAN_STATUS)
+if (CMAKE_Fortran_COMPILER)
     message(STATUS "suanPan Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
 endif ()
 
@@ -712,7 +676,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         set(CPACK_PACKAGE_ICON ${ROOT}/Resource/suanPan-ua.svg)
         set(CPACK_PACKAGE_RELEASE 1)
         set(CPACK_PACKAGE_VENDOR "tlcfem")
-        set(CPACK_PACKAGE_VERSION "3.7.0")
+        set(CPACK_PACKAGE_VERSION "3.7.1")
         set(CPACK_PACKAGE_DESCRIPTION "An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework")
         set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/TLCFEM/suanPan")
 

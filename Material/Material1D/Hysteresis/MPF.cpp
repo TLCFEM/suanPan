@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "MPF.h"
+
 #include <Toolbox/utility.h>
 
 MPF::MPF(const unsigned T, const double E, const double Y, const double H, const double R, const double B1, const double B2, const double B3, const double B4, const bool ISO, const bool CON, const double D)
@@ -30,7 +31,7 @@ int MPF::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> MPF::get_copy() { return make_unique<MPF>(*this); }
+unique_ptr<Material> MPF::get_copy() { return std::make_unique<MPF>(*this); }
 
 int MPF::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -89,7 +90,7 @@ int MPF::update_trial_status(const vec& t_strain) {
     trial_stress = (hardening_ratio + factor_b) * normal_strain * gap_stress + reverse_stress;
     trial_stiffness = gap_stress / gap_strain * (hardening_ratio + factor_b / factor_a);
 
-    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw invalid_argument("infinite number detected"); });
+    suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw std::invalid_argument("infinite number detected"); });
 
     return SUANPAN_SUCCESS;
 }

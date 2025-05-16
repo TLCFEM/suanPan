@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "MaxHistory.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Element.h>
 
@@ -24,7 +25,7 @@ MaxHistory::MaxHistory(const unsigned T, const unsigned ST, const OutputType HT,
     , history_type(HT)
     , max_history(MH) {}
 
-unique_ptr<Criterion> MaxHistory::get_copy() { return make_unique<MaxHistory>(*this); }
+unique_ptr<Criterion> MaxHistory::get_copy() { return std::make_unique<MaxHistory>(*this); }
 
 int MaxHistory::process(const shared_ptr<DomainBase>& D) {
     suanpan::for_all(D->get_element_pool(), [&](const shared_ptr<Element>& t_element) {

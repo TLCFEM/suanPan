@@ -42,7 +42,7 @@ class C3D8I final : public MaterialElement3D {
 
     static constexpr unsigned c_node = 8, c_dof = 3, c_size = c_dof * c_node;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     C3D8I(
@@ -61,7 +61,7 @@ public:
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

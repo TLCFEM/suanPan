@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include <Toolbox/sort_rcm.h>
 #include "CatchHeader.h"
+
+#include <Toolbox/sort_rcm.h>
 
 TEST_CASE("RCM", "[Utility.Sorting]") {
     constexpr auto N = 200;

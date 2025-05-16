@@ -91,9 +91,9 @@ public:
         , u_band(other.u_band)
         , m_rows(other.m_rows) { init_spike(); }
 
-    BandMatSpike(BandMatSpike&&) noexcept = delete;
+    BandMatSpike(BandMatSpike&&) = delete;
     BandMatSpike& operator=(const BandMatSpike&) = delete;
-    BandMatSpike& operator=(BandMatSpike&&) noexcept = delete;
+    BandMatSpike& operator=(BandMatSpike&&) = delete;
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMatSpike>(*this); }
 
@@ -163,7 +163,7 @@ template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
 
 template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(!this->factored) {
-        suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+        suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
         la_it INFO = 0;
 

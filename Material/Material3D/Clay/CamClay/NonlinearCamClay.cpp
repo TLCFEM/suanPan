@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearCamClay.h"
+
 #include <Toolbox/tensor.h>
 
 const double NonlinearCamClay::sqrt_three_two = sqrt(1.5);

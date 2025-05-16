@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GlobalRecorder.h"
+
 #include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>

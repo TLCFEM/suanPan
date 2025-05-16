@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -32,23 +32,24 @@ at the top-level directory.
  */
 
 void ilu_heap_relax_snode(
-    const int n, int* et,    /* column elimination tree */
+    const int n,
+    int* et,                 /* column elimination tree */
     const int relax_columns, /* max no of columns allowed in a
-					 relaxed snode */
+                relaxed snode */
     int* descendants,        /* no of descendants of each node
-					 in the etree */
+                in the etree */
     int* relax_end,          /* last column in a supernode
-				       * if j-th column starts a relaxed
-				       * supernode, relax_end[j] represents
-				       * the last column of this supernode */
+                              * if j-th column starts a relaxed
+                              * supernode, relax_end[j] represents
+                              * the last column of this supernode */
     int* relax_fsupc         /* first column in a supernode
-				       * relax_fsupc[j] represents the first
-				       * column of j-th supernode */
+                              * relax_fsupc[j] represents the first
+                              * column of j-th supernode */
 ) {
     register int i, j, k, l, f, parent;
     register int snode_start; /* beginning of a snode */
     int *et_save, *post, *inv_post, *iwork;
-#if ( PRNTlevel>=1 )
+#if (PRNTlevel >= 1)
     int nsuper_et = 0, nsuper_et_post = 0;
 #endif
 
@@ -71,8 +72,8 @@ void ilu_heap_relax_snode(
     for(i = 0; i < n; ++i) et[i] = iwork[i];
 
     /* Compute the number of descendants of each node in the etree */
-    ifill(relax_end, n, EMPTY);
-    ifill(relax_fsupc, n, EMPTY);
+    ifill(relax_end, n, SLU_EMPTY);
+    ifill(relax_fsupc, n, SLU_EMPTY);
     for(j = 0; j < n; j++) descendants[j] = 0;
     for(j = 0; j < n; j++) {
         parent = et[j];
@@ -89,18 +90,19 @@ void ilu_heap_relax_snode(
             parent = et[j];
         }
         /* Found a supernode in postordered etree; j is the last column. */
-#if ( PRNTlevel>=1 )
-	++nsuper_et_post;
+#if (PRNTlevel >= 1)
+        ++nsuper_et_post;
 #endif
         k = n;
-        for(i = snode_start; i <= j; ++i) k = SUPERLU_MIN(k, inv_post[i]);
+        for(i = snode_start; i <= j; ++i)
+            k = SUPERLU_MIN(k, inv_post[i]);
         l = inv_post[j];
         if((l - k) == (j - snode_start)) {
             /* It's also a supernode in the original etree */
             relax_end[k] = l; /* Last column is recorded */
             relax_fsupc[f++] = k;
-#if ( PRNTlevel>=1 )
-	    ++nsuper_et;
+#if (PRNTlevel >= 1)
+            ++nsuper_et;
 #endif
         }
         else {
@@ -109,8 +111,8 @@ void ilu_heap_relax_snode(
                 if(descendants[i] == 0) {
                     relax_end[l] = l;
                     relax_fsupc[f++] = l;
-#if ( PRNTlevel>=1 )
-		    ++nsuper_et;
+#if (PRNTlevel >= 1)
+                    ++nsuper_et;
 #endif
                 }
             }
@@ -120,11 +122,11 @@ void ilu_heap_relax_snode(
         while(descendants[j] != 0 && j < n) j++;
     }
 
-#if ( PRNTlevel>=1 )
+#if (PRNTlevel >= 1)
     printf(".. heap_snode_relax:\n"
-	   "\tNo of relaxed snodes in postordered etree:\t%d\n"
-	   "\tNo of relaxed snodes in original etree:\t%d\n",
-	   nsuper_et_post, nsuper_et);
+           "\tNo of relaxed snodes in postordered etree:\t%d\n"
+           "\tNo of relaxed snodes in original etree:\t%d\n",
+           nsuper_et_post, nsuper_et);
 #endif
 
     /* Recover the original etree */

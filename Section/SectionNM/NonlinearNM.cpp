@@ -17,6 +17,7 @@
 
 // ReSharper disable IdentifierTypo
 #include "NonlinearNM.h"
+
 #include <Recorder/OutputType.h>
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const bool KK, const double LD, vec&& YF)
@@ -130,7 +131,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> NonlinearNM::record(const OutputType P) {
+std::vector<vec> NonlinearNM::record(const OutputType P) {
     if(P == OutputType::YF) return {current_history.tail(2)};
     if(P == OutputType::HIST) return {current_history};
 

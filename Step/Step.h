@@ -36,7 +36,7 @@ class Solver;
 class Converger;
 class Integrator;
 
-class Step : public Tag {
+class Step : public UniqueTag {
     double time_period = 1.0; // time period
 
     double time_left = time_period;
@@ -62,7 +62,7 @@ protected:
     SolverType sub_system_solver = SolverType::LAPACK;
     SolverSetting<double> system_setting{};
 
-    weak_ptr<DomainBase> database;
+    std::weak_ptr<DomainBase> database;
     shared_ptr<Factory<double>> factory;
     shared_ptr<Solver> solver;
     shared_ptr<Converger> tester;
@@ -72,18 +72,13 @@ protected:
 
 public:
     explicit Step(unsigned = 0, double = 1.);
-    Step(const Step&) = delete;
-    Step(Step&&) noexcept = delete;
-    Step& operator=(const Step&) = delete;
-    Step& operator=(Step&&) noexcept = delete;
-    ~Step() override = default;
 
     virtual int initialize();
 
     virtual int analyze() = 0;
 
-    void set_domain(const weak_ptr<DomainBase>&);
-    [[nodiscard]] const weak_ptr<DomainBase>& get_domain() const;
+    void set_domain(const std::weak_ptr<DomainBase>&);
+    [[nodiscard]] const std::weak_ptr<DomainBase>& get_domain() const;
 
     void set_factory(const shared_ptr<Factory<double>>&);
     [[nodiscard]] const shared_ptr<Factory<double>>& get_factory() const;
@@ -114,8 +109,8 @@ public:
     void set_precision(Precision);
     void set_tolerance(double);
     void set_refinement(std::uint8_t);
-    void set_lis_option(istringstream&);
-    void set_magma_option(istringstream&);
+    void set_lis_option(std::istringstream&);
+    void set_option(std::istringstream&);
 
     [[nodiscard]] double get_ini_step_size() const;
     [[nodiscard]] double get_min_step_size() const;

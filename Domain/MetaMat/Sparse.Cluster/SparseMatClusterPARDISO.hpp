@@ -31,7 +31,7 @@
 
 #include "../SparseMat.hpp"
 
-#include <ezp/ezp/pardiso.hpp>
+#include <ezp/ezp/pardiso.parser.hpp>
 
 template<sp_d T, ezp::matrix_type mtype> class SparseMatBaseClusterPARDISO final : public SparseMat<T> {
     csr_form<T, la_it> csr_mat{};
@@ -65,6 +65,7 @@ template<sp_d T, ezp::matrix_type mtype> int SparseMatBaseClusterPARDISO<T, mtyp
         solver.iparm_iterative_refinement(2);
         solver.iparm_pivoting_perturbation(std::is_same_v<T, double> ? 14 : 7);
         solver.iparm_weighted_matching(1);
+        ezp::pardiso_set(this->setting.option, solver);
 
         if(ezp::matrix_type::real_and_nonsymmetric == mtype) {
             csr_mat = csr_form<T, la_it>(this->triplet_mat, SparseBase::ONE, true);

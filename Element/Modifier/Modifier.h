@@ -33,23 +33,17 @@
 
 class DomainBase;
 
-class Modifier : public Tag {
+class Modifier : public UniqueTag {
 protected:
     uvec element_tag;
 
-    std::vector<weak_ptr<Element>> element_pool;
+    std::vector<std::weak_ptr<Element>> element_pool;
 
 public:
     explicit Modifier(
         unsigned = 0, // tag
         uvec&& = {}   // element tags
     );
-    Modifier(const Modifier&) = delete;            // copy forbidden
-    Modifier(Modifier&&) = delete;                 // move forbidden
-    Modifier& operator=(const Modifier&) = delete; // assign forbidden
-    Modifier& operator=(Modifier&&) = delete;      // assign forbidden
-
-    ~Modifier() override = default;
 
     [[nodiscard]] virtual bool has_nonviscous() const { return false; }
 

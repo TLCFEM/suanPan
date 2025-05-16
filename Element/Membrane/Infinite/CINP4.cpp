@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CINP4.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
@@ -339,8 +340,8 @@ int CINP4::reset_status() {
     return code;
 }
 
-vector<vec> CINP4::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> CINP4::record(const OutputType P) {
+    std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }

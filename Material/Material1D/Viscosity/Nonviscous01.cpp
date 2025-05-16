@@ -16,9 +16,10 @@
  ******************************************************************************/
 
 #include "Nonviscous01.h"
-#include <Recorder/OutputType.h>
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
+#include <Recorder/OutputType.h>
 #include <Step/Step.h>
 
 Nonviscous01::Nonviscous01(const unsigned T, cx_vec&& M, cx_vec&& S)
@@ -40,7 +41,7 @@ int Nonviscous01::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Nonviscous01::get_copy() { return make_unique<Nonviscous01>(*this); }
+unique_ptr<Material> Nonviscous01::get_copy() { return std::make_unique<Nonviscous01>(*this); }
 
 int Nonviscous01::update_trial_status(const vec&) {
     suanpan_error("Receives strain only from the associated element.\n");
@@ -93,7 +94,7 @@ int Nonviscous01::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> Nonviscous01::record(const OutputType P) {
+std::vector<vec> Nonviscous01::record(const OutputType P) {
     if(OutputType::V == P) return {current_strain_rate};
 
     return Material1D::record(P);

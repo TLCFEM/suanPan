@@ -39,11 +39,6 @@ protected:
 
 public:
     Fibre(unsigned, uvec&&, SectionType);
-    Fibre(const Fibre&) = default;
-    Fibre(Fibre&&) noexcept = delete;
-    Fibre& operator=(const Fibre&) = delete;
-    Fibre& operator=(Fibre&&) noexcept = delete;
-    ~Fibre() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -23,14 +23,14 @@ at the top-level directory.
 #include <stdlib.h>
 #include "slu_cdefs.h"
 
-extern void cswap_(int*, complex [], int*, complex [], int*);
-extern void caxpy_(int*, complex*, complex [], int*, complex [], int*);
-extern void ccopy_(int*, complex [], int*, complex [], int*);
-extern void scopy_(int*, float [], int*, float [], int*);
-extern float scasum_(int*, complex*, int*);
-extern float scnrm2_(int*, complex*, int*);
-extern double dnrm2_(int*, double [], int*);
-extern int icamax_(int*, complex [], int*);
+extern void cswap_(int*, singlecomplex[], int*, singlecomplex[], int*);
+extern void caxpy_(int*, singlecomplex*, singlecomplex[], int*, singlecomplex[], int*);
+extern void ccopy_(int*, singlecomplex[], int*, singlecomplex[], int*);
+extern void scopy_(int*, float[], int*, float[], int*);
+extern float scasum_(int*, singlecomplex*, int*);
+extern float scnrm2_(int*, singlecomplex*, int*);
+extern double dnrm2_(int*, double[], int*);
+extern int icamax_(int*, singlecomplex[], int*);
 
 #if 0
 static float *A;  /* used in _compare_ only */
@@ -47,7 +47,7 @@ static int _compare_(const void *a, const void *b)
  * <pre>
  * Purpose
  * =======
- *    ilu_cdrop_row() - Drop some small rows from the previous 
+ *    ilu_cdrop_row() - Drop some small rows from the previous
  *    supernode (L-part only).
  * </pre>
  */
@@ -59,17 +59,17 @@ int ilu_cdrop_row(
     int quota,                  /* maximum nonzero entries allowed */
     int* nnzLj,                 /* in/out number of nonzeros in L(:, 1:last) */
     double* fill_tol,           /* in/out - on exit, fill_tol=-num_zero_pivots,
-			     * does not change if options->ILU_MILU != SMILU1 */
+                                 * does not change if options->ILU_MILU != SMILU1 */
     GlobalLU_t* Glu,            /* modified */
     float swork[],              /* working space
-	                     * the length of swork[] should be no less than
-			     * the number of rows in the supernode */
+                                 * the length of swork[] should be no less than
+                                 * the number of rows in the supernode */
     float swork2[],             /* working space with the same size as swork[],
-			     * used only by the second dropping rule */
+                                 * used only by the second dropping rule */
     int lastc                   /* if lastc == 0, there is nothing after the
-			     * working supernode [first:last];
-			     * if lastc == 1, there is one more column after
-			     * the working supernode. */
+                                 * working supernode [first:last];
+                                 * if lastc == 1, there is one more column after
+                                 * the working supernode. */
 ) {
     register int i, j, k, m1;
     register int nzlc; /* number of nonzeros in column last+1 */
@@ -77,7 +77,7 @@ int ilu_cdrop_row(
     int m, n;  /* m x n is the size of the supernode */
     int r = 0; /* number of dropped rows */
     register float* temp;
-    register complex* lusup = (complex*)Glu->lusup;
+    register singlecomplex* lusup = (singlecomplex*)Glu->lusup;
     int_t* lsub = Glu->lsub;
     int_t* xlsub = Glu->xlsub;
     int_t* xlusup = Glu->xlusup;
@@ -85,8 +85,8 @@ int ilu_cdrop_row(
     int drop_rule = options->ILU_DropRule;
     milu_t milu = options->ILU_MILU;
     norm_t nrm = options->ILU_Norm;
-    complex one = {1.0, 0.0};
-    complex none = {-1.0, 0.0};
+    singlecomplex one = {1.0, 0.0};
+    singlecomplex none = {-1.0, 0.0};
     int i_1 = 1;
     int inc_diag; /* inc_diag = m + 1 */
     int nzp = 0;  /* number of zero pivots */
@@ -117,7 +117,8 @@ int ilu_cdrop_row(
         case TWO_NORM:
             temp[i] = scnrm2_(&n, &lusup[xlusup_first + i], &m) / sqrt((double)n);
             break;
-        case INF_NORM: default:
+        case INF_NORM:
+        default:
             k = icamax_(&n, &lusup[xlusup_first + i], &m) - 1;
             temp[i] = c_abs1(&lusup[xlusup_first + i + m * k]);
             break;
@@ -136,19 +137,23 @@ int ilu_cdrop_row(
                     caxpy_(&n, &one, &lusup[xlusup_first + i], &m, &lusup[xlusup_first + m - 1], &m);
                     break;
                 case SMILU_3:
-                    for(j = 0; j < n; j++) lusup[xlusup_first + (m - 1) + j * m].r += c_abs1(&lusup[xlusup_first + i + j * m]);
+                    for(j = 0; j < n; j++)
+                        lusup[xlusup_first + (m - 1) + j * m].r +=
+                            c_abs1(&lusup[xlusup_first + i + j * m]);
                     break;
-                case SILU: default:
+                case SILU:
+                default:
                     break;
                 }
                 ccopy_(&n, &lusup[xlusup_first + m1], &m, &lusup[xlusup_first + i], &m);
-            }    /* if (r > 1) */
+            } /* if (r > 1) */
             else /* move to last row */
             {
                 cswap_(&n, &lusup[xlusup_first + m1], &m, &lusup[xlusup_first + i], &m);
                 if(milu == SMILU_3)
                     for(j = 0; j < n; j++) {
-                        lusup[xlusup_first + m1 + j * m].r = c_abs1(&lusup[xlusup_first + m1 + j * m]);
+                        lusup[xlusup_first + m1 + j * m].r =
+                            c_abs1(&lusup[xlusup_first + m1 + j * m]);
                         lusup[xlusup_first + m1 + j * m].i = 0.0;
                     }
             }
@@ -205,19 +210,23 @@ int ilu_cdrop_row(
                         caxpy_(&n, &one, &lusup[xlusup_first + i], &m, &lusup[xlusup_first + m - 1], &m);
                         break;
                     case SMILU_3:
-                        for(j = 0; j < n; j++) lusup[xlusup_first + (m - 1) + j * m].r += c_abs1(&lusup[xlusup_first + i + j * m]);
+                        for(j = 0; j < n; j++)
+                            lusup[xlusup_first + (m - 1) + j * m].r +=
+                                c_abs1(&lusup[xlusup_first + i + j * m]);
                         break;
-                    case SILU: default:
+                    case SILU:
+                    default:
                         break;
                     }
                     ccopy_(&n, &lusup[xlusup_first + m1], &m, &lusup[xlusup_first + i], &m);
-                }    /* if (r > 1) */
+                } /* if (r > 1) */
                 else /* move to last row */
                 {
                     cswap_(&n, &lusup[xlusup_first + m1], &m, &lusup[xlusup_first + i], &m);
                     if(milu == SMILU_3)
                         for(j = 0; j < n; j++) {
-                            lusup[xlusup_first + m1 + j * m].r = c_abs1(&lusup[xlusup_first + m1 + j * m]);
+                            lusup[xlusup_first + m1 + j * m].r =
+                                c_abs1(&lusup[xlusup_first + m1 + j * m]);
                             lusup[xlusup_first + m1 + j * m].i = 0.0;
                         }
                 }
@@ -228,8 +237,10 @@ int ilu_cdrop_row(
                 continue;
             }
             i++;
+
         } /* for */
-    }     /* if secondary dropping */
+
+    } /* if secondary dropping */
 
     for(i = n; i < m; i++) temp[i] = 0.0;
 
@@ -238,10 +249,10 @@ int ilu_cdrop_row(
         return 0;
     }
 
-    /* add dropped entries to the diagnal */
+    /* add dropped entries to the diagonal */
     if(milu != SILU) {
         register int j;
-        complex t;
+        singlecomplex t;
         float omega;
         for(j = 0; j < n; j++) {
             t = lusup[xlusup_first + (m - 1) + j * m];
@@ -256,20 +267,27 @@ int ilu_cdrop_row(
                     cc_mult(&lusup[xlusup_first + j * inc_diag], &lusup[xlusup_first + j * inc_diag], &t);
                 }
                 else {
-                    cs_mult(&lusup[xlusup_first + j * inc_diag], &lusup[xlusup_first + j * inc_diag], *fill_tol);
+                    cs_mult(
+                        &lusup[xlusup_first + j * inc_diag],
+                        &lusup[xlusup_first + j * inc_diag],
+                        *fill_tol
+                    );
 #ifdef DEBUG
-			printf("[1] ZERO PIVOT: FILL col %d.\n", first + j);
-			fflush(stdout);
+                    printf("[1] ZERO PIVOT: FILL col %d.\n", first + j);
+                    fflush(stdout);
 #endif
                     nzp++;
                 }
                 break;
-            case SMILU_2: cs_mult(&lusup[xlusup_first + j * inc_diag], &lusup[xlusup_first + j * inc_diag], 1.0 + c_abs1(&t));
+            case SMILU_2:
+                cs_mult(&lusup[xlusup_first + j * inc_diag], &lusup[xlusup_first + j * inc_diag], 1.0 + c_abs1(&t));
                 break;
-            case SMILU_3: c_add(&t, &t, &one);
+            case SMILU_3:
+                c_add(&t, &t, &one);
                 cc_mult(&lusup[xlusup_first + j * inc_diag], &lusup[xlusup_first + j * inc_diag], &t);
                 break;
-            case SILU: default:
+            case SILU:
+            default:
                 break;
             }
         }
@@ -282,10 +300,13 @@ int ilu_cdrop_row(
         register int tmp1, tmp2;
         tmp1 = xlusup_first + j * m1;
         tmp2 = xlusup_first + j * m;
-        for(i = 0; i < m1; i++) lusup[i + tmp1] = lusup[i + tmp2];
+        for(i = 0; i < m1; i++)
+            lusup[i + tmp1] = lusup[i + tmp2];
     }
-    for(i = 0; i < nzlc; i++) lusup[xlusup_first + i + n * m1] = lusup[xlusup_first + i + n * m];
-    for(i = 0; i < nzlc; i++) lsub[xlsub[last + 1] - r + i] = lsub[xlsub[last + 1] + i];
+    for(i = 0; i < nzlc; i++)
+        lusup[xlusup_first + i + n * m1] = lusup[xlusup_first + i + n * m];
+    for(i = 0; i < nzlc; i++)
+        lsub[xlsub[last + 1] - r + i] = lsub[xlsub[last + 1] + i];
     for(i = first + 1; i <= last + 1; i++) {
         xlusup[i] -= r * (i - first);
         xlsub[i] -= r;

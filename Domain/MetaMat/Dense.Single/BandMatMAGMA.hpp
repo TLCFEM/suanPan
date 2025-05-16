@@ -58,20 +58,17 @@ public:
     BandMatMAGMA(const BandMatMAGMA& other)
         : BandMat<T>(other) { magma_queue_create(0, &queue); }
 
-    BandMatMAGMA(BandMatMAGMA&&) noexcept = delete;
+    BandMatMAGMA(BandMatMAGMA&&) = delete;
     BandMatMAGMA& operator=(const BandMatMAGMA&) = delete;
-    BandMatMAGMA& operator=(BandMatMAGMA&&) noexcept = delete;
+    BandMatMAGMA& operator=(BandMatMAGMA&&) = delete;
 
-    ~BandMatMAGMA() override {
-        release();
-        magma_queue_destroy(queue);
-    }
+    ~BandMatMAGMA() override { magma_queue_destroy(queue); }
 
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMatMAGMA>(*this); }
 };
 
 template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
-    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw invalid_argument("requires a square matrix"); });
+    suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     auto INFO = 0;
 
@@ -86,8 +83,6 @@ template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     const auto LDDB = magma_roundup(LDB, 32);
     const auto SIZEA = LDDAB * N;
     const auto SIZEB = LDDB * NRHS;
-
-    release();
 
     magma_imalloc(&IPIV, N);
 
@@ -134,11 +129,11 @@ template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         });
     }
 
-    if(0 != INFO)
-        suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
-
-    this->pivot.zeros(N);
-    magma_igetmatrix(N, 1, IPIV, N, this->pivot.memptr(), N, queue);
+    if(0 == INFO) {
+        this->pivot.zeros(N);
+        magma_igetmatrix(N, 1, IPIV, N, this->pivot.memptr(), N, queue);
+    }
+    else suanpan_error("Error code {} received, the matrix is probably singular.\n", INFO);
 
     release();
 

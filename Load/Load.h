@@ -57,12 +57,6 @@ public:
         uvec&&,   // dof tag
         double    // nominal magnitude
     );
-    Load(const Load&) = delete;            // copy forbidden
-    Load(Load&&) = delete;                 // move forbidden
-    Load& operator=(const Load&) = delete; // assign forbidden
-    Load& operator=(Load&&) = delete;      // assign forbidden
-
-    ~Load() override = default;
 
     void enable_displacement_control() const;
     [[nodiscard]] bool if_displacement_control() const;

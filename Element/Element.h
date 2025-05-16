@@ -34,19 +34,19 @@
 enum class MaterialType : unsigned;
 enum class SectionType : unsigned;
 
-//struct StateElement {
-//    mat mass{};
-//    mat damping{};
-//    mat stiffness{};
-//    mat geometry{};
+// struct StateElement {
+//     mat mass{};
+//     mat damping{};
+//     mat stiffness{};
+//     mat geometry{};
 //
-//    vec resistance{};
-//    vec damping_force{};
-//    vec inertial_force{};
+//     vec resistance{};
+//     vec damping_force{};
+//     vec inertial_force{};
 //
-//    vec body_force{};
-//    vec traction{};
-//};
+//     vec body_force{};
+//     vec traction{};
+// };
 
 struct DataElement {
     const uvec node_encoding; // node encoding
@@ -145,7 +145,7 @@ class Element : protected DataElement, public ElementBase, public Distributed {
     void update_momentum() override;
 
 protected:
-    std::vector<weak_ptr<Node>> node_ptr; // node pointers
+    std::vector<std::weak_ptr<Node>> node_ptr; // node pointers
 
     [[nodiscard]] mat get_coordinate(unsigned) const override;
 
@@ -195,12 +195,6 @@ public:
         unsigned, // other element tag
         unsigned  // node tag
     );
-    Element(const Element&) = delete;            // copy forbidden
-    Element(Element&&) = delete;                 // move forbidden
-    Element& operator=(const Element&) = delete; // assign forbidden
-    Element& operator=(Element&&) = delete;      // assign forbidden
-
-    ~Element() override = default;
 
     int initialize_base(const shared_ptr<DomainBase>&) final;
 
@@ -235,7 +229,7 @@ public:
     [[nodiscard]] unsigned get_total_number() const override;
 
     void clear_node_ptr() override;
-    [[nodiscard]] const std::vector<weak_ptr<Node>>& get_node_ptr() const override;
+    [[nodiscard]] const std::vector<std::weak_ptr<Node>>& get_node_ptr() const override;
 
     [[nodiscard]] vec get_incre_displacement() const override;
     [[nodiscard]] vec get_incre_velocity() const override;

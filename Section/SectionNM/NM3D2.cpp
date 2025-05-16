@@ -27,4 +27,4 @@ NM3D2::NM3D2(const unsigned T, const double EEA, const double EEIS, const double
     : SurfaceNM3D(CC, std::move(PS))
     , LinearHardeningNM(T, EEA, EEIS, EEIW, HH, KK, LD, vec{NP, MSP, MWP}) {}
 
-unique_ptr<Section> NM3D2::get_copy() { return make_unique<NM3D2>(*this); }
+unique_ptr<Section> NM3D2::get_copy() { return std::make_unique<NM3D2>(*this); }

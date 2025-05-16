@@ -35,7 +35,7 @@
 class Converger;
 class Integrator;
 
-class Solver : public Tag {
+class Solver : public UniqueTag {
     shared_ptr<Converger> converger = nullptr;
     shared_ptr<Integrator> modifier = nullptr;
 
@@ -43,11 +43,6 @@ class Solver : public Tag {
 
 public:
     explicit Solver(unsigned = 0);
-    Solver(const Solver&) = default;
-    Solver(Solver&&) = default;
-    Solver& operator=(const Solver&) = delete;
-    Solver& operator=(Solver&&) = delete;
-    ~Solver() override = default;
 
     virtual int initialize();
 

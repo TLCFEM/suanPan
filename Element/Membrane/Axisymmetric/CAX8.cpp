@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CAX8.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
@@ -135,8 +136,8 @@ int CAX8::reset_status() {
     return code;
 }
 
-vector<vec> CAX8::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> CAX8::record(const OutputType P) {
+    std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
     return data;
 }

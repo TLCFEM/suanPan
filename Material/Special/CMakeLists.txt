@@ -1,3 +1,3 @@
-set(MS
-        Special/Fluid.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        Fluid.cpp
 )

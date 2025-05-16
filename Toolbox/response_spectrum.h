@@ -122,7 +122,8 @@ template<sp_d T> Mat<T> response_spectrum(const T damping_ratio, const T interva
     Mat<T> spectrum(3, period.n_elem, fill::none);
 
     suanpan::for_each(period.n_elem, [&](const uword I) {
-        if(!suanpan::approx_equal(period(I), T(0), 10000)) [[likely]] spectrum.col(I) = Oscillator(datum::tau / period(I), damping_ratio).compute_maximum_response(interval, motion);
+        if(!suanpan::approx_equal(period(I), T(0), 10000)) [[likely]]
+            spectrum.col(I) = Oscillator(datum::tau / period(I), damping_ratio).compute_maximum_response(interval, motion);
         else [[unlikely]] {
             spectrum.col(I)(0) = spectrum.col(I)(1) = T(0);
             spectrum.col(I)(2) = std::max(std::abs(motion.max()), std::abs(motion.min()));

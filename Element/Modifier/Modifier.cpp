@@ -16,11 +16,12 @@
  ******************************************************************************/
 
 #include "Modifier.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 Modifier::Modifier(const unsigned T, uvec&& ET)
-    : Tag(T)
+    : UniqueTag(T)
     , element_tag(unique(ET)) {}
 
 int Modifier::initialize(const shared_ptr<DomainBase>& D) {

@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "TSection2D.h"
-#include <Material/Material1D/Material1D.h>
 
 TSection2D::TSection2D(const unsigned T, const double TFW, const double TFT, const double WH, const double WT, const unsigned MT, const unsigned IP, const double EC)
     : ISection2D(T, TFW, TFT, 0., 0., WH, WT, MT, IP, EC) {}
@@ -24,4 +23,4 @@ TSection2D::TSection2D(const unsigned T, const double TFW, const double TFT, con
 TSection2D::TSection2D(const unsigned T, vec&& D, const unsigned MT, const unsigned IP, const double EC)
     : ISection2D(T, D(0), D(1), 0., 0., D(2), D(3), MT, IP, EC) {}
 
-unique_ptr<Section> TSection2D::get_copy() { return make_unique<TSection2D>(*this); }
+unique_ptr<Section> TSection2D::get_copy() { return std::make_unique<TSection2D>(*this); }

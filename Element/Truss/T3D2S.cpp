@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "T3D2S.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Utility/T3DC.h>
 #include <Section/Section.h>
 
 T3D2S::T3D2S(const unsigned T, uvec&& N, const unsigned M, const bool F, const bool LS)
     : SectionElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::U3})
-    , t_trans(F ? make_unique<T3DC>() : make_unique<T3DL>())
+    , t_trans(F ? std::make_unique<T3DC>() : std::make_unique<T3DL>())
     , log_strain(LS) {}
 
 int T3D2S::initialize(const shared_ptr<DomainBase>& D) {
@@ -81,7 +82,7 @@ int T3D2S::reset_status() {
     return t_section->reset_status();
 }
 
-vector<vec> T3D2S::record(const OutputType P) { return t_section->record(P); }
+std::vector<vec> T3D2S::record(const OutputType P) { return t_section->record(P); }
 
 void T3D2S::print() {
     suanpan_info("A 3D truss element with ");

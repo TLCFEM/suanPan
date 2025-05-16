@@ -52,7 +52,7 @@ using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 3;
 constexpr auto SUANPAN_MINOR = 7;
-constexpr auto SUANPAN_PATCH = 0;
+constexpr auto SUANPAN_PATCH = 1;
 constexpr auto SUANPAN_CODE = "Canopus";
 
 bool SUANPAN_PRINT = true;
@@ -122,12 +122,12 @@ namespace {
 
         if(!exists(updater_module)) return;
 
-        auto terminal = istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
+        auto terminal = std::istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
 
         execute_command(terminal);
     }
 
-    void strip_mode(const string& input_file_name, const string& output_file_name) {
+    void strip_mode(const std::string& input_file_name, const std::string& output_file_name) {
         ifstream input_file(input_file_name);
 
         if(!input_file.is_open()) {
@@ -145,7 +145,7 @@ namespace {
         output_file.setf(std::ios::scientific);
         output_file << std::setprecision(3);
 
-        string line;
+        std::string line;
 
         while(std::getline(input_file, line)) {
             if(line.empty() || if_contain(line, "**")) continue;
@@ -156,7 +156,7 @@ namespace {
         }
     }
 
-    void convert_mode(const string& input_file_name, const string& output_file_name) {
+    void convert_mode(const std::string& input_file_name, const std::string& output_file_name) {
         ifstream input_file(input_file_name);
 
         if(!input_file.is_open()) {
@@ -173,7 +173,7 @@ namespace {
 
         const auto pos = output_file_name.find_last_of('/');
 
-        Converter abaqus_converter(string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
+        Converter abaqus_converter(std::string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
 
         abaqus_converter.process(input_file, output_file);
     }
@@ -311,9 +311,9 @@ void argument_parser(const int argc, char** argv) {
 
                 auto found = output_file_name.rfind(".inp");
 
-                if(string::npos == found) found = output_file_name.rfind(".INP");
+                if(std::string::npos == found) found = output_file_name.rfind(".INP");
 
-                if(string::npos != found) output_file_name.erase(found, 4);
+                if(std::string::npos != found) output_file_name.erase(found, 4);
 
                 output_file_name += strip ? "_out.inp" : "_out.supan";
             }
@@ -336,7 +336,7 @@ void argument_parser(const int argc, char** argv) {
         }
 
         print_header();
-        const auto model = make_shared<Bead>();
+        const auto model = std::make_shared<Bead>();
         if(input_file_name.empty()) cli_mode(model);
         else if(process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
             if(output_file.is_open()) {
@@ -349,7 +349,7 @@ void argument_parser(const int argc, char** argv) {
     else {
         check_version(SUANPAN_EXE);
         print_header();
-        const auto model = make_shared<Bead>();
+        const auto model = std::make_shared<Bead>();
         cli_mode(model);
     }
 
@@ -427,9 +427,9 @@ void cli_mode(const shared_ptr<Bead>& model) {
 
     ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
 
-    string all_line;
+    std::string all_line;
     while(true) {
-        string command_line;
+        std::string command_line;
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         if(0 == comm_rank)
             suanpan_info("suanPan ~<> ");
@@ -437,7 +437,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(output_file.is_open()) output_file << all_line << '\n';
-        if(istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return;
+        if(std::istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return;
         all_line.clear();
     }
 }

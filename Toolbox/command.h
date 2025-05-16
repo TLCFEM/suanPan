@@ -33,13 +33,13 @@
 
 class Bead;
 
-int process_command(const shared_ptr<Bead>&, istringstream&);
+int process_command(const std::shared_ptr<Bead>&, std::istringstream&);
 
-bool normalise_command(string&, string&);
+bool normalise_command(std::string&, std::string&);
 
-int process_file(const shared_ptr<Bead>&, const char*);
+int process_file(const std::shared_ptr<Bead>&, const char*);
 
-int execute_command(istringstream&);
+int execute_command(std::istringstream&);
 
 fs::path get_history_path();
 

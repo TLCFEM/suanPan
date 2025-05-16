@@ -17,6 +17,7 @@
 
 // ReSharper disable CppFunctionalStyleCast
 #include "ExternalModule.h"
+
 #include <Material/ExternalMaterial.h>
 #include <algorithm>
 
@@ -26,18 +27,18 @@
 #include <dlfcn.h>
 #endif
 
-using element_creator = void (*)(unique_ptr<Element>&, istringstream&);
-using load_creator = void (*)(unique_ptr<Load>&, istringstream&);
-using material_creator = void (*)(unique_ptr<Material>&, istringstream&);
-using section_creator = void (*)(unique_ptr<Section>&, istringstream&);
-using solver_creator = void (*)(unique_ptr<Solver>&, istringstream&);
-using amplitude_creator = void (*)(unique_ptr<Amplitude>&, istringstream&);
-using modifier_creator = void (*)(unique_ptr<Modifier>&, istringstream&);
-using constraint_creator = void (*)(unique_ptr<Constraint>&, istringstream&);
+using element_creator = void (*)(unique_ptr<Element>&, std::istringstream&);
+using load_creator = void (*)(unique_ptr<Load>&, std::istringstream&);
+using material_creator = void (*)(unique_ptr<Material>&, std::istringstream&);
+using section_creator = void (*)(unique_ptr<Section>&, std::istringstream&);
+using solver_creator = void (*)(unique_ptr<Solver>&, std::istringstream&);
+using amplitude_creator = void (*)(unique_ptr<Amplitude>&, std::istringstream&);
+using modifier_creator = void (*)(unique_ptr<Modifier>&, std::istringstream&);
+using constraint_creator = void (*)(unique_ptr<Constraint>&, std::istringstream&);
 
 using external_handler = void (*)(ExternalMaterialData*, int*);
 
-bool ExternalModule::locate_module(string module_name) {
+bool ExternalModule::locate_module(std::string module_name) {
     if(ext_library == nullptr) return false;
 
     suanpan::to_lower(module_name);
@@ -51,7 +52,7 @@ bool ExternalModule::locate_module(string module_name) {
     return ext_creator != nullptr;
 }
 
-ExternalModule::ExternalModule(string L)
+ExternalModule::ExternalModule(std::string L)
     : library_name(std::move(L)) {
 #ifdef SUANPAN_WIN
     auto file_name = library_name + ".dll";
@@ -99,31 +100,31 @@ ExternalModule::~ExternalModule() {
 #endif
 }
 
-bool ExternalModule::locate_c_module(const string& module_name) { return locate_module(module_name + "_handler"); }
+bool ExternalModule::locate_c_module(const std::string& module_name) { return locate_module(module_name + "_handler"); }
 
-bool ExternalModule::locate_cpp_module(const string& module_name) { return locate_module("new_" + module_name); }
+bool ExternalModule::locate_cpp_module(const std::string& module_name) { return locate_module("new_" + module_name); }
 
-void ExternalModule::new_object(unique_ptr<Element>& return_obj, istringstream& command) const { (element_creator(ext_creator))(return_obj, command); }
+void ExternalModule::new_object(unique_ptr<Element>& return_obj, std::istringstream& command) const { (element_creator(ext_creator))(return_obj, command); }
 
-void ExternalModule::new_object(unique_ptr<Load>& return_obj, istringstream& command) const { (load_creator(ext_creator))(return_obj, command); }
+void ExternalModule::new_object(unique_ptr<Load>& return_obj, std::istringstream& command) const { (load_creator(ext_creator))(return_obj, command); }
 
-void ExternalModule::new_object(unique_ptr<Material>& return_obj, istringstream& command) const { (material_creator(ext_creator))(return_obj, command); }
+void ExternalModule::new_object(unique_ptr<Material>& return_obj, std::istringstream& command) const { (material_creator(ext_creator))(return_obj, command); }
 
-void ExternalModule::new_object(unique_ptr<Section>& return_obj, istringstream& command) const { (section_creator(ext_creator))(return_obj, command); }
+void ExternalModule::new_object(unique_ptr<Section>& return_obj, std::istringstream& command) const { (section_creator(ext_creator))(return_obj, command); }
 
-void ExternalModule::new_object(unique_ptr<Solver>& return_obj, istringstream& command) const { (solver_creator(ext_creator))(return_obj, command); }
+void ExternalModule::new_object(unique_ptr<Solver>& return_obj, std::istringstream& command) const { (solver_creator(ext_creator))(return_obj, command); }
 
-void ExternalModule::new_object(unique_ptr<Amplitude>& return_obj, istringstream& command) const { (amplitude_creator(ext_creator))(return_obj, command); }
+void ExternalModule::new_object(unique_ptr<Amplitude>& return_obj, std::istringstream& command) const { (amplitude_creator(ext_creator))(return_obj, command); }
 
-void ExternalModule::new_object(unique_ptr<Modifier>& return_obj, istringstream& command) const { (modifier_creator(ext_creator))(return_obj, command); }
+void ExternalModule::new_object(unique_ptr<Modifier>& return_obj, std::istringstream& command) const { (modifier_creator(ext_creator))(return_obj, command); }
 
-void ExternalModule::new_object(unique_ptr<Constraint>& return_obj, istringstream& command) const { (constraint_creator(ext_creator))(return_obj, command); }
+void ExternalModule::new_object(unique_ptr<Constraint>& return_obj, std::istringstream& command) const { (constraint_creator(ext_creator))(return_obj, command); }
 
-void ExternalModule::new_adapter(unique_ptr<Element>&, istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Element>&, std::istringstream&) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Load>&, istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Load>&, std::istringstream&) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, istringstream& command) const {
+void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, std::istringstream& command) const {
     unsigned tag;
 
     if(!get_input(command, tag)) {
@@ -137,15 +138,15 @@ void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, istringstream
 
     while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
 
-    if(auto ext_obj = make_unique<ExternalMaterial>(tag, std::move(pool), ext_creator); ext_obj->validate()) return_obj = std::move(ext_obj);
+    if(auto ext_obj = std::make_unique<ExternalMaterial>(tag, std::move(pool), ext_creator); ext_obj->validate()) return_obj = std::move(ext_obj);
 }
 
-void ExternalModule::new_adapter(unique_ptr<Section>&, istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Section>&, std::istringstream&) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Solver>&, istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Solver>&, std::istringstream&) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Amplitude>&, istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Amplitude>&, std::istringstream&) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Modifier>&, istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Modifier>&, std::istringstream&) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Constraint>&, istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Constraint>&, std::istringstream&) const {}

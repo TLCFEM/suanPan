@@ -50,7 +50,7 @@ class CSMT6 final : public MaterialElement2D {
 
     const double area = 0.;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     CSMT6(
@@ -69,7 +69,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 

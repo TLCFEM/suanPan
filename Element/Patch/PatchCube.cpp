@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PatchCube.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Utility/IGA/NURBSVolume.h>
 #include <Material/Material3D/Material3D.h>
@@ -89,9 +90,12 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
                     }
                     initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
 
-                    for(auto M = 0u, N = 0u; M < c_node; ++M, N += c_dof) for(auto P = 0llu; P < c_dof; ++P) body_force(N + P, P) += c_pt.weight * ders(0, 0, 0)(M);
+                    for(auto M = 0u, N = 0u; M < c_node; ++M, N += c_dof)
+                        for(auto P = 0llu; P < c_dof; ++P) body_force(N + P, P) += c_pt.weight * ders(0, 0, 0)(M);
 
-                    if(t_density > 0.) for(auto M = 0llu; M < c_node; ++M) for(auto N = M; N < c_node; ++N) initial_mass(c_dof * M, c_dof * N) += t_density * c_pt.weight * ders(0, 0, 0)(M) * ders(0, 0, 0)(N);
+                    if(t_density > 0.)
+                        for(auto M = 0llu; M < c_node; ++M)
+                            for(auto N = M; N < c_node; ++N) initial_mass(c_dof * M, c_dof * N) += t_density * c_pt.weight * ders(0, 0, 0)(M) * ders(0, 0, 0)(N);
                 }
             }
     trial_stiffness = current_stiffness = initial_stiffness;
@@ -141,8 +145,8 @@ int PatchCube::reset_status() {
     return code;
 }
 
-vector<vec> PatchCube::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> PatchCube::record(const OutputType P) {
+    std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
     return data;
 }

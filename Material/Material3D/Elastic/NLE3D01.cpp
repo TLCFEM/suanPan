@@ -17,6 +17,7 @@
 
 // ReSharper disable CppClangTidyClangDiagnosticDocumentationUnknownCommand
 #include "NLE3D01.h"
+
 #include <Toolbox/tensor.h>
 
 /**
@@ -44,4 +45,4 @@ NLE3D01::NLE3D01(const unsigned T, const double K, const double RE, const double
     : DataNLE3D01{9 * K, fabs(RE), fabs(RS), std::max(0., std::min(1., M))}
     , IsotropicNonlinearElastic3D(T, R) {}
 
-unique_ptr<Material> NLE3D01::get_copy() { return make_unique<NLE3D01>(*this); }
+unique_ptr<Material> NLE3D01::get_copy() { return std::make_unique<NLE3D01>(*this); }

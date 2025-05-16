@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -11,7 +11,7 @@ at the top-level directory.
 
 /*! @file zmyblas2.c
  * \brief Level 2 Blas operations
- * 
+ *
  * <pre>
  * -- SuperLU routine (version 2.0) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
@@ -31,9 +31,9 @@ at the top-level directory.
 #include "slu_dcomplex.h"
 
 /*! \brief Solves a dense UNIT lower triangular system
- * 
- * The unit lower 
- * triangular matrix is stored in a 2D array M(1:nrow,1:ncol). 
+ *
+ * The unit lower
+ * triangular matrix is stored in a 2D array M(1:nrow,1:ncol).
  * The solution will be returned in the rhs vector.
  */
 void zlsolve(int ldm, int ncol, doublecomplex* M, doublecomplex* rhs) {
@@ -45,8 +45,7 @@ void zlsolve(int ldm, int ncol, doublecomplex* M, doublecomplex* rhs) {
 
     M0 = &M[0];
 
-    while(firstcol < ncol - 3) {
-        /* Do 4 columns */
+    while(firstcol < ncol - 3) { /* Do 4 columns */
         Mki0 = M0 + 1;
         Mki1 = Mki0 + ldm + 1;
         Mki2 = Mki1 + ldm + 1;
@@ -55,16 +54,16 @@ void zlsolve(int ldm, int ncol, doublecomplex* M, doublecomplex* rhs) {
         x0 = rhs[firstcol];
         zz_mult(&temp, &x0, Mki0);
         Mki0++;
-        z_sub(&x1, &rhs[firstcol+1], &temp);
+        z_sub(&x1, &rhs[firstcol + 1], &temp);
         zz_mult(&temp, &x0, Mki0);
         Mki0++;
-        z_sub(&x2, &rhs[firstcol+2], &temp);
+        z_sub(&x2, &rhs[firstcol + 2], &temp);
         zz_mult(&temp, &x1, Mki1);
         Mki1++;
         z_sub(&x2, &x2, &temp);
         zz_mult(&temp, &x0, Mki0);
         Mki0++;
-        z_sub(&x3, &rhs[firstcol+3], &temp);
+        z_sub(&x3, &rhs[firstcol + 3], &temp);
         zz_mult(&temp, &x1, Mki1);
         Mki1++;
         z_sub(&x3, &x3, &temp);
@@ -95,15 +94,14 @@ void zlsolve(int ldm, int ncol, doublecomplex* M, doublecomplex* rhs) {
         M0 += 4 * ldm + 4;
     }
 
-    if(firstcol < ncol - 1) {
-        /* Do 2 columns */
+    if(firstcol < ncol - 1) { /* Do 2 columns */
         Mki0 = M0 + 1;
         Mki1 = Mki0 + ldm + 1;
 
         x0 = rhs[firstcol];
         zz_mult(&temp, &x0, Mki0);
         Mki0++;
-        z_sub(&x1, &rhs[firstcol+1], &temp);
+        z_sub(&x1, &rhs[firstcol + 1], &temp);
 
         rhs[++firstcol] = x1;
         ++firstcol;
@@ -119,7 +117,7 @@ void zlsolve(int ldm, int ncol, doublecomplex* M, doublecomplex* rhs) {
     }
 }
 
-/*! \brief Solves a dense upper triangular system. 
+/*! \brief Solves a dense upper triangular system.
  *
  * The upper triangular matrix is
  * stored in a 2-dim array M(1:ldm,1:ncol). The solution will be returned
@@ -136,7 +134,7 @@ void zusolve(int ldm, int ncol, doublecomplex* M, doublecomplex* rhs) {
         rhs[jcol] = xj;
 
         for(irow = 0; irow < jcol; irow++) {
-            zz_mult(&temp, &xj, &M[irow+jcol*ldm]); /* M(irow, jcol) */
+            zz_mult(&temp, &xj, &M[irow + jcol * ldm]); /* M(irow, jcol) */
             z_sub(&rhs[irow], &rhs[irow], &temp);
         }
 
@@ -157,8 +155,7 @@ void zmatvec(int ldm, int nrow, int ncol, doublecomplex* M, doublecomplex* vec, 
 
     M0 = &M[0];
 
-    while(firstcol < ncol - 3) {
-        /* Do 4 columns */
+    while(firstcol < ncol - 3) { /* Do 4 columns */
         Mki0 = M0;
         Mki1 = Mki0 + ldm;
         Mki2 = Mki1 + ldm;
@@ -186,8 +183,7 @@ void zmatvec(int ldm, int nrow, int ncol, doublecomplex* M, doublecomplex* vec, 
         M0 += 4 * ldm;
     }
 
-    while(firstcol < ncol) {
-        /* Do 1 column */
+    while(firstcol < ncol) { /* Do 1 column */
         Mki0 = M0;
         vi0 = vec[firstcol++];
         for(k = 0; k < nrow; k++) {

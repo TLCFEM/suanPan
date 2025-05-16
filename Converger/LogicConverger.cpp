@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LogicConverger.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <future>
@@ -49,7 +50,7 @@ int LogicConverger::initialize() {
     return converger_a->initialize() + converger_b->initialize();
 }
 
-unique_ptr<Converger> LogicAND::get_copy() { return make_unique<LogicAND>(*this); }
+unique_ptr<Converger> LogicAND::get_copy() { return std::make_unique<LogicAND>(*this); }
 
 bool LogicAND::is_converged(const unsigned counter) {
     auto result_a = std::async([&] { return converger_a->is_converged(counter); });
@@ -63,7 +64,7 @@ bool LogicAND::is_converged(const unsigned counter) {
     return get_conv_flag();
 }
 
-unique_ptr<Converger> LogicOR::get_copy() { return make_unique<LogicOR>(*this); }
+unique_ptr<Converger> LogicOR::get_copy() { return std::make_unique<LogicOR>(*this); }
 
 bool LogicOR::is_converged(const unsigned counter) {
     auto result_a = std::async([&] { return converger_a->is_converged(counter); });
@@ -77,7 +78,7 @@ bool LogicOR::is_converged(const unsigned counter) {
     return get_conv_flag();
 }
 
-unique_ptr<Converger> LogicXOR::get_copy() { return make_unique<LogicXOR>(*this); }
+unique_ptr<Converger> LogicXOR::get_copy() { return std::make_unique<LogicXOR>(*this); }
 
 bool LogicXOR::is_converged(const unsigned counter) {
     auto result_a = std::async([&] { return converger_a->is_converged(counter); });

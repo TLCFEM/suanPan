@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "ConvergerParser.h"
+
 #include <Converger/Converger>
 #include <Domain/DomainBase.h>
 #include <Step/Step.h>
 #include <Toolbox/utility.h>
 
-int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& command) {
-    string converger_id;
+int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string converger_id;
     if(!get_input(command, converger_id)) {
         suanpan_error("A valid converger type is required.\n");
         return SUANPAN_SUCCESS;
@@ -42,9 +43,9 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(converger_id, "LogicAND") && domain->insert(make_shared<LogicAND>(tag, tag_a, tag_b))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(is_equal(converger_id, "LogicOR") && domain->insert(make_shared<LogicOR>(tag, tag_a, tag_b))) code = 1;
-        else if(is_equal(converger_id, "LogicXOR") && domain->insert(make_shared<LogicXOR>(tag, tag_a, tag_b))) code = 1;
+        if(is_equal(converger_id, "LogicAND") && domain->insert(std::make_shared<LogicAND>(tag, tag_a, tag_b))) code = 1; // NOLINT(bugprone-branch-clone)
+        else if(is_equal(converger_id, "LogicOR") && domain->insert(std::make_shared<LogicOR>(tag, tag_a, tag_b))) code = 1;
+        else if(is_equal(converger_id, "LogicXOR") && domain->insert(std::make_shared<LogicXOR>(tag, tag_a, tag_b))) code = 1;
         else
             suanpan_error("Cannot identify converger type.\n");
     }
@@ -61,25 +62,25 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, istringstream& co
             return SUANPAN_SUCCESS;
         }
 
-        string print_flag = "false";
+        std::string print_flag = "false";
         if(!command.eof() && !get_input(command, print_flag)) {
             suanpan_error("A valid print flag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(converger_id, "AbsResidual") && domain->insert(make_shared<AbsResidual>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(is_equal(converger_id, "RelResidual") && domain->insert(make_shared<RelResidual>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsIncreDisp") && domain->insert(make_shared<AbsIncreDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelIncreDisp") && domain->insert(make_shared<RelIncreDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsIncreAcc") && domain->insert(make_shared<AbsIncreAcc>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelIncreAcc") && domain->insert(make_shared<RelIncreAcc>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsDisp") && domain->insert(make_shared<AbsDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelDisp") && domain->insert(make_shared<RelDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsError") && domain->insert(make_shared<AbsError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelError") && domain->insert(make_shared<RelError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsIncreEnergy") && domain->insert(make_shared<AbsIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelIncreEnergy") && domain->insert(make_shared<RelIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "FixedNumber") && domain->insert(make_shared<FixedNumber>(tag, max_iteration, is_true(print_flag)))) code = 1;
+        if(is_equal(converger_id, "AbsResidual") && domain->insert(std::make_shared<AbsResidual>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1; // NOLINT(bugprone-branch-clone)
+        else if(is_equal(converger_id, "RelResidual") && domain->insert(std::make_shared<RelResidual>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "AbsIncreDisp") && domain->insert(std::make_shared<AbsIncreDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "RelIncreDisp") && domain->insert(std::make_shared<RelIncreDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "AbsIncreAcc") && domain->insert(std::make_shared<AbsIncreAcc>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "RelIncreAcc") && domain->insert(std::make_shared<RelIncreAcc>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "AbsDisp") && domain->insert(std::make_shared<AbsDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "RelDisp") && domain->insert(std::make_shared<RelDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "AbsError") && domain->insert(std::make_shared<AbsError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "RelError") && domain->insert(std::make_shared<RelError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "AbsIncreEnergy") && domain->insert(std::make_shared<AbsIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "RelIncreEnergy") && domain->insert(std::make_shared<RelIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
+        else if(is_equal(converger_id, "FixedNumber") && domain->insert(std::make_shared<FixedNumber>(tag, max_iteration, is_true(print_flag)))) code = 1;
         else
             suanpan_error("Cannot identify converger type.\n");
     }

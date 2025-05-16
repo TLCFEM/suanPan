@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "B21.h"
+
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B2DC.h>
 #include <Section/Section.h>
@@ -34,7 +35,7 @@ B21::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_p
 B21::B21(const unsigned T, uvec&& N, const unsigned S, const unsigned P, const bool F)
     : SectionElement2D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , int_pt_num(P > 20 ? 20 : P)
-    , b_trans(F ? make_unique<B2DC>() : make_unique<B2DL>()) {}
+    , b_trans(F ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
 
 int B21::initialize(const shared_ptr<DomainBase>& D) {
     auto& section_proto = D->get<Section>(section_tag(0));
@@ -108,8 +109,8 @@ int B21::reset_status() {
     return code;
 }
 
-vector<vec> B21::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> B21::record(const OutputType P) {
+    std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
     return data;
 }

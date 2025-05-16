@@ -175,7 +175,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           cache: false
-      - name: Depedency
+      - name: Dependency
         run: |
           wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-linux.tar.gz
           tar xf VTK-9.4.2-linux.tar.gz

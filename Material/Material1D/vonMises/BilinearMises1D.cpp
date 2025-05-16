@@ -29,4 +29,4 @@ BilinearMises1D::BilinearMises1D(const unsigned T, const double E, const double 
     : DataBilinearMises1D{fabs(Y), fabs(E) * H / (1. - H)}
     , NonlinearMises1D(T, E, R) {}
 
-unique_ptr<Material> BilinearMises1D::get_copy() { return make_unique<BilinearMises1D>(*this); }
+unique_ptr<Material> BilinearMises1D::get_copy() { return std::make_unique<BilinearMises1D>(*this); }

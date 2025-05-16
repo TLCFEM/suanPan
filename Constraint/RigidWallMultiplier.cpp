@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "RigidWallMultiplier.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
@@ -43,8 +44,10 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
     for(const auto& I : D->get_node_pool()) {
         if(!checker_handler(I)) continue;
         const vec t_pos = trial_position_handler(I) - origin;
-        if(!edge_a.empty()) if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) continue;
-        if(!edge_b.empty()) if(const auto projection = dot(t_pos, edge_b); projection > length_b || projection < 0.) continue;
+        if(!edge_a.empty())
+            if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) continue;
+        if(!edge_b.empty())
+            if(const auto projection = dot(t_pos, edge_b); projection > length_b || projection < 0.) continue;
         if(const auto t_pen = dot(t_pos, outer_norm); t_pen > datum::eps) continue;
         ++counter;
         auxiliary_stiffness.resize(W->get_size(), counter);

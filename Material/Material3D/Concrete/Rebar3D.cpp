@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Rebar3D.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
@@ -45,7 +46,7 @@ int Rebar3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Rebar3D::get_copy() { return make_unique<Rebar3D>(*this); }
+unique_ptr<Material> Rebar3D::get_copy() { return std::make_unique<Rebar3D>(*this); }
 
 int Rebar3D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;
@@ -88,8 +89,8 @@ int Rebar3D::reset_status() {
     return rebar_x->reset_status() + rebar_y->reset_status() + rebar_z->reset_status();
 }
 
-vector<vec> Rebar3D::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> Rebar3D::record(const OutputType P) {
+    std::vector<vec> data;
 
     for(const auto& I : rebar_x->record(P)) data.emplace_back(I);
     for(const auto& I : rebar_y->record(P)) data.emplace_back(I);

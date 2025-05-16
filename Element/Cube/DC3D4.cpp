@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "DC3D4.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
 #include <Recorder/OutputType.h>
@@ -105,7 +106,7 @@ int DC3D4::clear_status() {
 
 int DC3D4::reset_status() { return c_material->reset_status(); }
 
-vector<vec> DC3D4::record(const OutputType P) {
+std::vector<vec> DC3D4::record(const OutputType P) {
     if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
 
     return c_material->record(P);

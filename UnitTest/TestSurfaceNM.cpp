@@ -1,4 +1,5 @@
 #include "CatchHeader.h"
+
 #include <Section/SectionNM/SurfaceNM2D.h>
 
 TEST_CASE("2D Surface", "[NM.Surface]") {

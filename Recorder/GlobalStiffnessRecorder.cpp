@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "GlobalStiffnessRecorder.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
@@ -23,7 +24,8 @@
 void GlobalStiffnessRecorder::assemble_stiffness(const mat& EK, const uvec& EC, mat& GK) {
     if(EK.is_empty()) return;
 
-    for(unsigned I = 0; I < EC.n_elem; ++I) for(unsigned J = 0; J < EC.n_elem; ++J) GK(EC(J), EC(I)) += EK(J, I);
+    for(unsigned I = 0; I < EC.n_elem; ++I)
+        for(unsigned J = 0; J < EC.n_elem; ++J) GK(EC(J), EC(I)) += EK(J, I);
 }
 
 GlobalStiffnessRecorder::GlobalStiffnessRecorder(const unsigned T, const unsigned I, const bool R, const bool H)
@@ -39,7 +41,8 @@ void GlobalStiffnessRecorder::record(const shared_ptr<DomainBase>& D) {
 
     vec stiffness(S * S, fill::zeros);
 
-    if(mat g_stiffness(stiffness.memptr(), S, S, false, true); C.empty()) for(const auto& I : D->get_element_pool()) assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), g_stiffness);
+    if(mat g_stiffness(stiffness.memptr(), S, S, false, true); C.empty())
+        for(const auto& I : D->get_element_pool()) assemble_stiffness(I->get_current_stiffness(), I->get_dof_encoding(), g_stiffness);
     else
         std::ranges::for_each(C, [&](const std::vector<unsigned>& color) {
             suanpan::for_all(color, [&](const unsigned tag) {

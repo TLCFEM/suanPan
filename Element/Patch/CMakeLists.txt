@@ -1,5 +1,5 @@
-set(Patch
-        Patch/Patch.cpp
-        Patch/PatchQuad.cpp
-        Patch/PatchCube.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        Patch.cpp
+        PatchCube.cpp
+        PatchQuad.cpp
 )

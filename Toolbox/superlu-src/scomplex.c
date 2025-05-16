@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -28,12 +28,14 @@ at the top-level directory.
 #include "slu_scomplex.h"
 
 /*! \brief Complex Division c = a/b */
-void c_div(complex* c, complex* a, complex* b) {
+void c_div(singlecomplex* c, const singlecomplex* a, const singlecomplex* b) {
     float ratio, den;
     float abr, abi, cr, ci;
 
-    if((abr = b->r) < 0.) abr = -abr;
-    if((abi = b->i) < 0.) abi = -abi;
+    if((abr = b->r) < 0.)
+        abr = -abr;
+    if((abi = b->i) < 0.)
+        abi = -abi;
     if(abr <= abi) {
         if(abi == 0) {
             fprintf(stderr, "z_div.c: division by zero\n");
@@ -55,7 +57,7 @@ void c_div(complex* c, complex* a, complex* b) {
 }
 
 /*! \brief Returns sqrt(z.r^2 + z.i^2) */
-double c_abs(complex* z) {
+double c_abs(singlecomplex* z) {
     float temp;
     float real = z->r;
     float imag = z->i;
@@ -75,7 +77,7 @@ double c_abs(complex* z) {
 }
 
 /*! \brief Approximates the abs. Returns abs(z.r) + abs(z.i) */
-double c_abs1(complex* z) {
+double c_abs1(singlecomplex* z) {
     float real = z->r;
     float imag = z->i;
 
@@ -86,7 +88,7 @@ double c_abs1(complex* z) {
 }
 
 /*! \brief Return the exponentiation */
-void c_exp(complex* r, complex* z) {
+void c_exp(singlecomplex* r, singlecomplex* z) {
     float expx;
 
     expx = exp(z->r);
@@ -95,28 +97,34 @@ void c_exp(complex* r, complex* z) {
 }
 
 /*! \brief Return the complex conjugate */
-void r_cnjg(complex* r, complex* z) {
+void r_cnjg(singlecomplex* r, singlecomplex* z) {
     r->r = z->r;
     r->i = -z->i;
 }
 
 /*! \brief Return the imaginary part */
-double r_imag(complex* z) { return (z->i); }
+double r_imag(singlecomplex* z) {
+    return (z->i);
+}
 
 /*! \brief SIGN functions for complex number. Returns z/abs(z) */
-complex c_sgn(complex* z) {
+singlecomplex c_sgn(singlecomplex* z) {
     register float t = c_abs(z);
-    register complex retval;
+    register singlecomplex retval;
 
-    if(t == 0.0) { retval.r = 1.0, retval.i = 0.0; }
-    else { retval.r = z->r / t, retval.i = z->i / t; }
+    if(t == 0.0) {
+        retval.r = 1.0, retval.i = 0.0;
+    }
+    else {
+        retval.r = z->r / t, retval.i = z->i / t;
+    }
 
     return retval;
 }
 
 /*! \brief Square-root of a complex number. */
-complex c_sqrt(complex* z) {
-    complex retval;
+singlecomplex c_sqrt(singlecomplex* z) {
+    singlecomplex retval;
     register float cr, ci, real, imag;
 
     real = z->r;

@@ -45,7 +45,7 @@ class NonviscousNewmark : public Newmark {
     cx_mat current_damping;
 
 public:
-    explicit NonviscousNewmark(unsigned, double, double, cx_vec&&, cx_vec&&);
+    NonviscousNewmark(unsigned, double, double, cx_vec&&, cx_vec&&);
 
     int initialize() override;
 

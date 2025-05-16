@@ -17,10 +17,11 @@
 
 // ReSharper disable IdentifierTypo
 #include "CDPM2.h"
+
 #include <Recorder/OutputType.h>
+#include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
-#include <Toolbox/ridders.hpp>
 
 const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
@@ -366,7 +367,7 @@ int CDPM2::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> CDPM2::get_copy() { return make_unique<CDPM2>(*this); }
+unique_ptr<Material> CDPM2::get_copy() { return std::make_unique<CDPM2>(*this); }
 
 double CDPM2::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
@@ -569,7 +570,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     mat principal_direction; // 3x3
     if(!eig_sym(principal_stress, principal_direction, tensor::stress::to_tensor(trial_stress), "std")) return SUANPAN_FAIL;
 
-    vector<uword> tp, cp;
+    std::vector<uword> tp, cp;
     tp.reserve(3);
     cp.reserve(3);
     for(auto I = 0llu; I < 3llu; ++I)
@@ -666,7 +667,7 @@ int CDPM2::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> CDPM2::record(const OutputType P) {
+std::vector<vec> CDPM2::record(const OutputType P) {
     if(P == OutputType::DT) return {vec{current_history(16)}};
     if(P == OutputType::DC) return {vec{current_history(17)}};
 

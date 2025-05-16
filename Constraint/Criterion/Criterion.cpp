@@ -16,10 +16,11 @@
  ******************************************************************************/
 
 #include "Criterion.h"
+
 #include <Domain/DomainBase.h>
 
 Criterion::Criterion(const unsigned T, const unsigned ST)
-    : Tag(T)
+    : CopiableTag(T)
     , step_tag(ST) {}
 
 void Criterion::set_step_tag(const unsigned T) { step_tag = T; }

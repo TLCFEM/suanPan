@@ -46,7 +46,7 @@ class PatchCube final : public MaterialPatch3D {
 
     const unsigned c_size = c_dof * c_node;
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     PatchCube(
@@ -66,7 +66,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 
     void print() override;
 };

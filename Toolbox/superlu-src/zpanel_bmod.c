@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -22,7 +22,7 @@ at the top-level directory.
  *
  * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY
  * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
- * 
+ *
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
@@ -46,14 +46,14 @@ at the top-level directory.
  *
  *    Performs numeric block updates (sup-panel) in topological order.
  *    It features: col-col, 2cols-col, 3cols-col, and sup-col updates.
- *    Special processing on the supernodal portion of L\\U[*,j]
+ *    Special processing on the supernodal portion of L\U[*,j]
  *
- *    Before entering this routine, the original nonzeros in the panel 
+ *    Before entering this routine, the original nonzeros in the panel
  *    were already copied into the spa[m,w].
  *
  *    Updated/Output parameters-
- *    dense[0:m-1,w]: L[*,j:j+w-1] and U[*,j:j+w-1] are returned 
- *    collectively in the m-by-w vector dense[*]. 
+ *    dense[0:m-1,w]: L[*,j:j+w-1] and U[*,j:j+w-1] are returned
+ *    collectively in the m-by-w vector dense[*].
  * </pre>
  */
 
@@ -75,8 +75,8 @@ void zpanel_bmod(
          ftcs2 = _cptofcd("N", strlen("N")),
          ftcs3 = _cptofcd("U", strlen("U"));
 #endif
-    int          incx = 1, incy = 1;
-    doublecomplex       alpha, beta;
+    int incx = 1, incy = 1;
+    doublecomplex alpha, beta;
 #endif
 
     register int k, ksub;
@@ -118,12 +118,11 @@ void zpanel_bmod(
     colblk = sp_ienv(5);
     ldaTmp = maxsuper + rowblk;
 
-    /* 
-     * For each nonz supernode segment of U[*,j] in topological order 
+    /*
+     * For each nonz supernode segment of U[*,j] in topological order
      */
     k = nseg - 1;
-    for(ksub = 0; ksub < nseg; ksub++) {
-        /* for each updating supernode */
+    for(ksub = 0; ksub < nseg; ksub++) { /* for each updating supernode */
 
         /* krep = representative of current k-th supernode
          * fsupc = first supernodal column
@@ -141,15 +140,15 @@ void zpanel_bmod(
         repfnz_col = repfnz;
         dense_col = dense;
 
-        if(nsupc >= colblk && nrow > rowblk) {
-            /* 2-D block update */
+        if(nsupc >= colblk && nrow > rowblk) { /* 2-D block update */
 
             TriTmp = tempv;
 
             /* Sequence through each column in panel -- triangular solves */
-            for(jj = jcol; jj < jcol + w; jj++, repfnz_col += m, dense_col += m, TriTmp += ldaTmp) {
+            for(jj = jcol; jj < jcol + w; jj++,
+            repfnz_col += m, dense_col += m, TriTmp += ldaTmp) {
                 kfnz = repfnz_col[krep];
-                if(kfnz == EMPTY) continue; /* Skip any zero segment */
+                if(kfnz == SLU_EMPTY) continue; /* Skip any zero segment */
 
                 segsze = krep - kfnz + 1;
                 luptr = xlusup[fsupc];
@@ -192,7 +191,7 @@ void zpanel_bmod(
                     else {
                         ukj2 = dense_col[lsub[krep_ind - 2]];
                         luptr2 = luptr1 - nsupr;
-                        zz_mult(&comp_temp, &ukj2, &lusup[luptr2-1]);
+                        zz_mult(&comp_temp, &ukj2, &lusup[luptr2 - 1]);
                         z_sub(&ukj1, &ukj1, &comp_temp);
 
                         zz_mult(&comp_temp, &ukj1, &lusup[luptr1]);
@@ -215,8 +214,7 @@ void zpanel_bmod(
                         }
                     }
                 }
-                else {
-                    /* segsze >= 4 */
+                else { /* segsze >= 4 */
 
                     /* Copy U[*,j] segment from dense[*] to TriTmp[*], which
                        holds the result of triangular solves.    */
@@ -233,17 +231,17 @@ void zpanel_bmod(
 
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
-		    CTRSV( ftcs1, ftcs2, ftcs3, &segsze, &lusup[luptr], 
-			   &nsupr, TriTmp, &incx );
+                    CTRSV(ftcs1, ftcs2, ftcs3, &segsze, &lusup[luptr], &nsupr, TriTmp, &incx);
 #else
-		    ztrsv_( "L", "N", "U", &segsze, &lusup[luptr], 
-			   &nsupr, TriTmp, &incx );
+                    ztrsv_("L", "N", "U", &segsze, &lusup[luptr], &nsupr, TriTmp, &incx);
 #endif
 #else
                     zlsolve(nsupr, segsze, &lusup[luptr], TriTmp);
 #endif
+
                 } /* else ... */
-            }     /* for jj ... end tri-solves */
+
+            } /* for jj ... end tri-solves */
 
             /* Block row updates; push all the way into dense[*] block */
             for(r_ind = 0; r_ind < nrow; r_ind += rowblk) {
@@ -257,9 +255,10 @@ void zpanel_bmod(
                 dense_col = dense;
 
                 /* Sequence through each column in panel -- matrix-vector */
-                for(jj = jcol; jj < jcol + w; jj++, repfnz_col += m, dense_col += m, TriTmp += ldaTmp) {
+                for(jj = jcol; jj < jcol + w; jj++,
+                repfnz_col += m, dense_col += m, TriTmp += ldaTmp) {
                     kfnz = repfnz_col[krep];
-                    if(kfnz == EMPTY) continue; /* Skip any zero segment */
+                    if(kfnz == SLU_EMPTY) continue; /* Skip any zero segment */
 
                     segsze = krep - kfnz + 1;
                     if(segsze <= 3) continue; /* skip unrolled cases */
@@ -271,14 +270,12 @@ void zpanel_bmod(
                     MatvecTmp = &TriTmp[maxsuper];
 
 #ifdef USE_VENDOR_BLAS
-		    alpha = one; 
+                    alpha = one;
                     beta = zero;
 #ifdef _CRAY
-		    CGEMV(ftcs2, &block_nrow, &segsze, &alpha, &lusup[luptr1], 
-			   &nsupr, TriTmp, &incx, &beta, MatvecTmp, &incy);
+                    CGEMV(ftcs2, &block_nrow, &segsze, &alpha, &lusup[luptr1], &nsupr, TriTmp, &incx, &beta, MatvecTmp, &incy);
 #else
-		    zgemv_("N", &block_nrow, &segsze, &alpha, &lusup[luptr1], 
-			   &nsupr, TriTmp, &incx, &beta, MatvecTmp, &incy);
+                    zgemv_("N", &block_nrow, &segsze, &alpha, &lusup[luptr1], &nsupr, TriTmp, &incx, &beta, MatvecTmp, &incy);
 #endif
 #else
                     zmatvec(nsupr, block_nrow, segsze, &lusup[luptr1], TriTmp, MatvecTmp);
@@ -286,7 +283,7 @@ void zpanel_bmod(
 
                     /* Scatter MatvecTmp[*] into SPA dense[*] temporarily
                      * such that MatvecTmp[*] can be re-used for the
-                     * the next blok row update. dense[] will be copied into 
+                     * the next blok row update. dense[] will be copied into
                      * global store after the whole panel has been finished.
                      */
                     isub = isub1;
@@ -296,17 +293,20 @@ void zpanel_bmod(
                         MatvecTmp[i] = zero;
                         ++isub;
                     }
+
                 } /* for jj ... */
-            }     /* for each block row ... */
+
+            } /* for each block row ... */
 
             /* Scatter the triangular solves into SPA dense[*] */
             repfnz_col = repfnz;
             TriTmp = tempv;
             dense_col = dense;
 
-            for(jj = jcol; jj < jcol + w; jj++, repfnz_col += m, dense_col += m, TriTmp += ldaTmp) {
+            for(jj = jcol; jj < jcol + w; jj++,
+            repfnz_col += m, dense_col += m, TriTmp += ldaTmp) {
                 kfnz = repfnz_col[krep];
-                if(kfnz == EMPTY) continue; /* Skip any zero segment */
+                if(kfnz == SLU_EMPTY) continue; /* Skip any zero segment */
 
                 segsze = krep - kfnz + 1;
                 if(segsze <= 3) continue; /* skip unrolled cases */
@@ -319,15 +319,16 @@ void zpanel_bmod(
                     TriTmp[i] = zero;
                     ++isub;
                 }
+
             } /* for jj ... */
         }
-        else {
-            /* 1-D block modification */
+        else { /* 1-D block modification */
 
             /* Sequence through each column in the panel */
-            for(jj = jcol; jj < jcol + w; jj++, repfnz_col += m, dense_col += m) {
+            for(jj = jcol; jj < jcol + w; jj++,
+            repfnz_col += m, dense_col += m) {
                 kfnz = repfnz_col[krep];
-                if(kfnz == EMPTY) continue; /* Skip any zero segment */
+                if(kfnz == SLU_EMPTY) continue; /* Skip any zero segment */
 
                 segsze = krep - kfnz + 1;
                 luptr = xlusup[fsupc];
@@ -370,7 +371,7 @@ void zpanel_bmod(
                     else {
                         ukj2 = dense_col[lsub[krep_ind - 2]];
                         luptr2 = luptr1 - nsupr;
-                        zz_mult(&comp_temp, &ukj2, &lusup[luptr2-1]);
+                        zz_mult(&comp_temp, &ukj2, &lusup[luptr2 - 1]);
                         z_sub(&ukj1, &ukj1, &comp_temp);
 
                         zz_mult(&comp_temp, &ukj1, &lusup[luptr1]);
@@ -393,15 +394,14 @@ void zpanel_bmod(
                         }
                     }
                 }
-                else {
-                    /* segsze >= 4 */
-                    /* 
+                else { /* segsze >= 4 */
+                    /*
                      * Perform a triangular solve and block update,
                      * then scatter the result of sup-col update to dense[].
                      */
                     no_zeros = kfnz - fsupc;
 
-                    /* Copy U[*,j] segment from dense[*] to tempv[*]: 
+                    /* Copy U[*,j] segment from dense[*] to tempv[*]:
                      *    The result of triangular solve is in tempv[*];
                      *    The result of matrix vector update is in dense_col[*]
                      */
@@ -417,23 +417,19 @@ void zpanel_bmod(
 
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
-		    CTRSV( ftcs1, ftcs2, ftcs3, &segsze, &lusup[luptr], 
-			   &nsupr, tempv, &incx );
+                    CTRSV(ftcs1, ftcs2, ftcs3, &segsze, &lusup[luptr], &nsupr, tempv, &incx);
 #else
-		    ztrsv_( "L", "N", "U", &segsze, &lusup[luptr], 
-			   &nsupr, tempv, &incx );
+                    ztrsv_("L", "N", "U", &segsze, &lusup[luptr], &nsupr, tempv, &incx);
 #endif
-		    
-		    luptr += segsze;	/* Dense matrix-vector */
-		    tempv1 = &tempv[segsze];
+
+                    luptr += segsze; /* Dense matrix-vector */
+                    tempv1 = &tempv[segsze];
                     alpha = one;
                     beta = zero;
 #ifdef _CRAY
-		    CGEMV( ftcs2, &nrow, &segsze, &alpha, &lusup[luptr], 
-			   &nsupr, tempv, &incx, &beta, tempv1, &incy );
+                    CGEMV(ftcs2, &nrow, &segsze, &alpha, &lusup[luptr], &nsupr, tempv, &incx, &beta, tempv1, &incy);
 #else
-		    zgemv_( "N", &nrow, &segsze, &alpha, &lusup[luptr], 
-			   &nsupr, tempv, &incx, &beta, tempv1, &incy );
+                    zgemv_("N", &nrow, &segsze, &alpha, &lusup[luptr], &nsupr, tempv, &incx, &beta, tempv1, &incy);
 #endif
 #else
                     zlsolve(nsupr, segsze, &lusup[luptr], tempv);
@@ -445,7 +441,7 @@ void zpanel_bmod(
 
                     /* Scatter tempv[*] into SPA dense[*] temporarily, such
                      * that tempv[*] can be used for the triangular solve of
-                     * the next column of the panel. They will be copied into 
+                     * the next column of the panel. They will be copied into
                      * ucol[*] after the whole panel has been finished.
                      */
                     isub = lptr + no_zeros;
@@ -464,8 +460,12 @@ void zpanel_bmod(
                         tempv1[i] = zero;
                         ++isub;
                     }
+
                 } /* else segsze>=4 ... */
-            }     /* for each column in the panel... */
-        }         /* else 1-D update ... */
-    }             /* for each updating supernode ... */
+
+            } /* for each column in the panel... */
+
+        } /* else 1-D update ... */
+
+    } /* for each updating supernode ... */
 }

@@ -17,7 +17,9 @@
 
 #include "BSpline.h"
 
-void IGA::convert_to_weighted(mat& polygon) { for(auto I = 0llu; I < polygon.n_rows - 1; ++I) polygon.row(I) %= polygon.tail_rows(1); }
+void IGA::convert_to_weighted(mat& polygon) {
+    for(auto I = 0llu; I < polygon.n_rows - 1; ++I) polygon.row(I) %= polygon.tail_rows(1);
+}
 
 void IGA::convert_to_weighted(field<vec>& polygon) {
     polygon.for_each([](vec& t_point) {
@@ -42,7 +44,8 @@ uvec IGA::compute_all_element_span(const vec& knot) {
     std::vector<uword> span;
     span.reserve(knot.n_elem);
 
-    for(auto I = 0llu, J = 1llu; I < knot.n_elem - 1; ++I, ++J) if(knot(I) < knot(J)) span.emplace_back(I);
+    for(auto I = 0llu, J = 1llu; I < knot.n_elem - 1; ++I, ++J)
+        if(knot(I) < knot(J)) span.emplace_back(I);
 
     return span;
 }
@@ -72,7 +75,7 @@ uvec BSpline::get_all_element_span() const { return IGA::compute_all_element_spa
 uword BSpline::evaluate_span(const double u) const {
     const auto n = knot.n_elem - order - 2llu;
 
-    if(fabs(u - knot(n + 1)) <= 1E-14) return n;
+    if(std::fabs(u - knot(n + 1)) <= 1E-14) return n;
 
     auto low = order, high = n + 1;
 
@@ -196,11 +199,12 @@ vec BSpline::evaluate_point(const double u, const field<vec>& polygon) const {
     const auto span = evaluate_span(u);
     const auto basis = evaluate_basis(u);
 
-    suanpan_assert([&] { if(polygon.n_elem < knot.n_elem - order - 1) throw invalid_argument("need more control points"); });
+    suanpan_assert([&] { if(polygon.n_elem < knot.n_elem - order - 1) throw std::invalid_argument("need more control points"); });
 
     vec point(dimension, fill::zeros);
 
-    for(auto i = 0llu; i <= order; ++i) if(const auto sind = span + i - order; !polygon(sind).empty()) point += basis(i) * polygon(sind);
+    for(auto i = 0llu; i <= order; ++i)
+        if(const auto sind = span + i - order; !polygon(sind).empty()) point += basis(i) * polygon(sind);
 
     return point;
 }
@@ -228,7 +232,9 @@ field<vec> BSpline::evaluate_point_derivative(const double u, const field<vec>& 
     const auto span = evaluate_span(u);
     const auto ders = evaluate_basis_derivative(u, du);
 
-    for(auto k = 0ll; k <= du; ++k) for(auto j = 0llu; j <= order; ++j) if(const auto sind = span + j - order; !polygon(sind).empty()) point(k) += ders(k, j) * polygon(sind);
+    for(auto k = 0ll; k <= du; ++k)
+        for(auto j = 0llu; j <= order; ++j)
+            if(const auto sind = span + j - order; !polygon(sind).empty()) point(k) += ders(k, j) * polygon(sind);
 
     return point;
 }
@@ -253,7 +259,8 @@ field<vec> BSpline::evaluate_shape_function_derivative(const double u, const fie
     const auto span = evaluate_span(u);
     const auto ders = evaluate_basis_derivative(u, du);
 
-    for(auto i = 0ll; i <= du; ++i) for(auto j = 0llu; j <= order; ++j) shape(i)(span + j - order) = ders(i, j);
+    for(auto i = 0ll; i <= du; ++i)
+        for(auto j = 0llu; j <= order; ++j) shape(i)(span + j - order) = ders(i, j);
 
     return shape;
 }

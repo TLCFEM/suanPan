@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "RelError.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
@@ -29,7 +30,7 @@
 RelError::RelError(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelError::get_copy() { return make_unique<RelError>(*this); }
+unique_ptr<Converger> RelError::get_copy() { return std::make_unique<RelError>(*this); }
 
 /**
  * \brief Method to return `conv_flag`.
@@ -38,7 +39,7 @@ unique_ptr<Converger> RelError::get_copy() { return make_unique<RelError>(*this)
 bool RelError::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    const auto rel_error = fabs(W->get_error()) / inf_norm(W->get_trial_displacement());
+    const auto rel_error = std::fabs(W->get_error()) / inf_norm(W->get_trial_displacement());
     set_error(std::isfinite(rel_error) ? rel_error : 1.);
     set_conv_flag(get_tolerance() > get_error());
 

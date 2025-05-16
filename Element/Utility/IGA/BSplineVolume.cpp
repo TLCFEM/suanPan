@@ -67,7 +67,8 @@ vec BSplineVolume::evaluate_point(const double u, const double v, const double w
         const auto wind = wspan - r + m;
         for(auto l = 0llu; l <= q; ++l) {
             const auto vind = vspan - q + l;
-            for(auto k = 0llu; k <= p; ++k) if(const auto uind = uspan - p + k; !polygon(uind, vind, wind).empty()) point += nw(m) * nv(l) * nu(k) * polygon(uind, vind, wind);
+            for(auto k = 0llu; k <= p; ++k)
+                if(const auto uind = uspan - p + k; !polygon(uind, vind, wind).empty()) point += nw(m) * nv(l) * nu(k) * polygon(uind, vind, wind);
         }
     }
 

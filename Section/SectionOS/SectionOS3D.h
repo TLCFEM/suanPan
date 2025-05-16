@@ -33,11 +33,9 @@
 #ifndef SECTIONOS3D_H
 #define SECTIONOS3D_H
 
-#include <Section/Section.h>
 #include <Material/Material.h>
+#include <Section/Section.h>
 #include <Toolbox/ResourceHolder.h>
-
-using std::vector;
 
 class SectionOS3D : public Section {
     static const mat weighing_mat;
@@ -49,7 +47,7 @@ protected:
         IntegrationPoint(double, double, double, double, unique_ptr<Material>&&);
     };
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     SectionOS3D(
@@ -67,7 +65,7 @@ public:
     int commit_status() override;
     int reset_status() override;
 
-    vector<vec> record(OutputType) override;
+    std::vector<vec> record(OutputType) override;
 };
 
 #endif

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "NonlinearGurson.h"
+
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
@@ -160,7 +161,7 @@ int NonlinearGurson::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-vector<vec> NonlinearGurson::record(const OutputType P) {
+std::vector<vec> NonlinearGurson::record(const OutputType P) {
     if(P == OutputType::VF) return {vec{current_history(1)}};
 
     return Material3D::record(P);

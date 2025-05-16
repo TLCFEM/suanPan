@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -13,10 +13,11 @@ at the top-level directory.
  * \brief Solves the system of linear equations A*X=B or A'*X=B
  *
  * <pre>
- * -- SuperLU routine (version 3.0) --
+ * -- SuperLU routine (version 7.0.0) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
  * and Lawrence Berkeley National Lab.
  * October 15, 2003
+ * August 2024
  * </pre>
  */
 #include "slu_zdefs.h"
@@ -32,7 +33,7 @@ at the top-level directory.
  * a condition estimate are also provided. It performs the following steps:
  *
  *   1. If A is stored column-wise (A->Stype = SLU_NC):
- *  
+ *
  *      1.1. If options->Equil = YES, scaling factors are computed to
  *           equilibrate the system:
  *           options->Trans = NOTRANS:
@@ -58,7 +59,7 @@ at the top-level directory.
  *      1.4. Compute the reciprocal pivot growth factor.
  *
  *      1.5. If some U(i,i) = 0, so that U is exactly singular, then the
- *           routine returns with info = i. Otherwise, the factored form of 
+ *           routine returns with info = i. Otherwise, the factored form of
  *           A is used to estimate the condition number of the matrix A. If
  *           the reciprocal of the condition number is less than machine
  *           precision, info = A->ncol+1 is returned as a warning, but the
@@ -90,23 +91,23 @@ at the top-level directory.
  *               (diag(R)*A*diag(C))**H *inv(diag(R))*X = diag(C)*B
  *           Whether or not the system will be equilibrated depends on the
  *           scaling of the matrix A, but if equilibration is used, A' is
- *           overwritten by diag(R)*A'*diag(C) and B by diag(R)*B 
+ *           overwritten by diag(R)*A'*diag(C) and B by diag(R)*B
  *           (if trans='N') or diag(C)*B (if trans = 'T' or 'C').
  *
- *      2.2. Permute columns of transpose(A) (rows of A), 
- *           forming transpose(A)*Pc, where Pc is a permutation matrix that 
+ *      2.2. Permute columns of transpose(A) (rows of A),
+ *           forming transpose(A)*Pc, where Pc is a permutation matrix that
  *           usually preserves sparsity.
  *           For more details of this step, see sp_preorder.c.
  *
  *      2.3. If options->Fact != FACTORED, the LU decomposition is used to
- *           factor the transpose(A) (after equilibration if 
+ *           factor the transpose(A) (after equilibration if
  *           options->Fact = YES) as Pr*transpose(A)*Pc = L*U with the
  *           permutation Pr determined by partial pivoting.
  *
  *      2.4. Compute the reciprocal pivot growth factor.
  *
  *      2.5. If some U(i,i) = 0, so that U is exactly singular, then the
- *           routine returns with info = i. Otherwise, the factored form 
+ *           routine returns with info = i. Otherwise, the factored form
  *           of transpose(A) is used to estimate the condition number of the
  *           matrix A. If the reciprocal of the condition number
  *           is less than machine precision, info = A->nrow+1 is returned as
@@ -121,7 +122,7 @@ at the top-level directory.
  *           error bounds and backward error estimates for it.
  *
  *      2.8. If equilibration was used, the matrix X is premultiplied by
- *           diag(C) (if options->Trans = NOTRANS) or diag(R) 
+ *           diag(C) (if options->Trans = NOTRANS) or diag(R)
  *           (if options->Trans = TRANS or CONJ) so that it solves the
  *           original system before equilibration.
  *
@@ -141,10 +142,10 @@ at the top-level directory.
  *         Stype = SLU_NC or SLU_NR, Dtype = SLU_D, Mtype = SLU_GE.
  *         In the future, more general A may be handled.
  *
- *         On entry, If options->Fact = FACTORED and equed is not 'N', 
+ *         On entry, If options->Fact = FACTORED and equed is not 'N',
  *         then A must have been equilibrated by the scaling factors in
- *         R and/or C.  
- *         On exit, A is not modified if options->Equil = NO, or if 
+ *         R and/or C.
+ *         On exit, A is not modified if options->Equil = NO, or if
  *         options->Equil = YES but equed = 'N' on exit.
  *         Otherwise, if options->Equil = YES and equed is not 'N',
  *         A is scaled as follows:
@@ -167,13 +168,13 @@ at the top-level directory.
  *         is already in postorder.
  *
  *         If A->Stype = SLU_NR, column permutation vector of size A->nrow,
- *         which describes permutation of columns of transpose(A) 
+ *         which describes permutation of columns of transpose(A)
  *         (rows of A) as described above.
- * 
+ *
  * perm_r  (input/output) int*
- *         If A->Stype = SLU_NC, row permutation vector of size A->nrow, 
+ *         If A->Stype = SLU_NC, row permutation vector of size A->nrow,
  *         which defines the permutation matrix Pr, and is determined
- *         by partial pivoting.  perm_r[i] = j means row i of A is in 
+ *         by partial pivoting.  perm_r[i] = j means row i of A is in
  *         position j in Pr*A.
  *
  *         If A->Stype = SLU_NR, permutation vector of size A->ncol, which
@@ -186,7 +187,7 @@ at the top-level directory.
  *         new permutation determined by partial pivoting or diagonal
  *         threshold pivoting.
  *         Otherwise, perm_r is output argument.
- * 
+ *
  * etree   (input/output) int*,  dimension (A->ncol)
  *         Elimination tree of Pc'*A'*A*Pc.
  *         If options->Fact != FACTORED and options->Fact != DOFACT,
@@ -199,7 +200,7 @@ at the top-level directory.
  *         = 'N': No equilibration.
  *         = 'R': Row equilibration, i.e., A was premultiplied by diag(R).
  *         = 'C': Column equilibration, i.e., A was postmultiplied by diag(C).
- *         = 'B': Both row and column equilibration, i.e., A was replaced 
+ *         = 'B': Both row and column equilibration, i.e., A was replaced
  *                by diag(R)*A*diag(C).
  *         If options->Fact = FACTORED, equed is an input argument,
  *         otherwise it is an output argument.
@@ -213,7 +214,7 @@ at the top-level directory.
  *             otherwise, R is output.
  *         If options->zFact = FACTORED and equed = 'R' or 'B', each element
  *             of R must be positive.
- * 
+ *
  * C       (input/output) double*, dimension (A->ncol)
  *         The column scale factors for A or transpose(A).
  *         If equed = 'C' or 'B', A (if A->Stype = SLU_NC) or transpose(A)
@@ -223,7 +224,7 @@ at the top-level directory.
  *             otherwise, C is output.
  *         If options->Fact = FACTORED and equed = 'C' or 'B', each element
  *             of C must be positive.
- *         
+ *
  * L       (output) SuperMatrix*
  *	   The factor L from the factorization
  *             Pr*A*Pc=L*U              (if A->Stype SLU_= NC) or
@@ -243,7 +244,7 @@ at the top-level directory.
  *         to hold data structures for factors L and U.
  *         On exit, if fact is not 'F', L and U point to this array.
  *
- * lwork   (input) int
+ * lwork   (input) int_t
  *         Specifies the size of work array in bytes.
  *         = 0:  allocate space internally by system malloc;
  *         > 0:  use user-supplied work array of length lwork in bytes,
@@ -273,7 +274,7 @@ at the top-level directory.
  *                  B is overwritten by diag(R)*B.
  *
  * X       (output) SuperMatrix*
- *         X has types: Stype = SLU_DN, Dtype = SLU_Z, Mtype = SLU_GE. 
+ *         X has types: Stype = SLU_DN, Dtype = SLU_Z, Mtype = SLU_GE.
  *         If info = 0 or info = A->ncol+1, X contains the solution matrix
  *         to the original system of equations. Note that A and B are modified
  *         on exit if equed is not 'N', and the solution to the equilibrated
@@ -293,26 +294,26 @@ at the top-level directory.
  *         to working precision. This condition is indicated by a return
  *         code of info > 0.
  *
- * FERR    (output) double*, dimension (B->ncol)   
- *         The estimated forward error bound for each solution vector   
- *         X(j) (the j-th column of the solution matrix X).   
- *         If XTRUE is the true solution corresponding to X(j), FERR(j) 
- *         is an estimated upper bound for the magnitude of the largest 
- *         element in (X(j) - XTRUE) divided by the magnitude of the   
- *         largest element in X(j).  The estimate is as reliable as   
- *         the estimate for RCOND, and is almost always a slight   
+ * FERR    (output) double*, dimension (B->ncol)
+ *         The estimated forward error bound for each solution vector
+ *         X(j) (the j-th column of the solution matrix X).
+ *         If XTRUE is the true solution corresponding to X(j), FERR(j)
+ *         is an estimated upper bound for the magnitude of the largest
+ *         element in (X(j) - XTRUE) divided by the magnitude of the
+ *         largest element in X(j).  The estimate is as reliable as
+ *         the estimate for RCOND, and is almost always a slight
  *         overestimate of the true error.
  *         If options->IterRefine = NOREFINE, ferr = 1.0.
  *
  * BERR    (output) double*, dimension (B->ncol)
- *         The componentwise relative backward error of each solution   
- *         vector X(j) (i.e., the smallest relative change in   
+ *         The componentwise relative backward error of each solution
+ *         vector X(j) (i.e., the smallest relative change in
  *         any element of A or B that makes X(j) an exact solution).
  *         If options->IterRefine = NOREFINE, berr = 1.0.
  *
  * Glu      (input/output) GlobalLU_t *
  *          If options->Fact == SamePattern_SameRowPerm, it is an input;
- *              The matrix A will be factorized assuming that a 
+ *              The matrix A will be factorized assuming that a
  *              factorization of a matrix with the same sparsity pattern
  *              and similar numerical values was performed prior to this one.
  *              Therefore, this factorization will reuse both row and column
@@ -335,19 +336,19 @@ at the top-level directory.
  *        See slu_util.h for the definition of 'SuperLUStat_t'.
  *
  * info    (output) int*
- *         = 0: successful exit   
- *         < 0: if info = -i, the i-th argument had an illegal value   
- *         > 0: if info = i, and i is   
- *              <= A->ncol: U(i,i) is exactly zero. The factorization has   
- *                    been completed, but the factor U is exactly   
- *                    singular, so the solution and error bounds   
- *                    could not be computed.   
+ *         = 0: successful exit
+ *         < 0: if info = -i, the i-th argument had an illegal value
+ *         > 0: if info = i, and i is
+ *              <= A->ncol: U(i,i) is exactly zero. The factorization has
+ *                    been completed, but the factor U is exactly
+ *                    singular, so the solution and error bounds
+ *                    could not be computed.
  *              = A->ncol+1: U is nonsingular, but RCOND is less than machine
  *                    precision, meaning that the matrix is singular to
  *                    working precision. Nevertheless, the solution and
  *                    error bounds are computed because there are a number
  *                    of situations where the computed solution can be more
- *                    accurate than the value of RCOND would suggest.   
+ *                    accurate than the value of RCOND would suggest.
  *              > A->ncol+1: number of bytes allocated when memory allocation
  *                    failure occurred, plus A->ncol.
  * </pre>
@@ -401,9 +402,20 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 #endif
 
     /* Test the input parameters */
-    if(options->Fact != DOFACT && options->Fact != SamePattern && options->Fact != SamePattern_SameRowPerm && options->Fact != FACTORED && options->Trans != NOTRANS && options->Trans != TRANS && options->Trans != CONJ && options->Equil != NO && options->Equil != YES) *info = -1;
-    else if(A->nrow != A->ncol || A->nrow < 0 || (A->Stype != SLU_NC && A->Stype != SLU_NR) || A->Dtype != SLU_Z || A->Mtype != SLU_GE) *info = -2;
-    else if(options->Fact == FACTORED && !(rowequ || colequ || strncmp(equed, "N", 1) == 0)) *info = -6;
+    if((options->Fact != DOFACT && options->Fact != SamePattern &&
+        options->Fact != SamePattern_SameRowPerm &&
+        options->Fact != FACTORED) ||
+       (options->Trans != NOTRANS && options->Trans != TRANS &&
+        options->Trans != CONJ) ||
+       (options->Equil != NO && options->Equil != YES))
+        *info = -1;
+    else if(A->nrow != A->ncol || A->nrow < 0 ||
+            (A->Stype != SLU_NC && A->Stype != SLU_NR) ||
+            A->Dtype != SLU_Z || A->Mtype != SLU_GE)
+        *info = -2;
+    else if(options->Fact == FACTORED &&
+            !(rowequ || colequ || strncmp(equed, "N", 1) == 0))
+        *info = -6;
     else {
         if(rowequ) {
             rcmin = bignum;
@@ -413,7 +425,8 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
                 rcmax = SUPERLU_MAX(rcmax, R[j]);
             }
             if(rcmin <= 0.) *info = -7;
-            else if(A->nrow > 0) rowcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
+            else if(A->nrow > 0)
+                rowcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
             else rowcnd = 1.;
         }
         if(colequ && *info == 0) {
@@ -424,20 +437,26 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
                 rcmax = SUPERLU_MAX(rcmax, C[j]);
             }
             if(rcmin <= 0.) *info = -8;
-            else if(A->nrow > 0) colcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
+            else if(A->nrow > 0)
+                colcnd = SUPERLU_MAX(rcmin, smlnum) / SUPERLU_MIN(rcmax, bignum);
             else colcnd = 1.;
         }
         if(*info == 0) {
             if(lwork < -1) *info = -12;
             else if(B->ncol < 0) *info = -13;
-            else if(B->ncol > 0) {
-                /* no checking if B->ncol=0 */
-                if(Bstore->lda < SUPERLU_MAX(0, A->nrow) || B->Stype != SLU_DN || B->Dtype != SLU_Z || B->Mtype != SLU_GE) *info = -13;
+            else if(B->ncol > 0) { /* no checking if B->ncol=0 */
+                if(Bstore->lda < SUPERLU_MAX(0, A->nrow) ||
+                   B->Stype != SLU_DN || B->Dtype != SLU_Z ||
+                   B->Mtype != SLU_GE)
+                    *info = -13;
             }
             if(X->ncol < 0) *info = -14;
-            else if(X->ncol > 0) {
-                /* no checking if X->ncol=0 */
-                if(Xstore->lda < SUPERLU_MAX(0, A->nrow) || (B->ncol != 0 && B->ncol != X->ncol) || X->Stype != SLU_DN || X->Dtype != SLU_Z || X->Mtype != SLU_GE) *info = -14;
+            else if(X->ncol > 0) { /* no checking if X->ncol=0 */
+                if(Xstore->lda < SUPERLU_MAX(0, A->nrow) ||
+                   (B->ncol != 0 && B->ncol != X->ncol) ||
+                   X->Stype != SLU_DN ||
+                   X->Dtype != SLU_Z || X->Mtype != SLU_GE)
+                    *info = -14;
             }
         }
     }
@@ -458,8 +477,7 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
         NRformat* Astore = A->Store;
         AA = (SuperMatrix*)SUPERLU_MALLOC(sizeof(SuperMatrix));
         zCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz, Astore->nzval, Astore->colind, Astore->rowptr, SLU_NC, A->Dtype, A->Mtype);
-        if(notran) {
-            /* Reverse the transpose argument. */
+        if(notran) { /* Reverse the transpose argument. */
             trant = TRANS;
             notran = 0;
         }
@@ -468,8 +486,7 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
             notran = 1;
         }
     }
-    else {
-        /* A->Stype == SLU_NC */
+    else { /* A->Stype == SLU_NC */
         trant = options->Trans;
         AA = A;
     }
@@ -492,21 +509,22 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
         t0 = SuperLU_timer_();
         /*
          * Gnet column permutation vector perm_c[], according to permc_spec:
-         *   permc_spec = NATURAL:  natural ordering 
+         *   permc_spec = NATURAL:  natural ordering
          *   permc_spec = MMD_AT_PLUS_A: minimum degree on structure of A'+A
          *   permc_spec = MMD_ATA:  minimum degree on structure of A'*A
          *   permc_spec = COLAMD:   approximate minimum degree column ordering
          *   permc_spec = MY_PERMC: the ordering already supplied in perm_c[]
          */
         permc_spec = options->ColPerm;
-        if(permc_spec != MY_PERMC && options->Fact == DOFACT) get_perm_c(permc_spec, AA, perm_c);
+        if(permc_spec != MY_PERMC && options->Fact == DOFACT)
+            get_perm_c(permc_spec, AA, perm_c);
         utime[COLPERM] = SuperLU_timer_() - t0;
 
         t0 = SuperLU_timer_();
         sp_preorder(options, AA, perm_c, etree, &AC);
         utime[ETREE] = SuperLU_timer_() - t0;
 
-        /*	printf("Factor PA = LU ... relax %d\tw %d\tmaxsuper %d\trowblk %d\n", 
+        /*	printf("Factor PA = LU ... relax %d\tw %d\tmaxsuper %d\trowblk %d\n",
                    relax, panel_size, sp_ienv(3), sp_ienv(4));
             fflush(stdout); */
 
@@ -522,7 +540,7 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
     }
 
     if(*info > 0) {
-        if(*info <= A->ncol) {
+        if(*info <= A->ncol) { /* singular */
             /* Compute the reciprocal pivot growth factor of the leading
                rank-deficient (*info) columns of A. */
             *recip_pivot_growth = zPivotGrowth(*info, AA, perm_c, L, U);
@@ -540,8 +558,12 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
     if(options->ConditionNumber) {
         /* Estimate the reciprocal of the condition number of A. */
         t0 = SuperLU_timer_();
-        if(notran) { *(unsigned char*)norm = '1'; }
-        else { *(unsigned char*)norm = 'I'; }
+        if(notran) {
+            *(unsigned char*)norm = '1';
+        }
+        else {
+            *(unsigned char*)norm = 'I';
+        }
         anorm = zlangs(norm, AA);
         zgscon(norm, L, U, anorm, rcond, stat, &info1);
         utime[RCOND] = SuperLU_timer_() - t0;
@@ -549,12 +571,23 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 
     if(nrhs > 0) {
         /* Scale the right hand side if equilibration was performed. */
-        if(notran) { if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) zd_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], R[i]); } }
-        else if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) zd_mult(&Bmat[i+j*ldb], &Bmat[i+j*ldb], C[i]); }
+        if(notran) {
+            if(rowequ) {
+                for(j = 0; j < nrhs; ++j)
+                    for(i = 0; i < A->nrow; ++i)
+                        zd_mult(&Bmat[i + j * ldb], &Bmat[i + j * ldb], R[i]);
+            }
+        }
+        else if(colequ) {
+            for(j = 0; j < nrhs; ++j)
+                for(i = 0; i < A->nrow; ++i)
+                    zd_mult(&Bmat[i + j * ldb], &Bmat[i + j * ldb], C[i]);
+        }
 
         /* Compute the solution matrix X. */
         for(j = 0; j < nrhs; j++) /* Save a copy of the right hand sides */
-            for(i = 0; i < B->nrow; i++) Xmat[i + j * ldx] = Bmat[i + j * ldb];
+            for(i = 0; i < B->nrow; i++)
+                Xmat[i + j * ldx] = Bmat[i + j * ldb];
 
         t0 = SuperLU_timer_();
         zgstrs(trant, L, U, perm_c, perm_r, X, stat, &info1);
@@ -563,13 +596,27 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
         /* Use iterative refinement to improve the computed solution and compute
            error bounds and backward error estimates for it. */
         t0 = SuperLU_timer_();
-        if(options->IterRefine != NOREFINE) { zgsrfs(trant, AA, L, U, perm_c, perm_r, equed, R, C, B, X, ferr, berr, stat, &info1); }
-        else { for(j = 0; j < nrhs; ++j) ferr[j] = berr[j] = 1.0; }
+        if(options->IterRefine != NOREFINE) {
+            zgsrfs(trant, AA, L, U, perm_c, perm_r, equed, R, C, B, X, ferr, berr, stat, &info1);
+        }
+        else {
+            for(j = 0; j < nrhs; ++j) ferr[j] = berr[j] = 1.0;
+        }
         utime[REFINE] = SuperLU_timer_() - t0;
 
         /* Transform the solution matrix X to a solution of the original system. */
-        if(notran) { if(colequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) zd_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], C[i]); } }
-        else if(rowequ) { for(j = 0; j < nrhs; ++j) for(i = 0; i < A->nrow; ++i) zd_mult(&Xmat[i+j*ldx], &Xmat[i+j*ldx], R[i]); }
+        if(notran) {
+            if(colequ) {
+                for(j = 0; j < nrhs; ++j)
+                    for(i = 0; i < A->nrow; ++i)
+                        zd_mult(&Xmat[i + j * ldx], &Xmat[i + j * ldx], C[i]);
+            }
+        }
+        else if(rowequ) {
+            for(j = 0; j < nrhs; ++j)
+                for(i = 0; i < A->nrow; ++i)
+                    zd_mult(&Xmat[i + j * ldx], &Xmat[i + j * ldx], R[i]);
+        }
     } /* end if nrhs > 0 */
 
     if(options->ConditionNumber) {

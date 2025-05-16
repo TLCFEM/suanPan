@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -22,20 +22,20 @@ at the top-level directory.
  *
  * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY
  * EXPRESSED OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
- * 
+ *
  *  Permission is hereby granted to use or copy this program for any
  *  purpose, provided the above notices are retained on all copies.
  *  Permission to modify the code and to distribute modified code is
  *  granted, provided the above notices are retained, and a notice that
  *  the code was modified is included with the above copyright notice.
  * </pre>
-*/
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "slu_zdefs.h"
 
-/*! \brief 
+/*! \brief
  *
  * <pre>
  * Purpose:
@@ -83,7 +83,7 @@ int zcolumn_bmod(
     int_t no_zeros, new_next, ufirst, nextlu;
     int fst_col; /* First column within small LU update */
     int d_fsupc; /* Distance between the first column of the current
-			     panel and the first column of the current snode. */
+        panel and the first column of the current snode. */
     int *xsup, *supno;
     int_t *lsub, *xlsub;
     doublecomplex* lusup;
@@ -107,21 +107,20 @@ int zcolumn_bmod(
     jcolp1 = jcol + 1;
     jsupno = supno[jcol];
 
-    /* 
-     * For each nonz supernode segment of U[*,j] in topological order 
+    /*
+     * For each nonz supernode segment of U[*,j] in topological order
      */
     k = nseg - 1;
     for(ksub = 0; ksub < nseg; ksub++) {
         krep = segrep[k];
         k--;
         ksupno = supno[krep];
-        if(jsupno != ksupno) {
-            /* Outside the rectangular supernode */
+        if(jsupno != ksupno) { /* Outside the rectangular supernode */
 
             fsupc = xsup[ksupno];
             fst_col = SUPERLU_MAX(fsupc, fpanelc);
 
-            /* Distance from the current supernode to the current panel; 
+            /* Distance from the current supernode to the current panel;
                d_fsupc=0 if fsupc > fpanelc. */
             d_fsupc = fst_col - fsupc;
 
@@ -140,8 +139,8 @@ int zcolumn_bmod(
             ops[TRSV] += 4 * segsze * (segsze - 1);
             ops[GEMV] += 8 * nrow * segsze;
 
-            /* 
-             * Case 1: Update U-segment of size 1 -- col-col update 
+            /*
+             * Case 1: Update U-segment of size 1 -- col-col update
              */
             if(segsze == 1) {
                 ukj = dense[lsub[krep_ind]];
@@ -160,8 +159,7 @@ int zcolumn_bmod(
                 ukj1 = dense[lsub[krep_ind - 1]];
                 luptr1 = luptr - nsupr;
 
-                if(segsze == 2) {
-                    /* Case 2: 2cols-col update */
+                if(segsze == 2) { /* Case 2: 2cols-col update */
                     zz_mult(&comp_temp, &ukj1, &lusup[luptr1]);
                     z_sub(&ukj, &ukj, &comp_temp);
                     dense[lsub[krep_ind]] = ukj;
@@ -175,11 +173,10 @@ int zcolumn_bmod(
                         z_sub(&dense[irow], &dense[irow], &comp_temp);
                     }
                 }
-                else {
-                    /* Case 3: 3cols-col update */
+                else { /* Case 3: 3cols-col update */
                     ukj2 = dense[lsub[krep_ind - 2]];
                     luptr2 = luptr1 - nsupr;
-                    zz_mult(&comp_temp, &ukj2, &lusup[luptr2-1]);
+                    zz_mult(&comp_temp, &ukj2, &lusup[luptr2 - 1]);
                     z_sub(&ukj1, &ukj1, &comp_temp);
 
                     zz_mult(&comp_temp, &ukj1, &lusup[luptr1]);
@@ -225,22 +222,18 @@ int zcolumn_bmod(
 
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
-		CTRSV( ftcs1, ftcs2, ftcs3, &segsze, &lusup[luptr], 
-		       &nsupr, tempv, &incx );
+                CTRSV(ftcs1, ftcs2, ftcs3, &segsze, &lusup[luptr], &nsupr, tempv, &incx);
 #else
-		ztrsv_( "L", "N", "U", &segsze, &lusup[luptr], 
-		       &nsupr, tempv, &incx );
+                ztrsv_("L", "N", "U", &segsze, &lusup[luptr], &nsupr, tempv, &incx);
 #endif
- 		luptr += segsze;  /* Dense matrix-vector */
-		tempv1 = &tempv[segsze];
+                luptr += segsze; /* Dense matrix-vector */
+                tempv1 = &tempv[segsze];
                 alpha = one;
                 beta = zero;
 #ifdef _CRAY
-		CGEMV( ftcs2, &nrow, &segsze, &alpha, &lusup[luptr], 
-		       &nsupr, tempv, &incx, &beta, tempv1, &incy );
+                CGEMV(ftcs2, &nrow, &segsze, &alpha, &lusup[luptr], &nsupr, tempv, &incx, &beta, tempv1, &incy);
 #else
-		zgemv_( "N", &nrow, &segsze, &alpha, &lusup[luptr], 
-		       &nsupr, tempv, &incx, &beta, tempv1, &incy );
+                zgemv_("N", &nrow, &segsze, &alpha, &lusup[luptr], &nsupr, tempv, &incx, &beta, tempv1, &incy);
 #endif
 #else
                 zlsolve(nsupr, segsze, &lusup[luptr], tempv);
@@ -267,8 +260,10 @@ int zcolumn_bmod(
                     ++isub;
                 }
             }
+
         } /* if jsupno ... */
-    }     /* for each segment... */
+
+    } /* for each segment... */
 
     /*
      *	Process the supernodal portion of L\U[*,j]
@@ -294,8 +289,8 @@ int zcolumn_bmod(
 
     xlusup[jcolp1] = nextlu; /* Close L\U[*,jcol] */
 
-    /* For more updates within the panel (also within the current supernode), 
-     * should start from the first column of the panel, or the first column 
+    /* For more updates within the panel (also within the current supernode),
+     * should start from the first column of the panel, or the first column
      * of the supernode, whichever is bigger. There are 2 cases:
      *    1) fsupc < fpanelc, then fst_col := fpanelc
      *    2) fsupc >= fpanelc, then fst_col := fsupc
@@ -321,21 +316,18 @@ int zcolumn_bmod(
 
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
-	CTRSV( ftcs1, ftcs2, ftcs3, &nsupc, &lusup[luptr], 
-	       &nsupr, &lusup[ufirst], &incx );
+        CTRSV(ftcs1, ftcs2, ftcs3, &nsupc, &lusup[luptr], &nsupr, &lusup[ufirst], &incx);
 #else
-	ztrsv_( "L", "N", "U", &nsupc, &lusup[luptr], 
-	       &nsupr, &lusup[ufirst], &incx );
+        ztrsv_("L", "N", "U", &nsupc, &lusup[luptr], &nsupr, &lusup[ufirst], &incx);
 #endif
-	
-	alpha = none; beta = one; /* y := beta*y + alpha*A*x */
+
+        alpha = none;
+        beta = one; /* y := beta*y + alpha*A*x */
 
 #ifdef _CRAY
-	CGEMV( ftcs2, &nrow, &nsupc, &alpha, &lusup[luptr+nsupc], &nsupr,
-	       &lusup[ufirst], &incx, &beta, &lusup[ufirst+nsupc], &incy );
+        CGEMV(ftcs2, &nrow, &nsupc, &alpha, &lusup[luptr + nsupc], &nsupr, &lusup[ufirst], &incx, &beta, &lusup[ufirst + nsupc], &incy);
 #else
-	zgemv_( "N", &nrow, &nsupc, &alpha, &lusup[luptr+nsupc], &nsupr,
-	       &lusup[ufirst], &incx, &beta, &lusup[ufirst+nsupc], &incy );
+        zgemv_("N", &nrow, &nsupc, &alpha, &lusup[luptr + nsupc], &nsupr, &lusup[ufirst], &incx, &beta, &lusup[ufirst + nsupc], &incy);
 #endif
 #else
         zlsolve(nsupr, nsupc, &lusup[luptr], &lusup[ufirst]);
@@ -351,6 +343,7 @@ int zcolumn_bmod(
         }
 
 #endif
+
     } /* if fst_col < jcol ... */
 
     return 0;

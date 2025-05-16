@@ -48,6 +48,8 @@ peek node 2 3 6
 
 # plot type U3 scale 1 save U.vtk
 
+peek stats
+
 reset
 clear
 exit

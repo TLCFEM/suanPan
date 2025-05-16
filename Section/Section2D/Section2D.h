@@ -29,11 +29,9 @@
 #ifndef SECTION2D_H
 #define SECTION2D_H
 
-#include <Section/Section.h>
 #include <Material/Material.h>
+#include <Section/Section.h>
 #include <Toolbox/ResourceHolder.h>
-
-using std::vector;
 
 class Section2D : public Section {
 protected:
@@ -43,7 +41,7 @@ protected:
         IntegrationPoint(double, double, unique_ptr<Material>&&);
     };
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
     void initialize_stiffness();
 

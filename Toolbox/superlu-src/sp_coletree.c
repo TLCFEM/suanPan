@@ -1,17 +1,14 @@
-/*! \file
+/*
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
 */
-/*! @file sp_coletree.c
- * \brief Tree layout and computation routines
- *
- *<pre>
+/*
  * -- SuperLU routine (version 3.1) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
  * and Lawrence Berkeley National Lab.
@@ -27,8 +24,12 @@ at the top-level directory.
  * Permission to modify the code and to distribute modified code is
  * granted, provided the above notices are retained, and a notice that
  * the code was modified is included with the above copyright notice.
- * </pre>
-*/
+ */
+/*! \file
+ * \brief Tree layout and computation routines
+ *
+ * \ingroup Common
+ */
 
 /*  Elimination tree computation and layout routines */
 
@@ -36,11 +37,11 @@ at the top-level directory.
 #include <stdlib.h>
 #include "slu_ddefs.h"
 
-/* 
+/*
  *  Implementation of disjoint set union routines.
- *  Elements are integers in 0..n-1, and the 
+ *  Elements are integers in 0..n-1, and the
  *  names of the sets themselves are of type int.
- *  
+ *
  *  Calls are:
  *  initialize_disjoint_sets (n) initial call.
  *  s = make_set (i)             returns a set containing only i.
@@ -60,25 +61,42 @@ static int* mxCallocInt(int n) {
     int* buf;
 
     buf = (int*)SUPERLU_MALLOC(n * sizeof(int));
-    if(!buf) { ABORT("SUPERLU_MALLOC fails for buf in mxCallocInt()"); }
+    if(!buf) {
+        ABORT("SUPERLU_MALLOC fails for buf in mxCallocInt()");
+    }
     for(i = 0; i < n; i++) buf[i] = 0;
     return (buf);
 }
 
-static void initialize_disjoint_sets(int n, int** pp) { (*pp) = mxCallocInt(n); }
+static void initialize_disjoint_sets(
+    int n,
+    int** pp
+) {
+    (*pp) = mxCallocInt(n);
+}
 
-static int make_set(int i, int* pp) {
+static int make_set(
+    int i,
+    int* pp
+) {
     pp[i] = i;
     return i;
 }
 
-static int link(int s, int t, int* pp) {
+static int link(
+    int s,
+    int t,
+    int* pp
+) {
     pp[s] = t;
     return t;
 }
 
 /* PATH HALVING */
-static int find(int i, int* pp) {
+static int find(
+    int i,
+    int* pp
+) {
     register int p, gp;
 
     p = pp[i];
@@ -105,11 +123,15 @@ int find (
 }
 #endif
 
-static void finalize_disjoint_sets(int* pp) { SUPERLU_FREE(pp); }
+static void finalize_disjoint_sets(
+    int* pp
+) {
+    SUPERLU_FREE(pp);
+}
 
 /*
  *      Find the elimination tree for A'*A.
- *      This uses something similar to Liu's algorithm. 
+ *      This uses something similar to Liu's algorithm.
  *      It runs in time O(nz(A)*log n) and does not form A'*A.
  *
  *      Input:
@@ -128,12 +150,14 @@ static void finalize_disjoint_sets(int* pp) { SUPERLU_FREE(pp); }
  * Nonsymmetric elimination tree
  */
 int sp_coletree(
-    int_t* acolst, int_t* acolend, /* column start and end past 1 */
-    int_t* arow,                   /* row indices of A */
-    int nr, int nc,                /* dimension of A */
-    int* parent                    /* parent in elim tree */
-) {
-    int* root;     /* root of subtee of etree 	*/
+    const int_t* acolst, const int_t* acolend, /* column start and end past 1 */
+    const int_t* arow,                         /* row indices of A */
+    int nr,
+    int nc, /* dimension of A */
+    int* parent
+) /* parent in elim tree */
+{
+    int* root;     /* root of subtree of etree 	*/
     int* firstcol; /* first nonzero col in each row*/
     int rset, cset;
     int row, col;
@@ -201,12 +225,12 @@ int sp_coletree(
  *	In the child structure, lower-numbered children are represented
  *	first, so that a tree which is already numbered in postorder
  *	will not have its order changed.
- *    
+ *
  *  Written by John Gilbert, Xerox, 10 Dec 1990.
  *  Based on code written by John Gilbert at CMI in 1987.
  */
 
-#if 0  // replaced by a non-recursive version 
+#if 0 // replaced by a non-recursive version 
 static
 /*
  * Depth-first search from vertex v.
@@ -230,11 +254,12 @@ void etdfs (
 #endif
 
 static
-/*
- * Depth-first search from vertex n.  No recursion.
- * This routine was contributed by Cédric Doucet, CEDRAT Group, Meylan, France.
- */
-void nr_etdfs(int n, int* parent, int* first_kid, int* next_kid, int* post, int postnum) {
+    /*
+     * Depth-first search from vertex n.  No recursion.
+     * This routine was contributed by Cédric Doucet, CEDRAT Group, Meylan, France.
+     */
+    void
+    nr_etdfs(int n, const int* parent, const int* first_kid, const int* next_kid, int* post, int postnum) {
     int current = n, first, next;
 
     while(postnum != n) {
@@ -267,14 +292,19 @@ void nr_etdfs(int n, int* parent, int* first_kid, int* next_kid, int* post, int 
             current = next;
         }
         /* updating current node */
-        else { current = first; }
+        else {
+            current = first;
+        }
     }
 }
 
 /*
  * Post order a tree
  */
-int* TreePostorder(int n, int* parent) {
+int* TreePostorder(
+    int n,
+    int* parent
+) {
     int *first_kid, *next_kid; /* Linked list of children.	*/
     int *post, postnum;
     int v, dad;
@@ -316,12 +346,12 @@ int* TreePostorder(int n, int* parent) {
  *      Input:
  *        Square sparse matrix A.  No check is made for symmetry;
  *        elements below and on the diagonal are ignored.
- *        Numeric values are ignored, so any explicit zeros are 
+ *        Numeric values are ignored, so any explicit zeros are
  *        treated as nonzero.
  *      Output:
  *        Integer array of parents representing the etree, with n
  *        meaning a root of the elimination forest.
- *      Note:  
+ *      Note:
  *        This routine uses only the upper triangle, while sparse
  *        Cholesky (as in spchol.c) uses only the lower.  Matlab's
  *        dense Cholesky uses only the upper.  This routine could
@@ -338,11 +368,12 @@ int* TreePostorder(int n, int* parent) {
  * Symmetric elimination tree
  */
 int sp_symetree(
-    int* acolst, int* acolend, /* column starts and ends past 1 */
-    int* arow,                 /* row indices of A */
-    int n,                     /* dimension of A */
-    int* parent                /* parent in elim tree */
-) {
+    const int* acolst, const int* acolend, /* column starts and ends past 1 */
+    const int* arow,                       /* row indices of A */
+    int n,                                 /* dimension of A */
+    int* parent
+) /* parent in elim tree */
+{
     int* root; /* root of subtree of etree 	*/
     int rset, cset;
     int row, col;

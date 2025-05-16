@@ -41,11 +41,11 @@ class Homogeneous final : public SectionShell {
         IntegrationPoint(const IntegrationPoint&);
         IntegrationPoint(IntegrationPoint&&) noexcept = default;
         IntegrationPoint& operator=(const IntegrationPoint&) = delete;
-        IntegrationPoint& operator=(IntegrationPoint&&) noexcept = delete;
+        IntegrationPoint& operator=(IntegrationPoint&&) = delete;
         ~IntegrationPoint() = default;
     };
 
-    vector<IntegrationPoint> int_pt;
+    std::vector<IntegrationPoint> int_pt;
 
 public:
     Homogeneous(

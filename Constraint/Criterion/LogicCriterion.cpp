@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "LogicCriterion.h"
+
 #include <Domain/DomainBase.h>
 
 LogicCriterion::LogicCriterion(const unsigned T, const unsigned ST, const unsigned TA, const unsigned TB)
@@ -44,7 +45,7 @@ int LogicCriterion::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Criterion> LogicCriterionAND::get_copy() { return make_unique<LogicCriterionAND>(*this); }
+unique_ptr<Criterion> LogicCriterionAND::get_copy() { return std::make_unique<LogicCriterionAND>(*this); }
 
 int LogicCriterionAND::process(const shared_ptr<DomainBase>& D) {
     const auto result_a = criterion_a->process(D);
@@ -55,7 +56,7 @@ int LogicCriterionAND::process(const shared_ptr<DomainBase>& D) {
     return SUANPAN_EXIT == result_a && SUANPAN_EXIT == result_b;
 }
 
-unique_ptr<Criterion> LogicCriterionOR::get_copy() { return make_unique<LogicCriterionOR>(*this); }
+unique_ptr<Criterion> LogicCriterionOR::get_copy() { return std::make_unique<LogicCriterionOR>(*this); }
 
 int LogicCriterionOR::process(const shared_ptr<DomainBase>& D) {
     const auto result_a = criterion_a->process(D);

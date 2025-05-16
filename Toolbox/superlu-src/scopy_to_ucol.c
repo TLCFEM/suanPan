@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -41,7 +41,7 @@ int scopy_to_ucol(
     float* dense,   /* modified - reset to zero on return */
     GlobalLU_t* Glu /* modified */
 ) {
-    /* 
+    /*
      * Gather from SPA dense[*] to global ucol[*].
      */
     int ksub, krep, ksupno;
@@ -71,11 +71,9 @@ int scopy_to_ucol(
         krep = segrep[k--];
         ksupno = supno[krep];
 
-        if(ksupno != jsupno) {
-            /* Should go into ucol[] */
+        if(ksupno != jsupno) { /* Should go into ucol[] */
             kfnz = repfnz[krep];
-            if(kfnz != EMPTY) {
-                /* Nonzero U-segment */
+            if(kfnz != SLU_EMPTY) { /* Nonzero U-segment */
 
                 fsupc = xsup[ksupno];
                 isub = xlsub[fsupc] + kfnz - fsupc;
@@ -102,6 +100,7 @@ int scopy_to_ucol(
                 }
             }
         }
+
     } /* for each segment... */
 
     xusub[jcol + 1] = nextu; /* Close U[*,jcol] */

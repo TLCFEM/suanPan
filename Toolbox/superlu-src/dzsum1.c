@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -12,10 +12,10 @@ at the top-level directory.
  * \brief Takes sum of the absolute values of a complex vector and returns a double precision result
  *
  * <pre>
- *     -- LAPACK auxiliary routine (version 2.0) --   
- *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
- *     Courant Institute, Argonne National Lab, and Rice University   
- *     October 31, 1992   
+ *     -- LAPACK auxiliary routine (version 2.0) --
+ *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+ *     Courant Institute, Argonne National Lab, and Rice University
+ *     October 31, 1992
  * </pre>
  */
 
@@ -25,30 +25,30 @@ at the top-level directory.
 /*! \brief
 
  <pre>
-    Purpose   
-    =======   
+    Purpose
+    =======
 
-    DZSUM1 takes the sum of the absolute values of a complex   
-    vector and returns a double precision result.   
+    DZSUM1 takes the sum of the absolute values of a complex
+    vector and returns a double precision result.
 
-    Based on DZASUM from the Level 1 BLAS.   
-    The change is to use the 'genuine' absolute value.   
+    Based on DZASUM from the Level 1 BLAS.
+    The change is to use the 'genuine' absolute value.
 
-    Contributed by Nick Higham for use with ZLACON.   
+    Contributed by Nick Higham for use with ZLACON.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    N       (input) INT   
-            The number of elements in the vector CX.   
+    N       (input) INT
+            The number of elements in the vector CX.
 
-    CX      (input) COMPLEX*16 array, dimension (N)   
-            The vector whose elements will be summed.   
+    CX      (input) COMPLEX*16 array, dimension (N)
+            The vector whose elements will be summed.
 
-    INCX    (input) INT   
-            The spacing between successive values of CX.  INCX > 0.   
+    INCX    (input) INT
+            The spacing between successive values of CX.  INCX > 0.
 
-    ===================================================================== 
+    =====================================================================
 </pre>
 */
 double dzsum1_slu(int* n, doublecomplex* cx, int* incx) {
@@ -59,11 +59,15 @@ double dzsum1_slu(int* n, doublecomplex* cx, int* incx) {
     int i, nincx;
     double stemp;
 
-#define CX(I) cx[(I)-1]
+#define CX(I) cx[(I) - 1]
 
     stemp = 0.;
-    if(*n <= 0) { return stemp; }
-    if(*incx == 1) { goto L20; }
+    if(*n <= 0) {
+        return stemp;
+    }
+    if(*incx == 1) {
+        goto L20;
+    }
 
     /*     CODE FOR INCREMENT NOT EQUAL TO 1 */
 
@@ -79,7 +83,8 @@ double dzsum1_slu(int* n, doublecomplex* cx, int* incx) {
 
     /*     CODE FOR INCREMENT EQUAL TO 1 */
 
-L20: for(i = 1; i <= *n; ++i) {
+L20:
+    for(i = 1; i <= *n; ++i) {
         /*        NEXT LINE MODIFIED. */
 
         stemp += z_abs(&CX(i));
@@ -89,4 +94,5 @@ L20: for(i = 1; i <= *n; ++i) {
     return stemp;
 
     /*     End of DZSUM1 */
+
 } /* dzsum1_slu */

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "ElementExample.h"
+
 #include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Material/Material.h>
@@ -49,7 +50,7 @@ SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::ist
         return;
     }
 
-    return_obj = make_unique<ElementExample>(tag, node_tag, material_tag, thickness);
+    return_obj = std::make_unique<ElementExample>(tag, node_tag, material_tag, thickness);
 }
 
 ElementExample::ElementExample(const unsigned T, uvec&& NT, const unsigned MT, const double TH)

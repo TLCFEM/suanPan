@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Maxwell.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Recorder/OutputType.h>
@@ -44,7 +45,7 @@ int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Maxwell::get_copy() { return make_unique<Maxwell>(*this); }
+unique_ptr<Material> Maxwell::get_copy() { return std::make_unique<Maxwell>(*this); }
 
 int Maxwell::update_trial_status(const vec&) {
     suanpan_error("Receives strain only from the associated element.\n");
@@ -175,7 +176,7 @@ int Maxwell::reset_status() {
     return spring->reset_status() + damper->reset_status();
 }
 
-vector<vec> Maxwell::record(const OutputType P) {
+std::vector<vec> Maxwell::record(const OutputType P) {
     if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) return {current_stress};
     if(OutputType::ED == P) return {damper->get_current_strain()};
     if(OutputType::VD == P) return {damper->get_current_strain_rate()};

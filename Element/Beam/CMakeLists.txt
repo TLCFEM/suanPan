@@ -1,16 +1,16 @@
-set(Beam
-        Beam/B21.cpp
-        Beam/B21E.cpp
-        Beam/B21H.cpp
-        Beam/B31.cpp
-        Beam/B31OS.cpp
-        Beam/EB31OS.cpp
-        Beam/EB21.cpp
-        Beam/F21.cpp
-        Beam/F21H.cpp
-        Beam/F31.cpp
-        Beam/MVLEM.cpp
-        Beam/NMB21.cpp
-        Beam/NMB21E.cpp
-        Beam/NMB31.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        B21E.cpp
+        B21H.cpp
+        B31OS.cpp
+        B21.cpp
+        B31.cpp
+        EB31OS.cpp
+        EB21.cpp
+        F21H.cpp
+        F21.cpp
+        F31.cpp
+        MVLEM.cpp
+        NMB21E.cpp
+        NMB21.cpp
+        NMB31.cpp
 )

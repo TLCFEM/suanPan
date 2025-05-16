@@ -1,9 +1,9 @@
 /*! \file
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
@@ -37,7 +37,8 @@ int zfill_diag(int n, NCformat* Astore)
 
     for(i = 0; i < n; i++) {
         diag = -1;
-        for(j = colptr[i]; j < colptr[i + 1]; j++) if(rowind[j] == i) diag = j;
+        for(j = colptr[i]; j < colptr[i + 1]; j++)
+            if(rowind[j] == i) diag = j;
         if(diag < 0) fill++;
     }
     if(fill) {
@@ -81,7 +82,8 @@ int zdominate(int n, NCformat* Astore)
 
     for(i = 0; i < n; i++) {
         diag = -1;
-        for(j = colptr[i]; j < colptr[i + 1]; j++) if(rowind[j] == i) diag = j;
+        for(j = colptr[i]; j < colptr[i + 1]; j++)
+            if(rowind[j] == i) diag = j;
         if(diag < 0) fill++;
     }
     if(fill) {

@@ -16,13 +16,14 @@
  ******************************************************************************/
 
 #include "Material.h"
+
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 
 Material::Material(const unsigned T, const MaterialType MT, const double D)
     : DataMaterial{fabs(D), MT}
     , DataCoupleMaterial{}
-    , Tag(T) {}
+    , CopiableTag(T) {}
 
 double Material::get_density() const { return density; }
 
@@ -136,7 +137,7 @@ const mat& Material::get_current_couple_stiffness() { return current_couple_stif
 
 const mat& Material::get_initial_couple_stiffness() const { return initial_couple_stiffness; }
 
-unique_ptr<Material> Material::get_copy() { throw invalid_argument("hidden method get_copy() called"); }
+unique_ptr<Material> Material::get_copy() { throw std::invalid_argument("hidden method get_copy() called"); }
 
 int Material::update_incre_status(const double i_strain) { return update_incre_status(vec{i_strain}); }
 
@@ -156,7 +157,7 @@ int Material::update_incre_status(const vec& i_strain, const vec& i_strain_rate)
 
 int Material::update_incre_status(const vec& i_strain, const vec& i_strain_rate, const vec& i_strain_acc) { return update_trial_status(current_strain + i_strain, current_strain_rate + i_strain_rate, current_strain_acc + i_strain_acc); }
 
-int Material::update_trial_status(const vec&) { throw invalid_argument("hidden method update_trial_status() called"); }
+int Material::update_trial_status(const vec&) { throw std::invalid_argument("hidden method update_trial_status() called"); }
 
 int Material::update_trial_status(const vec& t_strain, const vec& t_strain_rate) {
     trial_strain_rate = t_strain_rate;

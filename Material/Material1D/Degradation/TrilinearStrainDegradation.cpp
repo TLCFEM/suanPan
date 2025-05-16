@@ -46,4 +46,4 @@ TrilinearStrainDegradation::TrilinearStrainDegradation(const unsigned T, const u
     : DataTrilinearStrainDegradation{fabs(SE), fabs(EE), fabs(ED)}
     , StrainDegradation(T, MT) {}
 
-unique_ptr<Material> TrilinearStrainDegradation::get_copy() { return make_unique<TrilinearStrainDegradation>(*this); }
+unique_ptr<Material> TrilinearStrainDegradation::get_copy() { return std::make_unique<TrilinearStrainDegradation>(*this); }

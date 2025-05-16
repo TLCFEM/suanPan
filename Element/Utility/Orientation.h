@@ -45,7 +45,7 @@ enum class OrientationType {
 
 class Element;
 
-class Orientation : public Tag {
+class Orientation : public CopiableTag {
 protected:
     const Element* element_ptr = nullptr;
 
@@ -61,11 +61,6 @@ protected:
 
 public:
     explicit Orientation(unsigned = 0, vec&& = {});
-    Orientation(const Orientation&) = default;           // copy allowed
-    Orientation(Orientation&&) = delete;                 // move forbidden
-    Orientation& operator=(const Orientation&) = delete; // copy assign forbidden
-    Orientation& operator=(Orientation&&) = delete;      // move assign forbidden
-    ~Orientation() override = default;
 
     void update_axis(const vec&);
 

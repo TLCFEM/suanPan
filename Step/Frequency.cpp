@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Frequency.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Solver/Arnoldi.h>
@@ -38,11 +39,11 @@ int Frequency::initialize() {
     const auto t_domain = database.lock();
 
     // integrator
-    modifier = make_shared<Integrator>();
+    modifier = std::make_shared<Integrator>();
     modifier->set_domain(t_domain);
 
     // solver
-    if(nullptr == solver) solver = make_shared<Arnoldi>(0, eigen_number, eigen_type);
+    if(nullptr == solver) solver = std::make_shared<Arnoldi>(0, eigen_number, eigen_type);
     solver->set_integrator(modifier);
 
     if(SUANPAN_SUCCESS != modifier->initialize()) return SUANPAN_FAIL;

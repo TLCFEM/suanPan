@@ -36,8 +36,9 @@
 #define LEENEWMARKITERATIVE_H
 
 #include "Newmark.h"
-#include <Domain/MetaMat/MetaMat.hpp>
+
 #include <Domain/Factory.hpp>
+#include <Domain/MetaMat/MetaMat.hpp>
 
 class LeeNewmarkIterative final : public Newmark {
 public:

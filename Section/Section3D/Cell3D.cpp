@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "Cell3D.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material1D/Material1D.h>
 
@@ -37,7 +38,7 @@ int Cell3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Cell3D::get_copy() { return make_unique<Cell3D>(*this); }
+unique_ptr<Section> Cell3D::get_copy() { return std::make_unique<Cell3D>(*this); }
 
 void Cell3D::print() {
     suanpan_info("A 3D section that represents a small cell.\n");

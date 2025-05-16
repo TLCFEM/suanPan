@@ -1,14 +1,14 @@
-set(M2D
-        Material2D/Concrete21.cpp
-        Material2D/Concrete22.cpp
-        Material2D/DuncanSelig.cpp
-        Material2D/Elastic/AxisymmetricElastic.cpp
-        Material2D/Elastic/Elastic2D.cpp
-        Material2D/Material2D.cpp
-        Material2D/Wrapper/Axisymmetric.cpp
-        Material2D/Wrapper/Laminated.cpp
-        Material2D/Wrapper/PlaneStrain.cpp
-        Material2D/Wrapper/PlaneStress.cpp
-        Material2D/Wrapper/Rebar2D.cpp
-        Material2D/Wrapper/Rotation2D.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        Concrete21.cpp
+        Concrete22.cpp
+        DuncanSelig.cpp
+        Elastic/AxisymmetricElastic.cpp
+        Elastic/Elastic2D.cpp
+        Material2D.cpp
+        Wrapper/Axisymmetric.cpp
+        Wrapper/Laminated.cpp
+        Wrapper/PlaneStrain.cpp
+        Wrapper/PlaneStress.cpp
+        Wrapper/Rebar2D.cpp
+        Wrapper/Rotation2D.cpp
 )

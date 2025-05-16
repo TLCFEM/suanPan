@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "TimberPD.h"
+
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
@@ -34,7 +35,7 @@ int TimberPD::initialize(const shared_ptr<DomainBase>& D) {
     return BilinearHoffman::initialize(D);
 }
 
-unique_ptr<Material> TimberPD::get_copy() { return make_unique<TimberPD>(*this); }
+unique_ptr<Material> TimberPD::get_copy() { return std::make_unique<TimberPD>(*this); }
 
 int TimberPD::update_trial_status(const vec& t_strain) {
     if(SUANPAN_SUCCESS != BilinearHoffman::update_trial_status(t_strain)) return SUANPAN_FAIL;
@@ -102,7 +103,7 @@ double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t 
 
 double TimberPD::compute_damage_c(const double r_c) const { return b_c * pow(std::max(datum::eps, 1. - ini_r_c / r_c), m_c); }
 
-vector<vec> TimberPD::record(const OutputType P) {
+std::vector<vec> TimberPD::record(const OutputType P) {
     if(P == OutputType::DT) return {vec{compute_damage_t(current_history(1))}};
     if(P == OutputType::DC) return {vec{compute_damage_c(current_history(2))}};
 

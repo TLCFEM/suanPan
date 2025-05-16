@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "PCPE4UC.h"
+
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
@@ -146,14 +147,15 @@ int PCPE4UC::reset_status() {
 
 mat PCPE4UC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-vector<vec> PCPE4UC::record(const OutputType P) {
-    vector<vec> data;
+std::vector<vec> PCPE4UC::record(const OutputType P) {
+    std::vector<vec> data;
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
         for(const auto& I : int_pt) data.emplace_back(vec{-alpha * q * tensor::trace2(I.strain_mat * t_disp)});
     }
-    else for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    else
+        for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 
     return data;
 }

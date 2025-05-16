@@ -1,21 +1,22 @@
-/*! \file
+/*
 Copyright (c) 2003, The Regents of the University of California, through
-Lawrence Berkeley National Laboratory (subject to receipt of any required 
-approvals from U.S. Dept. of Energy) 
+Lawrence Berkeley National Laboratory (subject to receipt of any required
+approvals from U.S. Dept. of Energy)
 
-All rights reserved. 
+All rights reserved.
 
 The source code is distributed under BSD license, see the file License.txt
 at the top-level directory.
 */
-/*! @file ilu_relax_snode.c
- * \brief Identify initial relaxed supernodes
- *
- * <pre>
+/*
  * -- SuperLU routine (version 4.0) --
  * Lawrence Berkeley National Laboratory
  * June 1, 2009
- * </pre>
+ */
+/*! \file
+ * \brief Identify initial relaxed supernodes
+ *
+ * \ingroup Common
  */
 
 #include "slu_ddefs.h"
@@ -30,24 +31,25 @@ at the top-level directory.
  * </pre>
  */
 void ilu_relax_snode(
-    const int n, int* et,    /* column elimination tree */
+    const int n,
+    const int* et,           /* column elimination tree */
     const int relax_columns, /* max no of columns allowed in a
-					  relaxed snode */
+                relaxed snode */
     int* descendants,        /* no of descendants of each node
-					 in the etree */
+                   in the etree */
     int* relax_end,          /* last column in a supernode
-					* if j-th column starts a relaxed
-					* supernode, relax_end[j] represents
-					* the last column of this supernode */
+                              * if j-th column starts a relaxed
+                              * supernode, relax_end[j] represents
+                              * the last column of this supernode */
     int* relax_fsupc         /* first column in a supernode
-					* relax_fsupc[j] represents the first
-					* column of j-th supernode */
+                              * relax_fsupc[j] represents the first
+                              * column of j-th supernode */
 ) {
     register int j, f, parent;
     register int snode_start; /* beginning of a snode */
 
-    ifill(relax_end, n, EMPTY);
-    ifill(relax_fsupc, n, EMPTY);
+    ifill(relax_end, n, SLU_EMPTY);
+    ifill(relax_fsupc, n, SLU_EMPTY);
     for(j = 0; j < n; j++) descendants[j] = 0;
 
     /* Compute the number of descendants of each node in the etree */

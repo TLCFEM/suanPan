@@ -32,7 +32,7 @@ int ElasticOS::initialize(const shared_ptr<DomainBase>&) {
 
 double ElasticOS::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> ElasticOS::get_copy() { return make_unique<ElasticOS>(*this); }
+unique_ptr<Material> ElasticOS::get_copy() { return std::make_unique<ElasticOS>(*this); }
 
 int ElasticOS::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;

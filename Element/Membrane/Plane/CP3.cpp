@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "CP3.h"
+
 #include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
@@ -176,7 +177,8 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
 
     if(const auto t_density = area * thickness * m_material->get_density(); t_density > 0.) {
         initial_mass.zeros(m_size, m_size);
-        for(auto I = 0u, K = 0u; I < m_node; ++I, K += m_dof) for(auto J = I, L = K; J < m_node; ++J, L += m_dof) initial_mass(K, L) += t_density * n(I) * n(J);
+        for(auto I = 0u, K = 0u; I < m_node; ++I, K += m_dof)
+            for(auto J = I, L = K; J < m_node; ++J, L += m_dof) initial_mass(K, L) += t_density * n(I) * n(J);
         for(auto I = 0u, K = 1u; I < m_size; I += m_dof, K += m_dof) {
             initial_mass(K, K) = initial_mass(I, I);
             for(auto J = I + m_dof, L = K + m_dof; J < m_size; J += m_dof, L += m_dof) initial_mass(J, I) = initial_mass(K, L) = initial_mass(L, K) = initial_mass(I, J);
@@ -186,7 +188,8 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
 
     body_force.zeros(m_size, m_dof);
     n *= area * thickness;
-    for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) for(auto K = 0llu; K < m_dof; ++K) body_force(L + K, K) = n(J);
+    for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
+        for(auto K = 0llu; K < m_dof; ++K) body_force(L + K, K) = n(J);
 
     return SUANPAN_SUCCESS;
 }
@@ -246,7 +249,7 @@ int CP3::clear_status() { return m_material->clear_status(); }
 
 int CP3::reset_status() { return m_material->reset_status(); }
 
-vector<vec> CP3::record(const OutputType P) { return m_material->record(P); }
+std::vector<vec> CP3::record(const OutputType P) { return m_material->record(P); }
 
 void CP3::print() {
     suanpan_info("CP3 element connects nodes:", node_encoding);

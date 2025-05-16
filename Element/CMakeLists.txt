@@ -1,45 +1,19 @@
-cmake_minimum_required(VERSION 3.18)
+add_subdirectory(Beam)
+add_subdirectory(Cube)
+add_subdirectory(Membrane)
+add_subdirectory(Modifier)
+add_subdirectory(Patch)
+add_subdirectory(Plate)
+add_subdirectory(Shell)
+add_subdirectory(Special)
+add_subdirectory(Truss)
+add_subdirectory(Utility)
+add_subdirectory(Visualisation)
 
-project(Element)
-
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../Libs)
-
-include(Beam/CMakeLists.txt)
-include(Cube/CMakeLists.txt)
-include(Membrane/CMakeLists.txt)
-include(Modifier/CMakeLists.txt)
-include(Plate/CMakeLists.txt)
-include(Shell/CMakeLists.txt)
-include(Special/CMakeLists.txt)
-include(Truss/CMakeLists.txt)
-include(Utility/CMakeLists.txt)
-include(Visualisation/CMakeLists.txt)
-include(Patch/CMakeLists.txt)
-
-add_library(${PROJECT_NAME} STATIC
+target_sources(${PROJECT_NAME} PRIVATE
         Element.cpp
         ElementParser.cpp
         ElementTemplate.cpp
         MaterialElement.cpp
         SectionElement.cpp
-        ${Beam}
-        ${Cube}
-        ${Membrane}
-        ${Modifier}
-        ${Plate}
-        ${Shell}
-        ${Special}
-        ${Truss}
-        ${Utility}
-        ${Visualisation}
-        ${Patch}
 )
-
-if (SP_ENABLE_VTK)
-    target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES})
-    if (VTK_VERSION VERSION_LESS "8.90.0")
-        include(${VTK_USE_FILE})
-    else ()
-        vtk_module_autoinit(TARGETS ${PROJECT_NAME} MODULES ${VTK_LIBRARIES})
-    endif ()
-endif ()

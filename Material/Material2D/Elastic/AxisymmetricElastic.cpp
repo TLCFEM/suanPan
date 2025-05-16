@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "AxisymmetricElastic.h"
+
 #include <Toolbox/tensor.h>
 
 AxisymmetricElastic::AxisymmetricElastic(const unsigned T, const double E, const double P, const double R)
@@ -31,7 +32,7 @@ int AxisymmetricElastic::initialize(const shared_ptr<DomainBase>&) {
 
 double AxisymmetricElastic::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> AxisymmetricElastic::get_copy() { return make_unique<AxisymmetricElastic>(*this); }
+unique_ptr<Material> AxisymmetricElastic::get_copy() { return std::make_unique<AxisymmetricElastic>(*this); }
 
 int AxisymmetricElastic::update_trial_status(const vec& t_strain) {
     trial_stress = trial_stiffness * (trial_strain = t_strain);

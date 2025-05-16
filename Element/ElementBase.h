@@ -28,18 +28,18 @@
 #ifndef ELEMENTBASE_H
 #define ELEMENTBASE_H
 
+#include <Domain/DOF.h>
 #include <Domain/Tag.h>
-#include <Element/Visualisation/vtkBase.h>
 #include <Element/MappingDOF.h>
+#include <Element/Visualisation/vtkBase.h>
 
 class Node;
 class DomainBase;
 class Material;
 class Section;
 enum class OutputType;
-enum class DOF : unsigned short;
 
-class ElementBase : public Tag, public vtkBase {
+class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_strain_energy() = 0;
     virtual void update_kinetic_energy() = 0;
     virtual void update_viscous_energy() = 0;
@@ -71,14 +71,7 @@ protected:
 
 public:
     explicit ElementBase(const unsigned T)
-        : Tag(T) {}
-
-    ElementBase(const ElementBase&) = delete;            // copy forbidden
-    ElementBase(ElementBase&&) = delete;                 // move forbidden
-    ElementBase& operator=(const ElementBase&) = delete; // assign forbidden
-    ElementBase& operator=(ElementBase&&) = delete;      // assign forbidden
-
-    ~ElementBase() override = default;
+        : UniqueTag(T) {}
 
     virtual int initialize_base(const shared_ptr<DomainBase>&) = 0;
     virtual int initialize(const shared_ptr<DomainBase>&) = 0;
@@ -114,7 +107,7 @@ public:
     [[nodiscard]] virtual unsigned get_total_number() const = 0;
 
     virtual void clear_node_ptr() = 0;
-    [[nodiscard]] virtual const std::vector<weak_ptr<Node>>& get_node_ptr() const = 0;
+    [[nodiscard]] virtual const std::vector<std::weak_ptr<Node>>& get_node_ptr() const = 0;
 
     [[nodiscard]] virtual vec get_incre_displacement() const = 0;
     [[nodiscard]] virtual vec get_incre_velocity() const = 0;

@@ -16,12 +16,13 @@
  ******************************************************************************/
 
 #include "ConcreteCM.h"
+
 #include <Toolbox/utility.h>
 
 pod2 ConcreteCM::compute_compression_backbone(const double n_strain) {
     pod2 response;
 
-    suanpan_assert([&] { if(n_strain > 0.) throw invalid_argument("argument is not acceptable"); });
+    suanpan_assert([&] { if(n_strain > 0.) throw std::invalid_argument("argument is not acceptable"); });
 
     const auto normal_strain = std::max(datum::eps, n_strain / c_strain);
 
@@ -36,7 +37,7 @@ pod2 ConcreteCM::compute_compression_backbone(const double n_strain) {
 pod2 ConcreteCM::compute_tension_backbone(const double n_strain) {
     pod2 response;
 
-    suanpan_assert([&] { if(n_strain < 0.) throw invalid_argument("argument is not acceptable"); });
+    suanpan_assert([&] { if(n_strain < 0.) throw std::invalid_argument("argument is not acceptable"); });
 
     const auto normal_strain = std::max(datum::eps, n_strain / t_strain);
 
@@ -195,7 +196,7 @@ pod2 ConcreteCM::compute_transition(const double EM, const double EA, const doub
         const auto secant = (SB - SA) / d_strain;
         const auto tmp_a = secant - KA;
         const auto ratio = (KB - secant) / tmp_a;
-        suanpan_assert([&] { if(ratio <= 0.) throw invalid_argument("argument is not acceptable"); });
+        suanpan_assert([&] { if(ratio <= 0.) throw std::invalid_argument("argument is not acceptable"); });
         const auto tmp_b = tmp_a * pow(i_strain / d_strain, ratio);
 
         response[0] = SA + i_strain * (KA + tmp_b);
@@ -311,7 +312,7 @@ ConcreteCM::ConcreteCM(const unsigned T, const double E, const double SC, const 
     , t_n(std::max(perturb(1.), NTT))
     , linear_trans(LT) {}
 
-unique_ptr<Material> ConcreteCM::get_copy() { return make_unique<ConcreteCM>(*this); }
+unique_ptr<Material> ConcreteCM::get_copy() { return std::make_unique<ConcreteCM>(*this); }
 
 double ConcreteCM::get_parameter(const ParameterType P) const {
     if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;

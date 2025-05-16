@@ -1,6 +1,6 @@
-set(Shell
-        Shell/DKTS3.cpp
-        Shell/S4.cpp
-        Shell/SGCMS.cpp
-        Shell/ShellBase.cpp
+target_sources(${PROJECT_NAME} PRIVATE
+        DKTS3.cpp
+        S4.cpp
+        SGCMS.cpp
+        ShellBase.cpp
 )
