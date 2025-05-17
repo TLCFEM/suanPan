@@ -24,7 +24,7 @@
 template<sp_d data_t, sp_i index_t> class csc_form;
 template<sp_d data_t, sp_i index_t> class csr_form;
 
-enum class SparseBase : short unsigned {
+enum class SparseBase : std::uint8_t {
     ZERO,
     ONE
 };
