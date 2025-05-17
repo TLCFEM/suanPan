@@ -20,9 +20,11 @@
  *
  * The `SparseMatCUDA` class uses CUDA and supports single, double, mixed precision.
  *
+ * todo: use cuDSS library instead
+ *
  * @author tlc
- * @date 21/04/2021
- * @version 0.1.0
+ * @date 17/05/2025
+ * @version 0.2.0
  * @file SparseMatCUDA.hpp
  * @addtogroup MetaMat
  * @{
@@ -46,23 +48,28 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     class cuda_ptr {
         void* ptr{};
 
-    public:
-        size_t size{};
+        size_t total_size() const { return unit * size; }
 
-        explicit cuda_ptr(const size_t in_size = 0)
-            : size(in_size) {
-            if(size > 0) cudaMalloc(&ptr, size);
+    public:
+        size_t unit{}, size{};
+
+        explicit cuda_ptr(const size_t in_unit = 0, const size_t in_size = 0)
+            : unit(in_unit)
+            , size(in_size) {
+            if(total_size() > 0) cudaMalloc(&ptr, total_size());
         }
         cuda_ptr(const cuda_ptr& other)
-            : cuda_ptr(other.size) {}
+            : cuda_ptr(other.unit, other.size) {}
         cuda_ptr(cuda_ptr&&) = delete;
         cuda_ptr& operator=(const cuda_ptr&) = delete;
         cuda_ptr& operator=(cuda_ptr&& other) noexcept {
             if(this != &other) {
                 cudaFree(ptr);
                 ptr = other.ptr;
+                unit = other.unit;
                 size = other.size;
                 other.ptr = nullptr;
+                other.unit = 0;
                 other.size = 0;
             }
             return *this;
@@ -71,9 +78,9 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
 
         auto operator&() { return ptr; }
 
-        auto copy_to(void* dest, cudaStream_t s) { return cudaMemcpyAsync(dest, ptr, size, cudaMemcpyDeviceToHost, s); }
+        auto copy_to(void* dest, cudaStream_t s) { return cudaMemcpyAsync(dest, ptr, total_size(), cudaMemcpyDeviceToHost, s); }
 
-        auto copy_from(const void* src, cudaStream_t s) { return cudaMemcpyAsync(ptr, src, size, cudaMemcpyHostToDevice, s); }
+        auto copy_from(const void* src, cudaStream_t s) { return cudaMemcpyAsync(ptr, src, total_size(), cudaMemcpyHostToDevice, s); }
     };
 
     cuda_ptr d_val_idx{}, d_col_idx{}, d_row_ptr{};
@@ -85,7 +92,7 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
         cusparseCreateMatDescr(&descr);
         cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
         cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
-        d_row_ptr = cuda_ptr(sizeof(int) * (this->n_rows + 1));
+        d_row_ptr = cuda_ptr(sizeof(int), this->n_rows + 1);
     }
 
     void release() const {
@@ -95,8 +102,8 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     }
 
     template<sp_d ET> void device_alloc(csr_form<ET, int>&& csr_mat) {
-        d_val_idx = cuda_ptr(sizeof(ET) * csr_mat.n_elem);
-        d_col_idx = cuda_ptr(sizeof(int) * csr_mat.n_elem);
+        d_val_idx = cuda_ptr(sizeof(ET), csr_mat.n_elem);
+        d_col_idx = cuda_ptr(sizeof(int), csr_mat.n_elem);
 
         d_val_idx.copy_from(csr_mat.val_mem(), stream);
         d_col_idx.copy_from(csr_mat.col_mem(), stream);
@@ -113,7 +120,10 @@ public:
         : SparseMat<T>(in_row, in_col, in_elem) { acquire(); }
 
     SparseMatCUDA(const SparseMatCUDA& other)
-        : SparseMat<T>(other) { acquire(); }
+        : SparseMat<T>(other) {
+        acquire();
+        this->factored = false;
+    }
 
     SparseMatCUDA(SparseMatCUDA&&) = delete;
     SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;
@@ -131,9 +141,9 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
         this->factored = true;
     }
 
-    const size_t n_rhs = (std::is_same_v<T, float> || Precision::MIXED == this->setting.precision ? sizeof(float) : sizeof(double)) * B.n_elem;
+    const size_t unit_size = std::is_same_v<T, float> || Precision::MIXED == this->setting.precision ? sizeof(float) : sizeof(double);
 
-    cuda_ptr d_b{n_rhs}, d_x{n_rhs};
+    cuda_ptr d_b{unit_size, B.n_elem}, d_x{unit_size, B.n_elem};
 
     int singularity;
     auto code = 0;
