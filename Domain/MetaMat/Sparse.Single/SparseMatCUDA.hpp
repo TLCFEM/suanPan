@@ -47,7 +47,7 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
 
     cuda_ptr d_val_idx{}, d_col_idx{}, d_row_ptr{};
 
-    void acquire() {
+    void init_config() {
         cusolverSpCreate(&handle);
         cudaStreamCreate(&stream);
         cusolverSpSetStream(handle, stream);
@@ -80,10 +80,10 @@ protected:
 
 public:
     SparseMatCUDA(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem) { acquire(); }
+        : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
     SparseMatCUDA(const SparseMatCUDA& other)
-        : SparseMat<T>(other) { acquire(); }
+        : SparseMat<T>(other) { init_config(); }
 
     SparseMatCUDA(SparseMatCUDA&&) = delete;
     SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;

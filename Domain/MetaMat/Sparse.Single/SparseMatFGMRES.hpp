@@ -44,15 +44,6 @@ protected:
 public:
     using SparseMat<T>::SparseMat;
 
-    SparseMatFGMRES(const SparseMatFGMRES& other)
-        : SparseMat<T>(other) {}
-
-    SparseMatFGMRES(SparseMatFGMRES&&) = delete;
-    SparseMatFGMRES& operator=(const SparseMatFGMRES&) = delete;
-    SparseMatFGMRES& operator=(SparseMatFGMRES&&) = delete;
-
-    ~SparseMatFGMRES() override = default;
-
     unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
 };
 

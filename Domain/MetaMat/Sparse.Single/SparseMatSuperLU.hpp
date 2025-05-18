@@ -89,6 +89,8 @@ template<sp_d T> auto SparseMatSuperLU<T>::init_config() {
     StatAlloc(static_cast<int>(this->n_cols), SUANPAN_NUM_THREADS, sp_ienv(1), sp_ienv(2), &stat);
     StatInit(static_cast<int>(this->n_cols), SUANPAN_NUM_THREADS, &stat);
 #endif
+
+    this->factored = false;
 }
 
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, int>&& in) {
@@ -143,10 +145,7 @@ template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const uword in_row, const
     : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
 template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const SparseMatSuperLU& other)
-    : SparseMat<T>(other) {
-    init_config();
-    this->factored = false;
-}
+    : SparseMat<T>(other) { init_config(); }
 
 template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
     dealloc();

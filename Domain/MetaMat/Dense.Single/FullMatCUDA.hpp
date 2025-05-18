@@ -41,7 +41,7 @@ template<sp_d T> class FullMatCUDA final : public FullMat<T> {
 
     cuda_ptr info{sizeof(int), 1}, d_ipiv{sizeof(int), static_cast<int>(this->n_rows)}, d_A{}, d_work{};
 
-    void acquire() {
+    void init_config() {
         cusolverDnCreate(&handle);
         cudaStreamCreate(&stream);
         cusolverDnSetStream(handle, stream);
@@ -73,10 +73,10 @@ protected:
 
 public:
     FullMatCUDA(const uword in_rows, const uword in_cols)
-        : FullMat<T>(in_rows, in_cols) { acquire(); }
+        : FullMat<T>(in_rows, in_cols) { init_config(); }
 
     FullMatCUDA(const FullMatCUDA& other)
-        : FullMat<T>(other) { acquire(); }
+        : FullMat<T>(other) { init_config(); }
 
     FullMatCUDA(FullMatCUDA&&) = delete;
     FullMatCUDA& operator=(const FullMatCUDA&) = delete;
