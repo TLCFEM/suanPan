@@ -36,52 +36,14 @@
 
 #include "../SparseMat.hpp"
 #include "../csr_form.hpp"
+#include "../cuda_ptr.hpp"
 
 #include <cusolverSp.h>
-#include <cusparse.h>
 
 template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     cusolverSpHandle_t handle = nullptr;
     cudaStream_t stream = nullptr;
     cusparseMatDescr_t descr = nullptr;
-
-    class cuda_ptr {
-        void* ptr{};
-
-        size_t total_size() const { return unit * size; }
-
-    public:
-        size_t unit{}, size{};
-
-        explicit cuda_ptr(const size_t in_unit = 0, const size_t in_size = 0)
-            : unit(in_unit)
-            , size(in_size) {
-            if(total_size() > 0) cudaMalloc(&ptr, total_size());
-        }
-        cuda_ptr(const cuda_ptr& other)
-            : cuda_ptr(other.unit, other.size) {}
-        cuda_ptr(cuda_ptr&&) = delete;
-        cuda_ptr& operator=(const cuda_ptr&) = delete;
-        cuda_ptr& operator=(cuda_ptr&& other) noexcept {
-            if(this != &other) {
-                cudaFree(ptr);
-                ptr = other.ptr;
-                unit = other.unit;
-                size = other.size;
-                other.ptr = nullptr;
-                other.unit = 0;
-                other.size = 0;
-            }
-            return *this;
-        }
-        ~cuda_ptr() { cudaFree(ptr); }
-
-        auto operator&() { return ptr; }
-
-        auto copy_to(void* dest, cudaStream_t s) { return cudaMemcpyAsync(dest, ptr, total_size(), cudaMemcpyDeviceToHost, s); }
-
-        auto copy_from(const void* src, cudaStream_t s) { return cudaMemcpyAsync(ptr, src, total_size(), cudaMemcpyHostToDevice, s); }
-    };
 
     cuda_ptr d_val_idx{}, d_col_idx{}, d_row_ptr{};
 
@@ -92,7 +54,8 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
         cusparseCreateMatDescr(&descr);
         cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
         cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
-        d_row_ptr = cuda_ptr(sizeof(int), this->n_rows + 1);
+        d_row_ptr = cuda_ptr(sizeof(int), static_cast<int>(this->n_rows) + 1);
+        this->factored = false;
     }
 
     void release() const {
@@ -120,10 +83,7 @@ public:
         : SparseMat<T>(in_row, in_col, in_elem) { acquire(); }
 
     SparseMatCUDA(const SparseMatCUDA& other)
-        : SparseMat<T>(other) {
-        acquire();
-        this->factored = false;
-    }
+        : SparseMat<T>(other) { acquire(); }
 
     SparseMatCUDA(SparseMatCUDA&&) = delete;
     SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;
@@ -135,40 +95,39 @@ public:
 };
 
 template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
-    if(!this->factored) {
-        std::is_same_v<T, float> || Precision::MIXED == this->setting.precision ? device_alloc(csr_form<float, int>(this->triplet_mat)) : device_alloc(csr_form<double, int>(this->triplet_mat));
+    const auto single_precision = std::is_same_v<T, float> || Precision::MIXED == this->setting.precision;
 
+    if(!this->factored) {
         this->factored = true;
+        single_precision ? device_alloc(csr_form<float, int>(this->triplet_mat)) : device_alloc(csr_form<double, int>(this->triplet_mat));
     }
 
-    const size_t unit_size = std::is_same_v<T, float> || Precision::MIXED == this->setting.precision ? sizeof(float) : sizeof(double);
+    const size_t unit_size = single_precision ? sizeof(float) : sizeof(double);
 
-    cuda_ptr d_b{unit_size, B.n_elem}, d_x{unit_size, B.n_elem};
+    const cuda_ptr d_b{unit_size, static_cast<int>(B.n_elem)}, d_x{unit_size, static_cast<int>(B.n_elem)};
 
     int singularity;
-    auto code = 0;
+    Col<int> code(B.n_cols);
 
     if constexpr(std::is_same_v<T, float>) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (float*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (float*)&d_b + I, float(this->setting.tolerance), 3, (float*)&d_x + I, &singularity);
+        for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get<int>(), d_col_idx.get<int>(), d_b.get<float>(I), static_cast<float>(this->setting.tolerance), 3, d_x.get<float>(I), &singularity);
 
-        X.set_size(arma::size(B));
-
-        d_x.copy_to(X.memptr(), stream);
-
-        cudaDeviceSynchronize();
+        if(0 == code.max()) {
+            X.set_size(arma::size(B));
+            d_x.copy_to(X.memptr(), stream);
+        }
     }
     else if(Precision::FULL == this->setting.precision) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpDcsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (double*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (double*)&d_b + I, this->setting.tolerance, 3, (double*)&d_x + I, &singularity);
+        for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpDcsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<double>(), d_row_ptr.get<int>(), d_col_idx.get<int>(), d_b.get<double>(I), this->setting.tolerance, 3, d_x.get<double>(I), &singularity);
 
-        X.set_size(arma::size(B));
-
-        d_x.copy_to(X.memptr(), stream);
-
-        cudaDeviceSynchronize();
+        if(0 == code.max()) {
+            X.set_size(arma::size(B));
+            d_x.copy_to(X.memptr(), stream);
+        }
     }
     else {
         X = arma::zeros(arma::size(B));
@@ -177,7 +136,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
 
         auto multiplier = norm(full_residual);
 
-        auto counter = std::uint8_t{0};
+        std::uint8_t counter{0};
         while(counter++ < this->setting.iterative_refinement) {
             if(multiplier < this->setting.tolerance) break;
 
@@ -185,13 +144,10 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
 
             d_b.copy_from(residual.memptr(), stream);
 
-            code = 0;
-            for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (float*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (float*)&d_b + I, float(this->setting.tolerance), 3, (float*)&d_x + I, &singularity);
-            if(0 != code) break;
+            for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get<int>(), d_col_idx.get<int>(), d_b.get<float>(I), static_cast<float>(this->setting.tolerance), 3, d_x.get<float>(I), &singularity);
+            if(0 != code.max()) break;
 
             d_x.copy_to(residual.memptr(), stream);
-
-            cudaDeviceSynchronize();
 
             const mat incre = multiplier * conv_to<mat>::from(residual);
 
@@ -201,7 +157,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
         }
     }
 
-    return 0 == code ? SUANPAN_SUCCESS : SUANPAN_FAIL;
+    return 0 == code.max() ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
 
 #endif
