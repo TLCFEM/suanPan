@@ -109,8 +109,8 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, 
         sCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val.data(), t_row.data(), t_col.data(), Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
     }
 
-    perm_r = std::vector<int>(this->n_rows + 1);
-    perm_c = std::vector<int>(this->n_cols + 1);
+    perm_r.resize(this->n_rows + 1);
+    perm_c.resize(this->n_cols + 1);
 
     allocated = true;
 }
