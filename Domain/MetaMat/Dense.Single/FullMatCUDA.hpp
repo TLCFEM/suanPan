@@ -30,55 +30,40 @@
 #ifndef FULLMATCUDA_HPP
 #define FULLMATCUDA_HPP
 
+#include "../cuda_ptr.hpp"
 #include "FullMat.hpp"
 
-#include <cuda_runtime.h>
 #include <cusolverDn.h>
 
 template<sp_d T> class FullMatCUDA final : public FullMat<T> {
     cusolverDnHandle_t handle = nullptr;
     cudaStream_t stream = nullptr;
 
-    int* info = nullptr;
-    int* ipiv = nullptr;
-    void* d_A = nullptr;
-    void* buffer = nullptr;
+    cuda_ptr info{sizeof(int), 1}, d_ipiv{sizeof(int), static_cast<int>(this->n_rows)}, d_A{}, d_work{};
 
     void acquire() {
         cusolverDnCreate(&handle);
         cudaStreamCreate(&stream);
         cusolverDnSetStream(handle, stream);
 
-        cudaMalloc(&info, sizeof(int));
-        cudaMemset(info, 0, sizeof(int));
-        cudaMalloc(&ipiv, sizeof(int) * this->n_rows);
-
-        int bufferSize = 0;
-        if constexpr(std::is_same_v<T, float>) {
-            cudaMalloc(&d_A, sizeof(float) * this->n_elem);
-            cusolverDnSgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), (float*)d_A, static_cast<int>(this->n_elem), &bufferSize);
-            cudaMalloc(&buffer, sizeof(float) * bufferSize);
-        }
-        else if(Precision::MIXED == this->setting.precision) {
-            cudaMalloc(&d_A, sizeof(float) * this->n_elem);
-            cusolverDnSgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), (float*)d_A, static_cast<int>(this->n_elem), &bufferSize);
-            cudaMalloc(&buffer, sizeof(float) * bufferSize);
+        int work_size = 0;
+        if(std::is_same_v<T, float> || Precision::MIXED == this->setting.precision) {
+            d_A = cuda_ptr(sizeof(float), static_cast<int>(this->n_elem));
+            cusolverDnSgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), d_A.get<float>(), d_A.size, &work_size);
+            d_work = cuda_ptr(sizeof(float), work_size);
         }
         else {
-            cudaMalloc(&d_A, sizeof(double) * this->n_elem);
-            cusolverDnDgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), (double*)d_A, static_cast<int>(this->n_elem), &bufferSize);
-            cudaMalloc(&buffer, sizeof(double) * bufferSize);
+            d_A = cuda_ptr(sizeof(double), static_cast<int>(this->n_elem));
+            cusolverDnDgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), d_A.get<double>(), d_A.size, &work_size);
+            d_work = cuda_ptr(sizeof(double), work_size);
         }
+
+        this->factored = false;
     }
 
     void release() const {
         if(handle) cusolverDnDestroy(handle);
         if(stream) cudaStreamDestroy(stream);
-
-        if(info) cudaFree(info);
-        if(d_A) cudaFree(d_A);
-        if(buffer) cudaFree(buffer);
-        if(ipiv) cudaFree(ipiv);
     }
 
 protected:
@@ -103,42 +88,36 @@ public:
 };
 
 template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
+    const auto NROW = static_cast<int>(this->n_rows), NCOL = static_cast<int>(this->n_cols);
+
+    int flag;
+
     if constexpr(std::is_same_v<T, float>) {
         // pure float
         if(!this->factored) {
             this->factored = true;
-            cudaMemcpyAsync(d_A, this->memptr(), sizeof(float) * this->n_elem, cudaMemcpyHostToDevice, stream);
-            cusolverDnSgetrf(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), (float*)d_A, static_cast<int>(this->n_rows), (float*)buffer, ipiv, info);
+            d_A.copy_from(this->memptr(), stream);
+            cusolverDnSgetrf(handle, NROW, NCOL, d_A.get<float>(), NROW, d_work.get<float>(), d_ipiv.get<int>(), info.get<int>());
         }
 
-        const size_t byte_size = sizeof(float) * B.n_elem;
+        const cuda_ptr d_x{sizeof(float), static_cast<int>(B.n_elem)};
+        d_x.copy_from(B.memptr(), stream);
 
-        void* d_x = nullptr;
-        cudaMalloc(&d_x, byte_size);
-        cudaMemcpyAsync(d_x, B.memptr(), byte_size, cudaMemcpyHostToDevice, stream);
-        cusolverDnSgetrs(handle, CUBLAS_OP_N, static_cast<int>(this->n_rows), static_cast<int>(B.n_cols), (float*)d_A, static_cast<int>(this->n_rows), ipiv, (float*)d_x, static_cast<int>(this->n_rows), info);
+        cusolverDnSgetrs(handle, CUBLAS_OP_N, NROW, static_cast<int>(B.n_cols), d_A.get<float>(), NROW, d_ipiv.get<int>(), d_x.get<float>(), NROW, info.get<int>());
 
         X.set_size(arma::size(B));
-
-        cudaMemcpyAsync(X.memptr(), d_x, byte_size, cudaMemcpyDeviceToHost, stream);
-
-        cudaDeviceSynchronize();
-
-        if(d_x) cudaFree(d_x);
+        d_x.copy_to(X.memptr(), stream);
     }
     else if(Precision::MIXED == this->setting.precision) {
         // mixed precision
         if(!this->factored) {
             this->factored = true;
             this->s_memory = this->to_float();
-            cudaMemcpyAsync(d_A, this->s_memory.memptr(), sizeof(float) * this->s_memory.n_elem, cudaMemcpyHostToDevice, stream);
-            cusolverDnSgetrf(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), (float*)d_A, static_cast<int>(this->n_rows), (float*)buffer, ipiv, info);
+            d_A.copy_from(this->s_memory.memptr(), stream);
+            cusolverDnSgetrf(handle, NROW, NCOL, d_A.get<float>(), NROW, d_work.get<float>(), d_ipiv.get<int>(), info.get<int>());
         }
 
-        const size_t byte_size = sizeof(float) * B.n_elem;
-
-        void* d_x = nullptr;
-        cudaMalloc(&d_x, byte_size);
+        const cuda_ptr d_x{sizeof(float), static_cast<int>(B.n_elem)};
 
         X = arma::zeros(B.n_rows, B.n_cols);
 
@@ -146,17 +125,15 @@ template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
         auto multiplier = norm(full_residual);
 
-        auto counter = std::uint8_t{0};
+        std::uint8_t counter{0};
         while(counter++ < this->setting.iterative_refinement) {
             if(multiplier < this->setting.tolerance) break;
 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
+            d_x.copy_from(residual.memptr(), stream);
 
-            cudaMemcpyAsync(d_x, residual.memptr(), byte_size, cudaMemcpyHostToDevice, stream);
-            cusolverDnSgetrs(handle, CUBLAS_OP_N, static_cast<int>(this->n_rows), static_cast<int>(B.n_cols), (float*)d_A, static_cast<int>(this->n_rows), ipiv, (float*)d_x, static_cast<int>(this->n_rows), info);
-            cudaMemcpyAsync(residual.memptr(), d_x, byte_size, cudaMemcpyDeviceToHost, stream);
-
-            cudaDeviceSynchronize();
+            cusolverDnSgetrs(handle, CUBLAS_OP_N, NROW, static_cast<int>(B.n_cols), d_A.get<float>(), NROW, d_ipiv.get<int>(), d_x.get<float>(), NROW, info.get<int>());
+            d_x.copy_to(residual.memptr(), stream);
 
             const mat incre = multiplier * conv_to<mat>::from(residual);
 
@@ -164,34 +141,27 @@ template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
             suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
         }
-
-        if(d_x) cudaFree(d_x);
     }
     else {
         // pure double
         if(!this->factored) {
             this->factored = true;
-            cudaMemcpyAsync(d_A, this->memptr(), sizeof(double) * this->n_elem, cudaMemcpyHostToDevice, stream);
-            cusolverDnDgetrf(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), (double*)d_A, static_cast<int>(this->n_rows), (double*)buffer, ipiv, info);
+            d_A.copy_from(this->memptr(), stream);
+            cusolverDnDgetrf(handle, NROW, NCOL, d_A.get<double>(), NROW, d_work.get<double>(), d_ipiv.get<int>(), info.get<int>());
         }
 
-        const size_t byte_size = sizeof(double) * B.n_elem;
+        const cuda_ptr d_x{sizeof(float), static_cast<int>(B.n_elem)};
+        d_x.copy_from(B.memptr(), stream);
 
-        void* d_x = nullptr;
-        cudaMalloc(&d_x, byte_size);
-        cudaMemcpyAsync(d_x, B.memptr(), byte_size, cudaMemcpyHostToDevice, stream);
-        cusolverDnDgetrs(handle, CUBLAS_OP_N, static_cast<int>(this->n_rows), static_cast<int>(B.n_cols), (double*)d_A, static_cast<int>(this->n_rows), ipiv, (double*)d_x, static_cast<int>(this->n_rows), info);
+        cusolverDnDgetrs(handle, CUBLAS_OP_N, NROW, static_cast<int>(B.n_cols), d_A.get<double>(), NROW, d_ipiv.get<int>(), d_x.get<double>(), NROW, info.get<int>());
 
         X.set_size(arma::size(B));
-
-        cudaMemcpyAsync(X.memptr(), d_x, byte_size, cudaMemcpyDeviceToHost, stream);
-
-        cudaDeviceSynchronize();
-
-        if(d_x) cudaFree(d_x);
+        d_x.copy_to(X.memptr(), stream);
     }
 
-    return 0;
+    info.copy_to(&flag, stream);
+
+    return flag;
 }
 
 #endif
