@@ -123,23 +123,19 @@ template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
 
         mat full_residual = B;
 
-        auto multiplier = norm(full_residual);
-
         std::uint8_t counter{0};
         while(counter++ < this->setting.iterative_refinement) {
+            const auto multiplier = norm(full_residual);
             if(multiplier < this->setting.tolerance) break;
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier);
 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
             d_x.copy_from(residual.memptr(), stream);
 
             cusolverDnSgetrs(handle, CUBLAS_OP_N, NROW, static_cast<int>(B.n_cols), d_A.get<float>(), NROW, d_ipiv.get(), d_x.get<float>(), NROW, info.get());
+
             d_x.copy_to(residual.memptr(), stream);
-
-            const mat incre = multiplier * conv_to<mat>::from(residual);
-
-            X += incre;
-
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
+            full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual));
         }
     }
     else {

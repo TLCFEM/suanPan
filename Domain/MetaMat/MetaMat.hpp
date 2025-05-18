@@ -90,11 +90,11 @@ protected:
 
         X = arma::zeros(size(B));
 
-        auto multiplier = norm(B);
-
-        auto counter = std::uint8_t{0};
+        std::uint8_t counter{0};
         while(counter++ < this->setting.iterative_refinement) {
+            const auto multiplier = norm(B);
             if(multiplier < this->setting.tolerance) break;
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier);
 
             auto residual = conv_to<fmat>::from(B / multiplier);
 
@@ -103,8 +103,7 @@ protected:
             const mat incre = multiplier * conv_to<mat>::from(residual);
 
             X += incre;
-
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = norm(B -= this->operator*(incre)));
+            B -= this->operator*(incre);
         }
 
         return INFO;
