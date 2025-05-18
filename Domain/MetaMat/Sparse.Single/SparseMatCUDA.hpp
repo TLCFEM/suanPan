@@ -112,7 +112,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
     if constexpr(std::is_same_v<T, float>) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get<int>(), d_col_idx.get<int>(), d_b.get<float>(I), static_cast<float>(this->setting.tolerance), 3, d_x.get<float>(I), &singularity);
+        for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<float>(I), static_cast<float>(this->setting.tolerance), 3, d_x.get<float>(I), &singularity);
 
         if(0 == code.max()) {
             X.set_size(arma::size(B));
@@ -122,7 +122,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
     else if(Precision::FULL == this->setting.precision) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpDcsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<double>(), d_row_ptr.get<int>(), d_col_idx.get<int>(), d_b.get<double>(I), this->setting.tolerance, 3, d_x.get<double>(I), &singularity);
+        for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpDcsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<double>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<double>(I), this->setting.tolerance, 3, d_x.get<double>(I), &singularity);
 
         if(0 == code.max()) {
             X.set_size(arma::size(B));
@@ -144,7 +144,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
 
             d_b.copy_from(residual.memptr(), stream);
 
-            for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get<int>(), d_col_idx.get<int>(), d_b.get<float>(I), static_cast<float>(this->setting.tolerance), 3, d_x.get<float>(I), &singularity);
+            for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<float>(I), static_cast<float>(this->setting.tolerance), 3, d_x.get<float>(I), &singularity);
             if(0 != code.max()) break;
 
             d_x.copy_to(residual.memptr(), stream);

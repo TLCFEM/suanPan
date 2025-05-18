@@ -62,7 +62,7 @@ public:
     }
     ~cuda_ptr() { cudaFree(ptr); }
 
-    template<typename T> [[nodiscard]] T* get(const unsigned long long offset = 0) const { return static_cast<T*>(ptr) + offset; }
+    template<typename T = int> [[nodiscard]] T* get(const unsigned long long offset = 0) const { return static_cast<T*>(ptr) + offset; }
 
     auto copy_from(const void* src, const cudaStream_t s) const { cudaMemcpyAsync(ptr, src, total_size(), cudaMemcpyHostToDevice, s); }
 
