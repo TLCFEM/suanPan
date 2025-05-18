@@ -59,8 +59,6 @@ template<sp_d T> class SparseMatSuperLU final : public SparseMat<T> {
     void dealloc();
 
     template<sp_d ET> void wrap_b(const Mat<ET>&);
-    template<sp_d ET> void tri_solve(int&);
-    template<sp_d ET> void full_solve(int&);
 
     int solve_trs(Mat<T>&, Mat<T>&&);
 
@@ -141,29 +139,6 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::wrap_b(const Mat<ET
     }
 }
 
-template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::tri_solve(int& flag) {
-#ifdef SUANPAN_SUPERLUMT
-    if(std::is_same_v<ET, float>) sgstrs(NOTRANS, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
-    else dgstrs(NOTRANS, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
-#else
-    superlu::gstrs<ET>(options.Trans, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
-#endif
-
-    Destroy_SuperMatrix_Store(&B);
-}
-
-template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::full_solve(int& flag) {
-#ifdef SUANPAN_SUPERLUMT
-    get_perm_c(ordering_num, &A, perm_c.data());
-    if(std::is_same_v<ET, float>) psgssv(SUANPAN_NUM_THREADS, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &flag);
-    else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &flag);
-#else
-    superlu::gssv<ET>(&options, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &stat, &flag);
-#endif
-
-    Destroy_SuperMatrix_Store(&B);
-}
-
 template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const uword in_row, const uword in_col, const uword in_elem)
     : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
@@ -189,9 +164,17 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&&
 
     wrap_b(in_mat);
 
-    auto flag = 0;
+    int flag{0};
 
-    full_solve<T>(flag);
+#ifdef SUANPAN_SUPERLUMT
+    get_perm_c(ordering_num, &A, perm_c.data());
+    if(std::is_same_v<T, float>) psgssv(SUANPAN_NUM_THREADS, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &flag);
+    else pdgssv(SUANPAN_NUM_THREADS, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &flag);
+#else
+    superlu::gssv<T>(&options, &A, perm_c.data(), perm_r.data(), &L, &U, &B, &stat, &flag);
+#endif
+
+    Destroy_SuperMatrix_Store(&B);
 
     out_mat = std::move(in_mat);
 
@@ -201,9 +184,16 @@ template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&&
 template<sp_d T> int SparseMatSuperLU<T>::solve_trs(Mat<T>& out_mat, Mat<T>&& in_mat) {
     wrap_b(in_mat);
 
-    auto flag = 0;
+    int flag{0};
 
-    tri_solve<T>(flag);
+#ifdef SUANPAN_SUPERLUMT
+    if(std::is_same_v<T, float>) sgstrs(NOTRANS, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
+    else dgstrs(NOTRANS, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
+#else
+    superlu::gstrs<T>(options.Trans, &L, &U, perm_c.data(), perm_r.data(), &B, &stat, &flag);
+#endif
+
+    Destroy_SuperMatrix_Store(&B);
 
     out_mat = std::move(in_mat);
 
