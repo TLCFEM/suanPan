@@ -2761,9 +2761,6 @@
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\UnitTest\TestSolver.h">
-      <Filter>UnitTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp">
       <Filter>Domain\MetaMat</Filter>
     </ClInclude>

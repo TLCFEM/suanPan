@@ -1023,7 +1023,6 @@
     <ClInclude Include="..\..\..\Toolbox\tensor.h" />
     <ClInclude Include="..\..\..\Toolbox\thread_pool.hpp" />
     <ClInclude Include="..\..\..\Toolbox\utility.h" />
-    <ClInclude Include="..\..\..\UnitTest\TestSolver.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\Resource\suanPan.rc" />
