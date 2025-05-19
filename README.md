@@ -36,7 +36,7 @@
 > [!IMPORTANT]
 > Please check the [documentation](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
 > For a summary of available functionalities, check [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
-> ***Please star ⭐ the project!***
+> Please star ⭐ the project!
 
 ## Introduction
 
