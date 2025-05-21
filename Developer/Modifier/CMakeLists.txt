@@ -14,8 +14,6 @@ if (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-U,_SUANPAN_PRINT")
 endif ()
 
-link_libraries(suanPan)
-
 add_library(${PROJECT_NAME} SHARED
         ModifierExample.cpp
         ../../Domain/Group/Group.cpp
@@ -28,6 +26,8 @@ add_library(${PROJECT_NAME} SHARED
         ../../Include/fmt/src/format.cc
 )
 
-add_dependencies(ModifierExample suanPan)
+target_link_libraries(${PROJECT_NAME} suanPan)
 
-message(STATUS "ModifierExample CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+install(TARGETS ${PROJECT_NAME})
+
+message(STATUS "${PROJECT_NAME} CXX_FLAGS: ${CMAKE_CXX_FLAGS}")

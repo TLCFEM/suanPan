@@ -93,6 +93,7 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
           -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
           -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_BUILD_DLL_EXAMPLE=${{ env.COVERAGE }} \
           -DSP_BUILD_PARALLEL=$MT \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
