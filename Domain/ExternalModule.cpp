@@ -21,9 +21,9 @@
 #include <Material/ExternalMaterial.h>
 #include <algorithm>
 
-#if defined(SUANPAN_WIN)
+#ifdef SUANPAN_WIN
 #include <Windows.h>
-#elif defined(SUANPAN_UNIX)
+#else
 #include <dlfcn.h>
 #endif
 
@@ -45,7 +45,7 @@ bool ExternalModule::locate_module(std::string module_name) {
 
 #ifdef SUANPAN_WIN
     ext_creator = reinterpret_cast<void*>(GetProcAddress(HINSTANCE(ext_library), LPCSTR(module_name.c_str())));
-#elif defined(SUANPAN_UNIX)
+#else
     ext_creator = dlsym(ext_library, module_name.c_str());
 #endif
 
@@ -100,7 +100,7 @@ ExternalModule::ExternalModule(std::string L)
 ExternalModule::~ExternalModule() {
 #ifdef SUANPAN_WIN
     if(ext_library != nullptr) FreeLibrary(HINSTANCE(ext_library));
-#elif defined(SUANPAN_UNIX)
+#else
     if(ext_library != nullptr) dlclose(ext_library);
 #endif
 }
