@@ -81,11 +81,16 @@ ExternalModule::ExternalModule(std::string L)
     }
     if(ext_library == nullptr)
         suanpan_error("Cannot load the library with the name \"{}\".\n", file_name);
-#elif defined(SUANPAN_UNIX)
-    auto file_name = "./lib" + library_name + ".so";
+#else
+#ifdef SUANPAN_UNIX
+    static constexpr auto suffix = ".so";
+#else
+    static constexpr auto suffix = ".dylib";
+#endif
+    auto file_name = "lib" + library_name + suffix;
     ext_library = dlopen(file_name.c_str(), RTLD_NOW);
     if(ext_library == nullptr) {
-        file_name = "./" + library_name + ".so";
+        file_name = library_name + suffix;
         ext_library = dlopen(file_name.c_str(), RTLD_NOW);
     }
     if(ext_library == nullptr) suanpan_error("Cannot load the library with the name \"{}\".\n", file_name);
