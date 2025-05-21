@@ -52,7 +52,7 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
 
     csr_form<T, la_it> csr_mat(this->triplet_mat);
 
-    const auto precond = this->triplet_mat.diag();
+    const Col<T> precond = this->triplet_mat.diag() + std::numeric_limits<T>::epsilon();
 
     Col<int> info(B.n_cols);
 
