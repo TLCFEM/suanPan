@@ -531,11 +531,11 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
     endif ()
     if (SP_ENABLE_MKL)
         if (SP_ENABLE_SHARED_MKL)
-            file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_core${DECOR}*${SUFFIX})
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX})
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib)
-            file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_avx*${DECOR}*${SUFFIX})
+            file(GLOB MKL_FILES
+                    ${MKL_ROOT}/lib/intel64/libmkl_core${DECOR}*${SUFFIX}
+                    ${MKL_ROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX}
+                    ${MKL_ROOT}/lib/intel64/libmkl_avx*${DECOR}*${SUFFIX}
+            )
             install(PROGRAMS ${MKL_FILES} DESTINATION lib)
             if (SP_ENABLE_64BIT_INDEXING)
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_ilp64${DECOR}*${SUFFIX})
