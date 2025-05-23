@@ -360,7 +360,7 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
     else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
     else if(is_equal(load_id, "SupportDisplacement")) new_supportmotion(new_load, command, 0);
     else if(is_equal(load_id, "SupportVelocity")) new_supportmotion(new_load, command, 1);
-    else load::object(new_load, domain, load_id, command);
+    else external_module::object(new_load, domain, load_id, command);
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());
 

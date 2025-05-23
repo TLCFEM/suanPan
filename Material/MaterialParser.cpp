@@ -3546,7 +3546,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);
     else if(is_equal(material_id, "Viscosity02")) new_viscosity02(new_material, command);
     else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
-    else load::object(new_material, domain, material_id, command);
+    else external_module::object(new_material, domain, material_id, command);
 
     if(nullptr == new_material || !domain->insert(std::move(new_material)))
         suanpan_error("Fail to create new material via \"{}\".\n", command.str());

@@ -591,7 +591,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
     else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
     else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve(new_constraint, command, 2);
     else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve(new_constraint, command, 3);
-    else load::object(new_constraint, domain, constraint_id, command);
+    else external_module::object(new_constraint, domain, constraint_id, command);
 
     if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());
 

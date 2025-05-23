@@ -2707,7 +2707,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "Tie")) new_tie(new_element, command);
     else if(is_equal(element_id, "TranslationConnector2D")) new_translationconnector(new_element, command, 2u);
     else if(is_equal(element_id, "TranslationConnector3D")) new_translationconnector(new_element, command, 3u);
-    else load::object(new_element, domain, element_id, command);
+    else external_module::object(new_element, domain, element_id, command);
 
     if(nullptr == new_element || !domain->insert(std::move(new_element)))
         suanpan_error("Fail to create new element via \"{}\".\n", command.str());
