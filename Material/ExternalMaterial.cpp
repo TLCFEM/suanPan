@@ -51,7 +51,7 @@ ExternalMaterial::ExternalMaterial(const ExternalMaterial& old_obj)
 
     cooker(&data, &info);
 
-    // need to reinitialize to setup containers
+    // need to reinitialize to set up containers
     initialize(nullptr);
 }
 
