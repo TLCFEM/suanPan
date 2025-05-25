@@ -5,43 +5,42 @@ import sys
 
 
 def pack(root_folder: str):
-    fn = "tools"
+    dest = "tools"
 
-    if os.path.exists(fn):
-        shutil.rmtree(fn)
+    if os.path.exists(dest):
+        shutil.rmtree(dest)
 
-    os.mkdir(fn)
+    os.mkdir(dest)
 
-    with open(fn + "/VERIFICATION.txt", "w") as verification:
-        verification.write("VERIFICATION\n")
-        verification.write(
+    with open(dest + "/VERIFICATION.txt", "w") as checksum:
+        checksum.write(
+            "VERIFICATION\n"
             "\tTo verify, please visit https://github.com/TLCFEM/suanPan/releases"
             " where the same archive is uploaded.\n"
+            "\nDEPENDENCY\n"
         )
-
-        verification.write("\nDEPENDENCY\n")
 
         for f in os.listdir(root_folder):
             if f.endswith(".dll"):
                 full_path = os.path.join(root_folder, f)
                 with open(full_path, "rb") as target:
-                    verification.write(
-                        f"\t{os.path.basename(full_path)} : {hashlib.sha256(target.read()).hexdigest()}\n"
+                    checksum.write(
+                        f"\t{f} : {hashlib.sha256(target.read()).hexdigest()}\n"
                     )
-                shutil.copy(full_path, fn)
+                shutil.copy(full_path, dest)
 
-        verification.write("\nEXECUTABLE\n")
+        checksum.write("\nEXECUTABLE\n")
 
         for f in ["suanPan.exe"]:
             full_path = os.path.join(root_folder, f)
             if os.path.exists(full_path):
                 with open(full_path, "rb") as target:
-                    verification.write(
+                    checksum.write(
                         f"\t{f} : {hashlib.sha256(target.read()).hexdigest()}\n"
                     )
-                shutil.copy(full_path, fn)
+                shutil.copy(full_path, dest)
 
-        verification.write("\nTEXT\n")
+        checksum.write("\nTEXT\n")
 
         for f in [
             "AddAssociation.bat",
@@ -53,8 +52,8 @@ def pack(root_folder: str):
         ]:
             full_path = os.path.join(root_folder, f)
             if os.path.exists(full_path):
-                verification.write(f"\t{f}\n")
-                shutil.copy(full_path, fn)
+                checksum.write(f"\t{f}\n")
+                shutil.copy(full_path, dest)
 
     with open("suanPan-win-mkl-vtk.sha256", "w") as hashfile, open(
         "suanPan-win-mkl-vtk.zip", "rb"
@@ -67,5 +66,4 @@ def pack(root_folder: str):
 
 
 if __name__ == "__main__":
-    # "build/dist/bin"
-    pack(sys.argv[1])
+    pack(sys.argv[1] if len(sys.argv) > 1 else "build/dist/bin")
