@@ -17,5 +17,5 @@ jobs:
         uses: minish144/delete-untagged-action@v2
         with:
           github-token: ${{ secrets.ALL }}
-          package-name: suanpan
+          package-name: tlcfem/suanpan
           personal-account: true
