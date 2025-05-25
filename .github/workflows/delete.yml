@@ -5,7 +5,8 @@ jobs:
   delete:
     runs-on: ubuntu-latest
     steps:
-      - uses: strumwolf/delete-deployment-environment@v3
+      - name: Delete All
+        uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.ALL }}
           environment: github-pages
