@@ -1,12 +1,21 @@
-name: Delete Deployments
+name: Delete
 on:
   workflow_dispatch:
 jobs:
-  delete:
+  deployment:
     runs-on: ubuntu-latest
     steps:
-      - name: Delete All
+      - name: Delete Deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.ALL }}
           environment: github-pages
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Package
+        uses: minish144/delete-untagged-action@v2
+        with:
+          github-token: ${{ secrets.ALL }}
+          package-name: suanpan
+          personal-account: true
