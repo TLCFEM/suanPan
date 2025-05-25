@@ -14,8 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete Package
-        uses: minish144/delete-untagged-action@v2
+        uses: Chizkiyahu/delete-untagged-ghcr-action@v6
         with:
-          github-token: ${{ secrets.ALL }}
-          package-name: tlcfem/suanpan
-          personal-account: true
+          token: ${{ secrets.ALL }}
+          package_name: suanpan
+          untagged_only: true
+          owner_type: 'user'
