@@ -21,14 +21,8 @@ for file in $yml_file; do
   fi
 done
 
-# inno setup
-file_name="Enhancement/suanPan.iss"
-if [ -f $file_name ]; then
-  sed -i "s/#define MyAppVersion \"[0-9]\.[0-9]\.[0-9]\"/#define MyAppVersion \"$1\.$2\.$3\"/g" $file_name
-fi
-
 # chocolatey
-file_name="Enhancement/suanpan.nuspec"
+file_name="Enhancement/suanPan.nuspec"
 if [ -f $file_name ]; then
   sed -i "s/<version>[0-9]\.[0-9]\.[0-9]<\/version>/<version>$1\.$2\.$3<\/version>/g" $file_name
 fi
