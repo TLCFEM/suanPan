@@ -315,13 +315,6 @@ else ()
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
     endif ()
 
-    link_libraries(dl pthread gfortran)
-
-    find_library(HAS_QUADMATH quadmath)
-    if (HAS_QUADMATH)
-        link_libraries(quadmath)
-    endif ()
-
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
