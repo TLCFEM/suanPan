@@ -256,9 +256,7 @@ jobs:
             export CXX=$(brew --prefix llvm@15)/bin/clang++
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-            -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
-            -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
-            -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
