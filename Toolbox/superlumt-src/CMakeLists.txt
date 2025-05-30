@@ -15,7 +15,7 @@ if (SP_ENABLE_64BIT_INDEXING)
 endif ()
 
 if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0 /openmp")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
     set_source_files_properties(await.c PROPERTIES COMPILE_FLAGS "/Od")
 else ()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
