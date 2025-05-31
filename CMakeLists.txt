@@ -392,7 +392,9 @@ elseif (SP_ENABLE_AOCL)
     link_libraries(${AOCL_PATH})
 else ()
     link_libraries(openblas)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-init,gotoblas_init")
+    if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-init,gotoblas_init")
+    endif ()
 endif ()
 
 add_executable(${PROJECT_NAME}
@@ -405,16 +407,14 @@ add_executable(${PROJECT_NAME}
 set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
 
 if (MSVC)
-    target_link_options(${PROJECT_NAME} PRIVATE "/NODEFAULTLIB:LIBCMT")
-    target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
-elseif (MINGW)
-    target_compile_options(${PROJECT_NAME} PRIVATE "-Wa,-mbig-obj")
-endif ()
-
-if (COMPILER_IDENTIFIER MATCHES "vs") # MSVC COMPILER
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan.rc")
+    target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
+    target_link_options(${PROJECT_NAME} PRIVATE "/NODEFAULTLIB:LIBCMT")
 else ()
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan_gcc.rc")
+    if (MINGW)
+        target_compile_options(${PROJECT_NAME} PRIVATE "-Wa,-mbig-obj")
+    endif ()
 endif ()
 
 add_subdirectory(Constraint)
