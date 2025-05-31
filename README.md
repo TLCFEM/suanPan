@@ -272,7 +272,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
 - [**METIS**](https://github.com/KarypisLab/METIS) version 5.1.0
-- [**MUMPS**](https://mumps-solver.org/) version 5.7.3
+- [**MUMPS**](https://mumps-solver.org/) version 5.8.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
