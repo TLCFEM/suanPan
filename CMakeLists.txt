@@ -458,6 +458,10 @@ if (SP_ENABLE_MIMALLOC)
             GIT_REPOSITORY https://github.com/microsoft/mimalloc
             GIT_TAG v2.2.3)
     FetchContent_MakeAvailable(mimalloc)
+    set(MI_BUILD_OBJECT OFF)
+    set(MI_BUILD_STATIC OFF)
+    set(MI_BUILD_TESTS OFF)
+    set(MI_INSTALL_TOPLEVEL ON)
     add_dependencies(${PROJECT_NAME} mimalloc)
 endif ()
 
