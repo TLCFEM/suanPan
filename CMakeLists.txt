@@ -87,9 +87,6 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux") # LINUX PLATFORM
         set(COMPILER_IDENTIFIER "gcc-linux")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM") # Intel COMPILER icpx
         set(COMPILER_IDENTIFIER "clang-linux")
-    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel") # Intel COMPILER Classic icc
-        set(COMPILER_IDENTIFIER "gcc-linux")
-        message(STATUS "Classic Intel compiler icc has incomplete CPP20 support, if it fails to compile please use another compiler.")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang COMPILER
         set(COMPILER_IDENTIFIER "clang-linux")
     endif ()
@@ -102,7 +99,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
         set(COMPILER_IDENTIFIER "clang-mac")
         include_directories("/usr/local/include" "/usr/local/opt/llvm/include" "/usr/local/opt/libomp/include")
         link_directories("/usr/local/lib" "/usr/local/opt/llvm/lib" "/usr/local/opt/libomp/lib/")
-        message(STATUS "On macOS, make sure `llvm` and `libomp` are installed.")
+        message(NOTICE "On macOS, make sure `libomp` is installed.")
     endif ()
 endif ()
 
