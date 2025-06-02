@@ -10,10 +10,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
 link_directories(${LIBRARY_OUTPUT_PATH}/../)
 
-include_directories(../Element)
-include_directories(../Material)
-include_directories(../Section)
-
 if (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-U,_SUANPAN_PRINT")
 endif ()
