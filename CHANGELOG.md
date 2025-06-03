@@ -5,6 +5,10 @@
 1. Eigenanalysis does not support distributed computation.
 2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 3.8
+
+1. add optional hourglassing control for `CP4R` and `C3D8R` elements
+
 ## version 3.7
 
 1. update `Armadillo` to version `14.4.1`
