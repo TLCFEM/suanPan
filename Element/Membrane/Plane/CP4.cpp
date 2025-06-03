@@ -207,9 +207,10 @@ void CP4::stack_stiffness(mat& K, const mat& D, const sp_mat& N, const double F)
     K(7, 7) += NX4 * D33NX4D23NY4 + NY4 * D32NX4D22NY4;
 }
 
-CP4::CP4(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool R, const bool F)
+CP4::CP4(const unsigned T, uvec&& N, const unsigned M, const double TH, const double HM, const bool R, const bool F)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2})
     , thickness(TH)
+    , penalty(std::fabs(HM))
     , reduced_scheme(R) {}
 
 int CP4::initialize(const shared_ptr<DomainBase>& D) {
@@ -222,8 +223,7 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(characteristic_length) = sqrt(area::shoelace(ele_coor));
 
     if(reduced_scheme) {
-        hourglassing.zeros(m_size, m_size);
-        const auto area = .5 * ((ele_coor(2, 0) - ele_coor(0, 0)) * (ele_coor(3, 1) - ele_coor(1, 1)) + (ele_coor(1, 0) - ele_coor(3, 0)) * (ele_coor(2, 1) - ele_coor(0, 1)));
+        // https://doi.org/10.1016/0045-7825(84)90067-7
         vec b1(4), b2(4);
         b1(0) = ele_coor(1, 1) - ele_coor(3, 1);
         b1(1) = ele_coor(2, 1) - ele_coor(0, 1);
@@ -233,10 +233,15 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
         b2(1) = ele_coor(0, 0) - ele_coor(2, 0);
         b2(2) = ele_coor(1, 0) - ele_coor(3, 0);
         b2(3) = ele_coor(2, 0) - ele_coor(0, 0);
-        vec gamma = 2. * area * h_mode - dot(h_mode, ele_coor.col(0)) * b1 - dot(h_mode, ele_coor.col(1)) * b2;
-        mat t_hourglassing = gamma * gamma.t();
+        const auto double_area = b2(3) * b1(2) + b2(2) * b1(1);
+        b1 /= double_area;
+        b2 /= double_area;
+        const vec gamma = 2. / double_area * (h_mode - dot(h_mode, ele_coor.col(0)) * b1 - dot(h_mode, ele_coor.col(1)) * b2);
+        const mat t_hourglass = gamma * gamma.t();
+        hourglass.zeros(m_size, m_size);
         for(unsigned I = 0, K = 0, M = 1; I < m_node; ++I, K += m_dof, M += m_dof)
-            for(unsigned J = 0, L = 0, N = 1; J < m_node; ++J, L += m_dof, N += m_dof) hourglassing(M, N) = hourglassing(K, L) = t_hourglassing(I, J);
+            for(unsigned J = 0, L = 0, N = 1; J < m_node; ++J, L += m_dof, N += m_dof) hourglass(M, N) = hourglass(K, L) = t_hourglass(I, J);
+        hourglass *= double_area / 2. * penalty;
     }
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
@@ -350,8 +355,8 @@ int CP4::update_status() {
         }
 
     if(reduced_scheme) {
-        trial_stiffness += hourglassing;
-        trial_resistance += hourglassing * t_disp;
+        trial_stiffness += hourglass;
+        trial_resistance += hourglass * t_disp;
     }
 
     return SUANPAN_SUCCESS;
