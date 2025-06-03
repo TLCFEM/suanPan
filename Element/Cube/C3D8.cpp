@@ -39,8 +39,9 @@ C3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     }
 }
 
-C3D8::C3D8(const unsigned T, uvec&& N, const unsigned M, const char R, const bool F)
+C3D8::C3D8(const unsigned T, uvec&& N, const unsigned M, const double HM, const char R, const bool F)
     : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, F)
+    , penalty(std::fabs(HM))
     , int_scheme(R)
     , hourglass_control('R' == R) {}
 
@@ -56,14 +57,17 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
     if(hourglass_control) {
         hourglass.zeros(c_size, c_size);
         const auto pn = compute_shape_function(vec{0., 0., 0.}, 1);
-        const mat pn_pxy = solve(pn * ele_coor, pn).t();
+        const mat jacob = pn * ele_coor;
+        const mat pn_pxyz = solve(jacob, pn).t();
+        mat t_hourglass(c_node, c_node, fill::zeros);
         auto gamma = h_mode;
-        for(auto I = 0; I < 3; ++I)
-            for(auto J = 0; J < 4; ++J) gamma(J) -= dot(h_mode(J), ele_coor.col(I)) * pn_pxy.col(I);
-        mat t_hourglassing(8, 8, fill::zeros);
-        for(const auto& I : gamma) t_hourglassing += I * I.t();
-        for(unsigned I = 0, K = 0; I < c_node; ++I, K += c_dof)
-            for(unsigned J = 0, L = 0; J < c_node; ++J, L += c_dof) hourglass(K + 2llu, L + 2llu) = hourglass(K + 1llu, L + 1llu) = hourglass(K, L) = t_hourglassing(I, J);
+        for(auto J = 0llu; J < h_mode.size(); ++J) {
+            for(auto I = 0u; I < 3u; ++I) gamma(J) -= dot(h_mode(J), ele_coor.col(I)) * pn_pxyz.col(I);
+            t_hourglass += gamma(J) * gamma(J).t();
+        }
+        for(auto I = 0u, K = 0u; I < c_node; ++I, K += c_dof)
+            for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof) hourglass(K + 2llu, L + 2llu) = hourglass(K + 1llu, L + 1llu) = hourglass(K, L) = t_hourglass(I, J);
+        hourglass *= .125 * penalty / det(jacob);
     }
 
     initial_stiffness.zeros(c_size, c_size);

@@ -288,7 +288,7 @@ namespace {
         return_obj = std::make_unique<C3D4>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
     }
 
-    void new_c3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    void new_c3d8(unique_ptr<Element>& return_obj, std::istringstream& command, const bool force_reduced) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -308,46 +308,28 @@ namespace {
         }
 
         std::string reduced_scheme = "I";
-        if(command.eof())
-            suanpan_debug("Standard 4-point integration scheme assumed.\n");
-        else if(!get_input(command, reduced_scheme))
-            suanpan_error("A valid reduced integration switch is required.\n");
-
-        std::string nonlinear = "false";
-        if(command.eof())
-            suanpan_debug("Linear geometry assumed.\n");
-        else if(!get_input(command, nonlinear))
-            suanpan_error("A valid nonlinear geometry switch is required.\n");
-
-        return_obj = std::make_unique<C3D8>(tag, std::move(node_tag), material_tag, suanpan::to_upper(reduced_scheme[0]), is_true(nonlinear));
-    }
-
-    void new_c3d8r(unique_ptr<Element>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
-        uvec node_tag(8);
-        if(!get_input(command, node_tag)) {
-            suanpan_error("Eight valid nodes are required.\n");
-            return;
-        }
-
-        unsigned material_tag;
-        if(!get_input(command, material_tag)) {
-            suanpan_error("A valid material tag is required.\n");
+        if(force_reduced) reduced_scheme = "R";
+        else if(command.eof()) suanpan_debug("Standard 4-point Gaussian integration scheme assumed.\n");
+        else if(!get_input(command, reduced_scheme)) {
+            suanpan_error("A valid integration switch is required.\n");
             return;
         }
 
         std::string nonlinear = "false";
-        if(command.eof())
-            suanpan_debug("Linear geometry assumed.\n");
-        else if(!get_input(command, nonlinear))
+        if(command.eof()) suanpan_debug("Linear geometry assumed.\n");
+        else if(!get_input(command, nonlinear)) {
             suanpan_error("A valid nonlinear geometry switch is required.\n");
+            return;
+        }
 
-        return_obj = std::make_unique<C3D8>(tag, std::move(node_tag), material_tag, 'R', is_true(nonlinear));
+        auto penalty = 1.;
+        if(command.eof()) suanpan_debug("Unit penalty multiplier assumed.\n");
+        else if(!get_input(command, penalty)) {
+            suanpan_error("A valid penalty multiplier is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<C3D8>(tag, std::move(node_tag), material_tag, penalty, suanpan::to_upper(reduced_scheme[0]), is_true(nonlinear));
     }
 
     void new_c3d8i(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2590,9 +2572,9 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "B31OS")) new_b31(new_element, command, true);
     else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
     else if(is_equal(element_id, "C3D4")) new_c3d4(new_element, command);
-    else if(is_equal(element_id, "C3D8")) new_c3d8(new_element, command);
+    else if(is_equal(element_id, "C3D8")) new_c3d8(new_element, command, false);
     else if(is_equal(element_id, "C3D8I")) new_c3d8i(new_element, command);
-    else if(is_equal(element_id, "C3D8R")) new_c3d8r(new_element, command);
+    else if(is_equal(element_id, "C3D8R")) new_c3d8(new_element, command, true);
     else if(is_equal(element_id, "CAX3")) new_cax3(new_element, command);
     else if(is_equal(element_id, "CAX4")) new_cax4(new_element, command);
     else if(is_equal(element_id, "CAX8")) new_cax8(new_element, command);
