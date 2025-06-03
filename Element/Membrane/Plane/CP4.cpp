@@ -236,12 +236,12 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
         const auto double_area = b2(3) * b1(2) + b2(2) * b1(1);
         b1 /= double_area;
         b2 /= double_area;
-        const vec gamma = 2. / double_area * (h_mode - dot(h_mode, ele_coor.col(0)) * b1 - dot(h_mode, ele_coor.col(1)) * b2);
+        const vec gamma = h_mode - dot(h_mode, ele_coor.col(0)) * b1 - dot(h_mode, ele_coor.col(1)) * b2;
         const mat t_hourglass = gamma * gamma.t();
         hourglass.zeros(m_size, m_size);
-        for(unsigned I = 0, K = 0, M = 1; I < m_node; ++I, K += m_dof, M += m_dof)
-            for(unsigned J = 0, L = 0, N = 1; J < m_node; ++J, L += m_dof, N += m_dof) hourglass(M, N) = hourglass(K, L) = t_hourglass(I, J);
-        hourglass *= double_area / 2. * penalty;
+        for(auto I = 0u, K = 0u, M = 1u; I < m_node; ++I, K += m_dof, M += m_dof)
+            for(auto J = 0u, L = 0u, N = 1u; J < m_node; ++J, L += m_dof, N += m_dof) hourglass(M, N) = hourglass(K, L) = t_hourglass(I, J);
+        hourglass *= 2. / double_area * penalty;
     }
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
@@ -252,7 +252,7 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(auto I = 0u; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;

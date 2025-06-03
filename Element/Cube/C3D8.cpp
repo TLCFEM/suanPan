@@ -74,7 +74,7 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(auto I = 0u; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
