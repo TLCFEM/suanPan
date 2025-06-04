@@ -60,7 +60,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
           ..
           make install -j"$(nproc)" && make package
       - name: Pack
@@ -137,7 +137,7 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
           ..
           make install -j"$(nproc)" && make package
       - name: Pack
@@ -204,7 +204,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
           ..
           make install -j4
       - name: Pack
@@ -281,7 +281,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ `
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ `
           ..
           cmake --build . --target install --config Release -j 4
       - name: Pack
@@ -400,7 +400,7 @@ jobs:
           -DSP_BUILD_PARALLEL=ON `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 `
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 `
           ..
           cmake --build . --target install --config Release -j 4
       - name: Pack

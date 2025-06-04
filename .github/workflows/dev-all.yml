@@ -102,7 +102,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
           ..
           make install -j"$(nproc)" && make package
       - name: Pack
@@ -201,7 +201,7 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_DIR=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
           ..
           make install -j"$(nproc)" && make package
       - name: Pack
@@ -259,7 +259,7 @@ jobs:
             -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
             ..
           else
             export CC=gcc-12
@@ -268,7 +268,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_DIR=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
             ..
           fi
           make install -j4
@@ -344,7 +344,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_DIR=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ `
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
@@ -429,7 +429,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=dist `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_DIR=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 `
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
