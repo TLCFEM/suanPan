@@ -237,7 +237,7 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
         hourglass.zeros(m_size, m_size);
         for(auto I = 0u, K = 0u, M = 1u; I < m_node; ++I, K += m_dof, M += m_dof)
             for(auto J = 0u, L = 0u, N = 1u; J < m_node; ++J, L += m_dof, N += m_dof) hourglass(M, N) = hourglass(K, L) = t_hourglass(I, J);
-        hourglass *= 2. / double_area * penalty;
+        hourglass *= thickness * 2. / double_area * penalty;
     }
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
