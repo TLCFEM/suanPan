@@ -225,14 +225,10 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
     if(reduced_scheme) {
         // https://doi.org/10.1016/0045-7825(84)90067-7
         vec b1(4), b2(4);
-        b1(0) = ele_coor(1, 1) - ele_coor(3, 1);
-        b1(1) = ele_coor(2, 1) - ele_coor(0, 1);
-        b1(2) = ele_coor(3, 1) - ele_coor(1, 1);
-        b1(3) = ele_coor(0, 1) - ele_coor(2, 1);
-        b2(0) = ele_coor(3, 0) - ele_coor(1, 0);
-        b2(1) = ele_coor(0, 0) - ele_coor(2, 0);
-        b2(2) = ele_coor(1, 0) - ele_coor(3, 0);
-        b2(3) = ele_coor(2, 0) - ele_coor(0, 0);
+        b1(2) = -(b1(0) = ele_coor(1, 1) - ele_coor(3, 1));
+        b1(3) = -(b1(1) = ele_coor(2, 1) - ele_coor(0, 1));
+        b2(2) = -(b2(0) = ele_coor(3, 0) - ele_coor(1, 0));
+        b2(3) = -(b2(1) = ele_coor(0, 0) - ele_coor(2, 0));
         const auto double_area = b2(3) * b1(2) + b2(2) * b1(1);
         b1 /= double_area;
         b2 /= double_area;
