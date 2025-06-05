@@ -49,9 +49,8 @@ uvec ConditionalModifier::get_all_nodal_active_dof(const shared_ptr<DomainBase>&
     return active_dof;
 }
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D)
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& N, uvec&& D)
     : UniqueTag(T)
-    , start_step(std::max(1u, ST))
     , amplitude_tag(AT)
     , node_encoding(std::move(N))
     , dof_reference(D - 1) {}

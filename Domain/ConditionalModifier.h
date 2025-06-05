@@ -44,7 +44,7 @@ protected:
 
     const bool connected = false;
 
-    unsigned start_step, end_step = static_cast<unsigned>(-1);
+    unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};
 
     const unsigned amplitude_tag;
 
@@ -68,7 +68,6 @@ protected:
 public:
     ConditionalModifier(
         unsigned, // tag
-        unsigned, // step tag
         unsigned, // amplitude tag
         uvec&&,   // node tag
         uvec&&    // dof tag
