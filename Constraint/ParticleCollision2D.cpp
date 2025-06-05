@@ -62,7 +62,7 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
     return SUANPAN_SUCCESS;
 }
 
-ParticleCollision2D::ParticleCollision2D(const unsigned T, const unsigned S, const double G, const double A)
-    : ParticleCollision(T, S, 2)
+ParticleCollision2D::ParticleCollision2D(const unsigned T, const double G, const double A)
+    : ParticleCollision(T, 2)
     , space(std::max(G, 1E-4))
     , alpha(A) {}

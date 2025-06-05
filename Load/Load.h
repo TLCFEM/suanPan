@@ -51,7 +51,6 @@ protected:
 public:
     Load(
         unsigned, // tag
-        unsigned, // step tag
         unsigned, // amplitude tag
         uvec&&,   // node tag
         uvec&&,   // dof tag

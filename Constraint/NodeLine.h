@@ -39,7 +39,7 @@ class NodeLine final : public Constraint {
     std::vector<vec> get_position(const shared_ptr<DomainBase>&);
 
 public:
-    NodeLine(unsigned, unsigned, unsigned, uvec&&);
+    NodeLine(unsigned, unsigned, uvec&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

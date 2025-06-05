@@ -22,12 +22,12 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
-RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F, const unsigned NS)
-    : RigidWallPenalty(T, S, A, std::move(O), std::move(N), F, NS)
+RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F, const unsigned NS)
+    : RigidWallPenalty(T, A, std::move(O), std::move(N), F, NS)
     , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
-RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F, const unsigned NS)
-    : RigidWallPenalty(T, S, A, std::move(O), std::move(E1), std::move(E2), F, NS)
+RestitutionWallPenalty::RestitutionWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F, const unsigned NS)
+    : RigidWallPenalty(T, A, std::move(O), std::move(E1), std::move(E2), F, NS)
     , restitution_coefficient(std::max(0., std::min(1., RC))) {}
 
 int RestitutionWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
@@ -107,22 +107,22 @@ void RestitutionWallPenalty::clear_status() { node_pool.clear(); }
 
 void RestitutionWallPenalty::reset_status() { node_pool.clear(); }
 
-RestitutionWallPenalty1D::RestitutionWallPenalty1D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, S, A, resize(O, 1, 1), resize(N, 1, 1), RC, F, 1) { set_handler<DOF::U1>(); }
+RestitutionWallPenalty1D::RestitutionWallPenalty1D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, resize(O, 1, 1), resize(N, 1, 1), RC, F, 1) { set_handler<DOF::U1>(); }
 
-RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, S, A, resize(O, 2, 1), resize(N, 2, 1), RC, F, 2) { set_handler<DOF::U1, DOF::U2>(); }
+RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, resize(O, 2, 1), resize(N, 2, 1), RC, F, 2) { set_handler<DOF::U1, DOF::U2>(); }
 
-RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
-    : RestitutionWallPenalty(T, S, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 2) {
+RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 2) {
     set_handler<DOF::U1, DOF::U2>();
     access::rw(outer_norm).resize(2);
     access::rw(edge_a).resize(2);
     access::rw(edge_b).reset();
 }
 
-RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, S, A, resize(O, 3, 1), resize(N, 3, 1), RC, F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, resize(O, 3, 1), resize(N, 3, 1), RC, F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
 
-RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
-    : RestitutionWallPenalty(T, S, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }

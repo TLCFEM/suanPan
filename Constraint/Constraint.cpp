@@ -19,7 +19,7 @@
 
 double Constraint::multiplier = 1E8;
 
-Constraint::Constraint(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D, const unsigned S)
+Constraint::Constraint(const unsigned T, const unsigned AT, uvec&& N, uvec&& D, const unsigned S)
     : ConditionalModifier(T, AT, std::move(N), std::move(D))
     , num_size(S) {}
 

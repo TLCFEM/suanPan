@@ -37,19 +37,17 @@ class BodyForce : public Load {
 public:
     BodyForce(
         unsigned, // tag
-        unsigned, // start step tag
         double,   // magnitude
         uvec&&,   // element tags
         unsigned, // dof tag
         unsigned  // amplitude tag
     );
     BodyForce(
-        unsigned,    // tag
-        unsigned,    // start step tag
-        double,      // magnitude
-        uvec&&,      // element tags
-        uvec&&,      // dof tags
-        unsigned = 0 // amplitude tag
+        unsigned, // tag
+        double,   // magnitude
+        uvec&&,   // element tags
+        uvec&&,   // dof tags
+        unsigned  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;

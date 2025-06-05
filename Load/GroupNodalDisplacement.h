@@ -37,19 +37,17 @@ class GroupNodalDisplacement final : protected GroupLoad, public NodalDisplaceme
 public:
     GroupNodalDisplacement(
         unsigned, // tag
-        unsigned, // step tag
         double,   // magnitude
         uvec&&,   // group tags
         unsigned, // dof tag
         unsigned  // amplitude tag
     );
     GroupNodalDisplacement(
-        unsigned,    // tag
-        unsigned,    // step tag
-        double,      // magnitude
-        uvec&&,      // group tags
-        uvec&&,      // dof tags
-        unsigned = 0 // amplitude tag
+        unsigned, // tag
+        double,   // magnitude
+        uvec&&,   // group tags
+        uvec&&,   // dof tags
+        unsigned  // amplitude tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

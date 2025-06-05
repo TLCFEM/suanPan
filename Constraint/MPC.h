@@ -37,7 +37,7 @@ class MPC final : public Constraint {
     const double pseudo_load;
 
 public:
-    MPC(unsigned, unsigned, unsigned, uvec&&, uvec&&, vec&&, double);
+    MPC(unsigned, unsigned, uvec&&, uvec&&, vec&&, double);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

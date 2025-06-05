@@ -39,7 +39,6 @@ class Embed : public Constraint {
 public:
     Embed(
         unsigned, // unique constraint tag
-        unsigned, // step tag
         unsigned, // element tag
         unsigned, // node tag
         unsigned  // dimension
@@ -52,12 +51,12 @@ public:
 
 class Embed2D final : public Embed {
 public:
-    Embed2D(unsigned, unsigned, unsigned, unsigned);
+    Embed2D(unsigned, unsigned, unsigned);
 };
 
 class Embed3D final : public Embed {
 public:
-    Embed3D(unsigned, unsigned, unsigned, unsigned);
+    Embed3D(unsigned, unsigned, unsigned);
 };
 
 #endif

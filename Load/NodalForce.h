@@ -37,19 +37,17 @@ class NodalForce : public Load {
 public:
     NodalForce(
         unsigned, // tag
-        unsigned, // start step tag
         double,   // magnitude
         uvec&&,   // node tags
         unsigned, // dof tag
         unsigned  // amplitude tag
     );
     NodalForce(
-        unsigned,    // tag
-        unsigned,    // start step tag
-        double,      // magnitude
-        uvec&&,      // node tags
-        uvec&&,      // dof tags
-        unsigned = 0 // amplitude tag
+        unsigned, // tag
+        double,   // magnitude
+        uvec&&,   // node tags
+        uvec&&,   // dof tags
+        unsigned  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;

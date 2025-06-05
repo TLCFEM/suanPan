@@ -24,22 +24,20 @@
 /**
  * \brief the constructor uses DoF vector.
  * \param T `unique_tag`
- * \param S `start_step`
  * \param N `nodes`
  * \param D `dofs`
  */
-PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
-    : Constraint(T, S, 0, std::move(N), std::move(D), 0) {}
+PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, uvec&& D)
+    : Constraint(T, 0, std::move(N), std::move(D), 0) {}
 
 /**
  * \brief the constructor uses predefined TYPE: "XSYMM", "YSYMM", "ZSYMM", "ENCASTRE", "PINNED".
  * \param T `unique_tag`
- * \param S `start_step`
  * \param N `nodes`
  * \param TP PenaltyBC TYPE
  */
-PenaltyBC::PenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP)
-    : Constraint(T, S, 0, std::move(N), {}, 0) {
+PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, const char TP)
+    : Constraint(T, 0, std::move(N), {}, 0) {
     if(is_equal(TP, 'X')) dof_reference = uvec{1, 5, 6};
     else if(is_equal(TP, 'Y')) dof_reference = uvec{2, 4, 6};
     else if(is_equal(TP, 'Z')) dof_reference = uvec{3, 4, 5};

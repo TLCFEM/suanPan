@@ -20,12 +20,12 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Group/Group.h>
 
-GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, uvec&& D)
-    : MultiplierBC(T, S, uvec{}, std::move(D))
+GroupPenaltyBC::GroupPenaltyBC(const unsigned T, uvec&& N, uvec&& D)
+    : MultiplierBC(T, uvec{}, std::move(D))
     , groups(std::move(N)) {}
 
-GroupPenaltyBC::GroupPenaltyBC(const unsigned T, const unsigned S, uvec&& N, const char TP)
-    : MultiplierBC(T, S, uvec{}, TP)
+GroupPenaltyBC::GroupPenaltyBC(const unsigned T, uvec&& N, const char TP)
+    : MultiplierBC(T, uvec{}, TP)
     , groups(std::move(N)) {}
 
 int GroupPenaltyBC::initialize(const shared_ptr<DomainBase>& D) {

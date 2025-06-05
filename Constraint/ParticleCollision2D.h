@@ -49,7 +49,7 @@ protected:
     const double alpha = 1.;
 
 public:
-    ParticleCollision2D(unsigned, unsigned, double = 1., double = 1.);
+    ParticleCollision2D(unsigned, double, double);
 };
 
 #endif
