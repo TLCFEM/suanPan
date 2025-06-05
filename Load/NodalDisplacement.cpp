@@ -41,7 +41,7 @@ int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
 
         trial_settlement.zeros(W->get_size());
 
-        trial_settlement(encoding).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
+        trial_settlement(encoding).fill(pattern * amplitude->get_amplitude(W->get_trial_time()));
     }
 
     return SUANPAN_SUCCESS;

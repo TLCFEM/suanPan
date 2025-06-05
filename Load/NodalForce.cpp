@@ -36,7 +36,7 @@ int NodalForce::process(const shared_ptr<DomainBase>& D) {
 
     trial_load.zeros(W->get_size());
 
-    trial_load(active_dof).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
+    trial_load(active_dof).fill(pattern * amplitude->get_amplitude(W->get_trial_time()));
 
     return SUANPAN_SUCCESS;
 }

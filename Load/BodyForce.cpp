@@ -33,7 +33,7 @@ int BodyForce::process(const shared_ptr<DomainBase>& D) {
 
     trial_load.zeros(W->get_size());
 
-    const auto final_load = pattern * magnitude->get_amplitude(W->get_trial_time());
+    const auto final_load = pattern * amplitude->get_amplitude(W->get_trial_time());
 
     for(const auto I : node_encoding)
         if(auto& t_element = D->get<Element>(I); nullptr != t_element && t_element->is_active()) {

@@ -52,7 +52,7 @@ protected:
     uvec dof_reference; // reference DoF ZERO based
     uvec dof_encoding;  // DoF encoding
 
-    shared_ptr<Amplitude> magnitude;
+    shared_ptr<Amplitude> amplitude;
 
     /**
      * \brief Generate active DoF vector from assigned nodes.

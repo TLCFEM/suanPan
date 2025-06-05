@@ -49,7 +49,7 @@ int MPC::initialize(const shared_ptr<DomainBase>& D) {
 int MPC::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    auxiliary_load = pseudo_load * magnitude->get_amplitude(W->get_trial_time());
+    auxiliary_load = pseudo_load * amplitude->get_amplitude(W->get_trial_time());
 
     auxiliary_resistance = auxiliary_stiffness.t() * W->get_trial_displacement();
 

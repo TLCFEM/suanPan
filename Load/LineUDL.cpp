@@ -43,7 +43,7 @@ int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
 
     trial_load.zeros(W->get_size());
 
-    const auto ref_load = pattern * magnitude->get_amplitude(W->get_trial_time());
+    const auto ref_load = pattern * amplitude->get_amplitude(W->get_trial_time());
 
     for(auto I = 0llu, J = 1llu; J < node_encoding.n_elem; ++I, ++J) {
         const auto& node_i = D->get<Node>(node_encoding(I));
@@ -76,7 +76,7 @@ int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
 
     trial_load.zeros(W->get_size());
 
-    const auto ref_load = pattern * magnitude->get_amplitude(W->get_trial_time());
+    const auto ref_load = pattern * amplitude->get_amplitude(W->get_trial_time());
 
     for(auto I = 0llu, J = 1llu; J < node_encoding.n_elem; ++I, ++J) {
         const auto& node_i = D->get<Node>(node_encoding(I));

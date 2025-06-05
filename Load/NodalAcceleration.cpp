@@ -41,7 +41,7 @@ int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
 
     trial_load(node_encoding.is_empty() ? get_all_nodal_active_dof(D) : get_nodal_active_dof(D)).fill(1.);
 
-    trial_load = W->get_mass() * trial_load * pattern * magnitude->get_amplitude(W->get_trial_time());
+    trial_load = W->get_mass() * trial_load * pattern * amplitude->get_amplitude(W->get_trial_time());
 
     return SUANPAN_SUCCESS;
 }
