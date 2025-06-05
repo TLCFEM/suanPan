@@ -50,7 +50,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<NodalAcceleration>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        return_obj = std::make_unique<NodalAcceleration>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 
     void new_bodyforce(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {

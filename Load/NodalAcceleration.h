@@ -38,20 +38,8 @@ public:
     NodalAcceleration(
         unsigned, // tag
         double,   // magnitude
-        unsigned, // dof tag
-        unsigned  // amplitude tag
-    );
-    NodalAcceleration(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // dof tags
-        unsigned  // amplitude tag
-    );
-    NodalAcceleration(
-        unsigned, // tag
-        double,   // magnitude
         uvec&&,   // node tags
-        unsigned, // dof tag
+        uvec&&,   // dof tags
         unsigned  // amplitude tag
     );
 
