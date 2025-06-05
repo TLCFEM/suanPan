@@ -39,13 +39,6 @@ public:
         unsigned, // tag
         double,   // magnitude
         uvec&&,   // group tags
-        unsigned, // dof tag
-        unsigned  // amplitude tag
-    );
-    GroupNodalForce(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // group tags
         uvec&&,   // dof tags
         unsigned  // amplitude tag
     );

@@ -107,8 +107,8 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<NodalForce>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else return_obj = std::make_unique<NodalForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 
     void new_refload(unique_ptr<Load>& return_obj, std::istringstream& command) {

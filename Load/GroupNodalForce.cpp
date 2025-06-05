@@ -19,10 +19,6 @@
 
 #include <Domain/DomainBase.h>
 
-GroupNodalForce::GroupNodalForce(const unsigned T, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : GroupLoad(std::move(N))
-    , NodalForce(T, L, uvec{}, uvec{D}, AT) {}
-
 GroupNodalForce::GroupNodalForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
     : GroupLoad(std::move(N))
     , NodalForce(T, L, uvec{}, std::move(D), AT) {}
