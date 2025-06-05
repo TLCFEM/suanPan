@@ -221,9 +221,9 @@ namespace {
             return;
         }
 
-        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<SupportAcceleration>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else return_obj = std::make_unique<SupportAcceleration>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 } // namespace
 

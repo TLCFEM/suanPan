@@ -42,13 +42,6 @@ public:
         unsigned, // tag
         double,   // magnitude
         uvec&&,   // node tags
-        unsigned, // dof tag
-        unsigned  // amplitude tag
-    );
-    SupportMotion(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
         uvec&&,   // dof tags
         unsigned  // amplitude tag
     );
