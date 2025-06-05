@@ -36,7 +36,7 @@ class Sine final : public Amplitude {
     const std::vector<double> amp;
 
 public:
-    Sine(unsigned, double, std::vector<double>&&, unsigned);
+    Sine(unsigned, double, std::vector<double>&&);
 
     double get_amplitude(double) override;
 

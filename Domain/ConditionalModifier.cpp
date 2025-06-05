@@ -65,7 +65,6 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
         start_time += t_step->get_time_period();
     }
 
-    amplitude->set_start_step(start_step);
     amplitude->set_start_time(start_time);
 
     set_initialized(true);

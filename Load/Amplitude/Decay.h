@@ -35,9 +35,7 @@ class Decay final : public Amplitude {
     const double A, TD;
 
 public:
-    Decay(
-        unsigned, double, double, unsigned // step tag
-    );
+    Decay(unsigned, double, double);
 
     double get_amplitude(double) override;
 

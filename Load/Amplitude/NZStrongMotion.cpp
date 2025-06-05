@@ -19,8 +19,8 @@
 
 #include <Domain/DomainBase.h>
 
-NZStrongMotion::NZStrongMotion(const unsigned T, const char* P, const unsigned ST)
-    : Amplitude(T, ST)
+NZStrongMotion::NZStrongMotion(const unsigned T, const char* P)
+    : Amplitude(T)
     , file_name(P) {}
 
 void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {

@@ -17,8 +17,8 @@
 
 #include "Linear.h"
 
-Linear::Linear(const unsigned T, const double L, const unsigned ST)
-    : Amplitude(T, ST)
+Linear::Linear(const unsigned T, const double L)
+    : Amplitude(T)
     , slope(L) {}
 
 double Linear::get_amplitude(const double T) {

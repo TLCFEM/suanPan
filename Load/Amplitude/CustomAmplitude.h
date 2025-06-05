@@ -39,7 +39,7 @@ class CustomAmplitude final : public Amplitude {
     ResourceHolder<Expression> expression;
 
 public:
-    CustomAmplitude(unsigned, unsigned, unsigned);
+    CustomAmplitude(unsigned, unsigned);
 
     void initialize(const shared_ptr<DomainBase>&) override;
 

@@ -17,8 +17,8 @@
 
 #include "Decay.h"
 
-Decay::Decay(const unsigned T, const double AA, const double TTD, const unsigned ST)
-    : Amplitude(T, ST)
+Decay::Decay(const unsigned T, const double AA, const double TTD)
+    : Amplitude(T)
     , A(AA)
     , TD(TTD) {}
 

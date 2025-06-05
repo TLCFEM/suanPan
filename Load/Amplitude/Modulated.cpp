@@ -17,8 +17,8 @@
 
 #include "Modulated.h"
 
-Modulated::Modulated(const unsigned T, const double AA, std::vector<double>&& WW, const unsigned ST)
-    : Amplitude(T, ST)
+Modulated::Modulated(const unsigned T, const double AA, std::vector<double>&& WW)
+    : Amplitude(T)
     , amp(AA)
     , freq(std::move(WW)) {}
 

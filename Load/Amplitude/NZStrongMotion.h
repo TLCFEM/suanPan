@@ -35,7 +35,7 @@ class NZStrongMotion final : public Amplitude {
     const std::string file_name;
     vec magnitude; // magnitude
 public:
-    NZStrongMotion(unsigned, const char*, unsigned = 0);
+    NZStrongMotion(unsigned, const char*);
 
     void initialize(const shared_ptr<DomainBase>&) override;
 

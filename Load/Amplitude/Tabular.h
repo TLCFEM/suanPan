@@ -39,8 +39,8 @@ protected:
     vec magnitude; // magnitude
 
 public:
-    Tabular(unsigned, vec&&, vec&&, unsigned);
-    Tabular(unsigned, std::string&&, unsigned);
+    Tabular(unsigned, vec&&, vec&&);
+    Tabular(unsigned, std::string&&);
 
     void initialize(const shared_ptr<DomainBase>&) override;
 

@@ -36,7 +36,7 @@
 
 class Ramp final : public Amplitude {
 public:
-    explicit Ramp(unsigned = 0, unsigned = 0);
+    using Amplitude::Amplitude;
 
     double get_amplitude(double) override;
 

@@ -36,7 +36,7 @@ class Cosine final : public Amplitude {
     const std::vector<double> amp;
 
 public:
-    Cosine(unsigned, double, std::vector<double>&&, unsigned);
+    Cosine(unsigned, double, std::vector<double>&&);
 
     double get_amplitude(double) override;
 

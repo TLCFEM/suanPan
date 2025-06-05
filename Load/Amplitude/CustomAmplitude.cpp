@@ -19,8 +19,8 @@
 
 #include <Domain/DomainBase.h>
 
-CustomAmplitude::CustomAmplitude(const unsigned T, const unsigned ET, const unsigned ST)
-    : Amplitude(T, ST)
+CustomAmplitude::CustomAmplitude(const unsigned T, const unsigned ET)
+    : Amplitude(T)
     , e_tag(ET) {}
 
 void CustomAmplitude::initialize(const shared_ptr<DomainBase>& D) {

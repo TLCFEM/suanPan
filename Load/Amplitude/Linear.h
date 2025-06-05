@@ -35,7 +35,7 @@ class Linear final : public Amplitude {
     const double slope;
 
 public:
-    Linear(unsigned, double, unsigned);
+    Linear(unsigned, double);
 
     double get_amplitude(double) override;
 

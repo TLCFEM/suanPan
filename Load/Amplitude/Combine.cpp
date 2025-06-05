@@ -19,8 +19,8 @@
 
 #include <Domain/DomainBase.h>
 
-Combine::Combine(const unsigned T, uvec&& TP, const unsigned ST)
-    : Amplitude(T, ST)
+Combine::Combine(const unsigned T, uvec&& TP)
+    : Amplitude(T)
     , tag_pool(std::move(TP)) {}
 
 void Combine::initialize(const shared_ptr<DomainBase>& D) {

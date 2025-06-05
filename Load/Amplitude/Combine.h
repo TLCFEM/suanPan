@@ -36,7 +36,7 @@ class Combine final : public Amplitude {
     std::vector<std::weak_ptr<Amplitude>> amp_pool;
 
 public:
-    Combine(unsigned, uvec&&, unsigned);
+    Combine(unsigned, uvec&&);
 
     void initialize(const shared_ptr<DomainBase>&) override;
 

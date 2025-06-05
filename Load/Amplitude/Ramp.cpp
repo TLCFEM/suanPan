@@ -17,9 +17,6 @@
 
 #include "Ramp.h"
 
-Ramp::Ramp(const unsigned T, const unsigned ST)
-    : Amplitude(T, ST) {}
-
 double Ramp::get_amplitude(const double T) {
     const auto step_time = T - start_time;
     if(step_time < 0.) return 0.;
