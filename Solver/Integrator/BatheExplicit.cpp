@@ -54,7 +54,7 @@ void BatheExplicit::update_incre_time(double T) {
     W->update_incre_time(T * (FLAG::FIRST == step_flag ? P : 1. - P));
 }
 
-int BatheExplicit::update_trial_status() {
+int BatheExplicit::update_trial_status(bool) {
     const auto D = get_domain();
 
     if(auto& W = D->get_factory(); FLAG::FIRST == step_flag) {

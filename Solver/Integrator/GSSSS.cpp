@@ -136,7 +136,7 @@ int GSSSS::process_constraint_resistance() {
     return code;
 }
 
-int GSSSS::update_trial_status() {
+int GSSSS::update_trial_status(bool) {
     const auto D = get_domain();
     auto& W = D->get_factory();
 

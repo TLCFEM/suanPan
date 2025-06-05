@@ -186,11 +186,11 @@ void Integrator::update_incre_time(const double T) {
     update_parameter(W->get_incre_time());
 }
 
-int Integrator::update_trial_status() {
+int Integrator::update_trial_status(const bool detect_trivial) {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
+    return detect_trivial && suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
 }
 
 int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
@@ -223,7 +223,7 @@ int Integrator::sync_status(const bool only_correct) {
     }
 
     // perform corrector/predictor depending on the algorithm
-    if(SUANPAN_SUCCESS != (has_corrector() ? correct_trial_status() : update_trial_status())) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != (has_corrector() ? correct_trial_status() : update_trial_status(true))) return SUANPAN_FAIL;
 
     return handle_force();
 }

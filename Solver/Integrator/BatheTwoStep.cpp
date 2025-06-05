@@ -75,7 +75,7 @@ void BatheTwoStep::update_incre_time(double T) {
     W->update_incre_time(T * (FLAG::TRAP == step_flag ? GM : 1. - GM));
 }
 
-int BatheTwoStep::update_trial_status() {
+int BatheTwoStep::update_trial_status(bool) {
     const auto D = get_domain();
 
     if(auto& W = D->get_factory(); FLAG::TRAP == step_flag) {

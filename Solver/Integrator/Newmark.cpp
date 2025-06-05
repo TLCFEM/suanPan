@@ -65,7 +65,7 @@ void Newmark::assemble_matrix() {
     W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
 }
 
-int Newmark::update_trial_status() {
+int Newmark::update_trial_status(bool) {
     const auto D = get_domain();
     auto& W = D->get_factory();
 

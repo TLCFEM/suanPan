@@ -117,7 +117,7 @@ int GeneralizedAlphaExplicit::process_constraint_resistance() {
     return code;
 }
 
-int GeneralizedAlphaExplicit::update_trial_status() {
+int GeneralizedAlphaExplicit::update_trial_status(bool) {
     const auto D = get_domain();
     auto& W = D->get_factory();
 

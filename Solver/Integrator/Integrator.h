@@ -104,7 +104,7 @@ public:
     virtual void update_trial_time(double);
     virtual void update_incre_time(double);
 
-    virtual int update_trial_status();
+    virtual int update_trial_status(bool);
     virtual int correct_trial_status();
 
     virtual int sync_status(bool);

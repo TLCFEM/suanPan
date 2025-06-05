@@ -64,7 +64,7 @@ public:
     [[nodiscard]] int process_load_resistance() override;
     [[nodiscard]] int process_constraint_resistance() override;
 
-    int update_trial_status() override;
+    int update_trial_status(bool) override;
 
     void update_parameter(double) override;
 

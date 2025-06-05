@@ -52,7 +52,7 @@ public:
 
     void update_incre_time(double) override;
 
-    int update_trial_status() override;
+    int update_trial_status(bool) override;
     int correct_trial_status() override;
 
     void commit_status() override;

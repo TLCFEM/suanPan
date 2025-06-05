@@ -46,7 +46,7 @@ int Ramm::analyze() {
 
         t_clock.tic();
         // update for nodes and elements
-        if(SUANPAN_SUCCESS != G->update_trial_status()) return SUANPAN_FAIL;
+        if(SUANPAN_SUCCESS != G->update_trial_status(false)) return SUANPAN_FAIL;
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
         D->update<Statistics::UpdateStatus>(t_clock.toc());
 

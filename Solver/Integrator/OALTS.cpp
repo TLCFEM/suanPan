@@ -75,7 +75,7 @@ void OALTS::assemble_matrix() {
     }
 }
 
-int OALTS::update_trial_status() {
+int OALTS::update_trial_status(bool) {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
