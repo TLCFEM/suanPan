@@ -19,10 +19,6 @@
 
 #include <Domain/DomainBase.h>
 
-GroupBodyForce::GroupBodyForce(const unsigned T, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : GroupLoad(std::move(N))
-    , BodyForce(T, L, {}, D, AT) {}
-
 GroupBodyForce::GroupBodyForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
     : GroupLoad(std::move(N))
     , BodyForce(T, L, {}, std::move(D), AT) {}

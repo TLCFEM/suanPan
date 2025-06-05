@@ -78,8 +78,8 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<BodyForce>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else return_obj = std::make_unique<BodyForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 
     void new_cload(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {

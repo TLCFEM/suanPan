@@ -39,13 +39,6 @@ public:
         unsigned, // tag
         double,   // magnitude
         uvec&&,   // element tags
-        unsigned, // dof tag
-        unsigned  // amplitude tag
-    );
-    BodyForce(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // element tags
         uvec&&,   // dof tags
         unsigned  // amplitude tag
     );

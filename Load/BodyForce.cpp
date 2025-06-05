@@ -22,9 +22,6 @@
 #include <Element/Element.h>
 #include <Load/Amplitude/Amplitude.h>
 
-BodyForce::BodyForce(const unsigned T, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : Load(T, AT, std::move(N), uvec{D}, L) {}
-
 BodyForce::BodyForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
     : Load(T, AT, std::move(N), std::move(D), L) {}
 
