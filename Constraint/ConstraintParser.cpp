@@ -318,9 +318,7 @@ namespace {
             return;
         }
 
-        const auto p = get_remaining<double>(command);
-
-        switch(p.size()) {
+        switch(const auto p = get_remaining<double>(command); p.size()) {
         case 2:
             // 1D origin norm
             if(penalty) return_obj = std::make_unique<RigidWallPenalty1D>(tag, 0, vec{p[0]}, vec{p[1]}, 1E4);
@@ -387,9 +385,7 @@ namespace {
             return;
         }
 
-        const auto p = get_remaining<double>(command);
-
-        switch(p.size()) {
+        switch(const auto p = get_remaining<double>(command); p.size()) {
         case 3:
             // 1D origin norm restitution
             return_obj = std::make_unique<RestitutionWallPenalty1D>(tag, 0, vec{p[0]}, vec{p[1]}, p[2], 1E4);
@@ -564,7 +560,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
 
     if(is_equal(constraint_id, "Embed2D")) new_embed(new_constraint, command, 2);
     else if(is_equal(constraint_id, "Embed3D")) new_embed(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "FiniteRestitutionWall") || is_equal(constraint_id, "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
+    else if(is_equal(constraint_id, "FiniteRestitutionWall") || is_equal(constraint_id, "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, true);
     else if(is_equal(constraint_id, "FiniteRigidWall") || is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
     else if(is_equal(constraint_id, "Fix") || is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);

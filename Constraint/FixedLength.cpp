@@ -100,22 +100,22 @@ void FixedLength::reset_status() {
 
 MinimumGap::MinimumGap(const unsigned T, const unsigned D, const double M, uvec&& N)
     : FixedLength(T, D, std::move(N)) {
-    access::rw(min_bound) = true;
-    access::rw(min_gap) = M * M;
+    min_bound = true;
+    min_gap = M * M;
 }
 
 MaximumGap::MaximumGap(const unsigned T, const unsigned D, const double M, uvec&& N)
     : FixedLength(T, D, std::move(N)) {
-    access::rw(max_bound) = true;
-    access::rw(max_gap) = M * M;
+    max_bound = true;
+    max_gap = M * M;
 }
 
 Sleeve::Sleeve(const unsigned T, const unsigned D, const double M1, const double M2, uvec&& N)
     : FixedLength(T, D, std::move(N)) {
-    access::rw(min_bound) = true;
-    access::rw(max_bound) = true;
-    access::rw(min_gap) = M1 * M1;
-    access::rw(max_gap) = M2 * M2;
+    min_bound = true;
+    max_bound = true;
+    min_gap = M1 * M1;
+    max_gap = M2 * M2;
 }
 
 MaxForce::MaxForce(const unsigned T, const unsigned D, const double MF, uvec&& N)
