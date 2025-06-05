@@ -44,6 +44,7 @@
 #include "Viscosity/Viscosity01.h"
 #include "Viscosity/Viscosity02.h"
 #include "Wrapper/Parallel.h"
+#include "Wrapper/Prestrain.h"
 #include "Wrapper/Sequential.h"
 #include "Wrapper/Uniaxial.h"
 #include "vonMises/ArmstrongFrederick1D.h"

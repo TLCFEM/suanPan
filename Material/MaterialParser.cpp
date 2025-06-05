@@ -2679,6 +2679,22 @@ namespace {
         return_obj = std::make_unique<PolyJ2>(tag, elastic_modulus, poissons_ratio, pool, density);
     }
 
+    void new_prestrain(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag, base_tag, amplitude_tag;
+        if(!get_input(command, tag, base_tag, amplitude_tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid magnitude is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<Prestrain>(tag, base_tag, amplitude_tag, magnitude);
+    }
+
     void new_rambergosgood(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -3518,6 +3534,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "PlaneSymmetric23")) new_planestrain(new_material, command, 2);
     else if(is_equal(material_id, "PolyElastic1D")) new_polyelastic1d(new_material, command);
     else if(is_equal(material_id, "PolyJ2")) new_polyj2(new_material, command);
+    else if(is_equal(material_id, "Prestrain")) new_prestrain(new_material, command);
     else if(is_equal(material_id, "RambergOsgood")) new_rambergosgood(new_material, command);
     else if(is_equal(material_id, "Rebar2D")) new_rebar2d(new_material, command);
     else if(is_equal(material_id, "Rebar3D")) new_rebar3d(new_material, command);

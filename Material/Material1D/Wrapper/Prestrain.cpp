@@ -31,7 +31,10 @@ Prestrain::Prestrain(const unsigned T, const unsigned BT, const unsigned AT, con
 
 int Prestrain::initialize(const shared_ptr<DomainBase>& D) {
     amplitude = D->get<Amplitude>(amplitude_tag);
-    if(nullptr == amplitude || !amplitude->is_active()) amplitude = std::make_shared<Ramp>(0);
+    if(nullptr == amplitude || !amplitude->is_active()) {
+        suanpan_warning("The provided amplitude {} is not usable, using a default one instead.\n", amplitude_tag);
+        amplitude = std::make_shared<Ramp>(0);
+    }
     base = D->initialized_material_copy(base_tag);
     if(nullptr == base || base->get_material_type() != MaterialType::D1) {
         suanpan_error("A valid uniaxial host material is required.\n");
@@ -53,11 +56,9 @@ unique_ptr<Material> Prestrain::get_copy() { return std::make_unique<Prestrain>(
 int Prestrain::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    const double prestrain = get_prestrain();
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    if(std::fabs(incre_strain(0) + prestrain) <= datum::eps) return SUANPAN_SUCCESS;
-
-    if(base->update_trial_status(trial_strain + prestrain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+    if(base->update_trial_status(trial_strain + get_prestrain()) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     trial_stress = base->get_trial_stress();
     trial_stiffness = base->get_trial_stiffness();
@@ -69,11 +70,9 @@ int Prestrain::update_trial_status(const vec& t_strain, const vec& t_strain_rate
     incre_strain = (trial_strain = t_strain) - current_strain;
     incre_strain_rate = (trial_strain_rate = t_strain_rate) - current_strain_rate;
 
-    const double prestrain = get_prestrain();
+    if(std::fabs(incre_strain(0) + incre_strain_rate(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    if(std::fabs(incre_strain(0) + incre_strain_rate(0) + prestrain) <= datum::eps) return SUANPAN_SUCCESS;
-
-    if(base->update_trial_status(trial_strain + prestrain, trial_strain_rate) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+    if(base->update_trial_status(trial_strain + get_prestrain(), trial_strain_rate) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     trial_stress = base->get_trial_stress();
     trial_stiffness = base->get_trial_stiffness();
