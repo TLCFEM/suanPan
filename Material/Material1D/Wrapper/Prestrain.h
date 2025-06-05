@@ -41,9 +41,13 @@ class Prestrain final : public Material1D {
 
     const double magnitude;
 
+    const double* analysis_time{};
+
     std::shared_ptr<Amplitude> amplitude;
 
     ResourceHolder<Material> base;
+
+    double get_prestrain() const;
 
 public:
     Prestrain(
@@ -58,6 +62,7 @@ public:
     unique_ptr<Material> get_copy() override;
 
     int update_trial_status(const vec&) override;
+    int update_trial_status(const vec&, const vec&) override;
 
     int clear_status() override;
     int commit_status() override;

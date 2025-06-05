@@ -18,7 +18,10 @@
 #include "Prestrain.h"
 
 #include <Domain/DomainBase.h>
+#include <Domain/Factory.hpp>
 #include <Load/Amplitude/Ramp.h>
+
+double Prestrain::get_prestrain() const { return amplitude->get_amplitude(*analysis_time) * magnitude; }
 
 Prestrain::Prestrain(const unsigned T, const unsigned BT, const unsigned AT, const double M)
     : Material1D(T, 0.)
@@ -35,6 +38,8 @@ int Prestrain::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
+    analysis_time = &D->get_factory()->modify_trial_time();
+
     access::rw(density) = base->get_density();
 
     trial_stiffness = current_stiffness = base->get_initial_stiffness();
@@ -48,12 +53,31 @@ unique_ptr<Material> Prestrain::get_copy() { return std::make_unique<Prestrain>(
 int Prestrain::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    const double prestrain = get_prestrain();
 
-    if(base->update_trial_status(trial_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+    if(std::fabs(incre_strain(0) + prestrain) <= datum::eps) return SUANPAN_SUCCESS;
+
+    if(base->update_trial_status(trial_strain + prestrain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     trial_stress = base->get_trial_stress();
     trial_stiffness = base->get_trial_stiffness();
+
+    return SUANPAN_SUCCESS;
+}
+
+int Prestrain::update_trial_status(const vec& t_strain, const vec& t_strain_rate) {
+    incre_strain = (trial_strain = t_strain) - current_strain;
+    incre_strain_rate = (trial_strain_rate = t_strain_rate) - current_strain_rate;
+
+    const double prestrain = get_prestrain();
+
+    if(std::fabs(incre_strain(0) + incre_strain_rate(0) + prestrain) <= datum::eps) return SUANPAN_SUCCESS;
+
+    if(base->update_trial_status(trial_strain + prestrain, trial_strain_rate) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+
+    trial_stress = base->get_trial_stress();
+    trial_stiffness = base->get_trial_stiffness();
+    trial_damping = base->get_trial_damping();
 
     return SUANPAN_SUCCESS;
 }
