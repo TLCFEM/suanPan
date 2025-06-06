@@ -2,19 +2,19 @@
 
 if [ $# -eq 0 ]; then
   echo "Usage: Coverage.sh <build_folder> <log_file>"
-  exit
+  exit 1
 fi
 
-cd "$1" || exit
+cd "$1" || exit 1
 
 if [ ! -f "suanPan" ]; then
   echo "This script must be executed in the folder contains suanPan."
-  exit
+  exit 1
 fi
 
 if [ ! -d "../Example" ]; then
   echo "This script must be executed in the sibling folder of Example folder."
-  exit
+  exit 1
 fi
 
 files=$(find ../Example -name "*.supan")
@@ -37,7 +37,7 @@ cp ../Example/Section/HIST .
 
 for file in $files; do
   echo "Processing $file ..."
-  time ./suanPan -f "$file" >>"$log_file"
+  time ./suanPan -f "$file" >> "$log_file" || exit 1
 done
 
 {
