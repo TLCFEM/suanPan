@@ -20,7 +20,7 @@
  * @author tlc
  * @date 13/01/2021
  * @version 0.2.0
- * @file KELVIN.h
+ * @file Kelvin.h
  * @addtogroup Material-1D
  * @{
  */
