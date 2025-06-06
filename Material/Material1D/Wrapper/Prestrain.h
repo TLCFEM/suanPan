@@ -43,7 +43,7 @@ class Prestrain final : public Material1D {
 
     const double* analysis_time{};
 
-    std::shared_ptr<Amplitude> amplitude;
+    ResourceHolder<Amplitude> amplitude;
 
     ResourceHolder<Material> base;
 
