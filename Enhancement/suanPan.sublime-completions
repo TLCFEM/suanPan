@@ -1705,6 +1705,12 @@
       "contents": "material PolyElastic1D ${1:(1)} [${2:(2)}...]\n# (1) int, unique material tag\n# (2) double, polynomial parameters, a_n"
     },
     {
+      "trigger": "Prestrain",
+      "details": "prestrain wrapper for uniaxial materials",
+      "kind": "type",
+      "contents": "material Prestrain ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique material tag\n# (2) int, underlying material tag\n# (3) int, amplitude tag, set to 0 to use a ramp function\n# (4) double, maginutde"
+    },
+    {
       "trigger": "PolyJ2",
       "details": "j2 material with polynomial hardening",
       "kind": "type",
