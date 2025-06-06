@@ -8,6 +8,7 @@
 ## version 3.8
 
 1. add optional hourglassing control for `CP4R` and `C3D8R` elements
+2. add `Prestrain` wrapper for uniaxial materials to apply prestrain [#266](https://github.com/TLCFEM/suanPan/pull/266)
 
 ## version 3.7
 
