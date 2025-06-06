@@ -1585,6 +1585,9 @@
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\Subloading.cpp">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Prestrain.cpp">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2973,6 +2976,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\Subloading.h">
       <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Prestrain.h">
+      <Filter>Material\Material1D\Wrapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

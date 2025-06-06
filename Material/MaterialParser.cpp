@@ -2679,6 +2679,22 @@ namespace {
         return_obj = std::make_unique<PolyJ2>(tag, elastic_modulus, poissons_ratio, pool, density);
     }
 
+    void new_prestrain(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag, base_tag, amplitude_tag;
+        if(!get_input(command, tag, base_tag, amplitude_tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid magnitude is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<Prestrain>(tag, base_tag, amplitude_tag, magnitude);
+    }
+
     void new_rambergosgood(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -3423,12 +3439,9 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
 
     unique_ptr<Material> new_material = nullptr;
 
-    if(is_equal(material_id, "AFC")) new_afc01(new_material, command);
-    else if(is_equal(material_id, "AFC01")) new_afc01(new_material, command);
-    else if(is_equal(material_id, "AFC02")) new_afc02(new_material, command);
-    else if(is_equal(material_id, "AFC03")) new_afc03(new_material, command);
-    else if(is_equal(material_id, "AFCN")) new_afc03(new_material, command);
-    else if(is_equal(material_id, "AFCS")) new_afc02(new_material, command);
+    if(is_equal(material_id, "AFC") || is_equal(material_id, "AFC01")) new_afc01(new_material, command);
+    else if(is_equal(material_id, "AFC02") || is_equal(material_id, "AFCS")) new_afc02(new_material, command);
+    else if(is_equal(material_id, "AFC03") || is_equal(material_id, "AFCN")) new_afc03(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
     else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
@@ -3450,9 +3463,8 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
-    else if(is_equal(material_id, "CDPM2")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+    else if(is_equal(material_id, "CDPM2") || is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
     else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
-    else if(is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
     else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
     else if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
     else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
@@ -3479,7 +3491,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "DuncanSelig")) new_duncanselig(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
-    else if(is_equal(material_id, "Elastic3D")) new_isotropicelastic3d(new_material, command);
+    else if(is_equal(material_id, "Elastic3D") || is_equal(material_id, "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "ElasticOS")) new_elasticos(new_material, command);
     else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
@@ -3492,7 +3504,6 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "Flag02")) new_flag02(new_material, command);
     else if(is_equal(material_id, "Fluid")) new_fluid(new_material, command);
     else if(is_equal(material_id, "Gap01")) new_gap01(new_material, command);
-    else if(is_equal(material_id, "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "Kelvin")) new_kelvin(new_material, command);
     else if(is_equal(material_id, "Laminated")) new_laminated(new_material, command);
     else if(is_equal(material_id, "LinearDamage")) new_lineardamage(new_material, command);
@@ -3518,6 +3529,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "PlaneSymmetric23")) new_planestrain(new_material, command, 2);
     else if(is_equal(material_id, "PolyElastic1D")) new_polyelastic1d(new_material, command);
     else if(is_equal(material_id, "PolyJ2")) new_polyj2(new_material, command);
+    else if(is_equal(material_id, "Prestrain")) new_prestrain(new_material, command);
     else if(is_equal(material_id, "RambergOsgood")) new_rambergosgood(new_material, command);
     else if(is_equal(material_id, "Rebar2D")) new_rebar2d(new_material, command);
     else if(is_equal(material_id, "Rebar3D")) new_rebar3d(new_material, command);

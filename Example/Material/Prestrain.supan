@@ -1,0 +1,35 @@
+# A TEST MODEL FOR PRESTRAIN MATERIAL
+
+node 1 0 0
+node 2 1 0
+
+material Elastic1D 1 100
+material Prestrain 2 1 0 1E-2
+
+element T2D2 1 1 2 1 10
+element T2D2 2 1 2 2 10
+
+fix2 1 1 1
+fix2 2 2 1 2
+
+step static 1
+set ini_step_size .1
+
+converger AbsIncreDisp 1 1E-4 10 1
+
+analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#  -5.0000e-03  0.0000e+00
+# Resistance:
+#   0.0000e+00  0.0000e+00
+peek node 2
+
+peek element 1 2
+
+reset
+clear
+exit
