@@ -306,6 +306,7 @@ public:
 
     unique_ptr<Amplitude> initialized_amplitude_copy(uword) override;
     unique_ptr<Material> initialized_material_copy(uword) override;
+    unique_ptr<Section> initialized_section_copy(uword) override;
 
     void insert_loaded_dof(const uvec&) override;
     void insert_restrained_dof(const uvec&) override;

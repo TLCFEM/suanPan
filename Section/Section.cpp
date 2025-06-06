@@ -149,19 +149,3 @@ std::vector<vec> Section::record(const OutputType P) {
 }
 
 unique_ptr<Section> suanpan::make_copy(const shared_ptr<Section>& S) { return S->get_copy(); }
-
-unique_ptr<Section> suanpan::make_copy(const unique_ptr<Section>& S) { return S->get_copy(); }
-
-unique_ptr<Section> suanpan::initialized_section_copy(const shared_ptr<DomainBase>& D, const uword T) {
-    if(!D->find<Section>(T)) return nullptr;
-
-    auto copy = D->get<Section>(T)->get_copy();
-
-    if(copy->is_initialized()) return copy;
-
-    if(SUANPAN_SUCCESS != copy->initialize_base(D) || SUANPAN_SUCCESS != copy->initialize(D)) return nullptr;
-
-    copy->set_initialized(true);
-
-    return copy;
-}

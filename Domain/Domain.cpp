@@ -739,6 +739,20 @@ unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
     return copy;
 }
 
+unique_ptr<Section> Domain::initialized_section_copy(const uword T) {
+    if(!find<Section>(T)) return nullptr;
+
+    auto copy = get<Section>(T)->get_copy();
+
+    if(copy->is_initialized()) return copy;
+
+    if(SUANPAN_SUCCESS != copy->initialize_base(shared_from_this()) || SUANPAN_SUCCESS != copy->initialize(shared_from_this())) return nullptr;
+
+    copy->set_initialized(true);
+
+    return copy;
+}
+
 /**
  * \brief concurrently safe insertion method
  */

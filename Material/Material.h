@@ -231,7 +231,6 @@ public:
 
 namespace suanpan {
     unique_ptr<Material> make_copy(const shared_ptr<Material>&);
-    unique_ptr<Material> make_copy(const unique_ptr<Material>&);
 } // namespace suanpan
 
 #endif

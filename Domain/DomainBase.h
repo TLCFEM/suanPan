@@ -311,6 +311,7 @@ public:
 
     virtual unique_ptr<Amplitude> initialized_amplitude_copy(uword) = 0;
     virtual unique_ptr<Material> initialized_material_copy(uword) = 0;
+    virtual unique_ptr<Section> initialized_section_copy(uword) = 0;
 
     /**
      * \brief concurrently safe insertion method
