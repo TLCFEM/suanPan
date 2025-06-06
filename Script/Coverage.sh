@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-  echo "Usage: Coverage.sh <build_folder> <log_file>"
+  echo "Usage: $0 <build_folder> <log_file>"
   exit 1
 fi
 
@@ -54,12 +54,12 @@ for file in "${files[@]}"; do
   timings["$file"]="$TIME_OUTPUT"
 done
 
-echo -e "\n=== Processing Time Summary ==="
-printf "%-40s %10s\n" "File" "Time (s)"
-printf "%-40s %10s\n" "----------------------------------------" "----------"
+echo -e "\n================================= Processing Time Summary ================================="
+printf "%-80s %10s\n" "File" "Time (s)"
+printf "%-80s %10s\n" "--------------------------------------------------------------------------------" "----------"
 
 for file in "${files[@]}"; do
-  printf "%-40s %10s\n" "$file" "${timings["$file"]}"
+  printf "%-80s %10s\n" "$file" "${timings["$file"]}"
 done
 
 {
