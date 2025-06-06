@@ -54,9 +54,9 @@ int Prestrain::initialize(const shared_ptr<DomainBase>& D) {
 unique_ptr<Material> Prestrain::get_copy() { return std::make_unique<Prestrain>(*this); }
 
 int Prestrain::update_trial_status(const vec& t_strain) {
-    incre_strain = (trial_strain = t_strain) - current_strain;
+    incre_strain = (trial_strain = t_strain + get_prestrain()) - current_strain;
 
-    if(base->update_trial_status(trial_strain + get_prestrain()) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+    if(base->update_trial_status(trial_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     trial_stress = base->get_trial_stress();
     trial_stiffness = base->get_trial_stiffness();
@@ -65,10 +65,10 @@ int Prestrain::update_trial_status(const vec& t_strain) {
 }
 
 int Prestrain::update_trial_status(const vec& t_strain, const vec& t_strain_rate) {
-    incre_strain = (trial_strain = t_strain) - current_strain;
+    incre_strain = (trial_strain = t_strain + get_prestrain()) - current_strain;
     incre_strain_rate = (trial_strain_rate = t_strain_rate) - current_strain_rate;
 
-    if(base->update_trial_status(trial_strain + get_prestrain(), trial_strain_rate) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+    if(base->update_trial_status(trial_strain, trial_strain_rate) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     trial_stress = base->get_trial_stress();
     trial_stiffness = base->get_trial_stiffness();
