@@ -37,6 +37,8 @@ class Decay final : public Amplitude {
 public:
     Decay(unsigned, double, double);
 
+    unique_ptr<Amplitude> get_copy() override;
+
     double get_amplitude(double) override;
 
     void print() override;

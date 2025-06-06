@@ -25,12 +25,14 @@ Combine::Combine(const unsigned T, uvec&& TP)
 
 void Combine::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : tag_pool)
-        if(D->find<Amplitude>(I)) amp_pool.emplace_back(D->get<Amplitude>(I));
+        if(D->find<Amplitude>(I)) amp_pool.emplace_back(D->initialized_amplitude_copy(I));
 }
+
+unique_ptr<Amplitude> Combine::get_copy() { return std::make_unique<Combine>(*this); }
 
 double Combine::get_amplitude(const double T) {
     auto A = 1.;
-    for(const auto& I : amp_pool) A *= I.lock()->get_amplitude(T);
+    for(const auto& amp : amp_pool) A *= amp->get_amplitude(T);
     return A;
 }
 

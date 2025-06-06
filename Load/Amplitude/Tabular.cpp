@@ -51,6 +51,8 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
     }
 }
 
+unique_ptr<Amplitude> Tabular::get_copy() { return std::make_unique<Tabular>(*this); }
+
 double Tabular::get_amplitude(const double T) {
     const auto step_time = T - start_time;
 

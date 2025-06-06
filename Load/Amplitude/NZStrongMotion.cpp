@@ -23,6 +23,8 @@ NZStrongMotion::NZStrongMotion(const unsigned T, const char* P)
     : Amplitude(T)
     , file_name(P) {}
 
+unique_ptr<Amplitude> NZStrongMotion::get_copy() { return std::make_unique<NZStrongMotion>(*this); }
+
 void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {
     std::error_code code;
     if(Col<int> data; !fs::exists(file_name, code) || !data.load(file_name, auto_detect)) {

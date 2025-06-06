@@ -21,4 +21,8 @@ void Amplitude::initialize(const shared_ptr<DomainBase>&) {}
 
 double Amplitude::get_amplitude(const double) { return 0.; }
 
+void Amplitude::set_initialized(const bool F) { initialized = F; }
+
+bool Amplitude::is_initialized() const { return initialized; }
+
 void Amplitude::set_start_time(const double T) { start_time = T; }

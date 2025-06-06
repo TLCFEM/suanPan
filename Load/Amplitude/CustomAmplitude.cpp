@@ -38,6 +38,8 @@ void CustomAmplitude::initialize(const shared_ptr<DomainBase>& D) {
     }
 }
 
+unique_ptr<Amplitude> CustomAmplitude::get_copy() { return std::make_unique<CustomAmplitude>(*this); }
+
 double CustomAmplitude::get_amplitude(const double T) {
     const auto step_time = T - start_time;
 

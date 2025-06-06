@@ -64,16 +64,23 @@ enum class AmplitudeType {
 
 class DomainBase;
 
-class Amplitude : public UniqueTag {
+class Amplitude : public CopiableTag {
+    bool initialized = false;
+
 protected:
     double start_time = 0.; // T0
 
 public:
-    using UniqueTag::UniqueTag;
+    using CopiableTag::CopiableTag;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 
+    virtual unique_ptr<Amplitude> get_copy() = 0;
+
     virtual double get_amplitude(double);
+
+    void set_initialized(bool);
+    [[nodiscard]] bool is_initialized() const;
 
     void set_start_time(double);
 };

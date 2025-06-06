@@ -309,6 +309,7 @@ public:
     [[nodiscard]] virtual const shared_ptr<Integrator>& get_current_integrator() const = 0;
     [[nodiscard]] virtual const shared_ptr<Solver>& get_current_solver() const = 0;
 
+    virtual unique_ptr<Amplitude> initialized_amplitude_copy(uword) = 0;
     virtual unique_ptr<Material> initialized_material_copy(uword) = 0;
 
     /**

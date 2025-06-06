@@ -22,6 +22,8 @@ Decay::Decay(const unsigned T, const double AA, const double TTD)
     , A(AA)
     , TD(TTD) {}
 
+unique_ptr<Amplitude> Decay::get_copy() { return std::make_unique<Decay>(*this); }
+
 double Decay::get_amplitude(const double T) {
     const auto step_time = T - start_time;
 

@@ -38,6 +38,8 @@ class Ramp final : public Amplitude {
 public:
     using Amplitude::Amplitude;
 
+    unique_ptr<Amplitude> get_copy() override;
+
     double get_amplitude(double) override;
 
     void print() override;

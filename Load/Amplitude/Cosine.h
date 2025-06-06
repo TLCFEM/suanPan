@@ -38,6 +38,8 @@ class Cosine final : public Amplitude {
 public:
     Cosine(unsigned, double, std::vector<double>&&);
 
+    unique_ptr<Amplitude> get_copy() override;
+
     double get_amplitude(double) override;
 
     void print() override;

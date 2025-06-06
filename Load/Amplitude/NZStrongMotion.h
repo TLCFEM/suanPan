@@ -37,6 +37,8 @@ class NZStrongMotion final : public Amplitude {
 public:
     NZStrongMotion(unsigned, const char*);
 
+    unique_ptr<Amplitude> get_copy() override;
+
     void initialize(const shared_ptr<DomainBase>&) override;
 
     double get_amplitude(double) override;
