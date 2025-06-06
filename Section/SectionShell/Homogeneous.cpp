@@ -26,11 +26,6 @@ Homogeneous::IntegrationPoint::IntegrationPoint(const double E, const double F, 
     , factor(F)
     , s_material(std::move(M)) {}
 
-Homogeneous::IntegrationPoint::IntegrationPoint(const IntegrationPoint& old_obj)
-    : eccentricity(old_obj.eccentricity)
-    , factor(old_obj.factor)
-    , s_material(suanpan::make_copy(old_obj.s_material)) {}
-
 Homogeneous::Homogeneous(const unsigned T, const unsigned MT, const double TH, const unsigned IP)
     : SectionShell(T, MT)
     , num_ip(IP > 20 ? 20 : IP)

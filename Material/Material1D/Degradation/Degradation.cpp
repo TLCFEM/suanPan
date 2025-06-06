@@ -24,11 +24,6 @@ Degradation::Degradation(const unsigned T, const unsigned MT)
     : Material1D(T, 0.)
     , mat_tag(MT) {}
 
-Degradation::Degradation(const Degradation& old_obj)
-    : Material1D(old_obj)
-    , mat_tag(old_obj.mat_tag)
-    , base(suanpan::make_copy(old_obj.base)) {}
-
 int Degradation::initialize(const shared_ptr<DomainBase>& D) {
     base = D->initialized_material_copy(mat_tag);
 
