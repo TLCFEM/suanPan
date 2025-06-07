@@ -77,11 +77,32 @@ int Prestrain::update_trial_status(const vec& t_strain, const vec& t_strain_rate
     return SUANPAN_SUCCESS;
 }
 
-int Prestrain::clear_status() { return base->clear_status(); }
+int Prestrain::clear_status() {
+    trial_strain = current_strain.zeros();
+    trial_strain_rate = current_strain_rate.zeros();
+    trial_stress = current_stress.zeros();
+    trial_stiffness = current_stiffness = initial_stiffness;
+    trial_damping = current_damping = initial_damping;
+    return base->clear_status();
+}
 
-int Prestrain::commit_status() { return base->commit_status(); }
+int Prestrain::commit_status() {
+    current_strain = trial_strain;
+    current_strain_rate = trial_strain_rate;
+    current_stress = trial_stress;
+    current_stiffness = trial_stiffness;
+    current_damping = trial_damping;
+    return base->commit_status();
+}
 
-int Prestrain::reset_status() { return base->reset_status(); }
+int Prestrain::reset_status() {
+    trial_strain = current_strain;
+    trial_strain_rate = current_strain_rate;
+    trial_stress = current_stress;
+    trial_stiffness = current_stiffness;
+    trial_damping = current_damping;
+    return base->reset_status();
+}
 
 std::vector<vec> Prestrain::record(const OutputType P) { return base->record(P); }
 

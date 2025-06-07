@@ -47,7 +47,7 @@ class Prestrain final : public Material1D {
 
     ResourceHolder<Material> base;
 
-    double get_prestrain() const;
+    [[nodiscard]] double get_prestrain() const;
 
 public:
     Prestrain(
