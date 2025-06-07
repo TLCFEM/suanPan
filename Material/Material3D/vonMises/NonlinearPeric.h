@@ -47,7 +47,7 @@ class NonlinearPeric : protected DataNonlinearPeric, public Material3D {
 
     const double shear_modulus = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus
     const double double_shear = 2. * shear_modulus;                            // double shear modulus
-    const double triple_shear = 3. * shear_modulus;                            // double shear modulus
+    const double triple_shear = 3. * shear_modulus;                            // triple shear modulus
 
     const double factor_a = mu * epsilon;
 

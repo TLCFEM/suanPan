@@ -35,8 +35,7 @@ class Tabular : public Amplitude {
     const std::string file_name;
 
 protected:
-    vec time;      // time
-    vec magnitude; // magnitude
+    vec time, magnitude;
 
 public:
     Tabular(unsigned, vec&&, vec&&);

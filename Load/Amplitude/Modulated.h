@@ -36,6 +36,7 @@
 
 class Modulated final : public Amplitude {
     const double amp;
+
     const std::vector<double> freq;
 
 public:

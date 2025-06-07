@@ -34,6 +34,7 @@
 
 class Combine final : public Amplitude {
     const uvec tag_pool;
+
     std::vector<ResourceHolder<Amplitude>> amp_pool;
 
 public:

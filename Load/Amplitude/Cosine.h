@@ -33,6 +33,7 @@
 
 class Cosine final : public Amplitude {
     const double period;
+
     const std::vector<double> amp;
 
 public:

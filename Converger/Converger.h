@@ -53,6 +53,7 @@ class Converger : public CopiableTag {
     double error = 0.; /**< current error */
 
     bool conv_flag = false; /**< converger flag */
+
 protected:
     [[nodiscard]] vec get_residual() const;
 

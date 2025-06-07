@@ -56,7 +56,7 @@ class DafaliasManzari final : protected DataDafaliasManzari, public Material3D {
     static const mat unit_dev_tensor;
 
     const double pr = (2. + 2. * poissons_ratio) / (3. - 6. * poissons_ratio);
-    const double gi = gr * shear_modulus * abs(pc);
+    const double gi = gr * shear_modulus * std::fabs(pc);
 
     static constexpr uword sa = 0, si = 0, sj = 1;
     static const span sb, sk, sl, sm;

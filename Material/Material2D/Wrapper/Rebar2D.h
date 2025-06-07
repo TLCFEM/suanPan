@@ -41,10 +41,10 @@ class Rebar2D final : public Material2D {
 public:
     Rebar2D(
         unsigned, // tag
-        unsigned, // material tag along x axis
-        unsigned, // material tag along y axis
-        double,   // reinforcement ratio along x axis
-        double    // reinforcement ratio along y axis
+        unsigned, // material tag along x-axis
+        unsigned, // material tag along y-axis
+        double,   // reinforcement ratio along x-axis
+        double    // reinforcement ratio along y-axis
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

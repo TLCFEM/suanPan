@@ -68,7 +68,7 @@ public:
     using Tag::Tag;
 
     CopiableTag(const CopiableTag&) = default;
-    CopiableTag(CopiableTag&&) = delete;
+    CopiableTag(CopiableTag&&) = default;
     CopiableTag& operator=(const CopiableTag&) = delete;
     CopiableTag& operator=(CopiableTag&&) = delete;
     ~CopiableTag() override = default;
