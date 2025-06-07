@@ -47,6 +47,11 @@ public:
     explicit ResourceHolder(std::unique_ptr<T>&& original_object)
         : object(std::move(original_object)) {}
 
+    template<typename U> requires std::is_base_of_v<T, U> ResourceHolder& operator=(U&& other) {
+        object = std::make_unique<U>(std::forward<U>(other));
+        return *this;
+    }
+
     ResourceHolder& operator=(const std::shared_ptr<T>& original_object) {
         if(nullptr != original_object) object = original_object->get_copy();
         return *this;

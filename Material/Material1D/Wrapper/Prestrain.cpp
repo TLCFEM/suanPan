@@ -33,7 +33,7 @@ int Prestrain::initialize(const shared_ptr<DomainBase>& D) {
     amplitude = D->get<Amplitude>(amplitude_tag);
     if(nullptr == amplitude || !amplitude->is_active()) {
         if(0u != amplitude_tag) suanpan_warning("The provided amplitude {} is not usable, using a default one instead.\n", amplitude_tag);
-        amplitude = std::make_shared<Ramp>(0);
+        amplitude = Ramp(0);
     }
     base = D->initialized_material_copy(base_tag);
     if(nullptr == base || base->get_material_type() != MaterialType::D1) {
