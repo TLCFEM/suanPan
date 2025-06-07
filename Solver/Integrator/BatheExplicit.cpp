@@ -22,7 +22,7 @@
 
 BatheExplicit::BatheExplicit(const unsigned T, const double R)
     : ExplicitIntegrator(T)
-    , P((2. - std::sqrt(2. + 2. * R)) / (1. - R))
+    , P(2. / (2. + std::sqrt(2. + 2. * R)))
     , Q1((.5 - P) / P / (1. - P))
     , Q2(.5 - P * Q1)
     , Q0(.5 - Q1 - Q2) {}
