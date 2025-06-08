@@ -59,6 +59,7 @@ void Domain::set_factory(const shared_ptr<LongFactory>& F) {
 const shared_ptr<LongFactory>& Domain::get_factory() const { return factory; }
 
 bool Domain::insert(const shared_ptr<std::future<void>>& T) {
+    std::erase_if(thread_pond, [](const shared_ptr<std::future<void>>& t_thread) { return std::future_status::ready == t_thread->wait_for(std::chrono::seconds(0)); });
     thread_pond.emplace_back(T);
     return true;
 }
