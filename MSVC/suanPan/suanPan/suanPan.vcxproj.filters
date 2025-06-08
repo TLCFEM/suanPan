@@ -1588,6 +1588,9 @@
     <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Prestrain.cpp">
       <Filter>Material\Material1D\Wrapper</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\GERKN.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2979,6 +2982,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Prestrain.h">
       <Filter>Material\Material1D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\GERKN.h">
+      <Filter>Solver\Integrator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

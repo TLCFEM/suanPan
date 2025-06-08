@@ -3,6 +3,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         BatheTwoStep.cpp
         GeneralizedAlpha.cpp
         GeneralizedAlphaExplicit.cpp
+        GERKN.cpp
         GSSSS.cpp
         Integrator.cpp
         LeeNewmark.cpp

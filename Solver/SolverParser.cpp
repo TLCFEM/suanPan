@@ -342,6 +342,15 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
 
         if(domain->insert(std::make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
+    else if(is_equal(integrator_type, "WAT2")) {
+        auto para = 1. / 3.;
+        if(!get_optional_input(command, para)) {
+            suanpan_error("A valid parameter is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(std::make_shared<WAT2>(tag, std::max(std::min(1., para), 0.)))) code = 1;
+    }
     else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
