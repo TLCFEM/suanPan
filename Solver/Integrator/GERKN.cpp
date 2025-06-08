@@ -112,4 +112,38 @@ void GERKN::clear_status() {
     ExplicitIntegrator::clear_status();
 }
 
-void GERKN::print() { suanpan_info("A generalized explicit RKN time integrator.\n"); }
+WAT2::WAT2(const unsigned T, double R)
+    : GERKN(T) {
+    R = std::min(1., std::max(0., R));
+    R = .1 * R + .3; // [0.3,0.4]
+
+    const auto E = 2. * R - 1.;
+    const auto D = 3. * R * R - 3. * R + 1.;
+    const auto F = R * D;
+    const auto E2 = E * E;
+
+    C1 = R;
+    C2 = (3. * C1 - 2.) / 3. / E;
+
+    VA10 = C1;
+    VA21 = 2. / 9. * D / C1 / E2;
+    VA20 = C2 - VA21;
+
+    UA10 = C1 / 6.;
+    UA20 = (3. * C1 - 1.) / 18. / C1;
+    UA21 = D / 18. / C1 / E2;
+
+    VB0 = 0.;
+    VB1 = .25 / D;
+    VB2 = 1. - VB1;
+
+    UB0 = (4. * C1 - 1.) / 12. / C1;
+    UB1 = (6. * C1 * C1 - 5. * C1 + 2.) / 24. / F;
+    UB2 = .5 - UB0 - UB1;
+
+    AB0 = (1. - 3. * C1) / C1;
+    AB1 = (-3. * C1 * C1 + 4. * C1 - 1.) / F;
+    AB2 = 1. - AB0 - AB1;
+}
+
+void WAT2::print() { suanpan_info("A generalized explicit RKN time integrator using WAT2 scheme with C1={}. doi:10.1002/nme.7658\n", C1); }

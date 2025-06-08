@@ -34,7 +34,7 @@
 
 #include "Integrator.h"
 
-class GERKN final : public ExplicitIntegrator {
+class GERKN : public ExplicitIntegrator {
     enum class FLAG {
         FIRST,
         SECOND
@@ -72,6 +72,11 @@ public:
 
     void commit_status() override;
     void clear_status() override;
+};
+
+class WAT2 final : public GERKN {
+public:
+    WAT2(unsigned, double);
 
     void print() override;
 };
