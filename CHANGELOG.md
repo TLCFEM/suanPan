@@ -9,6 +9,7 @@
 
 1. add optional hourglassing control for `CP4R` and `C3D8R` elements
 2. add `Prestrain` wrapper for uniaxial materials to apply prestrain [#266](https://github.com/TLCFEM/suanPan/pull/266)
+3. add `GERKN` generalized explicit RKN time integration [#268](https://github.com/TLCFEM/suanPan/pull/268)
 
 ## version 3.7
 
