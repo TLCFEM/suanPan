@@ -31,7 +31,7 @@ set fixed_step_size 1
 set symm_mat 0
 set linear_system
 
-integrator WAT2 1
+integrator WAT2 1 1.0
 
 converger RelIncreAcc 1 1E-10 10 0
 
@@ -41,13 +41,13 @@ analyze
 # Coordinate:
 #   0.0000e+00 -5.0000e+00
 # Displacement:
-#   3.3331e+00  1.2689e+00
+#   2.5718e+00  8.0212e+00
 # Resistance:
-#  -1.8335e+06  1.2361e+06
+#   3.9778e+02  3.4848e+03
 # Velocity:
-#  -2.7069e+02  9.1303e+02
+#   3.2633e+00  2.1262e+00
 # Acceleration:
-#   3.5311e+04 -3.4846e+04
+#  -1.8685e+01 -1.7542e+02
 peek node 2 3 4
 
 peek integrator 1
