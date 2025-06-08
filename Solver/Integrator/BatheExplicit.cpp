@@ -29,25 +29,6 @@ BatheExplicit::BatheExplicit(const unsigned T, const double R)
 
 bool BatheExplicit::has_corrector() const { return true; }
 
-void BatheExplicit::assemble_resistance() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    auto fa = std::async([&] { D->assemble_resistance(); });
-    auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
-    auto fd = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-
-    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
-}
-
-void BatheExplicit::assemble_matrix() { get_domain()->assemble_trial_mass(); }
-
 void BatheExplicit::update_incre_time(double T) {
     const auto& W = get_domain()->get_factory();
     update_parameter(T *= 2.);

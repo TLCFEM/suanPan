@@ -156,6 +156,9 @@ public:
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
 
+    void assemble_resistance() override;
+    void assemble_matrix() override;
+
     [[nodiscard]] const vec& get_trial_displacement() const override;
 
     void update_from_ninja() override;

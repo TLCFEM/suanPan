@@ -355,6 +355,25 @@ vec Integrator::from_total_acceleration(const double magnitude, const uvec& enco
 
 bool ImplicitIntegrator::time_independent_matrix() const { return false; }
 
+void ExplicitIntegrator::assemble_resistance() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    auto fa = std::async([&] { D->assemble_resistance(); });
+    auto fb = std::async([&] { D->assemble_damping_force(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
+
+    fa.get();
+    fb.get();
+    fc.get();
+    fd.get();
+
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
+}
+
+void ExplicitIntegrator::assemble_matrix() { get_domain()->assemble_trial_mass(); }
+
 const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain()->get_factory()->get_trial_acceleration(); }
 
 void ExplicitIntegrator::update_from_ninja() {

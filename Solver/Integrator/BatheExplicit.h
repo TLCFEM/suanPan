@@ -47,9 +47,6 @@ public:
 
     [[nodiscard]] bool has_corrector() const override;
 
-    void assemble_resistance() override;
-    void assemble_matrix() override;
-
     void update_incre_time(double) override;
 
     int update_trial_status(bool) override;
