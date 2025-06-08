@@ -54,6 +54,9 @@ class Integrator : public UniqueTag {
 
     std::weak_ptr<DomainBase> database;
 
+protected:
+    virtual void update_parameter(double);
+
 public:
     explicit Integrator(unsigned = 0);
 
@@ -128,8 +131,6 @@ public:
     virtual void commit_status();
     virtual void clear_status();
     virtual void reset_status();
-
-    virtual void update_parameter(double);
 
     virtual vec from_incre_velocity(const vec&, const uvec&);     // obtain target displacement from increment of velocity
     virtual vec from_incre_acceleration(const vec&, const uvec&); // obtain target displacement from increment of acceleration

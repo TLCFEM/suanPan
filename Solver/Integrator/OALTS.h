@@ -40,6 +40,9 @@ class OALTS final : public ImplicitIntegrator {
 
     bool if_starting = true;
 
+protected:
+    void update_parameter(double) override;
+
 public:
     OALTS(unsigned, double);
 
@@ -47,8 +50,6 @@ public:
     void assemble_matrix() override;
 
     int update_trial_status(bool) override;
-
-    void update_parameter(double) override;
 
     void commit_status() override;
     void clear_status() override;

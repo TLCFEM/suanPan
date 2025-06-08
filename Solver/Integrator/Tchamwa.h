@@ -35,12 +35,13 @@ class Tchamwa final : public ExplicitIntegrator {
     const double PHI;
     double DT{0.};
 
+protected:
+    void update_parameter(double) override;
+
 public:
     Tchamwa(unsigned, double);
 
     int update_trial_status(bool) override;
-
-    void update_parameter(double) override;
 
     void print() override;
 };

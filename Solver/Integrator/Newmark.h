@@ -45,8 +45,12 @@
 class Newmark : public ImplicitIntegrator {
     const double beta;  /**< parameter = .25 */
     const double gamma; /**< parameter = .5 */
+
 protected:
+    void update_parameter(double) override;
+
     double C0 = 0., C1 = 0., C2 = 0., C3 = 0., C4 = 0., C5 = 0.; /**< parameters */
+
 public:
     explicit Newmark(unsigned = 0, double = .25, double = .5);
 
@@ -54,8 +58,6 @@ public:
     void assemble_matrix() override;
 
     int update_trial_status(bool) override;
-
-    void update_parameter(double) override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;

@@ -42,6 +42,9 @@ class BatheExplicit final : public ExplicitIntegrator {
     const double P, Q1, Q2, Q0;
     double DT{0.}, A0{0.}, A1{0.}, A2{0.}, A3{0.}, A4{0.}, A5{0.}, A6{0.}, A7{0.};
 
+protected:
+    void update_parameter(double) override;
+
 public:
     BatheExplicit(unsigned, double);
 
@@ -54,8 +57,6 @@ public:
 
     void commit_status() override;
     void clear_status() override;
-
-    void update_parameter(double) override;
 
     void print() override;
 };

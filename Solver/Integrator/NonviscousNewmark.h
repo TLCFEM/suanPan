@@ -44,6 +44,9 @@ class NonviscousNewmark : public Newmark {
 
     cx_mat current_damping;
 
+protected:
+    void update_parameter(double) override;
+
 public:
     NonviscousNewmark(unsigned, double, double, cx_vec&&, cx_vec&&);
 
@@ -51,8 +54,6 @@ public:
 
     void assemble_resistance() override;
     void assemble_matrix() override;
-
-    void update_parameter(double) override;
 
     void commit_status() override;
     void clear_status() override;

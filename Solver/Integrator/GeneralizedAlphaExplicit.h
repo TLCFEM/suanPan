@@ -35,6 +35,9 @@ class GeneralizedAlphaExplicit final : public ExplicitIntegrator {
     const double B, AM, AF;
     double DT{0.};
 
+protected:
+    void update_parameter(double) override;
+
 public:
     GeneralizedAlphaExplicit(unsigned, double);
 
@@ -53,8 +56,6 @@ public:
 
     int update_trial_status(bool) override;
     int correct_trial_status() override;
-
-    void update_parameter(double) override;
 
     void print() override;
 };

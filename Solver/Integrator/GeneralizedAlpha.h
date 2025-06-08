@@ -49,6 +49,9 @@ class GeneralizedAlpha final : public ImplicitIntegrator {
 
     double F5 = 0., F6 = 0., F7 = 0., F8 = 0., F10 = 0., F11 = 0.;
 
+protected:
+    void update_parameter(double) override;
+
 public:
     GeneralizedAlpha(unsigned, double);
     GeneralizedAlpha(unsigned, double, double);
@@ -66,8 +69,6 @@ public:
     [[nodiscard]] int process_constraint_resistance() override;
 
     int update_trial_status(bool) override;
-
-    void update_parameter(double) override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;

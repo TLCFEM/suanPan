@@ -37,6 +37,8 @@
 
 class GSSSS : public ImplicitIntegrator {
 protected:
+    void update_parameter(double) override;
+
     const double L1, L2, L4;
 
     double L3 = 0., L5 = 0.;
@@ -65,8 +67,6 @@ public:
     [[nodiscard]] int process_constraint_resistance() override;
 
     int update_trial_status(bool) override;
-
-    void update_parameter(double) override;
 
     vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;
