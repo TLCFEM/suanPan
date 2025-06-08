@@ -120,6 +120,4 @@ void BatheExplicit::update_parameter(const double NT) {
     A7 = Q2 * A3;
 }
 
-void BatheExplicit::print() {
-    suanpan_info("A BatheExplicit time integrator.\n");
-}
+void BatheExplicit::print() { suanpan_info("An explicit Bathe time integrator. doi:10.1016/j.compstruc.2013.06.007\n"); }

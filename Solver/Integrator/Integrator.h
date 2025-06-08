@@ -77,8 +77,8 @@ public:
 
     [[nodiscard]] virtual int process_load();
     [[nodiscard]] virtual int process_constraint();
-    [[nodiscard]] virtual int process_criterion();
-    [[nodiscard]] virtual int process_modifier();
+    [[nodiscard]] int process_criterion();
+    [[nodiscard]] int process_modifier();
     [[nodiscard]] virtual int process_load_resistance();
     [[nodiscard]] virtual int process_constraint_resistance();
 
@@ -89,25 +89,25 @@ public:
 
     virtual vec get_force_residual();
     virtual vec get_displacement_residual();
-    virtual vec get_auxiliary_residual();
+    vec get_auxiliary_residual();
     virtual sp_mat get_reference_load();
 
     [[nodiscard]] virtual const vec& get_trial_displacement() const;
 
-    virtual void update_load();
-    virtual void update_constraint();
+    void update_load();
+    void update_constraint();
 
-    virtual void update_trial_load_factor(double);
-    virtual void update_trial_load_factor(const vec&);
+    void update_trial_load_factor(double);
+    void update_trial_load_factor(const vec&);
     virtual void update_from_ninja();
 
-    virtual void update_trial_time(double);
+    void update_trial_time(double);
     virtual void update_incre_time(double);
 
     virtual int update_trial_status(bool);
     virtual int correct_trial_status();
 
-    virtual int sync_status(bool);
+    int sync_status(bool);
 
     virtual int update_internal(const mat&);
 
@@ -120,11 +120,11 @@ public:
     virtual int solve(mat&, mat&&);
     virtual int solve(mat&, sp_mat&&);
 
-    virtual void erase_machine_error(vec&) const;
+    void erase_machine_error(vec&) const;
 
     void stage_and_commit_status();
 
-    virtual void stage_status();
+    void stage_status();
     virtual void commit_status();
     virtual void clear_status();
     virtual void reset_status();
