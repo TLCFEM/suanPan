@@ -75,9 +75,9 @@ int Integrator::process_constraint() {
     return code;
 }
 
-int Integrator::process_criterion() { return database.lock()->process_criterion(); }
+int Integrator::process_criterion() const { return database.lock()->process_criterion(); }
 
-int Integrator::process_modifier() { return database.lock()->process_modifier(); }
+int Integrator::process_modifier() const { return database.lock()->process_modifier(); }
 
 int Integrator::process_load_resistance() { return database.lock()->process_load(false); }
 
@@ -148,7 +148,7 @@ vec Integrator::get_displacement_residual() {
 /**
  * Assemble the global residual vector due to nonlinear constraints implemented via the multiplier method.
  */
-vec Integrator::get_auxiliary_residual() {
+vec Integrator::get_auxiliary_residual() const {
     auto& W = get_domain()->get_factory();
 
     return W->get_auxiliary_load() - W->get_auxiliary_resistance();
@@ -158,13 +158,13 @@ sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()-
 
 const vec& Integrator::get_trial_displacement() const { return database.lock()->get_factory()->get_trial_displacement(); }
 
-void Integrator::update_load() { database.lock()->update_load(); }
+void Integrator::update_load() const { database.lock()->update_load(); }
 
-void Integrator::update_constraint() { database.lock()->update_constraint(); }
+void Integrator::update_constraint() const { database.lock()->update_constraint(); }
 
-void Integrator::update_trial_load_factor(const double lambda) { update_trial_load_factor(vec{lambda}); }
+void Integrator::update_trial_load_factor(const double lambda) const { update_trial_load_factor(vec{lambda}); }
 
-void Integrator::update_trial_load_factor(const vec& lambda) {
+void Integrator::update_trial_load_factor(const vec& lambda) const {
     auto& W = get_domain()->get_factory();
     W->update_trial_load_factor_by(lambda);
 }
@@ -285,7 +285,7 @@ void Integrator::stage_and_commit_status() {
     commit_status();
 }
 
-void Integrator::stage_status() { database.lock()->stage_status(); }
+void Integrator::stage_status() const { database.lock()->stage_status(); }
 
 void Integrator::commit_status() { database.lock()->commit_status(); }
 
