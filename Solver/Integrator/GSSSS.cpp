@@ -20,6 +20,56 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+void GSSSS::update_parameter(const double NT) {
+    if(suanpan::approx_equal(DT, NT)) return;
+
+    DT = NT;
+
+    const auto L3T = 1. / L3 / DT;
+
+    C0 = L3T / DT;
+    C1 = -L1 * L3T;
+    C2 = -L2 / L3;
+    C3 = L4 * DT;
+    C4 = L5 * DT;
+
+    XD = L3 / W3G3;
+    XV = W2G5 / W3G3 / DT;
+    XA = W1G6 / W3G3 / DT / DT;
+}
+
+int GSSSS::process_load_impl(const bool full) {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
+
+    W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
+
+    const auto code = ImplicitIntegrator::process_load_impl(full);
+
+    W->update_trial_time(trial_time);
+
+    return code;
+}
+
+int GSSSS::process_constraint_impl(const bool full) {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
+
+    W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
+
+    const auto code = ImplicitIntegrator::process_constraint_impl(full);
+
+    W->update_trial_time(trial_time);
+
+    return code;
+}
+
 GSSSS::GSSSS(const unsigned T)
     : ImplicitIntegrator(T)
     , L1(1.)
@@ -72,70 +122,6 @@ vec GSSSS::get_displacement_residual() { return XD * ImplicitIntegrator::get_dis
 
 sp_mat GSSSS::get_reference_load() { return XD * ImplicitIntegrator::get_reference_load(); }
 
-int GSSSS::process_load() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    const sp_d auto current_time = W->get_current_time();
-    const sp_d auto trial_time = W->get_trial_time();
-
-    W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
-
-    const auto code = ImplicitIntegrator::process_load();
-
-    W->update_trial_time(trial_time);
-
-    return code;
-}
-
-int GSSSS::process_constraint() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    const sp_d auto current_time = W->get_current_time();
-    const sp_d auto trial_time = W->get_trial_time();
-
-    W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
-
-    const auto code = ImplicitIntegrator::process_constraint();
-
-    W->update_trial_time(trial_time);
-
-    return code;
-}
-
-int GSSSS::process_load_resistance() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    const sp_d auto current_time = W->get_current_time();
-    const sp_d auto trial_time = W->get_trial_time();
-
-    W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
-
-    const auto code = ImplicitIntegrator::process_load_resistance();
-
-    W->update_trial_time(trial_time);
-
-    return code;
-}
-
-int GSSSS::process_constraint_resistance() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    const sp_d auto current_time = W->get_current_time();
-    const sp_d auto trial_time = W->get_trial_time();
-
-    W->update_trial_time((1. - W1) * current_time + W1 * trial_time);
-
-    const auto code = ImplicitIntegrator::process_constraint_resistance();
-
-    W->update_trial_time(trial_time);
-
-    return code;
-}
-
 int GSSSS::update_trial_status(bool) {
     const auto D = get_domain();
     auto& W = D->get_factory();
@@ -144,24 +130,6 @@ int GSSSS::update_trial_status(bool) {
     W->update_incre_velocity(C3 * W->get_current_acceleration() + C4 * W->get_incre_acceleration());
 
     return D->update_trial_status();
-}
-
-void GSSSS::update_parameter(const double NT) {
-    if(suanpan::approx_equal(DT, NT)) return;
-
-    DT = NT;
-
-    const auto L3T = 1. / L3 / DT;
-
-    C0 = L3T / DT;
-    C1 = -L1 * L3T;
-    C2 = -L2 / L3;
-    C3 = L4 * DT;
-    C4 = L5 * DT;
-
-    XD = L3 / W3G3;
-    XV = W2G5 / W3G3 / DT;
-    XA = W1G6 / W3G3 / DT / DT;
 }
 
 vec GSSSS::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {

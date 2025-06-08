@@ -38,6 +38,9 @@ class GeneralizedAlphaExplicit final : public ExplicitIntegrator {
 protected:
     void update_parameter(double) override;
 
+    [[nodiscard]] int process_load_impl(bool) override;
+    [[nodiscard]] int process_constraint_impl(bool) override;
+
 public:
     GeneralizedAlphaExplicit(unsigned, double);
 
@@ -48,11 +51,6 @@ public:
     vec get_force_residual() override;
     vec get_displacement_residual() override;
     sp_mat get_reference_load() override;
-
-    [[nodiscard]] int process_load() override;
-    [[nodiscard]] int process_constraint() override;
-    [[nodiscard]] int process_load_resistance() override;
-    [[nodiscard]] int process_constraint_resistance() override;
 
     int update_trial_status(bool) override;
     int correct_trial_status() override;

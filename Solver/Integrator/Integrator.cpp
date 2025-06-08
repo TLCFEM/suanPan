@@ -20,6 +20,22 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+int Integrator::process_load_impl(const bool full) { return database.lock()->process_load(full); }
+
+int Integrator::process_constraint_impl(const bool full) {
+    const auto D = database.lock();
+    auto& W = D->get_factory();
+
+    const auto code = D->process_constraint(full);
+
+    W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
+
+    // some constraints may have stiffness
+    if(full) D->assemble_constraint_stiffness();
+
+    return code;
+}
+
 Integrator::Integrator(const unsigned T)
     : UniqueTag(T) {}
 
@@ -53,7 +69,7 @@ bool Integrator::has_corrector() const { return false; }
 
 bool Integrator::time_independent_matrix() const { return true; }
 
-int Integrator::process_load() { return database.lock()->process_load(true); }
+int Integrator::process_load() { return process_load_impl(true); }
 
 /**
  * The main task of this method is to apply constraints (of various forms implemented in various methods).
@@ -61,25 +77,13 @@ int Integrator::process_load() { return database.lock()->process_load(true); }
  * Combinations of different methods need to be considered: 1) penalty, 2) multiplier.
  * On exit, the global stiffness matrix should be updated, the global residual vector should be updated.
  */
-int Integrator::process_constraint() {
-    const auto D = database.lock();
-    auto& W = D->get_factory();
-
-    const auto code = D->process_constraint(true);
-
-    W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
-
-    // some constraints may have stiffness
-    D->assemble_constraint_stiffness();
-
-    return code;
-}
+int Integrator::process_constraint() { return process_constraint_impl(true); }
 
 int Integrator::process_criterion() const { return database.lock()->process_criterion(); }
 
 int Integrator::process_modifier() const { return database.lock()->process_modifier(); }
 
-int Integrator::process_load_resistance() { return database.lock()->process_load(false); }
+int Integrator::process_load_resistance() { return process_load_impl(false); }
 
 /**
  * This method is similar to process_constraint(), but it only updates the global residual vector.
@@ -88,16 +92,7 @@ int Integrator::process_load_resistance() { return database.lock()->process_load
  * Subsequent iterations do not assemble the global stiffness matrix again and reuse the factorised matrix.
  * In this case, the factorised matrix cannot be modified.
  */
-int Integrator::process_constraint_resistance() {
-    const auto D = database.lock();
-    auto& W = D->get_factory();
-
-    const auto code = D->process_constraint(false);
-
-    W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
-
-    return code;
-}
+int Integrator::process_constraint_resistance() { return process_constraint_impl(false); }
 
 void Integrator::record() const { database.lock()->record(); }
 

@@ -20,6 +20,49 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+void GeneralizedAlpha::update_parameter(const double NT) {
+    if(suanpan::approx_equal(F10, NT)) return;
+
+    F10 = NT;
+    F11 = F10 * gamma;
+    F8 = -1. / beta / F10;
+    F7 = -F8 / F10;
+    F6 = -gamma * F8 * F2;
+    F5 = F4 * F7;
+}
+
+int GeneralizedAlpha::process_load_impl(const bool full) {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
+
+    W->update_trial_time(F1 * current_time + F2 * trial_time);
+
+    const auto code = ImplicitIntegrator::process_load_impl(full);
+
+    W->update_trial_time(trial_time);
+
+    return code;
+}
+
+int GeneralizedAlpha::process_constraint_impl(const bool full) {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    const sp_d auto current_time = W->get_current_time();
+    const sp_d auto trial_time = W->get_trial_time();
+
+    W->update_trial_time(F1 * current_time + F2 * trial_time);
+
+    const auto code = ImplicitIntegrator::process_constraint_impl(full);
+
+    W->update_trial_time(trial_time);
+
+    return code;
+}
+
 GeneralizedAlpha::GeneralizedAlpha(const unsigned T, const double R)
     : ImplicitIntegrator(T)
     , alpha_f(R / (R + 1.))
@@ -93,70 +136,6 @@ vec GeneralizedAlpha::get_displacement_residual() { return ImplicitIntegrator::g
 
 sp_mat GeneralizedAlpha::get_reference_load() { return ImplicitIntegrator::get_reference_load() / F2; }
 
-int GeneralizedAlpha::process_load() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    const sp_d auto current_time = W->get_current_time();
-    const sp_d auto trial_time = W->get_trial_time();
-
-    W->update_trial_time(F1 * current_time + F2 * trial_time);
-
-    const auto code = ImplicitIntegrator::process_load();
-
-    W->update_trial_time(trial_time);
-
-    return code;
-}
-
-int GeneralizedAlpha::process_constraint() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    const sp_d auto current_time = W->get_current_time();
-    const sp_d auto trial_time = W->get_trial_time();
-
-    W->update_trial_time(F1 * current_time + F2 * trial_time);
-
-    const auto code = ImplicitIntegrator::process_constraint();
-
-    W->update_trial_time(trial_time);
-
-    return code;
-}
-
-int GeneralizedAlpha::process_load_resistance() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    const sp_d auto current_time = W->get_current_time();
-    const sp_d auto trial_time = W->get_trial_time();
-
-    W->update_trial_time(F1 * current_time + F2 * trial_time);
-
-    const auto code = ImplicitIntegrator::process_load_resistance();
-
-    W->update_trial_time(trial_time);
-
-    return code;
-}
-
-int GeneralizedAlpha::process_constraint_resistance() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    const sp_d auto current_time = W->get_current_time();
-    const sp_d auto trial_time = W->get_trial_time();
-
-    W->update_trial_time(F1 * current_time + F2 * trial_time);
-
-    const auto code = ImplicitIntegrator::process_constraint_resistance();
-
-    W->update_trial_time(trial_time);
-
-    return code;
-}
-
 int GeneralizedAlpha::update_trial_status(bool) {
     const auto D = get_domain();
     auto& W = D->get_factory();
@@ -165,17 +144,6 @@ int GeneralizedAlpha::update_trial_status(bool) {
     W->update_incre_velocity(F10 * W->get_current_acceleration() + F11 * W->get_incre_acceleration());
 
     return D->update_trial_status();
-}
-
-void GeneralizedAlpha::update_parameter(const double NT) {
-    if(suanpan::approx_equal(F10, NT)) return;
-
-    F10 = NT;
-    F11 = F10 * gamma;
-    F8 = -1. / beta / F10;
-    F7 = -F8 / F10;
-    F6 = -gamma * F8 * F2;
-    F5 = F4 * F7;
 }
 
 vec GeneralizedAlpha::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {

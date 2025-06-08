@@ -57,6 +57,9 @@ class Integrator : public UniqueTag {
 protected:
     virtual void update_parameter(double);
 
+    [[nodiscard]] virtual int process_load_impl(bool);
+    [[nodiscard]] virtual int process_constraint_impl(bool);
+
 public:
     explicit Integrator(unsigned = 0);
 
@@ -78,11 +81,11 @@ public:
     [[nodiscard]] virtual bool has_corrector() const;
     [[nodiscard]] virtual bool time_independent_matrix() const;
 
-    [[nodiscard]] virtual int process_load();
+    [[nodiscard]] int process_load();
     [[nodiscard]] virtual int process_constraint();
     [[nodiscard]] int process_criterion() const;
     [[nodiscard]] int process_modifier() const;
-    [[nodiscard]] virtual int process_load_resistance();
+    [[nodiscard]] int process_load_resistance();
     [[nodiscard]] virtual int process_constraint_resistance();
 
     void record() const;
