@@ -2143,6 +2143,12 @@
       "contents": "integrator WilsonPenzienNewmark ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4...]}\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark algorithm\n# (3) double, beta in Newmark algorithm\n# [4...] double, damping ratios on the first n modes"
     },
     {
+      "trigger": "WAT2",
+      "details": "generalized explicit RKN time integration",
+      "kind": "keyword",
+      "contents": "integrator WAT2 ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, parameter, default: 1/3"
+    },
+    {
       "trigger": "Yeoh",
       "details": "yeoh material",
       "kind": "type",
