@@ -56,6 +56,8 @@ peek node 7
 
 peek amplitude 1 2 3 4 5 6
 
+peek recorder 1 2 3
+
 reset
 clear
 exit
