@@ -71,7 +71,8 @@ jobs:
         if: |
           matrix.build == 'Debug' && 
           matrix.compiler.c == 'gcc' &&
-          matrix.avx == 'OFF'
+          matrix.avx == 'OFF' &&
+          matrix.vtk == 'OFF'
         run: |
           echo "COVERAGE=ON" >> "$GITHUB_ENV"
       - name: Compile
