@@ -107,7 +107,7 @@ public:
     virtual void set_factory(const shared_ptr<LongFactory>&) = 0;
     [[nodiscard]] virtual const shared_ptr<LongFactory>& get_factory() const = 0;
 
-    virtual bool insert(const shared_ptr<std::future<void>>&) = 0;
+    virtual bool insert(std::future<void>&&) = 0;
 
     virtual void wait() = 0;
 

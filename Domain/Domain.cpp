@@ -46,7 +46,7 @@ Domain::Domain(const unsigned T)
     , attribute(10, false) {}
 
 Domain::~Domain() {
-    for(const auto& I : thread_pond) I->get();
+    for(auto& thread : thread_pond) thread.get();
 }
 
 void Domain::set_factory(const shared_ptr<LongFactory>& F) {
@@ -58,14 +58,14 @@ void Domain::set_factory(const shared_ptr<LongFactory>& F) {
 
 const shared_ptr<LongFactory>& Domain::get_factory() const { return factory; }
 
-bool Domain::insert(const shared_ptr<std::future<void>>& T) {
-    std::erase_if(thread_pond, [](const shared_ptr<std::future<void>>& t_thread) { return std::future_status::ready == t_thread->wait_for(std::chrono::seconds(0)); });
-    thread_pond.emplace_back(T);
+bool Domain::insert(std::future<void>&& T) {
+    std::erase_if(thread_pond, [](const std::future<void>& thread) { return std::future_status::ready == thread.wait_for(std::chrono::seconds(0)); });
+    thread_pond.emplace_back(std::move(T));
     return true;
 }
 
 void Domain::wait() {
-    for(const auto& thread : thread_pond) thread->wait();
+    for(const auto& thread : thread_pond) thread.wait();
 }
 
 bool Domain::insert(const shared_ptr<ExternalModule>& E) {
