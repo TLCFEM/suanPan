@@ -55,7 +55,7 @@ int BatheExplicit::update_trial_status(bool) {
 int BatheExplicit::correct_trial_status() {
     const auto D = get_domain();
 
-    if(auto& W = D->get_factory(); FLAG::FIRST == step_flag) W->update_incre_velocity(A2 * W->get_incre_acceleration());
+    if(auto& W = D->get_factory(); FLAG::FIRST == step_flag) W->update_incre_velocity(A2 * (W->get_current_acceleration() + W->get_trial_acceleration()));
     else W->update_incre_velocity(A5 * W->get_pre_acceleration() + A6 * W->get_current_acceleration() + A7 * W->get_trial_acceleration());
 
     return D->update_trial_status();
