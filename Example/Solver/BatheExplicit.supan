@@ -41,13 +41,13 @@ analyze
 # Coordinate:
 #   0.0000e+00 -5.0000e+00
 # Displacement:
-#   2.1257e+00  9.3850e+00
+#   2.5650e+00  7.9871e+00
 # Resistance:
-#   2.7423e+03  3.8522e+03
+#   2.0905e+02  1.8927e+03
 # Velocity:
-#   1.8386e-01  6.4155e-01
+#   3.2405e+00  1.7753e+00
 # Acceleration:
-#  -1.3711e+02 -2.0261e+02
+#  -1.0453e+01 -1.0464e+02
 peek node 2 3 4
 
 peek integrator 1
