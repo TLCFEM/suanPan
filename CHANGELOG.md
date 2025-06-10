@@ -11,6 +11,7 @@
 2. add `Prestrain` wrapper for uniaxial materials to apply prestrain [#266](https://github.com/TLCFEM/suanPan/pull/266)
 3. add `GERKN` generalized explicit RKN time integration [#268](https://github.com/TLCFEM/suanPan/pull/268)
 4. fix improper detection of linear systems [#270](https://github.com/TLCFEM/suanPan/pull/270)
+5. fix wrong corrector in explicit Bathe time integration [#272](https://github.com/TLCFEM/suanPan/pull/272)
 
 ## version 3.7
 
