@@ -58,8 +58,8 @@ bool Solver::constant_matrix() const {
 
     // need to satisfy a number of conditions:
     // 1. fixed step size
-    // 2. if not fixed step size, the effective stiffness needs to be independent from time
+    // 2. the effective stiffness needs to be independent of time
     // 3. the system needs to be linear
     // 4. the effective stiffness has been assembled
-    return (S->is_fixed_step_size() || G->time_independent_matrix()) && D->get_attribute(ModalAttribute::LinearSystem) && G->matrix_is_assembled();
+    return S->is_fixed_step_size() && G->time_independent_matrix() && D->get_attribute(ModalAttribute::LinearSystem) && G->matrix_is_assembled();
 }
