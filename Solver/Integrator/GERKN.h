@@ -64,6 +64,7 @@ public:
     using ExplicitIntegrator::ExplicitIntegrator;
 
     [[nodiscard]] bool has_corrector() const override;
+    [[nodiscard]] bool time_independent_matrix() const override;
 
     void update_incre_time(double) override;
 

@@ -52,6 +52,8 @@ int GERKN::process_constraint_impl(const bool full) {
 
 bool GERKN::has_corrector() const { return true; }
 
+bool GERKN::time_independent_matrix() const { return false; }
+
 void GERKN::update_incre_time(double T) {
     const auto& W = get_domain()->get_factory();
     update_parameter(T *= 2.);
