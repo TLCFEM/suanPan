@@ -29,6 +29,8 @@ BatheExplicit::BatheExplicit(const unsigned T, const double R)
 
 bool BatheExplicit::has_corrector() const { return true; }
 
+bool BatheExplicit::time_independent_matrix() const { return false; }
+
 void BatheExplicit::update_incre_time(double T) {
     const auto& W = get_domain()->get_factory();
     update_parameter(T *= 2.);

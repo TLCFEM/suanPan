@@ -67,6 +67,12 @@ bool Integrator::matrix_is_assembled() const { return matrix_assembled_switch; }
 
 bool Integrator::has_corrector() const { return false; }
 
+/**
+ * Indicate whether the matrix is independent of time, that is, the system does not change with time.
+ * This helps to determine whether the matrix needs to be reassembled.
+ * For single-step methods, it is typically true.
+ * For multistep methods, it is typically false.
+ */
 bool Integrator::time_independent_matrix() const { return true; }
 
 int Integrator::process_load() { return process_load_impl(true); }

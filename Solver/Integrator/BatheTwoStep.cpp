@@ -27,6 +27,8 @@ BatheTwoStep::BatheTwoStep(const unsigned T, const double R, const double G)
     , Q2(.5 - GM * Q1)
     , Q0(1. - Q1 - Q2) {}
 
+bool BatheTwoStep::time_independent_matrix() const { return false; }
+
 void BatheTwoStep::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();

@@ -51,6 +51,8 @@ protected:
 public:
     BatheTwoStep(unsigned, double, double);
 
+    [[nodiscard]] bool time_independent_matrix() const override;
+
     void assemble_resistance() override;
     void assemble_matrix() override;
 
