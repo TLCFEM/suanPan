@@ -41,6 +41,9 @@ class Solver : public UniqueTag {
 
     double step_amplifier = 1.0;
 
+protected:
+    [[nodiscard]] bool constant_matrix() const;
+
 public:
     explicit Solver(unsigned = 0);
 
@@ -58,8 +61,6 @@ public:
 
     void set_integrator(const shared_ptr<Integrator>&);
     [[nodiscard]] const shared_ptr<Integrator>& get_integrator() const;
-
-    [[nodiscard]] bool constant_matrix() const;
 };
 
 #endif
