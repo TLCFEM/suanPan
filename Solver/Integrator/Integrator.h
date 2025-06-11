@@ -60,6 +60,8 @@ protected:
     [[nodiscard]] virtual int process_load_impl(bool);
     [[nodiscard]] virtual int process_constraint_impl(bool);
 
+    virtual int correct_trial_status();
+
 public:
     explicit Integrator(unsigned = 0);
 
@@ -111,7 +113,6 @@ public:
     virtual void update_incre_time(double);
 
     virtual int update_trial_status(bool);
-    virtual int correct_trial_status();
 
     int sync_status(bool);
 

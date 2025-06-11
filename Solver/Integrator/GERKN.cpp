@@ -50,7 +50,21 @@ int GERKN::process_constraint_impl(const bool full) {
     return code;
 }
 
-bool GERKN::has_corrector() const { return true; }
+int GERKN::correct_trial_status() {
+    // it is guaranteed that it is the second stage when this method is called
+    // if(FLAG::FIRST == step_flag) return SUANPAN_SUCCESS;
+
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    W->update_trial_displacement(W->get_pre_displacement() + DT * W->get_pre_velocity() + DT * DT * UB0 * W->get_pre_acceleration() + DT * DT * UB1 * W->get_current_acceleration() + DT * DT * UB2 * W->get_trial_acceleration());
+    W->update_trial_velocity(W->get_pre_velocity() + DT * VB0 * W->get_pre_acceleration() + DT * VB1 * W->get_current_acceleration() + DT * VB2 * W->get_trial_acceleration());
+    W->update_trial_acceleration(AB0 * W->get_pre_acceleration() + AB1 * W->get_current_acceleration() + AB2 * W->get_trial_acceleration());
+
+    return D->update_trial_status();
+}
+
+bool GERKN::has_corrector() const { return FLAG::FIRST != step_flag; }
 
 bool GERKN::time_independent_matrix() const { return false; }
 
@@ -71,19 +85,6 @@ int GERKN::update_trial_status(bool) {
         W->update_incre_velocity(DT * (VA20 - VA10) * W->get_pre_acceleration() + DT * VA21 * W->get_current_acceleration());
         W->update_incre_displacement(DT * (C2 - C1) * W->get_pre_velocity() + DT * DT * (UA20 - UA10) * W->get_pre_acceleration() + DT * DT * UA21 * W->get_current_acceleration());
     }
-
-    return D->update_trial_status();
-}
-
-int GERKN::correct_trial_status() {
-    if(FLAG::FIRST == step_flag) return SUANPAN_SUCCESS;
-
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    W->update_trial_displacement(W->get_pre_displacement() + DT * W->get_pre_velocity() + DT * DT * UB0 * W->get_pre_acceleration() + DT * DT * UB1 * W->get_current_acceleration() + DT * DT * UB2 * W->get_trial_acceleration());
-    W->update_trial_velocity(W->get_pre_velocity() + DT * VB0 * W->get_pre_acceleration() + DT * VB1 * W->get_current_acceleration() + DT * VB2 * W->get_trial_acceleration());
-    W->update_trial_acceleration(AB0 * W->get_pre_acceleration() + AB1 * W->get_current_acceleration() + AB2 * W->get_trial_acceleration());
 
     return D->update_trial_status();
 }

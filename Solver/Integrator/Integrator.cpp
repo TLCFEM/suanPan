@@ -36,6 +36,8 @@ int Integrator::process_constraint_impl(const bool full) {
     return code;
 }
 
+int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
+
 Integrator::Integrator(const unsigned T)
     : UniqueTag(T) {}
 
@@ -193,8 +195,6 @@ int Integrator::update_trial_status(const bool detect_trivial) {
 
     return detect_trivial && suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
 }
-
-int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
 
 /**
  * When a new displacement increment is computed, it is added to global displacement vector.

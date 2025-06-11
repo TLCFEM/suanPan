@@ -20,6 +20,30 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+void BatheExplicit::update_parameter(const double NT) {
+    if(suanpan::approx_equal(DT, NT)) return;
+
+    DT = NT;
+
+    A0 = P * DT;
+    A2 = .5 * A0;
+    A1 = A0 * A2;
+    A3 = DT - A0;
+    A4 = .5 * A3 * A3;
+    A5 = Q0 * A3;
+    A6 = (.5 + Q1) * A3;
+    A7 = Q2 * A3;
+}
+
+int BatheExplicit::correct_trial_status() {
+    const auto D = get_domain();
+
+    if(auto& W = D->get_factory(); FLAG::FIRST == step_flag) W->update_incre_velocity(A2 * (W->get_current_acceleration() + W->get_trial_acceleration()));
+    else W->update_incre_velocity(A5 * W->get_pre_acceleration() + A6 * W->get_current_acceleration() + A7 * W->get_trial_acceleration());
+
+    return D->update_trial_status();
+}
+
 BatheExplicit::BatheExplicit(const unsigned T, const double R)
     : ExplicitIntegrator(T)
     , P(2. / (2. + std::sqrt(2. + 2. * R)))
@@ -52,15 +76,6 @@ int BatheExplicit::update_trial_status(bool) {
     return D->update_trial_status();
 }
 
-int BatheExplicit::correct_trial_status() {
-    const auto D = get_domain();
-
-    if(auto& W = D->get_factory(); FLAG::FIRST == step_flag) W->update_incre_velocity(A2 * (W->get_current_acceleration() + W->get_trial_acceleration()));
-    else W->update_incre_velocity(A5 * W->get_pre_acceleration() + A6 * W->get_current_acceleration() + A7 * W->get_trial_acceleration());
-
-    return D->update_trial_status();
-}
-
 void BatheExplicit::commit_status() {
     const auto D = get_domain();
     auto& W = D->get_factory();
@@ -86,21 +101,6 @@ void BatheExplicit::clear_status() {
     set_time_step_switch(true);
 
     ExplicitIntegrator::clear_status();
-}
-
-void BatheExplicit::update_parameter(const double NT) {
-    if(suanpan::approx_equal(DT, NT)) return;
-
-    DT = NT;
-
-    A0 = P * DT;
-    A2 = .5 * A0;
-    A1 = A0 * A2;
-    A3 = DT - A0;
-    A4 = .5 * A3 * A3;
-    A5 = Q0 * A3;
-    A6 = (.5 + Q1) * A3;
-    A7 = Q2 * A3;
 }
 
 void BatheExplicit::print() { suanpan_info("An explicit Bathe time integrator. doi:10.1016/j.compstruc.2013.06.007\n"); }

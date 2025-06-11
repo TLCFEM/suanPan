@@ -45,6 +45,8 @@ class BatheExplicit final : public ExplicitIntegrator {
 protected:
     void update_parameter(double) override;
 
+    int correct_trial_status() override;
+
 public:
     BatheExplicit(unsigned, double);
 
@@ -54,7 +56,6 @@ public:
     void update_incre_time(double) override;
 
     int update_trial_status(bool) override;
-    int correct_trial_status() override;
 
     void commit_status() override;
     void clear_status() override;

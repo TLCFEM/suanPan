@@ -50,6 +50,8 @@ protected:
     [[nodiscard]] int process_load_impl(bool) override;
     [[nodiscard]] int process_constraint_impl(bool) override;
 
+    int correct_trial_status() override;
+
     double C1{0.}, C2{0.};
 
     double UA10{0.}, UA20{0.}, UA21{0.};
@@ -69,7 +71,6 @@ public:
     void update_incre_time(double) override;
 
     int update_trial_status(bool) override;
-    int correct_trial_status() override;
 
     void commit_status() override;
     void clear_status() override;

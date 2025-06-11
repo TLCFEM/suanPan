@@ -41,6 +41,8 @@ protected:
     [[nodiscard]] int process_load_impl(bool) override;
     [[nodiscard]] int process_constraint_impl(bool) override;
 
+    int correct_trial_status() override;
+
 public:
     GeneralizedAlphaExplicit(unsigned, double);
 
@@ -53,7 +55,6 @@ public:
     sp_mat get_reference_load() override;
 
     int update_trial_status(bool) override;
-    int correct_trial_status() override;
 
     void print() override;
 };

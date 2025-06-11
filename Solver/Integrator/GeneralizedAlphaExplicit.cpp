@@ -54,6 +54,15 @@ int GeneralizedAlphaExplicit::process_constraint_impl(const bool full) {
     return code;
 }
 
+int GeneralizedAlphaExplicit::correct_trial_status() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    W->update_trial_displacement_by(B * DT * DT * W->get_trial_acceleration());
+
+    return D->update_trial_status();
+}
+
 GeneralizedAlphaExplicit::GeneralizedAlphaExplicit(const unsigned T, const double R)
     : ExplicitIntegrator(T)
     , B((R * R - 5. * R + 10) / 6. / (R - 2.) / (R + 1.))
@@ -91,15 +100,6 @@ int GeneralizedAlphaExplicit::update_trial_status(bool) {
 
     W->update_incre_displacement(DT * W->get_current_velocity() + (.5 - B) * DT * DT * W->get_current_acceleration());
     W->update_incre_velocity(DT * W->get_current_acceleration());
-
-    return D->update_trial_status();
-}
-
-int GeneralizedAlphaExplicit::correct_trial_status() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    W->update_trial_displacement_by(B * DT * DT * W->get_trial_acceleration());
 
     return D->update_trial_status();
 }
