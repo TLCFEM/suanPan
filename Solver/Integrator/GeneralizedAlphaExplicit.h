@@ -18,6 +18,9 @@
  * @class GeneralizedAlphaExplicit
  * @brief A GeneralizedAlphaExplicit class defines a solver using GeneralizedAlphaExplicit algorithm.
  *
+ * References:
+ *     1. [10.1002/nme.6574](https://doi.org/10.1002/nme.6574)
+ *
  * @author tlc
  * @date 03/12/2022
  * @version 0.1.0

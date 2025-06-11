@@ -67,8 +67,8 @@ int GeneralizedAlphaExplicit::correct_trial_status() {
 
 GeneralizedAlphaExplicit::GeneralizedAlphaExplicit(const unsigned T, const double R)
     : ExplicitIntegrator(T)
-    , B((R * R - 5. * R + 10) / 6. / (R - 2.) / (R + 1.))
-    , AM((2. * R - 1) / (1. + R))
+    , B((R * R - 5. * R + 10.) / 6. / (R - 2.) / (R + 1.))
+    , AM((2. * R - 1.) / (1. + R))
     , AF(AM - .5) {}
 
 void GeneralizedAlphaExplicit::assemble_resistance() {
