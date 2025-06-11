@@ -36,8 +36,23 @@ int Integrator::process_constraint_impl(const bool full) {
     return code;
 }
 
+/**
+ * Indicate whether the integrator has a corrector.
+ * Some time integration methods adopt predictor-corrector type scheme.
+ * The final committed state is different from the one used in computation.
+ * Override this method to indicate whether the integrator has a corrector.
+ * If it returns `true`, the `correct_trial_status()` method will be called
+ * thus has to be implemented.
+ */
 bool Integrator::has_corrector() const { return false; }
 
+/**
+ * Correct the trial status.
+ * This method is called when the integrator has a corrector.
+ * It is used to correct the trial status after the computation.
+ * The default implementation does nothing and returns success.
+ * Override this method to implement the corrector.
+ */
 int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
 
 Integrator::Integrator(const unsigned T)
