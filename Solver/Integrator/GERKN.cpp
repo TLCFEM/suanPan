@@ -115,6 +115,16 @@ void GERKN::clear_status() {
     ExplicitIntegrator::clear_status();
 }
 
+vec GERKN::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return from_total_acceleration(get_domain()->get_factory()->get_current_acceleration()(encoding) + incre_acceleration, encoding); }
+
+vec GERKN::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
+    if(FLAG::FIRST == step_flag) return total_acceleration;
+
+    auto& W = get_domain()->get_factory();
+
+    return total_acceleration / AB2 - AB0 / AB2 * W->get_pre_acceleration()(encoding) - AB1 / AB2 * W->get_current_acceleration()(encoding);
+}
+
 WAT2::WAT2(const unsigned T, double R)
     : GERKN(T) {
     R = std::min(1., std::max(0., R));

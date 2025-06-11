@@ -75,6 +75,9 @@ public:
 
     void commit_status() override;
     void clear_status() override;
+
+    vec from_incre_acceleration(const vec&, const uvec&) override;
+    vec from_total_acceleration(const vec&, const uvec&) override;
 };
 
 class WAT2 final : public GERKN {
