@@ -53,8 +53,6 @@ BatheExplicit::BatheExplicit(const unsigned T, const double R)
     , Q2(.5 - P * Q1)
     , Q0(.5 - Q1 - Q2) {}
 
-bool BatheExplicit::time_independent_matrix() const { return false; }
-
 void BatheExplicit::update_incre_time(double T) {
     const auto& W = get_domain()->get_factory();
     update_parameter(T *= 2.);

@@ -66,8 +66,6 @@ int GERKN::correct_trial_status() {
     return D->update_trial_status();
 }
 
-bool GERKN::time_independent_matrix() const { return false; }
-
 void GERKN::update_incre_time(double T) {
     const auto& W = get_domain()->get_factory();
     update_parameter(T *= 2.);

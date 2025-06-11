@@ -152,8 +152,6 @@ public:
     using Integrator::Integrator;
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Implicit; }
-
-    [[nodiscard]] bool time_independent_matrix() const override;
 };
 
 class ExplicitIntegrator : public Integrator {

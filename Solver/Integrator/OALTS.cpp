@@ -30,6 +30,8 @@ OALTS::OALTS(const unsigned T, const double R)
     , B10(B1 / B0)
     , B20(B2 / B0) { set_time_step_switch(false); }
 
+bool OALTS::time_independent_matrix() const { return false; }
+
 void OALTS::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();

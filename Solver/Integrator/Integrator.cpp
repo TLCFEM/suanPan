@@ -369,8 +369,6 @@ vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
-bool ImplicitIntegrator::time_independent_matrix() const { return false; }
-
 void ExplicitIntegrator::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();

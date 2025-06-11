@@ -67,8 +67,6 @@ protected:
 public:
     using ExplicitIntegrator::ExplicitIntegrator;
 
-    [[nodiscard]] bool time_independent_matrix() const override;
-
     void update_incre_time(double) override;
 
     int update_trial_status(bool) override;
