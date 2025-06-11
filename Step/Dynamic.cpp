@@ -71,7 +71,6 @@ int Dynamic::initialize() {
 
     if(IntegratorType::Explicit == analysis_type && has_displacement_load) suanpan_warning("Explicit integrators use acceleration as the base quantity, displacement loads may not work as intended.\n");
 
-    // solver
     // avoid arc length solver
     if(std::dynamic_pointer_cast<Ramm>(solver)) solver = nullptr;
     // automatically enable displacement controlled solver
