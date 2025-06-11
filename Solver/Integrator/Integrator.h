@@ -60,6 +60,8 @@ protected:
     [[nodiscard]] virtual int process_load_impl(bool);
     [[nodiscard]] virtual int process_constraint_impl(bool);
 
+    [[nodiscard]] virtual bool has_corrector() const;
+
     virtual int correct_trial_status();
 
 public:
@@ -80,7 +82,6 @@ public:
     void set_matrix_assembled_switch(bool);
     [[nodiscard]] bool matrix_is_assembled() const;
 
-    [[nodiscard]] virtual bool has_corrector() const;
     [[nodiscard]] virtual bool time_independent_matrix() const;
 
     [[nodiscard]] int process_load();

@@ -50,6 +50,8 @@ int GERKN::process_constraint_impl(const bool full) {
     return code;
 }
 
+bool GERKN::has_corrector() const { return FLAG::FIRST != step_flag; }
+
 int GERKN::correct_trial_status() {
     // it is guaranteed that it is the second stage when this method is called
     // if(FLAG::FIRST == step_flag) return SUANPAN_SUCCESS;
@@ -63,8 +65,6 @@ int GERKN::correct_trial_status() {
 
     return D->update_trial_status();
 }
-
-bool GERKN::has_corrector() const { return FLAG::FIRST != step_flag; }
 
 bool GERKN::time_independent_matrix() const { return false; }
 

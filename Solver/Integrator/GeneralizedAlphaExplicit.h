@@ -41,12 +41,12 @@ protected:
     [[nodiscard]] int process_load_impl(bool) override;
     [[nodiscard]] int process_constraint_impl(bool) override;
 
+    [[nodiscard]] bool has_corrector() const override;
+
     int correct_trial_status() override;
 
 public:
     GeneralizedAlphaExplicit(unsigned, double);
-
-    [[nodiscard]] bool has_corrector() const override;
 
     void assemble_resistance() override;
 

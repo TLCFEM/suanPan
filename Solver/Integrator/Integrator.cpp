@@ -36,6 +36,8 @@ int Integrator::process_constraint_impl(const bool full) {
     return code;
 }
 
+bool Integrator::has_corrector() const { return false; }
+
 int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
 
 Integrator::Integrator(const unsigned T)
@@ -66,8 +68,6 @@ bool Integrator::allow_to_change_time_step() const { return time_step_switch; }
 void Integrator::set_matrix_assembled_switch(const bool T) { matrix_assembled_switch = T; }
 
 bool Integrator::matrix_is_assembled() const { return matrix_assembled_switch; }
-
-bool Integrator::has_corrector() const { return false; }
 
 /**
  * Indicate whether the matrix is independent of time, that is, the system does not change with time.

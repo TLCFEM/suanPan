@@ -45,12 +45,13 @@ class BatheExplicit final : public ExplicitIntegrator {
 protected:
     void update_parameter(double) override;
 
+    [[nodiscard]] bool has_corrector() const override;
+
     int correct_trial_status() override;
 
 public:
     BatheExplicit(unsigned, double);
 
-    [[nodiscard]] bool has_corrector() const override;
     [[nodiscard]] bool time_independent_matrix() const override;
 
     void update_incre_time(double) override;

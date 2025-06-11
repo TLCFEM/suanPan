@@ -50,6 +50,8 @@ protected:
     [[nodiscard]] int process_load_impl(bool) override;
     [[nodiscard]] int process_constraint_impl(bool) override;
 
+    [[nodiscard]] bool has_corrector() const override;
+
     int correct_trial_status() override;
 
     double C1{0.}, C2{0.};
@@ -65,7 +67,6 @@ protected:
 public:
     using ExplicitIntegrator::ExplicitIntegrator;
 
-    [[nodiscard]] bool has_corrector() const override;
     [[nodiscard]] bool time_independent_matrix() const override;
 
     void update_incre_time(double) override;

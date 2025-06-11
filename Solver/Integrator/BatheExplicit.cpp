@@ -35,6 +35,8 @@ void BatheExplicit::update_parameter(const double NT) {
     A7 = Q2 * A3;
 }
 
+bool BatheExplicit::has_corrector() const { return true; }
+
 int BatheExplicit::correct_trial_status() {
     const auto D = get_domain();
 
@@ -50,8 +52,6 @@ BatheExplicit::BatheExplicit(const unsigned T, const double R)
     , Q1((.5 - P) / P / (1. - P))
     , Q2(.5 - P * Q1)
     , Q0(.5 - Q1 - Q2) {}
-
-bool BatheExplicit::has_corrector() const { return true; }
 
 bool BatheExplicit::time_independent_matrix() const { return false; }
 

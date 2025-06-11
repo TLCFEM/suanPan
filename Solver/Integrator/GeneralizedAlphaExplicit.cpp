@@ -54,6 +54,8 @@ int GeneralizedAlphaExplicit::process_constraint_impl(const bool full) {
     return code;
 }
 
+bool GeneralizedAlphaExplicit::has_corrector() const { return true; }
+
 int GeneralizedAlphaExplicit::correct_trial_status() {
     const auto D = get_domain();
     auto& W = D->get_factory();
@@ -68,8 +70,6 @@ GeneralizedAlphaExplicit::GeneralizedAlphaExplicit(const unsigned T, const doubl
     , B((R * R - 5. * R + 10) / 6. / (R - 2.) / (R + 1.))
     , AM((2. * R - 1) / (1. + R))
     , AF(AM - .5) {}
-
-bool GeneralizedAlphaExplicit::has_corrector() const { return true; }
 
 void GeneralizedAlphaExplicit::assemble_resistance() {
     const auto D = get_domain();
