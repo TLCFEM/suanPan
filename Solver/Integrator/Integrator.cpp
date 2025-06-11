@@ -207,10 +207,10 @@ int Integrator::update_trial_status(const bool detect_trivial) {
  */
 int Integrator::sync_status(const bool only_correct) {
     auto handle_force = [&] {
-        // process modifiers
         if(SUANPAN_SUCCESS != process_modifier()) return SUANPAN_FAIL;
-        // assemble resistance
+
         assemble_resistance();
+
         return SUANPAN_SUCCESS;
     };
 
