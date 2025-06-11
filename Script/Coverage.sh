@@ -25,6 +25,7 @@ else
   log_file="/dev/null"
 fi
 
+cp ../Example/Solver/20110613_022049_MQZ_N_A .
 cp ../Example/Solver/EZ .
 cp ../Example/Material/Table .
 cp ../Example/Material/C.txt .

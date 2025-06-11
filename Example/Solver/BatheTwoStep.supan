@@ -12,11 +12,13 @@ element Mass 4 2 20 1 2
 fix2 1 1 1
 fix2 2 2 1 2
 
-initial velocity 25 1 2
+amplitude NZStrongMotion 1 20110613_022049_MQZ_N_A
+
+acceleration 2 1 .2 1 2
 
 hdf5recorder 1 Node U 2
 
-step dynamic 1 1
+step dynamic 1 10
 set ini_step_size 1E-2
 set fixed_step_size 1
 set symm_mat 0
@@ -24,7 +26,7 @@ set linear_system
 
 integrator BatheTwoStep 1
 
-converger RelIncreDisp 1 1E-10 10 1
+converger RelIncreDisp 1 1E-10 10 0
 
 analyze
 
@@ -32,14 +34,16 @@ analyze
 # Coordinate:
 #   2.0000e+00  0.0000e+00
 # Displacement:
-#  -6.0118e-02  0.0000e+00
+#   1.4032e-03  0.0000e+00
 # Resistance:
-#  -3.0059e+02  0.0000e+00
+#   7.0160e+00  0.0000e+00
 # Velocity:
-#  -2.4939e+01  0.0000e+00
+#  -5.4787e-02  0.0000e+00
 # Acceleration:
-#   1.5030e+01  0.0000e+00
+#  -3.2964e-01  0.0000e+00
 peek node 2 3 4
+
+peek amplitude 1
 
 peek integrator 1
 

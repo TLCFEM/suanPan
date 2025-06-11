@@ -50,6 +50,8 @@ analyze
 #  -1.8685e+01 -1.7542e+02
 peek node 2 3 4
 
+peek amplitude 1
+
 peek integrator 1
 
 # save recorder 1
