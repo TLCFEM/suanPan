@@ -24,4 +24,7 @@ endif ()
 
 add_library(${PROJECT_NAME} ${SUPERLUMT_SRC})
 
+find_package(OpenMP REQUIRED COMPONENTS C)
+target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_C)
+
 message(STATUS "SUPERLUMT C_FLAGS: ${CMAKE_C_FLAGS}")
