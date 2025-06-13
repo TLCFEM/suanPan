@@ -29,7 +29,7 @@
 #ifndef BATHETWOSTEP_H
 #define BATHETWOSTEP_H
 
-#include "Integrator.h"
+#include "../Integrator.h"
 
 class BatheTwoStep final : public ImplicitIntegrator {
     enum class FLAG {

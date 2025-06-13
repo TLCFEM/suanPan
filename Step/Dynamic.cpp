@@ -22,8 +22,8 @@
 #include <Domain/Factory.hpp>
 #include <Load/GroupNodalDisplacement.h>
 #include <Solver/BFGS.h>
-#include <Solver/Integrator/LeeNewmarkBase.h>
-#include <Solver/Integrator/Tchamwa.h>
+#include <Solver/Integrator/Explicit/Tchamwa.h>
+#include <Solver/Integrator/Implicit/LeeNewmark/LeeNewmarkBase.h>
 #include <Solver/MPDC.h>
 #include <Solver/Newton.h>
 #include <Solver/Ramm.h>

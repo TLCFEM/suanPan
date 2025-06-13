@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class GeneralizedAlphaExplicit
- * @brief A GeneralizedAlphaExplicit class defines a solver using GeneralizedAlphaExplicit algorithm.
+ * @class Tchamwa
+ * @brief A Tchamwa class defines a solver using Tchamwa algorithm.
  *
  * References:
  *     1. [10.1002/nme.6574](https://doi.org/10.1002/nme.6574)
@@ -24,38 +24,25 @@
  * @author tlc
  * @date 03/12/2022
  * @version 0.1.0
- * @file GeneralizedAlphaExplicit.h
+ * @file Tchamwa.h
  * @addtogroup Integrator
  * @{
  */
 
-#ifndef GENERALIZEDALPHAEXPLICIT_H
-#define GENERALIZEDALPHAEXPLICIT_H
+#ifndef TCHAMWA_H
+#define TCHAMWA_H
 
-#include "Integrator.h"
+#include "../Integrator.h"
 
-class GeneralizedAlphaExplicit final : public ExplicitIntegrator {
-    const double B, AM, AF;
+class Tchamwa final : public ExplicitIntegrator {
+    const double PHI;
     double DT{0.};
 
 protected:
     void update_parameter(double) override;
 
-    [[nodiscard]] int process_load_impl(bool) override;
-    [[nodiscard]] int process_constraint_impl(bool) override;
-
-    [[nodiscard]] bool has_corrector() const override;
-
-    int correct_trial_status() override;
-
 public:
-    GeneralizedAlphaExplicit(unsigned, double);
-
-    void assemble_resistance() override;
-
-    vec get_force_residual() override;
-    vec get_displacement_residual() override;
-    sp_mat get_reference_load() override;
+    Tchamwa(unsigned, double);
 
     int update_trial_status(bool) override;
 

@@ -15,49 +15,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class GeneralizedAlpha
- * @brief A GeneralizedAlpha class defines a solver using GeneralizedAlpha
- * algorithm.
+ * @class GSSSS
+ * @brief A GSSSS class defines a solver using GSSSS algorithm.
  *
- * Unlike Newmark method, in which the equilibrium is satisfied at the end of
- * current time step, i.e., \f$t=t_0+\Delta{}t\f$, the generalized-\f$\alpha\f$
- * approach applies it at somewhere in current step, i.e.,
- * \f$t=t_0+\Delta{}t-\alpha\f$, similar to the generalized midpoint concept.
+ * Advances in Computational Dynamics of Particles, Materials and Structures
  *
- * doi:10.1115/1.2900803
+ * ISBN: 978-1-119-96692-0
  *
  * @author tlc
- * @date 21/10/2017
+ * @date 15/04/2022
  * @version 0.1.0
- * @file GeneralizedAlpha.h
+ * @file GSSSS.h
  * @addtogroup Integrator
  * @{
  */
 
-#ifndef GENERALIZEDALPHA_H
-#define GENERALIZEDALPHA_H
+#ifndef GSSSS_H
+#define GSSSS_H
 
-#include "Integrator.h"
+#include "../Integrator.h"
 
-class GeneralizedAlpha final : public ImplicitIntegrator {
-    const double alpha_f;
-    const double alpha_m;
-    const double gamma;
-    const double beta;
-
-    const double F1, F2, F3, F4, F9;
-
-    double F5 = 0., F6 = 0., F7 = 0., F8 = 0., F10 = 0., F11 = 0.;
-
+class GSSSS : public ImplicitIntegrator {
 protected:
     void update_parameter(double) override;
 
     [[nodiscard]] int process_load_impl(bool) override;
     [[nodiscard]] int process_constraint_impl(bool) override;
 
+    const double L1, L2, L4;
+
+    double L3 = 0., L5 = 0.;
+    double W1 = 0., W3G3 = 0., W2G5 = 0., W1G6 = 0.;
+
+    double DT = 0.;
+
+    double C0{0.}, C1{0.}, C2{0.}, C3{0.}, C4{0.}, XD{0.}, XV{0.}, XA{0.};
+
+    // ReSharper disable once CppMemberFunctionMayBeStatic
+    template<typename T> void generate_constants(double, double, double) { throw std::invalid_argument("need a proper scheme"); }
+
 public:
-    GeneralizedAlpha(unsigned, double);
-    GeneralizedAlpha(unsigned, double, double);
+    explicit GSSSS(unsigned);
 
     void assemble_resistance() override;
     void assemble_matrix() override;
@@ -72,6 +70,21 @@ public:
     vec from_incre_acceleration(const vec&, const uvec&) override;
 
     void print() override;
+};
+
+class GSSSSU0 final : public GSSSS {
+public:
+    GSSSSU0(unsigned, vec&&);
+};
+
+class GSSSSV0 final : public GSSSS {
+public:
+    GSSSSV0(unsigned, vec&&);
+};
+
+class GSSSSOptimal final : public GSSSS {
+public:
+    GSSSSOptimal(unsigned, double);
 };
 
 #endif

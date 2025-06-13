@@ -29,9 +29,10 @@
 #ifndef LEENEWMARKBASE_H
 #define LEENEWMARKBASE_H
 
+#include "../Newmark.h"
+
 #include <Domain/Factory.hpp>
 #include <Domain/MetaMat/MetaMat.hpp>
-#include <Solver/Integrator/Newmark.h>
 
 class LeeNewmarkBase : public Newmark {
 public:

@@ -15,34 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class GERKN
- * @brief Generalized Explicit Runge-Kutta-Nystrom time integration.
+ * @class GeneralizedAlpha
+ * @brief A GeneralizedAlpha class defines a solver using GeneralizedAlpha
+ * algorithm.
  *
- * References:
- *     1. [10.1002/nme.7658](https://doi.org/10.1002/nme.7658)
+ * Unlike Newmark method, in which the equilibrium is satisfied at the end of
+ * current time step, i.e., \f$t=t_0+\Delta{}t\f$, the generalized-\f$\alpha\f$
+ * approach applies it at somewhere in current step, i.e.,
+ * \f$t=t_0+\Delta{}t-\alpha\f$, similar to the generalized midpoint concept.
+ *
+ * doi:10.1115/1.2900803
  *
  * @author tlc
- * @date 08/06/2025
+ * @date 21/10/2017
  * @version 0.1.0
- * @file GERKN.h
+ * @file GeneralizedAlpha.h
  * @addtogroup Integrator
  * @{
  */
 
-#ifndef GERKN_H
-#define GERKN_H
+#ifndef GENERALIZEDALPHA_H
+#define GENERALIZEDALPHA_H
 
-#include "Integrator.h"
+#include "../Integrator.h"
 
-class GERKN : public ExplicitIntegrator {
-    enum class FLAG {
-        FIRST,
-        SECOND
-    };
+class GeneralizedAlpha final : public ImplicitIntegrator {
+    const double alpha_f;
+    const double alpha_m;
+    const double gamma;
+    const double beta;
 
-    FLAG step_flag = FLAG::FIRST;
+    const double F1, F2, F3, F4, F9;
 
-    double DT{0.};
+    double F5 = 0., F6 = 0., F7 = 0., F8 = 0., F10 = 0., F11 = 0.;
 
 protected:
     void update_parameter(double) override;
@@ -50,37 +55,21 @@ protected:
     [[nodiscard]] int process_load_impl(bool) override;
     [[nodiscard]] int process_constraint_impl(bool) override;
 
-    [[nodiscard]] bool has_corrector() const override;
-
-    int correct_trial_status() override;
-
-    double C1{0.}, C2{0.};
-
-    double UA10{0.}, UA20{0.}, UA21{0.};
-    double UB0{0.}, UB1{0.}, UB2{0.};
-
-    double VA10{0.}, VA20{0.}, VA21{0.};
-    double VB0{0.}, VB1{0.}, VB2{0.};
-
-    double AB0{0.}, AB1{0.}, AB2{0.};
-
 public:
-    using ExplicitIntegrator::ExplicitIntegrator;
+    GeneralizedAlpha(unsigned, double);
+    GeneralizedAlpha(unsigned, double, double);
 
-    void update_incre_time(double) override;
+    void assemble_resistance() override;
+    void assemble_matrix() override;
+
+    vec get_force_residual() override;
+    vec get_displacement_residual() override;
+    sp_mat get_reference_load() override;
 
     int update_trial_status(bool) override;
 
-    void commit_status() override;
-    void clear_status() override;
-
+    vec from_incre_velocity(const vec&, const uvec&) override;
     vec from_incre_acceleration(const vec&, const uvec&) override;
-    vec from_total_acceleration(const vec&, const uvec&) override;
-};
-
-class WAT2 final : public GERKN {
-public:
-    WAT2(unsigned, double);
 
     void print() override;
 };

@@ -15,47 +15,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class WilsonPenzienNewmark
- * @brief A WilsonPenzienNewmark class defines a solver using Newmark algorithm with Wilson-Penzien damping model.
+ * @class BatheExplicit
+ * @brief A BatheExplicit class defines a solver using BatheExplicit algorithm.
+ *
  * @author tlc
- * @date 05/06/2020
- * @version 0.1.1
- * @file WilsonPenzienNewmark.h
+ * @date 03/12/2022
+ * @version 0.1.0
+ * @file BatheExplicit.h
  * @addtogroup Integrator
  * @{
  */
 
-#ifndef WILSONPENZIENNEWMARK_H
-#define WILSONPENZIENNEWMARK_H
+#ifndef BATHEEXPLICIT_H
+#define BATHEEXPLICIT_H
 
-#include <Solver/Integrator/Newmark.h>
+#include "../Integrator.h"
 
-class WilsonPenzienNewmark final : public Newmark {
-    bool first_iteration = true;
+class BatheExplicit final : public ExplicitIntegrator {
+    enum class FLAG {
+        FIRST,
+        SECOND
+    };
 
-    const vec damping_ratio;
+    FLAG step_flag = FLAG::FIRST;
 
-    mat theta;
-    vec beta;
+    const double P, Q1, Q2, Q0;
+    double DT{0.}, A0{0.}, A1{0.}, A2{0.}, A3{0.}, A4{0.}, A5{0.}, A6{0.}, A7{0.};
+
+protected:
+    void update_parameter(double) override;
+
+    [[nodiscard]] bool has_corrector() const override;
+
+    int correct_trial_status() override;
 
 public:
-    WilsonPenzienNewmark(unsigned, vec&&, double = .25, double = .5);
+    BatheExplicit(unsigned, double);
 
-    int initialize() override;
+    void update_incre_time(double) override;
 
-    [[nodiscard]] int process_constraint() override;
-
-    int solve(mat&, const mat&) override;
-    int solve(mat&, const sp_mat&) override;
-    int solve(mat&, mat&&) override;
-    int solve(mat&, sp_mat&&) override;
+    int update_trial_status(bool) override;
 
     void commit_status() override;
     void clear_status() override;
-    void reset_status() override;
-
-    void assemble_resistance() override;
-    void assemble_matrix() override;
 
     void print() override;
 };

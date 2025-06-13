@@ -35,7 +35,7 @@
 #ifndef LEENEWMARKITERATIVE_H
 #define LEENEWMARKITERATIVE_H
 
-#include "Newmark.h"
+#include "../Newmark.h"
 
 #include <Domain/Factory.hpp>
 #include <Domain/MetaMat/MetaMat.hpp>

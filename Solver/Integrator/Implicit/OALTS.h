@@ -15,43 +15,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class RayleighNewmark
- * @brief A RayleighNewmark class defines a solver using Newmark algorithm with Rayleigh damping model.
+ * @class OALTS
+ * @brief A OALTS class defines a solver using OALTS algorithm.
  *
- * `RayleighNewmark` algorithm is unconditionally stable if
- * \f{gather}{\alpha\geq\dfrac{1}{4}\left(\dfrac{1}{2}+\beta\right)^2,\qquad\beta\geq\dfrac{1}{2}\f}.
- *
- * There are several choices for solver parameters.
- *
- * Constant Acceleration:
- * \f{gather}{\alpha=\dfrac{1}{4},\qquad\beta=\dfrac{1}{2}\f}.
- *
- * Linear Acceleration:
- * \f{gather}{\alpha=\dfrac{1}{6},\qquad\beta=\dfrac{1}{2}\f}.
+ * doi:10.1002/nme.6188
  *
  * @author tlc
- * @date 25/08/2017
- * @version 0.1.1
- * @file RayleighNewmark.h
+ * @date 05/12/2022
+ * @version 0.1.0
+ * @file OALTS.h
  * @addtogroup Integrator
  * @{
  */
 
-#ifndef RAYLEIGHNEWMARK_H
-#define RAYLEIGHNEWMARK_H
+#ifndef OALTS_H
+#define OALTS_H
 
-#include <Solver/Integrator/Newmark.h>
+#include "../Integrator.h"
 
-class RayleighNewmark final : public Newmark {
-    const double damping_alpha;
-    const double damping_beta;
-    const double damping_zeta;
-    const double damping_eta;
+class OALTS final : public ImplicitIntegrator {
+    const double A1, A2, B0, B1, B2, B10, B20;
+
+    double DT{0.}, P1{0.}, P2{0.}, P3{0.};
+
+    bool if_starting = true;
+
+protected:
+    void update_parameter(double) override;
 
 public:
-    RayleighNewmark(unsigned, double, double, double, double, double, double);
+    OALTS(unsigned, double);
+
+    [[nodiscard]] bool time_independent_matrix() const override;
 
     void assemble_resistance() override;
+    void assemble_matrix() override;
+
+    int update_trial_status(bool) override;
+
+    void commit_status() override;
+    void clear_status() override;
+
+    vec from_incre_velocity(const vec&, const uvec&) override;
+    vec from_incre_acceleration(const vec&, const uvec&) override;
+    vec from_total_velocity(const vec&, const uvec&) override;
+    vec from_total_acceleration(const vec&, const uvec&) override;
+
+    void print() override;
 };
 
 #endif

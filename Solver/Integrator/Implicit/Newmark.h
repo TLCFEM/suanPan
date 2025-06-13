@@ -15,48 +15,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NonviscousNewmark
- * @brief A NonviscousNewmark class defines a solver using Newmark algorithm.
+ * @class Newmark
+ * @brief A Newmark class defines a solver using Newmark algorithm.
  *
- * Using exponential function based convolution for global damping model.
+ * `Newmark` algorithm is unconditionally stable if
+ * \f{gather}{\alpha\geq\dfrac{1}{4}\left(\dfrac{1}{2}+\beta\right)^2,\qquad\beta\geq\dfrac{1}{2}\f}.
  *
- * Reference: 10.1016/j.ymssp.2024.111156
+ * There are several choices for solver parameters.
+ *
+ * Constant Acceleration:
+ * \f{gather}{\alpha=\dfrac{1}{4},\qquad\beta=\dfrac{1}{2}\f}.
+ *
+ * Linear Acceleration:
+ * \f{gather}{\alpha=\dfrac{1}{6},\qquad\beta=\dfrac{1}{2}\f}.
  *
  * @author tlc
- * @date 18/03/2023
- * @version 0.1.0
- * @file NonviscousNewmark.h
+ * @date 25/08/2017
+ * @version 0.1.1
+ * @file Newmark.h
  * @addtogroup Integrator
  * @{
  */
 
-#ifndef NONVISCOUSNEWMARK_H
-#define NONVISCOUSNEWMARK_H
+#ifndef NEWMARK_H
+#define NEWMARK_H
 
-#include "Newmark.h"
+#include "../Integrator.h"
 
-class NonviscousNewmark : public Newmark {
-    const cx_vec m, s;
-
-    cx_vec s_para, m_para;
-
-    double accu_para{0.};
-
-    cx_mat current_damping;
+class Newmark : public ImplicitIntegrator {
+    const double beta;  /**< parameter = .25 */
+    const double gamma; /**< parameter = .5 */
 
 protected:
     void update_parameter(double) override;
 
-public:
-    NonviscousNewmark(unsigned, double, double, cx_vec&&, cx_vec&&);
+    double C0 = 0., C1 = 0., C2 = 0., C3 = 0., C4 = 0., C5 = 0.; /**< parameters */
 
-    int initialize() override;
+public:
+    explicit Newmark(unsigned = 0, double = .25, double = .5);
 
     void assemble_resistance() override;
     void assemble_matrix() override;
 
-    void commit_status() override;
-    void clear_status() override;
+    int update_trial_status(bool) override;
+
+    vec from_incre_velocity(const vec&, const uvec&) override;
+    vec from_incre_acceleration(const vec&, const uvec&) override;
 
     void print() override;
 };
