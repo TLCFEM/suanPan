@@ -63,7 +63,7 @@ int BoucWen::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;
             trial_stiffness = modulus_a + modulus_b / yield_strain * (1. - p_term) * z / jacobian;
 

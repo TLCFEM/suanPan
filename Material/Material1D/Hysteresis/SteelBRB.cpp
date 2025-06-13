@@ -96,7 +96,7 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) {
             trial_stiffness *= 1. - (pow_term + incre_strain(0) * elastic_modulus * exponent * pow_term / numerator) / jacobian;
 
             return SUANPAN_SUCCESS;

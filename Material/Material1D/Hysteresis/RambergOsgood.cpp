@@ -80,7 +80,7 @@ int RambergOsgood::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) {
             trial_stress = load_sign * norm_stress + reverse_stress;
             trial_stiffness = elastic_modulus * pow_a / jacobian;
             return SUANPAN_SUCCESS;

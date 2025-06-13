@@ -57,7 +57,7 @@ int NonlinearK4::compute_plasticity() {
         const auto error = fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) {
             const auto dgamma = elastic_modulus / jacobian;
             trial_stiffness -= dgamma * elastic_modulus;
 
