@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 Gap01::Gap01(const unsigned T, const double E, const double Y, const double G, const double R)
-    : DataGap01{fabs(E), fabs(Y), fabs(G)}
+    : DataGap01{std::fabs(E), std::fabs(Y), std::fabs(G)}
     , Material1D(T, R) {}
 
 int Gap01::initialize(const shared_ptr<DomainBase>&) {

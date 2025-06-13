@@ -46,7 +46,7 @@ int Bilinear1D::update_trial_status(const vec& t_strain) {
 
     const auto yield_surf = yield_stress + isotropic_modulus * plastic_strain;
 
-    if(const auto yield_func = fabs(shifted_stress) - std::max(0., yield_surf); yield_func >= 0.) {
+    if(const auto yield_func = std::fabs(shifted_stress) - std::max(0., yield_surf); yield_func >= 0.) {
         const auto dkdh = kinematic_modulus + (yield_surf > 0. ? isotropic_modulus : 0.);
         auto incre_plastic_strain = yield_func / (elastic_modulus + dkdh);
         plastic_strain += incre_plastic_strain;

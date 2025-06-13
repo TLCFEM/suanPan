@@ -46,7 +46,7 @@ int NonlinearViscosity::update_trial_status(const vec& t_strain, const vec& t_st
 
     const auto &u = trial_strain(0), &v = trial_strain_rate(0);
 
-    const auto abs_v = fabs(v);
+    const auto abs_v = std::fabs(v);
 
     const auto eta = compute_damping_coefficient(u, v);
 
@@ -60,7 +60,7 @@ int NonlinearViscosity::update_trial_status(const vec& t_strain, const vec& t_st
         term_b = v;
     }
     else if(1. < alpha || limit < abs_v) {
-        term_a = alpha * pow(abs_v, alpha - 1.);
+        term_a = alpha * std::pow(abs_v, alpha - 1.);
         term_b = term_a * v / alpha;
     }
     else {

@@ -34,7 +34,7 @@ unique_ptr<Material> BoucWen::get_copy() { return std::make_unique<BoucWen>(*thi
 int BoucWen::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     const auto n_strain = incre_strain(0) / yield_strain;
 
@@ -53,13 +53,13 @@ int BoucWen::update_trial_status(const vec& t_strain) {
 
         z += incre;
 
-        const auto p_term = (gamma + (z * n_strain >= 0. ? beta : -beta)) * pow(std::max(datum::eps, fabs(z)), n);
+        const auto p_term = (gamma + (z * n_strain >= 0. ? beta : -beta)) * std::pow(std::max(datum::eps, std::fabs(z)), n);
         const auto t_term = n_strain * p_term;
 
         const auto residual = z - current_z + t_term - n_strain;
         const auto jacobian = z + n * t_term;
 
-        const auto error = fabs(incre = -residual * z / jacobian);
+        const auto error = std::fabs(incre = -residual * z / jacobian);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 

@@ -18,7 +18,7 @@
 #include "CoulombFriction.h"
 
 CoulombFriction::CoulombFriction(const unsigned T, const double F, const double S)
-    : DataCoulombFriction{2. / datum::pi * fabs(F), fabs(S)}
+    : DataCoulombFriction{2. / datum::pi * std::fabs(F), std::fabs(S)}
     , Material1D(T, 0.) {}
 
 int CoulombFriction::initialize(const shared_ptr<DomainBase>&) {
@@ -37,11 +37,11 @@ int CoulombFriction::update_trial_status(const vec&) {
 int CoulombFriction::update_trial_status(const vec&, const vec& t_strain_rate) {
     incre_strain_rate = (trial_strain_rate = t_strain_rate) - current_strain_rate;
 
-    if(fabs(incre_strain_rate(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain_rate(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
-    trial_stress = friction_force * atan(factor * trial_strain_rate(0));
+    trial_stress = friction_force * std::atan(factor * trial_strain_rate(0));
 
-    trial_damping = friction_force * factor / (1. + pow(factor * trial_strain_rate(0), 2.));
+    trial_damping = friction_force * factor / (1. + std::pow(factor * trial_strain_rate(0), 2.));
 
     return SUANPAN_SUCCESS;
 }

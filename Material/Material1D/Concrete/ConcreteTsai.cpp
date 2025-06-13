@@ -39,8 +39,8 @@ pod2 ConcreteTsai::compute_compression_backbone(const double n_strain) const {
     pod2 response;
 
     const auto normal_strain = std::max(datum::eps, n_strain / c_strain);
-    const auto tmp_a = pow(normal_strain, c_n);
-    const auto tmp_b = c_n == 1. ? 1. + (c_m - 1. + log(normal_strain)) * normal_strain : 1. + (c_m - c_n / (c_n - 1.)) * normal_strain + tmp_a / (c_n - 1.);
+    const auto tmp_a = std::pow(normal_strain, c_n);
+    const auto tmp_b = c_n == 1. ? 1. + (c_m - 1. + std::log(normal_strain)) * normal_strain : 1. + (c_m - c_n / (c_n - 1.)) * normal_strain + tmp_a / (c_n - 1.);
     response[0] = c_stress * c_m * normal_strain / tmp_b;
     response[1] = initial_stiffness(0) * (1. - tmp_a) / tmp_b / tmp_b;
 
@@ -51,8 +51,8 @@ pod2 ConcreteTsai::compute_tension_backbone(const double n_strain) const {
     pod2 response;
 
     const auto normal_strain = std::max(datum::eps, n_strain / t_strain);
-    const auto tmp_a = pow(normal_strain, t_n);
-    const auto tmp_b = t_n == 1. ? 1. + (t_m - 1. + log(normal_strain)) * normal_strain : 1. + (t_m - t_n / (t_n - 1.)) * normal_strain + tmp_a / (t_n - 1.);
+    const auto tmp_a = std::pow(normal_strain, t_n);
+    const auto tmp_b = t_n == 1. ? 1. + (t_m - 1. + std::log(normal_strain)) * normal_strain : 1. + (t_m - t_n / (t_n - 1.)) * normal_strain + tmp_a / (t_n - 1.);
     response[0] = t_stress * t_m * normal_strain / tmp_b;
     response[1] = initial_stiffness(0) * (1. - tmp_a) / tmp_b / tmp_b;
 
@@ -65,13 +65,13 @@ double ConcreteTsai::compute_tension_residual(const double reverse_t_strain, con
 
 ConcreteTsai::ConcreteTsai(const unsigned T, const double E, const double CS, const double TS, const double NC, const double NT, const double MP, const double CE, const double TE, const double R)
     : SimpleHysteresis(T, MP, R)
-    , elastic_modulus(fabs(E))
-    , c_stress(-perturb(fabs(CS)))
-    , c_strain(-perturb(fabs(CE)))
+    , elastic_modulus(std::fabs(E))
+    , c_stress(-perturb(std::fabs(CS)))
+    , c_strain(-perturb(std::fabs(CE)))
     , c_m(elastic_modulus * c_strain / c_stress)
     , c_n(std::max(perturb(1.), NC))
-    , t_stress(perturb(fabs(TS)))
-    , t_strain(perturb(fabs(TE)))
+    , t_stress(perturb(std::fabs(TS)))
+    , t_strain(perturb(std::fabs(TE)))
     , t_m(elastic_modulus * t_strain / t_stress)
     , t_n(std::max(perturb(1.), NT)) {}
 

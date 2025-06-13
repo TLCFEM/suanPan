@@ -20,7 +20,7 @@
 pod2 SteelBRB::compute_t_yield_stress(const double plastic_strain) const {
     pod2 result;
 
-    result[1] = t_const * exp(-plastic_strain / t_scalar);
+    result[1] = t_const * std::exp(-plastic_strain / t_scalar);
 
     result[0] = t_saturated_stress - result[1] * t_scalar;
 
@@ -30,7 +30,7 @@ pod2 SteelBRB::compute_t_yield_stress(const double plastic_strain) const {
 pod2 SteelBRB::compute_c_yield_stress(const double plastic_strain) const {
     pod2 result;
 
-    result[1] = c_const * exp(-plastic_strain / c_scalar);
+    result[1] = c_const * std::exp(-plastic_strain / c_scalar);
 
     result[0] = c_saturated_stress - result[1] * c_scalar;
 
@@ -54,7 +54,7 @@ unique_ptr<Material> SteelBRB::get_copy() { return std::make_unique<SteelBRB>(*t
 int SteelBRB::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = elastic_modulus) * incre_strain;
 
@@ -84,15 +84,15 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
         plastic_strain = current_plastic_strain + incre_plastic_strain;
         trial_stress = elastic_modulus * (trial_strain - plastic_strain);
 
-        const auto sigma_y = compute_stress(this, accumulated_strain = current_accumulated_strain + fabs(incre_plastic_strain));
+        const auto sigma_y = compute_stress(this, accumulated_strain = current_accumulated_strain + std::fabs(incre_plastic_strain));
         const auto numerator = trial_stress(0) - plastic_modulus * plastic_strain;
         const auto fraction = numerator / sigma_y[0];
-        const auto pow_term = pow(fabs(fraction), exponent);
+        const auto pow_term = std::pow(std::fabs(fraction), exponent);
         auto residual = -incre_strain(0) * pow_term;
         const auto jacobian = 1. + exponent / numerator * residual * (s_modulus - fraction * (incre_plastic_strain >= 0. ? sigma_y[1] : -sigma_y[1]));
         residual += incre_plastic_strain;
 
-        const auto error = fabs(incre = -residual / jacobian);
+        const auto error = std::fabs(incre = -residual / jacobian);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 

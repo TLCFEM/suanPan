@@ -28,7 +28,7 @@ double Viscosity02::compute_damping_coefficient(const double strain, const doubl
 }
 
 Viscosity02::Viscosity02(const unsigned T, const double A, const double CA, const double CB, const double CC, const double CD, const double GA, const double GB, const double L)
-    : DataViscosity02{.25 * (fabs(CA) + fabs(CB) + fabs(CC) + fabs(CD)), .5 / datum::pi * (fabs(CA) - fabs(CB) - fabs(CC) + fabs(CD)), .5 / datum::pi * (fabs(CA) + fabs(CB) - fabs(CC) - fabs(CD)), (fabs(CA) - fabs(CB) + fabs(CC) - fabs(CD)) / datum::pi / datum::pi, fabs(GA), fabs(GB)}
-    , NonlinearViscosity(T, fabs(A), fabs(L)) {}
+    : DataViscosity02{.25 * (std::fabs(CA) + std::fabs(CB) + std::fabs(CC) + std::fabs(CD)), .5 / datum::pi * (std::fabs(CA) - std::fabs(CB) - std::fabs(CC) + std::fabs(CD)), .5 / datum::pi * (std::fabs(CA) + std::fabs(CB) - std::fabs(CC) - std::fabs(CD)), (std::fabs(CA) - std::fabs(CB) + std::fabs(CC) - std::fabs(CD)) / datum::pi / datum::pi, std::fabs(GA), std::fabs(GB)}
+    , NonlinearViscosity(T, std::fabs(A), std::fabs(L)) {}
 
 unique_ptr<Material> Viscosity02::get_copy() { return std::make_unique<Viscosity02>(*this); }

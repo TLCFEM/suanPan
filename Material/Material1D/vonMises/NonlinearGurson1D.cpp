@@ -65,9 +65,9 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
         const auto hardening = compute_hardening(pe);
         const auto &k = hardening(0), &dk = hardening(1);
         const auto hyper_term = .5 * q2 * s / k;
-        const auto cosh_term = cosh(hyper_term);
-        const auto sinh_term = sinh(hyper_term);
-        const auto an = para_b * exp(-.5 * pow((pe - en) / sn, 2.));
+        const auto cosh_term = std::cosh(hyper_term);
+        const auto sinh_term = std::sinh(hyper_term);
+        const auto an = para_b * std::exp(-.5 * std::pow((pe - en) / sn, 2.));
 
         const auto diff_pe = pe - current_pe, diff_s = s - trial_s;
 

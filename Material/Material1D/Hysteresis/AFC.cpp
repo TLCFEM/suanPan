@@ -22,13 +22,13 @@
 pod2 AFC::compute_transition(const double TX, const double XS, const double YS, const double ES, const double XF, const double YF, const double EF) {
     pod2 response;
 
-    if(fabs(TX - XS) <= datum::eps) {
+    if(std::fabs(TX - XS) <= datum::eps) {
         response[0] = YS;
         response[1] = ES;
         return response;
     }
 
-    if(fabs(TX - XF) <= datum::eps) {
+    if(std::fabs(TX - XF) <= datum::eps) {
         response[0] = YF;
         response[1] = EF;
         return response;
@@ -39,7 +39,7 @@ pod2 AFC::compute_transition(const double TX, const double XS, const double YS, 
     const auto ESEC = (YF - YS) / TA;
     const auto TB = ESEC - ES;
     const auto R = (EF - ESEC) / TB;
-    const auto TD = TB * pow(std::max(fabs(TC / TA), datum::eps), R);
+    const auto TD = TB * std::pow(std::max(std::fabs(TC / TA), datum::eps), R);
 
     response[0] = YS + TC * (ES + TD);
     response[1] = ES + (R + 1.) * TD;
@@ -61,9 +61,9 @@ void AFC::compute_degradation(const double yield_strain, const double stiffness)
         trial_stress = s_stress + trial_stiffness * (trial_strain(0) - s_strain);
     }
     else {
-        max_strain = std::max(std::max(fabs(trial_strain(0)), fabs(e_strain)), max_strain);
+        max_strain = std::max(std::max(std::fabs(trial_strain(0)), std::fabs(e_strain)), max_strain);
 
-        const auto factor = .9 * exp(-degrade * max_strain / fabs(yield_strain));
+        const auto factor = .9 * exp(-degrade * max_strain / std::fabs(yield_strain));
         const auto s_stiffness = factor * elastic_modulus;
         const auto e_stiffness = stiffness - factor * (stiffness - elastic_modulus);
 
@@ -75,7 +75,7 @@ void AFC::compute_degradation(const double yield_strain, const double stiffness)
 }
 
 AFC::AFC(const unsigned T, const double E, const double TYS, const double THK, const double TUK, const double CYS, const double CHK, const double CUK, const double DG, const double R)
-    : DataAFC{fabs(E), fabs(TYS), fabs(THK), fabs(TUK), fabs(CYS), fabs(CHK), fabs(CUK), fabs(DG)}
+    : DataAFC{std::fabs(E), std::fabs(TYS), std::fabs(THK), std::fabs(TUK), std::fabs(CYS), std::fabs(CHK), std::fabs(CUK), std::fabs(DG)}
     , Material1D(T, R) {}
 
 int AFC::initialize(const shared_ptr<DomainBase>&) {
@@ -93,7 +93,7 @@ int AFC::update_trial_status(const vec& t_strain) {
 
     const auto& i_strain = incre_strain(0);
 
-    if(fabs(i_strain) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(i_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     auto& load_sign = trial_history(0);

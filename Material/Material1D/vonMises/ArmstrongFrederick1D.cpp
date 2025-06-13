@@ -51,7 +51,7 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
     auto& r = trial_history(size + 2);
     auto& theta = trial_history(size + 3);
 
-    auto yield_func = fabs(trial_stress(0) - accu(trial_history.head(size))) - std::max(0., yield + hardening * q + saturation * (1. - exp(-ms * q)) - reduction * (1. - exp(-mr * r)));
+    auto yield_func = std::fabs(trial_stress(0) - accu(trial_history.head(size))) - std::max(0., yield + hardening * q + saturation * (1. - std::exp(-ms * q)) - reduction * (1. - std::exp(-mr * r)));
 
     if(yield_func < 0.) return SUANPAN_SUCCESS;
 
@@ -66,8 +66,8 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto s_term = saturation * exp(-ms * q);
-        const auto r_term = reduction * exp(-mr * r);
+        const auto s_term = saturation * std::exp(-ms * q);
+        const auto r_term = reduction * std::exp(-mr * r);
 
         auto k = yield + saturation - reduction + hardening * q - s_term + r_term;
         auto dk = hardening + ms * s_term - mr * r_term * dr;
@@ -80,20 +80,20 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
             sum_b += a(I) / denom;
         }
 
-        yield_func = fabs(xi = trial_stress(0) - sum_a) - (elastic_modulus + sum_b) * gamma - k;
+        yield_func = std::fabs(xi = trial_stress(0) - sum_a) - (elastic_modulus + sum_b) * gamma - k;
 
         jacobian = -elastic_modulus - dk;
 
         if(xi > 0.)
-            for(auto I = 0u; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * pow(1. + b(I) * gamma, -2.);
+            for(auto I = 0u; I < size; ++I) jacobian += (b(I) * trial_history(I) - a(I)) * std::pow(1. + b(I) * gamma, -2.);
         else
-            for(auto I = 0u; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * pow(1. + b(I) * gamma, -2.);
+            for(auto I = 0u; I < size; ++I) jacobian -= (b(I) * trial_history(I) + a(I)) * std::pow(1. + b(I) * gamma, -2.);
 
         const auto incre = yield_func / jacobian;
-        const auto error = fabs(incre);
+        const auto error = std::fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || fabs(yield_func) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(yield_func) < tolerance) && counter > 5u)) break;
 
         gamma -= incre;
         q -= incre;
@@ -102,7 +102,7 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
         r = current_r;
         theta = current_theta;
 
-        if(const auto h = fabs(ep - current_theta) - current_r; h > 0.) {
+        if(const auto h = std::fabs(ep - current_theta) - current_r; h > 0.) {
             const auto nh = ep > current_theta ? 1. : -1.;
             r += memory * h;
             theta += nh * (1. - memory) * h;

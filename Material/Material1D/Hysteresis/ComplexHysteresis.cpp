@@ -19,7 +19,7 @@
 
 ComplexHysteresis::ComplexHysteresis(const unsigned T, const double E, const double R)
     : Material1D(T, R)
-    , elastic_modulus(fabs(E)) {}
+    , elastic_modulus(std::fabs(E)) {}
 
 int ComplexHysteresis::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
