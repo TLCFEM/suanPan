@@ -47,7 +47,7 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
-          file_name="suanPan-linux-debug-gcc-no-avx-openblas"
+          file_name="linux-debug-openblas"
           file_name+="${{ env.SP_TIME }}.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
