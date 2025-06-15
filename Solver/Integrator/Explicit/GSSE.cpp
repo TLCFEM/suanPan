@@ -85,13 +85,9 @@ int GSSE::update_trial_status(bool) {
     return D->update_trial_status();
 }
 
-vec GSSE::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return from_total_acceleration(get_domain()->get_factory()->get_current_acceleration()(encoding) + incre_acceleration, encoding); }
+vec GSSE::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return 1. / C / AB * incre_acceleration + get_domain()->get_factory()->get_current_acceleration()(encoding); }
 
-vec GSSE::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) {
-    auto& W = get_domain()->get_factory();
-
-    return total_acceleration / AB - (1. / AB - 1.) * W->get_current_acceleration()(encoding);
-}
+vec GSSE::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) { return from_incre_acceleration(total_acceleration - get_domain()->get_factory()->get_current_acceleration()(encoding), encoding); }
 
 void GSSE::print() { suanpan_info("A generalized explicit time integrator. doi:10.1002/nme.6574\n"); }
 
