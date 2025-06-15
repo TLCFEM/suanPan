@@ -71,10 +71,7 @@ int GSSSS::process_constraint_impl(const bool full) {
 }
 
 GSSSS::GSSSS(const unsigned T)
-    : ImplicitIntegrator(T)
-    , L1(1.)
-    , L2(.5)
-    , L4(1.) {}
+    : ImplicitIntegrator(T) {}
 
 void GSSSS::assemble_resistance() {
     const auto D = get_domain();

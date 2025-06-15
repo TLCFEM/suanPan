@@ -42,7 +42,7 @@ protected:
     [[nodiscard]] int process_load_impl(bool) override;
     [[nodiscard]] int process_constraint_impl(bool) override;
 
-    const double L1, L2, L4;
+    static constexpr double L1{1.}, L2{.5}, L4{1.};
 
     double L3 = 0., L5 = 0.;
     double W1 = 0., W3G3 = 0., W2G5 = 0., W1G6 = 0.;
