@@ -70,9 +70,6 @@ int GSSSS::process_constraint_impl(const bool full) {
     return code;
 }
 
-GSSSS::GSSSS(const unsigned T)
-    : ImplicitIntegrator(T) {}
-
 void GSSSS::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();

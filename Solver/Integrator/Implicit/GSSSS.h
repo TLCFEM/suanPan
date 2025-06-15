@@ -55,7 +55,7 @@ protected:
     template<typename T> void generate_constants(double, double, double) { throw std::invalid_argument("need a proper scheme"); }
 
 public:
-    explicit GSSSS(unsigned);
+    using ImplicitIntegrator::ImplicitIntegrator;
 
     void assemble_resistance() override;
     void assemble_matrix() override;
