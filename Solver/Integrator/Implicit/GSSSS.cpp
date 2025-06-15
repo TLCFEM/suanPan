@@ -135,13 +135,13 @@ int GSSSS::update_trial_status(bool) {
 vec GSSSS::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
     auto& W = get_domain()->get_factory();
 
-    return from_incre_acceleration(incre_velocity / C4 - C3 / C4 * W->get_current_acceleration()(encoding), encoding);
+    return from_incre_acceleration(incre_velocity / C4 - W1 * C3 / C4 * W->get_current_acceleration()(encoding), encoding);
 }
 
 vec GSSSS::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
     auto& W = get_domain()->get_factory();
 
-    return incre_acceleration / C0 - C1 / C0 * W->get_current_velocity()(encoding) - C2 / C0 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
+    return incre_acceleration / W1 / C0 - C1 / C0 * W->get_current_velocity()(encoding) - C2 / C0 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
 void GSSSS::print() {
