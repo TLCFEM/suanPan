@@ -38,7 +38,7 @@ cp ../Example/Section/HIST .
 
 declare -A timings
 
->"$log_file"
+true >"$log_file"
 
 for file in "${files[@]}"; do
   echo "Processing $file ..." | tee -a "$log_file"
@@ -47,6 +47,7 @@ for file in "${files[@]}"; do
   TIME_OUTPUT=$({ /usr/bin/time -f "%e" ./suanPan -f "$file" >>"$log_file"; } 2>&1 1>&3)
   exec 3>&- 4>&-
 
+  # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then
     echo "Error processing $file." >&2
     exit 1
