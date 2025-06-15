@@ -1597,6 +1597,9 @@
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmarkIterative.cpp">
       <Filter>Solver\Integrator\Implicit</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GSSE.cpp">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2991,6 +2994,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmarkIterative.h">
       <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Explicit\GSSE.h">
+      <Filter>Solver\Integrator\Explicit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

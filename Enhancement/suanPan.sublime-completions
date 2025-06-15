@@ -2065,6 +2065,18 @@
       "contents": "integrator Tchamwa ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
     },
     {
+      "trigger": "GSSE",
+      "details": "gsse explicit time integration",
+      "kind": "keyword",
+      "contents": "integrator GSSE ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
+    },
+    {
+      "trigger": "ICL",
+      "details": "icl explicit time integration",
+      "kind": "keyword",
+      "contents": "integrator ICL ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
+    },
+    {
       "trigger": "Tie",
       "details": "tie constraint",
       "kind": "type",
