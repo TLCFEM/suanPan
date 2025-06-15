@@ -503,6 +503,7 @@
     <ClCompile Include="..\..\..\Solver\Integrator\Explicit\BatheExplicit.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GeneralizedAlphaExplicit.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GERKN.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GSSE.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Explicit\Tchamwa.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\BatheTwoStep.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\GeneralizedAlpha.cpp" />
@@ -977,6 +978,7 @@
     <ClInclude Include="..\..\..\Solver\Integrator\Explicit\BatheExplicit.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Explicit\GeneralizedAlphaExplicit.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Explicit\GERKN.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\Explicit\GSSE.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Explicit\Tchamwa.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\BatheTwoStep.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\GeneralizedAlpha.h" />

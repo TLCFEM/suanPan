@@ -342,6 +342,24 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
 
         if(domain->insert(std::make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
     }
+    else if(is_equal(integrator_type, "ICL")) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("A valid damping radius is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(std::make_shared<ICL>(tag, std::max(.5, std::min(radius, 1.))))) code = 1;
+    }
+    else if(is_equal(integrator_type, "GSSE")) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("A valid damping radius is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(std::make_shared<GSSE>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+    }
     else if(is_equal(integrator_type, "WAT2")) {
         auto para = 1. / 3.;
         if(!get_optional_input(command, para)) {

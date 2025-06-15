@@ -3,6 +3,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Explicit/BatheExplicit.cpp
         Explicit/GeneralizedAlphaExplicit.cpp
         Explicit/GERKN.cpp
+        Explicit/GSSE.cpp
         Explicit/Tchamwa.cpp
         Implicit/BatheTwoStep.cpp
         Implicit/GeneralizedAlpha.cpp
