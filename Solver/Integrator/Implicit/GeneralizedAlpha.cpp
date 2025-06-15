@@ -149,13 +149,13 @@ int GeneralizedAlpha::update_trial_status(bool) {
 vec GeneralizedAlpha::from_incre_velocity(const vec& incre_velocity, const uvec& encoding) {
     auto& W = get_domain()->get_factory();
 
-    return incre_velocity / (F11 * F7) + F10 * W->get_current_velocity()(encoding) - (F10 + F11 * F9) / (F11 * F7) * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
+    return from_incre_acceleration(incre_velocity / F11 - F2 * F10 / F11 * W->get_current_acceleration()(encoding), encoding);
 }
 
 vec GeneralizedAlpha::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) {
     auto& W = get_domain()->get_factory();
 
-    return incre_acceleration / F7 + F10 * W->get_current_velocity()(encoding) - F9 / F7 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
+    return incre_acceleration / F2 / F7 + F10 * W->get_current_velocity()(encoding) - F9 / F7 * W->get_current_acceleration()(encoding) + W->get_current_displacement()(encoding);
 }
 
 void GeneralizedAlpha::print() {
