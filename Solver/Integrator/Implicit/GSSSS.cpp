@@ -176,7 +176,7 @@ template<> void GSSSS::generate_constants<GSSSSV0>(const double R3, const double
 
     W1 = (T0 / 2. + T1 / 3. + T2 / 4. + T3 / 5.) / (T0 + T1 / 2. + T2 / 3. + T3 / 4.);
 
-    W3G3 = 1. / (1. + R1) / (1. + R2) / (1. + R3);
+    W3G3 = L5 / (1. + R1) / (1. + R2);
     W2G5 = 2. * W3G3;
     W1G6 = (2. + R1 + R2 + R3 - R1 * R2 * R3) * W3G3;
 }

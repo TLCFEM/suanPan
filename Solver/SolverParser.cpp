@@ -270,29 +270,27 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
     else if(is_equal(integrator_type, "GSSSSU0")) {
         vec pool(3);
 
-        for(auto& I : pool)
-            if(!get_input(command, I)) {
-                suanpan_error("A valid damping radius is required.\n");
-                return SUANPAN_SUCCESS;
-            }
+        if(!get_input(command, pool)) {
+            suanpan_error("A valid spectral radius is required.\n");
+            return SUANPAN_SUCCESS;
+        }
 
         if(domain->insert(std::make_shared<GSSSSU0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSV0")) {
         vec pool(3);
 
-        for(auto& I : pool)
-            if(!get_input(command, I)) {
-                suanpan_error("A valid damping radius is required.\n");
-                return SUANPAN_SUCCESS;
-            }
+        if(!get_input(command, pool)) {
+            suanpan_error("A valid spectral radius is required.\n");
+            return SUANPAN_SUCCESS;
+        }
 
         if(domain->insert(std::make_shared<GSSSSV0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSOptimal")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
-            suanpan_error("A valid damping radius is required.\n");
+            suanpan_error("A valid spectral radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
