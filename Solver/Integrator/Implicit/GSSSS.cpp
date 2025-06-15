@@ -169,7 +169,7 @@ template<> void GSSSS::generate_constants<GSSSSV0>(const double R3, const double
     L3 = .5 / (1. + R3);
     L5 = 2. * L3;
 
-    const auto T0 = 9. - 11. * R1 - 11 * R2 + 19. * R1 * R2;
+    const auto T0 = 9. - 11. * R1 - 11. * R2 + 19. * R1 * R2;
     const auto T1 = -30. * (3. - 4. * R1 - 4. * R2 + 6. * R1 * R2);
     const auto T2 = 7.5 * (25. - 37. * R1 - 37. * R2 + 53. * R1 * R2);
     const auto T3 = -35. * (3. - 5. * R1 - 5. * R2 + 7. * R1 * R2);
