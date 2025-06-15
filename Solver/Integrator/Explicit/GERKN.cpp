@@ -120,7 +120,9 @@ vec GERKN::from_total_acceleration(const vec& total_acceleration, const uvec& en
 
     auto& W = get_domain()->get_factory();
 
-    return total_acceleration / AB2 - AB0 / AB2 * W->get_pre_acceleration()(encoding) - AB1 / AB2 * W->get_current_acceleration()(encoding);
+    const vec incre_acceleration = (total_acceleration - W->get_current_acceleration()(encoding)) * (1. - C1) / (C2 - C1);
+
+    return incre_acceleration / AB2 - AB0 / AB2 * W->get_pre_acceleration()(encoding) + (1. - AB1) / AB2 * W->get_current_acceleration()(encoding);
 }
 
 WAT2::WAT2(const unsigned T, double R)

@@ -59,6 +59,9 @@ public:
 
     int update_trial_status(bool) override;
 
+    vec from_incre_acceleration(const vec&, const uvec&) override;
+    vec from_total_acceleration(const vec&, const uvec&) override;
+
     void print() override;
 };
 

@@ -104,6 +104,10 @@ int GeneralizedAlphaExplicit::update_trial_status(bool) {
     return D->update_trial_status();
 }
 
+vec GeneralizedAlphaExplicit::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return incre_acceleration / (1. - AF) + get_domain()->get_factory()->get_current_acceleration()(encoding); }
+
+vec GeneralizedAlphaExplicit::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) { return from_incre_acceleration(total_acceleration - get_domain()->get_factory()->get_current_acceleration()(encoding), encoding); }
+
 void GeneralizedAlphaExplicit::print() {
     suanpan_info("An explicit integrator using the Generalized-Alpha algorithm.\n");
 }
