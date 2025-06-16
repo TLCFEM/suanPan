@@ -48,7 +48,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
 
     const auto dev_stress = tensor::dev(trial_stress);
     const auto hydro_stress = tensor::mean3(trial_stress);
-    const auto sqrt_j2 = sqrt(std::max(datum::eps, tensor::stress::invariant2(dev_stress)));
+    const auto sqrt_j2 = std::sqrt(std::max(datum::eps, tensor::stress::invariant2(dev_stress)));
 
     const auto yield_const = sqrt_j2 + eta_yield * hydro_stress;
 
@@ -67,10 +67,10 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
 
         const auto residual = yield_const - factor_a * gamma - xi * compute_c(plastic_strain);
         const auto incre_gamma = residual / (denominator = factor_a + xi * xi * compute_dc(plastic_strain));
-        const auto error = fabs(incre_gamma);
+        const auto error = std::fabs(incre_gamma);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) break;
         plastic_strain = current_history(0) + xi * (gamma += incre_gamma);
     }
 
@@ -101,10 +101,10 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
 
             const auto residual = compute_c(plastic_strain) * xi / eta_flow - hydro_stress + bulk * gamma;
             const auto incre_gamma = residual / (denominator = factor_b * compute_dc(plastic_strain) + bulk);
-            const auto error = fabs(incre_gamma);
+            const auto error = std::fabs(incre_gamma);
             if(1u == counter) ref_error = error;
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance) && counter > 5u)) break;
+            if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) break;
             plastic_strain = current_history(0) + xi / eta_yield * (gamma -= incre_gamma);
         }
 
