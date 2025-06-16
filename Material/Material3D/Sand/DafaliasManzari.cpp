@@ -28,7 +28,7 @@ const span DafaliasManzari::sm(14, 19);
 const mat DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 DafaliasManzari::DafaliasManzari(const unsigned T, const double G0, const double NU, const double AC, const double LC, const double E0, const double XI, const double M, const double H0, const double H1, const double CH, const double NB, const double A, const double ND, const double ZM, const double CZ, const double PC, const double GR, const double R)
-    : DataDafaliasManzari{fabs(G0), fabs(NU), fabs(AC), fabs(LC), fabs(E0), fabs(XI), fabs(M), fabs(H0), fabs(H1), fabs(CH), fabs(NB), A, fabs(ND), fabs(ZM), fabs(CZ), -fabs(PC), fabs(GR)}
+    : DataDafaliasManzari{std::fabs(G0), std::fabs(NU), std::fabs(AC), std::fabs(LC), std::fabs(E0), std::fabs(XI), std::fabs(M), std::fabs(H0), std::fabs(H1), std::fabs(CH), std::fabs(NB), A, std::fabs(ND), std::fabs(ZM), std::fabs(CZ), -std::fabs(PC), std::fabs(GR)}
     , Material3D(T, R) {}
 
 int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
@@ -60,8 +60,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     vec s = current_s + 2. * gi * incre_ed;
 
     const auto void_ratio = e0 + (1. + e0) * tensor::trace3(trial_strain);
-    const auto v_term_a = pow(2.97 - void_ratio, 2.) / (1. + void_ratio);
-    const auto v_term_b = (void_ratio * (void_ratio + 2.) - 14.7609) * pow(1. + void_ratio, -2.) * (1. + e0);
+    const auto v_term_a = std::pow(2.97 - void_ratio, 2.) / (1. + void_ratio);
+    const auto v_term_b = (void_ratio * (void_ratio + 2.) - 14.7609) * std::pow(1. + void_ratio, -2.) * (1. + e0);
 
     double g, pgpe, pgpp;
 
@@ -77,7 +77,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto sqrt_term = shear_modulus * sqrt(std::max(datum::eps, pc * p));
+        const auto sqrt_term = shear_modulus * std::sqrt(std::max(datum::eps, pc * p));
 
         g = sqrt_term * v_term_a;
 
@@ -101,7 +101,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(residual);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local elastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         p -= incre(sa);
         s -= incre(sb);
@@ -163,7 +163,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         // shear modulus
 
-        auto tmp_term = shear_modulus * sqrt(std::max(datum::eps, pc * p));
+        auto tmp_term = shear_modulus * std::sqrt(std::max(datum::eps, pc * p));
         g = tmp_term * v_term_a;
 
         if(g > gi) {
@@ -177,14 +177,14 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         // state parameter
 
-        tmp_term = lc * pow(std::max(datum::eps, p / pc), xi);
+        tmp_term = lc * std::pow(std::max(datum::eps, p / pc), xi);
         const auto psi = void_ratio - e0 + tmp_term;
         const auto ppsipp = xi * tmp_term / p;
 
         // surface
 
-        const auto ad = ac * exp(nd * psi);
-        const auto ab = ac * exp(-nb * psi);
+        const auto ad = ac * std::exp(nd * psi);
+        const auto ab = ac * std::exp(-nb * psi);
         const auto adm = ad - m;
         const auto abm = ab - m;
 
@@ -239,19 +239,19 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         // hardening
 
-        tmp_term = shear_modulus * h0 * sqrt(std::max(datum::eps, pc / p));
+        tmp_term = shear_modulus * h0 * std::sqrt(std::max(datum::eps, pc / p));
         const auto b0 = tmp_term * (1. - ch * void_ratio);
         const auto pb0pe = -ch * tmp_term * (1. + e0);
         const auto pb0pp = -.5 * b0 / p;
 
         update_ini_alpha = false;
         vec diff_alpha = (ini_alpha - alpha) % tensor::stress::norm_weight;
-        tmp_term = exp(h1 * dot(diff_alpha, n));
+        tmp_term = std::exp(h1 * dot(diff_alpha, n));
 
         if(tmp_term > 1.) {
             update_ini_alpha = true;
             diff_alpha = (current_alpha - alpha) % tensor::stress::norm_weight;
-            tmp_term = exp(h1 * dot(diff_alpha, n));
+            tmp_term = std::exp(h1 * dot(diff_alpha, n));
         }
 
         h = tmp_term * b0;
@@ -320,7 +320,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(residual);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre(si);
         p -= incre(sj);

@@ -19,8 +19,8 @@
 
 #include <Toolbox/tensor.h>
 
-const double Subloading::root_two_third = sqrt(two_third);
-const double Subloading::rate_bound = -log(z_bound);
+const double Subloading::root_two_third = std::sqrt(two_third);
+const double Subloading::rate_bound = -std::log(z_bound);
 const mat Subloading::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 pod2 Subloading::yield_ratio(const double z) {

@@ -52,7 +52,7 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
 
     if(kp < 1.) {
         qh1 = qh0 + (1. - qh0) * kp * (kp * (kp - 3.) + 3.) - hp * kp * (kp - 1.) * (kp - 2.);
-        dqh1dkp = (3. - 3. * qh0) * pow(kp - 1., 2.) - hp * (3. * kp * (kp - 2.) + 2.);
+        dqh1dkp = (3. - 3. * qh0) * std::pow(kp - 1., 2.) - hp * (3. * kp * (kp - 2.) + 2.);
     }
     else {
         qh2 = 1. + hp * (kp - 1.);
@@ -62,7 +62,7 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     const auto ag = 3. * ftfc * qh2 + .5 * m0;
     const auto dagdkp = 3. * ftfc * dqh2dkp;
     const auto cg = qh2 * (1. + ftfc) / 3.;
-    const auto dg = log(ag) - log(3. * qh2 + .5 * m0) + lndf;
+    const auto dg = std::log(ag) - std::log(3. * qh2 + .5 * m0) + lndf;
     const auto dcgdkp = dqh2dkp * (1. + ftfc) / 3.;
     const auto ddgdkp = dagdkp / ag - dqh2dkp / (qh2 + m0 / 6.);
     const auto bg = cg / dg;
@@ -70,13 +70,13 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
 
     const auto eg = (p / fc - qh2 * ftfc / 3.) / bg;
     const auto pegpkp = (-ftfc / 3. * dqh2dkp - eg * dbgdkp) / bg;
-    const auto pmgpp = ag * exp(eg);
+    const auto pmgpp = ag * std::exp(eg);
 
     const auto g3 = (s / sqrt_six + p) / fc;
     const auto g1 = (1. - qh1) * g3 * g3 + sqrt_three_two * s / fc;
 
     const auto square_term = ra * lode * lode;
-    const auto sqrt_term = sqrt(rb * square_term + rc);
+    const auto sqrt_term = std::sqrt(rb * square_term + rc);
     const auto numerator = square_term + rb;
     const auto denominator = ra * lode + sqrt_term;
     r = numerator / denominator;
@@ -107,11 +107,11 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     gp = 2. * g1 * pg1pp + qh1 * qh1 * pg2pp;
     gs = 2. * g1 * pg1ps + qh1 * qh1 * pg2ps;
 
-    gg = sqrt(gs * gs + gp * gp / 3.);
+    gg = std::sqrt(gs * gs + gp * gp / 3.);
 
-    pgppp = (4. - 4. * qh1) * (pg1pp * g3 + g1 * pg3pp) + qh1 * qh1 * ag * exp(eg) / bg / fc;
+    pgppp = (4. - 4. * qh1) * (pg1pp * g3 + g1 * pg3pp) + qh1 * qh1 * ag * std::exp(eg) / bg / fc;
     pgpps = (4. - 4. * qh1) * (pg1ps * g3 + g1 * pg3ps);
-    pgppkp = 4. * g3 * (pg1pkp - qh1 * pg1pkp - dqh1dkp * g1) + (2. * dqh1dkp * ag + qh1 * (dagdkp + ag * pegpkp)) * qh1 * exp(eg);
+    pgppkp = 4. * g3 * (pg1pkp - qh1 * pg1pkp - dqh1dkp * g1) + (2. * dqh1dkp * ag + qh1 * (dagdkp + ag * pegpkp)) * qh1 * std::exp(eg);
 
     pgppp /= fc;
     pgpps /= fc;
@@ -126,12 +126,12 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     pgspkp /= sqrt_six * fc;
 
     if(const auto rh = -p / fc - 1. / 3.; rh >= 0.) {
-        xh = (bh - ah) * exp(-rh / ch);
+        xh = (bh - ah) * std::exp(-rh / ch);
         dxhdp = xh / ch / fc;
         xh += ah;
     }
     else {
-        xh = eh * exp(rh / fh);
+        xh = eh * std::exp(rh / fh);
         dxhdp = -xh / fh / fc;
         xh += dh;
     }
@@ -176,7 +176,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto ptbps = sqrt_three_two * e0 / fc;
     const auto term_a = ptaps * s + ptapp * p;
     const auto term_b = ptbps * s;
-    const auto term_c = sqrt(term_a * term_a + term_b * term_b);
+    const auto term_c = std::sqrt(term_a * term_a + term_b * term_b);
     ee = term_a + term_c;
     const auto incre_ee = ee - current_ee;
     const auto peeps = (ptaps * ee + term_b * ptbps) / term_c;
@@ -334,16 +334,16 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
     while(true) {
         if(max_iteration == ++counter) return SUANPAN_FAIL;
 
-        const auto term_a = ft * exp(-(kd1 + omega * kd2) / ef);
+        const auto term_a = ft * std::exp(-(kd1 + omega * kd2) / ef);
         const auto term_b = (1. - omega) * elastic_modulus;
         const auto residual = term_a - term_b * kd;
         const auto jacobian = elastic_modulus * kd - kd2 / ef * term_a;
         const auto incre = residual / jacobian;
 
-        const auto error = fabs(incre);
+        const auto error = std::fabs(incre);
         suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance || (std::fabs(residual) < tolerance && counter > 5u)) {
             popkd = term_b / jacobian;
             popkd1 = term_a / ef / jacobian;
             popkd2 = popkd1 * omega;
@@ -355,7 +355,7 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 }
 
 CDPM2::CDPM2(const unsigned T, const double E, const double V, const double FT, const double FC, const double QH0, const double HP, const double DF, const double AH, const double BH, const double CH, const double DH, const double AS, const double EFT, const double EFC, const DamageType DT, const double R)
-    : DataCDPM2{fabs(E), fabs(V), fabs(FT), fabs(FC), fabs(QH0), std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), DF, AH, BH, CH, DH, AS, fabs(EFT), fabs(EFC)}
+    : DataCDPM2{std::fabs(E), std::fabs(V), std::fabs(FT), std::fabs(FC), std::fabs(QH0), std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), DF, AH, BH, CH, DH, AS, std::fabs(EFT), std::fabs(EFC)}
     , Material3D(T, R)
     , damage_type(DT) {}
 
@@ -394,9 +394,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const vec n = dev_stress / trial_s;
 
     static constexpr double low_limit = -.95;
-    static const double low_slope = (2. * cos(acos(low_limit) / 3.) - 1.) / (low_limit + 1.);
+    static const double low_slope = (2. * std::cos(std::acos(low_limit) / 3.) - 1.) / (low_limit + 1.);
     static constexpr double high_limit = .95;
-    static const double high_slope = (2. * cos(acos(high_limit) / 3.) - 2.) / (high_limit - 1.);
+    static const double high_slope = (2. * std::cos(std::acos(high_limit) / 3.) - 2.) / (high_limit - 1.);
 
     double lode, dlode;
     if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < low_limit) {
@@ -412,9 +412,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         dlode = high_slope;
     }
     else {
-        const auto lode_b = acos(lode_a) / 3.; // theta
-        lode = 2. * cos(lode_b);               // 2*cos(theta)
-        dlode = 2. / 3. * sin(lode_b) / sqrt((1. - lode_a) * (1. + lode_a));
+        const auto lode_b = std::acos(lode_a) / 3.; // theta
+        lode = 2. * std::cos(lode_b);               // 2*cos(theta)
+        dlode = 2. / 3. * std::sin(lode_b) / std::sqrt((1. - lode_a) * (1. + lode_a));
     }
 
     const auto square_lode = lode * lode;
@@ -532,7 +532,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             const vec unit_n = n % tensor::stress::norm_weight;
 
             plastic_strain += gamma * gs * unit_n + gamma * gp / 3. * tensor::unit_tensor2;
