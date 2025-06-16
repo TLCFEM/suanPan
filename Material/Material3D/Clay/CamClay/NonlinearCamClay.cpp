@@ -92,7 +92,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(incre);
         if(1u == counter) rel_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * rel_error || (inf_norm(residual) < tolerance * ini_f && counter > 5u)) {
+        if(error < tolerance * rel_error || ((error < tolerance || inf_norm(residual) < tolerance * ini_f) && counter > 5u)) {
             mat::fixed<6, 2> left(fill::none);
 
             rel_error = 2. * bulk / square_b; // reuse variable
