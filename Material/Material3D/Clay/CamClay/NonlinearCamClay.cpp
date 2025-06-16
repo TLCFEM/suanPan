@@ -19,11 +19,11 @@
 
 #include <Toolbox/tensor.h>
 
-const double NonlinearCamClay::sqrt_three_two = sqrt(1.5);
+const double NonlinearCamClay::sqrt_three_two = std::sqrt(1.5);
 const mat NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearCamClay::NonlinearCamClay(const unsigned T, const double E, const double V, const double B, const double M, const double P, const double R)
-    : DataNonlinearCamClay{fabs(E), fabs(V), B * B, fabs(M), fabs(P)}
+    : DataNonlinearCamClay{std::fabs(E), std::fabs(V), B * B, std::fabs(M), std::fabs(P)}
     , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {
@@ -71,13 +71,13 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
         const auto rel_p = trial_p - pt + a;
         const auto square_b = rel_p >= 0. ? 1. : square_beta;
         const auto denom = square_m + six_shear * gamma;
-        const auto square_qm = pow(m * trial_q / denom, 2.);
+        const auto square_qm = std::pow(m * trial_q / denom, 2.);
 
         residual(0) = rel_p * rel_p / square_b + square_qm - a * a;
 
         if(1u == counter) {
             if(residual(0) < 0.) return SUANPAN_SUCCESS;
-            ini_f = std::max(1., residual(0)); // yield function can be very large, use relative error instead
+            ini_f = 1. + residual(0);
         }
 
         residual(1) = incre_alpha - 2. * gamma / square_b * rel_p;
