@@ -20,7 +20,7 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
-const double NonlinearCDP::root_three_two = sqrt(1.5);
+const double NonlinearCDP::root_three_two = std::sqrt(1.5);
 const mat NonlinearCDP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 double NonlinearCDP::compute_r(const vec3& in) {
@@ -41,7 +41,7 @@ vec3 NonlinearCDP::compute_dr(const vec3& in) {
 double NonlinearCDP::compute_s(const double r) const { return s0 + r - s0 * r; }
 
 NonlinearCDP::NonlinearCDP(const unsigned T, const double E, const double V, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
-    : DataNonlinearCDP{fabs(E), V < .5 ? V : .2, fabs(GT), fabs(GC), (fabs(BC) - 1.) / (2. * fabs(BC) - 1.), fabs(AP), fabs(S)}
+    : DataNonlinearCDP{std::fabs(E), V < .5 ? V : .2, std::fabs(GT), std::fabs(GC), (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), std::fabs(AP), std::fabs(S)}
     , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int NonlinearCDP::initialize(const shared_ptr<DomainBase>&) {
