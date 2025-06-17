@@ -19,7 +19,7 @@
 
 #include <Toolbox/tensor.h>
 
-const double NonlinearHoffman::root_two_third = sqrt(2. / 3.);
+const double NonlinearHoffman::root_two_third = std::sqrt(2. / 3.);
 const uword NonlinearHoffman::sa{0};
 const span NonlinearHoffman::sb{1, 6};
 
@@ -89,7 +89,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             plastic_strain += gamma * n_mid;
 
             mat::fixed<7, 6> left(fill::none), right(fill::zeros);
