@@ -139,8 +139,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
             auto approx_update = [&](const double in_lambda) {
                 r = compute_r(new_stress = principal_stress + (lambda = in_lambda) * dsigmadlambda);
 
-                brent(approx_kappa_t, current_kappa_t, 1., tolerance);
-                brent(approx_kappa_c, current_kappa_c, 1., tolerance);
+                brent(approx_kappa_t, current_kappa_t, 1. - datum::eps, tolerance);
+                brent(approx_kappa_c, current_kappa_c, 1. - datum::eps, tolerance);
 
                 auto f = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2];
 
