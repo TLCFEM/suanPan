@@ -54,7 +54,7 @@ template<std::floating_point T, std::invocable<T> F> T brent(F&& func, const T x
     while(true) {
         ++counter;
 
-        if(fb * fc > 0) {
+        if(fb * fc > T(0)) {
             c = a;
             fc = fa;
             e = d = b - a;
@@ -67,8 +67,8 @@ template<std::floating_point T, std::invocable<T> F> T brent(F&& func, const T x
             fb = fc;
             fc = fa;
         }
-        const auto comp_tol = 2 * eps * std::fabs(b) + .5 * tol;
-        const auto xm = .5 * (c - b);
+        const auto comp_tol = T(2) * eps * std::fabs(b) + T(.5) * tol;
+        const auto xm = T(.5) * (c - b);
         if(std::fabs(xm) <= comp_tol || std::fabs(fb) < tol) {
             suanpan_debug("Brent's method initial guess {:.5E} with {} iterations.\n", b, counter);
             return b;
@@ -76,18 +76,18 @@ template<std::floating_point T, std::invocable<T> F> T brent(F&& func, const T x
         if(std::fabs(e) >= comp_tol && std::fabs(fa) > std::fabs(fb)) {
             const auto s = fb / fa;
             if(a == c) {
-                p = 2 * xm * s;
-                q = 1 - s;
+                p = T(2) * xm * s;
+                q = T(1) - s;
             }
             else {
                 q = fa / fc;
                 const auto r = fb / fc;
-                p = s * (2 * xm * q * (q - r) - (b - a) * (r - 1));
-                q = (q - 1) * (r - 1) * (s - 1);
+                p = s * (T(2) * xm * q * (q - r) - (b - a) * (r - T(1)));
+                q = (q - T(1)) * (r - T(1)) * (s - T(1));
             }
-            if(p > 0) q = -q;
+            if(p > T(0)) q = -q;
             else p = std::fabs(p);
-            if(2 * p < std::min(3 * xm * q - std::fabs(comp_tol * q), std::fabs(e * q))) {
+            if(T(2) * p < std::min(T(3) * xm * q - std::fabs(comp_tol * q), std::fabs(e * q))) {
                 e = d;
                 d = p / q;
             }
@@ -96,7 +96,7 @@ template<std::floating_point T, std::invocable<T> F> T brent(F&& func, const T x
         else e = d = xm;
         a = b;
         fa = fb;
-        const auto dd = xm >= 0 ? comp_tol : -comp_tol;
+        const auto dd = xm >= T(0) ? comp_tol : -comp_tol;
         fb = func(b += std::fabs(d) > comp_tol ? d : dd);
     }
 }
