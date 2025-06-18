@@ -18,7 +18,7 @@
 #include "NonlinearCDP.h"
 
 #include <Recorder/OutputType.h>
-#include <Toolbox/brent.hpp>
+#include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 
 const double NonlinearCDP::root_three_two = std::sqrt(1.5);
@@ -139,8 +139,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
             auto approx_update = [&](const double in_lambda) {
                 r = compute_r(new_stress = principal_stress + (lambda = in_lambda) * dsigmadlambda);
 
-                brent(approx_kappa_t, current_kappa_t, 1. - datum::eps, tolerance);
-                brent(approx_kappa_c, current_kappa_c, 1. - datum::eps, tolerance);
+                ridders(approx_kappa_t, current_kappa_t, 1. - datum::eps, tolerance);
+                ridders(approx_kappa_c, current_kappa_c, 1. - datum::eps, tolerance);
 
                 auto f = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2];
 
@@ -150,13 +150,13 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
             };
 
             auto x1{0.};
-            lambda = .5 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p);
+            lambda = .25 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p);
             while(approx_update(lambda) > 0.) {
                 x1 = lambda;
                 lambda *= 2.;
             }
 
-            brent(approx_update, x1, lambda, tolerance);
+            ridders(approx_update, x1, lambda, tolerance);
         }
 
         t_para = compute_tension_backbone(kappa_t);

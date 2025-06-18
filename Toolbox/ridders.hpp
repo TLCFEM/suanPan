@@ -78,6 +78,8 @@ template<std::invocable<double> T> double ridders(const T& func, double x1, doub
     return target;
 }
 
+template<std::invocable<double> T> double ridders(const T& func, double x1, double x2, const double tolerance) { return ridders(func, x1, func(x1), x2, func(x2), tolerance); }
+
 #endif
 
 //! @}
