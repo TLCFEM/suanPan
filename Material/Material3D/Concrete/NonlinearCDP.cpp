@@ -19,7 +19,6 @@
 
 #include <Recorder/OutputType.h>
 #include <Toolbox/brent.hpp>
-#include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 
 const double NonlinearCDP::root_three_two = std::sqrt(1.5);
@@ -150,15 +149,14 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
                 return f;
             };
 
-            auto x1{0.}, f1{approx_update(0.)}, f2{0.};
+            auto x1{0.};
             lambda = .5 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p);
-            while((f2 = approx_update(lambda)) > 0.) {
+            while(approx_update(lambda) > 0.) {
                 x1 = lambda;
-                f1 = f2;
                 lambda *= 2.;
             }
 
-            ridders(approx_update, x1, f1, lambda, f2, tolerance);
+            brent(approx_update, x1, lambda, tolerance);
         }
 
         t_para = compute_tension_backbone(kappa_t);
