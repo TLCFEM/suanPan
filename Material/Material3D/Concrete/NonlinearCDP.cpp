@@ -18,6 +18,7 @@
 #include "NonlinearCDP.h"
 
 #include <Recorder/OutputType.h>
+#include <Toolbox/brent.hpp>
 #include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 
@@ -127,50 +128,27 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
             try_bisection = true;
             counter = 2u; // skip elastic check
 
-            auto approx_update = [&](const double gm) {
-                r = compute_r(new_stress = principal_stress + (lambda = gm) * dsigmadlambda);
+            auto approx_kappa_t = [&](const double in_kappa) {
+                t_para = compute_tension_backbone(kappa_t = in_kappa);
+                return r * t_para[1] * dgdsigma_t * lambda + current_kappa_t - kappa_t;
+            };
+            auto approx_kappa_c = [&](const double in_kappa) {
+                c_para = compute_compression_backbone(kappa_c = in_kappa);
+                return (1. - r) * c_para[1] * dgdsigma_c * lambda + current_kappa_c - kappa_c;
+            };
 
-                auto inner_counter = 0u;
-                while(true) {
-                    if(10u == ++inner_counter) {
-                        suanpan_error("Cannot converge within 10 iterations.\n");
-                        break;
-                    }
-                    const auto k_tmp = r * dgdsigma_t * gm;
-                    const auto k_residual = k_tmp * t_para[1] + current_kappa_t - kappa_t;
-                    const auto k_jacobian = k_tmp * t_para[4] - 1.;
-                    const auto k_incre = k_residual / k_jacobian;
-                    suanpan_debug("Local iteration error: {:.5E}.\n", std::fabs(k_incre));
-                    if(std::fabs(k_incre) < tolerance) break;
-                    kappa_t -= k_incre;
-                    t_para = compute_tension_backbone(bound_kappa_t());
-                }
+            auto approx_update = [&](const double in_lambda) {
+                r = compute_r(new_stress = principal_stress + (lambda = in_lambda) * dsigmadlambda);
 
-                inner_counter = 0u;
-                while(true) {
-                    if(10u == ++inner_counter) {
-                        suanpan_error("Cannot converge within 10 iterations.\n");
-                        break;
-                    }
-                    const auto k_tmp = (1. - r) * dgdsigma_c * gm;
-                    const auto k_residual = k_tmp * c_para[1] + current_kappa_c - kappa_c;
-                    const auto k_jacobian = k_tmp * c_para[4] - 1.;
-                    const auto k_incre = k_residual / k_jacobian;
-                    suanpan_debug("Local iteration error: {:.5E}.\n", std::fabs(k_incre));
-                    if(std::fabs(k_incre) < tolerance) break;
-                    kappa_c -= k_incre;
-                    c_para = compute_compression_backbone(bound_kappa_c());
-                }
+                brent(approx_kappa_t, current_kappa_t, 1., tolerance);
+                brent(approx_kappa_c, current_kappa_c, 1., tolerance);
 
-                auto f = const_yield + pfplambda * gm + one_minus_alpha * c_para[2];
+                auto f = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2];
 
                 if(new_stress(2) > 0.) f -= (one_minus_alpha * c_para[2] / t_para[2] + alpha + 1.) * new_stress(2);
 
                 return f;
             };
-
-            kappa_t = current_kappa_t;
-            kappa_c = current_kappa_c;
 
             auto x1{0.}, f1{approx_update(0.)}, f2{0.};
             lambda = .5 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p);
@@ -227,7 +205,13 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
         jacobian(1, 1) = r * lambda * dgdsigma_t * t_para[4] - 1.;
         jacobian(2, 2) = (lambda - r * lambda) * dgdsigma_c * c_para[4] - 1.;
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        if(rcond(jacobian) < datum::eps) {
+            // short-circuit and direct go to the bisection logic
+            counter = max_iteration - 1u;
+            continue;
+        }
+
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
