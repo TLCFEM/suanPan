@@ -455,39 +455,33 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     auto try_bisection = false;
     while(true) {
         if(max_iteration == ++counter) {
-            if(!try_bisection) {
-                try_bisection = true;
-
-                const auto approx_update = [&](const double gm) {
-                    gamma = gm;
-                    s = trial_s - double_shear * gamma * gs;
-                    p = trial_p - bulk * gamma * gp;
-                    kp = current_kp + gamma * gg * square_lode / xh;
-                    compute_plasticity(lode, s, p, kp, data);
-                    return f;
-                };
-
-                approx_update(0.); // clear data
-
-                gamma = ini_f / elastic_modulus / elastic_modulus;
-                auto x1 = 0., f1 = ini_f;
-                // find a proper bracket
-                while(true) {
-                    if(approx_update(gamma) < 0.) break;
-                    x1 = gamma;
-                    f1 = f;
-                    gamma *= 2.;
-                }
-
-                ridders(approx_update, x1, f1, gamma, f, tolerance);
-
-                counter = 1u; // avoid initial elastic check
-
-                continue;
+            if(try_bisection) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
             }
 
-            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
+            try_bisection = true;
+            counter = 2u; // avoid initial elastic check
+
+            const auto approx_update = [&](const double gm) {
+                gamma = gm;
+                s = trial_s - double_shear * gamma * gs;
+                p = trial_p - bulk * gamma * gp;
+                kp = current_kp + gamma * gg * square_lode / xh;
+                compute_plasticity(lode, s, p, kp, data);
+                return f;
+            };
+
+            auto x1 = 0., f1 = ini_f;
+            gamma = f1 / elastic_modulus / elastic_modulus;
+            // find a proper bracket
+            while(approx_update(gamma) >= 0.) {
+                x1 = gamma;
+                f1 = f;
+                gamma *= 2.;
+            }
+
+            ridders(approx_update, x1, f1, gamma, f, tolerance);
         }
 
         compute_plasticity(lode, s, p, kp, data);

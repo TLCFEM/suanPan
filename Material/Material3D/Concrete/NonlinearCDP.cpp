@@ -151,7 +151,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
             auto x1{0.};
             lambda = .25 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p);
-            while(approx_update(lambda) > 0.) {
+            while(approx_update(lambda) >= 0.) {
                 x1 = lambda;
                 lambda *= 2.;
             }
