@@ -133,7 +133,11 @@ int vtk_parser(const shared_ptr<DomainBase>& domain, std::istringstream& command
 
     const auto func = OutputType::U == L || OutputType::V == L || OutputType::A == L || OutputType::RF == L || OutputType::DF == L || OutputType::IF == L ? vtk_plot_node_quantity : vtk_plot_element_quantity;
 
+#ifdef SUANPAN_WIN
     domain->insert(std::async(std::launch::async, func, std::cref(domain), plot_info));
+#else
+    func(domain, plot_info);
+#endif
 
     return SUANPAN_SUCCESS;
 }
