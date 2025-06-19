@@ -357,7 +357,7 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 CDPM2::CDPM2(const unsigned T, const double E, const double V, const double FT, const double FC, const double QH0, const double HP, const double DF, const double AH, const double BH, const double CH, const double DH, const double AS, const double EFT, const double EFC, const DamageType DT, const double R)
     : DataCDPM2{std::fabs(E), std::fabs(V), std::fabs(FT), std::fabs(FC), std::fabs(QH0), std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), DF, AH, BH, CH, DH, AS, std::fabs(EFT), std::fabs(EFC)}
     , Material3D(T, R)
-    , damage_type(DT) {}
+    , damage_type(DT) { access::rw(tolerance) = 1E-13; }
 
 int CDPM2::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -420,7 +420,6 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto square_lode = lode * lode;
     const rowvec dlde = dlode * double_shear * (tensor::stress::lode_der(dev_stress) % tensor::stress::norm_weight).t() * unit_dev_tensor;
 
-    auto ini_f = 0.;
     auto gamma = 0., s = trial_s, p = trial_p;
 
     mat44 jacobian(fill::none);
@@ -472,7 +471,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
                 return f;
             };
 
-            auto x1 = 0., f1 = ini_f;
+            auto x1 = 0., f1 = approx_update(x1); // must clear data so that derivatives are correct
             gamma = f1 / elastic_modulus / elastic_modulus;
             // find a proper bracket
             while(approx_update(gamma) >= 0.) {
@@ -491,10 +490,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        if(1u == counter) {
-            if(f < 0.) break;
-            ini_f = f;
-        }
+        if(1u == counter && f < 0.) break;
 
         residual(0) = f;
         residual(1) = s + double_shear * gamma * gs - trial_s;
@@ -520,7 +516,13 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         jacobian(3, 2) = gamma * square_lode / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
         jacobian(3, 3) = gamma * square_lode / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
 
-        if(!solve(incre, jacobian, residual, solve_opts::equilibrate + solve_opts::refine)) return SUANPAN_FAIL;
+        if(rcond(jacobian) < datum::eps) {
+            // short-circuit and direct go to the bisection logic
+            counter = max_iteration - 1u;
+            continue;
+        }
+
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
