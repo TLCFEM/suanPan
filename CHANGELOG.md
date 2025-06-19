@@ -14,6 +14,7 @@
 5. fix improper detection of linear systems [#270](https://github.com/TLCFEM/suanPan/pull/270)
 6. fix wrong corrector in explicit Bathe time integration [#272](https://github.com/TLCFEM/suanPan/pull/272)
 7. improve numerical integration stability and robustness of various material models
+8. update `OpenBLAS` to version `0.3.30`
 
 ## version 3.7
 
