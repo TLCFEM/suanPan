@@ -463,11 +463,21 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             counter = 2u; // avoid initial elastic check
 
             const auto approx_update = [&](const double gm) {
+                const auto if_converged = [](const double x, const double pre_x) { return std::fabs(x - pre_x) < std::numeric_limits<float>::epsilon() * (1. + std::fabs(pre_x)); };
+
                 gamma = gm;
-                s = trial_s - double_shear * gamma * gs;
-                p = trial_p - bulk * gamma * gp;
-                kp = current_kp + gamma * gg * square_lode / xh;
-                compute_plasticity(lode, s, p, kp, data);
+
+                auto inner_counter{0u};
+                auto pre_s{trial_s}, pre_p{trial_p}, pre_kp{current_kp};
+                while(true) {
+                    s = trial_s - double_shear * gamma * gs;
+                    p = trial_p - bulk * gamma * gp;
+                    kp = current_kp + gamma * gg * square_lode / xh;
+                    if((if_converged(s, pre_s) && if_converged(p, pre_p) && if_converged(kp, pre_kp)) || ++inner_counter > 5u) break;
+                    suanpan_debug("Local fixed-point iteration {} error: {:.5E}.\n", inner_counter, std::fabs(s - pre_s) + std::fabs(p - pre_p) + std::fabs(kp - pre_kp));
+                    compute_plasticity(lode, pre_s = s, pre_p = p, pre_kp = kp, data);
+                }
+
                 return f;
             };
 
