@@ -449,9 +449,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     // const auto& r = data(16);
     // const auto& drdl = data(17);
 
-    auto counter = 0u;
-    auto ref_error = 1.;
-    auto try_bisection = false;
+    auto counter{0u};
+    auto ref_error{1.};
+    auto try_bisection{false};
     while(true) {
         if(max_iteration == ++counter) {
             if(try_bisection) {
@@ -471,8 +471,8 @@ int CDPM2::update_trial_status(const vec& t_strain) {
                 return f;
             };
 
-            auto x1 = 0., f1 = approx_update(x1); // must clear data so that derivatives are correct
-            gamma = f1 / elastic_modulus / elastic_modulus;
+            auto x1{0.}, f1{approx_update(x1)}; // must clear data so that derivatives are correct
+            gamma = std::sqrt(f1) / elastic_modulus;
             // find a proper bracket
             while(approx_update(gamma) >= 0.) {
                 x1 = gamma;
@@ -556,6 +556,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         s -= incre(1);
         p -= incre(2);
         kp -= incre(3);
+
+        if(gamma < 0.) gamma = datum::eps;
+        if(kp < 0.) kp = datum::eps;
     }
 
     //
