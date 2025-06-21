@@ -26,7 +26,6 @@ vec2 ExpGurson::compute_hardening(const double plastic_strain) const {
     double pow_term;
 
     auto counter = 0u;
-    auto ref_error = 1.;
     while(true) {
         if(max_iteration == ++counter) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
@@ -39,9 +38,8 @@ vec2 ExpGurson::compute_hardening(const double plastic_strain) const {
         const auto residual = k - pow_term * tmp_term;
         const auto incre = residual / (1. - n * pow_term);
         const auto error = std::fabs(incre);
-        if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance || (std::fabs(residual) < tolerance && counter > 5u)) break;
 
         k -= incre;
     }
