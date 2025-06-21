@@ -117,6 +117,7 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
         p -= incre(3);
 
         f = std::min(std::max(f, 0.), 1.); // avoid overshoot
+        pe = std::max(pe, 0.);
     }
 
     trial_s /= denom;
