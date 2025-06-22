@@ -109,6 +109,7 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
         s -= incre(3);
 
         f = std::min(std::max(f, 0.), 1.); // avoid overshoot
+        pe = std::max(pe, 0.);
     }
 
     vec left, right(4);
