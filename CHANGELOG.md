@@ -15,6 +15,7 @@
 6. fix wrong corrector in explicit Bathe time integration [#272](https://github.com/TLCFEM/suanPan/pull/272)
 7. improve numerical integration stability and robustness of various material models
 8. update `OpenBLAS` to version `0.3.30`
+9. fix damage variable output in `TimberPD` [#276](https://github.com/TLCFEM/suanPan/pull/276)
 
 ## version 3.7
 
