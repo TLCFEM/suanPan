@@ -65,14 +65,14 @@ double TimberPD::update_damage_t(const vec& sigma_t, mat& stiffness_t) {
     auto& r_t = trial_history(7);
 
     bool new_damage_t = false;
-    if(const auto eqv_stress_t = sqrt(.5 * dot(hill_t * sigma_t, sigma_t)); eqv_stress_t > r_t) {
+    if(const auto eqv_stress_t = std::sqrt(.5 * dot(hill_t * sigma_t, sigma_t)); eqv_stress_t > r_t) {
         new_damage_t = true;
         r_t = eqv_stress_t;
     }
 
     const auto omega_t = compute_damage_t(r_t);
     if(new_damage_t) {
-        const auto domega_t = ini_r_t / r_t / r_t * ((m_t * b_t * r_t + b_t) * exp(m_t * (ini_r_t - r_t)) - b_t + 1.);
+        const auto domega_t = ini_r_t / r_t / r_t * ((m_t * b_t * r_t + b_t) * std::exp(m_t * (ini_r_t - r_t)) - b_t + 1.);
         stiffness_t = ((1. - omega_t) * eye(6, 6) - sigma_t * domega_t * .5 / r_t * sigma_t.t() * hill_t) * stiffness_t;
     }
     else stiffness_t *= 1. - omega_t;
@@ -84,7 +84,7 @@ double TimberPD::update_damage_c(const vec& sigma_c, mat& stiffness_c) {
     auto& r_c = trial_history(8);
 
     bool new_damage_c = false;
-    if(const auto eqv_stress_c = sqrt(.5 * dot(hill_c * sigma_c, sigma_c)); eqv_stress_c > r_c) {
+    if(const auto eqv_stress_c = std::sqrt(.5 * dot(hill_c * sigma_c, sigma_c)); eqv_stress_c > r_c) {
         new_damage_c = true;
         r_c = eqv_stress_c;
     }
@@ -99,13 +99,13 @@ double TimberPD::update_damage_c(const vec& sigma_c, mat& stiffness_c) {
     return omega_c;
 }
 
-double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t / r_t * (1. - b_t + b_t * exp(m_t * (ini_r_t - r_t))); }
+double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t / r_t * (1. - b_t + b_t * std::exp(m_t * (ini_r_t - r_t))); }
 
-double TimberPD::compute_damage_c(const double r_c) const { return b_c * pow(std::max(datum::eps, 1. - ini_r_c / r_c), m_c); }
+double TimberPD::compute_damage_c(const double r_c) const { return b_c * std::pow(std::max(datum::eps, 1. - ini_r_c / r_c), m_c); }
 
 std::vector<vec> TimberPD::record(const OutputType P) {
-    if(P == OutputType::DT) return {vec{compute_damage_t(current_history(1))}};
-    if(P == OutputType::DC) return {vec{compute_damage_c(current_history(2))}};
+    if(P == OutputType::DT) return {vec{compute_damage_t(current_history(7))}};
+    if(P == OutputType::DC) return {vec{compute_damage_c(current_history(8))}};
 
     return Material3D::record(P);
 }
