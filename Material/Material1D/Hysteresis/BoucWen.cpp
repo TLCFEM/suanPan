@@ -17,6 +17,8 @@
 
 #include "BoucWen.h"
 
+#include <Toolbox/ridders.hpp>
+
 BoucWen::BoucWen(const unsigned T, vec&& P)
     : DataBoucWen{P(0), P(1), P(2), P(3), P(4)}
     , Material1D(T, P(5)) {}
@@ -42,33 +44,56 @@ int BoucWen::update_trial_status(const vec& t_strain) {
     const auto& current_z = current_history(0); // z
     auto& z = trial_history(0);                 // z
 
-    auto incre = .5 * n_strain;
     auto counter = 0u;
     auto ref_error = 1.;
+    auto try_bisection = false;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
+            if(try_bisection) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
+            }
+
+            try_bisection = true;
+            counter = 2u;
+            const auto approx_update = [&](const double in) {
+                z = current_z + in;
+                return in + n_strain * (gamma + (z * n_strain >= 0. ? beta : -beta)) * std::pow(std::max(datum::eps, std::fabs(z)), n) - n_strain;
+            };
+
+            auto x1{0.}, x2{.25 * n_strain};
+            auto f1 = approx_update(x1), f2 = approx_update(x2);
+
+            while(f1 * f2 > 0.) {
+                x1 = x2;
+                f1 = f2;
+                f2 = approx_update(x2 *= 2.);
+            }
+
+            ridders(approx_update, x1, f1, x2, f2, tolerance);
         }
 
-        z += incre;
-
-        const auto p_term = (gamma + (z * n_strain >= 0. ? beta : -beta)) * std::pow(std::max(datum::eps, std::fabs(z)), n);
+        const auto abs_z = std::max(datum::eps, std::fabs(z));
+        const auto z_a = std::pow(abs_z, n - 1.);
+        const auto b_term = gamma + (z * n_strain >= 0. ? beta : -beta);
+        const auto p_term = b_term * z_a * abs_z;
         const auto t_term = n_strain * p_term;
 
         const auto residual = z - current_z + t_term - n_strain;
-        const auto jacobian = z + n * t_term;
-
-        const auto error = std::fabs(incre = -residual * z / jacobian);
+        const auto jacobian = 1. + (z >= 0. ? n_strain : -n_strain) * b_term * n * z_a;
+        const auto incre = residual / jacobian;
+        const auto error = std::fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
         if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;
-            trial_stiffness = modulus_a + modulus_b / yield_strain * (1. - p_term) * z / jacobian;
+            trial_stiffness = modulus_a + modulus_b / yield_strain * (1. - p_term) / jacobian;
 
             return SUANPAN_SUCCESS;
         }
+
+        z -= incre;
     }
 }
 
