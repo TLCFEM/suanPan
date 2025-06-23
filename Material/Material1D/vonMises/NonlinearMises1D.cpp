@@ -18,7 +18,7 @@
 #include "NonlinearMises1D.h"
 
 NonlinearMises1D::NonlinearMises1D(const unsigned T, const double E, const double R)
-    : DataMises1D{fabs(E)}
+    : DataMises1D{std::fabs(E)}
     , Material1D(T, R) {}
 
 int NonlinearMises1D::initialize(const shared_ptr<DomainBase>&) {
@@ -32,7 +32,7 @@ int NonlinearMises1D::initialize(const shared_ptr<DomainBase>&) {
 int NonlinearMises1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     auto& plastic_strain = trial_history(0);
