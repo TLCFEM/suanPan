@@ -96,7 +96,7 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
 
             const auto f1{approx_update(0.)}, f2{approx_update(net_incre_strain)};
 
-            if(try_bisection || f1 * f2 > 0.) {
+            if(try_bisection || std::signbit(f1) == std::signbit(f2)) {
                 suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
                 return SUANPAN_FAIL;
             }
