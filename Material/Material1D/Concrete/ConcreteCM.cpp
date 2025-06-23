@@ -178,11 +178,11 @@ pod2 ConcreteCM::compute_tension_subunload(const double n_strain) {
 pod2 ConcreteCM::compute_transition(const double EM, const double EA, const double SA, const double KA, const double EB, const double SB, const double KB) const {
     pod2 response;
 
-    if(fabs(EM - EA) <= 1E-15) {
+    if(std::fabs(EM - EA) <= tolerance) {
         response[0] = SA;
         response[1] = KA;
     }
-    else if(fabs(EM - EB) <= 1E-15) {
+    else if(std::fabs(EM - EB) <= tolerance) {
         response[0] = SB;
         response[1] = KB;
     }
@@ -197,7 +197,7 @@ pod2 ConcreteCM::compute_transition(const double EM, const double EA, const doub
         const auto tmp_a = secant - KA;
         const auto ratio = (KB - secant) / tmp_a;
         suanpan_assert([&] { if(ratio <= 0.) throw std::invalid_argument("argument is not acceptable"); });
-        const auto tmp_b = tmp_a * pow(i_strain / d_strain, ratio);
+        const auto tmp_b = tmp_a * std::pow(i_strain / d_strain, ratio);
 
         response[0] = SA + i_strain * (KA + tmp_b);
         response[1] = KA + (ratio + 1.) * tmp_b;
@@ -228,8 +228,8 @@ void ConcreteCM::update_compression_unload(const double r_strain) {
     const auto secant_stiffness = std::max((std::max(datum::eps, unload_c_stress / c_strain) + .57 * initial_stiffness(0)) / (normal_strain + .57), unload_c_stress / unload_c_strain); // +
 
     // update residual strain
-    residual_c_strain = std::min(-datum::eps, unload_c_strain - unload_c_stress / secant_stiffness);              // -
-    residual_c_stiffness = std::min(.8 * secant_stiffness, .1 * initial_stiffness(0) * exp(-2. * normal_strain)); // +
+    residual_c_strain = std::min(-datum::eps, unload_c_strain - unload_c_stress / secant_stiffness);                   // -
+    residual_c_stiffness = std::min(.8 * secant_stiffness, .1 * initial_stiffness(0) * std::exp(-2. * normal_strain)); // +
 
     reload_c_stiffness = secant_stiffness;
 
@@ -262,8 +262,8 @@ void ConcreteCM::update_tension_unload(const double r_strain) {
     const auto normal_strain = std::max(datum::eps, unload_t_strain / t_strain);                                                                                                        // +
     const auto secant_stiffness = std::max((std::max(datum::eps, unload_t_stress / t_strain) + .67 * initial_stiffness(0)) / (normal_strain + .67), unload_t_stress / unload_t_strain); // +
 
-    residual_t_strain = std::max(datum::eps, unload_t_strain - unload_t_stress / secant_stiffness);                // +
-    residual_t_stiffness = std::min(.8 * secant_stiffness, initial_stiffness(0) / (1. + pow(normal_strain, 1.1))); // +
+    residual_t_strain = std::max(datum::eps, unload_t_strain - unload_t_stress / secant_stiffness);                     // +
+    residual_t_stiffness = std::min(.8 * secant_stiffness, initial_stiffness(0) / (1. + std::pow(normal_strain, 1.1))); // +
 
     reload_t_stiffness = secant_stiffness;
 
@@ -302,10 +302,10 @@ void ConcreteCM::update_connect() {
 
 ConcreteCM::ConcreteCM(const unsigned T, const double E, const double SC, const double ST, const double NCC, const double NTT, const double EC, const double ET, const bool LT, const double R)
     : ComplexHysteresis(T, E, R)
-    , c_stress(-perturb(fabs(SC)))
-    , c_strain(-perturb(fabs(EC)))
-    , t_stress(perturb(fabs(ST)))
-    , t_strain(perturb(fabs(ET)))
+    , c_stress(-perturb(std::fabs(SC)))
+    , c_strain(-perturb(std::fabs(EC)))
+    , t_stress(perturb(std::fabs(ST)))
+    , t_strain(perturb(std::fabs(ET)))
     , c_m(elastic_modulus * c_strain / c_stress)
     , c_n(std::max(perturb(1.), NCC))
     , t_m(elastic_modulus * t_strain / t_stress)
