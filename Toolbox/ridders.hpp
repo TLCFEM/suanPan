@@ -80,6 +80,18 @@ template<std::invocable<double> T> double ridders(const T& func, double x1, doub
 
 template<std::invocable<double> T> double ridders(const T& func, double x1, double x2, const double tolerance) { return ridders(func, x1, func(x1), x2, func(x2), tolerance); }
 
+template<std::invocable<double> T> double ridders_guess(const T& func, double x1, double f1, double x2, double f2, const double tolerance) {
+    while(f1 * f2 > 0.) {
+        x1 = x2;
+        f1 = f2;
+        f2 = func(x2 *= 2.);
+    }
+
+    return ridders(func, x1, f1, x2, f2, tolerance);
+}
+
+template<std::invocable<double> T> double ridders_guess(const T& func, double x1, double x2, const double tolerance) { return ridders_guess(func, x1, func(x1), x2, func(x2), tolerance); }
+
 #endif
 
 //! @}

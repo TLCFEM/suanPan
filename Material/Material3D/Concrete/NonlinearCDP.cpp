@@ -136,7 +136,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
                 return (1. - r) * c_para[1] * dgdsigma_c * lambda + current_kappa_c - kappa_c;
             };
 
-            auto approx_update = [&](const double in_lambda) {
+            const auto approx_update = [&](const double in_lambda) {
                 r = compute_r(new_stress = principal_stress + (lambda = in_lambda) * dsigmadlambda);
 
                 ridders(approx_kappa_t, current_kappa_t, 1. - datum::eps, tolerance);
@@ -149,14 +149,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
                 return f;
             };
 
-            auto x1{0.};
-            lambda = .25 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p);
-            while(approx_update(lambda) >= 0.) {
-                x1 = lambda;
-                lambda *= 2.;
-            }
-
-            ridders(approx_update, x1, lambda, tolerance);
+            ridders_guess(approx_update, 0., .25 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p), tolerance);
         }
 
         t_para = compute_tension_backbone(kappa_t);

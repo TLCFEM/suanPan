@@ -68,23 +68,14 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
             try_bisection = true;
             counter = 2u;
 
-            auto approx_update = [&](const double gm) {
+            const auto approx_update = [&](const double gm) {
                 gamma = gm;
                 const vec approx_a = proj_a * (trial_stress = solve(eye(6, 6) + gamma * elastic_a, predictor - gamma * initial_stiffness * proj_b));
                 const auto approx_k = compute_k(eqv_strain = current_eqv_strain + gamma * root_two_third * tensor::strain::norm(approx_a + proj_b));
                 return .5 * dot(trial_stress, approx_a) + dot(trial_stress, proj_b) - approx_k * approx_k;
             };
 
-            auto x1{0.}, f1{approx_update(x1)}, f2{0.};
-            gamma = .25 * tensor::strain::norm(incre_strain) / tensor::strain::norm(proj_a * trial_stress + proj_b);
-            // find a proper bracket
-            while((f2 = approx_update(gamma)) >= 0.) {
-                x1 = gamma;
-                f1 = f2;
-                gamma *= 2.;
-            }
-
-            ridders(approx_update, x1, f1, gamma, f2, tolerance);
+            ridders_guess(approx_update, 0., .25 * tensor::strain::norm(incre_strain) / tensor::strain::norm(proj_a * predictor + proj_b), tolerance);
         }
 
         const vec factor_a = proj_a * trial_stress;

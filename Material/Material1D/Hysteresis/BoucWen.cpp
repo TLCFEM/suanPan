@@ -56,21 +56,13 @@ int BoucWen::update_trial_status(const vec& t_strain) {
 
             try_bisection = true;
             counter = 2u;
+
             const auto approx_update = [&](const double in) {
                 z = current_z + in;
                 return in + n_strain * (gamma + (z * n_strain >= 0. ? beta : -beta)) * std::pow(std::max(datum::eps, std::fabs(z)), n) - n_strain;
             };
 
-            auto x1{0.}, x2{.25 * n_strain};
-            auto f1 = approx_update(x1), f2 = approx_update(x2);
-
-            while(f1 * f2 > 0.) {
-                x1 = x2;
-                f1 = f2;
-                f2 = approx_update(x2 *= 2.);
-            }
-
-            ridders(approx_update, x1, f1, x2, f2, tolerance);
+            ridders_guess(approx_update, 0., .25 * n_strain, tolerance);
         }
 
         const auto abs_z = std::max(datum::eps, std::fabs(z));
