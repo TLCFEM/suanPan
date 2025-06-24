@@ -112,12 +112,9 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre(0);
-        pe -= incre(1);
-        f -= incre(2);
+        pe = std::max(pe - incre(1), 0.);
+        f = suanpan::clamp(f - incre(2), 0., 1.); // avoid overshoot
         p -= incre(3);
-
-        f = std::min(std::max(f, 0.), 1.); // avoid overshoot
-        pe = std::max(pe, 0.);
     }
 
     trial_s /= denom;
