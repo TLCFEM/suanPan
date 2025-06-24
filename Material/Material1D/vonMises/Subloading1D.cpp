@@ -160,17 +160,15 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         }
 
         gamma -= incre(0);
-        zv -= incre(1);
-        z -= incre(2);
         if(gamma < 0.) gamma = 0.;
         else
             while(gamma > abs_incre_strain) gamma *= .5;
-        if(z < 0.) z = 0.;
-        else if(z > 1.) z = 1.;
-        if(is_viscous) {
-            if(zv < z) zv = z;
-            else if(zv > cv * z) zv = cv * z;
-        }
+
+        zv -= incre(1);
+
+        z = suanpan::clamp(z - incre(2), 0., 1.);
+
+        if(is_viscous) zv = suanpan::clamp(zv, z, cv * z);
     }
 }
 
