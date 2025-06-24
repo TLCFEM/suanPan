@@ -32,7 +32,7 @@ int ComplexHysteresis::initialize(const shared_ptr<DomainBase>&) {
 int ComplexHysteresis::update_trial_status(const vec& n_strain) {
     incre_strain = (trial_strain = n_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_load_status = current_load_status;
     trial_history = current_history;
