@@ -59,9 +59,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto p = current_p + pr * gi * incre_ev;
     vec s = current_s + 2. * gi * incre_ed;
 
-    const auto void_ratio = e0 + (1. + e0) * tensor::trace3(trial_strain);
+    const auto dede = 1. + e0;
+    const auto void_ratio = e0 + dede * tensor::trace3(trial_strain);
     const auto v_term_a = std::pow(2.97 - void_ratio, 2.) / (1. + void_ratio);
-    const auto v_term_b = (void_ratio * (void_ratio + 2.) - 14.7609) * std::pow(1. + void_ratio, -2.) * (1. + e0);
+    const auto v_term_b = (void_ratio * (void_ratio + 2.) - 14.7609) * std::pow(1. + void_ratio, -2.) * dede;
 
     double g, pgpe, pgpp;
 
@@ -192,8 +193,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         pabpe = -nb * ab;
         const auto padpp = padpe * ppsipp;
         const auto pabpp = pabpe * ppsipp;
-        padpe *= 1. + e0;
-        pabpe *= 1. + e0;
+        padpe *= dede;
+        pabpe *= dede;
 
         // yield function
 
@@ -241,7 +242,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         tmp_term = shear_modulus * h0 * std::sqrt(std::max(datum::eps, pc / p));
         const auto b0 = tmp_term * (1. - ch * void_ratio);
-        const auto pb0pe = -ch * tmp_term * (1. + e0);
+        const auto pb0pe = -ch * tmp_term * dede;
         const auto pb0pp = -.5 * b0 / p;
 
         update_ini_alpha = false;
