@@ -26,9 +26,9 @@ analyze
 # Coordinate:
 #   4.0000e+00  0.0000e+00
 # Displacement:
-#  -9.2154e-02  1.0000e+00
+#  -9.0976e-02  1.0000e+00
 # Resistance:
-#  -2.2737e-13  1.3134e+03
+#   3.5902e-10  1.3136e+03
 peek node 2
 
 peek element 1
