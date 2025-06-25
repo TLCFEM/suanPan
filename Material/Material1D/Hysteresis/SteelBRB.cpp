@@ -68,7 +68,7 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
     auto& plastic_strain = trial_history(1);                     // \delta_1
 
     // elastic unloading region
-    if(trial_stress(0) / incre_strain(0) < 0.) return SUANPAN_SUCCESS;
+    if(std::signbit(trial_stress(0)) != std::signbit(incre_strain(0))) return SUANPAN_SUCCESS;
 
     const auto tension_flag = incre_strain(0) >= 0.;
     const auto& exponent = tension_flag ? t_exponent : c_exponent;
@@ -78,7 +78,7 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
     // 1. same side full plastic loading
     // 2. unloading + reloading
     auto net_incre_strain = incre_strain(0);
-    if(trial_stress(0) * current_stress(0) < 0.) net_incre_strain += current_stress(0) / elastic_modulus;
+    if(std::signbit(trial_stress(0)) != std::signbit(current_stress(0))) net_incre_strain += current_stress(0) / elastic_modulus;
 
     auto incre_plastic_strain = .5 * net_incre_strain;
     auto counter = 0u;
