@@ -87,12 +87,12 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         q = current_q + gamma;
 
-        const auto exp_iso = saturation_iso * exp(-m_iso * q);
+        const auto exp_iso = saturation_iso * std::exp(-m_iso * q);
         auto y = initial_iso + saturation_iso + k_iso * q - exp_iso;
         auto dy = k_iso + m_iso * exp_iso;
         if(y < 0.) y = dy = 0.;
 
-        const auto exp_kin = saturation_kin * exp(-m_kin * q);
+        const auto exp_kin = saturation_kin * std::exp(-m_kin * q);
         auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
         auto da = k_kin + m_kin * exp_kin;
         if(a < 0.) a = da = 0.;
@@ -129,7 +129,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio[0];
         const auto fraction_term = (cv * z - zv) * norm_mu * gamma + 1.;
-        const auto power_term = pow(fraction_term, nv - 1.);
+        const auto power_term = std::pow(fraction_term, nv - 1.);
 
         residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (z - 1.) * y * sum_d) - zv * y;
         residual(1) = z - start_z - gamma * avg_rate;
@@ -160,17 +160,15 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         }
 
         gamma -= incre(0);
-        zv -= incre(1);
-        z -= incre(2);
         if(gamma < 0.) gamma = 0.;
         else
             while(gamma > abs_incre_strain) gamma *= .5;
-        if(z < 0.) z = 0.;
-        else if(z > 1.) z = 1.;
-        if(is_viscous) {
-            if(zv < z) zv = z;
-            else if(zv > cv * z) zv = cv * z;
-        }
+
+        zv -= incre(1);
+
+        z = suanpan::clamp(z - incre(2), 0., 1.);
+
+        if(is_viscous) zv = suanpan::clamp(zv, z, cv * z);
     }
 }
 

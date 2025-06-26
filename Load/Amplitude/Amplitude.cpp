@@ -17,18 +17,12 @@
 
 #include "Amplitude.h"
 
-Amplitude::Amplitude(const unsigned T, const unsigned ST)
-    : UniqueTag(T)
-    , start_step(ST) {}
-
 void Amplitude::initialize(const shared_ptr<DomainBase>&) {}
 
 double Amplitude::get_amplitude(const double) { return 0.; }
 
-void Amplitude::set_start_step(const unsigned T) { start_step = T; }
+void Amplitude::set_initialized(const bool F) { initialized = F; }
 
-unsigned Amplitude::get_start_step() const { return start_step; }
+bool Amplitude::is_initialized() const { return initialized; }
 
 void Amplitude::set_start_time(const double T) { start_time = T; }
-
-double Amplitude::set_start_time() const { return start_time; }

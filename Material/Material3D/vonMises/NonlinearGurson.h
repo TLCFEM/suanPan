@@ -47,7 +47,7 @@ class NonlinearGurson : protected DataNonlinearGurson, public Material3D {
     const double bulk = elastic_modulus / (3. - 6. * poissons_ratio);      // bulk modulus
 
     const double para_a = 3. * bulk * q1 * q2;
-    const double para_b = fn / sn / sqrt(2. * datum::pi);
+    const double para_b = fn / sn / sqrt(datum::tau);
 
     [[nodiscard]] virtual vec2 compute_hardening(double) const = 0;
 

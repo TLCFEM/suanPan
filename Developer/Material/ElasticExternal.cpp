@@ -34,7 +34,7 @@ void allocate_material(ExternalMaterialData* data, int* info) {
     data->c_stiffness = 5;
     data->t_stiffness = 6;
 
-    data->pool = new double[7];
+    data->pool = new(std::nothrow) double[7];
 
     if(nullptr == data->pool) *info = -1;
 
@@ -45,7 +45,7 @@ void allocate_material(ExternalMaterialData* data, int* info) {
     if(data->constant_size > 1) data->density = data->constant[1];
 }
 
-void deallocate_material(ExternalMaterialData* data, int* info) {
+void deallocate_material(const ExternalMaterialData* data, int* info) {
     if(nullptr == data) {
         *info = -1;
         return;
@@ -56,36 +56,36 @@ void deallocate_material(ExternalMaterialData* data, int* info) {
     *info = 0;
 }
 
-void static_update(ExternalMaterialData* data, int* info) {
+void static_update(const ExternalMaterialData* data, int* info) {
     data->pool[data->t_stress] = data->pool[data->t_stiffness] * data->pool[data->t_strain];
 
     *info = 0;
 }
 
-void dynamic_update(ExternalMaterialData* data, int* info) { static_update(data, info); }
+void dynamic_update(const ExternalMaterialData* data, int* info) { static_update(data, info); }
 
-void commit(ExternalMaterialData* data, int* info) {
+void commit(const ExternalMaterialData* data, int* info) {
     data->pool[data->c_strain] = data->pool[data->t_strain];
     data->pool[data->c_stress] = data->pool[data->t_stress];
 
     *info = 0;
 }
 
-void reset(ExternalMaterialData* data, int* info) {
+void reset(const ExternalMaterialData* data, int* info) {
     data->pool[data->t_strain] = data->pool[data->c_strain];
     data->pool[data->t_stress] = data->pool[data->c_stress];
 
     *info = 0;
 }
 
-void clear(ExternalMaterialData* data, int* info) {
+void clear(const ExternalMaterialData* data, int* info) {
     data->pool[data->c_strain] = data->pool[data->t_strain] = 0.;
     data->pool[data->c_stress] = data->pool[data->t_stress] = 0.;
 
     *info = 0;
 }
 
-void validate(ExternalMaterialData* data, int* info) { *info = 0 == data->constant_size ? -1 : 0; }
+void validate(const ExternalMaterialData* data, int* info) { *info = 0 == data->constant_size ? -1 : 0; }
 
 SUANPAN_EXPORT void elasticexternal_handler(ExternalMaterialData* data, int* info) {
     if(ALLOCATE == *info) allocate_material(data, info);

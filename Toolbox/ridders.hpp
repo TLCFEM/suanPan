@@ -60,11 +60,11 @@ template<std::invocable<double> T> double ridders(const T& func, double x1, doub
 
         // one end is x4
         // pick the other from x3, x2, x1
-        if(f4 * f3 < 0.) {
+        if(std::signbit(f4) != std::signbit(f3)) {
             x1 = x3;
             f1 = f3;
         }
-        else if(f4 * f2 < 0.) {
+        else if(std::signbit(f4) != std::signbit(f2)) {
             x1 = x2;
             f1 = f2;
         }
@@ -77,6 +77,20 @@ template<std::invocable<double> T> double ridders(const T& func, double x1, doub
 
     return target;
 }
+
+template<std::invocable<double> T> double ridders(const T& func, double x1, double x2, const double tolerance) { return ridders(func, x1, func(x1), x2, func(x2), tolerance); }
+
+template<std::invocable<double> T> double ridders_guess(const T& func, double x1, double f1, double x2, double f2, const double tolerance) {
+    while(std::signbit(f1) == std::signbit(f2)) {
+        x1 = x2;
+        f1 = f2;
+        f2 = func(x2 *= 2.);
+    }
+
+    return ridders(func, x1, f1, x2, f2, tolerance);
+}
+
+template<std::invocable<double> T> double ridders_guess(const T& func, double x1, double x2, const double tolerance) { return ridders_guess(func, x1, func(x1), x2, func(x2), tolerance); }
 
 #endif
 

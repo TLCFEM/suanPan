@@ -19,8 +19,8 @@
 
 #include <Domain/DomainBase.h>
 
-CustomAmplitude::CustomAmplitude(const unsigned T, const unsigned ET, const unsigned ST)
-    : Amplitude(T, ST)
+CustomAmplitude::CustomAmplitude(const unsigned T, const unsigned ET)
+    : Amplitude(T)
     , e_tag(ET) {}
 
 void CustomAmplitude::initialize(const shared_ptr<DomainBase>& D) {
@@ -37,6 +37,8 @@ void CustomAmplitude::initialize(const shared_ptr<DomainBase>& D) {
         D->disable_amplitude(get_tag());
     }
 }
+
+unique_ptr<Amplitude> CustomAmplitude::get_copy() { return std::make_unique<CustomAmplitude>(*this); }
 
 double CustomAmplitude::get_amplitude(const double T) {
     const auto step_time = T - start_time;

@@ -22,8 +22,8 @@
 #include <Domain/Factory.hpp>
 #include <Load/GroupNodalDisplacement.h>
 #include <Solver/BFGS.h>
-#include <Solver/Integrator/LeeNewmarkBase.h>
-#include <Solver/Integrator/Tchamwa.h>
+#include <Solver/Integrator/Explicit/Tchamwa.h>
+#include <Solver/Integrator/Implicit/LeeNewmark/LeeNewmarkBase.h>
 #include <Solver/MPDC.h>
 #include <Solver/Newton.h>
 #include <Solver/Ramm.h>
@@ -62,18 +62,20 @@ int Dynamic::initialize() {
     }
     modifier->set_domain(t_domain);
 
-    // solver
+    auto has_displacement_load = false;
+    for(const auto& I : t_domain->get_load_pool())
+        if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
+            has_displacement_load = true;
+            break;
+        }
+
+    if(IntegratorType::Explicit == analysis_type && has_displacement_load) suanpan_warning("Explicit integrators use acceleration as the base quantity, displacement loads may not work as intended.\n");
+
     // avoid arc length solver
     if(std::dynamic_pointer_cast<Ramm>(solver)) solver = nullptr;
     // automatically enable displacement controlled solver
     if(nullptr == solver) {
-        auto flag = false;
-        for(const auto& I : t_domain->get_load_pool())
-            if(I->if_displacement_control() && I->get_start_step() == get_tag()) {
-                flag = true;
-                break;
-            }
-        if(flag) solver = std::make_shared<MPDC>();
+        if(has_displacement_load) solver = std::make_shared<MPDC>();
         else solver = std::make_shared<Newton>();
     }
 

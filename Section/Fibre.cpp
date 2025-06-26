@@ -33,7 +33,7 @@ int Fibre::initialize(const shared_ptr<DomainBase>& D) {
 
     initial_stiffness.zeros();
     for(const auto I : fibre_tag) {
-        fibre.emplace_back(suanpan::initialized_section_copy(D, I));
+        fibre.emplace_back(D->initialized_section_copy(I));
         if(nullptr == fibre.back() || host_type != fibre.back()->get_section_type()) {
             suanpan_warning("Section {} is ignored as it is not compatible with fibre section {}.\n", I, get_tag());
             fibre.pop_back();

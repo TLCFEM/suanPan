@@ -22,196 +22,132 @@
 #include <Toolbox/misc.h>
 #include <Toolbox/utility.h>
 
-bool initialise_material(const shared_ptr<DomainBase>& domain, const unique_ptr<Material>& obj, const uword size) {
-    domain->initialize_material();
-    if(!obj->is_initialized()) {
-        if(SUANPAN_SUCCESS != obj->initialize_base(domain)) return false;
-        if(SUANPAN_SUCCESS != obj->initialize(domain)) return false;
-        obj->set_initialized(true);
-    }
-
-    if(obj->get_material_type() == MaterialType::D1 && 1 != size) {
-        suanpan_error("The tester cannot be applied to the given material model.\n");
-        return false;
-    }
-    if(obj->get_material_type() == MaterialType::D2 && 3 != size) {
-        suanpan_error("The tester cannot be applied to the given material model.\n");
-        return false;
-    }
-    if(obj->get_material_type() == MaterialType::D3 && 6 != size) {
-        suanpan_error("The tester cannot be applied to the given material model.\n");
-        return false;
-    }
-
-    return true;
-}
-
-mat material_tester(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
-    unsigned total_size = 1;
-    for(const auto& I : idx) total_size += I;
-
-    mat response(total_size, 2 * incre.n_elem, fill::zeros);
-
-    const span span_a(0, incre.n_elem - 1);
-    const span span_b(incre.n_elem, 2 * incre.n_elem - 1);
-
-    auto current_pos = 0;
-
-    response(current_pos, span_a) = obj->get_current_strain().t();
-    response(current_pos++, span_b) = obj->get_current_stress().t();
-
-    auto flag = SUANPAN_SUCCESS;
-    auto incre_strain = incre;
-    for(const auto& I : idx) {
-        for(unsigned J = 0; J < I; ++J) {
-            if((flag = obj->update_incre_status(incre_strain)) != SUANPAN_SUCCESS) break;
-            obj->commit_status();
-            response(current_pos, span_a) = obj->get_current_strain().t();
-            response(current_pos++, span_b) = obj->get_current_stress().t();
+namespace {
+    bool initialise_material(const shared_ptr<DomainBase>& domain, const unique_ptr<Material>& obj, const uword size) {
+        domain->initialize_material();
+        if(!obj->is_initialized()) {
+            if(SUANPAN_SUCCESS != obj->initialize_base(domain)) return false;
+            if(SUANPAN_SUCCESS != obj->initialize(domain)) return false;
+            obj->set_initialized(true);
         }
-        if(SUANPAN_SUCCESS != flag) break;
-        incre_strain = -incre_strain;
-    }
 
-    obj->print();
-    obj->reset_status();
-    obj->clear_status();
-
-    return response;
-}
-
-mat material_tester(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
-    unsigned total_size = 2;
-    for(const auto& I : idx) total_size += I;
-
-    mat response(total_size, 2 * incre.n_elem, fill::zeros);
-
-    const span span_a(0, incre.n_elem - 1);
-    const span span_b(incre.n_elem, 2 * incre.n_elem - 1);
-
-    auto current_pos = 0;
-
-    response(current_pos, span_a) = obj->get_current_strain().t();
-    response(current_pos++, span_b) = obj->get_current_stress().t();
-
-    if(obj->update_incre_status(base) != SUANPAN_SUCCESS) return response;
-
-    obj->commit_status();
-
-    response(current_pos, span_a) = obj->get_current_strain().t();
-    response(current_pos++, span_b) = obj->get_current_stress().t();
-
-    auto flag = SUANPAN_SUCCESS;
-    auto incre_strain = incre;
-    for(const auto& I : idx) {
-        for(unsigned J = 0; J < I; ++J) {
-            if((flag = obj->update_incre_status(incre_strain)) != SUANPAN_SUCCESS) break;
-            obj->commit_status();
-            response(current_pos, span_a) = obj->get_current_strain().t();
-            response(current_pos++, span_b) = obj->get_current_stress().t();
+        if(obj->get_material_type() == MaterialType::D1 && 1 != size) {
+            suanpan_error("The tester cannot be applied to the given material model.\n");
+            return false;
         }
-        if(SUANPAN_SUCCESS != flag) break;
-        incre_strain = -incre_strain;
+        if(obj->get_material_type() == MaterialType::D2 && 3 != size) {
+            suanpan_error("The tester cannot be applied to the given material model.\n");
+            return false;
+        }
+        if(obj->get_material_type() == MaterialType::D3 && 6 != size) {
+            suanpan_error("The tester cannot be applied to the given material model.\n");
+            return false;
+        }
+
+        return true;
     }
 
-    obj->print();
-    obj->reset_status();
-    obj->clear_status();
+    mat material_tester(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
+        unsigned total_size = 1;
+        for(const auto& I : idx) total_size += I;
 
-    return response;
-}
+        mat response(total_size, 2 * incre.n_elem, fill::zeros);
 
-mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
-    unsigned total_size = 1;
-    for(const auto& I : idx) total_size += I;
+        const span span_a(0, incre.n_elem - 1);
+        const span span_b(incre.n_elem, 2 * incre.n_elem - 1);
 
-    mat response(total_size, 2 * incre.n_elem, fill::zeros);
+        auto current_pos = 0;
 
-    const span span_a(0, incre.n_elem - 1);
-    const span span_b(incre.n_elem, 2 * incre.n_elem - 1);
+        response(current_pos, span_a) = obj->get_current_strain().t();
+        response(current_pos++, span_b) = obj->get_current_stress().t();
 
-    auto current_pos = 0;
-
-    response(current_pos, span_a) = obj->get_current_strain().t();
-    response(current_pos++, span_b) = obj->get_current_stress().t();
-
-    auto info = SUANPAN_SUCCESS;
-    auto incre_load = incre;
-    vec total_load = zeros(size(incre));
-    for(const auto& I : idx) {
-        for(unsigned J = 0; J < I; ++J) {
-            total_load += incre_load;
-            auto counter = 0;
-            while(true) {
-                const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
-                const auto error = norm(incre_strain);
-                suanpan_debug("Local iteration error: {:.5E}.\n", error);
-                if(error < 1E-12) break;
-                if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
-                    info = SUANPAN_FAIL;
-                    break;
-                }
+        auto flag = SUANPAN_SUCCESS;
+        auto incre_strain = incre;
+        for(const auto& I : idx) {
+            for(unsigned J = 0; J < I; ++J) {
+                if((flag = obj->update_incre_status(incre_strain)) != SUANPAN_SUCCESS) break;
+                obj->commit_status();
+                response(current_pos, span_a) = obj->get_current_strain().t();
+                response(current_pos++, span_b) = obj->get_current_stress().t();
             }
-            if(SUANPAN_FAIL == info) break;
-            obj->commit_status();
-            response(current_pos, span_a) = obj->get_current_strain().t();
-            response(current_pos++, span_b) = obj->get_current_stress().t();
+            if(SUANPAN_SUCCESS != flag) break;
+            incre_strain = -incre_strain;
         }
-        if(SUANPAN_FAIL == info) break;
-        incre_load = -incre_load;
-        // update trial stiffness to be closer to the correct one
-        obj->update_trial_status(obj->get_trial_strain() + normalise(incre_load) * norm(obj->get_trial_strain()) / 1E4);
+
+        obj->print();
+        obj->reset_status();
+        obj->clear_status();
+
+        return response;
     }
 
-    obj->print();
-    obj->reset_status();
-    obj->clear_status();
+    mat material_tester(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
+        unsigned total_size = 2;
+        for(const auto& I : idx) total_size += I;
 
-    return response;
-}
+        mat response(total_size, 2 * incre.n_elem, fill::zeros);
 
-mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
-    unsigned total_size = 2;
-    for(const auto& I : idx) total_size += I;
+        const span span_a(0, incre.n_elem - 1);
+        const span span_b(incre.n_elem, 2 * incre.n_elem - 1);
 
-    mat response(total_size, 2 * incre.n_elem, fill::zeros);
+        auto current_pos = 0;
 
-    const span span_a(0, incre.n_elem - 1);
-    const span span_b(incre.n_elem, 2 * incre.n_elem - 1);
+        response(current_pos, span_a) = obj->get_current_strain().t();
+        response(current_pos++, span_b) = obj->get_current_stress().t();
 
-    auto current_pos = 0;
+        if(obj->update_incre_status(base) != SUANPAN_SUCCESS) return response;
 
-    response(current_pos, span_a) = obj->get_current_strain().t();
-    response(current_pos++, span_b) = obj->get_current_stress().t();
+        obj->commit_status();
 
-    auto incre_load = incre;
-    auto total_load = base;
-    auto info = SUANPAN_SUCCESS;
-    auto counter = 0;
-    while(true) {
-        const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
-        const auto error = norm(incre_strain);
-        suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < 1E-12) break;
-        if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
-            info = SUANPAN_FAIL;
-            break;
+        response(current_pos, span_a) = obj->get_current_strain().t();
+        response(current_pos++, span_b) = obj->get_current_stress().t();
+
+        auto flag = SUANPAN_SUCCESS;
+        auto incre_strain = incre;
+        for(const auto& I : idx) {
+            for(unsigned J = 0; J < I; ++J) {
+                if((flag = obj->update_incre_status(incre_strain)) != SUANPAN_SUCCESS) break;
+                obj->commit_status();
+                response(current_pos, span_a) = obj->get_current_strain().t();
+                response(current_pos++, span_b) = obj->get_current_stress().t();
+            }
+            if(SUANPAN_SUCCESS != flag) break;
+            incre_strain = -incre_strain;
         }
-    }
-    obj->commit_status();
-    response(current_pos, span_a) = obj->get_current_strain().t();
-    response(current_pos++, span_b) = obj->get_current_stress().t();
 
-    if(SUANPAN_SUCCESS == info)
+        obj->print();
+        obj->reset_status();
+        obj->clear_status();
+
+        return response;
+    }
+
+    mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre) {
+        unsigned total_size = 1;
+        for(const auto& I : idx) total_size += I;
+
+        mat response(total_size, 2 * incre.n_elem, fill::zeros);
+
+        const span span_a(0, incre.n_elem - 1);
+        const span span_b(incre.n_elem, 2 * incre.n_elem - 1);
+
+        auto current_pos = 0;
+
+        response(current_pos, span_a) = obj->get_current_strain().t();
+        response(current_pos++, span_b) = obj->get_current_stress().t();
+
+        auto info = SUANPAN_SUCCESS;
+        auto incre_load = incre;
+        vec total_load = zeros(size(incre));
         for(const auto& I : idx) {
             for(unsigned J = 0; J < I; ++J) {
                 total_load += incre_load;
-                counter = 0;
+                auto counter = 0;
                 while(true) {
                     const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
                     const auto error = norm(incre_strain);
                     suanpan_debug("Local iteration error: {:.5E}.\n", error);
-                    if(error <= 1E-12) break;
+                    if(error < 1E-12) break;
                     if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
                         info = SUANPAN_FAIL;
                         break;
@@ -224,66 +160,132 @@ mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<u
             }
             if(SUANPAN_FAIL == info) break;
             incre_load = -incre_load;
+            // update trial stiffness to be closer to the correct one
+            obj->update_trial_status(obj->get_trial_strain() + normalise(incre_load) * norm(obj->get_trial_strain()) / 1E4);
         }
 
-    obj->print();
-    obj->reset_status();
-    obj->clear_status();
+        obj->print();
+        obj->reset_status();
+        obj->clear_status();
 
-    return response;
-}
-
-mat material_tester_by_strain_history(const unique_ptr<Material>& obj, const mat& history) {
-    mat response(size(history));
-
-    for(auto I = 0llu; I < history.n_rows; ++I) {
-        if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
-        obj->commit_status();
-        response.row(I) = obj->get_current_stress().t();
+        return response;
     }
 
-    obj->print();
-    obj->reset_status();
-    obj->clear_status();
+    mat material_tester_by_load(const unique_ptr<Material>& obj, const std::vector<unsigned>& idx, const vec& incre, const vec& base) {
+        unsigned total_size = 2;
+        for(const auto& I : idx) total_size += I;
 
-    return response;
-}
+        mat response(total_size, 2 * incre.n_elem, fill::zeros);
 
-mat material_tester_by_stress_history(const unique_ptr<Material>& obj, const mat& history) {
-    mat response(size(history));
+        const span span_a(0, incre.n_elem - 1);
+        const span span_b(incre.n_elem, 2 * incre.n_elem - 1);
 
-    for(auto I = 0llu; I < history.n_rows; ++I) {
+        auto current_pos = 0;
+
+        response(current_pos, span_a) = obj->get_current_strain().t();
+        response(current_pos++, span_b) = obj->get_current_stress().t();
+
+        auto incre_load = incre;
+        auto total_load = base;
+        auto info = SUANPAN_SUCCESS;
         auto counter = 0;
-        auto flag = false;
-        auto strain = obj->get_current_strain();
         while(true) {
-            if(20 == ++counter) {
-                flag = true;
-                break;
-            }
-            const vec incre_strain = solve(obj->get_trial_stiffness(), history.row(I).t() - obj->get_trial_stress());
+            const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
             const auto error = norm(incre_strain);
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error <= 1E-12) break;
-            strain += incre_strain;
-            if(SUANPAN_SUCCESS != obj->update_trial_status(strain)) {
-                flag = true;
+            if(error < 1E-12) break;
+            if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
+                info = SUANPAN_FAIL;
                 break;
             }
         }
-
-        if(flag) break;
-
         obj->commit_status();
-        response.row(I) = obj->get_current_strain().t();
+        response(current_pos, span_a) = obj->get_current_strain().t();
+        response(current_pos++, span_b) = obj->get_current_stress().t();
+
+        if(SUANPAN_SUCCESS == info)
+            for(const auto& I : idx) {
+                for(unsigned J = 0; J < I; ++J) {
+                    total_load += incre_load;
+                    counter = 0;
+                    while(true) {
+                        const vec incre_strain = solve(obj->get_trial_stiffness(), total_load - obj->get_trial_stress());
+                        const auto error = norm(incre_strain);
+                        suanpan_debug("Local iteration error: {:.5E}.\n", error);
+                        if(error <= 1E-12) break;
+                        if(++counter == 10 || obj->update_trial_status(obj->get_trial_strain() + incre_strain) != SUANPAN_SUCCESS) {
+                            info = SUANPAN_FAIL;
+                            break;
+                        }
+                    }
+                    if(SUANPAN_FAIL == info) break;
+                    obj->commit_status();
+                    response(current_pos, span_a) = obj->get_current_strain().t();
+                    response(current_pos++, span_b) = obj->get_current_stress().t();
+                }
+                if(SUANPAN_FAIL == info) break;
+                incre_load = -incre_load;
+            }
+
+        obj->print();
+        obj->reset_status();
+        obj->clear_status();
+
+        return response;
     }
 
-    obj->print();
-    obj->reset_status();
-    obj->clear_status();
+    mat material_tester_by_strain_history(const unique_ptr<Material>& obj, const mat& history) {
+        mat response(size(history));
 
-    return response;
-}
+        for(auto I = 0llu; I < history.n_rows; ++I) {
+            if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
+            obj->commit_status();
+            response.row(I) = obj->get_current_stress().t();
+        }
+
+        obj->print();
+        obj->reset_status();
+        obj->clear_status();
+
+        return response;
+    }
+
+    mat material_tester_by_stress_history(const unique_ptr<Material>& obj, const mat& history) {
+        mat response(size(history));
+
+        for(auto I = 0llu; I < history.n_rows; ++I) {
+            auto counter = 0;
+            auto flag = false;
+            auto strain = obj->get_current_strain();
+            while(true) {
+                if(20 == ++counter) {
+                    flag = true;
+                    break;
+                }
+                const vec incre_strain = solve(obj->get_trial_stiffness(), history.row(I).t() - obj->get_trial_stress());
+                const auto error = norm(incre_strain);
+                suanpan_debug("Local iteration error: {:.5E}.\n", error);
+                if(error <= 1E-12) break;
+                strain += incre_strain;
+                if(SUANPAN_SUCCESS != obj->update_trial_status(strain)) {
+                    flag = true;
+                    break;
+                }
+            }
+
+            if(flag) break;
+
+            obj->commit_status();
+            response.row(I) = obj->get_current_strain().t();
+        }
+
+        obj->print();
+        obj->reset_status();
+        obj->clear_status();
+
+        return response;
+    }
+} // namespace
 
 int test_material(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned size) {
     unsigned material_tag;

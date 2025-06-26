@@ -57,7 +57,7 @@ protected:
     virtual int process_meta(const shared_ptr<DomainBase>&, bool) = 0;
 
 public:
-    ParticleCollision(unsigned, unsigned, unsigned);
+    ParticleCollision(unsigned, unsigned);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

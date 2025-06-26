@@ -19,7 +19,7 @@
 
 ComplexHysteresis::ComplexHysteresis(const unsigned T, const double E, const double R)
     : Material1D(T, R)
-    , elastic_modulus(fabs(E)) {}
+    , elastic_modulus(std::fabs(E)) {}
 
 int ComplexHysteresis::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
@@ -32,7 +32,7 @@ int ComplexHysteresis::initialize(const shared_ptr<DomainBase>&) {
 int ComplexHysteresis::update_trial_status(const vec& n_strain) {
     incre_strain = (trial_strain = n_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_load_status = current_load_status;
     trial_history = current_history;

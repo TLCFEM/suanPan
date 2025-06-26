@@ -50,7 +50,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<NodalAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        return_obj = std::make_unique<NodalAcceleration>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 
     void new_bodyforce(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -78,8 +78,8 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<BodyForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else return_obj = std::make_unique<BodyForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 
     void new_cload(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -107,8 +107,8 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<NodalForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else return_obj = std::make_unique<NodalForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 
     void new_refload(unique_ptr<Load>& return_obj, std::istringstream& command) {
@@ -135,7 +135,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<ReferenceForce>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id);
+        return_obj = std::make_unique<ReferenceForce>(load_id, magnitude, get_remaining<uword>(command), dof_id);
     }
 
     void new_lineudl(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned dimension) {
@@ -163,8 +163,8 @@ namespace {
             return;
         }
 
-        if(2 == dimension) return_obj = std::make_unique<LineUDL2D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<LineUDL3D>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(2 == dimension) return_obj = std::make_unique<LineUDL2D>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        else return_obj = std::make_unique<LineUDL3D>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
     }
 
     void new_displacement(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -192,8 +192,8 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupNodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<NodalDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(flag) return_obj = std::make_unique<GroupNodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else return_obj = std::make_unique<NodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 
     void new_supportmotion(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned flag) {
@@ -221,9 +221,9 @@ namespace {
             return;
         }
 
-        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<SupportAcceleration>(load_id, 0, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        else return_obj = std::make_unique<SupportAcceleration>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
     }
 } // namespace
 
@@ -240,8 +240,8 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
         return SUANPAN_SUCCESS;
     }
 
-    if(const auto step_tag = domain->get_current_step_tag(); is_equal(amplitude_type, "Constant")) domain->insert(std::make_shared<Constant>(tag, step_tag));
-    else if(is_equal(amplitude_type, "Ramp")) domain->insert(std::make_shared<Ramp>(tag, step_tag));
+    if(is_equal(amplitude_type, "Constant")) domain->insert(std::make_shared<Constant>(tag));
+    else if(is_equal(amplitude_type, "Ramp")) domain->insert(std::make_shared<Ramp>(tag));
     else if(is_equal(amplitude_type, "Tabular")) {
         std::string file_name;
         if(!get_input(command, file_name)) {
@@ -249,7 +249,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        if(command.eof()) domain->insert(std::make_shared<Tabular>(tag, std::move(file_name), step_tag));
+        if(command.eof()) domain->insert(std::make_shared<Tabular>(tag, std::move(file_name)));
         else {
             uword up_rate;
             if(!get_input(command, up_rate)) {
@@ -276,7 +276,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
                 return SUANPAN_SUCCESS;
             }
 
-            domain->insert(std::make_shared<Tabular>(tag, result.col(0), result.col(1), step_tag));
+            domain->insert(std::make_shared<Tabular>(tag, result.col(0), result.col(1)));
         }
     }
     else if(is_equal(amplitude_type, "TabularSpline")) {
@@ -285,7 +285,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
             suanpan_error("A valid file is required.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(std::make_shared<TabularSpline>(tag, std::move(file_name), step_tag));
+        domain->insert(std::make_shared<TabularSpline>(tag, std::move(file_name)));
     }
     else if(is_equal(amplitude_type, "Decay")) {
         double A, TD;
@@ -293,7 +293,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
             suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(std::make_shared<Decay>(tag, A, TD, step_tag));
+        domain->insert(std::make_shared<Decay>(tag, A, TD));
     }
     else if(is_equal(amplitude_type, "Linear")) {
         double A;
@@ -301,10 +301,10 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
             suanpan_error("A valid value is required.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(std::make_shared<Linear>(tag, A, step_tag));
+        domain->insert(std::make_shared<Linear>(tag, A));
     }
     else if(is_equal(amplitude_type, "Combine")) {
-        domain->insert(std::make_shared<Combine>(tag, get_remaining<uword>(command), step_tag));
+        domain->insert(std::make_shared<Combine>(tag, get_remaining<uword>(command)));
     }
     else if(is_equal(amplitude_type, "Custom")) {
         unsigned expression;
@@ -312,7 +312,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
             suanpan_error("A valid expression tag is required.\n");
             return SUANPAN_SUCCESS;
         }
-        domain->insert(std::make_shared<CustomAmplitude>(tag, expression, step_tag));
+        domain->insert(std::make_shared<CustomAmplitude>(tag, expression));
     }
     else if(is_equal(amplitude_type, "Modulated") || is_equal(amplitude_type, "Sine") || is_equal(amplitude_type, "Cosine")) {
         double W;
@@ -321,9 +321,9 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(amplitude_type, "Modulated")) domain->insert(std::make_shared<Modulated>(tag, W, get_remaining<double>(command), step_tag));
-        else if(is_equal(amplitude_type, "Sine")) domain->insert(std::make_shared<Sine>(tag, W, get_remaining<double>(command), step_tag));
-        else if(is_equal(amplitude_type, "Cosine")) domain->insert(std::make_shared<Cosine>(tag, W, get_remaining<double>(command), step_tag));
+        if(is_equal(amplitude_type, "Modulated")) domain->insert(std::make_shared<Modulated>(tag, W, get_remaining<double>(command)));
+        else if(is_equal(amplitude_type, "Sine")) domain->insert(std::make_shared<Sine>(tag, W, get_remaining<double>(command)));
+        else if(is_equal(amplitude_type, "Cosine")) domain->insert(std::make_shared<Cosine>(tag, W, get_remaining<double>(command)));
     }
     else if(is_equal(amplitude_type, "NZStrongMotion")) {
         std::string name;
@@ -332,7 +332,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        domain->insert(std::make_shared<NZStrongMotion>(tag, name.c_str(), step_tag));
+        domain->insert(std::make_shared<NZStrongMotion>(tag, name.c_str()));
     }
 
     return SUANPAN_SUCCESS;
@@ -360,7 +360,7 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
     else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
     else if(is_equal(load_id, "SupportDisplacement")) new_supportmotion(new_load, command, 0);
     else if(is_equal(load_id, "SupportVelocity")) new_supportmotion(new_load, command, 1);
-    else load::object(new_load, domain, load_id, command);
+    else external_module::object(new_load, domain, load_id, command);
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());
 

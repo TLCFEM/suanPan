@@ -270,29 +270,27 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
     else if(is_equal(integrator_type, "GSSSSU0")) {
         vec pool(3);
 
-        for(auto& I : pool)
-            if(!get_input(command, I)) {
-                suanpan_error("A valid damping radius is required.\n");
-                return SUANPAN_SUCCESS;
-            }
+        if(!get_input(command, pool)) {
+            suanpan_error("A valid spectral radius is required.\n");
+            return SUANPAN_SUCCESS;
+        }
 
         if(domain->insert(std::make_shared<GSSSSU0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSV0")) {
         vec pool(3);
 
-        for(auto& I : pool)
-            if(!get_input(command, I)) {
-                suanpan_error("A valid damping radius is required.\n");
-                return SUANPAN_SUCCESS;
-            }
+        if(!get_input(command, pool)) {
+            suanpan_error("A valid spectral radius is required.\n");
+            return SUANPAN_SUCCESS;
+        }
 
         if(domain->insert(std::make_shared<GSSSSV0>(tag, std::move(pool)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSOptimal")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
-            suanpan_error("A valid damping radius is required.\n");
+            suanpan_error("A valid spectral radius is required.\n");
             return SUANPAN_SUCCESS;
         }
 
@@ -341,6 +339,33 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         }
 
         if(domain->insert(std::make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+    }
+    else if(is_equal(integrator_type, "ICL")) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("A valid damping radius is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(std::make_shared<ICL>(tag, std::max(.5, std::min(radius, 1.))))) code = 1;
+    }
+    else if(is_equal(integrator_type, "GSSE")) {
+        auto radius = .5;
+        if(!get_optional_input(command, radius)) {
+            suanpan_error("A valid damping radius is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(std::make_shared<GSSE>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+    }
+    else if(is_equal(integrator_type, "WAT2")) {
+        auto para = 1. / 3.;
+        if(!get_optional_input(command, para)) {
+            suanpan_error("A valid parameter is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(domain->insert(std::make_shared<WAT2>(tag, std::max(std::min(1., para), 0.)))) code = 1;
     }
     else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
         auto radius = .5;

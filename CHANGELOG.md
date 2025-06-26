@@ -5,6 +5,18 @@
 1. Eigenanalysis does not support distributed computation.
 2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 3.8
+
+1. add optional hourglassing control for `CP4R` and `C3D8R` elements
+2. add `Prestrain` wrapper for uniaxial materials to apply prestrain [#266](https://github.com/TLCFEM/suanPan/pull/266)
+3. add `GERKN` generalized explicit RKN time integration [#268](https://github.com/TLCFEM/suanPan/pull/268)
+4. add `GSSE` explicit time integration [#274](https://github.com/TLCFEM/suanPan/pull/274)
+5. fix improper detection of linear systems [#270](https://github.com/TLCFEM/suanPan/pull/270)
+6. fix wrong corrector in explicit Bathe time integration [#272](https://github.com/TLCFEM/suanPan/pull/272)
+7. improve numerical integration stability and robustness of various material models
+8. update `OpenBLAS` to version `0.3.30`
+9. fix damage variable output in `TimberPD` [#276](https://github.com/TLCFEM/suanPan/pull/276)
+
 ## version 3.7
 
 1. update `Armadillo` to version `14.4.1`

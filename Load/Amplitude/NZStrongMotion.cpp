@@ -19,9 +19,11 @@
 
 #include <Domain/DomainBase.h>
 
-NZStrongMotion::NZStrongMotion(const unsigned T, const char* P, const unsigned ST)
-    : Amplitude(T, ST)
+NZStrongMotion::NZStrongMotion(const unsigned T, const char* P)
+    : Amplitude(T)
     , file_name(P) {}
+
+unique_ptr<Amplitude> NZStrongMotion::get_copy() { return std::make_unique<NZStrongMotion>(*this); }
 
 void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {
     std::error_code code;

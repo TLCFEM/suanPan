@@ -17,10 +17,12 @@
 
 #include "Sine.h"
 
-Sine::Sine(const unsigned T, const double L, std::vector<double>&& AA, const unsigned ST)
-    : Amplitude(T, ST)
+Sine::Sine(const unsigned T, const double L, std::vector<double>&& AA)
+    : Amplitude(T)
     , period(.5 * L)
     , amp(std::move(AA)) {}
+
+unique_ptr<Amplitude> Sine::get_copy() { return std::make_unique<Sine>(*this); }
 
 double Sine::get_amplitude(const double T) {
     const auto step_time = T - start_time;

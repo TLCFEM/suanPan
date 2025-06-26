@@ -49,16 +49,15 @@ uvec ConditionalModifier::get_all_nodal_active_dof(const shared_ptr<DomainBase>&
     return active_dof;
 }
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned ST, const unsigned AT, uvec&& N, uvec&& D)
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& N, uvec&& D)
     : UniqueTag(T)
-    , start_step(std::max(1u, ST))
     , amplitude_tag(AT)
     , node_encoding(std::move(N))
     , dof_reference(D - 1) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
-    magnitude = D->get<Amplitude>(amplitude_tag);
-    if(nullptr == magnitude || !magnitude->is_active()) magnitude = std::make_shared<Ramp>(0);
+    amplitude = D->get<Amplitude>(amplitude_tag);
+    if(nullptr == amplitude || !amplitude->is_active()) amplitude = std::make_shared<Ramp>(0);
 
     auto start_time = 0.;
     for(const auto& [t_tag, t_step] : D->get_step_pool()) {
@@ -66,8 +65,7 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
         start_time += t_step->get_time_period();
     }
 
-    magnitude->set_start_step(start_step);
-    magnitude->set_start_time(start_time);
+    amplitude->set_start_time(start_time);
 
     set_initialized(true);
 

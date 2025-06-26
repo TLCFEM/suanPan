@@ -20,9 +20,11 @@
  *
  * The `SparseMatCUDA` class uses CUDA and supports single, double, mixed precision.
  *
+ * todo: use cuDSS library instead
+ *
  * @author tlc
- * @date 21/04/2021
- * @version 0.1.0
+ * @date 17/05/2025
+ * @version 0.2.0
  * @file SparseMatCUDA.hpp
  * @addtogroup MetaMat
  * @{
@@ -34,58 +36,26 @@
 
 #include "../SparseMat.hpp"
 #include "../csr_form.hpp"
+#include "../cuda_ptr.hpp"
 
 #include <cusolverSp.h>
-#include <cusparse.h>
 
 template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     cusolverSpHandle_t handle = nullptr;
     cudaStream_t stream = nullptr;
     cusparseMatDescr_t descr = nullptr;
 
-    class cuda_ptr {
-        void* ptr{};
-
-    public:
-        size_t size{};
-
-        explicit cuda_ptr(const size_t in_size = 0)
-            : size(in_size) {
-            if(size > 0) cudaMalloc(&ptr, size);
-        }
-        cuda_ptr(const cuda_ptr& other)
-            : cuda_ptr(other.size) {}
-        cuda_ptr(cuda_ptr&&) = delete;
-        cuda_ptr& operator=(const cuda_ptr&) = delete;
-        cuda_ptr& operator=(cuda_ptr&& other) noexcept {
-            if(this != &other) {
-                cudaFree(ptr);
-                ptr = other.ptr;
-                size = other.size;
-                other.ptr = nullptr;
-                other.size = 0;
-            }
-            return *this;
-        }
-        ~cuda_ptr() { cudaFree(ptr); }
-
-        auto operator&() { return ptr; }
-
-        auto copy_to(void* dest, cudaStream_t s) { return cudaMemcpyAsync(dest, ptr, size, cudaMemcpyDeviceToHost, s); }
-
-        auto copy_from(const void* src, cudaStream_t s) { return cudaMemcpyAsync(ptr, src, size, cudaMemcpyHostToDevice, s); }
-    };
-
     cuda_ptr d_val_idx{}, d_col_idx{}, d_row_ptr{};
 
-    void acquire() {
+    void init_config() {
         cusolverSpCreate(&handle);
         cudaStreamCreate(&stream);
         cusolverSpSetStream(handle, stream);
         cusparseCreateMatDescr(&descr);
         cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
         cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
-        d_row_ptr = cuda_ptr(sizeof(int) * (this->n_rows + 1));
+        d_row_ptr = cuda_ptr(sizeof(int), static_cast<int>(this->n_rows) + 1);
+        this->factored = false;
     }
 
     void release() const {
@@ -95,8 +65,8 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     }
 
     template<sp_d ET> void device_alloc(csr_form<ET, int>&& csr_mat) {
-        d_val_idx = cuda_ptr(sizeof(ET) * csr_mat.n_elem);
-        d_col_idx = cuda_ptr(sizeof(int) * csr_mat.n_elem);
+        d_val_idx = cuda_ptr(sizeof(ET), csr_mat.n_elem);
+        d_col_idx = cuda_ptr(sizeof(int), csr_mat.n_elem);
 
         d_val_idx.copy_from(csr_mat.val_mem(), stream);
         d_col_idx.copy_from(csr_mat.col_mem(), stream);
@@ -110,10 +80,10 @@ protected:
 
 public:
     SparseMatCUDA(const uword in_row, const uword in_col, const uword in_elem = 0)
-        : SparseMat<T>(in_row, in_col, in_elem) { acquire(); }
+        : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
     SparseMatCUDA(const SparseMatCUDA& other)
-        : SparseMat<T>(other) { acquire(); }
+        : SparseMat<T>(other) { init_config(); }
 
     SparseMatCUDA(SparseMatCUDA&&) = delete;
     SparseMatCUDA& operator=(const SparseMatCUDA&) = delete;
@@ -125,73 +95,63 @@ public:
 };
 
 template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
-    if(!this->factored) {
-        std::is_same_v<T, float> || Precision::MIXED == this->setting.precision ? device_alloc(csr_form<float, int>(this->triplet_mat)) : device_alloc(csr_form<double, int>(this->triplet_mat));
+    const auto single_precision = std::is_same_v<T, float> || Precision::MIXED == this->setting.precision;
 
+    if(!this->factored) {
         this->factored = true;
+        single_precision ? device_alloc(csr_form<float, int>(this->triplet_mat)) : device_alloc(csr_form<double, int>(this->triplet_mat));
     }
 
-    const size_t n_rhs = (std::is_same_v<T, float> || Precision::MIXED == this->setting.precision ? sizeof(float) : sizeof(double)) * B.n_elem;
+    const size_t unit_size = single_precision ? sizeof(float) : sizeof(double);
 
-    cuda_ptr d_b{n_rhs}, d_x{n_rhs};
+    const cuda_ptr d_b{unit_size, static_cast<int>(B.n_elem)}, d_x{unit_size, static_cast<int>(B.n_elem)};
 
     int singularity;
-    auto code = 0;
+    Col<int> code(B.n_cols);
 
     if constexpr(std::is_same_v<T, float>) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (float*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (float*)&d_b + I, float(this->setting.tolerance), 3, (float*)&d_x + I, &singularity);
+        for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<float>(I), std::numeric_limits<float>::epsilon(), 3, d_x.get<float>(I), &singularity);
 
-        X.set_size(arma::size(B));
-
-        d_x.copy_to(X.memptr(), stream);
-
-        cudaDeviceSynchronize();
+        if(0 == code.max()) {
+            X.set_size(arma::size(B));
+            d_x.copy_to(X.memptr(), stream);
+        }
     }
     else if(Precision::FULL == this->setting.precision) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpDcsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (double*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (double*)&d_b + I, this->setting.tolerance, 3, (double*)&d_x + I, &singularity);
+        for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpDcsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<double>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<double>(I), std::numeric_limits<double>::epsilon(), 3, d_x.get<double>(I), &singularity);
 
-        X.set_size(arma::size(B));
-
-        d_x.copy_to(X.memptr(), stream);
-
-        cudaDeviceSynchronize();
+        if(0 == code.max()) {
+            X.set_size(arma::size(B));
+            d_x.copy_to(X.memptr(), stream);
+        }
     }
     else {
         X = arma::zeros(arma::size(B));
 
         mat full_residual = B;
 
-        auto multiplier = norm(full_residual);
-
-        auto counter = std::uint8_t{0};
+        std::uint8_t counter{0};
         while(counter++ < this->setting.iterative_refinement) {
+            const auto multiplier = norm(full_residual);
             if(multiplier < this->setting.tolerance) break;
+            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier);
 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
-
             d_b.copy_from(residual.memptr(), stream);
 
-            code = 0;
-            for(auto I = 0llu; I < B.n_elem; I += B.n_rows) code += cusolverSpScsrlsvqr(handle, int(this->n_rows), int(d_val_idx.size), descr, (float*)&d_val_idx, (int*)&d_row_ptr, (int*)&d_col_idx, (float*)&d_b + I, float(this->setting.tolerance), 3, (float*)&d_x + I, &singularity);
-            if(0 != code) break;
+            for(auto I = 0llu, J = 0llu; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<float>(I), std::numeric_limits<float>::epsilon(), 3, d_x.get<float>(I), &singularity);
+            if(0 != code.max()) break;
 
             d_x.copy_to(residual.memptr(), stream);
-
-            cudaDeviceSynchronize();
-
-            const mat incre = multiplier * conv_to<mat>::from(residual);
-
-            X += incre;
-
-            suanpan_debug("Mixed precision algorithm multiplier: {:.5E}.\n", multiplier = arma::norm(full_residual -= this->operator*(incre)));
+            full_residual = B - this->operator*(X += multiplier * conv_to<mat>::from(residual));
         }
     }
 
-    return 0 == code ? SUANPAN_SUCCESS : SUANPAN_FAIL;
+    return 0 == code.max() ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
 
 #endif

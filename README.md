@@ -33,20 +33,19 @@
 > [!IMPORTANT]
 > ***Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).***
 
+> [!IMPORTANT]
+> Please check the [documentation](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
+> For a summary of available functionalities, check [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
+> Please star ⭐ the project!
+
 ## Introduction
 
-[🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for applications
-in fields such as solid mechanics and civil/structural/seismic engineering. **suanPan** is written in modern
-high-quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
+[🧮 **suanPan**](https://tlcfem.github.io/suanPan/) is a finite element method (FEM) simulation platform for applications in fields such as solid mechanics and civil/structural/seismic engineering.
+**suanPan** is written in modern high-quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
 
 **suanPan** is partially influenced by popular (non-)commercial FEA packages, such
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
-
-> [!IMPORTANT]
-> Please check the documentation [here](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
-> For a summary of available functionalities, see [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
-> Please star ⭐ the project!
 
 ![repobeats analytics](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg)
 
@@ -64,8 +63,8 @@ The highlights of **suanPan** are
 
 ## Quick Start
 
-Execute the application out-of-the-box in terminal on Linux using one of the following commands depending on how the
-application is obtained. See details below.
+Execute the application out-of-the-box in terminal on Linux using one of the following commands depending on how the application is obtained.
+See details below.
 
 ```bash
 # in folder bin/ for linux portable tarball
@@ -103,8 +102,9 @@ First time users can use `overview` command to go through a quick introduction.
 suanPan ~<> overview
 ```
 
-Sample models are available for almost all models/commands. Please check the `Example` folder for details. Further
-details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obtain) regarding how to run model files.
+Sample models are available for almost all models/commands.
+Please check the `Example` folder for details.
+Further details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obtain) regarding how to run model files.
 
 ## Installation
 
@@ -117,8 +117,9 @@ details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tutorial/obt
 ### Windows
 
 > [!NOTE]
-> It may be necessary to install the VC++ redistributable [package](https://aka.ms/vs/17/release/vc_redist.x64.exe).
-> If the application prompts that some file, such as `msvcp140.dll`, is missing, please install the redistributable package.
+> The dependencies are bundled with the archive.
+> One may also install the VC++ redistributable [package](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+> If the application prompts that some file, such as `msvcp140.dll`, is missing (unlikely), please install the redistributable package.
 
 #### Binary Package
 
@@ -171,8 +172,8 @@ Linux users are recommended to obtain the binaries via `snap` or `flatpak`.
 #### Snap
 
 The snap supports visualisation via VTK and uses Intel MKL for linear algebra.
-The edge channel is in sync with the `dev` branch.
-The stable channel is in sync with the `master` branch.
+The `edge` channel is in sync with the `dev` branch.
+The `stable` channel is in sync with the `master` branch.
 
 [![snap](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
@@ -181,8 +182,8 @@ The stable channel is in sync with the `master` branch.
 #### Flatpak
 
 Flatpak is also available if preferred.
-The beta channel is in sync with the `dev` branch.
-The stable channel is in sync with the `master` branch.
+The `beta` channel is in sync with the `dev` branch.
+The `stable` channel is in sync with the `master` branch.
 
 <a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
 
@@ -203,13 +204,13 @@ It is also possible to compile the package via docker, check the dockerfiles und
 questions please open an issue.
 
 One can directly pull the image.
-Using [Docker Hub](https://hub.docker.com/r/tlcfem/suanpan),
+Using [Docker Hub](https://hub.docker.com/r/tlcfem/suanpan).
 
 ```bash
 docker pull tlcfem/suanpan
 ```
 
-Or using [GitHub Container Registry](https://github.com/TLCFEM/suanPan/pkgs/container/suanpan),
+Using [GitHub Container Registry](https://github.com/TLCFEM/suanPan/pkgs/container/suanpan).
 
 ```bash
 docker pull ghcr.io/tlcfem/suanpan
@@ -226,27 +227,13 @@ A few flavors are available:
    may be missing on server systems
 2. `mkl` --- linear algebra operations are offloaded to MKL, which gives the optimal performance on Intel chips
 3. `openblas` --- linear algebra operations are offloaded to OpenBLAS, which may outperform MKL on AMD platforms
-4. `no-avx` --- AVX2 support is disabled, useful for older CPUs which do not support AVX2 instructions
+4. `aocl` --- linear algebra operations are offloaded to AOCL, which is optimized for AMD platforms
+5. `no-avx` --- AVX2 support is disabled, useful for older CPUs that do not support AVX2 instructions
+6. `win-gcc` --- GCC is used to compile the binary
+7. `win` --- MSVC is used to compile the binary
 
 Advanced users can compile the program from source by themselves to enable GPU based solvers which require
-an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) and/or MAGMA library.
-
-Since CI/CD uses `GCC 11` (on Linux) and `Clang 13.0.1` (on macOS), it may be required to update/install
-proper `libstdc++` (or `libc++`) version.
-The easiest way is to install the same compiler.
-For example, on Ubuntu 22.04,
-
-```bash
-# Ubuntu
-sudo apt install gcc g++ gfortran libomp5
-```
-
-For VTK enabled versions, it may be necessary to install OpenGL.
-
-```bash
-# Ubuntu
-sudo apt install libglvnd-dev
-```
+an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) and/or [MAGMA](https://icl.utk.edu/magma/) library.
 
 ### Automation Related
 
@@ -256,22 +243,20 @@ The VS Code extension is available [here](https://marketplace.visualstudio.com/i
 
 #### Sublime Text
 
-On Windows, a batch file named `AddAssociation.bat` is provided in the archive. It provides file associations and
-prepares a proper working environment (build system, autocompletion, highlighting)
-with [Sublime Text](https://www.sublimetext.com/). It also adds file associations with `.sp` and `.supan` files, please
-run the `AddAssociation.bat` file with administrator privilege. [Sublime Text](https://www.sublimetext.com/)
-autocompletion and syntax highlighting files are also provided. Please install Sublime Text first and execute the batch
-file with the administrator privilege.
+On Windows, a batch file named `AddAssociation.bat` is provided in the archive.
+It provides file associations and prepares a proper working environment (build system, autocompletion, highlighting) with [Sublime Text](https://www.sublimetext.com/).
+It also adds file associations with `.sp` and `.supan` files, please run the `AddAssociation.bat` file with administrator privilege.
+[Sublime Text](https://www.sublimetext.com/) autocompletion and syntax highlighting files are also provided.
+Please install Sublime Text first and execute the batch file with the administrator privilege.
 
-On Linux, a script file named as `suanPan.sh` is provided. By executing
+On Linux, a script file named as `suanPan.sh` is provided.
 
 ```bash
 ./suanPan.sh --create-link
 ```
 
-It adds Sublime Text autocompletion and syntax highlighting files to proper location if Sublime Text configuration
-folder is found. It also adds a command alias `suanpan` to `~/.local/bin` and a desktop file
-to `~/.local/share/applications`.
+The above command adds Sublime Text autocompletion and syntax highlighting files to proper location if Sublime Text configuration folder is found.
+It also adds a command alias `suanpan` to `~/.local/bin` and a desktop file to `~/.local/share/applications`.
 
 ## Dependency
 
@@ -279,38 +264,37 @@ Additional libraries used in **suanPan** are listed as follows.
 
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.1
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 14.4.1
-- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.5
+- [**Armadillo**](http://arma.sourceforge.net/) version 14.4.3
+- [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.8.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
-- [**MAGMA**](https://icl.utk.edu/magma/) version 2.8.0
+- [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
 - [**METIS**](https://github.com/KarypisLab/METIS) version 5.1.0
-- [**MUMPS**](https://mumps-solver.org/) version 5.7.3
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.29
+- [**MUMPS**](https://mumps-solver.org/) version 5.8.0
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.30
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
-- [**VTK**](https://vtk.org/) version 9.4
+- [**VTK**](https://vtk.org/) version 9.4.2
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.0.1
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.1.0
 - [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
-Those libraries may depend on other libraries such as [zlib](https://zlib.net/)
-and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/). Additional tools may be used by **suanPan**, they are
+Those libraries may depend on other libraries such as [zlib](https://zlib.net/) and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/).
+Additional tools may be used by **suanPan**, they are
 
 - [**UPX** the Ultimate Packer for eXecutables](https://upx.github.io/)
 
 ## How To Compile
 
-Please refer to the corresponding [page](https://tlcfem.github.io/suanPan-manual/latest/Basic/Compile/) in
-the manual for details.
+Please refer to the corresponding [page](https://tlcfem.github.io/suanPan-manual/latest/Basic/Compile/) in the manual for details.
 
 ## Happy Modelling
 

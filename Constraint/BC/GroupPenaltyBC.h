@@ -44,8 +44,8 @@ protected:
     const uvec groups;
 
 public:
-    GroupPenaltyBC(unsigned, unsigned, uvec&&, uvec&&);
-    GroupPenaltyBC(unsigned, unsigned, uvec&&, char);
+    GroupPenaltyBC(unsigned, uvec&&, uvec&&);
+    GroupPenaltyBC(unsigned, uvec&&, char);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -328,7 +328,7 @@
       "trigger": "C3D8",
       "details": "linear cube/brick",
       "kind": "type",
-      "contents": "element C3D8 ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:[11]} ${12:[12]}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag\n# [11] string, integration scheme, default: 'I'\n# [12] bool string, nonlinear geometry switch, default: false"
+      "contents": "element C3D8 ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:[11]} ${12:[12]} ${13:[13]}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag\n# [11] string, integration scheme, default: 'I'\n# [12] bool string, nonlinear geometry switch, default: false\n# [13] double, hourglassing penalty multiplier, default: 1.0"
     },
     {
       "trigger": "C3D8I",
@@ -340,7 +340,7 @@
       "trigger": "C3D8R",
       "details": "linear cube/brick with reduced integration",
       "kind": "type",
-      "contents": "element C3D8R ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:[11]}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag\n# [11] bool string, nonlinear geometry switch, default: false"
+      "contents": "element C3D8R ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:[11]} ${12:[12]}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag\n# [11] bool string, nonlinear geometry switch, default: false\n# [12] double, hourglassing penalty multiplier, default: 1.0"
     },
     {
       "trigger": "CAX3",
@@ -406,7 +406,7 @@
       "trigger": "CP4",
       "details": "bilinear quadrilateral",
       "kind": "type",
-      "contents": "element CP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0\n# [8] bool string, reduced integration switch, default: false\n# [9] bool string, nonlinear geometry switch, default: false"
+      "contents": "element CP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]} ${10:[10]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0\n# [8] bool string, reduced integration switch, default: false\n# [9] bool string, nonlinear geometry switch, default: false\n# [10] double, hourglassing penalty multiplier, default: 1.0"
     },
     {
       "trigger": "CP4I",
@@ -418,7 +418,7 @@
       "trigger": "CP4R",
       "details": "bilinear quadrilateral with reduced integration",
       "kind": "type",
-      "contents": "element CP4R ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0\n# [8] bool string, nonlinear geometry switch, default: false"
+      "contents": "element CP4R ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0\n# [8] bool string, nonlinear geometry switch, default: false\n# [9] double, hourglassing penalty multiplier, default: 1.0"
     },
     {
       "trigger": "CP5",
@@ -1705,6 +1705,12 @@
       "contents": "material PolyElastic1D ${1:(1)} [${2:(2)}...]\n# (1) int, unique material tag\n# (2) double, polynomial parameters, a_n"
     },
     {
+      "trigger": "Prestrain",
+      "details": "prestrain wrapper for uniaxial materials",
+      "kind": "type",
+      "contents": "material Prestrain ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique material tag\n# (2) int, underlying material tag\n# (3) int, amplitude tag, set to 0 to use a ramp function\n# (4) double, maginutde"
+    },
+    {
       "trigger": "PolyJ2",
       "details": "j2 material with polynomial hardening",
       "kind": "type",
@@ -1969,16 +1975,16 @@
       "contents": "criterion StrainEnergyEvolution ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique criterion tag\n# (2) int, increment of rejection level in percentage\n# (3) int, target rejection level in percentage\n# [4] double, weight of central element, used in averaging\n# [5] int, number of iterations of averaging\n# [6] int, reactivation rate in percentage\n# [7] double, propagation weight\n# [8] double, tolerance"
     },
     {
+      "trigger": "SubloadingMetal",
+      "details": "3d subloading surface model for metal",
+      "kind": "type",
+      "contents": "material Subloading ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:(12)} ${13:(13)} ${14:(14)} ${15:(15)} ${16:[16]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poisson's ratio\n# (4) double, isotropic initial stress\n# (5) double, isotropic linear hardening modulus\n# (6) double, isotropic saturation stress\n# (7) double, isotropic saturation rate\n# (8) double, kinematic initial stress\n# (9) double, kinematic linear hardening modulus\n# (10) double, kinematic saturation stress\n# (11) double, kinematic saturation rate\n# (12) double, yield ratio evolution rate\n# (13) double, kinematic hardening rate\n# (14) double, elastic core evolution rate\n# (15) double, elastic core size\n# [16] double, density, default: 0.0"
+    },
+    {
       "trigger": "Subloading1D",
       "details": "uniaxial subloading surface model for metal",
       "kind": "type",
       "contents": "material Subloading1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:(12)} ${13:(13)} ${14:(14)} ${15:[15]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, isotropic initial stress\n# (4) double, isotropic linear hardening modulus\n# (5) double, isotropic saturation stress\n# (6) double, isotropic saturation rate\n# (7) double, kinematic initial stress\n# (8) double, kinematic linear hardening modulus\n# (9) double, kinematic saturation stress\n# (10) double, kinematic saturation rate\n# (11) double, yield ratio evolution rate\n# (12) double, kinematic hardening rate\n# (13) double, elastic core evolution rate\n# (14) double, elastic core size\n# [15] double, density, default: 0.0"
-    },
-    {
-      "trigger": "Subloading",
-      "details": "3d subloading surface model for metal",
-      "kind": "type",
-      "contents": "material Subloading ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:(11)} ${12:(12)} ${13:(13)} ${14:(14)} ${15:(15)} ${16:[16]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poisson's ratio\n# (4) double, isotropic initial stress\n# (5) double, isotropic linear hardening modulus\n# (6) double, isotropic saturation stress\n# (7) double, isotropic saturation rate\n# (8) double, kinematic initial stress\n# (9) double, kinematic linear hardening modulus\n# (10) double, kinematic saturation stress\n# (11) double, kinematic saturation rate\n# (12) double, yield ratio evolution rate\n# (13) double, kinematic hardening rate\n# (14) double, elastic core evolution rate\n# (15) double, elastic core size\n# [16] double, density, default: 0.0"
     },
     {
       "trigger": "Substepping",
@@ -2059,6 +2065,18 @@
       "contents": "integrator Tchamwa ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
     },
     {
+      "trigger": "GSSE",
+      "details": "gsse explicit time integration",
+      "kind": "keyword",
+      "contents": "integrator GSSE ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
+    },
+    {
+      "trigger": "ICL",
+      "details": "icl explicit time integration",
+      "kind": "keyword",
+      "contents": "integrator ICL ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
+    },
+    {
       "trigger": "Tie",
       "details": "tie constraint",
       "kind": "type",
@@ -2135,6 +2153,12 @@
       "details": "newmark time integration with wilson penzien damping model",
       "kind": "keyword",
       "contents": "integrator WilsonPenzienNewmark ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4...]}\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark algorithm\n# (3) double, beta in Newmark algorithm\n# [4...] double, damping ratios on the first n modes"
+    },
+    {
+      "trigger": "WAT2",
+      "details": "generalized explicit RKN time integration",
+      "kind": "keyword",
+      "contents": "integrator WAT2 ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, parameter, default: 1/3"
     },
     {
       "trigger": "Yeoh",

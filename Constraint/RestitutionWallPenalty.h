@@ -41,8 +41,8 @@ class RestitutionWallPenalty : public RigidWallPenalty {
     const double restitution_coefficient;
 
 public:
-    RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, double, unsigned);
-    RestitutionWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double, unsigned);
+    RestitutionWallPenalty(unsigned, unsigned, vec&&, vec&&, double, double, unsigned);
+    RestitutionWallPenalty(unsigned, unsigned, vec&&, vec&&, vec&&, double, double, unsigned);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
@@ -57,19 +57,19 @@ public:
 
 class RestitutionWallPenalty1D final : public RestitutionWallPenalty {
 public:
-    RestitutionWallPenalty1D(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);
+    RestitutionWallPenalty1D(unsigned, unsigned, vec&&, vec&&, double, double);
 };
 
 class RestitutionWallPenalty2D final : public RestitutionWallPenalty {
 public:
-    RestitutionWallPenalty2D(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);
-    RestitutionWallPenalty2D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
+    RestitutionWallPenalty2D(unsigned, unsigned, vec&&, vec&&, double, double);
+    RestitutionWallPenalty2D(unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
 };
 
 class RestitutionWallPenalty3D final : public RestitutionWallPenalty {
 public:
-    RestitutionWallPenalty3D(unsigned, unsigned, unsigned, vec&&, vec&&, double, double);
-    RestitutionWallPenalty3D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
+    RestitutionWallPenalty3D(unsigned, unsigned, vec&&, vec&&, double, double);
+    RestitutionWallPenalty3D(unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
 };
 
 #endif

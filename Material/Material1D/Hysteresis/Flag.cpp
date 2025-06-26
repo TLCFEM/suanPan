@@ -20,11 +20,11 @@
 #include <Toolbox/utility.h>
 
 Flag::Flag(const unsigned T, const double E, const double YT, const double RT, const double HT, const double YC, const double RC, const double HC, const double D)
-    : DataFlag{fabs(E), HT, fabs(YT), RT, HC, -fabs(YC), RC}
+    : DataFlag{std::fabs(E), HT, std::fabs(YT), RT, HC, -std::fabs(YC), RC}
     , Material1D(T, D) {}
 
 Flag::Flag(const unsigned T, const double E, const double YT, const double RT, const double HT, const double D)
-    : DataFlag{fabs(E), HT, fabs(YT), RT, HT, -fabs(YT), -RT}
+    : DataFlag{std::fabs(E), HT, std::fabs(YT), RT, HT, -std::fabs(YT), -RT}
     , Material1D(T, D) {}
 
 int Flag::initialize(const shared_ptr<DomainBase>&) {
@@ -40,7 +40,7 @@ unique_ptr<Material> Flag::get_copy() { return std::make_unique<Flag>(*this); }
 int Flag::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_status = current_status;
     trial_history = current_history;

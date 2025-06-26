@@ -21,7 +21,7 @@
 #include <Domain/Factory.hpp>
 #include <Toolbox/tensor.h>
 
-const double NonlinearPeric::root_three_two = sqrt(1.5);
+const double NonlinearPeric::root_three_two = std::sqrt(1.5);
 const mat NonlinearPeric::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearPeric::NonlinearPeric(const unsigned T, const double E, const double V, const double MU, const double EPS, const double R)
@@ -76,14 +76,14 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
 
         const auto gradient = (triple_shear + factor_a * (eqv_stress - triple_shear * gamma) / denom) * pow_term - dk;
         const auto incre_gamma = residual / gradient;
-        const auto error = fabs(incre_gamma);
+        const auto error = std::fabs(incre_gamma);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((fabs(residual) < tolerance || error < datum::eps) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) break;
 
         plastic_strain = current_history(0) + (gamma += incre_gamma);
         denom = incre_t + mu * gamma;
-        pow_term = pow(incre_t / denom, epsilon);
+        pow_term = std::pow(incre_t / denom, epsilon);
         update_isotropic_hardening();
         residual = (eqv_stress - triple_shear * gamma) * pow_term - k;
     }

@@ -47,16 +47,25 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
-          file_name="suanPan-linux-debug-gcc-no-avx-openblas"
+          file_name="linux-debug-openblas"
           file_name+="${{ env.SP_TIME }}.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
+      - name: Test
+        run: |
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
+          ./build/dist/bin/suanPan -v
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
-      - name: Test
-        run: |
-          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
-          ./build/dist/bin/suanPan -v
+      - name: Remote
+        uses: appleboy/scp-action@v1
+        with:
+          host: 170.64.176.26
+          username: theodore
+          key: ${{ secrets.VETERAN_KEY }}
+          port: 2222
+          source: ${{ env.ARTIFACT }}
+          target: ~/Documents/suanPan-daily

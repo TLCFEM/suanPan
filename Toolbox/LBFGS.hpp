@@ -44,11 +44,6 @@
 #include <deque>
 #include <suanPan.h>
 
-template<typename T> concept Differentiable = requires(T t, const vec& x) {
-    t.evaluate_residual(x);
-    t.evaluate_jacobian(x);
-};
-
 class LBFGS final {
     std::deque<vec> hist_ninja, hist_residual;
     std::deque<double> hist_factor;
@@ -60,13 +55,16 @@ class LBFGS final {
     const double rel_tol;
 
 public:
-    explicit LBFGS(const unsigned MH = 10, const unsigned MI = 500, const double AT = 1E-12, const double RT = 1E-12)
+    explicit LBFGS(const unsigned MH = 10, const unsigned MI = 500, const double AT = datum::eps, const double RT = datum::eps)
         : max_hist(MH)
         , max_iteration(MI)
         , abs_tol(AT)
         , rel_tol(RT) {}
 
-    template<Differentiable F> int optimize(F& func, vec& x) {
+    template<typename F> requires requires(F t, const vec& x) {
+        { t.evaluate_residual(x) } -> std::same_as<vec>;
+        { t.evaluate_jacobian(x) } -> std::same_as<mat>;
+    } int optimize(F& func, vec& x) {
         // clear container
         hist_ninja.clear();
         hist_residual.clear();
@@ -80,7 +78,7 @@ public:
         while(true) {
             const auto residual = func.evaluate_residual(x);
 
-            if(0 == counter) ninja = solve(func.evaluate_jacobian(x), residual);
+            if(0u == counter) ninja = solve(func.evaluate_jacobian(x), residual);
             else {
                 // clear temporary factor container
                 alpha.clear();
@@ -93,16 +91,12 @@ public:
                 ninja = residual;
                 // perform two-step recursive loop
                 // right side loop
-                for(auto J = static_cast<int>(hist_factor.size()) - 1; J >= 0; --J) {
-                    // compute and commit alpha
-                    alpha.emplace_back(dot(hist_ninja[J], ninja) / hist_factor[J]);
-                    // update ninja
-                    ninja -= alpha.back() * hist_residual[J];
-                }
+                // compute and commit alpha and update ninja
+                for(auto J = static_cast<int>(hist_factor.size()) - 1; J >= 0; --J) ninja -= alpha.emplace_back(dot(hist_ninja[J], ninja)) / hist_factor[J] * hist_residual[J];
                 // apply the Hessian from the factorization in the first iteration
                 ninja *= dot(hist_residual.back(), hist_ninja.back()) / dot(hist_residual.back(), hist_residual.back());
                 // left side loop
-                for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) ninja += (alpha[J] - dot(hist_residual[I], ninja) / hist_factor[I]) * hist_ninja[I];
+                for(size_t I = 0, J = hist_factor.size() - 1; I < hist_factor.size(); ++I, --J) ninja += (alpha[J] - dot(hist_residual[I], ninja)) / hist_factor[I] * hist_ninja[I];
             }
 
             // commit current displacement increment

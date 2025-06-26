@@ -46,7 +46,7 @@ Domain::Domain(const unsigned T)
     , attribute(10, false) {}
 
 Domain::~Domain() {
-    for(const auto& I : thread_pond) I->get();
+    for(auto& thread : thread_pond) thread.get();
 }
 
 void Domain::set_factory(const shared_ptr<LongFactory>& F) {
@@ -58,13 +58,14 @@ void Domain::set_factory(const shared_ptr<LongFactory>& F) {
 
 const shared_ptr<LongFactory>& Domain::get_factory() const { return factory; }
 
-bool Domain::insert(const shared_ptr<std::future<void>>& T) {
-    thread_pond.emplace_back(T);
+bool Domain::insert(std::future<void>&& T) {
+    std::erase_if(thread_pond, [](const std::future<void>& thread) { return std::future_status::ready == thread.wait_for(std::chrono::seconds(0)); });
+    thread_pond.emplace_back(std::move(T));
     return true;
 }
 
 void Domain::wait() {
-    for(const auto& thread : thread_pond) thread->wait();
+    for(const auto& thread : thread_pond) thread.wait();
 }
 
 bool Domain::insert(const shared_ptr<ExternalModule>& E) {
@@ -712,10 +713,37 @@ const shared_ptr<Integrator>& Domain::get_current_integrator() const { return ge
 
 const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver(current_solver_tag.first); }
 
+unique_ptr<Amplitude> Domain::initialized_amplitude_copy(const uword T) {
+    if(!find<Amplitude>(T)) return nullptr;
+
+    auto copy = get<Amplitude>(T)->get_copy();
+
+    if(!copy->is_initialized()) {
+        copy->initialize(shared_from_this());
+        copy->set_initialized(true);
+    }
+
+    return copy;
+}
+
 unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
     if(!find<Material>(T)) return nullptr;
 
     auto copy = get<Material>(T)->get_copy();
+
+    if(copy->is_initialized()) return copy;
+
+    if(SUANPAN_SUCCESS != copy->initialize_base(shared_from_this()) || SUANPAN_SUCCESS != copy->initialize(shared_from_this())) return nullptr;
+
+    copy->set_initialized(true);
+
+    return copy;
+}
+
+unique_ptr<Section> Domain::initialized_section_copy(const uword T) {
+    if(!find<Section>(T)) return nullptr;
+
+    auto copy = get<Section>(T)->get_copy();
 
     if(copy->is_initialized()) return copy;
 
@@ -918,7 +946,10 @@ int Domain::initialize() {
     suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->set_initialized(false); });
 
     // amplitude should be updated before load
-    suanpan::for_all(amplitude_pond, [&](const dual<Amplitude>& t_amplitude) { t_amplitude.second->initialize(shared_from_this()); });
+    suanpan::for_all(amplitude_pond, [&](const dual<Amplitude>& t_amplitude) {
+        t_amplitude.second->initialize(shared_from_this());
+        t_amplitude.second->set_initialized(true);
+    });
     amplitude_pond.update();
 
     initialize_material();

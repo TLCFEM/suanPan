@@ -20,7 +20,7 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
-const double NonlinearGurson::sqrt_three_two = sqrt(1.5);
+const double NonlinearGurson::sqrt_three_two = std::sqrt(1.5);
 const mat NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearGurson::NonlinearGurson(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
@@ -71,10 +71,10 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
         const auto hardening = compute_hardening(pe);
         const auto &k = hardening(0), &dk = hardening(1);
         const auto hyper_term = 1.5 * q2 * p / k;
-        const auto cosh_term = cosh(hyper_term);
-        const auto sinh_term = sinh(hyper_term);
+        const auto cosh_term = std::cosh(hyper_term);
+        const auto sinh_term = std::sinh(hyper_term);
         const auto q = trial_q / (denom = 1. + six_shear * gamma);
-        const auto an = para_b * exp(-.5 * pow((pe - en) / sn, 2.));
+        const auto an = para_b * std::exp(-.5 * std::pow((pe - en) / sn, 2.));
         const auto para_d = para_a * sinh_term;
 
         const auto diff_pe = pe - current_pe, diff_p = p - trial_p;
@@ -109,14 +109,12 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre(0);
-        pe -= incre(1);
-        f -= incre(2);
+        pe = std::max(pe - incre(1), 0.);
+        f = suanpan::clamp(f - incre(2), 0., 1.); // avoid overshoot
         p -= incre(3);
-
-        f = std::min(std::max(f, 0.), 1.); // avoid overshoot
     }
 
     trial_s /= denom;

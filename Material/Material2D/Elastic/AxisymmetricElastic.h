@@ -32,8 +32,8 @@
 #include <Material/Material2D/Material2D.h>
 
 class AxisymmetricElastic final : public Material2D {
-    const double elastic_modulus; // elastic modulus
-    const double poissons_ratio;  // poissons ratio
+    const double elastic_modulus, poissons_ratio;
+
 public:
     AxisymmetricElastic(
         unsigned,  // tag

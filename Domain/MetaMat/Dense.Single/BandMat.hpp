@@ -90,9 +90,13 @@ public:
     Mat<T> operator*(const Mat<T>&) const override;
 
     [[nodiscard]] int sign_det() const override {
+        std::function<bool(uword)> neg_diag;
+        if(Precision::FULL == this->setting.precision) neg_diag = [&](const uword i) { return this->memory[s_band + i * m_rows] < 0.; };
+        else neg_diag = [&](const uword i) { return this->s_memory[s_band + i * m_rows] < 0.f; };
+
         auto det_sign = 1;
         for(unsigned I = 0; I < this->pivot.n_elem; ++I)
-            if((this->operator()(I, I) < T(0)) ^ (static_cast<int>(I) + 1 != this->pivot(I))) det_sign = -det_sign;
+            if(neg_diag(I) ^ (static_cast<int>(I) + 1 != this->pivot(I))) det_sign = -det_sign;
         return det_sign;
     }
 };

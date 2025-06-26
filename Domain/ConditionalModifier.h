@@ -34,9 +34,10 @@
 #define CONDITIONALMODIFIER_H
 
 #include <Domain/Tag.h>
+#include <Load/Amplitude/Amplitude.h>
+#include <Toolbox/ResourceHolder.h>
 
 class DomainBase;
-class Amplitude;
 
 class ConditionalModifier : public UniqueTag {
 protected:
@@ -44,7 +45,7 @@ protected:
 
     const bool connected = false;
 
-    unsigned start_step, end_step = static_cast<unsigned>(-1);
+    unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};
 
     const unsigned amplitude_tag;
 
@@ -52,7 +53,7 @@ protected:
     uvec dof_reference; // reference DoF ZERO based
     uvec dof_encoding;  // DoF encoding
 
-    shared_ptr<Amplitude> magnitude;
+    ResourceHolder<Amplitude> amplitude;
 
     /**
      * \brief Generate active DoF vector from assigned nodes.
@@ -68,7 +69,6 @@ protected:
 public:
     ConditionalModifier(
         unsigned, // tag
-        unsigned, // step tag
         unsigned, // amplitude tag
         uvec&&,   // node tag
         uvec&&    // dof tag
@@ -93,7 +93,7 @@ public:
     virtual int process_resistance(const shared_ptr<DomainBase>&);
 
     /**
-     * \brief Some algorithms needs to manually modify some variables after solving. Typical example is the
+     * \brief Some algorithms need to manually modify some variables after solving. Typical example is the
      * predictor--corrector type algorithms. This method is called before committing trial status to perform
      * necessary operations.
      */

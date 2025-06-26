@@ -41,8 +41,8 @@
 
 class PenaltyBC : public Constraint {
 public:
-    PenaltyBC(unsigned, unsigned, uvec&&, uvec&&);
-    PenaltyBC(unsigned, unsigned, uvec&&, char);
+    PenaltyBC(unsigned, uvec&&, uvec&&);
+    PenaltyBC(unsigned, uvec&&, char);
 
     int process(const shared_ptr<DomainBase>&) override;
     int process_resistance(const shared_ptr<DomainBase>&) override;

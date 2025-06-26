@@ -54,6 +54,16 @@ class Integrator : public UniqueTag {
 
     std::weak_ptr<DomainBase> database;
 
+protected:
+    virtual void update_parameter(double);
+
+    [[nodiscard]] virtual int process_load_impl(bool);
+    [[nodiscard]] virtual int process_constraint_impl(bool);
+
+    [[nodiscard]] virtual bool has_corrector() const;
+
+    virtual int correct_trial_status();
+
 public:
     explicit Integrator(unsigned = 0);
 
@@ -72,14 +82,13 @@ public:
     void set_matrix_assembled_switch(bool);
     [[nodiscard]] bool matrix_is_assembled() const;
 
-    [[nodiscard]] virtual bool has_corrector() const;
     [[nodiscard]] virtual bool time_independent_matrix() const;
 
-    [[nodiscard]] virtual int process_load();
+    [[nodiscard]] int process_load();
     [[nodiscard]] virtual int process_constraint();
-    [[nodiscard]] virtual int process_criterion();
-    [[nodiscard]] virtual int process_modifier();
-    [[nodiscard]] virtual int process_load_resistance();
+    [[nodiscard]] int process_criterion() const;
+    [[nodiscard]] int process_modifier() const;
+    [[nodiscard]] int process_load_resistance();
     [[nodiscard]] virtual int process_constraint_resistance();
 
     void record() const;
@@ -89,25 +98,24 @@ public:
 
     virtual vec get_force_residual();
     virtual vec get_displacement_residual();
-    virtual vec get_auxiliary_residual();
+    [[nodiscard]] vec get_auxiliary_residual() const;
     virtual sp_mat get_reference_load();
 
     [[nodiscard]] virtual const vec& get_trial_displacement() const;
 
-    virtual void update_load();
-    virtual void update_constraint();
+    void update_load() const;
+    void update_constraint() const;
 
-    virtual void update_trial_load_factor(double);
-    virtual void update_trial_load_factor(const vec&);
+    void update_trial_load_factor(double) const;
+    void update_trial_load_factor(const vec&) const;
     virtual void update_from_ninja();
 
-    virtual void update_trial_time(double);
+    void update_trial_time(double);
     virtual void update_incre_time(double);
 
-    virtual int update_trial_status();
-    virtual int correct_trial_status();
+    virtual int update_trial_status(bool);
 
-    virtual int sync_status(bool);
+    int sync_status(bool);
 
     virtual int update_internal(const mat&);
 
@@ -120,16 +128,14 @@ public:
     virtual int solve(mat&, mat&&);
     virtual int solve(mat&, sp_mat&&);
 
-    virtual void erase_machine_error(vec&) const;
+    void erase_machine_error(vec&) const;
 
     void stage_and_commit_status();
 
-    virtual void stage_status();
+    void stage_status() const;
     virtual void commit_status();
     virtual void clear_status();
     virtual void reset_status();
-
-    virtual void update_parameter(double);
 
     virtual vec from_incre_velocity(const vec&, const uvec&);     // obtain target displacement from increment of velocity
     virtual vec from_incre_acceleration(const vec&, const uvec&); // obtain target displacement from increment of acceleration
@@ -146,8 +152,6 @@ public:
     using Integrator::Integrator;
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Implicit; }
-
-    [[nodiscard]] bool time_independent_matrix() const override;
 };
 
 class ExplicitIntegrator : public Integrator {
@@ -155,6 +159,9 @@ public:
     using Integrator::Integrator;
 
     [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
+
+    void assemble_resistance() override;
+    void assemble_matrix() override;
 
     [[nodiscard]] const vec& get_trial_displacement() const override;
 

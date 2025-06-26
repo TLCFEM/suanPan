@@ -1,0 +1,22 @@
+name: Delete
+on:
+  workflow_dispatch:
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.ALL }}
+          environment: github-pages
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Package
+        uses: Chizkiyahu/delete-untagged-ghcr-action@v6
+        with:
+          token: ${{ secrets.ALL }}
+          package_name: suanpan
+          untagged_only: true
+          owner_type: 'user'

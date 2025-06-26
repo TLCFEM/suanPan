@@ -22,8 +22,8 @@
 
 double Load::multiplier = 1E8;
 
-Load::Load(const unsigned T, const unsigned ST, const unsigned AT, uvec&& NT, uvec&& DT, const double PT)
-    : ConditionalModifier(T, ST, AT, std::move(NT), std::move(DT))
+Load::Load(const unsigned T, const unsigned AT, uvec&& NT, uvec&& DT, const double PT)
+    : ConditionalModifier(T, AT, std::move(NT), std::move(DT))
     , pattern(PT) {}
 
 void Load::enable_displacement_control() const { access::rw(mpdc_flag) = true; }

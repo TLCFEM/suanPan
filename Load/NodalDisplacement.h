@@ -40,19 +40,10 @@ protected:
 public:
     NodalDisplacement(
         unsigned, // tag
-        unsigned, // step tag
         double,   // magnitude
         uvec&&,   // node tags
-        unsigned, // dof tag
+        uvec&&,   // dof tags
         unsigned  // amplitude tag
-    );
-    NodalDisplacement(
-        unsigned,    // tag
-        unsigned,    // step tag
-        double,      // magnitude
-        uvec&&,      // node tags
-        uvec&&,      // dof tags
-        unsigned = 0 // amplitude tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -37,7 +37,6 @@ class ReferenceForce final : public Load {
 public:
     ReferenceForce(
         unsigned, // tag
-        unsigned, // start step tag
         double,   // magnitude
         uvec&&,   // node tags
         unsigned  // dof tag

@@ -369,5 +369,3 @@ void PureWrapper(Material* M) {
 }
 
 unique_ptr<Material> suanpan::make_copy(const shared_ptr<Material>& P) { return nullptr == P ? nullptr : P->get_copy(); }
-
-unique_ptr<Material> suanpan::make_copy(const unique_ptr<Material>& P) { return nullptr == P ? nullptr : P->get_copy(); }

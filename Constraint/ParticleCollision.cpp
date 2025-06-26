@@ -27,8 +27,8 @@ vec ParticleCollision::get_position(const shared_ptr<Node>& node) const {
     return get_trial_position<DOF::U1, DOF::U2, DOF::U3>(node);
 }
 
-ParticleCollision::ParticleCollision(const unsigned T, const unsigned S, const unsigned D)
-    : Constraint(T, S, 0, {}, {}, 0)
+ParticleCollision::ParticleCollision(const unsigned T, const unsigned D)
+    : Constraint(T, 0, {}, {}, 0)
     , num_dof(D) {}
 
 int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {

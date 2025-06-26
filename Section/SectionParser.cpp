@@ -3070,7 +3070,7 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(section_id, "US3D")) new_us3d(new_section, command, false);
     else if(is_equal(section_id, "US2DC")) new_us2d(new_section, command, true);
     else if(is_equal(section_id, "US3DC")) new_us3d(new_section, command, true);
-    else load::object(new_section, domain, section_id, command);
+    else external_module::object(new_section, domain, section_id, command);
 
     if(new_section == nullptr || !domain->insert(std::move(new_section)))
         suanpan_error("Fail to create new section via \"{}\".\n", command.str());

@@ -19,7 +19,7 @@
 
 #include <Toolbox/tensor.h>
 
-const double NonlinearJ2::root_two_third = sqrt(two_third);
+const double NonlinearJ2::root_two_third = std::sqrt(two_third);
 const mat NonlinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearJ2::NonlinearJ2(const unsigned T, const double E, const double V, const double R)
@@ -77,10 +77,10 @@ int NonlinearJ2::update_trial_status(const vec& t_strain) {
 
         denom = double_shear + two_third * (dk + compute_dh(plastic_strain));
         const auto incre_gamma = yield_func / denom;
-        const auto error = fabs(incre_gamma);
+        const auto error = std::fabs(incre_gamma);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((fabs(yield_func) < tolerance || error < datum::eps) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(yield_func) < tolerance) && counter > 5u)) break;
         incre_h = compute_h(plastic_strain = current_history(0) + root_two_third * (gamma += incre_gamma)) - current_h;
         update_isotropic_hardening();
         yield_func = norm_rel_stress - double_shear * gamma - root_two_third * (k + incre_h);

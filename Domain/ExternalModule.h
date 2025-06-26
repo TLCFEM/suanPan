@@ -61,14 +61,9 @@ public:
     bool locate_c_module(const std::string&);
     bool locate_cpp_module(const std::string&);
 
-    void new_object(unique_ptr<Element>&, std::istringstream&) const;
-    void new_object(unique_ptr<Load>&, std::istringstream&) const;
-    void new_object(unique_ptr<Material>&, std::istringstream&) const;
-    void new_object(unique_ptr<Section>&, std::istringstream&) const;
-    void new_object(unique_ptr<Solver>&, std::istringstream&) const;
-    void new_object(unique_ptr<Amplitude>&, std::istringstream&) const;
-    void new_object(unique_ptr<Modifier>&, std::istringstream&) const;
-    void new_object(unique_ptr<Constraint>&, std::istringstream&) const;
+    template<typename T> void new_object(unique_ptr<T>& return_obj, std::istringstream& command) const {
+        if(ext_creator) reinterpret_cast<void (*)(unique_ptr<T>&, std::istringstream&)>(ext_creator)(return_obj, command);
+    }
 
     void new_adapter(unique_ptr<Element>&, std::istringstream&) const;
     void new_adapter(unique_ptr<Load>&, std::istringstream&) const;
@@ -80,29 +75,26 @@ public:
     void new_adapter(unique_ptr<Constraint>&, std::istringstream&) const;
 };
 
-class load {
-public:
-    template<typename T> static void object(unique_ptr<T>&, const shared_ptr<DomainBase>&, const std::string&, std::istringstream&);
-};
+namespace external_module {
+    template<typename T> void object(unique_ptr<T>& new_object, const shared_ptr<DomainBase>& domain, const std::string& id, std::istringstream& command) {
+        // check if the library is already loaded
+        auto loaded = false;
+        for(const auto& I : domain->get_external_module_pool())
+            if(is_equal(I->library_name, id) || I->locate_cpp_module(id) || I->locate_c_module(id)) {
+                loaded = true;
+                break;
+            }
 
-template<typename T> void load::object(unique_ptr<T>& new_object, const shared_ptr<DomainBase>& domain, const std::string& id, std::istringstream& command) {
-    // check if the library is already loaded
-    auto loaded = false;
-    for(const auto& I : domain->get_external_module_pool())
-        if(is_equal(I->library_name, id) || I->locate_cpp_module(id) || I->locate_c_module(id)) {
-            loaded = true;
-            break;
-        }
-
-    // not loaded then try load it
-    // if loaded find corresponding function
-    if(loaded || domain->insert(std::make_shared<ExternalModule>(id)))
-        for(const auto& I : domain->get_external_module_pool()) {
-            if(I->locate_cpp_module(id)) I->new_object(new_object, command);
-            if(new_object != nullptr) break;
-            if(I->locate_c_module(id)) I->new_adapter(new_object, command);
-            if(new_object != nullptr) break;
-        }
-}
+        // not loaded then try load it
+        // if loaded find corresponding function
+        if(loaded || domain->insert(std::make_shared<ExternalModule>(id)))
+            for(const auto& I : domain->get_external_module_pool()) {
+                if(I->locate_cpp_module(id)) I->new_object(new_object, command);
+                if(new_object != nullptr) break;
+                if(I->locate_c_module(id)) I->new_adapter(new_object, command);
+                if(new_object != nullptr) break;
+            }
+    }
+} // namespace external_module
 
 #endif

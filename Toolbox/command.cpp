@@ -1669,7 +1669,8 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         return SUANPAN_EXIT;
     }
 
-    ofstream output_file(get_history_path(), std::ios_base::app | std::ios_base::out);
+    const auto history_path = get_history_path();
+    ofstream output_file(history_path, !exists(history_path) || file_size(history_path) > 16777216 ? std::ios_base::out : (std::ios_base::app | std::ios_base::out));
 
     const auto record_command = output_file.is_open() && input_file_size <= 102400;
 

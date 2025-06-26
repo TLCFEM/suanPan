@@ -24,7 +24,7 @@
 template<sp_d data_t, sp_i index_t> class csc_form;
 template<sp_d data_t, sp_i index_t> class csr_form;
 
-enum class SparseBase : short unsigned {
+enum class SparseBase : std::uint8_t {
     ZERO,
     ONE
 };
@@ -225,7 +225,7 @@ public:
 
     void print() const;
 
-    void save(std::string_view) const;
+    void save(const std::string&) const;
 
     void csr_sort();
     void csc_sort();
@@ -448,8 +448,8 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::print() 
  * @note If the file cannot be opened, the function will return without
  * performing any operation.
  */
-template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::save(const std::string_view file_name) const {
-    std::ofstream file(file_name.data());
+template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::save(const std::string& file_name) const {
+    std::ofstream file(file_name);
     if(!file.is_open()) return;
     file << suanpan::format("{} {} {}\n", n_rows, n_cols, n_elem);
     for(index_t I = 0; I < n_elem; ++I) file << suanpan::format("{} {} {}\n", row_idx[I], col_idx[I], val_idx[I]);

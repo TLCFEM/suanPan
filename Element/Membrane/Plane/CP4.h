@@ -21,6 +21,9 @@
  * for both plane stress and plane strain problems and optional switch for TL
  * nonlinear geometry formulation.
  *
+ * References:
+ *     1. [10.1016/0045-7825(84)90067-7](https://doi.org/10.1016/0045-7825(84)90067-7)
+ *
  * @author tlc
  * @date 10/06/2018
  * @version 0.1.3
@@ -49,24 +52,25 @@ class CP4 final : public MaterialElement2D {
 
     static const vec h_mode;
 
-    const double thickness;
+    const double thickness, penalty;
 
     const bool reduced_scheme;
 
     std::vector<IntegrationPoint> int_pt;
 
-    mat hourglassing;
+    mat hourglass;
 
     static void stack_stiffness(mat&, const mat&, const sp_mat&, double);
 
 public:
     CP4(
-        unsigned,     // tag
-        uvec&&,       // node tag
-        unsigned,     // material tag
-        double = 1.,  // thickness
-        bool = false, // reduced integration
-        bool = false  // nonlinear geometry switch
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // thickness
+        double,   // multiplier for hourglassing control
+        bool,     // reduced integration
+        bool      // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

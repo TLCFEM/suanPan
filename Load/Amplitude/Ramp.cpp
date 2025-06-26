@@ -17,8 +17,7 @@
 
 #include "Ramp.h"
 
-Ramp::Ramp(const unsigned T, const unsigned ST)
-    : Amplitude(T, ST) {}
+unique_ptr<Amplitude> Ramp::get_copy() { return std::make_unique<Ramp>(*this); }
 
 double Ramp::get_amplitude(const double T) {
     const auto step_time = T - start_time;

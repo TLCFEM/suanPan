@@ -1,18 +1,20 @@
 target_sources(${PROJECT_NAME} PRIVATE
-        BatheExplicit.cpp
-        BatheTwoStep.cpp
-        GeneralizedAlpha.cpp
-        GeneralizedAlphaExplicit.cpp
-        GSSSS.cpp
         Integrator.cpp
-        LeeNewmark.cpp
-        LeeNewmarkBase.cpp
-        LeeNewmarkFull.cpp
-        LeeNewmarkIterative.cpp
-        Newmark.cpp
-        NonviscousNewmark.cpp
-        OALTS.cpp
-        RayleighNewmark.cpp
-        Tchamwa.cpp
-        WilsonPenzienNewmark.cpp
+        Explicit/BatheExplicit.cpp
+        Explicit/GeneralizedAlphaExplicit.cpp
+        Explicit/GERKN.cpp
+        Explicit/GSSE.cpp
+        Explicit/Tchamwa.cpp
+        Implicit/BatheTwoStep.cpp
+        Implicit/GeneralizedAlpha.cpp
+        Implicit/GSSSS.cpp
+        Implicit/LeeNewmark/LeeNewmark.cpp
+        Implicit/LeeNewmark/LeeNewmarkBase.cpp
+        Implicit/LeeNewmark/LeeNewmarkFull.cpp
+        Implicit/LeeNewmark/LeeNewmarkIterative.cpp
+        Implicit/Newmark.cpp
+        Implicit/NonviscousNewmark.cpp
+        Implicit/OALTS.cpp
+        Implicit/RayleighNewmark.cpp
+        Implicit/WilsonPenzienNewmark.cpp
 )

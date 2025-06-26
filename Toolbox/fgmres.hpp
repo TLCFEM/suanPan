@@ -36,10 +36,10 @@ template<typename T> requires requires(const T& a, const mat& b) { { a * b } -> 
 
     dfgmres_init(&N, nullptr, nullptr, &info, ipar, dpar, work.data());
 
-    ipar[8] = 1;
-    ipar[9] = 0;
+    ipar[8] = 1;  // residual stopping test
+    ipar[9] = 0;  // no user-defined stopping test
     ipar[10] = 1; // use preconditioner
-    ipar[11] = 1;
+    ipar[11] = 1; // automatic test
     dpar[0] = tolerance;
 
     while(true) {

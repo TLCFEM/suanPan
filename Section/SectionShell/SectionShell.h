@@ -33,7 +33,6 @@
 enum class OutputType;
 
 class DomainBase;
-class Material;
 
 struct SectionShellData {
     const unsigned material_tag; // material tag

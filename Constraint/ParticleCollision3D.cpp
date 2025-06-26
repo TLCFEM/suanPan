@@ -25,8 +25,8 @@ double ParticleCollision3D::compute_f(const double distance) const { return dist
 
 double ParticleCollision3D::compute_df(const double distance) const { return distance >= space ? 0. : -alpha / distance; }
 
-ParticleCollision3D::ParticleCollision3D(const unsigned T, const unsigned S, const double G, const double A)
-    : ParticleCollision(T, S, 3)
+ParticleCollision3D::ParticleCollision3D(const unsigned T, const double G, const double A)
+    : ParticleCollision(T, 3)
     , space(std::max(G, 1E-4))
     , alpha(A) {}
 

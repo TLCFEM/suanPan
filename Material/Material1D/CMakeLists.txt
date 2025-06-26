@@ -58,6 +58,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         vonMises/Subloading1D.cpp
         vonMises/VAFCRP1D.cpp
         Wrapper/Parallel.cpp
+        Wrapper/Prestrain.cpp
         Wrapper/Sequential.cpp
         Wrapper/Uniaxial.cpp
 )

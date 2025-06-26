@@ -22,8 +22,8 @@
 #include <Domain/Node.h>
 #include <Element/Element.h>
 
-Embed::Embed(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT, const unsigned D)
-    : Constraint(T, S, 0, {NT}, {}, D)
+Embed::Embed(const unsigned T, const unsigned ET, const unsigned NT, const unsigned D)
+    : Constraint(T, 0, {NT}, {}, D)
     , element_tag(ET) {}
 
 int Embed::initialize(const shared_ptr<DomainBase>& D) {
@@ -68,8 +68,8 @@ int Embed::process(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-Embed2D::Embed2D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
-    : Embed(T, S, ET, NT, 2) {}
+Embed2D::Embed2D(const unsigned T, const unsigned ET, const unsigned NT)
+    : Embed(T, ET, NT, 2) {}
 
-Embed3D::Embed3D(const unsigned T, const unsigned S, const unsigned ET, const unsigned NT)
-    : Embed(T, S, ET, NT, 3) {}
+Embed3D::Embed3D(const unsigned T, const unsigned ET, const unsigned NT)
+    : Embed(T, ET, NT, 3) {}

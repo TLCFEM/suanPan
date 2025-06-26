@@ -51,8 +51,8 @@ template<sp_d T, la_it MT> class SparseMatBasePARDISO final : public SparseMat<T
 
     auto init_config() {
         pardisoinit(pt, &mtype, iparm);
-
         if constexpr(std::is_same_v<T, float>) iparm[27] = 1;
+        this->factored = false;
     }
 
     auto alloc() {
@@ -90,10 +90,7 @@ public:
         : SparseMat<T>(in_row, in_col, in_elem) { init_config(); }
 
     SparseMatBasePARDISO(const SparseMatBasePARDISO& other)
-        : SparseMat<T>(other) {
-        init_config();
-        this->factored = false;
-    }
+        : SparseMat<T>(other) { init_config(); }
 
     SparseMatBasePARDISO(SparseMatBasePARDISO&&) = delete;
     SparseMatBasePARDISO& operator=(const SparseMatBasePARDISO&) = delete;

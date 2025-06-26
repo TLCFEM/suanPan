@@ -30,12 +30,13 @@
 #define DEGRADATION_H
 
 #include <Material/Material1D/Material1D.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Degradation : public Material1D {
     const unsigned mat_tag;
 
 protected:
-    unique_ptr<Material> base;
+    ResourceHolder<Material> base;
 
     [[nodiscard]] virtual vec compute_positive_degradation(double) const = 0; // positive region
     [[nodiscard]] virtual vec compute_negative_degradation(double) const = 0; // negative region
@@ -45,11 +46,6 @@ public:
         unsigned, // tag
         unsigned  // material tag
     );
-    Degradation(const Degradation&);
-    Degradation(Degradation&&) = delete;
-    Degradation& operator=(const Degradation&) = delete;
-    Degradation& operator=(Degradation&&) = delete;
-    ~Degradation() override = default;
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

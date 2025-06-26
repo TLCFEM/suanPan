@@ -107,7 +107,7 @@ public:
     virtual void set_factory(const shared_ptr<LongFactory>&) = 0;
     [[nodiscard]] virtual const shared_ptr<LongFactory>& get_factory() const = 0;
 
-    virtual bool insert(const shared_ptr<std::future<void>>&) = 0;
+    virtual bool insert(std::future<void>&&) = 0;
 
     virtual void wait() = 0;
 
@@ -309,7 +309,9 @@ public:
     [[nodiscard]] virtual const shared_ptr<Integrator>& get_current_integrator() const = 0;
     [[nodiscard]] virtual const shared_ptr<Solver>& get_current_solver() const = 0;
 
+    virtual unique_ptr<Amplitude> initialized_amplitude_copy(uword) = 0;
     virtual unique_ptr<Material> initialized_material_copy(uword) = 0;
+    virtual unique_ptr<Section> initialized_section_copy(uword) = 0;
 
     /**
      * \brief concurrently safe insertion method

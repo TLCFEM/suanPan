@@ -36,7 +36,9 @@
 
 class Ramp final : public Amplitude {
 public:
-    explicit Ramp(unsigned = 0, unsigned = 0);
+    using Amplitude::Amplitude;
+
+    unique_ptr<Amplitude> get_copy() override;
 
     double get_amplitude(double) override;
 

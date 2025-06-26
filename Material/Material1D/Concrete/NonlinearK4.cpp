@@ -38,7 +38,7 @@ int NonlinearK4::compute_plasticity() {
         }
 
         const auto backbone = backbone_handle(this, k);
-        const auto residual = fabs(trial_stress(0)) - backbone[0];
+        const auto residual = std::fabs(trial_stress(0)) - backbone[0];
 
         if(1u == counter && residual <= 0.) {
             if(apply_damage) {
@@ -54,10 +54,10 @@ int NonlinearK4::compute_plasticity() {
 
         const auto jacobian = elastic_modulus + backbone[1];
         const auto incre = residual / jacobian;
-        const auto error = fabs(incre);
+        const auto error = std::fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) {
             const auto dgamma = elastic_modulus / jacobian;
             trial_stiffness -= dgamma * elastic_modulus;
 
@@ -90,7 +90,7 @@ void NonlinearK4::compute_crack_close_branch() {
     const auto jacobian = elastic_modulus + hardening_k;
 
     // account for entering
-    const auto net_strain = fabs(incre_strain(0)) - std::max(0., current_stress(0)) / elastic_modulus;
+    const auto net_strain = std::fabs(incre_strain(0)) - std::max(0., current_stress(0)) / elastic_modulus;
     const auto dgamma = elastic_modulus / jacobian;
     auto incre = net_strain * dgamma;
 
@@ -114,7 +114,7 @@ double NonlinearK4::objective_scale(const double a, const double zeta) const {
 }
 
 NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const bool FD, const bool FC, const bool OD)
-    : DataNonlinearK4{fabs(E), std::min(1., std::max(fabs(H), 1E-4)) * fabs(E)}
+    : DataNonlinearK4{std::fabs(E), std::min(1., std::max(std::fabs(H), 1E-4)) * std::fabs(E)}
     , Material1D(T, R)
     , apply_damage(FD)
     , apply_crack_closing(FC)
@@ -136,7 +136,7 @@ double NonlinearK4::get_parameter(const ParameterType P) const {
 int NonlinearK4::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
     const auto& plastic_strain = trial_history(0);
@@ -191,7 +191,7 @@ pod2 ConcreteK4::compute_compression_backbone(const double k) const {
 
 pod2 ConcreteK4::compute_tension_damage(const double k) const {
     const auto e_t = f_t / objective_scale(hardening_t, zeta_t);
-    const auto factor = exp(-k / e_t);
+    const auto factor = std::exp(-k / e_t);
     return {1. - factor, factor / e_t};
 }
 
@@ -201,12 +201,12 @@ pod2 ConcreteK4::compute_compression_damage(double k) const {
     k -= k_peak;
 
     const auto e_c = f_c / objective_scale(hardening_d, zeta_c);
-    const auto factor = exp(-k / e_c);
+    const auto factor = std::exp(-k / e_c);
     return {1. - factor, factor / e_c};
 }
 
 ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC, const bool OD)
-    : DataConcreteK4{fabs(E * P(0)), fabs(E * P(1)), perturb(fabs(P(2))), fabs(P(3)), fabs(P(4)), fabs(P(3) * P(5)), fabs(E * P(6)), fabs(E * P(7))}
+    : DataConcreteK4{std::fabs(E * P(0)), std::fabs(E * P(1)), perturb(std::fabs(P(2))), std::fabs(P(3)), std::fabs(P(4)), std::fabs(P(3) * P(5)), std::fabs(E * P(6)), std::fabs(E * P(7))}
     , NonlinearK4(T, E, H, R, FD, FC, OD) {}
 
 unique_ptr<Material> ConcreteK4::get_copy() { return std::make_unique<ConcreteK4>(*this); }

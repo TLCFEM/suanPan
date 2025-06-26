@@ -32,9 +32,7 @@
 
 struct DataNonlinearViscosity {
     const double alpha;
-
-    // cubic replacement
-    const double limit;
+    const double limit; // cubic replacement
 };
 
 class NonlinearViscosity : protected DataNonlinearViscosity, public Material1D {

@@ -17,10 +17,12 @@
 
 #include "Cosine.h"
 
-Cosine::Cosine(const unsigned T, const double L, std::vector<double>&& AA, const unsigned ST)
-    : Amplitude(T, ST)
+Cosine::Cosine(const unsigned T, const double L, std::vector<double>&& AA)
+    : Amplitude(T)
     , period(.5 * L)
     , amp(std::move(AA)) {}
+
+unique_ptr<Amplitude> Cosine::get_copy() { return std::make_unique<Cosine>(*this); }
 
 double Cosine::get_amplitude(const double T) {
     const auto step_time = T - start_time;

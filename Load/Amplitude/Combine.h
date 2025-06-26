@@ -30,15 +30,19 @@
 #define COMBINE_H
 
 #include <Load/Amplitude/Amplitude.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Combine final : public Amplitude {
     const uvec tag_pool;
-    std::vector<std::weak_ptr<Amplitude>> amp_pool;
+
+    std::vector<ResourceHolder<Amplitude>> amp_pool;
 
 public:
-    Combine(unsigned, uvec&&, unsigned);
+    Combine(unsigned, uvec&&);
 
     void initialize(const shared_ptr<DomainBase>&) override;
+
+    unique_ptr<Amplitude> get_copy() override;
 
     double get_amplitude(double) override;
 

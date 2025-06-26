@@ -57,6 +57,11 @@ namespace suanpan {
 
     template<typename T> T sign(const T& I) { return (I > T(0)) - (I < T(0)); }
 
+    template<typename T> constexpr T clamp(T c, T a, T b) {
+        if(a > b) std::swap(a, b);
+        return std::max(a, std::min(b, c));
+    }
+
     template<typename T> bool approx_equal(T x, T y, int ulp = 2) requires(!std::numeric_limits<T>::is_integer) { return fabs(x - y) <= std::numeric_limits<T>::epsilon() * fabs(x + y) * ulp || fabs(x - y) < std::numeric_limits<T>::min(); }
 
     unsigned long long binomial(unsigned long long, unsigned long long);

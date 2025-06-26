@@ -67,11 +67,11 @@ int BWBN::update_trial_status(const vec& t_strain) {
         const auto petapz = eta_rate * pepz;
         const auto papz = -a_rate * pepz;
 
-        const auto za = (1. - exp(-p * e)) * zeta;
+        const auto za = (1. - std::exp(-p * e)) * zeta;
         const auto zb = (phi_i + phi_rate * e) * (lambda + za);
-        const auto zm = pow(mu, -1. / n);
+        const auto zm = std::pow(mu, -1. / n);
 
-        const auto pzapz = zeta * p * exp(-p * e) * pepz;
+        const auto pzapz = zeta * p * std::exp(-p * e) * pepz;
         const auto pzbpz = (phi_i + phi_rate * e) * pzapz + (lambda + za) * phi_rate * pepz;
         const auto pzmpz = -zm * pmupz / mu / n;
 
@@ -85,13 +85,13 @@ int BWBN::update_trial_status(const vec& t_strain) {
             pfpz = (-f_term * pzbpz - 1. - q * pzmpz) / zb;
         }
 
-        const auto e_term = exp(-f_term * f_term);
+        const auto e_term = std::exp(-f_term * f_term);
 
         const auto h = 1. - za * e_term;
 
         const auto phpz = e_term * (2. * za * f_term * pfpz - pzapz);
 
-        const auto p_term = (z * n_strain >= 0. ? 1. : 1. - 2. * beta) * pow(std::max(datum::eps, fabs(z)), n);
+        const auto p_term = (z * n_strain >= 0. ? 1. : 1. - 2. * beta) * std::pow(std::max(datum::eps, std::fabs(z)), n);
         const auto t_term = mu * n_strain * p_term;
 
         const auto ptpz = n_strain * (mu * n * p_term / z + p_term * pmupz);
@@ -99,11 +99,11 @@ int BWBN::update_trial_status(const vec& t_strain) {
         const auto residual = (z - current_z) * eta + (t_term - a * n_strain) * h;
         const auto jacobian = eta + (z - current_z) * petapz + (ptpz - papz * n_strain) * h + (t_term - a * n_strain) * phpz;
 
-        const auto error = fabs(incre = -residual / jacobian);
+        const auto error = std::fabs(incre = -residual / jacobian);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) {
             trial_stress = modulus_a * trial_strain + modulus_b * z;
 
             const auto pepn = .5 * modulus_c * (z + current_z);
@@ -112,7 +112,7 @@ int BWBN::update_trial_status(const vec& t_strain) {
             const auto petapn = eta_rate * pepn;
             const auto papn = -a_rate * pepn;
 
-            const auto pzapn = zeta * p * exp(-p * e) * pepn;
+            const auto pzapn = zeta * p * std::exp(-p * e) * pepn;
             const auto pzbpn = (phi_i + phi_rate * e) * pzapn + (lambda + za) * phi_rate * pepn;
             const auto pzmpn = -zm * pmupn / mu / n;
 

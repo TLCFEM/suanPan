@@ -33,10 +33,13 @@
 
 class Cosine final : public Amplitude {
     const double period;
+
     const std::vector<double> amp;
 
 public:
-    Cosine(unsigned, double, std::vector<double>&&, unsigned);
+    Cosine(unsigned, double, std::vector<double>&&);
+
+    unique_ptr<Amplitude> get_copy() override;
 
     double get_amplitude(double) override;
 

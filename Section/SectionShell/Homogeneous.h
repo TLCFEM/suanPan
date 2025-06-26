@@ -28,7 +28,9 @@
 #ifndef HOMOGENEOUS_H
 #define HOMOGENEOUS_H
 
+#include <Material/Material.h>
 #include <Section/SectionShell/SectionShell.h>
+#include <Toolbox/ResourceHolder.h>
 
 class Homogeneous final : public SectionShell {
     const unsigned num_ip;
@@ -36,13 +38,8 @@ class Homogeneous final : public SectionShell {
 
     struct IntegrationPoint final {
         const double eccentricity, factor;
-        unique_ptr<Material> s_material;
+        ResourceHolder<Material> s_material;
         IntegrationPoint(double, double, unique_ptr<Material>&&);
-        IntegrationPoint(const IntegrationPoint&);
-        IntegrationPoint(IntegrationPoint&&) noexcept = default;
-        IntegrationPoint& operator=(const IntegrationPoint&) = delete;
-        IntegrationPoint& operator=(IntegrationPoint&&) = delete;
-        ~IntegrationPoint() = default;
     };
 
     std::vector<IntegrationPoint> int_pt;

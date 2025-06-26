@@ -37,19 +37,10 @@ class GroupBodyForce final : protected GroupLoad, public BodyForce {
 public:
     GroupBodyForce(
         unsigned, // tag
-        unsigned, // start step tag
         double,   // magnitude
         uvec&&,   // element tags
-        unsigned, // dof tag
+        uvec&&,   // dof tags
         unsigned  // amplitude tag
-    );
-    GroupBodyForce(
-        unsigned,    // tag
-        unsigned,    // start step tag
-        double,      // magnitude
-        uvec&&,      // element tags
-        uvec&&,      // dof tags
-        unsigned = 0 // amplitude tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

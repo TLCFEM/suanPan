@@ -23,11 +23,8 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
-SupportMotion::SupportMotion(const unsigned T, const unsigned ST, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : Load(T, ST, AT, std::move(N), uvec{D}, L) { enable_displacement_control(); }
-
-SupportMotion::SupportMotion(const unsigned T, const unsigned ST, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, ST, AT, std::move(N), std::move(D), L) { enable_displacement_control(); }
+SupportMotion::SupportMotion(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
+    : Load(T, AT, std::move(N), std::move(D), L) { enable_displacement_control(); }
 
 int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
     set_end_step(start_step + 1);
@@ -42,7 +39,7 @@ int SupportDisplacement::process(const shared_ptr<DomainBase>& D) {
 
     trial_settlement.zeros(W->get_size());
 
-    trial_settlement(encoding).fill(pattern * magnitude->get_amplitude(W->get_trial_time()));
+    trial_settlement(encoding).fill(pattern * amplitude->get_amplitude(W->get_trial_time()));
 
     return SUANPAN_SUCCESS;
 }
@@ -53,7 +50,7 @@ int SupportVelocity::process(const shared_ptr<DomainBase>& D) {
 
     trial_settlement.zeros(W->get_size());
 
-    trial_settlement(encoding) = G->from_total_velocity(pattern * magnitude->get_amplitude(W->get_trial_time()), encoding);
+    trial_settlement(encoding) = G->from_total_velocity(pattern * amplitude->get_amplitude(W->get_trial_time()), encoding);
 
     return SUANPAN_SUCCESS;
 }
@@ -64,7 +61,7 @@ int SupportAcceleration::process(const shared_ptr<DomainBase>& D) {
 
     trial_settlement.zeros(W->get_size());
 
-    trial_settlement(encoding) = G->from_total_acceleration(pattern * magnitude->get_amplitude(W->get_trial_time()), encoding);
+    trial_settlement(encoding) = G->from_total_acceleration(pattern * amplitude->get_amplitude(W->get_trial_time()), encoding);
 
     return SUANPAN_SUCCESS;
 }

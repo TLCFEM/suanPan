@@ -133,7 +133,11 @@ int vtk_parser(const shared_ptr<DomainBase>& domain, std::istringstream& command
 
     const auto func = OutputType::U == L || OutputType::V == L || OutputType::A == L || OutputType::RF == L || OutputType::DF == L || OutputType::IF == L ? vtk_plot_node_quantity : vtk_plot_element_quantity;
 
-    domain->insert(std::make_unique<std::future<void>>(std::async(std::launch::async, func, std::cref(domain), plot_info)));
+#ifdef SUANPAN_WIN
+    domain->insert(std::async(std::launch::async, func, std::cref(domain), plot_info));
+#else
+    func(domain, plot_info);
+#endif
 
     return SUANPAN_SUCCESS;
 }
@@ -185,7 +189,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
         grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
-        domain->insert(std::make_unique<std::future<void>>(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config))));
+        domain->insert(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config)));
     }
     else {
         const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
@@ -259,7 +263,7 @@ void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo con
     else if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
         grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
-        domain->insert(std::make_unique<std::future<void>>(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config))));
+        domain->insert(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config)));
     }
     else {
         const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();

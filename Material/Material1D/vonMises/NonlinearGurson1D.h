@@ -45,7 +45,7 @@ class NonlinearGurson1D : protected DataNonlinearGurson1D, public Material1D {
     const double three_bulk = 3. * bulk;
     const double nine_bulk = 9. * bulk;
 
-    const double para_b = fn / sn / sqrt(2. * datum::pi);
+    const double para_b = fn / sn / sqrt(datum::tau);
 
     [[nodiscard]] virtual vec compute_hardening(double) const = 0;
 

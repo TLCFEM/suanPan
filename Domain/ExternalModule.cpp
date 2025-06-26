@@ -21,22 +21,11 @@
 #include <Material/ExternalMaterial.h>
 #include <algorithm>
 
-#if defined(SUANPAN_WIN)
+#ifdef SUANPAN_WIN
 #include <Windows.h>
-#elif defined(SUANPAN_UNIX)
+#else
 #include <dlfcn.h>
 #endif
-
-using element_creator = void (*)(unique_ptr<Element>&, std::istringstream&);
-using load_creator = void (*)(unique_ptr<Load>&, std::istringstream&);
-using material_creator = void (*)(unique_ptr<Material>&, std::istringstream&);
-using section_creator = void (*)(unique_ptr<Section>&, std::istringstream&);
-using solver_creator = void (*)(unique_ptr<Solver>&, std::istringstream&);
-using amplitude_creator = void (*)(unique_ptr<Amplitude>&, std::istringstream&);
-using modifier_creator = void (*)(unique_ptr<Modifier>&, std::istringstream&);
-using constraint_creator = void (*)(unique_ptr<Constraint>&, std::istringstream&);
-
-using external_handler = void (*)(ExternalMaterialData*, int*);
 
 bool ExternalModule::locate_module(std::string module_name) {
     if(ext_library == nullptr) return false;
@@ -45,7 +34,7 @@ bool ExternalModule::locate_module(std::string module_name) {
 
 #ifdef SUANPAN_WIN
     ext_creator = reinterpret_cast<void*>(GetProcAddress(HINSTANCE(ext_library), LPCSTR(module_name.c_str())));
-#elif defined(SUANPAN_UNIX)
+#else
     ext_creator = dlsym(ext_library, module_name.c_str());
 #endif
 
@@ -81,11 +70,16 @@ ExternalModule::ExternalModule(std::string L)
     }
     if(ext_library == nullptr)
         suanpan_error("Cannot load the library with the name \"{}\".\n", file_name);
-#elif defined(SUANPAN_UNIX)
-    auto file_name = "./lib" + library_name + ".so";
+#else
+#ifdef SUANPAN_UNIX
+    static constexpr auto suffix = ".so";
+#else
+    static constexpr auto suffix = ".dylib";
+#endif
+    auto file_name = "lib" + library_name + suffix;
     ext_library = dlopen(file_name.c_str(), RTLD_NOW);
     if(ext_library == nullptr) {
-        file_name = "./" + library_name + ".so";
+        file_name = library_name + suffix;
         ext_library = dlopen(file_name.c_str(), RTLD_NOW);
     }
     if(ext_library == nullptr) suanpan_error("Cannot load the library with the name \"{}\".\n", file_name);
@@ -95,7 +89,7 @@ ExternalModule::ExternalModule(std::string L)
 ExternalModule::~ExternalModule() {
 #ifdef SUANPAN_WIN
     if(ext_library != nullptr) FreeLibrary(HINSTANCE(ext_library));
-#elif defined(SUANPAN_UNIX)
+#else
     if(ext_library != nullptr) dlclose(ext_library);
 #endif
 }
@@ -103,22 +97,6 @@ ExternalModule::~ExternalModule() {
 bool ExternalModule::locate_c_module(const std::string& module_name) { return locate_module(module_name + "_handler"); }
 
 bool ExternalModule::locate_cpp_module(const std::string& module_name) { return locate_module("new_" + module_name); }
-
-void ExternalModule::new_object(unique_ptr<Element>& return_obj, std::istringstream& command) const { (element_creator(ext_creator))(return_obj, command); }
-
-void ExternalModule::new_object(unique_ptr<Load>& return_obj, std::istringstream& command) const { (load_creator(ext_creator))(return_obj, command); }
-
-void ExternalModule::new_object(unique_ptr<Material>& return_obj, std::istringstream& command) const { (material_creator(ext_creator))(return_obj, command); }
-
-void ExternalModule::new_object(unique_ptr<Section>& return_obj, std::istringstream& command) const { (section_creator(ext_creator))(return_obj, command); }
-
-void ExternalModule::new_object(unique_ptr<Solver>& return_obj, std::istringstream& command) const { (solver_creator(ext_creator))(return_obj, command); }
-
-void ExternalModule::new_object(unique_ptr<Amplitude>& return_obj, std::istringstream& command) const { (amplitude_creator(ext_creator))(return_obj, command); }
-
-void ExternalModule::new_object(unique_ptr<Modifier>& return_obj, std::istringstream& command) const { (modifier_creator(ext_creator))(return_obj, command); }
-
-void ExternalModule::new_object(unique_ptr<Constraint>& return_obj, std::istringstream& command) const { (constraint_creator(ext_creator))(return_obj, command); }
 
 void ExternalModule::new_adapter(unique_ptr<Element>&, std::istringstream&) const {}
 
@@ -132,13 +110,7 @@ void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, std::istrings
         return;
     }
 
-    std::vector<double> pool;
-
-    double para;
-
-    while(!command.eof() && get_input(command, para)) pool.emplace_back(para);
-
-    if(auto ext_obj = std::make_unique<ExternalMaterial>(tag, std::move(pool), ext_creator); ext_obj->validate()) return_obj = std::move(ext_obj);
+    if(auto ext_obj = std::make_unique<ExternalMaterial>(tag, get_remaining<double>(command), ext_creator); ext_obj->validate()) return_obj = std::move(ext_obj);
 }
 
 void ExternalModule::new_adapter(unique_ptr<Section>&, std::istringstream&) const {}

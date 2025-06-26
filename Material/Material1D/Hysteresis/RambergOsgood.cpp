@@ -21,7 +21,7 @@
 
 RambergOsgood::RambergOsgood(const unsigned T, const double E, const double Y, const double O, const double N, const double R)
     : DataRambergOsgood{fabs(E), fabs(Y), fabs(O), fabs(N)}
-    , Material1D(T, R) {}
+    , Material1D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int RambergOsgood::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
@@ -55,13 +55,13 @@ int RambergOsgood::update_trial_status(const vec& t_strain) {
         load_sign = trial_load_sign;
     }
 
-    const auto elastic_predictor = elastic_modulus * fabs(trial_strain(0) - reverse_strain);
+    const auto elastic_predictor = elastic_modulus * std::fabs(trial_strain(0) - reverse_strain);
 
-    const auto norm_yield_stress = std::max(datum::eps, 0. == p_reverse_stress || fabs(p_reverse_stress) < fabs(reverse_stress) ? std::max(fabs(reverse_stress - p_reverse_stress), yield_stress + fabs(reverse_stress)) : fabs(reverse_stress - p_reverse_stress));
+    const auto norm_yield_stress = std::max(datum::eps, 0. == p_reverse_stress || std::fabs(p_reverse_stress) < std::fabs(reverse_stress) ? std::max(std::fabs(reverse_stress - p_reverse_stress), yield_stress + std::fabs(reverse_stress)) : std::fabs(reverse_stress - p_reverse_stress));
 
-    const auto pow_a = pow(norm_yield_stress, nm);
+    const auto pow_a = std::pow(norm_yield_stress, nm);
 
-    auto norm_stress = fabs(current_stress(0) - reverse_stress);
+    auto norm_stress = std::fabs(current_stress(0) - reverse_stress);
 
     auto counter = 0u;
     auto ref_error = 1.;
@@ -71,16 +71,16 @@ int RambergOsgood::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto pow_b = offset * pow(norm_stress, nm);
+        const auto pow_b = offset * std::pow(norm_stress, nm);
         const auto residual = norm_stress * (pow_a + pow_b) - elastic_predictor * pow_a;
         const auto jacobian = pow_a + n * pow_b;
         const auto incre = residual / jacobian;
 
-        const auto error = fabs(incre);
+        const auto error = std::fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) {
             trial_stress = load_sign * norm_stress + reverse_stress;
             trial_stiffness = elastic_modulus * pow_a / jacobian;
             return SUANPAN_SUCCESS;

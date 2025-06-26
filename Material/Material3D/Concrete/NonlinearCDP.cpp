@@ -18,9 +18,10 @@
 #include "NonlinearCDP.h"
 
 #include <Recorder/OutputType.h>
+#include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 
-const double NonlinearCDP::root_three_two = sqrt(1.5);
+const double NonlinearCDP::root_three_two = std::sqrt(1.5);
 const mat NonlinearCDP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 double NonlinearCDP::compute_r(const vec3& in) {
@@ -41,7 +42,7 @@ vec3 NonlinearCDP::compute_dr(const vec3& in) {
 double NonlinearCDP::compute_s(const double r) const { return s0 + r - s0 * r; }
 
 NonlinearCDP::NonlinearCDP(const unsigned T, const double E, const double V, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
-    : DataNonlinearCDP{fabs(E), V < .5 ? V : .2, fabs(GT), fabs(GC), (fabs(BC) - 1.) / (2. * fabs(BC) - 1.), fabs(AP), fabs(S)}
+    : DataNonlinearCDP{std::fabs(E), V < .5 ? V : .2, std::fabs(GT), std::fabs(GC), (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), std::fabs(AP), std::fabs(S)}
     , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int NonlinearCDP::initialize(const shared_ptr<DomainBase>&) {
@@ -69,6 +70,17 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     const auto& current_kappa_t = current_history(2);
     const auto& current_kappa_c = current_history(3);
 
+    const auto bound_kappa_t = [&] {
+        if(kappa_t > 1.) kappa_t = 1. - std::numeric_limits<float>::epsilon(); // avoid overshoot
+        else if(kappa_t < current_kappa_t) kappa_t = current_kappa_t;
+        return kappa_t;
+    };
+    const auto bound_kappa_c = [&] {
+        if(kappa_c > 1.) kappa_c = 1. - std::numeric_limits<float>::epsilon(); // avoid overshoot
+        else if(kappa_c < current_kappa_c) kappa_c = current_kappa_c;
+        return kappa_c;
+    };
+
     trial_stress = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain); // 6
 
     vec3 principal_stress;     // 3
@@ -90,8 +102,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     const auto dgdsigma_t = (pn(2) + alpha_p) / g_t;
     const auto dgdsigma_c = (pn(0) + alpha_p) / g_c;
 
-    auto new_stress = principal_stress;     // converged principal stress
-    const auto& max_stress = new_stress(2); // algebraically maximum principal stress
+    auto new_stress = principal_stress; // converged principal stress
 
     const auto const_yield = alpha * accu(principal_stress) + root_three_two * norm_s;
 
@@ -105,22 +116,50 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     vec3 dr;
 
     auto counter = 0u;
+    auto try_bisection = false;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
+            if(try_bisection) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
+            }
+
+            try_bisection = true;
+            counter = 2u; // skip elastic check
+
+            auto approx_kappa_t = [&](const double in_kappa) {
+                t_para = compute_tension_backbone(kappa_t = in_kappa);
+                return r * t_para[1] * dgdsigma_t * lambda + current_kappa_t - kappa_t;
+            };
+            auto approx_kappa_c = [&](const double in_kappa) {
+                c_para = compute_compression_backbone(kappa_c = in_kappa);
+                return (1. - r) * c_para[1] * dgdsigma_c * lambda + current_kappa_c - kappa_c;
+            };
+
+            const auto approx_update = [&](const double in_lambda) {
+                r = compute_r(new_stress = principal_stress + (lambda = in_lambda) * dsigmadlambda);
+
+                ridders(approx_kappa_t, current_kappa_t, 1. - datum::eps, tolerance);
+                ridders(approx_kappa_c, current_kappa_c, 1. - datum::eps, tolerance);
+
+                auto f = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2];
+
+                if(new_stress(2) > 0.) f -= (one_minus_alpha * c_para[2] / t_para[2] + alpha + 1.) * new_stress(2);
+
+                return f;
+            };
+
+            ridders_guess(approx_update, 0., .25 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p), tolerance);
         }
 
         t_para = compute_tension_backbone(kappa_t);
         c_para = compute_compression_backbone(kappa_c);
 
-        const auto tension_flag = max_stress > 0.;
-
         beta = -one_minus_alpha * c_para[2] / t_para[2] - alpha - 1.;
 
         residual(0) = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2];
 
-        if(tension_flag) residual(0) += beta * max_stress;
+        if(new_stress(2) > 0.) residual(0) += beta * new_stress(2);
 
         r = compute_r(new_stress);
 
@@ -139,9 +178,9 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
         residual(1) = r * t_term * lambda + current_kappa_t - kappa_t;
         residual(2) = (c_term - r * c_term) * lambda + current_kappa_c - kappa_c;
 
-        if(tension_flag) {
+        if(new_stress(2) > 0.) {
             jacobian(0, 0) = pfplambda + beta * dsigmadlambda(2);
-            const auto tmp_term = one_minus_alpha * max_stress / t_para[2];
+            const auto tmp_term = one_minus_alpha * new_stress(2) / t_para[2];
             jacobian(0, 1) = tmp_term * c_para[2] / t_para[2] * t_para[5];
             jacobian(0, 2) = (one_minus_alpha - tmp_term) * c_para[5];
         }
@@ -157,7 +196,13 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
         jacobian(1, 1) = r * lambda * dgdsigma_t * t_para[4] - 1.;
         jacobian(2, 2) = (lambda - r * lambda) * dgdsigma_c * c_para[4] - 1.;
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        if(rcond(jacobian) < datum::eps) {
+            // short-circuit and direct go to the bisection logic
+            counter = max_iteration - 1u;
+            continue;
+        }
+
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
@@ -169,8 +214,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
         kappa_c -= incre(2);
         new_stress -= dsigmadlambda * incre(0);
 
-        if(kappa_t > 1.) kappa_t = 1. - datum::eps; // avoid overshoot
-        if(kappa_c > 1.) kappa_c = 1. - datum::eps; // avoid overshoot
+        bound_kappa_t();
+        bound_kappa_c();
     }
 
     // update damage indices
@@ -201,7 +246,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     left.row(1) = t_para[1] * lambda * (r / g_t * trans.row(2) * dnde + dgdsigma_t * prpe);
     left.row(2) = c_para[1] * lambda * ((1. - r) / g_c * trans.row(0) * dnde - dgdsigma_c * prpe);
 
-    if(max_stress > 0.) left.row(0) += beta * trans.row(2) * trial_stiffness;
+    if(new_stress(2) > 0.) left.row(0) += beta * trans.row(2) * trial_stiffness;
 
     const mat right = -solve(jacobian, left);
     const auto& dlambdade = right.row(0);

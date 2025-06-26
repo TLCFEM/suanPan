@@ -22,8 +22,8 @@
 #include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 
-MPC::MPC(const unsigned T, const unsigned S, const unsigned A, uvec&& N, uvec&& D, vec&& W, const double L)
-    : Constraint(T, S, A, std::move(N), {}, 1)
+MPC::MPC(const unsigned T, const unsigned A, uvec&& N, uvec&& D, vec&& W, const double L)
+    : Constraint(T, A, std::move(N), {}, 1)
     , dof_pool(D - 1)
     , weight_pool(std::move(W))
     , pseudo_load(L) {}
@@ -49,7 +49,7 @@ int MPC::initialize(const shared_ptr<DomainBase>& D) {
 int MPC::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    auxiliary_load = pseudo_load * magnitude->get_amplitude(W->get_trial_time());
+    auxiliary_load = pseudo_load * amplitude->get_amplitude(W->get_trial_time());
 
     auxiliary_resistance = auxiliary_stiffness.t() * W->get_trial_displacement();
 

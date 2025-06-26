@@ -48,7 +48,7 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
     auto& p = trial_history(size);
     vec beta(&trial_history(0), size, false, true);
 
-    if(fabs(trial_stress(0) - accu(beta)) < std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)))) return SUANPAN_SUCCESS;
+    if(std::fabs(trial_stress(0) - accu(beta)) < std::max(0., yield + hardening * p + saturated * (1. - std::exp(-m * p)))) return SUANPAN_SUCCESS;
 
     const auto norm_mu = mu / (incre_time && *incre_time > 0. ? *incre_time : 1.);
 
@@ -61,7 +61,7 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto exp_term = saturated * exp(-m * p);
+        const auto exp_term = saturated * std::exp(-m * p);
 
         auto k = yield + saturated + hardening * p - exp_term;
         auto dk = hardening + m * exp_term;
@@ -70,10 +70,10 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
         const vec bottom = 1. + b * gamma;
 
         const auto xi = trial_stress(0) - accu(beta / bottom);
-        const auto q = fabs(xi) - (elastic_modulus + accu(a / bottom)) * gamma;
+        const auto q = std::fabs(xi) - (elastic_modulus + accu(a / bottom)) * gamma;
 
         const auto fraction_term = norm_mu * gamma + 1.;
-        const auto power_term = pow(fraction_term, epsilon - 1.);
+        const auto power_term = std::pow(fraction_term, epsilon - 1.);
 
         auto jacobian = -elastic_modulus - power_term * (norm_mu * epsilon * k + fraction_term * dk);
 
@@ -82,10 +82,10 @@ int VAFCRP1D::update_trial_status(const vec& t_strain) {
 
         const auto residual = q - fraction_term * power_term * k;
         const auto incre = residual / jacobian;
-        const auto error = fabs(incre);
+        const auto error = std::fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || fabs(residual) < tolerance * yield) && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance * yield) && counter > 5u)) {
             if(xi > 0.) {
                 beta += a * gamma;
 

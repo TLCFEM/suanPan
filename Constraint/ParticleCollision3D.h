@@ -48,7 +48,7 @@ class ParticleCollision3D final : public ParticleCollision {
     int process_meta(const shared_ptr<DomainBase>&, bool) override;
 
 public:
-    ParticleCollision3D(unsigned, unsigned, double = 1., double = 1.);
+    ParticleCollision3D(unsigned, double, double);
 };
 
 #endif

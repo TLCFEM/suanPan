@@ -22,18 +22,15 @@
 #include <Element/Element.h>
 #include <Load/Amplitude/Amplitude.h>
 
-BodyForce::BodyForce(const unsigned T, const unsigned S, const double L, uvec&& N, const unsigned D, const unsigned AT)
-    : Load(T, S, AT, std::move(N), uvec{D}, L) {}
-
-BodyForce::BodyForce(const unsigned T, const unsigned S, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, S, AT, std::move(N), std::move(D), L) {}
+BodyForce::BodyForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
+    : Load(T, AT, std::move(N), std::move(D), L) {}
 
 int BodyForce::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
     trial_load.zeros(W->get_size());
 
-    const auto final_load = pattern * magnitude->get_amplitude(W->get_trial_time());
+    const auto final_load = pattern * amplitude->get_amplitude(W->get_trial_time());
 
     for(const auto I : node_encoding)
         if(auto& t_element = D->get<Element>(I); nullptr != t_element && t_element->is_active()) {

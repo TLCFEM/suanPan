@@ -49,6 +49,8 @@ peek element 2 3
 #   9.9252e+01  0.0000e+00
 peek node 2
 
+peek amplitude 2
+
 reset
 clear
 exit

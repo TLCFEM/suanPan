@@ -33,7 +33,7 @@
 #include <array>
 
 using ExternalModuleQueue = std::vector<shared_ptr<ExternalModule>>;
-using ThreadQueue = std::vector<shared_ptr<std::future<void>>>;
+using ThreadQueue = std::vector<std::future<void>>;
 
 class Domain final : public DomainBase, public std::enable_shared_from_this<Domain> {
     std::atomic_bool updated = false;
@@ -92,7 +92,7 @@ public:
     void set_factory(const shared_ptr<LongFactory>&) override;
     const shared_ptr<LongFactory>& get_factory() const override;
 
-    bool insert(const shared_ptr<std::future<void>>&) override;
+    bool insert(std::future<void>&&) override;
 
     void wait() override;
 
@@ -304,7 +304,9 @@ public:
     const shared_ptr<Integrator>& get_current_integrator() const override;
     const shared_ptr<Solver>& get_current_solver() const override;
 
+    unique_ptr<Amplitude> initialized_amplitude_copy(uword) override;
     unique_ptr<Material> initialized_material_copy(uword) override;
+    unique_ptr<Section> initialized_section_copy(uword) override;
 
     void insert_loaded_dof(const uvec&) override;
     void insert_restrained_dof(const uvec&) override;

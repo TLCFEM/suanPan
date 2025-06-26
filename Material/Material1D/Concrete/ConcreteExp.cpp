@@ -53,14 +53,14 @@ pod2 ConcreteExp::compute_compression_backbone(const double n_strain) const {
             return response;
         }
 
-        exp_term = exp(b_c * (n_strain - stress / elastic_modulus));
+        exp_term = std::exp(b_c * (n_strain - stress / elastic_modulus));
         const auto residual = (1. + a_c - a_c * exp_term) * exp_term - stress / f_c;
         jacobian = b_c / elastic_modulus * (2. * a_c * exp_term - 1. - a_c) * exp_term - 1. / f_c;
         const auto incre = residual / jacobian;
-        const auto error = fabs(incre);
+        const auto error = std::fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local compression iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) break;
 
         stress -= incre;
     }
@@ -89,14 +89,14 @@ pod2 ConcreteExp::compute_tension_backbone(const double n_strain) const {
             return response;
         }
 
-        exp_term = exp(-b_t * (n_strain - stress / elastic_modulus));
+        exp_term = std::exp(-b_t * (n_strain - stress / elastic_modulus));
         const auto residual = (1. + a_t - a_t * exp_term) * exp_term - stress / f_t;
         jacobian = b_t / elastic_modulus * (1. + a_t - 2. * a_t * exp_term) * exp_term - 1. / f_t;
         const auto incre = residual / jacobian;
-        const auto error = fabs(incre);
+        const auto error = std::fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local tension iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (fabs(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual) < tolerance) && counter > 5u)) break;
 
         stress -= incre;
     }
@@ -112,7 +112,7 @@ double ConcreteExp::compute_compression_residual(const double reverse_c_strain, 
 double ConcreteExp::compute_tension_residual(const double reverse_t_strain, const double reverse_t_stress) const { return std::max(0., reverse_t_strain - reverse_t_stress * (reverse_t_strain / f_t + .67 / elastic_modulus) / (reverse_t_stress / f_t + .67)); }
 
 ConcreteExp::ConcreteExp(const unsigned T, const double E, const double FT, const double AT, const double GT, const double FC, const double AC, const double GC, const double M, const double R)
-    : DataConcreteExp{E, fabs(FT), -fabs(FC) * 4. * AC * pow(1. + AC, -2.), AT, AC, fabs(FT) / GT * (1. + .5 * AT), fabs(FC) * 4. * AC * pow(1. + AC, -2.) / GC * (1. + .5 * AC)}
+    : DataConcreteExp{E, std::fabs(FT), -std::fabs(FC) * 4. * AC * std::pow(1. + AC, -2.), AT, AC, std::fabs(FT) / GT * (1. + .5 * AT), std::fabs(FC) * 4. * AC * std::pow(1. + AC, -2.) / GC * (1. + .5 * AC)}
     , SimpleHysteresis(T, M, R) {}
 
 int ConcreteExp::initialize(const shared_ptr<DomainBase>&) {

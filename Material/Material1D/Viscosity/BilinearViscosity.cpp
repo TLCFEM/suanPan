@@ -20,13 +20,13 @@
 double BilinearViscosity::compute_du(double, double) const { return 0.; }
 
 double BilinearViscosity::compute_dv(double, const double strain_rate) const {
-    if(const auto abs_v = fabs(strain_rate); abs_v > yield_strain) return hardening;
+    if(const auto abs_v = std::fabs(strain_rate); abs_v > yield_strain) return hardening;
 
     return damping;
 }
 
 double BilinearViscosity::compute_damping_coefficient(double, const double strain_rate) const {
-    const auto abs_v = fabs(strain_rate);
+    const auto abs_v = std::fabs(strain_rate);
 
     if(abs_v <= yield_strain) return damping * strain_rate;
 
@@ -36,7 +36,7 @@ double BilinearViscosity::compute_damping_coefficient(double, const double strai
 }
 
 BilinearViscosity::BilinearViscosity(const unsigned T, const double C, const double S, const double H)
-    : DataBilinearViscosity{fabs(C), fabs(S), fabs(C) * H}
+    : DataBilinearViscosity{std::fabs(C), std::fabs(S), std::fabs(C) * H}
     , NonlinearViscosity(T, 0., 1.) {}
 
 unique_ptr<Material> BilinearViscosity::get_copy() { return std::make_unique<BilinearViscosity>(*this); }

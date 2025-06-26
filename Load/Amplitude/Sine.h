@@ -33,10 +33,13 @@
 
 class Sine final : public Amplitude {
     const double period;
+
     const std::vector<double> amp;
 
 public:
-    Sine(unsigned, double, std::vector<double>&&, unsigned);
+    Sine(unsigned, double, std::vector<double>&&);
+
+    unique_ptr<Amplitude> get_copy() override;
 
     double get_amplitude(double) override;
 

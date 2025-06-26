@@ -24,7 +24,7 @@ const span SimpleSand::sd(8, 13);
 const mat SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 SimpleSand::SimpleSand(const unsigned T, const double E, const double V, const double M, const double A, const double H, const double AC, const double NB, const double ND, const double VC, const double PC, const double LC, const double V0, const double R)
-    : DataSimpleSand{E, V, fabs(M), A, H, AC, fabs(NB), fabs(ND), fabs(VC), -fabs(PC), fabs(LC), fabs(V0)}
+    : DataSimpleSand{E, V, std::fabs(M), A, H, AC, std::fabs(NB), std::fabs(ND), std::fabs(VC), -std::fabs(PC), std::fabs(LC), std::fabs(V0)}
     , Material3D(T, R) {}
 
 int SimpleSand::initialize(const shared_ptr<DomainBase>&) {
@@ -79,9 +79,9 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
         if(1u == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
 
-        const auto state = state_const + lc * log(p / pc);
-        alpha_d = ac * exp(nd * state);
-        alpha_b = ac * exp(-nb * state);
+        const auto state = state_const + lc * std::log(p / pc);
+        alpha_d = ac * std::exp(nd * state);
+        alpha_b = ac * std::exp(-nb * state);
         const auto alpha_d_m = alpha_d - m;
         const auto alpha_b_m = alpha_b - m;
         const vec unit_n = n % tensor::stress::norm_weight;
@@ -117,7 +117,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre(sa);
         p -= incre(sb);

@@ -54,7 +54,6 @@ protected:
 public:
     Constraint(
         unsigned, // tag
-        unsigned, // step tag
         unsigned, // amplitude tag
         uvec&&,   // node tags
         uvec&&,   // dof tags

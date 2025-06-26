@@ -40,7 +40,6 @@ protected:
 public:
     LineUDL(
         unsigned, // tag
-        unsigned, // start step tag
         double,   // magnitude
         uvec&&,   // node tags
         unsigned, // dof tag
@@ -55,7 +54,6 @@ class LineUDL2D final : public LineUDL {
 public:
     LineUDL2D(
         unsigned, // tag
-        unsigned, // start step tag
         double,   // magnitude
         uvec&&,   // node tags
         unsigned, // dof tag
@@ -69,7 +67,6 @@ class LineUDL3D final : public LineUDL {
 public:
     LineUDL3D(
         unsigned, // tag
-        unsigned, // start step tag
         double,   // magnitude
         uvec&&,   // node tags
         unsigned, // dof tag

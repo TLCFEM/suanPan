@@ -31,8 +31,8 @@ std::vector<vec> NodeFacet::get_position(const shared_ptr<DomainBase>& D) {
     return position;
 }
 
-NodeFacet::NodeFacet(const unsigned T, const unsigned S, const unsigned A, uvec&& N)
-    : Constraint(T, S, A, std::move(N), uvec{1, 2, 3}, 1) { set_connected(true); }
+NodeFacet::NodeFacet(const unsigned T, const unsigned A, uvec&& N)
+    : Constraint(T, A, std::move(N), uvec{1, 2, 3}, 1) { set_connected(true); }
 
 int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {
     dof_encoding = get_nodal_active_dof(D);

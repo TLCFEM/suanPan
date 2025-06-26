@@ -20,15 +20,15 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double F, const unsigned NS)
-    : Constraint(T, S, A, {}, {}, 0)
+RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F, const unsigned NS)
+    : Constraint(T, A, {}, {}, 0)
     , n_dim(NS)
     , alpha(F)
     , origin(std::move(O))
     , outer_norm(normalise(N)) {}
 
-RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F, const unsigned NS)
-    : Constraint(T, S, A, {}, {}, 0)
+RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F, const unsigned NS)
+    : Constraint(T, A, {}, {}, 0)
     , n_dim(NS)
     , alpha(F)             // penalty factor
     , edge_a(E1)           // 3D vector
@@ -79,22 +79,22 @@ void RigidWallPenalty::clear_status() { resistance.reset(); }
 
 void RigidWallPenalty::reset_status() { resistance.reset(); }
 
-RigidWallPenalty1D::RigidWallPenalty1D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, S, A, resize(O, 1, 1), resize(N, 1, 1), F, 1) { set_handler<DOF::U1>(); }
+RigidWallPenalty1D::RigidWallPenalty1D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
+    : RigidWallPenalty(T, A, resize(O, 1, 1), resize(N, 1, 1), F, 1) { set_handler<DOF::U1>(); }
 
-RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, S, A, resize(O, 2, 1), resize(N, 2, 1), F, 2) { set_handler<DOF::U1, DOF::U2>(); }
+RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
+    : RigidWallPenalty(T, A, resize(O, 2, 1), resize(N, 2, 1), F, 2) { set_handler<DOF::U1, DOF::U2>(); }
 
-RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallPenalty(T, S, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 2) {
+RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
+    : RigidWallPenalty(T, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 2) {
     set_handler<DOF::U1, DOF::U2>();
     access::rw(outer_norm).resize(2);
     access::rw(edge_a).resize(2);
     access::rw(edge_b).reset();
 }
 
-RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, S, A, resize(O, 3, 1), resize(N, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
+    : RigidWallPenalty(T, A, resize(O, 3, 1), resize(N, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
 
-RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned S, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallPenalty(T, S, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
+    : RigidWallPenalty(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }

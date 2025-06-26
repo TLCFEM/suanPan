@@ -45,6 +45,8 @@ class C3D8 final : public MaterialElement3D {
 
     static const field<vec> h_mode;
 
+    const double penalty;
+
     const char int_scheme;
 
     const bool hourglass_control;
@@ -55,11 +57,12 @@ class C3D8 final : public MaterialElement3D {
 
 public:
     C3D8(
-        unsigned,    // tag
-        uvec&&,      // node tag
-        unsigned,    // material tag
-        char = 'I',  // reduced integration
-        bool = false // nonlinear geometry switch
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // penalty factor
+        char,     // reduced integration
+        bool      // nonlinear geometry switch
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

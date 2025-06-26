@@ -17,9 +17,10 @@
 
 #include "NonlinearHoffman.h"
 
+#include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 
-const double NonlinearHoffman::root_two_third = sqrt(2. / 3.);
+const double NonlinearHoffman::root_two_third = std::sqrt(2. / 3.);
 const uword NonlinearHoffman::sa{0};
 const span NonlinearHoffman::sb{1, 6};
 
@@ -49,53 +50,64 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
 
     const vec predictor = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain);
     trial_stress = predictor;
-    const vec c_stress = .5 * proj_a * initial_stiffness * (current_strain - plastic_strain);
 
-    auto gamma = 0., ref_error = 1.;
+    auto gamma = 0.;
 
     vec7 incre(fill::none), residual(fill::none);
     mat77 jacobian(fill::none);
 
     auto counter = 0u;
+    auto try_bisection = false;
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
+            if(try_bisection) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
+            }
+
+            try_bisection = true;
+            counter = 2u;
+
+            const auto approx_update = [&](const double gm) {
+                gamma = gm;
+                const vec approx_a = proj_a * (trial_stress = solve(eye(6, 6) + gamma * elastic_a, predictor - gamma * initial_stiffness * proj_b));
+                const auto approx_k = compute_k(eqv_strain = current_eqv_strain + gamma * root_two_third * tensor::strain::norm(approx_a + proj_b));
+                return .5 * dot(trial_stress, approx_a) + dot(trial_stress, proj_b) - approx_k * approx_k;
+            };
+
+            ridders_guess(approx_update, 0., .25 * tensor::strain::norm(incre_strain) / tensor::strain::norm(proj_a * predictor + proj_b), tolerance);
         }
 
         const vec factor_a = proj_a * trial_stress;
-        const vec factor_b = .5 * factor_a + proj_b;
-        const vec n_mid = c_stress + factor_b;
-        const auto norm_n_mid = root_two_third * tensor::strain::norm(n_mid);
-        const auto k = compute_k(eqv_strain = current_eqv_strain + gamma * norm_n_mid);
-        const auto f = dot(trial_stress, factor_b) - k * k;
+        const vec n = factor_a + proj_b;
+        const auto norm_n = root_two_third * tensor::strain::norm(n);
+        const auto k = compute_k(eqv_strain = current_eqv_strain + gamma * norm_n);
+        const auto f = .5 * dot(trial_stress, factor_a) + dot(trial_stress, proj_b) - k * k;
 
         if(1u == counter && f <= 0.) return SUANPAN_SUCCESS;
 
-        const rowvec dn = two_third / norm_n_mid * (n_mid % tensor::strain::norm_weight).t();
-        const auto factor_c = k * compute_dk(eqv_strain);
-
         residual(sa) = f;
-        residual(sb) = trial_stress + gamma * initial_stiffness * n_mid - predictor;
+        residual(sb) = trial_stress + gamma * initial_stiffness * n - predictor;
 
-        jacobian(sa, sa) = -2. * factor_c * norm_n_mid;
-        jacobian(sa, sb) = factor_a.t() + proj_b.t() - factor_c * gamma * dn * proj_a;
-        jacobian(sb, sa) = initial_stiffness * n_mid;
-        jacobian(sb, sb) = eye(6, 6) + .5 * gamma * elastic_a;
+        const auto factor_b = -2. * k * compute_dk(eqv_strain);
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        jacobian(sa, sa) = factor_b * norm_n;
+        jacobian(sa, sb) = n.t() + factor_b * gamma * two_third / norm_n * (n % tensor::strain::norm_weight).t() * proj_a;
+        jacobian(sb, sa) = initial_stiffness * n;
+        jacobian(sb, sb) = eye(6, 6) + gamma * elastic_a;
+
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
-        if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) {
-            plastic_strain += gamma * n_mid;
+        if(error < tolerance * (1. + yield_stress.max()) || (inf_norm(residual) < tolerance && counter > 5u)) {
+            plastic_strain += gamma * n;
 
             mat::fixed<7, 6> left(fill::none), right(fill::zeros);
             right.rows(sb) = initial_stiffness;
 
-            if(!solve(left, jacobian, right)) return SUANPAN_FAIL;
+            if(!solve(left, jacobian, right, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
             trial_stiffness = left.rows(sb);
 

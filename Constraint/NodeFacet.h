@@ -37,7 +37,7 @@ class NodeFacet final : public Constraint {
     std::vector<vec> get_position(const shared_ptr<DomainBase>&);
 
 public:
-    NodeFacet(unsigned, unsigned, unsigned, uvec&&);
+    NodeFacet(unsigned, unsigned, uvec&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

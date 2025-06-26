@@ -38,11 +38,11 @@ class FixedLength : public Constraint {
     vec coor;
 
 protected:
-    const bool min_bound = false, max_bound = false;
-    const double min_gap = 0., max_gap = 0.;
+    bool min_bound = false, max_bound = false;
+    double min_gap = 0., max_gap = 0.;
 
 public:
-    FixedLength(unsigned, unsigned, unsigned, uvec&&);
+    FixedLength(unsigned, unsigned, uvec&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
@@ -56,17 +56,17 @@ public:
 
 class MinimumGap final : public FixedLength {
 public:
-    MinimumGap(unsigned, unsigned, unsigned, double, uvec&&);
+    MinimumGap(unsigned, unsigned, double, uvec&&);
 };
 
 class MaximumGap final : public FixedLength {
 public:
-    MaximumGap(unsigned, unsigned, unsigned, double, uvec&&);
+    MaximumGap(unsigned, unsigned, double, uvec&&);
 };
 
 class Sleeve final : public FixedLength {
 public:
-    Sleeve(unsigned, unsigned, unsigned, double, double, uvec&&);
+    Sleeve(unsigned, unsigned, double, double, uvec&&);
 };
 
 class MaxForce final : public FixedLength {
@@ -76,7 +76,7 @@ class MaxForce final : public FixedLength {
     bool current_flag = false;
 
 public:
-    MaxForce(unsigned, unsigned, unsigned, double, uvec&&);
+    MaxForce(unsigned, unsigned, double, uvec&&);
 
     int process(const shared_ptr<DomainBase>&) override;
 

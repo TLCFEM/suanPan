@@ -19,13 +19,13 @@
 
 #include <Domain/DomainBase.h>
 
-Tabular::Tabular(const unsigned T, vec&& TI, vec&& M, const unsigned ST)
-    : Amplitude(T, ST)
+Tabular::Tabular(const unsigned T, vec&& TI, vec&& M)
+    : Amplitude(T)
     , time(std::move(TI))
     , magnitude(std::move(M)) {}
 
-Tabular::Tabular(const unsigned T, std::string&& P, const unsigned ST)
-    : Amplitude(T, ST)
+Tabular::Tabular(const unsigned T, std::string&& P)
+    : Amplitude(T)
     , file_name(std::move(P)) {}
 
 void Tabular::initialize(const shared_ptr<DomainBase>& D) {
@@ -50,6 +50,8 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
         D->disable_amplitude(get_tag());
     }
 }
+
+unique_ptr<Amplitude> Tabular::get_copy() { return std::make_unique<Tabular>(*this); }
 
 double Tabular::get_amplitude(const double T) {
     const auto step_time = T - start_time;

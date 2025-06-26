@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 MPF::MPF(const unsigned T, const double E, const double Y, const double H, const double R, const double B1, const double B2, const double B3, const double B4, const bool ISO, const bool CON, const double D)
-    : DataMPF{fabs(E), H, fabs(Y), fabs(R), fabs(B1), fabs(B2), fabs(B3), fabs(B4), ISO, CON}
+    : DataMPF{std::fabs(E), H, std::fabs(Y), std::fabs(R), std::fabs(B1), std::fabs(B2), std::fabs(B3), std::fabs(B4), ISO, CON}
     , Material1D(T, D) {}
 
 int MPF::initialize(const shared_ptr<DomainBase>&) {
@@ -50,7 +50,7 @@ int MPF::update_trial_status(const vec& t_strain) {
     auto shift_stress = 0.;
     if(isotropic_hardening) {
         shift_stress = std::max(0., A3 * yield_stress * (max_strain / yield_strain - A4));
-        max_strain = std::max(max_strain, fabs(trial_strain(0)));
+        max_strain = std::max(max_strain, std::fabs(trial_strain(0)));
     }
 
     if(const auto trial_load_sign = suanpan::sign(incre_strain(0)); !suanpan::approx_equal(trial_load_sign, load_sign)) {
@@ -77,15 +77,15 @@ int MPF::update_trial_status(const vec& t_strain) {
     auto radius = R0;
     if(!constant_radius) {
         // update radius
-        const auto xi = fabs(reverse_strain - pre_inter_strain) / yield_strain;
+        const auto xi = std::fabs(reverse_strain - pre_inter_strain) / yield_strain;
         radius -= A1 * xi / (A2 + xi);
     }
 
     const auto gap_strain = inter_strain - reverse_strain;
     const auto gap_stress = inter_stress - reverse_stress;
     const auto normal_strain = std::max(datum::eps, (trial_strain(0) - reverse_strain) / gap_strain);
-    const auto factor_a = 1. + pow(normal_strain, radius);
-    const auto factor_b = (1. - hardening_ratio) * pow(factor_a, -1. / radius);
+    const auto factor_a = 1. + std::pow(normal_strain, radius);
+    const auto factor_b = (1. - hardening_ratio) * std::pow(factor_a, -1. / radius);
 
     trial_stress = (hardening_ratio + factor_b) * normal_strain * gap_stress + reverse_stress;
     trial_stiffness = gap_stress / gap_strain * (hardening_ratio + factor_b / factor_a);

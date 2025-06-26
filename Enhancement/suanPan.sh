@@ -57,7 +57,7 @@ if [[ $# == 1 ]] && [[ $1 == "--create-link" ]]; then
     fi
 
     # desktop file
-    echo -e "[Desktop Entry]\nExec=suanpan\nVersion=2.0\nType=Application\nIcon=$CURRENT_PATH/suanPan-ua.svg\nCategories=Science\nName=suanPan\nTerminal=true\n" >"$TARGET_PATH/../share/applications/suanPan.desktop"
+    echo -e "[Desktop Entry]\nExec=suanpan\nVersion=2.0\nType=Application\nIcon=$CURRENT_PATH/suanPan-ua.svg\nCategories=Education;Science\nName=suanPan\nTerminal=true\n" >"$TARGET_PATH/../share/applications/suanPan.desktop"
     echo "$HOME/.local/share/applications/suanPan.desktop is successfully created."
 else
     case "$(uname -s)" in

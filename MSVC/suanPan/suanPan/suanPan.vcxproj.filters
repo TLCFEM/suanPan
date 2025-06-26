@@ -214,6 +214,12 @@
     <Filter Include="Material\MaterialOS\Wrapper">
       <UniqueIdentifier>{383bbae7-39ee-40f6-875e-a61aba9726da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Solver\Integrator\Explicit">
+      <UniqueIdentifier>{4d9e431a-b809-4685-8efd-55a241f8bb44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Solver\Integrator\Implicit">
+      <UniqueIdentifier>{fb357536-8be5-4c27-ab18-9c8dab52a3d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
@@ -1029,33 +1035,6 @@
     <ClCompile Include="..\..\..\Solver\Solver.cpp">
       <Filter>Solver</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\BatheTwoStep.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\GeneralizedAlpha.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\Integrator.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmark.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkBase.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkFull.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\Newmark.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\RayleighNewmark.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Step\ArcLength.cpp">
       <Filter>Step</Filter>
     </ClCompile>
@@ -1297,9 +1276,6 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\LogicCriterion.cpp">
       <Filter>Constraint\Criterion</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\GSSSS.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
@@ -1402,23 +1378,11 @@
     <ClCompile Include="..\..\..\Element\Modifier\ElementalLee.cpp">
       <Filter>Element\Modifier</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\Tchamwa.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Converger\RelIncreAcc.cpp">
       <Filter>Converger</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Converger\AbsIncreAcc.cpp">
       <Filter>Converger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\BatheExplicit.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\OALTS.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\GeneralizedAlphaExplicit.cpp">
-      <Filter>Solver\Integrator</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp">
       <Filter>UnitTest</Filter>
@@ -1498,9 +1462,6 @@
     <ClCompile Include="..\..\..\Element\Special\TranslationConnector.cpp">
       <Filter>Element\Special</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\NonviscousNewmark.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Load\Amplitude\CustomAmplitude.cpp">
       <Filter>Load\Amplitude</Filter>
     </ClCompile>
@@ -1573,9 +1534,6 @@
     <ClCompile Include="..\..\..\Material\Material1D\Hysteresis\ComplexHysteresis.cpp">
       <Filter>Material\Material1D\Hysteresis</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Solver\Integrator\LeeNewmarkIterative.cpp">
-      <Filter>Solver\Integrator</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Material\Material2D\DuncanSelig.cpp">
       <Filter>Material\Material2D</Filter>
     </ClCompile>
@@ -1584,6 +1542,63 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\Subloading.cpp">
       <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material1D\Wrapper\Prestrain.cpp">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Integrator.cpp">
+      <Filter>Solver\Integrator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Explicit\BatheExplicit.cpp">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GeneralizedAlphaExplicit.cpp">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GERKN.cpp">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Explicit\Tchamwa.cpp">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\GSSSS.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\Newmark.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\NonviscousNewmark.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\OALTS.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\RayleighNewmark.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\WilsonPenzienNewmark.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\BatheTwoStep.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\GeneralizedAlpha.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmark.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmarkBase.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmarkFull.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmarkIterative.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GSSE.cpp">
+      <Filter>Solver\Integrator\Explicit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2433,33 +2448,6 @@
     <ClInclude Include="..\..\..\Solver\Solver.h">
       <Filter>Solver</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\BatheTwoStep.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\GeneralizedAlpha.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\Integrator.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmark.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkBase.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkFull.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\Newmark.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\RayleighNewmark.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\WilsonPenzienNewmark.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Step\ArcLength.h">
       <Filter>Step</Filter>
     </ClInclude>
@@ -2689,9 +2677,6 @@
     <ClInclude Include="..\..\..\Constraint\Criterion\LogicCriterion.h">
       <Filter>Constraint\Criterion</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\GSSSS.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Recorder\RecorderParser.h">
       <Filter>Recorder</Filter>
     </ClInclude>
@@ -2761,9 +2746,6 @@
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\UnitTest\TestSolver.h">
-      <Filter>UnitTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Domain\MetaMat\SolverSetting.hpp">
       <Filter>Domain\MetaMat</Filter>
     </ClInclude>
@@ -2791,23 +2773,11 @@
     <ClInclude Include="..\..\..\Toolbox\response_spectrum.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\Tchamwa.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Converger\RelIncreAcc.h">
       <Filter>Converger</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Converger\AbsIncreAcc.h">
       <Filter>Converger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\BatheExplicit.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\OALTS.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\GeneralizedAlphaExplicit.h">
-      <Filter>Solver\Integrator</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Elastic\Sinh1D.h">
       <Filter>Material\Material1D\Elastic</Filter>
@@ -2883,9 +2853,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Special\TranslationConnector.h">
       <Filter>Element\Special</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\NonviscousNewmark.h">
-      <Filter>Solver\Integrator</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Load\Amplitude\CustomAmplitude.h">
       <Filter>Load\Amplitude</Filter>
@@ -2965,9 +2932,6 @@
     <ClInclude Include="..\..\..\Include\catch\catch_amalgamated.hpp">
       <Filter>Z</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Solver\Integrator\LeeNewmarkIterative.h">
-      <Filter>Solver\Integrator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Material\Material2D\DuncanSelig.h">
       <Filter>Material\Material2D</Filter>
     </ClInclude>
@@ -2976,6 +2940,63 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\Subloading.h">
       <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material1D\Wrapper\Prestrain.h">
+      <Filter>Material\Material1D\Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Integrator.h">
+      <Filter>Solver\Integrator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Explicit\BatheExplicit.h">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Explicit\GeneralizedAlphaExplicit.h">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Explicit\GERKN.h">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Explicit\Tchamwa.h">
+      <Filter>Solver\Integrator\Explicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\GeneralizedAlpha.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\GSSSS.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\Newmark.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\NonviscousNewmark.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\OALTS.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\RayleighNewmark.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\WilsonPenzienNewmark.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\BatheTwoStep.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmark.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmarkBase.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmarkFull.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\LeeNewmark\LeeNewmarkIterative.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Explicit\GSSE.h">
+      <Filter>Solver\Integrator\Explicit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

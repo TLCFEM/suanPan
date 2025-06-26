@@ -75,6 +75,9 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istrings
             }
         if(!domain->insert(std::make_shared<VisualisationRecorder>(tag, to_token(variable_type), interval, width, scale)))
             suanpan_error("Fail to create new visualisation recorder.\n");
+#ifndef SUANPAN_VTK
+        suanpan_warning("Visualisation recorders have no effect as the required VTK support is not available.\n");
+#endif
         return SUANPAN_SUCCESS;
     }
 

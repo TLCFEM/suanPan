@@ -142,8 +142,6 @@ public:
 
 namespace suanpan {
     unique_ptr<Section> make_copy(const shared_ptr<Section>&);
-    unique_ptr<Section> make_copy(const unique_ptr<Section>&);
-    unique_ptr<Section> initialized_section_copy(const shared_ptr<DomainBase>&, uword);
 } // namespace suanpan
 
 #endif

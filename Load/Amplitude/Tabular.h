@@ -35,14 +35,15 @@ class Tabular : public Amplitude {
     const std::string file_name;
 
 protected:
-    vec time;      // time
-    vec magnitude; // magnitude
+    vec time, magnitude;
 
 public:
-    Tabular(unsigned, vec&&, vec&&, unsigned);
-    Tabular(unsigned, std::string&&, unsigned);
+    Tabular(unsigned, vec&&, vec&&);
+    Tabular(unsigned, std::string&&);
 
     void initialize(const shared_ptr<DomainBase>&) override;
+
+    unique_ptr<Amplitude> get_copy() override;
 
     double get_amplitude(double) override;
 

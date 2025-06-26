@@ -42,8 +42,8 @@
  *   \f{gather}{a=A_0+A\exp\left(-\left(t-t_0\right)/t_d\right)\f}
  *
  * @author tlc
- * @date 17/09/2017
- * @version 0.1.0
+ * @date 05/06/2025
+ * @version 0.2.0
  * @file Amplitude.h
  * @addtogroup Amplitude
  * @{
@@ -64,22 +64,25 @@ enum class AmplitudeType {
 
 class DomainBase;
 
-class Amplitude : public UniqueTag {
+class Amplitude : public CopiableTag {
+    bool initialized = false;
+
 protected:
-    unsigned start_step;
     double start_time = 0.; // T0
+
 public:
-    explicit Amplitude(unsigned = 0, unsigned = 0);
+    using CopiableTag::CopiableTag;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 
+    virtual unique_ptr<Amplitude> get_copy() = 0;
+
     virtual double get_amplitude(double);
 
-    void set_start_step(unsigned);
-    [[nodiscard]] unsigned get_start_step() const;
+    void set_initialized(bool);
+    [[nodiscard]] bool is_initialized() const;
 
     void set_start_time(double);
-    [[nodiscard]] double set_start_time() const;
 };
 
 #endif

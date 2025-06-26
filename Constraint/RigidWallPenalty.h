@@ -35,7 +35,7 @@
 
 class RigidWallPenalty : public Constraint {
 protected:
-    template<DOF... D> void set_handler() { throw std::logic_error("not implemented"); }
+    template<DOF...> void set_handler() { throw std::logic_error("not implemented"); }
 
     const unsigned n_dim;
 
@@ -54,8 +54,8 @@ protected:
     Col<double> (*trial_acceleration_handler)(const shared_ptr<Node>&) = nullptr;
 
 public:
-    RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, double, unsigned);
-    RigidWallPenalty(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double, unsigned);
+    RigidWallPenalty(unsigned, unsigned, vec&&, vec&&, double, unsigned);
+    RigidWallPenalty(unsigned, unsigned, vec&&, vec&&, vec&&, double, unsigned);
 
     int process(const shared_ptr<DomainBase>&) override;
 
@@ -96,19 +96,19 @@ template<> inline void RigidWallPenalty::set_handler<DOF::U1, DOF::U2, DOF::U3>(
 
 class RigidWallPenalty1D final : public RigidWallPenalty {
 public:
-    RigidWallPenalty1D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallPenalty1D(unsigned, unsigned, vec&&, vec&&, double);
 };
 
 class RigidWallPenalty2D final : public RigidWallPenalty {
 public:
-    RigidWallPenalty2D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
-    RigidWallPenalty2D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
+    RigidWallPenalty2D(unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallPenalty2D(unsigned, unsigned, vec&&, vec&&, vec&&, double);
 };
 
 class RigidWallPenalty3D final : public RigidWallPenalty {
 public:
-    RigidWallPenalty3D(unsigned, unsigned, unsigned, vec&&, vec&&, double);
-    RigidWallPenalty3D(unsigned, unsigned, unsigned, vec&&, vec&&, vec&&, double);
+    RigidWallPenalty3D(unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallPenalty3D(unsigned, unsigned, vec&&, vec&&, vec&&, double);
 };
 
 #endif

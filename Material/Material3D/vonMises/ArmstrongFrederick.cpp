@@ -19,7 +19,7 @@
 
 #include <Toolbox/tensor.h>
 
-const double ArmstrongFrederick::root_three_two = sqrt(1.5);
+const double ArmstrongFrederick::root_three_two = std::sqrt(1.5);
 const mat ArmstrongFrederick::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 ArmstrongFrederick::ArmstrongFrederick(const unsigned T, DataArmstrongFrederick&& D, const double R)
@@ -53,7 +53,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     auto eta = trial_s;
     for(unsigned I = 0; I < size; ++I) eta -= vec{&trial_history(1 + 6ull * I), 6, false, true};
 
-    auto yield_func = root_three_two * tensor::stress::norm(eta) - std::max(0., yield + hardening * p + saturation * (1. - exp(-ms * p)));
+    auto yield_func = root_three_two * tensor::stress::norm(eta) - std::max(0., yield + hardening * p + saturation * (1. - std::exp(-ms * p)));
 
     if(yield_func < 0.) return SUANPAN_SUCCESS;
 
@@ -69,7 +69,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto exp_term = saturation * exp(-ms * p);
+        const auto exp_term = saturation * std::exp(-ms * p);
 
         auto k = yield + saturation + hardening * p - exp_term;
         auto dk = 0.;
@@ -88,15 +88,15 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
         yield_func = root_three_two * (norm_xi - root_six_shear * gamma - sum_b) - k;
 
         sum_b = 0.;
-        for(unsigned I = 0; I < size; ++I) sum_b += (b(I) / norm_xi * tensor::stress::double_contraction(xi, vec{&trial_history(1 + 6ull * I), 6, false, true}) - a(I)) * pow(1. + b(I) * gamma, -2.);
+        for(unsigned I = 0; I < size; ++I) sum_b += (b(I) / norm_xi * tensor::stress::double_contraction(xi, vec{&trial_history(1 + 6ull * I), 6, false, true}) - a(I)) * std::pow(1. + b(I) * gamma, -2.);
 
         jacobian = root_three_two * sum_b - three_shear - dk;
 
         const auto incre = yield_func / jacobian;
-        const auto error = fabs(incre);
+        const auto error = std::fabs(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((fabs(yield_func) < tolerance || error < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || std::fabs(yield_func) < tolerance) && counter > 5u)) break;
 
         gamma -= incre;
         p -= incre;
@@ -107,7 +107,7 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     vec6 sum_c(fill::zeros);
     for(unsigned I = 0; I < size; ++I) {
         vec beta(&trial_history(1 + 6ull * I), 6, false, true);
-        sum_c += b(I) * pow(1. + b(I) * gamma, -2.) * (beta - tensor::stress::double_contraction(u, beta) * u);
+        sum_c += b(I) * std::pow(1. + b(I) * gamma, -2.) * (beta - tensor::stress::double_contraction(u, beta) * u);
         beta = (beta + a(I) * gamma * u) / (1. + b(I) * gamma);
     }
 

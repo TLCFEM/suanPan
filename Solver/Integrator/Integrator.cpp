@@ -20,6 +20,41 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
+int Integrator::process_load_impl(const bool full) { return database.lock()->process_load(full); }
+
+int Integrator::process_constraint_impl(const bool full) {
+    const auto D = database.lock();
+    auto& W = D->get_factory();
+
+    const auto code = D->process_constraint(full);
+
+    W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
+
+    // some constraints may have stiffness
+    if(full) D->assemble_constraint_stiffness();
+
+    return code;
+}
+
+/**
+ * Indicate whether the integrator has a corrector.
+ * Some time integration methods adopt predictor-corrector type scheme.
+ * The final committed state is different from the one used in computation.
+ * Override this method to indicate whether the integrator has a corrector.
+ * If it returns `true`, the `correct_trial_status()` method will be called
+ * thus has to be implemented.
+ */
+bool Integrator::has_corrector() const { return false; }
+
+/**
+ * Correct the trial status.
+ * This method is called when the integrator has a corrector.
+ * It is used to correct the trial status after the computation.
+ * The default implementation does nothing and returns success.
+ * Override this method to implement the corrector.
+ */
+int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
+
 Integrator::Integrator(const unsigned T)
     : UniqueTag(T) {}
 
@@ -49,11 +84,15 @@ void Integrator::set_matrix_assembled_switch(const bool T) { matrix_assembled_sw
 
 bool Integrator::matrix_is_assembled() const { return matrix_assembled_switch; }
 
-bool Integrator::has_corrector() const { return false; }
-
+/**
+ * Indicate whether the matrix is independent of time, that is, the system does not change with time.
+ * This helps to determine whether the matrix needs to be reassembled.
+ * For single-step methods, it is typically true.
+ * For multistep methods, it is typically false.
+ */
 bool Integrator::time_independent_matrix() const { return true; }
 
-int Integrator::process_load() { return database.lock()->process_load(true); }
+int Integrator::process_load() { return process_load_impl(true); }
 
 /**
  * The main task of this method is to apply constraints (of various forms implemented in various methods).
@@ -61,25 +100,13 @@ int Integrator::process_load() { return database.lock()->process_load(true); }
  * Combinations of different methods need to be considered: 1) penalty, 2) multiplier.
  * On exit, the global stiffness matrix should be updated, the global residual vector should be updated.
  */
-int Integrator::process_constraint() {
-    const auto D = database.lock();
-    auto& W = D->get_factory();
+int Integrator::process_constraint() { return process_constraint_impl(true); }
 
-    const auto code = D->process_constraint(true);
+int Integrator::process_criterion() const { return database.lock()->process_criterion(); }
 
-    W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
+int Integrator::process_modifier() const { return database.lock()->process_modifier(); }
 
-    // some constraints may have stiffness
-    D->assemble_constraint_stiffness();
-
-    return code;
-}
-
-int Integrator::process_criterion() { return database.lock()->process_criterion(); }
-
-int Integrator::process_modifier() { return database.lock()->process_modifier(); }
-
-int Integrator::process_load_resistance() { return database.lock()->process_load(false); }
+int Integrator::process_load_resistance() { return process_load_impl(false); }
 
 /**
  * This method is similar to process_constraint(), but it only updates the global residual vector.
@@ -88,16 +115,7 @@ int Integrator::process_load_resistance() { return database.lock()->process_load
  * Subsequent iterations do not assemble the global stiffness matrix again and reuse the factorised matrix.
  * In this case, the factorised matrix cannot be modified.
  */
-int Integrator::process_constraint_resistance() {
-    const auto D = database.lock();
-    auto& W = D->get_factory();
-
-    const auto code = D->process_constraint(false);
-
-    W->set_sushi(W->get_sushi() + W->get_trial_constraint_resistance());
-
-    return code;
-}
+int Integrator::process_constraint_resistance() { return process_constraint_impl(false); }
 
 void Integrator::record() const { database.lock()->record(); }
 
@@ -148,7 +166,7 @@ vec Integrator::get_displacement_residual() {
 /**
  * Assemble the global residual vector due to nonlinear constraints implemented via the multiplier method.
  */
-vec Integrator::get_auxiliary_residual() {
+vec Integrator::get_auxiliary_residual() const {
     auto& W = get_domain()->get_factory();
 
     return W->get_auxiliary_load() - W->get_auxiliary_resistance();
@@ -158,13 +176,13 @@ sp_mat Integrator::get_reference_load() { return database.lock()->get_factory()-
 
 const vec& Integrator::get_trial_displacement() const { return database.lock()->get_factory()->get_trial_displacement(); }
 
-void Integrator::update_load() { database.lock()->update_load(); }
+void Integrator::update_load() const { database.lock()->update_load(); }
 
-void Integrator::update_constraint() { database.lock()->update_constraint(); }
+void Integrator::update_constraint() const { database.lock()->update_constraint(); }
 
-void Integrator::update_trial_load_factor(const double lambda) { update_trial_load_factor(vec{lambda}); }
+void Integrator::update_trial_load_factor(const double lambda) const { update_trial_load_factor(vec{lambda}); }
 
-void Integrator::update_trial_load_factor(const vec& lambda) {
+void Integrator::update_trial_load_factor(const vec& lambda) const {
     auto& W = get_domain()->get_factory();
     W->update_trial_load_factor_by(lambda);
 }
@@ -186,14 +204,12 @@ void Integrator::update_incre_time(const double T) {
     update_parameter(W->get_incre_time());
 }
 
-int Integrator::update_trial_status() {
+int Integrator::update_trial_status(const bool detect_trivial) {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    return suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
+    return detect_trivial && suanpan::approx_equal(norm(W->get_incre_displacement()), 0.) ? SUANPAN_SUCCESS : D->update_trial_status();
 }
-
-int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
 
 /**
  * When a new displacement increment is computed, it is added to global displacement vector.
@@ -206,10 +222,10 @@ int Integrator::correct_trial_status() { return SUANPAN_SUCCESS; }
  */
 int Integrator::sync_status(const bool only_correct) {
     auto handle_force = [&] {
-        // process modifiers
         if(SUANPAN_SUCCESS != process_modifier()) return SUANPAN_FAIL;
-        // assemble resistance
+
         assemble_resistance();
+
         return SUANPAN_SUCCESS;
     };
 
@@ -223,7 +239,7 @@ int Integrator::sync_status(const bool only_correct) {
     }
 
     // perform corrector/predictor depending on the algorithm
-    if(SUANPAN_SUCCESS != (has_corrector() ? correct_trial_status() : update_trial_status())) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != (has_corrector() ? correct_trial_status() : update_trial_status(true))) return SUANPAN_FAIL;
 
     return handle_force();
 }
@@ -285,7 +301,7 @@ void Integrator::stage_and_commit_status() {
     commit_status();
 }
 
-void Integrator::stage_status() { database.lock()->stage_status(); }
+void Integrator::stage_status() const { database.lock()->stage_status(); }
 
 void Integrator::commit_status() { database.lock()->commit_status(); }
 
@@ -353,7 +369,24 @@ vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
-bool ImplicitIntegrator::time_independent_matrix() const { return false; }
+void ExplicitIntegrator::assemble_resistance() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    auto fa = std::async([&] { D->assemble_resistance(); });
+    auto fb = std::async([&] { D->assemble_damping_force(); });
+    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
+    auto fd = std::async([&] { D->assemble_inertial_force(); });
+
+    fa.get();
+    fb.get();
+    fc.get();
+    fd.get();
+
+    W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
+}
+
+void ExplicitIntegrator::assemble_matrix() { get_domain()->assemble_trial_mass(); }
 
 const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain()->get_factory()->get_trial_acceleration(); }
 
