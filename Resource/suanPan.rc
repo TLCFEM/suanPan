@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,8,0,0
- PRODUCTVERSION 3,8,0,0
+ FILEVERSION 3,9,0,0
+ PRODUCTVERSION 3,9,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "TLCFEM"
             VALUE "FileDescription", "suanPan --- An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework"
-            VALUE "FileVersion", "3.8.0.0"
+            VALUE "FileVersion", "3.9.0.0"
             VALUE "InternalName", "suanPan"
             VALUE "LegalCopyright", "Copyright (C) 2017-2025 Theodore Chang https://github.com/TLCFEM/suanPan"
             VALUE "OriginalFilename", "suanPan"
             VALUE "ProductName", "suanPan"
-            VALUE "ProductVersion", "3.8.0.0"
+            VALUE "ProductVersion", "3.9.0.0"
         END
     END
     BLOCK "VarFileInfo"
