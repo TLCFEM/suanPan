@@ -105,7 +105,7 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
 
         gamma -= incre(0);
         pe = std::max(pe - incre(1), 0.);
-        f = suanpan::clamp(f - incre(2), 0., 1.); // avoid overshoot
+        f = suanpan::clamp_unit(f - incre(2)); // avoid overshoot
         s -= incre(3);
     }
 

@@ -264,7 +264,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         const auto pool = get_remaining<double>(command);
 
         if(pool.empty() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, .5))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(1 == pool.size() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, suanpan::clamp(pool[0], 0., 1.)))) code = 1;
+        else if(1 == pool.size() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, suanpan::clamp_unit(pool[0])))) code = 1;
         else if(2 == pool.size() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, pool[0], pool[1]))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSU0")) {
@@ -294,7 +294,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<GSSSSOptimal>(tag, suanpan::clamp(radius, 0., 1.)))) code = 1;
+        if(domain->insert(std::make_shared<GSSSSOptimal>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "OALTS")) {
         auto radius = .5;
@@ -303,7 +303,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<OALTS>(tag, suanpan::clamp(radius, 0., 1.)))) code = 1;
+        if(domain->insert(std::make_shared<OALTS>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheTwoStep")) {
         auto radius = 0.;
@@ -319,7 +319,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         }
         if(gamma <= 0. || gamma >= 1.) gamma = .5;
 
-        if(domain->insert(std::make_shared<BatheTwoStep>(tag, suanpan::clamp(radius, 0., 1.), gamma))) code = 1;
+        if(domain->insert(std::make_shared<BatheTwoStep>(tag, suanpan::clamp_unit(radius), gamma))) code = 1;
     }
     else if(is_equal(integrator_type, "Tchamwa")) {
         auto radius = .5;
@@ -328,7 +328,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<Tchamwa>(tag, suanpan::clamp(radius, 0., 1.)))) code = 1;
+        if(domain->insert(std::make_shared<Tchamwa>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheExplicit")) {
         auto radius = .5;
@@ -337,7 +337,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<BatheExplicit>(tag, suanpan::clamp(radius, 0., 1.)))) code = 1;
+        if(domain->insert(std::make_shared<BatheExplicit>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "ICL")) {
         auto radius = .5;
@@ -355,7 +355,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<GSSE>(tag, suanpan::clamp(radius, 0., 1.)))) code = 1;
+        if(domain->insert(std::make_shared<GSSE>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "WAT2")) {
         auto para = 1. / 3.;
@@ -364,7 +364,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<WAT2>(tag, suanpan::clamp(para, 0., 1.)))) code = 1;
+        if(domain->insert(std::make_shared<WAT2>(tag, suanpan::clamp_unit(para)))) code = 1;
     }
     else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
         auto radius = .5;
@@ -373,7 +373,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<GeneralizedAlphaExplicit>(tag, suanpan::clamp(radius, 0., 1.)))) code = 1;
+        if(domain->insert(std::make_shared<GeneralizedAlphaExplicit>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
 
     if(1 == code) {
