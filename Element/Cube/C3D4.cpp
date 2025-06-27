@@ -174,6 +174,12 @@ void C3D4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
     for(unsigned I = 0; I < c_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
+mat C3D4::GetData(const OutputType P) {
+    vec t_stress(6, fill::zeros);
+    if(const auto t_data = c_material->record(P); !t_data.empty()) t_stress = resize(t_data[0], 6, 1);
+    return repmat(t_stress, 1, c_node);
+}
+
 void C3D4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement(), c_dof, c_node).t();
     for(unsigned I = 0; I < c_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
