@@ -325,8 +325,6 @@ namespace {
             suanpan_error("A valid beta is required.\n");
             return;
         }
-        if(beta > 1.) beta = 1.;
-        else if(beta < 0.) beta = 0.;
 
         auto density = 0.;
         if(command.eof())
@@ -336,7 +334,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<Bilinear1D>(tag, elastic_modulus, yield_stress, hardening_ratio, beta, density);
+        return_obj = std::make_unique<Bilinear1D>(tag, elastic_modulus, yield_stress, hardening_ratio, suanpan::clamp_unit(beta), density);
     }
 
     void new_bilinearcc(unique_ptr<Material>& return_obj, std::istringstream& command) {
