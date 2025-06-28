@@ -868,7 +868,7 @@
       "trigger": "ExpCC",
       "details": "cam-clay model with exponential hardening",
       "kind": "type",
-      "contents": "material ExpCC ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, beta, controls compression side shape\n# (5) double, m, slope of CSL\n# (6) double, p_t, initial tension strength\n# (7) double, a_0, initial a_0\n# (8) double, e_0, nitial void ratio\n# (9) double, lambda\n# (10) double, kappa\n# [11] double, density, default: 0.0"
+      "contents": "material ExpCC ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, beta, controls compression side shape\n# (5) double, m, slope of CSL\n# (6) double, p_t, initial tension strength\n# (7) double, a_0, initial a_0\n# (8) double, e_0, initial void ratio\n# (9) double, lambda\n# (10) double, kappa\n# [11] double, density, default: 0.0"
     },
     {
       "trigger": "ExpDP",
