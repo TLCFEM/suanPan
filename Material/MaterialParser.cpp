@@ -1459,45 +1459,9 @@ namespace {
             return;
         }
 
-        double elastic_modulus;
-        if(!get_input(command, elastic_modulus)) {
-            suanpan_error("A valid elastic modulus is required.\n");
-            return;
-        }
-
-        double poissons_ratio;
-        if(!get_input(command, poissons_ratio)) {
-            suanpan_error("A valid poisson's ratio is required.\n");
-            return;
-        }
-
-        double beta, m, pt, a0, e0, lambda, kappa;
-        if(!get_input(command, beta)) {
-            suanpan_error("A valid beta is required.\n");
-            return;
-        }
-        if(!get_input(command, m)) {
-            suanpan_error("A valid radius ratio is required.\n");
-            return;
-        }
-        if(!get_input(command, pt)) {
-            suanpan_error("A valid tensile yield strength is required.\n");
-            return;
-        }
-        if(!get_input(command, a0)) {
-            suanpan_error("A valid initial a_0 is required.\n");
-            return;
-        }
-        if(!get_input(command, e0)) {
-            suanpan_error("A valid initial void ratio is required.\n");
-            return;
-        }
-        if(!get_input(command, lambda)) {
-            suanpan_error("A valid lambda is required.\n");
-            return;
-        }
-        if(!get_input(command, kappa)) {
-            suanpan_error("A valid kappa is required.\n");
+        double elastic_modulus, poissons_ratio, beta, m, pt, a0, e0, lambda, kappa;
+        if(!get_input(command, elastic_modulus, poissons_ratio, beta, m, pt, a0, e0, lambda, kappa)) {
+            suanpan_error("A valid parameter is required.\n");
             return;
         }
 
@@ -1507,7 +1471,12 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<ExpCC>(tag, elastic_modulus, poissons_ratio, beta, m, pt, a0, e0, lambda, kappa, density);
+        if(std::fabs(lambda) < std::fabs(kappa)) {
+            suanpan_error("The inelastic slope (lambda) must be greater than the elastic slope (kappa).\n");
+            return;
+        }
+
+        return_obj = std::make_unique<ExpCC>(tag, std::fabs(elastic_modulus), std::fabs(poissons_ratio), std::fabs(beta), std::fabs(m), std::fabs(pt), std::fabs(a0), std::fabs(e0), std::fabs(lambda), std::fabs(kappa), density);
     }
 
     void new_customcc(unique_ptr<Material>& return_obj, std::istringstream& command) {
