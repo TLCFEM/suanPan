@@ -60,13 +60,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
     auto try_bisection = false;
     while(true) {
         if(max_iteration == ++counter) {
-            if(try_bisection) {
-                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-                return SUANPAN_FAIL;
-            }
-
             try_bisection = true;
-            counter = 2u;
 
             const auto approx_update = [&](const double gm) {
                 gamma = gm;
@@ -101,7 +95,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(incre);
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * (1. + yield_stress.max()) || (inf_norm(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * (1. + yield_stress.max()) || (inf_norm(residual) < tolerance && counter > 5u) || try_bisection) {
             plastic_strain += gamma * n;
 
             mat::fixed<7, 6> left(fill::none), right(fill::zeros);
@@ -114,7 +108,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        gamma -= incre(sa);
+        gamma = std::max(0., gamma - incre(sa));
         trial_stress -= incre(sb);
     }
 }
