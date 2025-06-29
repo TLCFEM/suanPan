@@ -32,7 +32,7 @@
 #ifndef TIMBERPD_H
 #define TIMBERPD_H
 
-#include "BilinearHoffman.h"
+#include "BilinearOrthotropic.h"
 
 struct DataTimberPD {
     const double ini_r_t, b_t, m_t, ini_r_c, b_c, m_c;

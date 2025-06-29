@@ -29,12 +29,12 @@
 #ifndef CUSTOMHOFFMAN_H
 #define CUSTOMHOFFMAN_H
 
-#include "NonlinearHoffman.h"
+#include "NonlinearOrthotropic.h"
 
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 
-class CustomHoffman final : public NonlinearHoffman {
+class CustomHoffman final : public NonlinearOrthotropic {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
 

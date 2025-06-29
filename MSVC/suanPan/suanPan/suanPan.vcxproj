@@ -399,11 +399,8 @@
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\NLE3D01.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\Yeoh.cpp" />
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.cpp" />
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.cpp" />
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.cpp" />
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Hoffman\TimberPD.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Material3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.cpp" />
@@ -874,11 +871,8 @@
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\NLE3D01.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\Yeoh.h" />
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.h" />
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.h" />
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.h" />
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearOrthotropic.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Hoffman\TimberPD.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Material3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.h" />

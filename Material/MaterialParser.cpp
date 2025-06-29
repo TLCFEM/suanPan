@@ -565,7 +565,7 @@ namespace {
         return_obj = std::make_unique<BilinearElastic1D>(tag, elastic_modulus, yield_stress, hardening_ratio, radius, density);
     }
 
-    void new_bilinearhoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    void new_bilinearorthotropic(unique_ptr<Material>& return_obj, std::istringstream& command, const bool is_hoffman) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -606,7 +606,8 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<BilinearHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
+        if(is_hoffman) return_obj = std::make_unique<BilinearHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
+        else return_obj = std::make_unique<BilinearTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
     }
 
     void new_bilinearj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -1637,7 +1638,7 @@ namespace {
         return_obj = std::make_unique<CustomGurson1D>(tag, expression_tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
     }
 
-    void new_exphoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    void new_exporthotropic(unique_ptr<Material>& return_obj, std::istringstream& command, const bool is_hoffman) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1680,7 +1681,8 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<ExpHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
+        if(is_hoffman) return_obj = std::make_unique<ExpHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
+        else return_obj = std::make_unique<ExpTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
     }
 
     void new_customhoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -3419,7 +3421,8 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
-    else if(is_equal(material_id, "BilinearHoffman")) new_bilinearhoffman(new_material, command);
+    else if(is_equal(material_id, "BilinearHoffman")) new_bilinearorthotropic(new_material, command, true);
+    else if(is_equal(material_id, "BilinearTsaiWu")) new_bilinearorthotropic(new_material, command, false);
     else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
     else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
     else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
@@ -3464,7 +3467,8 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
     else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
     else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
-    else if(is_equal(material_id, "ExpHoffman")) new_exphoffman(new_material, command);
+    else if(is_equal(material_id, "ExpHoffman")) new_exporthotropic(new_material, command, true);
+    else if(is_equal(material_id, "ExpTsaiWu")) new_exporthotropic(new_material, command, false);
     else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
     else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);
     else if(is_equal(material_id, "Flag01")) new_flag01(new_material, command);

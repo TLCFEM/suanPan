@@ -15,20 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "NonlinearHoffman.h"
+#include "NonlinearOrthotropic.h"
 
 #include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 
-const double NonlinearHoffman::root_two_third = std::sqrt(2. / 3.);
-const uword NonlinearHoffman::sa{0};
-const span NonlinearHoffman::sb{1, 6};
+const double NonlinearOrthotropic::root_two_third = std::sqrt(2. / 3.);
+const uword NonlinearOrthotropic::sa{0};
+const span NonlinearOrthotropic::sb{1, 6};
 
-NonlinearHoffman::NonlinearHoffman(const unsigned T, vec&& EE, vec&& VV, vec&& SS, const double R)
-    : DataNonlinearHoffman{std::move(EE), std::move(VV), std::move(SS)}
-    , Material3D(T, R) { transform::hoffman_projection(yield_stress, proj_a, proj_b); }
+NonlinearOrthotropic::NonlinearOrthotropic(const unsigned T, const OrthotropicType TP, vec&& EE, vec&& VV, vec&& SS, const double R)
+    : DataNonlinearOrthotropic{std::move(EE), std::move(VV), std::move(SS)}
+    , Material3D(T, R) {
+    switch(TP) {
+    case OrthotropicType::Hoffman:
+        transform::hoffman_projection(yield_stress, proj_a, proj_b);
+        break;
+    case OrthotropicType::TsaiWu:
+        transform::tsai_wu_projection(yield_stress, proj_a, proj_b);
+        break;
+    }
+}
 
-int NonlinearHoffman::initialize(const shared_ptr<DomainBase>&) {
+int NonlinearOrthotropic::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::orthotropic_stiffness(modulus, ratio);
 
     elastic_a = initial_stiffness * proj_a;
@@ -38,7 +47,7 @@ int NonlinearHoffman::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-int NonlinearHoffman::update_trial_status(const vec& t_strain) {
+int NonlinearOrthotropic::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
@@ -113,7 +122,7 @@ int NonlinearHoffman::update_trial_status(const vec& t_strain) {
     }
 }
 
-int NonlinearHoffman::clear_status() {
+int NonlinearOrthotropic::clear_status() {
     current_strain.zeros();
     current_stress.zeros();
     current_history = initial_history;
@@ -121,7 +130,7 @@ int NonlinearHoffman::clear_status() {
     return reset_status();
 }
 
-int NonlinearHoffman::commit_status() {
+int NonlinearOrthotropic::commit_status() {
     current_strain = trial_strain;
     current_stress = trial_stress;
     current_history = trial_history;
@@ -129,7 +138,7 @@ int NonlinearHoffman::commit_status() {
     return SUANPAN_SUCCESS;
 }
 
-int NonlinearHoffman::reset_status() {
+int NonlinearOrthotropic::reset_status() {
     trial_strain = current_strain;
     trial_stress = current_stress;
     trial_history = current_history;
@@ -137,6 +146,7 @@ int NonlinearHoffman::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearHoffman::print() {
-    suanpan_info("A 3D nonlinear hardening model using Hoffman yielding criterion.\n");
-}
+void NonlinearOrthotropic::print() { suanpan_info("A 3D nonlinear hardening model using orthotropic yielding criterion.\n"); }
+
+NonlinearHill::NonlinearHill(const unsigned T, vec&& EE, vec&& VV, vec&& S, const double R)
+    : NonlinearOrthotropic(T, OrthotropicType::Hoffman, std::move(EE), std::move(VV), vec{S(0), S(0), S(1), S(1), S(2), S(2), S(3), S(4), S(5)}, R) {}

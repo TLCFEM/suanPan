@@ -120,6 +120,7 @@ namespace tensor {
 } // namespace tensor
 
 namespace transform {
+    void tsai_wu_projection(const vec&, mat&, mat&);
     void hoffman_projection(const vec&, mat&, mat&);
     mat hill_projection(double, double, double, double, double, double);
 

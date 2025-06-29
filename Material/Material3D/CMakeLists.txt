@@ -23,11 +23,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         Elastic/NLE3D01.cpp
         Elastic/OrthotropicElastic3D.cpp
         Elastic/Yeoh.cpp
-        Hoffman/BilinearHoffman.cpp
         Hoffman/CustomHoffman.cpp
-        Hoffman/ExpHoffman.cpp
-        Hoffman/NonlinearHill.cpp
-        Hoffman/NonlinearHoffman.cpp
+        Hoffman/NonlinearOrthotropic.cpp
         Hoffman/TimberPD.cpp
         Material3D.cpp
         Sand/DafaliasManzari.cpp

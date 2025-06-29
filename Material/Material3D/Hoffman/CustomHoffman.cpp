@@ -25,7 +25,7 @@ double CustomHoffman::compute_k(const double p_strain) const { return k_expressi
 double CustomHoffman::compute_dk(const double p_strain) const { return k_expression->gradient(p_strain).at(0); }
 
 CustomHoffman::CustomHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const unsigned KT, const double R)
-    : NonlinearHoffman(T, std::move(E), std::move(V), std::move(S), R)
+    : NonlinearOrthotropic(T, OrthotropicType::Hoffman, std::move(E), std::move(V), std::move(S), R)
     , k_tag(KT) {}
 
 int CustomHoffman::initialize(const shared_ptr<DomainBase>& D) {
@@ -46,11 +46,9 @@ int CustomHoffman::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    return NonlinearHoffman::initialize(D);
+    return NonlinearOrthotropic::initialize(D);
 }
 
 unique_ptr<Material> CustomHoffman::get_copy() { return std::make_unique<CustomHoffman>(*this); }
 
-void CustomHoffman::print() {
-    suanpan_info("A 3D nonlinear Hoffman model using custom hardening function.\n");
-}
+void CustomHoffman::print() { suanpan_info("A 3D nonlinear Hoffman model using custom hardening function.\n"); }

@@ -9,7 +9,7 @@ node 6 5 5 5
 node 7 -5 5 5
 node 8 -5 -5 5
 
-material ExpHoffman 1 1E5 1E5 1E5 1E5 1E5 1E5 .3 .3 .3 400 300 400 300 250 200 200 200 200 2 4
+material ExpTsaiWu 1 1E5 1E5 1E5 1E5 1E5 1E5 .3 .3 .3 400 300 400 300 250 200 200 200 200 2 4
 
 element C3D8 1 1 2 3 4 5 6 7 8 1 G
 
@@ -34,9 +34,9 @@ peek element 1
 # Coordinate:
 #   5.0000e+00 -5.0000e+00  5.0000e+00
 # Displacement:
-#  -2.6352e-02  2.0000e-01  6.2136e-02
+#  -1.9382e-02  2.0000e-01  6.8688e-02
 # Resistance:
-#   2.5935e-13  5.6473e+03  7.3896e-13
+#  -1.8971e-12  4.7140e+03  2.2169e-12
 peek node 5
 
 # save recorder 1
