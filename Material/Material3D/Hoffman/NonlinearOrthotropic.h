@@ -18,10 +18,10 @@
  * @class NonlinearOrthotropic
  * @brief The NonlinearOrthotropic class.
  *
- * algorithm verified at 29 June 2025 by tlc
+ * algorithm verified on 29 June 2025 by tlc
  *
  * @author tlc
- * @date 29/06/2025
+ * @date 30/06/2025
  * @version 1.0.0
  * @file NonlinearOrthotropic.h
  * @addtogroup Material-3D
@@ -33,11 +33,6 @@
 
 #include <Material/Material3D/Material3D.h>
 
-enum class OrthotropicType {
-    Hoffman,
-    TsaiWu
-};
-
 struct DataNonlinearOrthotropic {
     const vec modulus, ratio, yield_stress;
 };
@@ -46,16 +41,19 @@ class NonlinearOrthotropic : protected DataNonlinearOrthotropic, public Material
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
     static constexpr unsigned max_iteration = 20u;
-    static const uword sa;
+    static constexpr uword sa{0};
     static const span sb;
 
-    mat elastic_a;
+    mat proj_p, proj_q, elastic_p;
 
     [[nodiscard]] virtual double compute_k(double) const = 0;
     [[nodiscard]] virtual double compute_dk(double) const = 0;
 
 protected:
-    mat proj_a, proj_b;
+    enum class OrthotropicType {
+        Hoffman,
+        TsaiWu
+    };
 
 public:
     NonlinearOrthotropic(
