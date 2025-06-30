@@ -71,9 +71,9 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(characteristic_length) = sqrt(area::shoelace(ele_coor));
 
     access::rw(iso_mapping) = trans(mapping * ele_coor);
-
+    // clang-format off
     const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationType::IRONS : scheme == 'L' ? IntegrationType::LOBATTO : IntegrationType::GAUSS);
-
+    // clang-format on
     const auto diff_coor = form_diff_coor(ele_coor);
 
     const auto jacob_trans = form_transformation(shape::quad(vec{0., 0.}, 1) * ele_coor);

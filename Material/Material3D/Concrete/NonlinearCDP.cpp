@@ -24,10 +24,12 @@
 const double NonlinearCDP::root_three_two = std::sqrt(1.5);
 const mat NonlinearCDP::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
+// clang-format off
 double NonlinearCDP::compute_r(const vec3& in) {
     const auto r = .5 + .5 * accu(in) / accu(abs(in));
     return !std::isfinite(r) || r < 0. ? .0 : r > 1. ? 1. : r;
 }
+// clang-format on
 
 vec3 NonlinearCDP::compute_dr(const vec3& in) {
     const auto g = accu(abs(in));
