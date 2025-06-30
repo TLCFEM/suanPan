@@ -37,7 +37,7 @@ analyze
 # Displacement:
 #   0.0000e+00  0.0000e+00  5.0000e-02
 # Resistance:
-#   3.3014e-13 -3.5623e-13  6.9311e+03
+#   2.2608e-13  9.8759e-14  6.9317e+03
 peek node 5
 
 # save recorder 1
