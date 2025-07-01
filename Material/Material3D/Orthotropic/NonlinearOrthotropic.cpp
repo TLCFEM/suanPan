@@ -37,7 +37,7 @@ NonlinearOrthotropic::NonlinearOrthotropic(const unsigned T, const OrthotropicTy
 
     // a quite arbitrary and empirical value that does not necessarily imply any physical meaning
     // just to provide a threshold to switch between two integration methods
-    reference_strain = .2 * min(vec{.5 * (yield_stress(0) + yield_stress(1)), .5 * (yield_stress(2) + yield_stress(3)), .5 * (yield_stress(4) + yield_stress(5)), yield_stress(6), yield_stress(7), yield_stress(8)} / modulus);
+    reference_strain = min(vec{.5 * (yield_stress(0) + yield_stress(1)), .5 * (yield_stress(2) + yield_stress(3)), .5 * (yield_stress(4) + yield_stress(5)), yield_stress(6), yield_stress(7), yield_stress(8)} / modulus);
 }
 
 int NonlinearOrthotropic::initialize(const shared_ptr<DomainBase>&) {
