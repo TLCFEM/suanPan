@@ -46,8 +46,15 @@ class NonlinearOrthotropic : protected DataNonlinearOrthotropic, public Material
 
     mat proj_p, proj_q, elastic_p;
 
+    double reference_strain{0.};
+
     [[nodiscard]] virtual double compute_k(double) const = 0;
     [[nodiscard]] virtual double compute_dk(double) const = 0;
+
+    auto ortho_inner(const auto& t_stress) const { return .5 * dot(t_stress, proj_p * t_stress) + dot(t_stress, proj_q); }
+
+    [[nodiscard]] int trapezoidal_return();
+    [[nodiscard]] int euler_return();
 
 protected:
     enum class OrthotropicType {

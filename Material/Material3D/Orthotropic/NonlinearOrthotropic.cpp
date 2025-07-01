@@ -34,6 +34,10 @@ NonlinearOrthotropic::NonlinearOrthotropic(const unsigned T, const OrthotropicTy
         transform::tsai_wu_projection(yield_stress, proj_p, proj_q);
         break;
     }
+
+    // a quite arbitrary and empirical value that does not necessarily imply any physical meaning
+    // just to provide a threshold to switch between two integration methods
+    reference_strain = tensor::strain::norm(vec{.5 * (yield_stress(0) + yield_stress(1)), .5 * (yield_stress(2) + yield_stress(3)), .5 * (yield_stress(4) + yield_stress(5)), yield_stress(6), yield_stress(7), yield_stress(8)} / modulus);
 }
 
 int NonlinearOrthotropic::initialize(const shared_ptr<DomainBase>&) {
@@ -49,10 +53,14 @@ int NonlinearOrthotropic::initialize(const shared_ptr<DomainBase>&) {
 int NonlinearOrthotropic::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
+    const auto norm_incre_strain = tensor::strain::norm(incre_strain);
 
-    const auto ortho_inner = [&](const auto& t_stress) { return .5 * dot(t_stress, proj_p * t_stress) + dot(t_stress, proj_q); };
+    if(norm_incre_strain <= datum::eps) return SUANPAN_SUCCESS;
 
+    return norm_incre_strain < reference_strain ? trapezoidal_return() : euler_return();
+}
+
+int NonlinearOrthotropic::trapezoidal_return() {
     trial_history = current_history;
     const auto& current_ep = current_history(0);
     auto& ep = trial_history(0);
@@ -123,7 +131,7 @@ int NonlinearOrthotropic::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
-        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
+        suanpan_debug("Local plasticity iteration (2nd) error: {:.5E}.\n", error);
 
         if(error < tolerance * (1. + yield_stress.max()) || (inf_norm(residual) < tolerance && counter > 5u) || try_bisection) {
             plastic_strain += gamma * n_mid;
@@ -138,6 +146,78 @@ int NonlinearOrthotropic::update_trial_status(const vec& t_strain) {
             if(!solve(left, jacobian, right, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
             trial_stiffness = left.rows(sb) * initial_stiffness;
+
+            return SUANPAN_SUCCESS;
+        }
+
+        gamma = std::max(0., gamma - incre(sa));
+        trial_stress -= incre(sb);
+    }
+}
+
+int NonlinearOrthotropic::euler_return() {
+    trial_history = current_history;
+    const auto& current_ep = current_history(0);
+    auto& ep = trial_history(0);
+    vec plastic_strain(&trial_history(1), 6, false, true);
+
+    const vec6 predictor_s = trial_stress = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain);
+
+    // elastic region
+    if(ortho_inner(predictor_s) <= std::pow(compute_k(current_ep), 2.)) return SUANPAN_SUCCESS;
+
+    auto gamma{0.};
+
+    vec7 incre(fill::none), residual(fill::none);
+    mat77 jacobian(fill::none);
+
+    auto counter{0u};
+    auto try_bisection{false};
+    while(true) {
+        if(max_iteration == ++counter) {
+            try_bisection = true;
+
+            const vec6 elastic_q = initial_stiffness * proj_q;
+
+            const auto approx_update = [&](const double gm) {
+                gamma = gm;
+                const vec6 approx_a = proj_p * (trial_stress = solve(eye(6, 6) + gamma * elastic_p, predictor_s - gamma * elastic_q));
+                const auto approx_k = compute_k(ep = current_ep + gamma * root_two_third * tensor::strain::norm(approx_a + proj_q));
+                return .5 * dot(trial_stress, approx_a) + dot(trial_stress, proj_q) - approx_k * approx_k;
+            };
+
+            ridders_guess(approx_update, 0., .25 * tensor::strain::norm(incre_strain) / tensor::strain::norm(proj_p * predictor_s + proj_q), tolerance);
+        }
+
+        const vec6 n = proj_p * trial_stress + proj_q;
+        const auto norm_n = root_two_third * tensor::strain::norm(n);
+        const rowvec6 pnn = two_third / norm_n * (n % tensor::strain::norm_weight).t(); // part of some derivative
+        const auto k = compute_k(ep = current_ep + gamma * norm_n);
+
+        residual(sa) = ortho_inner(trial_stress) - k * k;
+        residual(sb) = trial_stress + gamma * initial_stiffness * n - predictor_s;
+
+        const auto pk = -2. * k * compute_dk(ep);
+
+        jacobian(sa, sa) = pk * norm_n;
+        jacobian(sa, sb) = n.t() + pk * gamma * pnn * proj_p;
+        jacobian(sb, sa) = initial_stiffness * n;
+        jacobian(sb, sb) = eye(6, 6) + gamma * elastic_p;
+
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
+
+        const auto error = inf_norm(incre);
+        suanpan_debug("Local plasticity iteration (1st) error: {:.5E}.\n", error);
+
+        if(error < tolerance * (1. + yield_stress.max()) || (inf_norm(residual) < tolerance && counter > 5u) || try_bisection) {
+            plastic_strain += gamma * n;
+
+            mat::fixed<7, 6> left(fill::none), right(fill::zeros);
+            right.rows(sb) = initial_stiffness;
+
+            if(!solve(left, jacobian, right, solve_opts::equilibrate)) return SUANPAN_FAIL;
+
+            trial_stiffness = left.rows(sb);
 
             return SUANPAN_SUCCESS;
         }
