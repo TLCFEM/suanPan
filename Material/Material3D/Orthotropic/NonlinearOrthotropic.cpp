@@ -88,6 +88,8 @@ int NonlinearOrthotropic::trapezoidal_return() {
     }
     else onset_n = proj_p * (onset_s = base_s) + proj_q;
 
+    const auto norm_incre_strain = tensor::strain::norm(incre_strain);
+
     auto gamma{0.};
 
     vec7 incre(fill::none), residual(fill::none);
@@ -109,7 +111,12 @@ int NonlinearOrthotropic::trapezoidal_return() {
                 return .5 * dot(trial_stress, approx_a) + dot(trial_stress, proj_q) - approx_k * approx_k;
             };
 
-            ridders_guess(approx_update, 0., .25 * tensor::strain::norm(incre_strain) / tensor::strain::norm(proj_p * predictor_s + proj_q), tolerance);
+            ridders_guess(approx_update, 0., .25 * norm_incre_strain / tensor::strain::norm(proj_p * predictor_s + proj_q), tolerance);
+
+            if(gamma * tensor::strain::norm(proj_p * trial_stress + const_a) > 2. * norm_incre_strain) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
+            }
         }
 
         const vec6 n = proj_p * trial_stress + proj_q;
@@ -166,6 +173,8 @@ int NonlinearOrthotropic::euler_return() {
     // elastic region
     if(ortho_inner(predictor_s) <= std::pow(compute_k(current_ep), 2.)) return SUANPAN_SUCCESS;
 
+    const auto norm_incre_strain = tensor::strain::norm(incre_strain);
+
     auto gamma{0.};
 
     vec7 incre(fill::none), residual(fill::none);
@@ -186,7 +195,12 @@ int NonlinearOrthotropic::euler_return() {
                 return .5 * dot(trial_stress, approx_a) + dot(trial_stress, proj_q) - approx_k * approx_k;
             };
 
-            ridders_guess(approx_update, 0., .25 * tensor::strain::norm(incre_strain) / tensor::strain::norm(proj_p * predictor_s + proj_q), tolerance);
+            ridders_guess(approx_update, 0., .25 * norm_incre_strain / tensor::strain::norm(proj_p * predictor_s + proj_q), tolerance);
+
+            if(gamma * tensor::strain::norm(proj_p * trial_stress + proj_q) > norm_incre_strain) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
+            }
         }
 
         const vec6 n = proj_p * trial_stress + proj_q;
