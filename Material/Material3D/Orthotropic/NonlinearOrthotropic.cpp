@@ -78,12 +78,15 @@ int NonlinearOrthotropic::trapezoidal_return() {
     vec6 onset_s, onset_n;
     mat66 dnds;
 
-    const auto inside_surface = ortho_inner(base_s) < current_k * current_k;
+    const auto base_f = ortho_inner(base_s) - current_k * current_k;
+    const auto inside_surface = std::signbit(base_f);
     if(inside_surface) {
         // elastic loading to plastic
         // need to find the onset point
-        const auto onset_r = ridders([&](const double r) { return ortho_inner(onset_s = base_s + r * incre_s) - current_k * current_k; }, 0., 1., tolerance);
-        onset_n = proj_p * onset_s + proj_q;
+        const auto quadratic_a = dot(incre_s, proj_p * incre_s);
+        const auto quadratic_b = dot(incre_s, proj_p * base_s + proj_q);
+        const auto onset_r = (std::sqrt(quadratic_b * quadratic_b - 2. * quadratic_a * base_f) - quadratic_b) / quadratic_a;
+        onset_n = proj_p * (onset_s = base_s + onset_r * incre_s) + proj_q;
         dnds = proj_p * (onset_r * eye(6, 6) - onset_r / dot(onset_n, incre_s) * incre_s * onset_n.t());
     }
     else onset_n = proj_p * (onset_s = base_s) + proj_q;
