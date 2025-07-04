@@ -56,8 +56,8 @@ mat tensor::orthotropic_stiffness(const vec& modulus, const vec& poissons_ratio)
     mat stiffness(6, 6, fill::zeros);
     stiffness(span(0, 2), span(0, 2)) = inv(t_mat);
     stiffness(3, 3) = G12;
-    stiffness(4, 4) = G13;
-    stiffness(5, 5) = G23;
+    stiffness(4, 4) = G23;
+    stiffness(5, 5) = G13;
 
     return stiffness;
 }
