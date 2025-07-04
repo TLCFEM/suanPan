@@ -5,6 +5,10 @@
 1. Eigenanalysis does not support distributed computation.
 2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 3.9
+
+1. fix computation of elasticity matrix in orthotropic materials [#280](https://github.com/TLCFEM/suanPan/pull/280)
+
 ## version 3.8
 
 1. add optional hourglassing control for `CP4R` and `C3D8R` elements
