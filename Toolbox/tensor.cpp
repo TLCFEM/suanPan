@@ -33,24 +33,31 @@ mat tensor::isotropic_stiffness(const double modulus, const double poissons_rati
 }
 
 mat tensor::orthotropic_stiffness(const vec& modulus, const vec& poissons_ratio) {
+    const auto& E1 = modulus(0);
+    const auto& E2 = modulus(1);
+    const auto& E3 = modulus(2);
+    const auto& G12 = modulus(3);
+    const auto& G23 = modulus(4);
+    const auto& G13 = modulus(5);
+
+    const auto& V12 = poissons_ratio(0);
+    const auto& V23 = poissons_ratio(1);
+    const auto& V13 = poissons_ratio(2);
+
     mat t_mat(3, 3);
-    t_mat(0, 0) = 1. / modulus(0);
-    t_mat(1, 0) = -poissons_ratio(0) * t_mat(0, 0);
-    t_mat(2, 0) = -poissons_ratio(2) * t_mat(0, 0);
+    t_mat(0, 0) = 1. / E1;
+    t_mat(1, 1) = 1. / E2;
+    t_mat(2, 2) = 1. / E3;
 
-    t_mat(1, 1) = 1. / modulus(1);
-    t_mat(0, 1) = -poissons_ratio(0) * t_mat(1, 1);
-    t_mat(2, 1) = -poissons_ratio(1) * t_mat(1, 1);
-
-    t_mat(2, 2) = 1. / modulus(2);
-    t_mat(0, 2) = -poissons_ratio(2) * t_mat(2, 2);
-    t_mat(1, 2) = -poissons_ratio(1) * t_mat(2, 2);
+    t_mat(0, 1) = t_mat(1, 0) = -V12 / E1;
+    t_mat(0, 2) = t_mat(2, 0) = -V13 / E1;
+    t_mat(1, 2) = t_mat(2, 1) = -V23 / E2;
 
     mat stiffness(6, 6, fill::zeros);
     stiffness(span(0, 2), span(0, 2)) = inv(t_mat);
-    stiffness(3, 3) = modulus(3);
-    stiffness(4, 4) = modulus(4);
-    stiffness(5, 5) = modulus(5);
+    stiffness(3, 3) = G12;
+    stiffness(4, 4) = G13;
+    stiffness(5, 5) = G23;
 
     return stiffness;
 }
