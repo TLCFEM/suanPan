@@ -244,7 +244,13 @@
       "trigger": "BilinearHoffman",
       "details": "bilinear hoffman material",
       "kind": "type",
-      "contents": "material BilinearHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{zx}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
+      "contents": "material BilinearHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
+    },
+    {
+      "trigger": "BilinearTsaiWu",
+      "details": "bilinear tsai-wu material",
+      "kind": "type",
+      "contents": "material BilinearTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
     },
     {
       "trigger": "BilinearJ2",
@@ -664,7 +670,7 @@
       "trigger": "CustomHoffman",
       "details": "hoffman model with custom isotropic hardening",
       "kind": "type",
-      "contents": "material CustomHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xx}, v_{yy}, v_{zz}\n# (11...19) double, nine yield stress\n# (20) int, hardening expression tag\n# [21] double, density, default: 0.0"
+      "contents": "material CustomHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) int, hardening expression tag\n# [21] double, density, default: 0.0"
     },
     {
       "trigger": "CustomJ2",
@@ -892,7 +898,13 @@
       "trigger": "ExpHoffman",
       "details": "hoffman model with exponential isotropic hardening",
       "kind": "type",
-      "contents": "material ExpHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xx}, v_{yy}, v_{zz}\n# (11...19) double, nine yield stress\n# (20) double, a\n# (21) double, b\n# [22] double, density, default: 0.0"
+      "contents": "material ExpHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) double, a, saturation\n# (21) double, b, saturation rate\n# [22] double, density, default: 0.0"
+    },
+    {
+      "trigger": "ExpTsaiWu",
+      "details": "tsai-wu model with exponential isotropic hardening",
+      "kind": "type",
+      "contents": "material ExpTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) double, a, saturation\n# (21) double, b, saturation rate\n# [22] double, density, default: 0.0"
     },
     {
       "trigger": "ExpJ2",
@@ -2086,7 +2098,7 @@
       "trigger": "TimberPD",
       "details": "plastic damage model for timber",
       "kind": "type",
-      "contents": "material TimberPD ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20...26)} ${6:[27]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{zx}\n# (11...19) double, nine yield stresses\n# (20...26) double, hardening parameters\n# [27] double, density, default: 0.0"
+      "contents": "material TimberPD ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20...26)} ${6:[27]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# (20...26) double, hardening parameters\n# [27] double, density, default: 0.0"
     },
     {
       "trigger": "TranslationConnector2D",
