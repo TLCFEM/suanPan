@@ -1685,7 +1685,7 @@ namespace {
         else return_obj = std::make_unique<ExpTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
     }
 
-    void new_customhoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    void new_customorthotropic(unique_ptr<Material>& return_obj, std::istringstream& command, const bool is_hoffman) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1724,7 +1724,8 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<CustomHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
+        if(is_hoffman) return_obj = std::make_unique<CustomHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
+        else return_obj = std::make_unique<CustomTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
     }
 
     void new_expj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -3450,7 +3451,8 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
     else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
     else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
-    else if(is_equal(material_id, "CustomHoffman")) new_customhoffman(new_material, command);
+    else if(is_equal(material_id, "CustomHoffman")) new_customorthotropic(new_material, command, true);
+    else if(is_equal(material_id, "CustomTsaiWu")) new_customorthotropic(new_material, command, false);
     else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "CustomMises1D")) new_custommises1d(new_material, command);
     else if(is_equal(material_id, "CustomStrainDegradation")) new_customdegradation(new_material, command, true);

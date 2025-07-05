@@ -24,7 +24,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Elastic/OrthotropicElastic3D.cpp
         Elastic/Yeoh.cpp
         Material3D.cpp
-        Orthotropic/CustomHoffman.cpp
+        Orthotropic/CustomOrthotropic.cpp
         Orthotropic/NonlinearOrthotropic.cpp
         Orthotropic/TimberPD.cpp
         Sand/DafaliasManzari.cpp

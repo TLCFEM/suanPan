@@ -1582,13 +1582,13 @@
     <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GSSE.cpp">
       <Filter>Solver\Integrator\Explicit</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\CustomHoffman.cpp">
-      <Filter>Material\Material3D\Orthotropic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\NonlinearOrthotropic.cpp">
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\TimberPD.cpp">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.cpp">
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2974,9 +2974,6 @@
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\BilinearOrthotropic.h">
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\CustomHoffman.h">
-      <Filter>Material\Material3D\Orthotropic</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\ExpOrthotropic.h">
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClInclude>
@@ -2984,6 +2981,9 @@
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\TimberPD.h">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.h">
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClInclude>
   </ItemGroup>

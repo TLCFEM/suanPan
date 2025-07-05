@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "CustomHoffman.h"
+#include "CustomOrthotropic.h"
 
 #include <Domain/DomainBase.h>
 #include <Toolbox/utility.h>
 
-double CustomHoffman::compute_k(const double p_strain) const { return k_expression->evaluate(p_strain).at(0); }
+double CustomOrthotropic::compute_k(const double p_strain) const { return k_expression->evaluate(p_strain).at(0); }
 
-double CustomHoffman::compute_dk(const double p_strain) const { return k_expression->gradient(p_strain).at(0); }
+double CustomOrthotropic::compute_dk(const double p_strain) const { return k_expression->gradient(p_strain).at(0); }
 
-CustomHoffman::CustomHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const unsigned KT, const double R)
-    : NonlinearOrthotropic(T, OrthotropicType::Hoffman, std::move(E), std::move(V), std::move(S), R)
+CustomOrthotropic::CustomOrthotropic(const unsigned T, const OrthotropicType TP, vec&& E, vec&& V, vec&& S, const unsigned KT, const double R)
+    : NonlinearOrthotropic(T, TP, std::move(E), std::move(V), std::move(S), R)
     , k_tag(KT) {}
 
-int CustomHoffman::initialize(const shared_ptr<DomainBase>& D) {
+int CustomOrthotropic::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find_expression(k_tag)) {
         suanpan_error("Cannot find the assigned expression with tag {}.\n", k_tag);
         return SUANPAN_FAIL;
@@ -42,13 +42,11 @@ int CustomHoffman::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     if(!suanpan::approx_equal(1., k_expression->evaluate(0.).at(0))) {
-        suanpan_error("The assigned expression {} does not evaluates to unity for trial plastic strain.\n", k_tag);
+        suanpan_error("The assigned expression {} does not evaluates to unity for trivial plastic strain.\n", k_tag);
         return SUANPAN_FAIL;
     }
 
     return NonlinearOrthotropic::initialize(D);
 }
 
-unique_ptr<Material> CustomHoffman::get_copy() { return std::make_unique<CustomHoffman>(*this); }
-
-void CustomHoffman::print() { suanpan_info("A 3D nonlinear Hoffman model using custom hardening function.\n"); }
+void CustomOrthotropic::print() { suanpan_info("A 3D nonlinear orthotropic model using custom hardening function.\n"); }

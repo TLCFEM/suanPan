@@ -23,7 +23,7 @@
 #include "Elastic/OrthotropicElastic3D.h"
 #include "Elastic/Yeoh.h"
 #include "Orthotropic/BilinearOrthotropic.h"
-#include "Orthotropic/CustomHoffman.h"
+#include "Orthotropic/CustomOrthotropic.h"
 #include "Orthotropic/ExpOrthotropic.h"
 #include "Orthotropic/NonlinearOrthotropic.h"
 #include "Orthotropic/TimberPD.h"
