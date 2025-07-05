@@ -657,7 +657,7 @@ vec transform::eigen_fraction(const vec& principal_stress) {
     const auto compute = [&principal_stress](const unsigned i, const unsigned j) {
         const auto a = principal_stress(i), b = principal_stress(j);
 
-        if(const auto fraction = 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); std::isfinite(fraction) && fraction >= 0. && fraction <= 2.) return fraction;
+        if(const auto fraction = (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); std::isfinite(fraction)) return 2. * suanpan::clamp_unit(fraction);
 
         return a + b <= 0. ? 0. : 2.;
     };
