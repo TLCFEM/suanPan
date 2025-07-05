@@ -75,7 +75,7 @@ int NonlinearOrthotropic::trapezoidal_return() {
     // elastic region
     if(ortho_inner(predictor_s) <= current_k * current_k) return SUANPAN_SUCCESS;
 
-    vec6 onset_s, onset_n;
+    vec6 onset_n = proj_p * base_s + proj_q;
     mat66 dnds;
 
     const auto base_f = ortho_inner(base_s) - current_k * current_k;
@@ -84,14 +84,11 @@ int NonlinearOrthotropic::trapezoidal_return() {
         // elastic loading to plastic
         // need to find the onset point
         const auto quadratic_a = dot(incre_s, proj_p * incre_s);
-        const auto quadratic_b = dot(incre_s, proj_p * base_s + proj_q);
+        const auto quadratic_b = dot(incre_s, onset_n);
         const auto onset_r = (std::sqrt(quadratic_b * quadratic_b - 2. * quadratic_a * base_f) - quadratic_b) / quadratic_a;
-        onset_n = proj_p * (onset_s = base_s + onset_r * incre_s) + proj_q;
+        onset_n += proj_p * incre_s * onset_r;
         dnds = proj_p * (onset_r * eye(6, 6) - onset_r / dot(onset_n, incre_s) * incre_s * onset_n.t());
     }
-    else onset_n = proj_p * (onset_s = base_s) + proj_q;
-
-    const auto norm_incre_strain = tensor::strain::norm(incre_strain);
 
     auto gamma{0.};
 
@@ -113,6 +110,8 @@ int NonlinearOrthotropic::trapezoidal_return() {
                 const auto approx_k = compute_k(ep = current_ep + .5 * gamma * root_two_third * tensor::strain::norm(approx_a + const_a));
                 return .5 * dot(trial_stress, approx_a) + dot(trial_stress, proj_q) - approx_k * approx_k;
             };
+
+            const auto norm_incre_strain = tensor::strain::norm(incre_strain);
 
             ridders_guess(approx_update, 0., .25 * norm_incre_strain / tensor::strain::norm(proj_p * predictor_s + proj_q), tolerance);
 
@@ -176,8 +175,6 @@ int NonlinearOrthotropic::euler_return() {
     // elastic region
     if(ortho_inner(predictor_s) <= std::pow(compute_k(current_ep), 2.)) return SUANPAN_SUCCESS;
 
-    const auto norm_incre_strain = tensor::strain::norm(incre_strain);
-
     auto gamma{0.};
 
     vec7 incre(fill::none), residual(fill::none);
@@ -197,6 +194,8 @@ int NonlinearOrthotropic::euler_return() {
                 const auto approx_k = compute_k(ep = current_ep + gamma * root_two_third * tensor::strain::norm(approx_a + proj_q));
                 return .5 * dot(trial_stress, approx_a) + dot(trial_stress, proj_q) - approx_k * approx_k;
             };
+
+            const auto norm_incre_strain = tensor::strain::norm(incre_strain);
 
             ridders_guess(approx_update, 0., .25 * norm_incre_strain / tensor::strain::norm(proj_p * predictor_s + proj_q), tolerance);
 
@@ -268,7 +267,7 @@ int NonlinearOrthotropic::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void NonlinearOrthotropic::print() { suanpan_info("A 3D nonlinear hardening model using an orthotropic yielding criterion.\n"); }
+void NonlinearOrthotropic::print() { suanpan_info("A 3D nonlinear hardening model using an orthotropic yielding criterion with E_1={:.5E}, E_2={:.5E}, E_3={:.5E}, G_{{12}}={:.5E}, G_{{23}}={:.5E}, G_{{13}}={:.5E}, and nu_{{12}}={:.5E}, nu_{{23}}={:.5E}, nu_{{13}}={:.5E}.\n", modulus(0), modulus(1), modulus(2), modulus(3), modulus(4), modulus(5), ratio(0), ratio(1), ratio(2)); }
 
 NonlinearHill::NonlinearHill(const unsigned T, vec&& EE, vec&& VV, vec&& S, const double R)
     : NonlinearOrthotropic(T, OrthotropicType::Hoffman, std::move(EE), std::move(VV), vec{S(0), S(0), S(1), S(1), S(2), S(2), S(3), S(4), S(5)}, R) {}
