@@ -653,13 +653,19 @@ mat transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& p
     return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;
 }
 
-mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
-    const auto get_fraction = [](const vec& p_stress) {
-        const auto compute_fraction = [](const double a, const double b) { return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); };
+vec transform::eigen_fraction(const vec& principal_stress) {
+    const auto compute = [&principal_stress](const unsigned i, const unsigned j) {
+        const auto a = principal_stress(i), b = principal_stress(j);
 
-        return vec{compute_fraction(p_stress(0), p_stress(1)), compute_fraction(p_stress(1), p_stress(2)), compute_fraction(p_stress(2), p_stress(0))};
+        if(const auto fraction = 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); std::isfinite(fraction) && fraction >= 0. && fraction <= 2.) return fraction;
+
+        return a + b <= 0. ? 0. : 2.;
     };
 
+    return vec{compute(0, 1), compute(1, 2), compute(2, 0)};
+}
+
+mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
     const mat pnn = eigen_to_tensor_base(principal_direction);
 
     std::vector<uword> tp;
@@ -669,7 +675,7 @@ mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const ma
 
     const uvec pattern = tp;
 
-    mat eigen_derivative = pnn.cols(pattern) * pnn.cols(pattern).t() + pnn.tail_cols(3) * diagmat(get_fraction(principal_stress)) * pnn.tail_cols(3).t();
+    mat eigen_derivative = pnn.cols(pattern) * pnn.cols(pattern).t() + pnn.tail_cols(3) * diagmat(eigen_fraction(principal_stress)) * pnn.tail_cols(3).t();
 
     eigen_derivative.tail_cols(3) *= 2.;
 

@@ -128,6 +128,7 @@ namespace transform {
     mat compute_jacobian_nominal_to_principal(const mat&);
     mat compute_jacobian_principal_to_nominal(const mat&);
 
+    vec eigen_fraction(const vec&);
     mat eigen_to_tensor_base(const mat&);
     mat eigen_to_tensile_stress(const vec&, const mat&);
     mat eigen_to_tensile_derivative(const vec&, const mat&);
