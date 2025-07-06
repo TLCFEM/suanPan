@@ -382,12 +382,6 @@ double tensor::strain::norm(const vec& in) {
     throw std::invalid_argument("need a valid strain vector");
 }
 
-double tensor::strain::norm(vec&& in) {
-    if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
-    if(in.n_elem == 3) return arma::norm(in);
-    throw std::invalid_argument("need a valid strain vector");
-}
-
 double tensor::strain::double_contraction(const vec& a) { return double_contraction(a, a); }
 
 double tensor::strain::double_contraction(const vec& a, const vec& b) { return dot(a % b, norm_weight); }
@@ -449,12 +443,6 @@ vec tensor::stress::to_voigt(const mat& in_stress) {
 }
 
 double tensor::stress::norm(const vec& in) {
-    if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
-    if(in.n_elem == 3) return arma::norm(in);
-    throw std::invalid_argument("need a valid stress vector");
-}
-
-double tensor::stress::norm(vec&& in) {
     if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
     if(in.n_elem == 3) return arma::norm(in);
     throw std::invalid_argument("need a valid stress vector");
