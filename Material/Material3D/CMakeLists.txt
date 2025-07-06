@@ -27,6 +27,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Orthotropic/CustomOrthotropic.cpp
         Orthotropic/NonlinearOrthotropic.cpp
         Orthotropic/TimberPD.cpp
+        Orthotropic/YLD0418P.cpp
         Sand/DafaliasManzari.cpp
         Sand/SimpleSand.cpp
         vonMises/ArmstrongFrederick.cpp

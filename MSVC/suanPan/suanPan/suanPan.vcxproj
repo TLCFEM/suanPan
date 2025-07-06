@@ -403,6 +403,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\NonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\TimberPD.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\YLD0418P.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Sand\SimpleSand.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.cpp" />
@@ -877,6 +878,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\ExpOrthotropic.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\NonlinearOrthotropic.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\TimberPD.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\YLD0418P.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Sand\SimpleSand.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.h" />

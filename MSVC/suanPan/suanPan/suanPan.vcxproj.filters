@@ -1591,6 +1591,9 @@
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.cpp">
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\YLD0418P.cpp">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
@@ -2984,6 +2987,9 @@
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.h">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\YLD0418P.h">
       <Filter>Material\Material3D\Orthotropic</Filter>
     </ClInclude>
   </ItemGroup>
