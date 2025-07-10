@@ -656,12 +656,7 @@ vec transform::eigen_fraction(const vec& principal_stress) {
 mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
     const mat pnn = eigen_to_tensor_base(principal_direction);
 
-    std::vector<uword> tp;
-    tp.reserve(principal_stress.n_elem);
-    for(auto I = 0llu; I < principal_stress.n_elem; ++I)
-        if(principal_stress(I) > 0.) tp.emplace_back(I);
-
-    const uvec pattern = tp;
+    const uvec pattern = find(principal_stress > 0.);
 
     mat eigen_derivative = pnn.cols(pattern) * pnn.cols(pattern).t() + pnn.tail_cols(3) * diagmat(eigen_fraction(principal_stress)) * pnn.tail_cols(3).t();
 
