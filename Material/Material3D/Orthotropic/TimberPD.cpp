@@ -46,7 +46,7 @@ int TimberPD::update_trial_status(const vec& t_strain) {
     mat principal_direction; // 3x3
     if(!eig_sym(principal_stress, principal_direction, tensor::stress::to_tensor(trial_stress), "std")) return SUANPAN_FAIL;
 
-    mat stiffness_t = transform::eigen_to_tensile_derivative(principal_stress, principal_direction);
+    mat stiffness_t = transform::eigen_to_tensile_derivative(principal_stress, principal_direction).second;
     mat stiffness_c = eye(6, 6) - stiffness_t;
 
     const vec sigma_t = transform::eigen_to_tensile_stress(principal_stress, principal_direction);

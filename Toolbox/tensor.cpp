@@ -649,16 +649,18 @@ vec transform::eigen_fraction(const vec& principal_stress) {
     return vec{compute(0, 1), compute(1, 2), compute(2, 0)};
 }
 
-mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
+std::pair<mat, mat> transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
     const mat pnn = eigen_to_tensor_base(principal_direction);
 
     const uvec pattern = find(principal_stress > 0.);
 
-    mat eigen_derivative = pnn.cols(pattern) * pnn.cols(pattern).t() + pnn.tail_cols(3) * diagmat(eigen_fraction(principal_stress)) * pnn.tail_cols(3).t();
+    mat eigen_projector = pnn.cols(pattern) * pnn.cols(pattern).t();
+    mat eigen_derivative = eigen_projector + pnn.tail_cols(3) * diagmat(eigen_fraction(principal_stress)) * pnn.tail_cols(3).t();
 
+    eigen_projector.tail_cols(3) *= 2.;
     eigen_derivative.tail_cols(3) *= 2.;
 
-    return eigen_derivative;
+    return std::make_pair(std::move(eigen_projector), std::move(eigen_derivative));
 }
 
 vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes) {
