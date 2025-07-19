@@ -612,12 +612,12 @@ mat transform::compute_jacobian_principal_to_nominal(const mat& in) {
     throw std::invalid_argument("need a valid tensor");
 }
 
-mat transform::eigen_to_tensor_base(const mat& eig_vec) {
+mat66 transform::eigen_to_tensor_base(const mat& eig_vec) {
     const mat n12 = eig_vec.col(0) * eig_vec.col(1).t();
     const mat n23 = eig_vec.col(1) * eig_vec.col(2).t();
     const mat n31 = eig_vec.col(2) * eig_vec.col(0).t();
 
-    mat pij(6, 6);
+    mat66 pij(fill::none);
 
     pij.col(0) = tensor::stress::to_voigt(eig_vec.col(0) * eig_vec.col(0).t());
     pij.col(1) = tensor::stress::to_voigt(eig_vec.col(1) * eig_vec.col(1).t());
@@ -629,7 +629,7 @@ mat transform::eigen_to_tensor_base(const mat& eig_vec) {
     return pij;
 }
 
-mat transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
+vec transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
     vec principal_tensile_stress(principal_stress.n_elem, fill::zeros);
     for(auto I = 0llu; I < principal_stress.n_elem; ++I)
         if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
@@ -637,17 +637,19 @@ mat transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& p
     return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;
 }
 
-vec transform::eigen_fraction(const vec& principal_stress) {
-    const auto compute = [&principal_stress](const unsigned i, const unsigned j) {
-        const auto a = principal_stress(i), b = principal_stress(j);
+namespace {
+    vec3 tensile_fraction(const vec& principal_stress) {
+        const auto compute = [&principal_stress](const unsigned i, const unsigned j) {
+            const auto a = principal_stress(i), b = principal_stress(j);
 
-        if(const auto fraction = (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); std::isfinite(fraction)) return 2. * suanpan::clamp_unit(fraction);
+            if(const auto fraction = (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); std::isfinite(fraction)) return 2. * suanpan::clamp_unit(fraction);
 
-        return a + b <= 0. ? 0. : 2.;
-    };
+            return a + b <= 0. ? 0. : 2.;
+        };
 
-    return vec{compute(0, 1), compute(1, 2), compute(2, 0)};
-}
+        return vec3{compute(0, 1), compute(1, 2), compute(2, 0)};
+    }
+} // namespace
 
 std::pair<mat, mat> transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
     const mat pnn = eigen_to_tensor_base(principal_direction);
@@ -655,7 +657,7 @@ std::pair<mat, mat> transform::eigen_to_tensile_derivative(const vec& principal_
     const uvec pattern = find(principal_stress > 0.);
 
     mat eigen_projector = pnn.cols(pattern) * pnn.cols(pattern).t();
-    mat eigen_derivative = eigen_projector + pnn.tail_cols(3) * diagmat(eigen_fraction(principal_stress)) * pnn.tail_cols(3).t();
+    mat eigen_derivative = eigen_projector + pnn.tail_cols(3) * diagmat(tensile_fraction(principal_stress)) * pnn.tail_cols(3).t();
 
     eigen_projector.tail_cols(3) *= 2.;
     eigen_derivative.tail_cols(3) *= 2.;
