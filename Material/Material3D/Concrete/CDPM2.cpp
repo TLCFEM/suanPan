@@ -623,13 +623,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         trial_stress *= damage_t * damage_c;
     }
     else if(DamageType::ANISOTROPIC == damage_type) {
-        const mat pnn = transform::eigen_to_tensor_base(principal_direction);
-
-        mat tension_projector = pnn.cols(t_pattern) * pnn.cols(t_pattern).t();
-        mat tension_derivative = tension_projector + pnn.tail_cols(3) * diagmat(transform::eigen_fraction(principal_stress)) * pnn.tail_cols(3).t();
-
-        tension_projector.tail_cols(3) *= 2.;
-        tension_derivative.tail_cols(3) *= 2.;
+        const auto [tension_projector, tension_derivative] = transform::eigen_to_tensile_derivative(principal_stress, principal_direction);
 
         const vec tension_stress = tension_projector * trial_stress;
 
