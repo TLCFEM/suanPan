@@ -647,7 +647,7 @@ namespace {
             return a + b <= 0. ? 0. : 2.;
         };
 
-        return vec3{compute(0, 1), compute(1, 2), compute(2, 0)};
+        return {compute(0, 1), compute(1, 2), compute(2, 0)};
     }
 } // namespace
 
@@ -662,7 +662,7 @@ std::pair<mat, mat> transform::eigen_to_tensile_derivative(const vec& principal_
     eigen_projector.tail_cols(3) *= 2.;
     eigen_derivative.tail_cols(3) *= 2.;
 
-    return std::make_pair(std::move(eigen_projector), std::move(eigen_derivative));
+    return {std::move(eigen_projector), std::move(eigen_derivative)};
 }
 
 vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes) {
