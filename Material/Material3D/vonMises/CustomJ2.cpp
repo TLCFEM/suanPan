@@ -59,7 +59,7 @@ int CustomJ2::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     if(!suanpan::approx_equal(0., h_expression->evaluate(0.).at(0))) {
-        suanpan_error("The assigned expression {} does not evaluates to zero.\n", h_tag);
+        suanpan_error("The assigned expression {} does not evaluate to zero.\n", h_tag);
         return SUANPAN_FAIL;
     }
 
