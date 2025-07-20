@@ -19,7 +19,6 @@
 #include "CDPM2.h"
 
 #include <Recorder/OutputType.h>
-#include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
