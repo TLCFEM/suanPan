@@ -207,6 +207,8 @@ bool if_contain(const std::string&, const char*);
 bool if_contain(const std::string&, const std::string&);
 bool if_contain(std::string&&, std::string&&);
 
+bool if_startswith(std::string_view, std::string_view);
+
 template<std::equality_comparable T> std::pair<bool, std::int64_t> if_contain(const std::vector<T>& container, const T target) {
     auto position = std::find(container.begin(), container.end(), target);
 

@@ -123,6 +123,15 @@ bool if_contain(const std::string& A, const std::string& B) { return A.find(B) !
 
 bool if_contain(std::string&& A, std::string&& B) { return if_contain(A, B); }
 
+bool if_startswith(const std::string_view A, const std::string_view B) {
+    if(A.size() < B.size()) return false;
+
+    for(size_t i = 0; i < B.size(); ++i)
+        if(A[i] != B[i]) return false;
+
+    return true;
+}
+
 bool is_true(const char* S) { return is_equal(S, "On") || is_equal(S, "True") || is_equal(S, "T") || is_equal(S, "1") || is_equal(S, "Yes") || is_equal(S, "Y"); }
 
 bool is_false(const char* S) { return is_equal(S, "Off") || is_equal(S, "False") || is_equal(S, "F") || is_equal(S, "0") || is_equal(S, "No") || is_equal(S, "N"); }

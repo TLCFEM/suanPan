@@ -3412,9 +3412,9 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     if(is_equal(material_id, "AFC") || is_equal(material_id, "AFC01")) new_afc01(new_material, command);
     else if(is_equal(material_id, "AFC02") || is_equal(material_id, "AFCS")) new_afc02(new_material, command);
     else if(is_equal(material_id, "AFC03") || is_equal(material_id, "AFCN")) new_afc03(new_material, command);
+    else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
-    else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
     else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
@@ -3423,27 +3423,31 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
     else if(is_equal(material_id, "BilinearHoffman")) new_bilinearorthotropic(new_material, command, true);
-    else if(is_equal(material_id, "BilinearTsaiWu")) new_bilinearorthotropic(new_material, command, false);
     else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
     else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
     else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
     else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
     else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
+    else if(is_equal(material_id, "BilinearTsaiWu")) new_bilinearorthotropic(new_material, command, false);
     else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
     else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
-    else if(is_equal(material_id, "CDPM2") || is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
-    else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
-    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
-    else if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
-    else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
-    else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
-    else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
-    else if(is_equal(material_id, "ConcreteK4")) new_concretek4(new_material, command);
-    else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
-    else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
+    else if(if_startswith(material_id, "CDPM2")) {
+        if(is_equal(material_id, "CDPM2") || is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+        else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
+        else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
+    }
+    else if(if_startswith(material_id, "Concrete")) {
+        if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
+        else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
+        else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
+        else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
+        else if(is_equal(material_id, "ConcreteK4")) new_concretek4(new_material, command);
+        else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
+        else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
+    }
     else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
     else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
@@ -3452,11 +3456,11 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
     else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
     else if(is_equal(material_id, "CustomHoffman")) new_customorthotropic(new_material, command, true);
-    else if(is_equal(material_id, "CustomTsaiWu")) new_customorthotropic(new_material, command, false);
     else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "CustomMises1D")) new_custommises1d(new_material, command);
     else if(is_equal(material_id, "CustomStrainDegradation")) new_customdegradation(new_material, command, true);
     else if(is_equal(material_id, "CustomStressDegradation")) new_customdegradation(new_material, command, false);
+    else if(is_equal(material_id, "CustomTsaiWu")) new_customorthotropic(new_material, command, false);
     else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
@@ -3470,9 +3474,9 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
     else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
     else if(is_equal(material_id, "ExpHoffman")) new_exporthotropic(new_material, command, true);
-    else if(is_equal(material_id, "ExpTsaiWu")) new_exporthotropic(new_material, command, false);
     else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
     else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);
+    else if(is_equal(material_id, "ExpTsaiWu")) new_exporthotropic(new_material, command, false);
     else if(is_equal(material_id, "Flag01")) new_flag01(new_material, command);
     else if(is_equal(material_id, "Flag02")) new_flag02(new_material, command);
     else if(is_equal(material_id, "Fluid")) new_fluid(new_material, command);
@@ -3488,6 +3492,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "MultilinearMises1D")) new_multilinearmises1d(new_material, command);
     else if(is_equal(material_id, "MultilinearOO")) new_multilinearoo(new_material, command);
     else if(is_equal(material_id, "MultilinearPO")) new_multilinearpo(new_material, command);
+    else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
     else if(is_equal(material_id, "NLE1D01")) new_nle1d01(new_material, command);
     else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
     else if(is_equal(material_id, "Nonviscous01")) new_nonviscous01(new_material, command);
@@ -3514,10 +3519,11 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
     else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
     else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
-    else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
-    else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
-    else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
-    else if(is_equal(material_id, "Subloading")) new_subloading(new_material, command);
+    else if(if_startswith(material_id, "Subloading")) {
+        if(is_equal(material_id, "Subloading")) new_subloading(new_material, command);
+        else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
+        else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
+    }
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
     else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
