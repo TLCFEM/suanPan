@@ -223,4 +223,7 @@ int YLD0418P::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-void YLD0418P::print() { suanpan_info("YLD2004-18P model with E_1={:.5E}, E_2={:.5E}, E_3={:.5E}, G_{{12}}={:.5E}, G_{{23}}={:.5E}, G_{{13}}={:.5E}, and nu_{{12}}={:.5E}, nu_{{23}}={:.5E}, nu_{{13}}={:.5E}.\n", modulus(0), modulus(1), modulus(2), modulus(3), modulus(4), modulus(5), ratio(0), ratio(1), ratio(2)); }
+void YLD0418P::print() {
+    if(1llu == modulus.n_elem && 1llu == ratio.n_elem) suanpan_info("YLD2004-18P model with E={:.5E} and nu={:.5E}.\n", modulus(0), modulus(1), ratio(0));
+    else suanpan_info("YLD2004-18P model with E_1={:.5E}, E_2={:.5E}, E_3={:.5E}, G_{{12}}={:.5E}, G_{{23}}={:.5E}, G_{{13}}={:.5E}, and nu_{{12}}={:.5E}, nu_{{23}}={:.5E}, nu_{{13}}={:.5E}.\n", modulus(0), modulus(1), modulus(2), modulus(3), modulus(4), modulus(5), ratio(0), ratio(1), ratio(2));
+}
