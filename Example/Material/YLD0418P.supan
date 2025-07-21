@@ -37,7 +37,7 @@ converger RelIncreDisp 1 1E-12 10 1
 
 analyze
 
-# peek element 1
+peek element 1
 
 # Node 7:
 # Coordinate:
