@@ -1,0 +1,55 @@
+# A TEST MODEL FOR YLD0418P MATERIAL
+
+node 1 5 -5 -5
+node 2 5 5 -5
+node 3 -5 5 -5
+node 4 -5 -5 -5
+node 5 5 -5 5
+node 6 5 5 5
+node 7 -5 5 5
+node 8 -5 -5 5
+
+expression SimpleScalar 1 x 1+.02x
+
+material YLD0418P 1 1E4 1E4 1E4 4E3 4E3 4E3 .25 .25 .25 \
+1.241024 1.078271 1.216463 1.223867 1.093105 0.889161 0.501909 0.557173 1.349094 \
+0.775366 0.922743 0.765487 0.793356 0.918689 1.027625 1.115833 1.112273 0.589787 \
+8 100. \
+1
+
+element C3D8 1 1 2 3 4 5 6 7 8 1 G
+
+fix2 1 1 1 2 5 6
+fix2 2 2 1 4 5 8
+fix2 3 3 1 2 3 4
+
+displacement 2 0 .2 3 5 6 ! 7 8
+displacement 1 0 .1 2 2 3 6 7
+
+hdf5recorder 1 Node RF 7
+
+step static 1
+set fixed_step_size 1
+set ini_step_size 2E-1
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-12 10 1
+
+analyze
+
+peek element 1
+
+# Node 7:
+# Coordinate:
+#  -5.0000e+00  5.0000e+00  5.0000e+00
+# Displacement:
+#   3.3376e-02  1.0000e-01 -6.0202e-02
+# Resistance:
+#  -4.5475e-13  1.9120e+03  1.4211e-13
+peek node 7
+
+# save recorder 1
+
+reset
+clear
+exit

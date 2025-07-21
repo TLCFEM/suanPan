@@ -3398,6 +3398,58 @@ namespace {
 
         return_obj = std::make_unique<Yeoh>(tag, std::vector(pool.begin(), pool.begin() + h_size), std::vector(pool.begin() + h_size, pool.begin() + 2 * h_size), t_size % 2 == 0 ? 0. : pool.back());
     }
+
+    void new_yld0418p(unique_ptr<Material>& return_obj, std::istringstream& command, const bool if_isotropic) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        vec modulus(if_isotropic ? 1 : 6);
+        if(!get_input(command, modulus)) {
+            suanpan_error("A valid modulus is required.\n");
+            return;
+        }
+
+        vec poissons_ratio(if_isotropic ? 1 : 3);
+        if(!get_input(command, poissons_ratio)) {
+            suanpan_error("A valid poisson's ratio is required.\n");
+            return;
+        }
+
+        vec parameter(18);
+        if(!get_input(command, parameter)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        double exponent, ref_stress;
+        if(!get_input(command, exponent)) {
+            suanpan_error("A valid exponent is required.\n");
+            return;
+        }
+        if(!get_input(command, ref_stress)) {
+            suanpan_error("A valid reference stress is required.\n");
+            return;
+        }
+
+        unsigned hardening;
+        if(!get_input(command, hardening)) {
+            suanpan_error("A valid hardening expression tag is required.\n");
+            return;
+        }
+
+        auto density = 0.;
+        if(command.eof())
+            suanpan_debug("Zero density assumed.\n");
+        else if(!get_input(command, density)) {
+            suanpan_error("A valid density is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<YLD0418P>(tag, std::move(modulus), std::move(poissons_ratio), std::move(parameter), exponent, ref_stress, hardening, density);
+    }
 } // namespace
 
 int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
@@ -3537,6 +3589,10 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);
     else if(is_equal(material_id, "Viscosity02")) new_viscosity02(new_material, command);
     else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
+    else if(if_startswith(material_id, "YLD0418P")) {
+        if(is_equal(material_id, "YLD0418P")) new_yld0418p(new_material, command, false);
+        else if(is_equal(material_id, "YLD0418PISO")) new_yld0418p(new_material, command, true);
+    }
     else external_module::object(new_material, domain, material_id, command);
 
     if(nullptr == new_material || !domain->insert(std::move(new_material)))
