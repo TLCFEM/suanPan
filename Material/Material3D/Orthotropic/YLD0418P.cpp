@@ -32,9 +32,8 @@ YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& 
     for(auto i = 0u; i < 3u; ++i)
         for(auto j = 0u; j < 3u; ++j) {
             const auto diff = (psa(i) - psb(j)) / ref_stress;
-            const auto abs_diff = std::fabs(diff);
-            const auto pow_diff = std::pow(std::max(datum::eps, abs_diff), exponent - 2.);
-            f += pow_diff * abs_diff * abs_diff;
+            const auto pow_diff = std::pow(std::max(datum::eps, std::fabs(diff)), exponent - 2.);
+            f += pow_diff * diff * diff;
             pfpa(i) += pow_diff * diff;
             pfpb(j) -= pow_diff * diff;
             pfpaa(i) += pow_diff;
