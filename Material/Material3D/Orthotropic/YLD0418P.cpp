@@ -22,6 +22,7 @@
 
 const double YLD0418P::root_two_third = std::sqrt(2. / 3.);
 const span YLD0418P::sb{1, 6};
+const mat YLD0418P::unit_dev_tensor = tensor::unit_deviatoric_tensor4v2();
 
 YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& pva, const vec3& psb, const mat33& pvb) const {
     auto f{0.};
@@ -119,7 +120,7 @@ int YLD0418P::initialize(const shared_ptr<DomainBase>& D) {
 
     initial_stiffness = 1llu == modulus.n_elem && 1llu == ratio.n_elem ? tensor::isotropic_stiffness(modulus(0), ratio(0)) : tensor::orthotropic_stiffness(modulus, ratio);
 
-    dev_ini_stiffness = tensor::unit_deviatoric_tensor4v2() * (trial_stiffness = current_stiffness = initial_stiffness);
+    dev_ini_stiffness = unit_dev_tensor * (trial_stiffness = current_stiffness = initial_stiffness);
 
     initialize_history(7);
 
@@ -159,19 +160,22 @@ int YLD0418P::update_trial_status(const vec& t_strain) {
         if(!eig_sym(psb, pvb, tensor::strain::to_tensor(C2 * dev_s), "std")) return SUANPAN_FAIL;
 
         const auto [f, pfps, pfpss] = compute_yield_surface(psa, pva, psb, pvb);
-        const auto norm_n = root_two_third * tensor::strain::norm(pfps);
+        const vec6 n = tensor::dev(pfps); // associated plastic flow direction
+        const auto norm_n = root_two_third * tensor::strain::norm(n);
         const auto [k, dk] = compute_hardening(ep = current_ep + gamma * norm_n);
-        const auto pk = -4. * exponent * std::pow(k, exponent - 1.) * dk;
 
         residual(sa) = f - 4. * std::pow(k, exponent);
 
         if(1u == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
 
-        residual(sb) = dev_s + dev_ini_stiffness * pfps * gamma - trial_dev_s;
+        const auto pk = -4. * exponent * std::pow(k, exponent - 1.) * dk;
+        const vec6 en = initial_stiffness * n;
+
+        residual(sb) = dev_s + en * gamma - trial_dev_s;
 
         jacobian(sa, sa) = pk * norm_n;
-        jacobian(sa, sb) = pfps.t() + pk * gamma * two_third / norm_n * (pfps % tensor::strain::norm_weight).t() * pfpss;
-        jacobian(sb, sa) = dev_ini_stiffness * pfps;
+        jacobian(sa, sb) = pfps.t() + pk * gamma * two_third / norm_n * (n % tensor::strain::norm_weight).t() * pfpss;
+        jacobian(sb, sa) = en;
         jacobian(sb, sb) = eye(6, 6) + gamma * dev_ini_stiffness * pfpss;
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
@@ -179,16 +183,16 @@ int YLD0418P::update_trial_status(const vec& t_strain) {
         const auto error = inf_norm(incre);
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
         if(error < tolerance * (1. + ref_stress) || (inf_norm(residual) < tolerance && counter > 5u)) {
-            plastic_strain += pfps * gamma;
+            plastic_strain += n * gamma;
 
-            trial_stress -= initial_stiffness * pfps * gamma;
+            trial_stress -= en * gamma;
 
             mat::fixed<7, 6> left(fill::none), right(fill::zeros);
             right.rows(sb) = dev_ini_stiffness;
 
             if(!solve(left, jacobian, right, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-            trial_stiffness -= initial_stiffness * join_rows(pfps, pfpss * gamma) * left;
+            trial_stiffness -= dev_ini_stiffness * join_rows(pfps, pfpss * gamma) * left;
 
             return SUANPAN_SUCCESS;
         }

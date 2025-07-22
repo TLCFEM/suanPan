@@ -43,9 +43,9 @@ peek element 1
 # Coordinate:
 #  -5.0000e+00  5.0000e+00  5.0000e+00
 # Displacement:
-#   3.3376e-02  1.0000e-01 -6.0202e-02
+#   3.9178e-02  1.0000e-01 -6.2437e-02
 # Resistance:
-#  -4.5475e-13  1.9120e+03  1.4211e-13
+#   5.6843e-14  1.9219e+03  1.4211e-13
 peek node 7
 
 # save recorder 1
