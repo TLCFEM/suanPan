@@ -3,7 +3,7 @@
 # Compared to the Rocky.Pre.Dockerfile, it adds the CUDA toolkit.
 # If you need the GPU related solvers, you should use this Dockerfile.
 
-FROM nvidia/cuda:12.5.1-devel-rockylinux9
+FROM nvidia/cuda:12.9.1-devel-rockylinux9
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \
