@@ -46,7 +46,7 @@ parts:
       - -DSP_ENABLE_MKL=ON
       - -DSP_ENABLE_SHARED_MKL=OFF
       - -DSP_ENABLE_VTK=ON
-      - -DVTK_PATH=$CRAFT_PART_BUILD/lib/cmake/vtk-9.4/
+      - -DVTK_PATH=$CRAFT_PART_BUILD/lib/cmake/vtk-9.5/
     build-packages:
       - g++
       - gcc
@@ -54,8 +54,8 @@ parts:
       - libglvnd-dev
       - wget
     override-build: |
-      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-linux.tar.gz
-      tar xf VTK-9.4.2-linux.tar.gz
+      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.0-linux.tar.gz
+      tar xf VTK-9.5.0-linux.tar.gz
       wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/47c7d946-fca1-441a-b0df-b094e3f045ea/intel-onemkl-2025.2.0.629_offline.sh
       sh ./intel-onemkl-2025.2.0.629_offline.sh -a --silent --eula accept
       craftctl default

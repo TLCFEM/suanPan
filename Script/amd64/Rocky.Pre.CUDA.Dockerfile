@@ -18,8 +18,8 @@ RUN dnf install -y dnf-plugins-core && \
     dnf install -y libglvnd-devel gfortran rpm-build rpm-devel rpmdevtools cmake wget git ninja-build intel-oneapi-mkl-devel procps sudo
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.4/VTK-9.4.2.tar.gz && tar xf VTK-9.4.2.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.4.2 && \
+    wget -q https://www.vtk.org/files/release/9.5/VTK-9.5.0.tar.gz && tar xf VTK-9.5.0.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.5.0 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 RUN mkdir magma-build && cd magma-build && \
