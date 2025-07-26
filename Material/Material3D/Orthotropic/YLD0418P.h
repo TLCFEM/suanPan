@@ -60,7 +60,7 @@ class YLD0418P final : protected DataYLD0418P, public Material3D {
         return {0., 0.};
     };
 
-    using yield_t = std::tuple<double, vec6, mat66>;
+    using yield_t = std::tuple<const double, const vec6, mat66>;
 
     [[nodiscard]] yield_t compute_yield_surface(const vec3&, const mat33&, const vec3&, const mat33&) const;
 

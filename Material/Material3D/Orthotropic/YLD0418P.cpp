@@ -159,7 +159,7 @@ int YLD0418P::update_trial_status(const vec& t_strain) {
         // !!! using strain version due to additional shear factors combined into transformation matrices
         if(!eig_sym(psb, pvb, tensor::strain::to_tensor(C2 * dev_s), "std")) return SUANPAN_FAIL;
 
-        const auto [f, pfps, pfpss] = compute_yield_surface(psa, pva, psb, pvb);
+        auto [f, pfps, pfpss] = compute_yield_surface(psa, pva, psb, pvb);
         const vec6 n = tensor::dev(pfps); // associated plastic flow direction
         const auto norm_n = root_two_third * tensor::strain::norm(n);
         const auto [k, dk] = compute_hardening(ep = current_ep + gamma * norm_n);
@@ -174,9 +174,9 @@ int YLD0418P::update_trial_status(const vec& t_strain) {
         residual(sb) = dev_s + en * gamma - trial_dev_s;
 
         jacobian(sa, sa) = pk * norm_n;
-        jacobian(sa, sb) = pfps.t() + pk * gamma * two_third / norm_n * (n % tensor::strain::norm_weight).t() * pfpss;
+        jacobian(sa, sb) = pfps.t() + pk * two_third / norm_n * (n % tensor::strain::norm_weight).t() * (pfpss *= gamma);
         jacobian(sb, sa) = en;
-        jacobian(sb, sb) = eye(6, 6) + gamma * dev_ini_stiffness * pfpss;
+        jacobian(sb, sb) = eye(6, 6) + dev_ini_stiffness * pfpss;
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
@@ -192,7 +192,7 @@ int YLD0418P::update_trial_status(const vec& t_strain) {
 
             if(!solve(left, jacobian, right, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-            trial_stiffness -= dev_ini_stiffness * join_rows(pfps, pfpss * gamma) * left;
+            trial_stiffness -= dev_ini_stiffness * join_rows(pfps, pfpss) * left;
 
             return SUANPAN_SUCCESS;
         }
