@@ -62,7 +62,10 @@ YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& 
     const mat66 pfpmix = trans_a.t() * pfpab * trans_b;
 
     const auto kernel = [](const vec3& ps, const vec3& pfp) {
-        const auto item = [&](const unsigned i, const unsigned j) { return 2. * (pfp(i) - pfp(j)) / (ps(i) - ps(j)); };
+        const auto item = [&](const unsigned i, const unsigned j) {
+            const auto fraction = 2. * (pfp(i) - pfp(j)) / (ps(i) - ps(j));
+            return std::isfinite(fraction) ? fraction : 0.;
+        };
 
         return vec3{item(0, 1), item(1, 2), item(2, 0)};
     };
