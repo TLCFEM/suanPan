@@ -266,7 +266,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**Armadillo**](http://arma.sourceforge.net/) version 14.6.1
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.8.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.9.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
 - [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
@@ -278,7 +278,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
-- [**VTK**](https://vtk.org/) version 9.4.2
+- [**VTK**](https://vtk.org/) version 9.5.0
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
