@@ -61,16 +61,16 @@ YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& 
 
     const mat66 pfpmix = trans_a.t() * pfpab * trans_b;
 
-    const auto kernel = [](const vec3& ps, const vec3& pfp) {
+    const auto kernel = [](const vec3& ps, const vec3& pfp, const vec3& pfpp) {
         const auto item = [&](const unsigned i, const unsigned j) {
             const auto fraction = 2. * (pfp(i) - pfp(j)) / (ps(i) - ps(j));
-            return std::isfinite(fraction) ? fraction : 0.;
+            return std::isfinite(fraction) ? fraction : pfpp(i) + pfpp(j);
         };
 
         return vec3{item(0, 1), item(1, 2), item(2, 0)};
     };
 
-    return {f, trans_a.t() * pfpa + trans_b.t() * pfpb, proj_a.t() * diagmat(join_cols(pfpaa, kernel(psa, pfpa))) * proj_a + proj_b.t() * diagmat(join_cols(pfpbb, kernel(psb, pfpb))) * proj_b + pfpmix + pfpmix.t()};
+    return {f, trans_a.t() * pfpa + trans_b.t() * pfpb, proj_a.t() * diagmat(join_cols(pfpaa, kernel(psa, pfpa, pfpaa))) * proj_a + proj_b.t() * diagmat(join_cols(pfpbb, kernel(psb, pfpb, pfpbb))) * proj_b + pfpmix + pfpmix.t()};
 }
 
 YLD0418P::YLD0418P(const unsigned T, vec&& EE, vec&& VV, vec&& PP, const double M, const double RS, const unsigned HT, const double R)
