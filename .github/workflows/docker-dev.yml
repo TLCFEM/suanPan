@@ -6,7 +6,7 @@ on:
 jobs:
   linux-amd64:
     runs-on: self-hosted
-    timeout-minutes: 60
+    timeout-minutes: 1200
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
             ghcr.io/tlcfem/suanpan:latest
   linux-mpi-amd64:
     runs-on: self-hosted
-    timeout-minutes: 60
+    timeout-minutes: 1200
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
             ghcr.io/tlcfem/suanpan-mpi:latest
   linux-arm64:
     runs-on: self-hosted
-    timeout-minutes: 600
+    timeout-minutes: 1200
     steps:
       - name: Clone
         uses: actions/checkout@v4
