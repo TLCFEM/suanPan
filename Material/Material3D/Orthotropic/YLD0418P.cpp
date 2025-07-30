@@ -190,12 +190,10 @@ int YLD0418P::update_trial_status(const vec& t_strain) {
 
             trial_stress -= en * gamma;
 
-            mat::fixed<7, 6> left(fill::none), right(fill::zeros);
+            mat::fixed<7, 6> right(fill::zeros);
             right.rows(sb) = dev_ini_stiffness;
 
-            if(!solve(left, jacobian, right, solve_opts::equilibrate)) return SUANPAN_FAIL;
-
-            trial_stiffness -= dev_ini_stiffness * join_rows(pfps, pfpss) * left;
+            trial_stiffness -= dev_ini_stiffness * join_rows(pfps, pfpss) * solve(jacobian, right, solve_opts::equilibrate);
 
             return SUANPAN_SUCCESS;
         }
