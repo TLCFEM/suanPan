@@ -7,7 +7,7 @@ RUN source /opt/intel/oneapi/setvars.sh && \
     cmake -DCMAKE_BUILD_TYPE=Release -DSP_BUILD_PARALLEL=ON -DSP_ENABLE_HDF5=ON -DSP_ENABLE_VTK=ON -DSP_ENABLE_AVX2=OFF -DSP_ENABLE_MKL=ON -DSP_ENABLE_IOMP=OFF -DSP_ENABLE_SHARED_MKL=OFF -DSP_ENABLE_64BIT_INDEXING=ON -DSP_ENABLE_MPI=ON -DBUILD_PACKAGE=RPM .. && make package -j"$(nproc)" && cp suanPan*.rpm / && \
     cd / && rm -r suanPan
 
-FROM rockylinux:10
+FROM rockylinux:9
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \

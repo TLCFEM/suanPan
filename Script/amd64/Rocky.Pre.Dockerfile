@@ -2,7 +2,7 @@
 # It preinstalls the MKL library, which is required as a fast linear algebra driver that does the heavy lifting.
 # It installs the VTK library, which is required to generate VTK files for visualization.
 
-FROM rockylinux:10
+FROM rockylinux:9
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \
