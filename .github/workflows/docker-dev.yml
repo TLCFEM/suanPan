@@ -64,8 +64,8 @@ jobs:
           provenance: false
           push: true
           tags: |
-            tlcfem/suanpan-mpi:amd64
-            ghcr.io/tlcfem/suanpan-mpi:latest
+            tlcfem/suanpan:mpi-amd64
+            ghcr.io/tlcfem/suanpan:mpi-latest
   linux-arm64:
     runs-on: self-hosted
     timeout-minutes: 1200
