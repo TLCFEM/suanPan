@@ -269,10 +269,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.9.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
-- [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
-- [**METIS**](https://github.com/KarypisLab/METIS) version 5.1.0
-- [**MUMPS**](https://mumps-solver.org/) version 5.8.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.30
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
@@ -281,6 +278,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**VTK**](https://vtk.org/) version 9.5.0
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
+- [**ezp**](https://github.com/TLCFEM/ezp)
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.2.0

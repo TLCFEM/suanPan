@@ -6,7 +6,7 @@ on:
 jobs:
   ide-image-base:
     runs-on: self-hosted
-    timeout-minutes: 1200
+    timeout-minutes: 3000
     strategy:
       matrix:
         arch: [ amd64, arm64 ]
@@ -51,7 +51,7 @@ jobs:
           docker manifest push tlcfem/suanpan-env:latest
   ide-image-cuda:
     runs-on: self-hosted
-    timeout-minutes: 1200
+    timeout-minutes: 3000
     steps:
       - name: Clone
         uses: actions/checkout@v4
