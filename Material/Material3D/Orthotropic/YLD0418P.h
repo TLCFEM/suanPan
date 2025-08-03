@@ -88,6 +88,8 @@ public:
         double,   // exponent
         double,   // reference stress
         unsigned, // hardening expression tag
+        double,   // kinematic rate
+        double,   // kinematic bound
         double    // density
     );
 
