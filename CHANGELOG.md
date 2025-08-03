@@ -11,7 +11,7 @@
 2. update `Armadillo` to version `14.6.1`
 3. update `Catch2` to version `3.9.0`
 4. update `VTK` to version `9.5.0`
-5. add `YLD0418P` anisotropic yield material [#281](https://github.com/TLCFEM/suanPan/pull/281)
+5. add `YLD0418P` anisotropic yield material [#281](https://github.com/TLCFEM/suanPan/pull/281) [#282](https://github.com/TLCFEM/suanPan/pull/282)
 
 ## version 3.8
 
