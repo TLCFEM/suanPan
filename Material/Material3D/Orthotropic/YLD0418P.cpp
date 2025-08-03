@@ -22,6 +22,7 @@
 
 const double YLD0418P::root_two_third = std::sqrt(2. / 3.);
 const span YLD0418P::sb{1, 6};
+const span YLD0418P::sc{7, 12};
 const mat YLD0418P::unit_dev_tensor = tensor::unit_deviatoric_tensor4v2();
 
 YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& pva, const vec3& psb, const mat33& pvb) const {
@@ -73,8 +74,8 @@ YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& 
     return {f, trans_a.t() * pfpa + trans_b.t() * pfpb, proj_a.t() * diagmat(join_cols(pfpaa, kernel(psa, pfpa, pfpaa))) * proj_a + proj_b.t() * diagmat(join_cols(pfpbb, kernel(psb, pfpb, pfpbb))) * proj_b + pfpmix + pfpmix.t()};
 }
 
-YLD0418P::YLD0418P(const unsigned T, vec&& EE, vec&& VV, vec&& PP, const double M, const double RS, const unsigned HT, const double R)
-    : DataYLD0418P{std::move(EE), std::move(VV), std::move(PP), M, std::fabs(RS)}
+YLD0418P::YLD0418P(const unsigned T, vec&& EE, vec&& VV, vec&& PP, const double M, const double RS, const unsigned HT, const double KR, const double KB, const double R)
+    : DataYLD0418P{std::move(EE), std::move(VV), std::move(PP), M, std::fabs(RS), {KR, KB}}
     , Material3D(T, R)
     , hardening_tag(HT) {
     C1.zeros();
@@ -125,7 +126,7 @@ int YLD0418P::initialize(const shared_ptr<DomainBase>& D) {
 
     dev_ini_stiffness = unit_dev_tensor * (trial_stiffness = current_stiffness = initial_stiffness);
 
-    initialize_history(7);
+    initialize_history(13);
 
     return SUANPAN_SUCCESS;
 }
@@ -135,6 +136,94 @@ unique_ptr<Material> YLD0418P::get_copy() { return std::make_unique<YLD0418P>(*t
 int YLD0418P::update_trial_status(const vec& t_strain) {
     if(tensor::strain::norm(incre_strain = (trial_strain = t_strain) - current_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
+    return kin.active ? with_kinematic() : without_kinematic();
+}
+
+int YLD0418P::with_kinematic() {
+    trial_history = current_history;
+    const auto& current_ep = current_history(0);
+    auto& ep = trial_history(0);
+    vec plastic_strain(&trial_history(1), 6, false, true);
+    const vec current_back(&current_history(7), 6, false, true);
+    vec back(&trial_history(7), 6, false, true);
+
+    const auto kin_rb = root_two_third * kin.rate * kin.bound;
+
+    const vec6 trial_dev_s = tensor::dev(trial_stress = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain));
+
+    auto gamma{0.};
+    auto dev_s = trial_dev_s;
+
+    vec::fixed<13> incre(fill::none), residual(fill::none);
+    mat::fixed<13, 13> jacobian(fill::none);
+
+    auto counter{0u};
+    while(true) {
+        if(max_iteration == ++counter) {
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
+
+        const vec6 shifted = dev_s - back;
+
+        vec3 psa, psb;  // 3 eigenvalues
+        mat33 pva, pvb; // 3x3 eigenvectors
+        // !!! using strain version due to additional shear factors combined into transformation matrices
+        if(!eig_sym(psa, pva, tensor::strain::to_tensor(C1 * shifted), "std")) return SUANPAN_FAIL;
+        // !!! using strain version due to additional shear factors combined into transformation matrices
+        if(!eig_sym(psb, pvb, tensor::strain::to_tensor(C2 * shifted), "std")) return SUANPAN_FAIL;
+
+        auto [f, pfps, pfpss] = compute_yield_surface(psa, pva, psb, pvb);
+        const vec6 n = tensor::dev(pfps); // associated plastic flow direction
+        const auto norm_n = root_two_third * tensor::strain::norm(n);
+        const vec6 u = root_two_third / norm_n * n;
+        const auto [k, dk] = compute_hardening(ep = current_ep + gamma * norm_n);
+
+        residual(sa) = f - 4. * std::pow(k, exponent);
+
+        if(1u == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
+
+        const auto pk = -4. * exponent * std::pow(k, exponent - 1.) * dk;
+        const vec6 en = initial_stiffness * n;
+        const rowvec6 scaled_u = (u % tensor::strain::norm_weight).t();
+
+        residual(sb) = dev_s + en * gamma - trial_dev_s;
+        residual(sc) = current_back + gamma * kin_rb * u - (1. + gamma * kin.rate) * back;
+
+        jacobian(sa, sa) = pk * norm_n;
+        jacobian(sa, sb) = pfps.t() + pk * root_two_third * scaled_u * (pfpss *= gamma);
+        jacobian(sa, sc) = -jacobian(sa, sb);
+        jacobian(sb, sa) = en;
+        jacobian(sb, sc) = -dev_ini_stiffness * pfpss;
+        jacobian(sb, sb) = eye(6, 6) - jacobian(sb, sc);
+        jacobian(sc, sa) = kin_rb * u - kin.rate * back;
+        jacobian(sc, sb) = kin_rb * root_two_third / norm_n * (unit_dev_tensor - u * scaled_u) * pfpss;
+        jacobian(sc, sc) = (-1. - gamma * kin.rate) * eye(6, 6) - jacobian(sc, sb);
+
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
+
+        const auto error = inf_norm(incre);
+        suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
+        if(error < tolerance * (1. + ref_stress) || (inf_norm(residual) < tolerance && counter > 5u)) {
+            plastic_strain += n * gamma;
+
+            trial_stress -= en * gamma;
+
+            mat::fixed<13, 6> right(fill::zeros);
+            right.rows(sb) = dev_ini_stiffness;
+
+            trial_stiffness -= dev_ini_stiffness * join_rows(pfps, pfpss, -pfpss) * solve(jacobian, right, solve_opts::equilibrate);
+
+            return SUANPAN_SUCCESS;
+        }
+
+        gamma = std::max(0., gamma - incre(sa));
+        dev_s -= incre(sb);
+        back -= incre(sc);
+    }
+}
+
+int YLD0418P::without_kinematic() {
     trial_history = current_history;
     const auto& current_ep = current_history(0);
     auto& ep = trial_history(0);

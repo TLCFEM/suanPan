@@ -34,9 +34,21 @@
 #include <Toolbox/ResourceHolder.h>
 
 struct DataYLD0418P {
+    struct Saturation {
+        Saturation(const double R, const double B)
+            : rate(R)
+            , bound(B) {}
+
+        const double rate, bound;
+
+        const bool active = rate > 0. && bound > 0.;
+    };
+
     const vec modulus, ratio, parameter;
     const double exponent;
     const double ref_stress; // reference stress for scaling
+
+    const Saturation kin;
 };
 
 class YLD0418P final : protected DataYLD0418P, public Material3D {
@@ -44,7 +56,7 @@ class YLD0418P final : protected DataYLD0418P, public Material3D {
     static const double root_two_third;
     static constexpr unsigned max_iteration = 20u;
     static constexpr uword sa{0};
-    static const span sb;
+    static const span sb, sc;
     static const mat unit_dev_tensor;
 
     const unsigned hardening_tag;
@@ -64,6 +76,9 @@ class YLD0418P final : protected DataYLD0418P, public Material3D {
 
     [[nodiscard]] yield_t compute_yield_surface(const vec3&, const mat33&, const vec3&, const mat33&) const;
 
+    int with_kinematic();
+    int without_kinematic();
+
 public:
     YLD0418P(
         unsigned, // tag
@@ -73,6 +88,8 @@ public:
         double,   // exponent
         double,   // reference stress
         unsigned, // hardening expression tag
+        double,   // kinematic rate
+        double,   // kinematic bound
         double    // density
     );
 

@@ -2188,13 +2188,13 @@
       "trigger": "YLD0418P",
       "details": "anisotropic yld0418p material",
       "kind": "type",
-      "contents": "material YLD0418P ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...28)} ${5:(29)} ${6:(30)} ${7:(31)} ${8:[32]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...28) double, 18 model parameters, see documentation for details\n# (29) double, exponent\n# (30) double, reference stress\n# (31) int, hardening backbone expression tag\n# [32] double, density, default: 0.0"
+      "contents": "material YLD0418P ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...28)} ${5:(29)} ${6:(30)} ${7:(31)} ${8:(32)} ${9:(33)} ${10:[34]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...28) double, 18 model parameters, see documentation for details\n# (29) double, exponent\n# (30) double, reference stress\n# (31) int, hardening backbone expression tag\n# (32) double, kinematic hardening rate\n# (33) double, kinematic hardening bound\n# [34] double, density, default: 0.0"
     },
     {
       "trigger": "YLD0418PISO",
       "details": "isotropic yld0418p material",
       "kind": "type",
-      "contents": "material YLD0418PISO ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...21)} ${5:(22)} ${6:(23)} ${7:(24)} ${8:[25]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissions ratio\n# (4...21) double, 18 model parameters, see documentation for details\n# (22) double, exponent\n# (23) double, reference stress\n# (24) int, hardening backbone expression tag\n# [25] double, density, default: 0.0"
+      "contents": "material YLD0418PISO ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...21)} ${5:(22)} ${6:(23)} ${7:(24)} ${8:(25)} ${9:(26)} ${10:[27]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissions ratio\n# (4...21) double, 18 model parameters, see documentation for details\n# (22) double, exponent\n# (23) double, reference stress\n# (24) int, hardening backbone expression tag\n# (25) double, kinematic hardening rate\n# (26) double, kinematic hardening bound\n# [27] double, density, default: 0.0"
     },
     {
       "trigger": "acceleration",

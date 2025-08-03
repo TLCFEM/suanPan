@@ -3440,6 +3440,12 @@ namespace {
             return;
         }
 
+        double kin_rate, kin_bound;
+        if(!get_input(command, kin_rate, kin_bound)) {
+            suanpan_error("A valid kinematic hardening rate/bound is required.\n");
+            return;
+        }
+
         auto density = 0.;
         if(command.eof())
             suanpan_debug("Zero density assumed.\n");
@@ -3448,7 +3454,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<YLD0418P>(tag, std::move(modulus), std::move(poissons_ratio), std::move(parameter), exponent, ref_stress, hardening, density);
+        return_obj = std::make_unique<YLD0418P>(tag, std::move(modulus), std::move(poissons_ratio), std::move(parameter), exponent, ref_stress, hardening, kin_rate, kin_bound, density);
     }
 } // namespace
 
