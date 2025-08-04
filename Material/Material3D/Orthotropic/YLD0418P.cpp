@@ -117,11 +117,6 @@ int YLD0418P::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    if(!suanpan::approx_equal(1., hardening_expression->evaluate(0.).at(0))) {
-        suanpan_error("The assigned expression {} does not evaluate to unity for trivial plastic strain.\n", hardening_tag);
-        return SUANPAN_FAIL;
-    }
-
     initial_stiffness = 1llu == modulus.n_elem && 1llu == ratio.n_elem ? tensor::isotropic_stiffness(modulus(0), ratio(0)) : tensor::orthotropic_stiffness(modulus, ratio);
 
     dev_ini_stiffness = unit_dev_tensor * (trial_stiffness = current_stiffness = initial_stiffness);
