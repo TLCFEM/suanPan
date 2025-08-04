@@ -102,6 +102,8 @@ YLD0418P::YLD0418P(const unsigned T, vec&& EE, vec&& VV, vec&& PP, const double 
     C2(3, 3) = 2. * parameter(15);
     C2(4, 4) = 2. * parameter(16);
     C2(5, 5) = 2. * parameter(17);
+
+    access::rw(tolerance) = 1E-13;
 }
 
 int YLD0418P::initialize(const shared_ptr<DomainBase>& D) {
