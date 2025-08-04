@@ -70,4 +70,4 @@ jobs:
           context: .
           file: ./Script/amd64/Rocky.Pre.CUDA.Dockerfile
           push: true
-          tags: tlcfem/suanpan-env-cuda:latest
+          tags: tlcfem/suanpan-env:cuda
