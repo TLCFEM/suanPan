@@ -148,7 +148,7 @@ int YLD0418P::with_kinematic() {
 
     const vec6 trial_dev_s = tensor::dev(trial_stress = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain));
 
-    auto gamma{0.};
+    auto gamma{0.}, ref_error{0.};
     auto dev_s = trial_dev_s;
 
     vec::fixed<13> incre(fill::none), residual(fill::none);
@@ -200,8 +200,9 @@ int YLD0418P::with_kinematic() {
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
-        if(error < tolerance * (1. + ref_stress) || (inf_norm(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             plastic_strain += n * gamma;
 
             trial_stress -= en * gamma;
@@ -228,7 +229,7 @@ int YLD0418P::without_kinematic() {
 
     const vec6 trial_dev_s = tensor::dev(trial_stress = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain));
 
-    auto gamma{0.};
+    auto gamma{0.}, ref_error{0.};
     auto dev_s = trial_dev_s;
 
     vec7 incre(fill::none), residual(fill::none);
@@ -270,8 +271,9 @@ int YLD0418P::without_kinematic() {
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
+        if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
-        if(error < tolerance * (1. + ref_stress) || (inf_norm(residual) < tolerance && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
             plastic_strain += n * gamma;
 
             trial_stress -= en * gamma;
