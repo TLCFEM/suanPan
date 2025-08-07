@@ -47,7 +47,7 @@
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-![repobeats analytics](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg)
+<p align="center"><img src="https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg"></p>
 
 ## Features
 
@@ -146,7 +146,7 @@ on [Chocolatey](https://chocolatey.org/packages/suanpan), please use the followi
 The Chocolatey repo available to you may not be up-to-date.
 If the latest version is not available, please try alternatives, such as portable binaries or scoop.
 
-[![choco](Resource/choco.gif)](https://asciinema.org/a/684063)
+[<p align="center"><img src="Resource/choco.gif"></p>](https://asciinema.org/a/684063)
 
 #### Scoop
 
@@ -177,7 +177,7 @@ The `stable` channel is in sync with the `master` branch.
 
 [![snap](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
-[![snap](Resource/snap.gif)](https://asciinema.org/a/684061)
+[<p align="center"><img src="Resource/snap.gif"></p>](https://asciinema.org/a/684061)
 
 #### Flatpak
 
