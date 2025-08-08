@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.9.0
-//  Generated: 2025-07-24 22:00:24.654688
+//  Catch v3.9.1
+//  Generated: 2025-08-09 00:29:20.303175
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -918,7 +918,7 @@ namespace Catch {
             }
 
             explicit operator bool() const {
-                return m_ptr;
+                return m_ptr != nullptr;
             }
 
             friend void swap(unique_ptr& lhs, unique_ptr& rhs) {
@@ -2044,9 +2044,6 @@ namespace Catch {
                     BenchmarkStats<> stats{CATCH_MOVE(info), CATCH_MOVE(analysis.samples), analysis.mean, analysis.standard_deviation, analysis.outliers, analysis.outlier_variance};
                     getResultCapture().benchmarkEnded(stats);
                 }
-                CATCH_CATCH_ANON(TestFailureException const&) {
-                    getResultCapture().benchmarkFailed("Benchmark failed due to failed assertion"_sr);
-                }
                 CATCH_CATCH_ALL {
                     getResultCapture().benchmarkFailed(translateActiveException());
                     // We let the exception go further up so that the
@@ -2440,11 +2437,17 @@ namespace Catch {
 
     namespace Detail {
 
+        std::string makeExceptionHappenedString();
+
         // This function dispatches all stringification requests inside of Catch.
         // Should be preferably called fully qualified, like ::Catch::Detail::stringify
         template<typename T>
         std::string stringify(const T& e) {
-            return ::Catch::StringMaker<std::remove_cv_t<std::remove_reference_t<T>>>::convert(e);
+            CATCH_TRY {
+                return ::Catch::StringMaker<
+                    std::remove_cv_t<std::remove_reference_t<T>>>::convert(e);
+            }
+            CATCH_CATCH_ALL { return makeExceptionHappenedString(); }
         }
 
         template<typename E>
@@ -2929,17 +2932,19 @@ namespace Catch {
     template<typename Duration>
     struct StringMaker<std::chrono::time_point<std::chrono::system_clock, Duration>> {
         static std::string convert(std::chrono::time_point<std::chrono::system_clock, Duration> const& time_point) {
-            auto converted = std::chrono::system_clock::to_time_t(time_point);
+            const auto systemish = std::chrono::time_point_cast<
+                std::chrono::system_clock::duration>(time_point);
+            const auto as_time_t = std::chrono::system_clock::to_time_t(systemish);
 
 #ifdef _MSC_VER
             std::tm timeInfo = {};
-            const auto err = gmtime_s(&timeInfo, &converted);
+            const auto err = gmtime_s(&timeInfo, &as_time_t);
             if(err) {
                 return "gmtime from provided timepoint has failed. This "
                        "happens e.g. with pre-1970 dates using Microsoft libc";
             }
 #else
-            std::tm* timeInfo = std::gmtime(&converted);
+            std::tm* timeInfo = std::gmtime(&as_time_t);
 #endif
 
             auto const timeStampSize = sizeof("2017-01-16T17:06:45Z");
@@ -5023,10 +5028,11 @@ namespace Catch {
  *
  * 3) If a type has no linkage, we also cannot capture it by reference.
  *    The solution is once again to capture them by value. We handle
- *    the common cases by using `std::is_arithmetic` as the default
- *    for `Catch::capture_by_value`, but that is only a some-effort
- *    heuristic. But as with 2), users can specialize `capture_by_value`
- *    for their own types as needed.
+ *    the common cases by using `std::is_arithmetic` and `std::is_enum`
+ *    as the default for `Catch::capture_by_value`, but that is only a
+ *    some-effort heuristic. These combine to capture all possible bitfield
+ *    bases, and also some trait-like types. As with 2), users can
+ *    specialize `capture_by_value` for their own types as needed.
  *
  * 4) To support C++20 and make the SFINAE on our decomposing operators
  *    work, the SFINAE has to happen in return type, rather than in
@@ -5078,13 +5084,20 @@ namespace Catch {
         using RemoveCVRef_t = std::remove_cv_t<std::remove_reference_t<T>>;
     } // namespace Detail
 
-    // Note: There is nothing that stops us from extending this,
-    //       e.g. to `std::is_scalar`, but the more encompassing
-    //       traits are usually also more expensive. For now we
-    //       keep this as it used to be and it can be changed later.
+    // Note: This is about as much as we can currently reasonably support.
+    //       In an ideal world, we could capture by value small trivially
+    //       copyable types, but the actual `std::is_trivially_copyable`
+    //       trait is a huge mess with standard-violating results on
+    //       GCC and Clang, which are unlikely to be fixed soon due to ABI
+    //       concerns.
+    //       `std::is_scalar` also causes issues due to the `is_pointer`
+    //       component, which causes ambiguity issues with (references-to)
+    //       function pointer. If those are resolved, we still need to
+    //       disambiguate the overload set for arrays, through explicit
+    //       overload for references to sized arrays.
     template<typename T>
     struct capture_by_value
-        : std::integral_constant<bool, std::is_arithmetic<T>{}> {};
+        : std::integral_constant<bool, std::is_arithmetic<T>::value || std::is_enum<T>::value> {};
 
 #if defined(CATCH_CONFIG_CPP20_COMPARE_OVERLOADS)
     template<>
@@ -5987,9 +6000,13 @@ namespace Catch {
             __assume(false);
 #elif defined(__GNUC__)
             __builtin_unreachable();
-#endif
-#endif // ^^ NDEBUG
+#else // vv platform without known optimization hint
             std::terminate();
+#endif
+#else  // ^^ NDEBUG
+       // For non-release builds, we prefer termination on bug over UB
+            std::terminate();
+#endif //
         }
 
     } // namespace Detail
@@ -7199,7 +7216,7 @@ namespace Catch {
 
 #define CATCH_VERSION_MAJOR 3
 #define CATCH_VERSION_MINOR 9
-#define CATCH_VERSION_PATCH 0
+#define CATCH_VERSION_PATCH 1
 
 #endif // CATCH_VERSION_MACROS_HPP_INCLUDED
 
@@ -9130,6 +9147,17 @@ namespace Catch {
     bool isDebuggerActive();
 }
 
+#if !defined(CATCH_TRAP) && defined(__clang__) && defined(__has_builtin)
+#if __has_builtin(__builtin_debugtrap)
+#define CATCH_TRAP() __builtin_debugtrap()
+#endif
+#endif
+
+#if !defined(CATCH_TRAP) && defined(_MSC_VER)
+#define CATCH_TRAP() __debugbreak()
+#endif
+
+#if !defined(CATCH_TRAP) // If we couldn't use compiler-specific impl from above, we get into platform-specific options
 #ifdef CATCH_PLATFORM_MAC
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -9165,15 +9193,14 @@ namespace Catch {
 
 #define CATCH_TRAP() raise(SIGTRAP)
 #endif
-#elif defined(_MSC_VER)
-#define CATCH_TRAP() __debugbreak()
 #elif defined(__MINGW32__)
 extern "C" __declspec(dllimport) void __stdcall DebugBreak();
 #define CATCH_TRAP() DebugBreak()
 #endif
+#endif // ^^ CATCH_TRAP is not defined yet, so we define it
 
-#ifndef CATCH_BREAK_INTO_DEBUGGER
-#ifdef CATCH_TRAP
+#if !defined(CATCH_BREAK_INTO_DEBUGGER)
+#if defined(CATCH_TRAP)
 #define CATCH_BREAK_INTO_DEBUGGER() [] { if( Catch::isDebuggerActive() ) { CATCH_TRAP(); } }()
 #else
 #define CATCH_BREAK_INTO_DEBUGGER() [] {}()

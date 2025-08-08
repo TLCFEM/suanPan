@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.9.0
-//  Generated: 2025-07-24 22:00:25.173359
+//  Catch v3.9.1
+//  Generated: 2025-08-09 00:29:21.552225
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -1903,6 +1903,12 @@ namespace Catch {
                 rss << std::setw(2) << static_cast<unsigned>(bytes[i]);
             return rss.str();
         }
+
+        std::string makeExceptionHappenedString() {
+            return "{ stringification failed with an exception: \"" +
+                   translateActiveException() + "\" }";
+        }
+
     } // namespace Detail
 
     //// ======================================================= ////
@@ -2145,7 +2151,7 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
-        static Version version(3, 9, 0, "", 0);
+        static Version version(3, 9, 1, "", 0);
         return version;
     }
 
@@ -3707,10 +3713,10 @@ namespace Catch {
         // To avoid having to handle TFE explicitly everywhere, we just
         // rethrow it so that it goes back up the caller.
         catch(TestFailureException&) {
-            std::rethrow_exception(std::current_exception());
+            return "{ nested assertion failed }";
         }
         catch(TestSkipException&) {
-            std::rethrow_exception(std::current_exception());
+            return "{ nested SKIP() called }";
         }
         catch(std::exception const& ex) {
             return ex.what();
