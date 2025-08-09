@@ -27,16 +27,10 @@
 [![marketplace](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
 
 > [!IMPORTANT]
-> ***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
-> highlighting and autocompletion.***
-
-> [!IMPORTANT]
-> ***Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).***
-
-> [!IMPORTANT]
-> Please check the [documentation](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
-> For a summary of available functionalities, check [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
-> Please star ⭐ the project!
+> - **Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).**
+> - Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax highlighting and autocompletion.
+> - Check out the [documentation](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) for a summary of all available functionalities.
+> - Please star ⭐ the project!
 
 ## Introduction
 
