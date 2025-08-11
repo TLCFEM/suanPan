@@ -93,7 +93,8 @@ func downloadLatestVersion(versionString string) error {
 
 	var package_array []string
 
-	if cos == "windows" {
+	switch cos {
+	case "windows":
 		package_array = []string{
 			"suanPan-win-mkl-no-avx.zip",
 			"suanPan-win-mkl-vtk-no-avx.zip",
@@ -104,7 +105,7 @@ func downloadLatestVersion(versionString string) error {
 			"suanPan-win-openblas-vtk.7z",
 			"suanPan-win-openblas.7z",
 		}
-	} else if cos == "linux" {
+	case "linux":
 		package_array = []string{
 			"suanPan-linux-mkl-no-avx.tar.gz",
 			"suanPan-linux-mkl-vtk-no-avx.tar.gz",
@@ -119,7 +120,7 @@ func downloadLatestVersion(versionString string) error {
 			"suanPan-linux-openblas-vtk.tar.gz",
 			"suanPan-linux-openblas.tar.gz",
 		}
-	} else if cos == "darwin" {
+	case "darwin":
 		package_array = []string{
 			"suanPan-macos-openblas-vtk.tar.gz",
 			"suanPan-macos-openblas.tar.gz",
