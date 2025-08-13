@@ -63,9 +63,8 @@ jobs:
       - name: Remote
         uses: appleboy/scp-action@v1
         with:
-          host: 170.64.176.26
-          username: theodore
-          key: ${{ secrets.VETERAN_KEY }}
-          port: 2222
+          host: hetzner.tlcfem.top
+          username: root
+          key: ${{ secrets.STATIC_KEY }}
           source: ${{ env.ARTIFACT }}
           target: ~/Documents/suanPan-daily
