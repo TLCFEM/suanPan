@@ -21,110 +21,90 @@
 
 
 
-class spop_rel_lt_pre
+struct spop_rel_lt_pre
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_lt_pre>& X);
   };
 
 
 
-class spop_rel_lt_post
+struct spop_rel_lt_post
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_lt_post>& X);
   };
 
 
 
-class spop_rel_gt_pre
+struct spop_rel_gt_pre
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_gt_pre>& X);
   };
 
 
 
-class spop_rel_gt_post
+struct spop_rel_gt_post
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_gt_post>& X);
   };
 
 
 
-class spop_rel_lteq_pre
+struct spop_rel_lteq_pre
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_lteq_pre>& X);
   };
 
 
 
-class spop_rel_lteq_post
+struct spop_rel_lteq_post
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_lteq_post>& X);
   };
 
 
 
-class spop_rel_gteq_pre
+struct spop_rel_gteq_pre
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_gteq_pre>& X);
   };
 
 
 
-class spop_rel_gteq_post
+struct spop_rel_gteq_post
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_gteq_post>& X);
   };
 
 
 
-class spop_rel_eq
+struct spop_rel_eq
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_eq>& X);
   };
 
 
 
-class spop_rel_noteq
+struct spop_rel_noteq
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<uword>& out, const mtSpOp<uword, T1, spop_rel_noteq>& X);
   };

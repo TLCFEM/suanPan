@@ -22,10 +22,8 @@
 
 
 template<typename T1, typename op_type>
-class CubeToMatOp : public Base< typename T1::elem_type, CubeToMatOp<T1, op_type> >
+struct CubeToMatOp : public Base< typename T1::elem_type, CubeToMatOp<T1, op_type> >
   {
-  public:
-  
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   

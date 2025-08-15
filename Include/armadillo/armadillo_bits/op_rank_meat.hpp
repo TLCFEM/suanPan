@@ -46,7 +46,7 @@ op_rank::apply(uword& out, const Base<typename T1::elem_type,T1>& expr, const ty
   
   const bool is_sym_size_ok = (A.n_rows == A.n_cols) && (A.n_rows > (is_cx<eT>::yes ? uword(20) : uword(40)));  // for consistency with op_pinv
   
-  if( (is_sym_size_ok) && (arma_config::optimise_sym) && (auxlib::crippled_lapack(A) == false) )
+  if( (is_sym_size_ok) && (arma_config::optimise_sym) )
     {
     do_sym = is_sym_expr<T1>::eval(expr.get_ref());
     
@@ -57,7 +57,20 @@ op_rank::apply(uword& out, const Base<typename T1::elem_type,T1>& expr, const ty
     {
     arma_debug_print("op_rank::apply(): symmetric/hermitian optimisation");
     
-    return op_rank::apply_sym(out, A, tol);
+    const bool status = op_rank::apply_sym(out, A, tol);
+    
+    if( (status) && (out > uword(0)) )
+      {
+      return true;
+      }
+    else
+      {
+      arma_debug_print("op_rank::apply(): symmetric/hermitian optimisation failed");
+      
+      A = expr.get_ref();
+      
+      // fallthrough
+      }
     }
   
   return op_rank::apply_gen(out, A, tol);

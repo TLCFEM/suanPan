@@ -22,10 +22,8 @@
 
 //! 'hermitian transpose' operation
 
-class op_htrans
+struct op_htrans
   {
-  public:
-  
   template<typename T1>
   struct traits
     {
@@ -83,10 +81,8 @@ class op_htrans
 
 
 
-class op_htrans2
+struct op_htrans2
   {
-  public:
-  
   template<typename T1>
   struct traits
     {

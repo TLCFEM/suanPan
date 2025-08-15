@@ -21,11 +21,9 @@
 
 
 
-class spglue_schur
+struct spglue_schur
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(SpMat<typename T1::elem_type>& out, const SpGlue<T1,T2,spglue_schur>& X);
   
@@ -38,22 +36,18 @@ class spglue_schur
 
 
 
-class spglue_schur_misc
+struct spglue_schur_misc
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void dense_schur_sparse(SpMat<typename T1::elem_type>& out, const T1& x, const T2& y);
   };
 
 
 
-class spglue_schur_mixed
+struct spglue_schur_mixed
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(SpMat<typename eT_promoter<T1,T2>::eT>& out, const mtSpGlue<typename eT_promoter<T1,T2>::eT, T1, T2, spglue_schur_mixed>& expr);
   

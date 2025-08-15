@@ -21,10 +21,8 @@
 
 
 
-class SizeCube
+struct SizeCube
   {
-  public:
-  
   const uword n_rows;
   const uword n_cols;
   const uword n_slices;

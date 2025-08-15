@@ -23,7 +23,7 @@
 
 template<typename T1>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 balance(Col<typename T1::pod_type>& S, Col<uword>& P, Mat<typename T1::elem_type>& B, const Base<typename T1::elem_type,T1>& A, const char* method = "both")
   {
   arma_debug_sigprint();
@@ -68,7 +68,7 @@ balance(Col<typename T1::pod_type>& S, Col<uword>& P, Mat<typename T1::elem_type
 
 template<typename T1>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 balance(Mat<typename T1::elem_type>& B, const Base<typename T1::elem_type,T1>& A, const char* method = "both")
   {
   arma_debug_sigprint();
@@ -114,7 +114,7 @@ balance(Mat<typename T1::elem_type>& B, const Base<typename T1::elem_type,T1>& A
 
 template<typename T1>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, Mat<typename T1::elem_type> >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, Mat<typename T1::elem_type> >::result
 balance(const Base<typename T1::elem_type,T1>& A, const char* method = "both")
   {
   arma_debug_sigprint();

@@ -22,10 +22,8 @@
 
 
 
-class glue_trapz
+struct glue_trapz
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -41,11 +39,9 @@ class glue_trapz
 
 
 
-class op_trapz
+struct op_trapz
   : public traits_op_xvec
   {
-  public:
-  
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_trapz>& in);
   
   template<typename eT> inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& Y, const uword dim);

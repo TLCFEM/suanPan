@@ -22,11 +22,9 @@
 
 
 
-class op_shuffle
+struct op_shuffle
   : public traits_op_default
   {
-  public:
-  
   template<typename eT> inline static void apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim);
   
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle>& in);
@@ -34,11 +32,9 @@ class op_shuffle
 
 
 
-class op_shuffle_vec
+struct op_shuffle_vec
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shuffle_vec>& in);
   };
 

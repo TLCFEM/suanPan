@@ -22,10 +22,8 @@
 
 
 template<typename T1, typename op_type>
-class SpOp : public SpBase< typename T1::elem_type, SpOp<T1, op_type> >
+struct SpOp : public SpBase< typename T1::elem_type, SpOp<T1, op_type> >
   {
-  public:
-  
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   

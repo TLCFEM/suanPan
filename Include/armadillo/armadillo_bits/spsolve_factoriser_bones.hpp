@@ -44,9 +44,9 @@ class spsolve_factoriser
   
   inline double rcond() const;
   
-  template<typename T1> inline bool factorise(const SpBase<typename T1::elem_type,T1>& A_expr, const spsolve_opts_base& settings = spsolve_opts_none(), const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr);
+  template<typename T1> inline bool factorise(const SpBase<typename T1::elem_type,T1>& A_expr, const spsolve_opts_base& settings = spsolve_opts_none(), const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr);
   
-  template<typename T1> inline bool solve(Mat<typename T1::elem_type>& X, const Base<typename T1::elem_type,T1>& B_expr, const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr);
+  template<typename T1> inline bool solve(Mat<typename T1::elem_type>& X, const Base<typename T1::elem_type,T1>& B_expr, const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr);
   
   inline      spsolve_factoriser(const spsolve_factoriser&) = delete;
   inline void operator=         (const spsolve_factoriser&) = delete;

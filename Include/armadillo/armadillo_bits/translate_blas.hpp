@@ -30,7 +30,7 @@ namespace blas
   void
   gemv(const char* transA, const blas_int* m, const blas_int* n, const eT* alpha, const eT* A, const blas_int* ldA, const eT* x, const blas_int* incx, const eT* beta, eT* y, const blas_int* incy)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     #if defined(ARMA_USE_FORTRAN_HIDDEN_ARGS)
       {
@@ -56,7 +56,7 @@ namespace blas
   void
   gemm(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const eT* alpha, const eT* A, const blas_int* ldA, const eT* B, const blas_int* ldB, const eT* beta, eT* C, const blas_int* ldC)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     #if defined(ARMA_USE_FORTRAN_HIDDEN_ARGS)
       {
@@ -82,7 +82,7 @@ namespace blas
   void
   syrk(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const eT* alpha, const eT* A, const blas_int* ldA, const eT* beta, eT* C, const blas_int* ldC)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     #if defined(ARMA_USE_FORTRAN_HIDDEN_ARGS)
       {
@@ -104,7 +104,7 @@ namespace blas
   void
   herk(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const T* alpha, const std::complex<T>* A, const blas_int* ldA, const T* beta, std::complex<T>* C, const blas_int* ldC)
     {
-    arma_type_check((is_supported_blas_type<T>::value == false));
+    arma_type_check((is_blas_type<T>::value == false));
     
     #if defined(ARMA_USE_FORTRAN_HIDDEN_ARGS)
       {
@@ -126,7 +126,7 @@ namespace blas
   eT
   dot(const uword n_elem, const eT* x, const eT* y)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {
@@ -207,7 +207,7 @@ namespace blas
   eT
   asum(const uword n_elem, const eT* x)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {
@@ -239,7 +239,7 @@ namespace blas
   eT
   nrm2(const uword n_elem, const eT* x)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {

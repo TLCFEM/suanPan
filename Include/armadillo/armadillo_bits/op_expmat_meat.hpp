@@ -86,7 +86,7 @@ op_expmat::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1
     return true;
     }
   
-  if( (arma_config::optimise_sym) && (auxlib::crippled_lapack(A) == false) && sym_helper::is_approx_sym(A) )
+  if( (arma_config::optimise_sym) && sym_helper::is_approx_sym(A) )
     {
     arma_debug_print("op_expmat: symmetric/hermitian optimisation");
     

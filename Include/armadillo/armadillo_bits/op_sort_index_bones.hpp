@@ -21,11 +21,9 @@
 
 
 
-class op_sort_index
+struct op_sort_index
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   static inline bool apply_helper(Mat<uword>& out, const Proxy<T1>& P, const uword sort_mode);
   

@@ -39,7 +39,7 @@ get_cerr_stream()
 
 
 
-arma_deprecated
+[[deprecated]]
 inline
 std::ostream&
 get_stream_err1()
@@ -49,7 +49,7 @@ get_stream_err1()
 
 
 
-arma_deprecated
+[[deprecated]]
 inline
 std::ostream&
 get_stream_err2()
@@ -59,7 +59,7 @@ get_stream_err2()
 
 
 
-arma_frown("this function does nothing; instead use ARMA_COUT_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_COUT_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 void
 set_cout_stream(const std::ostream&)
@@ -68,7 +68,7 @@ set_cout_stream(const std::ostream&)
 
 
 
-arma_frown("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 void
 set_cerr_stream(const std::ostream&)
@@ -77,7 +77,7 @@ set_cerr_stream(const std::ostream&)
 
 
 
-arma_frown("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 void
 set_stream_err1(const std::ostream&)
@@ -86,7 +86,7 @@ set_stream_err1(const std::ostream&)
 
 
 
-arma_frown("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 void
 set_stream_err2(const std::ostream&)
@@ -96,7 +96,7 @@ set_stream_err2(const std::ostream&)
 
 
 template<typename T>
-arma_frown("this function does nothing; instead use ARMA_COUT_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_COUT_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 std::ostream&
 arma_cout_stream(std::ostream*)
@@ -107,7 +107,7 @@ arma_cout_stream(std::ostream*)
 
 
 template<typename T>
-arma_frown("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 std::ostream&
 arma_cerr_stream(std::ostream*)
@@ -1393,7 +1393,7 @@ arma_assert_atlas_size(const T1& A, const T2& B)
 
 
 // for compatibility with earlier versions of Armadillo
-arma_frown("use arma_conform_check() instead")
+[[deprecated("use arma_conform_check() instead")]]
 inline void arma_debug_check(bool state, const char* msg)  { arma_conform_check(state, msg); }
 
 
@@ -1401,10 +1401,8 @@ inline void arma_debug_check(bool state, const char* msg)  { arma_conform_check(
 
   namespace junk
     {
-    class arma_first_debug_message
+    struct arma_first_debug_message
       {
-      public:
-      
       inline
       arma_first_debug_message()
         {
@@ -1418,7 +1416,6 @@ inline void arma_debug_check(bool state, const char* msg)  { arma_conform_check(
             << " (" << nickname << ')';
         
         out << "\n@ arma_config::wrapper          = " << arma_config::wrapper;
-        out << "\n@ arma_config::cxx14            = " << arma_config::cxx14;
         out << "\n@ arma_config::cxx17            = " << arma_config::cxx17;
         out << "\n@ arma_config::cxx20            = " << arma_config::cxx20;
         out << "\n@ arma_config::cxx23            = " << arma_config::cxx23;
@@ -1445,6 +1442,8 @@ inline void arma_debug_check(bool state, const char* msg)  { arma_conform_check(
         out << "\n@ arma_config::check_conform    = " << arma_config::check_conform;
         out << "\n@ arma_config::check_nonfinite  = " << arma_config::check_nonfinite;
         out << "\n@ arma_config::fast_math        = " << arma_config::fast_math;
+        out << "\n@ arma_config::have_fp16        = " << arma_config::have_fp16;
+        out << "\n@ arma_config::good_fp16        = " << arma_config::good_fp16;
         out << "\n@ sizeof(void*)    = " << sizeof(void*);
         out << "\n@ sizeof(int)      = " << sizeof(int);
         out << "\n@ sizeof(long)     = " << sizeof(long);

@@ -21,11 +21,9 @@
 
 
 
-class op_find_unique
+struct op_find_unique
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   static inline bool apply_helper(Mat<uword>& out, const Proxy<T1>& P, const bool ascending_indices);
   

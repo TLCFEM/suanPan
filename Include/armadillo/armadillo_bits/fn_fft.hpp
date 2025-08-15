@@ -67,7 +67,7 @@ inline
 typename
 enable_if2
   <
-  (is_arma_type<T1>::value && (is_cx_float<typename T1::elem_type>::yes || is_cx_double<typename T1::elem_type>::yes)),
+  (is_arma_type<T1>::value && is_cx<typename T1::elem_type>::yes),
   const Op<T1, op_fft_cx>
   >::result
 fft(const T1& A)
@@ -85,7 +85,7 @@ inline
 typename
 enable_if2
   <
-  (is_arma_type<T1>::value && (is_cx_float<typename T1::elem_type>::yes || is_cx_double<typename T1::elem_type>::yes)),
+  (is_arma_type<T1>::value && is_cx<typename T1::elem_type>::yes),
   const Op<T1, op_fft_cx>
   >::result
 fft(const T1& A, const uword N)
@@ -103,7 +103,7 @@ inline
 typename
 enable_if2
   <
-  (is_arma_type<T1>::value && (is_cx_float<typename T1::elem_type>::yes || is_cx_double<typename T1::elem_type>::yes)),
+  (is_arma_type<T1>::value && is_cx<typename T1::elem_type>::yes),
   const Op<T1, op_ifft_cx>
   >::result
 ifft(const T1& A)
@@ -121,7 +121,7 @@ inline
 typename
 enable_if2
   <
-  (is_arma_type<T1>::value && (is_cx_float<typename T1::elem_type>::yes || is_cx_double<typename T1::elem_type>::yes)),
+  (is_arma_type<T1>::value && is_cx<typename T1::elem_type>::yes),
   const Op<T1, op_ifft_cx>
   >::result
 ifft(const T1& A, const uword N)

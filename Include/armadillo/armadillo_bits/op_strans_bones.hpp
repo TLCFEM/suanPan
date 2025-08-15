@@ -22,10 +22,8 @@
 
 //! 'matrix transpose' operation (simple transpose, ie. without taking the conjugate of the elements)
 
-class op_strans
+struct op_strans
   {
-  public:
-  
   template<typename T1>
   struct traits
     {
@@ -72,10 +70,8 @@ class op_strans
 
 
 
-class op_strans_cube
+struct op_strans_cube
   {
-  public:
-  
   template<typename eT>
   inline static void apply_noalias(Cube<eT>& out, const Cube<eT>& X);
   };

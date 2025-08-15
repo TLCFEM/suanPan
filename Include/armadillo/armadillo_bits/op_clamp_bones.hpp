@@ -22,11 +22,9 @@
 
 
 
-class op_clamp
+struct op_clamp
   : public traits_op_passthru
   {
-  public:
-  
   // matrices
   
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const mtOp<typename T1::elem_type, T1, op_clamp>& in);
@@ -46,11 +44,9 @@ class op_clamp
 
 
 
-class op_clamp_cx
+struct op_clamp_cx
   : public traits_op_passthru
   {
-  public:
-  
   // matrices
   
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const mtOp<typename T1::elem_type, T1, op_clamp_cx>& in);

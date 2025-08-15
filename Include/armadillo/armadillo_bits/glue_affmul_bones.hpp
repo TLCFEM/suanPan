@@ -21,10 +21,8 @@
 
 
 
-class glue_affmul
+struct glue_affmul
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

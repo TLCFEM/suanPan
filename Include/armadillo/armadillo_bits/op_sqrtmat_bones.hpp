@@ -21,11 +21,9 @@
 
 
 
-class op_sqrtmat
+struct op_sqrtmat
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat< std::complex<typename T1::elem_type> >& out, const mtOp<std::complex<typename T1::elem_type>,T1,op_sqrtmat>& in);
 
@@ -38,11 +36,9 @@ class op_sqrtmat
 
 
 
-class op_sqrtmat_cx
+struct op_sqrtmat_cx
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_sqrtmat_cx>& in);
   
@@ -61,11 +57,9 @@ class op_sqrtmat_cx
 
 
 
-class op_sqrtmat_sympd
+struct op_sqrtmat_sympd
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_sqrtmat_sympd>& in);
   

@@ -94,15 +94,13 @@ class running_stat
   arma_aligned  T max_val_norm;
   
   
-  friend class running_stat_aux;
+  friend struct running_stat_aux;
   };
 
 
 
-class running_stat_aux
+struct running_stat_aux
   {
-  public:
-  
   template<typename eT>
   inline static void update_stats(running_stat<eT>& x, const eT sample, const typename arma_not_cx<eT>::result* junk = nullptr);
   

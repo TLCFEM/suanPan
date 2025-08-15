@@ -26,7 +26,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::pod_type>::value,
+  is_blas_real<typename T1::pod_type>::value,
   const Op<T1,op_expmat>
   >::result
 expmat(const Base<typename T1::elem_type,T1>& A)
@@ -43,7 +43,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::pod_type>::value,
+  is_blas_real<typename T1::pod_type>::value,
   bool
   >::result
 expmat(Mat<typename T1::elem_type>& B, const Base<typename T1::elem_type,T1>& A)
@@ -70,7 +70,7 @@ expmat(Mat<typename T1::elem_type>& B, const Base<typename T1::elem_type,T1>& A)
 template<typename T1>
 arma_warn_unused
 arma_inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, const Op<T1, op_expmat_sym> >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, const Op<T1, op_expmat_sym> >::result
 expmat_sym(const Base<typename T1::elem_type,T1>& X)
   {
   arma_debug_sigprint();
@@ -82,7 +82,7 @@ expmat_sym(const Base<typename T1::elem_type,T1>& X)
 
 template<typename T1>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 expmat_sym(Mat<typename T1::elem_type>& Y, const Base<typename T1::elem_type,T1>& X)
   {
   arma_debug_sigprint();

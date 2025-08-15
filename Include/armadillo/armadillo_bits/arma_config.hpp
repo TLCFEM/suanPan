@@ -160,13 +160,6 @@ struct arma_config
   #endif
   
   
-  #if defined(ARMA_HAVE_CXX14)
-    static constexpr bool cxx14 = true;
-  #else
-    static constexpr bool cxx14 = false;
-  #endif
-  
-  
   #if defined(ARMA_HAVE_CXX17)
     static constexpr bool cxx17 = true;
   #else
@@ -241,6 +234,20 @@ struct arma_config
     static constexpr bool text_as_binary = true;
   #else
     static constexpr bool text_as_binary = false;
+  #endif
+  
+  
+  #if defined(ARMA_HAVE_FP16)
+    static constexpr bool have_fp16 = true;
+  #else
+    static constexpr bool have_fp16 = false;
+  #endif
+  
+  
+  #if defined(ARMA_GOOD_FP16)
+    static constexpr bool good_fp16 = true;
+  #else
+    static constexpr bool good_fp16 = false;
   #endif
   
   

@@ -20,11 +20,9 @@
 //! @{
 
 
-class glue_quantile
+struct glue_quantile
   : public traits_glue_default
   {
-  public:
-  
   template<typename eTa, typename eTb>
   inline static void worker(eTb* out_mem, Col<eTa>& Y, const Mat<eTb>& P);
   
@@ -38,10 +36,8 @@ class glue_quantile
 
 
 
-class glue_quantile_default
+struct glue_quantile_default
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

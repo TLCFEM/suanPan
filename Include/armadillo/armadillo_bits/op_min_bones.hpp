@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_min
+struct op_min
   : public traits_op_xvec
   {
-  public:
-  
   // 
   // dense matrices
   

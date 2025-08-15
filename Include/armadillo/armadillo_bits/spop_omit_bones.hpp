@@ -21,11 +21,9 @@
 //! @{
 
 
-class spop_omit
+struct spop_omit
   : public traits_op_col
   {
-  public:
-  
   template<typename T1> inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_omit>& in);
   
   template<typename T1, typename functor> inline static void apply_noalias(SpMat<typename T1::elem_type>& out, const SpProxy<T1>& P, functor is_omitted);

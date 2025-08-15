@@ -27,7 +27,7 @@ schur
   (
          Mat<typename T1::elem_type>&    S,
   const Base<typename T1::elem_type,T1>& X,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -57,7 +57,7 @@ Mat<typename T1::elem_type>
 schur
   (
   const Base<typename T1::elem_type,T1>& X,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -89,7 +89,7 @@ schur
          Mat<typename T1::elem_type>&    U,
          Mat<typename T1::elem_type>&    S,
   const Base<typename T1::elem_type,T1>& X,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();

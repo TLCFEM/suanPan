@@ -21,10 +21,8 @@
 
 
 
-class spglue_join_cols
+struct spglue_join_cols
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -48,10 +46,8 @@ class spglue_join_cols
 
 
 
-class spglue_join_rows
+struct spglue_join_rows
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

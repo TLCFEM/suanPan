@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_index_min
+struct op_index_min
   : public traits_op_xvec
   {
-  public:
-  
   // dense matrices
   
   template<typename T1>

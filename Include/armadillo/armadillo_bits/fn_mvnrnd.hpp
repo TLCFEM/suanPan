@@ -27,7 +27,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   const Glue<T1, T2, glue_mvnrnd_vec>
   >::result
 mvnrnd(const Base<typename T1::elem_type, T1>& M, const Base<typename T1::elem_type, T2>& C)
@@ -45,7 +45,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   const Glue<T1, T2, glue_mvnrnd>
   >::result
 mvnrnd(const Base<typename T1::elem_type, T1>& M, const Base<typename T1::elem_type, T2>& C, const uword N)
@@ -62,7 +62,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   bool
   >::result
 mvnrnd(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& M, const Base<typename T1::elem_type, T2>& C)
@@ -87,7 +87,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   bool
   >::result
 mvnrnd(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& M, const Base<typename T1::elem_type, T2>& C, const uword N)

@@ -24,7 +24,7 @@
 template<typename eT>
 struct arma_lt_comparator
   {
-  arma_inline bool operator() (const eT a, const eT b) const { return (a < b); }
+  constexpr bool operator() (const eT a, const eT b) const { return (a < b); }
   };
 
 
@@ -32,7 +32,7 @@ struct arma_lt_comparator
 template<typename eT>
 struct arma_gt_comparator
   {
-  arma_inline bool operator() (const eT a, const eT b) const { return (a > b); }
+  constexpr bool operator() (const eT a, const eT b) const { return (a > b); }
   };
 
 
@@ -40,7 +40,7 @@ struct arma_gt_comparator
 template<typename eT>
 struct arma_leq_comparator
   {
-  arma_inline bool operator() (const eT a, const eT b) const { return (a <= b); }
+  constexpr bool operator() (const eT a, const eT b) const { return (a <= b); }
   };
   
 
@@ -48,7 +48,7 @@ struct arma_leq_comparator
 template<typename eT>
 struct arma_geq_comparator
   {
-  arma_inline bool operator() (const eT a, const eT b) const { return (a >= b); }
+  constexpr bool operator() (const eT a, const eT b) const { return (a >= b); }
   };
 
 

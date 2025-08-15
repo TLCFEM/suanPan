@@ -35,10 +35,8 @@
 // NOTE: The Mat class has an explicit constructor to efficiently handle mtSpReduceOp.
 
 template<typename out_eT, typename T1, typename op_type>
-class mtSpReduceOp : public SpBase< out_eT, mtSpReduceOp<out_eT, T1, op_type> >
+struct mtSpReduceOp : public SpBase< out_eT, mtSpReduceOp<out_eT, T1, op_type> >
   {
-  public:
-  
   typedef          out_eT                       elem_type;
   typedef typename get_pod_type<out_eT>::result pod_type;
   

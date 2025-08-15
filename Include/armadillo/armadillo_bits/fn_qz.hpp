@@ -27,7 +27,7 @@ inline
 typename
 enable_if2
   <
-  is_supported_blas_type<typename T1::elem_type>::value,
+  is_blas_type<typename T1::elem_type>::value,
   bool
   >::result
 qz

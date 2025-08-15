@@ -32,7 +32,7 @@ svds_helper
   const uword                              k,
   const typename T1::pod_type              tol,
   const bool                               calc_UV,
-  const typename arma_real_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -43,7 +43,7 @@ svds_helper
   
   arma_conform_check
     (
-    ( ((void*)(&U) == (void*)(&S)) || (&U == &V) || ((void*)(&S) == (void*)(&V)) ),
+    ( (void_ptr(&U) == void_ptr(&S)) || (&U == &V) || (void_ptr(&S) == void_ptr(&V)) ),
     "svds(): two or more output objects are the same object"
     );
   
@@ -150,7 +150,7 @@ svds_helper
   const uword                              k,
   const typename T1::pod_type              tol,
   const bool                               calc_UV,
-  const typename arma_cx_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -167,7 +167,7 @@ svds_helper
   
   arma_conform_check
     (
-    ( ((void*)(&U) == (void*)(&S)) || (&U == &V) || ((void*)(&S) == (void*)(&V)) ),
+    ( (void_ptr(&U) == void_ptr(&S)) || (&U == &V) || (void_ptr(&S) == void_ptr(&V)) ),
     "svds(): two or more output objects are the same object"
     );
   
@@ -276,7 +276,7 @@ svds
   const SpBase<typename T1::elem_type,T1>& X,
   const uword                              k,
   const typename T1::pod_type              tol  = 0.0,
-  const typename arma_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -301,7 +301,7 @@ svds
   const SpBase<typename T1::elem_type,T1>& X,
   const uword                              k,
   const typename T1::pod_type              tol  = 0.0,
-  const typename arma_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -329,7 +329,7 @@ svds
   const SpBase<typename T1::elem_type,T1>& X,
   const uword                              k,
   const typename T1::pod_type              tol  = 0.0,
-  const typename arma_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();

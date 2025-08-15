@@ -27,7 +27,7 @@ inline
 typename
 enable_if2
   <
-  (is_supported_blas_type<typename T1::elem_type>::value && is_arma_type<T2>::value && is_same_type<typename T1::elem_type,typename T2::elem_type>::value),
+  (is_blas_type<typename T1::elem_type>::value && is_arma_type<T2>::value && is_same_type<typename T1::elem_type,typename T2::elem_type>::value),
   const Glue<T1, T2, glue_polyval>
   >::result
 polyval(const Base<typename T1::elem_type, T1>& P, const T2& X)

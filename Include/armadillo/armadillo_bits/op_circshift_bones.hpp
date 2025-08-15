@@ -16,25 +16,24 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cond_rel
+
+//! \addtogroup op_circshift
 //! @{
 
 
-//
-// for preventing pedantic compiler warnings
 
-template<const bool do_eval>
-class cond_rel
+struct op_circshift_vec
+  : public traits_op_passthru
   {
-  public:
-  
-  template<typename eT> arma_inline static bool lt(const eT A, const eT B);
-  template<typename eT> arma_inline static bool gt(const eT A, const eT B);
+  template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_circshift_vec>& in);
+  };
 
-  template<typename eT> arma_inline static bool leq(const eT A, const eT B);
-  template<typename eT> arma_inline static bool geq(const eT A, const eT B);
-  
-  template<typename eT> arma_inline static eT make_neg(const eT val);
+
+
+struct op_circshift
+  : public traits_op_default
+  {
+  template<typename eT> inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword len, const uword neg, const uword dim);
   };
 
 

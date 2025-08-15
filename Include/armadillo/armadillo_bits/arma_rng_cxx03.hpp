@@ -21,10 +21,8 @@
 
 
 
-class arma_rng_cxx03
+struct arma_rng_cxx03
   {
-  public:
-  
   typedef unsigned int seed_type;
   
   inline static void set_seed(const seed_type val);

@@ -24,7 +24,7 @@
 template<typename T1>
 arma_warn_unused
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, Col<typename T1::pod_type> >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, Col<typename T1::pod_type> >::result
 eigs_sym
   (
   const SpBase<typename T1::elem_type,T1>& X,
@@ -55,9 +55,9 @@ eigs_sym
 
 //! this form is deprecated; use eigs_sym(X, n_eigvals, form, opts) instead
 template<typename T1>
-arma_deprecated
+[[deprecated]]
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, Col<typename T1::pod_type> >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, Col<typename T1::pod_type> >::result
 eigs_sym
   (
   const SpBase<typename T1::elem_type,T1>& X,
@@ -79,7 +79,7 @@ eigs_sym
 template<typename T1>
 arma_warn_unused
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, Col<typename T1::pod_type> >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, Col<typename T1::pod_type> >::result
 eigs_sym
   (
   const SpBase<typename T1::elem_type,T1>& X,
@@ -111,7 +111,7 @@ eigs_sym
 //! eigenvalues of symmetric real sparse matrix X
 template<typename T1>
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, bool >::result
 eigs_sym
   (
            Col<typename T1::pod_type >&    eigval,
@@ -142,9 +142,9 @@ eigs_sym
 
 //! this form is deprecated; use eigs_sym(eigval, X, n_eigvals, form, opts) instead
 template<typename T1>
-arma_deprecated
+[[deprecated]]
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, bool >::result
 eigs_sym
   (
            Col<typename T1::pod_type >&    eigval,
@@ -166,7 +166,7 @@ eigs_sym
 
 template<typename T1>
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, bool >::result
 eigs_sym
   (
            Col<typename T1::pod_type >&    eigval,
@@ -198,7 +198,7 @@ eigs_sym
 //! eigenvalues and eigenvectors of symmetric real sparse matrix X
 template<typename T1>
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, bool >::result
 eigs_sym
   (
            Col<typename T1::pod_type >&    eigval,
@@ -231,9 +231,9 @@ eigs_sym
 
 //! this form is deprecated; use eigs_sym(eigval, eigvec, X, n_eigvals, form, opts) instead
 template<typename T1>
-arma_deprecated
+[[deprecated]]
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, bool >::result
 eigs_sym
   (
            Col<typename T1::pod_type >&    eigval,
@@ -256,7 +256,7 @@ eigs_sym
 
 template<typename T1>
 inline
-typename enable_if2< is_real<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_real<typename T1::elem_type>::value, bool >::result
 eigs_sym
   (
            Col<typename T1::pod_type >&    eigval,

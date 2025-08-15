@@ -21,10 +21,8 @@
 
 
 
-class spglue_times
+struct spglue_times
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -45,10 +43,8 @@ class spglue_times
 
 
 
-class spglue_times_mixed
+struct spglue_times_mixed
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

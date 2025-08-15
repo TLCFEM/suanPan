@@ -21,11 +21,9 @@
 
 
 
-class op_real
+struct op_real
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply( Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_type, T1, op_real>& X);
   
@@ -35,11 +33,9 @@ class op_real
 
 
 
-class op_imag
+struct op_imag
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply( Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_type, T1, op_imag>& X);
   
@@ -49,11 +45,9 @@ class op_imag
 
 
 
-class op_abs
+struct op_abs
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply( Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_type, T1, op_abs>& X);
   
@@ -63,11 +57,9 @@ class op_abs
 
 
 
-class op_arg
+struct op_arg
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply( Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_type, T1, op_arg>& X);
   
@@ -77,11 +69,9 @@ class op_arg
 
 
 
-class op_replace
+struct op_replace
   : public traits_op_passthru
   {
-  public:
-  
   template<typename eT, typename T1> inline static void apply(Mat<eT>& out, const mtOp<eT,T1,op_replace>& in);
   
   template<typename eT, typename T1> inline static void apply(Cube<eT>& out, const mtOpCube<eT,T1,op_replace>& in);

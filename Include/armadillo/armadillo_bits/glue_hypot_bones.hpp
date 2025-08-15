@@ -22,12 +22,9 @@
 
 
 
-class glue_hypot
+struct glue_hypot
   : public traits_glue_or
   {
-  public:
-  
-  
   // matrices
   
   template<typename T1, typename T2> inline static void apply(Mat<typename T1::elem_type>& out, const Glue<T1, T2, glue_hypot>& expr);

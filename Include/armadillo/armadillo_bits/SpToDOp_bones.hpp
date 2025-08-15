@@ -23,10 +23,8 @@
 // NOTE: SpToDOp is dedicated for unary operations on sparse matrices that result in dense matrices.
 
 template<typename T1, typename op_type>
-class SpToDOp : public Base< typename T1::elem_type, SpToDOp<T1, op_type> >
+struct SpToDOp : public Base< typename T1::elem_type, SpToDOp<T1, op_type> >
   {
-  public:
-  
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   

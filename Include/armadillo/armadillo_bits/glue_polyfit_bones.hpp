@@ -22,10 +22,8 @@
 
 
 
-class glue_polyfit
+struct glue_polyfit
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

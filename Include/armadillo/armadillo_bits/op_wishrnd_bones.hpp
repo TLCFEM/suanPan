@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_wishrnd
+struct op_wishrnd
   : public traits_op_default
   {
-  public:
-
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_wishrnd>& expr);
 
@@ -40,11 +38,9 @@ class op_wishrnd
 
 
 
-class op_iwishrnd
+struct op_iwishrnd
   : public traits_op_default
   {
-  public:
-
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_iwishrnd>& expr);
 

@@ -22,11 +22,9 @@
 
 
 
-class op_nonzeros
+struct op_nonzeros
   : public traits_op_col
   {
-  public:
-  
   // for dense matrices
   
   template<typename T1>

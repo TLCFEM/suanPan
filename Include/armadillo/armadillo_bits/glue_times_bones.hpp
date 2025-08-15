@@ -108,10 +108,8 @@ struct glue_times_redirect<4>
 
 
 //! Class which implements the immediate multiplication of two or more matrices
-class glue_times
+struct glue_times
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -147,10 +145,8 @@ class glue_times
 
 
 
-class glue_times_diag
+struct glue_times_diag
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

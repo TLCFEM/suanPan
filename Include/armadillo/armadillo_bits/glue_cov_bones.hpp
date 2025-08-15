@@ -22,10 +22,8 @@
 
 
 
-class glue_cov
+struct glue_cov
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

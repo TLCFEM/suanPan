@@ -110,7 +110,7 @@ spsolve_factoriser::factorise
   (
   const SpBase<typename T1::elem_type,T1>& A_expr,
   const spsolve_opts_base&                 settings,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk
   )
   {
   arma_debug_sigprint();
@@ -210,7 +210,7 @@ spsolve_factoriser::solve
   (
          Mat<typename T1::elem_type>&    X,
   const Base<typename T1::elem_type,T1>& B_expr,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk
   )
   {
   arma_debug_sigprint();

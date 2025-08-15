@@ -22,10 +22,8 @@
 
 
 
-class glue_cross
+struct glue_cross
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

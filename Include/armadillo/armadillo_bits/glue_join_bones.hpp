@@ -22,10 +22,8 @@
 
 
 
-class glue_join_cols
+struct glue_join_cols
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -49,10 +47,8 @@ class glue_join_cols
 
 
 
-class glue_join_rows
+struct glue_join_rows
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -76,10 +72,8 @@ class glue_join_rows
 
 
 
-class glue_join_slices
+struct glue_join_slices
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(Cube<typename T1::elem_type>& out, const GlueCube<T1,T2,glue_join_slices>& X);
   };

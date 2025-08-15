@@ -22,10 +22,8 @@
 
 //! simple transpose operation (no complex conjugates) for sparse matrices 
 
-class spop_strans
+struct spop_strans
   {
-  public:
-  
   template<typename T1>
   struct traits
     {

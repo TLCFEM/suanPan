@@ -22,11 +22,9 @@
 
 
 
-class op_orth
+struct op_orth
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1, op_orth>& expr);
   
@@ -36,11 +34,9 @@ class op_orth
 
 
 
-class op_null
+struct op_null
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1, op_null>& expr);
   

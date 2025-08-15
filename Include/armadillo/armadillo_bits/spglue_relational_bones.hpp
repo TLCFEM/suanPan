@@ -21,11 +21,9 @@
 
 
 
-class spglue_rel_lt
+struct spglue_rel_lt
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(SpMat<uword>& out, const mtSpGlue<uword, T1, T2, spglue_rel_lt>& X);
   
@@ -35,11 +33,9 @@ class spglue_rel_lt
 
 
 
-class spglue_rel_gt
+struct spglue_rel_gt
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(SpMat<uword>& out, const mtSpGlue<uword, T1, T2, spglue_rel_gt>& X);
   
@@ -49,11 +45,9 @@ class spglue_rel_gt
 
 
 
-class spglue_rel_and
+struct spglue_rel_and
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(SpMat<uword>& out, const mtSpGlue<uword, T1, T2, spglue_rel_and>& X);
   
@@ -63,11 +57,9 @@ class spglue_rel_and
 
 
 
-class spglue_rel_or
+struct spglue_rel_or
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(SpMat<uword>& out, const mtSpGlue<uword, T1, T2, spglue_rel_or>& X);
   

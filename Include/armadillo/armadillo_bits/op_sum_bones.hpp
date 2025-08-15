@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_sum
+struct op_sum
   : public traits_op_xvec
   {
-  public:
-  
   // dense matrices
   
   template<typename T1>
@@ -44,7 +42,7 @@ class op_sum
   
   template<typename eT>
   inline static void apply_mat_square_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim);
-
+  
   template<typename T1>
   inline static void apply_proxy_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>& P, const uword dim);
   

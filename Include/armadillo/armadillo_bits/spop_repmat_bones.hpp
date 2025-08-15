@@ -21,11 +21,9 @@
 
 
 
-class spop_repmat
+struct spop_repmat
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1,spop_repmat>& X);
   

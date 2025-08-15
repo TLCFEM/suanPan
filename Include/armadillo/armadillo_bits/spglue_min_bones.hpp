@@ -21,11 +21,9 @@
 
 
 
-class spglue_min
+struct spglue_min
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(SpMat<typename T1::elem_type>& out, const SpGlue<T1,T2,spglue_min>& X);
   

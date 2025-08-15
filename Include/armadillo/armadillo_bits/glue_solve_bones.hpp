@@ -22,10 +22,8 @@
 
 
 
-class glue_solve_gen_default
+struct glue_solve_gen_default
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -41,10 +39,8 @@ class glue_solve_gen_default
 
 
 
-class glue_solve_gen_full
+struct glue_solve_gen_full
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -60,10 +56,8 @@ class glue_solve_gen_full
 
 
 
-class glue_solve_tri_default
+struct glue_solve_tri_default
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -79,10 +73,8 @@ class glue_solve_tri_default
 
 
 
-class glue_solve_tri_full
+struct glue_solve_tri_full
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

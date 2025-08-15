@@ -336,25 +336,6 @@ op_inv_spd_rcond::apply_direct(Mat<typename T1::elem_type>& out, op_inv_spd_stat
     return true;
     }
   
-  if(auxlib::crippled_lapack(out))
-    {
-    arma_debug_print("op_inv_spd_rcond: workaround for crippled lapack");
-    
-    Mat<eT> tmp = out;
-    
-    bool sympd_state = false;
-    
-    auxlib::inv_sympd(out, sympd_state);
-    
-    if(sympd_state == false)  { out.soft_reset(); out_state.rcond = T(0); return false; }
-    
-    out_state.rcond = auxlib::rcond(tmp);
-    
-    if(out_state.rcond == T(0))  { out.soft_reset(); return false; }
-    
-    return true;
-    }
-  
   return auxlib::inv_sympd_rcond(out, out_state.rcond);
   }
 

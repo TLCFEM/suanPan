@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_sp_as_dense
+struct op_sp_as_dense
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const SpToDOp<T1, op_sp_as_dense>& expr);
   };

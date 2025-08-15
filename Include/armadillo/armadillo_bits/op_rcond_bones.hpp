@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_rcond
+struct op_rcond
   : public traits_op_default
   {
-  public:
-  
   template<typename T1> static inline typename T1::pod_type apply(const Base<typename T1::elem_type, T1>& X);
   };
 

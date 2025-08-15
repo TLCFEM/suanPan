@@ -24,7 +24,6 @@
 template<typename eglue_type>
 struct eglue_core
   {
-  
   // matrices
   
   template<typename outT, typename T1, typename T2> arma_hot inline static void apply(outT& out, const eGlue<T1, T2, eglue_type>& x);
@@ -47,37 +46,29 @@ struct eglue_core
 
 
 
-class eglue_plus : public eglue_core<eglue_plus>
+struct eglue_plus : public eglue_core<eglue_plus>
   {
-  public:
-  
   inline static const char* text() { return "addition"; }
   };
 
 
 
-class eglue_minus : public eglue_core<eglue_minus>
+struct eglue_minus : public eglue_core<eglue_minus>
   {
-  public:
-  
   inline static const char* text() { return "subtraction"; }
   };
 
 
 
-class eglue_div : public eglue_core<eglue_div>
+struct eglue_div : public eglue_core<eglue_div>
   {
-  public:
-  
   inline static const char* text() { return "element-wise division"; }
   };
 
 
 
-class eglue_schur : public eglue_core<eglue_schur>
+struct eglue_schur : public eglue_core<eglue_schur>
   {
-  public:
-  
   inline static const char* text() { return "element-wise multiplication"; }
   };
 

@@ -20,10 +20,26 @@
 //! @{
 
 
+//
+// for preventing pedantic compiler warnings
+
+template<bool do_eval>
+struct cond_rel
+  {
+  template<typename eT> static constexpr bool lt(const eT A, const eT B);
+  template<typename eT> static constexpr bool gt(const eT A, const eT B);
+
+  template<typename eT> static constexpr bool leq(const eT A, const eT B);
+  template<typename eT> static constexpr bool geq(const eT A, const eT B);
+  
+  template<typename eT> static constexpr eT make_neg(const eT val);
+  };
+
+
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 bool
 cond_rel<true>::lt(const eT A, const eT B)
   {
@@ -34,7 +50,7 @@ cond_rel<true>::lt(const eT A, const eT B)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 bool
 cond_rel<false>::lt(const eT, const eT)
   {
@@ -45,7 +61,7 @@ cond_rel<false>::lt(const eT, const eT)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 bool
 cond_rel<true>::gt(const eT A, const eT B)
   {
@@ -56,7 +72,7 @@ cond_rel<true>::gt(const eT A, const eT B)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 bool
 cond_rel<false>::gt(const eT, const eT)
   {
@@ -67,7 +83,7 @@ cond_rel<false>::gt(const eT, const eT)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 bool
 cond_rel<true>::leq(const eT A, const eT B)
   {
@@ -78,7 +94,7 @@ cond_rel<true>::leq(const eT A, const eT B)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 bool
 cond_rel<false>::leq(const eT, const eT)
   {
@@ -89,7 +105,7 @@ cond_rel<false>::leq(const eT, const eT)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 bool
 cond_rel<true>::geq(const eT A, const eT B)
   {
@@ -100,7 +116,7 @@ cond_rel<true>::geq(const eT A, const eT B)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 bool
 cond_rel<false>::geq(const eT, const eT)
   {
@@ -111,7 +127,7 @@ cond_rel<false>::geq(const eT, const eT)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 eT
 cond_rel<true>::make_neg(const eT val)
   {
@@ -122,7 +138,7 @@ cond_rel<true>::make_neg(const eT val)
 
 template<>
 template<typename eT>
-arma_inline
+constexpr
 eT
 cond_rel<false>::make_neg(const eT)
   {

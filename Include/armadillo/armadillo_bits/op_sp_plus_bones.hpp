@@ -22,11 +22,9 @@
 
 
 // Add a scalar to a sparse matrix; this will return a dense matrix.
-class op_sp_plus
+struct op_sp_plus
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const SpToDOp<T1,op_sp_plus>& in);
   

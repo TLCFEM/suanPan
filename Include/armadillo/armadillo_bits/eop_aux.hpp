@@ -24,10 +24,8 @@
 //! use of the SFINAE approach to work around compiler limitations
 //! http://en.wikipedia.org/wiki/SFINAE
 
-class eop_aux
+struct eop_aux
   {
-  public:
-  
   template<typename eT> arma_inline static typename arma_integral_only<eT>::result    acos  (const eT x) { return eT( std::acos(double(x)) ); }
   template<typename eT> arma_inline static typename arma_integral_only<eT>::result    asin  (const eT x) { return eT( std::asin(double(x)) ); }
   template<typename eT> arma_inline static typename arma_integral_only<eT>::result    atan  (const eT x) { return eT( std::atan(double(x)) ); }

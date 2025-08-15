@@ -22,10 +22,8 @@
 
 
 
-class glue_kron
+struct glue_kron
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

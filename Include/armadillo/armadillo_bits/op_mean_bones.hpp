@@ -21,11 +21,9 @@
 
 
 //! Class for finding mean values of a matrix
-class op_mean
+struct op_mean
   : public traits_op_xvec
   {
-  public:
-  
   // dense matrices
   
   template<typename T1>
@@ -34,6 +32,8 @@ class op_mean
   template<typename eT>
   inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim);
   
+  template<typename eT>
+  inline static void apply_noalias_promote(Mat<eT>& out, const Mat<eT>& X, const uword dim);
   
   // cubes
   
@@ -51,6 +51,11 @@ class op_mean
   template<typename eT>
   inline static eT direct_mean_robust(const eT old_mean, const eT* X_mem, const uword N);
   
+  template<typename eT>
+  inline static eT direct_mean_promote(const eT* X_mem, const uword N);
+  
+  template<typename eT>
+  inline static eT direct_mean_robust_promote(const eT old_mean, const eT* X_mem, const uword N);
   
   //
   

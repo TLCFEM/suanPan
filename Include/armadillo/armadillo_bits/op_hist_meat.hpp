@@ -97,7 +97,7 @@ op_hist::apply(Mat<uword>& out, const mtOp<uword, T1, op_hist>& X)
   
   const uword dim = (T1::is_xvec) ? uword(U.M.is_rowvec() ? 1 : 0) : uword((T1::is_row) ? 1 : 0);
   
-  if(is_non_integral<typename T1::elem_type>::value)
+  if(is_real<typename T1::elem_type>::value)
     {
     if(U.is_alias(out))
       {

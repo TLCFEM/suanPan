@@ -21,10 +21,8 @@
 
 
 template<typename T1, typename T2, typename eglue_type>
-class eGlue : public Base< typename T1::elem_type, eGlue<T1, T2, eglue_type> >
+struct eGlue : public Base< typename T1::elem_type, eGlue<T1, T2, eglue_type> >
   {
-  public:
-  
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef          Proxy<T1>                       proxy1_type;

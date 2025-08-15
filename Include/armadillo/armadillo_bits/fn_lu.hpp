@@ -30,7 +30,7 @@ lu
          Mat<typename T1::elem_type>&    L,
          Mat<typename T1::elem_type>&    U,
   const Base<typename T1::elem_type,T1>& X,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -62,7 +62,7 @@ lu
          Mat<typename T1::elem_type>&    U, 
          Mat<typename T1::elem_type>&    P,
   const Base<typename T1::elem_type,T1>& X,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();

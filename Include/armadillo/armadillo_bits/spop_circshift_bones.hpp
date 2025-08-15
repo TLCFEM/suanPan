@@ -17,27 +17,15 @@
 
 
 
-//! \addtogroup op_shift
+//! \addtogroup spop_circshift
 //! @{
 
 
 
-class op_shift_vec
-  : public traits_op_passthru
-  {
-  public:
-  
-  template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shift_vec>& in);
-  };
-
-
-
-class op_shift
+struct spop_circshift
   : public traits_op_default
   {
-  public:
-  
-  template<typename eT> inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword len, const uword neg, const uword dim);
+  template<typename eT> inline static void apply_noalias(SpMat<eT>& out, const SpMat<eT>& X, const uword len, const uword neg, const uword dim);
   };
 
 

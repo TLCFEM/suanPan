@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_vecnorm
+struct op_vecnorm
   : public traits_op_xvec
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_type, T1, op_vecnorm>& in);
   
@@ -36,11 +34,9 @@ class op_vecnorm
   };
 
 
-class op_vecnorm_ext
+struct op_vecnorm_ext
   : public traits_op_xvec
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_type, T1, op_vecnorm_ext>& in);
   

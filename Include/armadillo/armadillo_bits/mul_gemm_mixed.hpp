@@ -27,10 +27,8 @@
 //! Matrix 'C' is assumed to have been set to the correct size (ie. taking into account transposes)
 
 template<const bool do_trans_A=false, const bool do_trans_B=false, const bool use_alpha=false, const bool use_beta=false>
-class gemm_mixed_large
+struct gemm_mixed_large
   {
-  public:
-  
   template<typename out_eT, typename in_eT1, typename in_eT2>
   arma_hot
   inline
@@ -239,10 +237,8 @@ class gemm_mixed_large
 //! Matrix multiplication where the matrices have differing element types.
 
 template<const bool do_trans_A=false, const bool do_trans_B=false, const bool use_alpha=false, const bool use_beta=false>
-class gemm_mixed
+struct gemm_mixed
   {
-  public:
-  
   //! immediate multiplication of matrices A and B, storing the result in C
   template<typename out_eT, typename in_eT1, typename in_eT2>
   inline

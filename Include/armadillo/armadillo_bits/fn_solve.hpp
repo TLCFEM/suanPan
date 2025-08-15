@@ -28,7 +28,7 @@
 template<typename T1, typename T2>
 arma_warn_unused
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, const Glue<T1, T2, glue_solve_gen_default> >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, const Glue<T1, T2, glue_solve_gen_default> >::result
 solve
   (
   const Base<typename T1::elem_type,T1>& A,
@@ -44,7 +44,7 @@ solve
 
 template<typename T1, typename T2>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 solve
   (
          Mat<typename T1::elem_type>&    out,
@@ -70,7 +70,7 @@ solve
 template<typename T1, typename T2>
 arma_warn_unused
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, const Glue<T1, T2, glue_solve_gen_full> >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, const Glue<T1, T2, glue_solve_gen_full> >::result
 solve
   (
   const Base<typename T1::elem_type,T1>& A,
@@ -87,7 +87,7 @@ solve
 
 template<typename T1, typename T2>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 solve
   (
          Mat<typename T1::elem_type>&    out,
@@ -118,7 +118,7 @@ solve
 template<typename T1, typename T2>
 arma_warn_unused
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, const Glue<T1, T2, glue_solve_tri_default> >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, const Glue<T1, T2, glue_solve_tri_default> >::result
 solve
   (
   const Op<T1, op_trimat>&               A,
@@ -140,7 +140,7 @@ solve
 template<typename T1, typename T2>
 arma_warn_unused
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, const Glue<T1, T2, glue_solve_tri_full> >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, const Glue<T1, T2, glue_solve_tri_full> >::result
 solve
   (
   const Op<T1, op_trimat>&               A,
@@ -162,7 +162,7 @@ solve
 
 template<typename T1, typename T2>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 solve
   (
          Mat<typename T1::elem_type>&    out,
@@ -192,7 +192,7 @@ solve
 
 template<typename T1, typename T2>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 solve
   (
          Mat<typename T1::elem_type>&    out,

@@ -22,11 +22,9 @@
 
 
 
-class op_find
+struct op_find
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static uword
   helper
@@ -83,55 +81,45 @@ class op_find
 
 
 
-class op_find_simple
+struct op_find_simple
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find_simple>& X);
   };
 
 
 
-class op_find_finite
+struct op_find_finite
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find_finite>& X);
   };
 
 
 
-class op_find_nonfinite
+struct op_find_nonfinite
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find_nonfinite>& X);
   };
 
 
 
-class op_find_nan
+struct op_find_nan
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find_nan>& X);
   };
 
 
 
-class op_find_nonnan
+struct op_find_nonnan
   : public traits_op_col
   {
-  public:
-
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find_nonnan>& X);
   };

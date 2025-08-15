@@ -78,13 +78,8 @@
 #endif
 
 
-#if !defined(ARMA_HAVE_CXX11)
-  #error "*** C++11 compiler required; enable C++11 mode in your compiler, or use an earlier version of Armadillo"
-#endif
-
-
-#if (!defined(ARMA_HAVE_CXX14)) && (!defined(ARMA_IGNORE_DEPRECATED_MARKER))
-  #pragma message ("INFO: support for C++11 is deprecated; minimum recommended standard is C++14")
+#if !defined(ARMA_HAVE_CXX14)
+  #error "*** C++14 compiler required; enable C++14 mode in your compiler, or use an earlier version of Armadillo"
 #endif
 
 

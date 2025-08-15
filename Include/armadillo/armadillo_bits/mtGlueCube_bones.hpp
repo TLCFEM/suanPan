@@ -22,10 +22,8 @@
 
 
 template<typename out_eT, typename T1, typename T2, typename glue_type>
-class mtGlueCube : public BaseCube< out_eT, mtGlueCube<out_eT, T1, T2, glue_type> >
+struct mtGlueCube : public BaseCube< out_eT, mtGlueCube<out_eT, T1, T2, glue_type> >
   {
-  public:
-  
   typedef          out_eT                       elem_type;
   typedef typename get_pod_type<out_eT>::result pod_type;
   

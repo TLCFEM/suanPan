@@ -20,10 +20,8 @@
 //! @{
 
 
-class arrayops
+struct arrayops
   {
-  public:
-  
   template<typename eT>
   arma_inline static void
   copy(eT* dest, const eT* src, const uword n_elem);

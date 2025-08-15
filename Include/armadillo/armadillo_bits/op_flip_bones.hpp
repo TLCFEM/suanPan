@@ -21,11 +21,9 @@
 
 
 
-class op_flipud
+struct op_flipud
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_flipud>& in);
   
@@ -39,11 +37,9 @@ class op_flipud
 
 
 
-class op_fliplr
+struct op_fliplr
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_fliplr>& in);
   

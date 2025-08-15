@@ -25,10 +25,8 @@ struct mtSpOp_dual_aux_indicator {};
 
 
 template<typename out_eT, typename T1, typename spop_type>
-class mtSpOp : public SpBase< out_eT, mtSpOp<out_eT, T1, spop_type> >
+struct mtSpOp : public SpBase< out_eT, mtSpOp<out_eT, T1, spop_type> >
   {
-  public:
-  
   typedef          out_eT                       elem_type;
   typedef typename get_pod_type<out_eT>::result pod_type;
   

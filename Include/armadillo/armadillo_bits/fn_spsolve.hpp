@@ -31,7 +31,7 @@ spsolve_helper
   const   Base<typename T1::elem_type, T2>& B,
   const char*                               solver,
   const spsolve_opts_base&                  settings,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -137,7 +137,7 @@ spsolve
   const   Base<typename T1::elem_type, T2>& B,
   const char*                               solver   = "superlu",
   const spsolve_opts_base&                  settings = spsolve_opts_none(),
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -166,7 +166,7 @@ spsolve
   const   Base<typename T1::elem_type, T2>& B,
   const char*                               solver   = "superlu",
   const spsolve_opts_base&                  settings = spsolve_opts_none(),
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();

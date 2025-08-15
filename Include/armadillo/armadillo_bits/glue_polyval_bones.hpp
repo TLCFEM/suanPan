@@ -22,10 +22,8 @@
 
 
 
-class glue_polyval
+struct glue_polyval
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

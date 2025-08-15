@@ -22,10 +22,8 @@
 
 //! hermitian transpose operation for sparse matrices
 
-class spop_htrans
+struct spop_htrans
   {
-  public:
-  
   template<typename T1>
   struct traits
     {

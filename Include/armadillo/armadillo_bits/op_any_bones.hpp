@@ -22,12 +22,9 @@
 
 
 
-class op_any
+struct op_any
   : public traits_op_xvec
   {
-  public:
-  
-  
   template<typename T1>
   static inline bool
   any_vec_helper(const Base<typename T1::elem_type, T1>& X);

@@ -21,10 +21,8 @@
 
 
 
-class spglue_kron
+struct spglue_kron
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

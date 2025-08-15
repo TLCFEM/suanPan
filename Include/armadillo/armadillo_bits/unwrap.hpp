@@ -512,7 +512,7 @@ struct quasi_unwrap< Op<T1, op_vectorise_col> >
   static constexpr bool has_orig_mem = true;
   
   template<typename eT2>
-  arma_inline bool is_alias(const Mat<eT2>& X) const { return U.is_alias(X); }
+  arma_inline bool is_alias(const Mat<eT2>& X) const { return (is_same_type<eT,eT2>::yes) && U.is_alias(X); }
   };
 
 

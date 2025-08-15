@@ -24,7 +24,7 @@
 template<typename T1>
 arma_warn_unused
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, typename T1::elem_type >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, typename T1::elem_type >::result
 det(const Base<typename T1::elem_type,T1>& X)
   {
   arma_debug_sigprint();
@@ -48,7 +48,7 @@ det(const Base<typename T1::elem_type,T1>& X)
 
 template<typename T1>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 det(typename T1::elem_type& out_val, const Base<typename T1::elem_type,T1>& X)
   {
   arma_debug_sigprint();

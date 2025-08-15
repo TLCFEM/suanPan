@@ -22,11 +22,9 @@
 
 
 
-class op_powmat
+struct op_powmat
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_powmat>& expr);
   
@@ -39,11 +37,9 @@ class op_powmat
 
 
 
-class op_powmat_cx
+struct op_powmat_cx
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat< std::complex<typename T1::pod_type> >& out, const mtOp<std::complex<typename T1::pod_type>,T1,op_powmat_cx>& expr);
   

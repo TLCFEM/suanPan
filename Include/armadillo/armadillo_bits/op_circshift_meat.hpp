@@ -17,7 +17,7 @@
 
 
 
-//! \addtogroup op_shift
+//! \addtogroup op_circshift
 //! @{
 
 
@@ -25,7 +25,7 @@
 template<typename T1>
 inline
 void
-op_shift_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shift_vec>& in)
+op_circshift_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_circshift_vec>& in)
   {
   arma_debug_sigprint();
   
@@ -42,13 +42,13 @@ op_shift_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shift_vec>&
     {
     Mat<eT> tmp;
     
-    op_shift::apply_noalias(tmp, U.M, len, neg, dim);
+    op_circshift::apply_noalias(tmp, U.M, len, neg, dim);
     
     out.steal_mem(tmp);
     }
   else
     {
-    op_shift::apply_noalias(out, U.M, len, neg, dim);
+    op_circshift::apply_noalias(out, U.M, len, neg, dim);
     }
   }
 
@@ -57,12 +57,12 @@ op_shift_vec::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_shift_vec>&
 template<typename eT>
 inline
 void
-op_shift::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword len, const uword neg, const uword dim)
+op_circshift::apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword len, const uword neg, const uword dim)
   {
   arma_debug_sigprint();
   
-  arma_conform_check_bounds( ((dim == 0) && (len >= X.n_rows)), "shift(): shift amount out of bounds" );
-  arma_conform_check_bounds( ((dim == 1) && (len >= X.n_cols)), "shift(): shift amount out of bounds" );
+  arma_conform_check_bounds( ((dim == 0) && (len >= X.n_rows)), "circshift(): shift amount out of bounds" );
+  arma_conform_check_bounds( ((dim == 1) && (len >= X.n_cols)), "circshift(): shift amount out of bounds" );
   
   if(len == 0)  { out = X; return; }
   

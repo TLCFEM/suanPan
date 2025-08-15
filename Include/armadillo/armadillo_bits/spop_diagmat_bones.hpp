@@ -20,11 +20,9 @@
 //! @{
 
 
-class spop_diagmat
+struct spop_diagmat
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_diagmat>& in);
   
@@ -47,11 +45,9 @@ class spop_diagmat
 
 
 
-class spop_diagmat2
+struct spop_diagmat2
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_diagmat2>& in);
   

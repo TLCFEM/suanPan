@@ -22,11 +22,9 @@
 
 
 
-class op_vectorise_col
+struct op_vectorise_col
   : public traits_op_col
   {
-  public:
-  
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_col>& in);
   
   template<typename T1> inline static void apply_direct(Mat<typename T1::elem_type>& out, const T1& expr);
@@ -38,11 +36,9 @@ class op_vectorise_col
 
 
 
-class op_vectorise_row
+struct op_vectorise_row
   : public traits_op_row
   {
-  public:
-  
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_row>& in);
   
   template<typename T1> inline static void apply_direct(Mat<typename T1::elem_type>& out, const T1& expr);
@@ -52,21 +48,17 @@ class op_vectorise_row
 
 
 
-class op_vectorise_all
+struct op_vectorise_all
   : public traits_op_xvec
   {
-  public:
-  
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_all>& in);
   };
 
 
 
-class op_vectorise_cube_col
+struct op_vectorise_cube_col
   : public traits_op_col
   {
-  public:
-  
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const CubeToMatOp<T1, op_vectorise_cube_col>& in);
   
   template<typename eT> inline static void apply_subview(Mat<eT>& out, const subview_cube<eT>& sv);

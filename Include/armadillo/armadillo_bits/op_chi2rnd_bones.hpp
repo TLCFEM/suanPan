@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_chi2rnd
+struct op_chi2rnd
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_chi2rnd>& in);
   
@@ -38,10 +36,8 @@ class op_chi2rnd
 
 
 template<typename eT>
-class op_chi2rnd_varying_df
+struct op_chi2rnd_varying_df
   {
-  public:
-  
   arma_aligned std::mt19937_64 motor;
   
   inline ~op_chi2rnd_varying_df();

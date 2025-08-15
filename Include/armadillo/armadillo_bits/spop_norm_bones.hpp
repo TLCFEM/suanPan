@@ -20,15 +20,14 @@
 //! @{
 
 
-class spop_norm
+struct spop_norm
   : public traits_op_default
   {
-  public:
-  
   template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_1(const SpMat<eT>& X);
 
-  template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_2(const SpMat<eT>& X, const typename arma_real_only<eT>::result* junk = nullptr);
-  template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_2(const SpMat<eT>& X, const typename   arma_cx_only<eT>::result* junk = nullptr);
+  template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_2(const SpMat<eT>& X, const typename       arma_blas_real_only<eT>::result* junk = nullptr);
+  template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_2(const SpMat<eT>& X, const typename         arma_blas_cx_only<eT>::result* junk = nullptr);
+  template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_2(const SpMat<eT>& X, const typename arma_fp16_real_or_cx_only<eT>::result* junk = nullptr);
 
   template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_inf(const SpMat<eT>& X);
   

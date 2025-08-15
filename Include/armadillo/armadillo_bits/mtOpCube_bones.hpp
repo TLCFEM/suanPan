@@ -25,10 +25,8 @@ struct mtOpCube_dual_aux_indicator {};
 
 
 template<typename out_eT, typename T1, typename op_type>
-class mtOpCube : public BaseCube< out_eT, mtOpCube<out_eT, T1, op_type> >
+struct mtOpCube : public BaseCube< out_eT, mtOpCube<out_eT, T1, op_type> >
   {
-  public:
-  
   typedef          out_eT                       elem_type;
   typedef typename get_pod_type<out_eT>::result pod_type;
   

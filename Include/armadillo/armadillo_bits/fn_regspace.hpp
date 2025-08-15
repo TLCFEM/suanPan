@@ -79,7 +79,7 @@ internal_regspace_var_delta
   
   const T M = ((ascend) ? T(end-start) : T(start-end)) / T(inc);
   
-  const uword N = uword(1) + ( (is_non_integral<T>::value) ? uword(std::floor(double(M))) : uword(M) );
+  const uword N = uword(1) + ( (is_real<T>::value) ? uword(std::floor(double(M))) : uword(M) );
   
   x.set_size(N);
   
@@ -121,7 +121,7 @@ internal_regspace_var_delta
   
   const T M = ((ascend) ? T(end-start) : T(start-end)) / T(inc);
   
-  const uword N = uword(1) + ( (is_non_integral<T>::value) ? uword(std::floor(double(M))) : uword(M) );
+  const uword N = uword(1) + ( (is_real<T>::value) ? uword(std::floor(double(M))) : uword(M) );
   
   x.set_size(N);
   

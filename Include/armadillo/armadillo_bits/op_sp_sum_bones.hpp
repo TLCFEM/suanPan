@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_sp_sum
+struct op_sp_sum
   : public traits_op_xvec
   {
-  public:
-  
   template<typename eT, typename T1>
   inline static void apply(Mat<eT>& out, const mtSpReduceOp<eT, T1, op_sp_sum>& in);
   

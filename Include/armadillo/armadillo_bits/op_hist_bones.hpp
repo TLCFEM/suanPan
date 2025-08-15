@@ -22,11 +22,9 @@
 
 
 
-class op_hist
+struct op_hist
   : public traits_op_passthru
   {
-  public:
-  
   template<typename eT>
   inline static void apply_noalias(Mat<uword>& out, const Mat<eT>& A, const uword n_bins, const uword dim);
   

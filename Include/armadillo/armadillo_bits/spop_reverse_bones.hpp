@@ -20,11 +20,9 @@
 //! @{
 
 
-class spop_reverse
+struct spop_reverse
   : public traits_op_passthru
   {
-  public:
-  
   template<typename eT>
   inline static void apply_spmat(SpMat<eT>& out, const SpMat<eT>& X, const uword dim);
   

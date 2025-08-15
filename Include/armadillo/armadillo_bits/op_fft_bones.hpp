@@ -22,22 +22,18 @@
 
 
 
-class op_fft_real
+struct op_fft_real
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply( Mat< std::complex<typename T1::pod_type> >& out, const mtOp<std::complex<typename T1::pod_type>,T1,op_fft_real>& in );
   };
 
 
 
-class op_fft_cx
+struct op_fft_cx
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply( Mat<typename T1::elem_type>& out, const Op<T1,op_fft_cx>& in );
   
@@ -47,11 +43,9 @@ class op_fft_cx
 
 
 
-class op_ifft_cx
+struct op_ifft_cx
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply( Mat<typename T1::elem_type>& out, const Op<T1,op_ifft_cx>& in );
   };

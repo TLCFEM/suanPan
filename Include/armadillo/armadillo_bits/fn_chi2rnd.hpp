@@ -42,10 +42,20 @@ typename arma_real_only<eT>::result
 chi2rnd(const eT df)
   {
   arma_debug_sigprint();
-  
-  op_chi2rnd_varying_df<eT> generator;
-  
-  return generator(df);
+
+  if(is_fp16<eT>::yes)
+    {
+    // std::chi_squared_distribution is undefined for types other than float, double, and long double
+    op_chi2rnd_varying_df<float> generator;
+
+    return eT(generator(df));
+    }
+  else
+    {
+    op_chi2rnd_varying_df<eT> generator;
+
+    return generator(df);
+    }
   }
 
 

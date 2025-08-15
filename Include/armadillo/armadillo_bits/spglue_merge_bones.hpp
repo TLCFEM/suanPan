@@ -21,10 +21,8 @@
 
 
 
-class spglue_merge
+struct spglue_merge
   {
-  public:
-  
   template<typename eT>
   inline static void subview_merge(SpSubview<eT>& sv, const SpMat<eT>& B);
   

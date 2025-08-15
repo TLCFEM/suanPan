@@ -20,7 +20,7 @@
 //! @{
 
 
-// within each specialisation of the Proxy class:
+// within each specialisation of the Proxy struct:
 // 
 // elem_type        = type of the elements obtained from object Q
 // pod_type         = underlying type of elements if elem_type is std::complex

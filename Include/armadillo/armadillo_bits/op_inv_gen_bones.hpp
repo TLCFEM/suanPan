@@ -21,11 +21,9 @@
 
 
 
-class op_inv_gen_default
+struct op_inv_gen_default
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_inv_gen_default>& in);
   
@@ -35,11 +33,9 @@ class op_inv_gen_default
 
 
 
-class op_inv_gen_full
+struct op_inv_gen_full
   : public traits_op_default
   {
-  public:
-  
   template<const uword row, const uword col>
   struct pos
     {
@@ -73,11 +69,9 @@ struct op_inv_gen_state
 
 
 
-class op_inv_gen_rcond
+struct op_inv_gen_rcond
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static bool apply_direct(Mat<typename T1::elem_type>& out_inv, op_inv_gen_state<typename T1::pod_type>& out_state, const Base<typename T1::elem_type,T1>& expr);
   };

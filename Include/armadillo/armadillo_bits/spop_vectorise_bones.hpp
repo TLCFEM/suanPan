@@ -21,11 +21,9 @@
 //! @{
 
 
-class spop_vectorise_col
+struct spop_vectorise_col
   : public traits_op_col
   {
-  public:
-  
   template<typename T1> inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_vectorise_col>& in);
   
   template<typename T1> inline static void apply_direct(SpMat<typename T1::elem_type>& out, const T1& expr);
@@ -33,11 +31,9 @@ class spop_vectorise_col
 
 
 
-class spop_vectorise_row
+struct spop_vectorise_row
   : public traits_op_row
   {
-  public:
-  
   template<typename T1> inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_vectorise_row>& in);
   
   template<typename T1> inline static void apply_direct(SpMat<typename T1::elem_type>& out, const T1& expr);
@@ -45,11 +41,9 @@ class spop_vectorise_row
 
 
 
-class spop_vectorise_all
+struct spop_vectorise_all
   : public traits_op_xvec
   {
-  public:
-  
   template<typename T1> inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_vectorise_all>& in);
   };
 

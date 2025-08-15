@@ -23,7 +23,7 @@
 template<typename T1>
 arma_warn_unused
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, const Op<T1,op_powmat> >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, const Op<T1,op_powmat> >::result
 powmat(const Base<typename T1::elem_type,T1>& X, const int y)
   {
   arma_debug_sigprint();
@@ -38,7 +38,7 @@ powmat(const Base<typename T1::elem_type,T1>& X, const int y)
 
 template<typename T1>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 powmat
   (
          Mat<typename T1::elem_type>&    out,
@@ -67,7 +67,7 @@ powmat
 template<typename T1>
 arma_warn_unused
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, const mtOp<std::complex<typename T1::pod_type>,T1,op_powmat_cx> >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, const mtOp<std::complex<typename T1::pod_type>,T1,op_powmat_cx> >::result
 powmat(const Base<typename T1::elem_type,T1>& X, const double y)
   {
   arma_debug_sigprint();
@@ -81,7 +81,7 @@ powmat(const Base<typename T1::elem_type,T1>& X, const double y)
 
 template<typename T1>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 powmat
   (
          Mat< std::complex<typename T1::pod_type> >& out,

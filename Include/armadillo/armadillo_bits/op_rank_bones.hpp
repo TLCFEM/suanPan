@@ -22,11 +22,9 @@
 
 
 
-class op_rank
+struct op_rank
   : public traits_op_default
   {
-  public:
-  
   template<typename T1> inline static bool apply(uword& out, const Base<typename T1::elem_type,T1>& expr, const typename T1::pod_type tol);
   
   template<typename eT> inline static bool  apply_gen(uword& out, Mat<eT>& A, typename get_pod_type<eT>::result tol);

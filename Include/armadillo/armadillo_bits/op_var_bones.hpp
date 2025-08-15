@@ -21,11 +21,9 @@
 
 
 
-class op_var
+struct op_var
   : public traits_op_xvec
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::pod_type>& out, const mtOp<typename T1::pod_type, T1, op_var>& in);
   

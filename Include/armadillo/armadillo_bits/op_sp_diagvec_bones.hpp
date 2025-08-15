@@ -21,11 +21,9 @@
 
 
 
-class op_sp_diagvec
+struct op_sp_diagvec
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const mtSpReduceOp<typename T1::elem_type, T1, op_sp_diagvec>& in);
   };

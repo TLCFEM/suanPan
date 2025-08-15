@@ -21,10 +21,8 @@
 
 
 
-class dense_sparse_helper
+struct dense_sparse_helper
   {
-  public:
-  
   template<typename eT>
   arma_inline static typename  arma_not_cx<eT>::result dot(const eT* A_mem, const SpMat<eT>& B, const uword col);
   
@@ -34,10 +32,8 @@ class dense_sparse_helper
 
 
 
-class glue_times_dense_sparse
+struct glue_times_dense_sparse
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -58,10 +54,8 @@ class glue_times_dense_sparse
 
 
 
-class glue_times_sparse_dense
+struct glue_times_sparse_dense
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

@@ -24,7 +24,7 @@
 template<typename T1>
 arma_warn_unused
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, uword >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, uword >::result
 rank(const Base<typename T1::elem_type,T1>& expr, const typename T1::pod_type tol = 0)
   {
   arma_debug_sigprint();
@@ -42,7 +42,7 @@ rank(const Base<typename T1::elem_type,T1>& expr, const typename T1::pod_type to
 
 template<typename T1>
 inline
-typename enable_if2< is_supported_blas_type<typename T1::elem_type>::value, bool >::result
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
 rank(uword& out, const Base<typename T1::elem_type,T1>& expr, const typename T1::pod_type tol = 0)
   {
   arma_debug_sigprint();

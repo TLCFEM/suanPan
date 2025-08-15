@@ -22,10 +22,8 @@
 
 
 template<typename out_eT, typename T1, typename T2, typename spglue_type>
-class mtSpGlue : public SpBase< out_eT, mtSpGlue<out_eT, T1, T2, spglue_type> >
+struct mtSpGlue : public SpBase< out_eT, mtSpGlue<out_eT, T1, T2, spglue_type> >
   {
-  public:
-  
   typedef          out_eT                       elem_type;
   typedef typename get_pod_type<out_eT>::result pod_type;
   

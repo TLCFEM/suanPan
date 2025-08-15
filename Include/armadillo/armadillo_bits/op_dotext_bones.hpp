@@ -21,12 +21,9 @@
 
 
 
-class op_dotext
+struct op_dotext
   : public traits_op_default
   {
-  public:
-  
-  
   template<typename eT>
   inline static eT direct_rowvec_mat_colvec       (const eT* A_mem, const Mat<eT>& B, const eT* C_mem);
   

@@ -74,11 +74,11 @@ op_normalise_mat::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_normali
   
   if(quasi_unwrap<T1>::has_subview && U.is_alias(out))
     {
-    Mat<eT> out2;
+    Mat<eT> tmp;
     
-    op_normalise_mat::apply(out2, U.M, p, dim);
+    op_normalise_mat::apply(tmp, U.M, p, dim);
     
-    out.steal_mem(out2);
+    out.steal_mem(tmp);
     }
   else
     {

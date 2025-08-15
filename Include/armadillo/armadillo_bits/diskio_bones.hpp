@@ -21,11 +21,9 @@
 
 
 //! class for saving and loading matrices and fields - INTERNAL USE ONLY!
-class diskio
+struct diskio
   {
-  public:
-  
-  arma_deprecated inline static file_type guess_file_type(std::istream& f);
+  [[deprecated]] inline static file_type guess_file_type(std::istream& f);
   
   
   private:
@@ -219,9 +217,6 @@ class diskio
   
   template<typename T1> inline static bool load_ppm_binary(      field<T1>& x, const std::string&  final_name, std::string& err_msg);
   template<typename T1> inline static bool load_ppm_binary(      field<T1>& x,       std::istream& f,          std::string& err_msg);
-  
-
-
   };
 
 

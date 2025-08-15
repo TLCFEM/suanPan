@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_row_as_mat
+struct op_row_as_mat
   : public traits_op_default
   {
-  public:
-  
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const CubeToMatOp<T1, op_row_as_mat>& expr);
   };
 

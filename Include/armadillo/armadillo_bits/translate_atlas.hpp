@@ -38,7 +38,7 @@ namespace atlas
   eT
   cblas_asum(const int N, const eT* X)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {
@@ -62,7 +62,7 @@ namespace atlas
   eT
   cblas_nrm2(const int N, const eT* X)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {
@@ -86,7 +86,7 @@ namespace atlas
   eT
   cblas_dot(const int N, const eT* X, const eT* Y)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {
@@ -110,7 +110,7 @@ namespace atlas
   eT
   cblas_cx_dot(const int N, const eT* X, const eT* Y)
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_cx_float<eT>::value)
       {
@@ -151,7 +151,7 @@ namespace atlas
     eT *Y, const int incY
     )
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {
@@ -192,7 +192,7 @@ namespace atlas
     const eT beta, eT *C, const int ldc
     )
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {
@@ -231,7 +231,7 @@ namespace atlas
     const eT* A, const int lda, const eT beta, eT* C, const int ldc
     )
     {
-    arma_type_check((is_supported_blas_type<eT>::value == false));
+    arma_type_check((is_blas_type<eT>::value == false));
     
     if(is_float<eT>::value)
       {
@@ -258,7 +258,7 @@ namespace atlas
     const std::complex<T>* A, const int lda, const T beta, std::complex<T>* C, const int ldc
     )
     {
-    arma_type_check((is_supported_blas_type<T>::value == false));
+    arma_type_check((is_blas_type<T>::value == false));
     
     if(is_float<T>::value)
       {

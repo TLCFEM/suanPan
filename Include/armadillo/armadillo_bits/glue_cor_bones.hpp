@@ -22,10 +22,8 @@
 
 
 
-class glue_cor
+struct glue_cor
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

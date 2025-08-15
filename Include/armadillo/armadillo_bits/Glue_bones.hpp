@@ -43,12 +43,10 @@ struct Glue_traits<T1, T2, glue_type, false>
 
 
 template<typename T1, typename T2, typename glue_type>
-class Glue
+struct Glue
   : public Base< typename T1::elem_type, Glue<T1, T2, glue_type> >
   , public Glue_traits<T1, T2, glue_type, has_nested_glue_traits<glue_type>::value>
   {
-  public:
-  
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   

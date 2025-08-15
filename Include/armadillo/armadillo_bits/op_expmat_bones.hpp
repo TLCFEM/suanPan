@@ -22,11 +22,9 @@
 
 
 
-class op_expmat
+struct op_expmat
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_expmat>& expr);
   
@@ -36,11 +34,9 @@ class op_expmat
 
 
 
-class op_expmat_sym
+struct op_expmat_sym
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_expmat_sym>& in);
   

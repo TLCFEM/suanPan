@@ -27,7 +27,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   const Op<T1, op_wishrnd>
   >::result
 wishrnd(const Base<typename T1::elem_type, T1>& S, typename T1::elem_type df)
@@ -45,7 +45,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   const Op<T2, op_wishrnd>
   >::result
 wishrnd(const Base<typename T1::elem_type, T1>& S, typename T1::elem_type df, const Base<typename T1::elem_type, T2>& D)
@@ -63,7 +63,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   bool
   >::result
 wishrnd(Mat<typename T1::elem_type>& W, const Base<typename T1::elem_type, T1>& S, typename T1::elem_type df)
@@ -88,7 +88,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   bool
   >::result
 wishrnd(Mat<typename T1::elem_type>& W, const Base<typename T1::elem_type, T1>& S, typename T1::elem_type df, const Base<typename T1::elem_type, T2>& D)
@@ -119,7 +119,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   const Op<T1, op_iwishrnd>
   >::result
 iwishrnd(const Base<typename T1::elem_type, T1>& T, typename T1::elem_type df)
@@ -137,7 +137,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   const Op<T2, op_iwishrnd>
   >::result
 iwishrnd(const Base<typename T1::elem_type, T1>& T, typename T1::elem_type df, const Base<typename T1::elem_type, T2>& Dinv)
@@ -155,7 +155,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   bool
   >::result
 iwishrnd(Mat<typename T1::elem_type>& W, const Base<typename T1::elem_type, T1>& T, typename T1::elem_type df)
@@ -180,7 +180,7 @@ inline
 typename
 enable_if2
   <
-  is_real<typename T1::elem_type>::value,
+  is_blas_real<typename T1::elem_type>::value,
   bool
   >::result
 iwishrnd(Mat<typename T1::elem_type>& W, const Base<typename T1::elem_type, T1>& T, typename T1::elem_type df, const Base<typename T1::elem_type, T2>& Dinv)

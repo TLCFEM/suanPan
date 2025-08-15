@@ -21,11 +21,9 @@
 
 
 
-class op_diagvec
+struct op_diagvec
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_diagvec>& X);
   
@@ -41,11 +39,9 @@ class op_diagvec
 
 
 
-class op_diagvec2
+struct op_diagvec2
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_diagvec2>& X);
   

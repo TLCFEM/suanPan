@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_omit
+struct op_omit
   : public traits_op_col
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_omit>& in);
   
@@ -34,11 +32,9 @@ class op_omit
 
 
 
-class op_omit_cube
+struct op_omit_cube
   : public traits_op_col
   {
-  public:
-  
   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const CubeToMatOp<T1, op_omit_cube>& in);
   
   template<typename T1, typename functor>

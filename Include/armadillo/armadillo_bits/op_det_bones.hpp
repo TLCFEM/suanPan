@@ -21,11 +21,9 @@
 
 
 
-class op_det
+struct op_det
   : public traits_op_default
   {
-  public:
-  
   template<const uword row, const uword col>
   struct pos
     {

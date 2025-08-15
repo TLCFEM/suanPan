@@ -21,10 +21,8 @@
 
 
 
-class SizeMat
+struct SizeMat
   {
-  public:
-  
   const uword n_rows;
   const uword n_cols;
   

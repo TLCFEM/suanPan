@@ -20,11 +20,9 @@
 //! @{
 
 
-class op_prod
+struct op_prod
   : public traits_op_xvec
   {
-  public:
-  
   template<typename eT>
   inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim);
   

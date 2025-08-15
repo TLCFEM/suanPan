@@ -22,10 +22,8 @@
 
 
 template<typename T1, typename T2, typename glue_type>
-class SpToDGlue : public Base< typename T1::elem_type, SpToDGlue<T1, T2, glue_type> >
+struct SpToDGlue : public Base< typename T1::elem_type, SpToDGlue<T1, T2, glue_type> >
   {
-  public:
-  
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   

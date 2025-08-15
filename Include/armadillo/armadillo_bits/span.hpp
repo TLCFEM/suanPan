@@ -25,9 +25,8 @@ struct span_alt {};
 
 
 template<typename junk = int>
-class span_base
+struct span_base
   {
-  public:
   static const span_alt all;
   };
 
@@ -36,10 +35,8 @@ template<typename junk>
 const span_alt span_base<junk>::all = span_alt();
 
 
-class span : public span_base<>
+struct span : public span_base<>
   {
-  public:
-
   uword a;
   uword b;
   bool  whole;

@@ -27,7 +27,7 @@ inline
 typename
 enable_if2
   <
-  is_supported_blas_type<typename T1::elem_type>::value,
+  is_blas_type<typename T1::elem_type>::value,
   const mtOp<std::complex<typename T1::pod_type>, T1, op_roots>
   >::result
 roots(const Base<typename T1::elem_type, T1>& X)
@@ -44,7 +44,7 @@ inline
 typename
 enable_if2
   <
-  is_supported_blas_type<typename T1::elem_type>::value,
+  is_blas_type<typename T1::elem_type>::value,
   bool
   >::result
 roots(Mat< std::complex<typename T1::pod_type> >& out, const Base<typename T1::elem_type, T1>& X)

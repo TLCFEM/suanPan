@@ -56,10 +56,8 @@
 
 
 template<typename cx_type, bool inverse>
-class fft_engine_kissfft
+struct fft_engine_kissfft
   {
-  public:
-  
   typedef typename get_pod_type<cx_type>::result T;
   
   const uword N;
@@ -384,8 +382,6 @@ class fft_engine_kissfft
       default: butterfly_N(Y, stride, m, r);  break;
       }
     }
-
-
   };
 
 

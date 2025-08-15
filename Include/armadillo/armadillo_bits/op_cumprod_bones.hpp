@@ -21,11 +21,9 @@
 
 
 
-class op_cumprod
+struct op_cumprod
   : public traits_op_default
   {
-  public:
-  
   template<typename eT>
   inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& X, const uword dim);
   
@@ -35,11 +33,9 @@ class op_cumprod
 
 
 
-class op_cumprod_vec
+struct op_cumprod_vec
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_cumprod_vec>& in);
   };

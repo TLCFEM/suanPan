@@ -39,11 +39,9 @@ operator< (const arma_cx_median_packet<T>& A, const arma_cx_median_packet<T>& B)
 
 
 
-class op_median
+struct op_median
   : public traits_op_xvec
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_median>& expr);
   

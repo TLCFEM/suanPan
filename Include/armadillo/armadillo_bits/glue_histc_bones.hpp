@@ -20,24 +20,20 @@
 //! @{
 
 
-class glue_histc
+struct glue_histc
   : public traits_glue_default
   {
-  public:
-
   template<typename eT>
   inline static void apply_noalias(Mat<uword>& C, const Mat<eT>& A, const Mat<eT>& B, const uword dim);
-
+  
   template<typename T1, typename T2>
   inline static void apply(Mat<uword>& C, const mtGlue<uword,T1,T2,glue_histc>& expr);
   };
 
 
 
-class glue_histc_default
+struct glue_histc_default
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

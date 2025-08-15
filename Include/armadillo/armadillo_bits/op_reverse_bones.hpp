@@ -21,22 +21,18 @@
 
 
 
-class op_reverse
+struct op_reverse
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reverse>& in);
   };
 
 
 
-class op_reverse_vec
+struct op_reverse_vec
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_reverse_vec>& in);
   };

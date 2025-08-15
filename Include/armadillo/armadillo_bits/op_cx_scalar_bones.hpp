@@ -21,11 +21,9 @@
 
 
 
-class op_cx_scalar_times
+struct op_cx_scalar_times
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void
   apply
@@ -45,11 +43,9 @@ class op_cx_scalar_times
 
 
 
-class op_cx_scalar_plus
+struct op_cx_scalar_plus
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void
   apply
@@ -69,11 +65,9 @@ class op_cx_scalar_plus
 
 
 
-class op_cx_scalar_minus_pre
+struct op_cx_scalar_minus_pre
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void
   apply
@@ -93,11 +87,9 @@ class op_cx_scalar_minus_pre
 
 
 
-class op_cx_scalar_minus_post
+struct op_cx_scalar_minus_post
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void
   apply
@@ -117,11 +109,9 @@ class op_cx_scalar_minus_post
 
 
 
-class op_cx_scalar_div_pre
+struct op_cx_scalar_div_pre
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void
   apply
@@ -141,11 +131,9 @@ class op_cx_scalar_div_pre
 
 
 
-class op_cx_scalar_div_post
+struct op_cx_scalar_div_post
   : public traits_op_passthru
   {
-  public:
-  
   template<typename T1>
   inline static void
   apply

@@ -21,10 +21,8 @@
 
 
 
-class glue_intersect
+struct glue_intersect
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {

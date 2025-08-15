@@ -21,11 +21,9 @@
 
 
 
-class op_diagmat
+struct op_diagmat
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_diagmat>& X);
   
@@ -44,11 +42,9 @@ class op_diagmat
 
 
 
-class op_diagmat2
+struct op_diagmat2
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_diagmat2>& X);
   

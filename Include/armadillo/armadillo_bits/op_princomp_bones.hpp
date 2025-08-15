@@ -21,11 +21,9 @@
 
 
 
-class op_princomp
+struct op_princomp
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static bool
   direct_princomp

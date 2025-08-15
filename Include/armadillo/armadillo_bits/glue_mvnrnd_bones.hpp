@@ -20,10 +20,8 @@
 //! @{
 
 
-class glue_mvnrnd_vec
+struct glue_mvnrnd_vec
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -38,11 +36,9 @@ class glue_mvnrnd_vec
 
 
 
-class glue_mvnrnd
+struct glue_mvnrnd
   : public traits_glue_default
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_mvnrnd>& expr);
   

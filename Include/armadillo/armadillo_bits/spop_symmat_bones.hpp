@@ -21,22 +21,18 @@
 
 
 
-class spop_symmat
+struct spop_symmat
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1,spop_symmat>& in);
   };
 
 
 
-class spop_symmat_cx
+struct spop_symmat_cx
   : public traits_op_default
   {
-  public:
-  
   template<typename T1>
   inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1,spop_symmat_cx>& in);
   };

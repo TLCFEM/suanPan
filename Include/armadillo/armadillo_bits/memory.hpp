@@ -20,10 +20,8 @@
 //! @{
 
 
-class memory
+struct memory
   {
-  public:
-  
   template<typename eT> arma_malloc inline static eT* acquire(const uword n_elem);
   
   template<typename eT> arma_inline static void release(eT* mem);

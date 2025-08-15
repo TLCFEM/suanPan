@@ -79,10 +79,8 @@
 #endif
 
 
-class arma_rng
+struct arma_rng
   {
-  public:
-  
   #if   defined(ARMA_RNG_ALT)
     typedef arma_rng_alt::seed_type      seed_type;
   #elif defined(ARMA_USE_CXX11_RNG)

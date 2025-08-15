@@ -21,10 +21,8 @@
 
 
 
-class glue_mixed_times
+struct glue_mixed_times
   {
-  public:
-  
   template<typename T1, typename T2>
   struct traits
     {
@@ -39,11 +37,9 @@ class glue_mixed_times
 
 
 
-class glue_mixed_plus
+struct glue_mixed_plus
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(Mat<typename eT_promoter<T1,T2>::eT>& out, const mtGlue<typename eT_promoter<T1,T2>::eT, T1, T2, glue_mixed_plus>& X);
   
@@ -53,11 +49,9 @@ class glue_mixed_plus
 
 
 
-class glue_mixed_minus
+struct glue_mixed_minus
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(Mat<typename eT_promoter<T1,T2>::eT>& out, const mtGlue<typename eT_promoter<T1,T2>::eT, T1, T2, glue_mixed_minus>& X);
   
@@ -67,11 +61,9 @@ class glue_mixed_minus
 
 
 
-class glue_mixed_div
+struct glue_mixed_div
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(Mat<typename eT_promoter<T1,T2>::eT>& out, const mtGlue<typename eT_promoter<T1,T2>::eT, T1, T2, glue_mixed_div>& X);
   
@@ -81,11 +73,9 @@ class glue_mixed_div
 
 
 
-class glue_mixed_schur
+struct glue_mixed_schur
   : public traits_glue_or
   {
-  public:
-  
   template<typename T1, typename T2>
   inline static void apply(Mat<typename eT_promoter<T1,T2>::eT>& out, const mtGlue<typename eT_promoter<T1,T2>::eT, T1, T2, glue_mixed_schur>& X);
   
