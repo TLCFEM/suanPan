@@ -20,32 +20,30 @@ fi
 mapfile -t files < <(find ../Example -name "*.supan")
 
 if [ $# -eq 2 ]; then
-  log_file=$2
+  log_file=$(realpath "$2")
 else
   log_file="/dev/null"
 fi
-
-cp ../Example/Solver/20110613_022049_MQZ_N_A .
-cp ../Example/Solver/EZ .
-cp ../Example/Material/Table .
-cp ../Example/Material/C.txt .
-cp ../Example/Material/T.txt .
-cp ../Example/Material/CYCLE.txt .
-cp ../Example/Material/EHIST .
-cp ../Example/Material/example .
-cp ../Example/Material/exp .
-cp ../Example/Section/HIST .
 
 declare -A timings
 
 true >"$log_file"
 
+current_dir=$(pwd)
+
 for file in "${files[@]}"; do
   echo "Processing $file ..." | tee -a "$log_file"
 
+  file_path=$(realpath "$file")
+  file_base=$(basename "$file_path")
+
+  cd $(dirname "$file_path") || exit 1
+
   exec 3>&1 4>&2
-  TIME_OUTPUT=$({ /usr/bin/time -f "%e" ./suanPan -f "$file" >>"$log_file"; } 2>&1 1>&3)
+  TIME_OUTPUT=$({ /usr/bin/time -f "%e" $current_dir/suanPan -f "$file_base" >>"$log_file"; } 2>&1 1>&3)
   exec 3>&- 4>&-
+
+  cd "$current_dir" || exit 1
 
   # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then
