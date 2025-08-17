@@ -234,6 +234,7 @@ an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) an
 #### VS Code
 
 The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan).
+It provides syntax highlighting, autocompletion, running the model using the specified executable or docker container.
 
 #### Sublime Text
 
