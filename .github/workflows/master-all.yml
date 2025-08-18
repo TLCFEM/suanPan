@@ -22,7 +22,7 @@ jobs:
             aocl: ON
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Golang
@@ -104,7 +104,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Golang
@@ -176,7 +176,7 @@ jobs:
         vtk: [ ON, OFF ]
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Prepare
@@ -243,7 +243,7 @@ jobs:
         mkl: [ ON, OFF ]
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Golang
@@ -370,7 +370,7 @@ jobs:
         vtk: [ ON, OFF ]
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Golang
