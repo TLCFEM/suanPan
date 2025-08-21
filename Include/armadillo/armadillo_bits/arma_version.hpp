@@ -21,10 +21,10 @@
 
 
 
-#define ARMA_VERSION_MAJOR 14
-#define ARMA_VERSION_MINOR 90
+#define ARMA_VERSION_MAJOR 15
+#define ARMA_VERSION_MINOR 0
 #define ARMA_VERSION_PATCH 0
-#define ARMA_VERSION_NAME  "experimental"
+#define ARMA_VERSION_NAME  "Medium Roast"
 
 
 
