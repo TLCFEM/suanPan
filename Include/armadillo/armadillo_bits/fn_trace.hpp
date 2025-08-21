@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -97,8 +97,8 @@ trace(const Glue<T1, T2, glue_times>& X)
   const typename partial_unwrap<T1>::stored_type& A = tmp1.M;
   const typename partial_unwrap<T2>::stored_type& B = tmp2.M;
   
-  const bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times;
-  const eT       alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val()) : eT(0);
+  constexpr bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times;
+  const     eT       alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val()) : eT(0);
   
   arma_conform_assert_trans_mul_size< partial_unwrap<T1>::do_trans, partial_unwrap<T2>::do_trans >(A.n_rows, A.n_cols, B.n_rows, B.n_cols, "matrix multiplication");
   
@@ -216,8 +216,8 @@ trace(const Glue<T1, T2, glue_times>& X)
   const typename partial_unwrap<T1>::stored_type& A = tmp1.M;
   const typename partial_unwrap<T2>::stored_type& B = tmp2.M;
   
-  const bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times;
-  const eT       alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val()) : eT(0);
+  constexpr bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times;
+  const     eT       alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val()) : eT(0);
   
   arma_conform_assert_trans_mul_size< partial_unwrap<T1>::do_trans, partial_unwrap<T2>::do_trans >(A.n_rows, A.n_cols, B.n_rows, B.n_cols, "matrix multiplication");
   

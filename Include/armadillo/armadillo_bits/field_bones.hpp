@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -131,8 +131,8 @@ class field
   arma_warn_unused arma_inline const oT& back() const;
   
   
-  arma_frown("use braced initialiser list instead") inline field_injector<field> operator<<(const oT& val);
-  arma_frown("use braced initialiser list instead") inline field_injector<field> operator<<(const injector_end_of_row<>& x);
+  [[deprecated("use braced initialiser list instead")]] inline field_injector<field> operator<<(const oT& val);
+  [[deprecated("use braced initialiser list instead")]] inline field_injector<field> operator<<(const injector_end_of_row<>& x);
   
   
   inline       subview_field<oT> row(const uword row_num);
@@ -221,11 +221,11 @@ class field
   arma_cold inline bool load(      std::istream& is,   const file_type type = auto_detect);
   
   
-  arma_deprecated inline bool quiet_save(const std::string   name, const file_type type = arma_binary) const;
-  arma_deprecated inline bool quiet_save(      std::ostream& os,   const file_type type = arma_binary) const;
+  [[deprecated]] inline bool quiet_save(const std::string   name, const file_type type = arma_binary) const;
+  [[deprecated]] inline bool quiet_save(      std::ostream& os,   const file_type type = arma_binary) const;
   
-  arma_deprecated inline bool quiet_load(const std::string   name, const file_type type = auto_detect);
-  arma_deprecated inline bool quiet_load(      std::istream& is,   const file_type type = auto_detect);
+  [[deprecated]] inline bool quiet_load(const std::string   name, const file_type type = auto_detect);
+  [[deprecated]] inline bool quiet_load(      std::istream& is,   const file_type type = auto_detect);
   
   
   // for container-like functionality

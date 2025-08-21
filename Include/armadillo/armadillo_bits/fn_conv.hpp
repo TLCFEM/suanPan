@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,9 +38,9 @@ conv(const T1& A, const T2& B, const char* shape = "full")
   
   const char sig = (shape != nullptr) ? shape[0] : char(0);
   
-  arma_conform_check( ((sig != 'f') && (sig != 's')), "conv(): unsupported value of 'shape' parameter" );
+  arma_conform_check( ((sig != 'f') && (sig != 's') && (sig != 'v')), "conv(): unsupported value of 'shape' parameter" );
   
-  const uword mode = (sig == 's') ? uword(1) : uword(0);
+  const uword mode = (sig == 'v') ? uword(2) : ((sig == 's') ? uword(1) : uword(0));
   
   return Glue<T1, T2, glue_conv>(A, B, mode);
   }
@@ -62,9 +62,9 @@ conv2(const T1& A, const T2& B, const char* shape = "full")
   
   const char sig = (shape != nullptr) ? shape[0] : char(0);
   
-  arma_conform_check( ((sig != 'f') && (sig != 's')), "conv2(): unsupported value of 'shape' parameter" );
+  arma_conform_check( ((sig != 'f') && (sig != 's') && (sig != 'v')), "conv2(): unsupported value of 'shape' parameter" );
   
-  const uword mode = (sig == 's') ? uword(1) : uword(0);
+  const uword mode = (sig == 'v') ? uword(2) : ((sig == 's') ? uword(1) : uword(0));
   
   return Glue<T1, T2, glue_conv2>(A, B, mode);
   }

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,20 +24,48 @@
 template<typename T1>
 arma_warn_unused
 inline
-typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, typename T1::pod_type>::result
+typename enable_if2<is_blas_type<typename T1::elem_type>::value, typename T1::pod_type>::result
 cond(const Base<typename T1::elem_type, T1>& X)
   {
   arma_debug_sigprint();
   
-  return op_cond::apply(X.get_ref());
+  typedef typename T1::pod_type T;
+  
+  T out = T(0);
+  
+  const bool status = op_cond::apply(out, X.get_ref());
+  
+  if(status == false)  { arma_stop_runtime_error("cond(): failed"); return Datum<T>::nan; }
+  
+  return out;
   }
+
+
+
+template<typename T1>
+inline
+typename enable_if2< is_blas_type<typename T1::elem_type>::value, bool >::result
+cond(typename T1::pod_type& out, const Base<typename T1::elem_type, T1>& X)
+  {
+  arma_debug_sigprint();
+  
+  typedef typename T1::pod_type T;
+  
+  out = T(0);
+  
+  return op_cond::apply(out, X.get_ref());
+  }
+
+
+
+//
 
 
 
 template<typename T1>
 arma_warn_unused
 inline
-typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, typename T1::pod_type>::result
+typename enable_if2<is_blas_type<typename T1::elem_type>::value, typename T1::pod_type>::result
 rcond(const Base<typename T1::elem_type, T1>& X)
   {
   arma_debug_sigprint();
@@ -50,7 +78,7 @@ rcond(const Base<typename T1::elem_type, T1>& X)
 // template<typename T1>
 // arma_warn_unused
 // inline
-// typename enable_if2<is_supported_blas_type<typename T1::elem_type>::value, typename T1::pod_type>::result
+// typename enable_if2<is_blas_type<typename T1::elem_type>::value, typename T1::pod_type>::result
 // rcond(const SpBase<typename T1::elem_type, T1>& X)
 //   {
 //   arma_debug_sigprint();

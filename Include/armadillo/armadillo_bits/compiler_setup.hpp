@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,8 +22,6 @@
 #undef arma_aligned
 #undef arma_align_mem
 #undef arma_warn_unused
-#undef arma_deprecated
-#undef arma_frown
 #undef arma_malloc
 #undef arma_inline
 #undef arma_noinline
@@ -34,8 +32,6 @@
 #define arma_aligned
 #define arma_align_mem
 #define arma_warn_unused
-#define arma_deprecated
-#define arma_frown(msg)
 #define arma_malloc
 #define arma_inline            inline
 #define arma_noinline
@@ -102,6 +98,7 @@
 #define ARMA_SIMPLE_LOOPS
 
 #undef ARMA_GOOD_COMPILER
+#undef ARMA_REAL_GCC
 
 // posix_memalign() is part of IEEE standard 1003.1
 // http://pubs.opengroup.org/onlinepubs/009696899/functions/posix_memalign.html
@@ -158,29 +155,18 @@
   
   // #pragma message ("using GCC extensions")
   
-  #undef  ARMA_GCC_VERSION
-  #define ARMA_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-  
-  #if (ARMA_GCC_VERSION < 60100)
-    #error "*** newer compiler required; need gcc 6.1 or newer ***"
-  #endif
-  
-  // gcc 6.1 has proper C++14 support and fixes an OpenMP related bug:
-  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57580
-  
-  #if (ARMA_GCC_VERSION < 80100)
-    #pragma message("INFO: support for GCC versions older than 8.1 is deprecated")
+  #if (__GNUC__ < 8)
+    #error "*** newer compiler required; need at least gcc 8.1 ***"
   #endif
   
   #define ARMA_GOOD_COMPILER
+  #define ARMA_REAL_GCC
   
   #undef  arma_hot
   #undef  arma_cold
   #undef  arma_aligned
   #undef  arma_align_mem
   #undef  arma_warn_unused
-  #undef  arma_deprecated
-  #undef  arma_frown
   #undef  arma_malloc
   #undef  arma_inline
   #undef  arma_noinline
@@ -190,8 +176,6 @@
   #define arma_aligned     __attribute__((__aligned__))
   #define arma_align_mem   __attribute__((__aligned__(16)))
   #define arma_warn_unused __attribute__((__warn_unused_result__))
-  #define arma_deprecated  __attribute__((__deprecated__))
-  #define arma_frown(msg)  __attribute__((__deprecated__(msg)))
   #define arma_malloc      __attribute__((__malloc__))
   #define arma_inline      __attribute__((__always_inline__)) inline
   #define arma_noinline    __attribute__((__noinline__))
@@ -251,16 +235,6 @@
     #define arma_warn_unused __attribute__((__warn_unused_result__))
   #endif
   
-  #if __has_attribute(__deprecated__)
-    #undef  arma_deprecated
-    #define arma_deprecated __attribute__((__deprecated__))
-  #endif
-  
-  #if __has_attribute(__deprecated__)
-    #undef  arma_frown
-    #define arma_frown(msg) __attribute__((__deprecated__(msg)))
-  #endif
-  
   #if __has_attribute(__malloc__)
     #undef  arma_malloc
     #define arma_malloc __attribute__((__malloc__))
@@ -318,9 +292,6 @@
     #error "*** newer compiler required ***"
   #endif
   
-  #undef  arma_deprecated
-  #define arma_deprecated __declspec(deprecated)
-  
   #undef  arma_noinline
   #define arma_noinline __declspec(noinline)
   
@@ -375,15 +346,6 @@
   //   
   // #endif
   
-#endif
-
-
-#if defined(ARMA_HAVE_CXX14)
-  #undef  arma_deprecated
-  #define arma_deprecated [[deprecated]]
-
-  #undef  arma_frown
-  #define arma_frown(msg) [[deprecated(msg)]]
 #endif
 
 
@@ -449,7 +411,6 @@
 
 #undef ARMA_DETECTED_FAKE_GCC
 #undef ARMA_DETECTED_FAKE_CLANG
-#undef ARMA_GCC_VERSION
 #undef ARMA_PRINT_OPENMP_WARNING
 
 
@@ -475,12 +436,3 @@
 // https://sourceware.org/bugzilla/show_bug.cgi?id=19239
 #undef minor
 #undef major
-
-
-#if defined(ARMA_IGNORE_DEPRECATED_MARKER)
-  #undef  arma_deprecated
-  #define arma_deprecated
-
-  #undef  arma_frown
-  #define arma_frown(msg)
-#endif

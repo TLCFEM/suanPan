@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,7 @@
 
 
 
-//! \addtogroup spop_shift
+//! \addtogroup spop_circshift
 //! @{
 
 
@@ -25,12 +25,12 @@
 template<typename eT>
 inline
 void
-spop_shift::apply_noalias(SpMat<eT>& out, const SpMat<eT>& X, const uword len, const uword neg, const uword dim)
+spop_circshift::apply_noalias(SpMat<eT>& out, const SpMat<eT>& X, const uword len, const uword neg, const uword dim)
   {
   arma_debug_sigprint();
   
-  arma_conform_check_bounds( ((dim == 0) && (len >= X.n_rows)), "shift(): shift amount out of bounds" );
-  arma_conform_check_bounds( ((dim == 1) && (len >= X.n_cols)), "shift(): shift amount out of bounds" );
+  arma_conform_check_bounds( ((dim == 0) && (len >= X.n_rows)), "circshift(): shift amount out of bounds" );
+  arma_conform_check_bounds( ((dim == 1) && (len >= X.n_cols)), "circshift(): shift amount out of bounds" );
   
   if(X.n_nonzero == 0)  { out.zeros(X.n_rows, X.n_cols); return; }
   

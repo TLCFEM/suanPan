@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -91,7 +91,7 @@ class Col : public Mat<eT>
   inline            Col(const subview_cube<eT>& X);
   inline Col& operator=(const subview_cube<eT>& X);
   
-  arma_frown("use braced initialiser list instead") inline mat_injector<Col> operator<<(const eT val);
+  [[deprecated("use braced initialiser list instead")]] inline mat_injector<Col> operator<<(const eT val);
   
   arma_warn_unused arma_inline const Op<Col<eT>,op_htrans>  t() const;
   arma_warn_unused arma_inline const Op<Col<eT>,op_htrans> ht() const;
@@ -141,7 +141,7 @@ class Col : public Mat<eT>
   
   template<typename T1> inline void shed_rows(const Base<uword, T1>& indices);
   
-  arma_deprecated inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero);
+  [[deprecated]] inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero);
                   inline void insert_rows(const uword row_num, const uword N);
   
   template<typename T1> inline void insert_rows(const uword row_num, const Base<eT,T1>& X);
