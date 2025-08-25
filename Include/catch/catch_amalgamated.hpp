@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.9.1
-//  Generated: 2025-08-09 00:29:20.303175
+//  Catch v3.10.0
+//  Generated: 2025-08-24 16:18:04.055916
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -1855,9 +1855,7 @@ namespace Catch {
                 std::vector<double> deltas;
                 deltas.reserve(static_cast<size_t>(k));
                 for(size_t idx = 1; idx < points; ++idx) {
-                    deltas.push_back(static_cast<double>(
-                        (times[idx] - times[idx - 1]).count()
-                    ));
+                    deltas.push_back(static_cast<double>((times[idx] - times[idx - 1]).count()));
                 }
 
                 return deltas;
@@ -1889,10 +1887,8 @@ namespace Catch {
             }
             template<typename Clock>
             EnvironmentEstimate estimate_clock_cost(FDuration resolution) {
-                auto time_limit = (std::min)(
-                    resolution * clock_cost_estimation_tick_limit,
-                    FDuration(clock_cost_estimation_time_limit)
-                );
+                auto time_limit = (std::min)(resolution * clock_cost_estimation_tick_limit,
+                                             FDuration(clock_cost_estimation_time_limit));
                 auto time_clock = [](int k) {
                     return Detail::measure<Clock>([k] {
                                for(int i = 0; i < k; ++i) {
@@ -1909,10 +1905,7 @@ namespace Catch {
                 int nsamples = static_cast<int>(std::ceil(time_limit / r.elapsed));
                 times.reserve(static_cast<size_t>(nsamples));
                 for(int s = 0; s < nsamples; ++s) {
-                    times.push_back(static_cast<double>(
-                        (time_clock(r.iterations) / r.iterations)
-                            .count()
-                    ));
+                    times.push_back(static_cast<double>((time_clock(r.iterations) / r.iterations).count()));
                 }
                 return {
                     FDuration(mean(times.data(), times.data() + times.size())),
@@ -3806,7 +3799,7 @@ namespace Catch {
         }
 
     private:
-        static unsigned int globalCount;
+        static thread_local unsigned int globalCount;
     };
 
 } // end namespace Catch
@@ -7215,8 +7208,8 @@ namespace Catch {
 #define CATCH_VERSION_MACROS_HPP_INCLUDED
 
 #define CATCH_VERSION_MAJOR 3
-#define CATCH_VERSION_MINOR 9
-#define CATCH_VERSION_PATCH 1
+#define CATCH_VERSION_MINOR 10
+#define CATCH_VERSION_PATCH 0
 
 #endif // CATCH_VERSION_MACROS_HPP_INCLUDED
 
@@ -10283,9 +10276,6 @@ namespace Catch {
         Totals m_totals;
         Detail::AtomicCounts m_atomicAssertionCount;
         IEventListenerPtr m_reporter;
-        std::vector<MessageInfo> m_messages;
-        // Owners for the UNSCOPED_X information macro
-        std::vector<ScopedMessage> m_messageScopes;
         std::vector<SectionEndInfo> m_unfinishedSections;
         std::vector<ITracker*> m_activeSections;
         TrackerContext m_trackerContext;
@@ -11517,8 +11507,7 @@ namespace Catch {
 
             template<typename... MatcherTs, std::size_t... Idx>
             std::string describe_multi_matcher(StringRef combine, std::array<void const*, sizeof...(MatcherTs)> const& matchers, std::index_sequence<Idx...>) {
-                std::array<std::string, sizeof...(MatcherTs)> descriptions{{static_cast<MatcherTs const*>(matchers[Idx])->toString()...
-                }};
+                std::array<std::string, sizeof...(MatcherTs)> descriptions{{static_cast<MatcherTs const*>(matchers[Idx])->toString()...}};
 
                 return describe_multi_matcher(combine, descriptions.data(), descriptions.data() + descriptions.size());
             }

@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.9.1
-//  Generated: 2025-08-09 00:29:21.552225
+//  Catch v3.10.0
+//  Generated: 2025-08-24 16:18:04.775778
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -214,7 +214,11 @@ namespace Catch {
                         return (nc / n) * (sb2 - nc * sg2);
                     };
 
-                    return (std::min)(var_out(1), var_out((std::min)(c_max(0.), c_max(mg_min)))) /
+                    return (std::min)(var_out(1),
+                                      var_out(
+                                          (std::min)(c_max(0.),
+                                                     c_max(mg_min))
+                                      )) /
                            sb2;
                 }
 
@@ -791,12 +795,7 @@ namespace Catch {
                 defaultOutputUsed = true;
             }
 
-            m_processedReporterSpecs.push_back(ProcessedReporterSpec{
-                reporterSpec.name(),
-                reporterSpec.outputFile() ? *reporterSpec.outputFile() : data.defaultOutputFilename,
-                reporterSpec.colourMode().valueOr(data.defaultColourMode),
-                reporterSpec.customOptions()
-            });
+            m_processedReporterSpecs.push_back(ProcessedReporterSpec{reporterSpec.name(), reporterSpec.outputFile() ? *reporterSpec.outputFile() : data.defaultOutputFilename, reporterSpec.colourMode().valueOr(data.defaultColourMode), reporterSpec.customOptions()});
         }
     }
 
@@ -981,8 +980,9 @@ namespace Catch {
     }
     Capturer::~Capturer() {
         assert(m_captured == m_messages.size());
-        for(size_t i = 0; i < m_captured; ++i)
+        for(size_t i = 0; i < m_captured; ++i) {
             m_resultCapture.popScopedMessage(m_messages[i]);
+        }
     }
 
     void Capturer::captureValue(size_t index, std::string const& value) {
@@ -2151,7 +2151,7 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
-        static Version version(3, 9, 1, "", 0);
+        static Version version(3, 10, 0, "", 0);
         return version;
     }
 
@@ -2598,9 +2598,7 @@ namespace Catch {
 
             auto token = *tokens;
             if(token.type != Detail::TokenType::Argument)
-                return Detail::InternalParseResult::ok(Detail::ParseState(
-                    ParseResultType::NoMatch, CATCH_MOVE(tokens)
-                ));
+                return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::NoMatch, CATCH_MOVE(tokens)));
 
             assert(!m_ref->isFlag());
             auto valueRef =
@@ -2661,9 +2659,7 @@ namespace Catch {
                             return Detail::InternalParseResult(result);
                         if(result.value() ==
                            ParseResultType::ShortCircuitAll)
-                            return Detail::InternalParseResult::ok(Detail::ParseState(
-                                result.value(), CATCH_MOVE(tokens)
-                            ));
+                            return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), CATCH_MOVE(tokens)));
                     }
                     else {
                         auto valueRef =
@@ -2687,13 +2683,9 @@ namespace Catch {
                             return Detail::InternalParseResult(result);
                         if(result.value() ==
                            ParseResultType::ShortCircuitAll)
-                            return Detail::InternalParseResult::ok(Detail::ParseState(
-                                result.value(), CATCH_MOVE(tokens)
-                            ));
+                            return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), CATCH_MOVE(tokens)));
                     }
-                    return Detail::InternalParseResult::ok(Detail::ParseState(
-                        ParseResultType::Matched, CATCH_MOVE(++tokens)
-                    ));
+                    return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::Matched, CATCH_MOVE(++tokens)));
                 }
             }
             return Detail::InternalParseResult::ok(
@@ -3249,7 +3241,7 @@ namespace Catch {
 
 #endif // Windows/ ANSI/ None
 
-#if defined(CATCH_PLATFORM_LINUX) || defined(CATCH_PLATFORM_MAC) || defined(__GLIBC__)
+#if defined(CATCH_PLATFORM_LINUX) || defined(CATCH_PLATFORM_MAC) || defined(__GLIBC__) || defined(__FreeBSD__)
 #define CATCH_INTERNAL_HAS_ISATTY
 #include <unistd.h>
 #endif
@@ -4172,6 +4164,39 @@ namespace Catch {
 } // namespace Catch
 
 namespace Catch {
+
+    namespace {
+        static bool needsEscape(char c) {
+            return c == '"' || c == '\\' || c == '\b' || c == '\f' ||
+                   c == '\n' || c == '\r' || c == '\t';
+        }
+
+        static Catch::StringRef makeEscapeStringRef(char c) {
+            if(c == '"') {
+                return "\\\""_sr;
+            }
+            else if(c == '\\') {
+                return "\\\\"_sr;
+            }
+            else if(c == '\b') {
+                return "\\b"_sr;
+            }
+            else if(c == '\f') {
+                return "\\f"_sr;
+            }
+            else if(c == '\n') {
+                return "\\n"_sr;
+            }
+            else if(c == '\r') {
+                return "\\r"_sr;
+            }
+            else if(c == '\t') {
+                return "\\t"_sr;
+            }
+            Catch::Detail::Unreachable();
+        }
+    } // namespace
+
     void JsonUtils::indent(std::ostream& os, std::uint64_t level) {
         for(std::uint64_t i = 0; i < level; ++i) {
             os << "  ";
@@ -4282,36 +4307,18 @@ namespace Catch {
 
     void JsonValueWriter::writeImpl(Catch::StringRef value, bool quote) {
         if(quote) { m_os << '"'; }
-        for(char c : value) {
-            // Escape list taken from https://www.json.org/json-en.html,
-            // string definition.
-            // Note that while forward slash _can_ be escaped, it does
-            // not have to be, if JSON is not further embedded somewhere
-            // where forward slash is meaningful.
-            if(c == '"') {
-                m_os << "\\\"";
+        size_t current_start = 0;
+        for(size_t i = 0; i < value.size(); ++i) {
+            if(needsEscape(value[i])) {
+                if(current_start < i) {
+                    m_os << value.substr(current_start, i - current_start);
+                }
+                m_os << makeEscapeStringRef(value[i]);
+                current_start = i + 1;
             }
-            else if(c == '\\') {
-                m_os << "\\\\";
-            }
-            else if(c == '\b') {
-                m_os << "\\b";
-            }
-            else if(c == '\f') {
-                m_os << "\\f";
-            }
-            else if(c == '\n') {
-                m_os << "\\n";
-            }
-            else if(c == '\r') {
-                m_os << "\\r";
-            }
-            else if(c == '\t') {
-                m_os << "\\t";
-            }
-            else {
-                m_os << c;
-            }
+        }
+        if(current_start < value.size()) {
+            m_os << value.substr(current_start, value.size() - current_start);
         }
         if(quote) { m_os << '"'; }
     }
@@ -4484,8 +4491,9 @@ namespace Catch {
         , type(_type)
         , sequence(++globalCount) {}
 
-    // This may need protecting if threading support is added
-    unsigned int MessageInfo::globalCount = 0;
+    // Messages are owned by their individual threads, so the counter should be thread-local as well.
+    // Alternative consideration: atomic, so threads don't share IDs and things are easier to debug.
+    thread_local unsigned int MessageInfo::globalCount = 0;
 
 } // end namespace Catch
 
@@ -5087,9 +5095,7 @@ namespace Catch {
 
             while(separatorPos < reporterSpec.size()) {
                 const auto nextSeparator = findNextSeparator(separatorPos);
-                parts.push_back(static_cast<std::string>(reporterSpec.substr(
-                    separatorPos, nextSeparator - separatorPos
-                )));
+                parts.push_back(static_cast<std::string>(reporterSpec.substr(separatorPos, nextSeparator - separatorPos)));
 
                 if(nextSeparator == static_cast<size_t>(-1)) {
                     break;
@@ -5215,8 +5221,10 @@ namespace Catch {
         std::vector<Detail::unique_ptr<std::ostringstream>> m_streams;
         std::vector<std::size_t> m_unused;
         std::ostringstream m_referenceStream; // Used for copy state/ flags from
+        Detail::Mutex m_mutex;
 
         auto add() -> std::size_t {
+            Detail::LockGuard _(m_mutex);
             if(m_unused.empty()) {
                 m_streams.push_back(Detail::make_unique<std::ostringstream>());
                 return m_streams.size() - 1;
@@ -5228,8 +5236,12 @@ namespace Catch {
             }
         }
 
-        void release(std::size_t index) {
-            m_streams[index]->copyfmt(m_referenceStream); // Restore initial flags and other state
+        void release(std::size_t index, std::ostream* originalPtr) {
+            assert(originalPtr);
+            originalPtr->copyfmt(m_referenceStream); // Restore initial flags and other state
+
+            Detail::LockGuard _(m_mutex);
+            assert(originalPtr == m_streams[index].get() && "Mismatch between release index and stream ptr");
             m_unused.push_back(index);
         }
     };
@@ -5241,7 +5253,7 @@ namespace Catch {
     ReusableStringStream::~ReusableStringStream() {
         static_cast<std::ostringstream*>(m_oss)->str("");
         m_oss->clear();
-        Singleton<StringStreams>::getMutable().release(m_index);
+        Singleton<StringStreams>::getMutable().release(m_index, m_oss);
     }
 
     std::string ReusableStringStream::str() const {
@@ -5403,9 +5415,6 @@ namespace Catch {
         // This also implies that messages are owned by their respective
         // threads, and should not be shared across different threads.
         //
-        // For simplicity, we disallow messages in multi-threaded contexts,
-        // but in the future we can enable them under this logic.
-        //
         // This implies that various pieces of metadata referring to last
         // assertion result/source location/message handling, etc
         // should also be thread local. For now we just use naked globals
@@ -5414,14 +5423,26 @@ namespace Catch {
 
         // This is used for the "if" part of CHECKED_IF/CHECKED_ELSE
         static thread_local bool g_lastAssertionPassed = false;
-        // Should we clear message scopes before sending off the messages to
-        // reporter? Set in `assertionPassedFastPath` to avoid doing the full
-        // clear there for performance reasons.
-        static thread_local bool g_clearMessageScopes = false;
+
         // This is the source location for last encountered macro. It is
         // used to provide the users with more precise location of error
         // when an unexpected exception/fatal error happens.
         static thread_local SourceLineInfo g_lastKnownLineInfo("DummyLocation", static_cast<size_t>(-1));
+
+        // Should we clear message scopes before sending off the messages to
+        // reporter? Set in `assertionPassedFastPath` to avoid doing the full
+        // clear there for performance reasons.
+        static thread_local bool g_clearMessageScopes = false;
+
+        CATCH_INTERNAL_START_WARNINGS_SUPPRESSION
+        CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS
+        // Actual messages to be provided to the reporter
+        static thread_local std::vector<MessageInfo> g_messages;
+
+        // Owners for the UNSCOPED_X information macro
+        static thread_local std::vector<ScopedMessage> g_messageScopes;
+        CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION
+
     } // namespace Detail
 
     RunContext::RunContext(IConfig const* _config, IEventListenerPtr&& reporter)
@@ -5553,20 +5574,21 @@ namespace Catch {
             Detail::g_lastAssertionPassed = true;
         }
 
+        if(Detail::g_clearMessageScopes) {
+            Detail::g_messageScopes.clear();
+            Detail::g_clearMessageScopes = false;
+        }
+
         // From here, we are touching shared state and need mutex.
         Detail::LockGuard lock(m_assertionMutex);
         {
-            if(Detail::g_clearMessageScopes) {
-                m_messageScopes.clear();
-                Detail::g_clearMessageScopes = false;
-            }
             auto _ = scopedDeactivate(*m_outputRedirect);
             updateTotalsFromAtomics();
-            m_reporter->assertionEnded(AssertionStats(result, m_messages, m_totals));
+            m_reporter->assertionEnded(AssertionStats(result, Detail::g_messages, m_totals));
         }
 
         if(result.getResultType() != ResultWas::Warning) {
-            m_messageScopes.clear();
+            Detail::g_messageScopes.clear();
         }
 
         // Reset working state. assertion info will be reset after
@@ -5698,7 +5720,7 @@ namespace Catch {
     }
 
     void RunContext::pushScopedMessage(MessageInfo const& message) {
-        m_messages.push_back(message);
+        Detail::g_messages.push_back(message);
     }
 
     void RunContext::popScopedMessage(MessageInfo const& message) {
@@ -5707,15 +5729,15 @@ namespace Catch {
         //       messages than low single digits, so the optimization is tiny,
         //       and we would have to hand-write the loop to avoid terrible
         //       codegen of reverse iterators in debug mode.
-        m_messages.erase(
-            std::find_if(m_messages.begin(), m_messages.end(), [id = message.sequence](MessageInfo const& msg) {
+        Detail::g_messages.erase(
+            std::find_if(Detail::g_messages.begin(), Detail::g_messages.end(), [id = message.sequence](MessageInfo const& msg) {
                 return msg.sequence == id;
             })
         );
     }
 
     void RunContext::emplaceUnscopedMessage(MessageBuilder&& builder) {
-        m_messageScopes.emplace_back(CATCH_MOVE(builder));
+        Detail::g_messageScopes.emplace_back(CATCH_MOVE(builder));
     }
 
     std::string RunContext::getCurrentTestName() const {
@@ -5867,10 +5889,10 @@ namespace Catch {
 
         m_testCaseTracker->close();
         handleUnfinishedSections();
-        m_messageScopes.clear();
+        Detail::g_messageScopes.clear();
         // TBD: At this point, m_messages should be empty. Do we want to
         //      assert that this is true, or keep the defensive clear call?
-        m_messages.clear();
+        Detail::g_messages.clear();
 
         SectionStats testCaseSectionStats(CATCH_MOVE(testCaseSection), assertions, duration, missingAssertions);
         m_reporter->sectionEnded(testCaseSectionStats);
@@ -7558,7 +7580,7 @@ namespace Catch {
 
         void hexEscapeChar(std::ostream& os, unsigned char c) {
             std::ios_base::fmtflags f(os.flags());
-            os << "\\x"
+            os << "\\x"_sr
                << std::uppercase << std::hex << std::setfill('0') << std::setw(2)
                << static_cast<int>(c);
             os.flags(f);
@@ -7577,69 +7599,82 @@ namespace Catch {
     void XmlEncode::encodeTo(std::ostream& os) const {
         // Apostrophe escaping not necessary if we always use " to write attributes
         // (see: http://www.w3.org/TR/xml/#syntax)
+        size_t last_start = 0;
+        auto write_to = [&](size_t idx) {
+            if(last_start < idx) {
+                os << m_str.substr(last_start, idx - last_start);
+            }
+            last_start = idx + 1;
+        };
 
         for(std::size_t idx = 0; idx < m_str.size(); ++idx) {
             unsigned char c = static_cast<unsigned char>(m_str[idx]);
             switch(c) {
             case '<':
-                os << "&lt;";
+                write_to(idx);
+                os << "&lt;"_sr;
                 break;
             case '&':
-                os << "&amp;";
+                write_to(idx);
+                os << "&amp;"_sr;
                 break;
 
             case '>':
                 // See: http://www.w3.org/TR/xml/#syntax
-                if(idx > 2 && m_str[idx - 1] == ']' && m_str[idx - 2] == ']')
-                    os << "&gt;";
-                else
-                    os << c;
+                if(idx > 2 && m_str[idx - 1] == ']' && m_str[idx - 2] == ']') {
+                    write_to(idx);
+                    os << "&gt;"_sr;
+                }
                 break;
 
             case '\"':
-                if(m_forWhat == ForAttributes)
-                    os << "&quot;";
-                else
-                    os << c;
+                if(m_forWhat == ForAttributes) {
+                    write_to(idx);
+                    os << "&quot;"_sr;
+                }
                 break;
 
             default:
                 // Check for control characters and invalid utf-8
 
                 // Escape control characters in standard ascii
-                // see http://stackoverflow.com/questions/404107/why-are-control-characters-illegal-in-xml-1-0
+                // see
+                // http://stackoverflow.com/questions/404107/why-are-control-characters-illegal-in-xml-1-0
                 if(c < 0x09 || (c > 0x0D && c < 0x20) || c == 0x7F) {
+                    write_to(idx);
                     hexEscapeChar(os, c);
                     break;
                 }
 
                 // Plain ASCII: Write it to stream
                 if(c < 0x7F) {
-                    os << c;
                     break;
                 }
 
                 // UTF-8 territory
-                // Check if the encoding is valid and if it is not, hex escape bytes.
-                // Important: We do not check the exact decoded values for validity, only the encoding format
-                // First check that this bytes is a valid lead byte:
-                // This means that it is not encoded as 1111 1XXX
+                // Check if the encoding is valid and if it is not, hex escape
+                // bytes. Important: We do not check the exact decoded values for
+                // validity, only the encoding format First check that this bytes is
+                // a valid lead byte: This means that it is not encoded as 1111 1XXX
                 // Or as 10XX XXXX
-                if(c < 0xC0 ||
-                   c >= 0xF8) {
+                if(c < 0xC0 || c >= 0xF8) {
+                    write_to(idx);
                     hexEscapeChar(os, c);
                     break;
                 }
 
                 auto encBytes = trailingBytes(c);
-                // Are there enough bytes left to avoid accessing out-of-bounds memory?
+                // Are there enough bytes left to avoid accessing out-of-bounds
+                // memory?
                 if(idx + encBytes - 1 >= m_str.size()) {
+                    write_to(idx);
                     hexEscapeChar(os, c);
                     break;
                 }
                 // The header is valid, check data
                 // The next encBytes bytes must together be a valid utf-8
-                // This means: bitpattern 10XX XXXX and the extracted value is sane (ish)
+                // This means: bitpattern 10XX XXXX and the extracted value is sane
+                // (ish)
                 bool valid = true;
                 uint32_t value = headerValue(c);
                 for(std::size_t n = 1; n < encBytes; ++n) {
@@ -7658,18 +7693,18 @@ namespace Catch {
                     // Encoded value out of range
                     (value >= 0x110000)
                 ) {
+                    write_to(idx);
                     hexEscapeChar(os, c);
                     break;
                 }
 
                 // If we got here, this is in fact a valid(ish) utf-8 sequence
-                for(std::size_t n = 0; n < encBytes; ++n) {
-                    os << m_str[idx + n];
-                }
                 idx += encBytes - 1;
                 break;
             }
         }
+
+        write_to(m_str.size());
     }
 
     std::ostream& operator<<(std::ostream& os, XmlEncode const& xmlEncode) {

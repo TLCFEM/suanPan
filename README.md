@@ -261,7 +261,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**Armadillo**](http://arma.sourceforge.net/) version 15.0.1
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.9.1
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.10.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
