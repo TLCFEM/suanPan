@@ -270,7 +270,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
-- [**VTK**](https://vtk.org/) version 9.5.0
+- [**VTK**](https://vtk.org/) version 9.5.1
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**ezp**](https://github.com/TLCFEM/ezp)
