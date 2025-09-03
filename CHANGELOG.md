@@ -12,6 +12,7 @@
 3. update `Catch2` to version `3.10.0`
 4. update `VTK` to version `9.5.1`
 5. add `YLD0418P` anisotropic yield material [#281](https://github.com/TLCFEM/suanPan/pull/281) [#282](https://github.com/TLCFEM/suanPan/pull/282)
+6. add Tsai-Wu failure criterion for orthotropic materials
 
 ## version 3.8
 
