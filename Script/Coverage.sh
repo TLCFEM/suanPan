@@ -40,7 +40,7 @@ for file in "${files[@]}"; do
   cd $(dirname "$file_path") || exit 1
 
   exec 3>&1 4>&2
-  TIME_OUTPUT=$({ /usr/bin/time -f "%e" $current_dir/suanPan -f "$file_base" >>"$log_file"; } 2>&1 1>&3)
+  TIME_OUTPUT=$({ /usr/bin/time -f "%e" "$current_dir/suanPan" -f "$file_base" >>"$log_file"; } 2>&1 1>&3)
   exec 3>&- 4>&-
 
   cd "$current_dir" || exit 1
