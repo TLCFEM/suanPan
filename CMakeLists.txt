@@ -640,7 +640,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         set(CPACK_PACKAGE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/Resource/suanPan-ua.svg)
         set(CPACK_PACKAGE_RELEASE 1)
         set(CPACK_PACKAGE_VENDOR "tlcfem")
-        set(CPACK_PACKAGE_VERSION "3.9.0")
+        set(CPACK_PACKAGE_VERSION "4.0.0")
         set(CPACK_PACKAGE_DESCRIPTION "An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework")
         set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/TLCFEM/suanPan")
 

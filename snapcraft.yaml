@@ -9,7 +9,7 @@ issues: https://github.com/TLCFEM/suanPan/issues
 license: GPL-3.0
 source-code: https://github.com/TLCFEM/suanPan
 summary: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
-version: "3.9.0"
+version: "4.0.0"
 website: https://suanpan.tlcfem.top
 description: |
   [**suanPan**](https://github.com/TLCFEM/suanPan) is a finite element method (FEM) simulation platform for applications

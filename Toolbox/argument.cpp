@@ -50,10 +50,10 @@
 using std::ifstream;
 using std::ofstream;
 
-constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 9;
+constexpr auto SUANPAN_MAJOR = 4;
+constexpr auto SUANPAN_MINOR = 0;
 constexpr auto SUANPAN_PATCH = 0;
-constexpr auto SUANPAN_CODE = "Canopus";
+constexpr auto SUANPAN_CODE = "Deneb";
 
 bool SUANPAN_PRINT = true;
 bool SUANPAN_COLOR = true;
@@ -405,7 +405,7 @@ void print_version() {
 #ifdef SUANPAN_VTK
     suanpan_info("    The visualisation support is implemented via VTK ({}) library. https://vtk.org/\n", vtkVersion::GetVTKVersion());
 #endif
-    suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n");
+    suanpan_info("\n\n[From Wikipedia] Deneb is a blue supergiant star in the constellation of Cygnus. It is the brightest star in the constellation and the 19th brightest in the night sky, with an apparent magnitude slightly varying between +1.21 and +1.29. Deneb is one of the vertices of the asterism known as the Summer Triangle and the head of the Northern Cross.\n");
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
