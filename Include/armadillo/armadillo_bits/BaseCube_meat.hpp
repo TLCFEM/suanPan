@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -328,7 +328,7 @@ BaseCube<elem_type,derived>::is_finite() const
     for(uword c=0; c<n_c; ++c)
     for(uword r=0; r<n_r; ++r)
       {
-      if( arma_isfinite(P.at(r,c,s)) == false )  { return false; }
+      if( arma_isnonfinite(P.at(r,c,s)) )  { return false; }
       }
     }
   
@@ -436,7 +436,7 @@ BaseCube<elem_type,derived>::has_nonfinite() const
     for(uword c=0; c<n_c; ++c)
     for(uword r=0; r<n_r; ++r)
       {
-      if(arma_isfinite(P.at(r,c,s)) == false)  { return true; }
+      if(arma_isnonfinite(P.at(r,c,s)))  { return true; }
       }
     }
   

@@ -214,7 +214,9 @@ std::vector<vec> C3D8::record(const OutputType P) {
 }
 
 void C3D8::print() {
+    // clang-format off
     suanpan_info("A C3D8 element{}{}.\n", int_scheme == 'R' ? " reduced integration" : int_scheme == 'I' ? " Iron's integration" : " full integration", nlgeom ? " nonlinear geometry" : "");
+    // clang-format on
     suanpan_info("The element connects nodes:", node_encoding);
     if(!is_initialized()) return;
     suanpan_info("Material:\n");

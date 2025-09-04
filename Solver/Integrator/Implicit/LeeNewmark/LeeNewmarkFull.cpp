@@ -521,5 +521,7 @@ int LeeNewmarkFull::process_constraint_resistance() {
 }
 
 void LeeNewmarkFull::print() {
+    // clang-format off
     suanpan_info("A Newmark solver using Lee's damping model with adjustable bandwidth using {} stiffness. doi:10.1016/j.compstruc.2020.106423 and 10.1016/j.compstruc.2021.106663\n", stiffness_type == StiffnessType::TRIAL ? "tangent" : stiffness_type == StiffnessType::CURRENT ? "converged" : "initial");
+    // clang-format on
 }

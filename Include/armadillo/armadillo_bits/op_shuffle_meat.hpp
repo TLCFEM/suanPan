@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,9 +40,18 @@ op_shuffle::apply_direct(Mat<eT>& out, const Mat<eT>& X, const uword dim)
   
   std::vector<packet> packet_vec(N);
   
+  podarray<int> tmp(N);
+  
+  int* tmp_mem = tmp.memptr();
+  
+  const int a = 0;
+  const int b = arma_rng::randi<int>::max_val();
+  
+  arma_rng::randi<int>::fill(tmp_mem, N, a, b);
+  
   for(uword i=0; i<N; ++i)
     {
-    packet_vec[i].val   = int(arma_rng::randi<int>());
+    packet_vec[i].val   = tmp_mem[i];
     packet_vec[i].index = i;
     }
   

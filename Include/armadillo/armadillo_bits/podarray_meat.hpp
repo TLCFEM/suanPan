@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,8 +37,8 @@ podarray<eT>::~podarray()
 template<typename eT>
 inline
 podarray<eT>::podarray()
-  : n_elem(0)
-  , mem   (0)
+  : n_elem(0      )
+  , mem   (nullptr)
   {
   arma_debug_sigprint_this(this);
   }
@@ -128,7 +128,7 @@ arma_inline
 eT&
 podarray<eT>::operator[] (const uword i)
   {
-  return access::rw(mem[i]);
+  return mem[i];
   }
 
 
@@ -152,7 +152,7 @@ podarray<eT>::operator() (const uword i)
   {
   arma_conform_check_bounds( (i >= n_elem), "podarray::operator(): index out of bounds" );
   
-  return access::rw(mem[i]);
+  return mem[i];
   }
 
 
@@ -258,10 +258,10 @@ podarray<eT>::copy_row(const Mat<eT>& A, const uword row)
   {
   arma_debug_sigprint();
   
-  // note: this function assumes that the podarray has been set to the correct size beforehand
-  
   const uword n_rows = A.n_rows;
   const uword n_cols = A.n_cols;
+  
+  init_warm(n_cols);
   
   const eT*   A_mem = &(A.at(row,0));
         eT* out_mem = memptr();

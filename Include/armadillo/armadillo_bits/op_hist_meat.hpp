@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -66,8 +66,8 @@ op_hist::apply_noalias(Mat<uword>& out, const Mat<eT>& A, const uword n_bins, co
     max_val += (n_bins/2);
     }
   
-  if(arma_isfinite(min_val) == false) { min_val = priv::most_neg<eT>(); }
-  if(arma_isfinite(max_val) == false) { max_val = priv::most_pos<eT>(); }
+  if(arma_isnonfinite(min_val)) { min_val = priv::most_neg<eT>(); }
+  if(arma_isnonfinite(max_val)) { max_val = priv::most_pos<eT>(); }
   
   Col<eT> c(n_bins, arma_nozeros_indicator());
   eT* c_mem = c.memptr();
@@ -97,7 +97,7 @@ op_hist::apply(Mat<uword>& out, const mtOp<uword, T1, op_hist>& X)
   
   const uword dim = (T1::is_xvec) ? uword(U.M.is_rowvec() ? 1 : 0) : uword((T1::is_row) ? 1 : 0);
   
-  if(is_non_integral<typename T1::elem_type>::value)
+  if(is_real<typename T1::elem_type>::value)
     {
     if(U.is_alias(out))
       {

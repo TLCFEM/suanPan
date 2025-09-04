@@ -205,6 +205,8 @@ inline auto& SUANPAN_CFTL = std::cout;
 #define ARMA_CERR_STREAM SUANPAN_COUT
 
 #include <armadillo/armadillo>
+// extra bits used in calling lapack subroutines
+#include <armadillo/ext_def_lapack.hpp>
 using namespace arma;
 
 #include <filesystem>

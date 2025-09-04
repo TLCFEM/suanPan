@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,11 +21,12 @@
 
 
 
+struct mtSpOp_dual_aux_indicator {};
+
+
 template<typename out_eT, typename T1, typename spop_type>
-class mtSpOp : public SpBase< out_eT, mtSpOp<out_eT, T1, spop_type> >
+struct mtSpOp : public SpBase< out_eT, mtSpOp<out_eT, T1, spop_type> >
   {
-  public:
-  
   typedef          out_eT                       elem_type;
   typedef typename get_pod_type<out_eT>::result pod_type;
   
@@ -39,6 +40,7 @@ class mtSpOp : public SpBase< out_eT, mtSpOp<out_eT, T1, spop_type> >
   inline           mtSpOp(const T1& in_m, const in_eT in_aux);
   inline           mtSpOp(const T1& in_m, const uword aux_uword_a, const uword aux_uword_b);
   inline           mtSpOp(const char junk, const T1& in_m, const out_eT in_aux);
+  inline           mtSpOp(const mtSpOp_dual_aux_indicator&, const T1& in_m, const in_eT in_aux_a, const out_eT in_aux_b);
   inline          ~mtSpOp();
   
   template<typename eT2>

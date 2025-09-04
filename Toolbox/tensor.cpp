@@ -33,24 +33,31 @@ mat tensor::isotropic_stiffness(const double modulus, const double poissons_rati
 }
 
 mat tensor::orthotropic_stiffness(const vec& modulus, const vec& poissons_ratio) {
+    const auto& E1 = modulus(0);
+    const auto& E2 = modulus(1);
+    const auto& E3 = modulus(2);
+    const auto& G12 = modulus(3);
+    const auto& G23 = modulus(4);
+    const auto& G13 = modulus(5);
+
+    const auto& V12 = poissons_ratio(0);
+    const auto& V23 = poissons_ratio(1);
+    const auto& V13 = poissons_ratio(2);
+
     mat t_mat(3, 3);
-    t_mat(0, 0) = 1. / modulus(0);
-    t_mat(1, 0) = -poissons_ratio(0) * t_mat(0, 0);
-    t_mat(2, 0) = -poissons_ratio(2) * t_mat(0, 0);
+    t_mat(0, 0) = 1. / E1;
+    t_mat(1, 1) = 1. / E2;
+    t_mat(2, 2) = 1. / E3;
 
-    t_mat(1, 1) = 1. / modulus(1);
-    t_mat(0, 1) = -poissons_ratio(0) * t_mat(1, 1);
-    t_mat(2, 1) = -poissons_ratio(1) * t_mat(1, 1);
-
-    t_mat(2, 2) = 1. / modulus(2);
-    t_mat(0, 2) = -poissons_ratio(2) * t_mat(2, 2);
-    t_mat(1, 2) = -poissons_ratio(1) * t_mat(2, 2);
+    t_mat(0, 1) = t_mat(1, 0) = -V12 / E1;
+    t_mat(0, 2) = t_mat(2, 0) = -V13 / E1;
+    t_mat(1, 2) = t_mat(2, 1) = -V23 / E2;
 
     mat stiffness(6, 6, fill::zeros);
     stiffness(span(0, 2), span(0, 2)) = inv(t_mat);
-    stiffness(3, 3) = modulus(3);
-    stiffness(4, 4) = modulus(4);
-    stiffness(5, 5) = modulus(5);
+    stiffness(3, 3) = G12;
+    stiffness(4, 4) = G23;
+    stiffness(5, 5) = G13;
 
     return stiffness;
 }
@@ -205,21 +212,17 @@ double tensor::mean3(const vec& S) { return trace3(S) / 3.; }
 
 vec tensor::dev(const vec& S) {
     auto D = S;
-    D(span(0, 2)) -= mean3(D);
-    return D;
+    return dev(std::move(D));
 }
 
 vec tensor::dev(vec&& S) {
-    S(span(0, 2)) -= mean3(S);
+    S.head(3) -= mean3(S);
     return std::move(S);
 }
 
 mat tensor::dev(const mat& in) {
-    suanpan_assert([&] { if(in.n_rows != in.n_cols) throw std::invalid_argument("need square matrix"); });
-
     auto out = in;
-    out.diag() -= mean(out.diag());
-    return out;
+    return dev(std::move(out));
 }
 
 mat tensor::dev(mat&& in) {
@@ -375,12 +378,6 @@ double tensor::strain::norm(const vec& in) {
     throw std::invalid_argument("need a valid strain vector");
 }
 
-double tensor::strain::norm(vec&& in) {
-    if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
-    if(in.n_elem == 3) return arma::norm(in);
-    throw std::invalid_argument("need a valid strain vector");
-}
-
 double tensor::strain::double_contraction(const vec& a) { return double_contraction(a, a); }
 
 double tensor::strain::double_contraction(const vec& a, const vec& b) { return dot(a % b, norm_weight); }
@@ -447,17 +444,59 @@ double tensor::stress::norm(const vec& in) {
     throw std::invalid_argument("need a valid stress vector");
 }
 
-double tensor::stress::norm(vec&& in) {
-    if(in.n_elem == 6) return sqrt(dot(norm_weight, square(in)));
-    if(in.n_elem == 3) return arma::norm(in);
-    throw std::invalid_argument("need a valid stress vector");
-}
-
 double tensor::stress::double_contraction(const vec& a) { return double_contraction(a, a); }
 
 double tensor::stress::double_contraction(const vec& a, const vec& b) { return dot(a % b, norm_weight); }
 
 double tensor::stress::double_contraction(vec&& a, vec&& b) { return dot(a % b, norm_weight); }
+
+namespace {
+    void orthotropic_projection(const vec& yield_stress, mat& proj_a, mat& proj_b) {
+        // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
+        // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
+        // S(4) = \sigma_{33}^t    S(5) = \sigma_{33}^c
+        // S(6) = \sigma_{12}^0    S(7) = \sigma_{23}^0    S(8) = \sigma_{13}^0
+
+        proj_a.zeros(6, 6);
+        proj_b.zeros(6, 1);
+
+        const auto T1 = 1. / yield_stress(0) / yield_stress(1);
+        const auto T2 = 1. / yield_stress(2) / yield_stress(3);
+        const auto T3 = 1. / yield_stress(4) / yield_stress(5);
+
+        proj_b(0) = (yield_stress(1) - yield_stress(0)) * (proj_a(0, 0) = T1);
+        proj_b(1) = (yield_stress(3) - yield_stress(2)) * (proj_a(1, 1) = T2);
+        proj_b(2) = (yield_stress(5) - yield_stress(4)) * (proj_a(2, 2) = T3);
+
+        proj_a(3, 3) = 1. / yield_stress(6) / yield_stress(6);
+        proj_a(4, 4) = 1. / yield_stress(7) / yield_stress(7);
+        proj_a(5, 5) = 1. / yield_stress(8) / yield_stress(8);
+        proj_a *= 2.;
+    }
+} // namespace
+
+/**
+ * \brief Generate two projection matrix based on the given yield stress according to the Tsai-Wu yielding criterion
+ * \param yield_stress nine yield stresses
+ * \param proj_a P matrix
+ * \param proj_b q vector
+ */
+void transform::tsai_wu_projection(const vec& yield_stress, mat& proj_a, mat& proj_b) {
+    // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
+    // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
+    // S(4) = \sigma_{33}^t    S(5) = \sigma_{33}^c
+    // S(6) = \sigma_{12}^0    S(7) = \sigma_{23}^0    S(8) = \sigma_{13}^0
+
+    orthotropic_projection(yield_stress, proj_a, proj_b);
+
+    const auto T1 = 1. / yield_stress(0) / yield_stress(1);
+    const auto T2 = 1. / yield_stress(2) / yield_stress(3);
+    const auto T3 = 1. / yield_stress(4) / yield_stress(5);
+
+    proj_a(0, 1) = proj_a(1, 0) = -std::sqrt(T1 * T2);
+    proj_a(1, 2) = proj_a(2, 1) = -std::sqrt(T2 * T3);
+    proj_a(2, 0) = proj_a(0, 2) = -std::sqrt(T3 * T1);
+}
 
 /**
  * \brief Generate two projection matrix based on the given yield stress according to the Hoffman yielding criterion
@@ -471,24 +510,15 @@ void transform::hoffman_projection(const vec& yield_stress, mat& proj_a, mat& pr
     // S(4) = \sigma_{33}^t    S(5) = \sigma_{33}^c
     // S(6) = \sigma_{12}^0    S(7) = \sigma_{23}^0    S(8) = \sigma_{13}^0
 
-    proj_a.zeros(6, 6);
-    proj_b.zeros(6, 1);
+    orthotropic_projection(yield_stress, proj_a, proj_b);
 
     const auto T1 = 1. / yield_stress(0) / yield_stress(1);
     const auto T2 = 1. / yield_stress(2) / yield_stress(3);
     const auto T3 = 1. / yield_stress(4) / yield_stress(5);
 
-    proj_b(0) = (yield_stress(1) - yield_stress(0)) * (proj_a(0, 0) = T1);
-    proj_b(1) = (yield_stress(3) - yield_stress(2)) * (proj_a(1, 1) = T2);
-    proj_b(2) = (yield_stress(5) - yield_stress(4)) * (proj_a(2, 2) = T3);
-
-    proj_a(0, 1) = proj_a(1, 0) = -.5 * (T1 + T2 - T3);
-    proj_a(1, 2) = proj_a(2, 1) = -.5 * (T2 + T3 - T1);
-    proj_a(2, 0) = proj_a(0, 2) = -.5 * (T3 + T1 - T2);
-    proj_a(3, 3) = 1. / yield_stress(6) / yield_stress(6);
-    proj_a(4, 4) = 1. / yield_stress(7) / yield_stress(7);
-    proj_a(5, 5) = 1. / yield_stress(8) / yield_stress(8);
-    proj_a *= 2.;
+    proj_a(0, 1) = proj_a(1, 0) = T3 - T1 - T2;
+    proj_a(1, 2) = proj_a(2, 1) = T1 - T2 - T3;
+    proj_a(2, 0) = proj_a(0, 2) = T2 - T3 - T1;
 }
 
 mat transform::hill_projection(const double S1, const double S2, const double S3, const double S4, const double S5, const double S6) {
@@ -582,12 +612,12 @@ mat transform::compute_jacobian_principal_to_nominal(const mat& in) {
     throw std::invalid_argument("need a valid tensor");
 }
 
-mat transform::eigen_to_tensor_base(const mat& eig_vec) {
+mat66 transform::eigen_to_tensor_base(const mat& eig_vec) {
     const mat n12 = eig_vec.col(0) * eig_vec.col(1).t();
     const mat n23 = eig_vec.col(1) * eig_vec.col(2).t();
     const mat n31 = eig_vec.col(2) * eig_vec.col(0).t();
 
-    mat pij(6, 6);
+    mat66 pij(fill::none);
 
     pij.col(0) = tensor::stress::to_voigt(eig_vec.col(0) * eig_vec.col(0).t());
     pij.col(1) = tensor::stress::to_voigt(eig_vec.col(1) * eig_vec.col(1).t());
@@ -599,7 +629,7 @@ mat transform::eigen_to_tensor_base(const mat& eig_vec) {
     return pij;
 }
 
-mat transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
+vec transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
     vec principal_tensile_stress(principal_stress.n_elem, fill::zeros);
     for(auto I = 0llu; I < principal_stress.n_elem; ++I)
         if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
@@ -607,27 +637,32 @@ mat transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& p
     return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;
 }
 
-mat transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
-    const auto get_fraction = [](const vec& p_stress) {
-        const auto compute_fraction = [](const double a, const double b) { return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); };
+namespace {
+    vec3 tensile_fraction(const vec& principal_stress) {
+        const auto compute = [&principal_stress](const unsigned i, const unsigned j) {
+            const auto a = principal_stress(i), b = principal_stress(j);
 
-        return vec{compute_fraction(p_stress(0), p_stress(1)), compute_fraction(p_stress(1), p_stress(2)), compute_fraction(p_stress(2), p_stress(0))};
-    };
+            if(const auto fraction = (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); std::isfinite(fraction)) return 2. * suanpan::clamp_unit(fraction);
 
+            return a + b <= 0. ? 0. : 2.;
+        };
+
+        return {compute(0, 1), compute(1, 2), compute(2, 0)};
+    }
+} // namespace
+
+std::pair<mat, mat> transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
     const mat pnn = eigen_to_tensor_base(principal_direction);
 
-    std::vector<uword> tp;
-    tp.reserve(principal_stress.n_elem);
-    for(auto I = 0llu; I < principal_stress.n_elem; ++I)
-        if(principal_stress(I) > 0.) tp.emplace_back(I);
+    const uvec pattern = find(principal_stress > 0.);
 
-    const uvec pattern = tp;
+    mat eigen_projector = pnn.cols(pattern) * pnn.cols(pattern).t();
+    mat eigen_derivative = eigen_projector + pnn.tail_cols(3) * diagmat(tensile_fraction(principal_stress)) * pnn.tail_cols(3).t();
 
-    mat eigen_derivative = pnn.cols(pattern) * pnn.cols(pattern).t() + pnn.tail_cols(3) * diagmat(get_fraction(principal_stress)) * pnn.tail_cols(3).t();
-
+    eigen_projector.tail_cols(3) *= 2.;
     eigen_derivative.tail_cols(3) *= 2.;
 
-    return eigen_derivative;
+    return {std::move(eigen_projector), std::move(eigen_derivative)};
 }
 
 vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes) {

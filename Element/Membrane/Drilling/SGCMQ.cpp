@@ -168,9 +168,9 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
     const auto ele_coor = get_coordinate(2);
 
     access::rw(characteristic_length) = sqrt(area::shoelace(ele_coor));
-
+    // clang-format off
     const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationType::IRONS : scheme == 'L' ? IntegrationType::LOBATTO : IntegrationType::GAUSS);
-
+    // clang-format on
     const auto diff_coor = form_diff_coor(ele_coor);
 
     const mat iso_mapping = trans(mapping * ele_coor);

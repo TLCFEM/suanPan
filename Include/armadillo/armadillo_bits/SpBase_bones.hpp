@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -76,11 +76,11 @@ struct SpBase
   arma_warn_unused inline elem_type min() const;
   arma_warn_unused inline elem_type max() const;
   
-  arma_frown("use .index_min() instead") inline elem_type min(uword& index_of_min_val) const;
-  arma_frown("use .index_max() instead") inline elem_type max(uword& index_of_max_val) const;
+  [[deprecated("use .index_min() instead")]] inline elem_type min(uword& index_of_min_val) const;
+  [[deprecated("use .index_max() instead")]] inline elem_type max(uword& index_of_max_val) const;
   
-  arma_frown("use .index_min() with ind2sub() instead") inline elem_type min(uword& row_of_min_val, uword& col_of_min_val) const;
-  arma_frown("use .index_max() with ind2sub() instead") inline elem_type max(uword& row_of_max_val, uword& col_of_max_val) const;
+  [[deprecated("use .index_min() with ind2sub() instead")]] inline elem_type min(uword& row_of_min_val, uword& col_of_min_val) const;
+  [[deprecated("use .index_max() with ind2sub() instead")]] inline elem_type max(uword& row_of_max_val, uword& col_of_max_val) const;
   
   arma_warn_unused inline uword index_min() const;
   arma_warn_unused inline uword index_max() const;

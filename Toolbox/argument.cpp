@@ -51,7 +51,7 @@ using std::ifstream;
 using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 8;
+constexpr auto SUANPAN_MINOR = 9;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Canopus";
 
@@ -204,16 +204,16 @@ namespace {
         if(support_emoji() && SUANPAN_COLOR) {
             static constexpr std::array POOL{"\xF0\x9F\x8C\x88", "\xF0\x9F\x8C\x8F", "\xF0\x9F\x8E\xA7", "\xF0\x9F\x8E\xB1", "\xF0\x9F\x91\xB9", "\xF0\x9F\x92\xBB", "\xF0\x9F\x94\x8B", "\xF0\x9F\x94\x94", "\xF0\x9F\x9A\x80", "\xF0\x9F\xA7\xA9"};
             arma_rng::set_seed_random();
-            suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan                  |\n");
-            suanpan_info("|  \xF0\x9F\x93\x9A https://tlcfem.github.io/suanPan-manual/latest     |\n");
+            suanpan_info("|  \xF0\x9F\xA7\xAE https://github.com/TLCFEM/suanPan/                 |\n");
+            suanpan_info("|  \xF0\x9F\x93\x9A https://suanpan.tlcfem.top/                        |\n");
             suanpan_info(header);
-            suanpan_info("|  {} https://bit.ly/vsc-sp                              |\n", POOL[randi() % POOL.size()]);
+            suanpan_info("|  {} https://bit.ly/vsc-sp/                             |\n", POOL[randi() % POOL.size()]);
         }
         else {
-            suanpan_info("|  https://github.com/TLCFEM/suanPan                     |\n");
-            suanpan_info("|  https://tlcfem.github.io/suanPan-manual/latest        |\n");
+            suanpan_info("|  https://github.com/TLCFEM/suanPan/                    |\n");
+            suanpan_info("|  https://suanpan.tlcfem.top/                           |\n");
             suanpan_info(header);
-            suanpan_info("|  https://bit.ly/vsc-sp                                 |\n");
+            suanpan_info("|  https://bit.ly/vsc-sp/                                |\n");
         }
         suanpan_info("{}\n", header);
     }
@@ -378,7 +378,7 @@ void print_version() {
 #endif
     );
     suanpan_info("    The source code of suanPan is hosted on GitHub. https://github.com/TLCFEM/suanPan/\n");
-    suanpan_info("    The documentation is hosted on GitHub. https://tlcfem.github.io/suanPan-manual/latest/\n");
+    suanpan_info("    The documentation is hosted on GitHub. https://suanpan.tlcfem.top/\n");
     suanpan_info("    The linear algebra support is provided by Armadillo ({}) with {}. http://arma.sourceforge.net/\n", arma_version::as_string(),
 #ifdef SUANPAN_MKL
                  "Intel oneAPI Math Kernel Library (MKL)"

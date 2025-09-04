@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -748,7 +748,7 @@ SpBase<elem_type,derived>::is_finite() const
     
     while(it != it_end)
       {
-      if(arma_isfinite(*it) == false)  { return false; }
+      if(arma_isnonfinite(*it))  { return false; }
       ++it;
       }
     }
@@ -850,7 +850,7 @@ SpBase<elem_type,derived>::has_nonfinite() const
     
     while(it != it_end)
       {
-      if(arma_isfinite(*it) == false)  { return true; }
+      if(arma_isnonfinite(*it))  { return true; }
       ++it;
       }
     }

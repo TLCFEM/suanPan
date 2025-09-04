@@ -17,8 +17,8 @@ RUN echo "deb https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/source
 RUN apt-get update -y && apt-get install -y gcc g++ gfortran cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.4/VTK-9.4.2.tar.gz && tar xf VTK-9.4.2.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.4.2 && \
+    wget -q https://www.vtk.org/files/release/9.5/VTK-9.5.1.tar.gz && tar xf VTK-9.5.1.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.5.1 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/suanPan.git && cd suanPan && mkdir build && cd build && \

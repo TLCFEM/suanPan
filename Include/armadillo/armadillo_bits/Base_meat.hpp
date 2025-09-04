@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -685,7 +685,7 @@ Base<elem_type,derived>::is_finite() const
       
       for(uword i=0; i<n_elem; ++i)
         {
-        if(arma_isfinite(Pea[i]) == false)  { return false; }
+        if(arma_isnonfinite(Pea[i]))  { return false; }
         }
       }
     else
@@ -696,7 +696,7 @@ Base<elem_type,derived>::is_finite() const
       for(uword col=0; col<n_cols; ++col)
       for(uword row=0; row<n_rows; ++row)
         {
-        if(arma_isfinite(P.at(row,col)) == false)  { return false; }
+        if(arma_isnonfinite(P.at(row,col)))  { return false; }
         }
       }
     }
@@ -829,7 +829,7 @@ Base<elem_type,derived>::has_nonfinite() const
       
       for(uword i=0; i<n_elem; ++i)
         {
-        if(arma_isfinite(Pea[i]) == false)  { return true; }
+        if(arma_isnonfinite(Pea[i]))  { return true; }
         }
       }
     else
@@ -840,7 +840,7 @@ Base<elem_type,derived>::has_nonfinite() const
       for(uword col=0; col<n_cols; ++col)
       for(uword row=0; row<n_rows; ++row)
         {
-        if(arma_isfinite(P.at(row,col)) == false)  { return true; }
+        if(arma_isnonfinite(P.at(row,col)))  { return true; }
         }
       }
     }

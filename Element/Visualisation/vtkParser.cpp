@@ -100,7 +100,10 @@ void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& 
     actor->GetProperty()->SetOpacity(1.);
 
     renderer->AddActor(actor);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     if(config.colorbar) renderer->AddActor2D(bar);
+#pragma GCC diagnostic pop
     renderer->SetBackground(color->GetColor3d("Grey").GetData());
     renderer->ResetCameraClippingRange();
 

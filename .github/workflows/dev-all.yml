@@ -35,7 +35,7 @@ jobs:
             aocl: ON
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Golang
@@ -45,8 +45,8 @@ jobs:
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-linux.tar.gz
-          tar xf VTK-9.4.2-linux.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.1-linux.tar.gz
+          tar xf VTK-9.5.1-linux.tar.gz
       - name: MKL
         run: |
           if [ "${{ matrix.mkl }}" == "ON" ] || [ "${{ matrix.compiler.c }}" == "icx" ]; then
@@ -102,7 +102,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
           make install -j"$(nproc)" && make package
       - name: Pack
@@ -169,7 +169,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Golang
@@ -178,8 +178,8 @@ jobs:
           cache: false
       - name: Dependency
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-linux.tar.gz
-          tar xf VTK-9.4.2-linux.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.1-linux.tar.gz
+          tar xf VTK-9.5.1-linux.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt-get update
@@ -201,7 +201,7 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
           make install -j"$(nproc)" && make package
       - name: Pack
@@ -236,14 +236,14 @@ jobs:
             vtk: ON
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-macos.tar.gz
-          tar xf VTK-9.4.2-macos.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.1-macos.tar.gz
+          tar xf VTK-9.5.1-macos.tar.gz
           brew install glfw glew
       - name: Compile
         run: |
@@ -259,7 +259,7 @@ jobs:
             -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
             ..
           else
             export CC=gcc-12
@@ -268,7 +268,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.4/ \
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
             ..
           fi
           make install -j4
@@ -310,7 +310,7 @@ jobs:
         mkl: [ OFF ]
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Golang
@@ -321,15 +321,15 @@ jobs:
         shell: cmd
         if: matrix.mkl == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9c567fd-df1c-4477-9030-682c66058324/intel-onemkl-2025.1.0.802_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/9962ffec-17a2-4135-94e5-acc3995e0c49/intel-fortran-compiler-2025.1.0.602_offline.exe
-          intel-onemkl-2025.1.0.802_offline.exe -s -a --silent --eula accept
-          intel-fortran-compiler-2025.1.0.602_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a665fc26-bdf1-415f-9fc4-345f257f4fb1/w_onemkl_p_2024.2.1.106_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ea23d696-a77f-4a4a-8996-20d02cdbc48f/w_fortran-compiler_p_2024.2.1.81_offline.exe
+          w_onemkl_p_2024.2.1.106_offline.exe -s -a --silent --eula accept
+          w_fortran-compiler_p_2024.2.1.81_offline.exe -s -a --silent --eula accept
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-win.7z
-          7z x VTK-9.4.2-win.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.1-win.7z
+          7z x VTK-9.5.1-win.7z
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -344,7 +344,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.4/ `
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.5/ `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack
@@ -401,7 +401,7 @@ jobs:
         avx: [ OFF ]
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Golang
@@ -415,8 +415,8 @@ jobs:
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.4.2-win-gcc.7z
-          7z x VTK-9.4.2-win-gcc.7z -oVTK
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.1-win-gcc.7z
+          7z x VTK-9.5.1-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -429,7 +429,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=dist `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.4 `
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.5 `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
       - name: Pack

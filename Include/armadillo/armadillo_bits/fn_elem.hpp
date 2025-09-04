@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -541,6 +541,45 @@ arg(const T1& X)
   arma_debug_sigprint();
   
   return mtSpOp<typename T1::pod_type, T1, spop_cx_arg>(X);
+  }
+
+
+
+template<typename T1>
+arma_warn_unused
+inline
+typename enable_if2< is_arma_type<T1>::value, const mtOp<typename T1::elem_type, T1, op_replace> >::result
+replace(const T1& X, typename T1::elem_type old_val, typename T1::elem_type new_val)
+  {
+  arma_debug_sigprint();
+  
+  return mtOp<typename T1::elem_type, T1, op_replace>(mtOp_dual_aux_indicator(), X, old_val, new_val);
+  }
+
+
+
+template<typename T1>
+arma_warn_unused
+inline
+const mtOpCube<typename T1::elem_type, T1, op_replace>
+replace(const BaseCube<typename T1::elem_type,T1>& X, typename T1::elem_type old_val, typename T1::elem_type new_val)
+  {
+  arma_debug_sigprint();
+  
+  return mtOpCube<typename T1::elem_type, T1, op_replace>(mtOpCube_dual_aux_indicator(), X.get_ref(), old_val, new_val);
+  }
+
+
+
+template<typename T1>
+arma_warn_unused
+inline
+typename enable_if2< is_arma_sparse_type<T1>::value, const mtSpOp<typename T1::elem_type, T1, spop_replace> >::result
+replace(const T1& X, typename T1::elem_type old_val, typename T1::elem_type new_val)
+  {
+  arma_debug_sigprint();
+  
+  return mtSpOp<typename T1::elem_type, T1, spop_replace>(mtSpOp_dual_aux_indicator(), X, old_val, new_val);
   }
 
 
@@ -1147,6 +1186,61 @@ tgamma(const BaseCube<typename T1::elem_type,T1>& A)
   arma_debug_sigprint();
   
   return eOpCube<T1, eop_tgamma>(A.get_ref());
+  }
+
+
+
+//
+// eps
+
+template<typename T1>
+arma_warn_unused
+inline
+typename enable_if2< (is_arma_type<T1>::value && is_real_or_cx<typename T1::elem_type>::value), const mtOp<typename T1::pod_type, T1, op_eps> >::result
+eps(const T1& X)
+  {
+  arma_debug_sigprint();
+  
+  return mtOp<typename T1::pod_type, T1, op_eps>(X);
+  }
+
+
+
+template<typename T1>
+arma_warn_unused
+inline
+typename enable_if2< (is_arma_cube_type<T1>::value && is_real_or_cx<typename T1::elem_type>::value), const mtOpCube<typename T1::pod_type, T1, op_eps> >::result
+eps(const T1& X)
+  {
+  arma_debug_sigprint();
+  
+  return mtOpCube<typename T1::pod_type, T1, op_eps>(X);
+  }
+
+
+
+template<typename eT>
+arma_warn_unused
+inline
+typename arma_real_only<eT>::result
+eps(const eT& x)
+  {
+  arma_debug_sigprint();
+  
+  return op_eps::direct_eps(x);
+  }
+
+
+
+template<typename T>
+arma_warn_unused
+inline
+typename arma_real_only<T>::result
+eps(const std::complex<T>& x)
+  {
+  arma_debug_sigprint();
+  
+  return op_eps::direct_eps(x);
   }
 
 

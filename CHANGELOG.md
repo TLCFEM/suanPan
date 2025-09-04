@@ -5,6 +5,15 @@
 1. Eigenanalysis does not support distributed computation.
 2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 3.9
+
+1. fix computation of elasticity matrix in orthotropic materials [#280](https://github.com/TLCFEM/suanPan/pull/280)
+2. update `Armadillo` to version `15.0.1`
+3. update `Catch2` to version `3.10.0`
+4. update `VTK` to version `9.5.1`
+5. add `YLD0418P` anisotropic yield material [#281](https://github.com/TLCFEM/suanPan/pull/281) [#282](https://github.com/TLCFEM/suanPan/pull/282)
+6. add Tsai-Wu failure criterion for orthotropic materials
+
 ## version 3.8
 
 1. add optional hourglassing control for `CP4R` and `C3D8R` elements

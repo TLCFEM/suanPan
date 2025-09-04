@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -100,7 +100,7 @@ running_stat_vec<obj_type>::operator() (const Base<typename running_stat_vec<obj
   
   if( sample.internal_has_nonfinite() )
     {
-    arma_warn(3, "running_stat_vec: sample ignored as it has non-finite elements");
+    arma_warn(3, "running_stat_vec: non-finite sample ignored");
     return;
     }
   
@@ -128,7 +128,7 @@ running_stat_vec<obj_type>::operator() (const Base< std::complex<typename runnin
   
   if( sample.internal_has_nonfinite() )
     {
-    arma_warn(3, "running_stat_vec: sample ignored as it has non-finite elements");
+    arma_warn(3, "running_stat_vec: non-finite sample ignored");
     return;
     }
   

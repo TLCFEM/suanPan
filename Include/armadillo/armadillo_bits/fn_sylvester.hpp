@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,13 +24,13 @@
 template<typename T1, typename T2, typename T3>
 inline
 bool
-syl
+sylvester
   (
         Mat <typename T1::elem_type>   & out,
   const Base<typename T1::elem_type,T1>& in_A,
   const Base<typename T1::elem_type,T2>& in_B,
   const Base<typename T1::elem_type,T3>& in_C,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -46,12 +46,12 @@ syl
   const Mat<eT>& B = tmp_B.M;
   const Mat<eT>& C = tmp_C.M;
   
-  const bool status = auxlib::syl(out, A, B, C);
+  const bool status = auxlib::sylvester(out, A, B, C);
   
   if(status == false)
     {
     out.soft_reset();
-    arma_warn(3, "syl(): solution not found");
+    arma_warn(3, "sylvester(): solution not found");
     }
   
   return status;
@@ -59,20 +59,23 @@ syl
 
 
 
+// kept for compatibility with old user code
 template<typename T1, typename T2, typename T3>
+[[deprecated("use sylvester() instead")]]
 inline
 bool
-sylvester
+syl
   (
         Mat <typename T1::elem_type>   & out,
   const Base<typename T1::elem_type,T1>& in_A,
   const Base<typename T1::elem_type,T2>& in_B,
   const Base<typename T1::elem_type,T3>& in_C,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_ignore(junk);
-  return syl(out, in_A, in_B, in_C);
+  
+  return sylvester(out, in_A, in_B, in_C);
   }
 
 
@@ -81,12 +84,12 @@ template<typename T1, typename T2, typename T3>
 arma_warn_unused
 inline
 Mat<typename T1::elem_type>
-syl
+sylvester
   (
   const Base<typename T1::elem_type,T1>& in_A,
   const Base<typename T1::elem_type,T2>& in_B,
   const Base<typename T1::elem_type,T3>& in_C,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_debug_sigprint();
@@ -104,12 +107,12 @@ syl
   
   Mat<eT> out;
   
-  const bool status = auxlib::syl(out, A, B, C);
+  const bool status = auxlib::sylvester(out, A, B, C);
   
   if(status == false)
     {
     out.soft_reset();
-    arma_stop_runtime_error("syl(): solution not found");
+    arma_stop_runtime_error("sylvester(): solution not found");
     }
   
   return out;
@@ -117,20 +120,22 @@ syl
 
 
 
+// kept for compatibility with old user code
 template<typename T1, typename T2, typename T3>
-arma_warn_unused
+[[deprecated("use sylvester() instead")]]
 inline
 Mat<typename T1::elem_type>
-sylvester
+syl
   (
   const Base<typename T1::elem_type,T1>& in_A,
   const Base<typename T1::elem_type,T2>& in_B,
   const Base<typename T1::elem_type,T3>& in_C,
-  const typename arma_blas_type_only<typename T1::elem_type>::result* junk = nullptr
+  const typename arma_blas_real_or_cx_only<typename T1::elem_type>::result* junk = nullptr
   )
   {
   arma_ignore(junk);
-  return syl(in_A, in_B, in_C);
+  
+  return sylvester(in_A, in_B, in_C);
   }
 
 

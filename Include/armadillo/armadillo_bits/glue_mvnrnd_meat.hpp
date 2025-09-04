@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -139,13 +139,13 @@ glue_mvnrnd::apply_noalias(Mat<eT>& out, const Mat<eT>& M, const Mat<eT>& C, con
     
     const eT tol = eT(-100) * Datum<eT>::eps * norm(C, "fro");
     
-    if(arma_isfinite(tol) == false)  { return false; }
+    if(arma_isnonfinite(tol))  { return false; }
     
     for(uword i=0; i<eigval_n_elem; ++i)
       {
       const eT val = eigval_mem[i];
       
-      if( (val < tol) || (arma_isfinite(val) == false) )  { return false; }
+      if( (val < tol) || arma_isnonfinite(val) )  { return false; }
       }
     
     for(uword i=0; i<eigval_n_elem; ++i)  { if(eigval_mem[i] < eT(0))  { eigval_mem[i] = eT(0); } }

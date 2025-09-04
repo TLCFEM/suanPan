@@ -118,9 +118,6 @@
     <Filter Include="Material\Material3D\Elastic">
       <UniqueIdentifier>{ceec96be-d607-45aa-9f40-26b1357e4990}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Material\Material3D\Hoffman">
-      <UniqueIdentifier>{e5fd9cc9-f250-4a5c-a9ff-0e63d8549c17}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Material\Material3D\Sand">
       <UniqueIdentifier>{c9be22ba-5986-46a9-b751-0295415571d3}</UniqueIdentifier>
     </Filter>
@@ -219,6 +216,9 @@
     </Filter>
     <Filter Include="Solver\Integrator\Implicit">
       <UniqueIdentifier>{fb357536-8be5-4c27-ab18-9c8dab52a3d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Orthotropic">
+      <UniqueIdentifier>{68492507-04ef-47b3-8ee9-a8e526e31e7f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -831,18 +831,6 @@
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\Yeoh.cpp">
       <Filter>Material\Material3D\Elastic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.cpp">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.cpp">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.cpp">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.cpp">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Sand\SimpleSand.cpp">
       <Filter>Material\Material3D\Sand</Filter>
     </ClCompile>
@@ -1429,9 +1417,6 @@
     <ClCompile Include="..\..\..\Material\Material3D\DruckerPrager\CustomDP.cpp">
       <Filter>Material\Material3D\DruckerPrager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.cpp">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.cpp">
       <Filter>Material\Material3D\Clay\CamClay</Filter>
     </ClCompile>
@@ -1476,9 +1461,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\misc.cpp">
       <Filter>Toolbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Material\Material3D\Hoffman\TimberPD.cpp">
-      <Filter>Material\Material3D\Hoffman</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Degradation\CustomStressDegradation.cpp">
       <Filter>Material\Material1D\Degradation</Filter>
@@ -1599,6 +1581,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Solver\Integrator\Explicit\GSSE.cpp">
       <Filter>Solver\Integrator\Explicit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\NonlinearOrthotropic.cpp">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\TimberPD.cpp">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.cpp">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\YLD0418P.cpp">
+      <Filter>Material\Material3D\Orthotropic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2244,18 +2238,6 @@
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\Yeoh.h">
       <Filter>Material\Material3D\Elastic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\BilinearHoffman.h">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\ExpHoffman.h">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHill.h">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\NonlinearHoffman.h">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Sand\SimpleSand.h">
       <Filter>Material\Material3D\Sand</Filter>
     </ClInclude>
@@ -2821,9 +2803,6 @@
     <ClInclude Include="..\..\..\Material\Material3D\DruckerPrager\CustomDP.h">
       <Filter>Material\Material3D\DruckerPrager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\CustomHoffman.h">
-      <Filter>Material\Material3D\Hoffman</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Clay\CamClay\CustomCC.h">
       <Filter>Material\Material3D\Clay\CamClay</Filter>
     </ClInclude>
@@ -2868,9 +2847,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\misc.h">
       <Filter>Toolbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Material\Material3D\Hoffman\TimberPD.h">
-      <Filter>Material\Material3D\Hoffman</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\Degradation\CustomStressDegradation.h">
       <Filter>Material\Material1D\Degradation</Filter>
@@ -2997,6 +2973,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Solver\Integrator\Explicit\GSSE.h">
       <Filter>Solver\Integrator\Explicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\BilinearOrthotropic.h">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\ExpOrthotropic.h">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\NonlinearOrthotropic.h">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\TimberPD.h">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.h">
+      <Filter>Material\Material3D\Orthotropic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\YLD0418P.h">
+      <Filter>Material\Material3D\Orthotropic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

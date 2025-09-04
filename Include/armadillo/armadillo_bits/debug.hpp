@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,7 +39,7 @@ get_cerr_stream()
 
 
 
-arma_deprecated
+[[deprecated]]
 inline
 std::ostream&
 get_stream_err1()
@@ -49,7 +49,7 @@ get_stream_err1()
 
 
 
-arma_deprecated
+[[deprecated]]
 inline
 std::ostream&
 get_stream_err2()
@@ -59,7 +59,7 @@ get_stream_err2()
 
 
 
-arma_frown("this function does nothing; instead use ARMA_COUT_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_COUT_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 void
 set_cout_stream(const std::ostream&)
@@ -68,7 +68,7 @@ set_cout_stream(const std::ostream&)
 
 
 
-arma_frown("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 void
 set_cerr_stream(const std::ostream&)
@@ -77,7 +77,7 @@ set_cerr_stream(const std::ostream&)
 
 
 
-arma_frown("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 void
 set_stream_err1(const std::ostream&)
@@ -86,7 +86,7 @@ set_stream_err1(const std::ostream&)
 
 
 
-arma_frown("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 void
 set_stream_err2(const std::ostream&)
@@ -96,7 +96,7 @@ set_stream_err2(const std::ostream&)
 
 
 template<typename T>
-arma_frown("this function does nothing; instead use ARMA_COUT_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_COUT_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 std::ostream&
 arma_cout_stream(std::ostream*)
@@ -107,7 +107,7 @@ arma_cout_stream(std::ostream*)
 
 
 template<typename T>
-arma_frown("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")
+[[deprecated("this function does nothing; instead use ARMA_CERR_STREAM or ARMA_WARN_LEVEL; see documentation")]]
 inline
 std::ostream&
 arma_cerr_stream(std::ostream*)
@@ -1330,6 +1330,47 @@ arma_assert_atlas_size(const T1& A, const T2& B)
 
 
 
+template<typename eT>
+inline
+void
+arma_elem_type_string(std::string& out)
+  {
+       if(       is_u8<eT>::value)  { out = "u8";        }
+  else if(       is_s8<eT>::value)  { out = "s8";        }
+  else if(      is_u16<eT>::value)  { out = "u16";       }
+  else if(      is_s16<eT>::value)  { out = "s16";       }
+  else if(      is_u32<eT>::value)  { out = "u32";       }
+  else if(      is_s32<eT>::value)  { out = "s32";       }
+  else if(      is_u64<eT>::value)  { out = "u64";       }
+  else if(      is_s64<eT>::value)  { out = "s64";       }
+  else if(   is_ulng_t<eT>::value)  { out = "ulng_t";    }
+  else if(   is_slng_t<eT>::value)  { out = "slng_t";    }
+  else if(    is_float<eT>::value)  { out = "float";     }
+  else if(   is_double<eT>::value)  { out = "double";    }
+  else if( is_cx_float<eT>::value)  { out = "cx_float";  }
+  else if(is_cx_double<eT>::value)  { out = "cx_double"; }
+  else if(     is_fp16<eT>::value)  { out = "fp16";      }
+  else if(  is_cx_fp16<eT>::value)  { out = "cx_fp16";   }
+  else                              { out = "unknown";   }
+  }
+
+
+
+template<typename eT>
+arma_cold
+inline
+void
+arma_type_print(const char* header)
+  {
+  std::string elem_type_str;
+  
+  arma_elem_type_string<eT>(elem_type_str);
+  
+  get_cerr_stream() << header << ": " << elem_type_str << std::endl;
+  }
+
+
+
 //
 // macros
 
@@ -1372,6 +1413,7 @@ arma_assert_atlas_size(const T1& A, const T2& B)
   #define arma_debug_sigprint       arma_sigprint(ARMA_FNSIG); arma_bktprint
   #define arma_debug_sigprint_this  arma_sigprint(ARMA_FNSIG); arma_thisprint
   #define arma_debug_print          arma_print
+  #define arma_debug_type_print     arma_type_print
   
   // for compatibility with earlier versions of Armadillo
   #define arma_extra_debug_sigprint       arma_sigprint(ARMA_FNSIG); arma_bktprint
@@ -1383,6 +1425,7 @@ arma_assert_atlas_size(const T1& A, const T2& B)
   #define arma_debug_sigprint        true ? (void)0 : arma_bktprint
   #define arma_debug_sigprint_this   true ? (void)0 : arma_thisprint
   #define arma_debug_print           true ? (void)0 : arma_print
+  #define arma_debug_type_print      true ? (void)0 : arma_type_print
   
   // for compatibility with earlier versions of Armadillo
   #define arma_extra_debug_sigprint        true ? (void)0 : arma_bktprint
@@ -1393,7 +1436,7 @@ arma_assert_atlas_size(const T1& A, const T2& B)
 
 
 // for compatibility with earlier versions of Armadillo
-arma_frown("use arma_conform_check() instead")
+[[deprecated("use arma_conform_check() instead")]]
 inline void arma_debug_check(bool state, const char* msg)  { arma_conform_check(state, msg); }
 
 
@@ -1401,10 +1444,8 @@ inline void arma_debug_check(bool state, const char* msg)  { arma_conform_check(
 
   namespace junk
     {
-    class arma_first_debug_message
+    struct arma_first_debug_message
       {
-      public:
-      
       inline
       arma_first_debug_message()
         {
@@ -1418,7 +1459,6 @@ inline void arma_debug_check(bool state, const char* msg)  { arma_conform_check(
             << " (" << nickname << ')';
         
         out << "\n@ arma_config::wrapper          = " << arma_config::wrapper;
-        out << "\n@ arma_config::cxx14            = " << arma_config::cxx14;
         out << "\n@ arma_config::cxx17            = " << arma_config::cxx17;
         out << "\n@ arma_config::cxx20            = " << arma_config::cxx20;
         out << "\n@ arma_config::cxx23            = " << arma_config::cxx23;
@@ -1441,9 +1481,12 @@ inline void arma_debug_check(bool state, const char* msg)  { arma_conform_check(
         out << "\n@ arma_config::optimise_band    = " << arma_config::optimise_band;
         out << "\n@ arma_config::optimise_sym     = " << arma_config::optimise_sym;
         out << "\n@ arma_config::optimise_invexpr = " << arma_config::optimise_invexpr;
+        out << "\n@ arma_config::optimise_powexpr = " << arma_config::optimise_powexpr;
         out << "\n@ arma_config::check_conform    = " << arma_config::check_conform;
         out << "\n@ arma_config::check_nonfinite  = " << arma_config::check_nonfinite;
         out << "\n@ arma_config::fast_math        = " << arma_config::fast_math;
+        out << "\n@ arma_config::have_fp16        = " << arma_config::have_fp16;
+        out << "\n@ arma_config::good_fp16        = " << arma_config::good_fp16;
         out << "\n@ sizeof(void*)    = " << sizeof(void*);
         out << "\n@ sizeof(int)      = " << sizeof(int);
         out << "\n@ sizeof(long)     = " << sizeof(long);

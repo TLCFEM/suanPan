@@ -50,7 +50,7 @@ int Flag::update_trial_status(const vec& t_strain) {
     auto& cr_low_strain = trial_history(3);
 
     const auto load_direction = suanpan::sign(incre_strain(0));
-
+    // clang-format off
     switch(trial_status) {
     case Status::NONE:
         trial_status = load_direction > 0. ? Status::TLOAD : Status::CLOAD;
@@ -88,7 +88,7 @@ int Flag::update_trial_status(const vec& t_strain) {
         trial_status = trial_strain(0) < cr_strain ? Status::CLOAD : trial_strain(0) < cr_low_strain ? Status::CUNLOAD : trial_strain(0) < c_residual_strain ? Status::CLOW : trial_strain(0) < 0. ? Status::CLOAD : Status::TLOAD;
         break;
     }
-
+    // clang-format on
     trial_stiffness = elastic_modulus;
 
     if(Status::TLOAD == trial_status) trial_strain(0) > t_yield_strain ? trial_stress = t_yield_stress + (trial_stiffness *= t_hardening_ratio) * (trial_strain(0) - t_yield_strain) : trial_stress = trial_stiffness * trial_strain(0);

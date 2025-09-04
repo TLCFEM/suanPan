@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,9 +28,9 @@ class gmm_diag
   {
   public:
   
-  arma_aligned const Mat<eT> means;
-  arma_aligned const Mat<eT> dcovs;
-  arma_aligned const Row<eT> hefts;
+  const Mat<eT> means;
+  const Mat<eT> dcovs;
+  const Row<eT> hefts;
   
   //
   //
@@ -116,10 +116,10 @@ class gmm_diag
   
   protected:
   
-  arma_aligned Mat<eT> inv_dcovs;
-  arma_aligned Row<eT> log_det_etc;
-  arma_aligned Row<eT> log_hefts;
-  arma_aligned Col<eT> mah_aux;
+  Mat<eT> inv_dcovs;
+  Row<eT> log_det_etc;
+  Row<eT> log_hefts;
+  Col<eT> mah_aux;
   
   //
   

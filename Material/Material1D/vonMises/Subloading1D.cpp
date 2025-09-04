@@ -166,7 +166,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         zv -= incre(1);
 
-        z = suanpan::clamp(z - incre(2), 0., 1.);
+        z = suanpan::clamp_unit(z - incre(2));
 
         if(is_viscous) zv = suanpan::clamp(zv, z, cv * z);
     }

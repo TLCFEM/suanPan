@@ -21,7 +21,7 @@
 #include <Toolbox/tensor.h>
 
 TimberPD::TimberPD(const unsigned T, vec&& EE, vec&& VV, vec&& SS, vec&& HH, const double R)
-    : DataTimberPD{HH(1), HH(2), HH(3), HH(4), HH(5), HH(6)}
+    : DataTimberPD{std::max(datum::eps, HH(1)), suanpan::clamp_unit(HH(2)), HH(3), std::max(datum::eps, HH(4)), suanpan::clamp_unit(HH(5)), HH(6)}
     , BilinearHoffman(T, std::move(EE), std::move(VV), std::move(SS), HH(0), R)
     , hill_t(transform::hill_projection(yield_stress(0), yield_stress(2), yield_stress(4), yield_stress(6), yield_stress(7), yield_stress(8)))
     , hill_c(transform::hill_projection(yield_stress(1), yield_stress(3), yield_stress(5), yield_stress(6), yield_stress(7), yield_stress(8))) {}
@@ -46,7 +46,7 @@ int TimberPD::update_trial_status(const vec& t_strain) {
     mat principal_direction; // 3x3
     if(!eig_sym(principal_stress, principal_direction, tensor::stress::to_tensor(trial_stress), "std")) return SUANPAN_FAIL;
 
-    mat stiffness_t = transform::eigen_to_tensile_derivative(principal_stress, principal_direction);
+    mat stiffness_t = transform::eigen_to_tensile_derivative(principal_stress, principal_direction).second;
     mat stiffness_c = eye(6, 6) - stiffness_t;
 
     const vec sigma_t = transform::eigen_to_tensile_stress(principal_stress, principal_direction);
@@ -101,7 +101,7 @@ double TimberPD::update_damage_c(const vec& sigma_c, mat& stiffness_c) {
 
 double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t / r_t * (1. - b_t + b_t * std::exp(m_t * (ini_r_t - r_t))); }
 
-double TimberPD::compute_damage_c(const double r_c) const { return b_c * std::pow(std::max(datum::eps, 1. - ini_r_c / r_c), m_c); }
+double TimberPD::compute_damage_c(const double r_c) const { return b_c * std::pow(std::max(0., 1. - ini_r_c / r_c), m_c); }
 
 std::vector<vec> TimberPD::record(const OutputType P) {
     if(P == OutputType::DT) return {vec{compute_damage_t(current_history(7))}};

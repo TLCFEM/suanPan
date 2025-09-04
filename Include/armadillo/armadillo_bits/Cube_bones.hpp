@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -218,9 +218,9 @@ class Cube : public BaseCube< eT, Cube<eT> >
   
   template<typename T1> inline void shed_slices(const Base<uword, T1>& indices);
   
-  arma_deprecated inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero);
-  arma_deprecated inline void insert_cols(const uword row_num, const uword N, const bool set_to_zero);
-  arma_deprecated inline void insert_slices(const uword slice_num, const uword N, const bool set_to_zero);
+  [[deprecated]] inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero);
+  [[deprecated]] inline void insert_cols(const uword row_num, const uword N, const bool set_to_zero);
+  [[deprecated]] inline void insert_slices(const uword slice_num, const uword N, const bool set_to_zero);
   
   inline void insert_rows(const uword row_num, const uword N);
   inline void insert_cols(const uword row_num, const uword N);
@@ -387,11 +387,11 @@ class Cube : public BaseCube< eT, Cube<eT> >
   arma_warn_unused inline eT min() const;
   arma_warn_unused inline eT max() const;
   
-  arma_frown("use .index_min() instead") inline eT min(uword& index_of_min_val) const;
-  arma_frown("use .index_max() instead") inline eT max(uword& index_of_max_val) const;
+  [[deprecated("use .index_min() instead")]] inline eT min(uword& index_of_min_val) const;
+  [[deprecated("use .index_max() instead")]] inline eT max(uword& index_of_max_val) const;
   
-  arma_frown("use .index_min() with ind2sub() instead") inline eT min(uword& row_of_min_val, uword& col_of_min_val, uword& slice_of_min_val) const;
-  arma_frown("use .index_max() with ind2sub() instead") inline eT max(uword& row_of_max_val, uword& col_of_max_val, uword& slice_of_max_val) const;
+  [[deprecated("use .index_min() with ind2sub() instead")]] inline eT min(uword& row_of_min_val, uword& col_of_min_val, uword& slice_of_min_val) const;
+  [[deprecated("use .index_max() with ind2sub() instead")]] inline eT max(uword& row_of_max_val, uword& col_of_max_val, uword& slice_of_max_val) const;
   
   arma_cold inline bool save(const std::string   name, const file_type type = arma_binary) const;
   arma_cold inline bool save(const hdf5_name&    spec, const file_type type = hdf5_binary) const;
@@ -401,13 +401,13 @@ class Cube : public BaseCube< eT, Cube<eT> >
   arma_cold inline bool load(const hdf5_name&    spec, const file_type type = hdf5_binary);
   arma_cold inline bool load(      std::istream& is,   const file_type type = auto_detect);
   
-  arma_deprecated inline bool quiet_save(const std::string   name, const file_type type = arma_binary) const;
-  arma_deprecated inline bool quiet_save(const hdf5_name&    spec, const file_type type = hdf5_binary) const;
-  arma_deprecated inline bool quiet_save(      std::ostream& os,   const file_type type = arma_binary) const;
+  [[deprecated("use save() instead")]] inline bool quiet_save(const std::string   name, const file_type type = arma_binary) const;
+  [[deprecated("use save() instead")]] inline bool quiet_save(const hdf5_name&    spec, const file_type type = hdf5_binary) const;
+  [[deprecated("use save() instead")]] inline bool quiet_save(      std::ostream& os,   const file_type type = arma_binary) const;
   
-  arma_deprecated inline bool quiet_load(const std::string   name, const file_type type = auto_detect);
-  arma_deprecated inline bool quiet_load(const hdf5_name&    spec, const file_type type = hdf5_binary);
-  arma_deprecated inline bool quiet_load(      std::istream& is,   const file_type type = auto_detect);
+  [[deprecated("use load() instead")]] inline bool quiet_load(const std::string   name, const file_type type = auto_detect);
+  [[deprecated("use load() instead")]] inline bool quiet_load(const hdf5_name&    spec, const file_type type = hdf5_binary);
+  [[deprecated("use load() instead")]] inline bool quiet_load(      std::istream& is,   const file_type type = auto_detect);
   
   
   // iterators
@@ -464,11 +464,12 @@ class Cube : public BaseCube< eT, Cube<eT> >
   inline Mat<eT>* create_mat_ptr(const uword in_slice) const;
   inline Mat<eT>*    get_mat_ptr(const uword in_slice) const;
   
-  friend class glue_join;
-  friend class op_reshape;
-  friend class op_resize;
   friend class subview_cube<eT>;
   
+  friend struct glue_join;
+  friend struct op_reshape;
+  friend struct op_resize;
+    
   
   public:
   

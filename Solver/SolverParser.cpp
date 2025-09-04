@@ -245,14 +245,14 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
             auto m_imag = vec{m_i}, s_imag = vec{s_i};
-            if(accu(m_imag) + accu(s_imag) > 1E-10) {
+            if(accu(m_imag) + accu(s_imag) > 1E-12) {
                 suanpan_error("Parameters should be conjugate pairs.\n");
                 return SUANPAN_SUCCESS;
             }
 
             auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
 
-            if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
+            if(std::abs(accu(m % exp(-1E8 * s))) > 1E-12) {
                 suanpan_error("The provided kernel does not converge to zero.\n");
                 return SUANPAN_SUCCESS;
             }
@@ -264,7 +264,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         const auto pool = get_remaining<double>(command);
 
         if(pool.empty() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, .5))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(1 == pool.size() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, std::min(std::max(0., pool[0]), 1.)))) code = 1;
+        else if(1 == pool.size() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, suanpan::clamp_unit(pool[0])))) code = 1;
         else if(2 == pool.size() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, pool[0], pool[1]))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSSSU0")) {
@@ -294,7 +294,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<GSSSSOptimal>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<GSSSSOptimal>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "OALTS")) {
         auto radius = .5;
@@ -303,7 +303,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<OALTS>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<OALTS>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheTwoStep")) {
         auto radius = 0.;
@@ -311,7 +311,6 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             suanpan_error("A valid damping radius is required.\n");
             return SUANPAN_SUCCESS;
         }
-        radius = std::max(0., std::min(radius, 1.));
 
         auto gamma = .5;
         if(!get_optional_input(command, gamma)) {
@@ -320,7 +319,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         }
         if(gamma <= 0. || gamma >= 1.) gamma = .5;
 
-        if(domain->insert(std::make_shared<BatheTwoStep>(tag, radius, gamma))) code = 1;
+        if(domain->insert(std::make_shared<BatheTwoStep>(tag, suanpan::clamp_unit(radius), gamma))) code = 1;
     }
     else if(is_equal(integrator_type, "Tchamwa")) {
         auto radius = .5;
@@ -329,7 +328,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<Tchamwa>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<Tchamwa>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "BatheExplicit")) {
         auto radius = .5;
@@ -338,7 +337,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<BatheExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<BatheExplicit>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "ICL")) {
         auto radius = .5;
@@ -347,7 +346,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<ICL>(tag, std::max(.5, std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<ICL>(tag, suanpan::clamp(radius, .5, 1.)))) code = 1;
     }
     else if(is_equal(integrator_type, "GSSE")) {
         auto radius = .5;
@@ -356,7 +355,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<GSSE>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<GSSE>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
     else if(is_equal(integrator_type, "WAT2")) {
         auto para = 1. / 3.;
@@ -365,7 +364,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<WAT2>(tag, std::max(std::min(1., para), 0.)))) code = 1;
+        if(domain->insert(std::make_shared<WAT2>(tag, suanpan::clamp_unit(para)))) code = 1;
     }
     else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
         auto radius = .5;
@@ -374,7 +373,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             return SUANPAN_SUCCESS;
         }
 
-        if(domain->insert(std::make_shared<GeneralizedAlphaExplicit>(tag, std::max(0., std::min(radius, 1.))))) code = 1;
+        if(domain->insert(std::make_shared<GeneralizedAlphaExplicit>(tag, suanpan::clamp_unit(radius)))) code = 1;
     }
 
     if(1 == code) {

@@ -86,7 +86,6 @@ namespace tensor {
         mat to_tensor(const vec&);
         vec to_voigt(const mat&);
         double norm(const vec&);
-        double norm(vec&&);
         double double_contraction(const vec&);
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
@@ -95,7 +94,6 @@ namespace tensor {
         mat to_tensor(const vec&);
         vec to_voigt(const mat&);
         double norm(const vec&);
-        double norm(vec&&);
         double double_contraction(const vec&);
         double double_contraction(const vec&, const vec&);
         double double_contraction(vec&&, vec&&);
@@ -120,6 +118,7 @@ namespace tensor {
 } // namespace tensor
 
 namespace transform {
+    void tsai_wu_projection(const vec&, mat&, mat&);
     void hoffman_projection(const vec&, mat&, mat&);
     mat hill_projection(double, double, double, double, double, double);
 
@@ -127,9 +126,9 @@ namespace transform {
     mat compute_jacobian_nominal_to_principal(const mat&);
     mat compute_jacobian_principal_to_nominal(const mat&);
 
-    mat eigen_to_tensor_base(const mat&);
-    mat eigen_to_tensile_stress(const vec&, const mat&);
-    mat eigen_to_tensile_derivative(const vec&, const mat&);
+    mat66 eigen_to_tensor_base(const mat&);
+    vec eigen_to_tensile_stress(const vec&, const mat&);
+    std::pair<mat, mat> eigen_to_tensile_derivative(const vec&, const mat&);
 
     template<typename T> Mat<T> skew_symm(const Mat<T>& R) {
         suanpan_assert([&] { if(R.n_elem != 3) throw std::invalid_argument("need 3 element vector"); });

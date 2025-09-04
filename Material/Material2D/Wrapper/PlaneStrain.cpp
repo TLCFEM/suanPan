@@ -21,11 +21,13 @@
 
 const uvec PlaneStrain::F{0, 1, 3};
 
+// clang-format off
 PlaneStrain::PlaneStrain(const unsigned T, const unsigned BT, const unsigned ST)
     : Material2D(T, PlaneType::E, 0.)
     , FA(0 == ST ? std::initializer_list<uword>{} : 1 == ST ? std::initializer_list<uword>{0, 2} : std::initializer_list<uword>{1, 2})
     , FB(0 == ST ? std::initializer_list<uword>{} : 1 == ST ? std::initializer_list<uword>{2, 5} : std::initializer_list<uword>{2, 4})
     , base_tag(BT) {}
+// clang-format on
 
 int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
     base = D->initialized_material_copy(base_tag);

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -76,7 +76,7 @@ op_var::apply_noalias(Mat<typename get_pod_type<in_eT>::result>& out, const Mat<
       {
       out_eT* out_mem = out.memptr();
       
-      for(uword col=0; col<X_n_cols; ++col)
+      for(uword col=0; col < X_n_cols; ++col)
         {
         out_mem[col] = op_var::direct_var( X.colptr(col), X_n_rows, norm_type );
         }
@@ -91,16 +91,15 @@ op_var::apply_noalias(Mat<typename get_pod_type<in_eT>::result>& out, const Mat<
     
     if(X_n_cols > 0)
       {
-      podarray<in_eT> dat(X_n_cols);
-      
-      in_eT*  dat_mem = dat.memptr();
       out_eT* out_mem = out.memptr();
       
-      for(uword row=0; row<X_n_rows; ++row)
+      podarray<in_eT> tmp;
+      
+      for(uword row=0; row < X_n_rows; ++row)
         {
-        dat.copy_row(X, row);
+        tmp.copy_row(X, row);
         
-        out_mem[row] = op_var::direct_var( dat_mem, X_n_cols, norm_type );
+        out_mem[row] = op_var::direct_var( tmp.memptr(), tmp.n_elem, norm_type );
         }
       }
     }
@@ -111,7 +110,7 @@ op_var::apply_noalias(Mat<typename get_pod_type<in_eT>::result>& out, const Mat<
 template<typename T1>
 inline
 typename T1::pod_type
-op_var::var_vec(const Base<typename T1::elem_type, T1>& X, const uword norm_type)
+op_var::var_vec(const T1& X, const uword norm_type)
   {
   arma_debug_sigprint();
   
@@ -119,7 +118,7 @@ op_var::var_vec(const Base<typename T1::elem_type, T1>& X, const uword norm_type
   
   arma_conform_check( (norm_type > 1), "var(): parameter 'norm_type' must be 0 or 1" );
   
-  const quasi_unwrap<T1> U(X.get_ref());
+  const quasi_unwrap<T1> U(X);
   
   if(U.M.n_elem == 0)
     {
@@ -133,92 +132,37 @@ op_var::var_vec(const Base<typename T1::elem_type, T1>& X, const uword norm_type
 
 
 
-template<typename eT>
-inline
-typename get_pod_type<eT>::result
-op_var::var_vec(const subview_col<eT>& X, const uword norm_type)
-  {
-  arma_debug_sigprint();
-  
-  typedef typename get_pod_type<eT>::result T;
-  
-  arma_conform_check( (norm_type > 1), "var(): parameter 'norm_type' must be 0 or 1" );
-  
-  if(X.n_elem == 0)
-    {
-    arma_conform_check(true, "var(): object has no elements");
-    
-    return Datum<T>::nan;
-    }
-  
-  return op_var::direct_var(X.colptr(0), X.n_rows, norm_type);
-  }
-
-
-
-
-template<typename eT>
-inline
-typename get_pod_type<eT>::result
-op_var::var_vec(const subview_row<eT>& X, const uword norm_type)
-  {
-  arma_debug_sigprint();
-  
-  typedef typename get_pod_type<eT>::result T;
-  
-  arma_conform_check( (norm_type > 1), "var(): parameter 'norm_type' must be 0 or 1" );
-  
-  if(X.n_elem == 0)
-    {
-    arma_conform_check(true, "var(): object has no elements");
-    
-    return Datum<T>::nan;
-    }
-  
-  const Mat<eT>& A = X.m;
-  
-  const uword start_row = X.aux_row1;
-  const uword start_col = X.aux_col1;
-  
-  const uword end_col_p1 = start_col + X.n_cols;
-  
-  podarray<eT> tmp(X.n_elem);
-  eT* tmp_mem = tmp.memptr();
-  
-  for(uword i=0, col=start_col; col < end_col_p1; ++col, ++i)
-    {
-    tmp_mem[i] = A.at(start_row, col);
-    }
-  
-  return op_var::direct_var(tmp.memptr(), tmp.n_elem, norm_type);
-  }
-
-
-
 //! find the variance of an array
 template<typename eT>
 inline
 eT
-op_var::direct_var(const eT* const X, const uword n_elem, const uword norm_type)
+op_var::direct_var(const eT* X, const uword n_elem, const uword norm_type)
   {
   arma_debug_sigprint();
   
+  typedef typename conditional_promote_type<is_real_or_cx<eT>::value, eT, float>::result acc_eT;
+  
+  arma_debug_type_print<eT>("eT");
+  arma_debug_type_print<acc_eT>("acc_eT");
+  
   if(n_elem >= 2)
     {
-    const eT acc1 = op_mean::direct_mean(X, n_elem);
+    const acc_eT acc1 = acc_eT( op_mean::direct_mean(X, n_elem) );
     
-    eT acc2 = eT(0);
-    eT acc3 = eT(0);
+    if(arma_isnonfinite(acc1))  { return Datum<eT>::nan; }
+    
+    acc_eT acc2 = acc_eT(0);
+    acc_eT acc3 = acc_eT(0);
     
     uword i,j;
     
     for(i=0, j=1; j<n_elem; i+=2, j+=2)
       {
-      const eT Xi = X[i];
-      const eT Xj = X[j];
+      const acc_eT Xi = acc_eT(X[i]);
+      const acc_eT Xj = acc_eT(X[j]);
       
-      const eT tmpi = acc1 - Xi;
-      const eT tmpj = acc1 - Xj;
+      const acc_eT tmpi = acc1 - Xi;
+      const acc_eT tmpj = acc1 - Xj;
       
       acc2 += tmpi*tmpi + tmpj*tmpj;
       acc3 += tmpi      + tmpj;
@@ -226,18 +170,18 @@ op_var::direct_var(const eT* const X, const uword n_elem, const uword norm_type)
     
     if(i < n_elem)
       {
-      const eT Xi = X[i];
+      const acc_eT Xi = acc_eT(X[i]);
       
-      const eT tmpi = acc1 - Xi;
+      const acc_eT tmpi = acc1 - Xi;
       
       acc2 += tmpi*tmpi;
       acc3 += tmpi;
       }
     
-    const eT norm_val = (norm_type == 0) ? eT(n_elem-1) : eT(n_elem);
-    const eT var_val  = (acc2 - acc3*acc3/eT(n_elem)) / norm_val;
+    const acc_eT norm_val = (norm_type == 0) ? acc_eT(n_elem-1) : acc_eT(n_elem);
+    const acc_eT var_val  = (acc2 - acc3*acc3/acc_eT(n_elem)) / norm_val;
     
-    return arma_isfinite(var_val) ? var_val : op_var::direct_var_robust(X, n_elem, norm_type);
+    return arma_isfinite(var_val) ? eT(var_val) : eT(op_var::direct_var_robust(X, n_elem, norm_type));
     }
   else
     {
@@ -251,26 +195,31 @@ op_var::direct_var(const eT* const X, const uword n_elem, const uword norm_type)
 template<typename eT>
 inline
 eT
-op_var::direct_var_robust(const eT* const X, const uword n_elem, const uword norm_type)
+op_var::direct_var_robust(const eT* X, const uword n_elem, const uword norm_type)
   {
   arma_debug_sigprint();
   
-  if(n_elem > 1)
+  typedef typename conditional_promote_type<is_real_or_cx<eT>::value, eT, float>::result acc_eT;
+  
+  arma_debug_type_print<eT>("eT");
+  arma_debug_type_print<acc_eT>("acc_eT");
+  
+  if(n_elem >= 2)
     {
-    eT r_mean = X[0];
-    eT r_var  = eT(0);
+    acc_eT r_mean = acc_eT(X[0]);
+    acc_eT r_var  = acc_eT(0);
     
     for(uword i=1; i<n_elem; ++i)
       {
-      const eT tmp      = X[i] - r_mean;
-      const eT i_plus_1 = eT(i+1);
+      const acc_eT tmp      = acc_eT(X[i]) - r_mean;
+      const acc_eT i_plus_1 = acc_eT(i+1);
       
-      r_var  = eT(i-1)/eT(i) * r_var + (tmp*tmp)/i_plus_1;
+      r_var  = acc_eT(i-1)/acc_eT(i) * r_var + (tmp*tmp)/i_plus_1;
       
       r_mean = r_mean + tmp/i_plus_1;
       }
     
-    return (norm_type == 0) ? r_var : (eT(n_elem-1)/eT(n_elem)) * r_var;
+    return (norm_type == 0) ? eT(r_var) : eT( (acc_eT(n_elem-1)/acc_eT(n_elem)) * r_var );
     }
   else
     {
@@ -290,25 +239,34 @@ op_var::direct_var(const std::complex<T>* const X, const uword n_elem, const uwo
   
   typedef typename std::complex<T> eT;
   
+  typedef typename conditional_promote_type<is_real_or_cx<eT>::value, eT, float>::result acc_eT;
+  
+  typedef typename get_pod_type<acc_eT>::result acc_T;
+  
+  arma_debug_type_print<eT>("eT");
+  arma_debug_type_print<acc_eT>("acc_eT");
+  
   if(n_elem >= 2)
     {
-    const eT acc1 = op_mean::direct_mean(X, n_elem);
+    const acc_eT acc1 = acc_eT(op_mean::direct_mean(X, n_elem));
     
-    T  acc2 =  T(0);
-    eT acc3 = eT(0);
+    if(arma_isnonfinite(acc1))  { return Datum<T>::nan; }
+    
+    acc_T  acc2 =  acc_T(0);
+    acc_eT acc3 = acc_eT(0);
     
     for(uword i=0; i<n_elem; ++i)
       {
-      const eT tmp = acc1 - X[i];
+      const acc_eT tmp = acc1 - acc_eT(X[i]);
       
       acc2 += std::norm(tmp);
       acc3 += tmp;
       }
     
-    const T norm_val = (norm_type == 0) ? T(n_elem-1) : T(n_elem);
-    const T var_val  = (acc2 - std::norm(acc3)/T(n_elem)) / norm_val;
+    const acc_T norm_val = (norm_type == 0) ? acc_T(n_elem-1) : acc_T(n_elem);
+    const acc_T var_val  = (acc2 - std::norm(acc3)/acc_T(n_elem)) / norm_val;
     
-    return arma_isfinite(var_val) ? var_val : op_var::direct_var_robust(X, n_elem, norm_type);
+    return arma_isfinite(var_val) ? T(var_val) : T(op_var::direct_var_robust(X, n_elem, norm_type));
     }
   else
     {
@@ -328,22 +286,29 @@ op_var::direct_var_robust(const std::complex<T>* const X, const uword n_elem, co
   
   typedef typename std::complex<T> eT;
   
-  if(n_elem > 1)
+  typedef typename conditional_promote_type<is_real_or_cx<eT>::value, eT, float>::result acc_eT;
+  
+  typedef typename get_pod_type<acc_eT>::result acc_T;
+  
+  arma_debug_type_print<eT>("eT");
+  arma_debug_type_print<acc_eT>("acc_eT");
+  
+  if(n_elem >= 2)
     {
-    eT r_mean = X[0];
-     T r_var  = T(0);
+    acc_eT r_mean = acc_eT(X[0]);
+    acc_T  r_var  = acc_T(0);
     
     for(uword i=1; i<n_elem; ++i)
       {
-      const eT tmp      = X[i] - r_mean;
-      const  T i_plus_1 = T(i+1);
+      const acc_eT tmp      = acc_eT(X[i]) - r_mean;
+      const acc_T  i_plus_1 = acc_T(i+1);
       
-      r_var  = T(i-1)/T(i) * r_var + std::norm(tmp)/i_plus_1;
+      r_var  = acc_T(i-1)/acc_T(i) * r_var + std::norm(tmp)/i_plus_1;
       
       r_mean = r_mean + tmp/i_plus_1;
       }
     
-    return (norm_type == 0) ? r_var : (T(n_elem-1)/T(n_elem)) * r_var;
+    return (norm_type == 0) ? T(r_var) : T( (acc_T(n_elem-1)/acc_T(n_elem)) * r_var );
     }
   else
     {
@@ -354,4 +319,3 @@ op_var::direct_var_robust(const std::complex<T>* const X, const uword n_elem, co
 
 
 //! @}
-

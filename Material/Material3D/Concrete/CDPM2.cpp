@@ -19,7 +19,6 @@
 #include "CDPM2.h"
 
 #include <Recorder/OutputType.h>
-#include <Toolbox/ridders.hpp>
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
@@ -451,52 +450,16 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     auto counter{0u};
     auto ref_error{1.};
-    auto try_bisection{false};
     while(true) {
         if(max_iteration == ++counter) {
-            if(try_bisection) {
-                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-                return SUANPAN_FAIL;
-            }
-
-            try_bisection = true;
-            counter = 2u; // avoid initial elastic check
-
-            const auto approx_update = [&](const double gm) {
-                const auto if_converged = [](const double x, const double pre_x) { return std::fabs(x - pre_x) < std::numeric_limits<float>::epsilon() * (1. + std::fabs(pre_x)); };
-
-                gamma = gm;
-
-                auto inner_counter{0u};
-                auto pre_s{trial_s}, pre_p{trial_p}, pre_kp{current_kp};
-                while(true) {
-                    s = trial_s - double_shear * gamma * gs;
-                    p = trial_p - bulk * gamma * gp;
-                    kp = current_kp + gamma * gg * square_lode / xh;
-                    if((if_converged(s, pre_s) && if_converged(p, pre_p) && if_converged(kp, pre_kp)) || ++inner_counter > 5u) break;
-                    suanpan_debug("Local fixed-point iteration {} error: {:.5E}.\n", inner_counter, std::fabs(s - pre_s) + std::fabs(p - pre_p) + std::fabs(kp - pre_kp));
-                    compute_plasticity(lode, pre_s = s, pre_p = p, pre_kp = kp, data);
-                }
-
-                return f;
-            };
-
-            auto x1{0.}, f1{approx_update(x1)}; // must clear data so that derivatives are correct
-            gamma = std::sqrt(f1) / elastic_modulus;
-            // find a proper bracket
-            while(approx_update(gamma) >= 0.) {
-                x1 = gamma;
-                f1 = f;
-                gamma *= 2.;
-            }
-
-            ridders(approx_update, x1, f1, gamma, f, tolerance);
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
         }
 
         compute_plasticity(lode, s, p, kp, data);
 
         if(!data.is_finite()) {
-            suanpan_error("Non-finite value detected.\n");
+            suanpan_error("Invalid value detected.\n");
             return SUANPAN_FAIL;
         }
 
@@ -527,7 +490,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         jacobian(3, 3) = gamma * square_lode / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
 
         if(rcond(jacobian) < datum::eps) {
-            // short-circuit and direct go to the bisection logic
+            // short-circuit and directly fail
             counter = max_iteration - 1u;
             continue;
         }
@@ -623,23 +586,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         trial_stress *= damage_t * damage_c;
     }
     else if(DamageType::ANISOTROPIC == damage_type) {
-        const auto get_fraction = [](const vec& stress) {
-            const auto compute_fraction = [&stress](const unsigned i, const unsigned j) {
-                const auto &a = stress(i), &b = stress(j);
-
-                return suanpan::approx_equal(a, b, 4) ? a + b <= 0. ? 0. : 2. : 2. * (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b);
-            };
-
-            return vec{compute_fraction(0, 1), compute_fraction(1, 2), compute_fraction(2, 0)};
-        };
-
-        const mat pnn = transform::eigen_to_tensor_base(principal_direction);
-
-        mat tension_projector = pnn.cols(t_pattern) * pnn.cols(t_pattern).t();
-        mat tension_derivative = tension_projector + pnn.tail_cols(3) * diagmat(get_fraction(principal_stress)) * pnn.tail_cols(3).t();
-
-        tension_projector.tail_cols(3) *= 2.;
-        tension_derivative.tail_cols(3) *= 2.;
+        const auto [tension_projector, tension_derivative] = transform::eigen_to_tensile_derivative(principal_stress, principal_direction);
 
         const vec tension_stress = tension_projector * trial_stress;
 

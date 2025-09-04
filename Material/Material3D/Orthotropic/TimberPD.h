@@ -15,31 +15,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NonlinearHill
- * @brief The NonlinearHill class.
+ * @class TimberPD
+ * @brief The TimberPD class.
+ *
+ * Reference:
+ * 1. [10.1016/j.compstruc.2017.09.010](https://doi.org/10.1016/j.compstruc.2017.09.010)
  *
  * @author tlc
- * @date 20/01/2019
- * @version 0.2.0
- * @file NonlinearHill.h
+ * @date 24/08/2023
+ * @version 1.0.0
+ * @file TimberPD.h
  * @addtogroup Material-3D
  * @{
  */
 
-#ifndef NONLINEARHILL_H
-#define NONLINEARHILL_H
+#ifndef TIMBERPD_H
+#define TIMBERPD_H
 
-#include "NonlinearHoffman.h"
+#include "BilinearOrthotropic.h"
 
-class NonlinearHill : public NonlinearHoffman {
+struct DataTimberPD {
+    const double ini_r_t, b_t, m_t, ini_r_c, b_c, m_c;
+};
+
+class TimberPD final : protected DataTimberPD, public BilinearHoffman {
+    const mat hill_t, hill_c;
+
+    [[nodiscard]] double compute_damage_c(double) const;
+    [[nodiscard]] double compute_damage_t(double) const;
+    [[nodiscard]] double update_damage_t(const vec&, mat&);
+    [[nodiscard]] double update_damage_c(const vec&, mat&);
+
 public:
-    NonlinearHill(
+    TimberPD(
         unsigned,   // tag
         vec&&,      // elastic modulus
         vec&&,      // poissons ratio
-        vec&&,      // yield stress
+        vec&&,      // sigma
+        vec&&,      // hardening
         double = 0. // density
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+
+    unique_ptr<Material> get_copy() override;
+
+    int update_trial_status(const vec&) override;
+
+    std::vector<vec> record(OutputType) override;
+
+    void print() override;
 };
 
 #endif

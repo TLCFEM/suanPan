@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -615,7 +615,7 @@ Cube<eT>::get_mat_ptr(const uword in_slice) const
   
   #if defined(ARMA_USE_OPENMP)
     {
-    #pragma omp atomic read
+    #pragma omp atomic read seq_cst
     mat_ptr = mat_ptrs[in_slice];
     }
   #elif defined(ARMA_USE_STD_MUTEX)
@@ -634,12 +634,12 @@ Cube<eT>::get_mat_ptr(const uword in_slice) const
       {
       #pragma omp critical (arma_Cube_mat_ptrs)
         {
-        #pragma omp atomic read
+        #pragma omp atomic read seq_cst
         mat_ptr = mat_ptrs[in_slice];
         
         if(mat_ptr == nullptr)  { mat_ptr = create_mat_ptr(in_slice); }
         
-        #pragma omp atomic write
+        #pragma omp atomic write seq_cst
         mat_ptrs[in_slice] = mat_ptr;
         }
       }
@@ -783,6 +783,10 @@ Cube<eT>::operator=(const Cube<eT>& x)
     init_warm(x.n_rows, x.n_cols, x.n_slices);
     
     arrayops::copy( memptr(), x.mem, n_elem );
+    }
+  else
+    {
+    arma_debug_print("Cube::operator=(): copy omitted");
     }
   
   return *this;
@@ -2868,12 +2872,12 @@ Cube<eT>::Cube(const eOpCube<T1, eop_type>& X)
   
   init_cold();
   
-  if(is_same_type<eop_type, eop_pow>::value)
+  if(arma_config::optimise_powexpr && is_same_type<eop_type, eop_pow>::value)
     {
-    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    constexpr bool eT_ok = is_real_or_cx<eT>::value;
     
-    if(               X.aux == eT(2)   )  { eop_square::apply(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return; }
-    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return; }
+    if(          X.aux == eT(2)   )  { eop_square::apply(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return; }
+    if(eT_ok && (X.aux == eT(0.5)))  {   eop_sqrt::apply(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return; }
     }
   
   eop_type::apply(*this, X);
@@ -2898,12 +2902,12 @@ Cube<eT>::operator=(const eOpCube<T1, eop_type>& X)
   
   init_warm(X.get_n_rows(), X.get_n_cols(), X.get_n_slices());
   
-  if(is_same_type<eop_type, eop_pow>::value)
+  if(arma_config::optimise_powexpr && is_same_type<eop_type, eop_pow>::value)
     {
-    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    constexpr bool eT_ok = is_real_or_cx<eT>::value;
     
-    if(               X.aux == eT(2)   )  { eop_square::apply(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
-    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
+    if(          X.aux == eT(2)   )  { eop_square::apply(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
+    if(eT_ok && (X.aux == eT(0.5)))  {   eop_sqrt::apply(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
     }
   
   eop_type::apply(*this, X);
@@ -2928,12 +2932,12 @@ Cube<eT>::operator+=(const eOpCube<T1, eop_type>& X)
   
   if(bad_alias)  { const Cube<eT> tmp(X); return (*this).operator+=(tmp); }
   
-  if(is_same_type<eop_type, eop_pow>::value)
+  if(arma_config::optimise_powexpr && is_same_type<eop_type, eop_pow>::value)
     {
-    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    constexpr bool eT_ok = is_real_or_cx<eT>::value;
     
-    if(               X.aux == eT(2)   )  { eop_square::apply_inplace_plus(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
-    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_plus(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
+    if(          X.aux == eT(2)   )  { eop_square::apply_inplace_plus(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
+    if(eT_ok && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_plus(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
     }
   
   eop_type::apply_inplace_plus(*this, X);
@@ -2958,12 +2962,12 @@ Cube<eT>::operator-=(const eOpCube<T1, eop_type>& X)
   
   if(bad_alias)  { const Cube<eT> tmp(X); return (*this).operator-=(tmp); }
   
-  if(is_same_type<eop_type, eop_pow>::value)
+  if(arma_config::optimise_powexpr && is_same_type<eop_type, eop_pow>::value)
     {
-    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    constexpr bool eT_ok = is_real_or_cx<eT>::value;
     
-    if(               X.aux == eT(2)   )  { eop_square::apply_inplace_minus(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
-    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_minus(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
+    if(          X.aux == eT(2)   )  { eop_square::apply_inplace_minus(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
+    if(eT_ok && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_minus(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
     }
   
   eop_type::apply_inplace_minus(*this, X);
@@ -2988,12 +2992,12 @@ Cube<eT>::operator%=(const eOpCube<T1, eop_type>& X)
   
   if(bad_alias)  { const Cube<eT> tmp(X); return (*this).operator%=(tmp); }
   
-  if(is_same_type<eop_type, eop_pow>::value)
+  if(arma_config::optimise_powexpr && is_same_type<eop_type, eop_pow>::value)
     {
-    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    constexpr bool eT_ok = is_real_or_cx<eT>::value;
     
-    if(               X.aux == eT(2)   )  { eop_square::apply_inplace_schur(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
-    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_schur(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
+    if(          X.aux == eT(2)   )  { eop_square::apply_inplace_schur(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
+    if(eT_ok && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_schur(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
     }
   
   eop_type::apply_inplace_schur(*this, X);
@@ -3018,12 +3022,12 @@ Cube<eT>::operator/=(const eOpCube<T1, eop_type>& X)
   
   if(bad_alias)  { const Cube<eT> tmp(X); return (*this).operator/=(tmp); }
   
-  if(is_same_type<eop_type, eop_pow>::value)
+  if(arma_config::optimise_powexpr && is_same_type<eop_type, eop_pow>::value)
     {
-    constexpr bool eT_non_int = is_non_integral<eT>::value;
+    constexpr bool eT_ok = is_real_or_cx<eT>::value;
     
-    if(               X.aux == eT(2)   )  { eop_square::apply_inplace_div(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
-    if(eT_non_int && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_div(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
+    if(          X.aux == eT(2)   )  { eop_square::apply_inplace_div(*this, reinterpret_cast< const eOpCube<T1, eop_square>& >(X)); return *this; }
+    if(eT_ok && (X.aux == eT(0.5)))  {   eop_sqrt::apply_inplace_div(*this, reinterpret_cast< const eOpCube<T1, eop_sqrt  >& >(X)); return *this; }
     }
   
   eop_type::apply_inplace_div(*this, X);

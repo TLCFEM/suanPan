@@ -15,26 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class CustomHoffman
- * @brief The CustomHoffman class.
+ * @class CustomOrthotropic
+ * @brief The CustomOrthotropic class.
  *
  * @author tlc
  * @date 16/01/2023
  * @version 0.2.0
- * @file CustomHoffman.h
+ * @file CustomOrthotropic.h
  * @addtogroup Material-3D
  * @{
  */
 
-#ifndef CUSTOMHOFFMAN_H
-#define CUSTOMHOFFMAN_H
+#ifndef CUSTOMORTHOTROPIC_H
+#define CUSTOMORTHOTROPIC_H
 
-#include "NonlinearHoffman.h"
+#include "NonlinearOrthotropic.h"
 
 #include <Toolbox/Expression.h>
 #include <Toolbox/ResourceHolder.h>
 
-class CustomHoffman final : public NonlinearHoffman {
+class CustomOrthotropic : public NonlinearOrthotropic {
     [[nodiscard]] double compute_k(double) const override;
     [[nodiscard]] double compute_dk(double) const override;
 
@@ -43,20 +43,35 @@ class CustomHoffman final : public NonlinearHoffman {
     ResourceHolder<Expression> k_expression;
 
 public:
-    CustomHoffman(
-        unsigned,   // tag
-        vec&&,      // elastic modulus
-        vec&&,      // poissons ratio
-        vec&&,      // sigma
-        unsigned,   // hardening function tag
-        double = 0. // density
+    CustomOrthotropic(
+        unsigned,        // tag
+        OrthotropicType, // type
+        vec&&,           // elastic modulus
+        vec&&,           // poissons ratio
+        vec&&,           // sigma
+        unsigned,        // hardening function tag
+        double = 0.      // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Material> get_copy() override;
-
     void print() override;
+};
+
+class CustomHoffman final : public CustomOrthotropic {
+public:
+    CustomHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const unsigned K, const double R)
+        : CustomOrthotropic(T, OrthotropicType::Hoffman, std::move(E), std::move(V), std::move(S), K, R) {}
+
+    unique_ptr<Material> get_copy() override { return std::make_unique<CustomHoffman>(*this); }
+};
+
+class CustomTsaiWu final : public CustomOrthotropic {
+public:
+    CustomTsaiWu(const unsigned T, vec&& E, vec&& V, vec&& S, const unsigned K, const double R)
+        : CustomOrthotropic(T, OrthotropicType::TsaiWu, std::move(E), std::move(V), std::move(S), K, R) {}
+
+    unique_ptr<Material> get_copy() override { return std::make_unique<CustomTsaiWu>(*this); }
 };
 
 #endif

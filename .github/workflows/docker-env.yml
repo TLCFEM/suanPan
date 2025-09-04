@@ -6,13 +6,13 @@ on:
 jobs:
   ide-image-base:
     runs-on: self-hosted
-    timeout-minutes: 6000
+    timeout-minutes: 3000
     strategy:
       matrix:
         arch: [ amd64, arm64 ]
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Login
@@ -51,10 +51,10 @@ jobs:
           docker manifest push tlcfem/suanpan-env:latest
   ide-image-cuda:
     runs-on: self-hosted
-    timeout-minutes: 240
+    timeout-minutes: 3000
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: Login
@@ -70,4 +70,4 @@ jobs:
           context: .
           file: ./Script/amd64/Rocky.Pre.CUDA.Dockerfile
           push: true
-          tags: tlcfem/suanpan-env-cuda:latest
+          tags: tlcfem/suanpan-env:cuda

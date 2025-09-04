@@ -325,8 +325,6 @@ namespace {
             suanpan_error("A valid beta is required.\n");
             return;
         }
-        if(beta > 1.) beta = 1.;
-        else if(beta < 0.) beta = 0.;
 
         auto density = 0.;
         if(command.eof())
@@ -336,7 +334,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<Bilinear1D>(tag, elastic_modulus, yield_stress, hardening_ratio, beta, density);
+        return_obj = std::make_unique<Bilinear1D>(tag, elastic_modulus, yield_stress, hardening_ratio, suanpan::clamp_unit(beta), density);
     }
 
     void new_bilinearcc(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -567,7 +565,7 @@ namespace {
         return_obj = std::make_unique<BilinearElastic1D>(tag, elastic_modulus, yield_stress, hardening_ratio, radius, density);
     }
 
-    void new_bilinearhoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    void new_bilinearorthotropic(unique_ptr<Material>& return_obj, std::istringstream& command, const bool is_hoffman) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -608,7 +606,8 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<BilinearHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
+        if(is_hoffman) return_obj = std::make_unique<BilinearHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
+        else return_obj = std::make_unique<BilinearTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
     }
 
     void new_bilinearj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -1461,45 +1460,9 @@ namespace {
             return;
         }
 
-        double elastic_modulus;
-        if(!get_input(command, elastic_modulus)) {
-            suanpan_error("A valid elastic modulus is required.\n");
-            return;
-        }
-
-        double poissons_ratio;
-        if(!get_input(command, poissons_ratio)) {
-            suanpan_error("A valid poisson's ratio is required.\n");
-            return;
-        }
-
-        double beta, m, pt, a0, e0, lambda, kappa;
-        if(!get_input(command, beta)) {
-            suanpan_error("A valid beta is required.\n");
-            return;
-        }
-        if(!get_input(command, m)) {
-            suanpan_error("A valid radius ratio is required.\n");
-            return;
-        }
-        if(!get_input(command, pt)) {
-            suanpan_error("A valid tensile yield strength is required.\n");
-            return;
-        }
-        if(!get_input(command, a0)) {
-            suanpan_error("A valid initial a_0 is required.\n");
-            return;
-        }
-        if(!get_input(command, e0)) {
-            suanpan_error("A valid initial void ratio is required.\n");
-            return;
-        }
-        if(!get_input(command, lambda)) {
-            suanpan_error("A valid lambda is required.\n");
-            return;
-        }
-        if(!get_input(command, kappa)) {
-            suanpan_error("A valid kappa is required.\n");
+        double elastic_modulus, poissons_ratio, beta, m, pt, a0, e0, lambda, kappa;
+        if(!get_input(command, elastic_modulus, poissons_ratio, beta, m, pt, a0, e0, lambda, kappa)) {
+            suanpan_error("A valid parameter is required.\n");
             return;
         }
 
@@ -1509,7 +1472,12 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<ExpCC>(tag, elastic_modulus, poissons_ratio, beta, m, pt, a0, e0, lambda, kappa, density);
+        if(std::fabs(lambda) < std::fabs(kappa)) {
+            suanpan_error("The inelastic slope (lambda) must be greater than the elastic slope (kappa).\n");
+            return;
+        }
+
+        return_obj = std::make_unique<ExpCC>(tag, std::fabs(elastic_modulus), std::fabs(poissons_ratio), std::fabs(beta), std::fabs(m), std::fabs(pt), std::fabs(a0), std::fabs(e0), std::fabs(lambda), std::fabs(kappa), density);
     }
 
     void new_customcc(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -1670,7 +1638,7 @@ namespace {
         return_obj = std::make_unique<CustomGurson1D>(tag, expression_tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7));
     }
 
-    void new_exphoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    void new_exporthotropic(unique_ptr<Material>& return_obj, std::istringstream& command, const bool is_hoffman) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1713,10 +1681,11 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<ExpHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
+        if(is_hoffman) return_obj = std::make_unique<ExpHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
+        else return_obj = std::make_unique<ExpTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
     }
 
-    void new_customhoffman(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    void new_customorthotropic(unique_ptr<Material>& return_obj, std::istringstream& command, const bool is_hoffman) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1755,7 +1724,8 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<CustomHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
+        if(is_hoffman) return_obj = std::make_unique<CustomHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
+        else return_obj = std::make_unique<CustomTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
     }
 
     void new_expj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -3428,6 +3398,64 @@ namespace {
 
         return_obj = std::make_unique<Yeoh>(tag, std::vector(pool.begin(), pool.begin() + h_size), std::vector(pool.begin() + h_size, pool.begin() + 2 * h_size), t_size % 2 == 0 ? 0. : pool.back());
     }
+
+    void new_yld0418p(unique_ptr<Material>& return_obj, std::istringstream& command, const bool if_isotropic) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        vec modulus(if_isotropic ? 1 : 6);
+        if(!get_input(command, modulus)) {
+            suanpan_error("A valid modulus is required.\n");
+            return;
+        }
+
+        vec poissons_ratio(if_isotropic ? 1 : 3);
+        if(!get_input(command, poissons_ratio)) {
+            suanpan_error("A valid poisson's ratio is required.\n");
+            return;
+        }
+
+        vec parameter(18);
+        if(!get_input(command, parameter)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        double exponent, ref_stress;
+        if(!get_input(command, exponent)) {
+            suanpan_error("A valid exponent is required.\n");
+            return;
+        }
+        if(!get_input(command, ref_stress)) {
+            suanpan_error("A valid reference stress is required.\n");
+            return;
+        }
+
+        unsigned hardening;
+        if(!get_input(command, hardening)) {
+            suanpan_error("A valid hardening expression tag is required.\n");
+            return;
+        }
+
+        double kin_rate, kin_bound;
+        if(!get_input(command, kin_rate, kin_bound)) {
+            suanpan_error("A valid kinematic hardening rate/bound is required.\n");
+            return;
+        }
+
+        auto density = 0.;
+        if(command.eof())
+            suanpan_debug("Zero density assumed.\n");
+        else if(!get_input(command, density)) {
+            suanpan_error("A valid density is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<YLD0418P>(tag, std::move(modulus), std::move(poissons_ratio), std::move(parameter), exponent, ref_stress, hardening, kin_rate, kin_bound, density);
+    }
 } // namespace
 
 int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
@@ -3442,9 +3470,9 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     if(is_equal(material_id, "AFC") || is_equal(material_id, "AFC01")) new_afc01(new_material, command);
     else if(is_equal(material_id, "AFC02") || is_equal(material_id, "AFCS")) new_afc02(new_material, command);
     else if(is_equal(material_id, "AFC03") || is_equal(material_id, "AFCN")) new_afc03(new_material, command);
+    else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
-    else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
     else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
@@ -3452,27 +3480,32 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
-    else if(is_equal(material_id, "BilinearHoffman")) new_bilinearhoffman(new_material, command);
+    else if(is_equal(material_id, "BilinearHoffman")) new_bilinearorthotropic(new_material, command, true);
     else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
     else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
     else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
     else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
     else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
+    else if(is_equal(material_id, "BilinearTsaiWu")) new_bilinearorthotropic(new_material, command, false);
     else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
     else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
-    else if(is_equal(material_id, "CDPM2") || is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
-    else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
-    else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
-    else if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
-    else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
-    else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
-    else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
-    else if(is_equal(material_id, "ConcreteK4")) new_concretek4(new_material, command);
-    else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
-    else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
+    else if(if_startswith(material_id, "CDPM2")) {
+        if(is_equal(material_id, "CDPM2") || is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+        else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
+        else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
+    }
+    else if(if_startswith(material_id, "Concrete")) {
+        if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
+        else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
+        else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
+        else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
+        else if(is_equal(material_id, "ConcreteK4")) new_concretek4(new_material, command);
+        else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
+        else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
+    }
     else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
     else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
     else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
@@ -3480,11 +3513,12 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
     else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
     else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
-    else if(is_equal(material_id, "CustomHoffman")) new_customhoffman(new_material, command);
+    else if(is_equal(material_id, "CustomHoffman")) new_customorthotropic(new_material, command, true);
     else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
     else if(is_equal(material_id, "CustomMises1D")) new_custommises1d(new_material, command);
     else if(is_equal(material_id, "CustomStrainDegradation")) new_customdegradation(new_material, command, true);
     else if(is_equal(material_id, "CustomStressDegradation")) new_customdegradation(new_material, command, false);
+    else if(is_equal(material_id, "CustomTsaiWu")) new_customorthotropic(new_material, command, false);
     else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
     else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
     else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
@@ -3497,9 +3531,10 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
     else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
     else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
-    else if(is_equal(material_id, "ExpHoffman")) new_exphoffman(new_material, command);
+    else if(is_equal(material_id, "ExpHoffman")) new_exporthotropic(new_material, command, true);
     else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
     else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);
+    else if(is_equal(material_id, "ExpTsaiWu")) new_exporthotropic(new_material, command, false);
     else if(is_equal(material_id, "Flag01")) new_flag01(new_material, command);
     else if(is_equal(material_id, "Flag02")) new_flag02(new_material, command);
     else if(is_equal(material_id, "Fluid")) new_fluid(new_material, command);
@@ -3515,6 +3550,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "MultilinearMises1D")) new_multilinearmises1d(new_material, command);
     else if(is_equal(material_id, "MultilinearOO")) new_multilinearoo(new_material, command);
     else if(is_equal(material_id, "MultilinearPO")) new_multilinearpo(new_material, command);
+    else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
     else if(is_equal(material_id, "NLE1D01")) new_nle1d01(new_material, command);
     else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
     else if(is_equal(material_id, "Nonviscous01")) new_nonviscous01(new_material, command);
@@ -3541,10 +3577,11 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
     else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
     else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
-    else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
-    else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
-    else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
-    else if(is_equal(material_id, "Subloading")) new_subloading(new_material, command);
+    else if(if_startswith(material_id, "Subloading")) {
+        if(is_equal(material_id, "Subloading")) new_subloading(new_material, command);
+        else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
+        else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
+    }
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
     else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
@@ -3558,6 +3595,10 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);
     else if(is_equal(material_id, "Viscosity02")) new_viscosity02(new_material, command);
     else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
+    else if(if_startswith(material_id, "YLD0418P")) {
+        if(is_equal(material_id, "YLD0418P")) new_yld0418p(new_material, command, false);
+        else if(is_equal(material_id, "YLD0418PISO")) new_yld0418p(new_material, command, true);
+    }
     else external_module::object(new_material, domain, material_id, command);
 
     if(nullptr == new_material || !domain->insert(std::move(new_material)))

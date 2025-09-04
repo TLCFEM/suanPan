@@ -27,16 +27,10 @@
 [![marketplace](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
 
 > [!IMPORTANT]
-> ***Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax
-> highlighting and autocompletion.***
-
-> [!IMPORTANT]
-> ***Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).***
-
-> [!IMPORTANT]
-> Please check the [documentation](https://tlcfem.github.io/suanPan-manual/latest/) for command references.
-> For a summary of available functionalities, check [this](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) page.
-> Please star ⭐ the project!
+> - **Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).**
+> - Check out the VS Code [extension](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan) for syntax highlighting and autocompletion.
+> - Check out the [documentation](https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/) for a summary of all available functionalities.
+> - Please star ⭐ the project!
 
 ## Introduction
 
@@ -47,7 +41,7 @@
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-![repobeats analytics](https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg)
+<p align="center"><img src="https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg"></p>
 
 ## Features
 
@@ -146,7 +140,7 @@ on [Chocolatey](https://chocolatey.org/packages/suanpan), please use the followi
 The Chocolatey repo available to you may not be up-to-date.
 If the latest version is not available, please try alternatives, such as portable binaries or scoop.
 
-[![choco](Resource/choco.gif)](https://asciinema.org/a/684063)
+[<p align="center"><img src="Resource/choco.gif"></p>](https://asciinema.org/a/684063)
 
 #### Scoop
 
@@ -177,7 +171,7 @@ The `stable` channel is in sync with the `master` branch.
 
 [![snap](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
-[![snap](Resource/snap.gif)](https://asciinema.org/a/684061)
+[<p align="center"><img src="Resource/snap.gif"></p>](https://asciinema.org/a/684061)
 
 #### Flatpak
 
@@ -240,6 +234,7 @@ an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) an
 #### VS Code
 
 The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan).
+It provides syntax highlighting, autocompletion, running the model using the specified executable or docker container.
 
 #### Sublime Text
 
@@ -264,26 +259,24 @@ Additional libraries used in **suanPan** are listed as follows.
 
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.1
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 14.4.3
+- [**Armadillo**](http://arma.sourceforge.net/) version 15.0.1
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.8.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.10.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
-- [**Lis**](https://www.ssisc.org/lis/) version 2.1.6
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
-- [**METIS**](https://github.com/KarypisLab/METIS) version 5.1.0
-- [**MUMPS**](https://mumps-solver.org/) version 5.8.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.30
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
-- [**VTK**](https://vtk.org/) version 9.4.2
+- [**VTK**](https://vtk.org/) version 9.5.1
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
+- [**ezp**](https://github.com/TLCFEM/ezp)
 - [**fmt**](https://github.com/fmtlib/fmt) version 10.2.1
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.1.0
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.2.0
 - [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // 
-// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
+// https://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -399,11 +399,11 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   arma_cold inline bool load(const csv_name&     spec, const file_type type =   csv_ascii);
   arma_cold inline bool load(      std::istream& is,   const file_type type = arma_binary);
   
-  arma_frown("use save() instead") inline bool quiet_save(const std::string   name, const file_type type = arma_binary) const;
-  arma_frown("use save() instead") inline bool quiet_save(      std::ostream& os,   const file_type type = arma_binary) const;
+  [[deprecated("use save() instead")]] inline bool quiet_save(const std::string   name, const file_type type = arma_binary) const;
+  [[deprecated("use save() instead")]] inline bool quiet_save(      std::ostream& os,   const file_type type = arma_binary) const;
   
-  arma_frown("use load() instead") inline bool quiet_load(const std::string   name, const file_type type = arma_binary);
-  arma_frown("use load() instead") inline bool quiet_load(      std::istream& is,   const file_type type = arma_binary);
+  [[deprecated("use load() instead")]] inline bool quiet_load(const std::string   name, const file_type type = arma_binary);
+  [[deprecated("use load() instead")]] inline bool quiet_load(      std::istream& is,   const file_type type = arma_binary);
   
   
   

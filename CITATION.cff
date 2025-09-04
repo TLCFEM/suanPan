@@ -21,15 +21,16 @@ identifiers:
 repository-code: 'https://github.com/TLCFEM/suanPan'
 url: 'https://tlcfem.github.io/suanPan-manual/latest/'
 keywords:
-  - FEM
-  - Seismic Engineering
-  - Structural Engineering
-  - Plasticity
   - Constitutive Modelling
-  - Nonlinear Dynamics
+  - FEM
   - HPC
   - IGA
+  - Nonlinear Dynamics
+  - Plasticity
+  - Seismic Engineering
   - Solid Mechanics
+  - Structural Engineering
+  - Time Integration
 license: GPL-3.0
-version: "3.8.0"
-date-released: '2025-06-26'
+version: "3.9.0"
+date-released: '2025-09-04'

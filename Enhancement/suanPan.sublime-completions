@@ -244,7 +244,13 @@
       "trigger": "BilinearHoffman",
       "details": "bilinear hoffman material",
       "kind": "type",
-      "contents": "material BilinearHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{zx}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
+      "contents": "material BilinearHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
+    },
+    {
+      "trigger": "BilinearTsaiWu",
+      "details": "bilinear tsai-wu material",
+      "kind": "type",
+      "contents": "material BilinearTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
     },
     {
       "trigger": "BilinearJ2",
@@ -664,7 +670,13 @@
       "trigger": "CustomHoffman",
       "details": "hoffman model with custom isotropic hardening",
       "kind": "type",
-      "contents": "material CustomHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xx}, v_{yy}, v_{zz}\n# (11...19) double, nine yield stress\n# (20) int, hardening expression tag\n# [21] double, density, default: 0.0"
+      "contents": "material CustomHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) int, hardening expression tag\n# [21] double, density, default: 0.0"
+    },
+    {
+      "trigger": "CustomTsaiWu",
+      "details": "tsai-wu model with custom isotropic hardening",
+      "kind": "type",
+      "contents": "material CustomTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) int, hardening expression tag\n# [21] double, density, default: 0.0"
     },
     {
       "trigger": "CustomJ2",
@@ -868,7 +880,7 @@
       "trigger": "ExpCC",
       "details": "cam-clay model with exponential hardening",
       "kind": "type",
-      "contents": "material ExpCC ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) nt, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, beta, controls compression side shapen# (5) double, m, slope of CSL\n# (6) double, p_t, initial tension strength\n# (7) double, a_0, initial a_0\n# (8) double, e_0, nitial void ratio\n# (9) double, lambda\n# (10) double, kappa\n# [11] double, density, default: 0.0"
+      "contents": "material ExpCC ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:(10)} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, beta, controls compression side shape\n# (5) double, m, slope of CSL\n# (6) double, p_t, initial tension strength\n# (7) double, a_0, initial a_0\n# (8) double, e_0, initial void ratio\n# (9) double, lambda\n# (10) double, kappa\n# [11] double, density, default: 0.0"
     },
     {
       "trigger": "ExpDP",
@@ -892,7 +904,13 @@
       "trigger": "ExpHoffman",
       "details": "hoffman model with exponential isotropic hardening",
       "kind": "type",
-      "contents": "material ExpHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xx}, v_{yy}, v_{zz}\n# (11...19) double, nine yield stress\n# (20) double, a\n# (21) double, b\n# [22] double, density, default: 0.0"
+      "contents": "material ExpHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) double, a, saturation\n# (21) double, b, saturation rate\n# [22] double, density, default: 0.0"
+    },
+    {
+      "trigger": "ExpTsaiWu",
+      "details": "tsai-wu model with exponential isotropic hardening",
+      "kind": "type",
+      "contents": "material ExpTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) double, a, saturation\n# (21) double, b, saturation rate\n# [22] double, density, default: 0.0"
     },
     {
       "trigger": "ExpJ2",
@@ -2086,7 +2104,7 @@
       "trigger": "TimberPD",
       "details": "plastic damage model for timber",
       "kind": "type",
-      "contents": "material TimberPD ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20...26)} ${6:[27]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, E_{xy}, E_{yz}, E_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{zx}\n# (11...19) double, nine yield stresses\n# (20...26) double, hardening parameters\n# [27] double, density, default: 0.0"
+      "contents": "material TimberPD ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20...26)} ${6:[27]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# (20...26) double, hardening parameters\n# [27] double, density, default: 0.0"
     },
     {
       "trigger": "TranslationConnector2D",
@@ -2165,6 +2183,18 @@
       "details": "yeoh material",
       "kind": "type",
       "contents": "material Yeoh ${1:(1)} ${2:(2...)}\n# (1) int, unique material tag\n# (2...) double, material constants with possible density"
+    },
+    {
+      "trigger": "YLD0418P",
+      "details": "anisotropic yld0418p material",
+      "kind": "type",
+      "contents": "material YLD0418P ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...28)} ${5:(29)} ${6:(30)} ${7:(31)} ${8:(32)} ${9:(33)} ${10:[34]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...28) double, 18 model parameters, see documentation for details\n# (29) double, exponent\n# (30) double, reference stress\n# (31) int, hardening backbone expression tag\n# (32) double, kinematic hardening rate\n# (33) double, kinematic hardening bound\n# [34] double, density, default: 0.0"
+    },
+    {
+      "trigger": "YLD0418PISO",
+      "details": "isotropic yld0418p material",
+      "kind": "type",
+      "contents": "material YLD0418PISO ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...21)} ${5:(22)} ${6:(23)} ${7:(24)} ${8:(25)} ${9:(26)} ${10:[27]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissions ratio\n# (4...21) double, 18 model parameters, see documentation for details\n# (22) double, exponent\n# (23) double, reference stress\n# (24) int, hardening backbone expression tag\n# (25) double, kinematic hardening rate\n# (26) double, kinematic hardening bound\n# [27] double, density, default: 0.0"
     },
     {
       "trigger": "acceleration",

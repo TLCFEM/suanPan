@@ -15,47 +15,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NonlinearHoffman
- * @brief The NonlinearHoffman class.
+ * @class NonlinearOrthotropic
+ * @brief The NonlinearOrthotropic class.
  *
- * algorithm verified at 24 April 2019 by tlc
+ * algorithm verified on 29 June 2025 by tlc
  *
  * @author tlc
- * @date 24/04/2019
+ * @date 30/06/2025
  * @version 1.0.0
- * @file NonlinearHoffman.h
+ * @file NonlinearOrthotropic.h
  * @addtogroup Material-3D
  * @{
  */
 
-#ifndef NONLINEARHOFFMAN_H
-#define NONLINEARHOFFMAN_H
+#ifndef NONLINEARORTHOTROPIC_H
+#define NONLINEARORTHOTROPIC_H
 
 #include <Material/Material3D/Material3D.h>
 
-struct DataNonlinearHoffman {
+struct DataNonlinearOrthotropic {
     const vec modulus, ratio, yield_stress;
 };
 
-class NonlinearHoffman : protected DataNonlinearHoffman, public Material3D {
+class NonlinearOrthotropic : protected DataNonlinearOrthotropic, public Material3D {
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
     static constexpr unsigned max_iteration = 20u;
-    static const uword sa;
+    static constexpr uword sa{0};
     static const span sb;
 
-    mat proj_a, proj_b, elastic_a;
+    mat proj_p, proj_q, elastic_p;
+
+    double reference_strain{0.};
 
     [[nodiscard]] virtual double compute_k(double) const = 0;
     [[nodiscard]] virtual double compute_dk(double) const = 0;
 
+    auto ortho_inner(const auto& t_stress) const { return .5 * dot(t_stress, proj_p * t_stress) + dot(t_stress, proj_q); }
+
+    [[nodiscard]] int trapezoidal_return();
+    [[nodiscard]] int euler_return();
+
+protected:
+    enum class OrthotropicType {
+        Hoffman,
+        TsaiWu
+    };
+
 public:
-    NonlinearHoffman(
-        unsigned,   // tag
-        vec&&,      // elastic modulus
-        vec&&,      // poissons ratio
-        vec&&,      // sigma
-        double = 0. // density
+    NonlinearOrthotropic(
+        unsigned,        // tag
+        OrthotropicType, // type
+        vec&&,           // elastic modulus
+        vec&&,           // poissons ratio
+        vec&&,           // sigma
+        double           // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -67,6 +81,17 @@ public:
     int reset_status() override;
 
     void print() override;
+};
+
+class NonlinearHill : public NonlinearOrthotropic {
+public:
+    NonlinearHill(
+        unsigned,   // tag
+        vec&&,      // elastic modulus
+        vec&&,      // poissons ratio
+        vec&&,      // yield stress
+        double = 0. // density
+    );
 };
 
 #endif
