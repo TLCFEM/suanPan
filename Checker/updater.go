@@ -44,7 +44,7 @@ func main() {
 		newMinor, _ := strconv.Atoi(number[2])
 		newPatch := 0
 
-		if len(number) == 3 {
+		if "" != number[3] {
 			newPatch, _ = strconv.Atoi(number[3])
 		}
 
