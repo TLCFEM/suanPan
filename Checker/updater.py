@@ -15,15 +15,16 @@
 
 import re
 import sys
-import urllib.request
 from os.path import abspath
+from urllib.request import urlopen
 
 
 def check_version(_major: int, _minor: int, _patch: int):
     BASE_URL: str = "https://github.com/TLCFEM/suanPan/releases"
 
     try:
-        html = urllib.request.urlopen(BASE_URL).read()
+        with urlopen(BASE_URL, timeout=10) as request:
+            html = request.read()
     except Exception:
         return
 
@@ -97,12 +98,11 @@ def check_version(_major: int, _minor: int, _patch: int):
     if result < 0 or result >= len(version_list):
         return
 
-    file_name = version_list[result]
-
     try:
-        urllib.request.urlretrieve(
-            f"{BASE_URL}/download/{version.group(0)}/{file_name}", file_name
-        )
+        file_name = version_list[result]
+        url: str = f"{BASE_URL}/download/{version.group(0)}/{file_name}"
+        with urlopen(url, timeout=10) as source, open(file_name, "wb") as destination:
+            destination.write(source.read())
         print(f"\nDownloaded {abspath(file_name)}.")
         print("You can manually extract the archive to overwrite the existing folder.")
     except Exception:
