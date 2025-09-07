@@ -196,12 +196,12 @@ namespace {
         if(SUANPAN_EXIT == guide_command("fullname")) return;
 
         redirect();
-        suanpan_info("There are other options that can be used to invoke the application. Type in '");
-        suanpan_highlight("help");
-        suanpan_info("' to see what options are available.\n");
+        suanpan_info("There are a number of top-level commands. Type in '");
+        suanpan_highlight("command");
+        suanpan_info("' to see a list.\n");
         restore();
 
-        if(SUANPAN_EXIT == guide_command("help")) return;
+        if(SUANPAN_EXIT == guide_command("command")) return;
 
         redirect();
         suanpan_info("In the current interactive mode, it is also possible to load an existing model file and run it directly. Let's first echo a '");
