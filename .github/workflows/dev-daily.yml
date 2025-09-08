@@ -23,7 +23,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           cache: false
       - name: Dependency
