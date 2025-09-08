@@ -39,7 +39,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           cache: false
       - name: VTK
@@ -173,7 +173,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           cache: false
       - name: Dependency
@@ -314,7 +314,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           cache: false
       - name: MKL
@@ -405,7 +405,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           cache: false
       - name: GCC
