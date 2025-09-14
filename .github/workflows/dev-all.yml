@@ -228,7 +228,7 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-13-large, macos-14-large, macos-15-large, macos-14-xlarge ]
+        os: [ macos-13-large, macos-14-large, macos-15-large ]
         build: [ RelWithDebInfo, Debug ]
         compiler: [ gcc, clang ]
         vtk: [ ON, OFF ]
@@ -253,14 +253,13 @@ jobs:
           mkdir build && cd build
           export FC=gfortran-13
           if [ "${{ matrix.compiler }}" == "clang" ]; then
-            if [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
+            if [[ "${{ matrix.os }}" == "macos-15-large" ]]; then
               export CC=$(brew --prefix llvm@18)/bin/clang
               export CXX=$(brew --prefix llvm@18)/bin/clang++
             else
               export CC=$(brew --prefix llvm@15)/bin/clang
               export CXX=$(brew --prefix llvm@15)/bin/clang++
             fi
-            export OpenMP_ROOT=$(brew --prefix)/opt/libomp
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
