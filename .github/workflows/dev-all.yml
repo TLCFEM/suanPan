@@ -253,7 +253,7 @@ jobs:
           mkdir build && cd build
           export FC=gfortran-12
           if [ "${{ matrix.compiler }}" == "clang" ]; then
-            if [ "${{ matrix.os }}" == "macos-15-xlarge" ]; then
+            if [ "${{ matrix.os }}" == "macos-15-large" ]; then
               export CC=$(brew --prefix llvm@18)/bin/clang
               export CXX=$(brew --prefix llvm@18)/bin/clang++
             else
