@@ -103,20 +103,20 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
         set(COMPILER_IDENTIFIER "gcc-mac")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(COMPILER_IDENTIFIER "clang-mac")
-        include_directories(
-            "/usr/local/include"
-            "/usr/local/opt/llvm/include"
-            "/usr/local/opt/libomp/include"
-            "/opt/homebrew/opt/libomp/include"
-        )
-        link_directories(
-            "/usr/local/lib"
-            "/usr/local/opt/llvm/lib"
-            "/usr/local/opt/libomp/lib/"
-            "/opt/homebrew/opt/libomp/lib"
-        )
         message(NOTICE "On macOS, make sure `libomp` is installed.")
     endif ()
+    include_directories(
+        "/usr/local/include"
+        "/usr/local/opt/llvm/include"
+        "/usr/local/opt/libomp/include"
+        "/opt/homebrew/opt/libomp/include"
+    )
+    link_directories(
+        "/usr/local/lib"
+        "/usr/local/opt/llvm/lib"
+        "/usr/local/opt/libomp/lib/"
+        "/opt/homebrew/opt/libomp/lib"
+    )
 endif ()
 
 if (COMPILER_IDENTIFIER MATCHES "unknown")
