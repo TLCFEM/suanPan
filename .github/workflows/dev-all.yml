@@ -260,6 +260,7 @@ jobs:
               export CC=$(brew --prefix llvm@15)/bin/clang
               export CXX=$(brew --prefix llvm@15)/bin/clang++
             fi
+            export OpenMP_ROOT=$(brew --prefix)/opt/libomp
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
