@@ -173,7 +173,7 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-13-large, macos-14-large, macos-15-large ]
+        os: [ macos-13-large, macos-14-large, macos-15-large, macos-14-xlarge ]
         vtk: [ ON, OFF ]
     steps:
       - name: Clone
@@ -194,7 +194,7 @@ jobs:
           brew install go libomp
           go build Checker/updater.go
           mkdir build && cd build
-          if [ "${{ matrix.os }}" == "macos-15-large" ]; then
+          if [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
             export CC=$(brew --prefix llvm@18)/bin/clang
             export CXX=$(brew --prefix llvm@18)/bin/clang++
           else

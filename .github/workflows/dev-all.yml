@@ -228,7 +228,7 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-13-large, macos-14-large, macos-15-large ]
+        os: [ macos-13-large, macos-14-large, macos-15-large, macos-14-xlarge ]
         build: [ RelWithDebInfo, Debug ]
         compiler: [ gcc, clang ]
         vtk: [ ON, OFF ]
@@ -253,7 +253,7 @@ jobs:
           mkdir build && cd build
           export FC=gfortran-13
           if [ "${{ matrix.compiler }}" == "clang" ]; then
-            if [ "${{ matrix.os }}" == "macos-15-large" ]; then
+            if [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
               export CC=$(brew --prefix llvm@18)/bin/clang
               export CXX=$(brew --prefix llvm@18)/bin/clang++
             else
