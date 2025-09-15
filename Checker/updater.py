@@ -79,8 +79,12 @@ def check_version(_major: int, _minor: int, _patch: int):
         ]
     elif sys.platform.startswith("darwin"):
         version_list = [
-            "suanPan-macos-openblas-vtk.tar.gz",
-            "suanPan-macos-openblas.tar.gz",
+            "suanPan-macos-13-large-openblas-vtk.tar.gz",
+            "suanPan-macos-13-large-openblas.tar.gz",
+            "suanPan-macos-14-large-openblas-vtk.tar.gz",
+            "suanPan-macos-14-large-openblas.tar.gz",
+            "suanPan-macos-15-large-openblas-vtk.tar.gz",
+            "suanPan-macos-15-large-openblas.tar.gz",
         ]
 
     for index, item in enumerate(version_list):
