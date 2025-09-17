@@ -333,7 +333,7 @@ namespace suanpan {
     template<typename T> void info(const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), format(in_vec));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), "{}", format(in_vec));
         else SUANPAN_COUT << format(in_vec);
     }
 
@@ -343,7 +343,7 @@ namespace suanpan {
         if(format_sv.back() != '\t' && format_sv.back() != '\n') output += '\n';
         output += format(in_vec);
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), output);
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), "{}", output);
         else SUANPAN_COUT << output;
     }
 
