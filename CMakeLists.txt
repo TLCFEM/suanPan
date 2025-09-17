@@ -404,7 +404,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
 
 if (MSVC)
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan.rc")
-    target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj /utf-8")
+    target_compile_options(${PROJECT_NAME} PRIVATE /bigobj /utf-8)
     target_link_options(${PROJECT_NAME} PRIVATE "/NODEFAULTLIB:LIBCMT")
 else ()
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan_gcc.rc")
