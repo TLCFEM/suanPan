@@ -270,14 +270,9 @@ namespace suanpan {
         // ReSharper disable once CppDFAConstantConditions
         if(comm_size > 1) {
             // ReSharper disable once CppDFAUnreachableCode
-            pattern += "[P";
-            pattern += std::to_string(comm_rank);
-            pattern += "] ";
+            pattern.append("[P").append(std::to_string(comm_rank)).append("] ");
         }
-        pattern += header;
-        pattern += fs::path(file_name).filename().string();
-        pattern += ":{} ~> ";
-        pattern += format;
+        pattern.append(header).append(fs::path(file_name).filename().string()).append(":{} ~> ").append(format);
         return pattern;
     }
 
@@ -323,10 +318,10 @@ namespace suanpan {
     template<typename T> std::string format(const Col<T>& in_vec) {
         std::string output;
         if(std::is_floating_point_v<T>)
-            for(const auto I : in_vec) output += format(" {: 1.4e}", I);
+            for(const auto I : in_vec) output.append(format(" {: 1.4e}", I));
         else
-            for(const auto I : in_vec) output += format(" {:6d}", I);
-        output += '\n';
+            for(const auto I : in_vec) output.append(format(" {:6d}", I));
+        output.push_back('\n');
         return output;
     }
 
