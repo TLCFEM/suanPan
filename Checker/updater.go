@@ -36,11 +36,12 @@ import (
 const URL = "https://github.com/TLCFEM/suanPan/releases"
 
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "--rename" && len(os.Args) > 2 {
+	if len(os.Args) > 2 && os.Args[1] == "--rename" {
 		originalPath := os.Args[2]
+		newPath := originalPath + ".new"
 		for i := 1; i <= 10; i++ {
 			time.Sleep(time.Duration(100*i) * time.Millisecond)
-			err := os.Rename(originalPath+".new", originalPath)
+			err := os.Rename(newPath, originalPath)
 			if err == nil {
 				break
 			}
@@ -61,10 +62,7 @@ func fetch() {
 	}
 	defer response.Body.Close()
 
-	html, err := io.ReadAll(response.Body)
-	if err != nil {
-		return
-	}
+	html, _ := io.ReadAll(response.Body)
 
 	regex, _ := regexp.Compile(`suanPan-v(\d)\.(\d)\.?(\d?)`)
 
@@ -94,25 +92,25 @@ func fetch() {
 		fmt.Printf("Downloading the latest version.\n")
 	}
 
-	_ = downloadLatestVersion(newVersion, fromMain)
+	downloadLatestVersion(newVersion, fromMain)
 }
 
-func downloadLatestVersion(versionString string, fromMain bool) error {
+func downloadLatestVersion(versionString string, fromMain bool) {
 	cos := runtime.GOOS
 
 	if cos != "windows" && cos != "linux" && cos != "darwin" {
-		return nil
+		return
 	}
 
 	fmt.Printf("Found new version %s, you can download it using this updater, or using package managers.\nDo you want to download now? [y/N] ", versionString)
 	var downloadSwitch string
 	_, err := fmt.Scanln(&downloadSwitch)
 	if err != nil {
-		return err
+		return
 	}
 
 	if len(downloadSwitch) == 0 || (downloadSwitch[0] != 'y' && downloadSwitch[0] != 'Y') {
-		return nil
+		return
 	}
 
 	fmt.Printf("\nPlease note the following:\n")
@@ -176,44 +174,39 @@ func downloadLatestVersion(versionString string, fromMain bool) error {
 	downloadOption := 0
 	_, err = fmt.Scanf("%d", &downloadOption)
 	if err != nil {
-		return err
+		return
 	}
 
-	link := URL + "/download/" + versionString
-	fileName := ""
-	if downloadOption < len(package_array) && downloadOption >= 0 {
-		fileName = package_array[downloadOption]
+	if downloadOption >= len(package_array) || downloadOption < 0 {
+		return
 	}
 
-	if fileName == "" {
-		return nil
-	}
-
-	link += "/" + fileName
+	fileName := package_array[downloadOption]
+	link := URL + "/download/" + versionString + "/" + fileName
 
 	fmt.Printf("Downloading files...\n")
 
 	response, err := http.Get(link)
 	if err != nil {
-		return err
+		return
 	}
 	defer response.Body.Close()
 
 	parentPath := filepath.Clean(filepath.Join(".", ".."))
 	absPath, err := filepath.Abs(filepath.Join(parentPath, fileName))
 	if err != nil {
-		return err
+		return
 	}
 
 	storage, err := os.Create(absPath)
 	if err != nil {
-		return err
+		return
 	}
 	defer storage.Close()
 
 	_, err = io.Copy(storage, response.Body)
 	if err != nil {
-		return err
+		return
 	}
 
 	fmt.Printf("Downloaded %s\n", absPath)
@@ -224,41 +217,36 @@ func downloadLatestVersion(versionString string, fromMain bool) error {
 	isArchive = isArchive || strings.HasSuffix(absPath, "7z")
 
 	if isArchive {
-		if cos != "linux" || fromMain {
+		if cos == "windows" || fromMain {
 			fmt.Printf("You can manually extract the archive to overwrite the existing folder.\n")
 		} else {
 			fmt.Printf("Do you want me to unpack the archive? [y/N] ")
 			var unpackSwitch string
 			_, err := fmt.Scanln(&unpackSwitch)
 			if err != nil {
-				return err
+				return
 			}
 
 			if len(unpackSwitch) == 0 || (unpackSwitch[0] != 'y' && unpackSwitch[0] != 'Y') {
-				return nil
+				return
 			}
 
 			fmt.Printf("Overwriting the parent folder.\n")
-			err = unpack(absPath, parentPath)
-			if err != nil {
-				return fmt.Errorf("Error unpacking the archive: %v\n", err)
+			if err := unpack(absPath, parentPath); err != nil {
+				return
 			}
 
 			selfPath, tmpPath, err := copySelf()
 			if err != nil {
-				return err
+				return
 			}
 
 			cmd := exec.Command(tmpPath, "--rename", selfPath)
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
-			if err := cmd.Start(); err != nil {
-				return err
-			}
+			cmd.Start()
 		}
 	}
-
-	return nil
 }
 
 func unpack(src, dest string) error {
