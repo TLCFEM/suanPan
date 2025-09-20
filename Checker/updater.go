@@ -331,9 +331,7 @@ func copySelf() (string, string, error) {
 	}
 	defer tmpFile.Close()
 
-	if _, err := io.Copy(tmpFile, sourceFile); err != nil {
-		return "", "", err
-	}
+	_, err = io.Copy(tmpFile, sourceFile)
 
-	return selfPath, tmpPath, nil
+	return selfPath, tmpPath, err
 }
