@@ -173,7 +173,7 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-13-large, macos-14-large, macos-15-large ]
+        os: [ macos-14-large, macos-15-large ]
         vtk: [ ON, OFF ]
     steps:
       - name: Clone

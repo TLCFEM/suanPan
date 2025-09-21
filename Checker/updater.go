@@ -157,8 +157,6 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 		}
 	case "darwin":
 		package_array = []string{
-			"suanPan-macos-13-large-openblas-vtk.tar.gz",
-			"suanPan-macos-13-large-openblas.tar.gz",
 			"suanPan-macos-14-large-openblas-vtk.tar.gz",
 			"suanPan-macos-14-large-openblas.tar.gz",
 			"suanPan-macos-15-large-openblas-vtk.tar.gz",
