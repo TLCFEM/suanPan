@@ -118,10 +118,12 @@ jobs:
           else
             file_name+="-intel"
           fi
-          if [ "${{ matrix.avx }}" == "ON" ]; then
-            file_name+="-avx"
-          else
-            file_name+="-no-avx"
+          if [ "${{ matrix.os }}" != *"arm"* ]; then
+            if [ "${{ matrix.avx }}" == "ON" ]; then
+              file_name+="-avx"
+            else
+              file_name+="-no-avx"
+            fi
           fi
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
@@ -207,14 +209,7 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
-          file_name="suanPan-${{ matrix.os }}"
-          file_name+="-release"
-          file_name+="-gcc"
-          file_name+="-avx"
-          file_name+="-vtk"
-          file_name+="-mkl"
-          file_name+="-mpi"
-          file_name+=".tar.gz"
+          file_name="suanPan-${{ matrix.os }}-release-gcc-avx-vtk-mkl-mpi.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload

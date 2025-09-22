@@ -45,11 +45,9 @@ jobs:
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
-      - name: Dependency
-        run: |
-          sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils
       - name: Compile
         run: |
+          sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils
           go build Checker/updater.go
           ./Script/linux-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
@@ -80,8 +78,12 @@ jobs:
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
           fi
-          if [ "${{ matrix.avx }}" == "OFF" ]; then
-            file_name+="-no-avx"
+          if [ "${{ matrix.os }}" != *"arm"* ]; then
+            if [ "${{ matrix.avx }}" == "ON" ]; then
+              file_name+="-avx"
+            else
+              file_name+="-no-avx"
+            fi
           fi
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
@@ -149,13 +151,7 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
-          file_name="suanPan-linux"
-          file_name+="-mkl"
-          file_name+="-vtk"
-          file_name+="-mpi"
-          file_name+="-no-avx"
-          file_name+="-64bit"
-          file_name+=".tar.gz"
+          file_name="suanPan-${{ matrix.os }}-mkl-vtk-mpi-no-avx-64bit.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
