@@ -144,18 +144,22 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 		}
 	case "linux":
 		package_array = []string{
-			"suanPan-linux-mkl-no-avx.tar.gz",
-			"suanPan-linux-mkl-vtk-no-avx.tar.gz",
-			"suanPan-linux-mkl-vtk.tar.gz",
-			"suanPan-linux-mkl.tar.gz",
-			"suanPan-linux-aocl-no-avx.tar.gz",
-			"suanPan-linux-aocl-vtk-no-avx.tar.gz",
-			"suanPan-linux-aocl-vtk.tar.gz",
-			"suanPan-linux-aocl.tar.gz",
-			"suanPan-linux-openblas-no-avx.tar.gz",
-			"suanPan-linux-openblas-vtk-no-avx.tar.gz",
-			"suanPan-linux-openblas-vtk.tar.gz",
-			"suanPan-linux-openblas.tar.gz",
+			"suanPan-ubuntu-22.04-mkl-no-avx.tar.gz",
+			"suanPan-ubuntu-22.04-mkl-vtk-no-avx.tar.gz",
+			"suanPan-ubuntu-22.04-mkl-vtk.tar.gz",
+			"suanPan-ubuntu-22.04-mkl.tar.gz",
+			"suanPan-ubuntu-22.04-aocl-no-avx.tar.gz",
+			"suanPan-ubuntu-22.04-aocl-vtk-no-avx.tar.gz",
+			"suanPan-ubuntu-22.04-aocl-vtk.tar.gz",
+			"suanPan-ubuntu-22.04-aocl.tar.gz",
+			"suanPan-ubuntu-22.04-openblas-no-avx.tar.gz",
+			"suanPan-ubuntu-22.04-openblas-vtk-no-avx.tar.gz",
+			"suanPan-ubuntu-22.04-openblas-vtk.tar.gz",
+			"suanPan-ubuntu-22.04-openblas.tar.gz",
+			"suanPan-ubuntu-22.04-arm-openblas-no-avx.tar.gz",
+			"suanPan-ubuntu-22.04-arm-openblas-vtk-no-avx.tar.gz",
+			"suanPan-ubuntu-22.04-arm-openblas-vtk.tar.gz",
+			"suanPan-ubuntu-22.04-arm-openblas.tar.gz",
 		}
 	case "darwin":
 		package_array = []string{
