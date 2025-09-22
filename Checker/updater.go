@@ -124,6 +124,8 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 	fmt.Printf("      Visualisation may be useful when it comes to post-processing, but it requires OpenGL support. Please make sure the corresponding packages are installed.\n")
 	fmt.Printf("  `no-avx` disables AVX2.\n")
 	fmt.Printf("      For CPUs that do not support AVX2, please use this version.\n")
+	fmt.Printf("  `large` is targeting amd64 architecture (Intel CPUs).\n")
+	fmt.Printf("  `xlarge` is targeting arm64 architecture (Apple silicon CPUs).\n")
 	fmt.Printf("\nDownload the new version:\n")
 
 	var package_array []string
@@ -161,6 +163,10 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 			"suanPan-macos-14-large-openblas.tar.gz",
 			"suanPan-macos-15-large-openblas-vtk.tar.gz",
 			"suanPan-macos-15-large-openblas.tar.gz",
+			"suanPan-macos-14-xlarge-openblas-vtk.tar.gz",
+			"suanPan-macos-14-xlarge-openblas.tar.gz",
+			"suanPan-macos-15-xlarge-openblas-vtk.tar.gz",
+			"suanPan-macos-15-xlarge-openblas.tar.gz",
 		}
 	}
 

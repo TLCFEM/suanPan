@@ -228,8 +228,8 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-14-large, macos-15-large ]
-        build: [ RelWithDebInfo, Debug ]
+        os: [ macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge ]
+        build: [ RelWithDebInfo ]
         compiler: [ gcc, clang ]
         vtk: [ ON, OFF ]
         exclude:
@@ -250,10 +250,11 @@ jobs:
         run: |
           brew install go libomp
           go build Checker/updater.go
+          ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
           export FC=gfortran-13
           if [ "${{ matrix.compiler }}" == "clang" ]; then
-            if [[ "${{ matrix.os }}" == "macos-15-large" ]]; then
+            if [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
               export CC=$(brew --prefix llvm@18)/bin/clang
               export CXX=$(brew --prefix llvm@18)/bin/clang++
             else
@@ -277,7 +278,7 @@ jobs:
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
             ..
           fi
-          make install -j4
+          cmake --build . --target install --config ${{ matrix.build }} -j 3
       - name: Pack
         run: |
           cp updater build/dist/bin
@@ -304,7 +305,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
@@ -396,7 +397,7 @@ jobs:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
   windows-gcc-dev:
-    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') && !contains(github.event.head_commit.message, '[skip.all]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: windows-2022
     timeout-minutes: 100
     strategy:
