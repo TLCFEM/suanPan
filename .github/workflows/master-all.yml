@@ -183,15 +183,9 @@ jobs:
       - name: Prepare
         run: |
           echo "SP_TIME=daily-$(date +''%y%m%d'')" >> $GITHUB_ENV
-      - name: VTK
-        if: matrix.vtk == 'ON'
-        run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-${{ matrix.os }}.tar.gz
-          tar xf VTK-9.5.2-${{ matrix.os }}.tar.gz
-          brew install glfw glew
       - name: Compile
         run: |
-          brew install go libomp
+          brew install glfw glew go libomp
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build

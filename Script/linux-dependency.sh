@@ -83,3 +83,11 @@ tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
 
 rm -rf "$TMP_DIR"
+
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-$RUNNER_IMAGE_NAME.tar.gz"
+TMP_DIR="$(mktemp -d)"
+
+wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
+tar -xzf "$TMP_DIR/archive.tar.gz" -C .
+
+rm -rf "$TMP_DIR"

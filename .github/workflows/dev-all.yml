@@ -49,11 +49,6 @@ jobs:
         uses: actions/setup-go@v6
         with:
           cache: false
-      - name: VTK
-        if: matrix.vtk == 'ON'
-        run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-${{ matrix.os }}.tar.gz
-          tar xf VTK-9.5.2-${{ matrix.os }}.tar.gz
       - name: MKL
         run: |
           if [ "${{ matrix.mkl }}" == "ON" ] || [ "${{ matrix.compiler.c }}" == "icx" ]; then
@@ -93,8 +88,8 @@ jobs:
             MT="ON"
           fi
           go build Checker/updater.go
-          mkdir build && cd build
           ./Script/linux-dependency.sh ${{ matrix.os }}
+          mkdir build && cd build
           cmake \
           -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
           -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} \
@@ -251,15 +246,9 @@ jobs:
         uses: actions/checkout@v5
         with:
           submodules: recursive
-      - name: VTK
-        if: matrix.vtk == 'ON'
-        run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-${{ matrix.os }}.tar.gz
-          tar xf VTK-9.5.2-${{ matrix.os }}.tar.gz
-          brew install glfw glew
       - name: Compile
         run: |
-          brew install go libomp
+          brew install glfw glew go libomp
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
