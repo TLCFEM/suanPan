@@ -127,8 +127,8 @@ H5_DLL hid_t H5Gcreate2(hid_t loc_id, const char *name, hid_t lcpl_id, hid_t gcp
 H5_DLL hid_t H5Gcreate_async(const char *app_file, const char *app_func, unsigned app_line, hid_t loc_id,
                              const char *name, hid_t lcpl_id, hid_t gcpl_id, hid_t gapl_id, hid_t es_id);
 #else
-H5_DLL hid_t  H5Gcreate_async(hid_t loc_id, const char *name, hid_t lcpl_id, hid_t gcpl_id, hid_t gapl_id,
-                              hid_t es_id);
+H5_DLL hid_t H5Gcreate_async(hid_t loc_id, const char *name, hid_t lcpl_id, hid_t gcpl_id, hid_t gapl_id,
+                             hid_t es_id);
 #endif
 
 /**
@@ -222,7 +222,7 @@ H5_DLL hid_t H5Gopen2(hid_t loc_id, const char *name, hid_t gapl_id);
 H5_DLL hid_t H5Gopen_async(const char *app_file, const char *app_func, unsigned app_line, hid_t loc_id,
                            const char *name, hid_t gapl_id, hid_t es_id);
 #else
-H5_DLL hid_t  H5Gopen_async(hid_t loc_id, const char *name, hid_t gapl_id, hid_t es_id);
+H5_DLL hid_t H5Gopen_async(hid_t loc_id, const char *name, hid_t gapl_id, hid_t es_id);
 #endif
 
 /**
@@ -838,7 +838,7 @@ H5_DLL herr_t H5Gmove2(hid_t src_loc_id, const char *src_name, hid_t dst_loc_id,
  *          the \ref UG for further details.
  *
  * \attention Exercise care in moving groups as it is possible to render data in
- *            a file inaccessible with H5Gunlink(). See The Group Interface in the
+ *            a file inaccessible with H5Gunlink(). See \ref sec_group in the
  *            \ref UG.
  *
  * \version 1.8.0 Function deprecated in this release.
@@ -1031,6 +1031,8 @@ H5_DLL int H5Gget_comment(hid_t loc_id, const char *name, size_t bufsize, char *
  *
  * \warning  Adding or removing members to the group during iteration
  *           will lead to undefined behavior.
+ *
+ * \callback_note
  *
  * \version 1.8.0 Function deprecated in this release.
  *
