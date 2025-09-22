@@ -51,8 +51,11 @@ else
     TARGET_DIR="$(dirname "$0")/../Libs/linux"
 fi
 
-rm -rf "$TARGET_DIR"
-mkdir -p "$TARGET_DIR"
+if [ -d "$TARGET_DIR" ]; then
+    find "$TARGET_DIR" -mindepth 1 ! -name '*aocl*' -delete
+else
+    mkdir -p "$TARGET_DIR"
+fi
 
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-1.14.6-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
