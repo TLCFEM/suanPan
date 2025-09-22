@@ -52,6 +52,8 @@ typedef struct {
  *              indicating failure. The iterator can be restarted at the next
  *              attribute.
  *
+ * \callback_note
+ *
  * \since 1.8.0
  *
  */
@@ -153,8 +155,8 @@ H5_DLL hid_t H5Acreate_async(const char *app_file, const char *app_func, unsigne
                              const char *attr_name, hid_t type_id, hid_t space_id, hid_t acpl_id,
                              hid_t aapl_id, hid_t es_id);
 #else
-H5_DLL hid_t  H5Acreate_async(hid_t loc_id, const char *attr_name, hid_t type_id, hid_t space_id,
-                              hid_t acpl_id, hid_t aapl_id, hid_t es_id);
+H5_DLL hid_t H5Acreate_async(hid_t loc_id, const char *attr_name, hid_t type_id, hid_t space_id,
+                             hid_t acpl_id, hid_t aapl_id, hid_t es_id);
 #endif
 
 /*--------------------------------------------------------------------------*/
@@ -661,6 +663,8 @@ H5_DLL hid_t H5Aget_type(hid_t attr_id);
  * \warning   Adding or removing attributes to the object during iteration
  *            will lead to undefined behavior.
  *
+ * \callback_note
+ *
  * \since 1.8.0
  *
  */
@@ -769,7 +773,7 @@ H5_DLL hid_t H5Aopen(hid_t obj_id, const char *attr_name, hid_t aapl_id);
 H5_DLL hid_t H5Aopen_async(const char *app_file, const char *app_func, unsigned app_line, hid_t obj_id,
                            const char *attr_name, hid_t aapl_id, hid_t es_id);
 #else
-H5_DLL hid_t  H5Aopen_async(hid_t obj_id, const char *attr_name, hid_t aapl_id, hid_t es_id);
+H5_DLL hid_t H5Aopen_async(hid_t obj_id, const char *attr_name, hid_t aapl_id, hid_t es_id);
 #endif
 /*--------------------------------------------------------------------------*/
 /**
@@ -824,9 +828,9 @@ H5_DLL hid_t H5Aopen_by_idx_async(const char *app_file, const char *app_func, un
                                   const char *obj_name, H5_index_t idx_type, H5_iter_order_t order, hsize_t n,
                                   hid_t aapl_id, hid_t lapl_id, hid_t es_id);
 #else
-H5_DLL hid_t  H5Aopen_by_idx_async(hid_t loc_id, const char *obj_name, H5_index_t idx_type,
-                                   H5_iter_order_t order, hsize_t n, hid_t aapl_id, hid_t lapl_id,
-                                   hid_t es_id);
+H5_DLL hid_t H5Aopen_by_idx_async(hid_t loc_id, const char *obj_name, H5_index_t idx_type,
+                                  H5_iter_order_t order, hsize_t n, hid_t aapl_id, hid_t lapl_id,
+                                  hid_t es_id);
 #endif
 /*--------------------------------------------------------------------------*/
 /**
@@ -879,8 +883,8 @@ H5_DLL hid_t H5Aopen_by_name_async(const char *app_file, const char *app_func, u
                                    hid_t loc_id, const char *obj_name, const char *attr_name, hid_t aapl_id,
                                    hid_t lapl_id, hid_t es_id);
 #else
-H5_DLL hid_t  H5Aopen_by_name_async(hid_t loc_id, const char *obj_name, const char *attr_name, hid_t aapl_id,
-                                    hid_t lapl_id, hid_t es_id);
+H5_DLL hid_t H5Aopen_by_name_async(hid_t loc_id, const char *obj_name, const char *attr_name, hid_t aapl_id,
+                                   hid_t lapl_id, hid_t es_id);
 #endif
 
 /*-------------------------------------------------------------------------- */
@@ -1190,6 +1194,8 @@ H5_DLL int H5Aget_num_attrs(hid_t loc_id);
  *
  * \warning   Adding or removing attributes to the object during iteration
  *            will lead to undefined behavior.
+ *
+ * \callback_note
  *
  * \version 1.8.0 The function \p H5Aiterate was renamed to H5Aiterate1()
  *                and deprecated in this release.

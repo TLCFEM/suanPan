@@ -196,12 +196,12 @@ namespace {
         if(SUANPAN_EXIT == guide_command("fullname")) return;
 
         redirect();
-        suanpan_info("There are other options that can be used to invoke the application. Type in '");
-        suanpan_highlight("help");
-        suanpan_info("' to see what options are available.\n");
+        suanpan_info("There are a number of top-level commands. Type in '");
+        suanpan_highlight("command");
+        suanpan_info("' to see a list.\n");
         restore();
 
-        if(SUANPAN_EXIT == guide_command("help")) return;
+        if(SUANPAN_EXIT == guide_command("command")) return;
 
         redirect();
         suanpan_info("In the current interactive mode, it is also possible to load an existing model file and run it directly. Let's first echo a '");
@@ -1236,7 +1236,7 @@ namespace {
         suanpan_info(format, "amplitude", "define amplitudes");
         suanpan_info(format, "analyze/analyse", "analyse the model");
         suanpan_info(format, "benchmark", "benchmark the platform for comparisons");
-        suanpan_info(format, "clear", "clear the model");
+        suanpan_info(format, "clear", "clear the model to the initial state");
         suanpan_info(format, "command", "list all commands");
         suanpan_info(format, "constraint", "define constraints such as boundary conditions");
         suanpan_info(format, "converger", "define convergers");
@@ -1248,6 +1248,7 @@ namespace {
         suanpan_info(format, "enable", "enable objects");
         suanpan_info(format, "example", "establish and execute a minimum example");
         suanpan_info(format, "exit/quit", "exit the program");
+        suanpan_info(format, "expression", "define mathematical expressions to be used in other objects");
         suanpan_info(format, "file", "load external files");
         suanpan_info(format, "fullname", "print the full path of the program");
         suanpan_info(format, "group", "define groups via various rules");
@@ -1256,6 +1257,7 @@ namespace {
         suanpan_info(format, "initial", "define initial conditions for nodes and materials");
         suanpan_info(format, "integrator", "define time integration algorithms");
         suanpan_info(format, "list", "list objects in the current domain");
+        suanpan_info(format, "load", "define loads of various types");
         suanpan_info(format, "material", "define materials");
         suanpan_info(format, "materialtest*", "test materials without creating a finite element model");
         suanpan_info(format, "modifier", "define modifiers that modify the existing model properties");
@@ -1274,11 +1276,11 @@ namespace {
         suanpan_info(format, "response_spectrum", "compute the response spectrum of a given ground motion");
         suanpan_info(format, "save", "save objects");
         suanpan_info(format, "sdof_response", "compute the sdof response of a given ground motion");
-        suanpan_info(format, "section", "define sections");
+        suanpan_info(format, "section", "define truss/beam/plate/shell sections");
         suanpan_info(format, "sectiontest*", "test sections without creating a finite element model");
         suanpan_info(format, "set", "set properties of the analysis/model");
         suanpan_info(format, "solver", "define solvers");
-        suanpan_info(format, "step", "define steps");
+        suanpan_info(format, "step", "define analysis steps");
         suanpan_info(format, "summary", "print summary for the current problem domain");
         suanpan_info(format, "suspend", "suspend objects in the current step");
         suanpan_info(format, "terminal", "execute commands in terminal");

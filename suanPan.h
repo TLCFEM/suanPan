@@ -264,51 +264,48 @@ template<typename T> auto reduce(T&& object) { return std::forward<T>(object); }
 namespace suanpan {
     inline std::mutex print_mutex;
 
-    inline std::string pattern(const std::string_view header, const std::string_view file_name, const std::string_view format) {
+    inline std::string pattern(const std::string_view header, const std::string_view file_path, const std::string_view format) {
         std::string pattern;
+
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAConstantConditions
-        if(comm_size > 1) {
-            // ReSharper disable once CppDFAUnreachableCode
-            pattern += "[P";
-            pattern += std::to_string(comm_rank);
-            pattern += "] ";
-        }
-        pattern += header;
-        pattern += fs::path(file_name).filename().string();
-        pattern += ":{} ~> ";
-        pattern += format;
+        // ReSharper disable once CppDFAUnreachableCode
+        if(comm_size > 1) pattern.append(fmt::format("[P{}] ", comm_rank));
+
+        const auto pos = file_path.find_last_of("/\\");
+        pattern.append(fmt::format("[{}] {}:{{}} ~> {}", header, pos == std::string_view::npos ? file_path : file_path.substr(pos + 1), format));
+
         return pattern;
     }
 
     template<typename... T> void debug(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_VERBOSE || !SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::coral), pattern("[DEBUG] ", file_name, format_str), fmt::make_format_args(line, args...));
-        else SUANPAN_COUT << fmt::vformat(pattern("[DEBUG] ", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::coral), pattern("DEBUG", file_name, format_str), fmt::make_format_args(line, args...));
+        else SUANPAN_COUT << fmt::vformat(pattern("DEBUG", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
     template<typename... T> void warning(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         SUANPAN_WARNING_COUNT += 1;
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_CWRN << fmt::vformat(fg(fmt::color::slate_blue), pattern("[WARNING] ", file_name, format_str), fmt::make_format_args(line, args...));
-        else SUANPAN_CWRN << fmt::vformat(pattern("[WARNING] ", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_CWRN << fmt::vformat(fg(fmt::color::slate_blue), pattern("WARNING", file_name, format_str), fmt::make_format_args(line, args...));
+        else SUANPAN_CWRN << fmt::vformat(pattern("WARNING", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
     template<typename... T> void error(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         SUANPAN_ERROR_COUNT += 1;
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_CERR << fmt::vformat(fg(fmt::color::orange), pattern("[ERROR] ", file_name, format_str), fmt::make_format_args(line, args...));
-        else SUANPAN_CERR << fmt::vformat(pattern("[ERROR] ", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_CERR << fmt::vformat(fg(fmt::color::orange), pattern("ERROR", file_name, format_str), fmt::make_format_args(line, args...));
+        else SUANPAN_CERR << fmt::vformat(pattern("ERROR", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
     template<typename... T> void fatal(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_CFTL << fmt::vformat(fg(fmt::color::violet), pattern("[FATAL] ", file_name, format_str), fmt::make_format_args(line, args...));
-        else SUANPAN_CFTL << fmt::vformat(pattern("[FATAL] ", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_CFTL << fmt::vformat(fg(fmt::color::violet), pattern("FATAL", file_name, format_str), fmt::make_format_args(line, args...));
+        else SUANPAN_CFTL << fmt::vformat(pattern("FATAL", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
     template<typename... T> void info(const std::string_view format_sv, const T&... args) {
@@ -323,17 +320,17 @@ namespace suanpan {
     template<typename T> std::string format(const Col<T>& in_vec) {
         std::string output;
         if(std::is_floating_point_v<T>)
-            for(const auto I : in_vec) output += format(" {: 1.4e}", I);
+            for(const auto I : in_vec) output.append(format(" {: 1.4e}", I));
         else
-            for(const auto I : in_vec) output += format(" {:6d}", I);
-        output += '\n';
+            for(const auto I : in_vec) output.append(format(" {:6d}", I));
+        output.push_back('\n');
         return output;
     }
 
     template<typename T> void info(const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), format(in_vec));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), "{}", format(in_vec));
         else SUANPAN_COUT << format(in_vec);
     }
 
@@ -343,7 +340,7 @@ namespace suanpan {
         if(format_sv.back() != '\t' && format_sv.back() != '\n') output += '\n';
         output += format(in_vec);
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), output);
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), "{}", output);
         else SUANPAN_COUT << output;
     }
 

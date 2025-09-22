@@ -366,6 +366,9 @@
 /* Define to 1 if you have the <zlib.h> header file. */
 /* #undef H5_HAVE_ZLIB_H */
 
+/* Define to 1 if you have the <zlib.h> header file. */
+/* #undef H5_HAVE_ZLIBNG_H */
+
 /* Define to 1 if you have the `_getvideoconfig' function. */
 /* #undef H5_HAVE__GETVIDEOCONFIG */
 
@@ -416,16 +419,16 @@
 #define H5_PACKAGE_NAME "HDF5"
 
 /* Define to the full name and version of this package. */
-#define H5_PACKAGE_STRING "HDF5 1.14.5"
+#define H5_PACKAGE_STRING "HDF5 1.14.6"
 
 /* Define to the one symbol short name of this package. */
 #define H5_PACKAGE_TARNAME "hdf5"
 
 /* Define to the home page for this package. */
-#define H5_PACKAGE_URL "http://www.hdfgroup.org"
+#define H5_PACKAGE_URL "https://www.hdfgroup.org"
 
 /* Define to the version of this package. */
-#define H5_PACKAGE_VERSION "1.14.5"
+#define H5_PACKAGE_VERSION "1.14.6"
 
 /* Determine the maximum decimal precision in C */
 #define H5_PAC_C_MAX_REAL_PRECISION 
@@ -617,7 +620,7 @@
 /* #undef H5_USING_MEMCHECKER */
 
 /* Version number of package */
-#define H5_VERSION "1.14.5"
+#define H5_VERSION "1.14.6"
 
 /* Data accuracy is preferred to speed during data conversions */
 #define H5_WANT_DATA_ACCURACY 1

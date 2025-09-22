@@ -20,12 +20,14 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+*.spec
 *.u2d
 build
 Checker/.idea
 Checker/*.exe
 Checker/updater
 cmake-build*
+dist
 Document
 MSVC/Debug
 MSVC/Release

@@ -33,7 +33,6 @@
 void argument_parser(int, char**);
 
 void print_version();
-void print_helper();
 
 void cli_mode(const shared_ptr<Bead>&);
 
