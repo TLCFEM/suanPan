@@ -74,7 +74,7 @@ find "$TMP_DIR/tbb-install/lib" -name "*.so" -exec cp -P {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.30-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.30-$RUNNER_IMAGE_NAME-32.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
