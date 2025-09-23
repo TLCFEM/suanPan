@@ -140,6 +140,8 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 	}
 
 	fmt.Printf("\nPlease note the following:\n")
+	fmt.Printf("  `amd64` represents x86_64 Intel architecture.\n")
+	fmt.Printf("  `arm64` represents ARM64/AAarch64 architecture, not applicable to Windows.\n")
 	fmt.Printf("  `mkl` uses oneMKL that has the best performance on Intel platforms.\n")
 	fmt.Printf("      Please use `mkl` version on Intel platforms.\n")
 	fmt.Printf("  `aocl` uses AMD Optimizing CPU Libraries (AOCL) that has the best performance on AMD platforms.\n")
@@ -148,10 +150,10 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 	fmt.Printf("      Always prefer `mkl` and `aocl` versions if they are available.\n")
 	fmt.Printf("  `vtk` uses VTK for visualisation.\n")
 	fmt.Printf("      Visualisation may be useful when it comes to post-processing, but it requires OpenGL support. Please make sure the corresponding packages are installed.\n")
-	fmt.Printf("  `no-avx` disables AVX2.\n")
-	fmt.Printf("      For CPUs that do not support AVX2, please use this version.\n")
-	fmt.Printf("  `large` is targeting amd64 architecture (Intel CPUs).\n")
-	fmt.Printf("  `xlarge` is targeting arm64 architecture (Apple silicon CPUs).\n")
+	fmt.Printf("  `avx`/`no-avx` enables/disables AVX2, not applicable to `arm64` builds.\n")
+	fmt.Printf("      For CPUs that do not support AVX2, please use the `no-avx` version.\n")
+	fmt.Printf("  `mpi` enables distributed parallelism.\n")
+	fmt.Printf("  `ilp64` enables 64-bit integer for indexing (default is 32-bit), not well tested, extensive testing is welcome.\n")
 	fmt.Printf("\nDownload the new version:\n")
 
 	var package_array []string
@@ -160,7 +162,7 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 	case "windows":
 		package_array = getPackageList(release, []string{"win"})
 	case "linux":
-		package_array = getPackageList(release, []string{"linux", "ubuntu"})
+		package_array = getPackageList(release, []string{"linux" })
 	case "darwin":
 		package_array = getPackageList(release, []string{"macos"})
 	}

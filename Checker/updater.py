@@ -55,7 +55,7 @@ def check_version(_major: int, _minor: int, _patch: int):
     if sys.platform.startswith("win32"):
         version_list = [x for x in assets if "win" in x]
     elif sys.platform.startswith("linux"):
-        version_list = [x for x in assets if "linux" in x or "ubuntu" in x]
+        version_list = [x for x in assets if "linux" in x]
     elif sys.platform.startswith("darwin"):
         version_list = [x for x in assets if "mac" in x]
 

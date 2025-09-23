@@ -107,7 +107,12 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
-          file_name="suanPan-${{ matrix.os }}"
+          file_name="suanPan-linux"
+          if [ "${{ matrix.os }}" != *"arm"* ]; then
+            file_name+="-amd64"
+          else
+            file_name+="-arm64"
+          fi
           if [ "${{ matrix.build }}" == "Debug" ]; then
             file_name+="-debug"
           else
@@ -209,7 +214,7 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
-          file_name="suanPan-${{ matrix.os }}-release-gcc-avx-vtk-mkl-mpi.tar.gz"
+          file_name="suanPan-linux-amd64-release-gcc-avx-vtk-mkl-mpi.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
@@ -272,6 +277,8 @@ jobs:
         run: |
           cp updater build/dist/bin
           file_name="suanPan-${{ matrix.os }}"
+          file_name="${file_name//xlarge/arm64}"
+          file_name="${file_name//large/amd64}"
           if [ "${{ matrix.build }}" == "Debug" ]; then
             file_name+="-debug"
           else
@@ -280,6 +287,9 @@ jobs:
           file_name+="-${{ matrix.compiler }}"
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
+          fi
+          if [ "${{ matrix.os }}" != *"xlarge"* ]; then
+            file_name+="-avx"
           fi
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
