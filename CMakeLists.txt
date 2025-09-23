@@ -114,7 +114,6 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
             "/usr/local/opt/libomp/lib/"
         )
         message(NOTICE "On macOS, make sure `libomp` is installed.")
-        message(NOTICE "Dependencies are not bundled, please check `Script/mac-dependency.sh` for more details.")
     endif ()
 endif ()
 
@@ -124,6 +123,9 @@ endif ()
 
 if (NOT SP_AMD64)
     set(SP_EXTERNAL_LIB_PATH "${SP_EXTERNAL_LIB_PATH}-arm")
+    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Libs/${SP_EXTERNAL_LIB_PATH}")
+        message(NOTICE "Dependencies are not bundled and not downloaded, please check `Script/mac-dependency.sh` or `Script/linux-dependency.sh` for more details.")
+    endif ()
 endif ()
 
 link_directories(Libs/${SP_EXTERNAL_LIB_PATH})
