@@ -224,7 +224,7 @@ jobs:
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
           fi
-          if [ "${{ matrix.os }}" != *"xlarge"* ]; then
+          if [[ "${{ matrix.os }}" != *"xlarge"* ]]; then
             file_name+="-avx"
           fi
           file_name+=".tar.gz"
