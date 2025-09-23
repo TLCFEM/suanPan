@@ -20,14 +20,17 @@ package main
 import (
 	"archive/tar"
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -46,34 +49,43 @@ func main() {
 				break
 			}
 		}
-	} else {
-		fetch()
+	} else if err := fetch(); err != nil {
+		log.Printf("Error: %v", err)
 	}
 }
 
-func fetch() {
+type Asset struct {
+	Name string `json:"name"`
+}
+
+type Release struct {
+	TagName string  `json:"tag_name"`
+	Assets  []Asset `json:"assets"`
+}
+
+func fetch() error {
 	client := &http.Client{
 		Timeout: 2 * time.Second,
 	}
 
-	response, err := client.Get(URL)
+	response, err := client.Get("https://api.github.com/repos/TLCFEM/suanPan/releases/latest")
 	if err != nil {
-		return
+		return err
 	}
 	defer response.Body.Close()
 
-	html, _ := io.ReadAll(response.Body)
-
-	regex, _ := regexp.Compile(`suanPan-v(\d)\.(\d)\.?(\d?)`)
-
-	newVersion := string(regex.Find(html))
+	var release Release
+	if err := json.NewDecoder(response.Body).Decode(&release); err != nil {
+		return err
+	}
 
 	fromMain := len(os.Args) > 1
 
 	if fromMain {
 		fmt.Printf("Checking new version, delete/rename file updater/updater.exe or execute with '-nu' flag if not wanted.\n")
 
-		number := regex.FindStringSubmatch(newVersion)
+		regex, _ := regexp.Compile(`suanPan-v(\d)\.(\d)\.?(\d?)`)
+		number := regex.FindStringSubmatch(release.TagName)
 
 		newMajor, _ := strconv.Atoi(number[1])
 		newMinor, _ := strconv.Atoi(number[2])
@@ -86,34 +98,50 @@ func fetch() {
 		currentVersion, _ := strconv.Atoi(os.Args[1])
 
 		if 100*newMajor+10*newMinor+newPatch <= currentVersion {
-			return
+			return nil
 		}
 	} else {
 		fmt.Printf("Downloading the latest version.\n")
 	}
 
-	downloadLatestVersion(newVersion, fromMain)
+	return downloadLatestVersion(release, fromMain)
 }
 
-func downloadLatestVersion(versionString string, fromMain bool) {
+func getPackageList(release Release, platforms []string) []string {
+	var package_list []string
+	for _, asset := range release.Assets {
+		for _, platform := range platforms {
+			if strings.Contains(asset.Name, platform) {
+				package_list = append(package_list, asset.Name)
+				break
+			}
+		}
+	}
+	sort.Strings(package_list)
+	return package_list
+}
+
+func downloadLatestVersion(release Release, fromMain bool) error {
 	cos := runtime.GOOS
 
 	if cos != "windows" && cos != "linux" && cos != "darwin" {
-		return
+		return nil
 	}
 
-	fmt.Printf("Found new version %s, you can download it using this updater, or using package managers.\nDo you want to download now? [y/N] ", versionString)
+	fmt.Printf("Found new version %s, you can download it using this updater, or using package managers.\nDo you want to download now? [y/N] ", release.TagName)
 	var downloadSwitch string
 	_, err := fmt.Scanln(&downloadSwitch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if len(downloadSwitch) == 0 || (downloadSwitch[0] != 'y' && downloadSwitch[0] != 'Y') {
-		return
+		return nil
 	}
 
 	fmt.Printf("\nPlease note the following:\n")
+	fmt.Printf("  `amd64` represents x86_64 Intel architecture.\n")
+	fmt.Printf("  `arm64` represents ARM64/AAarch64 architecture, not applicable to Windows.\n")
 	fmt.Printf("  `mkl` uses oneMKL that has the best performance on Intel platforms.\n")
 	fmt.Printf("      Please use `mkl` version on Intel platforms.\n")
 	fmt.Printf("  `aocl` uses AMD Optimizing CPU Libraries (AOCL) that has the best performance on AMD platforms.\n")
@@ -122,52 +150,21 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 	fmt.Printf("      Always prefer `mkl` and `aocl` versions if they are available.\n")
 	fmt.Printf("  `vtk` uses VTK for visualisation.\n")
 	fmt.Printf("      Visualisation may be useful when it comes to post-processing, but it requires OpenGL support. Please make sure the corresponding packages are installed.\n")
-	fmt.Printf("  `no-avx` disables AVX2.\n")
-	fmt.Printf("      For CPUs that do not support AVX2, please use this version.\n")
-	fmt.Printf("  `large` is targeting amd64 architecture (Intel CPUs).\n")
-	fmt.Printf("  `xlarge` is targeting arm64 architecture (Apple silicon CPUs).\n")
+	fmt.Printf("  `avx`/`no-avx` enables/disables AVX2, not applicable to `arm64` builds.\n")
+	fmt.Printf("      For CPUs that do not support AVX2, please use the `no-avx` version.\n")
+	fmt.Printf("  `mpi` enables distributed parallelism.\n")
+	fmt.Printf("  `ilp64` enables 64-bit integer for indexing (default is 32-bit), not well tested, extensive testing is welcome.\n")
 	fmt.Printf("\nDownload the new version:\n")
 
 	var package_array []string
 
 	switch cos {
 	case "windows":
-		package_array = []string{
-			"suanPan-win-mkl-no-avx.zip",
-			"suanPan-win-mkl-vtk-no-avx.zip",
-			"suanPan-win-mkl-vtk.zip",
-			"suanPan-win-mkl.zip",
-			"suanPan-win-openblas-no-avx.7z",
-			"suanPan-win-openblas-vtk-no-avx.7z",
-			"suanPan-win-openblas-vtk.7z",
-			"suanPan-win-openblas.7z",
-		}
+		package_array = getPackageList(release, []string{"win"})
 	case "linux":
-		package_array = []string{
-			"suanPan-linux-mkl-no-avx.tar.gz",
-			"suanPan-linux-mkl-vtk-no-avx.tar.gz",
-			"suanPan-linux-mkl-vtk.tar.gz",
-			"suanPan-linux-mkl.tar.gz",
-			"suanPan-linux-aocl-no-avx.tar.gz",
-			"suanPan-linux-aocl-vtk-no-avx.tar.gz",
-			"suanPan-linux-aocl-vtk.tar.gz",
-			"suanPan-linux-aocl.tar.gz",
-			"suanPan-linux-openblas-no-avx.tar.gz",
-			"suanPan-linux-openblas-vtk-no-avx.tar.gz",
-			"suanPan-linux-openblas-vtk.tar.gz",
-			"suanPan-linux-openblas.tar.gz",
-		}
+		package_array = getPackageList(release, []string{"linux" })
 	case "darwin":
-		package_array = []string{
-			"suanPan-macos-14-large-openblas-vtk.tar.gz",
-			"suanPan-macos-14-large-openblas.tar.gz",
-			"suanPan-macos-15-large-openblas-vtk.tar.gz",
-			"suanPan-macos-15-large-openblas.tar.gz",
-			"suanPan-macos-14-xlarge-openblas-vtk.tar.gz",
-			"suanPan-macos-14-xlarge-openblas.tar.gz",
-			"suanPan-macos-15-xlarge-openblas-vtk.tar.gz",
-			"suanPan-macos-15-xlarge-openblas.tar.gz",
-		}
+		package_array = getPackageList(release, []string{"macos"})
 	}
 
 	for i, v := range package_array {
@@ -178,39 +175,39 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 	downloadOption := 0
 	_, err = fmt.Scanf("%d", &downloadOption)
 	if err != nil {
-		return
+		return err
 	}
 
 	if downloadOption >= len(package_array) || downloadOption < 0 {
-		return
+		return nil
 	}
 
 	fileName := package_array[downloadOption]
-	link := URL + "/download/" + versionString + "/" + fileName
+	link := URL + "/download/" + release.TagName + "/" + fileName
 
 	fmt.Printf("Downloading files...\n")
 
 	response, err := http.Get(link)
 	if err != nil {
-		return
+		return err
 	}
 	defer response.Body.Close()
 
 	parentPath := filepath.Clean(filepath.Join(".", ".."))
 	absPath, err := filepath.Abs(filepath.Join(parentPath, fileName))
 	if err != nil {
-		return
+		return err
 	}
 
 	storage, err := os.Create(absPath)
 	if err != nil {
-		return
+		return err
 	}
 	defer storage.Close()
 
 	_, err = io.Copy(storage, response.Body)
 	if err != nil {
-		return
+		return err
 	}
 
 	fmt.Printf("Downloaded %s\n", absPath)
@@ -228,21 +225,21 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 			var unpackSwitch string
 			_, err := fmt.Scanln(&unpackSwitch)
 			if err != nil {
-				return
+				return err
 			}
 
 			if len(unpackSwitch) == 0 || (unpackSwitch[0] != 'y' && unpackSwitch[0] != 'Y') {
-				return
+				return nil
 			}
 
 			fmt.Printf("Overwriting the parent folder.\n")
 			if err := unpack(absPath, parentPath); err != nil {
-				return
+				return err
 			}
 
 			selfPath, tmpPath, err := copySelf()
 			if err != nil {
-				return
+				return err
 			}
 
 			cmd := exec.Command(tmpPath, "--rename", selfPath)
@@ -251,6 +248,8 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 			cmd.Start()
 		}
 	}
+
+	return nil
 }
 
 func unpack(src, dest string) error {

@@ -15,7 +15,6 @@ ignore:
   - "Include"
   - "MSVC"
   - "Recorder/OutputType.cpp"
-  - "Toolbox/amd-src"
   - "Toolbox/arpack-src"
   - "Toolbox/feast-src"
   - "Toolbox/superlu-src"

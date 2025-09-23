@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------
-# mac-dependency.sh
+# linux-dependency.sh
 #
-# Downloads and extracts prebuilt library dependencies for macOS runners,
+# Downloads and extracts prebuilt library dependencies for Linux runners,
 # organizing them into the appropriate target directory based on the runner
 # image name.
 #
 # Usage:
-#   ./mac-dependency.sh <runner-image-name>
+#   ./linux-dependency.sh <runner-image-name>
 #
 #   <runner-image-name>: The name of the GitHub Actions runner image
-#                        (one of macos-14-large, macos-14-xlarge, macos-15-large, macos-15-xlarge).
+#                        (one of ubuntu-22.04, ubuntu-22.04-arm).
 #
 # What it does:
 #   1. Checks that exactly one argument is provided.
 #   2. Sets the target directory:
-#        - If the runner image name contains "xlarge", uses ../Libs/mac-arm.
-#        - Otherwise, uses ../Libs/mac.
+#        - If the runner image name contains "arm", uses ../Libs/linux-arm.
+#        - Otherwise, uses ../Libs/linux.
 #   3. Removes and recreates the target directory.
 #   4. Downloads and extracts:
 #        - HDF5: Copies all .a files from the extracted lib directory.
-#        - TBB:  Copies all .dylib files from the extracted tbb-install/lib directory.
-#        - OpenBLAS: Copies all .dylib files.
+#        - TBB:  Copies all .so files from the extracted tbb-install/lib directory.
+#        - OpenBLAS: Copies libopenblas.a file.
 #   5. Cleans up temporary directories.
 #
 # Requirements:
@@ -45,14 +45,17 @@ fi
 
 RUNNER_IMAGE_NAME="$1"
 
-if [[ "$RUNNER_IMAGE_NAME" == *"xlarge"* ]]; then
-    TARGET_DIR="$(dirname "$0")/../Libs/mac-arm"
+if [[ "$RUNNER_IMAGE_NAME" == *"arm"* ]]; then
+    TARGET_DIR="$(dirname "$0")/../Libs/linux-arm"
 else
-    TARGET_DIR="$(dirname "$0")/../Libs/mac"
+    TARGET_DIR="$(dirname "$0")/../Libs/linux"
 fi
 
-rm -rf "$TARGET_DIR"
-mkdir -p "$TARGET_DIR"
+if [ -d "$TARGET_DIR" ]; then
+    find "$TARGET_DIR" -mindepth 1 ! -name '*aocl*' -delete
+else
+    mkdir -p "$TARGET_DIR"
+fi
 
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-1.14.6-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
@@ -70,17 +73,17 @@ TMP_DIR="$(mktemp -d)"
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
-find "$TMP_DIR/tbb-install/lib" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
+find "$TMP_DIR/tbb-install/lib" -name "lib*" -exec cp -P {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.30-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.30-$RUNNER_IMAGE_NAME-32.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
-find "$TMP_DIR" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
+cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
 
 rm -rf "$TMP_DIR"
 
