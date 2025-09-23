@@ -108,7 +108,7 @@ jobs:
         run: |
           cp updater build/dist/bin
           file_name="suanPan-linux"
-          if [ "${{ matrix.os }}" != *"arm"* ]; then
+          if [[ "${{ matrix.os }}" != *"arm"* ]]; then
             file_name+="-amd64"
           else
             file_name+="-arm64"
@@ -123,7 +123,7 @@ jobs:
           else
             file_name+="-intel"
           fi
-          if [ "${{ matrix.os }}" != *"arm"* ]; then
+          if [[ "${{ matrix.os }}" != *"arm"* ]]; then
             if [ "${{ matrix.avx }}" == "ON" ]; then
               file_name+="-avx"
             else
