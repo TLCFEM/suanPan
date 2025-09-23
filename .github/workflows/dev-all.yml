@@ -170,7 +170,6 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   linux-dev-mpi:
-    needs:  linux-dev
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
