@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -48,8 +49,8 @@ func main() {
 				break
 			}
 		}
-	} else {
-		fetch()
+	} else if err := fetch(); err != nil {
+		log.Printf("Error: %v", err)
 	}
 }
 
@@ -62,20 +63,20 @@ type Release struct {
 	Assets  []Asset `json:"assets"`
 }
 
-func fetch() {
+func fetch() error {
 	client := &http.Client{
 		Timeout: 2 * time.Second,
 	}
 
 	response, err := client.Get("https://api.github.com/repos/TLCFEM/suanPan/releases/latest")
 	if err != nil {
-		return
+		return err
 	}
 	defer response.Body.Close()
 
 	var release Release
 	if err := json.NewDecoder(response.Body).Decode(&release); err != nil {
-		return
+		return err
 	}
 
 	fromMain := len(os.Args) > 1
@@ -97,13 +98,13 @@ func fetch() {
 		currentVersion, _ := strconv.Atoi(os.Args[1])
 
 		if 100*newMajor+10*newMinor+newPatch <= currentVersion {
-			return
+			return nil
 		}
 	} else {
 		fmt.Printf("Downloading the latest version.\n")
 	}
 
-	downloadLatestVersion(release, fromMain)
+	return downloadLatestVersion(release, fromMain)
 }
 
 func getPackageList(release Release, platforms []string) []string {
@@ -120,22 +121,22 @@ func getPackageList(release Release, platforms []string) []string {
 	return package_list
 }
 
-func downloadLatestVersion(release Release, fromMain bool) {
+func downloadLatestVersion(release Release, fromMain bool) error {
 	cos := runtime.GOOS
 
 	if cos != "windows" && cos != "linux" && cos != "darwin" {
-		return
+		return nil
 	}
 
 	fmt.Printf("Found new version %s, you can download it using this updater, or using package managers.\nDo you want to download now? [y/N] ", release.TagName)
 	var downloadSwitch string
 	_, err := fmt.Scanln(&downloadSwitch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if len(downloadSwitch) == 0 || (downloadSwitch[0] != 'y' && downloadSwitch[0] != 'Y') {
-		return
+		return nil
 	}
 
 	fmt.Printf("\nPlease note the following:\n")
@@ -172,11 +173,11 @@ func downloadLatestVersion(release Release, fromMain bool) {
 	downloadOption := 0
 	_, err = fmt.Scanf("%d", &downloadOption)
 	if err != nil {
-		return
+		return err
 	}
 
 	if downloadOption >= len(package_array) || downloadOption < 0 {
-		return
+		return nil
 	}
 
 	fileName := package_array[downloadOption]
@@ -186,25 +187,25 @@ func downloadLatestVersion(release Release, fromMain bool) {
 
 	response, err := http.Get(link)
 	if err != nil {
-		return
+		return err
 	}
 	defer response.Body.Close()
 
 	parentPath := filepath.Clean(filepath.Join(".", ".."))
 	absPath, err := filepath.Abs(filepath.Join(parentPath, fileName))
 	if err != nil {
-		return
+		return err
 	}
 
 	storage, err := os.Create(absPath)
 	if err != nil {
-		return
+		return err
 	}
 	defer storage.Close()
 
 	_, err = io.Copy(storage, response.Body)
 	if err != nil {
-		return
+		return err
 	}
 
 	fmt.Printf("Downloaded %s\n", absPath)
@@ -222,21 +223,21 @@ func downloadLatestVersion(release Release, fromMain bool) {
 			var unpackSwitch string
 			_, err := fmt.Scanln(&unpackSwitch)
 			if err != nil {
-				return
+				return err
 			}
 
 			if len(unpackSwitch) == 0 || (unpackSwitch[0] != 'y' && unpackSwitch[0] != 'Y') {
-				return
+				return nil
 			}
 
 			fmt.Printf("Overwriting the parent folder.\n")
 			if err := unpack(absPath, parentPath); err != nil {
-				return
+				return err
 			}
 
 			selfPath, tmpPath, err := copySelf()
 			if err != nil {
-				return
+				return err
 			}
 
 			cmd := exec.Command(tmpPath, "--rename", selfPath)
@@ -245,6 +246,8 @@ func downloadLatestVersion(release Release, fromMain bool) {
 			cmd.Start()
 		}
 	}
+
+	return nil
 }
 
 func unpack(src, dest string) error {
