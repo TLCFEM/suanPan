@@ -13,6 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import json
 import re
 import sys
 from os.path import abspath
@@ -20,17 +21,17 @@ from urllib.request import urlopen
 
 
 def check_version(_major: int, _minor: int, _patch: int):
-    BASE_URL: str = "https://github.com/TLCFEM/suanPan/releases"
-
     try:
-        with urlopen(BASE_URL, timeout=10) as request:
-            html = request.read()
+        with urlopen(
+            "https://api.github.com/repos/TLCFEM/suanPan/releases/latest", timeout=10
+        ) as response:
+            data = json.load(response)
+            tag_name = data["tag_name"]
+            assets = [asset["name"] for asset in data["assets"]]
     except Exception:
         return
 
-    version = re.search(r"suanPan-v(\d)\.(\d)\.?(\d)?", html.decode("utf-8"))
-
-    if not version:
+    if not (version := re.search(r"suanPan-v(\d)\.(\d)\.?(\d)?", tag_name)):
         return
 
     new_major = int(version.group(1))
@@ -43,7 +44,7 @@ def check_version(_major: int, _minor: int, _patch: int):
     ):
         return
 
-    result = input(f"New version {version.group(0)} available, download now? [y/N] ")
+    result = input(f"New version {tag_name} available, download now? [y/N] ")
 
     if result == "" or result[0] != "y" and result[0] != "Y":
         return
@@ -52,46 +53,13 @@ def check_version(_major: int, _minor: int, _patch: int):
 
     version_list = []
     if sys.platform.startswith("win32"):
-        version_list = [
-            "suanPan-win-mkl-no-avx.zip",
-            "suanPan-win-mkl-vtk-no-avx.zip",
-            "suanPan-win-mkl-vtk.zip",
-            "suanPan-win-mkl.zip",
-            "suanPan-win-openblas-no-avx.7z",
-            "suanPan-win-openblas-vtk-no-avx.7z",
-            "suanPan-win-openblas-vtk.7z",
-            "suanPan-win-openblas.7z",
-        ]
+        version_list = [x for x in assets if "win" in x]
     elif sys.platform.startswith("linux"):
-        version_list = [
-            "suanPan-ubuntu-22.04-mkl-no-avx.tar.gz",
-            "suanPan-ubuntu-22.04-mkl-vtk-no-avx.tar.gz",
-            "suanPan-ubuntu-22.04-mkl-vtk.tar.gz",
-            "suanPan-ubuntu-22.04-mkl.tar.gz",
-            "suanPan-ubuntu-22.04-aocl-no-avx.tar.gz",
-            "suanPan-ubuntu-22.04-aocl-vtk-no-avx.tar.gz",
-            "suanPan-ubuntu-22.04-aocl-vtk.tar.gz",
-            "suanPan-ubuntu-22.04-aocl.tar.gz",
-            "suanPan-ubuntu-22.04-openblas-no-avx.tar.gz",
-            "suanPan-ubuntu-22.04-openblas-vtk-no-avx.tar.gz",
-            "suanPan-ubuntu-22.04-openblas-vtk.tar.gz",
-            "suanPan-ubuntu-22.04-openblas.tar.gz",
-            "suanPan-ubuntu-22.04-arm-openblas-no-avx.tar.gz",
-            "suanPan-ubuntu-22.04-arm-openblas-vtk-no-avx.tar.gz",
-            "suanPan-ubuntu-22.04-arm-openblas-vtk.tar.gz",
-            "suanPan-ubuntu-22.04-arm-openblas.tar.gz",
-        ]
+        version_list = [x for x in assets if "linux" in x or "ubuntu" in x]
     elif sys.platform.startswith("darwin"):
-        version_list = [
-            "suanPan-macos-14-large-openblas-vtk.tar.gz",
-            "suanPan-macos-14-large-openblas.tar.gz",
-            "suanPan-macos-15-large-openblas-vtk.tar.gz",
-            "suanPan-macos-15-large-openblas.tar.gz",
-            "suanPan-macos-14-xlarge-openblas-vtk.tar.gz",
-            "suanPan-macos-14-xlarge-openblas.tar.gz",
-            "suanPan-macos-15-xlarge-openblas-vtk.tar.gz",
-            "suanPan-macos-15-xlarge-openblas.tar.gz",
-        ]
+        version_list = [x for x in assets if "mac" in x]
+
+    version_list.sort()
 
     for index, item in enumerate(version_list):
         print(f"  [{index}] {item}")
@@ -110,8 +78,8 @@ def check_version(_major: int, _minor: int, _patch: int):
 
     try:
         file_name = version_list[result]
-        url: str = f"{BASE_URL}/download/{version.group(0)}/{file_name}"
-        with urlopen(url, timeout=10) as source, open(file_name, "wb") as destination:
+        url: str = f"https://github.com/TLCFEM/suanPan/releases/download/{tag_name}/{file_name}"
+        with urlopen(url, timeout=30) as source, open(file_name, "wb") as destination:
             destination.write(source.read())
         print(f"\nDownloaded {abspath(file_name)}.")
         print("You can manually extract the archive to overwrite the existing folder.")

@@ -20,6 +20,7 @@ package main
 import (
 	"archive/tar"
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,6 +29,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -51,29 +53,38 @@ func main() {
 	}
 }
 
+type Asset struct {
+	Name string `json:"name"`
+}
+
+type Release struct {
+	TagName string  `json:"tag_name"`
+	Assets  []Asset `json:"assets"`
+}
+
 func fetch() {
 	client := &http.Client{
 		Timeout: 2 * time.Second,
 	}
 
-	response, err := client.Get(URL)
+	response, err := client.Get("https://api.github.com/repos/TLCFEM/suanPan/releases/latest")
 	if err != nil {
 		return
 	}
 	defer response.Body.Close()
 
-	html, _ := io.ReadAll(response.Body)
-
-	regex, _ := regexp.Compile(`suanPan-v(\d)\.(\d)\.?(\d?)`)
-
-	newVersion := string(regex.Find(html))
+	var release Release
+	if err := json.NewDecoder(response.Body).Decode(&release); err != nil {
+		return
+	}
 
 	fromMain := len(os.Args) > 1
 
 	if fromMain {
 		fmt.Printf("Checking new version, delete/rename file updater/updater.exe or execute with '-nu' flag if not wanted.\n")
 
-		number := regex.FindStringSubmatch(newVersion)
+		regex, _ := regexp.Compile(`suanPan-v(\d)\.(\d)\.?(\d?)`)
+		number := regex.FindStringSubmatch(release.TagName)
 
 		newMajor, _ := strconv.Atoi(number[1])
 		newMinor, _ := strconv.Atoi(number[2])
@@ -92,17 +103,31 @@ func fetch() {
 		fmt.Printf("Downloading the latest version.\n")
 	}
 
-	downloadLatestVersion(newVersion, fromMain)
+	downloadLatestVersion(release, fromMain)
 }
 
-func downloadLatestVersion(versionString string, fromMain bool) {
+func getPackageList(release Release, platforms []string) []string {
+	var package_list []string
+	for _, asset := range release.Assets {
+		for _, platform := range platforms {
+			if strings.Contains(asset.Name, platform) {
+				package_list = append(package_list, asset.Name)
+				break
+			}
+		}
+	}
+	sort.Strings(package_list)
+	return package_list
+}
+
+func downloadLatestVersion(release Release, fromMain bool) {
 	cos := runtime.GOOS
 
 	if cos != "windows" && cos != "linux" && cos != "darwin" {
 		return
 	}
 
-	fmt.Printf("Found new version %s, you can download it using this updater, or using package managers.\nDo you want to download now? [y/N] ", versionString)
+	fmt.Printf("Found new version %s, you can download it using this updater, or using package managers.\nDo you want to download now? [y/N] ", release.TagName)
 	var downloadSwitch string
 	_, err := fmt.Scanln(&downloadSwitch)
 	if err != nil {
@@ -132,46 +157,11 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 
 	switch cos {
 	case "windows":
-		package_array = []string{
-			"suanPan-win-mkl-no-avx.zip",
-			"suanPan-win-mkl-vtk-no-avx.zip",
-			"suanPan-win-mkl-vtk.zip",
-			"suanPan-win-mkl.zip",
-			"suanPan-win-openblas-no-avx.7z",
-			"suanPan-win-openblas-vtk-no-avx.7z",
-			"suanPan-win-openblas-vtk.7z",
-			"suanPan-win-openblas.7z",
-		}
+		package_array = getPackageList(release, []string{"win"})
 	case "linux":
-		package_array = []string{
-			"suanPan-ubuntu-22.04-mkl-no-avx.tar.gz",
-			"suanPan-ubuntu-22.04-mkl-vtk-no-avx.tar.gz",
-			"suanPan-ubuntu-22.04-mkl-vtk.tar.gz",
-			"suanPan-ubuntu-22.04-mkl.tar.gz",
-			"suanPan-ubuntu-22.04-aocl-no-avx.tar.gz",
-			"suanPan-ubuntu-22.04-aocl-vtk-no-avx.tar.gz",
-			"suanPan-ubuntu-22.04-aocl-vtk.tar.gz",
-			"suanPan-ubuntu-22.04-aocl.tar.gz",
-			"suanPan-ubuntu-22.04-openblas-no-avx.tar.gz",
-			"suanPan-ubuntu-22.04-openblas-vtk-no-avx.tar.gz",
-			"suanPan-ubuntu-22.04-openblas-vtk.tar.gz",
-			"suanPan-ubuntu-22.04-openblas.tar.gz",
-			"suanPan-ubuntu-22.04-arm-openblas-no-avx.tar.gz",
-			"suanPan-ubuntu-22.04-arm-openblas-vtk-no-avx.tar.gz",
-			"suanPan-ubuntu-22.04-arm-openblas-vtk.tar.gz",
-			"suanPan-ubuntu-22.04-arm-openblas.tar.gz",
-		}
+		package_array = getPackageList(release, []string{"linux", "ubuntu"})
 	case "darwin":
-		package_array = []string{
-			"suanPan-macos-14-large-openblas-vtk.tar.gz",
-			"suanPan-macos-14-large-openblas.tar.gz",
-			"suanPan-macos-15-large-openblas-vtk.tar.gz",
-			"suanPan-macos-15-large-openblas.tar.gz",
-			"suanPan-macos-14-xlarge-openblas-vtk.tar.gz",
-			"suanPan-macos-14-xlarge-openblas.tar.gz",
-			"suanPan-macos-15-xlarge-openblas-vtk.tar.gz",
-			"suanPan-macos-15-xlarge-openblas.tar.gz",
-		}
+		package_array = getPackageList(release, []string{"macos"})
 	}
 
 	for i, v := range package_array {
@@ -190,7 +180,7 @@ func downloadLatestVersion(versionString string, fromMain bool) {
 	}
 
 	fileName := package_array[downloadOption]
-	link := URL + "/download/" + versionString + "/" + fileName
+	link := URL + "/download/" + release.TagName + "/" + fileName
 
 	fmt.Printf("Downloading files...\n")
 
