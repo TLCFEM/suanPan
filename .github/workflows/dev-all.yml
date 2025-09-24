@@ -297,7 +297,7 @@ jobs:
           tar czf $file_name -C build/dist .
       - name: Test
         run: |
-          export DYLD_LIBRARY_PATH="/Users/runner/work/suanPan/suanPan/build/dist/lib/;$(brew --prefix gcc@13)/lib/gcc/13/
+          export DYLD_LIBRARY_PATH="/Users/runner/work/suanPan/suanPan/build/dist/lib/;$(brew --prefix gcc@13)/lib/gcc/13/"
           ./build/dist/bin/suanPan -v
       - name: Upload
         uses: actions/upload-artifact@v4
