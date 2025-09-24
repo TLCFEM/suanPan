@@ -267,6 +267,7 @@ jobs:
             export CXX=g++-13
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
