@@ -503,7 +503,7 @@ if (SP_BUILD_DLL_EXAMPLE)
 endif ()
 
 # need further work
-install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION "." DESTINATION bin COMPONENT Main)
+install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION bin COMPONENT Main)
 install(FILES
         CHANGELOG.md
         Enhancement/suanPan.sublime-completions
