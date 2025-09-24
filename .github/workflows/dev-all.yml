@@ -299,9 +299,6 @@ jobs:
         run: |
           export DYLD_LIBRARY_PATH=/Users/runner/work/suanPan/suanPan/build/dist/lib/
           ./build/dist/bin/suanPan -v
-      - name: SSH
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
