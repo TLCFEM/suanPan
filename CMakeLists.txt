@@ -639,7 +639,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
     fixup_bundle(
         \"\${CMAKE_INSTALL_PREFIX}/bin/suanPan\"
         \"\"
-        \"\"
+        \"/usr/local/lib;/usr/local/opt/llvm/lib;/usr/local/opt/libomp/lib/;\${CMAKE_INSTALL_PREFIX}/lib/\"
     )" COMPONENT Main)
 endif ()
 
