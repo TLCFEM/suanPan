@@ -239,12 +239,10 @@ jobs:
         uses: actions/checkout@v5
         with:
           submodules: recursive
-      - name: SSH
-        uses: mxschmitt/action-tmate@v3
       - name: Compile
         run: |
           brew install glfw glew go libomp
-          export HOMEBREW_GCC_PREFIX=$(dirname "$(find "$(brew --prefix gcc@13)" -type f -name gcc | head -n1)")
+          export HOMEBREW_GCC_PREFIX=$(brew --prefix gcc@13)/lib/gcc/13/
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
