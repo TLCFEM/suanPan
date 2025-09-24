@@ -257,7 +257,7 @@ jobs:
             fi
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-            -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
+            -DCMAKE_PREFIX_PATH=$(brew --prefix libomp);$HOMEBREW_GCC_PREFIX \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
@@ -267,7 +267,7 @@ jobs:
             export CXX=g++-13
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-            -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
+            -DCMAKE_PREFIX_PATH=$HOMEBREW_GCC_PREFIX \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
