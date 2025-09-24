@@ -644,7 +644,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
     fixup_bundle(
         \"\${CMAKE_INSTALL_PREFIX}/bin/suanPan.app/Contents/MacOS/suanPan\"
         \"\"
-        \"/usr/local/lib;/usr/local/opt/llvm/lib;/usr/local/opt/libomp/lib/;\${CMAKE_INSTALL_PREFIX}/lib/;\$ENV{HOMEBREW_GCC_PREFIX}\"
+        \"/usr/local/lib;/usr/local/opt/llvm/lib;/usr/local/opt/libomp/lib/;/opt/homebrew/opt/libomp/lib;\${CMAKE_INSTALL_PREFIX}/lib/;\$ENV{HOMEBREW_GCC_PREFIX}\"
     )" COMPONENT Main)
 endif ()
 
