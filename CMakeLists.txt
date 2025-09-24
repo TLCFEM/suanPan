@@ -410,7 +410,7 @@ else ()
     endif ()
 endif ()
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} MACOSX_BUNDLE
         suanPan.cpp
         Include/catch/catch_amalgamated.cpp
         Include/fmt/src/format.cc
@@ -503,7 +503,7 @@ if (SP_BUILD_DLL_EXAMPLE)
 endif ()
 
 # need further work
-install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT Main)
+install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION "." DESTINATION bin COMPONENT Main)
 install(FILES
         CHANGELOG.md
         Enhancement/suanPan.sublime-completions
@@ -637,7 +637,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
     include(BundleUtilities)
     set(BU_CHMOD_BUNDLE_ITEMS TRUE)
     fixup_bundle(
-        \"\${CMAKE_INSTALL_PREFIX}/bin/suanPan\"
+        \"\${CMAKE_INSTALL_PREFIX}/suanPan.app/Contents/MacOS/suanPan\"
         \"\"
         \"/usr/local/lib;/usr/local/opt/llvm/lib;/usr/local/opt/libomp/lib/;\${CMAKE_INSTALL_PREFIX}/lib/;\$ENV{HOMEBREW_GCC_PREFIX}\"
     )" COMPONENT Main)
