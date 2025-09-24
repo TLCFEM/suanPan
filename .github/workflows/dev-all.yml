@@ -239,8 +239,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           submodules: recursive
-      - name: SSH
-        uses: mxschmitt/action-tmate@v3
       - name: Compile
         run: |
           brew install glfw glew go libomp
