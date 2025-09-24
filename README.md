@@ -262,7 +262,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.10.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.6
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.30
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
