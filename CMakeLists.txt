@@ -450,7 +450,7 @@ add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 
 if (CMAKE_Fortran_COMPILER)
-    find_package(OpenMP COMPONENTS Fortran)
+    find_package(OpenMP REQUIRED COMPONENTS Fortran)
     link_libraries(OpenMP::OpenMP_Fortran)
     message(STATUS "Linking additional arpack feast libraries.")
     add_subdirectory(Toolbox/arpack-src)
