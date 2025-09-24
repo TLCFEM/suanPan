@@ -107,11 +107,13 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
             "/usr/local/include"
             "/usr/local/opt/llvm/include"
             "/usr/local/opt/libomp/include"
+            "/opt/homebrew/opt/libomp/include"
         )
         link_directories(
             "/usr/local/lib"
             "/usr/local/opt/llvm/lib"
             "/usr/local/opt/libomp/lib/"
+            "/opt/homebrew/opt/libomp/lib"
         )
         message(NOTICE "On macOS, make sure `libomp` is installed.")
     endif ()
