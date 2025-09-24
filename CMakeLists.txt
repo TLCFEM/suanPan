@@ -633,18 +633,13 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
     install(FILES ${VC_FILES} DESTINATION bin COMPONENT Main)
 endif ()
 if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    execute_process(
-        COMMAND bash -c "dirname \"$(find \"$(brew --prefix gcc@13)\" -type f -name gcc | head -n1)\""
-        OUTPUT_VARIABLE HOMEBREW_GCC_PREFIX
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
     install(CODE "
     include(BundleUtilities)
     set(BU_CHMOD_BUNDLE_ITEMS TRUE)
     fixup_bundle(
         \"\${CMAKE_INSTALL_PREFIX}/bin/suanPan\"
         \"\"
-        \"/usr/local/lib;/usr/local/opt/llvm/lib;/usr/local/opt/libomp/lib/;\${CMAKE_INSTALL_PREFIX}/lib/;\${HOMEBREW_GCC_PREFIX}\"
+        \"/usr/local/lib;/usr/local/opt/llvm/lib;/usr/local/opt/libomp/lib/;\${CMAKE_INSTALL_PREFIX}/lib/;\$ENV{HOMEBREW_GCC_PREFIX}\"
     )" COMPONENT Main)
 endif ()
 
