@@ -193,6 +193,7 @@ jobs:
       - name: Compile
         run: |
           brew install glfw glew go libomp
+          export HOMEBREW_GCC_PREFIX=$(brew --prefix gcc@13)/lib/gcc/13/
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
@@ -209,6 +210,7 @@ jobs:
           -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
           -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
           -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+          -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \

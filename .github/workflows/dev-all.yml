@@ -242,6 +242,7 @@ jobs:
       - name: Compile
         run: |
           brew install glfw glew go libomp
+          export HOMEBREW_GCC_PREFIX=$(brew --prefix gcc@13)/lib/gcc/13/
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
@@ -256,7 +257,7 @@ jobs:
             fi
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-            -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
@@ -266,6 +267,7 @@ jobs:
             export CXX=g++-13
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \

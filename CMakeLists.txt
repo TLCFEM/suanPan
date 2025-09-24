@@ -107,11 +107,13 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
             "/usr/local/include"
             "/usr/local/opt/llvm/include"
             "/usr/local/opt/libomp/include"
+            "/opt/homebrew/opt/libomp/include"
         )
         link_directories(
             "/usr/local/lib"
             "/usr/local/opt/llvm/lib"
             "/usr/local/opt/libomp/lib/"
+            "/opt/homebrew/opt/libomp/lib"
         )
         message(NOTICE "On macOS, make sure `libomp` is installed.")
     endif ()
@@ -445,12 +447,8 @@ add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 
 if (CMAKE_Fortran_COMPILER)
-    find_package(OpenMP QUIET COMPONENTS Fortran)
-    if (OpenMP_Fortran_FOUND)
-        link_libraries(OpenMP::OpenMP_Fortran)
-    else ()
-        message(WARNING "OpenMP for Fortran not found, the corresponding Fortran code will be compiled without OpenMP support.")
-    endif ()
+    find_package(OpenMP REQUIRED COMPONENTS Fortran)
+    link_libraries(OpenMP::OpenMP_Fortran)
     message(STATUS "Linking additional arpack feast libraries.")
     add_subdirectory(Toolbox/arpack-src)
     add_subdirectory(Toolbox/feast-src)
@@ -632,6 +630,16 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
     file(GLOB VC_FILES Libs/vc/*.dll)
     install(FILES ${VC_FILES} DESTINATION bin COMPONENT Main)
 endif ()
+# if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+#     install(CODE "
+#     include(BundleUtilities)
+#     set(BU_CHMOD_BUNDLE_ITEMS TRUE)
+#     fixup_bundle(
+#         \"\${CMAKE_INSTALL_PREFIX}/bin/suanPan.app/Contents/MacOS/suanPan\"
+#         \"\"
+#         \"/usr/local/lib;/usr/local/opt/llvm/lib;/usr/local/opt/libomp/lib/;/opt/homebrew/opt/libomp/lib;\${CMAKE_INSTALL_PREFIX}/lib/;\$ENV{HOMEBREW_GCC_PREFIX}\"
+#     )" COMPONENT Main)
+# endif ()
 
 message(STATUS "Flags and Dirs:")
 message(STATUS "suanPan CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
@@ -640,15 +648,15 @@ if (CMAKE_Fortran_COMPILER)
 endif ()
 
 message(STATUS "Link Dirs:")
-get_property(SDIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
-foreach (SDIRA ${SDIR})
-    message(STATUS "${SDIRA}")
+get_property(SP_LINK_DIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
+foreach (SDIR ${SP_LINK_DIR})
+    message(STATUS "${SDIR}")
 endforeach ()
 
 message(STATUS "Include Dirs:")
-get_property(SDIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach (SDIRA ${SDIR})
-    message(STATUS "${SDIRA}")
+get_property(SP_INCLUDE_DIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach (SDIR ${SP_INCLUDE_DIR})
+    message(STATUS "${SDIR}")
 endforeach ()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")

@@ -81,6 +81,7 @@ wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
 find "$TMP_DIR" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
+# cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
 
 rm -rf "$TMP_DIR"
 
