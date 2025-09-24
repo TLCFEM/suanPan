@@ -359,7 +359,7 @@ else ()
 
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -w -fallow-argument-mismatch")
     if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-libgfortran -static-libgcc -static-libquadmath")
     endif ()
     if (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
