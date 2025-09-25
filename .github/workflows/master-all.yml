@@ -220,6 +220,7 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
+          ./Script/mac-patcher.sh build/dist
           file_name="suanPan-${{ matrix.os }}-openblas"
           file_name="${file_name//xlarge/arm64}"
           file_name="${file_name//large/amd64}"
