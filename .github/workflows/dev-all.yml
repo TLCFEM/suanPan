@@ -22,7 +22,7 @@ jobs:
         avx: [ OFF ]
         vtk: [ ON, OFF ]
         mkl: [ OFF ]
-        aocl: [ OFF ]
+        aocl: [ ON, OFF ]
         exclude:
           - build: Debug
             mkl: ON
