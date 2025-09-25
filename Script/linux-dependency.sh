@@ -34,27 +34,27 @@
 set -e
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <runner-image-name>"
-    exit 1
+  echo "Usage: $0 <runner-image-name>"
+  exit 1
 fi
 
-if ! command -v wget &> /dev/null; then
-    echo "Error: wget is not installed. Please install wget and try again."
-    exit 1
+if ! command -v wget &>/dev/null; then
+  echo "Error: wget is not installed. Please install wget and try again."
+  exit 1
 fi
 
 RUNNER_IMAGE_NAME="$1"
 
 if [[ "$RUNNER_IMAGE_NAME" == *"arm"* ]]; then
-    TARGET_DIR="$(dirname "$0")/../Libs/linux-arm"
+  TARGET_DIR="$(dirname "$0")/../Libs/linux-arm"
 else
-    TARGET_DIR="$(dirname "$0")/../Libs/linux"
+  TARGET_DIR="$(dirname "$0")/../Libs/linux"
 fi
 
 if [ -d "$TARGET_DIR" ]; then
-    find "$TARGET_DIR" -mindepth 1 ! -name '*aocl*' -delete
+  find "$TARGET_DIR" -mindepth 1 ! -name '*aocl*' -delete
 else
-    mkdir -p "$TARGET_DIR"
+  mkdir -p "$TARGET_DIR"
 fi
 
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-1.14.6-$RUNNER_IMAGE_NAME.tar.gz"
