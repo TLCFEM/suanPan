@@ -169,6 +169,9 @@ jobs:
           files: ./build/coverage.info
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: SSH
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
   linux-dev-mpi:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
