@@ -52,7 +52,7 @@ else
 fi
 
 if [ -d "$TARGET_DIR" ]; then
-  find "$TARGET_DIR" -mindepth 1 ! -name '*aocl*' -delete
+  find "$TARGET_DIR" -maxdepth 1 ! -name "libflame.a" ! -name "libblis-mt.a" ! -name "libaoclutils.a" -delete
 else
   mkdir -p "$TARGET_DIR"
 fi

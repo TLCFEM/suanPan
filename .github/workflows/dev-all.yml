@@ -150,6 +150,7 @@ jobs:
           path: ${{ env.ARTIFACT }}
       - name: Test
         run: |
+          ldd build/dist/bin/suanPan
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
           ./build/dist/bin/suanPan -v
       - name: Coverage
@@ -169,6 +170,9 @@ jobs:
           files: ./build/coverage.info
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: SSH
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
   linux-dev-mpi:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
