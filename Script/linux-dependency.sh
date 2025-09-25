@@ -51,8 +51,10 @@ else
   TARGET_DIR="$(dirname "$0")/../Libs/linux"
 fi
 
+TARGET_DIR="$(realpath "$TARGET_DIR")"
+
 if [ -d "$TARGET_DIR" ]; then
-  find "$TARGET_DIR" -maxdepth 1 ! -name "libflame.a" ! -name "libblis-mt.a" ! -name "libaoclutils.a" -delete
+  find "$TARGET_DIR" -mindepth 1 ! -name "libflame.a" ! -name "libblis-mt.a" ! -name "libaoclutils.a" -delete
 else
   mkdir -p "$TARGET_DIR"
 fi
