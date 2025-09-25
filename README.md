@@ -121,6 +121,11 @@ The archives of binaries are released under [Release](https://github.com/TLCFEM/
 1. `suanpan-win-mkl-vtk.zip` is the portable archive.
 2. `suanpan-win-mkl-vtk.exe` is the installer.
 
+> [!NOTE]
+> The executables are **not** signed.
+> Windows Defender SmartScreen may block execution.
+> Click `More info` -> `Run anyway` to execute the application.
+
 #### Chocolatey
 
 The binaries, which are compiled with Intel MKL and VTK, are available
@@ -190,6 +195,15 @@ flatpak install suanPan
 # define alias
 echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 ```
+
+### macOS
+
+The portable binary archives are provided for macOS 14 and 15 with both `amd64` and `arm64` architectures.
+The archives themselves are self-contained.
+
+> [!NOTE]
+> The binaries are **not** signed.
+> It is necessary to run `xattr -dr com.apple.quarantine` to remove extra attribute.
 
 ### Docker
 
