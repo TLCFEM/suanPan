@@ -14,9 +14,7 @@ echo "Bundling all required dylibs for binaries and existing dylibs..."
 copy_deps() {
 	local target="$1"
 	otool -L "$target" | tail -n +2 | awk '{print $1}' | while read -r dep; do
-		if [[ "$dep" == /usr/lib/* || "$dep" == /System/* ]]; then
-			continue
-		fi
+		[[ "$dep" == /usr/lib/* || "$dep" == /System/* ]] && continue
 		depname=$(basename "$dep")
 		if [[ -f "$dep" && ! -f "$LIB_DIR/$depname" ]]; then
 			echo "Copying $dep to $LIB_DIR/"
@@ -29,71 +27,41 @@ copy_deps() {
 while :; do
 	rm -f "$LIB_DIR/.new_dylib_copied"
 
-	for binfile in "$BIN_DIR"/*; do
-		[ -f "$binfile" ] || continue
-		if ! file "$binfile" | grep -q 'Mach-O'; then
-			continue
-		fi
-		copy_deps "$binfile"
-	done
-
-	for libfile in "$LIB_DIR"/*.dylib; do
-		[ -f "$libfile" ] || continue
-		if ! file "$libfile" | grep -q 'Mach-O'; then
-			continue
-		fi
-		copy_deps "$libfile"
+	for target in "$BIN_DIR"/* "$LIB_DIR"/*.dylib; do
+		[[ -f "$target" ]] && file "$target" | grep -q 'Mach-O' && copy_deps "$target"
 	done
 
 	[ -f "$LIB_DIR/.new_dylib_copied" ] || break
 done
 
-for binfile in "$BIN_DIR"/*; do
-	[ -f "$binfile" ] || continue
-	if ! file "$binfile" | grep -q 'Mach-O'; then
-		continue
-	fi
-	otool -L "$binfile" | tail -n +2 | awk '{print $1}' | while read -r dylib; do
-		if [[ "$dylib" == /usr/lib/* || "$dylib" == /System/* ]]; then
-			continue
-		fi
-		libname=$(basename "$dylib")
-		install_name_tool -change "$dylib" "@executable_path/../lib/$libname" "$binfile"
+for target in "$BIN_DIR"/*; do
+	[[ -f "$target" ]] && file "$target" | grep -q 'Mach-O' || continue
+	echo "Patching $target"
+	otool -L "$target" | tail -n +2 | awk '{print $1}' | while read -r dep; do
+		[[ "$dep" == /usr/lib/* || "$dep" == /System/* ]] && continue
+		install_name_tool -change "$dep" "@executable_path/../lib/$(basename "$dep")" "$target"
 	done
 done
 
-for libfile in "$LIB_DIR"/*.dylib; do
-	[ -f "$libfile" ] || continue
-	if ! file "$libfile" | grep -q 'Mach-O'; then
-		continue
-	fi
-	echo "Patching $libfile"
-	install_name_tool -id "@loader_path/$(basename "$libfile")" "$libfile"
-	otool -L "$libfile" | tail -n +2 | awk '{print $1}' | while read -r dep; do
-		if [[ "$dep" == /usr/lib/* || "$dep" == /System/* ]]; then
-			continue
-		fi
+for target in "$LIB_DIR"/*.dylib; do
+	[[ -f "$target" ]] && file "$target" | grep -q 'Mach-O' || continue
+	echo "Patching $target"
+	install_name_tool -id "@loader_path/$(basename "$target")" "$target"
+	otool -L "$target" | tail -n +2 | awk '{print $1}' | while read -r dep; do
+		[[ "$dep" == /usr/lib/* || "$dep" == /System/* ]] && continue
 		depname=$(basename "$dep")
 		if [[ -f "$LIB_DIR/$depname" ]]; then
-			install_name_tool -change "$dep" "@loader_path/$depname" "$libfile"
+			install_name_tool -change "$dep" "@loader_path/$depname" "$target"
 		fi
 	done
 done
 
 echo "Verification:"
 
-for binfile in "$BIN_DIR"/*; do
-	[ -f "$binfile" ] || continue
-	if ! file "$binfile" | grep -q 'Mach-O'; then
-		continue
-	fi
-	echo "== $binfile =="
-	otool -L "$binfile"
-done
-
-for libfile in "$LIB_DIR"/*.dylib; do
-	echo "== $libfile =="
-	otool -L "$libfile"
+for target in "$BIN_DIR"/* "$LIB_DIR"/*.dylib; do
+	[[ -f "$target" ]] && file "$target" | grep -q 'Mach-O' || continue
+	echo "== $target =="
+	otool -L "$target"
 done
 
 if [ $# -gt 0 ]; then
