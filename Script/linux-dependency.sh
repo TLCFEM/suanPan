@@ -73,7 +73,7 @@ TMP_DIR="$(mktemp -d)"
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
-find "$TMP_DIR/tbb-install/lib" -name "lib*" -exec cp -P {} "$TARGET_DIR" \;
+find "$TMP_DIR/tbb-install/lib" -name "lib*so*" -exec cp -P {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
