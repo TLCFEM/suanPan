@@ -162,7 +162,7 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 	case "windows":
 		package_array = getPackageList(release, []string{"win"})
 	case "linux":
-		package_array = getPackageList(release, []string{"linux" })
+		package_array = getPackageList(release, []string{"linux"})
 	case "darwin":
 		package_array = getPackageList(release, []string{"macos"})
 	}
@@ -193,7 +193,12 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 	}
 	defer response.Body.Close()
 
-	parentPath := filepath.Clean(filepath.Join(".", ".."))
+	var parentPath string
+	if cos != "windows" {
+		parentPath = filepath.Clean(filepath.Join(".", ".."))
+	} else {
+		parentPath = filepath.Clean(".")
+	}
 	absPath, err := filepath.Abs(filepath.Join(parentPath, fileName))
 	if err != nil {
 		return err
