@@ -17,7 +17,7 @@ jobs:
         avx: [ ON, OFF ]
         vtk: [ ON, OFF ]
         mkl: [ ON, OFF ]
-        aocl: [ ON, OFF ]
+        aocl: [ OFF ]
         exclude:
           - mkl: ON
             aocl: ON
