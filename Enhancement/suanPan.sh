@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 CURRENT_PATH="$(dirname "$(readlink -f "$0")")"
 
 TARGET_PATH="$HOME/.local/bin"

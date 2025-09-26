@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ $# -eq 0 ]; then
   echo "Usage: $0 <build_folder> <log_file>"
   exit 1

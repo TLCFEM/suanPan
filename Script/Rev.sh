@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 git --version >/dev/null 2>&1
 
 if [ ! $? ]; then

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ $# -ne 3 ]; then
   echo "This script updates all version tags in the source tree."
   echo "Please invoke under the root folder of the project."

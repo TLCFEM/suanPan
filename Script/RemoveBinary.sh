@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 shopt -s nullglob
 
 SCRIPT_DIR=$(realpath "$0")
