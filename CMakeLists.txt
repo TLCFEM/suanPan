@@ -68,7 +68,7 @@ else ()
     set(SP_OPENBLAS_PATH "" CACHE FILEPATH "Manually assign the path to the OpenBLAS library, if not set, the bundled version will be used.")
 endif ()
 if (SP_ENABLE_AOCL)
-    set(SP_AOCL_PATH "Libs/linux/libflame.a;Libs/linux/libblis-mt.a;Libs/linux/libaoclutils.a" CACHE FILEPATH "AOCL all-in-one library path.")
+    set(SP_AOCL_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libflame.a;${CMAKE_SOURCE_DIR}/Libs/linux/libblis-mt.a;${CMAKE_SOURCE_DIR}/Libs/linux/libaoclutils.a" CACHE FILEPATH "AOCL all-in-one library path.")
     add_compile_definitions(SUANPAN_AOCL)
 endif ()
 
