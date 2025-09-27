@@ -81,20 +81,23 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
+        auto split = 1., dsplit = 0.;
+
         q = current_q + gamma;
-        qm = current_qm + gamma;
-        qr = current_qr + gamma;
+        qm = current_qm + split * gamma;
+        qr = current_qr + (1. - split) * gamma;
 
         const auto exp_iso_m = saturation_iso_m * std::exp(-m_iso_m * qm);
         const auto ym = initial_iso_m + saturation_iso_m + k_iso_m * qm - exp_iso_m;
-        const auto pympg = k_iso_m + m_iso_m * exp_iso_m;
+        const auto dym = k_iso_m + m_iso_m * exp_iso_m;
         const auto exp_iso_r = saturation_iso_r * std::exp(-m_iso_r * qr);
         const auto yr = initial_iso_r + saturation_iso_r + k_iso_r * qr - exp_iso_r;
-        const auto pyrpg = k_iso_r + m_iso_r * exp_iso_r;
+        const auto dyr = k_iso_r + m_iso_r * exp_iso_r;
 
         auto y = ym + yr;
-        auto pypg = pympg + pyrpg;
-        if(y < 0.) y = pypg = 0.;
+        auto pypg = (dym - dyr) * split + dyr;
+        auto pypz = (dym - dyr) * gamma * dsplit;
+        if(y < 0.) y = pypg = pypz = 0.;
 
         const auto exp_kin = saturation_kin * std::exp(-m_kin * q);
         auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
@@ -133,7 +136,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         residual(1) = z - start_z - gamma * avg_rate;
 
         jacobian(0, 0) = n * ((z - 1.) * (y * dd + sum_d * pypg) - (a * dalpha + sum_alpha * da)) - elastic - z * pypg;
-        jacobian(0, 1) = n * y * sum_d - y;
+        jacobian(0, 1) = n * sum_d * (y + z * pypz - pypz) - y - z * pypz;
 
         jacobian(1, 0) = -avg_rate;
         jacobian(1, 1) = 1. - u * gamma * trial_ratio[1];
