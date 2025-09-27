@@ -46,6 +46,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Viscosity/Viscosity01.cpp
         Viscosity/Viscosity02.cpp
         vonMises/ArmstrongFrederick1D.cpp
+        vonMises/Balloon1D.cpp
         vonMises/Bilinear1D.cpp
         vonMises/BilinearMises1D.cpp
         vonMises/CustomGurson1D.cpp
