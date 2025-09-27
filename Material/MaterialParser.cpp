@@ -291,6 +291,39 @@ namespace {
         return_obj = std::make_unique<AxisymmetricElastic>(tag, elastic_modulus, poissons_ratio, density);
     }
 
+    void new_balloon1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        vec p{2E5, 2E3, 4, 4E2, 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
+        if(!get_optional_input(command, p)) {
+            suanpan_error("Valid inputs are required.\n");
+            return;
+        }
+
+        auto density = 0.;
+        if(!command.eof() && !get_input(command, density)) {
+            suanpan_error("A valid density is required.\n");
+            return;
+        }
+
+        DataBalloon1D para{
+            p(0),                         // elastic modulus
+            p(1),                         // u
+            static_cast<unsigned>(p(2)),  // zr memory size
+            {p(3), p(4), p(5), p(6)},     // monotonic isotropic
+            {p(7), p(8), p(9), p(10)},    // cyclic isotropic
+            {p(11), p(12), p(13), p(14)}, // kinematic
+            {{p(15), p(16)}},             // back stress saturation
+            {{p(17), p(18)}},             // similarity saturation
+        };
+
+        return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
+    }
+
     void new_bilinear1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -3476,6 +3509,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
+    else if(is_equal(material_id, "Balloon1D")) new_balloon1d(new_material, command);
     else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
