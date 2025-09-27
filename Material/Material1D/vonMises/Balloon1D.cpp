@@ -84,6 +84,10 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         }
 
         auto split = 1., dsplit = 0.;
+        if(const auto max_zr = trial_zr.max(); z < max_zr) {
+            split = z / max_zr;
+            dsplit = 1. / max_zr;
+        }
 
         const auto [ym, dym] = iso_m(qm = current_qm + split * gamma);
         const auto [yr, dyr] = iso_r(qr = current_qr + (1. - split) * gamma);
