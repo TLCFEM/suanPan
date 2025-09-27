@@ -61,8 +61,7 @@ struct DataBalloon1D {
         [[nodiscard]] std::pair<double, double> operator()(const double q) const {
             const auto exp_term = saturation * std::exp(-rate * q);
             const auto y = initial + saturation + linear * q - exp_term;
-            const auto dy = linear + rate * exp_term;
-            return y < 0. ? std::make_pair(0., 0.) : std::make_pair(y, dy);
+            return y < 0. ? std::make_pair(0., 0.) : std::make_pair(y, linear + rate * exp_term);
         }
     };
 
