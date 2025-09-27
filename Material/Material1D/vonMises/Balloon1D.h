@@ -49,7 +49,8 @@ struct DataBalloon1D {
     };
 
     const double elastic; // elastic modulus
-    const double initial_iso, k_iso, saturation_iso, m_iso;
+    const double initial_iso_m, k_iso_m, saturation_iso_m, m_iso_m;
+    const double initial_iso_r, k_iso_r, saturation_iso_r, m_iso_r;
     const double initial_kin, k_kin, saturation_kin, m_kin;
     const double u;
 
