@@ -84,7 +84,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         }
 
         auto split = 1., dsplit = 0.;
-        if(const auto max_zr = trial_zr.max(); z < max_zr) {
+        if(const auto max_zr = trial_zr.max(); z < max_zr && k > -1.) {
             if(k >= 1.) split = 0.;
             else {
                 const auto x = z / max_zr;
