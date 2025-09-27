@@ -101,11 +101,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         auto y = ym + yr;
         auto pypg = (dym - dyr) * split + dyr;
         auto pypz = (dym - dyr) * gamma * dsplit;
-        if(y < 0.) {
-            y = 0.;
-            pypg = 0.;
-            pypz = 0.;
-        }
+        if(y < 0.) y = pypg = pypz = 0.;
 
         const auto [a, da] = kin(q = current_q + gamma, true);
 
