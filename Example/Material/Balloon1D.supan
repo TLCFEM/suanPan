@@ -1,0 +1,33 @@
+node 1 0 0
+node 2 1 0
+
+material Balloon1D 1 \
+2E5 5E3 1E-2 2 \
+200 2E4 0 0 \
+0 0 0 0 \
+5E3 1. \
+100 0.7
+
+element T2D2 1 1 2 1 1
+
+fix2 1 1 1
+fix2 2 2 1 2
+
+amplitude Sine 2 1 1
+
+disp 1 2 2e-3 1 2
+
+step static 1 10
+set fixed_step_size 1
+set ini_step_size 1E-2
+set symm_mat 0
+
+converger RelIncreDisp 1 1E-10 10 1
+
+analyze
+
+peek element 1
+
+reset
+clear
+exit
