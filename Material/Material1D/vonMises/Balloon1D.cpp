@@ -109,6 +109,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         if(1u == counter) {
             const auto s = (y * sum_d + a * sum_alpha - current_stress(0)) / (trial_stress(0) - current_stress(0));
             if(s >= 1.) {
+                // elastic unloading
                 z = ((trial_stress(0) - a * sum_alpha) / y - sum_d) / (n - sum_d);
                 return SUANPAN_SUCCESS;
             }
