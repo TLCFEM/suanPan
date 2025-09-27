@@ -37,7 +37,7 @@ Balloon1D::Balloon1D(const unsigned T, DataBalloon1D&& D, const double R)
 int Balloon1D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic;
 
-    initialize_history(5u + static_cast<unsigned>(b.size() + c.size()));
+    initialize_history(6u + static_cast<unsigned>(b.size() + c.size()));
 
     return SUANPAN_SUCCESS;
 }
@@ -53,20 +53,21 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
 
     trial_history = current_history;
     trial_zr = current_zr;
-    const auto& current_q = current_history(1);
-    const auto& current_qm = current_history(2);
-    const auto& current_qr = current_history(3);
-    const auto& current_z = current_history(4);
+    const auto& current_q = current_history(2);
+    const auto& current_qm = current_history(3);
+    const auto& current_qr = current_history(4);
+    const auto& current_z = current_history(5);
     auto& iteration = trial_history(0);
-    auto& q = trial_history(1);
-    auto& qm = trial_history(2);
-    auto& qr = trial_history(3);
-    auto& z = trial_history(4);
+    auto& last_loading = trial_history(1);
+    auto& q = trial_history(2);
+    auto& qm = trial_history(3);
+    auto& qr = trial_history(4);
+    auto& z = trial_history(5);
 
-    const vec current_alpha(&current_history(5), b.size(), false, true);
-    const vec current_d(&current_history(5 + b.size()), c.size(), false, true);
-    vec alpha(&trial_history(5), b.size(), false, true);
-    vec d(&trial_history(5 + b.size()), c.size(), false, true);
+    const vec current_alpha(&current_history(6), b.size(), false, true);
+    const vec current_d(&current_history(6 + b.size()), c.size(), false, true);
+    vec alpha(&trial_history(6), b.size(), false, true);
+    vec d(&trial_history(6 + b.size()), c.size(), false, true);
 
     iteration = 0.;
     auto gamma = 0., ref_error = 0.;
@@ -84,18 +85,14 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
 
         auto split = 1., dsplit = 0.;
 
-        q = current_q + gamma;
-        qm = current_qm + split * gamma;
-        qr = current_qr + (1. - split) * gamma;
-
-        const auto [ym, dym] = iso_m(qm);
-        const auto [yr, dyr] = iso_r(qr);
+        const auto [ym, dym] = iso_m(qm = current_qm + split * gamma);
+        const auto [yr, dyr] = iso_r(qr = current_qr + (1. - split) * gamma);
 
         const auto y = ym + yr;
         const auto pypg = (dym - dyr) * split + dyr;
         const auto pypz = (dym - dyr) * gamma * dsplit;
 
-        const auto [a, da] = kin(q);
+        const auto [a, da] = kin(q = current_q + gamma);
 
         vec bottom_alpha(b.size(), fill::none), bottom_d(c.size(), fill::none);
         for(auto I = 0llu; I < b.size(); ++I) bottom_alpha(I) = 1. + b[I].r() * gamma;
@@ -111,10 +108,12 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         if(1u == counter) {
             const auto s = (y * sum_d + a * sum_alpha - current_stress(0)) / (trial_stress(0) - current_stress(0));
             if(s >= 1.) {
+                last_loading = -1.;
                 // elastic unloading
                 z = ((trial_stress(0) - a * sum_alpha) / y - sum_d) / (n - sum_d);
                 return SUANPAN_SUCCESS;
             }
+            last_loading = 1.;
             if(s > 0.) start_z = 0.;
         }
 
