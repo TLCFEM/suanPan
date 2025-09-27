@@ -29,6 +29,7 @@
 #define BALLOON1D_H
 
 #include <Material/Material1D/Material1D.h>
+#include <numeric>
 
 struct DataBalloon1D {
     class Saturation {
