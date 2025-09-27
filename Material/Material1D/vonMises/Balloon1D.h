@@ -66,10 +66,10 @@ struct DataBalloon1D {
         }
     };
 
-    const double elastic; // elastic modulus
-    const double u;
-
-    const unsigned zr_size;
+    const double elastic;   // elastic modulus
+    const double u;         // z evolution rate
+    const double k;         // plastic strain split ratio
+    const unsigned zr_size; // memory size
 
     const Bound iso_m, iso_r, kin;
 

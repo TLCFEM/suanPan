@@ -298,8 +298,8 @@ namespace {
             return;
         }
 
-        vec p{2E5, 2E3, 4, 4E2, 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
-        if(!get_optional_input(command, p)) {
+        vec p(20);
+        if(!get_input(command, p)) {
             suanpan_error("Valid inputs are required.\n");
             return;
         }
@@ -313,12 +313,13 @@ namespace {
         DataBalloon1D para{
             p(0),                         // elastic modulus
             p(1),                         // u
-            static_cast<unsigned>(p(2)),  // zr memory size
-            {p(3), p(4), p(5), p(6)},     // monotonic isotropic
-            {p(7), p(8), p(9), p(10)},    // cyclic isotropic
-            {p(11), p(12), p(13), p(14)}, // kinematic
-            {{p(15), p(16)}},             // back stress saturation
-            {{p(17), p(18)}},             // similarity saturation
+            p(2),                         // split
+            static_cast<unsigned>(p(3)),  // zr memory size
+            {p(4), p(5), p(6), p(7)},     // monotonic isotropic
+            {p(8), p(9), p(10), p(11)},   // cyclic isotropic
+            {p(12), p(13), p(14), p(15)}, // kinematic
+            {{p(16), p(17)}},             // back stress saturation
+            {{p(18), p(19)}},             // similarity saturation
         };
 
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
