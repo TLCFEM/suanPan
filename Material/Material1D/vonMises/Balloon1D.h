@@ -48,13 +48,30 @@ struct DataBalloon1D {
         [[nodiscard]] double rb() const { return r() * b(); }
     };
 
+    class Bound {
+        const double initial, linear, saturation, rate;
+
+    public:
+        Bound(const double I, const double K, const double S, const double M)
+            : initial(I)
+            , linear(K)
+            , saturation(S)
+            , rate(M) {}
+
+        [[nodiscard]] std::pair<double, double> operator()(const double q) const {
+            const auto exp_term = saturation * std::exp(-rate * q);
+            const auto y = initial + saturation + linear * q - exp_term;
+            const auto dy = linear + rate * exp_term;
+            return y < 0. ? std::make_pair(0., 0.) : std::make_pair(y, dy);
+        }
+    };
+
     const double elastic; // elastic modulus
-    const double initial_iso_m, k_iso_m, saturation_iso_m, m_iso_m;
-    const double initial_iso_r, k_iso_r, saturation_iso_r, m_iso_r;
-    const double initial_kin, k_kin, saturation_kin, m_kin;
     const double u;
 
     const unsigned zr_size;
+
+    const Bound iso_m, iso_r, kin;
 
     const std::vector<Saturation> b, c;
 };

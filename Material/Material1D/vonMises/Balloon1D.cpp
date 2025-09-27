@@ -88,22 +88,14 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         qm = current_qm + split * gamma;
         qr = current_qr + (1. - split) * gamma;
 
-        const auto exp_iso_m = saturation_iso_m * std::exp(-m_iso_m * qm);
-        const auto ym = initial_iso_m + saturation_iso_m + k_iso_m * qm - exp_iso_m;
-        const auto dym = k_iso_m + m_iso_m * exp_iso_m;
-        const auto exp_iso_r = saturation_iso_r * std::exp(-m_iso_r * qr);
-        const auto yr = initial_iso_r + saturation_iso_r + k_iso_r * qr - exp_iso_r;
-        const auto dyr = k_iso_r + m_iso_r * exp_iso_r;
+        const auto [ym, dym] = iso_m(qm);
+        const auto [yr, dyr] = iso_r(qr);
 
-        auto y = ym + yr;
-        auto pypg = (dym - dyr) * split + dyr;
-        auto pypz = (dym - dyr) * gamma * dsplit;
-        if(y < 0.) y = pypg = pypz = 0.;
+        const auto y = ym + yr;
+        const auto pypg = (dym - dyr) * split + dyr;
+        const auto pypz = (dym - dyr) * gamma * dsplit;
 
-        const auto exp_kin = saturation_kin * std::exp(-m_kin * q);
-        auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
-        auto da = k_kin + m_kin * exp_kin;
-        if(a < 0.) a = da = 0.;
+        const auto [a, da] = kin(q);
 
         vec bottom_alpha(b.size(), fill::none), bottom_d(c.size(), fill::none);
         for(auto I = 0llu; I < b.size(); ++I) bottom_alpha(I) = 1. + b[I].r() * gamma;
