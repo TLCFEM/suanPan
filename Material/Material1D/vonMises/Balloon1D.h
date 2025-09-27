@@ -72,7 +72,7 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
 
     public:
         memory(const std::size_t size)
-            : buffer(size, 0.)
+            : buffer(std::max(std::size_t{1}, size), 0.)
             , head(0) {}
 
         auto& enqueue(const double value) {
@@ -93,7 +93,7 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
 
     memory current_zr{zr_size}, trial_zr{zr_size};
 
-    auto push_zr(const double zr) { return (trial_zr = current_zr).enqueue(zr).mean(); }
+    auto push_zr(const double zr) { return trial_zr.enqueue(zr).mean(); }
 
 public:
     Balloon1D(

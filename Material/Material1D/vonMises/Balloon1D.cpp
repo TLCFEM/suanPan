@@ -52,6 +52,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
     trial_history = current_history;
+    trial_zr = current_zr;
     const auto& current_q = current_history(1);
     const auto& current_qm = current_history(2);
     const auto& current_qr = current_history(3);
