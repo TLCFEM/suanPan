@@ -107,7 +107,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
 
         if(1u == counter) {
             const auto s = (y * sum_d + a * sum_alpha - current_stress(0)) / (trial_stress(0) - current_stress(0));
-            if(last_loading > 0. && s > 0.) trial_zr.enqueue(z);
+            if(std::signbit(last_loading) == std::signbit(s)) trial_zr.enqueue(z);
             if(s >= 1.) {
                 last_loading = -1.;
                 // elastic unloading
