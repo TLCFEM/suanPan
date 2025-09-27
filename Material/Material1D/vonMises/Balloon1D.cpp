@@ -85,10 +85,13 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
 
         auto split = 1., dsplit = 0.;
         if(const auto max_zr = trial_zr.max(); z < max_zr) {
-            const auto x = z / max_zr;
-            const auto denom = 1. + k - 2. * k * x;
-            split = (1. - k) / denom * x;
-            dsplit = (1. - k) / denom * (1. + k) / denom;
+            if(k >= 1.) split = 0.;
+            else {
+                const auto x = z / max_zr;
+                const auto denom = 1. + k - 2. * k * x;
+                split = (1. - k) / denom * x;
+                dsplit = (1. - k) / denom * (1. + k) / denom;
+            }
         }
 
         const auto [ym, dym] = iso_m(qm = current_qm + split * gamma);
