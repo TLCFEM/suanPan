@@ -59,10 +59,10 @@ struct DataBalloon1D {
             , saturation(S)
             , rate(M) {}
 
-        [[nodiscard]] std::pair<double, double> operator()(const double q) const {
+        [[nodiscard]] std::pair<double, double> operator()(const double q, const bool check_positive) const {
             const auto exp_term = saturation * std::exp(-rate * q);
             const auto y = initial + saturation + linear * q - exp_term;
-            return y < 0. ? std::make_pair(0., 0.) : std::make_pair(y, linear + rate * exp_term);
+            return y < 0. && check_positive ? std::make_pair(0., 0.) : std::make_pair(y, linear + rate * exp_term);
         }
     };
 

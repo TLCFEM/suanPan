@@ -94,14 +94,19 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             }
         }
 
-        const auto [ym, dym] = iso_m(qm = current_qm + split * gamma);
-        const auto [yr, dyr] = iso_r(qr = current_qr + (1. - split) * gamma);
+        const auto [ym, dym] = iso_m(qm = current_qm + split * gamma, false);
+        const auto [yr, dyr] = iso_r(qr = current_qr + (1. - split) * gamma, false);
 
-        const auto y = ym + yr;
-        const auto pypg = (dym - dyr) * split + dyr;
-        const auto pypz = (dym - dyr) * gamma * dsplit;
+        auto y = ym + yr;
+        auto pypg = (dym - dyr) * split + dyr;
+        auto pypz = (dym - dyr) * gamma * dsplit;
+        if(y < 0.) {
+            y = 0.;
+            pypg = 0.;
+            pypz = 0.;
+        }
 
-        const auto [a, da] = kin(q = current_q + gamma);
+        const auto [a, da] = kin(q = current_q + gamma, true);
 
         vec bottom_alpha(b.size(), fill::none), bottom_d(c.size(), fill::none);
         for(auto I = 0llu; I < b.size(); ++I) bottom_alpha(I) = 1. + b[I].r() * gamma;
