@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.10.0
-//  Generated: 2025-08-24 16:18:04.055916
+//  Catch v3.11.0
+//  Generated: 2025-09-30 10:49:11.225746
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -91,6 +91,9 @@
 
 #elif defined(linux) || defined(__linux) || defined(__linux__)
 #define CATCH_PLATFORM_LINUX
+
+#elif defined(__QNX__)
+#define CATCH_PLATFORM_QNX
 
 #elif defined(WIN32) || defined(__WIN32__) || defined(_WIN32) || defined(_MSC_VER) || defined(__MINGW32__)
 #define CATCH_PLATFORM_WINDOWS
@@ -296,11 +299,15 @@ _Pragma("clang diagnostic ignored \"-Wgnu-zero-variadic-macro-arguments\"")
 #endif
 
 // Universal Windows platform does not support SEH
-// Or console colours (or console at all...)
-#if defined(CATCH_PLATFORM_WINDOWS_UWP)
-#define CATCH_INTERNAL_CONFIG_NO_COLOUR_WIN32
-#else
+#if !defined(CATCH_PLATFORM_WINDOWS_UWP)
 #define CATCH_INTERNAL_CONFIG_WINDOWS_SEH
+#endif
+
+// Only some Windows platform families support the console
+#if defined(WINAPI_FAMILY_PARTITION)
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP | WINAPI_PARTITION_SYSTEM)
+#define CATCH_INTERNAL_CONFIG_NO_COLOUR_WIN32
+#endif
 #endif
 
 // MSVC traditional preprocessor needs some workaround for __VA_ARGS__
@@ -545,11 +552,9 @@ namespace Catch {
         IConfig const* m_config = nullptr;
         IResultCapture* m_resultCapture = nullptr;
 
-        CATCH_EXPORT static Context* currentContext;
+        CATCH_EXPORT static Context currentContext;
         friend Context& getCurrentMutableContext();
         friend Context const& getCurrentContext();
-        static void createContext();
-        friend void cleanUpContext();
 
     public:
         constexpr IResultCapture* getResultCapture() const {
@@ -565,14 +570,8 @@ namespace Catch {
     Context& getCurrentMutableContext();
 
     inline Context const& getCurrentContext() {
-        // We duplicate the logic from `getCurrentMutableContext` here,
-        // to avoid paying the call overhead in debug mode.
-        if(!Context::currentContext) { Context::createContext(); }
-        // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
-        return *Context::currentContext;
+        return Context::currentContext;
     }
-
-    void cleanUpContext();
 
     class SimplePcg32;
     SimplePcg32& sharedRng();
@@ -1019,10 +1018,9 @@ namespace Catch {
         virtual void benchmarkEnded(BenchmarkStats<> const& stats) = 0;
         virtual void benchmarkFailed(StringRef error) = 0;
 
-        virtual void pushScopedMessage(MessageInfo const& message) = 0;
-        virtual void popScopedMessage(MessageInfo const& message) = 0;
-
-        virtual void emplaceUnscopedMessage(MessageBuilder&& builder) = 0;
+        static void pushScopedMessage(MessageInfo&& message);
+        static void popScopedMessage(unsigned int messageId);
+        static void emplaceUnscopedMessage(MessageBuilder&& builder);
 
         virtual void handleFatalErrorCondition(StringRef message) = 0;
 
@@ -1041,7 +1039,18 @@ namespace Catch {
         virtual void exceptionEarlyReported() = 0;
     };
 
-    IResultCapture& getResultCapture();
+    namespace Detail {
+        [[noreturn]] void missingCaptureInstance();
+    }
+    inline IResultCapture& getResultCapture() {
+        if(auto* capture = getCurrentContext().getResultCapture()) {
+            return *capture;
+        }
+        else {
+            Detail::missingCaptureInstance();
+        }
+    }
+
 } // namespace Catch
 
 #endif // CATCH_INTERFACES_CAPTURE_HPP_INCLUDED
@@ -1855,7 +1864,9 @@ namespace Catch {
                 std::vector<double> deltas;
                 deltas.reserve(static_cast<size_t>(k));
                 for(size_t idx = 1; idx < points; ++idx) {
-                    deltas.push_back(static_cast<double>((times[idx] - times[idx - 1]).count()));
+                    deltas.push_back(static_cast<double>(
+                        (times[idx] - times[idx - 1]).count()
+                    ));
                 }
 
                 return deltas;
@@ -1887,8 +1898,10 @@ namespace Catch {
             }
             template<typename Clock>
             EnvironmentEstimate estimate_clock_cost(FDuration resolution) {
-                auto time_limit = (std::min)(resolution * clock_cost_estimation_tick_limit,
-                                             FDuration(clock_cost_estimation_time_limit));
+                auto time_limit = (std::min)(
+                    resolution * clock_cost_estimation_tick_limit,
+                    FDuration(clock_cost_estimation_time_limit)
+                );
                 auto time_clock = [](int k) {
                     return Detail::measure<Clock>([k] {
                                for(int i = 0; i < k; ++i) {
@@ -1905,7 +1918,10 @@ namespace Catch {
                 int nsamples = static_cast<int>(std::ceil(time_limit / r.elapsed));
                 times.reserve(static_cast<size_t>(nsamples));
                 for(int s = 0; s < nsamples; ++s) {
-                    times.push_back(static_cast<double>((time_clock(r.iterations) / r.iterations).count()));
+                    times.push_back(static_cast<double>(
+                        (time_clock(r.iterations) / r.iterations)
+                            .count()
+                    ));
                 }
                 return {
                     FDuration(mean(times.data(), times.data() + times.size())),
@@ -3642,6 +3658,8 @@ namespace Catch {
 
         std::vector<std::string> testsOrTags;
         std::vector<std::string> sectionsToRun;
+
+        std::string prematureExitGuardFilePath;
     };
 
     class Config : public IConfig {
@@ -3666,6 +3684,8 @@ namespace Catch {
         bool hasTestFilters() const override;
 
         bool showHelp() const;
+
+        std::string const& getExitGuardFilePath() const;
 
         // IConfig interface
         bool allowThrows() const override;
@@ -3787,6 +3807,7 @@ namespace Catch {
         std::string message;
         SourceLineInfo lineInfo;
         ResultWas::OfType type;
+        // The "ID" of the message, used to know when to remove it from reporter context.
         unsigned int sequence;
 
         DEPRECATED("Explicitly use the 'sequence' member instead")
@@ -3844,13 +3865,12 @@ namespace Catch {
         ScopedMessage(ScopedMessage&& old) noexcept;
         ~ScopedMessage();
 
-        MessageInfo m_info;
+        unsigned int m_messageId;
         bool m_moved = false;
     };
 
     class Capturer {
         std::vector<MessageInfo> m_messages;
-        IResultCapture& m_resultCapture;
         size_t m_captured = 0;
 
     public:
@@ -3896,7 +3916,7 @@ namespace Catch {
 
 ///////////////////////////////////////////////////////////////////////////////
 #define INTERNAL_CATCH_UNSCOPED_INFO(macroName, log) \
-    Catch::getResultCapture().emplaceUnscopedMessage(Catch::MessageBuilder(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info) << log)
+    Catch::IResultCapture::emplaceUnscopedMessage(Catch::MessageBuilder(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info) << log)
 
 #if defined(CATCH_CONFIG_PREFIX_MESSAGES) && !defined(CATCH_CONFIG_DISABLE)
 
@@ -7208,7 +7228,7 @@ namespace Catch {
 #define CATCH_VERSION_MACROS_HPP_INCLUDED
 
 #define CATCH_VERSION_MAJOR 3
-#define CATCH_VERSION_MINOR 10
+#define CATCH_VERSION_MINOR 11
 #define CATCH_VERSION_PATCH 0
 
 #endif // CATCH_VERSION_MACROS_HPP_INCLUDED
@@ -7606,9 +7626,10 @@ namespace Catch {
         class FilterGenerator final : public IGenerator<T> {
             GeneratorWrapper<T> m_generator;
             Predicate m_predicate;
+            static_assert(!std::is_reference<Predicate>::value, "This would most likely result in a dangling reference");
 
         public:
-            template<typename P = Predicate>
+            template<typename P>
             FilterGenerator(P&& pred, GeneratorWrapper<T>&& generator)
                 : m_generator(CATCH_MOVE(generator))
                 , m_predicate(CATCH_FORWARD(pred)) {
@@ -7638,7 +7659,7 @@ namespace Catch {
 
         template<typename T, typename Predicate>
         GeneratorWrapper<T> filter(Predicate&& pred, GeneratorWrapper<T>&& generator) {
-            return GeneratorWrapper<T>(Catch::Detail::make_unique<FilterGenerator<T, Predicate>>(CATCH_FORWARD(pred), CATCH_MOVE(generator)));
+            return GeneratorWrapper<T>(Catch::Detail::make_unique<FilterGenerator<T, typename std::remove_reference<Predicate>::type>>(CATCH_FORWARD(pred), CATCH_MOVE(generator)));
         }
 
         template<typename T>
@@ -9175,7 +9196,7 @@ namespace Catch {
 #define CATCH_TRAP() __asm__(".inst 0xde01")
 #endif
 
-#elif defined(CATCH_PLATFORM_LINUX)
+#elif defined(CATCH_PLATFORM_LINUX) || defined(CATCH_PLATFORM_QNX)
 // If we can use inline assembler, do it because this allows us to break
 // directly at the location of the failing check instead of breaking inside
 // raise() called from it, i.e. one stack frame below.
@@ -10225,11 +10246,6 @@ namespace Catch {
         void benchmarkStarting(BenchmarkInfo const& info) override;
         void benchmarkEnded(BenchmarkStats<> const& stats) override;
         void benchmarkFailed(StringRef error) override;
-
-        void pushScopedMessage(MessageInfo const& message) override;
-        void popScopedMessage(MessageInfo const& message) override;
-
-        void emplaceUnscopedMessage(MessageBuilder&& builder) override;
 
         std::string getCurrentTestName() const override;
 
@@ -11507,7 +11523,8 @@ namespace Catch {
 
             template<typename... MatcherTs, std::size_t... Idx>
             std::string describe_multi_matcher(StringRef combine, std::array<void const*, sizeof...(MatcherTs)> const& matchers, std::index_sequence<Idx...>) {
-                std::array<std::string, sizeof...(MatcherTs)> descriptions{{static_cast<MatcherTs const*>(matchers[Idx])->toString()...}};
+                std::array<std::string, sizeof...(MatcherTs)> descriptions{{static_cast<MatcherTs const*>(matchers[Idx])->toString()...
+                }};
 
                 return describe_multi_matcher(combine, descriptions.data(), descriptions.data() + descriptions.size());
             }
