@@ -200,10 +200,11 @@ echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 
 The portable binary archives are provided for macOS 14 and 15 with both `amd64` and `arm64` architectures.
 The archives themselves are self-contained.
+They can be successfully executed on earlier versions of macOS.
 
 > [!NOTE]
 > The binaries are **not** signed.
-> It is necessary to run `xattr -dr com.apple.quarantine` to remove extra attribute.
+> It is necessary to run `sudo xattr -dr com.apple.quarantine <folder/to/downloaded/archive>` to remove extra attribute.
 
 ### Docker
 
