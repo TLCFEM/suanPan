@@ -78,11 +78,6 @@ jobs:
           if [ "${{ matrix.compiler.c }}" == "icx" ]; then
             source /opt/intel/oneapi/setvars.sh
           fi
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            MT="OFF"
-          else
-            MT="ON"
-          fi
           go build Checker/updater.go
           ./Script/linux-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
@@ -93,7 +88,7 @@ jobs:
           -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_DLL_EXAMPLE=${{ env.COVERAGE }} \
-          -DSP_BUILD_PARALLEL=$MT \
+          -DSP_BUILD_PARALLEL=$([ "${{ matrix.build }}" = "Debug" ] && echo "OFF" || echo "ON") \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
           -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
@@ -103,7 +98,8 @@ jobs:
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config ${{ matrix.build }} -j $(nproc)
+          cmake --build . --target package
       - name: Pack
         run: |
           cp updater build/dist/bin
@@ -213,7 +209,8 @@ jobs:
           -DSP_ENABLE_VTK=ON \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config RelWithDebInfo -j $(nproc)
+          cmake --build . --target package
       - name: Pack
         run: |
           cp updater build/dist/bin
@@ -381,17 +378,10 @@ jobs:
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
           fi
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            file_name+=".zip"
-            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-            cd build/dist/bin
-            7z a -tzip ../../../$file_name ./*
-          else
-            file_name+=".7z"
-            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-            cd build/dist/bin
-            7z a ../../../$file_name ./*
-          fi
+          file_name+=".zip"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          cd build/dist/bin
+          7z a -tzip ../../../$file_name ./*
       - name: Test
         run: |
           build/dist/bin/suanPan.exe -v
@@ -462,10 +452,10 @@ jobs:
           if [ "${{ matrix.vtk }}" == "ON" ]; then
             file_name+="-vtk"
           fi
-          file_name+=".7z"
+          file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
-          7z a ../../../$file_name ./*
+          7z a -tzip ../../../$file_name ./*
       - name: Test
         run: |
           build/dist/bin/suanPan.exe -v

@@ -10,56 +10,113 @@ jobs:
   linux-daily:
     runs-on: ubuntu-22.04
     timeout-minutes: 60
-    strategy:
-      matrix:
-        build: [ Debug ]
-        compiler: [ { c: gcc, cpp: g++, fortran: gfortran } ]
-        avx: [ OFF ]
-        vtk: [ OFF ]
-        mkl: [ OFF ]
     steps:
       - name: Clone
         uses: actions/checkout@v5
         with:
           submodules: recursive
-      - name: Golang
-        uses: actions/setup-go@v6
-        with:
-          cache: false
-      - name: Dependency
-        run: |
-          echo "SP_TIME=-$(date +''%y%m%d'')" >> $GITHUB_ENV
-          sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils
       - name: Compile
         run: |
-          go build Checker/updater.go
+          echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
           mkdir build && cd build
           cmake \
-          -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-          -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} \
-          -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
-          -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
+          -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_INSTALL_PREFIX=dist \
-          -DSP_BUILD_PARALLEL=OFF \
-          -DSP_ENABLE_AVX2=${{ matrix.avx }} \
+          -DSP_ENABLE_AVX2=OFF \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config Debug -j $(nproc)
       - name: Pack
         run: |
-          cp updater build/dist/bin
-          file_name="linux-debug-openblas"
-          file_name+="${{ env.SP_TIME }}.tar.gz"
+          file_name="suanPan-linux-debug-openblas-${{ env.SP_TIME }}.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
-      - name: Test
-        run: |
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
           ./build/dist/bin/suanPan -v
-      - name: Upload
-        uses: actions/upload-artifact@v4
+      - name: Remote
+        uses: appleboy/scp-action@v1
         with:
-          name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
+          host: hetzner.tlcfem.top
+          username: root
+          key: ${{ secrets.STATIC_KEY }}
+          source: ${{ env.ARTIFACT }}
+          target: ~/Documents/suanPan-daily
+  macos-dev:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 100
+    strategy:
+      matrix:
+        os: [ macos-14-large, macos-14-xlarge ]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - name: Compile
+        run: |
+          echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
+          brew install glfw glew libomp
+          export HOMEBREW_GCC_PREFIX=$(brew --prefix gcc@13)/lib/gcc/13/
+          ./Script/mac-dependency.sh ${{ matrix.os }}
+          mkdir build && cd build
+          export CC=gcc-13 && export CXX=g++-13 && export FC=gfortran-13
+          cmake \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
+          -DSP_ENABLE_AVX2=OFF \
+          -DCMAKE_INSTALL_PREFIX=dist \
+          ..
+          cmake --build . --target install --config Debug -j 3
+      - name: Pack
+        run: |
+          ./Script/mac-patcher.sh build/dist
+          file_name="suanPan-${{ matrix.os }}"
+          file_name="${file_name//xlarge/arm64}"
+          file_name="${file_name//large/amd64}"
+          file_name+="-debug-gcc-${{ env.SP_TIME }}.tar.gz"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          tar czf $file_name -C build/dist .
+          ./build/dist/bin/suanPan -v
+      - name: Remote
+        uses: appleboy/scp-action@v1
+        with:
+          host: hetzner.tlcfem.top
+          username: root
+          key: ${{ secrets.STATIC_KEY }}
+          source: ${{ env.ARTIFACT }}
+          target: ~/Documents/suanPan-daily
+  windows-gcc-daily:
+    runs-on: windows-2022
+    timeout-minutes: 100
+    steps:
+      - name: Clone
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - name: GCC
+        run: |
+          C:/msys64/usr/bin/wget.exe -q https://github.com/brechtsanders/winlibs_mingw/releases/download/13.3.0posix-11.0.1-ucrt-r1/winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
+          7z x winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
+      - name: Compile
+        run: |
+          "SP_TIME=$(Get-Date -Format 'yyMMdd')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          mkdir build && cd build
+          cmake -G "MinGW Makefiles" `
+          -DCMAKE_BUILD_TYPE=Debug `
+          -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe `
+          -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe `
+          -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
+          -DCMAKE_INSTALL_PREFIX=dist `
+          -DSP_ENABLE_AVX2=OFF `
+          ..
+          cmake --build . --target install --config Debug -j 4
+      - name: Pack
+        shell: bash
+        run: |
+          file_name="suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          cd build/dist/bin
+          7z a -tzip ../../../$file_name ./*
+          build/dist/bin/suanPan.exe -v
       - name: Remote
         uses: appleboy/scp-action@v1
         with:

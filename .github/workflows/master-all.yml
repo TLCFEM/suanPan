@@ -63,7 +63,8 @@ jobs:
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config Release -j $(nproc)
+          cmake --build . --target package
       - name: Pack
         run: |
           cp updater build/dist/bin
@@ -152,7 +153,8 @@ jobs:
           -DSP_ENABLE_VTK=ON \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config Release -j $(nproc)
+          cmake --build . --target package
       - name: Pack
         run: |
           cp updater build/dist/bin
@@ -316,17 +318,10 @@ jobs:
           if [ "${{ matrix.avx }}" == "OFF" ]; then
             file_name+="-no-avx"
           fi
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            file_name+=".zip"
-            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-            cd build/dist/bin
-            7z a -tzip ../../../$file_name ./*
-          else
-            file_name+=".7z"
-            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-            cd build/dist/bin
-            7z a ../../../$file_name ./*
-          fi
+          file_name+=".zip"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          cd build/dist/bin
+          7z a -tzip ../../../$file_name ./*
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -430,10 +425,10 @@ jobs:
           if [ "${{ matrix.avx }}" == "OFF" ]; then
             file_name+="-no-avx"
           fi
-          file_name+=".7z"
+          file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
-          7z a ../../../$file_name ./*
+          7z a -tzip ../../../$file_name ./*
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
