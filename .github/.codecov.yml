@@ -16,6 +16,7 @@ ignore:
   - "MSVC"
   - "Recorder/OutputType.cpp"
   - "Toolbox/arpack-src"
+  - "Toolbox/parpack-src"
   - "Toolbox/feast-src"
   - "Toolbox/superlu-src"
   - "Toolbox/superlumt-src"
