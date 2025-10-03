@@ -34,7 +34,10 @@ jobs:
           ./build/dist/bin/suanPan -v
       - name: Remote
         run: |
-          scp -i ${{ secrets.STATIC_KEY }} -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
+          echo "${{ secrets.STATIC_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
+          rm -f key.pem
   macos-dev:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 100
@@ -73,7 +76,10 @@ jobs:
           ./build/dist/bin/suanPan -v
       - name: Remote
         run: |
-          scp -i ${{ secrets.STATIC_KEY }} -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
+          echo "${{ secrets.STATIC_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
+          rm -f key.pem
   windows-gcc-daily:
     runs-on: windows-2022
     timeout-minutes: 100
@@ -108,5 +114,9 @@ jobs:
           7z a -tzip ../../../$file_name ./*
           ./suanPan.exe -v
       - name: Remote
+        shell: bash
         run: |
-          scp -i ${{ secrets.STATIC_KEY }} -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
+          echo "${{ secrets.STATIC_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
+          rm -f key.pem
