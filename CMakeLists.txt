@@ -244,6 +244,7 @@ if (SP_BUILD_PARALLEL)
         find_package(TBB REQUIRED)
         link_libraries(TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
     else ()
+        include_directories(Include/tbb)
         if (COMPILER_IDENTIFIER MATCHES "gcc-win")
             link_libraries(tbb12)
         else ()
@@ -252,7 +253,7 @@ if (SP_BUILD_PARALLEL)
         option(SP_ENABLE_TBB_ALLOC "Build with TBB's memory allocator." OFF)
         if (SP_ENABLE_TBB_ALLOC)
             add_compile_definitions(ARMA_USE_TBB_ALLOC) # for armadillo to use tbb allocator
-            include_directories(Include/oneapi) # because armadillo assumes oneapi be in the include path
+            include_directories(Include/tbb/oneapi) # because armadillo assumes oneapi be in the include path
             link_libraries(tbbmalloc tbbmalloc_proxy)
         endif ()
     endif ()
