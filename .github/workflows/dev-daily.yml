@@ -33,13 +33,8 @@ jobs:
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
           ./build/dist/bin/suanPan -v
       - name: Remote
-        uses: appleboy/scp-action@v1
-        with:
-          host: hetzner.tlcfem.top
-          username: root
-          key: ${{ secrets.STATIC_KEY }}
-          source: ${{ env.ARTIFACT }}
-          target: ~/Documents/suanPan-daily
+        run: |
+          scp -i ${{ secrets.STATIC_KEY }} -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
   macos-dev:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 100
@@ -77,13 +72,8 @@ jobs:
           tar czf $file_name -C build/dist .
           ./build/dist/bin/suanPan -v
       - name: Remote
-        uses: appleboy/scp-action@v1
-        with:
-          host: hetzner.tlcfem.top
-          username: root
-          key: ${{ secrets.STATIC_KEY }}
-          source: ${{ env.ARTIFACT }}
-          target: ~/Documents/suanPan-daily
+        run: |
+          scp -i ${{ secrets.STATIC_KEY }} -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
   windows-gcc-daily:
     runs-on: windows-2022
     timeout-minutes: 100
@@ -118,10 +108,5 @@ jobs:
           7z a -tzip ../../../$file_name ./*
           ./suanPan.exe -v
       - name: Remote
-        uses: appleboy/scp-action@v1
-        with:
-          host: hetzner.tlcfem.top
-          username: root
-          key: ${{ secrets.STATIC_KEY }}
-          source: ${{ env.ARTIFACT }}
-          target: ~/Documents/suanPan-daily
+        run: |
+          scp -i ${{ secrets.STATIC_KEY }} -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} root@hetzner.tlcfem.top:~/Documents/suanPan-daily/
