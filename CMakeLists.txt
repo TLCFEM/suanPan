@@ -632,16 +632,6 @@ elseif (COMPILER_IDENTIFIER MATCHES "vs")
     file(GLOB VC_FILES Libs/vc/*.dll)
     install(FILES ${VC_FILES} DESTINATION bin COMPONENT Main)
 endif ()
-# if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-#     install(CODE "
-#     include(BundleUtilities)
-#     set(BU_CHMOD_BUNDLE_ITEMS TRUE)
-#     fixup_bundle(
-#         \"\${CMAKE_INSTALL_PREFIX}/bin/suanPan.app/Contents/MacOS/suanPan\"
-#         \"\"
-#         \"/usr/local/lib;/usr/local/opt/llvm/lib;/usr/local/opt/libomp/lib/;/opt/homebrew/opt/libomp/lib;\${CMAKE_INSTALL_PREFIX}/lib/;\$ENV{HOMEBREW_GCC_PREFIX}\"
-#     )" COMPONENT Main)
-# endif ()
 
 message(STATUS "Flags and Dirs:")
 message(STATUS "suanPan CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
