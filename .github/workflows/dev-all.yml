@@ -104,31 +104,13 @@ jobs:
         run: |
           cp updater build/dist/bin
           file_name="suanPan-linux"
+          file_name+=$([[ "${{ matrix.os }}" != *"arm"* ]] && echo "-amd64" || echo "-arm64")
+          file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
+          file_name+=$([[ "${{ matrix.compiler.c }}" == "gcc" ]] && echo "-gcc" || echo "-intel")
           if [[ "${{ matrix.os }}" != *"arm"* ]]; then
-            file_name+="-amd64"
-          else
-            file_name+="-arm64"
+            file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
           fi
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            file_name+="-debug"
-          else
-            file_name+="-release"
-          fi
-          if [ "${{ matrix.compiler.c }}" == "gcc" ]; then
-            file_name+="-gcc"
-          else
-            file_name+="-intel"
-          fi
-          if [[ "${{ matrix.os }}" != *"arm"* ]]; then
-            if [ "${{ matrix.avx }}" == "ON" ]; then
-              file_name+="-avx"
-            else
-              file_name+="-no-avx"
-            fi
-          fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           if [ "${{ matrix.mkl }}" == "ON" ]; then
             file_name+="-mkl"
           elif [ "${{ matrix.aocl }}" == "ON" ]; then
@@ -282,18 +264,10 @@ jobs:
           file_name="suanPan-${{ matrix.os }}"
           file_name="${file_name//xlarge/arm64}"
           file_name="${file_name//large/amd64}"
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            file_name+="-debug"
-          else
-            file_name+="-release"
-          fi
+          file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
           file_name+="-${{ matrix.compiler }}"
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [[ "${{ matrix.os }}" != *"xlarge"* ]]; then
-            file_name+="-avx"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          [[ "${{ matrix.os }}" != *"xlarge"* ]] && file_name+="-avx"
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
@@ -360,24 +334,10 @@ jobs:
         run: |
           cp updater.exe build/dist/bin
           file_name="suanPan-win"
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            file_name+="-debug"
-          else
-            file_name+="-release"
-          fi
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            file_name+="-mkl"
-          else
-            file_name+="-openblas"
-          fi
-          if [ "${{ matrix.avx }}" == "ON" ]; then
-            file_name+="-avx"
-          else
-            file_name+="-no-avx"
-          fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
+          file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
+          file_name+=$([[ "${{ matrix.mkl }}" == "ON" ]] && echo "-mkl" || echo "-openblas")
+          file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
@@ -438,20 +398,10 @@ jobs:
         run: |
           cp updater.exe build/dist/bin
           file_name="suanPan-win-gcc"
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            file_name+="-debug"
-          else
-            file_name+="-release"
-          fi
+          file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
           file_name+="-openblas"
-          if [ "${{ matrix.avx }}" == "ON" ]; then
-            file_name+="-avx"
-          else
-            file_name+="-no-avx"
-          fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
+          file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin

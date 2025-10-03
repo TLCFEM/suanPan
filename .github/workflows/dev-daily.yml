@@ -116,7 +116,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
           7z a -tzip ../../../$file_name ./*
-          build/dist/bin/suanPan.exe -v
+          ./suanPan.exe -v
       - name: Remote
         uses: appleboy/scp-action@v1
         with:

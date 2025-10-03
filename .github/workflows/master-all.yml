@@ -69,11 +69,7 @@ jobs:
         run: |
           cp updater build/dist/bin
           file_name="suanPan-linux"
-          if [[ "${{ matrix.os }}" != *"arm"* ]]; then 
-            file_name+="-amd64"
-          else
-            file_name+="-arm64" 
-          fi
+          file_name+=$([[ "${{ matrix.os }}" != *"arm"* ]] && echo "-amd64" || echo "-arm64")
           if [ "${{ matrix.mkl }}" == "ON" ]; then
             file_name+="-mkl"
           elif [ "${{ matrix.aocl }}" == "ON" ]; then
@@ -81,15 +77,9 @@ jobs:
           else
             file_name+="-openblas"
           fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           if [[ "${{ matrix.os }}" != *"arm"* ]]; then
-            if [ "${{ matrix.avx }}" == "ON" ]; then
-              file_name+="-avx"
-            else
-              file_name+="-no-avx"
-            fi
+            file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
           fi
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
@@ -226,12 +216,8 @@ jobs:
           file_name="suanPan-${{ matrix.os }}-openblas"
           file_name="${file_name//xlarge/arm64}"
           file_name="${file_name//large/amd64}"
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [[ "${{ matrix.os }}" != *"xlarge"* ]]; then
-            file_name+="-avx"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          [[ "${{ matrix.os }}" != *"xlarge"* ]] && file_name+="-avx"
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
@@ -307,17 +293,9 @@ jobs:
         run: |
           cp updater.exe build/dist/bin
           file_name="suanPan-win"
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            file_name+="-mkl"
-          else
-            file_name+="-openblas"
-          fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [ "${{ matrix.avx }}" == "OFF" ]; then
-            file_name+="-no-avx"
-          fi
+          file_name+=$([[ "${{ matrix.mkl }}" == "ON" ]] && echo "-mkl" || echo "-openblas")
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
@@ -419,12 +397,8 @@ jobs:
         run: |
           cp updater.exe build/dist/bin
           file_name="suanPan-win-gcc-openblas"
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [ "${{ matrix.avx }}" == "OFF" ]; then
-            file_name+="-no-avx"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
