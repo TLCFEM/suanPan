@@ -48,20 +48,18 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     trial_history = current_history;
     trial_zr = current_zr;
     const auto& current_q = current_history(2);
-    const auto& current_z = current_history(3);
-    const auto& current_bc = current_history(4);
+    const auto& current_qm = current_history(3);
+    const auto& current_z = current_history(4);
     auto& iteration = trial_history(0);
     auto& last_loading = trial_history(1);
     auto& q = trial_history(2);
-    auto& z = trial_history(3);
-    auto& bc = trial_history(4);
+    auto& qm = trial_history(3);
+    auto& z = trial_history(4);
 
     const vec current_alpha(&current_history(5), b.size(), false, true);
     const vec current_d(&current_history(5 + b.size()), c.size(), false, true);
     vec alpha(&trial_history(5), b.size(), false, true);
     vec d(&trial_history(5 + b.size()), c.size(), false, true);
-
-    [[maybe_unused]] const auto [current_ybc, current_dybc] = iso_bound(current_q, false);
 
     iteration = 0.;
     auto gamma = 0., ref_error = 0.;
@@ -77,18 +75,15 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        const auto [ybc, dybc] = iso_bound(q = current_q + gamma, false);
-
         auto split = 1., dsplit = 0.;
         if(const auto ref_zr = trial_zr.min(); z < ref_zr) split = k;
 
-        const auto incre_ybc = ybc - current_ybc;
-        auto y = initial_y + (bc = current_bc + split * incre_ybc);
-        auto pypg = split * dybc;
-        auto pypz = dsplit * incre_ybc;
-        if(y < 0.) y = pypg = pypz = 0.;
+        const auto [ym, dym] = isotropic(qm = current_qm + split * gamma, true);
+        const auto y = ym;
+        const auto pypg = dym * split;
+        const auto pypz = dym * gamma * dsplit;
 
-        const auto [a, da] = kin(q, true);
+        const auto [a, da] = kinematic(q = current_q + gamma, true);
 
         vec bottom_alpha(b.size(), fill::none), bottom_d(c.size(), fill::none);
         for(auto I = 0llu; I < b.size(); ++I) bottom_alpha(I) = 1. + b[I].r() * gamma;

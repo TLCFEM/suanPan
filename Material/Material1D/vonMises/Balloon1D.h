@@ -66,13 +66,12 @@ struct DataBalloon1D {
         }
     };
 
-    const double elastic;        // elastic modulus
-    const double initial_y;      // initial yield stress
-    const double u;              // yield ratio evolution rate
-    const double k;              // plastic strain split ratio
-    const unsigned zr_size;      // memory size
+    const double elastic;   // elastic modulus
+    const double u;         // yield ratio evolution rate
+    const double k;         // plastic strain split ratio
+    const unsigned zr_size; // memory size
 
-    const Bound iso_bound, kin;
+    const Bound isotropic, kinematic;
 
     const std::vector<Saturation> b, c;
 };
@@ -108,9 +107,9 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
             head = 0;
         }
 
-        auto max() { return *std::max_element(buffer.cbegin(), buffer.cend()); }
-        auto min() { return *std::min_element(buffer.cbegin(), buffer.cend()); }
-        auto mean() { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / buffer.size(); }
+        [[nodiscard]] auto max() const { return *std::max_element(buffer.cbegin(), buffer.cend()); }
+        [[nodiscard]] auto min() const { return *std::min_element(buffer.cbegin(), buffer.cend()); }
+        [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
     };
 
     memory current_zr{zr_size}, trial_zr{zr_size};
