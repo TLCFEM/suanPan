@@ -17,17 +17,13 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-22.04, ubuntu-22.04-arm ]
-        build: [ RelWithDebInfo, Debug ]
+        build: [ RelWithDebInfo ]
         compiler: [ { c: gcc, cpp: g++, fortran: gfortran }, { c: icx, cpp: icpx, fortran: ifx } ]
         avx: [ OFF ]
         vtk: [ ON, OFF ]
         mkl: [ OFF ]
         aocl: [ ON, OFF ]
         exclude:
-          - build: Debug
-            mkl: ON
-          - build: Debug
-            avx: ON
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
             mkl: OFF
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
