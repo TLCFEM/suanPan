@@ -41,7 +41,7 @@ template<sp_d data_t> struct SolverSetting {
             option = "-i fgmres -p ilu";
             return;
         }
-        if(std::any_of(sub_command.begin(), sub_command.end(), [](const char c) { return !std::isspace(c); })) option = sub_command;
+        if(std::ranges::any_of(sub_command, [](const char c) { return !std::isspace(c); })) option = sub_command;
         if(option.length() < max_length) return;
 
         const auto pos = option.find_last_of(" \t\n\r", max_length);
