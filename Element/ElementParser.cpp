@@ -1694,11 +1694,11 @@ namespace {
 
         const auto dof_tag = get_remaining<uword>(command);
 
-        if(2 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 3) {
+        if(2 == which && *std::ranges::max_element(dof_tag) > 3) {
             suanpan_error("At most three dofs are supported.\n");
             return;
         }
-        if(3 == which && *std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 6) {
+        if(3 == which && *std::ranges::max_element(dof_tag) > 6) {
             suanpan_error("At most six dofs are supported.\n");
             return;
         }
@@ -2379,7 +2379,7 @@ int create_new_mass(const shared_ptr<DomainBase>& domain, std::istringstream& co
 
     const auto dof_tag = get_remaining<uword>(command);
 
-    if(*std::max_element(dof_tag.cbegin(), dof_tag.cend()) > 6) {
+    if(*std::ranges::max_element(dof_tag) > 6) {
         suanpan_error("At most six dofs are supported.\n");
         return SUANPAN_SUCCESS;
     }
