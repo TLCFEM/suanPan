@@ -103,12 +103,12 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
         }
 
         auto zeros() {
-            std::fill(buffer.begin(), buffer.end(), 0.);
+            std::ranges::fill(buffer, 0.);
             head = 0;
         }
 
-        [[nodiscard]] auto max() const { return *std::max_element(buffer.cbegin(), buffer.cend()); }
-        [[nodiscard]] auto min() const { return *std::min_element(buffer.cbegin(), buffer.cend()); }
+        [[nodiscard]] auto max() const { return *std::ranges::max_element(buffer); }
+        [[nodiscard]] auto min() const { return *std::ranges::min_element(buffer); }
         [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
     };
 
