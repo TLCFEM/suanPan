@@ -1,4 +1,22 @@
-#!/bin/bash
+# -----------------------------------------------------------------------------
+# suanPan.sh
+#
+# Usage:
+#
+# 1. Setup mode:
+#      suanPan.sh --create-link
+#    - Creates symbolic links in ~/.local/bin (suanpan, sp)
+#    - Copies Sublime Text configuration files if Sublime Text is installed
+#    - Adds a desktop entry for suanPan in ~/.local/share/applications
+#
+# 2. Run mode:
+#      suanPan.sh [suanPan arguments...]
+#    - Forwards all arguments to the suanPan executable in bin/
+#    - Example: suanPan.sh -f input.supan
+#
+# -----------------------------------------------------------------------------
+
+#!/usr/bin/env bash
 
 set -e
 

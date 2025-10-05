@@ -1,3 +1,22 @@
+# -----------------------------------------------------------------------------
+# linux-patcher.sh
+#
+# Usage:
+#   linux-patcher.sh <target_binary>
+#
+# Description:
+#   - Copies all non-system shared library dependencies of <target_binary> into ../lib
+#   - Patches the rpath of <target_binary> to use '$ORIGIN/../lib'
+#   - Patches the rpath of each copied library in ../lib to use '$ORIGIN'
+#
+# Requirements:
+#   - ldd, awk, realpath, patchelf must be installed and available in PATH
+#
+# Example:
+#   ./linux-patcher.sh ./bin/suanPan
+#
+# -----------------------------------------------------------------------------
+
 #!/usr/bin/env bash
 
 set -e

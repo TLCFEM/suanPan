@@ -1,4 +1,23 @@
-#!/bin/bash
+# -----------------------------------------------------------------------------
+# RemoveBinary.sh
+#
+# Usage:
+#   RemoveBinary.sh
+#
+# Description:
+#   - Removes all compiled suanPan binaries from cmake-build* and build* directories
+#     located two levels above the script location.
+#   - Prints the list of directories scanned.
+#
+# Requirements:
+#   - bash, realpath, shopt must be available in PATH.
+#
+# Example:
+#   ./RemoveBinary.sh
+#
+# -----------------------------------------------------------------------------
+
+#!/usr/bin/env bash
 
 set -e
 
