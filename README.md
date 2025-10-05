@@ -101,7 +101,7 @@ Further details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tuto
 
 ## Installation
 
-> [!NOTE]
+> [!TIP]
 > Daily debug builds can be downloaded via [this](https://tlcfem.top/suanpan/) page.
 
 > [!WARNING]
@@ -205,7 +205,7 @@ The portable binary archives are provided for macOS 14 and 15 with both `amd64` 
 The archives themselves are self-contained.
 They can be successfully executed on earlier versions of macOS.
 
-> [!NOTE]
+> [!CAUTION]
 > The binaries are **not** signed.
 > It is necessary to run `sudo xattr -dr com.apple.quarantine <folder/to/downloaded/archive>` to remove extra attribute.
 
