@@ -1,14 +1,14 @@
 name: Develop
 on:
   push:
-    branches: [ dev ]
+    branches: [dev]
   pull_request:
-    branches: [ dev ]
+    branches: [dev]
 env:
-  SP_TIME: ''
-  ARTIFACT: ''
-  IOMP: ''
-  COVERAGE: ''
+  SP_TIME: ""
+  ARTIFACT: ""
+  IOMP: ""
+  COVERAGE: ""
 jobs:
   linux-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
@@ -16,13 +16,17 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ ubuntu-22.04, ubuntu-22.04-arm ]
-        build: [ RelWithDebInfo ]
-        compiler: [ { c: gcc, cpp: g++, fortran: gfortran }, { c: icx, cpp: icpx, fortran: ifx } ]
-        avx: [ OFF ]
-        vtk: [ ON, OFF ]
-        mkl: [ OFF ]
-        aocl: [ ON, OFF ]
+        os: [ubuntu-22.04, ubuntu-22.04-arm]
+        build: [RelWithDebInfo]
+        compiler:
+          [
+            { c: gcc, cpp: g++, fortran: gfortran },
+            { c: icx, cpp: icpx, fortran: ifx },
+          ]
+        avx: [OFF]
+        vtk: [ON, OFF]
+        mkl: [OFF]
+        aocl: [ON, OFF]
         exclude:
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
             mkl: OFF
@@ -154,7 +158,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ ubuntu-22.04 ]
+        os: [ubuntu-22.04]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -209,10 +213,10 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge ]
-        build: [ RelWithDebInfo ]
-        compiler: [ gcc, clang ]
-        vtk: [ ON, OFF ]
+        os: [macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge]
+        build: [RelWithDebInfo]
+        compiler: [gcc, clang]
+        vtk: [ON, OFF]
         exclude:
           - compiler: gcc
             vtk: ON
@@ -284,11 +288,11 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        build: [ Release ]
-        compiler: [ "Visual Studio 17 2022" ]
-        vtk: [ ON, OFF ]
-        avx: [ OFF ]
-        mkl: [ OFF ]
+        build: [Release]
+        compiler: ["Visual Studio 17 2022"]
+        vtk: [ON, OFF]
+        avx: [OFF]
+        mkl: [OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -355,10 +359,10 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        build: [ Release ]
-        compiler: [ "MinGW Makefiles" ]
-        vtk: [ ON ]
-        avx: [ OFF ]
+        build: [Release]
+        compiler: ["MinGW Makefiles"]
+        vtk: [ON]
+        avx: [OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -413,4 +417,3 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
-        

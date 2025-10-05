@@ -1,7 +1,7 @@
 name: Docker Latest
 on:
   schedule:
-    - cron: '0 8 * * 4'
+    - cron: "0 8 * * 4"
   workflow_dispatch:
 jobs:
   linux-amd64:
@@ -100,7 +100,7 @@ jobs:
           tags: |
             tlcfem/suanpan:arm64
   linux-combine:
-    needs: [ linux-amd64, linux-arm64 ]
+    needs: [linux-amd64, linux-arm64]
     runs-on: ubuntu-latest
     steps:
       - name: Login Docker

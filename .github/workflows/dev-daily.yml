@@ -1,11 +1,11 @@
 name: Daily
 on:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: "0 5 * * *"
   workflow_dispatch:
 env:
-  SP_TIME: ''
-  ARTIFACT: ''
+  SP_TIME: ""
+  ARTIFACT: ""
 jobs:
   linux-daily:
     runs-on: ubuntu-22.04
@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-14-large, macos-14-xlarge ]
+        os: [macos-14-large, macos-14-xlarge]
     steps:
       - name: Clone
         uses: actions/checkout@v5
