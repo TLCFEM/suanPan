@@ -35,4 +35,11 @@ echo "Patching $TARGET ..."
 
 patchelf --set-rpath '$ORIGIN/../lib' "$TARGET"
 
+for DEPENDENCY in "$LIBDIR"/*.so*; do
+  if [ -f "$DEPENDENCY" ]; then
+    echo "Patching $DEPENDENCY ..."
+    patchelf --set-rpath '$ORIGIN' "$DEPENDENCY"
+  fi
+done
+
 echo "Done."
