@@ -63,7 +63,7 @@ jobs:
           fi
       - name: Dependency
         run: |
-          sudo apt-get install libglvnd-dev dpkg-dev xz-utils lcov
+          sudo apt-get install libglvnd-dev dpkg-dev xz-utils lcov patchelf
           if [[ "${{ matrix.build }}" == "Debug" ]] && [[ "${{ matrix.compiler.c }}" == "gcc" ]] && [[ "${{ matrix.avx }}" == "OFF" ]] && [[ "${{ matrix.vtk }}" == "OFF" ]]; then
             echo "COVERAGE=ON" >> "$GITHUB_ENV"
           else
@@ -98,6 +98,7 @@ jobs:
           cmake --build . --target package
       - name: Pack
         run: |
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
           file_name="suanPan-linux"
           file_name+=$([[ "${{ matrix.os }}" != *"arm"* ]] && echo "-amd64" || echo "-arm64")
@@ -168,7 +169,7 @@ jobs:
           tar xf VTK-9.5.2-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
       - name: Compile
         run: |
           source /opt/intel/oneapi/setvars.sh
@@ -191,6 +192,7 @@ jobs:
           cmake --build . --target package
       - name: Pack
         run: |
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
           file_name="suanPan-linux-amd64-release-gcc-avx-vtk-mkl-mpi.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"

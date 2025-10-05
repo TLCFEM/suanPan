@@ -47,7 +47,7 @@ jobs:
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
       - name: Compile
         run: |
-          sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils
+          sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils patchelf
           go build Checker/updater.go
           ./Script/linux-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
@@ -67,6 +67,7 @@ jobs:
           cmake --build . --target package
       - name: Pack
         run: |
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
           file_name="suanPan-linux"
           file_name+=$([[ "${{ matrix.os }}" != *"arm"* ]] && echo "-amd64" || echo "-arm64")
@@ -124,7 +125,7 @@ jobs:
           tar xf VTK-9.5.2-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils patchelf
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -147,6 +148,7 @@ jobs:
           cmake --build . --target package
       - name: Pack
         run: |
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
           file_name="suanPan-linux-amd64-mkl-vtk-mpi-no-avx-ilp64.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"

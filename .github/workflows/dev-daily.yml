@@ -27,6 +27,8 @@ jobs:
           cmake --build . --target install --config Debug -j $(nproc)
       - name: Pack
         run: |
+          sudo apt-get install patchelf
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           file_name="suanPan-linux-debug-openblas-${{ env.SP_TIME }}.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
