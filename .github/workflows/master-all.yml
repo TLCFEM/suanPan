@@ -290,16 +290,19 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.5/ `
           ..
           cmake --build . --target install --config Release -j 4
-      - name: Pack
+          cp updater.exe build/dist/bin
+      - name: Name
         shell: bash
         run: |
-          cp updater.exe build/dist/bin
           file_name="suanPan-win"
           file_name+=$([[ "${{ matrix.mkl }}" == "ON" ]] && echo "-mkl" || echo "-openblas")
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Pack
+        shell: bash
+        run: |
           cd build/dist/bin
           7z a -tzip ../../../$file_name ./*
       - name: Upload
@@ -394,15 +397,18 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.5 `
           ..
           cmake --build . --target install --config Release -j 4
-      - name: Pack
+          cp updater.exe build/dist/bin
+      - name: Name
         shell: bash
         run: |
-          cp updater.exe build/dist/bin
           file_name="suanPan-win-gcc-openblas"
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Pack
+        shell: bash
+        run: |
           cd build/dist/bin
           7z a -tzip ../../../$file_name ./*
       - name: Upload
