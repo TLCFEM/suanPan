@@ -505,17 +505,22 @@ endif ()
 # need further work
 install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT Main)
 install(FILES
+        Resource/suanPan-ua.svg
+        DESTINATION share/icons/hicolor/scalable/apps
+        RENAME suanPan.svg
+        COMPONENT Support
+)
+install(FILES
         CHANGELOG.md
         Enhancement/suanPan.sublime-completions
         Enhancement/suanPan.sublime-syntax
         LICENSE
         README.md
-        Resource/suanPan-ua.svg
-        Resource/suanPan.svg
-        DESTINATION bin
+        DESTINATION share/${PROJECT_NAME}
         COMPONENT Support
 )
 if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
+    install(PROGRAMS Enhancement/suanPan.sh DESTINATION . COMPONENT Support)
     set(DECOR ".")
     set(SUFFIX "")
     if (COMPILER_IDENTIFIER MATCHES "linux")
@@ -525,12 +530,11 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         set(DECOR "")
         set(SUFFIX ".dylib")
         file(GLOB OPENBLAS_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libopenblas*)
-        install(PROGRAMS ${OPENBLAS_FILES} DESTINATION lib COMPONENT Main)
+        install(PROGRAMS ${OPENBLAS_FILES} TYPE LIB COMPONENT Main)
     endif ()
-    install(PROGRAMS Enhancement/suanPan.sh DESTINATION bin COMPONENT Support)
     if (SP_BUILD_PARALLEL AND NOT SP_ENABLE_SYSLIB)
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libtbb*)
-        install(PROGRAMS ${TBB_FILES} DESTINATION lib COMPONENT Main)
+        install(PROGRAMS ${TBB_FILES} TYPE LIB COMPONENT Main)
     endif ()
     if (SP_ENABLE_MKL)
         if (SP_ENABLE_SHARED_MKL)
@@ -539,23 +543,23 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
                     ${MKL_ROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX}
                     ${MKL_ROOT}/lib/intel64/libmkl_avx*${DECOR}*${SUFFIX}
             )
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${MKL_FILES} TYPE LIB COMPONENT Main)
             if (SP_ENABLE_64BIT_INDEXING)
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_ilp64${DECOR}*${SUFFIX})
             else ()
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_lp64${DECOR}*${SUFFIX})
             endif ()
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${MKL_FILES} TYPE LIB COMPONENT Main)
             if (SP_ENABLE_IOMP)
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_thread${DECOR}*${SUFFIX})
             else ()
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_gnu_thread${DECOR}*${SUFFIX})
             endif ()
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${MKL_FILES} TYPE LIB COMPONENT Main)
         endif ()
         if (SP_ENABLE_IOMP)
             file(GLOB MKL_FILES ${IOMPPATH}/libiomp5${DECOR}*${SUFFIX})
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${MKL_FILES} TYPE LIB COMPONENT Main)
         endif ()
     endif ()
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
@@ -571,12 +575,12 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
                     ${ONEAPI_PATH}/libiomp5${DECOR}*${SUFFIX}
                     ${ONEAPI_PATH}/libsvml${DECOR}*${SUFFIX}
             )
-            install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${ONEAPI_FILES} TYPE LIB COMPONENT Main)
         endforeach ()
     endif ()
     if (SP_ENABLE_MAGMA)
         file(GLOB MAGMA_FILES ${MAGMA_PATH}/lib/libmagma*.so)
-        install(PROGRAMS ${MAGMA_FILES} DESTINATION lib COMPONENT Main)
+        install(PROGRAMS ${MAGMA_FILES} TYPE LIB COMPONENT Main)
     endif ()
 elseif (COMPILER_IDENTIFIER MATCHES "win")
     install(FILES Enhancement/AddAssociation.bat DESTINATION bin COMPONENT Support)
