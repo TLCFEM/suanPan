@@ -304,7 +304,7 @@ jobs:
         shell: bash
         run: |
           cd build/dist/bin
-          7z a -tzip ../../../$file_name ./*
+          7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -410,7 +410,7 @@ jobs:
         shell: bash
         run: |
           cd build/dist/bin
-          7z a -tzip ../../../$file_name ./*
+          7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
