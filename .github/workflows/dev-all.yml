@@ -346,6 +346,24 @@ jobs:
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Unsigned
+        if: ${{ github.event_name == 'push' }}
+        id: upload-unsigned-vs
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ env.ARTIFACT }}
+          path: build/dist/bin/*.exe
+      - name: Sign
+        if: ${{ github.event_name == 'push' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: "${{ secrets.SIGNPATH }}"
+          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
+          project-slug: "suanPan"
+          signing-policy-slug: "test-signing"
+          github-artifact-id: "${{ steps.upload-unsigned-vs.outputs.artifact-id }}"
+          wait-for-completion: true
+          output-artifact-directory: "build/dist/bin"
       - name: Pack
         shell: bash
         run: |
@@ -413,6 +431,24 @@ jobs:
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Unsigned
+        if: ${{ github.event_name == 'push' }}
+        id: upload-unsigned-gcc
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ env.ARTIFACT }}
+          path: build/dist/bin/*.exe
+      - name: Sign
+        if: ${{ github.event_name == 'push' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: "${{ secrets.SIGNPATH }}"
+          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
+          project-slug: "suanPan"
+          signing-policy-slug: "test-signing"
+          github-artifact-id: "${{ steps.upload-unsigned-gcc.outputs.artifact-id }}"
+          wait-for-completion: true
+          output-artifact-directory: "build/dist/bin"
       - name: Pack
         shell: bash
         run: |

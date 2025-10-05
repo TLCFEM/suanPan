@@ -124,11 +124,6 @@ The archives of binaries are released under [Release](https://github.com/TLCFEM/
 1. `suanpan-win-mkl-vtk.zip` is the portable archive.
 2. `suanpan-win-mkl-vtk.exe` is the installer.
 
-> [!NOTE]
-> The executables are **not** signed.
-> Windows Defender SmartScreen may block execution.
-> Click `More info` -> `Run anyway` to execute the application.
-
 #### Chocolatey
 
 The binaries, which are compiled with Intel MKL and VTK, are available
@@ -165,6 +160,14 @@ It is also possible to use [Scoop](https://scoop.sh/) to install the package.
    ```ps
    scoop install suanpan
    ```
+
+### Code Signing Policy
+
+[![SignPath](https://raw.githubusercontent.com/SignPath/fdn-website/refs/heads/main/docs/assets/logo.svg)](https://about.signpath.io/)
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.
 
 ### Linux
 
