@@ -149,9 +149,6 @@ jobs:
           files: ./build/coverage.info
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - name: SSH
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
   linux-dev-mpi:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ${{ matrix.os }}
@@ -332,7 +329,7 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.5/ `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
-          cp updater.exe build/dist/bin
+          cp ../updater.exe dist/bin
       - name: Name
         shell: bash
         run: |
@@ -399,7 +396,7 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.5 `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
-          cp updater.exe build/dist/bin
+          cp ../updater.exe dist/bin
       - name: Name
         shell: bash
         run: |

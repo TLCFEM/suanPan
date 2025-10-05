@@ -290,7 +290,7 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.5/ `
           ..
           cmake --build . --target install --config Release -j 4
-          cp updater.exe build/dist/bin
+          cp ../updater.exe dist/bin
       - name: Name
         shell: bash
         run: |
@@ -397,7 +397,7 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.5 `
           ..
           cmake --build . --target install --config Release -j 4
-          cp updater.exe build/dist/bin
+          cp ../updater.exe dist/bin
       - name: Name
         shell: bash
         run: |
