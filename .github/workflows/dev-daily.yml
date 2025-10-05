@@ -40,7 +40,7 @@ jobs:
           chmod 600 key.pem
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/suanPan-daily/linux/
           rm -f key.pem
-  macos-dev:
+  macos-daily:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 100
     strategy:

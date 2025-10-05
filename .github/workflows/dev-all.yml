@@ -149,6 +149,7 @@ jobs:
         if: failure()
         uses: mxschmitt/action-tmate@v3
   linux-dev-mpi:
+    if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
