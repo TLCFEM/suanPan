@@ -42,6 +42,10 @@ echo "Scanning $TARGET ..."
 ldd "$TARGET" | awk '/=>/ { print $3 }' | while read -r DEPENDENCY; do
   if [ -z "$DEPENDENCY" ] || [ ! -f "$DEPENDENCY" ]; then continue; fi
   FILENAME=$(basename "$DEPENDENCY")
+  case "$FILENAME" in
+  libgcc_s* | libgfortran* | libgomp* | libquadmath* | libstdc++*) ;;
+  *) continue ;;
+  esac
   TARGET="$LIBDIR/$FILENAME"
   if [ ! -f "$TARGET" ]; then
     echo "Copying $FILENAME to $LIBDIR"
