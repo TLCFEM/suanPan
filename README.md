@@ -101,6 +101,9 @@ Further details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tuto
 
 ## Installation
 
+> [!NOTE]
+> Daily debug builds can be downloaded via [this](https://tlcfem.top/suanpan/) page.
+
 > [!WARNING]
 > Only the 64-bit version is compiled.
 > It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
