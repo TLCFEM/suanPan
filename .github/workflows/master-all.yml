@@ -439,8 +439,8 @@ jobs:
       ]
     steps:
       - name: VirusTotal
-        uses: crazy-max/ghaction-virustotal@v4
+        uses: cssnr/virustotal-action@v1
         with:
           vt_api_key: ${{ secrets.VIRUSTOTAL_KEY }}
-          update_release_body: true
-          files: "*"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          update_release: true
