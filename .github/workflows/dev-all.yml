@@ -210,7 +210,7 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge]
+        os: [macos-14-large, macos-14-xlarge]
         build: [RelWithDebInfo]
         compiler: [gcc, clang]
         vtk: [ON, OFF]
