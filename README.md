@@ -207,15 +207,17 @@ They can be successfully executed on earlier versions of macOS.
 
 > [!CAUTION]
 > The binaries are **not** signed.
-> It is necessary to run `sudo xattr -dr com.apple.quarantine <folder/to/downloaded/archive>` to remove extra attribute.
+> It is necessary to run `sudo xattr -dr com.apple.quarantine <downloaded/archive/folder>` to remove extra attribute.
 >
 > ```bash
-> DOWNLOAD_URL="https://github.com/TLCFEM/suanPan/releases/download/suanPan-v3.9.2/suanPan-macos-14-amd64-openblas-avx.tar.gz"
+> DOWNLOAD_URL="https://github.com/TLCFEM/suanPan/releases/download/suanPan-v3.9.3/suanPan-macos-14-amd64-openblas-avx.tar.gz"
 > curl -L "$DOWNLOAD_URL" -o suanPan-latest.tar.gz
 > mkdir -p suanPan && tar -xzf suanPan-latest.tar.gz -C suanPan && cd suanPan
 > sudo xattr -dr com.apple.quarantine .
 > ./suanPan.sh
 > ```
+>
+> The download link should be replaced with one appropriate for your system and requirements.
 
 ### Docker
 
