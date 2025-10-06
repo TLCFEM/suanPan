@@ -101,16 +101,16 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(COMPILER_IDENTIFIER "clang-mac")
         include_directories(
-            "/usr/local/include"
-            "/usr/local/opt/llvm/include"
-            "/usr/local/opt/libomp/include"
-            "/opt/homebrew/opt/libomp/include"
+                "/usr/local/include"
+                "/usr/local/opt/llvm/include"
+                "/usr/local/opt/libomp/include"
+                "/opt/homebrew/opt/libomp/include"
         )
         link_directories(
-            "/usr/local/lib"
-            "/usr/local/opt/llvm/lib"
-            "/usr/local/opt/libomp/lib/"
-            "/opt/homebrew/opt/libomp/lib"
+                "/usr/local/lib"
+                "/usr/local/opt/llvm/lib"
+                "/usr/local/opt/libomp/lib/"
+                "/opt/homebrew/opt/libomp/lib"
         )
         message(NOTICE "On macOS, make sure `libomp` is installed.")
     endif ()
@@ -337,7 +337,7 @@ else ()
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx")
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mavx")
         endif ()
-    endif()
+    endif ()
 
     option(SP_ENABLE_CODECOV "Enable code coverage report." OFF)
 
@@ -370,7 +370,7 @@ else ()
             elseif (SP_ENABLE_AVX)
                 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -arch AVX")
             endif ()
-        endif()
+        endif ()
     else ()
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
         if (SP_ENABLE_64BIT_INDEXING)
@@ -504,21 +504,39 @@ endif ()
 
 # need further work
 install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT Main)
-install(FILES
-        Resource/suanPan-ua.svg
-        DESTINATION share/icons/hicolor/scalable/apps
-        RENAME suanPan.svg
-        COMPONENT Support
-)
-install(FILES
-        CHANGELOG.md
-        Enhancement/suanPan.sublime-completions
-        Enhancement/suanPan.sublime-syntax
-        LICENSE
-        README.md
-        DESTINATION share/${PROJECT_NAME}
-        COMPONENT Support
-)
+if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
+    install(FILES
+            Resource/suanPan-ua.svg
+            DESTINATION share/icons/hicolor/scalable/apps
+            RENAME suanPan.svg
+            COMPONENT Support
+    )
+    install(FILES
+            Enhancement/suanPan.sublime-completions
+            Enhancement/suanPan.sublime-syntax
+            DESTINATION share/${PROJECT_NAME}
+            COMPONENT Support
+    )
+    install(FILES
+            CHANGELOG.md
+            LICENSE
+            README.md
+            DESTINATION share/doc/${PROJECT_NAME}
+            COMPONENT Support
+    )
+else ()
+    install(FILES
+            CHANGELOG.md
+            Enhancement/AddAssociation.bat
+            Enhancement/suanPan.sublime-completions
+            Enhancement/suanPan.sublime-syntax
+            LICENSE
+            README.md
+            Resource/suanPan-ua.svg
+            DESTINATION bin
+            COMPONENT Support
+    )
+endif ()
 if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
     install(PROGRAMS Enhancement/suanPan.sh DESTINATION . COMPONENT Support)
     set(DECOR ".")
@@ -583,7 +601,6 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         install(PROGRAMS ${MAGMA_FILES} TYPE LIB COMPONENT Main)
     endif ()
 elseif (COMPILER_IDENTIFIER MATCHES "win")
-    install(FILES Enhancement/AddAssociation.bat DESTINATION bin COMPONENT Support)
     if (SP_BUILD_PARALLEL)
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libtbb*.dll)
         install(FILES ${TBB_FILES} DESTINATION bin COMPONENT Main)
@@ -606,7 +623,6 @@ elseif (COMPILER_IDENTIFIER MATCHES "win")
     file(GLOB DLL_FILES Libs/${SP_EXTERNAL_LIB_PATH}/lib*.dll)
     install(FILES ${DLL_FILES} DESTINATION bin COMPONENT Main)
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
-    install(FILES Enhancement/AddAssociation.bat DESTINATION bin COMPONENT Support)
     if (SP_BUILD_PARALLEL OR SP_ENABLE_MKL)
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/tbb*.dll)
         install(FILES ${TBB_FILES} DESTINATION bin COMPONENT Main)
