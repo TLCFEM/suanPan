@@ -76,7 +76,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         }
 
         auto split = 1., dsplit = 0.;
-        if(const auto ref_zr = trial_zr.min(); z < ref_zr) split = k;
+        if(const auto ref_zr = zr_size > 0 ? trial_zr.max() : trial_zr.min(); z < ref_zr) split = k;
 
         const auto [ym, dym] = isotropic(qm = current_qm + split * gamma, true);
         const auto y = ym;

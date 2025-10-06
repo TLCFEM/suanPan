@@ -66,10 +66,10 @@ struct DataBalloon1D {
         }
     };
 
-    const double elastic;   // elastic modulus
-    const double u;         // yield ratio evolution rate
-    const double k;         // plastic strain split ratio
-    const unsigned zr_size; // memory size
+    const double elastic; // elastic modulus
+    const double u;       // yield ratio evolution rate
+    const double k;       // plastic strain split ratio
+    const int zr_size;    // memory size
 
     const Bound isotropic, kinematic;
 
@@ -112,7 +112,7 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
         [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
     };
 
-    memory current_zr{zr_size}, trial_zr{zr_size};
+    memory current_zr{static_cast<std::size_t>(std::abs(zr_size))}, trial_zr{static_cast<std::size_t>(std::abs(zr_size))};
 
 public:
     Balloon1D(

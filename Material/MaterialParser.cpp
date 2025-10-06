@@ -311,14 +311,14 @@ namespace {
         }
 
         DataBalloon1D para{
-            p(0),                        // elastic modulus
-            p(1),                        // u
-            p(2),                        // split
-            static_cast<unsigned>(p(3)), // zr memory size
-            {p(4), p(5), p(6), p(7)},    // isotropic
-            {p(8), p(9), p(10), p(11)},  // kinematic
-            {{p(12), p(13)}},            // back stress saturation
-            {{p(14), p(15)}},            // similarity saturation
+            p(0),                       // elastic modulus
+            p(1),                       // u
+            p(2),                       // split
+            static_cast<int>(p(3)),     // zr memory size
+            {p(4), p(5), p(6), p(7)},   // isotropic
+            {p(8), p(9), p(10), p(11)}, // kinematic
+            {{p(12), p(13)}},           // back stress saturation
+            {{p(14), p(15)}},           // similarity saturation
         };
 
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
