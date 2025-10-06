@@ -122,6 +122,8 @@ namespace {
 
         if(!exists(updater_module)) return;
 
+        suanpan_info("Checking for updates. To skip, delete or rename updater/updater.exe, or use the '-nu' flag.\n");
+
         auto terminal = std::istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
 
         execute_command(terminal);

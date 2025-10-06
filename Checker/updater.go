@@ -82,8 +82,6 @@ func fetch() error {
 	fromMain := len(os.Args) > 1
 
 	if fromMain {
-		fmt.Printf("Checking new version, delete/rename file updater/updater.exe or execute with '-nu' flag if not wanted.\n")
-
 		regex, _ := regexp.Compile(`suanPan-v(\d)\.(\d)\.?(\d?)`)
 		number := regex.FindStringSubmatch(release.TagName)
 
