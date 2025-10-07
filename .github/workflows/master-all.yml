@@ -65,10 +65,15 @@ jobs:
           ..
           cmake --build . --target install --config Release -j $(nproc)
           cmake --build . --target package
-      - name: Pack
-        run: |
+          cd ..
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
+      - name: Pack
+        run: |
           file_name="suanPan-linux"
           file_name+=$([[ "${{ matrix.os }}" != *"arm"* ]] && echo "-amd64" || echo "-arm64")
           if [ "${{ matrix.mkl }}" == "ON" ]; then
