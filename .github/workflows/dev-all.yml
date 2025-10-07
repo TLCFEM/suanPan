@@ -225,7 +225,6 @@ jobs:
       - name: Compile
         run: |
           brew install glfw glew go libomp
-          export HOMEBREW_GCC_PREFIX=$(brew --prefix gcc@13)/lib/gcc/13/
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build

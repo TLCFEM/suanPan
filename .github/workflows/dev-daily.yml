@@ -55,7 +55,6 @@ jobs:
         run: |
           echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
           brew install glfw glew libomp
-          export HOMEBREW_GCC_PREFIX=$(brew --prefix gcc@13)/lib/gcc/13/
           ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
           export CC=gcc-13 && export CXX=g++-13 && export FC=gfortran-13
