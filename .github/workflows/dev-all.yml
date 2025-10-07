@@ -13,6 +13,8 @@ jobs:
   linux-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: write
     timeout-minutes: 60
     strategy:
       matrix:
@@ -100,10 +102,15 @@ jobs:
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j $(nproc)
           cmake --build . --target package
-      - name: Pack
-        run: |
+          cd ..
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
+      - name: Pack
+        run: |
           file_name="suanPan-linux"
           file_name+=$([[ "${{ matrix.os }}" != *"arm"* ]] && echo "-amd64" || echo "-arm64")
           file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
