@@ -188,8 +188,9 @@ int Subloading::update_trial_status(const vec& t_strain) {
         }
 
         gamma -= incre(0);
-        while(gamma > norm_incre_strain) gamma *= .5;
-        z = suanpan::clamp(z - incre(1), 0., 1. - datum::eps);
+        if(gamma < 0.) gamma = 0.;
+
+        z = suanpan::clamp_unit(z - incre(1));
     }
 }
 
