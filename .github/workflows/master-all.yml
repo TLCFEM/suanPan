@@ -438,7 +438,7 @@ jobs:
       ]
     steps:
       - name: VirusTotal
-        uses: TLCFEM/virustotal-action@feature-explicit-release-id
+        uses: cssnr/virustotal-action@v1
         with:
           vt_api_key: ${{ secrets.VIRUSTOTAL_KEY }}
           release_id: ${{ env.SP_TIME }}
