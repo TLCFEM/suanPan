@@ -115,15 +115,16 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio[0];
+        const auto diff_z = z - start_z;
 
         residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (z - 1.) * y * sum_d) - z * y;
-        residual(1) = z - start_z - gamma * avg_rate;
+        residual(1) = y * diff_z - gamma * avg_rate;
 
         jacobian(0, 0) = n * ((z - 1.) * (y * dd + sum_d * pypg) - a * dalpha - sum_alpha * da) - elastic - z * pypg;
         jacobian(0, 1) = n * sum_d * (y + z * pypz - pypz) - y - z * pypz;
 
-        jacobian(1, 0) = -avg_rate;
-        jacobian(1, 1) = 1. - u * gamma * trial_ratio[1];
+        jacobian(1, 0) = pypg * diff_z - avg_rate;
+        jacobian(1, 1) = pypz * diff_z + y - u * gamma * trial_ratio[1];
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
