@@ -7,6 +7,8 @@ on:
 env:
   SP_TIME: ""
   ARTIFACT: ""
+permissions:
+  id-token: write
 jobs:
   linux-master:
     runs-on: ${{ matrix.os }}

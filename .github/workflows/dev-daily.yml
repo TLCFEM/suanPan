@@ -6,6 +6,8 @@ on:
 env:
   SP_TIME: ""
   ARTIFACT: ""
+permissions:
+  id-token: write
 jobs:
   linux-daily:
     runs-on: ubuntu-22.04
