@@ -25,10 +25,15 @@ jobs:
           -DSP_ENABLE_AVX2=OFF \
           ..
           cmake --build . --target install --config Debug -j $(nproc)
-      - name: Pack
-        run: |
+          cd ..
           sudo apt-get install patchelf
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
+      - name: Pack
+        run: |
           file_name="suanPan-linux-debug-openblas-${{ env.SP_TIME }}.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
@@ -65,9 +70,14 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=dist \
           ..
           cmake --build . --target install --config Debug -j 3
+          cd ..
+          ./Script/mac-patcher.sh build/dist
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
       - name: Pack
         run: |
-          ./Script/mac-patcher.sh build/dist
           file_name="suanPan-${{ matrix.os }}"
           file_name="${file_name//xlarge/arm64}"
           file_name="${file_name//large/amd64}"
@@ -106,6 +116,10 @@ jobs:
           -DSP_ENABLE_AVX2=OFF `
           ..
           cmake --build . --target install --config Debug -j 4
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
       - name: Pack
         shell: bash
         run: |

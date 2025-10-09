@@ -224,10 +224,15 @@ jobs:
           -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
           cmake --build . --target install --config Release -j 3
-      - name: Pack
-        run: |
+          cd ..
           cp updater build/dist/bin
           ./Script/mac-patcher.sh build/dist
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
+      - name: Pack
+        run: |
           file_name="suanPan-${{ matrix.os }}-openblas"
           file_name="${file_name//xlarge/arm64}"
           file_name="${file_name//large/amd64}"
