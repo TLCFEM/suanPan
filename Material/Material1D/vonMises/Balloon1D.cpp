@@ -79,22 +79,28 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        auto km = 1.;
-        if(const auto ref_zr = zr_size > 0 ? trial_zr.max() : trial_zr.min(); z < ref_zr) km = kb / (1. - kr * std::log(1. - ref_zr));
-        const auto kc = 1. - km;
+        const auto ref_zr = zr_size > 0 ? trial_zr.max() : trial_zr.min();
+        auto km = 1. / (1. - kb * std::log(1. - ref_zr)), dkm = 0.;
+        if(z < ref_zr) {
+            const auto ratio_term = z / ref_zr;
+            const auto exp_term = std::exp(ratio_term / kr / (ratio_term - 1.));
+            dkm = km / kr * std::pow(ratio_term - 1., -2.) * exp_term / ref_zr;
+            km *= 1. - exp_term;
+        }
+        const auto kc = 1. - km, dkc = -dkm;
 
         qm = current_qm + km * gamma;
         qc = current_qc + kc * gamma;
         q = current_q + gamma;
 
         const auto [hf, dhf] = bound_hf(qm, true);
-        const auto phfpg = dhf * km;
+        const auto phfpg = dhf * km, phfpz = dhf * gamma * dkm;
 
         const auto [ha, dha] = bound_ha(q, true);
         const auto phapg = dha;
 
         const auto [hb, dhb] = bound_hb(qm, false);
-        const auto phbpg = dhb * km;
+        const auto phbpg = dhb * km, phbpz = dhb * gamma * dkm;
 
         const auto [hd, dhd] = bound_hd(q, true);
         const auto phdpg = dhd;
@@ -144,10 +150,14 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             if(s > 0.) start_z = 0.;
         }
 
-        auto dalpha = 0., dbeta = 0., dd = 0.;
-        for(auto I = 0llu; I < ba.size(); ++I) dalpha += ba[I].r() * (ba[I].b() * n - alpha[I]) / bot_alpha[I];
-        for(auto I = 0llu; I < bb.size(); ++I) dbeta += bb[I].r() * kc * (bb[I].b() * n - beta[I]) / bot_beta[I];
-        for(auto I = 0llu; I < bd.size(); ++I) dd += bd[I].r() * (bd[I].b() * n - d[I]) / bot_d[I];
+        auto palphapg = 0., pbetapg = 0., pbetapz = 0., pdpg = 0.;
+        for(auto I = 0llu; I < ba.size(); ++I) palphapg += ba[I].r() * (ba[I].b() * n - alpha[I]) / bot_alpha[I];
+        for(auto I = 0llu; I < bb.size(); ++I) {
+            const auto factor = bb[I].r() * (bb[I].b() * n - beta[I]) / bot_beta[I];
+            pbetapg += kc * factor;
+            pbetapz += gamma * dkc * factor;
+        }
+        for(auto I = 0llu; I < bd.size(); ++I) pdpg += bd[I].r() * (bd[I].b() * n - d[I]) / bot_d[I];
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio[0];
@@ -156,8 +166,8 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - ha * sum_alpha - hb * sum_beta + (z - 1.) * hd * sum_d) - z * hf;
         residual(1) = hf * diff_z - gamma * avg_rate;
 
-        jacobian(0, 0) = n * ((z - 1.) * (hd * dd + sum_d * phdpg) - ha * dalpha - sum_alpha * phapg - hb * dbeta - sum_beta * phbpg) - elastic - z * phfpg;
-        jacobian(0, 1) = n * hd * sum_d - hf;
+        jacobian(0, 0) = n * ((z - 1.) * (hd * pdpg + sum_d * phdpg) - ha * palphapg - sum_alpha * phapg - hb * pbetapg - sum_beta * phbpg) - elastic - z * phfpg;
+        jacobian(0, 1) = n * (hd * sum_d - phbpz * sum_beta - hb * pbetapz) - hf - z * phfpz;
 
         jacobian(1, 0) = phfpg * diff_z - avg_rate;
         jacobian(1, 1) = hf - u * gamma * trial_ratio[1];
