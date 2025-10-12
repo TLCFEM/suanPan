@@ -82,9 +82,8 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         const auto ref_zr = zr_size > 0 ? trial_zr.max() : trial_zr.min();
         auto km = 1. / (1. - kb * std::log(1. - ref_zr)), dkm = 0.;
         if(z < ref_zr) {
-            const auto ratio_term = z / ref_zr;
-            const auto exp_term = std::exp(ratio_term / kr / (ratio_term - 1.));
-            dkm = km / kr * std::pow(ratio_term - 1., -2.) * exp_term / ref_zr;
+            const auto exp_term = std::exp(z / kr / (z - ref_zr));
+            dkm = km / kr * std::pow(z / ref_zr - 1., -2.) * exp_term / ref_zr;
             km *= 1. - exp_term;
         }
         const auto kc = 1. - km, dkc = -dkm;
