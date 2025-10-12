@@ -43,9 +43,7 @@ struct DataBalloon1D {
             , bound(B) {}
 
         [[nodiscard]] double r() const { return rate * root_one_half; }
-
         [[nodiscard]] double b() const { return bound; }
-
         [[nodiscard]] double rb() const { return r() * b(); }
     };
 
@@ -68,12 +66,12 @@ struct DataBalloon1D {
 
     const double elastic; // elastic modulus
     const double u;       // yield ratio evolution rate
-    const double k;       // plastic strain split ratio
+    const double kb, kr;  // plastic strain split ratio
     const int zr_size;    // memory size
 
-    const Bound isotropic, kinematic;
+    const Bound bound_hf, bound_ha, bound_hb, bound_hd;
 
-    const std::vector<Saturation> b, c;
+    const std::vector<Saturation> ba, bb, bd;
 };
 
 class Balloon1D final : protected DataBalloon1D, public Material1D {
@@ -113,6 +111,8 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
     };
 
     memory current_zr{static_cast<std::size_t>(std::abs(zr_size))}, trial_zr{static_cast<std::size_t>(std::abs(zr_size))};
+
+    [[nodiscard]] double initial_check(double);
 
 public:
     Balloon1D(

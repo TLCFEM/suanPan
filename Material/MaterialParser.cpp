@@ -298,7 +298,7 @@ namespace {
             return;
         }
 
-        vec p(16);
+        vec p(27);
         if(!get_input(command, p)) {
             suanpan_error("Valid inputs are required.\n");
             return;
@@ -311,14 +311,18 @@ namespace {
         }
 
         DataBalloon1D para{
-            p(0),                       // elastic modulus
-            p(1),                       // u
-            p(2),                       // split
-            static_cast<int>(p(3)),     // zr memory size
-            {p(4), p(5), p(6), p(7)},   // isotropic
-            {p(8), p(9), p(10), p(11)}, // kinematic
-            {{p(12), p(13)}},           // back stress saturation
-            {{p(14), p(15)}},           // similarity saturation
+            p(0),                         // elastic modulus
+            p(1),                         // u
+            p(2),                         // split bound
+            p(3),                         // split rate
+            static_cast<int>(p(4)),       // zr memory size
+            {p(5), p(6), p(7), p(8)},     // hf
+            {p(9), p(10), p(11), p(12)},  // ha
+            {p(13), p(14), p(15), p(16)}, // hb
+            {p(17), p(18), p(19), p(20)}, // hd
+            {{p(21), p(22)}},             // alpha saturation
+            {{p(23), p(24)}},             // beta saturation
+            {{p(25), p(26)}},             // similarity saturation
         };
 
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);

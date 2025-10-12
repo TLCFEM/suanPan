@@ -24,6 +24,47 @@ const double DataBalloon1D::Saturation::root_one_half = sqrt(1.5);
 
 const double Balloon1D::rate_bound = -log(z_bound);
 
+/**
+ * @brief Perform the initial check to determine whether the material is plastic loading or elastic unloading.
+ * If it is plastic loading, correct the $z$ value when necessary.
+ * If it is elastic unloading, update the $z$ value accordingly.
+ * The loading flag is also updated.
+ * The history buffer for $z$ is also updated.
+ * @param start_z The $z$ value at the start of the step
+ * @return The revised $z$ value at the start of the integration
+ */
+double Balloon1D::initial_check(double start_z) {
+    const auto& current_q = current_history(2);
+    const auto& current_qm = current_history(3);
+    const vec current_alpha(&current_history(6), ba.size(), false, true);
+    const vec current_beta(&current_history(6 + ba.size()), bb.size(), false, true);
+    const vec current_d(&current_history(6 + ba.size() + bb.size()), bd.size(), false, true);
+
+    auto& last_loading = trial_history(1);
+    auto& z = trial_history(5);
+
+    const auto sum_alpha = bound_ha(current_q, true).first * accu(current_alpha);
+    const auto sum_beta = bound_hb(current_qm, false).first * accu(current_beta);
+    const auto sum_d = bound_hd(current_q, true).first * accu(current_d);
+    const auto sum_all = sum_alpha + sum_beta + sum_d;
+
+    // assuming z is zero find the load factor
+    const auto s = (sum_all - current_stress(0)) / incre_strain(0);
+    if(std::signbit(last_loading) == std::signbit(s)) trial_zr.enqueue(z);
+    if(s >= elastic) {
+        last_loading = -1.;
+        // elastic unloading
+        const auto n = current_stress(0) - sum_all + z * sum_d > 0. ? 1. : -1.;
+        z = (trial_stress(0) - sum_all) / (bound_hf(current_qm, true).first * n - sum_d);
+    }
+    else {
+        last_loading = 1.;
+        if(s > 0.) start_z = 0.;
+    }
+
+    return start_z;
+}
+
 Balloon1D::Balloon1D(const unsigned T, DataBalloon1D&& D, const double R)
     : DataBalloon1D{std::move(D)}
     , Material1D(T, R) {}
@@ -31,7 +72,7 @@ Balloon1D::Balloon1D(const unsigned T, DataBalloon1D&& D, const double R)
 int Balloon1D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic;
 
-    initialize_history(5u + static_cast<unsigned>(b.size() + c.size()));
+    initialize_history(6u + static_cast<unsigned>(ba.size() + bb.size() + bd.size()));
 
     return SUANPAN_SUCCESS;
 }
@@ -49,21 +90,29 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     trial_zr = current_zr;
     const auto& current_q = current_history(2);
     const auto& current_qm = current_history(3);
-    const auto& current_z = current_history(4);
+    const auto& current_qc = current_history(4);
+    const auto& current_z = current_history(5);
     auto& iteration = trial_history(0);
     auto& last_loading = trial_history(1);
     auto& q = trial_history(2);
     auto& qm = trial_history(3);
-    auto& z = trial_history(4);
+    auto& qc = trial_history(4);
+    auto& z = trial_history(5);
 
-    const vec current_alpha(&current_history(5), b.size(), false, true);
-    const vec current_d(&current_history(5 + b.size()), c.size(), false, true);
-    vec alpha(&trial_history(5), b.size(), false, true);
-    vec d(&trial_history(5 + b.size()), c.size(), false, true);
+    const vec current_alpha(&current_history(6), ba.size(), false, true);
+    const vec current_beta(&current_history(6 + ba.size()), bb.size(), false, true);
+    const vec current_d(&current_history(6 + ba.size() + bb.size()), bd.size(), false, true);
+    vec alpha(&trial_history(6), ba.size(), false, true);
+    vec beta(&trial_history(6 + ba.size()), bb.size(), false, true);
+    vec d(&trial_history(6 + ba.size() + bb.size()), bd.size(), false, true);
 
     iteration = 0.;
+    const auto start_z = initial_check(current_z);
+
+    // elastic unloading
+    if(last_loading < -.5) return SUANPAN_SUCCESS;
+
     auto gamma = 0., ref_error = 0.;
-    auto start_z = current_z;
 
     vec2 residual, incre;
     mat22 jacobian;
@@ -75,56 +124,82 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        auto split = 1., dsplit = 0.;
-        if(const auto ref_zr = zr_size > 0 ? trial_zr.max() : trial_zr.min(); z < ref_zr) split = 1 / (1. - k * std::log(1. - ref_zr));
+        const auto ref_zr = zr_size > 0 ? trial_zr.max() : trial_zr.min();
+        auto km = 1. / (1. - kb * std::log(1. - ref_zr)), dkm = 0.;
+        if(z < ref_zr) {
+            const auto exp_term = std::exp(z / kr / (z - ref_zr));
+            dkm = km / kr * std::pow(z / ref_zr - 1., -2.) * exp_term / ref_zr;
+            km *= 1. - exp_term;
+        }
+        const auto kc = 1. - km, dkc = -dkm;
 
-        const auto [ym, dym] = isotropic(qm = current_qm + split * gamma, true);
-        const auto y = ym;
-        const auto pypg = dym * split;
-        const auto pypz = dym * gamma * dsplit;
+        q = current_q + gamma;
+        qm = current_qm + km * gamma;
+        qc = current_qc + kc * gamma;
 
-        const auto [a, da] = kinematic(q = current_q + gamma, true);
+        const auto [hf, dhf] = bound_hf(qm, true);
+        const auto phfpg = dhf * km, phfpz = dhf * gamma * dkm;
 
-        vec bottom_alpha(b.size(), fill::none), bottom_d(c.size(), fill::none);
-        for(auto I = 0llu; I < b.size(); ++I) bottom_alpha(I) = 1. + b[I].r() * gamma;
-        for(auto I = 0llu; I < c.size(); ++I) bottom_d(I) = 1. + c[I].r() * gamma;
+        const auto [ha, dha] = bound_ha(q, true);
+        const auto phapg = dha;
 
-        const auto n = trial_stress(0) - a * accu(current_alpha / bottom_alpha) + (z - 1.) * y * accu(current_d / bottom_d) > 0. ? 1. : -1.;
+        const auto [hb, dhb] = bound_hb(qm, false);
+        const auto phbpg = dhb * km, phbpz = dhb * gamma * dkm;
 
-        for(auto I = 0llu; I < b.size(); ++I) alpha(I) = (b[I].rb() * gamma * n + current_alpha(I)) / bottom_alpha(I);
-        for(auto I = 0llu; I < c.size(); ++I) d(I) = (c[I].rb() * gamma * n + current_d(I)) / bottom_d(I);
+        const auto [hd, dhd] = bound_hd(q, true);
+        const auto phdpg = dhd;
 
-        const auto sum_alpha = accu(alpha), sum_d = accu(d);
-
-        if(1u == counter) {
-            const auto s = (y * sum_d + a * sum_alpha - current_stress(0)) / (trial_stress(0) - current_stress(0));
-            if(std::signbit(last_loading) == std::signbit(s)) trial_zr.enqueue(z);
-            if(s >= 1.) {
-                last_loading = -1.;
-                // elastic unloading
-                z = ((trial_stress(0) - a * sum_alpha) / y - sum_d) / (n - sum_d);
-                return SUANPAN_SUCCESS;
-            }
-            last_loading = 1.;
-            if(s > 0.) start_z = 0.;
+        vec top_alpha(ba.size(), fill::none), top_beta(bb.size(), fill::none), top_d(bd.size(), fill::none);
+        vec bot_alpha(ba.size(), fill::none), bot_beta(bb.size(), fill::none), bot_d(bd.size(), fill::none);
+        for(auto I = 0llu; I < ba.size(); ++I) {
+            top_alpha(I) = ba[I].rb() * gamma;
+            bot_alpha(I) = 1. + ba[I].r() * gamma;
+        }
+        for(auto I = 0llu; I < bb.size(); ++I) {
+            top_beta(I) = bb[I].rb() * gamma * kc;
+            bot_beta(I) = 1. + bb[I].r() * gamma * kc;
+        }
+        for(auto I = 0llu; I < bd.size(); ++I) {
+            top_d(I) = bd[I].rb() * gamma;
+            bot_d(I) = 1. + bd[I].r() * gamma;
         }
 
-        auto dalpha = 0., dd = 0.;
-        for(auto I = 0llu; I < b.size(); ++I) dalpha += b[I].r() * (b[I].b() * n - alpha[I]) / bottom_alpha[I];
-        for(auto I = 0llu; I < c.size(); ++I) dd += c[I].r() * (c[I].b() * n - d[I]) / bottom_d[I];
+        const auto zeta = trial_stress(0) - ha * accu(current_alpha / bot_alpha) - hb * accu(current_beta / bot_beta) + (z - 1.) * hd * accu(current_d / bot_d);
+        const auto norm_zeta = std::fabs(zeta);
+        const auto norm_diff = elastic * gamma + ha * accu(top_alpha / bot_alpha) + hb * accu(top_beta / bot_beta) + (1. - z) * hd * accu(top_d / bot_d);
+
+        auto n = 0.;
+        if(norm_zeta >= norm_diff) n = zeta > 0. ? 1. : -1.;
+        else if(-norm_zeta >= norm_diff) n = zeta > 0. ? -1. : 1.;
+        else {
+            suanpan_error("Sign mismatch, likely an unknown bug.\n");
+            return SUANPAN_FAIL;
+        }
+
+        const auto sum_alpha = accu(alpha = (top_alpha * n + current_alpha) / bot_alpha);
+        const auto sum_beta = accu(beta = (top_beta * n + current_beta) / bot_beta);
+        const auto sum_d = accu(d = (top_d * n + current_d) / bot_d);
+
+        auto palphapg = 0., pbetapg = 0., pbetapz = 0., pdpg = 0.;
+        for(auto I = 0llu; I < ba.size(); ++I) palphapg += ba[I].r() * (ba[I].b() * n - alpha[I]) / bot_alpha[I];
+        for(auto I = 0llu; I < bb.size(); ++I) {
+            const auto factor = bb[I].r() * (bb[I].b() * n - beta[I]) / bot_beta[I];
+            pbetapg += kc * factor;
+            pbetapz += gamma * dkc * factor;
+        }
+        for(auto I = 0llu; I < bd.size(); ++I) pdpg += bd[I].r() * (bd[I].b() * n - d[I]) / bot_d[I];
 
         const auto trial_ratio = yield_ratio(z);
-        const auto avg_rate = u * trial_ratio[0];
         const auto diff_z = z - start_z;
 
-        residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (z - 1.) * y * sum_d) - z * y;
-        residual(1) = y * diff_z - gamma * avg_rate;
+        residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - ha * sum_alpha - hb * sum_beta + (z - 1.) * hd * sum_d) - z * hf;
+        residual(1) = hf * diff_z - gamma * u * trial_ratio[0];
 
-        jacobian(0, 0) = n * ((z - 1.) * (y * dd + sum_d * pypg) - a * dalpha - sum_alpha * da) - elastic - z * pypg;
-        jacobian(0, 1) = n * sum_d * (y + z * pypz - pypz) - y - z * pypz;
+        jacobian(0, 0) = n * ((z - 1.) * (hd * pdpg + sum_d * phdpg) - ha * palphapg - sum_alpha * phapg - hb * pbetapg - sum_beta * phbpg) - elastic - z * phfpg;
+        jacobian(0, 1) = n * (hd * sum_d - phbpz * sum_beta - hb * pbetapz) - hf - z * phfpz;
 
-        jacobian(1, 0) = pypg * diff_z - avg_rate;
-        jacobian(1, 1) = pypz * diff_z + y - u * gamma * trial_ratio[1];
+        jacobian(1, 0) = phfpg * diff_z - u * trial_ratio[0];
+        jacobian(1, 1) = hf - gamma * u * trial_ratio[1];
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
@@ -173,6 +248,6 @@ int Balloon1D::reset_status() {
 }
 
 void Balloon1D::print() {
-    suanpan_info("A uniaxial combined hardening material using subloading surface model. doi:10.1007/s00707-025-04339-0\n");
+    suanpan_info("The Balloon uniaxial model.\n");
     Material1D::print();
 }
