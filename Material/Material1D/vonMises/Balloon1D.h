@@ -112,6 +112,8 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
 
     memory current_zr{static_cast<std::size_t>(std::abs(zr_size))}, trial_zr{static_cast<std::size_t>(std::abs(zr_size))};
 
+    [[nodiscard]] double initial_check(double);
+
 public:
     Balloon1D(
         unsigned,        // tag

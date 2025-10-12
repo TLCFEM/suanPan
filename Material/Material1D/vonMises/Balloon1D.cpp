@@ -24,6 +24,46 @@ const double DataBalloon1D::Saturation::root_one_half = sqrt(1.5);
 
 const double Balloon1D::rate_bound = -log(z_bound);
 
+/**
+ * @brief Perform the initial check to determine whether the material is plastic loading or elastic unloading.
+ * If it is plastic loading, correct the $z$ value when necessary.
+ * If it is elastic unloading, update the $z$ value accordingly.
+ * The loading flag is also updated.
+ * @param start_z The $z$ value at the start of the step
+ * @return The revised $z$ value at the start of the integration
+ */
+double Balloon1D::initial_check(double start_z) {
+    const auto& current_q = current_history(2);
+    const auto& current_qm = current_history(3);
+    const vec current_alpha(&current_history(6), ba.size(), false, true);
+    const vec current_beta(&current_history(6 + ba.size()), bb.size(), false, true);
+    const vec current_d(&current_history(6 + ba.size() + bb.size()), bd.size(), false, true);
+
+    auto& last_loading = trial_history(1);
+    auto& z = trial_history(5);
+
+    const auto sum_alpha = bound_ha(current_q, true).first * accu(current_alpha);
+    const auto sum_beta = bound_hb(current_qm, false).first * accu(current_beta);
+    const auto sum_d = bound_hd(current_q, true).first * accu(current_d);
+    const auto sum_all = sum_alpha + sum_beta + sum_d;
+
+    // assuming z is zero find the load factor
+    const auto s = (sum_all - current_stress(0)) / incre_strain(0);
+    if(std::signbit(last_loading) == std::signbit(s)) trial_zr.enqueue(z);
+    if(s >= elastic) {
+        last_loading = -1.;
+        // elastic unloading
+        const auto n = current_stress(0) - sum_all + z * sum_d > 0. ? 1. : -1.;
+        z = (trial_stress(0) - sum_all) / (bound_hf(current_qm, true).first * n - sum_d);
+    }
+    else {
+        last_loading = 1.;
+        if(s > 0.) start_z = 0.;
+    }
+
+    return start_z;
+}
+
 Balloon1D::Balloon1D(const unsigned T, DataBalloon1D&& D, const double R)
     : DataBalloon1D{std::move(D)}
     , Material1D(T, R) {}
@@ -66,8 +106,12 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     vec d(&trial_history(6 + ba.size() + bb.size()), bd.size(), false, true);
 
     iteration = 0.;
+    const auto start_z = initial_check(current_z);
+
+    // elastic unloading
+    if(last_loading < -.5) return SUANPAN_SUCCESS;
+
     auto gamma = 0., ref_error = 0.;
-    auto start_z = current_z;
 
     vec2 residual, incre;
     mat22 jacobian;
@@ -88,9 +132,9 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         }
         const auto kc = 1. - km, dkc = -dkm;
 
+        q = current_q + gamma;
         qm = current_qm + km * gamma;
         qc = current_qc + kc * gamma;
-        q = current_q + gamma;
 
         const auto [hf, dhf] = bound_hf(qm, true);
         const auto phfpg = dhf * km, phfpz = dhf * gamma * dkm;
@@ -135,20 +179,6 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         const auto sum_beta = accu(beta = (top_beta * n + current_beta) / bot_beta);
         const auto sum_d = accu(d = (top_d * n + current_d) / bot_d);
 
-        if(1u == counter) {
-            const auto h_sum = ha * sum_alpha + hb * sum_beta + hd * sum_d;
-            const auto s = (h_sum - current_stress(0)) / (trial_stress(0) - current_stress(0));
-            if(std::signbit(last_loading) == std::signbit(s)) trial_zr.enqueue(z);
-            if(s >= 1.) {
-                last_loading = -1.;
-                // elastic unloading
-                z = (trial_stress(0) - h_sum) / (hf * n - hd * sum_d);
-                return SUANPAN_SUCCESS;
-            }
-            last_loading = 1.;
-            if(s > 0.) start_z = 0.;
-        }
-
         auto palphapg = 0., pbetapg = 0., pbetapz = 0., pdpg = 0.;
         for(auto I = 0llu; I < ba.size(); ++I) palphapg += ba[I].r() * (ba[I].b() * n - alpha[I]) / bot_alpha[I];
         for(auto I = 0llu; I < bb.size(); ++I) {
@@ -159,17 +189,16 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         for(auto I = 0llu; I < bd.size(); ++I) pdpg += bd[I].r() * (bd[I].b() * n - d[I]) / bot_d[I];
 
         const auto trial_ratio = yield_ratio(z);
-        const auto avg_rate = u * trial_ratio[0];
         const auto diff_z = z - start_z;
 
         residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - ha * sum_alpha - hb * sum_beta + (z - 1.) * hd * sum_d) - z * hf;
-        residual(1) = hf * diff_z - gamma * avg_rate;
+        residual(1) = hf * diff_z - gamma * u * trial_ratio[0];
 
         jacobian(0, 0) = n * ((z - 1.) * (hd * pdpg + sum_d * phdpg) - ha * palphapg - sum_alpha * phapg - hb * pbetapg - sum_beta * phbpg) - elastic - z * phfpg;
         jacobian(0, 1) = n * (hd * sum_d - phbpz * sum_beta - hb * pbetapz) - hf - z * phfpz;
 
-        jacobian(1, 0) = phfpg * diff_z - avg_rate;
-        jacobian(1, 1) = hf - u * gamma * trial_ratio[1];
+        jacobian(1, 0) = phfpg * diff_z - u * trial_ratio[0];
+        jacobian(1, 1) = hf - gamma * u * trial_ratio[1];
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
