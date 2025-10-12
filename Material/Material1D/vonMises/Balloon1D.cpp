@@ -29,6 +29,7 @@ const double Balloon1D::rate_bound = -log(z_bound);
  * If it is plastic loading, correct the $z$ value when necessary.
  * If it is elastic unloading, update the $z$ value accordingly.
  * The loading flag is also updated.
+ * The history buffer for $z$ is also updated.
  * @param start_z The $z$ value at the start of the step
  * @return The revised $z$ value at the start of the integration
  */
