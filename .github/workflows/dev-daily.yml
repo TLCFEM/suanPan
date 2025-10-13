@@ -121,7 +121,7 @@ jobs:
       - name: Cosign
         uses: sigstore/gh-action-sigstore-python@v3.0.1
         with:
-          inputs: build/dist/bin/*
+          inputs: build/dist/bin/*.exe
       - name: Pack
         shell: bash
         run: |
