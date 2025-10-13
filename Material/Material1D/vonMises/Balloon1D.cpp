@@ -24,6 +24,15 @@ const double DataBalloon1D::Saturation::root_one_half = sqrt(1.5);
 
 const double Balloon1D::rate_bound = -log(z_bound);
 
+auto Balloon1D::compute_bounds(const double q, const double qm, [[maybe_unused]] const double qc) const {
+    const auto [hf, dhf] = bound_hf(qm, true);
+    const auto [ha, dha] = bound_ha(q, true);
+    const auto [hb, dhb] = bound_hb(qm, false);
+    const auto [hd, dhd] = bound_hd(q, true);
+
+    return std::make_tuple(hf, ha, hb, hd, dhf, dha, dhb, dhd);
+}
+
 /**
  * @brief Perform the initial check to determine whether the material is plastic loading or elastic unloading.
  * If it is plastic loading, correct the $z$ value when necessary.
@@ -36,17 +45,21 @@ const double Balloon1D::rate_bound = -log(z_bound);
 double Balloon1D::initial_check(double start_z) {
     const auto& current_q = current_history(2);
     const auto& current_qm = current_history(3);
+    const auto& current_qc = current_history(4);
+
     const vec current_alpha(&current_history(6), ba.size(), false, true);
     const vec current_beta(&current_history(6 + ba.size()), bb.size(), false, true);
     const vec current_d(&current_history(6 + ba.size() + bb.size()), bd.size(), false, true);
 
+    [[maybe_unused]] const auto [hf, ha, hb, hd, dhf, dha, dhb, dhd] = compute_bounds(current_q, current_qm, current_qc);
+
+    const auto sum_alpha = ha * accu(current_alpha);
+    const auto sum_beta = hb * accu(current_beta);
+    const auto sum_d = hd * accu(current_d);
+    const auto sum_all = sum_alpha + sum_beta + sum_d;
+
     auto& last_loading = trial_history(1);
     auto& z = trial_history(5);
-
-    const auto sum_alpha = bound_ha(current_q, true).first * accu(current_alpha);
-    const auto sum_beta = bound_hb(current_qm, false).first * accu(current_beta);
-    const auto sum_d = bound_hd(current_q, true).first * accu(current_d);
-    const auto sum_all = sum_alpha + sum_beta + sum_d;
 
     // assuming z is zero find the load factor
     const auto s = (sum_all - current_stress(0)) / incre_strain(0);
@@ -55,7 +68,7 @@ double Balloon1D::initial_check(double start_z) {
         last_loading = -1.;
         // elastic unloading
         const auto n = current_stress(0) - sum_all + z * sum_d > 0. ? 1. : -1.;
-        z = (trial_stress(0) - sum_all) / (bound_hf(current_qm, true).first * n - sum_d);
+        z = (trial_stress(0) - sum_all) / (hf * n - sum_d);
     }
     else {
         last_loading = 1.;
@@ -137,16 +150,10 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         qm = current_qm + km * gamma;
         qc = current_qc + kc * gamma;
 
-        const auto [hf, dhf] = bound_hf(qm, true);
+        const auto [hf, ha, hb, hd, dhf, dha, dhb, dhd] = compute_bounds(q, qm, qc);
         const auto phfpg = dhf * km, phfpz = dhf * gamma * dkm;
-
-        const auto [ha, dha] = bound_ha(q, true);
         const auto phapg = dha;
-
-        const auto [hb, dhb] = bound_hb(qm, false);
         const auto phbpg = dhb * km, phbpz = dhb * gamma * dkm;
-
-        const auto [hd, dhd] = bound_hd(q, true);
         const auto phdpg = dhd;
 
         vec top_alpha(ba.size(), fill::none), top_beta(bb.size(), fill::none), top_d(bd.size(), fill::none);
