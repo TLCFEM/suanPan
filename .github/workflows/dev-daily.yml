@@ -9,8 +9,27 @@ env:
 permissions:
   id-token: write
 jobs:
+  check-latest:
+    runs-on: ubuntu-22.04
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - name: Commit
+        id: commit
+        run: |
+          head=$(git ls-remote https://github.com/TLCFEM/suanPan.git HEAD | awk '{print $1}')
+          echo "head=$head" >> $GITHUB_OUTPUT
+          echo "$head" > .commit
+      - name: Cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: .commit
+          key: commit-${{ steps.commit.outputs.head }}
   linux-daily:
     runs-on: ubuntu-22.04
+    needs: check-latest
+    if: needs.check-latest.outputs.cache-hit != 'true'
     timeout-minutes: 60
     steps:
       - name: Clone
@@ -49,6 +68,8 @@ jobs:
           rm -f key.pem
   macos-daily:
     runs-on: ${{ matrix.os }}
+    needs: check-latest
+    if: needs.check-latest.outputs.cache-hit != 'true'
     timeout-minutes: 100
     strategy:
       matrix:
@@ -95,6 +116,8 @@ jobs:
           rm -f key.pem
   windows-gcc-daily:
     runs-on: windows-2022
+    needs: check-latest
+    if: needs.check-latest.outputs.cache-hit != 'true'
     timeout-minutes: 100
     steps:
       - name: Clone
