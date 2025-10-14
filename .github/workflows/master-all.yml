@@ -9,6 +9,7 @@ env:
   ARTIFACT: ""
 permissions:
   id-token: write
+  contents: write
 jobs:
   linux-master:
     runs-on: ${{ matrix.os }}
