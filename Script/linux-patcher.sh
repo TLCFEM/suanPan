@@ -46,21 +46,21 @@ ldd "$TARGET" | awk '/=>/ { print $3 }' | while read -r DEPENDENCY; do
   libgcc_s* | libgfortran* | libgomp* | libquadmath* | libstdc++*) ;;
   *) continue ;;
   esac
-  TARGET="$LIBDIR/$FILENAME"
-  if [ ! -f "$TARGET" ]; then
+  DEST="$LIBDIR/$FILENAME"
+  if [ ! -f "$DEST" ]; then
     echo "Copying $FILENAME to $LIBDIR"
-    cp "$DEPENDENCY" "$TARGET"
+    cp "$DEPENDENCY" "$DEST"
   fi
 done
 
 echo "Patching $TARGET ..."
 
-patchelf --set-rpath '$ORIGIN/../lib' "$TARGET"
+patchelf --set-rpath "$ORIGIN/../lib" "$TARGET"
 
 for DEPENDENCY in "$LIBDIR"/*.so*; do
   if [ -f "$DEPENDENCY" ]; then
     echo "Patching $DEPENDENCY ..."
-    patchelf --set-rpath '$ORIGIN' "$DEPENDENCY"
+    patchelf --set-rpath "$ORIGIN" "$DEPENDENCY"
   fi
 done
 

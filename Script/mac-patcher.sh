@@ -66,7 +66,9 @@ while :; do
 done
 
 for target in "$BIN_DIR"/*; do
-  [[ -f "$target" ]] && file "$target" | grep -q 'Mach-O' || continue
+  if ! [[ -f "$target" ]] || ! file "$target" | grep -q 'Mach-O'; then
+    continue
+  fi
   echo "Patching $target"
   otool -L "$target" | tail -n +2 | awk '{print $1}' | while read -r dep; do
     [[ "$dep" == /usr/lib/* || "$dep" == /System/* ]] && continue
