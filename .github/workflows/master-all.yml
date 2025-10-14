@@ -491,6 +491,9 @@ jobs:
         windows-gcc-master,
       ]
     steps:
+      - name: Prepare
+        run: |
+          echo "SP_TIME=daily-$(date +''%y%m%d'')" >> $GITHUB_ENV
       - name: VirusTotal
         uses: cssnr/virustotal-action@v1
         with:
