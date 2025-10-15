@@ -130,6 +130,7 @@ jobs:
           7z x winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z
       - name: Compile
         run: |
+          "ARTIFACT=suanPan-win-gcc-debug-openblas-$env:SP_TIME.zip" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "SP_TIME=$(Get-Date -Format 'yyMMdd')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           mkdir build && cd build
           cmake -G "MinGW Makefiles" `
@@ -145,13 +146,26 @@ jobs:
         uses: sigstore/gh-action-sigstore-python@v3.0.1
         with:
           inputs: build/dist/bin/*.exe
-      - name: Pack
-        shell: bash
+      - name: Unsigned
+        id: upload-unsigned-vs
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ env.ARTIFACT }}
+          path: build/dist/bin/*.exe
+      - name: Sign
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: "${{ secrets.SIGNPATH }}"
+          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
+          project-slug: "suanPan"
+          signing-policy-slug: "test-signing"
+          github-artifact-id: "${{ steps.upload-unsigned-vs.outputs.artifact-id }}"
+          wait-for-completion: true
+          output-artifact-directory: "build/dist/bin"
+      - name: Test
         run: |
-          file_name="suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip"
-          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
-          7z a -tzip ../../../$file_name ./*
+          7z a -tzip ../../../${{ env.ARTIFACT }} ./*
           ./suanPan.exe -v
       - name: Remote
         shell: bash
