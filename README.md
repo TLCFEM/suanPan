@@ -101,6 +101,9 @@ Further details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tuto
 
 ## Installation
 
+> [!TIP]
+> Daily debug builds can be downloaded via [this](https://tlcfem.top/suanpan/) page.
+
 > [!WARNING]
 > Only the 64-bit version is compiled.
 > It is assumed that [**AVX2**](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) is available thus if the program
@@ -139,7 +142,7 @@ on [Chocolatey](https://chocolatey.org/packages/suanpan), please use the followi
 The Chocolatey repo available to you may not be up-to-date.
 If the latest version is not available, please try alternatives, such as portable binaries or scoop.
 
-[<p align="center"><img src="Resource/choco.gif" alt="Installation Demo"></p>](https://asciinema.org/a/684063)
+<p align="center"><a href="https://asciinema.org/a/684063"><img src="Resource/choco.gif" alt="Installation Demo"></a></p>
 
 #### Scoop
 
@@ -158,6 +161,14 @@ It is also possible to use [Scoop](https://scoop.sh/) to install the package.
    scoop install suanpan
    ```
 
+### Code Signing Policy
+
+[![SignPath](https://raw.githubusercontent.com/SignPath/fdn-website/refs/heads/main/docs/assets/logo.svg)](https://about.signpath.io/)
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.
+
 ### Linux
 
 Linux users are recommended to obtain the binaries via `snap` or `flatpak`.
@@ -170,7 +181,7 @@ The `stable` channel is in sync with the `master` branch.
 
 [![Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/suanpan)
 
-[<p align="center"><img src="Resource/snap.gif" alt="Installation Demo"></p>](https://asciinema.org/a/684061)
+<p align="center"><a href="https://asciinema.org/a/684061"><img src="Resource/snap.gif" alt="Installation Demo"></a></p>
 
 #### Flatpak
 
@@ -190,6 +201,26 @@ flatpak install suanPan
 # define alias
 echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
 ```
+
+### macOS
+
+The portable binary archives are provided for macOS 14 and 15 with both `amd64` and `arm64` architectures.
+The archives themselves are self-contained.
+They can be successfully executed on earlier versions of macOS.
+
+> [!CAUTION]
+> The binaries are **not** signed.
+> It is necessary to run `sudo xattr -dr com.apple.quarantine <downloaded/archive/folder>` to remove extra attribute.
+>
+> ```bash
+> DOWNLOAD_URL="https://github.com/TLCFEM/suanPan/releases/download/suanPan-v3.9.3/suanPan-macos-14-amd64-openblas-avx.tar.gz"
+> curl -L "$DOWNLOAD_URL" -o suanPan-latest.tar.gz
+> mkdir -p suanPan && tar -xzf suanPan-latest.tar.gz -C suanPan && cd suanPan
+> sudo xattr -dr com.apple.quarantine .
+> ./suanPan.sh
+> ```
+>
+> The download link should be replaced with one appropriate for your system and requirements.
 
 ### Docker
 
@@ -260,9 +291,9 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**Armadillo**](http://arma.sourceforge.net/) version 15.0.3
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.10.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.11.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.5
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.6
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.30
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0

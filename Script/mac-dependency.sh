@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # -----------------------------------------------------------------------------
 # mac-dependency.sh
 #
@@ -34,21 +33,21 @@
 set -e
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <runner-image-name>"
-    exit 1
+  echo "Usage: $0 <runner-image-name>"
+  exit 1
 fi
 
-if ! command -v wget &> /dev/null; then
-    echo "Error: wget is not installed. Please install wget and try again."
-    exit 1
+if ! command -v wget &>/dev/null; then
+  echo "Error: wget is not installed. Please install wget and try again."
+  exit 1
 fi
 
 RUNNER_IMAGE_NAME="$1"
 
 if [[ "$RUNNER_IMAGE_NAME" == *"xlarge"* ]]; then
-    TARGET_DIR="$(dirname "$0")/../Libs/mac-arm"
+  TARGET_DIR="$(dirname "$0")/../Libs/mac-arm"
 else
-    TARGET_DIR="$(dirname "$0")/../Libs/mac"
+  TARGET_DIR="$(dirname "$0")/../Libs/mac"
 fi
 
 rm -rf "$TARGET_DIR"
@@ -81,6 +80,7 @@ wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
 find "$TMP_DIR" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
+# cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
 
 rm -rf "$TMP_DIR"
 

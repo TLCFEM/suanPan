@@ -55,16 +55,16 @@ namespace suanpan {
 
     template<typename T> constexpr T*& hacker(const T* const& I) { return const_cast<T*&>(I); }
 
-    template<typename T> T sign(const T& I) { return (I > T(0)) - (I < T(0)); }
+    template<typename T> requires std::signed_integral<T> || std::floating_point<T> constexpr T sign(const T I) { return (I > T(0)) - (I < T(0)); }
 
-    template<typename T> constexpr T clamp(T c, T a, T b) {
+    template<std::floating_point T> constexpr T clamp(const T c, T a, T b) {
         if(a > b) std::swap(a, b);
         return std::max(a, std::min(b, c));
     }
 
-    template<typename T> constexpr T clamp_unit(T c) { return clamp(c, T(0), T(1)); }
+    template<std::floating_point T> constexpr T clamp_unit(const T c) { return clamp(c, T(0), T(1)); }
 
-    template<typename T> bool approx_equal(T x, T y, int ulp = 2) requires(!std::numeric_limits<T>::is_integer) { return fabs(x - y) <= std::numeric_limits<T>::epsilon() * fabs(x + y) * ulp || fabs(x - y) < std::numeric_limits<T>::min(); }
+    template<std::floating_point T> bool approx_equal(const T x, const T y, int ulp = 2) { return std::fabs(x - y) <= std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp || std::fabs(x - y) < std::numeric_limits<T>::min(); }
 
     unsigned long long binomial(unsigned long long, unsigned long long);
 

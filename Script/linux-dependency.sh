@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # -----------------------------------------------------------------------------
 # linux-dependency.sh
 #
@@ -34,27 +33,29 @@
 set -e
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <runner-image-name>"
-    exit 1
+  echo "Usage: $0 <runner-image-name>"
+  exit 1
 fi
 
-if ! command -v wget &> /dev/null; then
-    echo "Error: wget is not installed. Please install wget and try again."
-    exit 1
+if ! command -v wget &>/dev/null; then
+  echo "Error: wget is not installed. Please install wget and try again."
+  exit 1
 fi
 
 RUNNER_IMAGE_NAME="$1"
 
 if [[ "$RUNNER_IMAGE_NAME" == *"arm"* ]]; then
-    TARGET_DIR="$(dirname "$0")/../Libs/linux-arm"
+  TARGET_DIR="$(dirname "$0")/../Libs/linux-arm"
 else
-    TARGET_DIR="$(dirname "$0")/../Libs/linux"
+  TARGET_DIR="$(dirname "$0")/../Libs/linux"
 fi
 
+TARGET_DIR="$(realpath "$TARGET_DIR")"
+
 if [ -d "$TARGET_DIR" ]; then
-    find "$TARGET_DIR" -mindepth 1 ! -name '*aocl*' -delete
+  find "$TARGET_DIR" -mindepth 1 ! -name "libflame.a" ! -name "libblis-mt.a" ! -name "libaoclutils.a" -delete
 else
-    mkdir -p "$TARGET_DIR"
+  mkdir -p "$TARGET_DIR"
 fi
 
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-1.14.6-$RUNNER_IMAGE_NAME.tar.gz"
@@ -73,7 +74,7 @@ TMP_DIR="$(mktemp -d)"
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
-find "$TMP_DIR/tbb-install/lib" -name "lib*" -exec cp -P {} "$TARGET_DIR" \;
+find "$TMP_DIR/tbb-install/lib" -name "lib*so*" -exec cp -P {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 

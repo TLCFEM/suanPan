@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.10.0
-//  Generated: 2025-08-24 16:18:04.775778
+//  Catch v3.11.0
+//  Generated: 2025-09-30 10:49:12.549018
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -214,11 +214,7 @@ namespace Catch {
                         return (nc / n) * (sb2 - nc * sg2);
                     };
 
-                    return (std::min)(var_out(1),
-                                      var_out(
-                                          (std::min)(c_max(0.),
-                                                     c_max(mg_min))
-                                      )) /
+                    return (std::min)(var_out(1), var_out((std::min)(c_max(0.), c_max(mg_min)))) /
                            sb2;
                 }
 
@@ -767,6 +763,8 @@ namespace Catch {
             m_data.reporterSpecifications.push_back(std::move(*parsed));
         }
 
+        // Reading bazel env vars can change some parts of the config data,
+        // so we have to process the bazel env before acting on the config.
         if(enableBazelEnvSupport()) {
             readBazelEnvVars();
         }
@@ -795,7 +793,12 @@ namespace Catch {
                 defaultOutputUsed = true;
             }
 
-            m_processedReporterSpecs.push_back(ProcessedReporterSpec{reporterSpec.name(), reporterSpec.outputFile() ? *reporterSpec.outputFile() : data.defaultOutputFilename, reporterSpec.colourMode().valueOr(data.defaultColourMode), reporterSpec.customOptions()});
+            m_processedReporterSpecs.push_back(ProcessedReporterSpec{
+                reporterSpec.name(),
+                reporterSpec.outputFile() ? *reporterSpec.outputFile() : data.defaultOutputFilename,
+                reporterSpec.colourMode().valueOr(data.defaultColourMode),
+                reporterSpec.customOptions()
+            });
         }
     }
 
@@ -822,6 +825,8 @@ namespace Catch {
     bool Config::hasTestFilters() const { return m_hasTestFilters; }
 
     bool Config::showHelp() const { return m_data.showHelp; }
+
+    std::string const& Config::getExitGuardFilePath() const { return m_data.prematureExitGuardFilePath; }
 
     // IConfig interface
     bool Config::allowThrows() const { return !m_data.noThrow; }
@@ -884,6 +889,27 @@ namespace Catch {
                 m_data.shardCount = bazelShardOptions->shardCount;
             }
         }
+
+        const auto bazelExitGuardFile = Detail::getEnv("TEST_PREMATURE_EXIT_FILE");
+        if(bazelExitGuardFile) {
+            m_data.prematureExitGuardFilePath = bazelExitGuardFile;
+        }
+
+        const auto bazelRandomSeed = Detail::getEnv("TEST_RANDOM_SEED");
+        if(bazelRandomSeed) {
+            auto parsedSeed = parseUInt(bazelRandomSeed, 0);
+            if(!parsedSeed) {
+                // Currently we handle issues with parsing other Bazel Env
+                // options by warning and ignoring the issue. So we do the
+                // same for random seed option.
+                Catch::cerr()
+                    << "Warning: could not parse 'TEST_RANDOM_SEED' ('"
+                    << bazelRandomSeed << "') as proper seed.\n";
+            }
+            else {
+                m_data.rngSeed = *parsedSeed;
+            }
+        }
     }
 
 } // end namespace Catch
@@ -902,24 +928,22 @@ namespace Catch {
     ////////////////////////////////////////////////////////////////////////////
 
     ScopedMessage::ScopedMessage(MessageBuilder&& builder)
-        : m_info(CATCH_MOVE(builder.m_info)) {
-        m_info.message = builder.m_stream.str();
-        getResultCapture().pushScopedMessage(m_info);
+        : m_messageId(builder.m_info.sequence) {
+        MessageInfo info(CATCH_MOVE(builder.m_info));
+        info.message = builder.m_stream.str();
+        IResultCapture::pushScopedMessage(CATCH_MOVE(info));
     }
 
     ScopedMessage::ScopedMessage(ScopedMessage&& old) noexcept
-        : m_info(CATCH_MOVE(old.m_info)) {
+        : m_messageId(old.m_messageId) {
         old.m_moved = true;
     }
 
     ScopedMessage::~ScopedMessage() {
-        if(!m_moved) {
-            getResultCapture().popScopedMessage(m_info);
-        }
+        if(!m_moved) { IResultCapture::popScopedMessage(m_messageId); }
     }
 
-    Capturer::Capturer(StringRef macroName, SourceLineInfo const& lineInfo, ResultWas::OfType resultType, StringRef names)
-        : m_resultCapture(getResultCapture()) {
+    Capturer::Capturer(StringRef macroName, SourceLineInfo const& lineInfo, ResultWas::OfType resultType, StringRef names) {
         auto trimmed = [&](size_t start, size_t end) {
             while(names[start] == ',' || isspace(static_cast<unsigned char>(names[start]))) {
                 ++start;
@@ -965,8 +989,8 @@ namespace Catch {
             case ',':
                 if(start != pos && openings.empty()) {
                     m_messages.emplace_back(macroName, lineInfo, resultType);
-                    m_messages.back().message = static_cast<std::string>(trimmed(start, pos));
-                    m_messages.back().message += " := ";
+                    m_messages.back().message += trimmed(start, pos);
+                    m_messages.back().message += " := "_sr;
                     start = pos;
                 }
                 break;
@@ -975,20 +999,20 @@ namespace Catch {
         }
         assert(openings.empty() && "Mismatched openings");
         m_messages.emplace_back(macroName, lineInfo, resultType);
-        m_messages.back().message = static_cast<std::string>(trimmed(start, names.size() - 1));
-        m_messages.back().message += " := ";
+        m_messages.back().message += trimmed(start, names.size() - 1);
+        m_messages.back().message += " := "_sr;
     }
     Capturer::~Capturer() {
         assert(m_captured == m_messages.size());
-        for(size_t i = 0; i < m_captured; ++i) {
-            m_resultCapture.popScopedMessage(m_messages[i]);
+        for(auto const& message : m_messages) {
+            IResultCapture::popScopedMessage(message.sequence);
         }
     }
 
     void Capturer::captureValue(size_t index, std::string const& value) {
         assert(index < m_messages.size());
         m_messages[index].message += value;
-        m_resultCapture.pushScopedMessage(m_messages[index]);
+        IResultCapture::pushScopedMessage(CATCH_MOVE(m_messages[index]));
         m_captured++;
     }
 
@@ -1068,7 +1092,6 @@ namespace Catch {
     }
     void cleanUp() {
         cleanupSingletons();
-        cleanUpContext();
     }
     std::string translateActiveException() {
         return getRegistryHub().getExceptionTranslatorRegistry().translateActiveException();
@@ -1077,6 +1100,8 @@ namespace Catch {
 } // end namespace Catch
 
 #include <cassert>
+#include <cstdio>
+#include <cstdlib>
 #include <exception>
 #include <iomanip>
 #include <set>
@@ -1180,6 +1205,51 @@ namespace Catch {
         void applyFilenamesAsTags() {
             for(auto const& testInfo : getRegistryHub().getTestCaseRegistry().getAllInfos()) {
                 testInfo->addFilenameTag();
+            }
+        }
+
+        // Creates empty file at path. The path must be writable, we do not
+        // try to create directories in path because that's hard in C++14.
+        void setUpGuardFile(std::string const& guardFilePath) {
+            if(!guardFilePath.empty()) {
+#if defined(_MSC_VER)
+                std::FILE* file = nullptr;
+                if(fopen_s(&file, guardFilePath.c_str(), "w")) {
+                    char msgBuffer[100];
+                    const auto err = errno;
+                    std::string errMsg;
+                    if(!strerror_s(msgBuffer, err)) {
+                        errMsg = msgBuffer;
+                    }
+                    else {
+                        errMsg = "Could not translate errno to a string";
+                    }
+
+#else
+                std::FILE* file = std::fopen(guardFilePath.c_str(), "w");
+                if(!file) {
+                    const auto err = errno;
+                    const char* errMsg = std::strerror(err);
+#endif
+
+                    CATCH_RUNTIME_ERROR("Could not open the exit guard file '" << guardFilePath << "' because '" << errMsg << "' (" << err << ')');
+                }
+                const int ret = std::fclose(file);
+                CATCH_ENFORCE(
+                    ret == 0,
+                    "Error when closing the exit guard file: " << ret
+                );
+            }
+        }
+
+        // Removes file at path. Assuming we created it in setUpGuardFile.
+        void tearDownGuardFile(std::string const& guardFilePath) {
+            if(!guardFilePath.empty()) {
+                const int ret = std::remove(guardFilePath.c_str());
+                CATCH_ENFORCE(
+                    ret == 0,
+                    "Error when removing the exit guard file: " << ret
+                );
             }
         }
 
@@ -1306,6 +1376,7 @@ namespace Catch {
             static_cast<void>(std::getchar());
         }
         int exitCode = runInternal();
+
         if((m_configData.waitForKeypress & WaitForKeypress::BeforeExit) != 0) {
             Catch::cout() << "...waiting for enter/ return before exiting, with code: " << exitCode << '\n'
                           << std::flush;
@@ -1347,6 +1418,10 @@ namespace Catch {
         CATCH_TRY {
             config(); // Force config to be constructed
 
+            // We need to retrieve potential Bazel config with the full Config
+            // constructor, so we have to create the guard file after it is created.
+            setUpGuardFile(m_config->getExitGuardFilePath());
+
             seedRng(*m_config);
 
             if(m_configData.filenamesAsTags) {
@@ -1375,8 +1450,11 @@ namespace Catch {
             TestGroup tests{CATCH_MOVE(reporter), m_config.get()};
             auto const totals = tests.execute();
 
+            // If we got here, running the tests finished normally-enough.
+            // They might've failed, but that would've been reported elsewhere.
+            tearDownGuardFile(m_config->getExitGuardFilePath());
+
             if(tests.hadUnmatchedTestSpecs() && m_config->warnAboutUnmatchedTestSpecs()) {
-                // UnmatchedTestSpecExitCode
                 return UnmatchedTestSpecExitCode;
             }
 
@@ -1859,26 +1937,26 @@ namespace Catch {
                 return ret;
             }
 
+            size_t last_start = 0;
+            auto write_to = [&](size_t idx) {
+                if(last_start < idx) {
+                    ret += string.substr(last_start, idx - last_start);
+                }
+                last_start = idx + 1;
+            };
+
             ret += '"';
-            for(char c : string) {
-                switch(c) {
-                case '\r':
-                    ret.append("\\r");
-                    break;
-                case '\n':
-                    ret.append("\\n");
-                    break;
-                case '\t':
-                    ret.append("\\t");
-                    break;
-                case '\f':
-                    ret.append("\\f");
-                    break;
-                default:
-                    ret.push_back(c);
-                    break;
+            for(size_t i = 0; i < string.size(); ++i) {
+                const char c = string[i];
+                if(c == '\r' || c == '\n' || c == '\t' || c == '\f') {
+                    write_to(i);
+                    if(c == '\r') { ret.append("\\r"); }
+                    if(c == '\n') { ret.append("\\n"); }
+                    if(c == '\t') { ret.append("\\t"); }
+                    if(c == '\f') { ret.append("\\f"); }
                 }
             }
+            write_to(string.size());
             ret += '"';
 
             return ret;
@@ -2151,7 +2229,7 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
-        static Version version(3, 10, 0, "", 0);
+        static Version version(3, 11, 0, "", 0);
         return version;
     }
 
@@ -2227,8 +2305,14 @@ namespace Catch {
 } // namespace Catch
 
 namespace Catch {
+    namespace Detail {
+        void missingCaptureInstance() {
+            CATCH_INTERNAL_ERROR("No result capture instance");
+        }
+    } // namespace Detail
+
     IResultCapture::~IResultCapture() = default;
-}
+} // namespace Catch
 
 namespace Catch {
     IConfig::~IConfig() = default;
@@ -2598,7 +2682,9 @@ namespace Catch {
 
             auto token = *tokens;
             if(token.type != Detail::TokenType::Argument)
-                return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::NoMatch, CATCH_MOVE(tokens)));
+                return Detail::InternalParseResult::ok(Detail::ParseState(
+                    ParseResultType::NoMatch, CATCH_MOVE(tokens)
+                ));
 
             assert(!m_ref->isFlag());
             auto valueRef =
@@ -2659,7 +2745,9 @@ namespace Catch {
                             return Detail::InternalParseResult(result);
                         if(result.value() ==
                            ParseResultType::ShortCircuitAll)
-                            return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), CATCH_MOVE(tokens)));
+                            return Detail::InternalParseResult::ok(Detail::ParseState(
+                                result.value(), CATCH_MOVE(tokens)
+                            ));
                     }
                     else {
                         auto valueRef =
@@ -2683,9 +2771,13 @@ namespace Catch {
                             return Detail::InternalParseResult(result);
                         if(result.value() ==
                            ParseResultType::ShortCircuitAll)
-                            return Detail::InternalParseResult::ok(Detail::ParseState(result.value(), CATCH_MOVE(tokens)));
+                            return Detail::InternalParseResult::ok(Detail::ParseState(
+                                result.value(), CATCH_MOVE(tokens)
+                            ));
                     }
-                    return Detail::InternalParseResult::ok(Detail::ParseState(ParseResultType::Matched, CATCH_MOVE(++tokens)));
+                    return Detail::InternalParseResult::ok(Detail::ParseState(
+                        ParseResultType::Matched, CATCH_MOVE(++tokens)
+                    ));
                 }
             }
             return Detail::InternalParseResult::ok(
@@ -3083,7 +3175,7 @@ namespace Catch {
             return ParserResult::ok(ParseResultType::Matched);
         };
 
-        auto cli = ExeName(config.processName) | Help(config.showHelp) | Opt(config.showSuccessfulTests)["-s"]["--success"]("include successful tests in output") | Opt(config.shouldDebugBreak)["-b"]["--break"]("break into debugger on failure") | Opt(config.noThrow)["-e"]["--nothrow"]("skip exception tests") | Opt(config.showInvisibles)["-i"]["--invisibles"]("show invisibles (tabs, newlines)") | Opt(config.defaultOutputFilename, "filename")["-o"]["--out"]("default output filename") | Opt(accept_many, setReporter, "name[::key=value]*")["-r"]["--reporter"]("reporter to use (defaults to console)") | Opt(config.name, "name")["-n"]["--name"]("suite name") | Opt([&](bool) { config.abortAfter = 1; })["-a"]["--abort"]("abort at first failure") | Opt([&](int x) { config.abortAfter = x; }, "no. failures")["-x"]["--abortx"]("abort after x failures") | Opt(accept_many, setWarning, "warning name")["-w"]["--warn"]("enable warnings") | Opt([&](bool flag) { config.showDurations = flag ? ShowDurations::Always : ShowDurations::Never; }, "yes|no")["-d"]["--durations"]("show test durations") | Opt(config.minDuration, "seconds")["-D"]["--min-duration"]("show test durations for tests taking at least the given number of seconds") | Opt(loadTestNamesFromFile, "filename")["-f"]["--input-file"]("load test names to run from a file") | Opt(config.filenamesAsTags)["-#"]["--filenames-as-tags"]("adds a tag for the filename") | Opt(config.sectionsToRun, "section name")["-c"]["--section"]("specify section to run") | Opt(setVerbosity, "quiet|normal|high")["-v"]["--verbosity"]("set output verbosity") | Opt(config.listTests)["--list-tests"]("list all/matching test cases") | Opt(config.listTags)["--list-tags"]("list all/matching tags") | Opt(config.listReporters)["--list-reporters"]("list all available reporters") | Opt(config.listListeners)["--list-listeners"]("list all listeners") | Opt(setTestOrder, "decl|lex|rand")["--order"]("test case order (defaults to decl)") | Opt(setRngSeed, "'time'|'random-device'|number")["--rng-seed"]("set a specific seed for random numbers") | Opt(setDefaultColourMode, "ansi|win32|none|default")["--colour-mode"]("what color mode should be used as default") | Opt(config.libIdentify)["--libidentify"]("report name and version according to libidentify standard") | Opt(setWaitForKeypress, "never|start|exit|both")["--wait-for-keypress"]("waits for a keypress before exiting") | Opt(config.skipBenchmarks)["--skip-benchmarks"]("disable running benchmarks") | Opt(config.benchmarkSamples, "samples")["--benchmark-samples"]("number of samples to collect (default: 100)") | Opt(config.benchmarkResamples, "resamples")["--benchmark-resamples"]("number of resamples for the bootstrap (default: 100000)") | Opt(config.benchmarkConfidenceInterval, "confidence interval")["--benchmark-confidence-interval"]("confidence interval for the bootstrap (between 0 and 1, default: 0.95)") | Opt(config.benchmarkNoAnalysis)["--benchmark-no-analysis"]("perform only measurements; do not perform any analysis") | Opt(config.benchmarkWarmupTime, "benchmarkWarmupTime")["--benchmark-warmup-time"]("amount of time in milliseconds spent on warming up each test (default: 100)") | Opt(setShardCount, "shard count")["--shard-count"]("split the tests to execute into this many groups") | Opt(setShardIndex, "shard index")["--shard-index"]("index of the group of tests to execute (see --shard-count)") | Opt(config.allowZeroTests)["--allow-running-no-tests"]("Treat 'No tests run' as a success") | Arg(config.testsOrTags, "test name|pattern|tags")("which test or tests to use");
+        auto cli = ExeName(config.processName) | Help(config.showHelp) | Opt(config.showSuccessfulTests)["-s"]["--success"]("include successful tests in output") | Opt(config.shouldDebugBreak)["-b"]["--break"]("break into debugger on failure") | Opt(config.noThrow)["-e"]["--nothrow"]("skip exception tests") | Opt(config.showInvisibles)["-i"]["--invisibles"]("show invisibles (tabs, newlines)") | Opt(config.defaultOutputFilename, "filename")["-o"]["--out"]("default output filename") | Opt(accept_many, setReporter, "name[::key=value]*")["-r"]["--reporter"]("reporter to use (defaults to console)") | Opt(config.name, "name")["-n"]["--name"]("suite name") | Opt([&](bool) { config.abortAfter = 1; })["-a"]["--abort"]("abort at first failure") | Opt([&](int x) { config.abortAfter = x; }, "no. failures")["-x"]["--abortx"]("abort after x failures") | Opt(accept_many, setWarning, "warning name")["-w"]["--warn"]("enable warnings") | Opt([&](bool flag) { config.showDurations = flag ? ShowDurations::Always : ShowDurations::Never; }, "yes|no")["-d"]["--durations"]("show test durations") | Opt(config.minDuration, "seconds")["-D"]["--min-duration"]("show test durations for tests taking at least the given number of seconds") | Opt(loadTestNamesFromFile, "filename")["-f"]["--input-file"]("load test names to run from a file") | Opt(config.filenamesAsTags)["-#"]["--filenames-as-tags"]("adds a tag for the filename") | Opt(config.sectionsToRun, "section name")["-c"]["--section"]("specify section to run") | Opt(setVerbosity, "quiet|normal|high")["-v"]["--verbosity"]("set output verbosity") | Opt(config.listTests)["--list-tests"]("list all/matching test cases") | Opt(config.listTags)["--list-tags"]("list all/matching tags") | Opt(config.listReporters)["--list-reporters"]("list all available reporters") | Opt(config.listListeners)["--list-listeners"]("list all listeners") | Opt(setTestOrder, "decl|lex|rand")["--order"]("test case order (defaults to decl)") | Opt(setRngSeed, "'time'|'random-device'|number")["--rng-seed"]("set a specific seed for random numbers") | Opt(setDefaultColourMode, "ansi|win32|none|default")["--colour-mode"]("what color mode should be used as default") | Opt(config.libIdentify)["--libidentify"]("report name and version according to libidentify standard") | Opt(setWaitForKeypress, "never|start|exit|both")["--wait-for-keypress"]("waits for a keypress before exiting") | Opt(config.skipBenchmarks)["--skip-benchmarks"]("disable running benchmarks") | Opt(config.benchmarkSamples, "samples")["--benchmark-samples"]("number of samples to collect (default: 100)") | Opt(config.benchmarkResamples, "resamples")["--benchmark-resamples"]("number of resamples for the bootstrap (default: 100000)") | Opt(config.benchmarkConfidenceInterval, "confidence interval")["--benchmark-confidence-interval"]("confidence interval for the bootstrap (between 0 and 1, default: 0.95)") | Opt(config.benchmarkNoAnalysis)["--benchmark-no-analysis"]("perform only measurements; do not perform any analysis") | Opt(config.benchmarkWarmupTime, "benchmarkWarmupTime")["--benchmark-warmup-time"]("amount of time in milliseconds spent on warming up each test (default: 100)") | Opt(setShardCount, "shard count")["--shard-count"]("split the tests to execute into this many groups") | Opt(setShardIndex, "shard index")["--shard-index"]("index of the group of tests to execute (see --shard-count)") | Opt(config.allowZeroTests)["--allow-running-no-tests"]("Treat 'No tests run' as a success") | Opt(config.prematureExitGuardFilePath, "path")["--premature-exit-guard-file"]("create a file before running tests and delete it during clean exit") | Arg(config.testsOrTags, "test name|pattern|tags")("which test or tests to use");
 
         return cli;
     }
@@ -3241,7 +3333,7 @@ namespace Catch {
 
 #endif // Windows/ ANSI/ None
 
-#if defined(CATCH_PLATFORM_LINUX) || defined(CATCH_PLATFORM_MAC) || defined(__GLIBC__) || defined(__FreeBSD__)
+#if defined(CATCH_PLATFORM_LINUX) || defined(CATCH_PLATFORM_MAC) || defined(__GLIBC__) || defined(__FreeBSD__) || defined(CATCH_PLATFORM_QNX)
 #define CATCH_INTERNAL_HAS_ISATTY
 #include <unistd.h>
 #endif
@@ -3375,20 +3467,10 @@ namespace Catch {
 
 namespace Catch {
 
-    Context* Context::currentContext = nullptr;
-
-    void cleanUpContext() {
-        delete Context::currentContext;
-        Context::currentContext = nullptr;
-    }
-    void Context::createContext() {
-        currentContext = new Context();
-    }
+    Context Context::currentContext;
 
     Context& getCurrentMutableContext() {
-        if(!Context::currentContext) { Context::createContext(); }
-        // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
-        return *Context::currentContext;
+        return Context::currentContext;
     }
 
     SimplePcg32& sharedRng() {
@@ -3424,7 +3506,7 @@ namespace Catch {
         // !TBD: Need a version for Mac/ XCode and other IDEs
         Catch::cout() << text;
     }
-} // namespace Catch
+}
 
 #endif // Platform
 
@@ -3488,7 +3570,7 @@ namespace Catch {
 #endif
 } // namespace Catch
 
-#elif defined(CATCH_PLATFORM_LINUX)
+#elif defined(CATCH_PLATFORM_LINUX) || defined(CATCH_PLATFORM_QNX)
 #include <fstream>
 #include <string>
 
@@ -3524,18 +3606,18 @@ namespace Catch {
     bool isDebuggerActive() {
         return IsDebuggerPresent() != 0;
     }
-} // namespace Catch
+}
 #elif defined(__MINGW32__)
 extern "C" __declspec(dllimport) int __stdcall IsDebuggerPresent();
 namespace Catch {
     bool isDebuggerActive() {
         return IsDebuggerPresent() != 0;
     }
-} // namespace Catch
+}
 #else
 namespace Catch {
     bool isDebuggerActive() { return false; }
-} // namespace Catch
+}
 #endif // Platform
 
 namespace Catch {
@@ -3806,21 +3888,25 @@ namespace Catch {
         {EXCEPTION_INT_DIVIDE_BY_ZERO, "Divide by zero error"},
     };
 
+    // Since we do not support multiple instantiations, we put these
+    // into global variables and rely on cleaning them up in outlined
+    // constructors/destructors
+    static LPTOP_LEVEL_EXCEPTION_FILTER previousTopLevelExceptionFilter = nullptr;
+
     static LONG CALLBACK topLevelExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo) {
         for(auto const& def : signalDefs) {
             if(ExceptionInfo->ExceptionRecord->ExceptionCode == def.id) {
                 reportFatal(def.name);
             }
         }
-        // If its not an exception we care about, pass it along.
+        // If a filter was previously registered, invoke it
+        if(previousTopLevelExceptionFilter) {
+            return previousTopLevelExceptionFilter(ExceptionInfo);
+        }
+        // Otherwise, pass along all exceptions.
         // This stops us from eating debugger breaks etc.
         return EXCEPTION_CONTINUE_SEARCH;
     }
-
-    // Since we do not support multiple instantiations, we put these
-    // into global variables and rely on cleaning them up in outlined
-    // constructors/destructors
-    static LPTOP_LEVEL_EXCEPTION_FILTER previousTopLevelExceptionFilter = nullptr;
 
     // For MSVC, we reserve part of the stack memory for handling
     // memory overflow structured exception.
@@ -5095,7 +5181,9 @@ namespace Catch {
 
             while(separatorPos < reporterSpec.size()) {
                 const auto nextSeparator = findNextSeparator(separatorPos);
-                parts.push_back(static_cast<std::string>(reporterSpec.substr(separatorPos, nextSeparator - separatorPos)));
+                parts.push_back(static_cast<std::string>(reporterSpec.substr(
+                    separatorPos, nextSeparator - separatorPos
+                )));
 
                 if(nextSeparator == static_cast<size_t>(-1)) {
                     break;
@@ -5212,6 +5300,7 @@ namespace Catch {
 
 #include <cstdio>
 #include <sstream>
+#include <tuple>
 #include <vector>
 
 namespace Catch {
@@ -5223,16 +5312,16 @@ namespace Catch {
         std::ostringstream m_referenceStream; // Used for copy state/ flags from
         Detail::Mutex m_mutex;
 
-        auto add() -> std::size_t {
+        auto add() -> std::pair<std::size_t, std::ostringstream*> {
             Detail::LockGuard _(m_mutex);
             if(m_unused.empty()) {
                 m_streams.push_back(Detail::make_unique<std::ostringstream>());
-                return m_streams.size() - 1;
+                return {m_streams.size() - 1, m_streams.back().get()};
             }
             else {
                 auto index = m_unused.back();
                 m_unused.pop_back();
-                return index;
+                return {index, m_streams[index].get()};
             }
         }
 
@@ -5246,9 +5335,10 @@ namespace Catch {
         }
     };
 
-    ReusableStringStream::ReusableStringStream()
-        : m_index(Singleton<StringStreams>::getMutable().add())
-        , m_oss(Singleton<StringStreams>::getMutable().m_streams[m_index].get()) {}
+    ReusableStringStream::ReusableStringStream() {
+        std::tie(m_index, m_oss) =
+            Singleton<StringStreams>::getMutable().add();
+    }
 
     ReusableStringStream::~ReusableStringStream() {
         static_cast<std::ostringstream*>(m_oss)->str("");
@@ -5719,27 +5809,6 @@ namespace Catch {
         m_reporter->benchmarkFailed(error);
     }
 
-    void RunContext::pushScopedMessage(MessageInfo const& message) {
-        Detail::g_messages.push_back(message);
-    }
-
-    void RunContext::popScopedMessage(MessageInfo const& message) {
-        // Note: On average, it would probably be better to look for the message
-        //       backwards. However, we do not expect to have to deal with more
-        //       messages than low single digits, so the optimization is tiny,
-        //       and we would have to hand-write the loop to avoid terrible
-        //       codegen of reverse iterators in debug mode.
-        Detail::g_messages.erase(
-            std::find_if(Detail::g_messages.begin(), Detail::g_messages.end(), [id = message.sequence](MessageInfo const& msg) {
-                return msg.sequence == id;
-            })
-        );
-    }
-
-    void RunContext::emplaceUnscopedMessage(MessageBuilder&& builder) {
-        Detail::g_messageScopes.emplace_back(CATCH_MOVE(builder));
-    }
-
     std::string RunContext::getCurrentTestName() const {
         return m_activeTestCase ? m_activeTestCase->getTestCaseInfo().name : std::string();
     }
@@ -6060,11 +6129,24 @@ namespace Catch {
         }
     }
 
-    IResultCapture& getResultCapture() {
-        if(auto* capture = getCurrentContext().getResultCapture())
-            return *capture;
-        else
-            CATCH_INTERNAL_ERROR("No result capture instance");
+    void IResultCapture::pushScopedMessage(MessageInfo&& message) {
+        Detail::g_messages.push_back(CATCH_MOVE(message));
+    }
+
+    void IResultCapture::popScopedMessage(unsigned int messageId) {
+        // Note: On average, it would probably be better to look for the message
+        //       backwards. However, we do not expect to have to deal with more
+        //       messages than low single digits, so the optimization is tiny,
+        //       and we would have to hand-write the loop to avoid terrible
+        //       codegen of reverse iterators in debug mode.
+        Detail::g_messages.erase(std::find_if(Detail::g_messages.begin(), Detail::g_messages.end(), [=](MessageInfo const& msg) {
+            return msg.sequence ==
+                   messageId;
+        }));
+    }
+
+    void IResultCapture::emplaceUnscopedMessage(MessageBuilder&& builder) {
+        Detail::g_messageScopes.emplace_back(CATCH_MOVE(builder));
     }
 
     void seedRng(IConfig const& config) {

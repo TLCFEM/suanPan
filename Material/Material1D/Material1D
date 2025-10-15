@@ -48,6 +48,7 @@
 #include "Wrapper/Sequential.h"
 #include "Wrapper/Uniaxial.h"
 #include "vonMises/ArmstrongFrederick1D.h"
+#include "vonMises/Balloon1D.h"
 #include "vonMises/Bilinear1D.h"
 #include "vonMises/BilinearMises1D.h"
 #include "vonMises/CustomGurson1D.h"

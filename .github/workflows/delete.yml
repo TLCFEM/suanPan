@@ -19,4 +19,4 @@ jobs:
           token: ${{ secrets.ALL }}
           package_name: suanpan
           untagged_only: true
-          owner_type: 'user'
+          owner_type: "user"

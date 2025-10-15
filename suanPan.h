@@ -398,7 +398,11 @@ namespace std::ranges {
 
     template<class IN, class FN> bool any_of(const IN& from, FN&& func) { return std::any_of(from.cbegin(), from.cend(), std::forward<FN>(func)); }
 
-    template<class IN, class OUT> OUT copy(IN& from, OUT to) { return std::copy(from.begin(), from.end(), to); }
+    template<class IN, class T> constexpr auto fill(IN& from, T value) { return std::fill(from.begin(), from.end(), value); }
+
+    template<class IN> constexpr auto max_element(const IN& from) { return std::max_element(from.cbegin(), from.cend()); }
+
+    template<class IN> constexpr auto min_element(const IN& from) { return std::min_element(from.cbegin(), from.cend()); }
 } // namespace std::ranges
 #endif
 

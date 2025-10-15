@@ -291,6 +291,43 @@ namespace {
         return_obj = std::make_unique<AxisymmetricElastic>(tag, elastic_modulus, poissons_ratio, density);
     }
 
+    void new_balloon1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        vec p(27);
+        if(!get_input(command, p)) {
+            suanpan_error("Valid inputs are required.\n");
+            return;
+        }
+
+        auto density = 0.;
+        if(!command.eof() && !get_input(command, density)) {
+            suanpan_error("A valid density is required.\n");
+            return;
+        }
+
+        DataBalloon1D para{
+            p(0),                         // elastic modulus
+            p(1),                         // u
+            p(2),                         // split bound
+            p(3),                         // split rate
+            static_cast<int>(p(4)),       // zr memory size
+            {p(5), p(6), p(7), p(8)},     // hf
+            {p(9), p(10), p(11), p(12)},  // ha
+            {p(13), p(14), p(15), p(16)}, // hb
+            {p(17), p(18), p(19), p(20)}, // hd
+            {{p(21), p(22)}},             // alpha saturation
+            {{p(23), p(24)}},             // beta saturation
+            {{p(25), p(26)}},             // similarity saturation
+        };
+
+        return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
+    }
+
     void new_bilinear1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -3476,6 +3513,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
+    else if(is_equal(material_id, "Balloon1D")) new_balloon1d(new_material, command);
     else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
     else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);

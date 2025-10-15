@@ -7,14 +7,12 @@ https://github.com/jothepro/doxygen-awesome-css
 Copyright (c) 2021 - 2025 jothepro
 
  */
-
 html {
     /* side nav width. MUST be = `TREEVIEW_WIDTH`.
      * Make sure it is wide enough to contain the page title (logo + title + version)
      */
     --side-nav-fixed-width: 335px;
     --menu-display: none;
-
     --top-height: 120px;
     --toc-sticky-top: -25px;
     --toc-max-height: calc(100vh - 2 * var(--spacing-medium) - 25px);
@@ -23,7 +21,6 @@ html {
 #projectname {
     white-space: nowrap;
 }
-
 
 @media screen and (min-width: 768px) {
     html {
@@ -37,7 +34,8 @@ html {
         overflow: visible;
     }
 
-    #nav-tree, #side-nav {
+        #nav-tree,
+        #side-nav {
         height: calc(100vh - var(--top-height)) !important;
     }
 

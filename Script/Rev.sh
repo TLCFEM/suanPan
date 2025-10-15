@@ -1,4 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# -----------------------------------------------------------------------------
+# Rev.sh
+#
+# Usage:
+#   Rev.sh
+#
+# Description:
+#   - Sets the current Git revision hash in Toolbox/revision.h as a C++ constexpr.
+#   - Sleeps for a random short time to avoid git conflicts in parallel execution.
+#   - Prints the revision tag that was set.
+#
+# Requirements:
+#   - git, bash, realpath must be available in PATH.
+#   - Must be run inside a Git repository.
+#
+# Example:
+#   ./Rev.sh
+#
+# -----------------------------------------------------------------------------
+
+set -e
 
 git --version >/dev/null 2>&1
 

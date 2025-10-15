@@ -18,6 +18,7 @@
 
 Include/** linguist-vendored
 Toolbox/arpack-src/** linguist-vendored
+Toolbox/parpack-src/** linguist-vendored
 Toolbox/feast-src/** linguist-vendored
 Toolbox/superlu-src/** linguist-vendored
 Toolbox/superlumt-src/** linguist-vendored

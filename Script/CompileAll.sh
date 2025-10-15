@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
 
 if [ -f "/opt/intel/oneapi/setvars.sh" ]; then
   source /opt/intel/oneapi/setvars.sh

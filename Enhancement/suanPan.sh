@@ -1,4 +1,23 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# -----------------------------------------------------------------------------
+# suanPan.sh
+#
+# Usage:
+#
+# 1. Setup mode:
+#      suanPan.sh --create-link
+#    - Creates symbolic links in ~/.local/bin (suanpan, sp)
+#    - Copies Sublime Text configuration files if Sublime Text is installed
+#    - Adds a desktop entry for suanPan in ~/.local/share/applications
+#
+# 2. Run mode:
+#      suanPan.sh [suanPan arguments...]
+#    - Forwards all arguments to the suanPan executable in bin/
+#    - Example: suanPan.sh -f input.supan
+#
+# -----------------------------------------------------------------------------
+
+set -e
 
 CURRENT_PATH="$(dirname "$(readlink -f "$0")")"
 
@@ -12,22 +31,13 @@ if [[ $# == 1 ]] && [[ $1 == "--create-link" ]]; then
     echo "To uninstall, remove those files manually."
     echo ""
 
-    # make sure the link does not exist
-    if [[ -f "$TARGET_PATH/suanpan" ]]; then
-        echo "$TARGET_PATH/suanpan exists, now deleting it."
-        echo ""
-        rm "$TARGET_PATH/suanpan"
-    fi
+    mkdir -p "$TARGET_PATH"
+    rm -f "$TARGET_PATH/sp" "$TARGET_PATH/suanpan"
 
-    # make sure the path exists
-    if ! [[ -d $TARGET_PATH ]]; then
-        mkdir -p "$TARGET_PATH"
-    fi
-
-    # create the link
     ln -s "$CURRENT_PATH/suanPan.sh" "$TARGET_PATH/suanpan"
+    ln -s "$CURRENT_PATH/suanPan.sh" "$TARGET_PATH/sp"
 
-    echo "$TARGET_PATH/suanpan is successfully created."
+    echo "$TARGET_PATH/suanpan and $TARGET_PATH/sp are successfully created."
     echo ""
 
     INSTALLED=false
@@ -45,8 +55,8 @@ if [[ $# == 1 ]] && [[ $1 == "--create-link" ]]; then
 
     # install the files
     if [[ $INSTALLED == true ]]; then
-        echo "{\"cmd\":[\"suanpan\",\"-f\",\"\$file\"],\"selector\":\"source.supan\",\"file_patterns\":[\"*.supan\",\"*.sp\"]}" >suanPan.sublime-build
-        cp suanPan.sublime* "$ST_DIR"
+        echo "{\"cmd\":[\"suanpan\",\"-f\",\"\$file\"],\"selector\":\"source.supan\",\"file_patterns\":[\"*.supan\",\"*.sp\"]}" >share/suanPan/suanPan.sublime-build
+        cp share/suanPan/suanPan.sublime* "$ST_DIR"
         echo "Sublime Text installed, configuration files are copied to default folder $ST_DIR."
         echo ""
     fi
@@ -57,23 +67,23 @@ if [[ $# == 1 ]] && [[ $1 == "--create-link" ]]; then
     fi
 
     # desktop file
-    echo -e "[Desktop Entry]\nExec=suanpan\nVersion=2.0\nType=Application\nIcon=$CURRENT_PATH/suanPan-ua.svg\nCategories=Education;Science\nName=suanPan\nTerminal=true\n" >"$TARGET_PATH/../share/applications/suanPan.desktop"
+    echo -e "[Desktop Entry]\nExec=suanpan\nVersion=2.0\nType=Application\nIcon=$CURRENT_PATH/share/icons/hicolor/scalable/apps/suanPan.svg\nCategories=Education;Science\nName=suanPan\nTerminal=true\n" >"$TARGET_PATH/../share/applications/suanPan.desktop"
     echo "$HOME/.local/share/applications/suanPan.desktop is successfully created."
 else
     case "$(uname -s)" in
     Darwin*)
-        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$CURRENT_PATH/../lib
-        if [[ -f "$CURRENT_PATH/../lib/libmimalloc.dylib" ]]; then
-            export DYLD_INSERT_LIBRARIES="$CURRENT_PATH/../lib/libmimalloc.dylib"
+        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$CURRENT_PATH/lib
+        if [[ -f "$CURRENT_PATH/lib/libmimalloc.dylib" ]]; then
+            export DYLD_INSERT_LIBRARIES="$CURRENT_PATH/lib/libmimalloc.dylib"
         fi
         ;;
     *)
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_PATH/../lib
-        if [[ -f "$CURRENT_PATH/../lib/libmimalloc.so" ]]; then
-            export LD_PRELOAD="$CURRENT_PATH/../lib/libmimalloc.so"
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_PATH/lib
+        if [[ -f "$CURRENT_PATH/lib/libmimalloc.so" ]]; then
+            export LD_PRELOAD="$CURRENT_PATH/lib/libmimalloc.so"
         fi
         ;;
     esac
     export PATH=$PATH:$CURRENT_PATH
-    "$CURRENT_PATH/suanPan" "$@"
+    "$CURRENT_PATH/bin/suanPan" "$@"
 fi

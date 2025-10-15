@@ -30,7 +30,7 @@ int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
 
     factory = D->get_factory();
 
-    if(std::any_of(element_pool.cbegin(), element_pool.cend(), [](const std::weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
+    if(std::ranges::any_of(element_pool, [](const std::weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
         suanpan_error("Repeated element tags are detected, modifier {} is disabled.\n", get_tag());
         element_pool.clear();
         return SUANPAN_FAIL;

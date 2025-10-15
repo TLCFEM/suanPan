@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(CheckLanguage)
 check_language(Fortran)
@@ -68,10 +69,7 @@ else ()
     set(SP_OPENBLAS_PATH "" CACHE FILEPATH "Manually assign the path to the OpenBLAS library, if not set, the bundled version will be used.")
 endif ()
 if (SP_ENABLE_AOCL)
-    set(SP_AOCL_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libaocl.a" CACHE FILEPATH "AOCL all-in-one library path.")
-    if (NOT SP_AOCL_PATH MATCHES "aocl")
-        message(FATAL_ERROR "Please point SP_AOCL_PATH to the all-in-one library file of AOCL.")
-    endif ()
+    set(SP_AOCL_PATH "${CMAKE_SOURCE_DIR}/Libs/linux/libflame.a;${CMAKE_SOURCE_DIR}/Libs/linux/libblis-mt.a;${CMAKE_SOURCE_DIR}/Libs/linux/libaoclutils.a" CACHE FILEPATH "AOCL all-in-one library path.")
     add_compile_definitions(SUANPAN_AOCL)
 endif ()
 
@@ -104,17 +102,18 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") # MAC PLATFORM
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(COMPILER_IDENTIFIER "clang-mac")
         include_directories(
-            "/usr/local/include"
-            "/usr/local/opt/llvm/include"
-            "/usr/local/opt/libomp/include"
+                "/usr/local/include"
+                "/usr/local/opt/llvm/include"
+                "/usr/local/opt/libomp/include"
+                "/opt/homebrew/opt/libomp/include"
         )
         link_directories(
-            "/usr/local/lib"
-            "/usr/local/opt/llvm/lib"
-            "/usr/local/opt/libomp/lib/"
+                "/usr/local/lib"
+                "/usr/local/opt/llvm/lib"
+                "/usr/local/opt/libomp/lib/"
+                "/opt/homebrew/opt/libomp/lib"
         )
         message(NOTICE "On macOS, make sure `libomp` is installed.")
-        message(NOTICE "Dependencies are not bundled, please check `Script/mac-dependency.sh` for more details.")
     endif ()
 endif ()
 
@@ -124,6 +123,9 @@ endif ()
 
 if (NOT SP_AMD64)
     set(SP_EXTERNAL_LIB_PATH "${SP_EXTERNAL_LIB_PATH}-arm")
+    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Libs/${SP_EXTERNAL_LIB_PATH}")
+        message(NOTICE "Dependencies are not bundled and not downloaded, please check `Script/mac-dependency.sh` or `Script/linux-dependency.sh` for more details.")
+    endif ()
 endif ()
 
 link_directories(Libs/${SP_EXTERNAL_LIB_PATH})
@@ -243,6 +245,7 @@ if (SP_BUILD_PARALLEL)
         find_package(TBB REQUIRED)
         link_libraries(TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
     else ()
+        include_directories(Include/tbb)
         if (COMPILER_IDENTIFIER MATCHES "gcc-win")
             link_libraries(tbb12)
         else ()
@@ -251,7 +254,7 @@ if (SP_BUILD_PARALLEL)
         option(SP_ENABLE_TBB_ALLOC "Build with TBB's memory allocator." OFF)
         if (SP_ENABLE_TBB_ALLOC)
             add_compile_definitions(ARMA_USE_TBB_ALLOC) # for armadillo to use tbb allocator
-            include_directories(Include/oneapi) # because armadillo assumes oneapi be in the include path
+            include_directories(Include/tbb/oneapi) # because armadillo assumes oneapi be in the include path
             link_libraries(tbbmalloc tbbmalloc_proxy)
         endif ()
     endif ()
@@ -335,7 +338,7 @@ else ()
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx")
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mavx")
         endif ()
-    endif()
+    endif ()
 
     option(SP_ENABLE_CODECOV "Enable code coverage report." OFF)
 
@@ -368,7 +371,7 @@ else ()
             elseif (SP_ENABLE_AVX)
                 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -arch AVX")
             endif ()
-        endif()
+        endif ()
     else ()
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
         if (SP_ENABLE_64BIT_INDEXING)
@@ -443,17 +446,17 @@ add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
 
 if (CMAKE_Fortran_COMPILER)
-    find_package(OpenMP QUIET COMPONENTS Fortran)
-    if (OpenMP_Fortran_FOUND)
-        link_libraries(OpenMP::OpenMP_Fortran)
-    else ()
-        message(WARNING "OpenMP for Fortran not found, the corresponding Fortran code will be compiled without OpenMP support.")
-    endif ()
+    find_package(OpenMP REQUIRED COMPONENTS Fortran)
+    link_libraries(OpenMP::OpenMP_Fortran)
     message(STATUS "Linking additional arpack feast libraries.")
     add_subdirectory(Toolbox/arpack-src)
     add_subdirectory(Toolbox/feast-src)
     add_subdirectory(Toolbox/fext)
     target_link_libraries(${PROJECT_NAME} fext)
+    if (SP_ENABLE_MPI)
+        add_subdirectory(Toolbox/parpack-src)
+        target_link_libraries(${PROJECT_NAME} parpack)
+    endif ()
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
     target_link_libraries(${PROJECT_NAME} libfext)
     message(STATUS "Linking precompiled fext (packed with arpack feast) library.")
@@ -502,18 +505,41 @@ endif ()
 
 # need further work
 install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT Main)
-install(FILES
-        CHANGELOG.md
-        Enhancement/suanPan.sublime-completions
-        Enhancement/suanPan.sublime-syntax
-        LICENSE
-        README.md
-        Resource/suanPan-ua.svg
-        Resource/suanPan.svg
-        DESTINATION bin
-        COMPONENT Support
-)
 if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
+    install(FILES
+            Resource/suanPan-ua.svg
+            DESTINATION share/icons/hicolor/scalable/apps
+            RENAME suanPan.svg
+            COMPONENT Support
+    )
+    install(FILES
+            Enhancement/suanPan.sublime-completions
+            Enhancement/suanPan.sublime-syntax
+            DESTINATION share/${PROJECT_NAME}
+            COMPONENT Support
+    )
+    install(FILES
+            CHANGELOG.md
+            LICENSE
+            README.md
+            DESTINATION share/doc/${PROJECT_NAME}
+            COMPONENT Support
+    )
+else ()
+    install(FILES
+            CHANGELOG.md
+            Enhancement/AddAssociation.bat
+            Enhancement/suanPan.sublime-completions
+            Enhancement/suanPan.sublime-syntax
+            LICENSE
+            README.md
+            Resource/suanPan-ua.svg
+            DESTINATION bin
+            COMPONENT Support
+    )
+endif ()
+if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
+    install(PROGRAMS Enhancement/suanPan.sh DESTINATION . COMPONENT Support)
     set(DECOR ".")
     set(SUFFIX "")
     if (COMPILER_IDENTIFIER MATCHES "linux")
@@ -523,12 +549,11 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
         set(DECOR "")
         set(SUFFIX ".dylib")
         file(GLOB OPENBLAS_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libopenblas*)
-        install(PROGRAMS ${OPENBLAS_FILES} DESTINATION lib COMPONENT Main)
+        install(PROGRAMS ${OPENBLAS_FILES} TYPE LIB COMPONENT Main)
     endif ()
-    install(PROGRAMS Enhancement/suanPan.sh DESTINATION bin COMPONENT Support)
     if (SP_BUILD_PARALLEL AND NOT SP_ENABLE_SYSLIB)
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libtbb*)
-        install(PROGRAMS ${TBB_FILES} DESTINATION lib COMPONENT Main)
+        install(PROGRAMS ${TBB_FILES} TYPE LIB COMPONENT Main)
     endif ()
     if (SP_ENABLE_MKL)
         if (SP_ENABLE_SHARED_MKL)
@@ -537,23 +562,23 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
                     ${MKL_ROOT}/lib/intel64/libmkl_def${DECOR}*${SUFFIX}
                     ${MKL_ROOT}/lib/intel64/libmkl_avx*${DECOR}*${SUFFIX}
             )
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${MKL_FILES} TYPE LIB COMPONENT Main)
             if (SP_ENABLE_64BIT_INDEXING)
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_ilp64${DECOR}*${SUFFIX})
             else ()
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_lp64${DECOR}*${SUFFIX})
             endif ()
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${MKL_FILES} TYPE LIB COMPONENT Main)
             if (SP_ENABLE_IOMP)
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_intel_thread${DECOR}*${SUFFIX})
             else ()
                 file(GLOB MKL_FILES ${MKL_ROOT}/lib/intel64/libmkl_gnu_thread${DECOR}*${SUFFIX})
             endif ()
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${MKL_FILES} TYPE LIB COMPONENT Main)
         endif ()
         if (SP_ENABLE_IOMP)
             file(GLOB MKL_FILES ${IOMPPATH}/libiomp5${DECOR}*${SUFFIX})
-            install(PROGRAMS ${MKL_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${MKL_FILES} TYPE LIB COMPONENT Main)
         endif ()
     endif ()
     if (CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
@@ -569,15 +594,14 @@ if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
                     ${ONEAPI_PATH}/libiomp5${DECOR}*${SUFFIX}
                     ${ONEAPI_PATH}/libsvml${DECOR}*${SUFFIX}
             )
-            install(PROGRAMS ${ONEAPI_FILES} DESTINATION lib COMPONENT Main)
+            install(PROGRAMS ${ONEAPI_FILES} TYPE LIB COMPONENT Main)
         endforeach ()
     endif ()
     if (SP_ENABLE_MAGMA)
         file(GLOB MAGMA_FILES ${MAGMA_PATH}/lib/libmagma*.so)
-        install(PROGRAMS ${MAGMA_FILES} DESTINATION lib COMPONENT Main)
+        install(PROGRAMS ${MAGMA_FILES} TYPE LIB COMPONENT Main)
     endif ()
 elseif (COMPILER_IDENTIFIER MATCHES "win")
-    install(FILES Enhancement/AddAssociation.bat DESTINATION bin COMPONENT Support)
     if (SP_BUILD_PARALLEL)
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/libtbb*.dll)
         install(FILES ${TBB_FILES} DESTINATION bin COMPONENT Main)
@@ -600,7 +624,6 @@ elseif (COMPILER_IDENTIFIER MATCHES "win")
     file(GLOB DLL_FILES Libs/${SP_EXTERNAL_LIB_PATH}/lib*.dll)
     install(FILES ${DLL_FILES} DESTINATION bin COMPONENT Main)
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
-    install(FILES Enhancement/AddAssociation.bat DESTINATION bin COMPONENT Support)
     if (SP_BUILD_PARALLEL OR SP_ENABLE_MKL)
         file(GLOB TBB_FILES Libs/${SP_EXTERNAL_LIB_PATH}/tbb*.dll)
         install(FILES ${TBB_FILES} DESTINATION bin COMPONENT Main)
@@ -638,15 +661,15 @@ if (CMAKE_Fortran_COMPILER)
 endif ()
 
 message(STATUS "Link Dirs:")
-get_property(SDIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
-foreach (SDIRA ${SDIR})
-    message(STATUS "${SDIRA}")
+get_property(SP_LINK_DIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
+foreach (SDIR ${SP_LINK_DIR})
+    message(STATUS "${SDIR}")
 endforeach ()
 
 message(STATUS "Include Dirs:")
-get_property(SDIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach (SDIRA ${SDIR})
-    message(STATUS "${SDIRA}")
+get_property(SP_INCLUDE_DIR DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach (SDIR ${SP_INCLUDE_DIR})
+    message(STATUS "${SDIR}")
 endforeach ()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -659,7 +682,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         set(CPACK_PACKAGE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/Resource/suanPan-ua.svg)
         set(CPACK_PACKAGE_RELEASE 1)
         set(CPACK_PACKAGE_VENDOR "tlcfem")
-        set(CPACK_PACKAGE_VERSION "3.9.2")
+        set(CPACK_PACKAGE_VERSION "3.9.3")
         set(CPACK_PACKAGE_DESCRIPTION "An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework")
         set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/TLCFEM/suanPan")
         set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
@@ -681,5 +704,17 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         endif ()
 
         include(CPack)
+    endif ()
+endif ()
+
+if (UNIX)
+    get_filename_component(SP_BUILD_DIR "${CMAKE_BINARY_DIR}" NAME)
+    if (SP_BUILD_DIR MATCHES "${CMAKE_BUILD_TYPE}")
+        set(SP_SRC_JSON "${CMAKE_BINARY_DIR}/compile_commands.json")
+        set(SP_DST_JSON "${CMAKE_BINARY_DIR}/../compile_commands.json")
+        if (EXISTS "${SP_SRC_JSON}")
+            execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${SP_SRC_JSON}" "${SP_DST_JSON}")
+            message(STATUS "Created symlink: ${SP_DST_JSON} -> ${SP_SRC_JSON}")
+        endif ()
     endif ()
 endif ()

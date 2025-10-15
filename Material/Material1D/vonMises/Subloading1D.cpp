@@ -147,7 +147,7 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         jacobian(2, 1) = 1. + z * nv * power_term * norm_mu * gamma;
         jacobian(2, 2) = -power_term * (fraction_term + z * nv * cv * norm_mu * gamma);
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = inf_norm(incre);
         if(1u == counter) ref_error = error;
@@ -161,14 +161,9 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         gamma -= incre(0);
         if(gamma < 0.) gamma = 0.;
-        else
-            while(gamma > abs_incre_strain) gamma *= .5;
-
-        zv -= incre(1);
 
         z = suanpan::clamp_unit(z - incre(2));
-
-        if(is_viscous) zv = suanpan::clamp(zv, z, cv * z);
+        zv = is_viscous ? suanpan::clamp(zv - incre(1), z, cv * z) : z;
     }
 }
 

@@ -1585,7 +1585,7 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream& command) 
         return SUANPAN_SUCCESS;
     }
 
-    if(is_equal(command_id, "terminal")) {
+    if(is_equal(command_id, "terminal") || is_equal(command_id, "t")) {
         execute_command(command);
         return SUANPAN_SUCCESS;
     }

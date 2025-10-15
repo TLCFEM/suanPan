@@ -1,7 +1,7 @@
 name: Docker Latest
 on:
   schedule:
-    - cron: '0 8 * * 4'
+    - cron: "0 8 * * 4"
   workflow_dispatch:
 jobs:
   linux-amd64:
@@ -67,7 +67,7 @@ jobs:
             tlcfem/suanpan:mpi-amd64
             ghcr.io/tlcfem/suanpan:mpi-latest
   linux-arm64:
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04-arm
     timeout-minutes: 1200
     steps:
       - name: Clone
@@ -85,8 +85,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: QEMU
-        uses: docker/setup-qemu-action@v3
       - name: Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build
@@ -100,7 +98,7 @@ jobs:
           tags: |
             tlcfem/suanpan:arm64
   linux-combine:
-    needs: [ linux-amd64, linux-arm64 ]
+    needs: [linux-amd64, linux-arm64]
     runs-on: ubuntu-latest
     steps:
       - name: Login Docker

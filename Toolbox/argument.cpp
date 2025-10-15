@@ -52,7 +52,7 @@ using std::ofstream;
 
 constexpr auto SUANPAN_MAJOR = 3;
 constexpr auto SUANPAN_MINOR = 9;
-constexpr auto SUANPAN_PATCH = 2;
+constexpr auto SUANPAN_PATCH = 3;
 constexpr auto SUANPAN_CODE = "Canopus";
 
 bool SUANPAN_PRINT = true;
@@ -121,6 +121,8 @@ namespace {
 #endif
 
         if(!exists(updater_module)) return;
+
+        suanpan_info("Checking for updates. To skip, delete or rename updater/updater.exe, or use the '-nu' flag.\n");
 
         auto terminal = std::istringstream("\"" + updater_module.string() + "\" " + std::to_string(100 * SUANPAN_MAJOR + 10 * SUANPAN_MINOR + SUANPAN_PATCH));
 

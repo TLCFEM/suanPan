@@ -1,7 +1,7 @@
 name: Docker Base Image
 on:
   schedule:
-    - cron: '0 5 2 * *'
+    - cron: "0 5 2 * *"
   workflow_dispatch:
 jobs:
   ide-image-base:
@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 3000
     strategy:
       matrix:
-        arch: [ amd64, arm64 ]
+        arch: [amd64, arm64]
     steps:
       - name: Clone
         uses: actions/checkout@v5

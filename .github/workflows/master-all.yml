@@ -1,23 +1,26 @@
 name: Stable
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 env:
-  SP_TIME: ''
-  ARTIFACT: ''
+  SP_TIME: ""
+  ARTIFACT: ""
+permissions:
+  id-token: write
+  contents: write
 jobs:
   linux-master:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ ubuntu-22.04, ubuntu-22.04-arm ]
-        avx: [ ON, OFF ]
-        vtk: [ ON, OFF ]
-        mkl: [ ON, OFF ]
-        aocl: [ ON, OFF ]
+        os: [ubuntu-22.04, ubuntu-22.04-arm]
+        avx: [ON, OFF]
+        vtk: [ON, OFF]
+        mkl: [ON, OFF]
+        aocl: [ON, OFF]
         exclude:
           - mkl: ON
             aocl: ON
@@ -47,7 +50,7 @@ jobs:
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
       - name: Compile
         run: |
-          sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils
+          sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils patchelf
           go build Checker/updater.go
           ./Script/linux-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
@@ -63,16 +66,19 @@ jobs:
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config Release -j $(nproc)
+          cmake --build . --target package
+          cd ..
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
+          cp updater build/dist/bin
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
       - name: Pack
         run: |
-          cp updater build/dist/bin
           file_name="suanPan-linux"
-          if [[ "${{ matrix.os }}" != *"arm"* ]]; then 
-            file_name+="-amd64"
-          else
-            file_name+="-arm64" 
-          fi
+          file_name+=$([[ "${{ matrix.os }}" != *"arm"* ]] && echo "-amd64" || echo "-arm64")
           if [ "${{ matrix.mkl }}" == "ON" ]; then
             file_name+="-mkl"
           elif [ "${{ matrix.aocl }}" == "ON" ]; then
@@ -80,15 +86,9 @@ jobs:
           else
             file_name+="-openblas"
           fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           if [[ "${{ matrix.os }}" != *"arm"* ]]; then
-            if [ "${{ matrix.avx }}" == "ON" ]; then
-              file_name+="-avx"
-            else
-              file_name+="-no-avx"
-            fi
+            file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
           fi
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
@@ -114,7 +114,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ ubuntu-22.04 ]
+        os: [ubuntu-22.04]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -133,7 +133,7 @@ jobs:
           tar xf VTK-9.5.2-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils patchelf
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -152,10 +152,17 @@ jobs:
           -DSP_ENABLE_VTK=ON \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config Release -j $(nproc)
+          cmake --build . --target package
+          cd ..
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
+          cp updater build/dist/bin
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
       - name: Pack
         run: |
-          cp updater build/dist/bin
           file_name="suanPan-linux-amd64-mkl-vtk-mpi-no-avx-ilp64.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
@@ -180,8 +187,8 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge ]
-        vtk: [ ON, OFF ]
+        os: [macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge]
+        vtk: [ON, OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -209,24 +216,27 @@ jobs:
           -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
           -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
           -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+          -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
           -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
           cmake --build . --target install --config Release -j 3
+          cd ..
+          cp updater build/dist/bin
+          ./Script/mac-patcher.sh build/dist
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
       - name: Pack
         run: |
-          cp updater build/dist/bin
           file_name="suanPan-${{ matrix.os }}-openblas"
           file_name="${file_name//xlarge/arm64}"
           file_name="${file_name//large/amd64}"
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [ "${{ matrix.os }}" != *"xlarge"* ]; then
-            file_name+="-avx"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          [[ "${{ matrix.os }}" != *"xlarge"* ]] && file_name+="-avx"
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
@@ -251,9 +261,9 @@ jobs:
     timeout-minutes: 120
     strategy:
       matrix:
-        avx: [ ON, OFF ]
-        vtk: [ ON, OFF ]
-        mkl: [ ON, OFF ]
+        avx: [ON, OFF]
+        vtk: [ON, OFF]
+        mkl: [ON, OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -297,33 +307,39 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.5/ `
           ..
           cmake --build . --target install --config Release -j 4
+          cp ../updater.exe dist/bin
+      - name: Name
+        shell: bash
+        run: |
+          file_name="suanPan-win"
+          file_name+=$([[ "${{ matrix.mkl }}" == "ON" ]] && echo "-mkl" || echo "-openblas")
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
+          file_name+=".zip"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Unsigned
+        if: ${{ github.event_name == 'push' }}
+        id: upload-unsigned-vs
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ env.ARTIFACT }}
+          path: build/dist/bin/*.exe
+      - name: Sign
+        if: ${{ github.event_name == 'push' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: "${{ secrets.SIGNPATH }}"
+          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
+          project-slug: "suanPan"
+          signing-policy-slug: "release-signing"
+          github-artifact-id: "${{ steps.upload-unsigned-vs.outputs.artifact-id }}"
+          wait-for-completion: true
+          output-artifact-directory: "build/dist/bin"
       - name: Pack
         shell: bash
         run: |
-          cp updater.exe build/dist/bin
-          file_name="suanPan-win"
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            file_name+="-mkl"
-          else
-            file_name+="-openblas"
-          fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [ "${{ matrix.avx }}" == "OFF" ]; then
-            file_name+="-no-avx"
-          fi
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            file_name+=".zip"
-            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-            cd build/dist/bin
-            7z a -tzip ../../../$file_name ./*
-          else
-            file_name+=".7z"
-            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-            cd build/dist/bin
-            7z a ../../../$file_name ./*
-          fi
+          cd build/dist/bin
+          7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -348,7 +364,7 @@ jobs:
           ls -halt
           if [ "${{ github.event_name }}" == "push" ]; then
             choco apikey --key ${{ secrets.CHOCO_KEY }} --source https://push.chocolatey.org/
-            choco push suanpan.3.9.2.nupkg --source https://push.chocolatey.org/
+            choco push suanpan.3.9.3.nupkg --source https://push.chocolatey.org/
           fi
       - name: Release SHA256
         if: matrix.mkl == 'ON' && matrix.vtk == 'ON' && matrix.avx == 'ON'
@@ -367,8 +383,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanpan.3.9.2.nupkg
-          asset_name: suanpan.3.9.2.nupkg
+          file: suanpan.3.9.3.nupkg
+          asset_name: suanpan.3.9.3.nupkg
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
@@ -379,8 +395,8 @@ jobs:
     timeout-minutes: 120
     strategy:
       matrix:
-        avx: [ ON, OFF ]
-        vtk: [ ON, OFF ]
+        avx: [ON, OFF]
+        vtk: [ON, OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -416,21 +432,38 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.5 `
           ..
           cmake --build . --target install --config Release -j 4
+          cp ../updater.exe dist/bin
+      - name: Name
+        shell: bash
+        run: |
+          file_name="suanPan-win-gcc-openblas"
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
+          file_name+=".zip"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Unsigned
+        if: ${{ github.event_name == 'push' }}
+        id: upload-unsigned-gcc
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ env.ARTIFACT }}
+          path: build/dist/bin/*.exe
+      - name: Sign
+        if: ${{ github.event_name == 'push' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: "${{ secrets.SIGNPATH }}"
+          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
+          project-slug: "suanPan"
+          signing-policy-slug: "release-signing"
+          github-artifact-id: "${{ steps.upload-unsigned-gcc.outputs.artifact-id }}"
+          wait-for-completion: true
+          output-artifact-directory: "build/dist/bin"
       - name: Pack
         shell: bash
         run: |
-          cp updater.exe build/dist/bin
-          file_name="suanPan-win-gcc-openblas"
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [ "${{ matrix.avx }}" == "OFF" ]; then
-            file_name+="-no-avx"
-          fi
-          file_name+=".7z"
-          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
-          7z a ../../../$file_name ./*
+          7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -447,3 +480,23 @@ jobs:
           overwrite: true
           body: |
             This release is automatically generated by CI/CD pipelines.
+  virustotal-scan:
+    runs-on: ubuntu-22.04
+    needs:
+      [
+        linux-master,
+        linux-master-mpi,
+        macos-master,
+        windows-master,
+        windows-gcc-master,
+      ]
+    steps:
+      - name: Prepare
+        run: |
+          echo "SP_TIME=daily-$(date +''%y%m%d'')" >> $GITHUB_ENV
+      - name: VirusTotal
+        uses: cssnr/virustotal-action@v1
+        with:
+          vt_api_key: ${{ secrets.VIRUSTOTAL_KEY }}
+          release_id: ${{ env.SP_TIME }}
+          release_heading: "### 🛡️ VirusTotal Results"

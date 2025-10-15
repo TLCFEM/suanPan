@@ -1,33 +1,35 @@
 name: Develop
 on:
   push:
-    branches: [ dev ]
+    branches: [dev]
   pull_request:
-    branches: [ dev ]
+    branches: [dev]
 env:
-  SP_TIME: ''
-  ARTIFACT: ''
-  IOMP: ''
-  COVERAGE: ''
+  SP_TIME: ""
+  ARTIFACT: ""
+  IOMP: ""
+  COVERAGE: ""
 jobs:
   linux-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: write
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ ubuntu-22.04, ubuntu-22.04-arm ]
-        build: [ RelWithDebInfo, Debug ]
-        compiler: [ { c: gcc, cpp: g++, fortran: gfortran }, { c: icx, cpp: icpx, fortran: ifx } ]
-        avx: [ OFF ]
-        vtk: [ ON, OFF ]
-        mkl: [ OFF ]
-        aocl: [ ON, OFF ]
+        os: [ubuntu-22.04, ubuntu-22.04-arm]
+        build: [Debug]
+        compiler:
+          [
+            { c: gcc, cpp: g++, fortran: gfortran },
+            { c: icx, cpp: icpx, fortran: ifx },
+          ]
+        avx: [OFF]
+        vtk: [ON, OFF]
+        mkl: [OFF]
+        aocl: [ON, OFF]
         exclude:
-          - build: Debug
-            mkl: ON
-          - build: Debug
-            avx: ON
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
             mkl: OFF
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
@@ -67,7 +69,7 @@ jobs:
           fi
       - name: Dependency
         run: |
-          sudo apt-get install libglvnd-dev dpkg-dev xz-utils lcov
+          sudo apt-get install libglvnd-dev dpkg-dev xz-utils lcov patchelf
           if [[ "${{ matrix.build }}" == "Debug" ]] && [[ "${{ matrix.compiler.c }}" == "gcc" ]] && [[ "${{ matrix.avx }}" == "OFF" ]] && [[ "${{ matrix.vtk }}" == "OFF" ]]; then
             echo "COVERAGE=ON" >> "$GITHUB_ENV"
           else
@@ -77,11 +79,6 @@ jobs:
         run: |
           if [ "${{ matrix.compiler.c }}" == "icx" ]; then
             source /opt/intel/oneapi/setvars.sh
-          fi
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            MT="OFF"
-          else
-            MT="ON"
           fi
           go build Checker/updater.go
           ./Script/linux-dependency.sh ${{ matrix.os }}
@@ -93,7 +90,7 @@ jobs:
           -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_DLL_EXAMPLE=${{ env.COVERAGE }} \
-          -DSP_BUILD_PARALLEL=$MT \
+          -DSP_BUILD_PARALLEL=$([ "${{ matrix.build }}" = "Debug" ] && echo "OFF" || echo "ON") \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
           -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
@@ -103,36 +100,25 @@ jobs:
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config ${{ matrix.build }} -j $(nproc)
+          cmake --build . --target package
+          cd ..
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
+          cp updater build/dist/bin
+      - name: Cosign
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: build/dist/bin/*
       - name: Pack
         run: |
-          cp updater build/dist/bin
           file_name="suanPan-linux"
+          file_name+=$([[ "${{ matrix.os }}" != *"arm"* ]] && echo "-amd64" || echo "-arm64")
+          file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
+          file_name+=$([[ "${{ matrix.compiler.c }}" == "gcc" ]] && echo "-gcc" || echo "-intel")
           if [[ "${{ matrix.os }}" != *"arm"* ]]; then
-            file_name+="-amd64"
-          else
-            file_name+="-arm64"
+            file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
           fi
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            file_name+="-debug"
-          else
-            file_name+="-release"
-          fi
-          if [ "${{ matrix.compiler.c }}" == "gcc" ]; then
-            file_name+="-gcc"
-          else
-            file_name+="-intel"
-          fi
-          if [[ "${{ matrix.os }}" != *"arm"* ]]; then
-            if [ "${{ matrix.avx }}" == "ON" ]; then
-              file_name+="-avx"
-            else
-              file_name+="-no-avx"
-            fi
-          fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           if [ "${{ matrix.mkl }}" == "ON" ]; then
             file_name+="-mkl"
           elif [ "${{ matrix.aocl }}" == "ON" ]; then
@@ -150,6 +136,7 @@ jobs:
           path: ${{ env.ARTIFACT }}
       - name: Test
         run: |
+          ldd build/dist/bin/suanPan
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
           ./build/dist/bin/suanPan -v
       - name: Coverage
@@ -170,11 +157,12 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   linux-dev-mpi:
+    if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ ubuntu-22.04 ]
+        os: [ubuntu-22.04]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -190,7 +178,7 @@ jobs:
           tar xf VTK-9.5.2-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
       - name: Compile
         run: |
           source /opt/intel/oneapi/setvars.sh
@@ -209,9 +197,11 @@ jobs:
           -DSP_ENABLE_VTK=ON \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
           ..
-          make install -j"$(nproc)" && make package
+          cmake --build . --target install --config RelWithDebInfo -j $(nproc)
+          cmake --build . --target package
       - name: Pack
         run: |
+          ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
           file_name="suanPan-linux-amd64-release-gcc-avx-vtk-mkl-mpi.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
@@ -227,10 +217,10 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        os: [ macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge ]
-        build: [ RelWithDebInfo ]
-        compiler: [ gcc, clang ]
-        vtk: [ ON, OFF ]
+        os: [macos-14-large, macos-14-xlarge]
+        build: [RelWithDebInfo]
+        compiler: [gcc, clang]
+        vtk: [ON, OFF]
         exclude:
           - compiler: gcc
             vtk: ON
@@ -256,7 +246,7 @@ jobs:
             fi
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-            -DCMAKE_PREFIX_PATH=$(brew --prefix libomp) \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
@@ -266,6 +256,7 @@ jobs:
             export CXX=g++-13
             cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
@@ -275,27 +266,19 @@ jobs:
       - name: Pack
         run: |
           cp updater build/dist/bin
+          ./Script/mac-patcher.sh build/dist
           file_name="suanPan-${{ matrix.os }}"
           file_name="${file_name//xlarge/arm64}"
           file_name="${file_name//large/amd64}"
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            file_name+="-debug"
-          else
-            file_name+="-release"
-          fi
+          file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
           file_name+="-${{ matrix.compiler }}"
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [ "${{ matrix.os }}" != *"xlarge"* ]; then
-            file_name+="-avx"
-          fi
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          [[ "${{ matrix.os }}" != *"xlarge"* ]] && file_name+="-avx"
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Test
         run: |
-          export DYLD_LIBRARY_PATH=/Users/runner/work/suanPan/suanPan/build/dist/lib/
           ./build/dist/bin/suanPan -v
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -308,11 +291,11 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        build: [ Release ]
-        compiler: [ "Visual Studio 17 2022" ]
-        vtk: [ ON, OFF ]
-        avx: [ OFF ]
-        mkl: [ OFF ]
+        build: [Release]
+        compiler: ["Visual Studio 17 2022"]
+        vtk: [ON, OFF]
+        avx: [OFF]
+        mkl: [OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -352,40 +335,40 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.5/ `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
+          cp ../updater.exe dist/bin
+      - name: Name
+        shell: bash
+        run: |
+          file_name="suanPan-win"
+          file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
+          file_name+=$([[ "${{ matrix.mkl }}" == "ON" ]] && echo "-mkl" || echo "-openblas")
+          file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          file_name+=".zip"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Unsigned
+        if: ${{ github.event_name == 'push' }}
+        id: upload-unsigned-vs
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ env.ARTIFACT }}
+          path: build/dist/bin/*.exe
+      - name: Sign
+        if: ${{ github.event_name == 'push' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: "${{ secrets.SIGNPATH }}"
+          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
+          project-slug: "suanPan"
+          signing-policy-slug: "test-signing"
+          github-artifact-id: "${{ steps.upload-unsigned-vs.outputs.artifact-id }}"
+          wait-for-completion: true
+          output-artifact-directory: "build/dist/bin"
       - name: Pack
         shell: bash
         run: |
-          cp updater.exe build/dist/bin
-          file_name="suanPan-win"
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            file_name+="-debug"
-          else
-            file_name+="-release"
-          fi
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            file_name+="-mkl"
-          else
-            file_name+="-openblas"
-          fi
-          if [ "${{ matrix.avx }}" == "ON" ]; then
-            file_name+="-avx"
-          else
-            file_name+="-no-avx"
-          fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          if [ "${{ matrix.mkl }}" == "ON" ]; then
-            file_name+=".zip"
-            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-            cd build/dist/bin
-            7z a -tzip ../../../$file_name ./*
-          else
-            file_name+=".7z"
-            echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-            cd build/dist/bin
-            7z a ../../../$file_name ./*
-          fi
+          cd build/dist/bin
+          7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Test
         run: |
           build/dist/bin/suanPan.exe -v
@@ -400,10 +383,10 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        build: [ Release ]
-        compiler: [ "MinGW Makefiles" ]
-        vtk: [ ON ]
-        avx: [ OFF ]
+        build: [Release]
+        compiler: ["MinGW Makefiles"]
+        vtk: [ON]
+        avx: [OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -437,29 +420,40 @@ jobs:
           -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.5 `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
+          cp ../updater.exe dist/bin
+      - name: Name
+        shell: bash
+        run: |
+          file_name="suanPan-win-gcc"
+          file_name+=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "-debug" || echo "-release")
+          file_name+="-openblas"
+          file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
+          [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
+          file_name+=".zip"
+          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Unsigned
+        if: ${{ github.event_name == 'push' }}
+        id: upload-unsigned-gcc
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ env.ARTIFACT }}
+          path: build/dist/bin/*.exe
+      - name: Sign
+        if: ${{ github.event_name == 'push' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: "${{ secrets.SIGNPATH }}"
+          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
+          project-slug: "suanPan"
+          signing-policy-slug: "test-signing"
+          github-artifact-id: "${{ steps.upload-unsigned-gcc.outputs.artifact-id }}"
+          wait-for-completion: true
+          output-artifact-directory: "build/dist/bin"
       - name: Pack
         shell: bash
         run: |
-          cp updater.exe build/dist/bin
-          file_name="suanPan-win-gcc"
-          if [ "${{ matrix.build }}" == "Debug" ]; then
-            file_name+="-debug"
-          else
-            file_name+="-release"
-          fi
-          file_name+="-openblas"
-          if [ "${{ matrix.avx }}" == "ON" ]; then
-            file_name+="-avx"
-          else
-            file_name+="-no-avx"
-          fi
-          if [ "${{ matrix.vtk }}" == "ON" ]; then
-            file_name+="-vtk"
-          fi
-          file_name+=".7z"
-          echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           cd build/dist/bin
-          7z a ../../../$file_name ./*
+          7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Test
         run: |
           build/dist/bin/suanPan.exe -v
@@ -468,4 +462,3 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
-        
