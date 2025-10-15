@@ -4,7 +4,7 @@ cmake_policy(SET CMP0076 NEW)
 
 project(suanPan C CXX)
 
-if (CMAKE_GNUtoMS_VCVARS OR MINGW)
+if (CMAKE_GNUtoMS_VCVARS AND MINGW)
     set(CMAKE_GNUtoMS ON)
 endif ()
 
