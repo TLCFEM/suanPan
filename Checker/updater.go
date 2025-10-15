@@ -105,11 +105,16 @@ func fetch() error {
 	return downloadLatestVersion(release, fromMain)
 }
 
+func isArchive(name string) bool {
+	ext := strings.ToLower(name)
+	return strings.HasSuffix(ext, ".zip") || strings.HasSuffix(ext, ".tar.gz") || strings.HasSuffix(ext, ".7z")
+}
+
 func getPackageList(release Release, platforms []string) []string {
 	var package_list []string
 	for _, asset := range release.Assets {
 		for _, platform := range platforms {
-			if strings.Contains(asset.Name, platform) {
+			if strings.Contains(asset.Name, platform) && isArchive(asset.Name) {
 				package_list = append(package_list, asset.Name)
 				break
 			}
