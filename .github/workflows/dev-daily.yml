@@ -131,7 +131,6 @@ jobs:
       - name: Compile
         run: |
           "SP_TIME=$(Get-Date -Format 'yyMMdd')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "ARTIFACT=suanPan-win-gcc-debug-openblas-$env:SP_TIME.zip" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           mkdir build && cd build
           cmake -G "MinGW Makefiles" `
           -DCMAKE_BUILD_TYPE=Debug `
@@ -142,6 +141,10 @@ jobs:
           -DSP_ENABLE_AVX2=OFF `
           ..
           cmake --build . --target install --config Debug -j 4
+      - name: Name
+        shell: bash
+        run: |
+          echo "ARTIFACT=suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
       - name: Cosign
         uses: sigstore/gh-action-sigstore-python@v3.0.1
         with:
