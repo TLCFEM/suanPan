@@ -148,6 +148,12 @@ jobs:
           lcov --capture --directory . --output-file coverage.info
           lcov --remove coverage.info '/usr/*' --output-file coverage.info
           lcov --list coverage.info
+      - name: Result
+        if: ${{ matrix.os == 'ubuntu-22.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Results-${{ hashFiles('./build/Results.tar.gz') }}
+          path: ./build/Results.tar.gz
       - name: Report
         if: ${{ hashFiles('./build/coverage.info') != '' }}
         uses: codecov/codecov-action@v5
