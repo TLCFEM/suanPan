@@ -142,7 +142,7 @@ class Row : public Mat<eT>
   template<typename T1> inline void shed_cols(const Base<uword, T1>& indices);
   
   [[deprecated]] inline void insert_cols(const uword col_num, const uword N, const bool set_to_zero);
-                  inline void insert_cols(const uword col_num, const uword N);
+                 inline void insert_cols(const uword col_num, const uword N);
   
   template<typename T1> inline void insert_cols(const uword col_num, const Base<eT,T1>& X);
   
@@ -154,6 +154,11 @@ class Row : public Mat<eT>
   arma_warn_unused arma_inline const eT& at(const uword in_row, const uword in_col) const;
   
   
+  inline constexpr bool is_vec()    const { return true;  }
+  inline constexpr bool is_rowvec() const { return true;  }
+  inline constexpr bool is_colvec() const { return false; }
+  
+  
   typedef       eT*       row_iterator;
   typedef const eT* const_row_iterator;
   
@@ -162,6 +167,9 @@ class Row : public Mat<eT>
   
   inline       row_iterator end_row  (const uword row_num);
   inline const_row_iterator end_row  (const uword row_num) const;
+  
+  
+  inline explicit Row(const subview<eT>& X, const bool reuse_mem);  // only to be used by the partial_unwrap class
   
   
   template<uword fixed_n_elem> class fixed;

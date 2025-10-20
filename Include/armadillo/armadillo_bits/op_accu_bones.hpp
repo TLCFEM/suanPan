@@ -65,6 +65,9 @@ struct  op_accu_mat
   
   template<typename eT>
   static inline eT apply(const subview_col<eT>& X);
+  
+  template<typename eT>
+  static inline eT apply(const subview_row<eT>& X);
   };
 
 
@@ -95,6 +98,9 @@ struct  op_accu_cube
   
   template<typename T1>
   static inline typename T1::elem_type apply(const CubeToMatOp<T1, op_omit_cube>& in);
+  
+  template<typename eT>
+  static inline eT apply(const subview_cube<eT>& sv);
   };
 
 
