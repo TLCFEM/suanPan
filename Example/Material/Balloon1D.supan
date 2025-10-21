@@ -2,25 +2,23 @@ node 1 0 0
 node 2 1 0
 
 material Balloon1D 1 \
-2E5 1E6 1E0 1E2 4 \
-200 2E2 0 0 \ ! hf
-0 0 0 0 \ ! ha
-2 1E0 0 0 \ ! hb
-200 6E3 0 0 \ ! hd
-5E3 0 \ ! alpha
-1E1 1. \ ! beta
-5E3 0 ! d
+2E5 1E6 1E1 2 \
+200 1E3 0 0 \ ! hfm
+0 1E3 0 0 \ ! hfc
+1 0 0 0 \ ! ha
+0 0 0 0 \ ! hd
+1E2 1. \ ! fc
+1E1 1. \ ! alpha
+1E3 1. ! d
 
 element T2D2 1 1 2 1 1
 
 fix2 1 1 1
 fix2 2 2 1 2
 
-amplitude Sine 2 1 1
+disp 1 0 5e-3 1 2
 
-disp 1 2 2e-3 1 2
-
-step static 1 10
+step static 1 1
 set fixed_step_size 1
 set ini_step_size 1E-2
 set symm_mat 0
@@ -30,6 +28,15 @@ converger RelIncreDisp 1 1E-10 10 1
 analyze
 
 peek element 1
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00
+# Displacement:
+#   5.0000e-03  0.0000e+00
+# Resistance:
+#   2.0371e+02  0.0000e+00
+peek node 2
 
 reset
 clear
