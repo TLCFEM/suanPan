@@ -66,7 +66,7 @@ struct DataBalloon1D {
 
     const double elastic; // elastic modulus
     const double u;       // yield ratio evolution rate
-    const double kb;      // plastic strain split ratio
+    const double kr;      // plastic strain split ratio
     const int zr_size;    // memory size
 
     const Bound bound_fm, bound_fc, bound_ha, bound_hd;

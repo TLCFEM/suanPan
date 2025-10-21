@@ -79,9 +79,9 @@ auto Balloon1D::compute_isotropic_bound(const double gamma, const double ref_zr)
 
     auto km = 0., dkm = 0.;
     if(z > ref_zr) {
-        if(const auto exp_term = std::exp((z - ref_zr) / kb / (z - 1.)); !std::isfinite(exp_term)) km = 1.;
+        if(const auto exp_term = std::exp((z - ref_zr) / kr / (z - 1.)); !std::isfinite(exp_term)) km = 1.;
         else {
-            dkm = (1. - ref_zr) / kb * std::pow(z - 1., -2.) * exp_term;
+            dkm = (1. - ref_zr) / kr * std::pow(z - 1., -2.) * exp_term;
             km = 1. - exp_term;
         }
     }
