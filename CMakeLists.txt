@@ -234,8 +234,6 @@ if (SP_ENABLE_HDF5)
             link_libraries(hdf5_hl hdf5)
         endif ()
     endif ()
-else ()
-    add_compile_definitions(ARMA_DONT_USE_HDF5)
 endif ()
 
 if (SP_BUILD_PARALLEL)
@@ -261,8 +259,7 @@ if (SP_BUILD_PARALLEL)
 endif ()
 
 if (CMAKE_BUILD_TYPE MATCHES "Rel")
-    add_compile_definitions(ARMA_WARN_LEVEL=1)
-    add_compile_definitions(ARMA_DONT_CHECK_CONFORMANCE)
+    add_compile_definitions(ARMA_WARN_LEVEL=1 ARMA_DONT_CHECK_CONFORMANCE)
 endif ()
 
 if (BUILD_SHARED_LIBS)

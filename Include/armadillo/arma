@@ -1,0 +1,28 @@
+#ifndef SUANPAN_ARMA
+#define SUANPAN_ARMA
+
+#ifdef SUANPAN_SUPERLUMT
+#define ARMA_DONT_USE_SUPERLU
+#else
+#define ARMA_USE_SUPERLU
+#endif
+
+#ifdef SUANPAN_HDF5
+#define ARMA_USE_HDF5
+#else
+#define ARMA_DONT_USE_HDF5
+#endif
+
+#ifdef SUANSPAN_64BIT_INT
+#define ARMA_BLAS_64BIT_INT
+#endif
+
+#define ARMA_USE_ARPACK
+#define ARMA_MAT_PREALLOC 6
+#define ARMA_OPENMP_THRESHOLD 400
+
+#include "armadillo"
+// extra bits used in calling lapack subroutines
+#include "ext_def_lapack.hpp"
+
+#endif
