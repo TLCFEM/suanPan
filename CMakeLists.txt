@@ -23,13 +23,16 @@ endif ()
 
 # run script to add revision tags to source file
 if (WIN32)
-    execute_process(COMMAND powershell ${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.ps1 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    find_program(POWERSHELL NAMES pwsh powershell)
+    if (POWERSHELL)
+        execute_process(COMMAND "${POWERSHELL}" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.ps1" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+    endif ()
 else ()
-    execute_process(COMMAND bash -c ${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    execute_process(COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endif ()
 
 # make sure changes to revision.h is not logged
-execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(Include)
