@@ -18,7 +18,7 @@
  * @class Balloon1D
  * @brief A Balloon1D material class.
  * @author tlc
- * @date 27/09/2025
+ * @date 23/10/2025
  * @version 0.1.0
  * @file Balloon1D.h
  * @addtogroup Material-1D
@@ -65,13 +65,12 @@ struct DataBalloon1D {
     };
 
     const double elastic; // elastic modulus
-    const double u;       // yield ratio evolution rate
-    const double kb, kr;  // plastic strain split ratio
+    const double kr;      // plastic strain split ratio
     const int zr_size;    // memory size
 
-    const Bound bound_hf, bound_ha, bound_hb, bound_hd;
+    const Bound bound_u, bound_fm, bound_fc, bound_ha, bound_hd;
 
-    const std::vector<Saturation> ba, bb, bd;
+    const std::vector<Saturation> bf, ba, bd;
 };
 
 class Balloon1D final : protected DataBalloon1D, public Material1D {
@@ -111,8 +110,6 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
     };
 
     memory current_zr{static_cast<std::size_t>(std::abs(zr_size))}, trial_zr{static_cast<std::size_t>(std::abs(zr_size))};
-
-    [[nodiscard]] auto compute_bounds(double, double, double) const;
 
     [[nodiscard]] double initial_check(double);
 
