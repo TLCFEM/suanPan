@@ -411,6 +411,10 @@ else ()
     endif ()
 endif ()
 
+if (MINGW)
+    link_libraries(libgfortran.a libquadmath.a libgomp.a libdl.a)
+endif ()
+
 add_executable(${PROJECT_NAME}
         suanPan.cpp
         Include/catch/catch_amalgamated.cpp
@@ -622,7 +626,12 @@ elseif (COMPILER_IDENTIFIER MATCHES "win")
         install(FILES ${MKL_FILES} DESTINATION bin COMPONENT Main)
     endif ()
     file(GLOB DLL_FILES Libs/${SP_EXTERNAL_LIB_PATH}/lib*.dll)
-    list(FILTER DLL_FILES EXCLUDE REGEX "openblas")
+    list(FILTER DLL_FILES EXCLUDE REGEX "libopenblas")
+    list(FILTER DLL_FILES EXCLUDE REGEX "libfext")
+    list(FILTER DLL_FILES EXCLUDE REGEX "libgfortran")
+    list(FILTER DLL_FILES EXCLUDE REGEX "libquadmath")
+    list(FILTER DLL_FILES EXCLUDE REGEX "libgomp")
+    list(FILTER DLL_FILES EXCLUDE REGEX "libdl")
     install(FILES ${DLL_FILES} DESTINATION bin COMPONENT Main)
 elseif (COMPILER_IDENTIFIER MATCHES "vs")
     if (SP_BUILD_PARALLEL OR SP_ENABLE_MKL)
