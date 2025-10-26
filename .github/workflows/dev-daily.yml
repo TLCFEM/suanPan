@@ -50,6 +50,7 @@ jobs:
           sudo apt-get install patchelf
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
       - name: Cosign
+        if: ${{ false }}
         uses: sigstore/gh-action-sigstore-python@v3.1.0
         with:
           inputs: build/dist/bin/*
@@ -96,6 +97,7 @@ jobs:
           cd ..
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
+        if: ${{ false }}
         uses: sigstore/gh-action-sigstore-python@v3.1.0
         with:
           inputs: build/dist/bin/*
@@ -146,6 +148,7 @@ jobs:
         run: |
           echo "ARTIFACT=suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
       - name: Cosign
+        if: ${{ false }}
         uses: sigstore/gh-action-sigstore-python@v3.1.0
         with:
           inputs: build/dist/bin/*.exe

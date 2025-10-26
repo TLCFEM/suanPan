@@ -106,6 +106,7 @@ jobs:
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
+        if: ${{ false }}
         uses: sigstore/gh-action-sigstore-python@v3.1.0
         with:
           inputs: build/dist/bin/*
