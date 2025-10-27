@@ -34,7 +34,6 @@ const double Balloon1D::rate_bound = -log(z_bound);
  * @return The revised $z$ value at the start of the integration
  */
 double Balloon1D::initial_check(double start_z) {
-    const auto& q = current_history(2);
     const auto& qm = current_history(3);
 
     const vec fc(&current_history(5), bf.size(), false, true);
@@ -42,7 +41,7 @@ double Balloon1D::initial_check(double start_z) {
     const vec d(&current_history(5 + bf.size() + ba.size()), bd.size(), false, true);
 
     [[maybe_unused]] const auto [fm, dfm] = bound_fm(qm, true);
-    [[maybe_unused]] const auto [ha, dha] = bound_ha(q, true);
+    [[maybe_unused]] const auto [ha, dha] = bound_ha(qm, true);
     [[maybe_unused]] const auto [hd, dhd] = bound_hd(qm, true);
 
     const auto hf = std::max(0., fm + accu(fc));
@@ -140,6 +139,10 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         const auto kc = 1. - km, dkc = -dkm;
 
         qm = current_qm + km * gamma;
+        q = current_q + gamma;
+
+        const auto [u, du] = bound_u(qm, true);
+        const auto pupg = du * km, pupz = du * gamma * dkm;
 
         const auto [fm, dfm] = bound_fm(qm, true);
         const auto [fc, dfc] = bound_fc(qm, false);
@@ -168,10 +171,8 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             phdpz = dhd * gamma * dkm;
         }
 
-        const auto [u, du] = bound_u(qm, true);
-        const auto pupg = du * km, pupz = du * gamma * dkm;
-
-        const auto [ha, phapg] = bound_ha(q = current_q + gamma, true);
+        const auto [ha, dha] = bound_ha(qm, true);
+        const auto phapg = dha * km, phapz = dha * gamma * dkm;
 
         vec top_alpha(ba.size(), fill::none), bot_alpha(ba.size(), fill::none), top_d(bd.size(), fill::none), bot_d(bd.size(), fill::none);
         for(auto I = 0llu; I < ba.size(); ++I) {
@@ -199,7 +200,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         residual(1) = hf * diff_z - gamma * u * trial_ratio[0];
 
         jacobian(0, 0) = n * ((z - 1.) * (hd * pdpg + sum_d * phdpg) - ha * palphapg - sum_alpha * phapg) - elastic - z * phfpg;
-        jacobian(0, 1) = n * (hd + (z - 1.) * phdpz) * sum_d - hf - z * phfpz;
+        jacobian(0, 1) = n * ((hd + (z - 1.) * phdpz) * sum_d - phapz * sum_alpha) - hf - z * phfpz;
 
         jacobian(1, 0) = phfpg * diff_z - (u + gamma * pupg) * trial_ratio[0];
         jacobian(1, 1) = hf + phfpz * diff_z - gamma * (pupz * trial_ratio[0] + u * trial_ratio[1]);
@@ -216,7 +217,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        gamma = suanpan::clamp(gamma - incre(0), 0., 1.5 * abs_incre_strain);
+        gamma = suanpan::clamp(gamma - incre(0), 0., abs_incre_strain);
         z = suanpan::clamp_unit(z - incre(1));
     }
 }
