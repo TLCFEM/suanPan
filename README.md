@@ -199,7 +199,7 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 # install
 flatpak install suanPan
 # define alias
-echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
+echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan --\"" >> ~/.bashrc
 ```
 
 ### macOS
