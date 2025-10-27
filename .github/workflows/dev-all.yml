@@ -131,7 +131,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -151,7 +151,7 @@ jobs:
           lcov --list coverage.info
       - name: Result
         if: ${{ matrix.os == 'ubuntu-22.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Results-${{ hashFiles('./build/Results.tar.gz') }}
           path: ./build/Results.tar.gz
@@ -214,7 +214,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -288,7 +288,7 @@ jobs:
         run: |
           ./build/dist/bin/suanPan -v
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -357,7 +357,7 @@ jobs:
           7z a -tzip ../../../$file_name ./*
           ./suanPan.exe -v
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -419,7 +419,7 @@ jobs:
           7z a -tzip ../../../$file_name ./*
           ./suanPan.exe -v
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
