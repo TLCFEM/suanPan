@@ -154,7 +154,7 @@ jobs:
           inputs: build/dist/bin/*.exe
       - name: Unsigned
         id: upload-unsigned-vs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: unsigned-${{ env.ARTIFACT }}
           path: build/dist/bin/*.exe
