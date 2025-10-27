@@ -329,7 +329,7 @@ jobs:
           path: build/dist/bin/*.exe
       - name: Sign
         if: ${{ github.event_name == 'push' }}
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: "${{ secrets.SIGNPATH }}"
           organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
@@ -453,7 +453,7 @@ jobs:
           path: build/dist/bin/*.exe
       - name: Sign
         if: ${{ github.event_name == 'push' }}
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: "${{ secrets.SIGNPATH }}"
           organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
