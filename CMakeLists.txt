@@ -517,6 +517,10 @@ if (SP_BUILD_DLL_EXAMPLE)
     add_subdirectory(Developer/Section)
 endif ()
 
+if (MINGW AND NOT BUILD_SHARED_LIBS AND NOT SP_BUILD_PARALLEL)
+    target_link_options(${PROJECT_NAME} PRIVATE -static)
+endif ()
+
 # need further work
 install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT Main)
 if (COMPILER_IDENTIFIER MATCHES "(linux|mac)")
