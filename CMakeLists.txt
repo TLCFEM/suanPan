@@ -411,10 +411,6 @@ else ()
     endif ()
 endif ()
 
-if (MINGW)
-    link_libraries(libgfortran.a libquadmath.a libgomp.a libdl.a)
-endif ()
-
 add_executable(${PROJECT_NAME}
         suanPan.cpp
         Include/catch/catch_amalgamated.cpp
@@ -506,6 +502,25 @@ if (SP_BUILD_DLL_EXAMPLE)
     add_subdirectory(Developer/ModuleBundle)
     add_subdirectory(Developer/Section)
 endif ()
+
+set(STATIC_LIST "")
+if (MINGW OR UNIX)
+    list(APPEND STATIC_LIST gfortran quadmath)
+    if (MINGW)
+        list(APPEND STATIC_LIST gomp dl)
+    endif ()
+endif ()
+foreach (STATIC_DEP IN LISTS STATIC_LIST)
+    find_library(${STATIC_DEP}_LIB NAMES lib${STATIC_DEP}.a PATHS
+            ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+            ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES}
+            ${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}
+    )
+    if (${STATIC_DEP}_LIB)
+        message(STATUS "Found static library ${${STATIC_DEP}_LIB}")
+        target_link_libraries(${PROJECT_NAME} ${${STATIC_DEP}_LIB})
+    endif ()
+endforeach ()
 
 # need further work
 install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT Main)
