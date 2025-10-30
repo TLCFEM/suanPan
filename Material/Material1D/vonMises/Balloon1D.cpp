@@ -88,7 +88,6 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
     const auto abs_incre_strain = std::fabs(incre_strain(0));
-
     if(abs_incre_strain <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
@@ -117,7 +116,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     // elastic unloading
     if(last_loading < -.5) return SUANPAN_SUCCESS;
 
-    const auto k_factor = (1. - (zr_size > 0 ? trial_zr.max() : trial_zr.min())) / kr;
+    const auto ref_zr = trial_zr.mean();
 
     auto gamma = 0., ref_error = 0.;
 
@@ -131,10 +130,13 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        auto km = 1., dkm = 0.;
-        if(const auto k_exp = std::exp(k_factor * z / (z - 1.)); std::isfinite(k_exp)) {
-            dkm = k_factor * k_exp * std::pow(z - 1., -2.);
-            km = 1. - k_exp;
+        auto km = 0., dkm = 0.;
+        if(z > ref_zr) {
+            if(const auto k_exp = std::exp((z - ref_zr) / (z - 1.) / kr); std::isfinite(k_exp)) {
+                dkm = k_exp / kr * (1. - ref_zr) * std::pow(z - 1., -2.);
+                km = 1. - k_exp;
+            }
+            else km = 1.;
         }
         const auto kc = 1. - km, dkc = -dkm;
 
@@ -217,7 +219,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        gamma = suanpan::clamp(gamma - incre(0), 0., abs_incre_strain);
+        gamma = suanpan::clamp(gamma - incre(0), 0., 1.1 * abs_incre_strain);
         z = suanpan::clamp_unit(z - incre(1));
     }
 }
