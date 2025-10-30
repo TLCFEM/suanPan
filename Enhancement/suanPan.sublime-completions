@@ -193,6 +193,12 @@
       "contents": "material BWBN ${1:(1)} ${2:[2...18]}\n# (1) int, unique material tag\n# [2] double, elastic modulus, default: 2E5\n# [3] double, yield stress, default: 4E2\n# [4] double, hardening ratio, default: 1E-2\n# [5] double, beta (>0), default: 0.5\n# [6] double, exponent n (>0, normally >=1), default: 1.0\n# [7] double, initial \\nu (>0), default: 1.0\n# [8] double, slope of \\nu (>0), default: 0.0\n# [9] double, initial eta (>0), default: 1.0\n# [10] double, slope of eta (>0), default: 0.0\n# [11] double, initial phi (>0), default: 1.0\n# [12] double, slope of phi (>0), default: 0.0\n# [13] double, zeta ${1>zeta>0:(1>zeta>0)}, default: 0.0\n# [14] double, slope of A (>0), default: 0.0\n# [15] double, p (>0), default: 0.0\n# [16] double, q (>0), default: 0.0\n# [17] double, lambda (>0), default: 1.0\n# [18] double, density, default: 0.0"
     },
     {
+      "trigger": "Balloon1D",
+      "details": "uniaxial balloon-v1 model",
+      "kind": "type",
+      "contents": "material Balloon1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5 6 7 8)} ${6:(9 10 11 12)} ${7:(13 14 15 16)} ${8:(17 18 19 20)} ${9:(21 22 23 24)} ${10:(25 26)} ${11:(27 28)} ${12:(29 30)} ${13:[31]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, k_r\n# (4) double, load reversal memory size\n# (5 6 7 8) double, u bound, initial, linear, saturation, rate\n# (9 10 11 12) double, fm bound, initial, linear, saturation, rate\n# (13 14 15 16) double, fc bound, initial, linear, saturation, rate\n# (17 18 19 20) double, back stress bound, initial, linear, saturation, rate\n# (21 22 23 24) double, similarity bound, initial, linear, saturation, rate\n# (25 26) double, fc saturation, rate\n# (27 28) double, back stress saturation, rate\n# (29 30) double, similarity saturation, rate\n# [31] double, density, default: 0.0"
+    },
+    {
       "trigger": "Bar2D",
       "details": "2d reinforcing bar section",
       "kind": "type",
