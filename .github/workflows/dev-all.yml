@@ -353,6 +353,7 @@ jobs:
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          ./Script/win-patcher.sh build/dist/bin/suanPan.exe
           cd build/dist/bin
           7z a -tzip ../../../$file_name ./*
           ./suanPan.exe -v
@@ -415,6 +416,7 @@ jobs:
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          ./Script/win-patcher.sh build/dist/bin/suanPan.exe
           cd build/dist/bin
           7z a -tzip ../../../$file_name ./*
           ./suanPan.exe -v

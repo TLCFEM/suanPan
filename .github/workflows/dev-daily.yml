@@ -147,6 +147,7 @@ jobs:
         shell: bash
         run: |
           echo "ARTIFACT=suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
+          ./Script/win-patcher.sh build/dist/bin/suanPan.exe
       - name: Cosign
         if: ${{ false }}
         uses: sigstore/gh-action-sigstore-python@v3.1.0

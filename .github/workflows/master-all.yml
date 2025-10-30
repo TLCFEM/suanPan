@@ -320,6 +320,7 @@ jobs:
           [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          ./Script/win-patcher.sh build/dist/bin/suanPan.exe
       - name: Unsigned
         if: ${{ github.event_name == 'push' }}
         id: upload-unsigned-vs
@@ -444,6 +445,7 @@ jobs:
           [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          ./Script/win-patcher.sh build/dist/bin/suanPan.exe
       - name: Unsigned
         if: ${{ github.event_name == 'push' }}
         id: upload-unsigned-gcc
