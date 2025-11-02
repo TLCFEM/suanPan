@@ -152,10 +152,10 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
 
         auto phfpg = dfm * km, phfpz = dfm * gamma * dkm;
         for(auto I = 0llu; I < bf.size(); ++I) {
-            const auto bot_fc = 1. + bf[I].r() * gamma * kc;
-            hfc(I) = (bf[I].rb() * gamma * kc * fc + current_hfc(I)) / bot_fc;
-            phfpg += (bf[I].b() * (fc + gamma * pfcpg) - hfc(I)) * bf[I].r() * kc / bot_fc;
-            phfpz += (bf[I].b() * (dkc * fc + kc * pfcpz) - hfc(I) * dkc) * bf[I].r() * gamma / bot_fc;
+            const auto bot_fc = 1. + bf[I].b() * gamma * kc;
+            hfc(I) = (bf[I].a() * gamma * kc * fc + current_hfc(I)) / bot_fc;
+            phfpg += (bf[I].a() * (fc + gamma * pfcpg) - hfc(I) * bf[I].b()) * kc / bot_fc;
+            phfpz += (bf[I].a() * (dkc * fc + kc * pfcpz) - hfc(I) * bf[I].b() * dkc) * gamma / bot_fc;
         }
 
         auto hf = fm + accu(hfc);
@@ -178,12 +178,12 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
 
         vec top_alpha(ba.size(), fill::none), bot_alpha(ba.size(), fill::none), top_d(bd.size(), fill::none), bot_d(bd.size(), fill::none);
         for(auto I = 0llu; I < ba.size(); ++I) {
-            top_alpha(I) = ba[I].rb() * gamma;
-            bot_alpha(I) = 1. + ba[I].r() * gamma;
+            top_alpha(I) = ba[I].a() * gamma;
+            bot_alpha(I) = 1. + ba[I].b() * gamma;
         }
         for(auto I = 0llu; I < bd.size(); ++I) {
-            top_d(I) = bd[I].rb() * gamma;
-            bot_d(I) = 1. + bd[I].r() * gamma;
+            top_d(I) = bd[I].a() * gamma;
+            bot_d(I) = 1. + bd[I].b() * gamma;
         }
 
         const auto n = trial_stress(0) > ha * accu(current_alpha / bot_alpha) + (1. - z) * hd * accu(current_d / bot_d) ? 1. : -1.;
@@ -192,8 +192,8 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         const auto sum_d = accu(d = (top_d * n + current_d) / bot_d);
 
         auto palphapg = 0., pdpg = 0.;
-        for(auto I = 0llu; I < ba.size(); ++I) palphapg += ba[I].r() * (ba[I].b() * n - alpha[I]) / bot_alpha[I];
-        for(auto I = 0llu; I < bd.size(); ++I) pdpg += bd[I].r() * (bd[I].b() * n - d[I]) / bot_d[I];
+        for(auto I = 0llu; I < ba.size(); ++I) palphapg += (ba[I].a() * n - ba[I].b() * alpha[I]) / bot_alpha[I];
+        for(auto I = 0llu; I < bd.size(); ++I) pdpg += (bd[I].a() * n - bd[I].b() * d[I]) / bot_d[I];
 
         const auto trial_ratio = yield_ratio(z);
         const auto diff_z = z - start_z;

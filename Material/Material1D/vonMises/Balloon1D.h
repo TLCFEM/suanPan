@@ -42,9 +42,8 @@ struct DataBalloon1D {
             : rate(R)
             , bound(B) {}
 
-        [[nodiscard]] double r() const { return rate * root_one_half; }
-        [[nodiscard]] double b() const { return bound; }
-        [[nodiscard]] double rb() const { return r() * b(); }
+        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
+        [[nodiscard]] double b() const { return rate * root_one_half; }
     };
 
     class Bound {
