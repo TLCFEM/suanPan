@@ -298,7 +298,7 @@ namespace {
             return;
         }
 
-        vec p(29);
+        vec p(31);
         if(!get_input(command, p)) {
             suanpan_error("Valid inputs are required.\n");
             return;
@@ -317,11 +317,12 @@ namespace {
             {p(3), p(4), p(5), p(6)},     // u
             {p(7), p(8), p(9), p(10)},    // fm
             {p(11), p(12), p(13), p(14)}, // fc
-            {p(15), p(16), p(17), p(18)}, // ha
-            {p(19), p(20), p(21), p(22)}, // hd
+            {p(15), p(16), p(17), p(18)}, // am
+            {p(19), p(20), p(21), p(22)}, // ac
             {{p(23), p(24)}},             // fc saturation
-            {{p(25), p(26)}},             // alpha saturation
-            {{p(27), p(28)}},             // similarity saturation
+            {{p(25), p(26)}},             // ac saturation
+            {{p(27), p(28)}},             // alpha saturation
+            {{p(29), p(30)}},             // similarity saturation
         };
 
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
