@@ -313,7 +313,7 @@ namespace {
         DataBalloon1D para{
             p(0),                         // elastic modulus
             p(1),                         // split ratio
-            static_cast<int>(p(2)),       // zr memory size
+            static_cast<unsigned>(p(2)),  // zr memory size
             {p(3), p(4), p(5), p(6)},     // u
             {p(7), p(8), p(9), p(10)},    // fm
             {p(11), p(12), p(13), p(14)}, // fc
@@ -321,8 +321,8 @@ namespace {
             {p(19), p(20), p(21), p(22)}, // ac
             {{p(23), p(24)}},             // fc saturation
             {{p(25), p(26)}},             // ac saturation
-            {{p(27), p(28)}},             // alpha saturation
-            {{p(29), p(30)}},             // similarity saturation
+            {{p(27), p(28)}},             // na saturation
+            {{p(29), p(30)}},             // nd saturation
         };
 
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);

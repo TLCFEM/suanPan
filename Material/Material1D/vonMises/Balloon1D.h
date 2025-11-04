@@ -62,13 +62,13 @@ struct DataBalloon1D {
         }
     };
 
-    const double elastic; // elastic modulus
-    const double kr;      // plastic strain split ratio
-    const int zr_size;    // memory size
+    const double elastic;   // elastic modulus
+    const double kr;        // plastic strain split ratio
+    const unsigned zr_size; // memory size
 
     const Bound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
 
-    const std::vector<Saturation> bfc, bac, ba, bd;
+    const std::vector<Saturation> bfc, bac, bna, bnd;
 };
 
 class Balloon1D final : protected DataBalloon1D, public Material1D {
@@ -107,7 +107,7 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
         [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
     };
 
-    memory current_zr{static_cast<std::size_t>(std::abs(zr_size))}, trial_zr{static_cast<std::size_t>(std::abs(zr_size))};
+    memory current_zr{zr_size}, trial_zr{zr_size};
 
     [[nodiscard]] double initial_check(double);
 
