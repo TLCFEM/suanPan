@@ -38,8 +38,8 @@ double Balloon1D::initial_check(double start_z) {
 
     const vec fc(&current_history(5), bfc.size(), false, true);
     const vec ac(&current_history(5 + bfc.size()), bac.size(), false, true);
-    const vec current_na(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    const vec current_nd(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    const vec na(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
+    const vec nd(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
 
     [[maybe_unused]] const auto [fm, dfm] = bound_fm(qm, true);
     [[maybe_unused]] const auto [am, dam] = bound_am(qm, true);
@@ -47,8 +47,8 @@ double Balloon1D::initial_check(double start_z) {
     const auto hf = std::max(0., fm + accu(fc));
     const auto ha = std::max(0., am + accu(ac));
 
-    const auto sum_a = ha * accu(current_na);
-    const auto sum_d = hf * accu(current_nd);
+    const auto sum_a = ha * accu(na);
+    const auto sum_d = hf * accu(nd);
     const auto sum_all = sum_a + sum_d;
 
     auto& last_loading = trial_history(1);
