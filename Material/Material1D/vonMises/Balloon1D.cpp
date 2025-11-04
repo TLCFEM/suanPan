@@ -154,12 +154,12 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     auto& qm = trial_history(3);
     auto& z = trial_history(4);
 
-    const vec current_hfc(&current_history(5), bfc.size(), false, true);
-    const vec current_hac(&current_history(5 + bfc.size()), bac.size(), false, true);
+    // const vec current_hfc(&current_history(5), bfc.size(), false, true);
+    // const vec current_hac(&current_history(5 + bfc.size()), bac.size(), false, true);
     const vec current_na(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
     const vec current_nd(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
-    vec hfc(&trial_history(5), bfc.size(), false, true);
-    vec hac(&trial_history(5 + bfc.size()), bac.size(), false, true);
+    // vec hfc(&trial_history(5), bfc.size(), false, true);
+    // vec hac(&trial_history(5 + bfc.size()), bac.size(), false, true);
     vec na(&trial_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
     vec nd(&trial_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
 
