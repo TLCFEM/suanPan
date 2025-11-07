@@ -2237,6 +2237,10 @@ copy of the Program in return for a fee.
     return SUANPAN_SUCCESS;
 }
 
+auto sanitize_command(std::string& line, const char delimiter) {
+    while(!line.empty() && delimiter == line.back()) line.pop_back();
+}
+
 bool normalise_command(std::string& all_line, std::string& command_line) {
     // if to parse and process immediately
     auto process = true;
@@ -2248,13 +2252,15 @@ bool normalise_command(std::string& all_line, std::string& command_line) {
     // remove all delimiters
     for(auto& c : command_line)
         if(',' == c || '\t' == c || '\r' == c || '\n' == c) c = ' ';
-    while(!command_line.empty() && ' ' == command_line.back()) command_line.pop_back();
+    sanitize_command(command_line, ' ');
     // it is a command spanning multiple lines
     if(!command_line.empty() && '\\' == command_line.back()) {
-        while(!command_line.empty() && '\\' == command_line.back()) command_line.pop_back();
+        sanitize_command(command_line, '\\');
         process = false;
     }
     all_line.append(command_line);
+
+    if(process) sanitize_command(all_line, ' ');
 
     return process && !all_line.empty();
 }
