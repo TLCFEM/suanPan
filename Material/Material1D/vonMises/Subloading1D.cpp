@@ -64,10 +64,10 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     auto& z = trial_history(2);
     auto& zv = trial_history(3);
 
-    const vec current_alpha(&current_history(4), b.size(), false, true);
-    const vec current_d(&current_history(4 + b.size()), c.size(), false, true);
-    vec alpha(&trial_history(4), b.size(), false, true);
-    vec d(&trial_history(4 + b.size()), c.size(), false, true);
+    const auto current_alpha = 0 == b.size() ? vec{} : vec(&current_history(4), b.size(), false, true);
+    const auto current_d = 0 == c.size() ? vec{} : vec(&current_history(4 + b.size()), c.size(), false, true);
+    auto alpha = 0 == b.size() ? vec{} : vec(&trial_history(4), b.size(), false, true);
+    auto d = 0 == c.size() ? vec{} : vec(&trial_history(4 + b.size()), c.size(), false, true);
 
     const auto norm_mu = mu / (incre_time && *incre_time > 0. ? *incre_time : 1.);
 

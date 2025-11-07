@@ -36,10 +36,10 @@ const double Balloon1D::rate_bound = -log(z_bound);
 double Balloon1D::initial_check(double start_z) {
     const auto& qm = current_history(3);
 
-    const vec fc(&current_history(5), bfc.size(), false, true);
-    const vec ac(&current_history(5 + bfc.size()), bac.size(), false, true);
-    const vec na(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    const vec nd(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    const auto fc = bfc.size() == 0 ? vec{} : vec(&current_history(5), bfc.size(), false, true);
+    const auto ac = bac.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
+    const auto na = bna.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
+    const auto nd = bnd.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
 
     [[maybe_unused]] const auto [fm, dfm] = bound_fm(qm, true);
     [[maybe_unused]] const auto [am, dam] = bound_am(qm, true);
@@ -74,8 +74,8 @@ double Balloon1D::initial_check(double start_z) {
 auto Balloon1D::compute_isotropic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
-    const vec current_hfc(&current_history(5), bfc.size(), false, true);
-    vec hfc(&trial_history(5), bfc.size(), false, true);
+    const auto current_hfc = bfc.size() == 0 ? vec{} : vec(&current_history(5), bfc.size(), false, true);
+    auto hfc = bfc.size() == 0 ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
 
     const auto kc = 1. - km, dkc = -dkm;
 
@@ -99,8 +99,8 @@ auto Balloon1D::compute_isotropic_bound(const double gamma, const double km, con
 auto Balloon1D::compute_kinematic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
-    const vec current_hac(&current_history(5 + bfc.size()), bac.size(), false, true);
-    vec hac(&trial_history(5 + bfc.size()), bac.size(), false, true);
+    const auto current_hac = bac.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
+    auto hac = bac.size() == 0 ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
 
     const auto kc = 1. - km, dkc = -dkm;
 
@@ -154,14 +154,14 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     auto& qm = trial_history(3);
     auto& z = trial_history(4);
 
-    // const vec current_hfc(&current_history(5), bfc.size(), false, true);
-    // const vec current_hac(&current_history(5 + bfc.size()), bac.size(), false, true);
-    const vec current_na(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    const vec current_nd(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
-    // vec hfc(&trial_history(5), bfc.size(), false, true);
-    // vec hac(&trial_history(5 + bfc.size()), bac.size(), false, true);
-    vec na(&trial_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    vec nd(&trial_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    // const auto current_hfc = bfc.size() == 0 ? vec{} : vec(&current_history(5), bfc.size(), false, true);
+    // const auto current_hac = bac.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
+    const auto current_na = bna.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
+    const auto current_nd = bnd.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    // auto hfc = bfc.size() == 0 ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
+    // auto hac = bac.size() == 0 ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
+    auto na = bna.size() == 0 ? vec{} : vec(&trial_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
+    auto nd = bnd.size() == 0 ? vec{} : vec(&trial_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
 
     iteration = 0.;
     const auto start_z = initial_check(current_z);
