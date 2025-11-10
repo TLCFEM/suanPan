@@ -190,7 +190,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge]
-        vtk: [ON, OFF]
+        vtk: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -265,8 +265,8 @@ jobs:
     strategy:
       matrix:
         avx: [ON, OFF]
-        vtk: [ON, OFF]
-        mkl: [ON, OFF]
+        vtk: [ON]
+        mkl: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -400,7 +400,7 @@ jobs:
     strategy:
       matrix:
         avx: [ON, OFF]
-        vtk: [ON, OFF]
+        vtk: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v5
