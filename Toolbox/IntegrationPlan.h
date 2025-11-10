@@ -61,7 +61,7 @@
 #ifndef INTEGRATIONPLAN_H
 #define INTEGRATIONPLAN_H
 
-#include <armadillo/armadillo>
+#include <armadillo/arma>
 
 enum class IntegrationType {
     GAUSS,

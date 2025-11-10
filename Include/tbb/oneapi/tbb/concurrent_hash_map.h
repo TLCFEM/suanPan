@@ -1,5 +1,6 @@
 /*
     Copyright (c) 2005-2025 Intel Corporation
+    Copyright (c) 2025 UXL Foundation Contributors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -1013,9 +1014,10 @@ public:
         hashcode_type m = this->my_mask.load(std::memory_order_relaxed);
         __TBB_ASSERT((m&(m+1))==0, "data structure is invalid");
         this->my_size.store(0, std::memory_order_relaxed);
-        segment_index_type s = this->segment_index_of( m );
-        __TBB_ASSERT( s+1 == this->pointers_per_table || !this->my_table[s+1].load(std::memory_order_relaxed), "wrong mask or concurrent grow" );
-        do {
+        segment_index_type s = this->segment_index_of( m ) + 1;
+        __TBB_ASSERT( s == this->pointers_per_table || !this->my_table[s].load(std::memory_order_relaxed), "wrong mask or concurrent grow" );
+        while(s != 0) {
+            s--;
             __TBB_ASSERT(this->is_valid(this->my_table[s].load(std::memory_order_relaxed)), "wrong mask or concurrent grow" );
             segment_ptr_type buckets_ptr = this->my_table[s].load(std::memory_order_relaxed);
             size_type sz = this->segment_size( s ? s : 1 );
@@ -1027,7 +1029,7 @@ public:
                     delete_node( n );
                 }
             this->delete_segment(s);
-        } while(s-- > 0);
+        }
         this->my_mask.store(this->embedded_buckets - 1, std::memory_order_relaxed);
     }
 
@@ -1516,12 +1518,16 @@ protected:
         this->reserve(reserve_size); // TODO: load_factor?
         hashcode_type m = this->my_mask.load(std::memory_order_relaxed);
         for(; first != last; ++first) {
-            hashcode_type h = my_hash_compare.hash( (*first).first );
+            const auto& key = (*first).first;
+            hashcode_type h = my_hash_compare.hash(key);
             bucket *b = this->get_bucket( h & m );
             __TBB_ASSERT(!rehash_required(b->node_list.load(std::memory_order_relaxed)), "Invalid bucket in destination table");
-            node* node_ptr = create_node(base_type::get_allocator(), (*first).first, (*first).second);
-            this->add_to_bucket( b, node_ptr );
-            ++this->my_size; // TODO: replace by non-atomic op
+            
+            if (search_bucket(key, b) == nullptr) {
+                node* node_ptr = create_node(base_type::get_allocator(), *first);
+                this->add_to_bucket( b, node_ptr );
+                ++this->my_size; // TODO: replace by non-atomic op
+            }
         }
     }
 

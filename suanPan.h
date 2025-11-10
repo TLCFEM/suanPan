@@ -28,22 +28,8 @@
 #define ARMA_NO_DEBUG
 #endif
 
-#ifdef SUANPAN_SUPERLUMT
-#define ARMA_DONT_USE_SUPERLU
-#else
-#define ARMA_USE_SUPERLU
-#endif
-
 #ifdef SUANPAN_MKL
 #define MKL_DIRECT_CALL
-#endif
-
-#ifdef SUANPAN_HDF5
-#define ARMA_USE_HDF5
-#endif
-
-#ifdef SUANSPAN_64BIT_INT
-#define ARMA_BLAS_64BIT_INT
 #endif
 
 #ifdef SUANPAN_MAGMA
@@ -204,9 +190,7 @@ inline auto& SUANPAN_CFTL = std::cout;
 #define ARMA_COUT_STREAM SUANPAN_COUT
 #define ARMA_CERR_STREAM SUANPAN_COUT
 
-#include <armadillo/armadillo>
-// extra bits used in calling lapack subroutines
-#include <armadillo/ext_def_lapack.hpp>
+#include <armadillo/arma>
 using namespace arma;
 
 #include <filesystem>

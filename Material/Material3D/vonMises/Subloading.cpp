@@ -46,7 +46,7 @@ unique_ptr<Material> Subloading::get_copy() { return std::make_unique<Subloading
 int Subloading::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    const auto norm_incre_strain = norm(incre_strain);
+    const auto norm_incre_strain = tensor::strain::norm(incre_strain);
     if(norm_incre_strain <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
@@ -187,9 +187,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        gamma -= incre(0);
-        if(gamma < 0.) gamma = 0.;
-
+        gamma = suanpan::clamp(gamma - incre(0), 0., 1.1 * norm_incre_strain);
         z = suanpan::clamp_unit(z - incre(1));
     }
 }

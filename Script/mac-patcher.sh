@@ -77,7 +77,9 @@ for target in "$BIN_DIR"/*; do
 done
 
 for target in "$LIB_DIR"/*.dylib; do
-  [[ -f "$target" ]] && file "$target" | grep -q 'Mach-O' || continue
+  if [[ ! -f "$target" ]] || ! file "$target" | grep -q 'Mach-O'; then
+    continue
+  fi
   echo "Patching $target"
   install_name_tool -id "@loader_path/$(basename "$target")" "$target"
   otool -L "$target" | tail -n +2 | awk '{print $1}' | while read -r dep; do
@@ -92,7 +94,9 @@ done
 echo "Verification:"
 
 for target in "$BIN_DIR"/* "$LIB_DIR"/*.dylib; do
-  [[ -f "$target" ]] && file "$target" | grep -q 'Mach-O' || continue
+  if [[ ! -f "$target" ]] || ! file "$target" | grep -q 'Mach-O'; then
+    continue
+  fi
   echo "== $target =="
   otool -L "$target"
 done

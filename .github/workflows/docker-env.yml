@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   ide-image-base:
-    runs-on: self-hosted
+    runs-on: ${{ matrix.arch == 'amd64' && 'self-hosted' || 'ubuntu-22.04-arm' }}
     timeout-minutes: 3000
     strategy:
       matrix:
@@ -20,9 +20,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: QEMU
-        if: ${{ matrix.arch == 'arm64' }}
-        uses: docker/setup-qemu-action@v3
       - name: Buildx
         uses: docker/setup-buildx-action@v3
       - name: Base ${{ matrix.arch }}

@@ -4,7 +4,7 @@ cmake_policy(SET CMP0076 NEW)
 
 project(suanPan C CXX)
 
-if (CMAKE_GNUtoMS_VCVARS OR MINGW)
+if (CMAKE_GNUtoMS_VCVARS AND MINGW)
     set(CMAKE_GNUtoMS ON)
 endif ()
 
@@ -23,13 +23,16 @@ endif ()
 
 # run script to add revision tags to source file
 if (WIN32)
-    execute_process(COMMAND powershell ${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.ps1 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    find_program(POWERSHELL NAMES pwsh powershell)
+    if (POWERSHELL)
+        execute_process(COMMAND "${POWERSHELL}" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.ps1" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+    endif ()
 else ()
-    execute_process(COMMAND bash -c ${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    execute_process(COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endif ()
 
 # make sure changes to revision.h is not logged
-execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(Include)
@@ -234,8 +237,6 @@ if (SP_ENABLE_HDF5)
             link_libraries(hdf5_hl hdf5)
         endif ()
     endif ()
-else ()
-    add_compile_definitions(ARMA_DONT_USE_HDF5)
 endif ()
 
 if (SP_BUILD_PARALLEL)
@@ -261,8 +262,7 @@ if (SP_BUILD_PARALLEL)
 endif ()
 
 if (CMAKE_BUILD_TYPE MATCHES "Rel")
-    add_compile_definitions(ARMA_WARN_LEVEL=1)
-    add_compile_definitions(ARMA_DONT_CHECK_CONFORMANCE)
+    add_compile_definitions(ARMA_WARN_LEVEL=1 ARMA_DONT_CHECK_CONFORMANCE)
 endif ()
 
 if (BUILD_SHARED_LIBS)
@@ -411,6 +411,20 @@ else ()
     endif ()
 endif ()
 
+if (MINGW)
+    foreach (STATIC_DEP gfortran quadmath gomp dl)
+        find_library(${STATIC_DEP}_LIB NAMES lib${STATIC_DEP}.a PATHS
+                ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+                ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES}
+                ${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}
+        )
+        if (${STATIC_DEP}_LIB)
+            message(STATUS "Found static library ${${STATIC_DEP}_LIB}")
+            link_libraries(${${STATIC_DEP}_LIB})
+        endif ()
+    endforeach ()
+endif ()
+
 add_executable(${PROJECT_NAME}
         suanPan.cpp
         Include/catch/catch_amalgamated.cpp
@@ -501,6 +515,10 @@ if (SP_BUILD_DLL_EXAMPLE)
     add_subdirectory(Developer/Modifier)
     add_subdirectory(Developer/ModuleBundle)
     add_subdirectory(Developer/Section)
+endif ()
+
+if (MINGW AND NOT BUILD_SHARED_LIBS AND NOT SP_BUILD_PARALLEL)
+    target_link_options(${PROJECT_NAME} PRIVATE -static)
 endif ()
 
 # need further work
@@ -682,7 +700,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         set(CPACK_PACKAGE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/Resource/suanPan-ua.svg)
         set(CPACK_PACKAGE_RELEASE 1)
         set(CPACK_PACKAGE_VENDOR "tlcfem")
-        set(CPACK_PACKAGE_VERSION "3.9.3")
+        set(CPACK_PACKAGE_VERSION "3.9.4")
         set(CPACK_PACKAGE_DESCRIPTION "An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework")
         set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/TLCFEM/suanPan")
         set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")

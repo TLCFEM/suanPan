@@ -32,7 +32,7 @@
 
 #ifdef SUANPAN_VTK
 #include <Recorder/OutputType.h>
-#include <armadillo/armadillo>
+#include <armadillo/arma>
 #include <vtkCell.h>
 #include <vtkDoubleArray.h>
 #include <vtkPoints.h>

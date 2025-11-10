@@ -51,13 +51,18 @@ def check_version(_major: int, _minor: int, _patch: int):
 
     print("\nDownload the new version:")
 
+    def _get_platform_list(token: str):
+        return [
+            x for x in assets if token in x and x.endswith((".zip", ".tar.gz", ".7z"))
+        ]
+
     version_list = []
     if sys.platform.startswith("win32"):
-        version_list = [x for x in assets if "win" in x]
+        version_list = _get_platform_list("win")
     elif sys.platform.startswith("linux"):
-        version_list = [x for x in assets if "linux" in x]
+        version_list = _get_platform_list("linux")
     elif sys.platform.startswith("darwin"):
-        version_list = [x for x in assets if "mac" in x]
+        version_list = _get_platform_list("mac")
 
     version_list.sort()
 

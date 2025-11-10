@@ -114,7 +114,7 @@ op_accu_mat::apply(const T1& X)
   {
   arma_debug_sigprint();
   
-  if( (is_Mat<T1>::value) || (is_subview_col<T1>::value) || (is_Mat<typename Proxy<T1>::stored_type>::value) || (arma_config::openmp && Proxy<T1>::use_mp) )
+  if( (quasi_unwrap<T1>::has_orig_mem) || (is_Mat<typename Proxy<T1>::stored_type>::value) || (arma_config::openmp && Proxy<T1>::use_mp) )
     {
     const quasi_unwrap<T1> U(X);
     
@@ -604,16 +604,27 @@ op_accu_mat::apply(const subview<eT>& X)
   
   if(X_n_rows == 1)
     {
-    const Mat<eT>& m = X.m;
+    const uword X_m_n_rows = X.m.n_rows;
     
-    const uword col_offset = X.aux_col1;
-    const uword row_offset = X.aux_row1;
+    const eT* mem_ptr = X.colptr(0);
     
-    eT val = eT(0);
+    eT val1 = eT(0);
+    eT val2 = eT(0);
     
-    for(uword i=0; i < X_n_cols; ++i)  { val += m.at(row_offset, col_offset + i); }
+    uword j;
     
-    return val;
+    for(j=1; j < X_n_cols; j+=2)
+      {
+      val1 += (*mem_ptr); mem_ptr += X_m_n_rows;
+      val2 += (*mem_ptr); mem_ptr += X_m_n_rows;
+      }
+    
+    if((j-1) < X_n_cols)
+      {
+      val1 += (*mem_ptr);
+      }
+    
+    return val1 + val2;
     }
   
   if(X_n_cols == 1)  { return arrayops::accumulate( X.colptr(0), X_n_rows ); }
@@ -638,6 +649,39 @@ op_accu_mat::apply(const subview_col<eT>& X)
   arma_debug_sigprint();  
   
   return arrayops::accumulate( X.colmem, X.n_rows );
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_accu_mat::apply(const subview_row<eT>& X)
+  {
+  arma_debug_sigprint();  
+  
+  const uword X_m_n_rows = X.m.n_rows;
+  const uword X_n_cols   = X.n_cols;
+  
+  const eT* mem_ptr = X.rowmem;
+  
+  eT val1 = eT(0);
+  eT val2 = eT(0);
+  
+  uword j;
+  
+  for(j=1; j < X_n_cols; j+=2)
+    {
+    val1 += (*mem_ptr); mem_ptr += X_m_n_rows;
+    val2 += (*mem_ptr); mem_ptr += X_m_n_rows;
+    }
+  
+  if((j-1) < X_n_cols)
+    {
+    val1 += (*mem_ptr);
+    }
+  
+  return val1 + val2;
   }
 
 
@@ -920,6 +964,46 @@ op_accu_cube::apply(const CubeToMatOp<T1, op_omit_cube>& in)
   
   if(omit_mode == 1)  { acc = op_accu_cube::apply_omit_helper(P, is_omitted_1); }
   if(omit_mode == 2)  { acc = op_accu_cube::apply_omit_helper(P, is_omitted_2); }
+  
+  return acc;
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_accu_cube::apply(const subview_cube<eT>& sv)
+  {
+  arma_debug_sigprint();  
+  
+  if(sv.n_elem == 0)  { return eT(0); }
+  
+  const uword sv_nr = sv.n_rows;
+  const uword sv_nc = sv.n_cols;
+  const uword sv_ns = sv.n_slices;
+  
+  eT acc = eT(0);
+  
+  if( (sv_nr == 1)  && (sv_nc == 1) && (sv.aux_slice1 == 0) )
+    {
+    const uword sv_m_n_elem_slice = sv.m.n_elem_slice;
+    
+    const eT* sv_m_ptr = &( sv.m.at(sv.aux_row1, sv.aux_col1, 0) );
+    
+    for(uword s=0; s < sv_ns; ++s)
+      {
+      acc += (*sv_m_ptr);  sv_m_ptr += sv_m_n_elem_slice;
+      }
+    }
+  else
+    {
+    for(uword s=0; s < sv_ns; ++s)
+    for(uword c=0; c < sv_nc; ++c)
+      {
+      acc += arrayops::accumulate(sv.slice_colptr(s,c), sv_nr);
+      }
+    }
   
   return acc;
   }

@@ -18,7 +18,7 @@
  * @class Balloon1D
  * @brief A Balloon1D material class.
  * @author tlc
- * @date 27/09/2025
+ * @date 04/11/2025
  * @version 0.1.0
  * @file Balloon1D.h
  * @addtogroup Material-1D
@@ -29,7 +29,7 @@
 #define BALLOON1D_H
 
 #include <Material/Material1D/Material1D.h>
-#include <numeric>
+#include <numeric> // std::accumulate
 
 struct DataBalloon1D {
     class Saturation {
@@ -42,9 +42,8 @@ struct DataBalloon1D {
             : rate(R)
             , bound(B) {}
 
-        [[nodiscard]] double r() const { return rate * root_one_half; }
-        [[nodiscard]] double b() const { return bound; }
-        [[nodiscard]] double rb() const { return r() * b(); }
+        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
+        [[nodiscard]] double b() const { return rate * root_one_half; }
     };
 
     class Bound {
@@ -64,14 +63,13 @@ struct DataBalloon1D {
         }
     };
 
-    const double elastic; // elastic modulus
-    const double u;       // yield ratio evolution rate
-    const double kb, kr;  // plastic strain split ratio
-    const int zr_size;    // memory size
+    const double elastic;   // elastic modulus
+    const double kr;        // plastic strain split ratio
+    const unsigned zr_size; // memory size
 
-    const Bound bound_hf, bound_ha, bound_hb, bound_hd;
+    const Bound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
 
-    const std::vector<Saturation> ba, bb, bd;
+    const std::vector<Saturation> bfc, bac, bna, bnd;
 };
 
 class Balloon1D final : protected DataBalloon1D, public Material1D {
@@ -110,11 +108,12 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
         [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
     };
 
-    memory current_zr{static_cast<std::size_t>(std::abs(zr_size))}, trial_zr{static_cast<std::size_t>(std::abs(zr_size))};
-
-    [[nodiscard]] auto compute_bounds(double, double, double) const;
+    memory current_zr{zr_size}, trial_zr{zr_size};
 
     [[nodiscard]] double initial_check(double);
+
+    [[nodiscard]] auto compute_isotropic_bound(double, double, double);
+    [[nodiscard]] auto compute_kinematic_bound(double, double, double);
 
 public:
     Balloon1D(

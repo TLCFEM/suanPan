@@ -199,7 +199,7 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 # install
 flatpak install suanPan
 # define alias
-echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan\"" >> ~/.bashrc
+echo "alias suanpan=\"flatpak run io.github.tlcfem.suanPan --\"" >> ~/.bashrc
 ```
 
 ### macOS
@@ -289,7 +289,7 @@ Additional libraries used in **suanPan** are listed as follows.
 
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.1
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 15.0.3
+- [**Armadillo**](http://arma.sourceforge.net/) version 15.2.1
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.11.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
@@ -299,7 +299,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.1.0
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.3.0
 - [**VTK**](https://vtk.org/) version 9.5.2
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.18)
 project(ElementExample CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_compile_definitions(SUANPAN_DLL)
 
@@ -20,6 +21,7 @@ add_library(${PROJECT_NAME} SHARED
         ../../Domain/Node.cpp
         ../../Domain/Tag.cpp
         ../../Element/Element.cpp
+        ../../Element/Visualisation/vtkBase.cpp
         ../../Material/Material.cpp
         ../../Section/Section.cpp
         ../../Include/fmt/src/format.cc

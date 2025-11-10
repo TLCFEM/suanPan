@@ -72,7 +72,8 @@ jobs:
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        if: ${{ false }}
+        uses: sigstore/gh-action-sigstore-python@v3.1.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -94,7 +95,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -158,7 +159,8 @@ jobs:
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        if: ${{ false }}
+        uses: sigstore/gh-action-sigstore-python@v3.1.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -167,7 +169,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -188,7 +190,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge]
-        vtk: [ON, OFF]
+        vtk: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -227,7 +229,8 @@ jobs:
           cp updater build/dist/bin
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        if: ${{ false }}
+        uses: sigstore/gh-action-sigstore-python@v3.1.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -241,7 +244,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -262,8 +265,8 @@ jobs:
     strategy:
       matrix:
         avx: [ON, OFF]
-        vtk: [ON, OFF]
-        mkl: [ON, OFF]
+        vtk: [ON]
+        mkl: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -317,16 +320,17 @@ jobs:
           [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          ./Script/win-patcher.sh build/dist/bin/suanPan.exe
       - name: Unsigned
         if: ${{ github.event_name == 'push' }}
         id: upload-unsigned-vs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: unsigned-${{ env.ARTIFACT }}
           path: build/dist/bin/*.exe
       - name: Sign
         if: ${{ github.event_name == 'push' }}
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: "${{ secrets.SIGNPATH }}"
           organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
@@ -341,7 +345,7 @@ jobs:
           cd build/dist/bin
           7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -364,7 +368,7 @@ jobs:
           ls -halt
           if [ "${{ github.event_name }}" == "push" ]; then
             choco apikey --key ${{ secrets.CHOCO_KEY }} --source https://push.chocolatey.org/
-            choco push suanpan.3.9.3.nupkg --source https://push.chocolatey.org/
+            choco push suanpan.3.9.4.nupkg --source https://push.chocolatey.org/
           fi
       - name: Release SHA256
         if: matrix.mkl == 'ON' && matrix.vtk == 'ON' && matrix.avx == 'ON'
@@ -383,8 +387,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: suanpan.3.9.3.nupkg
-          asset_name: suanpan.3.9.3.nupkg
+          file: suanpan.3.9.4.nupkg
+          asset_name: suanpan.3.9.4.nupkg
           tag: ${{ env.SP_TIME }}
           prerelease: true
           overwrite: true
@@ -396,7 +400,7 @@ jobs:
     strategy:
       matrix:
         avx: [ON, OFF]
-        vtk: [ON, OFF]
+        vtk: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v5
@@ -441,16 +445,17 @@ jobs:
           [[ "${{ matrix.avx }}" == "OFF" ]] && file_name+="-no-avx"
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+          ./Script/win-patcher.sh build/dist/bin/suanPan.exe
       - name: Unsigned
         if: ${{ github.event_name == 'push' }}
         id: upload-unsigned-gcc
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: unsigned-${{ env.ARTIFACT }}
           path: build/dist/bin/*.exe
       - name: Sign
         if: ${{ github.event_name == 'push' }}
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: "${{ secrets.SIGNPATH }}"
           organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
@@ -465,7 +470,7 @@ jobs:
           cd build/dist/bin
           7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}

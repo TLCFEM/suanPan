@@ -43,7 +43,7 @@ ldd "$TARGET" | awk '/=>/ { print $3 }' | while read -r DEPENDENCY; do
   if [ -z "$DEPENDENCY" ] || [ ! -f "$DEPENDENCY" ]; then continue; fi
   FILENAME=$(basename "$DEPENDENCY")
   case "$FILENAME" in
-  libgcc_s* | libgfortran* | libgomp* | libquadmath* | libstdc++*) ;;
+  libgcc_s* | libgfortran* | libgomp* | libm* | libquadmath* | libstdc++*) ;;
   *) continue ;;
   esac
   DEST="$LIBDIR/$FILENAME"

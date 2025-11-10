@@ -298,31 +298,51 @@ namespace {
             return;
         }
 
-        vec p(27);
+        vec p(23);
         if(!get_input(command, p)) {
             suanpan_error("Valid inputs are required.\n");
             return;
         }
 
         auto density = 0.;
-        if(!command.eof() && !get_input(command, density)) {
+        if(!get_input(command, density)) {
             suanpan_error("A valid density is required.\n");
             return;
         }
 
+        const auto populate = [&command](auto& container) {
+            double a, b;
+            if(!get_input(command, a, b)) return;
+            container.emplace_back(a, b);
+        };
+
+        std::vector<DataBalloon1D::Saturation> bfc, bac, bna, bnd;
+
+        std::string token;
+        while(!command.eof()) {
+            if(!get_input(command, token)) {
+                suanpan_error("A valid token (-fc,-ac,-na,-nd) is required.\n");
+                return;
+            }
+            if(is_equal("-fc", token)) populate(bfc);
+            else if(is_equal("-ac", token)) populate(bac);
+            else if(is_equal("-na", token)) populate(bna);
+            else if(is_equal("-nd", token)) populate(bnd);
+        }
+
         DataBalloon1D para{
             p(0),                         // elastic modulus
-            p(1),                         // u
-            p(2),                         // split bound
-            p(3),                         // split rate
-            static_cast<int>(p(4)),       // zr memory size
-            {p(5), p(6), p(7), p(8)},     // hf
-            {p(9), p(10), p(11), p(12)},  // ha
-            {p(13), p(14), p(15), p(16)}, // hb
-            {p(17), p(18), p(19), p(20)}, // hd
-            {{p(21), p(22)}},             // alpha saturation
-            {{p(23), p(24)}},             // beta saturation
-            {{p(25), p(26)}},             // similarity saturation
+            p(1),                         // split ratio
+            static_cast<unsigned>(p(2)),  // zr memory size
+            {p(3), p(4), p(5), p(6)},     // u
+            {p(7), p(8), p(9), p(10)},    // fm
+            {p(11), p(12), p(13), p(14)}, // fc
+            {p(15), p(16), p(17), p(18)}, // am
+            {p(19), p(20), p(21), p(22)}, // ac
+            std::move(bfc),
+            std::move(bac),
+            std::move(bna),
+            std::move(bnd)
         };
 
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
