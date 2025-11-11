@@ -245,7 +245,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        gamma = suanpan::clamp(gamma - incre(0), 0., 1.1 * abs_incre_strain);
+        gamma = suanpan::clamp(gamma - incre(0), 0., 4. * abs_incre_strain);
         z = suanpan::clamp_unit(z - incre(1));
     }
 }
