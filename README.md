@@ -13,6 +13,7 @@
 [![GitHub Download](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11&label=github%20download)](https://github.com/TLCFEM/suanPan/releases)
 [![Docker Image](https://img.shields.io/docker/pulls/tlcfem/suanpan?color=44cc11)](https://hub.docker.com/r/tlcfem/suanpan/tags)
 [![CI/CD](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml/badge.svg?branch=dev)](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/tlcfem/suanPan/package/suanPan/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/tlcfem/suanPan/package/suanPan/)
 [![Coverage](https://codecov.io/gh/TLCFEM/suanPan/branch/dev/graph/badge.svg?token=65BF9DF697)](https://codecov.io/gh/TLCFEM/suanPan)
 [![Codacy](https://app.codacy.com/project/badge/Grade/1ea08c43edf342a8b00b21e585e63503)](https://app.codacy.com/gh/TLCFEM/suanPan/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/tlcfem/suanpan/badge)](https://www.codefactor.io/repository/github/tlcfem/suanpan)
