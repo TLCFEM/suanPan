@@ -36,6 +36,7 @@ suanPan is written in modern high-quality C++ code and is targeted to provide an
 rm -rf Libs
 %cmake \
   -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_SHARED_LIBS=OFF \
   -DCMAKE_INSTALL_PREFIX=%{_prefix} \
   -DSP_ENABLE_SYSLIB=ON \
   -DSP_BUILD_PARALLEL=ON \
