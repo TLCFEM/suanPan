@@ -29,6 +29,8 @@ BuildRequires:  tbb-devel
 suanPan is a finite element method (FEM) simulation platform for applications in fields such as solid mechanics and civil/structural/seismic engineering.
 suanPan is written in modern high-quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
 
+%define _lto_cflags %{nil}
+
 %prep
 {{{ git_dir_setup_macro }}}
 
