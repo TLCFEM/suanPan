@@ -1,0 +1,53 @@
+Name:           {{{ git_dir_name }}}
+Version:        latest
+Release:        1%{?dist}
+Summary:        An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
+License:        GPL-3.0+
+URL:            https://github.com/TLCFEM/suanPan
+Source:         {{{ git_dir_pack }}}
+VCS:            {{{ git_dir_vcs }}}
+BuildRequires:  cmake
+BuildRequires:  gcc-c++
+%if 0%{?fedora}
+BuildRequires:  gcc-gfortran
+BuildRequires:  hdf5-static
+BuildRequires:  openblas-devel
+BuildRequires:  tbb-devel
+%elif 0%{?rhel} || 0%{?centos}
+BuildRequires:  gcc-gfortran
+BuildRequires:  hdf5-devel
+BuildRequires:  openblas-devel
+BuildRequires:  tbb-devel
+%elif 0%{?suse_version}
+BuildRequires:  gcc-fortran
+BuildRequires:  hdf5-devel
+BuildRequires:  openblas_openmp-devel-static
+BuildRequires:  tbb-devel
+%endif
+
+%description
+suanPan is a finite element method (FEM) simulation platform for applications in fields such as solid mechanics and civil/structural/seismic engineering.
+suanPan is written in modern high-quality C++ code and is targeted to provide an efficient, concise, flexible and reliable FEM simulation platform.
+
+%prep
+{{{ git_dir_setup_macro }}}
+
+%build
+rm -rf Libs
+%cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+  -DSP_ENABLE_SYSLIB=ON \
+  -DSP_BUILD_PARALLEL=ON \
+  -DSP_ENABLE_AVX2=OFF
+%cmake_build
+
+%install
+rm -rf %{buildroot}
+%cmake_install --component Main
+
+%files
+%{_bindir}/suanPan
+
+%changelog
+{{{ git_dir_changelog }}}
