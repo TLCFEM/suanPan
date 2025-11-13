@@ -31,8 +31,10 @@ else ()
     execute_process(COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endif ()
 
-# make sure changes to revision.h is not logged
-execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
+    # make sure changes to revision.h is not logged
+    execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(Include)
