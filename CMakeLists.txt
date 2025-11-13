@@ -439,6 +439,14 @@ add_executable(${PROJECT_NAME}
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
 
+if (NOT MINGW)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT SP_LTO_RESULT OUTPUT SP_LTO_OUTPUT)
+    if (SP_LTO_RESULT)
+        set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif ()
+endif ()
+
 if (MSVC)
     target_sources(${PROJECT_NAME} PRIVATE "Resource/suanPan.rc")
     target_compile_options(${PROJECT_NAME} PRIVATE /bigobj /utf-8)
