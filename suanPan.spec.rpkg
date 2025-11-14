@@ -33,9 +33,9 @@ suanPan is written in modern high-quality C++ code and is targeted to provide an
 
 %prep
 {{{ git_dir_setup_macro }}}
+ls -halt && rm -rf Libs
 
 %build
-rm -rf Libs
 %cmake \
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_SHARED_LIBS=OFF \
