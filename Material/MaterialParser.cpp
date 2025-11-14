@@ -318,22 +318,35 @@ namespace {
 
         std::vector<DataBalloon1D::Saturation> bfc, bac, bna, bnd;
 
+        auto memory_type = DataBalloon1D::MemoryType::MEAN;
+
         std::string token;
         while(!command.eof()) {
             if(!get_input(command, token)) {
-                suanpan_error("A valid token (-fc,-ac,-na,-nd) is required.\n");
+                suanpan_error("A valid token (-fc,-ac,-na,-nd,-memory) is required.\n");
                 return;
             }
             if(is_equal("-fc", token)) populate(bfc);
             else if(is_equal("-ac", token)) populate(bac);
             else if(is_equal("-na", token)) populate(bna);
             else if(is_equal("-nd", token)) populate(bnd);
+            else if(is_equal("-nd", token)) populate(bnd);
+            else if(is_equal("-memory", token) && get_input(command, token)) {
+                if(is_equal("minimum", token)) memory_type = DataBalloon1D::MemoryType::MINIMUM;
+                else if(is_equal("maximum", token)) memory_type = DataBalloon1D::MemoryType::MAXIMUM;
+                else if(is_equal("mean", token)) memory_type = DataBalloon1D::MemoryType::MEAN;
+                else {
+                    suanpan_error("A valid memory type (minimum, maximum, mean) is required.\n");
+                    return;
+                }
+            }
         }
 
         DataBalloon1D para{
             p(0),                         // elastic modulus
             p(1),                         // split ratio
             static_cast<unsigned>(p(2)),  // zr memory size
+            memory_type,                  // zr memory type
             {p(3), p(4), p(5), p(6)},     // u
             {p(7), p(8), p(9), p(10)},    // fm
             {p(11), p(12), p(13), p(14)}, // fc

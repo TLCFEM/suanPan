@@ -169,7 +169,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     // elastic unloading
     if(last_loading < -.5) return SUANPAN_SUCCESS;
 
-    const auto ref_zr = trial_zr.mean();
+    const auto ref_zr = trial_zr(zr_type);
 
     auto gamma = 0., ref_error = 0.;
 

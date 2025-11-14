@@ -63,9 +63,16 @@ struct DataBalloon1D {
         }
     };
 
+    enum class MemoryType : std::uint8_t {
+        MINIMUM,
+        MAXIMUM,
+        MEAN
+    };
+
     const double elastic;   // elastic modulus
     const double kr;        // plastic strain split ratio
     const unsigned zr_size; // memory size
+    const MemoryType zr_type;
 
     const Bound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
 
@@ -87,6 +94,10 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
         std::vector<double> buffer;
         std::size_t head;
 
+        [[nodiscard]] auto max() const { return *std::ranges::max_element(buffer); }
+        [[nodiscard]] auto min() const { return *std::ranges::min_element(buffer); }
+        [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
+
     public:
         explicit memory(const std::size_t size)
             : buffer(std::max(std::size_t{1}, size), 0.)
@@ -103,9 +114,17 @@ class Balloon1D final : protected DataBalloon1D, public Material1D {
             head = 0;
         }
 
-        [[nodiscard]] auto max() const { return *std::ranges::max_element(buffer); }
-        [[nodiscard]] auto min() const { return *std::ranges::min_element(buffer); }
-        [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
+        [[nodiscard]] auto operator()(const MemoryType memory_type) const {
+            switch(memory_type) {
+            case MemoryType::MINIMUM:
+                return min();
+            case MemoryType::MAXIMUM:
+                return max();
+            case MemoryType::MEAN:
+            default:
+                return mean();
+            }
+        }
     };
 
     memory current_zr{zr_size}, trial_zr{zr_size};
