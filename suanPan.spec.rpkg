@@ -1,6 +1,6 @@
 Name:           {{{ git_dir_name }}}
 Version:        latest
-Release:        1%{?dist}
+Release:        %autorelease
 Summary:        An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
 License:        GPL-3.0+
 URL:            https://github.com/TLCFEM/suanPan
