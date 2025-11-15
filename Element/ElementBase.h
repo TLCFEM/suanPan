@@ -32,12 +32,12 @@
 #include <Domain/Tag.h>
 #include <Element/MappingDOF.h>
 #include <Element/Visualisation/vtkBase.h>
+#include <Recorder/OutputType.h>
 
 class Node;
 class DomainBase;
 class Material;
 class Section;
-enum class OutputType;
 
 class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_strain_energy() = 0;

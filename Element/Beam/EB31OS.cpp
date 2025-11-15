@@ -151,7 +151,7 @@ void EB31OS::Setup() {
     }
 }
 
-void EB31OS::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void EB31OS::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, b_node, fill::zeros);
 
     if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), b_dof, b_node);
@@ -163,7 +163,7 @@ void EB31OS::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType t
     for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void EB31OS::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void EB31OS::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(3) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node)).rows(0, 2).t();
     for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
 }

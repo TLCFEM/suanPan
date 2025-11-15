@@ -188,7 +188,7 @@ void PS::Setup() {
     }
 }
 
-void PS::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void PS::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, m_node, fill::zeros);
 
     if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node);
@@ -198,7 +198,7 @@ void PS::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type)
     for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void PS::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void PS::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t();
     for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }

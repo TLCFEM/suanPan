@@ -269,7 +269,6 @@
     <ClCompile Include="..\..\..\Element\Utility\T2DL.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\T3DC.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp" />
-    <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp" />
     <ClCompile Include="..\..\..\Include\catch\catch_amalgamated.cpp" />
     <ClCompile Include="..\..\..\Include\fmt\src\format.cc" />

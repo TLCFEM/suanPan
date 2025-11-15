@@ -25,8 +25,6 @@ class DomainBase;
 
 #ifdef SUANPAN_VTK
 
-#include <vtkSmartPointer.h>
-
 class vtkUnstructuredGrid;
 
 int vtk_parser(const shared_ptr<DomainBase>&, std::istringstream&);
@@ -42,15 +40,8 @@ struct vtkInfo {
     std::string title_name;
     bool colorbar = true;
     int material_type = -1;
-    bool store_ptr = false;
-    vtkSmartPointer<vtkUnstructuredGrid> grid_ptr;
+    bool average = true;
 };
-
-vtkInfo vtk_process(std::istringstream&);
-
-void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>&, const vtkInfo&);
-
-void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&&, vtkInfo);
 
 void vtk_plot_node_quantity(const shared_ptr<DomainBase>&, vtkInfo);
 

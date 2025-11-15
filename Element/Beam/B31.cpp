@@ -151,7 +151,7 @@ void B31::Setup() {
     }
 }
 
-void B31::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void B31::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, b_node, fill::zeros);
 
     if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), b_dof, b_node);
@@ -161,7 +161,7 @@ void B31::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type
     for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void B31::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void B31::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(3) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node)).rows(0, 2).t();
     for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
 }

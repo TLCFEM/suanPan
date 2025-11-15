@@ -46,7 +46,7 @@ void MassBase::Setup() {
     }
 }
 
-void MassBase::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void MassBase::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     const auto n_dof = get_dof_number();
     const auto n_node = get_node_number();
 
@@ -61,7 +61,7 @@ void MassBase::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType
 
 mat MassBase::GetData(const OutputType) { return {}; }
 
-void MassBase::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void MassBase::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const auto n_dof = get_dof_number();
     const auto n_node = get_node_number();
 

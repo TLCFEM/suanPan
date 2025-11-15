@@ -212,7 +212,7 @@ void DKT4::Setup() {
     }
 }
 
-void DKT4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void DKT4::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, p_node, fill::zeros);
 
     if(OutputType::A == type) t_disp.rows(2, 4) = reshape(get_current_acceleration(), p_dof, p_node);
@@ -222,7 +222,7 @@ void DKT4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
     for(unsigned I = 0; I < p_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void DKT4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void DKT4::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const auto ele_coor = get_coordinate(2);
     const mat ele_disp = reshape(get_current_displacement(), p_dof, p_node);
     for(unsigned I = 0; I < p_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_coor(I, 0), ele_coor(I, 1), amplifier * ele_disp(0, I));

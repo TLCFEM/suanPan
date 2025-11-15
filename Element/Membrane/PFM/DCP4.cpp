@@ -186,7 +186,7 @@ void DCP4::Setup() {
     }
 }
 
-void DCP4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void DCP4::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, m_node, fill::zeros);
 
     if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration()(u_dof), 2, m_node);
@@ -221,7 +221,7 @@ mat DCP4::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void DCP4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void DCP4::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement()(u_dof), 2, m_node).t();
     for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }

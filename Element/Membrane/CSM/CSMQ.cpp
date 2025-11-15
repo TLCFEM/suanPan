@@ -224,7 +224,7 @@ void CSMQ::Setup() {
     }
 }
 
-void CSMQ::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void CSMQ::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, m_node, fill::zeros);
 
     if(OutputType::A == type) t_disp.head_rows(2) = reshape(get_current_acceleration(), m_dof, m_node).eval().head_rows(2);
@@ -257,7 +257,7 @@ mat CSMQ::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void CSMQ::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void CSMQ::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t().eval().head_cols(2);
     for(unsigned I = 0; I < 4; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }

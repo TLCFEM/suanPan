@@ -259,7 +259,7 @@ void CIN3D8::Setup() {
     }
 }
 
-void CIN3D8::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void CIN3D8::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, c_node, fill::zeros);
 
     if(OutputType::A == type) t_disp.rows(0, 2) = reshape(get_current_acceleration(), c_dof, c_node);
@@ -269,7 +269,7 @@ void CIN3D8::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType t
     for(unsigned I = 0; I < c_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void CIN3D8::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void CIN3D8::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement(), c_dof, c_node).t();
     for(unsigned I = 0; I < c_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
 }

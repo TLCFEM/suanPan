@@ -287,7 +287,7 @@ void DKTS3::Setup() {
     }
 }
 
-void DKTS3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void DKTS3::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, s_node, fill::zeros);
 
     if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), s_dof, s_node);
@@ -297,7 +297,7 @@ void DKTS3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType ty
     for(unsigned I = 0; I < s_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void DKTS3::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void DKTS3::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat t_mat = amplifier * mat(reshape(get_current_displacement(), s_dof, s_node)).rows(0, 2).t() + get_coordinate(3);
     for(unsigned I = 0; I < s_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), t_mat(I, 0), t_mat(I, 1), t_mat(I, 2));
 }

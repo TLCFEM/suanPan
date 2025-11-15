@@ -114,7 +114,7 @@ void T3D2::Setup() {
     }
 }
 
-void T3D2::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void T3D2::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, t_node, fill::zeros);
 
     if(OutputType::A == type) t_disp.rows(0, 2) = reshape(get_current_acceleration(), t_dof, t_node);
@@ -124,7 +124,7 @@ void T3D2::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType typ
     for(unsigned I = 0; I < t_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void T3D2::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void T3D2::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement(), t_dof, t_node).t();
     for(unsigned I = 0; I < t_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
 }

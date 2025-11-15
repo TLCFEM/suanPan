@@ -31,15 +31,13 @@
 #define VTKBASE_H
 
 #ifdef SUANPAN_VTK
-#include <Recorder/OutputType.h>
-#include <armadillo/arma>
 #include <vtkCell.h>
 #include <vtkDoubleArray.h>
 #include <vtkPoints.h>
 #include <vtkSmartPointer.h>
-
-using arma::mat;
 #endif
+
+enum class OutputType;
 
 class vtkBase {
 #ifdef SUANPAN_VTK
@@ -51,14 +49,14 @@ public:
     vtkBase() = default;
     virtual ~vtkBase() = default;
 
-    virtual void Setup();
+    virtual void Setup() {}
 
-    virtual void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType);
-    virtual mat GetData(OutputType);
+    virtual void GetData(vtkDoubleArray*, OutputType) {}
+    virtual mat GetData(OutputType) { return {}; }
 
-    virtual void SetDeformation(vtkSmartPointer<vtkPoints>&, double);
+    virtual void SetDeformation(vtkPoints*, double) {}
 
-    [[nodiscard]] virtual const vtkSmartPointer<vtkCell>& GetCell() const;
+    [[nodiscard]] const vtkSmartPointer<vtkCell>& GetCell() const { return vtk_cell; }
 #endif
 };
 

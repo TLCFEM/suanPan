@@ -519,9 +519,6 @@
     <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp">
       <Filter>Element\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp">
-      <Filter>Element\Visualisation</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp">
       <Filter>Element\Visualisation</Filter>
     </ClCompile>

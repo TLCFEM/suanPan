@@ -242,7 +242,7 @@ void MVLEM::Setup() {
     }
 }
 
-void MVLEM::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void MVLEM::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, b_node, fill::zeros);
 
     if(OutputType::A == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_acceleration(), b_dof, b_node);
@@ -252,7 +252,7 @@ void MVLEM::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType ty
     for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void MVLEM::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void MVLEM::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(2) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node).t()).cols(0, 1);
     for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }

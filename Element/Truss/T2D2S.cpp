@@ -108,7 +108,7 @@ void T2D2S::Setup() {
     }
 }
 
-void T2D2S::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
+void T2D2S::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     mat t_disp(6, t_node, fill::zeros);
 
     if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), t_dof, t_node);
@@ -118,7 +118,7 @@ void T2D2S::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType ty
     for(unsigned I = 0; I < t_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void T2D2S::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
+void T2D2S::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), t_dof, t_node).t();
     for(unsigned I = 0; I < t_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
 }
