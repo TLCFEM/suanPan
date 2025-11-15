@@ -118,6 +118,12 @@ void T2D2S::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     for(unsigned I = 0; I < t_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
+mat T2D2S::GetData(const OutputType P) {
+    vec t_stress;
+    if(const auto t_data = t_section->record(P); !t_data.empty()) t_stress = t_data[0];
+    return repmat(t_stress.resize(6), 1, t_node);
+}
+
 void T2D2S::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), t_dof, t_node).t();
     for(unsigned I = 0; I < t_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);

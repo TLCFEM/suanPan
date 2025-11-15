@@ -161,6 +161,18 @@ void B31::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
+mat B31::GetData(const OutputType P) {
+    vec low, high;
+    if(const auto t_data = int_pt.front().b_section->record(P); !t_data.empty()) low = t_data[0];
+    if(const auto t_data = int_pt.back().b_section->record(P); !t_data.empty()) high = t_data[0];
+
+    mat data(6, b_node);
+    data.col(0) = low.resize(6);
+    data.col(1) = high.resize(6);
+
+    return data;
+}
+
 void B31::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const mat ele_disp = get_coordinate(3) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node)).rows(0, 2).t();
     for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));

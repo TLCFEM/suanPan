@@ -87,6 +87,7 @@ public:
 #ifdef SUANPAN_VTK
     void Setup() override;
     void GetData(vtkDoubleArray*, OutputType) override;
+    mat GetData(OutputType) override;
     void SetDeformation(vtkPoints*, double) override;
 #endif
 };
