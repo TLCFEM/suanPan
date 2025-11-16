@@ -49,7 +49,7 @@ public:
     vtkBase() = default;
     virtual ~vtkBase() = default;
 
-    virtual void Setup() {}
+    virtual vtkSmartPointer<vtkCell> Setup(const uvec&) { return nullptr; }
 
     virtual void GetData(vtkDoubleArray*, OutputType) {}
     virtual mat GetData(OutputType) { return {}; }

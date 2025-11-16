@@ -70,7 +70,7 @@ public:
     void print() override;
 
 #ifdef SUANPAN_VTK
-    void Setup() override;
+    vtkSmartPointer<vtkCell> Setup(const uvec&) override;
     void GetData(vtkDoubleArray*, OutputType) override;
     void SetDeformation(vtkPoints*, double) override;
 #endif
