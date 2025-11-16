@@ -131,9 +131,6 @@ mat T3D2::GetData(const OutputType P) {
     return repmat(data.resize(6), 1, t_node);
 }
 
-void T3D2::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement(), t_dof, t_node).t();
-    for(unsigned I = 0; I < t_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat T3D2::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), t_dof, t_node); }
 
 #endif

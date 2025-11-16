@@ -60,17 +60,6 @@ void MassBase::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     for(unsigned I = 0; I < n_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void MassBase::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const auto n_dof = get_dof_number();
-    const auto n_node = get_node_number();
-
-    mat current_disp(3, n_node, fill::none);
-    for(unsigned I = 0; I < n_node; ++I) nodes->GetPoint(static_cast<vtkIdType>(node_encoding(I)), current_disp.colptr(I));
-
-    current_disp.head_rows(n_dof) = get_coordinate(n_dof).t() + amplifier * reshape(get_current_displacement(), n_dof, n_node);
-    for(unsigned I = 0; I < n_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), current_disp(0, I), current_disp(1, I), current_disp(2, I));
-}
-
 #endif
 
 Mass2D::Mass2D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)

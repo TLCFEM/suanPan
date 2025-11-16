@@ -162,9 +162,9 @@ mat DCP3::GetData(const OutputType P) {
     return repmat(t_stress.resize(6), 1, m_node);
 }
 
-void DCP3::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement()(u_dof), 2, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
+mat DCP3::GetDeformation(const double amplifier) {
+    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(u_dof), 2, m_node);
+    return ele_disp.resize(3, m_node);
 }
 
 #endif

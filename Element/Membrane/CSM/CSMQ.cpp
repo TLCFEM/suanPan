@@ -258,9 +258,9 @@ mat CSMQ::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void CSMQ::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t().eval().head_cols(2);
-    for(unsigned I = 0; I < 4; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
+mat CSMQ::GetDeformation(const double amplifier) {
+    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2);
+    return ele_disp.resize(3, 4);
 }
 
 #endif

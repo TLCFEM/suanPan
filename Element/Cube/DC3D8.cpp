@@ -200,9 +200,6 @@ void DC3D8::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     for(unsigned I = 0; I < c_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void DC3D8::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement()(u_dof), 3, c_node).t();
-    for(unsigned I = 0; I < c_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat DC3D8::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement()(u_dof), 3, c_node); }
 
 #endif

@@ -214,9 +214,9 @@ mat PCPE4UC::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void PCPE4UC::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), 2, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
+mat PCPE4UC::GetDeformation(const double amplifier) {
+    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node);
+    return ele_disp.resize(3, m_node);
 }
 
 #endif

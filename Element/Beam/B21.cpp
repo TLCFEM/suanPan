@@ -162,9 +162,9 @@ mat B21::GetData(const OutputType P) {
     return data;
 }
 
-void B21::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node).t()).cols(0, 1);
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
+mat B21::GetDeformation(const double amplifier) {
+    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2);
+    return ele_disp.resize(3, b_node);
 }
 
 #endif

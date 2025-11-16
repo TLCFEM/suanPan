@@ -125,9 +125,9 @@ mat T2D2S::GetData(const OutputType P) {
     return repmat(data.resize(6), 1, t_node);
 }
 
-void T2D2S::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), t_dof, t_node).t();
-    for(unsigned I = 0; I < t_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
+mat T2D2S::GetDeformation(const double amplifier) {
+    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), t_dof, t_node);
+    return ele_disp.resize(3, t_node);
 }
 
 #endif

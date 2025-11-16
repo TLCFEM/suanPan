@@ -33,6 +33,7 @@
 #ifdef SUANPAN_VTK
 #include <vtkCell.h>
 #include <vtkDoubleArray.h>
+#include <vtkPoints.h>
 #include <vtkSmartPointer.h>
 #endif
 

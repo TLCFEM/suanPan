@@ -181,9 +181,6 @@ mat C3D4::GetData(const OutputType P) {
     return repmat(data.resize(6), 1, c_node);
 }
 
-void C3D4::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement(), c_dof, c_node).t();
-    for(unsigned I = 0; I < c_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat C3D4::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), c_dof, c_node); }
 
 #endif

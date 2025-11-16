@@ -233,10 +233,6 @@ void DKT3::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     for(unsigned I = 0; I < p_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-void DKT3::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const auto ele_coor = get_coordinate(2);
-    const mat ele_disp = reshape(get_current_displacement(), p_dof, p_node);
-    for(unsigned I = 0; I < p_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_coor(I, 0), ele_coor(I, 1), amplifier * ele_disp(0, I));
-}
+mat DKT3::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * reshape(get_current_displacement(), p_dof, p_node).eval().row(0)); }
 
 #endif

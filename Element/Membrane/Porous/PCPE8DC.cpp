@@ -253,9 +253,9 @@ mat PCPE8DC::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void PCPE8DC::SetDeformation(vtkPoints* const nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement()(s_dof), 2, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
+mat PCPE8DC::GetDeformation(const double amplifier) {
+    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(s_dof), 2, m_node);
+    return ele_disp.resize(3, m_node);
 }
 
 #endif
