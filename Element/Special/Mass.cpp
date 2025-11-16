@@ -60,8 +60,6 @@ void MassBase::GetData(vtkDoubleArray* const arrays, const OutputType type) {
     for(unsigned I = 0; I < n_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
-mat MassBase::GetData(const OutputType) { return {}; }
-
 void MassBase::SetDeformation(vtkPoints* const nodes, const double amplifier) {
     const auto n_dof = get_dof_number();
     const auto n_node = get_node_number();

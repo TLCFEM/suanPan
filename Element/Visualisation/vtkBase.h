@@ -52,6 +52,14 @@ public:
     [[nodiscard]] virtual vtkSmartPointer<vtkCell> Setup(const uvec&) const { return nullptr; }
 
     virtual void GetData(vtkDoubleArray*, OutputType) {}
+    /**
+     * Get elemental data for VTK output.
+     * Produce a 6-by-n matrix, where n is the number of nodes of the element.
+     * Each column represents the data of the corresponding node.
+     * Extrapolation may be needed for certain element types.
+     *
+     * @return A 6-by-n matrix, where n is the number of nodes of the element.
+     */
     virtual mat GetData(OutputType) { return {}; }
 
     virtual void SetDeformation(vtkPoints*, double) {}

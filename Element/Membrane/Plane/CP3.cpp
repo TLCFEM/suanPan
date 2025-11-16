@@ -282,9 +282,9 @@ void CP3::GetData(vtkDoubleArray* const arrays, const OutputType type) {
 }
 
 mat CP3::GetData(const OutputType P) {
-    vec t_stress(6, fill::zeros);
-    if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress(uvec{0, 1, 3}) = t_data[0];
-    return repmat(t_stress, 1, m_node);
+    vec data;
+    if(const auto t_data = m_material->record(P); !t_data.empty()) data = t_data[0];
+    return repmat(data.resize(6), 1, m_node);
 }
 
 void CP3::SetDeformation(vtkPoints* const nodes, const double amplifier) {

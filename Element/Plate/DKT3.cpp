@@ -21,6 +21,7 @@
 #include <Material/Material.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
+#include <Toolbox/utility.h>
 
 DKT3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)

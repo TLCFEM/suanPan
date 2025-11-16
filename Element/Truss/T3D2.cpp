@@ -126,9 +126,9 @@ void T3D2::GetData(vtkDoubleArray* const arrays, const OutputType type) {
 }
 
 mat T3D2::GetData(const OutputType P) {
-    vec t_stress;
-    if(const auto t_data = t_material->record(P); !t_data.empty()) t_stress = t_data[0];
-    return repmat(t_stress.resize(6), 1, t_node);
+    vec data;
+    if(const auto t_data = t_material->record(P); !t_data.empty()) data = t_data[0];
+    return repmat(data.resize(6), 1, t_node);
 }
 
 void T3D2::SetDeformation(vtkPoints* const nodes, const double amplifier) {

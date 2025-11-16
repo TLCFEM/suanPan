@@ -157,9 +157,9 @@ mat DCP3::GetData(const OutputType P) {
         return t_damage;
     }
 
-    vec t_stress(6, fill::zeros);
-    if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress(uvec{0, 1, 3}) = t_data[0];
-    return repmat(t_stress, 1, m_node);
+    vec t_stress;
+    if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress = t_data[0];
+    return repmat(t_stress.resize(6), 1, m_node);
 }
 
 void DCP3::SetDeformation(vtkPoints* const nodes, const double amplifier) {

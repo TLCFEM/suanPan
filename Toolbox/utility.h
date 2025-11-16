@@ -25,6 +25,8 @@
 #endif
 
 namespace suanpan {
+    template<typename T> constexpr T& middle(std::vector<T>& container) { return container[container.size() / 2]; }
+
     template<sp_i IT, std::invocable<IT> F> void for_each(const IT start, const IT end, F&& FN) {
 #ifdef SUANPAN_MT
         static tbb::affinity_partitioner ap;

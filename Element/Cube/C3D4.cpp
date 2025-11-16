@@ -176,9 +176,9 @@ void C3D4::GetData(vtkDoubleArray* const arrays, const OutputType type) {
 }
 
 mat C3D4::GetData(const OutputType P) {
-    vec t_stress(6, fill::zeros);
-    if(const auto t_data = c_material->record(P); !t_data.empty()) t_stress = resize(t_data[0], 6, 1);
-    return repmat(t_stress, 1, c_node);
+    vec data;
+    if(const auto t_data = c_material->record(P); !t_data.empty()) data = t_data[0];
+    return repmat(data.resize(6), 1, c_node);
 }
 
 void C3D4::SetDeformation(vtkPoints* const nodes, const double amplifier) {

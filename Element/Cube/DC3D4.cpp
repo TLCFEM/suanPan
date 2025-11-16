@@ -141,7 +141,9 @@ mat DC3D4::GetData(const OutputType P) {
         return t_damage;
     }
 
-    return {};
+    vec data;
+    if(const auto t_data = c_material->record(P); !t_data.empty()) data = t_data[0];
+    return repmat(data.resize(6), 1, c_node);
 }
 
 void DC3D4::GetData(vtkDoubleArray* const arrays, const OutputType type) {
