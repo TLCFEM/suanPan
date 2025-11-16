@@ -104,9 +104,13 @@ void NMB21::GetData(vtkDoubleArray* const arrays, const OutputType type) {
 }
 
 mat NMB21::GetData(const OutputType P) {
-    vec t_stress;
-    if(const auto t_data = b_section->record(P); !t_data.empty()) t_stress = t_data[0];
-    return repmat(t_stress.resize(6), 1, b_node);
+    mat data(6, b_node, fill::zeros);
+    if(const auto t_data = b_section->record(P); !t_data.empty() && t_data[0].n_elem >= 3) {
+        data(0, 0) = data(0, 1) = t_data[0](0);
+        data(1, 0) = t_data[0](1);
+        data(1, 1) = t_data[0](2);
+    }
+    return data;
 }
 
 void NMB21::SetDeformation(vtkPoints* const nodes, const double amplifier) {
