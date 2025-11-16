@@ -319,19 +319,19 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
 
         for(auto I = 0u; I < max_node; ++I) data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
 
-        const vtkNew<vtkUnstructuredGrid> grid;
-        grid->Allocate(1);
-
         auto& t_encoding = t_element->get_node_encoding();
 
         t_element->SetDeformation(node, config.scale);
         if(const auto t_data = t_element->GetData(actual_type); !t_data.empty())
             for(auto I = 0u; I < t_element->get_node_number(); ++I) data->SetTuple(static_cast<vtkIdType>(t_encoding(I)), t_data.colptr(I));
-        if(auto& t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
-
-        grid->SetPoints(node);
-        grid->GetPointData()->SetScalars(data);
-        root->SetBlock(counter++, grid);
+        if(auto& t_cell = t_element->GetCell(); nullptr != t_cell) {
+            const vtkNew<vtkUnstructuredGrid> grid;
+            grid->Allocate(1);
+            grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
+            grid->SetPoints(node);
+            grid->GetPointData()->SetScalars(data);
+            root->SetBlock(counter++, grid);
+        }
     }
 
     if(config.save_file) domain->insert(std::async(std::launch::async, vtk_save_multiple, std::move(root), config.file_name));
