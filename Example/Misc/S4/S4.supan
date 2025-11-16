@@ -14,6 +14,6 @@ set sparse_mat 0
 
 analyze
 
-# plot type U2 nobar save A.vtk
+# plot type U2 nobar save A
 
 exit

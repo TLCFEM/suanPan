@@ -45,6 +45,7 @@ VTK_MODULE_INIT(vtkRenderingFreeType) // NOLINT(cppcoreguidelines-special-member
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLMultiBlockDataWriter.h>
+#include <vtkXMLUnstructuredGridWriter.h>
 
 vtkInfo vtk_process(std::istringstream& command) {
     vtkInfo config;
@@ -121,19 +122,21 @@ void vtk_setup(vtkUnstructuredGrid* grid, const vtkInfo& config) {
     interactor->Start();
 }
 
-void vtk_save_single(vtkNew<vtkUnstructuredGrid>&& grid, const std::string file_name) {
+void vtk_save_single(vtkNew<vtkUnstructuredGrid>&& grid, std::string file_name) {
     // NOLINT(performance-unnecessary-value-param)
-    const vtkNew<vtkUnstructuredGridWriter> writer;
+    const vtkNew<vtkXMLUnstructuredGridWriter> writer;
+    if(const auto ext = writer->GetDefaultFileExtension(); !file_name.ends_with(ext)) file_name += "." + std::string(ext);
     writer->SetInputData(grid);
     writer->SetFileName(file_name.c_str());
-    writer->SetFileTypeToBinary();
+    writer->SetDataModeToBinary();
     writer->Write();
     suanpan_debug("Plot is written to file \"{}\".\n", file_name);
 }
 
-void vtk_save_multiple(vtkNew<vtkMultiBlockDataSet>&& root, const std::string file_name) {
+void vtk_save_multiple(vtkNew<vtkMultiBlockDataSet>&& root, std::string file_name) {
     // NOLINT(performance-unnecessary-value-param)
     const vtkNew<vtkXMLMultiBlockDataWriter> writer;
+    if(const auto ext = writer->GetDefaultFileExtension(); !file_name.ends_with(ext)) file_name += "." + std::string(ext);
     writer->SetInputData(root);
     writer->SetFileName(file_name.c_str());
     writer->SetDataModeToBinary();
