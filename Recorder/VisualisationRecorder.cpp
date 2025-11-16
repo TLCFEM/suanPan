@@ -31,7 +31,7 @@ VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType 
 
     const auto P = to_token(to_category(config.type));
 
-    function_handler = OutputType::U == P || OutputType::V == P || OutputType::A == P || OutputType::RF == P || OutputType::DF == P || OutputType::IF == P ? &vtk_plot_node_quantity : &vtk_plot_element_quantity;
+    function_handler = OutputType::U == P || OutputType::V == P || OutputType::A == P || OutputType::RF == P || OutputType::DF == P || OutputType::IF == P ? vtk_plot_node_quantity : vtk_plot_element_quantity;
 #endif
 }
 
@@ -49,7 +49,7 @@ void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>
 
     config.file_name = file_path.generic_string();
 
-    (*function_handler)(D, config);
+    function_handler(D, config);
 #endif
 }
 
