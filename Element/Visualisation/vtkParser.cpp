@@ -180,15 +180,19 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     data->SetComponentName(5, "6");
     node->SetNumberOfPoints(max_node);
 
-    for(auto I = 0u; I < max_node; ++I) {
-        node->SetPoint(I, 0., 0., 0.);
-        data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
-    }
+    for(auto I = 0u; I < max_node; ++I) data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
 
     vtkNew<vtkUnstructuredGrid> grid;
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
-        t_element->SetDeformation(node, config.scale);
+        const auto num_node = t_element->get_node_number();
+        auto& encoding = t_element->get_node_encoding();
+
+        if(const auto coor = t_element->GetDeformation(config.scale); coor.empty())
+            for(auto I = 0u; I < num_node; ++I) node->SetPoint(encoding(I), 0., 0., 0.);
+        else
+            for(auto I = 0u; I < num_node; ++I) node->SetPoint(encoding(I), coor.colptr(I));
+
         t_element->GetData(data, to_token(to_category(config.type)));
         if(const auto t_cell = t_element->GetCell(); t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
     });
@@ -247,10 +251,17 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
         if(-1 != config.material_type)
             if(const auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) return;
-        t_element->SetDeformation(node, config.scale);
-        auto& t_encoding = t_element->get_node_encoding();
-        counter(t_encoding) += 1.;
-        if(const auto t_data = t_element->GetData(to_token(to_category(config.type))); !t_data.empty()) tensor.cols(t_encoding) += t_data;
+
+        const auto num_node = t_element->get_node_number();
+        auto& encoding = t_element->get_node_encoding();
+
+        if(const auto coor = t_element->GetDeformation(config.scale); coor.empty())
+            for(auto I = 0u; I < num_node; ++I) node->SetPoint(encoding(I), 0., 0., 0.);
+        else
+            for(auto I = 0u; I < num_node; ++I) node->SetPoint(encoding(I), coor.colptr(I));
+
+        counter(encoding) += 1.;
+        if(const auto t_data = t_element->GetData(to_token(to_category(config.type))); !t_data.empty()) tensor.cols(encoding) += t_data;
         if(const auto t_cell = t_element->GetCell(); t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
     });
 
@@ -299,14 +310,17 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
         if(-1 != config.material_type)
             if(const auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) continue;
 
-        t_element->SetDeformation(global_node, config.scale);
-
         const auto num_node = t_element->get_node_number();
+        auto encoding = t_element->get_node_encoding();
+
+        if(const auto coor = t_element->GetDeformation(config.scale); coor.empty())
+            for(auto I = 0u; I < num_node; ++I) global_node->SetPoint(encoding(I), 0., 0., 0.);
+        else
+            for(auto I = 0u; I < num_node; ++I) global_node->SetPoint(encoding(I), coor.colptr(I));
 
         const vtkNew<vtkPoints> node;
         node->SetNumberOfPoints(num_node);
 
-        auto encoding = t_element->get_node_encoding();
         for(auto I = 0u; I < num_node; ++I) {
             node->SetPoint(I, global_node->GetPoint(static_cast<vtkIdType>(encoding(I))));
             encoding(I) = I;
@@ -359,7 +373,10 @@ public:
         const auto num_node = element->get_node_number();
         auto encoding = element->get_node_encoding();
 
-        element->SetDeformation(grid_node, scale);
+        if(const auto coor = element->GetDeformation(scale); coor.empty())
+            for(auto I = 0u; I < num_node; ++I) grid_node->SetPoint(encoding(I), 0., 0., 0.);
+        else
+            for(auto I = 0u; I < num_node; ++I) grid_node->SetPoint(encoding(I), coor.colptr(I));
 
         const vtkNew<vtkPoints> node;
         node->SetNumberOfPoints(num_node);

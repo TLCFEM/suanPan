@@ -33,7 +33,6 @@
 #ifdef SUANPAN_VTK
 #include <vtkCell.h>
 #include <vtkDoubleArray.h>
-#include <vtkPoints.h>
 #include <vtkSmartPointer.h>
 #endif
 
@@ -62,7 +61,7 @@ public:
      */
     virtual mat GetData(OutputType) { return {}; }
 
-    virtual void SetDeformation(vtkPoints*, double) {}
+    virtual mat GetDeformation(double) { return {}; }
 
     [[nodiscard]] auto GetCell() const { return vtk_cell; }
     [[nodiscard]] auto GetCell(const uvec& encoding) const { return Setup(encoding); }
