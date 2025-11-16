@@ -198,7 +198,6 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
 
     if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
         domain->insert(std::async(std::launch::async, vtk_save_single, std::move(grid), config.file_name));
     }
     else {
@@ -267,7 +266,6 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
 
     if(config.save_file) {
         grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
         domain->insert(std::async(std::launch::async, vtk_save_single, std::move(grid), config.file_name));
     }
     else {
