@@ -140,17 +140,11 @@ vtkSmartPointer<vtkCell> DCP3::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void DCP3::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration()(u_dof), 2, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity()(u_dof), 2, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement()(u_dof), 2, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
 mat DCP3::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 2, m_node), 6, m_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 2, m_node), 6, m_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 2, m_node), 6, m_node);
+
     if(P == OutputType::DAMAGE) {
         mat t_damage(6, m_node, fill::zeros);
         for(unsigned I = 0; I < m_node; ++I) t_damage(0, I) = node_ptr[I].lock()->get_current_displacement()(2);

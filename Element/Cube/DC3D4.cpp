@@ -135,6 +135,10 @@ vtkSmartPointer<vtkCell> DC3D4::Setup(const uvec& encoding) const {
 }
 
 mat DC3D4::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 3, c_node), 6, c_node);
+
     if(P == OutputType::DAMAGE) {
         mat t_damage(6, c_node, fill::zeros);
         t_damage.row(0) = get_current_displacement()(d_dof).t();
@@ -144,16 +148,6 @@ mat DC3D4::GetData(const OutputType P) {
     vec data;
     if(const auto t_data = c_material->record(P); !t_data.empty()) data = t_data[0];
     return repmat(data.resize(6), 1, c_node);
-}
-
-void DC3D4::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, c_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 2) = reshape(get_current_acceleration()(u_dof), 3, c_node);
-    else if(OutputType::V == type) t_disp.rows(0, 2) = reshape(get_current_velocity()(u_dof), 3, c_node);
-    else if(OutputType::U == type) t_disp.rows(0, 2) = reshape(get_current_displacement()(u_dof), 3, c_node);
-
-    for(unsigned I = 0; I < c_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
 }
 
 mat DC3D4::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement()(u_dof), 3, c_node); }

@@ -187,14 +187,12 @@ vtkSmartPointer<vtkCell> Allman::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void Allman::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
+mat Allman::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), m_dof, m_node), 6, m_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity(), m_dof, m_node), 6, m_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement(), m_dof, m_node), 6, m_node);
 
-    if(OutputType::A == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
+    return {};
 }
 
 mat Allman::GetDeformation(const double amplifier) {

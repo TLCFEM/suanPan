@@ -126,17 +126,11 @@ vtkSmartPointer<vtkCell> T2D2::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void T2D2::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, t_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), t_dof, t_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), t_dof, t_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), t_dof, t_node);
-
-    for(unsigned I = 0; I < t_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
 mat T2D2::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), t_dof, t_node), 6, t_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity(), t_dof, t_node), 6, t_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement(), t_dof, t_node), 6, t_node);
+
     vec t_stress;
     if(const auto t_data = t_material->record(P); !t_data.empty()) t_stress = t_data[0];
     return repmat(t_stress.resize(6), 1, t_node);

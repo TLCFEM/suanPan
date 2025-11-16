@@ -152,16 +152,12 @@ vtkSmartPointer<vtkCell> EB31OS::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void EB31OS::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, b_node, fill::zeros);
+mat EB31OS::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), b_dof, b_node), 6, b_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity(), b_dof, b_node), 6, b_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement(), b_dof, b_node), 6, b_node);
 
-    if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), b_dof, b_node);
-    else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), b_dof, b_node);
-    else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), b_dof, b_node);
-
-    t_disp = t_disp.head_rows(6);
-
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
+    return {};
 }
 
 mat EB31OS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(3); }

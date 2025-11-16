@@ -74,8 +74,8 @@ public:
 
 #ifdef SUANPAN_VTK
     [[nodiscard]] vtkSmartPointer<vtkCell> Setup(const uvec&) const override;
+
     mat GetData(OutputType) override;
-    void GetData(vtkDoubleArray*, OutputType) override;
     mat GetDeformation(double) override;
 #endif
 };

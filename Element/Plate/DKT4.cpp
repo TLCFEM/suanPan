@@ -214,14 +214,12 @@ vtkSmartPointer<vtkCell> DKT4::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void DKT4::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, p_node, fill::zeros);
+mat DKT4::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), p_dof, p_node), 6, p_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity(), p_dof, p_node), 6, p_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement(), p_dof, p_node), 6, p_node);
 
-    if(OutputType::A == type) t_disp.rows(2, 4) = reshape(get_current_acceleration(), p_dof, p_node);
-    else if(OutputType::V == type) t_disp.rows(2, 4) = reshape(get_current_velocity(), p_dof, p_node);
-    else if(OutputType::U == type) t_disp.rows(2, 4) = reshape(get_current_displacement(), p_dof, p_node);
-
-    for(unsigned I = 0; I < p_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
+    return {};
 }
 
 mat DKT4::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * reshape(get_current_displacement(), p_dof, p_node).eval().row(0)); }

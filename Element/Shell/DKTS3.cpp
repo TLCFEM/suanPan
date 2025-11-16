@@ -288,14 +288,12 @@ vtkSmartPointer<vtkCell> DKTS3::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void DKTS3::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, s_node, fill::zeros);
+mat DKTS3::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), s_dof, s_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), s_dof, s_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), s_dof, s_node);
 
-    if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), s_dof, s_node);
-    else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), s_dof, s_node);
-    else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), s_dof, s_node);
-
-    for(unsigned I = 0; I < s_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
+    return {};
 }
 
 mat DKTS3::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), s_dof, s_node).eval().head_rows(3); }

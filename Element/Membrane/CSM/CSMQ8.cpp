@@ -219,17 +219,11 @@ vtkSmartPointer<vtkCell> CSMQ8::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void CSMQ8::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.head_rows(2) = reshape(get_current_acceleration(), m_dof, m_node).eval().head_rows(2);
-    else if(OutputType::V == type) t_disp.head_rows(2) = reshape(get_current_velocity(), m_dof, m_node).eval().head_rows(2);
-    else if(OutputType::U == type) t_disp.head_rows(2) = reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
 mat CSMQ8::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), m_dof, m_node), 6, m_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity(), m_dof, m_node), 6, m_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement(), m_dof, m_node), 6, m_node);
+
     mat A(int_pt.size(), 9);
     mat B(6, int_pt.size(), fill::zeros);
 

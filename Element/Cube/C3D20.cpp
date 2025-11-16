@@ -212,14 +212,12 @@ vtkSmartPointer<vtkCell> C3D20::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void C3D20::GetData(vtkDoubleArray* const arrays, const OutputType type) {
-    mat t_disp(6, c_node, fill::zeros);
+mat C3D20::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), c_dof, c_node), 6, c_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity(), c_dof, c_node), 6, c_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement(), c_dof, c_node), 6, c_node);
 
-    if(OutputType::A == type) t_disp.rows(0, 2) = reshape(get_current_acceleration(), c_dof, c_node);
-    else if(OutputType::V == type) t_disp.rows(0, 2) = reshape(get_current_velocity(), c_dof, c_node);
-    else if(OutputType::U == type) t_disp.rows(0, 2) = reshape(get_current_displacement(), c_dof, c_node);
-
-    for(unsigned I = 0; I < c_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
+    return {};
 }
 
 mat C3D20::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), c_dof, c_node); }

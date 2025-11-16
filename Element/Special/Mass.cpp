@@ -47,17 +47,15 @@ vtkSmartPointer<vtkCell> MassBase::Setup(const uvec& encoding) const {
     return cell;
 }
 
-void MassBase::GetData(vtkDoubleArray* const arrays, const OutputType type) {
+mat MassBase::GetData(const OutputType P) {
     const auto n_dof = get_dof_number();
     const auto n_node = get_node_number();
 
-    mat t_disp(6, n_node, fill::zeros);
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), n_dof, n_node), 6, n_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity(), n_dof, n_node), 6, n_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement(), n_dof, n_node), 6, n_node);
 
-    if(OutputType::A == type) t_disp.rows(0, n_dof - 1) = reshape(get_current_acceleration(), n_dof, n_node);
-    else if(OutputType::V == type) t_disp.rows(0, n_dof - 1) = reshape(get_current_velocity(), n_dof, n_node);
-    else if(OutputType::U == type) t_disp.rows(0, n_dof - 1) = reshape(get_current_displacement(), n_dof, n_node);
-
-    for(unsigned I = 0; I < n_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
+    return {};
 }
 
 #endif

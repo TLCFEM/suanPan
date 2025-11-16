@@ -32,7 +32,6 @@
 
 #ifdef SUANPAN_VTK
 #include <vtkCell.h>
-#include <vtkDoubleArray.h>
 #include <vtkPoints.h>
 #include <vtkSmartPointer.h>
 #endif
@@ -51,7 +50,6 @@ public:
 
     [[nodiscard]] virtual vtkSmartPointer<vtkCell> Setup(const uvec&) const { return nullptr; }
 
-    virtual void GetData(vtkDoubleArray*, OutputType) {}
     /**
      * Get elemental data for VTK output.
      * Produce a 6-by-n matrix, where n is the number of nodes of the element.
