@@ -181,13 +181,14 @@ void F31::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void F31::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
+vtkSmartPointer<vtkCell> F31::Setup(const uvec& encoding) {
+    auto cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(3);
     for(auto I = 0u; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
+        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
+        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
     }
+    return cell;
 }
 
 void F31::GetData(vtkDoubleArray* const arrays, const OutputType type) {

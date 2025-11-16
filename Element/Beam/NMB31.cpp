@@ -99,13 +99,14 @@ void NMB31::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void NMB31::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
+vtkSmartPointer<vtkCell> NMB31::Setup(const uvec& encoding) {
+    auto cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(3);
     for(unsigned I = 0; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
+        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
+        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
     }
+    return cell;
 }
 
 void NMB31::GetData(vtkDoubleArray* const arrays, const OutputType type) {

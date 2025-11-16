@@ -163,13 +163,14 @@ void C3D8I::print() {
 #ifdef SUANPAN_VTK
 #include <vtkHexahedron.h>
 
-void C3D8I::Setup() {
-    vtk_cell = vtkSmartPointer<vtkHexahedron>::New();
+vtkSmartPointer<vtkCell> C3D8I::Setup(const uvec& encoding) {
+    auto cell = vtkSmartPointer<vtkHexahedron>::New();
     const auto ele_coor = get_coordinate(3);
     for(unsigned I = 0; I < c_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
+        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
+        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
     }
+    return cell;
 }
 
 mat C3D8I::GetData(const OutputType P) {

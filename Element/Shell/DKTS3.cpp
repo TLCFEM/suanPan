@@ -278,13 +278,14 @@ void DKTS3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-void DKTS3::Setup() {
-    vtk_cell = vtkSmartPointer<vtkTriangle>::New();
+vtkSmartPointer<vtkCell> DKTS3::Setup(const uvec& encoding) {
+    auto cell = vtkSmartPointer<vtkTriangle>::New();
     const auto ele_coor = get_coordinate(3);
     for(unsigned I = 0; I < s_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
+        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
+        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
     }
+    return cell;
 }
 
 void DKTS3::GetData(vtkDoubleArray* const arrays, const OutputType type) {

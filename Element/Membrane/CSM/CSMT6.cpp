@@ -214,13 +214,14 @@ void CSMT6::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuadraticTriangle.h>
 
-void CSMT6::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuadraticTriangle>::New();
+vtkSmartPointer<vtkCell> CSMT6::Setup(const uvec& encoding) {
+    auto cell = vtkSmartPointer<vtkQuadraticTriangle>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
+        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
+        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
     }
+    return cell;
 }
 
 void CSMT6::GetData(vtkDoubleArray* const arrays, const OutputType type) {
