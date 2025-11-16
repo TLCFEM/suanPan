@@ -43,7 +43,6 @@ VTK_MODULE_INIT(vtkRenderingFreeType) // NOLINT(cppcoreguidelines-special-member
 #include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLMultiBlockDataWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 
@@ -71,15 +70,15 @@ vtkInfo vtk_process(std::istringstream& command) {
 }
 
 void vtk_setup(vtkUnstructuredGrid* grid, const vtkInfo& config) {
-    const auto color = vtkSmartPointer<vtkNamedColors>::New();
-    const auto table = vtkSmartPointer<vtkLookupTable>::New();
-    const auto func = vtkSmartPointer<vtkColorTransferFunction>::New();
-    const auto mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-    const auto bar = vtkSmartPointer<vtkScalarBarActor>::New();
-    const auto actor = vtkSmartPointer<vtkActor>::New();
-    const auto interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    const auto renderer = vtkSmartPointer<vtkRenderer>::New();
-    const auto window = vtkSmartPointer<vtkRenderWindow>::New();
+    const vtkNew<vtkNamedColors> color;
+    const vtkNew<vtkLookupTable> table;
+    const vtkNew<vtkColorTransferFunction> func;
+    const vtkNew<vtkDataSetMapper> mapper;
+    const vtkNew<vtkScalarBarActor> bar;
+    const vtkNew<vtkActor> actor;
+    const vtkNew<vtkRenderWindowInteractor> interactor;
+    const vtkNew<vtkRenderer> renderer;
+    const vtkNew<vtkRenderWindow> window;
 
     func->SetColorSpaceToDiverging();
     func->AddRGBPoint(0., .230, .299, .754);
@@ -104,10 +103,7 @@ void vtk_setup(vtkUnstructuredGrid* grid, const vtkInfo& config) {
     actor->GetProperty()->SetOpacity(1.);
 
     renderer->AddActor(actor);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    if(config.colorbar) renderer->AddActor2D(bar);
-#pragma GCC diagnostic pop
+    if(config.colorbar) renderer->AddViewProp(bar);
     renderer->SetBackground(color->GetColor3d("Grey").GetData());
     renderer->ResetCameraClippingRange();
 
@@ -170,8 +166,8 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     auto max_node = static_cast<unsigned>(t_node_pool.size());
     for(const auto& I : t_node_pool) max_node = std::max(max_node, I->get_tag());
 
-    const auto data = vtkSmartPointer<vtkDoubleArray>::New();
-    const auto node = vtkSmartPointer<vtkPoints>::New();
+    const vtkNew<vtkDoubleArray> data;
+    const vtkNew<vtkPoints> node;
 
     data->SetNumberOfComponents(6);
     data->SetNumberOfTuples(++max_node);
@@ -206,7 +202,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
         domain->insert(std::async(std::launch::async, vtk_save_single, std::move(grid), config.file_name));
     }
     else {
-        const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
+        const vtkNew<vtkDoubleArray> sub_data;
 
         sub_data->SetNumberOfTuples(data->GetNumberOfTuples());
         sub_data->CopyComponent(0, data, to_index(config.type));
@@ -226,8 +222,8 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
     auto max_node = static_cast<unsigned>(t_node_pool.size());
     for(const auto& I : t_node_pool) max_node = std::max(max_node, I->get_tag());
 
-    const auto data = vtkSmartPointer<vtkDoubleArray>::New();
-    const auto node = vtkSmartPointer<vtkPoints>::New();
+    const vtkNew<vtkDoubleArray> data;
+    const vtkNew<vtkPoints> node;
 
     data->SetNumberOfComponents(6);
     data->SetNumberOfTuples(++max_node);
@@ -275,7 +271,7 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
         domain->insert(std::async(std::launch::async, vtk_save_single, std::move(grid), config.file_name));
     }
     else {
-        const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
+        const vtkNew<vtkDoubleArray> sub_data;
 
         sub_data->SetNumberOfTuples(data->GetNumberOfTuples());
         sub_data->CopyComponent(0, data, to_index(config.type));
