@@ -204,7 +204,7 @@ void B31OS::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-vtkSmartPointer<vtkCell> B31OS::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> B31OS::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(3);
     for(unsigned I = 0; I < b_node; ++I) {

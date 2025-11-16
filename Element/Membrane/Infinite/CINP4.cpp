@@ -360,7 +360,7 @@ void CINP4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> CINP4::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> CINP4::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkQuad>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < m_node; ++I) {

@@ -99,7 +99,7 @@ void T3D2S::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-vtkSmartPointer<vtkCell> T3D2S::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> T3D2S::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(3);
     for(unsigned I = 0; I < t_node; ++I) {

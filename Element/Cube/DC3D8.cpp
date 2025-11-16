@@ -151,7 +151,7 @@ void DC3D8::print() {
 #ifdef SUANPAN_VTK
 #include <vtkHexahedron.h>
 
-vtkSmartPointer<vtkCell> DC3D8::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> DC3D8::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkHexahedron>::New();
     const auto ele_coor = get_coordinate(3);
     for(unsigned I = 0; I < c_node; ++I) {

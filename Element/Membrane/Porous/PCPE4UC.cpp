@@ -175,7 +175,7 @@ void PCPE4UC::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> PCPE4UC::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> PCPE4UC::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkQuad>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < m_node; ++I) {

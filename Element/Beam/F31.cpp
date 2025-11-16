@@ -181,7 +181,7 @@ void F31::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-vtkSmartPointer<vtkCell> F31::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> F31::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(3);
     for(auto I = 0u; I < b_node; ++I) {

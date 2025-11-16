@@ -116,7 +116,7 @@ void T2D2::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-vtkSmartPointer<vtkCell> T2D2::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> T2D2::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < t_node; ++I) {

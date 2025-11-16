@@ -366,7 +366,7 @@ void SGCMS::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> SGCMS::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> SGCMS::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkQuad>::New();
     const auto ele_coor = get_coordinate(3);
     for(unsigned I = 0; I < s_node; ++I) {

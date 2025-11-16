@@ -49,14 +49,15 @@ public:
     vtkBase() = default;
     virtual ~vtkBase() = default;
 
-    virtual vtkSmartPointer<vtkCell> Setup(const uvec&) { return nullptr; }
+    [[nodiscard]] virtual vtkSmartPointer<vtkCell> Setup(const uvec&) const { return nullptr; }
 
     virtual void GetData(vtkDoubleArray*, OutputType) {}
     virtual mat GetData(OutputType) { return {}; }
 
     virtual void SetDeformation(vtkPoints*, double) {}
 
-    [[nodiscard]] const vtkSmartPointer<vtkCell>& GetCell() const { return vtk_cell; }
+    [[nodiscard]] auto GetCell() const { return vtk_cell; }
+    [[nodiscard]] auto GetCell(const uvec& encoding) const { return Setup(encoding); }
 #endif
 };
 

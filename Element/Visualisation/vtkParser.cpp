@@ -192,7 +192,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
         t_element->SetDeformation(node, config.scale);
         t_element->GetData(data, to_token(to_category(config.type)));
-        if(auto& t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
+        if(const auto t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
     });
 
     grid->SetPoints(node);
@@ -255,7 +255,7 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
         auto& t_encoding = t_element->get_node_encoding();
         counter(t_encoding) += 1.;
         if(const auto t_data = t_element->GetData(to_token(to_category(config.type))); !t_data.empty()) tensor.cols(t_encoding) += t_data;
-        if(auto& t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
+        if(const auto t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
     });
 
     for(unsigned I = 0; I < max_node; ++I)
@@ -324,7 +324,7 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
         t_element->SetDeformation(node, config.scale);
         if(const auto t_data = t_element->GetData(actual_type); !t_data.empty())
             for(auto I = 0u; I < t_element->get_node_number(); ++I) data->SetTuple(static_cast<vtkIdType>(t_encoding(I)), t_data.colptr(I));
-        if(auto& t_cell = t_element->GetCell(); nullptr != t_cell) {
+        if(const auto t_cell = t_element->GetCell(); nullptr != t_cell) {
             const vtkNew<vtkUnstructuredGrid> grid;
             grid->Allocate(1);
             grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());

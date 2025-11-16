@@ -195,7 +195,7 @@ void CP6::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuadraticTriangle.h>
 
-vtkSmartPointer<vtkCell> CP6::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> CP6::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkQuadraticTriangle>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < m_node; ++I) {

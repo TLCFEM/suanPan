@@ -155,7 +155,7 @@ void C3D4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTetra.h>
 
-vtkSmartPointer<vtkCell> C3D4::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> C3D4::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkTetra>::New();
     const auto ele_coor = get_coordinate(3);
     for(unsigned I = 0; I < c_node; ++I) {

@@ -177,7 +177,7 @@ void Allman::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-vtkSmartPointer<vtkCell> Allman::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> Allman::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkTriangle>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < m_node; ++I) {

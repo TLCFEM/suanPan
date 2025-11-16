@@ -239,7 +239,7 @@ void QE2::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> QE2::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> QE2::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkQuad>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < m_node; ++I) {

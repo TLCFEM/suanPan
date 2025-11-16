@@ -212,7 +212,7 @@ void DKT3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-vtkSmartPointer<vtkCell> DKT3::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> DKT3::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkTriangle>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < p_node; ++I) {

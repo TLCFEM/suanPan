@@ -233,7 +233,7 @@ void MVLEM::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-vtkSmartPointer<vtkCell> MVLEM::Setup(const uvec& encoding) {
+vtkSmartPointer<vtkCell> MVLEM::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkLine>::New();
     const auto ele_coor = get_coordinate(2);
     for(unsigned I = 0; I < b_node; ++I) {
