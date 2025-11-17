@@ -81,6 +81,8 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
 
     mutable std::array<double, 5> statistics{};
 
+    std::unordered_map<uword, uword> compact_node; // existing tag -> compact tag
+
 public:
     explicit Domain(unsigned = 0);
     Domain(const Domain&) = delete;            // copy forbidden
@@ -324,11 +326,13 @@ public:
     bool is_sparse() const override;
 
     void set_attribute(ModalAttribute) override;
-    [[nodiscard]] bool get_attribute(ModalAttribute) override;
+    bool get_attribute(ModalAttribute) override;
 
     void set_color_model(ColorMethod) override;
     const std::vector<std::vector<unsigned>>& get_color_map() const override;
     std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> get_element_connectivity(bool) override;
+
+    const std::unordered_map<uword, uword>& get_compact_node_map() const override;
 
     int reorder_dof() override;
     int assign_color() override;

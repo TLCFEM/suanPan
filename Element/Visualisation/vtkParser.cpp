@@ -160,7 +160,8 @@ int vtk_parser(const shared_ptr<DomainBase>& domain, std::istringstream& command
 }
 
 void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    auto& t_node_pool = domain->get_node_pool();
+    auto& node_map = domain->get_compact_node_map();
+
     auto& t_element_pool = domain->get_element_pool();
 
     config.title_name = "Plotting Nodal Quantity " + std::string(to_name(config.type));
@@ -168,14 +169,13 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     const auto category = to_category(config.type);
     const auto actual_type = to_token(category);
 
-    auto max_node = static_cast<unsigned>(t_node_pool.size());
-    for(auto& t_node : t_node_pool) max_node = std::max(max_node, t_node->get_tag());
+    const auto max_node = node_map.size();
 
     const vtkNew<vtkDoubleArray> data;
     const vtkNew<vtkPoints> node;
 
     data->SetNumberOfComponents(6);
-    data->SetNumberOfTuples(++max_node);
+    data->SetNumberOfTuples(max_node);
     data->SetName(category.c_str());
     node->SetNumberOfPoints(max_node);
 
@@ -188,14 +188,15 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
         const auto num_node = t_element->get_node_number();
-        auto& encoding = t_element->get_node_encoding();
+        auto encoding = t_element->get_node_encoding();
+        for(auto& I : encoding) I = node_map.at(I);
 
         if(const auto result = t_element->GetDeformation(config.scale); !result.empty())
             for(auto I = 0u; I < num_node; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
         if(const auto result = t_element->GetData(actual_type); !result.empty())
             for(auto I = 0u; I < num_node; ++I) data->SetTuple(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
 
-        if(const auto cell = t_element->GetCell(); cell) grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+        if(const auto cell = t_element->Setup(encoding); cell) grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
     });
 
     grid->SetPoints(node);
@@ -206,7 +207,8 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
 }
 
 void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    auto& t_node_pool = domain->get_node_pool();
+    auto& node_map = domain->get_compact_node_map();
+
     auto& t_element_pool = domain->get_element_pool();
 
     config.title_name = "Plotting Element Quantity " + std::string(to_name(config.type));
@@ -214,14 +216,13 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
     const auto category = to_category(config.type);
     const auto actual_type = to_token(category);
 
-    auto max_node = static_cast<unsigned>(t_node_pool.size());
-    for(auto& t_node : t_node_pool) max_node = std::max(max_node, t_node->get_tag());
+    const auto max_node = node_map.size();
 
     const vtkNew<vtkDoubleArray> data;
     const vtkNew<vtkPoints> node;
 
     data->SetNumberOfComponents(6);
-    data->SetNumberOfTuples(++max_node);
+    data->SetNumberOfTuples(max_node);
     data->SetName(category.c_str());
     node->SetNumberOfPoints(max_node);
 
@@ -240,7 +241,8 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
             if(auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) return;
 
         const auto num_node = t_element->get_node_number();
-        auto& encoding = t_element->get_node_encoding();
+        auto encoding = t_element->get_node_encoding();
+        for(auto& I : encoding) I = node_map.at(I);
 
         if(const auto result = t_element->GetDeformation(config.scale); !result.empty())
             for(auto I = 0u; I < num_node; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
@@ -249,7 +251,7 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
             tensor.cols(encoding) += result;
             counter(encoding) += 1.;
         }
-        if(const auto cell = t_element->GetCell(); cell) grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+        if(const auto cell = t_element->Setup(encoding); cell) grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
     });
 
     for(auto I = 0u; I < max_node; ++I)
@@ -299,7 +301,7 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
         const mat result = t_element->GetData(actual_type).resize(6, num_node);
         for(auto I = 0u; I < num_node; ++I) data->SetTuple(I, result.colptr(I));
 
-        if(const auto cell = t_element->GetCell(encoding); cell) {
+        if(const auto cell = t_element->Setup(encoding); cell) {
             const vtkNew<vtkUnstructuredGrid> grid;
             grid->Allocate(1);
             grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());

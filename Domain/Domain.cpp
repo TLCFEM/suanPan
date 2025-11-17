@@ -833,6 +833,8 @@ std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_c
     return std::make_pair(std::move(element_map), std::move(element_register));
 }
 
+const std::unordered_map<uword, uword>& Domain::get_compact_node_map() const { return compact_node; }
+
 int Domain::reorder_dof() {
     // assign dof label for active dof
     auto dof_counter = 0u;
@@ -927,6 +929,10 @@ int Domain::restart() {
 
     // reference may depend on reformulated displacement
     if(SUANPAN_SUCCESS != initialize_reference()) return SUANPAN_FAIL;
+
+    compact_node.clear();
+    auto counter = 0llu;
+    for(auto& t_node : get_node_pool()) compact_node.emplace(t_node->get_tag(), counter++);
 
     return SUANPAN_SUCCESS;
 }

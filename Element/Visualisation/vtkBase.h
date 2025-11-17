@@ -40,10 +40,6 @@ enum class OutputType;
 
 class vtkBase {
 #ifdef SUANPAN_VTK
-
-protected:
-    vtkSmartPointer<vtkCell> vtk_cell;
-
 public:
     vtkBase() = default;
     virtual ~vtkBase() = default;
@@ -61,9 +57,6 @@ public:
     virtual mat GetData(OutputType) { return {}; }
 
     virtual mat GetDeformation(double) { return {}; }
-
-    [[nodiscard]] auto GetCell() const { return vtk_cell; }
-    [[nodiscard]] auto GetCell(const uvec& encoding) const { return Setup(encoding); }
 #endif
 };
 

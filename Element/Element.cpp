@@ -385,11 +385,6 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
                 return SUANPAN_FAIL;
             }
 
-#ifdef SUANPAN_VTK
-    // vtk visualization setup
-    vtk_cell = Setup(node_encoding);
-#endif
-
     return SUANPAN_SUCCESS;
 }
 
