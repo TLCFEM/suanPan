@@ -220,9 +220,9 @@ vtkSmartPointer<vtkCell> DKT3::Setup(const uvec& encoding) const {
 }
 
 mat DKT3::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), p_dof, p_node), 6, p_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), p_dof, p_node), 6, p_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), p_dof, p_node), 6, p_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), p_dof, p_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), p_dof, p_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), p_dof, p_node);
 
     return {};
 }

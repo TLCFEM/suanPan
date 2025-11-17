@@ -271,9 +271,9 @@ vtkSmartPointer<vtkCell> SGCMQ::Setup(const uvec& encoding) const {
 }
 
 mat SGCMQ::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), m_dof, m_node), 6, m_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), m_dof, m_node), 6, m_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), m_dof, m_node), 6, m_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
 
     if(P == OutputType::S) {
         mat B(3 * int_pt.size(), 1);

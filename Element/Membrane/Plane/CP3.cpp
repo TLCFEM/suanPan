@@ -268,9 +268,9 @@ vtkSmartPointer<vtkCell> CP3::Setup(const uvec& encoding) const {
 }
 
 mat CP3::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), m_dof, m_node), 6, m_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), m_dof, m_node), 6, m_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), m_dof, m_node), 6, m_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
 
     vec data;
     if(const auto t_data = m_material->record(P); !t_data.empty()) data = t_data[0];

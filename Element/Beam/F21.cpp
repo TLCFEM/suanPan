@@ -168,9 +168,9 @@ vtkSmartPointer<vtkCell> F21::Setup(const uvec& encoding) const {
 }
 
 mat F21::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), b_dof, b_node), 6, b_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), b_dof, b_node), 6, b_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), b_dof, b_node), 6, b_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
 
     vec low, high;
     if(const auto t_data = int_pt.front().b_section->record(P); !t_data.empty()) low = t_data[0];

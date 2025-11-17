@@ -182,9 +182,9 @@ vtkSmartPointer<vtkCell> PCPE8UC::Setup(const uvec& encoding) const {
 }
 
 mat PCPE8UC::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), m_dof, m_node), 6, m_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), m_dof, m_node), 6, m_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), m_dof, m_node), 6, m_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
 
     mat A(int_pt.size(), 9);
     mat B(6, int_pt.size(), fill::zeros);

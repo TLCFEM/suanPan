@@ -209,9 +209,9 @@ vtkSmartPointer<vtkCell> C3D20::Setup(const uvec& encoding) const {
 }
 
 mat C3D20::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), c_dof, c_node), 6, c_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), c_dof, c_node), 6, c_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), c_dof, c_node), 6, c_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), c_dof, c_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), c_dof, c_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), c_dof, c_node);
 
     return {};
 }

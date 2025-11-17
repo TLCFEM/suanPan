@@ -112,9 +112,9 @@ vtkSmartPointer<vtkCell> T3D2::Setup(const uvec& encoding) const {
 }
 
 mat T3D2::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), t_dof, t_node), 6, t_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), t_dof, t_node), 6, t_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), t_dof, t_node), 6, t_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), t_dof, t_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), t_dof, t_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), t_dof, t_node);
 
     vec data;
     if(const auto t_data = t_material->record(P); !t_data.empty()) data = t_data[0];

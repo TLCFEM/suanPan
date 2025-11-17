@@ -106,9 +106,9 @@ vtkSmartPointer<vtkCell> NMB31::Setup(const uvec& encoding) const {
 }
 
 mat NMB31::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), b_dof, b_node), 6, b_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), b_dof, b_node), 6, b_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), b_dof, b_node), 6, b_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
 
     mat data(6, b_node, fill::zeros);
     if(const auto t_data = b_section->record(P); !t_data.empty() && t_data[0].n_elem >= 5) {

@@ -257,9 +257,9 @@ vtkSmartPointer<vtkCell> CIN3D8::Setup(const uvec& encoding) const {
 }
 
 mat CIN3D8::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), c_dof, c_node), 6, c_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), c_dof, c_node), 6, c_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), c_dof, c_node), 6, c_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), c_dof, c_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), c_dof, c_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), c_dof, c_node);
 
     return {};
 }

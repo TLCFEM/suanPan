@@ -375,9 +375,9 @@ vtkSmartPointer<vtkCell> CP4I::Setup(const uvec& encoding) const {
 }
 
 mat CP4I::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), m_dof, m_node), 6, m_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), m_dof, m_node), 6, m_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), m_dof, m_node), 6, m_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
 
     mat A(int_pt.size(), 4);
     mat B(6, int_pt.size(), fill::zeros);
