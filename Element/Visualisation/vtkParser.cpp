@@ -267,6 +267,8 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
 }
 
 void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vtkInfo config) {
+    if(!config.save_file) return;
+
     config.title_name = "Plotting Element Quantity " + std::string(to_name(config.type));
 
     vtkNew<vtkMultiBlockDataSet> root;
@@ -309,7 +311,7 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
         }
     }
 
-    if(config.save_file) domain->insert(std::async(std::launch::async, vtk_save<vtkMultiBlockDataSet>, std::move(root), config.file_name));
+    domain->insert(std::async(std::launch::async, vtk_save<vtkMultiBlockDataSet>, std::move(root), config.file_name));
 }
 
 void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config) {
