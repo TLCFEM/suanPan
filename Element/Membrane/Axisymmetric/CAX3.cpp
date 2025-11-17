@@ -111,9 +111,6 @@ mat CAX3::GetData(const OutputType P) {
     return {};
 }
 
-mat CAX3::GetDeformation(const double amplifier) {
-    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node);
-    return ele_disp.resize(3, m_node);
-}
+mat CAX3::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

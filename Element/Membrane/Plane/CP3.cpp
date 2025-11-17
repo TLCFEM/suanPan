@@ -277,9 +277,6 @@ mat CP3::GetData(const OutputType P) {
     return repmat(data.resize(6), 1, m_node);
 }
 
-mat CP3::GetDeformation(const double amplifier) {
-    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node);
-    return ele_disp.resize(3, m_node);
-}
+mat CP3::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

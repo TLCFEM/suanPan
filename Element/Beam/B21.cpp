@@ -152,9 +152,6 @@ mat B21::GetData(const OutputType P) {
     return data;
 }
 
-mat B21::GetDeformation(const double amplifier) {
-    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2);
-    return ele_disp.resize(3, b_node);
-}
+mat B21::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2); }
 
 #endif

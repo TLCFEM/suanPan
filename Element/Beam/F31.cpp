@@ -203,8 +203,6 @@ mat F31::GetData(const OutputType P) {
     return data;
 }
 
-mat F31::GetDeformation(const double amplifier) {
-    return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(3);
-}
+mat F31::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(3); }
 
 #endif

@@ -115,9 +115,6 @@ mat T2D2S::GetData(const OutputType P) {
     return repmat(data.resize(6), 1, t_node);
 }
 
-mat T2D2S::GetDeformation(const double amplifier) {
-    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), t_dof, t_node);
-    return ele_disp.resize(3, t_node);
-}
+mat T2D2S::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), t_dof, t_node); }
 
 #endif

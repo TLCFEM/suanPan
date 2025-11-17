@@ -428,9 +428,6 @@ mat CP4::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-mat CP4::GetDeformation(const double amplifier) {
-    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node);
-    return ele_disp.resize(3, m_node);
-}
+mat CP4::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

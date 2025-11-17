@@ -243,9 +243,6 @@ mat PCPE8DC::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-mat PCPE8DC::GetDeformation(const double amplifier) {
-    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(s_dof), 2, m_node);
-    return ele_disp.resize(3, m_node);
-}
+mat PCPE8DC::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(s_dof), 2, m_node); }
 
 #endif

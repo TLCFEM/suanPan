@@ -247,9 +247,6 @@ mat MVLEM::GetData(const OutputType P) {
     return {};
 }
 
-mat MVLEM::GetDeformation(const double amplifier) {
-    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2);
-    return ele_disp.resize(3, b_node);
-}
+mat MVLEM::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2); }
 
 #endif
