@@ -97,11 +97,7 @@ void CAX3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-vtkSmartPointer<vtkCell> CAX3::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkTriangle>::New();
-    for(unsigned I = 0; I < m_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> CAX3::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
 
 mat CAX3::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);

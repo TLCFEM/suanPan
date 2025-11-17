@@ -254,11 +254,7 @@ void S4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> S4::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkQuad>::New();
-    for(unsigned I = 0; I < s_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> S4::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat S4::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), s_dof, s_node);

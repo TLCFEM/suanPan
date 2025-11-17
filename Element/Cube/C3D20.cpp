@@ -202,11 +202,7 @@ void C3D20::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuadraticHexahedron.h>
 
-vtkSmartPointer<vtkCell> C3D20::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkQuadraticHexahedron>::New();
-    for(unsigned I = 0; I < c_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> C3D20::GetCell() const { return vtkSmartPointer<vtkQuadraticHexahedron>::New(); }
 
 mat C3D20::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), c_dof, c_node);

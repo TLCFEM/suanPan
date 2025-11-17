@@ -145,11 +145,7 @@ void B21H::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-vtkSmartPointer<vtkCell> B21H::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkLine>::New();
-    for(unsigned I = 0; I < b_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> B21H::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
 
 mat B21H::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);

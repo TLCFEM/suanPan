@@ -155,11 +155,7 @@ void Mindlin::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> Mindlin::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkQuad>::New();
-    for(unsigned I = 0; I < p_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> Mindlin::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat Mindlin::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), p_dof, p_node);

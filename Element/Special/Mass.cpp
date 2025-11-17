@@ -37,11 +37,7 @@ void MassBase::print() {
 #ifdef SUANPAN_VTK
 #include <vtkVertex.h>
 
-vtkSmartPointer<vtkCell> MassBase::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkVertex>::New();
-    for(unsigned I = 0; I < get_node_number(); ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> MassBase::GetCell() const { return vtkSmartPointer<vtkVertex>::New(); }
 
 mat MassBase::GetData(const OutputType P) {
     const auto n_dof = get_dof_number();

@@ -175,11 +175,7 @@ void PCPE8UC::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuadraticQuad.h>
 
-vtkSmartPointer<vtkCell> PCPE8UC::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkQuadraticQuad>::New();
-    for(unsigned I = 0; I < m_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> PCPE8UC::GetCell() const { return vtkSmartPointer<vtkQuadraticQuad>::New(); }
 
 mat PCPE8UC::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);

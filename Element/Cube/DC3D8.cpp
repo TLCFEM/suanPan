@@ -151,11 +151,7 @@ void DC3D8::print() {
 #ifdef SUANPAN_VTK
 #include <vtkHexahedron.h>
 
-vtkSmartPointer<vtkCell> DC3D8::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkHexahedron>::New();
-    for(unsigned I = 0; I < c_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> DC3D8::GetCell() const { return vtkSmartPointer<vtkHexahedron>::New(); }
 
 mat DC3D8::GetData(const OutputType P) {
     if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 3, c_node), 6, c_node);

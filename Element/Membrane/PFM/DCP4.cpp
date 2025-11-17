@@ -177,11 +177,7 @@ void DCP4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> DCP4::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkQuad>::New();
-    for(unsigned I = 0; I < m_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> DCP4::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat DCP4::GetData(const OutputType P) {
     if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 2, m_node), 6, m_node);

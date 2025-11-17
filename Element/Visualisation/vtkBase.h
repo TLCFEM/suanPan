@@ -40,11 +40,18 @@ enum class OutputType;
 
 class vtkBase {
 #ifdef SUANPAN_VTK
+    [[nodiscard]] virtual vtkSmartPointer<vtkCell> GetCell() const { return nullptr; }
+
 public:
     vtkBase() = default;
     virtual ~vtkBase() = default;
 
-    [[nodiscard]] virtual vtkSmartPointer<vtkCell> Setup(const uvec&) const { return nullptr; }
+    [[nodiscard]] vtkSmartPointer<vtkCell> Setup(const uvec& encoding) const {
+        auto cell = GetCell();
+        if(cell)
+            for(auto I = 0llu; I < encoding.n_elem; ++I) cell->GetPointIds()->SetId(static_cast<vtkIdType>(I), static_cast<vtkIdType>(encoding(I)));
+        return cell;
+    }
 
     /**
      * Get elemental data for VTK output.

@@ -210,11 +210,7 @@ void PCPE4DC::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> PCPE4DC::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkQuad>::New();
-    for(unsigned I = 0; I < m_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> PCPE4DC::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat PCPE4DC::GetData(const OutputType P) {
     if(OutputType::A == P) return resize(reshape(get_current_acceleration()(s_dof), 2, m_node), 6, m_node);

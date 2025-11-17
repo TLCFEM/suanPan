@@ -155,11 +155,7 @@ void C3D4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTetra.h>
 
-vtkSmartPointer<vtkCell> C3D4::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkTetra>::New();
-    for(unsigned I = 0; I < c_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> C3D4::GetCell() const { return vtkSmartPointer<vtkTetra>::New(); }
 
 mat C3D4::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), c_dof, c_node);

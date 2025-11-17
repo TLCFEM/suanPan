@@ -124,11 +124,7 @@ void DC3D4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTetra.h>
 
-vtkSmartPointer<vtkCell> DC3D4::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkTetra>::New();
-    for(unsigned I = 0; I < c_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> DC3D4::GetCell() const { return vtkSmartPointer<vtkTetra>::New(); }
 
 mat DC3D4::GetData(const OutputType P) {
     if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 3, c_node), 6, c_node);

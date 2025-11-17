@@ -366,11 +366,7 @@ void SGCMS::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-vtkSmartPointer<vtkCell> SGCMS::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkQuad>::New();
-    for(unsigned I = 0; I < s_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> SGCMS::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat SGCMS::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), s_dof, s_node);

@@ -181,11 +181,7 @@ void F31::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-vtkSmartPointer<vtkCell> F31::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkLine>::New();
-    for(auto I = 0u; I < b_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> F31::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
 
 mat F31::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);

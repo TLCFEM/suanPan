@@ -213,11 +213,7 @@ void DKT3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-vtkSmartPointer<vtkCell> DKT3::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkTriangle>::New();
-    for(unsigned I = 0; I < p_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
+vtkSmartPointer<vtkCell> DKT3::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
 
 mat DKT3::GetData(const OutputType P) {
     if(OutputType::A == P) return reshape(get_current_acceleration(), p_dof, p_node);
