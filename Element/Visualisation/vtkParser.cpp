@@ -278,12 +278,14 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
 
     auto counter{0u};
 
-    for(auto& t_element : domain->get_element_pool()) {
-        if(-1 != config.material_type)
-            if(auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) continue;
-
+    std::mutex mutex;
+    suanpan::for_all(domain->get_element_pool(), [&](const shared_ptr<Element>& t_element) {
         const auto num_node = t_element->get_node_number();
         auto encoding = t_element->get_node_encoding();
+        for(auto I = 0u; I < num_node; ++I) encoding(I) = I;
+        const auto cell = t_element->Setup(encoding);
+
+        if(!cell) return;
 
         const vtkNew<vtkPoints> node;
         node->SetNumberOfPoints(num_node);
@@ -298,18 +300,19 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
         for(auto I = 0u; I < num_node; ++I) {
             node->SetPoint(I, location.colptr(I));
             data->SetTuple(I, result.colptr(I));
-            encoding(I) = I;
         }
 
-        if(const auto cell = t_element->Setup(encoding); cell) {
-            const vtkNew<vtkUnstructuredGrid> grid;
-            grid->Allocate(1);
-            grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
-            grid->SetPoints(node);
-            grid->GetPointData()->SetScalars(data);
+        const vtkNew<vtkUnstructuredGrid> grid;
+        grid->Allocate(1);
+        grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+        grid->SetPoints(node);
+        grid->GetPointData()->SetScalars(data);
+
+        {
+            std::scoped_lock lock(mutex);
             root->SetBlock(counter++, grid);
         }
-    }
+    });
 
     domain->insert(std::async(std::launch::async, vtk_save<vtkMultiBlockDataSet>, std::move(root), config.file_name));
 }
