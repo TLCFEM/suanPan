@@ -183,11 +183,7 @@ void F31::print() {
 
 vtkSmartPointer<vtkCell> F31::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(auto I = 0u; I < b_node; ++I) {
-        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+    for(auto I = 0u; I < b_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
     return cell;
 }
 

@@ -39,11 +39,7 @@ void MassBase::print() {
 
 vtkSmartPointer<vtkCell> MassBase::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkVertex>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < get_node_number(); ++I) {
-        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(0, 2));
-    }
+    for(unsigned I = 0; I < get_node_number(); ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
     return cell;
 }
 

@@ -206,11 +206,7 @@ void B31OS::print() {
 
 vtkSmartPointer<vtkCell> B31OS::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < b_node; ++I) {
-        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+    for(unsigned I = 0; I < b_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
     return cell;
 }
 

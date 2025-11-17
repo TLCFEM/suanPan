@@ -197,11 +197,7 @@ void CP6::print() {
 
 vtkSmartPointer<vtkCell> CP6::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkQuadraticTriangle>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+    for(unsigned I = 0; I < m_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
     return cell;
 }
 

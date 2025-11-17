@@ -252,11 +252,7 @@ void CIN3D8::print() {
 
 vtkSmartPointer<vtkCell> CIN3D8::Setup(const uvec& encoding) const {
     auto cell = vtkSmartPointer<vtkHexahedron>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < c_node; ++I) {
-        cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-        cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+    for(unsigned I = 0; I < c_node; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
     return cell;
 }
 
