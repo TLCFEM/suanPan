@@ -23,6 +23,7 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
+#include <Toolbox/utility.h>
 
 DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
@@ -285,7 +286,11 @@ mat DKTS3::GetData(const OutputType P) {
     if(OutputType::V == P) return reshape(get_current_velocity(), s_dof, s_node);
     if(OutputType::U == P) return reshape(get_current_displacement(), s_dof, s_node);
 
-    return {};
+    running_stat_vec<vec> stats;
+    for(const auto& I : int_pt)
+        for(const auto& J : suanpan::middle(I.sec_int_pt).s_material->record(P)) stats(J);
+
+    return repmat(stats.mean(), 1, s_node);
 }
 
 mat DKTS3::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), s_dof, s_node).eval().head_rows(3); }

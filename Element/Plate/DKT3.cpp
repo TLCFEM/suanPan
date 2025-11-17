@@ -220,7 +220,11 @@ mat DKT3::GetData(const OutputType P) {
     if(OutputType::V == P) return reshape(get_current_velocity(), p_dof, p_node);
     if(OutputType::U == P) return reshape(get_current_displacement(), p_dof, p_node);
 
-    return {};
+    running_stat_vec<vec> stats;
+    for(const auto& I : int_pt)
+        for(const auto& J : suanpan::middle(I.sec_int_pt).p_material->record(P)) stats(J);
+
+    return repmat(stats.mean(), 1, p_node);
 }
 
 mat DKT3::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * reshape(get_current_displacement(), p_dof, p_node).eval().row(0)); }
