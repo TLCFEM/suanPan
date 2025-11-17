@@ -21,7 +21,6 @@
 #include "vtkParser.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Toolbox/utility.h>
 #include <vtkActor.h>
@@ -120,22 +119,20 @@ void vtk_setup(vtkUnstructuredGrid* grid, const vtkInfo& config) {
     interactor->Start();
 }
 
-void vtk_save_single(vtkNew<vtkUnstructuredGrid>&& grid, std::string file_name) {
-    // NOLINT(performance-unnecessary-value-param)
-    const vtkNew<vtkXMLUnstructuredGridWriter> writer;
+template<typename> struct vtkWriter {};
+
+template<> struct vtkWriter<vtkUnstructuredGrid> {
+    using writer = vtkXMLUnstructuredGridWriter;
+};
+
+template<> struct vtkWriter<vtkMultiBlockDataSet> {
+    using writer = vtkXMLMultiBlockDataWriter;
+};
+
+template<typename T> void vtk_save(vtkNew<T>&& grid, std::string file_name) {
+    const vtkNew<typename vtkWriter<T>::writer> writer;
     if(const auto ext = writer->GetDefaultFileExtension(); !file_name.ends_with(ext)) file_name += "." + std::string(ext);
     writer->SetInputData(grid);
-    writer->SetFileName(file_name.c_str());
-    writer->SetDataModeToBinary();
-    writer->Write();
-    suanpan_debug("Plot is written to file \"{}\".\n", file_name);
-}
-
-void vtk_save_multiple(vtkNew<vtkMultiBlockDataSet>&& root, std::string file_name) {
-    // NOLINT(performance-unnecessary-value-param)
-    const vtkNew<vtkXMLMultiBlockDataWriter> writer;
-    if(const auto ext = writer->GetDefaultFileExtension(); !file_name.ends_with(ext)) file_name += "." + std::string(ext);
-    writer->SetInputData(root);
     writer->SetFileName(file_name.c_str());
     writer->SetDataModeToBinary();
     writer->Write();
@@ -204,7 +201,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     grid->SetPoints(node);
     grid->GetPointData()->SetScalars(data);
 
-    if(config.save_file) domain->insert(std::async(std::launch::async, vtk_save_single, std::move(grid), config.file_name));
+    if(config.save_file) domain->insert(std::async(std::launch::async, vtk_save<vtkUnstructuredGrid>, std::move(grid), config.file_name));
     else vtk_setup(grid, config);
 }
 
@@ -265,7 +262,7 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
     grid->SetPoints(node);
     grid->GetPointData()->SetScalars(data);
 
-    if(config.save_file) domain->insert(std::async(std::launch::async, vtk_save_single, std::move(grid), config.file_name));
+    if(config.save_file) domain->insert(std::async(std::launch::async, vtk_save<vtkUnstructuredGrid>, std::move(grid), config.file_name));
     else vtk_setup(grid, config);
 }
 
@@ -312,7 +309,7 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
         }
     }
 
-    if(config.save_file) domain->insert(std::async(std::launch::async, vtk_save_multiple, std::move(root), config.file_name));
+    if(config.save_file) domain->insert(std::async(std::launch::async, vtk_save<vtkMultiBlockDataSet>, std::move(root), config.file_name));
 }
 
 void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config) {
