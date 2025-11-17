@@ -169,7 +169,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     const auto category = to_category(config.type);
     const auto actual_type = to_token(category);
 
-    const auto max_node = node_map.size();
+    const auto max_node = static_cast<unsigned>(node_map.size());
 
     const vtkNew<vtkDoubleArray> data;
     const vtkNew<vtkPoints> node;
@@ -191,10 +191,12 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
         auto encoding = t_element->get_node_encoding();
         for(auto& I : encoding) I = node_map.at(I);
 
-        if(const auto result = t_element->GetDeformation(config.scale); !result.empty())
-            for(auto I = 0u; I < num_node; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
-        if(const auto result = t_element->GetData(actual_type); !result.empty())
-            for(auto I = 0u; I < num_node; ++I) data->SetTuple(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
+        const mat location = t_element->GetDeformation(config.scale).resize(3, num_node);
+        const mat result = t_element->GetData(actual_type).resize(6, num_node);
+        for(auto I = 0u; I < num_node; ++I) {
+            node->SetPoint(static_cast<vtkIdType>(encoding(I)), location.colptr(I));
+            data->SetTuple(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
+        }
 
         if(const auto cell = t_element->Setup(encoding); cell) grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
     });
@@ -216,7 +218,7 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
     const auto category = to_category(config.type);
     const auto actual_type = to_token(category);
 
-    const auto max_node = node_map.size();
+    const auto max_node = static_cast<unsigned>(node_map.size());
 
     const vtkNew<vtkDoubleArray> data;
     const vtkNew<vtkPoints> node;
@@ -244,11 +246,11 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
         auto encoding = t_element->get_node_encoding();
         for(auto& I : encoding) I = node_map.at(I);
 
-        if(const auto result = t_element->GetDeformation(config.scale); !result.empty())
-            for(auto I = 0u; I < num_node; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
+        const mat location = t_element->GetDeformation(config.scale).resize(3, num_node);
+        for(auto I = 0u; I < num_node; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), location.colptr(I));
 
-        if(const auto result = t_element->GetData(actual_type); !result.empty()) {
-            tensor.cols(encoding) += result;
+        if(auto result = t_element->GetData(actual_type); !result.empty()) {
+            tensor.cols(encoding) += result.resize(6, num_node);
             counter(encoding) += 1.;
         }
         if(const auto cell = t_element->Setup(encoding); cell) grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
@@ -287,19 +289,18 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
         const vtkNew<vtkPoints> node;
         node->SetNumberOfPoints(num_node);
 
-        const mat location = t_element->GetDeformation(config.scale).resize(3, num_node);
-        for(auto I = 0u; I < num_node; ++I) {
-            node->SetPoint(I, location.colptr(I));
-            encoding(I) = I;
-        }
-
         const vtkNew<vtkDoubleArray> data;
         data->SetNumberOfComponents(6);
         data->SetNumberOfTuples(num_node);
         data->SetName(category.c_str());
 
+        const mat location = t_element->GetDeformation(config.scale).resize(3, num_node);
         const mat result = t_element->GetData(actual_type).resize(6, num_node);
-        for(auto I = 0u; I < num_node; ++I) data->SetTuple(I, result.colptr(I));
+        for(auto I = 0u; I < num_node; ++I) {
+            node->SetPoint(I, location.colptr(I));
+            data->SetTuple(I, result.colptr(I));
+            encoding(I) = I;
+        }
 
         if(const auto cell = t_element->Setup(encoding); cell) {
             const vtkNew<vtkUnstructuredGrid> grid;

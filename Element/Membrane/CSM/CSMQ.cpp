@@ -212,49 +212,6 @@ void CSMQ::print() {
     }
 }
 
-#ifdef SUANPAN_VTK
-#include <vtkQuad.h>
-
-vtkSmartPointer<vtkCell> CSMQ::Setup(const uvec& encoding) const {
-    auto cell = vtkSmartPointer<vtkQuad>::New();
-    for(auto I = 0u; I < 4u; ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
-    return cell;
-}
-
-mat CSMQ::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration(), m_dof, m_node), 6, 4);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity(), m_dof, m_node), 6, 4);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement(), m_dof, m_node), 6, 4);
-
-    mat A(int_pt.size(), 9);
-    mat B(6, int_pt.size(), fill::zeros);
-
-    for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
-        A.row(I) = interpolation::quadratic(int_pt[I].coor);
-    }
-
-    mat data(m_node, 9);
-
-    data.row(0) = interpolation::quadratic(-1., -1.);
-    data.row(1) = interpolation::quadratic(1., -1.);
-    data.row(2) = interpolation::quadratic(1., 1.);
-    data.row(3) = interpolation::quadratic(-1., 1.);
-    data.row(4) = interpolation::quadratic(0., -1.);
-    data.row(5) = interpolation::quadratic(1., 0.);
-    data.row(6) = interpolation::quadratic(0., 1.);
-    data.row(7) = interpolation::quadratic(-1., 0.);
-
-    return (data * solve(A, B.t())).t();
-}
-
-mat CSMQ::GetDeformation(const double amplifier) {
-    mat ele_disp = get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2);
-    return ele_disp.resize(3, 4);
-}
-
-#endif
-
 const uvec CSMQ5::t_dof{0, 1, 3, 4, 6, 7, 9, 10, 12, 13};
 const uvec CSMQ5::r_dof{2, 5, 8, 11, 14};
 

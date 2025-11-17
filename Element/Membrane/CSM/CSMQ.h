@@ -77,13 +77,6 @@ public:
     std::vector<vec> record(OutputType) override;
 
     void print() override;
-
-#ifdef SUANPAN_VTK
-    [[nodiscard]] vtkSmartPointer<vtkCell> Setup(const uvec&) const override;
-
-    mat GetData(OutputType) override;
-    mat GetDeformation(double) override;
-#endif
 };
 
 class CSMQ5 final : public CSMQ {
