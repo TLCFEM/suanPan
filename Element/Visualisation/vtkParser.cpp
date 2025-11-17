@@ -46,14 +46,12 @@ vtkInfo vtk_process(std::istringstream& command) {
     std::string keyword;
 
     while(!command.eof() && get_input(command, keyword))
-        if(is_equal(keyword, "scale") && !get_input(command, config.scale)) config.scale = 1.;
-        else if(is_equal(keyword, "deformed")) config.on_deformed = true;
-        else if(is_equal(keyword, "undeformed")) config.on_deformed = false;
+        if(is_equal(keyword, "scale") && !get_input(command, config.scale)) config.scale = 0.;
         else if(is_equal(keyword, "type") && get_input(command, keyword)) config.type = to_token(keyword);
         else if(is_equal(keyword, "fontsize") && !get_input(command, config.font_size)) config.font_size = 8;
         else if(is_equal(keyword, "save") && get_input(command, config.file_name)) config.save_file = true;
-        else if(is_equal(keyword, "nobar")) config.colorbar = false;
-        else if(is_equal(keyword, "noaverage")) config.average = false;
+        else if(is_equal(keyword, "nobar")) config.color_bar = false;
+        else if(is_equal(keyword, "noaverage")) config.multi_block = false;
         else if(is_equal(keyword, "material") && !get_input(command, config.material_type)) config.material_type = -1;
         else if(is_equal(keyword, "size")) {
             if(!get_input(command, config.canvas_size[0])) config.canvas_size[0] = 500;
@@ -104,7 +102,7 @@ void vtk_setup(vtkUnstructuredGrid* grid, const vtkInfo& config) {
     actor->GetProperty()->SetLineWidth(4.);
 
     renderer->AddActor(actor);
-    if(config.colorbar) renderer->AddViewProp(bar);
+    if(config.color_bar) renderer->AddViewProp(bar);
     renderer->SetBackground(color->GetColor3d("Grey").GetData());
     renderer->ResetCameraClippingRange();
 
@@ -141,7 +139,6 @@ template<typename T> void vtk_save(vtkNew<T>&& grid, std::string file_name) {
 
 int vtk_parser(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     auto plot_info = vtk_process(command);
-    if(!plot_info.on_deformed) plot_info.scale = 0.;
 
     const auto L = to_token(to_category(plot_info.type));
 
@@ -318,7 +315,7 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
 }
 
 void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    const auto func = config.average ? vtk_plot_element_quantity_single : vtk_plot_element_quantity_multiple;
+    const auto func = config.multi_block ? vtk_plot_element_quantity_single : vtk_plot_element_quantity_multiple;
 
     return func(domain, std::move(config));
 }

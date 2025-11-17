@@ -31,16 +31,15 @@ int vtk_parser(const shared_ptr<DomainBase>&, std::istringstream&);
 
 struct vtkInfo {
     OutputType type = OutputType::U;
-    double scale = 1.;
-    bool on_deformed = true;
-    unsigned font_size = 8;
-    int canvas_size[2] = {500, 500};
+    bool color_bar = true;
+    bool multi_block = true;
     bool save_file = false;
+    double scale = 0.;
+    int canvas_size[2] = {500, 500};
+    int material_type = -1;
     std::string file_name;
     std::string title_name;
-    bool colorbar = true;
-    int material_type = -1;
-    bool average = true;
+    unsigned font_size = 8;
 };
 
 void vtk_plot_node_quantity(const shared_ptr<DomainBase>&, vtkInfo);
