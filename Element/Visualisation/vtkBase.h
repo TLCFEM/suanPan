@@ -49,7 +49,7 @@ public:
     [[nodiscard]] vtkSmartPointer<vtkCell> Setup(const uvec& encoding) const {
         auto cell = GetCell();
         if(cell)
-            for(auto I = 0llu; I < encoding.n_elem; ++I) cell->GetPointIds()->SetId(static_cast<vtkIdType>(I), static_cast<vtkIdType>(encoding(I)));
+            for(vtkIdType I = 0; I < cell->GetNumberOfPoints(); ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
         return cell;
     }
 
