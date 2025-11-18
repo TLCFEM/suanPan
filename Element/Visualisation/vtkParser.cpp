@@ -48,15 +48,23 @@ vtkInfo vtk_process(std::istringstream& command) {
     std::string keyword;
 
     while(!command.eof() && get_input(command, keyword))
-        if(is_equal(keyword, "scale") && !get_input(command, config.scale)) config.scale = 0.;
+        if(is_equal(keyword, "scale")) get_input(command, config.scale);
         else if(is_equal(keyword, "type") && get_input(command, keyword)) config.display_type = to_token(keyword);
-        else if(is_equal(keyword, "fontsize") && !get_input(command, config.font_size)) config.font_size = 8;
+        else if(is_equal(keyword, "fontsize")) get_input(command, config.font_size);
         else if(is_equal(keyword, "save") && get_input(command, config.file_name)) config.save_file = true;
         else if(is_equal(keyword, "nobar")) config.color_bar = false;
         else if(is_equal(keyword, "noaverage")) config.multi_block = true;
+        else if(is_equal(keyword, "material")) {
+            config.per_material = true;
+            config.per_section = false;
+        }
+        else if(is_equal(keyword, "section")) {
+            config.per_section = true;
+            config.per_material = false;
+        }
         else if(is_equal(keyword, "size")) {
-            if(!get_input(command, config.canvas_size[0])) config.canvas_size[0] = 500;
-            if(!get_input(command, config.canvas_size[1])) config.canvas_size[1] = 500;
+            get_input(command, config.canvas_size[0]);
+            get_input(command, config.canvas_size[1]);
         }
 
     config.title_name = "Plotting Quantity " + std::string(to_name(config.display_type));
@@ -251,7 +259,8 @@ void vtk_cell_per_material(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
     std::unordered_map<uword, vtkBlock> blocks;
 
     auto& compact_map = domain->get_compact_node_map_per_material();
-    for(const auto& [tag, node_map] : compact_map) blocks[tag].init(static_cast<vtkIdType>(node_map.size()), element_count[tag], config.category.c_str());
+    for(const auto& [tag, node_map] : compact_map)
+        if(element_count[tag] > 0) blocks[tag].init(static_cast<vtkIdType>(node_map.size()), element_count[tag], config.category.c_str());
 
     std::ranges::for_each(element_pool, [&](const shared_ptr<Element>& element) {
         for(const auto tag : element->get_material_tag()) {
@@ -269,6 +278,42 @@ void vtk_cell_per_material(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
     for(auto& [tag, block] : blocks) {
         root->SetBlock(counter, block.attach());
         root->GetMetaData(counter++)->Set(vtkCompositeDataSet::NAME(), "Material " + std::to_string(tag));
+    }
+
+    domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
+}
+
+void vtk_cell_per_section(const shared_ptr<DomainBase>& domain, vtkInfo&& config) {
+    if(!config.save_file) return;
+
+    std::unordered_map<uword, vtkIdType> element_count;
+
+    auto& element_pool = domain->get_element_pool();
+    for(const auto& element : element_pool)
+        for(const auto tag : element->get_section_tag()) element_count[tag] += 1;
+
+    std::unordered_map<uword, vtkBlock> blocks;
+
+    auto& compact_map = domain->get_compact_node_map_per_section();
+    for(const auto& [tag, node_map] : compact_map)
+        if(element_count[tag] > 0) blocks[tag].init(static_cast<vtkIdType>(node_map.size()), element_count[tag], config.category.c_str());
+
+    std::ranges::for_each(element_pool, [&](const shared_ptr<Element>& element) {
+        for(const auto tag : element->get_section_tag()) {
+            auto encoding = element->get_node_encoding();
+            auto& node_map = compact_map.at(tag);
+            for(auto& I : encoding) I = node_map.at(I);
+
+            blocks.at(tag).add(element, encoding, config);
+        }
+    });
+
+    vtkNew<vtkMultiBlockDataSet> root;
+
+    auto counter = 0u;
+    for(auto& [tag, block] : blocks) {
+        root->SetBlock(counter, block.attach());
+        root->GetMetaData(counter++)->Set(vtkCompositeDataSet::NAME(), "Section " + std::to_string(tag));
     }
 
     domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
@@ -297,9 +342,14 @@ void vtl_cell_multiple_block(const shared_ptr<DomainBase>& domain, vtkInfo&& con
 }
 
 void vtk_cell_plot(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    const auto func = config.multi_block ? vtl_cell_multiple_block : vtk_cell_single_block;
+    decltype(&vtk_cell_single_block) handler;
 
-    return func(domain, std::move(config));
+    if(config.multi_block) handler = vtl_cell_multiple_block;
+    else if(config.per_material) handler = vtk_cell_per_material;
+    else if(config.per_section) handler = vtk_cell_per_section;
+    else handler = vtk_cell_single_block;
+
+    return handler(domain, std::move(config));
 }
 
 #endif

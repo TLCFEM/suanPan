@@ -33,6 +33,8 @@ struct vtkInfo {
     bool color_bar = true;
     bool multi_block = false;
     bool save_file = false;
+    bool per_material = false;
+    bool per_section = false;
     double scale = 0.;
     int canvas_size[2] = {500, 500};
     OutputType record_type = OutputType::U;
