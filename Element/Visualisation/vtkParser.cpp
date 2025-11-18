@@ -40,7 +40,6 @@
 #include <vtkScalarBarActor.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkXMLMultiBlockDataWriter.h>
-#include <vtkXMLUnstructuredGridWriter.h>
 
 vtkInfo vtk_process(std::istringstream& command) {
     vtkInfo config;
@@ -342,12 +341,11 @@ void vtl_cell_multiple_block(const shared_ptr<DomainBase>& domain, vtkInfo&& con
 }
 
 void vtk_cell_plot(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    decltype(&vtk_cell_single_block) handler;
+    auto handler = vtk_cell_single_block;
 
     if(config.per_element) handler = vtl_cell_multiple_block;
     else if(config.per_material) handler = vtk_cell_per_material;
     else if(config.per_section) handler = vtk_cell_per_section;
-    else handler = vtk_cell_single_block;
 
     return handler(domain, std::move(config));
 }
