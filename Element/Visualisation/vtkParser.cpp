@@ -156,6 +156,8 @@ class vtkBlock {
     const vtkNew<vtkPoints> node;
     const vtkNew<vtkUnstructuredGrid> grid;
 
+    std::mutex mutex;
+
     mat tensor;
     u32_vec counter;
 
@@ -188,20 +190,23 @@ public:
         const auto cell = element->Setup(encoding);
         if(!cell) return;
 
+        const std::scoped_lock lock(mutex);
+
+        grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+
         const mat location = element->GetDeformation(config.scale).resize(3, encoding.n_elem);
         for(auto I = 0u; I < encoding.n_elem; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), location.colptr(I));
 
-        if(auto result = element->GetData(config.record_type); !result.empty()) {
-            result.resize(6, encoding.n_elem);
-            if(num_cell > 1) {
-                tensor.cols(encoding) += result;
-                counter(encoding) += 1u;
-            }
-            else
-                for(auto I = 0u; I < encoding.n_elem; ++I) data->SetTuple(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
-        }
+        auto result = element->GetData(config.record_type);
+        if(result.empty()) return;
 
-        grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+        result.resize(6, encoding.n_elem);
+        if(num_cell > 1) {
+            tensor.cols(encoding) += result;
+            counter(encoding) += 1u;
+        }
+        else
+            for(auto I = 0u; I < encoding.n_elem; ++I) data->SetTuple(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
     }
 
     auto& attach() {
@@ -252,16 +257,16 @@ void vtk_cell_per_material(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
     std::unordered_map<uword, vtkIdType> element_count;
 
     auto& element_pool = domain->get_element_pool();
-    for(const auto& element : element_pool)
+    for(auto& element : element_pool)
         for(const auto tag : element->get_material_tag()) element_count[tag] += 1;
 
     std::unordered_map<uword, vtkBlock> blocks;
 
     auto& compact_map = domain->get_compact_node_map_per_material();
-    for(const auto& [tag, node_map] : compact_map)
+    for(auto& [tag, node_map] : compact_map)
         if(element_count[tag] > 0) blocks[tag].init(static_cast<vtkIdType>(node_map.size()), element_count[tag], config.category.c_str());
 
-    std::ranges::for_each(element_pool, [&](const shared_ptr<Element>& element) {
+    suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
         for(const auto tag : element->get_material_tag()) {
             auto encoding = element->get_node_encoding();
             auto& node_map = compact_map.at(tag);
@@ -288,16 +293,16 @@ void vtk_cell_per_section(const shared_ptr<DomainBase>& domain, vtkInfo&& config
     std::unordered_map<uword, vtkIdType> element_count;
 
     auto& element_pool = domain->get_element_pool();
-    for(const auto& element : element_pool)
+    for(auto& element : element_pool)
         for(const auto tag : element->get_section_tag()) element_count[tag] += 1;
 
     std::unordered_map<uword, vtkBlock> blocks;
 
     auto& compact_map = domain->get_compact_node_map_per_section();
-    for(const auto& [tag, node_map] : compact_map)
+    for(auto& [tag, node_map] : compact_map)
         if(element_count[tag] > 0) blocks[tag].init(static_cast<vtkIdType>(node_map.size()), element_count[tag], config.category.c_str());
 
-    std::ranges::for_each(element_pool, [&](const shared_ptr<Element>& element) {
+    suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
         for(const auto tag : element->get_section_tag()) {
             auto encoding = element->get_node_encoding();
             auto& node_map = compact_map.at(tag);
