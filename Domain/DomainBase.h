@@ -353,7 +353,11 @@ public:
     [[nodiscard]] virtual const std::vector<std::vector<unsigned>>& get_color_map() const = 0;
     [[nodiscard]] virtual std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> get_element_connectivity(bool) = 0;
 
-    [[nodiscard]] virtual const std::unordered_map<uword, uword>& get_compact_node_map() const = 0;
+    using TagMap = std::unordered_map<uword, uword>;
+    using TagMapCollection = std::unordered_map<uword, TagMap>;
+    [[nodiscard]] virtual const TagMap& get_compact_node_map() const = 0;
+    [[nodiscard]] virtual const TagMapCollection& get_compact_node_map_per_material() const = 0;
+    [[nodiscard]] virtual const TagMapCollection& get_compact_node_map_per_section() const = 0;
 
     virtual int reorder_dof() = 0;
     virtual int assign_color() = 0;

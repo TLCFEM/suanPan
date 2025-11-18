@@ -833,7 +833,11 @@ std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_c
     return std::make_pair(std::move(element_map), std::move(element_register));
 }
 
-const std::unordered_map<uword, uword>& Domain::get_compact_node_map() const { return compact_node; }
+const DomainBase::TagMap& Domain::get_compact_node_map() const { return compact_node; }
+
+const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_material() const { return compact_node_per_material; }
+
+const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_section() const { return compact_node_per_section; }
 
 int Domain::reorder_dof() {
     // assign dof label for active dof
@@ -933,6 +937,27 @@ int Domain::restart() {
     compact_node.clear();
     auto counter = 0llu;
     for(auto& t_node : get_node_pool()) compact_node.emplace(t_node->get_tag(), counter++);
+
+    suanpan::unordered_map<uword, suanpan::set<uword>> material_map, section_map;
+    suanpan::for_all(get_element_pool(), [&](const shared_ptr<Element>& t_element) {
+        const auto& nodes = t_element->get_node_encoding();
+        for(const auto tag : t_element->get_material_tag()) material_map[tag].insert(nodes.cbegin(), nodes.cend());
+        for(const auto tag : t_element->get_section_tag()) section_map[tag].insert(nodes.cbegin(), nodes.cend());
+    });
+
+    compact_node_per_material.clear();
+    for(const auto& [tag, node_set] : material_map) {
+        auto& target = compact_node_per_material[tag];
+        counter = 0llu;
+        for(const auto node : node_set) target.emplace(node, counter++);
+    }
+
+    compact_node_per_section.clear();
+    for(const auto& [tag, node_set] : section_map) {
+        auto& target = compact_node_per_section[tag];
+        counter = 0llu;
+        for(const auto node : node_set) target.emplace(node, counter++);
+    }
 
     return SUANPAN_SUCCESS;
 }

@@ -81,7 +81,9 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
 
     mutable std::array<double, 5> statistics{};
 
-    std::unordered_map<uword, uword> compact_node; // existing tag -> compact tag
+    TagMap compact_node;                        // existing tag -> compact tag
+    TagMapCollection compact_node_per_material; // material tag -> (existing tag -> compact tag)
+    TagMapCollection compact_node_per_section;  // section tag -> (existing tag -> compact tag)
 
 public:
     explicit Domain(unsigned = 0);
@@ -332,7 +334,9 @@ public:
     const std::vector<std::vector<unsigned>>& get_color_map() const override;
     std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> get_element_connectivity(bool) override;
 
-    const std::unordered_map<uword, uword>& get_compact_node_map() const override;
+    const TagMap& get_compact_node_map() const override;
+    const TagMapCollection& get_compact_node_map_per_material() const override;
+    const TagMapCollection& get_compact_node_map_per_section() const override;
 
     int reorder_dof() override;
     int assign_color() override;
