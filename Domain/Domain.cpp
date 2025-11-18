@@ -822,6 +822,7 @@ std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_c
     };
 
     if(all_elements)
+        // ReSharper disable once CppUseElementsView
         for(auto& [t_tag, t_element] : element_pond) populate(t_element);
     else
         for(auto& t_element : element_pond.get()) populate(t_element);
@@ -934,6 +935,7 @@ int Domain::restart() {
     // reference may depend on reformulated displacement
     if(SUANPAN_SUCCESS != initialize_reference()) return SUANPAN_FAIL;
 
+#ifdef SUANPAN_VTK
     compact_node.clear();
     auto counter = 0llu;
     for(auto& t_node : get_node_pool()) compact_node.emplace(t_node->get_tag(), counter++);
@@ -958,6 +960,7 @@ int Domain::restart() {
         counter = 0llu;
         for(const auto node : node_set) target.emplace(node, counter++);
     }
+#endif
 
     return SUANPAN_SUCCESS;
 }

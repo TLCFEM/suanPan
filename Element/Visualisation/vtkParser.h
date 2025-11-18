@@ -31,7 +31,7 @@ int vtk_parser(const shared_ptr<DomainBase>&, std::istringstream&);
 
 struct vtkInfo {
     bool color_bar = true;
-    bool multi_block = true;
+    bool multi_block = false;
     bool save_file = false;
     double scale = 0.;
     int canvas_size[2] = {500, 500};

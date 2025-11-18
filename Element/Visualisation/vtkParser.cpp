@@ -28,6 +28,7 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetMapper.h>
 #include <vtkDoubleArray.h>
+#include <vtkInformation.h>
 #include <vtkLookupTable.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkNamedColors.h>
@@ -52,7 +53,7 @@ vtkInfo vtk_process(std::istringstream& command) {
         else if(is_equal(keyword, "fontsize") && !get_input(command, config.font_size)) config.font_size = 8;
         else if(is_equal(keyword, "save") && get_input(command, config.file_name)) config.save_file = true;
         else if(is_equal(keyword, "nobar")) config.color_bar = false;
-        else if(is_equal(keyword, "noaverage")) config.multi_block = false;
+        else if(is_equal(keyword, "noaverage")) config.multi_block = true;
         else if(is_equal(keyword, "size")) {
             if(!get_input(command, config.canvas_size[0])) config.canvas_size[0] = 500;
             if(!get_input(command, config.canvas_size[1])) config.canvas_size[1] = 500;
@@ -232,7 +233,8 @@ void vtk_cell_single_block(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
     if(!config.save_file) vtk_setup(block.attach(), config);
     else {
         vtkNew<vtkMultiBlockDataSet> root;
-        root->SetBlock(0, block.attach());
+        root->SetBlock(0u, block.attach());
+        root->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "Default");
         domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
     }
 }
@@ -264,7 +266,10 @@ void vtk_cell_per_material(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
     vtkNew<vtkMultiBlockDataSet> root;
 
     auto counter = 0u;
-    for(auto& [tag, block] : blocks) root->SetBlock(counter++, block.attach());
+    for(auto& [tag, block] : blocks) {
+        root->SetBlock(counter, block.attach());
+        root->GetMetaData(counter++)->Set(vtkCompositeDataSet::NAME(), "Material " + std::to_string(tag));
+    }
 
     domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
 }
@@ -283,13 +288,16 @@ void vtl_cell_multiple_block(const shared_ptr<DomainBase>& domain, vtkInfo&& con
     vtkNew<vtkMultiBlockDataSet> root;
 
     auto counter{0u};
-    for(auto& [tag, block] : blocks) root->SetBlock(counter++, block.attach());
+    for(auto& [tag, block] : blocks) {
+        root->SetBlock(counter, block.attach());
+        root->GetMetaData(counter++)->Set(vtkCompositeDataSet::NAME(), "Element " + std::to_string(tag));
+    }
 
     domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
 }
 
 void vtk_cell_plot(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    const auto func = config.multi_block ? vtk_cell_single_block : vtl_cell_multiple_block;
+    const auto func = config.multi_block ? vtl_cell_multiple_block : vtk_cell_single_block;
 
     return func(domain, std::move(config));
 }
