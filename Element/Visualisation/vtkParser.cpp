@@ -142,7 +142,7 @@ int vtk_parser(const shared_ptr<DomainBase>& domain, std::istringstream& command
 
     const auto L = to_token(to_category(plot_info.type));
 
-    const auto func = OutputType::U == L || OutputType::V == L || OutputType::A == L || OutputType::RF == L || OutputType::DF == L || OutputType::IF == L ? vtk_plot_node_quantity : vtk_plot_element_quantity;
+    const auto func = OutputType::U == L || OutputType::V == L || OutputType::A == L || OutputType::RF == L || OutputType::DF == L || OutputType::IF == L ? vtk_point_plot : vtk_cell_plot;
 
 #ifdef SUANPAN_WIN
     domain->insert(std::async(std::launch::async, func, std::cref(domain), plot_info));
@@ -153,7 +153,7 @@ int vtk_parser(const shared_ptr<DomainBase>& domain, std::istringstream& command
     return SUANPAN_SUCCESS;
 }
 
-void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config) {
+void vtk_point_plot(const shared_ptr<DomainBase>& domain, vtkInfo config) {
     auto& node_map = domain->get_compact_node_map();
 
     auto& t_element_pool = domain->get_element_pool();
@@ -204,7 +204,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     else vtk_setup(grid, config);
 }
 
-void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkInfo config) {
+void vtk_cell_single_block(const shared_ptr<DomainBase>& domain, vtkInfo config) {
     auto& node_map = domain->get_compact_node_map();
 
     auto& t_element_pool = domain->get_element_pool();
@@ -266,7 +266,7 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
     else vtk_setup(grid, config);
 }
 
-void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vtkInfo config) {
+void vtl_cell_multiple_block(const shared_ptr<DomainBase>& domain, vtkInfo config) {
     if(!config.save_file) return;
 
     config.title_name = "Plotting Element Quantity " + std::string(to_name(config.type));
@@ -317,8 +317,8 @@ void vtk_plot_element_quantity_multiple(const shared_ptr<DomainBase>& domain, vt
     domain->insert(std::async(std::launch::async, vtk_save<vtkMultiBlockDataSet>, std::move(root), config.file_name));
 }
 
-void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    const auto func = config.multi_block ? vtk_plot_element_quantity_single : vtk_plot_element_quantity_multiple;
+void vtk_cell_plot(const shared_ptr<DomainBase>& domain, vtkInfo config) {
+    const auto func = config.multi_block ? vtk_cell_single_block : vtl_cell_multiple_block;
 
     return func(domain, std::move(config));
 }

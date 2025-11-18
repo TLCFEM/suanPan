@@ -42,9 +42,9 @@ struct vtkInfo {
     unsigned font_size = 8;
 };
 
-void vtk_plot_node_quantity(const shared_ptr<DomainBase>&, vtkInfo);
+void vtk_point_plot(const shared_ptr<DomainBase>&, vtkInfo);
 
-void vtk_plot_element_quantity(const shared_ptr<DomainBase>&, vtkInfo);
+void vtk_cell_plot(const shared_ptr<DomainBase>&, vtkInfo);
 
 #else
 

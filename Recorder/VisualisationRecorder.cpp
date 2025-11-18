@@ -31,7 +31,7 @@ VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType 
 
     const auto P = to_token(to_category(config.type));
 
-    function_handler = OutputType::U == P || OutputType::V == P || OutputType::A == P || OutputType::RF == P || OutputType::DF == P || OutputType::IF == P ? vtk_plot_node_quantity : vtk_plot_element_quantity;
+    function_handler = OutputType::U == P || OutputType::V == P || OutputType::A == P || OutputType::RF == P || OutputType::DF == P || OutputType::IF == P ? vtk_point_plot : vtk_cell_plot;
 #endif
 }
 
