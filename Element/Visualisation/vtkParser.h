@@ -31,14 +31,13 @@ int vtk_parser(const shared_ptr<DomainBase>&, std::istringstream&);
 
 struct vtkInfo {
     bool color_bar = true;
-    bool multi_block = false;
-    bool save_file = false;
+    bool per_element = false;
     bool per_material = false;
     bool per_section = false;
     double scale = 0.;
     int canvas_size[2] = {500, 500};
-    OutputType record_type = OutputType::U;
     OutputType display_type = OutputType::U;
+    OutputType record_type = OutputType::U;
     std::string category;
     std::string file_name;
     std::string title_name;

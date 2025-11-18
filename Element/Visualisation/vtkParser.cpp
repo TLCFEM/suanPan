@@ -51,9 +51,9 @@ vtkInfo vtk_process(std::istringstream& command) {
         if(is_equal(keyword, "scale")) get_input(command, config.scale);
         else if(is_equal(keyword, "type") && get_input(command, keyword)) config.display_type = to_token(keyword);
         else if(is_equal(keyword, "fontsize")) get_input(command, config.font_size);
-        else if(is_equal(keyword, "save") && get_input(command, config.file_name)) config.save_file = true;
+        else if(is_equal(keyword, "save")) get_input(command, config.file_name);
         else if(is_equal(keyword, "nobar")) config.color_bar = false;
-        else if(is_equal(keyword, "noaverage")) config.multi_block = true;
+        else if(is_equal(keyword, "element")) config.per_element = true;
         else if(is_equal(keyword, "material")) {
             config.per_material = true;
             config.per_section = false;
@@ -238,7 +238,7 @@ void vtk_cell_single_block(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
         block.add(element, encoding, config);
     });
 
-    if(!config.save_file) vtk_setup(block.attach(), config);
+    if(config.file_name.empty()) vtk_setup(block.attach(), config);
     else {
         vtkNew<vtkMultiBlockDataSet> root;
         root->SetBlock(0u, block.attach());
@@ -248,7 +248,7 @@ void vtk_cell_single_block(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
 }
 
 void vtk_cell_per_material(const shared_ptr<DomainBase>& domain, vtkInfo&& config) {
-    if(!config.save_file) return;
+    if(config.file_name.empty()) return;
 
     std::unordered_map<uword, vtkIdType> element_count;
 
@@ -284,7 +284,7 @@ void vtk_cell_per_material(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
 }
 
 void vtk_cell_per_section(const shared_ptr<DomainBase>& domain, vtkInfo&& config) {
-    if(!config.save_file) return;
+    if(config.file_name.empty()) return;
 
     std::unordered_map<uword, vtkIdType> element_count;
 
@@ -320,7 +320,7 @@ void vtk_cell_per_section(const shared_ptr<DomainBase>& domain, vtkInfo&& config
 }
 
 void vtl_cell_multiple_block(const shared_ptr<DomainBase>& domain, vtkInfo&& config) {
-    if(!config.save_file) return;
+    if(config.file_name.empty()) return;
 
     suanpan::unordered_map<uword, vtkBlock> blocks;
     suanpan::for_all(domain->get_element_pool(), [&](const shared_ptr<Element>& element) {
@@ -344,7 +344,7 @@ void vtl_cell_multiple_block(const shared_ptr<DomainBase>& domain, vtkInfo&& con
 void vtk_cell_plot(const shared_ptr<DomainBase>& domain, vtkInfo config) {
     decltype(&vtk_cell_single_block) handler;
 
-    if(config.multi_block) handler = vtl_cell_multiple_block;
+    if(config.per_element) handler = vtl_cell_multiple_block;
     else if(config.per_material) handler = vtk_cell_per_material;
     else if(config.per_section) handler = vtk_cell_per_section;
     else handler = vtk_cell_single_block;

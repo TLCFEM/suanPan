@@ -25,7 +25,6 @@ VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType 
     : Recorder(T, {}, L, I, false, false)
     , width(W) {
 #ifdef SUANPAN_VTK
-    config.save_file = true;
     config.display_type = get_variable_type();
     config.scale = S;
 #endif
