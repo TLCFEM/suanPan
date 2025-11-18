@@ -181,10 +181,12 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
     vtkNew<vtkUnstructuredGrid> grid;
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
     std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
-        const auto num_node = t_element->get_node_number();
         auto encoding = t_element->get_node_encoding();
         for(auto& I : encoding) I = node_map.at(I);
+        const auto cell = t_element->Setup(encoding);
+        if(!cell) return;
 
+        const auto num_node = t_element->get_node_number();
         const mat location = t_element->GetDeformation(config.scale).resize(3, num_node);
         const mat result = t_element->GetData(actual_type).resize(6, num_node);
         for(auto I = 0u; I < num_node; ++I) {
@@ -192,7 +194,7 @@ void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config
             data->SetTuple(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
         }
 
-        if(const auto cell = t_element->Setup(encoding); cell) grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+        grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
     });
 
     grid->SetPoints(node);
@@ -222,13 +224,10 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
     data->SetName(category.c_str());
     node->SetNumberOfPoints(max_node);
 
-    for(auto I = 0u; I < max_node; ++I) {
-        node->SetPoint(I, 0., 0., 0.);
-        data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
-    }
+    for(auto I = 0u; I < max_node; ++I) node->SetPoint(I, 0., 0., 0.);
 
     mat tensor(6, max_node, fill::zeros);
-    vec counter(max_node, fill::zeros);
+    u32_vec counter(max_node, fill::zeros);
 
     vtkNew<vtkUnstructuredGrid> grid;
     grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
@@ -236,22 +235,26 @@ void vtk_plot_element_quantity_single(const shared_ptr<DomainBase>& domain, vtkI
         if(-1 != config.material_type)
             if(auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) return;
 
-        const auto num_node = t_element->get_node_number();
         auto encoding = t_element->get_node_encoding();
         for(auto& I : encoding) I = node_map.at(I);
+        const auto cell = t_element->Setup(encoding);
+        if(!cell) return;
 
+        const auto num_node = t_element->get_node_number();
         const mat location = t_element->GetDeformation(config.scale).resize(3, num_node);
         for(auto I = 0u; I < num_node; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), location.colptr(I));
 
         if(auto result = t_element->GetData(actual_type); !result.empty()) {
             tensor.cols(encoding) += result.resize(6, num_node);
-            counter(encoding) += 1.;
+            counter(encoding) += 1u;
         }
-        if(const auto cell = t_element->Setup(encoding); cell) grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+
+        grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
     });
 
     for(auto I = 0u; I < max_node; ++I)
-        if(0. != counter(I)) {
+        if(counter(I) == 0u) data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
+        else {
             tensor.col(I) /= counter(I);
             data->SetTuple(I, tensor.colptr(I));
         }
