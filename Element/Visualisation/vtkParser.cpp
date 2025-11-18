@@ -156,7 +156,9 @@ class vtkBlock {
     const vtkNew<vtkPoints> node;
     const vtkNew<vtkUnstructuredGrid> grid;
 
+#ifdef SUANPAN_MT
     std::mutex mutex;
+#endif
 
     mat tensor;
     u32_vec counter;
@@ -190,7 +192,9 @@ public:
         const auto cell = element->Setup(encoding);
         if(!cell) return;
 
+#ifdef SUANPAN_MT
         const std::scoped_lock lock(mutex);
+#endif
 
         grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
 
