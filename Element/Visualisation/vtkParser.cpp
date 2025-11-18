@@ -231,11 +231,11 @@ void vtk_cell_single_block(const shared_ptr<DomainBase>& domain, vtkInfo&& confi
     vtkBlock block;
     block.init(static_cast<vtkIdType>(node_map.size()), static_cast<vtkIdType>(element_pool.size()), config.category.c_str());
 
-    std::ranges::for_each(element_pool, [&](const shared_ptr<Element>& t_element) {
-        auto encoding = t_element->get_node_encoding();
+    std::ranges::for_each(element_pool, [&](const shared_ptr<Element>& element) {
+        auto encoding = element->get_node_encoding();
         for(auto& I : encoding) I = node_map.at(I);
 
-        block.add(t_element, encoding, config);
+        block.add(element, encoding, config);
     });
 
     if(!config.save_file) vtk_setup(block.attach(), config);
