@@ -30,19 +30,18 @@ class vtkUnstructuredGrid;
 int vtk_parser(const shared_ptr<DomainBase>&, std::istringstream&);
 
 struct vtkInfo {
-    OutputType type = OutputType::U;
     bool color_bar = true;
     bool multi_block = true;
     bool save_file = false;
     double scale = 0.;
     int canvas_size[2] = {500, 500};
-    int material_type = -1;
+    OutputType record_type = OutputType::U;
+    OutputType display_type = OutputType::U;
+    std::string category;
     std::string file_name;
     std::string title_name;
     unsigned font_size = 8;
 };
-
-void vtk_point_plot(const shared_ptr<DomainBase>&, vtkInfo);
 
 void vtk_cell_plot(const shared_ptr<DomainBase>&, vtkInfo);
 

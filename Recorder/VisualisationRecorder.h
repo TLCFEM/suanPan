@@ -41,8 +41,6 @@ class VisualisationRecorder final : public Recorder {
 
 #ifdef SUANPAN_VTK
     vtkInfo config;
-
-    void (*function_handler)(const shared_ptr<DomainBase>&, vtkInfo) = nullptr;
 #endif
 
 public:

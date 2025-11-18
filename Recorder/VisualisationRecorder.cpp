@@ -26,12 +26,8 @@ VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType 
     , width(W) {
 #ifdef SUANPAN_VTK
     config.save_file = true;
-    config.type = get_variable_type();
+    config.display_type = get_variable_type();
     config.scale = S;
-
-    const auto P = to_token(to_category(config.type));
-
-    function_handler = OutputType::U == P || OutputType::V == P || OutputType::A == P || OutputType::RF == P || OutputType::DF == P || OutputType::IF == P ? vtk_point_plot : vtk_cell_plot;
 #endif
 }
 
@@ -49,7 +45,7 @@ void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>
 
     config.file_name = file_path.generic_string();
 
-    function_handler(D, config);
+    vtk_cell_plot(D, config);
 #endif
 }
 
