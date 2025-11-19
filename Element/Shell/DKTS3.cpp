@@ -293,6 +293,6 @@ mat DKTS3::GetData(const OutputType P) {
     return repmat(stats.mean(), 1, s_node);
 }
 
-mat DKTS3::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), s_dof, s_node).eval().head_rows(3); }
+mat DKTS3::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * get_current_displacement().reshape(s_dof, s_node).head_rows(3); }
 
 #endif

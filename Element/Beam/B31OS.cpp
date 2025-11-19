@@ -220,6 +220,6 @@ mat B31OS::GetData(const OutputType P) {
     return {};
 }
 
-mat B31OS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(3); }
+mat B31OS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * get_current_displacement().reshape(b_dof, b_node).head_rows(3); }
 
 #endif

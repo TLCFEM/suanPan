@@ -220,6 +220,6 @@ mat DKT4::GetData(const OutputType P) {
     return {};
 }
 
-mat DKT4::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * reshape(get_current_displacement(), p_dof, p_node).eval().row(0)); }
+mat DKT4::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * get_current_displacement().reshape(p_dof, p_node).row(0)); }
 
 #endif

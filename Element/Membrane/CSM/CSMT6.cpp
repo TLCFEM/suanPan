@@ -224,6 +224,6 @@ mat CSMT6::GetData(const OutputType P) {
     return {};
 }
 
-mat CSMT6::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2); }
+mat CSMT6::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * get_current_displacement().reshape(m_dof, m_node).head_rows(2); }
 
 #endif

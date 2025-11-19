@@ -376,6 +376,6 @@ mat SGCMS::GetData(const OutputType P) {
     return {};
 }
 
-mat SGCMS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), s_dof, s_node).eval().head_rows(3); }
+mat SGCMS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * get_current_displacement().reshape(s_dof, s_node).head_rows(3); }
 
 #endif
