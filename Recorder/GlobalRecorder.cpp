@@ -28,27 +28,27 @@ GlobalRecorder::GlobalRecorder(const unsigned T, const OutputType L, const unsig
 void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
     if(!if_perform_record()) return;
 
-    if(OutputType::KE == get_variable_type()) {
+    if(OutputType::KE == variable_type) {
         auto kinetic_energy = 0.;
         for(auto& I : D->get_pool<Element>()) kinetic_energy += I->get_kinetic_energy();
         insert({{kinetic_energy, D->get_factory()->get_kinetic_energy()}}, 0);
     }
-    else if(OutputType::VE == get_variable_type()) {
+    else if(OutputType::VE == variable_type) {
         auto viscous_energy = 0.;
         for(auto& I : D->get_pool<Element>()) viscous_energy += I->get_viscous_energy();
         insert({{viscous_energy, D->get_factory()->get_viscous_energy()}}, 0);
     }
-    else if(OutputType::NVE == get_variable_type()) {
+    else if(OutputType::NVE == variable_type) {
         auto nonviscous_energy = 0.;
         for(auto& I : D->get_pool<Element>()) nonviscous_energy += I->get_nonviscous_energy();
         insert({{nonviscous_energy, D->get_factory()->get_nonviscous_energy()}}, 0);
     }
-    else if(OutputType::SE == get_variable_type()) {
+    else if(OutputType::SE == variable_type) {
         auto strain_energy = 0.;
         for(auto& I : D->get_pool<Element>()) strain_energy += I->get_strain_energy();
         insert({{strain_energy, D->get_factory()->get_strain_energy()}}, 0);
     }
-    else if(OutputType::MM == get_variable_type()) {
+    else if(OutputType::MM == variable_type) {
         auto momentum = 0.;
         for(auto& I : D->get_pool<Element>()) momentum += accu(I->get_momentum());
         insert({{momentum, accu(D->get_factory()->get_momentum())}}, 0);

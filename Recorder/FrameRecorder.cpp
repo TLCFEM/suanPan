@@ -32,7 +32,7 @@ FrameRecorder::FrameRecorder(const unsigned T, const OutputType L, const unsigne
     : Recorder(T, {}, L, I, false, true) {
 #ifdef SUANPAN_HDF5
     std::ostringstream file_name;
-    file_name << 'R' << get_tag() << '-' << to_name(get_variable_type()) << ".h5";
+    file_name << 'R' << get_tag() << '-' << to_name(original_type) << ".h5";
     file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 #endif
 }
@@ -54,7 +54,7 @@ void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
     const auto group_id = H5Gcreate(file_id, group_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     for(const auto& I : D->get_element_pool()) {
-        if(const auto data = I->record(get_variable_type()); !data.empty()) {
+        if(const auto data = I->record(variable_type); !data.empty()) {
             mat data_to_write(data[0].n_elem, data.size());
 
             uword idx = 0;

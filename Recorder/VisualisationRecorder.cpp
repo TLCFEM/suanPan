@@ -36,7 +36,7 @@ void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>
 
     std::ostringstream file_name;
 
-    file_name << 'R' << get_tag() << '-' << to_name(get_variable_type()) << '-' << std::setw(static_cast<int>(width)) << std::setfill('0') << ++total_counter;
+    file_name << 'R' << get_tag() << '-' << to_name(original_type) << '-' << std::setw(static_cast<int>(width)) << std::setfill('0') << ++total_counter;
 
     fs::path file_path = SUANPAN_OUTPUT;
 

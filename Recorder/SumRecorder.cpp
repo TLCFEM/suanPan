@@ -39,7 +39,7 @@ void SumRecorder::record(const shared_ptr<DomainBase>& D) {
     for(const auto I : get_object_tag()) {
         const auto& t_node = D->get<Node>(I);
         if(!t_node->is_active()) continue;
-        for(const auto& t_data : t_node->record(get_variable_type()))
+        for(const auto& t_data : t_node->record(variable_type))
             data(t_data);
     }
     insert({data.mean() * data.count()}, 0);

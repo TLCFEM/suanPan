@@ -34,7 +34,6 @@ class DomainBase;
 
 class Recorder : public UniqueTag {
     uvec object_tag;
-    OutputType variable_type;
     std::vector<double> time_pool;                        // recorded data
     std::vector<std::vector<std::vector<vec>>> data_pool; // recorded data
 
@@ -42,8 +41,10 @@ class Recorder : public UniqueTag {
     const bool use_hdf5;
 
 protected:
+    const OutputType original_type, variable_type;
+    const unsigned component;
     const unsigned interval;
-    unsigned counter = 0;
+    unsigned counter = 0u;
 
     bool if_perform_record();
 
@@ -62,14 +63,11 @@ public:
     void set_object_tag(uvec&&);
     [[nodiscard]] const uvec& get_object_tag() const;
 
-    void set_variable_type(OutputType);
-    [[nodiscard]] OutputType get_variable_type() const;
-
     [[nodiscard]] bool if_hdf5() const;
     [[nodiscard]] bool if_record_time() const;
 
     void insert(double);
-    void insert(const std::vector<vec>&, unsigned);
+    void insert(std::vector<vec>&&, unsigned);
 
     [[nodiscard]] const std::vector<std::vector<std::vector<vec>>>& get_data_pool() const;
     [[nodiscard]] const std::vector<double>& get_time_pool() const;

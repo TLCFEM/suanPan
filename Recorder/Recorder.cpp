@@ -36,10 +36,12 @@ extern fs::path SUANPAN_OUTPUT;
 Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
     : UniqueTag(T)
     , object_tag(std::move(B))
-    , variable_type(to_token(to_category(L)))
     , data_pool(object_tag.n_elem)
     , record_time(R)
     , use_hdf5(H)
+    , original_type(L)
+    , variable_type(to_token(to_category(L)))
+    , component(to_index(L))
     , interval(I) {}
 
 void Recorder::initialize(const shared_ptr<DomainBase>&) {}
@@ -47,10 +49,6 @@ void Recorder::initialize(const shared_ptr<DomainBase>&) {}
 void Recorder::set_object_tag(uvec&& T) { object_tag = std::move(T); }
 
 const uvec& Recorder::get_object_tag() const { return object_tag; }
-
-void Recorder::set_variable_type(const OutputType T) { variable_type = T; }
-
-OutputType Recorder::get_variable_type() const { return variable_type; }
 
 bool Recorder::if_hdf5() const { return use_hdf5; }
 
@@ -60,7 +58,12 @@ bool Recorder::if_perform_record() { return 1 == interval || 0 == counter++ % in
 
 void Recorder::insert(const double T) { time_pool.emplace_back(T); }
 
-void Recorder::insert(const std::vector<vec>& D, const unsigned I) { data_pool[I].emplace_back(D); }
+void Recorder::insert(std::vector<vec>&& data, const unsigned index) {
+    if(0u != component)
+        for(auto& item : data) item = vec{item.n_elem > component ? item(component) : 0.};
+
+    data_pool[index].emplace_back(std::move(data));
+}
 
 const std::vector<std::vector<std::vector<vec>>>& Recorder::get_data_pool() const { return data_pool; }
 
@@ -78,7 +81,7 @@ void Recorder::save() {
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     // ReSharper disable once CppDFAUnreachableCode
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
-    file_name << 'R' << get_tag() << '-' << to_name(variable_type);
+    file_name << 'R' << get_tag() << '-' << to_name(original_type);
     const auto origin_name = file_name.str();
 
     unsigned idx = 0;
