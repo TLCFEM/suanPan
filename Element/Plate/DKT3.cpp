@@ -216,9 +216,15 @@ void DKT3::print() {
 vtkSmartPointer<vtkCell> DKT3::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
 
 mat DKT3::GetData(const OutputType P) {
-    if(OutputType::A == P) return reshape(get_current_acceleration(), p_dof, p_node);
-    if(OutputType::V == P) return reshape(get_current_velocity(), p_dof, p_node);
-    if(OutputType::U == P) return reshape(get_current_displacement(), p_dof, p_node);
+    const auto remap = [&](vec&& in) {
+        mat data(6, p_node, fill::zeros);
+        data.rows(2, 4) = in.reshape(p_dof, p_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
 
     running_stat_vec<vec> stats;
     for(const auto& I : int_pt)

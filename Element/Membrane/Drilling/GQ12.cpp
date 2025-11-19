@@ -190,9 +190,15 @@ void GQ12::print() {
 vtkSmartPointer<vtkCell> GQ12::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat GQ12::GetData(const OutputType P) {
-    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
-    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
-    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+    const auto remap = [&](vec&& in) {
+        mat data(6, m_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = in.reshape(m_dof, m_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
 
     mat A(int_pt.size(), 4);
     mat B(6, int_pt.size(), fill::zeros);

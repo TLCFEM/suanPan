@@ -180,9 +180,15 @@ void Allman::print() {
 vtkSmartPointer<vtkCell> Allman::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
 
 mat Allman::GetData(const OutputType P) {
-    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
-    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
-    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+    const auto remap = [&](vec&& in) {
+        mat data(6, m_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = in.reshape(m_dof, m_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
 
     return {};
 }

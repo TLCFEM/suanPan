@@ -86,9 +86,15 @@ void NMB21::print() {
 vtkSmartPointer<vtkCell> NMB21::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
 
 mat NMB21::GetData(const OutputType P) {
-    if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);
-    if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
-    if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
+    const auto remap = [&](vec&& in) {
+        mat data(6, b_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = in.reshape(b_dof, b_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
 
     mat data(6, b_node, fill::zeros);
     if(const auto t_data = b_section->record(P); !t_data.empty() && t_data[0].n_elem >= 3) {
