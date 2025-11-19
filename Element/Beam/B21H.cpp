@@ -152,7 +152,15 @@ mat B21H::GetData(const OutputType P) {
     if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
     if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
 
-    return {};
+    vec low, high;
+    if(const auto t_data = int_pt.front().b_section->record(P); !t_data.empty()) low = t_data[0];
+    if(const auto t_data = int_pt.back().b_section->record(P); !t_data.empty()) high = t_data[0];
+
+    mat data(6, b_node);
+    data.col(0) = low.resize(6);
+    data.col(1) = high.resize(6);
+
+    return data;
 }
 
 mat B21H::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2); }

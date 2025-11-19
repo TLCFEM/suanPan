@@ -130,7 +130,7 @@ int DC3D8::reset_status() {
 }
 
 std::vector<vec> DC3D8::record(const OutputType P) {
-    if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
+    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
@@ -158,7 +158,7 @@ mat DC3D8::GetData(const OutputType P) {
     if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 3, c_node), 6, c_node);
     if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 3, c_node), 6, c_node);
 
-    if(P == OutputType::DAMAGE) {
+    if(OutputType::DAMAGE == P) {
         mat t_damage(6, c_node, fill::zeros);
         t_damage.row(0) = get_current_displacement()(d_dof).t();
         return t_damage;

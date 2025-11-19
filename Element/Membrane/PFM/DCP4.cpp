@@ -155,7 +155,7 @@ int DCP4::reset_status() {
 }
 
 std::vector<vec> DCP4::record(const OutputType P) {
-    if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
+    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
@@ -184,7 +184,7 @@ mat DCP4::GetData(const OutputType P) {
     if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 2, m_node), 6, m_node);
     if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 2, m_node), 6, m_node);
 
-    if(P == OutputType::DAMAGE) {
+    if(OutputType::DAMAGE == P) {
         mat t_damage(6, m_node, fill::zeros);
         t_damage.row(0) = get_current_displacement()(d_dof).t();
         return t_damage;
