@@ -99,7 +99,7 @@ std::vector<vec> Stacked::record(const OutputType P) {
             data.emplace_back(J);
         }
 
-    for(auto&& I : data) I.resize(max_size);
+    for(auto& I : data) I.resize(max_size);
 
     return data;
 }

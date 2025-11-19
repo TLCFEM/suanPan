@@ -92,9 +92,14 @@ int Rebar3D::reset_status() {
 std::vector<vec> Rebar3D::record(const OutputType P) {
     std::vector<vec> data;
 
-    for(const auto& I : rebar_x->record(P)) data.emplace_back(I);
-    for(const auto& I : rebar_y->record(P)) data.emplace_back(I);
-    for(const auto& I : rebar_z->record(P)) data.emplace_back(I);
+    const auto append_to = [](std::vector<vec>& a, std::vector<vec>&& b) {
+        a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
+        return a;
+    };
+
+    append_to(data, rebar_x->record(P));
+    append_to(data, rebar_y->record(P));
+    append_to(data, rebar_z->record(P));
 
     return data;
 }

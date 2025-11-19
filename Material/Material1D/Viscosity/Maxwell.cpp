@@ -177,16 +177,15 @@ int Maxwell::reset_status() {
 }
 
 std::vector<vec> Maxwell::record(const OutputType P) {
-    if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) return {current_stress};
+    if(OutputType::SD == P || OutputType::SS == P) return {current_stress};
     if(OutputType::ED == P) return {damper->get_current_strain()};
     if(OutputType::VD == P) return {damper->get_current_strain_rate()};
     if(OutputType::ES == P) return {spring->get_current_strain()};
     if(OutputType::VS == P) return {current_strain_rate - damper->get_current_strain_rate()};
-    if(OutputType::E == P) return {current_strain};
     if(OutputType::V == P) return {current_strain_rate};
     if(OutputType::LITR == P) return {vec{static_cast<double>(counter)}};
 
-    return {};
+    return Material1D::record(P);
 }
 
 void Maxwell::print() {

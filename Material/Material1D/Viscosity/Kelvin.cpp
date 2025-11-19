@@ -93,8 +93,6 @@ int Kelvin::reset_status() {
 }
 
 std::vector<vec> Kelvin::record(const OutputType P) {
-    if(OutputType::S == P) return {current_stress};
-    if(OutputType::E == P) return {current_strain};
     if(OutputType::V == P) return {current_strain_rate};
     if(OutputType::SD == P) return {damper->get_current_stress()};
     if(OutputType::ED == P) return {damper->get_current_strain()};
@@ -103,7 +101,7 @@ std::vector<vec> Kelvin::record(const OutputType P) {
     if(OutputType::ES == P) return {spring->get_current_strain()};
     if(OutputType::VS == P) return {spring->get_current_strain_rate()};
 
-    return {};
+    return Material1D::record(P);
 }
 
 void Kelvin::print() {
