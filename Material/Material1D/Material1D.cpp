@@ -22,9 +22,11 @@
 Material1D::Material1D(const unsigned T, const double D)
     : Material(T, MaterialType::D1, D) { set_symmetric(true); }
 
-std::vector<vec> Material1D::record(const OutputType P) {
-    if(P == OutputType::S) return {current_stress};
-    if(P == OutputType::E) return {current_strain};
+std::vector<vec> Material1D::record(OutputType P) {
+    if(P == OutputType::SP) P = OutputType::S;
+    else if(P == OutputType::EP) P = OutputType::E;
+    else if(P == OutputType::EEP) P = OutputType::EE;
+    else if(P == OutputType::PEP) P = OutputType::PE;
 
     return Material::record(P);
 }

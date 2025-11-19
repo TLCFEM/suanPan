@@ -142,8 +142,8 @@ int Section::update_trial_status(const vec& t_deformation, const vec&) { return 
 std::vector<vec> Section::record(const OutputType P) {
     if(P == OutputType::E) return {current_deformation};
     if(P == OutputType::S) return {current_resistance};
-    if(P == OutputType::PE) return {current_deformation - solve(initial_stiffness, current_resistance)};
     if(P == OutputType::EE) return {solve(initial_stiffness, current_resistance)};
+    if(P == OutputType::PE) return {current_deformation - solve(initial_stiffness, current_resistance)};
 
     return {};
 }
