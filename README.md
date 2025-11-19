@@ -7,7 +7,7 @@
 [![Release](https://img.shields.io/github/release-pre/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/releases)
 [![Snap Store](https://snapcraft.io//suanpan/badge.svg)](https://snapcraft.io/suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/v/suanpan?color=44cc11)](https://chocolatey.org/packages/suanpan)
-![Scoop Version](https://img.shields.io/scoop/v/suanpan?color=44cc11)
+[![Scoop Version](https://img.shields.io/scoop/v/suanpan?color=44cc11)](https://scoop.sh/#/apps?q=suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/dt/suanpan?color=44cc11&label=choco%20install)](https://chocolatey.org/packages/suanpan)
 [![Flathub](https://img.shields.io/flathub/downloads/io.github.tlcfem.suanPan?label=flathub%20install)](https://flathub.org/apps/io.github.tlcfem.suanPan)
 [![GitHub Download](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11&label=github%20download)](https://github.com/TLCFEM/suanPan/releases)
