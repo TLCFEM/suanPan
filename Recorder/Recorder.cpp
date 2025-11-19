@@ -59,8 +59,10 @@ bool Recorder::if_perform_record() { return 1 == interval || 0 == counter++ % in
 void Recorder::insert(const double T) { time_pool.emplace_back(T); }
 
 void Recorder::insert(std::vector<vec>&& data, const unsigned index) {
-    if(0u != component)
-        for(auto& item : data) item = vec{item.n_elem > component ? item(component) : 0.};
+    if(component >= 0) {
+        const auto select = static_cast<uword>(component);
+        for(auto& item : data) item = vec{item.n_elem > select ? item(select) : 0.};
+    }
 
     data_pool[index].emplace_back(std::move(data));
 }

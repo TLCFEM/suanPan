@@ -154,7 +154,7 @@ int to_index(const OutputType config) {
     if(config == OutputType::GIM2) return 4;
     if(config == OutputType::GIM3) return 5;
 
-    return 0;
+    return -1;
 }
 
 std::string to_category(const OutputType L) {

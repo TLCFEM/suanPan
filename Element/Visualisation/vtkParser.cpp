@@ -96,7 +96,7 @@ void vtk_setup(vtkUnstructuredGrid* grid, const vtkInfo& config) {
     }
 
     const auto scalar = grid->GetPointData()->GetScalars();
-    const auto index = std::min(to_index(config.display_type), scalar->GetNumberOfComponents() - 1);
+    const auto index = std::max(0, std::min(to_index(config.display_type), scalar->GetNumberOfComponents() - 1));
 
     mapper->SetInputDataObject(grid);
     mapper->SelectColorArray(scalar->GetName());

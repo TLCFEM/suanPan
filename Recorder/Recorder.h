@@ -42,7 +42,7 @@ class Recorder : public UniqueTag {
 
 protected:
     const OutputType original_type, variable_type;
-    const unsigned component;
+    const int component;
     const unsigned interval;
     unsigned counter = 0u;
 
