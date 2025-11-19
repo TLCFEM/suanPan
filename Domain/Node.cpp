@@ -530,55 +530,14 @@ void Node::clear_status() {
 std::vector<vec> Node::record(const OutputType L) const {
     std::vector<vec> data;
 
-    const auto ensure_rf = [&](const uword n) { return vec{current_resistance.n_elem > n ? current_resistance(n) : 0.}; };
-    const auto ensure_df = [&](const uword n) { return vec{current_damping_force.n_elem > n ? current_damping_force(n) : 0.}; };
-    const auto ensure_if = [&](const uword n) { return vec{current_inertial_force.n_elem > n ? current_inertial_force(n) : 0.}; };
-    const auto ensure_u = [&](const uword n) { return vec{current_displacement.n_elem > n ? current_displacement(n) : 0.}; };
-    const auto ensure_v = [&](const uword n) { return vec{current_velocity.n_elem > n ? current_velocity(n) : 0.}; };
-    const auto ensure_a = [&](const uword n) { return vec{current_acceleration.n_elem > n ? current_acceleration(n) : 0.}; };
+    const auto ensure = [&](const vec& in) { return in.empty() ? zeros(num_dof) : in; };
 
-    if(L == OutputType::RF) data.push_back(current_resistance.empty() ? zeros(num_dof) : current_resistance);
-    else if(L == OutputType::DF) data.push_back(current_damping_force.empty() ? zeros(num_dof) : current_damping_force);
-    else if(L == OutputType::IF) data.push_back(current_inertial_force.empty() ? zeros(num_dof) : current_inertial_force);
-    else if(L == OutputType::U) data.push_back(current_displacement);
-    else if(L == OutputType::V) data.push_back(current_velocity);
-    else if(L == OutputType::A) data.push_back(current_acceleration);
-    else if(L == OutputType::RF1) data.emplace_back(ensure_rf(0));
-    else if(L == OutputType::RF2) data.emplace_back(ensure_rf(1));
-    else if(L == OutputType::RF3) data.emplace_back(ensure_rf(2));
-    else if(L == OutputType::RF4 || L == OutputType::RM1) data.emplace_back(ensure_rf(3));
-    else if(L == OutputType::RF5 || L == OutputType::RM2) data.emplace_back(ensure_rf(4));
-    else if(L == OutputType::RF6 || L == OutputType::RM3) data.emplace_back(ensure_rf(5));
-    else if(L == OutputType::DF1) data.emplace_back(ensure_df(0));
-    else if(L == OutputType::DF2) data.emplace_back(ensure_df(1));
-    else if(L == OutputType::DF3) data.emplace_back(ensure_df(2));
-    else if(L == OutputType::DF4 || L == OutputType::DM1) data.emplace_back(ensure_df(3));
-    else if(L == OutputType::DF5 || L == OutputType::DM2) data.emplace_back(ensure_df(4));
-    else if(L == OutputType::DF6 || L == OutputType::DM3) data.emplace_back(ensure_df(5));
-    else if(L == OutputType::IF1) data.emplace_back(ensure_if(0));
-    else if(L == OutputType::IF2) data.emplace_back(ensure_if(1));
-    else if(L == OutputType::IF3) data.emplace_back(ensure_if(2));
-    else if(L == OutputType::IF4 || L == OutputType::IM1) data.emplace_back(ensure_if(3));
-    else if(L == OutputType::IF5 || L == OutputType::IM2) data.emplace_back(ensure_if(4));
-    else if(L == OutputType::IF6 || L == OutputType::IM3) data.emplace_back(ensure_if(5));
-    else if(L == OutputType::U1) data.emplace_back(ensure_u(0));
-    else if(L == OutputType::U2) data.emplace_back(ensure_u(1));
-    else if(L == OutputType::U3) data.emplace_back(ensure_u(2));
-    else if(L == OutputType::U4 || L == OutputType::UR1) data.emplace_back(ensure_u(3));
-    else if(L == OutputType::U5 || L == OutputType::UR2) data.emplace_back(ensure_u(4));
-    else if(L == OutputType::U6 || L == OutputType::UR3) data.emplace_back(ensure_u(5));
-    else if(L == OutputType::V1) data.emplace_back(ensure_v(0));
-    else if(L == OutputType::V2) data.emplace_back(ensure_v(1));
-    else if(L == OutputType::V3) data.emplace_back(ensure_v(2));
-    else if(L == OutputType::V4 || L == OutputType::VR1) data.emplace_back(ensure_v(3));
-    else if(L == OutputType::V5 || L == OutputType::VR2) data.emplace_back(ensure_v(4));
-    else if(L == OutputType::V6 || L == OutputType::VR3) data.emplace_back(ensure_v(5));
-    else if(L == OutputType::A1) data.emplace_back(ensure_a(0));
-    else if(L == OutputType::A2) data.emplace_back(ensure_a(1));
-    else if(L == OutputType::A3) data.emplace_back(ensure_a(2));
-    else if(L == OutputType::A4 || L == OutputType::AR1) data.emplace_back(ensure_a(3));
-    else if(L == OutputType::A5 || L == OutputType::AR2) data.emplace_back(ensure_a(4));
-    else if(L == OutputType::A6 || L == OutputType::AR3) data.emplace_back(ensure_a(5));
+    if(L == OutputType::RF) data.emplace_back(ensure(current_resistance));
+    else if(L == OutputType::DF) data.emplace_back(ensure(current_damping_force));
+    else if(L == OutputType::IF) data.emplace_back(ensure(current_inertial_force));
+    else if(L == OutputType::U) data.emplace_back(ensure(current_displacement));
+    else if(L == OutputType::V) data.emplace_back(ensure(current_velocity));
+    else if(L == OutputType::A) data.emplace_back(ensure(current_acceleration));
 
     return data;
 }

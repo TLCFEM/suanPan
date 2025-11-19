@@ -35,17 +35,14 @@ void SumRecorder::initialize(const shared_ptr<DomainBase>& D) {
 void SumRecorder::record(const shared_ptr<DomainBase>& D) {
     if(!if_perform_record()) return;
 
-    auto data = 0.;
+    running_stat_vec<vec> data;
     for(const auto I : get_object_tag()) {
         const auto& t_node = D->get<Node>(I);
         if(!t_node->is_active()) continue;
-        const auto t_data = t_node->record(get_variable_type());
-        if(t_data.empty()) continue;
-        const auto& n_data = t_data[0];
-        if(n_data.empty()) continue;
-        data += as_scalar(n_data);
+        for(const auto& t_data : t_node->record(get_variable_type()))
+            data(t_data);
     }
-    insert({{data}}, 0);
+    insert({data.mean() * data.count()}, 0);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());
 }

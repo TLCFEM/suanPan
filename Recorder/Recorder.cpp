@@ -36,7 +36,7 @@ extern fs::path SUANPAN_OUTPUT;
 Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
     : UniqueTag(T)
     , object_tag(std::move(B))
-    , variable_type(L)
+    , variable_type(to_token(to_category(L)))
     , data_pool(object_tag.n_elem)
     , record_time(R)
     , use_hdf5(H)
@@ -50,7 +50,7 @@ const uvec& Recorder::get_object_tag() const { return object_tag; }
 
 void Recorder::set_variable_type(const OutputType T) { variable_type = T; }
 
-const OutputType& Recorder::get_variable_type() const { return variable_type; }
+OutputType Recorder::get_variable_type() const { return variable_type; }
 
 bool Recorder::if_hdf5() const { return use_hdf5; }
 

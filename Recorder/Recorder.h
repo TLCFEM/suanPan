@@ -63,7 +63,7 @@ public:
     [[nodiscard]] const uvec& get_object_tag() const;
 
     void set_variable_type(OutputType);
-    [[nodiscard]] const OutputType& get_variable_type() const;
+    [[nodiscard]] OutputType get_variable_type() const;
 
     [[nodiscard]] bool if_hdf5() const;
     [[nodiscard]] bool if_record_time() const;
