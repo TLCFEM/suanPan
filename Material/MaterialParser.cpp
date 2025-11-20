@@ -330,7 +330,6 @@ namespace {
             else if(is_equal("-ac", token)) populate(bac);
             else if(is_equal("-na", token)) populate(bna);
             else if(is_equal("-nd", token)) populate(bnd);
-            else if(is_equal("-nd", token)) populate(bnd);
             else if(is_equal("-memory", token) && get_input(command, token)) {
                 if(is_equal("minimum", token)) memory_type = DataBalloon1D::MemoryType::MINIMUM;
                 else if(is_equal("maximum", token)) memory_type = DataBalloon1D::MemoryType::MAXIMUM;
@@ -1008,9 +1007,7 @@ namespace {
             return;
         }
 
-        const auto para = get_remaining<double>(command);
-
-        if(para.size() == 8) return_obj = std::make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], 0.);
+        if(const auto para = get_remaining<double>(command); para.size() == 8) return_obj = std::make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], 0.);
         else if(para.size() == 9) return_obj = std::make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
         else
             suanpan_error("Eight or nine double inputs are required.\n");
@@ -1023,9 +1020,7 @@ namespace {
             return;
         }
 
-        const auto para = get_remaining<double>(command);
-
-        if(para.size() == 10) return_obj = std::make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], 0.);
+        if(const auto para = get_remaining<double>(command); para.size() == 10) return_obj = std::make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], 0.);
         else if(para.size() == 11) return_obj = std::make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10]);
         else
             suanpan_error("Ten or eleven double inputs are required.\n");
@@ -1223,9 +1218,7 @@ namespace {
             return;
         }
 
-        const auto para = get_remaining<double>(command);
-
-        if(para.size() == 8) return_obj = std::make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
+        if(const auto para = get_remaining<double>(command); para.size() == 8) return_obj = std::make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
         else if(para.size() == 9) return_obj = std::make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
         else
             suanpan_error("Eight or nine double inputs are required.\n");
@@ -2508,13 +2501,13 @@ namespace {
 
         const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
-        auto m_imag = vec{m_i}, s_imag = vec{s_i};
+        const vec m_imag{m_i}, s_imag{s_i};
         if(accu(m_imag) + accu(s_imag) > 1E-10) {
             suanpan_error("Parameters should be conjugate pairs.\n");
             return;
         }
 
-        auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+        cx_vec m{vec{m_r}, m_imag}, s{vec{s_r}, s_imag};
 
         if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
             suanpan_error("The provided kernel does not converge to zero.\n");
