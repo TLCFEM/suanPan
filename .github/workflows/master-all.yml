@@ -141,7 +141,7 @@ jobs:
           mkdir build && cd build
           source /opt/intel/oneapi/setvars.sh
           cmake \
-          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_64BIT_INDEXING=ON \

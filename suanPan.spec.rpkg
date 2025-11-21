@@ -1,5 +1,5 @@
 Name:           {{{ git_dir_name }}}
-Version:        latest
+Version:        3.9.5
 Release:        %autorelease
 Summary:        An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
 License:        GPL-3.0+
