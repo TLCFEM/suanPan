@@ -55,6 +55,7 @@ option(SP_ENABLE_AVX "Build with AVX support, has no effect on ARM." OFF)
 option(SP_ENABLE_AVX2 "Build with AVX2 support, has no effect on ARM." ON)
 option(SP_ENABLE_AVX512 "Build with AVX512 support, has no effect on ARM." OFF)
 option(SP_ENABLE_HDF5 "Build with HDF5 format support." ON)
+option(SP_ENABLE_LTO "Enable link-time optimisation." OFF)
 if (SP_AMD64)
     option(SP_ENABLE_MKL "Build with Intel MKL instead of the bundled OpenBLAS." OFF)
 endif ()
@@ -442,7 +443,7 @@ add_executable(${PROJECT_NAME}
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
 
-if (NOT MINGW AND CMAKE_BUILD_TYPE MATCHES "Release")
+if ((NOT MINGW AND CMAKE_BUILD_TYPE STREQUAL "Release") OR SP_ENABLE_LTO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT SP_LTO_RESULT OUTPUT SP_LTO_OUTPUT)
     if (SP_LTO_RESULT)
