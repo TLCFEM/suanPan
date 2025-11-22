@@ -76,10 +76,7 @@ void Element::update_momentum() {
 mat Element::get_coordinate(const unsigned num_dim) const {
     mat ele_coor(num_node, num_dim, fill::zeros);
 
-    for(unsigned I = 0; I < num_node; ++I) {
-        auto& t_coor = node_ptr[I].lock()->get_coordinate();
-        for(uword J = 0; J < std::min(static_cast<uword>(num_dim), t_coor.n_elem); ++J) ele_coor(I, J) = t_coor(J);
-    }
+    for(auto I = 0u; I < num_node; ++I) ele_coor.row(I) = vec(node_ptr[I].lock()->get_coordinate()).resize(num_dim).t();
 
     return ele_coor;
 }
