@@ -37,8 +37,6 @@ class ParticleCollision3D final : public ParticleCollision {
         unsigned tag = 0;
     };
 
-    std::vector<CellList> list;
-
     const double space = 1.;
     const double alpha = 1.;
 

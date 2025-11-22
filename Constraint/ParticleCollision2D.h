@@ -37,8 +37,6 @@ class ParticleCollision2D : public ParticleCollision {
         unsigned tag = 0;
     };
 
-    std::vector<CellList> list;
-
     [[nodiscard]] double compute_f(double) const override;
     [[nodiscard]] double compute_df(double) const override;
 

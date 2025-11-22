@@ -32,7 +32,7 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
 
     const auto node_size = node_pool.size();
 
-    list = std::vector<CellList>(node_size);
+    std::vector<CellList> list(node_size);
 
     suanpan::for_each(node_size, [&](const size_t I) {
         const auto& t_node = node_pool[I];
