@@ -191,7 +191,7 @@ Flatpak is also available if preferred.
 The `beta` channel is in sync with the `dev` branch.
 The `stable` channel is in sync with the `master` branch.
 
-<a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
+<a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/api/badge?svg&locale=en'/></a>
 
 ```bash
 # add repo
