@@ -40,6 +40,8 @@ class ParticleCollision2D : public ParticleCollision {
     [[nodiscard]] double compute_f(double) const override;
     [[nodiscard]] double compute_df(double) const override;
 
+    [[nodiscard]] vec get_position(const shared_ptr<Node>&) const override;
+
     int process_meta(const shared_ptr<DomainBase>&, bool) override;
 
 protected:

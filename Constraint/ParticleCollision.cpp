@@ -19,13 +19,7 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/NodeHelper.hpp>
-
-vec ParticleCollision::get_position(const shared_ptr<Node>& node) const {
-    if(2 == num_dof) return get_trial_position<DOF::U1, DOF::U2>(node);
-
-    return get_trial_position<DOF::U1, DOF::U2, DOF::U3>(node);
-}
+#include <Domain/Node.h>
 
 ParticleCollision::ParticleCollision(const unsigned T, const unsigned D)
     : Constraint(T, 0, {}, {}, 0)

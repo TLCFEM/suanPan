@@ -19,11 +19,13 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
+#include <Domain/NodeHelper.hpp>
 
 double ParticleCollision3D::compute_f(const double distance) const { return distance >= space ? 0. : -alpha * log(distance / space); }
 
 double ParticleCollision3D::compute_df(const double distance) const { return distance >= space ? 0. : -alpha / distance; }
+
+vec ParticleCollision3D::get_position(const shared_ptr<Node>& node) const { return get_trial_position<DOF::U1, DOF::U2, DOF::U3>(node); }
 
 ParticleCollision3D::ParticleCollision3D(const unsigned T, const double G, const double A)
     : ParticleCollision(T, 3)

@@ -50,7 +50,7 @@ class ParticleCollision : public Constraint {
     [[nodiscard]] virtual double compute_df(double) const = 0;
 
 protected:
-    [[nodiscard]] vec get_position(const shared_ptr<Node>&) const;
+    [[nodiscard]] virtual vec get_position(const shared_ptr<Node>&) const = 0;
 
     void apply_contact(const shared_ptr<DomainBase>&, const shared_ptr<Node>&, const shared_ptr<Node>&, bool);
 

@@ -19,11 +19,13 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
+#include <Domain/NodeHelper.hpp>
 
 double ParticleCollision2D::compute_f(const double distance) const { return distance >= space ? 0. : -alpha * log(distance / space); }
 
 double ParticleCollision2D::compute_df(const double distance) const { return distance >= space ? 0. : -alpha / distance; }
+
+vec ParticleCollision2D::get_position(const shared_ptr<Node>& node) const { return get_trial_position<DOF::U1, DOF::U2>(node); }
 
 int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const bool full) {
     auto& W = D->get_factory();
