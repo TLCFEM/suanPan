@@ -36,7 +36,7 @@ CP6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
 }
 
 CP6::CP6(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const bool R)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
 int CP6::initialize(const shared_ptr<DomainBase>& D) {

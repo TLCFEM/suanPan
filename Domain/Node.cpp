@@ -21,35 +21,9 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/utility.h>
 
-Node::Node(const unsigned T)
-    : UniqueTag(T) {}
-
 Node::Node(const unsigned T, vec&& C)
     : UniqueTag(T) {
     num_dof = static_cast<unsigned>(C.n_elem);
-    coordinate = std::move(C);
-}
-
-/**
- * \brief initialize `num_dof` and set the size of `coordinate` to `num_dof`.
- * \param T `unique_tag`
- * \param D `num_dof`
- */
-Node::Node(const unsigned T, const unsigned D)
-    : UniqueTag(T) {
-    num_dof = D;
-    coordinate.zeros(D);
-}
-
-/**
- * \brief initialize `num_dof` and `coordinate`.
- * \param T `unique_tag`
- * \param D `num_dof`
- * \param C `coordinate`
- */
-Node::Node(const unsigned T, const unsigned D, vec&& C)
-    : UniqueTag(T) {
-    num_dof = D;
     coordinate = std::move(C);
 }
 
@@ -115,7 +89,7 @@ void Node::set_dof_identifier(const std::vector<DOF>& D) {
     }
 }
 
-const std::vector<DOF>& Node::get_dof_identifier() const { return dof_identifier; }
+const std::vector<Node::DOF>& Node::get_dof_identifier() const { return dof_identifier; }
 
 void Node::set_original_dof(unsigned& F) {
     if(!is_active()) return;

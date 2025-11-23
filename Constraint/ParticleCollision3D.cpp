@@ -25,7 +25,7 @@ double ParticleCollision3D::compute_f(const double distance) const { return dist
 
 double ParticleCollision3D::compute_df(const double distance) const { return distance >= space ? 0. : -alpha / distance; }
 
-vec ParticleCollision3D::get_position(const shared_ptr<Node>& node) const { return get_trial_position<DOF::U1, DOF::U2, DOF::U3>(node); }
+vec ParticleCollision3D::get_position(const shared_ptr<Node>& node) const { return get_trial_position<Node::DOF::U1, Node::DOF::U2, Node::DOF::U3>(node); }
 
 ParticleCollision3D::ParticleCollision3D(const unsigned T, const double G, const double A)
     : ParticleCollision(T, 3)

@@ -43,31 +43,8 @@
 class DomainBase;
 enum class OutputType;
 
-enum class DOF : std::uint8_t {
-    NONE,
-    U1,
-    // displacement in x direction
-    U2,
-    // displacement in y direction
-    U3,
-    // displacement in z direction
-    UR1,
-    // rotation in x direction
-    UR2,
-    // rotation in y direction
-    UR3,
-    // rotation in z direction
-    DMG,
-    // damage
-    P,
-    // pressure
-    T,
-    // temperature
-    WARP // warping
-};
-
 struct NodeData {
-    unsigned num_dof = 0; // number of DoFs
+    unsigned num_dof{0u}; // number of DoFs
 
     vec coordinate; // coordinates of the node
 
@@ -100,6 +77,31 @@ struct NodeData {
 };
 
 class Node final : protected NodeData, public UniqueTag {
+public:
+    enum class DOF : std::uint8_t {
+        NONE,
+        U1,
+        // displacement in x direction
+        U2,
+        // displacement in y direction
+        U3,
+        // displacement in z direction
+        UR1,
+        // rotation in x direction
+        UR2,
+        // rotation in y direction
+        UR3,
+        // rotation in z direction
+        DMG,
+        // damage
+        P,
+        // pressure
+        T,
+        // temperature
+        WARP // warping
+    };
+
+private:
     bool initialized = false;
 
     std::mutex node_mutex;
@@ -107,10 +109,7 @@ class Node final : protected NodeData, public UniqueTag {
     std::vector<DOF> dof_identifier;
 
 public:
-    explicit Node(unsigned = 0);
     Node(unsigned, vec&&);
-    Node(unsigned, unsigned);
-    Node(unsigned, unsigned, vec&&);
 
     void initialize(const shared_ptr<DomainBase>&);
 

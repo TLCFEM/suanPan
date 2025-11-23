@@ -241,7 +241,7 @@ void CP4I::stack_stiffness_incompatible(mat& K, const mat& D, const mat& N, cons
 }
 
 CP4I::CP4I(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
 int CP4I::initialize(const shared_ptr<DomainBase>& D) {

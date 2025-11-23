@@ -128,7 +128,7 @@ class Element : protected DataElement, public ElementBase, public Distributed {
     const MaterialType material_type;
     const SectionType section_type;
 
-    const std::vector<DOF> dof_identifier;
+    const std::vector<Node::DOF> dof_identifier;
 
     std::vector<MappingDOF> dof_mapping;
 
@@ -158,31 +158,31 @@ protected:
 
 public:
     Element(
-        unsigned,          // tag
-        unsigned,          // number of nodes
-        unsigned,          // number of dofs
-        uvec&&,            // node encoding
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        unsigned,                // number of nodes
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        std::vector<Node::DOF>&& // dof identifier
     );
     Element(
-        unsigned,          // tag
-        unsigned,          // number of nodes
-        unsigned,          // number of dofs
-        uvec&&,            // node encoding
-        uvec&&,            // material tags
-        bool,              // nonlinear geometry switch
-        MaterialType,      // material type for internal check
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        unsigned,                // number of nodes
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        uvec&&,                  // material tags
+        bool,                    // nonlinear geometry switch
+        MaterialType,            // material type for internal check
+        std::vector<Node::DOF>&& // dof identifier
     );
     Element(
-        unsigned,          // tag
-        unsigned,          // number of nodes
-        unsigned,          // number of dofs
-        uvec&&,            // node encoding
-        uvec&&,            // section tags
-        bool,              // nonlinear geometry switch
-        SectionType,       // section type for internal check
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        unsigned,                // number of nodes
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        uvec&&,                  // section tags
+        bool,                    // nonlinear geometry switch
+        SectionType,             // section type for internal check
+        std::vector<Node::DOF>&& // dof identifier
     );
     Element(
         unsigned, // tag

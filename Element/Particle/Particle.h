@@ -35,9 +35,9 @@
 class Particle : public Element {
 public:
     Particle(
-        unsigned,          // tag
-        unsigned,          // node tag
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        unsigned,                // node tag
+        std::vector<Node::DOF>&& // dof identifier
     );
 
     [[nodiscard]] Type type() const final { return Type::DEM; }
@@ -55,14 +55,14 @@ protected:
 
 public:
     SphericalParticle(
-        unsigned,           // tag
-        unsigned,           // node tag
-        std::vector<DOF>&&, // dof identifier
-        double,             // radius
-        double,             // elastic modulus
-        double,             // poisson ratio
-        double,             // mass
-        double              // inertia
+        unsigned,                 // tag
+        unsigned,                 // node tag
+        std::vector<Node::DOF>&&, // dof identifier
+        double,                   // radius
+        double,                   // elastic modulus
+        double,                   // poisson ratio
+        double,                   // mass
+        double                    // inertia
     );
 
     [[nodiscard]] double get(Parameter) const final;

@@ -17,10 +17,10 @@
 
 #include "Particle.h"
 
-Particle::Particle(const unsigned T, const unsigned N, std::vector<DOF>&& D)
+Particle::Particle(const unsigned T, const unsigned N, std::vector<Node::DOF>&& D)
     : Element(T, 1, D.size(), uvec{N}, std::move(D)) {}
 
-SphericalParticle::SphericalParticle(const unsigned T, const unsigned N, std::vector<DOF>&& D, const double R, const double E, const double V, const double M, const double I)
+SphericalParticle::SphericalParticle(const unsigned T, const unsigned N, std::vector<Node::DOF>&& D, const double R, const double E, const double V, const double M, const double I)
     : Particle(T, N, std::move(D))
     , radius(R)
     , elastic_modulus(E)
@@ -39,7 +39,7 @@ double SphericalParticle::get(const Parameter P) const {
 }
 
 InertialSphericalParticle2D::InertialSphericalParticle2D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double M, const double I)
-    : SphericalParticle(T, N, {DOF::U1, DOF::U2, DOF::UR3}, R, E, V, M, I) {}
+    : SphericalParticle(T, N, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3}, R, E, V, M, I) {}
 
 int InertialSphericalParticle2D::initialize(const shared_ptr<DomainBase>&) {
     initial_mass = diagmat(vec{mass, mass, inertia});
@@ -50,7 +50,7 @@ int InertialSphericalParticle2D::initialize(const shared_ptr<DomainBase>&) {
 }
 
 SphericalParticle2D::SphericalParticle2D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double M)
-    : SphericalParticle(T, N, {DOF::U1, DOF::U2}, R, E, V, M, 0.) {}
+    : SphericalParticle(T, N, {Node::DOF::U1, Node::DOF::U2}, R, E, V, M, 0.) {}
 
 int SphericalParticle2D::initialize(const shared_ptr<DomainBase>&) {
     initial_mass = diagmat(vec{mass, mass});

@@ -21,7 +21,7 @@
 #include <Material/Material1D/Material1D.h>
 
 T2D2::T2D2(const unsigned T, uvec&& N, const unsigned M, const double A, const bool F, const bool UA, const bool LS, const double FR)
-    : MaterialElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2})
+    : MaterialElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {Node::DOF::U1, Node::DOF::U2})
     , area(A)
     , rigidity(FR)
     , t_trans(F ? std::make_unique<T2DC>() : std::make_unique<T2DL>())

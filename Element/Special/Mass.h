@@ -60,9 +60,9 @@
 class MassBase : public Element {
 public:
     MassBase(
-        unsigned,          // tag
-        uvec&&,            // node encoding
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        uvec&&,                  // node encoding
+        std::vector<Node::DOF>&& // dof identifier
     );
 
     int update_status() override;

@@ -27,7 +27,7 @@ std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
     std::vector<vec> position;
     position.reserve(node_encoding.n_elem);
 
-    for(const auto I : node_encoding) position.emplace_back(get_trial_position<DOF::U1, DOF::U2>(D->get<Node>(I)));
+    for(const auto I : node_encoding) position.emplace_back(get_trial_position<Node::DOF::U1, Node::DOF::U2>(D->get<Node>(I)));
 
     return position;
 }

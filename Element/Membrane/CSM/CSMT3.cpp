@@ -30,7 +30,7 @@ CSMT3::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr
     , m_material(std::move(M)) {}
 
 CSMT3::CSMT3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMT3::initialize(const shared_ptr<DomainBase>& D) {

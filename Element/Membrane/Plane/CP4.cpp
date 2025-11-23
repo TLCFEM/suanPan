@@ -208,7 +208,7 @@ void CP4::stack_stiffness(mat& K, const mat& D, const sp_mat& N, const double F)
 }
 
 CP4::CP4(const unsigned T, uvec&& N, const unsigned M, const double TH, const double HM, const bool R, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH)
     , penalty(std::fabs(HM))
     , reduced_scheme(R) {}

@@ -154,10 +154,10 @@ std::vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBas
     return section_pool;
 }
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<Node::DOF>&& DI)
     : Element(T, NN, ND, std::move(NT), {}, false, MaterialType::D0, std::move(DI)) {}
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<DOF>&& DI)
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<Node::DOF>&& DI)
     : DataElement{std::move(NT), std::move(MT), uvec{}, F}
     , ElementBase(T)
     , Distributed(static_cast<int>(T))
@@ -169,7 +169,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
 }
 
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<Node::DOF>&& DI)
     : DataElement{std::move(NT), uvec{}, std::move(ST), F}
     , ElementBase(T)
     , Distributed(static_cast<int>(T))

@@ -17,7 +17,7 @@
 
 #include "Mass.h"
 
-MassBase::MassBase(const unsigned T, uvec&& NT, std::vector<DOF>&& DI)
+MassBase::MassBase(const unsigned T, uvec&& NT, std::vector<Node::DOF>&& DI)
     : Element(T, static_cast<unsigned>(NT.size()), static_cast<unsigned>(DI.size()), std::move(NT), std::move(DI)) { modify_mass = false; }
 
 int MassBase::update_status() { return SUANPAN_SUCCESS; }
@@ -49,12 +49,12 @@ mat MassBase::GetData(const OutputType P) {
 
 Mass2D::Mass2D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     : MassBase(T, uvec{NT}, [&] {
-        std::vector DI(std::min(3llu, DT.max()), DOF::NONE);
+        std::vector DI(std::min(3llu, DT.max()), Node::DOF::NONE);
 
         for(const auto I : DT)
-            if(1 == I) DI[0] = DOF::U1;
-            else if(2 == I) DI[1] = DOF::U2;
-            else if(3 == I) DI[2] = DOF::UR3;
+            if(1 == I) DI[0] = Node::DOF::U1;
+            else if(2 == I) DI[1] = Node::DOF::U2;
+            else if(3 == I) DI[2] = Node::DOF::UR3;
 
         return DI;
     }())
@@ -73,15 +73,15 @@ int Mass2D::initialize(const shared_ptr<DomainBase>&) {
 
 Mass3D::Mass3D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     : MassBase(T, uvec{NT}, [&] {
-        std::vector DI(std::min(6llu, DT.max()), DOF::NONE);
+        std::vector DI(std::min(6llu, DT.max()), Node::DOF::NONE);
 
         for(const auto I : DT)
-            if(1 == I) DI[0] = DOF::U1;
-            else if(2 == I) DI[1] = DOF::U2;
-            else if(3 == I) DI[2] = DOF::U3;
-            else if(4 == I) DI[3] = DOF::UR1;
-            else if(5 == I) DI[4] = DOF::UR2;
-            else if(6 == I) DI[5] = DOF::UR3;
+            if(1 == I) DI[0] = Node::DOF::U1;
+            else if(2 == I) DI[1] = Node::DOF::U2;
+            else if(3 == I) DI[2] = Node::DOF::U3;
+            else if(4 == I) DI[3] = Node::DOF::UR1;
+            else if(5 == I) DI[4] = Node::DOF::UR2;
+            else if(6 == I) DI[5] = Node::DOF::UR3;
 
         return DI;
     }())
@@ -99,12 +99,12 @@ int Mass3D::initialize(const shared_ptr<DomainBase>&) {
 }
 
 MassPoint2D::MassPoint2D(const unsigned T, const unsigned NT, const double TM)
-    : MassBase(T, uvec{NT}, {DOF::U1, DOF::U2})
+    : MassBase(T, uvec{NT}, {Node::DOF::U1, Node::DOF::U2})
     , translational_magnitude(TM)
     , rotational_magnitude(0.) {}
 
 MassPoint2D::MassPoint2D(const unsigned T, const unsigned NT, const double TM, const double RM)
-    : MassBase(T, uvec{NT}, {DOF::U1, DOF::U2, DOF::UR3})
+    : MassBase(T, uvec{NT}, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , translational_magnitude(TM)
     , rotational_magnitude(RM) {}
 
@@ -120,12 +120,12 @@ int MassPoint2D::initialize(const shared_ptr<DomainBase>&) {
 }
 
 MassPoint3D::MassPoint3D(const unsigned T, const unsigned NT, const double TM)
-    : MassBase(T, uvec{NT}, {DOF::U1, DOF::U2, DOF::U3})
+    : MassBase(T, uvec{NT}, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3})
     , translational_magnitude(TM)
     , rotational_magnitude(0.) {}
 
 MassPoint3D::MassPoint3D(const unsigned T, const unsigned NT, const double TM, const double RM)
-    : MassBase(T, uvec{NT}, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : MassBase(T, uvec{NT}, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3})
     , translational_magnitude(TM)
     , rotational_magnitude(RM) {}
 

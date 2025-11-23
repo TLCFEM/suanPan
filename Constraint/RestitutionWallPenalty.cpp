@@ -108,21 +108,21 @@ void RestitutionWallPenalty::clear_status() { node_pool.clear(); }
 void RestitutionWallPenalty::reset_status() { node_pool.clear(); }
 
 RestitutionWallPenalty1D::RestitutionWallPenalty1D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 1, 1), resize(N, 1, 1), RC, F, 1) { set_handler<DOF::U1>(); }
+    : RestitutionWallPenalty(T, A, resize(O, 1, 1), resize(N, 1, 1), RC, F, 1) { set_handler<Node::DOF::U1>(); }
 
 RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 2, 1), resize(N, 2, 1), RC, F, 2) { set_handler<DOF::U1, DOF::U2>(); }
+    : RestitutionWallPenalty(T, A, resize(O, 2, 1), resize(N, 2, 1), RC, F, 2) { set_handler<Node::DOF::U1, Node::DOF::U2>(); }
 
 RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
     : RestitutionWallPenalty(T, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 2) {
-    set_handler<DOF::U1, DOF::U2>();
+    set_handler<Node::DOF::U1, Node::DOF::U2>();
     access::rw(outer_norm).resize(2);
     access::rw(edge_a).resize(2);
     access::rw(edge_b).reset();
 }
 
 RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 3, 1), resize(N, 3, 1), RC, F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+    : RestitutionWallPenalty(T, A, resize(O, 3, 1), resize(N, 3, 1), RC, F, 3) { set_handler<Node::DOF::U1, Node::DOF::U2, Node::DOF::U3>(); }
 
 RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+    : RestitutionWallPenalty(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 3) { set_handler<Node::DOF::U1, Node::DOF::U2, Node::DOF::U3>(); }

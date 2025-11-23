@@ -33,7 +33,7 @@ CSMQ4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
     , m_material(std::move(M)) {}
 
 CSMQ4::CSMQ4(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMQ4::initialize(const shared_ptr<DomainBase>& D) {

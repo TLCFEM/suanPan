@@ -167,7 +167,7 @@ mat SGCMS::form_displacement_dn(const mat& pn_pxy, const mat& pnt_pxy) {
 }
 
 SGCMS::SGCMS(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool NL)
-    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3})
     , thickness(TH) {}
 
 int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
