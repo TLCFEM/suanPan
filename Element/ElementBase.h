@@ -47,11 +47,6 @@ enum class ElementParameter : std::uint8_t {
     INERTIA
 };
 
-enum class ElementType : std::uint8_t {
-    FEM,
-    DEM
-};
-
 class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_strain_energy() = 0;
     virtual void update_kinetic_energy() = 0;
@@ -83,6 +78,11 @@ protected:
     [[nodiscard]] virtual std::vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const = 0;
 
 public:
+    enum class Type : std::uint8_t {
+        FEM,
+        DEM
+    };
+
     explicit ElementBase(const unsigned T)
         : UniqueTag(T) {}
 
@@ -95,7 +95,7 @@ public:
     [[nodiscard]] virtual bool is_symmetric() const = 0;
     [[nodiscard]] virtual bool is_nlgeom() const = 0;
 
-    [[nodiscard]] virtual ElementType element_type() const = 0;
+    [[nodiscard]] virtual Type type() const = 0;
 
     virtual void update_dof_encoding() = 0;
 

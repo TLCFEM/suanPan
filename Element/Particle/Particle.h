@@ -40,7 +40,7 @@ public:
         std::vector<DOF>&& // dof identifier
     );
 
-    [[nodiscard]] ElementType element_type() const final { return ElementType::DEM; }
+    [[nodiscard]] Type type() const final { return Type::DEM; }
 
     int update_status() override { return SUANPAN_SUCCESS; }
 

@@ -204,7 +204,7 @@ public:
     [[nodiscard]] bool is_symmetric() const override;
     [[nodiscard]] bool is_nlgeom() const override;
 
-    [[nodiscard]] ElementType element_type() const override;
+    [[nodiscard]] Type type() const override;
 
     void update_dof_encoding() override;
 

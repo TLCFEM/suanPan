@@ -302,7 +302,7 @@ bool Element::is_symmetric() const { return symmetric; }
 
 bool Element::is_nlgeom() const { return nlgeom; }
 
-ElementType Element::element_type() const { return ElementType::FEM; }
+Element::Type Element::type() const { return Type::FEM; }
 
 void Element::update_dof_encoding() {
     auto idx = 0u;
