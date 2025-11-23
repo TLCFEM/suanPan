@@ -2,6 +2,7 @@
 #include "Cube/Cube"
 #include "Membrane/Membrane"
 #include "Modifier/Modifier"
+#include "Particle/Particle"
 #include "Patch/Patch"
 #include "Plate/Plate"
 #include "Shell/Shell"
