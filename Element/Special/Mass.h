@@ -61,7 +61,6 @@ class MassBase : public Element {
 public:
     MassBase(
         unsigned,          // tag
-        unsigned,          // number of dofs
         uvec&&,            // node encoding
         std::vector<DOF>&& // dof identifier
     );
