@@ -40,12 +40,9 @@ void MassBase::print() {
 vtkSmartPointer<vtkCell> MassBase::GetCell() const { return vtkSmartPointer<vtkVertex>::New(); }
 
 mat MassBase::GetData(const OutputType P) {
-    const auto n_dof = get_dof_number();
-    const auto n_node = get_node_number();
-
-    if(OutputType::A == P) return reshape(get_current_acceleration(), n_dof, n_node);
-    if(OutputType::V == P) return reshape(get_current_velocity(), n_dof, n_node);
-    if(OutputType::U == P) return reshape(get_current_displacement(), n_dof, n_node);
+    if(OutputType::A == P) return get_current_acceleration();
+    if(OutputType::V == P) return get_current_velocity();
+    if(OutputType::U == P) return get_current_displacement();
 
     return {};
 }
