@@ -39,6 +39,19 @@ class DomainBase;
 class Material;
 class Section;
 
+enum class ElementParameter {
+    ELASTIC,
+    POISSON,
+    RADIUS,
+    MASS,
+    INERTIA
+};
+
+enum class ElementType {
+    FEM,
+    DEM
+};
+
 class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_strain_energy() = 0;
     virtual void update_kinetic_energy() = 0;
@@ -81,6 +94,8 @@ public:
     [[nodiscard]] virtual bool is_initialized() const = 0;
     [[nodiscard]] virtual bool is_symmetric() const = 0;
     [[nodiscard]] virtual bool is_nlgeom() const = 0;
+
+    [[nodiscard]] virtual ElementType element_type() const = 0;
 
     virtual void update_dof_encoding() = 0;
 
@@ -165,7 +180,7 @@ public:
     virtual const vec& update_body_force(const vec&) = 0;
     virtual const vec& update_traction(const vec&) = 0;
 
-    virtual std::vector<vec> record(OutputType) = 0;
+    [[nodiscard]] virtual std::vector<vec> record(OutputType) = 0;
 
     [[nodiscard]] virtual double get_strain_energy() const = 0;
     [[nodiscard]] virtual double get_complementary_energy() const = 0;
@@ -176,6 +191,8 @@ public:
     [[nodiscard]] virtual double get_momentum_component(DOF) const = 0;
 
     [[nodiscard]] virtual double get_characteristic_length() const = 0;
+
+    [[nodiscard]] virtual double get_parameter(ElementParameter) const = 0;
 
     [[nodiscard]] virtual mat compute_shape_function(const mat&, unsigned) const = 0;
 };

@@ -32,14 +32,6 @@
 
 #include <Element/Element.h>
 
-enum class ParticleParameter {
-    ELASTICMODULUS,
-    POISSONSRATIO,
-    RADIUS,
-    MASS,
-    INERTIA
-};
-
 class Particle : public Element {
 public:
     Particle(
@@ -48,7 +40,7 @@ public:
         std::vector<DOF>&& // dof identifier
     );
 
-    [[nodiscard]] virtual double get_parameter(ParticleParameter) const = 0;
+    [[nodiscard]] ElementType element_type() const final { return ElementType::DEM; }
 
     int update_status() override { return SUANPAN_SUCCESS; }
 
@@ -73,7 +65,7 @@ public:
         double              // inertia
     );
 
-    [[nodiscard]] double get_parameter(ParticleParameter) const final;
+    [[nodiscard]] double get_parameter(ElementParameter) const final;
 };
 
 class InertialSphericalParticle2D final : public SphericalParticle {
