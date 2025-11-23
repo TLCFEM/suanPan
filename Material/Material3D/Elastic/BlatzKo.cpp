@@ -32,7 +32,7 @@ int BlatzKo::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double BlatzKo::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double BlatzKo::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> BlatzKo::get_copy() { return std::make_unique<BlatzKo>(*this); }
 

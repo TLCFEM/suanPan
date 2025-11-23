@@ -128,8 +128,8 @@ int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearK4::get_parameter(const ParameterType P) const {
-    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
+double NonlinearK4::get(const Parameter P) const {
+    if(Parameter::ELASTIC == P) return elastic_modulus;
     return 0.;
 }
 

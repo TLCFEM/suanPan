@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Group/Group.h>
-#include <Domain/Node.h>
 #include <Toolbox/tensor.h>
 
 void Contact3D::update_position() {

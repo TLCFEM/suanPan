@@ -30,7 +30,7 @@ int AxisymmetricElastic::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double AxisymmetricElastic::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double AxisymmetricElastic::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> AxisymmetricElastic::get_copy() { return std::make_unique<AxisymmetricElastic>(*this); }
 

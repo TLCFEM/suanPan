@@ -63,7 +63,7 @@ int PS::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto jacob_trans = form_transformation(shape::quad(vec{0., 0.}, 1) * ele_coor);
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     mat poly_disp(3, 8, fill::zeros), poly_stress(3, 5, fill::zeros);
     for(auto J = 0; J < 3; ++J) poly_stress(J, J) = 1.;

@@ -72,7 +72,7 @@ public:
 
     unique_ptr<Material> get_copy() override;
 
-    [[nodiscard]] double get_parameter(ParameterType) const override;
+    [[nodiscard]] double get(Parameter) const override;
 
     void print() override;
 };

@@ -94,7 +94,7 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Material> Rotation3D::get_copy() { return std::make_unique<Rotation3D>(*this); }
 
-double Rotation3D::get_parameter(const ParameterType P) const { return mat_obj->get_parameter(P); }
+double Rotation3D::get(const Parameter P) const { return mat_obj->get(P); }
 
 int Rotation3D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

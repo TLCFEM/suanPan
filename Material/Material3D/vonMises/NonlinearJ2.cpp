@@ -34,7 +34,7 @@ int NonlinearJ2::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearJ2::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double NonlinearJ2::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearJ2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

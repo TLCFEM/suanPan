@@ -18,7 +18,6 @@
 #include "Optimization.h"
 
 #include <Domain/DomainBase.h>
-#include <Solver/Integrator/Integrator.h>
 
 int Optimization::initialize() {
     if(SUANPAN_SUCCESS != Static::initialize()) return SUANPAN_FAIL;

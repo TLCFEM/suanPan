@@ -44,7 +44,7 @@ int B21::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(length) = b_trans->get_length();
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::LOBATTO);
 
     mat local_stiffness(3, 3, fill::zeros);
     int_pt.clear();

@@ -130,7 +130,7 @@ int DKT3::initialize(const shared_ptr<DomainBase>& D) {
     const auto& BX = trans_mat(0);
     const auto& BY = trans_mat(1);
 
-    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationType::GAUSS);
+    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(p_size, p_size);
 

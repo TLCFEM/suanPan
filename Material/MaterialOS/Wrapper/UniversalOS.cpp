@@ -54,7 +54,7 @@ int OS146S::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double OS146S::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
+double OS146S::get(const Parameter P) const { return base->get(P); }
 
 unique_ptr<Material> OS146S::get_copy() { return std::make_unique<OS146S>(*this); }
 

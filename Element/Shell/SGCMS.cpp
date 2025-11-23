@@ -180,7 +180,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     auto ele_coor = get_local_coordinate();
 
     // in-plane
-    const IntegrationPlan m_plan(2, 2, IntegrationType::IRONS);
+    const IntegrationPlan m_plan(2, 2, IntegrationPlan::Type::IRONS);
 
     //
     // membrane action
@@ -235,7 +235,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     ele_coor.row(7) = .5 * (ele_coor.row(3) + ele_coor.row(0));
 
     // along thickness
-    const IntegrationPlan t_plan(1, 3, IntegrationType::GAUSS);
+    const IntegrationPlan t_plan(1, 3, IntegrationPlan::Type::GAUSS);
 
     mat::fixed<12, 12> p_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
 

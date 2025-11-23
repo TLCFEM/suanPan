@@ -35,7 +35,7 @@ int IsotropicDamage::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double IsotropicDamage::get_parameter(const ParameterType P) const { return mat_ptr->get_parameter(P); }
+double IsotropicDamage::get(const Parameter P) const { return mat_ptr->get(P); }
 
 int IsotropicDamage::update_trial_status(const vec& t_strain) {
     if(SUANPAN_SUCCESS != mat_ptr->update_trial_status(trial_strain = t_strain)) return SUANPAN_FAIL;

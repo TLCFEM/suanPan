@@ -28,7 +28,7 @@
 #ifndef ELEMENTBASE_H
 #define ELEMENTBASE_H
 
-#include <Domain/DOF.h>
+#include <Domain/Node.h>
 #include <Domain/Tag.h>
 #include <Element/MappingDOF.h>
 #include <Element/Visualisation/vtkBase.h>
@@ -70,6 +70,19 @@ protected:
     [[nodiscard]] virtual std::vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const = 0;
 
 public:
+    enum class Type : std::uint8_t {
+        FEM,
+        DEM
+    };
+
+    enum class Parameter : std::uint8_t {
+        ELASTIC,
+        POISSON,
+        RADIUS,
+        MASS,
+        INERTIA
+    };
+
     explicit ElementBase(const unsigned T)
         : UniqueTag(T) {}
 
@@ -81,6 +94,8 @@ public:
     [[nodiscard]] virtual bool is_initialized() const = 0;
     [[nodiscard]] virtual bool is_symmetric() const = 0;
     [[nodiscard]] virtual bool is_nlgeom() const = 0;
+
+    [[nodiscard]] virtual Type type() const = 0;
 
     virtual void update_dof_encoding() = 0;
 
@@ -165,7 +180,7 @@ public:
     virtual const vec& update_body_force(const vec&) = 0;
     virtual const vec& update_traction(const vec&) = 0;
 
-    virtual std::vector<vec> record(OutputType) = 0;
+    [[nodiscard]] virtual std::vector<vec> record(OutputType) = 0;
 
     [[nodiscard]] virtual double get_strain_energy() const = 0;
     [[nodiscard]] virtual double get_complementary_energy() const = 0;
@@ -173,9 +188,10 @@ public:
     [[nodiscard]] virtual double get_viscous_energy() const = 0;
     [[nodiscard]] virtual double get_nonviscous_energy() const = 0;
     [[nodiscard]] virtual const vec& get_momentum() const = 0;
-    [[nodiscard]] virtual double get_momentum_component(DOF) const = 0;
 
     [[nodiscard]] virtual double get_characteristic_length() const = 0;
+
+    [[nodiscard]] virtual double get(Parameter) const = 0;
 
     [[nodiscard]] virtual mat compute_shape_function(const mat&, unsigned) const = 0;
 };

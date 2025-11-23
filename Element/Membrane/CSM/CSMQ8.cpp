@@ -50,7 +50,7 @@ int CSMQ8::initialize(const shared_ptr<DomainBase>& D) {
 
     if(characteristic_length < 0.) access::rw(characteristic_length) = sqrt(area::shoelace(ele_coor));
 
-    const IntegrationPlan plan(2, 3, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 3, IntegrationPlan::Type::GAUSS);
 
     const auto& t_size = t_dof.n_elem;
     const auto& r_size = r_dof.n_elem;

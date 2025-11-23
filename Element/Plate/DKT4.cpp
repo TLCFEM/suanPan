@@ -116,8 +116,8 @@ int DKT4::initialize(const shared_ptr<DomainBase>& D) {
     ele_coor.row(6) = .5 * (coor.row(2) + coor.row(3));
     ele_coor.row(7) = .5 * (coor.row(3) + coor.row(0));
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
-    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
+    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(p_size, p_size);
 

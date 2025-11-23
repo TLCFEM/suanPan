@@ -39,7 +39,7 @@ void T3DL::update_transformation() {
     direction_cosine = x_axis / length;
 }
 
-OrientationType T3DL::get_orientation_type() const { return OrientationType::T3D; }
+Orientation::Type T3DL::type() const { return Type::T3D; }
 
 vec T3DL::to_local_vec(const vec& g_disp) const { return vec{dot(direction_cosine, g_disp(JS) - g_disp(IS))}; }
 

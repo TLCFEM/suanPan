@@ -41,7 +41,7 @@ int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(3, 2, IntegrationType::IRONS);
+    const IntegrationPlan plan(3, 2, IntegrationPlan::Type::IRONS);
 
     initial_stiffness.zeros(c_size, c_size);
     mat stiff_a(9, 9, fill::zeros), stiff_b(c_size, 9, fill::zeros);

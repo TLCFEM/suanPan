@@ -45,7 +45,7 @@ int Concrete22::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Material> Concrete22::get_copy() { return std::make_unique<Concrete22>(*this); }
 
-double Concrete22::get_parameter(const ParameterType P) const { return concrete_major.get_parameter(P); }
+double Concrete22::get(const Parameter P) const { return concrete_major.get(P); }
 
 int Concrete22::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -59,7 +59,7 @@ int Concrete22::update_trial_status(const vec& t_strain) {
 
     bool if_rotating = false;
 
-    if(max_t_strain < get_parameter(ParameterType::CRACKSTRAIN) && max_c_strain > get_parameter(ParameterType::PEAKSTRAIN)) {
+    if(max_t_strain < get(Parameter::CRACKSTRAIN) && max_c_strain > get(Parameter::PEAKSTRAIN)) {
         if_rotating = true;
         principal_angle = transform::strain::angle(trial_strain);
     }

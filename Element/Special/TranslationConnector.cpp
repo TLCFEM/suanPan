@@ -17,7 +17,6 @@
 
 #include "TranslationConnector.h"
 
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 
 TranslationConnector::TranslationConnector(const unsigned T, uvec&& N, const unsigned D, const double P)

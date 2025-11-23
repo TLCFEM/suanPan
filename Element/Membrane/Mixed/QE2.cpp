@@ -57,7 +57,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(iso_mapping) = trans(mapping * ele_coor);
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     mat H(7, 7, fill::zeros);
 

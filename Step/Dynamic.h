@@ -28,15 +28,14 @@
 #ifndef DYNAMIC_H
 #define DYNAMIC_H
 
+#include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
-enum class IntegratorType;
-
 class Dynamic final : public Step {
-    const IntegratorType analysis_type;
+    const Integrator::Type analysis_type;
 
 public:
-    Dynamic(unsigned, double, IntegratorType);
+    Dynamic(unsigned, double, Integrator::Type);
 
     int initialize() override;
 

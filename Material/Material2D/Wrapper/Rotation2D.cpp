@@ -40,7 +40,7 @@ int Rotation2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double Rotation2D::get_parameter(const ParameterType P) const { return mat_obj->get_parameter(P); }
+double Rotation2D::get(const Parameter P) const { return mat_obj->get(P); }
 
 unique_ptr<Material> Rotation2D::get_copy() { return std::make_unique<Rotation2D>(*this); }
 

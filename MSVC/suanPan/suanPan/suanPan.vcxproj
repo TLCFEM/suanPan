@@ -610,7 +610,6 @@
     <ClInclude Include="..\..\..\Database\Database.h" />
     <ClInclude Include="..\..\..\Database\HDF.h" />
     <ClInclude Include="..\..\..\Domain\ConditionalModifier.h" />
-    <ClInclude Include="..\..\..\Domain\DOF.h" />
     <ClInclude Include="..\..\..\Domain\Domain.h" />
     <ClInclude Include="..\..\..\Domain\DomainBase.h" />
     <ClInclude Include="..\..\..\Domain\ExternalModule.h" />

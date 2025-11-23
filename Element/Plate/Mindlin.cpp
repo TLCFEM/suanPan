@@ -50,7 +50,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 
-    const auto shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
+    const auto shear_modulus = mat_proto->get(Material::Parameter::SHEAR);
     if(suanpan::approx_equal(shear_modulus, 0.)) {
         suanpan_error("A zero shear modulus is detected.\n");
         return SUANPAN_FAIL;
@@ -70,8 +70,8 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
     }
     initial_stiffness = penalty_stiffness = 10. / 3. * shear_modulus * thickness * det(jacob) * penalty_mat.t() * penalty_mat;
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
-    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
+    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);

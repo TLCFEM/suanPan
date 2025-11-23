@@ -18,7 +18,6 @@
 #include "CP7.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
@@ -52,7 +51,7 @@ int CP7::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, 2, IntegrationType::IRONS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::IRONS);
 
     initial_stiffness.zeros(m_size, m_size);
 

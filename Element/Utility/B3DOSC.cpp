@@ -26,7 +26,7 @@ B3DOSC::B3DOSC(const unsigned T, vec&& XYZ)
     access::rw(sd) = span(10, 12);
 }
 
-OrientationType B3DOSC::get_orientation_type() const { return OrientationType::B3DOS; }
+Orientation::Type B3DOSC::type() const { return Type::B3DOS; }
 
 void B3DOSC::update_transformation() {
     const mat t_coor = get_coordinate(element_ptr, 3).t();

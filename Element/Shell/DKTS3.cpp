@@ -148,7 +148,7 @@ int DKTS3::initialize(const shared_ptr<DomainBase>& D) {
     const auto &BMX = dkt_trans(0), &BMY = dkt_trans(1), &BPX = dkt_trans(2), &BPY = dkt_trans(3);
 
     // along thickness
-    const IntegrationPlan t_plan(1, num_ip, IntegrationType::GAUSS);
+    const IntegrationPlan t_plan(1, num_ip, IntegrationPlan::Type::GAUSS);
 
     mat99 m_stiffness(fill::zeros), p_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
 

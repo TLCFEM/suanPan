@@ -55,8 +55,8 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     // validate bulk modulus
-    const auto ks = s_mat->get_parameter(ParameterType::BULKMODULUS);
-    const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
+    const auto ks = s_mat->get(Material::Parameter::BULK);
+    const auto kf = f_mat->get(Material::Parameter::BULK);
 
     if(suanpan::approx_equal(ks, 0.) || suanpan::approx_equal(kf, 0.)) {
         suanpan_error("A zero bulk modulus is detected.\n");
@@ -77,7 +77,7 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = s_mat->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, 2, IntegrationType::IRONS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::IRONS);
 
     initial_stiffness.zeros(m_size, m_size);
     body_force.zeros(m_size, 2);

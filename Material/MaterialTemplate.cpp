@@ -22,7 +22,7 @@ MaterialTemplate::MaterialTemplate(const unsigned T)
 
 int MaterialTemplate::initialize(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
 
-double MaterialTemplate::get_parameter(const ParameterType) const { return 0.; }
+double MaterialTemplate::get(const Parameter) const { return 0.; }
 
 unique_ptr<Material> MaterialTemplate::get_copy() { return std::make_unique<MaterialTemplate>(*this); }
 

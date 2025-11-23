@@ -40,7 +40,7 @@ int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double Axisymmetric::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
+double Axisymmetric::get(const Parameter P) const { return base->get(P); }
 
 unique_ptr<Material> Axisymmetric::get_copy() { return std::make_unique<Axisymmetric>(*this); }
 

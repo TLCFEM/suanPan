@@ -18,7 +18,6 @@
 #include "StepParser.h"
 
 #include <Domain/DomainBase.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Step/Step>
 #include <Toolbox/utility.h>
 
@@ -83,7 +82,7 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
             suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(std::make_shared<Dynamic>(tag, time, IntegratorType::Implicit))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Dynamic>(tag, time, Integrator::Type::Implicit))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
@@ -93,7 +92,7 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
             suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(std::make_shared<Dynamic>(tag, time, IntegratorType::Explicit))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Dynamic>(tag, time, Integrator::Type::Explicit))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }

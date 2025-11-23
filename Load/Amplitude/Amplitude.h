@@ -52,14 +52,6 @@
 #ifndef AMPLITUDE_H
 #define AMPLITUDE_H
 
-enum class AmplitudeType {
-    RAMP,
-    TABULAR,
-    PERIODIC,
-    MODULATED,
-    DECAY
-};
-
 #include <Domain/Tag.h>
 
 class DomainBase;

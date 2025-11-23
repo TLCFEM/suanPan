@@ -39,7 +39,7 @@ void T2DL::update_transformation() {
     inclination = transform::atan2(direction_cosine);
 }
 
-OrientationType T2DL::get_orientation_type() const { return OrientationType::T2D; }
+Orientation::Type T2DL::type() const { return Type::T2D; }
 
 vec T2DL::to_local_vec(const vec& g_disp) const { return vec{dot(direction_cosine, g_disp(JS) - g_disp(IS))}; }
 

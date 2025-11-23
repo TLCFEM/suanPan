@@ -51,7 +51,7 @@ int DC3D8::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(3, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(3, 2, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(c_size, c_size);
 

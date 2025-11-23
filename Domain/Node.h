@@ -42,7 +42,29 @@
 
 class DomainBase;
 enum class OutputType;
-enum class DOF : std::uint8_t;
+
+enum class DOF : std::uint8_t {
+    NONE,
+    U1,
+    // displacement in x direction
+    U2,
+    // displacement in y direction
+    U3,
+    // displacement in z direction
+    UR1,
+    // rotation in x direction
+    UR2,
+    // rotation in y direction
+    UR3,
+    // rotation in z direction
+    DMG,
+    // damage
+    P,
+    // pressure
+    T,
+    // temperature
+    WARP // warping
+};
 
 struct NodeData {
     unsigned num_dof = 0; // number of DoFs

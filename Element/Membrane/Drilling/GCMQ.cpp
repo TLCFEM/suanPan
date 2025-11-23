@@ -72,7 +72,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(iso_mapping) = trans(mapping * ele_coor);
     // clang-format off
-    const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationType::IRONS : scheme == 'L' ? IntegrationType::LOBATTO : IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationPlan::Type::IRONS : scheme == 'L' ? IntegrationPlan::Type::LOBATTO : IntegrationPlan::Type::GAUSS);
     // clang-format on
     const auto diff_coor = form_diff_coor(ele_coor);
 

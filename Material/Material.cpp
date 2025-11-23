@@ -75,7 +75,7 @@ void Material::set_characteristic_length(const double L) const { access::rw(char
 
 double Material::get_characteristic_length() const { return characteristic_length; }
 
-double Material::get_parameter(ParameterType) const { return 0.; }
+double Material::get(Parameter) const { return 0.; }
 
 const vec& Material::get_trial_strain() { return trial_strain; }
 

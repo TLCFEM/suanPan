@@ -43,11 +43,6 @@
 
 class DomainBase;
 
-enum class IntegratorType {
-    Implicit,
-    Explicit
-};
-
 class Integrator : public UniqueTag {
     bool time_step_switch = true;
     bool matrix_assembled_switch = false;
@@ -65,6 +60,11 @@ protected:
     virtual int correct_trial_status();
 
 public:
+    enum class Type {
+        Implicit,
+        Explicit
+    };
+
     explicit Integrator(unsigned = 0);
 
     void set_domain(const std::weak_ptr<DomainBase>&);
@@ -72,7 +72,7 @@ public:
 
     virtual int initialize();
 
-    [[nodiscard]] virtual constexpr IntegratorType type() const { return IntegratorType::Implicit; }
+    [[nodiscard]] virtual Type type() const { return Type::Implicit; }
 
     // ! some multistep integrators may require fixed time step for some consecutive sub-steps
     void set_time_step_switch(bool);
@@ -151,14 +151,14 @@ class ImplicitIntegrator : public Integrator {
 public:
     using Integrator::Integrator;
 
-    [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Implicit; }
+    [[nodiscard]] Type type() const final { return Type::Implicit; }
 };
 
 class ExplicitIntegrator : public Integrator {
 public:
     using Integrator::Integrator;
 
-    [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
+    [[nodiscard]] Type type() const final { return Type::Explicit; }
 
     void assemble_resistance() override;
     void assemble_matrix() override;

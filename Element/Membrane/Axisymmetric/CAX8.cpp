@@ -18,7 +18,6 @@
 #include "CAX8.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
@@ -62,7 +61,7 @@ int CAX8::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, reduced_scheme ? 2 : 3, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, reduced_scheme ? 2 : 3, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(m_size, m_size);
 

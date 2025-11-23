@@ -28,7 +28,7 @@
 #include <Solver/Newton.h>
 #include <Solver/Ramm.h>
 
-Dynamic::Dynamic(const unsigned T, const double P, const IntegratorType AT)
+Dynamic::Dynamic(const unsigned T, const double P, const Integrator::Type AT)
     : Step(T, P)
     , analysis_type(AT) {}
 
@@ -47,16 +47,16 @@ int Dynamic::initialize() {
 
     // integrator
     if(nullptr == modifier) {
-        if(IntegratorType::Implicit == analysis_type) modifier = std::make_shared<Newmark>();
+        if(Integrator::Type::Implicit == analysis_type) modifier = std::make_shared<Newmark>();
         else modifier = std::make_shared<Tchamwa>(0, .8);
     }
-    else if(IntegratorType::Implicit == analysis_type) {
-        if(IntegratorType::Implicit != modifier->type()) {
+    else if(Integrator::Type::Implicit == analysis_type) {
+        if(Integrator::Type::Implicit != modifier->type()) {
             suanpan_error("An implicit integrator is required.\n");
             return SUANPAN_FAIL;
         }
     }
-    else if(IntegratorType::Implicit == modifier->type()) {
+    else if(Integrator::Type::Implicit == modifier->type()) {
         suanpan_error("An explicit integrator is required.\n");
         return SUANPAN_FAIL;
     }
@@ -69,7 +69,7 @@ int Dynamic::initialize() {
             break;
         }
 
-    if(IntegratorType::Explicit == analysis_type && has_displacement_load) suanpan_warning("Explicit integrators use acceleration as the base quantity, displacement loads may not work as intended.\n");
+    if(Integrator::Type::Explicit == analysis_type && has_displacement_load) suanpan_warning("Explicit integrators use acceleration as the base quantity, displacement loads may not work as intended.\n");
 
     // avoid arc length solver
     if(std::dynamic_pointer_cast<Ramm>(solver)) solver = nullptr;

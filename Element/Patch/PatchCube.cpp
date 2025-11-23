@@ -49,7 +49,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto t_density = material_proto->get_density();
 
-    const IntegrationPlan plan(3, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(3, 2, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(c_size, c_size);
     body_force.zeros(c_size, c_dof);

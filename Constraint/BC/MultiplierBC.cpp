@@ -34,7 +34,7 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
     // the container used is concurrently safe
     D->insert_restrained_dof(dof_encoding = get_nodal_active_dof(D));
 
-    if(IntegratorType::Explicit == D->get_current_step()->get_integrator()->type()) {
+    if(Integrator::Type::Explicit == D->get_current_step()->get_integrator()->type()) {
         if(auto& t_mass = W->get_mass(); nullptr != t_mass) {
             std::scoped_lock lock(W->get_mass_mutex());
             for(const auto I : dof_encoding) t_mass->unify(I);

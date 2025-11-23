@@ -204,6 +204,8 @@ public:
     [[nodiscard]] bool is_symmetric() const override;
     [[nodiscard]] bool is_nlgeom() const override;
 
+    [[nodiscard]] Type type() const override;
+
     void update_dof_encoding() override;
 
     [[nodiscard]] bool if_update_mass() const override;
@@ -286,7 +288,7 @@ public:
     const vec& update_body_force(const vec&) override;
     const vec& update_traction(const vec&) override;
 
-    std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) override;
 
     [[nodiscard]] double get_strain_energy() const override;
     [[nodiscard]] double get_complementary_energy() const override;
@@ -294,9 +296,9 @@ public:
     [[nodiscard]] double get_viscous_energy() const override;
     [[nodiscard]] double get_nonviscous_energy() const override;
     [[nodiscard]] const vec& get_momentum() const override;
-    [[nodiscard]] double get_momentum_component(DOF) const override;
 
     [[nodiscard]] double get_characteristic_length() const override;
+    [[nodiscard]] double get(Parameter) const override;
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 };

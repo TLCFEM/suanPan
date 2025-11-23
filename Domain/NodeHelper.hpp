@@ -18,7 +18,6 @@
 #ifndef NODE_HELPER_HPP
 #define NODE_HELPER_HPP
 
-#include "DOF.h"
 #include "Node.h"
 
 template<DOF...> struct always_false {

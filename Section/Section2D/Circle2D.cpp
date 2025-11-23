@@ -31,7 +31,7 @@ int Circle2D::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(linear_density) = area * material_proto->get_density();
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(int_pt_num);
