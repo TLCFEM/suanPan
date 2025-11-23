@@ -17,6 +17,6 @@
 
 #include "LinearSpring2D.h"
 
-double LinearSpring2D::compute_f(const double distance) const { return alpha * (space - distance); }
+double LinearSpring2D::compute_f(const double distance) const { return distance > space ? 0. : alpha * (space - distance); }
 
-double LinearSpring2D::compute_df(const double) const { return -alpha; }
+double LinearSpring2D::compute_df(const double distance) const { return distance > space ? 0. : -alpha; }
