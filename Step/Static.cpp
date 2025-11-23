@@ -21,7 +21,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Load/GroupNodalDisplacement.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Solver/MPDC.h>
 #include <Solver/Newton.h>
 

@@ -20,7 +20,6 @@
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Solver/Integrator/Integrator.h>
 #include <Solver/Newton.h>
 #include <Toolbox/arpack.h>
 

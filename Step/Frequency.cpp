@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Solver/Arnoldi.h>
-#include <Solver/Integrator/Integrator.h>
 
 Frequency::Frequency(const unsigned T, const unsigned N, const char TP)
     : Step(T, 0.)

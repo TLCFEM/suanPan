@@ -18,7 +18,6 @@
 #include "StepParser.h"
 
 #include <Domain/DomainBase.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Step/Step>
 #include <Toolbox/utility.h>
 
