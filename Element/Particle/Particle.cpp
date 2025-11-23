@@ -17,8 +17,6 @@
 
 #include "Particle.h"
 
-#include <Domain/DOF.h>
-
 Particle::Particle(const unsigned T, const unsigned N, std::vector<DOF>&& D)
     : Element(T, 1, D.size(), uvec{N}, std::move(D)) {}
 

@@ -18,7 +18,6 @@
 #include "CAX8.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>

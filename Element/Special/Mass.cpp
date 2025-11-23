@@ -17,8 +17,6 @@
 
 #include "Mass.h"
 
-#include <Domain/DOF.h>
-
 MassBase::MassBase(const unsigned T, uvec&& NT, std::vector<DOF>&& DI)
     : Element(T, NT.size(), DI.size(), std::move(NT), std::move(DI)) { modify_mass = false; }
 
