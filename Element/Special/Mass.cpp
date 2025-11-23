@@ -19,8 +19,8 @@
 
 #include <Domain/DOF.h>
 
-MassBase::MassBase(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)
-    : Element(T, NN, ND, std::move(NT), std::move(DI)) { modify_mass = false; }
+MassBase::MassBase(const unsigned T, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)
+    : Element(T, NT.size(), ND, std::move(NT), std::move(DI)) { modify_mass = false; }
 
 int MassBase::update_status() { return SUANPAN_SUCCESS; }
 
@@ -53,7 +53,7 @@ mat MassBase::GetData(const OutputType P) {
 #endif
 
 Mass2D::Mass2D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
-    : MassBase(T, 1, std::min(3u, static_cast<unsigned>(DT.max())), uvec{NT}, [&] {
+    : MassBase(T, std::min(3u, static_cast<unsigned>(DT.max())), uvec{NT}, [&] {
         std::vector DI(std::min(3llu, DT.max()), DOF::NONE);
 
         for(const auto I : DT)
@@ -76,7 +76,7 @@ int Mass2D::initialize(const shared_ptr<DomainBase>&) {
 }
 
 Mass3D::Mass3D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
-    : MassBase(T, 1, std::min(6u, static_cast<unsigned>(DT.max())), uvec{NT}, [&] {
+    : MassBase(T, std::min(6u, static_cast<unsigned>(DT.max())), uvec{NT}, [&] {
         std::vector DI(std::min(6llu, DT.max()), DOF::NONE);
 
         for(const auto I : DT)
@@ -102,12 +102,12 @@ int Mass3D::initialize(const shared_ptr<DomainBase>&) {
 }
 
 MassPoint2D::MassPoint2D(const unsigned T, const unsigned NT, const double TM)
-    : MassBase(T, 1, 2, uvec{NT}, {DOF::U1, DOF::U2})
+    : MassBase(T, 2, uvec{NT}, {DOF::U1, DOF::U2})
     , translational_magnitude(TM)
     , rotational_magnitude(0.) {}
 
 MassPoint2D::MassPoint2D(const unsigned T, const unsigned NT, const double TM, const double RM)
-    : MassBase(T, 1, 3, uvec{NT}, {DOF::U1, DOF::U2, DOF::UR3})
+    : MassBase(T, 3, uvec{NT}, {DOF::U1, DOF::U2, DOF::UR3})
     , translational_magnitude(TM)
     , rotational_magnitude(RM) {}
 
@@ -123,12 +123,12 @@ int MassPoint2D::initialize(const shared_ptr<DomainBase>&) {
 }
 
 MassPoint3D::MassPoint3D(const unsigned T, const unsigned NT, const double TM)
-    : MassBase(T, 1, 3, uvec{NT}, {DOF::U1, DOF::U2, DOF::U3})
+    : MassBase(T, 3, uvec{NT}, {DOF::U1, DOF::U2, DOF::U3})
     , translational_magnitude(TM)
     , rotational_magnitude(0.) {}
 
 MassPoint3D::MassPoint3D(const unsigned T, const unsigned NT, const double TM, const double RM)
-    : MassBase(T, 1, 6, uvec{NT}, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : MassBase(T, 6, uvec{NT}, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
     , translational_magnitude(TM)
     , rotational_magnitude(RM) {}
 
