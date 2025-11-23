@@ -121,10 +121,10 @@ int ConcreteExp::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double ConcreteExp::get_parameter(const ParameterType P) const {
-    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
-    if(ParameterType::PEAKSTRAIN == P) return f_c / elastic_modulus;
-    if(ParameterType::CRACKSTRAIN == P) return f_t / elastic_modulus;
+double ConcreteExp::get(const Parameter P) const {
+    if(Parameter::ELASTIC == P) return elastic_modulus;
+    if(Parameter::PEAKSTRAIN == P) return f_c / elastic_modulus;
+    if(Parameter::CRACKSTRAIN == P) return f_t / elastic_modulus;
     return 0.;
 }
 

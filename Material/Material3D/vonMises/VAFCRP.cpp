@@ -40,7 +40,7 @@ int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Material> VAFCRP::get_copy() { return std::make_unique<VAFCRP>(*this); }
 
-double VAFCRP::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double VAFCRP::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int VAFCRP::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * (incre_strain = (trial_strain = t_strain) - current_strain);

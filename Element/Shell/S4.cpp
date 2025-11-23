@@ -64,7 +64,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     // Mindlin plate
     // check if proper shear modulus is available
     // not very vital as for multiplier any large value can be chosen
-    const auto shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
+    const auto shear_modulus = mat_proto->get(Material::Parameter::SHEAR);
     if(suanpan::approx_equal(shear_modulus, 0.)) {
         suanpan_error("A zero shear modulus is detected.\n");
         return SUANPAN_FAIL;

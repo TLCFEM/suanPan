@@ -77,7 +77,7 @@ public:
 
     unique_ptr<Material> get_copy() override;
 
-    [[nodiscard]] double get_parameter(ParameterType) const override;
+    [[nodiscard]] double get(Parameter) const override;
 
     int update_trial_status(const vec&) override;
 

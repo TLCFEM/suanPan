@@ -298,7 +298,7 @@ public:
     [[nodiscard]] const vec& get_momentum() const override;
 
     [[nodiscard]] double get_characteristic_length() const override;
-    [[nodiscard]] double get_parameter(ElementParameter) const override;
+    [[nodiscard]] double get(Parameter) const override;
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 };

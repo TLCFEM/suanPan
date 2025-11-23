@@ -49,7 +49,7 @@ public:
 
     unique_ptr<Material> get_copy() override;
 
-    [[nodiscard]] double get_parameter(ParameterType) const override;
+    [[nodiscard]] double get(Parameter) const override;
 
     [[nodiscard]] const mat& get_initial_damping() const override;
     [[nodiscard]] const vec& get_initial_history() const override;

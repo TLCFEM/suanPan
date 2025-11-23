@@ -31,8 +31,8 @@ int ArmstrongFrederick1D::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> ArmstrongFrederick1D::get_copy() { return std::make_unique<ArmstrongFrederick1D>(*this); }
 
-double ArmstrongFrederick1D::get_parameter(const ParameterType P) const {
-    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
+double ArmstrongFrederick1D::get(const Parameter P) const {
+    if(Parameter::ELASTIC == P) return elastic_modulus;
     return 0.;
 }
 

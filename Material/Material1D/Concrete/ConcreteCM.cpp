@@ -314,10 +314,10 @@ ConcreteCM::ConcreteCM(const unsigned T, const double E, const double SC, const 
 
 unique_ptr<Material> ConcreteCM::get_copy() { return std::make_unique<ConcreteCM>(*this); }
 
-double ConcreteCM::get_parameter(const ParameterType P) const {
-    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
-    if(ParameterType::PEAKSTRAIN == P) return c_strain;
-    if(ParameterType::CRACKSTRAIN == P) return t_strain;
+double ConcreteCM::get(const Parameter P) const {
+    if(Parameter::ELASTIC == P) return elastic_modulus;
+    if(Parameter::PEAKSTRAIN == P) return c_strain;
+    if(Parameter::CRACKSTRAIN == P) return t_strain;
     return 0.;
 }
 

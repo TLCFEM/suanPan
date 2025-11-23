@@ -30,12 +30,12 @@ SphericalParticle::SphericalParticle(const unsigned T, const unsigned N, std::ve
     , mass(M)
     , inertia(I) {}
 
-double SphericalParticle::get_parameter(const ElementParameter P) const {
-    if(ElementParameter::ELASTIC == P) return elastic_modulus;
-    if(ElementParameter::POISSON == P) return poisson_ratio;
-    if(ElementParameter::RADIUS == P) return radius;
-    if(ElementParameter::MASS == P) return mass;
-    if(ElementParameter::INERTIA == P) return inertia;
+double SphericalParticle::get(const Parameter P) const {
+    if(Parameter::ELASTIC == P) return elastic_modulus;
+    if(Parameter::POISSON == P) return poisson_ratio;
+    if(Parameter::RADIUS == P) return radius;
+    if(Parameter::MASS == P) return mass;
+    if(Parameter::INERTIA == P) return inertia;
 
     return 0.;
 }

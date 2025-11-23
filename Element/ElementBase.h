@@ -39,14 +39,6 @@ class DomainBase;
 class Material;
 class Section;
 
-enum class ElementParameter : std::uint8_t {
-    ELASTIC,
-    POISSON,
-    RADIUS,
-    MASS,
-    INERTIA
-};
-
 class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_strain_energy() = 0;
     virtual void update_kinetic_energy() = 0;
@@ -81,6 +73,14 @@ public:
     enum class Type : std::uint8_t {
         FEM,
         DEM
+    };
+
+    enum class Parameter : std::uint8_t {
+        ELASTIC,
+        POISSON,
+        RADIUS,
+        MASS,
+        INERTIA
     };
 
     explicit ElementBase(const unsigned T)
@@ -191,7 +191,7 @@ public:
 
     [[nodiscard]] virtual double get_characteristic_length() const = 0;
 
-    [[nodiscard]] virtual double get_parameter(ElementParameter) const = 0;
+    [[nodiscard]] virtual double get(Parameter) const = 0;
 
     [[nodiscard]] virtual mat compute_shape_function(const mat&, unsigned) const = 0;
 };

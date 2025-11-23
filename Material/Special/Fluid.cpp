@@ -23,8 +23,8 @@ Fluid::Fluid(const unsigned T, const double E, const double R)
 
 int Fluid::initialize(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
 
-double Fluid::get_parameter(const ParameterType P) const {
-    if(ParameterType::BULKMODULUS == P) return bulk_modulus;
+double Fluid::get(const Parameter P) const {
+    if(Parameter::BULK == P) return bulk_modulus;
     return 0.;
 }
 

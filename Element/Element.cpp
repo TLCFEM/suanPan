@@ -631,7 +631,7 @@ const vec& Element::get_momentum() const { return momentum; }
 
 double Element::get_characteristic_length() const { return characteristic_length; }
 
-double Element::get_parameter(ElementParameter) const { return 0.; }
+double Element::get(Parameter) const { return 0.; }
 
 mat Element::compute_shape_function(const mat&, unsigned) const { return {}; }
 

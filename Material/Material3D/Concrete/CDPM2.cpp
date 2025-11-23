@@ -368,7 +368,7 @@ int CDPM2::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> CDPM2::get_copy() { return std::make_unique<CDPM2>(*this); }
 
-double CDPM2::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double CDPM2::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int CDPM2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

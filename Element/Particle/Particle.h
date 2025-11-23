@@ -65,7 +65,7 @@ public:
         double              // inertia
     );
 
-    [[nodiscard]] double get_parameter(ElementParameter) const final;
+    [[nodiscard]] double get(Parameter) const final;
 };
 
 class InertialSphericalParticle2D final : public SphericalParticle {

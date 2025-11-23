@@ -28,8 +28,6 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "ParameterType.h"
-
 #include <Domain/Tag.h>
 #include <array>
 
@@ -125,6 +123,15 @@ class Material : protected DataMaterial, protected DataCoupleMaterial, public Co
     friend void PureWrapper(Material*);
 
 public:
+    enum class Parameter {
+        ELASTIC,
+        POISSON,
+        SHEAR,
+        BULK,
+        PEAKSTRAIN,
+        CRACKSTRAIN
+    };
+
     explicit Material(
         unsigned = 0,                    // tag
         MaterialType = MaterialType::D0, // material type
@@ -153,7 +160,7 @@ public:
     void set_characteristic_length(double) const;
     [[nodiscard]] double get_characteristic_length() const;
 
-    [[nodiscard]] virtual double get_parameter(ParameterType) const;
+    [[nodiscard]] virtual double get(Parameter) const;
 
     virtual const vec& get_trial_strain();
     virtual const vec& get_trial_strain_rate();
@@ -227,6 +234,33 @@ public:
     virtual int reset_couple_status();
 
     virtual std::vector<vec> record(OutputType);
+
+protected:
+    class prop {
+        const double e, v;
+
+    public:
+        prop(const double E, const double P)
+            : e(E)
+            , v(P) {}
+
+        double operator()(const Parameter P) const {
+            switch(P) {
+            case Parameter::ELASTIC:
+                return e;
+            case Parameter::POISSON:
+                return v;
+            case Parameter::SHEAR:
+                return e / (2. + 2. * v);
+            case Parameter::BULK:
+                return e / (3. - 6. * v);
+            case Parameter::PEAKSTRAIN:
+            case Parameter::CRACKSTRAIN:
+            default:
+                return 0.;
+            }
+        }
+    };
 };
 
 namespace suanpan {

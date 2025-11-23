@@ -44,7 +44,7 @@ int Substepping::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Material> Substepping::get_copy() { return std::make_unique<Substepping>(*this); }
 
-double Substepping::get_parameter(const ParameterType P) const { return current_mat_obj->get_parameter(P); }
+double Substepping::get(const Parameter P) const { return current_mat_obj->get(P); }
 
 const mat& Substepping::get_initial_damping() const { return current_mat_obj->get_initial_damping(); }
 

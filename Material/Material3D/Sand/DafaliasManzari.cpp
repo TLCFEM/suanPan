@@ -41,7 +41,7 @@ int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> DafaliasManzari::get_copy() { return std::make_unique<DafaliasManzari>(*this); }
 
-double DafaliasManzari::get_parameter(const ParameterType P) const { return material_property(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
+double DafaliasManzari::get(const Parameter P) const { return prop(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
 
 int DafaliasManzari::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

@@ -55,7 +55,7 @@ int NonlinearCDP::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearCDP::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double NonlinearCDP::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearCDP::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

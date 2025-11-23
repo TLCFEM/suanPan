@@ -70,7 +70,7 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    [[nodiscard]] double get_parameter(ParameterType) const override;
+    [[nodiscard]] double get(Parameter) const override;
 
     unique_ptr<Material> get_copy() override;
 

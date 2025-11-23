@@ -32,7 +32,7 @@ int NonlinearGurson1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearGurson1D::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double NonlinearGurson1D::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

@@ -45,7 +45,7 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double StressWrapper::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
+double StressWrapper::get(const Parameter P) const { return base->get(P); }
 
 int StressWrapper::update_trial_status(const vec& t_strain) {
     auto& t_stress = base->get_trial_stress();
