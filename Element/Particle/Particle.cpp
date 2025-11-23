@@ -43,5 +43,21 @@ double SphericalParticle::get_parameter(const ParticleParameter P) const {
 InertialSphericalParticle2D::InertialSphericalParticle2D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double M, const double I)
     : SphericalParticle(T, N, {DOF::U1, DOF::U2, DOF::UR3}, R, E, V, M, I) {}
 
+int InertialSphericalParticle2D::initialize(const shared_ptr<DomainBase>&) {
+    initial_mass = diagmat(vec{mass, mass, inertia});
+
+    ConstantMass(this);
+
+    return SUANPAN_SUCCESS;
+}
+
 SphericalParticle2D::SphericalParticle2D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double M)
     : SphericalParticle(T, N, {DOF::U1, DOF::U2}, R, E, V, M, 0.) {}
+
+int SphericalParticle2D::initialize(const shared_ptr<DomainBase>&) {
+    initial_mass = diagmat(vec{mass, mass});
+
+    ConstantMass(this);
+
+    return SUANPAN_SUCCESS;
+}

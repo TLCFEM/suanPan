@@ -48,6 +48,8 @@ public:
         std::vector<DOF>&& // dof identifier
     );
 
+    [[nodiscard]] virtual double get_parameter(ParticleParameter) const = 0;
+
     int update_status() override { return SUANPAN_SUCCESS; }
 
     int commit_status() override { return SUANPAN_SUCCESS; }
@@ -56,6 +58,7 @@ public:
 };
 
 class SphericalParticle : public Particle {
+protected:
     const double radius, elastic_modulus, poisson_ratio, mass, inertia;
 
 public:
@@ -70,10 +73,10 @@ public:
         double              // inertia
     );
 
-    [[nodiscard]] double get_parameter(ParticleParameter) const;
+    [[nodiscard]] double get_parameter(ParticleParameter) const final;
 };
 
-class InertialSphericalParticle2D : public SphericalParticle {
+class InertialSphericalParticle2D final : public SphericalParticle {
 public:
     InertialSphericalParticle2D(
         unsigned, // tag
@@ -84,9 +87,11 @@ public:
         double,   // mass
         double    // inertia
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
-class SphericalParticle2D : public SphericalParticle {
+class SphericalParticle2D final : public SphericalParticle {
 public:
     SphericalParticle2D(
         unsigned, // tag
@@ -96,6 +101,8 @@ public:
         double,   // poisson ratio
         double    // mass
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif
