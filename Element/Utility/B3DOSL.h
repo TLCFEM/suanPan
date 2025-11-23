@@ -49,7 +49,7 @@ class B3DOSL final : public B3DL {
 public:
     using B3DL::B3DL;
 
-    [[nodiscard]] OrientationType get_orientation_type() const override;
+    [[nodiscard]] Type type() const override;
 
     unique_ptr<Orientation> get_copy() override;
 

@@ -59,7 +59,7 @@ int CSMT6::initialize(const shared_ptr<DomainBase>& D) {
 
     if(characteristic_length < 0.) access::rw(characteristic_length) = sqrt(area);
 
-    const IntegrationPlan plan(2, 5, IntegrationType::TRIANGLE);
+    const IntegrationPlan plan(2, 5, IntegrationPlan::Type::TRIANGLE);
 
     const auto& t_size = t_dof.n_elem;
     const auto& r_size = r_dof.n_elem;

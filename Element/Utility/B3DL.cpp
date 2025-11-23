@@ -19,7 +19,7 @@
 
 #include <Element/Element.h>
 
-OrientationType B3DL::get_orientation_type() const { return OrientationType::B3D; }
+Orientation::Type B3DL::type() const { return Type::B3D; }
 
 unique_ptr<Orientation> B3DL::get_copy() { return std::make_unique<B3DL>(*this); }
 

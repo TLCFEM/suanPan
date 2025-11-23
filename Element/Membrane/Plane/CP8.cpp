@@ -53,7 +53,7 @@ int CP8::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, 2, reduced_scheme ? IntegrationType::GAUSS : IntegrationType::IRONS);
+    const IntegrationPlan plan(2, 2, reduced_scheme ? IntegrationPlan::Type::GAUSS : IntegrationPlan::Type::IRONS);
 
     initial_stiffness.zeros(m_size, m_size);
 

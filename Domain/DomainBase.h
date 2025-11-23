@@ -81,16 +81,6 @@ using StepQueue = std::map<unsigned, shared_ptr<Step>>;
 
 using LongFactory = Factory<double>;
 
-enum class ColorMethod : std::uint8_t {
-    OFF,
-    WP,
-    MIS
-};
-
-enum class ModalAttribute : std::uint8_t {
-    LinearSystem
-};
-
 enum class Statistics : std::uint8_t {
     UpdateStatus,
     AssembleVector,
@@ -101,6 +91,16 @@ enum class Statistics : std::uint8_t {
 
 class DomainBase : public UniqueTag {
 public:
+    enum class ColorMethod : std::uint8_t {
+        OFF,
+        WP,
+        MIS
+    };
+
+    enum class ModalAttribute : std::uint8_t {
+        LinearSystem
+    };
+
     explicit DomainBase(const unsigned T)
         : UniqueTag(T) {}
 

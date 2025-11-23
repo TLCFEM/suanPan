@@ -117,6 +117,6 @@ int MPDC::analyze() {
         // for tracking
         G->update_constraint();
 
-        if(D->get_attribute(ModalAttribute::LinearSystem)) return G->sync_status(false);
+        if(D->get_attribute(DomainBase::ModalAttribute::LinearSystem)) return G->sync_status(false);
     }
 }

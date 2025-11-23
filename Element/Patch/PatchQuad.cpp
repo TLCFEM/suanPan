@@ -57,7 +57,7 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
     initial_stiffness.zeros(m_size, m_size);
     if(t_density > 0.) initial_mass.zeros(m_size, m_size);
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     const auto ele_span = net.get_all_element_span();
 

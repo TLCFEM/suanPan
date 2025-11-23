@@ -46,7 +46,7 @@ int B21H::initialize(const shared_ptr<DomainBase>& D) {
     const auto elastic_length = 1. - 2. * hinge_length;
 
     // build up the elastic interior
-    const IntegrationPlan elastic_plan(1, 2, IntegrationType::GAUSS);
+    const IntegrationPlan elastic_plan(1, 2, IntegrationPlan::Type::GAUSS);
     elastic_int_pt.clear();
     elastic_int_pt.reserve(elastic_plan.n_rows);
     for(unsigned I = 0; I < elastic_plan.n_rows; ++I) elastic_int_pt.emplace_back(elastic_plan(I, 0) * elastic_length, elastic_plan(I, 1) * elastic_length / 2., section_proto->get_copy());

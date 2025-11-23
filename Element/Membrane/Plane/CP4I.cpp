@@ -253,7 +253,7 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto ele_coor = get_coordinate(2);
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(m_size, m_size);
     mat stiff_a(4, 4, fill::zeros), stiff_b(m_size, 4, fill::zeros);

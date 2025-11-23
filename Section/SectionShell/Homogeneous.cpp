@@ -36,7 +36,7 @@ int Homogeneous::initialize(const shared_ptr<DomainBase>& D) {
 
     if(nullptr == mat_proto) return SUANPAN_FAIL;
 
-    const IntegrationPlan plan(1, num_ip, IntegrationType::GAUSS);
+    const IntegrationPlan plan(1, num_ip, IntegrationPlan::Type::GAUSS);
 
     initial_membrane_stiffness.zeros(3, 3);
     initial_plate_stiffness.zeros(3, 3);

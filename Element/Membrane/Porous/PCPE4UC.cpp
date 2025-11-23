@@ -67,7 +67,7 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = s_mat->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     meta_k.zeros(m_size, m_size);
     initial_stiffness.zeros(m_size, m_size);

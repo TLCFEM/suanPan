@@ -40,8 +40,8 @@ int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
     const auto l_flange_area = left_flange_height * left_flange_thickness;
     const auto r_flange_area = right_flange_height * right_flange_thickness;
 
-    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationType::GAUSS);
-    const IntegrationPlan plan_web(1, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationPlan::Type::GAUSS);
+    const IntegrationPlan plan_web(1, 2, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(2llu * int_pt_num + 2);

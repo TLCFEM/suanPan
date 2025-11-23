@@ -50,8 +50,8 @@ int ISection2D::initialize(const shared_ptr<DomainBase>& D) {
     const auto b_flange_area = bottom_flange_width * bottom_flange_thickness;
     const auto t_flange_area = top_flange_width * top_flange_thickness;
 
-    const IntegrationPlan plan_flange(1, 2, IntegrationType::GAUSS);
-    const IntegrationPlan plan_web(1, int_pt_num, IntegrationType::GAUSS);
+    const IntegrationPlan plan_flange(1, 2, IntegrationPlan::Type::GAUSS);
+    const IntegrationPlan plan_web(1, int_pt_num, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(int_pt_num + 2llu * plan_flange.n_rows);

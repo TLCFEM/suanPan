@@ -38,7 +38,7 @@ int CircularHollow2D::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(linear_density) = area * material_proto->get_density();
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::GAUSS);
 
     const auto m_radius = radius - .5 * thickness;
 

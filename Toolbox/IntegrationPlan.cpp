@@ -55,9 +55,9 @@ arma::mat generate_points(const unsigned dimension, const std::pair<arma::vec, a
     throw std::invalid_argument("not supported");
 }
 
-template<IntegrationType> std::pair<arma::vec, arma::vec> generate_seeds(unsigned) { throw std::invalid_argument("not supported"); }
+template<IntegrationPlan::Type> std::pair<arma::vec, arma::vec> generate_seeds(unsigned) { throw std::invalid_argument("not supported"); }
 
-template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::GAUSS>(const unsigned order) {
+template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationPlan::Type::GAUSS>(const unsigned order) {
     arma::vec PTL(order, arma::fill::none), PTW(order, arma::fill::none);
 
     switch(order) {
@@ -393,7 +393,7 @@ template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::GAUSS
     return {std::move(PTL), std::move(PTW)};
 }
 
-template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::HERMITE>(const unsigned order) {
+template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationPlan::Type::HERMITE>(const unsigned order) {
     arma::vec PTL(order, arma::fill::none), PTW(order, arma::fill::none);
 
     switch(order) {
@@ -722,7 +722,7 @@ template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::HERMI
     return {std::move(PTL), std::move(PTW)};
 }
 
-template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::CHEBYSHEV>(const unsigned order) {
+template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationPlan::Type::CHEBYSHEV>(const unsigned order) {
     arma::vec PTL(order, arma::fill::none), PTW(order, arma::fill::none);
 
     switch(order) {
@@ -798,7 +798,7 @@ template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::CHEBY
     return {std::move(PTL), std::move(PTW)};
 }
 
-template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::LOBATTO>(const unsigned order) {
+template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationPlan::Type::LOBATTO>(const unsigned order) {
     arma::vec PTL(order, arma::fill::none), PTW(order, arma::fill::none);
 
     switch(order) {
@@ -1124,7 +1124,7 @@ template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::LOBAT
     return {std::move(PTL), std::move(PTW)};
 }
 
-template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::RADAU>(const unsigned order) {
+template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationPlan::Type::RADAU>(const unsigned order) {
     arma::vec PTL(order, arma::fill::none), PTW(order, arma::fill::none);
 
     switch(order) {
@@ -1288,7 +1288,7 @@ template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::RADAU
     return {std::move(PTL), std::move(PTW)};
 }
 
-template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::LAGUERRE>(const unsigned order) {
+template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationPlan::Type::LAGUERRE>(const unsigned order) {
     arma::vec PTL(order, arma::fill::none), PTW(order, arma::fill::none);
 
     switch(order) {
@@ -1812,31 +1812,31 @@ template<> std::pair<arma::vec, arma::vec> generate_seeds<IntegrationType::LAGUE
     return {std::move(PTL), std::move(PTW)};
 }
 
-IntegrationPlan::IntegrationPlan(const unsigned D, const unsigned O, const IntegrationType T) {
+IntegrationPlan::IntegrationPlan(const unsigned D, const unsigned O, const Type T) {
     switch(T) {
-    case IntegrationType::GAUSS:
-        generate<IntegrationType::GAUSS>(D, O);
+    case Type::GAUSS:
+        generate<Type::GAUSS>(D, O);
         break;
-    case IntegrationType::HERMITE:
-        generate<IntegrationType::HERMITE>(D, O);
+    case Type::HERMITE:
+        generate<Type::HERMITE>(D, O);
         break;
-    case IntegrationType::CHEBYSHEV:
-        generate<IntegrationType::CHEBYSHEV>(D, O);
+    case Type::CHEBYSHEV:
+        generate<Type::CHEBYSHEV>(D, O);
         break;
-    case IntegrationType::LOBATTO:
-        generate<IntegrationType::LOBATTO>(D, O);
+    case Type::LOBATTO:
+        generate<Type::LOBATTO>(D, O);
         break;
-    case IntegrationType::RADAU:
-        generate<IntegrationType::RADAU>(D, O);
+    case Type::RADAU:
+        generate<Type::RADAU>(D, O);
         break;
-    case IntegrationType::LAGUERRE:
-        generate<IntegrationType::LAGUERRE>(D, O);
+    case Type::LAGUERRE:
+        generate<Type::LAGUERRE>(D, O);
         break;
-    case IntegrationType::IRONS:
-        generate<IntegrationType::IRONS>(D, O);
+    case Type::IRONS:
+        generate<Type::IRONS>(D, O);
         break;
-    case IntegrationType::TRIANGLE:
-        generate<IntegrationType::TRIANGLE>(D, O);
+    case Type::TRIANGLE:
+        generate<Type::TRIANGLE>(D, O);
         break;
     }
 }
@@ -1854,43 +1854,43 @@ void IntegrationPlan::print() const {
     printf("\n");
 }
 
-template<> void IntegrationPlan::generate<IntegrationType::GAUSS>(const unsigned D, const unsigned O) {
-    int_pts = generate_points(D, generate_seeds<IntegrationType::GAUSS>(std::min(std::max(O, 1u), 20u)));
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::GAUSS>(const unsigned D, const unsigned O) {
+    int_pts = generate_points(D, generate_seeds<Type::GAUSS>(std::min(std::max(O, 1u), 20u)));
     arma::access::rw(n_rows) = static_cast<unsigned>(int_pts.n_rows);
     arma::access::rw(n_cols) = static_cast<unsigned>(int_pts.n_cols);
 }
 
-template<> void IntegrationPlan::generate<IntegrationType::HERMITE>(const unsigned D, const unsigned O) {
-    int_pts = generate_points(D, generate_seeds<IntegrationType::HERMITE>(std::min(std::max(O, 2u), 20u)));
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::HERMITE>(const unsigned D, const unsigned O) {
+    int_pts = generate_points(D, generate_seeds<Type::HERMITE>(std::min(std::max(O, 2u), 20u)));
     arma::access::rw(n_rows) = static_cast<unsigned>(int_pts.n_rows);
     arma::access::rw(n_cols) = static_cast<unsigned>(int_pts.n_cols);
 }
 
-template<> void IntegrationPlan::generate<IntegrationType::CHEBYSHEV>(const unsigned D, const unsigned O) {
-    int_pts = generate_points(D, generate_seeds<IntegrationType::CHEBYSHEV>(std::min(std::max(O, 2u), 20u)));
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::CHEBYSHEV>(const unsigned D, const unsigned O) {
+    int_pts = generate_points(D, generate_seeds<Type::CHEBYSHEV>(std::min(std::max(O, 2u), 20u)));
     arma::access::rw(n_rows) = static_cast<unsigned>(int_pts.n_rows);
     arma::access::rw(n_cols) = static_cast<unsigned>(int_pts.n_cols);
 }
 
-template<> void IntegrationPlan::generate<IntegrationType::LOBATTO>(const unsigned D, const unsigned O) {
-    int_pts = generate_points(D, generate_seeds<IntegrationType::LOBATTO>(std::min(std::max(O, 3u), 20u)));
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::LOBATTO>(const unsigned D, const unsigned O) {
+    int_pts = generate_points(D, generate_seeds<Type::LOBATTO>(std::min(std::max(O, 3u), 20u)));
     arma::access::rw(n_rows) = static_cast<unsigned>(int_pts.n_rows);
     arma::access::rw(n_cols) = static_cast<unsigned>(int_pts.n_cols);
 }
 
-template<> void IntegrationPlan::generate<IntegrationType::RADAU>(const unsigned D, const unsigned O) {
-    int_pts = generate_points(D, generate_seeds<IntegrationType::RADAU>(std::min(std::max(O, 2u), 10u)));
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::RADAU>(const unsigned D, const unsigned O) {
+    int_pts = generate_points(D, generate_seeds<Type::RADAU>(std::min(std::max(O, 2u), 10u)));
     arma::access::rw(n_rows) = static_cast<unsigned>(int_pts.n_rows);
     arma::access::rw(n_cols) = static_cast<unsigned>(int_pts.n_cols);
 }
 
-template<> void IntegrationPlan::generate<IntegrationType::LAGUERRE>(const unsigned D, const unsigned O) {
-    int_pts = generate_points(D, generate_seeds<IntegrationType::LAGUERRE>(std::min(std::max(O, 2u), 20u)));
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::LAGUERRE>(const unsigned D, const unsigned O) {
+    int_pts = generate_points(D, generate_seeds<Type::LAGUERRE>(std::min(std::max(O, 2u), 20u)));
     arma::access::rw(n_rows) = static_cast<unsigned>(int_pts.n_rows);
     arma::access::rw(n_cols) = static_cast<unsigned>(int_pts.n_cols);
 }
 
-template<> void IntegrationPlan::generate<IntegrationType::IRONS>(const unsigned D, const unsigned O) {
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::IRONS>(const unsigned D, const unsigned O) {
     arma::access::rw(n_cols) = D + 1;
 
     if(3 == D && 2 == O) {
@@ -1945,7 +1945,7 @@ template<> void IntegrationPlan::generate<IntegrationType::IRONS>(const unsigned
     throw std::invalid_argument("not supported");
 }
 
-template<> void IntegrationPlan::generate<IntegrationType::TRIANGLE>(const unsigned D, const unsigned O) {
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::TRIANGLE>(const unsigned D, const unsigned O) {
     if(3 == D) throw std::invalid_argument("not supported");
 
     arma::access::rw(n_cols) = 4;

@@ -84,9 +84,9 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     auto p_stiffness = penalty_stiffness = 10. / 3. * shear_modulus * thickness * det(jacob) * penalty_mat.t() * penalty_mat;
 
     // in-plane
-    const IntegrationPlan m_plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan m_plan(2, 2, IntegrationPlan::Type::GAUSS);
     // along thickness
-    const IntegrationPlan t_plan(1, 3, IntegrationType::GAUSS);
+    const IntegrationPlan t_plan(1, 3, IntegrationPlan::Type::GAUSS);
 
     mat pnt(2, 8);
     mat::fixed<12, 12> m_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);

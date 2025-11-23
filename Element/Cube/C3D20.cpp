@@ -47,7 +47,7 @@ int C3D20::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(3, reduced_scheme ? 2 : 3, reduced_scheme ? IntegrationType::GAUSS : IntegrationType::IRONS);
+    const IntegrationPlan plan(3, reduced_scheme ? 2 : 3, reduced_scheme ? IntegrationPlan::Type::GAUSS : IntegrationPlan::Type::IRONS);
 
     initial_stiffness.zeros(c_size, c_size);
 

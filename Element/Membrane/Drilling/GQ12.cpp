@@ -53,7 +53,7 @@ int GQ12::initialize(const shared_ptr<DomainBase>& D) {
     const auto LY3 = ele_coor(2, 0) - ele_coor(3, 0);
     const auto LY4 = ele_coor(3, 0) - ele_coor(0, 0);
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     mat pnt(2, 8);
 

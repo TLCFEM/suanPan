@@ -35,14 +35,6 @@
 
 #include <Domain/Tag.h>
 
-enum class OrientationType {
-    T2D,
-    T3D,
-    B2D,
-    B3D,
-    B3DOS
-};
-
 class Element;
 
 class Orientation : public CopiableTag {
@@ -60,6 +52,14 @@ protected:
     virtual void update_transformation() = 0;
 
 public:
+    enum class Type {
+        T2D,
+        T3D,
+        B2D,
+        B3D,
+        B3DOS
+    };
+
     explicit Orientation(unsigned = 0, vec&& = {});
 
     void update_axis(const vec&);
@@ -68,7 +68,7 @@ public:
 
     [[nodiscard]] virtual bool is_nlgeom() const;
 
-    [[nodiscard]] virtual OrientationType get_orientation_type() const = 0;
+    [[nodiscard]] virtual Type type() const = 0;
 
     [[nodiscard]] double get_length() const;
     [[nodiscard]] double get_inclination() const;

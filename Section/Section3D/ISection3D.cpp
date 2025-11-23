@@ -50,7 +50,7 @@ int ISection3D::initialize(const shared_ptr<DomainBase>& D) {
     const auto b_flange_area = bottom_flange_width * bottom_flange_thickness;
     const auto t_flange_area = top_flange_width * top_flange_thickness;
 
-    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationType::GAUSS);
+    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationPlan::Type::GAUSS);
     const auto& plan_web = plan_flange;
 
     int_pt.clear();

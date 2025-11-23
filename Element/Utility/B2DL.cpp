@@ -45,7 +45,7 @@ void B2DL::update_transformation() {
     form_trans_mat(direction_cosine);
 }
 
-OrientationType B2DL::get_orientation_type() const { return OrientationType::B2D; }
+Orientation::Type B2DL::type() const { return Type::B2D; }
 
 vec B2DL::to_local_vec(const vec& g_disp) const { return trans_mat * g_disp; }
 

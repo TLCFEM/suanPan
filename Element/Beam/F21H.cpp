@@ -47,7 +47,7 @@ int F21H::initialize(const shared_ptr<DomainBase>& D) {
     elastic_section_flexibility = inv(section_proto->get_initial_stiffness());
 
     // perform integration of elastic region
-    const IntegrationPlan plan(1, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(1, 2, IntegrationPlan::Type::GAUSS);
     // add two inner points of Radau quadrature
     const auto int_pt_num = plan.n_rows + 2;
     const auto elastic_length = 1. - 8. * hinge_length;

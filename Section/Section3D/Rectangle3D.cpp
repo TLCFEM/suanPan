@@ -32,8 +32,8 @@ int Rectangle3D::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(linear_density) = area * material_proto->get_density();
 
-    const IntegrationPlan plan_y(1, int_pt_num, IntegrationType::LOBATTO);
-    const IntegrationPlan plan_z(1, int_pt_num, IntegrationType::LOBATTO);
+    const IntegrationPlan plan_y(1, int_pt_num, IntegrationPlan::Type::LOBATTO);
+    const IntegrationPlan plan_z(1, int_pt_num, IntegrationPlan::Type::LOBATTO);
 
     int_pt.clear();
     int_pt.reserve(static_cast<size_t>(int_pt_num) * static_cast<size_t>(int_pt_num));

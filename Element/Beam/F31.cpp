@@ -53,7 +53,7 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
-    if(OrientationType::B3D != b_trans->get_orientation_type()) {
+    if(Orientation::Type::B3D != b_trans->type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
@@ -64,7 +64,7 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
 
     const mat section_stiffness = section_proto->get_initial_stiffness()(b_span, b_span);
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::LOBATTO);
 
     initial_local_flexibility.zeros(6, 6);
     int_pt.clear();

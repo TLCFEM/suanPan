@@ -46,7 +46,7 @@ int F21::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto t_flexibility = inv(section_proto->get_initial_stiffness());
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::LOBATTO);
 
     initial_local_flexibility.zeros(3, 3);
     int_pt.clear();

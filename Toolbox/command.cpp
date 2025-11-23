@@ -967,9 +967,9 @@ namespace {
         if(is_equal(property_id, "color_model")) {
             if(std::string value; !get_input(command, value))
                 suanpan_error("A valid value is required.\n");
-            else if(is_equal("WP", value)) domain->set_color_model(ColorMethod::WP);
-            else if(is_equal("MIS", value)) domain->set_color_model(ColorMethod::MIS);
-            else domain->set_color_model(ColorMethod::OFF);
+            else if(is_equal("WP", value)) domain->set_color_model(DomainBase::ColorMethod::WP);
+            else if(is_equal("MIS", value)) domain->set_color_model(DomainBase::ColorMethod::MIS);
+            else domain->set_color_model(DomainBase::ColorMethod::OFF);
 
             return SUANPAN_SUCCESS;
         }
@@ -987,7 +987,7 @@ namespace {
         }
 
         if(is_equal(property_id, "linear_system")) {
-            domain->set_attribute(ModalAttribute::LinearSystem);
+            domain->set_attribute(DomainBase::ModalAttribute::LinearSystem);
 
             return SUANPAN_SUCCESS;
         }

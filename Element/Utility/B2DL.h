@@ -41,7 +41,7 @@ protected:
 public:
     using Orientation::Orientation;
 
-    [[nodiscard]] OrientationType get_orientation_type() const override;
+    [[nodiscard]] Type type() const override;
 
     unique_ptr<Orientation> get_copy() override;
 
