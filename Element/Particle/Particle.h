@@ -32,6 +32,14 @@
 
 #include <Element/Element.h>
 
+enum class ParticleParameter {
+    ELASTICMODULUS,
+    POISSONSRATIO,
+    RADIUS,
+    MASS,
+    INERTIA
+};
+
 class Particle : public Element {
 public:
     Particle(
@@ -61,6 +69,8 @@ public:
         double,             // mass
         double              // inertia
     );
+
+    [[nodiscard]] double get_parameter(ParticleParameter) const;
 };
 
 class InertialSphericalParticle2D : public SphericalParticle {
