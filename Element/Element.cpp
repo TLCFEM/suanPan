@@ -629,17 +629,6 @@ double Element::get_nonviscous_energy() const { return nonviscous_energy; }
 
 const vec& Element::get_momentum() const { return momentum; }
 
-double Element::get_momentum_component(const DOF D) const {
-    auto [flag, position] = if_contain(dof_identifier, D);
-
-    if(!flag || momentum.empty()) return 0.;
-
-    auto momentum_component = 0.;
-    for(auto I = 0u; I < num_node; ++I, position += num_dof) momentum_component += momentum(position);
-
-    return momentum_component;
-}
-
 double Element::get_characteristic_length() const { return characteristic_length; }
 
 double Element::get_parameter(ElementParameter) const { return 0.; }

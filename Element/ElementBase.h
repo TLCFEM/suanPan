@@ -39,7 +39,7 @@ class DomainBase;
 class Material;
 class Section;
 
-enum class ElementParameter {
+enum class ElementParameter : std::uint8_t {
     ELASTIC,
     POISSON,
     RADIUS,
@@ -47,7 +47,7 @@ enum class ElementParameter {
     INERTIA
 };
 
-enum class ElementType {
+enum class ElementType : std::uint8_t {
     FEM,
     DEM
 };
@@ -188,7 +188,6 @@ public:
     [[nodiscard]] virtual double get_viscous_energy() const = 0;
     [[nodiscard]] virtual double get_nonviscous_energy() const = 0;
     [[nodiscard]] virtual const vec& get_momentum() const = 0;
-    [[nodiscard]] virtual double get_momentum_component(DOF) const = 0;
 
     [[nodiscard]] virtual double get_characteristic_length() const = 0;
 

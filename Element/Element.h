@@ -296,7 +296,6 @@ public:
     [[nodiscard]] double get_viscous_energy() const override;
     [[nodiscard]] double get_nonviscous_energy() const override;
     [[nodiscard]] const vec& get_momentum() const override;
-    [[nodiscard]] double get_momentum_component(DOF) const override;
 
     [[nodiscard]] double get_characteristic_length() const override;
     [[nodiscard]] double get_parameter(ElementParameter) const override;
