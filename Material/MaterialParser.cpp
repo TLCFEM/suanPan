@@ -3556,12 +3556,12 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
-    else if(if_startswith(material_id, "CDPM2")) {
+    else if(material_id.starts_with("CDPM2")) {
         if(is_equal(material_id, "CDPM2") || is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
         else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
         else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
     }
-    else if(if_startswith(material_id, "Concrete")) {
+    else if(material_id.starts_with("Concrete")) {
         if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
         else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
         else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
@@ -3641,7 +3641,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
     else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
     else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
-    else if(if_startswith(material_id, "Subloading")) {
+    else if(material_id.starts_with("Subloading")) {
         if(is_equal(material_id, "Subloading")) new_subloading(new_material, command);
         else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
         else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
@@ -3659,7 +3659,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);
     else if(is_equal(material_id, "Viscosity02")) new_viscosity02(new_material, command);
     else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
-    else if(if_startswith(material_id, "YLD0418P")) {
+    else if(material_id.starts_with("YLD0418P")) {
         if(is_equal(material_id, "YLD0418P")) new_yld0418p(new_material, command, false);
         else if(is_equal(material_id, "YLD0418PISO")) new_yld0418p(new_material, command, true);
     }

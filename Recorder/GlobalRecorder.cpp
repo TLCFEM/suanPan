@@ -47,11 +47,6 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
         for(auto& I : D->get_pool<Element>()) strain_energy += I->get_strain_energy();
         insert({{strain_energy, D->get_factory()->get_strain_energy()}}, 0);
     }
-    else if(OutputType::MM == variable_type) {
-        auto momentum = 0.;
-        for(auto& I : D->get_pool<Element>()) momentum += accu(I->get_momentum());
-        insert({{momentum, accu(D->get_factory()->get_momentum())}}, 0);
-    }
     else insert({{.0, .0}}, 0);
 
     if(if_record_time()) insert(D->get_factory()->get_current_time());
