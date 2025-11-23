@@ -2674,9 +2674,6 @@
     <ClInclude Include="..\..\..\Step\StepParser.h">
       <Filter>Step</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\DOF.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\container.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
