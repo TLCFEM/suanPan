@@ -18,8 +18,7 @@
 #include "Mass.h"
 
 MassBase::MassBase(const unsigned T, uvec&& NT, std::vector<DOF>&& DI)
-    : Element(T,static_cast<unsigned>( NT.size()),static_cast<unsigned>( DI.size()), std::move(NT), std::move(DI)) {
-    modify_mass = false; }
+    : Element(T, static_cast<unsigned>(NT.size()), static_cast<unsigned>(DI.size()), std::move(NT), std::move(DI)) { modify_mass = false; }
 
 int MassBase::update_status() { return SUANPAN_SUCCESS; }
 
