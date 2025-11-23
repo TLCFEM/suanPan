@@ -67,8 +67,9 @@ Mass2D::Mass2D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     , dof_label(DT - 1) {}
 
 int Mass2D::initialize(const shared_ptr<DomainBase>&) {
-    initial_mass.zeros(dof_label.max() + 1, dof_label.max() + 1);
-    for(const auto& I : dof_label) initial_mass(I, I) = magnitude;
+    const auto dof_size = get_dof_number();
+    initial_mass.zeros(dof_size, dof_size);
+    for(const auto I : dof_label) initial_mass(I, I) = magnitude;
 
     ConstantMass(this);
 
@@ -93,8 +94,9 @@ Mass3D::Mass3D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     , dof_label(DT - 1) {}
 
 int Mass3D::initialize(const shared_ptr<DomainBase>&) {
-    initial_mass.zeros(dof_label.max() + 1, dof_label.max() + 1);
-    for(const auto& I : dof_label) initial_mass(I, I) = magnitude;
+    const auto dof_size = get_dof_number();
+    initial_mass.zeros(dof_size, dof_size);
+    for(const auto I : dof_label) initial_mass(I, I) = magnitude;
 
     ConstantMass(this);
 
