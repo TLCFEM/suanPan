@@ -162,7 +162,7 @@ int SectionOS3D::reset_status() {
     return code;
 }
 
-std::vector<vec> SectionOS3D::record(const OutputType P) {
+std::vector<vec> SectionOS3D::record(const OutputType P) const {
     if(OutputType::S == P) {
         vec beam_force(6, fill::zeros);
         for(const auto& I : int_pt) {

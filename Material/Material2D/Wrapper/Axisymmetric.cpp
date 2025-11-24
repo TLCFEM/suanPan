@@ -79,7 +79,7 @@ int Axisymmetric::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> Axisymmetric::record(const OutputType P) { return base->record(P); }
+std::vector<vec> Axisymmetric::record(const OutputType P) const { return base->record(P); }
 
 void Axisymmetric::print() {
     suanpan_info("An axisymmetric wrapper.\n");

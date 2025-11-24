@@ -148,4 +148,4 @@ int ExternalMaterial::clear_status() {
     return info;
 }
 
-std::vector<vec> ExternalMaterial::record(OutputType) { return {}; }
+std::vector<vec> ExternalMaterial::record(OutputType) const { return {}; }

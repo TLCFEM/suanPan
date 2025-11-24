@@ -137,7 +137,7 @@ public:
     virtual int commit_status() = 0;
     virtual int reset_status() = 0;
 
-    virtual std::vector<vec> record(OutputType);
+    [[nodiscard]] virtual std::vector<vec> record(OutputType) const;
 };
 
 namespace suanpan {

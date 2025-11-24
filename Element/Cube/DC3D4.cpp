@@ -106,7 +106,7 @@ int DC3D4::clear_status() {
 
 int DC3D4::reset_status() { return c_material->reset_status(); }
 
-std::vector<vec> DC3D4::record(const OutputType P) {
+std::vector<vec> DC3D4::record(const OutputType P) const {
     if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     return c_material->record(P);

@@ -87,7 +87,7 @@ int Laminated::reset_status() {
     return code;
 }
 
-std::vector<vec> Laminated::record(const OutputType P) {
+std::vector<vec> Laminated::record(const OutputType P) const {
     std::vector<vec> data;
 
     auto max_size = 0llu;

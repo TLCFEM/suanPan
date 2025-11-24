@@ -291,7 +291,7 @@ int Material::reset_couple_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> Material::record(const OutputType P) {
+std::vector<vec> Material::record(const OutputType P) const {
     if(P == OutputType::S) return {current_stress};
     if(P == OutputType::E) return {current_strain};
     if(P == OutputType::EE) return {solve(initial_stiffness, current_stress)};

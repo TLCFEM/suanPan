@@ -180,7 +180,7 @@ public:
     virtual const vec& update_body_force(const vec&) = 0;
     virtual const vec& update_traction(const vec&) = 0;
 
-    [[nodiscard]] virtual std::vector<vec> record(OutputType) = 0;
+    [[nodiscard]] virtual std::vector<vec> record(OutputType) const = 0;
 
     [[nodiscard]] virtual double get_strain_energy() const = 0;
     [[nodiscard]] virtual double get_complementary_energy() const = 0;

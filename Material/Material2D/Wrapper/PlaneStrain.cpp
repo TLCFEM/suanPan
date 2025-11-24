@@ -84,7 +84,7 @@ int PlaneStrain::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> PlaneStrain::record(const OutputType P) { return base->record(P); }
+std::vector<vec> PlaneStrain::record(const OutputType P) const { return base->record(P); }
 
 void PlaneStrain::print() {
     suanpan_info("A plane strain wrapper.\n");

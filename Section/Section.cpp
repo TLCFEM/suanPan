@@ -139,7 +139,7 @@ int Section::update_trial_status(const vec&) { throw std::invalid_argument("hidd
 
 int Section::update_trial_status(const vec& t_deformation, const vec&) { return update_trial_status(t_deformation); }
 
-std::vector<vec> Section::record(const OutputType P) {
+std::vector<vec> Section::record(const OutputType P) const {
     if(P == OutputType::E) return {current_deformation};
     if(P == OutputType::S) return {current_resistance};
     if(P == OutputType::EE) return {solve(initial_stiffness, current_resistance)};

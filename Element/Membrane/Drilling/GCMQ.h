@@ -70,7 +70,7 @@ public:
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 
-    std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 
     void print() override;
 

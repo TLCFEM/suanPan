@@ -113,7 +113,7 @@ int DCP3::clear_status() {
 
 int DCP3::reset_status() { return m_material->reset_status(); }
 
-std::vector<vec> DCP3::record(const OutputType P) {
+std::vector<vec> DCP3::record(const OutputType P) const {
     if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     return m_material->record(P);

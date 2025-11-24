@@ -202,7 +202,7 @@ int GCMQ::reset_status() {
 
 mat GCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> GCMQ::record(const OutputType P) {
+std::vector<vec> GCMQ::record(const OutputType P) const {
     std::vector<vec> data;
 
     if(P == OutputType::S)

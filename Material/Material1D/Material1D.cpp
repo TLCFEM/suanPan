@@ -22,7 +22,7 @@
 Material1D::Material1D(const unsigned T, const double D)
     : Material(T, MaterialType::D1, D) { set_symmetric(true); }
 
-std::vector<vec> Material1D::record(OutputType P) {
+std::vector<vec> Material1D::record(OutputType P) const {
     if(P == OutputType::SP) P = OutputType::S;
     else if(P == OutputType::EP) P = OutputType::E;
     else if(P == OutputType::EEP) P = OutputType::EE;

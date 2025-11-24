@@ -288,7 +288,7 @@ public:
     const vec& update_body_force(const vec&) override;
     const vec& update_traction(const vec&) override;
 
-    [[nodiscard]] std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 
     [[nodiscard]] double get_strain_energy() const override;
     [[nodiscard]] double get_complementary_energy() const override;

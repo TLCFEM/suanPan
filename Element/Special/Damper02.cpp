@@ -86,7 +86,7 @@ int Damper02::clear_status() { return device->clear_status(); }
 
 int Damper02::reset_status() { return device->reset_status(); }
 
-std::vector<vec> Damper02::record(const OutputType P) { return device->record(P); }
+std::vector<vec> Damper02::record(const OutputType P) const { return device->record(P); }
 
 void Damper02::print() {
     suanpan_info("A viscous damper element using displacement and velocity as basic quantities.\n");

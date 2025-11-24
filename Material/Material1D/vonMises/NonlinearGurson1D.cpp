@@ -149,7 +149,7 @@ int NonlinearGurson1D::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> NonlinearGurson1D::record(const OutputType P) {
+std::vector<vec> NonlinearGurson1D::record(const OutputType P) const {
     if(P == OutputType::VF) return {vec{current_history(1)}};
 
     return Material1D::record(P);

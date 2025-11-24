@@ -119,7 +119,7 @@ int B21H::reset_status() {
     return code;
 }
 
-std::vector<vec> B21H::record(const OutputType P) {
+std::vector<vec> B21H::record(const OutputType P) const {
     std::vector<vec> data;
     append_to(data, int_pt[0].b_section->record(P));
     append_to(data, int_pt[1].b_section->record(P));

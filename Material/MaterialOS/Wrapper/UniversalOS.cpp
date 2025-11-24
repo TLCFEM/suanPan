@@ -90,7 +90,7 @@ int OS146S::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> OS146S::record(const OutputType P) { return base->record(P); }
+std::vector<vec> OS146S::record(const OutputType P) const { return base->record(P); }
 
 void OS146S::print() {
     if(base) base->print();

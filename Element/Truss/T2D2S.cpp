@@ -82,7 +82,7 @@ int T2D2S::reset_status() {
     return t_section->reset_status();
 }
 
-std::vector<vec> T2D2S::record(const OutputType P) { return t_section->record(P); }
+std::vector<vec> T2D2S::record(const OutputType P) const { return t_section->record(P); }
 
 void T2D2S::print() {
     suanpan_info("A 2D truss element with ");

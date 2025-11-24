@@ -154,7 +154,7 @@ int DCP4::reset_status() {
     return code;
 }
 
-std::vector<vec> DCP4::record(const OutputType P) {
+std::vector<vec> DCP4::record(const OutputType P) const {
     if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     std::vector<vec> data;

@@ -102,7 +102,7 @@ int NonlinearViscosity::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> NonlinearViscosity::record(const OutputType P) {
+std::vector<vec> NonlinearViscosity::record(const OutputType P) const {
     if(OutputType::ED == P) return {current_strain};
     if(OutputType::V == P || OutputType::VD == P) return {current_strain_rate};
 

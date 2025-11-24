@@ -129,7 +129,7 @@ int DC3D8::reset_status() {
     return code;
 }
 
-std::vector<vec> DC3D8::record(const OutputType P) {
+std::vector<vec> DC3D8::record(const OutputType P) const {
     if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     std::vector<vec> data;

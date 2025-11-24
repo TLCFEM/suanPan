@@ -131,7 +131,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> NonlinearNM::record(const OutputType P) {
+std::vector<vec> NonlinearNM::record(const OutputType P) const {
     if(P == OutputType::YF) return {current_history.tail(2)};
     if(P == OutputType::HIST) return {current_history};
 

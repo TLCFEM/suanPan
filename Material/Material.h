@@ -233,7 +233,7 @@ public:
     virtual int commit_couple_status();
     virtual int reset_couple_status();
 
-    virtual std::vector<vec> record(OutputType);
+    [[nodiscard]] virtual std::vector<vec> record(OutputType) const;
 
 protected:
     class prop {

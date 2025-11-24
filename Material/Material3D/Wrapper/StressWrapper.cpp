@@ -111,4 +111,4 @@ int StressWrapper::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> StressWrapper::record(const OutputType P) { return base->record(P); }
+std::vector<vec> StressWrapper::record(const OutputType P) const { return base->record(P); }

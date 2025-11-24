@@ -143,7 +143,7 @@ int C3D8I::reset_status() {
 
 mat C3D8I::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::cube(coordinate, order, c_node); }
 
-std::vector<vec> C3D8I::record(const OutputType P) {
+std::vector<vec> C3D8I::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
     return data;

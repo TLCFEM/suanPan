@@ -623,7 +623,7 @@ int CDPM2::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> CDPM2::record(const OutputType P) {
+std::vector<vec> CDPM2::record(const OutputType P) const {
     if(P == OutputType::DT) return {vec{current_history(16)}};
     if(P == OutputType::DC) return {vec{current_history(17)}};
 

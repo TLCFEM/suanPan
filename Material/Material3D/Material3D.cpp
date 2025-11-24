@@ -23,7 +23,7 @@
 Material3D::Material3D(const unsigned T, const double R)
     : Material(T, MaterialType::D3, R) {}
 
-std::vector<vec> Material3D::record(const OutputType P) {
+std::vector<vec> Material3D::record(const OutputType P) const {
     if(P == OutputType::SP) {
         vec principal_stress;
         eig_sym(principal_stress, tensor::stress::to_tensor(current_stress));

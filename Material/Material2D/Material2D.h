@@ -46,7 +46,7 @@ public:
         double     // density
     );
 
-    std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 };
 
 #endif

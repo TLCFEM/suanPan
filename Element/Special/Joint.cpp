@@ -71,7 +71,7 @@ int Joint::reset_status() {
     return code;
 }
 
-std::vector<vec> Joint::record(const OutputType P) {
+std::vector<vec> Joint::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : j_material) append_to(data, I->record(P));
     return data;

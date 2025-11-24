@@ -288,7 +288,7 @@ int NonlinearCDP::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> NonlinearCDP::record(const OutputType P) {
+std::vector<vec> NonlinearCDP::record(const OutputType P) const {
     if(P == OutputType::DT) return {vec{current_history(0)}};
     if(P == OutputType::DC) return {vec{current_history(1)}};
 

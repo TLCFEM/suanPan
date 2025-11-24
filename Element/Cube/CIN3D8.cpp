@@ -230,7 +230,7 @@ int CIN3D8::reset_status() {
     return code;
 }
 
-std::vector<vec> CIN3D8::record(const OutputType P) {
+std::vector<vec> CIN3D8::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
     return data;

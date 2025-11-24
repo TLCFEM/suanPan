@@ -104,7 +104,7 @@ int Prestrain::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> Prestrain::record(const OutputType P) { return base->record(P); }
+std::vector<vec> Prestrain::record(const OutputType P) const { return base->record(P); }
 
 void Prestrain::print() {
     suanpan_info("A Prestrain container that holds the following material.\n");

@@ -137,7 +137,7 @@ int F21::reset_status() {
     return code;
 }
 
-std::vector<vec> F21::record(const OutputType P) {
+std::vector<vec> F21::record(const OutputType P) const {
     if(P == OutputType::BEAME) return {current_local_deformation};
     if(P == OutputType::BEAMS) return {current_local_resistance};
 

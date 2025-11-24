@@ -70,7 +70,7 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 
     void print() override;
 

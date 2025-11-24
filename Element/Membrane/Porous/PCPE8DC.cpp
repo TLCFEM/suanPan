@@ -182,7 +182,7 @@ int PCPE8DC::reset_status() {
 
 mat PCPE8DC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> PCPE8DC::record(const OutputType P) {
+std::vector<vec> PCPE8DC::record(const OutputType P) const {
     std::vector<vec> data;
 
     if(P == OutputType::PP) {

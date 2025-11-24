@@ -125,7 +125,7 @@ int Sequential::reset_status() {
     return code;
 }
 
-std::vector<vec> Sequential::record(const OutputType P) {
+std::vector<vec> Sequential::record(const OutputType P) const {
     std::vector<vec> data;
 
     auto max_size = 0llu;

@@ -610,7 +610,7 @@ const vec& Element::update_body_force(const vec& load_factor) { return body_forc
 
 const vec& Element::update_traction(const vec& load_factor) { return traction.is_empty() ? trial_traction : trial_traction = traction * load_factor; }
 
-std::vector<vec> Element::record(const OutputType) { return {}; }
+std::vector<vec> Element::record(const OutputType) const { return {}; }
 
 double Element::get_strain_energy() const { return strain_energy; }
 

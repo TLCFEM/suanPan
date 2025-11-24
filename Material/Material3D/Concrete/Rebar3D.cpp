@@ -89,7 +89,7 @@ int Rebar3D::reset_status() {
     return rebar_x->reset_status() + rebar_y->reset_status() + rebar_z->reset_status();
 }
 
-std::vector<vec> Rebar3D::record(const OutputType P) {
+std::vector<vec> Rebar3D::record(const OutputType P) const {
     std::vector<vec> data;
 
     const auto append_to = [](std::vector<vec>& a, std::vector<vec>&& b) {
