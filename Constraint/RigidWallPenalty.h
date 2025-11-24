@@ -31,20 +31,17 @@
 
 #include "Constraint.h"
 
-#include <Domain/NodeHelper.hpp>
+#include <Domain/Node.h>
 
 class RigidWallPenalty : public Constraint {
-protected:
-    template<Node::DOF... D> void set_handler() {
-        checker_handler = check_dof_definition<D...>;
-        current_velocity_handler = get_current_velocity<D...>;
-        incre_acceleration_handler = get_incre_acceleration<D...>;
-        trial_position_handler = get_trial_position<D...>;
-        trial_displacement_handler = get_trial_displacement<D...>;
-        trial_velocity_handler = get_trial_velocity<D...>;
-        trial_acceleration_handler = get_trial_acceleration<D...>;
+    void setup() {
+        ref_dof.clear();
+        if(n_dim > 0u) ref_dof.emplace_back(Node::DOF::U1);
+        if(n_dim > 1u) ref_dof.emplace_back(Node::DOF::U2);
+        if(n_dim > 2u) ref_dof.emplace_back(Node::DOF::U3);
     }
 
+protected:
     const unsigned n_dim;
 
     const double alpha;
@@ -53,13 +50,7 @@ protected:
     const vec origin, outer_norm;
     const double length_a = 0., length_b = 0.;
 
-    bool (*checker_handler)(const shared_ptr<Node>&) = nullptr;
-    Col<double> (*current_velocity_handler)(const shared_ptr<Node>&) = nullptr;
-    Col<double> (*incre_acceleration_handler)(const shared_ptr<Node>&) = nullptr;
-    Col<double> (*trial_position_handler)(const shared_ptr<Node>&) = nullptr;
-    Col<double> (*trial_displacement_handler)(const shared_ptr<Node>&) = nullptr;
-    Col<double> (*trial_velocity_handler)(const shared_ptr<Node>&) = nullptr;
-    Col<double> (*trial_acceleration_handler)(const shared_ptr<Node>&) = nullptr;
+    std::vector<Node::DOF> ref_dof;
 
 public:
     RigidWallPenalty(unsigned, unsigned, vec&&, vec&&, double, unsigned);

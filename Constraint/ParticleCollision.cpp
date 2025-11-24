@@ -38,7 +38,7 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
     const auto& dof_i = node_i->get_reordered_dof();
     const auto& dof_j = node_j->get_reordered_dof();
 
-    vec diff_pos = get_position(node_j) - get_position(node_i);
+    vec diff_pos = node_j->trial_position(num_dof) - node_i->trial_position(num_dof);
     const auto diff_norm = norm(diff_pos);
 
     diff_pos /= diff_norm;

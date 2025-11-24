@@ -2692,9 +2692,6 @@
     <ClInclude Include="..\..\..\Constraint\RestitutionWallPenalty.h">
       <Filter>Constraint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\NodeHelper.hpp">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM.h">
       <Filter>Section\SectionNM</Filter>
     </ClInclude>

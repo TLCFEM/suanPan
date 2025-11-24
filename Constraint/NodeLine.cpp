@@ -19,7 +19,7 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/NodeHelper.hpp>
+#include <Domain/Node.h>
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
 
@@ -27,7 +27,7 @@ std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
     std::vector<vec> position;
     position.reserve(node_encoding.n_elem);
 
-    for(const auto I : node_encoding) position.emplace_back(get_trial_position<Node::DOF::U1, Node::DOF::U2>(D->get<Node>(I)));
+    for(const auto I : node_encoding) position.emplace_back(D->get<Node>(I)->trial_position(2u));
 
     return position;
 }

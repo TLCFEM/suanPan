@@ -115,7 +115,6 @@ public:
 
     void ensure_dof(unsigned, const std::vector<DOF>&);
     [[nodiscard]] bool validate_dof(const std::vector<DOF>&) const;
-    [[nodiscard]] const std::vector<DOF>& get_dof_identifier() const;
 
     void set_original_dof(unsigned&);
     [[nodiscard]] const uvec& get_original_dof() const;

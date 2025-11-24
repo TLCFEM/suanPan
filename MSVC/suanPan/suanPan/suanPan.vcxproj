@@ -629,7 +629,6 @@
     <ClInclude Include="..\..\..\Domain\MetaMat\SparseMat.hpp" />
     <ClInclude Include="..\..\..\Domain\MetaMat\triplet_form.hpp" />
     <ClInclude Include="..\..\..\Domain\Node.h" />
-    <ClInclude Include="..\..\..\Domain\NodeHelper.hpp" />
     <ClInclude Include="..\..\..\Domain\Storage.hpp" />
     <ClInclude Include="..\..\..\Domain\Tag.h" />
     <ClInclude Include="..\..\..\Element\Beam\B21.h" />

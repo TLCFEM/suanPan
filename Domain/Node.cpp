@@ -77,8 +77,6 @@ bool Node::validate_dof(const std::vector<DOF>& in) const {
     return true;
 }
 
-const std::vector<Node::DOF>& Node::get_dof_identifier() const { return dof_identifier; }
-
 void Node::set_original_dof(unsigned& F) {
     original_dof.set_size(num_dof);
     for(auto& I : original_dof) I = F++;

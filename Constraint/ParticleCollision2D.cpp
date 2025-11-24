@@ -19,13 +19,11 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/NodeHelper.hpp>
+#include <Domain/Node.h>
 
 double ParticleCollision2D::compute_f(const double distance) const { return distance >= space ? 0. : -alpha * log(distance / space); }
 
 double ParticleCollision2D::compute_df(const double distance) const { return distance >= space ? 0. : -alpha / distance; }
-
-vec ParticleCollision2D::get_position(const shared_ptr<Node>& node) const { return get_trial_position<Node::DOF::U1, Node::DOF::U2>(node); }
 
 int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const bool full) {
     auto& W = D->get_factory();
@@ -40,7 +38,7 @@ int ParticleCollision2D::process_meta(const shared_ptr<DomainBase>& D, const boo
         const auto& t_node = node_pool[I];
         if(norm(t_node->get_trial_velocity()) * W->get_incre_time() > space)
             suanpan_warning("The nodal speed seems to be too large.\n");
-        const auto new_pos = get_position(t_node);
+        const auto new_pos = t_node->trial_position(num_dof);
         list[I].y = static_cast<int>(floor(new_pos(1) / space));
         list[I].x = static_cast<int>(floor(new_pos(0) / space));
         list[I].tag = t_node->get_tag();

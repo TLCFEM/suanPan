@@ -42,8 +42,8 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
     // multiplier method
     auto counter = 0llu;
     for(const auto& I : D->get_node_pool()) {
-        if(!checker_handler(I)) continue;
-        const vec t_pos = trial_position_handler(I) - origin;
+        if(!I->validate_dof(ref_dof)) continue;
+        const vec t_pos = I->trial_position(n_dim) - origin;
         if(!edge_a.empty())
             if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) continue;
         if(!edge_b.empty())
@@ -53,7 +53,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
         auxiliary_stiffness.resize(W->get_size(), counter);
         auto& t_dof = I->get_reordered_dof();
         for(auto J = 0llu; J < n_dim; ++J) auxiliary_stiffness(t_dof(J), counter - 1) = outer_norm(J);
-        const auto t_disp = trial_displacement_handler(I);
+        const auto t_disp = I->get_trial_displacement(n_dim);
         t_resistance.emplace_back(dot(t_disp, outer_norm));
         t_load.emplace_back(-dot(t_pos - t_disp, outer_norm));
     }
@@ -67,21 +67,20 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
 }
 
 RigidWallMultiplier1D::RigidWallMultiplier1D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 1, 1), resize(N, 1, 1), F, 1) { set_handler<Node::DOF::U1>(); }
+    : RigidWallMultiplier(T, A, resize(O, 1, 1), resize(N, 1, 1), F, 1) {}
 
 RigidWallMultiplier2D::RigidWallMultiplier2D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 2, 1), resize(N, 2, 1), F, 2) { set_handler<Node::DOF::U1, Node::DOF::U2>(); }
+    : RigidWallMultiplier(T, A, resize(O, 2, 1), resize(N, 2, 1), F, 2) {}
 
 RigidWallMultiplier2D::RigidWallMultiplier2D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
     : RigidWallMultiplier(T, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 2) {
-    set_handler<Node::DOF::U1, Node::DOF::U2>();
     access::rw(outer_norm).resize(2);
     access::rw(edge_a).resize(2);
     access::rw(edge_b).reset();
 }
 
 RigidWallMultiplier3D::RigidWallMultiplier3D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 3, 1), resize(N, 3, 1), F, 3) { set_handler<Node::DOF::U1, Node::DOF::U2, Node::DOF::U3>(); }
+    : RigidWallMultiplier(T, A, resize(O, 3, 1), resize(N, 3, 1), F, 3) {}
 
 RigidWallMultiplier3D::RigidWallMultiplier3D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 3) { set_handler<Node::DOF::U1, Node::DOF::U2, Node::DOF::U3>(); }
+    : RigidWallMultiplier(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 3) {}
