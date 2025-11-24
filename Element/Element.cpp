@@ -630,11 +630,6 @@ double Element::get(Parameter) const { return 0.; }
 
 mat Element::compute_shape_function(const mat&, unsigned) const { return {}; }
 
-std::vector<vec>& append_to(std::vector<vec>& a, std::vector<vec>&& b) {
-    a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
-    return a;
-}
-
 mat get_coordinate(const ElementBase* const E, const unsigned N) { return E->get_coordinate(N); }
 
 vec get_incre_displacement(const ElementBase* const E) { return E->get_incre_displacement(); }

@@ -371,6 +371,21 @@ namespace suanpan {
     template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); } void for_all(IN& from, FN&& func) {
         suanpan_for_each(from.begin(), from.end(), std::forward<FN>(func));
     }
+
+    template<typename T> std::vector<T>& append_to(std::vector<T>& a, std::vector<T>&& b) {
+        a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
+        return a;
+    }
+
+    template<sp_d T> std::vector<Col<T>> normalise_size(std::vector<Col<T>>&& container) {
+        auto max_size = 0llu;
+        for(const auto& item : container)
+            if(item.n_elem > max_size) max_size = item.n_elem;
+
+        for(auto& item : container) item.resize(max_size);
+
+        return container;
+    }
 } // namespace suanpan
 
 #if defined(SUANPAN_CLANG) && !defined(__cpp_lib_ranges)
@@ -390,6 +405,6 @@ namespace std::ranges {
 } // namespace std::ranges
 #endif
 
-template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
+template<typename T1> [[nodiscard]] enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
 
 #endif

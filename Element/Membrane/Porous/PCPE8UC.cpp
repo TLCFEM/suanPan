@@ -155,7 +155,7 @@ std::vector<vec> PCPE8UC::record(const OutputType P) const {
         for(const auto& I : int_pt) data.emplace_back(vec{-alpha * q * tensor::trace2(I.strain_mat * t_disp)});
     }
     else
-        for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+        for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
 
     return data;
 }

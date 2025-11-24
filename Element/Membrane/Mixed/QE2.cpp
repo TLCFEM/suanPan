@@ -221,7 +221,7 @@ std::vector<vec> QE2::record(const OutputType P) const {
     else if(P == OutputType::E)
         for(const auto& I : int_pt) data.emplace_back(remap(I.A * current_alpha));
     else
-        for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+        for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
 
     return data;
 }

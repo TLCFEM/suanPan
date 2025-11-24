@@ -89,17 +89,8 @@ int Laminated::reset_status() {
 
 std::vector<vec> Laminated::record(const OutputType P) const {
     std::vector<vec> data;
-
-    auto max_size = 0llu;
-    for(const auto& I : mat_pool)
-        for(const auto& J : I->record(P)) {
-            if(J.n_elem > max_size) max_size = J.n_elem;
-            data.emplace_back(J);
-        }
-
-    for(auto& I : data) I.resize(max_size);
-
-    return data;
+    for(const auto& I : mat_pool) suanpan::append_to(data, I->record(P));
+    return suanpan::normalise_size(std::move(data));
 }
 
 void Laminated::print() {

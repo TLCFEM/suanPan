@@ -129,7 +129,7 @@ int CAX4::reset_status() {
 
 std::vector<vec> CAX4::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 

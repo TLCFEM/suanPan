@@ -133,7 +133,7 @@ std::vector<vec> DC3D8::record(const OutputType P) const {
     if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.c_material->record(P));
     return data;
 }
 

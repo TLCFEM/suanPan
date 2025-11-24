@@ -73,7 +73,7 @@ int Joint::reset_status() {
 
 std::vector<vec> Joint::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : j_material) append_to(data, I->record(P));
+    for(const auto& I : j_material) suanpan::append_to(data, I->record(P));
     return data;
 }
 

@@ -192,7 +192,7 @@ int B31OS::reset_status() {
 
 std::vector<vec> B31OS::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.b_section->record(P));
     return data;
 }
 

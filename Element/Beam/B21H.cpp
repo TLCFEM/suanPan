@@ -121,11 +121,11 @@ int B21H::reset_status() {
 
 std::vector<vec> B21H::record(const OutputType P) const {
     std::vector<vec> data;
-    append_to(data, int_pt[0].b_section->record(P));
-    append_to(data, int_pt[1].b_section->record(P));
-    for(const auto& I : elastic_int_pt) append_to(data, I.b_section->record(P));
-    append_to(data, int_pt[2].b_section->record(P));
-    append_to(data, int_pt[3].b_section->record(P));
+    suanpan::append_to(data, int_pt[0].b_section->record(P));
+    suanpan::append_to(data, int_pt[1].b_section->record(P));
+    for(const auto& I : elastic_int_pt) suanpan::append_to(data, I.b_section->record(P));
+    suanpan::append_to(data, int_pt[2].b_section->record(P));
+    suanpan::append_to(data, int_pt[3].b_section->record(P));
     return data;
 }
 

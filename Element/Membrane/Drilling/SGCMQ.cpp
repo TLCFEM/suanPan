@@ -246,7 +246,7 @@ mat SGCMQ::compute_shape_function(const mat& coordinate, const unsigned order) c
 
 std::vector<vec> SGCMQ::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 

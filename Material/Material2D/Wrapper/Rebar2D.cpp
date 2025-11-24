@@ -95,13 +95,8 @@ int Rebar2D::reset_status() {
 std::vector<vec> Rebar2D::record(const OutputType P) const {
     std::vector<vec> data;
 
-    const auto append_to = [](std::vector<vec>& a, std::vector<vec>&& b) {
-        a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
-        return a;
-    };
-
-    append_to(data, rebar_x->record(P));
-    append_to(data, rebar_y->record(P));
+    suanpan::append_to(data, rebar_x->record(P));
+    suanpan::append_to(data, rebar_y->record(P));
 
     return data;
 }

@@ -210,8 +210,8 @@ int MVLEM::reset_status() {
 std::vector<vec> MVLEM::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : axial_spring) {
-        append_to(data, I.c_material->record(P));
-        append_to(data, I.s_material->record(P));
+        suanpan::append_to(data, I.c_material->record(P));
+        suanpan::append_to(data, I.s_material->record(P));
     }
     return data;
 }
