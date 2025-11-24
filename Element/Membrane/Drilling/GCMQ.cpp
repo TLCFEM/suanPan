@@ -214,7 +214,7 @@ std::vector<vec> GCMQ::record(const OutputType P) {
     else if(P == OutputType::EP)
         for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta));
     else if(P == OutputType::PE)
-        for(const auto& I : int_pt) { data.emplace_back(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)); }
+        for(const auto& I : int_pt) data.emplace_back(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha));
     else if(P == OutputType::PEP)
         for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)));
     else
