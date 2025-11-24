@@ -48,7 +48,7 @@ vtkInfo vtk_process(std::istringstream& command) {
 
     while(!command.eof() && get_input(command, keyword))
         if(is_equal(keyword, "scale")) get_input(command, config.scale);
-        else if(is_equal(keyword, "type") && get_input(command, keyword)) config.display_type = to_token(keyword);
+        else if(is_equal(keyword, "type") && get_input(command, keyword)) config.set(to_token(keyword));
         else if(is_equal(keyword, "fontsize")) get_input(command, config.font_size);
         else if(is_equal(keyword, "save")) get_input(command, config.file_name);
         else if(is_equal(keyword, "nobar")) config.color_bar = false;
@@ -67,8 +67,6 @@ vtkInfo vtk_process(std::istringstream& command) {
         }
 
     config.title_name = "Plotting Quantity " + std::string(to_name(config.display_type));
-    config.category = to_category(config.display_type);
-    config.record_type = to_token(config.category);
 
     return config;
 }
@@ -134,7 +132,12 @@ void vtk_save(vtkNew<vtkMultiBlockDataSet>&& grid, std::string file_name) {
     if(const auto ext = writer->GetDefaultFileExtension(); !file_name.ends_with(ext)) file_name += "." + std::string(ext);
     writer->SetInputData(grid);
     writer->SetFileName(file_name.c_str());
+#ifdef SUANPAN_DEBUG
+    writer->SetDataModeToAscii();
+    writer->SetCompressorTypeToNone();
+#else
     writer->SetDataModeToBinary();
+#endif
     writer->Write();
     suanpan_debug("Plot is written to file \"{}\".\n", file_name);
 }
