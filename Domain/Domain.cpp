@@ -990,10 +990,9 @@ int Domain::initialize() {
     initialize_section();
 
     // set dof number to zero before first initialisation of elements
+    // for restart analysis that may reassign dof
     suanpan::for_all(node_pond, [](const dual<Node>& t_node) {
-        // for restart analysis that may reassign dof
-        t_node.second->set_initialized(false);
-        t_node.second->set_dof_number(0);
+        t_node.second->deinitialize();
     });
     node_pond.update();
 

@@ -497,7 +497,7 @@ namespace {
                     auto t_variable = t_node->get_current_displacement();
                     if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
                     t_variable(dof_tag - 1) = magnitude;
-                    t_node->update_current_displacement(t_variable);
+                    t_node->update_current_displacement(std::move(t_variable));
                 }
                 else {
                     suanpan_error("A valid node tag is required.\n");
@@ -510,7 +510,7 @@ namespace {
                     auto t_variable = t_node->get_current_velocity();
                     if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
                     t_variable(dof_tag - 1) = magnitude;
-                    t_node->update_current_velocity(t_variable);
+                    t_node->update_current_velocity(std::move(t_variable));
                 }
                 else {
                     suanpan_error("A valid node tag is required.\n");
@@ -523,7 +523,7 @@ namespace {
                     auto t_variable = t_node->get_current_acceleration();
                     if(t_variable.n_elem < dof_tag) t_variable.resize(dof_tag);
                     t_variable(dof_tag - 1) = magnitude;
-                    t_node->update_current_acceleration(t_variable);
+                    t_node->update_current_acceleration(std::move(t_variable));
                 }
                 else {
                     suanpan_error("A valid node tag is required.\n");

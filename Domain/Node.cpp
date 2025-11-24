@@ -22,10 +22,7 @@
 #include <Toolbox/utility.h>
 
 Node::Node(const unsigned T, vec&& C)
-    : UniqueTag(T) {
-    num_dof = static_cast<unsigned>(C.n_elem);
-    coordinate = std::move(C);
-}
+    : UniqueTag(T) { coordinate = std::move(C); }
 
 /**
  * \brief This method should be called after Element objects are set. Element
@@ -61,25 +58,26 @@ void Node::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     initialized = true;
+
+    dof_identifier.clear();
 }
 
-void Node::set_initialized(const bool B) { initialized = B; }
+void Node::deinitialize() {
+    num_dof = 0u;
+    initialized = false;
+}
 
-bool Node::get_initialized() const { return initialized; }
-
-void Node::set_dof_number(const unsigned D) {
-    if(num_dof == D) return;
+void Node::ensure_dof_number(const unsigned D) {
+    if(num_dof >= D) return;
 
     num_dof = D;
     initialized = false;
 }
 
-unsigned Node::get_dof_number() const { return num_dof; }
-
 void Node::set_dof_identifier(const std::vector<DOF>& D) {
     std::scoped_lock node_lock{node_mutex};
 
-    if(dof_identifier.empty()) dof_identifier = std::vector(num_dof, DOF::NONE);
+    if(dof_identifier.empty()) dof_identifier.resize(num_dof, DOF::NONE);
 
     for(size_t I = 0; I < D.size(); ++I) {
         if(DOF::NONE == D[I]) continue;
@@ -92,8 +90,6 @@ void Node::set_dof_identifier(const std::vector<DOF>& D) {
 const std::vector<Node::DOF>& Node::get_dof_identifier() const { return dof_identifier; }
 
 void Node::set_original_dof(unsigned& F) {
-    if(!is_active()) return;
-
     for(auto I = 0u; I < num_dof; ++I, ++F)
         if(original_dof(I) != F) {
             original_dof(I) = F;
@@ -101,64 +97,13 @@ void Node::set_original_dof(unsigned& F) {
         }
 }
 
-void Node::set_original_dof(const uvec& D) {
-    if(!is_active() || original_dof.size() == D.size() && sum(abs(D - original_dof)) == 0) return;
-
-    original_dof = D;
-    initialized = false;
-}
-
 const uvec& Node::get_original_dof() const { return original_dof; }
 
-void Node::set_reordered_dof(const uvec& R) { reordered_dof = R; }
+void Node::set_reordered_dof(uvec&& R) { reordered_dof = std::move(R); }
 
 const uvec& Node::get_reordered_dof() const { return reordered_dof.is_empty() ? original_dof : reordered_dof; }
 
-void Node::set_coordinate(const vec& C) { coordinate = C; }
-
 const vec& Node::get_coordinate() const { return coordinate; }
-
-void Node::set_current_resistance(const vec& R) { current_resistance = R; }
-
-void Node::set_current_damping_force(const vec& R) { current_damping_force = R; }
-
-void Node::set_current_nonviscous_force(const vec& R) { current_nonviscous_force = R; }
-
-void Node::set_current_inertial_force(const vec& R) { current_inertial_force = R; }
-
-void Node::set_current_displacement(const vec& D) { current_displacement = D; }
-
-void Node::set_current_velocity(const vec& V) { current_velocity = V; }
-
-void Node::set_current_acceleration(const vec& A) { current_acceleration = A; }
-
-void Node::set_incre_resistance(const vec& R) { incre_resistance = R; }
-
-void Node::set_incre_damping_force(const vec& R) { incre_damping_force = R; }
-
-void Node::set_incre_nonviscous_force(const vec& R) { incre_nonviscous_force = R; }
-
-void Node::set_incre_inertial_force(const vec& R) { incre_inertial_force = R; }
-
-void Node::set_incre_displacement(const vec& D) { incre_displacement = D; }
-
-void Node::set_incre_velocity(const vec& V) { incre_velocity = V; }
-
-void Node::set_incre_acceleration(const vec& A) { incre_acceleration = A; }
-
-void Node::set_trial_resistance(const vec& R) { trial_resistance = R; }
-
-void Node::set_trial_damping_force(const vec& R) { trial_damping_force = R; }
-
-void Node::set_trial_nonviscous_force(const vec& R) { trial_nonviscous_force = R; }
-
-void Node::set_trial_inertial_force(const vec& R) { trial_inertial_force = R; }
-
-void Node::set_trial_displacement(const vec& D) { trial_displacement = D; }
-
-void Node::set_trial_velocity(const vec& V) { trial_velocity = V; }
-
-void Node::set_trial_acceleration(const vec& A) { trial_acceleration = A; }
 
 const vec& Node::get_current_resistance() const { return current_resistance; }
 
@@ -202,199 +147,165 @@ const vec& Node::get_trial_velocity() const { return trial_velocity; }
 
 const vec& Node::get_trial_acceleration() const { return trial_acceleration; }
 
-void Node::update_current_resistance(const vec& R) {
-    trial_resistance = current_resistance = R;
-    incre_resistance.zeros(R.size());
+const vec& Node::update_current_resistance(vec&& in) {
+    trial_resistance = current_resistance = std::move(in);
+    incre_resistance.zeros(current_resistance.size());
+    return current_resistance;
 }
 
-void Node::update_current_damping_force(const vec& R) {
-    trial_damping_force = current_damping_force = R;
-    incre_damping_force.zeros(R.size());
+const vec& Node::update_current_damping_force(vec&& in) {
+    trial_damping_force = current_damping_force = std::move(in);
+    incre_damping_force.zeros(current_damping_force.size());
+    return current_damping_force;
 }
 
-void Node::update_current_nonviscous_force(const vec& R) {
-    trial_nonviscous_force = current_nonviscous_force = R;
-    incre_nonviscous_force.zeros(R.size());
+const vec& Node::update_current_nonviscous_force(vec&& in) {
+    trial_nonviscous_force = current_nonviscous_force = std::move(in);
+    incre_nonviscous_force.zeros(current_nonviscous_force.size());
+    return current_nonviscous_force;
 }
 
-void Node::update_current_inertial_force(const vec& R) {
-    trial_inertial_force = current_inertial_force = R;
-    incre_inertial_force.zeros(R.size());
+const vec& Node::update_current_inertial_force(vec&& in) {
+    trial_inertial_force = current_inertial_force = std::move(in);
+    incre_inertial_force.zeros(current_inertial_force.size());
+    return current_inertial_force;
 }
 
-void Node::update_current_displacement(const vec& D) {
-    current_displacement = trial_displacement = D;
-    incre_displacement.zeros(D.size());
+const vec& Node::update_current_displacement(vec&& in) {
+    trial_displacement = current_displacement = std::move(in);
+    incre_displacement.zeros(current_displacement.size());
+    return current_displacement;
 }
 
-void Node::update_current_velocity(const vec& V) {
-    current_velocity = trial_velocity = V;
-    incre_velocity.zeros(V.size());
+const vec& Node::update_current_velocity(vec&& in) {
+    trial_velocity = current_velocity = std::move(in);
+    incre_velocity.zeros(current_velocity.size());
+    return current_velocity;
 }
 
-void Node::update_current_acceleration(const vec& A) {
-    current_acceleration = trial_acceleration = A;
-    incre_acceleration.zeros(A.size());
+const vec& Node::update_current_acceleration(vec&& in) {
+    trial_acceleration = current_acceleration = std::move(in);
+    incre_acceleration.zeros(current_acceleration.size());
+    return current_acceleration;
 }
 
-void Node::update_incre_resistance(const vec& R) {
-    incre_resistance = R;
-    if(current_resistance.empty()) current_resistance.zeros(R.size());
-    else current_resistance.resize(R.size());
-    trial_resistance = current_resistance + incre_resistance;
+const vec& Node::update_incre_resistance(vec&& in) {
+    incre_resistance = std::move(in);
+    trial_resistance = current_resistance.resize(incre_resistance.size()) + incre_resistance;
+    return incre_resistance;
 }
 
-void Node::update_incre_damping_force(const vec& R) {
-    incre_damping_force = R;
-    if(current_damping_force.empty()) current_damping_force.zeros(R.size());
-    else current_damping_force.resize(R.size());
-    trial_damping_force = current_damping_force + incre_damping_force;
+const vec& Node::update_incre_damping_force(vec&& in) {
+    incre_damping_force = std::move(in);
+    trial_damping_force = current_damping_force.resize(incre_damping_force.size()) + incre_damping_force;
+    return incre_damping_force;
 }
 
-void Node::update_incre_nonviscous_force(const vec& R) {
-    incre_nonviscous_force = R;
-    if(current_nonviscous_force.empty()) current_nonviscous_force.zeros(R.size());
-    else current_nonviscous_force.resize(R.size());
-    trial_nonviscous_force = current_nonviscous_force + incre_nonviscous_force;
+const vec& Node::update_incre_nonviscous_force(vec&& in) {
+    incre_nonviscous_force = std::move(in);
+    trial_nonviscous_force = current_nonviscous_force.resize(incre_nonviscous_force.size()) + incre_nonviscous_force;
+    return incre_nonviscous_force;
 }
 
-void Node::update_incre_inertial_force(const vec& R) {
-    incre_inertial_force = R;
-    if(current_inertial_force.empty()) current_inertial_force.zeros(R.size());
-    else current_inertial_force.resize(R.size());
-    trial_inertial_force = current_inertial_force + incre_inertial_force;
+const vec& Node::update_incre_inertial_force(vec&& in) {
+    incre_inertial_force = std::move(in);
+    trial_inertial_force = current_inertial_force.resize(incre_inertial_force.size()) + incre_inertial_force;
+    return incre_inertial_force;
 }
 
-void Node::update_incre_displacement(const vec& D) {
-    incre_displacement = D;
-    if(current_displacement.empty()) current_displacement.zeros(D.size());
-    else current_displacement.resize(D.size());
-    trial_displacement = current_displacement + incre_displacement;
+const vec& Node::update_incre_displacement(vec&& in) {
+    incre_displacement = std::move(in);
+    trial_displacement = current_displacement.resize(incre_displacement.size()) + incre_displacement;
+    return incre_displacement;
 }
 
-void Node::update_incre_velocity(const vec& V) {
-    incre_velocity = V;
-    if(current_velocity.empty()) current_velocity.zeros(V.size());
-    else current_velocity.resize(V.size());
-    trial_velocity = current_velocity + incre_velocity;
+const vec& Node::update_incre_velocity(vec&& in) {
+    incre_velocity = std::move(in);
+    trial_velocity = current_velocity.resize(incre_velocity.size()) + incre_velocity;
+    return incre_velocity;
 }
 
-void Node::update_incre_acceleration(const vec& A) {
-    incre_acceleration = A;
-    if(current_acceleration.empty()) current_acceleration.zeros(A.size());
-    else current_acceleration.resize(A.size());
-    trial_acceleration = current_acceleration + incre_acceleration;
+const vec& Node::update_incre_acceleration(vec&& in) {
+    incre_acceleration = std::move(in);
+    trial_acceleration = current_acceleration.resize(incre_acceleration.size()) + incre_acceleration;
+    return incre_acceleration;
 }
 
-void Node::update_trial_resistance(const vec& R) {
-    trial_resistance = R;
-    if(current_resistance.empty()) current_resistance.zeros(R.size());
-    else current_resistance.resize(R.size());
-    incre_resistance = trial_resistance - current_resistance;
+const vec& Node::update_trial_resistance(vec&& in) {
+    trial_resistance = std::move(in);
+    incre_resistance = trial_resistance - current_resistance.resize(trial_resistance.size());
+    return trial_resistance;
 }
 
-void Node::update_trial_damping_force(const vec& R) {
-    trial_damping_force = R;
-    if(current_damping_force.empty()) current_damping_force.zeros(R.size());
-    else current_damping_force.resize(R.size());
-    incre_damping_force = trial_damping_force - current_damping_force;
+const vec& Node::update_trial_damping_force(vec&& in) {
+    trial_damping_force = std::move(in);
+    incre_damping_force = trial_damping_force - current_damping_force.resize(trial_damping_force.size());
+    return trial_damping_force;
 }
 
-void Node::update_trial_nonviscous_force(const vec& R) {
-    trial_nonviscous_force = R;
-    if(current_nonviscous_force.empty()) current_nonviscous_force.zeros(R.size());
-    else current_nonviscous_force.resize(R.size());
-    incre_nonviscous_force = trial_nonviscous_force - current_nonviscous_force;
+const vec& Node::update_trial_nonviscous_force(vec&& in) {
+    trial_nonviscous_force = std::move(in);
+    incre_nonviscous_force = trial_nonviscous_force - current_nonviscous_force.resize(trial_nonviscous_force.size());
+    return trial_nonviscous_force;
 }
 
-void Node::update_trial_inertial_force(const vec& R) {
-    trial_inertial_force = R;
-    if(current_inertial_force.empty()) current_inertial_force.zeros(R.size());
-    else current_inertial_force.resize(R.size());
-    incre_inertial_force = trial_inertial_force - current_inertial_force;
+const vec& Node::update_trial_inertial_force(vec&& in) {
+    trial_inertial_force = std::move(in);
+    incre_inertial_force = trial_inertial_force - current_inertial_force.resize(trial_inertial_force.size());
+    return trial_inertial_force;
 }
 
-void Node::update_trial_displacement(const vec& D) {
-    trial_displacement = D;
-    if(current_displacement.empty()) current_displacement.zeros(D.size());
-    else current_displacement.resize(D.size());
-    incre_displacement = trial_displacement - current_displacement;
+const vec& Node::update_trial_displacement(vec&& in) {
+    trial_displacement = std::move(in);
+    incre_displacement = trial_displacement - current_displacement.resize(trial_displacement.size());
+    return trial_displacement;
 }
 
-void Node::update_trial_velocity(const vec& V) {
-    trial_velocity = V;
-    if(current_velocity.empty()) current_velocity.zeros(V.size());
-    else current_velocity.resize(V.size());
-    incre_velocity = trial_velocity - current_velocity;
+const vec& Node::update_trial_velocity(vec&& in) {
+    trial_velocity = std::move(in);
+    incre_velocity = trial_velocity - current_velocity.resize(trial_velocity.size());
+    return trial_velocity;
 }
 
-void Node::update_trial_acceleration(const vec& A) {
-    trial_acceleration = A;
-    if(current_acceleration.empty()) current_acceleration.zeros(A.size());
-    else current_acceleration.resize(A.size());
-    incre_acceleration = trial_acceleration - current_acceleration;
+const vec& Node::update_trial_acceleration(vec&& in) {
+    trial_acceleration = std::move(in);
+    incre_acceleration = trial_acceleration - current_acceleration.resize(trial_acceleration.size());
+    return trial_acceleration;
 }
 
-void Node::update_current_status(const vec& D) {
-    trial_displacement = current_displacement = D(reordered_dof);
-    incre_displacement.zeros(reordered_dof.size());
-}
+void Node::update_current_status(const vec& D) { update_current_displacement(D(reordered_dof)); }
 
 void Node::update_current_status(const vec& D, const vec& V) {
-    trial_velocity = current_velocity = V(reordered_dof);
-    incre_velocity.zeros(reordered_dof.size());
+    update_current_velocity(V(reordered_dof));
     update_current_status(D);
 }
 
 void Node::update_current_status(const vec& D, const vec& V, const vec& A) {
-    trial_acceleration = current_acceleration = A(reordered_dof);
-    incre_acceleration.zeros(reordered_dof.size());
+    update_current_acceleration(A(reordered_dof));
     update_current_status(D, V);
 }
 
-void Node::update_incre_status(const vec& D) {
-    incre_displacement = D(reordered_dof);
-    if(current_displacement.empty()) current_displacement.zeros(reordered_dof.size());
-    else current_displacement.resize(reordered_dof.size());
-    trial_displacement = current_displacement + incre_displacement;
-}
+void Node::update_incre_status(const vec& D) { update_incre_displacement(D(reordered_dof)); }
 
 void Node::update_incre_status(const vec& D, const vec& V) {
-    incre_velocity = V(reordered_dof);
-    if(current_velocity.empty()) current_velocity.zeros(reordered_dof.size());
-    else current_velocity.resize(reordered_dof.size());
-    trial_velocity = current_velocity + incre_velocity;
+    update_incre_velocity(V(reordered_dof));
     update_incre_status(D);
 }
 
 void Node::update_incre_status(const vec& D, const vec& V, const vec& A) {
-    incre_acceleration = A(reordered_dof);
-    if(current_acceleration.empty()) current_acceleration.zeros(reordered_dof.size());
-    else current_acceleration.resize(reordered_dof.size());
-    trial_acceleration = current_acceleration + incre_acceleration;
+    update_incre_acceleration(A(reordered_dof));
     update_incre_status(D, V);
 }
 
-void Node::update_trial_status(const vec& D) {
-    trial_displacement = D(reordered_dof);
-    if(current_displacement.empty()) current_displacement.zeros(reordered_dof.size());
-    else current_displacement.resize(reordered_dof.size());
-    incre_displacement = trial_displacement - current_displacement;
-}
+void Node::update_trial_status(const vec& D) { update_trial_displacement(D(reordered_dof)); }
 
 void Node::update_trial_status(const vec& D, const vec& V) {
-    trial_velocity = V(reordered_dof);
-    if(current_velocity.empty()) current_velocity.zeros(reordered_dof.size());
-    else current_velocity.resize(reordered_dof.size());
-    incre_velocity = trial_velocity - current_velocity;
+    update_trial_velocity(V(reordered_dof));
     update_trial_status(D);
 }
 
 void Node::update_trial_status(const vec& D, const vec& V, const vec& A) {
-    trial_acceleration = A(reordered_dof);
-    if(current_acceleration.empty()) current_acceleration.zeros(reordered_dof.size());
-    else current_acceleration.resize(reordered_dof.size());
-    incre_acceleration = trial_acceleration - current_acceleration;
+    update_trial_acceleration(A(reordered_dof));
     update_trial_status(D, V);
 }
 
@@ -497,7 +408,7 @@ void Node::clear_status() {
         trial_acceleration.zeros();
     }
 
-    set_initialized(false);
+    deinitialize();
 }
 
 std::vector<vec> Node::record(const OutputType L) const {
