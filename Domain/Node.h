@@ -102,8 +102,6 @@ public:
     };
 
 private:
-    bool initialized = false;
-
     std::mutex node_mutex;
 
     std::vector<DOF> dof_identifier;

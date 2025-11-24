@@ -29,44 +29,39 @@ Node::Node(const unsigned T, vec&& C)
  * Elements will set the minimum number of DoFs for all related nodes.
  */
 void Node::initialize(const shared_ptr<DomainBase>& D) {
-    if(initialized || !is_active()) return;
+    if(!is_active()) return;
 
-    if(0u != num_dof) {
-        original_dof.reset();
-        reordered_dof.reset();
-
-        current_displacement.resize(num_dof);
-        current_velocity.resize(num_dof);
-        current_acceleration.resize(num_dof);
-
-        incre_displacement.resize(num_dof);
-        incre_velocity.resize(num_dof);
-        incre_acceleration.resize(num_dof);
-
-        trial_displacement.resize(num_dof);
-        trial_velocity.resize(num_dof);
-        trial_acceleration.resize(num_dof);
-    }
-    else {
+    if(0u == num_dof) {
         suanpan_debug("Node {} disabled as it is not used.\n", get_tag());
         D->disable_node(get_tag());
+        return;
     }
 
-    initialized = true;
-
+    original_dof.reset();
+    reordered_dof.reset();
     dof_identifier.clear();
+
+    current_displacement.resize(num_dof);
+    current_velocity.resize(num_dof);
+    current_acceleration.resize(num_dof);
+
+    incre_displacement.resize(num_dof);
+    incre_velocity.resize(num_dof);
+    incre_acceleration.resize(num_dof);
+
+    trial_displacement.resize(num_dof);
+    trial_velocity.resize(num_dof);
+    trial_acceleration.resize(num_dof);
 }
 
-void Node::deinitialize() {
-    num_dof = 0u;
-    initialized = false;
-}
+void Node::deinitialize() { num_dof = 0u; }
 
 void Node::ensure_dof_number(const unsigned D) {
+    std::scoped_lock node_lock{node_mutex};
+
     if(num_dof >= D) return;
 
     num_dof = D;
-    initialized = false;
 }
 
 void Node::set_dof_identifier(const std::vector<DOF>& D) {
@@ -399,8 +394,6 @@ void Node::clear_status() {
         incre_acceleration.zeros();
         trial_acceleration.zeros();
     }
-
-    deinitialize();
 }
 
 std::vector<vec> Node::record(const OutputType L) const {
