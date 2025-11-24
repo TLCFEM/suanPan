@@ -114,6 +114,7 @@ public:
     void deinitialize();
 
     void ensure_dof(unsigned, const std::vector<DOF>&);
+    [[nodiscard]] bool validate_dof(const std::vector<DOF>&) const;
     [[nodiscard]] const std::vector<DOF>& get_dof_identifier() const;
 
     void set_original_dof(unsigned&);
@@ -147,6 +148,33 @@ public:
     [[nodiscard]] const vec& get_trial_displacement() const;
     [[nodiscard]] const vec& get_trial_velocity() const;
     [[nodiscard]] const vec& get_trial_acceleration() const;
+
+    [[nodiscard]] vec get_current_resistance(unsigned) const;
+    [[nodiscard]] vec get_current_damping_force(unsigned) const;
+    [[nodiscard]] vec get_current_nonviscous_force(unsigned) const;
+    [[nodiscard]] vec get_current_inertial_force(unsigned) const;
+    [[nodiscard]] vec get_current_displacement(unsigned) const;
+    [[nodiscard]] vec get_current_velocity(unsigned) const;
+    [[nodiscard]] vec get_current_acceleration(unsigned) const;
+
+    [[nodiscard]] vec get_incre_resistance(unsigned) const;
+    [[nodiscard]] vec get_incre_damping_force(unsigned) const;
+    [[nodiscard]] vec get_incre_nonviscous_force(unsigned) const;
+    [[nodiscard]] vec get_incre_inertial_force(unsigned) const;
+    [[nodiscard]] vec get_incre_displacement(unsigned) const;
+    [[nodiscard]] vec get_incre_velocity(unsigned) const;
+    [[nodiscard]] vec get_incre_acceleration(unsigned) const;
+
+    [[nodiscard]] vec get_trial_resistance(unsigned) const;
+    [[nodiscard]] vec get_trial_damping_force(unsigned) const;
+    [[nodiscard]] vec get_trial_nonviscous_force(unsigned) const;
+    [[nodiscard]] vec get_trial_inertial_force(unsigned) const;
+    [[nodiscard]] vec get_trial_displacement(unsigned) const;
+    [[nodiscard]] vec get_trial_velocity(unsigned) const;
+    [[nodiscard]] vec get_trial_acceleration(unsigned) const;
+
+    [[nodiscard]] vec current_position(unsigned) const;
+    [[nodiscard]] vec trial_position(unsigned) const;
 
     const vec& update_current_resistance(vec&&);
     const vec& update_current_damping_force(vec&&);

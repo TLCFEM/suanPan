@@ -70,6 +70,13 @@ void Node::ensure_dof(const unsigned num_in, const std::vector<DOF>& dof_in) {
     }
 }
 
+bool Node::validate_dof(const std::vector<DOF>& in) const {
+    if(dof_identifier.size() < in.size()) return false;
+    for(size_t I = 0; I < in.size(); ++I)
+        if(dof_identifier[I] != in[I]) return false;
+    return true;
+}
+
 const std::vector<Node::DOF>& Node::get_dof_identifier() const { return dof_identifier; }
 
 void Node::set_original_dof(unsigned& F) {
@@ -126,6 +133,52 @@ const vec& Node::get_trial_displacement() const { return trial_displacement; }
 const vec& Node::get_trial_velocity() const { return trial_velocity; }
 
 const vec& Node::get_trial_acceleration() const { return trial_acceleration; }
+
+vec Node::get_current_resistance(const unsigned dim) const { return resize(current_resistance, dim, 1); };
+
+vec Node::get_current_damping_force(const unsigned dim) const { return resize(current_damping_force, dim, 1); };
+
+vec Node::get_current_nonviscous_force(const unsigned dim) const { return resize(current_nonviscous_force, dim, 1); };
+
+vec Node::get_current_inertial_force(const unsigned dim) const { return resize(current_inertial_force, dim, 1); };
+
+vec Node::get_current_displacement(const unsigned dim) const { return resize(current_displacement, dim, 1); };
+
+vec Node::get_current_velocity(const unsigned dim) const { return resize(current_velocity, dim, 1); };
+
+vec Node::get_current_acceleration(const unsigned dim) const { return resize(current_acceleration, dim, 1); };
+
+vec Node::get_incre_resistance(const unsigned dim) const { return resize(incre_resistance, dim, 1); };
+
+vec Node::get_incre_damping_force(const unsigned dim) const { return resize(incre_damping_force, dim, 1); };
+
+vec Node::get_incre_nonviscous_force(const unsigned dim) const { return resize(incre_nonviscous_force, dim, 1); };
+
+vec Node::get_incre_inertial_force(const unsigned dim) const { return resize(incre_inertial_force, dim, 1); };
+
+vec Node::get_incre_displacement(const unsigned dim) const { return resize(incre_displacement, dim, 1); };
+
+vec Node::get_incre_velocity(const unsigned dim) const { return resize(incre_velocity, dim, 1); };
+
+vec Node::get_incre_acceleration(const unsigned dim) const { return resize(incre_acceleration, dim, 1); };
+
+vec Node::get_trial_resistance(const unsigned dim) const { return resize(trial_resistance, dim, 1); };
+
+vec Node::get_trial_damping_force(const unsigned dim) const { return resize(trial_damping_force, dim, 1); };
+
+vec Node::get_trial_nonviscous_force(const unsigned dim) const { return resize(trial_nonviscous_force, dim, 1); };
+
+vec Node::get_trial_inertial_force(const unsigned dim) const { return resize(trial_inertial_force, dim, 1); };
+
+vec Node::get_trial_displacement(const unsigned dim) const { return resize(trial_displacement, dim, 1); };
+
+vec Node::get_trial_velocity(const unsigned dim) const { return resize(trial_velocity, dim, 1); };
+
+vec Node::get_trial_acceleration(const unsigned dim) const { return resize(trial_acceleration, dim, 1); }
+
+vec Node::current_position(const unsigned dim) const { return resize(coordinate, dim, 1) + resize(current_displacement, dim, 1); }
+
+vec Node::trial_position(const unsigned dim) const { return resize(coordinate, dim, 1) + resize(trial_displacement, dim, 1); }
 
 const vec& Node::update_current_resistance(vec&& in) {
     trial_resistance = current_resistance = std::move(in);
