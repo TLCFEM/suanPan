@@ -268,8 +268,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} disabled as inactive nodes used.\n", get_tag());
         return SUANPAN_FAIL;
     }
-    for(auto& I : node_ptr)
-        if(I.lock()->get_dof_number() < num_dof) I.lock()->set_dof_number(num_dof);
+    for(auto& I : node_ptr) I.lock()->ensure_dof_number(num_dof);
 
     // check if material models are valid
     if(MaterialType::D0 != material_type)

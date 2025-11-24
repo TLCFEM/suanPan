@@ -882,7 +882,7 @@ int Domain::reorder_dof() {
     suanpan_debug("The global matrix has a size of {} with bandwidth {} (lower) and {} (upper).\n", dof_counter, low_bw, -up_bw);
 
     // assign new labels to active nodes
-    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->set_reordered_dof(idx_sorted(t_node->get_original_dof())); });
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->set_reordered_dof(idx_sorted); });
 
     factory->set_size(dof_counter);
     factory->set_bandwidth(static_cast<unsigned>(low_bw), static_cast<unsigned>(-up_bw));
@@ -990,11 +990,8 @@ int Domain::initialize() {
     initialize_section();
 
     // set dof number to zero before first initialisation of elements
-    suanpan::for_all(node_pond, [](const dual<Node>& t_node) {
-        // for restart analysis that may reassign dof
-        t_node.second->set_initialized(false);
-        t_node.second->set_dof_number(0);
-    });
+    // for restart analysis that may reassign dof
+    suanpan::for_all(node_pond, [](const dual<Node>& t_node) { t_node.second->deinitialize(); });
     node_pond.update();
 
     // groups reply on nodes

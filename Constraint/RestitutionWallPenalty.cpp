@@ -94,8 +94,7 @@ void RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
     for(const auto& I : node_pool) {
         auto t_acceleration = I->get_trial_acceleration();
         t_acceleration.head(n_dim) = trial_acceleration_handler(I) - dot(incre_acceleration_handler(I), outer_norm) * outer_norm;
-        I->update_trial_acceleration(t_acceleration);
-        trial_acceleration(I->get_reordered_dof()) = t_acceleration;
+        trial_acceleration(I->get_reordered_dof()) = I->update_trial_acceleration(std::move(t_acceleration));
     }
 
     W->update_trial_acceleration(trial_acceleration);

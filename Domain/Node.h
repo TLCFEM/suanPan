@@ -113,48 +113,20 @@ public:
 
     void initialize(const shared_ptr<DomainBase>&);
 
-    void set_initialized(bool);
-    [[nodiscard]] bool get_initialized() const;
+    void deinitialize();
 
-    void set_dof_number(unsigned);
-    [[nodiscard]] unsigned get_dof_number() const;
+    void ensure_dof_number(unsigned);
 
     void set_dof_identifier(const std::vector<DOF>&);
     [[nodiscard]] const std::vector<DOF>& get_dof_identifier() const;
 
     void set_original_dof(unsigned&);
-    void set_original_dof(const uvec&);
     [[nodiscard]] const uvec& get_original_dof() const;
 
     void set_reordered_dof(const uvec&);
     [[nodiscard]] const uvec& get_reordered_dof() const;
 
-    void set_coordinate(const vec&);
     [[nodiscard]] const vec& get_coordinate() const;
-
-    void set_current_resistance(const vec&);
-    void set_current_damping_force(const vec&);
-    void set_current_nonviscous_force(const vec&);
-    void set_current_inertial_force(const vec&);
-    void set_current_displacement(const vec&);
-    void set_current_velocity(const vec&);
-    void set_current_acceleration(const vec&);
-
-    void set_incre_resistance(const vec&);
-    void set_incre_damping_force(const vec&);
-    void set_incre_nonviscous_force(const vec&);
-    void set_incre_inertial_force(const vec&);
-    void set_incre_displacement(const vec&);
-    void set_incre_velocity(const vec&);
-    void set_incre_acceleration(const vec&);
-
-    void set_trial_resistance(const vec&);
-    void set_trial_damping_force(const vec&);
-    void set_trial_nonviscous_force(const vec&);
-    void set_trial_inertial_force(const vec&);
-    void set_trial_displacement(const vec&);
-    void set_trial_velocity(const vec&);
-    void set_trial_acceleration(const vec&);
 
     [[nodiscard]] const vec& get_current_resistance() const;
     [[nodiscard]] const vec& get_current_damping_force() const;
@@ -180,29 +152,29 @@ public:
     [[nodiscard]] const vec& get_trial_velocity() const;
     [[nodiscard]] const vec& get_trial_acceleration() const;
 
-    void update_current_resistance(const vec&);
-    void update_current_damping_force(const vec&);
-    void update_current_nonviscous_force(const vec&);
-    void update_current_inertial_force(const vec&);
-    void update_current_displacement(const vec&);
-    void update_current_velocity(const vec&);
-    void update_current_acceleration(const vec&);
+    const vec& update_current_resistance(vec&&);
+    const vec& update_current_damping_force(vec&&);
+    const vec& update_current_nonviscous_force(vec&&);
+    const vec& update_current_inertial_force(vec&&);
+    const vec& update_current_displacement(vec&&);
+    const vec& update_current_velocity(vec&&);
+    const vec& update_current_acceleration(vec&&);
 
-    void update_incre_resistance(const vec&);
-    void update_incre_damping_force(const vec&);
-    void update_incre_nonviscous_force(const vec&);
-    void update_incre_inertial_force(const vec&);
-    void update_incre_displacement(const vec&);
-    void update_incre_velocity(const vec&);
-    void update_incre_acceleration(const vec&);
+    const vec& update_incre_resistance(vec&&);
+    const vec& update_incre_damping_force(vec&&);
+    const vec& update_incre_nonviscous_force(vec&&);
+    const vec& update_incre_inertial_force(vec&&);
+    const vec& update_incre_displacement(vec&&);
+    const vec& update_incre_velocity(vec&&);
+    const vec& update_incre_acceleration(vec&&);
 
-    void update_trial_resistance(const vec&);
-    void update_trial_damping_force(const vec&);
-    void update_trial_nonviscous_force(const vec&);
-    void update_trial_inertial_force(const vec&);
-    void update_trial_displacement(const vec&);
-    void update_trial_velocity(const vec&);
-    void update_trial_acceleration(const vec&);
+    const vec& update_trial_resistance(vec&&);
+    const vec& update_trial_damping_force(vec&&);
+    const vec& update_trial_nonviscous_force(vec&&);
+    const vec& update_trial_inertial_force(vec&&);
+    const vec& update_trial_displacement(vec&&);
+    const vec& update_trial_velocity(vec&&);
+    const vec& update_trial_acceleration(vec&&);
 
     void update_current_status(const vec&);
     void update_current_status(const vec&, const vec&);
