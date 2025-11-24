@@ -32,7 +32,7 @@ jobs:
             aocl: ON
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Golang
@@ -118,7 +118,7 @@ jobs:
         os: [ubuntu-22.04]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Golang
@@ -193,7 +193,7 @@ jobs:
         vtk: [ON]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Prepare
@@ -269,7 +269,7 @@ jobs:
         mkl: [ON]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Golang
@@ -403,7 +403,7 @@ jobs:
         vtk: [ON]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Golang
