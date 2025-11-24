@@ -205,16 +205,22 @@ mat GCMQ::compute_shape_function(const mat& coordinate, const unsigned order) co
 std::vector<vec> GCMQ::record(const OutputType P) const {
     std::vector<vec> data;
 
+    const auto remap = [](vec&& in) {
+        vec out(6, fill::zeros);
+        out(uvec{0, 1, 3}) = in;
+        return out;
+    };
+
     if(P == OutputType::S)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_stress * current_alpha);
+        for(const auto& I : int_pt) data.emplace_back(remap(I.poly_stress * current_alpha));
+    else if(P == OutputType::E)
+        for(const auto& I : int_pt) data.emplace_back(remap(I.poly_strain * current_beta));
+    else if(P == OutputType::PE)
+        for(const auto& I : int_pt) data.emplace_back(remap(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)));
     else if(P == OutputType::SP)
         for(const auto& I : int_pt) data.emplace_back(transform::stress::principal(I.poly_stress * current_alpha));
-    else if(P == OutputType::E)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_strain * current_beta);
     else if(P == OutputType::EP)
         for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta));
-    else if(P == OutputType::PE)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha));
     else if(P == OutputType::PEP)
         for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)));
     else

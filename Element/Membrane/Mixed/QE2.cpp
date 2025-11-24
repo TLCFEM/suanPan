@@ -210,10 +210,16 @@ mat QE2::compute_shape_function(const mat& coordinate, const unsigned order) con
 std::vector<vec> QE2::record(const OutputType P) const {
     std::vector<vec> data;
 
-    if(P == OutputType::E)
-        for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
-    else if(P == OutputType::S)
-        for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);
+    const auto remap = [](vec&& in) {
+        vec out(6, fill::zeros);
+        out(uvec{0, 1, 3}) = in;
+        return out;
+    };
+
+    if(P == OutputType::S)
+        for(const auto& I : int_pt) data.emplace_back(remap(I.P * current_beta));
+    else if(P == OutputType::E)
+        for(const auto& I : int_pt) data.emplace_back(remap(I.A * current_alpha));
     else
         for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
 

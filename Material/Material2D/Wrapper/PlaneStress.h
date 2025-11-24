@@ -29,7 +29,6 @@
 #define PLANESTRESS_H
 
 #include <Material/Material3D/Wrapper/StressWrapper.h>
-#include <Toolbox/ResourceHolder.h>
 
 class PlaneStress final : public StressWrapper {
 public:

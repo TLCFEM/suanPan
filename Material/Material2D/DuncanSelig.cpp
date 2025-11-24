@@ -119,8 +119,8 @@ DuncanSelig::ds_moduli DuncanSelig::compute_plastic_moduli() {
     else max_dev_stress = min_ratio * p_atm;
 
     const auto dev_stress = s1 - s3;
-    const auto pdsps1 = 1.;
-    const auto pdsps3 = -1.;
+    constexpr auto pdsps1 = 1.;
+    constexpr auto pdsps3 = -1.;
 
     const auto [ini_elastic, deids3] = compute_elastic(s3);
 

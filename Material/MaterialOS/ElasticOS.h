@@ -19,8 +19,8 @@
  * @brief The ElasticOS class defines a isotropic elastic material for open section
  * problems.
  *
- * The Young's modulus is stored in `elastic_modulus`. The Poisson's ratio is
- * stored in `poissons_ratio`.
+ * The Young's modulus is stored in `elastic_modulus`.
+ * The Poisson's ratio is stored in `poissons_ratio`.
  *
  *
  * @author tlc
