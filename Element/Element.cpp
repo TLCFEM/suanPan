@@ -268,7 +268,8 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         suanpan_warning("Element {} disabled as inactive nodes used.\n", get_tag());
         return SUANPAN_FAIL;
     }
-    for(auto& I : node_ptr) I.lock()->ensure_dof_number(num_dof);
+
+    for(const auto& t_ptr : node_ptr) t_ptr.lock()->ensure_dof(num_dof, dof_identifier);
 
     // check if material models are valid
     if(MaterialType::D0 != material_type)
@@ -315,9 +316,6 @@ void Element::update_dof_encoding() {
         for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
     // ReSharper disable once CppUseRangeAlgorithm
     std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
-
-    if(!dof_identifier.empty())
-        for(const auto& t_ptr : node_ptr) t_ptr.lock()->set_dof_identifier(dof_identifier);
 }
 
 bool Element::if_update_mass() const { return update_mass; }

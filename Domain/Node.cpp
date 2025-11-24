@@ -39,7 +39,6 @@ void Node::initialize(const shared_ptr<DomainBase>& D) {
 
     original_dof.reset();
     reordered_dof.reset();
-    dof_identifier.clear();
 
     current_displacement.resize(num_dof);
     current_velocity.resize(num_dof);
@@ -54,26 +53,20 @@ void Node::initialize(const shared_ptr<DomainBase>& D) {
     trial_acceleration.resize(num_dof);
 }
 
-void Node::deinitialize() { num_dof = 0u; }
-
-void Node::ensure_dof_number(const unsigned D) {
-    std::scoped_lock node_lock{node_mutex};
-
-    if(num_dof >= D) return;
-
-    num_dof = D;
+void Node::deinitialize() {
+    num_dof = 0u;
+    dof_identifier.clear();
 }
 
-void Node::set_dof_identifier(const std::vector<DOF>& D) {
+void Node::ensure_dof(const unsigned num_in, const std::vector<DOF>& dof_in) {
     std::scoped_lock node_lock{node_mutex};
 
-    if(dof_identifier.empty()) dof_identifier.resize(num_dof, DOF::NONE);
+    if(num_dof < num_in) dof_identifier.resize(num_dof = num_in, DOF::NONE);
 
-    for(size_t I = 0; I < D.size(); ++I) {
-        if(DOF::NONE == D[I]) continue;
-        if(DOF::NONE != dof_identifier[I] && D[I] != dof_identifier[I])
-            suanpan_warning("Inconsistent DoF assignment for node {} detected.\n", get_tag());
-        dof_identifier[I] = D[I];
+    for(size_t I = 0; I < dof_in.size(); ++I) {
+        if(DOF::NONE == dof_in[I]) continue;
+        if(DOF::NONE != dof_identifier[I] && dof_in[I] != dof_identifier[I]) suanpan_warning("Inconsistent DoF assignment for node {} detected.\n", get_tag());
+        dof_identifier[I] = dof_in[I];
     }
 }
 

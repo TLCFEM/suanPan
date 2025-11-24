@@ -113,9 +113,7 @@ public:
 
     void deinitialize();
 
-    void ensure_dof_number(unsigned);
-
-    void set_dof_identifier(const std::vector<DOF>&);
+    void ensure_dof(unsigned, const std::vector<DOF>&);
     [[nodiscard]] const std::vector<DOF>& get_dof_identifier() const;
 
     void set_original_dof(unsigned&);
