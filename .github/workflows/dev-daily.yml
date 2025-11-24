@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Compile
@@ -77,7 +77,7 @@ jobs:
         os: [macos-14-large, macos-14-xlarge]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Compile
@@ -123,7 +123,7 @@ jobs:
     timeout-minutes: 100
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: GCC
