@@ -106,21 +106,21 @@ void RestitutionWallPenalty::clear_status() { node_pool.clear(); }
 
 void RestitutionWallPenalty::reset_status() { node_pool.clear(); }
 
-RestitutionWallPenalty1D::RestitutionWallPenalty1D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 1, 1), resize(N, 1, 1), RC, F, 1) {}
+RestitutionWallPenalty1D::RestitutionWallPenalty1D(const unsigned T, const unsigned A, const double O, const double N, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, {O}, {N}, RC, F, 1) {}
 
-RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 2, 1), resize(N, 2, 1), RC, F, 2) {}
+RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned A, vec2&& O, vec2&& N, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, std::move(O), std::move(N), RC, F, 2) {}
 
-RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 2) {
+RestitutionWallPenalty2D::RestitutionWallPenalty2D(const unsigned T, const unsigned A, vec2&& O, vec3&& E1, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, std::move(O), std::move(E1), vec{0., 0., 1.}, RC, F, 2) {
     access::rw(outer_norm).resize(2);
     access::rw(edge_a).resize(2);
     access::rw(edge_b).reset();
 }
 
-RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 3, 1), resize(N, 3, 1), RC, F, 3) {}
+RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned A, vec3&& O, vec3&& N, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, std::move(O), std::move(N), RC, F, 3) {}
 
-RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double RC, const double F)
-    : RestitutionWallPenalty(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), RC, F, 3) {}
+RestitutionWallPenalty3D::RestitutionWallPenalty3D(const unsigned T, const unsigned A, vec3&& O, vec3&& E1, vec3&& E2, const double RC, const double F)
+    : RestitutionWallPenalty(T, A, std::move(O), std::move(E1), std::move(E2), RC, F, 3) {}

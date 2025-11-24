@@ -34,7 +34,7 @@ RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, 
     , edge_a(E1)           // 3D vector
     , edge_b(E2)           // 3D vector
     , origin(std::move(O)) // 1D, 2D and 3D vectors
-    , outer_norm(normalise(cross(E1, E2)))
+    , outer_norm(normalise(cross(edge_a, edge_b)))
     , length_a(norm(edge_a))
     , length_b(norm(edge_b)) { setup(); }
 
@@ -79,21 +79,21 @@ void RigidWallPenalty::clear_status() { resistance.reset(); }
 
 void RigidWallPenalty::reset_status() { resistance.reset(); }
 
-RigidWallPenalty1D::RigidWallPenalty1D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, A, resize(O, 1, 1), resize(N, 1, 1), F, 1) {}
+RigidWallPenalty1D::RigidWallPenalty1D(const unsigned T, const unsigned A, const double O, const double N, const double F)
+    : RigidWallPenalty(T, A, {O}, {N}, F, 1) {}
 
-RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, A, resize(O, 2, 1), resize(N, 2, 1), F, 2) {}
+RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec2&& O, vec2&& N, const double F)
+    : RigidWallPenalty(T, A, std::move(O), std::move(N), F, 2) {}
 
-RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallPenalty(T, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 2) {
+RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec2&& O, vec3&& E1, const double F)
+    : RigidWallPenalty(T, A, std::move(O), std::move(E1), vec{0., 0., 1.}, F, 2) {
     access::rw(outer_norm).resize(2);
     access::rw(edge_a).resize(2);
     access::rw(edge_b).reset();
 }
 
-RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, A, resize(O, 3, 1), resize(N, 3, 1), F, 3) {}
+RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec3&& O, vec3&& N, const double F)
+    : RigidWallPenalty(T, A, std::move(O), std::move(N), F, 3) {}
 
-RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallPenalty(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 3) {}
+RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec3&& O, vec3&& E1, vec3&& E2, const double F)
+    : RigidWallPenalty(T, A, std::move(O), std::move(E1), std::move(E2), F, 3) {}

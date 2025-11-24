@@ -65,19 +65,19 @@ public:
 
 class RigidWallPenalty1D final : public RigidWallPenalty {
 public:
-    RigidWallPenalty1D(unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallPenalty1D(unsigned, unsigned, double, double, double);
 };
 
 class RigidWallPenalty2D final : public RigidWallPenalty {
 public:
-    RigidWallPenalty2D(unsigned, unsigned, vec&&, vec&&, double);
-    RigidWallPenalty2D(unsigned, unsigned, vec&&, vec&&, vec&&, double);
+    RigidWallPenalty2D(unsigned, unsigned, vec2&&, vec2&&, double);
+    RigidWallPenalty2D(unsigned, unsigned, vec2&&, vec3&&, double);
 };
 
 class RigidWallPenalty3D final : public RigidWallPenalty {
 public:
-    RigidWallPenalty3D(unsigned, unsigned, vec&&, vec&&, double);
-    RigidWallPenalty3D(unsigned, unsigned, vec&&, vec&&, vec&&, double);
+    RigidWallPenalty3D(unsigned, unsigned, vec3&&, vec3&&, double);
+    RigidWallPenalty3D(unsigned, unsigned, vec3&&, vec3&&, vec3&&, double);
 };
 
 #endif

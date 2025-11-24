@@ -57,19 +57,19 @@ public:
 
 class RestitutionWallPenalty1D final : public RestitutionWallPenalty {
 public:
-    RestitutionWallPenalty1D(unsigned, unsigned, vec&&, vec&&, double, double);
+    RestitutionWallPenalty1D(unsigned, unsigned, double, double, double, double);
 };
 
 class RestitutionWallPenalty2D final : public RestitutionWallPenalty {
 public:
-    RestitutionWallPenalty2D(unsigned, unsigned, vec&&, vec&&, double, double);
-    RestitutionWallPenalty2D(unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
+    RestitutionWallPenalty2D(unsigned, unsigned, vec2&&, vec2&&, double, double);
+    RestitutionWallPenalty2D(unsigned, unsigned, vec2&&, vec3&&, double, double);
 };
 
 class RestitutionWallPenalty3D final : public RestitutionWallPenalty {
 public:
-    RestitutionWallPenalty3D(unsigned, unsigned, vec&&, vec&&, double, double);
-    RestitutionWallPenalty3D(unsigned, unsigned, vec&&, vec&&, vec&&, double, double);
+    RestitutionWallPenalty3D(unsigned, unsigned, vec3&&, vec3&&, double, double);
+    RestitutionWallPenalty3D(unsigned, unsigned, vec3&&, vec3&&, vec3&&, double, double);
 };
 
 #endif
