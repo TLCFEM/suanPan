@@ -111,7 +111,7 @@ void Recorder::save() {
             data_to_write.row(0) = rowvec{time_pool};
 
             for(auto J = 0llu; J < data_to_write.n_cols; ++J) {
-                auto row = time_pool.empty() ? 0llu : 1llu;
+                auto row = 1llu;
                 for(auto& block : object_data[J]) {
                     data_to_write(span(row, row + cell_size - 1), J) = block;
                     row += cell_size;
@@ -140,14 +140,14 @@ void Recorder::save() {
 
             const auto [cell_size, cell_num] = normalise_size(object_data);
 
-            mat data_to_write(cell_size * cell_num + 1, object_data.size(), fill::zeros);
-            data_to_write.row(0) = rowvec{time_pool};
+            mat data_to_write(object_data.size(), cell_size * cell_num + 1, fill::zeros);
+            data_to_write.col(0) = vec{time_pool};
 
-            for(auto J = 0llu; J < data_to_write.n_cols; ++J) {
-                auto row = time_pool.empty() ? 0llu : 1llu;
+            for(auto J = 0llu; J < data_to_write.n_rows; ++J) {
+                auto col = 1llu;
                 for(auto& block : object_data[J]) {
-                    data_to_write(span(row, row + cell_size - 1), J) = block;
-                    row += cell_size;
+                    data_to_write(J, span(col, col + cell_size - 1)) = block.t();
+                    col += cell_size;
                 }
             }
 
@@ -156,7 +156,7 @@ void Recorder::save() {
             if(object_tag.size() == data_pool.size()) dataset_name << object_tag(I);
             else dataset_name << "-SUM";
 
-            data_to_write.t().eval().save(dataset_name.str() + ".txt", raw_ascii);
+            data_to_write.save(dataset_name.str() + ".txt", raw_ascii);
         }
     }
 }
