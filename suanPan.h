@@ -339,7 +339,6 @@ namespace suanpan {
 #ifdef SUANPAN_MSVC
 #pragma warning(disable : 4100)
 #endif
-#include <functional>
 
 template<std::invocable F> auto suanpan_assert([[maybe_unused]] F&& handler) {
 #ifdef SUANPAN_DEBUG
