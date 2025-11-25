@@ -38,8 +38,6 @@ void SumRecorder::initialize(const shared_ptr<DomainBase>& D) {
             D->disable_recorder(get_tag());
             return;
         }
-
-    data_pool.resize(1);
 }
 
 void SumRecorder::print() { suanpan_info("A summation recorder computes the summation of a collection of nodal scalar variables.\n"); }

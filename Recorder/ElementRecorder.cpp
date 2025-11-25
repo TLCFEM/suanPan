@@ -23,11 +23,11 @@
 
 void ElementRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     if(OutputType::K == variable_type)
-        for(auto I = 0llu; I < object_tag.n_elem; ++I) insert({vectorise(D->get<Element>(object_tag(I))->get_current_stiffness())}, I);
+        for(const auto I : object_tag) insert({vectorise(D->get<Element>(I)->get_current_stiffness())}, I);
     else if(OutputType::M == variable_type)
-        for(auto I = 0llu; I < object_tag.n_elem; ++I) insert({vectorise(D->get<Element>(object_tag(I))->get_current_mass())}, I);
+        for(const auto I : object_tag) insert({vectorise(D->get<Element>(I)->get_current_mass())}, I);
     else
-        for(auto I = 0llu; I < object_tag.n_elem; ++I) insert(D->get<Element>(object_tag(I))->record(variable_type), I);
+        for(const auto I : object_tag) insert(D->get<Element>(I)->record(variable_type), I);
 
     insert(D->get_factory()->get_current_time());
 }
@@ -43,7 +43,6 @@ void ElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
         else if(t_element->is_local) pool.emplace_back(I);
 
     object_tag = pool;
-    data_pool.resize(object_tag.n_elem);
 }
 
 void ElementRecorder::print() { suanpan_info("An element recorder.\n"); }

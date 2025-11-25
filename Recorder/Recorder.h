@@ -46,8 +46,8 @@ protected:
     const uvec reference_tag;
 
     uvec object_tag;
-    std::vector<double> time_pool;                        // recorded data
-    std::vector<std::vector<std::vector<vec>>> data_pool; // recorded data
+    std::vector<double> time_pool;                                      // recorded data
+    std::unordered_map<uword, std::vector<std::vector<vec>>> data_pool; // recorded data
 
     unsigned counter = 0u;
 
@@ -67,7 +67,7 @@ public:
     virtual void initialize(const shared_ptr<DomainBase>&);
 
     void insert(double);
-    void insert(std::vector<vec>&&, unsigned);
+    void insert(std::vector<vec>&&, uword);
 
     void record(const shared_ptr<DomainBase>&);
 

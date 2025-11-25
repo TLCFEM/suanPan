@@ -69,17 +69,17 @@ Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigne
     , interval(I)
     , reference_tag(std::move(B)) {}
 
-void Recorder::initialize(const shared_ptr<DomainBase>& D) { data_pool.resize(update_tag(D).n_elem); }
+void Recorder::initialize(const shared_ptr<DomainBase>& D) { update_tag(D); }
 
 void Recorder::insert(const double T) { time_pool.emplace_back(T); }
 
-void Recorder::insert(std::vector<vec>&& data, const unsigned index) {
+void Recorder::insert(std::vector<vec>&& data, const uword tag) {
     if(component >= 0) {
         const auto select = static_cast<uword>(component);
         for(auto& item : data) item = vec{item.n_elem > select ? item(select) : 0.};
     }
 
-    data_pool[index].emplace_back(std::move(data));
+    data_pool[tag].emplace_back(std::move(data));
 }
 void Recorder::record(const shared_ptr<DomainBase>& D) {
     if(1 == interval || 0 == counter++ % interval) record_impl(D);
@@ -111,8 +111,7 @@ void Recorder::save() {
 
         const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-        for(auto I = 0u; I < data_pool.size(); ++I) {
-            auto& object_data = data_pool[I];
+        for(auto& [tag, object_data] : data_pool) {
             if(object_data.empty()) continue;
 
             const auto [cell_size, cell_num] = normalise_size(object_data);
@@ -131,9 +130,7 @@ void Recorder::save() {
             hsize_t dimension[2]{data_to_write.n_cols, data_to_write.n_rows};
 
             std::ostringstream dataset_name;
-            dataset_name << origin_name.c_str();
-            if(object_tag.size() == data_pool.size()) dataset_name << object_tag(I);
-            else dataset_name << "-SUM";
+            dataset_name << origin_name.c_str() << tag;
 
             H5LTmake_dataset(group_id, dataset_name.str().c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
         }
@@ -144,8 +141,7 @@ void Recorder::save() {
     else
 #endif
     {
-        for(auto I = 0u; I < data_pool.size(); ++I) {
-            auto& object_data = data_pool[I];
+        for(auto& [tag, object_data] : data_pool) {
             if(object_data.empty()) continue;
 
             const auto [cell_size, cell_num] = normalise_size(object_data);
@@ -162,9 +158,7 @@ void Recorder::save() {
             }
 
             std::ostringstream dataset_name;
-            dataset_name << (SUANPAN_OUTPUT / origin_name).generic_string();
-            if(object_tag.size() == data_pool.size()) dataset_name << object_tag(I);
-            else dataset_name << "-SUM";
+            dataset_name << (SUANPAN_OUTPUT / origin_name).generic_string() << tag;
 
             data_to_write.save(dataset_name.str() + ".txt", raw_ascii);
         }

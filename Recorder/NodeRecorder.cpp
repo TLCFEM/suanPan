@@ -23,7 +23,7 @@
 
 void NodeRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     const auto populate = [&](const vec& in) {
-        for(auto I = 0llu; I < object_tag.n_elem; ++I) insert({in(D->get<Node>(object_tag(I))->get_reordered_dof())}, I);
+        for(const auto I : object_tag) insert({in(D->get<Node>(I)->get_reordered_dof())}, I);
     };
 
     if(OutputType::GDF == variable_type) {
@@ -42,7 +42,7 @@ void NodeRecorder::record_impl(const shared_ptr<DomainBase>& D) {
         populate(momentum);
     }
     else
-        for(auto I = 0llu; I < object_tag.n_elem; ++I) insert(D->get<Node>(object_tag(I))->record(variable_type), I);
+        for(const auto I : object_tag) insert(D->get<Node>(I)->record(variable_type), I);
 
     insert(D->get_factory()->get_current_time());
 }
@@ -58,7 +58,6 @@ void NodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
         else pool.emplace_back(I);
 
     object_tag = pool;
-    data_pool.resize(object_tag.n_elem);
 }
 
 void NodeRecorder::print() { suanpan_info("A node recorder.\n"); }

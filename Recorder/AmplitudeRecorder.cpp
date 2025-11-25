@@ -24,7 +24,7 @@
 void AmplitudeRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     const sp_d auto current_time = D->get_factory()->get_current_time();
 
-    for(auto I = 0llu; I < object_tag.n_elem; ++I) insert({{D->get<Amplitude>(object_tag(I))->get_amplitude(current_time)}}, I);
+    for(const auto I : object_tag) insert({{D->get<Amplitude>(I)->get_amplitude(current_time)}}, I);
 
     insert(current_time);
 }
