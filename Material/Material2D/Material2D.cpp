@@ -24,10 +24,23 @@ Material2D::Material2D(const unsigned T, const PlaneType PT, const double R)
     : Material(T, MaterialType::D2, R) { access::rw(plane_type) = PT; }
 
 std::vector<vec> Material2D::record(const OutputType P) const {
-    if(P == OutputType::SP) return {transform::stress::principal(current_stress)};
-    if(P == OutputType::EP) return {transform::strain::principal(current_strain)};
-    if(P == OutputType::EEP) return {transform::stress::principal(solve(initial_stiffness, current_stress))};
-    if(P == OutputType::PEP) return {transform::strain::principal(current_strain - solve(initial_stiffness, current_stress))};
+    if(P == OutputType::HIST) return {current_history};
+    if(P == OutputType::YF) return {vec{any(current_history != 0.) ? 1. : 0.}};
 
-    return Material::record(P);
+    const auto remap = [](const vec& in) {
+        vec out(6, fill::zeros);
+        out(uvec{0, 1, 3}) = in;
+        return out;
+    };
+
+    if(plane_type == PlaneType::S) {
+        if(P == OutputType::S) return {remap(current_stress)};
+        if(P == OutputType::SP) return {transform::stress::principal(current_stress)};
+    }
+    else if(plane_type == PlaneType::E) {
+        if(P == OutputType::E) return {remap(current_strain)};
+        if(P == OutputType::EP) return {transform::strain::principal(current_strain)};
+    }
+
+    return {};
 }

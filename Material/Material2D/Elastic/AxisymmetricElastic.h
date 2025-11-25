@@ -54,6 +54,8 @@ public:
     int commit_status() override;
     int reset_status() override;
 
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
+
     void print() override;
 };
 
