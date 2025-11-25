@@ -21,32 +21,30 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
-SumRecorder::SumRecorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
-    : Recorder(T, std::move(B), L, I, R, H) { access::rw(get_data_pool()).resize(1); }
-
 void SumRecorder::initialize(const shared_ptr<DomainBase>& D) {
-    for(const auto I : get_object_tag())
-        if(!D->find<Node>(I)) {
+    for(const auto I : update_tag(D))
+        if(!D->find<Node>(I) || !D->get<Node>(I)->is_active()) {
             D->disable_recorder(get_tag());
             return;
         }
+
+    data_pool.resize(1);
 }
 
 void SumRecorder::record(const shared_ptr<DomainBase>& D) {
     if(!if_perform_record()) return;
 
     running_stat_vec<vec> data;
-    for(const auto I : get_object_tag()) {
-        const auto& t_node = D->get<Node>(I);
-        if(!t_node->is_active()) continue;
-        for(const auto& t_data : t_node->record(variable_type))
-            data(t_data);
-    }
+    for(const auto I : object_tag)
+        for(const auto& t_data : D->get<Node>(I)->record(variable_type)) data(t_data);
+
     insert({data.mean() * data.count()}, 0);
 
-    if(if_record_time()) insert(D->get_factory()->get_current_time());
+    insert(D->get_factory()->get_current_time());
 }
 
-void SumRecorder::print() {
-    suanpan_info("A summation recorder computes the summation of a collection of nodal scalar variables.\n");
-}
+void SumRecorder::print() { suanpan_info("A summation recorder computes the summation of a collection of nodal scalar variables.\n"); }
+
+const uvec& GroupSumRecorder::update_tag(const shared_ptr<DomainBase>& D) { return object_tag = D->flatten_group(reference_tag); }
+
+void GroupSumRecorder::print() { suanpan_info("A summation recorder.\n"); }

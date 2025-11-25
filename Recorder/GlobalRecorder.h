@@ -32,13 +32,41 @@
 #include <Recorder/Recorder.h>
 
 class GlobalRecorder : public Recorder {
+protected:
+    static void assemble_matrix(const mat&, const uvec&, mat&);
+
 public:
     GlobalRecorder(
         unsigned,   // tag
         OutputType, // recorder type
         unsigned,   // interval
-        bool,       // if to record time
         bool        // if to use hdf5
+    );
+
+    void record(const shared_ptr<DomainBase>&) override;
+
+    void print() override;
+};
+
+class GlobalStiffnessRecorder final : public GlobalRecorder {
+public:
+    GlobalStiffnessRecorder(
+        unsigned, // tag
+        unsigned, // interval
+        bool      // if to use hdf5
+    );
+
+    void record(const shared_ptr<DomainBase>&) override;
+
+    void print() override;
+};
+
+class GlobalMassRecorder final : public GlobalRecorder {
+public:
+    GlobalMassRecorder(
+        unsigned, // tag
+        unsigned, // interval
+        bool      // if to use hdf5
     );
 
     void record(const shared_ptr<DomainBase>&) override;

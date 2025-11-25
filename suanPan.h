@@ -382,7 +382,7 @@ namespace suanpan {
         for(const auto& item : container)
             if(item.n_elem > max_size) max_size = item.n_elem;
 
-        for(auto& item : container) item.resize(max_size);
+        for(auto&& item : container) item.resize(max_size);
 
         return container;
     }
@@ -405,6 +405,6 @@ namespace std::ranges {
 } // namespace std::ranges
 #endif
 
-template<typename T1> [[nodiscard]] enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
+template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
 
 #endif

@@ -81,27 +81,25 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istrings
         return SUANPAN_SUCCESS;
     }
 
-    const auto object_tag = get_remaining<uword>(command);
-
-    if(is_equal(object_type, "Node") && !domain->insert(std::make_shared<NodeRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, true, use_hdf5)))
+    if(const auto object_tag = get_remaining<uword>(command); is_equal(object_type, "Node") && !domain->insert(std::make_shared<NodeRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
         suanpan_error("Fail to create new node recorder.\n");
-    else if(is_equal(object_type, "GroupNode") && !domain->insert(std::make_shared<GroupNodeRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, true, use_hdf5)))
+    else if(is_equal(object_type, "GroupNode") && !domain->insert(std::make_shared<GroupNodeRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
         suanpan_error("Fail to create new group node recorder.\n");
-    else if(is_equal(object_type, "Sum") && !domain->insert(std::make_shared<SumRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, true, use_hdf5)))
+    else if(is_equal(object_type, "Sum") && !domain->insert(std::make_shared<SumRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
         suanpan_error("Fail to create new summation recorder.\n");
-    else if(is_equal(object_type, "GroupSum") && !domain->insert(std::make_shared<GroupSumRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, true, use_hdf5)))
+    else if(is_equal(object_type, "GroupSum") && !domain->insert(std::make_shared<GroupSumRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
         suanpan_error("Fail to create new group summation recorder.\n");
-    else if(is_equal(object_type, "Element") && !domain->insert(std::make_shared<ElementRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, true, use_hdf5)))
+    else if(is_equal(object_type, "Element") && !domain->insert(std::make_shared<ElementRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
         suanpan_error("Fail to create new element recorder.\n");
-    else if(is_equal(object_type, "GroupElement") && !domain->insert(std::make_shared<GroupElementRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, true, use_hdf5)))
+    else if(is_equal(object_type, "GroupElement") && !domain->insert(std::make_shared<GroupElementRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
         suanpan_error("Fail to create new group element recorder.\n");
-    else if(is_equal(object_type, "Amplitude") && !domain->insert(std::make_shared<AmplitudeRecorder>(tag, uvec(object_tag), OutputType::AMP, interval, true, use_hdf5)))
+    else if(is_equal(object_type, "Amplitude") && !domain->insert(std::make_shared<AmplitudeRecorder>(tag, uvec(object_tag), OutputType::AMP, interval, use_hdf5)))
         suanpan_error("Fail to create new amplitude recorder.\n");
     else if(is_equal(object_type, "Global")) {
         bool flag;
-        if(OutputType::K == to_token(variable_type)) flag = domain->insert(std::make_shared<GlobalStiffnessRecorder>(tag, interval, true, use_hdf5));
-        else if(OutputType::M == to_token(variable_type)) flag = domain->insert(std::make_shared<GlobalMassRecorder>(tag, interval, true, use_hdf5));
-        else flag = domain->insert(std::make_shared<GlobalRecorder>(tag, to_token(variable_type), interval, true, use_hdf5));
+        if(OutputType::K == to_token(variable_type)) flag = domain->insert(std::make_shared<GlobalStiffnessRecorder>(tag, interval, use_hdf5));
+        else if(OutputType::M == to_token(variable_type)) flag = domain->insert(std::make_shared<GlobalMassRecorder>(tag, interval, use_hdf5));
+        else flag = domain->insert(std::make_shared<GlobalRecorder>(tag, to_token(variable_type), interval, use_hdf5));
         if(!flag)
             suanpan_error("Fail to create new global recorder.\n");
     }
@@ -122,7 +120,7 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream
         return SUANPAN_SUCCESS;
     }
 
-    return process_recorder_command(domain, command, tag, is_equal(file_type[0], 'h'));
+    return process_recorder_command(domain, command, tag, file_type.starts_with("hdf"));
 }
 
 int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream& command, const bool use_hdf5) {

@@ -22,51 +22,52 @@
 #include <Domain/Node.h>
 
 void NodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
+    update_tag(D);
+
     std::vector<uword> pool;
-    pool.reserve(get_object_tag().n_elem);
-    for(const auto I : get_object_tag())
+    pool.reserve(object_tag.n_elem);
+    for(const auto I : object_tag)
         if(!D->find<Node>(I) || !D->get<Node>(I)->is_active())
             suanpan_warning("Node {} is not available/active, removed from recorder {}.\n", I, get_tag());
         else pool.emplace_back(I);
 
-    set_object_tag(pool);
-
-    access::rw(get_data_pool()).resize(get_object_tag().n_elem);
+    object_tag = pool;
+    data_pool.resize(object_tag.n_elem);
 }
 
 void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
     if(!if_perform_record()) return;
 
-    auto& obj_tag = get_object_tag();
-
     if(OutputType::GDF == variable_type) {
         auto& damping_force = D->get_factory()->get_current_damping_force();
         if(damping_force.empty()) return;
 
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
-            if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({damping_force(t_node->get_reordered_dof())}, I);
+        for(auto I = 0llu; I < object_tag.n_elem; ++I)
+            if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert({damping_force(t_node->get_reordered_dof())}, I);
     }
     else if(OutputType::GIF == variable_type) {
         auto& inertial_force = D->get_factory()->get_current_inertial_force();
         if(inertial_force.empty()) return;
 
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
-            if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({inertial_force(t_node->get_reordered_dof())}, I);
+        for(auto I = 0llu; I < object_tag.n_elem; ++I)
+            if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert({inertial_force(t_node->get_reordered_dof())}, I);
     }
     else if(OutputType::MM == variable_type) {
         auto& momentum = D->get_factory()->get_momentum();
         if(momentum.empty()) return;
 
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
-            if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert({momentum(t_node->get_reordered_dof())}, I);
+        for(auto I = 0llu; I < object_tag.n_elem; ++I)
+            if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert({momentum(t_node->get_reordered_dof())}, I);
     }
     else
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
-            if(const auto& t_node = D->get<Node>(obj_tag(I)); t_node->is_active()) insert(t_node->record(variable_type), I);
+        for(auto I = 0llu; I < object_tag.n_elem; ++I)
+            if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert(t_node->record(variable_type), I);
 
-    if(if_record_time()) insert(D->get_factory()->get_current_time());
+    insert(D->get_factory()->get_current_time());
 }
 
-void NodeRecorder::print() {
-    suanpan_info("A node recorder.\n");
-}
+void NodeRecorder::print() { suanpan_info("A node recorder.\n"); }
+
+const uvec& GroupNodeRecorder::update_tag(const shared_ptr<DomainBase>& D) { return object_tag = D->flatten_group(reference_tag); }
+
+void GroupNodeRecorder::print() { suanpan_info("A node recorder based on groups.\n"); }

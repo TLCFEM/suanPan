@@ -436,12 +436,7 @@
     <ClCompile Include="..\..\..\Recorder\EigenRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\ElementRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\FrameRecorder.cpp" />
-    <ClCompile Include="..\..\..\Recorder\GlobalMassRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\GlobalRecorder.cpp" />
-    <ClCompile Include="..\..\..\Recorder\GlobalStiffnessRecorder.cpp" />
-    <ClCompile Include="..\..\..\Recorder\GroupElementRecorder.cpp" />
-    <ClCompile Include="..\..\..\Recorder\GroupNodeRecorder.cpp" />
-    <ClCompile Include="..\..\..\Recorder\GroupSumRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\NodeRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\OutputType.cpp" />
     <ClCompile Include="..\..\..\Recorder\Recorder.cpp" />
@@ -910,12 +905,7 @@
     <ClInclude Include="..\..\..\Recorder\EigenRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\ElementRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\FrameRecorder.h" />
-    <ClInclude Include="..\..\..\Recorder\GlobalMassRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\GlobalRecorder.h" />
-    <ClInclude Include="..\..\..\Recorder\GlobalStiffnessRecorder.h" />
-    <ClInclude Include="..\..\..\Recorder\GroupElementRecorder.h" />
-    <ClInclude Include="..\..\..\Recorder\GroupNodeRecorder.h" />
-    <ClInclude Include="..\..\..\Recorder\GroupSumRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\NodeRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\OutputType.h" />
     <ClInclude Include="..\..\..\Recorder\Recorder.h" />

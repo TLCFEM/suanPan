@@ -29,7 +29,7 @@
 extern fs::path SUANPAN_OUTPUT;
 
 FrameRecorder::FrameRecorder(const unsigned T, const OutputType L, const unsigned I)
-    : Recorder(T, {}, L, I, false, true) {
+    : Recorder(T, {}, L, I, true) {
 #ifdef SUANPAN_HDF5
     std::ostringstream file_name;
     file_name << 'R' << get_tag() << '-' << to_name(original_type) << ".h5";
@@ -72,6 +72,4 @@ void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 
 void FrameRecorder::save() {}
 
-void FrameRecorder::print() {
-    suanpan_info("A frame recorder.\n");
-}
+void FrameRecorder::print() { suanpan_info("A frame recorder.\n"); }

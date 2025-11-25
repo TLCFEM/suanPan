@@ -42,6 +42,15 @@ public:
     void print() override;
 };
 
+class GroupNodeRecorder final : public NodeRecorder {
+    const uvec& update_tag(const shared_ptr<DomainBase>&) override;
+
+public:
+    using NodeRecorder::NodeRecorder;
+
+    void print() override;
+};
+
 #endif
 
 //! @}

@@ -338,6 +338,8 @@ public:
     const TagMapCollection& get_compact_node_map_per_material() const override;
     const TagMapCollection& get_compact_node_map_per_section() const override;
 
+    uvec flatten_group(const uvec&) override;
+
     int reorder_dof() override;
     int assign_color() override;
 

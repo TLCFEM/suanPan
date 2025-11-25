@@ -33,18 +33,20 @@
 
 class SumRecorder : public Recorder {
 public:
-    SumRecorder(
-        unsigned,   // tag
-        uvec&&,     // object tags
-        OutputType, // recorder type
-        unsigned,   // interval
-        bool,       // if to record time
-        bool        // if to use hdf5
-    );
+    using Recorder::Recorder;
 
     void initialize(const shared_ptr<DomainBase>&) override;
 
     void record(const shared_ptr<DomainBase>&) override;
+
+    void print() override;
+};
+
+class GroupSumRecorder final : public SumRecorder {
+    const uvec& update_tag(const shared_ptr<DomainBase>&) override;
+
+public:
+    using SumRecorder::SumRecorder;
 
     void print() override;
 };

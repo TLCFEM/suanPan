@@ -21,8 +21,8 @@
 
 extern fs::path SUANPAN_OUTPUT;
 
-VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType L, const unsigned I, const unsigned W, [[maybe_unused]] const double S)
-    : Recorder(T, {}, L, I, false, false)
+VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType L, const unsigned I, const int W, [[maybe_unused]] const double S)
+    : Recorder(T, {}, L, I, false)
     , width(W) {
 #ifdef SUANPAN_VTK
     config.set(L);
@@ -36,7 +36,7 @@ void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>
 
     std::ostringstream file_name;
 
-    file_name << 'R' << get_tag() << '-' << to_name(original_type) << '-' << std::setw(static_cast<int>(width)) << std::setfill('0') << ++total_counter;
+    file_name << 'R' << get_tag() << '-' << to_name(original_type) << '-' << std::setw(width) << std::setfill('0') << ++total_counter;
 
     fs::path file_path = SUANPAN_OUTPUT;
 
@@ -46,6 +46,11 @@ void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>
 
     vtk_cell_plot(D, config);
 #endif
+}
+
+void VisualisationRecorder::clear_status() {
+    total_counter = 0u;
+    Recorder::clear_status();
 }
 
 void VisualisationRecorder::save() {}

@@ -359,6 +359,8 @@ public:
     [[nodiscard]] virtual const TagMapCollection& get_compact_node_map_per_material() const = 0;
     [[nodiscard]] virtual const TagMapCollection& get_compact_node_map_per_section() const = 0;
 
+    virtual uvec flatten_group(const uvec&) = 0;
+
     virtual int reorder_dof() = 0;
     virtual int assign_color() = 0;
 

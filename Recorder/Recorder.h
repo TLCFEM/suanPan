@@ -33,20 +33,25 @@
 class DomainBase;
 
 class Recorder : public UniqueTag {
-    uvec object_tag;
-    std::vector<double> time_pool;                        // recorded data
-    std::vector<std::vector<std::vector<vec>>> data_pool; // recorded data
-
-    const bool record_time;
     const bool use_hdf5;
+
+    static auto normalise_size(std::vector<std::vector<vec>>&);
 
 protected:
     const OutputType original_type, variable_type;
     const int component;
     const unsigned interval;
+    const uvec reference_tag;
+
+    uvec object_tag;
+    std::vector<double> time_pool;                        // recorded data
+    std::vector<std::vector<std::vector<vec>>> data_pool; // recorded data
+
     unsigned counter = 0u;
 
     bool if_perform_record();
+
+    virtual const uvec& update_tag(const shared_ptr<DomainBase>&);
 
 public:
     Recorder(
@@ -54,27 +59,17 @@ public:
         uvec&&,     // object tags
         OutputType, // recorder type
         unsigned,   // interval
-        bool,       // if to record time
         bool        // if to use hdf5
     );
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 
-    void set_object_tag(uvec&&);
-    [[nodiscard]] const uvec& get_object_tag() const;
-
-    [[nodiscard]] bool if_hdf5() const;
-    [[nodiscard]] bool if_record_time() const;
-
     void insert(double);
     void insert(std::vector<vec>&&, unsigned);
 
-    [[nodiscard]] const std::vector<std::vector<std::vector<vec>>>& get_data_pool() const;
-    [[nodiscard]] const std::vector<double>& get_time_pool() const;
-
     virtual void record(const shared_ptr<DomainBase>&) = 0;
 
-    void clear_status();
+    virtual void clear_status();
 
     virtual void save();
 

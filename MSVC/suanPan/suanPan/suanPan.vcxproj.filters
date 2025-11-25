@@ -885,22 +885,7 @@
     <ClCompile Include="..\..\..\Recorder\FrameRecorder.cpp">
       <Filter>Recorder</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GlobalMassRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Recorder\GlobalRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GlobalStiffnessRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GroupElementRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GroupNodeRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GroupSumRecorder.cpp">
       <Filter>Recorder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Recorder\NodeRecorder.cpp">
@@ -2295,22 +2280,7 @@
     <ClInclude Include="..\..\..\Recorder\FrameRecorder.h">
       <Filter>Recorder</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GlobalMassRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Recorder\GlobalRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GlobalStiffnessRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GroupElementRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GroupNodeRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GroupSumRecorder.h">
       <Filter>Recorder</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Recorder\NodeRecorder.h">

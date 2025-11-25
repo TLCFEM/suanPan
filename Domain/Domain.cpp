@@ -840,6 +840,16 @@ const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_material() 
 
 const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_section() const { return compact_node_per_section; }
 
+uvec Domain::flatten_group(const uvec& groups) {
+    std::vector<uword> tag;
+
+    for(const auto I : groups)
+        if(find<Group>(I))
+            for(const auto J : get<Group>(I)->get_pool()) tag.emplace_back(J);
+
+    return unique(uvec(tag));
+}
+
 int Domain::reorder_dof() {
     // assign dof label for active dof
     auto dof_counter = 0u;
