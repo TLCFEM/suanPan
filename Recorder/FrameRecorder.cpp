@@ -36,15 +36,15 @@ void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D
     const auto group_id = H5Gcreate(file_id, group_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     for(auto& I : D->get_element_pool()) {
-        if(const auto data = I->record(variable_type); !data.empty()) {
+        if(const auto data = suanpan::normalise_size(I->record(variable_type)); !data.empty()) {
             mat data_to_write(data[0].n_elem, data.size());
 
             uword idx = 0;
             for(const auto& J : data) data_to_write.col(idx++) = J;
 
-            const hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
+            const hsize_t dimension[2]{data_to_write.n_cols, data_to_write.n_rows};
 
-            H5LTmake_dataset(group_id, std::to_string(I->get_tag()).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
+            H5LTmake_dataset(group_id, ("Element " + std::to_string(I->get_tag())).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
         }
     }
 

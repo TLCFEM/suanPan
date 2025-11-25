@@ -60,13 +60,11 @@ GlobalRecorder::GlobalRecorder(const unsigned T, const OutputType L, const unsig
 void GlobalRecorder::print() { suanpan_info("A global recorder.\n"); }
 
 void GlobalStiffnessRecorder::record_impl(const shared_ptr<DomainBase>& D) {
-    auto& W = D->get_factory();
-    auto& C = D->get_color_map();
-
-    const uword S = W->get_size();
+    const uword S = D->get_factory()->get_size();
 
     vec stiffness(S * S, fill::zeros);
 
+    auto& C = D->get_color_map();
     if(mat g_stiffness(stiffness.memptr(), S, S, false, true); C.empty())
         for(const auto& I : D->get_element_pool()) assemble_matrix(I->get_current_stiffness(), I->get_dof_encoding(), g_stiffness);
     else
@@ -88,13 +86,11 @@ GlobalStiffnessRecorder::GlobalStiffnessRecorder(const unsigned T, const unsigne
 void GlobalStiffnessRecorder::print() { suanpan_info("A global stiffness recorder.\n"); }
 
 void GlobalMassRecorder::record_impl(const shared_ptr<DomainBase>& D) {
-    auto& W = D->get_factory();
-    auto& C = D->get_color_map();
-
-    const uword S = W->get_size();
+    const uword S = D->get_factory()->get_size();
 
     vec mass(S * S, fill::zeros);
 
+    auto& C = D->get_color_map();
     if(mat g_mass(mass.memptr(), S, S, false, true); C.empty())
         for(const auto& I : D->get_element_pool()) assemble_matrix(I->get_current_mass(), I->get_dof_encoding(), g_mass);
     else

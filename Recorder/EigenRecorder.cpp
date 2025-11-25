@@ -57,12 +57,11 @@ void EigenRecorder::save() {
 
     const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-    hsize_t dimension[2] = {eigen_value.n_elem, 1};
+    hsize_t dimension[2]{eigen_value.n_elem, 1};
     H5LTmake_dataset(file_id, "Eigenvalue", 2, dimension, H5T_NATIVE_DOUBLE, eigen_value.mem);
 
-    for(uword I = 0; I < eigen_value.n_elem; ++I) {
-        const auto group_name = "Eigenvalue " + std::to_string(I + 1);
-        const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    for(uword I = 0, J = 1; I < eigen_value.n_elem; ++I, ++J) {
+        const auto group_id = H5Gcreate(file_id, ("Eigenvalue " + std::to_string(J)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         for(const auto& [e_val, e_vec] : eigen_pool[I]) {
             const auto dataset_name = "N" + std::to_string(e_val);

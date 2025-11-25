@@ -107,8 +107,7 @@ void Recorder::save() {
 
             const auto [cell_size, cell_num] = normalise_size(object_data);
 
-            mat data_to_write;
-            data_to_write.zeros(cell_size * cell_num + 1, object_data.size());
+            mat data_to_write(cell_size * cell_num + 1, object_data.size(), fill::zeros);
             data_to_write.row(0) = rowvec{time_pool};
 
             for(auto J = 0llu; J < data_to_write.n_cols; ++J) {
@@ -141,8 +140,7 @@ void Recorder::save() {
 
             const auto [cell_size, cell_num] = normalise_size(object_data);
 
-            mat data_to_write;
-            data_to_write.zeros(cell_size * cell_num + 1, object_data.size());
+            mat data_to_write(cell_size * cell_num + 1, object_data.size(), fill::zeros);
             data_to_write.row(0) = rowvec{time_pool};
 
             for(auto J = 0llu; J < data_to_write.n_cols; ++J) {

@@ -62,16 +62,10 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istrings
         auto scale = 1.;
         while(!command.eof() && get_input(command, para))
             if(is_equal(para, "Width")) {
-                if(!get_input(command, width)) {
-                    width = 6;
-                    suanpan_error("A valid width is required, using six.\n");
-                }
+                if(!get_input(command, width)) suanpan_error("A valid width is required, using six.\n");
             }
             else if(is_equal(para, "Scale")) {
-                if(!get_input(command, scale)) {
-                    scale = 1.;
-                    suanpan_error("A valid scale is required, using unity.\n");
-                }
+                if(!get_input(command, scale)) suanpan_error("A valid scale is required, using unity.\n");
             }
         if(!domain->insert(std::make_shared<VisualisationRecorder>(tag, to_token(variable_type), interval, width, scale)))
             suanpan_error("Fail to create new visualisation recorder.\n");
