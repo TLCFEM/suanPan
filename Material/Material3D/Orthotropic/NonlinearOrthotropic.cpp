@@ -139,10 +139,10 @@ int NonlinearOrthotropic::trapezoidal_return() {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         suanpan_debug("Local plasticity iteration (2nd) error: {:.5E}.\n", error);
 
-        if(error < tolerance * (1. + yield_stress.max()) || (inf_norm(residual) < tolerance && counter > 5u) || try_bisection) {
+        if(error < tolerance * (1. + yield_stress.max()) || (suanpan::inf_norm(residual) < tolerance && counter > 5u) || try_bisection) {
             plastic_strain += gamma * n_mid;
 
             mat::fixed<7, 6> left(fill::none), right(fill::zeros);
@@ -222,10 +222,10 @@ int NonlinearOrthotropic::euler_return() {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         suanpan_debug("Local plasticity iteration (1st) error: {:.5E}.\n", error);
 
-        if(error < tolerance * (1. + yield_stress.max()) || (inf_norm(residual) < tolerance && counter > 5u) || try_bisection) {
+        if(error < tolerance * (1. + yield_stress.max()) || (suanpan::inf_norm(residual) < tolerance && counter > 5u) || try_bisection) {
             plastic_strain += gamma * n;
 
             mat::fixed<7, 6> left(fill::none), right(fill::zeros);

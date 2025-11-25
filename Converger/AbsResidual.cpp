@@ -23,7 +23,7 @@ AbsResidual::AbsResidual(const unsigned T, const double E, const unsigned M, con
 unique_ptr<Converger> AbsResidual::get_copy() { return std::make_unique<AbsResidual>(*this); }
 
 bool AbsResidual::is_converged(unsigned) {
-    set_error(inf_norm(get_residual()));
+    set_error(suanpan::inf_norm(get_residual()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())

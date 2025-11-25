@@ -71,10 +71,10 @@ int StressWrapper::update_trial_status(const vec& t_strain) {
             if(SUANPAN_SUCCESS != base->update_trial_status(trial_full_strain)) return SUANPAN_FAIL;
 
             const vec incre = solve(t_stiffness(F2, F2), t_stress(F2));
-            const auto error = inf_norm(incre);
+            const auto error = suanpan::inf_norm(incre);
             if(1u == counter) ref_error = error;
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error < tolerance * ref_error || (inf_norm(t_stress(F2)) < tolerance && counter > 5u)) break;
+            if(error < tolerance * ref_error || (suanpan::inf_norm(t_stress(F2)) < tolerance && counter > 5u)) break;
 
             trial_full_strain(F2) -= incre;
         }

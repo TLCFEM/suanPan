@@ -39,7 +39,7 @@ unique_ptr<Converger> AbsIncreAcc::get_copy() { return std::make_unique<AbsIncre
 bool AbsIncreAcc::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    set_error(inf_norm(W->get_ninja()));
+    set_error(suanpan::inf_norm(W->get_ninja()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())

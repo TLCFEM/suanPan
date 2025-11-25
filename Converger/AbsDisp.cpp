@@ -35,7 +35,7 @@ unique_ptr<Converger> AbsDisp::get_copy() { return std::make_unique<AbsDisp>(*th
 bool AbsDisp::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    set_error(inf_norm(W->get_incre_displacement() + W->get_ninja()));
+    set_error(suanpan::inf_norm(W->get_incre_displacement() + W->get_ninja()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())

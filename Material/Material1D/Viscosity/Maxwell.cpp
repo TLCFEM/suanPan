@@ -95,13 +95,13 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
 
             const vec incre = inv_jacobian * residual / (factor_a * (K1 + K2) + K3);
 
-            error = inf_norm(incre);
+            error = suanpan::inf_norm(incre);
             if(1u == counter) {
                 ref_error = error;
-                ref_residual = inf_norm(residual);
+                ref_residual = suanpan::inf_norm(residual);
             }
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error < tolerance * ref_error || inf_norm(residual) < tolerance * ref_residual) break;
+            if(error < tolerance * ref_error || suanpan::inf_norm(residual) < tolerance * ref_residual) break;
             solution += incre;
             spring->update_incre_status(solution(0));
             damper->update_incre_status(solution(1), solution(2));

@@ -131,10 +131,10 @@ int LinearHardeningNM::compute_local_integration(vec& q, mat& jacobian) {
 
         const vec incre = solve(jacobian += prpz * (eye(d_size, d_size) - m * m.t()) / norm(z) * dzdx, residual);
 
-        const auto error = inf_norm(residual);
+        const auto error = suanpan::inf_norm(residual);
         if(2u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) return SUANPAN_SUCCESS;
+        if(error < tolerance * ref_error || (suanpan::inf_norm(residual) < tolerance && counter > 5u)) return SUANPAN_SUCCESS;
 
         q -= incre(ga);
         if(has_kinematic) beta -= incre(gb);

@@ -80,10 +80,10 @@ int Sequential::update_trial_status(const vec& t_strain) {
 
         const vec i_strain = solve(jacobian, residual);
 
-        const auto error = inf_norm(i_strain);
+        const auto error = suanpan::inf_norm(i_strain);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || (suanpan::inf_norm(residual) < tolerance && counter > 5u)) break;
 
         for(size_t I = 0; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
     }

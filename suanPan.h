@@ -341,11 +341,12 @@ namespace suanpan {
 #endif
 #include <functional>
 
-inline void suanpan_assert(const std::function<void()>& F) {
+template<std::invocable F> auto suanpan_assert([[maybe_unused]] F&& handler) {
 #ifdef SUANPAN_DEBUG
-    F();
+    std::forward<F>(handler)();
 #endif
 }
+
 #ifdef SUANPAN_MSVC
 #pragma warning(default : 4100)
 #endif
@@ -376,6 +377,8 @@ namespace suanpan {
         a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
         return a;
     }
+
+    template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
 } // namespace suanpan
 
 #if defined(SUANPAN_CLANG) && !defined(__cpp_lib_ranges)
@@ -394,7 +397,5 @@ namespace std::ranges {
     template<class IN> constexpr auto min_element(const IN& from) { return std::min_element(from.cbegin(), from.cend()); }
 } // namespace std::ranges
 #endif
-
-template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
 
 #endif

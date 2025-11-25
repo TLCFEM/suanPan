@@ -197,10 +197,10 @@ int DuncanSelig::project_onto_surface(double& multiplier) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local elastic iteration error: {:.5E}.\n", error / ref_error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) return SUANPAN_SUCCESS;
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) return SUANPAN_SUCCESS;
 
         trial_stress -= incre.head(3);
         multiplier -= incre(3);
@@ -250,10 +250,10 @@ int DuncanSelig::local_update(const vec& ref_stress, const vec& ref_strain, cons
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
             return SUANPAN_SUCCESS;

@@ -53,11 +53,11 @@ int B21E::update_status() {
         }
 
         const vec incre = solve(local_stiffness(a, a), local_resistance(a));
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || inf_norm(local_resistance(a)) < tolerance) {
+        if(error < tolerance * ref_error || suanpan::inf_norm(local_resistance(a)) < tolerance) {
             const mat t_mat = local_stiffness(b, b) - local_stiffness(b, a) * solve(local_stiffness(a, a), local_stiffness(a, b));
 
             local_stiffness.zeros();
