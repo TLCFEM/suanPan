@@ -35,35 +35,31 @@ class ResourceHolder final {
 public:
     ResourceHolder() = default;
 
-    ResourceHolder(const ResourceHolder& old_holder)
-        : object(old_holder ? old_holder.object->get_copy() : nullptr) {}
+    ResourceHolder(const ResourceHolder& old)
+        : object(old.object ? old.object->get_copy() : nullptr) {}
 
-    ResourceHolder(ResourceHolder&& old_holder) noexcept { object = std::move(old_holder.object); }
+    ResourceHolder(ResourceHolder&& old) noexcept { object = std::move(old.object); }
 
     ResourceHolder& operator=(const ResourceHolder&) = delete;
     ResourceHolder& operator=(ResourceHolder&&) = delete;
     ~ResourceHolder() = default;
 
-    explicit ResourceHolder(std::unique_ptr<T>&& original_object)
-        : object(std::move(original_object)) {}
+    explicit ResourceHolder(std::unique_ptr<T>&& old)
+        : object(std::move(old)) {}
 
     template<typename U> requires std::is_base_of_v<T, U> ResourceHolder& operator=(U&& other) {
         object = std::make_unique<U>(std::forward<U>(other));
         return *this;
     }
 
-    ResourceHolder& operator=(const std::shared_ptr<T>& original_object) {
-        if(nullptr != original_object) object = original_object->get_copy();
+    ResourceHolder& operator=(const std::shared_ptr<T>& old) {
+        if(old) object = old->get_copy();
         return *this;
     }
 
     T* operator->() const { return object.get(); }
 
     explicit operator bool() const { return object != nullptr; }
-
-    bool operator==(const ResourceHolder& other) const { return object == other.object; }
-
-    bool operator==(const T& other) const { return object == other; }
 
     bool operator==(std::nullptr_t null) const { return object == null; }
 };

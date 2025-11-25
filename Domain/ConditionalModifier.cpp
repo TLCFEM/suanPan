@@ -60,7 +60,7 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     if(nullptr == amplitude || !amplitude->is_active()) amplitude = std::make_shared<Ramp>(0);
 
     auto start_time = 0.;
-    for(const auto& [t_tag, t_step] : D->get_step_pool()) {
+    for(auto& [t_tag, t_step] : D->get_step_pool()) {
         if(t_step->get_tag() >= start_step) break;
         start_time += t_step->get_time_period();
     }
