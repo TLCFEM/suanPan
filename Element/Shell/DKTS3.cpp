@@ -37,8 +37,8 @@ DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const 
 
 DKTS3::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
-    , BM(3, s_size / 2)
-    , BP(3, s_size / 2) {}
+    , BM(3, s_size / 2, fill::zeros)
+    , BP(3, s_size / 2, fill::zeros) {}
 
 mat DKTS3::form_coor(const mat& C) {
     const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1);

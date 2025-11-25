@@ -35,7 +35,7 @@ DKT3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const S
 
 DKT3::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
-    , strain_mat(3, p_size) {}
+    , strain_mat(3, p_size, fill::zeros) {}
 
 mat DKT3::form_coor(const mat& C) {
     const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0);

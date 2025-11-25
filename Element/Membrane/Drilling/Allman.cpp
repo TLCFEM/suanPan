@@ -26,7 +26,7 @@ Allman::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<M
     : coor(std::move(C))
     , weight(W)
     , m_material(std::move(M))
-    , strain_mat(3, m_size) {}
+    , strain_mat(3, m_size, fill::zeros) {}
 
 mat Allman::form_coor(const mat& C) {
     const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1);
