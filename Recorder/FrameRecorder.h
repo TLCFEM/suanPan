@@ -36,6 +36,8 @@ class FrameRecorder final : public Recorder {
     hid_t file_id = 0;
 #endif
 
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     FrameRecorder(
         unsigned,   // tag
@@ -47,8 +49,6 @@ public:
     FrameRecorder& operator=(const FrameRecorder&) = delete;
     FrameRecorder& operator=(FrameRecorder&&) = delete;
     ~FrameRecorder() override;
-
-    void record(const shared_ptr<DomainBase>&) override;
 
     void save() override;
 

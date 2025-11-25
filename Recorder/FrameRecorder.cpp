@@ -28,25 +28,8 @@
 
 extern fs::path SUANPAN_OUTPUT;
 
-FrameRecorder::FrameRecorder(const unsigned T, const OutputType L, const unsigned I)
-    : Recorder(T, {}, L, I, true) {
+void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 #ifdef SUANPAN_HDF5
-    std::ostringstream file_name;
-    file_name << 'R' << get_tag() << '-' << to_name(original_type) << ".h5";
-    file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-#endif
-}
-
-FrameRecorder::~FrameRecorder() {
-#ifdef SUANPAN_HDF5
-    H5Fclose(file_id);
-#endif
-}
-
-void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
-#ifdef SUANPAN_HDF5
-    if(!if_perform_record()) return;
-
     std::ostringstream group_name;
     group_name << "/";
     group_name << D->get_factory()->get_current_time();
@@ -67,6 +50,21 @@ void FrameRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
     }
 
     H5Gclose(group_id);
+#endif
+}
+
+FrameRecorder::FrameRecorder(const unsigned T, const OutputType L, const unsigned I)
+    : Recorder(T, {}, L, I, true) {
+#ifdef SUANPAN_HDF5
+    std::ostringstream file_name;
+    file_name << 'R' << get_tag() << '-' << to_name(original_type) << ".h5";
+    file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+#endif
+}
+
+FrameRecorder::~FrameRecorder() {
+#ifdef SUANPAN_HDF5
+    H5Fclose(file_id);
 #endif
 }
 

@@ -32,12 +32,12 @@
 #include <Recorder/Recorder.h>
 
 class ElementRecorder : public Recorder {
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     using Recorder::Recorder;
 
     void initialize(const shared_ptr<DomainBase>&) override;
-
-    void record(const shared_ptr<DomainBase>&) override;
 
     void print() override;
 };

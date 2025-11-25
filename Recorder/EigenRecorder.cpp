@@ -28,10 +28,7 @@
 
 extern fs::path SUANPAN_OUTPUT;
 
-EigenRecorder::EigenRecorder(const unsigned T, const bool H)
-    : Recorder(T, {}, OutputType::NL, 1, H) {}
-
-void EigenRecorder::record(const shared_ptr<DomainBase>& D) {
+void EigenRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
     if(W->get_analysis_type() != AnalysisType::EIGEN) return;
@@ -48,6 +45,9 @@ void EigenRecorder::record(const shared_ptr<DomainBase>& D) {
         for(const auto& J : node_pool) eigen_pool[I].emplace(J->get_tag(), t_eigen_vector(J->get_reordered_dof()));
     }
 }
+
+EigenRecorder::EigenRecorder(const unsigned T, const bool H)
+    : Recorder(T, {}, OutputType::NL, 1, H) {}
 
 void EigenRecorder::save() {
     if(eigen_value.is_empty()) return;

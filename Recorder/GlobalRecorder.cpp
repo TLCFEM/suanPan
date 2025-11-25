@@ -28,12 +28,7 @@ void GlobalRecorder::assemble_matrix(const mat& local, const uvec& encoding, mat
         for(unsigned J = 0; J < encoding.n_elem; ++J) global(encoding(J), encoding(I)) += local(J, I);
 }
 
-GlobalRecorder::GlobalRecorder(const unsigned T, const OutputType L, const unsigned I, const bool H)
-    : Recorder(T, {0}, L, I, H) {}
-
-void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
+void GlobalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     if(OutputType::KE == variable_type) {
         auto kinetic_energy = 0.;
         for(auto& I : D->get_pool<Element>()) kinetic_energy += I->get_kinetic_energy();
@@ -59,14 +54,12 @@ void GlobalRecorder::record(const shared_ptr<DomainBase>& D) {
     insert(D->get_factory()->get_current_time());
 }
 
+GlobalRecorder::GlobalRecorder(const unsigned T, const OutputType L, const unsigned I, const bool H)
+    : Recorder(T, {0}, L, I, H) {}
+
 void GlobalRecorder::print() { suanpan_info("A global recorder.\n"); }
 
-GlobalStiffnessRecorder::GlobalStiffnessRecorder(const unsigned T, const unsigned I, const bool H)
-    : GlobalRecorder(T, OutputType::K, I, H) {}
-
-void GlobalStiffnessRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
+void GlobalStiffnessRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
     auto& C = D->get_color_map();
 
@@ -89,14 +82,12 @@ void GlobalStiffnessRecorder::record(const shared_ptr<DomainBase>& D) {
     insert(D->get_factory()->get_current_time());
 }
 
+GlobalStiffnessRecorder::GlobalStiffnessRecorder(const unsigned T, const unsigned I, const bool H)
+    : GlobalRecorder(T, OutputType::K, I, H) {}
+
 void GlobalStiffnessRecorder::print() { suanpan_info("A global stiffness recorder.\n"); }
 
-GlobalMassRecorder::GlobalMassRecorder(const unsigned T, const unsigned I, const bool H)
-    : GlobalRecorder(T, OutputType::M, I, H) {}
-
-void GlobalMassRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
+void GlobalMassRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
     auto& C = D->get_color_map();
 
@@ -118,5 +109,8 @@ void GlobalMassRecorder::record(const shared_ptr<DomainBase>& D) {
 
     insert(D->get_factory()->get_current_time());
 }
+
+GlobalMassRecorder::GlobalMassRecorder(const unsigned T, const unsigned I, const bool H)
+    : GlobalRecorder(T, OutputType::M, I, H) {}
 
 void GlobalMassRecorder::print() { suanpan_info("A global mass recorder.\n"); }

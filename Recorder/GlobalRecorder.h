@@ -35,6 +35,8 @@ class GlobalRecorder : public Recorder {
 protected:
     static void assemble_matrix(const mat&, const uvec&, mat&);
 
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     GlobalRecorder(
         unsigned,   // tag
@@ -43,12 +45,12 @@ public:
         bool        // if to use hdf5
     );
 
-    void record(const shared_ptr<DomainBase>&) override;
-
     void print() override;
 };
 
 class GlobalStiffnessRecorder final : public GlobalRecorder {
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     GlobalStiffnessRecorder(
         unsigned, // tag
@@ -56,20 +58,18 @@ public:
         bool      // if to use hdf5
     );
 
-    void record(const shared_ptr<DomainBase>&) override;
-
     void print() override;
 };
 
 class GlobalMassRecorder final : public GlobalRecorder {
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     GlobalMassRecorder(
         unsigned, // tag
         unsigned, // interval
         bool      // if to use hdf5
     );
-
-    void record(const shared_ptr<DomainBase>&) override;
 
     void print() override;
 };

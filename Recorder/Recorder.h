@@ -49,9 +49,9 @@ protected:
 
     unsigned counter = 0u;
 
-    bool if_perform_record();
-
     virtual const uvec& update_tag(const shared_ptr<DomainBase>&);
+
+    virtual void record_impl(const shared_ptr<DomainBase>&) = 0;
 
 public:
     Recorder(
@@ -67,7 +67,7 @@ public:
     void insert(double);
     void insert(std::vector<vec>&&, unsigned);
 
-    virtual void record(const shared_ptr<DomainBase>&) = 0;
+    void record(const shared_ptr<DomainBase>&);
 
     virtual void clear_status();
 

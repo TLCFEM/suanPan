@@ -35,10 +35,10 @@ class EigenRecorder final : public Recorder {
     vec eigen_value;
     std::vector<std::map<unsigned, vec>> eigen_pool;
 
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     explicit EigenRecorder(unsigned = 0, bool = true);
-
-    void record(const shared_ptr<DomainBase>&) override;
 
     void save() override;
 

@@ -44,6 +44,8 @@ class VisualisationRecorder final : public Recorder {
     vtkInfo config;
 #endif
 
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     VisualisationRecorder(
         unsigned,   // tag
@@ -52,8 +54,6 @@ public:
         int,        // output width
         double = 1. // scale
     );
-
-    void record(const shared_ptr<DomainBase>&) override;
 
     void clear_status() override;
 

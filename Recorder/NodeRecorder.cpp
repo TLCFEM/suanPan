@@ -21,23 +21,7 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
-void NodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
-    update_tag(D);
-
-    std::vector<uword> pool;
-    pool.reserve(object_tag.n_elem);
-    for(const auto I : object_tag)
-        if(!D->find<Node>(I) || !D->get<Node>(I)->is_active())
-            suanpan_warning("Node {} is not available/active, removed from recorder {}.\n", I, get_tag());
-        else pool.emplace_back(I);
-
-    object_tag = pool;
-    data_pool.resize(object_tag.n_elem);
-}
-
-void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
+void NodeRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     if(OutputType::GDF == variable_type) {
         auto& damping_force = D->get_factory()->get_current_damping_force();
         if(damping_force.empty()) return;
@@ -64,6 +48,20 @@ void NodeRecorder::record(const shared_ptr<DomainBase>& D) {
             if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert(t_node->record(variable_type), I);
 
     insert(D->get_factory()->get_current_time());
+}
+
+void NodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
+    update_tag(D);
+
+    std::vector<uword> pool;
+    pool.reserve(object_tag.n_elem);
+    for(const auto I : object_tag)
+        if(!D->find<Node>(I) || !D->get<Node>(I)->is_active())
+            suanpan_warning("Node {} is not available/active, removed from recorder {}.\n", I, get_tag());
+        else pool.emplace_back(I);
+
+    object_tag = pool;
+    data_pool.resize(object_tag.n_elem);
 }
 
 void NodeRecorder::print() { suanpan_info("A node recorder.\n"); }

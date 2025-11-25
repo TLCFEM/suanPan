@@ -21,23 +21,7 @@
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
 
-void ElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
-    update_tag(D);
-
-    std::vector<uword> pool;
-    pool.reserve(object_tag.n_elem);
-    for(const auto I : object_tag)
-        if(!D->find<Element>(I) || !D->get<Element>(I)->is_active())
-            suanpan_warning("Element {} is not available/active, removed from recorder {}.\n", I, get_tag());
-        else pool.emplace_back(I);
-
-    object_tag = pool;
-    data_pool.resize(object_tag.n_elem);
-}
-
-void ElementRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
+void ElementRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     if(OutputType::K == variable_type) {
         for(auto I = 0llu; I < object_tag.n_elem; ++I)
             if(const auto& t_element = D->get<Element>(object_tag(I)); t_element->is_active() && t_element->is_local) insert({vectorise(t_element->get_current_stiffness())}, I);
@@ -51,6 +35,20 @@ void ElementRecorder::record(const shared_ptr<DomainBase>& D) {
             if(const auto& t_element = D->get<Element>(object_tag(I)); t_element->is_active() && t_element->is_local) insert(t_element->record(variable_type), I);
 
     insert(D->get_factory()->get_current_time());
+}
+
+void ElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
+    update_tag(D);
+
+    std::vector<uword> pool;
+    pool.reserve(object_tag.n_elem);
+    for(const auto I : object_tag)
+        if(!D->find<Element>(I) || !D->get<Element>(I)->is_active())
+            suanpan_warning("Element {} is not available/active, removed from recorder {}.\n", I, get_tag());
+        else pool.emplace_back(I);
+
+    object_tag = pool;
+    data_pool.resize(object_tag.n_elem);
 }
 
 void ElementRecorder::print() { suanpan_info("An element recorder.\n"); }

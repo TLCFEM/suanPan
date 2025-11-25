@@ -21,6 +21,16 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
+void SumRecorder::record_impl(const shared_ptr<DomainBase>& D) {
+    running_stat_vec<vec> data;
+    for(const auto I : object_tag)
+        for(const auto& t_data : D->get<Node>(I)->record(variable_type)) data(t_data);
+
+    insert({data.mean() * data.count()}, 0);
+
+    insert(D->get_factory()->get_current_time());
+}
+
 void SumRecorder::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : update_tag(D))
         if(!D->find<Node>(I) || !D->get<Node>(I)->is_active()) {
@@ -29,18 +39,6 @@ void SumRecorder::initialize(const shared_ptr<DomainBase>& D) {
         }
 
     data_pool.resize(1);
-}
-
-void SumRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
-    running_stat_vec<vec> data;
-    for(const auto I : object_tag)
-        for(const auto& t_data : D->get<Node>(I)->record(variable_type)) data(t_data);
-
-    insert({data.mean() * data.count()}, 0);
-
-    insert(D->get_factory()->get_current_time());
 }
 
 void SumRecorder::print() { suanpan_info("A summation recorder computes the summation of a collection of nodal scalar variables.\n"); }

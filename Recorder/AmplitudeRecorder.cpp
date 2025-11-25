@@ -21,6 +21,14 @@
 #include <Domain/Factory.hpp>
 #include <Load/Amplitude/Amplitude.h>
 
+void AmplitudeRecorder::record_impl(const shared_ptr<DomainBase>& D) {
+    const sp_d auto current_time = D->get_factory()->get_current_time();
+
+    for(auto I = 0llu; I < object_tag.n_elem; ++I) insert({{D->get<Amplitude>(object_tag(I))->get_amplitude(current_time)}}, I);
+
+    insert(current_time);
+}
+
 void AmplitudeRecorder::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : reference_tag)
         if(!D->find<Amplitude>(I)) {
@@ -30,16 +38,6 @@ void AmplitudeRecorder::initialize(const shared_ptr<DomainBase>& D) {
         }
 
     Recorder::initialize(D);
-}
-
-void AmplitudeRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
-    const sp_d auto current_time = D->get_factory()->get_current_time();
-
-    for(auto I = 0llu; I < object_tag.n_elem; ++I) insert({{D->get<Amplitude>(object_tag(I))->get_amplitude(current_time)}}, I);
-
-    insert(current_time);
 }
 
 void AmplitudeRecorder::print() { suanpan_info("A recorder to record amplitudes.\n"); }

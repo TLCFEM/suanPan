@@ -40,8 +40,6 @@ auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
     return std::make_tuple(cell_size, inner_size);
 }
 
-bool Recorder::if_perform_record() { return 1 == interval || 0 == counter++ % interval; }
-
 const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
 
 /**
@@ -72,6 +70,9 @@ void Recorder::insert(std::vector<vec>&& data, const unsigned index) {
     }
 
     data_pool[index].emplace_back(std::move(data));
+}
+void Recorder::record(const shared_ptr<DomainBase>& D) {
+    if(1 == interval || 0 == counter++ % interval) record_impl(D);
 }
 
 void Recorder::clear_status() {
