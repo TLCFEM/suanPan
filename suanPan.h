@@ -376,16 +376,6 @@ namespace suanpan {
         a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
         return a;
     }
-
-    template<sp_d T> std::vector<Col<T>> normalise_size(std::vector<Col<T>>&& container) {
-        auto max_size = 0llu;
-        for(const auto& item : container)
-            if(item.n_elem > max_size) max_size = item.n_elem;
-
-        for(auto&& item : container) item.resize(max_size);
-
-        return container;
-    }
 } // namespace suanpan
 
 #if defined(SUANPAN_CLANG) && !defined(__cpp_lib_ranges)

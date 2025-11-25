@@ -40,6 +40,16 @@ auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
     return std::make_tuple(cell_size, inner_size);
 }
 
+std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
+    auto max_size = 0llu;
+    for(const auto& item : container)
+        if(item.n_elem > max_size) max_size = item.n_elem;
+
+    for(auto&& item : container) item.resize(max_size);
+
+    return container;
+}
+
 const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
 
 /**

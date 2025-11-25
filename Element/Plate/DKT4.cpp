@@ -209,7 +209,7 @@ vtkSmartPointer<vtkCell> DKT4::GetCell() const { return vtkSmartPointer<vtkQuad>
 mat DKT4::GetData(const OutputType P) {
     const auto remap = [&](vec&& in) {
         mat data(6, p_node, fill::zeros);
-        data.rows(2, 4) = in.reshape(p_dof, p_node);
+        data.rows(2, 4) = reshape(in, p_dof, p_node);
         return data;
     };
 
@@ -220,6 +220,6 @@ mat DKT4::GetData(const OutputType P) {
     return {};
 }
 
-mat DKT4::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * get_current_displacement().reshape(p_dof, p_node).row(0)); }
+mat DKT4::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * reshape(get_current_displacement(), p_dof, p_node).eval().row(0)); }
 
 #endif

@@ -131,11 +131,7 @@ mat DC3D4::GetData(const OutputType P) {
     if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 3, c_node), 6, c_node);
     if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 3, c_node), 6, c_node);
 
-    if(OutputType::DAMAGE == P) {
-        mat t_damage(6, c_node, fill::zeros);
-        t_damage.row(0) = get_current_displacement()(d_dof).t();
-        return t_damage;
-    }
+    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
 
     vec data;
     if(const auto t_data = c_material->record(P); !t_data.empty()) data = t_data[0];

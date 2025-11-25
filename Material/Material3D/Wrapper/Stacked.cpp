@@ -92,7 +92,7 @@ int Stacked::reset_status() {
 std::vector<vec> Stacked::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : mat_pool) suanpan::append_to(data, I->record(P));
-    return suanpan::normalise_size(std::move(data));
+    return data;
 }
 
 void Stacked::print() {

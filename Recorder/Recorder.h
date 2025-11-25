@@ -38,6 +38,8 @@ class Recorder : public UniqueTag {
     static auto normalise_size(std::vector<std::vector<vec>>&);
 
 protected:
+    static std::vector<vec> normalise_size(std::vector<vec>&&);
+
     const OutputType original_type, variable_type;
     const int component;
     const unsigned interval;

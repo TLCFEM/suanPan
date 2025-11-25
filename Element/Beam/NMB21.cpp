@@ -88,7 +88,7 @@ vtkSmartPointer<vtkCell> NMB21::GetCell() const { return vtkSmartPointer<vtkLine
 mat NMB21::GetData(const OutputType P) {
     const auto remap = [&](vec&& in) {
         mat data(6, b_node, fill::zeros);
-        data.rows(uvec{0, 1, 5}) = in.reshape(b_dof, b_node);
+        data.rows(uvec{0, 1, 5}) = reshape(in, b_dof, b_node);
         return data;
     };
 
@@ -105,6 +105,6 @@ mat NMB21::GetData(const OutputType P) {
     return data;
 }
 
-mat NMB21::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * get_current_displacement().reshape(b_dof, b_node).head_rows(2); }
+mat NMB21::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2); }
 
 #endif

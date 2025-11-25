@@ -136,11 +136,7 @@ mat DCP3::GetData(const OutputType P) {
     if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 2, m_node), 6, m_node);
     if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 2, m_node), 6, m_node);
 
-    if(OutputType::DAMAGE == P) {
-        mat t_damage(6, m_node, fill::zeros);
-        for(unsigned I = 0; I < m_node; ++I) t_damage(0, I) = node_ptr[I].lock()->get_current_displacement()(2);
-        return t_damage;
-    }
+    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
 
     vec t_stress;
     if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress = t_data[0];

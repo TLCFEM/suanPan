@@ -234,6 +234,6 @@ mat CSMQ4::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-mat CSMQ4::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * get_current_displacement().reshape(m_dof, m_node).head_rows(2); }
+mat CSMQ4::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2); }
 
 #endif

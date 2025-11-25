@@ -253,7 +253,7 @@ void GCMQ::print() {
 mat GCMQ::GetData(const OutputType P) {
     const auto remap = [&](vec&& in) {
         mat data(6, m_node, fill::zeros);
-        data.rows(uvec{0, 1, 5}) = in.reshape(m_dof, m_node);
+        data.rows(uvec{0, 1, 5}) = reshape(in, m_dof, m_node);
         return data;
     };
 

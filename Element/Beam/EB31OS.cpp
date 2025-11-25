@@ -145,19 +145,13 @@ void EB31OS::print() {
 vtkSmartPointer<vtkCell> EB31OS::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
 
 mat EB31OS::GetData(const OutputType P) {
-    const auto remap = [&](vec&& in) {
-        mat data(6, b_node, fill::zeros);
-        data.rows(uvec{0, 1, 5}) = in.reshape(b_dof, b_node);
-        return data;
-    };
-
-    if(OutputType::A == P) return remap(get_current_acceleration());
-    if(OutputType::V == P) return remap(get_current_velocity());
-    if(OutputType::U == P) return remap(get_current_displacement());
+    if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
 
     return {};
 }
 
-mat EB31OS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * get_current_displacement().reshape(b_dof, b_node).head_rows(3); }
+mat EB31OS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(3); }
 
 #endif

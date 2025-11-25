@@ -145,15 +145,9 @@ void B31::print() {
 vtkSmartPointer<vtkCell> B31::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
 
 mat B31::GetData(const OutputType P) {
-    const auto remap = [&](vec&& in) {
-        mat data(6, b_node, fill::zeros);
-        data.rows(uvec{0, 1, 5}) = in.reshape(b_dof, b_node);
-        return data;
-    };
-
-    if(OutputType::A == P) return remap(get_current_acceleration());
-    if(OutputType::V == P) return remap(get_current_velocity());
-    if(OutputType::U == P) return remap(get_current_displacement());
+    if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
 
     vec low, high;
     if(const auto t_data = int_pt.front().b_section->record(P); !t_data.empty()) low = t_data[0];
@@ -166,6 +160,6 @@ mat B31::GetData(const OutputType P) {
     return data;
 }
 
-mat B31::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * get_current_displacement().reshape(b_dof, b_node).head_rows(3); }
+mat B31::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(3); }
 
 #endif

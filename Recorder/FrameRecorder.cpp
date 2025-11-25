@@ -36,7 +36,7 @@ void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D
     const auto group_id = H5Gcreate(file_id, group_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     for(auto& I : D->get_element_pool()) {
-        if(const auto data = suanpan::normalise_size(I->record(variable_type)); !data.empty()) {
+        if(const auto data = normalise_size(I->record(variable_type)); !data.empty()) {
             mat data_to_write(data[0].n_elem, data.size());
 
             uword idx = 0;

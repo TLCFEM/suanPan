@@ -264,6 +264,6 @@ mat S4::GetData(const OutputType P) {
     return {};
 }
 
-mat S4::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * get_current_displacement().reshape(s_dof, s_node).head_rows(3); }
+mat S4::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), s_dof, s_node).eval().head_rows(3); }
 
 #endif
