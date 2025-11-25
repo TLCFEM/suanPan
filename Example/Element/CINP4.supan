@@ -30,7 +30,7 @@ step static 1
 
 analyze
 
-save recorder 1 2
+save recorder 1 2 11
 
 # Node 1:
 # Coordinate:

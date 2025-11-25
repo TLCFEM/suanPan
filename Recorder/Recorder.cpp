@@ -156,7 +156,7 @@ void Recorder::save() {
             if(object_tag.size() == data_pool.size()) dataset_name << object_tag(I);
             else dataset_name << "-SUM";
 
-            data_to_write.save(dataset_name.str() + ".txt", raw_ascii);
+            data_to_write.t().eval().save(dataset_name.str() + ".txt", raw_ascii);
         }
     }
 }
