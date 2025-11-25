@@ -27,11 +27,9 @@ void VisualisationRecorder::record_impl([[maybe_unused]] const shared_ptr<Domain
 
     file_name << 'R' << get_tag() << '-' << to_name(original_type) << '-' << std::setw(width) << std::setfill('0') << ++total_counter;
 
-    fs::path file_path = SUANPAN_OUTPUT;
+    const fs::path file_path = SUANPAN_OUTPUT;
 
-    file_path.append(file_name.str());
-
-    config.file_name = file_path.generic_string();
+    config.file_name = (file_path / file_name.str()).generic_string();
 
     vtk_cell_plot(D, config);
 #endif

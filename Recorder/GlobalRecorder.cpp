@@ -49,7 +49,7 @@ void GlobalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
         for(auto& I : D->get_pool<Element>()) strain_energy += I->get_strain_energy();
         insert({{strain_energy, D->get_factory()->get_strain_energy()}}, 0);
     }
-    else insert({{.0, .0}}, 0);
+    else return;
 
     insert(D->get_factory()->get_current_time());
 }

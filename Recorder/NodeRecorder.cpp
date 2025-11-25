@@ -22,30 +22,27 @@
 #include <Domain/Node.h>
 
 void NodeRecorder::record_impl(const shared_ptr<DomainBase>& D) {
+    const auto populate = [&](const vec& in) {
+        for(auto I = 0llu; I < object_tag.n_elem; ++I) insert({in(D->get<Node>(object_tag(I))->get_reordered_dof())}, I);
+    };
+
     if(OutputType::GDF == variable_type) {
         auto& damping_force = D->get_factory()->get_current_damping_force();
         if(damping_force.empty()) return;
-
-        for(auto I = 0llu; I < object_tag.n_elem; ++I)
-            if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert({damping_force(t_node->get_reordered_dof())}, I);
+        populate(damping_force);
     }
     else if(OutputType::GIF == variable_type) {
         auto& inertial_force = D->get_factory()->get_current_inertial_force();
         if(inertial_force.empty()) return;
-
-        for(auto I = 0llu; I < object_tag.n_elem; ++I)
-            if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert({inertial_force(t_node->get_reordered_dof())}, I);
+        populate(inertial_force);
     }
     else if(OutputType::MM == variable_type) {
         auto& momentum = D->get_factory()->get_momentum();
         if(momentum.empty()) return;
-
-        for(auto I = 0llu; I < object_tag.n_elem; ++I)
-            if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert({momentum(t_node->get_reordered_dof())}, I);
+        populate(momentum);
     }
     else
-        for(auto I = 0llu; I < object_tag.n_elem; ++I)
-            if(const auto& t_node = D->get<Node>(object_tag(I)); t_node->is_active()) insert(t_node->record(variable_type), I);
+        for(auto I = 0llu; I < object_tag.n_elem; ++I) insert(D->get<Node>(object_tag(I))->record(variable_type), I);
 
     insert(D->get_factory()->get_current_time());
 }

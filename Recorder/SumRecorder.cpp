@@ -34,6 +34,7 @@ void SumRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 void SumRecorder::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto I : update_tag(D))
         if(!D->find<Node>(I) || !D->get<Node>(I)->is_active()) {
+            suanpan_warning("Node {} is not available/active, recorder {} is disabled.\n", I, get_tag());
             D->disable_recorder(get_tag());
             return;
         }

@@ -31,12 +31,11 @@ extern fs::path SUANPAN_OUTPUT;
 void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 #ifdef SUANPAN_HDF5
     std::ostringstream group_name;
-    group_name << "/";
-    group_name << D->get_factory()->get_current_time();
+    group_name << "/" << D->get_factory()->get_current_time();
 
     const auto group_id = H5Gcreate(file_id, group_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-    for(const auto& I : D->get_element_pool()) {
+    for(auto& I : D->get_element_pool()) {
         if(const auto data = I->record(variable_type); !data.empty()) {
             mat data_to_write(data[0].n_elem, data.size());
 
