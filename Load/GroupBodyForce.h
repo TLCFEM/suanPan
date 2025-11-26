@@ -33,7 +33,7 @@
 
 #include "BodyForce.h"
 
-class GroupBodyForce final : protected GroupLoad, public BodyForce {
+class GroupBodyForce final : protected GroupModifier, public BodyForce {
 public:
     GroupBodyForce(
         unsigned, // tag

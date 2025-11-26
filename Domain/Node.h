@@ -116,6 +116,9 @@ public:
     void ensure_dof(unsigned, const std::vector<DOF>&);
     [[nodiscard]] bool validate_dof(const std::vector<DOF>&) const;
 
+    [[nodiscard]] unsigned get_dof_number() const;
+    [[nodiscard]] const std::vector<DOF>& get_dof_identifier() const;
+
     void set_original_dof(unsigned&);
     [[nodiscard]] const uvec& get_original_dof() const;
 
@@ -172,6 +175,7 @@ public:
     [[nodiscard]] vec get_trial_velocity(unsigned) const;
     [[nodiscard]] vec get_trial_acceleration(unsigned) const;
 
+    [[nodiscard]] vec initial_position(unsigned) const;
     [[nodiscard]] vec current_position(unsigned) const;
     [[nodiscard]] vec trial_position(unsigned) const;
 

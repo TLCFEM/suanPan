@@ -68,7 +68,7 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
         counter = next_counter;
     }
 
-    dof_encoding = pool;
+    target_dof = pool;
 
     return SUANPAN_SUCCESS;
 }

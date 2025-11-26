@@ -27,16 +27,16 @@ Embed::Embed(const unsigned T, const unsigned ET, const unsigned NT, const unsig
     , element_tag(ET) {}
 
 int Embed::initialize(const shared_ptr<DomainBase>& D) {
-    auto& t_node = D->get<Node>(node_encoding(0));
+    auto& t_node = D->get<Node>(target_node(0));
     auto& t_element = D->get<Element>(element_tag);
 
-    if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || t_element->compute_shape_function(zeros(num_size, 1), 0).is_empty()) return SUANPAN_FAIL;
+    if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || t_element->compute_shape_function(zeros(lagrangian_size, 1), 0).is_empty()) return SUANPAN_FAIL;
 
-    const auto t_coor = get_coordinate(t_element.get(), num_size);
+    const auto t_coor = t_element->get_coordinate(lagrangian_size);
 
-    const vec n_coor = t_node->get_coordinate().head(num_size);
+    const vec n_coor = t_node->initial_position(lagrangian_size);
 
-    vec t_para = zeros(num_size);
+    vec t_para = zeros(lagrangian_size);
 
     rowvec n;
 
@@ -52,11 +52,11 @@ int Embed::initialize(const shared_ptr<DomainBase>& D) {
     auto& n_dof = t_node->get_reordered_dof();
     auto& e_dof = t_element->get_dof_encoding();
 
-    auxiliary_stiffness.zeros(D->get_factory()->get_size(), num_size);
+    auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
 
-    for(auto K = 0u; K < num_size; ++K) {
+    for(auto K = 0u; K < lagrangian_size; ++K) {
         auxiliary_stiffness(n_dof(K), K) = -1.;
-        for(uword I = 0, J = K; I < n.n_elem; ++I, J += num_size) auxiliary_stiffness(e_dof(J), K) = n(I);
+        for(uword I = 0, J = K; I < n.n_elem; ++I, J += lagrangian_size) auxiliary_stiffness(e_dof(J), K) = n(I);
     }
 
     return Constraint::initialize(D);

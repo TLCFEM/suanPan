@@ -20,25 +20,27 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
-#include <Load/Amplitude/Amplitude.h>
 
 BodyForce::BodyForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), std::move(D), L) {}
+    : Load(T, AT, {}, std::move(D), L)
+    , target_element(std::move(N)) {}
 
 int BodyForce::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
     trial_load.zeros(W->get_size());
 
-    const auto final_load = pattern * amplitude->get_amplitude(W->get_trial_time());
+    const auto final_load = magnitude * get_amplitude(D);
 
-    for(const auto I : node_encoding)
-        if(auto& t_element = D->get<Element>(I); nullptr != t_element && t_element->is_active()) {
-            vec t_body_load(t_element->get_dof_number(), fill::zeros);
-            for(const auto J : dof_reference)
-                if(J < t_element->get_dof_number()) t_body_load(J) = final_load;
-            if(const auto& t_body_force = t_element->update_body_force(t_body_load); !t_body_force.empty()) trial_load(t_element->get_dof_encoding()) += t_body_force;
-        }
+    const auto check = [&](const shared_ptr<Element>& element) {
+        if(!element || !element->is_active()) return;
+
+        vec t_body_load(element->get_dof_number(), fill::zeros);
+        for(const auto J : dof_reference)
+            if(J < element->get_dof_number()) t_body_load(J) = final_load;
+        if(auto& t_body_force = element->update_body_force(t_body_load); !t_body_force.empty()) trial_load(element->get_dof_encoding()) += t_body_force; };
+
+    for(const auto tag : target_element) check(D->get<Element>(tag));
 
     return SUANPAN_SUCCESS;
 }

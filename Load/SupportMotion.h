@@ -34,9 +34,6 @@
 #include <Load/Load.h>
 
 class SupportMotion : public Load {
-protected:
-    uvec encoding;
-
 public:
     SupportMotion(
         unsigned, // tag
@@ -45,6 +42,8 @@ public:
         uvec&&,   // dof tags
         unsigned  // amplitude tag
     );
+
+    [[nodiscard]] bool if_displacement_control() const final { return true; }
 
     int initialize(const shared_ptr<DomainBase>&) override;
 };

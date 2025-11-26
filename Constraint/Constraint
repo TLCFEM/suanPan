@@ -1,6 +1,6 @@
-#include "BC/BC"
 #include "Criterion/Criterion"
 
+#include "BC.h"
 #include "Constraint.h"
 #include "Embed.h"
 #include "FixedLength.h"

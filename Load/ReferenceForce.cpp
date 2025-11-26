@@ -28,7 +28,7 @@ int ReferenceForce::process(const shared_ptr<DomainBase>& D) {
 
     reference_load.zeros(W->get_size());
 
-    for(const auto I : get_nodal_active_dof(D)) reference_load(I) = pattern;
+    for(const auto I : target_dof) reference_load(I) = magnitude;
 
     return SUANPAN_SUCCESS;
 }

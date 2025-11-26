@@ -29,12 +29,12 @@ B3DOSC::B3DOSC(const unsigned T, vec&& XYZ)
 Orientation::Type B3DOSC::type() const { return Type::B3DOS; }
 
 void B3DOSC::update_transformation() {
-    const mat t_coor = get_coordinate(element_ptr, 3).t();
+    const mat t_coor = element_ptr->get_coordinate(3).t();
     const vec x_axis = t_coor.col(1) - t_coor.col(0);
 
     update_direct_cosine(x_axis);
 
-    const mat trial_disp = reshape(get_trial_displacement(element_ptr), 7, 2);
+    const mat trial_disp = reshape(element_ptr->get_trial_displacement(), 7, 2);
     const vec incre_disp = trial_disp.head_rows(3).col(1) - trial_disp.head_rows(3).col(0);
     const vec trial_cord = x_axis + incre_disp;
 

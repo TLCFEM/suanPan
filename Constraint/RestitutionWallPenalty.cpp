@@ -82,7 +82,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
         counter = next_counter;
     }
 
-    dof_encoding = pool;
+    target_dof = pool;
 
     return SUANPAN_SUCCESS;
 }
@@ -100,11 +100,20 @@ void RestitutionWallPenalty::stage(const shared_ptr<DomainBase>& D) {
     W->update_trial_acceleration(trial_acceleration);
 }
 
-void RestitutionWallPenalty::commit_status() { node_pool.clear(); }
+void RestitutionWallPenalty::commit_status() {
+    node_pool.clear();
+    RigidWallPenalty::commit_status();
+}
 
-void RestitutionWallPenalty::clear_status() { node_pool.clear(); }
+void RestitutionWallPenalty::clear_status() {
+    node_pool.clear();
+    RigidWallPenalty::clear_status();
+}
 
-void RestitutionWallPenalty::reset_status() { node_pool.clear(); }
+void RestitutionWallPenalty::reset_status() {
+    node_pool.clear();
+    RigidWallPenalty::reset_status();
+}
 
 RestitutionWallPenalty1D::RestitutionWallPenalty1D(const unsigned T, const unsigned A, const double O, const double N, const double RC, const double F)
     : RestitutionWallPenalty(T, A, {O}, {N}, RC, F, 1) {}

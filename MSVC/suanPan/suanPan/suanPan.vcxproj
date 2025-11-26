@@ -101,10 +101,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp" />
-    <ClCompile Include="..\..\..\Constraint\BC\GroupPenaltyBC.cpp" />
-    <ClCompile Include="..\..\..\Constraint\BC\MultiplierBC.cpp" />
-    <ClCompile Include="..\..\..\Constraint\BC\PenaltyBC.cpp" />
+    <ClCompile Include="..\..\..\Constraint\BC\BC.cpp" />
     <ClCompile Include="..\..\..\Constraint\Constraint.cpp" />
     <ClCompile Include="..\..\..\Constraint\ConstraintParser.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.cpp" />
@@ -556,10 +553,7 @@
     <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h" />
-    <ClInclude Include="..\..\..\Constraint\BC\GroupPenaltyBC.h" />
-    <ClInclude Include="..\..\..\Constraint\BC\MultiplierBC.h" />
-    <ClInclude Include="..\..\..\Constraint\BC\PenaltyBC.h" />
+    <ClInclude Include="..\..\..\Constraint\BC\BC.h" />
     <ClInclude Include="..\..\..\Constraint\Constraint.h" />
     <ClInclude Include="..\..\..\Constraint\ConstraintParser.h" />
     <ClInclude Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.h" />

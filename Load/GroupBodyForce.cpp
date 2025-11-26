@@ -20,11 +20,11 @@
 #include <Domain/DomainBase.h>
 
 GroupBodyForce::GroupBodyForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : GroupLoad(std::move(N))
+    : GroupModifier(std::move(N))
     , BodyForce(T, L, {}, std::move(D), AT) {}
 
 int GroupBodyForce::initialize(const shared_ptr<DomainBase>& D) {
-    node_encoding = update_object_tag(D);
+    target_element = update_object_tag(D);
 
     return BodyForce::initialize(D);
 }

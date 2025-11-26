@@ -20,16 +20,15 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
-#include <Load/Amplitude/Amplitude.h>
 
 LineUDL::LineUDL(const unsigned T, const double L, uvec&& N, const unsigned DT, const unsigned AT, const uword D)
     : Load(T, AT, std::move(N), uvec{DT}, L)
     , dimension(D) {}
 
 int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
-    if(node_encoding.n_elem % 2 != 0) return SUANPAN_FAIL;
+    if(target_node.n_elem % 2 != 0) return SUANPAN_FAIL;
 
-    for(const auto I : node_encoding)
+    for(const auto I : target_node)
         if(const auto& t_node = D->get<Node>(I); t_node->get_reordered_dof().size() < dimension || t_node->get_coordinate().size() < dimension) return SUANPAN_FAIL;
 
     return Load::initialize(D);
@@ -43,15 +42,15 @@ int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
 
     trial_load.zeros(W->get_size());
 
-    const auto ref_load = pattern * amplitude->get_amplitude(W->get_trial_time());
+    const auto ref_load = magnitude * get_amplitude(D);
 
-    for(auto I = 0llu, J = 1llu; J < node_encoding.n_elem; ++I, ++J) {
-        const auto& node_i = D->get<Node>(node_encoding(I));
-        const auto& node_j = D->get<Node>(node_encoding(J));
+    for(auto I = 0llu, J = 1llu; J < target_node.n_elem; ++I, ++J) {
+        const auto& node_i = D->get<Node>(target_node(I));
+        const auto& node_j = D->get<Node>(target_node(J));
         const auto& dof_i = node_i->get_reordered_dof();
         const auto& dof_j = node_j->get_reordered_dof();
 
-        const vec diff_coor = node_j->get_coordinate().head(dimension) - node_i->get_coordinate().head(dimension);
+        const vec diff_coor = node_j->initial_position(dimension) - node_i->initial_position(dimension);
 
         if(0llu == dof_reference(0)) {
             trial_load(dof_i(0)) = trial_load(dof_j(0)) = -.5 * diff_coor(1) * ref_load;
@@ -76,15 +75,15 @@ int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
 
     trial_load.zeros(W->get_size());
 
-    const auto ref_load = pattern * amplitude->get_amplitude(W->get_trial_time());
+    const auto ref_load = magnitude * get_amplitude(D);
 
-    for(auto I = 0llu, J = 1llu; J < node_encoding.n_elem; ++I, ++J) {
-        const auto& node_i = D->get<Node>(node_encoding(I));
-        const auto& node_j = D->get<Node>(node_encoding(J));
+    for(auto I = 0llu, J = 1llu; J < target_node.n_elem; ++I, ++J) {
+        const auto& node_i = D->get<Node>(target_node(I));
+        const auto& node_j = D->get<Node>(target_node(J));
         const auto& dof_i = node_i->get_reordered_dof();
         const auto& dof_j = node_j->get_reordered_dof();
 
-        const vec diff_coor = node_j->get_coordinate().head(dimension) - node_i->get_coordinate().head(dimension);
+        const vec diff_coor = node_j->initial_position(dimension) - node_i->initial_position(dimension);
 
         if(0llu == dof_reference(0)) {
             trial_load(dof_i(0)) = trial_load(dof_j(0)) = -.5 * norm(diff_coor(uvec{1, 2})) * ref_load;

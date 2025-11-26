@@ -155,6 +155,17 @@ template<typename T1, typename T2, typename T3> auto get_remaining(std::istrings
     return std::make_tuple(O1, O2, O3);
 }
 
+template<typename T1, typename T2, typename T3> auto get_remaining_as_tuple(std::istringstream& I) {
+    std::vector<std::tuple<T1, T2, T3>> container;
+    T1 V1;
+    T2 V2;
+    T3 V3;
+
+    while(get_input(I, V1, V2, V3)) container.emplace_back(std::make_tuple(V1, V2, V3));
+
+    return container;
+}
+
 template<typename T1, typename T2, typename T3, typename T4> auto get_remaining(std::istringstream& I) {
     std::vector<T1> O1;
     std::vector<T2> O2;

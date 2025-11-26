@@ -32,12 +32,11 @@
 #include "Constraint.h"
 
 class MPC final : public Constraint {
-    const uvec dof_pool;
-    const vec weight_pool;
-    const double pseudo_load;
+    const double magnitude;
+    const std::vector<std::tuple<uword, uword, double>> pool;
 
 public:
-    MPC(unsigned, unsigned, uvec&&, uvec&&, vec&&, double);
+    MPC(unsigned, unsigned, double, std::vector<std::tuple<uword, uword, double>>&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

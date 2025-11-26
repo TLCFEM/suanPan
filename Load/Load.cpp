@@ -18,17 +18,12 @@
 #include "Load.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Group/Group.h>
 
 double Load::multiplier = 1E8;
 
 Load::Load(const unsigned T, const unsigned AT, uvec&& NT, uvec&& DT, const double PT)
     : ConditionalModifier(T, AT, std::move(NT), std::move(DT))
-    , pattern(PT) {}
-
-void Load::enable_displacement_control() const { access::rw(mpdc_flag) = true; }
-
-bool Load::if_displacement_control() const { return mpdc_flag; }
+    , magnitude(PT) {}
 
 const vec& Load::get_trial_load() const { return trial_load; }
 
@@ -37,19 +32,3 @@ const vec& Load::get_trial_settlement() const { return trial_settlement; }
 const sp_vec& Load::get_reference_load() const { return reference_load; }
 
 void set_load_multiplier(const double M) { Load::multiplier = M; }
-
-GroupLoad::GroupLoad(uvec&& N)
-    : groups(std::move(N)) {}
-
-uvec GroupLoad::update_object_tag(const shared_ptr<DomainBase>& D) const {
-    suanpan::unordered_set<uword> tag;
-
-    for(const auto I : groups) {
-        const auto& t_group = D->get<Group>(I);
-        if(nullptr == t_group) continue;
-        const auto& t_pool = t_group->get_pool();
-        tag.insert(t_pool.cbegin(), t_pool.cend());
-    }
-
-    return to_uvec(tag);
-}

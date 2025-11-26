@@ -35,12 +35,10 @@
 #include <Domain/ConditionalModifier.h>
 
 class Load : public ConditionalModifier {
-protected:
     static double multiplier;
 
-    const bool mpdc_flag = false;
-
-    const double pattern;
+protected:
+    const double magnitude;
 
     vec trial_load;
     vec trial_settlement;
@@ -57,8 +55,7 @@ public:
         double    // nominal magnitude
     );
 
-    void enable_displacement_control() const;
-    [[nodiscard]] bool if_displacement_control() const;
+    [[nodiscard]] virtual bool if_displacement_control() const { return false; }
 
     [[nodiscard]] const vec& get_trial_load() const;
     [[nodiscard]] const vec& get_trial_settlement() const;
@@ -66,16 +63,6 @@ public:
 };
 
 void set_load_multiplier(double);
-
-class GroupLoad {
-    const uvec groups;
-
-protected:
-    [[nodiscard]] uvec update_object_tag(const shared_ptr<DomainBase>&) const;
-
-public:
-    explicit GroupLoad(uvec&&);
-};
 
 #endif
 

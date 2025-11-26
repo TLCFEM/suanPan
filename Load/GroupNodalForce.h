@@ -33,7 +33,7 @@
 
 #include "NodalForce.h"
 
-class GroupNodalForce final : protected GroupLoad, public NodalForce {
+class GroupNodalForce final : protected GroupModifier, public NodalForce {
 public:
     GroupNodalForce(
         unsigned, // tag

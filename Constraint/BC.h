@@ -16,6 +16,9 @@
  ******************************************************************************/
 /**
  * @class PenaltyBC
+ * @class MultiplierBC
+ * @class GroupPenaltyBC
+ * @class GroupMultiplierBC
  * @brief A PenaltyBC class handles boundary conditions.
  *
  * The PenaltyBC class is in charge of applying boundary conditions to the system. The
@@ -27,26 +30,54 @@
  * method to modify the global stiffness matrix.
  *
  * @author tlc
- * @date 23/07/2017
- * @version 0.1.0
- * @file PenaltyBC.h
+ * @date 26/11/2025
+ * @version 0.2.0
+ * @file BC.h
  * @addtogroup Constraint
  * @{
  */
 
-#ifndef PENALTYBC_H
-#define PENALTYBC_H
+#ifndef BC_H
+#define BC_H
 
 #include <Constraint/Constraint.h>
 
 class PenaltyBC : public Constraint {
+    static double multiplier;
+
+    friend void set_constraint_multiplier(double);
+
 public:
     PenaltyBC(unsigned, uvec&&, uvec&&);
-    PenaltyBC(unsigned, uvec&&, char);
 
     int process(const shared_ptr<DomainBase>&) override;
-    int process_resistance(const shared_ptr<DomainBase>&) override;
+    int process_resistance(const shared_ptr<DomainBase>&) final;
 };
+
+class MultiplierBC : public PenaltyBC {
+public:
+    using PenaltyBC::PenaltyBC;
+
+    int process(const shared_ptr<DomainBase>&) override;
+};
+
+class GroupPenaltyBC : protected GroupModifier, public MultiplierBC {
+public:
+    GroupPenaltyBC(unsigned, uvec&&, uvec&&);
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+
+    int process(const shared_ptr<DomainBase>&) override;
+};
+
+class GroupMultiplierBC final : public GroupPenaltyBC {
+public:
+    using GroupPenaltyBC::GroupPenaltyBC;
+
+    int process(const shared_ptr<DomainBase>&) override;
+};
+
+void set_constraint_multiplier(double);
 
 #endif
 

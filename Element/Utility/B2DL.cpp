@@ -34,7 +34,7 @@ unique_ptr<Orientation> B2DL::get_copy() { return std::make_unique<B2DL>(*this);
 void B2DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;
 
-    const mat coord = get_coordinate(element_ptr, 2).t();
+    const mat coord = element_ptr->get_coordinate(2).t();
 
     const vec x_axis = coord.col(1) - coord.col(0);
 

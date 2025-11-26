@@ -35,12 +35,10 @@
 
 class Constraint : public ConditionalModifier {
 protected:
-    static double multiplier;
+    unsigned lagrangian_size; // size of multiplier
 
-    unsigned num_size; // size of multiplier
-
-    vec trial_lambda = zeros(num_size);
-    vec current_lambda = zeros(num_size);
+    vec trial_lambda{lagrangian_size, fill::zeros};
+    vec current_lambda{lagrangian_size, fill::zeros};
 
     sp_vec resistance;
     sp_mat stiffness;
@@ -48,8 +46,6 @@ protected:
     vec auxiliary_resistance;
     vec auxiliary_load;
     sp_mat auxiliary_stiffness;
-
-    friend void set_constraint_multiplier(double);
 
 public:
     Constraint(
@@ -70,8 +66,6 @@ public:
     void set_multiplier_size(unsigned);
     [[nodiscard]] unsigned get_multiplier_size() const;
 };
-
-void set_constraint_multiplier(double);
 
 #endif
 

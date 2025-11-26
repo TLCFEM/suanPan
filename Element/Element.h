@@ -147,8 +147,6 @@ class Element : protected DataElement, public ElementBase, public Distributed {
 protected:
     std::vector<std::weak_ptr<Node>> node_ptr; // node pointers
 
-    [[nodiscard]] mat get_coordinate(unsigned) const override;
-
     [[nodiscard]] vec get_node_incre_resistance() const override;
     [[nodiscard]] vec get_node_trial_resistance() const override;
     [[nodiscard]] vec get_node_current_resistance() const override;
@@ -221,6 +219,7 @@ public:
     [[nodiscard]] const uvec& get_dof_encoding() const override;
     [[nodiscard]] const uvec& get_node_encoding() const override;
 
+    [[nodiscard]] const std::vector<Node::DOF>& get_dof_identifier() const override;
     [[nodiscard]] const std::vector<MappingDOF>& get_dof_mapping() const override;
 
     [[nodiscard]] const uvec& get_material_tag() const override;
@@ -232,6 +231,8 @@ public:
 
     void clear_node_ptr() override;
     [[nodiscard]] const std::vector<std::weak_ptr<Node>>& get_node_ptr() const override;
+
+    [[nodiscard]] mat get_coordinate(unsigned) const override;
 
     [[nodiscard]] vec get_incre_displacement() const override;
     [[nodiscard]] vec get_incre_velocity() const override;

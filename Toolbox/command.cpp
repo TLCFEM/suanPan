@@ -19,7 +19,7 @@
 // ReSharper disable IdentifierTypo
 #include "command.h"
 
-#include <Constraint/Constraint.h>
+#include <Constraint/BC.h>
 #include <Constraint/ConstraintParser.h>
 #include <Constraint/Criterion/Criterion.h>
 #include <Converger/Converger.h>

@@ -222,16 +222,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
-      <Filter>Constraint\BC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\BC\GroupPenaltyBC.cpp">
-      <Filter>Constraint\BC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\BC\MultiplierBC.cpp">
-      <Filter>Constraint\BC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\BC\PenaltyBC.cpp">
+    <ClCompile Include="..\..\..\Constraint\BC\BC.cpp">
       <Filter>Constraint\BC</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
@@ -1581,16 +1572,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
-      <Filter>Constraint\BC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\BC\GroupPenaltyBC.h">
-      <Filter>Constraint\BC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\BC\MultiplierBC.h">
-      <Filter>Constraint\BC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\BC\PenaltyBC.h">
+    <ClInclude Include="..\..\..\Constraint\BC\BC.h">
       <Filter>Constraint\BC</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">

@@ -21,8 +21,8 @@
 #include <Toolbox/tensor.h>
 
 void B2DC::update_transformation() {
-    const auto coord = get_coordinate(element_ptr, 2);
-    const auto t_disp = get_trial_displacement(element_ptr);
+    const auto coord = element_ptr->get_coordinate(2);
+    const auto t_disp = element_ptr->get_trial_displacement();
 
     vec x_axis(2);
     x_axis(0) = coord(1, 0) - coord(0, 0) + t_disp(3) - t_disp(0);

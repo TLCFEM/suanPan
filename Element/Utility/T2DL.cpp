@@ -28,7 +28,7 @@ unique_ptr<Orientation> T2DL::get_copy() { return std::make_unique<T2DL>(*this);
 void T2DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;
 
-    const auto coord = get_coordinate(element_ptr, 2);
+    const auto coord = element_ptr->get_coordinate(2);
 
     vec x_axis(2);
     x_axis(0) = coord(1, 0) - coord(0, 0);

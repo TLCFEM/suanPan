@@ -19,21 +19,14 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/Amplitude/Amplitude.h>
 
 NodalForce::NodalForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
     : Load(T, AT, std::move(N), std::move(D), L) {}
 
 int NodalForce::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
+    D->insert_loaded_dof(target_dof);
 
-    const auto active_dof = get_nodal_active_dof(D);
-
-    D->insert_loaded_dof(active_dof);
-
-    trial_load.zeros(W->get_size());
-
-    trial_load(active_dof).fill(pattern * amplitude->get_amplitude(W->get_trial_time()));
+    trial_load.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
 }

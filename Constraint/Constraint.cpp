@@ -17,11 +17,9 @@
 
 #include "Constraint.h"
 
-double Constraint::multiplier = 1E8;
-
 Constraint::Constraint(const unsigned T, const unsigned AT, uvec&& N, uvec&& D, const unsigned S)
     : ConditionalModifier(T, AT, std::move(N), std::move(D))
-    , num_size(S) {}
+    , lagrangian_size(S) {}
 
 const sp_vec& Constraint::get_resistance() const { return resistance; }
 
@@ -33,18 +31,10 @@ const sp_mat& Constraint::get_stiffness() const { return stiffness; }
 
 const vec& Constraint::get_auxiliary_load() const { return auxiliary_load; }
 
-/**
- * \brief At the beginning of each sub-step, it is assumed that constraints are not active (constraining conditions are not satisfied).
- * The `process(const shared_ptr<DomainBase>&)` checks the constraining conditions for each iteration, and activates the multiplier(s)
- * if conditions are met. The activation will be valid for all subsequent iterations in the same sub-step to avoid numerical instability.
- * \param S number of multipliers
- */
 void Constraint::set_multiplier_size(const unsigned S) {
-    num_size = S;
+    lagrangian_size = S;
     stiffness.reset();
     resistance.reset();
 }
 
-unsigned Constraint::get_multiplier_size() const { return num_size; }
-
-void set_constraint_multiplier(const double M) { Constraint::multiplier = M; }
+unsigned Constraint::get_multiplier_size() const { return lagrangian_size; }

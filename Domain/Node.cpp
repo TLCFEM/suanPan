@@ -77,6 +77,10 @@ bool Node::validate_dof(const std::vector<DOF>& in) const {
     return true;
 }
 
+unsigned Node::get_dof_number() const { return num_dof; }
+
+const std::vector<Node::DOF>& Node::get_dof_identifier() const { return dof_identifier; }
+
 void Node::set_original_dof(unsigned& F) {
     original_dof.set_size(num_dof);
     for(auto& I : original_dof) I = F++;
@@ -173,6 +177,8 @@ vec Node::get_trial_displacement(const unsigned dim) const { return resize(trial
 vec Node::get_trial_velocity(const unsigned dim) const { return resize(trial_velocity, dim, 1); };
 
 vec Node::get_trial_acceleration(const unsigned dim) const { return resize(trial_acceleration, dim, 1); }
+
+vec Node::initial_position(const unsigned dim) const { return resize(coordinate, dim, 1); }
 
 vec Node::current_position(const unsigned dim) const { return resize(coordinate, dim, 1) + resize(current_displacement, dim, 1); }
 
