@@ -34,6 +34,9 @@
 #include <Load/Load.h>
 
 class BodyForce : public Load {
+protected:
+    uvec target_element;
+
 public:
     BodyForce(
         unsigned, // tag

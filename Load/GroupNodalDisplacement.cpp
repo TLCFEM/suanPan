@@ -21,7 +21,7 @@
 
 GroupNodalDisplacement::GroupNodalDisplacement(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
     : GroupModifier(std::move(N))
-    , NodalDisplacement(T, L, uvec{}, std::move(D), AT) {}
+    , NodalDisplacement(T, L, {}, std::move(D), AT) {}
 
 int GroupNodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
     target_node = update_object_tag(D);

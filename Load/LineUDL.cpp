@@ -50,7 +50,7 @@ int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
         const auto& dof_i = node_i->get_reordered_dof();
         const auto& dof_j = node_j->get_reordered_dof();
 
-        const vec diff_coor = node_j->get_coordinate().head(dimension) - node_i->get_coordinate().head(dimension);
+        const vec diff_coor = node_j->initial_position(dimension) - node_i->initial_position(dimension);
 
         if(0llu == dof_reference(0)) {
             trial_load(dof_i(0)) = trial_load(dof_j(0)) = -.5 * diff_coor(1) * ref_load;
@@ -83,7 +83,7 @@ int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
         const auto& dof_i = node_i->get_reordered_dof();
         const auto& dof_j = node_j->get_reordered_dof();
 
-        const vec diff_coor = node_j->get_coordinate().head(dimension) - node_i->get_coordinate().head(dimension);
+        const vec diff_coor = node_j->initial_position(dimension) - node_i->initial_position(dimension);
 
         if(0llu == dof_reference(0)) {
             trial_load(dof_i(0)) = trial_load(dof_j(0)) = -.5 * norm(diff_coor(uvec{1, 2})) * ref_load;
