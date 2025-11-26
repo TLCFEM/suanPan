@@ -92,11 +92,11 @@ public:
         // rotation in y direction
         UR3,
         // rotation in z direction
-        DMG,
+        DAMAGE,
         // damage
-        P,
+        PRESSURE,
         // pressure
-        T,
+        TEMPERATURE,
         // temperature
         WARP // warping
     };

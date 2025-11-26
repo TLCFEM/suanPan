@@ -101,27 +101,15 @@ std::string get_remaining(std::istringstream& I) {
     return {};
 }
 
-bool is_equal(const char* A, const char* B) { return _strcmpi(A, B) == 0; }
-
 bool is_equal(const char A, const char B) { return tolower(static_cast<int>(A)) == tolower(static_cast<int>(B)); }
 
 bool is_equal(const int A, const char B) { return tolower(A) == tolower(static_cast<int>(B)); }
 
-bool is_equal(const std::string& A, const char* B) { return is_equal(A.c_str(), B); }
-
-bool is_equal(const char* A, const std::string& B) { return is_equal(A, B.c_str()); }
-
-bool is_equal(const std::string& A, const std::string& B) { return is_equal(A.c_str(), B.c_str()); }
-
-bool is_equal(const std::string_view A, const char* B) { return is_equal(A.data(), B); }
-
-bool is_equal(const char* A, const std::string_view B) { return is_equal(A, B.data()); }
+bool is_equal(const std::string_view A, const std::string_view B) { return _strcmpi(A.data(), B.data()) == 0; }
 
 bool if_contain(const std::string& A, const char* B) { return A.find(B) != std::string::npos; }
 
 bool if_contain(const std::string& A, const std::string& B) { return A.find(B) != std::string::npos; }
-
-bool if_contain(std::string&& A, std::string&& B) { return if_contain(A, B); }
 
 bool is_true(const char* S) { return is_equal(S, "On") || is_equal(S, "True") || is_equal(S, "T") || is_equal(S, "1") || is_equal(S, "Yes") || is_equal(S, "Y"); }
 
