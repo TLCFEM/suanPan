@@ -37,19 +37,22 @@ namespace {
             return;
         }
 
-        uvec dof_pool;
-        if(const auto bc_type = suanpan::to_lower(dof_id[0]); 'p' == bc_type) dof_pool = uvec{1, 2, 3};
-        else if('e' == bc_type) dof_pool = uvec{1, 2, 3, 4, 5, 6};
-        else if('x' == bc_type) dof_pool = uvec{1, 5, 6};
-        else if('y' == bc_type) dof_pool = uvec{2, 4, 6};
-        else if('z' == bc_type) dof_pool = uvec{3, 4, 5};
-        else if('1' == bc_type) dof_pool = uvec{1};
-        else if('2' == bc_type) dof_pool = uvec{2};
-        else if('3' == bc_type) dof_pool = uvec{3};
-        else if('4' == bc_type) dof_pool = uvec{4};
-        else if('5' == bc_type) dof_pool = uvec{5};
-        else if('6' == bc_type) dof_pool = uvec{6};
-        else if('7' == bc_type) dof_pool = uvec{7};
+        std::set<Node::DOF> dof_pool;
+        if(is_equal(dof_id, "pinned")) dof_pool = std::set{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
+        else if(is_equal(dof_id, "encastre")) dof_pool = std::set{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3};
+        else if(is_equal(dof_id, "xsymm")) dof_pool = std::set{Node::DOF::U1, Node::DOF::UR2, Node::DOF::UR3};
+        else if(is_equal(dof_id, "ysymm")) dof_pool = std::set{Node::DOF::UR1, Node::DOF::U2, Node::DOF::UR3};
+        else if(is_equal(dof_id, "zsymm")) dof_pool = std::set{Node::DOF::UR1, Node::DOF::UR2, Node::DOF::U3};
+        else if(is_equal(dof_id, "1")) dof_pool = std::set{Node::DOF::U1};
+        else if(is_equal(dof_id, "2")) dof_pool = std::set{Node::DOF::U2};
+        else if(is_equal(dof_id, "3")) dof_pool = std::set{Node::DOF::U3};
+        else if(is_equal(dof_id, "4")) dof_pool = std::set{Node::DOF::UR1};
+        else if(is_equal(dof_id, "5")) dof_pool = std::set{Node::DOF::UR2};
+        else if(is_equal(dof_id, "6")) dof_pool = std::set{Node::DOF::UR3};
+        else if(is_equal(dof_id, "DAMAGE")) dof_pool = std::set{Node::DOF::DAMAGE};
+        else if(is_equal(dof_id, "PRESSURE")) dof_pool = std::set{Node::DOF::PRESSURE};
+        else if(is_equal(dof_id, "TEMPERATURE")) dof_pool = std::set{Node::DOF::TEMPERATURE};
+        else if(is_equal(dof_id, "WARP")) dof_pool = std::set{Node::DOF::WARP};
         else {
             suanpan_error("A valid dof identifier is required.\n");
             return;

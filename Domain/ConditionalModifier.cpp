@@ -27,39 +27,25 @@ uvec ConditionalModifier::update_active_dof(const shared_ptr<DomainBase>& D) {
 
     const auto check = [&](const shared_ptr<Node>& node) {
         if(!node || !node->is_active()) return;
-        auto& t_dof = node->get_reordered_dof();
-        for(const auto J : dof_reference)
-            if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
+        suanpan::append_to(active_dof, node->get_dof(dof_component));
     };
 
     if(target_node.is_empty())
         for(auto& node : D->get_node_pool()) check(node);
     else
-        for(const auto I : target_node) check(D->get<Node>(I));
+        for(const auto tag : target_node) check(D->get<Node>(tag));
 
     return active_dof;
-
-    // const auto check = [&](const shared_ptr<Node>& node) {
-    //     if(!node || !node->is_active()) return;
-    //     auto& t_dof = node->get_reordered_dof();
-    //     auto& t_identifier = node->get_dof_identifier();
-    //     for(auto J = 0u; J < node->get_dof_number(); ++J)
-    //         if(dof_identifier.contains(t_identifier[J])) active_dof.emplace_back(t_dof[J]);
-    // };
-    //
-    // if(target_object.is_empty())
-    //     for(auto& node : D->get_node_pool()) check(node);
-    // else
-    //     for(const auto tag : target_object) check(D->get<Node>(tag));
 }
 
 double ConditionalModifier::get_amplitude(const shared_ptr<DomainBase>& D) const { return amplitude->get_amplitude(D->get_factory()->get_trial_time()); }
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& N, uvec&& D)
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& OT, std::set<Node::DOF>&& DC, std::vector<Node::DOF>&& DO)
     : UniqueTag(T)
     , amplitude_tag(AT)
-    , dof_reference(D - 1)
-    , target_node(std::move(N)) {}
+    , dof_component(std::move(DC))
+    , dof_order(std::move(DO))
+    , target_node(std::move(OT)) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     amplitude = D->get<Amplitude>(amplitude_tag);

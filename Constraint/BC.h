@@ -48,7 +48,11 @@ class PenaltyBC : public Constraint {
     friend void set_constraint_multiplier(double);
 
 public:
-    PenaltyBC(unsigned, uvec&&, uvec&&);
+    PenaltyBC(
+        unsigned,
+        uvec&&,               // node tags
+        std::set<Node::DOF>&& // dof components
+    );
 
     int process(const shared_ptr<DomainBase>&) override;
     int process_resistance(const shared_ptr<DomainBase>&) final;
@@ -63,7 +67,11 @@ public:
 
 class GroupPenaltyBC : protected GroupModifier, public MultiplierBC {
 public:
-    GroupPenaltyBC(unsigned, uvec&&, uvec&&);
+    GroupPenaltyBC(
+        unsigned,
+        uvec&&,               // node group tags
+        std::set<Node::DOF>&& // dof components
+    );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

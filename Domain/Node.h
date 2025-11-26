@@ -39,6 +39,7 @@
 #define NODE_H
 
 #include <Domain/Tag.h>
+#include <set>
 
 class DomainBase;
 enum class OutputType;
@@ -115,9 +116,7 @@ public:
 
     void ensure_dof(unsigned, const std::vector<DOF>&);
     [[nodiscard]] bool validate_dof(const std::vector<DOF>&) const;
-
-    [[nodiscard]] unsigned get_dof_number() const;
-    [[nodiscard]] const std::vector<DOF>& get_dof_identifier() const;
+    [[nodiscard]] std::vector<uword> get_dof(const std::set<DOF>&) const;
 
     void set_original_dof(unsigned&);
     [[nodiscard]] const uvec& get_original_dof() const;

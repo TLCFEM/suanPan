@@ -52,8 +52,13 @@ class ConditionalModifier : public UniqueTag {
 protected:
     unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};
 
-    const uvec dof_reference; // reference DoF ZERO based
-    const std::set<Node::DOF> dof_identifier;
+    // indicate which DOF components of the target nodes/elements shall be found
+    // the modifier itself will apply itself to those active components
+    const std::set<Node::DOF> dof_component;
+
+    // indicate the order of DOF components
+    // used to validate of the problem is compatible
+    const std::vector<Node::DOF> dof_order;
 
     uvec target_node, target_dof;
 
@@ -61,10 +66,11 @@ protected:
 
 public:
     ConditionalModifier(
-        unsigned, // tag
-        unsigned, // amplitude tag
-        uvec&&,   // node tag
-        uvec&&    // dof tag
+        unsigned,                // tag
+        unsigned,                // amplitude tag
+        uvec&&,                  // object tag
+        std::set<Node::DOF>&&,   // dof component (unordered)
+        std::vector<Node::DOF>&& // dof order
     );
 
     virtual int initialize(const shared_ptr<DomainBase>&);

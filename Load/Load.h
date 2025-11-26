@@ -48,11 +48,12 @@ protected:
 
 public:
     Load(
-        unsigned, // tag
-        unsigned, // amplitude tag
-        uvec&&,   // node tag
-        uvec&&,   // dof tag
-        double    // nominal magnitude
+        unsigned,                 // tag
+        unsigned,                 // amplitude tag
+        uvec&&,                   // node tag
+        std::set<Node::DOF>&&,    // dof component (unordered)
+        std::vector<Node::DOF>&&, // dof order
+        double                    // nominal magnitude
     );
 
     [[nodiscard]] virtual bool if_displacement_control() const { return false; }

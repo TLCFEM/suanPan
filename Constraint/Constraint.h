@@ -49,11 +49,12 @@ protected:
 
 public:
     Constraint(
-        unsigned, // tag
-        unsigned, // amplitude tag
-        uvec&&,   // node tags
-        uvec&&,   // dof tags
-        unsigned  // size of multiplier
+        unsigned,                 // tag
+        unsigned,                 // amplitude tag
+        uvec&&,                   // node tags
+        std::set<Node::DOF>&&,    // dof component (unordered)
+        std::vector<Node::DOF>&&, // dof order
+        unsigned                  // size of multiplier
     );
 
     const sp_vec& get_resistance() const;
