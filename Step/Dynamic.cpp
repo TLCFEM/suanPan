@@ -20,7 +20,7 @@
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/GroupNodalDisplacement.h>
+#include <Load/NodalDisplacement.h>
 #include <Solver/BFGS.h>
 #include <Solver/Integrator/Explicit/Tchamwa.h>
 #include <Solver/Integrator/Implicit/LeeNewmark/LeeNewmarkBase.h>
