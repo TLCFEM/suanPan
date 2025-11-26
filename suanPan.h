@@ -336,19 +336,11 @@ namespace suanpan {
     }
 } // namespace suanpan
 
-#ifdef SUANPAN_MSVC
-#pragma warning(disable : 4100)
-#endif
-
 template<std::invocable F> auto suanpan_assert([[maybe_unused]] F&& handler) {
 #ifdef SUANPAN_DEBUG
     std::forward<F>(handler)();
 #endif
 }
-
-#ifdef SUANPAN_MSVC
-#pragma warning(default : 4100)
-#endif
 
 #define suanpan_info suanpan::info
 #define suanpan_highlight suanpan::highlight
