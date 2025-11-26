@@ -841,14 +841,14 @@ const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_material() 
 const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_section() const { return compact_node_per_section; }
 
 uvec Domain::flatten_group(const uvec& groups) {
-    std::set<uword> tag;
+    suanpan::set<uword> tag;
 
-    for(const auto I : groups) {
+    suanpan::for_all(groups, [&](const uword I) {
         if(auto& group = get<Group>(I)) {
             auto& pool = group->get_pool();
             tag.insert(pool.cbegin(), pool.cend());
         }
-    }
+    });
 
     return to_uvec(tag);
 }

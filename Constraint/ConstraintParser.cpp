@@ -217,9 +217,7 @@ namespace {
             return;
         }
 
-        const auto [node_tag, dof_tag, weight_tag] = get_remaining<uword, uword, double>(command);
-
-        return_obj = std::make_unique<MPC>(tag, amplitude, uvec(node_tag), uvec(dof_tag), vec(weight_tag), magnitude);
+        return_obj = std::make_unique<MPC>(tag, amplitude, magnitude, get_remaining_as_tuple<uword, uword, double>(command));
     }
 
     void new_nodeline(unique_ptr<Constraint>& return_obj, std::istringstream& command) {

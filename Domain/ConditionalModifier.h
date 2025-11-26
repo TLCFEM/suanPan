@@ -36,7 +36,7 @@
 #include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 #include <Toolbox/ResourceHolder.h>
-#include <Toolbox/container.h>
+#include <set>
 
 class DomainBase;
 

@@ -21,32 +21,30 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
-MPC::MPC(const unsigned T, const unsigned A, uvec&& N, uvec&& D, vec&& W, const double L)
-    : Constraint(T, A, std::move(N), {}, 1)
-    , dof_pool(D - 1)
-    , weight_pool(std::move(W))
-    , pseudo_load(L) {}
+MPC::MPC(const unsigned T, const unsigned A, const double L, std::vector<std::tuple<uword, uword, double>>&& P)
+    : Constraint(T, A, {}, {}, 1)
+    , magnitude(L)
+    , pool(std::move(P)) {}
 
 int MPC::initialize(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
     auxiliary_stiffness.zeros(W->get_size(), lagrangian_size);
 
-    for(auto I = 0llu; I < target_node.n_elem; ++I) {
-        auto& t_node = D->get<Node>(target_node(I));
-        auto& t_dof = t_node->get_reordered_dof();
-        if(nullptr == t_node || !t_node->is_active() || t_dof.n_elem < dof_pool(I)) {
+    for(auto [tag, dof, weight] : pool) {
+        auto& node = D->get<Node>(tag);
+        if(!node || !node->is_active() || node->get_reordered_dof().size() <= dof) {
             auxiliary_stiffness.reset();
             return SUANPAN_FAIL;
         }
-        auxiliary_stiffness(t_dof(dof_pool(I))) = weight_pool(I);
+        auxiliary_stiffness(node->get_reordered_dof()(dof - 1)) = weight;
     }
 
     return Constraint::initialize(D);
 }
 
 int MPC::process(const shared_ptr<DomainBase>& D) {
-    auxiliary_load = pseudo_load * get_amplitude(D);
+    auxiliary_load = magnitude * get_amplitude(D);
 
     auxiliary_resistance = auxiliary_stiffness.t() * D->get_factory()->get_trial_displacement();
 
