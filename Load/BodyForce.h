@@ -16,10 +16,7 @@
  ******************************************************************************/
 /**
  * @class BodyForce
- * @brief A BodyForce class.
- *
- * The BodyForce class is in charge of handling body force.
- *
+ * @class GroupBodyForce
  * @author tlc
  * @date 10/07/2020
  * @version 0.1.0
@@ -39,14 +36,27 @@ protected:
 
 public:
     BodyForce(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // element tags
-        uvec&&,   // dof tags
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // element tags
+        std::vector<Node::DOF>&&, // dof components
+        unsigned                  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;
+};
+
+class GroupBodyForce final : protected GroupModifier, public BodyForce {
+public:
+    GroupBodyForce(
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // element tags
+        std::vector<Node::DOF>&&, // dof components
+        unsigned                  // amplitude tag
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

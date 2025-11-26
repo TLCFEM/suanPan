@@ -17,8 +17,8 @@
 
 #include "Constraint.h"
 
-Constraint::Constraint(const unsigned T, const unsigned AT, uvec&& NT, std::set<Node::DOF>&& DC, std::vector<Node::DOF>&& DO, const unsigned S)
-    : ConditionalModifier(T, AT, std::move(NT), std::move(DC), std::move(DO))
+Constraint::Constraint(const unsigned T, const unsigned AT, uvec&& NT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC, const unsigned S)
+    : ConditionalModifier(T, AT, std::move(NT), std::move(DO), std::move(DC))
     , lagrangian_size(S) {}
 
 const sp_vec& Constraint::get_resistance() const { return resistance; }

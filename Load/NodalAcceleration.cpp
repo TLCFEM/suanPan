@@ -20,8 +20,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-NodalAcceleration::NodalAcceleration(const unsigned T, const double L, uvec&& NT, uvec&& DT, const unsigned AT)
-    : Load(T, AT, std::move(NT), std::move(DT), L) {}
+NodalAcceleration::NodalAcceleration(const unsigned T, const double L, uvec&& NT, std::vector<Node::DOF>&& DT, const unsigned AT)
+    : Load(T, AT, std::move(NT), std::move(DT), {}, L) {}
 
 int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();

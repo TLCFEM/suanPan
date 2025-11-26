@@ -33,10 +33,10 @@ std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
 }
 
 NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
-    : Constraint(T, A, std::move(N), uvec{1, 2}, 1) {}
+    : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2}, {}, 1) {}
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 
     return Constraint::initialize(D);
 }
@@ -52,7 +52,7 @@ int NodeLine::process(const shared_ptr<DomainBase>& D) {
 
     if(const auto t = dot(position, axis); 0 == lagrangian_size && (pen > 0. || t < 0. || t > norm(axis))) return SUANPAN_SUCCESS;
 
-    set_multiplier_size(1);
+    set_multiplier_size(1u);
 
     const span span_i(0, 1), span_j(2, 3), span_k(4, 5);
 
@@ -84,15 +84,15 @@ void NodeLine::update_status(const vec& i_lambda) { trial_lambda += i_lambda; }
 
 void NodeLine::commit_status() {
     current_lambda = trial_lambda;
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 void NodeLine::clear_status() {
     current_lambda = trial_lambda.zeros();
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 void NodeLine::reset_status() {
     trial_lambda = current_lambda;
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }

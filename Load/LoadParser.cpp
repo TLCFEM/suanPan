@@ -44,13 +44,19 @@ namespace {
             return;
         }
 
-        unsigned dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        return_obj = std::make_unique<NodalAcceleration>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<NodalAcceleration>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
     void new_bodyforce(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -72,14 +78,20 @@ namespace {
             return;
         }
 
-        unsigned dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
-        else return_obj = std::make_unique<BodyForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        else return_obj = std::make_unique<BodyForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
     void new_cload(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -101,14 +113,20 @@ namespace {
             return;
         }
 
-        unsigned dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
-        else return_obj = std::make_unique<NodalForce>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        else return_obj = std::make_unique<NodalForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
     void new_refload(unique_ptr<Load>& return_obj, std::istringstream& command) {
@@ -129,13 +147,19 @@ namespace {
             return;
         }
 
-        unsigned dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        return_obj = std::make_unique<ReferenceForce>(load_id, magnitude, get_remaining<uword>(command), dof_id);
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<ReferenceForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool));
     }
 
     void new_lineudl(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned dimension) {
@@ -157,14 +181,20 @@ namespace {
             return;
         }
 
-        unsigned dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        if(2 == dimension) return_obj = std::make_unique<LineUDL2D>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
-        else return_obj = std::make_unique<LineUDL3D>(load_id, magnitude, get_remaining<uword>(command), dof_id, amplitude_id);
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        if(2 == dimension) return_obj = std::make_unique<LineUDL2D>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        else return_obj = std::make_unique<LineUDL3D>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
     void new_displacement(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
@@ -186,14 +216,20 @@ namespace {
             return;
         }
 
-        unsigned dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupNodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
-        else return_obj = std::make_unique<NodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        if(flag) return_obj = std::make_unique<GroupNodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        else return_obj = std::make_unique<NodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
     void new_supportmotion(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned flag) {
@@ -215,15 +251,21 @@ namespace {
             return;
         }
 
-        unsigned dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
-        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
-        else return_obj = std::make_unique<SupportAcceleration>(load_id, magnitude, get_remaining<uword>(command), uvec{dof_id}, amplitude_id);
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
+        }
+
+        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        else return_obj = std::make_unique<SupportAcceleration>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 } // namespace
 

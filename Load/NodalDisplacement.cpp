@@ -20,8 +20,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), std::move(D), L) {}
+NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : Load(T, AT, std::move(N), {}, std::move(D), L) {}
 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
     set_end_step(start_step + 1);
@@ -37,4 +37,14 @@ int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
     if(!target_dof.empty()) trial_settlement.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
+}
+
+GroupNodalDisplacement::GroupNodalDisplacement(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : GroupModifier(std::move(N))
+    , NodalDisplacement(T, L, {}, std::move(D), AT) {}
+
+int GroupNodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
+    target_node = update_object_tag(D);
+
+    return NodalDisplacement::initialize(D);
 }

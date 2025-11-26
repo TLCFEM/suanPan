@@ -44,7 +44,6 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
     stiffness.reset();
 
     suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& t_node) {
-        if(!t_node->validate_dof(ref_dof)) return;
         const vec t_pos = t_node->trial_position(n_dim) - origin;
         if(!edge_a.empty())
             if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) return;

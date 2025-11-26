@@ -36,14 +36,27 @@
 class NodalForce : public Load {
 public:
     NodalForce(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        uvec&&,   // dof tags
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tags
+        unsigned                  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;
+};
+
+class GroupNodalForce final : protected GroupModifier, public NodalForce {
+public:
+    GroupNodalForce(
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // group tags
+        std::vector<Node::DOF>&&, // dof tags
+        unsigned                  // amplitude tag
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

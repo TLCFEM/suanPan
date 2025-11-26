@@ -24,8 +24,8 @@
 
 double PenaltyBC::multiplier = 1E8;
 
-PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, std::set<Node::DOF>&& D)
-    : Constraint(T, 0, std::move(N), std::move(D), {}, 0) {}
+PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, std::vector<Node::DOF>&& D)
+    : Constraint(T, 0, std::move(N), {}, std::move(D), 0) {}
 
 /**
  * \brief Apply the BC to the system using penalty method.
@@ -84,7 +84,7 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
     return process_resistance(D);
 }
 
-GroupPenaltyBC::GroupPenaltyBC(const unsigned T, uvec&& N, std::set<Node::DOF>&& D)
+GroupPenaltyBC::GroupPenaltyBC(const unsigned T, uvec&& N, std::vector<Node::DOF>&& D)
     : GroupModifier(std::move(N))
     , MultiplierBC(T, {}, std::move(D)) {}
 

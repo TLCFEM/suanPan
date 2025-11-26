@@ -42,7 +42,6 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
     // multiplier method
     auto counter = 0llu;
     for(const auto& I : D->get_node_pool()) {
-        if(!I->validate_dof(ref_dof)) continue;
         const vec t_pos = I->trial_position(n_dim) - origin;
         if(!edge_a.empty())
             if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) continue;

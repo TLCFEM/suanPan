@@ -31,29 +31,14 @@ namespace {
             return;
         }
 
-        std::string dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        std::set<Node::DOF> dof_pool;
-        if(is_equal(dof_id, "pinned")) dof_pool = std::set{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
-        else if(is_equal(dof_id, "encastre")) dof_pool = std::set{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3};
-        else if(is_equal(dof_id, "xsymm")) dof_pool = std::set{Node::DOF::U1, Node::DOF::UR2, Node::DOF::UR3};
-        else if(is_equal(dof_id, "ysymm")) dof_pool = std::set{Node::DOF::UR1, Node::DOF::U2, Node::DOF::UR3};
-        else if(is_equal(dof_id, "zsymm")) dof_pool = std::set{Node::DOF::UR1, Node::DOF::UR2, Node::DOF::U3};
-        else if(is_equal(dof_id, "1")) dof_pool = std::set{Node::DOF::U1};
-        else if(is_equal(dof_id, "2")) dof_pool = std::set{Node::DOF::U2};
-        else if(is_equal(dof_id, "3")) dof_pool = std::set{Node::DOF::U3};
-        else if(is_equal(dof_id, "4")) dof_pool = std::set{Node::DOF::UR1};
-        else if(is_equal(dof_id, "5")) dof_pool = std::set{Node::DOF::UR2};
-        else if(is_equal(dof_id, "6")) dof_pool = std::set{Node::DOF::UR3};
-        else if(is_equal(dof_id, "DAMAGE")) dof_pool = std::set{Node::DOF::DAMAGE};
-        else if(is_equal(dof_id, "PRESSURE")) dof_pool = std::set{Node::DOF::PRESSURE};
-        else if(is_equal(dof_id, "TEMPERATURE")) dof_pool = std::set{Node::DOF::TEMPERATURE};
-        else if(is_equal(dof_id, "WARP")) dof_pool = std::set{Node::DOF::WARP};
-        else {
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }

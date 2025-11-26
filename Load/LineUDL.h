@@ -35,29 +35,27 @@
 
 class LineUDL : public Load {
 protected:
-    const uword dimension;
+    const unsigned dimension;
 
 public:
     LineUDL(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        unsigned, // dof tag
-        unsigned, // amplitude tag
-        uword     // dimension
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tag
+        unsigned,                 // amplitude tag
+        unsigned                  // dimension
     );
-
-    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 class LineUDL2D final : public LineUDL {
 public:
     LineUDL2D(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        unsigned, // dof tag
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tag
+        unsigned                  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;
@@ -66,11 +64,11 @@ public:
 class LineUDL3D final : public LineUDL {
 public:
     LineUDL3D(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        unsigned, // dof tag
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tag
+        unsigned                  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;

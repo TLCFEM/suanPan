@@ -21,14 +21,14 @@
 #include <Domain/Factory.hpp>
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F, const unsigned NS)
-    : Constraint(T, A, {}, {}, 0)
+    : Constraint(T, A, {}, setup(NS), {}, 0)
     , n_dim(NS)
     , alpha(F)
     , origin(std::move(O))
-    , outer_norm(normalise(N)) { setup(); }
+    , outer_norm(normalise(N)) {}
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F, const unsigned NS)
-    : Constraint(T, A, {}, {}, 0)
+    : Constraint(T, A, {}, setup(NS), {}, 0)
     , n_dim(NS)
     , alpha(F)             // penalty factor
     , edge_a(E1)           // 3D vector
@@ -36,7 +36,7 @@ RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, 
     , origin(std::move(O)) // 1D, 2D and 3D vectors
     , outer_norm(normalise(cross(edge_a, edge_b)))
     , length_a(norm(edge_a))
-    , length_b(norm(edge_b)) { setup(); }
+    , length_b(norm(edge_b)) {}
 
 int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
@@ -49,7 +49,6 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 
     auto counter = 0llu;
     for(const auto& I : D->get_node_pool()) {
-        if(!I->validate_dof(ref_dof)) continue;
         const vec t_pos = I->trial_position(n_dim) - origin;
         if(!edge_a.empty())
             if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) continue;

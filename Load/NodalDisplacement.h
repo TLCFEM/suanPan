@@ -36,11 +36,11 @@
 class NodalDisplacement : public Load {
 public:
     NodalDisplacement(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        uvec&&,   // dof tags
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tags
+        unsigned                  // amplitude tag
     );
 
     [[nodiscard]] bool if_displacement_control() const final { return true; }
@@ -48,6 +48,19 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
+};
+
+class GroupNodalDisplacement final : protected GroupModifier, public NodalDisplacement {
+public:
+    GroupNodalDisplacement(
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // group tags
+        std::vector<Node::DOF>&&, // dof tags
+        unsigned                  // amplitude tag
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif // NODALDISPLACEMENT_H

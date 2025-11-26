@@ -34,11 +34,12 @@
 #include <Domain/Node.h>
 
 class RigidWallPenalty : public Constraint {
-    void setup() {
-        ref_dof.clear();
-        if(n_dim > 0u) ref_dof.emplace_back(Node::DOF::U1);
-        if(n_dim > 1u) ref_dof.emplace_back(Node::DOF::U2);
-        if(n_dim > 2u) ref_dof.emplace_back(Node::DOF::U3);
+    static auto setup(const unsigned dimension) {
+        std::vector<Node::DOF> ref_dof;
+        if(dimension > 0u) ref_dof.emplace_back(Node::DOF::U1);
+        if(dimension > 1u) ref_dof.emplace_back(Node::DOF::U2);
+        if(dimension > 2u) ref_dof.emplace_back(Node::DOF::U3);
+        return ref_dof;
     }
 
 protected:
@@ -49,8 +50,6 @@ protected:
     const vec edge_a, edge_b;
     const vec origin, outer_norm;
     const double length_a = 0., length_b = 0.;
-
-    std::vector<Node::DOF> ref_dof;
 
 public:
     RigidWallPenalty(unsigned, unsigned, vec&&, vec&&, double, unsigned);

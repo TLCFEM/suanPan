@@ -52,8 +52,8 @@ public:
         unsigned,                 // tag
         unsigned,                 // amplitude tag
         uvec&&,                   // node tags
-        std::set<Node::DOF>&&,    // dof component (unordered)
         std::vector<Node::DOF>&&, // dof order
+        std::vector<Node::DOF>&&, // dof component (unordered)
         unsigned                  // size of multiplier
     );
 

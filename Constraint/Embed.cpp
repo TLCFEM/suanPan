@@ -23,7 +23,7 @@
 #include <Element/Element.h>
 
 Embed::Embed(const unsigned T, const unsigned ET, const unsigned NT, const unsigned D)
-    : Constraint(T, 0, {NT}, {}, D)
+    : Constraint(T, 0, {NT}, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, D)
     , element_tag(ET) {}
 
 int Embed::initialize(const shared_ptr<DomainBase>& D) {
