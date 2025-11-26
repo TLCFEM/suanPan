@@ -61,7 +61,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
     auxiliary_resistance = t_resistance;
     auxiliary_load = t_load;
 
-    num_size = static_cast<unsigned>(auxiliary_resistance.n_elem);
+    lagrangian_size = static_cast<unsigned>(auxiliary_resistance.n_elem);
 
     return SUANPAN_SUCCESS;
 }

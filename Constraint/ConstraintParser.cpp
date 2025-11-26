@@ -37,9 +37,20 @@ namespace {
             return;
         }
 
-        const auto bc_type = suanpan::to_lower(dof_id[0]);
-
-        if(!is_equal(bc_type, 'p') && !is_equal(bc_type, 'e') && !is_equal(bc_type, 'x') && !is_equal(bc_type, 'y') && !is_equal(bc_type, 'z') && !is_equal(bc_type, '1') && !is_equal(bc_type, '2') && !is_equal(bc_type, '3') && !is_equal(bc_type, '4') && !is_equal(bc_type, '5') && !is_equal(bc_type, '6') && !is_equal(bc_type, '7')) {
+        uvec dof_pool;
+        if(const auto bc_type = suanpan::to_lower(dof_id[0]); 'p' == bc_type) dof_pool = uvec{1, 2, 3};
+        else if('e' == bc_type) dof_pool = uvec{1, 2, 3, 4, 5, 6};
+        else if('x' == bc_type) dof_pool = uvec{1, 5, 6};
+        else if('y' == bc_type) dof_pool = uvec{2, 4, 6};
+        else if('z' == bc_type) dof_pool = uvec{3, 4, 5};
+        else if('1' == bc_type) dof_pool = uvec{1};
+        else if('2' == bc_type) dof_pool = uvec{2};
+        else if('3' == bc_type) dof_pool = uvec{3};
+        else if('4' == bc_type) dof_pool = uvec{4};
+        else if('5' == bc_type) dof_pool = uvec{5};
+        else if('6' == bc_type) dof_pool = uvec{6};
+        else if('7' == bc_type) dof_pool = uvec{7};
+        else {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
@@ -47,12 +58,12 @@ namespace {
         const auto obj_tag = get_remaining<uword>(command);
 
         if(penalty) {
-            if(group) return_obj = std::make_unique<GroupPenaltyBC>(bc_id, uvec(obj_tag), bc_type);
-            else return_obj = std::make_unique<PenaltyBC>(bc_id, uvec(obj_tag), bc_type);
+            if(group) return_obj = std::make_unique<GroupPenaltyBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
+            else return_obj = std::make_unique<PenaltyBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
         }
         else {
-            if(group) return_obj = std::make_unique<GroupMultiplierBC>(bc_id, uvec(obj_tag), bc_type);
-            else return_obj = std::make_unique<MultiplierBC>(bc_id, uvec(obj_tag), bc_type);
+            if(group) return_obj = std::make_unique<GroupMultiplierBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
+            else return_obj = std::make_unique<MultiplierBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
         }
     }
 

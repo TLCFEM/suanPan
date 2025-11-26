@@ -44,7 +44,7 @@ int Rayleigh::update_status() {
 
         access::rw(t_ptr->get_trial_viscous()) = t_damping;
 
-        access::rw(t_ptr->get_trial_damping_force()) = t_damping * get_trial_velocity(t_ptr.get());
+        access::rw(t_ptr->get_trial_damping_force()) = t_damping * t_ptr->get_trial_velocity();
     });
 
     return SUANPAN_SUCCESS;

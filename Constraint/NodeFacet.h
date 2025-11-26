@@ -43,6 +43,8 @@ public:
 
     int process(const shared_ptr<DomainBase>&) override;
 
+    [[nodiscard]] bool is_connected() const override { return true; }
+
     void update_status(const vec&) override;
     void commit_status() override;
     void clear_status() override;

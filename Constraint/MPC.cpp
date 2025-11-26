@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
-#include <Load/Amplitude/Amplitude.h>
 
 MPC::MPC(const unsigned T, const unsigned A, uvec&& N, uvec&& D, vec&& W, const double L)
     : Constraint(T, A, std::move(N), {}, 1)
@@ -31,10 +30,10 @@ MPC::MPC(const unsigned T, const unsigned A, uvec&& N, uvec&& D, vec&& W, const 
 int MPC::initialize(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    auxiliary_stiffness.zeros(W->get_size(), num_size);
+    auxiliary_stiffness.zeros(W->get_size(), lagrangian_size);
 
-    for(auto I = 0llu; I < node_encoding.n_elem; ++I) {
-        auto& t_node = D->get<Node>(node_encoding(I));
+    for(auto I = 0llu; I < target_node.n_elem; ++I) {
+        auto& t_node = D->get<Node>(target_node(I));
         auto& t_dof = t_node->get_reordered_dof();
         if(nullptr == t_node || !t_node->is_active() || t_dof.n_elem < dof_pool(I)) {
             auxiliary_stiffness.reset();
@@ -47,11 +46,9 @@ int MPC::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int MPC::process(const shared_ptr<DomainBase>& D) {
-    auto& W = D->get_factory();
+    auxiliary_load = pseudo_load * get_amplitude(D);
 
-    auxiliary_load = pseudo_load * amplitude->get_amplitude(W->get_trial_time());
-
-    auxiliary_resistance = auxiliary_stiffness.t() * W->get_trial_displacement();
+    auxiliary_resistance = auxiliary_stiffness.t() * D->get_factory()->get_trial_displacement();
 
     return SUANPAN_SUCCESS;
 }

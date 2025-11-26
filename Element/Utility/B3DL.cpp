@@ -26,7 +26,7 @@ unique_ptr<Orientation> B3DL::get_copy() { return std::make_unique<B3DL>(*this);
 void B3DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;
 
-    const mat coor = get_coordinate(element_ptr, 3).t();
+    const mat coor = element_ptr->get_coordinate(3).t();
 
     const vec x_axis = coor.col(1) - coor.col(0);
 

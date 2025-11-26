@@ -841,13 +841,16 @@ const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_material() 
 const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_section() const { return compact_node_per_section; }
 
 uvec Domain::flatten_group(const uvec& groups) {
-    std::vector<uword> tag;
+    std::set<uword> tag;
 
-    for(const auto I : groups)
-        if(find<Group>(I))
-            for(const auto J : get<Group>(I)->get_pool()) tag.emplace_back(J);
+    for(const auto I : groups) {
+        if(auto& group = get<Group>(I)) {
+            auto& pool = group->get_pool();
+            tag.insert(pool.cbegin(), pool.cend());
+        }
+    }
 
-    return unique(uvec(tag));
+    return to_uvec(tag);
 }
 
 int Domain::reorder_dof() {
@@ -986,8 +989,8 @@ int Domain::initialize() {
     solver_pond.update();
 
     // for restart analysis
-    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { t_load.second->set_initialized(false); });
-    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->set_initialized(false); });
+    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { t_load.second->deinitialize(); });
+    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->deinitialize(); });
 
     // amplitude should be updated before load
     suanpan::for_all(amplitude_pond, [&](const dual<Amplitude>& t_amplitude) {

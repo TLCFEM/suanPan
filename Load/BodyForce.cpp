@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
-#include <Load/Amplitude/Amplitude.h>
 
 BodyForce::BodyForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
     : Load(T, AT, std::move(N), std::move(D), L) {}
@@ -30,9 +29,9 @@ int BodyForce::process(const shared_ptr<DomainBase>& D) {
 
     trial_load.zeros(W->get_size());
 
-    const auto final_load = pattern * amplitude->get_amplitude(W->get_trial_time());
+    const auto final_load = magnitude * get_amplitude(D);
 
-    for(const auto I : node_encoding)
+    for(const auto I : target_node)
         if(auto& t_element = D->get<Element>(I); nullptr != t_element && t_element->is_active()) {
             vec t_body_load(t_element->get_dof_number(), fill::zeros);
             for(const auto J : dof_reference)

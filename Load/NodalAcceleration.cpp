@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/Amplitude/Amplitude.h>
 
 NodalAcceleration::NodalAcceleration(const unsigned T, const double L, uvec&& NT, uvec&& DT, const unsigned AT)
     : Load(T, AT, std::move(NT), std::move(DT), L) {}
@@ -29,13 +28,11 @@ int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
 
     trial_load.reset();
 
-    if(nullptr == W->get_mass()) return SUANPAN_SUCCESS;
+    if(auto& t_mass = W->get_mass()) {
+        trial_load.zeros(W->get_size())(target_dof).fill(magnitude * get_amplitude(D));
 
-    trial_load.zeros(W->get_size());
-
-    trial_load(node_encoding.is_empty() ? get_all_nodal_active_dof(D) : get_nodal_active_dof(D)).fill(1.);
-
-    trial_load = W->get_mass() * trial_load * pattern * amplitude->get_amplitude(W->get_trial_time());
+        trial_load = t_mass * trial_load;
+    }
 
     return SUANPAN_SUCCESS;
 }

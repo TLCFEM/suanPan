@@ -87,22 +87,6 @@ void Element::update_momentum() {
     momentum = trial_mass * get_trial_velocity();
 }
 
-/**
- * \brief generate a matrix that contains coordinates of connected nodes
- * \param num_dim number of dimension required
- * \return a matrix of following form
- *         | x_1  y_1  z_1  ... |
- *         | x_2  y_2  z_2  ... |
- *         | x_3  y_3  z_3  ... |
- */
-mat Element::get_coordinate(const unsigned num_dim) const {
-    mat ele_coor(num_node, num_dim, fill::zeros);
-
-    for(auto I = 0u; I < num_node; ++I) ele_coor.row(I) = vec(node_ptr[I].lock()->get_coordinate()).resize(num_dim).t();
-
-    return ele_coor;
-}
-
 vec Element::get_node_incre_resistance() const {
     vec node_incre_resistance(num_size, fill::none);
 
@@ -338,6 +322,8 @@ const uvec& Element::get_dof_encoding() const { return dof_encoding; }
 
 const uvec& Element::get_node_encoding() const { return node_encoding; }
 
+const std::vector<Node::DOF>& Element::get_dof_identifier() const { return dof_identifier; }
+
 const std::vector<MappingDOF>& Element::get_dof_mapping() const { return dof_mapping; }
 
 const uvec& Element::get_material_tag() const { return material_tag; }
@@ -353,6 +339,22 @@ unsigned Element::get_total_number() const { return num_size; }
 void Element::clear_node_ptr() { node_ptr.clear(); }
 
 const std::vector<std::weak_ptr<Node>>& Element::get_node_ptr() const { return node_ptr; }
+
+/**
+ * \brief generate a matrix that contains coordinates of connected nodes
+ * \param num_dim number of dimension required
+ * \return a matrix of following form
+ *         | x_1  y_1  z_1  ... |
+ *         | x_2  y_2  z_2  ... |
+ *         | x_3  y_3  z_3  ... |
+ */
+mat Element::get_coordinate(const unsigned num_dim) const {
+    mat ele_coor(num_node, num_dim, fill::zeros);
+
+    for(auto I = 0u; I < num_node; ++I) ele_coor.row(I) = vec(node_ptr[I].lock()->get_coordinate()).resize(num_dim).t();
+
+    return ele_coor;
+}
 
 vec Element::get_incre_displacement() const {
     vec incre_displacement(num_size, fill::none);
@@ -629,23 +631,3 @@ double Element::get_characteristic_length() const { return characteristic_length
 double Element::get(Parameter) const { return 0.; }
 
 mat Element::compute_shape_function(const mat&, unsigned) const { return {}; }
-
-mat get_coordinate(const ElementBase* const E, const unsigned N) { return E->get_coordinate(N); }
-
-vec get_incre_displacement(const ElementBase* const E) { return E->get_incre_displacement(); }
-
-vec get_incre_velocity(const ElementBase* const E) { return E->get_incre_velocity(); }
-
-vec get_incre_acceleration(const ElementBase* const E) { return E->get_incre_acceleration(); }
-
-vec get_trial_displacement(const ElementBase* const E) { return E->get_trial_displacement(); }
-
-vec get_trial_velocity(const ElementBase* const E) { return E->get_trial_velocity(); }
-
-vec get_trial_acceleration(const ElementBase* const E) { return E->get_trial_acceleration(); }
-
-vec get_current_displacement(const ElementBase* const E) { return E->get_current_displacement(); }
-
-vec get_current_velocity(const ElementBase* const E) { return E->get_current_velocity(); }
-
-vec get_current_acceleration(const ElementBase* const E) { return E->get_current_acceleration(); }

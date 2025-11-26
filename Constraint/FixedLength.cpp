@@ -22,15 +22,10 @@
 #include <Domain/Node.h>
 
 FixedLength::FixedLength(const unsigned T, const unsigned D, uvec&& N)
-    : Constraint(T, 0, std::move(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1) { set_connected(true); }
+    : Constraint(T, 0, std::move(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1) {}
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
-    dof_encoding = get_nodal_active_dof(D);
-
-    // need to check if sizes conform since the method does not emit error flag
-    if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) return SUANPAN_FAIL;
-
-    coor = resize(D->get<Node>(node_encoding(1))->get_coordinate(), dof_reference.n_elem, 1) - resize(D->get<Node>(node_encoding(0))->get_coordinate(), dof_reference.n_elem, 1);
+    coor = D->get<Node>(target_node(1))->initial_position(dof_reference.n_elem) - D->get<Node>(target_node(0))->initial_position(dof_reference.n_elem);
 
     set_multiplier_size(0);
 
@@ -42,37 +37,37 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
 
     const auto& n_dof = dof_reference.n_elem;
 
-    const uvec dof_i = dof_encoding.head(n_dof);
-    const uvec dof_j = dof_encoding.tail(n_dof);
+    const uvec dof_i = target_dof.head(n_dof);
+    const uvec dof_j = target_dof.tail(n_dof);
 
     const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
 
     if(const auto t_gap = accu(square(coor + t_disp)); min_bound && max_bound) {
-        if(0u == num_size && t_gap > min_gap && t_gap < max_gap) return SUANPAN_SUCCESS;
+        if(0u == lagrangian_size && t_gap > min_gap && t_gap < max_gap) return SUANPAN_SUCCESS;
 
         auxiliary_load = (2. * std::sqrt(t_gap) < std::sqrt(min_gap) + std::sqrt(max_gap) ? min_gap : max_gap) - dot(coor, coor);
     }
     else if(min_bound && !max_bound) {
-        if(0u == num_size && t_gap > min_gap) return SUANPAN_SUCCESS;
+        if(0u == lagrangian_size && t_gap > min_gap) return SUANPAN_SUCCESS;
 
         auxiliary_load = min_gap - dot(coor, coor);
     }
     else if(!min_bound && max_bound) {
-        if(0u == num_size && t_gap < max_gap) return SUANPAN_SUCCESS;
+        if(0u == lagrangian_size && t_gap < max_gap) return SUANPAN_SUCCESS;
 
         auxiliary_load = max_gap - dot(coor, coor);
     }
 
     set_multiplier_size(1);
 
-    auxiliary_stiffness.zeros(W->get_size(), num_size);
+    auxiliary_stiffness.zeros(W->get_size(), lagrangian_size);
     auxiliary_resistance = 0.;
     for(auto I = 0llu; I < n_dof; ++I) {
         auxiliary_stiffness(dof_i(I)) = -(auxiliary_stiffness(dof_j(I)) = 2. * (coor(I) + t_disp(I)));
         auxiliary_resistance += t_disp(I) * (2. * coor(I) + t_disp(I));
     }
 
-    stiffness.zeros(dof_encoding.n_elem, dof_encoding.n_elem);
+    stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
     const auto t_factor = 2. * trial_lambda(0);
     for(auto I = 0llu; I < n_dof; ++I) stiffness(I + n_dof, I) = stiffness(I, I + n_dof) = -(stiffness(I, I) = stiffness(I + n_dof, I + n_dof) = t_factor);
 
@@ -131,10 +126,10 @@ int MaxForce::process(const shared_ptr<DomainBase>& D) {
 
     if(SUANPAN_SUCCESS != FixedLength::process(D)) return SUANPAN_FAIL;
 
-    if(0u == num_size) return SUANPAN_SUCCESS;
+    if(0u == lagrangian_size) return SUANPAN_SUCCESS;
 
     vec nodal_resistance(dof_reference.n_elem);
-    for(auto I = 0llu; I < nodal_resistance.n_elem; ++I) nodal_resistance(I) = resistance(dof_encoding(I));
+    for(auto I = 0llu; I < nodal_resistance.n_elem; ++I) nodal_resistance(I) = resistance(target_dof(I));
 
     if(norm(nodal_resistance) > max_force) {
         trial_flag = true;
@@ -146,15 +141,15 @@ int MaxForce::process(const shared_ptr<DomainBase>& D) {
 
 void MaxForce::commit_status() {
     current_flag = trial_flag;
-    return FixedLength::commit_status();
+    FixedLength::commit_status();
 }
 
 void MaxForce::clear_status() {
     current_flag = trial_flag = false;
-    return FixedLength::clear_status();
+    FixedLength::clear_status();
 }
 
 void MaxForce::reset_status() {
     trial_flag = current_flag;
-    return FixedLength::reset_status();
+    FixedLength::reset_status();
 }

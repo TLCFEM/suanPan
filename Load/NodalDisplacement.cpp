@@ -19,27 +19,22 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/Amplitude/Amplitude.h>
 
 NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), std::move(D), L) { enable_displacement_control(); }
+    : Load(T, AT, std::move(N), std::move(D), L) {}
 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
     set_end_step(start_step + 1);
 
-    D->get_factory()->update_reference_dof(encoding = get_nodal_active_dof(D));
+    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
 
-    return Load::initialize(D);
+    D->get_factory()->update_reference_dof(target_dof);
+
+    return SUANPAN_SUCCESS;
 }
 
 int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
-    if(!encoding.empty()) {
-        const auto& W = D->get_factory();
-
-        trial_settlement.zeros(W->get_size());
-
-        trial_settlement(encoding).fill(pattern * amplitude->get_amplitude(W->get_trial_time()));
-    }
+    if(!target_dof.empty()) trial_settlement.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
 }

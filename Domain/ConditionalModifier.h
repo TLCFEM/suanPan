@@ -18,9 +18,9 @@
  * @class ConditionalModifier
  * @brief A ConditionalModifier class.
  *
- * The ConditionalModifier class.
- *
- * TODO: update node/element tags from groups need to be done in each iteration
+ * A parent abstract class for constraints and loads.
+ * Both are node based and conditionally applied to the system.
+ * Thus, they conditionally modify the system.
  *
  * @author tlc
  * @date 07/03/2021
@@ -33,38 +33,31 @@
 #ifndef CONDITIONALMODIFIER_H
 #define CONDITIONALMODIFIER_H
 
-#include <Domain/Tag.h>
+#include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 #include <Toolbox/ResourceHolder.h>
+#include <Toolbox/container.h>
 
 class DomainBase;
 
 class ConditionalModifier : public UniqueTag {
-protected:
-    const bool initialized = false;
-
-    const bool connected = false;
-
-    unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};
-
     const unsigned amplitude_tag;
 
-    uvec node_encoding; // node/element encoding
-    uvec dof_reference; // reference DoF ZERO based
-    uvec dof_encoding;  // DoF encoding
+    bool initialized = false;
 
     ResourceHolder<Amplitude> amplitude;
 
-    /**
-     * \brief Generate active DoF vector from assigned nodes.
-     * \return vector of active DoFs
-     */
-    uvec get_nodal_active_dof(const shared_ptr<DomainBase>&);
-    /**
-     * \brief Generate active DoF vector from all nodes in the model.
-     * \return vector of active DoFs
-     */
-    uvec get_all_nodal_active_dof(const shared_ptr<DomainBase>&);
+    uvec update_active_dof(const shared_ptr<DomainBase>&);
+
+protected:
+    unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};
+
+    const uvec dof_reference; // reference DoF ZERO based
+    const std::set<Node::DOF> dof_identifier;
+
+    uvec target_node, target_dof;
+
+    [[nodiscard]] double get_amplitude(const shared_ptr<DomainBase>&) const;
 
 public:
     ConditionalModifier(
@@ -80,7 +73,6 @@ public:
      * \brief  This method provides all necessary pieces of typical constraints/loads
      * required, including additional blocks in original global stiffness, border matrix
      * resistance of multiplier, external loads.
-     * \return success flag
      */
     virtual int process(const shared_ptr<DomainBase>&) = 0;
     /**
@@ -88,7 +80,6 @@ public:
      * After calling solver, the storage may contain factorization. It is not correct to modify it
      * in those algorithms. This method should provide updated constraint/load resistance but must not
      * touch global stiffness.
-     * \return success flag
      */
     virtual int process_resistance(const shared_ptr<DomainBase>&);
 
@@ -102,7 +93,7 @@ public:
     [[nodiscard]] const uvec& get_node_encoding() const;
     [[nodiscard]] const uvec& get_dof_encoding() const;
 
-    void set_initialized(bool) const;
+    void deinitialize();
     [[nodiscard]] bool is_initialized() const;
 
     void set_start_step(unsigned);
@@ -116,16 +107,28 @@ public:
      * which may affect bandwidth of banded storage. By calling this method, the RCM reordering algorithm will
      * take this constraint into consideration. Make sure it is called in the constructor.
      */
-    void set_connected(bool) const;
-    [[nodiscard]] bool is_connected() const;
+    [[nodiscard]] virtual bool is_connected() const { return false; }
 
+    /**
+     * \brief Validate itself against the current active step to see if itself needs to be applied.
+     */
     [[nodiscard]] bool validate_step(const shared_ptr<DomainBase>&) const;
 
     // some may manage state
-    virtual void update_status(const vec&);
-    virtual void commit_status();
-    virtual void clear_status();
-    virtual void reset_status();
+    virtual void update_status(const vec&) {}
+    virtual void clear_status() {}
+    virtual void commit_status() {}
+    virtual void reset_status() {}
+};
+
+class GroupModifier {
+    const uvec groups;
+
+protected:
+    [[nodiscard]] uvec update_object_tag(const shared_ptr<DomainBase>&) const;
+
+public:
+    explicit GroupModifier(uvec&&);
 };
 
 #endif

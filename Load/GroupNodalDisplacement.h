@@ -33,7 +33,7 @@
 
 #include "NodalDisplacement.h"
 
-class GroupNodalDisplacement final : protected GroupLoad, public NodalDisplacement {
+class GroupNodalDisplacement final : protected GroupModifier, public NodalDisplacement {
 public:
     GroupNodalDisplacement(
         unsigned, // tag

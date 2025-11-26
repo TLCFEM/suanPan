@@ -20,11 +20,11 @@
 #include <Domain/DomainBase.h>
 
 GroupNodalDisplacement::GroupNodalDisplacement(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : GroupLoad(std::move(N))
+    : GroupModifier(std::move(N))
     , NodalDisplacement(T, L, uvec{}, std::move(D), AT) {}
 
 int GroupNodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
-    node_encoding = update_object_tag(D);
+    target_node = update_object_tag(D);
 
     return NodalDisplacement::initialize(D);
 }

@@ -25,22 +25,17 @@ const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
 
 std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
     std::vector<vec> position;
-    position.reserve(node_encoding.n_elem);
+    position.reserve(target_node.n_elem);
 
-    for(const auto I : node_encoding) position.emplace_back(D->get<Node>(I)->trial_position(2u));
+    for(const auto I : target_node) position.emplace_back(D->get<Node>(I)->trial_position(2u));
 
     return position;
 }
 
 NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
-    : Constraint(T, A, std::move(N), uvec{1, 2}, 1) { set_connected(true); }
+    : Constraint(T, A, std::move(N), uvec{1, 2}, 1) {}
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
-    dof_encoding = get_nodal_active_dof(D);
-
-    // need to check if sizes conform since the method does not emit error flag
-    if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) return SUANPAN_FAIL;
-
     set_multiplier_size(0);
 
     return Constraint::initialize(D);
@@ -55,27 +50,27 @@ int NodeLine::process(const shared_ptr<DomainBase>& D) {
 
     const auto pen = dot(position, outer_normal);
 
-    if(const auto t = dot(position, axis); 0 == num_size && (pen > 0. || t < 0. || t > norm(axis))) return SUANPAN_SUCCESS;
+    if(const auto t = dot(position, axis); 0 == lagrangian_size && (pen > 0. || t < 0. || t > norm(axis))) return SUANPAN_SUCCESS;
 
     set_multiplier_size(1);
 
     const span span_i(0, 1), span_j(2, 3), span_k(4, 5);
 
-    auxiliary_stiffness.zeros(D->get_factory()->get_size(), num_size);
+    auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
     auxiliary_resistance = pen;
 
     const rowvec dpdi = -position.t() * rotation - outer_normal.t();
     const rowvec dpdj = position.t() * rotation;
 
     for(auto I = 0, J = 2, K = 4; I < 2; ++I, ++J, ++K) {
-        auxiliary_stiffness(dof_encoding(I)) = dpdi(I);
-        auxiliary_stiffness(dof_encoding(J)) = dpdj(I);
-        auxiliary_stiffness(dof_encoding(K)) = outer_normal(I);
+        auxiliary_stiffness(target_dof(I)) = dpdi(I);
+        auxiliary_stiffness(target_dof(J)) = dpdj(I);
+        auxiliary_stiffness(target_dof(K)) = outer_normal(I);
     }
 
     const mat factor = trial_lambda(0) * rotation;
 
-    stiffness.zeros(dof_encoding.n_elem, dof_encoding.n_elem);
+    stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
     stiffness(span_i, span_i) = factor.t() + factor;
     stiffness(span_i, span_j) = stiffness(span_k, span_i) = -(stiffness(span_k, span_j) = factor);
     stiffness(span_i, span_k) = stiffness(span_j, span_i) = -(stiffness(span_j, span_k) = factor.t());

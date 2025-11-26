@@ -20,11 +20,11 @@
 #include <Domain/DomainBase.h>
 
 GroupNodalForce::GroupNodalForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : GroupLoad(std::move(N))
+    : GroupModifier(std::move(N))
     , NodalForce(T, L, uvec{}, std::move(D), AT) {}
 
 int GroupNodalForce::initialize(const shared_ptr<DomainBase>& D) {
-    node_encoding = update_object_tag(D);
+    target_node = update_object_tag(D);
 
     return NodalForce::initialize(D);
 }

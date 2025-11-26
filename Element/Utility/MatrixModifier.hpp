@@ -94,9 +94,9 @@ template<typename T> void suanpan::damping::rayleigh::apply(const shared_ptr<Ele
 
         ele_damping = damping;
 
-        ele_force = damping * get_trial_velocity(element_obj.get());
+        ele_force = damping * element_obj->get_trial_velocity();
     }
-    else if(!ele_damping.is_empty()) ele_force = ele_damping * get_trial_velocity(element_obj.get());
+    else if(!ele_damping.is_empty()) ele_force = ele_damping * element_obj->get_trial_velocity();
 }
 
 template<typename T> void suanpan::damping::elemental::apply(const shared_ptr<Element>& element_obj, const T damping_ratio) {
@@ -117,7 +117,7 @@ template<typename T> void suanpan::damping::elemental::apply(const shared_ptr<El
 
     access::rw(element_obj->get_trial_viscous()) = damping;
 
-    access::rw(element_obj->get_trial_damping_force()) = damping * get_trial_velocity(element_obj.get());
+    access::rw(element_obj->get_trial_damping_force()) = damping * element_obj->get_trial_velocity();
 }
 
 #endif
