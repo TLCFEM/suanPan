@@ -284,9 +284,6 @@
     <ClCompile Include="..\..\..\Load\Amplitude\Tabular.cpp" />
     <ClCompile Include="..\..\..\Load\Amplitude\TabularSpline.cpp" />
     <ClCompile Include="..\..\..\Load\BodyForce.cpp" />
-    <ClCompile Include="..\..\..\Load\GroupBodyForce.cpp" />
-    <ClCompile Include="..\..\..\Load\GroupNodalDisplacement.cpp" />
-    <ClCompile Include="..\..\..\Load\GroupNodalForce.cpp" />
     <ClCompile Include="..\..\..\Load\LineUDL.cpp" />
     <ClCompile Include="..\..\..\Load\Load.cpp" />
     <ClCompile Include="..\..\..\Load\LoadParser.cpp" />
@@ -747,9 +744,6 @@
     <ClInclude Include="..\..\..\Load\Amplitude\Tabular.h" />
     <ClInclude Include="..\..\..\Load\Amplitude\TabularSpline.h" />
     <ClInclude Include="..\..\..\Load\BodyForce.h" />
-    <ClInclude Include="..\..\..\Load\GroupBodyForce.h" />
-    <ClInclude Include="..\..\..\Load\GroupNodalDisplacement.h" />
-    <ClInclude Include="..\..\..\Load\GroupNodalForce.h" />
     <ClInclude Include="..\..\..\Load\LineUDL.h" />
     <ClInclude Include="..\..\..\Load\Load.h" />
     <ClInclude Include="..\..\..\Load\LoadParser.h" />

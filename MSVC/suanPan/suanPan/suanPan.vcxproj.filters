@@ -531,15 +531,6 @@
     <ClCompile Include="..\..\..\Load\BodyForce.cpp">
       <Filter>Load</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupBodyForce.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupNodalDisplacement.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupNodalForce.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Load\Load.cpp">
       <Filter>Load</Filter>
     </ClCompile>
@@ -1915,15 +1906,6 @@
       <Filter>Element</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Load\BodyForce.h">
-      <Filter>Load</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupBodyForce.h">
-      <Filter>Load</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupNodalDisplacement.h">
-      <Filter>Load</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupNodalForce.h">
       <Filter>Load</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Load\Load.h">
