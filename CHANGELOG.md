@@ -5,6 +5,10 @@
 1. Eigenanalysis does not support distributed computation.
 2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 4.0
+
+1. (breaking) change the behaviour of `P` constraint token in 2D problems, it is no more blindly applied to the first 3 DoFs (which may contain rotational DoF in 2D problems) but the precise U1, U2 and U3 DoFs
+
 ## version 3.9
 
 1. fix computation of elasticity matrix in orthotropic materials [#280](https://github.com/TLCFEM/suanPan/pull/280)
