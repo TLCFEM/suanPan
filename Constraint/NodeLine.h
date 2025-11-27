@@ -39,7 +39,7 @@ class NodeLine final : public Constraint {
     [[nodiscard]] bool reject_invalid_object() const override { return true; }
 
 public:
-    NodeLine(unsigned, unsigned, uvec3&&);
+    NodeLine(unsigned, unsigned, uvec&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

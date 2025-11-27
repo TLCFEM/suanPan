@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 #include <Toolbox/tensor.h>
 
-NodeFacet::NodeFacet(const unsigned T, const unsigned A, uvec4&& N)
+NodeFacet::NodeFacet(const unsigned T, const unsigned A, uvec&& N)
     : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1) {}
 
 int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {

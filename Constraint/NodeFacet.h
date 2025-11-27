@@ -37,7 +37,7 @@ class NodeFacet final : public Constraint {
     [[nodiscard]] bool reject_invalid_object() const override { return true; }
 
 public:
-    NodeFacet(unsigned, unsigned, uvec4&&);
+    NodeFacet(unsigned, unsigned, uvec&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

@@ -21,7 +21,7 @@
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
 
-NodeLine::NodeLine(const unsigned T, const unsigned A, uvec3&& N)
+NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
     : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2}, {}, 1) {}
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
