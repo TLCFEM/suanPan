@@ -3,15 +3,15 @@
 node 1 0 0
 node 2 10 0
 
-material MPF 1 1E3 3 .05
+material MPF 1 1E3 3 .02
 
 section Rectangle2D 1 12 1 1 12
 
 element F21 1 1 2 1 5
 
-fix2 1 E 1
+fix2 1 P 1
 
-displacement 1 0 .5 2 2
+displacement 1 0 1 2 3 ! wrong node
 
 step static 1 1
 solver Newton 1
@@ -20,17 +20,6 @@ set fixed_step_size 1
 converger RelIncreDisp 1 1E-12 10 1
 
 analyze
-
-peek element 1
-
-# Node 2:
-# Coordinate:
-#   1.0000e+01  0.0000e+00
-# Displacement:
-#   8.9213e-19  5.0000e-01  6.7907e-02
-# Resistance:
-#   8.9148e-16  9.9587e-01 -9.3224e-11
-peek node 2
 
 reset
 clear
