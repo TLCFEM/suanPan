@@ -46,13 +46,14 @@ public:
 class MaterialPatch : public Patch, public MaterialElement {
 public:
     MaterialPatch(
-        unsigned,     // tag
-        unsigned,     // number of dofs
-        uvec&&,       // node encoding
-        uvec&&,       // material tags
-        field<vec>&&, // knot pool
-        bool,         // nonlinear geometry switch
-        MaterialType  // material type
+        unsigned,                // tag
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        uvec&&,                  // material tags
+        field<vec>&&,            // knot pool
+        bool,                    // nonlinear geometry switch
+        MaterialType,            // material type
+        std::vector<Node::DOF>&& // dof identifier
     );
 };
 
@@ -83,13 +84,14 @@ public:
 class SectionPatch : public Patch, public SectionElement {
 public:
     SectionPatch(
-        unsigned,     // tag
-        unsigned,     // number of dofs
-        uvec&&,       // node encoding
-        uvec&&,       // section tags
-        field<vec>&&, // knot pool
-        bool,         // nonlinear geometry switch
-        SectionType   // section type
+        unsigned,                // tag
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        uvec&&,                  // section tags
+        field<vec>&&,            // knot pool
+        bool,                    // nonlinear geometry switch
+        SectionType,             // section type
+        std::vector<Node::DOF>&& // dof identifier
     );
 };
 

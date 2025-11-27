@@ -60,13 +60,13 @@ public:
 class MaterialElement2D : public MaterialElement {
 public:
     MaterialElement2D(
-        unsigned,                     // tag
-        unsigned,                     // number of nodes
-        unsigned,                     // number of dofs
-        uvec&&,                       // node encoding
-        uvec&&,                       // material tags
-        bool,                         // nonlinear geometry switch
-        std::vector<Node::DOF>&& = {} // dof identifier
+        unsigned,                // tag
+        unsigned,                // number of nodes
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        uvec&&,                  // material tags
+        bool,                    // nonlinear geometry switch
+        std::vector<Node::DOF>&& // dof identifier
     );
 };
 

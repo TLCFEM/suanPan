@@ -81,25 +81,24 @@ class Node final : protected NodeData, public UniqueTag {
 public:
     enum class DOF : std::uint8_t {
         NONE,
-        U1,
-        // displacement in x direction
-        U2,
-        // displacement in y direction
-        U3,
-        // displacement in z direction
-        UR1,
-        // rotation in x direction
-        UR2,
-        // rotation in y direction
-        UR3,
-        // rotation in z direction
-        DAMAGE,
-        // damage
-        PRESSURE,
-        // pressure
-        TEMPERATURE,
-        // temperature
-        WARP // warping
+        U1,          // displacement in x direction
+        U2,          // displacement in y direction
+        U3,          // displacement in z direction
+        UR1,         // rotation in x direction
+        UR2,         // rotation in y direction
+        UR3,         // rotation in z direction
+        FU1,         // fluid displacement
+        FU2,         // fluid displacement
+        FU3,         // fluid displacement
+        FUR1,        // fluid rotation
+        FUR2,        // fluid rotation
+        FUR3,        // fluid rotation
+        RADIAL,      // radius direction in axis-symmetric problem
+        AXIAL,       // axial direction in axis-symmetric problem
+        DAMAGE,      // damage
+        PRESSURE,    // pressure
+        TEMPERATURE, // temperature
+        WARP         // warping
     };
 
 private:

@@ -131,6 +131,14 @@ std::vector<Node::DOF> parse_dof(const std::string_view token) {
     if(is_equal_any(token, "4", "U4", "UR1")) return std::vector{Node::DOF::UR1};
     if(is_equal_any(token, "5", "U5", "UR2")) return std::vector{Node::DOF::UR2};
     if(is_equal_any(token, "6", "U6", "UR3")) return std::vector{Node::DOF::UR3};
+    if(is_equal(token, "FU1")) return std::vector{Node::DOF::FU1};
+    if(is_equal(token, "FU2")) return std::vector{Node::DOF::FU2};
+    if(is_equal(token, "FU3")) return std::vector{Node::DOF::FU3};
+    if(is_equal(token, "FUR1")) return std::vector{Node::DOF::FUR1};
+    if(is_equal(token, "FUR2")) return std::vector{Node::DOF::FUR2};
+    if(is_equal(token, "FUR3")) return std::vector{Node::DOF::FUR3};
+    if(is_equal(token, "RADIAL")) return std::vector{Node::DOF::RADIAL};
+    if(is_equal(token, "AXIAL")) return std::vector{Node::DOF::AXIAL};
     if(is_equal(token, "DAMAGE")) return std::vector{Node::DOF::DAMAGE};
     if(is_equal(token, "PRESSURE")) return std::vector{Node::DOF::PRESSURE};
     if(is_equal(token, "TEMPERATURE")) return std::vector{Node::DOF::TEMPERATURE};

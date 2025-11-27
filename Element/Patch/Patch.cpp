@@ -34,22 +34,22 @@ uvec Patch::get_number_of_control_points() const {
     return number;
 }
 
-MaterialPatch::MaterialPatch(const unsigned T, const unsigned ND, uvec&& NT, uvec&& MT, field<vec>&& KP, const bool R, const MaterialType MTP)
+MaterialPatch::MaterialPatch(const unsigned T, const unsigned ND, uvec&& NT, uvec&& MT, field<vec>&& KP, const bool R, const MaterialType MTP, std::vector<Node::DOF>&& DI)
     : Patch(std::move(KP))
-    , MaterialElement(T, static_cast<unsigned>(NT.size()), ND, std::move(NT), std::move(MT), R, MTP, {}) {}
+    , MaterialElement(T, static_cast<unsigned>(NT.size()), ND, std::move(NT), std::move(MT), R, MTP, std::move(DI)) {}
 
 MaterialPatch2D::MaterialPatch2D(const unsigned T, const unsigned ND, uvec&& NT, uvec&& MT, field<vec>&& KP, const bool R)
-    : MaterialPatch(T, ND, std::move(NT), std::move(MT), std::move(KP), R, MaterialType::D2) {}
+    : MaterialPatch(T, ND, std::move(NT), std::move(MT), std::move(KP), R, MaterialType::D2, {Node::DOF::U1, Node::DOF::U2}) {}
 
 MaterialPatch3D::MaterialPatch3D(const unsigned T, const unsigned ND, uvec&& NT, uvec&& MT, field<vec>&& KP, const bool R)
-    : MaterialPatch(T, ND, std::move(NT), std::move(MT), std::move(KP), R, MaterialType::D3) {}
+    : MaterialPatch(T, ND, std::move(NT), std::move(MT), std::move(KP), R, MaterialType::D3, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}) {}
 
-SectionPatch::SectionPatch(const unsigned T, const unsigned ND, uvec&& NT, uvec&& ST, field<vec>&& KP, const bool R, const SectionType STP)
+SectionPatch::SectionPatch(const unsigned T, const unsigned ND, uvec&& NT, uvec&& ST, field<vec>&& KP, const bool R, const SectionType STP, std::vector<Node::DOF>&& DI)
     : Patch(std::move(KP))
-    , SectionElement(T, static_cast<unsigned>(NT.size()), ND, std::move(NT), std::move(ST), R, STP, {}) {}
+    , SectionElement(T, static_cast<unsigned>(NT.size()), ND, std::move(NT), std::move(ST), R, STP, std::move(DI)) {}
 
 SectionPatch2D::SectionPatch2D(const unsigned T, const unsigned ND, uvec&& NT, uvec&& ST, field<vec>&& KP, const bool R)
-    : SectionPatch(T, ND, std::move(NT), std::move(ST), std::move(KP), R, SectionType::D2) {}
+    : SectionPatch(T, ND, std::move(NT), std::move(ST), std::move(KP), R, SectionType::D2, {Node::DOF::U1, Node::DOF::U2}) {}
 
 SectionPatch3D::SectionPatch3D(const unsigned T, const unsigned ND, uvec&& NT, uvec&& ST, field<vec>&& KP, const bool R)
-    : SectionPatch(T, ND, std::move(NT), std::move(ST), std::move(KP), R, SectionType::D3) {}
+    : SectionPatch(T, ND, std::move(NT), std::move(ST), std::move(KP), R, SectionType::D3, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}) {}

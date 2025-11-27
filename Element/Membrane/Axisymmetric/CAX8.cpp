@@ -46,7 +46,7 @@ vec CAX8::isoparametric_mapping(const vec& in) {
 }
 
 CAX8::CAX8(const unsigned T, uvec&& N, const unsigned M, const bool R, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F)
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {Node::DOF::RADIAL, Node::DOF::AXIAL})
     , reduced_scheme(R) {}
 
 int CAX8::initialize(const shared_ptr<DomainBase>& D) {
