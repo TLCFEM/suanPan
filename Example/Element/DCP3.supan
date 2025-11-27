@@ -191,6 +191,15 @@ analyze
 
 peek element 1
 
+# Node 32:
+# Coordinate:
+#   1.0000e+01  6.8000e+00
+# Displacement:
+#   9.3322e-04  2.4616e-04  1.0050e+00
+# Resistance:
+#   1.6298e-13  2.3231e-14  1.0019e-12
+peek node 32
+
 reset
 clear
 exit
