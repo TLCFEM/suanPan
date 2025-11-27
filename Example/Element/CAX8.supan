@@ -17,10 +17,10 @@ element CAX8 1 1 3 9 7 2 6 8 4 3
 
 plainrecorder 1 Element S 1
 
-fix2 1 1 1 4 7
-fix2 2 2 1 2 3
+fix2 1 radial 1 4 7
+fix2 2 axial 1 2 3
 
-displacement 1 0 -.2 2 7 8 9
+displacement 1 0 -.2 axial 7 8 9
 
 step static 1
 

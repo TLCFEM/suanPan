@@ -17,10 +17,10 @@ element CAX4 2 2 3 6 5 3
 element CAX4 3 4 5 8 7 3
 element CAX4 4 5 6 9 8 3
 
-fix 1 1 1 4 7
-fix 2 2 1 2 3
+fix 1 radial 1 4 7
+fix 2 axial 1 2 3
 
-displacement 1 0 -5E-3 2 7 8 9
+displacement 1 0 -5E-3 axial 7 8 9
 
 hdf5recorder 1 Element S 1 2 3 4
 

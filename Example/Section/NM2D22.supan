@@ -7,7 +7,7 @@ section NM2D2 1 1E3 1E3 1E2 1E2 1. .05 .08 0.
 element NMB21 1 1 2 1
 
 fix2 1 E 1
-fix2 2 3 2
+fix2 2 ur3 2
 
 displacement 1 0 .5 2 2
 displacement 2 0 -.4 1 2

@@ -177,6 +177,7 @@ generate nodegroup 1 1 1 6
 generate nodegroup 3 61 1 66
 
 groupmultiplierbc 1 E 1
+groupmultiplierbc 2 damage 1
 
 step static 1 1.000e+00
 set ini_step_size 1.000e-2
