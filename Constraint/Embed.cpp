@@ -25,10 +25,12 @@ Embed::Embed(const unsigned T, const unsigned ET, const unsigned NT, const unsig
     , element_tag(ET) {}
 
 int Embed::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
     auto& t_node = D->get<Node>(target_node(0));
     auto& t_element = D->get<Element>(element_tag);
 
-    if(nullptr == t_node || nullptr == t_element || !t_node->is_active() || !t_element->is_active() || t_element->compute_shape_function(zeros(lagrangian_size, 1), 0).is_empty()) return SUANPAN_FAIL;
+    if(nullptr == t_element || !t_element->is_active() || t_element->compute_shape_function(zeros(lagrangian_size, 1), 0).is_empty()) return SUANPAN_FAIL;
 
     const auto t_coor = t_element->get_coordinate(lagrangian_size);
 
@@ -57,7 +59,7 @@ int Embed::initialize(const shared_ptr<DomainBase>& D) {
         for(uword I = 0, J = K; I < n.n_elem; ++I, J += lagrangian_size) auxiliary_stiffness(e_dof(J), K) = n(I);
     }
 
-    return Constraint::initialize(D);
+    return SUANPAN_SUCCESS;
 }
 
 int Embed::process(const shared_ptr<DomainBase>& D) {

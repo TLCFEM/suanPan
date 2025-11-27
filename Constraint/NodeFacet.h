@@ -34,10 +34,10 @@
 #include "Constraint.h"
 
 class NodeFacet final : public Constraint {
-    std::vector<vec> get_position(const shared_ptr<DomainBase>&);
+    [[nodiscard]] bool reject_invalid_object() const override { return true; }
 
 public:
-    NodeFacet(unsigned, unsigned, uvec&&);
+    NodeFacet(unsigned, unsigned, uvec4&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

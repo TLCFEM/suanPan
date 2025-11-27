@@ -25,9 +25,9 @@ SupportMotion::SupportMotion(const unsigned T, const double L, uvec&& N, std::ve
     : Load(T, AT, std::move(N), {}, std::move(D), L) {}
 
 int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
-    set_end_step(start_step + 1);
-
     if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+
+    set_end_step(start_step + 1);
 
     D->get_factory()->update_reference_dof(target_dof);
 
@@ -35,9 +35,7 @@ int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int SupportDisplacement::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
-
-    trial_settlement.zeros(W->get_size())(target_dof).fill(magnitude * get_amplitude(D));
+    trial_settlement.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
 }

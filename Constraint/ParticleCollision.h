@@ -31,8 +31,6 @@
 
 #include "Constraint.h"
 
-class Node;
-
 class ParticleCollision : public Constraint {
     std::mutex resistance_mutex;
 
@@ -47,8 +45,10 @@ class ParticleCollision : public Constraint {
      */
     [[nodiscard]] virtual double compute_df(double) const = 0;
 
+    [[nodiscard]] bool reject_invalid_object() const final { return true; }
+
 protected:
-    const unsigned num_dof;
+    const unsigned dimension;
 
     void apply_contact(const shared_ptr<DomainBase>&, const shared_ptr<Node>&, const shared_ptr<Node>&, bool);
 

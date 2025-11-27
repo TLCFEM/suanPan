@@ -21,7 +21,7 @@
 
 ParticleCollision::ParticleCollision(const unsigned T, const unsigned D)
     : Constraint(T, 0, {}, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 0)
-    , num_dof(D) {}
+    , dimension(D) {}
 
 int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
     if(const auto t_scheme = D->get_factory()->get_storage_scheme(); StorageScheme::FULL != t_scheme && StorageScheme::SPARSE != t_scheme && StorageScheme::SPARSESYMM != t_scheme) {
@@ -33,20 +33,20 @@ int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const shared_ptr<Node>& node_i, const shared_ptr<Node>& node_j, const bool full) {
-    const auto& dof_i = node_i->get_reordered_dof();
-    const auto& dof_j = node_j->get_reordered_dof();
+    const uvec dof_i = node_i->get_reordered_dof().head(dimension);
+    const uvec dof_j = node_j->get_reordered_dof().head(dimension);
 
-    vec diff_pos = node_j->trial_position(num_dof) - node_i->trial_position(num_dof);
-    const auto diff_norm = norm(diff_pos);
+    vec unit_cord = node_j->trial_position(dimension) - node_i->trial_position(dimension);
+    const auto distance = norm(unit_cord);
 
-    diff_pos /= diff_norm;
+    unit_cord /= distance;
 
-    const auto force = compute_f(diff_norm);
+    const auto force = compute_f(distance);
     {
         std::scoped_lock resistance_lock(resistance_mutex);
-        for(auto I = 0llu; I < diff_pos.n_elem; ++I) {
-            resistance(dof_i(I)) += force * diff_pos(I);
-            resistance(dof_j(I)) -= force * diff_pos(I);
+        for(auto I = 0llu; I < unit_cord.n_elem; ++I) {
+            resistance(dof_i(I)) += force * unit_cord(I);
+            resistance(dof_j(I)) -= force * unit_cord(I);
         }
     }
 
@@ -55,11 +55,11 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
     auto& W = D->get_factory();
     auto& t_stiff = W->get_stiffness();
 
-    const mat d_norm = (compute_df(diff_norm) - force / diff_norm) * diff_pos * diff_pos.t() + force / diff_norm * eye(num_dof, num_dof);
+    const mat d_norm = (compute_df(distance) - force / distance) * unit_cord * unit_cord.t() + force / distance * eye(dimension, dimension);
 
     std::scoped_lock stiffness_lock(W->get_stiffness_mutex());
-    for(auto L = 0u; L < num_dof; ++L)
-        for(auto K = 0u; K < num_dof; ++K) {
+    for(auto L = 0u; L < dimension; ++L)
+        for(auto K = 0u; K < dimension; ++K) {
             t_stiff->at(dof_i(K), dof_i(L)) -= d_norm(K, L);
             t_stiff->at(dof_j(K), dof_j(L)) -= d_norm(K, L);
             t_stiff->at(dof_i(K), dof_j(L)) += d_norm(K, L);

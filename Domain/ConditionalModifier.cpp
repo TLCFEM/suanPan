@@ -22,7 +22,7 @@
 #include <Step/Step.h>
 
 bool ConditionalModifier::validate_dof(const shared_ptr<DomainBase>& D) {
-    const auto not_valid = [&](const shared_ptr<Node>& node) { return node && node->is_active() && !node->validate_dof(dof_order); };
+    const auto not_valid = [&](const shared_ptr<Node>& node) { return node && node->is_active() ? !node->validate_dof(dof_order) : reject_invalid_object(); };
 
     if(target_node.is_empty())
         for(auto& node : D->get_node_pool()) {

@@ -40,6 +40,8 @@ class RigidWallPenalty : public Constraint {
         return ref_dof;
     }
 
+    [[nodiscard]] bool reject_invalid_object() const override { return true; }
+
 protected:
     const unsigned n_dim;
 

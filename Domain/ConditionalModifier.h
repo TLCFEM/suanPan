@@ -63,9 +63,11 @@ protected:
 
     uvec target_node, target_dof;
 
+    [[nodiscard]] virtual bool reject_invalid_object() const { return false; }
+
     [[nodiscard]] double get_amplitude(const shared_ptr<DomainBase>&) const;
 
-    const std::vector<Node::DOF>& get_dof_component() const;
+    [[nodiscard]] const std::vector<Node::DOF>& get_dof_component() const;
 
 public:
     ConditionalModifier(

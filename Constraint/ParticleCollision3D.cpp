@@ -41,7 +41,7 @@ int ParticleCollision3D::process_meta(const shared_ptr<DomainBase>& D, const boo
         const auto& t_node = node_pool[I];
         if(norm(t_node->get_trial_velocity()) * W->get_incre_time() > space)
             suanpan_warning("The nodal speed seems to be too large.\n");
-        const auto new_pos = t_node->trial_position(num_dof);
+        const auto new_pos = t_node->trial_position(dimension);
         list[I].x = static_cast<int>(floor(new_pos(0) / space));
         list[I].y = static_cast<int>(floor(new_pos(1) / space));
         list[I].z = static_cast<int>(floor(new_pos(2) / space));

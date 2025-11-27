@@ -32,7 +32,7 @@ int NodalForce::process(const shared_ptr<DomainBase>& D) {
 
 GroupNodalForce::GroupNodalForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
     : GroupModifier(std::move(N))
-    , NodalForce(T, L, uvec{}, std::move(D), AT) {}
+    , NodalForce(T, L, {}, std::move(D), AT) {}
 
 int GroupNodalForce::initialize(const shared_ptr<DomainBase>& D) {
     target_node = update_object_tag(D);

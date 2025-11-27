@@ -23,9 +23,7 @@ ReferenceForce::ReferenceForce(const unsigned T, const double L, uvec&& N, std::
     : Load(T, 0, std::move(N), {}, std::move(D), L) {}
 
 int ReferenceForce::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
-
-    reference_load.zeros(W->get_size());
+    reference_load.zeros(D->get_factory()->get_size());
 
     for(const auto I : target_dof) reference_load(I) = magnitude;
 

@@ -35,6 +35,8 @@ class MPC final : public Constraint {
     const double magnitude;
     const std::vector<std::tuple<uword, uword, double>> pool;
 
+    [[nodiscard]] bool reject_invalid_object() const override { return true; }
+
 public:
     MPC(unsigned, unsigned, double, std::vector<std::tuple<uword, uword, double>>&&);
 

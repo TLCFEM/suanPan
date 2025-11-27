@@ -35,13 +35,15 @@
 #include "Constraint.h"
 
 class FixedLength : public Constraint {
-    vec coor;
+    vec initial_cord;
 
 protected:
     const unsigned dimension;
 
     bool min_bound = false, max_bound = false;
     double min_gap = 0., max_gap = 0.;
+
+    [[nodiscard]] bool reject_invalid_object() const final { return true; }
 
 public:
     FixedLength(unsigned, unsigned, uvec&&);

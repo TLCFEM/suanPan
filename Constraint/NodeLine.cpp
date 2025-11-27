@@ -21,16 +21,7 @@
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
 
-std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
-    std::vector<vec> position;
-    position.reserve(target_node.n_elem);
-
-    for(const auto I : target_node) position.emplace_back(D->get<Node>(I)->trial_position(2u));
-
-    return position;
-}
-
-NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
+NodeLine::NodeLine(const unsigned T, const unsigned A, uvec3&& N)
     : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2}, {}, 1) {}
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
@@ -40,11 +31,13 @@ int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int NodeLine::process(const shared_ptr<DomainBase>& D) {
-    const auto node = get_position(D);
+    const auto node_i = D->get<Node>(target_node(0))->trial_position(2u);
+    const auto node_j = D->get<Node>(target_node(1))->trial_position(2u);
+    const auto node_k = D->get<Node>(target_node(2))->trial_position(2u);
 
-    const vec axis = node[1] - node[0];
+    const vec axis = node_j - node_i;
     const vec outer_normal = rotation * axis;
-    const vec position = node[2] - node[0];
+    const vec position = node_k - node_i;
 
     const auto pen = dot(position, outer_normal);
 

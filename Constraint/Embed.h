@@ -36,6 +36,8 @@ class Embed : public Constraint {
 
     const unsigned element_tag;
 
+    [[nodiscard]] bool reject_invalid_object() const final { return true; }
+
 public:
     Embed(
         unsigned, // unique constraint tag

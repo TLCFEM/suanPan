@@ -23,9 +23,9 @@ NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N,
     : Load(T, AT, std::move(N), {}, std::move(D), L) {}
 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
-    set_end_step(start_step + 1);
-
     if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+
+    set_end_step(start_step + 1);
 
     D->get_factory()->update_reference_dof(target_dof);
 
