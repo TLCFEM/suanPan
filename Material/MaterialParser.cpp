@@ -3530,9 +3530,9 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
 
     unique_ptr<Material> new_material = nullptr;
 
-    if(is_equal(material_id, "AFC") || is_equal(material_id, "AFC01")) new_afc01(new_material, command);
-    else if(is_equal(material_id, "AFC02") || is_equal(material_id, "AFCS")) new_afc02(new_material, command);
-    else if(is_equal(material_id, "AFC03") || is_equal(material_id, "AFCN")) new_afc03(new_material, command);
+    if(is_equal_any(material_id, "AFC", "AFC01")) new_afc01(new_material, command);
+    else if(is_equal_any(material_id, "AFC02", "AFCS")) new_afc02(new_material, command);
+    else if(is_equal_any(material_id, "AFC03", "AFCN")) new_afc03(new_material, command);
     else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
@@ -3557,7 +3557,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
     else if(material_id.starts_with("CDPM2")) {
-        if(is_equal(material_id, "CDPM2") || is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+        if(is_equal_any(material_id, "CDPM2", "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
         else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
         else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
     }
@@ -3589,7 +3589,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "DuncanSelig")) new_duncanselig(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
-    else if(is_equal(material_id, "Elastic3D") || is_equal(material_id, "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
+    else if(is_equal_any(material_id, "Elastic3D", "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "ElasticOS")) new_elasticos(new_material, command);
     else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);

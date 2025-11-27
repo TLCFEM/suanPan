@@ -111,13 +111,9 @@ bool if_contain(const std::string& A, const char* B) { return A.find(B) != std::
 
 bool if_contain(const std::string& A, const std::string& B) { return A.find(B) != std::string::npos; }
 
-bool is_true(const char* S) { return is_equal(S, "On") || is_equal(S, "True") || is_equal(S, "T") || is_equal(S, "1") || is_equal(S, "Yes") || is_equal(S, "Y"); }
+bool is_true(const std::string_view S) { return is_equal_any(S, "On", "True", "T", "1", "Yes", "Y"); }
 
-bool is_false(const char* S) { return is_equal(S, "Off") || is_equal(S, "False") || is_equal(S, "F") || is_equal(S, "0") || is_equal(S, "No") || is_equal(S, "N"); }
-
-bool is_true(const std::string& S) { return is_true(S.c_str()); }
-
-bool is_false(const std::string& S) { return is_false(S.c_str()); }
+bool is_false(const std::string_view S) { return is_equal_any(S, "Off", "False", "F", "0", "No", "N"); }
 
 bool is_integer(const std::string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }
 

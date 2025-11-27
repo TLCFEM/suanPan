@@ -211,13 +211,13 @@ bool is_equal(char, char);
 bool is_equal(int, char);
 bool is_equal(std::string_view, std::string_view);
 
+template<typename... S> bool is_equal_any(std::string_view a, S... rest) { return (is_equal(a, rest) || ...); }
+
 bool if_contain(const std::string&, const char*);
 bool if_contain(const std::string&, const std::string&);
 
-bool is_true(const char*);
-bool is_false(const char*);
-bool is_true(const std::string&);
-bool is_false(const std::string&);
+bool is_true(std::string_view);
+bool is_false(std::string_view);
 
 bool is_integer(const std::string&);
 

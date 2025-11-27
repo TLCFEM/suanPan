@@ -2476,7 +2476,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
 
         new_modifier = std::make_unique<ElementalModal>(tag, a, b, get_remaining<uword>(command));
     }
-    else if(is_equal(modifier_type, "ElementalNonviscous") || is_equal(modifier_type, "ElementalNonviscousGroup")) {
+    else if(is_equal_any(modifier_type, "ElementalNonviscous", "ElementalNonviscousGroup")) {
         unsigned tag, ele_tag;
         if(!get_input(command, tag, ele_tag)) {
             suanpan_error("A valid tag is required.\n");

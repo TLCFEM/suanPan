@@ -355,7 +355,7 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
         }
         domain->insert(std::make_shared<CustomAmplitude>(tag, expression));
     }
-    else if(is_equal(amplitude_type, "Modulated") || is_equal(amplitude_type, "Sine") || is_equal(amplitude_type, "Cosine")) {
+    else if(is_equal_any(amplitude_type, "Modulated", "Sine", "Cosine")) {
         double W;
         if(!get_input(command, W)) {
             suanpan_error("A valid value is required.\n");
@@ -391,13 +391,13 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
     if(is_equal(load_id, "Acceleration")) new_acceleration(new_load, command);
     else if(is_equal(load_id, "BodyForce")) new_bodyforce(new_load, command, false);
     else if(is_equal(load_id, "Cload")) new_cload(new_load, command, false);
-    else if(is_equal(load_id, "Disp") || is_equal(load_id, "Displacement") || is_equal(load_id, "DispLoad")) new_displacement(new_load, command, false);
+    else if(is_equal_any(load_id, "Disp", "Displacement", "DispLoad")) new_displacement(new_load, command, false);
     else if(is_equal(load_id, "GroupBodyForce")) new_bodyforce(new_load, command, true);
     else if(is_equal(load_id, "GroupCload")) new_cload(new_load, command, true);
-    else if(is_equal(load_id, "GroupDisp") || is_equal(load_id, "GroupDisplacement") || is_equal(load_id, "GroupDispLoad")) new_displacement(new_load, command, true);
+    else if(is_equal_any(load_id, "GroupDisp", "GroupDisplacement", "GroupDispLoad")) new_displacement(new_load, command, true);
     else if(is_equal(load_id, "LineUDL2D")) new_lineudl(new_load, command, 2);
     else if(is_equal(load_id, "LineUDL3D")) new_lineudl(new_load, command, 3);
-    else if(is_equal(load_id, "ReferenceLoad") || is_equal(load_id, "RefLoad") || is_equal(load_id, "RefForce")) new_refload(new_load, command);
+    else if(is_equal_any(load_id, "ReferenceLoad", "RefLoad", "RefForce")) new_refload(new_load, command);
     else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
     else if(is_equal(load_id, "SupportDisplacement")) new_supportmotion(new_load, command, 0);
     else if(is_equal(load_id, "SupportVelocity")) new_supportmotion(new_load, command, 1);
