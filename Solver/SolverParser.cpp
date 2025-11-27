@@ -115,23 +115,23 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
                     suanpan_error("A valid type is required.\n");
                     return SUANPAN_SUCCESS;
                 }
-                if(is_equal("-type0", type)) {
+                if(is_equal(type, "-type0")) {
                     if(SUANPAN_SUCCESS != get_basic_input()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T0, vec{}, zeta, omega});
                 }
-                else if(is_equal("-type1", type)) {
+                else if(is_equal(type, "-type1")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T1, vec{regularise(para_a)}, zeta, omega});
                 }
-                else if(is_equal("-type2", type)) {
+                else if(is_equal(type, "-type2")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T2, vec{regularise(para_a), regularise(para_b)}, zeta, omega});
                 }
-                else if(is_equal("-type3", type)) {
+                else if(is_equal(type, "-type3")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T3, vec{para_a}, zeta, omega});
                 }
-                else if(is_equal("-type4", type)) {
+                else if(is_equal(type, "-type4")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     double para_c, para_d, para_e;
                     if(!get_input(command, para_c) || !get_input(command, para_d) || !get_input(command, para_e)) {
@@ -197,23 +197,23 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
                     suanpan_error("A valid type is required.\n");
                     return SUANPAN_SUCCESS;
                 }
-                if(is_equal("-type0", type)) {
+                if(is_equal(type, "-type0")) {
                     if(SUANPAN_SUCCESS != get_basic_input()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T0, vec{}, zeta, omega});
                 }
-                else if(is_equal("-type1", type)) {
+                else if(is_equal(type, "-type1")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T1, vec{regularise(para_a)}, zeta, omega});
                 }
-                else if(is_equal("-type2", type)) {
+                else if(is_equal(type, "-type2")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T2, vec{regularise(para_a), regularise(para_b)}, zeta, omega});
                 }
-                else if(is_equal("-type3", type)) {
+                else if(is_equal(type, "-type3")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T3, vec{para_a}, zeta, omega});
                 }
-                else if(is_equal("-type4", type)) {
+                else if(is_equal(type, "-type4")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     double para_c, para_d, para_e;
                     if(!get_input(command, para_c) || !get_input(command, para_d) || !get_input(command, para_e)) {

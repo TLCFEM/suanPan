@@ -423,7 +423,7 @@ namespace {
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal("material", variable_type)) {
+        if(is_equal(variable_type, "material")) {
             std::string state_type;
             if(!get_input(command, state_type)) {
                 suanpan_error("A valid state type is required.\n");
@@ -440,11 +440,11 @@ namespace {
             while(!command.eof())
                 if(double input; get_input(command, input)) para.emplace_back(input);
 
-            if(is_equal("history", state_type) && domain->find_material(mat_tag)) domain->get_material(mat_tag)->set_initial_history(para);
+            if(is_equal(state_type, "history") && domain->find_material(mat_tag)) domain->get_material(mat_tag)->set_initial_history(para);
 
             return SUANPAN_SUCCESS;
         }
-        if(is_equal("angularvelocity", variable_type) || is_equal("avel", variable_type)) {
+        if(is_equal_any(variable_type, "angularvelocity", "avel")) {
             vec magnitude(3);
             for(auto& I : magnitude)
                 if(!get_input(command, I)) {
@@ -490,7 +490,7 @@ namespace {
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal("displacement", variable_type) || is_equal("disp", variable_type))
+        if(is_equal_any(variable_type, "displacement", "disp"))
             while(!command.eof())
                 if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
                     auto& t_node = domain->get_node(node_tag);
@@ -503,7 +503,7 @@ namespace {
                     suanpan_error("A valid node tag is required.\n");
                     return SUANPAN_SUCCESS;
                 }
-        else if(is_equal("velocity", variable_type) || is_equal("vel", variable_type))
+        else if(is_equal_any(variable_type, "velocity", "vel"))
             while(!command.eof())
                 if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
                     auto& t_node = domain->get_node(node_tag);
@@ -516,7 +516,7 @@ namespace {
                     suanpan_error("A valid node tag is required.\n");
                     return SUANPAN_SUCCESS;
                 }
-        else if(is_equal("acceleration", variable_type) || is_equal("acc", variable_type))
+        else if(is_equal_any(variable_type, "acceleration", "acc"))
             while(!command.eof()) {
                 if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
                     auto& t_node = domain->get_node(node_tag);
@@ -967,8 +967,8 @@ namespace {
         if(is_equal(property_id, "color_model")) {
             if(std::string value; !get_input(command, value))
                 suanpan_error("A valid value is required.\n");
-            else if(is_equal("WP", value)) domain->set_color_model(DomainBase::ColorMethod::WP);
-            else if(is_equal("MIS", value)) domain->set_color_model(DomainBase::ColorMethod::MIS);
+            else if(is_equal(value, "WP")) domain->set_color_model(DomainBase::ColorMethod::WP);
+            else if(is_equal(value, "MIS")) domain->set_color_model(DomainBase::ColorMethod::MIS);
             else domain->set_color_model(DomainBase::ColorMethod::OFF);
 
             return SUANPAN_SUCCESS;

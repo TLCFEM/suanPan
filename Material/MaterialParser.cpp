@@ -326,14 +326,14 @@ namespace {
                 suanpan_error("A valid token (-fc,-ac,-na,-nd,-memory) is required.\n");
                 return;
             }
-            if(is_equal("-fc", token)) populate(bfc);
-            else if(is_equal("-ac", token)) populate(bac);
-            else if(is_equal("-na", token)) populate(bna);
-            else if(is_equal("-nd", token)) populate(bnd);
-            else if(is_equal("-memory", token) && get_input(command, token)) {
-                if(is_equal("minimum", token)) memory_type = DataBalloon1D::MemoryType::MINIMUM;
-                else if(is_equal("maximum", token)) memory_type = DataBalloon1D::MemoryType::MAXIMUM;
-                else if(is_equal("mean", token)) memory_type = DataBalloon1D::MemoryType::MEAN;
+            if(is_equal(token, "-fc")) populate(bfc);
+            else if(is_equal(token, "-ac")) populate(bac);
+            else if(is_equal(token, "-na")) populate(bna);
+            else if(is_equal(token, "-nd")) populate(bnd);
+            else if(is_equal(token, "-memory") && get_input(command, token)) {
+                if(is_equal(token, "minimum")) memory_type = DataBalloon1D::MemoryType::MINIMUM;
+                else if(is_equal(token, "maximum")) memory_type = DataBalloon1D::MemoryType::MAXIMUM;
+                else if(is_equal(token, "mean")) memory_type = DataBalloon1D::MemoryType::MEAN;
                 else {
                     suanpan_error("A valid memory type (minimum, maximum, mean) is required.\n");
                     return;
@@ -2961,14 +2961,14 @@ namespace {
         std::string token;
         while(!command.eof() && get_input(command, token)) {
             double a, b;
-            if(is_equal("-back", token)) {
+            if(is_equal(token, "-back")) {
                 if(!get_input(command, a, b)) {
                     suanpan_error("Valid saturation parameters are required.\n");
                     return;
                 }
                 back.emplace_back(a, b);
             }
-            else if(is_equal("-core", token)) {
+            else if(is_equal(token, "-core")) {
                 if(!get_input(command, a, b)) {
                     suanpan_error("Valid saturation parameters are required.\n");
                     return;
