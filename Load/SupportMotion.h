@@ -31,7 +31,7 @@
 #ifndef SUPPORTMOTION_H
 #define SUPPORTMOTION_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class SupportMotion : public Load {
 public:

@@ -28,7 +28,7 @@
 #ifndef BODYFORCE_H
 #define BODYFORCE_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class BodyForce : public Load {
 protected:

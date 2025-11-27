@@ -17,7 +17,6 @@
 
 #include "RigidWallMultiplier.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 int RigidWallMultiplier::initialize(const shared_ptr<DomainBase>& D) {

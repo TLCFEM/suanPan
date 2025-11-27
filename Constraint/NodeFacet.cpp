@@ -17,9 +17,7 @@
 
 #include "NodeFacet.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Toolbox/tensor.h>
 
 std::vector<vec> NodeFacet::get_position(const shared_ptr<DomainBase>& D) {

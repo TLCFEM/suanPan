@@ -17,7 +17,6 @@
 
 #include "ReferenceForce.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 ReferenceForce::ReferenceForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D)

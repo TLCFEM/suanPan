@@ -17,9 +17,7 @@
 
 #include "Embed.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Element/Element.h>
 
 Embed::Embed(const unsigned T, const unsigned ET, const unsigned NT, const unsigned D)

@@ -17,7 +17,6 @@
 
 #include "ConditionalModifier.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>

@@ -31,7 +31,7 @@
 #ifndef ACCELERATION_H
 #define ACCELERATION_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class NodalAcceleration final : public Load {
 public:

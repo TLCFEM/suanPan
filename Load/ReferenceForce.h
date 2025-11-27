@@ -31,7 +31,7 @@
 #ifndef REFERENCEFORCE_H
 #define REFERENCEFORCE_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class ReferenceForce final : public Load {
 public:

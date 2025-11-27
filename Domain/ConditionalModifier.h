@@ -33,12 +33,10 @@
 #ifndef CONDITIONALMODIFIER_H
 #define CONDITIONALMODIFIER_H
 
+#include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 #include <Toolbox/ResourceHolder.h>
-#include <set>
-
-class DomainBase;
 
 class ConditionalModifier : public UniqueTag {
     const unsigned amplitude_tag;

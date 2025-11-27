@@ -17,9 +17,7 @@
 
 #include "ParticleCollision3D.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 double ParticleCollision3D::compute_f(const double distance) const { return distance >= space ? 0. : -alpha * log(distance / space); }
 

@@ -40,7 +40,7 @@
 #ifndef BC_H
 #define BC_H
 
-#include <Constraint/Constraint.h>
+#include "Constraint.h"
 
 class PenaltyBC : public Constraint {
     static double multiplier;

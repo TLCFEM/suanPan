@@ -17,8 +17,6 @@
 
 #include "Load.h"
 
-#include <Domain/DomainBase.h>
-
 double Load::multiplier = 1E8;
 
 Load::Load(const unsigned T, const unsigned AT, uvec&& NT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC, const double PT)

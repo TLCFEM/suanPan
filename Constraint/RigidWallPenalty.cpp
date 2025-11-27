@@ -17,7 +17,6 @@
 
 #include "RigidWallPenalty.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F, const unsigned NS)

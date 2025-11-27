@@ -31,7 +31,7 @@
 #ifndef NODALDISPLACEMENT_H
 #define NODALDISPLACEMENT_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class NodalDisplacement : public Load {
 public:

@@ -31,8 +31,6 @@
 
 #include "Constraint.h"
 
-#include <Domain/Node.h>
-
 class RigidWallPenalty : public Constraint {
     static auto setup(const unsigned dimension) {
         std::vector<Node::DOF> ref_dof;

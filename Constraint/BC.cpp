@@ -17,7 +17,6 @@
 
 #include "BC.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>

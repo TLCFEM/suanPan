@@ -19,7 +19,6 @@
 #include "ConstraintParser.h"
 
 #include <Constraint/Constraint>
-#include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Recorder/OutputType.h>
 

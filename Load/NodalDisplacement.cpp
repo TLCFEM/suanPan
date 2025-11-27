@@ -17,7 +17,6 @@
 
 #include "NodalDisplacement.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)

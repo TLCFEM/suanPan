@@ -31,7 +31,7 @@
 #ifndef NODALFORCE_H
 #define NODALFORCE_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class NodalForce : public Load {
 public:

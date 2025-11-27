@@ -17,9 +17,7 @@
 
 #include "FixedLength.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 FixedLength::FixedLength(const unsigned T, const unsigned D, uvec&& N)
     : Constraint(T, 0, std::move(N), 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1)
