@@ -10,7 +10,7 @@ element Mass 4 2 20 1 2
 element Mass 5 3 10 1 2
 element Mass 6 4 20 1 2
 
-fix 1 P 1
+fix 1 E 1
 
 constraint FixedLength2D 10 1 2
 constraint FixedLength2D 11 2 3

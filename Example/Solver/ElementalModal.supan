@@ -7,7 +7,7 @@ material Elastic1D 1 10 .2
 
 element EB21 1 1 2 12 1 1
 
-fix2 1 P 1
+fix2 1 E 1
 
 hdf5recorder 1 Node U2 2
 

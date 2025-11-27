@@ -10,7 +10,7 @@ material Elastic1D 1 10
 element EB21 1 1 2 12 1 1 1
 element EB21 2 3 4 12 1 1 1
 
-fix2 1 P 1 4
+fix2 1 E 1 4
 
 constraint FixedLength2D 2 2 3
 

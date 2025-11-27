@@ -9,7 +9,7 @@ section Rectangle2D 1 12 1 1 12
 
 element F21 1 1 2 1 5
 
-fix2 1 P 1
+fix2 1 E 1
 
 displacement 1 0 1 2 3 ! wrong node
 

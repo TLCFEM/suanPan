@@ -11,7 +11,7 @@ element B21 1 1 2 1 6 1
 
 mass 2 2 10 1
 
-fix 1 P 1
+fix 1 E 1
 
 hdf5recorder 1 Global MMR3
 hdf5recorder 2 Node MMR3 2

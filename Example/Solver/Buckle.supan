@@ -14,7 +14,7 @@ element B21 3 3 4 1 6 1
 element B21 4 4 5 1 6 1
 element B21 5 5 6 1 6 1
 
-fix 1 P 1
+fix 1 E 1
 
 cload 1 0 -1E-2 1 6
 

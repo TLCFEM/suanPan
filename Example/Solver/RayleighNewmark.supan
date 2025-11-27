@@ -9,7 +9,7 @@ element EB21 1 1 2 10 1 1 false
 
 mass 2 2 10 1
 
-fix2 1 P 1
+fix2 1 E 1
 
 amplitude Tabular 1 EZ
 

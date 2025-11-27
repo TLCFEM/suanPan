@@ -9,7 +9,7 @@ material RambergOsgood 1 100 8 1 10
 element T2D2 1 1 2 1 10
 element T2D2 2 3 2 1 10
 
-fix 1 P 1
+fix 1 E 1
 fix 2 2 2 3
 
 hdf5recorder 1 Element S 1

@@ -12,7 +12,7 @@ element Damper02 4 1 2 2 1 false 0 .5
 
 mass 3 2 10 1
 
-fix2 1 P 1
+fix2 1 E 1
 fix2 2 2 2
 
 hdf5recorder 1 Node U 2

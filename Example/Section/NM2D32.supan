@@ -8,7 +8,7 @@ element NMB21 1 1 2 1
 
 recorder 1 hdf5 Element S 1
 
-fix2 1 P 1
+fix2 1 E 1
 fix2 2 3 2
 
 displacement 1 0 .3 2 2
