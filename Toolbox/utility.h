@@ -99,9 +99,16 @@ template<typename... Ts> bool get_input(std::istringstream& stream, std::tuple<T
     return std::apply([&](auto&... items) { return get_input(stream, items...); }, output);
 }
 
-template<typename... Ts> auto get_remaining(std::istringstream& stream) {
-    std::tuple<std::vector<Ts>...> output;
-    std::tuple<Ts...> temp;
+template<typename T> auto get_remaining(std::istringstream& stream) {
+    std::vector<T> output;
+    T value;
+    while(get_input(stream, value)) output.emplace_back(value);
+    return output;
+}
+
+template<typename T1, typename T2, typename... Ts> auto get_remaining(std::istringstream& stream) {
+    std::tuple<std::vector<T1>, std::vector<T2>, std::vector<Ts>...> output;
+    std::tuple<T1, T2, Ts...> temp;
     while(get_input(stream, temp)) std::apply([&](auto&... containers) { std::apply([&](auto&&... items) { ((containers.emplace_back(items)), ...); }, temp); }, output);
     return output;
 }
