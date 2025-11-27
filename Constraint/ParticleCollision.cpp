@@ -17,12 +17,10 @@
 
 #include "ParticleCollision.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 ParticleCollision::ParticleCollision(const unsigned T, const unsigned D)
-    : Constraint(T, 0, {}, {}, 0)
+    : Constraint(T, 0, {}, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 0)
     , num_dof(D) {}
 
 int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {

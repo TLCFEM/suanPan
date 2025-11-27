@@ -17,11 +17,10 @@
 
 #include "NodalForce.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-NodalForce::NodalForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), std::move(D), L) {}
+NodalForce::NodalForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : Load(T, AT, std::move(N), {}, std::move(D), L) {}
 
 int NodalForce::process(const shared_ptr<DomainBase>& D) {
     D->insert_loaded_dof(target_dof);
@@ -29,4 +28,14 @@ int NodalForce::process(const shared_ptr<DomainBase>& D) {
     trial_load.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
+}
+
+GroupNodalForce::GroupNodalForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : GroupModifier(std::move(N))
+    , NodalForce(T, L, uvec{}, std::move(D), AT) {}
+
+int GroupNodalForce::initialize(const shared_ptr<DomainBase>& D) {
+    target_node = update_object_tag(D);
+
+    return NodalForce::initialize(D);
 }

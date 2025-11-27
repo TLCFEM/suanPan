@@ -17,28 +17,27 @@
 
 #include "FixedLength.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
 FixedLength::FixedLength(const unsigned T, const unsigned D, uvec&& N)
-    : Constraint(T, 0, std::move(N), 2 == D ? uvec{1, 2} : uvec{1, 2, 3}, 1) {}
+    : Constraint(T, 0, std::move(N), 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1)
+    , dimension(D) {}
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
-    coor = D->get<Node>(target_node(1))->initial_position(dof_reference.n_elem) - D->get<Node>(target_node(0))->initial_position(dof_reference.n_elem);
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
-    set_multiplier_size(0);
+    coor = D->get<Node>(target_node(1))->initial_position(dimension) - D->get<Node>(target_node(0))->initial_position(dimension);
 
-    return Constraint::initialize(D);
+    set_multiplier_size(0u);
+
+    return SUANPAN_SUCCESS;
 }
 
 int FixedLength::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    const auto& n_dof = dof_reference.n_elem;
-
-    const uvec dof_i = target_dof.head(n_dof);
-    const uvec dof_j = target_dof.tail(n_dof);
+    const uvec dof_i = target_dof.head(dimension);
+    const uvec dof_j = target_dof.tail(dimension);
 
     const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
 
@@ -58,18 +57,18 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
         auxiliary_load = max_gap - dot(coor, coor);
     }
 
-    set_multiplier_size(1);
+    set_multiplier_size(1u);
 
     auxiliary_stiffness.zeros(W->get_size(), lagrangian_size);
     auxiliary_resistance = 0.;
-    for(auto I = 0llu; I < n_dof; ++I) {
+    for(auto I = 0llu; I < dimension; ++I) {
         auxiliary_stiffness(dof_i(I)) = -(auxiliary_stiffness(dof_j(I)) = 2. * (coor(I) + t_disp(I)));
         auxiliary_resistance += t_disp(I) * (2. * coor(I) + t_disp(I));
     }
 
     stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
     const auto t_factor = 2. * trial_lambda(0);
-    for(auto I = 0llu; I < n_dof; ++I) stiffness(I + n_dof, I) = stiffness(I, I + n_dof) = -(stiffness(I, I) = stiffness(I + n_dof, I + n_dof) = t_factor);
+    for(auto I = 0llu; I < dimension; ++I) stiffness(I + dimension, I) = stiffness(I, I + dimension) = -(stiffness(I, I) = stiffness(I + dimension, I + dimension) = t_factor);
 
     resistance = auxiliary_stiffness * trial_lambda;
 
@@ -80,17 +79,17 @@ void FixedLength::update_status(const vec& i_lambda) { trial_lambda += i_lambda;
 
 void FixedLength::commit_status() {
     current_lambda = trial_lambda;
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 void FixedLength::clear_status() {
     current_lambda = trial_lambda.zeros();
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 void FixedLength::reset_status() {
     trial_lambda = current_lambda;
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 MinimumGap::MinimumGap(const unsigned T, const unsigned D, const double M, uvec&& N)
@@ -120,7 +119,7 @@ MaxForce::MaxForce(const unsigned T, const unsigned D, const double MF, uvec&& N
 int MaxForce::process(const shared_ptr<DomainBase>& D) {
     if(current_flag) {
         // if already exceeded, the constraint is not triggered
-        set_multiplier_size(0);
+        set_multiplier_size(0u);
         return SUANPAN_SUCCESS;
     }
 
@@ -128,12 +127,12 @@ int MaxForce::process(const shared_ptr<DomainBase>& D) {
 
     if(0u == lagrangian_size) return SUANPAN_SUCCESS;
 
-    vec nodal_resistance(dof_reference.n_elem);
+    vec nodal_resistance(dimension);
     for(auto I = 0llu; I < nodal_resistance.n_elem; ++I) nodal_resistance(I) = resistance(target_dof(I));
 
     if(norm(nodal_resistance) > max_force) {
         trial_flag = true;
-        set_multiplier_size(0);
+        set_multiplier_size(0u);
     }
 
     return SUANPAN_SUCCESS;

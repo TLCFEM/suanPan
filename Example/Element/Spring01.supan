@@ -11,7 +11,7 @@ element Spring01 2 3 2 1
 
 plainrecorder 1 Element S 1
 
-fix 1 P 1
+fix 1 E 1
 fix 2 2 2 3
 
 step static 1

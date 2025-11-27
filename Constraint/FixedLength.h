@@ -38,6 +38,8 @@ class FixedLength : public Constraint {
     vec coor;
 
 protected:
+    const unsigned dimension;
+
     bool min_bound = false, max_bound = false;
     double min_gap = 0., max_gap = 0.;
 

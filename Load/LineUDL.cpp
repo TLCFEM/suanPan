@@ -17,25 +17,14 @@
 
 #include "LineUDL.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
-LineUDL::LineUDL(const unsigned T, const double L, uvec&& N, const unsigned DT, const unsigned AT, const uword D)
-    : Load(T, AT, std::move(N), uvec{DT}, L)
+LineUDL::LineUDL(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT, const unsigned D)
+    : Load(T, AT, std::move(N), 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, std::move(DT), L)
     , dimension(D) {}
 
-int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
-    if(target_node.n_elem % 2 != 0) return SUANPAN_FAIL;
-
-    for(const auto I : target_node)
-        if(const auto& t_node = D->get<Node>(I); t_node->get_reordered_dof().size() < dimension || t_node->get_coordinate().size() < dimension) return SUANPAN_FAIL;
-
-    return Load::initialize(D);
-}
-
-LineUDL2D::LineUDL2D(const unsigned T, const double L, uvec&& N, const unsigned DT, const unsigned AT)
-    : LineUDL(T, L, std::move(N), DT, AT, 2llu) {}
+LineUDL2D::LineUDL2D(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT)
+    : LineUDL(T, L, std::move(N), std::move(DT), AT, 2u) {}
 
 int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();
@@ -52,12 +41,12 @@ int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
 
         const vec diff_coor = node_j->initial_position(dimension) - node_i->initial_position(dimension);
 
-        if(0llu == dof_reference(0)) {
+        if(1u == static_cast<unsigned>(get_dof_component()[0])) {
             trial_load(dof_i(0)) = trial_load(dof_j(0)) = -.5 * diff_coor(1) * ref_load;
             D->insert_loaded_dof(dof_i(0));
             D->insert_loaded_dof(dof_j(0));
         }
-        else if(1llu == dof_reference(0)) {
+        else if(2u == static_cast<unsigned>(get_dof_component()[0])) {
             trial_load(dof_i(1)) = trial_load(dof_j(1)) = -.5 * diff_coor(0) * ref_load;
             D->insert_loaded_dof(dof_i(1));
             D->insert_loaded_dof(dof_j(1));
@@ -67,8 +56,8 @@ int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-LineUDL3D::LineUDL3D(const unsigned T, const double L, uvec&& N, const unsigned DT, const unsigned AT)
-    : LineUDL(T, L, std::move(N), DT, AT, 3llu) {}
+LineUDL3D::LineUDL3D(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT)
+    : LineUDL(T, L, std::move(N), std::move(DT), AT, 3u) {}
 
 int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();
@@ -85,17 +74,17 @@ int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
 
         const vec diff_coor = node_j->initial_position(dimension) - node_i->initial_position(dimension);
 
-        if(0llu == dof_reference(0)) {
+        if(1u == static_cast<unsigned>(get_dof_component()[0])) {
             trial_load(dof_i(0)) = trial_load(dof_j(0)) = -.5 * norm(diff_coor(uvec{1, 2})) * ref_load;
             D->insert_loaded_dof(dof_i(0));
             D->insert_loaded_dof(dof_j(0));
         }
-        else if(1llu == dof_reference(0)) {
+        else if(2u == static_cast<unsigned>(get_dof_component()[0])) {
             trial_load(dof_i(1)) = trial_load(dof_j(1)) = -.5 * norm(diff_coor(uvec{0, 2})) * ref_load;
             D->insert_loaded_dof(dof_i(1));
             D->insert_loaded_dof(dof_j(1));
         }
-        else if(2llu == dof_reference(0)) {
+        else if(3u == static_cast<unsigned>(get_dof_component()[0])) {
             trial_load(dof_i(2)) = trial_load(dof_j(2)) = -.5 * norm(diff_coor(uvec{0, 1})) * ref_load;
             D->insert_loaded_dof(dof_i(2));
             D->insert_loaded_dof(dof_j(2));

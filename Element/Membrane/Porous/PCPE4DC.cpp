@@ -35,7 +35,7 @@ PCPE4DC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<
     , strain_mat(3, 2llu * m_node, fill::zeros) {}
 
 PCPE4DC::PCPE4DC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN, const double KK)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::FU1, Node::DOF::FU2})
     , alpha(AL)
     , porosity(NN)
     , k(KK) {}

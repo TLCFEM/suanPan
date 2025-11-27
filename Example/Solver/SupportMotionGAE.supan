@@ -13,7 +13,7 @@ element MassPoint2D 2 1 11 11
 element MassPoint2D 3 2 22 22
 
 fix2 1 2 1
-fix2 2 3 1
+fix2 2 6 1
 
 amplitude Tabular 1 EZ
 

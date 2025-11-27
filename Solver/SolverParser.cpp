@@ -115,23 +115,23 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
                     suanpan_error("A valid type is required.\n");
                     return SUANPAN_SUCCESS;
                 }
-                if(is_equal("-type0", type)) {
+                if(is_equal(type, "-type0")) {
                     if(SUANPAN_SUCCESS != get_basic_input()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T0, vec{}, zeta, omega});
                 }
-                else if(is_equal("-type1", type)) {
+                else if(is_equal(type, "-type1")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T1, vec{regularise(para_a)}, zeta, omega});
                 }
-                else if(is_equal("-type2", type)) {
+                else if(is_equal(type, "-type2")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T2, vec{regularise(para_a), regularise(para_b)}, zeta, omega});
                 }
-                else if(is_equal("-type3", type)) {
+                else if(is_equal(type, "-type3")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T3, vec{para_a}, zeta, omega});
                 }
-                else if(is_equal("-type4", type)) {
+                else if(is_equal(type, "-type4")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     double para_c, para_d, para_e;
                     if(!get_input(command, para_c) || !get_input(command, para_d) || !get_input(command, para_e)) {
@@ -197,23 +197,23 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
                     suanpan_error("A valid type is required.\n");
                     return SUANPAN_SUCCESS;
                 }
-                if(is_equal("-type0", type)) {
+                if(is_equal(type, "-type0")) {
                     if(SUANPAN_SUCCESS != get_basic_input()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T0, vec{}, zeta, omega});
                 }
-                else if(is_equal("-type1", type)) {
+                else if(is_equal(type, "-type1")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T1, vec{regularise(para_a)}, zeta, omega});
                 }
-                else if(is_equal("-type2", type)) {
+                else if(is_equal(type, "-type2")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T2, vec{regularise(para_a), regularise(para_b)}, zeta, omega});
                 }
-                else if(is_equal("-type3", type)) {
+                else if(is_equal(type, "-type3")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first()) return SUANPAN_SUCCESS;
                     modes.emplace_back(LeeMode{LeeType::T3, vec{para_a}, zeta, omega});
                 }
-                else if(is_equal("-type4", type)) {
+                else if(is_equal(type, "-type4")) {
                     if(SUANPAN_SUCCESS != get_basic_input() || SUANPAN_SUCCESS != get_first() || SUANPAN_SUCCESS != get_second()) return SUANPAN_SUCCESS;
                     double para_c, para_d, para_e;
                     if(!get_input(command, para_c) || !get_input(command, para_d) || !get_input(command, para_e)) {
@@ -231,7 +231,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             if(is_equal(integrator_type, "LeeNewmarkFullTrial")) {
                 if(domain->insert(std::make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::TRIAL))) code = 1;
             }
-            else if(is_equal(integrator_type, "LeeNewmarkFullCurrent") || is_equal(integrator_type, "LeeNewmarkFull")) {
+            else if(is_equal_any(integrator_type, "LeeNewmarkFullCurrent", "LeeNewmarkFull")) {
                 if(domain->insert(std::make_shared<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, LeeNewmarkBase::StiffnessType::CURRENT))) code = 1;
             }
             else if(is_equal(integrator_type, "LeeNewmarkFullInitial")) {
@@ -260,7 +260,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
             if(domain->insert(std::make_shared<NonviscousNewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
         }
     }
-    else if(is_equal(integrator_type, "GeneralizedAlpha") || is_equal(integrator_type, "GeneralisedAlpha")) {
+    else if(is_equal_any(integrator_type, "GeneralizedAlpha", "GeneralisedAlpha")) {
         const auto pool = get_remaining<double>(command);
 
         if(pool.empty() && domain->insert(std::make_shared<GeneralizedAlpha>(tag, .5))) code = 1; // NOLINT(bugprone-branch-clone)
@@ -366,7 +366,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
 
         if(domain->insert(std::make_shared<WAT2>(tag, suanpan::clamp_unit(para)))) code = 1;
     }
-    else if(is_equal(integrator_type, "GeneralizedAlphaExplicit") || is_equal(integrator_type, "GeneralisedAlphaExplicit")) {
+    else if(is_equal_any(integrator_type, "GeneralizedAlphaExplicit", "GeneralisedAlphaExplicit")) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
             suanpan_error("A valid damping radius is required.\n");
@@ -403,7 +403,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& 
     if(is_equal(solver_type, "Newton")) {
         if(domain->insert(std::make_shared<Newton>(tag))) code = 1;
     }
-    else if(is_equal(solver_type, "modifiedNewton") || is_equal(solver_type, "mNewton")) {
+    else if(is_equal_any(solver_type, "modifiedNewton", "mNewton")) {
         if(domain->insert(std::make_shared<Newton>(tag, true))) code = 1;
     }
     else if(is_equal(solver_type, "AICN")) {
@@ -427,7 +427,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& 
 
         if(domain->insert(std::make_shared<BFGS>(tag, max_history))) code = 1;
     }
-    else if(is_equal(solver_type, "FEAST") || is_equal(solver_type, "QuadraticFEAST")) {
+    else if(is_equal_any(solver_type, "FEAST", "QuadraticFEAST")) {
         unsigned eigen_number;
         if(!get_input(command, eigen_number)) {
             suanpan_error("A valid number of frequencies is required.\n");
@@ -448,7 +448,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& 
 
         if(domain->insert(std::make_shared<FEAST>(tag, eigen_number, centre, radius, is_equal(solver_type, "QuadraticFEAST")))) code = 1;
     }
-    else if(is_equal(solver_type, "DisplacementControl") || is_equal(solver_type, "MPDC")) {
+    else if(is_equal_any(solver_type, "DisplacementControl", "MPDC")) {
         if(domain->insert(std::make_shared<MPDC>(tag))) code = 1;
     }
     else if(is_equal(solver_type, "Ramm")) {

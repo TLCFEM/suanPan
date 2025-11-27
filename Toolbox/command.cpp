@@ -423,7 +423,7 @@ namespace {
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal("material", variable_type)) {
+        if(is_equal(variable_type, "material")) {
             std::string state_type;
             if(!get_input(command, state_type)) {
                 suanpan_error("A valid state type is required.\n");
@@ -440,11 +440,11 @@ namespace {
             while(!command.eof())
                 if(double input; get_input(command, input)) para.emplace_back(input);
 
-            if(is_equal("history", state_type) && domain->find_material(mat_tag)) domain->get_material(mat_tag)->set_initial_history(para);
+            if(is_equal(state_type, "history") && domain->find_material(mat_tag)) domain->get_material(mat_tag)->set_initial_history(para);
 
             return SUANPAN_SUCCESS;
         }
-        if(is_equal("angularvelocity", variable_type) || is_equal("avel", variable_type)) {
+        if(is_equal_any(variable_type, "angularvelocity", "avel")) {
             vec magnitude(3);
             for(auto& I : magnitude)
                 if(!get_input(command, I)) {
@@ -490,7 +490,7 @@ namespace {
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal("displacement", variable_type) || is_equal("disp", variable_type))
+        if(is_equal_any(variable_type, "displacement", "disp"))
             while(!command.eof())
                 if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
                     auto& t_node = domain->get_node(node_tag);
@@ -503,7 +503,7 @@ namespace {
                     suanpan_error("A valid node tag is required.\n");
                     return SUANPAN_SUCCESS;
                 }
-        else if(is_equal("velocity", variable_type) || is_equal("vel", variable_type))
+        else if(is_equal_any(variable_type, "velocity", "vel"))
             while(!command.eof())
                 if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
                     auto& t_node = domain->get_node(node_tag);
@@ -516,7 +516,7 @@ namespace {
                     suanpan_error("A valid node tag is required.\n");
                     return SUANPAN_SUCCESS;
                 }
-        else if(is_equal("acceleration", variable_type) || is_equal("acc", variable_type))
+        else if(is_equal_any(variable_type, "acceleration", "acc"))
             while(!command.eof()) {
                 if(unsigned node_tag; get_input(command, node_tag) && domain->find_node(node_tag)) {
                     auto& t_node = domain->get_node(node_tag);
@@ -967,8 +967,8 @@ namespace {
         if(is_equal(property_id, "color_model")) {
             if(std::string value; !get_input(command, value))
                 suanpan_error("A valid value is required.\n");
-            else if(is_equal("WP", value)) domain->set_color_model(DomainBase::ColorMethod::WP);
-            else if(is_equal("MIS", value)) domain->set_color_model(DomainBase::ColorMethod::MIS);
+            else if(is_equal(value, "WP")) domain->set_color_model(DomainBase::ColorMethod::WP);
+            else if(is_equal(value, "MIS")) domain->set_color_model(DomainBase::ColorMethod::MIS);
             else domain->set_color_model(DomainBase::ColorMethod::OFF);
 
             return SUANPAN_SUCCESS;
@@ -1080,12 +1080,12 @@ namespace {
         else if(is_equal(property_id, "precision")) {
             if(std::string value; !get_input(command, value))
                 suanpan_error("A valid value is required.\n");
-            else if(is_equal(value, "DOUBLE") || is_equal(value, "FULL")) t_step->set_precision(Precision::FULL);
-            else if(is_equal(value, "SINGLE") || is_equal(value, "MIXED")) t_step->set_precision(Precision::MIXED);
+            else if(is_equal_any(value, "DOUBLE", "FULL")) t_step->set_precision(Precision::FULL);
+            else if(is_equal_any(value, "SINGLE", "MIXED")) t_step->set_precision(Precision::MIXED);
             else
                 suanpan_error("A valid precision is required.\n");
         }
-        else if(is_equal(property_id, "tolerance") || is_equal(property_id, "fgmres_tolerance")) {
+        else if(is_equal_any(property_id, "tolerance", "fgmres_tolerance")) {
             double value;
             get_input(command, value) ? t_step->set_tolerance(value) : suanpan_error("A valid value is required.\n");
         }
@@ -1214,7 +1214,7 @@ namespace {
             suanpan_info("SUANPAN_NUM_THREADS: {}\n", SUANPAN_NUM_THREADS);
         else if(is_equal(object_type, "num_nodes"))
             suanpan_info("SUANPAN_NUM_NODES: {}\n", SUANPAN_NUM_NODES);
-        else if(is_equal(object_type, "statistics") || is_equal(object_type, "stats")) {
+        else if(is_equal_any(object_type, "statistics", "stats")) {
             suanpan_info("Updating element trial status used:\n\t{:.5E} s.\n", domain->stats<Statistics::UpdateStatus>());
             suanpan_info("Assembling global vector used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleVector>());
             suanpan_info("Assembling global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleMatrix>());
@@ -1351,7 +1351,7 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream& command) 
     std::string command_id;
     if(!get_input(command, command_id)) return SUANPAN_SUCCESS;
 
-    if(is_equal(command_id, "exit") || is_equal(command_id, "quit")) return SUANPAN_EXIT;
+    if(is_equal_any(command_id, "exit", "quit")) return SUANPAN_EXIT;
 
     if(is_equal(command_id, "overview")) {
         overview();
@@ -1456,9 +1456,9 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream& command) 
     };
 
     if(is_equal(command_id, "constraint")) return create_new_constraint(domain, command);
-    if(is_equal(command_id, "embed2d") || is_equal(command_id, "embed3d")) return constraint_handler();
-    if(is_equal(command_id, "finiterestitutionwall") || is_equal(command_id, "finiterestitutionwallpenalty")) return constraint_handler();
-    if(is_equal(command_id, "finiterigidwall") || is_equal(command_id, "finiterigidwallpenalty")) return constraint_handler();
+    if(is_equal_any(command_id, "embed2d", "embed3d")) return constraint_handler();
+    if(is_equal_any(command_id, "finiterestitutionwall", "finiterestitutionwallpenalty")) return constraint_handler();
+    if(is_equal_any(command_id, "finiterigidwall", "finiterigidwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "finiterigidwallmultiplier")) return constraint_handler();
     if(is_equal(command_id, "fix")) return constraint_handler();
     if(is_equal(command_id, "fix2")) return constraint_handler();
@@ -1466,19 +1466,19 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream& command) 
     if(is_equal(command_id, "fixedlength3d")) return constraint_handler();
     if(is_equal(command_id, "groupmultiplierbc")) return constraint_handler();
     if(is_equal(command_id, "grouppenaltybc")) return constraint_handler();
-    if(is_equal(command_id, "maxforce2d") || is_equal(command_id, "maxforce3d")) return constraint_handler();
-    if(is_equal(command_id, "maxgap2d") || is_equal(command_id, "maxgap3d")) return constraint_handler();
-    if(is_equal(command_id, "mingap2d") || is_equal(command_id, "mingap3d")) return constraint_handler();
+    if(is_equal_any(command_id, "maxforce2d", "maxforce3d")) return constraint_handler();
+    if(is_equal_any(command_id, "maxgap2d", "maxgap3d")) return constraint_handler();
+    if(is_equal_any(command_id, "mingap2d", "mingap3d")) return constraint_handler();
     if(is_equal(command_id, "mpc")) return constraint_handler();
     if(is_equal(command_id, "multiplierbc")) return constraint_handler();
     if(is_equal(command_id, "nodefacet")) return constraint_handler();
     if(is_equal(command_id, "nodeline")) return constraint_handler();
-    if(is_equal(command_id, "particlecollision2d") || is_equal(command_id, "particlecollision3d")) return constraint_handler();
+    if(is_equal_any(command_id, "particlecollision2d", "particlecollision3d")) return constraint_handler();
     if(is_equal(command_id, "penaltybc")) return constraint_handler();
-    if(is_equal(command_id, "restitutionwall") || is_equal(command_id, "restitutionwallpenalty")) return constraint_handler();
-    if(is_equal(command_id, "rigidwall") || is_equal(command_id, "rigidwallpenalty")) return constraint_handler();
+    if(is_equal_any(command_id, "restitutionwall", "restitutionwallpenalty")) return constraint_handler();
+    if(is_equal_any(command_id, "rigidwall", "rigidwallpenalty")) return constraint_handler();
     if(is_equal(command_id, "rigidwallmultiplier")) return constraint_handler();
-    if(is_equal(command_id, "sleeve2d") || is_equal(command_id, "sleeve3d")) return constraint_handler();
+    if(is_equal_any(command_id, "sleeve2d", "sleeve3d")) return constraint_handler();
 
     // testers
     if(is_equal(command_id, "materialtest1d")) return test_material(domain, command, 1);
@@ -1509,7 +1509,7 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream& command) 
 
     if(is_equal(command_id, "precheck")) return model->precheck();
 
-    if(is_equal(command_id, "analyze") || is_equal(command_id, "analyse")) {
+    if(is_equal_any(command_id, "analyze", "analyse")) {
         const auto options = get_remaining(command);
         if(SUANPAN_WARNING_COUNT > 0 && !if_contain(options, "ignore_warning") && !if_contain(options, "ignore-warning")) {
             suanpan_warning("There are {} warnings, please fix them first or use `ignore-warning` to ignore them.\n", SUANPAN_WARNING_COUNT);
@@ -1585,7 +1585,7 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream& command) 
         return SUANPAN_SUCCESS;
     }
 
-    if(is_equal(command_id, "terminal") || is_equal(command_id, "t")) {
+    if(is_equal_any(command_id, "terminal", "t")) {
         execute_command(command);
         return SUANPAN_SUCCESS;
     }

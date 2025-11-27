@@ -77,9 +77,17 @@ bool Node::validate_dof(const std::vector<DOF>& in) const {
     return true;
 }
 
-unsigned Node::get_dof_number() const { return num_dof; }
+std::vector<uword> Node::get_dof(const std::vector<DOF>& seed) const {
+    const auto contains = [&](const DOF target) {
+        // ReSharper disable once CppUseRangeAlgorithm
+        return std::find(seed.begin(), seed.end(), target) != seed.end();
+    };
 
-const std::vector<Node::DOF>& Node::get_dof_identifier() const { return dof_identifier; }
+    std::vector<uword> active_dof;
+    for(auto J = 0u; J < num_dof; ++J)
+        if(contains(dof_identifier[J])) active_dof.emplace_back(reordered_dof[J]);
+    return active_dof;
+}
 
 void Node::set_original_dof(unsigned& F) {
     original_dof.set_size(num_dof);

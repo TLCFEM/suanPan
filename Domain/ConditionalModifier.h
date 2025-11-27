@@ -33,12 +33,10 @@
 #ifndef CONDITIONALMODIFIER_H
 #define CONDITIONALMODIFIER_H
 
+#include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 #include <Toolbox/ResourceHolder.h>
-#include <set>
-
-class DomainBase;
 
 class ConditionalModifier : public UniqueTag {
     const unsigned amplitude_tag;
@@ -47,24 +45,35 @@ class ConditionalModifier : public UniqueTag {
 
     ResourceHolder<Amplitude> amplitude;
 
+    // indicate which DOF components of the target nodes/elements shall be found
+    // the modifier itself will apply itself to those active components
+    const std::vector<Node::DOF> dof_component;
+
+    bool validate_dof(const shared_ptr<DomainBase>&);
     uvec update_active_dof(const shared_ptr<DomainBase>&);
 
 protected:
     unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};
 
-    const uvec dof_reference; // reference DoF ZERO based
-    const std::set<Node::DOF> dof_identifier;
+    // indicate the order of DOF components
+    // used to validate of the problem is compatible
+    // the target nodes must have the exact order of DoFs
+    // it can be empty such that the order check is not performed
+    const std::vector<Node::DOF> dof_order;
 
     uvec target_node, target_dof;
 
     [[nodiscard]] double get_amplitude(const shared_ptr<DomainBase>&) const;
 
+    const std::vector<Node::DOF>& get_dof_component() const;
+
 public:
     ConditionalModifier(
-        unsigned, // tag
-        unsigned, // amplitude tag
-        uvec&&,   // node tag
-        uvec&&    // dof tag
+        unsigned,                 // tag
+        unsigned,                 // amplitude tag
+        uvec&&,                   // object tag
+        std::vector<Node::DOF>&&, // dof order
+        std::vector<Node::DOF>&&  // dof component (unordered)
     );
 
     virtual int initialize(const shared_ptr<DomainBase>&);
@@ -130,6 +139,8 @@ protected:
 public:
     explicit GroupModifier(uvec&&);
 };
+
+std::vector<Node::DOF> parse_dof(std::string_view);
 
 #endif
 

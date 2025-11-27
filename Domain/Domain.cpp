@@ -1094,7 +1094,11 @@ int Domain::initialize() {
 }
 
 int Domain::initialize_load() {
-    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
+    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) {
+        if(!t_load.second->validate_step(shared_from_this()) || t_load.second->is_initialized() || SUANPAN_SUCCESS == t_load.second->initialize(shared_from_this())) return;
+        suanpan_warning("Load {} is disabled due to initialization error.\n", t_load.first);
+        disable_load(t_load.first);
+    });
     load_pond.update();
 
     factory->update_reference_size();
@@ -1103,7 +1107,11 @@ int Domain::initialize_load() {
 }
 
 int Domain::initialize_constraint() {
-    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
+    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) {
+        if(!t_constraint.second->validate_step(shared_from_this()) || t_constraint.second->is_initialized() || SUANPAN_SUCCESS == t_constraint.second->initialize(shared_from_this())) return;
+        suanpan_warning("Constraint {} is disabled due to initialization error.\n", t_constraint.first);
+        disable_constraint(t_constraint.first);
+    });
     constraint_pond.update();
 
     return SUANPAN_SUCCESS;

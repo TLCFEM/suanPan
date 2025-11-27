@@ -17,49 +17,55 @@
 
 #include "ConditionalModifier.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Node.h>
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
+bool ConditionalModifier::validate_dof(const shared_ptr<DomainBase>& D) {
+    const auto not_valid = [&](const shared_ptr<Node>& node) { return node && node->is_active() && !node->validate_dof(dof_order); };
+
+    if(target_node.is_empty())
+        for(auto& node : D->get_node_pool()) {
+            if(not_valid(node)) return false;
+        }
+    else
+        for(const auto tag : target_node) {
+            if(not_valid(D->get<Node>(tag))) return false;
+        }
+
+    return true;
+}
+
 uvec ConditionalModifier::update_active_dof(const shared_ptr<DomainBase>& D) {
+    const auto& ref_component = get_dof_component();
+
+    if(ref_component.empty()) return {};
+
     std::vector<uword> active_dof;
 
     const auto check = [&](const shared_ptr<Node>& node) {
         if(!node || !node->is_active()) return;
-        auto& t_dof = node->get_reordered_dof();
-        for(const auto J : dof_reference)
-            if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
+        suanpan::append_to(active_dof, node->get_dof(ref_component));
     };
 
     if(target_node.is_empty())
         for(auto& node : D->get_node_pool()) check(node);
     else
-        for(const auto I : target_node) check(D->get<Node>(I));
+        for(const auto tag : target_node) check(D->get<Node>(tag));
 
     return active_dof;
-
-    // const auto check = [&](const shared_ptr<Node>& node) {
-    //     if(!node || !node->is_active()) return;
-    //     auto& t_dof = node->get_reordered_dof();
-    //     auto& t_identifier = node->get_dof_identifier();
-    //     for(auto J = 0u; J < node->get_dof_number(); ++J)
-    //         if(dof_identifier.contains(t_identifier[J])) active_dof.emplace_back(t_dof[J]);
-    // };
-    //
-    // if(target_object.is_empty())
-    //     for(auto& node : D->get_node_pool()) check(node);
-    // else
-    //     for(const auto tag : target_object) check(D->get<Node>(tag));
 }
 
 double ConditionalModifier::get_amplitude(const shared_ptr<DomainBase>& D) const { return amplitude->get_amplitude(D->get_factory()->get_trial_time()); }
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& N, uvec&& D)
+const std::vector<Node::DOF>& ConditionalModifier::get_dof_component() const { return dof_component.empty() ? dof_order : dof_component; }
+
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& OT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC)
     : UniqueTag(T)
     , amplitude_tag(AT)
-    , dof_reference(D - 1)
-    , target_node(std::move(N)) {}
+    , dof_component(std::move(DC))
+    , dof_order(std::move(DO))
+    , target_node(std::move(OT)) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     amplitude = D->get<Amplitude>(amplitude_tag);
@@ -72,6 +78,8 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
         start_time += t_step->get_time_period();
     }
     amplitude->set_start_time(start_time);
+
+    if(!validate_dof(D)) return SUANPAN_FAIL;
 
     target_dof = update_active_dof(D);
 
@@ -110,3 +118,33 @@ GroupModifier::GroupModifier(uvec&& N)
     : groups(std::move(N)) {}
 
 uvec GroupModifier::update_object_tag(const shared_ptr<DomainBase>& D) const { return D->flatten_group(groups); }
+
+std::vector<Node::DOF> parse_dof(const std::string_view token) {
+    if(is_equal_any(token, "PINNED", "P")) return std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
+    if(is_equal_any(token, "ENCASTRE", "E")) return std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3};
+    if(is_equal_any(token, "XSYMM", "X")) return std::vector{Node::DOF::U1, Node::DOF::UR2, Node::DOF::UR3};
+    if(is_equal_any(token, "YSYMM", "Y")) return std::vector{Node::DOF::UR1, Node::DOF::U2, Node::DOF::UR3};
+    if(is_equal_any(token, "ZSYMM", "Z")) return std::vector{Node::DOF::UR1, Node::DOF::UR2, Node::DOF::U3};
+    if(is_equal_any(token, "1", "U1")) return std::vector{Node::DOF::U1};
+    if(is_equal_any(token, "2", "U2")) return std::vector{Node::DOF::U2};
+    if(is_equal_any(token, "3", "U3")) return std::vector{Node::DOF::U3};
+    if(is_equal_any(token, "4", "U4", "UR1")) return std::vector{Node::DOF::UR1};
+    if(is_equal_any(token, "5", "U5", "UR2")) return std::vector{Node::DOF::UR2};
+    if(is_equal_any(token, "6", "U6", "UR3")) return std::vector{Node::DOF::UR3};
+    if(is_equal(token, "FU1")) return std::vector{Node::DOF::FU1};
+    if(is_equal(token, "FU2")) return std::vector{Node::DOF::FU2};
+    if(is_equal(token, "FU3")) return std::vector{Node::DOF::FU3};
+    if(is_equal(token, "FUR1")) return std::vector{Node::DOF::FUR1};
+    if(is_equal(token, "FUR2")) return std::vector{Node::DOF::FUR2};
+    if(is_equal(token, "FUR3")) return std::vector{Node::DOF::FUR3};
+    if(is_equal(token, "RADIAL")) return std::vector{Node::DOF::RADIAL};
+    if(is_equal(token, "AXIAL")) return std::vector{Node::DOF::AXIAL};
+    if(is_equal(token, "RS")) return std::vector{Node::DOF::RS};
+    if(is_equal(token, "RW")) return std::vector{Node::DOF::RW};
+    if(is_equal(token, "DAMAGE")) return std::vector{Node::DOF::DAMAGE};
+    if(is_equal(token, "PRESSURE")) return std::vector{Node::DOF::PRESSURE};
+    if(is_equal(token, "TEMPERATURE")) return std::vector{Node::DOF::TEMPERATURE};
+    if(is_equal(token, "WARP")) return std::vector{Node::DOF::WARP};
+
+    return {};
+}

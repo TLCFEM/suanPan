@@ -3029,8 +3029,8 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
 
     if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
     else if(is_equal(section_id, "Box3D")) new_box3d(new_section, command);
-    else if(is_equal(section_id, "Cell2D") || is_equal(section_id, "Bar2D")) new_cell2d(new_section, command);
-    else if(is_equal(section_id, "Cell3D") || is_equal(section_id, "Bar3D")) new_cell3d(new_section, command);
+    else if(is_equal_any(section_id, "Cell2D", "Bar2D")) new_cell2d(new_section, command);
+    else if(is_equal_any(section_id, "Cell3D", "Bar3D")) new_cell3d(new_section, command);
     else if(is_equal(section_id, "Cell3DOS")) new_cell3dos(new_section, command);
     else if(is_equal(section_id, "Circle1D")) new_circle1d(new_section, command);
     else if(is_equal(section_id, "Circle2D")) new_circle2d(new_section, command);

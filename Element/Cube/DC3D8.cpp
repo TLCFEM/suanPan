@@ -41,7 +41,7 @@ DC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
 }
 
 DC3D8::DC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
-    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DMG})
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE})
     , release_rate(RR) { access::rw(characteristic_length) = CL; }
 
 int DC3D8::initialize(const shared_ptr<DomainBase>& D) {

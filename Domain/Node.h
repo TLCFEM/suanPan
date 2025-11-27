@@ -39,6 +39,7 @@
 #define NODE_H
 
 #include <Domain/Tag.h>
+#include <set>
 
 class DomainBase;
 enum class OutputType;
@@ -80,25 +81,26 @@ class Node final : protected NodeData, public UniqueTag {
 public:
     enum class DOF : std::uint8_t {
         NONE,
-        U1,
-        // displacement in x direction
-        U2,
-        // displacement in y direction
-        U3,
-        // displacement in z direction
-        UR1,
-        // rotation in x direction
-        UR2,
-        // rotation in y direction
-        UR3,
-        // rotation in z direction
-        DMG,
-        // damage
-        P,
-        // pressure
-        T,
-        // temperature
-        WARP // warping
+        U1,          // displacement in x direction
+        U2,          // displacement in y direction
+        U3,          // displacement in z direction
+        UR1,         // rotation in x direction
+        UR2,         // rotation in y direction
+        UR3,         // rotation in z direction
+        FU1,         // fluid displacement
+        FU2,         // fluid displacement
+        FU3,         // fluid displacement
+        FUR1,        // fluid rotation
+        FUR2,        // fluid rotation
+        FUR3,        // fluid rotation
+        RADIAL,      // radius direction in axis-symmetric problem
+        AXIAL,       // axial direction in axis-symmetric problem or single section elements
+        RS,          // strong axis rotation
+        RW,          // weak axis rotation
+        DAMAGE,      // damage
+        PRESSURE,    // pressure
+        TEMPERATURE, // temperature
+        WARP         // warping
     };
 
 private:
@@ -115,9 +117,7 @@ public:
 
     void ensure_dof(unsigned, const std::vector<DOF>&);
     [[nodiscard]] bool validate_dof(const std::vector<DOF>&) const;
-
-    [[nodiscard]] unsigned get_dof_number() const;
-    [[nodiscard]] const std::vector<DOF>& get_dof_identifier() const;
+    [[nodiscard]] std::vector<uword> get_dof(const std::vector<DOF>&) const;
 
     void set_original_dof(unsigned&);
     [[nodiscard]] const uvec& get_original_dof() const;

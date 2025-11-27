@@ -19,7 +19,6 @@
 #include "ConstraintParser.h"
 
 #include <Constraint/Constraint>
-#include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Recorder/OutputType.h>
 
@@ -31,26 +30,14 @@ namespace {
             return;
         }
 
-        std::string dof_id;
-        if(!get_input(command, dof_id)) {
+        std::string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
 
-        uvec dof_pool;
-        if(const auto bc_type = suanpan::to_lower(dof_id[0]); 'p' == bc_type) dof_pool = uvec{1, 2, 3};
-        else if('e' == bc_type) dof_pool = uvec{1, 2, 3, 4, 5, 6};
-        else if('x' == bc_type) dof_pool = uvec{1, 5, 6};
-        else if('y' == bc_type) dof_pool = uvec{2, 4, 6};
-        else if('z' == bc_type) dof_pool = uvec{3, 4, 5};
-        else if('1' == bc_type) dof_pool = uvec{1};
-        else if('2' == bc_type) dof_pool = uvec{2};
-        else if('3' == bc_type) dof_pool = uvec{3};
-        else if('4' == bc_type) dof_pool = uvec{4};
-        else if('5' == bc_type) dof_pool = uvec{5};
-        else if('6' == bc_type) dof_pool = uvec{6};
-        else if('7' == bc_type) dof_pool = uvec{7};
-        else {
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }
@@ -528,30 +515,30 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
 
     if(is_equal(constraint_id, "Embed2D")) new_embed(new_constraint, command, 2);
     else if(is_equal(constraint_id, "Embed3D")) new_embed(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "FiniteRestitutionWall") || is_equal(constraint_id, "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, true);
-    else if(is_equal(constraint_id, "FiniteRigidWall") || is_equal(constraint_id, "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
+    else if(is_equal_any(constraint_id, "FiniteRestitutionWall", "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, true);
+    else if(is_equal_any(constraint_id, "FiniteRigidWall", "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "Fix") || is_equal(constraint_id, "PenaltyBC")) new_bc(new_constraint, command, true, false);
-    else if(is_equal(constraint_id, "Fix2") || is_equal(constraint_id, "MultiplierBC")) new_bc(new_constraint, command, false, false);
-    else if(is_equal(constraint_id, "FixedLength2D") || is_equal(constraint_id, "R2D2")) new_fixedlength(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "FixedLength3D") || is_equal(constraint_id, "R3D2")) new_fixedlength(new_constraint, command, 3);
+    else if(is_equal_any(constraint_id, "Fix", "PenaltyBC")) new_bc(new_constraint, command, true, false);
+    else if(is_equal_any(constraint_id, "Fix2", "MultiplierBC")) new_bc(new_constraint, command, false, false);
+    else if(is_equal_any(constraint_id, "FixedLength2D", "R2D2")) new_fixedlength(new_constraint, command, 2);
+    else if(is_equal_any(constraint_id, "FixedLength3D", "R3D2")) new_fixedlength(new_constraint, command, 3);
     else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "LinearSpring2D")) new_linearspring(new_constraint, command, 2);
     else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "MaximumForce2D") || is_equal(constraint_id, "MaxForce2D")) new_maxforce(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "MaximumForce3D") || is_equal(constraint_id, "MaxForce3D")) new_maxforce(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "MaximumGap2D") || is_equal(constraint_id, "MaxGap2D")) new_maximumgap(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "MaximumGap3D") || is_equal(constraint_id, "MaxGap3D")) new_maximumgap(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "MinimumGap2D") || is_equal(constraint_id, "MinGap2D")) new_minimumgap(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "MinimumGap3D") || is_equal(constraint_id, "MinGap3D")) new_minimumgap(new_constraint, command, 3);
+    else if(is_equal_any(constraint_id, "MaximumForce2D", "MaxForce2D")) new_maxforce(new_constraint, command, 2);
+    else if(is_equal_any(constraint_id, "MaximumForce3D", "MaxForce3D")) new_maxforce(new_constraint, command, 3);
+    else if(is_equal_any(constraint_id, "MaximumGap2D", "MaxGap2D")) new_maximumgap(new_constraint, command, 2);
+    else if(is_equal_any(constraint_id, "MaximumGap3D", "MaxGap3D")) new_maximumgap(new_constraint, command, 3);
+    else if(is_equal_any(constraint_id, "MinimumGap2D", "MinGap2D")) new_minimumgap(new_constraint, command, 2);
+    else if(is_equal_any(constraint_id, "MinimumGap3D", "MinGap3D")) new_minimumgap(new_constraint, command, 3);
     else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
     else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
     else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
     else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision(new_constraint, command, 2);
     else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision(new_constraint, command, 3);
-    else if(is_equal(constraint_id, "RestitutionWall") || is_equal(constraint_id, "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
-    else if(is_equal(constraint_id, "RigidWall") || is_equal(constraint_id, "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
+    else if(is_equal_any(constraint_id, "RestitutionWall", "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
+    else if(is_equal_any(constraint_id, "RigidWall", "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
     else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve(new_constraint, command, 2);
     else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve(new_constraint, command, 3);

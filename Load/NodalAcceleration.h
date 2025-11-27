@@ -31,16 +31,16 @@
 #ifndef ACCELERATION_H
 #define ACCELERATION_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class NodalAcceleration final : public Load {
 public:
     NodalAcceleration(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        uvec&&,   // dof tags
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tags
+        unsigned                  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;

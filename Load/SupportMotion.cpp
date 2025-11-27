@@ -17,14 +17,12 @@
 
 #include "SupportMotion.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/Amplitude/Amplitude.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
-SupportMotion::SupportMotion(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), std::move(D), L) {}
+SupportMotion::SupportMotion(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : Load(T, AT, std::move(N), {}, std::move(D), L) {}
 
 int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
     set_end_step(start_step + 1);

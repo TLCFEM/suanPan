@@ -31,15 +31,15 @@
 #ifndef REFERENCEFORCE_H
 #define REFERENCEFORCE_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class ReferenceForce final : public Load {
 public:
     ReferenceForce(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        unsigned  // dof tag
+        unsigned,                // tag
+        double,                  // magnitude
+        uvec&&,                  // node tags
+        std::vector<Node::DOF>&& // dof tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;

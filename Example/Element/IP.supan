@@ -42,7 +42,7 @@ element B21 16 1 2 1 20 1
 element B21 17 1 2 1 4 1
 # element EB21 1 1 2 12 1 1 1
 
-fix 1 P 1
+fix 1 E 1
 
 cload 1 0 100 2 2
 

@@ -9,7 +9,7 @@ section Rectangle2D 1 12 1 1
 
 element B21H 1 1 2 1 5
 
-fix 1 P 1
+fix 1 E 1
 
 cload 1 0 1 2 2
 

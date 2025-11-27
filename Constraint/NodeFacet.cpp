@@ -17,9 +17,7 @@
 
 #include "NodeFacet.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Toolbox/tensor.h>
 
 std::vector<vec> NodeFacet::get_position(const shared_ptr<DomainBase>& D) {
@@ -32,10 +30,10 @@ std::vector<vec> NodeFacet::get_position(const shared_ptr<DomainBase>& D) {
 }
 
 NodeFacet::NodeFacet(const unsigned T, const unsigned A, uvec&& N)
-    : Constraint(T, A, std::move(N), uvec{1, 2, 3}, 1) {}
+    : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1) {}
 
 int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 
     return Constraint::initialize(D);
 }
@@ -53,11 +51,11 @@ int NodeFacet::process(const shared_ptr<DomainBase>& D) {
 
     const auto pen = dot(s_i, outer_normal);
 
-    if(0 == lagrangian_size && (pen > 0. || dot(node[s] - node[j], cross(edge_i, outer_normal)) > 0. || dot(node[s] - node[k], cross(edge_j, outer_normal)) > 0. || dot(s_i, cross(edge_k, outer_normal)) > 0.)) return SUANPAN_SUCCESS;
+    if(0u == lagrangian_size && (pen > 0. || dot(node[s] - node[j], cross(edge_i, outer_normal)) > 0. || dot(node[s] - node[k], cross(edge_j, outer_normal)) > 0. || dot(s_i, cross(edge_k, outer_normal)) > 0.)) return SUANPAN_SUCCESS;
 
-    set_multiplier_size(1);
+    set_multiplier_size(1u);
 
-    const span span_i(0, 2), span_j(3, 5), span_k(6, 8), span_s(9, 11);
+    static const span span_i(0, 2), span_j(3, 5), span_k(6, 8), span_s(9, 11);
 
     auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
     auxiliary_resistance = pen;
@@ -100,15 +98,15 @@ void NodeFacet::update_status(const vec& i_lambda) { trial_lambda += i_lambda; }
 
 void NodeFacet::commit_status() {
     current_lambda = trial_lambda;
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 void NodeFacet::clear_status() {
     current_lambda = trial_lambda.zeros();
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 void NodeFacet::reset_status() {
     trial_lambda = current_lambda;
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }

@@ -151,7 +151,7 @@ element SGCMQI 62 77 82 83 78 1 1
 element SGCMQI 63 78 83 84 79 1 1
 element SGCMQI 64 79 84 85 80 1 1
 
-fix2 1 P 1 2 3 4 5
+fix2 1 E 1 2 3 4 5
 
 displacement 1 0 .02 2 84 83 82
 displacement 2 0 .01 2 85 81

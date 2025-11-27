@@ -31,16 +31,16 @@
 #ifndef SUPPORTMOTION_H
 #define SUPPORTMOTION_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class SupportMotion : public Load {
 public:
     SupportMotion(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        uvec&&,   // dof tags
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tags
+        unsigned                  // amplitude tag
     );
 
     [[nodiscard]] bool if_displacement_control() const final { return true; }

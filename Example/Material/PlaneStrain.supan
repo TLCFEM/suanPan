@@ -151,7 +151,7 @@ element CP4 62 77 82 83 78 1 1
 element CP4 63 78 83 84 79 1 1
 element CP4 64 79 84 85 80 1 1
 
-fix 1 P 1 2 3 4 5
+fix 1 E 1 2 3 4 5
 
 cload 1 0 2 2 84 83 82
 cload 2 0 1 2 85 81

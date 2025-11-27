@@ -4,9 +4,6 @@
     <Filter Include="Constraint">
       <UniqueIdentifier>{2319a38c-547b-4f6c-8853-a5d93b9abd67}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Constraint\BC">
-      <UniqueIdentifier>{646eca21-97d8-4efc-b1e5-869fa75c997a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Constraint\Criterion">
       <UniqueIdentifier>{924e01ed-13db-412b-bbdb-986acc1a9464}</UniqueIdentifier>
     </Filter>
@@ -222,9 +219,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Constraint\BC\BC.cpp">
-      <Filter>Constraint\BC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
       <Filter>Constraint\Criterion</Filter>
     </ClCompile>
@@ -529,15 +523,6 @@
       <Filter>Element</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Load\BodyForce.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupBodyForce.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupNodalDisplacement.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupNodalForce.cpp">
       <Filter>Load</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Load\Load.cpp">
@@ -1570,11 +1555,11 @@
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\Balloon1D.cpp">
       <Filter>Material\Material1D\vonMises</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\BC.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Constraint\BC\BC.h">
-      <Filter>Constraint\BC</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
       <Filter>Constraint\Criterion</Filter>
     </ClInclude>
@@ -1915,15 +1900,6 @@
       <Filter>Element</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Load\BodyForce.h">
-      <Filter>Load</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupBodyForce.h">
-      <Filter>Load</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupNodalDisplacement.h">
-      <Filter>Load</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupNodalForce.h">
       <Filter>Load</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Load\Load.h">
@@ -2940,6 +2916,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\Balloon1D.h">
       <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\BC.h">
+      <Filter>Constraint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

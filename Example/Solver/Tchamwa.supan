@@ -14,7 +14,7 @@ element Mass 5 2 20 1 2
 element Mass 6 3 30 1 2
 element Mass 7 4 40 1 2
 
-fix2 1 P 1
+fix2 1 E 1
 
 initial velocity 25 1 3
 

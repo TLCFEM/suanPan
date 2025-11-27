@@ -40,7 +40,7 @@ vec CAX4::isoparametric_mapping(const vec& in) {
 }
 
 CAX4::CAX4(const unsigned T, uvec&& N, const unsigned M, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F) {}
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {Node::DOF::RADIAL, Node::DOF::AXIAL}) {}
 
 int CAX4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));

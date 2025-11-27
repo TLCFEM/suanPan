@@ -17,12 +17,10 @@
 
 #include "Load.h"
 
-#include <Domain/DomainBase.h>
-
 double Load::multiplier = 1E8;
 
-Load::Load(const unsigned T, const unsigned AT, uvec&& NT, uvec&& DT, const double PT)
-    : ConditionalModifier(T, AT, std::move(NT), std::move(DT))
+Load::Load(const unsigned T, const unsigned AT, uvec&& NT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC, const double PT)
+    : ConditionalModifier(T, AT, std::move(NT), std::move(DO), std::move(DC))
     , magnitude(PT) {}
 
 const vec& Load::get_trial_load() const { return trial_load; }

@@ -11,7 +11,7 @@ element EB21 2 2 3 12 1 1
 
 constraint RigidWallMultiplier 2 2 -1 0 1 1E2
 
-fix2 1 P 1
+fix2 1 E 1
 
 displacement 1 0 -.6 2 2
 

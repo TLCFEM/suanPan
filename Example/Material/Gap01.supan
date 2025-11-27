@@ -12,7 +12,7 @@ element T2D2 2 3 2 1 10
 element T2D2 3 1 2 2 10
 element T2D2 4 3 2 2 10
 
-fix2 1 P 1
+fix2 1 E 1
 fix2 2 2 2 3
 
 step static 1
