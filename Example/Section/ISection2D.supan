@@ -8,9 +8,9 @@ section ISection2D 1 200 25 100 25 150 25 1 6
 
 element SingleSection2D 1 1 1
 
-# fix 1 1 1
+# fix 1 axial 1
 
-displacement 1 0 3E-4 2 1
+displacement 1 0 3E-4 rs 1
 
 # hdf5recorder 1 Node RF 1
 

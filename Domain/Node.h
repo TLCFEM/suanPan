@@ -94,7 +94,9 @@ public:
         FUR2,        // fluid rotation
         FUR3,        // fluid rotation
         RADIAL,      // radius direction in axis-symmetric problem
-        AXIAL,       // axial direction in axis-symmetric problem
+        AXIAL,       // axial direction in axis-symmetric problem or single section elements
+        RS,          // strong axis rotation
+        RW,          // weak axis rotation
         DAMAGE,      // damage
         PRESSURE,    // pressure
         TEMPERATURE, // temperature

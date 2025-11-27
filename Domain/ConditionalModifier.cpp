@@ -139,6 +139,8 @@ std::vector<Node::DOF> parse_dof(const std::string_view token) {
     if(is_equal(token, "FUR3")) return std::vector{Node::DOF::FUR3};
     if(is_equal(token, "RADIAL")) return std::vector{Node::DOF::RADIAL};
     if(is_equal(token, "AXIAL")) return std::vector{Node::DOF::AXIAL};
+    if(is_equal(token, "RS")) return std::vector{Node::DOF::RS};
+    if(is_equal(token, "RW")) return std::vector{Node::DOF::RW};
     if(is_equal(token, "DAMAGE")) return std::vector{Node::DOF::DAMAGE};
     if(is_equal(token, "PRESSURE")) return std::vector{Node::DOF::PRESSURE};
     if(is_equal(token, "TEMPERATURE")) return std::vector{Node::DOF::TEMPERATURE};
