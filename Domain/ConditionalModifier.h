@@ -49,7 +49,7 @@ class ConditionalModifier : public UniqueTag {
     // the modifier itself will apply itself to those active components
     const std::vector<Node::DOF> dof_component;
 
-    bool validate_dof(const shared_ptr<DomainBase>&);
+    bool validate_node(const shared_ptr<DomainBase>&);
     uvec update_active_dof(const shared_ptr<DomainBase>&);
 
 protected:

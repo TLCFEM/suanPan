@@ -22,7 +22,7 @@
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
-bool ConditionalModifier::validate_dof(const shared_ptr<DomainBase>& D) {
+bool ConditionalModifier::validate_node(const shared_ptr<DomainBase>& D) {
     const auto not_valid = [&](const shared_ptr<Node>& node) { return node && node->is_active() ? !node->validate_dof(dof_order) : reject_invalid_object(); };
 
     if(target_node.is_empty())
@@ -79,7 +79,7 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     }
     amplitude->set_start_time(start_time);
 
-    if(!validate_dof(D)) return SUANPAN_FAIL;
+    if(!validate_node(D)) return SUANPAN_FAIL;
 
     target_dof = update_active_dof(D);
 
