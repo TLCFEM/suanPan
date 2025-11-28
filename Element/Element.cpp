@@ -333,6 +333,14 @@ bool Element::validate_dof(const std::vector<Node::DOF>& in) const {
     return true;
 }
 
+uvec Element::index_of(const std::vector<Node::DOF>& seed) const {
+    std::vector<uword> index;
+    for(const auto target : seed)
+        // ReSharper disable once CppUseRangeAlgorithm
+        if(const auto pos = std::find(dof_identifier.cbegin(), dof_identifier.cend(), target); pos != dof_identifier.cend()) index.emplace_back(std::distance(dof_identifier.cbegin(), pos));
+    return index;
+}
+
 const uvec& Element::get_material_tag() const { return material_tag; }
 
 const uvec& Element::get_section_tag() const { return section_tag; }

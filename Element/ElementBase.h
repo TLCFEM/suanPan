@@ -102,6 +102,7 @@ public:
     [[nodiscard]] virtual const std::vector<MappingDOF>& get_dof_mapping() const = 0;
 
     [[nodiscard]] virtual bool validate_dof(const std::vector<Node::DOF>&) const = 0;
+    [[nodiscard]] virtual uvec index_of(const std::vector<Node::DOF>&) const = 0;
 
     [[nodiscard]] virtual const uvec& get_material_tag() const = 0;
     [[nodiscard]] virtual const uvec& get_section_tag() const = 0;
