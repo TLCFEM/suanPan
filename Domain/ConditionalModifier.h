@@ -236,6 +236,8 @@ public:
 
 std::vector<Node::DOF> parse_dof(std::string_view);
 
+constexpr std::vector<Node::DOF> translational(const unsigned dimension) { return 2u == dimension ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}; }
+
 #endif
 
 //! @}

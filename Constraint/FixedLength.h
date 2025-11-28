@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class FixedLength
- * @brief A FixedLength class.
- *
- * The `FixedLength` constraint applies constraint to two nodes so that the
- * distance remain constant between those two nodes.
- *
  * @author tlc
  * @date 07/03/2021
  * @version 0.1.0
@@ -36,18 +30,25 @@
 
 #include <Domain/Factory.hpp>
 
+/**
+ * @class FixedLength
+ * @brief A FixedLength class.
+ *
+ * The `FixedLength` constraint applies constraint to two nodes so that the
+ * distance remain constant between those two nodes.
+ */
 template<unsigned DIM> class FixedLength : public Constraint {
     vec initial_chord;
+
+    [[nodiscard]] bool validate_node() const final { return true; }
 
 protected:
     bool min_bound = false, max_bound = false;
     double min_gap = 0., max_gap = 0.;
 
-    [[nodiscard]] bool validate_node() const final { return true; }
-
 public:
     FixedLength(const unsigned T, uvec&& N)
-        : Constraint(T, 0, 2u == DIM ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1) { target_node = std::move(N); }
+        : Constraint(T, 0, translational(DIM), {}, 1) { target_node = std::move(N); }
 
     int initialize(const shared_ptr<DomainBase>& D) override {
         if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
@@ -103,21 +104,28 @@ public:
 
     [[nodiscard]] bool is_connected() const override { return true; }
 
-    void update_status(const vec& incre_lambda) override { trial_lambda += incre_lambda; };
+    void update_status(const vec& incre_lambda) override { trial_lambda += incre_lambda; }
+
     void commit_status() override {
         current_lambda = trial_lambda;
         set_multiplier_size(0u);
     }
+
     void clear_status() override {
         current_lambda = trial_lambda.zeros();
         set_multiplier_size(0u);
     }
+
     void reset_status() override {
         trial_lambda = current_lambda;
         set_multiplier_size(0u);
     }
 };
 
+/**
+ * @class MinimumGap
+ * @brief A MinimumGap class.
+ */
 template<unsigned DIM> class MinimumGap final : public FixedLength<DIM> {
 public:
     MinimumGap(const unsigned T, const double M, uvec&& N)
@@ -127,6 +135,10 @@ public:
     }
 };
 
+/**
+ * @class MaximumGap
+ * @brief A MaximumGap class.
+ */
 template<unsigned DIM> class MaximumGap final : public FixedLength<DIM> {
 public:
     MaximumGap(const unsigned T, const double M, uvec&& N)
@@ -136,6 +148,10 @@ public:
     }
 };
 
+/**
+ * @class Sleeve
+ * @brief A Sleeve class.
+ */
 template<unsigned DIM> class Sleeve final : public FixedLength<DIM> {
 public:
     Sleeve(const unsigned T, const double M1, const double M2, uvec&& N)
@@ -147,11 +163,14 @@ public:
     }
 };
 
+/**
+ * @class MaxForce
+ * @brief A MaxForce class.
+ */
 template<unsigned DIM> class MaxForce final : public FixedLength<DIM> {
     const double max_force;
 
-    bool trial_flag = false;
-    bool current_flag = false;
+    bool trial_flag = false, current_flag = false;
 
 public:
     MaxForce(const unsigned T, const double MF, uvec&& N)
