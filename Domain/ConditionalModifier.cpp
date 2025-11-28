@@ -38,6 +38,17 @@ bool ConditionalModifier::validate_node_impl(const shared_ptr<DomainBase>& D) {
 }
 
 bool ConditionalModifier::validate_element_impl(const shared_ptr<DomainBase>& D) {
+    const auto not_valid = [&](const shared_ptr<Element>& element) { return element && element->is_active() ? !element->validate_dof(dof_order) : reject_invalid_object(); };
+
+    if(target_element.is_empty())
+        for(auto& element : D->get_element_pool()) {
+            if(not_valid(element)) return false;
+        }
+    else
+        for(const auto tag : target_element) {
+            if(not_valid(D->get<Element>(tag))) return false;
+        }
+
     return true;
 }
 
@@ -94,7 +105,7 @@ ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, st
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     amplitude = D->get<Amplitude>(amplitude_tag);
-    if(nullptr == amplitude || !amplitude->is_active()) amplitude = Ramp(0);
+    if(!amplitude || !amplitude->is_active()) amplitude = Ramp(0);
 
     auto start_time = 0.;
     // ReSharper disable once CppUseElementsView
@@ -131,7 +142,7 @@ std::set<uword> ConditionalModifier::get_involving_nodes(const shared_ptr<Domain
     return pool;
 }
 
-const uvec& ConditionalModifier::get_dof_encoding() const { return target_node_dof; }
+const uvec& ConditionalModifier::get_node_dof() const { return target_node_dof; }
 
 void ConditionalModifier::deinitialize() { initialized = false; }
 

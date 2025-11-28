@@ -137,7 +137,7 @@ public:
      */
     [[nodiscard]] std::set<uword> get_involving_nodes(const shared_ptr<DomainBase>&) const;
 
-    [[nodiscard]] const uvec& get_dof_encoding() const;
+    [[nodiscard]] const uvec& get_node_dof() const;
 
     void deinitialize();
     [[nodiscard]] bool is_initialized() const;

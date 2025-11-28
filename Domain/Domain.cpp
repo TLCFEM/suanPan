@@ -1362,7 +1362,7 @@ void Domain::assemble_load_stiffness() {}
 
 void Domain::assemble_constraint_stiffness() {
     for(auto& I : get_constraint_pool())
-        if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding());
+        if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_node_dof());
 }
 
 void Domain::save(std::string) {}
