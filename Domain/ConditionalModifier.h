@@ -100,7 +100,13 @@ public:
      */
     virtual void stage(const shared_ptr<DomainBase>&) {}
 
-    [[nodiscard]] const uvec& get_node_encoding() const;
+    /**
+     * \brief Return a set of all nodes involved.
+     * Some may define the interaction between nodes and elements.
+     * The nodes connected by elements are also found and returned.
+     */
+    [[nodiscard]] std::set<uword> get_involving_nodes(const shared_ptr<DomainBase>&) const;
+
     [[nodiscard]] const uvec& get_dof_encoding() const;
 
     void deinitialize();

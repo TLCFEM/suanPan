@@ -18,6 +18,7 @@
 #include "ConditionalModifier.h"
 
 #include <Domain/Node.h>
+#include <Element/Element.h>
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
@@ -89,7 +90,19 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 
 int ConditionalModifier::process_resistance(const shared_ptr<DomainBase>& D) { return process(D); }
 
-const uvec& ConditionalModifier::get_node_encoding() const { return target_node; }
+std::set<uword> ConditionalModifier::get_involving_nodes(const shared_ptr<DomainBase>& D) const {
+    std::set pool(target_node.cbegin(), target_node.cend());
+
+    for(const auto tag : target_element)
+        if(auto& element = D->get<Element>(tag)) {
+            // no need to check if the element is active
+            // the nodes will be checked anyway and if any is invalid the element will be disabled
+            auto& nodes = element->get_node_encoding();
+            pool.insert(nodes.cbegin(), nodes.cend());
+        }
+
+    return pool;
+}
 
 const uvec& ConditionalModifier::get_dof_encoding() const { return target_dof; }
 
