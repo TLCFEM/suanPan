@@ -23,7 +23,7 @@
 #include <Step/Step.h>
 
 bool ConditionalModifier::validate_node_impl(const shared_ptr<DomainBase>& D) {
-    const auto not_valid = [&](const shared_ptr<Node>& node) { return node && node->is_active() ? !node->validate_dof(dof_order) : reject_invalid_object(); };
+    const auto not_valid = [&](const shared_ptr<Node>& node) { return !node || !node->is_active() || !node->validate_dof(dof_order); };
 
     if(target_node.is_empty())
         for(auto& node : D->get_node_pool()) {
@@ -38,7 +38,7 @@ bool ConditionalModifier::validate_node_impl(const shared_ptr<DomainBase>& D) {
 }
 
 bool ConditionalModifier::validate_element_impl(const shared_ptr<DomainBase>& D) {
-    const auto not_valid = [&](const shared_ptr<Element>& element) { return element && element->is_active() ? !element->validate_dof(dof_order) : reject_invalid_object(); };
+    const auto not_valid = [&](const shared_ptr<Element>& element) { return !element || element->is_active() || !element->validate_dof(dof_order); };
 
     if(target_element.is_empty())
         for(auto& element : D->get_element_pool()) {

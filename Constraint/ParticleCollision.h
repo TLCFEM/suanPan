@@ -47,8 +47,6 @@ class ParticleCollision : public Constraint {
 
     [[nodiscard]] bool validate_node() const final { return true; }
 
-    [[nodiscard]] bool reject_invalid_object() const final { return true; }
-
 protected:
     const unsigned dimension;
 

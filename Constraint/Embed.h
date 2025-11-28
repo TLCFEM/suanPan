@@ -37,8 +37,6 @@ class Embed : public Constraint {
     [[nodiscard]] bool validate_node() const final { return true; }
     [[nodiscard]] bool validate_element() const final { return true; }
 
-    [[nodiscard]] bool reject_invalid_object() const final { return true; }
-
 public:
     Embed(
         unsigned, // unique constraint tag

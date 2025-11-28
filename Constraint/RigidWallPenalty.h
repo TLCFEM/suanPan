@@ -42,8 +42,6 @@ class RigidWallPenalty : public Constraint {
 
     [[nodiscard]] bool validate_node() const override { return true; }
 
-    [[nodiscard]] bool reject_invalid_object() const override { return true; }
-
 protected:
     const unsigned n_dim;
 

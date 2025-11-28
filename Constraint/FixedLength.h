@@ -45,8 +45,6 @@ protected:
 
     [[nodiscard]] bool validate_node() const final { return true; }
 
-    [[nodiscard]] bool reject_invalid_object() const final { return true; }
-
 public:
     FixedLength(unsigned, unsigned, uvec&&);
 

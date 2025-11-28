@@ -77,13 +77,6 @@ protected:
      */
     [[nodiscard]] virtual bool validate_element() const { return false; }
 
-    /**
-     * \brief Whether to flag failure on invalid nodes/elements.
-     *
-     * Modifiers always apply to valid and active nodes/elements.
-     */
-    [[nodiscard]] virtual bool reject_invalid_object() const { return false; }
-
     [[nodiscard]] double get_amplitude(const shared_ptr<DomainBase>&) const;
 
     /**

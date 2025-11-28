@@ -38,8 +38,6 @@ class NodeLine final : public Constraint {
 
     [[nodiscard]] bool validate_node() const override { return true; }
 
-    [[nodiscard]] bool reject_invalid_object() const override { return true; }
-
 public:
     NodeLine(unsigned, unsigned, uvec&&);
 
