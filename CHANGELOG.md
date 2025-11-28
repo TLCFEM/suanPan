@@ -8,6 +8,7 @@
 ## version 4.0
 
 1. (breaking) change the behaviour of `P` constraint token in 2D problems, it is no more blindly applied to the first 3 DoFs (which may contain rotational DoF in 2D problems) but the precise U1, U2 and U3 DoFs
+2. fix implementation of UDL [#317](https://github.com/TLCFEM/suanPan/pull/317)
 
 ## version 3.9
 
