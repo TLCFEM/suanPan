@@ -21,17 +21,8 @@
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
 
-std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
-    std::vector<vec> position;
-    position.reserve(target_node.n_elem);
-
-    for(const auto I : target_node) position.emplace_back(D->get<Node>(I)->trial_position(2u));
-
-    return position;
-}
-
 NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
-    : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2}, {}, 1) {}
+    : Constraint(T, A, {Node::DOF::U1, Node::DOF::U2}, {}, 1) { target_node = std::move(N); }
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
     set_multiplier_size(0u);
@@ -40,11 +31,13 @@ int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int NodeLine::process(const shared_ptr<DomainBase>& D) {
-    const auto node = get_position(D);
+    const auto node_i = D->get<Node>(target_node(0))->trial_position(2u);
+    const auto node_j = D->get<Node>(target_node(1))->trial_position(2u);
+    const auto node_k = D->get<Node>(target_node(2))->trial_position(2u);
 
-    const vec axis = node[1] - node[0];
+    const vec axis = node_j - node_i;
     const vec outer_normal = rotation * axis;
-    const vec position = node[2] - node[0];
+    const vec position = node_k - node_i;
 
     const auto pen = dot(position, outer_normal);
 
@@ -61,14 +54,14 @@ int NodeLine::process(const shared_ptr<DomainBase>& D) {
     const rowvec dpdj = position.t() * rotation;
 
     for(auto I = 0, J = 2, K = 4; I < 2; ++I, ++J, ++K) {
-        auxiliary_stiffness(target_dof(I)) = dpdi(I);
-        auxiliary_stiffness(target_dof(J)) = dpdj(I);
-        auxiliary_stiffness(target_dof(K)) = outer_normal(I);
+        auxiliary_stiffness(target_node_dof(I)) = dpdi(I);
+        auxiliary_stiffness(target_node_dof(J)) = dpdj(I);
+        auxiliary_stiffness(target_node_dof(K)) = outer_normal(I);
     }
 
     const mat factor = trial_lambda(0) * rotation;
 
-    stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
+    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem);
     stiffness(span_i, span_i) = factor.t() + factor;
     stiffness(span_i, span_j) = stiffness(span_k, span_i) = -(stiffness(span_k, span_j) = factor);
     stiffness(span_i, span_k) = stiffness(span_j, span_i) = -(stiffness(span_j, span_k) = factor.t());

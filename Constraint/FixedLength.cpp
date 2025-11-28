@@ -20,13 +20,13 @@
 #include <Domain/Factory.hpp>
 
 FixedLength::FixedLength(const unsigned T, const unsigned D, uvec&& N)
-    : Constraint(T, 0, std::move(N), 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1)
-    , dimension(D) {}
+    : Constraint(T, 0, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1)
+    , dimension(D) { target_node = std::move(N); }
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
-    coor = D->get<Node>(target_node(1))->initial_position(dimension) - D->get<Node>(target_node(0))->initial_position(dimension);
+    initial_chord = D->get<Node>(target_node(1))->initial_position(dimension) - D->get<Node>(target_node(0))->initial_position(dimension);
 
     set_multiplier_size(0u);
 
@@ -36,39 +36,39 @@ int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
 int FixedLength::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    const uvec dof_i = target_dof.head(dimension);
-    const uvec dof_j = target_dof.tail(dimension);
+    const uvec dof_i = target_node_dof.head(dimension), dof_j = target_node_dof.tail(dimension);
 
     const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
+    const vec t_chord = initial_chord + t_disp;
 
-    if(const auto t_gap = accu(square(coor + t_disp)); min_bound && max_bound) {
+    if(const auto t_gap = dot(t_chord, t_chord); min_bound && max_bound) {
         if(0u == lagrangian_size && t_gap > min_gap && t_gap < max_gap) return SUANPAN_SUCCESS;
 
-        auxiliary_load = (2. * std::sqrt(t_gap) < std::sqrt(min_gap) + std::sqrt(max_gap) ? min_gap : max_gap) - dot(coor, coor);
+        auxiliary_load = (2. * std::sqrt(t_gap) < std::sqrt(min_gap) + std::sqrt(max_gap) ? min_gap : max_gap) - dot(initial_chord, initial_chord);
     }
     else if(min_bound && !max_bound) {
         if(0u == lagrangian_size && t_gap > min_gap) return SUANPAN_SUCCESS;
 
-        auxiliary_load = min_gap - dot(coor, coor);
+        auxiliary_load = min_gap - dot(initial_chord, initial_chord);
     }
     else if(!min_bound && max_bound) {
         if(0u == lagrangian_size && t_gap < max_gap) return SUANPAN_SUCCESS;
 
-        auxiliary_load = max_gap - dot(coor, coor);
+        auxiliary_load = max_gap - dot(initial_chord, initial_chord);
     }
 
     set_multiplier_size(1u);
 
     auxiliary_stiffness.zeros(W->get_size(), lagrangian_size);
     auxiliary_resistance = 0.;
-    for(auto I = 0llu; I < dimension; ++I) {
-        auxiliary_stiffness(dof_i(I)) = -(auxiliary_stiffness(dof_j(I)) = 2. * (coor(I) + t_disp(I)));
-        auxiliary_resistance += t_disp(I) * (2. * coor(I) + t_disp(I));
+    for(auto I = 0u; I < dimension; ++I) {
+        auxiliary_stiffness(dof_i(I)) = -(auxiliary_stiffness(dof_j(I)) = 2. * t_chord(I));
+        auxiliary_resistance += t_disp(I) * (2. * initial_chord(I) + t_disp(I));
     }
 
-    stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
+    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem);
     const auto t_factor = 2. * trial_lambda(0);
-    for(auto I = 0llu; I < dimension; ++I) stiffness(I + dimension, I) = stiffness(I, I + dimension) = -(stiffness(I, I) = stiffness(I + dimension, I + dimension) = t_factor);
+    for(auto I = 0u; I < dimension; ++I) stiffness(I + dimension, I) = stiffness(I, I + dimension) = -(stiffness(I, I) = stiffness(I + dimension, I + dimension) = t_factor);
 
     resistance = auxiliary_stiffness * trial_lambda;
 
@@ -128,7 +128,7 @@ int MaxForce::process(const shared_ptr<DomainBase>& D) {
     if(0u == lagrangian_size) return SUANPAN_SUCCESS;
 
     vec nodal_resistance(dimension);
-    for(auto I = 0llu; I < nodal_resistance.n_elem; ++I) nodal_resistance(I) = resistance(target_dof(I));
+    for(auto I = 0llu; I < nodal_resistance.n_elem; ++I) nodal_resistance(I) = resistance(target_node_dof(I));
 
     if(norm(nodal_resistance) > max_force) {
         trial_flag = true;

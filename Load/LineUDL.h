@@ -34,6 +34,8 @@
 #include "Load.h"
 
 class LineUDL : public Load {
+    [[nodiscard]] bool validate_node() const final { return true; }
+
 protected:
     const unsigned dimension;
 

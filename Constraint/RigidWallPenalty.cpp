@@ -20,14 +20,14 @@
 #include <Domain/Factory.hpp>
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F, const unsigned NS)
-    : Constraint(T, A, {}, setup(NS), {}, 0)
+    : Constraint(T, A, setup(NS), {}, 0)
     , n_dim(NS)
     , alpha(F)
     , origin(std::move(O))
     , outer_norm(normalise(N)) {}
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F, const unsigned NS)
-    : Constraint(T, A, {}, setup(NS), {}, 0)
+    : Constraint(T, A, setup(NS), {}, 0)
     , n_dim(NS)
     , alpha(F)             // penalty factor
     , edge_a(E1)           // 3D vector
@@ -66,7 +66,7 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
         counter = next_counter;
     }
 
-    target_dof = pool;
+    target_node_dof = pool;
 
     return SUANPAN_SUCCESS;
 }

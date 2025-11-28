@@ -215,11 +215,10 @@ namespace {
         }
 
         uvec node_tag(3);
-        for(auto& I : node_tag)
-            if(!get_input(command, I)) {
-                suanpan_error("A valid node tag is required.\n");
-                return;
-            }
+        if(!get_input(command, node_tag)) {
+            suanpan_error("A valid node tag is required.\n");
+            return;
+        }
 
         return_obj = std::make_unique<NodeLine>(tag, 0, std::move(node_tag));
     }
@@ -232,11 +231,10 @@ namespace {
         }
 
         uvec node_tag(4);
-        for(auto& I : node_tag)
-            if(!get_input(command, I)) {
-                suanpan_error("A valid node tag is required.\n");
-                return;
-            }
+        if(!get_input(command, node_tag)) {
+            suanpan_error("A valid node tag is required.\n");
+            return;
+        }
 
         return_obj = std::make_unique<NodeFacet>(tag, 0, std::move(node_tag));
     }

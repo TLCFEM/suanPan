@@ -50,7 +50,6 @@ public:
     Load(
         unsigned,                 // tag
         unsigned,                 // amplitude tag
-        uvec&&,                   // node tag
         std::vector<Node::DOF>&&, // dof order
         std::vector<Node::DOF>&&, // dof component (unordered)
         double                    // nominal magnitude

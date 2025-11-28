@@ -222,6 +222,8 @@ public:
     [[nodiscard]] const std::vector<Node::DOF>& get_dof_identifier() const override;
     [[nodiscard]] const std::vector<MappingDOF>& get_dof_mapping() const override;
 
+    [[nodiscard]] bool validate_dof(const std::vector<Node::DOF>&) const override;
+
     [[nodiscard]] const uvec& get_material_tag() const override;
     [[nodiscard]] const uvec& get_section_tag() const override;
 

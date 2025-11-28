@@ -34,7 +34,8 @@
 class Embed : public Constraint {
     static constexpr unsigned max_iteration = 20u;
 
-    const unsigned element_tag;
+    [[nodiscard]] bool validate_node() const final { return true; }
+    [[nodiscard]] bool validate_element() const final { return true; }
 
 public:
     Embed(

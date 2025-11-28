@@ -20,14 +20,12 @@
 #include <Domain/Factory.hpp>
 
 ReferenceForce::ReferenceForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D)
-    : Load(T, 0, std::move(N), {}, std::move(D), L) {}
+    : Load(T, 0, {}, std::move(D), L) { target_node = std::move(N); }
 
 int ReferenceForce::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
+    reference_load.zeros(D->get_factory()->get_size());
 
-    reference_load.zeros(W->get_size());
-
-    for(const auto I : target_dof) reference_load(I) = magnitude;
+    for(const auto I : target_node_dof) reference_load(I) = magnitude;
 
     return SUANPAN_SUCCESS;
 }

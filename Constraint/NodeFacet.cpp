@@ -20,17 +20,8 @@
 #include <Domain/Factory.hpp>
 #include <Toolbox/tensor.h>
 
-std::vector<vec> NodeFacet::get_position(const shared_ptr<DomainBase>& D) {
-    std::vector<vec> position;
-    position.reserve(target_node.n_elem);
-
-    for(const auto I : target_node) position.emplace_back(D->get<Node>(I)->trial_position(3u));
-
-    return position;
-}
-
 NodeFacet::NodeFacet(const unsigned T, const unsigned A, uvec&& N)
-    : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1) {}
+    : Constraint(T, A, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1) { target_node = std::move(N); }
 
 int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {
     set_multiplier_size(0u);
@@ -39,19 +30,20 @@ int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 int NodeFacet::process(const shared_ptr<DomainBase>& D) {
-    const auto node = get_position(D);
+    const auto node_i = D->get<Node>(target_node(0))->trial_position(3u);
+    const auto node_j = D->get<Node>(target_node(1))->trial_position(3u);
+    const auto node_k = D->get<Node>(target_node(2))->trial_position(3u);
+    const auto node_s = D->get<Node>(target_node(3))->trial_position(3u);
 
-    constexpr auto i = 0, j = 1, k = 2, s = 3;
-
-    const vec edge_i = node[k] - node[j];
-    const vec edge_j = node[i] - node[k];
-    const vec edge_k = node[j] - node[i];
+    const vec edge_i = node_k - node_j;
+    const vec edge_j = node_i - node_k;
+    const vec edge_k = node_j - node_i;
     const vec outer_normal = cross(edge_j, edge_k);
-    vec s_i = node[s] - node[i];
+    vec s_i = node_s - node_i;
 
     const auto pen = dot(s_i, outer_normal);
 
-    if(0u == lagrangian_size && (pen > 0. || dot(node[s] - node[j], cross(edge_i, outer_normal)) > 0. || dot(node[s] - node[k], cross(edge_j, outer_normal)) > 0. || dot(s_i, cross(edge_k, outer_normal)) > 0.)) return SUANPAN_SUCCESS;
+    if(0u == lagrangian_size && (pen > 0. || dot(node_s - node_j, cross(edge_i, outer_normal)) > 0. || dot(node_s - node_k, cross(edge_j, outer_normal)) > 0. || dot(s_i, cross(edge_k, outer_normal)) > 0.)) return SUANPAN_SUCCESS;
 
     set_multiplier_size(1u);
 
@@ -69,10 +61,10 @@ int NodeFacet::process(const shared_ptr<DomainBase>& D) {
     const rowvec dpdk = s_i.t() * skew_edge_k;
 
     for(auto I = 0, J = 3, K = 6, L = 9; I < 3; ++I, ++J, ++K, ++L) {
-        auxiliary_stiffness(target_dof(I)) = dpdi(I);
-        auxiliary_stiffness(target_dof(J)) = dpdj(I);
-        auxiliary_stiffness(target_dof(K)) = dpdk(I);
-        auxiliary_stiffness(target_dof(L)) = outer_normal(I);
+        auxiliary_stiffness(target_node_dof(I)) = dpdi(I);
+        auxiliary_stiffness(target_node_dof(J)) = dpdj(I);
+        auxiliary_stiffness(target_node_dof(K)) = dpdk(I);
+        auxiliary_stiffness(target_node_dof(L)) = outer_normal(I);
     }
 
     skew_edge_i *= trial_lambda(0);
@@ -81,7 +73,7 @@ int NodeFacet::process(const shared_ptr<DomainBase>& D) {
 
     const auto skew_s_i = transform::skew_symm(s_i *= trial_lambda(0));
 
-    stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
+    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem);
     stiffness(span_i, span_j) = -(stiffness(span_j, span_i) = skew_s_i + skew_edge_j);
     stiffness(span_i, span_k) = -(stiffness(span_k, span_i) = skew_edge_k - skew_s_i);
     stiffness(span_j, span_k) = -(stiffness(span_k, span_j) = skew_s_i);

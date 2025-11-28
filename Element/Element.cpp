@@ -326,6 +326,13 @@ const std::vector<Node::DOF>& Element::get_dof_identifier() const { return dof_i
 
 const std::vector<MappingDOF>& Element::get_dof_mapping() const { return dof_mapping; }
 
+bool Element::validate_dof(const std::vector<Node::DOF>& in) const {
+    if(dof_identifier.size() < in.size()) return false;
+    for(size_t I = 0; I < in.size(); ++I)
+        if(dof_identifier[I] != in[I]) return false;
+    return true;
+}
+
 const uvec& Element::get_material_tag() const { return material_tag; }
 
 const uvec& Element::get_section_tag() const { return section_tag; }

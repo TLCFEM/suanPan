@@ -873,12 +873,12 @@ int Domain::reorder_dof() {
     suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) {
         if(!t_constraint.second->is_connected()) return;
         std::set<uword> t_encoding;
-        for(const auto I : t_constraint.second->get_node_encoding())
-            if(auto& t_node = get<Node>(I); nullptr != t_node && t_node->is_active()) {
+        for(const auto t_tag : t_constraint.second->get_involving_nodes(shared_from_this()))
+            if(auto& t_node = get<Node>(t_tag); nullptr != t_node && t_node->is_active()) {
                 auto& t_dof = t_node->get_original_dof();
                 t_encoding.insert(t_dof.cbegin(), t_dof.cend());
             }
-        for(const auto I : t_encoding) adjacency[I].insert(t_encoding.cbegin(), t_encoding.cend());
+        for(const auto t_dof : t_encoding) adjacency[t_dof].insert(t_encoding.cbegin(), t_encoding.cend());
     });
 
     const auto idx_rcm = sort_rcm(adjacency);
@@ -1362,7 +1362,7 @@ void Domain::assemble_load_stiffness() {}
 
 void Domain::assemble_constraint_stiffness() {
     for(auto& I : get_constraint_pool())
-        if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding());
+        if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_node_dof());
 }
 
 void Domain::save(std::string) {}

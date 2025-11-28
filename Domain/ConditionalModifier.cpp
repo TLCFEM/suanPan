@@ -18,11 +18,12 @@
 #include "ConditionalModifier.h"
 
 #include <Domain/Node.h>
+#include <Element/Element.h>
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
-bool ConditionalModifier::validate_dof(const shared_ptr<DomainBase>& D) {
-    const auto not_valid = [&](const shared_ptr<Node>& node) { return node && node->is_active() && !node->validate_dof(dof_order); };
+bool ConditionalModifier::validate_node_impl(const shared_ptr<DomainBase>& D) {
+    const auto not_valid = [&](const shared_ptr<Node>& node) { return !node || !node->is_active() || !node->validate_dof(dof_order); };
 
     if(target_node.is_empty())
         for(auto& node : D->get_node_pool()) {
@@ -36,8 +37,23 @@ bool ConditionalModifier::validate_dof(const shared_ptr<DomainBase>& D) {
     return true;
 }
 
-uvec ConditionalModifier::update_active_dof(const shared_ptr<DomainBase>& D) {
-    const auto& ref_component = get_dof_component();
+bool ConditionalModifier::validate_element_impl(const shared_ptr<DomainBase>& D) {
+    const auto not_valid = [&](const shared_ptr<Element>& element) { return !element || !element->is_active() || !element->validate_dof(dof_order); };
+
+    if(target_element.is_empty())
+        for(auto& element : D->get_element_pool()) {
+            if(not_valid(element)) return false;
+        }
+    else
+        for(const auto tag : target_element) {
+            if(not_valid(D->get<Element>(tag))) return false;
+        }
+
+    return true;
+}
+
+uvec ConditionalModifier::collect_node_dof(const shared_ptr<DomainBase>& D) {
+    auto& ref_component = get_dof_component();
 
     if(ref_component.empty()) return {};
 
@@ -56,20 +72,40 @@ uvec ConditionalModifier::update_active_dof(const shared_ptr<DomainBase>& D) {
     return active_dof;
 }
 
+uvec ConditionalModifier::collect_element_dof(const shared_ptr<DomainBase>& D) {
+    auto& ref_component = get_dof_component();
+
+    if(ref_component.empty()) return {};
+
+    std::vector<uword> active_dof;
+
+    const auto check = [&](const shared_ptr<Element>& element) {
+        if(!element || !element->is_active()) return;
+        for(const auto tag : element->get_node_encoding())
+            if(auto& node = D->get<Node>(tag); node && node->is_active()) suanpan::append_to(active_dof, node->get_dof(ref_component));
+    };
+
+    if(target_element.is_empty())
+        for(auto& element : D->get_element_pool()) check(element);
+    else
+        for(const auto tag : target_element) check(D->get<Element>(tag));
+
+    return active_dof;
+}
+
 double ConditionalModifier::get_amplitude(const shared_ptr<DomainBase>& D) const { return amplitude->get_amplitude(D->get_factory()->get_trial_time()); }
 
 const std::vector<Node::DOF>& ConditionalModifier::get_dof_component() const { return dof_component.empty() ? dof_order : dof_component; }
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& OT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC)
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC)
     : UniqueTag(T)
     , amplitude_tag(AT)
     , dof_component(std::move(DC))
-    , dof_order(std::move(DO))
-    , target_node(std::move(OT)) {}
+    , dof_order(std::move(DO)) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     amplitude = D->get<Amplitude>(amplitude_tag);
-    if(nullptr == amplitude || !amplitude->is_active()) amplitude = Ramp(0);
+    if(!amplitude || !amplitude->is_active()) amplitude = Ramp(0);
 
     auto start_time = 0.;
     // ReSharper disable once CppUseElementsView
@@ -79,9 +115,11 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     }
     amplitude->set_start_time(start_time);
 
-    if(!validate_dof(D)) return SUANPAN_FAIL;
+    if(validate_node() && !validate_node_impl(D)) return SUANPAN_FAIL;
+    if(validate_element() && !validate_element_impl(D)) return SUANPAN_FAIL;
 
-    target_dof = update_active_dof(D);
+    target_node_dof = collect_node_dof(D);
+    target_element_dof = collect_element_dof(D);
 
     initialized = true;
 
@@ -90,9 +128,21 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 
 int ConditionalModifier::process_resistance(const shared_ptr<DomainBase>& D) { return process(D); }
 
-const uvec& ConditionalModifier::get_node_encoding() const { return target_node; }
+std::set<uword> ConditionalModifier::get_involving_nodes(const shared_ptr<DomainBase>& D) const {
+    std::set pool(target_node.cbegin(), target_node.cend());
 
-const uvec& ConditionalModifier::get_dof_encoding() const { return target_dof; }
+    for(const auto tag : target_element)
+        if(auto& element = D->get<Element>(tag)) {
+            // no need to check if the element is active
+            // the nodes will be checked anyway and if any is invalid the element will be disabled
+            auto& nodes = element->get_node_encoding();
+            pool.insert(nodes.cbegin(), nodes.cend());
+        }
+
+    return pool;
+}
+
+const uvec& ConditionalModifier::get_node_dof() const { return target_node_dof; }
 
 void ConditionalModifier::deinitialize() { initialized = false; }
 

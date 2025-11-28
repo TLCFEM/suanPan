@@ -51,7 +51,6 @@ public:
     Constraint(
         unsigned,                 // tag
         unsigned,                 // amplitude tag
-        uvec&&,                   // node tags
         std::vector<Node::DOF>&&, // dof order
         std::vector<Node::DOF>&&, // dof component (unordered)
         unsigned                  // size of multiplier

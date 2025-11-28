@@ -20,18 +20,16 @@
 #include <Domain/Factory.hpp>
 
 NodalAcceleration::NodalAcceleration(const unsigned T, const double L, uvec&& NT, std::vector<Node::DOF>&& DT, const unsigned AT)
-    : Load(T, AT, std::move(NT), {}, std::move(DT), L) {}
+    : Load(T, AT, {}, std::move(DT), L) { target_node = std::move(NT); }
 
 int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    trial_load.reset();
-
-    if(auto& t_mass = W->get_mass()) {
-        trial_load.zeros(W->get_size())(target_dof).fill(magnitude * get_amplitude(D));
-
+    if(auto& t_mass = W->get_mass(); t_mass && !target_node_dof.is_empty()) {
+        trial_load.zeros(W->get_size())(target_node_dof).fill(magnitude * get_amplitude(D));
         trial_load = t_mass * trial_load;
     }
+    else trial_load.reset();
 
     return SUANPAN_SUCCESS;
 }

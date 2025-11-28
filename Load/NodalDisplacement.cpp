@@ -20,20 +20,21 @@
 #include <Domain/Factory.hpp>
 
 NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), {}, std::move(D), L) {}
+    : Load(T, AT, {}, std::move(D), L) { target_node = std::move(N); }
 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
-    set_end_step(start_step + 1);
-
     if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
 
-    D->get_factory()->update_reference_dof(target_dof);
+    set_end_step(start_step + 1);
+
+    D->get_factory()->update_reference_dof(target_node_dof);
 
     return SUANPAN_SUCCESS;
 }
 
 int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
-    if(!target_dof.empty()) trial_settlement.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
+    if(target_node_dof.empty()) trial_settlement.reset();
+    else trial_settlement.zeros(D->get_factory()->get_size())(target_node_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
 }

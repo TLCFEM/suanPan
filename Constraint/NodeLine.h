@@ -36,7 +36,7 @@
 class NodeLine final : public Constraint {
     static const mat rotation;
 
-    std::vector<vec> get_position(const shared_ptr<DomainBase>&);
+    [[nodiscard]] bool validate_node() const override { return true; }
 
 public:
     NodeLine(unsigned, unsigned, uvec&&);

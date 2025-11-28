@@ -34,7 +34,7 @@
 #include "Constraint.h"
 
 class NodeFacet final : public Constraint {
-    std::vector<vec> get_position(const shared_ptr<DomainBase>&);
+    [[nodiscard]] bool validate_node() const override { return true; }
 
 public:
     NodeFacet(unsigned, unsigned, uvec&&);

@@ -21,8 +21,7 @@
 #include <Element/Element.h>
 
 BodyForce::BodyForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
-    : Load(T, AT, {}, {}, std::move(D), L)
-    , target_element(std::move(N)) {}
+    : Load(T, AT, {}, std::move(D), L) { target_element = std::move(N); }
 
 int BodyForce::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
