@@ -204,7 +204,17 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<MPC>(tag, amplitude, magnitude, get_remaining_as_tuple<uword, uword, double>(command));
+        MPC::Pack pack;
+        for(const auto& [node, token, weight] : get_remaining_as_tuple<uword, std::string, double>(command)) {
+            const auto dof = parse_dof(token);
+            if(1 != dof.size()) {
+                suanpan_error("A valid dof is required.\n");
+                return;
+            }
+            pack.emplace_back(node, dof.front(), weight);
+        }
+
+        return_obj = std::make_unique<MPC>(tag, amplitude, magnitude, std::move(pack));
     }
 
     void new_nodeline(unique_ptr<Constraint>& return_obj, std::istringstream& command) {

@@ -32,11 +32,15 @@
 #include "Constraint.h"
 
 class MPC final : public Constraint {
+public:
+    using Pack = std::vector<std::tuple<uword, Node::DOF, double>>;
+
+private:
     const double magnitude;
-    const std::vector<std::tuple<uword, uword, double>> pool;
+    const Pack pool;
 
 public:
-    MPC(unsigned, unsigned, double, std::vector<std::tuple<uword, uword, double>>&&);
+    MPC(unsigned, unsigned, double, Pack&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

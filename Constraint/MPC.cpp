@@ -19,7 +19,7 @@
 
 #include <Domain/Factory.hpp>
 
-MPC::MPC(const unsigned T, const unsigned A, const double L, std::vector<std::tuple<uword, uword, double>>&& P)
+MPC::MPC(const unsigned T, const unsigned A, const double L, Pack&& P)
     : Constraint(T, A, {}, {}, 1)
     , magnitude(L)
     , pool(std::move(P)) {}
@@ -27,13 +27,14 @@ MPC::MPC(const unsigned T, const unsigned A, const double L, std::vector<std::tu
 int MPC::initialize(const shared_ptr<DomainBase>& D) {
     auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
 
-    for(auto [tag, dof, weight] : pool) {
-        auto& node = D->get<Node>(tag);
-        if(!node || !node->is_active() || node->get_reordered_dof().size() <= dof) {
-            auxiliary_stiffness.reset();
-            return SUANPAN_FAIL;
-        }
-        auxiliary_stiffness(node->get_reordered_dof()(dof - 1)) = weight;
+    for(auto [tag, target, weight] : pool) {
+        if(auto& node = D->get<Node>(tag); node && node->is_active())
+            if(const auto global = node->get_dof({target}); !global.empty()) {
+                auxiliary_stiffness(global.front()) = weight;
+                continue;
+            }
+        auxiliary_stiffness.reset();
+        return SUANPAN_FAIL;
     }
 
     return Constraint::initialize(D);
