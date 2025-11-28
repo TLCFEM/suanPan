@@ -36,6 +36,8 @@
 class NodeLine final : public Constraint {
     static const mat rotation;
 
+    [[nodiscard]] bool validate_node() const override { return true; }
+
     [[nodiscard]] bool reject_invalid_object() const override { return true; }
 
 public:

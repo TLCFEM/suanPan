@@ -70,12 +70,12 @@ protected:
      * \brief Derived classes must indicate if to validate nodes.
      * Validation will check if the defined nodes have compatible DoF layout.
      */
-    [[nodiscard]] virtual bool validate_node() const = 0;
+    [[nodiscard]] virtual bool validate_node() const { return false; }
     /**
      * \brief Derived classes must indicate if to validate elements.
      * Validation will check if the defined elements have compatible DoF layout.
      */
-    [[nodiscard]] virtual bool validate_element() const = 0;
+    [[nodiscard]] virtual bool validate_element() const { return false; }
 
     /**
      * \brief Whether to flag failure on invalid nodes/elements.

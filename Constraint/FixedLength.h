@@ -43,6 +43,8 @@ protected:
     bool min_bound = false, max_bound = false;
     double min_gap = 0., max_gap = 0.;
 
+    [[nodiscard]] bool validate_node() const final { return true; }
+
     [[nodiscard]] bool reject_invalid_object() const final { return true; }
 
 public:

@@ -32,7 +32,7 @@ int Embed::initialize(const shared_ptr<DomainBase>& D) {
     auto& t_node = D->get<Node>(target_node(0));
     auto& t_element = D->get<Element>(target_element(0));
 
-    if(nullptr == t_element || !t_element->is_active() || !t_element->validate_dof(dof_order) || t_element->compute_shape_function(zeros(lagrangian_size, 1), 0).is_empty()) return SUANPAN_FAIL;
+    if(t_element->compute_shape_function(zeros(lagrangian_size, 1), 0).is_empty()) return SUANPAN_FAIL;
 
     const auto t_coor = t_element->get_coordinate(lagrangian_size);
 

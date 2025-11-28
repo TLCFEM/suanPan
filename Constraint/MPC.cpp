@@ -25,9 +25,7 @@ MPC::MPC(const unsigned T, const unsigned A, const double L, std::vector<std::tu
     , pool(std::move(P)) {}
 
 int MPC::initialize(const shared_ptr<DomainBase>& D) {
-    auto& W = D->get_factory();
-
-    auxiliary_stiffness.zeros(W->get_size(), lagrangian_size);
+    auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
 
     for(auto [tag, dof, weight] : pool) {
         auto& node = D->get<Node>(tag);
