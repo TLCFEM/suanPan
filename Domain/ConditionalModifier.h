@@ -49,8 +49,11 @@ class ConditionalModifier : public UniqueTag {
     // the modifier itself will apply itself to those active components
     const std::vector<Node::DOF> dof_component;
 
-    bool validate_node(const shared_ptr<DomainBase>&);
-    uvec update_active_dof(const shared_ptr<DomainBase>&);
+    bool validate_node_impl(const shared_ptr<DomainBase>&);
+    bool validate_element_impl(const shared_ptr<DomainBase>&);
+
+    uvec collect_node_dof(const shared_ptr<DomainBase>&);
+    uvec collect_element_dof(const shared_ptr<DomainBase>&);
 
 protected:
     unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};
@@ -63,10 +66,31 @@ protected:
 
     uvec target_node, target_element, target_node_dof, target_element_dof;
 
+    /**
+     * \brief Derived classes must indicate if to validate nodes.
+     * Validation will check if the defined nodes have compatible DoF layout.
+     */
+    [[nodiscard]] virtual bool validate_node() const = 0;
+    /**
+     * \brief Derived classes must indicate if to validate elements.
+     * Validation will check if the defined elements have compatible DoF layout.
+     */
+    [[nodiscard]] virtual bool validate_element() const = 0;
+
+    /**
+     * \brief Whether to flag failure on invalid nodes/elements.
+     *
+     * Modifiers always apply to valid and active nodes/elements.
+     */
     [[nodiscard]] virtual bool reject_invalid_object() const { return false; }
 
     [[nodiscard]] double get_amplitude(const shared_ptr<DomainBase>&) const;
 
+    /**
+     * \brief Return the DoF components, falls back to the DoF order.
+     *
+     * When DoF order is given, DoF components can be omitted.
+     */
     [[nodiscard]] const std::vector<Node::DOF>& get_dof_component() const;
 
 public:
@@ -80,13 +104,17 @@ public:
     virtual int initialize(const shared_ptr<DomainBase>&);
 
     /**
-     * \brief  This method provides all necessary pieces of typical constraints/loads
+     * \brief Process and update both stiffness and resistance.
+     *
+     * This method provides all necessary pieces of typical constraints/loads
      * required, including additional blocks in original global stiffness, border matrix
      * resistance of multiplier, external loads.
      */
     virtual int process(const shared_ptr<DomainBase>&) = 0;
     /**
-     * \brief For some algorithms, the global stiffness is formed only once in each substep.
+     * \brief Process and update resistance.
+     *
+     * For some algorithms, the global stiffness is formed only once in each substep.
      * After calling solver, the storage may contain factorization. It is not correct to modify it
      * in those algorithms. This method should provide updated constraint/load resistance but must not
      * touch global stiffness.
@@ -94,14 +122,16 @@ public:
     virtual int process_resistance(const shared_ptr<DomainBase>&);
 
     /**
-     * \brief Some algorithms need to manually modify some variables after solving. Typical example is the
-     * predictor--corrector type algorithms. This method is called before committing trial status to perform
-     * necessary operations.
+     * \brief Some algorithms need to manually modify some variables after solving.
+     *
+     * Typical example is the predictor--corrector type algorithms.
+     * This method is called before committing trial status to perform necessary operations.
      */
     virtual void stage(const shared_ptr<DomainBase>&) {}
 
     /**
      * \brief Return a set of all nodes involved.
+     *
      * Some may define the interaction between nodes and elements.
      * The nodes connected by elements are also found and returned.
      */
@@ -119,9 +149,12 @@ public:
     [[nodiscard]] unsigned get_end_step() const;
 
     /**
-     * \brief Some constraints may modify global stiffness matrix so that it needs to be treated as an element
-     * which may affect bandwidth of banded storage. By calling this method, the RCM reordering algorithm will
-     * take this constraint into consideration. Make sure it is called in the constructor.
+     * \brief Indicate if this modifier can be deemed as an element that needs to account for connectivity.
+     *
+     * Some constraints may modify global stiffness matrix so that it needs to be treated as an element
+     * which may affect bandwidth of banded storage.
+     * By calling this method, the RCM reordering algorithm will take this constraint into consideration.
+     * Make sure it is properly overridden in the derived classes.
      */
     [[nodiscard]] virtual bool is_connected() const { return false; }
 

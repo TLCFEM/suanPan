@@ -22,7 +22,7 @@
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
-bool ConditionalModifier::validate_node(const shared_ptr<DomainBase>& D) {
+bool ConditionalModifier::validate_node_impl(const shared_ptr<DomainBase>& D) {
     const auto not_valid = [&](const shared_ptr<Node>& node) { return node && node->is_active() ? !node->validate_dof(dof_order) : reject_invalid_object(); };
 
     if(target_node.is_empty())
@@ -37,8 +37,12 @@ bool ConditionalModifier::validate_node(const shared_ptr<DomainBase>& D) {
     return true;
 }
 
-uvec ConditionalModifier::update_active_dof(const shared_ptr<DomainBase>& D) {
-    const auto& ref_component = get_dof_component();
+bool ConditionalModifier::validate_element_impl(const shared_ptr<DomainBase>& D) {
+    return true;
+}
+
+uvec ConditionalModifier::collect_node_dof(const shared_ptr<DomainBase>& D) {
+    auto& ref_component = get_dof_component();
 
     if(ref_component.empty()) return {};
 
@@ -53,6 +57,27 @@ uvec ConditionalModifier::update_active_dof(const shared_ptr<DomainBase>& D) {
         for(auto& node : D->get_node_pool()) check(node);
     else
         for(const auto tag : target_node) check(D->get<Node>(tag));
+
+    return active_dof;
+}
+
+uvec ConditionalModifier::collect_element_dof(const shared_ptr<DomainBase>& D) {
+    auto& ref_component = get_dof_component();
+
+    if(ref_component.empty()) return {};
+
+    std::vector<uword> active_dof;
+
+    const auto check = [&](const shared_ptr<Element>& element) {
+        if(!element || !element->is_active()) return;
+        for(const auto tag : element->get_node_encoding())
+            if(auto& node = D->get<Node>(tag); node && node->is_active()) suanpan::append_to(active_dof, node->get_dof(ref_component));
+    };
+
+    if(target_element.is_empty())
+        for(auto& element : D->get_element_pool()) check(element);
+    else
+        for(const auto tag : target_element) check(D->get<Element>(tag));
 
     return active_dof;
 }
@@ -79,9 +104,11 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     }
     amplitude->set_start_time(start_time);
 
-    if(!validate_node(D)) return SUANPAN_FAIL;
+    if(validate_node() && !validate_node_impl(D)) return SUANPAN_FAIL;
+    if(validate_element() && !validate_element_impl(D)) return SUANPAN_FAIL;
 
-    target_node_dof = update_active_dof(D);
+    target_node_dof = collect_node_dof(D);
+    target_element_dof = collect_element_dof(D);
 
     initialized = true;
 
