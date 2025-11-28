@@ -16,11 +16,72 @@
  ******************************************************************************/
 /**
  * @class ConditionalModifier
- * @brief A ConditionalModifier class.
+ * @brief Abstract base for node/element-scoped, step-conditional modifiers (constraints and loads).
  *
- * A parent abstract class for constraints and loads.
- * Both are node/element based and conditionally applied to the system.
- * Thus, they conditionally modify the system.
+ * Design intent
+ * - Provide a unified interface for objects that conditionally modify the global system
+ *   (stiffness, resistance, external loads, settlements) over analysis steps.
+ * - Decouple addressing (nodes/elements/DOFs) from the concrete behavior implemented by derived classes.
+ * - Standardize life-cycle, amplitude handling, and step gating across loads and constraints.
+ *
+ * Targeting and DOFs
+ * - Targets are given via tag lists: target_node and target_element.
+ * - DOF intent is specified by:
+ *   - dof_order: exact DOF layout required by the target (used for validation when non-empty).
+ *   - dof_component: unordered subset of DOFs to act upon (falls back to dof_order when empty).
+ * - Collected global DOF indices are cached in target_node_dof and target_element_dof:
+ *   - collect_node_dof(): from addressed nodes.
+ *   - collect_element_dof(): from nodes connected to addressed elements.
+ *
+ * Validation
+ * - Derived classes opt-in to validation via validate_node() / validate_element().
+ * - validate_node_impl()/validate_element_impl() ensure targets exist, are active, and match dof_order exactly
+ *   when dof_order is provided.
+ *
+ * Amplitude handling
+ * - amplitude_tag identifies an Amplitude resource (via ResourceHolder).
+ * - initialize() resolves the amplitude; defaults to Ramp(0) if missing/inactive.
+ * - The amplitude start time is aligned to the accumulated time of steps before start_step.
+ * - get_amplitude() samples by the current trial time from the Factory.
+ *
+ * Step gating
+ * - start_step and end_step bound the active interval [start_step, end_step) for this modifier.
+ * - validate_step() checks if the modifier is active in the current step and itself is active.
+ * - Derived classes may adjust these (e.g., displacement-control loads limit to one step).
+ *
+ * Life-cycle
+ * - Construction: record tags and DOF intent.
+ * - initialize():
+ *   1) resolve amplitude and set start time,
+ *   2) optional node/element layout validation,
+ *   3) collect and cache target DOFs,
+ *   4) mark as initialized.
+ * - process(): pure virtual; derived classes assemble stiffness/resistance/loads/settlements.
+ * - process_resistance(): defaults to process(); override to avoid touching stiffness when required by algorithms.
+ * - stage(): pre-commit hook for predictor–corrector style updates (e.g., restitution).
+ * - deinitialize()/is_initialized(): manage lifetime and reusability.
+ *
+ * Connectivity and queries
+ * - is_connected(): whether this modifier should be treated as an “element” for bandwidth/RCM; default false.
+ * - get_involving_nodes(): union of explicitly targeted nodes and nodes connected by targeted elements.
+ * - get_node_dof(): expose collected node DOFs.
+ *
+ * State hooks for advanced constraints
+ * - update_status(), clear_status(), commit_status(), reset_status(): optional state/multiplier management.
+ *
+ * Usage in derived classes
+ * - Loads (e.g., NodalForce, NodalDisplacement/SupportMotion, BodyForce, LineUDL, NodalAcceleration, ReferenceForce)
+ *   employ get_amplitude() and collected DOFs to assemble trial_load, trial_settlement, or reference_load.
+ * - Constraints (e.g., BC, FixedLength, NodeLine/Facet, Embed, ParticleCollision, Rigid/RestitutionWallPenalty, MPC)
+ *   use collected DOFs to assemble resistance/stiffness and optional auxiliary blocks.
+ *
+ * Group targeting
+ * - GroupModifier translates group tags to concrete node/element tags (DomainBase::flatten_group), allowing
+ *   group-based derived classes to reuse the same initialization and DOF collection logic.
+ *
+ * Concurrency and storage
+ * - ConditionalModifier itself is storage-agnostic; derived classes acquire Factory mutexes when modifying global
+ *   matrices/vectors under full/sparse schemes.
  *
  * @author tlc
  * @date 07/03/2021
