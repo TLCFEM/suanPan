@@ -40,4 +40,6 @@ analyze
 #   0.0000e+00  8.5714e+00  1.7764e-15
 peek node 2 3
 
+reset
+clear
 exit
