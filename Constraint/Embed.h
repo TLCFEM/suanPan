@@ -31,33 +31,65 @@
 
 #include "Constraint.h"
 
-class Embed : public Constraint {
+#include <Domain/Factory.hpp>
+#include <Element/Element.h>
+
+template<unsigned DIM> class Embed final : public Constraint {
     static constexpr unsigned max_iteration = 20u;
 
-    [[nodiscard]] bool validate_node() const final { return true; }
-    [[nodiscard]] bool validate_element() const final { return true; }
+    [[nodiscard]] bool validate_node() const override { return true; }
+    [[nodiscard]] bool validate_element() const override { return true; }
 
 public:
-    Embed(
-        unsigned, // unique constraint tag
-        unsigned, // element tag
-        unsigned, // node tag
-        unsigned  // dimension
-    );
+    Embed(const unsigned T, const unsigned ET, const unsigned NT)
+        : Constraint(T, 0, translational(DIM), {}, DIM) {
+        target_node = NT;
+        target_element = ET;
+    }
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    int initialize(const shared_ptr<DomainBase>& D) override {
+        if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
-    int process(const shared_ptr<DomainBase>&) override;
-};
+        auto& t_node = D->get<Node>(target_node(0));
+        auto& t_element = D->get<Element>(target_element(0));
 
-class Embed2D final : public Embed {
-public:
-    Embed2D(unsigned, unsigned, unsigned);
-};
+        if(t_element->compute_shape_function(zeros(DIM, 1), 0).is_empty()) return SUANPAN_FAIL;
 
-class Embed3D final : public Embed {
-public:
-    Embed3D(unsigned, unsigned, unsigned);
+        const auto t_coor = t_element->get_coordinate(DIM);
+
+        const vec n_coor = t_node->initial_position(DIM);
+
+        vec t_para = zeros(DIM);
+
+        rowvec n;
+
+        auto counter = 0u;
+        while(true) {
+            if(max_iteration == ++counter) return SUANPAN_FAIL;
+
+            const vec incre = solve((t_element->compute_shape_function(t_para, 1) * t_coor).t(), n_coor - ((n = t_element->compute_shape_function(t_para, 0)) * t_coor).t());
+            if(suanpan::inf_norm(incre) < 1E-14) break;
+            t_para += incre;
+        }
+
+        auto& n_dof = t_node->get_reordered_dof();
+        auto& e_dof = t_element->get_dof_encoding();
+
+        auxiliary_stiffness.zeros(D->get_factory()->get_size(), DIM);
+
+        for(auto K = 0u; K < DIM; ++K) {
+            auxiliary_stiffness(n_dof(K), K) = -1.;
+            for(uword I = 0, J = K; I < n.n_elem; ++I, J += DIM) auxiliary_stiffness(e_dof(J), K) = n(I);
+        }
+
+        return SUANPAN_SUCCESS;
+    }
+
+    int process(const shared_ptr<DomainBase>& D) override {
+        auxiliary_resistance = auxiliary_stiffness.t() * D->get_factory()->get_trial_displacement();
+
+        return SUANPAN_SUCCESS;
+    }
 };
 
 #endif

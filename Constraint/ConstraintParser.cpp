@@ -162,7 +162,7 @@ namespace {
         return_obj = std::make_unique<Sleeve<dof>>(tag, min_gap, max_gap, uvec{node_i, node_j});
     }
 
-    void new_embed(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
+    template<unsigned dof> void new_embed(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -181,8 +181,7 @@ namespace {
             return;
         }
 
-        if(2 == dof) return_obj = std::make_unique<Embed2D>(tag, element_tag, node_tag);
-        else return_obj = std::make_unique<Embed3D>(tag, element_tag, node_tag);
+        return_obj = std::make_unique<Embed<dof>>(tag, element_tag, node_tag);
     }
 
     void new_mpc(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
@@ -521,8 +520,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
 
     unique_ptr<Constraint> new_constraint = nullptr;
 
-    if(is_equal(constraint_id, "Embed2D")) new_embed(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "Embed3D")) new_embed(new_constraint, command, 3);
+    if(is_equal(constraint_id, "Embed2D")) new_embed<2u>(new_constraint, command);
+    else if(is_equal(constraint_id, "Embed3D")) new_embed<3u>(new_constraint, command);
     else if(is_equal_any(constraint_id, "FiniteRestitutionWall", "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, true);
     else if(is_equal_any(constraint_id, "FiniteRigidWall", "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);

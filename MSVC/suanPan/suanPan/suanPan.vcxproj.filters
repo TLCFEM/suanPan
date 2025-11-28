@@ -249,9 +249,6 @@
     <ClCompile Include="..\..\..\Constraint\ConstraintParser.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Embed.cpp">
-      <Filter>Constraint</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Constraint\MPC.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
