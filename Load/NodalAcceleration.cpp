@@ -28,7 +28,7 @@ int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
     trial_load.reset();
 
     if(auto& t_mass = W->get_mass()) {
-        trial_load.zeros(W->get_size())(target_dof).fill(magnitude * get_amplitude(D));
+        trial_load.zeros(W->get_size())(target_node_dof).fill(magnitude * get_amplitude(D));
 
         trial_load = t_mass * trial_load;
     }

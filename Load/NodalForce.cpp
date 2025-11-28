@@ -23,9 +23,9 @@ NodalForce::NodalForce(const unsigned T, const double L, uvec&& N, std::vector<N
     : Load(T, AT, {}, std::move(D), L) { target_node = std::move(N); }
 
 int NodalForce::process(const shared_ptr<DomainBase>& D) {
-    D->insert_loaded_dof(target_dof);
+    D->insert_loaded_dof(target_node_dof);
 
-    trial_load.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
+    trial_load.zeros(D->get_factory()->get_size())(target_node_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
 }

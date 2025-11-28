@@ -61,7 +61,7 @@ protected:
     // it can be empty such that the order check is not performed
     const std::vector<Node::DOF> dof_order;
 
-    uvec target_node, target_element, target_dof;
+    uvec target_node, target_element, target_node_dof, target_element_dof;
 
     [[nodiscard]] virtual bool reject_invalid_object() const { return false; }
 

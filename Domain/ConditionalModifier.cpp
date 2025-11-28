@@ -81,7 +81,7 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
 
     if(!validate_node(D)) return SUANPAN_FAIL;
 
-    target_dof = update_active_dof(D);
+    target_node_dof = update_active_dof(D);
 
     initialized = true;
 
@@ -104,7 +104,7 @@ std::set<uword> ConditionalModifier::get_involving_nodes(const shared_ptr<Domain
     return pool;
 }
 
-const uvec& ConditionalModifier::get_dof_encoding() const { return target_dof; }
+const uvec& ConditionalModifier::get_dof_encoding() const { return target_node_dof; }
 
 void ConditionalModifier::deinitialize() { initialized = false; }
 

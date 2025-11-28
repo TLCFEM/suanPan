@@ -31,14 +31,14 @@ PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, std::vector<Node::DOF>&& D)
  * It effectively adds a diagonal matrix to the global stiffness matrix.
  */
 int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
-    stiffness.zeros(target_dof.n_elem, target_dof.n_elem).diag().fill(multiplier * D->get_factory()->get_stiffness()->max());
+    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem).diag().fill(multiplier * D->get_factory()->get_stiffness()->max());
 
     return process_resistance(D);
 }
 
 int PenaltyBC::process_resistance(const shared_ptr<DomainBase>& D) {
     // this ensures all restrained DoFs have zero displacement in modified Newton methods
-    D->insert_restrained_dof(target_dof);
+    D->insert_restrained_dof(target_node_dof);
 
     return SUANPAN_SUCCESS;
 }
@@ -54,29 +54,29 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
     if(Integrator::Type::Explicit == D->get_current_step()->get_integrator()->type()) {
         if(auto& t_mass = W->get_mass()) {
             std::scoped_lock lock(W->get_mass_mutex());
-            for(const auto I : target_dof) t_mass->unify(I);
+            for(const auto I : target_node_dof) t_mass->unify(I);
         }
     }
     else {
         if(auto& t_stiff = W->get_stiffness()) {
             std::scoped_lock lock(W->get_stiffness_mutex());
-            for(const auto I : target_dof) t_stiff->unify(I);
+            for(const auto I : target_node_dof) t_stiff->unify(I);
         }
         if(auto& t_mass = W->get_mass()) {
             std::scoped_lock lock(W->get_mass_mutex());
-            for(const auto I : target_dof) t_mass->nullify(I);
+            for(const auto I : target_node_dof) t_mass->nullify(I);
         }
         if(auto& t_damping = W->get_damping()) {
             std::scoped_lock lock(W->get_damping_mutex());
-            for(const auto I : target_dof) t_damping->nullify(I);
+            for(const auto I : target_node_dof) t_damping->nullify(I);
         }
         if(auto& t_nonviscous = W->get_nonviscous()) {
             std::scoped_lock lock(W->get_nonviscous_mutex());
-            for(const auto I : target_dof) t_nonviscous->nullify(I);
+            for(const auto I : target_node_dof) t_nonviscous->nullify(I);
         }
         if(auto& t_geometry = W->get_geometry()) {
             std::scoped_lock lock(W->get_geometry_mutex());
-            for(const auto I : target_dof) t_geometry->nullify(I);
+            for(const auto I : target_node_dof) t_geometry->nullify(I);
         }
     }
 

@@ -80,7 +80,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
         counter = next_counter;
     }
 
-    target_dof = pool;
+    target_node_dof = pool;
 
     return SUANPAN_SUCCESS;
 }

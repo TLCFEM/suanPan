@@ -29,13 +29,13 @@ int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
 
     set_end_step(start_step + 1);
 
-    D->get_factory()->update_reference_dof(target_dof);
+    D->get_factory()->update_reference_dof(target_node_dof);
 
     return SUANPAN_SUCCESS;
 }
 
 int SupportDisplacement::process(const shared_ptr<DomainBase>& D) {
-    trial_settlement.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
+    trial_settlement.zeros(D->get_factory()->get_size())(target_node_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
 }
@@ -44,7 +44,7 @@ int SupportVelocity::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();
     const auto& G = D->get_current_step()->get_integrator();
 
-    trial_settlement.zeros(W->get_size())(target_dof) = G->from_total_velocity(magnitude * get_amplitude(D), target_dof);
+    trial_settlement.zeros(W->get_size())(target_node_dof) = G->from_total_velocity(magnitude * get_amplitude(D), target_node_dof);
 
     return SUANPAN_SUCCESS;
 }
@@ -53,7 +53,7 @@ int SupportAcceleration::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();
     const auto& G = D->get_current_step()->get_integrator();
 
-    trial_settlement.zeros(W->get_size())(target_dof) = G->from_total_acceleration(magnitude * get_amplitude(D), target_dof);
+    trial_settlement.zeros(W->get_size())(target_node_dof) = G->from_total_acceleration(magnitude * get_amplitude(D), target_node_dof);
 
     return SUANPAN_SUCCESS;
 }
