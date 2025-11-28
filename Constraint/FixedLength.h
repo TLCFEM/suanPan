@@ -73,16 +73,18 @@ public:
 
             auxiliary_load = (2. * std::sqrt(t_gap) < std::sqrt(min_gap) + std::sqrt(max_gap) ? min_gap : max_gap) - dot(initial_chord, initial_chord);
         }
-        else if(min_bound && !max_bound) {
+        else if(min_bound) {
             if(0u == lagrangian_size && t_gap > min_gap) return SUANPAN_SUCCESS;
 
             auxiliary_load = min_gap - dot(initial_chord, initial_chord);
         }
-        else if(!min_bound && max_bound) {
+        else if(max_bound) {
             if(0u == lagrangian_size && t_gap < max_gap) return SUANPAN_SUCCESS;
 
             auxiliary_load = max_gap - dot(initial_chord, initial_chord);
         }
+        // no need as empty quantities are skipped
+        // else auxiliary_load = 0.;
 
         set_multiplier_size(1u);
 
@@ -158,8 +160,8 @@ public:
         : FixedLength<DIM>(T, std::move(N)) {
         FixedLength<DIM>::min_bound = true;
         FixedLength<DIM>::max_bound = true;
-        FixedLength<DIM>::min_gap = M1 * M1;
-        FixedLength<DIM>::max_gap = M2 * M2;
+        FixedLength<DIM>::min_gap = std::pow(std::min(M1, M2), 2.);
+        FixedLength<DIM>::max_gap = std::pow(std::max(M1, M2), 2.);
     }
 };
 
@@ -189,7 +191,7 @@ public:
         if(0u == FixedLength<DIM>::lagrangian_size) return SUANPAN_SUCCESS;
 
         vec nodal_resistance(DIM);
-        for(auto I = 0llu; I < nodal_resistance.n_elem; ++I) nodal_resistance(I) = FixedLength<DIM>::resistance(FixedLength<DIM>::target_node_dof(I));
+        for(auto I = 0u; I < DIM; ++I) nodal_resistance(I) = FixedLength<DIM>::resistance(FixedLength<DIM>::target_node_dof(I));
 
         if(norm(nodal_resistance) > max_force) {
             trial_flag = true;
