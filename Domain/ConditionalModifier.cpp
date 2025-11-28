@@ -60,12 +60,11 @@ double ConditionalModifier::get_amplitude(const shared_ptr<DomainBase>& D) const
 
 const std::vector<Node::DOF>& ConditionalModifier::get_dof_component() const { return dof_component.empty() ? dof_order : dof_component; }
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& OT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC)
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC)
     : UniqueTag(T)
     , amplitude_tag(AT)
     , dof_component(std::move(DC))
-    , dof_order(std::move(DO))
-    , target_node(std::move(OT)) {}
+    , dof_order(std::move(DO)) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     amplitude = D->get<Amplitude>(amplitude_tag);

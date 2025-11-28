@@ -20,8 +20,8 @@
 #include <Domain/Factory.hpp>
 
 LineUDL::LineUDL(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT, const unsigned D)
-    : Load(T, AT, std::move(N), 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, std::move(DT), L)
-    , dimension(D) {}
+    : Load(T, AT, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, std::move(DT), L)
+    , dimension(D) { target_node = std::move(N); }
 
 LineUDL2D::LineUDL2D(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT)
     : LineUDL(T, L, std::move(N), std::move(DT), AT, 2u) {}

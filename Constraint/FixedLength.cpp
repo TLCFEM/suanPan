@@ -20,8 +20,8 @@
 #include <Domain/Factory.hpp>
 
 FixedLength::FixedLength(const unsigned T, const unsigned D, uvec&& N)
-    : Constraint(T, 0, std::move(N), 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1)
-    , dimension(D) {}
+    : Constraint(T, 0, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1)
+    , dimension(D) { target_node = std::move(N); }
 
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;

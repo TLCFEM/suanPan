@@ -21,7 +21,7 @@
 #include <Toolbox/tensor.h>
 
 NodeFacet::NodeFacet(const unsigned T, const unsigned A, uvec&& N)
-    : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1) {}
+    : Constraint(T, A, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1) { target_node = std::move(N); }
 
 int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {
     set_multiplier_size(0u);

@@ -22,7 +22,7 @@
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
 
 NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
-    : Constraint(T, A, std::move(N), {Node::DOF::U1, Node::DOF::U2}, {}, 1) {}
+    : Constraint(T, A, {Node::DOF::U1, Node::DOF::U2}, {}, 1) { target_node = std::move(N); }
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
     set_multiplier_size(0u);

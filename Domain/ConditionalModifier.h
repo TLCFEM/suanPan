@@ -19,7 +19,7 @@
  * @brief A ConditionalModifier class.
  *
  * A parent abstract class for constraints and loads.
- * Both are node based and conditionally applied to the system.
+ * Both are node/element based and conditionally applied to the system.
  * Thus, they conditionally modify the system.
  *
  * @author tlc
@@ -73,7 +73,6 @@ public:
     ConditionalModifier(
         unsigned,                 // tag
         unsigned,                 // amplitude tag
-        uvec&&,                   // object tag
         std::vector<Node::DOF>&&, // dof order
         std::vector<Node::DOF>&&  // dof component (unordered)
     );

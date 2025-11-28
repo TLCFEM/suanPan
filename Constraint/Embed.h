@@ -34,8 +34,6 @@
 class Embed : public Constraint {
     static constexpr unsigned max_iteration = 20u;
 
-    const unsigned element_tag;
-
     [[nodiscard]] bool reject_invalid_object() const final { return true; }
 
 public:

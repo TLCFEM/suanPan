@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 MPC::MPC(const unsigned T, const unsigned A, const double L, std::vector<std::tuple<uword, uword, double>>&& P)
-    : Constraint(T, A, {}, {}, {}, 1)
+    : Constraint(T, A, {}, {}, 1)
     , magnitude(L)
     , pool(std::move(P)) {}
 

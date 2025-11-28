@@ -21,14 +21,16 @@
 #include <Element/Element.h>
 
 Embed::Embed(const unsigned T, const unsigned ET, const unsigned NT, const unsigned D)
-    : Constraint(T, 0, {NT}, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, D)
-    , element_tag(ET) {}
+    : Constraint(T, 0, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, D) {
+    target_node = NT;
+    target_element = ET;
+}
 
 int Embed::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
     auto& t_node = D->get<Node>(target_node(0));
-    auto& t_element = D->get<Element>(element_tag);
+    auto& t_element = D->get<Element>(target_element(0));
 
     if(nullptr == t_element || !t_element->is_active() || !t_element->validate_dof(dof_order) || t_element->compute_shape_function(zeros(lagrangian_size, 1), 0).is_empty()) return SUANPAN_FAIL;
 

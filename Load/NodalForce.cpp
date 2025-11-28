@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 NodalForce::NodalForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), {}, std::move(D), L) {}
+    : Load(T, AT, {}, std::move(D), L) { target_node = std::move(N); }
 
 int NodalForce::process(const shared_ptr<DomainBase>& D) {
     D->insert_loaded_dof(target_dof);

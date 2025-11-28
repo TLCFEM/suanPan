@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), {}, std::move(D), L) {}
+    : Load(T, AT, {}, std::move(D), L) { target_node = std::move(N); }
 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;

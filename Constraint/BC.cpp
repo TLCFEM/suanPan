@@ -24,7 +24,7 @@
 double PenaltyBC::multiplier = 1E8;
 
 PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, std::vector<Node::DOF>&& D)
-    : Constraint(T, 0, std::move(N), {}, std::move(D), 0) {}
+    : Constraint(T, 0, {}, std::move(D), 0) { target_node = std::move(N); }
 
 /**
  * \brief Apply the BC to the system using penalty method.
