@@ -146,6 +146,14 @@ public:
 
     virtual void nullify(uword) = 0;
 
+    void unify(const uvec& list) {
+        for(const auto index : list) unify(index);
+    }
+
+    void nullify(const uvec& list) {
+        for(const auto index : list) nullify(index);
+    }
+
     [[nodiscard]] virtual T max() const = 0;
 
     /**

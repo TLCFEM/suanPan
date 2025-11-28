@@ -54,29 +54,29 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
     if(Integrator::Type::Explicit == D->get_current_step()->get_integrator()->type()) {
         if(auto& t_mass = W->get_mass()) {
             std::scoped_lock lock(W->get_mass_mutex());
-            for(const auto I : target_node_dof) t_mass->unify(I);
+            t_mass->unify(target_node_dof);
         }
     }
     else {
         if(auto& t_stiff = W->get_stiffness()) {
             std::scoped_lock lock(W->get_stiffness_mutex());
-            for(const auto I : target_node_dof) t_stiff->unify(I);
+            t_stiff->unify(target_node_dof);
         }
         if(auto& t_mass = W->get_mass()) {
             std::scoped_lock lock(W->get_mass_mutex());
-            for(const auto I : target_node_dof) t_mass->nullify(I);
+            t_mass->nullify(target_node_dof);
         }
         if(auto& t_damping = W->get_damping()) {
             std::scoped_lock lock(W->get_damping_mutex());
-            for(const auto I : target_node_dof) t_damping->nullify(I);
+            t_damping->nullify(target_node_dof);
         }
         if(auto& t_nonviscous = W->get_nonviscous()) {
             std::scoped_lock lock(W->get_nonviscous_mutex());
-            for(const auto I : target_node_dof) t_nonviscous->nullify(I);
+            t_nonviscous->nullify(target_node_dof);
         }
         if(auto& t_geometry = W->get_geometry()) {
             std::scoped_lock lock(W->get_geometry_mutex());
-            for(const auto I : target_node_dof) t_geometry->nullify(I);
+            t_geometry->nullify(target_node_dof);
         }
     }
 
