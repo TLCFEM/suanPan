@@ -23,73 +23,37 @@ LineUDL::LineUDL(const unsigned T, const double L, uvec&& N, std::vector<Node::D
     : Load(T, AT, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, std::move(DT), L)
     , dimension(D) { target_node = std::move(N); }
 
-LineUDL2D::LineUDL2D(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT)
-    : LineUDL(T, L, std::move(N), std::move(DT), AT, 2u) {}
+int LineUDL::process(const shared_ptr<DomainBase>& D) {
+    if(target_node_dof.is_empty()) return SUANPAN_SUCCESS;
 
-int LineUDL2D::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
+    trial_load.zeros(D->get_factory()->get_size());
 
-    trial_load.zeros(W->get_size());
+    D->insert_loaded_dof(target_node_dof);
 
-    const auto ref_load = magnitude * get_amplitude(D);
-
+    mat distribution(dimension, target_node.n_elem, fill::zeros);
     for(auto I = 0llu, J = 1llu; J < target_node.n_elem; ++I, ++J) {
-        const auto& node_i = D->get<Node>(target_node(I));
-        const auto& node_j = D->get<Node>(target_node(J));
-        const auto& dof_i = node_i->get_reordered_dof();
-        const auto& dof_j = node_j->get_reordered_dof();
-
-        const vec diff_coor = node_j->initial_position(dimension) - node_i->initial_position(dimension);
-
-        if(1u == static_cast<unsigned>(get_dof_component()[0])) {
-            trial_load(dof_i(0)) = trial_load(dof_j(0)) = -.5 * diff_coor(1) * ref_load;
-            D->insert_loaded_dof(dof_i(0));
-            D->insert_loaded_dof(dof_j(0));
-        }
-        else if(2u == static_cast<unsigned>(get_dof_component()[0])) {
-            trial_load(dof_i(1)) = trial_load(dof_j(1)) = -.5 * diff_coor(0) * ref_load;
-            D->insert_loaded_dof(dof_i(1));
-            D->insert_loaded_dof(dof_j(1));
-        }
+        const auto projection = project(abs(D->get<Node>(target_node(J))->initial_position(dimension) - D->get<Node>(target_node(I))->initial_position(dimension)));
+        distribution.col(I) += projection;
+        distribution.col(J) += projection;
     }
+
+    const auto ref_load = .5 * magnitude * get_amplitude(D);
+    if(const auto tag = get_dof_component()[0]; Node::DOF::U1 == tag) trial_load(target_node_dof) = ref_load * distribution.row(0).t();
+    else if(Node::DOF::U2 == tag) trial_load(target_node_dof) = ref_load * distribution.row(1).t();
+    else if(Node::DOF::U3 == tag) trial_load(target_node_dof) = ref_load * distribution.row(2).t();
 
     return SUANPAN_SUCCESS;
 }
 
+LineUDL2D::LineUDL2D(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT)
+    : LineUDL(T, L, std::move(N), std::move(DT), AT, 2u) {}
+
+vec LineUDL2D::project(vec&& increment) const { return reverse(increment); }
+
 LineUDL3D::LineUDL3D(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT)
     : LineUDL(T, L, std::move(N), std::move(DT), AT, 3u) {}
 
-int LineUDL3D::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
-
-    trial_load.zeros(W->get_size());
-
-    const auto ref_load = magnitude * get_amplitude(D);
-
-    for(auto I = 0llu, J = 1llu; J < target_node.n_elem; ++I, ++J) {
-        const auto& node_i = D->get<Node>(target_node(I));
-        const auto& node_j = D->get<Node>(target_node(J));
-        const auto& dof_i = node_i->get_reordered_dof();
-        const auto& dof_j = node_j->get_reordered_dof();
-
-        const vec diff_coor = node_j->initial_position(dimension) - node_i->initial_position(dimension);
-
-        if(1u == static_cast<unsigned>(get_dof_component()[0])) {
-            trial_load(dof_i(0)) = trial_load(dof_j(0)) = -.5 * norm(diff_coor(uvec{1, 2})) * ref_load;
-            D->insert_loaded_dof(dof_i(0));
-            D->insert_loaded_dof(dof_j(0));
-        }
-        else if(2u == static_cast<unsigned>(get_dof_component()[0])) {
-            trial_load(dof_i(1)) = trial_load(dof_j(1)) = -.5 * norm(diff_coor(uvec{0, 2})) * ref_load;
-            D->insert_loaded_dof(dof_i(1));
-            D->insert_loaded_dof(dof_j(1));
-        }
-        else if(3u == static_cast<unsigned>(get_dof_component()[0])) {
-            trial_load(dof_i(2)) = trial_load(dof_j(2)) = -.5 * norm(diff_coor(uvec{0, 1})) * ref_load;
-            D->insert_loaded_dof(dof_i(2));
-            D->insert_loaded_dof(dof_j(2));
-        }
-    }
-
-    return SUANPAN_SUCCESS;
+vec LineUDL3D::project(vec&& increment) const {
+    increment.transform([](const double value) { return value * value; });
+    return sqrt(vec{increment(1) + increment(2), increment(0) + increment(2), increment(0) + increment(1)});
 }

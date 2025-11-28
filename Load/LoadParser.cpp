@@ -187,7 +187,7 @@ namespace {
         }
 
         auto dof_pool = parse_dof(dof_token);
-        if(dof_pool.empty()) {
+        if(1 != dof_pool.size()) {
             suanpan_error("A valid dof identifier is required.\n");
             return;
         }

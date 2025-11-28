@@ -39,6 +39,8 @@ class LineUDL : public Load {
 protected:
     const unsigned dimension;
 
+    virtual vec project(vec&&) const = 0;
+
 public:
     LineUDL(
         unsigned,                 // tag
@@ -48,9 +50,13 @@ public:
         unsigned,                 // amplitude tag
         unsigned                  // dimension
     );
+
+    int process(const shared_ptr<DomainBase>&) override;
 };
 
 class LineUDL2D final : public LineUDL {
+    vec project(vec&&) const override;
+
 public:
     LineUDL2D(
         unsigned,                 // tag
@@ -59,11 +65,11 @@ public:
         std::vector<Node::DOF>&&, // dof tag
         unsigned                  // amplitude tag
     );
-
-    int process(const shared_ptr<DomainBase>&) override;
 };
 
 class LineUDL3D final : public LineUDL {
+    vec project(vec&&) const override;
+
 public:
     LineUDL3D(
         unsigned,                 // tag
@@ -72,8 +78,6 @@ public:
         std::vector<Node::DOF>&&, // dof tag
         unsigned                  // amplitude tag
     );
-
-    int process(const shared_ptr<DomainBase>&) override;
 };
 
 #endif
