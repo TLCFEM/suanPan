@@ -1051,9 +1051,6 @@
     <ClCompile Include="..\..\..\Domain\ConditionalModifier.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp">
-      <Filter>Constraint</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Load\SupportMotion.cpp">
       <Filter>Load</Filter>
     </ClCompile>

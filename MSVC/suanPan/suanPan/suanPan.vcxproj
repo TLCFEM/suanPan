@@ -116,7 +116,6 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
     <ClCompile Include="..\..\..\Constraint\Embed.cpp" />
-    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
     <ClCompile Include="..\..\..\Constraint\LinearSpring2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
