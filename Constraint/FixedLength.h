@@ -35,7 +35,7 @@
 #include "Constraint.h"
 
 class FixedLength : public Constraint {
-    vec initial_cord;
+    vec initial_chord;
 
 protected:
     const unsigned dimension;

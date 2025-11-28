@@ -26,7 +26,7 @@ FixedLength::FixedLength(const unsigned T, const unsigned D, uvec&& N)
 int FixedLength::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
-    initial_cord = D->get<Node>(target_node(1))->initial_position(dimension) - D->get<Node>(target_node(0))->initial_position(dimension);
+    initial_chord = D->get<Node>(target_node(1))->initial_position(dimension) - D->get<Node>(target_node(0))->initial_position(dimension);
 
     set_multiplier_size(0u);
 
@@ -39,22 +39,22 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
     const uvec dof_i = target_dof.head(dimension), dof_j = target_dof.tail(dimension);
 
     const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
-    const vec t_cord = initial_cord + t_disp;
+    const vec t_chord = initial_chord + t_disp;
 
-    if(const auto t_gap = dot(t_cord, t_cord); min_bound && max_bound) {
+    if(const auto t_gap = dot(t_chord, t_chord); min_bound && max_bound) {
         if(0u == lagrangian_size && t_gap > min_gap && t_gap < max_gap) return SUANPAN_SUCCESS;
 
-        auxiliary_load = (2. * std::sqrt(t_gap) < std::sqrt(min_gap) + std::sqrt(max_gap) ? min_gap : max_gap) - dot(initial_cord, initial_cord);
+        auxiliary_load = (2. * std::sqrt(t_gap) < std::sqrt(min_gap) + std::sqrt(max_gap) ? min_gap : max_gap) - dot(initial_chord, initial_chord);
     }
     else if(min_bound && !max_bound) {
         if(0u == lagrangian_size && t_gap > min_gap) return SUANPAN_SUCCESS;
 
-        auxiliary_load = min_gap - dot(initial_cord, initial_cord);
+        auxiliary_load = min_gap - dot(initial_chord, initial_chord);
     }
     else if(!min_bound && max_bound) {
         if(0u == lagrangian_size && t_gap < max_gap) return SUANPAN_SUCCESS;
 
-        auxiliary_load = max_gap - dot(initial_cord, initial_cord);
+        auxiliary_load = max_gap - dot(initial_chord, initial_chord);
     }
 
     set_multiplier_size(1u);
@@ -62,8 +62,8 @@ int FixedLength::process(const shared_ptr<DomainBase>& D) {
     auxiliary_stiffness.zeros(W->get_size(), lagrangian_size);
     auxiliary_resistance = 0.;
     for(auto I = 0u; I < dimension; ++I) {
-        auxiliary_stiffness(dof_i(I)) = -(auxiliary_stiffness(dof_j(I)) = 2. * t_cord(I));
-        auxiliary_resistance += t_disp(I) * (2. * initial_cord(I) + t_disp(I));
+        auxiliary_stiffness(dof_i(I)) = -(auxiliary_stiffness(dof_j(I)) = 2. * t_chord(I));
+        auxiliary_resistance += t_disp(I) * (2. * initial_chord(I) + t_disp(I));
     }
 
     stiffness.zeros(target_dof.n_elem, target_dof.n_elem);

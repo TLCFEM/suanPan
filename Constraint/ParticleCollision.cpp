@@ -36,17 +36,17 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
     const uvec dof_i = node_i->get_reordered_dof().head(dimension);
     const uvec dof_j = node_j->get_reordered_dof().head(dimension);
 
-    vec unit_cord = node_j->trial_position(dimension) - node_i->trial_position(dimension);
-    const auto distance = norm(unit_cord);
+    vec unit_chord = node_j->trial_position(dimension) - node_i->trial_position(dimension);
+    const auto distance = norm(unit_chord);
 
-    unit_cord /= distance;
+    unit_chord /= distance;
 
     const auto force = compute_f(distance);
     {
         std::scoped_lock resistance_lock(resistance_mutex);
-        for(auto I = 0llu; I < unit_cord.n_elem; ++I) {
-            resistance(dof_i(I)) += force * unit_cord(I);
-            resistance(dof_j(I)) -= force * unit_cord(I);
+        for(auto I = 0llu; I < unit_chord.n_elem; ++I) {
+            resistance(dof_i(I)) += force * unit_chord(I);
+            resistance(dof_j(I)) -= force * unit_chord(I);
         }
     }
 
@@ -55,7 +55,7 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
     auto& W = D->get_factory();
     auto& t_stiff = W->get_stiffness();
 
-    const mat d_norm = (compute_df(distance) - force / distance) * unit_cord * unit_cord.t() + force / distance * eye(dimension, dimension);
+    const mat d_norm = (compute_df(distance) - force / distance) * unit_chord * unit_chord.t() + force / distance * eye(dimension, dimension);
 
     std::scoped_lock stiffness_lock(W->get_stiffness_mutex());
     for(auto L = 0u; L < dimension; ++L)
