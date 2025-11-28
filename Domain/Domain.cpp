@@ -769,21 +769,6 @@ void Domain::insert_restrained_dof(const uvec& T) { restrained_dofs.insert(T.cbe
  */
 void Domain::insert_constrained_dof(const uvec& T) { constrained_dofs.insert(T.cbegin(), T.cend()); }
 
-/**
- * \brief concurrently safe insertion method
- */
-void Domain::insert_loaded_dof(const uword T) { loaded_dofs.insert(T); }
-
-/**
- * \brief concurrently safe insertion method
- */
-void Domain::insert_restrained_dof(const uword T) { restrained_dofs.insert(T); }
-
-/**
- * \brief concurrently safe insertion method
- */
-void Domain::insert_constrained_dof(const uword T) { constrained_dofs.insert(T); }
-
 const suanpan::unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
 
 const suanpan::unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }

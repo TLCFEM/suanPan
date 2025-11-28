@@ -316,10 +316,6 @@ public:
     void insert_restrained_dof(const uvec&) override;
     void insert_constrained_dof(const uvec&) override;
 
-    void insert_loaded_dof(uword) override;
-    void insert_restrained_dof(uword) override;
-    void insert_constrained_dof(uword) override;
-
     const suanpan::unordered_set<uword>& get_loaded_dof() const override;
     const suanpan::unordered_set<uword>& get_restrained_dof() const override;
     const suanpan::unordered_set<uword>& get_constrained_dof() const override;
