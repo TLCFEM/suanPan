@@ -90,12 +90,12 @@ public:
                 }
                 ConstantStiffness(this);
 
-                break;
+                return SUANPAN_SUCCESS;
             }
             normalised_coor += incre;
         }
 
-        return max_iteration == counter ? SUANPAN_FAIL : SUANPAN_SUCCESS;
+        return SUANPAN_FAIL;
     }
 
     int update_status() override {
