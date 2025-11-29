@@ -2,11 +2,11 @@
 
 node 1 0 0
 node 2 1 0
-node 3 1 1
+node 3 1.6 1
 node 4 0 1
 node 5 2 0
 node 6 3 0
-node 7 .5 .5
+node 7 .6 .8
 
 material Elastic2D 1 5000 .2
 material Elastic1D 2 1000
@@ -32,11 +32,11 @@ analyze
 
 # Node 7:
 # Coordinate:
-#   5.0000e-01  5.0000e-01
+#   6.0000e-01  8.0000e-01
 # Displacement:
-#  -1.4786e-05  1.9836e-04
+#  -9.4371e-05  2.4208e-04
 # Resistance:
-#  -6.6591e-02  1.9459e-02
+#  -1.7107e-01  8.2927e-02
 peek node 7
 
 reset
