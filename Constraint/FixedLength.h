@@ -205,10 +205,12 @@ public:
         current_flag = trial_flag;
         FixedLength<DIM>::commit_status();
     }
+
     void clear_status() override {
         current_flag = trial_flag = false;
         FixedLength<DIM>::clear_status();
     }
+
     void reset_status() override {
         trial_flag = current_flag;
         FixedLength<DIM>::reset_status();
