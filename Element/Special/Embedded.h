@@ -36,11 +36,12 @@
 class Embedded : public Element {
     static constexpr unsigned max_iteration = 20u;
 
-    const unsigned e_dof;
+    const unsigned dimension;
     const unsigned host_tag;
     const unsigned host_size = 0;
     const double alpha;
-    const rowvec iso_n;
+
+    rowvec shape;
 
     std::vector<uvec> idx;
 

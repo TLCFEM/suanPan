@@ -21,63 +21,60 @@
 #include <Domain/Factory.hpp>
 
 Embedded::Embedded(const unsigned T, const unsigned ET, const unsigned NT, const unsigned D, const double P)
-    : Element(T, D, ET, NT)
-    , e_dof(D)
+    : Element(T, D, ET, NT, translational(D))
+    , dimension(D)
     , host_tag(ET)
     , alpha(P) {}
 
 int Embedded::initialize(const shared_ptr<DomainBase>& D) {
     host_element = D->get<Element>(host_tag);
 
-    if(nullptr == host_element || !host_element->is_active() || host_element->compute_shape_function(zeros(e_dof, 1), 0).empty()) return SUANPAN_FAIL;
+    vec normalised_coor(dimension, fill::zeros);
+
+    if(!host_element->is_active() || host_element->compute_shape_function(normalised_coor, 0).empty()) return SUANPAN_FAIL;
 
     access::rw(host_size) = host_element->get_node_number();
 
     idx.clear();
-    idx.reserve(e_dof);
-    idx.emplace_back(linspace<uvec>(e_dof, e_dof * static_cast<uword>(host_size), host_size));
-    for(auto I = 1u; I < e_dof; ++I) idx.emplace_back(idx.back() + 1);
+    idx.reserve(dimension);
+    idx.emplace_back(linspace<uvec>(dimension, dimension * static_cast<uword>(host_size), host_size));
+    for(auto I = 1u; I < dimension; ++I) idx.emplace_back(idx.back() + 1);
 
-    const auto o_coor = get_coordinate(e_dof);
-    const mat t_coor = o_coor.tail_rows(host_size);
-    const vec n_coor = o_coor.row(0).t();
-
-    vec t_para = zeros(e_dof);
-
-    auto& n = access::rw(iso_n);
+    const auto temp_coor = get_coordinate(dimension);
+    const mat element_coor = temp_coor.tail_rows(host_size);
+    const vec node_coor = temp_coor.row(0).t();
 
     auto counter = 0u;
     while(++counter <= max_iteration) {
-        const vec incre = solve((host_element->compute_shape_function(t_para, 1) * t_coor).t(), n_coor - ((n = host_element->compute_shape_function(t_para, 0)) * t_coor).t());
+        const vec incre = solve((host_element->compute_shape_function(normalised_coor, 1) * element_coor).t(), node_coor - ((shape = host_element->compute_shape_function(normalised_coor, 0)) * element_coor).t());
         if(suanpan::inf_norm(incre) < 1E-14) break;
-        t_para += incre;
+        normalised_coor += incre;
     }
 
     return max_iteration == counter ? SUANPAN_FAIL : SUANPAN_SUCCESS;
 }
 
 int Embedded::update_status() {
-    const auto t_disp = get_trial_displacement();
-
-    const vec reaction = alpha * (t_disp.head(e_dof) - reshape(t_disp.tail(t_disp.n_elem - e_dof), e_dof, host_size) * iso_n.t());
+    const mat t_disp = reshape(get_trial_displacement(), dimension, get_node_number());
+    const vec reaction = alpha * (t_disp.col(0) - t_disp.tail_cols(host_size) * shape.t());
 
     trial_resistance.zeros(get_total_number());
     trial_stiffness.zeros(get_total_number(), get_total_number());
 
-    trial_resistance.head(e_dof) = -reaction;
+    trial_resistance.head(dimension) = -reaction;
 
-    mat t_n = alpha * iso_n.t();
+    mat t_shape = alpha * shape.t();
 
-    for(auto I = 0u; I < e_dof; ++I) {
-        trial_resistance(idx[I]) = iso_n.t() * reaction(I);
+    for(auto I = 0u; I < dimension; ++I) {
+        trial_resistance(idx[I]) = shape.t() * reaction(I);
         trial_stiffness(I, I) = -alpha;
-        trial_stiffness(uvec{I}, idx[I]) = t_n.t();
-        trial_stiffness(idx[I], uvec{I}) = t_n;
+        trial_stiffness(uvec{I}, idx[I]) = t_shape.t();
+        trial_stiffness(idx[I], uvec{I}) = t_shape;
     }
 
-    t_n *= -iso_n;
+    t_shape *= -shape;
 
-    for(auto I = 0u; I < e_dof; ++I) trial_stiffness(idx[I], idx[I]) = t_n;
+    for(auto I = 0u; I < dimension; ++I) trial_stiffness(idx[I], idx[I]) = t_shape;
 
     return SUANPAN_SUCCESS;
 }

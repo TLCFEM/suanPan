@@ -191,7 +191,8 @@ public:
         unsigned, // tag
         unsigned, // number of dofs
         unsigned, // other element tag
-        unsigned  // node tag
+        unsigned,                // node tag
+        std::vector<Node::DOF>&& // dof identifier
     );
 
     int initialize_base(const shared_ptr<DomainBase>&) final;

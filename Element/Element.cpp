@@ -177,7 +177,7 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
     , section_type(SectionType::D0) {}
 
 // for elements that use other elements
-Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
+Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT, std::vector<Node::DOF>&& DI)
     : DataElement{{NT}, {}, {}, false}
     , ElementBase(T)
     , Distributed(static_cast<int>(ET))
@@ -185,7 +185,10 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
     , num_dof(ND)
     , use_other(ET)
     , material_type(MaterialType::D0)
-    , section_type(SectionType::D0) {}
+    , section_type(SectionType::D0)
+    , dof_identifier(std::move(DI)) {
+    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
+}
 
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity
@@ -216,16 +219,15 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
 
     // embedded elements use other elements
     if(0u != use_other) {
-        if(!D->find<Element>(use_other)) return SUANPAN_FAIL;
-
-        auto size = 1u;
         auto& t_element = D->get<Element>(use_other);
-        size += t_element->get_node_number();
-        access::rw(num_node) = size;
+
+        if(!t_element) return SUANPAN_FAIL;
+
+        access::rw(num_node) = 1u + t_element->get_node_number();
 
         auto& n_encoding = access::rw(node_encoding);
-        n_encoding.resize(size);
-        n_encoding.tail(size - 1llu) = t_element->get_node_encoding();
+        n_encoding.resize(num_node);
+        n_encoding.tail(num_node - 1u) = t_element->get_node_encoding();
     }
 
     // first initialization
