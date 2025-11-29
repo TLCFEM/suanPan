@@ -249,9 +249,6 @@
     <ClCompile Include="..\..\..\Constraint\ConstraintParser.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Embed.cpp">
-      <Filter>Constraint</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Constraint\MPC.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
@@ -1051,9 +1048,6 @@
     <ClCompile Include="..\..\..\Domain\ConditionalModifier.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp">
-      <Filter>Constraint</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Load\SupportMotion.cpp">
       <Filter>Load</Filter>
     </ClCompile>
@@ -1068,9 +1062,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp">
       <Filter>Constraint</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Element\Special\Embedded.cpp">
-      <Filter>Element\Special</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.cpp">
       <Filter>Constraint\Criterion</Filter>

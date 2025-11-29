@@ -1296,7 +1296,7 @@ namespace {
         return_obj = std::make_unique<DKTS3>(tag, std::move(node_tag), material_tag, thickness, num_ip, is_true(nlgeom));
     }
 
-    void new_embedded(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dof) {
+    template<unsigned dof> void new_embedded(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1321,8 +1321,7 @@ namespace {
             return;
         }
 
-        if(2 == dof) return_obj = std::make_unique<Embedded2D>(tag, element_tag, node_tag, alpha);
-        else return_obj = std::make_unique<Embedded3D>(tag, element_tag, node_tag, alpha);
+        return_obj = std::make_unique<Embedded<dof>>(tag, element_tag, node_tag, alpha);
     }
 
     void new_eb21(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2615,8 +2614,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "DKTS3")) new_dkts3(new_element, command);
     else if(is_equal(element_id, "EB21")) new_eb21(new_element, command);
     else if(is_equal(element_id, "EB31OS")) new_eb31os(new_element, command);
-    else if(is_equal(element_id, "Embedded2D")) new_embedded(new_element, command, 2);
-    else if(is_equal(element_id, "Embedded3D")) new_embedded(new_element, command, 3);
+    else if(is_equal(element_id, "Embedded2D")) new_embedded<2u>(new_element, command);
+    else if(is_equal(element_id, "Embedded3D")) new_embedded<3u>(new_element, command);
     else if(is_equal(element_id, "F21")) new_f21(new_element, command);
     else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
     else if(is_equal(element_id, "F31")) new_f31(new_element, command);

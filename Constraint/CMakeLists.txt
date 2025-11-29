@@ -2,8 +2,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         BC.cpp
         Constraint.cpp
         ConstraintParser.cpp
-        Embed.cpp
-        FixedLength.cpp
         LinearSpring2D.cpp
         LJPotential2D.cpp
         MPC.cpp

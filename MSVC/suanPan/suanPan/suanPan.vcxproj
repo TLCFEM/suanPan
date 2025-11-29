@@ -115,8 +115,6 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\MinResistance.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
-    <ClCompile Include="..\..\..\Constraint\Embed.cpp" />
-    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp" />
     <ClCompile Include="..\..\..\Constraint\LinearSpring2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
@@ -235,7 +233,6 @@
     <ClCompile Include="..\..\..\Element\Special\Contact3D.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Damper01.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Damper02.cpp" />
-    <ClCompile Include="..\..\..\Element\Special\Embedded.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Joint.cpp" />
     <ClCompile Include="..\..\..\Element\Special\Mass.cpp" />
     <ClCompile Include="..\..\..\Element\Special\SingleSection2D.cpp" />

@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 LineUDL::LineUDL(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& DT, const unsigned AT, const unsigned D)
-    : Load(T, AT, 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, std::move(DT), L)
+    : Load(T, AT, translational(D), std::move(DT), L)
     , dimension(D) { target_node = std::move(N); }
 
 int LineUDL::process(const shared_ptr<DomainBase>& D) {

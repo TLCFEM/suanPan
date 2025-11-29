@@ -54,7 +54,7 @@ namespace {
         }
     }
 
-    void new_fixedlength(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
+    template<unsigned dof> void new_fixedlength(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -67,10 +67,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<FixedLength>(tag, dof, uvec{node_i, node_j});
+        return_obj = std::make_unique<FixedLength<dof>>(tag, uvec{node_i, node_j});
     }
 
-    void new_maxforce(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
+    template<unsigned dof> void new_maxforce(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -89,10 +89,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<MaxForce>(tag, dof, max_force, uvec{node_i, node_j});
+        return_obj = std::make_unique<MaxForce<dof>>(tag, max_force, uvec{node_i, node_j});
     }
 
-    void new_minimumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
+    template<unsigned dof> void new_minimumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -111,10 +111,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<MinimumGap>(tag, dof, gap, uvec{node_i, node_j});
+        return_obj = std::make_unique<MinimumGap<dof>>(tag, gap, uvec{node_i, node_j});
     }
 
-    void new_maximumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
+    template<unsigned dof> void new_maximumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -133,10 +133,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<MaximumGap>(tag, dof, gap, uvec{node_i, node_j});
+        return_obj = std::make_unique<MaximumGap<dof>>(tag, gap, uvec{node_i, node_j});
     }
 
-    void new_sleeve(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
+    template<unsigned dof> void new_sleeve(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -159,10 +159,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<Sleeve>(tag, dof, min_gap, max_gap, uvec{node_i, node_j});
+        return_obj = std::make_unique<Sleeve<dof>>(tag, min_gap, max_gap, uvec{node_i, node_j});
     }
 
-    void new_embed(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dof) {
+    template<unsigned dof> void new_embed(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -181,8 +181,7 @@ namespace {
             return;
         }
 
-        if(2 == dof) return_obj = std::make_unique<Embed2D>(tag, element_tag, node_tag);
-        else return_obj = std::make_unique<Embed3D>(tag, element_tag, node_tag);
+        return_obj = std::make_unique<Embed<dof>>(tag, element_tag, node_tag);
     }
 
     void new_mpc(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
@@ -521,25 +520,25 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
 
     unique_ptr<Constraint> new_constraint = nullptr;
 
-    if(is_equal(constraint_id, "Embed2D")) new_embed(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "Embed3D")) new_embed(new_constraint, command, 3);
+    if(is_equal(constraint_id, "Embed2D")) new_embed<2u>(new_constraint, command);
+    else if(is_equal(constraint_id, "Embed3D")) new_embed<3u>(new_constraint, command);
     else if(is_equal_any(constraint_id, "FiniteRestitutionWall", "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, true);
     else if(is_equal_any(constraint_id, "FiniteRigidWall", "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
     else if(is_equal_any(constraint_id, "Fix", "PenaltyBC")) new_bc(new_constraint, command, true, false);
     else if(is_equal_any(constraint_id, "Fix2", "MultiplierBC")) new_bc(new_constraint, command, false, false);
-    else if(is_equal_any(constraint_id, "FixedLength2D", "R2D2")) new_fixedlength(new_constraint, command, 2);
-    else if(is_equal_any(constraint_id, "FixedLength3D", "R3D2")) new_fixedlength(new_constraint, command, 3);
+    else if(is_equal_any(constraint_id, "FixedLength2D", "R2D2")) new_fixedlength<2u>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "FixedLength3D", "R3D2")) new_fixedlength<3u>(new_constraint, command);
     else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
     else if(is_equal(constraint_id, "LinearSpring2D")) new_linearspring(new_constraint, command, 2);
     else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command, 2);
-    else if(is_equal_any(constraint_id, "MaximumForce2D", "MaxForce2D")) new_maxforce(new_constraint, command, 2);
-    else if(is_equal_any(constraint_id, "MaximumForce3D", "MaxForce3D")) new_maxforce(new_constraint, command, 3);
-    else if(is_equal_any(constraint_id, "MaximumGap2D", "MaxGap2D")) new_maximumgap(new_constraint, command, 2);
-    else if(is_equal_any(constraint_id, "MaximumGap3D", "MaxGap3D")) new_maximumgap(new_constraint, command, 3);
-    else if(is_equal_any(constraint_id, "MinimumGap2D", "MinGap2D")) new_minimumgap(new_constraint, command, 2);
-    else if(is_equal_any(constraint_id, "MinimumGap3D", "MinGap3D")) new_minimumgap(new_constraint, command, 3);
+    else if(is_equal_any(constraint_id, "MaximumForce2D", "MaxForce2D")) new_maxforce<2u>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "MaximumForce3D", "MaxForce3D")) new_maxforce<3u>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "MaximumGap2D", "MaxGap2D")) new_maximumgap<2u>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "MaximumGap3D", "MaxGap3D")) new_maximumgap<3u>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "MinimumGap2D", "MinGap2D")) new_minimumgap<2u>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "MinimumGap3D", "MinGap3D")) new_minimumgap<3u>(new_constraint, command);
     else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
     else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
     else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
@@ -548,8 +547,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
     else if(is_equal_any(constraint_id, "RestitutionWall", "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
     else if(is_equal_any(constraint_id, "RigidWall", "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
     else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
-    else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve(new_constraint, command, 3);
+    else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve<2u>(new_constraint, command);
+    else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve<3u>(new_constraint, command);
     else external_module::object(new_constraint, domain, constraint_id, command);
 
     if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());
