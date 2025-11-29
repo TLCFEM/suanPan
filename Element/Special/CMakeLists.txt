@@ -3,7 +3,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         Contact3D.cpp
         Damper01.cpp
         Damper02.cpp
-        Embedded.cpp
         Joint.cpp
         Mass.cpp
         SingleSection2D.cpp
