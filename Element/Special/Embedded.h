@@ -38,10 +38,10 @@ template<unsigned DIM> class Embedded final : public Element {
     static constexpr unsigned max_iteration = 20u;
 
     const unsigned host_tag;
-    const unsigned host_size = 0;
-    const double alpha;
+    const double multiplier;
 
     rowvec shape;
+    vec weight;
 
     std::vector<uvec> idx;
 
@@ -51,7 +51,7 @@ public:
     Embedded(const unsigned T, const unsigned ET, const unsigned NT, const double P)
         : Element(T, DIM, ET, NT, translational(DIM))
         , host_tag(ET)
-        , alpha(P) {}
+        , multiplier(P) {}
 
     int initialize(const shared_ptr<DomainBase>& D) override {
         host_element = D->get<Element>(host_tag);
@@ -60,11 +60,11 @@ public:
 
         if(!host_element->is_active() || host_element->compute_shape_function(normalised_coor, 0).empty()) return SUANPAN_FAIL;
 
-        access::rw(host_size) = host_element->get_node_number();
+        const auto host_size = host_element->get_node_number();
 
         idx.clear();
         idx.reserve(DIM);
-        idx.emplace_back(linspace<uvec>(DIM, DIM * static_cast<uword>(host_size), host_size));
+        idx.emplace_back(linspace<uvec>(DIM, DIM * host_size, host_size));
         for(auto I = 1u; I < DIM; ++I) idx.emplace_back(idx.back() + 1);
 
         const auto temp_coor = get_coordinate(DIM);
@@ -74,7 +74,24 @@ public:
         auto counter = 0u;
         while(++counter <= max_iteration) {
             const vec incre = solve((host_element->compute_shape_function(normalised_coor, 1) * element_coor).t(), node_coor - ((shape = host_element->compute_shape_function(normalised_coor, 0)) * element_coor).t());
-            if(suanpan::inf_norm(incre) < 1E-14) break;
+            if(suanpan::inf_norm(incre) < 1E-14) {
+                weight.ones(get_node_number());
+                weight.tail(host_size) = -shape.t();
+
+                const vec shape_a = multiplier * shape.t();
+                const mat shape_b = -shape_a * shape;
+
+                initial_stiffness.zeros(get_total_number(), get_total_number());
+                for(auto I = 0u; I < DIM; ++I) {
+                    initial_stiffness(I, I) = -multiplier;
+                    initial_stiffness(uvec{I}, idx[I]) = shape_a.t();
+                    initial_stiffness(idx[I], uvec{I}) = shape_a;
+                    initial_stiffness(idx[I], idx[I]) = shape_b;
+                }
+                ConstantStiffness(this);
+
+                break;
+            }
             normalised_coor += incre;
         }
 
@@ -82,53 +99,20 @@ public:
     }
 
     int update_status() override {
-        const mat t_disp = reshape(get_trial_displacement(), DIM, get_node_number());
-        const vec reaction = alpha * (t_disp.col(0) - t_disp.tail_cols(host_size) * shape.t());
-
         trial_resistance.zeros(get_total_number());
-        trial_stiffness.zeros(get_total_number(), get_total_number());
+
+        const vec reaction = multiplier * reshape(get_trial_displacement(), DIM, get_node_number()) * weight;
 
         trial_resistance.head(DIM) = -reaction;
 
-        mat t_shape = alpha * shape.t();
-
-        for(auto I = 0u; I < DIM; ++I) {
-            trial_resistance(idx[I]) = shape.t() * reaction(I);
-            trial_stiffness(I, I) = -alpha;
-            trial_stiffness(uvec{I}, idx[I]) = t_shape.t();
-            trial_stiffness(idx[I], uvec{I}) = t_shape;
-        }
-
-        t_shape *= -shape;
-
-        for(auto I = 0u; I < DIM; ++I) trial_stiffness(idx[I], idx[I]) = t_shape;
+        for(auto I = 0u; I < DIM; ++I) trial_resistance(idx[I]) = shape.t() * reaction(I);
 
         return SUANPAN_SUCCESS;
     }
 
-    int clear_status() override {
-        trial_resistance.reset();
-        trial_stiffness.reset();
-
-        current_resistance = trial_resistance;
-        current_stiffness = trial_stiffness;
-
-        return SUANPAN_SUCCESS;
-    }
-
-    int commit_status() override {
-        current_resistance = trial_resistance;
-        current_stiffness = trial_stiffness;
-
-        return SUANPAN_SUCCESS;
-    }
-
-    int reset_status() override {
-        trial_resistance = current_resistance;
-        trial_stiffness = current_stiffness;
-
-        return SUANPAN_SUCCESS;
-    }
+    int clear_status() override { return SUANPAN_SUCCESS; }
+    int commit_status() override { return SUANPAN_SUCCESS; }
+    int reset_status() override { return SUANPAN_SUCCESS; }
 };
 
 #endif
