@@ -39,7 +39,6 @@
 #define NODE_H
 
 #include <Domain/Tag.h>
-#include <set>
 
 class DomainBase;
 enum class OutputType;
@@ -223,6 +222,16 @@ public:
 
     void print() override;
 };
+
+#if defined(__GNUC__) && (__GNUC__ < 12)
+inline
+#else
+constexpr inline
+#endif
+    std::vector<Node::DOF>
+    translational(const unsigned dimension) {
+    return 2u == dimension ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
+}
 
 #endif
 
