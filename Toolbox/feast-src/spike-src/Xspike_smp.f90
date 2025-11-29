@@ -1443,12 +1443,6 @@ integer, dimension(:), pointer :: ipiv_aux
 
 pivot = spm(3) .eq. 1
 
-!COPY OPTION
-!MAIN_TYPE, pointer, dimension(:,:) :: f_aux1
-!MAIN_TYPE, pointer, dimension(:,:) :: f_aux2
-call T_ALLOC(wallocate_2)(spike2_red,2*max(kl,ku),spm(23)*2*max(kl,ku),infoloc)
-call T_ALLOC(wallocate_2)(spike2_grj,2*max(kl,ku),spm(23)*nrhs,infoloc)
-
 start_time = OMP_GET_WTIME()
 call wallocate_2d(timing_array,spm(22),2,infoloc)
 
@@ -1476,6 +1470,12 @@ if(spm(20) == 1) then
   redsys_start_time = 0.0d0
   redsys_end_time = 0.0d0
 else
+
+!COPY OPTION
+!MAIN_TYPE, pointer, dimension(:,:) :: f_aux1
+!MAIN_TYPE, pointer, dimension(:,:) :: f_aux2
+call T_ALLOC(wallocate_2)(spike2_red, 2 * max(kl, ku), spm(23) * 2 * max(kl, ku), infoloc)
+call T_ALLOC(wallocate_2)(spike2_grj, 2 * max(kl, ku), spm(23) * nrhs, infoloc)
 
 call wallocate_1i(Ajmin,spm(20)+1,infoloc)
 call spikerl_calc_size_partitions(spm,Ajmin,n)
@@ -2040,8 +2040,6 @@ character :: trans
 
 start_time = OMP_GET_WTIME()
 
-call T_ALLOC(wallocate_2)(spike2_red,2*max(kl,ku),spm(23)*2*max(kl,ku),infoloc)
-call T_ALLOC(wallocate_2)(spike2_grj,2*max(kl,ku),spm(23)*nrhs,infoloc)
 call wallocate_2d(timing_array,spm(22),2,infoloc)
 
 if(spm(20) == 1) then
@@ -2059,6 +2057,9 @@ if(spm(20) == 1) then
   redsys_start_time = 0.0d0
   redsys_end_time = 0.0d0
 else
+
+call T_ALLOC(wallocate_2)(spike2_red, 2 * max(kl, ku), spm(23) * 2 * max(kl, ku), infoloc)
+call T_ALLOC(wallocate_2)(spike2_grj, 2 * max(kl, ku), spm(23) * nrhs, infoloc)
 
 klu = max(kl,ku)
 
