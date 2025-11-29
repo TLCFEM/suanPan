@@ -86,18 +86,21 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
     energy = (1. - propagation_weight) * energy + propagation_weight * current_energy;
 
     const uvec disabled_list = find(state == 0);
-    uvec sorted_list = sort_index(energy(disabled_list));
-
-    sorted_list = disabled_list(sorted_list.tail(reactive_ratio * disabled_list.n_elem / 100));
-    suanpan::for_all(sorted_list, [&](const uword I) {
-        D->enable_element(index[I]);
-        state(I) = 1;
-    });
+    if(const auto disabled_size = reactive_ratio * disabled_list.n_elem / 100; disabled_size > 0llu) {
+        uvec sorted_list = sort_index(energy(disabled_list));
+        sorted_list = disabled_list(sorted_list.tail(disabled_size));
+        suanpan::for_all(sorted_list, [&](const uword I) {
+            D->enable_element(index[I]);
+            state(I) = 1;
+        });
+    }
 
     const uvec enabled_list = find(state == 1);
-    sorted_list = sort_index(energy(enabled_list));
-    sorted_list = enabled_list(sorted_list.head(enabled_list.n_elem - std::min((100 - current_level) * current_energy.n_elem / 100, enabled_list.n_elem)));
-    suanpan::for_all(sorted_list, [&](const uword I) { D->disable_element(index[I]); });
+    if(const auto enabled_size = enabled_list.n_elem - std::min((100 - current_level) * current_energy.n_elem / 100, enabled_list.n_elem); enabled_size > 0llu) {
+        uvec sorted_list = sort_index(energy(enabled_list));
+        sorted_list = enabled_list(sorted_list.head(enabled_size));
+        suanpan::for_all(sorted_list, [&](const uword I) { D->disable_element(index[I]); });
+    }
 
     if(D->is_updated() && current_level == final_level) return SUANPAN_EXIT;
 
