@@ -87,6 +87,10 @@ void Element::update_momentum() {
     momentum = trial_mass * get_trial_velocity();
 }
 
+void Element::validate() const {
+    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
+}
+
 vec Element::get_node_incre_resistance() const {
     vec node_incre_resistance(num_size, fill::none);
 
@@ -149,9 +153,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , num_dof(ND)
     , material_type(MTP)
     , section_type(SectionType::D0)
-    , dof_identifier(std::move(DI)) {
-    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
-}
+    , dof_identifier(std::move(DI)) { validate(); }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<Node::DOF>&& DI)
     : DataElement{std::move(NT), uvec{}, std::move(ST), F}
@@ -161,12 +163,10 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , num_dof(ND)
     , material_type(MaterialType::D0)
     , section_type(STP)
-    , dof_identifier(std::move(DI)) {
-    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
-}
+    , dof_identifier(std::move(DI)) { validate(); }
 
 // for contact elements that use node groups
-Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
+Element::Element(const unsigned T, const unsigned ND, uvec&& GT, std::vector<Node::DOF>&& DI)
     : DataElement{std::move(GT), {}, {}, false}
     , ElementBase(T)
     , Distributed(static_cast<int>(T))
@@ -174,7 +174,8 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
     , num_dof(ND)
     , use_group(true)
     , material_type(MaterialType::D0)
-    , section_type(SectionType::D0) {}
+    , section_type(SectionType::D0)
+    , dof_identifier(std::move(DI)) { validate(); }
 
 // for elements that use other elements
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT, std::vector<Node::DOF>&& DI)
@@ -186,9 +187,7 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
     , use_other(ET)
     , material_type(MaterialType::D0)
     , section_type(SectionType::D0)
-    , dof_identifier(std::move(DI)) {
-    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
-}
+    , dof_identifier(std::move(DI)) { validate(); }
 
 int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity

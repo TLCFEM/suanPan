@@ -144,6 +144,8 @@ class Element : protected DataElement, public ElementBase, public Distributed {
     void update_complementary_energy() override;
     void update_momentum() override;
 
+    void validate() const;
+
 protected:
     std::vector<std::weak_ptr<Node>> node_ptr; // node pointers
 
@@ -183,9 +185,10 @@ public:
         std::vector<Node::DOF>&& // dof identifier
     );
     Element(
-        unsigned, // tag
-        unsigned, // number of dofs
-        uvec&&    // group encoding
+        unsigned,                // tag
+        unsigned,                // number of dofs
+        uvec&&,                  // group encoding
+        std::vector<Node::DOF>&& // dof identifier
     );
     Element(
         unsigned,                // tag

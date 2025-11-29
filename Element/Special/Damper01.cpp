@@ -21,8 +21,8 @@
 #include <Material/Material1D/Material1D.h>
 
 Damper01::Damper01(const unsigned T, uvec&& NT, const unsigned D, const unsigned DIM)
-    : MaterialElement1D(T, d_node, 3 == DIM ? 3 : 2, std::move(NT), uvec{D}, false, 3 == DIM ? std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3} : std::vector{Node::DOF::U1, Node::DOF::U2})
-    , d_dof(3 == DIM ? 3 : 2)
+    : MaterialElement1D(T, d_node, DIM, std::move(NT), uvec{D}, false, translational(DIM))
+    , d_dof(DIM)
     , IS(3 == d_dof ? uvec{0, 1, 2} : uvec{0, 1})
     , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3}) { modify_viscous = false; }
 
