@@ -2,21 +2,20 @@
 
 ROOT_DIR=$(dirname "$(dirname "$(realpath "$0")")")
 
-EXCLUDE_DIRS=("Include" "Toolbox/superlu*" "cmake*" "build*")
+EXCLUDE_PATTERNS=("Include" "Toolbox/superlu*" "cmake*" "build*")
 EXTENSIONS=("cpp" "c" "h" "hpp")
 
-PRUNE_EXPR=""
-for DIR in "${EXCLUDE_DIRS[@]}"; do
-  PRUNE_EXPR="$PRUNE_EXPR -path '$ROOT_DIR/$DIR' -prune -o"
+PRUNE_ARGS=()
+for PATTERN in "${EXCLUDE_PATTERNS[@]}"; do
+  for DIR in "$ROOT_DIR"/$PATTERN; do
+    [ -d "$DIR" ] && PRUNE_ARGS+=(-path "$DIR" -prune -o)
+  done
 done
 
-NAME_EXPR=""
+NAME_ARGS=()
 for EXT in "${EXTENSIONS[@]}"; do
-  if [ -z "$NAME_EXPR" ]; then
-    NAME_EXPR="-name '*.$EXT'"
-  else
-    NAME_EXPR="$NAME_EXPR -o -name '*.$EXT'"
-  fi
+  NAME_ARGS+=(-name "*.$EXT" -o)
 done
+unset 'NAME_ARGS[${#NAME_ARGS[@]}-1]'
 
-eval "find $ROOT_DIR $PRUNE_EXPR \( $NAME_EXPR \) -type f -exec cf -i {} +"
+find "$ROOT_DIR" "${PRUNE_ARGS[@]}" \( "${NAME_ARGS[@]}" \) -type f -print | xargs -P "$(nproc)" -I{} cf -i {}
