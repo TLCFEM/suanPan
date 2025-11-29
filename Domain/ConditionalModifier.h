@@ -98,6 +98,7 @@
 #include <Domain/Node.h>
 #include <Load/Amplitude/Amplitude.h>
 #include <Toolbox/ResourceHolder.h>
+#include <set>
 
 class ConditionalModifier : public UniqueTag {
     const unsigned amplitude_tag;
