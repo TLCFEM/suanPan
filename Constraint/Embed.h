@@ -26,8 +26,8 @@
  * @{
  */
 
-#ifndef EMBED2D_H
-#define EMBED2D_H
+#ifndef EMBED_H
+#define EMBED_H
 
 #include "Constraint.h"
 
