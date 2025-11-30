@@ -439,7 +439,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(output_file.is_open()) output_file << all_line << '\n';
-        if(std::istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return;
+        if(process_command(model, std::istringstream(all_line)) == SUANPAN_EXIT) return;
         all_line.clear();
     }
 }

@@ -138,8 +138,7 @@ namespace {
                     return SUANPAN_EXIT;
                 }
                 if(is_equal(command_line, target)) {
-                    std::istringstream tmp_str(command_line);
-                    const auto code = process_command(new_model, tmp_str);
+                    const auto code = process_command(new_model, std::istringstream(command_line));
                     suanpan_highlight("overview -> [Press Enter to Continue]");
                     getline(std::cin, command_line);
                     return code;
@@ -1301,8 +1300,7 @@ namespace {
 
         auto run_command = [&](const std::string& command_string) {
             suanpan_highlight("\t{}\n", command_string);
-            auto command = std::istringstream(command_string);
-            process_command(new_model, command);
+            process_command(new_model, std::istringstream(command_string));
             std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
         };
 
@@ -1345,7 +1343,7 @@ namespace {
     }
 } // namespace
 
-int process_command(const shared_ptr<Bead>& model, std::istringstream& command) {
+int process_command(const shared_ptr<Bead>& model, std::istringstream&& command) {
     if(nullptr == model) return SUANPAN_SUCCESS;
 
     std::string command_id;
@@ -2314,7 +2312,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(record_command) output_file << all_line << '\n';
-        if(std::istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) {
+        if(process_command(model, std::istringstream(all_line)) == SUANPAN_EXIT) {
             if(record_command) output_file << "### finish processing --> " << file_name << '\n';
             return SUANPAN_EXIT;
         }

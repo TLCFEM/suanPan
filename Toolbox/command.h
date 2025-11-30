@@ -33,7 +33,7 @@
 
 class Bead;
 
-int process_command(const std::shared_ptr<Bead>&, std::istringstream&);
+int process_command(const std::shared_ptr<Bead>&, std::istringstream&&);
 
 bool normalise_command(std::string&, std::string&);
 
