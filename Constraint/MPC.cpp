@@ -27,7 +27,7 @@ MPC::MPC(const unsigned T, const unsigned A, const double L, Pack&& P)
 int MPC::initialize(const shared_ptr<DomainBase>& D) {
     auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
 
-    for(auto [tag, target, weight] : pool) {
+    for(auto&& [tag, target, weight] : pool) {
         if(auto& node = D->get<Node>(tag); node && node->is_active())
             if(const auto global = node->get_dof({target}); !global.empty()) {
                 auxiliary_stiffness(global.front()) = weight;
