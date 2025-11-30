@@ -41,7 +41,7 @@
 
 class DomainBase;
 
-class Converger : public CopiableTag {
+class Converger : public CopyableTag {
     std::weak_ptr<DomainBase> database; /**< pointer to DomainBase */
 
     double tolerance; /**< tolerance */

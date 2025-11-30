@@ -24,7 +24,7 @@ void Orientation::check_element_ptr() const {
 }
 
 Orientation::Orientation(const unsigned T, vec&& O)
-    : CopiableTag(T)
+    : CopyableTag(T)
     , z_axis(std::move(O)) {}
 
 void Orientation::update_axis(const vec& O) {

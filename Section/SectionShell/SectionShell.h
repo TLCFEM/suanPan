@@ -62,7 +62,7 @@ struct SectionShellData {
     mat trial_plate_stiffness{};
 };
 
-class SectionShell : protected SectionShellData, public CopiableTag {
+class SectionShell : protected SectionShellData, public CopyableTag {
     const bool symmetric = false;
     const bool initialized = false;
 

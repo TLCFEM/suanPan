@@ -21,7 +21,7 @@
 
 SectionShell::SectionShell(const unsigned T, const unsigned MT, vec&& E)
     : SectionShellData{MT, std::move(E)}
-    , CopiableTag(T) {}
+    , CopyableTag(T) {}
 
 void SectionShell::set_initialized(const bool T) const { access::rw(initialized) = T; }
 

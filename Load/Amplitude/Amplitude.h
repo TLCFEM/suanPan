@@ -56,14 +56,14 @@
 
 class DomainBase;
 
-class Amplitude : public CopiableTag {
+class Amplitude : public CopyableTag {
     bool initialized = false;
 
 protected:
     double start_time = 0.; // T0
 
 public:
-    using CopiableTag::CopiableTag;
+    using CopyableTag::CopyableTag;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 

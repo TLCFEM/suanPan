@@ -37,7 +37,7 @@
 
 class Element;
 
-class Orientation : public CopiableTag {
+class Orientation : public CopyableTag {
 protected:
     const Element* element_ptr = nullptr;
 

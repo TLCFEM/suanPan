@@ -30,7 +30,7 @@
 
 class DomainBase;
 
-class Database : public CopiableTag {
+class Database : public CopyableTag {
     shared_ptr<DomainBase> domain = nullptr;
 
 public:

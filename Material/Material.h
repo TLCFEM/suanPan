@@ -111,7 +111,7 @@ struct DataMaterial {
     mat trial_inertial{};   // inertial matrix
 };
 
-class Material : protected DataMaterial, protected DataCoupleMaterial, public CopiableTag {
+class Material : protected DataMaterial, protected DataCoupleMaterial, public CopyableTag {
     const bool initialized = false;
     const bool symmetric = false;
     const bool support_couple = false; // indicate if the material supports couple stress theory

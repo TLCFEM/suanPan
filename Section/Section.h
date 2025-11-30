@@ -74,7 +74,7 @@ struct DataSection {
     mat trial_geometry{};   // geometry matrix
 };
 
-class Section : protected DataSection, public CopiableTag {
+class Section : protected DataSection, public CopyableTag {
     const bool initialized = false;
     const bool symmetric = false;
 

@@ -35,7 +35,7 @@
 
 class DomainBase;
 
-class Criterion : public CopiableTag {
+class Criterion : public CopyableTag {
     unsigned step_tag;
 
 public:
