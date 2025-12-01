@@ -46,6 +46,15 @@ namespace suanpan {
 #endif
     }
 
+    template<typename IN, typename FN> requires requires(IN& x) { x.cbegin(); x.cend(); } auto max_element_in(IN& from, FN&& func) {
+        return std::max_element(
+#ifdef __cpp_lib_execution
+            std::execution::par,
+#endif
+            from.cbegin(), from.cend(), std::forward<FN>(func)
+        );
+    }
+
     template<typename T> [[maybe_unused]] const std::vector<T>& unique(std::vector<T>& container) {
         std::sort(container.begin(), container.end());
         container.erase(std::unique(container.begin(), container.end()), container.end());

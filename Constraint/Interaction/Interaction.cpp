@@ -17,7 +17,6 @@
 
 #include "Interaction.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
 
@@ -44,13 +43,13 @@ vec InteractionPair::relative_velocity() const { return object_j->get_trial_velo
 
 void Interaction::initialize(const shared_ptr<DomainBase>& D) { factory = D->get_factory(); }
 
-int Hertzian::apply(const shared_ptr<InteractionPair>& pair) const {
+void Hertzian::apply(const shared_ptr<InteractionPair>& pair) const {
     const vec position_i = pair->position_i(), position_j = pair->position_j();
     const vec chord = position_j - position_i;
     const auto chord_length = norm(chord);
     const auto compression = pair->initial_gap() - chord_length;
 
-    if(compression <= 0.) return SUANPAN_SUCCESS;
+    if(compression <= 0.) return;
 
     const auto normal_factor = -2. * std::sqrt(pair->effective_radius) * pair->effective_modulus * std::pow(compression, .5);
     const auto normal_force_over_length = compression * normal_factor * two_third / chord_length;
@@ -80,17 +79,15 @@ int Hertzian::apply(const shared_ptr<InteractionPair>& pair) const {
                 t_stiff->at(dof_j(I), dof_i(J)) -= der_repulsive(I, J);
             }
     }
-
-    return SUANPAN_SUCCESS;
 }
 
-int HertzianDamped::apply(const shared_ptr<InteractionPair>& pair) const {
+void HertzianDamped::apply(const shared_ptr<InteractionPair>& pair) const {
     const vec position_i = pair->position_i(), position_j = pair->position_j();
     const vec chord = position_j - position_i;
     const auto chord_length = norm(chord);
     const auto compression = pair->initial_gap() - chord_length;
 
-    if(compression <= 0.) return SUANPAN_SUCCESS;
+    if(compression <= 0.) return;
 
     const vec unit_cord = chord / chord_length;
     const auto velocity_rel = pair->relative_velocity();
@@ -137,6 +134,4 @@ int HertzianDamped::apply(const shared_ptr<InteractionPair>& pair) const {
                 t_damping->at(dof_j(I), dof_i(J)) -= der_repulsive(I, J);
             }
     }
-
-    return SUANPAN_SUCCESS;
 }

@@ -61,7 +61,7 @@ public:
 
     void initialize(const shared_ptr<DomainBase>&);
 
-    [[nodiscard]] virtual int apply(const shared_ptr<InteractionPair>&) const = 0;
+    virtual void apply(const shared_ptr<InteractionPair>&) const = 0;
 };
 
 class Hertzian final : public Interaction {
@@ -70,7 +70,7 @@ class Hertzian final : public Interaction {
 public:
     using Interaction::Interaction;
 
-    [[nodiscard]] int apply(const shared_ptr<InteractionPair>&) const override;
+    void apply(const shared_ptr<InteractionPair>&) const override;
 };
 
 class HertzianDamped final : public Interaction {
@@ -79,7 +79,7 @@ class HertzianDamped final : public Interaction {
 public:
     using Interaction::Interaction;
 
-    [[nodiscard]] int apply(const shared_ptr<InteractionPair>&) const override;
+    void apply(const shared_ptr<InteractionPair>&) const override;
 };
 
 #endif
