@@ -76,3 +76,25 @@ int SphericalParticle2D::initialize(const shared_ptr<DomainBase>&) {
 
     return SUANPAN_SUCCESS;
 }
+
+InertialSphericalParticle3D::InertialSphericalParticle3D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double A, const double M, const double I)
+    : SphericalParticle(T, N, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3}, R, E, V, A, M, I) {}
+
+int InertialSphericalParticle3D::initialize(const shared_ptr<DomainBase>&) {
+    initial_mass = diagmat(vec{mass, mass, mass, inertia, inertia, inertia});
+
+    ConstantMass(this);
+
+    return SUANPAN_SUCCESS;
+}
+
+SphericalParticle3D::SphericalParticle3D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double A, const double M)
+    : SphericalParticle(T, N, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, R, E, V, A, M, 0.) {}
+
+int SphericalParticle3D::initialize(const shared_ptr<DomainBase>&) {
+    initial_mass = diagmat(vec{mass, mass, mass});
+
+    ConstantMass(this);
+
+    return SUANPAN_SUCCESS;
+}

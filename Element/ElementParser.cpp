@@ -1984,6 +1984,38 @@ namespace {
         return_obj = std::make_unique<T>(tag, node, section_tag);
     }
 
+    template<unsigned DIM> void new_sphericalparticle(unique_ptr<Element>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned node;
+        if(!get_input(command, node)) {
+            suanpan_error("A valid node tag is required.\n");
+            return;
+        }
+
+        const auto pool = get_remaining<double>(command);
+        if(pool.size() != 5 && pool.size() != 6) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        if constexpr(2u == DIM) {
+            if(5 == pool.size())
+                return_obj = std::make_unique<SphericalParticle2D>(tag, node, pool[0], pool[1], pool[2], pool[3], pool[4]);
+            else
+                return_obj = std::make_unique<InertialSphericalParticle2D>(tag, node, pool[0], pool[1], pool[2], pool[3], pool[4], pool[5]);
+        }
+        else {
+            if(5 == pool.size())
+                return_obj = std::make_unique<SphericalParticle3D>(tag, node, pool[0], pool[1], pool[2], pool[3], pool[4]);
+            else
+                return_obj = std::make_unique<InertialSphericalParticle3D>(tag, node, pool[0], pool[1], pool[2], pool[3], pool[4], pool[5]);
+        }
+    }
     void new_spring01(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -2651,6 +2683,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "SGCMS")) new_sgcms(new_element, command);
     else if(is_equal(element_id, "SingleSection2D")) new_singlesection<SingleSection2D>(new_element, command);
     else if(is_equal(element_id, "SingleSection3D")) new_singlesection<SingleSection3D>(new_element, command);
+    else if(is_equal(element_id, "SphericalParticle2D")) new_sphericalparticle<2u>(new_element, command);
     else if(is_equal(element_id, "Spring01")) new_spring01(new_element, command);
     else if(is_equal(element_id, "Spring02")) new_spring02(new_element, command);
     else if(is_equal(element_id, "T2D2")) new_t2d2(new_element, command);

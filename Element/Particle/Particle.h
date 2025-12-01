@@ -106,6 +106,37 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 };
 
+class InertialSphericalParticle3D final : public SphericalParticle {
+public:
+    InertialSphericalParticle3D(
+        unsigned, // tag
+        unsigned, // node tag
+        double,   // radius
+        double,   // elastic modulus
+        double,   // poisson ratio
+        double,   // damping
+        double,   // mass
+        double    // inertia
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+};
+
+class SphericalParticle3D final : public SphericalParticle {
+public:
+    SphericalParticle3D(
+        unsigned, // tag
+        unsigned, // node tag
+        double,   // radius
+        double,   // elastic modulus
+        double,   // poisson ratio
+        double,   // damping
+        double    // mass
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+};
+
 #endif
 
 //! @}
