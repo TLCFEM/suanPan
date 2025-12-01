@@ -1008,6 +1008,9 @@ int Domain::initialize() {
     integrator_pond.update();
     solver_pond.update();
 
+    suanpan::for_all(interaction_pond, [&](const dual<Interaction>& t_interaction) { t_interaction.second->initialize(shared_from_this()); });
+    interaction_pond.update();
+
     // for restart analysis
     suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { t_load.second->deinitialize(); });
     suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->deinitialize(); });

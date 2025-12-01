@@ -52,7 +52,7 @@ void Hertzian::apply(const shared_ptr<InteractionPair>& pair) const {
 
     if(compression <= 0.) return;
 
-    const auto normal_factor = -2. * std::sqrt(pair->effective_radius) * pair->effective_modulus * std::pow(compression, .5);
+    const auto normal_factor = 2. * std::sqrt(pair->effective_radius) * pair->effective_modulus * std::pow(compression, .5);
     const auto normal_force_over_length = compression * normal_factor * two_third / chord_length;
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
@@ -94,7 +94,7 @@ void HertzianDamped::apply(const shared_ptr<InteractionPair>& pair) const {
     const auto velocity_rel = pair->relative_velocity();
     const auto velocity_projection = dot(velocity_rel, unit_cord);
 
-    const auto pair_factor = -four_third * std::sqrt(pair->effective_radius) * pair->effective_modulus * pair->effective_damping;
+    const auto pair_factor = four_third * std::sqrt(pair->effective_radius) * pair->effective_modulus * pair->effective_damping;
     const auto normal_force = pair_factor * std::pow(compression, .5) * velocity_projection;
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
