@@ -51,7 +51,7 @@ public:
 
 class SphericalParticle : public Particle {
 protected:
-    const double radius, elastic_modulus, poisson_ratio, mass, inertia;
+    const double radius, elastic_modulus, poisson_ratio, damping, mass, inertia;
 
 public:
     SphericalParticle(
@@ -61,6 +61,7 @@ public:
         double,                   // radius
         double,                   // elastic modulus
         double,                   // poisson ratio
+        double,                   // damping
         double,                   // mass
         double                    // inertia
     );
@@ -76,6 +77,7 @@ public:
         double,   // radius
         double,   // elastic modulus
         double,   // poisson ratio
+        double,   // damping
         double,   // mass
         double    // inertia
     );
@@ -91,6 +93,7 @@ public:
         double,   // radius
         double,   // elastic modulus
         double,   // poisson ratio
+        double,   // damping
         double    // mass
     );
 

@@ -33,22 +33,52 @@ class DomainBase;
 class Element;
 
 struct InteractionPair {
-    shared_ptr<Element> object_i, object_j;
+    const shared_ptr<Element> object_i, object_j;
+
+    double effective_mass{};
+    double effective_radius{};
+    double effective_modulus{};
+    double effective_damping{};
 
     InteractionPair(const shared_ptr<Element>&, const shared_ptr<Element>&);
 
-    [[nodiscard]] double compression() const;
+    [[nodiscard]] vec position_i() const;
+    [[nodiscard]] vec position_j() const;
+    [[nodiscard]] const uvec& dof_i() const;
+    [[nodiscard]] const uvec& dof_j() const;
+
+    [[nodiscard]] double initial_gap() const;
+    [[nodiscard]] vec relative_velocity() const;
 };
 
 class Interaction : public CopyableTag {
+protected:
     shared_ptr<DomainBase> domain;
 
 public:
-    Interaction() = default;
+    using CopyableTag::CopyableTag;
 
     void initialize(const shared_ptr<DomainBase>&);
 
     [[nodiscard]] virtual int apply(const shared_ptr<InteractionPair>&) const = 0;
+};
+
+class Hertzian final : public Interaction {
+    static constexpr double two_third = 2. / 3.;
+
+public:
+    using Interaction::Interaction;
+
+    [[nodiscard]] int apply(const shared_ptr<InteractionPair>&) const override;
+};
+
+class HertzianDamped final : public Interaction {
+    static constexpr double four_third = 4. / 3.;
+
+public:
+    using Interaction::Interaction;
+
+    [[nodiscard]] int apply(const shared_ptr<InteractionPair>&) const override;
 };
 
 #endif

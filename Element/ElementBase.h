@@ -66,7 +66,8 @@ public:
         POISSON,
         RADIUS,
         MASS,
-        INERTIA
+        INERTIA,
+        DAMPING
     };
 
     explicit ElementBase(const unsigned T)
