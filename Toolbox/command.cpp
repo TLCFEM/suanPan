@@ -1385,14 +1385,15 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream&& command)
     if(is_equal(command_id, "use")) return use_object(domain, command);
 
     if(is_equal(command_id, "amplitude")) return create_new_amplitude(domain, command);
-    if(is_equal(command_id, "expression")) return create_new_expression(domain, command);
     if(is_equal(command_id, "converger")) return create_new_converger(domain, command);
     if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
     if(is_equal(command_id, "element")) return create_new_element(domain, command);
+    if(is_equal(command_id, "expression")) return create_new_expression(domain, command);
     if(is_equal(command_id, "hdf5recorder")) return create_new_recorder(domain, command, true);
     if(is_equal(command_id, "import")) return create_new_external_module(domain, command);
     if(is_equal(command_id, "initial")) return create_new_initial(domain, command);
     if(is_equal(command_id, "integrator")) return create_new_integrator(domain, command);
+    if(is_equal(command_id, "interaction")) return create_new_interaction(domain, command);
     if(is_equal(command_id, "mass")) return create_new_mass(domain, command);
     if(is_equal(command_id, "material")) return create_new_material(domain, command);
     if(is_equal(command_id, "modifier")) return create_new_modifier(domain, command);

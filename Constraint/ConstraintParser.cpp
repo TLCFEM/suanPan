@@ -248,6 +248,31 @@ namespace {
         return_obj = std::make_unique<NodeFacet>(tag, 0, std::move(node_tag));
     }
 
+    template<unsigned DIM> void new_moleculardynamics(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto space = 1.;
+        if(!command.eof() && !get_input(command, space)) {
+            suanpan_error("A valid spacing is required.\n");
+            return;
+        }
+
+        auto alpha = 1.;
+        if(!command.eof() && !get_input(command, alpha)) {
+            suanpan_error("A valid multiplier is required.\n");
+            return;
+        }
+
+        if constexpr(2 == DIM)
+            return_obj = std::make_unique<MolecularDynamics2D>(tag, get_remaining<uword>(command));
+        else
+            return_obj = std::make_unique<MolecularDynamics3D>(tag, get_remaining<uword>(command));
+    }
+
     void new_particlecollision(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dim) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -511,6 +536,29 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
     return SUANPAN_SUCCESS;
 }
 
+int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string criterion_type;
+    if(!get_input(command, criterion_type)) {
+        suanpan_error("A valid criterion type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    auto flag = true;
+
+    if(is_equal(criterion_type, "Hertzian")) flag = domain->insert(std::make_shared<Hertzian>(tag));
+    else if(is_equal(criterion_type, "HertzianDamped")) flag = domain->insert(std::make_shared<HertzianDamped>(tag));
+
+    if(!flag) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
 int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string constraint_id;
     if(!get_input(command, constraint_id)) {
@@ -542,6 +590,8 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
     else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
     else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
     else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
+    else if(is_equal(constraint_id, "MolecularDynamics2D")) new_moleculardynamics<2u>(new_constraint, command);
+    else if(is_equal(constraint_id, "MolecularDynamics3D")) new_moleculardynamics<3u>(new_constraint, command);
     else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision(new_constraint, command, 2);
     else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision(new_constraint, command, 3);
     else if(is_equal_any(constraint_id, "RestitutionWall", "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);

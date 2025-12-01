@@ -110,6 +110,55 @@ public:
     }
 };
 
+class MolecularDynamics3D final : public MolecularDynamics {
+    struct CellList {
+        int x = 0, y = 0, z = 0;
+        unsigned tag = 0;
+
+        CellList(const int in_x, const int in_y, const int in_z, const unsigned in_tag)
+            : x(in_x)
+            , y(in_y)
+            , z(in_z)
+            , tag(in_tag) {}
+    };
+
+public:
+    MolecularDynamics3D(const unsigned T, uvec&& IT)
+        : MolecularDynamics(T, std::move(IT), {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}) {}
+
+    int process(const shared_ptr<DomainBase>& D) override {
+        auto& W = D->get_factory();
+
+        auto& element_pool = D->get_element_pool();
+
+        suanpan::vector<CellList> list;
+        list.reserve(element_pool.size());
+
+        const auto space = 2. * std::transform_reduce(element_pool.cbegin(), element_pool.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); });
+        suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
+            if(norm(element->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("The nodal speed seems to be too large.\n");
+            const vec new_pos = element->get_coordinate().t() + element->get_trial_displacement();
+            list.emplace_back(static_cast<int>(floor(new_pos(0) / space)), static_cast<int>(floor(new_pos(1) / space)), static_cast<int>(floor(new_pos(2) / space)), element->get_tag());
+        });
+
+        suanpan_sort(list.begin(), list.end(), [](const CellList& a, const CellList& b) { return a.x < b.x || a.x == b.x && a.y < b.y || a.x == b.x && a.y == b.y && a.z < b.z; });
+
+        suanpan::for_each(list.size(), [&](const size_t I) {
+            for(auto J = I + 1; J < list.size(); ++J) {
+                const auto diff_x = list[J].x - list[I].x;
+                if(diff_x > 1) break;
+                const auto diff_y = list[J].y - list[I].y;
+                const auto diff_z = list[J].z - list[I].z;
+                if(diff_x == 1 && (diff_y > 1 || diff_z > 1)) break;
+                if(std::abs(diff_y) > 1 || std::abs(diff_z) > 1) continue;
+                apply_interaction(std::make_unique<InteractionPair>(D->get<Element>(list[I].tag), D->get<Element>(list[J].tag)));
+            }
+        });
+
+        return SUANPAN_SUCCESS;
+    }
+};
+
 #endif
 
 //! @}
