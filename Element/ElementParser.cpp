@@ -2684,6 +2684,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "SingleSection2D")) new_singlesection<SingleSection2D>(new_element, command);
     else if(is_equal(element_id, "SingleSection3D")) new_singlesection<SingleSection3D>(new_element, command);
     else if(is_equal(element_id, "SphericalParticle2D")) new_sphericalparticle<2u>(new_element, command);
+    else if(is_equal(element_id, "SphericalParticle3D")) new_sphericalparticle<3u>(new_element, command);
     else if(is_equal(element_id, "Spring01")) new_spring01(new_element, command);
     else if(is_equal(element_id, "Spring02")) new_spring02(new_element, command);
     else if(is_equal(element_id, "T2D2")) new_t2d2(new_element, command);

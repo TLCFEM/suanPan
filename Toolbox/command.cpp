@@ -1472,7 +1472,7 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream&& command)
     if(is_equal(command_id, "multiplierbc")) return constraint_handler();
     if(is_equal(command_id, "nodefacet")) return constraint_handler();
     if(is_equal(command_id, "nodeline")) return constraint_handler();
-    if(is_equal_any(command_id, "particlecollision2d", "particlecollision3d")) return constraint_handler();
+    if(is_equal_any(command_id, "moleculardynamics2d", "moleculardynamics3d", "particlecollision2d", "particlecollision3d")) return constraint_handler();
     if(is_equal(command_id, "penaltybc")) return constraint_handler();
     if(is_equal_any(command_id, "restitutionwall", "restitutionwallpenalty")) return constraint_handler();
     if(is_equal_any(command_id, "rigidwall", "rigidwallpenalty")) return constraint_handler();

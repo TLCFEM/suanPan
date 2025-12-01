@@ -255,18 +255,6 @@ namespace {
             return;
         }
 
-        auto space = 1.;
-        if(!command.eof() && !get_input(command, space)) {
-            suanpan_error("A valid spacing is required.\n");
-            return;
-        }
-
-        auto alpha = 1.;
-        if(!command.eof() && !get_input(command, alpha)) {
-            suanpan_error("A valid multiplier is required.\n");
-            return;
-        }
-
         if constexpr(2 == DIM)
             return_obj = std::make_unique<MolecularDynamics2D>(tag, get_remaining<uword>(command));
         else
