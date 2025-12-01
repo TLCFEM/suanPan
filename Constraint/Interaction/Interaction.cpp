@@ -16,3 +16,14 @@
  ******************************************************************************/
 
 #include "Interaction.h"
+
+#include <Domain/DomainBase.h>
+#include <Element/Element.h>
+
+InteractionPair::InteractionPair(const shared_ptr<Element>& obj_i, const shared_ptr<Element>& obj_j)
+    : object_i(obj_i)
+    , object_j(obj_j) {}
+
+double InteractionPair::compression() const { return object_j->get(Element::Parameter::RADIUS) + object_i->get(Element::Parameter::RADIUS) - norm(object_j->get_coordinate().t() - object_i->get_coordinate().t() + object_j->get_trial_displacement() - object_i->get_trial_displacement()); }
+
+void Interaction::initialize(const shared_ptr<DomainBase>& D) { domain = D; }

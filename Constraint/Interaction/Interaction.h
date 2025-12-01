@@ -27,18 +27,17 @@
 #ifndef INTERACTION_H
 #define INTERACTION_H
 
-#include <Domain/DomainBase.h>
 #include <Domain/Tag.h>
-#include <Element/Element.h>
+
+class DomainBase;
+class Element;
 
 struct InteractionPair {
     shared_ptr<Element> object_i, object_j;
 
-    InteractionPair(const shared_ptr<Element>& obj_i, const shared_ptr<Element>& obj_j)
-        : object_i(obj_i)
-        , object_j(obj_j) {}
+    InteractionPair(const shared_ptr<Element>&, const shared_ptr<Element>&);
 
-    [[nodiscard]] double compression() const { return object_j->get(Element::Parameter::RADIUS) + object_i->get(Element::Parameter::RADIUS) - norm(object_j->get_coordinate().t() - object_i->get_coordinate().t() + object_j->get_trial_displacement() - object_i->get_trial_displacement()); }
+    [[nodiscard]] double compression() const;
 };
 
 class Interaction : public CopyableTag {
@@ -47,7 +46,7 @@ class Interaction : public CopyableTag {
 public:
     Interaction() = default;
 
-    void initialize(const shared_ptr<DomainBase>& D) { domain = D; }
+    void initialize(const shared_ptr<DomainBase>&);
 
     [[nodiscard]] virtual int apply(const shared_ptr<InteractionPair>&) const = 0;
 };
