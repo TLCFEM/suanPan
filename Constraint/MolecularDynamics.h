@@ -67,6 +67,11 @@ class MolecularDynamics2D final : public MolecularDynamics {
     struct CellList {
         int x = 0, y = 0;
         unsigned tag = 0;
+
+        CellList(const int in_x, const int in_y, const unsigned in_tag)
+            : x(in_x)
+            , y(in_y)
+            , tag(in_tag) {}
     };
 
 public:
