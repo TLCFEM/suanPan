@@ -32,21 +32,6 @@ void MassBase::print() {
     suanpan_info("A point mass element.\n");
 }
 
-#ifdef SUANPAN_VTK
-#include <vtkVertex.h>
-
-vtkSmartPointer<vtkCell> MassBase::GetCell() const { return vtkSmartPointer<vtkVertex>::New(); }
-
-mat MassBase::GetData(const OutputType P) {
-    if(OutputType::A == P) return get_current_acceleration();
-    if(OutputType::V == P) return get_current_velocity();
-    if(OutputType::U == P) return get_current_displacement();
-
-    return {};
-}
-
-#endif
-
 Mass2D::Mass2D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     : MassBase(T, uvec{NT}, [&] {
         std::vector DI(std::min(3llu, DT.max()), Node::DOF::NONE);

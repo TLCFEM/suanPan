@@ -20,41 +20,6 @@
 Particle::Particle(const unsigned T, const unsigned N, std::vector<Node::DOF>&& D)
     : Element(T, 1, D.size(), uvec{N}, std::move(D)) {}
 
-SphericalParticle::SphericalParticle(const unsigned T, const unsigned N, std::vector<Node::DOF>&& D, const double R, const double E, const double V, const double A, const double M, const double I)
-    : Particle(T, N, std::move(D))
-    , radius(R)
-    , elastic_modulus(E)
-    , poisson_ratio(V)
-    , damping(A)
-    , mass(M)
-    , inertia(I) {}
-
-double SphericalParticle::get(const Parameter P) const {
-    if(Parameter::ELASTIC == P) return elastic_modulus;
-    if(Parameter::POISSON == P) return poisson_ratio;
-    if(Parameter::RADIUS == P) return radius;
-    if(Parameter::MASS == P) return mass;
-    if(Parameter::INERTIA == P) return inertia;
-    if(Parameter::DAMPING == P) return damping;
-
-    return 0.;
-}
-
-#ifdef SUANPAN_VTK
-#include <vtkVertex.h>
-
-vtkSmartPointer<vtkCell> SphericalParticle::GetCell() const { return vtkSmartPointer<vtkVertex>::New(); }
-
-mat SphericalParticle::GetData(const OutputType P) {
-    if(OutputType::A == P) return get_current_acceleration();
-    if(OutputType::V == P) return get_current_velocity();
-    if(OutputType::U == P) return get_current_displacement();
-
-    return {};
-}
-
-#endif
-
 InertialSphericalParticle2D::InertialSphericalParticle2D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double A, const double M, const double I)
     : SphericalParticle(T, N, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3}, R, E, V, A, M, I) {}
 
