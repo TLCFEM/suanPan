@@ -40,6 +40,21 @@ double SphericalParticle::get(const Parameter P) const {
     return 0.;
 }
 
+#ifdef SUANPAN_VTK
+#include <vtkVertex.h>
+
+vtkSmartPointer<vtkCell> SphericalParticle::GetCell() const { return vtkSmartPointer<vtkVertex>::New(); }
+
+mat SphericalParticle::GetData(const OutputType P) {
+    if(OutputType::A == P) return get_current_acceleration();
+    if(OutputType::V == P) return get_current_velocity();
+    if(OutputType::U == P) return get_current_displacement();
+
+    return {};
+}
+
+#endif
+
 InertialSphericalParticle2D::InertialSphericalParticle2D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double A, const double M, const double I)
     : SphericalParticle(T, N, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3}, R, E, V, A, M, I) {}
 

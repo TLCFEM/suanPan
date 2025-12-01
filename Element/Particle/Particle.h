@@ -67,6 +67,12 @@ public:
     );
 
     [[nodiscard]] double get(Parameter) const final;
+
+#ifdef SUANPAN_VTK
+    [[nodiscard]] vtkSmartPointer<vtkCell> GetCell() const override;
+
+    mat GetData(OutputType) override;
+#endif
 };
 
 class InertialSphericalParticle2D final : public SphericalParticle {
