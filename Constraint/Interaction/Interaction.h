@@ -38,7 +38,7 @@ struct InteractionPair {
         : object_i(obj_i)
         , object_j(obj_j) {}
 
-    [[nodiscard]] double distance() const { return norm(object_j->get_coordinate().t() - object_i->get_coordinate().t() + object_j->get_trial_displacement() - object_i->get_trial_displacement()); }
+    [[nodiscard]] double compression() const { return object_j->get(Element::Parameter::RADIUS) + object_i->get(Element::Parameter::RADIUS) - norm(object_j->get_coordinate().t() - object_i->get_coordinate().t() + object_j->get_trial_displacement() - object_i->get_trial_displacement()); }
 };
 
 class Interaction : public CopyableTag {
