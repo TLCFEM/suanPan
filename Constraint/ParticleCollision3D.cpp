@@ -32,28 +32,21 @@ int ParticleCollision3D::process_meta(const shared_ptr<DomainBase>& D, const boo
     auto& W = D->get_factory();
 
     auto& node_pool = D->get_node_pool();
+    suanpan::vector<CellList> list;
+    list.reserve(node_pool.size());
 
-    const auto node_size = node_pool.size();
-
-    std::vector<CellList> list(node_size);
-
-    suanpan::for_each(node_size, [&](const size_t I) {
-        const auto& t_node = node_pool[I];
-        if(norm(t_node->get_trial_velocity()) * W->get_incre_time() > space)
-            suanpan_warning("The nodal speed seems to be too large.\n");
-        const auto new_pos = t_node->trial_position(dimension);
-        list[I].x = static_cast<int>(floor(new_pos(0) / space));
-        list[I].y = static_cast<int>(floor(new_pos(1) / space));
-        list[I].z = static_cast<int>(floor(new_pos(2) / space));
-        list[I].tag = t_node->get_tag();
+    suanpan::for_all(node_pool, [&](const shared_ptr<Node>& node) {
+        if(norm(node->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("The nodal speed seems to be too large.\n");
+        const auto new_pos = node->trial_position(dimension);
+        list.emplace_back(static_cast<int>(floor(new_pos(0) / space)), static_cast<int>(floor(new_pos(1) / space)), static_cast<int>(floor(new_pos(2) / space)), node->get_tag());
     });
 
     suanpan_sort(list.begin(), list.end(), [](const CellList& a, const CellList& b) { return a.x < b.x || a.x == b.x && a.y < b.y || a.x == b.x && a.y == b.y && a.z < b.z; });
 
     resistance.zeros(W->get_size());
 
-    suanpan::for_each(node_size, [&](const size_t I) {
-        for(auto J = I + 1; J < node_size; ++J) {
+    suanpan::for_each(list.size(), [&](const size_t I) {
+        for(auto J = I + 1; J < list.size(); ++J) {
             const auto diff_x = list[J].x - list[I].x;
             if(diff_x > 1) break;
             const auto diff_y = list[J].y - list[I].y;
