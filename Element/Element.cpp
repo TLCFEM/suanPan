@@ -356,6 +356,8 @@ void Element::clear_node_ptr() { node_ptr.clear(); }
 
 const std::vector<std::weak_ptr<Node>>& Element::get_node_ptr() const { return node_ptr; }
 
+mat Element::get_coordinate() const { return get_coordinate(num_dof); }
+
 /**
  * \brief generate a matrix that contains coordinates of connected nodes
  * \param num_dim number of dimension required

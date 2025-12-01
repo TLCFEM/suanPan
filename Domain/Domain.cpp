@@ -19,6 +19,7 @@
 
 #include <Constraint/Constraint.h>
 #include <Constraint/Criterion/Criterion.h>
+#include <Constraint/Interaction/Interaction.h>
 #include <Converger/Converger.h>
 #include <Database/Database.h>
 #include <Domain/Factory.hpp>
@@ -118,6 +119,11 @@ bool Domain::insert(const shared_ptr<Group>& E) {
 bool Domain::insert(const shared_ptr<Integrator>& I) {
     updated = false;
     return integrator_pond.insert(I);
+}
+
+bool Domain::insert(const shared_ptr<Interaction>& I) {
+    updated = false;
+    return interaction_pond.insert(I);
 }
 
 bool Domain::insert(const shared_ptr<Load>& L) {
@@ -226,6 +232,13 @@ bool Domain::erase_integrator(const unsigned T) {
 
     updated = false;
     return integrator_pond.erase(T);
+}
+
+bool Domain::erase_interaction(const unsigned T) {
+    if(!find<Interaction>(T)) return true;
+
+    updated = false;
+    return interaction_pond.erase(T);
 }
 
 bool Domain::erase_load(const unsigned T) {
@@ -352,6 +365,13 @@ void Domain::disable_integrator(const unsigned T) {
 
     updated = false;
     integrator_pond.disable(T);
+}
+
+void Domain::disable_interaction(const unsigned T) {
+    if(!find<Interaction>(T) || !get<Interaction>(T)->is_active() || get<Interaction>(T)->is_guarded()) return;
+
+    updated = false;
+    interaction_pond.disable(T);
 }
 
 void Domain::disable_load(const unsigned T) {
@@ -481,6 +501,13 @@ void Domain::enable_integrator(const unsigned T) {
     integrator_pond.enable(T);
 }
 
+void Domain::enable_interaction(const unsigned T) {
+    if(!find<Interaction>(T) || get<Interaction>(T)->is_active()) return;
+
+    updated = false;
+    interaction_pond.enable(T);
+}
+
 void Domain::enable_load(const unsigned T) {
     if(!find<Load>(T) || get<Load>(T)->is_active()) return;
 
@@ -563,6 +590,8 @@ const shared_ptr<Group>& Domain::get_group(const unsigned T) const { return grou
 
 const shared_ptr<Integrator>& Domain::get_integrator(const unsigned T) const { return integrator_pond.at(T); }
 
+const shared_ptr<Interaction>& Domain::get_interaction(const unsigned T) const { return interaction_pond.at(T); }
+
 const shared_ptr<Load>& Domain::get_load(const unsigned T) const { return load_pond.at(T); }
 
 const shared_ptr<Material>& Domain::get_material(const unsigned T) const { return material_pond.at(T); }
@@ -598,6 +627,8 @@ const ElementQueue& Domain::get_element_pool() const { return element_pond.get()
 const GroupQueue& Domain::get_group_pool() const { return group_pond.get(); }
 
 const IntegratorQueue& Domain::get_integrator_pool() const { return integrator_pond.get(); }
+
+const InteractionQueue& Domain::get_interaction_pool() const { return interaction_pond.get(); }
 
 const LoadQueue& Domain::get_load_pool() const { return load_pond.get(); }
 
@@ -635,6 +666,8 @@ size_t Domain::get_group() const { return group_pond.size(); }
 
 size_t Domain::get_integrator() const { return integrator_pond.size(); }
 
+size_t Domain::get_interaction() const { return interaction_pond.size(); }
+
 size_t Domain::get_load() const { return load_pond.size(); }
 
 size_t Domain::get_material() const { return material_pond.size(); }
@@ -670,6 +703,8 @@ bool Domain::find_element(const unsigned T) const { return element_pond.find(T);
 bool Domain::find_group(const unsigned T) const { return group_pond.find(T); }
 
 bool Domain::find_integrator(const unsigned T) const { return integrator_pond.find(T); }
+
+bool Domain::find_interaction(const unsigned T) const { return interaction_pond.find(T); }
 
 bool Domain::find_load(const unsigned T) const { return load_pond.find(T); }
 
