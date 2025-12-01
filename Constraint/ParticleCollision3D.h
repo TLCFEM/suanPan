@@ -35,6 +35,12 @@ class ParticleCollision3D final : public ParticleCollision {
     struct CellList {
         int x = 0, y = 0, z = 0;
         unsigned tag = 0;
+
+        CellList(const int in_x, const int in_y, const int in_z, const unsigned in_tag)
+            : x(in_x)
+            , y(in_y)
+            , z(in_z)
+            , tag(in_tag) {}
     };
 
     const double space = 1.;
