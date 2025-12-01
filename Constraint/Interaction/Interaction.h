@@ -31,6 +31,7 @@
 
 class DomainBase;
 class Element;
+template<sp_d T> class Factory;
 
 struct InteractionPair {
     const shared_ptr<Element> object_i, object_j;
@@ -53,7 +54,7 @@ struct InteractionPair {
 
 class Interaction : public CopyableTag {
 protected:
-    shared_ptr<DomainBase> domain;
+    shared_ptr<Factory<double>> factory;
 
 public:
     using CopyableTag::CopyableTag;
