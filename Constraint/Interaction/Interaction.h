@@ -50,6 +50,7 @@ public:
 
     [[nodiscard]] vec position_i() const;
     [[nodiscard]] vec position_j() const;
+
     [[nodiscard]] const uvec& dof_i() const;
     [[nodiscard]] const uvec& dof_j() const;
 
