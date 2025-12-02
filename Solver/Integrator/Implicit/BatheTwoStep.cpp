@@ -48,7 +48,6 @@ void BatheTwoStep::assemble_resistance() {
 
 void BatheTwoStep::assemble_matrix() {
     const auto D = get_domain();
-    auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
     auto fb = std::async([&] { D->assemble_trial_geometry(); });
@@ -61,6 +60,10 @@ void BatheTwoStep::assemble_matrix() {
     fc.get();
     fd.get();
     fe.get();
+}
+
+void BatheTwoStep::assemble_effective_matrix() {
+    auto& W = get_domain()->get_factory();
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
@@ -69,6 +72,8 @@ void BatheTwoStep::assemble_matrix() {
     const auto damping_coef = FLAG::TRAP == step_flag ? P2 : P8;
 
     W->get_stiffness() += W->is_nonviscous() ? damping_coef * (W->get_damping() + W->get_nonviscous()) : damping_coef * W->get_damping();
+
+    set_matrix_assembled_switch();
 }
 
 void BatheTwoStep::update_incre_time(double T) {

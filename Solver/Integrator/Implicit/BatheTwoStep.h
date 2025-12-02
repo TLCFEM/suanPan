@@ -55,6 +55,7 @@ public:
 
     void assemble_resistance() override;
     void assemble_matrix() override;
+    void assemble_effective_matrix() override;
 
     void update_incre_time(double) override;
 

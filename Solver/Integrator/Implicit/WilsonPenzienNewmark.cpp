@@ -162,7 +162,6 @@ void WilsonPenzienNewmark::assemble_resistance() {
 
 void WilsonPenzienNewmark::assemble_matrix() {
     const auto D = get_domain();
-    auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
     auto fb = std::async([&] { D->assemble_trial_geometry(); });
@@ -175,8 +174,11 @@ void WilsonPenzienNewmark::assemble_matrix() {
     fc.get();
     fd.get();
     fe.get();
+}
 
-    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+void WilsonPenzienNewmark::assemble_effective_matrix() {
+    if(auto& W = get_domain()->get_factory(); W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+    set_matrix_assembled_switch();
 }
 
 void WilsonPenzienNewmark::print() {

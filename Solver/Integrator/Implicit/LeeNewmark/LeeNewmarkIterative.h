@@ -96,6 +96,7 @@ public:
     [[nodiscard]] int process_constraint_resistance() override;
 
     void assemble_matrix() override;
+    void assemble_effective_matrix() override;
 
     void print() override;
 };

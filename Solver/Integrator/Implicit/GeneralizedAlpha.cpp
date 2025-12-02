@@ -109,7 +109,6 @@ void GeneralizedAlpha::assemble_resistance() {
 
 void GeneralizedAlpha::assemble_matrix() {
     const auto D = get_domain();
-    auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
     auto fb = std::async([&] { D->assemble_trial_geometry(); });
@@ -122,12 +121,18 @@ void GeneralizedAlpha::assemble_matrix() {
     fc.get();
     fd.get();
     fe.get();
+}
+
+void GeneralizedAlpha::assemble_effective_matrix() {
+    auto& W = get_domain()->get_factory();
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
     W->get_stiffness() += F5 / F2 * W->get_mass();
 
     W->get_stiffness() += W->is_nonviscous() ? F6 / F2 * (W->get_damping() + W->get_nonviscous()) : F6 / F2 * W->get_damping();
+
+    set_matrix_assembled_switch();
 }
 
 vec GeneralizedAlpha::get_force_residual() { return ImplicitIntegrator::get_force_residual() / F2; }

@@ -71,8 +71,9 @@ int MPDC::analyze() {
             // process constraints
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
             D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
             // indicate the global matrix has been assembled
-            G->set_matrix_assembled_switch(true);
+            G->assemble_effective_matrix();
         }
 
         t_clock.tic();

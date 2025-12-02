@@ -59,6 +59,8 @@ protected:
 
     virtual int correct_trial_status();
 
+    void set_matrix_assembled_switch();
+
 public:
     enum class Type {
         Implicit,
@@ -79,7 +81,6 @@ public:
     [[nodiscard]] bool allow_to_change_time_step() const;
 
     // ! manually set switch after assembling global matrix
-    void set_matrix_assembled_switch(bool);
     [[nodiscard]] bool matrix_is_assembled() const;
 
     [[nodiscard]] virtual bool time_independent_matrix() const;
@@ -95,6 +96,7 @@ public:
 
     virtual void assemble_resistance();
     virtual void assemble_matrix();
+    virtual void assemble_effective_matrix();
 
     virtual vec get_force_residual();
     virtual vec get_displacement_residual();
@@ -162,6 +164,7 @@ public:
 
     void assemble_resistance() override;
     void assemble_matrix() override;
+    void assemble_effective_matrix() override;
 
     [[nodiscard]] const vec& get_trial_displacement() const override;
 

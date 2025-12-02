@@ -89,7 +89,6 @@ void GSSSS::assemble_resistance() {
 
 void GSSSS::assemble_matrix() {
     const auto D = get_domain();
-    auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
     auto fb = std::async([&] { D->assemble_trial_geometry(); });
@@ -102,12 +101,18 @@ void GSSSS::assemble_matrix() {
     fc.get();
     fd.get();
     fe.get();
+}
+
+void GSSSS::assemble_effective_matrix() {
+    auto& W = get_domain()->get_factory();
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
     W->get_stiffness() += XA * W->get_mass();
 
     W->get_stiffness() += W->is_nonviscous() ? XV * (W->get_damping() + W->get_nonviscous()) : XV * W->get_damping();
+
+    set_matrix_assembled_switch();
 }
 
 vec GSSSS::get_force_residual() { return XD * ImplicitIntegrator::get_force_residual(); }

@@ -44,7 +44,6 @@ void Newmark::assemble_resistance() {
 
 void Newmark::assemble_matrix() {
     const auto D = get_domain();
-    auto& W = D->get_factory();
 
     auto fa = std::async([&] { D->assemble_trial_stiffness(); });
     auto fb = std::async([&] { D->assemble_trial_geometry(); });
@@ -57,12 +56,18 @@ void Newmark::assemble_matrix() {
     fc.get();
     fd.get();
     fe.get();
+}
+
+void Newmark::assemble_effective_matrix() {
+    auto& W = get_domain()->get_factory();
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
     W->get_stiffness() += C0 * W->get_mass();
 
     W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
+
+    set_matrix_assembled_switch();
 }
 
 int Newmark::update_trial_status(bool) {
