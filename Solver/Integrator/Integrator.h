@@ -154,6 +154,8 @@ public:
     using Integrator::Integrator;
 
     [[nodiscard]] Type type() const final { return Type::Implicit; }
+
+    void assemble_matrix() override;
 };
 
 class ExplicitIntegrator : public Integrator {

@@ -371,22 +371,6 @@ int LeeNewmarkIterative::process_constraint_resistance() {
     return Newmark::process_constraint_resistance();
 }
 
-void LeeNewmarkIterative::assemble_matrix() {
-    const auto D = get_domain();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
-    auto fe = std::async([&] { D->assemble_trial_mass(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-    fe.get();
-}
-
 void LeeNewmarkIterative::assemble_effective_matrix() {
     auto& W = get_domain()->get_factory();
 

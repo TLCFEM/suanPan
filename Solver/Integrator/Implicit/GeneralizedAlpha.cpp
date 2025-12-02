@@ -107,22 +107,6 @@ void GeneralizedAlpha::assemble_resistance() {
     W->set_sushi(W->get_current_resistance() + F2 * W->get_incre_resistance() + W->get_current_damping_force() + F2 * W->get_incre_damping_force() + W->get_current_nonviscous_force() + F2 * W->get_incre_nonviscous_force() + W->get_current_inertial_force() + F4 * W->get_incre_inertial_force());
 }
 
-void GeneralizedAlpha::assemble_matrix() {
-    const auto D = get_domain();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
-    auto fe = std::async([&] { D->assemble_trial_mass(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-    fe.get();
-}
-
 void GeneralizedAlpha::assemble_effective_matrix() {
     auto& W = get_domain()->get_factory();
 

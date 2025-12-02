@@ -55,7 +55,6 @@ public:
     explicit Newmark(unsigned = 0, double = .25, double = .5);
 
     void assemble_resistance() override;
-    void assemble_matrix() override;
     void assemble_effective_matrix() override;
 
     int update_trial_status(bool) override;

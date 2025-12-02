@@ -132,7 +132,6 @@ void Integrator::assemble_resistance() {
  */
 void Integrator::assemble_matrix() {
     const auto D = database.lock();
-    auto& W = D->get_factory();
     D->assemble_trial_stiffness();
     D->assemble_trial_geometry();
 }
@@ -376,6 +375,22 @@ vec Integrator::from_incre_acceleration(const double magnitude, const uvec& enco
 vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding) { return from_total_velocity(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
+
+void ImplicitIntegrator::assemble_matrix() {
+    const auto D = get_domain();
+
+    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
+    auto fb = std::async([&] { D->assemble_trial_geometry(); });
+    auto fc = std::async([&] { D->assemble_trial_damping(); });
+    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
+    auto fe = std::async([&] { D->assemble_trial_mass(); });
+
+    fa.get();
+    fb.get();
+    fc.get();
+    fd.get();
+    fe.get();
+}
 
 void ExplicitIntegrator::assemble_resistance() {
     const auto D = get_domain();

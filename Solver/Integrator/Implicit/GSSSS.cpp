@@ -87,22 +87,6 @@ void GSSSS::assemble_resistance() {
     W->set_sushi(W->get_current_resistance() + W3G3 / L3 * W->get_incre_resistance() + W->get_current_damping_force() + W2G5 / L5 * W->get_incre_damping_force() + W->get_current_nonviscous_force() + W2G5 / L5 * W->get_incre_nonviscous_force() + W->get_current_inertial_force() + W1G6 * W->get_incre_inertial_force());
 }
 
-void GSSSS::assemble_matrix() {
-    const auto D = get_domain();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
-    auto fe = std::async([&] { D->assemble_trial_mass(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-    fe.get();
-}
-
 void GSSSS::assemble_effective_matrix() {
     auto& W = get_domain()->get_factory();
 

@@ -60,7 +60,6 @@ public:
     GeneralizedAlpha(unsigned, double, double);
 
     void assemble_resistance() override;
-    void assemble_matrix() override;
     void assemble_effective_matrix() override;
 
     vec get_force_residual() override;
