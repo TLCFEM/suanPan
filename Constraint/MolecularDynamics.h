@@ -35,7 +35,7 @@
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
 
-template<unsigned DIM> class MolecularDynamics : public Constraint {
+template<unsigned DIM, bool ROTATION> class MolecularDynamics : public Constraint {
     uvec interaction_tags;
     std::vector<shared_ptr<Interaction>> interactions;
 
@@ -44,12 +44,13 @@ template<unsigned DIM> class MolecularDynamics : public Constraint {
 protected:
     void apply_interaction(const shared_ptr<InteractionPair>& pair) const {
         pair->set_dimension(DIM);
+        pair->set_inertial(ROTATION);
         for(auto&& interaction : interactions) interaction->apply(pair);
     }
 
 public:
     MolecularDynamics(const unsigned T, uvec&& IT)
-        : Constraint(T, 0, suanpan::translational(DIM), {}, 0)
+        : Constraint(T, 0, ROTATION ? suanpan::mechanical(DIM) : suanpan::translational(DIM), {}, 0)
         , interaction_tags(std::move(IT)) {}
 
     int initialize(const shared_ptr<DomainBase>& D) override {
@@ -64,7 +65,7 @@ public:
     }
 };
 
-class MolecularDynamics2D final : public MolecularDynamics<2u> {
+class MolecularDynamics2D final : public MolecularDynamics<2u, false> {
     struct CellList {
         int x = 0, y = 0;
         unsigned tag = 0;
@@ -110,7 +111,7 @@ public:
     }
 };
 
-class MolecularDynamics3D final : public MolecularDynamics<3u> {
+class MolecularDynamics3D final : public MolecularDynamics<3u, false> {
     struct CellList {
         int x = 0, y = 0, z = 0;
         unsigned tag = 0;

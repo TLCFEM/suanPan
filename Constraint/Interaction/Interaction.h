@@ -36,6 +36,7 @@ template<sp_d T> class Factory;
 class InteractionPair {
     const shared_ptr<Element> object_i, object_j;
 
+    bool inertial = false;
     unsigned dimension{};
 
 public:
@@ -47,6 +48,7 @@ public:
     InteractionPair(const shared_ptr<Element>&, const shared_ptr<Element>&);
 
     void set_dimension(const unsigned dim) { dimension = dim; }
+    void set_inertial(const bool flag) { inertial = flag; }
 
     [[nodiscard]] vec position_i() const;
     [[nodiscard]] vec position_j() const;
