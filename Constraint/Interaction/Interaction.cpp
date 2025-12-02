@@ -30,9 +30,9 @@ InteractionPair::InteractionPair(const shared_ptr<Element>& obj_i, const shared_
     effective_damping = .5 * (obj_i->get(Element::Parameter::DAMPING) + obj_j->get(Element::Parameter::DAMPING));
 }
 
-vec InteractionPair::position_i() const { return object_i->get_coordinate().t() + object_i->get_trial_displacement(); }
+vec InteractionPair::position_i() const { return object_i->get_coordinate(dimension).t() + object_i->get_trial_displacement().head(dimension); }
 
-vec InteractionPair::position_j() const { return object_j->get_coordinate().t() + object_j->get_trial_displacement(); }
+vec InteractionPair::position_j() const { return object_j->get_coordinate(dimension).t() + object_j->get_trial_displacement().head(dimension); }
 
 const uvec& InteractionPair::dof_i() const { return object_i->get_dof_encoding(); }
 
@@ -40,7 +40,7 @@ const uvec& InteractionPair::dof_j() const { return object_j->get_dof_encoding()
 
 double InteractionPair::initial_gap() const { return object_i->get(Element::Parameter::RADIUS) + object_j->get(Element::Parameter::RADIUS); }
 
-vec InteractionPair::relative_velocity() const { return object_j->get_trial_velocity() - object_i->get_trial_velocity(); }
+vec InteractionPair::relative_velocity() const { return object_j->get_trial_velocity().head(dimension) - object_i->get_trial_velocity().head(dimension); }
 
 void Interaction::initialize(const shared_ptr<DomainBase>& D) { factory = D->get_factory(); }
 

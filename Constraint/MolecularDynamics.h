@@ -35,7 +35,7 @@
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
 
-class MolecularDynamics : public Constraint {
+template<unsigned DIM> class MolecularDynamics : public Constraint {
     uvec interaction_tags;
     std::vector<shared_ptr<Interaction>> interactions;
 
@@ -43,12 +43,13 @@ class MolecularDynamics : public Constraint {
 
 protected:
     void apply_interaction(const shared_ptr<InteractionPair>& pair) const {
+        pair->set_dimension(DIM);
         for(auto&& interaction : interactions) interaction->apply(pair);
     }
 
 public:
-    MolecularDynamics(const unsigned T, uvec&& IT, std::vector<Node::DOF>&& DC)
-        : Constraint(T, 0, std::move(DC), {}, 0)
+    MolecularDynamics(const unsigned T, uvec&& IT)
+        : Constraint(T, 0, translational(DIM), {}, 0)
         , interaction_tags(std::move(IT)) {}
 
     int initialize(const shared_ptr<DomainBase>& D) override {
@@ -63,7 +64,7 @@ public:
     }
 };
 
-class MolecularDynamics2D final : public MolecularDynamics {
+class MolecularDynamics2D final : public MolecularDynamics<2u> {
     struct CellList {
         int x = 0, y = 0;
         unsigned tag = 0;
@@ -75,8 +76,7 @@ class MolecularDynamics2D final : public MolecularDynamics {
     };
 
 public:
-    MolecularDynamics2D(const unsigned T, uvec&& IT)
-        : MolecularDynamics(T, std::move(IT), {Node::DOF::U1, Node::DOF::U2}) {}
+    using MolecularDynamics ::MolecularDynamics;
 
     int process(const shared_ptr<DomainBase>& D) override {
         auto& W = D->get_factory();
@@ -88,8 +88,8 @@ public:
 
         const auto space = 2. * std::transform_reduce(element_pool.cbegin(), element_pool.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); });
         suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
-            if(norm(element->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("The nodal speed seems to be too large.\n");
-            const vec new_pos = element->get_coordinate().t() + element->get_trial_displacement();
+            if(norm(element->get_trial_velocity().head(2)) * W->get_incre_time() > space) suanpan_warning("The nodal speed seems to be too large.\n");
+            const vec new_pos = element->get_coordinate(2).t() + element->get_trial_displacement().head(2);
             list.emplace_back(static_cast<int>(floor(new_pos(0) / space)), static_cast<int>(floor(new_pos(1) / space)), element->get_tag());
         });
 
@@ -110,7 +110,7 @@ public:
     }
 };
 
-class MolecularDynamics3D final : public MolecularDynamics {
+class MolecularDynamics3D final : public MolecularDynamics<3u> {
     struct CellList {
         int x = 0, y = 0, z = 0;
         unsigned tag = 0;
@@ -123,8 +123,7 @@ class MolecularDynamics3D final : public MolecularDynamics {
     };
 
 public:
-    MolecularDynamics3D(const unsigned T, uvec&& IT)
-        : MolecularDynamics(T, std::move(IT), {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}) {}
+    using MolecularDynamics ::MolecularDynamics;
 
     int process(const shared_ptr<DomainBase>& D) override {
         auto& W = D->get_factory();
@@ -136,8 +135,8 @@ public:
 
         const auto space = 2. * std::transform_reduce(element_pool.cbegin(), element_pool.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); });
         suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
-            if(norm(element->get_trial_velocity()) * W->get_incre_time() > space) suanpan_warning("The nodal speed seems to be too large.\n");
-            const vec new_pos = element->get_coordinate().t() + element->get_trial_displacement();
+            if(norm(element->get_trial_velocity().head(3)) * W->get_incre_time() > space) suanpan_warning("The nodal speed seems to be too large.\n");
+            const vec new_pos = element->get_coordinate(3).t() + element->get_trial_displacement().head(3);
             list.emplace_back(static_cast<int>(floor(new_pos(0) / space)), static_cast<int>(floor(new_pos(1) / space)), static_cast<int>(floor(new_pos(2) / space)), element->get_tag());
         });
 

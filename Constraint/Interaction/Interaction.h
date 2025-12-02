@@ -33,15 +33,20 @@ class DomainBase;
 class Element;
 template<sp_d T> class Factory;
 
-struct InteractionPair {
+class InteractionPair {
     const shared_ptr<Element> object_i, object_j;
 
+    unsigned dimension{};
+
+public:
     double effective_mass{};
     double effective_radius{};
     double effective_modulus{};
     double effective_damping{};
 
     InteractionPair(const shared_ptr<Element>&, const shared_ptr<Element>&);
+
+    void set_dimension(const unsigned dim) { dimension = dim; }
 
     [[nodiscard]] vec position_i() const;
     [[nodiscard]] vec position_j() const;
