@@ -49,7 +49,7 @@ protected:
 
 public:
     MolecularDynamics(const unsigned T, uvec&& IT)
-        : Constraint(T, 0, translational(DIM), {}, 0)
+        : Constraint(T, 0, suanpan::translational(DIM), {}, 0)
         , interaction_tags(std::move(IT)) {}
 
     int initialize(const shared_ptr<DomainBase>& D) override {
