@@ -34,13 +34,15 @@ vec InteractionPair::position_i() const { return object_i->get_coordinate(dimens
 
 vec InteractionPair::position_j() const { return object_j->get_coordinate(dimension).t() + object_j->get_trial_displacement().head(dimension); }
 
+vec InteractionPair::velocity_i() const { return object_i->get_trial_velocity().head(dimension); }
+
+vec InteractionPair::velocity_j() const { return object_j->get_trial_velocity().head(dimension); }
+
 const uvec& InteractionPair::dof_i() const { return object_i->get_dof_encoding(); }
 
 const uvec& InteractionPair::dof_j() const { return object_j->get_dof_encoding(); }
 
 double InteractionPair::initial_gap() const { return object_i->get(Element::Parameter::RADIUS) + object_j->get(Element::Parameter::RADIUS); }
-
-vec InteractionPair::relative_velocity() const { return object_j->get_trial_velocity().head(dimension) - object_i->get_trial_velocity().head(dimension); }
 
 void Interaction::initialize(const shared_ptr<DomainBase>& D) { factory = D->get_factory(); }
 
@@ -84,15 +86,15 @@ void Hertzian::apply(const shared_ptr<InteractionPair>& pair) const {
 
 void HertzianDamped::apply(const shared_ptr<InteractionPair>& pair) const {
     const vec position_i = pair->position_i(), position_j = pair->position_j();
-    const vec chord = position_j - position_i;
+    const vec chord = position_i - position_j;
     const auto chord_length = norm(chord);
     const auto compression = pair->initial_gap() - chord_length;
 
     if(compression <= 0.) return;
 
     const vec unit_cord = chord / chord_length;
-    const auto velocity_rel = pair->relative_velocity();
-    const auto velocity_projection = -dot(velocity_rel, unit_cord);
+    const vec velocity_rel = pair->velocity_i() - pair->velocity_j();
+    const auto velocity_projection = dot(velocity_rel, unit_cord);
 
     const auto pair_factor = four_third * std::sqrt(pair->effective_radius) * pair->effective_modulus * pair->effective_damping;
     const auto normal_force = pair_factor * std::pow(compression, .5) * velocity_projection;
@@ -110,8 +112,8 @@ void HertzianDamped::apply(const shared_ptr<InteractionPair>& pair) const {
     }
 
     {
-        const mat der_unit_chord = (unit_cord * unit_cord.t() - eye(chord.n_elem, chord.n_elem)) / chord_length;
-        const mat der_repulsive = normal_force * der_unit_chord + pair_factor * std::pow(compression, -.5) * unit_cord * (.5 * velocity_projection * unit_cord.t() - compression * velocity_rel.t() * der_unit_chord);
+        const mat der_unit_chord = (eye(chord.n_elem, chord.n_elem) - unit_cord * unit_cord.t()) / chord_length;
+        const mat der_repulsive = normal_force * der_unit_chord + pair_factor * std::pow(compression, -.5) * unit_cord * (compression * velocity_rel.t() * der_unit_chord - .5 * velocity_projection * unit_cord.t());
         auto& t_stiff = factory->get_stiffness();
         std::scoped_lock stiffness_lock(factory->get_stiffness_mutex());
         for(auto I = 0llu; I < chord.n_elem; ++I)

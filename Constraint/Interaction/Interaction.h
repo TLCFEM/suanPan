@@ -53,12 +53,13 @@ public:
     [[nodiscard]] vec position_i() const;
     [[nodiscard]] vec position_j() const;
 
+    [[nodiscard]] vec velocity_i() const;
+    [[nodiscard]] vec velocity_j() const;
+
     [[nodiscard]] const uvec& dof_i() const;
     [[nodiscard]] const uvec& dof_j() const;
 
     [[nodiscard]] double initial_gap() const;
-
-    [[nodiscard]] vec relative_velocity() const;
 };
 
 class Interaction : public CopyableTag {
