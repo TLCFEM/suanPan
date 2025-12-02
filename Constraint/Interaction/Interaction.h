@@ -55,6 +55,7 @@ public:
     [[nodiscard]] const uvec& dof_j() const;
 
     [[nodiscard]] double initial_gap() const;
+
     [[nodiscard]] vec relative_velocity() const;
 };
 
