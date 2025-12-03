@@ -64,6 +64,7 @@ public:
     int process_constraint_resistance() override;
 
     void assemble_resistance() override;
+    void assemble_effective_matrix() override;
 
     void print() override;
 };

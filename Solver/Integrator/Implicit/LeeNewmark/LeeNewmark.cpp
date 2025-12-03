@@ -100,6 +100,9 @@ int LeeNewmark::process_constraint() {
     // process constraint for the first time to obtain proper stiffness
     if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
 
+    // !!! need to call the parent method to have effective matrix assembled
+    LeeNewmarkBase::assemble_effective_matrix();
+
     // this stiffness contains geometry, mass and damping which are handled in Newmark::assemble_matrix()
     auto& t_stiff = factory->modify_stiffness();
 
@@ -167,6 +170,12 @@ void LeeNewmark::assemble_resistance() {
 
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }
+
+/**
+ * We are not interested in the original matrices anymore.
+ * Thus, we skip assembling them.
+ */
+void LeeNewmark::assemble_effective_matrix() {}
 
 void LeeNewmark::print() {
     suanpan_info("A Newmark solver using Lee's damping model. doi:10.1016/j.jsv.2020.115312\n");
