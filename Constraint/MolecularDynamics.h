@@ -42,11 +42,13 @@ template<unsigned DIM, bool ROTATION> class MolecularDynamics : public Constrain
     [[nodiscard]] bool validate_node() const final { return true; }
 
 protected:
-    void apply_interaction(const shared_ptr<InteractionPair>& pair) const {
+    void apply_interaction(const bool full, const shared_ptr<InteractionPair>& pair) const {
         pair->set_dimension(DIM);
         pair->set_inertial(ROTATION);
-        for(auto&& interaction : interactions) interaction->apply(pair);
+        for(auto&& interaction : interactions) interaction->apply(full, pair);
     }
+
+    [[nodiscard]] virtual int process_impl(const shared_ptr<DomainBase>&, bool) = 0;
 
 public:
     MolecularDynamics(const unsigned T, uvec&& IT)
@@ -63,6 +65,10 @@ public:
 
         return Constraint::initialize(D);
     }
+
+    int process(const shared_ptr<DomainBase>& D) override { return process_impl(D, true); }
+
+    int process_resistance(const shared_ptr<DomainBase>& D) override { return process_impl(D, false); }
 };
 
 class MolecularDynamics2D final : public MolecularDynamics<2u, false> {
@@ -76,10 +82,7 @@ class MolecularDynamics2D final : public MolecularDynamics<2u, false> {
             , tag(in_tag) {}
     };
 
-public:
-    using MolecularDynamics ::MolecularDynamics;
-
-    int process(const shared_ptr<DomainBase>& D) override {
+    int process_impl(const shared_ptr<DomainBase>& D, const bool full) override {
         auto& W = D->get_factory();
 
         auto& element_pool = D->get_element_pool();
@@ -103,12 +106,15 @@ public:
                 const auto diff_y = list[J].y - list[I].y;
                 if(diff_x == 1 && diff_y > 1) break;
                 if(std::abs(diff_y) > 1) continue;
-                apply_interaction(std::make_unique<InteractionPair>(D->get<Element>(list[I].tag), D->get<Element>(list[J].tag)));
+                apply_interaction(full, std::make_unique<InteractionPair>(D->get<Element>(list[I].tag), D->get<Element>(list[J].tag)));
             }
         });
 
         return SUANPAN_SUCCESS;
     }
+
+public:
+    using MolecularDynamics ::MolecularDynamics;
 };
 
 class MolecularDynamics3D final : public MolecularDynamics<3u, false> {
@@ -123,10 +129,7 @@ class MolecularDynamics3D final : public MolecularDynamics<3u, false> {
             , tag(in_tag) {}
     };
 
-public:
-    using MolecularDynamics ::MolecularDynamics;
-
-    int process(const shared_ptr<DomainBase>& D) override {
+    int process_impl(const shared_ptr<DomainBase>& D, const bool full) override {
         auto& W = D->get_factory();
 
         auto& element_pool = D->get_element_pool();
@@ -151,12 +154,15 @@ public:
                 const auto diff_z = list[J].z - list[I].z;
                 if(diff_x == 1 && (diff_y > 1 || diff_z > 1)) break;
                 if(std::abs(diff_y) > 1 || std::abs(diff_z) > 1) continue;
-                apply_interaction(std::make_unique<InteractionPair>(D->get<Element>(list[I].tag), D->get<Element>(list[J].tag)));
+                apply_interaction(full, std::make_unique<InteractionPair>(D->get<Element>(list[I].tag), D->get<Element>(list[J].tag)));
             }
         });
 
         return SUANPAN_SUCCESS;
     }
+
+public:
+    using MolecularDynamics ::MolecularDynamics;
 };
 
 #endif

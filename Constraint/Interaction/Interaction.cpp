@@ -46,7 +46,7 @@ double InteractionPair::initial_gap() const { return object_i->get(Element::Para
 
 void Interaction::initialize(const shared_ptr<DomainBase>& D) { factory = D->get_factory(); }
 
-void Hertzian::apply(const shared_ptr<InteractionPair>& pair) const {
+void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) const {
     const vec position_i = pair->position_i(), position_j = pair->position_j();
     const vec chord = position_j - position_i;
     const auto chord_length = norm(chord);
@@ -69,7 +69,7 @@ void Hertzian::apply(const shared_ptr<InteractionPair>& pair) const {
         }
     }
 
-    {
+    if(full) {
         mat der_repulsive = (normal_factor + normal_force_over_length) / chord_length / chord_length * chord * chord.t();
         der_repulsive.diag() -= normal_force_over_length;
         auto& t_stiff = factory->get_stiffness();
@@ -84,7 +84,7 @@ void Hertzian::apply(const shared_ptr<InteractionPair>& pair) const {
     }
 }
 
-void HertzianDamped::apply(const shared_ptr<InteractionPair>& pair) const {
+void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& pair) const {
     const vec position_i = pair->position_i(), position_j = pair->position_j();
     const vec chord = position_i - position_j;
     const auto chord_length = norm(chord);
@@ -110,6 +110,8 @@ void HertzianDamped::apply(const shared_ptr<InteractionPair>& pair) const {
             t_resistance(dof_j(I)) -= repulsive(I);
         }
     }
+
+    if(!full) return;
 
     {
         const mat der_unit_chord = (eye(chord.n_elem, chord.n_elem) - unit_cord * unit_cord.t()) / chord_length;
