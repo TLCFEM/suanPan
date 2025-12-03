@@ -554,6 +554,8 @@ int Domain::update_current_status() const {
         update_current_inertial_force();
     }
 
+    factory->commit_energy();
+
     return SUANPAN_SUCCESS;
 }
 
