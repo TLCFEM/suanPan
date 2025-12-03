@@ -42,6 +42,10 @@ template<unsigned DIM, bool ROTATION> class MolecularDynamics : public Constrain
     [[nodiscard]] bool validate_node() const final { return true; }
 
 protected:
+    void apply_interaction(const bool full, const shared_ptr<Element>& element) const {
+        for(auto&& interaction : interactions) interaction->apply(full, element);
+    }
+
     void apply_interaction(const bool full, const shared_ptr<InteractionPair>& pair) const {
         pair->set_dimension(DIM);
         pair->set_inertial(ROTATION);
@@ -49,6 +53,11 @@ protected:
     }
 
     [[nodiscard]] virtual int process_impl(const shared_ptr<DomainBase>&, bool) = 0;
+
+    int process_entrypoint(const shared_ptr<DomainBase>& D, const bool full) {
+        suanpan::for_all(D->get_element_pool(), [&](const shared_ptr<Element>& element) { apply_interaction(full, element); });
+        return process_impl(D, full);
+    }
 
 public:
     MolecularDynamics(const unsigned T, uvec&& IT)
@@ -66,14 +75,15 @@ public:
             return SUANPAN_FAIL;
         }
 
-        interactions = D->get<Interaction>(interaction_tags);
+        for(auto&& item : D->get<Interaction>(interaction_tags))
+            if(item && item->is_active()) interactions.emplace_back(item);
 
         return Constraint::initialize(D);
     }
 
-    int process(const shared_ptr<DomainBase>& D) override { return process_impl(D, true); }
+    int process(const shared_ptr<DomainBase>& D) override { return process_entrypoint(D, true); }
 
-    int process_resistance(const shared_ptr<DomainBase>& D) override { return process_impl(D, false); }
+    int process_resistance(const shared_ptr<DomainBase>& D) override { return process_entrypoint(D, false); }
 };
 
 class MolecularDynamics2D final : public MolecularDynamics<2u, false> {

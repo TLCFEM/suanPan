@@ -552,7 +552,11 @@ int Domain::update_current_status() const {
     if(analysis_type == AnalysisType::DYNAMICS) {
         update_current_damping_force();
         update_current_inertial_force();
+        // only for computing the very initial mass related energy
+        assemble_current_mass();
     }
+
+    factory->commit_energy();
 
     return SUANPAN_SUCCESS;
 }

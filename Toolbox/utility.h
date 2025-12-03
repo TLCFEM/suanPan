@@ -19,6 +19,7 @@
 #define UTILITY_H
 
 #include <concepts>
+#include <set>
 #include <suanPan.h>
 #ifdef __cpp_lib_execution
 #include <execution>
@@ -130,6 +131,13 @@ template<typename T> auto get_remaining(std::istringstream& stream) {
     std::vector<T> output;
     T value;
     while(get_input(stream, value)) output.emplace_back(value);
+    return output;
+}
+
+template<typename T> auto get_remaining_as_set(std::istringstream& stream) {
+    std::set<T> output;
+    T value;
+    while(get_input(stream, value)) output.insert(value);
     return output;
 }
 

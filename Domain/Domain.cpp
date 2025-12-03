@@ -797,16 +797,9 @@ void Domain::insert_loaded_dof(const uvec& T) { loaded_dofs.insert(T.cbegin(), T
 /**
  * \brief concurrently safe insertion method
  */
-void Domain::insert_restrained_dof(const uvec& T) { restrained_dofs.insert(T.cbegin(), T.cend()); }
-
-/**
- * \brief concurrently safe insertion method
- */
 void Domain::insert_constrained_dof(const uvec& T) { constrained_dofs.insert(T.cbegin(), T.cend()); }
 
 const suanpan::unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
-
-const suanpan::unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
 
 const suanpan::unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
 
@@ -1261,7 +1254,6 @@ int Domain::process_constraint(const bool full) {
     // ! 5. record auxiliary encoding
     // ! assemble stiffness shall be done in integrator
 
-    restrained_dofs.clear();
     constrained_dofs.clear();
 
     auto& constraint_resistance = factory->modify_trial_constraint_resistance();
@@ -1364,7 +1356,7 @@ void Domain::enable_all() {
 void Domain::summary() const { suanpan_info("Domain {} contains: {} nodes, {} elements, {} materials, {} expressions, {} loads, {} constraints, {} recorders.\n", get_tag(), get_node(), get_element(), get_material(), get_expression(), get_load(), get_constraint(), get_recorder()); }
 
 void Domain::erase_machine_error(vec& ninja) const {
-    suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; });
+    suanpan::for_all(constrained_dofs, [&](const uword I) { ninja(I) = 0.; });
 }
 
 void Domain::update_load() {}

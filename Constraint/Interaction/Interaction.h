@@ -28,10 +28,10 @@
 #define INTERACTION_H
 
 #include <Domain/Tag.h>
+#include <set>
 
 class DomainBase;
 class Element;
-template<sp_d T> class Factory;
 
 class InteractionPair {
     const shared_ptr<Element> object_i, object_j;
@@ -64,13 +64,14 @@ public:
 
 class Interaction : public CopyableTag {
 protected:
-    shared_ptr<Factory<double>> factory;
+    std::weak_ptr<DomainBase> domain;
 
 public:
     using CopyableTag::CopyableTag;
 
     void initialize(const shared_ptr<DomainBase>&);
 
+    virtual void apply(bool, const shared_ptr<Element>&) const = 0;
     virtual void apply(bool, const shared_ptr<InteractionPair>&) const = 0;
 };
 
@@ -80,6 +81,7 @@ class Hertzian final : public Interaction {
 public:
     using Interaction::Interaction;
 
+    void apply(bool, const shared_ptr<Element>&) const override {}
     void apply(bool, const shared_ptr<InteractionPair>&) const override;
 };
 
@@ -89,7 +91,19 @@ class HertzianDamped final : public Interaction {
 public:
     using Interaction::Interaction;
 
+    void apply(bool, const shared_ptr<Element>&) const override {}
     void apply(bool, const shared_ptr<InteractionPair>&) const override;
+};
+
+class FixedParticle final : public Interaction {
+    std::set<unsigned> particles;
+    const double multiplier;
+
+public:
+    FixedParticle(unsigned, double, std::set<unsigned>&&);
+
+    void apply(bool, const shared_ptr<Element>&) const override;
+    void apply(bool, const shared_ptr<InteractionPair>&) const override {}
 };
 
 #endif
