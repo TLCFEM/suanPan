@@ -61,6 +61,11 @@ public:
             return SUANPAN_FAIL;
         }
 
+        if(suanpan::any_of(D->get_element_pool(), [](const shared_ptr<Element>& element) { return element->type() != Element::Type::DEM; })) {
+            suanpan_warning("Only DEM elements are supported.\n");
+            return SUANPAN_FAIL;
+        }
+
         interactions = D->get<Interaction>(interaction_tags);
 
         return Constraint::initialize(D);
