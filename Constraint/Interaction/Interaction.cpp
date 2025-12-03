@@ -151,6 +151,8 @@ FixedParticle::FixedParticle(const unsigned T, const double M, std::set<unsigned
     , multiplier(M) {}
 
 void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) const {
+    if(!particles.contains(element->get_tag())) return;
+
     if(full) {
         const auto penalty = multiplier * element->get(Element::Parameter::ELASTIC);
         auto& factory = domain->get_factory();
