@@ -19,6 +19,7 @@
 #define UTILITY_H
 
 #include <concepts>
+#include <set>
 #include <suanPan.h>
 #ifdef __cpp_lib_execution
 #include <execution>
