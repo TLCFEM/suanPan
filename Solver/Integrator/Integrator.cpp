@@ -152,7 +152,7 @@ vec Integrator::get_force_residual() {
     auto& W = D->get_factory();
 
     vec residual = W->get_trial_load() - W->get_sushi();
-    for(const auto I : D->get_restrained_dof()) residual(I) = 0.;
+    for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
     return residual;
 }
 
@@ -165,7 +165,7 @@ vec Integrator::get_displacement_residual() {
     auto& W = D->get_factory();
 
     vec residual = W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi();
-    for(const auto I : D->get_restrained_dof()) residual(I) = 0.;
+    for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
     return residual;
 }
 

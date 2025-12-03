@@ -161,5 +161,5 @@ void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) c
         for(const auto I : element->get_dof_encoding()) t_stiff->at(I, I) += penalty;
     }
 
-    domain->insert_restrained_dof(element->get_dof_encoding());
+    domain->insert_constrained_dof(element->get_dof_encoding());
 }

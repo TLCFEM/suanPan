@@ -103,7 +103,7 @@ vec Converger::get_residual() const {
     vec residual = W->get_trial_load() - W->get_sushi();
     if(!W->get_reference_load().is_empty() && !W->get_trial_load_factor().is_empty()) residual += W->get_reference_load() * W->get_trial_load_factor();
 
-    for(const auto& t_dof : D->get_restrained_dof()) residual(t_dof) = 0.;
+    for(const auto& t_dof : D->get_constrained_dof()) residual(t_dof) = 0.;
 
     return residual;
 }
