@@ -362,6 +362,8 @@ int LeeNewmarkFull::process_constraint() {
     // process constraint for the first time to obtain proper stiffness
     if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
 
+    LeeNewmarkBase::assemble_effective_matrix();
+
     // this stiffness contains geometry, mass and damping from Newmark::assemble_matrix()
     auto& t_stiff = factory->get_stiffness()->triplet_mat;
 
