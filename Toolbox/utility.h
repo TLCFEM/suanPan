@@ -53,30 +53,30 @@ namespace suanpan {
         return container;
     }
 
-    template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); } auto all_of(IN& from, FN&& func) {
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto all_of(Container& target, Handler&& func) {
         return std::all_of(
 #ifdef __cpp_lib_execution
             std::execution::par,
 #endif
-            from.begin(), from.end(), std::forward<FN>(func)
+            target.begin(), target.end(), std::forward<Handler>(func)
         );
     }
 
-    template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); } auto none_of(IN& from, FN&& func) {
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto none_of(Container& target, Handler&& func) {
         return std::none_of(
 #ifdef __cpp_lib_execution
             std::execution::par,
 #endif
-            from.begin(), from.end(), std::forward<FN>(func)
+            target.begin(), target.end(), std::forward<Handler>(func)
         );
     }
 
-    template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); } auto any_of(IN& from, FN&& func) {
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto any_of(Container& target, Handler&& func) {
         return std::any_of(
 #ifdef __cpp_lib_execution
             std::execution::par,
 #endif
-            from.begin(), from.end(), std::forward<FN>(func)
+            target.begin(), target.end(), std::forward<Handler>(func)
         );
     }
 

@@ -360,8 +360,8 @@ template<class T> concept sp_i = std::is_integral_v<T>;
 template<typename T, typename U> concept is_arma_mat = sp_d<T> && (std::is_convertible_v<std::remove_cvref_t<U>, Mat<T>> || std::is_convertible_v<std::remove_cvref_t<U>, SpMat<T>>);
 
 namespace suanpan {
-    template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); } void for_all(IN& from, FN&& func) {
-        suanpan_for_each(from.begin(), from.end(), std::forward<FN>(func));
+    template<class Container, class Handler> requires requires(Container& x) { x.begin(); x.end(); } void for_all(Container& target, Handler&& func) {
+        suanpan_for_each(target.begin(), target.end(), std::forward<Handler>(func));
     }
 
     template<typename T> std::vector<T>& append_to(std::vector<T>& a, std::vector<T>&& b) {
