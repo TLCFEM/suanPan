@@ -64,7 +64,7 @@ public:
 
 class Interaction : public CopyableTag {
 protected:
-    shared_ptr<DomainBase> domain;
+    std::weak_ptr<DomainBase> domain;
 
 public:
     using CopyableTag::CopyableTag;

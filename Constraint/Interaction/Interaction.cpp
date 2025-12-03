@@ -59,7 +59,7 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
 
-    auto& factory = domain->get_factory();
+    auto& factory = domain.lock()->get_factory();
 
     {
         const vec repulsive = normal_force_over_length * chord;
@@ -103,7 +103,7 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
 
-    auto& factory = domain->get_factory();
+    auto& factory = domain.lock()->get_factory();
 
     {
         const vec repulsive = normal_force * unit_cord;
@@ -155,11 +155,11 @@ void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) c
 
     if(full) {
         const auto penalty = multiplier * element->get(Element::Parameter::ELASTIC);
-        auto& factory = domain->get_factory();
+        auto& factory = domain.lock()->get_factory();
         auto& t_stiff = factory->get_stiffness();
         std::scoped_lock stiffness_lock(factory->get_stiffness_mutex());
         for(const auto I : element->get_dof_encoding()) t_stiff->at(I, I) += penalty;
     }
 
-    domain->insert_constrained_dof(element->get_dof_encoding());
+    domain.lock()->insert_constrained_dof(element->get_dof_encoding());
 }
