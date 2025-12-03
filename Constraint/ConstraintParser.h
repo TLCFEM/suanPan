@@ -26,4 +26,6 @@ int create_new_constraint(const std::shared_ptr<DomainBase>&, std::istringstream
 
 int create_new_criterion(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
+int create_new_interaction(const std::shared_ptr<DomainBase>&, std::istringstream&);
+
 #endif

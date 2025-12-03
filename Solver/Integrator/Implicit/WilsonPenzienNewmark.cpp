@@ -160,23 +160,8 @@ void WilsonPenzienNewmark::assemble_resistance() {
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }
 
-void WilsonPenzienNewmark::assemble_matrix() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });    // the model may have viscous device
-    auto fd = std::async([&] { D->assemble_trial_nonviscous(); }); // the model may have viscous device
-    auto fe = std::async([&] { D->assemble_trial_mass(); });       // need a constant mass matrix
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-    fe.get();
-
-    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+void WilsonPenzienNewmark::assemble_effective_matrix() {
+    if(auto& W = get_domain()->get_factory(); W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 }
 
 void WilsonPenzienNewmark::print() {

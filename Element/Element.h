@@ -239,6 +239,7 @@ public:
     void clear_node_ptr() override;
     [[nodiscard]] const std::vector<std::weak_ptr<Node>>& get_node_ptr() const override;
 
+    [[nodiscard]] mat get_coordinate() const override;
     [[nodiscard]] mat get_coordinate(unsigned) const override;
 
     [[nodiscard]] vec get_incre_displacement() const override;

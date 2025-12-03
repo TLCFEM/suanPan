@@ -20,7 +20,7 @@
 #include <Domain/Factory.hpp>
 
 ParticleCollision::ParticleCollision(const unsigned T, const unsigned D)
-    : Constraint(T, 0, translational(D), {}, 0)
+    : Constraint(T, 0, suanpan::translational(D), {}, 0)
     , dimension(D) {}
 
 int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {

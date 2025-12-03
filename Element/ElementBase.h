@@ -66,7 +66,8 @@ public:
         POISSON,
         RADIUS,
         MASS,
-        INERTIA
+        INERTIA,
+        DAMPING
     };
 
     explicit ElementBase(const unsigned T)
@@ -114,6 +115,7 @@ public:
     virtual void clear_node_ptr() = 0;
     [[nodiscard]] virtual const std::vector<std::weak_ptr<Node>>& get_node_ptr() const = 0;
 
+    [[nodiscard]] virtual mat get_coordinate() const = 0;
     [[nodiscard]] virtual mat get_coordinate(unsigned) const = 0;
 
     [[nodiscard]] virtual vec get_incre_displacement() const = 0;

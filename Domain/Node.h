@@ -223,15 +223,27 @@ public:
     void print() override;
 };
 
+namespace suanpan {
 #if defined(__GNUC__) && (__GNUC__ < 12)
-inline
+    inline
 #else
-constexpr inline
+    constexpr inline
 #endif
-    std::vector<Node::DOF>
-    translational(const unsigned dimension) {
-    return 2u == dimension ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
-}
+        std::vector<Node::DOF>
+        translational(const unsigned dimension) {
+        return 2u == dimension ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
+    }
+
+#if defined(__GNUC__) && (__GNUC__ < 12)
+    inline
+#else
+    constexpr inline
+#endif
+        std::vector<Node::DOF>
+        mechanical(const unsigned dimension) {
+        return 2u == dimension ? std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3};
+    }
+} // namespace suanpan
 
 #endif
 

@@ -44,7 +44,7 @@ void Contact2D::update_position() {
 }
 
 Contact2D::Contact2D(const unsigned T, const unsigned M, const unsigned S, const double P)
-    : Element(T, c_dof, {M, S}, translational(c_dof))
+    : Element(T, c_dof, {M, S}, suanpan::translational(c_dof))
     , master_tag(M)
     , slave_tag(S)
     , alpha(P) {}

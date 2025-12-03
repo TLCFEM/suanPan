@@ -65,6 +65,10 @@ int Ramm::analyze() {
         if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
         D->update<Statistics::ProcessConstraint>(t_clock.toc());
 
+        // indicate the global matrix has been assembled
+        G->assemble_effective_matrix();
+        G->set_matrix_assembled_switch();
+
         t_clock.tic();
 
         // solve ninja

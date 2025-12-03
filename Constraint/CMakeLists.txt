@@ -16,3 +16,4 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 
 add_subdirectory(Criterion)
+add_subdirectory(Interaction)

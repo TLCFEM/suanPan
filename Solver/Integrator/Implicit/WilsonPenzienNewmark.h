@@ -55,7 +55,7 @@ public:
     void reset_status() override;
 
     void assemble_resistance() override;
-    void assemble_matrix() override;
+    void assemble_effective_matrix() override;
 
     void print() override;
 };

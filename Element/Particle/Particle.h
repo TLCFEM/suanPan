@@ -31,6 +31,9 @@
 #define PARTICLE_H
 
 #include <Element/Element.h>
+#ifdef SUANPAN_VTK
+#include <vtkVertex.h>
+#endif
 
 class Particle : public Element {
 public:
@@ -49,26 +52,47 @@ public:
     int reset_status() override { return SUANPAN_SUCCESS; }
 };
 
-class SphericalParticle : public Particle {
+template<unsigned DIM> class SphericalParticle : public Particle {
 protected:
-    const double radius, elastic_modulus, poisson_ratio, mass, inertia;
+    const double radius, elastic_modulus, poisson_ratio, damping, mass, inertia;
 
 public:
-    SphericalParticle(
-        unsigned,                 // tag
-        unsigned,                 // node tag
-        std::vector<Node::DOF>&&, // dof identifier
-        double,                   // radius
-        double,                   // elastic modulus
-        double,                   // poisson ratio
-        double,                   // mass
-        double                    // inertia
-    );
+    SphericalParticle(const unsigned T, const unsigned N, std::vector<Node::DOF>&& D, const double R, const double E, const double V, const double A, const double M, const double I)
+        : Particle(T, N, std::move(D))
+        , radius(R)
+        , elastic_modulus(E)
+        , poisson_ratio(V)
+        , damping(A)
+        , mass(M)
+        , inertia(I) {}
 
-    [[nodiscard]] double get(Parameter) const final;
+    [[nodiscard]] double get(const Parameter P) const final {
+        if(Parameter::ELASTIC == P) return elastic_modulus;
+        if(Parameter::POISSON == P) return poisson_ratio;
+        if(Parameter::RADIUS == P) return radius;
+        if(Parameter::MASS == P) return mass;
+        if(Parameter::INERTIA == P) return inertia;
+        if(Parameter::DAMPING == P) return damping;
+
+        return 0.;
+    }
+
+#ifdef SUANPAN_VTK
+    [[nodiscard]] vtkSmartPointer<vtkCell> GetCell() const override { return vtkSmartPointer<vtkVertex>::New(); }
+
+    mat GetData(const OutputType P) override {
+        if(OutputType::A == P) return get_current_acceleration();
+        if(OutputType::V == P) return get_current_velocity();
+        if(OutputType::U == P) return get_current_displacement();
+
+        return {};
+    }
+
+    mat GetDeformation(double) override { return get_coordinate(DIM).t() + get_current_displacement().head(DIM); }
+#endif
 };
 
-class InertialSphericalParticle2D final : public SphericalParticle {
+class InertialSphericalParticle2D final : public SphericalParticle<2u> {
 public:
     InertialSphericalParticle2D(
         unsigned, // tag
@@ -76,6 +100,7 @@ public:
         double,   // radius
         double,   // elastic modulus
         double,   // poisson ratio
+        double,   // damping
         double,   // mass
         double    // inertia
     );
@@ -83,7 +108,7 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 };
 
-class SphericalParticle2D final : public SphericalParticle {
+class SphericalParticle2D final : public SphericalParticle<2u> {
 public:
     SphericalParticle2D(
         unsigned, // tag
@@ -91,6 +116,38 @@ public:
         double,   // radius
         double,   // elastic modulus
         double,   // poisson ratio
+        double,   // damping
+        double    // mass
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+};
+
+class InertialSphericalParticle3D final : public SphericalParticle<3u> {
+public:
+    InertialSphericalParticle3D(
+        unsigned, // tag
+        unsigned, // node tag
+        double,   // radius
+        double,   // elastic modulus
+        double,   // poisson ratio
+        double,   // damping
+        double,   // mass
+        double    // inertia
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
+};
+
+class SphericalParticle3D final : public SphericalParticle<3u> {
+public:
+    SphericalParticle3D(
+        unsigned, // tag
+        unsigned, // node tag
+        double,   // radius
+        double,   // elastic modulus
+        double,   // poisson ratio
+        double,   // damping
         double    // mass
     );
 

@@ -62,6 +62,7 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
     ElementStorage element_pond;
     GroupStorage group_pond;
     IntegratorStorage integrator_pond;
+    InteractionStorage interaction_pond;
     LoadStorage load_pond;
     MaterialStorage material_pond;
     ModifierStorage modifier_pond;
@@ -112,6 +113,7 @@ public:
     bool insert(const shared_ptr<Element>&) override;
     bool insert(const shared_ptr<Group>&) override;
     bool insert(const shared_ptr<Integrator>&) override;
+    bool insert(const shared_ptr<Interaction>&) override;
     bool insert(const shared_ptr<Load>&) override;
     bool insert(const shared_ptr<Material>&) override;
     bool insert(const shared_ptr<Modifier>&) override;
@@ -131,6 +133,7 @@ public:
     bool erase_element(unsigned) override;
     bool erase_group(unsigned) override;
     bool erase_integrator(unsigned) override;
+    bool erase_interaction(unsigned) override;
     bool erase_load(unsigned) override;
     bool erase_material(unsigned) override;
     bool erase_modifier(unsigned) override;
@@ -150,6 +153,7 @@ public:
     void disable_element(unsigned) override;
     void disable_group(unsigned) override;
     void disable_integrator(unsigned) override;
+    void disable_interaction(unsigned) override;
     void disable_load(unsigned) override;
     void disable_material(unsigned) override;
     void disable_modifier(unsigned) override;
@@ -169,6 +173,7 @@ public:
     void enable_element(unsigned) override;
     void enable_group(unsigned) override;
     void enable_integrator(unsigned) override;
+    void enable_interaction(unsigned) override;
     void enable_load(unsigned) override;
     void enable_material(unsigned) override;
     void enable_modifier(unsigned) override;
@@ -188,6 +193,7 @@ public:
     const shared_ptr<Element>& get_element(unsigned) const override;
     const shared_ptr<Group>& get_group(unsigned) const override;
     const shared_ptr<Integrator>& get_integrator(unsigned) const override;
+    const shared_ptr<Interaction>& get_interaction(unsigned) const override;
     const shared_ptr<Load>& get_load(unsigned) const override;
     const shared_ptr<Material>& get_material(unsigned) const override;
     const shared_ptr<Modifier>& get_modifier(unsigned) const override;
@@ -207,6 +213,7 @@ public:
     const ElementQueue& get_element_pool() const override;
     const GroupQueue& get_group_pool() const override;
     const IntegratorQueue& get_integrator_pool() const override;
+    const InteractionQueue& get_interaction_pool() const override;
     const LoadQueue& get_load_pool() const override;
     const MaterialQueue& get_material_pool() const override;
     const ModifierQueue& get_modifier_pool() const override;
@@ -226,6 +233,7 @@ public:
     friend shared_ptr<Element>& get_element(const shared_ptr<Domain>&, unsigned);
     friend shared_ptr<Group>& get_group(const shared_ptr<Domain>&, unsigned);
     friend shared_ptr<Integrator>& get_integrator(const shared_ptr<Domain>&, unsigned);
+    friend shared_ptr<Interaction>& get_interaction(const shared_ptr<Domain>&, unsigned);
     friend shared_ptr<Load>& get_load(const shared_ptr<Domain>&, unsigned);
     friend shared_ptr<Material>& get_material(const shared_ptr<Domain>&, unsigned);
     friend shared_ptr<Modifier>& get_modifier(const shared_ptr<Domain>&, unsigned);
@@ -245,6 +253,7 @@ public:
     friend shared_ptr<Element>& get_element(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Group>& get_group(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Integrator>& get_integrator(const shared_ptr<DomainBase>&, unsigned);
+    friend shared_ptr<Interaction>& get_interaction(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Load>& get_load(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Material>& get_material(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Modifier>& get_modifier(const shared_ptr<DomainBase>&, unsigned);
@@ -264,6 +273,7 @@ public:
     size_t get_element() const override;
     size_t get_group() const override;
     size_t get_integrator() const override;
+    size_t get_interaction() const override;
     size_t get_load() const override;
     size_t get_material() const override;
     size_t get_modifier() const override;
@@ -283,6 +293,7 @@ public:
     bool find_element(unsigned) const override;
     bool find_group(unsigned) const override;
     bool find_integrator(unsigned) const override;
+    bool find_interaction(unsigned) const override;
     bool find_load(unsigned) const override;
     bool find_material(unsigned) const override;
     bool find_modifier(unsigned) const override;

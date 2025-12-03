@@ -48,7 +48,7 @@ protected:
 
 public:
     FixedLength(const unsigned T, uvec&& N)
-        : Constraint(T, 0, translational(DIM), {}, 1) { target_node = std::move(N); }
+        : Constraint(T, 0, suanpan::translational(DIM), {}, 1) { target_node = std::move(N); }
 
     int initialize(const shared_ptr<DomainBase>& D) override {
         if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
