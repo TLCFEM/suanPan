@@ -75,7 +75,8 @@ public:
             return SUANPAN_FAIL;
         }
 
-        interactions = D->get<Interaction>(interaction_tags);
+        for(auto&& item : D->get<Interaction>(interaction_tags))
+            if(item && item->is_active()) interactions.emplace_back(item);
 
         return Constraint::initialize(D);
     }
