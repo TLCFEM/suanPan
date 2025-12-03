@@ -799,16 +799,9 @@ void Domain::insert_loaded_dof(const uvec& T) { loaded_dofs.insert(T.cbegin(), T
  */
 void Domain::insert_restrained_dof(const uvec& T) { restrained_dofs.insert(T.cbegin(), T.cend()); }
 
-/**
- * \brief concurrently safe insertion method
- */
-void Domain::insert_constrained_dof(const uvec& T) { constrained_dofs.insert(T.cbegin(), T.cend()); }
-
 const suanpan::unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
 
 const suanpan::unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
-
-const suanpan::unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
 
 bool Domain::is_updated() const { return updated.load(); }
 
@@ -1262,7 +1255,6 @@ int Domain::process_constraint(const bool full) {
     // ! assemble stiffness shall be done in integrator
 
     restrained_dofs.clear();
-    constrained_dofs.clear();
 
     auto& constraint_resistance = factory->modify_trial_constraint_resistance();
     constraint_resistance.zeros();

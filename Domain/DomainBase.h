@@ -332,14 +332,9 @@ public:
      * \brief concurrently safe insertion method
      */
     virtual void insert_restrained_dof(const uvec&) = 0;
-    /**
-     * \brief concurrently safe insertion method
-     */
-    virtual void insert_constrained_dof(const uvec&) = 0;
 
     [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_loaded_dof() const = 0;
     [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_restrained_dof() const = 0;
-    [[nodiscard]] virtual const suanpan::unordered_set<uword>& get_constrained_dof() const = 0;
 
     [[nodiscard]] virtual bool is_updated() const = 0;
     [[nodiscard]] virtual bool is_sparse() const = 0;

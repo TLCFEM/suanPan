@@ -426,26 +426,21 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
         return SUANPAN_SUCCESS;
     }
 
+    auto flag = true;
+
     if(is_equal(criterion_type.substr(0, 5), "Logic")) {
         unsigned tag_a, tag_b;
-        if(!get_input(command, tag_a) || !get_input(command, tag_b)) {
+        if(!get_input(command, tag_a, tag_b)) {
             suanpan_error("A valid tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(criterion_type, "LogicCriterionAND")) domain->insert(std::make_shared<LogicCriterionAND>(tag, step_tag, tag_a, tag_b));
-        else if(is_equal(criterion_type, "LogicCriterionOR")) domain->insert(std::make_shared<LogicCriterionOR>(tag, step_tag, tag_a, tag_b));
-
-        return SUANPAN_SUCCESS;
+        if(is_equal(criterion_type, "LogicCriterionAND")) flag = domain->insert(std::make_shared<LogicCriterionAND>(tag, step_tag, tag_a, tag_b));
+        else if(is_equal(criterion_type, "LogicCriterionOR")) flag = domain->insert(std::make_shared<LogicCriterionOR>(tag, step_tag, tag_a, tag_b));
     }
-
-    if(is_equal(criterion_type, "StrainEnergyEvolution")) {
+    else if(is_equal(criterion_type, "StrainEnergyEvolution")) {
         unsigned incre_level, final_level;
-        if(!get_input(command, incre_level)) {
-            suanpan_error("A valid level is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(!get_input(command, final_level)) {
+        if(!get_input(command, incre_level, final_level)) {
             suanpan_error("A valid level is required.\n");
             return SUANPAN_SUCCESS;
         }
@@ -476,12 +471,9 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        domain->insert(std::make_shared<StrainEnergyEvolution>(tag, step_tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance));
-
-        return SUANPAN_SUCCESS;
+        flag = domain->insert(std::make_shared<StrainEnergyEvolution>(tag, step_tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance));
     }
-
-    if(is_equal(criterion_type, "MaxHistory")) {
+    else if(is_equal(criterion_type, "MaxHistory")) {
         std::string type;
         double limit;
         if(!get_input(command, type)) {
@@ -493,33 +485,34 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        domain->insert(std::make_shared<MaxHistory>(tag, step_tag, to_token(type), limit));
+        flag = domain->insert(std::make_shared<MaxHistory>(tag, step_tag, to_token(type), limit));
+    }
+    else {
+        unsigned node;
+        if(!get_input(command, node)) {
+            suanpan_error("A valid node tag is required.\n");
+            return SUANPAN_SUCCESS;
+        }
 
-        return SUANPAN_SUCCESS;
+        unsigned dof;
+        if(!get_input(command, dof)) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        double limit;
+        if(!get_input(command, limit)) {
+            suanpan_error("A valid limit is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(is_equal(criterion_type, "MaxDisplacement")) flag = domain->insert(std::make_shared<MaxDisplacement>(tag, step_tag, node, dof, limit));
+        else if(is_equal(criterion_type, "MinDisplacement")) flag = domain->insert(std::make_shared<MinDisplacement>(tag, step_tag, node, dof, limit));
+        else if(is_equal(criterion_type, "MaxResistance")) flag = domain->insert(std::make_shared<MaxResistance>(tag, step_tag, node, dof, limit));
+        else if(is_equal(criterion_type, "MinResistance")) flag = domain->insert(std::make_shared<MinResistance>(tag, step_tag, node, dof, limit));
     }
 
-    unsigned node;
-    if(!get_input(command, node)) {
-        suanpan_error("A valid node tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unsigned dof;
-    if(!get_input(command, dof)) {
-        suanpan_error("A valid dof identifier is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    double limit;
-    if(!get_input(command, limit)) {
-        suanpan_error("A valid limit is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    if(is_equal(criterion_type, "MaxDisplacement")) domain->insert(std::make_shared<MaxDisplacement>(tag, step_tag, node, dof, limit));
-    else if(is_equal(criterion_type, "MinDisplacement")) domain->insert(std::make_shared<MinDisplacement>(tag, step_tag, node, dof, limit));
-    else if(is_equal(criterion_type, "MaxResistance")) domain->insert(std::make_shared<MaxResistance>(tag, step_tag, node, dof, limit));
-    else if(is_equal(criterion_type, "MinResistance")) domain->insert(std::make_shared<MinResistance>(tag, step_tag, node, dof, limit));
+    if(!flag) suanpan_error("Fail to create new criterion via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
@@ -541,6 +534,17 @@ int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstr
 
     if(is_equal(criterion_type, "Hertzian")) flag = domain->insert(std::make_shared<Hertzian>(tag));
     else if(is_equal(criterion_type, "HertzianDamped")) flag = domain->insert(std::make_shared<HertzianDamped>(tag));
+    else if(is_equal(criterion_type, "FixedParticle")) {
+        double multiplier;
+        if(!get_input(command, multiplier)) {
+            suanpan_error("A valid multiplier is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        const auto particles = get_remaining<unsigned>(command);
+
+        flag = domain->insert(std::make_shared<FixedParticle>(tag, multiplier, std::set(particles.begin(), particles.end())));
+    }
 
     if(!flag) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
 

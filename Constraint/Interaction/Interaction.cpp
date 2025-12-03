@@ -44,7 +44,7 @@ const uvec& InteractionPair::dof_j() const { return object_j->get_dof_encoding()
 
 double InteractionPair::initial_gap() const { return object_i->get(Element::Parameter::RADIUS) + object_j->get(Element::Parameter::RADIUS); }
 
-void Interaction::initialize(const shared_ptr<DomainBase>& D) { factory = D->get_factory(); }
+void Interaction::initialize(const shared_ptr<DomainBase>& D) { domain = D; }
 
 void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) const {
     const vec position_i = pair->position_i(), position_j = pair->position_j();
@@ -58,6 +58,8 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
     const auto normal_force_over_length = compression * normal_factor * two_third / chord_length;
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
+
+    auto& factory = domain->get_factory();
 
     {
         const vec repulsive = normal_force_over_length * chord;
@@ -101,6 +103,8 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
 
+    auto& factory = domain->get_factory();
+
     {
         const vec repulsive = normal_force * unit_cord;
         auto& t_resistance = factory->modify_trial_constraint_resistance();
@@ -139,4 +143,21 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
                 t_damping->at(dof_j(I), dof_i(J)) -= der_repulsive(I, J);
             }
     }
+}
+
+FixedParticle::FixedParticle(const unsigned T, const double M, std::set<unsigned>&& P)
+    : Interaction(T)
+    , particles(std::move(P))
+    , multiplier(M) {}
+
+void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) const {
+    if(full) {
+        const auto penalty = multiplier * element->get(Element::Parameter::ELASTIC);
+        auto& factory = domain->get_factory();
+        auto& t_stiff = factory->get_stiffness();
+        std::scoped_lock stiffness_lock(factory->get_stiffness_mutex());
+        for(const auto I : element->get_dof_encoding()) t_stiff->at(I, I) += penalty;
+    }
+
+    domain->insert_restrained_dof(element->get_dof_encoding());
 }
