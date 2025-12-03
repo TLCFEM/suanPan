@@ -162,7 +162,6 @@ void WilsonPenzienNewmark::assemble_resistance() {
 
 void WilsonPenzienNewmark::assemble_effective_matrix() {
     if(auto& W = get_domain()->get_factory(); W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
-    set_matrix_assembled_switch();
 }
 
 void WilsonPenzienNewmark::print() {

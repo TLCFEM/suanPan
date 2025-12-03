@@ -56,8 +56,6 @@ void BatheTwoStep::assemble_effective_matrix() {
     const auto damping_coef = FLAG::TRAP == step_flag ? P2 : P8;
 
     W->get_stiffness() += W->is_nonviscous() ? damping_coef * (W->get_damping() + W->get_nonviscous()) : damping_coef * W->get_damping();
-
-    set_matrix_assembled_switch();
 }
 
 void BatheTwoStep::update_incre_time(double T) {

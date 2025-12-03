@@ -115,8 +115,6 @@ void GeneralizedAlpha::assemble_effective_matrix() {
     W->get_stiffness() += F5 / F2 * W->get_mass();
 
     W->get_stiffness() += W->is_nonviscous() ? F6 / F2 * (W->get_damping() + W->get_nonviscous()) : F6 / F2 * W->get_damping();
-
-    set_matrix_assembled_switch();
 }
 
 vec GeneralizedAlpha::get_force_residual() { return ImplicitIntegrator::get_force_residual() / F2; }

@@ -382,8 +382,6 @@ void LeeNewmarkIterative::assemble_effective_matrix() {
     W->get_stiffness() += C0 * W->get_mass();
 
     W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
-
-    set_matrix_assembled_switch();
 }
 
 void LeeNewmarkIterative::print() {

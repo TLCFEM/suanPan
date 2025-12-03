@@ -62,8 +62,6 @@ void OALTS::assemble_effective_matrix() {
         W->get_stiffness() += P1 * P1 * W->get_mass();
         W->get_stiffness() += W->is_nonviscous() ? P1 * (W->get_damping() + W->get_nonviscous()) : P1 * W->get_damping();
     }
-
-    set_matrix_assembled_switch();
 }
 
 int OALTS::update_trial_status(bool) {

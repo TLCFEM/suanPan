@@ -67,6 +67,7 @@ int Ramm::analyze() {
 
         // indicate the global matrix has been assembled
         G->assemble_effective_matrix();
+        G->set_matrix_assembled_switch();
 
         t_clock.tic();
 

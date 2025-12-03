@@ -95,8 +95,6 @@ void GSSSS::assemble_effective_matrix() {
     W->get_stiffness() += XA * W->get_mass();
 
     W->get_stiffness() += W->is_nonviscous() ? XV * (W->get_damping() + W->get_nonviscous()) : XV * W->get_damping();
-
-    set_matrix_assembled_switch();
 }
 
 vec GSSSS::get_force_residual() { return XD * ImplicitIntegrator::get_force_residual(); }

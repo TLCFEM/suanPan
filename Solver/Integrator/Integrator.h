@@ -59,8 +59,6 @@ protected:
 
     virtual int correct_trial_status();
 
-    void set_matrix_assembled_switch();
-
 public:
     enum class Type {
         Implicit,
@@ -81,6 +79,7 @@ public:
     [[nodiscard]] bool allow_to_change_time_step() const;
 
     // ! manually set switch after assembling global matrix
+    void set_matrix_assembled_switch();
     [[nodiscard]] bool matrix_is_assembled() const;
 
     [[nodiscard]] virtual bool time_independent_matrix() const;
