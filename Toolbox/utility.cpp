@@ -107,6 +107,15 @@ bool is_equal(const int A, const char B) { return tolower(A) == tolower(static_c
 
 bool is_equal(const std::string_view A, const std::string_view B) { return _strcmpi(A.data(), B.data()) == 0; }
 
+bool if_startswith(const std::string_view A, const std::string_view B) {
+    if(A.size() < B.size()) return false;
+
+    for(size_t i = 0; i < B.size(); ++i)
+        if(std::tolower(static_cast<unsigned char>(A[i])) != std::tolower(static_cast<unsigned char>(B[i]))) return false;
+
+    return true;
+}
+
 bool if_contain(const std::string& A, const char* B) { return A.find(B) != std::string::npos; }
 
 bool if_contain(const std::string& A, const std::string& B) { return A.find(B) != std::string::npos; }

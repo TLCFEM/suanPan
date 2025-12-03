@@ -114,7 +114,7 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream
         return SUANPAN_SUCCESS;
     }
 
-    return process_recorder_command(domain, command, tag, file_type.starts_with("hdf"));
+    return process_recorder_command(domain, command, tag, if_startswith(file_type, "hdf"));
 }
 
 int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream& command, const bool use_hdf5) {
