@@ -21,7 +21,7 @@
 #include <Material/Material1D/Viscosity/Maxwell.h>
 
 Damper02::Damper02(const unsigned T, uvec&& NT, const unsigned DT, const unsigned ST, const bool UM, const unsigned PC, const double BT, const unsigned DIM)
-    : MaterialElement1D(T, d_node, DIM, std::move(NT), {}, false, translational(DIM))
+    : MaterialElement1D(T, d_node, DIM, std::move(NT), {}, false, suanpan::translational(DIM))
     , d_dof(DIM)
     , IS(3 == d_dof ? uvec{0, 1, 2} : uvec{0, 1})
     , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3})

@@ -35,6 +35,8 @@ shared_ptr<Group>& get_group(const shared_ptr<Domain>& D, const unsigned T) { re
 
 shared_ptr<Integrator>& get_integrator(const shared_ptr<Domain>& D, const unsigned T) { return D->integrator_pond[T]; }
 
+shared_ptr<Interaction>& get_interaction(const shared_ptr<Domain>& D, const unsigned T) { return D->interaction_pond[T]; }
+
 shared_ptr<Load>& get_load(const shared_ptr<Domain>& D, const unsigned T) { return D->load_pond[T]; }
 
 shared_ptr<Material>& get_material(const shared_ptr<Domain>& D, const unsigned T) { return D->material_pond[T]; }
@@ -70,6 +72,8 @@ shared_ptr<Element>& get_element(const shared_ptr<DomainBase>& D, const unsigned
 shared_ptr<Group>& get_group(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->group_pond[T]; }
 
 shared_ptr<Integrator>& get_integrator(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->integrator_pond[T]; }
+
+shared_ptr<Interaction>& get_interaction(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->interaction_pond[T]; }
 
 shared_ptr<Load>& get_load(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->load_pond[T]; }
 

@@ -1,4 +1,5 @@
 #include "Criterion/Criterion"
+#include "Interaction/Interaction"
 
 #include "BC.h"
 #include "Constraint.h"
@@ -6,6 +7,7 @@
 #include "FixedLength.h"
 #include "LinearSpring2D.h"
 #include "LJPotential2D.h"
+#include "MolecularDynamics.h"
 #include "MPC.h"
 #include "NodeFacet.h"
 #include "NodeLine.h"

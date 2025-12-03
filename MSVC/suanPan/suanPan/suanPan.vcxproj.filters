@@ -217,6 +217,12 @@
     <Filter Include="Material\Material3D\Orthotropic">
       <UniqueIdentifier>{68492507-04ef-47b3-8ee9-a8e526e31e7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Constraint\Interaction">
+      <UniqueIdentifier>{d1bc5563-cfa5-44b7-a8ec-f22a6fe6271c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Particle">
+      <UniqueIdentifier>{a60da642-a634-4c7c-b2d5-bcdf0d8c08d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
@@ -1548,6 +1554,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\BC.cpp">
       <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Interaction\Interaction.cpp">
+      <Filter>Constraint\Interaction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Particle\Particle.cpp">
+      <Filter>Element\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2910,6 +2922,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\BC.h">
       <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Particle\Particle.h">
+      <Filter>Element\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Interaction\Interaction.h">
+      <Filter>Constraint\Interaction</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

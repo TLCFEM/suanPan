@@ -80,7 +80,7 @@ void Integrator::set_time_step_switch(const bool T) { time_step_switch = T; }
  */
 bool Integrator::allow_to_change_time_step() const { return time_step_switch; }
 
-void Integrator::set_matrix_assembled_switch(const bool T) { matrix_assembled_switch = T; }
+void Integrator::set_matrix_assembled_switch() { matrix_assembled_switch = true; }
 
 bool Integrator::matrix_is_assembled() const { return matrix_assembled_switch; }
 
@@ -127,15 +127,21 @@ void Integrator::assemble_resistance() {
 }
 
 /**
- * Assemble the global effective matrix A in AX=B.
- * For FEM applications, it is often a linear combination of stiffness, mass, damping and geometry matrices.
+ * Assemble global matrices such as stiffness, mass, damping and geometry matrices.
+ * This method should come with the companion method `assemble_effective_matrix()`.
  */
 void Integrator::assemble_matrix() {
     const auto D = database.lock();
-    auto& W = D->get_factory();
     D->assemble_trial_stiffness();
     D->assemble_trial_geometry();
-    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+}
+
+/**
+ * Assemble the global effective matrix A in AX=B.
+ * For FEM applications, it is often a linear combination of stiffness, mass, damping and geometry matrices.
+ */
+void Integrator::assemble_effective_matrix() {
+    if(auto& W = database.lock()->get_factory(); W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 }
 
 /**
@@ -369,6 +375,22 @@ vec Integrator::from_total_velocity(const double magnitude, const uvec& encoding
 
 vec Integrator::from_total_acceleration(const double magnitude, const uvec& encoding) { return from_total_acceleration(vec(encoding.n_elem, fill::value(magnitude)), encoding); }
 
+void ImplicitIntegrator::assemble_matrix() {
+    const auto D = get_domain();
+
+    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
+    auto fb = std::async([&] { D->assemble_trial_geometry(); });
+    auto fc = std::async([&] { D->assemble_trial_damping(); });
+    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
+    auto fe = std::async([&] { D->assemble_trial_mass(); });
+
+    fa.get();
+    fb.get();
+    fc.get();
+    fd.get();
+    fe.get();
+}
+
 void ExplicitIntegrator::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
@@ -387,6 +409,8 @@ void ExplicitIntegrator::assemble_resistance() {
 }
 
 void ExplicitIntegrator::assemble_matrix() { get_domain()->assemble_trial_mass(); }
+
+void ExplicitIntegrator::assemble_effective_matrix() {}
 
 const vec& ExplicitIntegrator::get_trial_displacement() const { return get_domain()->get_factory()->get_trial_acceleration(); }
 

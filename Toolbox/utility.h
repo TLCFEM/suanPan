@@ -53,6 +53,33 @@ namespace suanpan {
         return container;
     }
 
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto all_of(Container& target, Handler&& func) {
+        return std::all_of(
+#ifdef __cpp_lib_execution
+            std::execution::par,
+#endif
+            target.begin(), target.end(), std::forward<Handler>(func)
+        );
+    }
+
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto none_of(Container& target, Handler&& func) {
+        return std::none_of(
+#ifdef __cpp_lib_execution
+            std::execution::par,
+#endif
+            target.begin(), target.end(), std::forward<Handler>(func)
+        );
+    }
+
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto any_of(Container& target, Handler&& func) {
+        return std::any_of(
+#ifdef __cpp_lib_execution
+            std::execution::par,
+#endif
+            target.begin(), target.end(), std::forward<Handler>(func)
+        );
+    }
+
     template<typename T> constexpr T& hacker(const T& I) { return const_cast<T&>(I); }
 
     template<typename T> constexpr T*& hacker(const T* const& I) { return const_cast<T*&>(I); }

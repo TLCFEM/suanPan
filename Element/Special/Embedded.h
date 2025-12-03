@@ -49,7 +49,7 @@ template<unsigned DIM> class Embedded final : public Element {
 
 public:
     Embedded(const unsigned T, const unsigned ET, const unsigned NT, const double P)
-        : Element(T, DIM, ET, NT, translational(DIM))
+        : Element(T, DIM, ET, NT, suanpan::translational(DIM))
         , host_tag(ET)
         , multiplier(P) {}
 

@@ -43,7 +43,7 @@ template<unsigned DIM> class Embed final : public Constraint {
 
 public:
     Embed(const unsigned T, const unsigned ET, const unsigned NT)
-        : Constraint(T, 0, translational(DIM), {}, DIM) {
+        : Constraint(T, 0, suanpan::translational(DIM), {}, DIM) {
         target_node = NT;
         target_element = ET;
     }

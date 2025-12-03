@@ -72,12 +72,6 @@ public:
     int reset_status() override;
 
     void print() override;
-
-#ifdef SUANPAN_VTK
-    [[nodiscard]] vtkSmartPointer<vtkCell> GetCell() const override;
-
-    mat GetData(OutputType) override;
-#endif
 };
 
 class Mass2D final : public MassBase {

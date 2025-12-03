@@ -50,6 +50,7 @@ class Element;
 class ExternalModule;
 class Group;
 class Integrator;
+class Interaction;
 class Load;
 class Material;
 class Modifier;
@@ -69,6 +70,7 @@ using DatabaseQueue = std::vector<shared_ptr<Database>>;
 using ElementQueue = std::vector<shared_ptr<Element>>;
 using GroupQueue = std::vector<shared_ptr<Group>>;
 using IntegratorQueue = std::vector<shared_ptr<Integrator>>;
+using InteractionQueue = std::vector<shared_ptr<Interaction>>;
 using LoadQueue = std::vector<shared_ptr<Load>>;
 using MaterialQueue = std::vector<shared_ptr<Material>>;
 using ModifierQueue = std::vector<shared_ptr<Modifier>>;
@@ -123,6 +125,7 @@ public:
     virtual bool insert(const shared_ptr<Element>&) = 0;
     virtual bool insert(const shared_ptr<Group>&) = 0;
     virtual bool insert(const shared_ptr<Integrator>&) = 0;
+    virtual bool insert(const shared_ptr<Interaction>&) = 0;
     virtual bool insert(const shared_ptr<Load>&) = 0;
     virtual bool insert(const shared_ptr<Material>&) = 0;
     virtual bool insert(const shared_ptr<Modifier>&) = 0;
@@ -143,6 +146,7 @@ public:
     virtual bool erase_element(unsigned) = 0;
     virtual bool erase_group(unsigned) = 0;
     virtual bool erase_integrator(unsigned) = 0;
+    virtual bool erase_interaction(unsigned) = 0;
     virtual bool erase_load(unsigned) = 0;
     virtual bool erase_material(unsigned) = 0;
     virtual bool erase_modifier(unsigned) = 0;
@@ -162,6 +166,7 @@ public:
     virtual void disable_element(unsigned) = 0;
     virtual void disable_group(unsigned) = 0;
     virtual void disable_integrator(unsigned) = 0;
+    virtual void disable_interaction(unsigned) = 0;
     virtual void disable_load(unsigned) = 0;
     virtual void disable_material(unsigned) = 0;
     virtual void disable_modifier(unsigned) = 0;
@@ -181,6 +186,7 @@ public:
     virtual void enable_element(unsigned) = 0;
     virtual void enable_group(unsigned) = 0;
     virtual void enable_integrator(unsigned) = 0;
+    virtual void enable_interaction(unsigned) = 0;
     virtual void enable_load(unsigned) = 0;
     virtual void enable_material(unsigned) = 0;
     virtual void enable_modifier(unsigned) = 0;
@@ -192,7 +198,7 @@ public:
     virtual void enable_step(unsigned) = 0;
 
     template<typename T> const shared_ptr<T>& get(unsigned);
-    template<typename T> const shared_ptr<T>& get(uword);
+    template<typename T> const shared_ptr<T>& get(const uword tag) { return get<T>(static_cast<unsigned>(tag)); }
     template<typename T> std::vector<shared_ptr<T>> get(const uvec&);
     [[nodiscard]] virtual const shared_ptr<Amplitude>& get_amplitude(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Expression>& get_expression(unsigned) const = 0;
@@ -203,6 +209,7 @@ public:
     [[nodiscard]] virtual const shared_ptr<Element>& get_element(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Group>& get_group(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Integrator>& get_integrator(unsigned) const = 0;
+    [[nodiscard]] virtual const shared_ptr<Interaction>& get_interaction(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Load>& get_load(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Material>& get_material(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Modifier>& get_modifier(unsigned) const = 0;
@@ -223,6 +230,7 @@ public:
     [[nodiscard]] virtual const ElementQueue& get_element_pool() const = 0;
     [[nodiscard]] virtual const GroupQueue& get_group_pool() const = 0;
     [[nodiscard]] virtual const IntegratorQueue& get_integrator_pool() const = 0;
+    [[nodiscard]] virtual const InteractionQueue& get_interaction_pool() const = 0;
     [[nodiscard]] virtual const LoadQueue& get_load_pool() const = 0;
     [[nodiscard]] virtual const MaterialQueue& get_material_pool() const = 0;
     [[nodiscard]] virtual const ModifierQueue& get_modifier_pool() const = 0;
@@ -242,6 +250,7 @@ public:
     friend shared_ptr<Element>& get_element(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Group>& get_group(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Integrator>& get_integrator(const shared_ptr<DomainBase>&, unsigned);
+    friend shared_ptr<Interaction>& get_interaction(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Load>& get_load(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Material>& get_material(const shared_ptr<DomainBase>&, unsigned);
     friend shared_ptr<Modifier>& get_modifier(const shared_ptr<DomainBase>&, unsigned);
@@ -262,6 +271,7 @@ public:
     [[nodiscard]] virtual size_t get_element() const = 0;
     [[nodiscard]] virtual size_t get_group() const = 0;
     [[nodiscard]] virtual size_t get_integrator() const = 0;
+    [[nodiscard]] virtual size_t get_interaction() const = 0;
     [[nodiscard]] virtual size_t get_load() const = 0;
     [[nodiscard]] virtual size_t get_material() const = 0;
     [[nodiscard]] virtual size_t get_modifier() const = 0;
@@ -273,7 +283,7 @@ public:
     [[nodiscard]] virtual size_t get_step() const = 0;
 
     template<typename T> bool find(unsigned);
-    template<typename T> bool find(uword);
+    template<typename T> bool find(const uword tag) { return find<T>(static_cast<unsigned>(tag)); }
     template<typename T> bool find(const uvec&);
     [[nodiscard]] virtual bool find_amplitude(unsigned) const = 0;
     [[nodiscard]] virtual bool find_expression(unsigned) const = 0;
@@ -284,6 +294,7 @@ public:
     [[nodiscard]] virtual bool find_element(unsigned) const = 0;
     [[nodiscard]] virtual bool find_group(unsigned) const = 0;
     [[nodiscard]] virtual bool find_integrator(unsigned) const = 0;
+    [[nodiscard]] virtual bool find_interaction(unsigned) const = 0;
     [[nodiscard]] virtual bool find_load(unsigned) const = 0;
     [[nodiscard]] virtual bool find_material(unsigned) const = 0;
     [[nodiscard]] virtual bool find_modifier(unsigned) const = 0;
@@ -426,7 +437,7 @@ public:
     virtual void save(std::string) = 0;
 };
 
-template<typename T> bool DomainBase::erase(unsigned) { throw std::invalid_argument("unsupported"); }
+template<typename> bool DomainBase::erase(unsigned) { throw std::invalid_argument("unsupported"); }
 
 template<> inline bool DomainBase::erase<Amplitude>(const unsigned T) { return erase_amplitude(T); }
 
@@ -445,6 +456,8 @@ template<> inline bool DomainBase::erase<Element>(const unsigned T) { return era
 template<> inline bool DomainBase::erase<Group>(const unsigned T) { return erase_group(T); }
 
 template<> inline bool DomainBase::erase<Integrator>(const unsigned T) { return erase_integrator(T); }
+
+template<> inline bool DomainBase::erase<Interaction>(const unsigned T) { return erase_interaction(T); }
 
 template<> inline bool DomainBase::erase<Load>(const unsigned T) { return erase_load(T); }
 
@@ -466,8 +479,6 @@ template<> inline bool DomainBase::erase<Step>(const unsigned T) { return erase_
 
 template<typename T> const shared_ptr<T>& DomainBase::get(unsigned) { throw std::invalid_argument("unsupported"); }
 
-template<typename T> const shared_ptr<T>& DomainBase::get(uword) { throw std::invalid_argument("unsupported"); }
-
 template<typename T> std::vector<shared_ptr<T>> DomainBase::get(const uvec& P) {
     std::vector<shared_ptr<T>> output;
     output.reserve(P.n_elem);
@@ -476,42 +487,6 @@ template<typename T> std::vector<shared_ptr<T>> DomainBase::get(const uvec& P) {
 
     return output;
 }
-
-template<> inline const shared_ptr<Amplitude>& DomainBase::get<Amplitude>(const uword T) { return get_amplitude(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Expression>& DomainBase::get<Expression>(const uword T) { return get_expression(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Constraint>& DomainBase::get<Constraint>(const uword T) { return get_constraint(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Converger>& DomainBase::get<Converger>(const uword T) { return get_converger(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Criterion>& DomainBase::get<Criterion>(const uword T) { return get_criterion(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Database>& DomainBase::get<Database>(const uword T) { return get_database(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Element>& DomainBase::get<Element>(const uword T) { return get_element(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Group>& DomainBase::get<Group>(const uword T) { return get_group(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Integrator>& DomainBase::get<Integrator>(const uword T) { return get_integrator(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Load>& DomainBase::get<Load>(const uword T) { return get_load(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Material>& DomainBase::get<Material>(const uword T) { return get_material(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Modifier>& DomainBase::get<Modifier>(const uword T) { return get_modifier(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Node>& DomainBase::get<Node>(const uword T) { return get_node(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Orientation>& DomainBase::get<Orientation>(const uword T) { return get_orientation(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Recorder>& DomainBase::get<Recorder>(const uword T) { return get_recorder(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Section>& DomainBase::get<Section>(const uword T) { return get_section(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Solver>& DomainBase::get<Solver>(const uword T) { return get_solver(static_cast<unsigned>(T)); }
-
-template<> inline const shared_ptr<Step>& DomainBase::get<Step>(const uword T) { return get_step(static_cast<unsigned>(T)); }
 
 template<> inline const shared_ptr<Amplitude>& DomainBase::get<Amplitude>(const unsigned T) { return get_amplitude(T); }
 
@@ -530,6 +505,8 @@ template<> inline const shared_ptr<Element>& DomainBase::get<Element>(const unsi
 template<> inline const shared_ptr<Group>& DomainBase::get<Group>(const unsigned T) { return get_group(T); }
 
 template<> inline const shared_ptr<Integrator>& DomainBase::get<Integrator>(const unsigned T) { return get_integrator(T); }
+
+template<> inline const shared_ptr<Interaction>& DomainBase::get<Interaction>(const unsigned T) { return get_interaction(T); }
 
 template<> inline const shared_ptr<Load>& DomainBase::get<Load>(const unsigned T) { return get_load(T); }
 
@@ -569,6 +546,8 @@ template<> inline const std::vector<shared_ptr<Group>>& DomainBase::get_pool<Gro
 
 template<> inline const std::vector<shared_ptr<Integrator>>& DomainBase::get_pool<Integrator>() { return get_integrator_pool(); }
 
+template<> inline const std::vector<shared_ptr<Interaction>>& DomainBase::get_pool<Interaction>() { return get_interaction_pool(); }
+
 template<> inline const std::vector<shared_ptr<Load>>& DomainBase::get_pool<Load>() { return get_load_pool(); }
 
 template<> inline const std::vector<shared_ptr<Material>>& DomainBase::get_pool<Material>() { return get_material_pool(); }
@@ -585,7 +564,7 @@ template<> inline const std::vector<shared_ptr<Section>>& DomainBase::get_pool<S
 
 template<> inline const std::vector<shared_ptr<Solver>>& DomainBase::get_pool<Solver>() { return get_solver_pool(); }
 
-template<typename T> size_t DomainBase::get() { throw std::invalid_argument("unsupported"); }
+template<typename> size_t DomainBase::get() { throw std::invalid_argument("unsupported"); }
 
 template<> inline size_t DomainBase::get<Amplitude>() { return get_amplitude(); }
 
@@ -605,6 +584,8 @@ template<> inline size_t DomainBase::get<Group>() { return get_group(); }
 
 template<> inline size_t DomainBase::get<Integrator>() { return get_integrator(); }
 
+template<> inline size_t DomainBase::get<Interaction>() { return get_interaction(); }
+
 template<> inline size_t DomainBase::get<Load>() { return get_load(); }
 
 template<> inline size_t DomainBase::get<Material>() { return get_material(); }
@@ -623,9 +604,7 @@ template<> inline size_t DomainBase::get<Solver>() { return get_solver(); }
 
 template<> inline size_t DomainBase::get<Step>() { return get_step(); }
 
-template<typename T> bool DomainBase::find(unsigned) { throw std::invalid_argument("unsupported"); }
-
-template<typename T> bool DomainBase::find(uword) { throw std::invalid_argument("unsupported"); }
+template<typename> bool DomainBase::find(unsigned) { throw std::invalid_argument("unsupported"); }
 
 template<typename T> bool DomainBase::find(const uvec& P) {
     for(auto I : P)
@@ -633,42 +612,6 @@ template<typename T> bool DomainBase::find(const uvec& P) {
 
     return true;
 }
-
-template<> inline bool DomainBase::find<Amplitude>(const uword T) { return find_amplitude(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Expression>(const uword T) { return find_expression(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Constraint>(const uword T) { return find_constraint(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Converger>(const uword T) { return find_converger(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Criterion>(const uword T) { return find_criterion(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Database>(const uword T) { return find_database(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Element>(const uword T) { return find_element(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Group>(const uword T) { return find_group(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Integrator>(const uword T) { return find_integrator(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Load>(const uword T) { return find_load(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Material>(const uword T) { return find_material(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Modifier>(const uword T) { return find_modifier(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Node>(const uword T) { return find_node(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Orientation>(const uword T) { return find_orientation(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Recorder>(const uword T) { return find_recorder(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Section>(const uword T) { return find_section(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Solver>(const uword T) { return find_solver(static_cast<unsigned>(T)); }
-
-template<> inline bool DomainBase::find<Step>(const uword T) { return find_step(static_cast<unsigned>(T)); }
 
 template<> inline bool DomainBase::find<Amplitude>(const unsigned T) { return find_amplitude(T); }
 
@@ -687,6 +630,8 @@ template<> inline bool DomainBase::find<Element>(const unsigned T) { return find
 template<> inline bool DomainBase::find<Group>(const unsigned T) { return find_group(T); }
 
 template<> inline bool DomainBase::find<Integrator>(const unsigned T) { return find_integrator(T); }
+
+template<> inline bool DomainBase::find<Interaction>(const unsigned T) { return find_interaction(T); }
 
 template<> inline bool DomainBase::find<Load>(const unsigned T) { return find_load(T); }
 

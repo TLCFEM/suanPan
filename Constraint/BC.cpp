@@ -31,7 +31,22 @@ PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, std::vector<Node::DOF>&& D)
  * It effectively adds a diagonal matrix to the global stiffness matrix.
  */
 int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
-    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem).diag().fill(multiplier * D->get_factory()->get_stiffness()->max());
+    if(Integrator::Type::Explicit == D->get_current_step()->get_integrator()->type()) return process_resistance(D);
+
+    auto& W = D->get_factory();
+
+    double reference{0.};
+    if(AnalysisType::EIGEN == W->get_analysis_type()) reference = W->get_stiffness()->max();
+    else {
+        const auto incre_time = W->get_incre_time();
+        if(auto& t_mat = W->get_stiffness()) reference += t_mat->max();
+        if(auto& t_mat = W->get_geometry()) reference += t_mat->max();
+        if(auto& t_mat = W->get_damping()) reference += t_mat->max() / incre_time;
+        if(auto& t_mat = W->get_nonviscous()) reference += t_mat->max() / incre_time;
+        if(auto& t_mat = W->get_mass()) reference += t_mat->max() / incre_time / incre_time;
+    }
+
+    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem).diag().fill(multiplier * reference);
 
     return process_resistance(D);
 }
