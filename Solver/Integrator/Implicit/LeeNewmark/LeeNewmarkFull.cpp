@@ -522,6 +522,12 @@ int LeeNewmarkFull::process_constraint_resistance() {
     return LeeNewmarkBase::process_constraint_resistance();
 }
 
+/**
+ * We are not interested in the original matrices anymore.
+ * Thus, we skip assembling them.
+ */
+void LeeNewmarkFull::assemble_effective_matrix() {}
+
 void LeeNewmarkFull::print() {
     // clang-format off
     suanpan_info("A Newmark solver using Lee's damping model with adjustable bandwidth using {} stiffness. doi:10.1016/j.compstruc.2020.106423 and 10.1016/j.compstruc.2021.106663\n", stiffness_type == StiffnessType::TRIAL ? "tangent" : stiffness_type == StiffnessType::CURRENT ? "converged" : "initial");
