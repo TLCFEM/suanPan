@@ -115,6 +115,7 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\MinResistance.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.cpp" />
     <ClCompile Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.cpp" />
+    <ClCompile Include="..\..\..\Constraint\Interaction\Interaction.cpp" />
     <ClCompile Include="..\..\..\Constraint\LinearSpring2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\LJPotential2D.cpp" />
     <ClCompile Include="..\..\..\Constraint\MPC.cpp" />
@@ -218,6 +219,7 @@
     <ClCompile Include="..\..\..\Element\Modifier\LumpedSimple.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\Modifier.cpp" />
     <ClCompile Include="..\..\..\Element\Modifier\Rayleigh.cpp" />
+    <ClCompile Include="..\..\..\Element\Particle\Particle.cpp" />
     <ClCompile Include="..\..\..\Element\Patch\Patch.cpp" />
     <ClCompile Include="..\..\..\Element\Patch\PatchCube.cpp" />
     <ClCompile Include="..\..\..\Element\Patch\PatchQuad.cpp" />
@@ -563,6 +565,7 @@
     <ClInclude Include="..\..\..\Constraint\Criterion\StrainEnergyEvolution.h" />
     <ClInclude Include="..\..\..\Constraint\Embed.h" />
     <ClInclude Include="..\..\..\Constraint\FixedLength.h" />
+    <ClInclude Include="..\..\..\Constraint\Interaction\Interaction.h" />
     <ClInclude Include="..\..\..\Constraint\LinearSpring2D.h" />
     <ClInclude Include="..\..\..\Constraint\LJPotential2D.h" />
     <ClInclude Include="..\..\..\Constraint\MPC.h" />
@@ -677,6 +680,7 @@
     <ClInclude Include="..\..\..\Element\Modifier\LumpedSimple.h" />
     <ClInclude Include="..\..\..\Element\Modifier\Modifier.h" />
     <ClInclude Include="..\..\..\Element\Modifier\Rayleigh.h" />
+    <ClInclude Include="..\..\..\Element\Particle\Particle.h" />
     <ClInclude Include="..\..\..\Element\Patch\Patch.h" />
     <ClInclude Include="..\..\..\Element\Patch\PatchCube.h" />
     <ClInclude Include="..\..\..\Element\Patch\PatchQuad.h" />

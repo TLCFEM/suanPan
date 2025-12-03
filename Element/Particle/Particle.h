@@ -66,7 +66,7 @@ public:
         , mass(M)
         , inertia(I) {}
 
-    [[nodiscard]] double get(const Parameter P) const final {
+    [[nodiscard]] double get(const Parameter P) const override {
         if(Parameter::ELASTIC == P) return elastic_modulus;
         if(Parameter::POISSON == P) return poisson_ratio;
         if(Parameter::RADIUS == P) return radius;

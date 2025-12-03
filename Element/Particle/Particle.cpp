@@ -18,7 +18,7 @@
 #include "Particle.h"
 
 Particle::Particle(const unsigned T, const unsigned N, std::vector<Node::DOF>&& D)
-    : Element(T, 1, D.size(), uvec{N}, std::move(D)) {}
+    : Element(T, 1, static_cast<unsigned>(D.size()), uvec{N}, std::move(D)) {}
 
 InertialSphericalParticle2D::InertialSphericalParticle2D(const unsigned T, const unsigned N, const double R, const double E, const double V, const double A, const double M, const double I)
     : SphericalParticle(T, N, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3}, R, E, V, A, M, I) {}
