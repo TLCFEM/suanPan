@@ -133,6 +133,13 @@ template<typename T> auto get_remaining(std::istringstream& stream) {
     return output;
 }
 
+template<typename T> auto get_remaining_as_set(std::istringstream& stream) {
+    std::set<T> output;
+    T value;
+    while(get_input(stream, value)) output.insert(value);
+    return output;
+}
+
 template<typename T1, typename T2, typename... Ts> auto get_remaining(std::istringstream& stream) {
     std::tuple<std::vector<T1>, std::vector<T2>, std::vector<Ts>...> output;
     std::tuple<T1, T2, Ts...> temp;

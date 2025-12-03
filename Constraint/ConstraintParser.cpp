@@ -541,9 +541,7 @@ int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstr
             return SUANPAN_SUCCESS;
         }
 
-        const auto particles = get_remaining<unsigned>(command);
-
-        flag = domain->insert(std::make_shared<FixedParticle>(tag, multiplier, std::set(particles.begin(), particles.end())));
+        flag = domain->insert(std::make_shared<FixedParticle>(tag, multiplier, get_remaining_as_set<unsigned>(command)));
     }
 
     if(!flag) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
