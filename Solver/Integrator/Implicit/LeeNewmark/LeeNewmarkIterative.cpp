@@ -371,13 +371,19 @@ int LeeNewmarkIterative::process_constraint_resistance() {
     return Newmark::process_constraint_resistance();
 }
 
-void LeeNewmarkIterative::assemble_effective_matrix() {
+void LeeNewmarkIterative::assemble_matrix() {
+    Newmark::assemble_matrix();
+
     auto& W = get_domain()->get_factory();
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
     current_mass = W->get_mass()->make_copy();
     current_stiffness = W->get_stiffness()->make_copy();
+}
+
+void LeeNewmarkIterative::assemble_effective_matrix() {
+    auto& W = get_domain()->get_factory();
 
     W->get_stiffness() += C0 * W->get_mass();
 
