@@ -149,7 +149,7 @@ FixedParticle::FixedParticle(const unsigned T, std::set<unsigned>&& P)
     : Interaction(T)
     , particles(std::move(P)) {}
 
-void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) const {
+void FixedParticle::apply(bool, const shared_ptr<Element>& element) const {
     if(!particles.contains(element->get_tag())) return;
 
     // there is no need to touch matrices as in DEM for two reasons:
