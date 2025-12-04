@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: check-latest
     if: needs.check-latest.outputs.cache-hit != 'true'
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - name: Clone
         uses: actions/checkout@v6
