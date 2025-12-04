@@ -15,7 +15,7 @@ hdf5recorder 3 Node U 1 2
 
 interaction Hertzian 1
 interaction HertzianDamped 2
-interaction FixedParticle 3 1e4 3
+interaction FixedParticle 3 3
 
 constraint MolecularDynamics2D 1 1 2 3
 

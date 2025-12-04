@@ -97,10 +97,9 @@ public:
 
 class FixedParticle final : public Interaction {
     std::set<unsigned> particles;
-    const double multiplier;
 
 public:
-    FixedParticle(unsigned, double, std::set<unsigned>&&);
+    FixedParticle(unsigned, std::set<unsigned>&&);
 
     void apply(bool, const shared_ptr<Element>&) const override;
     void apply(bool, const shared_ptr<InteractionPair>&) const override {}

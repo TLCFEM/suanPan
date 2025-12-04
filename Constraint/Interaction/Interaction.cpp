@@ -145,10 +145,9 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
     }
 }
 
-FixedParticle::FixedParticle(const unsigned T, const double M, std::set<unsigned>&& P)
+FixedParticle::FixedParticle(const unsigned T, std::set<unsigned>&& P)
     : Interaction(T)
-    , particles(std::move(P))
-    , multiplier(M) {}
+    , particles(std::move(P)) {}
 
 void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) const {
     if(!particles.contains(element->get_tag())) return;
