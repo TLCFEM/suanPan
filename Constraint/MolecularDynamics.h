@@ -42,6 +42,9 @@ template<unsigned DIM, bool ROTATION> class MolecularDynamics : public Constrain
     [[nodiscard]] bool validate_node() const final { return true; }
 
 protected:
+    std::vector<shared_ptr<Element>> elements;
+    double space = 0.;
+
     void apply_interaction(const bool full, const shared_ptr<Element>& element) const {
         for(auto&& interaction : interactions) interaction->apply(full, element);
     }
@@ -70,13 +73,15 @@ public:
             return SUANPAN_FAIL;
         }
 
-        if(suanpan::any_of(D->get_element_pool(), [](const shared_ptr<Element>& element) { return element->type() != Element::Type::DEM; })) {
-            suanpan_warning("Only DEM elements are supported.\n");
-            return SUANPAN_FAIL;
-        }
-
+        interactions.clear();
         for(auto&& item : D->get<Interaction>(interaction_tags))
             if(item && item->is_active()) interactions.emplace_back(item);
+
+        elements.clear();
+        for(auto&& item : D->get_element_pool())
+            if(item && item->is_active() && item->type() == Element::Type::DEM) elements.emplace_back(item);
+
+        space = 2. * std::transform_reduce(elements.cbegin(), elements.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); });
 
         return Constraint::initialize(D);
     }
@@ -100,13 +105,10 @@ class MolecularDynamics2D final : public MolecularDynamics<2u, false> {
     int process_impl(const shared_ptr<DomainBase>& D, const bool full) override {
         auto& W = D->get_factory();
 
-        auto& element_pool = D->get_element_pool();
-
         suanpan::vector<CellList> list;
-        list.reserve(element_pool.size());
+        list.reserve(elements.size());
 
-        const auto space = 2. * std::transform_reduce(element_pool.cbegin(), element_pool.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); });
-        suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
+        suanpan::for_all(elements, [&](const shared_ptr<Element>& element) {
             if(norm(element->get_trial_velocity().head(2)) * W->get_incre_time() > space) suanpan_warning("The nodal speed seems to be too large.\n");
             const vec new_pos = element->get_coordinate(2).t() + element->get_trial_displacement().head(2);
             list.emplace_back(static_cast<int>(floor(new_pos(0) / space)), static_cast<int>(floor(new_pos(1) / space)), element->get_tag());
@@ -147,13 +149,10 @@ class MolecularDynamics3D final : public MolecularDynamics<3u, false> {
     int process_impl(const shared_ptr<DomainBase>& D, const bool full) override {
         auto& W = D->get_factory();
 
-        auto& element_pool = D->get_element_pool();
-
         suanpan::vector<CellList> list;
-        list.reserve(element_pool.size());
+        list.reserve(elements.size());
 
-        const auto space = 2. * std::transform_reduce(element_pool.cbegin(), element_pool.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); });
-        suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
+        suanpan::for_all(elements, [&](const shared_ptr<Element>& element) {
             if(norm(element->get_trial_velocity().head(3)) * W->get_incre_time() > space) suanpan_warning("The nodal speed seems to be too large.\n");
             const vec new_pos = element->get_coordinate(3).t() + element->get_trial_displacement().head(3);
             list.emplace_back(static_cast<int>(floor(new_pos(0) / space)), static_cast<int>(floor(new_pos(1) / space)), static_cast<int>(floor(new_pos(2) / space)), element->get_tag());
