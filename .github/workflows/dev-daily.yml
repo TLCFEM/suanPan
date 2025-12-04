@@ -149,6 +149,7 @@ jobs:
           -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
           -DCMAKE_INSTALL_PREFIX=dist `
           -DSP_ENABLE_AVX2=OFF `
+          -DSP_ENABLE_ASAN=ON `
           ..
           cmake --build . --target install --config Debug -j 4
       - name: Name
