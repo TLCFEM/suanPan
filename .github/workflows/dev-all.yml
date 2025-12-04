@@ -17,6 +17,7 @@ jobs:
       id-token: write
     timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-22.04-arm]
         build: [Debug]
@@ -222,6 +223,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-14-large, macos-14-xlarge]
         build: [RelWithDebInfo]
@@ -296,6 +298,7 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
         build: [Release]
         compiler: ["Visual Studio 17 2022"]
@@ -366,6 +369,7 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
         build: [Release]
         compiler: ["MinGW Makefiles"]

@@ -15,6 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-22.04-arm]
         avx: [ON, OFF]
@@ -186,6 +187,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 100
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge]
         vtk: [ON]
@@ -260,6 +262,7 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 120
     strategy:
+      fail-fast: false
       matrix:
         avx: [ON, OFF]
         vtk: [ON]
@@ -395,6 +398,7 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 120
     strategy:
+      fail-fast: false
       matrix:
         avx: [ON, OFF]
         vtk: [ON]
