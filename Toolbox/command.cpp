@@ -58,6 +58,7 @@
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
+#include <regex>
 #include <thread>
 
 using std::ifstream;
@@ -1341,6 +1342,24 @@ namespace {
         suanpan_info("====================================================\n");
         return SUANPAN_SUCCESS;
     }
+
+    bool compatible_version(ifstream& file) {
+        if('#' != file.peek()) return true;
+
+        std::string comment_line;
+        getline(file, comment_line);
+
+        if(!comment_line.starts_with("#!")) return true;
+
+        std::smatch m;
+        if(std::regex_search(comment_line, m, std::regex(R"(min(?:imum)?[-_]version:\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?)", std::regex_constants::icase)) && (SUANPAN_MAJOR < (m[1].matched ? std::stoi(m[1]) : 0) || SUANPAN_MINOR < (m[2].matched ? std::stoi(m[2]) : 0) || SUANPAN_PATCH < (m[3].matched ? std::stoi(m[3]) : 0)))
+            return false;
+
+        if(std::regex_search(comment_line, m, std::regex(R"(max(?:imum)?[-_]version:\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?)", std::regex_constants::icase)) && (SUANPAN_MAJOR > (m[1].matched ? std::stoi(m[1]) : 0) || SUANPAN_MINOR > (m[2].matched ? std::stoi(m[2]) : 0) || SUANPAN_PATCH > (m[3].matched ? std::stoi(m[3]) : 0)))
+            return false;
+
+        return true;
+    }
 } // namespace
 
 int process_command(const shared_ptr<Bead>& model, std::istringstream&& command) {
@@ -2301,6 +2320,11 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         return SUANPAN_EXIT;
     }
 
+    if(!compatible_version(input_file)) {
+        suanpan_error("The input file \"{}\" requires an incompatible version.\n", fs::path(file_name).generic_string());
+        return SUANPAN_EXIT;
+    }
+
     const auto history_path = get_history_path();
     ofstream output_file(history_path, !exists(history_path) || file_size(history_path) > 16777216 ? std::ios_base::out : (std::ios_base::app | std::ios_base::out));
 
@@ -2309,7 +2333,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
     if(record_command) output_file << "### start processing --> " << file_name << '\n';
 
     std::string all_line, command_line;
-    while(!getline(input_file, command_line).fail()) {
+    while(getline(input_file, command_line)) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(record_command) output_file << all_line << '\n';
