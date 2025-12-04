@@ -38,20 +38,21 @@ jobs:
           submodules: recursive
       - name: Compile
         run: |
+          sudo apt-get install patchelf lcov
           echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
           mkdir build && cd build
           cmake \
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_ENABLE_ASAN=ON \
+          -DSP_ENABLE_CODECOV=ON \
           -DSP_ENABLE_AVX2=OFF \
           ..
           cmake --build . --target install --config Debug -j $(nproc)
           cd ..
-          sudo apt-get install patchelf
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
       - name: Cosign
-        if: ${{ false }}
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.2.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -67,6 +68,14 @@ jobs:
           chmod 600 key.pem
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/suanPan-daily/linux/
           rm -f key.pem
+      - name: Coverage
+        run: |
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
+          cd build
+          bash ../Script/Coverage.sh .
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' --output-file coverage.info
+          lcov --list coverage.info
   macos-daily:
     runs-on: ${{ matrix.os }}
     needs: check-latest
@@ -97,8 +106,7 @@ jobs:
           cd ..
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
-        if: ${{ false }}
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.2.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -149,8 +157,7 @@ jobs:
           echo "ARTIFACT=suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
       - name: Cosign
-        if: ${{ false }}
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.2.0
         with:
           inputs: build/dist/bin/*.exe
       - name: Unsigned

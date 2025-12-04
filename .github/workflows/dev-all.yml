@@ -92,7 +92,6 @@ jobs:
           -DSP_BUILD_DLL_EXAMPLE=${{ env.COVERAGE }} \
           -DSP_BUILD_PARALLEL=$([ "${{ matrix.build }}" = "Debug" ] && echo "OFF" || echo "ON") \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
-          -DSP_ENABLE_ASAN=${{ env.COVERAGE }} \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
           -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
           -DSP_ENABLE_IOMP=${{ env.IOMP }} \
@@ -107,8 +106,7 @@ jobs:
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        if: ${{ false }}
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.2.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
