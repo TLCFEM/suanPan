@@ -152,13 +152,10 @@ FixedParticle::FixedParticle(const unsigned T, std::set<unsigned>&& P)
 void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) const {
     if(!particles.contains(element->get_tag())) return;
 
-    // if(full) {
-    //     const auto penalty = multiplier * element->get(Element::Parameter::ELASTIC);
-    //     auto& factory = domain.lock()->get_factory();
-    //     auto& t_stiff = factory->get_stiffness();
-    //     std::scoped_lock stiffness_lock(factory->get_stiffness_mutex());
-    //     for(const auto I : element->get_dof_encoding()) t_stiff->at(I, I) += penalty;
-    // }
+    // there is no need to touch matrices as in DEM for two reasons:
+    // 1. the final effective matrix is always positive definite, no need to worry about singularity
+    // 2. the solution will be zeroed out anyway on constrained DoFs
+    // thus, only need to insert constrained DoFs into the domain
 
     domain.lock()->insert_constrained_dof(element->get_dof_encoding());
 }
