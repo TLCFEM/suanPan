@@ -20,6 +20,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
+#include <Solver/Integrator/Integrator.h>
+#include <Step/Step.h>
 
 InteractionPair::InteractionPair(const shared_ptr<Element>& obj_i, const shared_ptr<Element>& obj_j)
     : object_i(obj_i)
@@ -59,7 +61,8 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
 
-    auto& factory = domain.lock()->get_factory();
+    const auto domain_ptr = domain.lock();
+    auto& factory = domain_ptr->get_factory();
 
     {
         const vec repulsive = normal_force_over_length * chord;
@@ -71,7 +74,7 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
         }
     }
 
-    if(full) {
+    if(full && Integrator::Type::Implicit == domain_ptr->get_current_step()->get_integrator()->type()) {
         mat der_repulsive = (normal_factor + normal_force_over_length) / chord_length / chord_length * chord * chord.t();
         der_repulsive.diag() -= normal_force_over_length;
         auto& t_stiff = factory->get_stiffness();
@@ -103,7 +106,8 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
 
-    auto& factory = domain.lock()->get_factory();
+    const auto domain_ptr = domain.lock();
+    auto& factory = domain_ptr->get_factory();
 
     {
         const vec repulsive = normal_force * unit_cord;
@@ -115,7 +119,7 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
         }
     }
 
-    if(!full) return;
+    if(!full || Integrator::Type::Explicit == domain_ptr->get_current_step()->get_integrator()->type()) return;
 
     {
         const mat der_unit_chord = (eye(chord.n_elem, chord.n_elem) - unit_cord * unit_cord.t()) / chord_length;
