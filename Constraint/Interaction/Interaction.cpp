@@ -60,7 +60,7 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
     const vec velocity_rel = pair->velocity_i() - pair->velocity_j();
     const auto velocity_projection = dot(velocity_rel, unit_cord);
 
-    const auto base_factor = four_third * std::sqrt(pair->effective_radius) * pair->effective_modulus * std::pow(compression, .5);
+    const auto base_factor = four_third * std::sqrt(pair->effective_radius * compression) * pair->effective_modulus;
     const auto damping_factor = base_factor * pair->effective_damping;
     const auto damping_force = damping_factor * velocity_projection;
     const auto resistance_force = -base_factor * compression;
@@ -86,29 +86,29 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
     if(!full || Integrator::Type::Explicit == domain_ptr->get_current_step()->get_integrator()->type()) return;
 
     {
-        const mat der_unit_chord = (eye(chord.n_elem, chord.n_elem) - unit_cord * unit_cord.t()) / chord_length;
-        const mat der_repulsive = total_force * der_unit_chord + unit_cord * (damping_factor * velocity_rel.t() * der_unit_chord + (1.5 * base_factor - .5 * damping_factor / compression * velocity_projection) * unit_cord.t());
-        auto& t_stiff = factory->get_stiffness();
-        std::scoped_lock stiffness_lock(factory->get_stiffness_mutex());
+        const mat der_unit_chord = eye(chord.n_elem, chord.n_elem) - unit_cord * unit_cord.t();
+        const mat der_repulsive = total_force / chord_length * der_unit_chord + unit_cord * (damping_factor / chord_length * velocity_rel.t() * der_unit_chord + (1.5 * base_factor - .5 * damping_factor / compression * velocity_projection) * unit_cord.t());
+        auto& t_mat = factory->get_stiffness();
+        std::scoped_lock lock(factory->get_stiffness_mutex());
         for(auto I = 0llu; I < chord.n_elem; ++I)
             for(auto J = 0llu; J < chord.n_elem; ++J) {
-                t_stiff->at(dof_i(I), dof_i(J)) += der_repulsive(I, J);
-                t_stiff->at(dof_j(I), dof_j(J)) += der_repulsive(I, J);
-                t_stiff->at(dof_i(I), dof_j(J)) -= der_repulsive(I, J);
-                t_stiff->at(dof_j(I), dof_i(J)) -= der_repulsive(I, J);
+                t_mat->at(dof_i(I), dof_i(J)) += der_repulsive(I, J);
+                t_mat->at(dof_j(I), dof_j(J)) += der_repulsive(I, J);
+                t_mat->at(dof_i(I), dof_j(J)) -= der_repulsive(I, J);
+                t_mat->at(dof_j(I), dof_i(J)) -= der_repulsive(I, J);
             }
     }
 
     {
         const mat der_repulsive = damping_factor * unit_cord * unit_cord.t();
-        auto& t_damping = factory->get_damping();
-        std::scoped_lock damping_lock(factory->get_damping_mutex());
+        auto& t_mat = factory->get_damping();
+        std::scoped_lock lock(factory->get_damping_mutex());
         for(auto I = 0llu; I < chord.n_elem; ++I)
             for(auto J = 0llu; J < chord.n_elem; ++J) {
-                t_damping->at(dof_i(I), dof_i(J)) += der_repulsive(I, J);
-                t_damping->at(dof_j(I), dof_j(J)) += der_repulsive(I, J);
-                t_damping->at(dof_i(I), dof_j(J)) -= der_repulsive(I, J);
-                t_damping->at(dof_j(I), dof_i(J)) -= der_repulsive(I, J);
+                t_mat->at(dof_i(I), dof_i(J)) += der_repulsive(I, J);
+                t_mat->at(dof_j(I), dof_j(J)) += der_repulsive(I, J);
+                t_mat->at(dof_i(I), dof_j(J)) -= der_repulsive(I, J);
+                t_mat->at(dof_j(I), dof_i(J)) -= der_repulsive(I, J);
             }
     }
 }
