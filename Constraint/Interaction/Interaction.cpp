@@ -121,8 +121,10 @@ FixedParticle::FixedParticle(const unsigned T, const double M, std::set<unsigned
 void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) const {
     if(!particles.contains(element->get_tag())) return;
 
-    if(full) {
-        auto& factory = domain.lock()->get_factory();
+    const auto domain_ptr = domain.lock();
+
+    if(full && Integrator::Type::Implicit == domain_ptr->get_current_step()->get_integrator()->type()) {
+        auto& factory = domain_ptr->get_factory();
 
         if(auto& t_mass = factory->get_mass()) {
             const auto penalty = multiplier * element->get(Element::Parameter::MASS);
@@ -136,5 +138,5 @@ void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) c
         }
     }
 
-    domain.lock()->insert_constrained_dof(element->get_dof_encoding());
+    domain_ptr->insert_constrained_dof(element->get_dof_encoding());
 }
