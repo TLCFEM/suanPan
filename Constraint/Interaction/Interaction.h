@@ -76,16 +76,6 @@ public:
 };
 
 class Hertzian final : public Interaction {
-    static constexpr double two_third = 2. / 3.;
-
-public:
-    using Interaction::Interaction;
-
-    void apply(bool, const shared_ptr<Element>&) const override {}
-    void apply(bool, const shared_ptr<InteractionPair>&) const override;
-};
-
-class HertzianDamped final : public Interaction {
     static constexpr double four_third = 4. / 3.;
 
 public:

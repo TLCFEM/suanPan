@@ -50,47 +50,6 @@ void Interaction::initialize(const shared_ptr<DomainBase>& D) { domain = D; }
 
 void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) const {
     const vec position_i = pair->position_i(), position_j = pair->position_j();
-    const vec chord = position_j - position_i;
-    const auto chord_length = norm(chord);
-    const auto compression = pair->initial_gap() - chord_length;
-
-    if(compression <= 0.) return;
-
-    const auto normal_factor = 2. * std::sqrt(pair->effective_radius) * pair->effective_modulus * std::pow(compression, .5);
-    const auto normal_force_over_length = compression * normal_factor * two_third / chord_length;
-
-    const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
-
-    const auto domain_ptr = domain.lock();
-    auto& factory = domain_ptr->get_factory();
-
-    {
-        const vec repulsive = normal_force_over_length * chord;
-        auto& t_resistance = factory->modify_trial_constraint_resistance();
-        std::scoped_lock resistance_lock(factory->get_trial_constraint_resistance_mutex());
-        for(auto I = 0llu; I < chord.n_elem; ++I) {
-            t_resistance(dof_i(I)) += repulsive(I);
-            t_resistance(dof_j(I)) -= repulsive(I);
-        }
-    }
-
-    if(full && Integrator::Type::Implicit == domain_ptr->get_current_step()->get_integrator()->type()) {
-        mat der_repulsive = (normal_factor + normal_force_over_length) / chord_length / chord_length * chord * chord.t();
-        der_repulsive.diag() -= normal_force_over_length;
-        auto& t_stiff = factory->get_stiffness();
-        std::scoped_lock stiffness_lock(factory->get_stiffness_mutex());
-        for(auto I = 0llu; I < chord.n_elem; ++I)
-            for(auto J = 0llu; J < chord.n_elem; ++J) {
-                t_stiff->at(dof_i(I), dof_i(J)) += der_repulsive(I, J);
-                t_stiff->at(dof_j(I), dof_j(J)) += der_repulsive(I, J);
-                t_stiff->at(dof_i(I), dof_j(J)) -= der_repulsive(I, J);
-                t_stiff->at(dof_j(I), dof_i(J)) -= der_repulsive(I, J);
-            }
-    }
-}
-
-void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& pair) const {
-    const vec position_i = pair->position_i(), position_j = pair->position_j();
     const vec chord = position_i - position_j;
     const auto chord_length = norm(chord);
     const auto compression = pair->initial_gap() - chord_length;
@@ -101,8 +60,13 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
     const vec velocity_rel = pair->velocity_i() - pair->velocity_j();
     const auto velocity_projection = dot(velocity_rel, unit_cord);
 
-    const auto pair_factor = four_third * std::sqrt(pair->effective_radius) * pair->effective_modulus * pair->effective_damping;
-    const auto normal_force = pair_factor * std::pow(compression, .5) * velocity_projection;
+    const auto base_factor = four_third * std::sqrt(pair->effective_radius) * pair->effective_modulus * std::pow(compression, .5);
+    const auto damping_factor = base_factor * pair->effective_damping;
+    const auto damping_force = damping_factor * velocity_projection;
+    const auto resistance_force = -base_factor * compression;
+    const auto total_force = resistance_force + damping_force;
+
+    if(total_force > 0.) return;
 
     const uvec &dof_i = pair->dof_i(), &dof_j = pair->dof_j();
 
@@ -110,7 +74,7 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
     auto& factory = domain_ptr->get_factory();
 
     {
-        const vec repulsive = normal_force * unit_cord;
+        const vec repulsive = total_force * unit_cord;
         auto& t_resistance = factory->modify_trial_constraint_resistance();
         std::scoped_lock resistance_lock(factory->get_trial_constraint_resistance_mutex());
         for(auto I = 0llu; I < chord.n_elem; ++I) {
@@ -123,7 +87,7 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
 
     {
         const mat der_unit_chord = (eye(chord.n_elem, chord.n_elem) - unit_cord * unit_cord.t()) / chord_length;
-        const mat der_repulsive = normal_force * der_unit_chord + pair_factor * std::pow(compression, -.5) * unit_cord * (compression * velocity_rel.t() * der_unit_chord - .5 * velocity_projection * unit_cord.t());
+        const mat der_repulsive = total_force * der_unit_chord + unit_cord * (damping_factor * velocity_rel.t() * der_unit_chord + (1.5 * base_factor - .5 * damping_factor / compression * velocity_projection) * unit_cord.t());
         auto& t_stiff = factory->get_stiffness();
         std::scoped_lock stiffness_lock(factory->get_stiffness_mutex());
         for(auto I = 0llu; I < chord.n_elem; ++I)
@@ -136,7 +100,7 @@ void HertzianDamped::apply(const bool full, const shared_ptr<InteractionPair>& p
     }
 
     {
-        const mat der_repulsive = pair_factor * std::pow(compression, .5) * unit_cord * unit_cord.t();
+        const mat der_repulsive = damping_factor * unit_cord * unit_cord.t();
         auto& t_damping = factory->get_damping();
         std::scoped_lock damping_lock(factory->get_damping_mutex());
         for(auto I = 0llu; I < chord.n_elem; ++I)

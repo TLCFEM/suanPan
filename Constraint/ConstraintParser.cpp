@@ -533,7 +533,6 @@ int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstr
     auto flag = true;
 
     if(is_equal(criterion_type, "Hertzian")) flag = domain->insert(std::make_shared<Hertzian>(tag));
-    else if(is_equal(criterion_type, "HertzianDamped")) flag = domain->insert(std::make_shared<HertzianDamped>(tag));
     else if(is_equal(criterion_type, "FixedParticle")) flag = domain->insert(std::make_shared<FixedParticle>(tag, get_remaining_as_set<unsigned>(command)));
 
     if(!flag) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());

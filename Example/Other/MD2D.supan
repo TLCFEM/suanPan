@@ -14,10 +14,9 @@ hdf5recorder 1 Global KE
 hdf5recorder 3 Node U 1 2
 
 interaction Hertzian 1
-interaction HertzianDamped 2
-interaction FixedParticle 3 3
+interaction FixedParticle 2 3
 
-constraint MolecularDynamics2D 1 1 2 3
+constraint MolecularDynamics2D 1 1 2
 
 #rigidwall 2 5 0 -1 0 1E0
 #rigidwall 3 0 5 0 -1 1E0
@@ -35,6 +34,8 @@ converger RelIncreDisp 1 1E-11 10 1
 analyze
 
 # save recorder 1 3
+
+peek node 1 2
 
 exit
 
