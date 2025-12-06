@@ -533,7 +533,15 @@ int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstr
     auto flag = true;
 
     if(is_equal(criterion_type, "Hertzian")) flag = domain->insert(std::make_shared<Hertzian>(tag));
-    else if(is_equal(criterion_type, "FixedParticle")) flag = domain->insert(std::make_shared<FixedParticle>(tag, get_remaining_as_set<unsigned>(command)));
+    else if(is_equal(criterion_type, "FixedParticle")) {
+        double multiplier;
+        if(!get_input(command, multiplier)) {
+            suanpan_error("A valid multiplier is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        flag = domain->insert(std::make_shared<FixedParticle>(tag, multiplier, get_remaining_as_set<unsigned>(command)));
+    }
 
     if(!flag) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
 

@@ -14,7 +14,7 @@ hdf5recorder 1 Global KE
 hdf5recorder 3 Node U 1 2
 
 interaction Hertzian 1
-interaction FixedParticle 2 3
+interaction FixedParticle 2 1e4 3
 
 constraint MolecularDynamics3D 1 1 2
 

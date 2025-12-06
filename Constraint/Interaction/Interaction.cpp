@@ -113,17 +113,28 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
     }
 }
 
-FixedParticle::FixedParticle(const unsigned T, std::set<unsigned>&& P)
+FixedParticle::FixedParticle(const unsigned T, const double M, std::set<unsigned>&& P)
     : Interaction(T)
-    , particles(std::move(P)) {}
+    , particles(std::move(P))
+    , multiplier(M) {}
 
-void FixedParticle::apply(bool, const shared_ptr<Element>& element) const {
+void FixedParticle::apply(const bool full, const shared_ptr<Element>& element) const {
     if(!particles.contains(element->get_tag())) return;
 
-    // there is no need to touch matrices as in DEM for two reasons:
-    // 1. the final effective matrix is always positive definite, no need to worry about singularity
-    // 2. the solution will be zeroed out anyway on constrained DoFs
-    // thus, only need to insert constrained DoFs into the domain
+    if(full) {
+        auto& factory = domain.lock()->get_factory();
+
+        if(auto& t_mass = factory->get_mass()) {
+            const auto penalty = multiplier * element->get(Element::Parameter::MASS);
+            std::scoped_lock lock(factory->get_mass_mutex());
+            for(const auto I : element->get_dof_encoding()) t_mass->at(I, I) += penalty;
+        }
+        if(auto& t_stiffness = factory->get_stiffness()) {
+            const auto penalty = multiplier * element->get(Element::Parameter::ELASTIC);
+            std::scoped_lock lock(factory->get_stiffness_mutex());
+            for(const auto I : element->get_dof_encoding()) t_stiffness->at(I, I) += penalty;
+        }
+    }
 
     domain.lock()->insert_constrained_dof(element->get_dof_encoding());
 }
