@@ -26,7 +26,7 @@ double BilinearMises1D::compute_h(const double) const { return 0.; }
 double BilinearMises1D::compute_dh(const double) const { return 0.; }
 
 BilinearMises1D::BilinearMises1D(const unsigned T, const double E, const double Y, const double H, const double R)
-    : DataBilinearMises1D{fabs(Y), fabs(E) * H / (1. - H)}
+    : DataBilinearMises1D{std::fabs(Y), std::fabs(E) * H / (1. - H)}
     , NonlinearMises1D(T, E, R) {}
 
 unique_ptr<Material> BilinearMises1D::get_copy() { return std::make_unique<BilinearMises1D>(*this); }

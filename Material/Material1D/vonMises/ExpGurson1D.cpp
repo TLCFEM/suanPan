@@ -18,7 +18,7 @@
 #include "ExpGurson1D.h"
 
 ExpGurson1D::ExpGurson1D(const unsigned T, const double E, const double V, const double YS, const double N, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
-    : DataExpGurson1D{fabs(YS), std::min(1., N)}
+    : DataExpGurson1D{std::fabs(YS), std::min(1., N)}
     , NonlinearGurson1D(T, E, V, Q1, Q2, FN, SN, EN, R) {}
 
 vec ExpGurson1D::compute_hardening(const double plastic_strain) const {

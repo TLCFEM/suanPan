@@ -17,16 +17,16 @@
 
 #include "ExpMises1D.h"
 
-double ExpMises1D::compute_k(const double p_strain) const { return yield_stress + a - a * exp(-b * p_strain) + c * elastic_modulus * p_strain; }
+double ExpMises1D::compute_k(const double p_strain) const { return yield_stress + a - a * std::exp(-b * p_strain) + c * elastic_modulus * p_strain; }
 
-double ExpMises1D::compute_dk(const double p_strain) const { return a * b * exp(-b * p_strain) + c * elastic_modulus; }
+double ExpMises1D::compute_dk(const double p_strain) const { return a * b * std::exp(-b * p_strain) + c * elastic_modulus; }
 
 double ExpMises1D::compute_h(const double) const { return 0.; }
 
 double ExpMises1D::compute_dh(const double) const { return 0.; }
 
 ExpMises1D::ExpMises1D(const unsigned T, const double E, const double Y, const double A, const double B, const double C, const double R)
-    : DataExpMises1D{fabs(Y), fabs(A), fabs(B), fabs(C)}
+    : DataExpMises1D{std::fabs(Y), std::fabs(A), std::fabs(B), std::fabs(C)}
     , NonlinearMises1D(T, E, R) {}
 
 unique_ptr<Material> ExpMises1D::get_copy() { return std::make_unique<ExpMises1D>(*this); }

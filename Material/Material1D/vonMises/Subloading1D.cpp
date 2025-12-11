@@ -20,14 +20,14 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-const double DataSubloading1D::Saturation::root_one_half = sqrt(1.5);
+const double DataSubloading1D::Saturation::root_one_half = std::sqrt(1.5);
 
-const double Subloading1D::rate_bound = -log(z_bound);
+const double Subloading1D::rate_bound = -std::log(z_bound);
 
 pod2 Subloading1D::yield_ratio(const double z) {
     if(z < z_bound) return {rate_bound, 0.};
 
-    return {-log(z), -1. / z};
+    return {-std::log(z), -1. / z};
 }
 
 Subloading1D::Subloading1D(const unsigned T, DataSubloading1D&& D, const double R)
