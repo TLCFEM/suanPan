@@ -20,14 +20,26 @@
 #include <Domain/Factory.hpp>
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
+const span NodeLine::span_i(0, 1);
+const span NodeLine::span_j(2, 3);
+const span NodeLine::span_k(4, 5);
 
 NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
     : Constraint(T, A, {Node::DOF::U1, Node::DOF::U2}, {}, 1) { target_node = std::move(N); }
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
     set_multiplier_size(0u);
 
-    return Constraint::initialize(D);
+    const auto node_i = D->get<Node>(target_node(0))->initial_position(2u);
+    const auto node_j = D->get<Node>(target_node(1))->initial_position(2u);
+    const auto node_k = D->get<Node>(target_node(2))->initial_position(2u);
+
+    // is it on the right side initially?
+    initial_right = std::signbit(dot(node_k - node_i, rotation * (node_j - node_i)));
+
+    return SUANPAN_SUCCESS;
 }
 
 int NodeLine::process(const shared_ptr<DomainBase>& D) {
@@ -39,13 +51,12 @@ int NodeLine::process(const shared_ptr<DomainBase>& D) {
     const vec outer_normal = rotation * axis;
     const vec position = node_k - node_i;
 
-    const auto pen = dot(position, outer_normal);
+    auto pen = dot(position, outer_normal);
+    if(initial_right) pen = -pen;
 
     if(const auto t = dot(position, axis); 0 == lagrangian_size && (pen > 0. || t < 0. || t > norm(axis))) return SUANPAN_SUCCESS;
 
     set_multiplier_size(1u);
-
-    const span span_i(0, 1), span_j(2, 3), span_k(4, 5);
 
     auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
     auxiliary_resistance = pen;
@@ -59,7 +70,9 @@ int NodeLine::process(const shared_ptr<DomainBase>& D) {
         auxiliary_stiffness(target_node_dof(K)) = outer_normal(I);
     }
 
-    const mat factor = trial_lambda(0) * rotation;
+    if(initial_right) auxiliary_stiffness *= -1.;
+
+    const mat factor = (initial_right ? -trial_lambda(0) : trial_lambda(0)) * rotation;
 
     stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem);
     stiffness(span_i, span_i) = factor.t() + factor;

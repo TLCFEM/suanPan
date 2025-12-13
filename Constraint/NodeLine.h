@@ -35,6 +35,9 @@
 
 class NodeLine final : public Constraint {
     static const mat rotation;
+    static const span span_i, span_j, span_k;
+
+    bool initial_right{true};
 
     [[nodiscard]] bool validate_node() const override { return true; }
 
