@@ -95,7 +95,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -168,7 +168,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -243,7 +243,7 @@ jobs:
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -324,7 +324,7 @@ jobs:
       - name: Unsigned
         if: ${{ github.event_name == 'push' }}
         id: upload-unsigned-vs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: unsigned-${{ env.ARTIFACT }}
           path: build/dist/bin/*.exe
@@ -345,7 +345,7 @@ jobs:
           cd build/dist/bin
           7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
@@ -450,7 +450,7 @@ jobs:
       - name: Unsigned
         if: ${{ github.event_name == 'push' }}
         id: upload-unsigned-gcc
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: unsigned-${{ env.ARTIFACT }}
           path: build/dist/bin/*.exe
@@ -471,7 +471,7 @@ jobs:
           cd build/dist/bin
           7z a -tzip ../../../${{ env.ARTIFACT }} ./*
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.ARTIFACT }}
           path: ${{ env.ARTIFACT }}
