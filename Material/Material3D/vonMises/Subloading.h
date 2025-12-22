@@ -21,7 +21,7 @@
  * @date 29/09/2024
  * @version 0.1.0
  * @file Subloading.h
- * @addtogroup Material-1D
+ * @addtogroup Material-3D
  * @{
  */
 
