@@ -31,6 +31,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Sand/DafaliasManzari.cpp
         Sand/SimpleSand.cpp
         vonMises/ArmstrongFrederick.cpp
+        vonMises/Balloon.cpp
         vonMises/BilinearJ2.cpp
         vonMises/BilinearPeric.cpp
         vonMises/CustomGurson.cpp
