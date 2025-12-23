@@ -29,6 +29,67 @@
 #define BALLOON_H
 
 #include <Material/Material3D/Material3D.h>
+#include <numeric> // std::accumulate
+
+class BalloonBuffer {
+    std::vector<double> buffer;
+    std::size_t head;
+
+    [[nodiscard]] auto max() const { return *std::ranges::max_element(buffer); }
+    [[nodiscard]] auto min() const { return *std::ranges::min_element(buffer); }
+    [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
+
+public:
+    enum class Type : std::uint8_t {
+        MINIMUM,
+        MAXIMUM,
+        MEAN
+    };
+
+    explicit BalloonBuffer(const std::size_t size)
+        : buffer(std::max(std::size_t{1}, size), 0.)
+        , head(0) {}
+
+    auto& enqueue(const double value) {
+        buffer[head] = value;
+        head = (head + 1) % buffer.size();
+        return *this;
+    }
+
+    auto zeros() {
+        std::ranges::fill(buffer, 0.);
+        head = 0;
+    }
+
+    [[nodiscard]] auto operator()(const Type memory_type) const {
+        switch(memory_type) {
+        case Type::MINIMUM:
+            return min();
+        case Type::MAXIMUM:
+            return max();
+        case Type::MEAN:
+        default:
+            return mean();
+        }
+    }
+};
+
+class BalloonBound {
+    const double initial, linear, saturation, rate;
+
+public:
+    BalloonBound(const double I, const double K, const double S, const double M)
+        : initial(I)
+        , linear(K)
+        , saturation(S)
+        , rate(M) {}
+
+    [[nodiscard]] std::pair<double, double> operator()(const double q, const bool check_positive) const {
+        const auto exp_term = saturation * std::exp(-rate * q);
+        const auto y = initial + saturation + linear * q - exp_term;
+        return y < 0. && check_positive ? std::make_pair(0., 0.) : std::make_pair(y, linear + rate * exp_term);
+    }
+};
 
 struct DataBalloon {
     class Saturation {
@@ -39,27 +100,19 @@ struct DataBalloon {
             : rate(R)
             , bound(B) {}
 
-        [[nodiscard]] double r() const { return rate; }
-
-        [[nodiscard]] double b() const { return bound; }
-
-        [[nodiscard]] double rb() const { return r() * b(); }
+        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
+        [[nodiscard]] double b() const { return rate; }
     };
 
-    const double elastic; // elastic modulus
-    const double poissons_ratio;
-    const double initial_iso;
-    const double k_iso;
-    const double saturation_iso;
-    const double m_iso;
-    const double initial_kin;
-    const double k_kin;
-    const double saturation_kin;
-    const double m_kin;
-    const double u;
+    const double elastic;   // elastic modulus
+    const double poisson;   // poisson's ratio
+    const double kr;        // plastic strain split ratio
+    const unsigned zr_size; // memory size
+    const BalloonBuffer::Type zr_type;
 
-    const Saturation b;
-    const Saturation c;
+    const BalloonBound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
+
+    const std::vector<Saturation> bfc, bac, bna, bnd;
 };
 
 class Balloon final : protected DataBalloon, public Material3D {
@@ -70,9 +123,18 @@ class Balloon final : protected DataBalloon, public Material3D {
     static const double rate_bound;
     static const mat unit_dev_tensor;
 
-    static pod2 yield_ratio(double);
+    static pod2 yield_ratio(const double z) {
+        if(z < z_bound) return {rate_bound, 0.};
 
-    const double double_shear = elastic / (1. + poissons_ratio); // double shear modulus
+        return {-log(z), -1. / z};
+    }
+
+    BalloonBuffer current_zr{zr_size}, trial_zr{zr_size};
+
+    const double double_shear = elastic / (1. + poisson); // double shear modulus
+
+    [[nodiscard]] auto compute_isotropic_bound(double, double, double);
+    [[nodiscard]] auto compute_kinematic_bound(double, double, double);
 
 public:
     Balloon(
