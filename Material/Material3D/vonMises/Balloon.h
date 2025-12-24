@@ -15,25 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class Balloon1D
- * @brief A Balloon1D material class.
+ * @class Balloon
+ * @brief A Balloon material class.
  * @author tlc
- * @date 04/11/2025
+ * @date 23/12/2025
  * @version 0.1.0
- * @file Balloon1D.h
- * @addtogroup Material-1D
+ * @file Balloon.h
+ * @addtogroup Material-3D
  * @{
  */
 
-#ifndef BALLOON1D_H
-#define BALLOON1D_H
+#ifndef BALLOON_H
+#define BALLOON_H
 
-#include <Material/Material1D/Material1D.h>
-#include <Material/Material3D/vonMises/BalloonUtil.h>
+#include "BalloonUtil.h"
 
-struct DataBalloon1D {
+#include <Material/Material3D/Material3D.h>
+
+struct DataBalloon {
     class Saturation {
-        static const double root_one_half;
+        inline static const double root_two_third = std::sqrt(2. / 3.);
 
         const double rate, bound;
 
@@ -42,11 +43,12 @@ struct DataBalloon1D {
             : rate(R)
             , bound(B) {}
 
-        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
-        [[nodiscard]] double b() const { return rate * root_one_half; }
+        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound * root_two_third; }
+        [[nodiscard]] double b() const { return rate; }
     };
 
     const double elastic;   // elastic modulus
+    const double poisson;   // poisson's ratio
     const double kr;        // plastic strain split ratio
     const unsigned zr_size; // memory size
     const BalloonBuffer::Type zr_type;
@@ -56,21 +58,24 @@ struct DataBalloon1D {
     const std::vector<Saturation> bfc, bac, bna, bnd;
 };
 
-class Balloon1D final : protected DataBalloon1D, protected BalloonBase, public Material1D {
+class Balloon final : protected DataBalloon, protected BalloonBase, public Material3D {
     static constexpr unsigned max_iteration = 20u;
+    static constexpr double two_third = 2. / 3.;
+    inline static const double root_two_third = std::sqrt(two_third);
+    static const mat unit_dev_tensor;
 
     BalloonBuffer current_zr{zr_size}, trial_zr{zr_size};
 
-    [[nodiscard]] double initial_check(double);
+    const double double_shear = elastic / (1. + poisson); // double shear modulus
 
     [[nodiscard]] auto compute_isotropic_bound(double, double, double);
     [[nodiscard]] auto compute_kinematic_bound(double, double, double);
 
 public:
-    Balloon1D(
-        unsigned,        // tag
-        DataBalloon1D&&, // data
-        double = 0.      // density
+    Balloon(
+        unsigned,      // tag
+        DataBalloon&&, // data
+        double = 0.    // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

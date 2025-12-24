@@ -22,8 +22,6 @@
 
 const double DataBalloon1D::Saturation::root_one_half = sqrt(1.5);
 
-const double Balloon1D::rate_bound = -log(z_bound);
-
 /**
  * @brief Perform the initial check to determine whether the material is plastic loading or elastic unloading.
  * If it is plastic loading, correct the $z$ value when necessary.

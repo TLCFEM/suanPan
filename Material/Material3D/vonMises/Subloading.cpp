@@ -105,16 +105,14 @@ int Subloading::update_trial_status(const vec& t_strain) {
         d = (root_two_third * gamma * c.rb() * n + current_d) / bot_d;
 
         if(1u == counter) {
+            const vec incre_s = trial_s - tensor::dev(current_stress);
             const vec ref = trial_s - a * alpha - y * d;
+            const vec base = ref - incre_s;
+
             const auto aa = two_third - tensor::stress::double_contraction(d);
             const auto bb = tensor::stress::double_contraction(d, ref);
             const auto cc = tensor::stress::double_contraction(ref);
-            const auto sqrt_term = std::sqrt(bb * bb + aa * cc);
 
-            const auto current_s = tensor::dev(current_stress);
-            const vec incre_s = trial_s - current_s;
-
-            const vec base = current_s - a * alpha - y * d;
             const auto incre_incre = tensor::stress::double_contraction(incre_s);
             const auto incre_d = tensor::stress::double_contraction(incre_s, d);
 
@@ -129,8 +127,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
                 const vec middle = base + x * incre_s;
                 const auto middle_d = tensor::stress::double_contraction(d, middle);
                 const auto tmp_sqrt = std::max(datum::eps, std::sqrt(middle_d * middle_d + aa * tensor::stress::double_contraction(middle)));
-                const auto tmp_numerator = middle_d * incre_d + aa * tensor::stress::double_contraction(incre_s, middle);
-                const auto residual_x = tmp_sqrt * incre_d + tmp_numerator;
+                const auto residual_x = tmp_sqrt * incre_d + middle_d * incre_d + aa * tensor::stress::double_contraction(incre_s, middle);
                 const auto jacobian_x = incre_d * residual_x + tmp_sqrt * aa * incre_incre;
                 const auto incre_x = tmp_sqrt * residual_x / jacobian_x;
 
@@ -145,7 +142,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
                 if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual_x) < tolerance) && inner_counter > 3u)) {
                     if(x >= 1.) {
                         // elastic unloading
-                        z = (bb + sqrt_term) / aa / y;
+                        z = (bb + std::sqrt(bb * bb + aa * cc)) / aa / y;
                         return SUANPAN_SUCCESS;
                     }
                     if(x > 0.) {
