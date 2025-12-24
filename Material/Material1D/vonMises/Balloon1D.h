@@ -29,7 +29,7 @@
 #define BALLOON1D_H
 
 #include <Material/Material1D/Material1D.h>
-#include <numeric> // std::accumulate
+#include <Material/Material3D/vonMises/BalloonUtil.h>
 
 struct DataBalloon1D {
     class Saturation {
@@ -46,88 +46,20 @@ struct DataBalloon1D {
         [[nodiscard]] double b() const { return rate * root_one_half; }
     };
 
-    class Bound {
-        const double initial, linear, saturation, rate;
-
-    public:
-        Bound(const double I, const double K, const double S, const double M)
-            : initial(I)
-            , linear(K)
-            , saturation(S)
-            , rate(M) {}
-
-        [[nodiscard]] std::pair<double, double> operator()(const double q, const bool check_positive) const {
-            const auto exp_term = saturation * std::exp(-rate * q);
-            const auto y = initial + saturation + linear * q - exp_term;
-            return y < 0. && check_positive ? std::make_pair(0., 0.) : std::make_pair(y, linear + rate * exp_term);
-        }
-    };
-
-    enum class MemoryType : std::uint8_t {
-        MINIMUM,
-        MAXIMUM,
-        MEAN
-    };
-
     const double elastic;   // elastic modulus
     const double kr;        // plastic strain split ratio
     const unsigned zr_size; // memory size
-    const MemoryType zr_type;
+    const BalloonBuffer::Type zr_type;
 
-    const Bound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
+    const BalloonBound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
 
     const std::vector<Saturation> bfc, bac, bna, bnd;
 };
 
-class Balloon1D final : protected DataBalloon1D, public Material1D {
+class Balloon1D final : protected DataBalloon1D, protected BalloonBase, public Material1D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double z_bound = 1E-15;
-    static const double rate_bound;
 
-    static pod2 yield_ratio(const double z) {
-        if(z < z_bound) return {rate_bound, 0.};
-
-        return {-log(z), -1. / z};
-    }
-
-    class memory {
-        std::vector<double> buffer;
-        std::size_t head;
-
-        [[nodiscard]] auto max() const { return *std::ranges::max_element(buffer); }
-        [[nodiscard]] auto min() const { return *std::ranges::min_element(buffer); }
-        [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
-
-    public:
-        explicit memory(const std::size_t size)
-            : buffer(std::max(std::size_t{1}, size), 0.)
-            , head(0) {}
-
-        auto& enqueue(const double value) {
-            buffer[head] = value;
-            head = (head + 1) % buffer.size();
-            return *this;
-        }
-
-        auto zeros() {
-            std::ranges::fill(buffer, 0.);
-            head = 0;
-        }
-
-        [[nodiscard]] auto operator()(const MemoryType memory_type) const {
-            switch(memory_type) {
-            case MemoryType::MINIMUM:
-                return min();
-            case MemoryType::MAXIMUM:
-                return max();
-            case MemoryType::MEAN:
-            default:
-                return mean();
-            }
-        }
-    };
-
-    memory current_zr{zr_size}, trial_zr{zr_size};
+    BalloonBuffer current_zr{zr_size}, trial_zr{zr_size};
 
     [[nodiscard]] double initial_check(double);
 

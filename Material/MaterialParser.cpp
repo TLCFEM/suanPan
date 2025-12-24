@@ -318,7 +318,7 @@ namespace {
 
         std::vector<DataBalloon1D::Saturation> bfc, bac, bna, bnd;
 
-        auto memory_type = DataBalloon1D::MemoryType::MEAN;
+        auto memory_type = BalloonBuffer::Type::MEAN;
 
         std::string token;
         while(!command.eof()) {
@@ -331,9 +331,9 @@ namespace {
             else if(is_equal(token, "-na")) populate(bna);
             else if(is_equal(token, "-nd")) populate(bnd);
             else if(is_equal(token, "-memory") && get_input(command, token)) {
-                if(is_equal(token, "minimum")) memory_type = DataBalloon1D::MemoryType::MINIMUM;
-                else if(is_equal(token, "maximum")) memory_type = DataBalloon1D::MemoryType::MAXIMUM;
-                else if(is_equal(token, "mean")) memory_type = DataBalloon1D::MemoryType::MEAN;
+                if(is_equal(token, "minimum")) memory_type = BalloonBuffer::Type::MINIMUM;
+                else if(is_equal(token, "maximum")) memory_type = BalloonBuffer::Type::MAXIMUM;
+                else if(is_equal(token, "mean")) memory_type = BalloonBuffer::Type::MEAN;
                 else {
                     suanpan_error("A valid memory type (minimum, maximum, mean) is required.\n");
                     return;
