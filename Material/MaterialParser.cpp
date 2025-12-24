@@ -360,6 +360,76 @@ namespace {
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
     }
 
+    void new_balloon(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        vec p(24);
+        if(!get_input(command, p)) {
+            suanpan_error("Valid inputs are required.\n");
+            return;
+        }
+
+        auto density = 0.;
+        if(!get_input(command, density)) {
+            suanpan_error("A valid density is required.\n");
+            return;
+        }
+
+        const auto populate = [&command](auto& container) {
+            double a, b;
+            if(!get_input(command, a, b)) return;
+            container.emplace_back(a, b);
+        };
+
+        std::vector<DataBalloon::Saturation> bfc, bac, bna, bnd;
+
+        auto memory_type = BalloonBuffer::Type::MEAN;
+
+        std::string token;
+        while(!command.eof()) {
+            if(!get_input(command, token)) {
+                suanpan_error("A valid token (-fc,-ac,-na,-nd,-memory) is required.\n");
+                return;
+            }
+            if(is_equal(token, "-fc")) populate(bfc);
+            else if(is_equal(token, "-ac")) populate(bac);
+            else if(is_equal(token, "-na")) populate(bna);
+            else if(is_equal(token, "-nd")) populate(bnd);
+            else if(is_equal(token, "-memory") && get_input(command, token)) {
+                if(is_equal(token, "minimum")) memory_type = BalloonBuffer::Type::MINIMUM;
+                else if(is_equal(token, "maximum")) memory_type = BalloonBuffer::Type::MAXIMUM;
+                else if(is_equal(token, "mean")) memory_type = BalloonBuffer::Type::MEAN;
+                else {
+                    suanpan_error("A valid memory type (minimum, maximum, mean) is required.\n");
+                    return;
+                }
+            }
+        }
+
+        DataBalloon para{
+            p(0),                         // elastic modulus
+            p(1),                         // poisson's ratio
+            p(2),                         // split ratio
+            static_cast<unsigned>(p(3)),  // zr memory size
+            memory_type,                  // zr memory type
+            {p(4), p(5), p(6), p(7)},     // u
+            {p(8), p(9), p(10), p(11)},   // fm
+            {p(12), p(13), p(14), p(15)}, // fc
+            {p(16), p(17), p(18), p(19)}, // am
+            {p(20), p(21), p(22), p(23)}, // ac
+            std::move(bfc),
+            std::move(bac),
+            std::move(bna),
+            std::move(bnd)
+        };
+
+        return_obj = std::make_unique<Balloon>(tag, std::move(para), density);
+    }
+
     void new_bilinear1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -3539,6 +3609,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
+    else if(is_equal(material_id, "Balloon")) new_balloon(new_material, command);
     else if(is_equal(material_id, "Balloon1D")) new_balloon1d(new_material, command);
     else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
