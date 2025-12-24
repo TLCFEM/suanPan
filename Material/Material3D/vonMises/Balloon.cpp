@@ -166,10 +166,9 @@ int Balloon::update_trial_status(const vec& t_strain) {
             const auto cc = tensor::stress::double_contraction(ref);
             const auto sqrt_term = std::sqrt(bb * bb + aa * cc);
 
-            const auto current_s = tensor::dev(current_stress);
-            const vec incre_s = trial_s - current_s;
+            const vec incre_s = trial_s - tensor::dev(current_stress);
 
-            const vec base = current_s - ha * sum_na - hf * sum_nd;
+            const vec base = ref - incre_s;
             const auto incre_incre = tensor::stress::double_contraction(incre_s);
             const auto incre_d = tensor::stress::double_contraction(incre_s, sum_nd);
 
@@ -198,11 +197,14 @@ int Balloon::update_trial_status(const vec& t_strain) {
                 if(1u == inner_counter) ref_error = error;
                 suanpan_debug("Local initial yield ratio iteration error: {:.5E}.\n", error);
                 if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual_x) < tolerance) && inner_counter > 3u)) {
+                    if(std::signbit(last_loading) == std::signbit(x)) trial_zr.enqueue(z);
                     if(x >= 1.) {
                         // elastic unloading
+                        last_loading = -1.;
                         z = (bb + sqrt_term) / aa / hf;
                         return SUANPAN_SUCCESS;
                     }
+                    last_loading = 1.;
                     if(x > 0.) {
                         start_z = (middle_d + tmp_sqrt) / aa / hf;
                         suanpan_debug("Initial yield ratio: {:.5E}, corrected yield ratio: {:.5E}.\n", current_z, start_z);
