@@ -159,15 +159,14 @@ int Balloon::update_trial_status(const vec& t_strain) {
         }
 
         if(1u == counter) {
+            const vec incre_s = trial_s - tensor::dev(current_stress);
             const vec ref = trial_s - ha * sum_na - hf * sum_nd;
+            const vec base = ref - incre_s;
+
             const auto aa = two_third - tensor::stress::double_contraction(sum_nd);
             const auto bb = tensor::stress::double_contraction(sum_nd, ref);
             const auto cc = tensor::stress::double_contraction(ref);
-            const auto sqrt_term = std::sqrt(bb * bb + aa * cc);
 
-            const vec incre_s = trial_s - tensor::dev(current_stress);
-
-            const vec base = ref - incre_s;
             const auto incre_incre = tensor::stress::double_contraction(incre_s);
             const auto incre_d = tensor::stress::double_contraction(incre_s, sum_nd);
 
@@ -182,8 +181,7 @@ int Balloon::update_trial_status(const vec& t_strain) {
                 const vec middle = base + x * incre_s;
                 const auto middle_d = tensor::stress::double_contraction(sum_nd, middle);
                 const auto tmp_sqrt = std::max(datum::eps, std::sqrt(middle_d * middle_d + aa * tensor::stress::double_contraction(middle)));
-                const auto tmp_numerator = middle_d * incre_d + aa * tensor::stress::double_contraction(incre_s, middle);
-                const auto residual_x = tmp_sqrt * incre_d + tmp_numerator;
+                const auto residual_x = tmp_sqrt * incre_d + middle_d * incre_d + aa * tensor::stress::double_contraction(incre_s, middle);
                 const auto jacobian_x = incre_d * residual_x + tmp_sqrt * aa * incre_incre;
                 const auto incre_x = tmp_sqrt * residual_x / jacobian_x;
 
@@ -200,7 +198,7 @@ int Balloon::update_trial_status(const vec& t_strain) {
                     if(x >= 1.) {
                         // elastic unloading
                         last_loading = -1.;
-                        z = (bb + sqrt_term) / aa / hf;
+                        z = (bb + std::sqrt(bb * bb + aa * cc)) / aa / hf;
                         return SUANPAN_SUCCESS;
                     }
                     last_loading = 1.;
