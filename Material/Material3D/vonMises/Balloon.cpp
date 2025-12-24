@@ -19,7 +19,6 @@
 
 #include <Toolbox/tensor.h>
 
-const double Balloon::root_two_third = std::sqrt(two_third);
 const mat Balloon::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 auto Balloon ::compute_isotropic_bound(const double gamma, const double km, const double dkm) {
