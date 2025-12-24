@@ -21,6 +21,7 @@ material Balloon 1 \
 1 0 0 0 \ ! ham
 0 0 0 0 \ ! hac
 0. \ ! density
+-memory maximum \
 -fc 1E2 1. \ ! fc
 -ac 1E1 1. \ ! ac
 -na 1E1 1. \ ! alpha
@@ -38,10 +39,10 @@ displacement 2 0 -.12 3 9 10
 
 step static 1
 set fixed_step_size 1
-set ini_step_size 1E-2
+set ini_step_size 1E-1
 set symm_mat 0
 
-converger RelIncreDisp 1 1E-10 10 1
+converger RelIncreDisp 1 1E-12 10 1
 
 analyze
 
@@ -53,7 +54,7 @@ peek element 1
 # Displacement:
 #   0.0000e+00  0.0000e+00 -1.2000e-01
 # Resistance:
-#  -8.9044e+02  4.5145e+02 -5.9900e+03
+#  -8.7998e+02  4.4151e+02 -5.9768e+03
 peek node 9
 
 reset
