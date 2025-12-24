@@ -34,6 +34,8 @@
 
 struct DataBalloon {
     class Saturation {
+        inline static const double root_two_third = std::sqrt(2. / 3.);
+
         const double rate, bound;
 
     public:
@@ -41,7 +43,7 @@ struct DataBalloon {
             : rate(R)
             , bound(B) {}
 
-        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
+        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound * root_two_third; }
         [[nodiscard]] double b() const { return rate; }
     };
 

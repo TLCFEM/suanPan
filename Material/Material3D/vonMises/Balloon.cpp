@@ -143,18 +143,20 @@ int Balloon::update_trial_status(const vec& t_strain) {
         const auto [ha, phapg, phapz] = compute_kinematic_bound(gamma, km, dkm);
 
         vec6 sum_na(fill::zeros);
-        vec top_na(bna.size(), fill::none), bot_na(bna.size(), fill::none), dna(bna.size(), fill::none);
+        vec top_na(bna.size(), fill::none), bot_na(bna.size(), fill::none);
+        auto dna{0.};
         for(auto I = 0llu; I < bna.size(); ++I) {
             top_na(I) = bna[I].a() * gamma;
             sum_na += vec(&current_history(offset_na + 6u * I), 6, false, true) / (bot_na(I) = 1. + bna[I].b() * gamma);
-            dna(I) = (bna[I].a() - top_na(I) / bot_na(I) * bna[I].b()) / bot_na(I);
+            dna += (bna[I].a() - top_na(I) / bot_na(I) * bna[I].b()) / bot_na(I);
         }
         vec6 sum_nd(fill::zeros);
-        vec top_nd(bnd.size(), fill::none), bot_nd(bnd.size(), fill::none), dnd(bnd.size(), fill::none);
+        vec top_nd(bnd.size(), fill::none), bot_nd(bnd.size(), fill::none);
+        auto dnd{0.};
         for(auto I = 0llu; I < bnd.size(); ++I) {
             top_nd(I) = bnd[I].a() * gamma;
             sum_nd += vec(&current_history(offset_nd + 6u * I), 6, false, true) / (bot_nd(I) = 1. + bnd[I].b() * gamma);
-            dnd(I) = (bnd[I].a() - top_nd(I) / bot_nd(I) * bnd[I].b()) / bot_nd(I);
+            dnd += (bnd[I].a() - top_nd(I) / bot_nd(I) * bnd[I].b()) / bot_nd(I);
         }
 
         if(1u == counter) {
@@ -216,6 +218,8 @@ int Balloon::update_trial_status(const vec& t_strain) {
         const auto norm_zeta = tensor::stress::norm(zeta);
         const vec n = zeta / norm_zeta;
 
+        // update history variables
+        // they are not used in the state determination algorithm for the current step (but next one)
         for(auto I = 0llu; I < bna.size(); ++I) vec(&trial_history(offset_na + 6u * I), 6, false, true) = (top_na(I) * n + vec(&current_history(offset_na + 6u * I), 6, false, true)) / bot_na(I);
         for(auto I = 0llu; I < bnd.size(); ++I) vec(&trial_history(offset_nd + 6u * I), 6, false, true) = (top_nd(I) * n + vec(&current_history(offset_nd + 6u * I), 6, false, true)) / bot_nd(I);
 
@@ -234,7 +238,7 @@ int Balloon::update_trial_status(const vec& t_strain) {
         residual(0) = norm_zeta - double_shear * gamma - ha * factor_na + (z - 1.) * hf * factor_nd - root_two_third * hf * z;
         residual(1) = hf * diff_z - gamma * u * trial_ratio[0];
 
-        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapg + (z - 1.) * hf * sum_nd - ha * sum_na) - double_shear - phapg * factor_na - ha * accu(dna) + (z - 1.) * (phfpg * factor_nd + hf * accu(dnd)) - root_two_third * phfpg * z;
+        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapg + (z - 1.) * hf * sum_nd - ha * sum_na) - double_shear - phapg * factor_na - ha * dna + (z - 1.) * (phfpg * factor_nd + hf * dnd) - root_two_third * phfpg * z;
         jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) - phapz * factor_na + (hf + (z - 1.) * phfpz) * factor_nd - root_two_third * (hf + phfpz * z);
         jacobian(1, 0) = phfpg * diff_z - (u + gamma * pupg) * trial_ratio[0];
         jacobian(1, 1) = hf + phfpz * diff_z - gamma * (pupz * trial_ratio[0] + u * trial_ratio[1]);
