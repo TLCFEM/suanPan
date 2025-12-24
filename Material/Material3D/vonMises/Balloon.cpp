@@ -108,7 +108,7 @@ int Balloon::update_trial_status(const vec& t_strain) {
 
     const vec trial_s = tensor::dev(trial_stress);
 
-    const auto ref_zr = trial_zr(zr_type);
+    auto ref_zr = trial_zr(zr_type);
 
     iteration = 0.;
     auto gamma = 0., ref_error = 0.;
@@ -195,7 +195,7 @@ int Balloon::update_trial_status(const vec& t_strain) {
                 if(1u == inner_counter) ref_error = error;
                 suanpan_debug("Local initial yield ratio iteration error: {:.5E}.\n", error);
                 if(error < tolerance * ref_error || ((error < tolerance || std::fabs(residual_x) < tolerance) && inner_counter > 3u)) {
-                    if(std::signbit(last_loading) == std::signbit(x)) trial_zr.enqueue(z);
+                    if(std::signbit(last_loading) == std::signbit(x)) ref_zr = trial_zr.enqueue(z)(zr_type);
                     if(x >= 1.) {
                         // elastic unloading
                         last_loading = -1.;
