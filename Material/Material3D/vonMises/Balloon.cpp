@@ -42,7 +42,7 @@ auto Balloon ::compute_isotropic_bound(const double incre_q, const double km, co
         phfpz += (bfc[I].a() * (dkc * incre_q * fc + incre_qc * pfcpz) - hfc(I) * bfc[I].b() * dkc * incre_q) / bot_fc;
     }
 
-    if(const auto hf = fm + accu(hfc); hf > 0.) return std::make_tuple(hf, phfpg, phfpz);
+    if(const auto hf = fm + accu(hfc); hf > 0.) return std::make_tuple(root_two_third * hf, root_two_third * phfpg, root_two_third * phfpz);
 
     return std::make_tuple(0., 0., 0.);
 }
@@ -68,7 +68,7 @@ auto Balloon ::compute_kinematic_bound(const double incre_q, const double km, co
         phapz += (bac[I].a() * (dkc * incre_q * ac + incre_qc * pacpz) - hac(I) * bac[I].b() * dkc * incre_q) / bot_ac;
     }
 
-    if(const auto ha = am + accu(hac); ha > 0.) return std::make_tuple(ha, phapg, phapz);
+    if(const auto ha = am + accu(hac); ha > 0.) return std::make_tuple(root_two_third * ha, root_two_third * phapg, root_two_third * phapz);
 
     return std::make_tuple(0., 0., 0.);
 }
