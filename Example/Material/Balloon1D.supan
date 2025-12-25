@@ -38,7 +38,7 @@ peek element 1
 # Displacement:
 #   5.0000e-03  0.0000e+00
 # Resistance:
-#   2.0371e+02  0.0000e+00
+#   2.0370e+02  0.0000e+00
 peek node 2
 
 reset

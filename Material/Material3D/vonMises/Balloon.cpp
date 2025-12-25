@@ -32,16 +32,21 @@ auto Balloon ::compute_isotropic_bound(const double gamma, const double km, cons
     const auto [fm, dfm] = bound_fm(qm, true);
     const auto [fc, dfc] = bound_fc(qm, false);
 
-    auto phfpg = dfm * root_two_third * km, phfpz = dfm * root_two_third * gamma * dkm;
-    const auto pfcpg = dfc * root_two_third * km, pfcpz = dfc * root_two_third * gamma * dkm;
+    const auto incre_q = root_two_third * gamma;
+    const auto incre_qc = kc * incre_q;
+
+    auto phfpg = dfm * root_two_third * km, phfpz = dfm * incre_q * dkm;
+    const auto pfcpg = dfc * root_two_third * km, pfcpz = dfc * incre_q * dkm;
     for(auto I = 0llu; I < bfc.size(); ++I) {
-        const auto bot_fc = 1. + bfc[I].b() * gamma * kc;
-        hfc(I) = (bfc[I].a() * gamma * kc * fc + current_hfc(I)) / bot_fc;
-        phfpg += (bfc[I].a() * (fc + gamma * pfcpg) - hfc(I) * bfc[I].b()) * kc / bot_fc;
-        phfpz += (bfc[I].a() * (dkc * fc + kc * pfcpz) - hfc(I) * bfc[I].b() * dkc) * gamma / bot_fc;
+        const auto bot_fc = 1. + bfc[I].b() * incre_qc;
+        hfc(I) = (bfc[I].a() * incre_qc * fc + current_hfc(I)) / bot_fc;
+        phfpg += (bfc[I].a() * (fc + gamma * pfcpg) - hfc(I) * bfc[I].b()) * kc * root_two_third / bot_fc;
+        phfpz += (bfc[I].a() * (dkc * fc + kc * pfcpz) - hfc(I) * bfc[I].b() * dkc) * incre_q / bot_fc;
     }
 
-    if(const auto hf = fm + accu(hfc); hf > 0.) return std::make_tuple(hf, phfpg, phfpz);
+    // apply the scaling factor to bounds
+    // the unit direction would still be of unit length
+    if(const auto hf = fm + accu(hfc); hf > 0.) return std::make_tuple(root_two_third * hf, root_two_third * phfpg, root_two_third * phfpz);
 
     return std::make_tuple(0., 0., 0.);
 }
@@ -57,16 +62,21 @@ auto Balloon ::compute_kinematic_bound(const double gamma, const double km, cons
     const auto [am, dam] = bound_am(qm, true);
     const auto [ac, dac] = bound_ac(qm, false);
 
-    auto phapg = dam * root_two_third * km, phapz = dam * root_two_third * gamma * dkm;
-    const auto pacpg = dac * root_two_third * km, pacpz = dac * root_two_third * gamma * dkm;
+    const auto incre_q = root_two_third * gamma;
+    const auto incre_qc = kc * incre_q;
+
+    auto phapg = dam * root_two_third * km, phapz = dam * incre_q * dkm;
+    const auto pacpg = dac * root_two_third * km, pacpz = dac * incre_q * dkm;
     for(auto I = 0llu; I < bac.size(); ++I) {
-        const auto bot_ac = 1. + bac[I].b() * gamma * kc;
-        hac(I) = (bac[I].a() * gamma * kc * ac + current_hac(I)) / bot_ac;
-        phapg += (bac[I].a() * (ac + gamma * pacpg) - hac(I) * bac[I].b()) * kc / bot_ac;
-        phapz += (bac[I].a() * (dkc * ac + kc * pacpz) - hac(I) * bac[I].b() * dkc) * gamma / bot_ac;
+        const auto bot_ac = 1. + bac[I].b() * incre_qc;
+        hac(I) = (bac[I].a() * incre_qc * ac + current_hac(I)) / bot_ac;
+        phapg += (bac[I].a() * (ac + gamma * pacpg) - hac(I) * bac[I].b()) * kc * root_two_third / bot_ac;
+        phapz += (bac[I].a() * (dkc * ac + kc * pacpz) - hac(I) * bac[I].b() * dkc) * incre_q / bot_ac;
     }
 
-    if(const auto ha = am + accu(hac); ha > 0.) return std::make_tuple(ha, phapg, phapz);
+    // apply the scaling factor to bounds
+    // the unit direction would still be of unit length
+    if(const auto ha = am + accu(hac); ha > 0.) return std::make_tuple(root_two_third * ha, root_two_third * phapg, root_two_third * phapz);
 
     return std::make_tuple(0., 0., 0.);
 }
@@ -133,11 +143,14 @@ int Balloon::update_trial_status(const vec& t_strain) {
             else km = 1.;
         }
 
-        q = current_q + root_two_third * gamma;
-        qm = current_qm + km * root_two_third * gamma;
+        const auto incre_q = root_two_third * gamma;
+        q = current_q + incre_q;
+        qm = current_qm + km * incre_q;
+
+        const auto pqmpg = km * root_two_third, pqmpz = dkm * incre_q;
 
         const auto [u, du] = bound_u(qm, true);
-        const auto pupg = du * root_two_third * km, pupz = du * root_two_third * gamma * dkm;
+        const auto pupg = du * pqmpg, pupz = du * pqmpz;
 
         const auto [hf, phfpg, phfpz] = compute_isotropic_bound(gamma, km, dkm);
         const auto [ha, phapg, phapz] = compute_kinematic_bound(gamma, km, dkm);
@@ -146,25 +159,28 @@ int Balloon::update_trial_status(const vec& t_strain) {
         vec top_na(bna.size(), fill::none), bot_na(bna.size(), fill::none);
         auto dna{0.};
         for(auto I = 0llu; I < bna.size(); ++I) {
-            top_na(I) = bna[I].a() * gamma;
-            sum_na += vec(&current_history(offset_na + 6u * I), 6, false, true) / (bot_na(I) = 1. + bna[I].b() * gamma);
+            top_na(I) = bna[I].a() * incre_q;
+            sum_na += vec(&current_history(offset_na + 6u * I), 6, false, true) / (bot_na(I) = 1. + bna[I].b() * incre_q);
             dna += (bna[I].a() - top_na(I) / bot_na(I) * bna[I].b()) / bot_na(I);
         }
+        dna *= root_two_third;
+
         vec6 sum_nd(fill::zeros);
         vec top_nd(bnd.size(), fill::none), bot_nd(bnd.size(), fill::none);
         auto dnd{0.};
         for(auto I = 0llu; I < bnd.size(); ++I) {
-            top_nd(I) = bnd[I].a() * gamma;
-            sum_nd += vec(&current_history(offset_nd + 6u * I), 6, false, true) / (bot_nd(I) = 1. + bnd[I].b() * gamma);
+            top_nd(I) = bnd[I].a() * incre_q;
+            sum_nd += vec(&current_history(offset_nd + 6u * I), 6, false, true) / (bot_nd(I) = 1. + bnd[I].b() * incre_q);
             dnd += (bnd[I].a() - top_nd(I) / bot_nd(I) * bnd[I].b()) / bot_nd(I);
         }
+        dnd *= root_two_third;
 
         if(1u == counter) {
-            const vec incre_s = trial_s - tensor::dev(current_stress);
             const vec ref = trial_s - ha * sum_na - hf * sum_nd;
+            const vec incre_s = trial_s - tensor::dev(current_stress);
             const vec base = ref - incre_s;
 
-            const auto aa = two_third - tensor::stress::double_contraction(sum_nd);
+            const auto aa = 1. - tensor::stress::double_contraction(sum_nd);
             const auto bb = tensor::stress::double_contraction(sum_nd, ref);
             const auto cc = tensor::stress::double_contraction(ref);
 
@@ -230,18 +246,21 @@ int Balloon::update_trial_status(const vec& t_strain) {
         sum_nd.zeros();
         for(auto I = 0llu; I < bna.size(); ++I) sum_na -= bna[I].b() * std::pow(bot_na(I), -2.) * vec(&current_history(offset_na + 6u * I), 6, false, true);
         for(auto I = 0llu; I < bnd.size(); ++I) sum_nd -= bnd[I].b() * std::pow(bot_nd(I), -2.) * vec(&current_history(offset_nd + 6u * I), 6, false, true);
+        sum_na *= root_two_third;
+        sum_nd *= root_two_third;
 
-        const auto trial_ratio = yield_ratio(z);
+        auto trial_ratio = yield_ratio(z);
+        for(auto& v : trial_ratio) v *= root_two_third;
         const auto diff_z = z - start_z;
 
         const auto factor_na = accu(top_na / bot_na), factor_nd = accu(top_nd / bot_nd);
-        residual(0) = norm_zeta - double_shear * gamma - ha * factor_na + (z - 1.) * hf * factor_nd - root_two_third * hf * z;
-        residual(1) = hf * diff_z - gamma * u * trial_ratio[0];
+        residual(0) = norm_zeta - double_shear * gamma - ha * factor_na + (z - 1.) * hf * factor_nd - hf * z;
+        residual(1) = hf * diff_z - incre_q * u * trial_ratio[0];
 
-        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapg + (z - 1.) * hf * sum_nd - ha * sum_na) - double_shear - phapg * factor_na - ha * dna + (z - 1.) * (phfpg * factor_nd + hf * dnd) - root_two_third * phfpg * z;
-        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) - phapz * factor_na + (hf + (z - 1.) * phfpz) * factor_nd - root_two_third * (hf + phfpz * z);
-        jacobian(1, 0) = phfpg * diff_z - (u + gamma * pupg) * trial_ratio[0];
-        jacobian(1, 1) = hf + phfpz * diff_z - gamma * (pupz * trial_ratio[0] + u * trial_ratio[1]);
+        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapg + (z - 1.) * hf * sum_nd - ha * sum_na) - double_shear - phapg * factor_na - ha * dna + (z - 1.) * (phfpg * factor_nd + hf * dnd) - phfpg * z;
+        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) - phapz * factor_na + (hf + (z - 1.) * phfpz) * factor_nd - hf - phfpz * z;
+        jacobian(1, 0) = phfpg * diff_z - (root_two_third * u + incre_q * pupg) * trial_ratio[0];
+        jacobian(1, 1) = hf + phfpz * diff_z - incre_q * (pupz * trial_ratio[0] + u * trial_ratio[1]);
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 

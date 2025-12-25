@@ -81,6 +81,18 @@ public:
     }
 };
 
+class BalloonSaturation {
+    const double rate, bound;
+
+public:
+    BalloonSaturation(const double R, const double B)
+        : rate(R)
+        , bound(B) {}
+
+    [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
+    [[nodiscard]] double b() const { return rate; }
+};
+
 class BalloonBase {
     static constexpr double z_bound = 1E-15;
     inline static const double rate_bound = -std::log(z_bound);
