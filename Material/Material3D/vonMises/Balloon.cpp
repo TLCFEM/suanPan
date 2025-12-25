@@ -44,6 +44,8 @@ auto Balloon ::compute_isotropic_bound(const double gamma, const double km, cons
         phfpz += (bfc[I].a() * (dkc * fc + kc * pfcpz) - hfc(I) * bfc[I].b() * dkc) * incre_q / bot_fc;
     }
 
+    // apply the scaling factor to bounds
+    // the unit direction would still be of unit length
     if(const auto hf = fm + accu(hfc); hf > 0.) return std::make_tuple(root_two_third * hf, root_two_third * phfpg, root_two_third * phfpz);
 
     return std::make_tuple(0., 0., 0.);
@@ -72,6 +74,8 @@ auto Balloon ::compute_kinematic_bound(const double gamma, const double km, cons
         phapz += (bac[I].a() * (dkc * ac + kc * pacpz) - hac(I) * bac[I].b() * dkc) * incre_q / bot_ac;
     }
 
+    // apply the scaling factor to bounds
+    // the unit direction would still be of unit length
     if(const auto ha = am + accu(hac); ha > 0.) return std::make_tuple(root_two_third * ha, root_two_third * phapg, root_two_third * phapz);
 
     return std::make_tuple(0., 0., 0.);
@@ -143,8 +147,10 @@ int Balloon::update_trial_status(const vec& t_strain) {
         q = current_q + incre_q;
         qm = current_qm + km * incre_q;
 
+        const auto pqmpg = km * root_two_third, pqmpz = dkm * incre_q;
+
         const auto [u, du] = bound_u(qm, true);
-        const auto pupg = du * root_two_third * km, pupz = du * incre_q * dkm;
+        const auto pupg = du * pqmpg, pupz = du * pqmpz;
 
         const auto [hf, phfpg, phfpz] = compute_isotropic_bound(gamma, km, dkm);
         const auto [ha, phapg, phapz] = compute_kinematic_bound(gamma, km, dkm);
@@ -167,8 +173,8 @@ int Balloon::update_trial_status(const vec& t_strain) {
         }
 
         if(1u == counter) {
-            const vec incre_s = trial_s - tensor::dev(current_stress);
             const vec ref = trial_s - ha * sum_na - hf * sum_nd;
+            const vec incre_s = trial_s - tensor::dev(current_stress);
             const vec base = ref - incre_s;
 
             const auto aa = 1. - tensor::stress::double_contraction(sum_nd);
