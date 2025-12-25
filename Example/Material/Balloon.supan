@@ -22,10 +22,10 @@ material Balloon 1 \
 0 0 0 0 \ ! hac
 0. \ ! density
 -memory maximum \
--fc 1E2 1. \ ! fc
--ac 1E1 1. \ ! ac
--na 1E1 1. \ ! alpha
--nd 1E3 0. ! d
+-fc 1. 1E2 \ ! fc
+-ac 1. 1E1 \ ! ac
+-na 1. 1E1 \ ! alpha
+-nd 0.8 1E3 ! d
 
 element C3D8 1 1 2 3 4 5 6 7 8 1 G
 element C3D8 2 5 6 7 8 9 10 11 12 1 G

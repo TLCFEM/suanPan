@@ -82,12 +82,12 @@ public:
 };
 
 class BalloonSaturation {
-    const double rate, bound;
+    const double bound, rate;
 
 public:
-    BalloonSaturation(const double R, const double B)
-        : rate(R)
-        , bound(B) {}
+    BalloonSaturation(const double B, const double R)
+        : bound(B)
+        , rate(R) {}
 
     [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
     [[nodiscard]] double b() const { return rate; }
