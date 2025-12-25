@@ -58,8 +58,7 @@ struct DataBalloon {
 
 class Balloon final : protected DataBalloon, protected BalloonBase, public Material3D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double two_third = 2. / 3.;
-    inline static const double root_two_third = std::sqrt(two_third);
+    inline static const double root_two_third = std::sqrt(2. / 3.);
     static const mat unit_dev_tensor;
 
     BalloonBuffer current_zr{zr_size}, trial_zr{zr_size};

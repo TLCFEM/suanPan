@@ -167,7 +167,7 @@ int Balloon::update_trial_status(const vec& t_strain) {
             const vec ref = trial_s - ha * sum_na - hf * sum_nd;
             const vec base = ref - incre_s;
 
-            const auto aa = two_third - tensor::stress::double_contraction(sum_nd);
+            const auto aa = 1. - tensor::stress::double_contraction(sum_nd);
             const auto bb = tensor::stress::double_contraction(sum_nd, ref);
             const auto cc = tensor::stress::double_contraction(ref);
 
