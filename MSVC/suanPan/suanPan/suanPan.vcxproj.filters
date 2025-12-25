@@ -1561,6 +1561,9 @@
     <ClCompile Include="..\..\..\Element\Particle\Particle.cpp">
       <Filter>Element\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\Balloon.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
@@ -2928,6 +2931,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\Interaction\Interaction.h">
       <Filter>Constraint\Interaction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\Balloon.h">
+      <Filter>Material\Material3D\vonMises</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

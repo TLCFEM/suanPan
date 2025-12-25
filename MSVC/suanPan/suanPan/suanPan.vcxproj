@@ -400,6 +400,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Sand\SimpleSand.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\Balloon.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\BilinearJ2.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\BilinearPeric.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\CustomGurson.cpp" />
@@ -865,6 +866,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\Sand\DafaliasManzari.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Sand\SimpleSand.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\ArmstrongFrederick.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\Balloon.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\BilinearJ2.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\BilinearPeric.h" />
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\CustomGurson.h" />
