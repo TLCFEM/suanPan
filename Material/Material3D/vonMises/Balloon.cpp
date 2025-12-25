@@ -21,7 +21,7 @@
 
 const mat Balloon::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-auto Balloon ::compute_isotropic_bound(const double incre_q, const double km, const double dkm) {
+auto Balloon ::compute_isotropic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
     const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5), bfc.size(), false, true);
@@ -32,14 +32,16 @@ auto Balloon ::compute_isotropic_bound(const double incre_q, const double km, co
     const auto [fm, dfm] = bound_fm(qm, true);
     const auto [fc, dfc] = bound_fc(qm, false);
 
+    const auto incre_q = root_two_third * gamma;
+    const auto incre_qc = kc * incre_q;
+
     auto phfpg = dfm * root_two_third * km, phfpz = dfm * incre_q * dkm;
     const auto pfcpg = dfc * root_two_third * km, pfcpz = dfc * incre_q * dkm;
-    const auto incre_qc = kc * incre_q;
     for(auto I = 0llu; I < bfc.size(); ++I) {
         const auto bot_fc = 1. + bfc[I].b() * incre_qc;
         hfc(I) = (bfc[I].a() * incre_qc * fc + current_hfc(I)) / bot_fc;
-        phfpg += (bfc[I].a() * (kc * root_two_third * fc + incre_qc * pfcpg) - hfc(I) * bfc[I].b() * kc * root_two_third) / bot_fc;
-        phfpz += (bfc[I].a() * (dkc * incre_q * fc + incre_qc * pfcpz) - hfc(I) * bfc[I].b() * dkc * incre_q) / bot_fc;
+        phfpg += (bfc[I].a() * (fc + gamma * pfcpg) - hfc(I) * bfc[I].b()) * kc * root_two_third / bot_fc;
+        phfpz += (bfc[I].a() * (dkc * fc + kc * pfcpz) - hfc(I) * bfc[I].b() * dkc) * incre_q / bot_fc;
     }
 
     if(const auto hf = fm + accu(hfc); hf > 0.) return std::make_tuple(root_two_third * hf, root_two_third * phfpg, root_two_third * phfpz);
@@ -47,7 +49,7 @@ auto Balloon ::compute_isotropic_bound(const double incre_q, const double km, co
     return std::make_tuple(0., 0., 0.);
 }
 
-auto Balloon ::compute_kinematic_bound(const double incre_q, const double km, const double dkm) {
+auto Balloon ::compute_kinematic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
     const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
@@ -58,14 +60,16 @@ auto Balloon ::compute_kinematic_bound(const double incre_q, const double km, co
     const auto [am, dam] = bound_am(qm, true);
     const auto [ac, dac] = bound_ac(qm, false);
 
+    const auto incre_q = root_two_third * gamma;
+    const auto incre_qc = kc * incre_q;
+
     auto phapg = dam * root_two_third * km, phapz = dam * incre_q * dkm;
     const auto pacpg = dac * root_two_third * km, pacpz = dac * incre_q * dkm;
-    const auto incre_qc = kc * incre_q;
     for(auto I = 0llu; I < bac.size(); ++I) {
         const auto bot_ac = 1. + bac[I].b() * incre_qc;
         hac(I) = (bac[I].a() * incre_qc * ac + current_hac(I)) / bot_ac;
-        phapg += (bac[I].a() * (kc * root_two_third * ac + incre_qc * pacpg) - hac(I) * bac[I].b() * kc * root_two_third) / bot_ac;
-        phapz += (bac[I].a() * (dkc * incre_q * ac + incre_qc * pacpz) - hac(I) * bac[I].b() * dkc * incre_q) / bot_ac;
+        phapg += (bac[I].a() * (ac + gamma * pacpg) - hac(I) * bac[I].b()) * kc * root_two_third / bot_ac;
+        phapz += (bac[I].a() * (dkc * ac + kc * pacpz) - hac(I) * bac[I].b() * dkc) * incre_q / bot_ac;
     }
 
     if(const auto ha = am + accu(hac); ha > 0.) return std::make_tuple(root_two_third * ha, root_two_third * phapg, root_two_third * phapz);
@@ -142,8 +146,8 @@ int Balloon::update_trial_status(const vec& t_strain) {
         const auto [u, du] = bound_u(qm, true);
         const auto pupg = du * root_two_third * km, pupz = du * incre_q * dkm;
 
-        const auto [hf, phfpg, phfpz] = compute_isotropic_bound(incre_q, km, dkm);
-        const auto [ha, phapg, phapz] = compute_kinematic_bound(incre_q, km, dkm);
+        const auto [hf, phfpg, phfpz] = compute_isotropic_bound(gamma, km, dkm);
+        const auto [ha, phapg, phapz] = compute_kinematic_bound(gamma, km, dkm);
 
         vec6 sum_na(fill::zeros);
         vec top_na(bna.size(), fill::none), bot_na(bna.size(), fill::none);
