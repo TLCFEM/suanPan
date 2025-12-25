@@ -159,18 +159,21 @@ int Balloon::update_trial_status(const vec& t_strain) {
         vec top_na(bna.size(), fill::none), bot_na(bna.size(), fill::none);
         auto dna{0.};
         for(auto I = 0llu; I < bna.size(); ++I) {
-            top_na(I) = bna[I].a() * gamma;
-            sum_na += vec(&current_history(offset_na + 6u * I), 6, false, true) / (bot_na(I) = 1. + bna[I].b() * gamma);
+            top_na(I) = bna[I].a() * incre_q;
+            sum_na += vec(&current_history(offset_na + 6u * I), 6, false, true) / (bot_na(I) = 1. + bna[I].b() * incre_q);
             dna += (bna[I].a() - top_na(I) / bot_na(I) * bna[I].b()) / bot_na(I);
         }
+        dna *= root_two_third;
+
         vec6 sum_nd(fill::zeros);
         vec top_nd(bnd.size(), fill::none), bot_nd(bnd.size(), fill::none);
         auto dnd{0.};
         for(auto I = 0llu; I < bnd.size(); ++I) {
-            top_nd(I) = bnd[I].a() * gamma;
-            sum_nd += vec(&current_history(offset_nd + 6u * I), 6, false, true) / (bot_nd(I) = 1. + bnd[I].b() * gamma);
+            top_nd(I) = bnd[I].a() * incre_q;
+            sum_nd += vec(&current_history(offset_nd + 6u * I), 6, false, true) / (bot_nd(I) = 1. + bnd[I].b() * incre_q);
             dnd += (bnd[I].a() - top_nd(I) / bot_nd(I) * bnd[I].b()) / bot_nd(I);
         }
+        dnd *= root_two_third;
 
         if(1u == counter) {
             const vec ref = trial_s - ha * sum_na - hf * sum_nd;
@@ -243,6 +246,8 @@ int Balloon::update_trial_status(const vec& t_strain) {
         sum_nd.zeros();
         for(auto I = 0llu; I < bna.size(); ++I) sum_na -= bna[I].b() * std::pow(bot_na(I), -2.) * vec(&current_history(offset_na + 6u * I), 6, false, true);
         for(auto I = 0llu; I < bnd.size(); ++I) sum_nd -= bnd[I].b() * std::pow(bot_nd(I), -2.) * vec(&current_history(offset_nd + 6u * I), 6, false, true);
+        sum_na *= root_two_third;
+        sum_nd *= root_two_third;
 
         const auto trial_ratio = yield_ratio(z);
         const auto diff_z = z - start_z;

@@ -81,9 +81,7 @@ public:
     }
 };
 
-template<bool S> class BalloonSaturation {
-    inline static const double scale = S ? std::sqrt(1.5) : 1.;
-
+class BalloonSaturation {
     const double rate, bound;
 
 public:
@@ -92,11 +90,8 @@ public:
         , bound(B) {}
 
     [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
-    [[nodiscard]] double b() const { return rate * scale; }
+    [[nodiscard]] double b() const { return rate; }
 };
-
-using BalloonSaturation1D = BalloonSaturation<true>;
-using BalloonSaturation3D = BalloonSaturation<false>;
 
 class BalloonBase {
     static constexpr double z_bound = 1E-15;

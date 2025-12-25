@@ -39,7 +39,7 @@ struct DataBalloon1D {
 
     const BalloonBound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
 
-    const std::vector<BalloonSaturation1D> bfc, bac, bna, bnd;
+    const std::vector<BalloonSaturation> bfc, bac, bna, bnd;
 };
 
 class Balloon1D final : protected DataBalloon1D, protected BalloonBase, public Material1D {
