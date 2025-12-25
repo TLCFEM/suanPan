@@ -54,7 +54,7 @@ peek element 1
 # Displacement:
 #   0.0000e+00  0.0000e+00 -1.2000e-01
 # Resistance:
-#  -8.8052e+02  4.4176e+02 -5.9789e+03
+#  -8.7998e+02  4.4151e+02 -5.9768e+03
 peek node 9
 
 reset
