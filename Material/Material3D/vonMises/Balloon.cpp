@@ -238,11 +238,11 @@ int Balloon::update_trial_status(const vec& t_strain) {
         const auto diff_z = z - start_z;
 
         const auto factor_na = accu(top_na / bot_na), factor_nd = accu(top_nd / bot_nd);
-        residual(0) = norm_zeta - double_shear * gamma - ha * factor_na + (z - 1.) * hf * factor_nd - root_two_third * hf * z;
+        residual(0) = norm_zeta - double_shear * gamma - ha * factor_na + (z - 1.) * hf * factor_nd - hf * z;
         residual(1) = hf * diff_z - gamma * u * trial_ratio[0];
 
-        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapg + (z - 1.) * hf * sum_nd - ha * sum_na) - double_shear - phapg * factor_na - ha * dna + (z - 1.) * (phfpg * factor_nd + hf * dnd) - root_two_third * phfpg * z;
-        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) - phapz * factor_na + (hf + (z - 1.) * phfpz) * factor_nd - root_two_third * (hf + phfpz * z);
+        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapg + (z - 1.) * hf * sum_nd - ha * sum_na) - double_shear - phapg * factor_na - ha * dna + (z - 1.) * (phfpg * factor_nd + hf * dnd) - phfpg * z;
+        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) - phapz * factor_na + (hf + (z - 1.) * phfpz) * factor_nd - hf - phfpz * z;
         jacobian(1, 0) = phfpg * diff_z - (u + gamma * pupg) * trial_ratio[0];
         jacobian(1, 1) = hf + phfpz * diff_z - gamma * (pupz * trial_ratio[0] + u * trial_ratio[1]);
 
