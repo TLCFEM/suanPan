@@ -249,7 +249,8 @@ int Balloon::update_trial_status(const vec& t_strain) {
         sum_na *= root_two_third;
         sum_nd *= root_two_third;
 
-        const auto trial_ratio = yield_ratio(z);
+        auto trial_ratio = yield_ratio(z);
+        for(auto& v : trial_ratio) v *= root_two_third;
         const auto diff_z = z - start_z;
 
         const auto factor_na = accu(top_na / bot_na), factor_nd = accu(top_nd / bot_nd);
