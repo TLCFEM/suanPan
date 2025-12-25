@@ -33,18 +33,6 @@
 #include <Material/Material3D/Material3D.h>
 
 struct DataBalloon {
-    class Saturation {
-        const double rate, bound;
-
-    public:
-        Saturation(const double R, const double B)
-            : rate(R)
-            , bound(B) {}
-
-        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
-        [[nodiscard]] double b() const { return rate; }
-    };
-
     const double elastic;   // elastic modulus
     const double poisson;   // poisson's ratio
     const double kr;        // plastic strain split ratio
@@ -53,7 +41,7 @@ struct DataBalloon {
 
     const BalloonBound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
 
-    const std::vector<Saturation> bfc, bac, bna, bnd;
+    const std::vector<BalloonSaturation3D> bfc, bac, bna, bnd;
 };
 
 class Balloon final : protected DataBalloon, protected BalloonBase, public Material3D {

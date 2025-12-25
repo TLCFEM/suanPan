@@ -32,20 +32,6 @@
 #include <Material/Material3D/vonMises/BalloonUtil.h>
 
 struct DataBalloon1D {
-    class Saturation {
-        static const double root_one_half;
-
-        const double rate, bound;
-
-    public:
-        Saturation(const double R, const double B)
-            : rate(R)
-            , bound(B) {}
-
-        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
-        [[nodiscard]] double b() const { return rate * root_one_half; }
-    };
-
     const double elastic;   // elastic modulus
     const double kr;        // plastic strain split ratio
     const unsigned zr_size; // memory size
@@ -53,7 +39,7 @@ struct DataBalloon1D {
 
     const BalloonBound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
 
-    const std::vector<Saturation> bfc, bac, bna, bnd;
+    const std::vector<BalloonSaturation1D> bfc, bac, bna, bnd;
 };
 
 class Balloon1D final : protected DataBalloon1D, protected BalloonBase, public Material1D {

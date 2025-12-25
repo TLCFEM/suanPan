@@ -316,7 +316,7 @@ namespace {
             container.emplace_back(a, b);
         };
 
-        std::vector<DataBalloon1D::Saturation> bfc, bac, bna, bnd;
+        std::vector<BalloonSaturation1D> bfc, bac, bna, bnd;
 
         auto memory_type = BalloonBuffer::Type::MEAN;
 
@@ -385,7 +385,7 @@ namespace {
             container.emplace_back(a, b);
         };
 
-        std::vector<DataBalloon::Saturation> bfc, bac, bna, bnd;
+        std::vector<BalloonSaturation3D> bfc, bac, bna, bnd;
 
         auto memory_type = BalloonBuffer::Type::MEAN;
 
