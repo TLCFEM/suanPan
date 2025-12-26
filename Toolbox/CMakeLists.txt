@@ -8,6 +8,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         IntegrationPlan.cpp
         misc.cpp
         resampling.cpp
+        sat.cpp
         sort_rcm.cpp
         tensor.cpp
         utility.cpp
