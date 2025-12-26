@@ -29,42 +29,21 @@
 #define SUBLOADING1D_H
 
 #include <Material/Material1D/Material1D.h>
+#include <Material/Material3D/vonMises/SubloadingUtil.h>
 
 struct DataSubloading1D {
-    class Saturation {
-        static const double root_one_half;
-
-        const double rate, bound;
-
-    public:
-        Saturation(const double R, const double B)
-            : rate(R)
-            , bound(B) {}
-
-        [[nodiscard]] double r() const { return rate * root_one_half; }
-
-        [[nodiscard]] double b() const { return bound; }
-
-        [[nodiscard]] double rb() const { return r() * b(); }
-    };
-
     const double elastic; // elastic modulus
-    const double initial_iso, k_iso, saturation_iso, m_iso;
-    const double initial_kin, k_kin, saturation_kin, m_kin;
+    const SubloadingBound iso_bound, kin_bound;
     const double u;
     const double cv;
     const double mu;
     const double nv;
 
-    const std::vector<Saturation> b, c;
+    const std::vector<SubloadingSaturation> b, c;
 };
 
-class Subloading1D final : protected DataSubloading1D, public Material1D {
+class Subloading1D final : protected DataSubloading1D, protected SubloadingBase, public Material1D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double z_bound = 1E-15;
-    static const double rate_bound;
-
-    static pod2 yield_ratio(double);
 
     const double* incre_time = nullptr;
 

@@ -19,22 +19,14 @@
 
 #include <Toolbox/tensor.h>
 
-const double Subloading::root_two_third = std::sqrt(two_third);
-const double Subloading::rate_bound = -std::log(z_bound);
 const mat Subloading::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
-
-pod2 Subloading::yield_ratio(const double z) {
-    if(z < z_bound) return {rate_bound, 0.};
-
-    return {-log(z), -1. / z};
-}
 
 Subloading::Subloading(const unsigned T, DataSubloading&& D, const double R)
     : DataSubloading{std::move(D)}
     , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int Subloading::initialize(const shared_ptr<DomainBase>&) {
-    trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic, poissons_ratio);
+    trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic, poisson);
 
     initialize_history(15);
 
@@ -54,13 +46,13 @@ int Subloading::update_trial_status(const vec& t_strain) {
     trial_history = current_history;
     const auto& current_q = current_history(1);
     const auto& current_z = current_history(2);
-    const vec current_alpha(&current_history(3), 6, false, true);
-    const vec current_d(&current_history(9), 6, false, true);
+    const vec current_na(&current_history(3), 6, false, true);
+    const vec current_nd(&current_history(9), 6, false, true);
     auto& iteration = trial_history(0);
     auto& q = trial_history(1);
     auto& z = trial_history(2);
-    vec alpha(&trial_history(3), 6, false, true);
-    vec d(&trial_history(9), 6, false, true);
+    vec na(&trial_history(3), 6, false, true);
+    vec nd(&trial_history(9), 6, false, true);
 
     const vec trial_s = tensor::dev(trial_stress);
 
@@ -78,43 +70,41 @@ int Subloading::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        q = current_q + root_two_third * gamma;
+        const auto incre_q = root_two_third * gamma;
+        q = current_q + incre_q;
 
-        const auto exp_iso = saturation_iso * std::exp(-m_iso * q);
-        auto y = initial_iso + saturation_iso + k_iso * q - exp_iso;
-        auto dy = root_two_third * (k_iso + m_iso * exp_iso);
-        if(y < 0.) y = dy = 0.;
+        auto [y, dy] = iso_bound(q, true);
+        y *= root_two_third;
+        dy *= 2. / 3.;
 
-        const auto exp_kin = saturation_kin * std::exp(-m_kin * q);
-        auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
-        auto da = root_two_third * (k_kin + m_kin * exp_kin);
-        if(a < 0.) a = da = 0.;
+        auto [a, da] = kin_bound(q, true);
+        a *= root_two_third;
+        da *= 2. / 3.;
 
-        const auto bot_alpha = 1. + b.r() * gamma;
-        const auto bot_d = 1. + c.r() * gamma;
+        const auto bot_na = 1. + b.r() * incre_q;
+        const auto bot_nd = 1. + c.r() * incre_q;
 
-        const vec pzetapz = y / bot_d * current_d;
-        const vec pzetapgamma = (b.r() * a / bot_alpha - da) / bot_alpha * current_alpha + (z - 1.) * (dy - c.r() * y / bot_d) / bot_d * current_d;
+        const vec pzetapz = y / bot_nd * current_nd;
+        const vec pzetapg = (b.r() * root_two_third * a / bot_na - da) / bot_na * current_na + (z - 1.) * (dy - c.r() * root_two_third * y / bot_nd) / bot_nd * current_nd;
 
-        const vec zeta = trial_s - a / bot_alpha * current_alpha + (z - 1.) * pzetapz;
+        const vec zeta = trial_s - a / bot_na * current_na + (z - 1.) * pzetapz;
         const auto norm_zeta = tensor::stress::norm(zeta);
         const vec n = zeta / norm_zeta;
 
-        alpha = (root_two_third * gamma * b.rb() * n + current_alpha) / bot_alpha;
-
-        d = (root_two_third * gamma * c.rb() * n + current_d) / bot_d;
+        na = (incre_q * b.rb() * n + current_na) / bot_na;
+        nd = (incre_q * c.rb() * n + current_nd) / bot_nd;
 
         if(1u == counter) {
+            const vec ref = trial_s - a * na - y * nd;
             const vec incre_s = trial_s - tensor::dev(current_stress);
-            const vec ref = trial_s - a * alpha - y * d;
             const vec base = ref - incre_s;
 
-            const auto aa = two_third - tensor::stress::double_contraction(d);
-            const auto bb = tensor::stress::double_contraction(d, ref);
+            const auto aa = 1. - tensor::stress::double_contraction(nd);
+            const auto bb = tensor::stress::double_contraction(nd, ref);
             const auto cc = tensor::stress::double_contraction(ref);
 
             const auto incre_incre = tensor::stress::double_contraction(incre_s);
-            const auto incre_d = tensor::stress::double_contraction(incre_s, d);
+            const auto incre_d = tensor::stress::double_contraction(incre_s, nd);
 
             auto x = .5;
             auto inner_counter = 0u;
@@ -125,7 +115,7 @@ int Subloading::update_trial_status(const vec& t_strain) {
                 }
 
                 const vec middle = base + x * incre_s;
-                const auto middle_d = tensor::stress::double_contraction(d, middle);
+                const auto middle_d = tensor::stress::double_contraction(nd, middle);
                 const auto tmp_sqrt = std::max(datum::eps, std::sqrt(middle_d * middle_d + aa * tensor::stress::double_contraction(middle)));
                 const auto residual_x = tmp_sqrt * incre_d + middle_d * incre_d + aa * tensor::stress::double_contraction(incre_s, middle);
                 const auto jacobian_x = incre_d * residual_x + tmp_sqrt * aa * incre_incre;
@@ -159,14 +149,14 @@ int Subloading::update_trial_status(const vec& t_strain) {
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio[0];
 
-        residual(0) = tensor::stress::norm(trial_s - gamma * double_shear * n - a * alpha + (z - 1.) * y * d) - root_two_third * z * y;
-        residual(1) = z - start_z - root_two_third * gamma * avg_rate;
+        residual(0) = tensor::stress::norm(trial_s - gamma * double_shear * n - a * na + (z - 1.) * y * nd) - z * y;
+        residual(1) = z - start_z - incre_q * avg_rate;
 
-        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapgamma) - double_shear - root_two_third * (b.rb() / bot_alpha * (a + gamma * da - gamma * a * b.r() / bot_alpha) + c.rb() * (1. - z) / bot_d * (y + gamma * dy - gamma * y * c.r() / bot_d) + z * dy);
-        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + root_two_third * y * (gamma * c.rb() / bot_d - 1.);
+        jacobian(0, 0) = tensor::stress::double_contraction(n, pzetapg) - double_shear - root_two_third * (b.rb() / bot_na * (a + gamma * da - incre_q * a / bot_na * b.r()) + (1. - z) * c.rb() / bot_nd * (y + gamma * dy - incre_q * y / bot_nd * c.r())) - z * dy;
+        jacobian(0, 1) = tensor::stress::double_contraction(n, pzetapz) + y * incre_q * c.rb() / bot_nd - y;
 
         jacobian(1, 0) = -root_two_third * avg_rate;
-        jacobian(1, 1) = 1. - root_two_third * gamma * u * trial_ratio[1];
+        jacobian(1, 1) = 1. - incre_q * u * trial_ratio[1];
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
