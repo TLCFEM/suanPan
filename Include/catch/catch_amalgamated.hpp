@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.11.0
-//  Generated: 2025-09-30 10:49:11.225746
+//  Catch v3.12.0
+//  Generated: 2025-12-28 22:27:25.408132
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -664,6 +664,23 @@ namespace Catch {
 #ifndef CATCH_STRINGREF_HPP_INCLUDED
 #define CATCH_STRINGREF_HPP_INCLUDED
 
+#ifndef CATCH_LIFETIMEBOUND_HPP_INCLUDED
+#define CATCH_LIFETIMEBOUND_HPP_INCLUDED
+
+#if !defined(__has_cpp_attribute)
+#define CATCH_ATTR_LIFETIMEBOUND
+#elif __has_cpp_attribute(msvc::lifetimebound)
+#define CATCH_ATTR_LIFETIMEBOUND [[msvc::lifetimebound]]
+#elif __has_cpp_attribute(clang::lifetimebound)
+#define CATCH_ATTR_LIFETIMEBOUND [[clang::lifetimebound]]
+#elif __has_cpp_attribute(lifetimebound)
+#define CATCH_ATTR_LIFETIMEBOUND [[lifetimebound]]
+#else
+#define CATCH_ATTR_LIFETIMEBOUND
+#endif
+
+#endif // CATCH_LIFETIMEBOUND_HPP_INCLUDED
+
 #include <cassert>
 #include <cstddef>
 #include <cstring>
@@ -691,13 +708,15 @@ namespace Catch {
     public: // construction
         constexpr StringRef() noexcept = default;
 
-        StringRef(char const* rawChars) noexcept;
+        StringRef(char const* rawChars CATCH_ATTR_LIFETIMEBOUND) noexcept;
 
-        constexpr StringRef(char const* rawChars, size_type size) noexcept
+        constexpr StringRef(char const* rawChars CATCH_ATTR_LIFETIMEBOUND, size_type size) noexcept
             : m_start(rawChars)
             , m_size(size) {}
 
-        StringRef(std::string const& stdString) noexcept
+        StringRef(
+            std::string const& stdString CATCH_ATTR_LIFETIMEBOUND
+        ) noexcept
             : m_start(stdString.c_str())
             , m_size(stdString.size()) {}
 
@@ -742,7 +761,7 @@ namespace Catch {
         }
 
         // Returns the current start pointer. May not be null-terminated.
-        constexpr char const* data() const noexcept {
+        constexpr char const* data() const noexcept CATCH_ATTR_LIFETIMEBOUND {
             return m_start;
         }
 
@@ -1864,9 +1883,7 @@ namespace Catch {
                 std::vector<double> deltas;
                 deltas.reserve(static_cast<size_t>(k));
                 for(size_t idx = 1; idx < points; ++idx) {
-                    deltas.push_back(static_cast<double>(
-                        (times[idx] - times[idx - 1]).count()
-                    ));
+                    deltas.push_back(static_cast<double>((times[idx] - times[idx - 1]).count()));
                 }
 
                 return deltas;
@@ -1898,10 +1915,8 @@ namespace Catch {
             }
             template<typename Clock>
             EnvironmentEstimate estimate_clock_cost(FDuration resolution) {
-                auto time_limit = (std::min)(
-                    resolution * clock_cost_estimation_tick_limit,
-                    FDuration(clock_cost_estimation_time_limit)
-                );
+                auto time_limit = (std::min)(resolution * clock_cost_estimation_tick_limit,
+                                             FDuration(clock_cost_estimation_time_limit));
                 auto time_clock = [](int k) {
                     return Detail::measure<Clock>([k] {
                                for(int i = 0; i < k; ++i) {
@@ -1918,10 +1933,7 @@ namespace Catch {
                 int nsamples = static_cast<int>(std::ceil(time_limit / r.elapsed));
                 times.reserve(static_cast<size_t>(nsamples));
                 for(int s = 0; s < nsamples; ++s) {
-                    times.push_back(static_cast<double>(
-                        (time_clock(r.iterations) / r.iterations)
-                            .count()
-                    ));
+                    times.push_back(static_cast<double>((time_clock(r.iterations) / r.iterations).count()));
                 }
                 return {
                     FDuration(mean(times.data(), times.data() + times.size())),
@@ -2190,6 +2202,7 @@ namespace Catch {
 #define CATCH_TOSTRING_HPP_INCLUDED
 
 #include <cstddef>
+#include <ctime>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -2348,13 +2361,9 @@ namespace Catch {
 
     namespace Detail {
 
-        inline std::size_t catch_strnlen(const char* str, std::size_t n) {
-            auto ret = std::char_traits<char>::find(str, n, '\0');
-            if(ret != nullptr) {
-                return static_cast<std::size_t>(ret - str);
-            }
-            return n;
-        }
+        std::size_t catch_strnlen(const char* str, std::size_t n);
+
+        std::string formatTimeT(std::time_t time);
 
         constexpr StringRef unprintableString = "{?}"_sr;
 
@@ -2725,26 +2734,19 @@ namespace Catch {
 // Separate std::tuple specialization
 #if defined(CATCH_CONFIG_ENABLE_TUPLE_STRINGMAKER)
 #include <tuple>
+#include <utility>
 namespace Catch {
     namespace Detail {
-        template<
-            typename Tuple,
-            std::size_t N = 0,
-            bool = (N < std::tuple_size<Tuple>::value)>
-        struct TupleElementPrinter {
-            static void print(const Tuple& tuple, std::ostream& os) {
-                os << (N ? ", " : " ")
-                   << ::Catch::Detail::stringify(std::get<N>(tuple));
-                TupleElementPrinter<Tuple, N + 1>::print(tuple, os);
-            }
-        };
-
-        template<
-            typename Tuple,
-            std::size_t N>
-        struct TupleElementPrinter<Tuple, N, false> {
-            static void print(const Tuple&, std::ostream&) {}
-        };
+        template<typename Tuple, std::size_t... Is>
+        void PrintTuple(const Tuple& tuple, std::ostream& os, std::index_sequence<Is...>) {
+            // 1 + Account for when the tuple is empty
+            char a[1 + sizeof...(Is)] = {
+                ((os << (Is ? ", " : " ")
+                     << ::Catch::Detail::stringify(std::get<Is>(tuple))),
+                 '\0')...
+            };
+            (void)a;
+        }
 
     } // namespace Detail
 
@@ -2753,7 +2755,11 @@ namespace Catch {
         static std::string convert(const std::tuple<Types...>& tuple) {
             ReusableStringStream rss;
             rss << '{';
-            Detail::TupleElementPrinter<std::tuple<Types...>>::print(tuple, rss.get());
+            Detail::PrintTuple(
+                tuple,
+                rss.get(),
+                std::make_index_sequence<sizeof...(Types)>{}
+            );
             rss << " }";
             return rss.str();
         }
@@ -2944,28 +2950,7 @@ namespace Catch {
             const auto systemish = std::chrono::time_point_cast<
                 std::chrono::system_clock::duration>(time_point);
             const auto as_time_t = std::chrono::system_clock::to_time_t(systemish);
-
-#ifdef _MSC_VER
-            std::tm timeInfo = {};
-            const auto err = gmtime_s(&timeInfo, &as_time_t);
-            if(err) {
-                return "gmtime from provided timepoint has failed. This "
-                       "happens e.g. with pre-1970 dates using Microsoft libc";
-            }
-#else
-            std::tm* timeInfo = std::gmtime(&as_time_t);
-#endif
-
-            auto const timeStampSize = sizeof("2017-01-16T17:06:45Z");
-            char timeStamp[timeStampSize];
-            const char* const fmt = "%Y-%m-%dT%H:%M:%SZ";
-
-#ifdef _MSC_VER
-            std::strftime(timeStamp, timeStampSize, fmt, &timeInfo);
-#else
-            std::strftime(timeStamp, timeStampSize, fmt, timeInfo);
-#endif
-            return std::string(timeStamp, timeStampSize - 1);
+            return ::Catch::Detail::formatTimeT(as_time_t);
         }
     };
 } // namespace Catch
@@ -3818,9 +3803,6 @@ namespace Catch {
         bool operator<(MessageInfo const& other) const {
             return sequence < other.sequence;
         }
-
-    private:
-        static thread_local unsigned int globalCount;
     };
 
 } // end namespace Catch
@@ -7228,7 +7210,7 @@ namespace Catch {
 #define CATCH_VERSION_MACROS_HPP_INCLUDED
 
 #define CATCH_VERSION_MAJOR 3
-#define CATCH_VERSION_MINOR 11
+#define CATCH_VERSION_MINOR 12
 #define CATCH_VERSION_PATCH 0
 
 #endif // CATCH_VERSION_MACROS_HPP_INCLUDED
@@ -9662,8 +9644,8 @@ namespace Catch {
 
     class JsonValueWriter {
     public:
-        JsonValueWriter(std::ostream& os);
-        JsonValueWriter(std::ostream& os, std::uint64_t indent_level);
+        JsonValueWriter(std::ostream& os CATCH_ATTR_LIFETIMEBOUND);
+        JsonValueWriter(std::ostream& os CATCH_ATTR_LIFETIMEBOUND, std::uint64_t indent_level);
 
         JsonObjectWriter writeObject() &&;
         JsonArrayWriter writeArray() &&;
@@ -9695,8 +9677,8 @@ namespace Catch {
 
     class JsonObjectWriter {
     public:
-        JsonObjectWriter(std::ostream& os);
-        JsonObjectWriter(std::ostream& os, std::uint64_t indent_level);
+        JsonObjectWriter(std::ostream& os CATCH_ATTR_LIFETIMEBOUND);
+        JsonObjectWriter(std::ostream& os CATCH_ATTR_LIFETIMEBOUND, std::uint64_t indent_level);
 
         JsonObjectWriter(JsonObjectWriter&& source) noexcept;
         JsonObjectWriter& operator=(JsonObjectWriter&& source) = delete;
@@ -9714,8 +9696,8 @@ namespace Catch {
 
     class JsonArrayWriter {
     public:
-        JsonArrayWriter(std::ostream& os);
-        JsonArrayWriter(std::ostream& os, std::uint64_t indent_level);
+        JsonArrayWriter(std::ostream& os CATCH_ATTR_LIFETIMEBOUND);
+        JsonArrayWriter(std::ostream& os CATCH_ATTR_LIFETIMEBOUND, std::uint64_t indent_level);
 
         JsonArrayWriter(JsonArrayWriter&& source) noexcept;
         JsonArrayWriter& operator=(JsonArrayWriter&& source) = delete;
@@ -9970,7 +9952,7 @@ namespace Catch {
             StringRef name;
             SourceLineInfo location;
 
-            constexpr NameAndLocationRef(StringRef name_, SourceLineInfo location_)
+            constexpr NameAndLocationRef(StringRef name_ CATCH_ATTR_LIFETIMEBOUND, SourceLineInfo location_)
                 : name(name_)
                 , location(location_) {}
 
@@ -10160,21 +10142,21 @@ namespace Catch {
 #ifndef CATCH_THREAD_SUPPORT_HPP_INCLUDED
 #define CATCH_THREAD_SUPPORT_HPP_INCLUDED
 
-#if defined(CATCH_CONFIG_EXPERIMENTAL_THREAD_SAFE_ASSERTIONS)
+#if defined(CATCH_CONFIG_THREAD_SAFE_ASSERTIONS)
 #include <atomic>
 #include <mutex>
 #endif
 
 namespace Catch {
     namespace Detail {
-#if defined(CATCH_CONFIG_EXPERIMENTAL_THREAD_SAFE_ASSERTIONS)
+#if defined(CATCH_CONFIG_THREAD_SAFE_ASSERTIONS)
         using Mutex = std::mutex;
         using LockGuard = std::lock_guard<std::mutex>;
         struct AtomicCounts {
-            std::atomic<std::uint64_t> passed = 0;
-            std::atomic<std::uint64_t> failed = 0;
-            std::atomic<std::uint64_t> failedButOk = 0;
-            std::atomic<std::uint64_t> skipped = 0;
+            std::atomic<std::uint64_t> passed{0};
+            std::atomic<std::uint64_t> failed{0};
+            std::atomic<std::uint64_t> failedButOk{0};
+            std::atomic<std::uint64_t> skipped{0};
         };
 #else // ^^ Use actual mutex, lock and atomics
       // vv Dummy implementations for single-thread performance
@@ -10443,10 +10425,10 @@ namespace Catch {
     //! Returns a new string without whitespace at the start/end
     std::string trim(std::string const& str);
     //! Returns a substring of the original ref without whitespace. Beware lifetimes!
-    StringRef trim(StringRef ref);
+    StringRef trim(StringRef ref CATCH_ATTR_LIFETIMEBOUND);
 
     // !!! Be aware, returns refs into original string - make sure original string outlives them
-    std::vector<StringRef> splitStringRef(StringRef str, char delimiter);
+    std::vector<StringRef> splitStringRef(StringRef str CATCH_ATTR_LIFETIMEBOUND, char delimiter);
     bool replaceInPlace(std::string& str, std::string const& replaceThis, std::string const& withThis);
 
     /**
@@ -10464,7 +10446,7 @@ namespace Catch {
         StringRef m_label;
 
     public:
-        constexpr pluralise(std::uint64_t count, StringRef label)
+        constexpr pluralise(std::uint64_t count, StringRef label CATCH_ATTR_LIFETIMEBOUND)
             : m_count(count)
             , m_label(label) {}
 
@@ -10934,6 +10916,17 @@ namespace Catch {
 } // namespace Catch
 #endif // CATCH_TEXTFLOW_HPP_INCLUDED
 
+#ifndef CATCH_THREAD_LOCAL_HPP_INCLUDED
+#define CATCH_THREAD_LOCAL_HPP_INCLUDED
+
+#if defined(CATCH_CONFIG_THREAD_SAFE_ASSERTIONS)
+#define CATCH_INTERNAL_THREAD_LOCAL thread_local
+#else
+#define CATCH_INTERNAL_THREAD_LOCAL
+#endif
+
+#endif // CATCH_THREAD_LOCAL_HPP_INCLUDED
+
 #ifndef CATCH_TO_STRING_HPP_INCLUDED
 #define CATCH_TO_STRING_HPP_INCLUDED
 
@@ -10996,7 +10989,7 @@ namespace Catch {
         enum ForWhat { ForTextNodes,
                        ForAttributes };
 
-        constexpr XmlEncode(StringRef str, ForWhat forWhat = ForTextNodes)
+        constexpr XmlEncode(StringRef str CATCH_ATTR_LIFETIMEBOUND, ForWhat forWhat = ForTextNodes)
             : m_str(str)
             , m_forWhat(forWhat) {}
 
@@ -11013,7 +11006,7 @@ namespace Catch {
     public:
         class ScopedElement {
         public:
-            ScopedElement(XmlWriter* writer, XmlFormatting fmt);
+            ScopedElement(XmlWriter* writer CATCH_ATTR_LIFETIMEBOUND, XmlFormatting fmt);
 
             ScopedElement(ScopedElement&& other) noexcept;
             ScopedElement& operator=(ScopedElement&& other) noexcept;
@@ -11040,7 +11033,7 @@ namespace Catch {
             XmlFormatting m_fmt;
         };
 
-        XmlWriter(std::ostream& os);
+        XmlWriter(std::ostream& os CATCH_ATTR_LIFETIMEBOUND);
         ~XmlWriter();
 
         XmlWriter(XmlWriter const&) = delete;
@@ -11282,11 +11275,12 @@ namespace Catch {
                     return description;
                 }
 
-                friend MatchAllOf operator&&(MatchAllOf&& lhs, MatcherBase<ArgT> const& rhs) {
+                friend MatchAllOf operator&&(MatchAllOf&& lhs, MatcherBase<ArgT> const& rhs CATCH_ATTR_LIFETIMEBOUND) {
                     lhs.m_matchers.push_back(&rhs);
                     return CATCH_MOVE(lhs);
                 }
-                friend MatchAllOf operator&&(MatcherBase<ArgT> const& lhs, MatchAllOf&& rhs) {
+                friend MatchAllOf
+                operator&&(MatcherBase<ArgT> const& lhs CATCH_ATTR_LIFETIMEBOUND, MatchAllOf&& rhs) {
                     rhs.m_matchers.insert(rhs.m_matchers.begin(), &lhs);
                     return CATCH_MOVE(rhs);
                 }
@@ -11335,11 +11329,12 @@ namespace Catch {
                     return description;
                 }
 
-                friend MatchAnyOf operator||(MatchAnyOf&& lhs, MatcherBase<ArgT> const& rhs) {
+                friend MatchAnyOf operator||(MatchAnyOf&& lhs, MatcherBase<ArgT> const& rhs CATCH_ATTR_LIFETIMEBOUND) {
                     lhs.m_matchers.push_back(&rhs);
                     return CATCH_MOVE(lhs);
                 }
-                friend MatchAnyOf operator||(MatcherBase<ArgT> const& lhs, MatchAnyOf&& rhs) {
+                friend MatchAnyOf
+                operator||(MatcherBase<ArgT> const& lhs CATCH_ATTR_LIFETIMEBOUND, MatchAnyOf&& rhs) {
                     rhs.m_matchers.insert(rhs.m_matchers.begin(), &lhs);
                     return CATCH_MOVE(rhs);
                 }
@@ -11359,7 +11354,7 @@ namespace Catch {
                 MatcherBase<ArgT> const& m_underlyingMatcher;
 
             public:
-                explicit MatchNotOf(MatcherBase<ArgT> const& underlyingMatcher)
+                explicit MatchNotOf(MatcherBase<ArgT> const& underlyingMatcher CATCH_ATTR_LIFETIMEBOUND)
                     : m_underlyingMatcher(underlyingMatcher) {}
 
                 bool match(ArgT const& arg) const override {
@@ -11374,16 +11369,20 @@ namespace Catch {
         } // namespace Detail
 
         template<typename T>
-        Detail::MatchAllOf<T> operator&&(MatcherBase<T> const& lhs, MatcherBase<T> const& rhs) {
+        Detail::MatchAllOf<T>
+        operator&&(MatcherBase<T> const& lhs CATCH_ATTR_LIFETIMEBOUND, MatcherBase<T> const& rhs CATCH_ATTR_LIFETIMEBOUND) {
             return Detail::MatchAllOf<T>{} && lhs && rhs;
         }
+
         template<typename T>
-        Detail::MatchAnyOf<T> operator||(MatcherBase<T> const& lhs, MatcherBase<T> const& rhs) {
+        Detail::MatchAnyOf<T>
+        operator||(MatcherBase<T> const& lhs CATCH_ATTR_LIFETIMEBOUND, MatcherBase<T> const& rhs CATCH_ATTR_LIFETIMEBOUND) {
             return Detail::MatchAnyOf<T>{} || lhs || rhs;
         }
 
         template<typename T>
-        Detail::MatchNotOf<T> operator!(MatcherBase<T> const& matcher) {
+        Detail::MatchNotOf<T>
+        operator!(MatcherBase<T> const& matcher CATCH_ATTR_LIFETIMEBOUND) {
             return Detail::MatchNotOf<T>{matcher};
         }
 
@@ -11523,8 +11522,7 @@ namespace Catch {
 
             template<typename... MatcherTs, std::size_t... Idx>
             std::string describe_multi_matcher(StringRef combine, std::array<void const*, sizeof...(MatcherTs)> const& matchers, std::index_sequence<Idx...>) {
-                std::array<std::string, sizeof...(MatcherTs)> descriptions{{static_cast<MatcherTs const*>(matchers[Idx])->toString()...
-                }};
+                std::array<std::string, sizeof...(MatcherTs)> descriptions{{static_cast<MatcherTs const*>(matchers[Idx])->toString()...}};
 
                 return describe_multi_matcher(combine, descriptions.data(), descriptions.data() + descriptions.size());
             }
@@ -11537,7 +11535,7 @@ namespace Catch {
                 MatchAllOfGeneric(MatchAllOfGeneric&&) = default;
                 MatchAllOfGeneric& operator=(MatchAllOfGeneric&&) = default;
 
-                MatchAllOfGeneric(MatcherTs const&... matchers)
+                MatchAllOfGeneric(MatcherTs const&... matchers CATCH_ATTR_LIFETIMEBOUND)
                     : m_matchers{{std::addressof(matchers)...}} {}
                 explicit MatchAllOfGeneric(std::array<void const*, sizeof...(MatcherTs)> matchers)
                     : m_matchers{matchers} {}
@@ -11559,8 +11557,8 @@ namespace Catch {
                 //! Avoids type nesting for `GenericAllOf && GenericAllOf` case
                 template<typename... MatchersRHS>
                 friend MatchAllOfGeneric<MatcherTs..., MatchersRHS...> operator&&(
-                    MatchAllOfGeneric<MatcherTs...>&& lhs,
-                    MatchAllOfGeneric<MatchersRHS...>&& rhs
+                    MatchAllOfGeneric<MatcherTs...>&& lhs CATCH_ATTR_LIFETIMEBOUND,
+                    MatchAllOfGeneric<MatchersRHS...>&& rhs CATCH_ATTR_LIFETIMEBOUND
                 ) {
                     return MatchAllOfGeneric<MatcherTs..., MatchersRHS...>{array_cat(CATCH_MOVE(lhs.m_matchers), CATCH_MOVE(rhs.m_matchers))};
                 }
@@ -11568,8 +11566,8 @@ namespace Catch {
                 //! Avoids type nesting for `GenericAllOf && some matcher` case
                 template<typename MatcherRHS>
                 friend std::enable_if_t<is_matcher_v<MatcherRHS>, MatchAllOfGeneric<MatcherTs..., MatcherRHS>> operator&&(
-                    MatchAllOfGeneric<MatcherTs...>&& lhs,
-                    MatcherRHS const& rhs
+                    MatchAllOfGeneric<MatcherTs...>&& lhs CATCH_ATTR_LIFETIMEBOUND,
+                    MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND
                 ) {
                     return MatchAllOfGeneric<MatcherTs..., MatcherRHS>{array_cat(CATCH_MOVE(lhs.m_matchers), static_cast<void const*>(&rhs))};
                 }
@@ -11577,8 +11575,8 @@ namespace Catch {
                 //! Avoids type nesting for `some matcher && GenericAllOf` case
                 template<typename MatcherLHS>
                 friend std::enable_if_t<is_matcher_v<MatcherLHS>, MatchAllOfGeneric<MatcherLHS, MatcherTs...>> operator&&(
-                    MatcherLHS const& lhs,
-                    MatchAllOfGeneric<MatcherTs...>&& rhs
+                    MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND,
+                    MatchAllOfGeneric<MatcherTs...>&& rhs CATCH_ATTR_LIFETIMEBOUND
                 ) {
                     return MatchAllOfGeneric<MatcherLHS, MatcherTs...>{array_cat(static_cast<void const*>(std::addressof(lhs)), CATCH_MOVE(rhs.m_matchers))};
                 }
@@ -11592,7 +11590,7 @@ namespace Catch {
                 MatchAnyOfGeneric(MatchAnyOfGeneric&&) = default;
                 MatchAnyOfGeneric& operator=(MatchAnyOfGeneric&&) = default;
 
-                MatchAnyOfGeneric(MatcherTs const&... matchers)
+                MatchAnyOfGeneric(MatcherTs const&... matchers CATCH_ATTR_LIFETIMEBOUND)
                     : m_matchers{{std::addressof(matchers)...}} {}
                 explicit MatchAnyOfGeneric(std::array<void const*, sizeof...(MatcherTs)> matchers)
                     : m_matchers{matchers} {}
@@ -11614,8 +11612,8 @@ namespace Catch {
                 //! Avoids type nesting for `GenericAnyOf || GenericAnyOf` case
                 template<typename... MatchersRHS>
                 friend MatchAnyOfGeneric<MatcherTs..., MatchersRHS...> operator||(
-                    MatchAnyOfGeneric<MatcherTs...>&& lhs,
-                    MatchAnyOfGeneric<MatchersRHS...>&& rhs
+                    MatchAnyOfGeneric<MatcherTs...>&& lhs CATCH_ATTR_LIFETIMEBOUND,
+                    MatchAnyOfGeneric<MatchersRHS...>&& rhs CATCH_ATTR_LIFETIMEBOUND
                 ) {
                     return MatchAnyOfGeneric<MatcherTs..., MatchersRHS...>{array_cat(CATCH_MOVE(lhs.m_matchers), CATCH_MOVE(rhs.m_matchers))};
                 }
@@ -11623,8 +11621,8 @@ namespace Catch {
                 //! Avoids type nesting for `GenericAnyOf || some matcher` case
                 template<typename MatcherRHS>
                 friend std::enable_if_t<is_matcher_v<MatcherRHS>, MatchAnyOfGeneric<MatcherTs..., MatcherRHS>> operator||(
-                    MatchAnyOfGeneric<MatcherTs...>&& lhs,
-                    MatcherRHS const& rhs
+                    MatchAnyOfGeneric<MatcherTs...>&& lhs CATCH_ATTR_LIFETIMEBOUND,
+                    MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND
                 ) {
                     return MatchAnyOfGeneric<MatcherTs..., MatcherRHS>{array_cat(CATCH_MOVE(lhs.m_matchers), static_cast<void const*>(std::addressof(rhs)))};
                 }
@@ -11632,8 +11630,8 @@ namespace Catch {
                 //! Avoids type nesting for `some matcher || GenericAnyOf` case
                 template<typename MatcherLHS>
                 friend std::enable_if_t<is_matcher_v<MatcherLHS>, MatchAnyOfGeneric<MatcherLHS, MatcherTs...>> operator||(
-                    MatcherLHS const& lhs,
-                    MatchAnyOfGeneric<MatcherTs...>&& rhs
+                    MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND,
+                    MatchAnyOfGeneric<MatcherTs...>&& rhs CATCH_ATTR_LIFETIMEBOUND
                 ) {
                     return MatchAnyOfGeneric<MatcherLHS, MatcherTs...>{array_cat(static_cast<void const*>(std::addressof(lhs)), CATCH_MOVE(rhs.m_matchers))};
                 }
@@ -11649,7 +11647,7 @@ namespace Catch {
                 MatchNotOfGeneric(MatchNotOfGeneric&&) = default;
                 MatchNotOfGeneric& operator=(MatchNotOfGeneric&&) = default;
 
-                explicit MatchNotOfGeneric(MatcherT const& matcher)
+                explicit MatchNotOfGeneric(MatcherT const& matcher CATCH_ATTR_LIFETIMEBOUND)
                     : m_matcher{matcher} {}
 
                 template<typename Arg>
@@ -11662,7 +11660,9 @@ namespace Catch {
                 }
 
                 //! Negating negation can just unwrap and return underlying matcher
-                friend MatcherT const& operator!(MatchNotOfGeneric<MatcherT> const& matcher) {
+                friend MatcherT const&
+                operator!(MatchNotOfGeneric<MatcherT> const& matcher
+                              CATCH_ATTR_LIFETIMEBOUND) {
                     return matcher.m_matcher;
                 }
             };
@@ -11671,45 +11671,45 @@ namespace Catch {
         // compose only generic matchers
         template<typename MatcherLHS, typename MatcherRHS>
         std::enable_if_t<Detail::are_generic_matchers_v<MatcherLHS, MatcherRHS>, Detail::MatchAllOfGeneric<MatcherLHS, MatcherRHS>>
-        operator&&(MatcherLHS const& lhs, MatcherRHS const& rhs) {
+        operator&&(MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND, MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND) {
             return {lhs, rhs};
         }
 
         template<typename MatcherLHS, typename MatcherRHS>
         std::enable_if_t<Detail::are_generic_matchers_v<MatcherLHS, MatcherRHS>, Detail::MatchAnyOfGeneric<MatcherLHS, MatcherRHS>>
-        operator||(MatcherLHS const& lhs, MatcherRHS const& rhs) {
+        operator||(MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND, MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND) {
             return {lhs, rhs};
         }
 
         //! Wrap provided generic matcher in generic negator
         template<typename MatcherT>
         std::enable_if_t<Detail::is_generic_matcher_v<MatcherT>, Detail::MatchNotOfGeneric<MatcherT>>
-        operator!(MatcherT const& matcher) {
+        operator!(MatcherT const& matcher CATCH_ATTR_LIFETIMEBOUND) {
             return Detail::MatchNotOfGeneric<MatcherT>{matcher};
         }
 
         // compose mixed generic and non-generic matchers
         template<typename MatcherLHS, typename ArgRHS>
         std::enable_if_t<Detail::is_generic_matcher_v<MatcherLHS>, Detail::MatchAllOfGeneric<MatcherLHS, MatcherBase<ArgRHS>>>
-        operator&&(MatcherLHS const& lhs, MatcherBase<ArgRHS> const& rhs) {
+        operator&&(MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND, MatcherBase<ArgRHS> const& rhs CATCH_ATTR_LIFETIMEBOUND) {
             return {lhs, rhs};
         }
 
         template<typename ArgLHS, typename MatcherRHS>
         std::enable_if_t<Detail::is_generic_matcher_v<MatcherRHS>, Detail::MatchAllOfGeneric<MatcherBase<ArgLHS>, MatcherRHS>>
-        operator&&(MatcherBase<ArgLHS> const& lhs, MatcherRHS const& rhs) {
+        operator&&(MatcherBase<ArgLHS> const& lhs CATCH_ATTR_LIFETIMEBOUND, MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND) {
             return {lhs, rhs};
         }
 
         template<typename MatcherLHS, typename ArgRHS>
         std::enable_if_t<Detail::is_generic_matcher_v<MatcherLHS>, Detail::MatchAnyOfGeneric<MatcherLHS, MatcherBase<ArgRHS>>>
-        operator||(MatcherLHS const& lhs, MatcherBase<ArgRHS> const& rhs) {
+        operator||(MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND, MatcherBase<ArgRHS> const& rhs CATCH_ATTR_LIFETIMEBOUND) {
             return {lhs, rhs};
         }
 
         template<typename ArgLHS, typename MatcherRHS>
         std::enable_if_t<Detail::is_generic_matcher_v<MatcherRHS>, Detail::MatchAnyOfGeneric<MatcherBase<ArgLHS>, MatcherRHS>>
-        operator||(MatcherBase<ArgLHS> const& lhs, MatcherRHS const& rhs) {
+        operator||(MatcherBase<ArgLHS> const& lhs CATCH_ATTR_LIFETIMEBOUND, MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND) {
             return {lhs, rhs};
         }
 
