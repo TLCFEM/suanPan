@@ -291,11 +291,11 @@ Additional libraries used in **suanPan** are listed as follows.
 
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.1
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 15.2.2
+- [**Armadillo**](http://arma.sourceforge.net/) version 15.2.3
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.12.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.6
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.0.0
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.30
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
@@ -308,7 +308,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ezp**](https://github.com/TLCFEM/ezp)
 - [**fmt**](https://github.com/fmtlib/fmt) version 12.0.0
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.2.0
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.3.0
 - [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
