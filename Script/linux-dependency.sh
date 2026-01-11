@@ -10,7 +10,7 @@
 #   ./linux-dependency.sh <runner-image-name>
 #
 #   <runner-image-name>: The name of the GitHub Actions runner image
-#                        (one of ubuntu-22.04, ubuntu-22.04-arm).
+#                        (one of ubuntu-24.04, ubuntu-24.04-arm).
 #
 # What it does:
 #   1. Checks that exactly one argument is provided.

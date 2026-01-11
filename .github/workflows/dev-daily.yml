@@ -10,7 +10,7 @@ permissions:
   id-token: write
 jobs:
   check-latest:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-slim
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
@@ -27,7 +27,7 @@ jobs:
           path: .commit
           key: commit-${{ steps.commit.outputs.head }}
   linux-daily:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: check-latest
     if: needs.check-latest.outputs.cache-hit != 'true'
     timeout-minutes: 120
@@ -125,7 +125,7 @@ jobs:
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/suanPan-daily/macos/
           rm -f key.pem
   windows-gcc-daily:
-    runs-on: windows-2022
+    runs-on: windows-2025
     needs: check-latest
     if: needs.check-latest.outputs.cache-hit != 'true'
     timeout-minutes: 100

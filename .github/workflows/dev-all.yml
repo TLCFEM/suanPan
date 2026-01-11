@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm]
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         build: [Debug]
         compiler:
           [
@@ -37,11 +37,11 @@ jobs:
             aocl: ON
           - mkl: ON
             aocl: ON
-          - os: ubuntu-22.04-arm
+          - os: ubuntu-24.04-arm
             compiler: { c: icx, cpp: icpx, fortran: ifx }
-          - os: ubuntu-22.04-arm
+          - os: ubuntu-24.04-arm
             aocl: ON
-          - os: ubuntu-22.04-arm
+          - os: ubuntu-24.04-arm
             mkl: ON
     steps:
       - name: Clone
@@ -150,7 +150,7 @@ jobs:
           lcov --remove coverage.info '/usr/*' --output-file coverage.info
           lcov --list coverage.info
       - name: Result
-        if: ${{ matrix.os == 'ubuntu-22.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
+        if: ${{ matrix.os == 'ubuntu-24.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
         uses: actions/upload-artifact@v6
         with:
           name: Results-${{ hashFiles('./build/Results.tar.gz') }}
@@ -169,7 +169,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-24.04]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -295,7 +295,7 @@ jobs:
           path: ${{ env.ARTIFACT }}
   windows-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
-    runs-on: windows-2022
+    runs-on: windows-2025
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -366,7 +366,7 @@ jobs:
           path: ${{ env.ARTIFACT }}
   windows-gcc-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
-    runs-on: windows-2022
+    runs-on: windows-2025
     timeout-minutes: 90
     strategy:
       fail-fast: false

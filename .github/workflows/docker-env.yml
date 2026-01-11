@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   ide-image-base:
-    runs-on: ${{ matrix.arch == 'amd64' && 'self-hosted' || 'ubuntu-22.04-arm' }}
+    runs-on: ${{ matrix.arch == 'amd64' && 'self-hosted' || 'ubuntu-24.04-arm' }}
     timeout-minutes: 3000
     strategy:
       matrix:
