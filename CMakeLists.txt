@@ -21,19 +21,29 @@ if (CMAKE_Fortran_COMPILER)
     enable_language(Fortran)
 endif ()
 
-# run script to add revision tags to source file
-if (WIN32)
-    find_program(POWERSHELL NAMES pwsh powershell)
-    if (POWERSHELL)
-        execute_process(COMMAND "${POWERSHELL}" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.ps1" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-    endif ()
-else ()
-    execute_process(COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/Script/Rev.sh" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-endif ()
-
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
     # make sure changes to revision.h is not logged
     execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+    find_program(GIT_EXE NAMES git)
+    if (GIT_EXE)
+        execute_process(
+                COMMAND git rev-parse --short=8 HEAD
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                OUTPUT_VARIABLE GIT_COMMIT_HASH
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_QUIET
+        )
+        if (GIT_COMMIT_HASH)
+            configure_file(
+                    ${CMAKE_CURRENT_SOURCE_DIR}/Toolbox/revision.h.in
+                    ${CMAKE_CURRENT_SOURCE_DIR}/Toolbox/revision.h
+                    @ONLY
+            )
+            message(STATUS "Revision set to ${GIT_COMMIT_HASH}.")
+        endif ()
+    else ()
+        message(STATUS "Git executable not found.")
+    endif ()
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
