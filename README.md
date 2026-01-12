@@ -289,7 +289,7 @@ It also adds a command alias `suanpan` to `~/.local/bin` and a desktop file to `
 
 Additional libraries used in **suanPan** are listed as follows.
 
-- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.1
+- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.2
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
 - [**Armadillo**](http://arma.sourceforge.net/) version 15.2.3
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
