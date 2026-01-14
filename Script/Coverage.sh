@@ -33,7 +33,7 @@ for file in "${files[@]}"; do
   FILEPATH=$(realpath "$file")
   FILEBASE=$(basename "$FILEPATH")
 
-  cd $(dirname "$FILEPATH") || exit 1
+  cd "$(dirname "$FILEPATH")" || exit 1
 
   exec 3>&1 4>&2
   TIME_OUTPUT=$({ /usr/bin/time -f "%e" "$ROOTDIR/suanPan" -nc -f "$FILEBASE" >>"$ROOTDIR/Results/$FILEBASE"; } 2>&1 1>&3)
