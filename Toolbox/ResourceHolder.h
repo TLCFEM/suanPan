@@ -28,7 +28,7 @@
 
 #include <memory>
 
-template<typename T> requires requires(T* copyable) { copyable->get_copy(); }
+template<typename T> requires requires(T* copyable) { copyable->unique_copy(); }
 class ResourceHolder final {
     std::unique_ptr<T> object = nullptr;
 
@@ -36,7 +36,7 @@ public:
     ResourceHolder() = default;
 
     ResourceHolder(const ResourceHolder& old)
-        : object(old.object ? old.object->get_copy() : nullptr) {}
+        : object(old.object ? old.object->unique_copy() : nullptr) {}
 
     ResourceHolder(ResourceHolder&& old) noexcept { object = std::move(old.object); }
 
@@ -53,7 +53,7 @@ public:
     }
 
     ResourceHolder& operator=(const std::shared_ptr<T>& old) {
-        if(old) object = old->get_copy();
+        if(old) object = old->unique_copy();
         return *this;
     }
 

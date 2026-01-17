@@ -44,7 +44,7 @@ public:
     void set_step_tag(unsigned);
     [[nodiscard]] unsigned get_step_tag() const;
 
-    virtual unique_ptr<Criterion> get_copy() = 0;
+    virtual unique_ptr<Criterion> unique_copy() = 0;
 
     virtual int initialize(const shared_ptr<DomainBase>&);
 

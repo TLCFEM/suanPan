@@ -32,7 +32,7 @@ DC3D4::DC3D4(const unsigned T, uvec&& N, const unsigned M, const double CL, cons
 int DC3D4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    c_material = material_proto->get_copy();
+    c_material = material_proto->unique_copy();
 
     mat ele_coor(c_node, c_node);
     ele_coor.col(0).fill(1.);

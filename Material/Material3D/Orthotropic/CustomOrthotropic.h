@@ -63,7 +63,7 @@ public:
     CustomHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const unsigned K, const double R)
         : CustomOrthotropic(T, OrthotropicType::Hoffman, std::move(E), std::move(V), std::move(S), K, R) {}
 
-    unique_ptr<Material> get_copy() override { return std::make_unique<CustomHoffman>(*this); }
+    unique_ptr<Material> unique_copy() override { return std::make_unique<CustomHoffman>(*this); }
 };
 
 class CustomTsaiWu final : public CustomOrthotropic {
@@ -71,7 +71,7 @@ public:
     CustomTsaiWu(const unsigned T, vec&& E, vec&& V, vec&& S, const unsigned K, const double R)
         : CustomOrthotropic(T, OrthotropicType::TsaiWu, std::move(E), std::move(V), std::move(S), K, R) {}
 
-    unique_ptr<Material> get_copy() override { return std::make_unique<CustomTsaiWu>(*this); }
+    unique_ptr<Material> unique_copy() override { return std::make_unique<CustomTsaiWu>(*this); }
 };
 
 #endif

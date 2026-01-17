@@ -137,7 +137,7 @@ const mat& Material::get_current_couple_stiffness() { return current_couple_stif
 
 const mat& Material::get_initial_couple_stiffness() const { return initial_couple_stiffness; }
 
-unique_ptr<Material> Material::get_copy() { throw std::invalid_argument("hidden method get_copy() called"); }
+unique_ptr<Material> Material::unique_copy() { throw std::invalid_argument("hidden method unique_copy() called"); }
 
 int Material::update_incre_status(const double i_strain) { return update_incre_status(vec{i_strain}); }
 
@@ -368,4 +368,4 @@ void PureWrapper(Material* M) {
     M->trial_couple_stiffness.reset();
 }
 
-unique_ptr<Material> suanpan::make_copy(const shared_ptr<Material>& P) { return nullptr == P ? nullptr : P->get_copy(); }
+unique_ptr<Material> suanpan::unique_copy(const shared_ptr<Material>& P) { return nullptr == P ? nullptr : P->unique_copy(); }

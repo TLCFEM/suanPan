@@ -51,7 +51,7 @@ public:
         : DenseMat<T>(in_size, in_size, (in_size + 1) * in_size / 2)
         , length(2 * in_size - 1) {}
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SymmPackMat>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SymmPackMat>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;

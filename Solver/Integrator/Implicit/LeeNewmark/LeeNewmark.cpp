@@ -56,7 +56,7 @@ void LeeNewmark::update_residual() const {
 void LeeNewmark::initialize_mass(const shared_ptr<DomainBase>&) {
     // assuming mass does not change
     // otherwise swap and assemble
-    current_mass = factory->get_mass()->make_copy();
+    current_mass = factory->get_mass()->unique_copy();
 }
 
 void LeeNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {
@@ -87,9 +87,9 @@ LeeNewmark::LeeNewmark(const unsigned T, vec&& X, vec&& F, const double A, const
 int LeeNewmark::initialize() {
     if(SUANPAN_SUCCESS != LeeNewmarkBase::initialize()) return SUANPAN_FAIL;
 
-    current_mass = factory->get_mass()->make_copy();
-    current_stiffness = factory->get_stiffness()->make_copy();
-    if(factory->is_nlgeom()) current_geometry = factory->get_geometry()->make_copy();
+    current_mass = factory->get_mass()->unique_copy();
+    current_stiffness = factory->get_stiffness()->unique_copy();
+    if(factory->is_nlgeom()) current_geometry = factory->get_geometry()->unique_copy();
 
     return SUANPAN_SUCCESS;
 }

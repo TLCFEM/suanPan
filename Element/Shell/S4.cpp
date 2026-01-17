@@ -32,7 +32,7 @@ S4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const dou
 S4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , s_material(old_obj.s_material == nullptr ? nullptr : old_obj.s_material->get_copy()) {}
+    , s_material(old_obj.s_material == nullptr ? nullptr : old_obj.s_material->unique_copy()) {}
 
 S4::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
@@ -143,7 +143,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
         s_ip.reserve(t_plan.n_rows);
         for(unsigned J = 0; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
-            s_ip.emplace_back(t_eccentricity, .5 * thickness * t_plan(J, 1) * m_plan(I, 2) * det_jacob, mat_proto->get_copy());
+            s_ip.emplace_back(t_eccentricity, .5 * thickness * t_plan(J, 1) * m_plan(I, 2) * det_jacob, mat_proto->unique_copy());
             m_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BM * s_ip.back().factor;
             p_stiffness += m_ip.BP.t() * mat_stiff * m_ip.BP * s_ip.back().factor * t_eccentricity * t_eccentricity;
             mp_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BP * s_ip.back().factor * t_eccentricity;

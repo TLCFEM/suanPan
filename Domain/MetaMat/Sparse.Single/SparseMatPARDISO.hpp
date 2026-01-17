@@ -98,7 +98,7 @@ public:
 
     ~SparseMatBasePARDISO() override { dealloc(); }
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatBasePARDISO>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SparseMatBasePARDISO>(*this); }
 };
 
 template<sp_d T, la_it MT> int SparseMatBasePARDISO<T, MT>::direct_solve(Mat<T>& X, const Mat<T>& B) {

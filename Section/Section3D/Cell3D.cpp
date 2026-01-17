@@ -31,14 +31,14 @@ int Cell3D::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(linear_density) = area * material_proto->get_density();
 
     int_pt.clear();
-    int_pt.emplace_back(0., 0., area, material_proto->get_copy());
+    int_pt.emplace_back(0., 0., area, material_proto->unique_copy());
 
     initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Cell3D::get_copy() { return std::make_unique<Cell3D>(*this); }
+unique_ptr<Section> Cell3D::unique_copy() { return std::make_unique<Cell3D>(*this); }
 
 void Cell3D::print() {
     suanpan_info("A 3D section that represents a small cell.\n");

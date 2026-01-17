@@ -95,7 +95,7 @@ public:
     BandMatSpike& operator=(const BandMatSpike&) = delete;
     BandMatSpike& operator=(BandMatSpike&&) = delete;
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMatSpike>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandMatSpike>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;

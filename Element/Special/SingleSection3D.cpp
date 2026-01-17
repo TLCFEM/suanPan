@@ -24,7 +24,7 @@ SingleSection3D::SingleSection3D(const unsigned T, const unsigned NT, const unsi
     : SectionElement3D(T, s_node, s_dof, uvec{NT}, uvec{ST}, false, {Node::DOF::AXIAL, Node::DOF::RS, Node::DOF::RW}) {}
 
 int SingleSection3D::initialize(const shared_ptr<DomainBase>& D) {
-    s_section = suanpan::make_copy(D->get<Section>(section_tag(0)));
+    s_section = suanpan::unique_copy(D->get<Section>(section_tag(0)));
 
     initial_stiffness = s_section->get_initial_stiffness();
 

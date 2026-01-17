@@ -77,7 +77,7 @@ int CAX8::initialize(const shared_ptr<DomainBase>& D) {
         const mat pn_pxy = solve(jacob, pn);
         const auto gx = dot(vec{1., X, Y, X * X, X * Y, Y * Y, X * X * Y, X * Y * Y}, isoparametric_mapping(ele_coor.col(0)));
 
-        int_pt.emplace_back(std::move(t_vec), 2. * datum::pi * gx * plan(I, 2) * det(jacob), material_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), 2. * datum::pi * gx * plan(I, 2) * det(jacob), material_proto->unique_copy());
 
         auto& c_int_pt = int_pt.back();
 

@@ -39,4 +39,4 @@ BilinearViscosity::BilinearViscosity(const unsigned T, const double C, const dou
     : DataBilinearViscosity{std::fabs(C), std::fabs(S), std::fabs(C) * H}
     , NonlinearViscosity(T, 0., 1.) {}
 
-unique_ptr<Material> BilinearViscosity::get_copy() { return std::make_unique<BilinearViscosity>(*this); }
+unique_ptr<Material> BilinearViscosity::unique_copy() { return std::make_unique<BilinearViscosity>(*this); }

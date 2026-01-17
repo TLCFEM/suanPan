@@ -119,7 +119,7 @@ void LeeNewmarkIterative::formulate_block(sword& current_pos, const std::vector<
 
 vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double stiffness_coef, int order) const {
     const auto ini_order = order;
-    const auto kernel = current_mass->make_copy();
+    const auto kernel = current_mass->unique_copy();
     kernel += stiffness_coef / mass_coef * current_stiffness;
     auto damping_force = factory->get_trial_velocity();
 
@@ -378,8 +378,8 @@ void LeeNewmarkIterative::assemble_matrix() {
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
-    current_mass = W->get_mass()->make_copy();
-    current_stiffness = W->get_stiffness()->make_copy();
+    current_mass = W->get_mass()->unique_copy();
+    current_stiffness = W->get_stiffness()->unique_copy();
 }
 
 void LeeNewmarkIterative::assemble_effective_matrix() {

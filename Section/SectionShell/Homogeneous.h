@@ -54,7 +54,7 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<SectionShell> get_copy() override;
+    unique_ptr<SectionShell> unique_copy() override;
 
     int update_trial_status(const vec&, const vec&) override;
 

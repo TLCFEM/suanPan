@@ -48,7 +48,7 @@ protected:
 public:
     using SparseMat<T>::SparseMat;
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatBaseClusterPARDISO>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SparseMatBaseClusterPARDISO>(*this); }
 };
 
 #pragma GCC diagnostic push

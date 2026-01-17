@@ -128,7 +128,7 @@ int YLD0418P::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> YLD0418P::get_copy() { return std::make_unique<YLD0418P>(*this); }
+unique_ptr<Material> YLD0418P::unique_copy() { return std::make_unique<YLD0418P>(*this); }
 
 int YLD0418P::update_trial_status(const vec& t_strain) {
     if(tensor::strain::norm(incre_strain = (trial_strain = t_strain) - current_strain) <= datum::eps) return SUANPAN_SUCCESS;

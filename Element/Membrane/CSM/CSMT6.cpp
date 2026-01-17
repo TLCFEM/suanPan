@@ -72,7 +72,7 @@ int CSMT6::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec = ele_coor(span(0, 2), span(1, 2)).t() * vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const rowvec n = shape::triangle(t_vec, 0) * inv_coor;
         const mat pnpxy = shape::triangle(t_vec, 1) * inv_coor;
-        int_pt.emplace_back(std::move(t_vec), area * plan(I, 3) * thickness, material_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), area * plan(I, 3) * thickness, material_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
 

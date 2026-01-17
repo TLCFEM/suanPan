@@ -105,6 +105,6 @@ int SectionShell::update_trial_status(const vec& m_strain, const vec& p_strain, 
 
 std::vector<vec> SectionShell::record(OutputType) { return {}; }
 
-unique_ptr<SectionShell> suanpan::make_copy(const shared_ptr<SectionShell>& S) { return S->get_copy(); }
+unique_ptr<SectionShell> suanpan::unique_copy(const shared_ptr<SectionShell>& S) { return S->unique_copy(); }
 
-unique_ptr<SectionShell> suanpan::make_copy(const unique_ptr<SectionShell>& S) { return S->get_copy(); }
+unique_ptr<SectionShell> suanpan::unique_copy(const unique_ptr<SectionShell>& S) { return S->unique_copy(); }

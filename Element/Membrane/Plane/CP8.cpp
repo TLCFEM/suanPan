@@ -62,7 +62,7 @@ int CP8::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->get_copy(), solve(jacob, pn));
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->unique_copy(), solve(jacob, pn));
 
         const auto& c_pt = int_pt.back();
         initial_stiffness += c_pt.weight * thickness * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;

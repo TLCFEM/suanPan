@@ -38,7 +38,7 @@ int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> VAFCRP::get_copy() { return std::make_unique<VAFCRP>(*this); }
+unique_ptr<Material> VAFCRP::unique_copy() { return std::make_unique<VAFCRP>(*this); }
 
 double VAFCRP::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 

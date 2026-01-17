@@ -32,7 +32,7 @@ int NMB31::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    b_trans = D->get_orientation(orientation_tag)->get_copy();
+    b_trans = D->get_orientation(orientation_tag)->unique_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
@@ -47,7 +47,7 @@ int NMB31::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(length) = b_trans->get_length();
 
-    b_section = D->get<Section>(section_tag(0))->get_copy();
+    b_section = D->get<Section>(section_tag(0))->unique_copy();
 
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(b_section->get_initial_stiffness() / length);
 

@@ -28,7 +28,7 @@ void Combine::initialize(const shared_ptr<DomainBase>& D) {
         if(D->find<Amplitude>(I)) amp_pool.emplace_back(D->initialized_amplitude_copy(I));
 }
 
-unique_ptr<Amplitude> Combine::get_copy() { return std::make_unique<Combine>(*this); }
+unique_ptr<Amplitude> Combine::unique_copy() { return std::make_unique<Combine>(*this); }
 
 double Combine::get_amplitude(const double T) {
     auto A = 1.;

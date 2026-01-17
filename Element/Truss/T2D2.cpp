@@ -35,7 +35,7 @@ int T2D2::initialize(const shared_ptr<DomainBase>& D) {
 
     if(rigidity > 0.) access::rw(euler) = -pow(datum::pi / length, 2.) * rigidity;
 
-    t_material = D->get<Material>(material_tag(0))->get_copy();
+    t_material = D->get<Material>(material_tag(0))->unique_copy();
 
     trial_stiffness = current_stiffness = initial_stiffness = t_trans->to_global_stiffness_mat(area / length * t_material->get_initial_stiffness());
 

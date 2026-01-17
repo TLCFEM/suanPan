@@ -92,7 +92,7 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Rotation3D::get_copy() { return std::make_unique<Rotation3D>(*this); }
+unique_ptr<Material> Rotation3D::unique_copy() { return std::make_unique<Rotation3D>(*this); }
 
 double Rotation3D::get(const Parameter P) const { return mat_obj->get(P); }
 

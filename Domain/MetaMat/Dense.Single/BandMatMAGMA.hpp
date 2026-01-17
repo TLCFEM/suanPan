@@ -64,7 +64,7 @@ public:
 
     ~BandMatMAGMA() override { magma_queue_destroy(queue); }
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMatMAGMA>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandMatMAGMA>(*this); }
 };
 
 template<sp_d T> int BandMatMAGMA<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {

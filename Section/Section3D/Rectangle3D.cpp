@@ -38,14 +38,14 @@ int Rectangle3D::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(static_cast<size_t>(int_pt_num) * static_cast<size_t>(int_pt_num));
     for(unsigned I = 0; I < int_pt_num; ++I)
-        for(unsigned J = 0; J < int_pt_num; ++J) int_pt.emplace_back(.5 * height * plan_y(I, 0), .5 * width * plan_z(J, 0), .25 * plan_y(I, 1) * plan_z(J, 1) * area, material_proto->get_copy());
+        for(unsigned J = 0; J < int_pt_num; ++J) int_pt.emplace_back(.5 * height * plan_y(I, 0), .5 * width * plan_z(J, 0), .25 * plan_y(I, 1) * plan_z(J, 1) * area, material_proto->unique_copy());
 
     initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Rectangle3D::get_copy() { return std::make_unique<Rectangle3D>(*this); }
+unique_ptr<Section> Rectangle3D::unique_copy() { return std::make_unique<Rectangle3D>(*this); }
 
 void Rectangle3D::print() {
     suanpan_info("A 3D rectangular section.\n");

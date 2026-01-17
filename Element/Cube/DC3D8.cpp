@@ -61,7 +61,7 @@ int DC3D8::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const auto pn = shape::cube(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->get_copy(), shape::cube(t_vec, 0), solve(jacob, pn));
+        int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), shape::cube(t_vec, 0), solve(jacob, pn));
 
         const auto& c_pt = int_pt.back();
         initial_stiffness(u_dof, u_dof) += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;

@@ -51,7 +51,7 @@ public:
         unsigned  // max iteration
     );
 
-    unique_ptr<Material> get_copy() override;
+    unique_ptr<Material> unique_copy() override;
 };
 
 class OS146S final : public Material {
@@ -72,7 +72,7 @@ public:
 
     [[nodiscard]] double get(Parameter) const override;
 
-    unique_ptr<Material> get_copy() override;
+    unique_ptr<Material> unique_copy() override;
 
     int update_trial_status(const vec&) override;
 

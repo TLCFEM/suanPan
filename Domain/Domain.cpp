@@ -751,7 +751,7 @@ const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver
 unique_ptr<Amplitude> Domain::initialized_amplitude_copy(const uword T) {
     if(!find<Amplitude>(T)) return nullptr;
 
-    auto copy = get<Amplitude>(T)->get_copy();
+    auto copy = get<Amplitude>(T)->unique_copy();
 
     if(!copy->is_initialized()) {
         copy->initialize(shared_from_this());
@@ -764,7 +764,7 @@ unique_ptr<Amplitude> Domain::initialized_amplitude_copy(const uword T) {
 unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
     if(!find<Material>(T)) return nullptr;
 
-    auto copy = get<Material>(T)->get_copy();
+    auto copy = get<Material>(T)->unique_copy();
 
     if(copy->is_initialized()) return copy;
 
@@ -778,7 +778,7 @@ unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
 unique_ptr<Section> Domain::initialized_section_copy(const uword T) {
     if(!find<Section>(T)) return nullptr;
 
-    auto copy = get<Section>(T)->get_copy();
+    auto copy = get<Section>(T)->unique_copy();
 
     if(copy->is_initialized()) return copy;
 

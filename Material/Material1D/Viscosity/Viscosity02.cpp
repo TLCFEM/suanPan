@@ -31,4 +31,4 @@ Viscosity02::Viscosity02(const unsigned T, const double A, const double CA, cons
     : DataViscosity02{.25 * (std::fabs(CA) + std::fabs(CB) + std::fabs(CC) + std::fabs(CD)), .5 / datum::pi * (std::fabs(CA) - std::fabs(CB) - std::fabs(CC) + std::fabs(CD)), .5 / datum::pi * (std::fabs(CA) + std::fabs(CB) - std::fabs(CC) - std::fabs(CD)), (std::fabs(CA) - std::fabs(CB) + std::fabs(CC) - std::fabs(CD)) / datum::pi / datum::pi, std::fabs(GA), std::fabs(GB)}
     , NonlinearViscosity(T, std::fabs(A), std::fabs(L)) {}
 
-unique_ptr<Material> Viscosity02::get_copy() { return std::make_unique<Viscosity02>(*this); }
+unique_ptr<Material> Viscosity02::unique_copy() { return std::make_unique<Viscosity02>(*this); }

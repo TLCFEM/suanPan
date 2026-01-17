@@ -47,7 +47,7 @@ public:
         double      // maximum history
     );
 
-    unique_ptr<Criterion> get_copy() override;
+    unique_ptr<Criterion> unique_copy() override;
 
     int process(const shared_ptr<DomainBase>&) override;
 };

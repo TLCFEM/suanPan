@@ -129,7 +129,7 @@ int Balloon1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Balloon1D::get_copy() { return std::make_unique<Balloon1D>(*this); }
+unique_ptr<Material> Balloon1D::unique_copy() { return std::make_unique<Balloon1D>(*this); }
 
 int Balloon1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

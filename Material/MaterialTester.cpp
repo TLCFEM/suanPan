@@ -306,7 +306,7 @@ int test_material(const shared_ptr<DomainBase>& domain, std::istringstream& comm
 
     if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
 
-    const auto material = domain->get_material(material_tag)->get_copy();
+    const auto material = domain->get_material(material_tag)->unique_copy();
 
     if(!initialise_material(domain, material, size)) return SUANPAN_SUCCESS;
 
@@ -342,7 +342,7 @@ int test_material_with_base3d(const shared_ptr<DomainBase>& domain, std::istring
 
     if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
 
-    const auto material = domain->get_material(material_tag)->get_copy();
+    const auto material = domain->get_material(material_tag)->unique_copy();
 
     if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
 
@@ -370,7 +370,7 @@ int test_material_by_load(const shared_ptr<DomainBase>& domain, std::istringstre
 
     if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
 
-    const auto material = domain->get_material(material_tag)->get_copy();
+    const auto material = domain->get_material(material_tag)->unique_copy();
 
     if(!initialise_material(domain, material, size)) return SUANPAN_SUCCESS;
 
@@ -406,7 +406,7 @@ int test_material_by_load_with_base3d(const shared_ptr<DomainBase>& domain, std:
 
     if(!domain->find_material(material_tag)) return SUANPAN_SUCCESS;
 
-    const auto material = domain->get_material(material_tag)->get_copy();
+    const auto material = domain->get_material(material_tag)->unique_copy();
 
     if(!initialise_material(domain, material, incre.n_elem)) return SUANPAN_SUCCESS;
 
@@ -431,7 +431,7 @@ int test_material_by_strain_history(const shared_ptr<DomainBase>& domain, std::i
     mat strain_history;
     if(!strain_history.load(history_file, raw_ascii) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
 
-    const auto material = domain->get_material(material_tag)->get_copy();
+    const auto material = domain->get_material(material_tag)->unique_copy();
 
     if(!initialise_material(domain, material, strain_history.n_cols)) return SUANPAN_SUCCESS;
 
@@ -456,7 +456,7 @@ int test_material_by_stress_history(const shared_ptr<DomainBase>& domain, std::i
     mat stress_history;
     if(!stress_history.load(history_file, raw_ascii) || !domain->find_material(material_tag)) return SUANPAN_SUCCESS;
 
-    const auto material = domain->get_material(material_tag)->get_copy();
+    const auto material = domain->get_material(material_tag)->unique_copy();
 
     if(!initialise_material(domain, material, stress_history.n_cols)) return SUANPAN_SUCCESS;
 

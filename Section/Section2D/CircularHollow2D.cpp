@@ -45,8 +45,8 @@ int CircularHollow2D::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(2llu * int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(cos(.5 * plan(I, 0) * datum::pi) * m_radius, .25 * plan(I, 1) * area, material_proto->get_copy());
-        int_pt.emplace_back(-cos(.5 * plan(I, 0) * datum::pi) * m_radius, .25 * plan(I, 1) * area, material_proto->get_copy());
+        int_pt.emplace_back(cos(.5 * plan(I, 0) * datum::pi) * m_radius, .25 * plan(I, 1) * area, material_proto->unique_copy());
+        int_pt.emplace_back(-cos(.5 * plan(I, 0) * datum::pi) * m_radius, .25 * plan(I, 1) * area, material_proto->unique_copy());
     }
 
     initialize_stiffness();
@@ -54,7 +54,7 @@ int CircularHollow2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> CircularHollow2D::get_copy() { return std::make_unique<CircularHollow2D>(*this); }
+unique_ptr<Section> CircularHollow2D::unique_copy() { return std::make_unique<CircularHollow2D>(*this); }
 
 void CircularHollow2D::print() {
     suanpan_info("A 2D circular hollow section.\n");

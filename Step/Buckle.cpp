@@ -76,7 +76,7 @@ int Buckle::analyze() {
 
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
-    const shared_ptr t_geometry = W->get_geometry()->make_copy();
+    const shared_ptr t_geometry = W->get_geometry()->unique_copy();
     t_geometry *= -1.;
 
     if(eig_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_geometry, 1, "SM") != SUANPAN_SUCCESS) return SUANPAN_FAIL;

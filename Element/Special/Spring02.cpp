@@ -27,7 +27,7 @@ Spring02::Spring02(const unsigned T, uvec&& NT, const unsigned MT)
     : MaterialElement1D(T, s_node, s_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2}) {}
 
 int Spring02::initialize(const shared_ptr<DomainBase>& D) {
-    s_material = suanpan::make_copy(D->get<Material>(material_tag(0)));
+    s_material = suanpan::unique_copy(D->get<Material>(material_tag(0)));
 
     const auto t_coord = get_coordinate(2);
 

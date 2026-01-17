@@ -53,7 +53,7 @@ public:
         , band(in_bandwidth)
         , m_rows(in_bandwidth + 1) {}
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandSymmMat>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandSymmMat>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;

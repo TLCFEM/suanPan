@@ -152,7 +152,7 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
-    m_material = material_proto->get_copy();
+    m_material = material_proto->unique_copy();
 
     mat ele_coor(m_node, m_node);
     ele_coor.col(0).fill(1.);

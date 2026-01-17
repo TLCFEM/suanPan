@@ -30,7 +30,7 @@
 AbsIncreDisp::AbsIncreDisp(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> AbsIncreDisp::get_copy() { return std::make_unique<AbsIncreDisp>(*this); }
+unique_ptr<Converger> AbsIncreDisp::unique_copy() { return std::make_unique<AbsIncreDisp>(*this); }
 
 /**
  * \brief Method to return `conv_flag`.

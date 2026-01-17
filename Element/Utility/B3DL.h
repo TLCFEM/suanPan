@@ -53,7 +53,7 @@ public:
 
     [[nodiscard]] Type type() const override;
 
-    unique_ptr<Orientation> get_copy() override;
+    unique_ptr<Orientation> unique_copy() override;
 
     [[nodiscard]] vec to_local_vec(const vec&) const override;
     [[nodiscard]] vec to_global_vec(const vec&) const override;

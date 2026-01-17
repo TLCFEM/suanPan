@@ -36,7 +36,7 @@ class FixedNumber final : public Converger {
 public:
     explicit FixedNumber(unsigned = 0, unsigned = 7, bool = false);
 
-    unique_ptr<Converger> get_copy() override;
+    unique_ptr<Converger> unique_copy() override;
 
     bool is_converged(unsigned) override;
 };

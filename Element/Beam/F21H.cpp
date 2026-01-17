@@ -73,7 +73,7 @@ int F21H::initialize(const shared_ptr<DomainBase>& D) {
             coor = plan(I - 1, 0) * elastic_length;
             weight = .5 * plan(I - 1, 1) * elastic_length;
         }
-        elastic_int_pt.emplace_back(coor, weight, section_proto->get_copy());
+        elastic_int_pt.emplace_back(coor, weight, section_proto->unique_copy());
         elastic_local_flexibility += elastic_int_pt[I].B.t() * elastic_section_flexibility * elastic_int_pt[I].B * weight * length;
     }
 
@@ -81,8 +81,8 @@ int F21H::initialize(const shared_ptr<DomainBase>& D) {
     initial_local_flexibility = elastic_local_flexibility;
     int_pt.clear();
     int_pt.reserve(2);
-    int_pt.emplace_back(-1., hinge_length, section_proto->get_copy());
-    int_pt.emplace_back(1., hinge_length, section_proto->get_copy());
+    int_pt.emplace_back(-1., hinge_length, section_proto->unique_copy());
+    int_pt.emplace_back(1., hinge_length, section_proto->unique_copy());
     for(auto& I : int_pt) initial_local_flexibility += I.B.t() * elastic_section_flexibility * I.B * I.weight * length;
 
     trial_local_flexibility = current_local_flexibility = initial_local_flexibility;

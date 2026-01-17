@@ -195,7 +195,7 @@ public:
 
     [[nodiscard]] virtual const mat& get_initial_couple_stiffness() const;
 
-    virtual unique_ptr<Material> get_copy() = 0;
+    virtual unique_ptr<Material> unique_copy() = 0;
 
     int update_incre_status(double);
     int update_incre_status(double, double);
@@ -264,7 +264,7 @@ protected:
 };
 
 namespace suanpan {
-    unique_ptr<Material> make_copy(const shared_ptr<Material>&);
+    unique_ptr<Material> unique_copy(const shared_ptr<Material>&);
 } // namespace suanpan
 
 #endif

@@ -35,7 +35,7 @@ class RelIncreAcc final : public Converger {
 public:
     explicit RelIncreAcc(unsigned = 0, double = 1E-8, unsigned = 7, bool = false);
 
-    unique_ptr<Converger> get_copy() override;
+    unique_ptr<Converger> unique_copy() override;
 
     bool is_converged(unsigned) override;
 };

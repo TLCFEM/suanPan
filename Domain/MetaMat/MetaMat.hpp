@@ -137,7 +137,7 @@ public:
     [[nodiscard]] virtual bool is_empty() const = 0;
     virtual void zeros() = 0;
 
-    virtual unique_ptr<MetaMat> make_copy() = 0;
+    virtual unique_ptr<MetaMat> unique_copy() = 0;
 
     void unify(const uword K) {
         this->nullify(K);

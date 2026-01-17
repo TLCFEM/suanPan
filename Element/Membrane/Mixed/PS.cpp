@@ -75,7 +75,7 @@ int PS::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), thickness * plan(I, 2) * det(jacob), material_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), thickness * plan(I, 2) * det(jacob), material_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
 

@@ -49,14 +49,14 @@ int B21H::initialize(const shared_ptr<DomainBase>& D) {
     const IntegrationPlan elastic_plan(1, 2, IntegrationPlan::Type::GAUSS);
     elastic_int_pt.clear();
     elastic_int_pt.reserve(elastic_plan.n_rows);
-    for(unsigned I = 0; I < elastic_plan.n_rows; ++I) elastic_int_pt.emplace_back(elastic_plan(I, 0) * elastic_length, elastic_plan(I, 1) * elastic_length / 2., section_proto->get_copy());
+    for(unsigned I = 0; I < elastic_plan.n_rows; ++I) elastic_int_pt.emplace_back(elastic_plan(I, 0) * elastic_length, elastic_plan(I, 1) * elastic_length / 2., section_proto->unique_copy());
 
     int_pt.clear();
     int_pt.reserve(4);
-    int_pt.emplace_back(-1., .25 * hinge_length, section_proto->get_copy());
-    int_pt.emplace_back(4. / 3. * hinge_length - 1., .75 * hinge_length, section_proto->get_copy());
-    int_pt.emplace_back(1. - 4. / 3. * hinge_length, .75 * hinge_length, section_proto->get_copy());
-    int_pt.emplace_back(1., .25 * hinge_length, section_proto->get_copy());
+    int_pt.emplace_back(-1., .25 * hinge_length, section_proto->unique_copy());
+    int_pt.emplace_back(4. / 3. * hinge_length - 1., .75 * hinge_length, section_proto->unique_copy());
+    int_pt.emplace_back(1. - 4. / 3. * hinge_length, .75 * hinge_length, section_proto->unique_copy());
+    int_pt.emplace_back(1., .25 * hinge_length, section_proto->unique_copy());
 
     const auto& elastic_section_stiffness = section_proto->get_initial_stiffness();
     // elastic part will be reused in computation

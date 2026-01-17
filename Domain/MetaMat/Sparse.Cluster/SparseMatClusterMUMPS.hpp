@@ -48,7 +48,7 @@ protected:
 public:
     using SparseMat<T>::SparseMat;
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatBaseClusterMUMPS>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SparseMatBaseClusterMUMPS>(*this); }
 
     [[nodiscard]] int sign_det() const override { return solver.sign_det(); }
 };

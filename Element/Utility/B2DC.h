@@ -41,7 +41,7 @@ public:
 
     [[nodiscard]] bool is_nlgeom() const override;
 
-    unique_ptr<Orientation> get_copy() override;
+    unique_ptr<Orientation> unique_copy() override;
 
     [[nodiscard]] vec to_local_vec(const vec&) const override;
     [[nodiscard]] mat to_global_geometry_mat(const mat&) const override;

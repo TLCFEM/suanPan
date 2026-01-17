@@ -32,7 +32,7 @@ int Substepping::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    trial_mat_obj = current_mat_obj->get_copy();
+    trial_mat_obj = current_mat_obj->unique_copy();
 
     PureWrapper(this);
 
@@ -42,7 +42,7 @@ int Substepping::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Substepping::get_copy() { return std::make_unique<Substepping>(*this); }
+unique_ptr<Material> Substepping::unique_copy() { return std::make_unique<Substepping>(*this); }
 
 double Substepping::get(const Parameter P) const { return current_mat_obj->get(P); }
 
@@ -92,7 +92,7 @@ int Substepping::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
-    trial_mat_obj = current_mat_obj->get_copy();
+    trial_mat_obj = current_mat_obj->unique_copy();
 
     auto accumulated_factor = 0., incre_factor = 1.;
 
@@ -125,19 +125,19 @@ int Substepping::update_trial_status(const vec& t_strain) {
 int Substepping::clear_status() {
     current_mat_obj->clear_status();
 
-    trial_mat_obj = current_mat_obj->get_copy();
+    trial_mat_obj = current_mat_obj->unique_copy();
 
     return SUANPAN_SUCCESS;
 }
 
 int Substepping::commit_status() {
-    current_mat_obj = trial_mat_obj->get_copy();
+    current_mat_obj = trial_mat_obj->unique_copy();
 
     return SUANPAN_SUCCESS;
 }
 
 int Substepping::reset_status() {
-    trial_mat_obj = current_mat_obj->get_copy();
+    trial_mat_obj = current_mat_obj->unique_copy();
 
     return SUANPAN_SUCCESS;
 }

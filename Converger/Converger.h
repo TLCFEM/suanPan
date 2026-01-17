@@ -64,7 +64,7 @@ public:
 
     virtual int initialize();
 
-    virtual unique_ptr<Converger> get_copy() = 0;
+    virtual unique_ptr<Converger> unique_copy() = 0;
 
     void set_tolerance(double);
     [[nodiscard]] double get_tolerance() const;

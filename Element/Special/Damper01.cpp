@@ -27,7 +27,7 @@ Damper01::Damper01(const unsigned T, uvec&& NT, const unsigned D, const unsigned
     , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3}) { modify_viscous = false; }
 
 int Damper01::initialize(const shared_ptr<DomainBase>& D) {
-    damper = D->get<Material>(material_tag(0))->get_copy();
+    damper = D->get<Material>(material_tag(0))->unique_copy();
 
     const mat coord = get_coordinate(d_dof);
 

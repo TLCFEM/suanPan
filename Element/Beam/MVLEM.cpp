@@ -61,11 +61,11 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto& total_fibre_num = axial_spring.size();
     for(size_t I = 0; I < total_fibre_num; ++I) {
-        axial_spring[I].c_material = suanpan::make_copy(D->get<Material>(material_tag(I)));
-        axial_spring[I].s_material = suanpan::make_copy(D->get<Material>(material_tag(I + total_fibre_num)));
+        axial_spring[I].c_material = suanpan::unique_copy(D->get<Material>(material_tag(I)));
+        axial_spring[I].s_material = suanpan::unique_copy(D->get<Material>(material_tag(I + total_fibre_num)));
     }
 
-    shear_spring = suanpan::make_copy(D->get<Material>(shear_spring_tag));
+    shear_spring = suanpan::unique_copy(D->get<Material>(shear_spring_tag));
     if(MaterialType::D1 != shear_spring->get_material_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;

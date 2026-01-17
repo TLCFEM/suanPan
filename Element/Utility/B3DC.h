@@ -83,7 +83,7 @@ public:
 
     [[nodiscard]] bool is_nlgeom() const override;
 
-    unique_ptr<Orientation> get_copy() override;
+    unique_ptr<Orientation> unique_copy() override;
 
     void commit_status() override;
     void reset_status() override;

@@ -312,7 +312,7 @@ ConcreteCM::ConcreteCM(const unsigned T, const double E, const double SC, const 
     , t_n(std::max(perturb(1.), NTT))
     , linear_trans(LT) {}
 
-unique_ptr<Material> ConcreteCM::get_copy() { return std::make_unique<ConcreteCM>(*this); }
+unique_ptr<Material> ConcreteCM::unique_copy() { return std::make_unique<ConcreteCM>(*this); }
 
 double ConcreteCM::get(const Parameter P) const {
     if(Parameter::ELASTIC == P) return elastic_modulus;

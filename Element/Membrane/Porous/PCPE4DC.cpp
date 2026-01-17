@@ -93,7 +93,7 @@ int PCPE4DC::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const mat pn_pxy = solve(jacob, pn);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->get_copy());
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->unique_copy());
 
         auto& c_pt = int_pt.back();
 

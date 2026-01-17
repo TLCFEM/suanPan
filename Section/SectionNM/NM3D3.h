@@ -57,7 +57,7 @@ public:
         mat&& = {}
     );
 
-    unique_ptr<Section> get_copy() override;
+    unique_ptr<Section> unique_copy() override;
 };
 
 #endif

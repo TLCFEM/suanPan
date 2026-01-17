@@ -332,7 +332,7 @@ public:
         magma_finalize();
     }
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatMAGMA>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SparseMatMAGMA>(*this); }
 };
 
 template<sp_d T> SparseMatMAGMA<T>::SparseMatMAGMA(const SparseMatMAGMA& other)

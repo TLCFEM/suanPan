@@ -31,7 +31,7 @@ DKT4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const d
 DKT4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , p_material(old_obj.p_material->get_copy()) {}
+    , p_material(old_obj.p_material->unique_copy()) {}
 
 DKT4::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
@@ -143,7 +143,7 @@ int DKT4::initialize(const shared_ptr<DomainBase>& D) {
         c_ip.reserve(num_section_ip);
         for(unsigned J = 0; J < num_section_ip; ++J) {
             const auto t_eccentricity = .5 * sec_plan(J, 0) * thickness;
-            c_ip.emplace_back(t_eccentricity, t_weight * sec_plan(J, 1), mat_proto->get_copy());
+            c_ip.emplace_back(t_eccentricity, t_weight * sec_plan(J, 1), mat_proto->unique_copy());
             initial_stiffness += t_eccentricity * t_eccentricity * c_ip.back().factor * strain_mat.t() * ini_stiffness * strain_mat;
         }
     }

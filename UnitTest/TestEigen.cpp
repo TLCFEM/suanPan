@@ -29,12 +29,12 @@ TEST_CASE("Eigensolver", "[Utility.Eigen]") {
         vec eigval;
         mat eigvec;
 
-        REQUIRE(eig_solve(eigval, eigvec, KK, MM->make_copy(), Q, "SM") == 0);
+        REQUIRE(eig_solve(eigval, eigvec, KK, MM->unique_copy(), Q, "SM") == 0);
 
         for(auto I = 0; I < Q; ++I)
             REQUIRE(Approx(eigval(I)) == .5 * I + .5);
 
-        REQUIRE(eig_solve(eigval, eigvec, KK, MM->make_copy(), Q, "LM") == 0);
+        REQUIRE(eig_solve(eigval, eigvec, KK, MM->unique_copy(), Q, "LM") == 0);
 
         for(auto I = 0; I < Q; ++I)
             REQUIRE(Approx(eigval(Q - 1 - I)) == .5 * (N - I));
@@ -42,7 +42,7 @@ TEST_CASE("Eigensolver", "[Utility.Eigen]") {
         cx_vec cx_eigval;
         cx_mat cx_eigvec;
 
-        REQUIRE(eig_solve(cx_eigval, cx_eigvec, KK->make_copy(), MM->make_copy(), Q, "LM") == 0);
+        REQUIRE(eig_solve(cx_eigval, cx_eigvec, KK->unique_copy(), MM->unique_copy(), Q, "LM") == 0);
 
         for(auto I = 0; I < Q; ++I)
             REQUIRE(Approx(cx_eigval(I).real()) == .5 * I + .5);

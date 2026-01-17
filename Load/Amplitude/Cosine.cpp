@@ -22,7 +22,7 @@ Cosine::Cosine(const unsigned T, const double L, std::vector<double>&& AA)
     , period(.5 * L)
     , amp(std::move(AA)) {}
 
-unique_ptr<Amplitude> Cosine::get_copy() { return std::make_unique<Cosine>(*this); }
+unique_ptr<Amplitude> Cosine::unique_copy() { return std::make_unique<Cosine>(*this); }
 
 double Cosine::get_amplitude(const double T) {
     const auto step_time = T - start_time;

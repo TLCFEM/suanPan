@@ -51,7 +51,7 @@ public:
     ExpHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const double A, const double B, const double R)
         : ExpOrthotropic(T, OrthotropicType::Hoffman, std::move(E), std::move(V), std::move(S), A, B, R) {}
 
-    unique_ptr<Material> get_copy() override { return std::make_unique<ExpHoffman>(*this); }
+    unique_ptr<Material> unique_copy() override { return std::make_unique<ExpHoffman>(*this); }
 };
 
 class ExpTsaiWu final : public ExpOrthotropic {
@@ -59,7 +59,7 @@ public:
     ExpTsaiWu(const unsigned T, vec&& E, vec&& V, vec&& S, const double A, const double B, const double R)
         : ExpOrthotropic(T, OrthotropicType::TsaiWu, std::move(E), std::move(V), std::move(S), A, B, R) {}
 
-    unique_ptr<Material> get_copy() override { return std::make_unique<ExpTsaiWu>(*this); }
+    unique_ptr<Material> unique_copy() override { return std::make_unique<ExpTsaiWu>(*this); }
 };
 
 #endif

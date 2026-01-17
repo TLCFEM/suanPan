@@ -38,7 +38,7 @@ int Circle3D::initialize(const shared_ptr<DomainBase>& D) {
     for(unsigned I = 0; I < plan.n_rows; ++I) {
         const auto t_angle = (plan(I, 0) + 1.) * datum::pi;
         const auto t_radius = .5 * radius * (plan(I, 1) + 1.);
-        int_pt.emplace_back(cos(t_angle) * t_radius, sin(t_angle) * t_radius, .5 * plan(I, 2) * t_radius * area, material_proto->get_copy());
+        int_pt.emplace_back(cos(t_angle) * t_radius, sin(t_angle) * t_radius, .5 * plan(I, 2) * t_radius * area, material_proto->unique_copy());
     }
 
     initialize_stiffness();
@@ -46,7 +46,7 @@ int Circle3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Circle3D::get_copy() { return std::make_unique<Circle3D>(*this); }
+unique_ptr<Section> Circle3D::unique_copy() { return std::make_unique<Circle3D>(*this); }
 
 void Circle3D::print() {
     suanpan_info("A 3D circular section.\n");

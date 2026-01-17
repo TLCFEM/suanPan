@@ -74,7 +74,7 @@ public:
     [[nodiscard]] double get_inclination() const;
     [[nodiscard]] const mat& get_transformation() const;
 
-    virtual unique_ptr<Orientation> get_copy() = 0;
+    virtual unique_ptr<Orientation> unique_copy() = 0;
 
     virtual void update_status();
     virtual void commit_status();

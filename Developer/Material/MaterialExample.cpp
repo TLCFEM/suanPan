@@ -115,7 +115,7 @@ int MaterialExample::initialize(const shared_ptr<DomainBase>&) {
 }
 
 /**
- * \brief The `get_copy()` method should always be implemented with `std::make_unique`.
+ * \brief The `unique_copy()` method should always be implemented with `std::make_unique`.
  * In case the model defines other memory management, developers may need to further
  * provide a copy ctor to make `std::make_unique` work.
  *
@@ -123,7 +123,7 @@ int MaterialExample::initialize(const shared_ptr<DomainBase>&) {
  *
  * \return a copy of material model
  */
-unique_ptr<Material> MaterialExample::get_copy() { return std::make_unique<MaterialExample>(*this); }
+unique_ptr<Material> MaterialExample::unique_copy() { return std::make_unique<MaterialExample>(*this); }
 
 /**
  * \brief There are two states we are managing at any time point.

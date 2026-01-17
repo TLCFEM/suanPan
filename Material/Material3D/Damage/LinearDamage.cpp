@@ -68,4 +68,4 @@ void LinearDamage::compute_damage() {
     }
 }
 
-unique_ptr<Material> LinearDamage::get_copy() { return std::make_unique<LinearDamage>(*this); }
+unique_ptr<Material> LinearDamage::unique_copy() { return std::make_unique<LinearDamage>(*this); }

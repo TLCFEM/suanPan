@@ -47,7 +47,7 @@ public:
         double = 1E-5  // tolerance
     );
 
-    unique_ptr<Criterion> get_copy() override;
+    unique_ptr<Criterion> unique_copy() override;
 };
 
 #endif

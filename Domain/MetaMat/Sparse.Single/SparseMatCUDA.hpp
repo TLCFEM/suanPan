@@ -91,7 +91,7 @@ public:
 
     ~SparseMatCUDA() override { release(); }
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatCUDA>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SparseMatCUDA>(*this); }
 };
 
 template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {

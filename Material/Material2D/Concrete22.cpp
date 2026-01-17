@@ -43,7 +43,7 @@ int Concrete22::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Concrete22::get_copy() { return std::make_unique<Concrete22>(*this); }
+unique_ptr<Material> Concrete22::unique_copy() { return std::make_unique<Concrete22>(*this); }
 
 double Concrete22::get(const Parameter P) const { return concrete_major.get(P); }
 

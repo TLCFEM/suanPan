@@ -148,4 +148,4 @@ std::vector<vec> Section::record(const OutputType P) const {
     return {};
 }
 
-unique_ptr<Section> suanpan::make_copy(const shared_ptr<Section>& S) { return S->get_copy(); }
+unique_ptr<Section> suanpan::unique_copy(const shared_ptr<Section>& S) { return S->unique_copy(); }

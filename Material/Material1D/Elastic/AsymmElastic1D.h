@@ -45,7 +45,7 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Material> get_copy() override;
+    unique_ptr<Material> unique_copy() override;
 
     int update_trial_status(const vec&) override;
 

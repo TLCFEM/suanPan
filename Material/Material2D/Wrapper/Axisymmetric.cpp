@@ -42,7 +42,7 @@ int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
 
 double Axisymmetric::get(const Parameter P) const { return base->get(P); }
 
-unique_ptr<Material> Axisymmetric::get_copy() { return std::make_unique<Axisymmetric>(*this); }
+unique_ptr<Material> Axisymmetric::unique_copy() { return std::make_unique<Axisymmetric>(*this); }
 
 int Axisymmetric::update_trial_status(const vec& t_strain) {
     vec full_strain(6, fill::zeros);

@@ -61,7 +61,7 @@ public:
         , indexer(in_size, in_bandwidth)
         , band(in_bandwidth) {}
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandSymmMatCluster>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandSymmMatCluster>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;

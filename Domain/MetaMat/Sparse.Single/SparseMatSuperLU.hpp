@@ -75,7 +75,7 @@ public:
     SparseMatSuperLU& operator=(SparseMatSuperLU&&) = delete;
     ~SparseMatSuperLU() override;
 
-    unique_ptr<MetaMat<T>> make_copy() override;
+    unique_ptr<MetaMat<T>> unique_copy() override;
 };
 
 template<sp_d T> auto SparseMatSuperLU<T>::init_config() {
@@ -152,7 +152,7 @@ template<sp_d T> SparseMatSuperLU<T>::~SparseMatSuperLU() {
     StatFree(&stat);
 }
 
-template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::make_copy() { return std::make_unique<SparseMatSuperLU>(*this); }
+template<sp_d T> unique_ptr<MetaMat<T>> SparseMatSuperLU<T>::unique_copy() { return std::make_unique<SparseMatSuperLU>(*this); }
 
 template<sp_d T> int SparseMatSuperLU<T>::direct_solve(Mat<T>& out_mat, Mat<T>&& in_mat) {
     if(this->factored) return solve_trs(out_mat, std::move(in_mat));

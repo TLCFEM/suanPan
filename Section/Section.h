@@ -121,7 +121,7 @@ public:
     [[nodiscard]] virtual const mat& get_initial_stiffness() const;
     [[nodiscard]] virtual const mat& get_initial_geometry() const;
 
-    virtual unique_ptr<Section> get_copy() = 0;
+    virtual unique_ptr<Section> unique_copy() = 0;
 
     int update_incre_status(double);
     int update_incre_status(double, double);
@@ -141,7 +141,7 @@ public:
 };
 
 namespace suanpan {
-    unique_ptr<Section> make_copy(const shared_ptr<Section>&);
+    unique_ptr<Section> unique_copy(const shared_ptr<Section>&);
 } // namespace suanpan
 
 #endif

@@ -46,7 +46,7 @@ int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
 
 double PlaneStrain::get(const Parameter P) const { return base->get(P); }
 
-unique_ptr<Material> PlaneStrain::get_copy() { return std::make_unique<PlaneStrain>(*this); }
+unique_ptr<Material> PlaneStrain::unique_copy() { return std::make_unique<PlaneStrain>(*this); }
 
 int PlaneStrain::update_trial_status(const vec& t_strain) {
     vec full_strain(6, fill::zeros);

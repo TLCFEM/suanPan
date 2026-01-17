@@ -209,4 +209,4 @@ ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P
     : DataConcreteK4{std::fabs(E * P(0)), std::fabs(E * P(1)), perturb(std::fabs(P(2))), std::fabs(P(3)), std::fabs(P(4)), std::fabs(P(3) * P(5)), std::fabs(E * P(6)), std::fabs(E * P(7))}
     , NonlinearK4(T, E, H, R, FD, FC, OD) {}
 
-unique_ptr<Material> ConcreteK4::get_copy() { return std::make_unique<ConcreteK4>(*this); }
+unique_ptr<Material> ConcreteK4::unique_copy() { return std::make_unique<ConcreteK4>(*this); }

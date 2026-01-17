@@ -100,7 +100,7 @@ int Allman::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(3);
     for(uword I = 0; I < 3; ++I) {
-        int_pt.emplace_back(vec{ele_coor(I + 3, 1), ele_coor(I + 3, 2)}, area * thickness / 3., mat_proto->get_copy());
+        int_pt.emplace_back(vec{ele_coor(I + 3, 1), ele_coor(I + 3, 2)}, area * thickness / 3., mat_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
 

@@ -21,7 +21,7 @@
 
 Orientation::Type B3DL::type() const { return Type::B3D; }
 
-unique_ptr<Orientation> B3DL::get_copy() { return std::make_unique<B3DL>(*this); }
+unique_ptr<Orientation> B3DL::unique_copy() { return std::make_unique<B3DL>(*this); }
 
 void B3DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;

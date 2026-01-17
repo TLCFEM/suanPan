@@ -29,7 +29,7 @@ int Joint::initialize(const shared_ptr<DomainBase>& D) {
 
     j_material.clear();
     j_material.reserve(j_dof);
-    for(auto& I : material_tag) j_material.emplace_back(D->get<Material>(I)->get_copy());
+    for(auto& I : material_tag) j_material.emplace_back(D->get<Material>(I)->unique_copy());
 
     initial_stiffness.zeros(j_size, j_size);
     for(size_t I = 0, J = j_dof; I < j_dof; ++I, ++J) initial_stiffness(I, J) = initial_stiffness(J, I) = -(initial_stiffness(I, I) = initial_stiffness(J, J) = as_scalar(j_material[I]->get_initial_stiffness()));

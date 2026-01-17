@@ -284,7 +284,7 @@ int CINP4::initialize(const shared_ptr<DomainBase>& D) {
     for(unsigned I = 0; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const mat jacob = compute_mapping(t_vec) * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->get_copy(), solve(jacob, compute_dn(t_vec)));
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->unique_copy(), solve(jacob, compute_dn(t_vec)));
 
         auto& c_pt = int_pt.back();
 

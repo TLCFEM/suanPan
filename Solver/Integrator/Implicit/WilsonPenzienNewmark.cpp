@@ -52,7 +52,7 @@ int WilsonPenzienNewmark::process_constraint() {
     if(first_iteration) {
         cx_vec eig_val;
         cx_mat eig_vec;
-        if(SUANPAN_SUCCESS != eig_solve(eig_val, eig_vec, t_stiff->make_copy(), t_mass, static_cast<unsigned>(damping_ratio.n_elem))) {
+        if(SUANPAN_SUCCESS != eig_solve(eig_val, eig_vec, t_stiff->unique_copy(), t_mass, static_cast<unsigned>(damping_ratio.n_elem))) {
             if(!eig_pair(eig_val, eig_vec, to_mat(t_stiff), to_mat(t_mass))) {
                 suanpan_error("Fail to perform eigen analysis.\n");
                 return SUANPAN_FAIL;

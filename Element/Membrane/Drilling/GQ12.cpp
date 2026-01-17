@@ -66,7 +66,7 @@ int GQ12::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const mat pn_pxy = solve(jacob, pn);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, mat_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, mat_proto->unique_copy());
 
         const auto TX = 2. * plan(I, 0);
         const auto TY = 2. * plan(I, 1);

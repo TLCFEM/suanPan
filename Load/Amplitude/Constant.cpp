@@ -17,7 +17,7 @@
 
 #include "Constant.h"
 
-unique_ptr<Amplitude> Constant::get_copy() { return std::make_unique<Constant>(*this); }
+unique_ptr<Amplitude> Constant::unique_copy() { return std::make_unique<Constant>(*this); }
 
 double Constant::get_amplitude(double) { return 1.; }
 

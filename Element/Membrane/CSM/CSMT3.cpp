@@ -100,9 +100,9 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(3);
-    int_pt.emplace_back(mean(ele_coor.rows(uvec{1, 2})), t_factor / 3., material_proto->get_copy());
-    int_pt.emplace_back(mean(ele_coor.rows(uvec{2, 0})), t_factor / 3., material_proto->get_copy());
-    int_pt.emplace_back(mean(ele_coor.rows(uvec{0, 1})), t_factor / 3., material_proto->get_copy());
+    int_pt.emplace_back(mean(ele_coor.rows(uvec{1, 2})), t_factor / 3., material_proto->unique_copy());
+    int_pt.emplace_back(mean(ele_coor.rows(uvec{2, 0})), t_factor / 3., material_proto->unique_copy());
+    int_pt.emplace_back(mean(ele_coor.rows(uvec{0, 1})), t_factor / 3., material_proto->unique_copy());
 
     mat E1(t_size, t_size, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros);
 

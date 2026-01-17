@@ -37,7 +37,7 @@ class Linear final : public Amplitude {
 public:
     Linear(unsigned, double);
 
-    unique_ptr<Amplitude> get_copy() override;
+    unique_ptr<Amplitude> unique_copy() override;
 
     double get_amplitude(double) override;
 

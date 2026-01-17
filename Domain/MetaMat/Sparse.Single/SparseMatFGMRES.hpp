@@ -44,7 +44,7 @@ protected:
 public:
     using SparseMat<T>::SparseMat;
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SparseMatFGMRES>(*this); }
 };
 
 template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {

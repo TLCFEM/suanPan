@@ -77,7 +77,7 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
                 const auto ders = net.evaluate_shape_function_derivative(x, y, polygon, 1, 1);
                 const mat pn = join_cols(.5 * dx * vectorise(ders(1, 0)).t(), .5 * dy * vectorise(ders(0, 1)).t());
                 const mat jacob = pn * ele_coor.head_cols(2);
-                int_pt.emplace_back(vec{x, y}, plan(K, 2) * det(jacob), material_proto->get_copy());
+                int_pt.emplace_back(vec{x, y}, plan(K, 2) * det(jacob), material_proto->unique_copy());
 
                 auto& c_pt = int_pt.back();
 

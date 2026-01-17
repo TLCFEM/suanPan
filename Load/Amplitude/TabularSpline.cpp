@@ -63,7 +63,7 @@ void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
     system.solve(m, b);
 }
 
-unique_ptr<Amplitude> TabularSpline::get_copy() { return std::make_unique<TabularSpline>(*this); }
+unique_ptr<Amplitude> TabularSpline::unique_copy() { return std::make_unique<TabularSpline>(*this); }
 
 double TabularSpline::get_amplitude(const double T) {
     const auto step_time = T - start_time;

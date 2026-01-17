@@ -57,7 +57,7 @@ ElementExample::ElementExample(const unsigned T, uvec&& NT, const unsigned MT, c
     , thickness(TH) {}
 
 int ElementExample::initialize(const shared_ptr<DomainBase>& D) {
-    m_material = D->get<Material>(material_tag(0))->get_copy();
+    m_material = D->get<Material>(material_tag(0))->unique_copy();
 
     mat ele_coor(m_node, m_node, fill::ones);
     ele_coor.cols(1, 2) = get_coordinate(2);

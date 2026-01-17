@@ -31,7 +31,7 @@ EB21::EB21(const unsigned T, uvec&& N, const double A, const double I, const uns
 int EB21::initialize(const shared_ptr<DomainBase>& D) {
     b_trans->set_element_ptr(this);
 
-    b_material = D->get<Material>(material_tag(0))->get_copy();
+    b_material = D->get<Material>(material_tag(0))->unique_copy();
 
     // stiffness
     const auto tmp_a = as_scalar(b_material->get_initial_stiffness()) / b_trans->get_length();

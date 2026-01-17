@@ -56,7 +56,7 @@ int SectionExample::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> SectionExample::get_copy() { return std::make_unique<SectionExample>(*this); }
+unique_ptr<Section> SectionExample::unique_copy() { return std::make_unique<SectionExample>(*this); }
 
 int SectionExample::update_trial_status(const vec& t_deformation) {
     trial_deformation = t_deformation;

@@ -49,7 +49,7 @@ class LogicCriterionAND final : public LogicCriterion {
 public:
     using LogicCriterion::LogicCriterion;
 
-    unique_ptr<Criterion> get_copy() override;
+    unique_ptr<Criterion> unique_copy() override;
 
     int process(const shared_ptr<DomainBase>&) override;
 };
@@ -58,7 +58,7 @@ class LogicCriterionOR final : public LogicCriterion {
 public:
     using LogicCriterion::LogicCriterion;
 
-    unique_ptr<Criterion> get_copy() override;
+    unique_ptr<Criterion> unique_copy() override;
 
     int process(const shared_ptr<DomainBase>&) override;
 };

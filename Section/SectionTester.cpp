@@ -105,7 +105,7 @@ int test_section(const shared_ptr<DomainBase>& domain, std::istringstream& comma
 
     if(!domain->find_section(section_tag)) return SUANPAN_SUCCESS;
 
-    const auto section = domain->get_section(section_tag)->get_copy();
+    const auto section = domain->get_section(section_tag)->unique_copy();
 
     if(!initialise_section(domain, section, size)) return SUANPAN_SUCCESS;
 
@@ -130,7 +130,7 @@ int test_section_by_deformation_history(const shared_ptr<DomainBase>& domain, st
     mat deformation_history;
     if(!deformation_history.load(history_file, raw_ascii) || !domain->find_section(section_tag)) return SUANPAN_SUCCESS;
 
-    const auto section = domain->get_section(section_tag)->get_copy();
+    const auto section = domain->get_section(section_tag)->unique_copy();
 
     if(!initialise_section(domain, section, deformation_history.n_cols)) return SUANPAN_SUCCESS;
 

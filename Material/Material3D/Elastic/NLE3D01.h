@@ -54,7 +54,7 @@ public:
         double    // density
     );
 
-    unique_ptr<Material> get_copy() override;
+    unique_ptr<Material> unique_copy() override;
 };
 
 #endif

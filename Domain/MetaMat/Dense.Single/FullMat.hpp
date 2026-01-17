@@ -46,7 +46,7 @@ public:
     FullMat(const uword in_rows, const uword in_cols)
         : DenseMat<T>(in_rows, in_cols, in_rows * in_cols) {}
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<FullMat>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<FullMat>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;

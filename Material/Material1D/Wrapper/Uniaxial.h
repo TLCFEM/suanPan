@@ -38,7 +38,7 @@ public:
         unsigned  // max iteration
     );
 
-    unique_ptr<Material> get_copy() override;
+    unique_ptr<Material> unique_copy() override;
 
     void print() override;
 };

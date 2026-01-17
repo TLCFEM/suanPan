@@ -39,7 +39,7 @@ int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> DafaliasManzari::get_copy() { return std::make_unique<DafaliasManzari>(*this); }
+unique_ptr<Material> DafaliasManzari::unique_copy() { return std::make_unique<DafaliasManzari>(*this); }
 
 double DafaliasManzari::get(const Parameter P) const { return prop(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
 

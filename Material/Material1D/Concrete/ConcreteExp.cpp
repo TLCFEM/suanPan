@@ -128,4 +128,4 @@ double ConcreteExp::get(const Parameter P) const {
     return 0.;
 }
 
-unique_ptr<Material> ConcreteExp::get_copy() { return std::make_unique<ConcreteExp>(*this); }
+unique_ptr<Material> ConcreteExp::unique_copy() { return std::make_unique<ConcreteExp>(*this); }

@@ -34,7 +34,7 @@ int BlatzKo::initialize(const shared_ptr<DomainBase>&) {
 
 double BlatzKo::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> BlatzKo::get_copy() { return std::make_unique<BlatzKo>(*this); }
+unique_ptr<Material> BlatzKo::unique_copy() { return std::make_unique<BlatzKo>(*this); }
 
 // takes green strain as input
 int BlatzKo::update_trial_status(const vec& t_strain) {

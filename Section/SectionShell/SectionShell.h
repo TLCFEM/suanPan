@@ -104,7 +104,7 @@ public:
     [[nodiscard]] virtual const mat& get_initial_membrane_stiffness() const;
     [[nodiscard]] virtual const mat& get_initial_plate_stiffness() const;
 
-    virtual unique_ptr<SectionShell> get_copy() = 0;
+    virtual unique_ptr<SectionShell> unique_copy() = 0;
 
     int update_incre_status(double, double);
     int update_incre_status(double, double, double, double);
@@ -124,8 +124,8 @@ public:
 };
 
 namespace suanpan {
-    unique_ptr<SectionShell> make_copy(const shared_ptr<SectionShell>&);
-    unique_ptr<SectionShell> make_copy(const unique_ptr<SectionShell>&);
+    unique_ptr<SectionShell> unique_copy(const shared_ptr<SectionShell>&);
+    unique_ptr<SectionShell> unique_copy(const unique_ptr<SectionShell>&);
 } // namespace suanpan
 
 #endif

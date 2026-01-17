@@ -41,7 +41,7 @@ public:
         double
     );
 
-    unique_ptr<Section> get_copy() override;
+    unique_ptr<Section> unique_copy() override;
 
     int update_trial_status(const vec&) override;
 

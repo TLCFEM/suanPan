@@ -22,7 +22,7 @@ Modulated::Modulated(const unsigned T, const double AA, std::vector<double>&& WW
     , amp(AA)
     , freq(std::move(WW)) {}
 
-unique_ptr<Amplitude> Modulated::get_copy() { return std::make_unique<Modulated>(*this); }
+unique_ptr<Amplitude> Modulated::unique_copy() { return std::make_unique<Modulated>(*this); }
 
 double Modulated::get_amplitude(const double T) {
     const auto step_time = T - start_time;

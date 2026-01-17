@@ -62,7 +62,7 @@ public:
             suanpan_warning("The storage requirement for the banded matrix is larger than that of a full matrix, consider using a full/sparse matrix instead.\n");
     }
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMat>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandMat>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;

@@ -47,7 +47,7 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Section> get_copy() override;
+    unique_ptr<Section> unique_copy() override;
 
     void print() override;
 };

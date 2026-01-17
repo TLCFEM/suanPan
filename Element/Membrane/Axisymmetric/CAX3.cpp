@@ -32,7 +32,7 @@ int CAX3::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    m_material = material_proto->get_copy();
+    m_material = material_proto->unique_copy();
 
     mat ele_coor(m_node, m_node);
     ele_coor.col(0).fill(1.);

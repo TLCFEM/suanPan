@@ -35,7 +35,7 @@ class Fibre1D final : public Fibre {
 public:
     Fibre1D(unsigned, uvec&&);
 
-    unique_ptr<Section> get_copy() override;
+    unique_ptr<Section> unique_copy() override;
 };
 
 #endif

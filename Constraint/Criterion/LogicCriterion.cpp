@@ -34,8 +34,8 @@ int LogicCriterion::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_SUCCESS;
     }
 
-    criterion_a = t_criterion_a->get_copy();
-    criterion_b = t_criterion_b->get_copy();
+    criterion_a = t_criterion_a->unique_copy();
+    criterion_b = t_criterion_b->unique_copy();
 
     if(SUANPAN_SUCCESS != criterion_a->initialize(D) || SUANPAN_SUCCESS != criterion_b->initialize(D)) {
         suanpan_error("Fail to initialize criteria {} and/or {}.\n", tag_a, tag_b);
@@ -45,7 +45,7 @@ int LogicCriterion::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Criterion> LogicCriterionAND::get_copy() { return std::make_unique<LogicCriterionAND>(*this); }
+unique_ptr<Criterion> LogicCriterionAND::unique_copy() { return std::make_unique<LogicCriterionAND>(*this); }
 
 int LogicCriterionAND::process(const shared_ptr<DomainBase>& D) {
     const auto result_a = criterion_a->process(D);
@@ -56,7 +56,7 @@ int LogicCriterionAND::process(const shared_ptr<DomainBase>& D) {
     return SUANPAN_EXIT == result_a && SUANPAN_EXIT == result_b;
 }
 
-unique_ptr<Criterion> LogicCriterionOR::get_copy() { return std::make_unique<LogicCriterionOR>(*this); }
+unique_ptr<Criterion> LogicCriterionOR::unique_copy() { return std::make_unique<LogicCriterionOR>(*this); }
 
 int LogicCriterionOR::process(const shared_ptr<DomainBase>& D) {
     const auto result_a = criterion_a->process(D);

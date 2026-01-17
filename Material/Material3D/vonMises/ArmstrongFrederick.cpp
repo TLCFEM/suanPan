@@ -34,7 +34,7 @@ int ArmstrongFrederick::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> ArmstrongFrederick::get_copy() { return std::make_unique<ArmstrongFrederick>(*this); }
+unique_ptr<Material> ArmstrongFrederick::unique_copy() { return std::make_unique<ArmstrongFrederick>(*this); }
 
 double ArmstrongFrederick::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 

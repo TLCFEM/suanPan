@@ -76,7 +76,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
                     const auto ders = net.evaluate_shape_function_derivative(x, y, z, polygon, 1, 1, 1);
                     const auto pn = join_cols(.5 * dx * vectorise(ders(1, 0, 0)).t(), .5 * dy * vectorise(ders(0, 1, 0)).t(), .5 * dz * vectorise(ders(0, 0, 1)).t());
                     const mat jacob = pn * ele_coor.head_cols(3);
-                    int_pt.emplace_back(vec{x, y, z}, plan(L, 3) * det(jacob), material_proto->get_copy());
+                    int_pt.emplace_back(vec{x, y, z}, plan(L, 3) * det(jacob), material_proto->unique_copy());
 
                     auto& c_pt = int_pt.back();
 

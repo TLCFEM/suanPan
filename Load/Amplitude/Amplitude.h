@@ -67,7 +67,7 @@ public:
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 
-    virtual unique_ptr<Amplitude> get_copy() = 0;
+    virtual unique_ptr<Amplitude> unique_copy() = 0;
 
     virtual double get_amplitude(double);
 

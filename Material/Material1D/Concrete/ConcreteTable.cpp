@@ -111,4 +111,4 @@ double ConcreteTable::get(const Parameter P) const {
     return 0.;
 }
 
-unique_ptr<Material> ConcreteTable::get_copy() { return std::make_unique<ConcreteTable>(*this); }
+unique_ptr<Material> ConcreteTable::unique_copy() { return std::make_unique<ConcreteTable>(*this); }

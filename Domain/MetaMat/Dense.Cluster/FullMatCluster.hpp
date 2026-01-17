@@ -50,7 +50,7 @@ public:
         : DenseMat<T>(in_rows, in_cols, in_rows * in_cols)
         , solver() {}
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<FullMatBaseCluster>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<FullMatBaseCluster>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;

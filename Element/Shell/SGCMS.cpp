@@ -38,7 +38,7 @@ SGCMS::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const 
 SGCMS::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , s_material(nullptr == old_obj.s_material ? nullptr : old_obj.s_material->get_copy()) {}
+    , s_material(nullptr == old_obj.s_material ? nullptr : old_obj.s_material->unique_copy()) {}
 
 SGCMS::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
@@ -259,7 +259,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
         c_ip.reserve(t_plan.n_rows);
         for(unsigned J = 0; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
-            c_ip.emplace_back(t_eccentricity, t_weight * t_plan(J, 1), mat_proto->get_copy());
+            c_ip.emplace_back(t_eccentricity, t_weight * t_plan(J, 1), mat_proto->unique_copy());
             p_stiffness += c_pt.BP.t() * mat_stiff * c_pt.BP * c_ip.back().factor * pow(t_eccentricity, 2.);
             mp_stiffness += c_pt.BM.t() * mat_stiff * c_pt.BP * c_ip.back().factor * t_eccentricity;
             pm_stiffness += c_pt.BP.t() * mat_stiff * c_pt.BM * c_ip.back().factor * t_eccentricity;

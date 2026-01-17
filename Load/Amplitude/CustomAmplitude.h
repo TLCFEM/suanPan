@@ -43,7 +43,7 @@ public:
 
     void initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Amplitude> get_copy() override;
+    unique_ptr<Amplitude> unique_copy() override;
 
     double get_amplitude(double) override;
 

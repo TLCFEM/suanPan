@@ -32,7 +32,7 @@ Mindlin::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(cons
 Mindlin::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , p_material(old_obj.p_material->get_copy()) {}
+    , p_material(old_obj.p_material->unique_copy()) {}
 
 Mindlin::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
@@ -94,7 +94,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
         current_ip.reserve(num_section_ip);
         for(unsigned J = 0; J < num_section_ip; ++J) {
             const auto t_eccentricity = .5 * sec_plan(J, 0) * thickness;
-            current_ip.emplace_back(t_eccentricity, .5 * thickness * sec_plan(J, 1) * plan(I, 2) * det_jacob, mat_proto->get_copy());
+            current_ip.emplace_back(t_eccentricity, .5 * thickness * sec_plan(J, 1) * plan(I, 2) * det_jacob, mat_proto->unique_copy());
             initial_stiffness += t_eccentricity * t_eccentricity * current_ip.back().factor * strain_mat.t() * mat_stiff * strain_mat;
         }
     }
