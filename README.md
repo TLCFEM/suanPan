@@ -122,9 +122,7 @@ Further details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tuto
 #### Binary Package
 
 The archives of binaries are released under [Release](https://github.com/TLCFEM/suanPan/releases) page.
-
-1. `suanpan-win-mkl-vtk.zip` is the portable archive.
-2. `suanpan-win-mkl-vtk.exe` is the installer.
+All are portable archives, simply unpack and execute the application.
 
 #### Chocolatey
 
