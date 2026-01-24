@@ -312,11 +312,6 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
-Those libraries may depend on other libraries such as [zlib](https://zlib.net/) and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/).
-Additional tools may be used by **suanPan**, they are
-
-- [**UPX** the Ultimate Packer for eXecutables](https://upx.github.io/)
-
 ## How To Compile
 
 Please refer to the corresponding [page](https://tlcfem.github.io/suanPan-manual/latest/Basic/Compile/) in the manual for details.
