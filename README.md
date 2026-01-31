@@ -304,7 +304,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**ezp**](https://github.com/TLCFEM/ezp)
-- [**fmt**](https://github.com/fmtlib/fmt) version 12.0.0
+- [**fmt**](https://github.com/fmtlib/fmt) version 12.1.0
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.3.0
 - [**whereami**](https://github.com/gpakosz/whereami)
