@@ -1,7 +1,7 @@
 name: Docker Base Image
 on:
   schedule:
-    - cron: "0 5 2 * *"
+    - cron: "30 5 1 * *"
   workflow_dispatch:
 jobs:
   ide-image-base:
