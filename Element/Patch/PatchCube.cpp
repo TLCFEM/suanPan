@@ -61,7 +61,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
     for(auto& I : ele_span) num_element *= I.n_elem;
 
     int_pt.clear();
-    int_pt.reserve(plan.n_rows);
+    int_pt.reserve(num_element * plan.n_rows);
     for(auto I : ele_span(0))
         for(auto J : ele_span(1))
             for(auto K : ele_span(2)) {
