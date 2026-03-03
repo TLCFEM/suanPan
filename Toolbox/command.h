@@ -29,9 +29,9 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 9;
-constexpr auto SUANPAN_PATCH = 5;
+constexpr auto SUANPAN_MAJOR = 4;
+constexpr auto SUANPAN_MINOR = 0;
+constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Canopus";
 
 #include <suanPan.h>
