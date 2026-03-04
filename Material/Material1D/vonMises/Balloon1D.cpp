@@ -274,6 +274,6 @@ int Balloon1D::reset_status() {
 }
 
 void Balloon1D::print() {
-    suanpan_info("The Balloon uniaxial model.\n");
+    suanpan_info("The Balloon-v1 uniaxial model.\n");
     Material1D::print();
 }
