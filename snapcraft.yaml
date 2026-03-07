@@ -56,8 +56,8 @@ parts:
     override-build: |
       wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-ubuntu-24.04.tar.gz
       tar xf VTK-9.5.2-ubuntu-24.04.tar.gz
-      wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/2ad98b49-1fb2-4294-ab3d-6889b434ebd3/intel-onemkl-2025.3.0.462_offline.sh
-      sh ./intel-onemkl-2025.3.0.462_offline.sh -a --silent --eula accept
+      wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6a17080f-f0de-41b9-b587-52f92512c59a/intel-onemkl-2025.3.1.11_offline.sh
+      sh ./intel-onemkl-2025.3.1.11_offline.sh -a --silent --eula accept
       craftctl default
     stage-packages:
       - libgfortran5
