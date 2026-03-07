@@ -304,7 +304,7 @@ jobs:
         compiler: ["Visual Studio 17 2022"]
         vtk: [ON, OFF]
         avx: [OFF]
-        mkl: [OFF]
+        mkl: [ON,OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -318,10 +318,10 @@ jobs:
         shell: cmd
         if: matrix.mkl == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a665fc26-bdf1-415f-9fc4-345f257f4fb1/w_onemkl_p_2024.2.1.106_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ea23d696-a77f-4a4a-8996-20d02cdbc48f/w_fortran-compiler_p_2024.2.1.81_offline.exe
-          w_onemkl_p_2024.2.1.106_offline.exe -s -a --silent --eula accept
-          w_fortran-compiler_p_2024.2.1.81_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ae472ff5-aa01-4a72-a452-ce7b559ef041/intel-onemkl-2025.3.1.10_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/039121f2-d488-4bc1-a5bb-97528e3a4b86/intel-fortran-compiler-2025.3.2.26_offline.exe
+          intel-onemkl-2025.3.1.10_offline.exe -s -a --silent --eula accept
+          intel-fortran-compiler-2025.3.2.26_offline.exe -s -a --silent --eula accept
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
