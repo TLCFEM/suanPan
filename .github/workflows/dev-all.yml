@@ -304,7 +304,7 @@ jobs:
         compiler: ["Visual Studio 17 2022"]
         vtk: [ON, OFF]
         avx: [OFF]
-        mkl: [ON,OFF]
+        mkl: [OFF]
     steps:
       - name: Clone
         uses: actions/checkout@v6
