@@ -23,7 +23,7 @@ jobs:
       - name: Buildx
         uses: docker/setup-buildx-action@v4
       - name: Base ${{ matrix.arch }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Script/${{ matrix.arch }}/Rocky.Pre.Dockerfile
@@ -62,7 +62,7 @@ jobs:
       - name: Buildx
         uses: docker/setup-buildx-action@v4
       - name: CUDA
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Script/amd64/Rocky.Pre.CUDA.Dockerfile
