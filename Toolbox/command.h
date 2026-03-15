@@ -32,7 +32,7 @@
 constexpr auto SUANPAN_MAJOR = 4;
 constexpr auto SUANPAN_MINOR = 0;
 constexpr auto SUANPAN_PATCH = 0;
-constexpr auto SUANPAN_CODE = "Canopus";
+constexpr auto SUANPAN_CODE = "Deneb";
 
 #include <suanPan.h>
 
