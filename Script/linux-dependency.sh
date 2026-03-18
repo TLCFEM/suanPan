@@ -112,7 +112,8 @@ TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.
 TMP_DIR="$(mktemp -d)"
 
 fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
-tar -xzf "$TMP_DIR/archive.tar.gz" -C .
+mkdir -p "$(dirname "$0")/../VTK"
+tar -xzf "$TMP_DIR/archive.tar.gz" -C "$(dirname "$0")/../VTK"
 
 rm -rf "$TMP_DIR"
 

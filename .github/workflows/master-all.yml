@@ -65,7 +65,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.5/ \
           ..
           cmake --build . --target install --config Release -j $(nproc)
           cmake --build . --target package
