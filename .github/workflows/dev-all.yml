@@ -258,7 +258,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DSP_FETCH_DEPENDENCY=ON \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.5/ \
             ..
           else
             export CC=gcc-13
@@ -269,7 +269,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DSP_FETCH_DEPENDENCY=ON \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.5/ \
             ..
           fi
           cmake --build . --target install --config ${{ matrix.build }} -j 3

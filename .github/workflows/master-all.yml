@@ -221,7 +221,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
+          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.5/ \
           ..
           cmake --build . --target install --config Release -j 3
           cd ..
