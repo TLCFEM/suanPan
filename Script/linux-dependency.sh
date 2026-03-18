@@ -42,6 +42,26 @@ if ! command -v wget &>/dev/null; then
   exit 1
 fi
 
+if command -v wget &>/dev/null; then
+  DOWNLOAD_TOOL="wget"
+elif command -v curl &>/dev/null; then
+  DOWNLOAD_TOOL="curl"
+else
+  echo "Error: neither wget nor curl is installed. Please install one and try again."
+  exit 1
+fi
+
+fetch_archive() {
+  local DOWNLOAD_TO="$1"
+  local DOWNLOAD_FROM="$2"
+
+  if [ "$DOWNLOAD_TOOL" = "wget" ]; then
+    wget -q -O "$DOWNLOAD_TO" "$DOWNLOAD_FROM"
+  else
+    curl -fsSL -o "$DOWNLOAD_TO" "$DOWNLOAD_FROM"
+  fi
+}
+
 RUNNER_IMAGE_NAME="$1"
 
 if [[ "$RUNNER_IMAGE_NAME" == *"arm"* ]]; then
@@ -61,7 +81,7 @@ fi
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-2.0.0-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
-wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
+fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
 find "$TMP_DIR/lib" -name "*.a" -exec cp {} "$TARGET_DIR" \;
@@ -71,7 +91,7 @@ rm -rf "$TMP_DIR"
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/tbb-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
-wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
+fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
 find "$TMP_DIR/tbb-install/lib" -name "lib*so*" -exec cp -P {} "$TARGET_DIR" \;
@@ -81,7 +101,7 @@ rm -rf "$TMP_DIR"
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.31-$RUNNER_IMAGE_NAME-32.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
-wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
+fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
 cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
@@ -91,7 +111,7 @@ rm -rf "$TMP_DIR"
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
-wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
+fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C .
 
 rm -rf "$TMP_DIR"
