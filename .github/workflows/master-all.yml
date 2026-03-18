@@ -204,7 +204,10 @@ jobs:
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
-          if [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
+          if [[ "${{ matrix.os }}" == "macos-26-large" || "${{ matrix.os }}" == "macos-26-xlarge" ]]; then
+            export CC=$(brew --prefix llvm@20)/bin/clang
+            export CXX=$(brew --prefix llvm@20)/bin/clang++
+          elif [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
             export CC=$(brew --prefix llvm@18)/bin/clang
             export CXX=$(brew --prefix llvm@18)/bin/clang++
           else

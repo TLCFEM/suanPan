@@ -82,6 +82,7 @@ jobs:
             source /opt/intel/oneapi/setvars.sh
           fi
           go build Checker/updater.go
+          ./Script/linux-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
           cmake \
           -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
@@ -99,7 +100,6 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DSP_FETCH_DEPENDENCY=ON \
           -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.5/ \
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j $(nproc)
@@ -242,10 +242,14 @@ jobs:
         run: |
           brew install glfw glew go libomp
           go build Checker/updater.go
+          ./Script/mac-dependency.sh ${{ matrix.os }}
           mkdir build && cd build
           export FC=gfortran-13
           if [ "${{ matrix.compiler }}" == "clang" ]; then
-            if [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
+            if [[ "${{ matrix.os }}" == "macos-26-large" || "${{ matrix.os }}" == "macos-26-xlarge" ]]; then
+              export CC=$(brew --prefix llvm@20)/bin/clang
+              export CXX=$(brew --prefix llvm@20)/bin/clang++
+            elif [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
               export CC=$(brew --prefix llvm@18)/bin/clang
               export CXX=$(brew --prefix llvm@18)/bin/clang++
             else
@@ -257,7 +261,6 @@ jobs:
             -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DSP_FETCH_DEPENDENCY=ON \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.5/ \
             ..
           else
@@ -268,7 +271,6 @@ jobs:
             -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DSP_FETCH_DEPENDENCY=ON \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.5/ \
             ..
           fi
