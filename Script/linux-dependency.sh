@@ -37,6 +37,11 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
+if ! command -v tar &>/dev/null; then
+  echo "Error: tar is not installed. Please install tar and try again."
+  exit 1
+fi
+
 if command -v wget &>/dev/null; then
   DOWNLOAD_TOOL="wget"
 elif command -v curl &>/dev/null; then
