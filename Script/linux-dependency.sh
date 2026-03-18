@@ -115,3 +115,5 @@ fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C .
 
 rm -rf "$TMP_DIR"
+
+echo "Dependencies for $RUNNER_IMAGE_NAME have been downloaded and extracted to $TARGET_DIR."
