@@ -37,11 +37,6 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-if ! command -v wget &>/dev/null; then
-  echo "Error: wget is not installed. Please install wget and try again."
-  exit 1
-fi
-
 if command -v wget &>/dev/null; then
   DOWNLOAD_TOOL="wget"
 elif command -v curl &>/dev/null; then
