@@ -364,7 +364,7 @@ void print_version() {
     suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
     suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\n\n");
     suanpan_info("suanPan is an open source FEM framework.\n");
-    suanpan_info("    The binary ({}.{}.{}) is compiled on {} with the {} instruction set.\n", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH, __DATE__,
+    suanpan_info("    The binary ({}.{}.{}) is compiled on {} with the {} instruction set.\n", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH, SUANPAN_DATE,
 #ifdef SUANPAN_AVX512
                  "AVX512"
 #elif defined(SUANPAN_AVX2)

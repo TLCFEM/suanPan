@@ -34,6 +34,10 @@ constexpr auto SUANPAN_MINOR = 0;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Deneb";
 
+#ifndef SUANPAN_DATE
+#define SUANPAN_DATE __DATE__
+#endif
+
 #include <suanPan.h>
 
 class Bead;
