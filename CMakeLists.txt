@@ -92,6 +92,10 @@ if (SP_ENABLE_AOCL)
     add_compile_definitions(SUANPAN_AOCL)
 endif ()
 
+if (SUANPAN_DATE)
+    add_compile_definitions(SUANPAN_DATE="${SUANPAN_DATE}")
+endif ()
+
 set(COMPILER_IDENTIFIER "unknown")
 set(SP_EXTERNAL_LIB_PATH "unknown")
 if (CMAKE_SYSTEM_NAME MATCHES "Windows") # WINDOWS PLATFORM
