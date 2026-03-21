@@ -93,7 +93,7 @@ if (SP_ENABLE_AOCL)
 endif ()
 
 if (SUANPAN_DATE)
-    add_compile_definitions(SUANPAN_DATE="${SUANPAN_DATE}")
+    add_compile_definitions(SUANPAN_DATE=${SUANPAN_DATE})
 endif ()
 
 set(COMPILER_IDENTIFIER "unknown")
