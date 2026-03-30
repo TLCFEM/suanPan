@@ -108,7 +108,7 @@ jobs:
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.2.0
+        uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*
       - name: Pack

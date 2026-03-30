@@ -52,7 +52,7 @@ jobs:
           cd ..
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.2.0
+        uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -106,7 +106,7 @@ jobs:
           cd ..
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.2.0
+        uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -157,7 +157,7 @@ jobs:
           echo "ARTIFACT=suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.2.0
+        uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*.exe
       - name: Unsigned
