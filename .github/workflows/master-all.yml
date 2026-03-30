@@ -334,13 +334,13 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         uses: signpath/github-action-submit-signing-request@v2
         with:
-          api-token: "${{ secrets.SIGNPATH }}"
-          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
-          project-slug: "suanPan"
-          signing-policy-slug: "release-signing"
-          github-artifact-id: "${{ steps.upload-unsigned-vs.outputs.artifact-id }}"
+          api-token: ${{ secrets.SIGNPATH }}
+          organization-id: b04bac88-d6e9-4140-948d-cb95e3095cbe
+          project-slug: suanPan
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ steps.upload-unsigned-vs.outputs.artifact-id }}
           wait-for-completion: true
-          output-artifact-directory: "build/dist/bin"
+          output-artifact-directory: build/dist/bin
       - name: Pack
         shell: bash
         run: |

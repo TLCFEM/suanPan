@@ -168,15 +168,16 @@ jobs:
           path: build/dist/bin/*.exe
       - name: Sign
         uses: signpath/github-action-submit-signing-request@v2
+        if: false
         with:
-          api-token: "${{ secrets.SIGNPATH }}"
-          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
-          project-slug: "suanPan"
-          signing-policy-slug: "test-signing"
-          artifact-configuration-slug: "test"
-          github-artifact-id: "${{ steps.upload-unsigned-vs.outputs.artifact-id }}"
+          api-token: ${{ secrets.SIGNPATH }}
+          organization-id: b04bac88-d6e9-4140-948d-cb95e3095cbe
+          project-slug: suanPan
+          signing-policy-slug: test-signing
+          artifact-configuration-slug: test
+          github-artifact-id: ${{ steps.upload-unsigned-vs.outputs.artifact-id }}
           wait-for-completion: true
-          output-artifact-directory: "build/dist/bin"
+          output-artifact-directory: build/dist/bin
       - name: Test
         run: |
           cd build/dist/bin
