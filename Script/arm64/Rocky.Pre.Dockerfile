@@ -16,7 +16,7 @@ RUN mkdir tbb-build && cd tbb-build && \
 
 # part 3: vtk
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.5/VTK-9.5.2.tar.gz && tar xf VTK-9.5.2.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.5.2 && \
+    wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.1.tar.gz && tar xf VTK-9.6.1.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.6.1 && \
     cmake --build . --target install --config Release --parallel "$(nproc)" && \
     cd .. && rm -r vtk-build
