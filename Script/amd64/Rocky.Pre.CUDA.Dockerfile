@@ -5,6 +5,8 @@
 
 FROM nvidia/cuda:12.9.1-devel-rockylinux9
 
+RUN dnf install -y ca-certificates
+
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \
     echo "baseurl=https://yum.repos.intel.com/oneapi" >> /etc/yum.repos.d/oneAPI.repo && \
