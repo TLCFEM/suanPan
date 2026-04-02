@@ -19,6 +19,8 @@ RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
 
 COPY --from=build /suanPan*.rpm /
 
+RUN dnf install -y ca-certificates
+
 RUN dnf install ./suanPan*.rpm intel-oneapi-mpi procps-ng -y && rm ./suanPan*.rpm
 
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
