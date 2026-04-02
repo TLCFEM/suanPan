@@ -221,10 +221,10 @@ int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const u
 extern "C" {
 #endif
 
-void pdsaupd_(int comm, int* ido, char const* bmat, int n, char const* which, int nev, double tol, double* resid, int ncv, double* v, int ldv, int* iparam, int* ipntr, double* workd, double* workl, int lworkl, int* info);
-void pdseupd_(int comm, int rvec, char const* howmny, int const* select, double* d, double* z, int ldz, double sigma, char const* bmat, int n, char const* which, int nev, double tol, double* resid, int ncv, double* v, int ldv, int* iparam, int* ipntr, double* workd, double* workl, int lworkl, int* info);
-void pdnaupd_(int comm, int* ido, char const* bmat, int n, char const* which, int nev, double tol, double* resid, int ncv, double* v, int ldv, int* iparam, int* ipntr, double* workd, double* workl, int lworkl, int* info);
-void pdneupd_(int comm, int rvec, char const* howmny, int const* select, double* dr, double* di, double* z, int ldz, double sigmar, double sigmai, double* workev, char const* bmat, int n, char const* which, int nev, double tol, double* resid, int ncv, double* v, int ldv, int* iparam, int* ipntr, double* workd, double* workl, int lworkl, int* info);
+void pdsaupd_(const blas_int* comm, blas_int* ido, char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+void pdseupd_(const blas_int* comm, blas_int* rvec, const char* howmny, const blas_int* select, double* d, double* z, blas_int* ldz, double* sigma, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+void pdnaupd_(blas_int* comm, blas_int* ido, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+void pdneupd_(blas_int* comm, blas_int* rvec, const char* howmny, const blas_int* select, double* dr, double* di, double* z, blas_int* ldz, double* sigmar, double* sigmai, double* workev, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
 
 #ifdef __cplusplus
 }
@@ -233,7 +233,7 @@ void pdneupd_(int comm, int rvec, char const* howmny, int const* select, double*
 int eig_psolve(vec& eigval, mat& eigvec, const mat_ptr& K, const mat_ptr& M, const unsigned num, const char* WHICH) {
     static auto BMAT{'G'}; // generalized eigenvalue problem A*x=lambda*B*x
 
-    // const auto comm = MPI_Comm_c2f(comm_world.native_handle());
+    const auto COMM = MPI_Comm_c2f(comm_world.native_handle());
 
     blas_int IDO{0}, INFO{0};
     auto N = static_cast<blas_int>(K->n_cols);
@@ -254,7 +254,7 @@ int eig_psolve(vec& eigval, mat& eigvec, const mat_ptr& K, const mat_ptr& M, con
     M += K;
 
     while(99 != IDO) {
-        arma_fortran(arma_dsaupd)(&IDO, &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+        pdsaupd_(&COMM, &IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
         if(0 != INFO) break;
         // ReSharper disable once CppEntityAssignedButNoRead
         if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false, true); -1 == IDO) {
@@ -291,7 +291,7 @@ int eig_psolve(vec& eigval, mat& eigvec, const mat_ptr& K, const mat_ptr& M, con
     eigval.set_size(NEV);
     eigvec.set_size(N, NEV);
 
-    arma_fortran(arma_dseupd)(&RVEC, &HOWMNY, SELECT.memptr(), eigval.memptr(), eigvec.memptr(), &N, &SIGMA, &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+    pdseupd_(&COMM, &RVEC, &HOWMNY, SELECT.memptr(), eigval.memptr(), eigvec.memptr(), &N, &SIGMA, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
 
     return INFO;
 }
