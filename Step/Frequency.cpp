@@ -29,7 +29,7 @@ Frequency::Frequency(const unsigned T, const unsigned N, const char TP)
 
 int Frequency::initialize() {
 #ifdef SUANPAN_DISTRIBUTED
-    suanpan_warning("Frequency analysis currently does not support distributed computation thus it will be conducted on each node.\n");
+    suanpan_warning("Not every frequency analysis solver supports distributed computation; some instead execute the analysis independently on each node. Refer to the documentation for specific details.\n");
 #endif
 
     configure_storage_scheme();
