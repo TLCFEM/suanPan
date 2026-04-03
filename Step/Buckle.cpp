@@ -29,7 +29,7 @@ Buckle::Buckle(const unsigned T)
 
 int Buckle::initialize() {
 #ifdef SUANPAN_DISTRIBUTED
-    suanpan_warning("Buckling analysis currently does not support distributed computation thus it will be conducted on each node.\n");
+    suanpan_warning("Not every buckling analysis solver supports distributed computation; some instead execute the analysis independently on each node. Refer to the documentation for specific details.\n");
 #endif
 
     const auto t_domain = database.lock();
