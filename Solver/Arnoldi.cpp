@@ -53,7 +53,11 @@ int Arnoldi::analyze() {
     const auto factor = std::max(datum::eps, 1E-12 * t_mass->max());
     for(auto I = 0llu; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
 
+#ifdef SUANPAN_DISTRIBUTED
+    return eig_psolve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
+#else
     return eig_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
+#endif
 }
 
 void Arnoldi::print() {

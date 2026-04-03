@@ -53,9 +53,11 @@ void EigenRecorder::save() {
     if(eigen_value.is_empty()) return;
 
 #ifdef SUANPAN_HDF5
-    const std::string file_name = "Eigenvalue.h5";
+    std::ostringstream file_name;
+    if(comm_size > 1) file_name << 'P' << comm_rank << '-';
+    file_name << "Eigenvalue.h5";
 
-    const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     hsize_t dimension[2]{eigen_value.n_elem, 1};
     H5LTmake_dataset(file_id, "Eigenvalue", 2, dimension, H5T_NATIVE_DOUBLE, eigen_value.mem);
