@@ -220,10 +220,10 @@ int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const u
 #ifdef __cplusplus
 extern "C" {
 #endif
-void pdsaupd_(const blas_int* comm, blas_int* ido, char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
-void pdseupd_(const blas_int* comm, blas_int* rvec, const char* howmny, const blas_int* select, double* d, double* z, blas_int* ldz, double* sigma, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
-void pdnaupd_(const blas_int* comm, blas_int* ido, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
-void pdneupd_(const blas_int* comm, blas_int* rvec, const char* howmny, const blas_int* select, double* dr, double* di, double* z, blas_int* ldz, double* sigmar, double* sigmai, double* workev, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+void pdsaupd_(const MPI_Fint* comm, blas_int* ido, char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+void pdseupd_(const MPI_Fint* comm, blas_int* rvec, const char* howmny, const blas_int* select, double* d, double* z, blas_int* ldz, double* sigma, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+void pdnaupd_(const MPI_Fint* comm, blas_int* ido, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+void pdneupd_(const MPI_Fint* comm, blas_int* rvec, const char* howmny, const blas_int* select, double* dr, double* di, double* z, blas_int* ldz, double* sigmar, double* sigmai, double* workev, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
 #ifdef __cplusplus
 }
 #endif
