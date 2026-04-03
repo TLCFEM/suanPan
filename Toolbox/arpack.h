@@ -39,6 +39,10 @@ int eig_solve(cx_vec&, const std::shared_ptr<MetaMat<double>>&, unsigned);
 
 #ifdef SUANPAN_DISTRIBUTED
 int eig_psolve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
+
+int eig_psolve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
+
+int eig_psolve(cx_vec&, const std::shared_ptr<MetaMat<double>>&, unsigned);
 #endif
 
 #endif
