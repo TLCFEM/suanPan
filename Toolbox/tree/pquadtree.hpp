@@ -53,10 +53,9 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
         nodes.clear();
         nodes.shrink_to_fit();
 
-        tbb::parallel_for(0, 4, [&](const auto i) {
-            buckets[i].shrink_to_fit();
-            children[i].insert(std::move(buckets[i]));
-        });
+        for(auto i = 0; i < 4; ++i) buckets[i].shrink_to_fit();
+
+        tbb::parallel_for(0, 4, [&](const auto i) { children[i].insert(std::move(buckets[i])); });
     }
 
     void insert(node_pool&& child) {
