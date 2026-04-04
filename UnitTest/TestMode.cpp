@@ -33,5 +33,5 @@ void test_mode() {
     QuadTree<double, 2> tree({{0.0, 0.0}, {1000.0, 1000.0}});
     tree.insert(ptr_view.begin(), ptr_view.end());
 
-    std::cout << points.size() << std::endl;
+    std::cout << tree.depth() << std::endl;
 }

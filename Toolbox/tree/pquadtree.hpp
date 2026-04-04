@@ -71,6 +71,12 @@ public:
 
         if(nodes.size() > BUCKET_SIZE) split();
     }
+
+    unsigned depth() const {
+        auto max_depth = 0u;
+        for(auto&& child : children) max_depth = std::max(max_depth, child.depth());
+        return max_depth + 1u;
+    }
 };
 
 #endif
