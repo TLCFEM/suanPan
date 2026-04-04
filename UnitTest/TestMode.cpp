@@ -25,14 +25,15 @@ void test_mode() {
     std::uniform_real_distribution dis(-1000.0, 1000.0);
 
     std::vector<Node2D<>> points;
-    const auto n = 3'000'000;
+    const auto n = 30'000'000;
     points.reserve(n);
     for(auto i = 0; i < n; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
 
-    auto ptr_view = points | std::views::transform([](const Node2D<>& p) { return &p; });
+    [[maybe_unused]] auto ptr_view = points | std::views::transform([](const Node2D<>& p) { return &p; });
 
     QuadTree<double, 2> tree({{0.0, 0.0}, {1000.0, 1000.0}});
     tree.insert(ptr_view.begin(), ptr_view.end());
 
     std::cout << tree.depth() << std::endl;
+    // for(auto&& node : points) tree.insert(std::move(node));
 }
