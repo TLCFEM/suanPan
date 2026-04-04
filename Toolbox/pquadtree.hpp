@@ -18,7 +18,7 @@
 #ifndef PQUADTREE_HPP
 #define PQUADTREE_HPP
 
-#include <oneapi/tbb/concurrent_unordered_set.h>
+#include <oneapi/tbb/concurrent_vector.h>
 #include <oneapi/tbb/parallel_for.h>
 #include <oneapi/tbb/parallel_for_each.h>
 
@@ -37,7 +37,7 @@ template<std::floating_point T = double> struct BoundingBox {
 template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTree {
     const BoundingBox<T> box;
 
-    tbb::concurrent_unordered_set<const Node2D<T>*> nodes;
+    tbb::concurrent_vector<const Node2D<T>*> nodes;
     std::vector<QuadTree> children;
 
     const QuadTree* parent = nullptr;
@@ -56,7 +56,7 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
         std::array<decltype(nodes), 4> buckets;
         tbb::parallel_for_each(nodes.cbegin(), nodes.cend(), [&](const auto& node) {
             const std::size_t a = node->x > box.center.x, b = node->y > box.center.y;
-            buckets[2 * b + (a ^ b)].insert(node);
+            buckets[2 * b + (a ^ b)].push_back(node);
         });
         tbb::parallel_for(0, 4, [&](const auto i) { children[i].insert(buckets[i].cbegin(), buckets[i].cend()); });
 
@@ -68,8 +68,8 @@ public:
         : box(std::move(in_box)) {}
 
     template<std::forward_iterator IT> void insert(IT begin, IT end) {
-        if constexpr(std::is_pointer_v<typename std::iterator_traits<IT>::value_type>) nodes.insert(begin, end);
-        else tbb::parallel_for_each(begin, end, [&](const auto& node) { nodes.insert(&node); });
+        if constexpr(std::is_pointer_v<typename std::iterator_traits<IT>::value_type>) nodes.assign(begin, end);
+        else tbb::parallel_for_each(begin, end, [&](const auto& node) { nodes.push_back(&node); });
 
         if(nodes.size() > BUCKET_SIZE) split();
     }
