@@ -46,13 +46,16 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
         const auto dx = T(.5) * box.dimension.x, dy = T(.5) * box.dimension.y;
         children.clear();
         children.reserve(4);
-        children.emplace_back(BoundingBox<>{{box.center.x - dx, box.center.y - dy}, {dx, dy}}).attach(this);
-        children.emplace_back(BoundingBox<>{{box.center.x + dx, box.center.y - dy}, {dx, dy}}).attach(this);
-        children.emplace_back(BoundingBox<>{{box.center.x + dx, box.center.y + dy}, {dx, dy}}).attach(this);
-        children.emplace_back(BoundingBox<>{{box.center.x - dx, box.center.y + dy}, {dx, dy}}).attach(this);
+        children.emplace_back(BoundingBox<T>{{box.center.x - dx, box.center.y - dy}, {dx, dy}}).attach(this);
+        children.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y - dy}, {dx, dy}}).attach(this);
+        children.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y + dy}, {dx, dy}}).attach(this);
+        children.emplace_back(BoundingBox<T>{{box.center.x - dx, box.center.y + dy}, {dx, dy}}).attach(this);
     }
 
-    void quick_insert(Node2D<T>&& node) { children[node.y <= box.center.y ? (node.x <= box.center.x ? 0 : 1) : (node.x <= box.center.x ? 3 : 2)].insert(std::move(node)); }
+    void quick_insert(Node2D<T>&& node) {
+        const std::size_t a = node.x > box.center.x, b = node.y > box.center.y;
+        children[2 * b + (a ^ b)].insert(std::move(node));
+    }
 
 public:
     explicit QuadTree(BoundingBox<T>&& in_box)
