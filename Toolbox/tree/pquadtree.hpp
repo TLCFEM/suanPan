@@ -20,16 +20,15 @@
 
 #include "common.hpp"
 
-#include <oneapi/tbb/concurrent_vector.h>
 #include <oneapi/tbb/parallel_for.h>
-#include <oneapi/tbb/parallel_for_each.h>
 
 template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTree {
     using node_ptr = const Node2D<T>*;
+    using node_pool = std::vector<node_ptr>;
 
     const BoundingBox<T> box;
 
-    tbb::concurrent_vector<node_ptr> nodes;
+    node_pool nodes;
 
     std::vector<QuadTree> children;
 
@@ -46,18 +45,18 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
         children.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y + dy}, {dx, dy}}).attach(this);
         children.emplace_back(BoundingBox<T>{{box.center.x - dx, box.center.y + dy}, {dx, dy}}).attach(this);
 
-        std::array<decltype(nodes), 4> buckets;
-        tbb::parallel_for_each(nodes.cbegin(), nodes.cend(), [&](const auto& node) {
+        std::array<node_pool, 4> buckets;
+        for(auto&& node : nodes) {
             const std::size_t a = node->x > box.center.x, b = node->y > box.center.y;
             buckets[2 * b + (a ^ b)].push_back(node);
-        });
+        }
         nodes.clear();
         nodes.shrink_to_fit();
 
         tbb::parallel_for(0, 4, [&](const auto i) { children[i].insert(std::move(buckets[i])); });
     }
 
-    void insert(tbb::concurrent_vector<node_ptr>&& child) {
+    void insert(node_pool&& child) {
         nodes = std::move(child);
 
         if(nodes.size() > BUCKET_SIZE) split();
