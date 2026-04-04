@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include <Toolbox/tree/pquadtree.hpp>
+#include <iostream>
 #include <random>
 #include <ranges>
 
@@ -24,11 +25,13 @@ void test_mode() {
     std::uniform_real_distribution dis(-1000.0, 1000.0);
 
     std::vector<Node2D<>> points;
-    points.reserve(10'000'000);
-    for(auto i = 0; i < 10'000'000; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
+    points.reserve(30'000'000);
+    for(auto i = 0; i < 30'000'000; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
 
     auto ptr_view = points | std::views::transform([](const Node2D<>& p) { return &p; });
 
     QuadTree<double, 2> tree({{0.0, 0.0}, {1000.0, 1000.0}});
     tree.insert(ptr_view.begin(), ptr_view.end());
+
+    std::cout << points.size() << std::endl;
 }
