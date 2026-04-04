@@ -23,8 +23,8 @@ void test_mode() {
     std::uniform_real_distribution dis(-1000.0, 1000.0);
 
     std::vector<Node2D<>> points;
-    points.reserve(1'000'000);
-    for(auto i = 0; i < 1'000'000; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
+    points.reserve(10'000'000);
+    for(auto i = 0; i < 10'000'000; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
 
     QuadTree<double, 2> tree({{0.0, 0.0}, {1000.0, 1000.0}});
     tree.insert(points.cbegin(), points.cend());

@@ -69,8 +69,7 @@ public:
 
     template<std::forward_iterator IT> void insert(IT begin, IT end) {
         if constexpr(std::is_pointer_v<typename std::iterator_traits<IT>::value_type>) nodes.insert(begin, end);
-        else
-            for(auto it = begin; it != end; ++it) nodes.insert(&*it);
+        else tbb::parallel_for_each(begin, end, [&](const auto& node) { nodes.insert(&node); });
 
         if(nodes.size() > BUCKET_SIZE) split();
     }
