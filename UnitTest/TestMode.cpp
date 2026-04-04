@@ -16,9 +16,11 @@
  ******************************************************************************/
 
 #include <Toolbox/tree/pquadtree.hpp>
+#include <chrono>
 #include <iostream>
 #include <random>
 #include <ranges>
+#include <thread>
 
 void test_mode() {
     std::mt19937 gen(42);
@@ -36,4 +38,6 @@ void test_mode() {
 
     std::cout << tree.depth() << std::endl;
     // for(auto&& node : points) tree.insert(std::move(node));
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 }
