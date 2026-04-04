@@ -15,20 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include <Toolbox/tree/pquadtree.hpp>
-#include <random>
-#include <ranges>
+#ifndef TREE_COMMON_HPP
+#define TREE_COMMON_HPP
 
-void test_mode() {
-    std::mt19937 gen(42);
-    std::uniform_real_distribution dis(-1000.0, 1000.0);
+#include <concepts>
 
-    std::vector<Node2D<>> points;
-    points.reserve(10'000'000);
-    for(auto i = 0; i < 10'000'000; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
+template<std::floating_point T = double> struct Vector2D {
+    const T x, y;
+};
 
-    auto ptr_view = points | std::views::transform([](const Node2D<>& p) { return &p; });
+template<std::floating_point T = double> struct Node2D : Vector2D<T> {
+    const unsigned id{0};
+};
 
-    QuadTree<double, 2> tree({{0.0, 0.0}, {1000.0, 1000.0}});
-    tree.insert(ptr_view.begin(), ptr_view.end());
-}
+template<std::floating_point T = double> struct BoundingBox {
+    const Vector2D<T> center, dimension;
+};
+
+#endif

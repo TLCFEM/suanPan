@@ -15,27 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#ifndef TREE_HPP
-#define TREE_HPP
+#ifndef PQUADTREE_HPP
+#define PQUADTREE_HPP
 
-#include <vector>
+#include "common.hpp"
 
-template<std::floating_point T = double> struct Vector2D {
-    const T x, y;
-};
-
-template<std::floating_point T = double> struct Node2D : Vector2D<T> {
-    const unsigned id{0};
-};
-
-template<std::floating_point T = double> struct BoundingBox {
-    const Vector2D<T> center, dimension;
-};
+#include <oneapi/tbb/concurrent_vector.h>
+#include <oneapi/tbb/parallel_for.h>
+#include <oneapi/tbb/parallel_for_each.h>
 
 template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTree {
+    using node_ptr = const Node2D<T>*;
+
     const BoundingBox<T> box;
 
-    std::vector<Node2D<T>> nodes;
+    tbb::concurrent_vector<node_ptr> nodes;
+
     std::vector<QuadTree> children;
 
     const QuadTree* parent = nullptr;
@@ -50,27 +45,28 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
         children.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y - dy}, {dx, dy}}).attach(this);
         children.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y + dy}, {dx, dy}}).attach(this);
         children.emplace_back(BoundingBox<T>{{box.center.x - dx, box.center.y + dy}, {dx, dy}}).attach(this);
-    }
 
-    void quick_insert(Node2D<T>&& node) {
-        const std::size_t a = node.x > box.center.x, b = node.y > box.center.y;
-        children[2 * b + (a ^ b)].insert(std::move(node));
+        std::array<decltype(nodes), 4> buckets;
+        tbb::parallel_for_each(nodes.cbegin(), nodes.cend(), [&](const auto& node) {
+            const std::size_t a = node->x > box.center.x, b = node->y > box.center.y;
+            buckets[2 * b + (a ^ b)].push_back(node);
+        });
+        nodes.clear();
+
+        tbb::parallel_for(0, 4, [&](const auto i) {
+            children[i].insert(buckets[i].cbegin(), buckets[i].cend());
+            buckets[i].clear();
+        });
     }
 
 public:
     explicit QuadTree(BoundingBox<T>&& in_box)
-        : box(std::move(in_box)) { nodes.reserve(BUCKET_SIZE + 1); }
+        : box(std::move(in_box)) {}
 
-    void insert(Node2D<T>&& node) {
-        if(!children.empty()) return quick_insert(std::move(node));
+    template<std::forward_iterator IT> void insert(IT begin, IT end) requires std::is_convertible_v<std::iter_value_t<IT>, node_ptr> {
+        nodes.assign(begin, end);
 
-        nodes.emplace_back(std::move(node));
-        if(nodes.size() <= BUCKET_SIZE) return;
-
-        split();
-        for(auto&& n : nodes) quick_insert(std::move(n));
-        nodes.clear();
-        nodes.shrink_to_fit();
+        if(nodes.size() > BUCKET_SIZE) split();
     }
 };
 

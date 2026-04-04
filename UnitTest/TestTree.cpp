@@ -1,6 +1,6 @@
 #include "CatchHeader.h"
 
-#include <Toolbox/tree.hpp>
+#include <Toolbox/tree/quadtree.hpp>
 #include <random>
 
 TEST_CASE("Quadtree constructs and accepts a single point", "[Utility.Tree]") {

@@ -15,29 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#ifndef PQUADTREE_HPP
-#define PQUADTREE_HPP
+#ifndef QUADTREE_HPP
+#define QUADTREE_HPP
 
-#include <oneapi/tbb/concurrent_vector.h>
-#include <oneapi/tbb/parallel_for.h>
-#include <oneapi/tbb/parallel_for_each.h>
+#include "common.hpp"
 
-template<std::floating_point T = double> struct Vector2D {
-    const T x, y;
-};
-
-template<std::floating_point T = double> struct Node2D : Vector2D<T> {
-    const unsigned id{0};
-};
-
-template<std::floating_point T = double> struct BoundingBox {
-    const Vector2D<T> center, dimension;
-};
+#include <vector>
 
 template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTree {
     const BoundingBox<T> box;
 
-    tbb::concurrent_vector<const Node2D<T>*> nodes;
+    std::vector<Node2D<T>> nodes;
+
     std::vector<QuadTree> children;
 
     const QuadTree* parent = nullptr;
@@ -52,26 +41,27 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
         children.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y - dy}, {dx, dy}}).attach(this);
         children.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y + dy}, {dx, dy}}).attach(this);
         children.emplace_back(BoundingBox<T>{{box.center.x - dx, box.center.y + dy}, {dx, dy}}).attach(this);
+    }
 
-        std::array<decltype(nodes), 4> buckets;
-        tbb::parallel_for_each(nodes.cbegin(), nodes.cend(), [&](const auto& node) {
-            const std::size_t a = node->x > box.center.x, b = node->y > box.center.y;
-            buckets[2 * b + (a ^ b)].push_back(node);
-        });
-        tbb::parallel_for(0, 4, [&](const auto i) { children[i].insert(buckets[i].cbegin(), buckets[i].cend()); });
-
-        nodes.clear();
+    void quick_insert(Node2D<T>&& node) {
+        const std::size_t a = node.x > box.center.x, b = node.y > box.center.y;
+        children[2 * b + (a ^ b)].insert(std::move(node));
     }
 
 public:
     explicit QuadTree(BoundingBox<T>&& in_box)
-        : box(std::move(in_box)) {}
+        : box(std::move(in_box)) { nodes.reserve(BUCKET_SIZE + 1); }
 
-    template<std::forward_iterator IT> void insert(IT begin, IT end) {
-        if constexpr(std::is_pointer_v<typename std::iterator_traits<IT>::value_type>) nodes.assign(begin, end);
-        else tbb::parallel_for_each(begin, end, [&](const auto& node) { nodes.push_back(&node); });
+    void insert(Node2D<T>&& node) {
+        if(!children.empty()) return quick_insert(std::move(node));
 
-        if(nodes.size() > BUCKET_SIZE) split();
+        nodes.emplace_back(std::move(node));
+        if(nodes.size() <= BUCKET_SIZE) return;
+
+        split();
+        for(auto&& n : nodes) quick_insert(std::move(n));
+        nodes.clear();
+        nodes.shrink_to_fit();
     }
 };
 
