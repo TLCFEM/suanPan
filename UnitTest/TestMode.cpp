@@ -33,7 +33,7 @@ void test_mode() {
 
     [[maybe_unused]] auto ptr_view = points | std::views::transform([](const Node2D<>& p) { return &p; });
 
-    QuadTree<double, 2> tree({{0.0, 0.0}, {1000.0, 1000.0}});
+    QuadTree<double, 32> tree({{0.0, 0.0}, {1000.0, 1000.0}});
     tree.insert(ptr_view.begin(), ptr_view.end());
 
     std::cout << tree.depth() << std::endl;

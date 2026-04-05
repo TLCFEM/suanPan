@@ -59,7 +59,6 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
 
     void insert(node_pool&& child) {
         nodes = std::move(child);
-
         if(nodes.size() > BUCKET_SIZE) split();
     }
 
@@ -69,7 +68,6 @@ public:
 
     template<std::forward_iterator IT> void insert(IT begin, IT end) requires std::is_convertible_v<std::iter_value_t<IT>, node_ptr> {
         nodes.assign(begin, end);
-
         if(nodes.size() > BUCKET_SIZE) split();
     }
 
