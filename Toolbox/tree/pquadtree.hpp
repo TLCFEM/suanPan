@@ -28,11 +28,12 @@
 
 template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class PQuadTree {
     using node_ptr = const Node2D<T>*;
-    using node_pool = std::vector<node_ptr>;
+    using leaf_t = std::vector<node_ptr>;
+    using subtree_t = std::array<std::unique_ptr<PQuadTree>, 4>;
 
     const BoundingBox<T> box;
 
-    std::variant<node_pool, std::vector<PQuadTree>> child;
+    std::variant<leaf_t, subtree_t> child;
 
     const PQuadTree* parent = nullptr;
 
@@ -42,28 +43,42 @@ public:
     explicit PQuadTree(BoundingBox<T>&& in_box)
         : box(std::move(in_box)) {}
 
-    template<std::forward_iterator IT> void insert(IT begin, IT end) requires std::is_convertible_v<std::iter_value_t<IT>, node_ptr> { insert(node_pool(begin, end)); }
+    template<std::forward_iterator IT> void insert(IT begin, IT end) requires std::is_convertible_v<std::iter_value_t<IT>, node_ptr> { insert(leaf_t(begin, end)); }
 
-    void insert(node_pool&& in_child) {
-        if(std::get<node_pool>(child = std::move(in_child)).size() <= BUCKET_SIZE) return;
+    void insert(leaf_t&& in_child) {
+        if(std::get<leaf_t>(child = std::move(in_child)).size() <= BUCKET_SIZE) return;
 
-        std::array<node_pool, 4> buckets;
-        for(auto&& node : std::get<node_pool>(child)) buckets[2 * (node->y > box.center.y) + (node->x > box.center.x)].push_back(node);
+        std::array<leaf_t, 4> buckets;
+        for(auto&& node : std::get<leaf_t>(child)) buckets[2 * (node->y > box.center.y) + (node->x > box.center.x)].push_back(node);
         for(auto i = 0; i < 4; ++i) buckets[i].shrink_to_fit();
 
-        auto& subtree = std::get<std::vector<PQuadTree>>(child = std::vector<PQuadTree>());
-        subtree.reserve(4);
+        auto& subtree = std::get<subtree_t>(child = subtree_t());
 
         const auto dx = T(.5) * box.dimension.x, dy = T(.5) * box.dimension.y;
-        subtree.emplace_back(BoundingBox<T>{{box.center.x - dx, box.center.y - dy}, {dx, dy}}).attach(this);
-        subtree.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y - dy}, {dx, dy}}).attach(this);
-        subtree.emplace_back(BoundingBox<T>{{box.center.x - dx, box.center.y + dy}, {dx, dy}}).attach(this);
-        subtree.emplace_back(BoundingBox<T>{{box.center.x + dx, box.center.y + dy}, {dx, dy}}).attach(this);
+        if(!buckets[0].empty()) {
+            subtree[0] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x - dx, box.center.y - dy}, {dx, dy}});
+            subtree[0]->attach(this);
+        }
+        if(!buckets[1].empty()) {
+            subtree[1] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x + dx, box.center.y - dy}, {dx, dy}});
+            subtree[1]->attach(this);
+        }
+        if(!buckets[2].empty()) {
+            subtree[2] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x - dx, box.center.y + dy}, {dx, dy}});
+            subtree[2]->attach(this);
+        }
+        if(!buckets[3].empty()) {
+            subtree[3] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x + dx, box.center.y + dy}, {dx, dy}});
+            subtree[3]->attach(this);
+        }
 
 #ifdef SUANPAN_MT
-        tbb::parallel_for(0, 4, [&](const auto i) { subtree[i].insert(std::move(buckets[i])); });
+        tbb::parallel_for(0, 4, [&](const auto i) {
+            if(subtree[i]) subtree[i]->insert(std::move(buckets[i]));
+        });
 #else
-        for(auto i = 0; i < 4; ++i) subtree[i].insert(std::move(buckets[i]));
+        for(auto i = 0; i < 4; ++i)
+            if(subtree[i]) subtree[i]->insert(std::move(buckets[i]));
 #endif
     }
 };
