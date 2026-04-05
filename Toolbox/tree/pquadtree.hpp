@@ -20,9 +20,11 @@
 
 #include "common.hpp"
 
+#ifdef SUANPAN_MT
 #include <oneapi/tbb/parallel_for.h>
+#endif
 
-template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTree {
+template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class PQuadTree {
     using node_ptr = const Node2D<T>*;
     using node_pool = std::vector<node_ptr>;
 
@@ -30,11 +32,11 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
 
     node_pool nodes;
 
-    std::vector<QuadTree> children;
+    std::vector<PQuadTree> children;
 
-    const QuadTree* parent = nullptr;
+    const PQuadTree* parent = nullptr;
 
-    void attach(const QuadTree* in_parent) { parent = in_parent; }
+    void attach(const PQuadTree* in_parent) { parent = in_parent; }
 
     void split() {
         const auto dx = T(.5) * box.dimension.x, dy = T(.5) * box.dimension.y;
@@ -54,17 +56,21 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
 
         for(auto i = 0; i < 4; ++i) buckets[i].shrink_to_fit();
 
+#ifdef SUANPAN_MT
         tbb::parallel_for(0, 4, [&](const auto i) { children[i].insert(std::move(buckets[i])); });
+#else
+        for(auto i = 0; i < 4; ++i) children[i].insert(std::move(buckets[i]));
+#endif
     }
+
+public:
+    explicit PQuadTree(BoundingBox<T>&& in_box)
+        : box(std::move(in_box)) {}
 
     void insert(node_pool&& child) {
         nodes = std::move(child);
         if(nodes.size() > BUCKET_SIZE) split();
     }
-
-public:
-    explicit QuadTree(BoundingBox<T>&& in_box)
-        : box(std::move(in_box)) {}
 
     template<std::forward_iterator IT> void insert(IT begin, IT end) requires std::is_convertible_v<std::iter_value_t<IT>, node_ptr> {
         nodes.assign(begin, end);

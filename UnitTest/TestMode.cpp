@@ -15,29 +15,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include <Toolbox/tree/pquadtree.hpp>
-#include <chrono>
-#include <iostream>
-#include <random>
-#include <ranges>
-#include <thread>
-
-void test_mode() {
-    std::mt19937 gen(42);
-    std::uniform_real_distribution dis(-1000.0, 1000.0);
-
-    std::vector<Node2D<>> points;
-    const auto n = 30'000'000;
-    points.reserve(n);
-    for(auto i = 0; i < n; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
-
-    [[maybe_unused]] auto ptr_view = points | std::views::transform([](const Node2D<>& p) { return &p; });
-
-    QuadTree<double, 32> tree({{0.0, 0.0}, {1000.0, 1000.0}});
-    tree.insert(ptr_view.begin(), ptr_view.end());
-
-    std::cout << tree.depth() << std::endl;
-    // for(auto&& node : points) tree.insert(std::move(node));
-
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-}
+void test_mode() {}

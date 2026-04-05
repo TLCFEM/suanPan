@@ -1,5 +1,6 @@
 #include "CatchHeader.h"
 
+#include <Toolbox/tree/pquadtree.hpp>
 #include <Toolbox/tree/quadtree.hpp>
 #include <random>
 
@@ -50,13 +51,36 @@ TEST_CASE("Quadtree handles repeated insertions without splitting when bucket is
     for(unsigned i = 0; i < 32; ++i) REQUIRE_NOTHROW(tree.insert(Node2D<>{0.125, -0.25}));
 }
 
-TEST_CASE("Quadtree benchmark: insert one million random nodes", "[Utility.Tree]") {
+TEST_CASE("Quadtree benchmark: insert random nodes", "[Utility.Tree]") {
+    static constexpr auto size = 1000.;
+    static constexpr auto n = 30'000;
     std::mt19937 gen(42);
-    std::uniform_real_distribution dis(-1000.0, 1000.0);
+    std::uniform_real_distribution dis(-size, size);
 
-    BENCHMARK("Insert one million random nodes") {
-        QuadTree<double, 2> tree({{0.0, 0.0}, {1000.0, 1000.0}});
-        for(auto i = 0; i < 1'000'000; ++i) tree.insert(Node2D<>{dis(gen), dis(gen)});
+    BENCHMARK("Insert random nodes") {
+        QuadTree<double, 2> tree({{0.0, 0.0}, {size, size}});
+        for(auto i = 0; i < n; ++i) tree.insert(Node2D<>{dis(gen), dis(gen)});
+        return tree;
+    };
+}
+
+TEST_CASE("PQuadtree benchmark: insert random nodes", "[Utility.Tree]") {
+    static constexpr auto size = 1000.;
+    static constexpr auto n = 30'000;
+    std::mt19937 gen(42);
+    std::uniform_real_distribution dis(-size, size);
+
+    std::vector<Node2D<>> points;
+    points.reserve(n);
+    for(auto i = 0; i < n; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
+
+    std::vector<const Node2D<>*> ptrs;
+    ptrs.reserve(points.size());
+    for(auto&& p : points) ptrs.push_back(&p);
+
+    BENCHMARK("Insert random nodes") {
+        PQuadTree<double, 32> tree({{0.0, 0.0}, {size, size}});
+        tree.insert(std::move(ptrs));
         return tree;
     };
 }
