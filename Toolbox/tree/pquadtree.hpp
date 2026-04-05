@@ -50,8 +50,7 @@ template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTre
             const std::size_t a = node->x > box.center.x, b = node->y > box.center.y;
             buckets[2 * b + (a ^ b)].push_back(node);
         }
-        nodes.clear();
-        nodes.shrink_to_fit();
+        nodes = {};
 
         for(auto i = 0; i < 4; ++i) buckets[i].shrink_to_fit();
 
