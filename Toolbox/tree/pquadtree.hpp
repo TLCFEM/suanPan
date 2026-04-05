@@ -20,7 +20,10 @@
 
 #include "common.hpp"
 
+#include <array>
+#include <memory>
 #include <variant>
+#include <vector>
 
 #ifdef SUANPAN_MT
 #include <oneapi/tbb/parallel_for.h>
@@ -52,34 +55,48 @@ public:
         for(auto&& node : std::get<leaf_t>(child)) buckets[2 * (node->y > box.center.y) + (node->x > box.center.x)].push_back(node);
         for(auto i = 0; i < 4; ++i) buckets[i].shrink_to_fit();
 
-        auto& subtree = std::get<subtree_t>(child = subtree_t());
+        auto& subtrees = std::get<subtree_t>(child = subtree_t());
 
         const auto dx = T(.5) * box.dimension.x, dy = T(.5) * box.dimension.y;
         if(!buckets[0].empty()) {
-            subtree[0] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x - dx, box.center.y - dy}, {dx, dy}});
-            subtree[0]->attach(this);
+            subtrees[0] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x - dx, box.center.y - dy}, {dx, dy}});
+            subtrees[0]->attach(this);
         }
         if(!buckets[1].empty()) {
-            subtree[1] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x + dx, box.center.y - dy}, {dx, dy}});
-            subtree[1]->attach(this);
+            subtrees[1] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x + dx, box.center.y - dy}, {dx, dy}});
+            subtrees[1]->attach(this);
         }
         if(!buckets[2].empty()) {
-            subtree[2] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x - dx, box.center.y + dy}, {dx, dy}});
-            subtree[2]->attach(this);
+            subtrees[2] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x - dx, box.center.y + dy}, {dx, dy}});
+            subtrees[2]->attach(this);
         }
         if(!buckets[3].empty()) {
-            subtree[3] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x + dx, box.center.y + dy}, {dx, dy}});
-            subtree[3]->attach(this);
+            subtrees[3] = std::make_unique<PQuadTree>(BoundingBox<T>{{box.center.x + dx, box.center.y + dy}, {dx, dy}});
+            subtrees[3]->attach(this);
         }
 
 #ifdef SUANPAN_MT
         tbb::parallel_for(0, 4, [&](const auto i) {
-            if(subtree[i]) subtree[i]->insert(std::move(buckets[i]));
+            if(subtrees[i]) subtrees[i]->insert(std::move(buckets[i]));
         });
 #else
         for(auto i = 0; i < 4; ++i)
-            if(subtree[i]) subtree[i]->insert(std::move(buckets[i]));
+            if(subtrees[i]) subtrees[i]->insert(std::move(buckets[i]));
 #endif
+    }
+
+    std::vector<const PQuadTree*> overlap(const BoundingBox<T>& target) const {
+        if(!box.overlap(target)) return {};
+
+        if(std::holds_alternative<leaf_t>(child)) return {this};
+
+        std::vector<const PQuadTree*> result;
+        for(auto&& subtree : std::get<subtree_t>(child)) {
+            if(!subtree) continue;
+            auto sub_result = subtree->overlap(target);
+            result.insert(result.end(), sub_result.begin(), sub_result.end());
+        }
+        return result;
     }
 };
 

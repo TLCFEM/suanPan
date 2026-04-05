@@ -81,6 +81,7 @@ TEST_CASE("PQuadtree benchmark: insert random nodes", "[Utility.Tree]") {
     BENCHMARK("Insert random nodes") {
         PQuadTree<double, 32> tree({{0.0, 0.0}, {size, size}});
         tree.insert(std::move(ptrs));
+        tree.overlap({{dis(gen), dis(gen)}, {1, 1}});
         return tree;
     };
 }

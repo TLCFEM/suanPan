@@ -18,6 +18,7 @@
 #ifndef TREE_COMMON_HPP
 #define TREE_COMMON_HPP
 
+#include <cmath>
 #include <concepts>
 
 template<std::floating_point T = double> struct Vector2D {
@@ -30,6 +31,8 @@ template<std::floating_point T = double> struct Node2D : Vector2D<T> {
 
 template<std::floating_point T = double> struct BoundingBox {
     const Vector2D<T> center, dimension;
+
+    bool overlap(const BoundingBox& other) const { return std::fabs(center.x - other.center.x) < (dimension.x + other.dimension.x) && std::fabs(center.y - other.center.y) < (dimension.y + other.dimension.y); }
 };
 
 #endif
