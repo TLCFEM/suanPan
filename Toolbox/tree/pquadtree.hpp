@@ -29,16 +29,26 @@
 #include <oneapi/tbb/parallel_for.h>
 #endif
 
+template<std::floating_point T, unsigned BUCKET_SIZE> class PQuadTree;
+
+template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> struct RefNode2D : Node2D<T> {
+    const PQuadTree<T, BUCKET_SIZE>* tree{nullptr};
+};
+
 template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class PQuadTree {
-    using node_ptr = const Node2D<T>*;
-    using leaf_t = std::vector<node_ptr>;
+public:
+    using node_t = RefNode2D<T, BUCKET_SIZE>;
+    using node_ptr_t = node_t*;
+
+private:
+    using leaf_t = std::vector<node_ptr_t>;
     using subtree_t = std::array<std::unique_ptr<PQuadTree>, 4>;
 
     const BoundingBox<T> box;
 
     std::variant<leaf_t, subtree_t> child;
 
-    const PQuadTree* parent = nullptr;
+    const PQuadTree* parent{nullptr};
 
     void attach(const PQuadTree* in_parent) { parent = in_parent; }
 
@@ -46,10 +56,13 @@ public:
     explicit PQuadTree(BoundingBox<T>&& in_box)
         : box(std::move(in_box)) {}
 
-    template<std::forward_iterator IT> void insert(IT begin, IT end) requires std::is_convertible_v<std::iter_value_t<IT>, node_ptr> { insert(leaf_t(begin, end)); }
+    template<std::forward_iterator IT> void insert(IT begin, IT end) requires std::is_convertible_v<std::iter_value_t<IT>, node_ptr_t> { insert(leaf_t(begin, end)); }
 
     void insert(leaf_t&& in_child) {
-        if(std::get<leaf_t>(child = std::move(in_child)).size() <= BUCKET_SIZE) return;
+        if(auto& nodes = std::get<leaf_t>(child = std::move(in_child)); nodes.size() <= BUCKET_SIZE) {
+            for(auto&& node : nodes) node->tree = this;
+            return;
+        }
 
         std::array<leaf_t, 4> buckets;
         for(auto&& node : std::get<leaf_t>(child)) buckets[2 * (node->y > box.center.y) + (node->x > box.center.x)].push_back(node);

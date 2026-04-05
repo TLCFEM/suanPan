@@ -70,16 +70,19 @@ TEST_CASE("PQuadtree benchmark: insert random nodes", "[Utility.Tree]") {
     std::mt19937 gen(42);
     std::uniform_real_distribution dis(-size, size);
 
-    std::vector<Node2D<>> points;
-    points.reserve(n);
-    for(auto i = 0; i < n; ++i) points.push_back(Node2D<>{dis(gen), dis(gen)});
+    using tree_t = PQuadTree<double, 2>;
+    using node_t = tree_t::node_t;
 
-    std::vector<const Node2D<>*> ptrs;
+    std::vector<node_t> points;
+    points.reserve(n);
+    for(auto i = 0; i < n; ++i) points.push_back(node_t{dis(gen), dis(gen)});
+
+    std::vector<tree_t::node_ptr_t> ptrs;
     ptrs.reserve(points.size());
     for(auto&& p : points) ptrs.push_back(&p);
 
     BENCHMARK("Insert random nodes") {
-        PQuadTree<double, 32> tree({{0.0, 0.0}, {size, size}});
+        tree_t tree({{0.0, 0.0}, {size, size}});
         tree.insert(std::move(ptrs));
         tree.overlap({{dis(gen), dis(gen)}, {1, 1}});
         return tree;
