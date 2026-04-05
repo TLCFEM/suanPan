@@ -266,7 +266,9 @@
     <ClCompile Include="..\..\..\Element\Utility\T3DC.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp" />
     <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp" />
-    <ClCompile Include="..\..\..\Include\catch\catch_amalgamated.cpp" />
+    <ClCompile Include="..\..\..\Include\catch\catch_amalgamated.cpp">
+      <PreprocessorDefinitions>CATCH_AMALGAMATED_CUSTOM_MAIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="..\..\..\Include\fmt\src\format.cc" />
     <ClCompile Include="..\..\..\Include\whereami\whereami.c" />
     <ClCompile Include="..\..\..\Load\Amplitude\Amplitude.cpp" />
