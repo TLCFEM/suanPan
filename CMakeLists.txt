@@ -467,6 +467,8 @@ add_executable(${PROJECT_NAME}
         Include/whereami/whereami.c
 )
 
+set_source_files_properties(Include/catch/catch_amalgamated.cpp PROPERTIES COMPILE_DEFINITIONS "CATCH_AMALGAMATED_CUSTOM_MAIN")
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS 1)
 
 if ((NOT MINGW AND CMAKE_BUILD_TYPE STREQUAL "Release") OR SP_ENABLE_LTO)
