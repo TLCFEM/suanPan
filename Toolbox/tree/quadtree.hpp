@@ -15,27 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#ifndef TREE_HPP
-#define TREE_HPP
+#ifndef QUADTREE_HPP
+#define QUADTREE_HPP
+
+#include "common.hpp"
 
 #include <vector>
-
-template<std::floating_point T = double> struct Vector2D {
-    const T x, y;
-};
-
-template<std::floating_point T = double> struct Node2D : Vector2D<T> {
-    const unsigned id{0};
-};
-
-template<std::floating_point T = double> struct BoundingBox {
-    const Vector2D<T> center, dimension;
-};
 
 template<std::floating_point T = double, unsigned BUCKET_SIZE = 1> class QuadTree {
     const BoundingBox<T> box;
 
     std::vector<Node2D<T>> nodes;
+
     std::vector<QuadTree> children;
 
     const QuadTree* parent = nullptr;
