@@ -210,20 +210,14 @@ double tensor::trace3(const vec& S) {
 
 double tensor::mean3(const vec& S) { return trace3(S) / 3.; }
 
-vec tensor::dev(const vec& S) {
-    auto D = S;
-    return dev(std::move(D));
-}
+vec tensor::dev(const vec& S) { return dev(vec(S)); }
 
 vec tensor::dev(vec&& S) {
     S.head(3) -= mean3(S);
     return std::move(S);
 }
 
-mat tensor::dev(const mat& in) {
-    auto out = in;
-    return dev(std::move(out));
-}
+mat tensor::dev(const mat& in) { return dev(mat(in)); }
 
 mat tensor::dev(mat&& in) {
     suanpan_assert([&] { if(in.n_rows != in.n_cols) throw std::invalid_argument("need square matrix"); });
