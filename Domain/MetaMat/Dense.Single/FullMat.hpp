@@ -33,7 +33,7 @@
 #include "../DenseMat.hpp"
 
 template<sp_d T> class FullMat : public DenseMat<T> {
-    static constexpr char TRAN = 'N';
+    static constexpr auto TRAN = 'N';
 
     int solve_trs(Mat<T>&, Mat<T>&&);
 
@@ -81,31 +81,19 @@ template<sp_d T> Mat<T> FullMat<T>::operator*(const Mat<T>& B) const {
     const auto M = static_cast<blas_int>(this->n_rows);
     const auto N = static_cast<blas_int>(this->n_cols);
 
-    T ALPHA = T(1), BETA = T(0);
+    static constexpr T ALPHA{1}, BETA{0};
 
     if(1 == B.n_cols) {
-        constexpr blas_int INC = 1;
+        static constexpr blas_int INC = 1;
 
-        if constexpr(std::is_same_v<T, float>) {
-            using E = float;
-            arma_fortran(arma_sgemv)(&TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &M, (E*)B.memptr(), &INC, (E*)&BETA, (E*)C.memptr(), &INC);
-        }
-        else {
-            using E = double;
-            arma_fortran(arma_dgemv)(&TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &M, (E*)B.memptr(), &INC, (E*)&BETA, (E*)C.memptr(), &INC);
-        }
+        if constexpr(std::is_same_v<T, float>) arma_fortran(arma_sgemv)(&TRAN, &M, &N, &ALPHA, this->memptr(), &M, B.memptr(), &INC, &BETA, C.memptr(), &INC);
+        else arma_fortran(arma_dgemv)(&TRAN, &M, &N, &ALPHA, this->memptr(), &M, B.memptr(), &INC, &BETA, C.memptr(), &INC);
     }
     else {
         const auto K = static_cast<blas_int>(B.n_cols);
 
-        if constexpr(std::is_same_v<T, float>) {
-            using E = float;
-            arma_fortran(arma_sgemm)(&TRAN, &TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &M, (E*)B.memptr(), &N, (E*)&BETA, (E*)C.memptr(), &M);
-        }
-        else {
-            using E = double;
-            arma_fortran(arma_dgemm)(&TRAN, &TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &M, (E*)B.memptr(), &N, (E*)&BETA, (E*)C.memptr(), &M);
-        }
+        if constexpr(std::is_same_v<T, float>) arma_fortran(arma_sgemm)(&TRAN, &TRAN, &M, &K, &N, &ALPHA, this->memptr(), &M, B.memptr(), &N, &BETA, C.memptr(), &M);
+        else arma_fortran(arma_dgemm)(&TRAN, &TRAN, &M, &K, &N, &ALPHA, this->memptr(), &M, B.memptr(), &N, &BETA, C.memptr(), &M);
     }
 
     return C;
@@ -125,13 +113,11 @@ template<sp_d T> int FullMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     this->factored = true;
 
     if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        arma_fortran(arma_sgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_sgesv)(&N, &NRHS, this->memptr(), &N, this->pivot.memptr(), B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        arma_fortran(arma_dgesv)(&N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_dgesv)(&N, &NRHS, this->memptr(), &N, this->pivot.memptr(), B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else {
@@ -154,13 +140,11 @@ template<sp_d T> int FullMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
     const auto LDB = static_cast<blas_int>(B.n_rows);
 
     if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_sgetrs)(&TRAN, &N, &NRHS, this->memptr(), &N, this->pivot.memptr(), B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        arma_fortran(arma_dgetrs)(&TRAN, &N, &NRHS, (E*)this->memptr(), &N, this->pivot.memptr(), (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_dgetrs)(&TRAN, &N, &NRHS, this->memptr(), &N, this->pivot.memptr(), B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else

@@ -35,10 +35,10 @@
 #include <ezp/ezp/ppbsv.hpp>
 
 template<sp_d T> class BandSymmMatCluster final : public DenseMat<T> {
-    static constexpr char UPLO = 'L';
+    static constexpr auto UPLO = 'L';
 
-    using solver_t = ezp::ppbsv<T, la_it, UPLO>;
-    using indexer_t = typename solver_t::indexer;
+    using solver_t = ezp::ppbsv<T, la_it>;
+    using indexer_t = solver_t::indexer;
 
     static T bin;
 
@@ -96,7 +96,7 @@ template<sp_d T> T BandSymmMatCluster<T>::bin = T(0);
 
 template<sp_d T> Mat<T> BandSymmMatCluster<T>::operator*(const Mat<T>& X) const {
     static constexpr blas_int INC = 1;
-    static constexpr T ALPHA = T(1), BETA = T(0);
+    static constexpr T ALPHA{1}, BETA{0};
 
     Mat<T> Y(arma::size(X));
 
@@ -104,14 +104,8 @@ template<sp_d T> Mat<T> BandSymmMatCluster<T>::operator*(const Mat<T>& X) const 
     const auto K = static_cast<blas_int>(band);
     const auto LDA = K + 1;
 
-    if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_ssbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
-    else {
-        using E = double;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dsbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
+    if constexpr(std::is_same_v<T, float>) suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_ssbmv)(&UPLO, &N, &K, &ALPHA, this->memptr(), &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
+    else suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dsbmv)(&UPLO, &N, &K, &ALPHA, this->memptr(), &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
 
     return Y;
 }

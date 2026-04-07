@@ -45,7 +45,7 @@ void sspike_gbtrs_(la_it*, const char*, la_it*, la_it*, la_it*, la_it*, float*, 
 }
 
 template<sp_d T> class BandMatSpike final : public DenseMat<T> {
-    static constexpr char TRAN = 'N';
+    static constexpr auto TRAN = 'N';
 
     static la_it SPROTO, DPROTO;
 
@@ -145,19 +145,11 @@ template<sp_d T> Mat<T> BandMatSpike<T>::operator*(const Mat<T>& X) const {
     const auto KL = static_cast<blas_int>(l_band);
     const auto KU = static_cast<blas_int>(u_band);
     const auto LDA = static_cast<blas_int>(m_rows);
-    constexpr blas_int INC = 1;
-    T ALPHA = T(1);
-    T BETA = T(0);
+    static constexpr blas_int INC = 1;
+    static constexpr T ALPHA{1}, BETA{0};
 
-    if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
-    else {
-        using E = double;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
-
+    if constexpr(std::is_same_v<T, float>) suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, &ALPHA, this->memptr(), &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
+    else suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, &ALPHA, this->memptr(), &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
     return Y;
 }
 
@@ -175,14 +167,12 @@ template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         this->factored = true;
 
         if constexpr(std::is_same_v<T, float>) {
-            using E = float;
             WORK.zeros(KLU * KLU * SPIKE[9]);
-            sspike_gbtrf_(SPIKE, &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
+            sspike_gbtrf_(SPIKE, &N, &KL, &KU, this->memptr(), &LDAB, WORK.memptr(), &INFO);
         }
         else if(Precision::FULL == this->setting.precision) {
-            using E = double;
             WORK.zeros(KLU * KLU * SPIKE[9]);
-            dspike_gbtrf_(SPIKE, &N, &KL, &KU, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), &INFO);
+            dspike_gbtrf_(SPIKE, &N, &KL, &KU, this->memptr(), &LDAB, WORK.memptr(), &INFO);
         }
         else {
             this->s_memory = this->to_float();
@@ -208,13 +198,11 @@ template<sp_d T> int BandMatSpike<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
     auto LDB = static_cast<la_it>(B.n_rows);
 
     if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        sspike_gbtrs_(SPIKE, &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)B.memptr(), &LDB);
+        sspike_gbtrs_(SPIKE, &TRAN, &N, &KL, &KU, &NRHS, this->memptr(), &LDAB, WORK.memptr(), B.memptr(), &LDB);
         X = std::move(B);
     }
     else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        dspike_gbtrs_(SPIKE, &TRAN, &N, &KL, &KU, &NRHS, (E*)this->memptr(), &LDAB, (E*)WORK.memptr(), (E*)B.memptr(), &LDB);
+        dspike_gbtrs_(SPIKE, &TRAN, &N, &KL, &KU, &NRHS, this->memptr(), &LDAB, WORK.memptr(), B.memptr(), &LDB);
         X = std::move(B);
     }
     else

@@ -100,14 +100,8 @@ template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::alloc(csc_form<ET, 
     t_col = std::vector<int>(in.col_mem(), in.col_mem() + in.n_cols + 1);
     t_val = std::vector<ET>(in.val_mem(), in.val_mem() + in.n_elem);
 
-    if constexpr(std::is_same_v<ET, double>) {
-        using E = double;
-        dCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val.data(), t_row.data(), t_col.data(), Stype_t::SLU_NC, Dtype_t::SLU_D, Mtype_t::SLU_GE);
-    }
-    else {
-        using E = float;
-        sCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, (E*)t_val.data(), t_row.data(), t_col.data(), Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
-    }
+    if constexpr(std::is_same_v<ET, double>) dCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, t_val.data(), t_row.data(), t_col.data(), Stype_t::SLU_NC, Dtype_t::SLU_D, Mtype_t::SLU_GE);
+    else sCreate_CompCol_Matrix(&A, in.n_rows, in.n_cols, in.n_elem, t_val.data(), t_row.data(), t_col.data(), Stype_t::SLU_NC, Dtype_t::SLU_S, Mtype_t::SLU_GE);
 
     perm_r.resize(this->n_rows + 1);
     perm_c.resize(this->n_cols + 1);
@@ -131,14 +125,8 @@ template<sp_d T> void SparseMatSuperLU<T>::dealloc() {
 }
 
 template<sp_d T> template<sp_d ET> void SparseMatSuperLU<T>::wrap_b(const Mat<ET>& in_mat) {
-    if constexpr(std::is_same_v<ET, float>) {
-        using E = float;
-        sCreate_Dense_Matrix(&B, (int)in_mat.n_rows, (int)in_mat.n_cols, (E*)in_mat.memptr(), (int)in_mat.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_S, Mtype_t::SLU_GE);
-    }
-    else {
-        using E = double;
-        dCreate_Dense_Matrix(&B, (int)in_mat.n_rows, (int)in_mat.n_cols, (E*)in_mat.memptr(), (int)in_mat.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_D, Mtype_t::SLU_GE);
-    }
+    if constexpr(std::is_same_v<ET, float>) sCreate_Dense_Matrix(&B, (int)in_mat.n_rows, (int)in_mat.n_cols, (ET*)in_mat.memptr(), (int)in_mat.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_S, Mtype_t::SLU_GE);
+    else dCreate_Dense_Matrix(&B, (int)in_mat.n_rows, (int)in_mat.n_cols, (ET*)in_mat.memptr(), (int)in_mat.n_rows, Stype_t::SLU_DN, Dtype_t::SLU_D, Mtype_t::SLU_GE);
 }
 
 template<sp_d T> SparseMatSuperLU<T>::SparseMatSuperLU(const uword in_row, const uword in_col, const uword in_elem)
