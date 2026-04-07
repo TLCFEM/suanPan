@@ -37,7 +37,7 @@
 template<sp_d T> class BandSymmMatCluster final : public DenseMat<T> {
     static constexpr auto UPLO = 'L';
 
-    using solver_t = ezp::ppbsv<T, la_it>;
+    using solver_t = ezp::ppbsv<T, la_it, UPLO>;
     using indexer_t = solver_t::indexer;
 
     static T bin;
