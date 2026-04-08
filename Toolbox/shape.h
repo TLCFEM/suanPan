@@ -473,7 +473,7 @@ template<typename T> Mat<T> shape::cube(const Mat<T>& int_pts, const unsigned or
 }
 
 template<typename T> Mat<T> shape::stress(const T X, const T Y, const unsigned S) {
-    Mat<T> N = zeros(3, S);
+    Mat<T> N(3, S, fill::zeros);
 
     for(auto I = 0; I < 3; ++I) N(I, I) = 1.;
 
