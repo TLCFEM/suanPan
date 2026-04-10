@@ -1,7 +1,7 @@
-FROM rockylinux:9
+FROM almalinux:10
 
 RUN dnf install -y epel-release && crb enable
-RUN dnf install -y gcc g++ gfortran cmake wget git hdf5-devel libglvnd-devel
+RUN dnf install -y gcc g++ gfortran cmake wget git hdf5-devel libglvnd-devel && dnf clean all
 
 # part 1: openblas
 # change the following configurations to match your needs

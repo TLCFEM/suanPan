@@ -5,19 +5,14 @@
 
 FROM nvidia/cuda:12.9.1-devel-rockylinux9
 
-RUN dnf install -y ca-certificates
-
-RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
-    echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \
-    echo "baseurl=https://yum.repos.intel.com/oneapi" >> /etc/yum.repos.d/oneAPI.repo && \
-    echo "enabled=1" >> /etc/yum.repos.d/oneAPI.repo && \
-    echo "gpgcheck=1" >> /etc/yum.repos.d/oneAPI.repo && \
-    echo "repo_gpgcheck=1" >> /etc/yum.repos.d/oneAPI.repo && \
-    echo "gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" >> /etc/yum.repos.d/oneAPI.repo
-
 RUN dnf install -y dnf-plugins-core && \
     dnf config-manager --enable crb && \
-    dnf install -y libglvnd-devel gfortran rpm-build rpm-devel rpmdevtools cmake wget git ninja-build intel-oneapi-mkl-devel procps sudo
+    dnf install -y libglvnd-devel gfortran rpm-build rpm-devel rpmdevtools cmake wget git sudo && \
+    dnf clean all
+
+RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6a17080f-f0de-41b9-b587-52f92512c59a/intel-onemkl-2025.3.1.11_offline.sh && \
+    bash ./intel-onemkl-2025.3.1.11_offline.sh -a --silent --eula accept && \
+    rm intel-onemkl-2025.3.1.11_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.1.tar.gz && tar xf VTK-9.6.1.tar.gz && \

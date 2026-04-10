@@ -5,7 +5,7 @@ on:
 jobs:
   linux-base:
     if: ${{ !contains(github.event.head_commit.message, '[skip.all]') }}
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04
     timeout-minutes: 600
     strategy:
       matrix:
@@ -36,7 +36,7 @@ jobs:
           tags: tlcfem/suanpan:stable-${{ matrix.arch }}
   linux-combine:
     needs: linux-base
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04
     steps:
       - name: Login
         uses: docker/login-action@v4
