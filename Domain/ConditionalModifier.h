@@ -130,11 +130,11 @@ class ConditionalModifier : public UniqueTag {
      */
     [[nodiscard]] virtual bool collect_element() const { return false; }
 
-    bool validate_node_impl(const shared_ptr<DomainBase>&);
-    bool validate_element_impl(const shared_ptr<DomainBase>&);
+    [[nodiscard]] bool validate_node_impl(const shared_ptr<DomainBase>&) const;
+    [[nodiscard]] bool validate_element_impl(const shared_ptr<DomainBase>&) const;
 
-    uvec collect_node_dof(const shared_ptr<DomainBase>&);
-    uvec collect_element_dof(const shared_ptr<DomainBase>&);
+    [[nodiscard]] uvec collect_node_dof(const shared_ptr<DomainBase>&) const;
+    [[nodiscard]] uvec collect_element_dof(const shared_ptr<DomainBase>&) const;
 
 protected:
     unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};

@@ -22,7 +22,7 @@
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
-bool ConditionalModifier::validate_node_impl(const shared_ptr<DomainBase>& D) {
+bool ConditionalModifier::validate_node_impl(const shared_ptr<DomainBase>& D) const {
     const auto not_valid = [&](const shared_ptr<Node>& node) { return !node || !node->is_active() || !node->validate_dof(dof_order); };
 
     if(target_node.is_empty())
@@ -37,7 +37,7 @@ bool ConditionalModifier::validate_node_impl(const shared_ptr<DomainBase>& D) {
     return true;
 }
 
-bool ConditionalModifier::validate_element_impl(const shared_ptr<DomainBase>& D) {
+bool ConditionalModifier::validate_element_impl(const shared_ptr<DomainBase>& D) const {
     const auto not_valid = [&](const shared_ptr<Element>& element) { return !element || !element->is_active() || !element->validate_dof(dof_order); };
 
     if(target_element.is_empty())
@@ -52,7 +52,7 @@ bool ConditionalModifier::validate_element_impl(const shared_ptr<DomainBase>& D)
     return true;
 }
 
-uvec ConditionalModifier::collect_node_dof(const shared_ptr<DomainBase>& D) {
+uvec ConditionalModifier::collect_node_dof(const shared_ptr<DomainBase>& D) const {
     auto& ref_component = get_dof_component();
 
     if(ref_component.empty()) return {};
@@ -72,7 +72,7 @@ uvec ConditionalModifier::collect_node_dof(const shared_ptr<DomainBase>& D) {
     return active_dof;
 }
 
-uvec ConditionalModifier::collect_element_dof(const shared_ptr<DomainBase>& D) {
+uvec ConditionalModifier::collect_element_dof(const shared_ptr<DomainBase>& D) const {
     auto& ref_component = get_dof_component();
 
     if(ref_component.empty()) return {};
