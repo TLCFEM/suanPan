@@ -34,6 +34,8 @@
 #include "Load.h"
 
 class NodalForce : public Load {
+    [[nodiscard]] bool collect_node() const final { return true; }
+
 public:
     NodalForce(
         unsigned,                 // tag

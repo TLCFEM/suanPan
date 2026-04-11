@@ -45,6 +45,8 @@ class PenaltyBC : public Constraint {
 
     friend void set_constraint_multiplier(double);
 
+    [[nodiscard]] bool collect_node() const final { return true; }
+
 public:
     PenaltyBC(
         unsigned,

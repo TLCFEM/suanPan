@@ -34,6 +34,8 @@
 #include "Load.h"
 
 class NodalAcceleration final : public Load {
+    [[nodiscard]] bool collect_node() const override { return true; }
+
 public:
     NodalAcceleration(
         unsigned,                 // tag

@@ -41,6 +41,7 @@ template<unsigned DIM> class FixedLength : public Constraint {
     vec initial_chord;
 
     [[nodiscard]] bool validate_node() const final { return true; }
+    [[nodiscard]] bool collect_node() const final { return true; }
 
 protected:
     bool min_bound = false, max_bound = false;

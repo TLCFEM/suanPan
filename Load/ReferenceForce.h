@@ -34,6 +34,8 @@
 #include "Load.h"
 
 class ReferenceForce final : public Load {
+    [[nodiscard]] bool collect_node() const override { return true; }
+
 public:
     ReferenceForce(
         unsigned,                // tag

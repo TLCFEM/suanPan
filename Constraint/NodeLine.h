@@ -40,6 +40,7 @@ class NodeLine final : public Constraint {
     bool initial_right{true};
 
     [[nodiscard]] bool validate_node() const override { return true; }
+    [[nodiscard]] bool collect_node() const override { return true; }
 
 public:
     NodeLine(unsigned, unsigned, uvec&&);
