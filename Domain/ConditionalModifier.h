@@ -111,6 +111,25 @@ class ConditionalModifier : public UniqueTag {
     // the modifier itself will apply itself to those active components
     const std::vector<Node::DOF> dof_component;
 
+    /**
+     * \brief Derived classes must indicate if to validate nodes.
+     * Validation will check if the defined nodes have compatible DoF layout.
+     */
+    [[nodiscard]] virtual bool validate_node() const { return false; }
+    /**
+     * \brief Derived classes must indicate if to validate elements.
+     * Validation will check if the defined elements have compatible DoF layout.
+     */
+    [[nodiscard]] virtual bool validate_element() const { return false; }
+    /**
+     * \brief Derived classes must indicate if to collect DoFs from node list.
+     */
+    [[nodiscard]] virtual bool collect_node() const { return false; }
+    /**
+     * \brief Derived classes must indicate if to collect DoFs from element list.
+     */
+    [[nodiscard]] virtual bool collect_element() const { return false; }
+
     bool validate_node_impl(const shared_ptr<DomainBase>&);
     bool validate_element_impl(const shared_ptr<DomainBase>&);
 
@@ -127,17 +146,6 @@ protected:
     const std::vector<Node::DOF> dof_order;
 
     uvec target_node, target_element, target_node_dof, target_element_dof;
-
-    /**
-     * \brief Derived classes must indicate if to validate nodes.
-     * Validation will check if the defined nodes have compatible DoF layout.
-     */
-    [[nodiscard]] virtual bool validate_node() const { return false; }
-    /**
-     * \brief Derived classes must indicate if to validate elements.
-     * Validation will check if the defined elements have compatible DoF layout.
-     */
-    [[nodiscard]] virtual bool validate_element() const { return false; }
 
     [[nodiscard]] double get_amplitude(const shared_ptr<DomainBase>&) const;
 

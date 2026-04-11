@@ -118,8 +118,8 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     if(validate_node() && !validate_node_impl(D)) return SUANPAN_FAIL;
     if(validate_element() && !validate_element_impl(D)) return SUANPAN_FAIL;
 
-    target_node_dof = collect_node_dof(D);
-    target_element_dof = collect_element_dof(D);
+    if(collect_node()) target_node_dof = collect_node_dof(D);
+    if(collect_element()) target_element_dof = collect_element_dof(D);
 
     initialized = true;
 
