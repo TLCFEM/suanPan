@@ -26,6 +26,14 @@ double PenaltyBC::multiplier = 1E8;
 PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, std::vector<Node::DOF>&& D)
     : Constraint(T, 0, {}, std::move(D), 0) { target_node = std::move(N); }
 
+int PenaltyBC::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
+    target_dof = collect_node_dof(D);
+
+    return SUANPAN_SUCCESS;
+}
+
 /**
  * \brief Apply the BC to the system using penalty method.
  * It effectively adds a diagonal matrix to the global stiffness matrix.
@@ -46,14 +54,14 @@ int PenaltyBC::process(const shared_ptr<DomainBase>& D) {
         if(auto& t_mat = W->get_mass()) reference += t_mat->max() / incre_time / incre_time;
     }
 
-    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem).diag().fill(multiplier * reference);
+    stiffness.zeros(target_dof.n_elem, target_dof.n_elem).diag().fill(multiplier * reference);
 
     return process_resistance(D);
 }
 
 int PenaltyBC::process_resistance(const shared_ptr<DomainBase>& D) {
     // this ensures all restrained DoFs have zero displacement in modified Newton methods
-    D->insert_constrained_dof(target_node_dof);
+    D->insert_constrained_dof(target_dof);
 
     return SUANPAN_SUCCESS;
 }
@@ -69,29 +77,29 @@ int MultiplierBC::process(const shared_ptr<DomainBase>& D) {
     if(Integrator::Type::Explicit == D->get_current_step()->get_integrator()->type()) {
         if(auto& t_mass = W->get_mass()) {
             std::scoped_lock lock(W->get_mass_mutex());
-            t_mass->unify(target_node_dof);
+            t_mass->unify(target_dof);
         }
     }
     else {
         if(auto& t_stiff = W->get_stiffness()) {
             std::scoped_lock lock(W->get_stiffness_mutex());
-            t_stiff->unify(target_node_dof);
+            t_stiff->unify(target_dof);
         }
         if(auto& t_mass = W->get_mass()) {
             std::scoped_lock lock(W->get_mass_mutex());
-            t_mass->nullify(target_node_dof);
+            t_mass->nullify(target_dof);
         }
         if(auto& t_damping = W->get_damping()) {
             std::scoped_lock lock(W->get_damping_mutex());
-            t_damping->nullify(target_node_dof);
+            t_damping->nullify(target_dof);
         }
         if(auto& t_nonviscous = W->get_nonviscous()) {
             std::scoped_lock lock(W->get_nonviscous_mutex());
-            t_nonviscous->nullify(target_node_dof);
+            t_nonviscous->nullify(target_dof);
         }
         if(auto& t_geometry = W->get_geometry()) {
             std::scoped_lock lock(W->get_geometry_mutex());
-            t_geometry->nullify(target_node_dof);
+            t_geometry->nullify(target_dof);
         }
     }
 

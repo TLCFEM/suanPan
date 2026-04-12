@@ -40,8 +40,6 @@ class RigidWallPenalty : public Constraint {
         return ref_dof;
     }
 
-    [[nodiscard]] bool validate_node() const override { return true; }
-
 protected:
     const unsigned n_dim;
 
@@ -54,6 +52,8 @@ protected:
 public:
     RigidWallPenalty(unsigned, unsigned, vec&&, vec&&, double, unsigned);
     RigidWallPenalty(unsigned, unsigned, vec&&, vec&&, vec&&, double, unsigned);
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
 

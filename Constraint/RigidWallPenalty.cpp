@@ -37,6 +37,12 @@ RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, 
     , length_a(norm(edge_a))
     , length_b(norm(edge_b)) {}
 
+int RigidWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
+    return validate_node(D) ? SUANPAN_SUCCESS : SUANPAN_FAIL;
+}
+
 int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
@@ -66,7 +72,7 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
         counter = next_counter;
     }
 
-    target_node_dof = pool;
+    target_dof = pool;
 
     return SUANPAN_SUCCESS;
 }

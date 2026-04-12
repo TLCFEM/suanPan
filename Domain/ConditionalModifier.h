@@ -111,12 +111,6 @@ class ConditionalModifier : public UniqueTag {
     // the modifier itself will apply itself to those active components
     const std::vector<Node::DOF> dof_component;
 
-    bool validate_node_impl(const shared_ptr<DomainBase>&);
-    bool validate_element_impl(const shared_ptr<DomainBase>&);
-
-    uvec collect_node_dof(const shared_ptr<DomainBase>&);
-    uvec collect_element_dof(const shared_ptr<DomainBase>&);
-
 protected:
     unsigned start_step{1u}, end_step{static_cast<unsigned>(-1)};
 
@@ -126,18 +120,7 @@ protected:
     // it can be empty such that the order check is not performed
     const std::vector<Node::DOF> dof_order;
 
-    uvec target_node, target_element, target_node_dof, target_element_dof;
-
-    /**
-     * \brief Derived classes must indicate if to validate nodes.
-     * Validation will check if the defined nodes have compatible DoF layout.
-     */
-    [[nodiscard]] virtual bool validate_node() const { return false; }
-    /**
-     * \brief Derived classes must indicate if to validate elements.
-     * Validation will check if the defined elements have compatible DoF layout.
-     */
-    [[nodiscard]] virtual bool validate_element() const { return false; }
+    uvec target_node, target_element, target_dof;
 
     [[nodiscard]] double get_amplitude(const shared_ptr<DomainBase>&) const;
 
@@ -147,6 +130,11 @@ protected:
      * When DoF order is given, DoF components can be omitted.
      */
     [[nodiscard]] const std::vector<Node::DOF>& get_dof_component() const;
+
+    [[nodiscard]] bool validate_node(const shared_ptr<DomainBase>&) const;
+    [[nodiscard]] bool validate_element(const shared_ptr<DomainBase>&) const;
+
+    [[nodiscard]] uvec collect_node_dof(const shared_ptr<DomainBase>&) const;
 
 public:
     ConditionalModifier(
