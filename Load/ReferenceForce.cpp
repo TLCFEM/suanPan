@@ -25,7 +25,7 @@ ReferenceForce::ReferenceForce(const unsigned T, const double L, uvec&& N, std::
 int ReferenceForce::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
 
-    target_node_dof = collect_node_dof(D);
+    target_dof = collect_node_dof(D);
 
     return SUANPAN_SUCCESS;
 }
@@ -33,7 +33,7 @@ int ReferenceForce::initialize(const shared_ptr<DomainBase>& D) {
 int ReferenceForce::process(const shared_ptr<DomainBase>& D) {
     reference_load.zeros(D->get_factory()->get_size());
 
-    for(const auto I : target_node_dof) reference_load(I) = magnitude;
+    for(const auto I : target_dof) reference_load(I) = magnitude;
 
     return SUANPAN_SUCCESS;
 }

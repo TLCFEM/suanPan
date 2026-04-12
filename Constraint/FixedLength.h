@@ -53,7 +53,7 @@ public:
 
         if(!validate_node(D)) return SUANPAN_FAIL;
 
-        target_node_dof = collect_node_dof(D);
+        target_dof = collect_node_dof(D);
 
         initial_chord = D->get<Node>(target_node(1))->initial_position(DIM) - D->get<Node>(target_node(0))->initial_position(DIM);
 
@@ -65,7 +65,7 @@ public:
     int process(const shared_ptr<DomainBase>& D) override {
         auto& W = D->get_factory();
 
-        const uvec dof_i = target_node_dof.head(DIM), dof_j = target_node_dof.tail(DIM);
+        const uvec dof_i = target_dof.head(DIM), dof_j = target_dof.tail(DIM);
 
         const vec t_disp = W->get_trial_displacement()(dof_j) - W->get_trial_displacement()(dof_i);
         const vec t_chord = initial_chord + t_disp;
@@ -97,7 +97,7 @@ public:
             auxiliary_resistance += t_disp(I) * (2. * initial_chord(I) + t_disp(I));
         }
 
-        stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem);
+        stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
         const auto t_factor = 2. * trial_lambda(0);
         for(auto I = 0u; I < DIM; ++I) stiffness(I + DIM, I) = stiffness(I, I + DIM) = -(stiffness(I, I) = stiffness(I + DIM, I + DIM) = t_factor);
 
@@ -193,7 +193,7 @@ public:
         if(0u == FixedLength<DIM>::lagrangian_size) return SUANPAN_SUCCESS;
 
         vec nodal_resistance(DIM);
-        for(auto I = 0u; I < DIM; ++I) nodal_resistance(I) = FixedLength<DIM>::resistance(FixedLength<DIM>::target_node_dof(I));
+        for(auto I = 0u; I < DIM; ++I) nodal_resistance(I) = FixedLength<DIM>::resistance(FixedLength<DIM>::target_dof(I));
 
         if(norm(nodal_resistance) > max_force) {
             trial_flag = true;

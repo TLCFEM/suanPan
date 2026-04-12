@@ -32,7 +32,7 @@ int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
 
     if(!validate_node(D)) return SUANPAN_FAIL;
 
-    target_node_dof = collect_node_dof(D);
+    target_dof = collect_node_dof(D);
 
     set_multiplier_size(0u);
 
@@ -69,16 +69,16 @@ int NodeLine::process(const shared_ptr<DomainBase>& D) {
     const rowvec dpdj = position.t() * rotation;
 
     for(auto I = 0, J = 2, K = 4; I < 2; ++I, ++J, ++K) {
-        auxiliary_stiffness(target_node_dof(I)) = dpdi(I);
-        auxiliary_stiffness(target_node_dof(J)) = dpdj(I);
-        auxiliary_stiffness(target_node_dof(K)) = outer_normal(I);
+        auxiliary_stiffness(target_dof(I)) = dpdi(I);
+        auxiliary_stiffness(target_dof(J)) = dpdj(I);
+        auxiliary_stiffness(target_dof(K)) = outer_normal(I);
     }
 
     if(initial_right) auxiliary_stiffness *= -1.;
 
     const mat factor = (initial_right ? -trial_lambda(0) : trial_lambda(0)) * rotation;
 
-    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem);
+    stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
     stiffness(span_i, span_i) = factor.t() + factor;
     stiffness(span_i, span_j) = stiffness(span_k, span_i) = -(stiffness(span_k, span_j) = factor);
     stiffness(span_i, span_k) = stiffness(span_j, span_i) = -(stiffness(span_j, span_k) = factor.t());

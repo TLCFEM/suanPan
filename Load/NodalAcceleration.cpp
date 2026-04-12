@@ -25,7 +25,7 @@ NodalAcceleration::NodalAcceleration(const unsigned T, const double L, uvec&& NT
 int NodalAcceleration::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
 
-    target_node_dof = collect_node_dof(D);
+    target_dof = collect_node_dof(D);
 
     return SUANPAN_SUCCESS;
 }
@@ -33,8 +33,8 @@ int NodalAcceleration::initialize(const shared_ptr<DomainBase>& D) {
 int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    if(auto& t_mass = W->get_mass(); t_mass && !target_node_dof.is_empty()) {
-        trial_load.zeros(W->get_size())(target_node_dof).fill(magnitude * get_amplitude(D));
+    if(auto& t_mass = W->get_mass(); t_mass && !target_dof.is_empty()) {
+        trial_load.zeros(W->get_size())(target_dof).fill(magnitude * get_amplitude(D));
         trial_load = t_mass * trial_load;
     }
     else trial_load.reset();

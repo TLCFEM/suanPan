@@ -115,7 +115,7 @@ std::set<uword> ConditionalModifier::get_involving_nodes(const shared_ptr<Domain
     return pool;
 }
 
-const uvec& ConditionalModifier::get_node_dof() const { return target_node_dof; }
+const uvec& ConditionalModifier::get_node_dof() const { return target_dof; }
 
 void ConditionalModifier::deinitialize() { initialized = false; }
 

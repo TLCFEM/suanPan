@@ -120,7 +120,7 @@ protected:
     // it can be empty such that the order check is not performed
     const std::vector<Node::DOF> dof_order;
 
-    uvec target_node, target_element, target_node_dof;
+    uvec target_node, target_element, target_dof;
 
     [[nodiscard]] double get_amplitude(const shared_ptr<DomainBase>&) const;
 

@@ -28,17 +28,17 @@ int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
 
     if(!validate_node(D)) return SUANPAN_FAIL;
 
-    target_node_dof = collect_node_dof(D);
+    target_dof = collect_node_dof(D);
 
     return SUANPAN_SUCCESS;
 }
 
 int LineUDL::process(const shared_ptr<DomainBase>& D) {
-    if(target_node_dof.is_empty()) return SUANPAN_SUCCESS;
+    if(target_dof.is_empty()) return SUANPAN_SUCCESS;
 
     trial_load.zeros(D->get_factory()->get_size());
 
-    D->insert_loaded_dof(target_node_dof);
+    D->insert_loaded_dof(target_dof);
 
     mat distribution(dimension, target_node.n_elem, fill::zeros);
     for(auto I = 0llu, J = 1llu; J < target_node.n_elem; ++I, ++J) {
@@ -48,9 +48,9 @@ int LineUDL::process(const shared_ptr<DomainBase>& D) {
     }
 
     const auto ref_load = .5 * magnitude * get_amplitude(D);
-    if(const auto tag = get_dof_component()[0]; Node::DOF::U1 == tag) trial_load(target_node_dof) = ref_load * distribution.row(0).t();
-    else if(Node::DOF::U2 == tag) trial_load(target_node_dof) = ref_load * distribution.row(1).t();
-    else if(Node::DOF::U3 == tag && 3u == dimension) trial_load(target_node_dof) = ref_load * distribution.row(2).t();
+    if(const auto tag = get_dof_component()[0]; Node::DOF::U1 == tag) trial_load(target_dof) = ref_load * distribution.row(0).t();
+    else if(Node::DOF::U2 == tag) trial_load(target_dof) = ref_load * distribution.row(1).t();
+    else if(Node::DOF::U3 == tag && 3u == dimension) trial_load(target_dof) = ref_load * distribution.row(2).t();
 
     return SUANPAN_SUCCESS;
 }

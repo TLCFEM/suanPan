@@ -28,7 +28,7 @@ int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {
 
     if(!validate_node(D)) return SUANPAN_FAIL;
 
-    target_node_dof = collect_node_dof(D);
+    target_dof = collect_node_dof(D);
 
     set_multiplier_size(0u);
 
@@ -67,10 +67,10 @@ int NodeFacet::process(const shared_ptr<DomainBase>& D) {
     const rowvec dpdk = s_i.t() * skew_edge_k;
 
     for(auto I = 0, J = 3, K = 6, L = 9; I < 3; ++I, ++J, ++K, ++L) {
-        auxiliary_stiffness(target_node_dof(I)) = dpdi(I);
-        auxiliary_stiffness(target_node_dof(J)) = dpdj(I);
-        auxiliary_stiffness(target_node_dof(K)) = dpdk(I);
-        auxiliary_stiffness(target_node_dof(L)) = outer_normal(I);
+        auxiliary_stiffness(target_dof(I)) = dpdi(I);
+        auxiliary_stiffness(target_dof(J)) = dpdj(I);
+        auxiliary_stiffness(target_dof(K)) = dpdk(I);
+        auxiliary_stiffness(target_dof(L)) = outer_normal(I);
     }
 
     skew_edge_i *= trial_lambda(0);
@@ -79,7 +79,7 @@ int NodeFacet::process(const shared_ptr<DomainBase>& D) {
 
     const auto skew_s_i = transform::skew_symm(s_i *= trial_lambda(0));
 
-    stiffness.zeros(target_node_dof.n_elem, target_node_dof.n_elem);
+    stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
     stiffness(span_i, span_j) = -(stiffness(span_j, span_i) = skew_s_i + skew_edge_j);
     stiffness(span_i, span_k) = -(stiffness(span_k, span_i) = skew_edge_k - skew_s_i);
     stiffness(span_j, span_k) = -(stiffness(span_k, span_j) = skew_s_i);
