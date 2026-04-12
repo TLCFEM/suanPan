@@ -33,6 +33,7 @@ int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
     if(!validate_node_impl(D)) return SUANPAN_FAIL;
 
     target_node_dof = collect_node_dof(D);
+
     set_multiplier_size(0u);
 
     const auto node_i = D->get<Node>(target_node(0))->initial_position(2u);

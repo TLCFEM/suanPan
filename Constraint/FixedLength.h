@@ -54,6 +54,7 @@ public:
         if(!validate_node_impl(D)) return SUANPAN_FAIL;
 
         target_node_dof = collect_node_dof(D);
+
         initial_chord = D->get<Node>(target_node(1))->initial_position(DIM) - D->get<Node>(target_node(0))->initial_position(DIM);
 
         set_multiplier_size(0u);

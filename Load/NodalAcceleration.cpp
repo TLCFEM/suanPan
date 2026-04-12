@@ -26,6 +26,7 @@ int NodalAcceleration::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
 
     target_node_dof = collect_node_dof(D);
+
     return SUANPAN_SUCCESS;
 }
 
