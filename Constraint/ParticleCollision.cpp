@@ -31,7 +31,7 @@ int ParticleCollision::initialize(const shared_ptr<DomainBase>& D) {
 
     if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
-    return validate_node_impl(D) ? SUANPAN_SUCCESS : SUANPAN_FAIL;
+    return validate_node(D) ? SUANPAN_SUCCESS : SUANPAN_FAIL;
 }
 
 void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const shared_ptr<Node>& node_i, const shared_ptr<Node>& node_j, const bool full) {

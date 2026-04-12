@@ -83,7 +83,7 @@ public:
 
         if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
-        if(!validate_node_impl(D)) return SUANPAN_FAIL;
+        if(!validate_node(D)) return SUANPAN_FAIL;
 
         return SUANPAN_SUCCESS;
     }

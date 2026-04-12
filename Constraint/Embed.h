@@ -48,8 +48,8 @@ public:
     int initialize(const shared_ptr<DomainBase>& D) override {
         if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
-        if(!validate_node_impl(D)) return SUANPAN_FAIL;
-        if(!validate_element_impl(D)) return SUANPAN_FAIL;
+        if(!validate_node(D)) return SUANPAN_FAIL;
+        if(!validate_element(D)) return SUANPAN_FAIL;
 
         auto& t_node = D->get<Node>(target_node(0));
         auto& t_element = D->get<Element>(target_element(0));

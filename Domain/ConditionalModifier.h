@@ -131,8 +131,8 @@ protected:
      */
     [[nodiscard]] const std::vector<Node::DOF>& get_dof_component() const;
 
-    [[nodiscard]] bool validate_node_impl(const shared_ptr<DomainBase>&) const;
-    [[nodiscard]] bool validate_element_impl(const shared_ptr<DomainBase>&) const;
+    [[nodiscard]] bool validate_node(const shared_ptr<DomainBase>&) const;
+    [[nodiscard]] bool validate_element(const shared_ptr<DomainBase>&) const;
 
     [[nodiscard]] uvec collect_node_dof(const shared_ptr<DomainBase>&) const;
 

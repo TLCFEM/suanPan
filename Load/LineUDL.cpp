@@ -26,7 +26,7 @@ LineUDL::LineUDL(const unsigned T, const double L, uvec&& N, std::vector<Node::D
 int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
 
-    if(!validate_node_impl(D)) return SUANPAN_FAIL;
+    if(!validate_node(D)) return SUANPAN_FAIL;
 
     target_node_dof = collect_node_dof(D);
 
