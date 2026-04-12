@@ -72,27 +72,6 @@ uvec ConditionalModifier::collect_node_dof(const shared_ptr<DomainBase>& D) cons
     return active_dof;
 }
 
-uvec ConditionalModifier::collect_element_dof(const shared_ptr<DomainBase>& D) const {
-    auto& ref_component = get_dof_component();
-
-    if(ref_component.empty()) return {};
-
-    std::vector<uword> active_dof;
-
-    const auto check = [&](const shared_ptr<Element>& element) {
-        if(!element || !element->is_active()) return;
-        for(const auto tag : element->get_node_encoding())
-            if(auto& node = D->get<Node>(tag); node && node->is_active()) suanpan::append_to(active_dof, node->get_dof(ref_component));
-    };
-
-    if(target_element.is_empty())
-        for(auto& element : D->get_element_pool()) check(element);
-    else
-        for(const auto tag : target_element) check(D->get<Element>(tag));
-
-    return active_dof;
-}
-
 double ConditionalModifier::get_amplitude(const shared_ptr<DomainBase>& D) const { return amplitude->get_amplitude(D->get_factory()->get_trial_time()); }
 
 const std::vector<Node::DOF>& ConditionalModifier::get_dof_component() const { return dof_component.empty() ? dof_order : dof_component; }
@@ -114,12 +93,6 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
         start_time += t_step->get_time_period();
     }
     amplitude->set_start_time(start_time);
-
-    if(validate_node() && !validate_node_impl(D)) return SUANPAN_FAIL;
-    if(validate_element() && !validate_element_impl(D)) return SUANPAN_FAIL;
-
-    if(collect_node()) target_node_dof = collect_node_dof(D);
-    if(collect_element()) target_element_dof = collect_element_dof(D);
 
     initialized = true;
 

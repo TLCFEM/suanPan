@@ -23,6 +23,16 @@ LineUDL::LineUDL(const unsigned T, const double L, uvec&& N, std::vector<Node::D
     : Load(T, AT, suanpan::translational(D), std::move(DT), L)
     , dimension(D) { target_node = std::move(N); }
 
+int LineUDL::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+
+    if(!validate_node_impl(D)) return SUANPAN_FAIL;
+
+    target_node_dof = collect_node_dof(D);
+
+    return SUANPAN_SUCCESS;
+}
+
 int LineUDL::process(const shared_ptr<DomainBase>& D) {
     if(target_node_dof.is_empty()) return SUANPAN_SUCCESS;
 

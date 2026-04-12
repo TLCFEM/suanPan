@@ -34,9 +34,6 @@
 #include "Constraint.h"
 
 class NodeFacet final : public Constraint {
-    [[nodiscard]] bool validate_node() const override { return true; }
-    [[nodiscard]] bool collect_node() const override { return true; }
-
 public:
     NodeFacet(unsigned, unsigned, uvec&&);
 

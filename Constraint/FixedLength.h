@@ -40,9 +40,6 @@
 template<unsigned DIM> class FixedLength : public Constraint {
     vec initial_chord;
 
-    [[nodiscard]] bool validate_node() const final { return true; }
-    [[nodiscard]] bool collect_node() const final { return true; }
-
 protected:
     bool min_bound = false, max_bound = false;
     double min_gap = 0., max_gap = 0.;
@@ -54,6 +51,9 @@ public:
     int initialize(const shared_ptr<DomainBase>& D) override {
         if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
+        if(!validate_node_impl(D)) return SUANPAN_FAIL;
+
+        target_node_dof = collect_node_dof(D);
         initial_chord = D->get<Node>(target_node(1))->initial_position(DIM) - D->get<Node>(target_node(0))->initial_position(DIM);
 
         set_multiplier_size(0u);

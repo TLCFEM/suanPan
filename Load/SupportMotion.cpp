@@ -29,7 +29,7 @@ int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
 
     set_end_step(start_step + 1);
 
-    D->get_factory()->update_reference_dof(target_node_dof);
+    D->get_factory()->update_reference_dof(target_node_dof = collect_node_dof(D));
 
     return SUANPAN_SUCCESS;
 }

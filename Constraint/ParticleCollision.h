@@ -45,8 +45,6 @@ class ParticleCollision : public Constraint {
      */
     [[nodiscard]] virtual double compute_df(double) const = 0;
 
-    [[nodiscard]] bool validate_node() const final { return true; }
-
 protected:
     const unsigned dimension;
 

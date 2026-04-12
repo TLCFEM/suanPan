@@ -26,6 +26,14 @@ double PenaltyBC::multiplier = 1E8;
 PenaltyBC::PenaltyBC(const unsigned T, uvec&& N, std::vector<Node::DOF>&& D)
     : Constraint(T, 0, {}, std::move(D), 0) { target_node = std::move(N); }
 
+int PenaltyBC::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
+    target_node_dof = collect_node_dof(D);
+
+    return SUANPAN_SUCCESS;
+}
+
 /**
  * \brief Apply the BC to the system using penalty method.
  * It effectively adds a diagonal matrix to the global stiffness matrix.

@@ -34,8 +34,6 @@
 #include "Load.h"
 
 class NodalAcceleration final : public Load {
-    [[nodiscard]] bool collect_node() const override { return true; }
-
 public:
     NodalAcceleration(
         unsigned,                 // tag
@@ -44,6 +42,8 @@ public:
         std::vector<Node::DOF>&&, // dof tags
         unsigned                  // amplitude tag
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
 };

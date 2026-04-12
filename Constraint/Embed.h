@@ -38,9 +38,6 @@ template<unsigned DIM> class Embed final : public Constraint {
     static constexpr unsigned max_iteration = 20u;
     static constexpr double tolerance = 1E-14;
 
-    [[nodiscard]] bool validate_node() const override { return true; }
-    [[nodiscard]] bool validate_element() const override { return true; }
-
 public:
     Embed(const unsigned T, const unsigned ET, const unsigned NT)
         : Constraint(T, 0, suanpan::translational(DIM), {}, DIM) {
@@ -50,6 +47,9 @@ public:
 
     int initialize(const shared_ptr<DomainBase>& D) override {
         if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
+        if(!validate_node_impl(D)) return SUANPAN_FAIL;
+        if(!validate_element_impl(D)) return SUANPAN_FAIL;
 
         auto& t_node = D->get<Node>(target_node(0));
         auto& t_element = D->get<Element>(target_element(0));

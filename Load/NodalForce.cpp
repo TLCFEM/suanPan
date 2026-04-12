@@ -22,6 +22,14 @@
 NodalForce::NodalForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
     : Load(T, AT, {}, std::move(D), L) { target_node = std::move(N); }
 
+int NodalForce::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+
+    target_node_dof = collect_node_dof(D);
+
+    return SUANPAN_SUCCESS;
+}
+
 int NodalForce::process(const shared_ptr<DomainBase>& D) {
     D->insert_loaded_dof(target_node_dof);
 

@@ -34,8 +34,6 @@
 #include "Load.h"
 
 class SupportMotion : public Load {
-    [[nodiscard]] bool collect_node() const final { return true; }
-
 public:
     SupportMotion(
         unsigned,                 // tag

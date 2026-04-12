@@ -39,8 +39,6 @@ template<unsigned DIM, bool ROTATION> class MolecularDynamics : public Constrain
     uvec interaction_tags;
     std::vector<shared_ptr<Interaction>> interactions;
 
-    [[nodiscard]] bool validate_node() const final { return true; }
-
 protected:
     std::vector<shared_ptr<Element>> elements;
     double space = 0.;
@@ -83,7 +81,11 @@ public:
 
         space = 2. * std::transform_reduce(elements.cbegin(), elements.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); });
 
-        return Constraint::initialize(D);
+        if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
+        if(!validate_node_impl(D)) return SUANPAN_FAIL;
+
+        return SUANPAN_SUCCESS;
     }
 
     int process(const shared_ptr<DomainBase>& D) override { return process_entrypoint(D, true); }

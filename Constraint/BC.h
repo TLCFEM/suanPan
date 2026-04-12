@@ -45,14 +45,14 @@ class PenaltyBC : public Constraint {
 
     friend void set_constraint_multiplier(double);
 
-    [[nodiscard]] bool collect_node() const final { return true; }
-
 public:
     PenaltyBC(
         unsigned,
         uvec&&,                  // node tags
         std::vector<Node::DOF>&& // dof components
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
     int process_resistance(const shared_ptr<DomainBase>&) final;

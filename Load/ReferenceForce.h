@@ -34,8 +34,6 @@
 #include "Load.h"
 
 class ReferenceForce final : public Load {
-    [[nodiscard]] bool collect_node() const override { return true; }
-
 public:
     ReferenceForce(
         unsigned,                // tag
@@ -43,6 +41,8 @@ public:
         uvec&&,                  // node tags
         std::vector<Node::DOF>&& // dof tag
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
 };

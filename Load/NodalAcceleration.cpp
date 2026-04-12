@@ -22,6 +22,13 @@
 NodalAcceleration::NodalAcceleration(const unsigned T, const double L, uvec&& NT, std::vector<Node::DOF>&& DT, const unsigned AT)
     : Load(T, AT, {}, std::move(DT), L) { target_node = std::move(NT); }
 
+int NodalAcceleration::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+
+    target_node_dof = collect_node_dof(D);
+    return SUANPAN_SUCCESS;
+}
+
 int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 

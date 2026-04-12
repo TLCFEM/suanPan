@@ -34,8 +34,6 @@
 #include "Load.h"
 
 class NodalDisplacement : public Load {
-    [[nodiscard]] bool collect_node() const final { return true; }
-
 public:
     NodalDisplacement(
         unsigned,                 // tag

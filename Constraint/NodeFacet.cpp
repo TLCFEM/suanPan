@@ -24,9 +24,14 @@ NodeFacet::NodeFacet(const unsigned T, const unsigned A, uvec&& N)
     : Constraint(T, A, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3}, {}, 1) { target_node = std::move(N); }
 
 int NodeFacet::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
+    if(!validate_node_impl(D)) return SUANPAN_FAIL;
+    target_node_dof = collect_node_dof(D);
+
     set_multiplier_size(0u);
 
-    return Constraint::initialize(D);
+    return SUANPAN_SUCCESS;
 }
 
 int NodeFacet::process(const shared_ptr<DomainBase>& D) {

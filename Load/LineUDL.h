@@ -34,9 +34,6 @@
 #include "Load.h"
 
 class LineUDL : public Load {
-    [[nodiscard]] bool validate_node() const final { return true; }
-    [[nodiscard]] bool collect_node() const final { return true; }
-
 protected:
     const unsigned dimension;
 
@@ -51,6 +48,7 @@ public:
         unsigned,                 // amplitude tag
         unsigned                  // dimension
     );
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
 };
