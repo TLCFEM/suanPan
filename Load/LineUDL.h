@@ -48,6 +48,7 @@ public:
         unsigned,                 // amplitude tag
         unsigned                  // dimension
     );
+
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
