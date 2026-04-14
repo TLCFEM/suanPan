@@ -26,7 +26,7 @@
 
 [![License: GNU General Public License v3.0 or later](https://www.gnu.org/graphics/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-[![VS Code Extension](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
+[![VS Code Extension](https://vsmarketplacebadges.dev/version-short/tlc.suanpan.svg)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
 
 > [!IMPORTANT]
 > - **Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).**
