@@ -22,7 +22,7 @@ FROM debian:12
 
 COPY --from=build /suanPan*.deb /
 
-RUN apt-get install ./suanPan*.deb -y && rm ./suanPan*.deb
+RUN apt-get update -y && apt-get install ./suanPan*.deb -y && rm ./suanPan*.deb
 
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
 RUN ln -s /usr/bin/suanPan /usr/bin/sp
