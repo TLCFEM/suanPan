@@ -21,6 +21,7 @@ RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/su
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_FLAGS="-Wno-stringop-overflow -Wno-stringop-overread" \
     -DSP_BUILD_PARALLEL=ON \
+    -DSP_ENABLE_AVX2=OFF \
     -DSP_ENABLE_HDF5=ON \
     -DSP_ENABLE_IOMP=OFF \
     -DSP_ENABLE_MKL=ON \
