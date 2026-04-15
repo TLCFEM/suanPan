@@ -18,4 +18,4 @@ for EXT in "${EXTENSIONS[@]}"; do
 done
 unset 'NAME_ARGS[${#NAME_ARGS[@]}-1]'
 
-find "$ROOT_DIR" "${PRUNE_ARGS[@]}" \( "${NAME_ARGS[@]}" \) -type f -print | xargs -P "$(nproc)" -I{} cf -i {}
+find "$ROOT_DIR" "${PRUNE_ARGS[@]}" \( "${NAME_ARGS[@]}" \) -type f -print0 | xargs -0 -r -n1 -P "$(nproc)" cf -i

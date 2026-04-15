@@ -1,4 +1,4 @@
-FROM fedora:42 AS build
+FROM fedora:44 AS build
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \
@@ -20,7 +20,7 @@ RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/su
     make package -j"$(nproc)" && cp suanPan*.rpm / && \
     cd / && rm -r suanPan
 
-FROM fedora:42
+FROM fedora:44
 
 COPY --from=build /suanPan*.rpm /
 
