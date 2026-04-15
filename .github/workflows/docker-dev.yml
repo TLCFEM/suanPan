@@ -3,6 +3,9 @@ on:
   schedule:
     - cron: "0 8 * * 4"
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   linux-amd64:
     runs-on: ubuntu-24.04
