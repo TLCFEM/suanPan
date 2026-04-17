@@ -11,7 +11,10 @@ SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
 SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
 cd "$SCRIPT_DIR" || exit
 
-find . -maxdepth 1 -mindepth 1 -type d -name "cmake-build*" -print0 |
+find . \
+  \( -maxdepth 1 -mindepth 1 -type d -name "cmake-build*" \) -o \
+  \( -maxdepth 2 -mindepth 2 -type d -path "./build/*" \) \
+  -print0 |
 while IFS= read -r -d '' folder; do
   (
     echo "Compiling $folder"
