@@ -11,7 +11,7 @@ jobs:
           token: ${{ secrets.ALL }}
           environment: github-pages
   package:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Delete Package
         uses: Chizkiyahu/delete-untagged-ghcr-action@v6
