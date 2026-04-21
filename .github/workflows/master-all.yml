@@ -1,9 +1,9 @@
 name: Stable
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -20,11 +20,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
-        avx: [ON, OFF]
-        vtk: [ON, OFF]
-        mkl: [ON, OFF]
-        aocl: [ON, OFF]
+        os: [ ubuntu-24.04, ubuntu-24.04-arm ]
+        avx: [ ON, OFF ]
+        vtk: [ ON, OFF ]
+        mkl: [ ON, OFF ]
+        aocl: [ ON, OFF ]
         exclude:
           - mkl: ON
             aocl: ON
@@ -97,11 +97,6 @@ jobs:
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
       - name: Release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -118,7 +113,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ubuntu-24.04]
+        os: [ ubuntu-24.04 ]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -169,11 +164,6 @@ jobs:
           file_name="suanPan-linux-amd64-mkl-vtk-mpi-no-avx-ilp64.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
       - name: Release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -191,8 +181,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge]
-        vtk: [ON]
+        os: [ macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge ]
+        vtk: [ ON ]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -247,11 +237,6 @@ jobs:
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
       - name: Release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -269,9 +254,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        avx: [ON, OFF]
-        vtk: [ON]
-        mkl: [ON]
+        avx: [ ON, OFF ]
+        vtk: [ ON ]
+        mkl: [ ON ]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -349,11 +334,6 @@ jobs:
         run: |
           cd build/dist/bin
           7z a -tzip ../../../${{ env.ARTIFACT }} ./*
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
       - name: Release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -405,8 +385,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        avx: [ON, OFF]
-        vtk: [ON]
+        avx: [ ON, OFF ]
+        vtk: [ ON ]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -475,11 +455,6 @@ jobs:
         run: |
           cd build/dist/bin
           7z a -tzip ../../../${{ env.ARTIFACT }} ./*
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
       - name: Release
         uses: svenstaro/upload-release-action@v2
         with:
