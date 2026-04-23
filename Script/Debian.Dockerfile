@@ -1,12 +1,12 @@
 FROM debian:12 AS build
 
-RUN apt-get update -y && apt-get install -y wget gnupg && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y --no-install-recommends wget gnupg && rm -rf /var/lib/apt/lists/*
 
 RUN wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 RUN echo "deb https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list
 
-RUN apt-get update -y && apt-get install -y gcc g++ gfortran cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
+RUN apt-get update -y && apt-get install -y --no-install-recommends gcc g++ gfortran cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.1.tar.gz && tar xf VTK-9.6.1.tar.gz && \
@@ -32,7 +32,7 @@ FROM debian:12
 
 COPY --from=build /suanPan*.deb /
 
-RUN apt-get update -y && apt-get install ./suanPan*.deb -y && rm ./suanPan*.deb && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y --no-install-recommends ./suanPan*.deb && rm ./suanPan*.deb && rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
 RUN ln -s /usr/bin/suanPan /usr/bin/sp
