@@ -51,7 +51,7 @@ jobs:
         run: |
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel=2025.3.1
       - name: Compile
         run: |
           sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils patchelf
@@ -131,7 +131,7 @@ jobs:
           wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.1-${{ matrix.os }}.tar.gz && tar xf VTK-9.6.1-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils patchelf
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel=2025.3.1 intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils patchelf
       - name: Compile
         run: |
           go build Checker/updater.go
