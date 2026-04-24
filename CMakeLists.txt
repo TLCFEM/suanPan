@@ -22,10 +22,10 @@ if (CMAKE_Fortran_COMPILER)
 endif ()
 
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
-    # make sure changes to revision.h is not logged
-    execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
     find_program(GIT_EXE NAMES git)
     if (GIT_EXE)
+        # make sure changes to revision.h is not logged
+        execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
         execute_process(
                 COMMAND git rev-parse --short=8 HEAD
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
