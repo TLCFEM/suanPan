@@ -63,7 +63,7 @@ jobs:
           fi
           sudo apt-get update
           if [ "${{ matrix.mkl }}" == "ON" ]; then
-            sudo apt-get install intel-oneapi-mkl-devel
+            sudo apt-get install intel-oneapi-mkl-devel=2025.3.1
           fi
           if [ "${{ matrix.compiler.c }}" == "icx" ]; then
             sudo apt-get install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
@@ -188,7 +188,7 @@ jobs:
           tar xf VTK-9.6.1-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel=2025.3.1 intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
       - name: Compile
         run: |
           source /opt/intel/oneapi/setvars.sh
