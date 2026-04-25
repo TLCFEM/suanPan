@@ -25,7 +25,7 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
     find_program(GIT_EXE NAMES git)
     if (GIT_EXE)
         # make sure changes to revision.h is not logged
-        execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+        execute_process(COMMAND git update-index --assume-unchanged Toolbox/revision.h WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" ERROR_QUIET)
         execute_process(
                 COMMAND git rev-parse --short=8 HEAD
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -201,8 +201,8 @@ if (SP_ENABLE_MKL)
     add_compile_definitions(SUANPAN_MKL)
     add_compile_definitions(EZP_MKL)
     message(STATUS "Using MKL library: ${MKL_VERSION}")
-    if (MKL_VERSION VERSION_GREATER_EQUAL "2026.0.0")
-        execute_process(COMMAND git apply "${CMAKE_CURRENT_SOURCE_DIR}/Script/mkl.2026.0.0.patch" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+    if (MKL_VERSION VERSION_GREATER_EQUAL "2026.0.0" AND GIT_EXE)
+        execute_process(COMMAND git apply "${CMAKE_CURRENT_SOURCE_DIR}/Script/mkl.2026.0.0.patch" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" ERROR_QUIET)
     endif ()
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     message(WARNING "Since Intel compilers are used, why not enabling MKL?")
