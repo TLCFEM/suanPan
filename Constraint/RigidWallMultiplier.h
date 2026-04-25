@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,19 +44,19 @@ public:
 
 class RigidWallMultiplier1D final : public RigidWallMultiplier {
 public:
-    RigidWallMultiplier1D(unsigned, unsigned, vec&&, vec&&, double);
+    RigidWallMultiplier1D(unsigned, unsigned, double, double, double);
 };
 
 class RigidWallMultiplier2D final : public RigidWallMultiplier {
 public:
-    RigidWallMultiplier2D(unsigned, unsigned, vec&&, vec&&, double);
-    RigidWallMultiplier2D(unsigned, unsigned, vec&&, vec&&, vec&&, double);
+    RigidWallMultiplier2D(unsigned, unsigned, vec2&&, vec2&&, double);
+    RigidWallMultiplier2D(unsigned, unsigned, vec2&&, vec3&&, double);
 };
 
 class RigidWallMultiplier3D final : public RigidWallMultiplier {
 public:
-    RigidWallMultiplier3D(unsigned, unsigned, vec&&, vec&&, double);
-    RigidWallMultiplier3D(unsigned, unsigned, vec&&, vec&&, vec&&, double);
+    RigidWallMultiplier3D(unsigned, unsigned, vec3&&, vec3&&, double);
+    RigidWallMultiplier3D(unsigned, unsigned, vec3&&, vec3&&, vec3&&, double);
 };
 
 #endif

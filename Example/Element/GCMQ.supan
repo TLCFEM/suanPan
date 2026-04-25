@@ -31,7 +31,7 @@ element GCMQG 5 5 6 12 11 1 1
 
 fix 1 1 1 7
 fix 2 2 1
-fix 3 3 1 7
+fix 3 ur3 1 7
 
 # cload 1 0 150 2 6 12
 # cload 2 0 -150 2 7

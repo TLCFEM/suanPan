@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,13 +47,13 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    b_trans = D->get_orientation(orientation_tag)->get_copy();
+    b_trans = D->get_orientation(orientation_tag)->unique_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
-    if(OrientationType::B3D != b_trans->get_orientation_type()) {
+    if(Orientation::Type::B3D != b_trans->type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
@@ -64,13 +64,13 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
 
     const mat section_stiffness = section_proto->get_initial_stiffness()(b_span, b_span);
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::LOBATTO);
 
     initial_local_flexibility.zeros(6, 6);
     int_pt.clear();
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->get_copy());
+        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->unique_copy());
         int_pt[I].b_section->set_characteristic_length(int_pt[I].weight * length);
         // factor .5 moved to weight
         initial_local_flexibility += int_pt[I].strain_mat.t() * solve(section_stiffness, int_pt[I].strain_mat * int_pt[I].weight * length);
@@ -157,12 +157,12 @@ int F31::reset_status() {
     return code;
 }
 
-std::vector<vec> F31::record(const OutputType P) {
+std::vector<vec> F31::record(const OutputType P) const {
     if(P == OutputType::BEAME) return {current_local_deformation};
     if(P == OutputType::BEAMS) return {current_local_resistance};
 
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.b_section->record(P));
     return data;
 }
 
@@ -181,28 +181,24 @@ void F31::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void F31::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(auto I = 0u; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+vtkSmartPointer<vtkCell> F31::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
+
+mat F31::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
+
+    vec low, high;
+    if(const auto t_data = int_pt.front().b_section->record(P); !t_data.empty()) low = t_data[0];
+    if(const auto t_data = int_pt.back().b_section->record(P); !t_data.empty()) high = t_data[0];
+
+    mat data(6, b_node);
+    data.col(0) = low.resize(6);
+    data.col(1) = high.resize(6);
+
+    return data;
 }
 
-void F31::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, b_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), b_dof, b_node);
-    else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), b_dof, b_node);
-    else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), b_dof, b_node);
-
-    for(auto I = 0u; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void F31::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node)).rows(0, 2).t();
-    for(auto I = 0u; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat F31::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().eval().head_rows(3); }
 
 #endif

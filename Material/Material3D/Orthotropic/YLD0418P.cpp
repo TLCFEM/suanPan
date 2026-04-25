@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ int YLD0418P::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> YLD0418P::get_copy() { return std::make_unique<YLD0418P>(*this); }
+unique_ptr<Material> YLD0418P::unique_copy() { return std::make_unique<YLD0418P>(*this); }
 
 int YLD0418P::update_trial_status(const vec& t_strain) {
     if(tensor::strain::norm(incre_strain = (trial_strain = t_strain) - current_strain) <= datum::eps) return SUANPAN_SUCCESS;
@@ -199,10 +199,10 @@ int YLD0418P::with_kinematic() {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             plastic_strain += n * gamma;
 
             trial_stress -= en * gamma;
@@ -270,10 +270,10 @@ int YLD0418P::without_kinematic() {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             plastic_strain += n * gamma;
 
             trial_stress -= en * gamma;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ int Rebar2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Rebar2D::get_copy() { return std::make_unique<Rebar2D>(*this); }
+unique_ptr<Material> Rebar2D::unique_copy() { return std::make_unique<Rebar2D>(*this); }
 
 int Rebar2D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;
@@ -92,11 +92,11 @@ int Rebar2D::reset_status() {
     return rebar_x->reset_status() + rebar_y->reset_status();
 }
 
-std::vector<vec> Rebar2D::record(const OutputType P) {
+std::vector<vec> Rebar2D::record(const OutputType P) const {
     std::vector<vec> data;
 
-    for(const auto& I : rebar_x->record(P)) data.emplace_back(I);
-    for(const auto& I : rebar_y->record(P)) data.emplace_back(I);
+    suanpan::append_to(data, rebar_x->record(P));
+    suanpan::append_to(data, rebar_y->record(P));
 
     return data;
 }

@@ -54,7 +54,7 @@ op_orth::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1::
   typedef typename T1::elem_type eT;
   typedef typename T1::pod_type   T;
   
-  arma_conform_check((tol < T(0)), "orth(): tolerance must be >= 0");
+  arma_conform_check( ((tol >= T(0)) == false), "orth(): tolerance must be > 0" );
   
   Mat<eT> U;
   Col< T> s;
@@ -86,6 +86,8 @@ op_orth::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1::
   
   // set tolerance to default if it hasn't been specified
   if(tol == T(0))  { tol = (std::max)(A.n_rows, A.n_cols) * s_mem[0] * std::numeric_limits<T>::epsilon(); }
+  
+  if(arma_isnan(tol))  { return false; }
   
   uword count = 0;
   
@@ -141,7 +143,7 @@ op_null::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1::
   typedef typename T1::elem_type eT;
   typedef typename T1::pod_type   T;
   
-  arma_conform_check((tol < T(0)), "null(): tolerance must be >= 0");
+  arma_conform_check( ((tol >= T(0)) == false), "null(): tolerance must be > 0" );
   
   Mat<eT> U;
   Col< T> s;
@@ -173,6 +175,8 @@ op_null::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1::
   
   // set tolerance to default if it hasn't been specified
   if(tol == T(0))  { tol = (std::max)(A.n_rows, A.n_cols) * s_mem[0] * std::numeric_limits<T>::epsilon(); }
+  
+  if(arma_isnan(tol))  { return false; }
   
   uword count = 0;
   

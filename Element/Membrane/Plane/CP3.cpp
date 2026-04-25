@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "CP3.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
@@ -145,7 +144,7 @@ void CP3::stack_stiffness(mat& K, const mat& D, const mat& N, const double F) {
 }
 
 CP3::CP3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const bool R)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
 int CP3::initialize(const shared_ptr<DomainBase>& D) {
@@ -153,7 +152,7 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
-    m_material = material_proto->get_copy();
+    m_material = material_proto->unique_copy();
 
     mat ele_coor(m_node, m_node);
     ele_coor.col(0).fill(1.);
@@ -249,7 +248,7 @@ int CP3::clear_status() { return m_material->clear_status(); }
 
 int CP3::reset_status() { return m_material->reset_status(); }
 
-std::vector<vec> CP3::record(const OutputType P) { return m_material->record(P); }
+std::vector<vec> CP3::record(const OutputType P) const { return m_material->record(P); }
 
 void CP3::print() {
     suanpan_info("CP3 element connects nodes:", node_encoding);
@@ -261,34 +260,18 @@ void CP3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-void CP3::Setup() {
-    vtk_cell = vtkSmartPointer<vtkTriangle>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
-}
-
-void CP3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
+vtkSmartPointer<vtkCell> CP3::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
 
 mat CP3::GetData(const OutputType P) {
-    vec t_stress(6, fill::zeros);
-    if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress(uvec{0, 1, 3}) = t_data[0];
-    return repmat(t_stress, 1, m_node);
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
+    vec data;
+    if(const auto t_data = m_material->record(P); !t_data.empty()) data = t_data[0];
+    return repmat(data.resize(6), 1, m_node);
 }
 
-void CP3::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat CP3::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

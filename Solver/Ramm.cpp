@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,10 @@ int Ramm::analyze() {
         // process constraints
         if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
         D->update<Statistics::ProcessConstraint>(t_clock.toc());
+
+        // indicate the global matrix has been assembled
+        G->assemble_effective_matrix();
+        G->set_matrix_assembled_switch();
 
         t_clock.tic();
 

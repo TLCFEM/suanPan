@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include <Recorder/OutputType.h>
 
 EB21::EB21(const unsigned T, uvec&& N, const double A, const double I, const unsigned M, const bool F)
-    : MaterialElement1D(T, b_node, b_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement1D(T, b_node, b_dof, std::move(N), uvec{M}, F, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , area(A)
     , moment_inertia(I)
     , b_trans(F ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
@@ -31,7 +31,7 @@ EB21::EB21(const unsigned T, uvec&& N, const double A, const double I, const uns
 int EB21::initialize(const shared_ptr<DomainBase>& D) {
     b_trans->set_element_ptr(this);
 
-    b_material = D->get<Material>(material_tag(0))->get_copy();
+    b_material = D->get<Material>(material_tag(0))->unique_copy();
 
     // stiffness
     const auto tmp_a = as_scalar(b_material->get_initial_stiffness()) / b_trans->get_length();
@@ -77,7 +77,7 @@ int EB21::reset_status() {
     return b_material->reset_status();
 }
 
-std::vector<vec> EB21::record(const OutputType P) {
+std::vector<vec> EB21::record(const OutputType P) const {
     if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
     if(P == OutputType::BEAMS) return {vec{local_stiff * b_trans->to_local_vec(get_current_displacement())}};
 
@@ -91,28 +91,22 @@ void EB21::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void EB21::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> EB21::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
+
+mat EB21::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, b_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = reshape(in, b_dof, b_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
+    return {};
 }
 
-void EB21::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, b_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_acceleration(), b_dof, b_node);
-    else if(OutputType::V == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_velocity(), b_dof, b_node);
-    else if(OutputType::U == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_displacement(), b_dof, b_node);
-
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void EB21::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node).t()).cols(0, 1);
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat EB21::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2); }
 
 #endif

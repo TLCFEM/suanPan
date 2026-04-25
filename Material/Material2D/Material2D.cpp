@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,15 +23,24 @@
 Material2D::Material2D(const unsigned T, const PlaneType PT, const double R)
     : Material(T, MaterialType::D2, R) { access::rw(plane_type) = PT; }
 
-std::vector<vec> Material2D::record(const OutputType P) {
-    if(P == OutputType::SP) return {transform::stress::principal(current_stress)};
-    if(P == OutputType::S11) return {vec{current_stress(0)}};
-    if(P == OutputType::S22) return {vec{current_stress(1)}};
-    if(P == OutputType::S12) return {vec{current_stress(2)}};
-    if(P == OutputType::EP) return {transform::strain::principal(current_strain)};
-    if(P == OutputType::E11) return {vec{current_strain(0)}};
-    if(P == OutputType::E22) return {vec{current_strain(1)}};
-    if(P == OutputType::E12) return {vec{current_strain(2)}};
+std::vector<vec> Material2D::record(const OutputType P) const {
+    if(P == OutputType::HIST) return {current_history};
+    if(P == OutputType::YF) return {vec{any(current_history != 0.) ? 1. : 0.}};
 
-    return Material::record(P);
+    const auto remap = [](const vec& in) {
+        vec out(6, fill::zeros);
+        out(uvec{0, 1, 3}) = in;
+        return out;
+    };
+
+    if(plane_type == PlaneType::S) {
+        if(P == OutputType::S) return {remap(current_stress)};
+        if(P == OutputType::SP) return {transform::stress::principal(current_stress)};
+    }
+    else if(plane_type == PlaneType::E) {
+        if(P == OutputType::E) return {remap(current_strain)};
+        if(P == OutputType::EP) return {transform::strain::principal(current_strain)};
+    }
+
+    return {};
 }

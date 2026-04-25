@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ int Stacked::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Stacked::get_copy() { return std::make_unique<Stacked>(*this); }
+unique_ptr<Material> Stacked::unique_copy() { return std::make_unique<Stacked>(*this); }
 
 int Stacked::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -89,18 +89,9 @@ int Stacked::reset_status() {
     return code;
 }
 
-std::vector<vec> Stacked::record(const OutputType P) {
+std::vector<vec> Stacked::record(const OutputType P) const {
     std::vector<vec> data;
-
-    auto max_size = 0llu;
-    for(const auto& I : mat_pool)
-        for(const auto& J : I->record(P)) {
-            if(J.n_elem > max_size) max_size = J.n_elem;
-            data.emplace_back(J);
-        }
-
-    for(auto&& I : data) I.resize(max_size);
-
+    for(const auto& I : mat_pool) suanpan::append_to(data, I->record(P));
     return data;
 }
 

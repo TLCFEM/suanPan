@@ -9,8 +9,19 @@
 
 if (Test-Path -Path "CompileAll.ps1") { Set-Location -Path .. }
 
-$folders = Get-ChildItem -Directory -Name -Path . | Where-Object { $_ -like "cmake-build*" } | ForEach-Object { Convert-Path $_ }
-$folder_count = $folders.length
+$cmake_folders = Get-ChildItem -Directory -Path . -Filter "cmake-build*" | ForEach-Object { Convert-Path $_.FullName }
+$build_folders = if (Test-Path -Path ".\build") {
+    Get-ChildItem -Directory -Path ".\build" | ForEach-Object { Convert-Path $_.FullName }
+}
+else {
+    @()
+}
+$folders = @($cmake_folders + $build_folders | Sort-Object -Unique)
+$folder_count = $folders.Count
+if ($folder_count -eq 0) {
+    Write-Warning "No cmake-build* folders or build/* folders found."
+    return
+}
 $per_core = [int][math]::Ceiling($env:NUMBER_OF_PROCESSORS / ($folder_count - 1) - 1)
 
 $script = {

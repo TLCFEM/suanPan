@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,61 +18,35 @@
  * @class Subloading
  * @brief A Subloading material class.
  * @author tlc
- * @date 29/09/2024
- * @version 0.1.0
+ * @date 26/12/2025
+ * @version 0.2.0
  * @file Subloading.h
- * @addtogroup Material-1D
+ * @addtogroup Material-3D
  * @{
  */
 
 #ifndef SUBLOADING_H
 #define SUBLOADING_H
 
+#include "SubloadingUtil.h"
+
 #include <Material/Material3D/Material3D.h>
 
 struct DataSubloading {
-    class Saturation {
-        const double rate, bound;
-
-    public:
-        Saturation(const double R, const double B)
-            : rate(R)
-            , bound(B) {}
-
-        [[nodiscard]] double r() const { return rate; }
-
-        [[nodiscard]] double b() const { return bound; }
-
-        [[nodiscard]] double rb() const { return r() * b(); }
-    };
-
     const double elastic; // elastic modulus
-    const double poissons_ratio;
-    const double initial_iso;
-    const double k_iso;
-    const double saturation_iso;
-    const double m_iso;
-    const double initial_kin;
-    const double k_kin;
-    const double saturation_kin;
-    const double m_kin;
+    const double poisson;
+    const SubloadingBound iso_bound, kin_bound;
     const double u;
 
-    const Saturation b;
-    const Saturation c;
+    const SubloadingSaturation b, c;
 };
 
-class Subloading final : protected DataSubloading, public Material3D {
+class Subloading final : protected DataSubloading, protected SubloadingBase, public Material3D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double two_third = 2. / 3.;
-    static const double root_two_third;
-    static constexpr double z_bound = 1E-15;
-    static const double rate_bound;
+    inline static const double root_two_third = std::sqrt(2. / 3.);
     static const mat unit_dev_tensor;
 
-    static pod2 yield_ratio(double);
-
-    const double double_shear = elastic / (1. + poissons_ratio); // double shear modulus
+    const double double_shear = elastic / (1. + poisson); // double shear modulus
 
 public:
     Subloading(
@@ -83,7 +57,7 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Material> get_copy() override;
+    unique_ptr<Material> unique_copy() override;
 
     int update_trial_status(const vec&) override;
 

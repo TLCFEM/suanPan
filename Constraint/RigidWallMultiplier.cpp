@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 #include "RigidWallMultiplier.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 int RigidWallMultiplier::initialize(const shared_ptr<DomainBase>& D) {
@@ -42,8 +41,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
     // multiplier method
     auto counter = 0llu;
     for(const auto& I : D->get_node_pool()) {
-        if(!checker_handler(I)) continue;
-        const vec t_pos = trial_position_handler(I) - origin;
+        const vec t_pos = I->trial_position(n_dim) - origin;
         if(!edge_a.empty())
             if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) continue;
         if(!edge_b.empty())
@@ -53,7 +51,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
         auxiliary_stiffness.resize(W->get_size(), counter);
         auto& t_dof = I->get_reordered_dof();
         for(auto J = 0llu; J < n_dim; ++J) auxiliary_stiffness(t_dof(J), counter - 1) = outer_norm(J);
-        const auto t_disp = trial_displacement_handler(I);
+        const auto t_disp = I->get_trial_displacement(n_dim);
         t_resistance.emplace_back(dot(t_disp, outer_norm));
         t_load.emplace_back(-dot(t_pos - t_disp, outer_norm));
     }
@@ -61,27 +59,26 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
     auxiliary_resistance = t_resistance;
     auxiliary_load = t_load;
 
-    num_size = static_cast<unsigned>(auxiliary_resistance.n_elem);
+    lagrangian_size = static_cast<unsigned>(auxiliary_resistance.n_elem);
 
     return SUANPAN_SUCCESS;
 }
 
-RigidWallMultiplier1D::RigidWallMultiplier1D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 1, 1), resize(N, 1, 1), F, 1) { set_handler<DOF::U1>(); }
+RigidWallMultiplier1D::RigidWallMultiplier1D(const unsigned T, const unsigned A, const double O, const double N, const double F)
+    : RigidWallMultiplier(T, A, {O}, {N}, F, 1) {}
 
-RigidWallMultiplier2D::RigidWallMultiplier2D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 2, 1), resize(N, 2, 1), F, 2) { set_handler<DOF::U1, DOF::U2>(); }
+RigidWallMultiplier2D::RigidWallMultiplier2D(const unsigned T, const unsigned A, vec2&& O, vec2&& N, const double F)
+    : RigidWallMultiplier(T, A, std::move(O), std::move(N), F, 2) {}
 
-RigidWallMultiplier2D::RigidWallMultiplier2D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 2) {
-    set_handler<DOF::U1, DOF::U2>();
+RigidWallMultiplier2D::RigidWallMultiplier2D(const unsigned T, const unsigned A, vec2&& O, vec3&& E1, const double F)
+    : RigidWallMultiplier(T, A, std::move(O), std::move(E1), vec{0., 0., 1.}, F, 2) {
     access::rw(outer_norm).resize(2);
     access::rw(edge_a).resize(2);
     access::rw(edge_b).reset();
 }
 
-RigidWallMultiplier3D::RigidWallMultiplier3D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 3, 1), resize(N, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+RigidWallMultiplier3D::RigidWallMultiplier3D(const unsigned T, const unsigned A, vec3&& O, vec3&& N, const double F)
+    : RigidWallMultiplier(T, A, std::move(O), std::move(N), F, 3) {}
 
-RigidWallMultiplier3D::RigidWallMultiplier3D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallMultiplier(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+RigidWallMultiplier3D::RigidWallMultiplier3D(const unsigned T, const unsigned A, vec3&& O, vec3&& E1, vec3&& E2, const double F)
+    : RigidWallMultiplier(T, A, std::move(O), std::move(E1), std::move(E2), F, 3) {}

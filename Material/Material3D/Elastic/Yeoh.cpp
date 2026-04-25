@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ int Yeoh::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Yeoh::get_copy() { return std::make_unique<Yeoh>(*this); }
+unique_ptr<Material> Yeoh::unique_copy() { return std::make_unique<Yeoh>(*this); }
 
 // takes green strain as input
 int Yeoh::update_trial_status(const vec& t_strain) {

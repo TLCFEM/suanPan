@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ int Kelvin::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Kelvin::get_copy() { return std::make_unique<Kelvin>(*this); }
+unique_ptr<Material> Kelvin::unique_copy() { return std::make_unique<Kelvin>(*this); }
 
 int Kelvin::update_trial_status(const vec&) {
     suanpan_error("Receives strain only from the associated element.\n");
@@ -92,9 +92,7 @@ int Kelvin::reset_status() {
     return spring->reset_status() + damper->reset_status();
 }
 
-std::vector<vec> Kelvin::record(const OutputType P) {
-    if(OutputType::S == P) return {current_stress};
-    if(OutputType::E == P) return {current_strain};
+std::vector<vec> Kelvin::record(const OutputType P) const {
     if(OutputType::V == P) return {current_strain_rate};
     if(OutputType::SD == P) return {damper->get_current_stress()};
     if(OutputType::ED == P) return {damper->get_current_strain()};
@@ -103,7 +101,7 @@ std::vector<vec> Kelvin::record(const OutputType P) {
     if(OutputType::ES == P) return {spring->get_current_strain()};
     if(OutputType::VS == P) return {spring->get_current_strain_rate()};
 
-    return {};
+    return Material1D::record(P);
 }
 
 void Kelvin::print() {

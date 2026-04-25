@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@
 const span T3DL::IS(0, 2);
 const span T3DL::JS(3, 5);
 
-unique_ptr<Orientation> T3DL::get_copy() { return std::make_unique<T3DL>(*this); }
+unique_ptr<Orientation> T3DL::unique_copy() { return std::make_unique<T3DL>(*this); }
 
 void T3DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;
 
-    const auto coord = get_coordinate(element_ptr, 3);
+    const auto coord = element_ptr->get_coordinate(3);
 
     vec x_axis(3);
     x_axis(0) = coord(1, 0) - coord(0, 0);
@@ -39,7 +39,7 @@ void T3DL::update_transformation() {
     direction_cosine = x_axis / length;
 }
 
-OrientationType T3DL::get_orientation_type() const { return OrientationType::T3D; }
+Orientation::Type T3DL::type() const { return Type::T3D; }
 
 vec T3DL::to_local_vec(const vec& g_disp) const { return vec{dot(direction_cosine, g_disp(JS) - g_disp(IS))}; }
 

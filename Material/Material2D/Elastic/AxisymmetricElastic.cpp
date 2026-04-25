@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@ int AxisymmetricElastic::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double AxisymmetricElastic::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double AxisymmetricElastic::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> AxisymmetricElastic::get_copy() { return std::make_unique<AxisymmetricElastic>(*this); }
+unique_ptr<Material> AxisymmetricElastic::unique_copy() { return std::make_unique<AxisymmetricElastic>(*this); }
 
 int AxisymmetricElastic::update_trial_status(const vec& t_strain) {
     trial_stress = trial_stiffness * (trial_strain = t_strain);
@@ -56,6 +56,8 @@ int AxisymmetricElastic::reset_status() {
     trial_stress = current_stress;
     return SUANPAN_SUCCESS;
 }
+
+std::vector<vec> AxisymmetricElastic::record(OutputType) const { return {}; }
 
 void AxisymmetricElastic::print() {
     suanpan_info("Strain:\t", get_trial_strain());

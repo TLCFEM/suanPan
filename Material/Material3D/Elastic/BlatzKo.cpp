@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@ int BlatzKo::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double BlatzKo::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double BlatzKo::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> BlatzKo::get_copy() { return std::make_unique<BlatzKo>(*this); }
+unique_ptr<Material> BlatzKo::unique_copy() { return std::make_unique<BlatzKo>(*this); }
 
 // takes green strain as input
 int BlatzKo::update_trial_status(const vec& t_strain) {

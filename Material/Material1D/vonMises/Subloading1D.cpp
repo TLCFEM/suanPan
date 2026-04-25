@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-const double DataSubloading1D::Saturation::root_one_half = sqrt(1.5);
-
-const double Subloading1D::rate_bound = -log(z_bound);
-
-pod2 Subloading1D::yield_ratio(const double z) {
-    if(z < z_bound) return {rate_bound, 0.};
-
-    return {-log(z), -1. / z};
-}
-
 Subloading1D::Subloading1D(const unsigned T, DataSubloading1D&& D, const double R)
     : DataSubloading1D{std::move(D)}
     , Material1D(T, R) {}
@@ -44,7 +34,7 @@ int Subloading1D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Subloading1D::get_copy() { return std::make_unique<Subloading1D>(*this); }
+unique_ptr<Material> Subloading1D::unique_copy() { return std::make_unique<Subloading1D>(*this); }
 
 int Subloading1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -64,10 +54,10 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
     auto& z = trial_history(2);
     auto& zv = trial_history(3);
 
-    const auto current_alpha = 0 == b.size() ? vec{} : vec(&current_history(4), b.size(), false, true);
-    const auto current_d = 0 == c.size() ? vec{} : vec(&current_history(4 + b.size()), c.size(), false, true);
-    auto alpha = 0 == b.size() ? vec{} : vec(&trial_history(4), b.size(), false, true);
-    auto d = 0 == c.size() ? vec{} : vec(&trial_history(4 + b.size()), c.size(), false, true);
+    const auto current_na = b.empty() ? vec{} : vec(&current_history(4), b.size(), false, true);
+    const auto current_nd = c.empty() ? vec{} : vec(&current_history(4 + b.size()), c.size(), false, true);
+    auto na = b.empty() ? vec{} : vec(&trial_history(4), b.size(), false, true);
+    auto nd = c.empty() ? vec{} : vec(&trial_history(4 + b.size()), c.size(), false, true);
 
     const auto norm_mu = mu / (incre_time && *incre_time > 0. ? *incre_time : 1.);
 
@@ -87,31 +77,24 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         q = current_q + gamma;
 
-        const auto exp_iso = saturation_iso * std::exp(-m_iso * q);
-        auto y = initial_iso + saturation_iso + k_iso * q - exp_iso;
-        auto dy = k_iso + m_iso * exp_iso;
-        if(y < 0.) y = dy = 0.;
+        const auto [y, dy] = iso_bound(q, true);
+        const auto [a, da] = kin_bound(q, true);
 
-        const auto exp_kin = saturation_kin * std::exp(-m_kin * q);
-        auto a = initial_kin + saturation_kin + k_kin * q - exp_kin;
-        auto da = k_kin + m_kin * exp_kin;
-        if(a < 0.) a = da = 0.;
+        vec bot_na(b.size(), fill::none), bot_nd(c.size(), fill::none);
+        for(auto I = 0llu; I < b.size(); ++I) bot_na(I) = 1. + b[I].r() * gamma;
+        for(auto I = 0llu; I < c.size(); ++I) bot_nd(I) = 1. + c[I].r() * gamma;
 
-        vec bottom_alpha(b.size(), fill::none), bottom_d(c.size(), fill::none);
-        for(auto I = 0llu; I < b.size(); ++I) bottom_alpha(I) = 1. + b[I].r() * gamma;
-        for(auto I = 0llu; I < c.size(); ++I) bottom_d(I) = 1. + c[I].r() * gamma;
+        const auto n = trial_stress(0) - a * accu(current_na / bot_na) + (z - 1.) * y * accu(current_nd / bot_nd) > 0. ? 1. : -1.;
 
-        const auto n = trial_stress(0) - a * accu(current_alpha / bottom_alpha) + (z - 1.) * y * accu(current_d / bottom_d) > 0. ? 1. : -1.;
+        for(auto I = 0llu; I < b.size(); ++I) na(I) = (b[I].rb() * gamma * n + current_na(I)) / bot_na(I);
+        for(auto I = 0llu; I < c.size(); ++I) nd(I) = (c[I].rb() * gamma * n + current_nd(I)) / bot_nd(I);
 
-        for(auto I = 0llu; I < b.size(); ++I) alpha(I) = (b[I].rb() * gamma * n + current_alpha(I)) / bottom_alpha(I);
-        for(auto I = 0llu; I < c.size(); ++I) d(I) = (c[I].rb() * gamma * n + current_d(I)) / bottom_d(I);
-
-        const auto sum_alpha = accu(alpha), sum_d = accu(d);
+        const auto sum_na = accu(na), sum_nd = accu(nd);
 
         if(1u == counter && !zero_increment) {
-            const auto s = (y * sum_d + a * sum_alpha - current_stress(0)) / (trial_stress(0) - current_stress(0));
+            const auto s = (y * sum_nd + a * sum_na - current_stress(0)) / (trial_stress(0) - current_stress(0));
             if(s >= 1.) {
-                zv = ((trial_stress(0) - a * sum_alpha) / y - sum_d) / (n - sum_d);
+                zv = ((trial_stress(0) - a * sum_na) / y - sum_nd) / (n - sum_nd);
                 if(zv < z) {
                     // elastic unloading
                     z = zv;
@@ -122,22 +105,22 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
             if(s > 0.) start_z = 0.;
         }
 
-        auto dalpha = 0., dd = 0.;
-        for(auto I = 0llu; I < b.size(); ++I) dalpha += b[I].r() * (b[I].b() * n - alpha[I]) / bottom_alpha[I];
-        for(auto I = 0llu; I < c.size(); ++I) dd += c[I].r() * (c[I].b() * n - d[I]) / bottom_d[I];
+        auto dna = 0., dnd = 0.;
+        for(auto I = 0llu; I < b.size(); ++I) dna += b[I].r() * (b[I].b() * n - na[I]) / bot_na[I];
+        for(auto I = 0llu; I < c.size(); ++I) dnd += c[I].r() * (c[I].b() * n - nd[I]) / bot_nd[I];
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio[0];
         const auto fraction_term = (cv * z - zv) * norm_mu * gamma + 1.;
         const auto power_term = std::pow(fraction_term, nv - 1.);
 
-        residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - a * sum_alpha + (z - 1.) * y * sum_d) - zv * y;
+        residual(0) = std::fabs(trial_stress(0) - elastic * gamma * n - a * sum_na + (z - 1.) * y * sum_nd) - zv * y;
         residual(1) = z - start_z - gamma * avg_rate;
         residual(2) = zv - fraction_term * power_term * z;
 
-        jacobian(0, 0) = n * ((z - 1.) * (y * dd + sum_d * dy) - (a * dalpha + sum_alpha * da)) - elastic - zv * dy;
+        jacobian(0, 0) = n * ((z - 1.) * (y * dnd + sum_nd * dy) - (a * dna + sum_na * da)) - elastic - zv * dy;
         jacobian(0, 1) = -y;
-        jacobian(0, 2) = n * y * sum_d;
+        jacobian(0, 2) = n * y * sum_nd;
 
         jacobian(1, 0) = -avg_rate;
         jacobian(1, 1) = 0.;
@@ -149,10 +132,10 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             iteration = counter;
             trial_stress -= elastic * gamma * n;
             trial_stiffness += elastic / det(jacobian) * elastic * det(jacobian.submat(1, 1, 2, 2));

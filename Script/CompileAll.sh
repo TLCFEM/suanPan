@@ -11,8 +11,17 @@ SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
 SCRIPT_DIR=$(dirname "$SCRIPT_DIR")
 cd "$SCRIPT_DIR" || exit
 
-# shellcheck disable=SC2044
-for folder in $(find . -maxdepth 1 -type d -name "cmake-build*"); do
+folders=()
+
+while IFS= read -r -d '' folder; do
+  folders+=("$folder")
+done < <(find . -mindepth 1 -maxdepth 1 -type d -name "cmake-build*" -print0)
+
+while IFS= read -r -d '' folder; do
+  folders+=("$folder")
+done < <([ -d ./build ] && find ./build -mindepth 1 -maxdepth 1 -type d -print0)
+
+for folder in "${folders[@]}"; do
   (
     echo "Compiling $folder"
     cd "$folder" || exit

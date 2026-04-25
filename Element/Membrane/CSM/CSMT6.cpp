@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ CSMT6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
     , m_material(std::move(M)) {}
 
 CSMT6::CSMT6(const unsigned T, uvec&& N, const unsigned M, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMT6::initialize(const shared_ptr<DomainBase>& D) {
@@ -59,7 +59,7 @@ int CSMT6::initialize(const shared_ptr<DomainBase>& D) {
 
     if(characteristic_length < 0.) access::rw(characteristic_length) = sqrt(area);
 
-    const IntegrationPlan plan(2, 5, IntegrationType::TRIANGLE);
+    const IntegrationPlan plan(2, 5, IntegrationPlan::Type::TRIANGLE);
 
     const auto& t_size = t_dof.n_elem;
     const auto& r_size = r_dof.n_elem;
@@ -72,7 +72,7 @@ int CSMT6::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec = ele_coor(span(0, 2), span(1, 2)).t() * vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const rowvec n = shape::triangle(t_vec, 0) * inv_coor;
         const mat pnpxy = shape::triangle(t_vec, 1) * inv_coor;
-        int_pt.emplace_back(std::move(t_vec), area * plan(I, 3) * thickness, material_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), area * plan(I, 3) * thickness, material_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
 
@@ -194,9 +194,9 @@ int CSMT6::reset_status() {
     return code;
 }
 
-std::vector<vec> CSMT6::record(const OutputType P) {
+std::vector<vec> CSMT6::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -214,28 +214,16 @@ void CSMT6::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuadraticTriangle.h>
 
-void CSMT6::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuadraticTriangle>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> CSMT6::GetCell() const { return vtkSmartPointer<vtkQuadraticTriangle>::New(); }
+
+mat CSMT6::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
+    return {};
 }
 
-void CSMT6::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_data(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_data.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node).eval().head_rows(2);
-    else if(OutputType::V == type) t_data.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node).eval().head_rows(2);
-    else if(OutputType::U == type) t_data.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_data.colptr(I));
-}
-
-void CSMT6::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat CSMT6::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2); }
 
 #endif

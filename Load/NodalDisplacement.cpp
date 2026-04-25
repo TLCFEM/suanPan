@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,34 @@
 
 #include "NodalDisplacement.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/Amplitude/Amplitude.h>
 
-NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), std::move(D), L) { enable_displacement_control(); }
+NodalDisplacement::NodalDisplacement(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : Load(T, AT, {}, std::move(D), L) { target_node = std::move(N); }
 
 int NodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+
     set_end_step(start_step + 1);
 
-    D->get_factory()->update_reference_dof(encoding = get_nodal_active_dof(D));
+    D->get_factory()->update_reference_dof(target_dof = collect_node_dof(D));
 
-    return Load::initialize(D);
+    return SUANPAN_SUCCESS;
 }
 
 int NodalDisplacement::process(const shared_ptr<DomainBase>& D) {
-    if(!encoding.empty()) {
-        const auto& W = D->get_factory();
-
-        trial_settlement.zeros(W->get_size());
-
-        trial_settlement(encoding).fill(pattern * amplitude->get_amplitude(W->get_trial_time()));
-    }
+    if(target_dof.empty()) trial_settlement.reset();
+    else trial_settlement.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
+}
+
+GroupNodalDisplacement::GroupNodalDisplacement(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : GroupModifier(std::move(N))
+    , NodalDisplacement(T, L, {}, std::move(D), AT) {}
+
+int GroupNodalDisplacement::initialize(const shared_ptr<DomainBase>& D) {
+    target_node = update_object_tag(D);
+
+    return NodalDisplacement::initialize(D);
 }

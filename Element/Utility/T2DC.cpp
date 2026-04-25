@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 #include <Toolbox/tensor.h>
 
 void T2DC::update_transformation() {
-    const auto coord = get_coordinate(element_ptr, 2);
-    const auto t_disp = get_trial_displacement(element_ptr);
+    const auto coord = element_ptr->get_coordinate(2);
+    const auto t_disp = element_ptr->get_trial_displacement();
 
     vec x_axis(2);
     x_axis(0) = coord(1, 0) - coord(0, 0) + t_disp(2) - t_disp(0);
@@ -35,7 +35,7 @@ void T2DC::update_transformation() {
 
 bool T2DC::is_nlgeom() const { return true; }
 
-unique_ptr<Orientation> T2DC::get_copy() { return std::make_unique<T2DC>(*this); }
+unique_ptr<Orientation> T2DC::unique_copy() { return std::make_unique<T2DC>(*this); }
 
 mat T2DC::to_global_geometry_mat(const mat& l_mat) const {
     auto g_mat = to_global_stiffness_mat(-l_mat);

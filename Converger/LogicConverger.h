@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class LogicAND final : public LogicConverger {
 public:
     using LogicConverger::LogicConverger;
 
-    unique_ptr<Converger> get_copy() override;
+    unique_ptr<Converger> unique_copy() override;
 
     bool is_converged(unsigned) override;
 };
@@ -56,7 +56,7 @@ class LogicOR final : public LogicConverger {
 public:
     using LogicConverger::LogicConverger;
 
-    unique_ptr<Converger> get_copy() override;
+    unique_ptr<Converger> unique_copy() override;
 
     bool is_converged(unsigned) override;
 };
@@ -65,7 +65,7 @@ class LogicXOR final : public LogicConverger {
 public:
     using LogicConverger::LogicConverger;
 
-    unique_ptr<Converger> get_copy() override;
+    unique_ptr<Converger> unique_copy() override;
 
     bool is_converged(unsigned) override;
 };

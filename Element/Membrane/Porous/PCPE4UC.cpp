@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ PCPE4UC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<
     , strain_mat(3, m_size, fill::zeros) {}
 
 PCPE4UC::PCPE4UC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false, {Node::DOF::U1, Node::DOF::U2})
     , alpha(AL)
     , porosity(NN) {}
 
@@ -51,8 +51,8 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     // validate bulk modulus
-    const auto ks = s_mat->get_parameter(ParameterType::BULKMODULUS);
-    const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
+    const auto ks = s_mat->get(Material::Parameter::BULK);
+    const auto kf = f_mat->get(Material::Parameter::BULK);
 
     if(suanpan::approx_equal(ks, 0.) || suanpan::approx_equal(kf, 0.)) {
         suanpan_error("A zero bulk modulus is detected.\n");
@@ -67,7 +67,7 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = s_mat->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     meta_k.zeros(m_size, m_size);
     initial_stiffness.zeros(m_size, m_size);
@@ -83,7 +83,7 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const mat pn_pxy = solve(jacob, pn);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->get_copy());
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->unique_copy());
 
         auto& c_pt = int_pt.back();
 
@@ -147,7 +147,7 @@ int PCPE4UC::reset_status() {
 
 mat PCPE4UC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> PCPE4UC::record(const OutputType P) {
+std::vector<vec> PCPE4UC::record(const OutputType P) const {
     std::vector<vec> data;
 
     if(P == OutputType::PP) {
@@ -155,7 +155,7 @@ std::vector<vec> PCPE4UC::record(const OutputType P) {
         for(const auto& I : int_pt) data.emplace_back(vec{-alpha * q * tensor::trace2(I.strain_mat * t_disp)});
     }
     else
-        for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+        for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
 
     return data;
 }
@@ -175,31 +175,18 @@ void PCPE4UC::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void PCPE4UC::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
-}
-
-void PCPE4UC::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), 2, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), 2, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), 2, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
+vtkSmartPointer<vtkCell> PCPE4UC::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat PCPE4UC::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
     mat A(int_pt.size(), 4);
     mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
+        if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -213,9 +200,6 @@ mat PCPE4UC::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void PCPE4UC::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), 2, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat PCPE4UC::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

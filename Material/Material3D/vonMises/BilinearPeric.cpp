@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,4 +25,4 @@ BilinearPeric::BilinearPeric(const unsigned T, const double E, const double V, c
     : DataBilinearPeric{Y, H}
     , NonlinearPeric(T, E, V, MU, EPS, R) {}
 
-unique_ptr<Material> BilinearPeric::get_copy() { return std::make_unique<BilinearPeric>(*this); }
+unique_ptr<Material> BilinearPeric::unique_copy() { return std::make_unique<BilinearPeric>(*this); }

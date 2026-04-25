@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 #include "../DenseMat.hpp"
 
 template<sp_d T> class SymmPackMat final : public DenseMat<T> {
-    static constexpr char UPLO = 'L';
+    static constexpr auto UPLO = 'L';
 
     static T bin;
 
@@ -51,7 +51,7 @@ public:
         : DenseMat<T>(in_size, in_size, (in_size + 1) * in_size / 2)
         , length(2 * in_size - 1) {}
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SymmPackMat>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SymmPackMat>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;
@@ -84,18 +84,11 @@ template<sp_d T> Mat<T> SymmPackMat<T>::operator*(const Mat<T>& X) const {
     auto Y = Mat<T>(arma::size(X), fill::none);
 
     const auto N = static_cast<blas_int>(this->n_rows);
-    constexpr blas_int INC = 1;
-    T ALPHA = T(1);
-    T BETA = T(0);
+    static constexpr blas_int INC = 1;
+    static constexpr T ALPHA{1}, BETA{0};
 
-    if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_sspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
-    else {
-        using E = double;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dspmv)(&UPLO, &N, (E*)&ALPHA, (E*)this->memptr(), (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
+    if constexpr(std::is_same_v<T, float>) suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_sspmv)(&UPLO, &N, &ALPHA, this->memptr(), X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
+    else suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dspmv)(&UPLO, &N, &ALPHA, this->memptr(), X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
 
     return Y;
 }
@@ -113,13 +106,11 @@ template<sp_d T> int SymmPackMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     this->factored = true;
 
     if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        arma_fortran(arma_sppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_sppsv)(&UPLO, &N, &NRHS, this->memptr(), B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        arma_fortran(arma_dppsv)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_dppsv)(&UPLO, &N, &NRHS, this->memptr(), B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else {
@@ -142,13 +133,11 @@ template<sp_d T> int SymmPackMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
     const auto LDB = static_cast<blas_int>(B.n_rows);
 
     if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_spptrs)(&UPLO, &N, &NRHS, this->memptr(), B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        arma_fortran(arma_dpptrs)(&UPLO, &N, &NRHS, (E*)this->memptr(), (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_dpptrs)(&UPLO, &N, &NRHS, this->memptr(), B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else

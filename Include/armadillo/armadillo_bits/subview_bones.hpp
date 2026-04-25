@@ -142,6 +142,9 @@ class subview : public Base< eT, subview<eT> >
   arma_inline       eT* colptr(const uword in_col);
   arma_inline const eT* colptr(const uword in_col) const;
   
+  arma_inline       eT* startptr();
+  arma_inline const eT* startptr() const;
+  
   template<typename eT2>
   inline bool check_overlap(const subview<eT2>& x) const;
   
@@ -392,11 +395,16 @@ class subview_col : public subview<eT>
   
   arma_warn_unused arma_inline const Op<subview_col<eT>,op_strans> as_row() const;
   
+  inline void replace(const eT old_val, const eT new_val);
+  
   inline void fill(const eT val);
   inline void zeros();
   inline void ones();
+  inline void randu();
+  inline void randn();
   
   arma_warn_unused inline bool is_finite() const;
+  arma_warn_unused inline bool is_zero(const pod_type tol = 0) const;
   
   arma_warn_unused inline bool has_inf() const;
   arma_warn_unused inline bool has_nan() const;
@@ -552,11 +560,16 @@ class subview_row : public subview<eT>
   
   arma_warn_unused arma_inline const Op<subview_row<eT>,op_strans> as_col() const;
   
+  inline void replace(const eT old_val, const eT new_val);
+  
   inline void fill(const eT val);
   inline void zeros();
   inline void ones();
+  inline void randu();
+  inline void randn();
   
   arma_warn_unused inline bool is_finite() const;
+  arma_warn_unused inline bool is_zero(const pod_type tol = 0) const;
   
   arma_warn_unused inline bool has_inf() const;
   arma_warn_unused inline bool has_nan() const;

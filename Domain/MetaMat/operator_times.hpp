@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, unique_ptr<Meta
 // template<sp_d T> unique_ptr<MetaMat<T>> operator*(const T value, const shared_ptr<MetaMat<T>>& M) {
 //     if(nullptr == M) return nullptr;
 //
-//     auto N = M->make_copy();
+//     auto N = M->unique_copy();
 //     N->operator*=(value);
 //     return N;
 // }
@@ -59,7 +59,7 @@ template<sp_d T> const shared_ptr<MetaMat<T>>& operator*=(const shared_ptr<MetaM
 }
 
 // template<sp_d T> unique_ptr<MetaMat<T>> operator+(const shared_ptr<MetaMat<T>>& A, const shared_ptr<MetaMat<T>>& B) {
-//     auto M = B->make_copy();
+//     auto M = B->unique_copy();
 //     M->operator+=(A);
 //     return M;
 // }

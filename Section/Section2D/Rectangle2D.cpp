@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,18 +32,18 @@ int Rectangle2D::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(linear_density) = area * material_proto->get_density();
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(int_pt_num);
-    for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(.5 * height * plan(I, 0), .5 * plan(I, 1) * area, material_proto->get_copy());
+    for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(.5 * height * plan(I, 0), .5 * plan(I, 1) * area, material_proto->unique_copy());
 
     initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Rectangle2D::get_copy() { return std::make_unique<Rectangle2D>(*this); }
+unique_ptr<Section> Rectangle2D::unique_copy() { return std::make_unique<Rectangle2D>(*this); }
 
 void Rectangle2D::print() {
     suanpan_info("A 2D rectangular section.\n");

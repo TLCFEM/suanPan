@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,6 +94,16 @@ int to_index(const OutputType config) {
     if(config == OutputType::AR2) return 4;
     if(config == OutputType::AR3) return 5;
 
+    if(config == OutputType::MM1) return 0;
+    if(config == OutputType::MM2) return 1;
+    if(config == OutputType::MM3) return 2;
+    if(config == OutputType::MM4) return 3;
+    if(config == OutputType::MM5) return 4;
+    if(config == OutputType::MM6) return 5;
+    if(config == OutputType::MMR1) return 3;
+    if(config == OutputType::MMR2) return 4;
+    if(config == OutputType::MMR3) return 5;
+
     if(config == OutputType::RF1) return 0;
     if(config == OutputType::RF2) return 1;
     if(config == OutputType::RF3) return 2;
@@ -124,7 +134,27 @@ int to_index(const OutputType config) {
     if(config == OutputType::IM2) return 4;
     if(config == OutputType::IM3) return 5;
 
-    return 0;
+    if(config == OutputType::GDF1) return 0;
+    if(config == OutputType::GDF2) return 1;
+    if(config == OutputType::GDF3) return 2;
+    if(config == OutputType::GDF4) return 3;
+    if(config == OutputType::GDF5) return 4;
+    if(config == OutputType::GDF6) return 5;
+    if(config == OutputType::GDM1) return 3;
+    if(config == OutputType::GDM2) return 4;
+    if(config == OutputType::GDM3) return 5;
+
+    if(config == OutputType::GIF1) return 0;
+    if(config == OutputType::GIF2) return 1;
+    if(config == OutputType::GIF3) return 2;
+    if(config == OutputType::GIF4) return 3;
+    if(config == OutputType::GIF5) return 4;
+    if(config == OutputType::GIF6) return 5;
+    if(config == OutputType::GIM1) return 3;
+    if(config == OutputType::GIM2) return 4;
+    if(config == OutputType::GIM3) return 5;
+
+    return -1;
 }
 
 std::string to_category(const OutputType L) {

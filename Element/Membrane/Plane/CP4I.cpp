@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ void CP4I::stack_stiffness_incompatible(mat& K, const mat& D, const mat& N, cons
 }
 
 CP4I::CP4I(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
 int CP4I::initialize(const shared_ptr<DomainBase>& D) {
@@ -253,7 +253,7 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto ele_coor = get_coordinate(2);
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(m_size, m_size);
     mat stiff_a(4, 4, fill::zeros), stiff_b(m_size, 4, fill::zeros);
@@ -264,7 +264,7 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->get_copy(), solve(jacob, pn));
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->unique_copy(), solve(jacob, pn));
 
         auto& c_pt = int_pt.back();
 
@@ -347,9 +347,9 @@ int CP4I::reset_status() {
 
 mat CP4I::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> CP4I::record(const OutputType P) {
+std::vector<vec> CP4I::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -368,31 +368,18 @@ void CP4I::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void CP4I::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
-}
-
-void CP4I::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
+vtkSmartPointer<vtkCell> CP4I::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat CP4I::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
     mat A(int_pt.size(), 4);
     mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
+        if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -406,9 +393,6 @@ mat CP4I::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void CP4I::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat CP4I::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

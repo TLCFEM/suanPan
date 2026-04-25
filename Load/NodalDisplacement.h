@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,24 +31,36 @@
 #ifndef NODALDISPLACEMENT_H
 #define NODALDISPLACEMENT_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class NodalDisplacement : public Load {
-protected:
-    uvec encoding;
-
 public:
     NodalDisplacement(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        uvec&&,   // dof tags
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tags
+        unsigned                  // amplitude tag
     );
+
+    [[nodiscard]] bool if_displacement_control() const final { return true; }
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
+};
+
+class GroupNodalDisplacement final : protected GroupModifier, public NodalDisplacement {
+public:
+    GroupNodalDisplacement(
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // group tags
+        std::vector<Node::DOF>&&, // dof tags
+        unsigned                  // amplitude tag
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif // NODALDISPLACEMENT_H

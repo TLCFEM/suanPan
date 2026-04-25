@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,36 +25,28 @@ class DomainBase;
 
 #ifdef SUANPAN_VTK
 
-#include <vtkSmartPointer.h>
-
 class vtkUnstructuredGrid;
 
 int vtk_parser(const shared_ptr<DomainBase>&, std::istringstream&);
 
 struct vtkInfo {
-    OutputType type = OutputType::U;
-    double scale = 1.;
-    bool on_deformed = true;
-    unsigned font_size = 8;
+    bool color_bar = true;
+    bool per_element = false;
+    bool per_material = false;
+    bool per_section = false;
+    double scale = 0.;
     int canvas_size[2] = {500, 500};
-    bool save_file = false;
+    OutputType display_type = OutputType::U;
+    OutputType record_type = OutputType::U;
+    std::string category{"U"};
     std::string file_name;
     std::string title_name;
-    bool colorbar = true;
-    int material_type = -1;
-    bool store_ptr = false;
-    vtkSmartPointer<vtkUnstructuredGrid> grid_ptr;
+    unsigned font_size = 8;
+
+    void set(const OutputType in) { record_type = to_token(category = to_category(display_type = in)); }
 };
 
-vtkInfo vtk_process(std::istringstream&);
-
-void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>&, const vtkInfo&);
-
-void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&&, vtkInfo);
-
-void vtk_plot_node_quantity(const shared_ptr<DomainBase>&, vtkInfo);
-
-void vtk_plot_element_quantity(const shared_ptr<DomainBase>&, vtkInfo);
+void vtk_cell_plot(const shared_ptr<DomainBase>&, vtkInfo);
 
 #else
 

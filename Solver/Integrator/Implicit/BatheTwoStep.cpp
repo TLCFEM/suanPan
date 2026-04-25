@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,21 +46,8 @@ void BatheTwoStep::assemble_resistance() {
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }
 
-void BatheTwoStep::assemble_matrix() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
-
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
-    auto fe = std::async([&] { D->assemble_trial_mass(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-    fe.get();
+void BatheTwoStep::assemble_effective_matrix() {
+    auto& W = get_domain()->get_factory();
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 

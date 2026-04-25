@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 Uniaxial::Uniaxial(const unsigned T, const unsigned BT, const unsigned MI)
     : StressWrapper(T, BT, MI, uvec{0}, uvec{1, 2, 3, 4, 5}, MaterialType::D1) {}
 
-unique_ptr<Material> Uniaxial::get_copy() { return std::make_unique<Uniaxial>(*this); }
+unique_ptr<Material> Uniaxial::unique_copy() { return std::make_unique<Uniaxial>(*this); }
 
 void Uniaxial::print() {
     suanpan_info("A uniaxial wrapper.\n");

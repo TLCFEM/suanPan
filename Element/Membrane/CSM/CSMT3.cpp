@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ CSMT3::IntegrationPoint::IntegrationPoint(rowvec&& C, const double W, unique_ptr
     , m_material(std::move(M)) {}
 
 CSMT3::CSMT3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const double L)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
 int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
@@ -100,9 +100,9 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(3);
-    int_pt.emplace_back(mean(ele_coor.rows(uvec{1, 2})), t_factor / 3., material_proto->get_copy());
-    int_pt.emplace_back(mean(ele_coor.rows(uvec{2, 0})), t_factor / 3., material_proto->get_copy());
-    int_pt.emplace_back(mean(ele_coor.rows(uvec{0, 1})), t_factor / 3., material_proto->get_copy());
+    int_pt.emplace_back(mean(ele_coor.rows(uvec{1, 2})), t_factor / 3., material_proto->unique_copy());
+    int_pt.emplace_back(mean(ele_coor.rows(uvec{2, 0})), t_factor / 3., material_proto->unique_copy());
+    int_pt.emplace_back(mean(ele_coor.rows(uvec{0, 1})), t_factor / 3., material_proto->unique_copy());
 
     mat E1(t_size, t_size, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros);
 
@@ -196,9 +196,9 @@ int CSMT3::reset_status() {
     return code;
 }
 
-std::vector<vec> CSMT3::record(const OutputType P) {
+std::vector<vec> CSMT3::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -212,28 +212,16 @@ void CSMT3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-void CSMT3::Setup() {
-    vtk_cell = vtkSmartPointer<vtkTriangle>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> CSMT3::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
+
+mat CSMT3::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
+    return {};
 }
 
-void CSMT3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node).eval().head_rows(2);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node).eval().head_rows(2);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void CSMT3::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat CSMT3::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2); }
 
 #endif

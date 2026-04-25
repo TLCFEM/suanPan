@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@ class Fibre3DOS final : public Fibre {
 public:
     Fibre3DOS(unsigned, uvec&&);
 
-    unique_ptr<Section> get_copy() override;
+    unique_ptr<Section> unique_copy() override;
 
-    std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 };
 
 #endif

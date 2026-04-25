@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ Decay::Decay(const unsigned T, const double AA, const double TTD)
     , A(AA)
     , TD(TTD) {}
 
-unique_ptr<Amplitude> Decay::get_copy() { return std::make_unique<Decay>(*this); }
+unique_ptr<Amplitude> Decay::unique_copy() { return std::make_unique<Decay>(*this); }
 
 double Decay::get_amplitude(const double T) {
     const auto step_time = T - start_time;

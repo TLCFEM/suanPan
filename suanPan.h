@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -336,19 +336,11 @@ namespace suanpan {
     }
 } // namespace suanpan
 
-#ifdef SUANPAN_MSVC
-#pragma warning(disable : 4100)
-#endif
-#include <functional>
-
-inline void suanpan_assert(const std::function<void()>& F) {
+template<std::invocable F> auto suanpan_assert([[maybe_unused]] F&& handler) {
 #ifdef SUANPAN_DEBUG
-    F();
+    std::forward<F>(handler)();
 #endif
 }
-#ifdef SUANPAN_MSVC
-#pragma warning(default : 4100)
-#endif
 
 #define suanpan_info suanpan::info
 #define suanpan_highlight suanpan::highlight
@@ -368,9 +360,17 @@ template<class T> concept sp_i = std::is_integral_v<T>;
 template<typename T, typename U> concept is_arma_mat = sp_d<T> && (std::is_convertible_v<std::remove_cvref_t<U>, Mat<T>> || std::is_convertible_v<std::remove_cvref_t<U>, SpMat<T>>);
 
 namespace suanpan {
-    template<class IN, class FN> requires requires(IN& x) { x.begin(); x.end(); } void for_all(IN& from, FN&& func) {
-        suanpan_for_each(from.begin(), from.end(), std::forward<FN>(func));
+    template<class Container, class Handler> requires requires(Container& x) { x.begin(); x.end(); } void for_all(Container& target, Handler&& func) {
+        suanpan_for_each(target.begin(), target.end(), std::forward<Handler>(func));
     }
+
+    template<typename T> std::vector<T>& append_to(std::vector<T>& a, std::vector<T>&& b) {
+        a.reserve(a.size() + b.size());
+        a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
+        return a;
+    }
+
+    template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
 } // namespace suanpan
 
 #if defined(SUANPAN_CLANG) && !defined(__cpp_lib_ranges)
@@ -389,7 +389,5 @@ namespace std::ranges {
     template<class IN> constexpr auto min_element(const IN& from) { return std::min_element(from.cbegin(), from.cend()); }
 } // namespace std::ranges
 #endif
-
-template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
 
 #endif

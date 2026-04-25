@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,12 +35,10 @@
 
 class Constraint : public ConditionalModifier {
 protected:
-    static double multiplier;
+    unsigned lagrangian_size; // size of multiplier
 
-    unsigned num_size; // size of multiplier
-
-    vec trial_lambda = zeros(num_size);
-    vec current_lambda = zeros(num_size);
+    vec trial_lambda{lagrangian_size, fill::zeros};
+    vec current_lambda{lagrangian_size, fill::zeros};
 
     sp_vec resistance;
     sp_mat stiffness;
@@ -49,15 +47,13 @@ protected:
     vec auxiliary_load;
     sp_mat auxiliary_stiffness;
 
-    friend void set_constraint_multiplier(double);
-
 public:
     Constraint(
-        unsigned, // tag
-        unsigned, // amplitude tag
-        uvec&&,   // node tags
-        uvec&&,   // dof tags
-        unsigned  // size of multiplier
+        unsigned,                 // tag
+        unsigned,                 // amplitude tag
+        std::vector<Node::DOF>&&, // dof order
+        std::vector<Node::DOF>&&, // dof component (unordered)
+        unsigned                  // size of multiplier
     );
 
     const sp_vec& get_resistance() const;
@@ -70,8 +66,6 @@ public:
     void set_multiplier_size(unsigned);
     [[nodiscard]] unsigned get_multiplier_size() const;
 };
-
-void set_constraint_multiplier(double);
 
 #endif
 

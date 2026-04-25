@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@ class FrameRecorder final : public Recorder {
     hid_t file_id = 0;
 #endif
 
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     FrameRecorder(
         unsigned,   // tag
@@ -47,8 +49,6 @@ public:
     FrameRecorder& operator=(const FrameRecorder&) = delete;
     FrameRecorder& operator=(FrameRecorder&&) = delete;
     ~FrameRecorder() override;
-
-    void record(const shared_ptr<DomainBase>&) override;
 
     void save() override;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ BilinearDP::BilinearDP(const unsigned T, const double E, const double V, const d
     : DataBilinearDP{CO, CS}
     , NonlinearDruckerPrager(T, E, V, ETAY, ETAF, XI, R) {}
 
-unique_ptr<Material> BilinearDP::get_copy() { return std::make_unique<BilinearDP>(*this); }
+unique_ptr<Material> BilinearDP::unique_copy() { return std::make_unique<BilinearDP>(*this); }
 
 void BilinearDP::print() {
     suanpan_info("A 3D nonlinear model using Drucker-Prager yielding criterion with linear cohesion.\n");

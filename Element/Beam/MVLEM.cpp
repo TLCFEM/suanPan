@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ MVLEM::Fibre::Fibre(const double B, const double H, const double R)
     , s_area(B * H * R) {}
 
 MVLEM::MVLEM(const unsigned T, uvec&& NT, const std::vector<double>& B, const std::vector<double>& H, const std::vector<double>& R, uvec&& CRT, uvec&& STT, const unsigned SST, const double CH)
-    : MaterialElement1D(T, b_node, b_dof, std::move(NT), join_cols(CRT, STT), false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement1D(T, b_node, b_dof, std::move(NT), join_cols(CRT, STT), false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , shear_height(CH)
     , shear_spring_tag(SST) {
     axial_spring.clear();
@@ -61,11 +61,11 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto& total_fibre_num = axial_spring.size();
     for(size_t I = 0; I < total_fibre_num; ++I) {
-        axial_spring[I].c_material = suanpan::make_copy(D->get<Material>(material_tag(I)));
-        axial_spring[I].s_material = suanpan::make_copy(D->get<Material>(material_tag(I + total_fibre_num)));
+        axial_spring[I].c_material = suanpan::unique_copy(D->get<Material>(material_tag(I)));
+        axial_spring[I].s_material = suanpan::unique_copy(D->get<Material>(material_tag(I + total_fibre_num)));
     }
 
-    shear_spring = suanpan::make_copy(D->get<Material>(shear_spring_tag));
+    shear_spring = suanpan::unique_copy(D->get<Material>(shear_spring_tag));
     if(MaterialType::D1 != shear_spring->get_material_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
         return SUANPAN_FAIL;
@@ -207,11 +207,11 @@ int MVLEM::reset_status() {
     return code;
 }
 
-std::vector<vec> MVLEM::record(const OutputType P) {
+std::vector<vec> MVLEM::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : axial_spring) {
-        append_to(data, I.c_material->record(P));
-        append_to(data, I.s_material->record(P));
+        suanpan::append_to(data, I.c_material->record(P));
+        suanpan::append_to(data, I.s_material->record(P));
     }
     return data;
 }
@@ -233,28 +233,22 @@ void MVLEM::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void MVLEM::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> MVLEM::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
+
+mat MVLEM::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, b_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = reshape(in, b_dof, b_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
+    return {};
 }
 
-void MVLEM::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, b_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_acceleration(), b_dof, b_node);
-    else if(OutputType::V == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_velocity(), b_dof, b_node);
-    else if(OutputType::U == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_displacement(), b_dof, b_node);
-
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void MVLEM::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node).t()).cols(0, 1);
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat MVLEM::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2); }
 
 #endif

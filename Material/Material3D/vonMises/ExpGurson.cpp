@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ vec2 ExpGurson::compute_hardening(const double plastic_strain) const {
     return vec2{k, pow_term * para_c / (1. - pow_term)} * yield_stress;
 }
 
-unique_ptr<Material> ExpGurson::get_copy() { return std::make_unique<ExpGurson>(*this); }
+unique_ptr<Material> ExpGurson::unique_copy() { return std::make_unique<ExpGurson>(*this); }
 
 void ExpGurson::print() {
     suanpan_info("A Gurson model.\n");

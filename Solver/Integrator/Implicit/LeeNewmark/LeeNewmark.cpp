@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ void LeeNewmark::update_residual() const {
 void LeeNewmark::initialize_mass(const shared_ptr<DomainBase>&) {
     // assuming mass does not change
     // otherwise swap and assemble
-    current_mass = factory->get_mass()->make_copy();
+    current_mass = factory->get_mass()->unique_copy();
 }
 
 void LeeNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {
@@ -87,9 +87,9 @@ LeeNewmark::LeeNewmark(const unsigned T, vec&& X, vec&& F, const double A, const
 int LeeNewmark::initialize() {
     if(SUANPAN_SUCCESS != LeeNewmarkBase::initialize()) return SUANPAN_FAIL;
 
-    current_mass = factory->get_mass()->make_copy();
-    current_stiffness = factory->get_stiffness()->make_copy();
-    if(factory->is_nlgeom()) current_geometry = factory->get_geometry()->make_copy();
+    current_mass = factory->get_mass()->unique_copy();
+    current_stiffness = factory->get_stiffness()->unique_copy();
+    if(factory->is_nlgeom()) current_geometry = factory->get_geometry()->unique_copy();
 
     return SUANPAN_SUCCESS;
 }
@@ -99,6 +99,9 @@ int LeeNewmark::process_constraint() {
 
     // process constraint for the first time to obtain proper stiffness
     if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
+
+    // !!! need to call the parent method to have effective matrix assembled
+    LeeNewmarkBase::assemble_effective_matrix();
 
     // this stiffness contains geometry, mass and damping which are handled in Newmark::assemble_matrix()
     auto& t_stiff = factory->modify_stiffness();
@@ -167,6 +170,12 @@ void LeeNewmark::assemble_resistance() {
 
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }
+
+/**
+ * We are not interested in the original matrices anymore.
+ * Thus, we skip assembling them.
+ */
+void LeeNewmark::assemble_effective_matrix() {}
 
 void LeeNewmark::print() {
     suanpan_info("A Newmark solver using Lee's damping model. doi:10.1016/j.jsv.2020.115312\n");

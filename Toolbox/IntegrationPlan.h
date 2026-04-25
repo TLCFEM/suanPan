@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,27 +63,29 @@
 
 #include <armadillo/arma>
 
-enum class IntegrationType {
-    GAUSS,
-    HERMITE,
-    CHEBYSHEV,
-    LOBATTO,
-    RADAU,
-    LAGUERRE,
-    IRONS,
-    TRIANGLE
-};
-
 class IntegrationPlan final {
+public:
+    enum class Type {
+        GAUSS,
+        HERMITE,
+        CHEBYSHEV,
+        LOBATTO,
+        RADAU,
+        LAGUERRE,
+        IRONS,
+        TRIANGLE
+    };
+
+private:
     arma::mat int_pts;
 
-    template<IntegrationType> void generate(unsigned, unsigned) { throw std::invalid_argument("not supported"); }
+    template<Type> void generate(unsigned, unsigned) { throw std::invalid_argument("not supported"); }
 
 public:
     const unsigned n_rows = 0;
     const unsigned n_cols = 0;
 
-    explicit IntegrationPlan(unsigned, unsigned, IntegrationType);
+    explicit IntegrationPlan(unsigned, unsigned, Type);
 
     [[nodiscard]] const arma::mat& get_data() const;
 
@@ -92,14 +94,14 @@ public:
     void print() const;
 };
 
-template<> void IntegrationPlan::generate<IntegrationType::GAUSS>(unsigned, unsigned);
-template<> void IntegrationPlan::generate<IntegrationType::HERMITE>(unsigned, unsigned);
-template<> void IntegrationPlan::generate<IntegrationType::CHEBYSHEV>(unsigned, unsigned);
-template<> void IntegrationPlan::generate<IntegrationType::LOBATTO>(unsigned, unsigned);
-template<> void IntegrationPlan::generate<IntegrationType::RADAU>(unsigned, unsigned);
-template<> void IntegrationPlan::generate<IntegrationType::LAGUERRE>(unsigned, unsigned);
-template<> void IntegrationPlan::generate<IntegrationType::IRONS>(unsigned, unsigned);
-template<> void IntegrationPlan::generate<IntegrationType::TRIANGLE>(unsigned, unsigned);
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::GAUSS>(unsigned, unsigned);
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::HERMITE>(unsigned, unsigned);
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::CHEBYSHEV>(unsigned, unsigned);
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::LOBATTO>(unsigned, unsigned);
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::RADAU>(unsigned, unsigned);
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::LAGUERRE>(unsigned, unsigned);
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::IRONS>(unsigned, unsigned);
+template<> void IntegrationPlan::generate<IntegrationPlan::Type::TRIANGLE>(unsigned, unsigned);
 
 #endif
 

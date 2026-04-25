@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ int MooneyRivlin::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> MooneyRivlin::get_copy() { return std::make_unique<MooneyRivlin>(*this); }
+unique_ptr<Material> MooneyRivlin::unique_copy() { return std::make_unique<MooneyRivlin>(*this); }
 
 // takes green strain as input
 int MooneyRivlin::update_trial_status(const vec& t_strain) {

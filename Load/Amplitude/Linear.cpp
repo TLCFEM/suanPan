@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ Linear::Linear(const unsigned T, const double L)
     : Amplitude(T)
     , slope(L) {}
 
-unique_ptr<Amplitude> Linear::get_copy() { return std::make_unique<Linear>(*this); }
+unique_ptr<Amplitude> Linear::unique_copy() { return std::make_unique<Linear>(*this); }
 
 double Linear::get_amplitude(const double T) {
     const auto step_time = T - start_time;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,13 @@ class ParticleCollision3D final : public ParticleCollision {
     struct CellList {
         int x = 0, y = 0, z = 0;
         unsigned tag = 0;
-    };
 
-    std::vector<CellList> list;
+        CellList(const int in_x, const int in_y, const int in_z, const unsigned in_tag)
+            : x(in_x)
+            , y(in_y)
+            , z(in_z)
+            , tag(in_tag) {}
+    };
 
     const double space = 1.;
     const double alpha = 1.;

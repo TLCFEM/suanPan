@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -552,7 +552,11 @@ int Domain::update_current_status() const {
     if(analysis_type == AnalysisType::DYNAMICS) {
         update_current_damping_force();
         update_current_inertial_force();
+        // only for computing the very initial mass related energy
+        assemble_current_mass();
     }
+
+    factory->commit_energy();
 
     return SUANPAN_SUCCESS;
 }

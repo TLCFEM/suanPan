@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ int IsotropicDamage::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double IsotropicDamage::get_parameter(const ParameterType P) const { return mat_ptr->get_parameter(P); }
+double IsotropicDamage::get(const Parameter P) const { return mat_ptr->get(P); }
 
 int IsotropicDamage::update_trial_status(const vec& t_strain) {
     if(SUANPAN_SUCCESS != mat_ptr->update_trial_status(trial_strain = t_strain)) return SUANPAN_FAIL;

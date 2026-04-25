@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #include <Element/Element.h>
 
 void T3DC::update_transformation() {
-    const auto coord = get_coordinate(element_ptr, 3);
-    const auto t_disp = get_trial_displacement(element_ptr);
+    const auto coord = element_ptr->get_coordinate(3);
+    const auto t_disp = element_ptr->get_trial_displacement();
 
     vec x_axis(3);
     x_axis(0) = coord(1, 0) - coord(0, 0) + t_disp(3) - t_disp(0);
@@ -35,7 +35,7 @@ void T3DC::update_transformation() {
 
 bool T3DC::is_nlgeom() const { return true; }
 
-unique_ptr<Orientation> T3DC::get_copy() { return std::make_unique<T3DC>(*this); }
+unique_ptr<Orientation> T3DC::unique_copy() { return std::make_unique<T3DC>(*this); }
 
 mat T3DC::to_global_geometry_mat(const mat& l_mat) const {
     auto g_mat = to_global_stiffness_mat(-l_mat);

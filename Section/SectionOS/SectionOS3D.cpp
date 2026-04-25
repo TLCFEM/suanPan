@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ int SectionOS3D::reset_status() {
     return code;
 }
 
-std::vector<vec> SectionOS3D::record(const OutputType P) {
+std::vector<vec> SectionOS3D::record(const OutputType P) const {
     if(OutputType::S == P) {
         vec beam_force(6, fill::zeros);
         for(const auto& I : int_pt) {

@@ -53,7 +53,7 @@ fi
 rm -rf "$TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-1.14.6-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-2.0.0-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
@@ -73,7 +73,7 @@ find "$TMP_DIR/tbb-install/lib" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.30-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.33-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
@@ -84,10 +84,11 @@ find "$TMP_DIR" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.1-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
-tar -xzf "$TMP_DIR/archive.tar.gz" -C .
+mkdir -p "$(dirname "$0")/../VTK"
+tar -xzf "$TMP_DIR/archive.tar.gz" -C "$(dirname "$0")/../VTK"
 
 rm -rf "$TMP_DIR"

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@
 const span T2DL::IS(0, 1);
 const span T2DL::JS(2, 3);
 
-unique_ptr<Orientation> T2DL::get_copy() { return std::make_unique<T2DL>(*this); }
+unique_ptr<Orientation> T2DL::unique_copy() { return std::make_unique<T2DL>(*this); }
 
 void T2DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;
 
-    const auto coord = get_coordinate(element_ptr, 2);
+    const auto coord = element_ptr->get_coordinate(2);
 
     vec x_axis(2);
     x_axis(0) = coord(1, 0) - coord(0, 0);
@@ -39,7 +39,7 @@ void T2DL::update_transformation() {
     inclination = transform::atan2(direction_cosine);
 }
 
-OrientationType T2DL::get_orientation_type() const { return OrientationType::T2D; }
+Orientation::Type T2DL::type() const { return Type::T2D; }
 
 vec T2DL::to_local_vec(const vec& g_disp) const { return vec{dot(direction_cosine, g_disp(JS) - g_disp(IS))}; }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,10 +35,10 @@ class EigenRecorder final : public Recorder {
     vec eigen_value;
     std::vector<std::map<unsigned, vec>> eigen_pool;
 
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     explicit EigenRecorder(unsigned = 0, bool = true);
-
-    void record(const shared_ptr<DomainBase>&) override;
 
     void save() override;
 

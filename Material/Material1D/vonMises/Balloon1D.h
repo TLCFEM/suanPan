@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,86 +29,23 @@
 #define BALLOON1D_H
 
 #include <Material/Material1D/Material1D.h>
-#include <numeric> // std::accumulate
+#include <Material/Material3D/vonMises/BalloonUtil.h>
 
 struct DataBalloon1D {
-    class Saturation {
-        static const double root_one_half;
-
-        const double rate, bound;
-
-    public:
-        Saturation(const double R, const double B)
-            : rate(R)
-            , bound(B) {}
-
-        [[nodiscard]] double a() const { return (rate > 0. ? b() : 1.) * bound; }
-        [[nodiscard]] double b() const { return rate * root_one_half; }
-    };
-
-    class Bound {
-        const double initial, linear, saturation, rate;
-
-    public:
-        Bound(const double I, const double K, const double S, const double M)
-            : initial(I)
-            , linear(K)
-            , saturation(S)
-            , rate(M) {}
-
-        [[nodiscard]] std::pair<double, double> operator()(const double q, const bool check_positive) const {
-            const auto exp_term = saturation * std::exp(-rate * q);
-            const auto y = initial + saturation + linear * q - exp_term;
-            return y < 0. && check_positive ? std::make_pair(0., 0.) : std::make_pair(y, linear + rate * exp_term);
-        }
-    };
-
     const double elastic;   // elastic modulus
     const double kr;        // plastic strain split ratio
     const unsigned zr_size; // memory size
+    const BalloonBuffer::Type zr_type;
 
-    const Bound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
+    const BalloonBound bound_u, bound_fm, bound_fc, bound_am, bound_ac;
 
-    const std::vector<Saturation> bfc, bac, bna, bnd;
+    const std::vector<BalloonSaturation> bfc, bac, bna, bnd;
 };
 
-class Balloon1D final : protected DataBalloon1D, public Material1D {
+class Balloon1D final : protected DataBalloon1D, protected BalloonBase, public Material1D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double z_bound = 1E-15;
-    static const double rate_bound;
 
-    static pod2 yield_ratio(const double z) {
-        if(z < z_bound) return {rate_bound, 0.};
-
-        return {-log(z), -1. / z};
-    }
-
-    class memory {
-        std::vector<double> buffer;
-        std::size_t head;
-
-    public:
-        explicit memory(const std::size_t size)
-            : buffer(std::max(std::size_t{1}, size), 0.)
-            , head(0) {}
-
-        auto& enqueue(const double value) {
-            buffer[head] = value;
-            head = (head + 1) % buffer.size();
-            return *this;
-        }
-
-        auto zeros() {
-            std::ranges::fill(buffer, 0.);
-            head = 0;
-        }
-
-        [[nodiscard]] auto max() const { return *std::ranges::max_element(buffer); }
-        [[nodiscard]] auto min() const { return *std::ranges::min_element(buffer); }
-        [[nodiscard]] auto mean() const { return std::accumulate(buffer.cbegin(), buffer.cend(), 0.) / static_cast<double>(buffer.size()); }
-    };
-
-    memory current_zr{zr_size}, trial_zr{zr_size};
+    BalloonBuffer current_zr{zr_size}, trial_zr{zr_size};
 
     [[nodiscard]] double initial_check(double);
 
@@ -124,7 +61,7 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Material> get_copy() override;
+    unique_ptr<Material> unique_copy() override;
 
     int update_trial_status(const vec&) override;
 

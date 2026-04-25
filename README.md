@@ -7,11 +7,13 @@
 [![Release](https://img.shields.io/github/release-pre/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/releases)
 [![Snap Store](https://snapcraft.io//suanpan/badge.svg)](https://snapcraft.io/suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/v/suanpan?color=44cc11)](https://chocolatey.org/packages/suanpan)
+[![Scoop Version](https://img.shields.io/scoop/v/suanpan?color=44cc11)](https://scoop.sh/#/apps?q=suanpan)
 [![Chocolatey](https://img.shields.io/chocolatey/dt/suanpan?color=44cc11&label=choco%20install)](https://chocolatey.org/packages/suanpan)
 [![Flathub](https://img.shields.io/flathub/downloads/io.github.tlcfem.suanPan?label=flathub%20install)](https://flathub.org/apps/io.github.tlcfem.suanPan)
 [![GitHub Download](https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11&label=github%20download)](https://github.com/TLCFEM/suanPan/releases)
 [![Docker Image](https://img.shields.io/docker/pulls/tlcfem/suanpan?color=44cc11)](https://hub.docker.com/r/tlcfem/suanpan/tags)
 [![CI/CD](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml/badge.svg?branch=dev)](https://github.com/TLCFEM/suanPan/actions/workflows/dev-all.yml)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/tlcfem/suanPan/package/suanPan/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/tlcfem/suanPan/package/suanPan/)
 [![Coverage](https://codecov.io/gh/TLCFEM/suanPan/branch/dev/graph/badge.svg?token=65BF9DF697)](https://codecov.io/gh/TLCFEM/suanPan)
 [![Codacy](https://app.codacy.com/project/badge/Grade/1ea08c43edf342a8b00b21e585e63503)](https://app.codacy.com/gh/TLCFEM/suanPan/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/tlcfem/suanpan/badge)](https://www.codefactor.io/repository/github/tlcfem/suanpan)
@@ -20,10 +22,11 @@
 [![Repository Size](https://img.shields.io/github/languages/code-size/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan)
 [![Issues](https://img.shields.io/github/issues/TLCFEM/suanPan.svg?color=44cc11)](https://github.com/TLCFEM/suanPan/issues)
 [![License Scan](https://app.fossa.com/api/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan?ref=badge_shield)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/TLCFEM/suanPan)
 
 [![License: GNU General Public License v3.0 or later](https://www.gnu.org/graphics/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-[![VS Code Extension](https://img.shields.io/visual-studio-marketplace/v/tlc.suanpan?label=VS%20Code&color=44cc11)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
+[![VS Code Extension](https://vsmarketplacebadges.dev/version-short/tlc.suanpan.svg)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
 
 > [!IMPORTANT]
 > - **Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).**
@@ -120,9 +123,7 @@ Further details can be seen [here](https://tlcfem.gitbook.io/suanpan-manual/tuto
 #### Binary Package
 
 The archives of binaries are released under [Release](https://github.com/TLCFEM/suanPan/releases) page.
-
-1. `suanpan-win-mkl-vtk.zip` is the portable archive.
-2. `suanpan-win-mkl-vtk.exe` is the installer.
+All are portable archives, simply unpack and execute the application.
 
 #### Chocolatey
 
@@ -189,7 +190,7 @@ Flatpak is also available if preferred.
 The `beta` channel is in sync with the `dev` branch.
 The `stable` channel is in sync with the `master` branch.
 
-<a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.svg'/></a>
+<a href='https://flathub.org/apps/details/io.github.tlcfem.suanPan'><img width='200' alt='Download on Flathub' src='https://flathub.org/api/badge?svg&locale=en'/></a>
 
 ```bash
 # add repo
@@ -287,33 +288,28 @@ It also adds a command alias `suanpan` to `~/.local/bin` and a desktop file to `
 
 Additional libraries used in **suanPan** are listed as follows.
 
-- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.1
+- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.2
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 15.2.1
+- [**Armadillo**](http://arma.sourceforge.net/) version 15.2.6
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.11.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.14.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 1.14.6
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.0.0
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.30
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.33
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.3.0
-- [**VTK**](https://vtk.org/) version 9.5.2
+- [**VTK**](https://vtk.org/) version 9.6.1
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**ezp**](https://github.com/TLCFEM/ezp)
-- [**fmt**](https://github.com/fmtlib/fmt) version 12.0.0
+- [**fmt**](https://github.com/fmtlib/fmt) version 12.1.0
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.2.0
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.3.1
 - [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
-
-Those libraries may depend on other libraries such as [zlib](https://zlib.net/) and [Szip](https://support.hdfgroup.org/doc_resource/SZIP/).
-Additional tools may be used by **suanPan**, they are
-
-- [**UPX** the Ultimate Packer for eXecutables](https://upx.github.io/)
 
 ## How To Compile
 

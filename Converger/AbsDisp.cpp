@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,12 +30,12 @@
 AbsDisp::AbsDisp(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> AbsDisp::get_copy() { return std::make_unique<AbsDisp>(*this); }
+unique_ptr<Converger> AbsDisp::unique_copy() { return std::make_unique<AbsDisp>(*this); }
 
 bool AbsDisp::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    set_error(inf_norm(W->get_incre_displacement() + W->get_ninja()));
+    set_error(suanpan::inf_norm(W->get_incre_displacement() + W->get_ninja()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())

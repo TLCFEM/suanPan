@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
     : DataSection{MT, ST, EC.head(2), A}
-    , CopiableTag(T) {}
+    , CopyableTag(T) {}
 
 SectionType Section::get_section_type() const { return section_type; }
 
@@ -139,13 +139,13 @@ int Section::update_trial_status(const vec&) { throw std::invalid_argument("hidd
 
 int Section::update_trial_status(const vec& t_deformation, const vec&) { return update_trial_status(t_deformation); }
 
-std::vector<vec> Section::record(const OutputType P) {
+std::vector<vec> Section::record(const OutputType P) const {
     if(P == OutputType::E) return {current_deformation};
     if(P == OutputType::S) return {current_resistance};
-    if(P == OutputType::PE) return {current_deformation - solve(initial_stiffness, current_resistance)};
     if(P == OutputType::EE) return {solve(initial_stiffness, current_resistance)};
+    if(P == OutputType::PE) return {current_deformation - solve(initial_stiffness, current_resistance)};
 
     return {};
 }
 
-unique_ptr<Section> suanpan::make_copy(const shared_ptr<Section>& S) { return S->get_copy(); }
+unique_ptr<Section> suanpan::unique_copy(const shared_ptr<Section>& S) { return S->unique_copy(); }

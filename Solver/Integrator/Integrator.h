@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,11 +43,6 @@
 
 class DomainBase;
 
-enum class IntegratorType {
-    Implicit,
-    Explicit
-};
-
 class Integrator : public UniqueTag {
     bool time_step_switch = true;
     bool matrix_assembled_switch = false;
@@ -65,6 +60,11 @@ protected:
     virtual int correct_trial_status();
 
 public:
+    enum class Type {
+        Implicit,
+        Explicit
+    };
+
     explicit Integrator(unsigned = 0);
 
     void set_domain(const std::weak_ptr<DomainBase>&);
@@ -72,14 +72,14 @@ public:
 
     virtual int initialize();
 
-    [[nodiscard]] virtual constexpr IntegratorType type() const { return IntegratorType::Implicit; }
+    [[nodiscard]] virtual Type type() const { return Type::Implicit; }
 
     // ! some multistep integrators may require fixed time step for some consecutive sub-steps
     void set_time_step_switch(bool);
     [[nodiscard]] bool allow_to_change_time_step() const;
 
     // ! manually set switch after assembling global matrix
-    void set_matrix_assembled_switch(bool);
+    void set_matrix_assembled_switch();
     [[nodiscard]] bool matrix_is_assembled() const;
 
     [[nodiscard]] virtual bool time_independent_matrix() const;
@@ -95,6 +95,7 @@ public:
 
     virtual void assemble_resistance();
     virtual void assemble_matrix();
+    virtual void assemble_effective_matrix();
 
     virtual vec get_force_residual();
     virtual vec get_displacement_residual();
@@ -151,17 +152,20 @@ class ImplicitIntegrator : public Integrator {
 public:
     using Integrator::Integrator;
 
-    [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Implicit; }
+    [[nodiscard]] Type type() const final { return Type::Implicit; }
+
+    void assemble_matrix() override;
 };
 
 class ExplicitIntegrator : public Integrator {
 public:
     using Integrator::Integrator;
 
-    [[nodiscard]] constexpr IntegratorType type() const override { return IntegratorType::Explicit; }
+    [[nodiscard]] Type type() const final { return Type::Explicit; }
 
     void assemble_resistance() override;
     void assemble_matrix() override;
+    void assemble_effective_matrix() override;
 
     [[nodiscard]] const vec& get_trial_displacement() const override;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,16 +40,16 @@ int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
     const auto l_flange_area = left_flange_height * left_flange_thickness;
     const auto r_flange_area = right_flange_height * right_flange_thickness;
 
-    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationType::GAUSS);
-    const IntegrationPlan plan_web(1, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationPlan::Type::GAUSS);
+    const IntegrationPlan plan_web(1, 2, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(2llu * int_pt_num + 2);
-    int_pt.emplace_back(.5 * plan_web(0, 0) * web_thickness, .5 * plan_web(0, 1) * web_area, mat_proto->get_copy());
-    int_pt.emplace_back(.5 * plan_web(1, 0) * web_thickness, .5 * plan_web(1, 1) * web_area, mat_proto->get_copy());
+    int_pt.emplace_back(.5 * plan_web(0, 0) * web_thickness, .5 * plan_web(0, 1) * web_area, mat_proto->unique_copy());
+    int_pt.emplace_back(.5 * plan_web(1, 0) * web_thickness, .5 * plan_web(1, 1) * web_area, mat_proto->unique_copy());
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(.5 * plan_flange(I, 0) * left_flange_height, .5 * plan_flange(I, 1) * l_flange_area, mat_proto->get_copy());
-        int_pt.emplace_back(.5 * plan_flange(I, 0) * right_flange_height, .5 * plan_flange(I, 1) * r_flange_area, mat_proto->get_copy());
+        int_pt.emplace_back(.5 * plan_flange(I, 0) * left_flange_height, .5 * plan_flange(I, 1) * l_flange_area, mat_proto->unique_copy());
+        int_pt.emplace_back(.5 * plan_flange(I, 0) * right_flange_height, .5 * plan_flange(I, 1) * r_flange_area, mat_proto->unique_copy());
     }
 
     initialize_stiffness();
@@ -57,7 +57,7 @@ int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> HSection2D::get_copy() { return std::make_unique<HSection2D>(*this); }
+unique_ptr<Section> HSection2D::unique_copy() { return std::make_unique<HSection2D>(*this); }
 
 void HSection2D::print() {
     suanpan_info("A 2D H-shape section.\n");

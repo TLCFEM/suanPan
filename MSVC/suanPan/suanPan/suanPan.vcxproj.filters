@@ -4,9 +4,6 @@
     <Filter Include="Constraint">
       <UniqueIdentifier>{2319a38c-547b-4f6c-8853-a5d93b9abd67}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Constraint\BC">
-      <UniqueIdentifier>{646eca21-97d8-4efc-b1e5-869fa75c997a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Constraint\Criterion">
       <UniqueIdentifier>{924e01ed-13db-412b-bbdb-986acc1a9464}</UniqueIdentifier>
     </Filter>
@@ -220,20 +217,14 @@
     <Filter Include="Material\Material3D\Orthotropic">
       <UniqueIdentifier>{68492507-04ef-47b3-8ee9-a8e526e31e7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Constraint\Interaction">
+      <UniqueIdentifier>{d1bc5563-cfa5-44b7-a8ec-f22a6fe6271c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Element\Particle">
+      <UniqueIdentifier>{a60da642-a634-4c7c-b2d5-bcdf0d8c08d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Constraint\BC\GroupMultiplierBC.cpp">
-      <Filter>Constraint\BC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\BC\GroupPenaltyBC.cpp">
-      <Filter>Constraint\BC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\BC\MultiplierBC.cpp">
-      <Filter>Constraint\BC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\BC\PenaltyBC.cpp">
-      <Filter>Constraint\BC</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
       <Filter>Constraint\Criterion</Filter>
     </ClCompile>
@@ -262,9 +253,6 @@
       <Filter>Constraint</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\ConstraintParser.cpp">
-      <Filter>Constraint</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Embed.cpp">
       <Filter>Constraint</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\MPC.cpp">
@@ -519,9 +507,6 @@
     <ClCompile Include="..\..\..\Element\Utility\T3DL.cpp">
       <Filter>Element\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Visualisation\vtkBase.cpp">
-      <Filter>Element\Visualisation</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Element\Visualisation\vtkParser.cpp">
       <Filter>Element\Visualisation</Filter>
     </ClCompile>
@@ -541,15 +526,6 @@
       <Filter>Element</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Load\BodyForce.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupBodyForce.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupNodalDisplacement.cpp">
-      <Filter>Load</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Load\GroupNodalForce.cpp">
       <Filter>Load</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Load\Load.cpp">
@@ -888,22 +864,7 @@
     <ClCompile Include="..\..\..\Recorder\FrameRecorder.cpp">
       <Filter>Recorder</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GlobalMassRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Recorder\GlobalRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GlobalStiffnessRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GroupElementRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GroupNodeRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\GroupSumRecorder.cpp">
       <Filter>Recorder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Recorder\NodeRecorder.cpp">
@@ -1093,9 +1054,6 @@
     <ClCompile Include="..\..\..\Domain\ConditionalModifier.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\FixedLength.cpp">
-      <Filter>Constraint</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Load\SupportMotion.cpp">
       <Filter>Load</Filter>
     </ClCompile>
@@ -1110,9 +1068,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\NodeFacet.cpp">
       <Filter>Constraint</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Element\Special\Embedded.cpp">
-      <Filter>Element\Special</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Constraint\Criterion\ComplementaryEnergyEvolution.cpp">
       <Filter>Constraint\Criterion</Filter>
@@ -1597,20 +1552,20 @@
     <ClCompile Include="..\..\..\Material\Material1D\vonMises\Balloon1D.cpp">
       <Filter>Material\Material1D\vonMises</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\BC.cpp">
+      <Filter>Constraint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Interaction\Interaction.cpp">
+      <Filter>Constraint\Interaction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Particle\Particle.cpp">
+      <Filter>Element\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\vonMises\Balloon.cpp">
+      <Filter>Material\Material3D\vonMises</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Constraint\BC\GroupMultiplierBC.h">
-      <Filter>Constraint\BC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\BC\GroupPenaltyBC.h">
-      <Filter>Constraint\BC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\BC\MultiplierBC.h">
-      <Filter>Constraint\BC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\BC\PenaltyBC.h">
-      <Filter>Constraint\BC</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
       <Filter>Constraint\Criterion</Filter>
     </ClInclude>
@@ -1953,15 +1908,6 @@
     <ClInclude Include="..\..\..\Load\BodyForce.h">
       <Filter>Load</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupBodyForce.h">
-      <Filter>Load</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupNodalDisplacement.h">
-      <Filter>Load</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Load\GroupNodalForce.h">
-      <Filter>Load</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Load\Load.h">
       <Filter>Load</Filter>
     </ClInclude>
@@ -2298,22 +2244,7 @@
     <ClInclude Include="..\..\..\Recorder\FrameRecorder.h">
       <Filter>Recorder</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GlobalMassRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Recorder\GlobalRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GlobalStiffnessRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GroupElementRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GroupNodeRecorder.h">
-      <Filter>Recorder</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Recorder\GroupSumRecorder.h">
       <Filter>Recorder</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Recorder\NodeRecorder.h">
@@ -2677,9 +2608,6 @@
     <ClInclude Include="..\..\..\Step\StepParser.h">
       <Filter>Step</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Domain\DOF.h">
-      <Filter>Domain</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\container.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
@@ -2697,9 +2625,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\RestitutionWallPenalty.h">
       <Filter>Constraint</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Domain\NodeHelper.hpp">
-      <Filter>Domain</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Section\SectionNM\NonlinearNM.h">
       <Filter>Section\SectionNM</Filter>
@@ -2997,6 +2922,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material1D\vonMises\Balloon1D.h">
       <Filter>Material\Material1D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\BC.h">
+      <Filter>Constraint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Particle\Particle.h">
+      <Filter>Element\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Interaction\Interaction.h">
+      <Filter>Constraint\Interaction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\vonMises\Balloon.h">
+      <Filter>Material\Material3D\vonMises</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

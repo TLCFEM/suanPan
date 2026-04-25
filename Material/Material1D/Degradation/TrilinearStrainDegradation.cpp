@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,4 +46,4 @@ TrilinearStrainDegradation::TrilinearStrainDegradation(const unsigned T, const u
     : DataTrilinearStrainDegradation{fabs(SE), fabs(EE), fabs(ED)}
     , StrainDegradation(T, MT) {}
 
-unique_ptr<Material> TrilinearStrainDegradation::get_copy() { return std::make_unique<TrilinearStrainDegradation>(*this); }
+unique_ptr<Material> TrilinearStrainDegradation::unique_copy() { return std::make_unique<TrilinearStrainDegradation>(*this); }

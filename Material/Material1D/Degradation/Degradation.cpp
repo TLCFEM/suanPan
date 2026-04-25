@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ int StrainDegradation::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> StrainDegradation::record(const OutputType P) {
+std::vector<vec> StrainDegradation::record(const OutputType P) const {
     if(OutputType::DT == P) return {vec{compute_positive_degradation(current_history(0))(0)}};
     if(OutputType::DC == P) return {vec{compute_negative_degradation(current_history(1))(0)}};
 
@@ -188,7 +188,7 @@ int StressDegradation::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> StressDegradation::record(const OutputType P) {
+std::vector<vec> StressDegradation::record(const OutputType P) const {
     if(OutputType::DT == P) return {vec{compute_positive_degradation(current_history(0))(0)}};
     if(OutputType::DC == P) return {vec{compute_negative_degradation(current_history(1))(0)}};
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "CAX8.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
@@ -47,7 +46,7 @@ vec CAX8::isoparametric_mapping(const vec& in) {
 }
 
 CAX8::CAX8(const unsigned T, uvec&& N, const unsigned M, const bool R, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F)
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {Node::DOF::RADIAL, Node::DOF::AXIAL})
     , reduced_scheme(R) {}
 
 int CAX8::initialize(const shared_ptr<DomainBase>& D) {
@@ -62,7 +61,7 @@ int CAX8::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, reduced_scheme ? 2 : 3, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, reduced_scheme ? 2 : 3, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(m_size, m_size);
 
@@ -78,7 +77,7 @@ int CAX8::initialize(const shared_ptr<DomainBase>& D) {
         const mat pn_pxy = solve(jacob, pn);
         const auto gx = dot(vec{1., X, Y, X * X, X * Y, Y * Y, X * X * Y, X * Y * Y}, isoparametric_mapping(ele_coor.col(0)));
 
-        int_pt.emplace_back(std::move(t_vec), 2. * datum::pi * gx * plan(I, 2) * det(jacob), material_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), 2. * datum::pi * gx * plan(I, 2) * det(jacob), material_proto->unique_copy());
 
         auto& c_int_pt = int_pt.back();
 
@@ -136,9 +135,9 @@ int CAX8::reset_status() {
     return code;
 }
 
-std::vector<vec> CAX8::record(const OutputType P) {
+std::vector<vec> CAX8::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -153,28 +152,16 @@ void CAX8::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuadraticQuad.h>
 
-void CAX8::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuadraticQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> CAX8::GetCell() const { return vtkSmartPointer<vtkQuadraticQuad>::New(); }
+
+mat CAX8::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
+    return {};
 }
 
-void CAX8::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void CAX8::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat CAX8::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

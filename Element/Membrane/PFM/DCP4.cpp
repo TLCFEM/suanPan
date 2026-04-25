@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ DCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     , b_mat(3, 8, fill::zeros) {}
 
 DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::DMG})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::DAMAGE})
     , release_rate(RR)
     , thickness(TH) { access::rw(characteristic_length) = CL; }
 
@@ -51,7 +51,7 @@ int DCP4::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(m_size, m_size);
 
@@ -61,7 +61,7 @@ int DCP4::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = shape::quad(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->get_copy(), shape::quad(t_vec, 0), solve(jacob, pn));
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->unique_copy(), shape::quad(t_vec, 0), solve(jacob, pn));
 
         auto& c_pt = int_pt.back();
 
@@ -154,11 +154,11 @@ int DCP4::reset_status() {
     return code;
 }
 
-std::vector<vec> DCP4::record(const OutputType P) {
-    if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
+std::vector<vec> DCP4::record(const OutputType P) const {
+    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -177,37 +177,20 @@ void DCP4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void DCP4::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
-}
-
-void DCP4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration()(u_dof), 2, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity()(u_dof), 2, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement()(u_dof), 2, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
+vtkSmartPointer<vtkCell> DCP4::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat DCP4::GetData(const OutputType P) {
-    if(P == OutputType::DAMAGE) {
-        mat t_damage(6, m_node, fill::zeros);
-        t_damage.row(0) = get_current_displacement()(d_dof).t();
-        return t_damage;
-    }
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 2, m_node), 6, m_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 2, m_node), 6, m_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 2, m_node), 6, m_node);
+
+    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
 
     mat A(int_pt.size(), 4);
     mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
+        if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -221,9 +204,6 @@ mat DCP4::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void DCP4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement()(u_dof), 2, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat DCP4::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(u_dof), 2, m_node); }
 
 #endif

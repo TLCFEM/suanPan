@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,34 +31,39 @@
 #define VTKBASE_H
 
 #ifdef SUANPAN_VTK
-#include <Recorder/OutputType.h>
-#include <armadillo/arma>
 #include <vtkCell.h>
-#include <vtkDoubleArray.h>
 #include <vtkPoints.h>
 #include <vtkSmartPointer.h>
-
-using arma::mat;
 #endif
+
+enum class OutputType;
 
 class vtkBase {
 #ifdef SUANPAN_VTK
-
-protected:
-    vtkSmartPointer<vtkCell> vtk_cell;
+    [[nodiscard]] virtual vtkSmartPointer<vtkCell> GetCell() const { return nullptr; }
 
 public:
     vtkBase() = default;
     virtual ~vtkBase() = default;
 
-    virtual void Setup();
+    [[nodiscard]] vtkSmartPointer<vtkCell> Setup(const uvec& encoding) const {
+        auto cell = GetCell();
+        if(cell)
+            for(vtkIdType I = 0; I < cell->GetNumberOfPoints(); ++I) cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(encoding(I)));
+        return cell;
+    }
 
-    virtual void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType);
-    virtual mat GetData(OutputType);
+    /**
+     * Get elemental data for VTK output.
+     * Produce a 6-by-n matrix, where n is the number of nodes of the element.
+     * Each column represents the data of the corresponding node.
+     * Extrapolation may be needed for certain element types.
+     *
+     * @return A 6-by-n matrix, where n is the number of nodes of the element.
+     */
+    virtual mat GetData(OutputType) { return {}; }
 
-    virtual void SetDeformation(vtkSmartPointer<vtkPoints>&, double);
-
-    [[nodiscard]] virtual const vtkSmartPointer<vtkCell>& GetCell() const;
+    virtual mat GetDeformation(double) { return {}; }
 #endif
 };
 

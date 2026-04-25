@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,49 +31,53 @@
 #ifndef LINEUDL_H
 #define LINEUDL_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class LineUDL : public Load {
 protected:
-    const uword dimension;
+    const unsigned dimension;
+
+    virtual vec project(vec&&) const = 0;
 
 public:
     LineUDL(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        unsigned, // dof tag
-        unsigned, // amplitude tag
-        uword     // dimension
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tag
+        unsigned,                 // amplitude tag
+        unsigned                  // dimension
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
+
+    int process(const shared_ptr<DomainBase>&) override;
 };
 
 class LineUDL2D final : public LineUDL {
+    vec project(vec&&) const override;
+
 public:
     LineUDL2D(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        unsigned, // dof tag
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tag
+        unsigned                  // amplitude tag
     );
-
-    int process(const shared_ptr<DomainBase>&) override;
 };
 
 class LineUDL3D final : public LineUDL {
+    vec project(vec&&) const override;
+
 public:
     LineUDL3D(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        unsigned, // dof tag
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // node tags
+        std::vector<Node::DOF>&&, // dof tag
+        unsigned                  // amplitude tag
     );
-
-    int process(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

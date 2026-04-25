@@ -1,12 +1,15 @@
 # Contribution
 
-Pull requests are welcome.
-By submitting pull requests, consent to future modifications without notice is implied.
+Pull requests are welcome.  
+By submitting a pull request, you acknowledge and agree that project maintainers may modify your contribution without prior notice.
+This may include changes to the submitted code and, where applicable, updates to the project's overall licensing terms.
 
-Feature requests can be made by creating issues.
-There is a template for feature requests.
+If you intend to retain full copyright control over your work, please consider contributing through dynamically linked libraries.
 
-Collaborations of any form in the private domain are possible, please contact me at `tlcfem(at)gmail(dot)com`.
+Feature requests should be submitted by opening an issue.  
+Templates are available for feature request submissions.
+
+Private-domain collaboration in any form is also available; please contact `tlcfem(at)gmail(dot)com`.
 
 ## Code Format Style
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,36 +21,30 @@
 
 extern fs::path SUANPAN_OUTPUT;
 
-VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType L, const unsigned I, const unsigned W, [[maybe_unused]] const double S)
-    : Recorder(T, {}, L, I, false, false)
-    , width(W) {
+void VisualisationRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 #ifdef SUANPAN_VTK
-    config.save_file = true;
-    config.type = get_variable_type();
-    config.scale = S;
+    std::ostringstream file_name;
 
-    const auto P = to_token(to_category(config.type));
+    file_name << 'R' << get_tag() << '-' << to_name(original_type) << '-' << std::setw(width) << std::setfill('0') << ++total_counter;
 
-    function_handler = OutputType::U == P || OutputType::V == P || OutputType::A == P || OutputType::RF == P || OutputType::DF == P || OutputType::IF == P ? &vtk_plot_node_quantity : &vtk_plot_element_quantity;
+    config.file_name = (SUANPAN_OUTPUT / file_name.str()).generic_string();
+
+    vtk_cell_plot(D, config);
 #endif
 }
 
-void VisualisationRecorder::record([[maybe_unused]] const shared_ptr<DomainBase>& D) {
+VisualisationRecorder::VisualisationRecorder(const unsigned T, const OutputType L, const unsigned I, const int W, [[maybe_unused]] const double S)
+    : Recorder(T, {}, L, I, false)
+    , width(W) {
 #ifdef SUANPAN_VTK
-    if(!if_perform_record()) return;
-
-    std::ostringstream file_name;
-
-    file_name << 'R' << get_tag() << '-' << to_name(get_variable_type()) << '-' << std::setw(static_cast<int>(width)) << std::setfill('0') << ++total_counter << ".vtk";
-
-    fs::path file_path = SUANPAN_OUTPUT;
-
-    file_path.append(file_name.str());
-
-    config.file_name = file_path.generic_string();
-
-    (*function_handler)(D, config);
+    config.set(L);
+    config.scale = S;
 #endif
+}
+
+void VisualisationRecorder::clear_status() {
+    total_counter = 0u;
+    Recorder::clear_status();
 }
 
 void VisualisationRecorder::save() {}

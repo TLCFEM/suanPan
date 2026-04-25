@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ struct DataSection {
     mat trial_geometry{};   // geometry matrix
 };
 
-class Section : protected DataSection, public CopiableTag {
+class Section : protected DataSection, public CopyableTag {
     const bool initialized = false;
     const bool symmetric = false;
 
@@ -121,7 +121,7 @@ public:
     [[nodiscard]] virtual const mat& get_initial_stiffness() const;
     [[nodiscard]] virtual const mat& get_initial_geometry() const;
 
-    virtual unique_ptr<Section> get_copy() = 0;
+    virtual unique_ptr<Section> unique_copy() = 0;
 
     int update_incre_status(double);
     int update_incre_status(double, double);
@@ -137,11 +137,11 @@ public:
     virtual int commit_status() = 0;
     virtual int reset_status() = 0;
 
-    virtual std::vector<vec> record(OutputType);
+    [[nodiscard]] virtual std::vector<vec> record(OutputType) const;
 };
 
 namespace suanpan {
-    unique_ptr<Section> make_copy(const shared_ptr<Section>&);
+    unique_ptr<Section> unique_copy(const shared_ptr<Section>&);
 } // namespace suanpan
 
 #endif

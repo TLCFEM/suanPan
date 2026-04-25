@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,64 +24,81 @@ extern fs::path SUANPAN_OUTPUT;
 #include <hdf5_hl.h>
 #endif
 
+auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
+    auto cell_size = 0llu, inner_size = 0llu;
+    for(const auto& inner : container) {
+        if(inner.size() > inner_size) inner_size = inner.size();
+        for(const auto& item : inner)
+            if(item.n_elem > cell_size) cell_size = item.n_elem;
+    }
+
+    for(auto&& inner : container) {
+        inner.resize(inner_size);
+        for(auto&& item : inner) item.resize(cell_size);
+    }
+
+    return std::make_tuple(cell_size, inner_size);
+}
+
+std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
+    auto max_size = 0llu;
+    for(const auto& item : container)
+        if(item.n_elem > max_size) max_size = item.n_elem;
+
+    for(auto&& item : container) item.resize(max_size);
+
+    return container;
+}
+
+const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
+
 /**
  * \brief ctor
  * \param T unique tag
  * \param B object tags
  * \param L variable type
  * \param I record interval
- * \param R if to record time stamp
  * \param H if to use hdf5 format
  */
-Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
+Recorder::Recorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool H)
     : UniqueTag(T)
-    , object_tag(std::move(B))
-    , variable_type(L)
-    , data_pool(object_tag.n_elem)
-    , record_time(R)
     , use_hdf5(H)
-    , interval(I) {}
+    , original_type(L)
+    , variable_type(to_token(to_category(L)))
+    , component(to_index(L))
+    , interval(I)
+    , reference_tag(std::move(B)) {}
 
-void Recorder::initialize(const shared_ptr<DomainBase>&) {}
-
-void Recorder::set_object_tag(uvec&& T) { object_tag = std::move(T); }
-
-const uvec& Recorder::get_object_tag() const { return object_tag; }
-
-void Recorder::set_variable_type(const OutputType T) { variable_type = T; }
-
-const OutputType& Recorder::get_variable_type() const { return variable_type; }
-
-bool Recorder::if_hdf5() const { return use_hdf5; }
-
-bool Recorder::if_record_time() const { return record_time; }
-
-bool Recorder::if_perform_record() { return 1 == interval || 0 == counter++ % interval; }
+void Recorder::initialize(const shared_ptr<DomainBase>& D) { update_tag(D); }
 
 void Recorder::insert(const double T) { time_pool.emplace_back(T); }
 
-void Recorder::insert(const std::vector<vec>& D, const unsigned I) { data_pool[I].emplace_back(D); }
+void Recorder::insert(std::vector<vec>&& data, const uword tag) {
+    if(component >= 0) {
+        const auto select = static_cast<uword>(component);
+        for(auto& item : data) item = vec{item.n_elem > select ? item(select) : 0.};
+    }
 
-const std::vector<std::vector<std::vector<vec>>>& Recorder::get_data_pool() const { return data_pool; }
-
-const std::vector<double>& Recorder::get_time_pool() const { return time_pool; }
+    data_pool[tag].emplace_back(std::move(data));
+}
+void Recorder::record(const shared_ptr<DomainBase>& D) {
+    if(1 == interval || 0 == counter++ % interval) record_impl(D);
+}
 
 void Recorder::clear_status() {
+    counter = 0u;
+    object_tag.reset();
     time_pool.clear();
     data_pool.clear();
 }
 
 void Recorder::save() {
-    if(time_pool.empty() || data_pool.empty() || data_pool.cbegin()->empty() || data_pool.cbegin()->cbegin()->empty() || data_pool.cbegin()->cbegin()->cbegin()->is_empty()) return;
-
     std::ostringstream file_name;
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     // ReSharper disable once CppDFAUnreachableCode
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
-    file_name << 'R' << get_tag() << '-' << to_name(variable_type);
+    file_name << 'R' << get_tag() << '-' << to_name(original_type);
     const auto origin_name = file_name.str();
-
-    unsigned idx = 0;
 
 #ifdef SUANPAN_HDF5
     if(use_hdf5) {
@@ -94,27 +111,26 @@ void Recorder::save() {
 
         const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-        for(const auto& s_data_pool : data_pool) {
-            if(s_data_pool.empty()) continue;
+        for(auto& [tag, object_data] : data_pool) {
+            if(object_data.empty()) continue;
 
-            auto max_size = 0llu;
-            for(const auto& I : s_data_pool[0])
-                if(I.n_elem > max_size) max_size = I.n_elem;
+            const auto [cell_size, cell_num] = normalise_size(object_data);
 
-            mat data_to_write(s_data_pool.cbegin()->size() * max_size + 1, time_pool.size(), fill::zeros);
+            mat data_to_write(cell_size * cell_num + 1, object_data.size(), fill::zeros);
+            data_to_write.row(0) = rowvec{time_pool};
 
-            for(size_t I = 0; I < time_pool.size(); ++I) {
-                data_to_write(0, I) = time_pool[I];
-                unsigned L = 1;
-                for(const auto& J : s_data_pool[I])
-                    for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(L++, I) = J[K];
+            for(auto J = 0llu; J < data_to_write.n_cols; ++J) {
+                auto row = 1llu;
+                for(auto& block : object_data[J]) {
+                    data_to_write(span(row, row + cell_size - 1), J) = block;
+                    row += cell_size;
+                }
             }
 
-            hsize_t dimension[2] = {data_to_write.n_cols, data_to_write.n_rows};
+            hsize_t dimension[2]{data_to_write.n_cols, data_to_write.n_rows};
 
             std::ostringstream dataset_name;
-            dataset_name << origin_name.c_str();
-            dataset_name << object_tag(idx++);
+            dataset_name << origin_name.c_str() << tag;
 
             H5LTmake_dataset(group_id, dataset_name.str().c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
         }
@@ -125,25 +141,24 @@ void Recorder::save() {
     else
 #endif
     {
-        for(const auto& s_data_pool : data_pool) {
-            if(s_data_pool.empty()) continue;
+        for(auto& [tag, object_data] : data_pool) {
+            if(object_data.empty()) continue;
 
-            auto max_size = 0llu;
-            for(const auto& I : s_data_pool[0])
-                if(I.n_elem > max_size) max_size = I.n_elem;
+            const auto [cell_size, cell_num] = normalise_size(object_data);
 
-            mat data_to_write(time_pool.size(), s_data_pool.cbegin()->size() * max_size + 1, fill::zeros);
+            mat data_to_write(object_data.size(), cell_size * cell_num + 1, fill::zeros);
+            data_to_write.col(0) = vec{time_pool};
 
-            for(size_t I = 0; I < time_pool.size(); ++I) {
-                data_to_write(I, 0) = time_pool[I];
-                auto L = 1u;
-                for(const auto& J : s_data_pool[I])
-                    for(unsigned K = 0; K < J.n_elem; ++K) data_to_write(I, L++) = J[K];
+            for(auto J = 0llu; J < data_to_write.n_rows; ++J) {
+                auto col = 1llu;
+                for(auto& block : object_data[J]) {
+                    data_to_write(J, span(col, col + cell_size - 1)) = block.t();
+                    col += cell_size;
+                }
             }
 
             std::ostringstream dataset_name;
-            dataset_name << (SUANPAN_OUTPUT / origin_name).generic_string();
-            dataset_name << object_tag(idx++);
+            dataset_name << (SUANPAN_OUTPUT / origin_name).generic_string() << tag;
 
             data_to_write.save(dataset_name.str() + ".txt", raw_ascii);
         }

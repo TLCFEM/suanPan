@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(linear_density) = area * material_proto->get_density();
 
     int_pt.clear();
-    int_pt.emplace_back(omega, py, pz, area, material_proto->get_copy());
+    int_pt.emplace_back(omega, py, pz, area, material_proto->unique_copy());
 
     const auto& arm_y = eccentricity(0);
     const auto& arm_z = eccentricity(1);
@@ -54,7 +54,7 @@ int Cell3DOS::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Cell3DOS::get_copy() { return std::make_unique<Cell3DOS>(*this); }
+unique_ptr<Section> Cell3DOS::unique_copy() { return std::make_unique<Cell3DOS>(*this); }
 
 void Cell3DOS::print() {
     suanpan_info("A 3D open section cell.\n");

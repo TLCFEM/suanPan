@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,15 @@
 #define UTILITY_H
 
 #include <concepts>
+#include <set>
 #include <suanPan.h>
 #ifdef __cpp_lib_execution
 #include <execution>
 #endif
 
 namespace suanpan {
+    template<typename T> constexpr const T& middle(const std::vector<T>& container) { return container[container.size() / 2]; }
+
     template<sp_i IT, std::invocable<IT> F> void for_each(const IT start, const IT end, F&& FN) {
 #ifdef SUANPAN_MT
         static tbb::affinity_partitioner ap;
@@ -49,6 +52,33 @@ namespace suanpan {
         container.erase(std::unique(container.begin(), container.end()), container.end());
         container.shrink_to_fit();
         return container;
+    }
+
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto all_of(Container& target, Handler&& func) {
+        return std::all_of(
+#ifdef __cpp_lib_execution
+            std::execution::par,
+#endif
+            target.begin(), target.end(), std::forward<Handler>(func)
+        );
+    }
+
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto none_of(Container& target, Handler&& func) {
+        return std::none_of(
+#ifdef __cpp_lib_execution
+            std::execution::par,
+#endif
+            target.begin(), target.end(), std::forward<Handler>(func)
+        );
+    }
+
+    template<class Container, class Handler> requires requires(Container x) { x.begin(); x.end(); } auto any_of(Container& target, Handler&& func) {
+        return std::any_of(
+#ifdef __cpp_lib_execution
+            std::execution::par,
+#endif
+            target.begin(), target.end(), std::forward<Handler>(func)
+        );
     }
 
     template<typename T> constexpr T& hacker(const T& I) { return const_cast<T&>(I); }
@@ -83,142 +113,81 @@ namespace suanpan {
     } // namespace expression
 } // namespace suanpan
 
-template<typename T> bool get_input(std::istringstream& I, T& O) { return static_cast<bool>(I >> O); }
+template<typename T> bool get_input(std::istringstream& stream, T& output) { return static_cast<bool>(stream >> output); }
 
-template<typename T> bool get_input(std::istringstream& I, Col<T>& O) {
-    auto code = true;
-    for(auto& P : O) code &= static_cast<bool>(I >> P);
-    return code;
+template<typename T> bool get_input(std::istringstream& stream, Col<T>& output) {
+    for(auto& item : output)
+        if(!get_input(stream, item)) return false;
+    return true;
 }
 
-template<typename T, typename... U> bool get_input(std::istringstream& I, T& O, U&... R) { return static_cast<bool>(I >> O) ? get_input(I, R...) : false; }
+template<typename T, typename... U> bool get_input(std::istringstream& stream, T& output, U&... rest) { return get_input(stream, output) && get_input(stream, rest...); }
 
-template<typename T> T get_input(std::istringstream& I) {
-    T O;
-    I >> O;
-    return O;
+template<typename... Ts> bool get_input(std::istringstream& stream, std::tuple<Ts...>& output) {
+    return std::apply([&](auto&... items) { return get_input(stream, items...); }, output);
+}
+
+template<typename T> auto get_remaining(std::istringstream& stream) {
+    std::vector<T> output;
+    T value;
+    while(get_input(stream, value)) output.emplace_back(value);
+    return output;
+}
+
+template<typename T> auto get_remaining_as_set(std::istringstream& stream) {
+    std::set<T> output;
+    T value;
+    while(get_input(stream, value)) output.insert(value);
+    return output;
+}
+
+template<typename T1, typename T2, typename... Ts> auto get_remaining(std::istringstream& stream) {
+    std::tuple<std::vector<T1>, std::vector<T2>, std::vector<Ts>...> output;
+    std::tuple<T1, T2, Ts...> temp;
+    while(get_input(stream, temp)) std::apply([&](auto&... containers) { std::apply([&](auto&&... items) { ((containers.emplace_back(items)), ...); }, temp); }, output);
+    return output;
+}
+
+template<typename... Ts> auto get_remaining_as_tuple(std::istringstream& stream) {
+    std::vector<std::tuple<Ts...>> output;
+    std::tuple<Ts...> temp;
+    while(get_input(stream, temp)) output.emplace_back(temp);
+    return output;
+}
+
+template<typename T> T get_input(std::istringstream& stream) {
+    T output{};
+    stream >> output;
+    return output;
 }
 
 void ignore_whitespace(std::istringstream&);
 
-template<typename T> bool get_optional_input(std::istringstream& I, T& O) {
-    if(I.eof()) return true;
+template<typename T> bool get_optional_input(std::istringstream& stream, T& output) { return stream.eof() || get_input(stream, output); }
 
-    return static_cast<bool>(I >> O);
+template<typename T> bool get_optional_input(std::istringstream& stream, Col<T>& output) {
+    for(auto& item : output)
+        if(!stream.eof() && !get_input(stream, item)) return false;
+    return true;
 }
 
-template<typename T> bool get_optional_input(std::istringstream& I, Col<T>& O) {
-    auto code = true;
-    for(auto& P : O) code &= I.eof() ? true : static_cast<bool>(I >> P);
-    return code;
-}
-
-template<typename T, typename... U> bool get_optional_input(std::istringstream& I, T& O, U&... R) {
-    if(I.eof()) return true;
-
-    return static_cast<bool>(I >> O) ? get_optional_input(I, R...) : false;
-}
-
-template<typename T> auto get_remaining(std::istringstream& I) {
-    std::vector<T> O;
-    T value;
-    while(get_input(I, value)) O.emplace_back(value);
-    return O;
-}
-
-template<typename T1, typename T2> auto get_remaining(std::istringstream& I) {
-    std::vector<T1> O1;
-    std::vector<T2> O2;
-    T1 V1;
-    T2 V2;
-    while(get_input(I, V1, V2)) {
-        O1.emplace_back(V1);
-        O2.emplace_back(V2);
-    }
-    return std::make_tuple(O1, O2);
-}
-
-template<typename T1, typename T2, typename T3> auto get_remaining(std::istringstream& I) {
-    std::vector<T1> O1;
-    std::vector<T2> O2;
-    std::vector<T3> O3;
-    T1 V1;
-    T2 V2;
-    T3 V3;
-    while(get_input(I, V1, V2, V3)) {
-        O1.emplace_back(V1);
-        O2.emplace_back(V2);
-        O3.emplace_back(V3);
-    }
-    return std::make_tuple(O1, O2, O3);
-}
-
-template<typename T1, typename T2, typename T3, typename T4> auto get_remaining(std::istringstream& I) {
-    std::vector<T1> O1;
-    std::vector<T2> O2;
-    std::vector<T3> O3;
-    std::vector<T4> O4;
-    T1 V1;
-    T2 V2;
-    T3 V3;
-    T4 V4;
-    while(get_input(I, V1, V2, V3, V4)) {
-        O1.emplace_back(V1);
-        O2.emplace_back(V2);
-        O3.emplace_back(V3);
-        O4.emplace_back(V4);
-    }
-    return std::make_tuple(O1, O2, O3, O4);
-}
-
-template<typename T1, typename T2, typename T3, typename T4, typename T5> auto get_remaining(std::istringstream& I) {
-    std::vector<T1> O1;
-    std::vector<T2> O2;
-    std::vector<T3> O3;
-    std::vector<T4> O4;
-    std::vector<T5> O5;
-    T1 V1;
-    T2 V2;
-    T3 V3;
-    T4 V4;
-    T5 V5;
-    while(get_input(I, V1, V2, V3, V4, V5)) {
-        O1.emplace_back(V1);
-        O2.emplace_back(V2);
-        O3.emplace_back(V3);
-        O4.emplace_back(V4);
-        O5.emplace_back(V5);
-    }
-    return std::make_tuple(O1, O2, O3, O4, O5);
-}
+template<typename T, typename... U> bool get_optional_input(std::istringstream& stream, T& output, U&... rest) { return stream.eof() || (get_input(stream, output) && get_optional_input(stream, rest...)); }
 
 std::string get_remaining(std::istringstream&);
 
-bool is_equal(const char*, const char*);
 bool is_equal(char, char);
 bool is_equal(int, char);
-bool is_equal(const std::string&, const char*);
-bool is_equal(const char*, const std::string&);
-bool is_equal(const std::string&, const std::string&);
-bool is_equal(std::string_view, const char*);
-bool is_equal(const char*, std::string_view);
+bool is_equal(std::string_view, std::string_view);
 
-bool if_contain(const std::string&, const char*);
-bool if_contain(const std::string&, const std::string&);
-bool if_contain(std::string&&, std::string&&);
+template<typename... S> bool is_equal_any(std::string_view a, S... rest) { return (is_equal(a, rest) || ...); }
 
 bool if_startswith(std::string_view, std::string_view);
 
-template<std::equality_comparable T> std::pair<bool, std::int64_t> if_contain(const std::vector<T>& container, const T target) {
-    auto position = std::find(container.begin(), container.end(), target);
+bool if_contain(const std::string&, const char*);
+bool if_contain(const std::string&, const std::string&);
 
-    return {position != container.end() && container.size() > 0, position - container.begin()};
-}
-
-bool is_true(const char*);
-bool is_false(const char*);
-bool is_true(const std::string&);
-bool is_false(const std::string&);
+bool is_true(std::string_view);
+bool is_false(std::string_view);
 
 bool is_integer(const std::string&);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ QE2::IntegrationPoint::IntegrationPoint(vec&& C, const double F, unique_ptr<Mate
 vec QE2::form_stress_mode(const double X, const double Y) { return vec{0., X, Y, X * Y}; }
 
 QE2::QE2(const unsigned T, uvec&& N, const unsigned M, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
 int QE2::initialize(const shared_ptr<DomainBase>& D) {
@@ -57,7 +57,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(iso_mapping) = trans(mapping * ele_coor);
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     mat H(7, 7, fill::zeros);
 
@@ -71,7 +71,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const auto det_jacob = det(jacob);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det_jacob * thickness, mat_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det_jacob * thickness, mat_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
 
@@ -207,15 +207,21 @@ int QE2::reset_status() {
 
 mat QE2::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> QE2::record(const OutputType P) {
+std::vector<vec> QE2::record(const OutputType P) const {
     std::vector<vec> data;
 
-    if(P == OutputType::E)
-        for(const auto& I : int_pt) data.emplace_back(I.A * current_alpha);
-    else if(P == OutputType::S)
-        for(const auto& I : int_pt) data.emplace_back(I.P * current_beta);
+    const auto remap = [](vec&& in) {
+        vec out(6, fill::zeros);
+        out(uvec{0, 1, 3}) = in;
+        return out;
+    };
+
+    if(P == OutputType::S)
+        for(const auto& I : int_pt) data.emplace_back(remap(I.P * current_beta));
+    else if(P == OutputType::E)
+        for(const auto& I : int_pt) data.emplace_back(remap(I.A * current_alpha));
     else
-        for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+        for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
 
     return data;
 }
@@ -239,26 +245,13 @@ void QE2::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void QE2::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
-}
-
-void QE2::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
+vtkSmartPointer<vtkCell> QE2::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat QE2::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
     if(OutputType::S == P) {
         mat t_stress(6, m_node, fill::zeros);
         t_stress(uvec{0, 1, 3}, uvec{0}) = shape::stress7(iso_mapping * form_stress_mode(-1., -1.)) * current_alpha;
@@ -280,7 +273,7 @@ mat QE2::GetData(const OutputType P) {
     mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
+        if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -294,9 +287,6 @@ mat QE2::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void QE2::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat QE2::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2); }
 
 #endif

@@ -688,15 +688,22 @@ SpMat<eT>::operator=(const SpMat<eT>& x)
 template<typename eT>
 inline
 SpMat<eT>&
-SpMat<eT>::operator+=(const SpMat<eT>& x)
+SpMat<eT>::operator+=(const SpMat<eT>& X)
   {
   arma_debug_sigprint();
   
   sync_csc();
   
-  SpMat<eT> out = (*this) + x;
-  
-  steal_mem(out);
+  if(X.n_nonzero == 0)
+    {
+    arma_conform_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "addition");
+    }
+  else
+    {
+    SpMat<eT> tmp = (*this) + X;
+    
+    steal_mem(tmp);
+    }
   
   return *this;
   }
@@ -706,15 +713,22 @@ SpMat<eT>::operator+=(const SpMat<eT>& x)
 template<typename eT>
 inline
 SpMat<eT>&
-SpMat<eT>::operator-=(const SpMat<eT>& x)
+SpMat<eT>::operator-=(const SpMat<eT>& X)
   {
   arma_debug_sigprint();
   
   sync_csc();
   
-  SpMat<eT> out = (*this) - x;
-  
-  steal_mem(out);
+  if(X.n_nonzero == 0)
+    {
+    arma_conform_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "subtraction");
+    }
+  else
+    {
+    SpMat<eT> tmp = (*this) - X;
+    
+    steal_mem(tmp);
+    }
   
   return *this;
   }
@@ -724,15 +738,15 @@ SpMat<eT>::operator-=(const SpMat<eT>& x)
 template<typename eT>
 inline
 SpMat<eT>&
-SpMat<eT>::operator*=(const SpMat<eT>& y)
+SpMat<eT>::operator*=(const SpMat<eT>& X)
   {
   arma_debug_sigprint();
   
   sync_csc();
   
-  SpMat<eT> z = (*this) * y;
+  SpMat<eT> tmp = (*this) * X;
   
-  steal_mem(z);
+  steal_mem(tmp);
   
   return *this;
   }
@@ -743,15 +757,24 @@ SpMat<eT>::operator*=(const SpMat<eT>& y)
 template<typename eT>
 inline
 SpMat<eT>&
-SpMat<eT>::operator%=(const SpMat<eT>& y)
+SpMat<eT>::operator%=(const SpMat<eT>& X)
   {
   arma_debug_sigprint();
   
   sync_csc();
   
-  SpMat<eT> z = (*this) % y;
-  
-  steal_mem(z);
+  if(X.n_nonzero == 0)
+    {
+    arma_conform_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "element-wise multiplication");
+    
+    (*this).zeros();
+    }
+  else
+    {
+    SpMat<eT> tmp = (*this) % X;
+    
+    steal_mem(tmp);
+    }
   
   return *this;
   }
@@ -1338,9 +1361,16 @@ SpMat<eT>::operator+=(const SpSubview<eT>& X)
   
   sync_csc();
   
-  SpMat<eT> tmp = (*this) + X;
-  
-  steal_mem(tmp);
+  if(X.n_nonzero == 0)
+    {
+    arma_conform_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "addition");
+    }
+  else
+    {
+    SpMat<eT> tmp = (*this) + X;
+    
+    steal_mem(tmp);
+    }
   
   return *this;
   }
@@ -1356,64 +1386,82 @@ SpMat<eT>::operator-=(const SpSubview<eT>& X)
   
   sync_csc();
   
-  SpMat<eT> tmp = (*this) - X;
-  
-  steal_mem(tmp);
-  
-  return *this;
-  }
-
-
-
-template<typename eT>
-inline
-SpMat<eT>&
-SpMat<eT>::operator*=(const SpSubview<eT>& y)
-  {
-  arma_debug_sigprint();
-  
-  sync_csc();
-  
-  SpMat<eT> z = (*this) * y;
-  
-  steal_mem(z);
-  
-  return *this;
-  }
-
-
-
-template<typename eT>
-inline
-SpMat<eT>&
-SpMat<eT>::operator%=(const SpSubview<eT>& x)
-  {
-  arma_debug_sigprint();
-  
-  sync_csc();
-  
-  SpMat<eT> tmp = (*this) % x;
-  
-  steal_mem(tmp);
-  
-  return *this;
-  }
-
-
-
-template<typename eT>
-inline
-SpMat<eT>&
-SpMat<eT>::operator/=(const SpSubview<eT>& x)
-  {
-  arma_debug_sigprint();
-  
-  arma_conform_assert_same_size(n_rows, n_cols, x.n_rows, x.n_cols, "element-wise division");
-  
-  // There is no pretty way to do this.
-  for(uword elem = 0; elem < n_elem; elem++)
+  if(X.n_nonzero == 0)
     {
-    at(elem) /= x(elem);
+    arma_conform_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "subtraction");
+    }
+  else
+    {
+    SpMat<eT> tmp = (*this) - X;
+    
+    steal_mem(tmp);
+    }
+  
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+SpMat<eT>&
+SpMat<eT>::operator*=(const SpSubview<eT>& X)
+  {
+  arma_debug_sigprint();
+  
+  sync_csc();
+  
+  SpMat<eT> tmp = (*this) * X;
+  
+  steal_mem(tmp);
+  
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+SpMat<eT>&
+SpMat<eT>::operator%=(const SpSubview<eT>& X)
+  {
+  arma_debug_sigprint();
+  
+  sync_csc();
+  
+  if(X.n_nonzero == 0)
+    {
+    arma_conform_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "element-wise multiplication");
+    
+    (*this).zeros();
+    }
+  else
+    {
+    SpMat<eT> tmp = (*this) % X;
+    
+    steal_mem(tmp);
+    }
+  
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+SpMat<eT>&
+SpMat<eT>::operator/=(const SpSubview<eT>& X)
+  {
+  arma_debug_sigprint();
+  
+  // NOTE: use of this function is not advised; it is implemented only for completeness
+  
+  arma_conform_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "element-wise division");
+  
+  for(uword c = 0; c < n_cols; ++c)
+  for(uword r = 0; r < n_rows; ++r)
+    {
+    at(r, c) /= X.at(r, c);
     }
   
   return *this;
@@ -1507,9 +1555,9 @@ SpMat<eT>::operator*=(const SpSubview_col_list<eT,T1>& X)
   
   sync_csc();
   
-  SpMat<eT> z = (*this) * X;
+  SpMat<eT> tmp = (*this) * X;
   
-  steal_mem(z);
+  steal_mem(tmp);
   
   return *this;
   }
@@ -3517,7 +3565,7 @@ SpMat<eT>::is_symmetric(const typename get_pod_type<elem_type>::result tol) cons
   
   if(tol == T(0))  { return (*this).is_symmetric(); }
   
-  arma_conform_check( (tol < T(0)), "is_symmetric(): parameter 'tol' must be >= 0" );
+  arma_conform_check( ((tol >= T(0)) == false), "is_symmetric(): parameter 'tol' must be > 0" );
   
   const SpMat<eT>& A = (*this);
   
@@ -3527,7 +3575,11 @@ SpMat<eT>::is_symmetric(const typename get_pod_type<elem_type>::result tol) cons
   
   if(norm_A == T(0))  { return true; }
   
+  if(arma_isnan(norm_A))  { return false; }
+  
   const T norm_A_Ast = as_scalar( arma::max(sum(abs(A - A.st()), 1), 0) );
+  
+  if(arma_isnan(norm_A_Ast))  { return false; }
   
   return ( (norm_A_Ast / norm_A) <= tol );
   }
@@ -3563,7 +3615,7 @@ SpMat<eT>::is_hermitian(const typename get_pod_type<elem_type>::result tol) cons
   
   if(tol == T(0))  { return (*this).is_hermitian(); }
   
-  arma_conform_check( (tol < T(0)), "is_hermitian(): parameter 'tol' must be >= 0" );
+  arma_conform_check( ((tol >= T(0)) == false), "is_hermitian(): parameter 'tol' must be > 0" );
   
   const SpMat<eT>& A = (*this);
   
@@ -3573,7 +3625,11 @@ SpMat<eT>::is_hermitian(const typename get_pod_type<elem_type>::result tol) cons
   
   if(norm_A == T(0))  { return true; }
   
+  if(arma_isnan(norm_A))  { return false; }
+  
   const T norm_A_At = as_scalar( arma::max(sum(abs(A - A.t()), 1), 0) );
+  
+  if(arma_isnan(norm_A_At))  { return false; }
   
   return ( (norm_A_At / norm_A) <= tol );
   }
@@ -4156,12 +4212,12 @@ SpMat<eT>::clamp(const eT min_val, const eT max_val)
   
   if(is_cx<eT>::no)
     {
-    arma_conform_check( (access::tmp_real(min_val) > access::tmp_real(max_val)), "SpMat::clamp(): min_val must be less than max_val" );
+    arma_conform_check( ((access::tmp_real(min_val) <= access::tmp_real(max_val)) == false), "SpMat::clamp(): min_val must be less than max_val" );
     }
   else
     {
-    arma_conform_check( (access::tmp_real(min_val) > access::tmp_real(max_val)), "SpMat::clamp(): real(min_val) must be less than real(max_val)" );
-    arma_conform_check( (access::tmp_imag(min_val) > access::tmp_imag(max_val)), "SpMat::clamp(): imag(min_val) must be less than imag(max_val)" );
+    arma_conform_check( ((access::tmp_real(min_val) <= access::tmp_real(max_val)) == false), "SpMat::clamp(): real(min_val) must be less than real(max_val)" );
+    arma_conform_check( ((access::tmp_imag(min_val) <= access::tmp_imag(max_val)) == false), "SpMat::clamp(): imag(min_val) must be less than imag(max_val)" );
     }
   
   if(n_nonzero == 0)  { return *this; }
@@ -4341,7 +4397,7 @@ SpMat<eT>::sprandu(const uword in_rows, const uword in_cols, const double densit
   {
   arma_debug_sigprint();
   
-  arma_conform_check( ( (density < double(0)) || (density > double(1)) ), "sprandu(): density must be in the [0,1] interval" );
+  arma_conform_check( ( ((density >= double(0)) == false) || ((density <= double(1)) == false) ), "sprandu(): density must be in the [0,1] interval" );
   
   const uword new_n_nonzero = uword(density * double(in_rows) * double(in_cols) + 0.5);
   
@@ -4418,7 +4474,7 @@ SpMat<eT>::sprandn(const uword in_rows, const uword in_cols, const double densit
   {
   arma_debug_sigprint();
   
-  arma_conform_check( ( (density < double(0)) || (density > double(1)) ), "sprandn(): density must be in the [0,1] interval" );
+  arma_conform_check( ( ((density >= double(0)) == false) || ((density <= double(1)) == false) ), "sprandn(): density must be in the [0,1] interval" );
   
   const uword new_n_nonzero = uword(density * double(in_rows) * double(in_cols) + 0.5);
   

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-const double DataBalloon1D::Saturation::root_one_half = sqrt(1.5);
-
-const double Balloon1D::rate_bound = -log(z_bound);
-
 /**
  * @brief Perform the initial check to determine whether the material is plastic loading or elastic unloading.
  * If it is plastic loading, correct the $z$ value when necessary.
@@ -36,10 +32,10 @@ const double Balloon1D::rate_bound = -log(z_bound);
 double Balloon1D::initial_check(double start_z) {
     const auto& qm = current_history(3);
 
-    const auto fc = bfc.size() == 0 ? vec{} : vec(&current_history(5), bfc.size(), false, true);
-    const auto ac = bac.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
-    const auto na = bna.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    const auto nd = bnd.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    const auto fc = bfc.empty() ? vec{} : vec(&current_history(5), bfc.size(), false, true);
+    const auto ac = bac.empty() ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
+    const auto na = bna.empty() ? vec{} : vec(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
+    const auto nd = bnd.empty() ? vec{} : vec(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
 
     [[maybe_unused]] const auto [fm, dfm] = bound_fm(qm, true);
     [[maybe_unused]] const auto [am, dam] = bound_am(qm, true);
@@ -74,8 +70,8 @@ double Balloon1D::initial_check(double start_z) {
 auto Balloon1D::compute_isotropic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
-    const auto current_hfc = bfc.size() == 0 ? vec{} : vec(&current_history(5), bfc.size(), false, true);
-    auto hfc = bfc.size() == 0 ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
+    const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5), bfc.size(), false, true);
+    auto hfc = bfc.empty() ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
 
     const auto kc = 1. - km, dkc = -dkm;
 
@@ -99,8 +95,8 @@ auto Balloon1D::compute_isotropic_bound(const double gamma, const double km, con
 auto Balloon1D::compute_kinematic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
-    const auto current_hac = bac.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
-    auto hac = bac.size() == 0 ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
+    const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
+    auto hac = bac.empty() ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
 
     const auto kc = 1. - km, dkc = -dkm;
 
@@ -133,7 +129,7 @@ int Balloon1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Balloon1D::get_copy() { return std::make_unique<Balloon1D>(*this); }
+unique_ptr<Material> Balloon1D::unique_copy() { return std::make_unique<Balloon1D>(*this); }
 
 int Balloon1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -154,14 +150,14 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     auto& qm = trial_history(3);
     auto& z = trial_history(4);
 
-    // const auto current_hfc = bfc.size() == 0 ? vec{} : vec(&current_history(5), bfc.size(), false, true);
-    // const auto current_hac = bac.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
-    const auto current_na = bna.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    const auto current_nd = bnd.size() == 0 ? vec{} : vec(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
-    // auto hfc = bfc.size() == 0 ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
-    // auto hac = bac.size() == 0 ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
-    auto na = bna.size() == 0 ? vec{} : vec(&trial_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    auto nd = bnd.size() == 0 ? vec{} : vec(&trial_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    // const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5), bfc.size(), false, true);
+    // const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
+    const auto current_na = bna.empty() ? vec{} : vec(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
+    const auto current_nd = bnd.empty() ? vec{} : vec(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    // auto hfc = bfc.empty() ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
+    // auto hac = bac.empty() ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
+    auto na = bna.empty() ? vec{} : vec(&trial_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
+    auto nd = bnd.empty() ? vec{} : vec(&trial_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
 
     iteration = 0.;
     const auto start_z = initial_check(current_z);
@@ -169,7 +165,7 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     // elastic unloading
     if(last_loading < -.5) return SUANPAN_SUCCESS;
 
-    const auto ref_zr = trial_zr.mean();
+    const auto ref_zr = trial_zr(zr_type);
 
     auto gamma = 0., ref_error = 0.;
 
@@ -235,17 +231,17 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             iteration = counter;
             trial_stress -= elastic * gamma * n;
             trial_stiffness += elastic / det(jacobian) * elastic * jacobian(1, 1);
             return SUANPAN_SUCCESS;
         }
 
-        gamma = suanpan::clamp(gamma - incre(0), 0., 1.1 * abs_incre_strain);
+        gamma = suanpan::clamp(gamma - incre(0), 0., 4. * abs_incre_strain);
         z = suanpan::clamp_unit(z - incre(1));
     }
 }
@@ -278,6 +274,6 @@ int Balloon1D::reset_status() {
 }
 
 void Balloon1D::print() {
-    suanpan_info("The Balloon uniaxial model.\n");
+    suanpan_info("The Balloon-v1 uniaxial model.\n");
     Material1D::print();
 }

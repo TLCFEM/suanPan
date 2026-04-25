@@ -24,7 +24,7 @@ element SGCMQG 5 5 6 12 11 1 1
 
 fix 1 1 1 7
 fix 2 2 1
-fix 3 3 1 7
+fix 3 6 1 7
 
 cload 1 0 1000 1 6
 cload 2 0 -1000 1 12

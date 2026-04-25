@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,16 +32,44 @@
 #include <Recorder/Recorder.h>
 
 class GlobalRecorder : public Recorder {
+protected:
+    static void assemble_matrix(const mat&, const uvec&, mat&);
+
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
 public:
     GlobalRecorder(
         unsigned,   // tag
         OutputType, // recorder type
         unsigned,   // interval
-        bool,       // if to record time
         bool        // if to use hdf5
     );
 
-    void record(const shared_ptr<DomainBase>&) override;
+    void print() override;
+};
+
+class GlobalStiffnessRecorder final : public GlobalRecorder {
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
+public:
+    GlobalStiffnessRecorder(
+        unsigned, // tag
+        unsigned, // interval
+        bool      // if to use hdf5
+    );
+
+    void print() override;
+};
+
+class GlobalMassRecorder final : public GlobalRecorder {
+    void record_impl(const shared_ptr<DomainBase>&) override;
+
+public:
+    GlobalMassRecorder(
+        unsigned, // tag
+        unsigned, // interval
+        bool      // if to use hdf5
+    );
 
     void print() override;
 };

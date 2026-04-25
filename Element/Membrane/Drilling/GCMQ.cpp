@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(iso_mapping) = trans(mapping * ele_coor);
     // clang-format off
-    const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationType::IRONS : scheme == 'L' ? IntegrationType::LOBATTO : IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationPlan::Type::IRONS : scheme == 'L' ? IntegrationPlan::Type::LOBATTO : IntegrationPlan::Type::GAUSS);
     // clang-format on
     const auto diff_coor = form_diff_coor(ele_coor);
 
@@ -91,7 +91,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{X, Y};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, material_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, material_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
 
@@ -202,43 +202,29 @@ int GCMQ::reset_status() {
 
 mat GCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> GCMQ::record(const OutputType P) {
+std::vector<vec> GCMQ::record(const OutputType P) const {
     std::vector<vec> data;
 
+    const auto remap = [](vec&& in) {
+        vec out(6, fill::zeros);
+        out(uvec{0, 1, 3}) = in;
+        return out;
+    };
+
     if(P == OutputType::S)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_stress * current_alpha);
-    else if(P == OutputType::S11)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(0) * current_alpha);
-    else if(P == OutputType::S22)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(1) * current_alpha);
-    else if(P == OutputType::S12)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_stress.row(2) * current_alpha);
+        for(const auto& I : int_pt) data.emplace_back(remap(I.poly_stress * current_alpha));
+    else if(P == OutputType::E)
+        for(const auto& I : int_pt) data.emplace_back(remap(I.poly_strain * current_beta));
+    else if(P == OutputType::PE)
+        for(const auto& I : int_pt) data.emplace_back(remap(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)));
     else if(P == OutputType::SP)
         for(const auto& I : int_pt) data.emplace_back(transform::stress::principal(I.poly_stress * current_alpha));
-    else if(P == OutputType::SP1)
-        for(const auto& I : int_pt) data.emplace_back(vec{transform::stress::principal(I.poly_stress * current_alpha).at(0)});
-    else if(P == OutputType::SP2)
-        for(const auto& I : int_pt) data.emplace_back(vec{transform::stress::principal(I.poly_stress * current_alpha).at(1)});
-    else if(P == OutputType::E)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_strain * current_beta);
-    else if(P == OutputType::E11)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(0) * current_beta);
-    else if(P == OutputType::E22)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(1) * current_beta);
-    else if(P == OutputType::E12)
-        for(const auto& I : int_pt) data.emplace_back(I.poly_strain.row(2) * current_beta);
     else if(P == OutputType::EP)
         for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta));
-    else if(P == OutputType::EP1)
-        for(const auto& I : int_pt) data.emplace_back(vec{transform::strain::principal(I.poly_strain * current_beta).at(0)});
-    else if(P == OutputType::EP2)
-        for(const auto& I : int_pt) data.emplace_back(vec{transform::strain::principal(I.poly_strain * current_beta).at(1)});
-    else if(P == OutputType::PE)
-        for(const auto& I : int_pt) { data.emplace_back(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)); }
     else if(P == OutputType::PEP)
         for(const auto& I : int_pt) data.emplace_back(transform::strain::principal(I.poly_strain * current_beta - solve(mat_stiffness, I.poly_stress * current_alpha)));
     else
-        for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+        for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
 
     return data;
 }
@@ -265,6 +251,16 @@ void GCMQ::print() {
 #include <vtkQuad.h>
 
 mat GCMQ::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, m_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = reshape(in, m_dof, m_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
     if(OutputType::S == P) {
         mat t_stress(6, m_node, fill::zeros);
         t_stress(uvec{0, 1, 3}, uvec{0}) = shape::stress11(iso_mapping * form_stress_mode(-1., -1.)) * current_alpha;
@@ -286,7 +282,7 @@ mat GCMQ::GetData(const OutputType P) {
     mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
+        if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 

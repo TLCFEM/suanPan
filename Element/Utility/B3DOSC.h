@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,9 +47,9 @@ protected:
 public:
     B3DOSC(unsigned, vec&&);
 
-    [[nodiscard]] OrientationType get_orientation_type() const override;
+    [[nodiscard]] Type type() const override;
 
-    unique_ptr<Orientation> get_copy() override;
+    unique_ptr<Orientation> unique_copy() override;
 
     [[nodiscard]] vec to_local_vec(const vec&) const override;
     [[nodiscard]] mat to_global_geometry_mat(const mat&) const override;

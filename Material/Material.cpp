@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 Material::Material(const unsigned T, const MaterialType MT, const double D)
     : DataMaterial{fabs(D), MT}
     , DataCoupleMaterial{}
-    , CopiableTag(T) {}
+    , CopyableTag(T) {}
 
 double Material::get_density() const { return density; }
 
@@ -75,7 +75,7 @@ void Material::set_characteristic_length(const double L) const { access::rw(char
 
 double Material::get_characteristic_length() const { return characteristic_length; }
 
-double Material::get_parameter(ParameterType) const { return 0.; }
+double Material::get(Parameter) const { return 0.; }
 
 const vec& Material::get_trial_strain() { return trial_strain; }
 
@@ -137,7 +137,7 @@ const mat& Material::get_current_couple_stiffness() { return current_couple_stif
 
 const mat& Material::get_initial_couple_stiffness() const { return initial_couple_stiffness; }
 
-unique_ptr<Material> Material::get_copy() { throw std::invalid_argument("hidden method get_copy() called"); }
+unique_ptr<Material> Material::unique_copy() { throw std::invalid_argument("hidden method unique_copy() called"); }
 
 int Material::update_incre_status(const double i_strain) { return update_incre_status(vec{i_strain}); }
 
@@ -291,13 +291,13 @@ int Material::reset_couple_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> Material::record(const OutputType P) {
+std::vector<vec> Material::record(const OutputType P) const {
     if(P == OutputType::S) return {current_stress};
     if(P == OutputType::E) return {current_strain};
     if(P == OutputType::EE) return {solve(initial_stiffness, current_stress)};
     if(P == OutputType::PE) return {current_strain - solve(initial_stiffness, current_stress)};
     if(P == OutputType::HIST) return {current_history};
-    if(P == OutputType::YF) return {vec{any(current_history > 0.) ? 1. : 0.}};
+    if(P == OutputType::YF) return {vec{any(current_history != 0.) ? 1. : 0.}};
 
     return {};
 }
@@ -368,4 +368,4 @@ void PureWrapper(Material* M) {
     M->trial_couple_stiffness.reset();
 }
 
-unique_ptr<Material> suanpan::make_copy(const shared_ptr<Material>& P) { return nullptr == P ? nullptr : P->get_copy(); }
+unique_ptr<Material> suanpan::unique_copy(const shared_ptr<Material>& P) { return nullptr == P ? nullptr : P->unique_copy(); }

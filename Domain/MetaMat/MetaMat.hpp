@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ public:
     [[nodiscard]] virtual bool is_empty() const = 0;
     virtual void zeros() = 0;
 
-    virtual unique_ptr<MetaMat> make_copy() = 0;
+    virtual unique_ptr<MetaMat> unique_copy() = 0;
 
     void unify(const uword K) {
         this->nullify(K);
@@ -145,6 +145,14 @@ public:
     }
 
     virtual void nullify(uword) = 0;
+
+    void unify(const uvec& list) {
+        for(const auto index : list) unify(index);
+    }
+
+    void nullify(const uvec& list) {
+        for(const auto index : list) nullify(index);
+    }
 
     [[nodiscard]] virtual T max() const = 0;
 

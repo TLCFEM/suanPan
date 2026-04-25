@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,34 @@
 
 #include "NodalForce.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/Amplitude/Amplitude.h>
 
-NodalForce::NodalForce(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), std::move(D), L) {}
+NodalForce::NodalForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : Load(T, AT, {}, std::move(D), L) { target_node = std::move(N); }
 
-int NodalForce::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
+int NodalForce::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
 
-    const auto active_dof = get_nodal_active_dof(D);
-
-    D->insert_loaded_dof(active_dof);
-
-    trial_load.zeros(W->get_size());
-
-    trial_load(active_dof).fill(pattern * amplitude->get_amplitude(W->get_trial_time()));
+    target_dof = collect_node_dof(D);
 
     return SUANPAN_SUCCESS;
+}
+
+int NodalForce::process(const shared_ptr<DomainBase>& D) {
+    D->insert_loaded_dof(target_dof);
+
+    if(target_dof.is_empty()) trial_load.reset();
+    else trial_load.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
+
+    return SUANPAN_SUCCESS;
+}
+
+GroupNodalForce::GroupNodalForce(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : GroupModifier(std::move(N))
+    , NodalForce(T, L, {}, std::move(D), AT) {}
+
+int GroupNodalForce::initialize(const shared_ptr<DomainBase>& D) {
+    target_node = update_object_tag(D);
+
+    return NodalForce::initialize(D);
 }

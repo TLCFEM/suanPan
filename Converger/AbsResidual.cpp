@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
 AbsResidual::AbsResidual(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> AbsResidual::get_copy() { return std::make_unique<AbsResidual>(*this); }
+unique_ptr<Converger> AbsResidual::unique_copy() { return std::make_unique<AbsResidual>(*this); }
 
 bool AbsResidual::is_converged(unsigned) {
-    set_error(inf_norm(get_residual()));
+    set_error(suanpan::inf_norm(get_residual()));
     set_conv_flag(get_tolerance() > get_error());
 
     if(is_print())

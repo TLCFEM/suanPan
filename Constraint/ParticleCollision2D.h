@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,12 @@ class ParticleCollision2D : public ParticleCollision {
     struct CellList {
         int x = 0, y = 0;
         unsigned tag = 0;
-    };
 
-    std::vector<CellList> list;
+        CellList(const int in_x, const int in_y, const unsigned in_tag)
+            : x(in_x)
+            , y(in_y)
+            , tag(in_tag) {}
+    };
 
     [[nodiscard]] double compute_f(double) const override;
     [[nodiscard]] double compute_df(double) const override;

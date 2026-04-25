@@ -845,7 +845,7 @@ material Elastic2D 1 1E3 .2
 
 generatebyrule nodegroup 1 1 1. 0.
 
-groupmultiplierbc 1 P 1
+groupmultiplierbc 1 E 1
 
 cload 1 0 -1 2 441 420
 

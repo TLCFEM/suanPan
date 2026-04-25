@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,10 @@ int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::sh
 int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
 
 int eig_solve(cx_vec&, const std::shared_ptr<MetaMat<double>>&, unsigned);
+
+#ifdef SUANPAN_DISTRIBUTED
+int eig_psolve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
+#endif
 
 #endif
 

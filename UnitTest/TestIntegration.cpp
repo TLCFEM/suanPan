@@ -14,40 +14,40 @@ double test_quartic(const double x) { return x * x * x * x - 2. * x * x * x - 6.
 
 TEST_CASE("Radau", "[Utility.Integration]") {
     for(auto I = 3u; I <= 10u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::RADAU), test_cubic)) == 4);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::RADAU), test_cubic)) == 4);
     for(auto I = 4u; I <= 10u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::RADAU), test_quartic)) == -5.6);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::RADAU), test_quartic)) == -5.6);
 }
 
 TEST_CASE("Lobatto", "[Utility.Integration]") {
     for(auto I = 3u; I <= 20u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::LOBATTO), test_cubic)) == 4);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::LOBATTO), test_cubic)) == 4);
     for(auto I = 4u; I <= 20u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::LOBATTO), test_quartic)) == -5.6);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::LOBATTO), test_quartic)) == -5.6);
 }
 
 TEST_CASE("Gauss", "[Utility.Integration]") {
     for(auto I = 2u; I <= 20u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::GAUSS), test_cubic)) == 4);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::GAUSS), test_cubic)) == 4);
     for(auto I = 3u; I <= 20u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::GAUSS), test_quartic)) == -5.6);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::GAUSS), test_quartic)) == -5.6);
 }
 
 TEST_CASE("Chebyshev", "[Utility.Integration]") {
     for(auto I = 2u; I <= 7u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::CHEBYSHEV), test_cubic)) == 4);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::CHEBYSHEV), test_cubic)) == 4);
     for(auto I = 4u; I <= 7u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::CHEBYSHEV), test_quartic)) == -5.6);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::CHEBYSHEV), test_quartic)) == -5.6);
 }
 
 double test_weighted_function(const double x) { return x * x + 2.; }
 
 TEST_CASE("Hermite", "[Utility.Integration]") {
     for(auto I = 2u; I <= 20u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::HERMITE), test_weighted_function)) == 4.43113);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::HERMITE), test_weighted_function)) == 4.43113);
 }
 
 TEST_CASE("Laguerre", "[Utility.Integration]") {
     for(auto I = 2u; I <= 20u; ++I)
-        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationType::LAGUERRE), test_weighted_function)) == 4);
+        REQUIRE(Approx(test_integration(IntegrationPlan(1, I, IntegrationPlan::Type::LAGUERRE), test_weighted_function)) == 4);
 }

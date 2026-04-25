@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ int TimberPD::initialize(const shared_ptr<DomainBase>& D) {
     return BilinearHoffman::initialize(D);
 }
 
-unique_ptr<Material> TimberPD::get_copy() { return std::make_unique<TimberPD>(*this); }
+unique_ptr<Material> TimberPD::unique_copy() { return std::make_unique<TimberPD>(*this); }
 
 int TimberPD::update_trial_status(const vec& t_strain) {
     if(SUANPAN_SUCCESS != BilinearHoffman::update_trial_status(t_strain)) return SUANPAN_FAIL;
@@ -103,7 +103,7 @@ double TimberPD::compute_damage_t(const double r_t) const { return 1. - ini_r_t 
 
 double TimberPD::compute_damage_c(const double r_c) const { return b_c * std::pow(std::max(0., 1. - ini_r_c / r_c), m_c); }
 
-std::vector<vec> TimberPD::record(const OutputType P) {
+std::vector<vec> TimberPD::record(const OutputType P) const {
     if(P == OutputType::DT) return {vec{compute_damage_t(current_history(7))}};
     if(P == OutputType::DC) return {vec{compute_damage_c(current_history(8))}};
 

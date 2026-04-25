@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,19 +33,27 @@
 class DomainBase;
 
 class Recorder : public UniqueTag {
-    uvec object_tag;
-    OutputType variable_type;
-    std::vector<double> time_pool;                        // recorded data
-    std::vector<std::vector<std::vector<vec>>> data_pool; // recorded data
-
-    const bool record_time;
     const bool use_hdf5;
 
-protected:
-    const unsigned interval;
-    unsigned counter = 0;
+    static auto normalise_size(std::vector<std::vector<vec>>&);
 
-    bool if_perform_record();
+protected:
+    static std::vector<vec> normalise_size(std::vector<vec>&&);
+
+    const OutputType original_type, variable_type;
+    const int component;
+    const unsigned interval;
+    const uvec reference_tag;
+
+    uvec object_tag;
+    std::vector<double> time_pool;                                      // recorded data
+    std::unordered_map<uword, std::vector<std::vector<vec>>> data_pool; // recorded data
+
+    unsigned counter = 0u;
+
+    virtual const uvec& update_tag(const shared_ptr<DomainBase>&);
+
+    virtual void record_impl(const shared_ptr<DomainBase>&) = 0;
 
 public:
     Recorder(
@@ -53,30 +61,17 @@ public:
         uvec&&,     // object tags
         OutputType, // recorder type
         unsigned,   // interval
-        bool,       // if to record time
         bool        // if to use hdf5
     );
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 
-    void set_object_tag(uvec&&);
-    [[nodiscard]] const uvec& get_object_tag() const;
-
-    void set_variable_type(OutputType);
-    [[nodiscard]] const OutputType& get_variable_type() const;
-
-    [[nodiscard]] bool if_hdf5() const;
-    [[nodiscard]] bool if_record_time() const;
-
     void insert(double);
-    void insert(const std::vector<vec>&, unsigned);
+    void insert(std::vector<vec>&&, uword);
 
-    [[nodiscard]] const std::vector<std::vector<std::vector<vec>>>& get_data_pool() const;
-    [[nodiscard]] const std::vector<double>& get_time_pool() const;
+    void record(const shared_ptr<DomainBase>&);
 
-    virtual void record(const shared_ptr<DomainBase>&) = 0;
-
-    void clear_status();
+    virtual void clear_status();
 
     virtual void save();
 

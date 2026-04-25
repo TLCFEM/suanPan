@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@
 
 class DomainBase;
 
-class Converger : public CopiableTag {
+class Converger : public CopyableTag {
     std::weak_ptr<DomainBase> database; /**< pointer to DomainBase */
 
     double tolerance; /**< tolerance */
@@ -64,7 +64,7 @@ public:
 
     virtual int initialize();
 
-    virtual unique_ptr<Converger> get_copy() = 0;
+    virtual unique_ptr<Converger> unique_copy() = 0;
 
     void set_tolerance(double);
     [[nodiscard]] double get_tolerance() const;

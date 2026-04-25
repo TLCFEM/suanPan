@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,25 +21,23 @@
 #include <Domain/Factory.hpp>
 #include <Load/Amplitude/Amplitude.h>
 
+void AmplitudeRecorder::record_impl(const shared_ptr<DomainBase>& D) {
+    const sp_d auto current_time = D->get_factory()->get_current_time();
+
+    for(const auto I : object_tag) insert({{D->get<Amplitude>(I)->get_amplitude(current_time)}}, I);
+
+    insert(current_time);
+}
+
 void AmplitudeRecorder::initialize(const shared_ptr<DomainBase>& D) {
-    for(const auto I : get_object_tag())
+    for(const auto I : reference_tag)
         if(!D->find<Amplitude>(I)) {
+            suanpan_warning("Amplitude {} is not available/active, recorder {} is disabled.\n", I, get_tag());
             D->disable_recorder(get_tag());
             return;
         }
+
+    Recorder::initialize(D);
 }
 
-void AmplitudeRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
-    const sp_d auto current_time = D->get_factory()->get_current_time();
-    auto& obj_tag = get_object_tag();
-
-    for(unsigned I = 0; I < obj_tag.n_elem; ++I) insert({{D->get<Amplitude>(obj_tag(I))->get_amplitude(current_time)}}, I);
-
-    if(if_record_time()) insert(current_time);
-}
-
-void AmplitudeRecorder::print() {
-    suanpan_info("A recorder to record amplitudes.\n");
-}
+void AmplitudeRecorder::print() { suanpan_info("A recorder to record amplitudes.\n"); }

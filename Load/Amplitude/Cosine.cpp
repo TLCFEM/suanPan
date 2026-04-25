@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ Cosine::Cosine(const unsigned T, const double L, std::vector<double>&& AA)
     , period(.5 * L)
     , amp(std::move(AA)) {}
 
-unique_ptr<Amplitude> Cosine::get_copy() { return std::make_unique<Cosine>(*this); }
+unique_ptr<Amplitude> Cosine::unique_copy() { return std::make_unique<Cosine>(*this); }
 
 double Cosine::get_amplitude(const double T) {
     const auto step_time = T - start_time;

@@ -154,7 +154,7 @@ element CP4 64 79 84 85 80 1 1
 material BilinearJ2 2 5000 .2 80 .05
 material PlaneStress 1 2
 
-fix 1 P 1 2 3 4 5
+fix 1 E 1 2 3 4 5
 
 cload 1 0 2 2 84 83 82
 cload 2 0 1 2 85 81

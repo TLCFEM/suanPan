@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double StressWrapper::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
+double StressWrapper::get(const Parameter P) const { return base->get(P); }
 
 int StressWrapper::update_trial_status(const vec& t_strain) {
     auto& t_stress = base->get_trial_stress();
@@ -71,10 +71,10 @@ int StressWrapper::update_trial_status(const vec& t_strain) {
             if(SUANPAN_SUCCESS != base->update_trial_status(trial_full_strain)) return SUANPAN_FAIL;
 
             const vec incre = solve(t_stiffness(F2, F2), t_stress(F2));
-            const auto error = inf_norm(incre);
+            const auto error = suanpan::inf_norm(incre);
             if(1u == counter) ref_error = error;
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error < tolerance * ref_error || (inf_norm(t_stress(F2)) < tolerance && counter > 5u)) break;
+            if(error < tolerance * ref_error || (suanpan::inf_norm(t_stress(F2)) < tolerance && counter > 5u)) break;
 
             trial_full_strain(F2) -= incre;
         }
@@ -111,4 +111,4 @@ int StressWrapper::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> StressWrapper::record(const OutputType P) { return base->record(P); }
+std::vector<vec> StressWrapper::record(const OutputType P) const { return base->record(P); }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ protected:
 public:
     Expression(unsigned, std::vector<std::string>&&);
 
-    [[nodiscard]] virtual unique_ptr<Expression> get_copy() const = 0;
+    [[nodiscard]] virtual unique_ptr<Expression> unique_copy() const = 0;
 
     [[nodiscard]] virtual uword input_size() const;
     [[nodiscard]] virtual uword output_size() const;
@@ -70,7 +70,7 @@ class SimpleScalarExpression final : public Expression {
 public:
     SimpleScalarExpression(unsigned, std::string_view);
 
-    [[nodiscard]] unique_ptr<Expression> get_copy() const override;
+    [[nodiscard]] unique_ptr<Expression> unique_copy() const override;
 
     Mat<double> evaluate(const Col<double>&) override;
 
@@ -83,7 +83,7 @@ class SimpleVectorExpression final : public Expression {
 public:
     SimpleVectorExpression(unsigned, std::string_view, std::string_view);
 
-    [[nodiscard]] unique_ptr<Expression> get_copy() const override;
+    [[nodiscard]] unique_ptr<Expression> unique_copy() const override;
 
     [[nodiscard]] uword output_size() const override;
 

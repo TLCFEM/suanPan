@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,26 @@
 
 #include "SupportMotion.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/Amplitude/Amplitude.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 
-SupportMotion::SupportMotion(const unsigned T, const double L, uvec&& N, uvec&& D, const unsigned AT)
-    : Load(T, AT, std::move(N), std::move(D), L) { enable_displacement_control(); }
+SupportMotion::SupportMotion(const unsigned T, const double L, uvec&& N, std::vector<Node::DOF>&& D, const unsigned AT)
+    : Load(T, AT, {}, std::move(D), L) { target_node = std::move(N); }
 
 int SupportMotion::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+
     set_end_step(start_step + 1);
 
-    D->get_factory()->update_reference_dof(encoding = get_nodal_active_dof(D));
+    D->get_factory()->update_reference_dof(target_dof = collect_node_dof(D));
 
-    return Load::initialize(D);
+    return SUANPAN_SUCCESS;
 }
 
 int SupportDisplacement::process(const shared_ptr<DomainBase>& D) {
-    const auto& W = D->get_factory();
-
-    trial_settlement.zeros(W->get_size());
-
-    trial_settlement(encoding).fill(pattern * amplitude->get_amplitude(W->get_trial_time()));
+    if(target_dof.is_empty()) trial_settlement.reset();
+    else trial_settlement.zeros(D->get_factory()->get_size())(target_dof).fill(magnitude * get_amplitude(D));
 
     return SUANPAN_SUCCESS;
 }
@@ -48,9 +45,8 @@ int SupportVelocity::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();
     const auto& G = D->get_current_step()->get_integrator();
 
-    trial_settlement.zeros(W->get_size());
-
-    trial_settlement(encoding) = G->from_total_velocity(pattern * amplitude->get_amplitude(W->get_trial_time()), encoding);
+    if(target_dof.is_empty()) trial_settlement.reset();
+    else trial_settlement.zeros(W->get_size())(target_dof) = G->from_total_velocity(magnitude * get_amplitude(D), target_dof);
 
     return SUANPAN_SUCCESS;
 }
@@ -59,9 +55,8 @@ int SupportAcceleration::process(const shared_ptr<DomainBase>& D) {
     const auto& W = D->get_factory();
     const auto& G = D->get_current_step()->get_integrator();
 
-    trial_settlement.zeros(W->get_size());
-
-    trial_settlement(encoding) = G->from_total_acceleration(pattern * amplitude->get_amplitude(W->get_trial_time()), encoding);
+    if(target_dof.is_empty()) trial_settlement.reset();
+    else trial_settlement.zeros(W->get_size())(target_dof) = G->from_total_acceleration(magnitude * get_amplitude(D), target_dof);
 
     return SUANPAN_SUCCESS;
 }

@@ -48,7 +48,8 @@ class [[nodiscard]] thread_pool {
         for(concurrency_t i = 0; i < thread_count; ++i) threads[i].join();
     }
 
-    [[nodiscard]] static concurrency_t determine_thread_count(const concurrency_t thread_count_) { return thread_count_ > 0 ? thread_count_ : std::thread::hardware_concurrency() > 0 ? std::thread::hardware_concurrency() : 1; }
+    [[nodiscard]] static concurrency_t determine_thread_count(const concurrency_t thread_count_) { return thread_count_ > 0 ? thread_count_ : std::thread::hardware_concurrency() > 0 ? std::thread::hardware_concurrency() :
+                                                                                                                                                                                        1; }
 
     void worker() {
         while(running) {
@@ -90,7 +91,9 @@ public:
             block_size = 1;
             num_blocks = (total_size > 1) ? total_size : 1;
         }
-        if(total_size > 0) { for(size_t i = 0; i < num_blocks; ++i) push_task(std::forward<F>(loop), static_cast<T>(i * block_size) + first_index, (i == num_blocks - 1) ? index_after_last : (static_cast<T>((i + 1) * block_size) + first_index)); }
+        if(total_size > 0) {
+            for(size_t i = 0; i < num_blocks; ++i) push_task(std::forward<F>(loop), static_cast<T>(i * block_size) + first_index, (i == num_blocks - 1) ? index_after_last : (static_cast<T>((i + 1) * block_size) + first_index));
+        }
     }
 
     template<typename F, typename T> void push_loop(const T index_after_last, F&& loop, const size_t num_blocks = 0) { push_loop(0, index_after_last, std::forward<F>(loop), num_blocks); }
@@ -117,8 +120,11 @@ public:
                 else { task_promise->set_value(std::invoke(task_function)); }
             }
             catch(...) {
-                try { task_promise->set_exception(std::current_exception()); }
-                catch(...) {}
+                try {
+                    task_promise->set_exception(std::current_exception());
+                }
+                catch(...) {
+                }
             }
         });
         return task_promise->get_future();

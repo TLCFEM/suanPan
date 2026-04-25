@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,8 +119,8 @@ DuncanSelig::ds_moduli DuncanSelig::compute_plastic_moduli() {
     else max_dev_stress = min_ratio * p_atm;
 
     const auto dev_stress = s1 - s3;
-    const auto pdsps1 = 1.;
-    const auto pdsps3 = -1.;
+    constexpr auto pdsps1 = 1.;
+    constexpr auto pdsps3 = -1.;
 
     const auto [ini_elastic, deids3] = compute_elastic(s3);
 
@@ -197,10 +197,10 @@ int DuncanSelig::project_onto_surface(double& multiplier) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local elastic iteration error: {:.5E}.\n", error / ref_error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) return SUANPAN_SUCCESS;
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) return SUANPAN_SUCCESS;
 
         trial_stress -= incre.head(3);
         multiplier -= incre(3);
@@ -250,10 +250,10 @@ int DuncanSelig::local_update(const vec& ref_stress, const vec& ref_strain, cons
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
             return SUANPAN_SUCCESS;
@@ -285,7 +285,7 @@ int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> DuncanSelig::get_copy() { return std::make_unique<DuncanSelig>(*this); }
+unique_ptr<Material> DuncanSelig::unique_copy() { return std::make_unique<DuncanSelig>(*this); }
 
 int DuncanSelig::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

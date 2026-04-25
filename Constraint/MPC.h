@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,12 +32,15 @@
 #include "Constraint.h"
 
 class MPC final : public Constraint {
-    const uvec dof_pool;
-    const vec weight_pool;
-    const double pseudo_load;
+public:
+    using Pack = std::vector<std::tuple<uword, Node::DOF, double>>;
+
+private:
+    const double magnitude;
+    const Pack pool;
 
 public:
-    MPC(unsigned, unsigned, uvec&&, uvec&&, vec&&, double);
+    MPC(unsigned, unsigned, double, Pack&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 

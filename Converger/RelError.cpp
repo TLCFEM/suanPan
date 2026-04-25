@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 RelError::RelError(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelError::get_copy() { return std::make_unique<RelError>(*this); }
+unique_ptr<Converger> RelError::unique_copy() { return std::make_unique<RelError>(*this); }
 
 /**
  * \brief Method to return `conv_flag`.
@@ -39,7 +39,7 @@ unique_ptr<Converger> RelError::get_copy() { return std::make_unique<RelError>(*
 bool RelError::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    const auto rel_error = std::fabs(W->get_error()) / inf_norm(W->get_trial_displacement());
+    const auto rel_error = std::fabs(W->get_error()) / suanpan::inf_norm(W->get_trial_displacement());
     set_error(std::isfinite(rel_error) ? rel_error : 1.);
     set_conv_flag(get_tolerance() > get_error());
 

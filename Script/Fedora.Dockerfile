@@ -1,4 +1,4 @@
-FROM fedora:42 AS build
+FROM fedora:44 AS build
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \
@@ -8,19 +8,30 @@ RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "repo_gpgcheck=1" >> /etc/yum.repos.d/oneAPI.repo && \
     echo "gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" >> /etc/yum.repos.d/oneAPI.repo
 
-RUN dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git intel-oneapi-mkl-devel
+RUN dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git intel-oneapi-mkl-devel=2025.3.1-8
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.5/VTK-9.5.2.tar.gz && tar xf VTK-9.5.2.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.5.2 && \
+    wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.1.tar.gz && tar xf VTK-9.6.1.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.6.1 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/suanPan.git && \
-    cd suanPan && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DSP_BUILD_PARALLEL=ON -DSP_ENABLE_HDF5=ON -DSP_ENABLE_VTK=ON -DSP_ENABLE_MKL=ON -DSP_ENABLE_IOMP=OFF -DSP_ENABLE_SHARED_MKL=OFF -DBUILD_PACKAGE=RPM .. && \
+    cd suanPan && mkdir build && cd build && cmake \
+    -DBUILD_PACKAGE=RPM \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_CXX_FLAGS="-Wno-stringop-overflow -Wno-stringop-overread" \
+    -DSP_BUILD_PARALLEL=ON \
+    -DSP_ENABLE_AVX2=OFF \
+    -DSP_ENABLE_HDF5=ON \
+    -DSP_ENABLE_IOMP=OFF \
+    -DSP_ENABLE_MKL=ON \
+    -DSP_ENABLE_SHARED_MKL=OFF \
+    -DSP_ENABLE_VTK=ON \
+    .. && \
     make package -j"$(nproc)" && cp suanPan*.rpm / && \
     cd / && rm -r suanPan
 
-FROM fedora:42
+FROM fedora:44
 
 COPY --from=build /suanPan*.rpm /
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ ExpJ2::ExpJ2(const unsigned T, const double E, const double V, const double YS, 
     : DataExpJ2{fabs(YS), PA, PB}
     , NonlinearJ2(T, E, V, R) {}
 
-unique_ptr<Material> ExpJ2::get_copy() { return std::make_unique<ExpJ2>(*this); }
+unique_ptr<Material> ExpJ2::unique_copy() { return std::make_unique<ExpJ2>(*this); }
 
 void ExpJ2::print() {
     suanpan_info("A 3D exponential hardening model.\n");

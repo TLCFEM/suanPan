@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ public:
     [[nodiscard]] bool time_independent_matrix() const override;
 
     void assemble_resistance() override;
-    void assemble_matrix() override;
+    void assemble_effective_matrix() override;
 
     void update_incre_time(double) override;
 

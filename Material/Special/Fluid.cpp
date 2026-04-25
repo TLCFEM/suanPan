@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@ Fluid::Fluid(const unsigned T, const double E, const double R)
 
 int Fluid::initialize(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
 
-double Fluid::get_parameter(const ParameterType P) const {
-    if(ParameterType::BULKMODULUS == P) return bulk_modulus;
+double Fluid::get(const Parameter P) const {
+    if(Parameter::BULK == P) return bulk_modulus;
     return 0.;
 }
 
-unique_ptr<Material> Fluid::get_copy() { return std::make_unique<Fluid>(*this); }
+unique_ptr<Material> Fluid::unique_copy() { return std::make_unique<Fluid>(*this); }
 
 int Fluid::update_trial_status(const vec&) { return SUANPAN_SUCCESS; }
 

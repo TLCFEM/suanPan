@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Group/Group.h>
-#include <Domain/Node.h>
 
 const mat Contact2D::rotation{{0., -1.}, {1., 0.}};
 
@@ -45,7 +44,7 @@ void Contact2D::update_position() {
 }
 
 Contact2D::Contact2D(const unsigned T, const unsigned M, const unsigned S, const double P)
-    : Element(T, c_dof, {M, S})
+    : Element(T, c_dof, {M, S}, suanpan::translational(c_dof))
     , master_tag(M)
     , slave_tag(S)
     , alpha(P) {}

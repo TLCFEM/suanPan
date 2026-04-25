@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ func fetch() error {
 		newMinor, _ := strconv.Atoi(number[2])
 		newPatch := 0
 
-		if "" != number[3] {
+		if number[3] != "" {
 			newPatch, _ = strconv.Atoi(number[3])
 		}
 
@@ -220,12 +220,7 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 
 	fmt.Printf("Downloaded %s\n", absPath)
 
-	isArchive := false
-	isArchive = isArchive || strings.HasSuffix(absPath, "zip")
-	isArchive = isArchive || strings.HasSuffix(absPath, "tar.gz")
-	isArchive = isArchive || strings.HasSuffix(absPath, "7z")
-
-	if isArchive {
+	if isArchive(absPath) {
 		if cos == "windows" || fromMain {
 			fmt.Printf("You can manually extract the archive to overwrite the existing folder.\n")
 		} else {

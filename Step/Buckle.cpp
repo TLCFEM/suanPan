@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ Buckle::Buckle(const unsigned T)
 
 int Buckle::initialize() {
 #ifdef SUANPAN_DISTRIBUTED
-    suanpan_warning("Buckling analysis currently does not support distributed computation thus it will be conducted on each node.\n");
+    suanpan_warning("Not every buckling analysis solver supports distributed computation; some instead execute the analysis independently on each node. Refer to the documentation for specific details.\n");
 #endif
 
     const auto t_domain = database.lock();
@@ -76,7 +76,7 @@ int Buckle::analyze() {
 
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
-    const shared_ptr t_geometry = W->get_geometry()->make_copy();
+    const shared_ptr t_geometry = W->get_geometry()->unique_copy();
     t_geometry *= -1.;
 
     if(eig_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_geometry, 1, "SM") != SUANPAN_SUCCESS) return SUANPAN_FAIL;

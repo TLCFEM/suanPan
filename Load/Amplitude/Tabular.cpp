@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
     }
 }
 
-unique_ptr<Amplitude> Tabular::get_copy() { return std::make_unique<Tabular>(*this); }
+unique_ptr<Amplitude> Tabular::unique_copy() { return std::make_unique<Tabular>(*this); }
 
 double Tabular::get_amplitude(const double T) {
     const auto step_time = T - start_time;

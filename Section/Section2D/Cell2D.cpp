@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,14 +31,14 @@ int Cell2D::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(linear_density) = area * material_proto->get_density();
 
     int_pt.clear();
-    int_pt.emplace_back(0., area, material_proto->get_copy());
+    int_pt.emplace_back(0., area, material_proto->unique_copy());
 
     initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Cell2D::get_copy() { return std::make_unique<Cell2D>(*this); }
+unique_ptr<Section> Cell2D::unique_copy() { return std::make_unique<Cell2D>(*this); }
 
 void Cell2D::print() {
     suanpan_info("A 2D section that represents a small cell.\n");

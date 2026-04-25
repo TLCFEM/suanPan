@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ class DomainBase;
 class Element;
 class Group;
 class Integrator;
+class Interaction;
 class Load;
 class Material;
 class Modifier;
@@ -72,6 +73,8 @@ template<> inline const char* StorageType<Element>() { return "Element"; }
 template<> inline const char* StorageType<Group>() { return "Group"; }
 
 template<> inline const char* StorageType<Integrator>() { return "Integrator"; }
+
+template<> inline const char* StorageType<Interaction>() { return "Interaction"; }
 
 template<> inline const char* StorageType<Load>() { return "Load"; }
 
@@ -220,6 +223,7 @@ using DomainBaseStorage = Storage<DomainBase>;
 using ElementStorage = Storage<Element>;
 using GroupStorage = Storage<Group>;
 using IntegratorStorage = Storage<Integrator>;
+using InteractionStorage = Storage<Interaction>;
 using LoadStorage = Storage<Load>;
 using MaterialStorage = Storage<Material>;
 using ModifierStorage = Storage<Modifier>;

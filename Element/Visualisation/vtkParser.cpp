@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+// ReSharper disable CppUseElementsView
 #ifdef SUANPAN_VTK
 
 // ReSharper disable StringLiteralTypo
 #include "vtkParser.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Toolbox/utility.h>
-#include <vtkAutoInit.h>
-VTK_MODULE_INIT(vtkRenderingOpenGL2)  // NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
-VTK_MODULE_INIT(vtkInteractionStyle)  // NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
-VTK_MODULE_INIT(vtkRenderingFreeType) // NOLINT(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
-
 #include <vtkActor.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetMapper.h>
 #include <vtkDoubleArray.h>
+#include <vtkInformation.h>
 #include <vtkLookupTable.h>
+#include <vtkMultiBlockDataSet.h>
 #include <vtkNamedColors.h>
 #include <vtkPointData.h>
 #include <vtkProperty.h>
@@ -42,7 +39,7 @@ VTK_MODULE_INIT(vtkRenderingFreeType) // NOLINT(cppcoreguidelines-special-member
 #include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkUnstructuredGridWriter.h>
+#include <vtkXMLMultiBlockDataWriter.h>
 
 vtkInfo vtk_process(std::istringstream& command) {
     vtkInfo config;
@@ -50,32 +47,40 @@ vtkInfo vtk_process(std::istringstream& command) {
     std::string keyword;
 
     while(!command.eof() && get_input(command, keyword))
-        if(is_equal(keyword, "scale") && !get_input(command, config.scale)) config.scale = 1.;
-        else if(is_equal(keyword, "deformed")) config.on_deformed = true;
-        else if(is_equal(keyword, "undeformed")) config.on_deformed = false;
-        else if(is_equal(keyword, "type") && get_input(command, keyword)) config.type = to_token(keyword);
-        else if(is_equal(keyword, "fontsize") && !get_input(command, config.font_size)) config.font_size = 8;
-        else if(is_equal(keyword, "save") && get_input(command, config.file_name)) config.save_file = true;
-        else if(is_equal(keyword, "nobar")) config.colorbar = false;
-        else if(is_equal(keyword, "material") && !get_input(command, config.material_type)) config.material_type = -1;
-        else if(is_equal(keyword, "size")) {
-            if(!get_input(command, config.canvas_size[0])) config.canvas_size[0] = 500;
-            if(!get_input(command, config.canvas_size[1])) config.canvas_size[1] = 500;
+        if(is_equal(keyword, "scale")) get_input(command, config.scale);
+        else if(is_equal(keyword, "type") && get_input(command, keyword)) config.set(to_token(keyword));
+        else if(is_equal(keyword, "fontsize")) get_input(command, config.font_size);
+        else if(is_equal(keyword, "save")) get_input(command, config.file_name);
+        else if(is_equal(keyword, "nobar")) config.color_bar = false;
+        else if(is_equal(keyword, "element")) config.per_element = true;
+        else if(is_equal(keyword, "material")) {
+            config.per_material = true;
+            config.per_section = false;
         }
+        else if(is_equal(keyword, "section")) {
+            config.per_section = true;
+            config.per_material = false;
+        }
+        else if(is_equal(keyword, "size")) {
+            get_input(command, config.canvas_size[0]);
+            get_input(command, config.canvas_size[1]);
+        }
+
+    config.title_name = "Plotting Quantity " + std::string(to_name(config.display_type));
 
     return config;
 }
 
-void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& config) {
-    const auto color = vtkSmartPointer<vtkNamedColors>::New();
-    const auto table = vtkSmartPointer<vtkLookupTable>::New();
-    const auto func = vtkSmartPointer<vtkColorTransferFunction>::New();
-    const auto mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-    const auto bar = vtkSmartPointer<vtkScalarBarActor>::New();
-    const auto actor = vtkSmartPointer<vtkActor>::New();
-    const auto interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    const auto renderer = vtkSmartPointer<vtkRenderer>::New();
-    const auto window = vtkSmartPointer<vtkRenderWindow>::New();
+void vtk_setup(vtkUnstructuredGrid* grid, const vtkInfo& config) {
+    const vtkNew<vtkNamedColors> color;
+    const vtkNew<vtkLookupTable> table;
+    const vtkNew<vtkColorTransferFunction> func;
+    const vtkNew<vtkDataSetMapper> mapper;
+    const vtkNew<vtkScalarBarActor> bar;
+    const vtkNew<vtkActor> actor;
+    const vtkNew<vtkRenderWindowInteractor> interactor;
+    const vtkNew<vtkRenderer> renderer;
+    const vtkNew<vtkRenderWindow> window;
 
     func->SetColorSpaceToDiverging();
     func->AddRGBPoint(0., .230, .299, .754);
@@ -88,22 +93,26 @@ void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& 
         table->SetTableValue(I, rgb);
     }
 
-    mapper->SetInputDataObject(grid);
-    mapper->SetLookupTable(table);
-    mapper->SetScalarRange(grid->GetPointData()->GetScalars()->GetRange());
+    const auto scalar = grid->GetPointData()->GetScalars();
+    const auto index = std::max(0, std::min(to_index(config.display_type), scalar->GetNumberOfComponents() - 1));
 
-    bar->SetLookupTable(mapper->GetLookupTable());
+    mapper->SetInputDataObject(grid);
+    mapper->SelectColorArray(scalar->GetName());
+    mapper->SetScalarModeToUsePointFieldData();
+    mapper->SetArrayComponent(index);
+    mapper->SetScalarRange(scalar->GetRange(index));
+    mapper->SetLookupTable(table);
+
+    bar->SetLookupTable(table);
 
     actor->SetMapper(mapper);
     actor->GetProperty()->SetColor(color->GetColor3d("DodgerBlue").GetData());
     actor->GetProperty()->EdgeVisibilityOn();
     actor->GetProperty()->SetOpacity(1.);
+    actor->GetProperty()->SetLineWidth(4.);
 
     renderer->AddActor(actor);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    if(config.colorbar) renderer->AddActor2D(bar);
-#pragma GCC diagnostic pop
+    if(config.color_bar) renderer->AddViewProp(bar);
     renderer->SetBackground(color->GetColor3d("Grey").GetData());
     renderer->ResetCameraClippingRange();
 
@@ -118,166 +127,239 @@ void vtk_setup(const vtkSmartPointer<vtkUnstructuredGrid>& grid, const vtkInfo& 
     interactor->Start();
 }
 
-void vtk_save(vtkSmartPointer<vtkUnstructuredGrid>&& grid, const vtkInfo config) {
-    // NOLINT(performance-unnecessary-value-param)
-    const auto writer = vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+void vtk_save(vtkNew<vtkMultiBlockDataSet>&& grid, std::string file_name) {
+    const vtkNew<vtkXMLMultiBlockDataWriter> writer;
+    if(const auto ext = writer->GetDefaultFileExtension(); !file_name.ends_with(ext)) file_name += "." + std::string(ext);
     writer->SetInputData(grid);
-    writer->SetFileName(config.file_name.c_str());
-    writer->SetFileTypeToBinary();
+    writer->SetFileName(file_name.c_str());
+#ifdef SUANPAN_DEBUG
+    writer->SetDataModeToAscii();
+    writer->SetCompressorTypeToNone();
+#else
+    writer->SetDataModeToBinary();
+#endif
     writer->Write();
-    suanpan_debug("Plot is written to file \"{}\".\n", config.file_name);
+    suanpan_debug("Plot is written to file \"{}\".\n", file_name);
 }
 
 int vtk_parser(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    auto plot_info = vtk_process(command);
-    if(!plot_info.on_deformed) plot_info.scale = 0.;
-
-    const auto L = to_token(to_category(plot_info.type));
-
-    const auto func = OutputType::U == L || OutputType::V == L || OutputType::A == L || OutputType::RF == L || OutputType::DF == L || OutputType::IF == L ? vtk_plot_node_quantity : vtk_plot_element_quantity;
-
 #ifdef SUANPAN_WIN
-    domain->insert(std::async(std::launch::async, func, std::cref(domain), plot_info));
+    domain->insert(std::async(std::launch::async, vtk_cell_plot, std::cref(domain), vtk_process(command)));
 #else
-    func(domain, plot_info);
+    vtk_cell_plot(domain, vtk_process(command));
 #endif
 
     return SUANPAN_SUCCESS;
 }
 
-void vtk_plot_node_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    auto& t_node_pool = domain->get_node_pool();
-    auto& t_element_pool = domain->get_element_pool();
+class vtkBlock {
+    vtkIdType num_node{0}, num_cell{0};
 
-    config.title_name = "Plotting Nodal Quantity " + std::string(to_name(config.type));
+    const vtkNew<vtkDoubleArray> data;
+    const vtkNew<vtkPoints> node;
+    const vtkNew<vtkUnstructuredGrid> grid;
 
-    auto max_node = static_cast<unsigned>(t_node_pool.size());
-    for(const auto& I : t_node_pool) max_node = std::max(max_node, I->get_tag());
+#ifdef SUANPAN_MT
+    std::mutex mutex;
+#endif
 
-    auto data = vtkSmartPointer<vtkDoubleArray>::New();
-    auto node = vtkSmartPointer<vtkPoints>::New();
+    mat tensor;
+    u32_vec counter;
 
-    data->SetNumberOfComponents(6);
-    data->SetNumberOfTuples(++max_node);
-    node->SetNumberOfPoints(max_node);
+public:
+    auto& init(const vtkIdType node_size, const vtkIdType cell_size, const char* name) {
+        num_node = node_size;
+        num_cell = cell_size;
 
-    for(unsigned I = 0; I < max_node; ++I) {
-        node->SetPoint(I, 0., 0., 0.);
-        data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
+        data->SetNumberOfComponents(6);
+        data->SetNumberOfTuples(num_node);
+        data->SetName(name);
+        node->SetNumberOfPoints(num_node);
+
+        for(auto I = 0; I < num_node; ++I) {
+            node->SetPoint(I, 0., 0., 0.);
+            data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
+        }
+
+        if(num_cell > 1) {
+            tensor.zeros(6, num_node);
+            counter.zeros(num_node);
+        }
+
+        grid->Allocate(num_cell);
+
+        return *this;
     }
 
-    data->SetName(to_category(config.type).c_str());
-    data->SetComponentName(0, "1");
-    data->SetComponentName(1, "2");
-    data->SetComponentName(2, "3");
-    data->SetComponentName(3, "4");
-    data->SetComponentName(4, "5");
-    data->SetComponentName(5, "6");
+    auto add(const shared_ptr<Element>& element, const uvec& encoding, const vtkInfo& config) {
+        const auto cell = element->Setup(encoding);
+        if(!cell) return;
 
-    auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
-    std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
-        t_element->SetDeformation(node, config.scale);
-        t_element->GetData(data, to_token(to_category(config.type)));
-        if(const auto t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
+#ifdef SUANPAN_MT
+        const std::scoped_lock lock(mutex);
+#endif
+
+        grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+
+        const mat location = element->GetDeformation(config.scale).resize(3, encoding.n_elem);
+        for(auto I = 0u; I < encoding.n_elem; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), location.colptr(I));
+
+        auto result = element->GetData(config.record_type);
+        if(result.empty()) return;
+
+        result.resize(6, encoding.n_elem);
+        if(num_cell > 1) {
+            tensor.cols(encoding) += result;
+            counter(encoding) += 1u;
+        }
+        else
+            for(auto I = 0u; I < encoding.n_elem; ++I) data->SetTuple(static_cast<vtkIdType>(encoding(I)), result.colptr(I));
+    }
+
+    auto& attach() {
+        if(num_cell > 1) {
+            for(auto I = 0; I < num_node; ++I)
+                if(counter(I) > 0u) {
+                    tensor.col(I) /= counter(I);
+                    data->SetTuple(I, tensor.colptr(I));
+                }
+
+            tensor.reset();
+            counter.reset();
+        }
+
+        grid->SetPoints(node);
+        grid->GetPointData()->SetScalars(data);
+
+        return grid;
+    }
+};
+
+void vtk_cell_single_block(const shared_ptr<DomainBase>& domain, vtkInfo&& config) {
+    auto& node_map = domain->get_compact_node_map();
+    auto& element_pool = domain->get_element_pool();
+
+    vtkBlock block;
+    block.init(static_cast<vtkIdType>(node_map.size()), static_cast<vtkIdType>(element_pool.size()), config.category.c_str());
+
+    std::ranges::for_each(element_pool, [&](const shared_ptr<Element>& element) {
+        auto encoding = element->get_node_encoding();
+        for(auto& I : encoding) I = node_map.at(I);
+
+        block.add(element, encoding, config);
     });
 
-    grid->SetPoints(node);
-
-    if(config.store_ptr) {
-        grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
-        config.grid_ptr = grid;
-    }
-    else if(config.save_file) {
-        grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
-        domain->insert(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config)));
-    }
+    if(config.file_name.empty()) vtk_setup(block.attach(), config);
     else {
-        const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
-
-        sub_data->SetNumberOfTuples(data->GetNumberOfTuples());
-        sub_data->CopyComponent(0, data, to_index(config.type));
-
-        grid->GetPointData()->SetScalars(sub_data);
-
-        vtk_setup(grid, config);
+        vtkNew<vtkMultiBlockDataSet> root;
+        root->SetBlock(0u, block.attach());
+        root->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "Default");
+        domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
     }
 }
 
-void vtk_plot_element_quantity(const shared_ptr<DomainBase>& domain, vtkInfo config) {
-    auto& t_node_pool = domain->get_node_pool();
-    auto& t_element_pool = domain->get_element_pool();
+void vtk_cell_per_material(const shared_ptr<DomainBase>& domain, vtkInfo&& config) {
+    if(config.file_name.empty()) return;
 
-    config.title_name = "Plotting Element Quantity " + std::string(to_name(config.type));
+    std::unordered_map<uword, vtkIdType> element_count;
 
-    auto max_node = static_cast<unsigned>(t_node_pool.size());
-    for(const auto& I : t_node_pool) max_node = std::max(max_node, I->get_tag());
+    auto& element_pool = domain->get_element_pool();
+    for(auto& element : element_pool)
+        for(const auto tag : element->get_material_tag()) element_count[tag] += 1;
 
-    const auto data = vtkSmartPointer<vtkDoubleArray>::New();
-    auto node = vtkSmartPointer<vtkPoints>::New();
+    std::unordered_map<uword, vtkBlock> blocks;
 
-    data->SetNumberOfComponents(6);
-    data->SetNumberOfTuples(++max_node);
-    node->SetNumberOfPoints(max_node);
+    auto& compact_map = domain->get_compact_node_map_per_material();
+    for(auto& [tag, node_map] : compact_map)
+        if(element_count[tag] > 0) blocks[tag].init(static_cast<vtkIdType>(node_map.size()), element_count[tag], config.category.c_str());
 
-    for(unsigned I = 0; I < max_node; ++I) {
-        node->SetPoint(I, 0., 0., 0.);
-        data->SetTuple6(I, 0., 0., 0., 0., 0., 0.);
-    }
+    suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
+        for(const auto tag : element->get_material_tag()) {
+            auto encoding = element->get_node_encoding();
+            auto& node_map = compact_map.at(tag);
+            for(auto& I : encoding) I = node_map.at(I);
 
-    data->SetName(to_category(config.type).c_str());
-    data->SetComponentName(0, "1");
-    data->SetComponentName(1, "2");
-    data->SetComponentName(2, "3");
-    data->SetComponentName(3, "4");
-    data->SetComponentName(4, "5");
-    data->SetComponentName(5, "6");
-
-    mat tensor(6, max_node, fill::zeros);
-    vec counter(max_node, fill::zeros);
-
-    auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    grid->Allocate(static_cast<vtkIdType>(t_element_pool.size()));
-    std::ranges::for_each(t_element_pool, [&](const shared_ptr<Element>& t_element) {
-        if(-1 != config.material_type)
-            if(const auto& t_tag = t_element->get_material_tag(); t_tag.empty() || static_cast<uword>(config.material_type) != t_tag(0)) return;
-        t_element->SetDeformation(node, config.scale);
-        auto& t_encoding = t_element->get_node_encoding();
-        counter(t_encoding) += 1.;
-        if(const auto t_data = t_element->GetData(to_token(to_category(config.type))); !t_data.empty()) tensor.cols(t_encoding) += t_data;
-        if(const auto t_cell = t_element->GetCell(); nullptr != t_cell) grid->InsertNextCell(t_cell->GetCellType(), t_cell->GetPointIds());
+            blocks.at(tag).add(element, encoding, config);
+        }
     });
 
-    for(unsigned I = 0; I < max_node; ++I)
-        if(0. != counter(I)) {
-            tensor.col(I) /= counter(I);
-            data->SetTuple(I, tensor.colptr(I));
+    vtkNew<vtkMultiBlockDataSet> root;
+
+    auto counter = 0u;
+    for(auto& [tag, block] : blocks) {
+        root->SetBlock(counter, block.attach());
+        root->GetMetaData(counter++)->Set(vtkCompositeDataSet::NAME(), "Material " + std::to_string(tag));
+    }
+
+    domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
+}
+
+void vtk_cell_per_section(const shared_ptr<DomainBase>& domain, vtkInfo&& config) {
+    if(config.file_name.empty()) return;
+
+    std::unordered_map<uword, vtkIdType> element_count;
+
+    auto& element_pool = domain->get_element_pool();
+    for(auto& element : element_pool)
+        for(const auto tag : element->get_section_tag()) element_count[tag] += 1;
+
+    std::unordered_map<uword, vtkBlock> blocks;
+
+    auto& compact_map = domain->get_compact_node_map_per_section();
+    for(auto& [tag, node_map] : compact_map)
+        if(element_count[tag] > 0) blocks[tag].init(static_cast<vtkIdType>(node_map.size()), element_count[tag], config.category.c_str());
+
+    suanpan::for_all(element_pool, [&](const shared_ptr<Element>& element) {
+        for(const auto tag : element->get_section_tag()) {
+            auto encoding = element->get_node_encoding();
+            auto& node_map = compact_map.at(tag);
+            for(auto& I : encoding) I = node_map.at(I);
+
+            blocks.at(tag).add(element, encoding, config);
         }
+    });
 
-    grid->SetPoints(node);
+    vtkNew<vtkMultiBlockDataSet> root;
 
-    if(config.store_ptr) {
-        grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
-        config.grid_ptr = grid;
+    auto counter = 0u;
+    for(auto& [tag, block] : blocks) {
+        root->SetBlock(counter, block.attach());
+        root->GetMetaData(counter++)->Set(vtkCompositeDataSet::NAME(), "Section " + std::to_string(tag));
     }
-    else if(config.save_file) {
-        grid->GetPointData()->SetScalars(data);
-        grid->GetPointData()->SetActiveScalars(to_category(config.type).c_str());
-        domain->insert(std::async(std::launch::async, vtk_save, std::move(grid), std::move(config)));
+
+    domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
+}
+
+void vtl_cell_multiple_block(const shared_ptr<DomainBase>& domain, vtkInfo&& config) {
+    if(config.file_name.empty()) return;
+
+    suanpan::unordered_map<uword, vtkBlock> blocks;
+    suanpan::for_all(domain->get_element_pool(), [&](const shared_ptr<Element>& element) {
+        auto encoding = element->get_node_encoding();
+        for(auto I = 0llu; I < encoding.n_elem; ++I) encoding(I) = I;
+
+        blocks[element->get_tag()].init(static_cast<vtkIdType>(encoding.n_elem), 1, config.category.c_str()).add(element, encoding, config);
+    });
+
+    vtkNew<vtkMultiBlockDataSet> root;
+
+    auto counter{0u};
+    for(auto& [tag, block] : blocks) {
+        root->SetBlock(counter, block.attach());
+        root->GetMetaData(counter++)->Set(vtkCompositeDataSet::NAME(), "Element " + std::to_string(tag));
     }
-    else {
-        const auto sub_data = vtkSmartPointer<vtkDoubleArray>::New();
 
-        sub_data->SetNumberOfTuples(data->GetNumberOfTuples());
-        sub_data->CopyComponent(0, data, to_index(config.type));
+    domain->insert(std::async(std::launch::async, vtk_save, std::move(root), config.file_name));
+}
 
-        grid->GetPointData()->SetScalars(sub_data);
+void vtk_cell_plot(const shared_ptr<DomainBase>& domain, vtkInfo config) {
+    auto handler = vtk_cell_single_block;
 
-        vtk_setup(grid, config);
-    }
+    if(config.per_element) handler = vtl_cell_multiple_block;
+    else if(config.per_material) handler = vtk_cell_per_material;
+    else if(config.per_section) handler = vtk_cell_per_section;
+
+    return handler(domain, std::move(config));
 }
 
 #endif

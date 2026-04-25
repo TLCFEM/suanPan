@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,10 +135,10 @@ int VAFNM::compute_local_integration(vec& q, mat& jacobian) {
 
         const vec incre = solve(jacobian += prpz * (eye(d_size, d_size) - m * m.t()) / norm(z) * dzdx, residual);
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(2u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) return SUANPAN_SUCCESS;
+        if(error < tolerance * ref_error || (suanpan::inf_norm(residual) < tolerance && counter > 5u)) return SUANPAN_SUCCESS;
 
         q -= incre(ga);
         if(has_kinematic) beta -= incre(gb);

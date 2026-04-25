@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <Material/Material.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
+#include <Toolbox/utility.h>
 
 DKT4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
@@ -30,11 +31,11 @@ DKT4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const d
 DKT4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , p_material(old_obj.p_material->get_copy()) {}
+    , p_material(old_obj.p_material->unique_copy()) {}
 
 DKT4::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
-    , strain_mat(3, p_size) {}
+    , strain_mat(3, p_size, fill::zeros) {}
 
 field<mat> DKT4::form_transform(const mat& C) {
     const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &X4 = C(3, 0);
@@ -93,7 +94,7 @@ field<mat> DKT4::form_transform(const mat& C) {
 }
 
 DKT4::DKT4(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const unsigned IPN)
-    : MaterialElement2D(T, p_node, p_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, p_node, p_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH)
     , num_section_ip(IPN) {}
 
@@ -115,8 +116,8 @@ int DKT4::initialize(const shared_ptr<DomainBase>& D) {
     ele_coor.row(6) = .5 * (coor.row(2) + coor.row(3));
     ele_coor.row(7) = .5 * (coor.row(3) + coor.row(0));
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
-    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
+    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(p_size, p_size);
 
@@ -142,7 +143,7 @@ int DKT4::initialize(const shared_ptr<DomainBase>& D) {
         c_ip.reserve(num_section_ip);
         for(unsigned J = 0; J < num_section_ip; ++J) {
             const auto t_eccentricity = .5 * sec_plan(J, 0) * thickness;
-            c_ip.emplace_back(t_eccentricity, t_weight * sec_plan(J, 1), mat_proto->get_copy());
+            c_ip.emplace_back(t_eccentricity, t_weight * sec_plan(J, 1), mat_proto->unique_copy());
             initial_stiffness += t_eccentricity * t_eccentricity * c_ip.back().factor * strain_mat.t() * ini_stiffness * strain_mat;
         }
     }
@@ -189,10 +190,10 @@ int DKT4::reset_status() {
     return code;
 }
 
-std::vector<vec> DKT4::record(const OutputType P) {
+std::vector<vec> DKT4::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : int_pt)
-        for(const auto& J : I.sec_int_pt) append_to(data, J.p_material->record(P));
+        for(const auto& J : I.sec_int_pt) suanpan::append_to(data, J.p_material->record(P));
     return data;
 }
 
@@ -203,29 +204,22 @@ void DKT4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void DKT4::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < p_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> DKT4::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
+
+mat DKT4::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, p_node, fill::zeros);
+        data.rows(2, 4) = reshape(in, p_dof, p_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
+    return {};
 }
 
-void DKT4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, p_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(2, 4) = reshape(get_current_acceleration(), p_dof, p_node);
-    else if(OutputType::V == type) t_disp.rows(2, 4) = reshape(get_current_velocity(), p_dof, p_node);
-    else if(OutputType::U == type) t_disp.rows(2, 4) = reshape(get_current_displacement(), p_dof, p_node);
-
-    for(unsigned I = 0; I < p_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void DKT4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const auto ele_coor = get_coordinate(2);
-    const mat ele_disp = reshape(get_current_displacement(), p_dof, p_node);
-    for(unsigned I = 0; I < p_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_coor(I, 0), ele_coor(I, 1), amplifier * ele_disp(0, I));
-}
+mat DKT4::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * reshape(get_current_displacement(), p_dof, p_node).eval().row(0)); }
 
 #endif

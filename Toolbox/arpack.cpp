@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -215,3 +215,80 @@ int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const u
 
     return INFO;
 }
+
+#ifdef SUANPAN_DISTRIBUTED
+#ifdef __cplusplus
+extern "C" {
+#endif
+void pdsaupd_(const MPI_Fint* comm, blas_int* ido, char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+void pdseupd_(const MPI_Fint* comm, blas_int* rvec, const char* howmny, const blas_int* select, double* d, double* z, blas_int* ldz, double* sigma, const char* bmat, blas_int* n, const char* which, blas_int* nev, double* tol, double* resid, blas_int* ncv, double* v, blas_int* ldv, blas_int* iparam, blas_int* ipntr, double* workd, double* workl, blas_int* lworkl, blas_int* info);
+#ifdef __cplusplus
+}
+#endif
+
+int eig_psolve(vec& eigval, mat& eigvec, const mat_ptr& K, const mat_ptr& M, const unsigned num, const char* WHICH) {
+    static auto BMAT{'G'}; // generalized eigenvalue problem A*x=lambda*B*x
+
+    const auto COMM = MPI_Comm_c2f(comm_world.native_handle());
+
+    blas_int IDO{0}, INFO{0};
+    auto N = static_cast<blas_int>(K->n_cols);
+    auto NEV = std::min(static_cast<blas_int>(num), N - 1);
+    auto TOL{0.};
+    auto NCV = std::min(3 * NEV, N); // use a larger NCV to ensure convergence
+    auto LWORKL = 2 * NCV * (NCV + 8);
+
+    blas_int IPARAM[11]{}, IPNTR[14]{};
+    podarray<double> RESID(N), V(uword(N) * uword(NCV)), WORKD(5 * uword(N)), WORKL(LWORKL);
+
+    IPARAM[0] = 1;    // exact shift
+    IPARAM[2] = 1000; // maximum iteration
+    IPARAM[6] = 4;    // mode 4: K*x=lambda*KG*x
+
+    // we choose shift to be -1 to ensure (M+K) is invertible
+    // since we know the eigenvalues are all positive
+    M += K;
+
+    while(99 != IDO) {
+        pdsaupd_(&COMM, &IDO, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+        if(0 != INFO) break;
+        // ReSharper disable once CppEntityAssignedButNoRead
+        if(vec Y(WORKD.memptr() + IPNTR[1] - 1, N, false, true); -1 == IDO) {
+            vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
+            X = K * X;
+            INFO = M->solve(Y, X);
+            if(0 != INFO) break;
+        }
+        else if(1 == IDO) {
+            const vec X(WORKD.memptr() + IPNTR[2] - 1, N, false, true);
+            INFO = M->solve(Y, X);
+            if(0 != INFO) break;
+        }
+        else if(2 == IDO) {
+            const vec X(WORKD.memptr() + IPNTR[0] - 1, N, false, true);
+            // ReSharper disable once CppDFAUnusedValue
+            Y = K * X;
+        }
+    }
+
+    if(0 != INFO) {
+        suanpan_error("Error code {} received.\n", INFO);
+        return SUANPAN_FAIL;
+    }
+
+    suanpan_debug("Arnoldi iteration counter: {}.\n", IPARAM[2]);
+
+    static blas_int RVEC{1};
+    static auto HOWMNY{'A'};
+    static auto SIGMA{-1.};
+
+    podarray<blas_int> SELECT(NCV);
+
+    eigval.set_size(NEV);
+    eigvec.set_size(N, NEV);
+
+    pdseupd_(&COMM, &RVEC, &HOWMNY, SELECT.memptr(), eigval.memptr(), eigvec.memptr(), &N, &SIGMA, &BMAT, &N, WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
+
+    return INFO;
+}
+#endif

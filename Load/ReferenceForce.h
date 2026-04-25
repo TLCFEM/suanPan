@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,16 +31,18 @@
 #ifndef REFERENCEFORCE_H
 #define REFERENCEFORCE_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class ReferenceForce final : public Load {
 public:
     ReferenceForce(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // node tags
-        unsigned  // dof tag
+        unsigned,                // tag
+        double,                  // magnitude
+        uvec&&,                  // node tags
+        std::vector<Node::DOF>&& // dof tag
     );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
 };

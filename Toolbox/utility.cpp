@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,44 +101,28 @@ std::string get_remaining(std::istringstream& I) {
     return {};
 }
 
-bool is_equal(const char* A, const char* B) { return _strcmpi(A, B) == 0; }
-
 bool is_equal(const char A, const char B) { return tolower(static_cast<int>(A)) == tolower(static_cast<int>(B)); }
 
 bool is_equal(const int A, const char B) { return tolower(A) == tolower(static_cast<int>(B)); }
 
-bool is_equal(const std::string& A, const char* B) { return is_equal(A.c_str(), B); }
-
-bool is_equal(const char* A, const std::string& B) { return is_equal(A, B.c_str()); }
-
-bool is_equal(const std::string& A, const std::string& B) { return is_equal(A.c_str(), B.c_str()); }
-
-bool is_equal(const std::string_view A, const char* B) { return is_equal(A.data(), B); }
-
-bool is_equal(const char* A, const std::string_view B) { return is_equal(A, B.data()); }
-
-bool if_contain(const std::string& A, const char* B) { return A.find(B) != std::string::npos; }
-
-bool if_contain(const std::string& A, const std::string& B) { return A.find(B) != std::string::npos; }
-
-bool if_contain(std::string&& A, std::string&& B) { return if_contain(A, B); }
+bool is_equal(const std::string_view A, const std::string_view B) { return _strcmpi(A.data(), B.data()) == 0; }
 
 bool if_startswith(const std::string_view A, const std::string_view B) {
     if(A.size() < B.size()) return false;
 
     for(size_t i = 0; i < B.size(); ++i)
-        if(A[i] != B[i]) return false;
+        if(std::tolower(static_cast<unsigned char>(A[i])) != std::tolower(static_cast<unsigned char>(B[i]))) return false;
 
     return true;
 }
 
-bool is_true(const char* S) { return is_equal(S, "On") || is_equal(S, "True") || is_equal(S, "T") || is_equal(S, "1") || is_equal(S, "Yes") || is_equal(S, "Y"); }
+bool if_contain(const std::string& A, const char* B) { return A.find(B) != std::string::npos; }
 
-bool is_false(const char* S) { return is_equal(S, "Off") || is_equal(S, "False") || is_equal(S, "F") || is_equal(S, "0") || is_equal(S, "No") || is_equal(S, "N"); }
+bool if_contain(const std::string& A, const std::string& B) { return A.find(B) != std::string::npos; }
 
-bool is_true(const std::string& S) { return is_true(S.c_str()); }
+bool is_true(const std::string_view S) { return is_equal_any(S, "On", "True", "T", "1", "Yes", "Y"); }
 
-bool is_false(const std::string& S) { return is_false(S.c_str()); }
+bool is_false(const std::string_view S) { return is_equal_any(S, "Off", "False", "F", "0", "No", "N"); }
 
 bool is_integer(const std::string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }
 

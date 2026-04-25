@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,4 +27,4 @@ Viscosity01::Viscosity01(const unsigned T, const double A, const double C, const
     : DataViscosity01{fabs(C)}
     , NonlinearViscosity(T, A, L) {}
 
-unique_ptr<Material> Viscosity01::get_copy() { return std::make_unique<Viscosity01>(*this); }
+unique_ptr<Material> Viscosity01::unique_copy() { return std::make_unique<Viscosity01>(*this); }

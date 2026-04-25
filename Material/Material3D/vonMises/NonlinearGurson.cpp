@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ int NonlinearGurson::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearGurson::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double NonlinearGurson::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearGurson::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -106,10 +106,10 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre(0);
         pe = std::max(pe - incre(1), 0.);
@@ -159,7 +159,7 @@ int NonlinearGurson::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> NonlinearGurson::record(const OutputType P) {
+std::vector<vec> NonlinearGurson::record(const OutputType P) const {
     if(P == OutputType::VF) return {vec{current_history(1)}};
 
     return Material3D::record(P);

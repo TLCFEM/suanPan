@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,30 +52,22 @@
 #ifndef AMPLITUDE_H
 #define AMPLITUDE_H
 
-enum class AmplitudeType {
-    RAMP,
-    TABULAR,
-    PERIODIC,
-    MODULATED,
-    DECAY
-};
-
 #include <Domain/Tag.h>
 
 class DomainBase;
 
-class Amplitude : public CopiableTag {
+class Amplitude : public CopyableTag {
     bool initialized = false;
 
 protected:
     double start_time = 0.; // T0
 
 public:
-    using CopiableTag::CopiableTag;
+    using CopyableTag::CopyableTag;
 
     virtual void initialize(const shared_ptr<DomainBase>&);
 
-    virtual unique_ptr<Amplitude> get_copy() = 0;
+    virtual unique_ptr<Amplitude> unique_copy() = 0;
 
     virtual double get_amplitude(double);
 

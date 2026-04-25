@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,4 +27,4 @@ NM2D3::NM2D3(const unsigned T, const double EEA, const double EEIS, const double
     : SurfaceNM2D(CC, std::move(PS))
     , VAFNM(T, EEA, EEIS, HH, HS, HD, std::move(KK), std::move(KB), LD, vec{NP, MSP}) {}
 
-unique_ptr<Section> NM2D3::get_copy() { return std::make_unique<NM2D3>(*this); }
+unique_ptr<Section> NM2D3::unique_copy() { return std::make_unique<NM2D3>(*this); }

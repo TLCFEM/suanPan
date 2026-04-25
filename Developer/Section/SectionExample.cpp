@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ int SectionExample::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> SectionExample::get_copy() { return std::make_unique<SectionExample>(*this); }
+unique_ptr<Section> SectionExample::unique_copy() { return std::make_unique<SectionExample>(*this); }
 
 int SectionExample::update_trial_status(const vec& t_deformation) {
     trial_deformation = t_deformation;

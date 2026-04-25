@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,9 +54,9 @@ void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
     ConstantCoupleStiffness(this);
 }
 
-double Elastic2D::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double Elastic2D::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> Elastic2D::get_copy() { return std::make_unique<Elastic2D>(*this); }
+unique_ptr<Material> Elastic2D::unique_copy() { return std::make_unique<Elastic2D>(*this); }
 
 int Elastic2D::update_trial_status(const vec& t_strain) {
     trial_stress = trial_stiffness * (trial_strain = t_strain);
@@ -87,7 +87,7 @@ void Elastic2D::print() {
     suanpan_info("Stress:", current_stress);
 }
 
-std::vector<vec> Elastic2D::record(const OutputType P) {
+std::vector<vec> Elastic2D::record(const OutputType P) const {
     const auto sigma_33 = elastic_modulus * poissons_ratio / (1. + poissons_ratio) / (1. - 2. * poissons_ratio) * (trial_strain(0) + trial_strain(1));
 
     if(P == OutputType::MISES) {

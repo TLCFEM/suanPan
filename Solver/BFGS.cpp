@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,8 @@ int BFGS::analyze() {
             D->update<Statistics::ProcessConstraint>(t_clock.toc());
 
             // indicate the global matrix has been assembled
-            G->set_matrix_assembled_switch(true);
+            G->assemble_effective_matrix();
+            G->set_matrix_assembled_switch();
 
             if(0 != W->get_multiplier_size()) {
                 suanpan_error("(L-)BFGS solver does not support constraints implemented via the Lagrange multiplier method.\n");
@@ -142,7 +143,7 @@ int BFGS::analyze() {
         // fast handling for linear elastic case
         // sync status using newly computed increment across elements and nodes
         // this may just call predictor or call corrector
-        if(D->get_attribute(ModalAttribute::LinearSystem)) return G->sync_status(false);
+        if(D->get_attribute(DomainBase::ModalAttribute::LinearSystem)) return G->sync_status(false);
 
         // check if the maximum record number is hit (L-BFGS)
         if(counter > max_storage) {

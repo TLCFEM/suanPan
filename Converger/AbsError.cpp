@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 AbsError::AbsError(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> AbsError::get_copy() { return std::make_unique<AbsError>(*this); }
+unique_ptr<Converger> AbsError::unique_copy() { return std::make_unique<AbsError>(*this); }
 
 /**
  * \brief Method to return `conv_flag`.

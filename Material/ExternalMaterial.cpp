@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ void ExternalMaterial::initialize_history(unsigned) {}
 
 void ExternalMaterial::set_initial_history(const vec&) {}
 
-unique_ptr<Material> ExternalMaterial::get_copy() { return std::make_unique<ExternalMaterial>(*this); }
+unique_ptr<Material> ExternalMaterial::unique_copy() { return std::make_unique<ExternalMaterial>(*this); }
 
 int ExternalMaterial::update_trial_status(const vec& t_strain) {
     if(-1 == data.t_strain) return SUANPAN_FAIL;
@@ -148,4 +148,4 @@ int ExternalMaterial::clear_status() {
     return info;
 }
 
-std::vector<vec> ExternalMaterial::record(OutputType) { return {}; }
+std::vector<vec> ExternalMaterial::record(OutputType) const { return {}; }

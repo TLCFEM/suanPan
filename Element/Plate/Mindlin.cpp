@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,14 +32,14 @@ Mindlin::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(cons
 Mindlin::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , p_material(old_obj.p_material->get_copy()) {}
+    , p_material(old_obj.p_material->unique_copy()) {}
 
 Mindlin::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
     , strain_mat(3, p_size, fill::zeros) {}
 
 Mindlin::Mindlin(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const unsigned IPN)
-    : MaterialElement2D(T, p_node, p_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, p_node, p_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH)
     , num_section_ip(IPN) {}
 
@@ -50,7 +50,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
 
-    const auto shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
+    const auto shear_modulus = mat_proto->get(Material::Parameter::SHEAR);
     if(suanpan::approx_equal(shear_modulus, 0.)) {
         suanpan_error("A zero shear modulus is detected.\n");
         return SUANPAN_FAIL;
@@ -70,8 +70,8 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
     }
     initial_stiffness = penalty_stiffness = 10. / 3. * shear_modulus * thickness * det(jacob) * penalty_mat.t() * penalty_mat;
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
-    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
+    const IntegrationPlan sec_plan(1, num_section_ip, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
@@ -94,7 +94,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
         current_ip.reserve(num_section_ip);
         for(unsigned J = 0; J < num_section_ip; ++J) {
             const auto t_eccentricity = .5 * sec_plan(J, 0) * thickness;
-            current_ip.emplace_back(t_eccentricity, .5 * thickness * sec_plan(J, 1) * plan(I, 2) * det_jacob, mat_proto->get_copy());
+            current_ip.emplace_back(t_eccentricity, .5 * thickness * sec_plan(J, 1) * plan(I, 2) * det_jacob, mat_proto->unique_copy());
             initial_stiffness += t_eccentricity * t_eccentricity * current_ip.back().factor * strain_mat.t() * mat_stiff * strain_mat;
         }
     }
@@ -141,10 +141,10 @@ int Mindlin::reset_status() {
     return code;
 }
 
-std::vector<vec> Mindlin::record(const OutputType P) {
+std::vector<vec> Mindlin::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : int_pt)
-        for(const auto& J : I.sec_int_pt) append_to(data, J.p_material->record(P));
+        for(const auto& J : I.sec_int_pt) suanpan::append_to(data, J.p_material->record(P));
     return data;
 }
 
@@ -155,29 +155,22 @@ void Mindlin::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void Mindlin::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < p_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> Mindlin::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
+
+mat Mindlin::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, p_node, fill::zeros);
+        data.rows(2, 4) = reshape(in, p_dof, p_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
+    return {};
 }
 
-void Mindlin::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, p_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(2, 4) = reshape(get_current_acceleration(), p_dof, p_node);
-    else if(OutputType::V == type) t_disp.rows(2, 4) = reshape(get_current_velocity(), p_dof, p_node);
-    else if(OutputType::U == type) t_disp.rows(2, 4) = reshape(get_current_displacement(), p_dof, p_node);
-
-    for(unsigned I = 0; I < p_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void Mindlin::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const auto ele_coor = get_coordinate(2);
-    const mat ele_disp = reshape(get_current_displacement(), p_dof, p_node);
-    for(unsigned I = 0; I < p_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_coor(I, 0), ele_coor(I, 1), amplifier * ele_disp(0, I));
-}
+mat Mindlin::GetDeformation(const double amplifier) { return join_cols(get_coordinate(2).t(), amplifier * reshape(get_current_displacement(), p_dof, p_node).eval().row(0)); }
 
 #endif

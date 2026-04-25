@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,6 @@
 
 #include "LinearSpring2D.h"
 
-double LinearSpring2D::compute_f(const double distance) const { return alpha * (space - distance); }
+double LinearSpring2D::compute_f(const double distance) const { return distance > space ? 0. : alpha * (space - distance); }
 
-double LinearSpring2D::compute_df(const double) const { return -alpha; }
+double LinearSpring2D::compute_df(const double distance) const { return distance > space ? 0. : -alpha; }

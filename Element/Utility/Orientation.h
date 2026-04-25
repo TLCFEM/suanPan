@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,17 +35,9 @@
 
 #include <Domain/Tag.h>
 
-enum class OrientationType {
-    T2D,
-    T3D,
-    B2D,
-    B3D,
-    B3DOS
-};
-
 class Element;
 
-class Orientation : public CopiableTag {
+class Orientation : public CopyableTag {
 protected:
     const Element* element_ptr = nullptr;
 
@@ -60,6 +52,14 @@ protected:
     virtual void update_transformation() = 0;
 
 public:
+    enum class Type {
+        T2D,
+        T3D,
+        B2D,
+        B3D,
+        B3DOS
+    };
+
     explicit Orientation(unsigned = 0, vec&& = {});
 
     void update_axis(const vec&);
@@ -68,13 +68,13 @@ public:
 
     [[nodiscard]] virtual bool is_nlgeom() const;
 
-    [[nodiscard]] virtual OrientationType get_orientation_type() const = 0;
+    [[nodiscard]] virtual Type type() const = 0;
 
     [[nodiscard]] double get_length() const;
     [[nodiscard]] double get_inclination() const;
     [[nodiscard]] const mat& get_transformation() const;
 
-    virtual unique_ptr<Orientation> get_copy() = 0;
+    virtual unique_ptr<Orientation> unique_copy() = 0;
 
     virtual void update_status();
     virtual void commit_status();

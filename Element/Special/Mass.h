@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,11 +60,9 @@
 class MassBase : public Element {
 public:
     MassBase(
-        unsigned,          // tag
-        unsigned,          // number of nodes
-        unsigned,          // number of dofs
-        uvec&&,            // node encoding
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        uvec&&,                  // node encoding
+        std::vector<Node::DOF>&& // dof identifier
     );
 
     int update_status() override;
@@ -74,13 +72,6 @@ public:
     int reset_status() override;
 
     void print() override;
-
-#ifdef SUANPAN_VTK
-    void Setup() override;
-    void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType) override;
-    mat GetData(OutputType) override;
-    void SetDeformation(vtkSmartPointer<vtkPoints>&, double) override;
-#endif
 };
 
 class Mass2D final : public MassBase {

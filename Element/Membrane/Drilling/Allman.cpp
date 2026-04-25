@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ Allman::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<M
     : coor(std::move(C))
     , weight(W)
     , m_material(std::move(M))
-    , strain_mat(3, m_size) {}
+    , strain_mat(3, m_size, fill::zeros) {}
 
 mat Allman::form_coor(const mat& C) {
     const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1);
@@ -74,7 +74,7 @@ field<mat> Allman::form_transform(const mat& C) {
 }
 
 Allman::Allman(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH) {}
 
 int Allman::initialize(const shared_ptr<DomainBase>& D) {
@@ -100,7 +100,7 @@ int Allman::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(3);
     for(uword I = 0; I < 3; ++I) {
-        int_pt.emplace_back(vec{ele_coor(I + 3, 1), ele_coor(I + 3, 2)}, area * thickness / 3., mat_proto->get_copy());
+        int_pt.emplace_back(vec{ele_coor(I + 3, 1), ele_coor(I + 3, 2)}, area * thickness / 3., mat_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
 
@@ -164,9 +164,9 @@ int Allman::reset_status() {
     return code;
 }
 
-std::vector<vec> Allman::record(const OutputType P) {
+std::vector<vec> Allman::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -177,28 +177,22 @@ void Allman::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-void Allman::Setup() {
-    vtk_cell = vtkSmartPointer<vtkTriangle>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> Allman::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
+
+mat Allman::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, m_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = reshape(in, m_dof, m_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
+    return {};
 }
 
-void Allman::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void Allman::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * mat(reshape(get_current_displacement(), m_dof, m_node)).rows(0, 1).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat Allman::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2); }
 
 #endif

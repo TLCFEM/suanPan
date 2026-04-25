@@ -8,7 +8,7 @@ section Rectangle2D 1 12 1 1
 
 element SingleSection2D 1 1 1
 
-cload 1 0 3 2 1
+cload 1 0 3 rs 1
 
 hdf5recorder 1 Node U 1
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ public:
     BilinearHoffman(const unsigned T, vec&& E, vec&& V, vec&& S, const double H, const double R)
         : BilinearOrthotropic(T, OrthotropicType::Hoffman, std::move(E), std::move(V), std::move(S), H, R) {}
 
-    unique_ptr<Material> get_copy() override { return std::make_unique<BilinearHoffman>(*this); }
+    unique_ptr<Material> unique_copy() override { return std::make_unique<BilinearHoffman>(*this); }
 };
 
 class BilinearTsaiWu : public BilinearOrthotropic {
@@ -59,7 +59,7 @@ public:
     BilinearTsaiWu(const unsigned T, vec&& E, vec&& V, vec&& S, const double H, const double R)
         : BilinearOrthotropic(T, OrthotropicType::TsaiWu, std::move(E), std::move(V), std::move(S), H, R) {}
 
-    unique_ptr<Material> get_copy() override { return std::make_unique<BilinearTsaiWu>(*this); }
+    unique_ptr<Material> unique_copy() override { return std::make_unique<BilinearTsaiWu>(*this); }
 };
 
 #endif

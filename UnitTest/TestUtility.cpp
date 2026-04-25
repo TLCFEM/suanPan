@@ -32,6 +32,12 @@ TEST_CASE("Matrix Allocation", "[Utility.Matrix]") {
     };
 }
 
+TEST_CASE("Matrix Resize", "[Utility.Matrix]") {
+    BENCHMARK("Upsize") { return vec(4).resize(6); };
+
+    BENCHMARK("Downsize") { return vec(4).resize(2); };
+}
+
 TEST_CASE("Color Print", "[Utility.Print]") {
     suanpan_info("TEST.\n");
     suanpan_highlight("TEST.\n");

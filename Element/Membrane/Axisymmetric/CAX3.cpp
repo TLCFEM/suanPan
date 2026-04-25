@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,11 @@
 #include "CAX3.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/utility.h>
 
 CAX3::CAX3(const unsigned T, uvec&& NT, const unsigned MT, const bool R)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R) {}
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {Node::DOF::RADIAL, Node::DOF::AXIAL}) {}
 
 int CAX3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
@@ -33,7 +32,7 @@ int CAX3::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    m_material = material_proto->get_copy();
+    m_material = material_proto->unique_copy();
 
     mat ele_coor(m_node, m_node);
     ele_coor.col(0).fill(1.);
@@ -85,7 +84,7 @@ int CAX3::clear_status() { return m_material->clear_status(); }
 
 int CAX3::reset_status() { return m_material->reset_status(); }
 
-std::vector<vec> CAX3::record(const OutputType P) { return m_material->record(P); }
+std::vector<vec> CAX3::record(const OutputType P) const { return m_material->record(P); }
 
 void CAX3::print() {
     suanpan_info("CAX3 element connects:", node_encoding);
@@ -97,28 +96,16 @@ void CAX3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-void CAX3::Setup() {
-    vtk_cell = vtkSmartPointer<vtkTriangle>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> CAX3::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
+
+mat CAX3::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
+    return {};
 }
 
-void CAX3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void CAX3::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat CAX3::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

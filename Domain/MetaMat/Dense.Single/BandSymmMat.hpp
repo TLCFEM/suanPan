@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 #include "../DenseMat.hpp"
 
 template<sp_d T> class BandSymmMat final : public DenseMat<T> {
-    static constexpr char UPLO = 'L';
+    static constexpr auto UPLO = 'L';
 
     static T bin;
 
@@ -53,7 +53,7 @@ public:
         , band(in_bandwidth)
         , m_rows(in_bandwidth + 1) {}
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandSymmMat>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandSymmMat>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;
@@ -92,19 +92,11 @@ template<sp_d T> Mat<T> BandSymmMat<T>::operator*(const Mat<T>& X) const {
     const auto N = static_cast<blas_int>(this->n_cols);
     const auto K = static_cast<blas_int>(band);
     const auto LDA = static_cast<blas_int>(m_rows);
-    constexpr blas_int INC = 1;
-    T ALPHA = T(1);
-    T BETA = T(0);
+    static constexpr blas_int INC = 1;
+    static constexpr T ALPHA{1}, BETA{0};
 
-    if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_ssbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
-    else {
-        using E = double;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dsbmv)(&UPLO, &N, &K, (E*)&ALPHA, (E*)this->memptr(), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
-
+    if constexpr(std::is_same_v<T, float>) suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_ssbmv)(&UPLO, &N, &K, &ALPHA, this->memptr(), &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
+    else suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dsbmv)(&UPLO, &N, &K, &ALPHA, this->memptr(), &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
     return Y;
 }
 
@@ -123,13 +115,11 @@ template<sp_d T> int BandSymmMat<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     this->factored = true;
 
     if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        arma_fortran(arma_spbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_spbsv)(&UPLO, &N, &KD, &NRHS, this->memptr(), &LDAB, B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        arma_fortran(arma_dpbsv)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_dpbsv)(&UPLO, &N, &KD, &NRHS, this->memptr(), &LDAB, B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else {
@@ -154,13 +144,11 @@ template<sp_d T> int BandSymmMat<T>::solve_trs(Mat<T>& X, Mat<T>&& B) {
     const auto LDB = static_cast<blas_int>(B.n_rows);
 
     if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        arma_fortran(arma_spbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_spbtrs)(&UPLO, &N, &KD, &NRHS, this->memptr(), &LDAB, B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else if(Precision::FULL == this->setting.precision) {
-        using E = double;
-        arma_fortran(arma_dpbtrs)(&UPLO, &N, &KD, &NRHS, (E*)this->memptr(), &LDAB, (E*)B.memptr(), &LDB, &INFO);
+        arma_fortran(arma_dpbtrs)(&UPLO, &N, &KD, &NRHS, this->memptr(), &LDAB, B.memptr(), &LDB, &INFO);
         X = std::move(B);
     }
     else

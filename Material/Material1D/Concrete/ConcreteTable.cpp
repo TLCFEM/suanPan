@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,11 +104,11 @@ int ConcreteTable::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double ConcreteTable::get_parameter(const ParameterType P) const {
-    if(ParameterType::ELASTICMODULUS == P) return initial_stiffness(0);
-    if(ParameterType::PEAKSTRAIN == P) return compute_compression_initial_reverse()[0];
-    if(ParameterType::CRACKSTRAIN == P) return compute_tension_initial_reverse()[0];
+double ConcreteTable::get(const Parameter P) const {
+    if(Parameter::ELASTIC == P) return initial_stiffness(0);
+    if(Parameter::PEAKSTRAIN == P) return compute_compression_initial_reverse()[0];
+    if(Parameter::CRACKSTRAIN == P) return compute_tension_initial_reverse()[0];
     return 0.;
 }
 
-unique_ptr<Material> ConcreteTable::get_copy() { return std::make_unique<ConcreteTable>(*this); }
+unique_ptr<Material> ConcreteTable::unique_copy() { return std::make_unique<ConcreteTable>(*this); }

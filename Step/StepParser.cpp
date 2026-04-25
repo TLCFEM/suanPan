@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "StepParser.h"
 
 #include <Domain/DomainBase.h>
-#include <Solver/Integrator/Integrator.h>
 #include <Step/Step>
 #include <Toolbox/utility.h>
 
@@ -52,12 +51,12 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
         else
             suanpan_error("Cannot create new step.\n");
     }
-    else if(is_equal(step_type, "Buckling") || is_equal(step_type, "Buckle")) {
+    else if(is_equal_any(step_type, "Buckling", "Buckle")) {
         if(domain->insert(std::make_shared<Buckle>(tag))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
-    else if(is_equal(step_type, "Optimization") || is_equal(step_type, "Optimisation")) {
+    else if(is_equal_any(step_type, "Optimization", "Optimisation")) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
             suanpan_error("A valid time period is required.\n");
@@ -77,13 +76,13 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
         else
             suanpan_error("Cannot create new step.\n");
     }
-    else if(is_equal(step_type, "Dynamic") || is_equal(step_type, "ImplicitDynamic")) {
+    else if(is_equal_any(step_type, "Dynamic", "ImplicitDynamic")) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
             suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(std::make_shared<Dynamic>(tag, time, IntegratorType::Implicit))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Dynamic>(tag, time, Integrator::Type::Implicit))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }
@@ -93,7 +92,7 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
             suanpan_error("A valid time period is required.\n");
             return SUANPAN_SUCCESS;
         }
-        if(domain->insert(std::make_shared<Dynamic>(tag, time, IntegratorType::Explicit))) domain->set_current_step_tag(tag);
+        if(domain->insert(std::make_shared<Dynamic>(tag, time, Integrator::Type::Explicit))) domain->set_current_step_tag(tag);
         else
             suanpan_error("Cannot create new step.\n");
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,68 +17,107 @@
 
 #include "ConditionalModifier.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Node.h>
+#include <Element/Element.h>
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
 
-uvec ConditionalModifier::get_nodal_active_dof(const shared_ptr<DomainBase>& D) {
-    std::vector<uword> active_dof;
-    active_dof.reserve(node_encoding.n_elem * dof_reference.n_elem);
+bool ConditionalModifier::validate_node(const shared_ptr<DomainBase>& D) const {
+    const auto not_valid = [&](const shared_ptr<Node>& node) { return !node || !node->is_active() || !node->validate_dof(dof_order); };
 
-    for(const auto I : node_encoding)
-        if(auto& t_node = D->get<Node>(I); nullptr != t_node && t_node->is_active()) {
-            auto& t_dof = t_node->get_reordered_dof();
-            for(const auto J : dof_reference)
-                if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
+    if(target_node.is_empty())
+        for(auto& node : D->get_node_pool()) {
+            if(not_valid(node)) return false;
+        }
+    else
+        for(const auto tag : target_node) {
+            if(not_valid(D->get<Node>(tag))) return false;
         }
 
-    return active_dof;
+    return true;
 }
 
-uvec ConditionalModifier::get_all_nodal_active_dof(const shared_ptr<DomainBase>& D) {
+bool ConditionalModifier::validate_element(const shared_ptr<DomainBase>& D) const {
+    const auto not_valid = [&](const shared_ptr<Element>& element) { return !element || !element->is_active() || !element->validate_dof(dof_order); };
+
+    if(target_element.is_empty())
+        for(auto& element : D->get_element_pool()) {
+            if(not_valid(element)) return false;
+        }
+    else
+        for(const auto tag : target_element) {
+            if(not_valid(D->get<Element>(tag))) return false;
+        }
+
+    return true;
+}
+
+uvec ConditionalModifier::collect_node_dof(const shared_ptr<DomainBase>& D) const {
+    auto& ref_component = get_dof_component();
+
+    if(ref_component.empty()) return {};
+
     std::vector<uword> active_dof;
-    active_dof.reserve(D->get_node() * dof_reference.n_elem);
 
-    for(const auto& I : D->get_node_pool()) {
-        auto& t_dof = I->get_reordered_dof();
-        for(const auto J : dof_reference)
-            if(J < t_dof.n_elem) active_dof.emplace_back(t_dof(J));
-    }
+    const auto check = [&](const shared_ptr<Node>& node) {
+        if(!node || !node->is_active()) return;
+        suanpan::append_to(active_dof, node->get_dof(ref_component));
+    };
+
+    if(target_node.is_empty())
+        for(auto& node : D->get_node_pool()) check(node);
+    else
+        for(const auto tag : target_node) check(D->get<Node>(tag));
 
     return active_dof;
 }
 
-ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, uvec&& N, uvec&& D)
+double ConditionalModifier::get_amplitude(const shared_ptr<DomainBase>& D) const { return amplitude->get_amplitude(D->get_factory()->get_trial_time()); }
+
+const std::vector<Node::DOF>& ConditionalModifier::get_dof_component() const { return dof_component.empty() ? dof_order : dof_component; }
+
+ConditionalModifier::ConditionalModifier(const unsigned T, const unsigned AT, std::vector<Node::DOF>&& DO, std::vector<Node::DOF>&& DC)
     : UniqueTag(T)
     , amplitude_tag(AT)
-    , node_encoding(std::move(N))
-    , dof_reference(D - 1) {}
+    , dof_component(std::move(DC))
+    , dof_order(std::move(DO)) {}
 
 int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     amplitude = D->get<Amplitude>(amplitude_tag);
-    if(nullptr == amplitude || !amplitude->is_active()) amplitude = std::make_shared<Ramp>(0);
+    if(!amplitude || !amplitude->is_active()) amplitude = Ramp(0);
 
     auto start_time = 0.;
-    for(const auto& [t_tag, t_step] : D->get_step_pool()) {
+    // ReSharper disable once CppUseElementsView
+    for(auto& [t_tag, t_step] : D->get_step_pool()) {
         if(t_step->get_tag() >= start_step) break;
         start_time += t_step->get_time_period();
     }
-
     amplitude->set_start_time(start_time);
 
-    set_initialized(true);
+    initialized = true;
 
     return SUANPAN_SUCCESS;
 }
 
 int ConditionalModifier::process_resistance(const shared_ptr<DomainBase>& D) { return process(D); }
 
-const uvec& ConditionalModifier::get_node_encoding() const { return node_encoding; }
+std::set<uword> ConditionalModifier::get_involving_nodes(const shared_ptr<DomainBase>& D) const {
+    std::set pool(target_node.cbegin(), target_node.cend());
 
-const uvec& ConditionalModifier::get_dof_encoding() const { return dof_encoding; }
+    for(const auto tag : target_element)
+        if(auto& element = D->get<Element>(tag)) {
+            // no need to check if the element is active
+            // the nodes will be checked anyway and if any is invalid the element will be disabled
+            auto& nodes = element->get_node_encoding();
+            pool.insert(nodes.cbegin(), nodes.cend());
+        }
 
-void ConditionalModifier::set_initialized(const bool B) const { access::rw(initialized) = B; }
+    return pool;
+}
+
+const uvec& ConditionalModifier::get_node_dof() const { return target_dof; }
+
+void ConditionalModifier::deinitialize() { initialized = false; }
 
 bool ConditionalModifier::is_initialized() const { return initialized; }
 
@@ -93,19 +132,42 @@ void ConditionalModifier::set_end_step(const unsigned ST) { end_step = ST; }
 
 unsigned ConditionalModifier::get_end_step() const { return end_step; }
 
-void ConditionalModifier::set_connected(const bool B) const { access::rw(connected) = B; }
-
-bool ConditionalModifier::is_connected() const { return connected; }
-
 bool ConditionalModifier::validate_step(const shared_ptr<DomainBase>& D) const {
     const auto t_step = D->get_current_step_tag();
     return t_step >= start_step && t_step < end_step && is_active();
 }
 
-void ConditionalModifier::update_status(const vec&) {}
+GroupModifier::GroupModifier(uvec&& N)
+    : groups(std::move(N)) {}
 
-void ConditionalModifier::commit_status() {}
+uvec GroupModifier::update_object_tag(const shared_ptr<DomainBase>& D) const { return D->flatten_group(groups); }
 
-void ConditionalModifier::clear_status() { set_initialized(false); }
+std::vector<Node::DOF> parse_dof(const std::string_view token) {
+    if(is_equal_any(token, "PINNED", "P")) return std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
+    if(is_equal_any(token, "ENCASTRE", "E")) return std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3};
+    if(is_equal_any(token, "XSYMM", "X")) return std::vector{Node::DOF::U1, Node::DOF::UR2, Node::DOF::UR3};
+    if(is_equal_any(token, "YSYMM", "Y")) return std::vector{Node::DOF::UR1, Node::DOF::U2, Node::DOF::UR3};
+    if(is_equal_any(token, "ZSYMM", "Z")) return std::vector{Node::DOF::UR1, Node::DOF::UR2, Node::DOF::U3};
+    if(is_equal_any(token, "1", "U1")) return std::vector{Node::DOF::U1};
+    if(is_equal_any(token, "2", "U2")) return std::vector{Node::DOF::U2};
+    if(is_equal_any(token, "3", "U3")) return std::vector{Node::DOF::U3};
+    if(is_equal_any(token, "4", "U4", "UR1")) return std::vector{Node::DOF::UR1};
+    if(is_equal_any(token, "5", "U5", "UR2")) return std::vector{Node::DOF::UR2};
+    if(is_equal_any(token, "6", "U6", "UR3")) return std::vector{Node::DOF::UR3};
+    if(is_equal(token, "FU1")) return std::vector{Node::DOF::FU1};
+    if(is_equal(token, "FU2")) return std::vector{Node::DOF::FU2};
+    if(is_equal(token, "FU3")) return std::vector{Node::DOF::FU3};
+    if(is_equal(token, "FUR1")) return std::vector{Node::DOF::FUR1};
+    if(is_equal(token, "FUR2")) return std::vector{Node::DOF::FUR2};
+    if(is_equal(token, "FUR3")) return std::vector{Node::DOF::FUR3};
+    if(is_equal(token, "RADIAL")) return std::vector{Node::DOF::RADIAL};
+    if(is_equal(token, "AXIAL")) return std::vector{Node::DOF::AXIAL};
+    if(is_equal(token, "RS")) return std::vector{Node::DOF::RS};
+    if(is_equal(token, "RW")) return std::vector{Node::DOF::RW};
+    if(is_equal(token, "DAMAGE")) return std::vector{Node::DOF::DAMAGE};
+    if(is_equal(token, "PRESSURE")) return std::vector{Node::DOF::PRESSURE};
+    if(is_equal(token, "TEMPERATURE")) return std::vector{Node::DOF::TEMPERATURE};
+    if(is_equal(token, "WARP")) return std::vector{Node::DOF::WARP};
 
-void ConditionalModifier::reset_status() {}
+    return {};
+}

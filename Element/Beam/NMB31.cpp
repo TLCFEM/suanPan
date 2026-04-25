@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,13 +32,13 @@ int NMB31::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    b_trans = D->get_orientation(orientation_tag)->get_copy();
+    b_trans = D->get_orientation(orientation_tag)->unique_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
-    if(OrientationType::B3D != b_trans->get_orientation_type()) {
+    if(Orientation::Type::B3D != b_trans->type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
@@ -47,7 +47,7 @@ int NMB31::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(length) = b_trans->get_length();
 
-    b_section = D->get<Section>(section_tag(0))->get_copy();
+    b_section = D->get<Section>(section_tag(0))->unique_copy();
 
     trial_stiffness = current_stiffness = initial_stiffness = b_trans->to_global_stiffness_mat(b_section->get_initial_stiffness() / length);
 
@@ -84,7 +84,7 @@ int NMB31::reset_status() {
     return b_section->reset_status();
 }
 
-std::vector<vec> NMB31::record(const OutputType P) {
+std::vector<vec> NMB31::record(const OutputType P) const {
     if(P == OutputType::BEAME) return {b_section->get_current_deformation() * length};
     if(P == OutputType::BEAMS) return {b_section->get_current_resistance()};
 
@@ -99,28 +99,24 @@ void NMB31::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void NMB31::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
+vtkSmartPointer<vtkCell> NMB31::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
+
+mat NMB31::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
+
+    mat data(6, b_node, fill::zeros);
+    if(const auto t_data = b_section->record(P); !t_data.empty() && t_data[0].n_elem >= 5) {
+        data(0, 0) = data(0, 1) = t_data[0](0);
+        data(1, 0) = t_data[0](1);
+        data(2, 0) = t_data[0](2);
+        data(1, 1) = t_data[0](3);
+        data(2, 1) = t_data[0](4);
     }
+    return data;
 }
 
-void NMB31::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, b_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), b_dof, b_node);
-    else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), b_dof, b_node);
-    else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), b_dof, b_node);
-
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void NMB31::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node)).rows(0, 2).t();
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat NMB31::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(3); }
 
 #endif

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,14 +61,15 @@ public:
     int clear_status() override;
     int reset_status() override;
 
-    std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 
     void print() override;
 
 #ifdef SUANPAN_VTK
-    void Setup() override;
-    void GetData(vtkSmartPointer<vtkDoubleArray>&, OutputType) override;
-    void SetDeformation(vtkSmartPointer<vtkPoints>&, double) override;
+    [[nodiscard]] vtkSmartPointer<vtkCell> GetCell() const override;
+
+    mat GetData(OutputType) override;
+    mat GetDeformation(double) override;
 #endif
 };
 

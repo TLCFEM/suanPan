@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,4 +45,4 @@ NLE3D01::NLE3D01(const unsigned T, const double K, const double RE, const double
     : DataNLE3D01{9 * K, fabs(RE), fabs(RS), std::max(0., std::min(1., M))}
     , IsotropicNonlinearElastic3D(T, R) {}
 
-unique_ptr<Material> NLE3D01::get_copy() { return std::make_unique<NLE3D01>(*this); }
+unique_ptr<Material> NLE3D01::unique_copy() { return std::make_unique<NLE3D01>(*this); }

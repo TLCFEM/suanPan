@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,11 +49,15 @@ int Arnoldi::analyze() {
     // if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
-    const shared_ptr t_mass = W->get_mass()->make_copy();
+    const shared_ptr t_mass = W->get_mass()->unique_copy();
     const auto factor = std::max(datum::eps, 1E-12 * t_mass->max());
     for(auto I = 0llu; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
 
+#ifdef SUANPAN_DISTRIBUTED
+    return eig_psolve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
+#else
     return eig_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
+#endif
 }
 
 void Arnoldi::print() {

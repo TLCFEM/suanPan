@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
+#include <Toolbox/utility.h>
 
 DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const double E, const double F, unique_ptr<Material>&& M)
     : eccentricity(E)
@@ -32,12 +33,12 @@ DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const 
 DKTS3::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , s_material(old_obj.s_material == nullptr ? nullptr : old_obj.s_material->get_copy()) {}
+    , s_material(old_obj.s_material == nullptr ? nullptr : old_obj.s_material->unique_copy()) {}
 
 DKTS3::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
-    , BM(3, s_size / 2)
-    , BP(3, s_size / 2) {}
+    , BM(3, s_size / 2, fill::zeros)
+    , BP(3, s_size / 2, fill::zeros) {}
 
 mat DKTS3::form_coor(const mat& C) {
     const auto &X1 = C(0, 0), &X2 = C(1, 0), &X3 = C(2, 0), &Y1 = C(0, 1), &Y2 = C(1, 1), &Y3 = C(2, 1);
@@ -125,7 +126,7 @@ field<mat> DKTS3::form_transform(const mat& C) {
 }
 
 DKTS3::DKTS3(const unsigned T, uvec&& N, const unsigned M, const double TH, const unsigned IP, const bool NL)
-    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3})
     , thickness(TH)
     , num_ip(IP > 20 ? 20 : IP) {}
 
@@ -147,7 +148,7 @@ int DKTS3::initialize(const shared_ptr<DomainBase>& D) {
     const auto &BMX = dkt_trans(0), &BMY = dkt_trans(1), &BPX = dkt_trans(2), &BPY = dkt_trans(3);
 
     // along thickness
-    const IntegrationPlan t_plan(1, num_ip, IntegrationType::GAUSS);
+    const IntegrationPlan t_plan(1, num_ip, IntegrationPlan::Type::GAUSS);
 
     mat99 m_stiffness(fill::zeros), p_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
 
@@ -171,7 +172,7 @@ int DKTS3::initialize(const shared_ptr<DomainBase>& D) {
         s_ip.reserve(t_plan.n_rows);
         for(unsigned J = 0; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
-            s_ip.emplace_back(t_eccentricity, thickness * t_plan(J, 1) * area / 6., mat_proto->get_copy());
+            s_ip.emplace_back(t_eccentricity, thickness * t_plan(J, 1) * area / 6., mat_proto->unique_copy());
             m_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BM * s_ip.back().factor;
             p_stiffness += m_ip.BP.t() * mat_stiff * m_ip.BP * s_ip.back().factor * t_eccentricity * t_eccentricity;
             mp_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BP * s_ip.back().factor * t_eccentricity;
@@ -264,10 +265,10 @@ int DKTS3::reset_status() {
     return code;
 }
 
-std::vector<vec> DKTS3::record(const OutputType P) {
+std::vector<vec> DKTS3::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : int_pt)
-        for(const auto& J : I.sec_int_pt) append_to(data, J.s_material->record(P));
+        for(const auto& J : I.sec_int_pt) suanpan::append_to(data, J.s_material->record(P));
     return data;
 }
 
@@ -278,28 +279,20 @@ void DKTS3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-void DKTS3::Setup() {
-    vtk_cell = vtkSmartPointer<vtkTriangle>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < s_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+vtkSmartPointer<vtkCell> DKTS3::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
+
+mat DKTS3::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), s_dof, s_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), s_dof, s_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), s_dof, s_node);
+
+    running_stat_vec<vec> stats;
+    for(const auto& I : int_pt)
+        for(const auto& J : suanpan::middle(I.sec_int_pt).s_material->record(P)) stats(J);
+
+    return repmat(stats.mean(), 1, s_node);
 }
 
-void DKTS3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, s_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), s_dof, s_node);
-    else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), s_dof, s_node);
-    else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), s_dof, s_node);
-
-    for(unsigned I = 0; I < s_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void DKTS3::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat t_mat = amplifier * mat(reshape(get_current_displacement(), s_dof, s_node)).rows(0, 2).t() + get_coordinate(3);
-    for(unsigned I = 0; I < s_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), t_mat(I, 0), t_mat(I, 1), t_mat(I, 2));
-}
+mat DKTS3::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), s_dof, s_node).eval().head_rows(3); }
 
 #endif

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,7 @@
  ******************************************************************************/
 /**
  * @class BodyForce
- * @brief A BodyForce class.
- *
- * The BodyForce class is in charge of handling body force.
- *
+ * @class GroupBodyForce
  * @author tlc
  * @date 10/07/2020
  * @version 0.1.0
@@ -31,19 +28,32 @@
 #ifndef BODYFORCE_H
 #define BODYFORCE_H
 
-#include <Load/Load.h>
+#include "Load.h"
 
 class BodyForce : public Load {
 public:
     BodyForce(
-        unsigned, // tag
-        double,   // magnitude
-        uvec&&,   // element tags
-        uvec&&,   // dof tags
-        unsigned  // amplitude tag
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // element tags
+        std::vector<Node::DOF>&&, // dof components
+        unsigned                  // amplitude tag
     );
 
     int process(const shared_ptr<DomainBase>&) override;
+};
+
+class GroupBodyForce final : protected GroupModifier, public BodyForce {
+public:
+    GroupBodyForce(
+        unsigned,                 // tag
+        double,                   // magnitude
+        uvec&&,                   // element tags
+        std::vector<Node::DOF>&&, // dof components
+        unsigned                  // amplitude tag
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,27 @@
 
 #include "NodalAcceleration.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Load/Amplitude/Amplitude.h>
 
-NodalAcceleration::NodalAcceleration(const unsigned T, const double L, uvec&& NT, uvec&& DT, const unsigned AT)
-    : Load(T, AT, std::move(NT), std::move(DT), L) {}
+NodalAcceleration::NodalAcceleration(const unsigned T, const double L, uvec&& NT, std::vector<Node::DOF>&& DT, const unsigned AT)
+    : Load(T, AT, {}, std::move(DT), L) { target_node = std::move(NT); }
+
+int NodalAcceleration::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Load::initialize(D)) return SUANPAN_FAIL;
+
+    target_dof = collect_node_dof(D);
+
+    return SUANPAN_SUCCESS;
+}
 
 int NodalAcceleration::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    trial_load.reset();
-
-    if(nullptr == W->get_mass()) return SUANPAN_SUCCESS;
-
-    trial_load.zeros(W->get_size());
-
-    trial_load(node_encoding.is_empty() ? get_all_nodal_active_dof(D) : get_nodal_active_dof(D)).fill(1.);
-
-    trial_load = W->get_mass() * trial_load * pattern * amplitude->get_amplitude(W->get_trial_time());
+    if(auto& t_mass = W->get_mass(); t_mass && !target_dof.is_empty()) {
+        trial_load.zeros(W->get_size())(target_dof).fill(magnitude * get_amplitude(D));
+        trial_load = t_mass * trial_load;
+    }
+    else trial_load.reset();
 
     return SUANPAN_SUCCESS;
 }

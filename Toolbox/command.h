@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,11 +29,20 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+constexpr auto SUANPAN_MAJOR = 4;
+constexpr auto SUANPAN_MINOR = 0;
+constexpr auto SUANPAN_PATCH = 0;
+constexpr auto SUANPAN_CODE = "Deneb";
+
+#ifndef SUANPAN_DATE
+#define SUANPAN_DATE __DATE__
+#endif
+
 #include <suanPan.h>
 
 class Bead;
 
-int process_command(const std::shared_ptr<Bead>&, std::istringstream&);
+int process_command(const std::shared_ptr<Bead>&, std::istringstream&&);
 
 bool normalise_command(std::string&, std::string&);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@ const uvec DC3D4::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14};
 const uvec DC3D4::d_dof{3, 7, 11, 15};
 
 DC3D4::DC3D4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
-    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::U3, DOF::DMG})
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE})
     , release_rate(RR) { access::rw(characteristic_length) = CL; }
 
 int DC3D4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    c_material = material_proto->get_copy();
+    c_material = material_proto->unique_copy();
 
     mat ele_coor(c_node, c_node);
     ele_coor.col(0).fill(1.);
@@ -106,8 +106,8 @@ int DC3D4::clear_status() {
 
 int DC3D4::reset_status() { return c_material->reset_status(); }
 
-std::vector<vec> DC3D4::record(const OutputType P) {
-    if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
+std::vector<vec> DC3D4::record(const OutputType P) const {
+    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     return c_material->record(P);
 }
@@ -124,38 +124,20 @@ void DC3D4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTetra.h>
 
-void DC3D4::Setup() {
-    vtk_cell = vtkSmartPointer<vtkTetra>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < c_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
-}
+vtkSmartPointer<vtkCell> DC3D4::GetCell() const { return vtkSmartPointer<vtkTetra>::New(); }
 
 mat DC3D4::GetData(const OutputType P) {
-    if(P == OutputType::DAMAGE) {
-        mat t_damage(6, c_node, fill::zeros);
-        t_damage.row(0) = get_current_displacement()(d_dof).t();
-        return t_damage;
-    }
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 3, c_node), 6, c_node);
 
-    return {};
+    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
+
+    vec data;
+    if(const auto t_data = c_material->record(P); !t_data.empty()) data = t_data[0];
+    return repmat(data.resize(6), 1, c_node);
 }
 
-void DC3D4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, c_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 2) = reshape(get_current_acceleration()(u_dof), 3, c_node);
-    else if(OutputType::V == type) t_disp.rows(0, 2) = reshape(get_current_velocity()(u_dof), 3, c_node);
-    else if(OutputType::U == type) t_disp.rows(0, 2) = reshape(get_current_displacement()(u_dof), 3, c_node);
-
-    for(unsigned I = 0; I < c_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void DC3D4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement()(u_dof), 3, c_node).t();
-    for(unsigned I = 0; I < c_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat DC3D4::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement()(u_dof), 3, c_node); }
 
 #endif

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ S4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const dou
 S4::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , s_material(old_obj.s_material == nullptr ? nullptr : old_obj.s_material->get_copy()) {}
+    , s_material(old_obj.s_material == nullptr ? nullptr : old_obj.s_material->unique_copy()) {}
 
 S4::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
@@ -40,7 +40,7 @@ S4::IntegrationPoint::IntegrationPoint(vec&& C)
     , BP(3, s_size / 2, fill::zeros) {}
 
 S4::S4(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool NL)
-    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3})
     , thickness(TH) {}
 
 int S4::initialize(const shared_ptr<DomainBase>& D) {
@@ -64,7 +64,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     // Mindlin plate
     // check if proper shear modulus is available
     // not very vital as for multiplier any large value can be chosen
-    const auto shear_modulus = mat_proto->get_parameter(ParameterType::SHEARMODULUS);
+    const auto shear_modulus = mat_proto->get(Material::Parameter::SHEAR);
     if(suanpan::approx_equal(shear_modulus, 0.)) {
         suanpan_error("A zero shear modulus is detected.\n");
         return SUANPAN_FAIL;
@@ -84,9 +84,9 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     auto p_stiffness = penalty_stiffness = 10. / 3. * shear_modulus * thickness * det(jacob) * penalty_mat.t() * penalty_mat;
 
     // in-plane
-    const IntegrationPlan m_plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan m_plan(2, 2, IntegrationPlan::Type::GAUSS);
     // along thickness
-    const IntegrationPlan t_plan(1, 3, IntegrationType::GAUSS);
+    const IntegrationPlan t_plan(1, 3, IntegrationPlan::Type::GAUSS);
 
     mat pnt(2, 8);
     mat::fixed<12, 12> m_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
@@ -143,7 +143,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
         s_ip.reserve(t_plan.n_rows);
         for(unsigned J = 0; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
-            s_ip.emplace_back(t_eccentricity, .5 * thickness * t_plan(J, 1) * m_plan(I, 2) * det_jacob, mat_proto->get_copy());
+            s_ip.emplace_back(t_eccentricity, .5 * thickness * t_plan(J, 1) * m_plan(I, 2) * det_jacob, mat_proto->unique_copy());
             m_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BM * s_ip.back().factor;
             p_stiffness += m_ip.BP.t() * mat_stiff * m_ip.BP * s_ip.back().factor * t_eccentricity * t_eccentricity;
             mp_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BP * s_ip.back().factor * t_eccentricity;
@@ -240,10 +240,10 @@ int S4::reset_status() {
     return code;
 }
 
-std::vector<vec> S4::record(const OutputType P) {
+std::vector<vec> S4::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : int_pt)
-        for(const auto& J : I.sec_int_pt) append_to(data, J.s_material->record(P));
+        for(const auto& J : I.sec_int_pt) suanpan::append_to(data, J.s_material->record(P));
     return data;
 }
 
@@ -254,28 +254,16 @@ void S4::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void S4::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < s_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+vtkSmartPointer<vtkCell> S4::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
+
+mat S4::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), s_dof, s_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), s_dof, s_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), s_dof, s_node);
+
+    return {};
 }
 
-void S4::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, s_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), s_dof, s_node);
-    else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), s_dof, s_node);
-    else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), s_dof, s_node);
-
-    for(unsigned I = 0; I < s_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void S4::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat t_mat = amplifier * mat(reshape(get_current_displacement(), s_dof, s_node)).rows(0, 2).t() + get_coordinate(3);
-    for(unsigned I = 0; I < s_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), t_mat(I, 0), t_mat(I, 1), t_mat(I, 2));
-}
+mat S4::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), s_dof, s_node).eval().head_rows(3); }
 
 #endif

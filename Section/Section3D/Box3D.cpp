@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(linear_density) = area * material_proto->get_density();
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::GAUSS);
 
     const auto net_web = height - thickness;
     const auto net_flange = width + thickness;
@@ -52,10 +52,10 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(4 * static_cast<size_t>(int_pt_num));
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(.5 * plan(I, 0) * net_web, web_middle, .5 * plan(I, 1) * web_area, material_proto->get_copy());
-        int_pt.emplace_back(.5 * plan(I, 0) * net_web, -web_middle, .5 * plan(I, 1) * web_area, material_proto->get_copy());
-        int_pt.emplace_back(flange_middle, .5 * plan(I, 0) * net_flange, .5 * plan(I, 1) * flange_area, material_proto->get_copy());
-        int_pt.emplace_back(-flange_middle, .5 * plan(I, 0) * net_flange, .5 * plan(I, 1) * flange_area, material_proto->get_copy());
+        int_pt.emplace_back(.5 * plan(I, 0) * net_web, web_middle, .5 * plan(I, 1) * web_area, material_proto->unique_copy());
+        int_pt.emplace_back(.5 * plan(I, 0) * net_web, -web_middle, .5 * plan(I, 1) * web_area, material_proto->unique_copy());
+        int_pt.emplace_back(flange_middle, .5 * plan(I, 0) * net_flange, .5 * plan(I, 1) * flange_area, material_proto->unique_copy());
+        int_pt.emplace_back(-flange_middle, .5 * plan(I, 0) * net_flange, .5 * plan(I, 1) * flange_area, material_proto->unique_copy());
     }
 
     initialize_stiffness();
@@ -63,7 +63,7 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Box3D::get_copy() { return std::make_unique<Box3D>(*this); }
+unique_ptr<Section> Box3D::unique_copy() { return std::make_unique<Box3D>(*this); }
 
 void Box3D::print() {
     suanpan_info("A 3D box section.\n");

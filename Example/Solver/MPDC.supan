@@ -9,17 +9,28 @@ section Rectangle2D 1 12 1 1 12
 
 element F21 1 1 2 1 5
 
-fix2 1 P 1
+fix2 1 E 1
 
 displacement 1 0 1 2 3 ! wrong node
+displacement 2 0 1 2 2
 
 step static 1 1
 solver Newton 1
 set fixed_step_size 1
+set ini_step_size 1E-2
 
 converger RelIncreDisp 1 1E-12 10 1
 
 analyze
+
+# Node 2:
+# Coordinate:
+#   1.0000e+01  0.0000e+00
+# Displacement:
+#   1.0764e-18  1.0000e+00  1.2257e-01
+# Resistance:
+#  -1.7012e-15  1.0760e+00 -5.0179e-15
+peek node 2
 
 reset
 clear

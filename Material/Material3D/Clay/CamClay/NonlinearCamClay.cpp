@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearCamClay::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double NonlinearCamClay::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -89,10 +89,10 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) rel_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * rel_error || ((error < tolerance || inf_norm(residual) < tolerance * ini_f) && counter > 5u)) {
+        if(error < tolerance * rel_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance * ini_f) && counter > 5u)) {
             mat::fixed<6, 2> left(fill::none);
 
             rel_error = 2. * bulk / square_b; // reuse variable

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,9 @@ int Rotation2D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double Rotation2D::get_parameter(const ParameterType P) const { return mat_obj->get_parameter(P); }
+double Rotation2D::get(const Parameter P) const { return mat_obj->get(P); }
 
-unique_ptr<Material> Rotation2D::get_copy() { return std::make_unique<Rotation2D>(*this); }
+unique_ptr<Material> Rotation2D::unique_copy() { return std::make_unique<Rotation2D>(*this); }
 
 int Rotation2D::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;
@@ -76,7 +76,7 @@ int Rotation2D::reset_status() {
     return mat_obj->reset_status();
 }
 
-std::vector<vec> Rotation2D::record(const OutputType P) { return mat_obj->record(P); }
+std::vector<vec> Rotation2D::record(const OutputType P) const { return mat_obj->record(P); }
 
 void Rotation2D::print() {
     suanpan_info("A rotation wrapper with the underlying material.\n");

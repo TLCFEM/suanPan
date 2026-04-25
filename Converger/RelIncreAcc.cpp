@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@
 RelIncreAcc::RelIncreAcc(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelIncreAcc::get_copy() { return std::make_unique<RelIncreAcc>(*this); }
+unique_ptr<Converger> RelIncreAcc::unique_copy() { return std::make_unique<RelIncreAcc>(*this); }
 
 bool RelIncreAcc::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    const auto rel_incre_disp = inf_norm(W->get_ninja()) / inf_norm(W->get_incre_acceleration() + W->get_ninja());
+    const auto rel_incre_disp = suanpan::inf_norm(W->get_ninja()) / suanpan::inf_norm(W->get_incre_acceleration() + W->get_ninja());
     set_error(std::isfinite(rel_incre_disp) ? rel_incre_disp : 1.);
     set_conv_flag(get_tolerance() > get_error());
 

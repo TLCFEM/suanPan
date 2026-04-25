@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,12 +29,12 @@ void B2DL::form_trans_mat(const vec& d_cosine) {
     trans_mat(1, 2) = trans_mat(2, 5) = 1.;
 }
 
-unique_ptr<Orientation> B2DL::get_copy() { return std::make_unique<B2DL>(*this); }
+unique_ptr<Orientation> B2DL::unique_copy() { return std::make_unique<B2DL>(*this); }
 
 void B2DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;
 
-    const mat coord = get_coordinate(element_ptr, 2).t();
+    const mat coord = element_ptr->get_coordinate(2).t();
 
     const vec x_axis = coord.col(1) - coord.col(0);
 
@@ -45,7 +45,7 @@ void B2DL::update_transformation() {
     form_trans_mat(direction_cosine);
 }
 
-OrientationType B2DL::get_orientation_type() const { return OrientationType::B2D; }
+Orientation::Type B2DL::type() const { return Type::B2D; }
 
 vec B2DL::to_local_vec(const vec& g_disp) const { return trans_mat * g_disp; }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,4 +22,4 @@
 ComplementaryEnergyEvolution::ComplementaryEnergyEvolution(const unsigned T, const unsigned ST, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
     : EnergyEvolution(T, ST, IL, FL, WT, IT, RR, PW, TL) { get_energy = &Element::get_complementary_energy; }
 
-unique_ptr<Criterion> ComplementaryEnergyEvolution::get_copy() { return std::make_unique<ComplementaryEnergyEvolution>(*this); }
+unique_ptr<Criterion> ComplementaryEnergyEvolution::unique_copy() { return std::make_unique<ComplementaryEnergyEvolution>(*this); }

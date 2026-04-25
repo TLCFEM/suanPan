@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ int CustomGurson1D::initialize(const shared_ptr<DomainBase>& D) {
 
 vec CustomGurson1D::compute_hardening(const double plastic_strain) const { return expression->evaluate(plastic_strain); }
 
-unique_ptr<Material> CustomGurson1D::get_copy() { return std::make_unique<CustomGurson1D>(*this); }
+unique_ptr<Material> CustomGurson1D::unique_copy() { return std::make_unique<CustomGurson1D>(*this); }
 
 void CustomGurson1D::print() {
     suanpan_info("A uniaxial Gurson model using custom hardening rule.\n");

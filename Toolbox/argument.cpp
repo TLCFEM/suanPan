@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,11 +49,6 @@
 
 using std::ifstream;
 using std::ofstream;
-
-constexpr auto SUANPAN_MAJOR = 3;
-constexpr auto SUANPAN_MINOR = 9;
-constexpr auto SUANPAN_PATCH = 4;
-constexpr auto SUANPAN_CODE = "Canopus";
 
 bool SUANPAN_PRINT = true;
 bool SUANPAN_COLOR = true;
@@ -236,7 +231,7 @@ namespace {
     bool catchtest_main(const int argc, char** argv) {
         static constexpr auto empty_arg = "";
         for(auto I = 1; I < argc; ++I)
-            if(is_equal(argv[I], "-ct") || is_equal(argv[I], "--catch2test")) {
+            if(is_equal_any(argv[I], "-ct", "--catch2test")) {
                 for(auto J = 1; J <= I; ++J) argv[J] = const_cast<char*>(empty_arg);
                 Catch::Session().run(argc, argv);
                 return true;
@@ -355,6 +350,7 @@ void argument_parser(const int argc, char** argv) {
         cli_mode(model);
     }
 
+    if(comm_size == 1 || comm_rank == 0) suanpan_highlight("\nPlease feel free to share feedback, start discussions, or request new features on the GitHub repository.\n");
     suanpan_info("\nTime Wasted: {:.4f} Seconds.\n", T.toc());
 }
 
@@ -363,12 +359,12 @@ void print_version() {
     // ReSharper disable once CppDFAUnreachableCode
     if(0 != comm_rank) return;
 
-    suanpan_info("Copyright (C) 2017-2025 Theodore Chang\n\n");
+    suanpan_info("Copyright (C) 2017-2026 Theodore Chang\n\n");
     suanpan_info("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n");
     suanpan_info("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n");
-    suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n");
+    suanpan_info("You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\n\n");
     suanpan_info("suanPan is an open source FEM framework.\n");
-    suanpan_info("    The binary ({}.{}.{}) is compiled on {} with the {} instruction set.\n", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH, __DATE__,
+    suanpan_info("    The binary ({}.{}.{}) is compiled on {} with the {} instruction set.\n", SUANPAN_MAJOR, SUANPAN_MINOR, SUANPAN_PATCH, SUANPAN_DATE,
 #ifdef SUANPAN_AVX512
                  "AVX512"
 #elif defined(SUANPAN_AVX2)
@@ -381,7 +377,7 @@ void print_version() {
     );
     suanpan_info("    The source code of suanPan is hosted on GitHub. https://github.com/TLCFEM/suanPan/\n");
     suanpan_info("    The documentation is hosted on GitHub. https://suanpan.tlcfem.top/\n");
-    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with {}. http://arma.sourceforge.net/\n", arma_version::as_string(),
+    suanpan_info("    The linear algebra support is provided by Armadillo ({}) with {}. https://arma.sourceforge.net/\n", arma_version::as_string(),
 #ifdef SUANPAN_MKL
                  "Intel oneAPI Math Kernel Library (MKL)"
 #elif defined(SUANPAN_AOCL)
@@ -407,7 +403,7 @@ void print_version() {
 #ifdef SUANPAN_VTK
     suanpan_info("    The visualisation support is implemented via VTK ({}) library. https://vtk.org/\n", vtkVersion::GetVTKVersion());
 #endif
-    suanpan_info("\n\n[From Wikipedia] Located approximately 310 light-years away from the Sun, Canopus is a bright giant with a spectral type of A9, which means that it appears white to the naked eye. It has a luminosity that is over 10,000 times that of the Sun, is eight times as massive, and has expanded to 71 times the radius of the Sun. The enlarged photosphere has an effective temperature of approximately 7,400 K. Canopus is currently in the blue loop phase of its evolution, undergoing core helium burning after exhausting the hydrogen in its core and passing through the red-giant branch. It is also a source of X-rays, which are likely being emitted from its corona.\n");
+    suanpan_info("\n\n[From Wikipedia] Deneb is a blue supergiant star in the constellation of Cygnus. It is the brightest star in the constellation and the 19th brightest in the night sky, with an apparent magnitude slightly varying between +1.21 and +1.29. Deneb is one of the vertices of the asterism known as the Summer Triangle and the \"head\" of the Northern Cross.\n");
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
@@ -439,7 +435,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(output_file.is_open()) output_file << all_line << '\n';
-        if(std::istringstream tmp_str(all_line); process_command(model, tmp_str) == SUANPAN_EXIT) return;
+        if(process_command(model, std::istringstream(all_line)) == SUANPAN_EXIT) return;
         all_line.clear();
     }
 }

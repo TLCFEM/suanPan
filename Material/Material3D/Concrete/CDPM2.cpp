@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -366,9 +366,9 @@ int CDPM2::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> CDPM2::get_copy() { return std::make_unique<CDPM2>(*this); }
+unique_ptr<Material> CDPM2::unique_copy() { return std::make_unique<CDPM2>(*this); }
 
-double CDPM2::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double CDPM2::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int CDPM2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -497,11 +497,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) {
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             const vec unit_n = n % tensor::stress::norm_weight;
 
             plastic_strain += gamma * gs * unit_n + gamma * gp / 3. * tensor::unit_tensor2;
@@ -623,7 +623,7 @@ int CDPM2::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> CDPM2::record(const OutputType P) {
+std::vector<vec> CDPM2::record(const OutputType P) const {
     if(P == OutputType::DT) return {vec{current_history(16)}};
     if(P == OutputType::DC) return {vec{current_history(17)}};
 

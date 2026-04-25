@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ struct SectionShellData {
     mat trial_plate_stiffness{};
 };
 
-class SectionShell : protected SectionShellData, public CopiableTag {
+class SectionShell : protected SectionShellData, public CopyableTag {
     const bool symmetric = false;
     const bool initialized = false;
 
@@ -104,7 +104,7 @@ public:
     [[nodiscard]] virtual const mat& get_initial_membrane_stiffness() const;
     [[nodiscard]] virtual const mat& get_initial_plate_stiffness() const;
 
-    virtual unique_ptr<SectionShell> get_copy() = 0;
+    virtual unique_ptr<SectionShell> unique_copy() = 0;
 
     int update_incre_status(double, double);
     int update_incre_status(double, double, double, double);
@@ -124,8 +124,8 @@ public:
 };
 
 namespace suanpan {
-    unique_ptr<SectionShell> make_copy(const shared_ptr<SectionShell>&);
-    unique_ptr<SectionShell> make_copy(const unique_ptr<SectionShell>&);
+    unique_ptr<SectionShell> unique_copy(const shared_ptr<SectionShell>&);
+    unique_ptr<SectionShell> unique_copy(const unique_ptr<SectionShell>&);
 } // namespace suanpan
 
 #endif

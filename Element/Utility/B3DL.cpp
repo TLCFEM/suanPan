@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,14 @@
 
 #include <Element/Element.h>
 
-OrientationType B3DL::get_orientation_type() const { return OrientationType::B3D; }
+Orientation::Type B3DL::type() const { return Type::B3D; }
 
-unique_ptr<Orientation> B3DL::get_copy() { return std::make_unique<B3DL>(*this); }
+unique_ptr<Orientation> B3DL::unique_copy() { return std::make_unique<B3DL>(*this); }
 
 void B3DL::update_transformation() {
     if(!direction_cosine.is_empty()) return;
 
-    const mat coor = get_coordinate(element_ptr, 3).t();
+    const mat coor = element_ptr->get_coordinate(3).t();
 
     const vec x_axis = coor.col(1) - coor.col(0);
 

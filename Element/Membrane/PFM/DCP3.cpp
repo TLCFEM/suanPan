@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "DCP3.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Recorder/OutputType.h>
 #include <Toolbox/utility.h>
@@ -27,7 +26,7 @@ const uvec DCP3::u_dof{0, 1, 3, 4, 6, 7};
 const uvec DCP3::d_dof{2, 5, 8};
 
 DCP3::DCP3(const unsigned T, uvec&& NT, const unsigned MT, const double CL, const double RR, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2, DOF::DMG})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::DAMAGE})
     , release_rate(RR)
     , thickness(TH) { access::rw(characteristic_length) = CL; }
 
@@ -36,7 +35,7 @@ int DCP3::initialize(const shared_ptr<DomainBase>& D) {
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
 
-    m_material = material_proto->get_copy();
+    m_material = material_proto->unique_copy();
 
     mat ele_coor(m_node, m_node);
     ele_coor.col(0).fill(1.);
@@ -114,8 +113,8 @@ int DCP3::clear_status() {
 
 int DCP3::reset_status() { return m_material->reset_status(); }
 
-std::vector<vec> DCP3::record(const OutputType P) {
-    if(P == OutputType::DAMAGE) return {get_current_displacement()(d_dof)};
+std::vector<vec> DCP3::record(const OutputType P) const {
+    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
 
     return m_material->record(P);
 }
@@ -130,40 +129,20 @@ void DCP3::print() {
 #ifdef SUANPAN_VTK
 #include <vtkTriangle.h>
 
-void DCP3::Setup() {
-    vtk_cell = vtkSmartPointer<vtkTriangle>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
-}
-
-void DCP3::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration()(u_dof), 2, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity()(u_dof), 2, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement()(u_dof), 2, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
+vtkSmartPointer<vtkCell> DCP3::GetCell() const { return vtkSmartPointer<vtkTriangle>::New(); }
 
 mat DCP3::GetData(const OutputType P) {
-    if(P == OutputType::DAMAGE) {
-        mat t_damage(6, m_node, fill::zeros);
-        for(unsigned I = 0; I < m_node; ++I) t_damage(0, I) = node_ptr[I].lock()->get_current_displacement()(2);
-        return t_damage;
-    }
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 2, m_node), 6, m_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 2, m_node), 6, m_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 2, m_node), 6, m_node);
 
-    vec t_stress(6, fill::zeros);
-    if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress(uvec{0, 1, 3}) = t_data[0];
-    return repmat(t_stress, 1, m_node);
+    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
+
+    vec t_stress;
+    if(const auto t_data = m_material->record(P); !t_data.empty()) t_stress = t_data[0];
+    return repmat(t_stress.resize(6), 1, m_node);
 }
 
-void DCP3::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement()(u_dof), 2, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat DCP3::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(u_dof), 2, m_node); }
 
 #endif

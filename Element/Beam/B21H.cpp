@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,17 +46,17 @@ int B21H::initialize(const shared_ptr<DomainBase>& D) {
     const auto elastic_length = 1. - 2. * hinge_length;
 
     // build up the elastic interior
-    const IntegrationPlan elastic_plan(1, 2, IntegrationType::GAUSS);
+    const IntegrationPlan elastic_plan(1, 2, IntegrationPlan::Type::GAUSS);
     elastic_int_pt.clear();
     elastic_int_pt.reserve(elastic_plan.n_rows);
-    for(unsigned I = 0; I < elastic_plan.n_rows; ++I) elastic_int_pt.emplace_back(elastic_plan(I, 0) * elastic_length, elastic_plan(I, 1) * elastic_length / 2., section_proto->get_copy());
+    for(unsigned I = 0; I < elastic_plan.n_rows; ++I) elastic_int_pt.emplace_back(elastic_plan(I, 0) * elastic_length, elastic_plan(I, 1) * elastic_length / 2., section_proto->unique_copy());
 
     int_pt.clear();
     int_pt.reserve(4);
-    int_pt.emplace_back(-1., .25 * hinge_length, section_proto->get_copy());
-    int_pt.emplace_back(4. / 3. * hinge_length - 1., .75 * hinge_length, section_proto->get_copy());
-    int_pt.emplace_back(1. - 4. / 3. * hinge_length, .75 * hinge_length, section_proto->get_copy());
-    int_pt.emplace_back(1., .25 * hinge_length, section_proto->get_copy());
+    int_pt.emplace_back(-1., .25 * hinge_length, section_proto->unique_copy());
+    int_pt.emplace_back(4. / 3. * hinge_length - 1., .75 * hinge_length, section_proto->unique_copy());
+    int_pt.emplace_back(1. - 4. / 3. * hinge_length, .75 * hinge_length, section_proto->unique_copy());
+    int_pt.emplace_back(1., .25 * hinge_length, section_proto->unique_copy());
 
     const auto& elastic_section_stiffness = section_proto->get_initial_stiffness();
     // elastic part will be reused in computation
@@ -119,13 +119,13 @@ int B21H::reset_status() {
     return code;
 }
 
-std::vector<vec> B21H::record(const OutputType P) {
+std::vector<vec> B21H::record(const OutputType P) const {
     std::vector<vec> data;
-    append_to(data, int_pt[0].b_section->record(P));
-    append_to(data, int_pt[1].b_section->record(P));
-    for(const auto& I : elastic_int_pt) append_to(data, I.b_section->record(P));
-    append_to(data, int_pt[2].b_section->record(P));
-    append_to(data, int_pt[3].b_section->record(P));
+    suanpan::append_to(data, int_pt[0].b_section->record(P));
+    suanpan::append_to(data, int_pt[1].b_section->record(P));
+    for(const auto& I : elastic_int_pt) suanpan::append_to(data, I.b_section->record(P));
+    suanpan::append_to(data, int_pt[2].b_section->record(P));
+    suanpan::append_to(data, int_pt[3].b_section->record(P));
     return data;
 }
 
@@ -145,28 +145,30 @@ void B21H::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void B21H::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> B21H::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
+
+mat B21H::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, b_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = reshape(in, b_dof, b_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
+    vec low, high;
+    if(const auto t_data = int_pt.front().b_section->record(P); !t_data.empty()) low = t_data[0];
+    if(const auto t_data = int_pt.back().b_section->record(P); !t_data.empty()) high = t_data[0];
+
+    mat data(6, b_node);
+    data.col(0) = low.resize(6);
+    data.col(1) = high.resize(6);
+
+    return data;
 }
 
-void B21H::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, b_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_acceleration(), b_dof, b_node);
-    else if(OutputType::V == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_velocity(), b_dof, b_node);
-    else if(OutputType::U == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_displacement(), b_dof, b_node);
-
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void B21H::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node).t()).cols(0, 1);
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat B21H::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2); }
 
 #endif

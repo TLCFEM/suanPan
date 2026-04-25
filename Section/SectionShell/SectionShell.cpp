@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 SectionShell::SectionShell(const unsigned T, const unsigned MT, vec&& E)
     : SectionShellData{MT, std::move(E)}
-    , CopiableTag(T) {}
+    , CopyableTag(T) {}
 
 void SectionShell::set_initialized(const bool T) const { access::rw(initialized) = T; }
 
@@ -105,6 +105,6 @@ int SectionShell::update_trial_status(const vec& m_strain, const vec& p_strain, 
 
 std::vector<vec> SectionShell::record(OutputType) { return {}; }
 
-unique_ptr<SectionShell> suanpan::make_copy(const shared_ptr<SectionShell>& S) { return S->get_copy(); }
+unique_ptr<SectionShell> suanpan::unique_copy(const shared_ptr<SectionShell>& S) { return S->unique_copy(); }
 
-unique_ptr<SectionShell> suanpan::make_copy(const unique_ptr<SectionShell>& S) { return S->get_copy(); }
+unique_ptr<SectionShell> suanpan::unique_copy(const unique_ptr<SectionShell>& S) { return S->unique_copy(); }

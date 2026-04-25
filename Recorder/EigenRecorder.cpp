@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +28,7 @@
 
 extern fs::path SUANPAN_OUTPUT;
 
-EigenRecorder::EigenRecorder(const unsigned T, const bool H)
-    : Recorder(T, {}, OutputType::NL, 1, false, H) {}
-
-void EigenRecorder::record(const shared_ptr<DomainBase>& D) {
+void EigenRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
     if(W->get_analysis_type() != AnalysisType::EIGEN) return;
@@ -49,37 +46,37 @@ void EigenRecorder::record(const shared_ptr<DomainBase>& D) {
     }
 }
 
+EigenRecorder::EigenRecorder(const unsigned T, const bool H)
+    : Recorder(T, {}, OutputType::NL, 1, H) {}
+
 void EigenRecorder::save() {
     if(eigen_value.is_empty()) return;
 
 #ifdef SUANPAN_HDF5
-    if(if_hdf5()) {
-        const std::string file_name = "Eigenvalue.h5";
+    std::ostringstream file_name;
+    if(comm_size > 1) file_name << 'P' << comm_rank << '-';
+    file_name << "Eigenvalue.h5";
 
-        const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-        hsize_t dimension[2] = {eigen_value.n_elem, 1};
-        H5LTmake_dataset(file_id, "Eigenvalue", 2, dimension, H5T_NATIVE_DOUBLE, eigen_value.mem);
+    hsize_t dimension[2]{eigen_value.n_elem, 1};
+    H5LTmake_dataset(file_id, "Eigenvalue", 2, dimension, H5T_NATIVE_DOUBLE, eigen_value.mem);
 
-        for(uword I = 0; I < eigen_value.n_elem; ++I) {
-            const auto group_name = "Eigenvalue " + std::to_string(I + 1);
-            const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    for(uword I = 0, J = 1; I < eigen_value.n_elem; ++I, ++J) {
+        const auto group_id = H5Gcreate(file_id, ("Eigenvalue " + std::to_string(J)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-            for(const auto& [e_val, e_vec] : eigen_pool[I]) {
-                const auto dataset_name = "N" + std::to_string(e_val);
-                dimension[0] = e_vec.n_cols;
-                dimension[1] = e_vec.n_rows;
-                H5LTmake_dataset(group_id, dataset_name.c_str(), 2, dimension, H5T_NATIVE_DOUBLE, e_vec.mem);
-            }
-
-            H5Gclose(group_id);
+        for(const auto& [e_val, e_vec] : eigen_pool[I]) {
+            const auto dataset_name = "N" + std::to_string(e_val);
+            dimension[0] = e_vec.n_cols;
+            dimension[1] = e_vec.n_rows;
+            H5LTmake_dataset(group_id, dataset_name.c_str(), 2, dimension, H5T_NATIVE_DOUBLE, e_vec.mem);
         }
 
-        H5Fclose(file_id);
+        H5Gclose(group_id);
     }
+
+    H5Fclose(file_id);
 #endif
 }
 
-void EigenRecorder::print() {
-    suanpan_info("A recorder to record eigenvalues and eigenvectors.\n");
-}
+void EigenRecorder::print() { suanpan_info("A recorder to record eigenvalues and eigenvectors.\n"); }

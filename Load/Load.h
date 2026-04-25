@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,12 +35,10 @@
 #include <Domain/ConditionalModifier.h>
 
 class Load : public ConditionalModifier {
-protected:
     static double multiplier;
 
-    const bool mpdc_flag = false;
-
-    const double pattern;
+protected:
+    const double magnitude;
 
     vec trial_load;
     vec trial_settlement;
@@ -50,15 +48,14 @@ protected:
 
 public:
     Load(
-        unsigned, // tag
-        unsigned, // amplitude tag
-        uvec&&,   // node tag
-        uvec&&,   // dof tag
-        double    // nominal magnitude
+        unsigned,                 // tag
+        unsigned,                 // amplitude tag
+        std::vector<Node::DOF>&&, // dof order
+        std::vector<Node::DOF>&&, // dof component (unordered)
+        double                    // nominal magnitude
     );
 
-    void enable_displacement_control() const;
-    [[nodiscard]] bool if_displacement_control() const;
+    [[nodiscard]] virtual bool if_displacement_control() const { return false; }
 
     [[nodiscard]] const vec& get_trial_load() const;
     [[nodiscard]] const vec& get_trial_settlement() const;
@@ -66,16 +63,6 @@ public:
 };
 
 void set_load_multiplier(double);
-
-class GroupLoad {
-    const uvec groups;
-
-protected:
-    [[nodiscard]] uvec update_object_tag(const shared_ptr<DomainBase>&) const;
-
-public:
-    explicit GroupLoad(uvec&&);
-};
 
 #endif
 

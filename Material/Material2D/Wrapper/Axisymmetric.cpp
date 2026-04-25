@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,9 @@ int Axisymmetric::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double Axisymmetric::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
+double Axisymmetric::get(const Parameter P) const { return base->get(P); }
 
-unique_ptr<Material> Axisymmetric::get_copy() { return std::make_unique<Axisymmetric>(*this); }
+unique_ptr<Material> Axisymmetric::unique_copy() { return std::make_unique<Axisymmetric>(*this); }
 
 int Axisymmetric::update_trial_status(const vec& t_strain) {
     vec full_strain(6, fill::zeros);
@@ -79,7 +79,7 @@ int Axisymmetric::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> Axisymmetric::record(const OutputType P) { return base->record(P); }
+std::vector<vec> Axisymmetric::record(const OutputType P) const { return base->record(P); }
 
 void Axisymmetric::print() {
     suanpan_info("An axisymmetric wrapper.\n");

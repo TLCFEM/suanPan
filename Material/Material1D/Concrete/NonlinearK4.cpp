@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,8 +128,8 @@ int NonlinearK4::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearK4::get_parameter(const ParameterType P) const {
-    if(ParameterType::ELASTICMODULUS == P) return elastic_modulus;
+double NonlinearK4::get(const Parameter P) const {
+    if(Parameter::ELASTIC == P) return elastic_modulus;
     return 0.;
 }
 
@@ -209,4 +209,4 @@ ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P
     : DataConcreteK4{std::fabs(E * P(0)), std::fabs(E * P(1)), perturb(std::fabs(P(2))), std::fabs(P(3)), std::fabs(P(4)), std::fabs(P(3) * P(5)), std::fabs(E * P(6)), std::fabs(E * P(7))}
     , NonlinearK4(T, E, H, R, FD, FC, OD) {}
 
-unique_ptr<Material> ConcreteK4::get_copy() { return std::make_unique<ConcreteK4>(*this); }
+unique_ptr<Material> ConcreteK4::unique_copy() { return std::make_unique<ConcreteK4>(*this); }

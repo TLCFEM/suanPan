@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,18 +31,18 @@ int Circle2D::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(linear_density) = area * material_proto->get_density();
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::GAUSS);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(int_pt_num);
-    for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(radius * plan(I, 0), 2. * radius * radius * sqrt(1. - plan(I, 0) * plan(I, 0)) * plan(I, 1), material_proto->get_copy());
+    for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(radius * plan(I, 0), 2. * radius * radius * sqrt(1. - plan(I, 0) * plan(I, 0)) * plan(I, 1), material_proto->unique_copy());
 
     initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> Circle2D::get_copy() { return std::make_unique<Circle2D>(*this); }
+unique_ptr<Section> Circle2D::unique_copy() { return std::make_unique<Circle2D>(*this); }
 
 void Circle2D::print() {
     suanpan_info("A 2D circular section.\n");

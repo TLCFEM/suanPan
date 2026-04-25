@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
  * \param P `print_flag`
  */
 Converger::Converger(const unsigned T, const double E, const unsigned M, const bool P)
-    : CopiableTag(T)
+    : CopyableTag(T)
     , tolerance(E)
     , max_iteration(M)
     , print_flag(P) {}
@@ -103,7 +103,7 @@ vec Converger::get_residual() const {
     vec residual = W->get_trial_load() - W->get_sushi();
     if(!W->get_reference_load().is_empty() && !W->get_trial_load_factor().is_empty()) residual += W->get_reference_load() * W->get_trial_load_factor();
 
-    for(const auto& t_dof : D->get_restrained_dof()) residual(t_dof) = 0.;
+    for(const auto& t_dof : D->get_constrained_dof()) residual(t_dof) = 0.;
 
     return residual;
 }

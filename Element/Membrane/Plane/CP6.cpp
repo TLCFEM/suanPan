@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "CP6.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/shape.h>
 #include <Toolbox/tensor.h>
@@ -37,7 +36,7 @@ CP6::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
 }
 
 CP6::CP6(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const bool R)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
 int CP6::initialize(const shared_ptr<DomainBase>& D) {
@@ -66,7 +65,7 @@ int CP6::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.reserve(3);
     for(auto I = 0; I < 3; ++I) {
         vec coor{ele_coor(I + 3llu, 1), ele_coor(I + 3llu, 2)};
-        int_pt.emplace_back(std::move(coor), area * thickness / 3., material_proto->get_copy(), shape::triangle(coor, 1) * inv_coor);
+        int_pt.emplace_back(std::move(coor), area * thickness / 3., material_proto->unique_copy(), shape::triangle(coor, 1) * inv_coor);
 
         const auto& c_pt = int_pt.back();
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
@@ -179,9 +178,9 @@ int CP6::reset_status() {
     return code;
 }
 
-std::vector<vec> CP6::record(const OutputType P) {
+std::vector<vec> CP6::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -195,28 +194,16 @@ void CP6::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuadraticTriangle.h>
 
-void CP6::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuadraticTriangle>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> CP6::GetCell() const { return vtkSmartPointer<vtkQuadraticTriangle>::New(); }
+
+mat CP6::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), m_dof, m_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
+
+    return {};
 }
 
-void CP6::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void CP6::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat CP6::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node); }
 
 #endif

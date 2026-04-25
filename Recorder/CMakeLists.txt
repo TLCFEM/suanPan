@@ -3,12 +3,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         EigenRecorder.cpp
         ElementRecorder.cpp
         FrameRecorder.cpp
-        GlobalMassRecorder.cpp
         GlobalRecorder.cpp
-        GlobalStiffnessRecorder.cpp
-        GroupElementRecorder.cpp
-        GroupNodeRecorder.cpp
-        GroupSumRecorder.cpp
         NodeRecorder.cpp
         OutputType.cpp
         Recorder.cpp

@@ -20,7 +20,6 @@ add_library(${PROJECT_NAME} SHARED
         ../../Domain/Tag.cpp
         ../../Domain/Group/Group.cpp
         ../../Element/Element.cpp
-        ../../Element/Visualisation/vtkBase.cpp
         ../../Material/Material.cpp
         ../../Section/Section.cpp
         ../Element/ElementExample.cpp

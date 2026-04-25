@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ void LeeNewmarkIterative::formulate_block(sword& current_pos, const std::vector<
 
 vec LeeNewmarkIterative::update_by_mode_one(const double mass_coef, const double stiffness_coef, int order) const {
     const auto ini_order = order;
-    const auto kernel = current_mass->make_copy();
+    const auto kernel = current_mass->unique_copy();
     kernel += stiffness_coef / mass_coef * current_stiffness;
     auto damping_force = factory->get_trial_velocity();
 
@@ -372,25 +372,18 @@ int LeeNewmarkIterative::process_constraint_resistance() {
 }
 
 void LeeNewmarkIterative::assemble_matrix() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
+    Newmark::assemble_matrix();
 
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
-    auto fe = std::async([&] { D->assemble_trial_mass(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-    fe.get();
+    auto& W = get_domain()->get_factory();
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
-    current_mass = W->get_mass()->make_copy();
-    current_stiffness = W->get_stiffness()->make_copy();
+    current_mass = W->get_mass()->unique_copy();
+    current_stiffness = W->get_stiffness()->unique_copy();
+}
+
+void LeeNewmarkIterative::assemble_effective_matrix() {
+    auto& W = get_domain()->get_factory();
 
     W->get_stiffness() += C0 * W->get_mass();
 

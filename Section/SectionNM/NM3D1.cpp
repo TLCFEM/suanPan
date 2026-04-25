@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 NM3D1::NM3D1(const unsigned T, const double EEA, const double EEIS, const double EEIW, const double LD)
     : SectionNM3D(T, EEA, EEIS, EEIW, LD) {}
 
-unique_ptr<Section> NM3D1::get_copy() { return std::make_unique<NM3D1>(*this); }
+unique_ptr<Section> NM3D1::unique_copy() { return std::make_unique<NM3D1>(*this); }
 
 int NM3D1::update_trial_status(const vec& t_deformation) {
     trial_resistance = trial_stiffness * (trial_deformation = t_deformation);

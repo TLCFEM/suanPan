@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ PCPE8DC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<
     , strain_mat(3, 2llu * m_node, fill::zeros) {}
 
 PCPE8DC::PCPE8DC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN, const double KK)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::FU1, Node::DOF::FU2})
     , alpha(AL)
     , porosity(NN)
     , k(KK) {}
@@ -55,8 +55,8 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     // validate bulk modulus
-    const auto ks = s_mat->get_parameter(ParameterType::BULKMODULUS);
-    const auto kf = f_mat->get_parameter(ParameterType::BULKMODULUS);
+    const auto ks = s_mat->get(Material::Parameter::BULK);
+    const auto kf = f_mat->get(Material::Parameter::BULK);
 
     if(suanpan::approx_equal(ks, 0.) || suanpan::approx_equal(kf, 0.)) {
         suanpan_error("A zero bulk modulus is detected.\n");
@@ -77,7 +77,7 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = s_mat->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, 2, IntegrationType::IRONS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::IRONS);
 
     initial_stiffness.zeros(m_size, m_size);
     body_force.zeros(m_size, 2);
@@ -93,7 +93,7 @@ int PCPE8DC::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const mat pn_pxy = solve(jacob, pn);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->get_copy());
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->unique_copy());
 
         auto& c_pt = int_pt.back();
 
@@ -182,7 +182,7 @@ int PCPE8DC::reset_status() {
 
 mat PCPE8DC::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> PCPE8DC::record(const OutputType P) {
+std::vector<vec> PCPE8DC::record(const OutputType P) const {
     std::vector<vec> data;
 
     if(P == OutputType::PP) {
@@ -190,7 +190,7 @@ std::vector<vec> PCPE8DC::record(const OutputType P) {
         for(const auto& I : int_pt) data.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
     }
     else
-        for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+        for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
 
     return data;
 }
@@ -210,31 +210,18 @@ void PCPE8DC::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuadraticQuad.h>
 
-void PCPE8DC::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuadraticQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
-}
-
-void PCPE8DC::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 1) = reshape(get_current_acceleration()(s_dof), 2, m_node);
-    else if(OutputType::V == type) t_disp.rows(0, 1) = reshape(get_current_velocity()(s_dof), 2, m_node);
-    else if(OutputType::U == type) t_disp.rows(0, 1) = reshape(get_current_displacement()(s_dof), 2, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
+vtkSmartPointer<vtkCell> PCPE8DC::GetCell() const { return vtkSmartPointer<vtkQuadraticQuad>::New(); }
 
 mat PCPE8DC::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(s_dof), 2, m_node), 6, m_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(s_dof), 2, m_node), 6, m_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(s_dof), 2, m_node), 6, m_node);
+
     mat A(int_pt.size(), 9);
     mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
+        if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -252,9 +239,6 @@ mat PCPE8DC::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void PCPE8DC::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement()(s_dof), 2, m_node).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat PCPE8DC::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(s_dof), 2, m_node); }
 
 #endif

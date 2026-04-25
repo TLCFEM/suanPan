@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@ uvec Spring01::IS{0, 1};
 uvec Spring01::JS{2, 3};
 
 Spring01::Spring01(const unsigned T, uvec&& NT, const unsigned MT)
-    : MaterialElement1D(T, s_node, s_dof, std::move(NT), uvec{MT}, false, {DOF::U1, DOF::U2}) {}
+    : MaterialElement1D(T, s_node, s_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2}) {}
 
 int Spring01::initialize(const shared_ptr<DomainBase>& D) {
-    s_material = suanpan::make_copy(D->get<Material>(material_tag(0)));
+    s_material = suanpan::unique_copy(D->get<Material>(material_tag(0)));
 
     const auto t_coord = get_coordinate(2);
 
@@ -65,7 +65,7 @@ int Spring01::clear_status() { return s_material->clear_status(); }
 
 int Spring01::reset_status() { return s_material->reset_status(); }
 
-std::vector<vec> Spring01::record(const OutputType P) { return s_material->record(P); }
+std::vector<vec> Spring01::record(const OutputType P) const { return s_material->record(P); }
 
 void Spring01::print() {
     suanpan_info("A spring element that uses displacement as basic quantity. The material model used shall be based on displacement-force relationship.\n");

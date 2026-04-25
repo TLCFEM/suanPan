@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ int Prestrain::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Prestrain::get_copy() { return std::make_unique<Prestrain>(*this); }
+unique_ptr<Material> Prestrain::unique_copy() { return std::make_unique<Prestrain>(*this); }
 
 int Prestrain::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain + get_prestrain()) - current_strain;
@@ -104,7 +104,7 @@ int Prestrain::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> Prestrain::record(const OutputType P) { return base->record(P); }
+std::vector<vec> Prestrain::record(const OutputType P) const { return base->record(P); }
 
 void Prestrain::print() {
     suanpan_info("A Prestrain container that holds the following material.\n");

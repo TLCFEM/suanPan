@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,23 +50,23 @@ int ISection3D::initialize(const shared_ptr<DomainBase>& D) {
     const auto b_flange_area = bottom_flange_width * bottom_flange_thickness;
     const auto t_flange_area = top_flange_width * top_flange_thickness;
 
-    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationType::GAUSS);
+    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationPlan::Type::GAUSS);
     const auto& plan_web = plan_flange;
 
     int_pt.clear();
     int_pt.reserve(plan_web.n_rows + 2llu * plan_flange.n_rows);
-    for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(.5 * plan_web(I, 0) * web_height, 0., .5 * plan_web(I, 1) * web_area, mat_proto->get_copy());
+    for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(.5 * plan_web(I, 0) * web_height, 0., .5 * plan_web(I, 1) * web_area, mat_proto->unique_copy());
     if(b_flange_area != 0.)
-        for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (bottom_flange_thickness + web_height), .5 * plan_flange(I, 0) * bottom_flange_width, .5 * plan_flange(I, 1) * b_flange_area, mat_proto->get_copy());
+        for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (bottom_flange_thickness + web_height), .5 * plan_flange(I, 0) * bottom_flange_width, .5 * plan_flange(I, 1) * b_flange_area, mat_proto->unique_copy());
     if(t_flange_area != 0.)
-        for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (top_flange_thickness + web_height), .5 * plan_flange(I, 0) * top_flange_width, .5 * plan_flange(I, 1) * t_flange_area, mat_proto->get_copy());
+        for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (top_flange_thickness + web_height), .5 * plan_flange(I, 0) * top_flange_width, .5 * plan_flange(I, 1) * t_flange_area, mat_proto->unique_copy());
 
     initialize_stiffness();
 
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Section> ISection3D::get_copy() { return std::make_unique<ISection3D>(*this); }
+unique_ptr<Section> ISection3D::unique_copy() { return std::make_unique<ISection3D>(*this); }
 
 void ISection3D::print() {
     suanpan_info("A 3D I-shape section with following integration points.\n");

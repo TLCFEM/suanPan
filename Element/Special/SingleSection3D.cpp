@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@
 #include <Section/Section.h>
 
 SingleSection3D::SingleSection3D(const unsigned T, const unsigned NT, const unsigned ST)
-    : SectionElement3D(T, s_node, s_dof, uvec{NT}, uvec{ST}, false, {}) {}
+    : SectionElement3D(T, s_node, s_dof, uvec{NT}, uvec{ST}, false, {Node::DOF::AXIAL, Node::DOF::RS, Node::DOF::RW}) {}
 
 int SingleSection3D::initialize(const shared_ptr<DomainBase>& D) {
-    s_section = suanpan::make_copy(D->get<Section>(section_tag(0)));
+    s_section = suanpan::unique_copy(D->get<Section>(section_tag(0)));
 
     initial_stiffness = s_section->get_initial_stiffness();
 

@@ -95,6 +95,8 @@ subview<eT>::inplace_op(const eT val)
   const uword s_n_rows = s.n_rows;
   const uword s_n_cols = s.n_cols;
   
+  if( (s_n_rows == 0) || (s_n_cols == 0) )  { return; }
+  
   if(s_n_rows == 1)
     {
     Mat<eT>& A = const_cast< Mat<eT>& >(s.m);
@@ -150,6 +152,8 @@ subview<eT>::inplace_op(const Base<eT,T1>& in, const char* identifier)
   const uword s_n_cols = s.n_cols;
   
   arma_conform_assert_same_size(s, P, identifier);
+  
+  if( (s_n_rows == 0) || (s_n_cols == 0) )  { return; }
   
   const bool use_mp      = arma_config::openmp && Proxy<T1>::use_mp && mp_gate<eT>::eval(s.n_elem);
   const bool has_overlap = P.has_overlap(s);
@@ -348,8 +352,10 @@ subview<eT>::inplace_op(const subview<eT>& x, const char* identifier)
   
   arma_conform_assert_same_size(s, x, identifier);
   
-  const uword s_n_cols = s.n_cols;
   const uword s_n_rows = s.n_rows;
+  const uword s_n_cols = s.n_cols;
+  
+  if( (s_n_rows == 0) || (s_n_cols == 0) )  { return; }
   
   if(s_n_rows == 1)
     {
@@ -606,7 +612,8 @@ subview<eT>::operator=(const SpBase<eT, T1>& x)
   // Clear the subview.
   zeros();
   
-  // Iterate through the sparse subview and set the nonzero values appropriately.
+  if(p.get_n_nonzero() == 0)  { return; }
+  
   typename SpProxy<T1>::const_iterator_type cit     = p.begin();
   typename SpProxy<T1>::const_iterator_type cit_end = p.end();
   
@@ -631,7 +638,8 @@ subview<eT>::operator+=(const SpBase<eT, T1>& x)
   
   arma_conform_assert_same_size(n_rows, n_cols, p.get_n_rows(), p.get_n_cols(), "addition");
   
-  // Iterate through the sparse subview and add its values.
+  if(p.get_n_nonzero() == 0)  { return; }
+  
   typename SpProxy<T1>::const_iterator_type cit     = p.begin();
   typename SpProxy<T1>::const_iterator_type cit_end = p.end();
   
@@ -656,7 +664,8 @@ subview<eT>::operator-=(const SpBase<eT, T1>& x)
   
   arma_conform_assert_same_size(n_rows, n_cols, p.get_n_rows(), p.get_n_cols(), "subtraction");
   
-  // Iterate through the sparse subview and subtract its values.
+  if(p.get_n_nonzero() == 0)  { return; }
+  
   typename SpProxy<T1>::const_iterator_type cit     = p.begin();
   typename SpProxy<T1>::const_iterator_type cit_end = p.end();
   
@@ -725,13 +734,12 @@ subview<eT>::operator/=(const SpBase<eT, T1>& x)
   {
   arma_debug_sigprint();
   
+  // NOTE: use of this function is not advised; it is implemented only for completeness
+  
   const SpProxy<T1> p(x.get_ref());
   
   arma_conform_assert_same_size(n_rows, n_cols, p.get_n_rows(), p.get_n_cols(), "element-wise division");
   
-  // This is probably going to fill your subview with a bunch of NaNs,
-  // so I'm not going to bother to implement it fast.
-  // You can have slow NaNs.  They're fine too.
   for(uword c = 0; c < n_cols; ++c)
   for(uword r = 0; r < n_rows; ++r)
     {
@@ -968,35 +976,14 @@ subview<eT>::replace(const eT old_val, const eT new_val)
   
   subview<eT>& s = *this;
   
-  const uword s_n_cols = s.n_cols;
   const uword s_n_rows = s.n_rows;
+  const uword s_n_cols = s.n_cols;
   
-  if(s_n_rows == 1)
+  if(s_n_rows == 0)  { return; }
+  
+  if( (s.aux_row1 == 0) && (s_n_rows == s.m.n_rows) )
     {
-    Mat<eT>& A = const_cast< Mat<eT>& >(s.m);
-    
-    const uword A_n_rows = A.n_rows;
-    
-    eT* Aptr = &(A.at(s.aux_row1,s.aux_col1));
-    
-    if(arma_isnan(old_val))
-      {
-      for(uword ucol=0; ucol < s_n_cols; ++ucol)
-        {
-        (*Aptr) = (arma_isnan(*Aptr)) ? new_val : (*Aptr);
-        
-        Aptr += A_n_rows;
-        }
-      }
-    else
-      {
-      for(uword ucol=0; ucol < s_n_cols; ++ucol)
-        {
-        (*Aptr) = ((*Aptr) == old_val) ? new_val : (*Aptr);
-        
-        Aptr += A_n_rows;
-        }
-      }
+    arrayops::replace(s.colptr(0), s.n_elem, old_val, new_val);
     }
   else
     {
@@ -1018,8 +1005,10 @@ subview<eT>::clean(const typename get_pod_type<eT>::result threshold)
   
   subview<eT>& s = *this;
   
-  const uword s_n_cols = s.n_cols;
   const uword s_n_rows = s.n_rows;
+  const uword s_n_cols = s.n_cols;
+  
+  if(s_n_rows == 0)  { return; }
   
   for(uword ucol=0; ucol < s_n_cols; ++ucol)
     {
@@ -1038,18 +1027,20 @@ subview<eT>::clamp(const eT min_val, const eT max_val)
   
   if(is_cx<eT>::no)
     {
-    arma_conform_check( (access::tmp_real(min_val) > access::tmp_real(max_val)), "subview::clamp(): min_val must be less than max_val" );
+    arma_conform_check( ((access::tmp_real(min_val) <= access::tmp_real(max_val)) == false), "subview::clamp(): min_val must be less than max_val" );
     }
   else
     {
-    arma_conform_check( (access::tmp_real(min_val) > access::tmp_real(max_val)), "subview::clamp(): real(min_val) must be less than real(max_val)" );
-    arma_conform_check( (access::tmp_imag(min_val) > access::tmp_imag(max_val)), "subview::clamp(): imag(min_val) must be less than imag(max_val)" );
+    arma_conform_check( ((access::tmp_real(min_val) <= access::tmp_real(max_val)) == false), "subview::clamp(): real(min_val) must be less than real(max_val)" );
+    arma_conform_check( ((access::tmp_imag(min_val) <= access::tmp_imag(max_val)) == false), "subview::clamp(): imag(min_val) must be less than imag(max_val)" );
     }
   
   subview<eT>& s = *this;
   
-  const uword s_n_cols = s.n_cols;
   const uword s_n_rows = s.n_rows;
+  const uword s_n_cols = s.n_cols;
+  
+  if(s_n_rows == 0)  { return; }
   
   for(uword ucol=0; ucol < s_n_cols; ++ucol)
     {
@@ -1068,34 +1059,20 @@ subview<eT>::fill(const eT val)
   
   subview<eT>& s = *this;
   
-  const uword s_n_cols = s.n_cols;
   const uword s_n_rows = s.n_rows;
+  const uword s_n_cols = s.n_cols;
   
-  if(s_n_rows == 1)
+  if(s_n_rows == 0)  { return; }
+  
+  if( (s.aux_row1 == 0) && (s_n_rows == s.m.n_rows) )
     {
-    Mat<eT>& A = const_cast< Mat<eT>& >(s.m);
-    
-    const uword A_n_rows = A.n_rows;
-    
-    eT* Aptr = &(A.at(s.aux_row1,s.aux_col1));
-    
-    for(uword ii=0; ii < s_n_cols; ++ii)
-      {
-      (*Aptr) = val;  Aptr += A_n_rows;
-      }
+    arrayops::inplace_set( s.colptr(0), val, s.n_elem );
     }
   else
     {
-    if( (s.aux_row1 == 0) && (s_n_rows == s.m.n_rows) )
+    for(uword ucol=0; ucol < s_n_cols; ++ucol)
       {
-      arrayops::inplace_set( s.colptr(0), val, s.n_elem );
-      }
-    else
-      {
-      for(uword ucol=0; ucol < s_n_cols; ++ucol)
-        {
-        arrayops::inplace_set( s.colptr(ucol), val, s_n_rows );
-        }
+      arrayops::inplace_set( s.colptr(ucol), val, s_n_rows );
       }
     }
   }
@@ -1109,7 +1086,24 @@ subview<eT>::zeros()
   {
   arma_debug_sigprint();
   
-  (*this).fill(eT(0));
+  subview<eT>& s = *this;
+  
+  const uword s_n_rows = s.n_rows;
+  const uword s_n_cols = s.n_cols;
+  
+  if(s_n_rows == 0)  { return; }
+  
+  if( (s.aux_row1 == 0) && (s_n_rows == s.m.n_rows) )
+    {
+    arrayops::fill_zeros( s.colptr(0), s.n_elem );
+    }
+  else
+    {
+    for(uword ucol=0; ucol < s_n_cols; ++ucol)
+      {
+      arrayops::fill_zeros( s.colptr(ucol), s_n_rows );
+      }
+    }
   }
 
 
@@ -1157,15 +1151,26 @@ subview<eT>::randu()
   const uword s_n_rows = s.n_rows;
   const uword s_n_cols = s.n_cols;
   
+  if( (s_n_rows == 0) || (s_n_cols == 0) )  { return; }
+  
   if(s_n_rows == 1)
     {
+    // NOTE: special handling to ensure that the same sequence is generated as per subview_row::randu()
+    
     podarray<eT> tmp(s_n_cols);
     
     eT* tmp_mem = tmp.memptr();
     
     arma_rng::randu<eT>::fill( tmp_mem, s_n_cols );
     
-    for(uword ii=0; ii < s_n_cols; ++ii)  { at(0,ii) = tmp_mem[ii]; }
+    eT* mem_ptr = startptr();
+    
+    const uword m_n_rows = s.m.n_rows;
+    
+    for(uword ii=0; ii < s_n_cols; ++ii)
+      {
+      (*mem_ptr) = tmp_mem[ii];  mem_ptr += m_n_rows;
+      }
     }
   else
     {
@@ -1197,15 +1202,26 @@ subview<eT>::randn()
   const uword s_n_rows = s.n_rows;
   const uword s_n_cols = s.n_cols;
   
+  if( (s_n_rows == 0) || (s_n_cols == 0) )  { return; }
+  
   if(s_n_rows == 1)
     {
+    // NOTE: special handling to ensure that the same sequence is generated as per subview_row::randu()
+    
     podarray<eT> tmp(s_n_cols);
     
     eT* tmp_mem = tmp.memptr();
     
     arma_rng::randn<eT>::fill( tmp_mem, s_n_cols );
     
-    for(uword ii=0; ii < s_n_cols; ++ii)  { at(0,ii) = tmp_mem[ii]; }
+    eT* mem_ptr = startptr();
+    
+    const uword m_n_rows = s.m.n_rows;
+    
+    for(uword ii=0; ii < s_n_cols; ++ii)
+      {
+      (*mem_ptr) = tmp_mem[ii];  mem_ptr += m_n_rows;
+      }
     }
   else
     {
@@ -1410,7 +1426,7 @@ arma_inline
 eT*
 subview<eT>::colptr(const uword in_col)
   {
-  return & access::rw((const_cast< Mat<eT>& >(m)).mem[ (in_col + aux_col1)*m.n_rows + aux_row1 ]);
+  return access::rwp( m.mem + ((in_col + aux_col1)*m.n_rows + aux_row1) );
   }
 
 
@@ -1420,7 +1436,27 @@ arma_inline
 const eT*
 subview<eT>::colptr(const uword in_col) const
   {
-  return & m.mem[ (in_col + aux_col1)*m.n_rows + aux_row1 ];
+  return m.mem + ((in_col + aux_col1)*m.n_rows + aux_row1);
+  }
+
+
+
+template<typename eT>
+arma_inline
+eT*
+subview<eT>::startptr()
+  {
+  return access::rwp( m.mem + (aux_col1*m.n_rows + aux_row1) );
+  }
+
+
+
+template<typename eT>
+arma_inline
+const eT*
+subview<eT>::startptr() const
+  {
+  return m.mem + (aux_col1*m.n_rows + aux_row1);
   }
 
 
@@ -1483,9 +1519,12 @@ subview<eT>::is_finite() const
   const uword local_n_rows = n_rows;
   const uword local_n_cols = n_cols;
   
-  for(uword ii=0; ii<local_n_cols; ++ii)
+  if(local_n_rows != 0)
     {
-    if(arrayops::is_finite(colptr(ii), local_n_rows) == false)  { return false; }
+    for(uword ii=0; ii<local_n_cols; ++ii)
+      {
+      if(arrayops::is_finite(colptr(ii), local_n_rows) == false)  { return false; }
+      }
     }
   
   return true;
@@ -1500,10 +1539,16 @@ subview<eT>::is_zero(const typename get_pod_type<eT>::result tol) const
   {
   arma_debug_sigprint();
   
+  typedef typename get_pod_type<eT>::result T;
+  
+  arma_conform_check( ((tol >= T(0)) == false), "is_zero(): parameter 'tol' must be >= 0" );
+  
   const uword local_n_rows = n_rows;
   const uword local_n_cols = n_cols;
   
-  for(uword ii=0; ii<local_n_cols; ++ii)
+  if( (local_n_rows == 0) || (local_n_cols == 0) )  { return false; }
+  
+  for(uword ii=0; ii < local_n_cols; ++ii)
     {
     if(arrayops::is_zero(colptr(ii), local_n_rows, tol) == false)  { return false; }
     }
@@ -1525,9 +1570,12 @@ subview<eT>::has_inf() const
   const uword local_n_rows = n_rows;
   const uword local_n_cols = n_cols;
   
-  for(uword ii=0; ii<local_n_cols; ++ii)
+  if(local_n_rows != 0)
     {
-    if(arrayops::has_inf(colptr(ii), local_n_rows))  { return true; }
+    for(uword ii=0; ii<local_n_cols; ++ii)
+      {
+      if(arrayops::has_inf(colptr(ii), local_n_rows))  { return true; }
+      }
     }
   
   return false;
@@ -1547,9 +1595,12 @@ subview<eT>::has_nan() const
   const uword local_n_rows = n_rows;
   const uword local_n_cols = n_cols;
   
-  for(uword ii=0; ii<local_n_cols; ++ii)
+  if(local_n_rows != 0)
     {
-    if(arrayops::has_nan(colptr(ii), local_n_rows))  { return true; }
+    for(uword ii=0; ii<local_n_cols; ++ii)
+      {
+      if(arrayops::has_nan(colptr(ii), local_n_rows))  { return true; }
+      }
     }
   
   return false;
@@ -1569,9 +1620,12 @@ subview<eT>::has_nonfinite() const
   const uword local_n_rows = n_rows;
   const uword local_n_cols = n_cols;
   
-  for(uword ii=0; ii<local_n_cols; ++ii)
+  if(local_n_rows != 0)
     {
-    if(arrayops::is_finite(colptr(ii), local_n_rows) == false)  { return true; }
+    for(uword ii=0; ii<local_n_cols; ++ii)
+      {
+      if(arrayops::is_finite(colptr(ii), local_n_rows) == false)  { return true; }
+      }
     }
   
   return false;
@@ -1590,64 +1644,66 @@ subview<eT>::extract(Mat<eT>& out, const subview<eT>& in)
   // NOTE: we're assuming that the matrix has already been set to the correct size and there is no aliasing;
   // size setting and alias checking is done by either the Mat constructor or operator=()
   
-  const uword n_rows = in.n_rows;  // number of rows in the subview
-  const uword n_cols = in.n_cols;  // number of columns in the subview
-  
   arma_debug_print(arma_str::format("out.n_rows: %u; out.n_cols: %u; in.m.n_rows: %u; in.m.n_cols: %u") % out.n_rows % out.n_cols % in.m.n_rows % in.m.n_cols );
   
+  const uword n_rows = in.n_rows;
+  const uword n_cols = in.n_cols;
   
-  if(in.is_vec())
+  if( (n_rows == 0) || (n_cols == 0) )  { return; }
+  
+  if(n_cols == 1)
     {
-    if(n_cols == 1)   // a column vector
-      {
-      arma_debug_print("subview::extract(): copying col");
-      
-      // in.colptr(0) is the first column of the subview, taking into account any row offset
-      arrayops::copy( out.memptr(), in.colptr(0), n_rows );
-      }
-    else
-    if(n_rows == 1)   // a row vector
-      {
-      arma_debug_print("subview::extract(): copying row)");
-      
-      eT* out_mem = out.memptr();
-      
-      const uword X_n_rows = in.m.n_rows;
-      
-      const eT* Xptr = &(in.m.at(in.aux_row1,in.aux_col1));
-      
-      uword j;
-      
-      for(j=1; j < n_cols; j+=2)
-        {
-        const eT tmp1 = (*Xptr);  Xptr += X_n_rows;
-        const eT tmp2 = (*Xptr);  Xptr += X_n_rows;
-        
-        (*out_mem) = tmp1;  out_mem++;
-        (*out_mem) = tmp2;  out_mem++;
-        }
-      
-      if((j-1) < n_cols)
-        {
-        (*out_mem) = (*Xptr);
-        }
-      }
-    }
-  else   // general submatrix
-    {
-    arma_debug_print("subview::extract(): general submatrix");
+    arma_debug_print("subview::extract(): copying col");
     
-    if( (in.aux_row1 == 0) && (n_rows == in.m.n_rows) )
+    // in.colptr(0) is the first column of the subview, taking into account any row offset
+    arrayops::copy( out.memptr(), in.colptr(0), n_rows );
+    
+    return;
+    }
+  
+  if(n_rows == 1)
+    {
+    arma_debug_print("subview::extract(): copying row");
+    
+    eT* out_mem = out.memptr();
+    
+    const uword X_n_rows = in.m.n_rows;
+    
+    const eT* Xptr = &(in.m.at(in.aux_row1,in.aux_col1));
+    
+    uword j;
+    
+    for(j=1; j < n_cols; j+=2)
       {
-      arrayops::copy( out.memptr(), in.colptr(0), in.n_elem );
+      const eT tmp1 = (*Xptr);  Xptr += X_n_rows;
+      const eT tmp2 = (*Xptr);  Xptr += X_n_rows;
+      
+      (*out_mem) = tmp1;  out_mem++;
+      (*out_mem) = tmp2;  out_mem++;
       }
-    else
+    
+    if((j-1) < n_cols)
       {
-      for(uword col=0; col < n_cols; ++col)
-        {
-        arrayops::copy( out.colptr(col), in.colptr(col), n_rows );
-        }
+      (*out_mem) = (*Xptr);
       }
+    
+    return;
+    }
+  
+  if( (in.aux_row1 == 0) && (n_rows == in.m.n_rows) )
+    {
+    arma_debug_print("subview::extract(): contiguous submatrix");
+    
+    arrayops::copy( out.memptr(), in.colptr(0), in.n_elem );
+    
+    return;
+    }
+    
+  arma_debug_print("subview::extract(): general submatrix");
+  
+  for(uword col=0; col < n_cols; ++col)
+    {
+    arrayops::copy( out.colptr(col), in.colptr(col), n_rows );
     }
   }
 
@@ -1665,6 +1721,8 @@ subview<eT>::plus_inplace(Mat<eT>& out, const subview<eT>& in)
   
   const uword n_rows = in.n_rows;
   const uword n_cols = in.n_cols;
+  
+  if( (n_rows == 0) || (n_cols == 0) )  { return; }
   
   if(n_rows == 1)
     {
@@ -1714,6 +1772,8 @@ subview<eT>::minus_inplace(Mat<eT>& out, const subview<eT>& in)
   const uword n_rows = in.n_rows;
   const uword n_cols = in.n_cols;
   
+  if( (n_rows == 0) || (n_cols == 0) )  { return; }
+  
   if(n_rows == 1)
     {
     eT* out_mem = out.memptr();
@@ -1762,6 +1822,8 @@ subview<eT>::schur_inplace(Mat<eT>& out, const subview<eT>& in)
   const uword n_rows = in.n_rows;
   const uword n_cols = in.n_cols;
   
+  if( (n_rows == 0) || (n_cols == 0) )  { return; }
+  
   if(n_rows == 1)
     {
     eT* out_mem = out.memptr();
@@ -1809,6 +1871,8 @@ subview<eT>::div_inplace(Mat<eT>& out, const subview<eT>& in)
   
   const uword n_rows = in.n_rows;
   const uword n_cols = in.n_cols;
+  
+  if( (n_rows == 0) || (n_cols == 0) )  { return; }
   
   if(n_rows == 1)
     {
@@ -2377,9 +2441,12 @@ subview<eT>::each_col(const std::function< void(Col<eT>&) >& F)
   {
   arma_debug_sigprint();
   
-  for(uword ii=0; ii < n_cols; ++ii)
+  const uword local_n_rows = n_rows;
+  const uword local_n_cols = n_cols;
+  
+  for(uword ii=0; ii < local_n_cols; ++ii)
     {
-    Col<eT> tmp(colptr(ii), n_rows, false, true);
+    Col<eT> tmp(colptr(ii), local_n_rows, false, true);
     F(tmp);
     }
   }
@@ -2393,9 +2460,12 @@ subview<eT>::each_col(const std::function< void(const Col<eT>&) >& F) const
   {
   arma_debug_sigprint();
   
-  for(uword ii=0; ii < n_cols; ++ii)
+  const uword local_n_rows = n_rows;
+  const uword local_n_cols = n_cols;
+  
+  for(uword ii=0; ii < local_n_cols; ++ii)
     {
-    const Col<eT> tmp(colptr(ii), n_rows, false, true);
+    const Col<eT> tmp(colptr(ii), local_n_rows, false, true);
     F(tmp);
     }
   }
@@ -2410,20 +2480,23 @@ subview<eT>::each_row(const std::function< void(Row<eT>&) >& F)
   {
   arma_debug_sigprint();
   
-  podarray<eT> array1(n_cols);
-  podarray<eT> array2(n_cols);
+  const uword local_n_rows = n_rows;
+  const uword local_n_cols = n_cols;
   
-  Row<eT> tmp1( array1.memptr(), n_cols, false, true );
-  Row<eT> tmp2( array2.memptr(), n_cols, false, true );
+  podarray<eT> array1(local_n_cols);
+  podarray<eT> array2(local_n_cols);
+  
+  Row<eT> tmp1( array1.memptr(), local_n_cols, false, true );
+  Row<eT> tmp2( array2.memptr(), local_n_cols, false, true );
   
   eT* tmp1_mem = tmp1.memptr();
   eT* tmp2_mem = tmp2.memptr();
   
   uword ii, jj;
   
-  for(ii=0, jj=1; jj < n_rows; ii+=2, jj+=2)
+  for(ii=0, jj=1; jj < local_n_rows; ii+=2, jj+=2)
     {
-    for(uword col_id = 0; col_id < n_cols; ++col_id)
+    for(uword col_id = 0; col_id < local_n_cols; ++col_id)
       {
       const eT* col_mem = colptr(col_id);
       
@@ -2434,7 +2507,7 @@ subview<eT>::each_row(const std::function< void(Row<eT>&) >& F)
     F(tmp1);
     F(tmp2);
     
-    for(uword col_id = 0; col_id < n_cols; ++col_id)
+    for(uword col_id = 0; col_id < local_n_cols; ++col_id)
       {
       eT* col_mem = colptr(col_id);
       
@@ -2443,7 +2516,7 @@ subview<eT>::each_row(const std::function< void(Row<eT>&) >& F)
       }
     }
   
-  if(ii < n_rows)
+  if(ii < local_n_rows)
     {
     tmp1 = (*this).row(ii);
     
@@ -2462,20 +2535,23 @@ subview<eT>::each_row(const std::function< void(const Row<eT>&) >& F) const
   {
   arma_debug_sigprint();
   
-  podarray<eT> array1(n_cols);
-  podarray<eT> array2(n_cols);
+  const uword local_n_rows = n_rows;
+  const uword local_n_cols = n_cols;
   
-  Row<eT> tmp1( array1.memptr(), n_cols, false, true );
-  Row<eT> tmp2( array2.memptr(), n_cols, false, true );
+  podarray<eT> array1(local_n_cols);
+  podarray<eT> array2(local_n_cols);
+  
+  Row<eT> tmp1( array1.memptr(), local_n_cols, false, true );
+  Row<eT> tmp2( array2.memptr(), local_n_cols, false, true );
   
   eT* tmp1_mem = tmp1.memptr();
   eT* tmp2_mem = tmp2.memptr();
   
   uword ii, jj;
   
-  for(ii=0, jj=1; jj < n_rows; ii+=2, jj+=2)
+  for(ii=0, jj=1; jj < local_n_rows; ii+=2, jj+=2)
     {
-    for(uword col_id = 0; col_id < n_cols; ++col_id)
+    for(uword col_id = 0; col_id < local_n_cols; ++col_id)
       {
       const eT* col_mem = colptr(col_id);
       
@@ -2487,7 +2563,7 @@ subview<eT>::each_row(const std::function< void(const Row<eT>&) >& F) const
     F(tmp2);
     }
   
-  if(ii < n_rows)
+  if(ii < local_n_rows)
     {
     tmp1 = (*this).row(ii);
     
@@ -3264,7 +3340,7 @@ template<typename eT>
 inline
 subview_col<eT>::subview_col(const Mat<eT>& in_m, const uword in_col)
   : subview<eT>(in_m, 0, in_col, in_m.n_rows, 1)
-  , colmem(subview<eT>::colptr(0)) 
+  , colmem(subview<eT>::startptr()) 
   {
   arma_debug_sigprint();
   }
@@ -3275,7 +3351,7 @@ template<typename eT>
 inline
 subview_col<eT>::subview_col(const Mat<eT>& in_m, const uword in_col, const uword in_row1, const uword in_n_rows)
   : subview<eT>(in_m, in_row1, in_col, in_n_rows, 1)
-  , colmem(subview<eT>::colptr(0)) 
+  , colmem(subview<eT>::startptr()) 
   {
   arma_debug_sigprint();
   }
@@ -3458,6 +3534,18 @@ subview_col<eT>::as_row() const
 template<typename eT>
 inline
 void
+subview_col<eT>::replace(const eT old_val, const eT new_val)
+  {
+  arma_debug_sigprint();
+  
+  arrayops::replace( access::rwp(colmem), subview<eT>::n_rows, old_val, new_val );
+  }
+
+
+
+template<typename eT>
+inline
+void
 subview_col<eT>::fill(const eT val)
   {
   arma_debug_sigprint();
@@ -3493,6 +3581,30 @@ subview_col<eT>::ones()
 
 template<typename eT>
 inline
+void
+subview_col<eT>::randu()
+  {
+  arma_debug_sigprint();
+  
+  arma_rng::randu<eT>::fill( access::rwp(colmem), subview<eT>::n_rows );
+  }
+
+
+
+template<typename eT>
+inline
+void
+subview_col<eT>::randn()
+  {
+  arma_debug_sigprint();
+  
+  arma_rng::randn<eT>::fill( access::rwp(colmem), subview<eT>::n_rows );
+  }
+
+
+
+template<typename eT>
+inline
 bool
 subview_col<eT>::is_finite() const
   {
@@ -3501,6 +3613,22 @@ subview_col<eT>::is_finite() const
   if(arma_config::fast_math_warn)  { arma_warn(1, "is_finite(): detection of non-finite values is not reliable in fast math mode"); }
   
   return arrayops::is_finite(colmem, subview<eT>::n_rows);
+  }
+
+
+
+template<typename eT>
+inline
+bool
+subview_col<eT>::is_zero(const typename get_pod_type<eT>::result tol) const
+  {
+  arma_debug_sigprint();
+  
+  typedef typename get_pod_type<eT>::result T;
+  
+  arma_conform_check( ((tol >= T(0)) == false), "is_zero(): parameter 'tol' must be >= 0" );
+  
+  return arrayops::is_zero(colmem, subview<eT>::n_rows, tol);
   }
 
 
@@ -4268,7 +4396,7 @@ template<typename eT>
 inline
 subview_row<eT>::subview_row(const Mat<eT>& in_m, const uword in_row)
   : subview<eT>(in_m, in_row, 0, 1, in_m.n_cols)
-  , rowmem(subview<eT>::colptr(0))
+  , rowmem(subview<eT>::startptr())
   {
   arma_debug_sigprint();
   }
@@ -4279,7 +4407,7 @@ template<typename eT>
 inline
 subview_row<eT>::subview_row(const Mat<eT>& in_m, const uword in_row, const uword in_col1, const uword in_n_cols)
   : subview<eT>(in_m, in_row, in_col1, 1, in_n_cols)
-  , rowmem(subview<eT>::colptr(0))
+  , rowmem(subview<eT>::startptr())
   {
   arma_debug_sigprint();
   }
@@ -4489,6 +4617,40 @@ subview_row<eT>::as_col() const
 template<typename eT>
 inline
 void
+subview_row<eT>::replace(const eT old_val, const eT new_val)
+  {
+  arma_debug_sigprint();
+  
+  eT* mem_ptr = access::rwp(rowmem);
+  
+  const uword local_s_n_cols = subview<eT>::n_cols;
+  const uword local_m_n_rows = subview<eT>::m.n_rows;
+  
+  if(arma_isnan(old_val))
+    {
+    for(uword ii=0; ii < local_s_n_cols; ++ii)
+      {
+      eT& val = (*mem_ptr);  mem_ptr += local_m_n_rows;
+      
+      val = (arma_isnan(val)) ? new_val : val;
+      }
+    }
+  else
+    {
+    for(uword ii=0; ii < local_s_n_cols; ++ii)
+      {
+      eT& val = (*mem_ptr);  mem_ptr += local_m_n_rows;
+      
+      val = (val == old_val) ? new_val : val;
+      }
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
 subview_row<eT>::fill(const eT val)
   {
   arma_debug_sigprint();
@@ -4532,6 +4694,58 @@ subview_row<eT>::ones()
 
 template<typename eT>
 inline
+void
+subview_row<eT>::randu()
+  {
+  arma_debug_sigprint();
+  
+  const uword local_s_n_cols = subview<eT>::n_cols;
+  const uword local_m_n_rows = subview<eT>::m.n_rows;
+  
+  podarray<eT> tmp(local_s_n_cols);
+  
+  eT* tmp_mem = tmp.memptr();
+  
+  arma_rng::randu<eT>::fill( tmp_mem, local_s_n_cols );
+  
+  eT* mem_ptr = access::rwp(rowmem);
+  
+  for(uword ii=0; ii < local_s_n_cols; ++ii)
+    {
+    (*mem_ptr) = tmp_mem[ii];  mem_ptr += local_m_n_rows;
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
+subview_row<eT>::randn()
+  {
+  arma_debug_sigprint();
+  
+  const uword local_s_n_cols = subview<eT>::n_cols;
+  const uword local_m_n_rows = subview<eT>::m.n_rows;
+  
+  podarray<eT> tmp(local_s_n_cols);
+  
+  eT* tmp_mem = tmp.memptr();
+  
+  arma_rng::randn<eT>::fill( tmp_mem, local_s_n_cols );
+  
+  eT* mem_ptr = access::rwp(rowmem);
+  
+  for(uword ii=0; ii < local_s_n_cols; ++ii)
+    {
+    (*mem_ptr) = tmp_mem[ii];  mem_ptr += local_m_n_rows;
+    }
+  }
+
+
+
+template<typename eT>
+inline
 bool
 subview_row<eT>::is_finite() const
   {
@@ -4549,6 +4763,80 @@ subview_row<eT>::is_finite() const
     const eT val = (*mem_ptr);  mem_ptr += local_m_n_rows;
     
     if(arma_isnonfinite(val))  { return false; }
+    }
+  
+  return true;
+  }
+
+
+
+template<typename eT>
+inline
+bool
+subview_row<eT>::is_zero(const typename get_pod_type<eT>::result tol) const
+  {
+  arma_debug_sigprint();
+  
+  typedef typename get_pod_type<eT>::result T;
+  
+  arma_conform_check( ((tol >= T(0)) == false), "is_zero(): parameter 'tol' must be >= 0" );
+  
+  const uword local_s_n_cols = subview<eT>::n_cols;
+  const uword local_m_n_rows = subview<eT>::m.n_rows;
+  
+  if(local_s_n_cols == 0)  { return false; }
+  
+  const eT* mem_ptr = rowmem;
+  
+  if(is_cx<eT>::yes)
+    {
+    if(tol == T(0))
+      {
+      for(uword ii=0; ii < local_s_n_cols; ++ii)
+        {
+        const eT& val = (*mem_ptr);  mem_ptr += local_m_n_rows;
+        
+        const T val_real = access::tmp_real(val);
+        const T val_imag = access::tmp_imag(val);
+        
+        if(eop_aux::arma_abs(val_real) != T(0))  { return false; }
+        if(eop_aux::arma_abs(val_imag) != T(0))  { return false; }
+        }
+      }
+    else
+      {
+      for(uword ii=0; ii < local_s_n_cols; ++ii)
+        {
+        const eT& val = (*mem_ptr);  mem_ptr += local_m_n_rows;
+        
+        const T val_real = access::tmp_real(val);
+        const T val_imag = access::tmp_imag(val);
+        
+        if( (eop_aux::arma_abs(val_real) <= tol) == false )  { return false; }
+        if( (eop_aux::arma_abs(val_imag) <= tol) == false )  { return false; }
+        }
+      }
+    }
+  else  // not complex
+    {
+    if(tol == T(0))
+      {
+      for(uword ii=0; ii < local_s_n_cols; ++ii)
+        {
+        const eT val = (*mem_ptr);  mem_ptr += local_m_n_rows;
+        
+        if(val != eT(0))  { return false; }
+        }
+      }
+    else
+      {
+      for(uword ii=0; ii < local_s_n_cols; ++ii)
+        {
+        const eT val = (*mem_ptr);  mem_ptr += local_m_n_rows;
+        
+        if( (eop_aux::arma_abs(val) <= tol) == false )  { return false; }
+        }
+      }
     }
   
   return true;

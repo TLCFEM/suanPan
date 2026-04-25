@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 #include <Material/Material1D/Viscosity/Maxwell.h>
 
 Damper02::Damper02(const unsigned T, uvec&& NT, const unsigned DT, const unsigned ST, const bool UM, const unsigned PC, const double BT, const unsigned DIM)
-    : MaterialElement1D(T, d_node, 3 == DIM ? 3 : 2, std::move(NT), {}, false, 3 == DIM ? std::vector{DOF::U1, DOF::U2, DOF::U3} : std::vector{DOF::U1, DOF::U2})
-    , d_dof(3 == DIM ? 3 : 2)
+    : MaterialElement1D(T, d_node, DIM, std::move(NT), {}, false, suanpan::translational(DIM))
+    , d_dof(DIM)
     , IS(3 == d_dof ? uvec{0, 1, 2} : uvec{0, 1})
     , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3})
     , device(std::make_unique<Maxwell>(0, DT, ST, UM, PC, BT)) { modify_viscous = false; }
@@ -86,7 +86,7 @@ int Damper02::clear_status() { return device->clear_status(); }
 
 int Damper02::reset_status() { return device->reset_status(); }
 
-std::vector<vec> Damper02::record(const OutputType P) { return device->record(P); }
+std::vector<vec> Damper02::record(const OutputType P) const { return device->record(P); }
 
 void Damper02::print() {
     suanpan_info("A viscous damper element using displacement and velocity as basic quantities.\n");

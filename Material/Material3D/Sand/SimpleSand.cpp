@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@ int SimpleSand::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> SimpleSand::get_copy() { return std::make_unique<SimpleSand>(*this); }
+unique_ptr<Material> SimpleSand::unique_copy() { return std::make_unique<SimpleSand>(*this); }
 
-double SimpleSand::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double SimpleSand::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int SimpleSand::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -114,10 +114,10 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(incre);
+        const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre(sa);
         p -= incre(sb);

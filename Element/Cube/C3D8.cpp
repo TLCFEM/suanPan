@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(3, int_scheme == 'R' ? 1 : 2, int_scheme == 'I' ? IntegrationType::IRONS : IntegrationType::GAUSS);
+    const IntegrationPlan plan(3, int_scheme == 'R' ? 1 : 2, int_scheme == 'I' ? IntegrationPlan::Type::IRONS : IntegrationPlan::Type::GAUSS);
 
     if(hourglass_control) {
         hourglass.zeros(c_size, c_size);
@@ -78,7 +78,7 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->get_copy(), solve(jacob, pn));
+        int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), solve(jacob, pn));
 
         const auto& c_pt = int_pt.back();
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
@@ -207,9 +207,9 @@ int C3D8::reset_status() {
 
 mat C3D8::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::cube(coordinate, order, c_node); }
 
-std::vector<vec> C3D8::record(const OutputType P) {
+std::vector<vec> C3D8::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.c_material->record(P));
     return data;
 }
 
@@ -230,21 +230,18 @@ void C3D8::print() {
 #ifdef SUANPAN_VTK
 #include <vtkHexahedron.h>
 
-void C3D8::Setup() {
-    vtk_cell = vtkSmartPointer<vtkHexahedron>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < c_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
-}
+vtkSmartPointer<vtkCell> C3D8::GetCell() const { return vtkSmartPointer<vtkHexahedron>::New(); }
 
 mat C3D8::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), c_dof, c_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), c_dof, c_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), c_dof, c_node);
+
     mat A(int_pt.size(), 7);
     mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].c_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
+        if(auto C = int_pt[I].c_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
 
@@ -262,19 +259,6 @@ mat C3D8::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void C3D8::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, c_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 2) = reshape(get_current_acceleration(), c_dof, c_node);
-    else if(OutputType::V == type) t_disp.rows(0, 2) = reshape(get_current_velocity(), c_dof, c_node);
-    else if(OutputType::U == type) t_disp.rows(0, 2) = reshape(get_current_displacement(), c_dof, c_node);
-
-    for(unsigned I = 0; I < c_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void C3D8::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement(), c_dof, c_node).t();
-    for(unsigned I = 0; I < c_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat C3D8::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), c_dof, c_node); }
 
 #endif

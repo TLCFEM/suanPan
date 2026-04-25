@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 
 template<sp_d T> class BandMatCluster : public DenseMat<T> {
     using solver_t = ezp::pgbsv<T, la_it>;
-    using indexer_t = typename solver_t::indexer;
+    using indexer_t = solver_t::indexer;
 
     static T bin;
 
@@ -63,7 +63,7 @@ public:
             suanpan_warning("The storage requirement for the banded matrix is larger than that of a full matrix, consider using a full/sparse matrix instead.\n");
     }
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<BandMatCluster>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandMatCluster>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;
@@ -97,9 +97,9 @@ public:
 template<sp_d T> T BandMatCluster<T>::bin = T(0);
 
 template<sp_d T> Mat<T> BandMatCluster<T>::operator*(const Mat<T>& X) const {
-    static constexpr char TRAN = 'N';
+    static constexpr auto TRAN = 'N';
     static constexpr blas_int INC = 1;
-    static constexpr T ALPHA = T(1), BETA = T(0);
+    static constexpr T ALPHA{1}, BETA{0};
 
     Mat<T> Y(arma::size(X));
 
@@ -111,14 +111,8 @@ template<sp_d T> Mat<T> BandMatCluster<T>::operator*(const Mat<T>& X) const {
     const auto KU = static_cast<blas_int>(u_band);
     const auto LDA = static_cast<blas_int>(2 * s_band + 1);
 
-    if constexpr(std::is_same_v<T, float>) {
-        using E = float;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + s_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
-    else {
-        using E = double;
-        suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, (E*)&ALPHA, (E*)(this->memptr() + s_band), &LDA, (E*)X.colptr(I), &INC, (E*)&BETA, (E*)Y.colptr(I), &INC); });
-    }
+    if constexpr(std::is_same_v<T, float>) suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, &ALPHA, this->memptr() + s_band, &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
+    else suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, &ALPHA, this->memptr() + s_band, &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
 
     return Y;
 }

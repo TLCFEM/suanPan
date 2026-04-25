@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ int ArmstrongFrederick::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> ArmstrongFrederick::get_copy() { return std::make_unique<ArmstrongFrederick>(*this); }
+unique_ptr<Material> ArmstrongFrederick::unique_copy() { return std::make_unique<ArmstrongFrederick>(*this); }
 
-double ArmstrongFrederick::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double ArmstrongFrederick::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
 int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

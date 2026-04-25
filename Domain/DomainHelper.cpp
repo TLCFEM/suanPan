@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ shared_ptr<Element>& get_element(const shared_ptr<Domain>& D, const unsigned T) 
 shared_ptr<Group>& get_group(const shared_ptr<Domain>& D, const unsigned T) { return D->group_pond[T]; }
 
 shared_ptr<Integrator>& get_integrator(const shared_ptr<Domain>& D, const unsigned T) { return D->integrator_pond[T]; }
+
+shared_ptr<Interaction>& get_interaction(const shared_ptr<Domain>& D, const unsigned T) { return D->interaction_pond[T]; }
 
 shared_ptr<Load>& get_load(const shared_ptr<Domain>& D, const unsigned T) { return D->load_pond[T]; }
 
@@ -70,6 +72,8 @@ shared_ptr<Element>& get_element(const shared_ptr<DomainBase>& D, const unsigned
 shared_ptr<Group>& get_group(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->group_pond[T]; }
 
 shared_ptr<Integrator>& get_integrator(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->integrator_pond[T]; }
+
+shared_ptr<Interaction>& get_interaction(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->interaction_pond[T]; }
 
 shared_ptr<Load>& get_load(const shared_ptr<DomainBase>& D, const unsigned T) { return std::dynamic_pointer_cast<Domain>(D)->load_pond[T]; }
 

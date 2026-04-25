@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,35 +21,27 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 
-SumRecorder::SumRecorder(const unsigned T, uvec&& B, const OutputType L, const unsigned I, const bool R, const bool H)
-    : Recorder(T, std::move(B), L, I, R, H) { access::rw(get_data_pool()).resize(1); }
+void SumRecorder::record_impl(const shared_ptr<DomainBase>& D) {
+    running_stat_vec<vec> data;
+    for(const auto I : object_tag)
+        for(const auto& t_data : D->get<Node>(I)->record(variable_type)) data(t_data);
+
+    insert({data.mean() * data.count()}, 0);
+
+    insert(D->get_factory()->get_current_time());
+}
 
 void SumRecorder::initialize(const shared_ptr<DomainBase>& D) {
-    for(const auto I : get_object_tag())
-        if(!D->find<Node>(I)) {
+    for(const auto I : update_tag(D))
+        if(!D->find<Node>(I) || !D->get<Node>(I)->is_active()) {
+            suanpan_warning("Node {} is not available/active, recorder {} is disabled.\n", I, get_tag());
             D->disable_recorder(get_tag());
             return;
         }
 }
 
-void SumRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
+void SumRecorder::print() { suanpan_info("A summation recorder computes the summation of a collection of nodal scalar variables.\n"); }
 
-    auto data = 0.;
-    for(const auto I : get_object_tag()) {
-        const auto& t_node = D->get<Node>(I);
-        if(!t_node->is_active()) continue;
-        const auto t_data = t_node->record(get_variable_type());
-        if(t_data.empty()) continue;
-        const auto& n_data = t_data[0];
-        if(n_data.empty()) continue;
-        data += as_scalar(n_data);
-    }
-    insert({{data}}, 0);
+const uvec& GroupSumRecorder::update_tag(const shared_ptr<DomainBase>& D) { return object_tag = D->flatten_group(reference_tag); }
 
-    if(if_record_time()) insert(D->get_factory()->get_current_time());
-}
-
-void SumRecorder::print() {
-    suanpan_info("A summation recorder computes the summation of a collection of nodal scalar variables.\n");
-}
+void GroupSumRecorder::print() { suanpan_info("A summation recorder.\n"); }

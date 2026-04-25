@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,31 @@
 
 #include "RigidWallPenalty.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F, const unsigned NS)
-    : Constraint(T, A, {}, {}, 0)
+    : Constraint(T, A, setup(NS), {}, 0)
     , n_dim(NS)
     , alpha(F)
     , origin(std::move(O))
     , outer_norm(normalise(N)) {}
 
 RigidWallPenalty::RigidWallPenalty(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F, const unsigned NS)
-    : Constraint(T, A, {}, {}, 0)
+    : Constraint(T, A, setup(NS), {}, 0)
     , n_dim(NS)
     , alpha(F)             // penalty factor
     , edge_a(E1)           // 3D vector
     , edge_b(E2)           // 3D vector
     , origin(std::move(O)) // 1D, 2D and 3D vectors
-    , outer_norm(normalise(cross(E1, E2)))
+    , outer_norm(normalise(cross(edge_a, edge_b)))
     , length_a(norm(edge_a))
     , length_b(norm(edge_b)) {}
+
+int RigidWallPenalty::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
+
+    return validate_node(D) ? SUANPAN_SUCCESS : SUANPAN_FAIL;
+}
 
 int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
@@ -49,8 +54,7 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
 
     auto counter = 0llu;
     for(const auto& I : D->get_node_pool()) {
-        if(!checker_handler(I)) continue;
-        const vec t_pos = trial_position_handler(I) - origin;
+        const vec t_pos = I->trial_position(n_dim) - origin;
         if(!edge_a.empty())
             if(const auto projection = dot(t_pos, edge_a); projection > length_a || projection < 0.) continue;
         if(!edge_b.empty())
@@ -68,7 +72,7 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
         counter = next_counter;
     }
 
-    dof_encoding = pool;
+    target_dof = pool;
 
     return SUANPAN_SUCCESS;
 }
@@ -79,22 +83,21 @@ void RigidWallPenalty::clear_status() { resistance.reset(); }
 
 void RigidWallPenalty::reset_status() { resistance.reset(); }
 
-RigidWallPenalty1D::RigidWallPenalty1D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, A, resize(O, 1, 1), resize(N, 1, 1), F, 1) { set_handler<DOF::U1>(); }
+RigidWallPenalty1D::RigidWallPenalty1D(const unsigned T, const unsigned A, const double O, const double N, const double F)
+    : RigidWallPenalty(T, A, {O}, {N}, F, 1) {}
 
-RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, A, resize(O, 2, 1), resize(N, 2, 1), F, 2) { set_handler<DOF::U1, DOF::U2>(); }
+RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec2&& O, vec2&& N, const double F)
+    : RigidWallPenalty(T, A, std::move(O), std::move(N), F, 2) {}
 
-RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallPenalty(T, A, resize(O, 2, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 2) {
-    set_handler<DOF::U1, DOF::U2>();
+RigidWallPenalty2D::RigidWallPenalty2D(const unsigned T, const unsigned A, vec2&& O, vec3&& E1, const double F)
+    : RigidWallPenalty(T, A, std::move(O), std::move(E1), vec{0., 0., 1.}, F, 2) {
     access::rw(outer_norm).resize(2);
     access::rw(edge_a).resize(2);
     access::rw(edge_b).reset();
 }
 
-RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& N, const double F)
-    : RigidWallPenalty(T, A, resize(O, 3, 1), resize(N, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec3&& O, vec3&& N, const double F)
+    : RigidWallPenalty(T, A, std::move(O), std::move(N), F, 3) {}
 
-RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec&& O, vec&& E1, vec&& E2, const double F)
-    : RigidWallPenalty(T, A, resize(O, 3, 1), resize(E1, 3, 1), resize(E2, 3, 1), F, 3) { set_handler<DOF::U1, DOF::U2, DOF::U3>(); }
+RigidWallPenalty3D::RigidWallPenalty3D(const unsigned T, const unsigned A, vec3&& O, vec3&& E1, vec3&& E2, const double F)
+    : RigidWallPenalty(T, A, std::move(O), std::move(E1), std::move(E2), F, 3) {}

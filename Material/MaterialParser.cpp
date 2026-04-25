@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -316,24 +316,36 @@ namespace {
             container.emplace_back(a, b);
         };
 
-        std::vector<DataBalloon1D::Saturation> bfc, bac, bna, bnd;
+        std::vector<BalloonSaturation> bfc, bac, bna, bnd;
+
+        auto memory_type = BalloonBuffer::Type::MEAN;
 
         std::string token;
         while(!command.eof()) {
             if(!get_input(command, token)) {
-                suanpan_error("A valid token (-fc,-ac,-na,-nd) is required.\n");
+                suanpan_error("A valid token (-fc,-ac,-na,-nd,-memory) is required.\n");
                 return;
             }
-            if(is_equal("-fc", token)) populate(bfc);
-            else if(is_equal("-ac", token)) populate(bac);
-            else if(is_equal("-na", token)) populate(bna);
-            else if(is_equal("-nd", token)) populate(bnd);
+            if(is_equal(token, "-fc")) populate(bfc);
+            else if(is_equal(token, "-ac")) populate(bac);
+            else if(is_equal(token, "-na")) populate(bna);
+            else if(is_equal(token, "-nd")) populate(bnd);
+            else if(is_equal(token, "-memory") && get_input(command, token)) {
+                if(is_equal(token, "minimum")) memory_type = BalloonBuffer::Type::MINIMUM;
+                else if(is_equal(token, "maximum")) memory_type = BalloonBuffer::Type::MAXIMUM;
+                else if(is_equal(token, "mean")) memory_type = BalloonBuffer::Type::MEAN;
+                else {
+                    suanpan_error("A valid memory type (minimum, maximum, mean) is required.\n");
+                    return;
+                }
+            }
         }
 
         DataBalloon1D para{
             p(0),                         // elastic modulus
             p(1),                         // split ratio
             static_cast<unsigned>(p(2)),  // zr memory size
+            memory_type,                  // zr memory type
             {p(3), p(4), p(5), p(6)},     // u
             {p(7), p(8), p(9), p(10)},    // fm
             {p(11), p(12), p(13), p(14)}, // fc
@@ -346,6 +358,76 @@ namespace {
         };
 
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
+    }
+
+    void new_balloon(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        vec p(24);
+        if(!get_input(command, p)) {
+            suanpan_error("Valid inputs are required.\n");
+            return;
+        }
+
+        auto density = 0.;
+        if(!get_input(command, density)) {
+            suanpan_error("A valid density is required.\n");
+            return;
+        }
+
+        const auto populate = [&command](auto& container) {
+            double a, b;
+            if(!get_input(command, a, b)) return;
+            container.emplace_back(a, b);
+        };
+
+        std::vector<BalloonSaturation> bfc, bac, bna, bnd;
+
+        auto memory_type = BalloonBuffer::Type::MEAN;
+
+        std::string token;
+        while(!command.eof()) {
+            if(!get_input(command, token)) {
+                suanpan_error("A valid token (-fc,-ac,-na,-nd,-memory) is required.\n");
+                return;
+            }
+            if(is_equal(token, "-fc")) populate(bfc);
+            else if(is_equal(token, "-ac")) populate(bac);
+            else if(is_equal(token, "-na")) populate(bna);
+            else if(is_equal(token, "-nd")) populate(bnd);
+            else if(is_equal(token, "-memory") && get_input(command, token)) {
+                if(is_equal(token, "minimum")) memory_type = BalloonBuffer::Type::MINIMUM;
+                else if(is_equal(token, "maximum")) memory_type = BalloonBuffer::Type::MAXIMUM;
+                else if(is_equal(token, "mean")) memory_type = BalloonBuffer::Type::MEAN;
+                else {
+                    suanpan_error("A valid memory type (minimum, maximum, mean) is required.\n");
+                    return;
+                }
+            }
+        }
+
+        DataBalloon para{
+            p(0),                         // elastic modulus
+            p(1),                         // poisson's ratio
+            p(2),                         // split ratio
+            static_cast<unsigned>(p(3)),  // zr memory size
+            memory_type,                  // zr memory type
+            {p(4), p(5), p(6), p(7)},     // u
+            {p(8), p(9), p(10), p(11)},   // fm
+            {p(12), p(13), p(14), p(15)}, // fc
+            {p(16), p(17), p(18), p(19)}, // am
+            {p(20), p(21), p(22), p(23)}, // ac
+            std::move(bfc),
+            std::move(bac),
+            std::move(bna),
+            std::move(bnd)
+        };
+
+        return_obj = std::make_unique<Balloon>(tag, std::move(para), density);
     }
 
     void new_bilinear1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -995,9 +1077,7 @@ namespace {
             return;
         }
 
-        const auto para = get_remaining<double>(command);
-
-        if(para.size() == 8) return_obj = std::make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], 0.);
+        if(const auto para = get_remaining<double>(command); para.size() == 8) return_obj = std::make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], 0.);
         else if(para.size() == 9) return_obj = std::make_unique<Concrete21>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
         else
             suanpan_error("Eight or nine double inputs are required.\n");
@@ -1010,9 +1090,7 @@ namespace {
             return;
         }
 
-        const auto para = get_remaining<double>(command);
-
-        if(para.size() == 10) return_obj = std::make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], 0.);
+        if(const auto para = get_remaining<double>(command); para.size() == 10) return_obj = std::make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], 0.);
         else if(para.size() == 11) return_obj = std::make_unique<Concrete22>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8], para[9], para[10]);
         else
             suanpan_error("Ten or eleven double inputs are required.\n");
@@ -1210,9 +1288,7 @@ namespace {
             return;
         }
 
-        const auto para = get_remaining<double>(command);
-
-        if(para.size() == 8) return_obj = std::make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
+        if(const auto para = get_remaining<double>(command); para.size() == 8) return_obj = std::make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7]);
         else if(para.size() == 9) return_obj = std::make_unique<ConcreteTsai>(tag, para[0], para[1], para[2], para[3], para[4], para[5], para[6], para[7], para[8]);
         else
             suanpan_error("Eight or nine double inputs are required.\n");
@@ -2495,13 +2571,13 @@ namespace {
 
         const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
-        auto m_imag = vec{m_i}, s_imag = vec{s_i};
+        const vec m_imag{m_i}, s_imag{s_i};
         if(accu(m_imag) + accu(s_imag) > 1E-10) {
             suanpan_error("Parameters should be conjugate pairs.\n");
             return;
         }
 
-        auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+        cx_vec m{vec{m_r}, m_imag}, s{vec{s_r}, s_imag};
 
         if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
             suanpan_error("The provided kernel does not converge to zero.\n");
@@ -2892,8 +2968,8 @@ namespace {
             return;
         }
 
-        DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), 1., 0., 0., {{p(10), 1.}}, {{p(11), std::min(1. - datum::eps, p(12))}}};
-        if(para.m_iso < 0. || para.m_kin < 0.) {
+        DataSubloading1D para{p(0), {p(1), p(2), p(3), p(4)}, {p(5), p(6), p(7), p(8)}, p(9), 1., 0., 0., {{p(10), 1.}}, {{p(11), std::min(1. - datum::eps, p(12))}}};
+        if(para.iso_bound.rate < 0. || para.kin_bound.rate < 0.) {
             suanpan_error("The evolution rate must be positive.\n");
             return;
         }
@@ -2924,8 +3000,8 @@ namespace {
             return;
         }
 
-        DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), std::min(1. - datum::eps, p(15))}}};
-        if(para.m_iso < 0. || para.m_kin < 0.) {
+        DataSubloading1D para{p(0), {p(1), p(2), p(3), p(4)}, {p(5), p(6), p(7), p(8)}, p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), std::min(1. - datum::eps, p(15))}}};
+        if(para.iso_bound.rate < 0. || para.kin_bound.rate < 0.) {
             suanpan_error("The evolution rate must be positive.\n");
             return;
         }
@@ -2950,19 +3026,19 @@ namespace {
             return;
         }
 
-        std::vector<DataSubloading1D::Saturation> back, core;
+        std::vector<SubloadingSaturation> back, core;
 
         std::string token;
         while(!command.eof() && get_input(command, token)) {
             double a, b;
-            if(is_equal("-back", token)) {
+            if(is_equal(token, "-back")) {
                 if(!get_input(command, a, b)) {
                     suanpan_error("Valid saturation parameters are required.\n");
                     return;
                 }
                 back.emplace_back(a, b);
             }
-            else if(is_equal("-core", token)) {
+            else if(is_equal(token, "-core")) {
                 if(!get_input(command, a, b)) {
                     suanpan_error("Valid saturation parameters are required.\n");
                     return;
@@ -2975,8 +3051,8 @@ namespace {
             }
         }
 
-        DataSubloading1D para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), 1., 0., 0., std::move(back), std::move(core)};
-        if(para.m_iso < 0. || para.m_kin < 0.) {
+        DataSubloading1D para{p(0), {p(1), p(2), p(3), p(4)}, {p(5), p(6), p(7), p(8)}, p(9), 1., 0., 0., std::move(back), std::move(core)};
+        if(para.iso_bound.rate < 0. || para.kin_bound.rate < 0.) {
             suanpan_error("The evolution rate must be positive.\n");
             return;
         }
@@ -3007,8 +3083,8 @@ namespace {
             return;
         }
 
-        DataSubloading para{p(0), p(1), p(2), p(3), p(4), p(5), p(6), p(7), p(8), p(9), p(10), {p(11), 1.}, {p(12), std::min(1. - datum::eps, p(13))}};
-        if(para.m_iso < 0. || para.m_kin < 0.) {
+        DataSubloading para{p(0), p(1), {p(2), p(3), p(4), p(5)}, {p(6), p(7), p(8), p(9)}, p(10), {p(11), 1.}, {p(12), std::min(1. - datum::eps, p(13))}};
+        if(para.iso_bound.rate < 0. || para.kin_bound.rate < 0.) {
             suanpan_error("The evolution rate must be positive.\n");
             return;
         }
@@ -3524,15 +3600,16 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
 
     unique_ptr<Material> new_material = nullptr;
 
-    if(is_equal(material_id, "AFC") || is_equal(material_id, "AFC01")) new_afc01(new_material, command);
-    else if(is_equal(material_id, "AFC02") || is_equal(material_id, "AFCS")) new_afc02(new_material, command);
-    else if(is_equal(material_id, "AFC03") || is_equal(material_id, "AFCN")) new_afc03(new_material, command);
+    if(is_equal_any(material_id, "AFC", "AFC01")) new_afc01(new_material, command);
+    else if(is_equal_any(material_id, "AFC02", "AFCS")) new_afc02(new_material, command);
+    else if(is_equal_any(material_id, "AFC03", "AFCN")) new_afc03(new_material, command);
     else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
     else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
     else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d(new_material, command);
     else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
     else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
     else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
+    else if(is_equal(material_id, "Balloon")) new_balloon(new_material, command);
     else if(is_equal(material_id, "Balloon1D")) new_balloon1d(new_material, command);
     else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
     else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
@@ -3551,7 +3628,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
     else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
     else if(if_startswith(material_id, "CDPM2")) {
-        if(is_equal(material_id, "CDPM2") || is_equal(material_id, "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
+        if(is_equal_any(material_id, "CDPM2", "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
         else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
         else if(is_equal(material_id, "CDPM2NO")) new_cdpm2(new_material, command, CDPM2::DamageType::NODAMAGE);
     }
@@ -3583,7 +3660,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "DuncanSelig")) new_duncanselig(new_material, command);
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
-    else if(is_equal(material_id, "Elastic3D") || is_equal(material_id, "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
+    else if(is_equal_any(material_id, "Elastic3D", "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "ElasticOS")) new_elasticos(new_material, command);
     else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);

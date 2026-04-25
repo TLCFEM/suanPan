@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,9 +92,9 @@ int Rotation3D::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Rotation3D::get_copy() { return std::make_unique<Rotation3D>(*this); }
+unique_ptr<Material> Rotation3D::unique_copy() { return std::make_unique<Rotation3D>(*this); }
 
-double Rotation3D::get_parameter(const ParameterType P) const { return mat_obj->get_parameter(P); }
+double Rotation3D::get(const Parameter P) const { return mat_obj->get(P); }
 
 int Rotation3D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -130,4 +130,4 @@ int Rotation3D::reset_status() {
     return mat_obj->reset_status();
 }
 
-std::vector<vec> Rotation3D::record(const OutputType P) { return mat_obj->record(P); }
+std::vector<vec> Rotation3D::record(const OutputType P) const { return mat_obj->record(P); }

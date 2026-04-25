@@ -34,6 +34,7 @@ MSVC/Release
 MSVC/suanPan/.idea
 MSVC/suanPan/.vs
 MSVC/suanPan/*/x64
+MSVC/suanPan/PredictedInputCache*.dat
 venv
 
 # Windows shortcuts

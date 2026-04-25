@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "Database.h"
 
 Database::Database(const unsigned T)
-    : CopiableTag(T) {}
+    : CopyableTag(T) {}
 
 void Database::set_domain(const shared_ptr<DomainBase>& D) { domain = D; }
 

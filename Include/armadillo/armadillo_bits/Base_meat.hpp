@@ -352,7 +352,7 @@ Base<elem_type,derived>::is_symmetric(const typename get_pod_type<elem_type>::re
   
   if(tol == T(0))  { return (*this).is_symmetric(); }
   
-  arma_conform_check( (tol < T(0)), "is_symmetric(): parameter 'tol' must be >= 0" );
+  arma_conform_check( ((tol >= T(0)) == false), "is_symmetric(): parameter 'tol' must be > 0" );
   
   const quasi_unwrap<derived> U( (*this).get_ref() );
   
@@ -365,7 +365,11 @@ Base<elem_type,derived>::is_symmetric(const typename get_pod_type<elem_type>::re
   
   if(norm_A == T(0))  { return true; }
   
+  if(arma_isnan(norm_A))  { return false; }
+  
   const T norm_A_Ast = as_scalar( arma::max(sum(abs(A - A.st()), 1), 0) );
+  
+  if(arma_isnan(norm_A_Ast))  { return false; }
   
   return ( (norm_A_Ast / norm_A) <= tol );
   }
@@ -435,7 +439,7 @@ Base<elem_type,derived>::is_hermitian(const typename get_pod_type<elem_type>::re
   
   if(tol == T(0))  { return (*this).is_hermitian(); }
   
-  arma_conform_check( (tol < T(0)), "is_hermitian(): parameter 'tol' must be >= 0" );
+  arma_conform_check( ((tol >= T(0)) == false), "is_hermitian(): parameter 'tol' must be > 0" );
   
   const quasi_unwrap<derived> U( (*this).get_ref() );
   
@@ -448,7 +452,11 @@ Base<elem_type,derived>::is_hermitian(const typename get_pod_type<elem_type>::re
   
   if(norm_A == T(0))  { return true; }
   
+  if(arma_isnan(norm_A))  { return false; }
+  
   const T norm_A_At = as_scalar( arma::max(sum(abs(A - A.t()), 1), 0) );
+  
+  if(arma_isnan(norm_A_At))  { return false; }
   
   return ( (norm_A_At / norm_A) <= tol );
   }
@@ -464,9 +472,9 @@ Base<elem_type,derived>::is_zero(const typename get_pod_type<elem_type>::result 
   
   typedef typename get_pod_type<elem_type>::result T;
   
-  arma_conform_check( (tol < T(0)), "is_zero(): parameter 'tol' must be >= 0" );
+  arma_conform_check( ((tol >= T(0)) == false), "is_zero(): parameter 'tol' must be >= 0" );
   
-  if(Proxy<derived>::use_at || is_Mat<typename Proxy<derived>::stored_type>::value)
+  if( (quasi_unwrap<derived>::has_orig_mem) || (is_Mat<typename Proxy<derived>::stored_type>::value) || (Proxy<derived>::use_at) )
     {
     const quasi_unwrap<derived> U( (*this).get_ref() );
     
@@ -483,22 +491,52 @@ Base<elem_type,derived>::is_zero(const typename get_pod_type<elem_type>::result 
   
   if(is_cx<elem_type>::yes)
     {
-    for(uword i=0; i<n_elem; ++i)
+    if(tol == T(0))
       {
-      const elem_type val = Pea[i];
-      
-      const T val_real = access::tmp_real(val);
-      const T val_imag = access::tmp_imag(val);
-      
-      if(eop_aux::arma_abs(val_real) > tol)  { return false; }
-      if(eop_aux::arma_abs(val_imag) > tol)  { return false; }
+      for(uword i=0; i < n_elem; ++i)
+        {
+        const elem_type val = Pea[i];
+        
+        const T val_real = access::tmp_real(val);
+        const T val_imag = access::tmp_imag(val);
+        
+        if(eop_aux::arma_abs(val_real) != T(0))  { return false; }
+        if(eop_aux::arma_abs(val_imag) != T(0))  { return false; }
+        }
+      }
+    else
+      {
+      for(uword i=0; i < n_elem; ++i)
+        {
+        const elem_type val = Pea[i];
+        
+        const T val_real = access::tmp_real(val);
+        const T val_imag = access::tmp_imag(val);
+        
+        if( (eop_aux::arma_abs(val_real) <= tol) == false )  { return false; }
+        if( (eop_aux::arma_abs(val_imag) <= tol) == false )  { return false; }
+        }
       }
     }
   else  // not complex
     {
-    for(uword i=0; i<n_elem; ++i)
+    if(tol == T(0))
       {
-      if(eop_aux::arma_abs(Pea[i]) > tol)  { return false; }
+      for(uword i=0; i < n_elem; ++i)
+        {
+        const elem_type val = Pea[i];
+        
+        if(val != elem_type(0))  { return false; }
+        }
+      }
+    else
+      {
+      for(uword i=0; i < n_elem; ++i)
+        {
+        const elem_type val = Pea[i];
+        
+        if( (eop_aux::arma_abs(val) <= tol) == false )  { return false; }
+        }
       }
     }
   
@@ -897,6 +935,8 @@ Base_extra_yes<elem_type,derived>::is_sympd() const
   // default value for tol
   const T tol = T(100) * std::numeric_limits<T>::epsilon() * norm(X, "fro");
   
+  if(arma_isnan(tol))  { return false; }
+  
   if(X.is_hermitian(tol) == false)  { return false; }
   
   if(X.is_empty())  { return false; }
@@ -917,7 +957,7 @@ Base_extra_yes<elem_type,derived>::is_sympd(typename get_pod_type<elem_type>::re
   
   typedef typename get_pod_type<elem_type>::result T;
   
-  arma_conform_check( (tol < T(0)), "is_sympd(): parameter 'tol' must be >= 0" );
+  arma_conform_check( ((tol >= T(0)) == false), "is_sympd(): parameter 'tol' must be > 0" );
   
   Mat<elem_type> X = static_cast<const derived&>(*this);
   

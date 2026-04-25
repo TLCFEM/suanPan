@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,12 +102,11 @@ int NonlinearViscosity::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> NonlinearViscosity::record(const OutputType P) {
-    if(OutputType::S == P) return {current_stress};
-    if(OutputType::E == P || OutputType::ED == P) return {current_strain};
+std::vector<vec> NonlinearViscosity::record(const OutputType P) const {
+    if(OutputType::ED == P) return {current_strain};
     if(OutputType::V == P || OutputType::VD == P) return {current_strain_rate};
 
-    return {};
+    return Material1D::record(P);
 }
 
 void NonlinearViscosity::print() {

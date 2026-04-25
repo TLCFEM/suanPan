@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
 RelResidual::RelResidual(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelResidual::get_copy() { return std::make_unique<RelResidual>(*this); }
+unique_ptr<Converger> RelResidual::unique_copy() { return std::make_unique<RelResidual>(*this); }
 
 bool RelResidual::is_converged(const unsigned counter) {
-    const auto residual = inf_norm(get_residual());
+    const auto residual = suanpan::inf_norm(get_residual());
     if(0u == counter) ref_residual = residual;
     set_error(residual / ref_residual);
     set_conv_flag(get_tolerance() > get_error());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@ int ElasticOS::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double ElasticOS::get_parameter(const ParameterType P) const { return material_property(elastic_modulus, poissons_ratio)(P); }
+double ElasticOS::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> ElasticOS::get_copy() { return std::make_unique<ElasticOS>(*this); }
+unique_ptr<Material> ElasticOS::unique_copy() { return std::make_unique<ElasticOS>(*this); }
 
 int ElasticOS::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;

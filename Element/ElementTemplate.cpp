@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "ElementTemplate.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 
 /**
@@ -44,7 +43,7 @@
  * simple as this.
  */
 ElementTemplate::ElementTemplate(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false)
+    : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
 /**
@@ -77,11 +76,11 @@ int ElementTemplate::initialize(const shared_ptr<DomainBase>& D) {
     //! As CPS3 is a constant stress/strain element, one integration point at the
     //! center of the element is enough. Hence we only have one material model
     //! defined. First we get a reference of the Material object from the Domain
-    //! and then call the `get_copy()` method to get a local copy. Direct
+    //! and then call the `unique_copy()` method to get a local copy. Direct
     //! assignment is allowed, the move semantics will automatically be invoked.
     //! There is no need to check if the material model is a 2D one. The validation
     //! is done in base Element class initialisation.
-    m_material = D->get<Material>(material_tag(0))->get_copy();
+    m_material = D->get<Material>(material_tag(0))->unique_copy();
 
     //! The node pointers are handled in the base Element class, we do not have to
     //! set it manually. Now we could fill in the `ele_coor` matrix. The

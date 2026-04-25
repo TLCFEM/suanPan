@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,11 @@
 Material1D::Material1D(const unsigned T, const double D)
     : Material(T, MaterialType::D1, D) { set_symmetric(true); }
 
-std::vector<vec> Material1D::record(const OutputType P) {
-    if(P == OutputType::S11) return {current_stress};
-    if(P == OutputType::E11) return {current_strain};
+std::vector<vec> Material1D::record(OutputType P) const {
+    if(P == OutputType::SP) P = OutputType::S;
+    else if(P == OutputType::EP) P = OutputType::E;
+    else if(P == OutputType::EEP) P = OutputType::EE;
+    else if(P == OutputType::PEP) P = OutputType::PE;
 
     return Material::record(P);
 }

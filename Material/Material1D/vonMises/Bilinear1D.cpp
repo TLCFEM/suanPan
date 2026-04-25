@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "Bilinear1D.h"
 
 Bilinear1D::Bilinear1D(const unsigned T, const double E, const double Y, const double H, const double B, const double R)
-    : DataBilinear1D{fabs(E), fabs(Y), fabs(B), fabs(B * E) * H / (1. - H), fabs((1. - B) * E) * H / (1. - H)}
+    : DataBilinear1D{std::fabs(E), std::fabs(Y), std::fabs(B), std::fabs(B * E) * H / (1. - H), std::fabs((1. - B) * E) * H / (1. - H)}
     , Material1D(T, R) {}
 
 int Bilinear1D::initialize(const shared_ptr<DomainBase>&) {
@@ -29,12 +29,12 @@ int Bilinear1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Bilinear1D::get_copy() { return std::make_unique<Bilinear1D>(*this); }
+unique_ptr<Material> Bilinear1D::unique_copy() { return std::make_unique<Bilinear1D>(*this); }
 
 int Bilinear1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
-    if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
+    if(std::fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 

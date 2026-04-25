@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 #include <Toolbox/tensor.h>
 
 void B2DC::update_transformation() {
-    const auto coord = get_coordinate(element_ptr, 2);
-    const auto t_disp = get_trial_displacement(element_ptr);
+    const auto coord = element_ptr->get_coordinate(2);
+    const auto t_disp = element_ptr->get_trial_displacement();
 
     vec x_axis(2);
     x_axis(0) = coord(1, 0) - coord(0, 0) + t_disp(3) - t_disp(0);
@@ -39,7 +39,7 @@ void B2DC::update_transformation() {
 
 bool B2DC::is_nlgeom() const { return true; }
 
-unique_ptr<Orientation> B2DC::get_copy() { return std::make_unique<B2DC>(*this); }
+unique_ptr<Orientation> B2DC::unique_copy() { return std::make_unique<B2DC>(*this); }
 
 vec B2DC::to_local_vec(const vec& g_vec) const {
     const auto& initial_length = original_position(0);

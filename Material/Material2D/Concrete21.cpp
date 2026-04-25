@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,9 +37,9 @@ int Concrete21::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Concrete21::get_copy() { return std::make_unique<Concrete21>(*this); }
+unique_ptr<Material> Concrete21::unique_copy() { return std::make_unique<Concrete21>(*this); }
 
-double Concrete21::get_parameter(const ParameterType P) const { return concrete_major.get_parameter(P); }
+double Concrete21::get(const Parameter P) const { return concrete_major.get(P); }
 
 int Concrete21::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

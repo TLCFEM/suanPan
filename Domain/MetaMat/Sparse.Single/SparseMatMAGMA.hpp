@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,91 +100,91 @@ namespace suanpan::detail::magma {
         while(get_input(command, token)) {
             if(is_equal(token, "--mscale")) {
                 if(std::string scale; get_input(command, scale)) {
-                    if(is_equal("NOSCALE", scale)) opts.scaling = Magma_NOSCALE;
-                    else if(is_equal("UNITDIAG", scale)) opts.scaling = Magma_UNITDIAG;
-                    else if(is_equal("UNITROW", scale)) opts.scaling = Magma_UNITROW;
-                    else if(is_equal("UNITCOL", scale)) opts.scaling = Magma_UNITCOL;
-                    else if(is_equal("UNITDIAGCOL", scale)) opts.scaling = Magma_UNITDIAGCOL;
-                    else if(is_equal("UNITROWCOL", scale)) opts.scaling = Magma_UNITROWCOL;
+                    if(is_equal(scale, "NOSCALE")) opts.scaling = Magma_NOSCALE;
+                    else if(is_equal(scale, "UNITDIAG")) opts.scaling = Magma_UNITDIAG;
+                    else if(is_equal(scale, "UNITROW")) opts.scaling = Magma_UNITROW;
+                    else if(is_equal(scale, "UNITCOL")) opts.scaling = Magma_UNITCOL;
+                    else if(is_equal(scale, "UNITDIAGCOL")) opts.scaling = Magma_UNITDIAGCOL;
+                    else if(is_equal(scale, "UNITROWCOL")) opts.scaling = Magma_UNITROWCOL;
                 }
             }
             else if(is_equal(token, "--solver")) {
                 if(std::string solver; get_input(command, solver)) {
-                    if(is_equal("CG", solver)) opts.solver_par.solver = Magma_PCGMERGE;
-                    else if(is_equal("PCG", solver)) opts.solver_par.solver = Magma_PCGMERGE;
-                    else if(is_equal("BICG", solver)) opts.solver_par.solver = Magma_PBICG;
-                    else if(is_equal("PBICG", solver)) opts.solver_par.solver = Magma_PBICG;
-                    else if(is_equal("BICGSTAB", solver)) opts.solver_par.solver = Magma_PBICGSTABMERGE;
-                    else if(is_equal("PBICGSTAB", solver)) opts.solver_par.solver = Magma_PBICGSTABMERGE;
-                    else if(is_equal("QMR", solver)) opts.solver_par.solver = Magma_PQMRMERGE;
-                    else if(is_equal("PQMR", solver)) opts.solver_par.solver = Magma_PQMRMERGE;
-                    else if(is_equal("TFQMR", solver)) opts.solver_par.solver = Magma_PTFQMRMERGE;
-                    else if(is_equal("PTFQMR", solver)) opts.solver_par.solver = Magma_PTFQMRMERGE;
-                    else if(is_equal("GMRES", solver)) opts.solver_par.solver = Magma_PGMRES;
-                    else if(is_equal("PGMRES", solver)) opts.solver_par.solver = Magma_PGMRES;
-                    else if(is_equal("LOBPCG", solver)) opts.solver_par.solver = Magma_LOBPCG;
-                    else if(is_equal("LSQR", solver)) opts.solver_par.solver = Magma_LSQR;
-                    else if(is_equal("JACOBI", solver)) opts.solver_par.solver = Magma_JACOBI;
-                    else if(is_equal("BA", solver)) opts.solver_par.solver = Magma_BAITER;
-                    else if(is_equal("BAO", solver)) opts.solver_par.solver = Magma_BAITERO;
-                    else if(is_equal("IDR", solver)) opts.solver_par.solver = Magma_PIDRMERGE;
-                    else if(is_equal("PIDR", solver)) opts.solver_par.solver = Magma_PIDRMERGE;
-                    else if(is_equal("CGS", solver)) opts.solver_par.solver = Magma_PCGSMERGE;
-                    else if(is_equal("PCGS", solver)) opts.solver_par.solver = Magma_PCGSMERGE;
-                    else if(is_equal("BOMBARDMENT", solver)) opts.solver_par.solver = Magma_BOMBARDMERGE;
-                    else if(is_equal("ITERREF", solver)) opts.solver_par.solver = Magma_ITERREF;
-                    else if(is_equal("PARDISO", solver)) opts.solver_par.solver = Magma_PARDISO;
+                    if(is_equal(solver, "CG")) opts.solver_par.solver = Magma_PCGMERGE;
+                    else if(is_equal(solver, "PCG")) opts.solver_par.solver = Magma_PCGMERGE;
+                    else if(is_equal(solver, "BICG")) opts.solver_par.solver = Magma_PBICG;
+                    else if(is_equal(solver, "PBICG")) opts.solver_par.solver = Magma_PBICG;
+                    else if(is_equal(solver, "BICGSTAB")) opts.solver_par.solver = Magma_PBICGSTABMERGE;
+                    else if(is_equal(solver, "PBICGSTAB")) opts.solver_par.solver = Magma_PBICGSTABMERGE;
+                    else if(is_equal(solver, "QMR")) opts.solver_par.solver = Magma_PQMRMERGE;
+                    else if(is_equal(solver, "PQMR")) opts.solver_par.solver = Magma_PQMRMERGE;
+                    else if(is_equal(solver, "TFQMR")) opts.solver_par.solver = Magma_PTFQMRMERGE;
+                    else if(is_equal(solver, "PTFQMR")) opts.solver_par.solver = Magma_PTFQMRMERGE;
+                    else if(is_equal(solver, "GMRES")) opts.solver_par.solver = Magma_PGMRES;
+                    else if(is_equal(solver, "PGMRES")) opts.solver_par.solver = Magma_PGMRES;
+                    else if(is_equal(solver, "LOBPCG")) opts.solver_par.solver = Magma_LOBPCG;
+                    else if(is_equal(solver, "LSQR")) opts.solver_par.solver = Magma_LSQR;
+                    else if(is_equal(solver, "JACOBI")) opts.solver_par.solver = Magma_JACOBI;
+                    else if(is_equal(solver, "BA")) opts.solver_par.solver = Magma_BAITER;
+                    else if(is_equal(solver, "BAO")) opts.solver_par.solver = Magma_BAITERO;
+                    else if(is_equal(solver, "IDR")) opts.solver_par.solver = Magma_PIDRMERGE;
+                    else if(is_equal(solver, "PIDR")) opts.solver_par.solver = Magma_PIDRMERGE;
+                    else if(is_equal(solver, "CGS")) opts.solver_par.solver = Magma_PCGSMERGE;
+                    else if(is_equal(solver, "PCGS")) opts.solver_par.solver = Magma_PCGSMERGE;
+                    else if(is_equal(solver, "BOMBARDMENT")) opts.solver_par.solver = Magma_BOMBARDMERGE;
+                    else if(is_equal(solver, "ITERREF")) opts.solver_par.solver = Magma_ITERREF;
+                    else if(is_equal(solver, "PARDISO")) opts.solver_par.solver = Magma_PARDISO;
                 }
             }
             else if(is_equal(token, "--precond")) {
                 if(std::string solver; get_input(command, solver)) {
-                    if(is_equal("CG", solver)) opts.precond_par.solver = Magma_CGMERGE;
-                    else if(is_equal("PCG", solver)) opts.precond_par.solver = Magma_PCG;
-                    else if(is_equal("BICGSTAB", solver)) opts.precond_par.solver = Magma_BICGSTABMERGE;
-                    else if(is_equal("QMR", solver)) opts.precond_par.solver = Magma_QMRMERGE;
-                    else if(is_equal("TFQMR", solver)) opts.precond_par.solver = Magma_TFQMRMERGE;
-                    else if(is_equal("PTFQMR", solver)) opts.precond_par.solver = Magma_PTFQMRMERGE;
-                    else if(is_equal("GMRES", solver)) opts.precond_par.solver = Magma_GMRES;
-                    else if(is_equal("PGMRES", solver)) opts.precond_par.solver = Magma_PGMRES;
-                    else if(is_equal("LOBPCG", solver)) opts.precond_par.solver = Magma_LOBPCG;
-                    else if(is_equal("JACOBI", solver)) opts.precond_par.solver = Magma_JACOBI;
-                    else if(is_equal("BA", solver)) opts.precond_par.solver = Magma_BAITER;
-                    else if(is_equal("BAO", solver)) opts.precond_par.solver = Magma_BAITERO;
-                    else if(is_equal("IDR", solver)) opts.precond_par.solver = Magma_IDRMERGE;
-                    else if(is_equal("PIDR", solver)) opts.precond_par.solver = Magma_PIDRMERGE;
-                    else if(is_equal("CGS", solver)) opts.precond_par.solver = Magma_CGSMERGE;
-                    else if(is_equal("PCGS", solver)) opts.precond_par.solver = Magma_PCGSMERGE;
-                    else if(is_equal("BOMBARDMENT", solver)) opts.precond_par.solver = Magma_BOMBARD;
-                    else if(is_equal("ITERREF", solver)) opts.precond_par.solver = Magma_ITERREF;
-                    else if(is_equal("ILU", solver) || is_equal("IC", solver)) opts.precond_par.solver = Magma_ILU;
-                    else if(is_equal("ILUT", solver) || is_equal("ICT", solver)) opts.precond_par.solver = Magma_ILUT;
-                    else if(is_equal("PARILU", solver) || is_equal("AIC", solver)) opts.precond_par.solver = Magma_PARILU;
-                    else if(is_equal("PARIC", solver)) opts.precond_par.solver = Magma_PARILU;
-                    else if(is_equal("PARICT", solver)) opts.precond_par.solver = Magma_PARICT;
-                    else if(is_equal("PARILUT", solver)) opts.precond_par.solver = Magma_PARILUT;
-                    else if(is_equal("CUSTOMIC", solver)) opts.precond_par.solver = Magma_CUSTOMIC;
-                    else if(is_equal("CUSTOMILU", solver)) opts.precond_par.solver = Magma_CUSTOMILU;
-                    else if(is_equal("ISAI", solver)) opts.precond_par.solver = Magma_ISAI;
-                    else if(is_equal("NONE", solver)) opts.precond_par.solver = Magma_NONE;
+                    if(is_equal(solver, "CG")) opts.precond_par.solver = Magma_CGMERGE;
+                    else if(is_equal(solver, "PCG")) opts.precond_par.solver = Magma_PCG;
+                    else if(is_equal(solver, "BICGSTAB")) opts.precond_par.solver = Magma_BICGSTABMERGE;
+                    else if(is_equal(solver, "QMR")) opts.precond_par.solver = Magma_QMRMERGE;
+                    else if(is_equal(solver, "TFQMR")) opts.precond_par.solver = Magma_TFQMRMERGE;
+                    else if(is_equal(solver, "PTFQMR")) opts.precond_par.solver = Magma_PTFQMRMERGE;
+                    else if(is_equal(solver, "GMRES")) opts.precond_par.solver = Magma_GMRES;
+                    else if(is_equal(solver, "PGMRES")) opts.precond_par.solver = Magma_PGMRES;
+                    else if(is_equal(solver, "LOBPCG")) opts.precond_par.solver = Magma_LOBPCG;
+                    else if(is_equal(solver, "JACOBI")) opts.precond_par.solver = Magma_JACOBI;
+                    else if(is_equal(solver, "BA")) opts.precond_par.solver = Magma_BAITER;
+                    else if(is_equal(solver, "BAO")) opts.precond_par.solver = Magma_BAITERO;
+                    else if(is_equal(solver, "IDR")) opts.precond_par.solver = Magma_IDRMERGE;
+                    else if(is_equal(solver, "PIDR")) opts.precond_par.solver = Magma_PIDRMERGE;
+                    else if(is_equal(solver, "CGS")) opts.precond_par.solver = Magma_CGSMERGE;
+                    else if(is_equal(solver, "PCGS")) opts.precond_par.solver = Magma_PCGSMERGE;
+                    else if(is_equal(solver, "BOMBARDMENT")) opts.precond_par.solver = Magma_BOMBARD;
+                    else if(is_equal(solver, "ITERREF")) opts.precond_par.solver = Magma_ITERREF;
+                    else if(is_equal_any(solver, "ILU", "IC")) opts.precond_par.solver = Magma_ILU;
+                    else if(is_equal_any(solver, "ILUT", "ICT")) opts.precond_par.solver = Magma_ILUT;
+                    else if(is_equal_any(solver, "PARILU", "AIC")) opts.precond_par.solver = Magma_PARILU;
+                    else if(is_equal(solver, "PARIC")) opts.precond_par.solver = Magma_PARILU;
+                    else if(is_equal(solver, "PARICT")) opts.precond_par.solver = Magma_PARICT;
+                    else if(is_equal(solver, "PARILUT")) opts.precond_par.solver = Magma_PARILUT;
+                    else if(is_equal(solver, "CUSTOMIC")) opts.precond_par.solver = Magma_CUSTOMIC;
+                    else if(is_equal(solver, "CUSTOMILU")) opts.precond_par.solver = Magma_CUSTOMILU;
+                    else if(is_equal(solver, "ISAI")) opts.precond_par.solver = Magma_ISAI;
+                    else if(is_equal(solver, "NONE")) opts.precond_par.solver = Magma_NONE;
                 }
             }
             else if(is_equal(token, "--trisolver")) {
                 if(std::string solver; get_input(command, solver)) {
-                    if(is_equal("CG", solver)) opts.precond_par.trisolver = Magma_CGMERGE;
-                    else if(is_equal("BICGSTAB", solver)) opts.precond_par.trisolver = Magma_BICGSTABMERGE;
-                    else if(is_equal("QMR", solver)) opts.precond_par.trisolver = Magma_QMRMERGE;
-                    else if(is_equal("TFQMR", solver)) opts.precond_par.trisolver = Magma_TFQMRMERGE;
-                    else if(is_equal("GMRES", solver)) opts.precond_par.trisolver = Magma_GMRES;
-                    else if(is_equal("JACOBI", solver)) opts.precond_par.trisolver = Magma_JACOBI;
-                    else if(is_equal("VBJACOBI", solver)) opts.precond_par.trisolver = Magma_VBJACOBI;
-                    else if(is_equal("BA", solver)) opts.precond_par.trisolver = Magma_BAITER;
-                    else if(is_equal("BAO", solver)) opts.precond_par.trisolver = Magma_BAITERO;
-                    else if(is_equal("IDR", solver)) opts.precond_par.trisolver = Magma_IDRMERGE;
-                    else if(is_equal("CGS", solver)) opts.precond_par.trisolver = Magma_CGSMERGE;
-                    else if(is_equal("CUSOLVE", solver)) opts.precond_par.trisolver = Magma_CUSOLVE;
-                    else if(is_equal("SYNCFREESOLVE", solver)) opts.precond_par.trisolver = Magma_SYNCFREESOLVE;
-                    else if(is_equal("ISAI", solver)) opts.precond_par.trisolver = Magma_ISAI;
-                    else if(is_equal("NONE", solver)) opts.precond_par.trisolver = Magma_NONE;
+                    if(is_equal(solver, "CG")) opts.precond_par.trisolver = Magma_CGMERGE;
+                    else if(is_equal(solver, "BICGSTAB")) opts.precond_par.trisolver = Magma_BICGSTABMERGE;
+                    else if(is_equal(solver, "QMR")) opts.precond_par.trisolver = Magma_QMRMERGE;
+                    else if(is_equal(solver, "TFQMR")) opts.precond_par.trisolver = Magma_TFQMRMERGE;
+                    else if(is_equal(solver, "GMRES")) opts.precond_par.trisolver = Magma_GMRES;
+                    else if(is_equal(solver, "JACOBI")) opts.precond_par.trisolver = Magma_JACOBI;
+                    else if(is_equal(solver, "VBJACOBI")) opts.precond_par.trisolver = Magma_VBJACOBI;
+                    else if(is_equal(solver, "BA")) opts.precond_par.trisolver = Magma_BAITER;
+                    else if(is_equal(solver, "BAO")) opts.precond_par.trisolver = Magma_BAITERO;
+                    else if(is_equal(solver, "IDR")) opts.precond_par.trisolver = Magma_IDRMERGE;
+                    else if(is_equal(solver, "CGS")) opts.precond_par.trisolver = Magma_CGSMERGE;
+                    else if(is_equal(solver, "CUSOLVE")) opts.precond_par.trisolver = Magma_CUSOLVE;
+                    else if(is_equal(solver, "SYNCFREESOLVE")) opts.precond_par.trisolver = Magma_SYNCFREESOLVE;
+                    else if(is_equal(solver, "ISAI")) opts.precond_par.trisolver = Magma_ISAI;
+                    else if(is_equal(solver, "NONE")) opts.precond_par.trisolver = Magma_NONE;
                 }
             }
             else if(is_equal(token, "--basic")) basic = 1;
@@ -332,7 +332,7 @@ public:
         magma_finalize();
     }
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<SparseMatMAGMA>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<SparseMatMAGMA>(*this); }
 };
 
 template<sp_d T> SparseMatMAGMA<T>::SparseMatMAGMA(const SparseMatMAGMA& other)

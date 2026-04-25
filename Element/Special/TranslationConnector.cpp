@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,10 @@
 
 #include "TranslationConnector.h"
 
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 
 TranslationConnector::TranslationConnector(const unsigned T, uvec&& N, const unsigned D, const double P)
-    : Element(T, c_node, D, std::move(N), 2u == D ? std::vector{DOF::U1, DOF::U2} : std::vector{DOF::U1, DOF::U2, DOF::U3})
+    : Element(T, c_node, D, std::move(N), 2u == D ? std::vector{Node::DOF::U1, Node::DOF::U2} : std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3})
     , c_dof(D)
     , sa(2u == c_dof ? span(0, 1) : span(0, 2))
     , sb(2u == c_dof ? span(2, 3) : span(3, 5))

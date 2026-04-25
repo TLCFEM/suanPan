@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ MaxHistory::MaxHistory(const unsigned T, const unsigned ST, const OutputType HT,
     , history_type(HT)
     , max_history(MH) {}
 
-unique_ptr<Criterion> MaxHistory::get_copy() { return std::make_unique<MaxHistory>(*this); }
+unique_ptr<Criterion> MaxHistory::unique_copy() { return std::make_unique<MaxHistory>(*this); }
 
 int MaxHistory::process(const shared_ptr<DomainBase>& D) {
     suanpan::for_all(D->get_element_pool(), [&](const shared_ptr<Element>& t_element) {

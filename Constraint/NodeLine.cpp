@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,65 +17,68 @@
 
 #include "NodeLine.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/NodeHelper.hpp>
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
-
-std::vector<vec> NodeLine::get_position(const shared_ptr<DomainBase>& D) {
-    std::vector<vec> position;
-    position.reserve(node_encoding.n_elem);
-
-    for(const auto I : node_encoding) position.emplace_back(get_trial_position<DOF::U1, DOF::U2>(D->get<Node>(I)));
-
-    return position;
-}
+const span NodeLine::span_i(0, 1);
+const span NodeLine::span_j(2, 3);
+const span NodeLine::span_k(4, 5);
 
 NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
-    : Constraint(T, A, std::move(N), uvec{1, 2}, 1) { set_connected(true); }
+    : Constraint(T, A, {Node::DOF::U1, Node::DOF::U2}, {}, 1) { target_node = std::move(N); }
 
 int NodeLine::initialize(const shared_ptr<DomainBase>& D) {
-    dof_encoding = get_nodal_active_dof(D);
+    if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
-    // need to check if sizes conform since the method does not emit error flag
-    if(dof_encoding.n_elem != node_encoding.n_elem * dof_reference.n_elem) return SUANPAN_FAIL;
+    if(!validate_node(D)) return SUANPAN_FAIL;
 
-    set_multiplier_size(0);
+    target_dof = collect_node_dof(D);
 
-    return Constraint::initialize(D);
+    set_multiplier_size(0u);
+
+    const auto node_i = D->get<Node>(target_node(0))->initial_position(2u);
+    const auto node_j = D->get<Node>(target_node(1))->initial_position(2u);
+    const auto node_k = D->get<Node>(target_node(2))->initial_position(2u);
+
+    // is it on the right side initially?
+    initial_right = std::signbit(dot(node_k - node_i, rotation * (node_j - node_i)));
+
+    return SUANPAN_SUCCESS;
 }
 
 int NodeLine::process(const shared_ptr<DomainBase>& D) {
-    const auto node = get_position(D);
+    const auto node_i = D->get<Node>(target_node(0))->trial_position(2u);
+    const auto node_j = D->get<Node>(target_node(1))->trial_position(2u);
+    const auto node_k = D->get<Node>(target_node(2))->trial_position(2u);
 
-    const vec axis = node[1] - node[0];
+    const vec axis = node_j - node_i;
     const vec outer_normal = rotation * axis;
-    const vec position = node[2] - node[0];
+    const vec position = node_k - node_i;
 
-    const auto pen = dot(position, outer_normal);
+    auto pen = dot(position, outer_normal);
+    if(initial_right) pen = -pen;
 
-    if(const auto t = dot(position, axis); 0 == num_size && (pen > 0. || t < 0. || t > norm(axis))) return SUANPAN_SUCCESS;
+    if(const auto t = dot(position, axis); 0 == lagrangian_size && (pen > 0. || t < 0. || t > norm(axis))) return SUANPAN_SUCCESS;
 
-    set_multiplier_size(1);
+    set_multiplier_size(1u);
 
-    const span span_i(0, 1), span_j(2, 3), span_k(4, 5);
-
-    auxiliary_stiffness.zeros(D->get_factory()->get_size(), num_size);
+    auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
     auxiliary_resistance = pen;
 
     const rowvec dpdi = -position.t() * rotation - outer_normal.t();
     const rowvec dpdj = position.t() * rotation;
 
     for(auto I = 0, J = 2, K = 4; I < 2; ++I, ++J, ++K) {
-        auxiliary_stiffness(dof_encoding(I)) = dpdi(I);
-        auxiliary_stiffness(dof_encoding(J)) = dpdj(I);
-        auxiliary_stiffness(dof_encoding(K)) = outer_normal(I);
+        auxiliary_stiffness(target_dof(I)) = dpdi(I);
+        auxiliary_stiffness(target_dof(J)) = dpdj(I);
+        auxiliary_stiffness(target_dof(K)) = outer_normal(I);
     }
 
-    const mat factor = trial_lambda(0) * rotation;
+    if(initial_right) auxiliary_stiffness *= -1.;
 
-    stiffness.zeros(dof_encoding.n_elem, dof_encoding.n_elem);
+    const mat factor = (initial_right ? -trial_lambda(0) : trial_lambda(0)) * rotation;
+
+    stiffness.zeros(target_dof.n_elem, target_dof.n_elem);
     stiffness(span_i, span_i) = factor.t() + factor;
     stiffness(span_i, span_j) = stiffness(span_k, span_i) = -(stiffness(span_k, span_j) = factor);
     stiffness(span_i, span_k) = stiffness(span_j, span_i) = -(stiffness(span_j, span_k) = factor.t());
@@ -89,15 +92,15 @@ void NodeLine::update_status(const vec& i_lambda) { trial_lambda += i_lambda; }
 
 void NodeLine::commit_status() {
     current_lambda = trial_lambda;
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 void NodeLine::clear_status() {
     current_lambda = trial_lambda.zeros();
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }
 
 void NodeLine::reset_status() {
     trial_lambda = current_lambda;
-    set_multiplier_size(0);
+    set_multiplier_size(0u);
 }

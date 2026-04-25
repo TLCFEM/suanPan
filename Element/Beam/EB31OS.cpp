@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,13 +31,13 @@ int EB31OS::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
-    b_trans = D->get_orientation(orientation_tag)->get_copy();
+    b_trans = D->get_orientation(orientation_tag)->unique_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
-    if(OrientationType::B3DOS != b_trans->get_orientation_type()) {
+    if(Orientation::Type::B3DOS != b_trans->type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DOSL or B3DOSC only.\n", get_tag(), orientation_tag);
         return SUANPAN_FAIL;
     }
@@ -128,7 +128,7 @@ int EB31OS::reset_status() {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> EB31OS::record(const OutputType P) {
+std::vector<vec> EB31OS::record(const OutputType P) const {
     if(P == OutputType::BEAME) return {b_trans->to_local_vec(get_current_displacement())};
     if(P == OutputType::BEAMS) return {vec{local_stiff * b_trans->to_local_vec(get_current_displacement())}};
 
@@ -142,30 +142,16 @@ void EB31OS::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void EB31OS::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+vtkSmartPointer<vtkCell> EB31OS::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
+
+mat EB31OS::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), b_dof, b_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), b_dof, b_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), b_dof, b_node);
+
+    return {};
 }
 
-void EB31OS::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, b_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), b_dof, b_node);
-    else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), b_dof, b_node);
-    else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), b_dof, b_node);
-
-    t_disp = t_disp.head_rows(6);
-
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void EB31OS::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node)).rows(0, 2).t();
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat EB31OS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(3); }
 
 #endif

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -788,16 +788,15 @@ void new_nm2d(unique_ptr<Section>& return_obj, std::istringstream& command, cons
         return;
     }
 
-    const auto para_set = get_remaining<double>(command);
+    mat poly_set;
+    if(const auto para_set = get_remaining<double>(command); para_set.size() > 0) {
+        if(para_set.size() % 3 != 0) {
+            suanpan_error("A valid parameter set is required.\n");
+            return;
+        }
 
-    if(para_set.size() % 3 != 0) {
-        suanpan_error("A valid parameter set is required.\n");
-        return;
+        inplace_trans((poly_set = para_set).reshape(3, poly_set.n_elem / 3));
     }
-
-    mat poly_set(para_set);
-    poly_set.reshape(3, poly_set.n_elem / 3);
-    inplace_trans(poly_set);
 
     if(8 == size) return_obj = std::make_unique<NM2D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), std::move(poly_set));
     else if(11 == size) return_obj = std::make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), vec{P(8), P(8)}, vec{P(9), P(9)}, P(10), std::move(poly_set));
@@ -821,16 +820,15 @@ void new_nm3d(unique_ptr<Section>& return_obj, std::istringstream& command, cons
         return;
     }
 
-    const auto para_set = get_remaining<double>(command);
+    mat poly_set;
+    if(const auto para_set = get_remaining<double>(command); para_set.size() > 0) {
+        if(para_set.size() % 4 != 0) {
+            suanpan_error("A valid parameter set is required.\n");
+            return;
+        }
 
-    if(para_set.size() % 4 != 0) {
-        suanpan_error("A valid parameter set is required.\n");
-        return;
+        inplace_trans((poly_set = para_set).reshape(4, poly_set.n_elem / 4));
     }
-
-    mat poly_set(para_set);
-    poly_set.reshape(4, poly_set.n_elem / 4);
-    inplace_trans(poly_set);
 
     if(10 == size) return_obj = std::make_unique<NM3D2>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), std::move(poly_set));
     else if(13 == size) return_obj = std::make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), vec{P(10), P(10), P(10)}, vec{P(11), P(11), P(11)}, P(12), std::move(poly_set));
@@ -849,18 +847,17 @@ void new_nmk(unique_ptr<Section>& return_obj, std::istringstream& command, const
         return;
     }
 
-    const auto para_set = get_remaining<double>(command);
+    mat poly_set;
+    if(const auto para_set = get_remaining<double>(command); para_set.size() > 0) {
+        const auto p_size = 13u == size ? 3 : 4;
 
-    const auto p_size = 13u == size ? 3 : 4;
+        if(para_set.size() % p_size != 0) {
+            suanpan_error("A valid parameter set is required.\n");
+            return;
+        }
 
-    if(para_set.size() % p_size != 0) {
-        suanpan_error("A valid parameter set is required.\n");
-        return;
+        inplace_trans((poly_set = para_set).reshape(p_size, poly_set.n_elem / p_size));
     }
-
-    mat poly_set(para_set);
-    poly_set.reshape(p_size, poly_set.n_elem / p_size);
-    inplace_trans(poly_set);
 
     if(13 == size) return_obj = std::make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), vec{P(8), P(9)}, vec{P(10), P(11)}, P(12), std::move(poly_set));
     else if(17 == size) return_obj = std::make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), vec{P(10), P(11), P(12)}, vec{P(13), P(14), P(15)}, P(16), std::move(poly_set));
@@ -3029,8 +3026,8 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
 
     if(is_equal(section_id, "Box2D")) new_box2d(new_section, command);
     else if(is_equal(section_id, "Box3D")) new_box3d(new_section, command);
-    else if(is_equal(section_id, "Cell2D") || is_equal(section_id, "Bar2D")) new_cell2d(new_section, command);
-    else if(is_equal(section_id, "Cell3D") || is_equal(section_id, "Bar3D")) new_cell3d(new_section, command);
+    else if(is_equal_any(section_id, "Cell2D", "Bar2D")) new_cell2d(new_section, command);
+    else if(is_equal_any(section_id, "Cell3D", "Bar3D")) new_cell3d(new_section, command);
     else if(is_equal(section_id, "Cell3DOS")) new_cell3dos(new_section, command);
     else if(is_equal(section_id, "Circle1D")) new_circle1d(new_section, command);
     else if(is_equal(section_id, "Circle2D")) new_circle2d(new_section, command);

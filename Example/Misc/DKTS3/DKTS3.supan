@@ -46,7 +46,7 @@ analyze
 # -7.0122e-13 5.3552e-13 -4.4888e+00 -6.2483e-16 7.4103e-14 -1.9514e-13
 peek node 2 3 6
 
-# plot type U3 scale 1 save U.vtk
+# plot type U3 scale 1 save U
 
 peek stats
 

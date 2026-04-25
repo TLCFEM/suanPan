@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ int NonlinearNM::update_trial_status(const vec& t_deformation) {
     return SUANPAN_SUCCESS;
 }
 
-std::vector<vec> NonlinearNM::record(const OutputType P) {
+std::vector<vec> NonlinearNM::record(const OutputType P) const {
     if(P == OutputType::YF) return {current_history.tail(2)};
     if(P == OutputType::HIST) return {current_history};
 

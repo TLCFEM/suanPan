@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ int Maxwell::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Maxwell::get_copy() { return std::make_unique<Maxwell>(*this); }
+unique_ptr<Material> Maxwell::unique_copy() { return std::make_unique<Maxwell>(*this); }
 
 int Maxwell::update_trial_status(const vec&) {
     suanpan_error("Receives strain only from the associated element.\n");
@@ -95,13 +95,13 @@ int Maxwell::update_trial_status(const vec& t_strain, const vec& t_strain_rate) 
 
             const vec incre = inv_jacobian * residual / (factor_a * (K1 + K2) + K3);
 
-            error = inf_norm(incre);
+            error = suanpan::inf_norm(incre);
             if(1u == counter) {
                 ref_error = error;
-                ref_residual = inf_norm(residual);
+                ref_residual = suanpan::inf_norm(residual);
             }
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
-            if(error < tolerance * ref_error || inf_norm(residual) < tolerance * ref_residual) break;
+            if(error < tolerance * ref_error || suanpan::inf_norm(residual) < tolerance * ref_residual) break;
             solution += incre;
             spring->update_incre_status(solution(0));
             damper->update_incre_status(solution(1), solution(2));
@@ -176,17 +176,16 @@ int Maxwell::reset_status() {
     return spring->reset_status() + damper->reset_status();
 }
 
-std::vector<vec> Maxwell::record(const OutputType P) {
-    if(OutputType::SD == P || OutputType::SS == P || OutputType::S == P) return {current_stress};
+std::vector<vec> Maxwell::record(const OutputType P) const {
+    if(OutputType::SD == P || OutputType::SS == P) return {current_stress};
     if(OutputType::ED == P) return {damper->get_current_strain()};
     if(OutputType::VD == P) return {damper->get_current_strain_rate()};
     if(OutputType::ES == P) return {spring->get_current_strain()};
     if(OutputType::VS == P) return {current_strain_rate - damper->get_current_strain_rate()};
-    if(OutputType::E == P) return {current_strain};
     if(OutputType::V == P) return {current_strain_rate};
     if(OutputType::LITR == P) return {vec{static_cast<double>(counter)}};
 
-    return {};
+    return Material1D::record(P);
 }
 
 void Maxwell::print() {

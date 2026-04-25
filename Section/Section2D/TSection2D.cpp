@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,4 +23,4 @@ TSection2D::TSection2D(const unsigned T, const double TFW, const double TFT, con
 TSection2D::TSection2D(const unsigned T, vec&& D, const unsigned MT, const unsigned IP, const double EC)
     : ISection2D(T, D(0), D(1), 0., 0., D(2), D(3), MT, IP, EC) {}
 
-unique_ptr<Section> TSection2D::get_copy() { return std::make_unique<TSection2D>(*this); }
+unique_ptr<Section> TSection2D::unique_copy() { return std::make_unique<TSection2D>(*this); }

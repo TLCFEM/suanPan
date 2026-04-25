@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
     initial_stiffness.zeros(m_size, m_size);
     if(t_density > 0.) initial_mass.zeros(m_size, m_size);
 
-    const IntegrationPlan plan(2, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
 
     const auto ele_span = net.get_all_element_span();
 
@@ -77,7 +77,7 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
                 const auto ders = net.evaluate_shape_function_derivative(x, y, polygon, 1, 1);
                 const mat pn = join_cols(.5 * dx * vectorise(ders(1, 0)).t(), .5 * dy * vectorise(ders(0, 1)).t());
                 const mat jacob = pn * ele_coor.head_cols(2);
-                int_pt.emplace_back(vec{x, y}, plan(K, 2) * det(jacob), material_proto->get_copy());
+                int_pt.emplace_back(vec{x, y}, plan(K, 2) * det(jacob), material_proto->unique_copy());
 
                 auto& c_pt = int_pt.back();
 
@@ -149,9 +149,9 @@ int PatchQuad::reset_status() {
     return code;
 }
 
-std::vector<vec> PatchQuad::record(const OutputType P) {
+std::vector<vec> PatchQuad::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> DafaliasManzari::get_copy() { return std::make_unique<DafaliasManzari>(*this); }
+unique_ptr<Material> DafaliasManzari::unique_copy() { return std::make_unique<DafaliasManzari>(*this); }
 
-double DafaliasManzari::get_parameter(const ParameterType P) const { return material_property(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
+double DafaliasManzari::get(const Parameter P) const { return prop(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
 
 int DafaliasManzari::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -99,10 +99,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(residual);
+        const auto error = suanpan::inf_norm(residual);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local elastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         p -= incre(sa);
         s -= incre(sb);
@@ -318,10 +318,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = inf_norm(residual);
+        const auto error = suanpan::inf_norm(residual);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre(si);
         p -= incre(sj);

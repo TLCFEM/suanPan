@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ ParabolicCC::ParabolicCC(const unsigned T, const double E, const double V, const
     : DataParabolicCC{A, K}
     , NonlinearCamClay(T, E, V, B, M, P, R) {}
 
-unique_ptr<Material> ParabolicCC::get_copy() { return std::make_unique<ParabolicCC>(*this); }
+unique_ptr<Material> ParabolicCC::unique_copy() { return std::make_unique<ParabolicCC>(*this); }
 
 void ParabolicCC::print() {
     suanpan_info("A 3D Cam-Clay model using parabolic hardening.\n");

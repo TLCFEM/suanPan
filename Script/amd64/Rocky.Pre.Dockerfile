@@ -2,7 +2,7 @@
 # It preinstalls the MKL library, which is required as a fast linear algebra driver that does the heavy lifting.
 # It installs the VTK library, which is required to generate VTK files for visualization.
 
-FROM rockylinux:9
+FROM almalinux:10
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "name=Intel oneAPI repository" >> /etc/yum.repos.d/oneAPI.repo && \
@@ -12,11 +12,11 @@ RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "repo_gpgcheck=1" >> /etc/yum.repos.d/oneAPI.repo && \
     echo "gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" >> /etc/yum.repos.d/oneAPI.repo
 
-RUN dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git intel-oneapi-mkl-devel
+RUN dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake git intel-oneapi-mkl-devel=2025.3.1-8 intel-oneapi-mpi-devel procps-ng wget && dnf clean all
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.5/VTK-9.5.2.tar.gz && tar xf VTK-9.5.2.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.5.2 && \
+    wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.1.tar.gz && tar xf VTK-9.6.1.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.6.1 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 # ARG USERNAME=nonroot

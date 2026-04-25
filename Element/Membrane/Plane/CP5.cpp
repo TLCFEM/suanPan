@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "CP5.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Node.h>
 #include <Material/Material2D/Material2D.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
@@ -38,7 +37,7 @@ CP5::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mate
 }
 
 CP5::CP5(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool F)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
 int CP5::initialize(const shared_ptr<DomainBase>& D) {
@@ -52,7 +51,7 @@ int CP5::initialize(const shared_ptr<DomainBase>& D) {
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
-    const IntegrationPlan plan(2, 2, IntegrationType::IRONS);
+    const IntegrationPlan plan(2, 2, IntegrationPlan::Type::IRONS);
 
     initial_stiffness.zeros(m_size, m_size);
 
@@ -62,7 +61,7 @@ int CP5::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->get_copy(), solve(jacob, pn));
+        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->unique_copy(), solve(jacob, pn));
 
         const auto& c_pt = int_pt.back();
         initial_stiffness += c_pt.weight * thickness * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
@@ -179,9 +178,9 @@ int CP5::reset_status() {
 
 mat CP5::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> CP5::record(const OutputType P) {
+std::vector<vec> CP5::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 

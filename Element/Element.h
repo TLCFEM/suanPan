@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class Element : protected DataElement, public ElementBase, public Distributed {
     const MaterialType material_type;
     const SectionType section_type;
 
-    const std::vector<DOF> dof_identifier;
+    const std::vector<Node::DOF> dof_identifier;
 
     std::vector<MappingDOF> dof_mapping;
 
@@ -144,10 +144,10 @@ class Element : protected DataElement, public ElementBase, public Distributed {
     void update_complementary_energy() override;
     void update_momentum() override;
 
+    void validate() const;
+
 protected:
     std::vector<std::weak_ptr<Node>> node_ptr; // node pointers
-
-    [[nodiscard]] mat get_coordinate(unsigned) const override;
 
     [[nodiscard]] vec get_node_incre_resistance() const override;
     [[nodiscard]] vec get_node_trial_resistance() const override;
@@ -158,42 +158,44 @@ protected:
 
 public:
     Element(
-        unsigned,          // tag
-        unsigned,          // number of nodes
-        unsigned,          // number of dofs
-        uvec&&,            // node encoding
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        unsigned,                // number of nodes
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        std::vector<Node::DOF>&& // dof identifier
     );
     Element(
-        unsigned,          // tag
-        unsigned,          // number of nodes
-        unsigned,          // number of dofs
-        uvec&&,            // node encoding
-        uvec&&,            // material tags
-        bool,              // nonlinear geometry switch
-        MaterialType,      // material type for internal check
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        unsigned,                // number of nodes
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        uvec&&,                  // material tags
+        bool,                    // nonlinear geometry switch
+        MaterialType,            // material type for internal check
+        std::vector<Node::DOF>&& // dof identifier
     );
     Element(
-        unsigned,          // tag
-        unsigned,          // number of nodes
-        unsigned,          // number of dofs
-        uvec&&,            // node encoding
-        uvec&&,            // section tags
-        bool,              // nonlinear geometry switch
-        SectionType,       // section type for internal check
-        std::vector<DOF>&& // dof identifier
+        unsigned,                // tag
+        unsigned,                // number of nodes
+        unsigned,                // number of dofs
+        uvec&&,                  // node encoding
+        uvec&&,                  // section tags
+        bool,                    // nonlinear geometry switch
+        SectionType,             // section type for internal check
+        std::vector<Node::DOF>&& // dof identifier
     );
     Element(
-        unsigned, // tag
-        unsigned, // number of dofs
-        uvec&&    // group encoding
+        unsigned,                // tag
+        unsigned,                // number of dofs
+        uvec&&,                  // group encoding
+        std::vector<Node::DOF>&& // dof identifier
     );
     Element(
-        unsigned, // tag
-        unsigned, // number of dofs
-        unsigned, // other element tag
-        unsigned  // node tag
+        unsigned,                // tag
+        unsigned,                // number of dofs
+        unsigned,                // other element tag
+        unsigned,                // node tag
+        std::vector<Node::DOF>&& // dof identifier
     );
 
     int initialize_base(const shared_ptr<DomainBase>&) final;
@@ -203,6 +205,8 @@ public:
     [[nodiscard]] bool is_initialized() const override;
     [[nodiscard]] bool is_symmetric() const override;
     [[nodiscard]] bool is_nlgeom() const override;
+
+    [[nodiscard]] Type type() const override;
 
     void update_dof_encoding() override;
 
@@ -219,7 +223,11 @@ public:
     [[nodiscard]] const uvec& get_dof_encoding() const override;
     [[nodiscard]] const uvec& get_node_encoding() const override;
 
+    [[nodiscard]] const std::vector<Node::DOF>& get_dof_identifier() const override;
     [[nodiscard]] const std::vector<MappingDOF>& get_dof_mapping() const override;
+
+    [[nodiscard]] bool validate_dof(const std::vector<Node::DOF>&) const override;
+    [[nodiscard]] uvec index_of(const std::vector<Node::DOF>&) const override;
 
     [[nodiscard]] const uvec& get_material_tag() const override;
     [[nodiscard]] const uvec& get_section_tag() const override;
@@ -230,6 +238,9 @@ public:
 
     void clear_node_ptr() override;
     [[nodiscard]] const std::vector<std::weak_ptr<Node>>& get_node_ptr() const override;
+
+    [[nodiscard]] mat get_coordinate() const override;
+    [[nodiscard]] mat get_coordinate(unsigned) const override;
 
     [[nodiscard]] vec get_incre_displacement() const override;
     [[nodiscard]] vec get_incre_velocity() const override;
@@ -286,7 +297,7 @@ public:
     const vec& update_body_force(const vec&) override;
     const vec& update_traction(const vec&) override;
 
-    std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 
     [[nodiscard]] double get_strain_energy() const override;
     [[nodiscard]] double get_complementary_energy() const override;
@@ -294,14 +305,12 @@ public:
     [[nodiscard]] double get_viscous_energy() const override;
     [[nodiscard]] double get_nonviscous_energy() const override;
     [[nodiscard]] const vec& get_momentum() const override;
-    [[nodiscard]] double get_momentum_component(DOF) const override;
 
     [[nodiscard]] double get_characteristic_length() const override;
+    [[nodiscard]] double get(Parameter) const override;
 
     [[nodiscard]] mat compute_shape_function(const mat&, unsigned) const override;
 };
-
-std::vector<vec>& append_to(std::vector<vec>&, std::vector<vec>&&);
 
 #endif
 

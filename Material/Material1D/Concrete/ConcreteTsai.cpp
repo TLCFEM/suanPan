@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,11 +81,11 @@ int ConcreteTsai::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double ConcreteTsai::get_parameter(const ParameterType P) const {
-    if(ParameterType::ELASTICMODULUS == P) return initial_stiffness(0);
-    if(ParameterType::PEAKSTRAIN == P) return c_strain;
-    if(ParameterType::CRACKSTRAIN == P) return t_strain;
+double ConcreteTsai::get(const Parameter P) const {
+    if(Parameter::ELASTIC == P) return initial_stiffness(0);
+    if(Parameter::PEAKSTRAIN == P) return c_strain;
+    if(Parameter::CRACKSTRAIN == P) return t_strain;
     return 0.;
 }
 
-unique_ptr<Material> ConcreteTsai::get_copy() { return std::make_unique<ConcreteTsai>(*this); }
+unique_ptr<Material> ConcreteTsai::unique_copy() { return std::make_unique<ConcreteTsai>(*this); }

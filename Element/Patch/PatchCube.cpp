@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto t_density = material_proto->get_density();
 
-    const IntegrationPlan plan(3, 2, IntegrationType::GAUSS);
+    const IntegrationPlan plan(3, 2, IntegrationPlan::Type::GAUSS);
 
     initial_stiffness.zeros(c_size, c_size);
     body_force.zeros(c_size, c_dof);
@@ -61,7 +61,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
     for(auto& I : ele_span) num_element *= I.n_elem;
 
     int_pt.clear();
-    int_pt.reserve(plan.n_rows);
+    int_pt.reserve(num_element * plan.n_rows);
     for(auto I : ele_span(0))
         for(auto J : ele_span(1))
             for(auto K : ele_span(2)) {
@@ -76,7 +76,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
                     const auto ders = net.evaluate_shape_function_derivative(x, y, z, polygon, 1, 1, 1);
                     const auto pn = join_cols(.5 * dx * vectorise(ders(1, 0, 0)).t(), .5 * dy * vectorise(ders(0, 1, 0)).t(), .5 * dz * vectorise(ders(0, 0, 1)).t());
                     const mat jacob = pn * ele_coor.head_cols(3);
-                    int_pt.emplace_back(vec{x, y, z}, plan(L, 3) * det(jacob), material_proto->get_copy());
+                    int_pt.emplace_back(vec{x, y, z}, plan(L, 3) * det(jacob), material_proto->unique_copy());
 
                     auto& c_pt = int_pt.back();
 
@@ -145,9 +145,9 @@ int PatchCube::reset_status() {
     return code;
 }
 
-std::vector<vec> PatchCube::record(const OutputType P) {
+std::vector<vec> PatchCube::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.c_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.c_material->record(P));
     return data;
 }
 

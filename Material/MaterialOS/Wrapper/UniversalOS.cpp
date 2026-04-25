@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ void UniversalOS::print() {
 OS146::OS146(const unsigned T, const unsigned BT, const unsigned MI)
     : UniversalOS(T, BT, MI, uvec{0, 3, 5}, uvec{1, 2, 4}) {}
 
-unique_ptr<Material> OS146::get_copy() { return std::make_unique<OS146>(*this); }
+unique_ptr<Material> OS146::unique_copy() { return std::make_unique<OS146>(*this); }
 
 OS146S::OS146S(const unsigned T, const unsigned BT, const double G)
     : Material(T, MaterialType::OS)
@@ -54,9 +54,9 @@ int OS146S::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double OS146S::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
+double OS146S::get(const Parameter P) const { return base->get(P); }
 
-unique_ptr<Material> OS146S::get_copy() { return std::make_unique<OS146S>(*this); }
+unique_ptr<Material> OS146S::unique_copy() { return std::make_unique<OS146S>(*this); }
 
 int OS146S::update_trial_status(const vec& t_strain) {
     trial_strain = t_strain;
@@ -90,7 +90,7 @@ int OS146S::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> OS146S::record(const OutputType P) { return base->record(P); }
+std::vector<vec> OS146S::record(const OutputType P) const { return base->record(P); }
 
 void OS146S::print() {
     if(base) base->print();

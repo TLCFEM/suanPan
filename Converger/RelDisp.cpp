@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@
 RelDisp::RelDisp(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> RelDisp::get_copy() { return std::make_unique<RelDisp>(*this); }
+unique_ptr<Converger> RelDisp::unique_copy() { return std::make_unique<RelDisp>(*this); }
 
 bool RelDisp::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();
 
-    const auto rel_disp = inf_norm(W->get_incre_displacement() + W->get_ninja()) / inf_norm(W->get_trial_displacement());
+    const auto rel_disp = suanpan::inf_norm(W->get_incre_displacement() + W->get_ninja()) / suanpan::inf_norm(W->get_trial_displacement());
     set_error(std::isfinite(rel_disp) ? rel_disp : 1.);
     set_conv_flag(get_tolerance() > get_error());
 

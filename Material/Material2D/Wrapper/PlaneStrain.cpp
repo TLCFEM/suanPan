@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,9 +44,9 @@ int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double PlaneStrain::get_parameter(const ParameterType P) const { return base->get_parameter(P); }
+double PlaneStrain::get(const Parameter P) const { return base->get(P); }
 
-unique_ptr<Material> PlaneStrain::get_copy() { return std::make_unique<PlaneStrain>(*this); }
+unique_ptr<Material> PlaneStrain::unique_copy() { return std::make_unique<PlaneStrain>(*this); }
 
 int PlaneStrain::update_trial_status(const vec& t_strain) {
     vec full_strain(6, fill::zeros);
@@ -84,7 +84,7 @@ int PlaneStrain::reset_status() {
     return base->reset_status();
 }
 
-std::vector<vec> PlaneStrain::record(const OutputType P) { return base->record(P); }
+std::vector<vec> PlaneStrain::record(const OutputType P) const { return base->record(P); }
 
 void PlaneStrain::print() {
     suanpan_info("A plane strain wrapper.\n");

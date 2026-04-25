@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,39 +21,32 @@
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
 
-void ElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
-    std::vector<uword> pool;
-    pool.reserve(get_object_tag().n_elem);
-    for(const auto I : get_object_tag())
-        if(!D->find<Element>(I) || !D->get<Element>(I)->is_active())
-            suanpan_warning("Element {} is not available/active, removed from recorder {}.\n", I, get_tag());
-        else pool.emplace_back(I);
-
-    set_object_tag(pool);
-
-    access::rw(get_data_pool()).resize(get_object_tag().n_elem);
-}
-
-void ElementRecorder::record(const shared_ptr<DomainBase>& D) {
-    if(!if_perform_record()) return;
-
-    auto& obj_tag = get_object_tag();
-
-    if(OutputType::K == get_variable_type()) {
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
-            if(const auto& t_element = D->get<Element>(obj_tag(I)); t_element->is_active() && t_element->is_local) insert({vectorise(t_element->get_current_stiffness())}, I);
-    }
-    else if(OutputType::M == get_variable_type()) {
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
-            if(const auto& t_element = D->get<Element>(obj_tag(I)); t_element->is_active() && t_element->is_local) insert({vectorise(t_element->get_current_mass())}, I);
-    }
+void ElementRecorder::record_impl(const shared_ptr<DomainBase>& D) {
+    if(OutputType::K == variable_type)
+        for(const auto I : object_tag) insert({vectorise(D->get<Element>(I)->get_current_stiffness())}, I);
+    else if(OutputType::M == variable_type)
+        for(const auto I : object_tag) insert({vectorise(D->get<Element>(I)->get_current_mass())}, I);
     else
-        for(unsigned I = 0; I < obj_tag.n_elem; ++I)
-            if(const auto& t_element = D->get<Element>(obj_tag(I)); t_element->is_active() && t_element->is_local) insert(t_element->record(get_variable_type()), I);
+        for(const auto I : object_tag) insert(D->get<Element>(I)->record(variable_type), I);
 
-    if(if_record_time()) insert(D->get_factory()->get_current_time());
+    insert(D->get_factory()->get_current_time());
 }
 
-void ElementRecorder::print() {
-    suanpan_info("An element recorder.\n");
+void ElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
+    update_tag(D);
+
+    std::vector<uword> pool;
+    pool.reserve(object_tag.n_elem);
+    for(const auto I : object_tag)
+        if(auto& t_element = D->get<Element>(I); !t_element || !t_element->is_active())
+            suanpan_warning("Element {} is not available/active, removed from recorder {}.\n", I, get_tag());
+        else if(t_element->is_local) pool.emplace_back(I);
+
+    object_tag = pool;
 }
+
+void ElementRecorder::print() { suanpan_info("An element recorder.\n"); }
+
+const uvec& GroupElementRecorder::update_tag(const shared_ptr<DomainBase>& D) { return object_tag = D->flatten_group(reference_tag); }
+
+void GroupElementRecorder::print() { suanpan_info("An element recorder based on groups.\n"); }

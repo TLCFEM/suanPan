@@ -5,6 +5,13 @@
 1. Eigenanalysis does not support distributed computation.
 2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 4.0
+
+1. (breaking) change the behaviour of constraint tokens, natural ordering (1, 2, 3, etc.) may break in this version, use more explicit tokens for unconventional DoFs
+2. fix implementation of UDL [#317](https://github.com/TLCFEM/suanPan/pull/317)
+3. bump up various dependencies
+4. add `Balloon` models for metals
+
 ## version 3.9
 
 1. fix computation of elasticity matrix in orthotropic materials [#280](https://github.com/TLCFEM/suanPan/pull/280)

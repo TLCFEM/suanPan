@@ -56,7 +56,7 @@ if [ -f $file_name ]; then
 fi
 
 # application
-file_name="Toolbox/argument.cpp"
+file_name="Toolbox/command.h"
 if [ -f $file_name ]; then
   sed -i "s/constexpr auto SUANPAN_MAJOR = [0-9];/constexpr auto SUANPAN_MAJOR = $1;/g" $file_name
   sed -i "s/constexpr auto SUANPAN_MINOR = [0-9];/constexpr auto SUANPAN_MINOR = $2;/g" $file_name
@@ -79,4 +79,10 @@ fi
 file_name="CITATION.cff"
 if [ -f $file_name ]; then
   sed -i "s/version: \"[0-9]\.[0-9]\.[0-9]\"/version: \"$1\.$2\.$3\"/g" $file_name
+fi
+
+# rpm spec
+file_name="suanPan.spec.rpkg"
+if [ -f $file_name ]; then
+  sed -i "s/[0-9]\.[0-9]\.[0-9]/$1\.$2\.$3/g" $file_name
 fi

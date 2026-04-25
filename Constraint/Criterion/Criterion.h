@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 
 class DomainBase;
 
-class Criterion : public CopiableTag {
+class Criterion : public CopyableTag {
     unsigned step_tag;
 
 public:
@@ -44,7 +44,7 @@ public:
     void set_step_tag(unsigned);
     [[nodiscard]] unsigned get_step_tag() const;
 
-    virtual unique_ptr<Criterion> get_copy() = 0;
+    virtual unique_ptr<Criterion> unique_copy() = 0;
 
     virtual int initialize(const shared_ptr<DomainBase>&);
 

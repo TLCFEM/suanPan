@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,15 +26,15 @@ B3DOSC::B3DOSC(const unsigned T, vec&& XYZ)
     access::rw(sd) = span(10, 12);
 }
 
-OrientationType B3DOSC::get_orientation_type() const { return OrientationType::B3DOS; }
+Orientation::Type B3DOSC::type() const { return Type::B3DOS; }
 
 void B3DOSC::update_transformation() {
-    const mat t_coor = get_coordinate(element_ptr, 3).t();
+    const mat t_coor = element_ptr->get_coordinate(3).t();
     const vec x_axis = t_coor.col(1) - t_coor.col(0);
 
     update_direct_cosine(x_axis);
 
-    const mat trial_disp = reshape(get_trial_displacement(element_ptr), 7, 2);
+    const mat trial_disp = reshape(element_ptr->get_trial_displacement(), 7, 2);
     const vec incre_disp = trial_disp.head_rows(3).col(1) - trial_disp.head_rows(3).col(0);
     const vec trial_cord = x_axis + incre_disp;
 
@@ -118,7 +118,7 @@ void B3DOSC::update_transformation() {
 
 unsigned B3DOSC::nodal_size() const { return 7u; }
 
-unique_ptr<Orientation> B3DOSC::get_copy() { return std::make_unique<B3DOSC>(*this); }
+unique_ptr<Orientation> B3DOSC::unique_copy() { return std::make_unique<B3DOSC>(*this); }
 
 vec B3DOSC::to_local_vec(const vec&) const { return {elongation, theta(2), theta(5), theta(1), theta(4), theta(0), theta(3), theta(6), theta(7)}; }
 

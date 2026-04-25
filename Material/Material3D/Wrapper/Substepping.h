@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,9 +47,9 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Material> get_copy() override;
+    unique_ptr<Material> unique_copy() override;
 
-    [[nodiscard]] double get_parameter(ParameterType) const override;
+    [[nodiscard]] double get(Parameter) const override;
 
     [[nodiscard]] const mat& get_initial_damping() const override;
     [[nodiscard]] const vec& get_initial_history() const override;
@@ -79,7 +79,7 @@ public:
     int commit_status() override;
     int reset_status() override;
 
-    std::vector<vec> record(OutputType) override;
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 
     void print() override;
 };

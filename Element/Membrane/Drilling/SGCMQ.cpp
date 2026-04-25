@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ void SGCMQ::form_body_force(const mat& diff_coor) {
 }
 
 SGCMQ::SGCMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, const char IP)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {DOF::U1, DOF::U2, DOF::UR3})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH)
     , scheme(IP) {}
 
@@ -169,7 +169,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(characteristic_length) = sqrt(area::shoelace(ele_coor));
     // clang-format off
-    const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationType::IRONS : scheme == 'L' ? IntegrationType::LOBATTO : IntegrationType::GAUSS);
+    const IntegrationPlan plan(2, scheme == 'I' ? 2 : 3, scheme == 'I' ? IntegrationPlan::Type::IRONS : scheme == 'L' ? IntegrationPlan::Type::LOBATTO : IntegrationPlan::Type::GAUSS);
     // clang-format on
     const auto diff_coor = form_diff_coor(ele_coor);
 
@@ -185,7 +185,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{X, Y};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, mat_proto->get_copy());
+        int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, mat_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
 
@@ -244,9 +244,9 @@ int SGCMQ::reset_status() {
 
 mat SGCMQ::compute_shape_function(const mat& coordinate, const unsigned order) const { return shape::quad(coordinate, order, m_node); }
 
-std::vector<vec> SGCMQ::record(const OutputType P) {
+std::vector<vec> SGCMQ::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.m_material->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
     return data;
 }
 
@@ -264,26 +264,19 @@ void SGCMQ::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void SGCMQ::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < m_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
-}
-
-void SGCMQ::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, m_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_acceleration(), m_dof, m_node);
-    else if(OutputType::V == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_velocity(), m_dof, m_node);
-    else if(OutputType::U == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_displacement(), m_dof, m_node);
-
-    for(unsigned I = 0; I < m_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
+vtkSmartPointer<vtkCell> SGCMQ::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat SGCMQ::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, m_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = reshape(in, m_dof, m_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
     if(P == OutputType::S) {
         mat B(3 * int_pt.size(), 1);
         mat A(3 * int_pt.size(), 11);
@@ -308,7 +301,7 @@ mat SGCMQ::GetData(const OutputType P) {
     mat B(6, int_pt.size(), fill::zeros);
 
     for(size_t I = 0; I < int_pt.size(); ++I) {
-        if(const auto C = int_pt[I].m_material->record(P); !C.empty()) B(0, I, size(C[0])) = C[0];
+        if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
 
@@ -322,9 +315,6 @@ mat SGCMQ::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-void SGCMQ::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2).t();
-    for(unsigned I = 0; I < m_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat SGCMQ::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), m_dof, m_node).eval().head_rows(2); }
 
 #endif

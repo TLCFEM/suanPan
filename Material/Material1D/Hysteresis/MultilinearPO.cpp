@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ int MultilinearPO::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> MultilinearPO::get_copy() { return std::make_unique<MultilinearPO>(*this); }
+unique_ptr<Material> MultilinearPO::unique_copy() { return std::make_unique<MultilinearPO>(*this); }
 
 void MultilinearPO::print() {
     suanpan_info("A multilinear peak oriented hysteresis model.\n");

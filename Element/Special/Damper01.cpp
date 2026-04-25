@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@
 #include <Material/Material1D/Material1D.h>
 
 Damper01::Damper01(const unsigned T, uvec&& NT, const unsigned D, const unsigned DIM)
-    : MaterialElement1D(T, d_node, 3 == DIM ? 3 : 2, std::move(NT), uvec{D}, false, 3 == DIM ? std::vector{DOF::U1, DOF::U2, DOF::U3} : std::vector{DOF::U1, DOF::U2})
-    , d_dof(3 == DIM ? 3 : 2)
+    : MaterialElement1D(T, d_node, DIM, std::move(NT), uvec{D}, false, suanpan::translational(DIM))
+    , d_dof(DIM)
     , IS(3 == d_dof ? uvec{0, 1, 2} : uvec{0, 1})
     , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3}) { modify_viscous = false; }
 
 int Damper01::initialize(const shared_ptr<DomainBase>& D) {
-    damper = D->get<Material>(material_tag(0))->get_copy();
+    damper = D->get<Material>(material_tag(0))->unique_copy();
 
     const mat coord = get_coordinate(d_dof);
 
@@ -89,7 +89,7 @@ int Damper01::clear_status() { return damper->clear_status(); }
 
 int Damper01::reset_status() { return damper->reset_status(); }
 
-std::vector<vec> Damper01::record(const OutputType P) { return damper->record(P); }
+std::vector<vec> Damper01::record(const OutputType P) const { return damper->record(P); }
 
 void Damper01::print() {
     suanpan_info("A viscous damper element using displacement and velocity as basic quantities.\n");

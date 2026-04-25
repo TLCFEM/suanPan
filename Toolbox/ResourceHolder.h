@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,42 +28,38 @@
 
 #include <memory>
 
-template<typename T> requires requires(T* copyable) { copyable->get_copy(); }
+template<typename T> requires requires(T* copyable) { copyable->unique_copy(); }
 class ResourceHolder final {
     std::unique_ptr<T> object = nullptr;
 
 public:
     ResourceHolder() = default;
 
-    ResourceHolder(const ResourceHolder& old_holder)
-        : object(old_holder ? old_holder.object->get_copy() : nullptr) {}
+    ResourceHolder(const ResourceHolder& old)
+        : object(old.object ? old.object->unique_copy() : nullptr) {}
 
-    ResourceHolder(ResourceHolder&& old_holder) noexcept { object = std::move(old_holder.object); }
+    ResourceHolder(ResourceHolder&& old) noexcept { object = std::move(old.object); }
 
     ResourceHolder& operator=(const ResourceHolder&) = delete;
     ResourceHolder& operator=(ResourceHolder&&) = delete;
     ~ResourceHolder() = default;
 
-    explicit ResourceHolder(std::unique_ptr<T>&& original_object)
-        : object(std::move(original_object)) {}
+    explicit ResourceHolder(std::unique_ptr<T>&& old)
+        : object(std::move(old)) {}
 
     template<typename U> requires std::is_base_of_v<T, U> ResourceHolder& operator=(U&& other) {
         object = std::make_unique<U>(std::forward<U>(other));
         return *this;
     }
 
-    ResourceHolder& operator=(const std::shared_ptr<T>& original_object) {
-        if(nullptr != original_object) object = original_object->get_copy();
+    ResourceHolder& operator=(const std::shared_ptr<T>& old) {
+        if(old) object = old->unique_copy();
         return *this;
     }
 
     T* operator->() const { return object.get(); }
 
     explicit operator bool() const { return object != nullptr; }
-
-    bool operator==(const ResourceHolder& other) const { return object == other.object; }
-
-    bool operator==(const T& other) const { return object == other; }
 
     bool operator==(std::nullptr_t null) const { return object == null; }
 };

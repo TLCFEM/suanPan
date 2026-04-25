@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 AbsIncreEnergy::AbsIncreEnergy(const unsigned T, const double E, const unsigned M, const bool P)
     : Converger(T, E, M, P) {}
 
-unique_ptr<Converger> AbsIncreEnergy::get_copy() { return std::make_unique<AbsIncreEnergy>(*this); }
+unique_ptr<Converger> AbsIncreEnergy::unique_copy() { return std::make_unique<AbsIncreEnergy>(*this); }
 
 bool AbsIncreEnergy::is_converged(unsigned) {
     auto& W = get_domain().lock()->get_factory();

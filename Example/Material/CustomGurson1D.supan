@@ -44,8 +44,6 @@ peek element 1
 #   5.0000e+02  0.0000e+00
 peek node 3
 
-save recorder 1
-
 reset
 clear
 exit

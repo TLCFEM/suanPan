@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,35 @@
 
 #include "Element.h"
 
-#include <Domain/DOF.h>
 #include <Domain/DomainBase.h>
 #include <Domain/Group/Group.h>
-#include <Domain/Node.h>
 #include <Material/Material.h>
 #include <Section/Section.h>
 #include <Toolbox/utility.h>
+
+void ConstantMass(DataElement* E) {
+    E->update_mass = false;
+    E->current_mass = mat(E->initial_mass.memptr(), E->initial_mass.n_rows, E->initial_mass.n_cols, false, true);
+    E->trial_mass = mat(E->initial_mass.memptr(), E->initial_mass.n_rows, E->initial_mass.n_cols, false, true);
+}
+
+void ConstantDamping(DataElement* E) {
+    E->update_viscous = false;
+    E->current_viscous = mat(E->initial_viscous.memptr(), E->initial_viscous.n_rows, E->initial_viscous.n_cols, false, true);
+    E->trial_viscous = mat(E->initial_viscous.memptr(), E->initial_viscous.n_rows, E->initial_viscous.n_cols, false, true);
+}
+
+void ConstantStiffness(DataElement* E) {
+    E->update_stiffness = false;
+    E->current_stiffness = mat(E->initial_stiffness.memptr(), E->initial_stiffness.n_rows, E->initial_stiffness.n_cols, false, true);
+    E->trial_stiffness = mat(E->initial_stiffness.memptr(), E->initial_stiffness.n_rows, E->initial_stiffness.n_cols, false, true);
+}
+
+void ConstantGeometry(DataElement* E) {
+    E->update_geometry = false;
+    E->current_geometry = mat(E->initial_geometry.memptr(), E->initial_geometry.n_rows, E->initial_geometry.n_cols, false, true);
+    E->trial_geometry = mat(E->initial_geometry.memptr(), E->initial_geometry.n_rows, E->initial_geometry.n_cols, false, true);
+}
 
 void Element::update_strain_energy() {
     if(trial_resistance.is_empty()) return;
@@ -65,6 +87,277 @@ void Element::update_momentum() {
     momentum = trial_mass * get_trial_velocity();
 }
 
+void Element::validate() const {
+    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
+}
+
+vec Element::get_node_incre_resistance() const {
+    vec node_incre_resistance(num_size, fill::none);
+
+    auto idx = 0;
+
+    for(unsigned I = 0; I < num_node; ++I) {
+        auto& t_force = node_ptr[I].lock()->get_incre_resistance();
+        for(unsigned J = 0; J < num_dof; ++J) node_incre_resistance(idx++) = t_force(J);
+    }
+
+    return node_incre_resistance;
+}
+
+vec Element::get_node_trial_resistance() const {
+    vec node_trial_resistance(num_size, fill::none);
+
+    auto idx = 0;
+
+    for(unsigned I = 0; I < num_node; ++I) {
+        auto& t_force = node_ptr[I].lock()->get_trial_resistance();
+        for(unsigned J = 0; J < num_dof; ++J) node_trial_resistance(idx++) = t_force(J);
+    }
+
+    return node_trial_resistance;
+}
+
+vec Element::get_node_current_resistance() const {
+    vec node_current_resistance(num_size, fill::none);
+
+    auto idx = 0;
+
+    for(unsigned I = 0; I < num_node; ++I) {
+        auto& t_force = node_ptr[I].lock()->get_current_resistance();
+        for(unsigned J = 0; J < num_dof; ++J) node_current_resistance(idx++) = t_force(J);
+    }
+
+    return node_current_resistance;
+}
+
+std::vector<shared_ptr<Material>> Element::get_material(const shared_ptr<DomainBase>& D) const {
+    std::vector<shared_ptr<Material>> material_pool;
+    for(const auto I : material_tag) material_pool.emplace_back(D->get<Material>(I));
+    return material_pool;
+}
+
+std::vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBase>& D) const {
+    std::vector<shared_ptr<Section>> section_pool;
+    for(const auto I : section_tag) section_pool.emplace_back(D->get<Section>(I));
+    return section_pool;
+}
+
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<Node::DOF>&& DI)
+    : Element(T, NN, ND, std::move(NT), {}, false, MaterialType::D0, std::move(DI)) {}
+
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<Node::DOF>&& DI)
+    : DataElement{std::move(NT), std::move(MT), uvec{}, F}
+    , ElementBase(T)
+    , Distributed(static_cast<int>(T))
+    , num_node(NN)
+    , num_dof(ND)
+    , material_type(MTP)
+    , section_type(SectionType::D0)
+    , dof_identifier(std::move(DI)) { validate(); }
+
+Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<Node::DOF>&& DI)
+    : DataElement{std::move(NT), uvec{}, std::move(ST), F}
+    , ElementBase(T)
+    , Distributed(static_cast<int>(T))
+    , num_node(NN)
+    , num_dof(ND)
+    , material_type(MaterialType::D0)
+    , section_type(STP)
+    , dof_identifier(std::move(DI)) { validate(); }
+
+// for contact elements that use node groups
+Element::Element(const unsigned T, const unsigned ND, uvec&& GT, std::vector<Node::DOF>&& DI)
+    : DataElement{std::move(GT), {}, {}, false}
+    , ElementBase(T)
+    , Distributed(static_cast<int>(T))
+    , num_node(static_cast<unsigned>(-1))
+    , num_dof(ND)
+    , use_group(true)
+    , material_type(MaterialType::D0)
+    , section_type(SectionType::D0)
+    , dof_identifier(std::move(DI)) { validate(); }
+
+// for elements that use other elements
+Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT, std::vector<Node::DOF>&& DI)
+    : DataElement{{NT}, {}, {}, false}
+    , ElementBase(T)
+    , Distributed(static_cast<int>(ET))
+    , num_node(static_cast<unsigned>(-1))
+    , num_dof(ND)
+    , use_other(ET)
+    , material_type(MaterialType::D0)
+    , section_type(SectionType::D0)
+    , dof_identifier(std::move(DI)) { validate(); }
+
+int Element::initialize_base(const shared_ptr<DomainBase>& D) {
+    // initialized already, check node validity
+    if(node_ptr.size() == num_node) {
+        for(const auto& I : node_ptr)
+            if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
+        return SUANPAN_SUCCESS;
+    }
+
+    // use node group instead of node
+    if(use_group) {
+        std::vector<const uvec*> pool;
+        pool.reserve(node_encoding.n_elem);
+        for(const auto I : node_encoding)
+            if(D->find<Group>(I)) pool.emplace_back(&D->get<Group>(I)->get_pool());
+            else return SUANPAN_FAIL;
+
+        uword counter = 0;
+        for(const auto& I : pool) counter += I->size();
+        access::rw(num_node) = static_cast<unsigned>(counter);
+
+        auto& n_encoding = access::rw(node_encoding);
+        n_encoding.zeros(num_node);
+        counter = 0;
+        for(const auto& I : pool)
+            for(const auto J : *I) n_encoding(counter++) = J;
+    }
+
+    // embedded elements use other elements
+    if(0u != use_other) {
+        auto& t_element = D->get<Element>(use_other);
+
+        if(!t_element) return SUANPAN_FAIL;
+
+        access::rw(num_node) = 1u + t_element->get_node_number();
+
+        auto& n_encoding = access::rw(node_encoding);
+        n_encoding.resize(num_node);
+        n_encoding.tail(num_node - 1u) = t_element->get_node_encoding();
+    }
+
+    // first initialization
+    access::rw(num_size) = num_node * num_dof;
+
+    if(0u == num_size) return SUANPAN_FAIL;
+
+    dof_encoding.set_size(num_size);
+
+    // check if nodes are still valid
+    auto inactive = false;
+    node_ptr.clear();
+    node_ptr.reserve(num_node);
+    for(const auto& t_tag : node_encoding) {
+        if(!D->find<Node>(t_tag)) {
+            suanpan_warning("Element {} disabled as node {} cannot be found.\n", get_tag(), t_tag);
+            return SUANPAN_FAIL;
+        }
+        auto& t_node = D->get<Node>(t_tag);
+        node_ptr.emplace_back(t_node);
+        if(!t_node->is_active()) inactive = true;
+    }
+    if(inactive) {
+        suanpan_warning("Element {} disabled as inactive nodes used.\n", get_tag());
+        return SUANPAN_FAIL;
+    }
+
+    for(const auto& t_ptr : node_ptr) t_ptr.lock()->ensure_dof(num_dof, dof_identifier);
+
+    // check if material models are valid
+    if(MaterialType::D0 != material_type)
+        for(const auto t_tag : material_tag)
+            if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != material_type) {
+                suanpan_warning("Element {} disabled as material {} cannot be found or type mismatch.\n", get_tag(), t_tag);
+                return SUANPAN_FAIL;
+            }
+
+    // check if section models are valid
+    if(SectionType::D0 != section_type)
+        for(const auto t_tag : section_tag)
+            if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != section_type) {
+                suanpan_warning("Element {} disabled as section {} cannot be found or type mismatch.\n", get_tag(), t_tag);
+                return SUANPAN_FAIL;
+            }
+
+    return SUANPAN_SUCCESS;
+}
+
+void Element::set_initialized(const bool F) const { access::rw(initialized) = F; }
+
+void Element::set_symmetric(const bool F) const { access::rw(symmetric) = F; }
+
+bool Element::is_initialized() const { return initialized; }
+
+bool Element::is_symmetric() const { return symmetric; }
+
+bool Element::is_nlgeom() const { return nlgeom; }
+
+Element::Type Element::type() const { return Type::FEM; }
+
+void Element::update_dof_encoding() {
+    auto idx = 0u;
+    for(const auto& t_ptr : node_ptr) {
+        auto& node_dof = t_ptr.lock()->get_reordered_dof();
+        for(auto i = 0u; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
+    }
+
+    dof_mapping.clear();
+    dof_mapping.reserve(num_size);
+    const uvec dof_index = sort_index(dof_encoding), dof_reordered = dof_encoding(dof_index);
+    for(auto I = 0llu; I < dof_index.n_elem; ++I)
+        for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
+    // ReSharper disable once CppUseRangeAlgorithm
+    std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
+}
+
+bool Element::if_update_mass() const { return update_mass; }
+
+bool Element::if_update_viscous() const { return update_viscous; }
+
+bool Element::if_update_nonviscous() const { return update_nonviscous; }
+
+bool Element::if_update_stiffness() const { return update_stiffness; }
+
+bool Element::if_update_geometry() const { return update_geometry; }
+
+bool Element::allow_modify_mass() const { return modify_mass; }
+
+bool Element::allow_modify_viscous() const { return modify_viscous; }
+
+bool Element::allow_modify_nonviscous() const { return modify_nonviscous; }
+
+const uvec& Element::get_dof_encoding() const { return dof_encoding; }
+
+const uvec& Element::get_node_encoding() const { return node_encoding; }
+
+const std::vector<Node::DOF>& Element::get_dof_identifier() const { return dof_identifier; }
+
+const std::vector<MappingDOF>& Element::get_dof_mapping() const { return dof_mapping; }
+
+bool Element::validate_dof(const std::vector<Node::DOF>& in) const {
+    if(dof_identifier.size() < in.size()) return false;
+    for(size_t I = 0; I < in.size(); ++I)
+        if(dof_identifier[I] != in[I]) return false;
+    return true;
+}
+
+uvec Element::index_of(const std::vector<Node::DOF>& seed) const {
+    std::vector<uword> index;
+    for(const auto target : seed)
+        // ReSharper disable once CppUseRangeAlgorithm
+        if(const auto pos = std::find(dof_identifier.cbegin(), dof_identifier.cend(), target); pos != dof_identifier.cend()) index.emplace_back(std::distance(dof_identifier.cbegin(), pos));
+    return index;
+}
+
+const uvec& Element::get_material_tag() const { return material_tag; }
+
+const uvec& Element::get_section_tag() const { return section_tag; }
+
+unsigned Element::get_dof_number() const { return num_dof; }
+
+unsigned Element::get_node_number() const { return num_node; }
+
+unsigned Element::get_total_number() const { return num_size; }
+
+void Element::clear_node_ptr() { node_ptr.clear(); }
+
+const std::vector<std::weak_ptr<Node>>& Element::get_node_ptr() const { return node_ptr; }
+
+mat Element::get_coordinate() const { return get_coordinate(num_dof); }
+
 /**
  * \brief generate a matrix that contains coordinates of connected nodes
  * \param num_dim number of dimension required
@@ -76,10 +369,7 @@ void Element::update_momentum() {
 mat Element::get_coordinate(const unsigned num_dim) const {
     mat ele_coor(num_node, num_dim, fill::zeros);
 
-    for(unsigned I = 0; I < num_node; ++I) {
-        auto& t_coor = node_ptr[I].lock()->get_coordinate();
-        for(uword J = 0; J < std::min(static_cast<uword>(num_dim), t_coor.n_elem); ++J) ele_coor(I, J) = t_coor(J);
-    }
+    for(auto I = 0u; I < num_node; ++I) ele_coor.row(I) = vec(node_ptr[I].lock()->get_coordinate()).resize(num_dim).t();
 
     return ele_coor;
 }
@@ -200,262 +490,6 @@ vec Element::get_current_acceleration() const {
 
     return current_acceleration;
 }
-
-vec Element::get_node_incre_resistance() const {
-    vec node_incre_resistance(num_size, fill::none);
-
-    auto idx = 0;
-
-    for(unsigned I = 0; I < num_node; ++I) {
-        auto& t_force = node_ptr[I].lock()->get_incre_resistance();
-        for(unsigned J = 0; J < num_dof; ++J) node_incre_resistance(idx++) = t_force(J);
-    }
-
-    return node_incre_resistance;
-}
-
-vec Element::get_node_trial_resistance() const {
-    vec node_trial_resistance(num_size, fill::none);
-
-    auto idx = 0;
-
-    for(unsigned I = 0; I < num_node; ++I) {
-        auto& t_force = node_ptr[I].lock()->get_trial_resistance();
-        for(unsigned J = 0; J < num_dof; ++J) node_trial_resistance(idx++) = t_force(J);
-    }
-
-    return node_trial_resistance;
-}
-
-vec Element::get_node_current_resistance() const {
-    vec node_current_resistance(num_size, fill::none);
-
-    auto idx = 0;
-
-    for(unsigned I = 0; I < num_node; ++I) {
-        auto& t_force = node_ptr[I].lock()->get_current_resistance();
-        for(unsigned J = 0; J < num_dof; ++J) node_current_resistance(idx++) = t_force(J);
-    }
-
-    return node_current_resistance;
-}
-
-std::vector<shared_ptr<Material>> Element::get_material(const shared_ptr<DomainBase>& D) const {
-    std::vector<shared_ptr<Material>> material_pool;
-    for(const auto I : material_tag) material_pool.emplace_back(D->get<Material>(I));
-    return material_pool;
-}
-
-std::vector<shared_ptr<Section>> Element::get_section(const shared_ptr<DomainBase>& D) const {
-    std::vector<shared_ptr<Section>> section_pool;
-    for(const auto I : section_tag) section_pool.emplace_back(D->get<Section>(I));
-    return section_pool;
-}
-
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, std::vector<DOF>&& DI)
-    : Element(T, NN, ND, std::move(NT), {}, false, MaterialType::D0, std::move(DI)) {}
-
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<DOF>&& DI)
-    : DataElement{std::move(NT), std::move(MT), uvec{}, F}
-    , ElementBase(T)
-    , Distributed(T)
-    , num_node(NN)
-    , num_dof(ND)
-    , material_type(MTP)
-    , section_type(SectionType::D0)
-    , dof_identifier(std::move(DI)) {
-    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
-}
-
-Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<DOF>&& DI)
-    : DataElement{std::move(NT), uvec{}, std::move(ST), F}
-    , ElementBase(T)
-    , Distributed(T)
-    , num_node(NN)
-    , num_dof(ND)
-    , material_type(MaterialType::D0)
-    , section_type(STP)
-    , dof_identifier(std::move(DI)) {
-    suanpan_assert([&] { if(!dof_identifier.empty() && num_dof != dof_identifier.size()) throw std::invalid_argument("size of dof identifier must meet number of dofs"); });
-}
-
-// for contact elements that use node groups
-Element::Element(const unsigned T, const unsigned ND, uvec&& GT)
-    : DataElement{std::move(GT), {}, {}, false}
-    , ElementBase(T)
-    , Distributed(T)
-    , num_node(static_cast<unsigned>(-1))
-    , num_dof(ND)
-    , use_group(true)
-    , material_type(MaterialType::D0)
-    , section_type(SectionType::D0) {}
-
-// for elements that use other elements
-Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT)
-    : DataElement{{NT}, {}, {}, false}
-    , ElementBase(T)
-    , Distributed(ET)
-    , num_node(static_cast<unsigned>(-1))
-    , num_dof(ND)
-    , use_other(ET)
-    , material_type(MaterialType::D0)
-    , section_type(SectionType::D0) {}
-
-int Element::initialize_base(const shared_ptr<DomainBase>& D) {
-    // initialized already, check node validity
-    if(node_ptr.size() == num_node) {
-        for(const auto& I : node_ptr)
-            if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
-        return SUANPAN_SUCCESS;
-    }
-
-    // use node group instead of node
-    if(use_group) {
-        std::vector<const uvec*> pool;
-        pool.reserve(node_encoding.n_elem);
-        for(const auto I : node_encoding)
-            if(D->find<Group>(I)) pool.emplace_back(&D->get<Group>(I)->get_pool());
-            else return SUANPAN_FAIL;
-
-        uword counter = 0;
-        for(const auto& I : pool) counter += I->size();
-        access::rw(num_node) = static_cast<unsigned>(counter);
-
-        auto& n_encoding = access::rw(node_encoding);
-        n_encoding.zeros(num_node);
-        counter = 0;
-        for(const auto& I : pool)
-            for(const auto J : *I) n_encoding(counter++) = J;
-    }
-
-    // embedded elements use other elements
-    if(0u != use_other) {
-        if(!D->find<Element>(use_other)) return SUANPAN_FAIL;
-
-        auto size = 1u;
-        auto& t_element = D->get<Element>(use_other);
-        size += t_element->get_node_number();
-        access::rw(num_node) = size;
-
-        auto& n_encoding = access::rw(node_encoding);
-        n_encoding.resize(size);
-        n_encoding.tail(size - 1llu) = t_element->get_node_encoding();
-    }
-
-    // first initialization
-    access::rw(num_size) = num_node * num_dof;
-
-    if(0u == num_size) return SUANPAN_FAIL;
-
-    dof_encoding.set_size(num_size);
-
-    // check if nodes are still valid
-    auto inactive = false;
-    node_ptr.clear();
-    node_ptr.reserve(num_node);
-    for(const auto& t_tag : node_encoding) {
-        if(!D->find<Node>(t_tag)) {
-            suanpan_warning("Element {} disabled as node {} cannot be found.\n", get_tag(), t_tag);
-            return SUANPAN_FAIL;
-        }
-        auto& t_node = D->get<Node>(t_tag);
-        node_ptr.emplace_back(t_node);
-        if(!t_node->is_active()) inactive = true;
-    }
-    if(inactive) {
-        suanpan_warning("Element {} disabled as inactive nodes used.\n", get_tag());
-        return SUANPAN_FAIL;
-    }
-    for(auto& I : node_ptr)
-        if(I.lock()->get_dof_number() < num_dof) I.lock()->set_dof_number(num_dof);
-
-    // check if material models are valid
-    if(MaterialType::D0 != material_type)
-        for(const auto t_tag : material_tag)
-            if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != material_type) {
-                suanpan_warning("Element {} disabled as material {} cannot be found or type mismatch.\n", get_tag(), t_tag);
-                return SUANPAN_FAIL;
-            }
-
-    // check if section models are valid
-    if(SectionType::D0 != section_type)
-        for(const auto t_tag : section_tag)
-            if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != section_type) {
-                suanpan_warning("Element {} disabled as section {} cannot be found or type mismatch.\n", get_tag(), t_tag);
-                return SUANPAN_FAIL;
-            }
-
-#ifdef SUANPAN_VTK
-    // vtk visualization setup
-    Setup();
-#endif
-
-    return SUANPAN_SUCCESS;
-}
-
-void Element::set_initialized(const bool F) const { access::rw(initialized) = F; }
-
-void Element::set_symmetric(const bool F) const { access::rw(symmetric) = F; }
-
-bool Element::is_initialized() const { return initialized; }
-
-bool Element::is_symmetric() const { return symmetric; }
-
-bool Element::is_nlgeom() const { return nlgeom; }
-
-void Element::update_dof_encoding() {
-    auto idx = 0u;
-    for(const auto& t_ptr : node_ptr) {
-        auto& node_dof = t_ptr.lock()->get_reordered_dof();
-        for(auto i = 0u; i < num_dof; ++i) dof_encoding(idx++) = node_dof(i);
-    }
-
-    dof_mapping.clear();
-    dof_mapping.reserve(num_size);
-    const uvec dof_index = sort_index(dof_encoding), dof_reordered = dof_encoding(dof_index);
-    for(auto I = 0llu; I < dof_index.n_elem; ++I)
-        for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
-    std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
-
-    if(!dof_identifier.empty())
-        for(const auto& t_ptr : node_ptr) t_ptr.lock()->set_dof_identifier(dof_identifier);
-}
-
-bool Element::if_update_mass() const { return update_mass; }
-
-bool Element::if_update_viscous() const { return update_viscous; }
-
-bool Element::if_update_nonviscous() const { return update_nonviscous; }
-
-bool Element::if_update_stiffness() const { return update_stiffness; }
-
-bool Element::if_update_geometry() const { return update_geometry; }
-
-bool Element::allow_modify_mass() const { return modify_mass; }
-
-bool Element::allow_modify_viscous() const { return modify_viscous; }
-
-bool Element::allow_modify_nonviscous() const { return modify_nonviscous; }
-
-const uvec& Element::get_dof_encoding() const { return dof_encoding; }
-
-const uvec& Element::get_node_encoding() const { return node_encoding; }
-
-const std::vector<MappingDOF>& Element::get_dof_mapping() const { return dof_mapping; }
-
-const uvec& Element::get_material_tag() const { return material_tag; }
-
-const uvec& Element::get_section_tag() const { return section_tag; }
-
-unsigned Element::get_dof_number() const { return num_dof; }
-
-unsigned Element::get_node_number() const { return num_node; }
-
-unsigned Element::get_total_number() const { return num_size; }
-
-void Element::clear_node_ptr() { node_ptr.clear(); }
-
-const std::vector<std::weak_ptr<Node>>& Element::get_node_ptr() const { return node_ptr; }
 
 const vec& Element::get_trial_resistance() const { return trial_resistance; }
 
@@ -596,7 +630,7 @@ const vec& Element::update_body_force(const vec& load_factor) { return body_forc
 
 const vec& Element::update_traction(const vec& load_factor) { return traction.is_empty() ? trial_traction : trial_traction = traction * load_factor; }
 
-std::vector<vec> Element::record(const OutputType) { return {}; }
+std::vector<vec> Element::record(const OutputType) const { return {}; }
 
 double Element::get_strain_energy() const { return strain_energy; }
 
@@ -610,66 +644,8 @@ double Element::get_nonviscous_energy() const { return nonviscous_energy; }
 
 const vec& Element::get_momentum() const { return momentum; }
 
-double Element::get_momentum_component(const DOF D) const {
-    auto [flag, position] = if_contain(dof_identifier, D);
-
-    if(!flag || momentum.empty()) return 0.;
-
-    auto momentum_component = 0.;
-    for(auto I = 0u; I < num_node; ++I, position += num_dof) momentum_component += momentum(position);
-
-    return momentum_component;
-}
-
 double Element::get_characteristic_length() const { return characteristic_length; }
 
+double Element::get(Parameter) const { return 0.; }
+
 mat Element::compute_shape_function(const mat&, unsigned) const { return {}; }
-
-std::vector<vec>& append_to(std::vector<vec>& a, std::vector<vec>&& b) {
-    a.insert(a.end(), std::make_move_iterator(b.begin()), std::make_move_iterator(b.end()));
-    return a;
-}
-
-void ConstantMass(DataElement* E) {
-    E->update_mass = false;
-    E->current_mass = mat(E->initial_mass.memptr(), E->initial_mass.n_rows, E->initial_mass.n_cols, false, true);
-    E->trial_mass = mat(E->initial_mass.memptr(), E->initial_mass.n_rows, E->initial_mass.n_cols, false, true);
-}
-
-void ConstantDamping(DataElement* E) {
-    E->update_viscous = false;
-    E->current_viscous = mat(E->initial_viscous.memptr(), E->initial_viscous.n_rows, E->initial_viscous.n_cols, false, true);
-    E->trial_viscous = mat(E->initial_viscous.memptr(), E->initial_viscous.n_rows, E->initial_viscous.n_cols, false, true);
-}
-
-void ConstantStiffness(DataElement* E) {
-    E->update_stiffness = false;
-    E->current_stiffness = mat(E->initial_stiffness.memptr(), E->initial_stiffness.n_rows, E->initial_stiffness.n_cols, false, true);
-    E->trial_stiffness = mat(E->initial_stiffness.memptr(), E->initial_stiffness.n_rows, E->initial_stiffness.n_cols, false, true);
-}
-
-void ConstantGeometry(DataElement* E) {
-    E->update_geometry = false;
-    E->current_geometry = mat(E->initial_geometry.memptr(), E->initial_geometry.n_rows, E->initial_geometry.n_cols, false, true);
-    E->trial_geometry = mat(E->initial_geometry.memptr(), E->initial_geometry.n_rows, E->initial_geometry.n_cols, false, true);
-}
-
-mat get_coordinate(const ElementBase* const E, const unsigned N) { return E->get_coordinate(N); }
-
-vec get_incre_displacement(const ElementBase* const E) { return E->get_incre_displacement(); }
-
-vec get_incre_velocity(const ElementBase* const E) { return E->get_incre_velocity(); }
-
-vec get_incre_acceleration(const ElementBase* const E) { return E->get_incre_acceleration(); }
-
-vec get_trial_displacement(const ElementBase* const E) { return E->get_trial_displacement(); }
-
-vec get_trial_velocity(const ElementBase* const E) { return E->get_trial_velocity(); }
-
-vec get_trial_acceleration(const ElementBase* const E) { return E->get_trial_acceleration(); }
-
-vec get_current_displacement(const ElementBase* const E) { return E->get_current_displacement(); }
-
-vec get_current_velocity(const ElementBase* const E) { return E->get_current_velocity(); }
-
-vec get_current_acceleration(const ElementBase* const E) { return E->get_current_acceleration(); }

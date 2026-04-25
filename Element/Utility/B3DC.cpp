@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,12 +120,12 @@ void B3DC::update_theta() {
 }
 
 void B3DC::update_transformation() {
-    const mat t_coor = get_coordinate(element_ptr, 3).t();
+    const mat t_coor = element_ptr->get_coordinate(3).t();
     const vec x_axis = t_coor.col(1) - t_coor.col(0);
 
     update_direct_cosine(x_axis);
 
-    const mat trial_disp = reshape(get_trial_displacement(element_ptr), 6, 2);
+    const mat trial_disp = reshape(element_ptr->get_trial_displacement(), 6, 2);
     const vec incre_disp = trial_disp.head_rows(3).col(1) - trial_disp.head_rows(3).col(0);
     const vec trial_cord = x_axis + incre_disp;
 
@@ -206,7 +206,7 @@ unsigned B3DC::nodal_size() const { return 6u; }
 
 bool B3DC::is_nlgeom() const { return true; }
 
-unique_ptr<Orientation> B3DC::get_copy() { return std::make_unique<B3DC>(*this); }
+unique_ptr<Orientation> B3DC::unique_copy() { return std::make_unique<B3DC>(*this); }
 
 void B3DC::commit_status() {
     current_n = trial_n;

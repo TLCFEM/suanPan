@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <Material/Material1D/Material1D.h>
 
 T3D2::T3D2(const unsigned T, uvec&& N, const unsigned M, const double A, const bool F, const bool UA, const bool LS)
-    : MaterialElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {DOF::U1, DOF::U2, DOF::U3})
+    : MaterialElement1D(T, t_node, t_dof, std::move(N), uvec{M}, F, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3})
     , area(A)
     , t_trans(F ? std::make_unique<T3DC>() : std::make_unique<T3DL>())
     , update_area(UA)
@@ -32,7 +32,7 @@ int T3D2::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(length) = t_trans->get_length();
 
-    t_material = D->get<Material>(material_tag(0))->get_copy();
+    t_material = D->get<Material>(material_tag(0))->unique_copy();
 
     trial_stiffness = current_stiffness = initial_stiffness = t_trans->to_global_stiffness_mat(area / length * t_material->get_initial_stiffness());
 
@@ -87,7 +87,7 @@ int T3D2::reset_status() {
     return t_material->reset_status();
 }
 
-std::vector<vec> T3D2::record(const OutputType P) { return t_material->record(P); }
+std::vector<vec> T3D2::record(const OutputType P) const { return t_material->record(P); }
 
 void T3D2::print() {
     suanpan_info("A 3D truss element with ");
@@ -105,28 +105,18 @@ void T3D2::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void T3D2::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < t_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+vtkSmartPointer<vtkCell> T3D2::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
+
+mat T3D2::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), t_dof, t_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), t_dof, t_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), t_dof, t_node);
+
+    vec data;
+    if(const auto t_data = t_material->record(P); !t_data.empty()) data = t_data[0];
+    return repmat(data.resize(6), 1, t_node);
 }
 
-void T3D2::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, t_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(0, 2) = reshape(get_current_acceleration(), t_dof, t_node);
-    else if(OutputType::V == type) t_disp.rows(0, 2) = reshape(get_current_velocity(), t_dof, t_node);
-    else if(OutputType::U == type) t_disp.rows(0, 2) = reshape(get_current_displacement(), t_dof, t_node);
-
-    for(unsigned I = 0; I < t_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void T3D2::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(3) + amplifier * reshape(get_current_displacement(), t_dof, t_node).t();
-    for(unsigned I = 0; I < t_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), ele_disp(I, 2));
-}
+mat T3D2::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), t_dof, t_node); }
 
 #endif

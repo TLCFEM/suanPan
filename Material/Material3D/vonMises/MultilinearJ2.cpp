@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ MultilinearJ2::MultilinearJ2(const unsigned T, const double E, const double V, m
     access::rw(backbone) = std::move(H);
 }
 
-unique_ptr<Material> MultilinearJ2::get_copy() { return std::make_unique<MultilinearJ2>(*this); }
+unique_ptr<Material> MultilinearJ2::unique_copy() { return std::make_unique<MultilinearJ2>(*this); }
 
 void MultilinearJ2::print() {
     suanpan_info("A 3D multilinear hardening model.\nE = {:.4E}\t\\sigma_y = {:.4E}.\n", elastic_modulus, backbone(0, 1));

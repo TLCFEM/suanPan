@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class Cosine final : public Amplitude {
 public:
     Cosine(unsigned, double, std::vector<double>&&);
 
-    unique_ptr<Amplitude> get_copy() override;
+    unique_ptr<Amplitude> unique_copy() override;
 
     double get_amplitude(double) override;
 

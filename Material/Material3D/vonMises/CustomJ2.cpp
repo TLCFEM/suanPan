@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ int CustomJ2::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearJ2::initialize(D);
 }
 
-unique_ptr<Material> CustomJ2::get_copy() { return std::make_unique<CustomJ2>(*this); }
+unique_ptr<Material> CustomJ2::unique_copy() { return std::make_unique<CustomJ2>(*this); }
 
 void CustomJ2::print() {
     suanpan_info("A 3D J2 hardening model with custom hardening rules.\n");

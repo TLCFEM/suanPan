@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,16 +28,16 @@
 #ifndef ELEMENTBASE_H
 #define ELEMENTBASE_H
 
-#include <Domain/DOF.h>
+#include <Domain/Node.h>
 #include <Domain/Tag.h>
 #include <Element/MappingDOF.h>
 #include <Element/Visualisation/vtkBase.h>
+#include <Recorder/OutputType.h>
 
 class Node;
 class DomainBase;
 class Material;
 class Section;
-enum class OutputType;
 
 class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_strain_energy() = 0;
@@ -48,20 +48,6 @@ class ElementBase : public UniqueTag, public vtkBase {
     virtual void update_momentum() = 0;
 
 protected:
-    friend mat get_coordinate(const ElementBase*, unsigned);
-
-    friend vec get_incre_displacement(const ElementBase*);
-    friend vec get_incre_velocity(const ElementBase*);
-    friend vec get_incre_acceleration(const ElementBase*);
-    friend vec get_trial_displacement(const ElementBase*);
-    friend vec get_trial_velocity(const ElementBase*);
-    friend vec get_trial_acceleration(const ElementBase*);
-    friend vec get_current_displacement(const ElementBase*);
-    friend vec get_current_velocity(const ElementBase*);
-    friend vec get_current_acceleration(const ElementBase*);
-
-    [[nodiscard]] virtual mat get_coordinate(unsigned) const = 0;
-
     [[nodiscard]] virtual vec get_node_incre_resistance() const = 0;
     [[nodiscard]] virtual vec get_node_trial_resistance() const = 0;
     [[nodiscard]] virtual vec get_node_current_resistance() const = 0;
@@ -70,6 +56,20 @@ protected:
     [[nodiscard]] virtual std::vector<shared_ptr<Section>> get_section(const shared_ptr<DomainBase>&) const = 0;
 
 public:
+    enum class Type : std::uint8_t {
+        FEM,
+        DEM
+    };
+
+    enum class Parameter : std::uint8_t {
+        ELASTIC,
+        POISSON,
+        RADIUS,
+        MASS,
+        INERTIA,
+        DAMPING
+    };
+
     explicit ElementBase(const unsigned T)
         : UniqueTag(T) {}
 
@@ -81,6 +81,8 @@ public:
     [[nodiscard]] virtual bool is_initialized() const = 0;
     [[nodiscard]] virtual bool is_symmetric() const = 0;
     [[nodiscard]] virtual bool is_nlgeom() const = 0;
+
+    [[nodiscard]] virtual Type type() const = 0;
 
     virtual void update_dof_encoding() = 0;
 
@@ -97,7 +99,11 @@ public:
     [[nodiscard]] virtual const uvec& get_dof_encoding() const = 0;
     [[nodiscard]] virtual const uvec& get_node_encoding() const = 0;
 
+    [[nodiscard]] virtual const std::vector<Node::DOF>& get_dof_identifier() const = 0;
     [[nodiscard]] virtual const std::vector<MappingDOF>& get_dof_mapping() const = 0;
+
+    [[nodiscard]] virtual bool validate_dof(const std::vector<Node::DOF>&) const = 0;
+    [[nodiscard]] virtual uvec index_of(const std::vector<Node::DOF>&) const = 0;
 
     [[nodiscard]] virtual const uvec& get_material_tag() const = 0;
     [[nodiscard]] virtual const uvec& get_section_tag() const = 0;
@@ -108,6 +114,9 @@ public:
 
     virtual void clear_node_ptr() = 0;
     [[nodiscard]] virtual const std::vector<std::weak_ptr<Node>>& get_node_ptr() const = 0;
+
+    [[nodiscard]] virtual mat get_coordinate() const = 0;
+    [[nodiscard]] virtual mat get_coordinate(unsigned) const = 0;
 
     [[nodiscard]] virtual vec get_incre_displacement() const = 0;
     [[nodiscard]] virtual vec get_incre_velocity() const = 0;
@@ -165,7 +174,7 @@ public:
     virtual const vec& update_body_force(const vec&) = 0;
     virtual const vec& update_traction(const vec&) = 0;
 
-    virtual std::vector<vec> record(OutputType) = 0;
+    [[nodiscard]] virtual std::vector<vec> record(OutputType) const = 0;
 
     [[nodiscard]] virtual double get_strain_energy() const = 0;
     [[nodiscard]] virtual double get_complementary_energy() const = 0;
@@ -173,9 +182,10 @@ public:
     [[nodiscard]] virtual double get_viscous_energy() const = 0;
     [[nodiscard]] virtual double get_nonviscous_energy() const = 0;
     [[nodiscard]] virtual const vec& get_momentum() const = 0;
-    [[nodiscard]] virtual double get_momentum_component(DOF) const = 0;
 
     [[nodiscard]] virtual double get_characteristic_length() const = 0;
+
+    [[nodiscard]] virtual double get(Parameter) const = 0;
 
     [[nodiscard]] virtual mat compute_shape_function(const mat&, unsigned) const = 0;
 };

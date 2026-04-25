@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,9 @@
 
 class NodeLine final : public Constraint {
     static const mat rotation;
+    static const span span_i, span_j, span_k;
 
-    std::vector<vec> get_position(const shared_ptr<DomainBase>&);
+    bool initial_right{true};
 
 public:
     NodeLine(unsigned, unsigned, uvec&&);
@@ -44,6 +45,8 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) override;
+
+    [[nodiscard]] bool is_connected() const override { return true; }
 
     void update_status(const vec&) override;
     void commit_status() override;

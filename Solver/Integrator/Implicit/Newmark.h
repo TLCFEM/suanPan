@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ public:
     explicit Newmark(unsigned = 0, double = .25, double = .5);
 
     void assemble_resistance() override;
-    void assemble_matrix() override;
+    void assemble_effective_matrix() override;
 
     int update_trial_status(bool) override;
 

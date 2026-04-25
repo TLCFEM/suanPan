@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include <Constraint/Constraint.h>
 #include <Constraint/Criterion/Criterion.h>
+#include <Constraint/Interaction/Interaction.h>
 #include <Converger/Converger.h>
 #include <Database/Database.h>
 #include <Domain/Factory.hpp>
@@ -118,6 +119,11 @@ bool Domain::insert(const shared_ptr<Group>& E) {
 bool Domain::insert(const shared_ptr<Integrator>& I) {
     updated = false;
     return integrator_pond.insert(I);
+}
+
+bool Domain::insert(const shared_ptr<Interaction>& I) {
+    updated = false;
+    return interaction_pond.insert(I);
 }
 
 bool Domain::insert(const shared_ptr<Load>& L) {
@@ -226,6 +232,13 @@ bool Domain::erase_integrator(const unsigned T) {
 
     updated = false;
     return integrator_pond.erase(T);
+}
+
+bool Domain::erase_interaction(const unsigned T) {
+    if(!find<Interaction>(T)) return true;
+
+    updated = false;
+    return interaction_pond.erase(T);
 }
 
 bool Domain::erase_load(const unsigned T) {
@@ -352,6 +365,13 @@ void Domain::disable_integrator(const unsigned T) {
 
     updated = false;
     integrator_pond.disable(T);
+}
+
+void Domain::disable_interaction(const unsigned T) {
+    if(!find<Interaction>(T) || !get<Interaction>(T)->is_active() || get<Interaction>(T)->is_guarded()) return;
+
+    updated = false;
+    interaction_pond.disable(T);
 }
 
 void Domain::disable_load(const unsigned T) {
@@ -481,6 +501,13 @@ void Domain::enable_integrator(const unsigned T) {
     integrator_pond.enable(T);
 }
 
+void Domain::enable_interaction(const unsigned T) {
+    if(!find<Interaction>(T) || get<Interaction>(T)->is_active()) return;
+
+    updated = false;
+    interaction_pond.enable(T);
+}
+
 void Domain::enable_load(const unsigned T) {
     if(!find<Load>(T) || get<Load>(T)->is_active()) return;
 
@@ -563,6 +590,8 @@ const shared_ptr<Group>& Domain::get_group(const unsigned T) const { return grou
 
 const shared_ptr<Integrator>& Domain::get_integrator(const unsigned T) const { return integrator_pond.at(T); }
 
+const shared_ptr<Interaction>& Domain::get_interaction(const unsigned T) const { return interaction_pond.at(T); }
+
 const shared_ptr<Load>& Domain::get_load(const unsigned T) const { return load_pond.at(T); }
 
 const shared_ptr<Material>& Domain::get_material(const unsigned T) const { return material_pond.at(T); }
@@ -598,6 +627,8 @@ const ElementQueue& Domain::get_element_pool() const { return element_pond.get()
 const GroupQueue& Domain::get_group_pool() const { return group_pond.get(); }
 
 const IntegratorQueue& Domain::get_integrator_pool() const { return integrator_pond.get(); }
+
+const InteractionQueue& Domain::get_interaction_pool() const { return interaction_pond.get(); }
 
 const LoadQueue& Domain::get_load_pool() const { return load_pond.get(); }
 
@@ -635,6 +666,8 @@ size_t Domain::get_group() const { return group_pond.size(); }
 
 size_t Domain::get_integrator() const { return integrator_pond.size(); }
 
+size_t Domain::get_interaction() const { return interaction_pond.size(); }
+
 size_t Domain::get_load() const { return load_pond.size(); }
 
 size_t Domain::get_material() const { return material_pond.size(); }
@@ -670,6 +703,8 @@ bool Domain::find_element(const unsigned T) const { return element_pond.find(T);
 bool Domain::find_group(const unsigned T) const { return group_pond.find(T); }
 
 bool Domain::find_integrator(const unsigned T) const { return integrator_pond.find(T); }
+
+bool Domain::find_interaction(const unsigned T) const { return interaction_pond.find(T); }
 
 bool Domain::find_load(const unsigned T) const { return load_pond.find(T); }
 
@@ -716,7 +751,7 @@ const shared_ptr<Solver>& Domain::get_current_solver() const { return get_solver
 unique_ptr<Amplitude> Domain::initialized_amplitude_copy(const uword T) {
     if(!find<Amplitude>(T)) return nullptr;
 
-    auto copy = get<Amplitude>(T)->get_copy();
+    auto copy = get<Amplitude>(T)->unique_copy();
 
     if(!copy->is_initialized()) {
         copy->initialize(shared_from_this());
@@ -729,7 +764,7 @@ unique_ptr<Amplitude> Domain::initialized_amplitude_copy(const uword T) {
 unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
     if(!find<Material>(T)) return nullptr;
 
-    auto copy = get<Material>(T)->get_copy();
+    auto copy = get<Material>(T)->unique_copy();
 
     if(copy->is_initialized()) return copy;
 
@@ -743,7 +778,7 @@ unique_ptr<Material> Domain::initialized_material_copy(const uword T) {
 unique_ptr<Section> Domain::initialized_section_copy(const uword T) {
     if(!find<Section>(T)) return nullptr;
 
-    auto copy = get<Section>(T)->get_copy();
+    auto copy = get<Section>(T)->unique_copy();
 
     if(copy->is_initialized()) return copy;
 
@@ -762,31 +797,9 @@ void Domain::insert_loaded_dof(const uvec& T) { loaded_dofs.insert(T.cbegin(), T
 /**
  * \brief concurrently safe insertion method
  */
-void Domain::insert_restrained_dof(const uvec& T) { restrained_dofs.insert(T.cbegin(), T.cend()); }
-
-/**
- * \brief concurrently safe insertion method
- */
 void Domain::insert_constrained_dof(const uvec& T) { constrained_dofs.insert(T.cbegin(), T.cend()); }
 
-/**
- * \brief concurrently safe insertion method
- */
-void Domain::insert_loaded_dof(const uword T) { loaded_dofs.insert(T); }
-
-/**
- * \brief concurrently safe insertion method
- */
-void Domain::insert_restrained_dof(const uword T) { restrained_dofs.insert(T); }
-
-/**
- * \brief concurrently safe insertion method
- */
-void Domain::insert_constrained_dof(const uword T) { constrained_dofs.insert(T); }
-
 const suanpan::unordered_set<uword>& Domain::get_loaded_dof() const { return loaded_dofs; }
-
-const suanpan::unordered_set<uword>& Domain::get_restrained_dof() const { return restrained_dofs; }
 
 const suanpan::unordered_set<uword>& Domain::get_constrained_dof() const { return constrained_dofs; }
 
@@ -822,6 +835,7 @@ std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_c
     };
 
     if(all_elements)
+        // ReSharper disable once CppUseElementsView
         for(auto& [t_tag, t_element] : element_pond) populate(t_element);
     else
         for(auto& t_element : element_pond.get()) populate(t_element);
@@ -831,6 +845,25 @@ std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_c
     suanpan::for_all(node_register, [&](const std::pair<uword, suanpan::unordered_set<unsigned>>& t_node) { for(const auto& t_element = t_node.second; const auto I : t_element) element_register[I].insert(t_element.cbegin(), t_element.cend()); });
 
     return std::make_pair(std::move(element_map), std::move(element_register));
+}
+
+const DomainBase::TagMap& Domain::get_compact_node_map() const { return compact_node; }
+
+const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_material() const { return compact_node_per_material; }
+
+const DomainBase::TagMapCollection& Domain::get_compact_node_map_per_section() const { return compact_node_per_section; }
+
+uvec Domain::flatten_group(const uvec& groups) {
+    suanpan::set<uword> tag;
+
+    suanpan::for_all(groups, [&](const uword I) {
+        if(auto& group = get<Group>(I)) {
+            auto& pool = group->get_pool();
+            tag.insert(pool.cbegin(), pool.cend());
+        }
+    });
+
+    return to_uvec(tag);
 }
 
 int Domain::reorder_dof() {
@@ -853,12 +886,12 @@ int Domain::reorder_dof() {
     suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) {
         if(!t_constraint.second->is_connected()) return;
         std::set<uword> t_encoding;
-        for(const auto I : t_constraint.second->get_node_encoding())
-            if(auto& t_node = get<Node>(I); nullptr != t_node && t_node->is_active()) {
+        for(const auto t_tag : t_constraint.second->get_involving_nodes(shared_from_this()))
+            if(auto& t_node = get<Node>(t_tag); nullptr != t_node && t_node->is_active()) {
                 auto& t_dof = t_node->get_original_dof();
                 t_encoding.insert(t_dof.cbegin(), t_dof.cend());
             }
-        for(const auto I : t_encoding) adjacency[I].insert(t_encoding.cbegin(), t_encoding.cend());
+        for(const auto t_dof : t_encoding) adjacency[t_dof].insert(t_encoding.cbegin(), t_encoding.cend());
     });
 
     const auto idx_rcm = sort_rcm(adjacency);
@@ -875,7 +908,7 @@ int Domain::reorder_dof() {
     suanpan_debug("The global matrix has a size of {} with bandwidth {} (lower) and {} (upper).\n", dof_counter, low_bw, -up_bw);
 
     // assign new labels to active nodes
-    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->set_reordered_dof(idx_sorted(t_node->get_original_dof())); });
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->set_reordered_dof(idx_sorted); });
 
     factory->set_size(dof_counter);
     factory->set_bandwidth(static_cast<unsigned>(low_bw), static_cast<unsigned>(-up_bw));
@@ -928,6 +961,33 @@ int Domain::restart() {
     // reference may depend on reformulated displacement
     if(SUANPAN_SUCCESS != initialize_reference()) return SUANPAN_FAIL;
 
+#ifdef SUANPAN_VTK
+    compact_node.clear();
+    auto counter = 0llu;
+    for(auto& t_node : get_node_pool()) compact_node.emplace(t_node->get_tag(), counter++);
+
+    suanpan::unordered_map<uword, suanpan::set<uword>> material_map, section_map;
+    suanpan::for_all(get_element_pool(), [&](const shared_ptr<Element>& t_element) {
+        const auto& nodes = t_element->get_node_encoding();
+        for(const auto tag : t_element->get_material_tag()) material_map[tag].insert(nodes.cbegin(), nodes.cend());
+        for(const auto tag : t_element->get_section_tag()) section_map[tag].insert(nodes.cbegin(), nodes.cend());
+    });
+
+    compact_node_per_material.clear();
+    for(const auto& [tag, node_set] : material_map) {
+        auto& target = compact_node_per_material[tag];
+        counter = 0llu;
+        for(const auto node : node_set) target.emplace(node, counter++);
+    }
+
+    compact_node_per_section.clear();
+    for(const auto& [tag, node_set] : section_map) {
+        auto& target = compact_node_per_section[tag];
+        counter = 0llu;
+        for(const auto node : node_set) target.emplace(node, counter++);
+    }
+#endif
+
     return SUANPAN_SUCCESS;
 }
 
@@ -941,9 +1001,12 @@ int Domain::initialize() {
     integrator_pond.update();
     solver_pond.update();
 
+    suanpan::for_all(interaction_pond, [&](const dual<Interaction>& t_interaction) { t_interaction.second->initialize(shared_from_this()); });
+    interaction_pond.update();
+
     // for restart analysis
-    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { t_load.second->set_initialized(false); });
-    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->set_initialized(false); });
+    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { t_load.second->deinitialize(); });
+    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->deinitialize(); });
 
     // amplitude should be updated before load
     suanpan::for_all(amplitude_pond, [&](const dual<Amplitude>& t_amplitude) {
@@ -956,11 +1019,8 @@ int Domain::initialize() {
     initialize_section();
 
     // set dof number to zero before first initialisation of elements
-    suanpan::for_all(node_pond, [](const dual<Node>& t_node) {
-        // for restart analysis that may reassign dof
-        t_node.second->set_initialized(false);
-        t_node.second->set_dof_number(0);
-    });
+    // for restart analysis that may reassign dof
+    suanpan::for_all(node_pond, [](const dual<Node>& t_node) { t_node.second->deinitialize(); });
     node_pond.update();
 
     // groups reply on nodes
@@ -1050,7 +1110,11 @@ int Domain::initialize() {
 }
 
 int Domain::initialize_load() {
-    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { if(t_load.second->validate_step(shared_from_this()) && !t_load.second->is_initialized() && SUANPAN_FAIL == t_load.second->initialize(shared_from_this())) disable_load(t_load.first); });
+    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) {
+        if(!t_load.second->validate_step(shared_from_this()) || t_load.second->is_initialized() || SUANPAN_SUCCESS == t_load.second->initialize(shared_from_this())) return;
+        suanpan_warning("Load {} is disabled due to initialization error.\n", t_load.first);
+        disable_load(t_load.first);
+    });
     load_pond.update();
 
     factory->update_reference_size();
@@ -1059,7 +1123,11 @@ int Domain::initialize_load() {
 }
 
 int Domain::initialize_constraint() {
-    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { if(t_constraint.second->validate_step(shared_from_this()) && !t_constraint.second->is_initialized() && SUANPAN_FAIL == t_constraint.second->initialize(shared_from_this())) disable_constraint(t_constraint.first); });
+    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) {
+        if(!t_constraint.second->validate_step(shared_from_this()) || t_constraint.second->is_initialized() || SUANPAN_SUCCESS == t_constraint.second->initialize(shared_from_this())) return;
+        suanpan_warning("Constraint {} is disabled due to initialization error.\n", t_constraint.first);
+        disable_constraint(t_constraint.first);
+    });
     constraint_pond.update();
 
     return SUANPAN_SUCCESS;
@@ -1186,7 +1254,6 @@ int Domain::process_constraint(const bool full) {
     // ! 5. record auxiliary encoding
     // ! assemble stiffness shall be done in integrator
 
-    restrained_dofs.clear();
     constrained_dofs.clear();
 
     auto& constraint_resistance = factory->modify_trial_constraint_resistance();
@@ -1289,7 +1356,7 @@ void Domain::enable_all() {
 void Domain::summary() const { suanpan_info("Domain {} contains: {} nodes, {} elements, {} materials, {} expressions, {} loads, {} constraints, {} recorders.\n", get_tag(), get_node(), get_element(), get_material(), get_expression(), get_load(), get_constraint(), get_recorder()); }
 
 void Domain::erase_machine_error(vec& ninja) const {
-    suanpan::for_all(restrained_dofs, [&](const uword I) { ninja(I) = 0.; });
+    suanpan::for_all(constrained_dofs, [&](const uword I) { ninja(I) = 0.; });
 }
 
 void Domain::update_load() {}
@@ -1310,7 +1377,7 @@ void Domain::assemble_load_stiffness() {}
 
 void Domain::assemble_constraint_stiffness() {
     for(auto& I : get_constraint_pool())
-        if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_dof_encoding());
+        if(I->is_initialized() && !I->get_stiffness().empty()) factory->assemble_stiffness(I->get_stiffness(), I->get_node_dof());
 }
 
 void Domain::save(std::string) {}

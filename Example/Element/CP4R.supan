@@ -153,7 +153,7 @@ element CP4 64 79 84 85 80 1 1 1
 
 material Elastic2D 1 50 .2
 
-fix 1 P 1 2 3 4 5
+fix 1 E 1 2 3 4 5
 
 cload 1 0 .25 2 84 83 82
 cload 2 0 .125 2 85 81

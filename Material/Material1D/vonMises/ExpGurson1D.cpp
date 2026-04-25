@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "ExpGurson1D.h"
 
 ExpGurson1D::ExpGurson1D(const unsigned T, const double E, const double V, const double YS, const double N, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
-    : DataExpGurson1D{fabs(YS), std::min(1., N)}
+    : DataExpGurson1D{std::fabs(YS), std::min(1., N)}
     , NonlinearGurson1D(T, E, V, Q1, Q2, FN, SN, EN, R) {}
 
 vec ExpGurson1D::compute_hardening(const double plastic_strain) const {
@@ -49,7 +49,7 @@ vec ExpGurson1D::compute_hardening(const double plastic_strain) const {
     return vec{k, pow_term * para_c / (1. - pow_term)} * yield_stress;
 }
 
-unique_ptr<Material> ExpGurson1D::get_copy() { return std::make_unique<ExpGurson1D>(*this); }
+unique_ptr<Material> ExpGurson1D::unique_copy() { return std::make_unique<ExpGurson1D>(*this); }
 
 void ExpGurson1D::print() {
     suanpan_info("A uniaxial Gurson model.\n");

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ int CustomDP::initialize(const shared_ptr<DomainBase>& D) {
     return NonlinearDruckerPrager::initialize(D);
 }
 
-unique_ptr<Material> CustomDP::get_copy() { return std::make_unique<CustomDP>(*this); }
+unique_ptr<Material> CustomDP::unique_copy() { return std::make_unique<CustomDP>(*this); }
 
 void CustomDP::print() {
     suanpan_info("A 3D nonlinear model using Drucker-Prager yielding criterion with custom cohesion function.\n");

@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ int Sequential::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> Sequential::get_copy() { return std::make_unique<Sequential>(*this); }
+unique_ptr<Material> Sequential::unique_copy() { return std::make_unique<Sequential>(*this); }
 
 int Sequential::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -80,10 +80,10 @@ int Sequential::update_trial_status(const vec& t_strain) {
 
         const vec i_strain = solve(jacobian, residual);
 
-        const auto error = inf_norm(i_strain);
+        const auto error = suanpan::inf_norm(i_strain);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || (inf_norm(residual) < tolerance && counter > 5u)) break;
+        if(error < tolerance * ref_error || (suanpan::inf_norm(residual) < tolerance && counter > 5u)) break;
 
         for(size_t I = 0; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
     }
@@ -125,18 +125,9 @@ int Sequential::reset_status() {
     return code;
 }
 
-std::vector<vec> Sequential::record(const OutputType P) {
+std::vector<vec> Sequential::record(const OutputType P) const {
     std::vector<vec> data;
-
-    auto max_size = 0llu;
-    for(const auto& I : mat_pool)
-        for(const auto& J : I->record(P)) {
-            if(J.n_elem > max_size) max_size = J.n_elem;
-            data.emplace_back(J);
-        }
-
-    for(auto&& I : data) I.resize(max_size);
-
+    for(const auto& I : mat_pool) suanpan::append_to(data, I->record(P));
     return data;
 }
 

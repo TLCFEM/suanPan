@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,13 +44,13 @@ int B21::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(length) = b_trans->get_length();
 
-    const IntegrationPlan plan(1, int_pt_num, IntegrationType::LOBATTO);
+    const IntegrationPlan plan(1, int_pt_num, IntegrationPlan::Type::LOBATTO);
 
     mat local_stiffness(3, 3, fill::zeros);
     int_pt.clear();
     int_pt.reserve(int_pt_num);
     for(unsigned I = 0; I < int_pt_num; ++I) {
-        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->get_copy());
+        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->unique_copy());
         int_pt[I].b_section->set_characteristic_length(int_pt[I].weight * length);
         local_stiffness += int_pt[I].strain_mat.t() * int_pt[I].b_section->get_initial_stiffness() * int_pt[I].strain_mat * int_pt[I].weight / length;
     }
@@ -109,9 +109,9 @@ int B21::reset_status() {
     return code;
 }
 
-std::vector<vec> B21::record(const OutputType P) {
+std::vector<vec> B21::record(const OutputType P) const {
     std::vector<vec> data;
-    for(const auto& I : int_pt) append_to(data, I.b_section->record(P));
+    for(const auto& I : int_pt) suanpan::append_to(data, I.b_section->record(P));
     return data;
 }
 
@@ -130,28 +130,30 @@ void B21::print() {
 #ifdef SUANPAN_VTK
 #include <vtkLine.h>
 
-void B21::Setup() {
-    vtk_cell = vtkSmartPointer<vtkLine>::New();
-    const auto ele_coor = get_coordinate(2);
-    for(unsigned I = 0; I < b_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), 0.);
-    }
+vtkSmartPointer<vtkCell> B21::GetCell() const { return vtkSmartPointer<vtkLine>::New(); }
+
+mat B21::GetData(const OutputType P) {
+    const auto remap = [&](vec&& in) {
+        mat data(6, b_node, fill::zeros);
+        data.rows(uvec{0, 1, 5}) = reshape(in, b_dof, b_node);
+        return data;
+    };
+
+    if(OutputType::A == P) return remap(get_current_acceleration());
+    if(OutputType::V == P) return remap(get_current_velocity());
+    if(OutputType::U == P) return remap(get_current_displacement());
+
+    vec low, high;
+    if(const auto t_data = int_pt.front().b_section->record(P); !t_data.empty()) low = t_data[0];
+    if(const auto t_data = int_pt.back().b_section->record(P); !t_data.empty()) high = t_data[0];
+
+    mat data(6, b_node);
+    data.col(0) = low.resize(6);
+    data.col(1) = high.resize(6);
+
+    return data;
 }
 
-void B21::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, b_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_acceleration(), b_dof, b_node);
-    else if(OutputType::V == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_velocity(), b_dof, b_node);
-    else if(OutputType::U == type) t_disp.rows(uvec{0, 1, 5}) = reshape(get_current_displacement(), b_dof, b_node);
-
-    for(unsigned I = 0; I < b_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void B21::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat ele_disp = get_coordinate(2) + amplifier * mat(reshape(get_current_displacement(), b_dof, b_node).t()).cols(0, 1);
-    for(unsigned I = 0; I < b_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), ele_disp(I, 0), ele_disp(I, 1), 0.);
-}
+mat B21::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement(), b_dof, b_node).eval().head_rows(2); }
 
 #endif

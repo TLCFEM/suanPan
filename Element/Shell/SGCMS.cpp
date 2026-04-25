@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ SGCMS::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const 
 SGCMS::IntegrationPoint::SectionIntegrationPoint::SectionIntegrationPoint(const SectionIntegrationPoint& old_obj)
     : eccentricity(old_obj.eccentricity)
     , factor(old_obj.factor)
-    , s_material(nullptr == old_obj.s_material ? nullptr : old_obj.s_material->get_copy()) {}
+    , s_material(nullptr == old_obj.s_material ? nullptr : old_obj.s_material->unique_copy()) {}
 
 SGCMS::IntegrationPoint::IntegrationPoint(vec&& C)
     : coor(std::move(C))
@@ -167,7 +167,7 @@ mat SGCMS::form_displacement_dn(const mat& pn_pxy, const mat& pnt_pxy) {
 }
 
 SGCMS::SGCMS(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool NL)
-    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {DOF::U1, DOF::U2, DOF::U3, DOF::UR1, DOF::UR2, DOF::UR3})
+    : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3})
     , thickness(TH) {}
 
 int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
@@ -180,7 +180,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     auto ele_coor = get_local_coordinate();
 
     // in-plane
-    const IntegrationPlan m_plan(2, 2, IntegrationType::IRONS);
+    const IntegrationPlan m_plan(2, 2, IntegrationPlan::Type::IRONS);
 
     //
     // membrane action
@@ -235,7 +235,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     ele_coor.row(7) = .5 * (ele_coor.row(3) + ele_coor.row(0));
 
     // along thickness
-    const IntegrationPlan t_plan(1, 3, IntegrationType::GAUSS);
+    const IntegrationPlan t_plan(1, 3, IntegrationPlan::Type::GAUSS);
 
     mat::fixed<12, 12> p_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
 
@@ -259,7 +259,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
         c_ip.reserve(t_plan.n_rows);
         for(unsigned J = 0; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
-            c_ip.emplace_back(t_eccentricity, t_weight * t_plan(J, 1), mat_proto->get_copy());
+            c_ip.emplace_back(t_eccentricity, t_weight * t_plan(J, 1), mat_proto->unique_copy());
             p_stiffness += c_pt.BP.t() * mat_stiff * c_pt.BP * c_ip.back().factor * pow(t_eccentricity, 2.);
             mp_stiffness += c_pt.BM.t() * mat_stiff * c_pt.BP * c_ip.back().factor * t_eccentricity;
             pm_stiffness += c_pt.BP.t() * mat_stiff * c_pt.BM * c_ip.back().factor * t_eccentricity;
@@ -352,10 +352,10 @@ int SGCMS::reset_status() {
     return code;
 }
 
-std::vector<vec> SGCMS::record(const OutputType P) {
+std::vector<vec> SGCMS::record(const OutputType P) const {
     std::vector<vec> data;
     for(const auto& I : int_pt)
-        for(const auto& J : I.sec_int_pt) append_to(data, J.s_material->record(P));
+        for(const auto& J : I.sec_int_pt) suanpan::append_to(data, J.s_material->record(P));
     return data;
 }
 
@@ -366,28 +366,16 @@ void SGCMS::print() {
 #ifdef SUANPAN_VTK
 #include <vtkQuad.h>
 
-void SGCMS::Setup() {
-    vtk_cell = vtkSmartPointer<vtkQuad>::New();
-    const auto ele_coor = get_coordinate(3);
-    for(unsigned I = 0; I < s_node; ++I) {
-        vtk_cell->GetPointIds()->SetId(I, static_cast<vtkIdType>(node_encoding(I)));
-        vtk_cell->GetPoints()->SetPoint(I, ele_coor(I, 0), ele_coor(I, 1), ele_coor(I, 2));
-    }
+vtkSmartPointer<vtkCell> SGCMS::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
+
+mat SGCMS::GetData(const OutputType P) {
+    if(OutputType::A == P) return reshape(get_current_acceleration(), s_dof, s_node);
+    if(OutputType::V == P) return reshape(get_current_velocity(), s_dof, s_node);
+    if(OutputType::U == P) return reshape(get_current_displacement(), s_dof, s_node);
+
+    return {};
 }
 
-void SGCMS::GetData(vtkSmartPointer<vtkDoubleArray>& arrays, const OutputType type) {
-    mat t_disp(6, s_node, fill::zeros);
-
-    if(OutputType::A == type) t_disp = reshape(get_current_acceleration(), s_dof, s_node);
-    else if(OutputType::V == type) t_disp = reshape(get_current_velocity(), s_dof, s_node);
-    else if(OutputType::U == type) t_disp = reshape(get_current_displacement(), s_dof, s_node);
-
-    for(unsigned I = 0; I < s_node; ++I) arrays->SetTuple(static_cast<vtkIdType>(node_encoding(I)), t_disp.colptr(I));
-}
-
-void SGCMS::SetDeformation(vtkSmartPointer<vtkPoints>& nodes, const double amplifier) {
-    const mat t_mat = amplifier * mat(reshape(get_current_displacement(), s_dof, s_node)).rows(0, 2).t() + get_coordinate(3);
-    for(unsigned I = 0; I < s_node; ++I) nodes->SetPoint(static_cast<vtkIdType>(node_encoding(I)), t_mat(I, 0), t_mat(I, 1), t_mat(I, 2));
-}
+mat SGCMS::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement(), s_dof, s_node).eval().head_rows(3); }
 
 #endif

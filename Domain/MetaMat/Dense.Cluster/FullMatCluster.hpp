@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ public:
         : DenseMat<T>(in_rows, in_cols, in_rows * in_cols)
         , solver() {}
 
-    unique_ptr<MetaMat<T>> make_copy() override { return std::make_unique<FullMatBaseCluster>(*this); }
+    unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<FullMatBaseCluster>(*this); }
 
     void nullify(const uword K) override {
         this->factored = false;
@@ -69,8 +69,8 @@ public:
 };
 
 template<sp_d T, typename solver_t> Mat<T> FullMatBaseCluster<T, solver_t>::operator*(const Mat<T>& B) const {
-    static constexpr char TRAN = 'N';
-    static constexpr T ALPHA = T(1), BETA = T(0);
+    static constexpr auto TRAN = 'N';
+    static constexpr T ALPHA{1}, BETA{0};
 
     Mat<T> C(arma::size(B));
 
@@ -80,26 +80,14 @@ template<sp_d T, typename solver_t> Mat<T> FullMatBaseCluster<T, solver_t>::oper
     if(1 == B.n_cols) {
         static constexpr blas_int INC = 1;
 
-        if constexpr(std::is_same_v<T, float>) {
-            using E = float;
-            arma_fortran(arma_sgemv)(&TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &M, (E*)B.memptr(), &INC, (E*)&BETA, (E*)C.memptr(), &INC);
-        }
-        else {
-            using E = double;
-            arma_fortran(arma_dgemv)(&TRAN, &M, &N, (E*)&ALPHA, (E*)this->memptr(), &M, (E*)B.memptr(), &INC, (E*)&BETA, (E*)C.memptr(), &INC);
-        }
+        if constexpr(std::is_same_v<T, float>) arma_fortran(arma_sgemv)(&TRAN, &M, &N, &ALPHA, this->memptr(), &M, B.memptr(), &INC, &BETA, C.memptr(), &INC);
+        else arma_fortran(arma_dgemv)(&TRAN, &M, &N, &ALPHA, this->memptr(), &M, B.memptr(), &INC, &BETA, C.memptr(), &INC);
     }
     else {
         const auto K = static_cast<blas_int>(B.n_cols);
 
-        if constexpr(std::is_same_v<T, float>) {
-            using E = float;
-            arma_fortran(arma_sgemm)(&TRAN, &TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &M, (E*)B.memptr(), &N, (E*)&BETA, (E*)C.memptr(), &M);
-        }
-        else {
-            using E = double;
-            arma_fortran(arma_dgemm)(&TRAN, &TRAN, &M, &K, &N, (E*)&ALPHA, (E*)this->memptr(), &M, (E*)B.memptr(), &N, (E*)&BETA, (E*)C.memptr(), &M);
-        }
+        if constexpr(std::is_same_v<T, float>) arma_fortran(arma_sgemm)(&TRAN, &TRAN, &M, &K, &N, &ALPHA, this->memptr(), &M, B.memptr(), &N, &BETA, C.memptr(), &M);
+        else arma_fortran(arma_dgemm)(&TRAN, &TRAN, &M, &K, &N, &ALPHA, this->memptr(), &M, B.memptr(), &N, &BETA, C.memptr(), &M);
     }
 
     return C;

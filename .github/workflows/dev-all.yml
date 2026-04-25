@@ -1,9 +1,12 @@
 name: Develop
 on:
   push:
-    branches: [dev]
+    branches: [ dev ]
   pull_request:
-    branches: [dev]
+    branches: [ dev ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 env:
   SP_TIME: ""
   ARTIFACT: ""
@@ -15,20 +18,21 @@ jobs:
     runs-on: ${{ matrix.os }}
     permissions:
       id-token: write
-    timeout-minutes: 60
+    timeout-minutes: 150
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm]
-        build: [Debug]
+        os: [ ubuntu-24.04, ubuntu-24.04-arm ]
+        build: [ Debug ]
         compiler:
           [
             { c: gcc, cpp: g++, fortran: gfortran },
             { c: icx, cpp: icpx, fortran: ifx },
           ]
-        avx: [OFF]
-        vtk: [ON, OFF]
-        mkl: [OFF]
-        aocl: [ON, OFF]
+        avx: [ OFF ]
+        vtk: [ ON, OFF ]
+        mkl: [ OFF ]
+        aocl: [ ON, OFF ]
         exclude:
           - compiler: { c: icx, cpp: icpx, fortran: ifx }
             mkl: OFF
@@ -36,15 +40,15 @@ jobs:
             aocl: ON
           - mkl: ON
             aocl: ON
-          - os: ubuntu-22.04-arm
+          - os: ubuntu-24.04-arm
             compiler: { c: icx, cpp: icpx, fortran: ifx }
-          - os: ubuntu-22.04-arm
+          - os: ubuntu-24.04-arm
             aocl: ON
-          - os: ubuntu-22.04-arm
+          - os: ubuntu-24.04-arm
             mkl: ON
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Golang
@@ -59,7 +63,7 @@ jobs:
           fi
           sudo apt-get update
           if [ "${{ matrix.mkl }}" == "ON" ]; then
-            sudo apt-get install intel-oneapi-mkl-devel
+            sudo apt-get install intel-oneapi-mkl-devel=2025.3.1-8
           fi
           if [ "${{ matrix.compiler.c }}" == "icx" ]; then
             sudo apt-get install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran
@@ -90,15 +94,16 @@ jobs:
           -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_BUILD_DLL_EXAMPLE=${{ env.COVERAGE }} \
-          -DSP_BUILD_PARALLEL=$([ "${{ matrix.build }}" = "Debug" ] && echo "OFF" || echo "ON") \
+          -DSP_BUILD_PARALLEL=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "OFF" || echo "ON") \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
+          -DSP_ENABLE_ASAN=$([[ "${{ env.COVERAGE }}" == "ON" && "${{ matrix.os }}" == *"arm"* ]] && echo "OFF" || echo "ON") \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
           -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
           -DSP_ENABLE_IOMP=${{ env.IOMP }} \
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/ \
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j $(nproc)
           cmake --build . --target package
@@ -106,8 +111,7 @@ jobs:
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        if: ${{ false }}
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -129,12 +133,11 @@ jobs:
           fi
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-          tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
+          path: build/dist
       - name: Test
         run: |
           ldd build/dist/bin/suanPan
@@ -150,14 +153,14 @@ jobs:
           lcov --remove coverage.info '/usr/*' --output-file coverage.info
           lcov --list coverage.info
       - name: Result
-        if: ${{ matrix.os == 'ubuntu-22.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
-        uses: actions/upload-artifact@v5
+        if: ${{ matrix.os == 'ubuntu-24.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
+        uses: actions/upload-artifact@v7
         with:
           name: Results-${{ hashFiles('./build/Results.tar.gz') }}
           path: ./build/Results.tar.gz
       - name: Report
         if: ${{ hashFiles('./build/coverage.info') != '' }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           plugins: gcov
           files: ./build/coverage.info
@@ -166,13 +169,13 @@ jobs:
   linux-dev-mpi:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 90
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        os: [ ubuntu-24.04 ]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Golang
@@ -181,11 +184,11 @@ jobs:
           cache: false
       - name: Dependency
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-${{ matrix.os }}.tar.gz
-          tar xf VTK-9.5.2-${{ matrix.os }}.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.1-${{ matrix.os }}.tar.gz
+          tar xf VTK-9.6.1-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
+          sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel=2025.3.1-8 intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
       - name: Compile
         run: |
           source /opt/intel/oneapi/setvars.sh
@@ -202,7 +205,7 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.6/ \
           ..
           cmake --build . --target install --config RelWithDebInfo -j $(nproc)
           cmake --build . --target package
@@ -212,28 +215,28 @@ jobs:
           cp updater build/dist/bin
           file_name="suanPan-linux-amd64-release-gcc-avx-vtk-mkl-mpi.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-          tar czf $file_name -C build/dist .
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
+          path: build/dist
   macos-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.macos]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 100
+    timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-14-large, macos-14-xlarge]
-        build: [RelWithDebInfo]
-        compiler: [gcc, clang]
-        vtk: [ON, OFF]
+        os: [ macos-14-large, macos-14-xlarge ]
+        build: [ RelWithDebInfo ]
+        compiler: [ gcc, clang ]
+        vtk: [ ON, OFF ]
         exclude:
           - compiler: gcc
             vtk: ON
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Compile
@@ -244,7 +247,10 @@ jobs:
           mkdir build && cd build
           export FC=gfortran-13
           if [ "${{ matrix.compiler }}" == "clang" ]; then
-            if [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
+            if [[ "${{ matrix.os }}" == "macos-26-large" || "${{ matrix.os }}" == "macos-26-xlarge" ]]; then
+              export CC=$(brew --prefix llvm@20)/bin/clang
+              export CXX=$(brew --prefix llvm@20)/bin/clang++
+            elif [[ "${{ matrix.os }}" == "macos-15-large" || "${{ matrix.os }}" == "macos-15-xlarge" ]]; then
               export CC=$(brew --prefix llvm@18)/bin/clang
               export CXX=$(brew --prefix llvm@18)/bin/clang++
             else
@@ -256,7 +262,7 @@ jobs:
             -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/ \
             ..
           else
             export CC=gcc-13
@@ -266,7 +272,7 @@ jobs:
             -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
             -DCMAKE_INSTALL_PREFIX=dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/lib/cmake/vtk-9.5/ \
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/ \
             ..
           fi
           cmake --build . --target install --config ${{ matrix.build }} -j 3
@@ -283,29 +289,28 @@ jobs:
           [[ "${{ matrix.os }}" != *"xlarge"* ]] && file_name+="-avx"
           file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
-          tar czf $file_name -C build/dist .
       - name: Test
-        run: |
-          ./build/dist/bin/suanPan -v
+        run: ./build/dist/bin/suanPan -v
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
+          path: build/dist
   windows-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
-    runs-on: windows-2022
-    timeout-minutes: 100
+    runs-on: windows-2025
+    timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
-        build: [Release]
-        compiler: ["Visual Studio 17 2022"]
-        vtk: [ON, OFF]
-        avx: [OFF]
-        mkl: [OFF]
+        build: [ Release ]
+        compiler: [ "Visual Studio 17 2022" ]
+        vtk: [ ON, OFF ]
+        avx: [ OFF ]
+        mkl: [ OFF ]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Golang
@@ -316,15 +321,15 @@ jobs:
         shell: cmd
         if: matrix.mkl == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a665fc26-bdf1-415f-9fc4-345f257f4fb1/w_onemkl_p_2024.2.1.106_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ea23d696-a77f-4a4a-8996-20d02cdbc48f/w_fortran-compiler_p_2024.2.1.81_offline.exe
-          w_onemkl_p_2024.2.1.106_offline.exe -s -a --silent --eula accept
-          w_fortran-compiler_p_2024.2.1.81_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ae472ff5-aa01-4a72-a452-ce7b559ef041/intel-onemkl-2025.3.1.10_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/039121f2-d488-4bc1-a5bb-97528e3a4b86/intel-fortran-compiler-2025.3.2.26_offline.exe
+          intel-onemkl-2025.3.1.10_offline.exe -s -a --silent --eula accept
+          intel-fortran-compiler-2025.3.2.26_offline.exe -s -a --silent --eula accept
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-win.7z
-          7z x VTK-9.5.2-win.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.1-win.7z
+          7z x VTK-9.6.1-win.7z
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -339,7 +344,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.5/ `
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.6/ `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
           cp ../updater.exe dist/bin
@@ -354,27 +359,26 @@ jobs:
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
-          cd build/dist/bin
-          7z a -tzip ../../../$file_name ./*
-          ./suanPan.exe -v
+          ./build/dist/bin/suanPan.exe -v
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
+          path: build/dist/bin
   windows-gcc-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
-    runs-on: windows-2022
-    timeout-minutes: 100
+    runs-on: windows-2025
+    timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
-        build: [Release]
-        compiler: ["MinGW Makefiles"]
-        vtk: [ON]
-        avx: [OFF]
+        build: [ Release ]
+        compiler: [ "MinGW Makefiles" ]
+        vtk: [ ON ]
+        avx: [ OFF ]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Golang
@@ -388,8 +392,8 @@ jobs:
       - name: VTK
         if: matrix.vtk == 'ON'
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.5.2-win-gcc.7z
-          7z x VTK-9.5.2-win-gcc.7z -oVTK
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.1-win-gcc.7z
+          7z x VTK-9.6.1-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -402,7 +406,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=dist `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.5 `
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6 `
           ..
           cmake --build . --target install --config ${{ matrix.build }} -j 4
           cp ../updater.exe dist/bin
@@ -417,11 +421,9 @@ jobs:
           file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
-          cd build/dist/bin
-          7z a -tzip ../../../$file_name ./*
-          ./suanPan.exe -v
+          ./build/dist/bin/suanPan.exe -v
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}
-          path: ${{ env.ARTIFACT }}
+          path: build/dist/bin

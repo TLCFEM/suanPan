@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -362,6 +362,8 @@ int LeeNewmarkFull::process_constraint() {
     // process constraint for the first time to obtain proper stiffness
     if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;
 
+    LeeNewmarkBase::assemble_effective_matrix();
+
     // this stiffness contains geometry, mass and damping from Newmark::assemble_matrix()
     auto& t_stiff = factory->get_stiffness()->triplet_mat;
 
@@ -519,6 +521,12 @@ int LeeNewmarkFull::process_constraint_resistance() {
 
     return LeeNewmarkBase::process_constraint_resistance();
 }
+
+/**
+ * We are not interested in the original matrices anymore.
+ * Thus, we skip assembling them.
+ */
+void LeeNewmarkFull::assemble_effective_matrix() {}
 
 void LeeNewmarkFull::print() {
     // clang-format off

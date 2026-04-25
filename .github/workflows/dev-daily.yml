@@ -10,7 +10,7 @@ permissions:
   id-token: write
 jobs:
   check-latest:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-slim
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
@@ -22,36 +22,37 @@ jobs:
           echo "$head" > .commit
       - name: Cache
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .commit
           key: commit-${{ steps.commit.outputs.head }}
   linux-daily:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: check-latest
     if: needs.check-latest.outputs.cache-hit != 'true'
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Compile
         run: |
+          sudo apt-get install patchelf lcov
           echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
           mkdir build && cd build
           cmake \
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_INSTALL_PREFIX=dist \
+          -DSP_ENABLE_ASAN=ON \
+          -DSP_ENABLE_CODECOV=ON \
           -DSP_ENABLE_AVX2=OFF \
           ..
           cmake --build . --target install --config Debug -j $(nproc)
           cd ..
-          sudo apt-get install patchelf
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
       - name: Cosign
-        if: ${{ false }}
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -67,6 +68,14 @@ jobs:
           chmod 600 key.pem
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/suanPan-daily/linux/
           rm -f key.pem
+      - name: Coverage
+        run: |
+          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
+          cd build
+          bash ../Script/Coverage.sh .
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' --output-file coverage.info
+          lcov --list coverage.info
   macos-daily:
     runs-on: ${{ matrix.os }}
     needs: check-latest
@@ -77,7 +86,7 @@ jobs:
         os: [macos-14-large, macos-14-xlarge]
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Compile
@@ -97,8 +106,7 @@ jobs:
           cd ..
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
-        if: ${{ false }}
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -117,13 +125,13 @@ jobs:
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/suanPan-daily/macos/
           rm -f key.pem
   windows-gcc-daily:
-    runs-on: windows-2022
+    runs-on: windows-2025
     needs: check-latest
     if: needs.check-latest.outputs.cache-hit != 'true'
     timeout-minutes: 100
     steps:
       - name: Clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: GCC
@@ -149,27 +157,27 @@ jobs:
           echo "ARTIFACT=suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
       - name: Cosign
-        if: ${{ false }}
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*.exe
       - name: Unsigned
         id: upload-unsigned-vs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: unsigned-${{ env.ARTIFACT }}
           path: build/dist/bin/*.exe
       - name: Sign
         uses: signpath/github-action-submit-signing-request@v2
+        if: false
         with:
-          api-token: "${{ secrets.SIGNPATH }}"
-          organization-id: "b04bac88-d6e9-4140-948d-cb95e3095cbe"
-          project-slug: "suanPan"
-          signing-policy-slug: "test-signing"
-          artifact-configuration-slug: "test"
-          github-artifact-id: "${{ steps.upload-unsigned-vs.outputs.artifact-id }}"
+          api-token: ${{ secrets.SIGNPATH }}
+          organization-id: b04bac88-d6e9-4140-948d-cb95e3095cbe
+          project-slug: suanPan
+          signing-policy-slug: test-signing
+          artifact-configuration-slug: test
+          github-artifact-id: ${{ steps.upload-unsigned-vs.outputs.artifact-id }}
           wait-for-completion: true
-          output-artifact-directory: "build/dist/bin"
+          output-artifact-directory: build/dist/bin
       - name: Test
         run: |
           cd build/dist/bin

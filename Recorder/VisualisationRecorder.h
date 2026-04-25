@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017-2025 Theodore Chang
+ * Copyright (C) 2017-2026 Theodore Chang
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,25 +36,26 @@
 #endif
 
 class VisualisationRecorder final : public Recorder {
+    const int width = 6;
+
     unsigned total_counter = 0u;
-    unsigned width = 6u;
 
 #ifdef SUANPAN_VTK
     vtkInfo config;
-
-    void (*function_handler)(const shared_ptr<DomainBase>&, vtkInfo) = nullptr;
 #endif
+
+    void record_impl(const shared_ptr<DomainBase>&) override;
 
 public:
     VisualisationRecorder(
         unsigned,   // tag
         OutputType, // recorder type
         unsigned,   // interval
-        unsigned,   // output width
+        int,        // output width
         double = 1. // scale
     );
 
-    void record(const shared_ptr<DomainBase>&) override;
+    void clear_status() override;
 
     void save() override;
 
