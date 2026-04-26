@@ -27,9 +27,9 @@ void Contact2D::update_position() {
     for(auto& [node, position, axis, norm] : master) {
         position.zeros(2);
         auto& t_coor = node.lock()->get_coordinate();
-        for(uword K = 0; K < std::min(2llu, t_coor.n_elem); ++K) position(K) += t_coor(K);
+        for(uword K = 0; K < std::min(uword{2}, t_coor.n_elem); ++K) position(K) += t_coor(K);
         auto& t_disp = node.lock()->get_trial_displacement();
-        for(uword K = 0; K < std::min(2llu, t_disp.n_elem); ++K) position(K) += t_disp(K);
+        for(uword K = 0; K < std::min(uword{2}, t_disp.n_elem); ++K) position(K) += t_disp(K);
     }
 
     for(decltype(master.size()) I = 0, J = 1; I < master.size() - 1; ++I, ++J) master[I].norm = rotation * normalise(master[I].axis = master[J].position - master[I].position);
@@ -37,9 +37,9 @@ void Contact2D::update_position() {
     for(auto& [node, position] : slave) {
         position.zeros(2);
         auto& t_coor = node.lock()->get_coordinate();
-        for(uword K = 0; K < std::min(2llu, t_coor.n_elem); ++K) position(K) += t_coor(K);
+        for(uword K = 0; K < std::min(uword{2}, t_coor.n_elem); ++K) position(K) += t_coor(K);
         auto& t_disp = node.lock()->get_trial_displacement();
-        for(uword K = 0; K < std::min(2llu, t_disp.n_elem); ++K) position(K) += t_disp(K);
+        for(uword K = 0; K < std::min(uword{2}, t_disp.n_elem); ++K) position(K) += t_disp(K);
     }
 }
 

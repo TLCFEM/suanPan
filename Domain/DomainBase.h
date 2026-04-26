@@ -198,7 +198,7 @@ public:
     virtual void enable_step(unsigned) = 0;
 
     template<typename T> const shared_ptr<T>& get(unsigned);
-    template<typename T> const shared_ptr<T>& get(const uword tag) { return get<T>(static_cast<unsigned>(tag)); }
+    template<typename T> requires(sizeof(uword) != sizeof(unsigned)) const shared_ptr<T>& get(const uword tag) { return get<T>(static_cast<unsigned>(tag)); }
     template<typename T> std::vector<shared_ptr<T>> get(const uvec&);
     [[nodiscard]] virtual const shared_ptr<Amplitude>& get_amplitude(unsigned) const = 0;
     [[nodiscard]] virtual const shared_ptr<Expression>& get_expression(unsigned) const = 0;
@@ -283,7 +283,7 @@ public:
     [[nodiscard]] virtual size_t get_step() const = 0;
 
     template<typename T> bool find(unsigned);
-    template<typename T> bool find(const uword tag) { return find<T>(static_cast<unsigned>(tag)); }
+    template<typename T> requires(sizeof(uword) != sizeof(unsigned)) bool find(const uword tag) { return find<T>(static_cast<unsigned>(tag)); }
     template<typename T> bool find(const uvec&);
     [[nodiscard]] virtual bool find_amplitude(unsigned) const = 0;
     [[nodiscard]] virtual bool find_expression(unsigned) const = 0;

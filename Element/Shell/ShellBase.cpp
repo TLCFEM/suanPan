@@ -130,7 +130,7 @@ mat ShellBase::transform_to_global_geometry(const mat& stiffness, const vec& res
 
     mat left(size(stiffness), fill::zeros), right(size(stiffness), fill::zeros);
 
-    for(auto I = 0llu, J = 1llu, K = 2llu; I < resistance.n_elem; I += 3llu, J += 3llu, K += 3llu) {
+    for(auto I = uword{0}, J = uword{1}, K = uword{2}; I < resistance.n_elem; I += uword{3}, J += uword{3}, K += uword{3}) {
         left(uvec{I, J, K}, d) = resistance(I) * diff_triad.rows(a) + resistance(J) * diff_triad.rows(b) + resistance(K) * diff_triad.rows(c);
         const vec nodal_disp = displacement(span(I, K));
         right(d, uvec{I}) = diff_triad.rows(a).t() * nodal_disp;

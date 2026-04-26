@@ -74,8 +74,8 @@ private:
 
     void assemble_mass(uword, uword, double) const;
     void assemble_stiffness(uword, uword, double) const;
-    void assemble_mass(const std::vector<sword>&, const std::vector<sword>&, const std::vector<double>&) const;
-    void assemble_stiffness(const std::vector<sword>&, const std::vector<sword>&, const std::vector<double>&) const;
+    void assemble_mass(const std::vector<s64>&, const std::vector<s64>&, const std::vector<double>&) const;
+    void assemble_stiffness(const std::vector<s64>&, const std::vector<s64>&, const std::vector<double>&) const;
 
     void formulate_block(sword&, double, double, int) const;
     void formulate_block(sword&, const std::vector<double>&, const std::vector<double>&, const std::vector<int>&) const;

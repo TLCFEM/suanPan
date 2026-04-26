@@ -23,8 +23,8 @@
 
 NMB21E::NMB21E(const unsigned T, const unsigned W, uvec&& N, const unsigned S, const bool F)
     : NMB21(T, std::move(N), S, F)
-    , a{1 == W ? 1llu : 2llu}
-    , b{1 == W ? uvec{0llu, 2llu} : uvec{0llu, 1llu}} {}
+    , a{1 == W ? uword{1} : uword{2}}
+    , b{1 == W ? uvec{uword{0}, uword{2}} : uvec{uword{0}, uword{1}}} {}
 
 int NMB21E::initialize(const shared_ptr<DomainBase>& D) {
     if(SUANPAN_SUCCESS != NMB21::initialize(D)) return SUANPAN_FAIL;

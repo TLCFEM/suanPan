@@ -26,18 +26,18 @@ void Contact3D::update_position() {
     for(auto& [node, span, position] : slave) {
         position.zeros(3);
         auto& t_coor = node.lock()->get_coordinate();
-        for(auto K = 0llu; K < std::min(3llu, t_coor.n_elem); ++K) position(K) += t_coor(K);
+        for(auto K = 0llu; K < std::min(uword{3}, t_coor.n_elem); ++K) position(K) += t_coor(K);
         auto& t_disp = node.lock()->get_trial_displacement();
-        for(auto K = 0llu; K < std::min(3llu, t_disp.n_elem); ++K) position(K) += t_disp(K);
+        for(auto K = 0llu; K < std::min(uword{3}, t_disp.n_elem); ++K) position(K) += t_disp(K);
     }
 
     for(auto& [m_node, f_norm, f_area] : master) {
         for(auto& [node, span, position, e_norm] : m_node) {
             position.zeros(3);
             auto& t_coor = node.lock()->get_coordinate();
-            for(auto K = 0llu; K < std::min(3llu, t_coor.n_elem); ++K) position(K) += t_coor(K);
+            for(auto K = 0llu; K < std::min(uword{3}, t_coor.n_elem); ++K) position(K) += t_coor(K);
             auto& t_disp = node.lock()->get_trial_displacement();
-            for(auto K = 0llu; K < std::min(3llu, t_disp.n_elem); ++K) position(K) += t_disp(K);
+            for(auto K = 0llu; K < std::min(uword{3}, t_disp.n_elem); ++K) position(K) += t_disp(K);
         }
 
         constexpr unsigned i = 0, j = 1, k = 2;

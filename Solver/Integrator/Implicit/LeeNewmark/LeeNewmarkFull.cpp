@@ -178,7 +178,7 @@ void LeeNewmarkFull::assemble_by_mode_one(uword& current_pos, const double mass_
     const auto mass_coefs = .5 * mass_coef;           // eq. 10
     const auto stiffness_coefs = .5 * stiffness_coef; // eq. 10
 
-    auto I = 0llu;
+    uword I{0};
     auto J = current_pos;
     auto K = current_pos += n_block;
     auto L = current_pos += n_block;
