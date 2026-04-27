@@ -481,7 +481,7 @@ jobs:
         run: |
           echo "SP_TIME=daily-$(date +''%y%m%d'')" >> $GITHUB_ENV
       - name: VirusTotal
-        uses: cssnr/virustotal-action@v1
+        uses: cssnr/virustotal-action@v2
         with:
           vt_api_key: ${{ secrets.VIRUSTOTAL_KEY }}
           release_id: ${{ env.SP_TIME }}
