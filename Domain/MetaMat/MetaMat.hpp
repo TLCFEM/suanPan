@@ -114,9 +114,9 @@ public:
 
     const uword n_rows;
     const uword n_cols;
-    const uword n_elem;
+    const std::uint64_t n_elem;
 
-    MetaMat(const uword in_rows, const uword in_cols, const uword in_elem)
+    MetaMat(const uword in_rows, const uword in_cols, const std::uint64_t in_elem)
         : triplet_mat(in_rows, in_cols)
         , n_rows(in_rows)
         , n_cols(in_cols)

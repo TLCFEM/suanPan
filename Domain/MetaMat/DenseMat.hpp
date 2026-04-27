@@ -49,12 +49,12 @@ protected:
 
     podarray<float> to_float() {
         podarray<float> f_memory(this->n_elem);
-        suanpan::for_each(this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
+        suanpan::for_each(this->n_elem, [&](const auto I) { f_memory(I) = static_cast<float>(memory[I]); });
         return f_memory;
     }
 
 public:
-    DenseMat(const uword in_rows, const uword in_cols, const uword in_elem)
+    DenseMat(const uword in_rows, const uword in_cols, const std::uint64_t in_elem)
         : MetaMat<T>(in_rows, in_cols, in_elem)
         , memory(new T[this->n_elem]) {
         if(in_elem > std::numeric_limits<la_it>::max()) throw std::runtime_error("matrix size exceeds limit, please enable 64-bit indexing");
@@ -66,7 +66,7 @@ public:
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
         , memory(new T[this->n_elem]) {
-        suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; });
+        suanpan::for_each(this->n_elem, [&](const auto I) { memory[I] = old_mat.memory[I]; });
     }
 
     DenseMat(DenseMat&&) = delete;
@@ -100,7 +100,7 @@ public:
         this->factored = false;
         if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
         else if(-1. == scalar) arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
-        else suanpan::for_each(this->n_elem, [&](const uword I) { memptr()[I] += scalar * M->memptr()[I]; });
+        else suanpan::for_each(this->n_elem, [&](const auto I) { memptr()[I] += scalar * M->memptr()[I]; });
     }
 
     void scale_accu(const T scalar, const triplet_form<T, uword>& M) override {
