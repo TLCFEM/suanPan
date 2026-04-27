@@ -396,12 +396,10 @@ int LeeNewmarkFull::process_constraint() {
         // steal the already assembled mass matrix
         // access::rw(current_mass) = std::move(t_mass);
         // must initialise it since nothing will be checked in if left uninitialized
-        // t_mass = triplet_form<double, uword>(n_block, n_block, current_mass.n_elem);
+        // t_mass = mat_t(n_block, n_block, current_mass.n_elem);
 
         // handle geometry matrix
         auto f_geometry = std::async([&] {
-            using mat_t = triplet_form<double, uword>;
-
             if(!factory->is_nlgeom()) return mat_t();
 
             auto& t_geometry = factory->get_geometry()->triplet_mat;
@@ -412,7 +410,7 @@ int LeeNewmarkFull::process_constraint() {
             std::swap(t_fox, t_geometry);
 
             // now t_geometry is empty
-            t_geometry = triplet_form<double, uword>(n_block, n_block, num_entry);
+            t_geometry = mat_t(n_block, n_block, num_entry);
 
             switch(stiffness_type) {
             case StiffnessType::TRIAL:
@@ -438,7 +436,7 @@ int LeeNewmarkFull::process_constraint() {
         std::swap(access::rw(current_stiffness), t_stiff);
 
         // now t_stiffness is empty
-        t_stiff = triplet_form<double, uword>(n_block, n_block, num_entry);
+        t_stiff = mat_t(n_block, n_block, num_entry);
 
         switch(stiffness_type) {
         case StiffnessType::TRIAL:
@@ -480,7 +478,7 @@ int LeeNewmarkFull::process_constraint() {
             // left top block of unrolled damping matrix may not be zero
             // make a copy
             auto& t_rabbit = access::rw(rabbit);
-            t_rabbit = triplet_form<double, uword>(n_block, n_block, t_stiff.n_elem);
+            t_rabbit = mat_t(n_block, n_block, t_stiff.n_elem);
             for(uword I = 0; I < t_triplet.n_elem; ++I) {
                 // quit if current column is beyond the original size of matrix
                 if(col[I] >= n_block) break;

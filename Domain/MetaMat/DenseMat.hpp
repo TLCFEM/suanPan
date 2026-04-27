@@ -103,7 +103,7 @@ public:
         else suanpan::for_each(this->n_elem, [&](const auto I) { memptr()[I] += scalar * M->memptr()[I]; });
     }
 
-    void scale_accu(const T scalar, const triplet_form<T, uword>& M) override {
+    void scale_accu(const T scalar, const triplet_form<T, std::uint64_t>& M) override {
         if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw std::invalid_argument("size mismatch");
         this->factored = false;
         const auto row = M.row_mem();

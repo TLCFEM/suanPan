@@ -110,7 +110,7 @@ protected:
     }
 
 public:
-    triplet_form<T, uword> triplet_mat;
+    triplet_form<T, std::uint64_t> triplet_mat;
 
     const uword n_rows;
     const uword n_cols;
@@ -177,7 +177,7 @@ public:
     virtual T* memptr() = 0;
 
     virtual void scale_accu(T, const shared_ptr<MetaMat>&) = 0;
-    virtual void scale_accu(T, const triplet_form<T, uword>&) = 0;
+    virtual void scale_accu(T, const triplet_form<T, std::uint64_t>&) = 0;
 
     void operator+=(const shared_ptr<MetaMat>& M) { return this->scale_accu(1., M); }
 
@@ -195,9 +195,9 @@ public:
         if(nullptr != bracket.mat_b) this->scale_accu(-M.scalar, bracket.mat_b);
     }
 
-    void operator+=(const triplet_form<T, uword>& M) { return this->scale_accu(1., M); }
+    void operator+=(const triplet_form<T, std::uint64_t>& M) { return this->scale_accu(1., M); }
 
-    void operator-=(const triplet_form<T, uword>& M) { return this->scale_accu(-1., M); }
+    void operator-=(const triplet_form<T, std::uint64_t>& M) { return this->scale_accu(-1., M); }
 
     virtual Mat<T> operator*(const Mat<T>&) const = 0;
 

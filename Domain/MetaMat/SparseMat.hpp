@@ -75,7 +75,7 @@ public:
                 if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = scalar * t_val;
     }
 
-    void scale_accu(const T scalar, const triplet_form<T, uword>& in_mat) override {
+    void scale_accu(const T scalar, const triplet_form<T, std::uint64_t>& in_mat) override {
         this->factored = false;
         if(1. == scalar) this->triplet_mat += in_mat;
         else if(-1. == scalar) this->triplet_mat -= in_mat;

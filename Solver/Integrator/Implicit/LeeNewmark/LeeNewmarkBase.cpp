@@ -23,7 +23,7 @@
 int LeeNewmarkBase::erase_top_left_block() const {
     auto& t_triplet = stiffness->triplet_mat;
 
-    uword *ptr_a, *ptr_b;
+    std::uint64_t *ptr_a, *ptr_b;
 
     if(t_triplet.is_csc_sorted()) {
         ptr_a = t_triplet.col_mem();
@@ -40,7 +40,7 @@ int LeeNewmarkBase::erase_top_left_block() const {
 
     const auto& val = t_triplet.val_mem();
 
-    for(uword I = 0; I < t_triplet.n_elem; ++I) {
+    for(std::uint64_t I = 0; I < t_triplet.n_elem; ++I) {
         // quit if current column/row is beyond the original size of matrix
         if(ptr_a[I] >= n_block) break;
         // erase existing entries if fall in intact stiffness matrix

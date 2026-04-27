@@ -35,6 +35,8 @@
 #include "LeeNewmarkBase.h"
 
 class LeeNewmarkFull final : public LeeNewmarkBase {
+    using mat_t = triplet_form<double, std::uint64_t>;
+
 public:
     enum class Type {
         T0,
@@ -54,9 +56,9 @@ private:
     std::vector<Mode> damping_mode;
 
     // a temporary matrix holding first block nonzero entries from damping matrix
-    const triplet_form<double, uword> rabbit;
-    const triplet_form<double, uword> current_stiffness;
-    const triplet_form<double, uword> current_mass;
+    const mat_t rabbit;
+    const mat_t current_stiffness;
+    const mat_t current_mass;
 
     const bool build_graph = false;
     mutable sp_mat stiffness_graph, mass_graph;
