@@ -67,6 +67,7 @@ option(SP_ENABLE_AVX512 "Build with AVX512 support, has no effect on ARM." OFF)
 option(SP_ENABLE_NATIVE_ARCH "Build with native arch, when this is set, all AVX related settings will be ignored." OFF)
 option(SP_ENABLE_HDF5 "Build with HDF5 format support." ON)
 option(SP_ENABLE_LTO "Enable link-time optimisation." OFF)
+option(SP_ENABLE_32BIT_INDEX "Use 32-bit unsigned integer for indexing instead of 64-bit." OFF)
 if (SP_AMD64)
     option(SP_ENABLE_MKL "Build with Intel MKL instead of the bundled OpenBLAS." OFF)
 else ()
@@ -94,6 +95,10 @@ endif ()
 
 if (SUANPAN_DATE)
     add_compile_definitions(SUANPAN_DATE=${SUANPAN_DATE})
+endif ()
+
+if (SP_ENABLE_32BIT_INDEX)
+    add_compile_definitions(ARMA_32BIT_WORD)
 endif ()
 
 set(COMPILER_IDENTIFIER "unknown")
