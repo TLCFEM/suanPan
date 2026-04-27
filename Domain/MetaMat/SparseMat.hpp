@@ -92,22 +92,22 @@ public:
     void allreduce() override {
 #ifdef SUANPAN_DISTRIBUTED
         const auto coo_elem = this->triplet_mat.n_elem;
-        std::vector<uword> dist_elem(comm_size);
+        std::vector<std::uint64_t> dist_elem(comm_size);
         comm_world.allgather(coo_elem, dist_elem.data());
-        this->triplet_mat.hack_size(std::accumulate(dist_elem.begin(), dist_elem.end(), uword{0}));
+        this->triplet_mat.hack_size(std::accumulate(dist_elem.begin(), dist_elem.end(), std::uint64_t{0}));
 
         mpl::irequest_pool requests;
 
         auto accu_elem = coo_elem;
         for(auto comm_n = 0; comm_n < comm_size; ++comm_n)
             if(comm_n == comm_rank) {
-                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.row_mem(), mpl::contiguous_layout<uword>{coo_elem}));
-                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.col_mem(), mpl::contiguous_layout<uword>{coo_elem}));
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.row_mem(), mpl::contiguous_layout<std::uint64_t>{coo_elem}));
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.col_mem(), mpl::contiguous_layout<std::uint64_t>{coo_elem}));
                 requests.push(comm_world.ibcast(comm_n, this->triplet_mat.val_mem(), mpl::contiguous_layout<T>{coo_elem}));
             }
             else {
-                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.row_mem() + accu_elem, mpl::contiguous_layout<uword>{dist_elem[comm_n]}));
-                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.col_mem() + accu_elem, mpl::contiguous_layout<uword>{dist_elem[comm_n]}));
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.row_mem() + accu_elem, mpl::contiguous_layout<std::uint64_t>{dist_elem[comm_n]}));
+                requests.push(comm_world.ibcast(comm_n, this->triplet_mat.col_mem() + accu_elem, mpl::contiguous_layout<std::uint64_t>{dist_elem[comm_n]}));
                 requests.push(comm_world.ibcast(comm_n, this->triplet_mat.val_mem() + accu_elem, mpl::contiguous_layout<T>{dist_elem[comm_n]}));
                 accu_elem += dist_elem[comm_n];
             }
