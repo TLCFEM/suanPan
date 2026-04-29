@@ -10,9 +10,9 @@ RUN dnf install -y dnf-plugins-core && \
     dnf install -y libglvnd-devel gfortran rpm-build rpm-devel rpmdevtools cmake wget git sudo && \
     dnf clean all
 
-RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6a17080f-f0de-41b9-b587-52f92512c59a/intel-onemkl-2025.3.1.11_offline.sh && \
-    bash ./intel-onemkl-2025.3.1.11_offline.sh -a --silent --eula accept && \
-    rm intel-onemkl-2025.3.1.11_offline.sh
+RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh && \
+    bash ./intel-onemkl-2026.0.0.909_offline.sh -a --silent --eula accept && \
+    rm intel-onemkl-2026.0.0.909_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.1.tar.gz && tar xf VTK-9.6.1.tar.gz && \
