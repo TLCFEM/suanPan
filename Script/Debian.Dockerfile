@@ -6,7 +6,7 @@ RUN wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PROD
 RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 RUN echo "deb https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list
 
-RUN apt-get update -y && apt-get install -y --no-install-recommends gcc g++ gfortran cmake git intel-oneapi-mkl-devel=2025.3.1-8 libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
+RUN apt-get update -y && apt-get install -y --no-install-recommends gcc g++ gfortran cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.1.tar.gz && tar xf VTK-9.6.1.tar.gz && \
