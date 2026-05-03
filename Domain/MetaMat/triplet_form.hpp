@@ -451,8 +451,9 @@ template<sp_d data_t, sp_i index_t> void triplet_form<data_t, index_t>::print() 
 template<sp_d data_t, sp_i index_t> bool triplet_form<data_t, index_t>::save(const std::string& file_name) const {
     std::ofstream file(file_name);
     if(!file.is_open()) return false;
+    file << "%%MatrixMarket matrix coordinate real general\n";
     file << suanpan::format("{} {} {}\n", n_rows, n_cols, n_elem);
-    for(index_t I = 0; I < n_elem; ++I) file << suanpan::format("{} {} {}\n", row_idx[I], col_idx[I], val_idx[I]);
+    for(index_t I = 0; I < n_elem; ++I) file << suanpan::format("{} {} {}\n", row_idx[I] + index_t{1}, col_idx[I] + index_t{1}, val_idx[I]);
     file.close();
     return true;
 }
