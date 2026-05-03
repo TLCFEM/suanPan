@@ -220,8 +220,7 @@ public:
     virtual void allreduce() = 0;
 
     void save(const char* name) {
-        if(!to_mat(*this).save(name, raw_ascii))
-            suanpan_error("Cannot save to file \"{}\".\n", name);
+        if(triplet_mat.is_empty() ? !to_mat(*this).save(name, raw_ascii) : !triplet_mat.save(name)) suanpan_error("Cannot save to file \"{}\".\n", name);
     }
 
     virtual void csc_condense() {}
