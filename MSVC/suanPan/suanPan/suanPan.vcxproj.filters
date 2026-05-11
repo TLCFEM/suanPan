@@ -1564,6 +1564,9 @@
     <ClCompile Include="..\..\..\Material\Material3D\vonMises\Balloon.cpp">
       <Filter>Material\Material3D\vonMises</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\UDNewmark.cpp">
+      <Filter>Solver\Integrator\Implicit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
@@ -2934,6 +2937,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\vonMises\Balloon.h">
       <Filter>Material\Material3D\vonMises</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\UDNewmark.h">
+      <Filter>Solver\Integrator\Implicit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

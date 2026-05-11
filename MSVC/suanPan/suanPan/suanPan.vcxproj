@@ -505,6 +505,7 @@
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\NonviscousNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\OALTS.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\RayleighNewmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\UDNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\WilsonPenzienNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Integrator.cpp" />
     <ClCompile Include="..\..\..\Solver\MPDC.cpp" />
@@ -971,6 +972,7 @@
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\NonviscousNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\OALTS.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\RayleighNewmark.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\UDNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\WilsonPenzienNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Solver\MPDC.h" />
