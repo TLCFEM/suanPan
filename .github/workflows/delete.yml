@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Delete Deployment
-        uses: strumwolf/delete-deployment-environment@v3
+        uses: strumwolf/delete-deployment-environment@v4
         with:
           token: ${{ secrets.ALL }}
           environment: github-pages
