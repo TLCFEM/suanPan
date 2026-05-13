@@ -5,6 +5,10 @@
 1. Eigenanalysis does not support distributed computation.
 2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 4.1
+
+1. add global uniform/universal damping model
+
 ## version 4.0
 
 1. (breaking) change the behaviour of constraint tokens, natural ordering (1, 2, 3, etc.) may break in this version, use more explicit tokens for unconventional DoFs

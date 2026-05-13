@@ -17,4 +17,5 @@
 #include "Implicit/NonviscousNewmark.h"
 #include "Implicit/OALTS.h"
 #include "Implicit/RayleighNewmark.h"
+#include "Implicit/UDNewmark.h"
 #include "Implicit/WilsonPenzienNewmark.h"

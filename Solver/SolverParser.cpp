@@ -259,6 +259,42 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
 
             if(domain->insert(std::make_shared<NonviscousNewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
         }
+        else if(is_equal(integrator_type, "UDDNewmark")) {
+            const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
+
+            auto m_imag = vec{m_i}, s_imag = vec{s_i};
+            if(accu(m_imag) + accu(s_imag) > 1E-12) {
+                suanpan_error("Parameters should be conjugate pairs.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+
+            if(std::abs(accu(m % exp(-1E8 * s))) > 1E-12) {
+                suanpan_error("The provided kernel does not converge to zero.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            if(domain->insert(std::make_shared<UDDNewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
+        }
+        else if(is_equal(integrator_type, "UDANewmark")) {
+            const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
+
+            auto m_imag = vec{m_i}, s_imag = vec{s_i};
+            if(accu(m_imag) + accu(s_imag) > 1E-12) {
+                suanpan_error("Parameters should be conjugate pairs.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+
+            if(std::abs(accu(m % exp(-1E8 * s))) > 1E-12) {
+                suanpan_error("The provided kernel does not converge to zero.\n");
+                return SUANPAN_SUCCESS;
+            }
+
+            if(domain->insert(std::make_shared<UDANewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
+        }
     }
     else if(is_equal_any(integrator_type, "GeneralizedAlpha", "GeneralisedAlpha")) {
         const auto pool = get_remaining<double>(command);
