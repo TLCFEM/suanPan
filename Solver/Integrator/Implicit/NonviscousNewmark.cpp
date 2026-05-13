@@ -20,29 +20,10 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-NonviscousNewmark::NonviscousNewmark(const unsigned T, const double A, const double B, cx_vec&& M, cx_vec&& S)
-    : Newmark(T, A, B)
-    , m(std::move(M))
-    , s(std::move(S)) {}
-
-int NonviscousNewmark::initialize() {
+vec NonviscousNewmark::target_field() const {
     auto& W = get_domain()->get_factory();
 
-    current_damping.zeros(W->get_size(), m.n_elem);
-
-    return Newmark::initialize();
-}
-
-void NonviscousNewmark::assemble_resistance() {
-    Newmark::assemble_resistance();
-
-    auto& W = get_domain()->get_factory();
-
-    const vec trial_damping_force = real(current_damping * s_para + accu_para * (W->get_current_velocity() + W->get_trial_velocity()));
-
-    W->update_trial_damping_force_by(trial_damping_force);
-
-    W->update_sushi_by(trial_damping_force);
+    return W->get_current_velocity() + W->get_trial_velocity();
 }
 
 void NonviscousNewmark::assemble_matrix() {
@@ -58,29 +39,6 @@ void NonviscousNewmark::assemble_matrix() {
     else suanpan::for_each(W->get_size(), [&](const unsigned I) { t_stiffness->unsafe_at(I, I) += damping_diag; });
 }
 
-void NonviscousNewmark::update_parameter(const double DT) {
-    Newmark::update_parameter(DT);
-
-    const cx_vec t_para = 2. / DT + s;
-    s_para = (t_para - 2. * s) / t_para;
-    m_para = m / t_para;
-    accu_para = accu(m_para).real();
-}
-
-void NonviscousNewmark::commit_status() {
-    auto& W = get_domain()->get_factory();
-
-    current_damping *= diagmat(s_para);
-    current_damping += (W->get_current_velocity() + W->get_trial_velocity()) * m_para.t();
-
-    Newmark::commit_status();
-}
-
-void NonviscousNewmark::clear_status() {
-    current_damping.zeros();
-    Newmark::clear_status();
-}
-
 void NonviscousNewmark::print() {
-    suanpan_info("A NonviscousNewmark solver.\n");
+    suanpan_info("A NonviscousNewmark solver using convolution based nonviscous damping. doi:10.1016/j.ymssp.2024.111156\n");
 }
