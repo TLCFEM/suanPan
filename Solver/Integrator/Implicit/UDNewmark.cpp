@@ -76,14 +76,16 @@ vec UDDNewmark::target_field() const {
     return W->get_current_resistance() + W->get_trial_resistance();
 }
 
-void UDDNewmark::assemble_matrix() {
-    UDNewmark::assemble_matrix();
-
+void UDDNewmark::assemble_effective_matrix() {
     auto& W = get_domain()->get_factory();
+
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
     W->get_stiffness() *= 1. + accu_para;
 
-    if(W->is_nlgeom()) W->get_geometry() *= 1. + accu_para;
+    W->get_stiffness() += C0 * W->get_mass();
+
+    W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
 }
 
 vec UDANewmark::target_field() const {
@@ -92,10 +94,12 @@ vec UDANewmark::target_field() const {
     return W->get_current_inertial_force() + W->get_trial_inertial_force();
 }
 
-void UDANewmark::assemble_matrix() {
-    UDNewmark::assemble_matrix();
-
+void UDANewmark::assemble_effective_matrix() {
     auto& W = get_domain()->get_factory();
 
-    W->get_mass() *= 1. + accu_para;
+    if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
+
+    W->get_stiffness() += (C0 + C0 * accu_para) * W->get_mass();
+
+    W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
 }

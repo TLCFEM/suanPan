@@ -42,7 +42,7 @@ protected:
 public:
     using UDNewmark::UDNewmark;
 
-    void assemble_matrix() override;
+    void assemble_effective_matrix() override;
 
     void print() override;
 };

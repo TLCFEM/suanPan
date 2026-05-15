@@ -26,11 +26,15 @@ vec NonviscousNewmark::target_field() const {
     return W->get_current_velocity() + W->get_trial_velocity();
 }
 
-void NonviscousNewmark::assemble_matrix() {
-    Newmark::assemble_matrix();
-
+void NonviscousNewmark::assemble_effective_matrix() {
     auto& W = get_domain()->get_factory();
     const auto& t_stiffness = W->get_stiffness();
+
+    if(W->is_nlgeom()) t_stiffness += W->get_geometry();
+
+    t_stiffness += C0 * W->get_mass();
+
+    t_stiffness += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
 
     const auto damping_diag = C1 * accu_para;
 
