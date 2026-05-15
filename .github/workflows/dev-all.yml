@@ -91,7 +91,7 @@ jobs:
           -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} \
           -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
           -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }} \
-          -DCMAKE_INSTALL_PREFIX=dist \
+          -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_BUILD_DLL_EXAMPLE=${{ env.COVERAGE }} \
           -DSP_BUILD_PARALLEL=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "OFF" || echo "ON") \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
@@ -192,7 +192,7 @@ jobs:
           go build Checker/updater.go
           cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-          -DCMAKE_INSTALL_PREFIX=dist \
+          -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_64BIT_INDEXING=ON \
           -DSP_ENABLE_AVX2=ON \
@@ -254,7 +254,7 @@ jobs:
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
-            -DCMAKE_INSTALL_PREFIX=dist \
+            -DCMAKE_INSTALL_PREFIX=build/dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
           else
@@ -263,7 +263,7 @@ jobs:
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
-            -DCMAKE_INSTALL_PREFIX=dist \
+            -DCMAKE_INSTALL_PREFIX=build/dist \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
           fi
@@ -330,7 +330,7 @@ jobs:
           }
           cmake -G "${{ matrix.compiler }}" -T fortran=ifx -S . -B build `
           -DCMAKE_BUILD_TYPE=${{ matrix.build }} `
-          -DCMAKE_INSTALL_PREFIX=dist `
+          -DCMAKE_INSTALL_PREFIX=build/dist `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
@@ -392,7 +392,7 @@ jobs:
           -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe `
           -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe `
           -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
-          -DCMAKE_INSTALL_PREFIX=dist `
+          -DCMAKE_INSTALL_PREFIX=build/dist `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
           -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6

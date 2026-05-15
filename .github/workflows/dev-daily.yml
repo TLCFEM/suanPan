@@ -42,7 +42,7 @@ jobs:
           echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
           cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_INSTALL_PREFIX=dist \
+          -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_ENABLE_ASAN=ON \
           -DSP_ENABLE_CODECOV=ON \
           -DSP_ENABLE_AVX2=OFF
@@ -96,7 +96,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
           -DSP_ENABLE_AVX2=OFF \
-          -DCMAKE_INSTALL_PREFIX=dist
+          -DCMAKE_INSTALL_PREFIX=build/dist
           cmake --build build --target install --config Debug -j 3
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
@@ -140,7 +140,7 @@ jobs:
           -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe `
           -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe `
           -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
-          -DCMAKE_INSTALL_PREFIX=dist `
+          -DCMAKE_INSTALL_PREFIX=build/dist `
           -DSP_ENABLE_AVX2=OFF
           cmake --build build --target install --config Debug -j 4
       - name: Name
