@@ -1,9 +1,9 @@
 name: Stable
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -20,11 +20,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-24.04, ubuntu-24.04-arm ]
-        avx: [ ON, OFF ]
-        vtk: [ ON, OFF ]
-        mkl: [ ON, OFF ]
-        aocl: [ ON, OFF ]
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        avx: [ON, OFF]
+        vtk: [ON, OFF]
+        mkl: [ON, OFF]
+        aocl: [ON, OFF]
         exclude:
           - mkl: ON
             aocl: ON
@@ -57,10 +57,9 @@ jobs:
           sudo apt-get update && sudo apt-get install libglvnd-dev dpkg-dev xz-utils patchelf
           go build Checker/updater.go
           ./Script/linux-dependency.sh ${{ matrix.os }}
-          mkdir build && cd build
-          cmake \
+          cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=dist \
+          -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
@@ -68,11 +67,9 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/ \
-          ..
-          cmake --build . --target install --config Release -j $(nproc)
-          cmake --build . --target package
-          cd ..
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+          cmake --build build --target install --config Release -j $(nproc)
+          cmake --build build --target package
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
@@ -113,7 +110,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [ ubuntu-24.04 ]
+        os: [ubuntu-24.04]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -135,11 +132,10 @@ jobs:
       - name: Compile
         run: |
           go build Checker/updater.go
-          mkdir build && cd build
           source /opt/intel/oneapi/setvars.sh
-          cmake \
+          cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=dist \
+          -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_64BIT_INDEXING=ON \
           -DSP_ENABLE_AVX2=OFF \
@@ -148,11 +144,9 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.6/ \
-          ..
-          cmake --build . --target install --config Release -j $(nproc)
-          cmake --build . --target package
-          cd ..
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.6/
+          cmake --build build --target install --config Release -j $(nproc)
+          cmake --build build --target package
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
@@ -181,8 +175,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge ]
-        vtk: [ ON ]
+        os: [macos-14-large, macos-15-large, macos-14-xlarge, macos-15-xlarge]
+        vtk: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -196,7 +190,6 @@ jobs:
           brew install glfw glew go libomp
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
-          mkdir build && cd build
           if [[ "${{ matrix.os }}" == "macos-26-large" || "${{ matrix.os }}" == "macos-26-xlarge" ]]; then
             export CC=$(brew --prefix llvm@20)/bin/clang
             export CXX=$(brew --prefix llvm@20)/bin/clang++
@@ -208,19 +201,17 @@ jobs:
             export CXX=$(brew --prefix llvm@15)/bin/clang++
           fi
           export FC=gfortran-13
-          cmake \
+          cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
           -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
           -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
           -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
-          -DCMAKE_INSTALL_PREFIX=dist \
+          -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/ \
-          ..
-          cmake --build . --target install --config Release -j 3
-          cd ..
+          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+          cmake --build build --target install --config Release -j 3
           cp updater build/dist/bin
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
@@ -254,9 +245,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        avx: [ ON, OFF ]
-        vtk: [ ON ]
-        mkl: [ ON ]
+        avx: [ON, OFF]
+        vtk: [ON]
+        mkl: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -285,22 +276,20 @@ jobs:
       - name: Compile
         run: |
           go build Checker/updater.go
-          mkdir build && cd build
           if (Test-Path "C:/Program Files (x86)/Intel/oneAPI/") {
             cmd.exe "/K" '"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" && powershell'
           }
-          cmake -T fortran=ifx `
+          cmake -T fortran=ifx -S . -B build `
           -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_INSTALL_PREFIX=dist `
+          -DCMAKE_INSTALL_PREFIX=build/dist `
           -DSP_BUILD_PARALLEL=ON `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.6/ `
-          ..
-          cmake --build . --target install --config Release -j 4
-          cp ../updater.exe dist/bin
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.6/
+          cmake --build build --target install --config Release -j 4
+          cp ./updater.exe build/dist/bin
       - name: Name
         shell: bash
         run: |
@@ -385,8 +374,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        avx: [ ON, OFF ]
-        vtk: [ ON ]
+        avx: [ON, OFF]
+        vtk: [ON]
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -409,20 +398,18 @@ jobs:
       - name: Compile
         run: |
           go build Checker/updater.go
-          mkdir build && cd build
-          cmake -G "MinGW Makefiles" `
+          cmake -G "MinGW Makefiles" -S . -B build `
           -DCMAKE_BUILD_TYPE=Release `
           -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe `
           -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe `
           -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
-          -DCMAKE_INSTALL_PREFIX=dist `
+          -DCMAKE_INSTALL_PREFIX=build/dist `
           -DSP_BUILD_PARALLEL=ON `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6 `
-          ..
-          cmake --build . --target install --config Release -j 4
-          cp ../updater.exe dist/bin
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6
+          cmake --build build --target install --config Release -j 4
+          cp ./updater.exe build/dist/bin
       - name: Name
         shell: bash
         run: |
