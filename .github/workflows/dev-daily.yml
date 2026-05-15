@@ -40,16 +40,13 @@ jobs:
         run: |
           sudo apt-get install patchelf lcov
           echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
-          mkdir build && cd build
-          cmake \
+          cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_INSTALL_PREFIX=dist \
           -DSP_ENABLE_ASAN=ON \
           -DSP_ENABLE_CODECOV=ON \
-          -DSP_ENABLE_AVX2=OFF \
-          ..
-          cmake --build . --target install --config Debug -j $(nproc)
-          cd ..
+          -DSP_ENABLE_AVX2=OFF
+          cmake --build build --target install --config Debug -j $(nproc)
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
       - name: Cosign
         uses: sigstore/gh-action-sigstore-python@v3.3.0
@@ -94,16 +91,13 @@ jobs:
           echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
           brew install glfw glew libomp
           ./Script/mac-dependency.sh ${{ matrix.os }}
-          mkdir build && cd build
           export CC=gcc-13 && export CXX=g++-13 && export FC=gfortran-13
-          cmake \
+          cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
           -DSP_ENABLE_AVX2=OFF \
-          -DCMAKE_INSTALL_PREFIX=dist \
-          ..
-          cmake --build . --target install --config Debug -j 3
-          cd ..
+          -DCMAKE_INSTALL_PREFIX=dist
+          cmake --build build --target install --config Debug -j 3
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
         uses: sigstore/gh-action-sigstore-python@v3.3.0
@@ -141,16 +135,14 @@ jobs:
       - name: Compile
         run: |
           "SP_TIME=$(Get-Date -Format 'yyMMdd')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          mkdir build && cd build
-          cmake -G "MinGW Makefiles" `
+          cmake -G "MinGW Makefiles" -S . -B build `
           -DCMAKE_BUILD_TYPE=Debug `
           -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe `
           -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe `
           -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
           -DCMAKE_INSTALL_PREFIX=dist `
-          -DSP_ENABLE_AVX2=OFF `
-          ..
-          cmake --build . --target install --config Debug -j 4
+          -DSP_ENABLE_AVX2=OFF
+          cmake --build build --target install --config Debug -j 4
       - name: Name
         shell: bash
         run: |
