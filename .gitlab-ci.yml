@@ -1,4 +1,6 @@
 image: debian:latest
+variables:
+  DEBIAN_FRONTEND: noninteractive
 stages:
   - build
 build:
