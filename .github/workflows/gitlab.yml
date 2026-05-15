@@ -1,0 +1,23 @@
+name: Sync to GitLab
+on:
+  push:
+    branches:
+      - dev
+      - master
+  workflow_dispatch:
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Push
+        run: |
+          git config user.name "Theodore Chang"
+          git config user.email "tlcfem@gmail.com"
+          git remote add gitlab "https://oauth2:${{ secrets.GITLAB_SYNC }}@gitlab.com/tlcfem/suanPan.git"
+          git push gitlab "+HEAD:refs/heads/${{ github.ref_name }}" --follow-tags
