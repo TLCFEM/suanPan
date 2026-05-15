@@ -1,0 +1,11 @@
+image: debian:latest
+stages:
+  - build
+build:
+  stage: build
+  before_script:
+    - apt-get update && apt-get install -y build-essential cmake gfortran g++ git golang
+  script:
+    - go build Checker/updater.go
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    - cmake --build build --parallel
