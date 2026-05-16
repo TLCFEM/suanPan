@@ -380,6 +380,8 @@ public:
     virtual void update_current_nonviscous_force() const = 0;
     virtual void update_current_inertial_force() const = 0;
 
+    virtual vec assemble_vector(std::function<vec(const shared_ptr<Element>&)>) const = 0;
+
     virtual void assemble_resistance() const = 0;
     virtual void assemble_damping_force() const = 0;
     virtual void assemble_nonviscous_force() const = 0;

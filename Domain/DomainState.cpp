@@ -100,6 +100,23 @@ void Domain::update_current_inertial_force() const {
     factory->commit_inertial_force();
 }
 
+vec Domain::assemble_vector(std::function<vec(const shared_ptr<Element>&)> kernel) const {
+    vec result(factory->get_size(), fill::zeros);
+
+    if(color_map.empty())
+        for(const auto& I : element_pond.get()) {
+            if(I->is_local) factory->assemble_vector(kernel(I), I->get_dof_encoding(), result);
+        }
+    else
+        std::ranges::for_each(color_map, [&](const std::vector<unsigned>& color) {
+            suanpan::for_all(color, [&](const unsigned tag) {
+                if(const auto& I = get_element(tag); I->is_local) factory->assemble_vector(kernel(I), I->get_dof_encoding(), result);
+            });
+        });
+
+    return allreduce(result);
+}
+
 void Domain::assemble_resistance() const {
     auto& trial_resistance = factory->modify_trial_resistance().zeros();
 

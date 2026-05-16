@@ -660,6 +660,8 @@ public:
 
     /*************************ASSEMBLER*************************/
 
+    void assemble_vector(const Mat<T>&, const uvec&, vec&);
+
     void assemble_resistance(const Mat<T>&, const uvec&);
     void assemble_damping_force(const Mat<T>&, const uvec&);
     void assemble_nonviscous_force(const Mat<T>&, const uvec&);
@@ -1448,25 +1450,18 @@ template<sp_d T> void Factory<T>::reset() {
     global_geometry = nullptr;
 }
 
-template<sp_d T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uvec& EI) {
+template<sp_d T> void Factory<T>::assemble_vector(const Mat<T>& ER, const uvec& EI, vec& TARGET) {
     if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) trial_resistance(EI(I)) += ER(I);
+    for(auto I = 0llu; I < EI.n_elem; ++I) TARGET(EI(I)) += ER(I);
 }
 
-template<sp_d T> void Factory<T>::assemble_damping_force(const Mat<T>& ER, const uvec& EI) {
-    if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) trial_damping_force(EI(I)) += ER(I);
-}
+template<sp_d T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_resistance); }
 
-template<sp_d T> void Factory<T>::assemble_nonviscous_force(const Mat<T>& ER, const uvec& EI) {
-    if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) trial_nonviscous_force(EI(I)) += ER(I);
-}
+template<sp_d T> void Factory<T>::assemble_damping_force(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_damping_force); }
 
-template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, const uvec& EI) {
-    if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) trial_inertial_force(EI(I)) += ER(I);
-}
+template<sp_d T> void Factory<T>::assemble_nonviscous_force(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_nonviscous_force); }
+
+template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_inertial_force); }
 
 template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) {
     if(EM.is_empty()) return;

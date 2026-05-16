@@ -380,6 +380,8 @@ public:
     void update_current_nonviscous_force() const override;
     void update_current_inertial_force() const override;
 
+    vec assemble_vector(std::function<vec(const shared_ptr<Element>&)>) const override;
+
     void assemble_resistance() const override;
     void assemble_damping_force() const override;
     void assemble_nonviscous_force() const override;
