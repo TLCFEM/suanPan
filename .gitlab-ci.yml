@@ -5,9 +5,9 @@ stages:
   - build
 build:
   stage: build
+  resource_group: $CI_COMMIT_REF_SLUG
   tags:
-    - watermill
-    - hellfire
+    - private
   before_script:
     - apt-get update && apt-get install -y build-essential cmake gfortran g++ git golang
   script:
