@@ -1,4 +1,4 @@
-name: Sync to GitLab
+name: Sync
 on:
   push:
     branches:
@@ -21,3 +21,5 @@ jobs:
           git config user.email "tlcfem@gmail.com"
           git remote add gitlab "https://oauth2:${{ secrets.GITLAB_SYNC }}@gitlab.com/${{ github.repository }}.git"
           git push gitlab "+HEAD:refs/heads/${{ github.ref_name }}" --follow-tags
+          git remote add codeberg "https://tlcfem:${{ secrets.CODEBERG_SYNC }}@codeberg.org/${{ github.repository }}.git"
+          git push codeberg "+HEAD:refs/heads/${{ github.ref_name }}" --follow-tags
