@@ -79,7 +79,7 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
 
     std::vector<bool> attribute;
 
-    mutable std::array<double, 5> statistics{};
+    mutable std::array<double, 6> statistics{};
 
     TagMap compact_node;                        // existing tag -> compact tag
     TagMapCollection compact_node_per_material; // material tag -> (existing tag -> compact tag)
