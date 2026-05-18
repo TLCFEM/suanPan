@@ -87,6 +87,7 @@ enum class Statistics : std::uint8_t {
     UpdateStatus,
     AssembleVector,
     AssembleMatrix,
+    AssembleEffectiveMatrix,
     ProcessConstraint,
     SolveSystem
 };

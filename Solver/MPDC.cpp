@@ -73,8 +73,10 @@ int MPDC::analyze() {
             D->update<Statistics::ProcessConstraint>(t_clock.toc());
 
             // indicate the global matrix has been assembled
+            t_clock.tic();
             G->assemble_effective_matrix();
             G->set_matrix_assembled_switch();
+            D->update<Statistics::AssembleEffectiveMatrix>(t_clock.toc());
         }
 
         t_clock.tic();
