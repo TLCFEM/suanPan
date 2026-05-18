@@ -1215,12 +1215,19 @@ namespace {
         else if(is_equal(object_type, "num_nodes"))
             suanpan_info("SUANPAN_NUM_NODES: {}\n", SUANPAN_NUM_NODES);
         else if(is_equal_any(object_type, "statistics", "stats")) {
-            suanpan_info("Updating element trial status used:\n\t{:.5E} s.\n", domain->stats<Statistics::UpdateStatus>());
-            suanpan_info("Assembling global vector used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleVector>());
-            suanpan_info("Assembling global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleMatrix>());
-            suanpan_info("Assembling global effective system used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleEffectiveMatrix>());
-            suanpan_info("Processing constraints used:\n\t{:.5E} s.\n", domain->stats<Statistics::ProcessConstraint>());
-            suanpan_info("Solving global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::SolveSystem>());
+            auto total_time{0.}, segment{0.};
+            suanpan_info("Updating element trial status used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::UpdateStatus>());
+            total_time += segment;
+            suanpan_info("Assembling global vector used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::AssembleVector>());
+            total_time += segment;
+            suanpan_info("Assembling global system used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::AssembleMatrix>());
+            total_time += segment;
+            suanpan_info("Assembling global effective system used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::AssembleEffectiveMatrix>());
+            total_time += segment;
+            suanpan_info("Processing constraints used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::ProcessConstraint>());
+            total_time += segment;
+            suanpan_info("Solving global system used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::SolveSystem>());
+            suanpan_info("Total tracked time:\n\t{:.5E} s.\n", total_time + segment);
         }
 
         return SUANPAN_SUCCESS;
