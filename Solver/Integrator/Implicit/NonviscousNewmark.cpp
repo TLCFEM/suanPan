@@ -26,6 +26,18 @@ vec NonviscousNewmark::target_field() const {
     return W->get_current_velocity() + W->get_trial_velocity();
 }
 
+void NonviscousNewmark::assemble_resistance() {
+    UDNewmark::assemble_resistance();
+
+    const vec trial_damping_force = real(current_damping * s_para + accu_para * target_field());
+
+    auto& W = get_domain()->get_factory();
+
+    W->update_trial_nonviscous_force_by(trial_damping_force);
+
+    W->update_sushi_by(trial_damping_force);
+}
+
 void NonviscousNewmark::assemble_effective_matrix() {
     auto& W = get_domain()->get_factory();
     const auto& t_stiffness = W->get_stiffness();

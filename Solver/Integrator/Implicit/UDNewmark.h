@@ -33,23 +33,22 @@
 class UDNewmark : public Newmark {
     const cx_vec m, s;
 
+protected:
     cx_vec s_para, m_para;
 
     cx_mat current_damping;
 
-protected:
+    double aux_para;
     double accu_para{0.};
 
     void update_parameter(double) override;
 
-    virtual vec target_field() const = 0;
+    [[nodiscard]] virtual vec target_field() const = 0;
 
 public:
     UDNewmark(unsigned, double, double, cx_vec&&, cx_vec&&);
 
     int initialize() override;
-
-    void assemble_resistance() override;
 
     void commit_status() override;
     void clear_status() override;
@@ -59,21 +58,23 @@ public:
 
 class UDDNewmark final : public UDNewmark {
 protected:
-    vec target_field() const override;
+    [[nodiscard]] vec target_field() const override;
 
 public:
     using UDNewmark::UDNewmark;
 
+    void assemble_resistance() override;
     void assemble_effective_matrix() override;
 };
 
 class UDANewmark final : public UDNewmark {
 protected:
-    vec target_field() const override;
+    [[nodiscard]] vec target_field() const override;
 
 public:
     using UDNewmark::UDNewmark;
 
+    void assemble_resistance() override;
     void assemble_effective_matrix() override;
 };
 

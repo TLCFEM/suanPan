@@ -37,11 +37,12 @@
 
 class NonviscousNewmark final : public UDNewmark {
 protected:
-    vec target_field() const override;
+    [[nodiscard]] vec target_field() const override;
 
 public:
     using UDNewmark::UDNewmark;
 
+    void assemble_resistance() override;
     void assemble_effective_matrix() override;
 
     void print() override;
