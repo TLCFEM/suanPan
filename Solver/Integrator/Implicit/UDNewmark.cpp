@@ -29,7 +29,7 @@ UDNewmark::UDNewmark(const unsigned T, const double A, const double B, cx_vec&& 
 int UDNewmark::initialize() {
     auto& W = get_domain()->get_factory();
 
-    current_damping.zeros(W->get_size(), m.n_elem);
+    current_nonviscous.zeros(W->get_size(), m.n_elem);
 
     return Newmark::initialize();
 }
@@ -44,14 +44,14 @@ void UDNewmark::update_parameter(const double DT) {
 }
 
 void UDNewmark::commit_status() {
-    current_damping *= diagmat(s_para);
-    current_damping += target_field() * m_para.t();
+    current_nonviscous *= diagmat(s_para);
+    current_nonviscous += target_field() * m_para.t();
 
     Newmark::commit_status();
 }
 
 void UDNewmark::clear_status() {
-    current_damping.zeros();
+    current_nonviscous.zeros();
     Newmark::clear_status();
 }
 
@@ -69,11 +69,11 @@ void UDDNewmark::assemble_resistance() {
 
     auto& W = get_domain()->get_factory();
 
-    const vec trial_damping_force = real(current_damping * s_para + accu_para * W->get_current_resistance() + (accu_para - aux_para) * W->get_trial_resistance());
+    const vec trial_nonviscous = real(current_nonviscous * s_para + accu_para * W->get_current_resistance() + (accu_para - aux_para) * W->get_trial_resistance());
 
-    W->update_trial_nonviscous_force_by(trial_damping_force);
+    W->update_trial_nonviscous_force_by(trial_nonviscous);
 
-    W->update_sushi_by(trial_damping_force);
+    W->update_sushi_by(trial_nonviscous);
 }
 
 void UDDNewmark::assemble_effective_matrix() {
@@ -98,11 +98,11 @@ void UDANewmark::assemble_resistance() {
 
     auto& W = get_domain()->get_factory();
 
-    const vec trial_damping_force = real(current_damping * s_para + accu_para * W->get_current_inertial_force() + (accu_para - aux_para) * W->get_trial_inertial_force());
+    const vec trial_nonviscous = real(current_nonviscous * s_para + accu_para * W->get_current_inertial_force() + (accu_para - aux_para) * W->get_trial_inertial_force());
 
-    W->update_trial_nonviscous_force_by(trial_damping_force);
+    W->update_trial_nonviscous_force_by(trial_nonviscous);
 
-    W->update_sushi_by(trial_damping_force);
+    W->update_sushi_by(trial_nonviscous);
 }
 
 void UDANewmark::assemble_effective_matrix() {

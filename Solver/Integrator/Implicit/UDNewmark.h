@@ -36,7 +36,7 @@ class UDNewmark : public Newmark {
 protected:
     cx_vec s_para, m_para;
 
-    cx_mat current_damping;
+    cx_mat current_nonviscous;
 
     double aux_para;
     double accu_para{0.};
