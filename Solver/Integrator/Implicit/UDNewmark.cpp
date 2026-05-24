@@ -64,6 +64,7 @@ vec UDDNewmark::target_field() const {
 
     return W->get_current_resistance() + W->get_trial_resistance();
 }
+
 void UDDNewmark::assemble_resistance() {
     UDNewmark::assemble_resistance();
 
@@ -93,6 +94,7 @@ vec UDANewmark::target_field() const {
 
     return W->get_current_inertial_force() + W->get_trial_inertial_force();
 }
+
 void UDANewmark::assemble_resistance() {
     UDNewmark::assemble_resistance();
 
