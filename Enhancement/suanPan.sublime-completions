@@ -832,7 +832,7 @@
       "trigger": "Elastic2D",
       "details": "2d elastic material",
       "kind": "type",
-      "contents": "material Elastic2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# [4] double, density, default: 0.0\n# [5] int, material type, plane stress = 0, plane strain = 1,, default: 0"
+      "contents": "material Elastic2D ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# [4] double, density, default: 0.0\n# [5] int, material type, plane stress = 0, plane strain = 1, default: 0"
     },
     {
       "trigger": "Elastic3D",
