@@ -84,6 +84,7 @@ using StepQueue = std::map<unsigned, shared_ptr<Step>>;
 using LongFactory = Factory<double>;
 
 enum class Statistics : std::uint8_t {
+    Initialization,
     UpdateStatus,
     AssembleVector,
     AssembleMatrix,

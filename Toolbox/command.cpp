@@ -1216,6 +1216,8 @@ namespace {
             suanpan_info("SUANPAN_NUM_NODES: {}\n", SUANPAN_NUM_NODES);
         else if(is_equal_any(object_type, "statistics", "stats")) {
             auto total_time{0.}, segment{0.};
+            suanpan_info("Initialization used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::Initialization>());
+            total_time += segment;
             suanpan_info("Updating element trial status used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::UpdateStatus>());
             total_time += segment;
             suanpan_info("Assembling global vector used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::AssembleVector>());
