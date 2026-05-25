@@ -88,9 +88,7 @@ void GeneralizedAlphaExplicit::assemble_resistance() {
     W->set_sushi(W->get_trial_resistance() - AF * W->get_incre_resistance() + W->get_trial_damping_force() - AF * W->get_incre_damping_force() + W->get_trial_nonviscous_force() - AF * W->get_incre_nonviscous_force() + W->get_trial_inertial_force() - AM * W->get_incre_inertial_force());
 }
 
-vec GeneralizedAlphaExplicit::get_force_residual() { return ExplicitIntegrator::get_force_residual() / (1. - AM); }
-
-vec GeneralizedAlphaExplicit::get_displacement_residual() { return ExplicitIntegrator::get_displacement_residual() / (1. - AM); }
+vec GeneralizedAlphaExplicit::get_residual(const bool disp_ctrl) { return ExplicitIntegrator::get_residual(disp_ctrl) / (1. - AM); }
 
 sp_mat GeneralizedAlphaExplicit::get_reference_load() { return ExplicitIntegrator::get_reference_load() / (1. - AM); }
 

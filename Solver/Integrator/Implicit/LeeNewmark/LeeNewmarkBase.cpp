@@ -99,14 +99,8 @@ int LeeNewmarkBase::solve(mat& X, mat&& B) { return solve(X, B); }
 
 int LeeNewmarkBase::solve(mat& X, sp_mat&& B) { return solve(X, B); }
 
-vec LeeNewmarkBase::get_force_residual() {
-    residual.head_rows(n_block) = Newmark::get_force_residual();
-
-    return residual;
-}
-
-vec LeeNewmarkBase::get_displacement_residual() {
-    residual.head_rows(n_block) = Newmark::get_displacement_residual();
+vec LeeNewmarkBase::get_residual(const bool disp_ctrl) {
+    residual.head_rows(n_block) = Newmark::get_residual(disp_ctrl);
 
     return residual;
 }

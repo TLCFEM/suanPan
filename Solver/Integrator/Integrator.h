@@ -97,8 +97,9 @@ public:
     virtual void assemble_matrix();
     virtual void assemble_effective_matrix();
 
-    virtual vec get_force_residual();
-    virtual vec get_displacement_residual();
+    virtual vec get_residual(bool);
+    vec get_force_residual() { return get_residual(false); }
+    vec get_displacement_residual() { return get_residual(true); }
     [[nodiscard]] vec get_auxiliary_residual() const;
     virtual sp_mat get_reference_load();
 

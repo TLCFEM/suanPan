@@ -117,9 +117,7 @@ void GeneralizedAlpha::assemble_effective_matrix() {
     W->get_stiffness() += W->is_nonviscous() ? F6 / F2 * (W->get_damping() + W->get_nonviscous()) : F6 / F2 * W->get_damping();
 }
 
-vec GeneralizedAlpha::get_force_residual() { return ImplicitIntegrator::get_force_residual() / F2; }
-
-vec GeneralizedAlpha::get_displacement_residual() { return ImplicitIntegrator::get_displacement_residual() / F2; }
+vec GeneralizedAlpha::get_residual(const bool disp_ctrl) { return ImplicitIntegrator::get_residual(disp_ctrl) / F2; }
 
 sp_mat GeneralizedAlpha::get_reference_load() { return ImplicitIntegrator::get_reference_load() / F2; }
 

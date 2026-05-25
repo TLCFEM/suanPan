@@ -145,27 +145,17 @@ void Integrator::assemble_effective_matrix() {
 }
 
 /**
- * Assemble the global residual vector in load-controlled solving schemes.
+ * Assemble the global residual vector.
+ * If displacement-controlled, apart from the global resistance and external load vectors, the reference load vector shall also be considered.
  */
-vec Integrator::get_force_residual() {
+vec Integrator::get_residual(const bool disp_ctrl) {
     const auto D = database.lock();
     auto& W = D->get_factory();
 
     vec residual = W->get_trial_load() - W->get_sushi();
+    if(disp_ctrl) residual += W->get_reference_load() * W->get_trial_load_factor();
     for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
-    return residual;
-}
 
-/**
- * Assemble the global residual vector in displacement-controlled solving schemes.
- * Apart from the global resistance and external load vectors, the reference load vector shall also be considered.
- */
-vec Integrator::get_displacement_residual() {
-    const auto D = database.lock();
-    auto& W = D->get_factory();
-
-    vec residual = W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi();
-    for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
     return residual;
 }
 
