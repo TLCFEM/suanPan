@@ -31,9 +31,9 @@
 #include "Newmark.h"
 
 class UDNewmark : public Newmark {
+protected:
     const cx_vec m, s;
 
-protected:
     cx_vec s_para, m_para;
 
     cx_mat current_nonviscous;
@@ -68,14 +68,23 @@ public:
 };
 
 class UDANewmark final : public UDNewmark {
+    cx_mat current_q;
+
 protected:
     [[nodiscard]] vec target_field() const override;
 
 public:
     using UDNewmark::UDNewmark;
 
+    int initialize() override;
+
     void assemble_resistance() override;
     void assemble_effective_matrix() override;
+
+    vec get_residual(bool) override;
+
+    void commit_status() override;
+    void clear_status() override;
 };
 
 #endif

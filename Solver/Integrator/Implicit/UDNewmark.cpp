@@ -27,9 +27,7 @@ UDNewmark::UDNewmark(const unsigned T, const double A, const double B, cx_vec&& 
     , aux_para(accu(m / s).real()) {}
 
 int UDNewmark::initialize() {
-    auto& W = get_domain()->get_factory();
-
-    current_nonviscous.zeros(W->get_size(), m.n_elem);
+    current_nonviscous.zeros(get_domain()->get_factory()->get_size(), m.n_elem);
 
     return Newmark::initialize();
 }
@@ -52,6 +50,7 @@ void UDNewmark::commit_status() {
 
 void UDNewmark::clear_status() {
     current_nonviscous.zeros();
+
     Newmark::clear_status();
 }
 
@@ -94,6 +93,11 @@ vec UDANewmark::target_field() const {
 
     return W->get_current_inertial_force() + W->get_trial_inertial_force();
 }
+int UDANewmark::initialize() {
+    current_q.zeros(get_domain()->get_factory()->get_size(), m.n_elem);
+
+    return UDNewmark::initialize();
+}
 
 void UDANewmark::assemble_resistance() {
     UDNewmark::assemble_resistance();
@@ -115,4 +119,31 @@ void UDANewmark::assemble_effective_matrix() {
     W->get_stiffness() += (C0 + C0 * (accu_para - aux_para)) * W->get_mass();
 
     W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
+}
+
+vec UDANewmark::get_residual(const bool disp_ctrl) {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    vec residual = real(current_q * s_para + accu_para * W->get_current_load() + (1. + accu_para - aux_para) * W->get_trial_load()) - W->get_sushi();
+    if(disp_ctrl) residual += W->get_reference_load() * W->get_trial_load_factor();
+    for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
+
+    return residual;
+}
+
+void UDANewmark::commit_status() {
+    const auto D = get_domain();
+    auto& W = D->get_factory();
+
+    current_q *= diagmat(s_para);
+    current_q += (W->get_current_load() + W->get_trial_load()) * m_para.t();
+
+    UDNewmark::commit_status();
+}
+
+void UDANewmark::clear_status() {
+    current_q.zeros();
+
+    UDNewmark::clear_status();
 }
