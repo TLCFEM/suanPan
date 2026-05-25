@@ -69,7 +69,7 @@ void UDDNewmark::assemble_resistance() {
 
     auto& W = get_domain()->get_factory();
 
-    const vec trial_nonviscous = real(current_nonviscous * s_para + accu_para * W->get_current_resistance() + (accu_para - aux_para) * W->get_trial_resistance());
+    const vec trial_nonviscous = real(current_nonviscous * s_para) + accu_para * W->get_current_resistance() + (accu_para - aux_para) * W->get_trial_resistance();
 
     W->update_trial_nonviscous_force_by(trial_nonviscous);
 
@@ -93,6 +93,7 @@ vec UDANewmark::target_field() const {
 
     return W->get_current_inertial_force() + W->get_trial_inertial_force();
 }
+
 int UDANewmark::initialize() {
     current_q.zeros(get_domain()->get_factory()->get_size(), m.n_elem);
 
@@ -104,7 +105,7 @@ void UDANewmark::assemble_resistance() {
 
     auto& W = get_domain()->get_factory();
 
-    const vec trial_nonviscous = real(current_nonviscous * s_para + accu_para * W->get_current_inertial_force() + (accu_para - aux_para) * W->get_trial_inertial_force());
+    const vec trial_nonviscous = real(current_nonviscous * s_para) + accu_para * W->get_current_inertial_force() + (accu_para - aux_para) * W->get_trial_inertial_force();
 
     W->update_trial_nonviscous_force_by(trial_nonviscous);
 
@@ -125,7 +126,7 @@ vec UDANewmark::get_residual(const bool disp_ctrl) {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    vec residual = real(current_q * s_para + accu_para * W->get_current_load() + (1. + accu_para - aux_para) * W->get_trial_load()) - W->get_sushi();
+    vec residual = real(current_q * s_para) + accu_para * W->get_current_load() + (1. + accu_para - aux_para) * W->get_trial_load() - W->get_sushi();
     if(disp_ctrl) residual += W->get_reference_load() * W->get_trial_load_factor();
     for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
 
@@ -133,8 +134,7 @@ vec UDANewmark::get_residual(const bool disp_ctrl) {
 }
 
 void UDANewmark::commit_status() {
-    const auto D = get_domain();
-    auto& W = D->get_factory();
+    auto& W = get_domain()->get_factory();
 
     current_q *= diagmat(s_para);
     current_q += (W->get_current_load() + W->get_trial_load()) * m_para.t();

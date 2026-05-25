@@ -29,7 +29,7 @@ vec NonviscousNewmark::target_field() const {
 void NonviscousNewmark::assemble_resistance() {
     UDNewmark::assemble_resistance();
 
-    const vec trial_nonviscous = real(current_nonviscous * s_para + accu_para * target_field());
+    const vec trial_nonviscous = real(current_nonviscous * s_para) + accu_para * target_field();
 
     auto& W = get_domain()->get_factory();
 
