@@ -20,7 +20,15 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-int Integrator::process_load_impl(const bool full) { return database.lock()->process_load(full); }
+int Integrator::process_load_impl(const bool full) {
+    const auto D = database.lock();
+
+    const auto code = D->process_load(full);
+
+    if(full) D->assemble_load_stiffness();
+
+    return code;
+}
 
 int Integrator::process_constraint_impl(const bool full) {
     const auto D = database.lock();
