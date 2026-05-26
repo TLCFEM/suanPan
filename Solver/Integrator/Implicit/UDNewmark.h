@@ -65,6 +65,9 @@ public:
 
     void assemble_resistance() override;
     void assemble_effective_matrix() override;
+
+    vec get_residual(bool) override;
+    sp_mat get_reference_load() override;
 };
 
 class UDANewmark final : public UDNewmark {

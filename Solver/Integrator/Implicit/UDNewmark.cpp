@@ -81,12 +81,16 @@ void UDDNewmark::assemble_effective_matrix() {
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
-    W->get_stiffness() *= 1. + accu_para - aux_para;
+    W->get_stiffness() += C0 / (1. + accu_para - aux_para) * W->get_mass();
 
-    W->get_stiffness() += C0 * W->get_mass();
+    const auto SC1 = C1 / (1. + accu_para - aux_para);
 
-    W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
+    W->get_stiffness() += W->is_nonviscous() ? SC1 * (W->get_damping() + W->get_nonviscous()) : SC1 * W->get_damping();
 }
+
+vec UDDNewmark::get_residual(const bool disp_ctrl) { return UDNewmark::get_residual(disp_ctrl) / (1. + accu_para - aux_para); }
+
+sp_mat UDDNewmark::get_reference_load() { return UDNewmark::get_reference_load() / (1. + accu_para - aux_para); }
 
 vec UDANewmark::target_field() const {
     auto& W = get_domain()->get_factory();
