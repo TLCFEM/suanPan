@@ -60,6 +60,7 @@ public:
     void assemble_resistance() override;
     void assemble_effective_matrix() override;
 
+    [[nodiscard]] double load_scaling_factor() const override;
     vec get_residual(bool) override;
     sp_mat get_reference_load() override;
 

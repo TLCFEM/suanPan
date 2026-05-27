@@ -81,16 +81,18 @@ void UDDNewmark::assemble_effective_matrix() {
 
     if(W->is_nlgeom()) W->get_stiffness() += W->get_geometry();
 
-    W->get_stiffness() += C0 / (1. + accu_para - aux_para) * W->get_mass();
+    W->get_stiffness() += load_scaling_factor() * C0 * W->get_mass();
 
-    const auto SC1 = C1 / (1. + accu_para - aux_para);
+    const auto SC1 = load_scaling_factor() * C1;
 
     W->get_stiffness() += W->is_nonviscous() ? SC1 * (W->get_damping() + W->get_nonviscous()) : SC1 * W->get_damping();
 }
 
-vec UDDNewmark::get_residual(const bool disp_ctrl) { return UDNewmark::get_residual(disp_ctrl) / (1. + accu_para - aux_para); }
+double UDDNewmark::load_scaling_factor() const { return 1. / (1. + accu_para - aux_para); }
 
-sp_mat UDDNewmark::get_reference_load() { return UDNewmark::get_reference_load() / (1. + accu_para - aux_para); }
+vec UDDNewmark::get_residual(const bool disp_ctrl) { return load_scaling_factor() * UDNewmark::get_residual(disp_ctrl); }
+
+sp_mat UDDNewmark::get_reference_load() { return load_scaling_factor() * UDNewmark::get_reference_load(); }
 
 vec UDANewmark::target_field() const {
     auto& W = get_domain()->get_factory();
@@ -126,11 +128,13 @@ void UDANewmark::assemble_effective_matrix() {
     W->get_stiffness() += W->is_nonviscous() ? C1 * (W->get_damping() + W->get_nonviscous()) : C1 * W->get_damping();
 }
 
+double UDANewmark::load_scaling_factor() const { return 1. + accu_para - aux_para; }
+
 vec UDANewmark::get_residual(const bool disp_ctrl) {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    vec residual = real(current_q * s_para) + accu_para * W->get_current_load() + (1. + accu_para - aux_para) * W->get_trial_load() - W->get_sushi();
+    vec residual = real(current_q * s_para) + accu_para * W->get_current_load() + load_scaling_factor() * W->get_trial_load() - W->get_sushi();
     if(disp_ctrl) residual += W->get_reference_load() * W->get_trial_load_factor();
     for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
 

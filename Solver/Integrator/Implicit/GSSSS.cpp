@@ -97,6 +97,8 @@ void GSSSS::assemble_effective_matrix() {
     W->get_stiffness() += W->is_nonviscous() ? XV * (W->get_damping() + W->get_nonviscous()) : XV * W->get_damping();
 }
 
+double GSSSS::load_scaling_factor() const { return XD * W1; }
+
 vec GSSSS::get_residual(const bool disp_ctrl) { return XD * ImplicitIntegrator::get_residual(disp_ctrl); }
 
 sp_mat GSSSS::get_reference_load() { return XD * ImplicitIntegrator::get_reference_load(); }

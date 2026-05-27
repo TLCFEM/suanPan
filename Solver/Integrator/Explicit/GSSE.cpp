@@ -85,6 +85,8 @@ int GSSE::update_trial_status(bool) {
     return D->update_trial_status();
 }
 
+double GSSE::load_scaling_factor() const { return C; }
+
 vec GSSE::from_incre_acceleration(const vec& incre_acceleration, const uvec& encoding) { return 1. / C / AB * incre_acceleration + get_domain()->get_factory()->get_current_acceleration()(encoding); }
 
 vec GSSE::from_total_acceleration(const vec& total_acceleration, const uvec& encoding) { return from_incre_acceleration(total_acceleration - get_domain()->get_factory()->get_current_acceleration()(encoding), encoding); }
