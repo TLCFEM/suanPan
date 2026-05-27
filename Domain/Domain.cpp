@@ -1373,7 +1373,7 @@ void Domain::update_constraint() {
     }
 }
 
-void Domain::assemble_load_stiffness() {}
+void Domain::assemble_load_stiffness(double) {}
 
 void Domain::assemble_constraint_stiffness() {
     for(auto& I : get_constraint_pool())

@@ -25,7 +25,7 @@ int Integrator::process_load_impl(const bool full) {
 
     const auto code = D->process_load(full);
 
-    if(full) D->assemble_load_stiffness();
+    if(full) D->assemble_load_stiffness(load_scaling_factor());
 
     return code;
 }

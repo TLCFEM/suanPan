@@ -413,7 +413,7 @@ public:
     virtual void update_load() = 0;
     virtual void update_constraint() = 0;
 
-    virtual void assemble_load_stiffness() = 0;
+    virtual void assemble_load_stiffness(double) = 0;
     virtual void assemble_constraint_stiffness() = 0;
 
     [[nodiscard]] virtual int update_current_status() const = 0;

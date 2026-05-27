@@ -411,7 +411,7 @@ public:
     void update_load() override;
     void update_constraint() override;
 
-    void assemble_load_stiffness() override;
+    void assemble_load_stiffness(double) override;
     void assemble_constraint_stiffness() override;
 
     int update_current_status() const override;
