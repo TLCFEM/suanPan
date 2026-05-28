@@ -279,6 +279,14 @@ jobs:
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           [[ "${{ matrix.os }}" != *"xlarge"* ]] && file_name+="-avx"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
+      - name: Create DMG
+        run: |
+          staging="$RUNNER_TEMP/dmg-root"
+          rm -rf "$staging"
+          mkdir -p "$staging/suanPan"
+          cp -R build/dist/* "$staging/suanPan/"
+          ln -s /Applications "$staging/Applications"
+          hdiutil create -volname "suanPan" -srcfolder "$staging" -ov -format UDZO "build/${{ env.ARTIFACT }}.dmg"
       - name: Test
         run: ./build/dist/bin/suanPan -v
       - name: Upload
@@ -286,6 +294,11 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}
           path: build/dist
+      - name: Upload DMG
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.ARTIFACT }}.dmg
+          path: build/${{ env.ARTIFACT }}.dmg
   windows-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     runs-on: windows-2025
