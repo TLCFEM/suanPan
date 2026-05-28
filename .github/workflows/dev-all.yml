@@ -128,7 +128,6 @@ jobs:
           else
             file_name+="-openblas"
           fi
-          file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -208,7 +207,7 @@ jobs:
         run: |
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
-          file_name="suanPan-linux-amd64-release-gcc-avx-vtk-mkl-mpi.tar.gz"
+          file_name="suanPan-linux-amd64-release-gcc-avx-vtk-mkl-mpi"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -279,7 +278,6 @@ jobs:
           file_name+="-${{ matrix.compiler }}"
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
           [[ "${{ matrix.os }}" != *"xlarge"* ]] && file_name+="-avx"
-          file_name+=".tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
       - name: Test
         run: ./build/dist/bin/suanPan -v
@@ -346,7 +344,6 @@ jobs:
           file_name+=$([[ "${{ matrix.mkl }}" == "ON" ]] && echo "-mkl" || echo "-openblas")
           file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
-          file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
           ./build/dist/bin/suanPan.exe -v
@@ -406,7 +403,6 @@ jobs:
           file_name+="-openblas"
           file_name+=$([[ "${{ matrix.avx }}" == "ON" ]] && echo "-avx" || echo "-no-avx")
           [[ "${{ matrix.vtk }}" == "ON" ]] && file_name+="-vtk"
-          file_name+=".zip"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
           ./build/dist/bin/suanPan.exe -v
