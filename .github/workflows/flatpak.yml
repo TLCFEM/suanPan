@@ -1,0 +1,37 @@
+name: Flatpak
+on:
+    push:
+        branches: [dev]
+    workflow_dispatch:
+jobs:
+    flatpak:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - name: Commit
+              id: commit
+              run: git fetch origin dev && echo "sha=$(git rev-parse origin/dev)" >> "$GITHUB_OUTPUT"
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  repository: flathub/io.github.tlcfem.suanPan
+                  ref: beta
+                  token: ${{ secrets.ALL }}
+                  path: flathub
+            - name: Update
+              run: sed -i -E "s|^([[:space:]]*commit:[[:space:]]*)[0-9a-f]{40}[[:space:]]*$|\1${{ steps.commit.outputs.sha }}|" flathub/io.github.tlcfem.suanPan.yml
+            - name: PR
+              uses: peter-evans/create-pull-request@v6
+              with:
+                  token: ${{ secrets.ALL }}
+                  path: flathub
+                  commit-message: "chore: update suanPan source commit to ${{ steps.commit.outputs.sha }}"
+                  branch: "chore/update-commit-${{ github.run_id }}"
+                  base: beta
+                  title: "Update commit ${{ steps.commit.outputs.sha }}"
+                  delete-branch: true
