@@ -262,38 +262,34 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         else if(is_equal(integrator_type, "UDDNewmark")) {
             const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
-            auto m_imag = vec{m_i}, s_imag = vec{s_i};
+            vec m_real{m_r}, s_real{s_r}, m_imag{m_i}, s_imag{s_i};
             if(accu(m_imag) + accu(s_imag) > 1E-12) {
                 suanpan_error("Parameters should be conjugate pairs.\n");
                 return SUANPAN_SUCCESS;
             }
 
-            auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
-
-            if(std::abs(accu(m % exp(-1E8 * s))) > 1E-12) {
-                suanpan_error("The provided kernel does not converge to zero.\n");
+            if(any(m_real > 0.) && any(s_real > 0.)) {
+                suanpan_error("UDD requires both weights (m_j) and poles (s_j) to have negative real parts.\n");
                 return SUANPAN_SUCCESS;
             }
 
-            if(domain->insert(std::make_shared<UDDNewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
+            if(domain->insert(std::make_shared<UDDNewmark>(tag, alpha, beta, cx_vec{m_real, m_imag}, cx_vec{s_real, s_imag}))) code = 1;
         }
         else if(is_equal(integrator_type, "UDANewmark")) {
             const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
-            auto m_imag = vec{m_i}, s_imag = vec{s_i};
+            vec m_real{m_r}, s_real{s_r}, m_imag{m_i}, s_imag{s_i};
             if(accu(m_imag) + accu(s_imag) > 1E-12) {
                 suanpan_error("Parameters should be conjugate pairs.\n");
                 return SUANPAN_SUCCESS;
             }
 
-            auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
-
-            if(std::abs(accu(m % exp(-1E8 * s))) > 1E-12) {
-                suanpan_error("The provided kernel does not converge to zero.\n");
+            if(any(m_real < 0.) && any(s_real > 0.)) {
+                suanpan_error("UDA requires weights (m_j) to have positive real parts and poles (s_j) to have negative real parts.\n");
                 return SUANPAN_SUCCESS;
             }
 
-            if(domain->insert(std::make_shared<UDANewmark>(tag, alpha, beta, std::move(m), std::move(s)))) code = 1;
+            if(domain->insert(std::make_shared<UDANewmark>(tag, alpha, beta, cx_vec{m_real, m_imag}, cx_vec{s_real, s_imag}))) code = 1;
         }
     }
     else if(is_equal_any(integrator_type, "GeneralizedAlpha", "GeneralisedAlpha")) {
