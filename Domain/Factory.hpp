@@ -1485,7 +1485,7 @@ template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec
 
 template<sp_d T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const uvec& EI) {
     if(EK.is_empty()) return;
-    for(auto I = EK.begin(); I != EK.end(); ++I) global_stiffness->at(EI(I.row()), EI(I.col())) += *I;
+    for(auto I = EK.begin(); I != EK.end(); ++I) global_stiffness->unsafe_at(EI(I.row()), EI(I.col())) += *I;
 }
 
 template<sp_d T> void Factory<T>::print() const {
