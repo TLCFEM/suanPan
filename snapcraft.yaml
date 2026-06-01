@@ -1,5 +1,5 @@
 name: suanpan
-base: core26
+base: core24
 confinement: strict
 contact: tlcfem@gmail.com
 donation: https://ko-fi.com/suanpan
@@ -19,6 +19,9 @@ platforms:
   amd64:
     build-on: amd64
     build-for: amd64
+  arm64:
+    build-on: arm64
+    build-for: arm64
 apps:
   suanpan:
     command: bin/suanPan
@@ -54,10 +57,18 @@ parts:
       - libglvnd-dev
       - wget
     override-build: |
-      wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-ubuntu-24.04.tar.gz
-      tar xf VTK-9.6.2-ubuntu-24.04.tar.gz
-      wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh
-      sh ./intel-onemkl-2026.0.0.909_offline.sh -a --silent --eula accept
+      case "$CRAFT_ARCH_BUILD_FOR" in
+        amd64)
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-ubuntu-24.04.tar.gz
+          tar xf VTK-9.6.2-ubuntu-24.04.tar.gz
+          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh
+          sh ./intel-onemkl-2026.0.0.909_offline.sh -a --silent --eula accept
+          ;;
+        arm64)
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-ubuntu-24.04-arm.tar.gz
+          tar xf VTK-9.6.2-ubuntu-24.04-arm.tar.gz
+          ;;
+      esac
       craftctl default
     stage-packages:
       - libgfortran5
