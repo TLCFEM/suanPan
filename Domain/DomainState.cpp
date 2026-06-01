@@ -40,6 +40,8 @@ void Domain::update_current_resistance() const {
 
     allreduce(trial_resistance);
 
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_current_resistance(trial_resistance(t_node->get_reordered_dof())); });
+
     factory->commit_resistance();
 }
 
@@ -58,6 +60,8 @@ void Domain::update_current_damping_force() const {
         });
 
     allreduce(trial_damping_force);
+
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_current_damping_force(trial_damping_force(t_node->get_reordered_dof())); });
 
     factory->commit_damping_force();
 }
@@ -78,6 +82,8 @@ void Domain::update_current_nonviscous_force() const {
 
     allreduce(trial_nonviscous_force);
 
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_current_nonviscous_force(trial_nonviscous_force(t_node->get_reordered_dof())); });
+
     factory->commit_nonviscous_force();
 }
 
@@ -96,6 +102,8 @@ void Domain::update_current_inertial_force() const {
         });
 
     allreduce(trial_inertial_force);
+
+    suanpan::for_all(node_pond.get(), [&](const shared_ptr<Node>& t_node) { t_node->update_current_inertial_force(trial_inertial_force(t_node->get_reordered_dof())); });
 
     factory->commit_inertial_force();
 }
