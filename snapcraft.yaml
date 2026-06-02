@@ -1,4 +1,5 @@
 name: suanpan
+title: suanpan
 base: core24
 confinement: strict
 contact: tlcfem@gmail.com
