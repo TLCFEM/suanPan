@@ -1549,7 +1549,12 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
         if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, n_elem);
 #endif
 #endif
+        if(contain_solver_type(SolverType::SUPERLU)) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+#ifdef SUANPAN_MKL
+        return std::make_unique<SparseMatPARDISO<T>>(n_size, n_size, n_elem);
+#else
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+#endif
 #endif
     default:
         throw std::invalid_argument("need a proper storage scheme");
