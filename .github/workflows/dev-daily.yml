@@ -65,14 +65,6 @@ jobs:
           chmod 600 key.pem
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan/linux/
           rm -f key.pem
-      - name: Coverage
-        run: |
-          export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
-          cd build
-          bash ../Script/Coverage.sh .
-          lcov --capture --directory . --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' --output-file coverage.info
-          lcov --list coverage.info
   macos-daily:
     runs-on: ${{ matrix.os }}
     needs: check-latest
