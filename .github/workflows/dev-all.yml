@@ -156,7 +156,7 @@ jobs:
           path: ./build/Results.tar.gz
       - name: Report
         if: ${{ hashFiles('./build/coverage.info') != '' }}
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           plugins: gcov
           files: ./build/coverage.info
