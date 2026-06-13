@@ -332,7 +332,7 @@ jobs:
   windows-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     needs: guard
-    runs-on: windows-2025
+    runs-on: windows-2022
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -405,7 +405,7 @@ jobs:
   windows-gcc-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     needs: guard
-    runs-on: windows-2025
+    runs-on: windows-2022
     steps:
       - name: Clone
         uses: actions/checkout@v6
