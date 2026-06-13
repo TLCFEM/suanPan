@@ -1,37 +1,44 @@
-name: Flatpak
-on:
-  push:
-    branches: [dev]
-  workflow_dispatch:
 jobs:
   flatpak:
-    runs-on: ubuntu-latest
+    needs: guard
     permissions:
       contents: read
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Commit
-        id: commit
+      - id: commit
+        name: Commit
         run: git fetch origin dev && echo "sha=$(git rev-parse origin/dev)" >> "$GITHUB_OUTPUT"
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          repository: flathub/io.github.tlcfem.suanPan
-          ref: beta
-          token: ${{ secrets.ALL }}
           path: flathub
+          ref: beta
+          repository: flathub/io.github.tlcfem.suanPan
+          token: ${{ secrets.ALL }}
       - name: Update
         run: sed -i -E "s|^([[:space:]]*commit:[[:space:]]*)[0-9a-f]{40}[[:space:]]*$|\1${{ steps.commit.outputs.sha }}|" flathub/io.github.tlcfem.suanPan.yml
       - name: PR
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.ALL }}
-          path: flathub
-          commit-message: "chore: update suanPan source commit to ${{ steps.commit.outputs.sha }}"
-          branch: "chore/update-commit"
           base: beta
-          title: "Update commit ${{ steps.commit.outputs.sha }}"
+          branch: chore/update-commit
+          commit-message: 'chore: update suanPan source commit to ${{ steps.commit.outputs.sha }}'
           delete-branch: true
+          path: flathub
+          title: Update commit ${{ steps.commit.outputs.sha }}
+          token: ${{ secrets.ALL }}
+  guard:
+    if: github.repository == 'TLCFEM/suanPan'
+    runs-on: ubuntu-slim
+    steps:
+      - run: echo "Hello, World!"
+name: Flatpak
+'on':
+  push:
+    branches:
+      - dev
+  workflow_dispatch: null

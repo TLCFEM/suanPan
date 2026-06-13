@@ -1,36 +1,34 @@
-name: Daily
-on:
-  schedule:
-    - cron: "0 5 * * *"
-  workflow_dispatch:
 env:
-  SP_TIME: ""
-  ARTIFACT: ""
-permissions:
-  id-token: write
+  ARTIFACT: ''
+  SP_TIME: ''
 jobs:
   check-latest:
-    runs-on: ubuntu-slim
+    needs: guard
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    runs-on: ubuntu-slim
     steps:
-      - name: Commit
-        id: commit
+      - id: commit
+        name: Commit
         run: |
           head=$(git ls-remote https://github.com/TLCFEM/suanPan.git HEAD | awk '{print $1}')
           echo "head=$head" >> $GITHUB_OUTPUT
           echo "$head" > .commit
-      - name: Cache
-        id: cache
+      - id: cache
+        name: Cache
         uses: actions/cache@v5
         with:
-          path: .commit
           key: commit-${{ steps.commit.outputs.head }}
+          path: .commit
+  guard:
+    if: github.repository == 'TLCFEM/suanPan'
+    runs-on: ubuntu-slim
+    steps:
+      - run: echo "Hello, World!"
   linux-daily:
-    runs-on: ubuntu-24.04
-    needs: check-latest
     if: needs.check-latest.outputs.cache-hit != 'true'
-    timeout-minutes: 120
+    needs: check-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -65,14 +63,11 @@ jobs:
           chmod 600 key.pem
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan/linux/
           rm -f key.pem
+    timeout-minutes: 120
   macos-daily:
-    runs-on: ${{ matrix.os }}
-    needs: check-latest
     if: needs.check-latest.outputs.cache-hit != 'true'
-    timeout-minutes: 100
-    strategy:
-      matrix:
-        os: [macos-14-large, macos-14-xlarge]
+    needs: check-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -110,11 +105,16 @@ jobs:
           chmod 600 key.pem
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan/macos/
           rm -f key.pem
-  windows-gcc-daily:
-    runs-on: windows-2025
-    needs: check-latest
-    if: needs.check-latest.outputs.cache-hit != 'true'
+    strategy:
+      matrix:
+        os:
+          - macos-14-large
+          - macos-14-xlarge
     timeout-minutes: 100
+  windows-gcc-daily:
+    if: needs.check-latest.outputs.cache-hit != 'true'
+    needs: check-latest
+    runs-on: windows-2025
     steps:
       - name: Clone
         uses: actions/checkout@v6
@@ -136,41 +136,49 @@ jobs:
           -DSP_ENABLE_AVX2=OFF
           cmake --build build --target install --config Debug -j 4
       - name: Name
-        shell: bash
         run: |
           echo "ARTIFACT=suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
+        shell: bash
       - name: Cosign
         uses: sigstore/gh-action-sigstore-python@v3.3.0
         with:
           inputs: build/dist/bin/*.exe
-      - name: Unsigned
-        id: upload-unsigned-vs
+      - id: upload-unsigned-vs
+        name: Unsigned
         uses: actions/upload-artifact@v7
         with:
           name: unsigned-${{ env.ARTIFACT }}
           path: build/dist/bin/*.exe
-      - name: Sign
+      - if: false
+        name: Sign
         uses: signpath/github-action-submit-signing-request@v2
-        if: false
         with:
           api-token: ${{ secrets.SIGNPATH }}
-          organization-id: b04bac88-d6e9-4140-948d-cb95e3095cbe
-          project-slug: suanPan
-          signing-policy-slug: test-signing
           artifact-configuration-slug: test
           github-artifact-id: ${{ steps.upload-unsigned-vs.outputs.artifact-id }}
-          wait-for-completion: true
+          organization-id: b04bac88-d6e9-4140-948d-cb95e3095cbe
           output-artifact-directory: build/dist/bin
+          project-slug: suanPan
+          signing-policy-slug: test-signing
+          wait-for-completion: true
       - name: Test
         run: |
           cd build/dist/bin
           7z a -tzip ../../../${{ env.ARTIFACT }} ./*
           ./suanPan.exe -v
       - name: Remote
-        shell: bash
         run: |
           echo "${{ secrets.STATIC_KEY }}" > key.pem
           chmod 600 key.pem
           scp -i key.pem -o StrictHostKeyChecking=no ${{ env.ARTIFACT }} ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan/windows/
           rm -f key.pem
+        shell: bash
+    timeout-minutes: 100
+name: Daily
+'on':
+  schedule:
+    - cron: 0 5 * * *
+  workflow_dispatch: null
+permissions:
+  id-token: write
