@@ -52,7 +52,7 @@ jobs:
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.3.0
+        uses: sigstore/gh-action-sigstore-python@v3.4.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -154,7 +154,7 @@ jobs:
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.3.0
+        uses: sigstore/gh-action-sigstore-python@v3.4.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -219,7 +219,7 @@ jobs:
           cp updater build/dist/bin
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.3.0
+        uses: sigstore/gh-action-sigstore-python@v3.4.0
         with:
           inputs: build/dist/bin/*
       - name: Pack

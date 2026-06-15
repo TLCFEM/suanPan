@@ -47,7 +47,7 @@ jobs:
           cmake --build build --target install --config Debug -j $(nproc)
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.3.0
+        uses: sigstore/gh-action-sigstore-python@v3.4.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -87,7 +87,7 @@ jobs:
           cmake --build build --target install --config Debug -j 3
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.3.0
+        uses: sigstore/gh-action-sigstore-python@v3.4.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -141,7 +141,7 @@ jobs:
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
         shell: bash
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.3.0
+        uses: sigstore/gh-action-sigstore-python@v3.4.0
         with:
           inputs: build/dist/bin/*.exe
       - id: upload-unsigned-vs
