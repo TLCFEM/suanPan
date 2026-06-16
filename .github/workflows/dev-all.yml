@@ -125,7 +125,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Results-${{ hashFiles('./build/Results.tar.gz') }}
-          path: ./build/Results.tar.gz
+          path: ./build/Results
       - env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         if: ${{ hashFiles('./build/coverage.info') != '' }}
