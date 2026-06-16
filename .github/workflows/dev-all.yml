@@ -124,7 +124,7 @@ jobs:
         name: Result
         uses: actions/upload-artifact@v7
         with:
-          name: Results-${{ hashFiles('./build/Results.tar.gz') }}
+          name: Results-${{ github.sha }}
           path: ./build/Results
       - env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
