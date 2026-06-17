@@ -94,15 +94,10 @@ void GeneralizedAlpha::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    auto fa = std::async([&] { D->assemble_resistance(); });
-    auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
-    auto fd = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
+    D->assemble_resistance();
+    D->assemble_damping_force();
+    D->assemble_nonviscous_force();
+    D->assemble_inertial_force();
 
     W->set_sushi(W->get_current_resistance() + F2 * W->get_incre_resistance() + W->get_current_damping_force() + F2 * W->get_incre_damping_force() + W->get_current_nonviscous_force() + F2 * W->get_incre_nonviscous_force() + W->get_current_inertial_force() + F4 * W->get_incre_inertial_force());
 }

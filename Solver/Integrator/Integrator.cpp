@@ -376,32 +376,21 @@ vec Integrator::from_total_acceleration(const double magnitude, const uvec& enco
 void ImplicitIntegrator::assemble_matrix() {
     const auto D = get_domain();
 
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
-    auto fe = std::async([&] { D->assemble_trial_mass(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-    fe.get();
+    D->assemble_trial_stiffness();
+    D->assemble_trial_geometry();
+    D->assemble_trial_damping();
+    D->assemble_trial_nonviscous();
+    D->assemble_trial_mass();
 }
 
 void ExplicitIntegrator::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    auto fa = std::async([&] { D->assemble_resistance(); });
-    auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
-    auto fd = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
+    D->assemble_resistance();
+    D->assemble_damping_force();
+    D->assemble_nonviscous_force();
+    D->assemble_inertial_force();
 
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }

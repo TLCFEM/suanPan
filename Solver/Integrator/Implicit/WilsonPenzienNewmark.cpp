@@ -145,15 +145,10 @@ void WilsonPenzienNewmark::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    auto fa = std::async([&] { D->assemble_resistance(); });
-    auto fb = std::async([&] { D->assemble_damping_force(); });    // consider independent viscous device
-    auto fc = std::async([&] { D->assemble_nonviscous_force(); }); // consider independent viscous device
-    auto fd = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
+    D->assemble_resistance();
+    D->assemble_damping_force();    // consider independent viscous device
+    D->assemble_nonviscous_force(); // consider independent viscous device
+    D->assemble_inertial_force();
 
     W->update_trial_damping_force_by(theta * (beta % (theta.t() * W->get_trial_velocity())));
 
