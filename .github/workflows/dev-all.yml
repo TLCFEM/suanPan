@@ -7,6 +7,42 @@ env:
   IOMP: ''
   SP_TIME: ''
 jobs:
+  compare:
+    needs: linux-dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+      - name: Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+      - id: hashes
+        name: Hash
+        run: |
+          CURRENT_SHA=$(git rev-parse HEAD)
+          PARENT_SHA=$(git rev-parse HEAD~1)
+          echo "current=$CURRENT_SHA" >> $GITHUB_OUTPUT
+          echo "parent=$PARENT_SHA" >> $GITHUB_OUTPUT
+      - id: cache-current
+        name: Cache Current
+        uses: actions/cache/restore@v5
+        with:
+          key: Results-${{ steps.hashes.outputs.current }}
+          path: results-current/
+      - id: cache-parent
+        name: Cache Parent
+        uses: actions/cache/restore@v5
+        with:
+          key: Results-${{ steps.hashes.outputs.parent }}
+          path: results-parent/
+      - continue-on-error: true
+        if: steps.cache-current.outputs.cache-hit == 'true' && steps.cache-parent.outputs.cache-hit == 'true'
+        name: Compare
+        run: |
+          python3 ./Script/compare.py results-current/ results-parent/
   guard:
     if: github.repository == 'TLCFEM/suanPan'
     runs-on: ubuntu-slim
