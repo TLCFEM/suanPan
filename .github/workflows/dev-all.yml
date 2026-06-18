@@ -9,40 +9,7 @@ env:
 jobs:
   compare:
     needs: linux-dev
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 2
-      - name: Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
-      - id: hashes
-        name: Hash
-        run: |
-          CURRENT_SHA=$(git rev-parse HEAD)
-          PARENT_SHA=$(git rev-parse HEAD~1)
-          echo "current=$CURRENT_SHA" >> $GITHUB_OUTPUT
-          echo "parent=$PARENT_SHA" >> $GITHUB_OUTPUT
-      - id: cache-current
-        name: Cache Current
-        uses: actions/cache/restore@v5
-        with:
-          key: Results-${{ steps.hashes.outputs.current }}
-          path: results-current/
-      - id: cache-parent
-        name: Cache Parent
-        uses: actions/cache/restore@v5
-        with:
-          key: Results-${{ steps.hashes.outputs.parent }}
-          path: results-parent/
-      - continue-on-error: true
-        if: steps.cache-current.outputs.cache-hit == 'true' && steps.cache-parent.outputs.cache-hit == 'true'
-        name: Compare
-        run: |
-          python3 ./Script/compare.py results-current/ results-parent/
+    uses: ./.github/workflows/compare.yml
   guard:
     if: github.repository == 'TLCFEM/suanPan'
     runs-on: ubuntu-slim
@@ -162,13 +129,13 @@ jobs:
         with:
           name: Results-${{ github.sha }}
           path: ./build/Results
-      - id: cache-results
-        if: ${{ matrix.os == 'ubuntu-24.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
+      - if: ${{ matrix.os == 'ubuntu-24.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
         name: Cache
-        uses: actions/cache@v5
-        with:
-          key: Results-${{ github.sha }}
-          path: ./build/Results
+        run: |
+          echo "${{ secrets.STATIC_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem -o StrictHostKeyChecking=no ./build/Results.tar.gz ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan-results/Results-${{ github.sha }}.tar.gz
+          rm -f key.pem
       - env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         if: ${{ hashFiles('./build/coverage.info') != '' }}

@@ -4,6 +4,8 @@
 from pathlib import Path
 from difflib import unified_diff
 import sys
+import tarfile
+from tempfile import TemporaryDirectory
 
 
 skip_files: tuple = (
@@ -31,10 +33,7 @@ def readlines(file_path: Path):
         return [x for x in file if not skip(x)]
 
 
-def compare_commits(current: Path, parent: Path):
-    if not current.is_dir() or not parent.is_dir():
-        return True
-
+def compare_folders(current: Path, parent: Path):
     error_flag: bool = False
 
     for current_path in current.rglob("*"):
@@ -76,6 +75,22 @@ def compare_commits(current: Path, parent: Path):
             print(f"Error reading files: {e}.")
 
         return error_flag
+
+
+def compare_commits(current: Path, parent: Path):
+    if current.is_dir() and parent.is_dir():
+        return compare_folders(current, parent)
+
+    if not current.is_file() or not parent.is_file():
+        return True
+
+    with TemporaryDirectory() as current_tmp, TemporaryDirectory() as parent_tmp:
+        with tarfile.open(current, "r:gz") as tar:
+            tar.extractall(current_dir := Path(current_tmp))
+        with tarfile.open(parent, "r:gz") as tar:
+            tar.extractall(parent_dir := Path(parent_tmp))
+
+        return compare_folders(current_dir, parent_dir)
 
 
 if __name__ == "__main__":
