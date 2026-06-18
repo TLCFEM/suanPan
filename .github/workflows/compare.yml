@@ -25,7 +25,7 @@ jobs:
           scp -i key.pem -o StrictHostKeyChecking=no ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan-results/Results-${{ steps.hashes.outputs.current }}.tar.gz results-current.tar.gz
           scp -i key.pem -o StrictHostKeyChecking=no ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan-results/Results-${{ steps.hashes.outputs.parent }}.tar.gz results-parent.tar.gz
           rm -f key.pem
-          ./Script/compare.py results-current.tar.gz results-parent.tar.gz
+          python3 ./Script/compare.py results-current.tar.gz results-parent.tar.gz
 name: A/B Testing
 'on':
   workflow_call: null
