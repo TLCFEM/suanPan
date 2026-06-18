@@ -36,7 +36,7 @@ def readlines(file_path: Path):
 def compare_folders(current: Path, parent: Path):
     error_flag: bool = False
 
-    for current_path in current.rglob("*"):
+    for current_path in current.iterdir():
         if not current_path.is_file():
             continue
 
@@ -66,7 +66,7 @@ def compare_folders(current: Path, parent: Path):
 
             error_flag = True
 
-            print(f"\n{'=' * 80}\nComparing: {relative_path}\n{'=' * 80}")
+            print(f"\n{'=' * 80}\nComparing: {relative_path}...\n{'=' * 80}")
 
             for line in lines:
                 print(line)
@@ -78,6 +78,8 @@ def compare_folders(current: Path, parent: Path):
 
 
 def compare_commits(current: Path, parent: Path):
+    print(f"Comparing {current} and {parent}...")
+
     if current.is_dir() and parent.is_dir():
         return compare_folders(current, parent)
 
