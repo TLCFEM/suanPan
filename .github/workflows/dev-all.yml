@@ -10,6 +10,7 @@ jobs:
   compare:
     needs: linux-dev
     uses: ./.github/workflows/compare.yml
+    secrets: inherit
   guard:
     if: github.repository == 'TLCFEM/suanPan'
     runs-on: ubuntu-slim
