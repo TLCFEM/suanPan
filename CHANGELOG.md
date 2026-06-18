@@ -8,6 +8,7 @@
 ## version 4.1
 
 1. add global uniform/universal damping models `UDDNewmark` and `UDANewmark`
+2. bump up various dependencies
 
 ## version 4.0
 
