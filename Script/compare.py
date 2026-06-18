@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 from pathlib import Path
 from difflib import unified_diff
 import sys
@@ -25,6 +26,11 @@ def skip(line: str):
     return False
 
 
+def readlines(file_path: Path):
+    with file_path.open("r") as file:
+        return [x for x in file if not skip(x)]
+
+
 def compare_commits(current: Path, parent: Path):
     if not current.is_dir() or not parent.is_dir():
         return True
@@ -46,17 +52,10 @@ def compare_commits(current: Path, parent: Path):
             continue
 
         try:
-            with (
-                open(current_path, "r") as current_file,
-                open(parent_path, "r") as parent_file,
-            ):
-                current_lines = [x for x in current_file.readlines() if not skip(x)]
-                parent_lines = [x for x in parent_file.readlines() if not skip(x)]
-
             lines = list(
                 unified_diff(
-                    current_lines,
-                    parent_lines,
+                    readlines(current_path),
+                    readlines(parent_path),
                     fromfile=current_path.as_posix(),
                     tofile=parent_path.as_posix(),
                     lineterm="",

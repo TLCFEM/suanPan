@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
+
+
 import hashlib
 import os
 import shutil
 import sys
+from pathlib import Path
 
 
 def pack(root_folder: str):
@@ -55,10 +59,9 @@ def pack(root_folder: str):
                 checksum.write(f"\t{f}\n")
                 shutil.copy(full_path, dest)
 
-    with open("suanPan-win-mkl-vtk.sha256", "w") as hashfile, open(
-        "suanPan-win-mkl-vtk.zip", "rb"
-    ) as target:
-        hashfile.write(hashlib.sha256(target.read()).hexdigest())
+    Path("suanPan-win-mkl-vtk.sha256").write_text(
+        hashlib.sha256(Path("suanPan-win-mkl-vtk.zip").read_bytes()).hexdigest()
+    )
 
     shutil.copy("Enhancement/suanPan.nuspec", ".")
 
