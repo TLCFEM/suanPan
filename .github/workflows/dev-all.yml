@@ -149,7 +149,6 @@ jobs:
       fail-fast: false
       matrix:
         aocl:
-          - 'ON'
           - 'OFF'
         avx:
           - 'OFF'
@@ -338,7 +337,6 @@ jobs:
           - macos-14-xlarge
         vtk:
           - 'ON'
-          - 'OFF'
     timeout-minutes: 90
   windows-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
@@ -411,7 +409,6 @@ jobs:
           - 'OFF'
         vtk:
           - 'ON'
-          - 'OFF'
     timeout-minutes: 90
   windows-gcc-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
