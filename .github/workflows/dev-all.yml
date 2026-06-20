@@ -63,6 +63,7 @@ jobs:
           go build Checker/updater.go
           ./Script/linux-dependency.sh ${{ matrix.os }}
           cmake -S . -B build \
+          -DSP_ENABLE_ARMA_FULLY_DYNAMIC=ON \
           -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
           -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} \
           -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
