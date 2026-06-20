@@ -1,5 +1,6 @@
 jobs:
   compare:
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -10,8 +11,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: 3.x
-      - continue-on-error: true
-        name: Compare
+      - name: Compare
         run: |
           CURRENT_SHA=$(git rev-parse HEAD)
           PARENT_SHA=$(git rev-parse HEAD~1)
