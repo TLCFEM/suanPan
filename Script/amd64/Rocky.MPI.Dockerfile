@@ -21,7 +21,7 @@ RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
     echo "repo_gpgcheck=1" >> /etc/yum.repos.d/oneAPI.repo && \
     echo "gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" >> /etc/yum.repos.d/oneAPI.repo
 
-RUN dnf install -y intel-oneapi-mpi procps-ng && dnf clean all
+RUN dnf install -y intel-oneapi-mpi procps-ng openssh-server openssh-clients && dnf clean all
 
 COPY --from=build /suanPan*.rpm /
 
@@ -29,3 +29,12 @@ RUN dnf install ./suanPan*.rpm -y && rm ./suanPan*.rpm
 
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
 RUN ln -s /usr/bin/suanPan /usr/bin/sp
+
+RUN useradd runner
+WORKDIR /home/runner
+USER runner
+
+RUN mkdir .ssh && \
+    ssh-keygen -t rsa -f .ssh/id_rsa -N "" && \
+    cp .ssh/id_rsa.pub .ssh/authorized_keys && \
+    chmod 700 .ssh && chmod 600 .ssh/*
