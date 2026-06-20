@@ -216,8 +216,11 @@ elseif (SP_ENABLE_64BIT_INDEXING)
     message(NOTICE "64-bit indexing is enabled, please make sure the linear algebra driver is compiled using 64-bit integer as well.")
 endif ()
 
-if (SP_ENABLE_ARMA_FULLY_DYNAMIC AND GIT_EXE)
-    execute_process(COMMAND git apply "${CMAKE_CURRENT_SOURCE_DIR}/Script/armadillo.patch" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" ERROR_QUIET)
+if (SP_ENABLE_ARMA_FULLY_DYNAMIC)
+    add_compile_definitions(SUANPAN_ARMA_FULLY_DYNAMIC)
+    if (GIT_EXE)
+        execute_process(COMMAND git apply "${CMAKE_CURRENT_SOURCE_DIR}/Script/armadillo.patch" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" ERROR_QUIET)
+    endif ()
 endif ()
 
 if (SP_ENABLE_CUDA)

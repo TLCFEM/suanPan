@@ -24,7 +24,7 @@
 struct arma_config
   {
   #if defined(ARMA_MAT_PREALLOC)
-    static constexpr uword mat_prealloc = (sword(ARMA_MAT_PREALLOC) > 0) ? uword(ARMA_MAT_PREALLOC) : 1;
+    static constexpr uword mat_prealloc = (sword(ARMA_MAT_PREALLOC) > 0) ? uword(ARMA_MAT_PREALLOC) : 0;
   #else
     static constexpr uword mat_prealloc = 16;
   #endif

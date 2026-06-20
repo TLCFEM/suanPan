@@ -17,9 +17,14 @@
 #define ARMA_BLAS_64BIT_INT
 #endif
 
+#ifdef SUANPAN_ARMA_FULLY_DYNAMIC
+#define ARMA_MAT_PREALLOC 0
+#else
+#define ARMA_MAT_PREALLOC 6
+#endif
+
 #define ARMA_USE_ARPACK
 #define ARMA_DONT_USE_FORTRAN_HIDDEN_ARGS
-#define ARMA_MAT_PREALLOC 6
 #define ARMA_OPENMP_THRESHOLD 400
 
 #include "armadillo"

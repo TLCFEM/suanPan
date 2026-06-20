@@ -48,9 +48,12 @@ class Mat : public Base< eT, Mat<eT> >
   
   protected:
   
-  arma_align_mem eT mem_local[ arma_config::mat_prealloc ];  // local storage, for small vectors and matrices
-  
-  
+#if defined(ARMA_MAT_PREALLOC) && ARMA_MAT_PREALLOC == 0
+      static constexpr eT* mem_local{nullptr};
+#else
+      arma_align_mem eT mem_local[arma_config::mat_prealloc]; // local storage, for small vectors and matrices
+#endif
+
   public:
   
   static constexpr bool is_col  = false;
