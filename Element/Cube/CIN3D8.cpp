@@ -149,7 +149,7 @@ mat CIN3D8::compute_dn(const vec& C) {
 CIN3D8::CIN3D8(const unsigned T, uvec&& N, const unsigned M)
     : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false) {}
 
-int CIN3D8::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CIN3D8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     const auto ele_coor = get_coordinate(c_dof);
@@ -194,7 +194,7 @@ int CIN3D8::initialize(const shared_ptr<DomainBase>& D) {
             for(uword K{0}; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CIN3D8::update_status() {

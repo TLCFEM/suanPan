@@ -49,7 +49,7 @@ Contact2D::Contact2D(const unsigned T, const unsigned M, const unsigned S, const
     , slave_tag(S)
     , alpha(P) {}
 
-int Contact2D::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS Contact2D::initialize(const shared_ptr<DomainBase>& D) {
     const auto& m_pool = D->get<Group>(master_tag)->get_pool();
     master.reserve(m_pool.n_elem);
     for(auto& I : m_pool) master.emplace_back(MasterNode{D->get<Node>(I), {}, {}, {}});
@@ -60,7 +60,7 @@ int Contact2D::initialize(const shared_ptr<DomainBase>& D) {
     for(auto& I : s_pool) slave.emplace_back(SlaveNode{D->get<Node>(I), {}});
     slave.shrink_to_fit();
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Contact2D::update_status() {

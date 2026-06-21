@@ -33,12 +33,12 @@ CSMT3::CSMT3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, co
     : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
-int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CSMT3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(!material_proto->is_support_couple()) {
         suanpan_warning("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -153,7 +153,7 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
         I.b3 *= T3;
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CSMT3::update_status() {

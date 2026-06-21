@@ -43,7 +43,7 @@ S4::S4(const unsigned T, uvec&& N, const unsigned M, const double TH, const bool
     : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3})
     , thickness(TH) {}
 
-int S4::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS S4::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
     direction_cosine();
@@ -67,7 +67,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     const auto shear_modulus = mat_proto->get(Material::Parameter::SHEAR);
     if(suanpan::approx_equal(shear_modulus, 0.)) {
         suanpan_error("A zero shear modulus is detected.\n");
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     };
 
     // reduced integration for the Kirchhoff constraint
@@ -154,7 +154,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     transform_from_local_to_global(initial_stiffness = reshuffle(m_stiffness, p_stiffness, mp_stiffness, pm_stiffness));
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int S4::update_status() {

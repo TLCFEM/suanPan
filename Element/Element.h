@@ -200,7 +200,7 @@ public:
         std::vector<Node::DOF>&& // dof identifier
     );
 
-    int initialize_base(const shared_ptr<DomainBase>&) final;
+    SP_STATUS initialize_base(const shared_ptr<DomainBase>&) final;
 
     void set_initialized(bool) const override;
     void set_symmetric(bool) const override;

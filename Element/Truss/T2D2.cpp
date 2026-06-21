@@ -28,7 +28,7 @@ T2D2::T2D2(const unsigned T, uvec&& N, const unsigned M, const double A, const b
     , update_area(UA)
     , log_strain(LS) {}
 
-int T2D2::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS T2D2::initialize(const shared_ptr<DomainBase>& D) {
     t_trans->set_element_ptr(this);
 
     access::rw(length) = t_trans->get_length();
@@ -41,7 +41,7 @@ int T2D2::initialize(const shared_ptr<DomainBase>& D) {
 
     if(const auto t_density = t_material->get_density(); t_density > 0.) trial_mass = current_mass = initial_mass = t_trans->to_global_mass_mat(t_density * area);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int T2D2::update_status() {

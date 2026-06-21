@@ -44,7 +44,7 @@ QE2::QE2(const unsigned T, uvec&& N, const unsigned M, const double TH)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
-int QE2::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS QE2::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == mat_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -97,7 +97,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
 
     if(!solve(HIL, H, L) || !solve(HILI, H, LI)) {
         suanpan_error("Element {} fails to initialize and is disabled.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     const mat TT = LI.t() * HIL;
@@ -133,7 +133,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
             for(uword K{0}; K < m_dof; ++K) body_force(M + K, K) += n_int(J);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int QE2::update_status() {

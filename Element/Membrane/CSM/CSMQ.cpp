@@ -34,12 +34,12 @@ CSMQ::CSMQ(const unsigned T, uvec&& N, const unsigned M, const unsigned NN, cons
     , m_node(NN)
     , thickness(TH) { access::rw(characteristic_length) = L; }
 
-int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CSMQ::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(!material_proto->is_support_couple()) {
         suanpan_warning("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -146,7 +146,7 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
             for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CSMQ::update_status() {

@@ -266,7 +266,7 @@ CINP4::CINP4(const unsigned T, uvec&& N, const unsigned M, const double TH)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
-int CINP4::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CINP4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -296,7 +296,7 @@ int CINP4::initialize(const shared_ptr<DomainBase>& D) {
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CINP4::update_status() {

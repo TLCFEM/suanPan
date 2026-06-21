@@ -105,7 +105,7 @@ public:
         double    // inertia
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 };
 
 class SphericalParticle2D final : public SphericalParticle<2u> {
@@ -120,7 +120,7 @@ public:
         double    // mass
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 };
 
 class InertialSphericalParticle3D final : public SphericalParticle<3u> {
@@ -136,7 +136,7 @@ public:
         double    // inertia
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 };
 
 class SphericalParticle3D final : public SphericalParticle<3u> {
@@ -151,7 +151,7 @@ public:
         double    // mass
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

@@ -34,7 +34,7 @@ C3D8I::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
 C3D8I::C3D8I(const unsigned T, uvec&& N, const unsigned M)
     : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false) {}
 
-int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS C3D8I::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
     const auto ele_coor = get_coordinate(c_dof);
@@ -97,7 +97,7 @@ int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
             for(uword K{0}; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int C3D8I::update_status() {

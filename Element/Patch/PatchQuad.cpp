@@ -34,7 +34,7 @@ PatchQuad::PatchQuad(const unsigned T, vec&& KX, vec&& KY, uvec&& N, const unsig
     , m_size(m_node * m_dof)
     , thickness(TH) {}
 
-int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -112,7 +112,7 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
         ConstantMass(this);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int PatchQuad::update_status() {

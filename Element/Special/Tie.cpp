@@ -27,7 +27,7 @@ Tie::Tie(const unsigned T, uvec&& N, uvec&& D, vec&& W, const double L, const do
     , pseudo_load(L)
     , penalty(P) {}
 
-int Tie::initialize(const shared_ptr<DomainBase>&) {
+SP_STATUS Tie::initialize(const shared_ptr<DomainBase>&) {
     initial_stiffness.zeros(get_total_number(), get_total_number());
 
     const auto n_dof = get_dof_number();
@@ -43,7 +43,7 @@ int Tie::initialize(const shared_ptr<DomainBase>&) {
 
     current_resistance = trial_resistance;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Tie::update_status() {

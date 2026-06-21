@@ -37,7 +37,7 @@ B21::B21(const unsigned T, uvec&& N, const unsigned S, const unsigned P, const b
     , int_pt_num(P > 20 ? 20 : P)
     , b_trans(F ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
 
-int B21::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS B21::initialize(const shared_ptr<DomainBase>& D) {
     auto& section_proto = D->get<Section>(section_tag(0));
 
     b_trans->set_element_ptr(this);
@@ -59,7 +59,7 @@ int B21::initialize(const shared_ptr<DomainBase>& D) {
 
     if(const auto linear_density = section_proto->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int B21::update_status() {

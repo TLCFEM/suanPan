@@ -1035,7 +1035,7 @@ int Domain::initialize() {
         if(!t_element.second->is_active()) return;
         // clear node pointer array to enable initialisation
         t_element.second->clear_node_ptr();
-        if(SUANPAN_SUCCESS != t_element.second->initialize_base(shared_from_this())) {
+        if(SP_STATUS::SUCCESS != t_element.second->initialize_base(shared_from_this())) {
             disable_element(t_element.first);
             remove_list.insert(t_element.first);
         }
@@ -1067,7 +1067,7 @@ int Domain::initialize() {
         }
 
         // if first initialisation fails, the element can be safely deleted
-        if(SUANPAN_SUCCESS != t_element->initialize(shared_from_this())) {
+        if(SP_STATUS::SUCCESS != t_element->initialize(shared_from_this())) {
             disable_element(t_element->get_tag());
             remove_list.insert(t_element->get_tag());
             return;

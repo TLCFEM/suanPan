@@ -40,7 +40,7 @@ DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const 
     , release_rate(RR)
     , thickness(TH) { access::rw(characteristic_length) = CL; }
 
-int DCP4::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS DCP4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -89,7 +89,7 @@ int DCP4::initialize(const shared_ptr<DomainBase>& D) {
         ConstantMass(this);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int DCP4::update_status() {

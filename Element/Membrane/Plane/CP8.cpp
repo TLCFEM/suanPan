@@ -41,7 +41,7 @@ CP8::CP8(const unsigned T, uvec&& N, const unsigned M, const double TH, const bo
     , thickness(TH)
     , reduced_scheme(R) {}
 
-int CP8::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CP8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -91,7 +91,7 @@ int CP8::initialize(const shared_ptr<DomainBase>& D) {
             for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CP8::update_status() {

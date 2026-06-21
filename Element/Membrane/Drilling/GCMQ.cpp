@@ -59,7 +59,7 @@ mat GCMQ::form_enhanced_strain(const vec& coor, const int num_enhanced_mode) {
     return poly;
 }
 
-int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS GCMQ::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     access::rw(mat_stiffness) = material_proto->get_initial_stiffness();
@@ -108,7 +108,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     if(!solve(NT, H, N) || !solve(MT, H, M)) {
         suanpan_error("Element {} fails to initialize and is disabled.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     const mat T = HTT * MT, W = NT.t() * T;
@@ -127,7 +127,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     form_body_force(diff_coor);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int GCMQ::update_status() {

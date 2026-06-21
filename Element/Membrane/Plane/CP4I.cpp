@@ -244,7 +244,7 @@ CP4I::CP4I(const unsigned T, uvec&& N, const unsigned M, const double TH)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
-int CP4I::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CP4I::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -294,7 +294,7 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
         ConstantMass(this);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CP4I::update_status() {

@@ -43,7 +43,7 @@ class Tie final : public Element {
 public:
     Tie(unsigned, uvec&&, uvec&&, vec&&, double, double = 1E8);
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
 

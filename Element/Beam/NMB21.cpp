@@ -26,7 +26,7 @@ NMB21::NMB21(const unsigned T, uvec&& N, const unsigned S, const bool R)
     : SectionNMElement2D(T, b_node, b_dof, std::move(N), uvec{S}, R)
     , b_trans(R ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
 
-int NMB21::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS NMB21::initialize(const shared_ptr<DomainBase>& D) {
     b_trans->set_element_ptr(this);
 
     access::rw(length) = b_trans->get_length();
@@ -37,7 +37,7 @@ int NMB21::initialize(const shared_ptr<DomainBase>& D) {
 
     if(const auto linear_density = b_section->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int NMB21::update_status() {

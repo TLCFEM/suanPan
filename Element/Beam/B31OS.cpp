@@ -87,23 +87,23 @@ B31OS::B31OS(const unsigned T, uvec&& N, const unsigned S, const unsigned O, con
     , orientation_tag(O)
     , int_pt_num(P > 20 ? 20 : P) {}
 
-int B31OS::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS B31OS::initialize(const shared_ptr<DomainBase>& D) {
     auto& section_proto = D->get<Section>(section_tag(0));
 
     if(!D->find_orientation(orientation_tag)) {
         suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->unique_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
     if(Orientation::Type::B3DOS != b_trans->type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DOSL or B3DOSC only.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     b_trans->set_element_ptr(this);
@@ -127,7 +127,7 @@ int B31OS::initialize(const shared_ptr<DomainBase>& D) {
 
     if(const auto linear_density = section_proto->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int B31OS::update_status() {

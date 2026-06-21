@@ -40,7 +40,7 @@ C3D20::C3D20(const unsigned T, uvec&& N, const unsigned M, const bool R, const b
     : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, F)
     , reduced_scheme(R) {}
 
-int C3D20::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS C3D20::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     const auto ele_coor = get_coordinate(c_dof);
@@ -86,7 +86,7 @@ int C3D20::initialize(const shared_ptr<DomainBase>& D) {
             for(uword K{0}; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int C3D20::update_status() {

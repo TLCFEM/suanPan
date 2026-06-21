@@ -196,6 +196,12 @@ using namespace arma;
 #include <filesystem>
 namespace fs = std::filesystem;
 
+enum class SP_STATUS : std::int8_t {
+    EXIT = 1,
+    SUCCESS = 0,
+    FAIL = -1
+};
+
 #ifdef SUANPAN_DISTRIBUTED
 #include <mpl/mpl.hpp>
 

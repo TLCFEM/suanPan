@@ -43,7 +43,7 @@ class CAX3 final : public MaterialElement2D {
 public:
     CAX3(unsigned, uvec&&, unsigned, bool = false);
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
 

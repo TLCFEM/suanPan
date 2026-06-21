@@ -53,7 +53,7 @@ class CSMT3 final : public MaterialElement2D {
 public:
     CSMT3(unsigned, uvec&&, unsigned, double = 1., double = -1.);
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
 

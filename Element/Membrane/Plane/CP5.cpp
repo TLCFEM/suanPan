@@ -40,7 +40,7 @@ CP5::CP5(const unsigned T, uvec&& N, const unsigned M, const double TH, const bo
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
-int CP5::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CP5::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -90,7 +90,7 @@ int CP5::initialize(const shared_ptr<DomainBase>& D) {
             for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CP5::update_status() {

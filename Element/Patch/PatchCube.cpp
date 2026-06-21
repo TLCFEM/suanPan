@@ -32,7 +32,7 @@ PatchCube::PatchCube(const unsigned T, vec&& KX, vec&& KY, vec&& KZ, uvec&& N, c
     : MaterialPatch3D(T, c_dof, std::move(N), uvec{M}, {KX, KY, KZ}, false)
     , c_node(static_cast<unsigned>(node_encoding.n_elem)) {}
 
-int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS PatchCube::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     const NURBSVolume3D net(knot_pool[0], knot_pool[1], knot_pool[2]);
@@ -108,7 +108,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
         ConstantMass(this);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int PatchCube::update_status() {

@@ -39,23 +39,23 @@ F31::F31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const u
     , int_pt_num(P > 20 ? 20 : P)
     , orientation_tag(O) {}
 
-int F31::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS F31::initialize(const shared_ptr<DomainBase>& D) {
     auto& section_proto = D->get<Section>(section_tag(0));
 
     if(!D->find_orientation(orientation_tag)) {
         suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->unique_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
     if(Orientation::Type::B3D != b_trans->type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     b_trans->set_element_ptr(this);
@@ -86,7 +86,7 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
     trial_local_deformation = current_local_deformation.zeros(6);
     trial_local_resistance = current_local_resistance.zeros(6);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int F31::update_status() {

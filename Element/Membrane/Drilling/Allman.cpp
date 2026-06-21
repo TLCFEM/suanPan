@@ -77,7 +77,7 @@ Allman::Allman(const unsigned T, uvec&& NT, const unsigned MT, const double TH)
     : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH) {}
 
-int Allman::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS Allman::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == mat_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -128,7 +128,7 @@ int Allman::initialize(const shared_ptr<DomainBase>& D) {
         ConstantMass(this);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Allman::update_status() {

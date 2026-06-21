@@ -189,12 +189,12 @@ Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const u
     , section_type(SectionType::D0)
     , dof_identifier(std::move(DI)) { validate(); }
 
-int Element::initialize_base(const shared_ptr<DomainBase>& D) {
+SP_STATUS Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // initialized already, check node validity
     if(node_ptr.size() == num_node) {
         for(const auto& I : node_ptr)
-            if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SUANPAN_FAIL;
-        return SUANPAN_SUCCESS;
+            if(const auto t_node = I.lock(); nullptr == t_node || !t_node->is_active()) return SP_STATUS::FAIL;
+        return SP_STATUS::SUCCESS;
     }
 
     // use node group instead of node
@@ -203,7 +203,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         pool.reserve(node_encoding.n_elem);
         for(const auto I : node_encoding)
             if(D->find<Group>(I)) pool.emplace_back(&D->get<Group>(I)->get_pool());
-            else return SUANPAN_FAIL;
+            else return SP_STATUS::FAIL;
 
         uword counter = 0;
         for(const auto& I : pool) counter += I->size();
@@ -220,7 +220,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     if(0u != use_other) {
         auto& t_element = D->get<Element>(use_other);
 
-        if(!t_element) return SUANPAN_FAIL;
+        if(!t_element) return SP_STATUS::FAIL;
 
         access::rw(num_node) = 1u + t_element->get_node_number();
 
@@ -232,7 +232,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     // first initialization
     access::rw(num_size) = num_node * num_dof;
 
-    if(0u == num_size) return SUANPAN_FAIL;
+    if(0u == num_size) return SP_STATUS::FAIL;
 
     dof_encoding.set_size(num_size);
 
@@ -243,7 +243,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     for(const auto& t_tag : node_encoding) {
         if(!D->find<Node>(t_tag)) {
             suanpan_warning("Element {} disabled as node {} cannot be found.\n", get_tag(), t_tag);
-            return SUANPAN_FAIL;
+            return SP_STATUS::FAIL;
         }
         auto& t_node = D->get<Node>(t_tag);
         node_ptr.emplace_back(t_node);
@@ -251,7 +251,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
     }
     if(inactive) {
         suanpan_warning("Element {} disabled as inactive nodes used.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     for(const auto& t_ptr : node_ptr) t_ptr.lock()->ensure_dof(num_dof, dof_identifier);
@@ -261,7 +261,7 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         for(const auto t_tag : material_tag)
             if(auto& t_material = D->get<Material>(t_tag); nullptr == t_material || !t_material->is_active() || t_material->get_material_type() != MaterialType::DS && t_material->get_material_type() != material_type) {
                 suanpan_warning("Element {} disabled as material {} cannot be found or type mismatch.\n", get_tag(), t_tag);
-                return SUANPAN_FAIL;
+                return SP_STATUS::FAIL;
             }
 
     // check if section models are valid
@@ -269,10 +269,10 @@ int Element::initialize_base(const shared_ptr<DomainBase>& D) {
         for(const auto t_tag : section_tag)
             if(auto& t_section = D->get<Section>(t_tag); nullptr == t_section || !t_section->is_active() || t_section->get_section_type() != section_type) {
                 suanpan_warning("Element {} disabled as section {} cannot be found or type mismatch.\n", get_tag(), t_tag);
-                return SUANPAN_FAIL;
+                return SP_STATUS::FAIL;
             }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 void Element::set_initialized(const bool F) const { access::rw(initialized) = F; }

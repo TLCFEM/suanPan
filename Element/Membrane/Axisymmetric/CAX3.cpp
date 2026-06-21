@@ -24,12 +24,12 @@
 CAX3::CAX3(const unsigned T, uvec&& NT, const unsigned MT, const bool R)
     : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {Node::DOF::RADIAL, Node::DOF::AXIAL}) {}
 
-int CAX3::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CAX3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::A != material_proto->get_plane_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     m_material = material_proto->unique_copy();
@@ -57,7 +57,7 @@ int CAX3::initialize(const shared_ptr<DomainBase>& D) {
 
     // trial_mass = current_mass = initial_mass.zeros(m_size, m_size);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CAX3::update_status() {

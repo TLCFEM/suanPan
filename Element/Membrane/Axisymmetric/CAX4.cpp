@@ -42,12 +42,12 @@ vec CAX4::isoparametric_mapping(const vec& in) {
 CAX4::CAX4(const unsigned T, uvec&& N, const unsigned M, const bool F)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {Node::DOF::RADIAL, Node::DOF::AXIAL}) {}
 
-int CAX4::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CAX4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::A != material_proto->get_plane_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     const auto ele_coor = get_coordinate(2);
@@ -82,7 +82,7 @@ int CAX4::initialize(const shared_ptr<DomainBase>& D) {
 
     // trial_mass = current_mass = initial_mass.zeros(m_size, m_size);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CAX4::update_status() {

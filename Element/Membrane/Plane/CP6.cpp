@@ -39,7 +39,7 @@ CP6::CP6(const unsigned T, uvec&& NT, const unsigned MT, const double TH, const 
     : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, R, {Node::DOF::U1, Node::DOF::U2})
     , thickness(TH) {}
 
-int CP6::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CP6::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
@@ -94,7 +94,7 @@ int CP6::initialize(const shared_ptr<DomainBase>& D) {
             for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CP6::update_status() {

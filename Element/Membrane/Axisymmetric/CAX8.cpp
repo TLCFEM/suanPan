@@ -49,12 +49,12 @@ CAX8::CAX8(const unsigned T, uvec&& N, const unsigned M, const bool R, const boo
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, F, {Node::DOF::RADIAL, Node::DOF::AXIAL})
     , reduced_scheme(R) {}
 
-int CAX8::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS CAX8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     if(PlaneType::A != material_proto->get_plane_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     const auto ele_coor = get_coordinate(m_dof);
@@ -92,7 +92,7 @@ int CAX8::initialize(const shared_ptr<DomainBase>& D) {
 
     // trial_mass = current_mass = initial_mass.zeros(m_size, m_size);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int CAX8::update_status() {

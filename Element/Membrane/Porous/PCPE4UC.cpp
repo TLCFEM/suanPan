@@ -36,18 +36,18 @@ PCPE4UC::PCPE4UC(const unsigned T, uvec&& N, const unsigned MS, const unsigned M
     , alpha(AL)
     , porosity(NN) {}
 
-int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
     auto& s_mat = D->get<Material>(material_tag(0));
     auto& f_mat = D->get<Material>(material_tag(1));
 
     // validate material type
     if(PlaneType::E != s_mat->get_plane_type()) {
         suanpan_error("Only plane strain material for solid phase is supported.\n");
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
     if(MaterialType::DS != f_mat->get_material_type()) {
         suanpan_error("Only isotropic fluid phase is supported.\n");
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     // validate bulk modulus
@@ -56,7 +56,7 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
 
     if(suanpan::approx_equal(ks, 0.) || suanpan::approx_equal(kf, 0.)) {
         suanpan_error("A zero bulk modulus is detected.\n");
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     q = ks * kf / (porosity * ks + (alpha - porosity) * kf);
@@ -108,7 +108,7 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
     initial_mass(s_dof_b, s_dof_b) = initial_mass(s_dof_a, s_dof_a);
     ConstantMass(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int PCPE4UC::update_status() {

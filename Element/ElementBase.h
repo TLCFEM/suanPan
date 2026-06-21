@@ -73,8 +73,8 @@ public:
     explicit ElementBase(const unsigned T)
         : UniqueTag(T) {}
 
-    virtual int initialize_base(const shared_ptr<DomainBase>&) = 0;
-    virtual int initialize(const shared_ptr<DomainBase>&) = 0;
+    virtual SP_STATUS initialize_base(const shared_ptr<DomainBase>&) = 0;
+    virtual SP_STATUS initialize(const shared_ptr<DomainBase>&) = 0;
 
     virtual void set_initialized(bool) const = 0;
     virtual void set_symmetric(bool) const = 0;

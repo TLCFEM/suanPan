@@ -114,7 +114,7 @@ DKT3::DKT3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, cons
     , thickness(TH)
     , num_section_ip(IPN) {}
 
-int DKT3::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS DKT3::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
     auto& ini_stiffness = mat_proto->get_initial_stiffness();
@@ -158,7 +158,7 @@ int DKT3::initialize(const shared_ptr<DomainBase>& D) {
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int DKT3::update_status() {

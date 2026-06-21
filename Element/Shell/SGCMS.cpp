@@ -170,7 +170,7 @@ SGCMS::SGCMS(const unsigned T, uvec&& N, const unsigned M, const double TH, cons
     : ShellBase(T, s_node, s_dof, std::move(N), uvec{M}, NL, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3})
     , thickness(TH) {}
 
-int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
     direction_cosine();
@@ -269,7 +269,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     transform_from_local_to_global(initial_stiffness = reshuffle(NT.t() * HT * NT, p_stiffness, mp_stiffness, pm_stiffness));
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int SGCMS::update_status() {
