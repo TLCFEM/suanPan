@@ -11,6 +11,12 @@ RUN source /opt/intel/oneapi/setvars.sh && \
     make package -j"$(nproc)" && cp suanPan*.rpm / && \
     cd / && rm -r suanPan
 
+WORKDIR /tester
+
+RUN echo -e '#include <mpi.h>\n#include <stdio.h>\n\nint main(int argc, char** argv) {\n    MPI_Init(&argc, &argv);\n    int world_size, world_rank;\n    MPI_Comm_size(MPI_COMM_WORLD, &world_size);\n    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);\n    printf("Hello world from rank %d out of %d processors\\n", world_rank, world_size);\n    MPI_Finalize();\n    return 0;\n}' > mpi_tester.c
+
+RUN source /opt/intel/oneapi/setvars.sh && mpicc mpi_tester.c -o mpi_tester
+
 FROM almalinux:10
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
@@ -30,11 +36,21 @@ RUN dnf install ./suanPan*.rpm -y && rm ./suanPan*.rpm
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
 RUN ln -s /usr/bin/suanPan /usr/bin/sp
 
-RUN useradd runner
-WORKDIR /home/runner
-USER runner
+COPY --from=build /tester/mpi_tester /usr/bin/mpi_tester
 
-RUN mkdir .ssh && \
-    ssh-keygen -t rsa -f .ssh/id_rsa -N "" && \
-    cp .ssh/id_rsa.pub .ssh/authorized_keys && \
-    chmod 700 .ssh && chmod 600 .ssh/*
+RUN ssh-keygen -A
+
+# RUN useradd -m runner
+# USER runner
+
+RUN echo "source /opt/intel/oneapi/setvars.sh > /dev/null 2>&1" >> ~/.bashrc
+
+RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -N "" && \
+    cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys && \
+    echo -e "Host *\n    StrictHostKeyChecking no\n    UserKnownHostsFile /dev/null" > ~/.ssh/config
+
+VOLUME ["/model"]
+
+WORKDIR /model
+
+CMD ["/usr/sbin/sshd", "-D"]
