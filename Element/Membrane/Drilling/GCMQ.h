@@ -60,7 +60,7 @@ class GCMQ final : public SGCMQ {
 public:
     using SGCMQ::SGCMQ;
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
 

@@ -72,7 +72,7 @@ ElementTemplate::ElementTemplate(const unsigned T, uvec&& NT, const unsigned MT,
  * update_status() method with a zero trial displacement to update current
  * stiffness and resistance before running iterations.
  */
-int ElementTemplate::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS ElementTemplate::initialize(const shared_ptr<DomainBase>& D) {
     //! As CPS3 is a constant stress/strain element, one integration point at the
     //! center of the element is enough. Hence we only have one material model
     //! defined. First we get a reference of the Material object from the Domain
@@ -127,7 +127,7 @@ int ElementTemplate::initialize(const shared_ptr<DomainBase>& D) {
     //! indeed remain unchanged for the whole analysis.
     ConstantMass(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 /**

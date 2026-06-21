@@ -166,7 +166,7 @@ SGCMQ::SGCMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, cons
     , objective_length(OL)
     , scheme(IP) {}
 
-int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
     auto& mat_stiff = mat_proto->get_initial_stiffness();
@@ -215,7 +215,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     form_body_force(diff_coor);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int SGCMQ::update_status() {

@@ -53,12 +53,12 @@ public:
         , host_tag(ET)
         , multiplier(P) {}
 
-    int initialize(const shared_ptr<DomainBase>& D) override {
+    SP_STATUS initialize(const shared_ptr<DomainBase>& D) override {
         host_element = D->get<Element>(host_tag);
 
         vec normalised_coor(DIM, fill::zeros);
 
-        if(!host_element->is_active() || host_element->compute_shape_function(normalised_coor, 0).empty()) return SUANPAN_FAIL;
+        if(!host_element->is_active() || host_element->compute_shape_function(normalised_coor, 0).empty()) return SP_STATUS::FAIL;
 
         const auto host_size = host_element->get_node_number();
 
@@ -90,12 +90,12 @@ public:
                 }
                 ConstantStiffness(this);
 
-                return SUANPAN_SUCCESS;
+                return SP_STATUS::SUCCESS;
             }
             normalised_coor += incre;
         }
 
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     int update_status() override {

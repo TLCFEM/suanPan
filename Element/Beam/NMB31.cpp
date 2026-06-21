@@ -26,21 +26,21 @@ NMB31::NMB31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, con
     : SectionNMElement3D(T, b_node, b_dof, std::move(N), uvec{S}, F)
     , orientation_tag(O) {}
 
-int NMB31::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS NMB31::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find_orientation(orientation_tag)) {
         suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->unique_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
     if(Orientation::Type::B3D != b_trans->type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DL or B3DC only.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     b_trans->set_element_ptr(this);
@@ -53,7 +53,7 @@ int NMB31::initialize(const shared_ptr<DomainBase>& D) {
 
     if(const auto linear_density = b_section->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = b_trans->to_global_mass_mat(linear_density);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int NMB31::update_status() {

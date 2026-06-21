@@ -27,7 +27,7 @@ TranslationConnector::TranslationConnector(const unsigned T, uvec&& N, const uns
     , sc(2u == c_dof ? span(4, 5) : span(6, 8))
     , alpha(std::fabs(P)) {}
 
-int TranslationConnector::initialize(const shared_ptr<DomainBase>&) {
+SP_STATUS TranslationConnector::initialize(const shared_ptr<DomainBase>&) {
     const mat coor = get_coordinate(c_dof).t();
     const vec x2x1 = coor.col(1) - coor.col(0);
     const vec x3x1 = coor.col(2) - coor.col(0);
@@ -47,7 +47,7 @@ int TranslationConnector::initialize(const shared_ptr<DomainBase>&) {
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int TranslationConnector::update_status() {

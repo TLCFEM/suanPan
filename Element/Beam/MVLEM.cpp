@@ -45,7 +45,7 @@ MVLEM::MVLEM(const unsigned T, uvec&& NT, const std::vector<double>& B, const st
     }
 }
 
-int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS MVLEM::initialize(const shared_ptr<DomainBase>& D) {
     const auto coor = get_coordinate(2);
 
     // chord vector
@@ -68,7 +68,7 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
     shear_spring = suanpan::unique_copy(D->get<Material>(shear_spring_tag));
     if(MaterialType::D1 != shear_spring->get_material_type()) {
         suanpan_warning("Element {} is assigned with an inconsistent material.\n", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     // form initial stiffness
@@ -110,7 +110,7 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness = trans_mat.t() * initial_stiffness * trans_mat;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int MVLEM::update_status() {

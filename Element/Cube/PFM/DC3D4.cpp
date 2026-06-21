@@ -30,7 +30,7 @@ DC3D4::DC3D4(const unsigned T, uvec&& N, const unsigned M, const double CL, cons
     , monolithic(MN)
     , release_rate(RR) { access::rw(characteristic_length) = CL; }
 
-int DC3D4::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS DC3D4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
     c_material = material_proto->unique_copy();
@@ -62,7 +62,7 @@ int DC3D4::initialize(const shared_ptr<DomainBase>& D) {
 
     ConstantMass(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int DC3D4::update_status() {

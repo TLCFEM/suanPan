@@ -46,14 +46,14 @@ Mass2D::Mass2D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     , magnitude(MA)
     , dof_label(DT - 1) {}
 
-int Mass2D::initialize(const shared_ptr<DomainBase>&) {
+SP_STATUS Mass2D::initialize(const shared_ptr<DomainBase>&) {
     const auto dof_size = get_dof_number();
     initial_mass.zeros(dof_size, dof_size);
     for(const auto I : dof_label) initial_mass(I, I) = magnitude;
 
     ConstantMass(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 Mass3D::Mass3D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
@@ -73,14 +73,14 @@ Mass3D::Mass3D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     , magnitude(MA)
     , dof_label(DT - 1) {}
 
-int Mass3D::initialize(const shared_ptr<DomainBase>&) {
+SP_STATUS Mass3D::initialize(const shared_ptr<DomainBase>&) {
     const auto dof_size = get_dof_number();
     initial_mass.zeros(dof_size, dof_size);
     for(const auto I : dof_label) initial_mass(I, I) = magnitude;
 
     ConstantMass(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 MassPoint2D::MassPoint2D(const unsigned T, const unsigned NT, const double TM)
@@ -93,7 +93,7 @@ MassPoint2D::MassPoint2D(const unsigned T, const unsigned NT, const double TM, c
     , translational_magnitude(TM)
     , rotational_magnitude(RM) {}
 
-int MassPoint2D::initialize(const shared_ptr<DomainBase>&) {
+SP_STATUS MassPoint2D::initialize(const shared_ptr<DomainBase>&) {
     const auto dof_size = get_dof_number();
     initial_mass.zeros(dof_size, dof_size);
     initial_mass.diag().fill(translational_magnitude);
@@ -101,7 +101,7 @@ int MassPoint2D::initialize(const shared_ptr<DomainBase>&) {
 
     ConstantMass(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 MassPoint3D::MassPoint3D(const unsigned T, const unsigned NT, const double TM)
@@ -114,7 +114,7 @@ MassPoint3D::MassPoint3D(const unsigned T, const unsigned NT, const double TM, c
     , translational_magnitude(TM)
     , rotational_magnitude(RM) {}
 
-int MassPoint3D::initialize(const shared_ptr<DomainBase>&) {
+SP_STATUS MassPoint3D::initialize(const shared_ptr<DomainBase>&) {
     const auto dof_size = get_dof_number();
     initial_mass.zeros(dof_size, dof_size);
     initial_mass.diag().fill(translational_magnitude);
@@ -122,5 +122,5 @@ int MassPoint3D::initialize(const shared_ptr<DomainBase>&) {
 
     ConstantMass(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
