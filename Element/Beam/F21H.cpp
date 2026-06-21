@@ -37,7 +37,7 @@ F21H::F21H(const unsigned T, uvec&& N, const unsigned S, const double L, const b
     , hinge_length(L > .5 ? .5 : L)
     , b_trans(F ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
 
-int F21H::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS F21H::initialize(const shared_ptr<DomainBase>& D) {
     auto& section_proto = D->get<Section>(section_tag(0));
 
     b_trans->set_element_ptr(this);
@@ -94,7 +94,7 @@ int F21H::initialize(const shared_ptr<DomainBase>& D) {
     trial_local_deformation = current_local_deformation.zeros(3);
     trial_local_resistance = current_local_resistance.zeros(3);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int F21H::update_status() {

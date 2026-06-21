@@ -28,7 +28,7 @@ EB21::EB21(const unsigned T, uvec&& N, const double A, const double I, const uns
     , moment_inertia(I)
     , b_trans(F ? std::make_unique<B2DC>() : std::make_unique<B2DL>()) {}
 
-int EB21::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS EB21::initialize(const shared_ptr<DomainBase>& D) {
     b_trans->set_element_ptr(this);
 
     b_material = D->get<Material>(material_tag(0))->unique_copy();
@@ -46,7 +46,7 @@ int EB21::initialize(const shared_ptr<DomainBase>& D) {
 
     ConstantMass(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int EB21::update_status() {

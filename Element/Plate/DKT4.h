@@ -69,7 +69,7 @@ public:
         unsigned = 3 // integration points along thickness
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 
     int update_status() override;
     int clear_status() override;

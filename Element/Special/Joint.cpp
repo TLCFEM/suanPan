@@ -24,8 +24,8 @@ Joint::Joint(const unsigned T, uvec&& NT, uvec&& MT)
     : MaterialElement1D(T, j_node, static_cast<unsigned>(MT.n_elem), std::move(NT), std::move(MT), false, {})
     , j_dof(Element::get_dof_number()) {}
 
-int Joint::initialize(const shared_ptr<DomainBase>& D) {
-    if(j_dof != material_tag.n_elem) return SUANPAN_FAIL;
+SP_STATUS Joint::initialize(const shared_ptr<DomainBase>& D) {
+    if(j_dof != material_tag.n_elem) return SP_STATUS::FAIL;
 
     j_material.clear();
     j_material.reserve(j_dof);
@@ -36,7 +36,7 @@ int Joint::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Joint::update_status() {

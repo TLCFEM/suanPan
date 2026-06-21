@@ -87,7 +87,7 @@ public:
         uvec&&    // dof tags
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 };
 
 class Mass3D final : public MassBase {
@@ -103,7 +103,7 @@ public:
         uvec&&    // dof tags
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 };
 
 class MassPoint2D final : public MassBase {
@@ -123,7 +123,7 @@ public:
         double    // rotational magnitude
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 };
 
 class MassPoint3D final : public MassBase {
@@ -143,7 +143,7 @@ public:
         double    // rotational magnitude
     );
 
-    int initialize(const shared_ptr<DomainBase>&) override;
+    SP_STATUS initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

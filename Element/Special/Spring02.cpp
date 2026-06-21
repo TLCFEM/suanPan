@@ -26,7 +26,7 @@ uvec Spring02::JS{2, 3};
 Spring02::Spring02(const unsigned T, uvec&& NT, const unsigned MT)
     : MaterialElement1D(T, s_node, s_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2}) {}
 
-int Spring02::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS Spring02::initialize(const shared_ptr<DomainBase>& D) {
     s_material = suanpan::unique_copy(D->get<Material>(material_tag(0)));
 
     const auto t_coord = get_coordinate(2);
@@ -46,7 +46,7 @@ int Spring02::initialize(const shared_ptr<DomainBase>& D) {
     initial_stiffness(JS, IS) = initial_stiffness(IS, JS);
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Spring02::update_status() {

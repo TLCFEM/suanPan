@@ -145,12 +145,12 @@ Contact3D::Contact3D(const unsigned T, const unsigned M, const unsigned S, const
     , slave_tag(S)
     , alpha(P) {}
 
-int Contact3D::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS Contact3D::initialize(const shared_ptr<DomainBase>& D) {
     const auto& m_pool = D->get<Group>(master_tag)->get_pool();
 
     if(0 != m_pool.n_elem % 3) {
         suanpan_error("Element {} has wrong number of nodes.", get_tag());
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     master.reserve(m_pool.n_elem / 3);
@@ -176,7 +176,7 @@ int Contact3D::initialize(const shared_ptr<DomainBase>& D) {
         span.imbue([&] { return counter++; });
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Contact3D::update_status() {

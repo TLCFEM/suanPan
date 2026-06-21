@@ -43,7 +43,7 @@ Mindlin::Mindlin(const unsigned T, uvec&& NT, const unsigned MT, const double TH
     , thickness(TH)
     , num_section_ip(IPN) {}
 
-int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS Mindlin::initialize(const shared_ptr<DomainBase>& D) {
     auto& mat_proto = D->get<Material>(material_tag(0));
 
     const auto ele_coor = get_coordinate(2);
@@ -53,7 +53,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
     const auto shear_modulus = mat_proto->get(Material::Parameter::SHEAR);
     if(suanpan::approx_equal(shear_modulus, 0.)) {
         suanpan_error("A zero shear modulus is detected.\n");
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     // reduced integration for the Kirchhoff constraint
@@ -101,7 +101,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Mindlin::update_status() {

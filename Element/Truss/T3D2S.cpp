@@ -26,7 +26,7 @@ T3D2S::T3D2S(const unsigned T, uvec&& N, const unsigned M, const bool F, const b
     , t_trans(F ? std::make_unique<T3DC>() : std::make_unique<T3DL>())
     , log_strain(LS) {}
 
-int T3D2S::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS T3D2S::initialize(const shared_ptr<DomainBase>& D) {
     t_trans->set_element_ptr(this);
 
     access::rw(length) = t_trans->get_length();
@@ -37,7 +37,7 @@ int T3D2S::initialize(const shared_ptr<DomainBase>& D) {
 
     if(const auto linear_density = t_section->get_linear_density(); linear_density > 0.) trial_mass = current_mass = initial_mass = t_trans->to_global_mass_mat(linear_density);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int T3D2S::update_status() {

@@ -25,21 +25,21 @@ EB31OS::EB31OS(const unsigned T, uvec&& N, vec&& P, const unsigned O, const bool
     , orientation_tag(O)
     , property(std::move(P)) {}
 
-int EB31OS::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS EB31OS::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find_orientation(orientation_tag)) {
         suanpan_warning("Element {} cannot find the assigned transformation {}.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     b_trans = D->get_orientation(orientation_tag)->unique_copy();
 
     if(b_trans->is_nlgeom() != is_nlgeom()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
     if(Orientation::Type::B3DOS != b_trans->type()) {
         suanpan_warning("Element {} is assigned with an inconsistent transformation {}, use B3DOSL or B3DOSC only.\n", get_tag(), orientation_tag);
-        return SUANPAN_FAIL;
+        return SP_STATUS::FAIL;
     }
 
     b_trans->set_element_ptr(this);
@@ -97,7 +97,7 @@ int EB31OS::initialize(const shared_ptr<DomainBase>& D) {
 
     ConstantStiffness(this);
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int EB31OS::update_status() {

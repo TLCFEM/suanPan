@@ -27,8 +27,8 @@ Damper02::Damper02(const unsigned T, uvec&& NT, const unsigned DT, const unsigne
     , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3})
     , device(std::make_unique<Maxwell>(0, DT, ST, UM, PC, BT)) { modify_viscous = false; }
 
-int Damper02::initialize(const shared_ptr<DomainBase>& D) {
-    if(SUANPAN_SUCCESS != device->initialize_base(D) || SUANPAN_SUCCESS != device->initialize(D)) return SUANPAN_FAIL;
+SP_STATUS Damper02::initialize(const shared_ptr<DomainBase>& D) {
+    if(SUANPAN_SUCCESS != device->initialize_base(D) || SUANPAN_SUCCESS != device->initialize(D)) return SP_STATUS::FAIL;
 
     const mat coord = get_coordinate(d_dof);
 
@@ -55,7 +55,7 @@ int Damper02::initialize(const shared_ptr<DomainBase>& D) {
     trial_viscous = current_viscous = initial_viscous;
     trial_stiffness = current_stiffness = initial_stiffness;
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Damper02::update_status() {

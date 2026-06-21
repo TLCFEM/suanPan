@@ -26,7 +26,7 @@ Damper01::Damper01(const unsigned T, uvec&& NT, const unsigned D, const unsigned
     , IS(3 == d_dof ? uvec{0, 1, 2} : uvec{0, 1})
     , JS(3 == d_dof ? uvec{3, 4, 5} : uvec{2, 3}) { modify_viscous = false; }
 
-int Damper01::initialize(const shared_ptr<DomainBase>& D) {
+SP_STATUS Damper01::initialize(const shared_ptr<DomainBase>& D) {
     damper = D->get<Material>(material_tag(0))->unique_copy();
 
     const mat coord = get_coordinate(d_dof);
@@ -57,7 +57,7 @@ int Damper01::initialize(const shared_ptr<DomainBase>& D) {
         trial_stiffness = current_stiffness = initial_stiffness;
     }
 
-    return SUANPAN_SUCCESS;
+    return SP_STATUS::SUCCESS;
 }
 
 int Damper01::update_status() {
