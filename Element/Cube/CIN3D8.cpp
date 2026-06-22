@@ -191,7 +191,7 @@ int CIN3D8::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * compute_n(I.coor);
         for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
-            for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K = 0; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;

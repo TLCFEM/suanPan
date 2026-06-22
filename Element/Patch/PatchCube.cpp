@@ -43,7 +43,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto ele_coor = get_coordinate(4);
 
-    for(auto I = 0llu; I < prod(net_size); ++I) polygon(I) = ele_coor.row(I).t();
+    for(uword I = 0; I < prod(net_size); ++I) polygon(I) = ele_coor.row(I).t();
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
@@ -91,10 +91,10 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
                     initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
 
                     for(auto M = 0u, N = 0u; M < c_node; ++M, N += c_dof)
-                        for(auto P = 0llu; P < c_dof; ++P) body_force(N + P, P) += c_pt.weight * ders(0, 0, 0)(M);
+                        for(uword P = 0; P < c_dof; ++P) body_force(N + P, P) += c_pt.weight * ders(0, 0, 0)(M);
 
                     if(t_density > 0.)
-                        for(auto M = 0llu; M < c_node; ++M)
+                        for(uword M = 0; M < c_node; ++M)
                             for(auto N = M; N < c_node; ++N) initial_mass(c_dof * M, c_dof * N) += t_density * c_pt.weight * ders(0, 0, 0)(M) * ders(0, 0, 0)(N);
                 }
             }

@@ -27,6 +27,6 @@ void ElementGroup::initialize(const shared_ptr<DomainBase>& D) {
     if(!pool.empty()) return;
 
     const auto& e_pool = D->get_element_pool();
-    pool.set_size(e_pool.size());
+    pool.set_size(static_cast<uword>(e_pool.size()));
     for(uword I = 0; I < pool.n_elem; ++I) pool(I) = e_pool[I]->get_tag();
 }

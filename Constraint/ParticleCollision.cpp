@@ -46,7 +46,7 @@ void ParticleCollision::apply_contact(const shared_ptr<DomainBase>& D, const sha
     const auto force = compute_f(distance);
     {
         std::scoped_lock resistance_lock(resistance_mutex);
-        for(auto I = 0llu; I < unit_chord.n_elem; ++I) {
+        for(uword I = 0; I < unit_chord.n_elem; ++I) {
             resistance(dof_i(I)) += force * unit_chord(I);
             resistance(dof_j(I)) -= force * unit_chord(I);
         }

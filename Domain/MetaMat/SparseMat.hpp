@@ -70,8 +70,8 @@ public:
         if(nullptr == in_mat) return;
         if(!in_mat->triplet_mat.is_empty()) return this->scale_accu(scalar, in_mat->triplet_mat);
         this->factored = false;
-        for(auto I = 0llu; I < in_mat->n_rows; ++I)
-            for(auto J = 0llu; J < in_mat->n_cols; ++J)
+        for(uword I = 0; I < in_mat->n_rows; ++I)
+            for(uword J = 0; J < in_mat->n_cols; ++J)
                 if(const auto t_val = in_mat->operator()(I, J); !suanpan::approx_equal(T(0), t_val)) at(I, J) = scalar * t_val;
     }
 

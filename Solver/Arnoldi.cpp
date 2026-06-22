@@ -60,7 +60,7 @@ int Arnoldi::analyze() {
     t_clock.tic();
     const shared_ptr t_mass = W->get_mass()->unique_copy();
     const auto factor = std::max(datum::eps, 1E-12 * t_mass->max());
-    for(auto I = 0llu; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
+    for(uword I = 0; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
     D->update<Statistics::AssembleMatrix>(t_clock.toc());
 
 #ifdef SUANPAN_DISTRIBUTED

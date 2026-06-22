@@ -695,7 +695,7 @@ template<sp_d T> unsigned Factory<T>::get_size() const { return n_size; }
 
 template<sp_d T> void Factory<T>::set_entry(const uword N) {
     n_elem = N;
-    if(n_elem > std::numeric_limits<la_it>::max()) throw std::invalid_argument("too many elements");
+    if(std::cmp_greater(n_elem, std::numeric_limits<la_it>::max())) throw std::invalid_argument("too many elements");
 }
 
 template<sp_d T> uword Factory<T>::get_entry() const { return n_elem; }
@@ -1452,7 +1452,7 @@ template<sp_d T> void Factory<T>::reset() {
 
 template<sp_d T> void Factory<T>::assemble_vector(const Mat<T>& ER, const uvec& EI, vec& TARGET) {
     if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) TARGET(EI(I)) += ER(I);
+    for(uword I = 0; I < EI.n_elem; ++I) TARGET(EI(I)) += ER(I);
 }
 
 template<sp_d T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_resistance); }
@@ -1469,8 +1469,8 @@ template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>&
     if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type)
         for(const auto [g_row, g_col, l_row, l_col] : MAP) GM->unsafe_at(g_row, g_col) += EM(l_row, l_col);
     else
-        for(auto I = 0llu; I < EI.n_elem; ++I)
-            for(auto J = 0llu; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
+        for(uword I = 0; I < EI.n_elem; ++I)
+            for(uword J = 0; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
 }
 
 template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_mass, EM, EI, MAP); }

@@ -278,7 +278,7 @@ int CP4::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * thickness * compute_shape_function(I.coor, 0);
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-            for(auto K = 0llu; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;
@@ -406,10 +406,10 @@ mat CP4::GetData(const OutputType P) {
     if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
     if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
 
-    mat A(int_pt.size(), 4);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 4);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I = 0; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }

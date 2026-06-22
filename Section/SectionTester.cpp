@@ -73,7 +73,7 @@ mat section_tester(const unique_ptr<Section>& obj, const std::vector<unsigned>& 
 mat section_tester_by_deformation_history(const unique_ptr<Section>& obj, const mat& history) {
     mat response(size(history));
 
-    for(auto I = 0llu; I < history.n_rows; ++I) {
+    for(uword I = 0; I < history.n_rows; ++I) {
         if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
         obj->commit_status();
         response.row(I) = obj->get_current_resistance().t();

@@ -30,8 +30,8 @@ arma::mat generate_points(const unsigned dimension, const std::pair<arma::vec, a
 
     if(2 == dimension) {
         int_pts.set_size(order * order, 3);
-        for(auto i = 0llu; i < order; ++i)
-            for(auto j = 0llu; j < order; ++j) {
+        for(arma::uword i = 0; i < order; ++i)
+            for(arma::uword j = 0; j < order; ++j) {
                 int_pts(counter, 0) = location(i);
                 int_pts(counter, 1) = location(j);
                 int_pts(counter++, 2) = weight(i) * weight(j);
@@ -41,9 +41,9 @@ arma::mat generate_points(const unsigned dimension, const std::pair<arma::vec, a
 
     if(3 == dimension) {
         int_pts.set_size(order * order * order, 4);
-        for(auto i = 0llu; i < order; ++i)
-            for(auto j = 0llu; j < order; ++j)
-                for(auto k = 0llu; k < order; ++k) {
+        for(arma::uword i = 0; i < order; ++i)
+            for(arma::uword j = 0; j < order; ++j)
+                for(arma::uword k = 0; k < order; ++k) {
                     int_pts(counter, 0) = location(i);
                     int_pts(counter, 1) = location(j);
                     int_pts(counter, 2) = location(k);

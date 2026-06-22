@@ -26,18 +26,18 @@ void Contact3D::update_position() {
     for(auto& [node, span, position] : slave) {
         position.zeros(3);
         auto& t_coor = node.lock()->get_coordinate();
-        for(auto K = 0llu; K < std::min(uword{3}, t_coor.n_elem); ++K) position(K) += t_coor(K);
+        for(uword K = 0; K < std::min(uword{3}, t_coor.n_elem); ++K) position(K) += t_coor(K);
         auto& t_disp = node.lock()->get_trial_displacement();
-        for(auto K = 0llu; K < std::min(uword{3}, t_disp.n_elem); ++K) position(K) += t_disp(K);
+        for(uword K = 0; K < std::min(uword{3}, t_disp.n_elem); ++K) position(K) += t_disp(K);
     }
 
     for(auto& [m_node, f_norm, f_area] : master) {
         for(auto& [node, span, position, e_norm] : m_node) {
             position.zeros(3);
             auto& t_coor = node.lock()->get_coordinate();
-            for(auto K = 0llu; K < std::min(uword{3}, t_coor.n_elem); ++K) position(K) += t_coor(K);
+            for(uword K = 0; K < std::min(uword{3}, t_coor.n_elem); ++K) position(K) += t_coor(K);
             auto& t_disp = node.lock()->get_trial_displacement();
-            for(auto K = 0llu; K < std::min(uword{3}, t_disp.n_elem); ++K) position(K) += t_disp(K);
+            for(uword K = 0; K < std::min(uword{3}, t_disp.n_elem); ++K) position(K) += t_disp(K);
         }
 
         constexpr unsigned i = 0, j = 1, k = 2;
@@ -154,7 +154,7 @@ int Contact3D::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     master.reserve(m_pool.n_elem / 3);
-    for(auto I = 0llu, J = 1llu, K = 2llu; K < m_pool.n_elem; I += 3llu, J += 3llu, K += 3llu) master.emplace_back(MasterFacet{{MasterNode{D->get<Node>(m_pool(I)), {}, {}, {}}, MasterNode{D->get<Node>(m_pool(J)), {}, {}, {}}, MasterNode{D->get<Node>(m_pool(K)), {}, {}, {}}}, {}, {}});
+    for(uword I = 0, J = 1, K = 2; K < m_pool.n_elem; I += 3, J += 3, K += 3) master.emplace_back(MasterFacet{{MasterNode{D->get<Node>(m_pool(I)), {}, {}, {}}, MasterNode{D->get<Node>(m_pool(J)), {}, {}, {}}, MasterNode{D->get<Node>(m_pool(K)), {}, {}, {}}}, {}, {}});
 
     master.shrink_to_fit();
 
@@ -163,7 +163,7 @@ int Contact3D::initialize(const shared_ptr<DomainBase>& D) {
     for(auto& I : s_pool) slave.emplace_back(SlaveNode{D->get<Node>(I), {}, {}});
     slave.shrink_to_fit();
 
-    auto counter = 0llu;
+    uword counter{0};
 
     for(auto& [m_node, f_norm, f_area] : master)
         for(auto& [node, span, pos, e_norm] : m_node) {

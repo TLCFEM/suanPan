@@ -69,8 +69,8 @@ int Contact2D::update_status() {
     trial_stiffness.zeros(get_total_number(), get_total_number());
     trial_resistance.zeros(get_total_number());
 
-    for(decltype(master.size()) I = 0; I < master.size() - 1; ++I)
-        for(decltype(slave.size()) J = 0; J < slave.size(); ++J) {
+    for(uword I = 0; I < master.size() - 1; ++I)
+        for(uword J = 0; J < slave.size(); ++J) {
             const vec s = slave[J].position - master[I].position; // 1-3
             const auto tn = dot(s, master[I].axis);               // numerator, 1-2-3
             const auto td = dot(master[I].axis, master[I].axis);  // denominator, 1-2
@@ -80,7 +80,7 @@ int Contact2D::update_status() {
                 const auto span_a = span(K, K + c_dof - 1);
                 K += c_dof;
                 const auto span_b = span(K, K + c_dof - 1);
-                K = c_dof * (master.size() + J);
+                K = c_dof * (static_cast<uword>(master.size()) + J);
                 const auto span_c = span(K, K + c_dof - 1);
 
                 const vec reaction = u * alpha * master[I].norm;

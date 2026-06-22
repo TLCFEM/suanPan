@@ -297,7 +297,7 @@ void Element::update_dof_encoding() {
     dof_mapping.clear();
     dof_mapping.reserve(num_size);
     const uvec dof_index = sort_index(dof_encoding), dof_reordered = dof_encoding(dof_index);
-    for(auto I = 0llu; I < dof_index.n_elem; ++I)
+    for(uword I = 0; I < dof_index.n_elem; ++I)
         for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
     // ReSharper disable once CppUseRangeAlgorithm
     std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
@@ -338,7 +338,7 @@ uvec Element::index_of(const std::vector<Node::DOF>& seed) const {
     std::vector<uword> index;
     for(const auto target : seed)
         // ReSharper disable once CppUseRangeAlgorithm
-        if(const auto pos = std::find(dof_identifier.cbegin(), dof_identifier.cend(), target); pos != dof_identifier.cend()) index.emplace_back(std::distance(dof_identifier.cbegin(), pos));
+        if(const auto pos = std::find(dof_identifier.cbegin(), dof_identifier.cend(), target); pos != dof_identifier.cend()) index.emplace_back(static_cast<uword>(std::distance(dof_identifier.cbegin(), pos)));
     return index;
 }
 

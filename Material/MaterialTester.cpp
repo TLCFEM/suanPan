@@ -237,7 +237,7 @@ namespace {
     mat material_tester_by_strain_history(const unique_ptr<Material>& obj, const mat& history) {
         mat response(size(history));
 
-        for(auto I = 0llu; I < history.n_rows; ++I) {
+        for(uword I = 0; I < history.n_rows; ++I) {
             if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
             obj->commit_status();
             response.row(I) = obj->get_current_stress().t();
@@ -253,7 +253,7 @@ namespace {
     mat material_tester_by_stress_history(const unique_ptr<Material>& obj, const mat& history) {
         mat response(size(history));
 
-        for(auto I = 0llu; I < history.n_rows; ++I) {
+        for(uword I = 0; I < history.n_rows; ++I) {
             auto counter = 0;
             auto flag = false;
             auto strain = obj->get_current_strain();

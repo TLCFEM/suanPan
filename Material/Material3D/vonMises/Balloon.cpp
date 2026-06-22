@@ -24,8 +24,8 @@ const mat Balloon::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 auto Balloon ::compute_isotropic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
-    const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5), bfc.size(), false, true);
-    auto hfc = bfc.empty() ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
+    const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5), static_cast<uword>(bfc.size()), false, true);
+    auto hfc = bfc.empty() ? vec{} : vec(&trial_history(5), static_cast<uword>(bfc.size()), false, true);
 
     const auto kc = 1. - km, dkc = -dkm;
 
@@ -37,7 +37,7 @@ auto Balloon ::compute_isotropic_bound(const double gamma, const double km, cons
 
     auto phfpg = dfm * root_two_third * km, phfpz = dfm * incre_q * dkm;
     const auto pfcpg = dfc * root_two_third * km, pfcpz = dfc * incre_q * dkm;
-    for(auto I = 0llu; I < bfc.size(); ++I) {
+    for(uword I = 0; I < bfc.size(); ++I) {
         const auto bot_fc = 1. + bfc[I].b() * incre_qc;
         hfc(I) = (bfc[I].a() * incre_qc * fc + current_hfc(I)) / bot_fc;
         phfpg += (bfc[I].a() * (fc + gamma * pfcpg) - hfc(I) * bfc[I].b()) * kc * root_two_third / bot_fc;
@@ -54,8 +54,8 @@ auto Balloon ::compute_isotropic_bound(const double gamma, const double km, cons
 auto Balloon ::compute_kinematic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
-    const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
-    auto hac = bac.empty() ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
+    const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5 + static_cast<uword>(bfc.size())), static_cast<uword>(bac.size()), false, true);
+    auto hac = bac.empty() ? vec{} : vec(&trial_history(5 + static_cast<uword>(bfc.size())), static_cast<uword>(bac.size()), false, true);
 
     const auto kc = 1. - km, dkc = -dkm;
 
@@ -67,7 +67,7 @@ auto Balloon ::compute_kinematic_bound(const double gamma, const double km, cons
 
     auto phapg = dam * root_two_third * km, phapz = dam * incre_q * dkm;
     const auto pacpg = dac * root_two_third * km, pacpz = dac * incre_q * dkm;
-    for(auto I = 0llu; I < bac.size(); ++I) {
+    for(uword I = 0; I < bac.size(); ++I) {
         const auto bot_ac = 1. + bac[I].b() * incre_qc;
         hac(I) = (bac[I].a() * incre_qc * ac + current_hac(I)) / bot_ac;
         phapg += (bac[I].a() * (ac + gamma * pacpg) - hac(I) * bac[I].b()) * kc * root_two_third / bot_ac;
@@ -113,8 +113,8 @@ int Balloon::update_trial_status(const vec& t_strain) {
     auto& qm = trial_history(3);
     auto& z = trial_history(4);
 
-    const auto offset_na = 5u + bfc.size() + bac.size();
-    const auto offset_nd = offset_na + 6u * bna.size();
+    const auto offset_na = 5u + static_cast<uword>(bfc.size() + bac.size());
+    const auto offset_nd = offset_na + 6u * static_cast<uword>(bna.size());
 
     const vec trial_s = tensor::dev(trial_stress);
 
@@ -156,9 +156,9 @@ int Balloon::update_trial_status(const vec& t_strain) {
         const auto [ha, phapg, phapz] = compute_kinematic_bound(gamma, km, dkm);
 
         vec6 sum_na(fill::zeros);
-        vec top_na(bna.size(), fill::none), bot_na(bna.size(), fill::none);
+        vec top_na(static_cast<uword>(bna.size()), fill::none), bot_na(static_cast<uword>(bna.size()), fill::none);
         auto dna{0.};
-        for(auto I = 0llu; I < bna.size(); ++I) {
+        for(uword I = 0; I < bna.size(); ++I) {
             top_na(I) = bna[I].a() * incre_q;
             sum_na += vec(&current_history(offset_na + 6u * I), 6, false, true) / (bot_na(I) = 1. + bna[I].b() * incre_q);
             dna += (bna[I].a() - top_na(I) / bot_na(I) * bna[I].b()) / bot_na(I);
@@ -166,9 +166,9 @@ int Balloon::update_trial_status(const vec& t_strain) {
         dna *= root_two_third;
 
         vec6 sum_nd(fill::zeros);
-        vec top_nd(bnd.size(), fill::none), bot_nd(bnd.size(), fill::none);
+        vec top_nd(static_cast<uword>(bnd.size()), fill::none), bot_nd(static_cast<uword>(bnd.size()), fill::none);
         auto dnd{0.};
-        for(auto I = 0llu; I < bnd.size(); ++I) {
+        for(uword I = 0; I < bnd.size(); ++I) {
             top_nd(I) = bnd[I].a() * incre_q;
             sum_nd += vec(&current_history(offset_nd + 6u * I), 6, false, true) / (bot_nd(I) = 1. + bnd[I].b() * incre_q);
             dnd += (bnd[I].a() - top_nd(I) / bot_nd(I) * bnd[I].b()) / bot_nd(I);
@@ -236,16 +236,16 @@ int Balloon::update_trial_status(const vec& t_strain) {
 
         // update history variables
         // they are not used in the state determination algorithm for the current step (but next one)
-        for(auto I = 0llu; I < bna.size(); ++I) vec(&trial_history(offset_na + 6u * I), 6, false, true) = (top_na(I) * n + vec(&current_history(offset_na + 6u * I), 6, false, true)) / bot_na(I);
-        for(auto I = 0llu; I < bnd.size(); ++I) vec(&trial_history(offset_nd + 6u * I), 6, false, true) = (top_nd(I) * n + vec(&current_history(offset_nd + 6u * I), 6, false, true)) / bot_nd(I);
+        for(uword I = 0; I < bna.size(); ++I) vec(&trial_history(offset_na + 6u * I), 6, false, true) = (top_na(I) * n + vec(&current_history(offset_na + 6u * I), 6, false, true)) / bot_na(I);
+        for(uword I = 0; I < bnd.size(); ++I) vec(&trial_history(offset_nd + 6u * I), 6, false, true) = (top_nd(I) * n + vec(&current_history(offset_nd + 6u * I), 6, false, true)) / bot_nd(I);
 
         const vec pzetapz = hf * sum_nd + (z - 1.) * phfpz * sum_nd - phapz * sum_na;
         const vec pzetapg = (z - 1.) * phfpg * sum_nd - phapg * sum_na; // just a part of it
 
         sum_na.zeros();
         sum_nd.zeros();
-        for(auto I = 0llu; I < bna.size(); ++I) sum_na -= bna[I].b() * std::pow(bot_na(I), -2.) * vec(&current_history(offset_na + 6u * I), 6, false, true);
-        for(auto I = 0llu; I < bnd.size(); ++I) sum_nd -= bnd[I].b() * std::pow(bot_nd(I), -2.) * vec(&current_history(offset_nd + 6u * I), 6, false, true);
+        for(uword I = 0; I < bna.size(); ++I) sum_na -= bna[I].b() * std::pow(bot_na(I), -2.) * vec(&current_history(offset_na + 6u * I), 6, false, true);
+        for(uword I = 0; I < bnd.size(); ++I) sum_nd -= bnd[I].b() * std::pow(bot_nd(I), -2.) * vec(&current_history(offset_nd + 6u * I), 6, false, true);
         sum_na *= root_two_third;
         sum_nd *= root_two_third;
 

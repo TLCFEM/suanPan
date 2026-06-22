@@ -266,7 +266,7 @@ public:
     Mat<data_t> operator*(const Col<data_t>& in_mat) const {
         Mat<data_t> out_mat(in_mat.n_rows, in_mat.n_cols, fill::zeros);
 
-        for(index_t I = 0; I < n_elem; ++I) out_mat(row_idx[I]) += val_idx[I] * in_mat(col_idx[I]);
+        for(index_t I = 0; I < n_elem; ++I) out_mat(static_cast<uword>(row_idx[I])) += val_idx[I] * in_mat(static_cast<uword>(col_idx[I]));
 
         return out_mat;
     }
@@ -274,7 +274,7 @@ public:
     Mat<data_t> operator*(const Mat<data_t>& in_mat) const {
         Mat<data_t> out_mat(in_mat.n_rows, in_mat.n_cols, fill::zeros);
 
-        for(index_t I = 0; I < n_elem; ++I) out_mat.row(row_idx[I]) += val_idx[I] * in_mat.row(col_idx[I]);
+        for(index_t I = 0; I < n_elem; ++I) out_mat.row(static_cast<uword>(row_idx[I])) += val_idx[I] * in_mat.row(static_cast<uword>(col_idx[I]));
 
         return out_mat;
     }
@@ -652,9 +652,9 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t>& triplet_form<
 }
 
 template<sp_d data_t, sp_i index_t> Col<data_t> triplet_form<data_t, index_t>::diag() const {
-    Col<data_t> diag_vec(std::min(n_rows, n_cols), fill::zeros);
+    Col<data_t> diag_vec(static_cast<uword>(std::min(n_rows, n_cols)), fill::zeros);
     for(index_t I = 0; I < n_elem; ++I)
-        if(row(I) == col(I)) diag_vec(row(I)) += val(I);
+        if(row(I) == col(I)) diag_vec(static_cast<uword>(row(I))) += val(I);
     return diag_vec;
 }
 

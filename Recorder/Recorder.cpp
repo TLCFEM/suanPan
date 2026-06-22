@@ -25,9 +25,9 @@ extern fs::path SUANPAN_OUTPUT;
 #endif
 
 auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
-    auto cell_size = 0llu, inner_size = 0llu;
+    uword cell_size{0}, inner_size{0};
     for(const auto& inner : container) {
-        if(inner.size() > inner_size) inner_size = inner.size();
+        if(inner.size() > inner_size) inner_size = static_cast<uword>(inner.size());
         for(const auto& item : inner)
             if(item.n_elem > cell_size) cell_size = item.n_elem;
     }
@@ -41,7 +41,7 @@ auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
 }
 
 std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
-    auto max_size = 0llu;
+    uword max_size{0};
     for(const auto& item : container)
         if(item.n_elem > max_size) max_size = item.n_elem;
 
@@ -116,11 +116,11 @@ void Recorder::save() {
 
             const auto [cell_size, cell_num] = normalise_size(object_data);
 
-            mat data_to_write(cell_size * cell_num + 1, object_data.size(), fill::zeros);
+            mat data_to_write(cell_size * cell_num + 1, static_cast<uword>(object_data.size()), fill::zeros);
             data_to_write.row(0) = rowvec{time_pool};
 
-            for(auto J = 0llu; J < data_to_write.n_cols; ++J) {
-                auto row = 1llu;
+            for(uword J = 0; J < data_to_write.n_cols; ++J) {
+                uword row{1};
                 for(auto& block : object_data[J]) {
                     data_to_write(span(row, row + cell_size - 1), J) = block;
                     row += cell_size;
@@ -146,11 +146,11 @@ void Recorder::save() {
 
             const auto [cell_size, cell_num] = normalise_size(object_data);
 
-            mat data_to_write(object_data.size(), cell_size * cell_num + 1, fill::zeros);
+            mat data_to_write(static_cast<uword>(object_data.size()), cell_size * cell_num + 1, fill::zeros);
             data_to_write.col(0) = vec{time_pool};
 
-            for(auto J = 0llu; J < data_to_write.n_rows; ++J) {
-                auto col = 1llu;
+            for(uword J = 0; J < data_to_write.n_rows; ++J) {
+                uword col{1};
                 for(auto& block : object_data[J]) {
                     data_to_write(J, span(col, col + cell_size - 1)) = block.t();
                     col += cell_size;

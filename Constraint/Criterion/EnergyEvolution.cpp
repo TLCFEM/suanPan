@@ -35,7 +35,7 @@ EnergyEvolution::EnergyEvolution(const unsigned T, const unsigned ST, const unsi
 int EnergyEvolution::initialize(const shared_ptr<DomainBase>& D) {
     std::tie(index, map) = D->get_element_connectivity(true);
 
-    energy.zeros(map.size());
+    energy.zeros(static_cast<uword>(map.size()));
 
     return SUANPAN_SUCCESS;
 }
@@ -45,9 +45,9 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
 
     if(20 == balanced_iteration) return SUANPAN_EXIT;
 
-    vec current_energy(map.size());
+    vec current_energy(static_cast<uword>(map.size()));
 
-    Col<int> state(map.size());
+    Col<int> state(static_cast<uword>(map.size()));
 
     suanpan::for_each(current_energy.n_elem, [&](const uword I) {
         if(!D->find<Element>(index[I])) {

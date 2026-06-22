@@ -260,7 +260,7 @@ namespace {
             return;
         }
 
-        auto window_size = 8llu;
+        uword window_size{8u};
         if(!get_optional_input(command, window_size)) {
             suanpan_error("A valid window size is required.\n");
             return;

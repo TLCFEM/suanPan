@@ -54,7 +54,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         }
         else if(is_equal(integrator_type, "RayleighNewmark")) {
             vec p(4, fill::zeros);
-            auto idx = 0llu;
+            uword idx{0};
             while(!command.eof() && idx < p.n_elem)
                 if(!get_input(command, p(idx++))) {
                     suanpan_error("A valid parameter for Rayleigh damping is required.\n");

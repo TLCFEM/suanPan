@@ -56,14 +56,14 @@ void LeeNewmarkIterative::assemble_mass(const uword row_shift, const uword col_s
 
 void LeeNewmarkIterative::assemble_stiffness(const uword row_shift, const uword col_shift, const double scalar) const { assemble(current_stiffness, row_shift, col_shift, scalar); }
 
-void LeeNewmarkIterative::assemble_mass(const std::vector<s64>& row_shift, const std::vector<s64>& col_shift, const std::vector<double>& scalar) const {
+void LeeNewmarkIterative::assemble_mass(const std::vector<sword>& row_shift, const std::vector<sword>& col_shift, const std::vector<double>& scalar) const {
     suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw std::invalid_argument("size mismatch detected"); });
 
     for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I)
         if(row_shift[I] >= 0 && col_shift[I] >= 0) assemble_mass(row_shift[I], col_shift[I], scalar[I]);
 }
 
-void LeeNewmarkIterative::assemble_stiffness(const std::vector<s64>& row_shift, const std::vector<s64>& col_shift, const std::vector<double>& scalar) const {
+void LeeNewmarkIterative::assemble_stiffness(const std::vector<sword>& row_shift, const std::vector<sword>& col_shift, const std::vector<double>& scalar) const {
     suanpan_assert([&] { if(scalar.size() != row_shift.size() || scalar.size() != col_shift.size()) throw std::invalid_argument("size mismatch detected"); });
 
     for(decltype(scalar.size()) I = 0; I < scalar.size(); ++I)
@@ -161,7 +161,7 @@ vec LeeNewmarkIterative::update_by_mode_two(double mass_coef, double stiffness_c
         final_force = damping_force.head(n_block) - current_mass * tmp_b;
     }
     else {
-        const auto J = n_block * npr;
+        const sword J = n_block * npr;
 
         // eq. 81
         assemble_mass({0, J}, {J, 0}, {mass_coef, mass_coef});
@@ -186,7 +186,7 @@ vec LeeNewmarkIterative::update_by_mode_three(double mass_coef, double stiffness
     stiffness_coef *= 1. + gm; // eq. 30
 
     constexpr auto I = 0;
-    const auto J = n_block;
+    const sword J = n_block;
 
     // eq. 87
     assemble_mass({J, I}, {J, I}, {.25 / gm * mass_coef, mass_coef});
@@ -237,7 +237,7 @@ vec LeeNewmarkIterative::update_by_mode_four(const double mass_coef, const doubl
 
     if(0 == npr && 0 == npm) {
         // eq. 100
-        const auto J = static_cast<sword>(n_block) * npl + n_block;
+        const sword J = n_block * npl + n_block;
 
         assemble_mass({0, 0, J, J}, {0, J, 0, J}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s + m_coef_p / bgm});
 
@@ -247,8 +247,8 @@ vec LeeNewmarkIterative::update_by_mode_four(const double mass_coef, const doubl
     }
     else if(0 == npr) {
         // eq. 98
-        const auto J = static_cast<sword>(n_block) * npl + n_block;
-        const auto K = J + static_cast<sword>(n_block) * npk + n_block;
+        const sword J = n_block * npl + n_block;
+        const sword K = J + n_block * npk + n_block;
 
         assemble_mass({0, 0, J, J, J, K}, {0, J, 0, J, K, J}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p, m_coef_p});
 
@@ -258,8 +258,8 @@ vec LeeNewmarkIterative::update_by_mode_four(const double mass_coef, const doubl
     }
     else if(0 == npm) {
         // eq. 97
-        const auto J = static_cast<sword>(n_block) * npr;
-        const auto K = J + static_cast<sword>(n_block) * npl + n_block;
+        const sword J = n_block * npr;
+        const sword K = J + n_block * npl + n_block;
 
         assemble_mass({0, 0, J, K, K}, {J, K, 0, 0, K}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p / bgm});
 
@@ -269,9 +269,9 @@ vec LeeNewmarkIterative::update_by_mode_four(const double mass_coef, const doubl
     }
     else {
         // eq. 84
-        const auto J = static_cast<sword>(n_block) * npr;
-        const auto K = J + static_cast<sword>(n_block) * npl + n_block;
-        const auto L = K + static_cast<sword>(n_block) * npk + n_block;
+        const sword J = n_block * npr;
+        const sword K = J + n_block * npl + n_block;
+        const sword L = K + n_block * npk + n_block;
 
         assemble_mass({0, 0, J, K, K, L}, {J, K, 0, 0, L, K}, {m_coef_s, m_coef_s, m_coef_s, m_coef_s, m_coef_p, m_coef_p});
 

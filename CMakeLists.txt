@@ -326,7 +326,7 @@ if (COMPILER_IDENTIFIER MATCHES "vs")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /EHsc /wd4068 /wd4996")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /EHsc /wd4068 /wd4996 /we4244 /we4267 /we4305")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /nowarn /MP /Qparallel /fpp /names:lowercase /assume:underscore /libs:dll /threads")
     if (SP_ENABLE_64BIT_INDEXING)
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /integer-size:64")

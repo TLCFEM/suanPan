@@ -27,14 +27,14 @@
 uword LeeNewmarkFull::get_amplifier() const {
     // TODO: CHECK ACCURACY
 
-    auto n_size = 2llu;
+    uword n_size{2};
 
     for(const auto& [t, p, zeta, omega] : damping_mode)
-        if(Type::T0 == t) n_size += 5llu;
-        else if(Type::T1 == t) n_size += 5llu + 6llu * static_cast<uword>(p.front());
-        else if(Type::T2 == t) n_size += 4llu + 5llu * static_cast<uword>(.5 * (p(0) + p(1) - 1.));
-        else if(Type::T3 == t) n_size += 9llu;
-        else if(Type::T4 == t) n_size += 2llu * static_cast<uword>(p(0) + p(1) + p(2) + p(3) + 4.);
+        if(Type::T0 == t) n_size += 5u;
+        else if(Type::T1 == t) n_size += 5u + 6u * static_cast<uword>(p.front());
+        else if(Type::T2 == t) n_size += 4u + 5u * static_cast<uword>(.5 * (p(0) + p(1) - 1.));
+        else if(Type::T3 == t) n_size += 9u;
+        else if(Type::T4 == t) n_size += 2u * static_cast<uword>(p(0) + p(1) + p(2) + p(3) + 4.);
 
     return n_size;
 }
@@ -44,14 +44,14 @@ uword LeeNewmarkFull::get_amplifier() const {
  * \return the exact size of final global effective stiffness
  */
 uword LeeNewmarkFull::get_total_size() const {
-    auto n_size = 1llu;
+    uword n_size{1};
 
     for(const auto& [t, p, zeta, omega] : damping_mode)
-        if(Type::T0 == t) n_size += 1llu;
-        else if(Type::T1 == t) n_size += 2llu * static_cast<uword>(p.front()) + 1llu;
-        else if(Type::T2 == t) n_size += static_cast<uword>(p(0) + p(1)) + 1llu;
-        else if(Type::T3 == t) n_size += 2llu;
-        else if(Type::T4 == t) n_size += static_cast<uword>(p(0) + p(1) + p(2) + p(3)) + 2llu;
+        if(Type::T0 == t) n_size += 1u;
+        else if(Type::T1 == t) n_size += 2u * static_cast<uword>(p.front()) + 1u;
+        else if(Type::T2 == t) n_size += static_cast<uword>(p(0) + p(1)) + 1u;
+        else if(Type::T3 == t) n_size += 2u;
+        else if(Type::T4 == t) n_size += static_cast<uword>(p(0) + p(1) + p(2) + p(3)) + 2u;
 
     return n_size * n_block;
 }

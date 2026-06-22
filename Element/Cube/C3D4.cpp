@@ -65,7 +65,7 @@ int C3D4::initialize(const shared_ptr<DomainBase>& D) {
 
     body_force.zeros(c_size, c_dof);
     for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
-        for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) = n(J);
+        for(uword K = 0; K < c_dof; ++K) body_force(L + K, K) = n(J);
 
     return SUANPAN_SUCCESS;
 }

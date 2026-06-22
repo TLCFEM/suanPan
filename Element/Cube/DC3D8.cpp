@@ -160,10 +160,10 @@ mat DC3D8::GetData(const OutputType P) {
 
     if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
 
-    mat A(int_pt.size(), 7);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 7);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I = 0; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].c_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }

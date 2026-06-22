@@ -58,9 +58,9 @@ vec BSplineSurface::evaluate_point(const double u, const double v, const field<v
 
     vec point(dimension, fill::zeros);
 
-    for(auto k = 0llu; k <= p; ++k) {
+    for(uword k = 0; k <= p; ++k) {
         const auto uind = uspan - p + k;
-        for(auto l = 0llu; l <= q; ++l)
+        for(uword l = 0; l <= q; ++l)
             if(const auto vind = vspan - q + l; !polygon(uind, vind).empty()) point += nu(k) * nv(l) * polygon(uind, vind);
     }
 
@@ -87,11 +87,11 @@ field<vec> BSplineSurface::evaluate_point_derivative(const double u, const doubl
     const auto nu = line_u.evaluate_basis_derivative(u, du);
     const auto nv = line_v.evaluate_basis_derivative(v, dv);
 
-    for(auto k = 0; k <= du; ++k)
-        for(auto l = 0; l <= dv; ++l)
-            for(auto r = 0llu; r <= p; ++r) {
+    for(sword k = 0; k <= du; ++k)
+        for(sword l = 0; l <= dv; ++l)
+            for(uword r = 0; r <= p; ++r) {
                 const auto uind = uspan - p + r;
-                for(auto s = 0llu; s <= q; ++s)
+                for(uword s = 0; s <= q; ++s)
                     if(const auto vind = vspan - q + s; !polygon(uind, vind).empty()) point(k, l) += nu(k, r) * nv(l, s) * polygon(uind, vind);
             }
 
@@ -110,9 +110,9 @@ mat BSplineSurface::evaluate_shape_function(const double u, const double v, cons
 
     mat shape(line_u.get_knot().n_elem - p - 1, line_v.get_knot().n_elem - q - 1, fill::zeros);
 
-    for(auto k = 0llu; k <= p; ++k) {
+    for(uword k = 0; k <= p; ++k) {
         const auto uind = uspan - p + k;
-        for(auto l = 0llu; l <= q; ++l) {
+        for(uword l = 0; l <= q; ++l) {
             const auto vind = vspan - q + l;
             shape(uind, vind) = nu(k) * nv(l);
         }
@@ -137,11 +137,11 @@ field<mat> BSplineSurface::evaluate_shape_function_derivative(const double u, co
     field<mat> shape(du + 1, dv + 1);
     shape.for_each([&](mat& t_shape) { t_shape.zeros(line_u.get_knot().n_elem - p - 1, line_v.get_knot().n_elem - q - 1); });
 
-    for(auto i = 0ll; i <= du; ++i)
-        for(auto j = 0ll; j <= dv; ++j)
-            for(auto k = 0llu; k <= p; ++k) {
+    for(sword i = 0; i <= du; ++i)
+        for(sword j = 0; j <= dv; ++j)
+            for(uword k = 0; k <= p; ++k) {
                 const auto uind = uspan - p + k;
-                for(auto l = 0llu; l <= q; ++l) {
+                for(uword l = 0; l <= q; ++l) {
                     const auto vind = vspan - q + l;
                     shape(i, j)(uind, vind) = nu(i, k) * nv(j, l);
                 }

@@ -48,8 +48,8 @@ protected:
     std::unique_ptr<T[]> memory = nullptr;
 
     podarray<float> to_float() {
-        podarray<float> f_memory(this->n_elem);
-        suanpan::for_each(this->n_elem, [&](const auto I) { f_memory(I) = static_cast<float>(memory[I]); });
+        podarray<float> f_memory(static_cast<uword>(this->n_elem));
+        suanpan::for_each(this->n_elem, [&](const auto I) { f_memory(static_cast<uword>(I)) = static_cast<float>(memory[I]); });
         return f_memory;
     }
 
@@ -78,7 +78,7 @@ public:
 
     void zeros() override {
         this->factored = false;
-        arrayops::fill_zeros(memptr(), this->n_elem);
+        arrayops::fill_zeros(memptr(), static_cast<uword>(this->n_elem));
     }
 
     [[nodiscard]] T max() const override {
@@ -98,8 +98,8 @@ public:
         if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw std::invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
         this->factored = false;
-        if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
-        else if(-1. == scalar) arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
+        if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), static_cast<uword>(this->n_elem));
+        else if(-1. == scalar) arrayops::inplace_minus(memptr(), M->memptr(), static_cast<uword>(this->n_elem));
         else suanpan::for_each(this->n_elem, [&](const auto I) { memptr()[I] += scalar * M->memptr()[I]; });
     }
 
@@ -110,16 +110,16 @@ public:
         const auto col = M.col_mem();
         const auto val = M.val_mem();
         if(1. == scalar)
-            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
+            for(std::uint64_t I = 0; I < M.n_elem; ++I) this->at(static_cast<uword>(row[I]), static_cast<uword>(col[I])) += val[I];
         else if(-1. == scalar)
-            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+            for(std::uint64_t I = 0; I < M.n_elem; ++I) this->at(static_cast<uword>(row[I]), static_cast<uword>(col[I])) -= val[I];
         else
-            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += scalar * val[I];
+            for(std::uint64_t I = 0; I < M.n_elem; ++I) this->at(static_cast<uword>(row[I]), static_cast<uword>(col[I])) += scalar * val[I];
     }
 
     void operator*=(const T value) override {
         this->factored = false;
-        arrayops::inplace_mul(memptr(), value, this->n_elem);
+        arrayops::inplace_mul(memptr(), value, static_cast<uword>(this->n_elem));
     }
 
     void allreduce() override {

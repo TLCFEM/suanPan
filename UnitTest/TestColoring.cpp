@@ -15,7 +15,7 @@ auto tiny_graph() {
     return graph;
 }
 
-auto small_graph(const unsigned long long N, const double D) {
+auto small_graph(const unsigned N, const double D) {
     suanpan::graph<unsigned> graph(N);
 
     for(auto I = 0u; I < N; ++I) graph[I].insert(I);
@@ -30,7 +30,7 @@ auto small_graph(const unsigned long long N, const double D) {
     return graph;
 }
 
-auto color_graph(const unsigned long long N, const double D, std::vector<std::vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
+auto color_graph(const unsigned N, const double D, std::vector<std::vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
     const auto graph = small_graph(N, D);
 
     const auto color_map = algorithm(graph);

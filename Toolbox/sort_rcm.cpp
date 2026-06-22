@@ -104,15 +104,15 @@ uvec sort_rcm(const std::vector<uvec>& A, const uvec& E) {
 }
 
 uvec sort_rcm(const std::vector<suanpan::unordered_set<uword>>& adjacency) {
-    const auto dof_size = adjacency.size();
+    const auto dof_size = static_cast<uword>(adjacency.size());
 
     // count number of degree
     uvec num_degree(dof_size, fill::none);
-    suanpan::for_each(dof_size, [&](const size_t I) { num_degree(I) = adjacency[I].size(); });
+    suanpan::for_each(dof_size, [&](const auto I) { num_degree(I) = static_cast<uword>(adjacency[I].size()); });
 
     // sort each column according to its degree
     std::vector<uvec> adjacency_sorted(dof_size);
-    suanpan::for_each(dof_size, [&](const size_t I) {
+    suanpan::for_each(dof_size, [&](const auto I) {
         adjacency_sorted[I] = to_uvec(adjacency[I]);
         auto& t_vec = adjacency_sorted[I];
         std::sort(t_vec.begin(), t_vec.end(), [&](const uword a, const uword b) { return num_degree(a) < num_degree(b); });

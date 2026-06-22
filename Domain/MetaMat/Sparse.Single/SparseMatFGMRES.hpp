@@ -56,7 +56,7 @@ template<sp_d T> int SparseMatFGMRES<T>::direct_solve(Mat<T>& X, const Mat<T>& B
 
     Col<int> info(B.n_cols);
 
-    for(auto I = 0llu; I < B.n_cols; ++I) info[I] = fgmres_solve(csr_mat, precond, X.colptr(I), (double*)B.colptr(I), this->setting.tolerance);
+    for(uword I = 0; I < B.n_cols; ++I) info[I] = fgmres_solve(csr_mat, precond, X.colptr(I), (double*)B.colptr(I), this->setting.tolerance);
 
     return info.min();
 }

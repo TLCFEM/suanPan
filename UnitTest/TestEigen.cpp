@@ -19,12 +19,12 @@ TEST_CASE("Eigensolver", "[Utility.Eigen]") {
 
         auto KK = std::make_shared<FullMat<double>>(D.n_elem, D.n_elem);
 
-        for(auto I = 0llu; I < D.n_elem; ++I)
-            for(auto J = 0llu; J < D.n_elem; ++J) KK->at(J, I) = K(J, I);
+        for(uword I = 0; I < D.n_elem; ++I)
+            for(uword J = 0; J < D.n_elem; ++J) KK->at(J, I) = K(J, I);
 
         auto MM = std::make_shared<FullMat<double>>(D.n_elem, D.n_elem);
 
-        for(auto I = 0llu; I < D.n_elem; ++I) MM->at(I, I) = M(I, I);
+        for(uword I = 0; I < D.n_elem; ++I) MM->at(I, I) = M(I, I);
 
         vec eigval;
         mat eigvec;

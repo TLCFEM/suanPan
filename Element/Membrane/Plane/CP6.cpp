@@ -91,7 +91,7 @@ int CP6::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const rowvec n_int = I.weight * shape::triangle(I.coor, 0) * inv_coor;
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-            for(auto K = 0llu; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;

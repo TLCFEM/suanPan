@@ -278,10 +278,10 @@ mat GCMQ::GetData(const OutputType P) {
         return t_strain;
     }
 
-    mat A(int_pt.size(), 9);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 9);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I = 0; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }

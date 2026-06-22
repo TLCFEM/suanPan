@@ -36,22 +36,22 @@ void TabularSpline::initialize(const shared_ptr<DomainBase>& D) {
     dy = diff(magnitude);
 
     const auto np = time.n_elem;
-    const auto n = np - 1llu;
-    const auto nm = n - 1llu;
+    const auto n = np - 1u;
+    const auto nm = n - 1u;
 
     BandMat<double> system(np, 1, 1);
 
-    suanpan::for_each(np, [&](const uword I) { system.at(I, I) = 2.; });
+    suanpan::for_each(np, [&](const auto I) { system.at(I, I) = 2.; });
 
-    system.at(0llu, 1llu) = 1.;
+    system.at(0u, 1u) = 1.;
     system.at(n, nm) = 1.;
 
     vec b(np, fill::none);
     b(0) = dy(0) / dt(0) / dt(0);
     b(n) = -dy(nm) / dt(nm) / dt(nm);
 
-    suanpan::for_each(1llu, n, [&](const uword I) {
-        const auto J = I - 1llu, K = I + 1llu;
+    suanpan::for_each(uword{1u}, n, [&](const auto I) {
+        const auto J = I - 1u, K = I + 1u;
         const auto denom = time(K) - time(J);
         const auto mu = dt(J) / denom;
         system.at(I, J) = mu;
@@ -72,8 +72,8 @@ double TabularSpline::get_amplitude(const double T) {
 
     if(step_time >= time.back()) return magnitude.back();
 
-    const auto I = std::distance(time.cbegin(), std::lower_bound(time.cbegin(), time.cend(), step_time));
-    const auto J = I - 1;
+    const auto I = static_cast<uword>(std::distance(time.cbegin(), std::lower_bound(time.cbegin(), time.cend(), step_time)));
+    const auto J = I - 1u;
 
     double y = (m(J) * pow(time(I) - step_time, 3.) + m(I) * pow(step_time - time(J), 3.)) / dt(J);
     y += (magnitude(J) / dt(J) - m(J) * dt(J)) * (time(I) - step_time);

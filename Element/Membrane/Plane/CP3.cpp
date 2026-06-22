@@ -188,7 +188,7 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
     body_force.zeros(m_size, m_dof);
     n *= area * thickness;
     for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-        for(auto K = 0llu; K < m_dof; ++K) body_force(L + K, K) = n(J);
+        for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) = n(J);
 
     return SUANPAN_SUCCESS;
 }

@@ -18,7 +18,7 @@
 #include "BSpline.h"
 
 void IGA::convert_to_weighted(mat& polygon) {
-    for(auto I = 0llu; I < polygon.n_rows - 1; ++I) polygon.row(I) %= polygon.tail_rows(1);
+    for(uword I = 0; I < polygon.n_rows - 1; ++I) polygon.row(I) %= polygon.tail_rows(1);
 }
 
 void IGA::convert_to_weighted(field<vec>& polygon) {
@@ -44,7 +44,7 @@ uvec IGA::compute_all_element_span(const vec& knot) {
     std::vector<uword> span;
     span.reserve(knot.n_elem);
 
-    for(auto I = 0llu, J = 1llu; I < knot.n_elem - 1; ++I, ++J)
+    for(uword I = 0, J = 1; I < knot.n_elem - 1; ++I, ++J)
         if(knot(I) < knot(J)) span.emplace_back(I);
 
     return span;
@@ -105,11 +105,11 @@ vec BSpline::evaluate_basis(const double u, sword p) const {
 
     const auto i = evaluate_span(u);
 
-    for(auto j = 1ll; j < p; ++j) {
+    for(sword j = 1; j < p; ++j) {
         left(j) = u - knot(i + 1 - j);
         right(j) = knot(i + j) - u;
         basis(j) = 0.;
-        for(auto r = 0ll; r < j; ++r) {
+        for(sword r = 0; r < j; ++r) {
             const auto &c_right = right(r + 1), &c_left = left(j - r);
             const auto factor = basis(r) / (c_right + c_left);
             basis(r) = basis(j) + c_right * factor;
@@ -140,11 +140,11 @@ mat BSpline::evaluate_basis_derivative(const double u, sword n, sword p) const {
     vec left(pp), right(pp);
 
     ndu(0, 0) = 1.;
-    for(auto j = 1ll; j <= p; ++j) {
+    for(sword j = 1; j <= p; ++j) {
         left(j) = u - knot(i + 1 - j);
         right(j) = knot(i + j) - u;
         ndu(j, j) = 0.;
-        for(auto r = 0ll; r < j; ++r) {
+        for(sword r = 0; r < j; ++r) {
             const auto &c_right = right(r + 1), &c_left = left(j - r);
             ndu(j, r) = c_right + c_left;
             const auto factor = ndu(r, j - 1) / ndu(j, r);
@@ -153,16 +153,16 @@ mat BSpline::evaluate_basis_derivative(const double u, sword n, sword p) const {
         }
     }
 
-    for(auto j = 0; j <= p; ++j) ders(0, j) = ndu(j, p);
+    for(sword j = 0; j <= p; ++j) ders(0, j) = ndu(j, p);
 
-    for(auto r = 0ll; r <= p; ++r) {
+    for(sword r = 0; r <= p; ++r) {
         // do not optimise due to swap
         // ReSharper disable once CppTooWideScope
         auto s1 = 0;
         // ReSharper disable once CppTooWideScope
         auto s2 = 1;
         a(0, 0) = 1.;
-        for(auto k = 1ll; k <= n; ++k) {
+        for(sword k = 1; k <= n; ++k) {
             const auto rk = r - k, pk = p - k;
             auto& d = ders(k, r);
             if(r >= k) d += (a(s2, 0) = a(s1, 0) / ndu(pk + 1, rk)) * ndu(rk, pk);
@@ -173,8 +173,8 @@ mat BSpline::evaluate_basis_derivative(const double u, sword n, sword p) const {
     }
 
     auto r = static_cast<double>(p);
-    for(auto k = 1; k <= n; ++k) {
-        for(auto j = 0; j <= p; ++j) ders(k, j) *= r;
+    for(sword k = 1; k <= n; ++k) {
+        for(sword j = 0; j <= p; ++j) ders(k, j) *= r;
         r *= static_cast<double>(p - k);
     }
 
@@ -203,7 +203,7 @@ vec BSpline::evaluate_point(const double u, const field<vec>& polygon) const {
 
     vec point(dimension, fill::zeros);
 
-    for(auto i = 0llu; i <= order; ++i)
+    for(uword i = 0; i <= order; ++i)
         if(const auto sind = span + i - order; !polygon(sind).empty()) point += basis(i) * polygon(sind);
 
     return point;
@@ -232,8 +232,8 @@ field<vec> BSpline::evaluate_point_derivative(const double u, const field<vec>& 
     const auto span = evaluate_span(u);
     const auto ders = evaluate_basis_derivative(u, du);
 
-    for(auto k = 0ll; k <= du; ++k)
-        for(auto j = 0llu; j <= order; ++j)
+    for(sword k = 0; k <= du; ++k)
+        for(uword j = 0; j <= order; ++j)
             if(const auto sind = span + j - order; !polygon(sind).empty()) point(k) += ders(k, j) * polygon(sind);
 
     return point;
@@ -245,7 +245,7 @@ vec BSpline::evaluate_shape_function(const double u, const field<vec>&) const {
     const auto span = evaluate_span(u);
     const auto basis = evaluate_basis(u);
 
-    for(auto i = 0llu; i <= order; ++i) shape(span + i - order) = basis(i);
+    for(uword i = 0; i <= order; ++i) shape(span + i - order) = basis(i);
 
     return shape;
 }
@@ -259,8 +259,8 @@ field<vec> BSpline::evaluate_shape_function_derivative(const double u, const fie
     const auto span = evaluate_span(u);
     const auto ders = evaluate_basis_derivative(u, du);
 
-    for(auto i = 0ll; i <= du; ++i)
-        for(auto j = 0llu; j <= order; ++j) shape(i)(span + j - order) = ders(i, j);
+    for(sword i = 0; i <= du; ++i)
+        for(uword j = 0; j <= order; ++j) shape(i)(span + j - order) = ders(i, j);
 
     return shape;
 }

@@ -147,8 +147,8 @@ void SGCMQ::form_body_force(const mat& diff_coor) {
         const mat n_translation = I.factor * compute_shape_function(I.coor, 0);
         const mat n_drilling = I.factor * form_drilling_n(I.coor, diff_coor);
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) {
-            for(auto K = 0llu; K < 2llu; ++K) body_force(L + K, K) += n_translation(J);
-            body_force(L + 2llu, 2) += n_drilling(J);
+            for(uword K = 0; K < uword{2}; ++K) body_force(L + K, K) += n_translation(J);
+            body_force(L + 2, 2) += n_drilling(J);
         }
     }
 }
@@ -278,11 +278,11 @@ mat SGCMQ::GetData(const OutputType P) {
     if(OutputType::U == P) return remap(get_current_displacement());
 
     if(P == OutputType::S) {
-        mat B(3 * int_pt.size(), 1);
-        mat A(3 * int_pt.size(), 11);
-        for(unsigned I = 0, J = 0; I < static_cast<unsigned>(int_pt.size()); ++I, J += 3) {
-            B.rows(J, J + 2llu) = int_pt[I].m_material->get_current_stress();
-            A.rows(J, J + 2llu) = shape::stress11(int_pt[I].coor);
+        mat B(3u * static_cast<unsigned>(int_pt.size()), 1);
+        mat A(3u * static_cast<unsigned>(int_pt.size()), 11);
+        for(unsigned I = 0, J = 0; I < static_cast<unsigned>(int_pt.size()); ++I, J += 3u) {
+            B.rows(J, J + 2u) = int_pt[I].m_material->get_current_stress();
+            A.rows(J, J + 2u) = shape::stress11(int_pt[I].coor);
         }
         mat X;
         if(!solve(X, A, B)) return {};
@@ -297,10 +297,10 @@ mat SGCMQ::GetData(const OutputType P) {
         return t_stress;
     }
 
-    mat A(int_pt.size(), 9);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 9);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I = 0; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }

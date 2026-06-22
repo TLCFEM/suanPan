@@ -61,7 +61,7 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
         const mat pn_pxyz = solve(jacob, pn).t();
         mat t_hourglass(c_node, c_node, fill::zeros);
         auto gamma = h_mode;
-        for(auto J = 0llu; J < h_mode.size(); ++J) {
+        for(uword J = 0; J < h_mode.size(); ++J) {
             for(auto I = 0u; I < 3u; ++I) gamma(J) -= dot(h_mode(J), ele_coor.col(I)) * pn_pxyz.col(I);
             t_hourglass += gamma(J) * gamma(J).t();
         }
@@ -104,7 +104,7 @@ int C3D8::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * shape::cube(I.coor, 0, c_node);
         for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
-            for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K = 0; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;
@@ -237,10 +237,10 @@ mat C3D8::GetData(const OutputType P) {
     if(OutputType::V == P) return reshape(get_current_velocity(), c_dof, c_node);
     if(OutputType::U == P) return reshape(get_current_displacement(), c_dof, c_node);
 
-    mat A(int_pt.size(), 7);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 7);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I = 0; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].c_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }
