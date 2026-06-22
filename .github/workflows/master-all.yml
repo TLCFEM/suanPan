@@ -41,6 +41,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
+          -DSP_ENABLE_ARMA_SMALL_MEMORY=ON \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
           -DSP_ENABLE_IOMP=OFF \
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \

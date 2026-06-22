@@ -63,7 +63,6 @@ jobs:
           go build Checker/updater.go
           ./Script/linux-dependency.sh ${{ matrix.os }}
           cmake -S . -B build \
-          -DSP_ENABLE_ARMA_FULLY_DYNAMIC=ON \
           -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
           -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} \
           -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
@@ -72,6 +71,7 @@ jobs:
           -DSP_BUILD_DLL_EXAMPLE=${{ env.COVERAGE }} \
           -DSP_BUILD_PARALLEL=$([[ "${{ matrix.build }}" == "Debug" ]] && echo "OFF" || echo "ON") \
           -DSP_ENABLE_AOCL=${{ matrix.aocl }} \
+          -DSP_ENABLE_ARMA_SMALL_MEMORY=ON \
           -DSP_ENABLE_ASAN=$([[ "${{ env.COVERAGE }}" == "ON" && "${{ matrix.os }}" == *"arm"* ]] && echo "OFF" || echo "ON") \
           -DSP_ENABLE_AVX2=${{ matrix.avx }} \
           -DSP_ENABLE_CODECOV=${{ env.COVERAGE }} \
