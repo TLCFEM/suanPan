@@ -378,6 +378,7 @@ jobs:
           cmake -G "${{ matrix.compiler }}" -T fortran=ifx -S . -B build `
           -DCMAKE_BUILD_TYPE=${{ matrix.build }} `
           -DCMAKE_INSTALL_PREFIX=build/dist `
+          -DSP_ENABLE_ARMA_SMALL_MEMORY=${{ matrix.small_memory }} `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
@@ -411,6 +412,9 @@ jobs:
         compiler:
           - Visual Studio 17 2022
         mkl:
+          - 'OFF'
+        small_memory:
+          - 'ON'
           - 'OFF'
         vtk:
           - 'ON'
