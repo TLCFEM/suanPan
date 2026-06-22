@@ -26,4 +26,5 @@ jobs:
           untagged_only: true
 name: Delete
 'on':
+  workflow_call: null
   workflow_dispatch: null

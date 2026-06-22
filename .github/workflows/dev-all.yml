@@ -9,8 +9,12 @@ env:
 jobs:
   compare:
     needs: linux-dev
-    uses: ./.github/workflows/compare.yml
     secrets: inherit
+    uses: ./.github/workflows/compare.yml
+  delete:
+    needs: linux-dev
+    secrets: inherit
+    uses: ./.github/workflows/delete.yml
   guard:
     if: github.repository == 'TLCFEM/suanPan'
     runs-on: ubuntu-slim
