@@ -18,7 +18,9 @@
 #endif
 
 #ifdef SUANPAN_ARMA_SMALL_MEMORY
+#ifndef SUANSPAN_64BIT_INT
 #define ARMA_32BIT_WORD
+#endif
 #define ARMA_MAT_PREALLOC 0
 #else
 #define ARMA_MAT_PREALLOC 6

@@ -27,6 +27,7 @@ jobs:
           max_attempts: 3
           retry_on: error
           timeout_minutes: 5
+name: Sync
 'on':
   push:
     branches:

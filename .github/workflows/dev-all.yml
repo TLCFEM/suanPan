@@ -15,6 +15,14 @@ jobs:
     needs: linux-dev
     secrets: inherit
     uses: ./.github/workflows/delete.yml
+  flatpak:
+    needs:
+      - linux-dev
+      - macos-dev
+      - windows-dev
+      - windows-gcc-dev
+    secrets: inherit
+    uses: ./.github/workflows/flatpak.yml
   guard:
     if: github.repository == 'TLCFEM/suanPan'
     runs-on: ubuntu-slim

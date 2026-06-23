@@ -38,7 +38,5 @@ jobs:
       - run: echo "Hello, World!"
 name: Flatpak
 'on':
-  push:
-    branches:
-      - dev
+  workflow_call: null
   workflow_dispatch: null
