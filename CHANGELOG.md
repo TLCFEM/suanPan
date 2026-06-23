@@ -9,6 +9,7 @@
 
 1. add global uniform/universal damping models `UDDNewmark` and `UDANewmark`
 2. bump up various dependencies
+3. add `SP_ENABLE_ARMA_SMALL_MEMORY` flag to optimize memory footprint
 
 ## version 4.0
 
