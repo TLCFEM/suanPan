@@ -386,6 +386,19 @@ void print_version() {
                  "OpenBLAS"
 #endif
     );
+    suanpan_info("    The {}-bit indexing is used in Armadillo {} local static stack array.\n",
+#ifdef ARMA_64BIT_WORD
+                 "64",
+#else
+                 "32",
+#endif
+#if ARMA_MAT_PREALLOC == 0
+                 "without"
+#else
+                 "with"
+#endif
+
+    );
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA ({}). https://developer.nvidia.com/about-cuda/\n", CUDA_VERSION);
 #endif
