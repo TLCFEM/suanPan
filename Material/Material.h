@@ -76,23 +76,25 @@ struct DataMaterial {
     const double tolerance = 1E-14;
     const double characteristic_length = -1.;
 
-    vec current_strain{};      // current status
+    vec current_strain{}; // current status
+    vec trial_strain{};   // trial status
+    vec incre_strain{};   // incremental status
+
     vec current_strain_rate{}; // current status
-    vec current_strain_acc{};  // current status
-    vec current_stress{};      // current status
+    vec trial_strain_rate{};   // trial status
+    vec incre_strain_rate{};   // incremental status
+
+    vec current_strain_acc{}; // current status
+    vec trial_strain_acc{};   // trial status
+    vec incre_strain_acc{};   // incremental status
+
+    vec current_stress{}; // current status
+    vec trial_stress{};   // trial status
+    vec incre_stress{};   // incremental status
+
     // vec current_stress_rate{}; // current status
-
-    vec trial_strain{};      // trial status
-    vec trial_strain_rate{}; // trial status
-    vec trial_strain_acc{};  // trial status
-    vec trial_stress{};      // trial status
-    // vec trial_stress_rate{}; // trial status
-
-    vec incre_strain{};      // incremental status
-    vec incre_strain_rate{}; // incremental status
-    vec incre_strain_acc{};  // incremental status
-    vec incre_stress{};      // incremental status
-    // vec incre_stress_rate{}; // incremental status
+    // vec trial_stress_rate{};   // trial status
+    // vec incre_stress_rate{};   // incremental status
 
     vec initial_history{}; // initial status
     vec current_history{}; // current status
