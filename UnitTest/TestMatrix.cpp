@@ -420,7 +420,7 @@ TEST_CASE("Triplet/CSR/CSC Sparse", "[Matrix.Sparse]") {
 
         B.zeros();
 
-        B.assemble(A, linspace<uvec>(0, N - 1llu, N));
+        B.assemble(A, linspace<uvec>(0, N - 1u, N));
 
         csr_form<double, uword> D(B);
         csc_form<double, uword> E(B);

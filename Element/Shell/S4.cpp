@@ -75,7 +75,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     const auto n = shape::quad(t_vec, 0);
     auto pn = shape::quad(t_vec, 1);
     mat jacob = pn * ele_coor, pn_pxy = solve(jacob, pn);
-    mat penalty_mat(2, 3llu * s_node, fill::zeros);
+    mat penalty_mat(2, 3u * s_node, fill::zeros);
     for(unsigned I{0}, J{0}; I < 4; ++I, J += 3) {
         penalty_mat(0, J) = pn_pxy(1, I);
         penalty_mat(1, J) = pn_pxy(0, I);

@@ -86,7 +86,7 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
     energy = (1. - propagation_weight) * energy + propagation_weight * current_energy;
 
     const uvec disabled_list = find(state == 0);
-    if(const auto disabled_size = reactive_ratio * disabled_list.n_elem / 100; disabled_size > 0llu) {
+    if(const auto disabled_size = reactive_ratio * disabled_list.n_elem / 100; disabled_size > 0u) {
         uvec sorted_list = sort_index(energy(disabled_list));
         sorted_list = disabled_list(sorted_list.tail(disabled_size));
         suanpan::for_all(sorted_list, [&](const uword I) {
@@ -96,7 +96,7 @@ int EnergyEvolution::process(const shared_ptr<DomainBase>& D) {
     }
 
     const uvec enabled_list = find(state == 1);
-    if(const auto enabled_size = enabled_list.n_elem - std::min((100 - current_level) * current_energy.n_elem / 100, enabled_list.n_elem); enabled_size > 0llu) {
+    if(const auto enabled_size = enabled_list.n_elem - std::min((100 - current_level) * current_energy.n_elem / 100, enabled_list.n_elem); enabled_size > 0u) {
         uvec sorted_list = sort_index(energy(enabled_list));
         sorted_list = enabled_list(sorted_list.head(enabled_size));
         suanpan::for_all(sorted_list, [&](const uword I) { D->disable_element(index[I]); });

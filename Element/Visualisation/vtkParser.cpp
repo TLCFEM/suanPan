@@ -202,7 +202,7 @@ public:
         grid->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
 
         const mat location = element->GetDeformation(config.scale).resize(3, encoding.n_elem);
-        for(auto I = 0u; I < encoding.n_elem; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), location.colptr(I));
+        for(uword I{0}; I < encoding.n_elem; ++I) node->SetPoint(static_cast<vtkIdType>(encoding(I)), location.colptr(I));
 
         auto result = element->GetData(config.record_type);
         if(result.empty()) return;
@@ -336,7 +336,7 @@ void vtl_cell_multiple_block(const shared_ptr<DomainBase>& domain, vtkInfo&& con
     suanpan::unordered_map<uword, vtkBlock> blocks;
     suanpan::for_all(domain->get_element_pool(), [&](const shared_ptr<Element>& element) {
         auto encoding = element->get_node_encoding();
-        for(auto I = 0llu; I < encoding.n_elem; ++I) encoding(I) = I;
+        for(uword I{0}; I < encoding.n_elem; ++I) encoding(I) = I;
 
         blocks[element->get_tag()].init(static_cast<vtkIdType>(encoding.n_elem), 1, config.category.c_str()).add(element, encoding, config);
     });

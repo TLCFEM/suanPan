@@ -296,7 +296,7 @@ namespace {
         }
 
         auto interval = 0.;
-        if(1llu == motion.n_cols) {
+        if(1u == motion.n_cols) {
             if(!get_input(command, interval) || interval <= 0.) {
                 suanpan_error("A valid sampling interval is required.\n");
                 return;
@@ -340,7 +340,7 @@ namespace {
         }
 
         auto interval = 0.;
-        if(1llu == motion.n_cols) {
+        if(1u == motion.n_cols) {
             if(!get_input(command, interval) || interval <= 0.) {
                 suanpan_error("A valid sampling interval is required.\n");
                 return;

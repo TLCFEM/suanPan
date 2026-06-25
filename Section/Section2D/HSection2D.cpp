@@ -44,7 +44,7 @@ int HSection2D::initialize(const shared_ptr<DomainBase>& D) {
     const IntegrationPlan plan_web(1, 2, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
-    int_pt.reserve(2llu * int_pt_num + 2);
+    int_pt.reserve(2u * int_pt_num + 2);
     int_pt.emplace_back(.5 * plan_web(0, 0) * web_thickness, .5 * plan_web(0, 1) * web_area, mat_proto->unique_copy());
     int_pt.emplace_back(.5 * plan_web(1, 0) * web_thickness, .5 * plan_web(1, 1) * web_area, mat_proto->unique_copy());
     for(unsigned I{0}; I < int_pt_num; ++I) {

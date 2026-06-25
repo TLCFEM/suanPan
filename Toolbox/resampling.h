@@ -136,6 +136,6 @@ template<WindowType T> mat upsampling(const std::string& file_name, const uword 
     return result;
 }
 
-mat upsampling(const std::string&, const std::string&, uword, uword = 8llu);
+mat upsampling(const std::string&, const std::string&, uword, uword = 8u);
 
 #endif

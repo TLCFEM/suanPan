@@ -33,7 +33,7 @@
 
 template<sp_d T> uword round_up(const uword in_size) {
     constexpr auto multiple = 64llu / sizeof(T);
-    return (in_size + multiple - 1llu) / multiple * multiple;
+    return (in_size + multiple - 1u) / multiple * multiple;
 }
 
 template<sp_d T> class DenseMat : public MetaMat<T> {

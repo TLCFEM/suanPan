@@ -595,8 +595,8 @@ template<typename T> Mat<T> shape::plate::triangle(const Col<T>& int_pts, const 
 
     Mat<T> N;
 
-    if(order == 0) N.zeros(1, 3llu * num_node);
-    else if(order == 1) N.zeros(3, 3llu * num_node);
+    if(order == 0) N.zeros(1, 3u * num_node);
+    else if(order == 1) N.zeros(3, 3u * num_node);
     else throw std::invalid_argument("order needs to be either 0 or 1");
 
     Mat<T> TEMP(3, 3);
@@ -674,8 +674,8 @@ template<typename T> Mat<T> shape::plate::triangle(const Col<T>& int_pts, const 
 template<typename T> Mat<T> shape::plate::quad(const Col<T>& int_pts, const unsigned order, const unsigned num_node) {
     Mat<T> N;
 
-    if(order == 0) N.zeros(1, 3llu * num_node);
-    else if(order == 1) N.zeros(2, 6llu * num_node);
+    if(order == 0) N.zeros(1, 3u * num_node);
+    else if(order == 1) N.zeros(2, 6u * num_node);
     else throw std::invalid_argument("order needs to be either 0 or 1");
 
     const auto& X = int_pts(0);

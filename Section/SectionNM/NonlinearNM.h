@@ -48,9 +48,9 @@ protected:
 
     const bool has_kinematic;
 
-    const unsigned n_size;                        // nodal dof size
-    const unsigned d_size = 2llu * n_size - 1llu; // element dof size
-    const unsigned g_size;                        // global jacobian size
+    const unsigned n_size;                    // nodal dof size
+    const unsigned d_size = 2u * n_size - 1u; // element dof size
+    const unsigned g_size;                    // global jacobian size
 
     const uvec ni, nj, ga, gb, gc, gd, ge;
 

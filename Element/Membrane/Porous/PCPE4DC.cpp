@@ -32,7 +32,7 @@ PCPE4DC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<
     : coor(std::move(C))
     , weight(W)
     , m_material(std::move(M))
-    , strain_mat(3, 2llu * m_node, fill::zeros) {}
+    , strain_mat(3, 2u * m_node, fill::zeros) {}
 
 PCPE4DC::PCPE4DC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN, const double KK)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::FU1, Node::DOF::FU2})
@@ -83,7 +83,7 @@ int PCPE4DC::initialize(const shared_ptr<DomainBase>& D) {
     body_force.zeros(m_size, 2);
 
     mat meta_a(m_node, m_node, fill::zeros);
-    mat meta_b(2llu * m_node, 2llu * m_node, fill::zeros);
+    mat meta_b(2u * m_node, 2u * m_node, fill::zeros);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
