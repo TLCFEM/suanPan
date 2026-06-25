@@ -259,12 +259,12 @@ an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) an
 
 ### Automation Related
 
-#### VS Code
+#### VS Code [Recommended]
 
 The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan).
 It provides syntax highlighting, autocompletion, running the model using the specified executable or docker container.
 
-#### Sublime Text
+#### Sublime Text [Deprecated]
 
 On Windows, a batch file named `AddAssociation.bat` is provided in the archive.
 It provides file associations and prepares a proper working environment (build system, autocompletion, highlighting) with [Sublime Text](https://www.sublimetext.com/).
