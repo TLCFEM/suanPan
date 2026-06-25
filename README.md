@@ -59,7 +59,7 @@ The highlights of **suanPan** are
 
 ## Quick Start
 
-Execute the application out-of-the-box in terminal on Linux using one of the following commands depending on how the application is obtained.
+Execute the application out-of-the-box in terminal using one of the following commands depending on how the application is obtained.
 See details below.
 
 ```bash
@@ -69,11 +69,8 @@ See details below.
 suanPan
 # for flatpak
 flatpak run io.github.tlcfem.suanPan
-```
 
-Or on Windows,
-
-```powershell
+# for windows
 # in the folder containing suanPan.exe
 .\suanPan.exe
 ```
