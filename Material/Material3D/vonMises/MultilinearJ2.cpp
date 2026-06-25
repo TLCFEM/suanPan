@@ -18,13 +18,13 @@
 #include "MultilinearJ2.h"
 
 double MultilinearJ2::compute_k(const double p_strain) const {
-    for(unsigned I = 1; I < backbone.n_rows; ++I)
+    for(unsigned I{1}; I < backbone.n_rows; ++I)
         if(p_strain <= backbone(I, 0)) return backbone(I - 1, 1) + backbone(I - 1, 2) * (p_strain - backbone(I - 1, 0));
     return backbone(backbone.n_rows - 1, 1);
 }
 
 double MultilinearJ2::compute_dk(const double p_strain) const {
-    for(unsigned I = 1; I < backbone.n_rows; ++I)
+    for(unsigned I{1}; I < backbone.n_rows; ++I)
         if(p_strain <= backbone(I, 0)) return backbone(I - 1, 2);
     return 0.;
 }
@@ -40,7 +40,7 @@ MultilinearJ2::MultilinearJ2(const unsigned T, const double E, const double V, m
     H.resize(H.n_rows, 3);
     H(H.n_rows - 1, 2) = 0.;
 
-    for(unsigned I = 0; I < H.n_rows - 1; ++I) H(I, 2) = (H(I + 1llu, 1) - H(I, 1)) / (H(I + 1llu, 0) - H(I, 0));
+    for(unsigned I{0}; I < H.n_rows - 1; ++I) H(I, 2) = (H(I + 1u, 1) - H(I, 1)) / (H(I + 1u, 0) - H(I, 0));
 
     access::rw(backbone) = std::move(H);
 }

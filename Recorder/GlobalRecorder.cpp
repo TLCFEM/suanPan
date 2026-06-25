@@ -24,8 +24,8 @@
 void GlobalRecorder::assemble_matrix(const mat& local, const uvec& encoding, mat& global) {
     if(local.is_empty()) return;
 
-    for(unsigned I = 0; I < encoding.n_elem; ++I)
-        for(unsigned J = 0; J < encoding.n_elem; ++J) global(encoding(J), encoding(I)) += local(J, I);
+    for(unsigned I{0}; I < encoding.n_elem; ++I)
+        for(unsigned J{0}; J < encoding.n_elem; ++J) global(encoding(J), encoding(I)) += local(J, I);
 }
 
 void GlobalRecorder::record_impl(const shared_ptr<DomainBase>& D) {

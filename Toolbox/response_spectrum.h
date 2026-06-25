@@ -63,7 +63,7 @@ template<sp_d T> class Oscillator {
         displacement(0) = T(0);
         displacement(1) = b * displacement(0) - motion(0);
 
-        for(uword I = 2, J = 1, K = 0; I < motion.n_elem; ++I, ++J, ++K) displacement(I) = b * displacement(J) - c * displacement(K) - motion(J);
+        for(uword I{2}, J{1}, K{0}; I < motion.n_elem; ++I, ++J, ++K) displacement(I) = b * displacement(J) - c * displacement(K) - motion(J);
 
         const auto n_elem = motion.n_elem - 1;
 

@@ -186,7 +186,7 @@ template<typename T> Mat<T> shape::triangle(const Col<T>& int_pts, const unsigne
 
     if(order != 0 && order != 1) throw std::invalid_argument("order needs to be either 0 or 1");
 
-    N.zeros(order + 1llu, 6);
+    N.zeros(order + 1u, 6);
 
     if(const auto &X = int_pts(0), &Y = int_pts(1); order == 0) {
         N(0, 0) = 1.;
@@ -211,7 +211,7 @@ template<typename T> Mat<T> shape::quad(const Mat<T>& int_pts, const unsigned or
     if(order != 0 && order != 1) throw std::invalid_argument("order needs to be either 0 or 1");
     if(num_node < 4 || num_node > 8) throw std::invalid_argument("number of nodes must between 4 and 8");
 
-    N.zeros(order + 1llu, num_node);
+    N.zeros(order + 1u, num_node);
 
     const auto& X = int_pts(0);
     const auto& Y = int_pts(1);

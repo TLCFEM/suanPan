@@ -119,7 +119,7 @@ void Recorder::save() {
             mat data_to_write(cell_size * cell_num + 1, static_cast<uword>(object_data.size()), fill::zeros);
             data_to_write.row(0) = rowvec{time_pool};
 
-            for(uword J = 0; J < data_to_write.n_cols; ++J) {
+            for(uword J{0}; J < data_to_write.n_cols; ++J) {
                 uword row{1};
                 for(auto& block : object_data[J]) {
                     data_to_write(span(row, row + cell_size - 1), J) = block;
@@ -149,7 +149,7 @@ void Recorder::save() {
             mat data_to_write(static_cast<uword>(object_data.size()), cell_size * cell_num + 1, fill::zeros);
             data_to_write.col(0) = vec{time_pool};
 
-            for(uword J = 0; J < data_to_write.n_rows; ++J) {
+            for(uword J{0}; J < data_to_write.n_rows; ++J) {
                 uword col{1};
                 for(auto& block : object_data[J]) {
                     data_to_write(J, span(col, col + cell_size - 1)) = block.t();

@@ -479,7 +479,7 @@ int LeeNewmarkFull::process_constraint() {
             // make a copy
             auto& t_rabbit = access::rw(rabbit);
             t_rabbit = mat_t(n_block, n_block, t_stiff.n_elem);
-            for(uword I = 0; I < t_triplet.n_elem; ++I) {
+            for(uword I{0}; I < t_triplet.n_elem; ++I) {
                 // quit if current column is beyond the original size of matrix
                 if(col[I] >= n_block) break;
                 // check in left top block of unrolled damping matrix to be used in subsequent iterations

@@ -22,7 +22,7 @@ MultilinearElastic1D::MultilinearElastic1D(const unsigned T, mat&& H, const doub
     if(H.n_cols != 2) throw std::invalid_argument("there should be exact two columns.\n");
     H.resize(H.n_rows, 3);
     H(0, 2) = H(0, 1) / H(0, 0);
-    for(unsigned I = 1; I < H.n_rows; ++I) H(I, 2) = (H(I, 1) - H(I - 1, 1)) / (H(I, 0) - H(I - 1, 0));
+    for(unsigned I{1}; I < H.n_rows; ++I) H(I, 2) = (H(I, 1) - H(I - 1, 1)) / (H(I, 0) - H(I - 1, 0));
     access::rw(backbone) = std::move(H);
 }
 
@@ -42,7 +42,7 @@ int MultilinearElastic1D::update_trial_status(const vec& t_strain) {
     const auto abs_strain = fabs(trial_strain(0));
 
     auto flag = true;
-    for(unsigned I = 0; I < backbone.n_rows; ++I)
+    for(unsigned I{0}; I < backbone.n_rows; ++I)
         if(abs_strain < backbone(I, 0)) {
             trial_stress = backbone(I, 1) + (abs_strain - backbone(I, 0)) * (trial_stiffness = backbone(I, 2));
             flag = false;

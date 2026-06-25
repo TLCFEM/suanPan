@@ -73,7 +73,7 @@ int RestitutionWallPenalty::process(const shared_ptr<DomainBase>& D) {
         const auto next_counter = counter + n_dim;
         stiffness.resize(next_counter, next_counter);
         stiffness.submat(counter, counter, size(n_dim, n_dim)) = factor * outer_norm * outer_norm.t();
-        for(uword J = 0; J < n_dim; ++J) {
+        for(uword J{0}; J < n_dim; ++J) {
             pool.emplace_back(t_dof(J));
             resistance(t_dof(J)) += factor * diff_disp(J);
         }

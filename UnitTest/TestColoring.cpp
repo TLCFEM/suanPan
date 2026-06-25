@@ -40,7 +40,7 @@ auto color_graph(const unsigned N, const double D, std::vector<std::vector<unsig
         number_element += color.size();
         for(auto I = 0llu; I < color.size(); ++I) {
             const auto& target_list = graph[color[I]];
-            for(auto J = I + 1llu; J < color.size(); ++J)
+            for(auto J = I + 1u; J < color.size(); ++J)
                 REQUIRE((target_list.find(color[J]) == target_list.end()));
         }
     }
@@ -58,7 +58,7 @@ TEST_CASE("Coloring Basic", "[Utility.Coloring]") {
         number_element += color.size();
         for(auto I = 0llu; I < color.size(); ++I) {
             const auto& target_list = graph[color[I]];
-            for(auto J = I + 1llu; J < color.size(); ++J)
+            for(auto J = I + 1u; J < color.size(); ++J)
                 REQUIRE((target_list.find(color[J]) == target_list.end()));
         }
     }
@@ -72,7 +72,7 @@ TEST_CASE("Coloring Basic", "[Utility.Coloring]") {
         number_element += color.size();
         for(auto I = 0llu; I < color.size(); ++I) {
             const auto& target_list = graph[color[I]];
-            for(auto J = I + 1llu; J < color.size(); ++J)
+            for(auto J = I + 1u; J < color.size(); ++J)
                 REQUIRE((target_list.find(color[J]) == target_list.end()));
         }
     }

@@ -81,7 +81,7 @@ Mat<double> SimpleScalarExpression::gradient(const Col<double>& in_x) {
 
     x = in_x;
     Col<double> result(x.n_elem);
-    for(uword I = 0; I < x.n_elem; ++I) result(I) = derivative(expression, x(I), 1E-4);
+    for(uword I{0}; I < x.n_elem; ++I) result(I) = derivative(expression, x(I), 1E-4);
     return result;
 }
 

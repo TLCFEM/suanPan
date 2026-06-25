@@ -41,7 +41,7 @@ mat T2DC::to_global_geometry_mat(const mat& l_mat) const {
     auto g_mat = to_global_stiffness_mat(-l_mat);
 
     g_mat.diag() += l_mat(0);
-    for(unsigned I = 0; I < 2; ++I) g_mat(I + 2llu, I) = g_mat(I, I + 2llu) -= l_mat(0);
+    for(unsigned I{0}; I < 2; ++I) g_mat(I + 2u, I) = g_mat(I, I + 2u) -= l_mat(0);
 
     return g_mat;
 }

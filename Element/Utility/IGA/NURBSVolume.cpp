@@ -31,13 +31,13 @@ field<vec> NURBSVolume::evaluate_point_derivative(const double u, const double v
 
     initialize_binomial(d);
 
-    for(sword l = 0; l <= d; ++l) {
-        for(sword m = 0; m <= d; ++m) {
-            for(sword n = 0; n <= d; ++n) {
+    for(sword l{0}; l <= d; ++l) {
+        for(sword m{0}; m <= d; ++m) {
+            for(sword n{0}; n <= d; ++n) {
                 auto& t_ders = ders(l, m, n) = point(l, m, n);
-                for(sword i = 0; i <= l; ++i)
-                    for(sword j = 0; j <= m; ++j)
-                        for(sword k = 0; k <= n; ++k)
+                for(sword i{0}; i <= l; ++i)
+                    for(sword j{0}; j <= m; ++j)
+                        for(sword k{0}; k <= n; ++k)
                             if(i != 0 || j != 0 || k != 0) t_ders -= binomial_mat(l, i) * binomial_mat(m, j) * binomial_mat(n, k) * point(i, j, k).back() * ders(l - i, m - j, n - k);
                 t_ders /= point(0, 0, 0).back();
             }
@@ -54,9 +54,9 @@ cube NURBSVolume::evaluate_shape_function(const double u, const double v, const 
 
     auto sum = 0.;
 
-    for(uword I = 0; I < shape.n_rows; ++I)
-        for(uword J = 0; J < shape.n_cols; ++J)
-            for(uword K = 0; K < shape.n_slices; ++K)
+    for(uword I{0}; I < shape.n_rows; ++I)
+        for(uword J{0}; J < shape.n_cols; ++J)
+            for(uword K{0}; K < shape.n_slices; ++K)
                 if(!polygon(I, J, K).empty()) sum += shape(I, J, K) * polygon(I, J, K).back();
 
     return shape / sum;
@@ -93,34 +93,34 @@ field<cube> NURBSVolume::evaluate_shape_function_derivative(const double u, cons
 
     auto sum = 0.;
 
-    for(uword i = 0; i <= p; ++i) {
+    for(uword i{0}; i <= p; ++i) {
         const auto uind = uspan + i - p;
-        for(uword j = 0; j <= q; ++j) {
+        for(uword j{0}; j <= q; ++j) {
             const auto vind = vspan + j - q;
-            for(uword k = 0; k <= r; ++k)
+            for(uword k{0}; k <= r; ++k)
                 if(const auto wind = wspan + k - r; !polygon(uind, vind, wind).empty()) {
                     sum += uders(0, i) * vders(0, j) * wders(0, k) * polygon(uind, vind, wind).back();
-                    for(sword l = 0; l <= du; ++l)
-                        for(sword m = 0; m <= dv; ++m)
+                    for(sword l{0}; l <= du; ++l)
+                        for(sword m{0}; m <= dv; ++m)
                             for(auto n = 0; n <= dw; ++n) shape(l, m, n)(uind, vind, wind) = uders(l, i) * vders(m, j) * wders(n, k) * polygon(uind, vind, wind).back();
                 }
         }
     }
 
-    for(sword i = 0; i <= du; ++i)
-        for(sword j = 0; j <= dv; ++j)
-            for(sword k = 0; k <= dw; ++k) {
+    for(sword i{0}; i <= du; ++i)
+        for(sword j{0}; j <= dv; ++j)
+            for(sword k{0}; k <= dw; ++k) {
                 auto& t_shape = shape(i, j, k);
-                for(sword l = 0; l <= i; ++l)
-                    for(sword m = 0; m <= j; ++m)
-                        for(sword n = 0; n <= k; ++n)
+                for(sword l{0}; l <= i; ++l)
+                    for(sword m{0}; m <= j; ++m)
+                        for(sword n{0}; n <= k; ++n)
                             if(l != 0 || m != 0 || n != 0) {
                                 auto weight_sum = 0.;
-                                for(uword x = 0; x <= p; ++x) {
+                                for(uword x{0}; x <= p; ++x) {
                                     const auto uind = uspan + x - p;
-                                    for(uword y = 0; y <= q; ++y) {
+                                    for(uword y{0}; y <= q; ++y) {
                                         const auto vind = vspan + y - q;
-                                        for(uword z = 0; z <= r; ++z) {
+                                        for(uword z{0}; z <= r; ++z) {
                                             const auto wind = wspan + z - r;
                                             if(!polygon(uind, vind, wind).empty()) weight_sum += polygon(uind, vind, wind).back() * uders(l, x) * vders(m, y) * wders(n, z);
                                         }

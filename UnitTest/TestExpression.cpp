@@ -28,7 +28,7 @@ TEST_CASE("Simple Scalar Evaluation", "[Utility.Expression]") {
         REQUIRE(expression_copy->evaluate(test_data.col(I)).at(0) == Approx(f));
         const auto df = 2. * (x + y);
         const auto gradient = expression_copy->gradient(test_data.col(I));
-        for(uword J = 0; J < test_data.n_rows; ++J)
+        for(uword J{0}; J < test_data.n_rows; ++J)
             REQUIRE(gradient(J) == Approx(df));
     });
 }
@@ -46,7 +46,7 @@ TEST_CASE("Simple Dot Evaluation", "[Utility.Expression]") {
         const auto f = x + y;
         REQUIRE(expression_copy->evaluate(test_data.col(I)).at(0) == Approx(f));
         const auto gradient = expression_copy->gradient(test_data.col(I));
-        for(uword J = 0; J < test_data.n_rows; ++J)
+        for(uword J{0}; J < test_data.n_rows; ++J)
             REQUIRE(gradient(J) == Approx(1));
     });
 }

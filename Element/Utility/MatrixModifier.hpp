@@ -59,7 +59,7 @@ template<typename T> void suanpan::mass::lumped_simple::apply(Mat<T>& mass) { ma
 template<typename T> void suanpan::mass::lumped_scale::apply(Mat<T>& mass, const unsigned dim) {
     Col<T> diag_mass(mass.n_rows, fill::zeros);
 
-    for(unsigned I = 0; I < dim; ++I) {
+    for(unsigned I{0}; I < dim; ++I) {
         auto total_mass = 0.;
         auto true_mass = 0.;
         for(auto J = I; J < diag_mass.n_elem; J += dim) {

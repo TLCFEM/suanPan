@@ -64,7 +64,7 @@ int CP6::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(3);
     for(auto I = 0; I < 3; ++I) {
-        vec coor{ele_coor(I + 3llu, 1), ele_coor(I + 3llu, 2)};
+        vec coor{ele_coor(I + 3u, 1), ele_coor(I + 3u, 2)};
         int_pt.emplace_back(std::move(coor), area * thickness / 3., material_proto->unique_copy(), shape::triangle(coor, 1) * inv_coor);
 
         const auto& c_pt = int_pt.back();
@@ -91,7 +91,7 @@ int CP6::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const rowvec n_int = I.weight * shape::triangle(I.coor, 0) * inv_coor;
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-            for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;
@@ -109,7 +109,7 @@ int CP6::update_status() {
         mat BN(3, m_size);
         for(const auto& I : int_pt) {
             const mat gradient = ele_disp * I.pn_pxy.t() + eye(m_dof, m_dof);
-            for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+            for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
                 BN(0, K) = I.pn_pxy(0, J) * gradient(0, 0);
                 BN(1, K) = I.pn_pxy(1, J) * gradient(0, 1);
                 BN(0, L) = I.pn_pxy(0, J) * gradient(1, 0);
@@ -124,7 +124,7 @@ int CP6::update_status() {
 
             const auto sigma = tensor::stress::to_tensor(t_stress);
 
-            for(unsigned J = 0, L = 0, M = 1; J < m_node; ++J, L += m_dof, M += m_dof) {
+            for(unsigned J{0}, L{0}, M{1}; J < m_node; ++J, L += m_dof, M += m_dof) {
                 const vec t_vec = sigma * I.pn_pxy.col(J);
                 auto t_factor = I.weight * dot(I.pn_pxy.col(J), t_vec);
                 trial_geometry(L, L) += t_factor;
@@ -145,7 +145,7 @@ int CP6::update_status() {
     else
         for(const auto& I : int_pt) {
             vec t_strain(3, fill::zeros);
-            for(unsigned J = 0; J < m_node; ++J) {
+            for(unsigned J{0}; J < m_node; ++J) {
                 const auto& t_disp = node_ptr[J].lock()->get_trial_displacement();
                 t_strain(0) += t_disp(0) * I.pn_pxy(0, J);
                 t_strain(1) += t_disp(1) * I.pn_pxy(1, J);

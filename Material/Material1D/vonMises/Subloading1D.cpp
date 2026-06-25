@@ -81,13 +81,13 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         const auto [a, da] = kin_bound(q, true);
 
         vec bot_na(static_cast<uword>(b.size()), fill::none), bot_nd(static_cast<uword>(c.size()), fill::none);
-        for(uword I = 0; I < b.size(); ++I) bot_na(I) = 1. + b[I].r() * gamma;
-        for(uword I = 0; I < c.size(); ++I) bot_nd(I) = 1. + c[I].r() * gamma;
+        for(uword I{0}; I < b.size(); ++I) bot_na(I) = 1. + b[I].r() * gamma;
+        for(uword I{0}; I < c.size(); ++I) bot_nd(I) = 1. + c[I].r() * gamma;
 
         const auto n = trial_stress(0) - a * accu(current_na / bot_na) + (z - 1.) * y * accu(current_nd / bot_nd) > 0. ? 1. : -1.;
 
-        for(uword I = 0; I < b.size(); ++I) na(I) = (b[I].rb() * gamma * n + current_na(I)) / bot_na(I);
-        for(uword I = 0; I < c.size(); ++I) nd(I) = (c[I].rb() * gamma * n + current_nd(I)) / bot_nd(I);
+        for(uword I{0}; I < b.size(); ++I) na(I) = (b[I].rb() * gamma * n + current_na(I)) / bot_na(I);
+        for(uword I{0}; I < c.size(); ++I) nd(I) = (c[I].rb() * gamma * n + current_nd(I)) / bot_nd(I);
 
         const auto sum_na = accu(na), sum_nd = accu(nd);
 
@@ -106,8 +106,8 @@ int Subloading1D::update_trial_status(const vec& t_strain) {
         }
 
         auto dna = 0., dnd = 0.;
-        for(uword I = 0; I < b.size(); ++I) dna += b[I].r() * (b[I].b() * n - na[I]) / bot_na[I];
-        for(uword I = 0; I < c.size(); ++I) dnd += c[I].r() * (c[I].b() * n - nd[I]) / bot_nd[I];
+        for(uword I{0}; I < b.size(); ++I) dna += b[I].r() * (b[I].b() * n - na[I]) / bot_na[I];
+        for(uword I{0}; I < c.size(); ++I) dnd += c[I].r() * (c[I].b() * n - nd[I]) / bot_nd[I];
 
         const auto trial_ratio = yield_ratio(z);
         const auto avg_rate = u * trial_ratio[0];

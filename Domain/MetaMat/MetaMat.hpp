@@ -230,8 +230,8 @@ public:
 
 template<sp_d T> Mat<T> to_mat(const MetaMat<T>& in_mat) {
     Mat<T> out_mat(in_mat.n_rows, in_mat.n_cols);
-    for(uword J = 0; J < in_mat.n_cols; ++J)
-        for(uword I = 0; I < in_mat.n_rows; ++I) out_mat(I, J) = in_mat(I, J);
+    for(uword J{0}; J < in_mat.n_cols; ++J)
+        for(uword I{0}; I < in_mat.n_rows; ++I) out_mat(I, J) = in_mat(I, J);
     return out_mat;
 }
 

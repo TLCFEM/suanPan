@@ -50,7 +50,7 @@ int RigidWallMultiplier::process(const shared_ptr<DomainBase>& D) {
         ++counter;
         auxiliary_stiffness.resize(W->get_size(), counter);
         auto& t_dof = I->get_reordered_dof();
-        for(uword J = 0; J < n_dim; ++J) auxiliary_stiffness(t_dof(J), counter - 1) = outer_norm(J);
+        for(uword J{0}; J < n_dim; ++J) auxiliary_stiffness(t_dof(J), counter - 1) = outer_norm(J);
         const auto t_disp = I->get_trial_displacement(n_dim);
         t_resistance.emplace_back(dot(t_disp, outer_norm));
         t_load.emplace_back(-dot(t_pos - t_disp, outer_norm));

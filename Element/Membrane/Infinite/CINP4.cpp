@@ -281,14 +281,14 @@ int CINP4::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const mat jacob = compute_mapping(t_vec) * ele_coor;
         int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->unique_copy(), solve(jacob, compute_dn(t_vec)));
 
         auto& c_pt = int_pt.back();
 
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+        for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
             c_pt.strain_mat(0, K) = c_pt.strain_mat(2, L) = c_pt.pn_pxy(0, J);
             c_pt.strain_mat(2, K) = c_pt.strain_mat(1, L) = c_pt.pn_pxy(1, J);
         }
@@ -307,7 +307,7 @@ int CINP4::update_status() {
 
     for(const auto& I : int_pt) {
         vec t_strain(3, fill::zeros);
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+        for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
             t_strain(0) += t_disp(K) * I.pn_pxy(0, J);
             t_strain(1) += t_disp(L) * I.pn_pxy(1, J);
             t_strain(2) += t_disp(K) * I.pn_pxy(1, J) + t_disp(L) * I.pn_pxy(0, J);

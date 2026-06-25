@@ -47,7 +47,7 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto ele_coor = get_coordinate(3);
 
-    for(uword I = 0; I < prod(net_size); ++I) polygon(I) = ele_coor.row(I).t();
+    for(uword I{0}; I < prod(net_size); ++I) polygon(I) = ele_coor.row(I).t();
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
@@ -86,18 +86,18 @@ int PatchQuad::initialize(const shared_ptr<DomainBase>& D) {
                 auto t_factor = c_pt.weight * thickness;
 
                 c_pt.strain_mat.zeros(3, m_size);
-                for(unsigned L = 0, M = 0, N = 1; L < m_node; ++L, M += m_dof, N += m_dof) {
+                for(unsigned L{0}, M{0}, N{1}; L < m_node; ++L, M += m_dof, N += m_dof) {
                     c_pt.strain_mat(0, M) = c_pt.strain_mat(2, N) = pn_pxy(0, L);
                     c_pt.strain_mat(2, M) = c_pt.strain_mat(1, N) = pn_pxy(1, L);
                 }
                 initial_stiffness += t_factor * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
 
                 for(auto M = 0u, L = 0u; M < m_node; ++M, L += m_dof)
-                    for(uword N = 0; N < m_dof; ++N) body_force(L + N, N) += t_factor * ders(0, 0)(M);
+                    for(uword N{0}; N < m_dof; ++N) body_force(L + N, N) += t_factor * ders(0, 0)(M);
 
                 if(t_density > 0.) {
                     t_factor *= t_density;
-                    for(uword M = 0; M < m_node; ++M)
+                    for(uword M{0}; M < m_node; ++M)
                         for(auto N = M; N < m_node; ++N) initial_mass(m_dof * M, m_dof * N) += t_factor * ders(0, 0)(M) * ders(0, 0)(N);
                 }
             }

@@ -61,7 +61,7 @@ int GQ12::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
@@ -128,7 +128,7 @@ int GQ12::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * compute_shape_function(I.coor, 0);
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-            for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;
@@ -203,7 +203,7 @@ mat GQ12::GetData(const OutputType P) {
     mat A(static_cast<uword>(int_pt.size()), 4);
     mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(uword I = 0; I < int_pt.size(); ++I) {
+    for(uword I{0}; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }

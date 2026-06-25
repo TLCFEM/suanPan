@@ -63,11 +63,11 @@ vec BSplineVolume::evaluate_point(const double u, const double v, const double w
 
     vec point(dimension, fill::zeros);
 
-    for(uword m = 0; m <= r; ++m) {
+    for(uword m{0}; m <= r; ++m) {
         const auto wind = wspan - r + m;
-        for(uword l = 0; l <= q; ++l) {
+        for(uword l{0}; l <= q; ++l) {
             const auto vind = vspan - q + l;
-            for(uword k = 0; k <= p; ++k)
+            for(uword k{0}; k <= p; ++k)
                 if(const auto uind = uspan - p + k; !polygon(uind, vind, wind).empty()) point += nw(m) * nv(l) * nu(k) * polygon(uind, vind, wind);
         }
     }
@@ -96,14 +96,14 @@ field<vec> BSplineVolume::evaluate_point_derivative(const double u, const double
     const auto nv = line_v.evaluate_basis_derivative(v, dv);
     const auto nw = line_w.evaluate_basis_derivative(w, dw);
 
-    for(sword k = 0; k <= du; ++k)
-        for(sword l = 0; l <= dv; ++l)
-            for(sword m = 0; m <= dw; ++m)
-                for(uword a = 0; a <= p; ++a) {
+    for(sword k{0}; k <= du; ++k)
+        for(sword l{0}; l <= dv; ++l)
+            for(sword m{0}; m <= dw; ++m)
+                for(uword a{0}; a <= p; ++a) {
                     const auto uind = uspan - p + a;
-                    for(uword b = 0; b <= q; ++b) {
+                    for(uword b{0}; b <= q; ++b) {
                         const auto vind = vspan - q + b;
-                        for(uword c = 0; c <= r; ++c) {
+                        for(uword c{0}; c <= r; ++c) {
                             const auto wind = wspan - r + c;
                             if(!polygon(uind, vind, wind).empty()) point(k, l, m) += nw(m, c) * nv(l, b) * nu(k, a) * polygon(uind, vind, wind);
                         }
@@ -128,11 +128,11 @@ cube BSplineVolume::evaluate_shape_function(const double u, const double v, cons
 
     cube point(line_u.get_knot().n_elem - p - 1, line_v.get_knot().n_elem - q - 1, line_w.get_knot().n_elem - r - 1, fill::zeros);
 
-    for(uword m = 0; m <= r; ++m) {
+    for(uword m{0}; m <= r; ++m) {
         const auto wind = wspan - r + m;
-        for(uword l = 0; l <= q; ++l) {
+        for(uword l{0}; l <= q; ++l) {
             const auto vind = vspan - q + l;
-            for(uword k = 0; k <= p; ++k) {
+            for(uword k{0}; k <= p; ++k) {
                 const auto uind = uspan - p + k;
                 point(uind, vind, wind) = nw(m) * nv(l) * nu(k);
             }
@@ -163,14 +163,14 @@ field<cube> BSplineVolume::evaluate_shape_function_derivative(const double u, co
 
     point.for_each([&](cube& t_point) { t_point.zeros(line_u.get_knot().n_elem - p - 1, line_v.get_knot().n_elem - q - 1, line_w.get_knot().n_elem - r - 1); });
 
-    for(sword i = 0; i <= du; ++i)
-        for(sword j = 0; j <= dv; ++j)
-            for(sword k = 0; k <= dw; ++k)
-                for(uword a = 0; a <= p; ++a) {
+    for(sword i{0}; i <= du; ++i)
+        for(sword j{0}; j <= dv; ++j)
+            for(sword k{0}; k <= dw; ++k)
+                for(uword a{0}; a <= p; ++a) {
                     const auto uind = uspan - p + a;
-                    for(uword b = 0; b <= q; ++b) {
+                    for(uword b{0}; b <= q; ++b) {
                         const auto vind = vspan - q + b;
-                        for(uword c = 0; c <= r; ++c) {
+                        for(uword c{0}; c <= r; ++c) {
                             const auto wind = wspan - r + c;
                             point(i, j, k)(uind, vind, wind) = nw(k, c) * nv(j, b) * nu(i, a);
                         }

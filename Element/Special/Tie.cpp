@@ -33,7 +33,7 @@ int Tie::initialize(const shared_ptr<DomainBase>&) {
     const auto n_dof = get_dof_number();
 
     t_span.zeros(dof_pool.n_elem);
-    for(uword I = 0, J = 0; I < dof_pool.n_elem; ++I, J += n_dof) t_span(I) = J + dof_pool(I) - 1;
+    for(uword I{0}, J{0}; I < dof_pool.n_elem; ++I, J += n_dof) t_span(I) = J + dof_pool(I) - 1;
 
     initial_stiffness(t_span, t_span) = penalty * weight_pool * weight_pool.t();
     trial_stiffness = current_stiffness = initial_stiffness;

@@ -57,7 +57,7 @@ int CP7::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
@@ -87,7 +87,7 @@ int CP7::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * thickness * compute_shape_function(I.coor, 0);
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-            for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;
@@ -105,7 +105,7 @@ int CP7::update_status() {
         mat BN(3, m_size);
         for(const auto& I : int_pt) {
             const mat gradient = ele_disp * I.pn_pxy.t() + eye(m_dof, m_dof);
-            for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+            for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
                 BN(0, K) = I.pn_pxy(0, J) * gradient(0, 0);
                 BN(1, K) = I.pn_pxy(1, J) * gradient(0, 1);
                 BN(0, L) = I.pn_pxy(0, J) * gradient(1, 0);
@@ -122,7 +122,7 @@ int CP7::update_status() {
 
             const auto sigma = tensor::stress::to_tensor(t_stress);
 
-            for(unsigned J = 0, L = 0, M = 1; J < m_node; ++J, L += m_dof, M += m_dof) {
+            for(unsigned J{0}, L{0}, M{1}; J < m_node; ++J, L += m_dof, M += m_dof) {
                 const vec t_vec = sigma * I.pn_pxy.col(J);
                 auto t_factor = t_weight * dot(I.pn_pxy.col(J), t_vec);
                 trial_geometry(L, L) += t_factor;
@@ -143,7 +143,7 @@ int CP7::update_status() {
     else
         for(const auto& I : int_pt) {
             vec t_strain(3, fill::zeros);
-            for(unsigned J = 0; J < m_node; ++J) {
+            for(unsigned J{0}; J < m_node; ++J) {
                 const auto& t_disp = node_ptr[J].lock()->get_trial_displacement();
                 t_strain(0) += t_disp(0) * I.pn_pxy(0, J);
                 t_strain(1) += t_disp(1) * I.pn_pxy(1, J);

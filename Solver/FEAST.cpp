@@ -317,12 +317,12 @@ int FEAST::quadratic_solve(const shared_ptr<LongFactory>& W) const {
     auto& eigval = W->modify_eigenvalue();
     eigval.set_size(output[2]);
 
-    for(uword I = 0; I < eigval.n_elem; ++I) eigval(I) = E[2 * I];
+    for(uword I{0}; I < eigval.n_elem; ++I) eigval(I) = E[2 * I];
 
     auto& eigvec = W->modify_eigenvector();
     eigvec.resize(N, output[2]);
 
-    for(uword I = 0; I < eigvec.n_elem; ++I) eigvec(I) = X[2 * I];
+    for(uword I{0}; I < eigvec.n_elem; ++I) eigvec(I) = X[2 * I];
 
     return SUANPAN_SUCCESS;
 }

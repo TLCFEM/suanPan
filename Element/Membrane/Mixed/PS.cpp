@@ -71,7 +71,7 @@ int PS::initialize(const shared_ptr<DomainBase>& D) {
     mat H(5, 5, fill::zeros), N(5, 8, fill::zeros);
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
@@ -80,7 +80,7 @@ int PS::initialize(const shared_ptr<DomainBase>& D) {
         auto& c_pt = int_pt.back();
 
         const mat pn_pxy = solve(jacob, pn);
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+        for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
             poly_disp(2, L) = poly_disp(0, K) = pn_pxy(0, J);
             poly_disp(2, K) = poly_disp(1, L) = pn_pxy(1, J);
         }
@@ -119,7 +119,7 @@ int PS::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * compute_shape_function(I.coor, 0);
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-            for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;

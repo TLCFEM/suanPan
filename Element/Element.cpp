@@ -96,9 +96,9 @@ vec Element::get_node_incre_resistance() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_force = node_ptr[I].lock()->get_incre_resistance();
-        for(unsigned J = 0; J < num_dof; ++J) node_incre_resistance(idx++) = t_force(J);
+        for(unsigned J{0}; J < num_dof; ++J) node_incre_resistance(idx++) = t_force(J);
     }
 
     return node_incre_resistance;
@@ -109,9 +109,9 @@ vec Element::get_node_trial_resistance() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_force = node_ptr[I].lock()->get_trial_resistance();
-        for(unsigned J = 0; J < num_dof; ++J) node_trial_resistance(idx++) = t_force(J);
+        for(unsigned J{0}; J < num_dof; ++J) node_trial_resistance(idx++) = t_force(J);
     }
 
     return node_trial_resistance;
@@ -122,9 +122,9 @@ vec Element::get_node_current_resistance() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_force = node_ptr[I].lock()->get_current_resistance();
-        for(unsigned J = 0; J < num_dof; ++J) node_current_resistance(idx++) = t_force(J);
+        for(unsigned J{0}; J < num_dof; ++J) node_current_resistance(idx++) = t_force(J);
     }
 
     return node_current_resistance;
@@ -297,7 +297,7 @@ void Element::update_dof_encoding() {
     dof_mapping.clear();
     dof_mapping.reserve(num_size);
     const uvec dof_index = sort_index(dof_encoding), dof_reordered = dof_encoding(dof_index);
-    for(uword I = 0; I < dof_index.n_elem; ++I)
+    for(uword I{0}; I < dof_index.n_elem; ++I)
         for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
     // ReSharper disable once CppUseRangeAlgorithm
     std::sort(dof_mapping.begin(), dof_mapping.end(), [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
@@ -379,9 +379,9 @@ vec Element::get_incre_displacement() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_disp = node_ptr[I].lock()->get_incre_displacement();
-        for(unsigned J = 0; J < num_dof; ++J) incre_displacement(idx++) = t_disp(J);
+        for(unsigned J{0}; J < num_dof; ++J) incre_displacement(idx++) = t_disp(J);
     }
 
     return incre_displacement;
@@ -392,9 +392,9 @@ vec Element::get_incre_velocity() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_vec = node_ptr[I].lock()->get_incre_velocity();
-        for(unsigned J = 0; J < num_dof; ++J) incre_velocity(idx++) = t_vec(J);
+        for(unsigned J{0}; J < num_dof; ++J) incre_velocity(idx++) = t_vec(J);
     }
 
     return incre_velocity;
@@ -405,9 +405,9 @@ vec Element::get_incre_acceleration() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_acc = node_ptr[I].lock()->get_incre_acceleration();
-        for(unsigned J = 0; J < num_dof; ++J) incre_acceleration(idx++) = t_acc(J);
+        for(unsigned J{0}; J < num_dof; ++J) incre_acceleration(idx++) = t_acc(J);
     }
 
     return incre_acceleration;
@@ -418,9 +418,9 @@ vec Element::get_trial_displacement() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_disp = node_ptr[I].lock()->get_trial_displacement();
-        for(unsigned J = 0; J < num_dof; ++J) trial_displacement(idx++) = t_disp(J);
+        for(unsigned J{0}; J < num_dof; ++J) trial_displacement(idx++) = t_disp(J);
     }
 
     return trial_displacement;
@@ -431,9 +431,9 @@ vec Element::get_trial_velocity() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_vec = node_ptr[I].lock()->get_trial_velocity();
-        for(unsigned J = 0; J < num_dof; ++J) trial_velocity(idx++) = t_vec(J);
+        for(unsigned J{0}; J < num_dof; ++J) trial_velocity(idx++) = t_vec(J);
     }
 
     return trial_velocity;
@@ -444,9 +444,9 @@ vec Element::get_trial_acceleration() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_acc = node_ptr[I].lock()->get_trial_acceleration();
-        for(unsigned J = 0; J < num_dof; ++J) trial_acceleration(idx++) = t_acc(J);
+        for(unsigned J{0}; J < num_dof; ++J) trial_acceleration(idx++) = t_acc(J);
     }
 
     return trial_acceleration;
@@ -457,9 +457,9 @@ vec Element::get_current_displacement() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_disp = node_ptr[I].lock()->get_current_displacement();
-        for(unsigned J = 0; J < num_dof; ++J) current_displacement(idx++) = t_disp(J);
+        for(unsigned J{0}; J < num_dof; ++J) current_displacement(idx++) = t_disp(J);
     }
 
     return current_displacement;
@@ -470,9 +470,9 @@ vec Element::get_current_velocity() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_vec = node_ptr[I].lock()->get_current_velocity();
-        for(unsigned J = 0; J < num_dof; ++J) current_velocity(idx++) = t_vec(J);
+        for(unsigned J{0}; J < num_dof; ++J) current_velocity(idx++) = t_vec(J);
     }
 
     return current_velocity;
@@ -483,9 +483,9 @@ vec Element::get_current_acceleration() const {
 
     auto idx = 0;
 
-    for(unsigned I = 0; I < num_node; ++I) {
+    for(unsigned I{0}; I < num_node; ++I) {
         auto& t_acc = node_ptr[I].lock()->get_current_acceleration();
-        for(unsigned J = 0; J < num_dof; ++J) current_acceleration(idx++) = t_acc(J);
+        for(unsigned J{0}; J < num_dof; ++J) current_acceleration(idx++) = t_acc(J);
     }
 
     return current_acceleration;

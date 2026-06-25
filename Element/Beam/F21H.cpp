@@ -56,7 +56,7 @@ int F21H::initialize(const shared_ptr<DomainBase>& D) {
     // build up the elastic interior
     elastic_int_pt.clear();
     elastic_int_pt.reserve(int_pt_num);
-    for(unsigned I = 0; I < int_pt_num; ++I) {
+    for(unsigned I{0}; I < int_pt_num; ++I) {
         double coor, weight;
         if(I == 0) {
             // left inner Radau point

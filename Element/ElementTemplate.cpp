@@ -88,9 +88,9 @@ int ElementTemplate::initialize(const shared_ptr<DomainBase>& D) {
     //! to FEM textbooks for theories. This will be used for the computation of
     //! the shape function.
     mat ele_coor(m_node, m_node, fill::ones);
-    for(unsigned i = 0; i < m_node; ++i) {
+    for(unsigned i{0}; i < m_node; ++i) {
         auto& tmp_coor = node_ptr[i].lock()->get_coordinate();
-        for(unsigned j = 0; j < m_dof; ++j) ele_coor(i, j + 1llu) = tmp_coor(j);
+        for(unsigned j{0}; j < m_dof; ++j) ele_coor(i, j + 1u) = tmp_coor(j);
     }
 
     //! The area is half of the determinant of the above matrix.
@@ -104,7 +104,7 @@ int ElementTemplate::initialize(const shared_ptr<DomainBase>& D) {
     //! stress/strain element, the derivatives are constants which can be directly
     //! obtained from above matrix.
     strain_mat.zeros(3, m_node * m_dof);
-    for(unsigned i = 0, j = 0, k = 1; i < 3; ++i, j += m_dof, k += m_dof) {
+    for(unsigned i{0}, j{0}, k{1}; i < 3; ++i, j += m_dof, k += m_dof) {
         strain_mat(2, k) = strain_mat(0, j) = inv_coor(1, i);
         strain_mat(2, j) = strain_mat(1, k) = inv_coor(2, i);
     }

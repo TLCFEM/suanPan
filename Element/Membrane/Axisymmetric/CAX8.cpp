@@ -67,7 +67,7 @@ int CAX8::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         const auto& X = plan(I, 0);
         const auto& Y = plan(I, 1);
         vec t_vec{X, Y};
@@ -101,7 +101,7 @@ int CAX8::update_status() {
 
     for(const auto& I : int_pt) {
         vec t_strain(4, fill::zeros);
-        for(unsigned J = 0, K = 0; J < m_node; ++J, K += m_dof) {
+        for(unsigned J{0}, K{0}; J < m_node; ++J, K += m_dof) {
             const auto& t_disp = node_ptr[J].lock()->get_trial_displacement();
             t_strain(0) += t_disp(0) * I.strain_mat(0, K);
             t_strain(1) += t_disp(1) * I.strain_mat(3, K);

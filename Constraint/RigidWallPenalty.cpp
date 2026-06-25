@@ -65,7 +65,7 @@ int RigidWallPenalty::process(const shared_ptr<DomainBase>& D) {
         stiffness.resize(next_counter, next_counter);
         stiffness.submat(counter, counter, size(n_dim, n_dim)) = factor * outer_norm * outer_norm.t();
         auto& t_dof = I->get_reordered_dof();
-        for(uword J = 0; J < n_dim; ++J) {
+        for(uword J{0}; J < n_dim; ++J) {
             pool.emplace_back(t_dof(J));
             resistance(t_dof(J)) += factor * t_pen * outer_norm(J);
         }

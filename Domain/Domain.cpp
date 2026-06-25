@@ -899,7 +899,7 @@ int Domain::reorder_dof() {
 
     // get bandwidth
     auto low_bw = 0, up_bw = 0;
-    for(unsigned i = 0; i < dof_counter; ++i)
+    for(unsigned i{0}; i < dof_counter; ++i)
         for(const auto j : adjacency[idx_rcm(i)]) {
             if(const auto t_bw = static_cast<int>(idx_sorted(j)) - static_cast<int>(i); t_bw > low_bw) low_bw = t_bw;
             else if(t_bw < up_bw) up_bw = t_bw;
@@ -1149,7 +1149,7 @@ int Domain::initialize_reference() {
     factory->set_current_settlement(ref_settlement);
     factory->initialize_load_factor();
     auto& ref_load = factory->modify_reference_load();
-    for(uword I = 0; I < ref_dof.n_elem; ++I) ref_load(ref_dof(I), I) = 1.;
+    for(uword I{0}; I < ref_dof.n_elem; ++I) ref_load(ref_dof(I), I) = 1.;
 
     return SUANPAN_SUCCESS;
 }
@@ -1365,7 +1365,7 @@ void Domain::update_constraint() {
     auto& t_encoding = factory->get_auxiliary_encoding();
     auto& t_lambda = factory->get_auxiliary_lambda();
 
-    for(uword I = 0; I < t_encoding.n_elem;) {
+    for(uword I{0}; I < t_encoding.n_elem;) {
         auto& t_constraint = get<Constraint>(t_encoding(I));
         const auto t_size = t_constraint->get_multiplier_size();
         t_constraint->update_status(t_lambda.subvec(I, I + t_size - 1));

@@ -61,7 +61,7 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto n = compute_shape_function(t_vec, 0);
         const auto pn = compute_shape_function(t_vec, 1);
@@ -80,7 +80,7 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
         const auto& j_s = j_p;
 
         const mat pnpxy = solve(jacob, pn);
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += 2, L += 2) {
+        for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += 2, L += 2) {
             j_q(1, J) = -(j_p(0, L) = l_p(0, K) = l_p(2, L) = pnpxy(0, J));
             j_p(0, K) = -(j_q(0, J) = l_p(2, K) = l_p(1, L) = pnpxy(1, J));
             phi_s(0, K) = phi_s(1, L) = n(J);
@@ -143,7 +143,7 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * compute_shape_function(I.coor, 0);
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-            for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;

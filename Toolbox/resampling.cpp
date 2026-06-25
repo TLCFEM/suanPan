@@ -32,7 +32,7 @@ uword gcd(uword a, uword b) {
 vec cos_window(const uword n, const vec& a) {
     vec h(n);
 
-    for(uword i = 0; i < n; ++i) {
+    for(uword i{0}; i < n; ++i) {
         const auto term = datum::tau * static_cast<double>(i) / (static_cast<double>(n) - 1.);
 
         h(i) = a(0) - a(1) * std::cos(term) + a(2) * std::cos(2. * term) - a(3) * std::cos(3. * term) + a(4) * std::cos(4. * term);
@@ -60,7 +60,7 @@ vec fir_low_pass(const uword s, const double f, vec (*window)(uword)) {
 
     vec b(sp);
 
-    for(uword m = 0; m < sp; ++m) b(m) = f * h(m) * sinc(f * (static_cast<double>(m) - .5 * static_cast<double>(s)));
+    for(uword m{0}; m < sp; ++m) b(m) = f * h(m) * sinc(f * (static_cast<double>(m) - .5 * static_cast<double>(s)));
 
     return b / sum(b);
 }
@@ -74,14 +74,14 @@ vec fir_high_pass(const uword s, const double f, vec (*window)(uword)) {
 
     vec b(sp, fill::none);
 
-    for(uword m = 0; m < sp; ++m) {
+    for(uword m{0}; m < sp; ++m) {
         const auto term = static_cast<double>(m) - .5 * static_cast<double>(s);
         b(m) = h(m) * (sinc(term) - f * sinc(f * term));
     }
 
     vec bb(sp);
-    for(uword i = 0; i < sp; i += 2) bb(i) = b(i);
-    for(uword i = 1; i < sp; i += 2) bb(i) = -b(i);
+    for(uword i{0}; i < sp; i += 2) bb(i) = b(i);
+    for(uword i{1}; i < sp; i += 2) bb(i) = -b(i);
 
     return b / std::abs(sum(bb));
 }
@@ -95,7 +95,7 @@ vec fir_band_pass(const uword s, const double fa, const double fb, vec (*window)
 
     vec b(sp, fill::none);
 
-    for(uword m = 0; m < sp; ++m) {
+    for(uword m{0}; m < sp; ++m) {
         const auto term = static_cast<double>(m) - .5 * static_cast<double>(s);
         b(m) = h(m) * (fb * sinc(fb * term) - fa * sinc(fa * term));
     }
@@ -119,7 +119,7 @@ vec fir_band_stop(const uword s, const double fa, const double fb, vec (*window)
 
     vec b(sp, fill::none);
 
-    for(uword m = 0; m < sp; ++m) {
+    for(uword m{0}; m < sp; ++m) {
         const auto term = static_cast<double>(m) - .5 * static_cast<double>(s);
         b(m) = h(m) * (sinc(term) - fb * sinc(fb * term) + fa * sinc(fa * term));
     }

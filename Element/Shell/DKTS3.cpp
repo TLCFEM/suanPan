@@ -154,8 +154,8 @@ int DKTS3::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(3);
-    for(unsigned I = 0; I < 3; ++I) {
-        int_pt.emplace_back(vec{ele_coor(I + 3llu, 1), ele_coor(I + 3llu, 2)});
+    for(unsigned I{0}; I < 3; ++I) {
+        int_pt.emplace_back(vec{ele_coor(I + 3u, 1), ele_coor(I + 3u, 2)});
 
         auto& m_ip = int_pt.back();
 
@@ -170,7 +170,7 @@ int DKTS3::initialize(const shared_ptr<DomainBase>& D) {
         auto& s_ip = m_ip.sec_int_pt;
         s_ip.clear();
         s_ip.reserve(t_plan.n_rows);
-        for(unsigned J = 0; J < t_plan.n_rows; ++J) {
+        for(unsigned J{0}; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
             s_ip.emplace_back(t_eccentricity, thickness * t_plan(J, 1) * area / 6., mat_proto->unique_copy());
             m_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BM * s_ip.back().factor;
@@ -192,8 +192,8 @@ int DKTS3::update_status() {
     const auto g_disp = get_trial_displacement();
     const auto t_disp = transform_from_global_to_local(g_disp);
     vec9 m_disp, p_disp;
-    for(unsigned I = 0, J = 0; I < s_size; I += s_dof, J += 3) {
-        const span t_span(J, J + 2llu);
+    for(unsigned I{0}, J{0}; I < s_size; I += s_dof, J += 3) {
+        const span t_span(J, J + 2u);
         m_disp(t_span) = t_disp(I + m_dof);
         p_disp(t_span) = t_disp(I + p_dof);
     }

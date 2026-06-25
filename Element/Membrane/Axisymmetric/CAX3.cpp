@@ -48,7 +48,7 @@ int CAX3::initialize(const shared_ptr<DomainBase>& D) {
     access::rw(weight) = 2. * datum::pi * area * r;
 
     strain_mat.zeros(4, m_size);
-    for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+    for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
         strain_mat(0, K) = strain_mat(3, L) = inv_coor(1, J);
         strain_mat(3, K) = strain_mat(1, L) = inv_coor(2, J);
         strain_mat(2, K) = inv_coor(0, J) / r + inv_coor(1, J) + inv_coor(2, J) * z / r;
@@ -62,7 +62,7 @@ int CAX3::initialize(const shared_ptr<DomainBase>& D) {
 
 int CAX3::update_status() {
     vec t_strain(4, fill::zeros);
-    for(unsigned I = 0, J = 0; I < m_node; ++I, J += m_dof) {
+    for(unsigned I{0}, J{0}; I < m_node; ++I, J += m_dof) {
         const auto& t_disp = node_ptr[I].lock()->get_trial_displacement();
         t_strain(0) += t_disp(0) * inv_coor(1, I);
         t_strain(1) += t_disp(1) * inv_coor(2, I);

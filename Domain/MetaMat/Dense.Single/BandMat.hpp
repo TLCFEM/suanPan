@@ -95,7 +95,7 @@ public:
         else neg_diag = [&](const uword i) { return this->s_memory[s_band + i * m_rows] < 0.f; };
 
         auto det_sign = 1;
-        for(unsigned I = 0; I < this->pivot.n_elem; ++I)
+        for(unsigned I{0}; I < this->pivot.n_elem; ++I)
             if(neg_diag(I) ^ (static_cast<int>(I) + 1 != this->pivot(I))) det_sign = -det_sign;
         return det_sign;
     }

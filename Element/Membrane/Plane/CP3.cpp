@@ -166,7 +166,7 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
     pn_pxy = inv_coor.rows(1, 2);
 
     strain_mat.zeros(3, m_size);
-    for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+    for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
         strain_mat(0, K) = strain_mat(2, L) = pn_pxy(0, J);
         strain_mat(2, K) = strain_mat(1, L) = pn_pxy(1, J);
     }
@@ -188,7 +188,7 @@ int CP3::initialize(const shared_ptr<DomainBase>& D) {
     body_force.zeros(m_size, m_dof);
     n *= area * thickness;
     for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
-        for(uword K = 0; K < m_dof; ++K) body_force(L + K, K) = n(J);
+        for(uword K{0}; K < m_dof; ++K) body_force(L + K, K) = n(J);
 
     return SUANPAN_SUCCESS;
 }
@@ -200,7 +200,7 @@ int CP3::update_status() {
         const mat gradient = reshape(get_trial_displacement(), m_dof, m_node) * pn_pxy.t() + eye(m_dof, m_dof);
 
         mat BN(3, m_size);
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+        for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
             BN(0, K) = pn_pxy(0, J) * gradient(0, 0);
             BN(1, K) = pn_pxy(1, J) * gradient(0, 1);
             BN(0, L) = pn_pxy(0, J) * gradient(1, 0);
@@ -214,7 +214,7 @@ int CP3::update_status() {
         auto& t_stress = m_material->get_trial_stress();
 
         const auto sigma = tensor::stress::to_tensor(t_stress);
-        for(unsigned J = 0, L = 0, N = 1; J < m_node; ++J, L += m_dof, N += m_dof) {
+        for(unsigned J{0}, L{0}, N{1}; J < m_node; ++J, L += m_dof, N += m_dof) {
             const vec t_vec = sigma * pn_pxy.col(J);
             trial_geometry(N, N) = trial_geometry(L, L) = area * thickness * dot(pn_pxy.col(J), t_vec);
             for(auto K = J + 1, M = L + m_dof, P = M + 1; K < m_node; ++K, M += m_dof, P += m_dof) trial_geometry(M, L) = trial_geometry(P, N) = trial_geometry(L, M) = trial_geometry(N, P) = area * thickness * dot(pn_pxy.col(K), t_vec);
@@ -225,7 +225,7 @@ int CP3::update_status() {
     }
     else {
         vec t_strain(3, fill::zeros);
-        for(unsigned I = 0; I < m_node; ++I) {
+        for(unsigned I{0}; I < m_node; ++I) {
             const auto& t_disp = node_ptr[I].lock()->get_trial_displacement();
             t_strain(0) += t_disp(0) * pn_pxy(0, I);
             t_strain(1) += t_disp(1) * pn_pxy(1, I);

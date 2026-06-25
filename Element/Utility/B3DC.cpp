@@ -115,7 +115,7 @@ void B3DC::update_theta() {
     for(auto I = 0u; I < 3u; ++I) {
         const auto J = (I + 1u) % 3u, K = (I + 2u) % 3u;
         theta(I) = asin(.5 * (dot(e(K), ni(J)) - dot(e(J), ni(K))));
-        theta(I + 3llu) = asin(.5 * (dot(e(K), nj(J)) - dot(e(J), nj(K))));
+        theta(I + 3u) = asin(.5 * (dot(e(K), nj(J)) - dot(e(J), nj(K))));
     }
 }
 

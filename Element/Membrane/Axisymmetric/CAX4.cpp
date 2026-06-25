@@ -60,7 +60,7 @@ int CAX4::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto n = shape::quad(t_vec, 0);
         const auto pn = shape::quad(t_vec, 1);
@@ -71,7 +71,7 @@ int CAX4::initialize(const shared_ptr<DomainBase>& D) {
 
         auto& c_pt = int_pt.back();
 
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+        for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
             c_pt.strain_mat(0, K) = c_pt.strain_mat(3, L) = pn_pxy(0, J);
             c_pt.strain_mat(3, K) = c_pt.strain_mat(1, L) = pn_pxy(1, J);
             c_pt.strain_mat(2, K) = n(J) / gx;
@@ -93,7 +93,7 @@ int CAX4::update_status() {
 
     for(const auto& I : int_pt) {
         vec t_strain(4, fill::zeros);
-        for(unsigned J = 0, K = 1; J < m_size; J += m_dof, K += m_dof) {
+        for(unsigned J{0}, K{1}; J < m_size; J += m_dof, K += m_dof) {
             t_strain(0) += t_disp(J) * I.strain_mat(0, J);
             t_strain(1) += t_disp(K) * I.strain_mat(3, J);
             t_strain(2) += t_disp(J) * I.strain_mat(2, J);

@@ -30,7 +30,7 @@ vec Yeoh::compute_derivative(const double J1M3, const double J3M1) const {
     auto &DWDJ1 = D(0), &DWDJ3 = D(1), &DDWDDJ1 = D(2), &DDWDDJ3 = D(3);
 
     auto TMP = 1., IDX = 1.;
-    for(uword X = 0; X < A0.n_elem; ++X) {
+    for(uword X{0}; X < A0.n_elem; ++X) {
         DWDJ1 += A0(X) * IDX * TMP;
         ++IDX;
         TMP *= J1M3;
@@ -38,7 +38,7 @@ vec Yeoh::compute_derivative(const double J1M3, const double J3M1) const {
 
     TMP = 1.;
     IDX = 1.;
-    for(uword X = 1; X < A0.n_elem; ++X) {
+    for(uword X{1}; X < A0.n_elem; ++X) {
         DDWDDJ1 += A0(X) * IDX * (IDX + 1.) * TMP;
         ++IDX;
         TMP *= J1M3;
@@ -46,7 +46,7 @@ vec Yeoh::compute_derivative(const double J1M3, const double J3M1) const {
 
     TMP = J3M1;
     IDX = 2.;
-    for(uword X = 0; X < A1.n_elem; ++X) {
+    for(uword X{0}; X < A1.n_elem; ++X) {
         DWDJ3 += A1(X) * IDX * TMP;
         TMP *= J3M12;
         IDX += 2.;
@@ -54,7 +54,7 @@ vec Yeoh::compute_derivative(const double J1M3, const double J3M1) const {
 
     TMP = 1.;
     IDX = 1.;
-    for(uword X = 0; X < A1.n_elem; ++X) {
+    for(uword X{0}; X < A1.n_elem; ++X) {
         DDWDDJ3 += A1(X) * IDX * (IDX + 1.) * TMP;
         IDX += 2.;
         TMP *= J3M12;

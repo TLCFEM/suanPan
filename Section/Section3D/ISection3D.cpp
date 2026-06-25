@@ -57,7 +57,7 @@ int ISection3D::initialize(const shared_ptr<DomainBase>& D) {
     const auto& plan_w = plan_f;
 
     int_pt.clear();
-    int_pt.reserve(plan_w.n_rows * plan_wt.n_rows + 2llu * plan_f.n_rows * plan_ft.n_rows);
+    int_pt.reserve(plan_w.n_rows * plan_wt.n_rows + 2u * plan_f.n_rows * plan_ft.n_rows);
     for(auto I = 0u; I < plan_w.n_rows; ++I)
         for(auto J = 0u; J < plan_wt.n_rows; ++J) int_pt.emplace_back(.5 * plan_w(I, 0) * web_height, .5 * plan_wt(J, 0) * web_thickness, .25 * plan_w(I, 1) * plan_wt(J, 1) * web_area, mat_proto->unique_copy());
     if(b_flange_area != 0.)

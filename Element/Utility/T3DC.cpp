@@ -41,7 +41,7 @@ mat T3DC::to_global_geometry_mat(const mat& l_mat) const {
     auto g_mat = to_global_stiffness_mat(-l_mat);
 
     g_mat.diag() += l_mat(0);
-    for(unsigned I = 0; I < 3; ++I) g_mat(I + 3llu, I) = g_mat(I, I + 3llu) -= l_mat(0);
+    for(unsigned I{0}; I < 3; ++I) g_mat(I + 3u, I) = g_mat(I, I + 3u) -= l_mat(0);
 
     return g_mat;
 }

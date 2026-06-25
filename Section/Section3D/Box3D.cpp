@@ -51,7 +51,7 @@ int Box3D::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(4 * static_cast<size_t>(int_pt_num));
-    for(unsigned I = 0; I < int_pt_num; ++I) {
+    for(unsigned I{0}; I < int_pt_num; ++I) {
         int_pt.emplace_back(.5 * plan(I, 0) * net_web, web_middle, .5 * plan(I, 1) * web_area, material_proto->unique_copy());
         int_pt.emplace_back(.5 * plan(I, 0) * net_web, -web_middle, .5 * plan(I, 1) * web_area, material_proto->unique_copy());
         int_pt.emplace_back(flange_middle, .5 * plan(I, 0) * net_flange, .5 * plan(I, 1) * flange_area, material_proto->unique_copy());

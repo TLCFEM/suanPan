@@ -1846,9 +1846,9 @@ const arma::mat& IntegrationPlan::get_data() const { return int_pts; }
 double IntegrationPlan::operator()(const unsigned i, const unsigned j) const { return int_pts(i, j); }
 
 void IntegrationPlan::print() const {
-    for(unsigned i = 0; i < n_rows; ++i) {
+    for(unsigned i{0}; i < n_rows; ++i) {
         printf("Node %u\t", i + 1);
-        for(unsigned j = 0; j < n_cols - 1; ++j) printf("%+.6E\t", int_pts(i, j));
+        for(unsigned j{0}; j < n_cols - 1; ++j) printf("%+.6E\t", int_pts(i, j));
         printf("Weight\t%+.6E\n", int_pts(i, n_cols - 1));
     }
     printf("\n");

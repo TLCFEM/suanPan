@@ -44,7 +44,7 @@ int Joint::update_status() {
 
     trial_resistance.zeros(j_size);
     trial_stiffness.zeros(j_size, j_size);
-    for(unsigned I = 0, J = j_dof; I < j_material.size(); ++I, ++J) {
+    for(unsigned I{0}, J{j_dof}; I < j_material.size(); ++I, ++J) {
         if(SUANPAN_SUCCESS != j_material[I]->update_trial_status(t_disp(I) - t_disp(J))) return SUANPAN_FAIL;
         trial_resistance(J) = -(trial_resistance(I) = as_scalar(j_material[I]->get_trial_stress()));
         trial_stiffness(I, J) = trial_stiffness(J, I) = -(trial_stiffness(J, J) = trial_stiffness(I, I) = as_scalar(j_material[I]->get_trial_stiffness()));

@@ -67,8 +67,8 @@ namespace {
 
             auto clear_mat = [&] {
                 A.zeros();
-                for(uword i = 0; i < N; ++i)
-                    for(uword j = 0; j < N; ++j)
+                for(uword i{0}; i < N; ++i)
+                    for(uword j{0}; j < N; ++j)
                         if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
                         else B(i, j) = ET(0);
             };

@@ -53,7 +53,7 @@ mat section_tester(const unique_ptr<Section>& obj, const std::vector<unsigned>& 
     auto flag = SUANPAN_SUCCESS;
     auto incre_strain = incre;
     for(const auto& I : idx) {
-        for(unsigned J = 0; J < I; ++J) {
+        for(unsigned J{0}; J < I; ++J) {
             if((flag = obj->update_incre_status(incre_strain)) != SUANPAN_SUCCESS) break;
             obj->commit_status();
             response(current_pos, span_a) = obj->get_current_deformation().t();
@@ -73,7 +73,7 @@ mat section_tester(const unique_ptr<Section>& obj, const std::vector<unsigned>& 
 mat section_tester_by_deformation_history(const unique_ptr<Section>& obj, const mat& history) {
     mat response(size(history));
 
-    for(uword I = 0; I < history.n_rows; ++I) {
+    for(uword I{0}; I < history.n_rows; ++I) {
         if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
         obj->commit_status();
         response.row(I) = obj->get_current_resistance().t();

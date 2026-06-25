@@ -20,7 +20,7 @@
 vec2 TableGurson::compute_hardening(const double plastic_strain) const {
     vec2 response;
 
-    for(uword I = 1; I < hardening_table.n_rows; ++I)
+    for(uword I{1}; I < hardening_table.n_rows; ++I)
         if(hardening_table(I, 0) > plastic_strain) {
             response(1) = (hardening_table(I, 1) - hardening_table(I - 1, 1)) / (hardening_table(I, 0) - hardening_table(I - 1, 0));
             response(0) = hardening_table(I - 1, 1) + (plastic_strain - hardening_table(I - 1, 0)) * response(1);

@@ -78,7 +78,7 @@ public:
         auto& element_dof = t_element->get_dof_encoding();
         for(auto K = 0u; K < DIM; ++K) {
             auxiliary_stiffness(node_dof(K), K) = -1.;
-            for(uword I = 0, J = K; I < shape.n_elem; ++I, J += t_element->get_dof_number()) auxiliary_stiffness(element_dof(J), K) = shape(I);
+            for(uword I{0}, J{K}; I < shape.n_elem; ++I, J += t_element->get_dof_number()) auxiliary_stiffness(element_dof(J), K) = shape(I);
         }
 
         return SUANPAN_SUCCESS;

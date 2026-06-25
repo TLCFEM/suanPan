@@ -34,11 +34,11 @@ field<vec> NURBSSurface::evaluate_point_derivative(const double u, const double 
 
     initialize_binomial(d);
 
-    for(sword k = 0; k <= du; ++k)
-        for(sword l = 0; l <= dv; ++l) {
+    for(sword k{0}; k <= du; ++k)
+        for(sword l{0}; l <= dv; ++l) {
             ders(k, l) = point(k, l);
-            for(sword i = 0; i <= k; ++i)
-                for(sword j = 0; j <= l; ++j)
+            for(sword i{0}; i <= k; ++i)
+                for(sword j{0}; j <= l; ++j)
                     if(i != 0 || j != 0) ders(k, l) -= binomial_mat(k, i) * binomial_mat(l, j) * point(i, j).back() * ders(k - i, l - j);
             ders(k, l) /= point(0, 0).back();
         }
@@ -53,8 +53,8 @@ mat NURBSSurface::evaluate_shape_function(const double u, const double v, const 
 
     auto sum = 0.;
 
-    for(uword I = 0; I < shape.n_rows; ++I)
-        for(uword J = 0; J < shape.n_cols; ++J)
+    for(uword I{0}; I < shape.n_rows; ++I)
+        for(uword J{0}; J < shape.n_cols; ++J)
             if(!polygon(I, J).empty()) sum += shape(I, J) * polygon(I, J).back();
 
     return shape / sum;
@@ -84,26 +84,26 @@ field<mat> NURBSSurface::evaluate_shape_function_derivative(const double u, cons
 
     auto sum = 0.;
 
-    for(uword i = 0; i <= p; ++i) {
+    for(uword i{0}; i <= p; ++i) {
         const auto uind = uspan + i - p;
-        for(uword j = 0; j <= q; ++j)
+        for(uword j{0}; j <= q; ++j)
             if(const auto vind = vspan + j - q; !polygon(uind, vind).empty()) {
                 sum += uders(0, i) * vders(0, j) * polygon(uind, vind).back();
-                for(sword k = 0; k <= du; ++k)
-                    for(sword l = 0; l <= dv; ++l) shape(k, l)(uind, vind) = uders(k, i) * vders(l, j) * polygon(uind, vind).back();
+                for(sword k{0}; k <= du; ++k)
+                    for(sword l{0}; l <= dv; ++l) shape(k, l)(uind, vind) = uders(k, i) * vders(l, j) * polygon(uind, vind).back();
             }
     }
 
-    for(sword i = 0; i <= du; ++i)
-        for(sword j = 0; j <= dv; ++j) {
+    for(sword i{0}; i <= du; ++i)
+        for(sword j{0}; j <= dv; ++j) {
             auto& t_shape = shape(i, j);
-            for(sword k = 0; k <= i; ++k)
-                for(sword l = 0; l <= j; ++l)
+            for(sword k{0}; k <= i; ++k)
+                for(sword l{0}; l <= j; ++l)
                     if(k != 0 || l != 0) {
                         auto weight_sum = 0.;
-                        for(uword m = 0; m <= p; ++m) {
+                        for(uword m{0}; m <= p; ++m) {
                             const auto uind = uspan + m - p;
-                            for(uword n = 0; n <= q; ++n)
+                            for(uword n{0}; n <= q; ++n)
                                 if(const auto vind = vspan + n - q; !polygon(uind, vind).empty()) weight_sum += polygon(uind, vind).back() * uders(k, m) * vders(l, n);
                         }
                         t_shape -= binomial_mat(i, k) * binomial_mat(j, l) * weight_sum * shape(i - k, j - l);

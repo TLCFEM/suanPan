@@ -26,8 +26,8 @@ void NURBSBase::initialize_binomial(const sword d) const {
 
     t_mat.set_size(d + 1, d + 1);
 
-    for(sword i = 0; i <= d; ++i)
-        for(sword j = 0; j <= i; ++j) t_mat(i, j) = static_cast<double>(suanpan::binomial(i, j));
+    for(sword i{0}; i <= d; ++i)
+        for(sword j{0}; j <= i; ++j) t_mat(i, j) = static_cast<double>(suanpan::binomial(i, j));
 }
 
 vec NURBS::evaluate_point(const double u, const field<vec>& polygon) const {
@@ -46,9 +46,9 @@ field<vec> NURBS::evaluate_point_derivative(const double u, const field<vec>& po
     field<vec> ders(d + 1);
     ders.for_each([&](vec& t_point) { t_point.zeros(dimension - 1); });
 
-    for(sword k = 0; k <= d; ++k) {
+    for(sword k{0}; k <= d; ++k) {
         ders(k) = point(k).head(dimension - 1);
-        for(sword i = 1; i <= k; ++i) ders(k) -= binomial_mat(k, i) * point(i).back() * ders(k - i);
+        for(sword i{1}; i <= k; ++i) ders(k) -= binomial_mat(k, i) * point(i).back() * ders(k - i);
         ders(k) /= point(0).back();
     }
 
@@ -60,8 +60,8 @@ vec NURBS::evaluate_shape_function(const double u, const field<vec>& polygon) co
 
     auto sum = 0.;
 
-    for(uword I = 0; I < shape.n_rows; ++I)
-        for(uword J = 0; J < shape.n_cols; ++J) sum += shape(I, J) * polygon(I, J).back();
+    for(uword I{0}; I < shape.n_rows; ++I)
+        for(uword J{0}; J < shape.n_cols; ++J) sum += shape(I, J) * polygon(I, J).back();
 
     return shape / sum;
 }
@@ -80,17 +80,17 @@ field<vec> NURBS::evaluate_shape_function_derivative(const double u, const field
 
     auto sum = 0.;
 
-    for(uword i = 0; i <= order; ++i)
+    for(uword i{0}; i <= order; ++i)
         if(const auto ind = span + i - order; !polygon(ind).empty()) {
             sum += ders(0, i) * polygon(ind).back();
             for(auto j = 0; j <= d; ++j) shape(j)(ind) = ders(j, i) * polygon(ind).back();
         }
 
-    for(sword i = 0; i <= d; ++i) {
+    for(sword i{0}; i <= d; ++i) {
         auto& t_shape = shape(i);
-        for(sword j = 1; j <= i; ++j) {
+        for(sword j{1}; j <= i; ++j) {
             auto factor = 0.;
-            for(uword k = 0; k <= order; ++k)
+            for(uword k{0}; k <= order; ++k)
                 if(const auto sind = span + k - order; !polygon(sind).empty()) factor += ders(j, k) * polygon(sind).back();
             t_shape -= binomial_mat(i, j) * factor * shape(i - j);
         }

@@ -83,7 +83,7 @@ public:
 
     [[nodiscard]] T max() const override {
         T max_value = T(1);
-        for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I)
+        for(uword I{0}; I < std::min(this->n_rows, this->n_cols); ++I)
             if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
         return max_value;
     }

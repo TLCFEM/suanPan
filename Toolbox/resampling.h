@@ -104,7 +104,7 @@ template<WindowType T> vec upsampling(const vec& in, const uword up_rate, const 
 
     vec out(up_rate * in.n_elem, fill::zeros);
 
-    for(uword I = 0, J = 0; I < in.n_elem; ++I, J += up_rate) out(J) = in(I);
+    for(uword I{0}, J{0}; I < in.n_elem; ++I, J += up_rate) out(J) = in(I);
 
     return conv(out, coef, "same");
 }
@@ -131,7 +131,7 @@ template<WindowType T> mat upsampling(const std::string& file_name, const uword 
 
     const auto time_size = mean(time_diff) / static_cast<double>(up_rate);
 
-    for(uword I = 0; I < result.n_rows; ++I) result(I, 0) = static_cast<double>(I) * time_size;
+    for(uword I{0}; I < result.n_rows; ++I) result(I, 0) = static_cast<double>(I) * time_size;
 
     return result;
 }

@@ -42,7 +42,7 @@ void LeeNewmarkIterative::assemble(const shared_ptr<MetaMat<double>>& in_mat, co
     if(factory->is_sparse()) worker->triplet_mat.assemble(in_mat->triplet_mat, row_shift, col_shift, scalar);
     else {
         const auto [low, up] = factory->get_bandwidth();
-        for(unsigned L = 0; L < n_block; ++L) {
+        for(unsigned L{0}; L < n_block; ++L) {
             const auto N = L + col_shift;
             for(unsigned K = std::max(L, up) - up; K < std::min(n_block, L + low + 1); ++K) {
                 const auto M = K + row_shift;
