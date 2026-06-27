@@ -242,6 +242,16 @@ contexts:
   - match: ^variable\.parameter$
     scope: variable.parameter
   global:
+  - match: (?i)^(converger)\s+(fixednumber|logicand|logicor|logicxor)\s+(\d+)\b
+    push:
+    - match: $
+      pop: true
+    - match: \d+
+      scope: variable
+    captures:
+      1: entity.name.tag
+      2: support.constant
+      3: variable
   - match: (?i)^(disable)\s+(amplitude|constraint|converger|criterion|domain|element|expression|group|integrator|load|material|modifier|node|orientation|recorder|section|solver|step|print)\b
     push:
     - match: $
@@ -368,7 +378,7 @@ contexts:
       1: entity.name.tag
       2: entity.name.type
       3: variable
-  - match: (?i)^(converger)\s+(absresidual|relresidual|absincredisp|relincredisp|absincreacc|relincreacc|absdisp|reldisp|abserror|relerror|absincreenergy|relincreenergy|fixednumber|logicand|logicor|logicxor)\s+(\d+)\b
+  - match: (?i)^(converger)\s+(absresidual|relresidual|absincredisp|relincredisp|absincreacc|relincreacc|absdisp|reldisp|abserror|relerror|absincreenergy|relincreenergy)\s+(\d+)\b
     captures:
       1: entity.name.tag
       2: entity.name.type
