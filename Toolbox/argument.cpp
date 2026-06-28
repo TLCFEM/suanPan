@@ -350,7 +350,8 @@ void argument_parser(const int argc, char** argv) {
         cli_mode(model);
     }
 
-    if(comm_size == 1 || comm_rank == 0) suanpan_highlight("\nPlease feel free to share feedback, start discussions, or request new features on the GitHub repository.\n");
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(comm_rank == 0) suanpan_highlight("\nPlease feel free to share feedback, start discussions, or request new features on the GitHub repository.\n");
     suanpan_info("\nTime Wasted: {:.4f} Seconds.\n", T.toc());
 }
 
