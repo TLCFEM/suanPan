@@ -371,7 +371,7 @@ contexts:
     captures:
       1: entity.name.tag
       2: support.constant
-  - match: (?i)^\bWP|MIS|LAPACK|SPIKE|SUPERLU|LIS|MUMPS|CUDA|MAGMA|PARDISO|FGMRES|DOUBLE|FULL|SINGLE|MIXED\b
+  - match: (?i)\bWP|MIS|LAPACK|SPIKE|SUPERLU|LIS|MUMPS|CUDA|MAGMA|PARDISO|FGMRES|DOUBLE|FULL|SINGLE|MIXED\b
     captures:
       0: variable
   - match: (?i)^(section)\s+(NZ2D|NZ3D|EU2D|EU3D|US2D|US3D)\s+(\S+)\s+(\d+)\b
