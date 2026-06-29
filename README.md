@@ -43,8 +43,6 @@
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-<p align="center"><img src="https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg" alt="Activities"></p>
-
 ## Features
 
 The highlights of **suanPan** are
