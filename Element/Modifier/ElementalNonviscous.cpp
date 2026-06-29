@@ -30,15 +30,14 @@ int ElementalNonviscous::initialize(const shared_ptr<DomainBase>& D) {
 
     factory = D->get_factory();
 
-    if(std::ranges::any_of(element_pool, [](const std::weak_ptr<Element>& ele_ptr) { return !ele_ptr.lock()->get_current_nonviscous_force().empty(); })) {
+    if(std::ranges::any_of(element_pool, [](const std::weak_ptr<Element>& t_ptr) { return !t_ptr.lock()->get_current_nonviscous_force().empty(); })) {
         suanpan_error("Repeated element tags are detected, modifier {} is disabled.\n", get_tag());
         element_pool.clear();
         return SUANPAN_FAIL;
     }
 
-    suanpan::for_all(element_pool, [&](const std::weak_ptr<Element>& ele_ptr) {
-        const auto t_ele = ele_ptr.lock();
-        access::rw(t_ele->get_current_nonviscous_force()).zeros(t_ele->get_total_number(), m.n_elem);
+    suanpan::for_all(element_pool, [&](const std::weak_ptr<Element>& t_ptr) {
+        if(const auto t_ele = t_ptr.lock(); t_ele) access::rw(t_ele->get_current_nonviscous_force()).zeros(t_ele->get_total_number(), m.n_elem);
     });
 
     return SUANPAN_SUCCESS;
@@ -54,17 +53,17 @@ int ElementalNonviscous::update_status() {
     const auto accu_para = accu(m_para).real();
 
     suanpan::for_all(element_pool, [&](const std::weak_ptr<Element>& t_ptr) {
-        const auto t_element = t_ptr.lock();
+        const auto t_ele = t_ptr.lock();
 
-        if(nullptr == t_element || !t_element->if_update_nonviscous() || !t_element->allow_modify_nonviscous()) return;
+        if(nullptr == t_ele || !t_ele->if_update_nonviscous() || !t_ele->allow_modify_nonviscous()) return;
 
-        if(t_element->get_current_nonviscous_force().n_cols != s_para.n_elem) return;
+        if(t_ele->get_current_nonviscous_force().n_cols != s_para.n_elem) return;
 
-        auto& trial_nonviscous_force = access::rw(t_element->get_trial_nonviscous_force());
-        trial_nonviscous_force = t_element->get_current_nonviscous_force() * diagmat(s_para) + (t_element->get_current_velocity() + t_element->get_trial_velocity()) * m_para.t();
+        auto& trial_nonviscous_force = access::rw(t_ele->get_trial_nonviscous_force());
+        trial_nonviscous_force = t_ele->get_current_nonviscous_force() * diagmat(s_para) + (t_ele->get_current_velocity() + t_ele->get_trial_velocity()) * m_para.t();
 
-        auto& trial_nonviscous = access::rw(t_element->get_trial_nonviscous());
-        trial_nonviscous.zeros(t_element->get_total_number(), t_element->get_total_number());
+        auto& trial_nonviscous = access::rw(t_ele->get_trial_nonviscous());
+        trial_nonviscous.zeros(t_ele->get_total_number(), t_ele->get_total_number());
         trial_nonviscous.diag().fill(accu_para);
     });
 
