@@ -47,13 +47,12 @@ and [OpenSees](http://opensees.berkeley.edu/).
 
 The highlights of **suanPan** are
 
-- ✅ ***fast***, memory and thread safe
-- ✅ [shared memory](https://en.wikipedia.org/wiki/Shared_memory) parallelism support
-- ✅ [distributed memory](https://en.wikipedia.org/wiki/Distributed_memory) parallelism support
-- ✅ multi-architecture (`amd64` and `arm64`) [support](https://hub.docker.com/r/tlcfem/suanpan)
-- ✅ rich collection of elements, materials, time integration methods, etc.
-- ✅ open source and easy to extend
-- ✅ modern language features
+* ⚡ ***fast***, thread-safe, and memory-safe
+* 🧠 built with modern C++ language features
+* 🌐 supports both shared-memory and distributed-memory parallelism
+* 🖥️ cross-platform with multi-arch [support](https://hub.docker.com/r/tlcfem/suanpan) (amd64 & arm64)
+* 🧩 rich library of elements, materials, and time-integration schemes
+* 🔧 highly expressive and easily extensible
 
 ## Quick Start
 
