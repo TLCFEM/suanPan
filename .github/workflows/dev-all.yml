@@ -12,10 +12,12 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/compare.yml
   delete:
+    if: github.event_name == 'push'
     needs: linux-dev
     secrets: inherit
     uses: ./.github/workflows/delete.yml
   flatpak:
+    if: github.event_name == 'push'
     needs:
       - linux-dev
       - macos-dev
