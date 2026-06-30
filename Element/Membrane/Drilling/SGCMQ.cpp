@@ -36,7 +36,7 @@ SGCMQ::IntegrationPoint::IntegrationPoint(vec&& C, const double F, unique_ptr<Ma
     , factor(F)
     , m_material(std::move(M)) {}
 
-vec SGCMQ::form_diff_coor(const mat& ele_coor) {
+vec SGCMQ::form_diff_coor(const mat& ele_coor) const {
     vec diff_coor(8);
 
     diff_coor(0) = ele_coor(1, 1) - ele_coor(0, 1);
@@ -47,6 +47,13 @@ vec SGCMQ::form_diff_coor(const mat& ele_coor) {
     diff_coor(5) = ele_coor(1, 0) - ele_coor(2, 0);
     diff_coor(6) = ele_coor(2, 0) - ele_coor(3, 0);
     diff_coor(7) = ele_coor(3, 0) - ele_coor(0, 0);
+
+    if(objective_length > 0.)
+        for(unsigned I{0}, J{4}; I < 4u; ++I, ++J) {
+            const auto s = objective_length / std::sqrt(diff_coor(I) * diff_coor(I) + diff_coor(J) * diff_coor(J));
+            diff_coor(I) *= s;
+            diff_coor(J) *= s;
+        }
 
     return diff_coor;
 }
@@ -153,9 +160,10 @@ void SGCMQ::form_body_force(const mat& diff_coor) {
     }
 }
 
-SGCMQ::SGCMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, const char IP)
+SGCMQ::SGCMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, const double OL, const char IP)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH)
+    , objective_length(OL)
     , scheme(IP) {}
 
 int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {

@@ -1535,7 +1535,7 @@ namespace {
         if(!command.eof() && !get_input(command, int_scheme))
             suanpan_error("A valid reduced scheme switch is required.\n");
 
-        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, suanpan::to_upper(int_scheme[0]));
+        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., suanpan::to_upper(int_scheme[0]));
     }
 
     void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
@@ -1563,7 +1563,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
+        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., int_type);
     }
 
     void new_sgcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
@@ -1591,7 +1591,7 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = std::make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
+        return_obj = std::make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., int_type);
     }
 
     void new_sgcms(unique_ptr<Element>& return_obj, std::istringstream& command) {
