@@ -406,7 +406,7 @@ contexts:
       1: entity.name.tag
       2: entity.name.type
       3: variable
-  - match: (?i)^(element)\s+(allman|b21|b21eh|b21el|b21h|b31|b31os|c3d20|c3d4|c3d8|c3d8i|c3d8r|cax3|cax4|cax8|cin3d8|cinp4|contact2d|contact3d|cp3|cp4|cp4i|cp4r|cp5|cp6|cp7|cp8|cpe8|cpe8r|cps8|csmq4|csmq5|csmq6|csmq7|csmq8|csmt3|csmt6|damper01|damper02|damper03|damper04|damper05|damper06|dc3d4|dc3d8|dcp3|dcp4|dkt3|dkt4|dkts3|eb21|eb31os|embedded2d|embedded3d|f21|f21h|f31|gcmq|gcmqg|gcmqi|gcmql|gq12|joint|mass|mass2d|mass3d|masspoint2d|masspoint3d|mindlin|mvlem|nmb21|nmb21eh|nmb21el|nmb31|patchcube|patchquad|pcpe4dc|pcpe4uc|pcpe8dc|pcpe8uc|ps|qe2|s4|sgcmqg|sgcmqi|sgcmql|sgcms|singlesection2d|singlesection3d|sphericalparticle2d|sphericalparticle3d|spring01|spring02|t2d2|t2d2s|t3d2|t3d2s|tie|translationconnector2d|translationconnector3d)\s+(\d+)\b
+  - match: (?i)^(element)\s+(allman|b21|b21eh|b21el|b21h|b31|b31os|c3d20|c3d4|c3d8|c3d8i|c3d8r|cax3|cax4|cax8|cin3d8|cinp4|contact2d|contact3d|cp3|cp4|cp4i|cp4r|cp5|cp6|cp7|cp8|cpe8|cpe8r|cps8|csmq4|csmq5|csmq6|csmq7|csmq8|csmt3|csmt6|damper01|damper02|damper03|damper04|damper05|damper06|dc3d4|dc3d8|dcp3|dcp4|dkt3|dkt4|dkts3|eb21|eb31os|embedded2d|embedded3d|f21|f21h|f31|gcmq|gcmqg|gcmqi|gcmql|ogcmqg|ogcmqi|ogcmql|gq12|joint|mass|mass2d|mass3d|masspoint2d|masspoint3d|mindlin|mvlem|nmb21|nmb21eh|nmb21el|nmb31|patchcube|patchquad|pcpe4dc|pcpe4uc|pcpe8dc|pcpe8uc|ps|qe2|s4|sgcmqg|sgcmqi|sgcmql|osgcmqg|osgcmqi|osgcmql|sgcms|singlesection2d|singlesection3d|sphericalparticle2d|sphericalparticle3d|spring01|spring02|t2d2|t2d2s|t3d2|t3d2s|tie|translationconnector2d|translationconnector3d)\s+(\d+)\b
     captures:
       1: entity.name.tag
       2: entity.name.type

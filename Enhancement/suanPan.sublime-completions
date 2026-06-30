@@ -1042,25 +1042,31 @@
       "trigger": "GCMQ",
       "details": "generalized conforming mixed quadrilateral with drilling dofs",
       "kind": "type",
-      "contents": "element GCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement GCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement GCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+      "contents": "element GCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\nelement GCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\nelement GCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+    },
+    {
+      "trigger": "OGCMQ",
+      "details": "generalized conforming mixed quadrilateral with objective drilling dofs",
+      "kind": "type",
+      "contents": "element OGCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)}\nelement OGCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)}\nelement OGCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, element thickness\n# (8) double, objective length"
     },
     {
       "trigger": "GCMQG",
       "details": "generalized conforming mixed quadrilateral with drilling dofs",
       "kind": "type",
-      "contents": "element GCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+      "contents": "element GCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
       "trigger": "GCMQI",
       "details": "generalized conforming mixed quadrilateral with drilling dofs",
       "kind": "type",
-      "contents": "element GCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+      "contents": "element GCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
       "trigger": "GCMQL",
       "details": "generalized conforming mixed quadrilateral with drilling dofs",
       "kind": "type",
-      "contents": "element GCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+      "contents": "element GCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
       "trigger": "GQ12",
@@ -1892,27 +1898,33 @@
     },
     {
       "trigger": "SGCMQ",
-      "details": "generalized conforming mixed quadrilateral with drilling dofs",
+      "details": "simplified generalized conforming mixed quadrilateral with drilling dofs",
       "kind": "type",
-      "contents": "element SGCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement SGCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\nelement SGCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+      "contents": "element SGCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\nelement SGCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\nelement SGCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+    },
+    {
+      "trigger": "SGCMQ",
+      "details": "simplified generalized conforming mixed quadrilateral with objective drilling dofs",
+      "kind": "type",
+      "contents": "element OSGCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)}\nelement OSGCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)}\nelement OSGCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:(8)}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, element thickness\n# (8) double, objective length"
     },
     {
       "trigger": "SGCMQG",
-      "details": "generalized conforming mixed quadrilateral with drilling dofs",
+      "details": "simplified generalized conforming mixed quadrilateral with objective drilling dofs",
       "kind": "type",
-      "contents": "element SGCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+      "contents": "element SGCMQG ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
       "trigger": "SGCMQI",
-      "details": "generalized conforming mixed quadrilateral with drilling dofs",
+      "details": "simplified generalized conforming mixed quadrilateral with objective drilling dofs",
       "kind": "type",
-      "contents": "element SGCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+      "contents": "element SGCMQI ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
       "trigger": "SGCMQL",
-      "details": "generalized conforming mixed quadrilateral with drilling dofs",
+      "details": "simplified generalized conforming mixed quadrilateral with objective drilling dofs",
       "kind": "type",
-      "contents": "element SGCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
+      "contents": "element SGCMQL ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
       "trigger": "SGCMS",
