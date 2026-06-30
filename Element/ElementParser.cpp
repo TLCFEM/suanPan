@@ -1566,6 +1566,34 @@ namespace {
         return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., int_type);
     }
 
+    void new_ogcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        double thickness, objective_length;
+        if(!get_input(command, thickness, objective_length)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, objective_length, int_type);
+    }
+
     void new_sgcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -2655,6 +2683,9 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "GCMQG")) new_gcmq(new_element, command, 'G');
     else if(is_equal(element_id, "GCMQI")) new_gcmq(new_element, command, 'I');
     else if(is_equal(element_id, "GCMQL")) new_gcmq(new_element, command, 'L');
+    else if(is_equal(element_id, "OGCMQG")) new_ogcmq(new_element, command, 'G');
+    else if(is_equal(element_id, "OGCMQI")) new_ogcmq(new_element, command, 'I');
+    else if(is_equal(element_id, "OGCMQL")) new_ogcmq(new_element, command, 'L');
     else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
     else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
     else if(is_equal(element_id, "Mass")) new_mass(new_element, command, 3);
