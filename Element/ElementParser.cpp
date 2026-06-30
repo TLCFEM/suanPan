@@ -1535,10 +1535,10 @@ namespace {
         if(!command.eof() && !get_input(command, int_scheme))
             suanpan_error("A valid reduced scheme switch is required.\n");
 
-        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, suanpan::to_upper(int_scheme[0]));
+        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., suanpan::to_upper(int_scheme[0]));
     }
 
-    void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
+    template<bool simplified> void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1563,10 +1563,11 @@ namespace {
         else if(!get_input(command, thickness))
             suanpan_error("A valid thickness is required.\n");
 
-        return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
+        if constexpr(simplified) return_obj = std::make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., int_type);
+        else return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., int_type);
     }
 
-    void new_sgcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
+    template<bool simplified> void new_ogcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1585,13 +1586,14 @@ namespace {
             return;
         }
 
-        auto thickness = 1.;
-        if(command.eof())
-            suanpan_debug("Unit thickness assumed.\n");
-        else if(!get_input(command, thickness))
-            suanpan_error("A valid thickness is required.\n");
+        double thickness, objective_length;
+        if(!get_input(command, thickness, objective_length)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
 
-        return_obj = std::make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, int_type);
+        if constexpr(simplified) return_obj = std::make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, objective_length, int_type);
+        else return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, objective_length, int_type);
     }
 
     void new_sgcms(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2652,9 +2654,12 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
     else if(is_equal(element_id, "F31")) new_f31(new_element, command);
     else if(is_equal(element_id, "GCMQ")) new_gcmq(new_element, command);
-    else if(is_equal(element_id, "GCMQG")) new_gcmq(new_element, command, 'G');
-    else if(is_equal(element_id, "GCMQI")) new_gcmq(new_element, command, 'I');
-    else if(is_equal(element_id, "GCMQL")) new_gcmq(new_element, command, 'L');
+    else if(is_equal(element_id, "GCMQG")) new_gcmq<false>(new_element, command, 'G');
+    else if(is_equal(element_id, "GCMQI")) new_gcmq<false>(new_element, command, 'I');
+    else if(is_equal(element_id, "GCMQL")) new_gcmq<false>(new_element, command, 'L');
+    else if(is_equal(element_id, "OGCMQG")) new_ogcmq<false>(new_element, command, 'G');
+    else if(is_equal(element_id, "OGCMQI")) new_ogcmq<false>(new_element, command, 'I');
+    else if(is_equal(element_id, "OGCMQL")) new_ogcmq<false>(new_element, command, 'L');
     else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
     else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
     else if(is_equal(element_id, "Mass")) new_mass(new_element, command, 3);
@@ -2677,9 +2682,12 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "PS")) new_ps(new_element, command);
     else if(is_equal(element_id, "QE2")) new_qe2(new_element, command);
     else if(is_equal(element_id, "S4")) new_s4(new_element, command);
-    else if(is_equal(element_id, "SGCMQG")) new_sgcmq(new_element, command, 'G');
-    else if(is_equal(element_id, "SGCMQI")) new_sgcmq(new_element, command, 'I');
-    else if(is_equal(element_id, "SGCMQL")) new_sgcmq(new_element, command, 'L');
+    else if(is_equal(element_id, "SGCMQG")) new_gcmq<true>(new_element, command, 'G');
+    else if(is_equal(element_id, "SGCMQI")) new_gcmq<true>(new_element, command, 'I');
+    else if(is_equal(element_id, "SGCMQL")) new_gcmq<true>(new_element, command, 'L');
+    else if(is_equal(element_id, "OSGCMQG")) new_ogcmq<true>(new_element, command, 'G');
+    else if(is_equal(element_id, "OSGCMQI")) new_ogcmq<true>(new_element, command, 'I');
+    else if(is_equal(element_id, "OSGCMQL")) new_ogcmq<true>(new_element, command, 'L');
     else if(is_equal(element_id, "SGCMS")) new_sgcms(new_element, command);
     else if(is_equal(element_id, "SingleSection2D")) new_singlesection<SingleSection2D>(new_element, command);
     else if(is_equal(element_id, "SingleSection3D")) new_singlesection<SingleSection3D>(new_element, command);
