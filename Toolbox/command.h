@@ -42,7 +42,7 @@ constexpr auto SUANPAN_CODE = "Deneb";
 
 class Bead;
 
-int process_command(const std::shared_ptr<Bead>&, std::istringstream&&);
+int process_command(const std::shared_ptr<Bead>&, const std::string&);
 
 bool normalise_command(std::string&, std::string&);
 
