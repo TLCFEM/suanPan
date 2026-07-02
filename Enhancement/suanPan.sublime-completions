@@ -1897,6 +1897,12 @@
       "contents": "element S4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] bool, nonlinear geometry switch, default: false"
     },
     {
+      "trigger": "variable",
+      "details": "define variables",
+      "kind": "keyword",
+      "contents": "variable ${1:(1)} ${2:(2)}\n# (1) string, name\n# (2) any read as string, value"
+    },
+    {
       "trigger": "SGCMQ",
       "details": "simplified generalized conforming mixed quadrilateral with drilling dofs",
       "kind": "type",
