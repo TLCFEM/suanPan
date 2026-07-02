@@ -1396,6 +1396,13 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream&& command)
         return process_file(model, file_name.c_str());
     }
 
+    if(is_equal_any(command_id, "var", "variable")) {
+        if(std::string name, value; get_input(command, name, value)) model->variable(name) = std::move(value);
+        else suanpan_error("A valid file name is required.\n");
+
+        return SUANPAN_SUCCESS;
+    }
+
     if(is_equal(command_id, "domain")) return create_new_domain(model, command);
 
     if(is_equal(command_id, "enable")) return enable_object(model, command);

@@ -93,6 +93,10 @@ int Bead::analyze() {
     return SUANPAN_SUCCESS;
 }
 
+std::string& Bead::variable(const std::string& name) { return variable_map[name]; }
+
+std::string Bead::replace_variable(const std::string& original) { return original; }
+
 shared_ptr<DomainBase>& get_domain(const shared_ptr<Bead>& B, const unsigned T) { return B->domain_pool[T]; }
 
 shared_ptr<DomainBase>& get_current_domain(const shared_ptr<Bead>& B) { return B->domain_pool[B->current_domain_tag]; }
