@@ -1373,7 +1373,7 @@ namespace {
     }
 } // namespace
 
-int process_command(const shared_ptr<Bead>& model, const std::string& command_str) {
+int process_command(const shared_ptr<Bead>& model, const std::string_view command_str) {
     if(nullptr == model) return SUANPAN_SUCCESS;
 
     std::istringstream command{model->replace_variable(command_str)};

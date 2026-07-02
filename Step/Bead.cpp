@@ -96,13 +96,13 @@ int Bead::analyze() {
 
 std::string& Bead::variable(const std::string& name) { return variable_map[name]; }
 
-std::string Bead::replace_variable(const std::string& original) {
+std::string Bead::replace_variable(const std::string_view original) {
     const std::regex var_regex(R"(\$([A-Za-z0-9_]+))");
 
     std::string result;
     size_t last_pos{0};
 
-    const std::sregex_iterator words_begin{original.begin(), original.end(), var_regex}, words_end{};
+    const std::regex_iterator<std::string_view::iterator> words_begin{original.cbegin(), original.cend(), var_regex}, words_end{};
 
     for(auto next = words_begin; next != words_end; ++next) {
         auto& match = *next;

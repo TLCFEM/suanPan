@@ -59,7 +59,7 @@ public:
     int analyze();
 
     std::string& variable(const std::string&);
-    std::string replace_variable(const std::string&);
+    std::string replace_variable(std::string_view);
 };
 
 #endif
