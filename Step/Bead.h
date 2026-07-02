@@ -35,6 +35,8 @@ class Bead {
 
     DomainBaseStorage domain_pool;
 
+    std::unordered_map<std::string, std::string> variable_map;
+
 public:
     Bead();
 
@@ -55,6 +57,9 @@ public:
     int precheck();
 
     int analyze();
+
+    std::string& variable(const std::string&);
+    std::string replace_variable(std::string_view);
 };
 
 #endif

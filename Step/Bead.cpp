@@ -19,6 +19,7 @@
 
 #include <Domain/Domain.h>
 #include <Step/Step.h>
+#include <regex>
 
 Bead::Bead() { insert(std::make_shared<Domain>(1)); }
 
@@ -91,6 +92,34 @@ int Bead::analyze() {
     }
 
     return SUANPAN_SUCCESS;
+}
+
+std::string& Bead::variable(const std::string& name) { return variable_map[name]; }
+
+std::string Bead::replace_variable(const std::string_view original) {
+    const std::regex var_regex(R"(\$([A-Za-z0-9_]+))");
+
+    std::string result;
+    size_t last_pos{0};
+
+    const std::regex_iterator<std::string_view::iterator> words_begin{original.cbegin(), original.cend(), var_regex}, words_end{};
+
+    for(auto next = words_begin; next != words_end; ++next) {
+        auto& match = *next;
+
+        result += original.substr(last_pos, match.position() - last_pos);
+
+        std::string token = match[1].str();
+
+        if(auto it = variable_map.find(token); it != variable_map.end()) result += it->second;
+        else result += match.str();
+
+        last_pos = match.position() + match.length();
+    }
+
+    result += original.substr(last_pos);
+
+    return result;
 }
 
 shared_ptr<DomainBase>& get_domain(const shared_ptr<Bead>& B, const unsigned T) { return B->domain_pool[T]; }
