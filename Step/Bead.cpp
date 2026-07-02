@@ -102,16 +102,12 @@ std::string Bead::replace_variable(const std::string_view original) {
     std::string result;
     size_t last_pos{0};
 
-    const std::regex_iterator<std::string_view::iterator> words_begin{original.cbegin(), original.cend(), var_regex}, words_end{};
-
-    for(auto next = words_begin; next != words_end; ++next) {
+    for(std::regex_iterator<std::string_view::iterator> next{original.cbegin(), original.cend(), var_regex}, last{}; next != last; ++next) {
         auto& match = *next;
 
         result += original.substr(last_pos, match.position() - last_pos);
 
-        std::string token = match[1].str();
-
-        if(auto it = variable_map.find(token); it != variable_map.end()) result += it->second;
+        if(auto it = variable_map.find(match[1].str()); it != variable_map.end()) result += it->second;
         else result += match.str();
 
         last_pos = match.position() + match.length();
