@@ -446,6 +446,11 @@ contexts:
       1: entity.name.tag
       2: entity.name.type
       3: variable
+  - match: (?i)^(var|variable)\s+(\S+)\s+(\S+)$
+    captures:
+      1: entity.name.tag
+      2: string
+      3: string
   - match: (?i)^(save)\s+(stiffness|mass|damping|model|\$\S+)(?:\s+(\S+))?$
     captures:
       1: entity.name.tag
