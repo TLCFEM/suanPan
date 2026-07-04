@@ -1557,38 +1557,13 @@ namespace {
             return;
         }
 
-        auto thickness = 1.;
-        if(command.eof())
-            suanpan_debug("Unit thickness assumed.\n");
-        else if(!get_input(command, thickness))
+        auto thickness = 1., objective_length = -1.;
+        if(!get_optional_input(command, thickness)) {
             suanpan_error("A valid thickness is required.\n");
-
-        if constexpr(simplified) return_obj = std::make_unique<SGCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., int_type);
-        else return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., int_type);
-    }
-
-    template<bool simplified> void new_ogcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
             return;
         }
-
-        uvec node_tag(4);
-        if(!get_input(command, node_tag)) {
-            suanpan_error("Four valid nodes are required.\n");
-            return;
-        }
-
-        unsigned material_tag;
-        if(!get_input(command, material_tag)) {
-            suanpan_error("A valid material tag is required.\n");
-            return;
-        }
-
-        double thickness, objective_length;
-        if(!get_input(command, thickness, objective_length)) {
-            suanpan_error("A valid parameter is required.\n");
+        if(!get_optional_input(command, objective_length)) {
+            suanpan_error("A valid length is required.\n");
             return;
         }
 
@@ -2657,9 +2632,6 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "GCMQG")) new_gcmq<false>(new_element, command, 'G');
     else if(is_equal(element_id, "GCMQI")) new_gcmq<false>(new_element, command, 'I');
     else if(is_equal(element_id, "GCMQL")) new_gcmq<false>(new_element, command, 'L');
-    else if(is_equal(element_id, "OGCMQG")) new_ogcmq<false>(new_element, command, 'G');
-    else if(is_equal(element_id, "OGCMQI")) new_ogcmq<false>(new_element, command, 'I');
-    else if(is_equal(element_id, "OGCMQL")) new_ogcmq<false>(new_element, command, 'L');
     else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
     else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
     else if(is_equal(element_id, "Mass")) new_mass(new_element, command, 3);
@@ -2685,9 +2657,6 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "SGCMQG")) new_gcmq<true>(new_element, command, 'G');
     else if(is_equal(element_id, "SGCMQI")) new_gcmq<true>(new_element, command, 'I');
     else if(is_equal(element_id, "SGCMQL")) new_gcmq<true>(new_element, command, 'L');
-    else if(is_equal(element_id, "OSGCMQG")) new_ogcmq<true>(new_element, command, 'G');
-    else if(is_equal(element_id, "OSGCMQI")) new_ogcmq<true>(new_element, command, 'I');
-    else if(is_equal(element_id, "OSGCMQL")) new_ogcmq<true>(new_element, command, 'L');
     else if(is_equal(element_id, "SGCMS")) new_sgcms(new_element, command);
     else if(is_equal(element_id, "SingleSection2D")) new_singlesection<SingleSection2D>(new_element, command);
     else if(is_equal(element_id, "SingleSection3D")) new_singlesection<SingleSection3D>(new_element, command);

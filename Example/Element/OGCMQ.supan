@@ -1,4 +1,4 @@
-# A TEST MODEL FOR OGCMQ ELEMENT
+# A TEST MODEL FOR GCMQ ELEMENT
 
 # node 1 0 0
 # node 2 1 0
@@ -23,7 +23,7 @@ node 12 10 2
 
 material Elastic2D 1 1500 .25 1E-4
 
-var quad_type OGCMQG
+var quad_type GCMQG
 
 element $quad_type 1 1 2 8 7 1 1 20.
 element $quad_type 2 2 3 9 8 1 1 20.
