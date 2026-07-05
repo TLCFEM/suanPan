@@ -2,12 +2,11 @@
 
 ## known issues
 
-1. Eigenanalysis does not support distributed computation.
-2. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
+1. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
 ## version 4.1
 
-1. add global uniform/universal damping model `UDDNewmark`
+1. add global uniform/universal damping model `UDDNewmark` [#348](https://github.com/TLCFEM/suanPan/pull/348)
 2. bump up various dependencies
 3. add `SP_ENABLE_ARMA_SMALL_MEMORY` flag to optimize memory footprint
 4. extend `(S)GCMQ` to accept an additional objective length parameter [#355](https://github.com/TLCFEM/suanPan/pull/355)
