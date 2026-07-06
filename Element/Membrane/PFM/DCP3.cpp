@@ -51,7 +51,7 @@ int DCP3::initialize(const shared_ptr<DomainBase>& D) {
     n_mat = mean(ele_coor) * inv_coor;
 
     b_mat.zeros(3, 6);
-    for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += 2, L += 2) {
+    for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += 2, L += 2) {
         b_mat(0, K) = b_mat(2, L) = pn_mat(0, J);
         b_mat(2, K) = b_mat(1, L) = pn_mat(1, J);
     }
@@ -67,7 +67,7 @@ int DCP3::initialize(const shared_ptr<DomainBase>& D) {
 
 int DCP3::update_status() {
     vec t_strain(3, fill::zeros), t_damage(m_node);
-    for(unsigned I = 0; I < m_node; ++I) {
+    for(unsigned I{0}; I < m_node; ++I) {
         const auto& t_disp = node_ptr[I].lock()->get_trial_displacement();
         t_strain(0) += t_disp(0) * pn_mat(0, I);
         t_strain(1) += t_disp(1) * pn_mat(1, I);

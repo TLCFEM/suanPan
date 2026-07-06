@@ -54,13 +54,13 @@
 #endif
 
 #if !defined(ARMA_USE_ARPACK)
-#define ARMA_USE_ARPACK
+// #define ARMA_USE_ARPACK
 //// Uncomment the above line if you have ARPACK or a high-speed replacement for ARPACK.
 //// ARPACK is required for eigen decompositions of complex sparse matrices
 #endif
 
 #if !defined(ARMA_USE_SUPERLU)
-#define ARMA_USE_SUPERLU
+// #define ARMA_USE_SUPERLU
 //// Uncomment the above line if you have SuperLU.
 //// SuperLU is used for solving sparse linear systems via spsolve()
 //// Caveat: only SuperLU version 5.2 can be used!
@@ -111,7 +111,7 @@
 // #define ARMA_LAPACK_NOEXCEPT
 //// Uncomment the above line if you require LAPACK functions to have the 'noexcept' specification
 
-// #define ARMA_USE_FORTRAN_HIDDEN_ARGS
+#define ARMA_USE_FORTRAN_HIDDEN_ARGS
 //// Comment out the above line to call BLAS and LAPACK functions without using so-called "hidden" arguments.
 //// Fortran functions (compiled without a BIND(C) declaration) that have char arguments
 //// (like many BLAS and LAPACK functions) also have associated "hidden" arguments.
@@ -191,7 +191,7 @@
 #endif
 
 #if !defined(ARMA_MAT_PREALLOC)
-  #define ARMA_MAT_PREALLOC 6
+  #define ARMA_MAT_PREALLOC 16
 #endif
 //// This is the number of preallocated elements used by matrices and vectors;
 //// it must be an integer that is at least 1.
@@ -199,7 +199,7 @@
 //// change the number to the size of your vectors.
 
 #if !defined(ARMA_OPENMP_THRESHOLD)
-  #define ARMA_OPENMP_THRESHOLD 400
+  #define ARMA_OPENMP_THRESHOLD 320
 #endif
 //// The minimum number of elements in a matrix to allow OpenMP based parallelisation;
 //// it must be an integer that is at least 1.

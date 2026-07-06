@@ -48,14 +48,14 @@ int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), mat_proto->unique_copy(), solve(jacob, pn));
 
         auto& c_pt = int_pt.back();
-        for(unsigned J = 0, K = 0, L = 1, M = 2; J < c_node; ++J, K += c_dof, L += c_dof, M += c_dof) {
+        for(unsigned J{0}, K{0}, L{1}, M{2}; J < c_node; ++J, K += c_dof, L += c_dof, M += c_dof) {
             c_pt.B1(0, K) = c_pt.B1(3, L) = c_pt.B1(5, M) = c_pt.pn_pxyz(0, J);
             c_pt.B1(3, K) = c_pt.B1(1, L) = c_pt.B1(4, M) = c_pt.pn_pxyz(1, J);
             c_pt.B1(5, K) = c_pt.B1(4, L) = c_pt.B1(2, M) = c_pt.pn_pxyz(2, J);
@@ -83,7 +83,7 @@ int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
             for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
                 for(auto K = J, M = L; K < c_node; ++K, M += c_dof) initial_mass(L, M) += t_factor * n_int(J) * n_int(K);
         }
-        for(unsigned I = 0, K = 1, L = 2; I < c_size; I += c_dof, K += c_dof, L += c_dof) {
+        for(unsigned I{0}, K{1}, L{2}; I < c_size; I += c_dof, K += c_dof, L += c_dof) {
             initial_mass(K, K) = initial_mass(L, L) = initial_mass(I, I);
             for(auto J = I + c_dof, M = J + 1, N = J + 2; J < c_size; J += c_dof, M += c_dof, N += c_dof) initial_mass(J, I) = initial_mass(K, M) = initial_mass(L, N) = initial_mass(M, K) = initial_mass(N, L) = initial_mass(I, J);
         }
@@ -94,7 +94,7 @@ int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.weight * compute_shape_function(I.coor, 0);
         for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
-            for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
+            for(uword K{0}; K < c_dof; ++K) body_force(L + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;
@@ -170,10 +170,10 @@ mat C3D8I::GetData(const OutputType P) {
     if(OutputType::V == P) return reshape(get_current_velocity(), c_dof, c_node);
     if(OutputType::U == P) return reshape(get_current_displacement(), c_dof, c_node);
 
-    mat A(int_pt.size(), 7);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 7);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I{0}; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].c_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }

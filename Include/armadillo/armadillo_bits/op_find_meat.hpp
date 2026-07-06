@@ -25,7 +25,7 @@
 template<typename T1>
 inline
 uword
-op_find::helper
+op_find_generic::helper
   (
   Mat<uword>& indices,
   const Base<typename T1::elem_type, T1>& X
@@ -77,7 +77,7 @@ op_find::helper
 template<typename T1, typename op_type>
 inline
 uword
-op_find::helper
+op_find_generic::helper
   (
   Mat<uword>& indices,
   const mtOp<uword, T1, op_type>& X,
@@ -209,7 +209,7 @@ op_find::helper
 template<typename T1, typename op_type>
 inline
 uword
-op_find::helper
+op_find_generic::helper
   (
   Mat<uword>& indices,
   const mtOp<uword, T1, op_type>& X,
@@ -290,7 +290,7 @@ op_find::helper
 template<typename T1, typename T2, typename glue_type>
 inline
 uword
-op_find::helper
+op_find_generic::helper
   (
   Mat<uword>& indices,
   const mtGlue<uword, T1, T2, glue_type>& X,
@@ -386,7 +386,7 @@ op_find::helper
 template<typename T1, typename T2, typename glue_type>
 inline
 uword
-op_find::helper
+op_find_generic::helper
   (
   Mat<uword>& indices,
   const mtGlue<uword, T1, T2, glue_type>& X,
@@ -461,7 +461,7 @@ op_find::helper
 template<typename T1>
 inline
 void
-op_find::apply(Mat<uword>& out, const mtOp<uword, T1, op_find>& X)
+op_find_generic::apply(Mat<uword>& out, const mtOp<uword, T1, op_find_generic>& X)
   {
   arma_debug_sigprint();
   
@@ -469,7 +469,7 @@ op_find::apply(Mat<uword>& out, const mtOp<uword, T1, op_find>& X)
   const uword type = X.aux_uword_b;
   
   Mat<uword> indices;
-  const uword n_nz = op_find::helper(indices, X.m);
+  const uword n_nz = op_find_generic::helper(indices, X.m);
   
   if(n_nz > 0)
     {
@@ -497,12 +497,12 @@ op_find::apply(Mat<uword>& out, const mtOp<uword, T1, op_find>& X)
 template<typename T1>
 inline
 void
-op_find_simple::apply(Mat<uword>& out, const mtOp<uword, T1, op_find_simple>& X)
+op_find_default::apply(Mat<uword>& out, const mtOp<uword, T1, op_find_default>& X)
   {
   arma_debug_sigprint();
   
   Mat<uword> indices;
-  const uword n_nz = op_find::helper(indices, X.m);
+  const uword n_nz = op_find_generic::helper(indices, X.m);
   
   out.steal_mem_col(indices, n_nz);
   }

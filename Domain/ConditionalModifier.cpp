@@ -143,31 +143,31 @@ GroupModifier::GroupModifier(uvec&& N)
 uvec GroupModifier::update_object_tag(const shared_ptr<DomainBase>& D) const { return D->flatten_group(groups); }
 
 std::vector<Node::DOF> parse_dof(const std::string_view token) {
-    if(is_equal_any(token, "PINNED", "P")) return std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
-    if(is_equal_any(token, "ENCASTRE", "E")) return std::vector{Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3};
-    if(is_equal_any(token, "XSYMM", "X")) return std::vector{Node::DOF::U1, Node::DOF::UR2, Node::DOF::UR3};
-    if(is_equal_any(token, "YSYMM", "Y")) return std::vector{Node::DOF::UR1, Node::DOF::U2, Node::DOF::UR3};
-    if(is_equal_any(token, "ZSYMM", "Z")) return std::vector{Node::DOF::UR1, Node::DOF::UR2, Node::DOF::U3};
-    if(is_equal_any(token, "1", "U1")) return std::vector{Node::DOF::U1};
-    if(is_equal_any(token, "2", "U2")) return std::vector{Node::DOF::U2};
-    if(is_equal_any(token, "3", "U3")) return std::vector{Node::DOF::U3};
-    if(is_equal_any(token, "4", "U4", "UR1")) return std::vector{Node::DOF::UR1};
-    if(is_equal_any(token, "5", "U5", "UR2")) return std::vector{Node::DOF::UR2};
-    if(is_equal_any(token, "6", "U6", "UR3")) return std::vector{Node::DOF::UR3};
-    if(is_equal(token, "FU1")) return std::vector{Node::DOF::FU1};
-    if(is_equal(token, "FU2")) return std::vector{Node::DOF::FU2};
-    if(is_equal(token, "FU3")) return std::vector{Node::DOF::FU3};
-    if(is_equal(token, "FUR1")) return std::vector{Node::DOF::FUR1};
-    if(is_equal(token, "FUR2")) return std::vector{Node::DOF::FUR2};
-    if(is_equal(token, "FUR3")) return std::vector{Node::DOF::FUR3};
-    if(is_equal(token, "RADIAL")) return std::vector{Node::DOF::RADIAL};
-    if(is_equal(token, "AXIAL")) return std::vector{Node::DOF::AXIAL};
-    if(is_equal(token, "RS")) return std::vector{Node::DOF::RS};
-    if(is_equal(token, "RW")) return std::vector{Node::DOF::RW};
-    if(is_equal(token, "DAMAGE")) return std::vector{Node::DOF::DAMAGE};
-    if(is_equal(token, "PRESSURE")) return std::vector{Node::DOF::PRESSURE};
-    if(is_equal(token, "TEMPERATURE")) return std::vector{Node::DOF::TEMPERATURE};
-    if(is_equal(token, "WARP")) return std::vector{Node::DOF::WARP};
+    if(is_equal_any(token, "PINNED", "P")) return {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3};
+    if(is_equal_any(token, "ENCASTRE", "E")) return {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::UR1, Node::DOF::UR2, Node::DOF::UR3};
+    if(is_equal_any(token, "XSYMM", "X")) return {Node::DOF::U1, Node::DOF::UR2, Node::DOF::UR3};
+    if(is_equal_any(token, "YSYMM", "Y")) return {Node::DOF::UR1, Node::DOF::U2, Node::DOF::UR3};
+    if(is_equal_any(token, "ZSYMM", "Z")) return {Node::DOF::UR1, Node::DOF::UR2, Node::DOF::U3};
+    if(is_equal_any(token, "1", "U1")) return {Node::DOF::U1};
+    if(is_equal_any(token, "2", "U2")) return {Node::DOF::U2};
+    if(is_equal_any(token, "3", "U3")) return {Node::DOF::U3};
+    if(is_equal_any(token, "4", "U4", "UR1")) return {Node::DOF::UR1};
+    if(is_equal_any(token, "5", "U5", "UR2")) return {Node::DOF::UR2};
+    if(is_equal_any(token, "6", "U6", "UR3")) return {Node::DOF::UR3};
+    if(is_equal(token, "FU1")) return {Node::DOF::FU1};
+    if(is_equal(token, "FU2")) return {Node::DOF::FU2};
+    if(is_equal(token, "FU3")) return {Node::DOF::FU3};
+    if(is_equal(token, "FUR1")) return {Node::DOF::FUR1};
+    if(is_equal(token, "FUR2")) return {Node::DOF::FUR2};
+    if(is_equal(token, "FUR3")) return {Node::DOF::FUR3};
+    if(is_equal(token, "RADIAL")) return {Node::DOF::RADIAL};
+    if(is_equal(token, "AXIAL")) return {Node::DOF::AXIAL};
+    if(is_equal(token, "RS")) return {Node::DOF::RS};
+    if(is_equal(token, "RW")) return {Node::DOF::RW};
+    if(is_equal(token, "DAMAGE")) return {Node::DOF::DAMAGE};
+    if(is_equal(token, "PRESSURE")) return {Node::DOF::PRESSURE};
+    if(is_equal(token, "TEMPERATURE")) return {Node::DOF::TEMPERATURE};
+    if(is_equal(token, "WARP")) return {Node::DOF::WARP};
 
     return {};
 }

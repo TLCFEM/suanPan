@@ -67,8 +67,8 @@ namespace {
 
             auto clear_mat = [&] {
                 A.zeros();
-                for(auto i = 0llu; i < N; ++i)
-                    for(auto j = 0llu; j < N; ++j)
+                for(uword i{0}; i < N; ++i)
+                    for(uword j{0}; j < N; ++j)
                         if(std::abs(static_cast<int>(i) - static_cast<int>(j)) <= 3) A.at(i, j) = B(i, j);
                         else B(i, j) = ET(0);
             };
@@ -137,63 +137,63 @@ namespace {
         };
     }
 
-    template<typename T> T create_new(u64) { throw std::runtime_error("unknown matrix"); }
+    template<typename T> T create_new(uword) { throw std::runtime_error("unknown matrix"); }
 
-    template<> FullMat<double> create_new(const u64 N) { return {N, N}; }
+    template<> FullMat<double> create_new(const uword N) { return {N, N}; }
 
-    template<> SymmPackMat<double> create_new(const u64 N) { return SymmPackMat<double>{N}; }
+    template<> SymmPackMat<double> create_new(const uword N) { return SymmPackMat<double>{N}; }
 
-    template<> BandMat<double> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
+    template<> BandMat<double> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3}), std::max(N / uword{200}, uword{3})}; }
 
-    template<> BandMatSpike<double> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
+    template<> BandMatSpike<double> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3}), std::max(N / uword{200}, uword{3})}; }
 
-    template<> BandSymmMat<double> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu)}; }
+    template<> BandSymmMat<double> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3})}; }
 
-    template<> SparseMatSuperLU<double> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatSuperLU<double> create_new(const uword N) { return {N, N}; }
 
-    template<> FullMat<float> create_new(const u64 N) { return {N, N}; }
+    template<> FullMat<float> create_new(const uword N) { return {N, N}; }
 
-    template<> SymmPackMat<float> create_new(const u64 N) { return SymmPackMat<float>{N}; }
+    template<> SymmPackMat<float> create_new(const uword N) { return SymmPackMat<float>{N}; }
 
-    template<> BandMat<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
+    template<> BandMat<float> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3}), std::max(N / uword{200}, uword{3})}; }
 
-    template<> BandMatSpike<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
+    template<> BandMatSpike<float> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3}), std::max(N / uword{200}, uword{3})}; }
 
-    template<> BandSymmMat<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu)}; }
+    template<> BandSymmMat<float> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3})}; }
 
-    template<> SparseMatSuperLU<float> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatSuperLU<float> create_new(const uword N) { return {N, N}; }
 
 #ifdef SUANPAN_MKL
-    template<> SparseMatPARDISO<double> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatPARDISO<double> create_new(const uword N) { return {N, N}; }
 
-    template<> SparseMatPARDISO<float> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatPARDISO<float> create_new(const uword N) { return {N, N}; }
 
 #ifdef SUANPAN_DISTRIBUTED
-    template<> SparseMatClusterPARDISO<double> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatClusterPARDISO<double> create_new(const uword N) { return {N, N}; }
 
-    template<> SparseMatClusterPARDISO<float> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatClusterPARDISO<float> create_new(const uword N) { return {N, N}; }
 #endif
 
-    template<> SparseMatFGMRES<double> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatFGMRES<double> create_new(const uword N) { return {N, N}; }
 #endif
 
 #ifdef SUANPAN_CUDA
-    template<> FullMatCUDA<double> create_new(const u64 N) { return {N, N}; }
+    template<> FullMatCUDA<double> create_new(const uword N) { return {N, N}; }
 
-    template<> FullMatCUDA<float> create_new(const u64 N) { return {N, N}; }
+    template<> FullMatCUDA<float> create_new(const uword N) { return {N, N}; }
 
-    template<> SparseMatCUDA<double> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatCUDA<double> create_new(const uword N) { return {N, N}; }
 
-    template<> SparseMatCUDA<float> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatCUDA<float> create_new(const uword N) { return {N, N}; }
 
 #ifdef SUANPAN_MAGMA
-    template<> BandMatMAGMA<double> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
+    template<> BandMatMAGMA<double> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3}), std::max(N / uword{200}, uword{3})}; }
 
-    template<> BandMatMAGMA<float> create_new(const u64 N) { return {N, std::max(N / 200llu, 3llu), std::max(N / 200llu, 3llu)}; }
+    template<> BandMatMAGMA<float> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3}), std::max(N / uword{200}, uword{3})}; }
 
-    template<> SparseMatMAGMA<double> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatMAGMA<double> create_new(const uword N) { return {N, N}; }
 
-    template<> SparseMatMAGMA<float> create_new(const u64 N) { return {N, N}; }
+    template<> SparseMatMAGMA<float> create_new(const uword N) { return {N, N}; }
 #endif
 #endif
 
@@ -420,7 +420,7 @@ TEST_CASE("Triplet/CSR/CSC Sparse", "[Matrix.Sparse]") {
 
         B.zeros();
 
-        B.assemble(A, linspace<uvec>(0, N - 1llu, N));
+        B.assemble(A, linspace<uvec>(0, N - 1u, N));
 
         csr_form<double, uword> D(B);
         csc_form<double, uword> E(B);

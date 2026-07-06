@@ -39,8 +39,8 @@ void Tabular::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_error("Cannot load \"{}\".\n", file_name);
         D->disable_amplitude(get_tag());
     }
-    else if(ext_data.n_cols >= 2llu) {
-        if(ext_data.n_cols > 2llu)
+    else if(ext_data.n_cols >= 2u) {
+        if(ext_data.n_cols > 2u)
             suanpan_warning("More than two columns read from \"{}\".\n", file_name);
         time = ext_data.col(0);
         magnitude = ext_data.col(1);

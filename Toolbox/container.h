@@ -61,15 +61,15 @@ namespace suanpan {
 #endif
 
 template<sp_i T> uvec to_uvec(const suanpan::set<T>& in) {
-    uvec out(in.size(), fill::none);
-    auto I = 0llu;
+    uvec out(static_cast<uword>(in.size()), fill::none);
+    uword I{0};
     for(const auto J : in) out(I++) = static_cast<uword>(J);
     return out;
 }
 
 template<sp_i T> uvec to_uvec(const suanpan::unordered_set<T>& in) {
-    uvec out(in.size(), fill::none);
-    auto I = 0llu;
+    uvec out(static_cast<uword>(in.size()), fill::none);
+    uword I{0};
     for(const auto J : in) out(I++) = static_cast<uword>(J);
     return out;
 }

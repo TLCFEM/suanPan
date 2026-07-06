@@ -80,8 +80,8 @@ TEST_CASE("BSplineSurface Compute Location of A Point", "[IGA.BSplineSurface]") 
         const auto B = U.evaluate_shape_function(2.5, 1., P);
 
         vec PP = zeros(4);
-        for(auto I = 0llu; I < B.n_rows; ++I)
-            for(auto J = 0llu; J < B.n_cols; ++J)
+        for(uword I{0}; I < B.n_rows; ++I)
+            for(uword J{0}; J < B.n_cols; ++J)
                 if(!P(I, J).empty()) PP += B(I, J) * P(I, J);
 
         REQUIRE(norm(PP) == Approx(norm(A)));
@@ -109,8 +109,8 @@ TEST_CASE("BSplineSurface Compute Derivative of A Point", "[IGA.BSplineSurface]"
         const auto E = U.evaluate_shape_function_derivative(0., 0., 1, 1)(1, 1);
 
         vec PP = zeros(4);
-        for(auto I = 0llu; I < E.n_rows; ++I)
-            for(auto J = 0llu; J < E.n_cols; ++J) PP += E(I, J) * P(I, J);
+        for(uword I{0}; I < E.n_rows; ++I)
+            for(uword J{0}; J < E.n_cols; ++J) PP += E(I, J) * P(I, J);
 
         REQUIRE(norm(A(1, 1)) == Approx(norm(PP)));
     }
@@ -130,9 +130,9 @@ TEST_CASE("BSplineVolume Compute Location of A Point", "[IGA.BSplineVolume]") {
 
     vec C = zeros(4);
 
-    for(auto I = 0llu; I < B.n_rows; ++I)
-        for(auto J = 0llu; J < B.n_cols; ++J)
-            for(auto K = 0llu; K < B.n_slices; ++K) C += B(I, J, K) * P(I, J, K);
+    for(uword I{0}; I < B.n_rows; ++I)
+        for(uword J{0}; J < B.n_cols; ++J)
+            for(uword K{0}; K < B.n_slices; ++K) C += B(I, J, K) * P(I, J, K);
 
     REQUIRE(norm(A) == Approx(norm(C)));
 
@@ -142,9 +142,9 @@ TEST_CASE("BSplineVolume Compute Location of A Point", "[IGA.BSplineVolume]") {
         const auto E = U.evaluate_shape_function_derivative(2.5, 1., .5, 1, 1, 1)(1, 1, 1);
 
         C.zeros(4);
-        for(auto I = 0llu; I < E.n_rows; ++I)
-            for(auto J = 0llu; J < E.n_cols; ++J)
-                for(auto K = 0llu; K < E.n_slices; ++K) C += E(I, J, K) * P(I, J, K);
+        for(uword I{0}; I < E.n_rows; ++I)
+            for(uword J{0}; J < E.n_cols; ++J)
+                for(uword K{0}; K < E.n_slices; ++K) C += E(I, J, K) * P(I, J, K);
 
         REQUIRE(norm(D) == Approx(norm(C)));
     }
@@ -171,7 +171,7 @@ TEST_CASE("NURBS Compute Location of A Point", "[IGA.NURBS]") {
     const auto C = A.evaluate_shape_function(1., P);
 
     vec BB(3, fill::zeros);
-    for(auto I = 0llu; I < P.n_rows; ++I) BB += P(I) * C(I);
+    for(uword I{0}; I < P.n_rows; ++I) BB += P(I) * C(I);
 
     REQUIRE(B(0) == Approx(BB(0)));
     REQUIRE(B(1) == Approx(BB(1)));
@@ -212,7 +212,7 @@ TEST_CASE("NURBS Compute Derivative of A Point", "[IGA.NURBS]") {
     const auto D = A.evaluate_shape_function_derivative(E, PP, 4)(4);
 
     vec BB(3, fill::zeros);
-    for(auto I = 0llu; I < PP.n_rows; ++I)
+    for(uword I{0}; I < PP.n_rows; ++I)
         if(!PP(I).empty()) BB += PP(I) * D(I);
 
     REQUIRE(norm(BB.head(2)) == Approx(norm(B(4))));
@@ -293,9 +293,9 @@ TEST_CASE("NURBSVolume Compute Location of A Point", "[IGA.NURBSVolume]") {
 
     vec C = zeros(4);
 
-    for(auto I = 0llu; I < B.n_rows; ++I)
-        for(auto J = 0llu; J < B.n_cols; ++J)
-            for(auto K = 0llu; K < B.n_slices; ++K) C += B(I, J, K) * P(I, J, K);
+    for(uword I{0}; I < B.n_rows; ++I)
+        for(uword J{0}; J < B.n_cols; ++J)
+            for(uword K{0}; K < B.n_slices; ++K) C += B(I, J, K) * P(I, J, K);
 
     REQUIRE(norm(A) == Approx(norm(C.head(3))));
 
@@ -305,9 +305,9 @@ TEST_CASE("NURBSVolume Compute Location of A Point", "[IGA.NURBSVolume]") {
 
     C.zeros();
 
-    for(auto I = 0llu; I < E.n_rows; ++I)
-        for(auto J = 0llu; J < E.n_cols; ++J)
-            for(auto K = 0llu; K < E.n_slices; ++K) C += E(I, J, K) * PP(I, J, K);
+    for(uword I{0}; I < E.n_rows; ++I)
+        for(uword J{0}; J < E.n_cols; ++J)
+            for(uword K{0}; K < E.n_slices; ++K) C += E(I, J, K) * PP(I, J, K);
 
     REQUIRE(norm(D) == Approx(norm(C.head(3))));
 }

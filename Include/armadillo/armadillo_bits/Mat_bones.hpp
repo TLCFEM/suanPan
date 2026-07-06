@@ -48,14 +48,19 @@ class Mat : public Base< eT, Mat<eT> >
   
   protected:
   
-  arma_align_mem eT mem_local[ arma_config::mat_prealloc ];  // local storage, for small vectors and matrices
-  
-  
+#if defined(ARMA_MAT_PREALLOC) && ARMA_MAT_PREALLOC == 0
+      static constexpr eT* mem_local{nullptr};
+#else
+      arma_align_mem eT mem_local[arma_config::mat_prealloc]; // local storage, for small vectors and matrices
+#endif
+
   public:
   
   static constexpr bool is_col  = false;
   static constexpr bool is_row  = false;
   static constexpr bool is_xvec = false;
+  
+  static constexpr bool has_subview = false;
   
   inline ~Mat();
   inline  Mat();
@@ -452,6 +457,8 @@ class Mat : public Base< eT, Mat<eT> >
   arma_warn_unused arma_inline       eT& operator() (const uword in_row, const uword in_col);
   arma_warn_unused arma_inline const eT& operator() (const uword in_row, const uword in_col) const;
   
+  inline void push_back(const eT val);
+  
   arma_inline const Mat& operator++();
   arma_inline void       operator++(int);
   
@@ -819,6 +826,8 @@ class Mat : public Base< eT, Mat<eT> >
   
   inline Mat(const arma_fixed_indicator&, const uword in_n_rows, const uword in_n_cols, const uhword in_vec_state, const eT* in_mem);
   
+  template<int vec_mode> inline void vec_push_back(const eT val, const arma_vec_mode_indicator<vec_mode>&);
+  
   
   friend class Cube<eT>;
   friend class subview_cube<eT>;
@@ -830,7 +839,7 @@ class Mat : public Base< eT, Mat<eT> >
   friend struct op_mean;
   friend struct op_max;
   friend struct op_min;
-
+  
   
   public:
   
@@ -865,6 +874,8 @@ class Mat<eT>::fixed : public Mat<eT>
   static constexpr bool is_col  = (fixed_n_cols == 1);
   static constexpr bool is_row  = (fixed_n_rows == 1);
   static constexpr bool is_xvec = false;
+  
+  static constexpr bool has_subview = false;
   
   static const uword n_rows;  // value provided below the class definition
   static const uword n_cols;  // value provided below the class definition
@@ -921,6 +932,8 @@ class Mat<eT>::fixed : public Mat<eT>
   arma_warn_unused arma_inline const eT& at         (const uword in_row, const uword in_col) const;
   arma_warn_unused arma_inline       eT& operator() (const uword in_row, const uword in_col);
   arma_warn_unused arma_inline const eT& operator() (const uword in_row, const uword in_col) const;
+  
+  inline void push_back(const eT) = delete;
   
   arma_warn_unused arma_inline       eT* colptr(const uword in_col);
   arma_warn_unused arma_inline const eT* colptr(const uword in_col) const;

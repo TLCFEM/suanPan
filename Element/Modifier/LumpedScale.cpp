@@ -31,7 +31,7 @@ int LumpedScale::update_status() {
         const auto num_node = t_ptr->get_node_number();
         const auto num_size = num_dof * num_node;
         vec n_mass(num_size, fill::zeros);
-        for(unsigned I = 0; I < num_dof; ++I) {
+        for(unsigned I{0}; I < num_dof; ++I) {
             auto mass_a = 0., mass_b = 0.;
             for(auto J = I; J < num_size; J += num_dof) {
                 mass_a += sum(t_mass.col(J));

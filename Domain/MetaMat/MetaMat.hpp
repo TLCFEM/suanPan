@@ -110,13 +110,13 @@ protected:
     }
 
 public:
-    triplet_form<T, uword> triplet_mat;
+    triplet_form<T, std::uint64_t> triplet_mat;
 
     const uword n_rows;
     const uword n_cols;
-    const uword n_elem;
+    const std::uint64_t n_elem;
 
-    MetaMat(const uword in_rows, const uword in_cols, const uword in_elem)
+    MetaMat(const uword in_rows, const uword in_cols, const std::uint64_t in_elem)
         : triplet_mat(in_rows, in_cols)
         , n_rows(in_rows)
         , n_cols(in_cols)
@@ -177,7 +177,7 @@ public:
     virtual T* memptr() = 0;
 
     virtual void scale_accu(T, const shared_ptr<MetaMat>&) = 0;
-    virtual void scale_accu(T, const triplet_form<T, uword>&) = 0;
+    virtual void scale_accu(T, const triplet_form<T, std::uint64_t>&) = 0;
 
     void operator+=(const shared_ptr<MetaMat>& M) { return this->scale_accu(1., M); }
 
@@ -195,9 +195,9 @@ public:
         if(nullptr != bracket.mat_b) this->scale_accu(-M.scalar, bracket.mat_b);
     }
 
-    void operator+=(const triplet_form<T, uword>& M) { return this->scale_accu(1., M); }
+    void operator+=(const triplet_form<T, std::uint64_t>& M) { return this->scale_accu(1., M); }
 
-    void operator-=(const triplet_form<T, uword>& M) { return this->scale_accu(-1., M); }
+    void operator-=(const triplet_form<T, std::uint64_t>& M) { return this->scale_accu(-1., M); }
 
     virtual Mat<T> operator*(const Mat<T>&) const = 0;
 
@@ -220,8 +220,7 @@ public:
     virtual void allreduce() = 0;
 
     void save(const char* name) {
-        if(!to_mat(*this).save(name, raw_ascii))
-            suanpan_error("Cannot save to file \"{}\".\n", name);
+        if(triplet_mat.is_empty() ? !to_mat(*this).save(name, raw_ascii) : !triplet_mat.save(name)) suanpan_error("Cannot save to file \"{}\".\n", name);
     }
 
     virtual void csc_condense() {}
@@ -231,8 +230,8 @@ public:
 
 template<sp_d T> Mat<T> to_mat(const MetaMat<T>& in_mat) {
     Mat<T> out_mat(in_mat.n_rows, in_mat.n_cols);
-    for(uword J = 0; J < in_mat.n_cols; ++J)
-        for(uword I = 0; I < in_mat.n_rows; ++I) out_mat(I, J) = in_mat(I, J);
+    for(uword J{0}; J < in_mat.n_cols; ++J)
+        for(uword I{0}; I < in_mat.n_rows; ++I) out_mat(I, J) = in_mat(I, J);
     return out_mat;
 }
 

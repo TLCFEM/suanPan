@@ -65,7 +65,7 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto& j_s = j_p;
 
-    for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += 2, L += 2) {
+    for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += 2, L += 2) {
         // \mathbold{L}\mathbold{\phi}_\mathbold{u}
         // l_p(0, K) = l_p(2, L) = pn_pxy(0, J);
         // l_p(2, K) = l_p(1, L) = pn_pxy(1, J);
@@ -117,7 +117,7 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
         const auto& phi_q = n;
         const auto& phi_r = phi_s;
 
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += 2, L += 2)
+        for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += 2, L += 2)
             // \mathbold{\phi}_\mathbold{\theta}
             // phi_q(0, J) = n(J);
 

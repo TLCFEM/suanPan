@@ -98,7 +98,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const mat_ptr& K, const mat_ptr& M
     auto LWORKL = 3 * NCV * (NCV + 2);
 
     blas_int IPARAM[11]{}, IPNTR[14]{};
-    podarray<double> RESID(N), V(N * uword(NCV)), WORKD(3llu * N), WORKL(LWORKL);
+    podarray<double> RESID(N), V(N * uword(NCV)), WORKD(3u * N), WORKL(LWORKL);
 
     IPARAM[0] = 1;    // exact shift
     IPARAM[2] = 1000; // maximum iteration
@@ -138,7 +138,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const mat_ptr& K, const mat_ptr& M
     static auto SIGMA{0.};
 
     podarray<blas_int> SELECT(NCV);
-    podarray<double> DR(NEV + 1llu), DI(NEV + 1llu), Z(N * (NEV + 1llu)), WORKEV(3llu * NCV);
+    podarray<double> DR(NEV + 1u), DI(NEV + 1u), Z(N * (NEV + 1u)), WORKEV(3u * NCV);
 
     arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), Z.memptr(), &N, &SIGMA, &SIGMA, WORKEV.memptr(), &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
 
@@ -146,18 +146,18 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const mat_ptr& K, const mat_ptr& M
     eigvec.set_size(N, NEV);
 
     // get eigenvalues
-    for(uword I = 0; I < uword(NEV); ++I) eigval(I) = std::complex(DR(I), DI(I));
+    for(uword I{0}; I < uword(NEV); ++I) eigval(I) = std::complex(DR(I), DI(I));
 
     // get eigenvectors
-    for(uword I = 0; I < uword(NEV); ++I) {
-        if(I < NEV - 1llu && eigval[I] == std::conj(eigval[I + 1llu])) {
-            for(uword J = 0; J < uword(N); ++J) {
+    for(uword I{0}; I < uword(NEV); ++I) {
+        if(std::cmp_less(I + 1, NEV) && eigval[I] == std::conj(eigval[I + 1u])) {
+            for(uword J{0}; J < uword(N); ++J) {
                 eigvec.at(J, I) = std::complex(Z[N * I + J], Z[N * I + N + J]);
-                eigvec.at(J, I + 1llu) = std::complex(Z[N * I + J], -Z[N * I + N + J]);
+                eigvec.at(J, I + 1u) = std::complex(Z[N * I + J], -Z[N * I + N + J]);
             }
             ++I;
         }
-        else if(I == NEV - 1llu && std::complex(eigval[I]).imag() != 0.)
+        else if(std::cmp_equal(I + 1, NEV) && std::complex(eigval[I]).imag() != 0.)
             for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex(Z[N * I + J], Z[N * I + N + J]);
         else
             for(auto J = 0; J < N; ++J) eigvec.at(J, I) = std::complex(Z[N * I + J], 0.);
@@ -178,7 +178,7 @@ int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const u
     auto LWORKL = 3 * NCV * (NCV + 2);
 
     blas_int IPARAM[11]{}, IPNTR[14]{};
-    podarray<double> RESID(N), V(N * uword(NCV)), WORKD(3llu * N), WORKL(LWORKL);
+    podarray<double> RESID(N), V(N * uword(NCV)), WORKD(3u * N), WORKL(LWORKL);
 
     IPARAM[0] = 1;                           // exact shift
     IPARAM[2] = std::min(blas_int{1000}, N); // maximum iteration
@@ -204,14 +204,14 @@ int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const u
     static auto SIGMA{0.};
 
     podarray<blas_int> SELECT(NCV);
-    podarray<double> DR(NEV + 1llu), DI(NEV + 1llu), WORKEV(3llu * NCV);
+    podarray<double> DR(NEV + 1u), DI(NEV + 1u), WORKEV(3u * NCV);
 
     arma_fortran(arma_dneupd)(&RVEC, &HOWMNY, SELECT.memptr(), DR.memptr(), DI.memptr(), nullptr, &N, &SIGMA, &SIGMA, WORKEV.memptr(), &BMAT, &N, (char*)WHICH, &NEV, &TOL, RESID.memptr(), &NCV, V.memptr(), &N, IPARAM, IPNTR, WORKD.memptr(), WORKL.memptr(), &LWORKL, &INFO);
 
     eigval.set_size(NEV);
 
     // get eigenvalues
-    for(uword I = 0; I < uword(NEV); ++I) eigval(I) = std::complex(DR(I), DI(I));
+    for(uword I{0}; I < uword(NEV); ++I) eigval(I) = std::complex(DR(I), DI(I));
 
     return INFO;
 }

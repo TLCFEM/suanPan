@@ -29,8 +29,8 @@ vec ShellBase::reshuffle(const vec& membrane_resistance, const vec& plate_resist
 
     vec total_resistance(t_size);
 
-    for(unsigned I = 0, J = 0; I < t_size; I += 6, J += 3) {
-        const span K(J, J + 2llu);
+    for(unsigned I{0}, J{0}; I < t_size; I += 6, J += 3) {
+        const span K(J, J + 2u);
         total_resistance(I + m_dof) = membrane_resistance(K);
         total_resistance(I + p_dof) = plate_resistance(K);
     }
@@ -43,10 +43,10 @@ mat ShellBase::reshuffle(const mat& membrane_stiffness, const mat& plate_stiffne
 
     mat total_stiffness(t_size, t_size, fill::zeros);
 
-    for(auto J = 0llu, L = 0llu; J < t_size; J += 6llu, L += 3llu) {
-        const span N(L, L + 2llu);
-        for(auto I = 0llu, K = 0llu; I < t_size; I += 6llu, K += 3llu) {
-            const span M(K, K + 2llu);
+    for(uword J{0}, L{0}; J < t_size; J += 6, L += 3) {
+        const span N(L, L + 2);
+        for(uword I{0}, K{0}; I < t_size; I += 6, K += 3) {
+            const span M(K, K + 2);
             total_stiffness(I + m_dof, J + m_dof) = membrane_stiffness(M, N);
             total_stiffness(I + p_dof, J + p_dof) = plate_stiffness(M, N);
             total_stiffness(I + m_dof, J + p_dof) = mp_stiffness(M, N);
@@ -87,13 +87,13 @@ mat ShellBase::get_local_coordinate() const {
 }
 
 vec& ShellBase::transform_from_local_to_global(vec& resistance) const {
-    for(auto I = 0llu, J = 2llu; I < resistance.n_elem; I += 3llu, J += 3llu) resistance.rows(I, J) = trans_mat * resistance.rows(I, J);
+    for(uword I{0}, J{2}; I < resistance.n_elem; I += 3, J += 3) resistance.rows(I, J) = trans_mat * resistance.rows(I, J);
 
     return resistance;
 }
 
 vec& ShellBase::transform_from_global_to_local(vec& displacement) const {
-    for(auto I = 0llu, J = 2llu; I < displacement.n_elem; I += 3llu, J += 3llu) displacement.rows(I, J) = trans_mat.t() * displacement.rows(I, J);
+    for(uword I{0}, J{2}; I < displacement.n_elem; I += 3, J += 3) displacement.rows(I, J) = trans_mat.t() * displacement.rows(I, J);
 
     return displacement;
 }
@@ -102,7 +102,7 @@ mat& ShellBase::transform_from_local_to_global(mat& stiffness) const {
     suanpan_assert([&] { if(stiffness.n_cols != stiffness.n_rows) throw std::invalid_argument("size conflicts"); });
 
     mat global_trans(size(stiffness), fill::zeros);
-    for(auto I = 0llu, J = 2llu; I < stiffness.n_cols; I += 3llu, J += 3llu) {
+    for(uword I{0}, J{2}; I < stiffness.n_cols; I += 3, J += 3) {
         const span t_span(I, J);
         global_trans(t_span, t_span) = trans_mat;
     }
@@ -130,7 +130,7 @@ mat ShellBase::transform_to_global_geometry(const mat& stiffness, const vec& res
 
     mat left(size(stiffness), fill::zeros), right(size(stiffness), fill::zeros);
 
-    for(auto I = 0llu, J = 1llu, K = 2llu; I < resistance.n_elem; I += 3llu, J += 3llu, K += 3llu) {
+    for(auto I = uword{0}, J = uword{1}, K = uword{2}; I < resistance.n_elem; I += uword{3}, J += uword{3}, K += uword{3}) {
         left(uvec{I, J, K}, d) = resistance(I) * diff_triad.rows(a) + resistance(J) * diff_triad.rows(b) + resistance(K) * diff_triad.rows(c);
         const vec nodal_disp = displacement(span(I, K));
         right(d, uvec{I}) = diff_triad.rows(a).t() * nodal_disp;
@@ -139,7 +139,7 @@ mat ShellBase::transform_to_global_geometry(const mat& stiffness, const vec& res
     }
 
     mat global_trans(size(stiffness), fill::zeros);
-    for(auto I = 0llu, J = 2llu; I < stiffness.n_cols; I += 3llu, J += 3llu) {
+    for(uword I{0}, J{2}; I < stiffness.n_cols; I += 3, J += 3) {
         const span t_span(I, J);
         global_trans(t_span, t_span) = trans_mat;
     }

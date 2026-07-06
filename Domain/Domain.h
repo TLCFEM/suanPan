@@ -79,7 +79,7 @@ class Domain final : public DomainBase, public std::enable_shared_from_this<Doma
 
     std::vector<bool> attribute;
 
-    mutable std::array<double, 5> statistics{};
+    mutable std::array<double, 7> statistics{};
 
     TagMap compact_node;                        // existing tag -> compact tag
     TagMapCollection compact_node_per_material; // material tag -> (existing tag -> compact tag)
@@ -380,6 +380,8 @@ public:
     void update_current_nonviscous_force() const override;
     void update_current_inertial_force() const override;
 
+    vec assemble_vector(std::function<vec(const shared_ptr<Element>&)>) const override;
+
     void assemble_resistance() const override;
     void assemble_damping_force() const override;
     void assemble_nonviscous_force() const override;
@@ -409,7 +411,7 @@ public:
     void update_load() override;
     void update_constraint() override;
 
-    void assemble_load_stiffness() override;
+    void assemble_load_stiffness(double) override;
     void assemble_constraint_stiffness() override;
 
     int update_current_status() const override;

@@ -1,0 +1,33 @@
+diff --git a/Include/armadillo/armadillo_bits/Mat_bones.hpp b/Include/armadillo/armadillo_bits/Mat_bones.hpp
+index a56e4f7b..6f9eac1b 100644
+--- a/Include/armadillo/armadillo_bits/Mat_bones.hpp
++++ b/Include/armadillo/armadillo_bits/Mat_bones.hpp
+@@ -48,9 +48,12 @@ class Mat : public Base< eT, Mat<eT> >
+   
+   protected:
+   
+-  arma_align_mem eT mem_local[ arma_config::mat_prealloc ];  // local storage, for small vectors and matrices
+-  
+-  
++#if defined(ARMA_MAT_PREALLOC) && ARMA_MAT_PREALLOC == 0
++      static constexpr eT* mem_local{nullptr};
++#else
++      arma_align_mem eT mem_local[arma_config::mat_prealloc]; // local storage, for small vectors and matrices
++#endif
++
+   public:
+   
+   static constexpr bool is_col  = false;
+diff --git a/Include/armadillo/armadillo_bits/arma_config.hpp b/Include/armadillo/armadillo_bits/arma_config.hpp
+index 5f4fc5b8..e45305e8 100644
+--- a/Include/armadillo/armadillo_bits/arma_config.hpp
++++ b/Include/armadillo/armadillo_bits/arma_config.hpp
+@@ -24,7 +24,7 @@
+ struct arma_config
+   {
+   #if defined(ARMA_MAT_PREALLOC)
+-    static constexpr uword mat_prealloc = (sword(ARMA_MAT_PREALLOC) > 0) ? uword(ARMA_MAT_PREALLOC) : 1;
++    static constexpr uword mat_prealloc = (sword(ARMA_MAT_PREALLOC) > 0) ? uword(ARMA_MAT_PREALLOC) : 0;
+   #else
+     static constexpr uword mat_prealloc = 16;
+   #endif

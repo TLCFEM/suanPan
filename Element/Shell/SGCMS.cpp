@@ -201,7 +201,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(m_plan.n_rows);
-    for(unsigned I = 0; I < m_plan.n_rows; ++I) {
+    for(unsigned I{0}; I < m_plan.n_rows; ++I) {
         const auto &X = m_plan(I, 0), &Y = m_plan(I, 1);
 
         int_pt.emplace_back(vec{X, Y});
@@ -239,7 +239,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
 
     mat::fixed<12, 12> p_stiffness(fill::zeros), mp_stiffness(fill::zeros), pm_stiffness(fill::zeros);
 
-    for(unsigned I = 0; I < m_plan.n_rows; ++I) {
+    for(unsigned I{0}; I < m_plan.n_rows; ++I) {
         auto& c_pt = int_pt.at(I);
 
         // update membrane strain matrix first
@@ -257,7 +257,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
         auto& c_ip = c_pt.sec_int_pt;
         c_ip.clear();
         c_ip.reserve(t_plan.n_rows);
-        for(unsigned J = 0; J < t_plan.n_rows; ++J) {
+        for(unsigned J{0}; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
             c_ip.emplace_back(t_eccentricity, t_weight * t_plan(J, 1), mat_proto->unique_copy());
             p_stiffness += c_pt.BP.t() * mat_stiff * c_pt.BP * c_ip.back().factor * pow(t_eccentricity, 2.);
@@ -279,8 +279,8 @@ int SGCMS::update_status() {
     const auto g_disp = get_trial_displacement();
     const auto t_disp = transform_from_global_to_local(g_disp);
     vec::fixed<12> m_disp, p_disp;
-    for(unsigned I = 0, J = 0; I < s_size; I += s_dof, J += 3) {
-        const span t_span(J, J + 2llu);
+    for(unsigned I{0}, J{0}; I < s_size; I += s_dof, J += 3) {
+        const span t_span(J, J + 2u);
         m_disp(t_span) = t_disp(I + m_dof);
         p_disp(t_span) = t_disp(I + p_dof);
     }

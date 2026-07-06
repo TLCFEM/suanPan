@@ -41,7 +41,7 @@ int Homogeneous::initialize(const shared_ptr<DomainBase>& D) {
     initial_membrane_stiffness.zeros(3, 3);
     initial_plate_stiffness.zeros(3, 3);
 
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         int_pt.emplace_back(.5 * thickness * plan(I, 0), plan(I, 1), mat_proto->unique_copy());
 
         const auto& c_pt = int_pt.back();

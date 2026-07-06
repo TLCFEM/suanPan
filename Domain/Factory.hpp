@@ -660,6 +660,8 @@ public:
 
     /*************************ASSEMBLER*************************/
 
+    void assemble_vector(const Mat<T>&, const uvec&, vec&);
+
     void assemble_resistance(const Mat<T>&, const uvec&);
     void assemble_damping_force(const Mat<T>&, const uvec&);
     void assemble_nonviscous_force(const Mat<T>&, const uvec&);
@@ -693,7 +695,7 @@ template<sp_d T> unsigned Factory<T>::get_size() const { return n_size; }
 
 template<sp_d T> void Factory<T>::set_entry(const uword N) {
     n_elem = N;
-    if(n_elem > std::numeric_limits<la_it>::max()) throw std::invalid_argument("too many elements");
+    if(std::cmp_greater(n_elem, std::numeric_limits<la_it>::max())) throw std::invalid_argument("too many elements");
 }
 
 template<sp_d T> uword Factory<T>::get_entry() const { return n_elem; }
@@ -1448,25 +1450,18 @@ template<sp_d T> void Factory<T>::reset() {
     global_geometry = nullptr;
 }
 
-template<sp_d T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uvec& EI) {
+template<sp_d T> void Factory<T>::assemble_vector(const Mat<T>& ER, const uvec& EI, vec& TARGET) {
     if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) trial_resistance(EI(I)) += ER(I);
+    for(uword I{0}; I < EI.n_elem; ++I) TARGET(EI(I)) += ER(I);
 }
 
-template<sp_d T> void Factory<T>::assemble_damping_force(const Mat<T>& ER, const uvec& EI) {
-    if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) trial_damping_force(EI(I)) += ER(I);
-}
+template<sp_d T> void Factory<T>::assemble_resistance(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_resistance); }
 
-template<sp_d T> void Factory<T>::assemble_nonviscous_force(const Mat<T>& ER, const uvec& EI) {
-    if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) trial_nonviscous_force(EI(I)) += ER(I);
-}
+template<sp_d T> void Factory<T>::assemble_damping_force(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_damping_force); }
 
-template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, const uvec& EI) {
-    if(ER.is_empty()) return;
-    for(auto I = 0llu; I < EI.n_elem; ++I) trial_inertial_force(EI(I)) += ER(I);
-}
+template<sp_d T> void Factory<T>::assemble_nonviscous_force(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_nonviscous_force); }
+
+template<sp_d T> void Factory<T>::assemble_inertial_force(const Mat<T>& ER, const uvec& EI) { return assemble_vector(ER, EI, trial_inertial_force); }
 
 template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>& GM, const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) {
     if(EM.is_empty()) return;
@@ -1474,8 +1469,8 @@ template<sp_d T> void Factory<T>::assemble_matrix_helper(shared_ptr<MetaMat<T>>&
     if(StorageScheme::BANDSYMM == storage_type || StorageScheme::SYMMPACK == storage_type)
         for(const auto [g_row, g_col, l_row, l_col] : MAP) GM->unsafe_at(g_row, g_col) += EM(l_row, l_col);
     else
-        for(auto I = 0llu; I < EI.n_elem; ++I)
-            for(auto J = 0llu; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
+        for(uword I{0}; I < EI.n_elem; ++I)
+            for(uword J{0}; J < EI.n_elem; ++J) GM->unsafe_at(EI(J), EI(I)) += EM(J, I);
 }
 
 template<sp_d T> void Factory<T>::assemble_mass(const Mat<T>& EM, const uvec& EI, const std::vector<MappingDOF>& MAP) { this->assemble_matrix_helper(global_mass, EM, EI, MAP); }
@@ -1490,7 +1485,7 @@ template<sp_d T> void Factory<T>::assemble_geometry(const Mat<T>& EG, const uvec
 
 template<sp_d T> void Factory<T>::assemble_stiffness(const SpMat<T>& EK, const uvec& EI) {
     if(EK.is_empty()) return;
-    for(auto I = EK.begin(); I != EK.end(); ++I) global_stiffness->at(EI(I.row()), EI(I.col())) += *I;
+    for(auto I = EK.begin(); I != EK.end(); ++I) global_stiffness->unsafe_at(EI(I.row()), EI(I.col())) += *I;
 }
 
 template<sp_d T> void Factory<T>::print() const {
@@ -1554,7 +1549,12 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
         if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<SparseMatMAGMA<T>>(n_size, n_size, n_elem);
 #endif
 #endif
+        if(contain_solver_type(SolverType::SUPERLU)) return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+#ifdef SUANPAN_MKL
+        return std::make_unique<SparseMatPARDISO<T>>(n_size, n_size, n_elem);
+#else
         return std::make_unique<SparseMatSuperLU<T>>(n_size, n_size, n_elem);
+#endif
 #endif
     default:
         throw std::invalid_argument("need a proper storage scheme");

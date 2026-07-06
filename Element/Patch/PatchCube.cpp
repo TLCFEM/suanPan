@@ -43,7 +43,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto ele_coor = get_coordinate(4);
 
-    for(auto I = 0llu; I < prod(net_size); ++I) polygon(I) = ele_coor.row(I).t();
+    for(uword I{0}; I < prod(net_size); ++I) polygon(I) = ele_coor.row(I).t();
 
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
@@ -69,7 +69,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
                 const auto &yl = knot_pool[1](J), &yh = knot_pool[1](J + 1);
                 const auto &zl = knot_pool[2](K), &zh = knot_pool[2](K + 1);
                 const auto dx = xh - xl, dy = yh - yl, dz = zh - zl;
-                for(unsigned L = 0; L < plan.n_rows; ++L) {
+                for(unsigned L{0}; L < plan.n_rows; ++L) {
                     const auto x = xl + dx * (.5 * plan(L, 0) + .5);
                     const auto y = yl + dy * (.5 * plan(L, 1) + .5);
                     const auto z = zl + dz * (.5 * plan(L, 2) + .5);
@@ -83,7 +83,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
                     const mat pn_pxyz = solve(jacob, pn);
 
                     c_pt.strain_mat.zeros(6, c_size);
-                    for(unsigned P = 0, M = 0, N = 1, O = 2; P < c_node; ++P, M += c_dof, N += c_dof, O += c_dof) {
+                    for(unsigned P{0}, M{0}, N{1}, O{2}; P < c_node; ++P, M += c_dof, N += c_dof, O += c_dof) {
                         c_pt.strain_mat(0, M) = c_pt.strain_mat(3, N) = c_pt.strain_mat(5, O) = pn_pxyz(0, P);
                         c_pt.strain_mat(3, M) = c_pt.strain_mat(1, N) = c_pt.strain_mat(4, O) = pn_pxyz(1, P);
                         c_pt.strain_mat(5, M) = c_pt.strain_mat(4, N) = c_pt.strain_mat(2, O) = pn_pxyz(2, P);
@@ -91,10 +91,10 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
                     initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
 
                     for(auto M = 0u, N = 0u; M < c_node; ++M, N += c_dof)
-                        for(auto P = 0llu; P < c_dof; ++P) body_force(N + P, P) += c_pt.weight * ders(0, 0, 0)(M);
+                        for(uword P{0}; P < c_dof; ++P) body_force(N + P, P) += c_pt.weight * ders(0, 0, 0)(M);
 
                     if(t_density > 0.)
-                        for(auto M = 0llu; M < c_node; ++M)
+                        for(uword M{0}; M < c_node; ++M)
                             for(auto N = M; N < c_node; ++N) initial_mass(c_dof * M, c_dof * N) += t_density * c_pt.weight * ders(0, 0, 0)(M) * ders(0, 0, 0)(N);
                 }
             }

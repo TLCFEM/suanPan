@@ -15,7 +15,7 @@ auto tiny_graph() {
     return graph;
 }
 
-auto small_graph(const unsigned long long N, const double D) {
+auto small_graph(const unsigned N, const double D) {
     suanpan::graph<unsigned> graph(N);
 
     for(auto I = 0u; I < N; ++I) graph[I].insert(I);
@@ -30,7 +30,7 @@ auto small_graph(const unsigned long long N, const double D) {
     return graph;
 }
 
-auto color_graph(const unsigned long long N, const double D, std::vector<std::vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
+auto color_graph(const unsigned N, const double D, std::vector<std::vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
     const auto graph = small_graph(N, D);
 
     const auto color_map = algorithm(graph);
@@ -40,7 +40,7 @@ auto color_graph(const unsigned long long N, const double D, std::vector<std::ve
         number_element += color.size();
         for(auto I = 0llu; I < color.size(); ++I) {
             const auto& target_list = graph[color[I]];
-            for(auto J = I + 1llu; J < color.size(); ++J)
+            for(auto J = I + 1u; J < color.size(); ++J)
                 REQUIRE((target_list.find(color[J]) == target_list.end()));
         }
     }
@@ -58,7 +58,7 @@ TEST_CASE("Coloring Basic", "[Utility.Coloring]") {
         number_element += color.size();
         for(auto I = 0llu; I < color.size(); ++I) {
             const auto& target_list = graph[color[I]];
-            for(auto J = I + 1llu; J < color.size(); ++J)
+            for(auto J = I + 1u; J < color.size(); ++J)
                 REQUIRE((target_list.find(color[J]) == target_list.end()));
         }
     }
@@ -72,7 +72,7 @@ TEST_CASE("Coloring Basic", "[Utility.Coloring]") {
         number_element += color.size();
         for(auto I = 0llu; I < color.size(); ++I) {
             const auto& target_list = graph[color[I]];
-            for(auto J = I + 1llu; J < color.size(); ++J)
+            for(auto J = I + 1u; J < color.size(); ++J)
                 REQUIRE((target_list.find(color[J]) == target_list.end()));
         }
     }

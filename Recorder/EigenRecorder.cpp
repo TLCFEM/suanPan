@@ -40,7 +40,7 @@ void EigenRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
     const auto& node_pool = D->get_node_pool();
 
-    for(uword I = 0; I < eigen_value.n_elem; ++I) {
+    for(uword I{0}; I < eigen_value.n_elem; ++I) {
         const vec t_eigen_vector = eig_vector.col(I);
         for(const auto& J : node_pool) eigen_pool[I].emplace(J->get_tag(), t_eigen_vector(J->get_reordered_dof()));
     }
@@ -62,7 +62,7 @@ void EigenRecorder::save() {
     hsize_t dimension[2]{eigen_value.n_elem, 1};
     H5LTmake_dataset(file_id, "Eigenvalue", 2, dimension, H5T_NATIVE_DOUBLE, eigen_value.mem);
 
-    for(uword I = 0, J = 1; I < eigen_value.n_elem; ++I, ++J) {
+    for(uword I{0}, J{1}; I < eigen_value.n_elem; ++I, ++J) {
         const auto group_id = H5Gcreate(file_id, ("Eigenvalue " + std::to_string(J)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         for(const auto& [e_val, e_vec] : eigen_pool[I]) {

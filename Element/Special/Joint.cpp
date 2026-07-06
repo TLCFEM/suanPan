@@ -32,7 +32,7 @@ int Joint::initialize(const shared_ptr<DomainBase>& D) {
     for(auto& I : material_tag) j_material.emplace_back(D->get<Material>(I)->unique_copy());
 
     initial_stiffness.zeros(j_size, j_size);
-    for(size_t I = 0, J = j_dof; I < j_dof; ++I, ++J) initial_stiffness(I, J) = initial_stiffness(J, I) = -(initial_stiffness(I, I) = initial_stiffness(J, J) = as_scalar(j_material[I]->get_initial_stiffness()));
+    for(auto I = 0u, J = j_dof; I < j_dof; ++I, ++J) initial_stiffness(I, J) = initial_stiffness(J, I) = -(initial_stiffness(I, I) = initial_stiffness(J, J) = as_scalar(j_material[I]->get_initial_stiffness()));
 
     trial_stiffness = current_stiffness = initial_stiffness;
 
@@ -44,7 +44,7 @@ int Joint::update_status() {
 
     trial_resistance.zeros(j_size);
     trial_stiffness.zeros(j_size, j_size);
-    for(unsigned I = 0, J = j_dof; I < j_material.size(); ++I, ++J) {
+    for(unsigned I{0}, J{j_dof}; I < j_material.size(); ++I, ++J) {
         if(SUANPAN_SUCCESS != j_material[I]->update_trial_status(t_disp(I) - t_disp(J))) return SUANPAN_FAIL;
         trial_resistance(J) = -(trial_resistance(I) = as_scalar(j_material[I]->get_trial_stress()));
         trial_stiffness(I, J) = trial_stiffness(J, I) = -(trial_stiffness(J, J) = trial_stiffness(I, I) = as_scalar(j_material[I]->get_trial_stiffness()));

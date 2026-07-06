@@ -41,7 +41,7 @@ int LineUDL::process(const shared_ptr<DomainBase>& D) {
     D->insert_loaded_dof(target_dof);
 
     mat distribution(dimension, target_node.n_elem, fill::zeros);
-    for(auto I = 0llu, J = 1llu; J < target_node.n_elem; ++I, ++J) {
+    for(uword I{0}, J{1}; J < target_node.n_elem; ++I, ++J) {
         const auto projection = project(abs(D->get<Node>(target_node(J))->initial_position(dimension) - D->get<Node>(target_node(I))->initial_position(dimension)));
         distribution.col(I) += projection;
         distribution.col(J) += projection;

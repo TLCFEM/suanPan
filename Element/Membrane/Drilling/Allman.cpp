@@ -99,7 +99,7 @@ int Allman::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(3);
-    for(uword I = 0; I < 3; ++I) {
+    for(uword I{0}; I < 3; ++I) {
         int_pt.emplace_back(vec{ele_coor(I + 3, 1), ele_coor(I + 3, 2)}, area * thickness / 3., mat_proto->unique_copy());
 
         auto& c_pt = int_pt.back();
@@ -121,7 +121,7 @@ int Allman::initialize(const shared_ptr<DomainBase>& D) {
             for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof)
                 for(auto K = J, P = L; K < m_node; ++K, P += m_dof) initial_mass(L, P) += t_factor * n_int(J) * n_int(K);
         }
-        for(unsigned I = 0, K = 1; I < m_size; I += m_dof, K += m_dof) {
+        for(unsigned I{0}, K{1}; I < m_size; I += m_dof, K += m_dof) {
             initial_mass(K, K) = initial_mass(I, I);
             for(auto J = I + m_dof, L = K + m_dof; J < m_size; J += m_dof, L += m_dof) initial_mass(J, I) = initial_mass(K, L) = initial_mass(L, K) = initial_mass(I, J);
         }

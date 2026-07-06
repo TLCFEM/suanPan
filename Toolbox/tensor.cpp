@@ -625,7 +625,7 @@ mat66 transform::eigen_to_tensor_base(const mat& eig_vec) {
 
 vec transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
     vec principal_tensile_stress(principal_stress.n_elem, fill::zeros);
-    for(auto I = 0llu; I < principal_stress.n_elem; ++I)
+    for(uword I{0}; I < principal_stress.n_elem; ++I)
         if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
 
     return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;

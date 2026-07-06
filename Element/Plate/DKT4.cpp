@@ -123,7 +123,7 @@ int DKT4::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         int_pt.emplace_back(vec{plan(I, 0), plan(I, 1)});
 
         auto& c_pt = int_pt.back();
@@ -141,7 +141,7 @@ int DKT4::initialize(const shared_ptr<DomainBase>& D) {
         auto& c_ip = c_pt.sec_int_pt;
         c_ip.clear();
         c_ip.reserve(num_section_ip);
-        for(unsigned J = 0; J < num_section_ip; ++J) {
+        for(unsigned J{0}; J < num_section_ip; ++J) {
             const auto t_eccentricity = .5 * sec_plan(J, 0) * thickness;
             c_ip.emplace_back(t_eccentricity, t_weight * sec_plan(J, 1), mat_proto->unique_copy());
             initial_stiffness += t_eccentricity * t_eccentricity * c_ip.back().factor * strain_mat.t() * ini_stiffness * strain_mat;

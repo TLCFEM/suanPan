@@ -19,6 +19,7 @@
 
 #include <Domain/Domain.h>
 #include <Step/Step.h>
+#include <regex>
 
 Bead::Bead() { insert(std::make_shared<Domain>(1)); }
 
@@ -70,14 +71,18 @@ int Bead::precheck() {
 }
 
 int Bead::analyze() {
+    wall_clock t_clock;
+
     for(const auto& [d_tag, t_domain] : domain_pool) {
         if(!t_domain->is_active()) continue;
         bool initial_record = true;
         for(const auto& [s_tag, t_step] : t_domain->get_step_pool()) {
             t_domain->set_current_step_tag(t_step->get_tag());
             t_step->set_domain(t_domain);
+            t_clock.tic();
             if(SUANPAN_FAIL == t_step->Step::initialize()) return SUANPAN_FAIL;
             if(SUANPAN_FAIL == t_step->initialize()) return SUANPAN_FAIL;
+            t_domain->update<Statistics::Initialization>(t_clock.toc());
             if(initial_record) {
                 initial_record = false;
                 t_domain->record();
@@ -87,6 +92,30 @@ int Bead::analyze() {
     }
 
     return SUANPAN_SUCCESS;
+}
+
+std::string& Bead::variable(const std::string& name) { return variable_map[name]; }
+
+std::string Bead::replace_variable(const std::string_view original) {
+    const std::regex var_regex(R"(\$([A-Za-z0-9_]+))");
+
+    std::string result;
+    size_t last_pos{0};
+
+    for(std::regex_iterator<std::string_view::iterator> next{original.cbegin(), original.cend(), var_regex}, last{}; next != last; ++next) {
+        auto& match = *next;
+
+        result += original.substr(last_pos, match.position() - last_pos);
+
+        if(auto it = variable_map.find(match[1].str()); it != variable_map.end()) result += it->second;
+        else result += match.str();
+
+        last_pos = match.position() + match.length();
+    }
+
+    result += original.substr(last_pos);
+
+    return result;
 }
 
 shared_ptr<DomainBase>& get_domain(const shared_ptr<Bead>& B, const unsigned T) { return B->domain_pool[T]; }

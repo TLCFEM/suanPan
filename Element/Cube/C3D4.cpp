@@ -42,7 +42,7 @@ int C3D4::initialize(const shared_ptr<DomainBase>& D) {
     pn_pxyz = inv_coor.rows(1, 3);
 
     strain_mat.zeros(6, c_size);
-    for(unsigned J = 0, K = 0, L = 1, M = 2; J < c_node; ++J, K += c_dof, L += c_dof, M += c_dof) {
+    for(unsigned J{0}, K{0}, L{1}, M{2}; J < c_node; ++J, K += c_dof, L += c_dof, M += c_dof) {
         strain_mat(0, K) = strain_mat(3, L) = strain_mat(5, M) = pn_pxyz(0, J);
         strain_mat(3, K) = strain_mat(1, L) = strain_mat(4, M) = pn_pxyz(1, J);
         strain_mat(5, K) = strain_mat(4, L) = strain_mat(2, M) = pn_pxyz(2, J);
@@ -65,7 +65,7 @@ int C3D4::initialize(const shared_ptr<DomainBase>& D) {
 
     body_force.zeros(c_size, c_dof);
     for(auto J = 0u, L = 0u; J < c_node; ++J, L += c_dof)
-        for(auto K = 0llu; K < c_dof; ++K) body_force(L + K, K) = n(J);
+        for(uword K{0}; K < c_dof; ++K) body_force(L + K, K) = n(J);
 
     return SUANPAN_SUCCESS;
 }
@@ -77,7 +77,7 @@ int C3D4::update_status() {
         mat BN(6, c_size);
 
         const mat gradient = ele_disp * pn_pxyz.t() + eye(c_dof, c_dof);
-        for(unsigned I = 0, J = 0, K = 1, L = 2; I < c_node; ++I, J += c_dof, K += c_dof, L += c_dof) {
+        for(unsigned I{0}, J{0}, K{1}, L{2}; I < c_node; ++I, J += c_dof, K += c_dof, L += c_dof) {
             BN(0, J) = pn_pxyz(0, I) * gradient(0, 0);
             BN(1, J) = pn_pxyz(1, I) * gradient(0, 1);
             BN(2, J) = pn_pxyz(2, I) * gradient(0, 2);
@@ -108,7 +108,7 @@ int C3D4::update_status() {
         trial_geometry.zeros(c_size, c_size);
         const auto sigma = tensor::stress::to_tensor(t_stress);
 
-        for(unsigned I = 0, K = 0, M = 1, N = 2; I < c_node; ++I, K += c_dof, M += c_dof, N += c_dof) {
+        for(unsigned I{0}, K{0}, M{1}, N{2}; I < c_node; ++I, K += c_dof, M += c_dof, N += c_dof) {
             const vec t_vec = sigma * pn_pxyz.col(I);
             auto t_factor = volume * dot(pn_pxyz.col(I), t_vec);
             trial_geometry(K, K) += t_factor;

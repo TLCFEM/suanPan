@@ -37,7 +37,7 @@ void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D
 
     for(auto& I : D->get_element_pool()) {
         if(const auto data = normalise_size(I->record(variable_type)); !data.empty()) {
-            mat data_to_write(data[0].n_elem, data.size());
+            mat data_to_write(data[0].n_elem, static_cast<uword>(data.size()));
 
             uword idx = 0;
             for(const auto& J : data) data_to_write.col(idx++) = J;

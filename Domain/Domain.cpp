@@ -899,7 +899,7 @@ int Domain::reorder_dof() {
 
     // get bandwidth
     auto low_bw = 0, up_bw = 0;
-    for(unsigned i = 0; i < dof_counter; ++i)
+    for(unsigned i{0}; i < dof_counter; ++i)
         for(const auto j : adjacency[idx_rcm(i)]) {
             if(const auto t_bw = static_cast<int>(idx_sorted(j)) - static_cast<int>(i); t_bw > low_bw) low_bw = t_bw;
             else if(t_bw < up_bw) up_bw = t_bw;
@@ -938,7 +938,7 @@ int Domain::assign_color() {
     // count how many entries in the sparse form and preallocate memory
     if(is_sparse()) {
         auto& t_element_pool = element_pond.get();
-        factory->set_entry(std::transform_reduce(t_element_pool.cbegin(), t_element_pool.cend(), 1000llu, std::plus(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }));
+        factory->set_entry(std::transform_reduce(t_element_pool.cbegin(), t_element_pool.cend(), uword{1000}, std::plus(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }));
     }
 
     return SUANPAN_SUCCESS;
@@ -963,7 +963,7 @@ int Domain::restart() {
 
 #ifdef SUANPAN_VTK
     compact_node.clear();
-    auto counter = 0llu;
+    uword counter{0};
     for(auto& t_node : get_node_pool()) compact_node.emplace(t_node->get_tag(), counter++);
 
     suanpan::unordered_map<uword, suanpan::set<uword>> material_map, section_map;
@@ -976,14 +976,14 @@ int Domain::restart() {
     compact_node_per_material.clear();
     for(const auto& [tag, node_set] : material_map) {
         auto& target = compact_node_per_material[tag];
-        counter = 0llu;
+        counter = 0;
         for(const auto node : node_set) target.emplace(node, counter++);
     }
 
     compact_node_per_section.clear();
     for(const auto& [tag, node_set] : section_map) {
         auto& target = compact_node_per_section[tag];
-        counter = 0llu;
+        counter = 0;
         for(const auto node : node_set) target.emplace(node, counter++);
     }
 #endif
@@ -1149,7 +1149,7 @@ int Domain::initialize_reference() {
     factory->set_current_settlement(ref_settlement);
     factory->initialize_load_factor();
     auto& ref_load = factory->modify_reference_load();
-    for(uword I = 0; I < ref_dof.n_elem; ++I) ref_load(ref_dof(I), I) = 1.;
+    for(uword I{0}; I < ref_dof.n_elem; ++I) ref_load(ref_dof(I), I) = 1.;
 
     return SUANPAN_SUCCESS;
 }
@@ -1365,7 +1365,7 @@ void Domain::update_constraint() {
     auto& t_encoding = factory->get_auxiliary_encoding();
     auto& t_lambda = factory->get_auxiliary_lambda();
 
-    for(auto I = 0llu; I < t_encoding.n_elem;) {
+    for(uword I{0}; I < t_encoding.n_elem;) {
         auto& t_constraint = get<Constraint>(t_encoding(I));
         const auto t_size = t_constraint->get_multiplier_size();
         t_constraint->update_status(t_lambda.subvec(I, I + t_size - 1));
@@ -1373,7 +1373,7 @@ void Domain::update_constraint() {
     }
 }
 
-void Domain::assemble_load_stiffness() {}
+void Domain::assemble_load_stiffness(double) {}
 
 void Domain::assemble_constraint_stiffness() {
     for(auto& I : get_constraint_pool())

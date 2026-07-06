@@ -38,6 +38,8 @@ analyze
 #  -3.3307e-16  1.0000e+00
 peek node 2 3
 
+save stiffness stiffness.mtx
+
 reset
 clear
 exit

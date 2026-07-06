@@ -21,6 +21,7 @@
 #   4. Downloads and extracts:
 #        - HDF5: Copies all .a files from the extracted lib directory.
 #        - TBB:  Copies all .so files from the extracted tbb-install/lib directory.
+#        - mimalloc: Copies all .so files from the extracted lib directory.
 #        - OpenBLAS: Copies libopenblas.a file.
 #   5. Cleans up temporary directories.
 #
@@ -78,7 +79,7 @@ else
   mkdir -p "$TARGET_DIR"
 fi
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-2.0.0-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-2.1.1-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
@@ -98,6 +99,16 @@ find "$TMP_DIR/tbb-install/lib" -name "lib*so*" -exec cp -P {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/mimalloc-$RUNNER_IMAGE_NAME.tar.gz"
+TMP_DIR="$(mktemp -d)"
+
+fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
+tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
+
+find "$TMP_DIR/lib" -name "lib*so*" -exec cp -P {} "$TARGET_DIR" \;
+
+rm -rf "$TMP_DIR"
+
 TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.33-$RUNNER_IMAGE_NAME-32.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
@@ -108,7 +119,7 @@ cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.1-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"

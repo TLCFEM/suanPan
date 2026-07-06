@@ -27,14 +27,14 @@
 uword LeeNewmarkFull::get_amplifier() const {
     // TODO: CHECK ACCURACY
 
-    auto n_size = 2llu;
+    uword n_size{2};
 
     for(const auto& [t, p, zeta, omega] : damping_mode)
-        if(Type::T0 == t) n_size += 5llu;
-        else if(Type::T1 == t) n_size += 5llu + 6llu * static_cast<uword>(p.front());
-        else if(Type::T2 == t) n_size += 4llu + 5llu * static_cast<uword>(.5 * (p(0) + p(1) - 1.));
-        else if(Type::T3 == t) n_size += 9llu;
-        else if(Type::T4 == t) n_size += 2llu * static_cast<uword>(p(0) + p(1) + p(2) + p(3) + 4.);
+        if(Type::T0 == t) n_size += 5u;
+        else if(Type::T1 == t) n_size += 5u + 6u * static_cast<uword>(p.front());
+        else if(Type::T2 == t) n_size += 4u + 5u * static_cast<uword>(.5 * (p(0) + p(1) - 1.));
+        else if(Type::T3 == t) n_size += 9u;
+        else if(Type::T4 == t) n_size += 2u * static_cast<uword>(p(0) + p(1) + p(2) + p(3) + 4.);
 
     return n_size;
 }
@@ -44,14 +44,14 @@ uword LeeNewmarkFull::get_amplifier() const {
  * \return the exact size of final global effective stiffness
  */
 uword LeeNewmarkFull::get_total_size() const {
-    auto n_size = 1llu;
+    uword n_size{1};
 
     for(const auto& [t, p, zeta, omega] : damping_mode)
-        if(Type::T0 == t) n_size += 1llu;
-        else if(Type::T1 == t) n_size += 2llu * static_cast<uword>(p.front()) + 1llu;
-        else if(Type::T2 == t) n_size += static_cast<uword>(p(0) + p(1)) + 1llu;
-        else if(Type::T3 == t) n_size += 2llu;
-        else if(Type::T4 == t) n_size += static_cast<uword>(p(0) + p(1) + p(2) + p(3)) + 2llu;
+        if(Type::T0 == t) n_size += 1u;
+        else if(Type::T1 == t) n_size += 2u * static_cast<uword>(p.front()) + 1u;
+        else if(Type::T2 == t) n_size += static_cast<uword>(p(0) + p(1)) + 1u;
+        else if(Type::T3 == t) n_size += 2u;
+        else if(Type::T4 == t) n_size += static_cast<uword>(p(0) + p(1) + p(2) + p(3)) + 2u;
 
     return n_size * n_block;
 }
@@ -178,7 +178,7 @@ void LeeNewmarkFull::assemble_by_mode_one(uword& current_pos, const double mass_
     const auto mass_coefs = .5 * mass_coef;           // eq. 10
     const auto stiffness_coefs = .5 * stiffness_coef; // eq. 10
 
-    auto I = 0llu;
+    uword I{0};
     auto J = current_pos;
     auto K = current_pos += n_block;
     auto L = current_pos += n_block;
@@ -396,12 +396,10 @@ int LeeNewmarkFull::process_constraint() {
         // steal the already assembled mass matrix
         // access::rw(current_mass) = std::move(t_mass);
         // must initialise it since nothing will be checked in if left uninitialized
-        // t_mass = triplet_form<double, uword>(n_block, n_block, current_mass.n_elem);
+        // t_mass = mat_t(n_block, n_block, current_mass.n_elem);
 
         // handle geometry matrix
         auto f_geometry = std::async([&] {
-            using mat_t = triplet_form<double, uword>;
-
             if(!factory->is_nlgeom()) return mat_t();
 
             auto& t_geometry = factory->get_geometry()->triplet_mat;
@@ -412,7 +410,7 @@ int LeeNewmarkFull::process_constraint() {
             std::swap(t_fox, t_geometry);
 
             // now t_geometry is empty
-            t_geometry = triplet_form<double, uword>(n_block, n_block, num_entry);
+            t_geometry = mat_t(n_block, n_block, num_entry);
 
             switch(stiffness_type) {
             case StiffnessType::TRIAL:
@@ -438,7 +436,7 @@ int LeeNewmarkFull::process_constraint() {
         std::swap(access::rw(current_stiffness), t_stiff);
 
         // now t_stiffness is empty
-        t_stiff = triplet_form<double, uword>(n_block, n_block, num_entry);
+        t_stiff = mat_t(n_block, n_block, num_entry);
 
         switch(stiffness_type) {
         case StiffnessType::TRIAL:
@@ -480,8 +478,8 @@ int LeeNewmarkFull::process_constraint() {
             // left top block of unrolled damping matrix may not be zero
             // make a copy
             auto& t_rabbit = access::rw(rabbit);
-            t_rabbit = triplet_form<double, uword>(n_block, n_block, t_stiff.n_elem);
-            for(uword I = 0; I < t_triplet.n_elem; ++I) {
+            t_rabbit = mat_t(n_block, n_block, t_stiff.n_elem);
+            for(uword I{0}; I < t_triplet.n_elem; ++I) {
                 // quit if current column is beyond the original size of matrix
                 if(col[I] >= n_block) break;
                 // check in left top block of unrolled damping matrix to be used in subsequent iterations

@@ -66,7 +66,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
@@ -130,7 +130,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
     for(const auto& I : int_pt) {
         const mat n_int = I.factor * compute_shape_function(I.coor, 0);
         for(auto J = 0u, M = 0u; J < m_node; ++J, M += m_dof)
-            for(auto K = 0llu; K < m_dof; ++K) body_force(M + K, K) += n_int(J);
+            for(uword K{0}; K < m_dof; ++K) body_force(M + K, K) += n_int(J);
     }
 
     return SUANPAN_SUCCESS;
@@ -269,10 +269,10 @@ mat QE2::GetData(const OutputType P) {
         return t_stress;
     }
 
-    mat A(int_pt.size(), 9);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 9);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I{0}; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }

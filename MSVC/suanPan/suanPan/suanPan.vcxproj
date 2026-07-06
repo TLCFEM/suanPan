@@ -24,6 +24,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
     <UseDebugLibraries>true</UseDebugLibraries>
+    <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -48,11 +49,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -65,8 +64,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalOptions>/bigobj /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/bigobj /utf-8 /we4244 /we4267 /we4305 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4068;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -88,7 +88,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalOptions>/bigobj /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/bigobj /utf-8 /we4244 /we4267 /we4305 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4068;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -505,6 +505,7 @@
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\NonviscousNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\OALTS.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\RayleighNewmark.cpp" />
+    <ClCompile Include="..\..\..\Solver\Integrator\Implicit\UDNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\WilsonPenzienNewmark.cpp" />
     <ClCompile Include="..\..\..\Solver\Integrator\Integrator.cpp" />
     <ClCompile Include="..\..\..\Solver\MPDC.cpp" />
@@ -971,6 +972,7 @@
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\NonviscousNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\OALTS.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\RayleighNewmark.h" />
+    <ClInclude Include="..\..\..\Solver\Integrator\Implicit\UDNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\WilsonPenzienNewmark.h" />
     <ClInclude Include="..\..\..\Solver\Integrator\Integrator.h" />
     <ClInclude Include="..\..\..\Solver\MPDC.h" />

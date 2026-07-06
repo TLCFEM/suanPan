@@ -67,23 +67,25 @@ struct DataElement {
 
     uvec dof_encoding{}; // DoF encoding vector
 
-    mat initial_mass{};       // mass matrix
-    mat initial_viscous{};    // viscous damping matrix
+    mat initial_mass{}; // mass matrix
+    mat trial_mass{};   // mass matrix
+    mat current_mass{}; // mass matrix
+
+    mat initial_viscous{}; // viscous damping matrix
+    mat trial_viscous{};   // viscous damping matrix
+    mat current_viscous{}; // viscous damping matrix
+
     mat initial_nonviscous{}; // nonviscous damping matrix
-    mat initial_stiffness{};  // stiffness matrix
-    mat initial_geometry{};   // geometry matrix
-
-    mat trial_mass{};       // mass matrix
-    mat trial_viscous{};    // viscous damping matrix
-    mat trial_nonviscous{}; // nonviscous damping matrix
-    mat trial_stiffness{};  // stiffness matrix
-    mat trial_geometry{};   // geometry matrix
-
-    mat current_mass{};       // mass matrix
-    mat current_viscous{};    // viscous damping matrix
+    mat trial_nonviscous{};   // nonviscous damping matrix
     mat current_nonviscous{}; // nonviscous damping matrix
-    mat current_stiffness{};  // stiffness matrix
-    mat current_geometry{};   // geometry matrix
+
+    mat initial_stiffness{}; // stiffness matrix
+    mat trial_stiffness{};   // stiffness matrix
+    mat current_stiffness{}; // stiffness matrix
+
+    mat initial_geometry{}; // geometry matrix
+    mat trial_geometry{};   // geometry matrix
+    mat current_geometry{}; // geometry matrix
 
     vec trial_resistance{};            // resistance vector
     vec current_resistance{};          // resistance vector

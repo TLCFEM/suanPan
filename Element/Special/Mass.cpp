@@ -34,7 +34,7 @@ void MassBase::print() {
 
 Mass2D::Mass2D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     : MassBase(T, uvec{NT}, [&] {
-        std::vector DI(std::min(3llu, DT.max()), Node::DOF::NONE);
+        std::vector DI(std::min(uword{3}, DT.max()), Node::DOF::NONE);
 
         for(const auto I : DT)
             if(1 == I) DI[0] = Node::DOF::U1;
@@ -58,7 +58,7 @@ int Mass2D::initialize(const shared_ptr<DomainBase>&) {
 
 Mass3D::Mass3D(const unsigned T, const unsigned NT, const double MA, uvec&& DT)
     : MassBase(T, uvec{NT}, [&] {
-        std::vector DI(std::min(6llu, DT.max()), Node::DOF::NONE);
+        std::vector DI(std::min(uword{6}, DT.max()), Node::DOF::NONE);
 
         for(const auto I : DT)
             if(1 == I) DI[0] = Node::DOF::U1;

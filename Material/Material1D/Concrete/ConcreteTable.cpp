@@ -20,7 +20,7 @@
 pod2 ConcreteTable::compute_compression_initial_reverse() const {
     pod2 response;
 
-    for(uword I = 0; I < c_table.n_rows; ++I)
+    for(uword I{0}; I < c_table.n_rows; ++I)
         if(c_table(I, 0) != 0.) {
             response[0] = c_table(I, 0);
             response[1] = c_table(I, 1);
@@ -33,7 +33,7 @@ pod2 ConcreteTable::compute_compression_initial_reverse() const {
 pod2 ConcreteTable::compute_tension_initial_reverse() const {
     pod2 response;
 
-    for(uword I = 0; I < t_table.n_rows; ++I)
+    for(uword I{0}; I < t_table.n_rows; ++I)
         if(t_table(I, 0) != 0.) {
             response[0] = t_table(I, 0);
             response[1] = t_table(I, 1);
@@ -46,7 +46,7 @@ pod2 ConcreteTable::compute_tension_initial_reverse() const {
 pod2 ConcreteTable::compute_compression_backbone(const double n_strain) const {
     pod2 response;
 
-    for(uword I = 0; I < c_table.n_rows; ++I)
+    for(uword I{0}; I < c_table.n_rows; ++I)
         if(c_table(I, 0) < n_strain) {
             if(0 == I) {
                 response[1] = c_table(I, 1) / c_table(I, 0);
@@ -68,7 +68,7 @@ pod2 ConcreteTable::compute_compression_backbone(const double n_strain) const {
 pod2 ConcreteTable::compute_tension_backbone(const double n_strain) const {
     pod2 response;
 
-    for(uword I = 0; I < t_table.n_rows; ++I)
+    for(uword I{0}; I < t_table.n_rows; ++I)
         if(t_table(I, 0) > n_strain) {
             if(0 == I) {
                 response[1] = t_table(I, 1) / t_table(I, 0);

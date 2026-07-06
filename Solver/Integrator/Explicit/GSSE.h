@@ -57,6 +57,8 @@ public:
 
     int update_trial_status(bool) override;
 
+    [[nodiscard]] double load_scaling_factor() const override;
+
     vec from_incre_acceleration(const vec&, const uvec&) override;
     vec from_total_acceleration(const vec&, const uvec&) override;
 

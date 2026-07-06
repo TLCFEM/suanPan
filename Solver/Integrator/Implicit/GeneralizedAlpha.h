@@ -62,8 +62,7 @@ public:
     void assemble_resistance() override;
     void assemble_effective_matrix() override;
 
-    vec get_force_residual() override;
-    vec get_displacement_residual() override;
+    vec get_residual(bool) override;
     sp_mat get_reference_load() override;
 
     int update_trial_status(bool) override;

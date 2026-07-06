@@ -33,7 +33,7 @@
 
 template<sp_d T> uword round_up(const uword in_size) {
     constexpr auto multiple = 64llu / sizeof(T);
-    return (in_size + multiple - 1llu) / multiple * multiple;
+    return (in_size + multiple - 1u) / multiple * multiple;
 }
 
 template<sp_d T> class DenseMat : public MetaMat<T> {
@@ -48,13 +48,13 @@ protected:
     std::unique_ptr<T[]> memory = nullptr;
 
     podarray<float> to_float() {
-        podarray<float> f_memory(this->n_elem);
-        suanpan::for_each(this->n_elem, [&](const uword I) { f_memory(I) = static_cast<float>(memory[I]); });
+        podarray<float> f_memory(static_cast<uword>(this->n_elem));
+        suanpan::for_each(this->n_elem, [&](const auto I) { f_memory(static_cast<uword>(I)) = static_cast<float>(memory[I]); });
         return f_memory;
     }
 
 public:
-    DenseMat(const uword in_rows, const uword in_cols, const uword in_elem)
+    DenseMat(const uword in_rows, const uword in_cols, const std::uint64_t in_elem)
         : MetaMat<T>(in_rows, in_cols, in_elem)
         , memory(new T[this->n_elem]) {
         if(in_elem > std::numeric_limits<la_it>::max()) throw std::runtime_error("matrix size exceeds limit, please enable 64-bit indexing");
@@ -66,7 +66,7 @@ public:
         , pivot(old_mat.pivot)
         , s_memory(old_mat.s_memory)
         , memory(new T[this->n_elem]) {
-        suanpan::for_each(this->n_elem, [&](const uword I) { memory[I] = old_mat.memory[I]; });
+        suanpan::for_each(this->n_elem, [&](const auto I) { memory[I] = old_mat.memory[I]; });
     }
 
     DenseMat(DenseMat&&) = delete;
@@ -78,12 +78,12 @@ public:
 
     void zeros() override {
         this->factored = false;
-        arrayops::fill_zeros(memptr(), this->n_elem);
+        arrayops::fill_zeros(memptr(), static_cast<uword>(this->n_elem));
     }
 
     [[nodiscard]] T max() const override {
         T max_value = T(1);
-        for(uword I = 0; I < std::min(this->n_rows, this->n_cols); ++I)
+        for(uword I{0}; I < std::min(this->n_rows, this->n_cols); ++I)
             if(const auto t_val = this->operator()(I, I); t_val > max_value) max_value = t_val;
         return max_value;
     }
@@ -98,28 +98,28 @@ public:
         if(this->n_rows != M->n_rows || this->n_cols != M->n_cols || this->n_elem != M->n_elem) throw std::invalid_argument("size mismatch");
         if(nullptr == M->memptr()) return;
         this->factored = false;
-        if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), this->n_elem);
-        else if(-1. == scalar) arrayops::inplace_minus(memptr(), M->memptr(), this->n_elem);
-        else suanpan::for_each(this->n_elem, [&](const uword I) { memptr()[I] += scalar * M->memptr()[I]; });
+        if(1. == scalar) arrayops::inplace_plus(memptr(), M->memptr(), static_cast<uword>(this->n_elem));
+        else if(-1. == scalar) arrayops::inplace_minus(memptr(), M->memptr(), static_cast<uword>(this->n_elem));
+        else suanpan::for_each(this->n_elem, [&](const auto I) { memptr()[I] += scalar * M->memptr()[I]; });
     }
 
-    void scale_accu(const T scalar, const triplet_form<T, uword>& M) override {
+    void scale_accu(const T scalar, const triplet_form<T, std::uint64_t>& M) override {
         if(this->n_rows != M.n_rows || this->n_cols != M.n_cols) throw std::invalid_argument("size mismatch");
         this->factored = false;
         const auto row = M.row_mem();
         const auto col = M.col_mem();
         const auto val = M.val_mem();
         if(1. == scalar)
-            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += val[I];
+            for(std::uint64_t I = 0; I < M.n_elem; ++I) this->at(static_cast<uword>(row[I]), static_cast<uword>(col[I])) += val[I];
         else if(-1. == scalar)
-            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) -= val[I];
+            for(std::uint64_t I = 0; I < M.n_elem; ++I) this->at(static_cast<uword>(row[I]), static_cast<uword>(col[I])) -= val[I];
         else
-            for(auto I = 0llu; I < M.n_elem; ++I) this->at(row[I], col[I]) += scalar * val[I];
+            for(std::uint64_t I = 0; I < M.n_elem; ++I) this->at(static_cast<uword>(row[I]), static_cast<uword>(col[I])) += scalar * val[I];
     }
 
     void operator*=(const T value) override {
         this->factored = false;
-        arrayops::inplace_mul(memptr(), value, this->n_elem);
+        arrayops::inplace_mul(memptr(), value, static_cast<uword>(this->n_elem));
     }
 
     void allreduce() override {

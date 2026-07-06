@@ -32,10 +32,10 @@
 double Balloon1D::initial_check(double start_z) {
     const auto& qm = current_history(3);
 
-    const auto fc = bfc.empty() ? vec{} : vec(&current_history(5), bfc.size(), false, true);
-    const auto ac = bac.empty() ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
-    const auto na = bna.empty() ? vec{} : vec(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    const auto nd = bnd.empty() ? vec{} : vec(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    const auto fc = bfc.empty() ? vec{} : vec(&current_history(5u), static_cast<uword>(bfc.size()), false, true);
+    const auto ac = bac.empty() ? vec{} : vec(&current_history(5u + static_cast<uword>(bfc.size())), static_cast<uword>(bac.size()), false, true);
+    const auto na = bna.empty() ? vec{} : vec(&current_history(5u + static_cast<uword>(bfc.size() + bac.size())), static_cast<uword>(bna.size()), false, true);
+    const auto nd = bnd.empty() ? vec{} : vec(&current_history(5u + static_cast<uword>(bfc.size() + bac.size() + bna.size())), static_cast<uword>(bnd.size()), false, true);
 
     [[maybe_unused]] const auto [fm, dfm] = bound_fm(qm, true);
     [[maybe_unused]] const auto [am, dam] = bound_am(qm, true);
@@ -70,8 +70,8 @@ double Balloon1D::initial_check(double start_z) {
 auto Balloon1D::compute_isotropic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
-    const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5), bfc.size(), false, true);
-    auto hfc = bfc.empty() ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
+    const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5u), static_cast<uword>(bfc.size()), false, true);
+    auto hfc = bfc.empty() ? vec{} : vec(&trial_history(5u), static_cast<uword>(bfc.size()), false, true);
 
     const auto kc = 1. - km, dkc = -dkm;
 
@@ -80,7 +80,7 @@ auto Balloon1D::compute_isotropic_bound(const double gamma, const double km, con
 
     auto phfpg = dfm * km, phfpz = dfm * gamma * dkm;
     const auto pfcpg = dfc * km, pfcpz = dfc * gamma * dkm;
-    for(auto I = 0llu; I < bfc.size(); ++I) {
+    for(uword I{0}; I < bfc.size(); ++I) {
         const auto bot_fc = 1. + bfc[I].b() * gamma * kc;
         hfc(I) = (bfc[I].a() * gamma * kc * fc + current_hfc(I)) / bot_fc;
         phfpg += (bfc[I].a() * (fc + gamma * pfcpg) - hfc(I) * bfc[I].b()) * kc / bot_fc;
@@ -95,8 +95,8 @@ auto Balloon1D::compute_isotropic_bound(const double gamma, const double km, con
 auto Balloon1D::compute_kinematic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
-    const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
-    auto hac = bac.empty() ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
+    const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5u + static_cast<uword>(bfc.size())), static_cast<uword>(bac.size()), false, true);
+    auto hac = bac.empty() ? vec{} : vec(&trial_history(5u + static_cast<uword>(bfc.size())), static_cast<uword>(bac.size()), false, true);
 
     const auto kc = 1. - km, dkc = -dkm;
 
@@ -105,7 +105,7 @@ auto Balloon1D::compute_kinematic_bound(const double gamma, const double km, con
 
     auto phapg = dam * km, phapz = dam * gamma * dkm;
     const auto pacpg = dac * km, pacpz = dac * gamma * dkm;
-    for(auto I = 0llu; I < bac.size(); ++I) {
+    for(uword I{0}; I < bac.size(); ++I) {
         const auto bot_ac = 1. + bac[I].b() * gamma * kc;
         hac(I) = (bac[I].a() * gamma * kc * ac + current_hac(I)) / bot_ac;
         phapg += (bac[I].a() * (ac + gamma * pacpg) - hac(I) * bac[I].b()) * kc / bot_ac;
@@ -150,14 +150,14 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
     auto& qm = trial_history(3);
     auto& z = trial_history(4);
 
-    // const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5), bfc.size(), false, true);
-    // const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5 + bfc.size()), bac.size(), false, true);
-    const auto current_na = bna.empty() ? vec{} : vec(&current_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    const auto current_nd = bnd.empty() ? vec{} : vec(&current_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
-    // auto hfc = bfc.empty() ? vec{} : vec(&trial_history(5), bfc.size(), false, true);
-    // auto hac = bac.empty() ? vec{} : vec(&trial_history(5 + bfc.size()), bac.size(), false, true);
-    auto na = bna.empty() ? vec{} : vec(&trial_history(5 + bfc.size() + bac.size()), bna.size(), false, true);
-    auto nd = bnd.empty() ? vec{} : vec(&trial_history(5 + bfc.size() + bac.size() + bna.size()), bnd.size(), false, true);
+    // const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5u), bfc.size(), false, true);
+    // const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5u + bfc.size()), bac.size(), false, true);
+    const auto current_na = bna.empty() ? vec{} : vec(&current_history(5u + static_cast<uword>(bfc.size() + bac.size())), static_cast<uword>(bna.size()), false, true);
+    const auto current_nd = bnd.empty() ? vec{} : vec(&current_history(5u + static_cast<uword>(bfc.size() + bac.size() + bna.size())), static_cast<uword>(bnd.size()), false, true);
+    // auto hfc = bfc.empty() ? vec{} : vec(&trial_history(5u), bfc.size(), false, true);
+    // auto hac = bac.empty() ? vec{} : vec(&trial_history(5u + bfc.size()), bac.size(), false, true);
+    auto na = bna.empty() ? vec{} : vec(&trial_history(5u + static_cast<uword>(bfc.size() + bac.size())), static_cast<uword>(bna.size()), false, true);
+    auto nd = bnd.empty() ? vec{} : vec(&trial_history(5u + static_cast<uword>(bfc.size() + bac.size() + bna.size())), static_cast<uword>(bnd.size()), false, true);
 
     iteration = 0.;
     const auto start_z = initial_check(current_z);
@@ -197,13 +197,13 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         const auto [hf, phfpg, phfpz] = compute_isotropic_bound(gamma, km, dkm);
         const auto [ha, phapg, phapz] = compute_kinematic_bound(gamma, km, dkm);
 
-        vec top_na(bna.size(), fill::none), bot_na(bna.size(), fill::none);
-        for(auto I = 0llu; I < bna.size(); ++I) {
+        vec top_na(static_cast<uword>(bna.size()), fill::none), bot_na(static_cast<uword>(bna.size()), fill::none);
+        for(uword I{0}; I < bna.size(); ++I) {
             top_na(I) = bna[I].a() * gamma;
             bot_na(I) = 1. + bna[I].b() * gamma;
         }
-        vec top_nd(bnd.size(), fill::none), bot_nd(bnd.size(), fill::none);
-        for(auto I = 0llu; I < bnd.size(); ++I) {
+        vec top_nd(static_cast<uword>(bnd.size()), fill::none), bot_nd(static_cast<uword>(bnd.size()), fill::none);
+        for(uword I{0}; I < bnd.size(); ++I) {
             top_nd(I) = bnd[I].a() * gamma;
             bot_nd(I) = 1. + bnd[I].b() * gamma;
         }
@@ -214,8 +214,8 @@ int Balloon1D::update_trial_status(const vec& t_strain) {
         const auto sum_nd = accu(nd = (top_nd * n + current_nd) / bot_nd);
 
         auto pnapg = 0., pndpg = 0.;
-        for(auto I = 0llu; I < bna.size(); ++I) pnapg += (bna[I].a() * n - bna[I].b() * na[I]) / bot_na[I];
-        for(auto I = 0llu; I < bnd.size(); ++I) pndpg += (bnd[I].a() * n - bnd[I].b() * nd[I]) / bot_nd[I];
+        for(uword I{0}; I < bna.size(); ++I) pnapg += (bna[I].a() * n - bna[I].b() * na[I]) / bot_na[I];
+        for(uword I{0}; I < bnd.size(); ++I) pndpg += (bnd[I].a() * n - bnd[I].b() * nd[I]) / bot_nd[I];
 
         const auto trial_ratio = yield_ratio(z);
         const auto diff_z = z - start_z;

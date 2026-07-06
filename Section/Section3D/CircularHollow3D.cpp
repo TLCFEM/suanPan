@@ -43,8 +43,8 @@ int CircularHollow3D::initialize(const shared_ptr<DomainBase>& D) {
     const auto m_radius = radius - .5 * thickness;
 
     int_pt.clear();
-    int_pt.reserve(2llu * int_pt_num);
-    for(unsigned I = 0; I < int_pt_num; ++I) {
+    int_pt.reserve(2u * int_pt_num);
+    for(unsigned I{0}; I < int_pt_num; ++I) {
         const auto t_angle = .5 * plan(I, 0) * datum::pi;
         int_pt.emplace_back(cos(t_angle) * m_radius, sin(t_angle) * m_radius, .25 * plan(I, 1) * area, material_proto->unique_copy());
         int_pt.emplace_back(-cos(t_angle) * m_radius, -sin(t_angle) * m_radius, .25 * plan(I, 1) * area, material_proto->unique_copy());

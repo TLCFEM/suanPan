@@ -93,8 +93,6 @@ template<> inline const char* StorageType<Section>() { return "Section"; }
 template<> inline const char* StorageType<Solver>() { return "Solver"; }
 
 template<typename T> class Storage : public std::enable_shared_from_this<Storage<T>> {
-    const char* type = StorageType<object_type>();
-
     std::vector<shared_ptr<T>> fish; /**< data storage */
 
     const shared_ptr<T> empty = nullptr;
@@ -150,7 +148,7 @@ template<typename T> typename Storage<T>::iterator Storage<T>::end() { return po
 template<typename T> bool Storage<T>::insert(const shared_ptr<T>& I) {
     auto flag = pond.insert({I->get_tag(), I}).second;
     if(!flag)
-        suanpan_warning("Fail to insert {} {}.\n", type, I->get_tag());
+        suanpan_warning("Fail to insert {} {}.\n", StorageType<T>(), I->get_tag());
     return flag;
 }
 

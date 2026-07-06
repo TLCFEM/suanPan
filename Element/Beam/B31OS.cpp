@@ -117,7 +117,7 @@ int B31OS::initialize(const shared_ptr<DomainBase>& D) {
     mat local_stiffness(9, 9, fill::zeros);
     int_pt.clear();
     int_pt.reserve(int_pt_num);
-    for(unsigned I = 0; I < int_pt_num; ++I) {
+    for(unsigned I{0}; I < int_pt_num; ++I) {
         int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), length, section_proto->unique_copy());
         int_pt[I].b_section->set_characteristic_length(int_pt[I].weight * length);
         local_stiffness += int_pt[I].strain_mat.t() * section_stiffness * int_pt[I].strain_mat * int_pt[I].weight * length;

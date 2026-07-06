@@ -59,8 +59,8 @@ int MVLEM::initialize(const shared_ptr<DomainBase>& D) {
     trans_mat(0, 0) = trans_mat(1, 1) = trans_mat(3, 3) = trans_mat(4, 4) = pos_diff(1) / length;
     trans_mat(0, 1) = trans_mat(3, 4) = -(trans_mat(1, 0) = trans_mat(4, 3) = pos_diff(0)) / length;
 
-    const auto& total_fibre_num = axial_spring.size();
-    for(size_t I = 0; I < total_fibre_num; ++I) {
+    const auto total_fibre_num = static_cast<uword>(axial_spring.size());
+    for(uword I{0}; I < total_fibre_num; ++I) {
         axial_spring[I].c_material = suanpan::unique_copy(D->get<Material>(material_tag(I)));
         axial_spring[I].s_material = suanpan::unique_copy(D->get<Material>(material_tag(I + total_fibre_num)));
     }

@@ -75,11 +75,11 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     const auto n = shape::quad(t_vec, 0);
     auto pn = shape::quad(t_vec, 1);
     mat jacob = pn * ele_coor, pn_pxy = solve(jacob, pn);
-    mat penalty_mat(2, 3llu * s_node, fill::zeros);
-    for(unsigned I = 0, J = 0; I < 4; ++I, J += 3) {
+    mat penalty_mat(2, 3u * s_node, fill::zeros);
+    for(unsigned I{0}, J{0}; I < 4; ++I, J += 3) {
         penalty_mat(0, J) = pn_pxy(1, I);
         penalty_mat(1, J) = pn_pxy(0, I);
-        penalty_mat(0, J + 1llu) = -(penalty_mat(1, J + 2llu) = n(I));
+        penalty_mat(0, J + 1u) = -(penalty_mat(1, J + 2u) = n(I));
     }
     auto p_stiffness = penalty_stiffness = 10. / 3. * shear_modulus * thickness * det(jacob) * penalty_mat.t() * penalty_mat;
 
@@ -93,7 +93,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(m_plan.n_rows);
-    for(unsigned I = 0; I < m_plan.n_rows; ++I) {
+    for(unsigned I{0}; I < m_plan.n_rows; ++I) {
         int_pt.emplace_back(vec{m_plan(I, 0), m_plan(I, 1)});
 
         auto& m_ip = int_pt.back();
@@ -141,7 +141,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
         auto& s_ip = m_ip.sec_int_pt;
         s_ip.clear();
         s_ip.reserve(t_plan.n_rows);
-        for(unsigned J = 0; J < t_plan.n_rows; ++J) {
+        for(unsigned J{0}; J < t_plan.n_rows; ++J) {
             const auto t_eccentricity = .5 * t_plan(J, 0) * thickness;
             s_ip.emplace_back(t_eccentricity, .5 * thickness * t_plan(J, 1) * m_plan(I, 2) * det_jacob, mat_proto->unique_copy());
             m_stiffness += m_ip.BM.t() * mat_stiff * m_ip.BM * s_ip.back().factor;
@@ -164,8 +164,8 @@ int S4::update_status() {
     const auto g_disp = get_trial_displacement();
     const auto t_disp = transform_from_global_to_local(g_disp);
     vec::fixed<12> m_disp, p_disp;
-    for(unsigned I = 0, J = 0; I < s_size; I += s_dof, J += 3) {
-        const span t_span(J, J + 2llu);
+    for(unsigned I{0}, J{0}; I < s_size; I += s_dof, J += 3) {
+        const span t_span(J, J + 2u);
         m_disp(t_span) = t_disp(I + m_dof);
         p_disp(t_span) = t_disp(I + p_dof);
     }

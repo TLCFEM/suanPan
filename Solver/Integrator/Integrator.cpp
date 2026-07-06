@@ -20,7 +20,15 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 
-int Integrator::process_load_impl(const bool full) { return database.lock()->process_load(full); }
+int Integrator::process_load_impl(const bool full) {
+    const auto D = database.lock();
+
+    const auto code = D->process_load(full);
+
+    if(full) D->assemble_load_stiffness(load_scaling_factor());
+
+    return code;
+}
 
 int Integrator::process_constraint_impl(const bool full) {
     const auto D = database.lock();
@@ -145,27 +153,17 @@ void Integrator::assemble_effective_matrix() {
 }
 
 /**
- * Assemble the global residual vector in load-controlled solving schemes.
+ * Assemble the global residual vector.
+ * If displacement-controlled, apart from the global resistance and external load vectors, the reference load vector shall also be considered.
  */
-vec Integrator::get_force_residual() {
+vec Integrator::get_residual(const bool disp_ctrl) {
     const auto D = database.lock();
     auto& W = D->get_factory();
 
     vec residual = W->get_trial_load() - W->get_sushi();
+    if(disp_ctrl) residual += W->get_reference_load() * W->get_trial_load_factor();
     for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
-    return residual;
-}
 
-/**
- * Assemble the global residual vector in displacement-controlled solving schemes.
- * Apart from the global resistance and external load vectors, the reference load vector shall also be considered.
- */
-vec Integrator::get_displacement_residual() {
-    const auto D = database.lock();
-    auto& W = D->get_factory();
-
-    vec residual = W->get_reference_load() * W->get_trial_load_factor() + W->get_trial_load() - W->get_sushi();
-    for(const auto I : D->get_constrained_dof()) residual(I) = 0.;
     return residual;
 }
 
@@ -378,32 +376,21 @@ vec Integrator::from_total_acceleration(const double magnitude, const uvec& enco
 void ImplicitIntegrator::assemble_matrix() {
     const auto D = get_domain();
 
-    auto fa = std::async([&] { D->assemble_trial_stiffness(); });
-    auto fb = std::async([&] { D->assemble_trial_geometry(); });
-    auto fc = std::async([&] { D->assemble_trial_damping(); });
-    auto fd = std::async([&] { D->assemble_trial_nonviscous(); });
-    auto fe = std::async([&] { D->assemble_trial_mass(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
-    fe.get();
+    D->assemble_trial_stiffness();
+    D->assemble_trial_geometry();
+    D->assemble_trial_damping();
+    D->assemble_trial_nonviscous();
+    D->assemble_trial_mass();
 }
 
 void ExplicitIntegrator::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    auto fa = std::async([&] { D->assemble_resistance(); });
-    auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
-    auto fd = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
+    D->assemble_resistance();
+    D->assemble_damping_force();
+    D->assemble_nonviscous_force();
+    D->assemble_inertial_force();
 
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }

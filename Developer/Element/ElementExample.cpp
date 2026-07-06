@@ -67,7 +67,7 @@ int ElementExample::initialize(const shared_ptr<DomainBase>& D) {
     const mat inv_coor = inv(ele_coor);
 
     strain_mat.zeros(3, m_size);
-    for(unsigned i = 0, j = 0, k = 1; i < 3; ++i, j += m_dof, k += m_dof) {
+    for(unsigned i{0}, j{0}, k{1}; i < 3; ++i, j += m_dof, k += m_dof) {
         strain_mat(2, k) = strain_mat(0, j) = inv_coor(1, i);
         strain_mat(2, j) = strain_mat(1, k) = inv_coor(2, i);
     }

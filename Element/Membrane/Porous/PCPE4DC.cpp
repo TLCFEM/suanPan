@@ -32,7 +32,7 @@ PCPE4DC::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<
     : coor(std::move(C))
     , weight(W)
     , m_material(std::move(M))
-    , strain_mat(3, 2llu * m_node, fill::zeros) {}
+    , strain_mat(3, 2u * m_node, fill::zeros) {}
 
 PCPE4DC::PCPE4DC(const unsigned T, uvec&& N, const unsigned MS, const unsigned MF, const double AL, const double NN, const double KK)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{MS, MF}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::FU1, Node::DOF::FU2})
@@ -83,7 +83,7 @@ int PCPE4DC::initialize(const shared_ptr<DomainBase>& D) {
     body_force.zeros(m_size, 2);
 
     mat meta_a(m_node, m_node, fill::zeros);
-    mat meta_b(2llu * m_node, 2llu * m_node, fill::zeros);
+    mat meta_b(2u * m_node, 2u * m_node, fill::zeros);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
@@ -217,10 +217,10 @@ mat PCPE4DC::GetData(const OutputType P) {
     if(OutputType::V == P) return resize(reshape(get_current_velocity()(s_dof), 2, m_node), 6, m_node);
     if(OutputType::U == P) return resize(reshape(get_current_displacement()(s_dof), 2, m_node), 6, m_node);
 
-    mat A(int_pt.size(), 4);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 4);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I{0}; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }

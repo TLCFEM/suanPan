@@ -42,7 +42,7 @@ void CustomNodeGroup::initialize(const shared_ptr<DomainBase>& D) {
     const auto input_size = expression->input_size();
 
     for(auto& I : D->get_node_pool())
-        if(as_scalar(expression->evaluate(resize(I->get_coordinate(), input_size, 1llu))) > 0.5) pond.emplace_back(I->get_tag());
+        if(as_scalar(expression->evaluate(resize(I->get_coordinate(), input_size, 1u))) > 0.5) pond.emplace_back(I->get_tag());
 
     suanpan_sort(pond.begin(), pond.end());
 

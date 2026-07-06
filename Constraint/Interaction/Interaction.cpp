@@ -75,7 +75,7 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
         const vec repulsive = total_force * unit_chord;
         auto& t_resistance = factory->modify_trial_constraint_resistance();
         std::scoped_lock resistance_lock(factory->get_trial_constraint_resistance_mutex());
-        for(auto I = 0llu; I < chord.n_elem; ++I) {
+        for(uword I{0}; I < chord.n_elem; ++I) {
             t_resistance(dof_i(I)) += repulsive(I);
             t_resistance(dof_j(I)) -= repulsive(I);
         }
@@ -88,8 +88,8 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
         const mat der_repulsive = total_force / chord_length * der_unit_chord + unit_chord * (damping_factor / chord_length * velocity_rel.t() * der_unit_chord + (1.5 * normal_factor - .5 * damping_factor / compression * velocity_proj) * unit_chord.t());
         auto& t_mat = factory->get_stiffness();
         std::scoped_lock lock(factory->get_stiffness_mutex());
-        for(auto I = 0llu; I < chord.n_elem; ++I)
-            for(auto J = 0llu; J < chord.n_elem; ++J) {
+        for(uword I{0}; I < chord.n_elem; ++I)
+            for(uword J{0}; J < chord.n_elem; ++J) {
                 t_mat->at(dof_i(I), dof_i(J)) += der_repulsive(I, J);
                 t_mat->at(dof_j(I), dof_j(J)) += der_repulsive(I, J);
                 t_mat->at(dof_i(I), dof_j(J)) -= der_repulsive(I, J);
@@ -101,8 +101,8 @@ void Hertzian::apply(const bool full, const shared_ptr<InteractionPair>& pair) c
         const mat der_repulsive = damping_factor * unit_chord * unit_chord.t();
         auto& t_mat = factory->get_damping();
         std::scoped_lock lock(factory->get_damping_mutex());
-        for(auto I = 0llu; I < chord.n_elem; ++I)
-            for(auto J = 0llu; J < chord.n_elem; ++J) {
+        for(uword I{0}; I < chord.n_elem; ++I)
+            for(uword J{0}; J < chord.n_elem; ++J) {
                 t_mat->at(dof_i(I), dof_i(J)) += der_repulsive(I, J);
                 t_mat->at(dof_j(I), dof_j(J)) += der_repulsive(I, J);
                 t_mat->at(dof_i(I), dof_j(J)) -= der_repulsive(I, J);

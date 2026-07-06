@@ -76,8 +76,7 @@ public:
     int solve(mat&, mat&&) final;
     int solve(mat&, sp_mat&&) final;
 
-    vec get_force_residual() final;
-    vec get_displacement_residual() final;
+    vec get_residual(bool) final;
 
     void commit_status() final;
     void clear_status() final;

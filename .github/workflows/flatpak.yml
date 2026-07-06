@@ -1,0 +1,42 @@
+jobs:
+  flatpak:
+    needs: guard
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: commit
+        name: Commit
+        run: git fetch origin dev && echo "sha=$(git rev-parse origin/dev)" >> "$GITHUB_OUTPUT"
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          path: flathub
+          ref: beta
+          repository: flathub/io.github.tlcfem.suanPan
+          token: ${{ secrets.ALL }}
+      - name: Update
+        run: sed -i -E "s|^([[:space:]]*commit:[[:space:]]*)[0-9a-f]{40}[[:space:]]*$|\1${{ steps.commit.outputs.sha }}|" flathub/io.github.tlcfem.suanPan.yml
+      - name: PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          base: beta
+          branch: chore/update-commit
+          commit-message: 'chore: update suanPan source commit to ${{ steps.commit.outputs.sha }}'
+          delete-branch: true
+          path: flathub
+          title: Update commit ${{ steps.commit.outputs.sha }}
+          token: ${{ secrets.ALL }}
+  guard:
+    if: github.repository == 'TLCFEM/suanPan'
+    runs-on: ubuntu-slim
+    steps:
+      - run: echo "Hello, World!"
+name: Flatpak
+'on':
+  workflow_call: null
+  workflow_dispatch: null

@@ -50,16 +50,22 @@ int ISection3D::initialize(const shared_ptr<DomainBase>& D) {
     const auto b_flange_area = bottom_flange_width * bottom_flange_thickness;
     const auto t_flange_area = top_flange_width * top_flange_thickness;
 
-    const IntegrationPlan plan_flange(1, int_pt_num, IntegrationPlan::Type::GAUSS);
-    const auto& plan_web = plan_flange;
+    const IntegrationPlan plan_ft(1, std::max(bottom_flange_thickness, top_flange_thickness) > .1 * web_height ? 2 : 1, IntegrationPlan::Type::GAUSS);
+    const IntegrationPlan plan_wt(1, web_thickness > .1 * std::max(bottom_flange_width, top_flange_width) ? 2 : 1, IntegrationPlan::Type::GAUSS);
+
+    const IntegrationPlan plan_f(1, int_pt_num, IntegrationPlan::Type::GAUSS);
+    const auto& plan_w = plan_f;
 
     int_pt.clear();
-    int_pt.reserve(plan_web.n_rows + 2llu * plan_flange.n_rows);
-    for(unsigned I = 0; I < int_pt_num; ++I) int_pt.emplace_back(.5 * plan_web(I, 0) * web_height, 0., .5 * plan_web(I, 1) * web_area, mat_proto->unique_copy());
+    int_pt.reserve(plan_w.n_rows * plan_wt.n_rows + 2u * plan_f.n_rows * plan_ft.n_rows);
+    for(auto I = 0u; I < plan_w.n_rows; ++I)
+        for(auto J = 0u; J < plan_wt.n_rows; ++J) int_pt.emplace_back(.5 * plan_w(I, 0) * web_height, .5 * plan_wt(J, 0) * web_thickness, .25 * plan_w(I, 1) * plan_wt(J, 1) * web_area, mat_proto->unique_copy());
     if(b_flange_area != 0.)
-        for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(.5 * (bottom_flange_thickness + web_height), .5 * plan_flange(I, 0) * bottom_flange_width, .5 * plan_flange(I, 1) * b_flange_area, mat_proto->unique_copy());
+        for(auto I = 0u; I < plan_f.n_rows; ++I)
+            for(auto J = 0u; J < plan_ft.n_rows; ++J) int_pt.emplace_back((.5 * plan_ft(J, 0) + .5) * bottom_flange_thickness + .5 * web_height, .5 * plan_f(I, 0) * bottom_flange_width, .25 * plan_f(I, 1) * plan_ft(J, 1) * b_flange_area, mat_proto->unique_copy());
     if(t_flange_area != 0.)
-        for(unsigned I = 0; I < plan_flange.n_rows; ++I) int_pt.emplace_back(-.5 * (top_flange_thickness + web_height), .5 * plan_flange(I, 0) * top_flange_width, .5 * plan_flange(I, 1) * t_flange_area, mat_proto->unique_copy());
+        for(auto I = 0u; I < plan_f.n_rows; ++I)
+            for(auto J = 0u; J < plan_ft.n_rows; ++J) int_pt.emplace_back((-.5 * plan_ft(J, 0) - .5) * top_flange_thickness - .5 * web_height, .5 * plan_f(I, 0) * top_flange_width, .25 * plan_f(I, 1) * plan_ft(J, 1) * t_flange_area, mat_proto->unique_copy());
 
     initialize_stiffness();
 

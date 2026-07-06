@@ -22,7 +22,7 @@
 
 
 
-struct op_find
+struct op_find_generic
   : public traits_op_col
   {
   template<typename T1>
@@ -76,16 +76,16 @@ struct op_find
     );
   
   template<typename T1>
-  inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find>& X);
+  inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find_generic>& X);
   };
 
 
 
-struct op_find_simple
+struct op_find_default
   : public traits_op_col
   {
   template<typename T1>
-  inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find_simple>& X);
+  inline static void apply(Mat<uword>& out, const mtOp<uword, T1, op_find_default>& X);
   };
 
 

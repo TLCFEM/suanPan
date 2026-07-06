@@ -71,6 +71,8 @@ public:
 
     int update_trial_status(bool) override;
 
+    [[nodiscard]] double load_scaling_factor() const override;
+
     void commit_status() override;
     void clear_status() override;
 

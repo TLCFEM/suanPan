@@ -460,7 +460,7 @@ void new_hsection2d(unique_ptr<Section>& return_obj, std::istringstream& command
 }
 
 double barycenter(const vec& dim) {
-    if(4llu == dim.n_elem) {
+    if(4u == dim.n_elem) {
         // dim(0): flange width
         // dim(1): flange thickness
         // dim(2): web height

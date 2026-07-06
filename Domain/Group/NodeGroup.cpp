@@ -63,7 +63,7 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
                 if(const auto T = (m_point(0) - s_point(0)) / denom; T >= 0. && T <= 1.) {
                     // on inclined line
                     auto flag = true;
-                    for(uword K = 1; K < size; ++K)
+                    for(uword K{1}; K < size; ++K)
                         if(std::fabs((T * ((e_point(K) - s_point(K))) - m_point(K) + s_point(K))) > 1E-8) {
                             flag = false;
                             break;
@@ -74,7 +74,7 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
             else if(std::fabs(m_point(0) - .5 * (e_point(0) + s_point(0))) < 1E-8) {
                 // on vertical line
                 auto flag = true;
-                for(uword K = 1; K < size; ++K)
+                for(uword K{1}; K < size; ++K)
                     if(const auto T = (m_point(K) - s_point(K)) / (e_point(K) - s_point(K)); T < 0. || T > 1.) {
                         flag = false;
                         break;

@@ -350,7 +350,8 @@ void argument_parser(const int argc, char** argv) {
         cli_mode(model);
     }
 
-    if(comm_size == 1 || comm_rank == 0) suanpan_highlight("\nPlease feel free to share feedback, start discussions, or request new features on the GitHub repository.\n");
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(comm_rank == 0) suanpan_highlight("\nPlease feel free to share feedback, start discussions, or request new features on the GitHub repository.\n");
     suanpan_info("\nTime Wasted: {:.4f} Seconds.\n", T.toc());
 }
 
@@ -385,6 +386,19 @@ void print_version() {
 #else
                  "OpenBLAS"
 #endif
+    );
+    suanpan_info("    The {}-bit indexing is used in Armadillo {} local static stack array.\n",
+#ifdef ARMA_64BIT_WORD
+                 "64",
+#else
+                 "32",
+#endif
+#if ARMA_MAT_PREALLOC == 0
+                 "without"
+#else
+                 "with"
+#endif
+
     );
 #ifdef SUANPAN_CUDA
     suanpan_info("    The GPCPU solvers are provided by CUDA ({}). https://developer.nvidia.com/about-cuda/\n", CUDA_VERSION);
@@ -435,7 +449,7 @@ void cli_mode(const shared_ptr<Bead>& model) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(output_file.is_open()) output_file << all_line << '\n';
-        if(process_command(model, std::istringstream(all_line)) == SUANPAN_EXIT) return;
+        if(process_command(model, all_line) == SUANPAN_EXIT) return;
         all_line.clear();
     }
 }

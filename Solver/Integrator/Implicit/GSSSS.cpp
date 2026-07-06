@@ -74,15 +74,10 @@ void GSSSS::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    auto fa = std::async([&] { D->assemble_resistance(); });
-    auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
-    auto fd = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
+    D->assemble_resistance();
+    D->assemble_damping_force();
+    D->assemble_nonviscous_force();
+    D->assemble_inertial_force();
 
     W->set_sushi(W->get_current_resistance() + W3G3 / L3 * W->get_incre_resistance() + W->get_current_damping_force() + W2G5 / L5 * W->get_incre_damping_force() + W->get_current_nonviscous_force() + W2G5 / L5 * W->get_incre_nonviscous_force() + W->get_current_inertial_force() + W1G6 * W->get_incre_inertial_force());
 }
@@ -97,9 +92,9 @@ void GSSSS::assemble_effective_matrix() {
     W->get_stiffness() += W->is_nonviscous() ? XV * (W->get_damping() + W->get_nonviscous()) : XV * W->get_damping();
 }
 
-vec GSSSS::get_force_residual() { return XD * ImplicitIntegrator::get_force_residual(); }
+double GSSSS::load_scaling_factor() const { return XD * W1; }
 
-vec GSSSS::get_displacement_residual() { return XD * ImplicitIntegrator::get_displacement_residual(); }
+vec GSSSS::get_residual(const bool disp_ctrl) { return XD * ImplicitIntegrator::get_residual(disp_ctrl); }
 
 sp_mat GSSSS::get_reference_load() { return XD * ImplicitIntegrator::get_reference_load(); }
 

@@ -64,7 +64,7 @@ namespace {
         auto flag = SUANPAN_SUCCESS;
         auto incre_strain = incre;
         for(const auto& I : idx) {
-            for(unsigned J = 0; J < I; ++J) {
+            for(unsigned J{0}; J < I; ++J) {
                 if((flag = obj->update_incre_status(incre_strain)) != SUANPAN_SUCCESS) break;
                 obj->commit_status();
                 response(current_pos, span_a) = obj->get_current_strain().t();
@@ -105,7 +105,7 @@ namespace {
         auto flag = SUANPAN_SUCCESS;
         auto incre_strain = incre;
         for(const auto& I : idx) {
-            for(unsigned J = 0; J < I; ++J) {
+            for(unsigned J{0}; J < I; ++J) {
                 if((flag = obj->update_incre_status(incre_strain)) != SUANPAN_SUCCESS) break;
                 obj->commit_status();
                 response(current_pos, span_a) = obj->get_current_strain().t();
@@ -140,7 +140,7 @@ namespace {
         auto incre_load = incre;
         vec total_load = zeros(size(incre));
         for(const auto& I : idx) {
-            for(unsigned J = 0; J < I; ++J) {
+            for(unsigned J{0}; J < I; ++J) {
                 total_load += incre_load;
                 auto counter = 0;
                 while(true) {
@@ -205,7 +205,7 @@ namespace {
 
         if(SUANPAN_SUCCESS == info)
             for(const auto& I : idx) {
-                for(unsigned J = 0; J < I; ++J) {
+                for(unsigned J{0}; J < I; ++J) {
                     total_load += incre_load;
                     counter = 0;
                     while(true) {
@@ -237,7 +237,7 @@ namespace {
     mat material_tester_by_strain_history(const unique_ptr<Material>& obj, const mat& history) {
         mat response(size(history));
 
-        for(auto I = 0llu; I < history.n_rows; ++I) {
+        for(uword I{0}; I < history.n_rows; ++I) {
             if(SUANPAN_SUCCESS != obj->update_trial_status(history.row(I).t())) break;
             obj->commit_status();
             response.row(I) = obj->get_current_stress().t();
@@ -253,7 +253,7 @@ namespace {
     mat material_tester_by_stress_history(const unique_ptr<Material>& obj, const mat& history) {
         mat response(size(history));
 
-        for(auto I = 0llu; I < history.n_rows; ++I) {
+        for(uword I{0}; I < history.n_rows; ++I) {
             auto counter = 0;
             auto flag = false;
             auto strain = obj->get_current_strain();

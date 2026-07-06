@@ -51,7 +51,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
     const auto trial_s = tensor::dev(trial_stress);
 
     auto eta = trial_s;
-    for(unsigned I = 0; I < size; ++I) eta -= vec{&trial_history(1 + 6llu * I), 6, false, true};
+    for(unsigned I{0}; I < size; ++I) eta -= vec{&trial_history(1 + 6u * I), 6, false, true};
 
     // const auto residual = root_three_two * tensor::stress::norm(eta) - std::max(0., yield + hardening * p + saturated * (1. - exp(-m * p)));
 
@@ -79,9 +79,9 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
 
         vec6 sum_a(fill::zeros);
         auto sum_b = 0.;
-        for(unsigned I = 0; I < size; ++I) {
+        for(unsigned I{0}; I < size; ++I) {
             const auto denom = 1. + b(I) * gamma;
-            sum_a += vec{&trial_history(1 + 6llu * I), 6, false, true} / denom;
+            sum_a += vec{&trial_history(1 + 6u * I), 6, false, true} / denom;
             sum_b += a(I) * gamma / denom;
         }
 
@@ -91,7 +91,7 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
         exp_gamma = pow(incre_t / (incre_t + mu * gamma), epsilon);
 
         sum_b = 0.;
-        for(unsigned I = 0; I < size; ++I) sum_b += (b(I) / norm_xi * tensor::stress::double_contraction(xi, vec{&trial_history(1 + 6llu * I), 6, false, true}) - a(I)) * pow(1. + b(I) * gamma, -2.);
+        for(unsigned I{0}; I < size; ++I) sum_b += (b(I) / norm_xi * tensor::stress::double_contraction(xi, vec{&trial_history(1 + 6u * I), 6, false, true}) - a(I)) * pow(1. + b(I) * gamma, -2.);
 
         jacobian = exp_gamma * (root_three_two * sum_b - three_shear - q * epsilon * mu / (incre_t + mu * gamma)) - dk;
 
@@ -109,8 +109,8 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
     const vec u = xi / norm_xi;
 
     vec6 sum_c(fill::zeros);
-    for(unsigned I = 0; I < size; ++I) {
-        vec beta(&trial_history(1 + 6llu * I), 6, false, true);
+    for(unsigned I{0}; I < size; ++I) {
+        vec beta(&trial_history(1 + 6u * I), 6, false, true);
         sum_c += b(I) * pow(1. + b(I) * gamma, -2.) * (beta - tensor::stress::double_contraction(u, beta) * u);
         beta = (beta + a(I) * gamma * u) / (1. + b(I) * gamma);
     }

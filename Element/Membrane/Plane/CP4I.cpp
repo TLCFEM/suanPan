@@ -260,7 +260,7 @@ int CP4I::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
@@ -307,7 +307,7 @@ int CP4I::update_status() {
 
     for(const auto& I : int_pt) {
         vec t_strain(3, fill::zeros);
-        for(unsigned J = 0, K = 0, L = 1; J < m_node; ++J, K += m_dof, L += m_dof) {
+        for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
             t_strain(0) += t_disp(K) * I.pn_pxy(0, J);
             t_strain(1) += t_disp(L) * I.pn_pxy(1, J);
             t_strain(2) += t_disp(K) * I.pn_pxy(1, J) + t_disp(L) * I.pn_pxy(0, J);
@@ -375,10 +375,10 @@ mat CP4I::GetData(const OutputType P) {
     if(OutputType::V == P) return reshape(get_current_velocity(), m_dof, m_node);
     if(OutputType::U == P) return reshape(get_current_displacement(), m_dof, m_node);
 
-    mat A(int_pt.size(), 4);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 4);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I{0}; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::linear(int_pt[I].coor);
     }

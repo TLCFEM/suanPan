@@ -94,15 +94,10 @@ void GeneralizedAlpha::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    auto fa = std::async([&] { D->assemble_resistance(); });
-    auto fb = std::async([&] { D->assemble_damping_force(); });
-    auto fc = std::async([&] { D->assemble_nonviscous_force(); });
-    auto fd = std::async([&] { D->assemble_inertial_force(); });
-
-    fa.get();
-    fb.get();
-    fc.get();
-    fd.get();
+    D->assemble_resistance();
+    D->assemble_damping_force();
+    D->assemble_nonviscous_force();
+    D->assemble_inertial_force();
 
     W->set_sushi(W->get_current_resistance() + F2 * W->get_incre_resistance() + W->get_current_damping_force() + F2 * W->get_incre_damping_force() + W->get_current_nonviscous_force() + F2 * W->get_incre_nonviscous_force() + W->get_current_inertial_force() + F4 * W->get_incre_inertial_force());
 }
@@ -117,9 +112,7 @@ void GeneralizedAlpha::assemble_effective_matrix() {
     W->get_stiffness() += W->is_nonviscous() ? F6 / F2 * (W->get_damping() + W->get_nonviscous()) : F6 / F2 * W->get_damping();
 }
 
-vec GeneralizedAlpha::get_force_residual() { return ImplicitIntegrator::get_force_residual() / F2; }
-
-vec GeneralizedAlpha::get_displacement_residual() { return ImplicitIntegrator::get_displacement_residual() / F2; }
+vec GeneralizedAlpha::get_residual(const bool disp_ctrl) { return ImplicitIntegrator::get_residual(disp_ctrl) / F2; }
 
 sp_mat GeneralizedAlpha::get_reference_load() { return ImplicitIntegrator::get_reference_load() / F2; }
 

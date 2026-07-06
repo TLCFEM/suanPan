@@ -46,7 +46,6 @@ template<sp_d data_t> struct SolverSetting {
 
         const auto pos = option.find_last_of(" \t\n\r", max_length);
         option.resize(pos == std::string::npos ? max_length : pos);
-        option = option.substr(0, pos == std::string::npos ? max_length : pos);
     }
 };
 

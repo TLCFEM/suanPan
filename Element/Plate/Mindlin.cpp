@@ -75,7 +75,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         int_pt.emplace_back(vec{plan(I, 0), plan(I, 1)});
 
         pn = shape::quad(int_pt.back().coor, 1);
@@ -84,7 +84,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
         const auto det_jacob = det(jacob);
 
         auto& strain_mat = int_pt.back().strain_mat;
-        for(unsigned J = 0, K = 1, L = 2; J < p_node; ++J, K += p_dof, L += p_dof) {
+        for(unsigned J{0}, K{1}, L{2}; J < p_node; ++J, K += p_dof, L += p_dof) {
             strain_mat(2, K) = -(strain_mat(0, L) = pn_pxy(0, J));
             strain_mat(1, K) = -(strain_mat(2, L) = pn_pxy(1, J));
         }
@@ -92,7 +92,7 @@ int Mindlin::initialize(const shared_ptr<DomainBase>& D) {
         auto& current_ip = int_pt.back().sec_int_pt;
         current_ip.clear();
         current_ip.reserve(num_section_ip);
-        for(unsigned J = 0; J < num_section_ip; ++J) {
+        for(unsigned J{0}; J < num_section_ip; ++J) {
             const auto t_eccentricity = .5 * sec_plan(J, 0) * thickness;
             current_ip.emplace_back(t_eccentricity, .5 * thickness * sec_plan(J, 1) * plan(I, 2) * det_jacob, mat_proto->unique_copy());
             initial_stiffness += t_eccentricity * t_eccentricity * current_ip.back().factor * strain_mat.t() * mat_stiff * strain_mat;

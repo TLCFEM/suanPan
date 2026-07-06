@@ -30,7 +30,7 @@
 #define COMMAND_H
 
 constexpr auto SUANPAN_MAJOR = 4;
-constexpr auto SUANPAN_MINOR = 0;
+constexpr auto SUANPAN_MINOR = 1;
 constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Deneb";
 
@@ -42,7 +42,7 @@ constexpr auto SUANPAN_CODE = "Deneb";
 
 class Bead;
 
-int process_command(const std::shared_ptr<Bead>&, std::istringstream&&);
+int process_command(const std::shared_ptr<Bead>&, std::string_view);
 
 bool normalise_command(std::string&, std::string&);
 

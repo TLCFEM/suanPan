@@ -45,7 +45,7 @@ double SurfaceNM2D::compute_sf(const vec& s, const vec& h) const {
     const auto ms = s(1) / h(1);
 
     auto f = -c;
-    for(auto I = 0llu; I < para_set.n_rows; ++I) f += evaluate(p, ms, para_set.row(I));
+    for(uword I{0}; I < para_set.n_rows; ++I) f += evaluate(p, ms, para_set.row(I));
 
     return f;
 }
@@ -56,8 +56,8 @@ vec SurfaceNM2D::compute_dsf(const vec& s, const vec& h) const {
 
     vec df(2, fill::zeros);
 
-    for(auto I = 0llu; I < para_set.n_rows; ++I)
-        for(auto J = 0llu; J < df.n_elem; ++J) df(J) += evaluate(p, ms, differentiate(para_set.row(I), J, 1));
+    for(uword I{0}; I < para_set.n_rows; ++I)
+        for(uword J{0}; J < df.n_elem; ++J) df(J) += evaluate(p, ms, differentiate(para_set.row(I), J, 1));
 
     return df / h;
 }
@@ -68,10 +68,10 @@ mat SurfaceNM2D::compute_ddsf(const vec& s, const vec& h) const {
 
     mat ddf(2, 2, fill::zeros);
 
-    for(auto I = 0llu; I < para_set.n_rows; ++I)
-        for(auto J = 0llu; J < ddf.n_rows; ++J) {
+    for(uword I{0}; I < para_set.n_rows; ++I)
+        for(uword J{0}; J < ddf.n_rows; ++J) {
             const auto dfj = differentiate(para_set.row(I), J, 1);
-            for(auto K = 0llu; K < ddf.n_cols; ++K) ddf(J, K) += evaluate(p, ms, differentiate(dfj, K, 1));
+            for(uword K{0}; K < ddf.n_cols; ++K) ddf(J, K) += evaluate(p, ms, differentiate(dfj, K, 1));
         }
 
     return ddf / (h * h.t());

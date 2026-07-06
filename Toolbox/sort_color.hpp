@@ -38,11 +38,11 @@ template<typename T> std::vector<std::vector<T>> sort_color_wp(const suanpan::gr
     wall_clock timer;
     timer.tic();
 
-    const auto num_node = node_register.size();
+    const auto num_node = static_cast<uword>(node_register.size());
 
     uvec weight(num_node, fill::none);
 
-    suanpan::for_each(node_register.size(), [&](const size_t I) { weight(I) = node_register[I].size(); });
+    suanpan::for_each(num_node, [&](const auto I) { weight(I) = static_cast<uword>(node_register[I].size()); });
 
     auto comparator = [&](const T A, const T B) { return weight[A] > weight[B]; };
 
@@ -85,13 +85,13 @@ template<typename T> std::vector<std::vector<T>> sort_color_mis(const suanpan::g
     wall_clock timer;
     timer.tic();
 
-    const auto num_node = node_register.size();
+    const auto num_node = static_cast<uword>(node_register.size());
 
     uvec weight(num_node, fill::none);
 
-    suanpan::for_each(node_register.size(), [&](const size_t I) { weight(I) = node_register[I].size(); });
+    suanpan::for_each(num_node, [&](const auto I) { weight(I) = static_cast<uword>(node_register[I].size()); });
 
-    uword counter = num_node;
+    auto counter = num_node;
     for(const auto I : sort_index(weight, "descend").eval()) weight[I] = --counter;
 
     auto comparator = [&](const T A, const T B) { return weight[A] > weight[B]; };

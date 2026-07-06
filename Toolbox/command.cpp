@@ -139,7 +139,7 @@ namespace {
                     return SUANPAN_EXIT;
                 }
                 if(is_equal(command_line, target)) {
-                    const auto code = process_command(new_model, std::istringstream(command_line));
+                    const auto code = process_command(new_model, command_line);
                     suanpan_highlight("overview -> [Press Enter to Continue]");
                     getline(std::cin, command_line);
                     return code;
@@ -260,7 +260,7 @@ namespace {
             return;
         }
 
-        auto window_size = 8llu;
+        uword window_size{8u};
         if(!get_optional_input(command, window_size)) {
             suanpan_error("A valid window size is required.\n");
             return;
@@ -296,7 +296,7 @@ namespace {
         }
 
         auto interval = 0.;
-        if(1llu == motion.n_cols) {
+        if(1u == motion.n_cols) {
             if(!get_input(command, interval) || interval <= 0.) {
                 suanpan_error("A valid sampling interval is required.\n");
                 return;
@@ -340,7 +340,7 @@ namespace {
         }
 
         auto interval = 0.;
-        if(1llu == motion.n_cols) {
+        if(1u == motion.n_cols) {
             if(!get_input(command, interval) || interval <= 0.) {
                 suanpan_error("A valid sampling interval is required.\n");
                 return;
@@ -1215,11 +1215,21 @@ namespace {
         else if(is_equal(object_type, "num_nodes"))
             suanpan_info("SUANPAN_NUM_NODES: {}\n", SUANPAN_NUM_NODES);
         else if(is_equal_any(object_type, "statistics", "stats")) {
-            suanpan_info("Updating element trial status used:\n\t{:.5E} s.\n", domain->stats<Statistics::UpdateStatus>());
-            suanpan_info("Assembling global vector used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleVector>());
-            suanpan_info("Assembling global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::AssembleMatrix>());
-            suanpan_info("Processing constraints used:\n\t{:.5E} s.\n", domain->stats<Statistics::ProcessConstraint>());
-            suanpan_info("Solving global system used:\n\t{:.5E} s.\n", domain->stats<Statistics::SolveSystem>());
+            auto total_time{0.}, segment{0.};
+            suanpan_info("Initialization used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::Initialization>());
+            total_time += segment;
+            suanpan_info("Updating element trial status used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::UpdateStatus>());
+            total_time += segment;
+            suanpan_info("Assembling global vector used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::AssembleVector>());
+            total_time += segment;
+            suanpan_info("Assembling global system used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::AssembleMatrix>());
+            total_time += segment;
+            suanpan_info("Assembling global effective system used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::AssembleEffectiveMatrix>());
+            total_time += segment;
+            suanpan_info("Processing constraints used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::ProcessConstraint>());
+            total_time += segment;
+            suanpan_info("Solving global system used:\n\t{:.5E} s.\n", segment = domain->stats<Statistics::SolveSystem>());
+            suanpan_info("Total tracked time:\n\t{:.5E} s.\n", total_time + segment);
         }
 
         return SUANPAN_SUCCESS;
@@ -1252,10 +1262,11 @@ namespace {
         suanpan_info(format, "file", "load external files");
         suanpan_info(format, "fullname", "print the full path of the program");
         suanpan_info(format, "group", "define groups via various rules");
-        suanpan_info(format, "hdf5recorder", "define recorders using hdf5 format");
         suanpan_info(format, "import", "import external modules");
         suanpan_info(format, "initial", "define initial conditions for nodes and materials");
         suanpan_info(format, "integrator", "define time integration algorithms");
+        suanpan_info(format, "interaction", "define interactions used in contact analysis");
+        suanpan_info(format, "license", "print license information");
         suanpan_info(format, "list", "list objects in the current domain");
         suanpan_info(format, "load", "define loads of various types");
         suanpan_info(format, "material", "define materials");
@@ -1265,13 +1276,12 @@ namespace {
         suanpan_info(format, "orientation", "define beam section orientations");
         suanpan_info(format, "overview", "walk thorugh a quick overview of the application");
         suanpan_info(format, "peek", "peek the current information of the target object");
-        suanpan_info(format, "plainrecorder", "define recorders using plain text format");
         suanpan_info(format, "plot", "plot and optionally save the model with VTK");
         suanpan_info(format, "precheck", "check the model without the actual analysis");
         suanpan_info(format, "protect", "protect objects from being disabled");
         suanpan_info(format, "pwd", "print/change the current working folder");
         suanpan_info(format, "qrcode", "print a qr code");
-        suanpan_info(format, "recorder", "define recorders");
+        suanpan_info(format, "recorder", "define recorders to record data");
         suanpan_info(format, "reset", "reset the model to the previously converged state");
         suanpan_info(format, "response_spectrum", "compute the response spectrum of a given ground motion");
         suanpan_info(format, "save", "save objects");
@@ -1283,8 +1293,9 @@ namespace {
         suanpan_info(format, "step", "define analysis steps");
         suanpan_info(format, "summary", "print summary for the current problem domain");
         suanpan_info(format, "suspend", "suspend objects in the current step");
-        suanpan_info(format, "terminal", "execute commands in terminal");
+        suanpan_info(format, "t/terminal", "execute commands in terminal");
         suanpan_info(format, "upsampling", "upsample the given ground motion with various filters");
+        suanpan_info(format, "use", "use the specific object in the current step");
         suanpan_info(format, "version", "print version information");
 
         return SUANPAN_SUCCESS;
@@ -1301,7 +1312,7 @@ namespace {
 
         auto run_command = [&](const std::string& command_string) {
             suanpan_highlight("\t{}\n", command_string);
-            process_command(new_model, std::istringstream(command_string));
+            process_command(new_model, command_string);
             std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
         };
 
@@ -1362,8 +1373,10 @@ namespace {
     }
 } // namespace
 
-int process_command(const shared_ptr<Bead>& model, std::istringstream&& command) {
+int process_command(const shared_ptr<Bead>& model, const std::string_view command_str) {
     if(nullptr == model) return SUANPAN_SUCCESS;
+
+    std::istringstream command{model->replace_variable(command_str)};
 
     std::string command_id;
     if(!get_input(command, command_id)) return SUANPAN_SUCCESS;
@@ -1383,6 +1396,13 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream&& command)
         }
 
         return process_file(model, file_name.c_str());
+    }
+
+    if(is_equal_any(command_id, "var", "variable")) {
+        if(std::string name, value; get_input(command, name, value)) model->variable(name) = std::move(value);
+        else suanpan_error("A valid file name is required.\n");
+
+        return SUANPAN_SUCCESS;
     }
 
     if(is_equal(command_id, "domain")) return create_new_domain(model, command);
@@ -1408,7 +1428,6 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream&& command)
     if(is_equal(command_id, "criterion")) return create_new_criterion(domain, command);
     if(is_equal(command_id, "element")) return create_new_element(domain, command);
     if(is_equal(command_id, "expression")) return create_new_expression(domain, command);
-    if(is_equal(command_id, "hdf5recorder")) return create_new_recorder(domain, command, true);
     if(is_equal(command_id, "import")) return create_new_external_module(domain, command);
     if(is_equal(command_id, "initial")) return create_new_initial(domain, command);
     if(is_equal(command_id, "integrator")) return create_new_integrator(domain, command);
@@ -1418,11 +1437,14 @@ int process_command(const shared_ptr<Bead>& model, std::istringstream&& command)
     if(is_equal(command_id, "modifier")) return create_new_modifier(domain, command);
     if(is_equal(command_id, "node")) return create_new_node(domain, command);
     if(is_equal(command_id, "orientation")) return create_new_orientation(domain, command);
-    if(is_equal(command_id, "plainrecorder")) return create_new_recorder(domain, command, false);
-    if(is_equal(command_id, "recorder")) return create_new_recorder(domain, command);
     if(is_equal(command_id, "section")) return create_new_section(domain, command);
     if(is_equal(command_id, "solver")) return create_new_solver(domain, command);
     if(is_equal(command_id, "step")) return create_new_step(domain, command);
+
+    // recorders
+    if(is_equal(command_id, "recorder")) return create_new_recorder(domain, command);
+    if(is_equal(command_id, "hdf5recorder")) return create_new_recorder(domain, command, true);
+    if(is_equal(command_id, "plainrecorder")) return create_new_recorder(domain, command, false);
 
     // groups
     auto group_handler = [&] {
@@ -2337,7 +2359,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
         if(record_command) output_file << all_line << '\n';
-        if(process_command(model, std::istringstream(all_line)) == SUANPAN_EXIT) {
+        if(process_command(model, all_line) == SUANPAN_EXIT) {
             if(record_command) output_file << "### finish processing --> " << file_name << '\n';
             return SUANPAN_EXIT;
         }

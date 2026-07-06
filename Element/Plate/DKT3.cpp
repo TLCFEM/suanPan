@@ -137,7 +137,7 @@ int DKT3::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(3);
     for(auto I = 0; I < 3; ++I) {
-        int_pt.emplace_back(vec{ele_coor(I + 3llu, 1), ele_coor(I + 3llu, 2)});
+        int_pt.emplace_back(vec{ele_coor(I + 3u, 1), ele_coor(I + 3u, 2)});
 
         auto& c_pt = int_pt.back();
         auto& strain_mat = c_pt.strain_mat;
@@ -150,7 +150,7 @@ int DKT3::initialize(const shared_ptr<DomainBase>& D) {
         auto& c_ip = c_pt.sec_int_pt;
         c_ip.clear();
         c_ip.reserve(num_section_ip);
-        for(unsigned J = 0; J < num_section_ip; ++J) {
+        for(unsigned J{0}; J < num_section_ip; ++J) {
             const auto t_eccentricity = .5 * sec_plan(J, 0) * thickness;
             c_ip.emplace_back(t_eccentricity, thickness * sec_plan(J, 1) * area / 6., mat_proto->unique_copy());
             initial_stiffness += t_eccentricity * t_eccentricity * c_ip.back().factor * strain_mat.t() * ini_stiffness * strain_mat;

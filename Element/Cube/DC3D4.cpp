@@ -49,7 +49,7 @@ int DC3D4::initialize(const shared_ptr<DomainBase>& D) {
     pn_mat = inv_coor.rows(1, 3);
 
     b_mat.zeros(6, 12);
-    for(unsigned J = 0, K = 0, L = 1, M = 2; J < c_node; ++J, K += 3, L += 3, M += 3) {
+    for(unsigned J{0}, K{0}, L{1}, M{2}; J < c_node; ++J, K += 3, L += 3, M += 3) {
         b_mat(0, K) = b_mat(3, L) = b_mat(5, M) = pn_mat(0, J);
         b_mat(3, K) = b_mat(1, L) = b_mat(4, M) = pn_mat(1, J);
         b_mat(5, K) = b_mat(4, L) = b_mat(2, M) = pn_mat(2, J);

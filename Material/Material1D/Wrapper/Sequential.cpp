@@ -71,7 +71,7 @@ int Sequential::update_trial_status(const vec& t_strain) {
         jacobian(1, 0) = -mat_pool.front()->get_trial_stiffness().at(0);
         jacobian(mat_size, mat_size) = mat_pool.back()->get_trial_stiffness().at(0);
 
-        for(uword I = 1; I < mat_size; ++I) {
+        for(uword I{1}; I < mat_size; ++I) {
             residual(0) -= mat_pool[I]->get_trial_strain().at(0);
             residual(I) -= mat_pool[I]->get_trial_stress().at(0);
             residual(I + 1) += mat_pool[I]->get_trial_stress().at(0);
@@ -85,7 +85,7 @@ int Sequential::update_trial_status(const vec& t_strain) {
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * ref_error || (suanpan::inf_norm(residual) < tolerance && counter > 5u)) break;
 
-        for(size_t I = 0; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
+        for(uword I{0}; I < mat_pool.size(); ++I) mat_pool[I]->update_trial_status(mat_pool[I]->get_trial_strain() + i_strain[I]);
     }
 
     trial_stress = mat_pool.front()->get_trial_stress();

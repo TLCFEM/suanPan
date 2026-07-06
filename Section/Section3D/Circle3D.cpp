@@ -35,7 +35,7 @@ int Circle3D::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         const auto t_angle = (plan(I, 0) + 1.) * datum::pi;
         const auto t_radius = .5 * radius * (plan(I, 1) + 1.);
         int_pt.emplace_back(cos(t_angle) * t_radius, sin(t_angle) * t_radius, .5 * plan(I, 2) * t_radius * area, material_proto->unique_copy());

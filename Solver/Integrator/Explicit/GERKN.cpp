@@ -87,6 +87,8 @@ int GERKN::update_trial_status(bool) {
     return D->update_trial_status();
 }
 
+double GERKN::load_scaling_factor() const { return FLAG::FIRST != step_flag ? C2 - C1 : 1.; }
+
 void GERKN::commit_status() {
     auto& W = get_domain()->get_factory();
 

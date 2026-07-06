@@ -51,12 +51,13 @@ protected:
     static const mat mapping;
 
     const double thickness;
+    const double objective_length;
 
     const char scheme;
 
     std::vector<IntegrationPoint> int_pt;
 
-    static vec form_diff_coor(const mat&);
+    [[nodiscard]] vec form_diff_coor(const mat&) const;
     static mat form_drilling_n(const vec&, const vec&);
     static mat form_drilling_dn(const vec&, const vec&);
     static mat form_displacement_dn(const mat&, const mat&);
@@ -66,11 +67,12 @@ protected:
 
 public:
     SGCMQ(
-        unsigned,    // element tag
-        uvec&&,      // node tag
-        unsigned,    // material tag
-        double = 1., // thickness
-        char = 'I'   // integration type
+        unsigned, // element tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // thickness
+        double,   // objective_length
+        char      // integration type
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

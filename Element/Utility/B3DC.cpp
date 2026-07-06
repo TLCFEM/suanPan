@@ -29,7 +29,7 @@ mat B3DC::compute_l(const mat& a, const subview_col<double>& rk) const {
     const mat srk = transform::skew_symm(rk);
     const auto rke0 = .25 * dot(rk, e(0));
 
-    mat l(3llu, 2llu * nodal_size(), fill::zeros); // eq. 4.111
+    mat l(3u, 2u * nodal_size(), fill::zeros); // eq. 4.111
 
     l.cols(sa) = (2. * rke0 * eye(3, 3) + 2. * e0r0 * rk.t()) * a;                             // eq. 4.110
     l.cols(sb) = rke0 * transform::skew_symm(r(0)) + (e0r0 * e(0).t() - .5 * eye(3, 3)) * srk; // eq. 4.110
@@ -46,7 +46,7 @@ mat B3DC::compute_m(const mat& a, const subview_col<double>& z) const {
 }
 
 mat B3DC::compute_g(const mat& a, const subview_col<double>& rk, const subview_col<double>& z) const {
-    mat g(2llu * nodal_size(), 2llu * nodal_size(), fill::zeros); // eq. 4.132
+    mat g(2u * nodal_size(), 2u * nodal_size(), fill::zeros); // eq. 4.132
 
     const auto srk = transform::skew_symm(rk);
     const auto sr0 = transform::skew_symm(r(0));
@@ -115,7 +115,7 @@ void B3DC::update_theta() {
     for(auto I = 0u; I < 3u; ++I) {
         const auto J = (I + 1u) % 3u, K = (I + 2u) % 3u;
         theta(I) = asin(.5 * (dot(e(K), ni(J)) - dot(e(J), ni(K))));
-        theta(I + 3llu) = asin(.5 * (dot(e(K), nj(J)) - dot(e(J), nj(K))));
+        theta(I + 3u) = asin(.5 * (dot(e(K), nj(J)) - dot(e(J), nj(K))));
     }
 }
 

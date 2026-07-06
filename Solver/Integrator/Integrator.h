@@ -97,10 +97,16 @@ public:
     virtual void assemble_matrix();
     virtual void assemble_effective_matrix();
 
-    virtual vec get_force_residual();
-    virtual vec get_displacement_residual();
-    [[nodiscard]] vec get_auxiliary_residual() const;
+    // ! some integrators need to rescale the right hand side
+    // ! this will affect the interaction with the left hand side
+    // ! the following three methods shall be overridden simultaneously
+    [[nodiscard]] virtual double load_scaling_factor() const { return 1.; }
+    virtual vec get_residual(bool);
     virtual sp_mat get_reference_load();
+
+    vec get_force_residual() { return get_residual(false); }
+    vec get_displacement_residual() { return get_residual(true); }
+    [[nodiscard]] vec get_auxiliary_residual() const;
 
     [[nodiscard]] virtual const vec& get_trial_displacement() const;
 

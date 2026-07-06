@@ -41,17 +41,27 @@ int Arnoldi::analyze() {
     const auto D = G->get_domain();
     auto& W = D->get_factory();
 
-    if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
+    wall_clock t_clock;
 
+    t_clock.tic();
+    if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
+    D->update<Statistics::UpdateStatus>(t_clock.toc());
+
+    t_clock.tic();
     D->assemble_trial_mass();
     D->assemble_trial_stiffness();
+    D->update<Statistics::AssembleMatrix>(t_clock.toc());
 
+    t_clock.tic();
     // if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
+    D->update<Statistics::ProcessConstraint>(t_clock.toc());
 
+    t_clock.tic();
     const shared_ptr t_mass = W->get_mass()->unique_copy();
     const auto factor = std::max(datum::eps, 1E-12 * t_mass->max());
-    for(auto I = 0llu; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
+    for(uword I{0}; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
+    D->update<Statistics::AssembleMatrix>(t_clock.toc());
 
 #ifdef SUANPAN_DISTRIBUTED
     return eig_psolve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");

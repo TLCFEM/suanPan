@@ -16,5 +16,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         Implicit/NonviscousNewmark.cpp
         Implicit/OALTS.cpp
         Implicit/RayleighNewmark.cpp
+        Implicit/UDNewmark.cpp
         Implicit/WilsonPenzienNewmark.cpp
 )

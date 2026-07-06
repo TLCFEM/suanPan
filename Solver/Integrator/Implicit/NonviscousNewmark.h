@@ -33,30 +33,17 @@
 #ifndef NONVISCOUSNEWMARK_H
 #define NONVISCOUSNEWMARK_H
 
-#include "Newmark.h"
+#include "UDNewmark.h"
 
-class NonviscousNewmark final : public Newmark {
-    const cx_vec m, s;
-
-    cx_vec s_para, m_para;
-
-    double accu_para{0.};
-
-    cx_mat current_damping;
-
+class NonviscousNewmark final : public UDNewmark {
 protected:
-    void update_parameter(double) override;
+    [[nodiscard]] vec target_field() const override;
 
 public:
-    NonviscousNewmark(unsigned, double, double, cx_vec&&, cx_vec&&);
-
-    int initialize() override;
+    using UDNewmark::UDNewmark;
 
     void assemble_resistance() override;
-    void assemble_matrix() override;
-
-    void commit_status() override;
-    void clear_status() override;
+    void assemble_effective_matrix() override;
 
     void print() override;
 };

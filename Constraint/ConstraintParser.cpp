@@ -43,6 +43,10 @@ namespace {
         }
 
         const auto obj_tag = get_remaining<uword>(command);
+        if(obj_tag.empty()) {
+            suanpan_error("At least one node is required.\n");
+            return;
+        }
 
         if(penalty) {
             if(group) return_obj = std::make_unique<GroupPenaltyBC>(bc_id, uvec(obj_tag), std::move(dof_pool));

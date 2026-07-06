@@ -24,14 +24,14 @@ uword LeeNewmark::get_total_size() const { return n_damping * n_block + n_block;
 
 void LeeNewmark::update_stiffness() const {
     if(factory->is_sparse())
-        for(uword I = 0, J = n_block; I < n_damping; ++I, J += n_block) {
+        for(uword I{0}, J{n_block}; I < n_damping; ++I, J += n_block) {
             stiffness->triplet_mat.assemble(current_mass->triplet_mat, {J, 0, J}, {J, J, 0}, {mass_coef(I), -mass_coef(I), -C1 * mass_coef(I)});
             stiffness->triplet_mat.assemble(current_stiffness->triplet_mat, J, J, stiffness_coef(I));
         }
     else {
         const auto [low, up] = factory->get_bandwidth();
-        for(uword I = 0, J = n_block; I < n_damping; ++I, J += n_block)
-            for(uword L = 0; L < n_block; ++L) {
+        for(uword I{0}, J{n_block}; I < n_damping; ++I, J += n_block)
+            for(uword L{0}; L < n_block; ++L) {
                 const auto N = L + J;
                 for(uword K = std::max(L, static_cast<uword>(up)) - up; K < std::min(n_block, L + low + 1); ++K) {
                     const auto M = K + J;
@@ -161,7 +161,7 @@ void LeeNewmark::assemble_resistance() {
 
     if(nullptr != current_mass) {
         vec internal_velocity = CM * W->get_trial_velocity();
-        for(uword I = 0, J = n_block; I < n_damping; ++I, J += n_block) {
+        for(uword I{0}, J{n_block}; I < n_damping; ++I, J += n_block) {
             const vec n_internal(&trial_internal(J), n_block);
             internal_velocity -= mass_coef(I) * n_internal;
         }
@@ -181,7 +181,7 @@ void LeeNewmark::print() {
     suanpan_info("A Newmark solver using Lee's damping model. doi:10.1016/j.jsv.2020.115312\n");
     const vec X = .25 * sqrt(mass_coef % stiffness_coef);
     const vec F = sqrt(mass_coef / stiffness_coef);
-    for(auto I = 0llu; I < n_damping; ++I)
+    for(uword I{0}; I < n_damping; ++I)
         suanpan_info("\tDamping Ratio: {:.4f}\tFrequency (rad/s): {:.4f}\n", X(I), F(I));
 }
 

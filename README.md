@@ -43,23 +43,20 @@
 as [ABAQUS UNIFIED FEA](https://www.3ds.com/products-services/simulia/products/abaqus/), [ANSYS](http://www.ansys.com/)
 and [OpenSees](http://opensees.berkeley.edu/).
 
-<p align="center"><img src="https://repobeats.axiom.co/api/embed/dc2e0bf6251aec5423157991015e9f2582618226.svg" alt="Activities"></p>
-
 ## Features
 
 The highlights of **suanPan** are
 
-- ✅ ***fast***, memory and thread safe
-- ✅ [shared memory](https://en.wikipedia.org/wiki/Shared_memory) parallelism support
-- ✅ [distributed memory](https://en.wikipedia.org/wiki/Distributed_memory) parallelism support
-- ✅ multi-architecture (`amd64` and `arm64`) [support](https://hub.docker.com/r/tlcfem/suanpan)
-- ✅ rich collection of elements, materials, time integration methods, etc.
-- ✅ open source and easy to extend
-- ✅ modern language features
+* ⚡ ***fast***, thread-safe, and memory-safe
+* 🧠 built with modern C++ language features
+* 🌐 supports both shared-memory and distributed-memory parallelism
+* 🖥️ cross-platform with multi-arch [support](https://hub.docker.com/r/tlcfem/suanpan) (amd64 & arm64)
+* 🧩 rich library of elements, materials, and time-integration schemes
+* 🔧 highly expressive and easily extensible
 
 ## Quick Start
 
-Execute the application out-of-the-box in terminal on Linux using one of the following commands depending on how the application is obtained.
+Execute the application out-of-the-box in terminal using one of the following commands depending on how the application is obtained.
 See details below.
 
 ```bash
@@ -69,11 +66,8 @@ See details below.
 suanPan
 # for flatpak
 flatpak run io.github.tlcfem.suanPan
-```
 
-Or on Windows,
-
-```powershell
+# for windows
 # in the folder containing suanPan.exe
 .\suanPan.exe
 ```
@@ -262,12 +256,12 @@ an available [CUDA](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) an
 
 ### Automation Related
 
-#### VS Code
+#### VS Code [Recommended]
 
 The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan).
 It provides syntax highlighting, autocompletion, running the model using the specified executable or docker container.
 
-#### Sublime Text
+#### Sublime Text [Deprecated]
 
 On Windows, a batch file named `AddAssociation.bat` is provided in the archive.
 It provides file associations and prepares a proper working environment (build system, autocompletion, highlighting) with [Sublime Text](https://www.sublimetext.com/).
@@ -290,23 +284,23 @@ Additional libraries used in **suanPan** are listed as follows.
 
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.2
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 15.2.6
+- [**Armadillo**](http://arma.sourceforge.net/) version 15.4.0
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.14.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.15.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.0.0
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.1.1
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.33
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2022.3.0
-- [**VTK**](https://vtk.org/) version 9.6.1
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2023.0.0
+- [**VTK**](https://vtk.org/) version 9.6.2
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**ezp**](https://github.com/TLCFEM/ezp)
-- [**fmt**](https://github.com/fmtlib/fmt) version 12.1.0
-- [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.7
+- [**fmt**](https://github.com/fmtlib/fmt) version 12.2.0
+- [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.8
 - [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.3.1
 - [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)

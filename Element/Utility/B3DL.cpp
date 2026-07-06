@@ -106,10 +106,10 @@ mat B3DL::to_global_mass_mat(const mat& l_mat) const {
 
         for(auto I = 0; I < 4; ++I) {
             const auto I3 = 3 * I;
-            const span sa(I3, I3 + 2llu);
+            const span sa(I3, I3 + 2u);
             for(auto J = 0; J < 4; ++J) {
                 const auto J3 = 3 * J;
-                const span sb(J3, J3 + 2llu);
+                const span sb(J3, J3 + 2u);
                 g_mat(sa, sb) = direction_cosine.t() * g_mat(sa, sb) * direction_cosine;
             }
         }
@@ -137,10 +137,10 @@ mat B3DL::to_global_stiffness_mat(const mat& l_mat) const {
 
     for(auto I = 0; I < 4; ++I) {
         const auto I3 = 3 * I;
-        const span sa(I3, I3 + 2llu);
+        const span sa(I3, I3 + 2u);
         for(auto J = 0; J < 4; ++J) {
             const auto J3 = 3 * J;
-            const span sb(J3, J3 + 2llu);
+            const span sb(J3, J3 + 2u);
             g_mat(sa, sb) = direction_cosine.t() * g_mat(sa, sb) * direction_cosine;
         }
     }

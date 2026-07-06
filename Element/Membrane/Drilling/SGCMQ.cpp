@@ -36,7 +36,7 @@ SGCMQ::IntegrationPoint::IntegrationPoint(vec&& C, const double F, unique_ptr<Ma
     , factor(F)
     , m_material(std::move(M)) {}
 
-vec SGCMQ::form_diff_coor(const mat& ele_coor) {
+vec SGCMQ::form_diff_coor(const mat& ele_coor) const {
     vec diff_coor(8);
 
     diff_coor(0) = ele_coor(1, 1) - ele_coor(0, 1);
@@ -47,6 +47,13 @@ vec SGCMQ::form_diff_coor(const mat& ele_coor) {
     diff_coor(5) = ele_coor(1, 0) - ele_coor(2, 0);
     diff_coor(6) = ele_coor(2, 0) - ele_coor(3, 0);
     diff_coor(7) = ele_coor(3, 0) - ele_coor(0, 0);
+
+    if(objective_length > 0.)
+        for(unsigned I{0}, J{4}; I < 4u; ++I, ++J) {
+            const auto s = objective_length / std::sqrt(diff_coor(I) * diff_coor(I) + diff_coor(J) * diff_coor(J));
+            diff_coor(I) *= s;
+            diff_coor(J) *= s;
+        }
 
     return diff_coor;
 }
@@ -147,15 +154,16 @@ void SGCMQ::form_body_force(const mat& diff_coor) {
         const mat n_translation = I.factor * compute_shape_function(I.coor, 0);
         const mat n_drilling = I.factor * form_drilling_n(I.coor, diff_coor);
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) {
-            for(auto K = 0llu; K < 2llu; ++K) body_force(L + K, K) += n_translation(J);
-            body_force(L + 2llu, 2) += n_drilling(J);
+            for(uword K{0}; K < uword{2}; ++K) body_force(L + K, K) += n_translation(J);
+            body_force(L + 2, 2) += n_drilling(J);
         }
     }
 }
 
-SGCMQ::SGCMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, const char IP)
+SGCMQ::SGCMQ(const unsigned T, uvec&& N, const unsigned M, const double TH, const double OL, const char IP)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::UR3})
     , thickness(TH)
+    , objective_length(OL)
     , scheme(IP) {}
 
 int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
@@ -179,7 +187,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
-    for(unsigned I = 0; I < plan.n_rows; ++I) {
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
         const auto &X = plan(I, 0), &Y = plan(I, 1);
 
         vec t_vec{X, Y};
@@ -278,11 +286,11 @@ mat SGCMQ::GetData(const OutputType P) {
     if(OutputType::U == P) return remap(get_current_displacement());
 
     if(P == OutputType::S) {
-        mat B(3 * int_pt.size(), 1);
-        mat A(3 * int_pt.size(), 11);
-        for(unsigned I = 0, J = 0; I < static_cast<unsigned>(int_pt.size()); ++I, J += 3) {
-            B.rows(J, J + 2llu) = int_pt[I].m_material->get_current_stress();
-            A.rows(J, J + 2llu) = shape::stress11(int_pt[I].coor);
+        mat B(3u * static_cast<unsigned>(int_pt.size()), 1);
+        mat A(3u * static_cast<unsigned>(int_pt.size()), 11);
+        for(unsigned I{0}, J{0}; I < static_cast<unsigned>(int_pt.size()); ++I, J += 3u) {
+            B.rows(J, J + 2u) = int_pt[I].m_material->get_current_stress();
+            A.rows(J, J + 2u) = shape::stress11(int_pt[I].coor);
         }
         mat X;
         if(!solve(X, A, B)) return {};
@@ -297,10 +305,10 @@ mat SGCMQ::GetData(const OutputType P) {
         return t_stress;
     }
 
-    mat A(int_pt.size(), 9);
-    mat B(6, int_pt.size(), fill::zeros);
+    mat A(static_cast<uword>(int_pt.size()), 9);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
 
-    for(size_t I = 0; I < int_pt.size(); ++I) {
+    for(uword I{0}; I < int_pt.size(); ++I) {
         if(auto C = int_pt[I].m_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
         A.row(I) = interpolation::quadratic(int_pt[I].coor);
     }
