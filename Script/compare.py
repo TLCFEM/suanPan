@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-
 from pathlib import Path
 from difflib import unified_diff
 import sys
 import tarfile
 from tempfile import TemporaryDirectory
-
 
 skip_files: tuple = (
     "DKTS3.supan",
@@ -96,6 +94,5 @@ def compare_commits(current: Path, parent: Path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2:
-        if compare_commits(Path(sys.argv[1]), Path(sys.argv[2])):
-            sys.exit(1)
+    if len(sys.argv) > 2 and compare_commits(Path(sys.argv[1]), Path(sys.argv[2])):
+        sys.exit(1)
