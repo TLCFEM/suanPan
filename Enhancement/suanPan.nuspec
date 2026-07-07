@@ -22,6 +22,13 @@
     <releaseNotes>Please visit: https://github.com/TLCFEM/suanPan/releases</releaseNotes>
   </metadata>
   <files>
-    <file src="tools\**" target="tools" />
+    <file src="tools\*.dll" target="bin" />
+    <file src="tools\*.md" target="doc" />
+    <file src="tools\AddAssociation.bat" target="bin" />
+    <file src="tools\LICENSE" target="doc" />
+    <file src="tools\suanPan.exe" target="bin" />
+    <file src="tools\suanPan.sublime-completions" target="bin" />
+    <file src="tools\suanPan.sublime-syntax" target="bin" />
+    <file src="tools\VERIFICATION.txt" target="doc" />
   </files>
 </package>
