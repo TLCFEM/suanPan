@@ -1005,8 +1005,8 @@ int Domain::initialize() {
     interaction_pond.update();
 
     // for restart analysis
-    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { t_load.second->deinitialize(); });
-    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->deinitialize(); });
+    suanpan::for_all(load_pond, [](const dual<Load>& t_load) { t_load.second->deinitialize(); });
+    suanpan::for_all(constraint_pond, [](const dual<Constraint>& t_constraint) { t_constraint.second->deinitialize(); });
 
     // amplitude should be updated before load
     suanpan::for_all(amplitude_pond, [&](const dual<Amplitude>& t_amplitude) {
