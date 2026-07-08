@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.15.0
-//  Generated: 2026-05-12 13:08:20.543985
+//  Catch v3.15.2
+//  Generated: 2026-07-07 20:39:49.020441
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -6844,11 +6844,11 @@ namespace Catch {
     CATCH_INTERNAL_SUPPRESS_ZERO_VARIADIC_WARNINGS                                                                                                                                                                                                                                                 \
     CATCH_INTERNAL_SUPPRESS_UNUSED_TEMPLATE_WARNINGS                                                                                                                                                                                                                                               \
     CATCH_INTERNAL_SUPPRESS_UNUSED_VARIABLE_WARNINGS                                                                                                                                                                                                                                               \
-    template<typename TestType>                                                                                                                                                                                                                                                                    \
-    struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>) {                                                                                                                                                                                                                          \
-        void test();                                                                                                                                                                                                                                                                               \
-    };                                                                                                                                                                                                                                                                                             \
     namespace {                                                                                                                                                                                                                                                                                    \
+        template<typename TestType>                                                                                                                                                                                                                                                                \
+        struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>) {                                                                                                                                                                                                                      \
+            void test();                                                                                                                                                                                                                                                                           \
+        };                                                                                                                                                                                                                                                                                         \
         namespace INTERNAL_CATCH_MAKE_NAMESPACE(TestNameClass) {                                                                                                                                                                                                                                   \
             INTERNAL_CATCH_TYPE_GEN                                                                                                                                                                                                                                                                \
             INTERNAL_CATCH_NTTP_GEN(INTERNAL_CATCH_REMOVE_PARENS(Signature))                                                                                                                                                                                                                       \
@@ -6897,11 +6897,11 @@ namespace Catch {
     CATCH_INTERNAL_SUPPRESS_UNUSED_TEMPLATE_WARNINGS                                                                                                                                                                                                                                  \
     CATCH_INTERNAL_SUPPRESS_UNUSED_VARIABLE_WARNINGS                                                                                                                                                                                                                                  \
     CATCH_INTERNAL_SUPPRESS_COMMA_WARNINGS                                                                                                                                                                                                                                            \
-    template<typename TestType>                                                                                                                                                                                                                                                       \
-    struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>) {                                                                                                                                                                                                             \
-        void test();                                                                                                                                                                                                                                                                  \
-    };                                                                                                                                                                                                                                                                                \
     namespace {                                                                                                                                                                                                                                                                       \
+        template<typename TestType>                                                                                                                                                                                                                                                   \
+        struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>) {                                                                                                                                                                                                         \
+            void test();                                                                                                                                                                                                                                                              \
+        };                                                                                                                                                                                                                                                                            \
         namespace INTERNAL_CATCH_MAKE_NAMESPACE(TestName) {                                                                                                                                                                                                                           \
             INTERNAL_CATCH_TYPE_GEN                                                                                                                                                                                                                                                   \
             template<typename... Types>                                                                                                                                                                                                                                               \
@@ -7228,6 +7228,8 @@ namespace Catch {
                     return m_translateFunction(ex);
                 }
 #else
+                (void)it;
+                (void)itEnd;
                 return "You should never get here!";
 #endif
             }
@@ -7310,7 +7312,7 @@ namespace Catch {
 
 #define CATCH_VERSION_MAJOR 3
 #define CATCH_VERSION_MINOR 15
-#define CATCH_VERSION_PATCH 0
+#define CATCH_VERSION_PATCH 2
 
 #endif // CATCH_VERSION_MACROS_HPP_INCLUDED
 
@@ -7642,9 +7644,7 @@ namespace Catch {
 
             bool isFinite() const override {
                 for(auto const& gen : m_generators) {
-                    if(!gen.isFinite()) {
-                        return false;
-                    }
+                    if(!gen.isFinite()) { return false; }
                 }
                 return true;
             }
@@ -10195,6 +10195,8 @@ namespace Catch {
 
             using Children = std::vector<ITrackerPtr>;
 
+            virtual bool isFilteredImpl() const = 0;
+
         protected:
             enum CycleState {
                 NotStarted,
@@ -10290,6 +10292,20 @@ namespace Catch {
              * for internal debug checks.
              */
             virtual bool isGeneratorTracker() const;
+
+            /**
+             * Returns true if the concrete tracker instance has a filter that applies to it.
+             */
+            bool isFiltered() const {
+                // Fast path: are there even filters for tracker in this position?
+                const size_t filter_depth =
+                    m_newStyleFilters ? m_allTrackerDepth : m_sectionOnlyDepth;
+                if(m_filterRef->size() <= filter_depth) { return false; }
+
+                // Slow path: If there are filters, ask the concrete tracker.
+                //            This handles things like match-all filters for that tracker.
+                return isFilteredImpl();
+            }
         };
 
         class TrackerContext {
@@ -10342,6 +10358,8 @@ namespace Catch {
             // to not own the name, the name still has to outlive the `ITracker` parent, so
             // this should still be safe.
             StringRef m_trimmed_name;
+
+            bool isFilteredImpl() const override;
 
         public:
             SectionTracker(NameAndLocation&& nameAndLocation, TrackerContext& ctx, ITracker* parent);
@@ -12599,7 +12617,7 @@ namespace Catch {
          */
         template<typename RangeLike, typename Equality = decltype(std::equal_to<>{})>
         constexpr RangeEqualsMatcher<RangeLike, Equality>
-        RangeEquals(RangeLike&& range, Equality&& predicate = std::equal_to<>{}) {
+            RangeEquals(RangeLike&& range, Equality&& predicate = std::equal_to<>{}) {
             return {CATCH_FORWARD(range), CATCH_FORWARD(predicate)};
         }
 
@@ -12612,7 +12630,7 @@ namespace Catch {
          */
         template<typename T, typename Equality = decltype(std::equal_to<>{})>
         constexpr RangeEqualsMatcher<std::initializer_list<T>, Equality>
-        RangeEquals(std::initializer_list<T> range, Equality&& predicate = std::equal_to<>{}) {
+            RangeEquals(std::initializer_list<T> range, Equality&& predicate = std::equal_to<>{}) {
             return {range, CATCH_FORWARD(predicate)};
         }
 
@@ -12625,7 +12643,7 @@ namespace Catch {
          */
         template<typename RangeLike, typename Equality = decltype(std::equal_to<>{})>
         constexpr UnorderedRangeEqualsMatcher<RangeLike, Equality>
-        UnorderedRangeEquals(RangeLike&& range, Equality&& predicate = std::equal_to<>{}) {
+            UnorderedRangeEquals(RangeLike&& range, Equality&& predicate = std::equal_to<>{}) {
             return {CATCH_FORWARD(range), CATCH_FORWARD(predicate)};
         }
 
@@ -12638,7 +12656,7 @@ namespace Catch {
          */
         template<typename T, typename Equality = decltype(std::equal_to<>{})>
         constexpr UnorderedRangeEqualsMatcher<std::initializer_list<T>, Equality>
-        UnorderedRangeEquals(std::initializer_list<T> range, Equality&& predicate = std::equal_to<>{}) {
+            UnorderedRangeEquals(std::initializer_list<T> range, Equality&& predicate = std::equal_to<>{}) {
             return {range, CATCH_FORWARD(predicate)};
         }
     } // namespace Matchers
