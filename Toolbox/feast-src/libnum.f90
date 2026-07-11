@@ -2935,9 +2935,9 @@ SUBROUTINE wdcsrmm(UPLO,TRANS,N,M,rhs,alpha,a,ia,ja,X,beta,B)
   matdescra(3)='N'
   matdescra(4)='F'
   if (TRANS=='T') then ! transpose
-     call mkl_dcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
+     call mkl_internal_dcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
   else
-     call mkl_dcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
+     call mkl_internal_dcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
   endif
 #else
   !! default mat-vec in libsprim (if mkl not present)
@@ -3018,9 +3018,9 @@ SUBROUTINE wzcsrmm(UPLO,TRANS,N,M,rhs,alpha,a,ia,ja,X,beta,B)
   matdescra(3)='N'
   matdescra(4)='F'
   if (TRANS=='T'.or.TRANS=='C') then ! transpose
-     call mkl_zcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
+     call mkl_internal_zcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
   else
-     call mkl_zcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
+     call mkl_internal_zcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
   endif
 #else
   !! default mat-vec in libsprim (if mkl not present)
@@ -3098,9 +3098,9 @@ SUBROUTINE wzhcsrmm(UPLO,TRANS,N,M,rhs,alpha,a,ia,ja,X,beta,B)
   matdescra(3)='N'
   matdescra(4)='F'
   if (TRANS=='T'.or.TRANS=='C') then ! transpose
-     call mkl_zcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
+     call mkl_internal_zcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
   else
-     call mkl_zcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
+     call mkl_internal_zcsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
   endif
 #else
   !! default mat-vec in libsprim (if mkl not present)
@@ -3178,9 +3178,9 @@ SUBROUTINE wscsrmm(UPLO,TRANS,N,M,rhs,alpha,a,ia,ja,X,beta,B)
   matdescra(3)='N'
   matdescra(4)='F'
   if (TRANS=='T') then ! transpose
-     call mkl_scsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
+     call mkl_internal_scsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
   else
-     call mkl_scsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
+     call mkl_internal_scsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
   endif
 #else
   !! default mat-vec in libsprim (if mkl not present)
@@ -3260,9 +3260,9 @@ SUBROUTINE wccsrmm(UPLO,TRANS,N,M,rhs,alpha,a,ia,ja,X,beta,B)
   matdescra(3)='N'
   matdescra(4)='F'
   if (TRANS=='T'.or.TRANS=='C') then ! transpose
-     call mkl_ccsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
+     call mkl_internal_ccsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
   else
-     call mkl_ccsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
+     call mkl_internal_ccsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
   endif
 #else
   !! default mat-vec in libsprim (if mkl not present)
@@ -3344,9 +3344,9 @@ SUBROUTINE wchcsrmm(UPLO,TRANS,N,M,rhs,alpha,a,ia,ja,X,beta,B)
   matdescra(3)='N'
   matdescra(4)='F'
   if (TRANS=='T'.or.TRANS=='C') then ! transpose
-     call mkl_ccsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
+     call mkl_internal_ccsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, N, beta, b, M)
   else
-     call mkl_ccsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
+     call mkl_internal_ccsrmm(TRANS, N, rhs, M, alpha, matdescra, a, ja, ia, ia(2), X, M, beta, b, N)
   endif
 #else
   !! default mat-vec in libsprim (if mkl not present)
