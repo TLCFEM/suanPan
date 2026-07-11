@@ -7,10 +7,12 @@
     <LocalDebuggerCommandArguments>-vb -f Balloon1D</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\..\..\Example\Material\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>-vb -f Balloon1D|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>-ct</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\..\..\Example</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>-ct|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
 </Project>
