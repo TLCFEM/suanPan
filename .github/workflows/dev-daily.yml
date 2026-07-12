@@ -114,7 +114,7 @@ jobs:
   windows-gcc-daily:
     if: needs.check-latest.outputs.cache-hit != 'true'
     needs: check-latest
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - name: Clone
         uses: actions/checkout@v7

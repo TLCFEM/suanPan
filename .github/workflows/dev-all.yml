@@ -356,7 +356,7 @@ jobs:
   windows-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.vs]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     needs: guard
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - name: Clone
         uses: actions/checkout@v7
@@ -420,7 +420,7 @@ jobs:
         build:
           - Release
         compiler:
-          - Visual Studio 17 2022
+          - Visual Studio 18 2026
         mkl:
           - 'OFF'
         small_memory:
@@ -432,7 +432,7 @@ jobs:
   windows-gcc-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.windows.gcc]') && !contains(github.event.head_commit.message, '[skip.windows]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     needs: guard
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - name: Clone
         uses: actions/checkout@v7

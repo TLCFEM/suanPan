@@ -275,7 +275,7 @@ jobs:
           vt_api_key: ${{ secrets.VIRUSTOTAL_KEY }}
   windows-gcc-master:
     needs: guard
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - name: Clone
         uses: actions/checkout@v7
@@ -364,7 +364,7 @@ jobs:
     timeout-minutes: 120
   windows-master:
     needs: guard
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - name: Clone
         uses: actions/checkout@v7
