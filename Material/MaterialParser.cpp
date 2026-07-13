@@ -3212,16 +3212,14 @@ namespace {
         while(!command.eof() && idx < 2)
             if(get_input(command, para)) para_pool(idx++) = para;
 
-        mat c_table, t_table, dc_table, dt_table;
-
         auto check_file = [&](mat& table) {
             std::string table_name;
             if(!get_input(command, table_name)) {
                 suanpan_error("A valid parameter is required.\n");
                 return false;
             }
-            if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2) {
-                suanpan_error("Cannot load \"{}\".\n", table_name);
+            if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2 || table.n_rows < 2) {
+                suanpan_error("Cannot load \"{}\" or incorrect format.\n", table_name);
                 return false;
             }
             if(0. != table(0)) {
@@ -3231,10 +3229,8 @@ namespace {
             return true;
         };
 
-        if(!check_file(c_table)) return;
-        if(!check_file(t_table)) return;
-        if(!check_file(dc_table)) return;
-        if(!check_file(dt_table)) return;
+        mat c_table, t_table, dc_table, dt_table;
+        if(!check_file(c_table) || !check_file(t_table) || !check_file(dc_table) || !check_file(dt_table)) return;
 
         while(!command.eof() && idx < 6)
             if(get_input(command, para)) para_pool(idx++) = para;
