@@ -275,7 +275,7 @@ jobs:
           brew install glfw glew go libomp
           go build Checker/updater.go
           ./Script/mac-dependency.sh ${{ matrix.os }}
-          export FC=gfortran-13
+          export FC=gfortran-15
           if [ "${{ matrix.compiler }}" == "clang" ]; then
             if [[ "${{ matrix.os }}" == "macos-26-large" || "${{ matrix.os }}" == "macos-26-xlarge" ]]; then
               export CC=$(brew --prefix llvm@20)/bin/clang
@@ -294,8 +294,8 @@ jobs:
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
           else
-            export CC=gcc-13
-            export CXX=g++-13
+            export CC=gcc-15
+            export CXX=g++-15
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
             -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \

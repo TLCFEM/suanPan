@@ -78,7 +78,7 @@ jobs:
           echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
           brew install glfw glew libomp
           ./Script/mac-dependency.sh ${{ matrix.os }}
-          export CC=gcc-13 && export CXX=g++-13 && export FC=gfortran-13
+          export CC=gcc-15 && export CXX=g++-15 && export FC=gfortran-15
           cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \

@@ -205,7 +205,7 @@ jobs:
             export CC=$(brew --prefix llvm@15)/bin/clang
             export CXX=$(brew --prefix llvm@15)/bin/clang++
           fi
-          export FC=gfortran-13
+          export FC=gfortran-15
           cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
