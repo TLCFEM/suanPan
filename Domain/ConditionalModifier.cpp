@@ -21,6 +21,7 @@
 #include <Element/Element.h>
 #include <Load/Amplitude/Ramp.h>
 #include <Step/Step.h>
+#include <ranges>
 
 bool ConditionalModifier::validate_node(const shared_ptr<DomainBase>& D) const {
     const auto not_valid = [&](const shared_ptr<Node>& node) { return !node || !node->is_active() || !node->validate_dof(dof_order); };
@@ -87,8 +88,7 @@ int ConditionalModifier::initialize(const shared_ptr<DomainBase>& D) {
     if(!amplitude || !amplitude->is_active()) amplitude = Ramp(0);
 
     auto start_time = 0.;
-    // ReSharper disable once CppUseElementsView
-    for(auto& [t_tag, t_step] : D->get_step_pool()) {
+    for(const auto& t_step : D->get_step_pool() | std::views::values) {
         if(t_step->get_tag() >= start_step) break;
         start_time += t_step->get_time_period();
     }

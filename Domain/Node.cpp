@@ -78,10 +78,7 @@ bool Node::validate_dof(const std::vector<DOF>& in) const {
 }
 
 std::vector<uword> Node::get_dof(const std::vector<DOF>& seed) const {
-    const auto contains = [&](const DOF target) {
-        // ReSharper disable once CppUseRangeAlgorithm
-        return std::find(seed.begin(), seed.end(), target) != seed.end();
-    };
+    const auto contains = [&](const DOF target) { return std::ranges::find(seed, target) != seed.end(); };
 
     std::vector<uword> active_dof;
     for(auto J = 0u; J < num_dof; ++J)
