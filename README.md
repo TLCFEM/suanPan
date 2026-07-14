@@ -208,7 +208,7 @@ They can be successfully executed on earlier versions of macOS.
 > It is necessary to run `sudo xattr -dr com.apple.quarantine <downloaded/archive/folder>` to remove extra attribute.
 >
 > ```bash
-> DOWNLOAD_URL="https://github.com/TLCFEM/suanPan/releases/download/suanPan-v3.9.3/suanPan-macos-14-amd64-openblas-avx.tar.gz"
+> DOWNLOAD_URL="https://github.com/TLCFEM/suanPan/releases/download/suanPan-v3.9.3/suanPan-macos-15-amd64-openblas-avx.tar.gz"
 > curl -L "$DOWNLOAD_URL" -o suanPan-latest.tar.gz
 > mkdir -p suanPan && tar -xzf suanPan-latest.tar.gz -C suanPan && cd suanPan
 > sudo xattr -dr com.apple.quarantine .

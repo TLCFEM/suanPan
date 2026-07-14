@@ -10,7 +10,7 @@
 #   ./mac-dependency.sh <runner-image-name>
 #
 #   <runner-image-name>: The name of the GitHub Actions runner image
-#                        (one of macos-14-large, macos-14-xlarge, macos-15-large, macos-15-xlarge).
+#                        (one of macos-15-large, macos-15-xlarge, macos-26-large, macos-26-xlarge).
 #
 # What it does:
 #   1. Checks that exactly one argument is provided.

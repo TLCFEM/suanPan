@@ -108,8 +108,8 @@ jobs:
     strategy:
       matrix:
         os:
-          - macos-14-large
-          - macos-14-xlarge
+          - macos-15-large
+          - macos-15-xlarge
     timeout-minutes: 100
   windows-gcc-daily:
     if: needs.check-latest.outputs.cache-hit != 'true'
