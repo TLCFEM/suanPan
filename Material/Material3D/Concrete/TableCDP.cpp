@@ -89,31 +89,11 @@ pod6 TableCDP::compute_compression_backbone(const double kappa) const {
     return out;
 }
 
-TableCDP::TableCDP(const unsigned T, const double E, const double V, mat&& TT, mat&& CT, mat&& TDT, mat&& CDT, const double AP, const double BC, const double S, const double R)
-    : NonlinearCDP(T, E, V, 0., 0., AP, BC, S, R)
-    , t_table(abs(std::move(TT)))
-    , c_table(abs(std::move(CT)))
-    , dt_table(abs(std::move(TDT)))
-    , dc_table(abs(std::move(CDT))) {
-    const auto convert = [](mat& backbone, mat& damage, const double g) {
-        // convert plastic strain (first column) to kappa
-        vec kappa = backbone.col(0);
-        for(uword I{0}; I < backbone.n_rows; ++I) kappa(I) = as_scalar(trapz(backbone.col(0).rows(0, I), backbone.col(1).rows(0, I))) / g;
-
-        // convert damage table
-        vec d_kappa;
-        interp1(backbone.col(0), kappa, damage.col(0), d_kappa);
-        damage.col(0) = d_kappa;
-        damage.col(1).clamp(0., 1.);
-
-        // check-in kappa for backbone table
-        backbone.col(0) = kappa;
-    };
-
-    convert(t_table, dt_table, access::rw(g_t) = as_scalar(trapz(t_table.col(0), t_table.col(1))));
-    convert(c_table, dc_table, access::rw(g_c) = as_scalar(trapz(c_table.col(0), c_table.col(1))));
-
-    c_table.col(1) *= -1.; // ensure compression table is negative
-}
+TableCDP::TableCDP(const unsigned T, const double E, const double V, mat&& TT, mat&& CT, mat&& TDT, mat&& CDT, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
+    : NonlinearCDP(T, E, V, GT, GC, AP, BC, S, R)
+    , t_table(std::move(TT))
+    , c_table(std::move(CT))
+    , dt_table(std::move(TDT))
+    , dc_table(std::move(CDT)) {}
 
 unique_ptr<Material> TableCDP::unique_copy() { return std::make_unique<TableCDP>(*this); }
