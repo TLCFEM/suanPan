@@ -17,6 +17,24 @@
 
 #include "TableCDP.h"
 
+#include <ranges>
+
+pod2 TableCDP::interpolate(const double kappa, const mat& table) {
+    const auto indices = std::views::iota(uword{0}, table.n_rows);
+
+    const auto it = std::ranges::lower_bound(indices, kappa, {}, [&](const uword idx) { return table(idx, 0); });
+
+    const double x0 = table(*it - 1, 0);
+    const double x1 = table(*it, 0);
+    const double y0 = table(*it - 1, 1);
+    const double y1 = table(*it, 1);
+
+    const auto rate = (y1 - y0) / (x1 - x0);
+    const auto value = rate * (kappa - x0) + y0;
+
+    return {value, rate};
+}
+
 pod6 TableCDP::compute_tension_backbone(const double kappa) const {
     pod6 out;
 
@@ -36,15 +54,9 @@ pod6 TableCDP::compute_tension_backbone(const double kappa) const {
                 break;
             }
 
-    out[4] = -t_table(t_table.n_rows - 1, 1) / (1. - t_table(t_table.n_rows - 1, 0)); // \md{f}
-    out[1] = std::max(0., (kappa - 1.) * out[4]);                                     // f
-
-    for(uword I{1}; I < t_table.n_rows; ++I)
-        if(kappa <= t_table(I, 0)) {
-            out[4] = (t_table(I, 1) - t_table(I - 1, 1)) / (t_table(I, 0) - t_table(I - 1, 0));
-            out[1] = out[4] * (kappa - t_table(I - 1, 0)) + t_table(I - 1, 1);
-            break;
-        }
+    const auto backbone = interpolate(kappa, t_table);
+    out[4] = backbone[1]; // \md{f}
+    out[1] = backbone[0]; // f
 
     out[2] = out[1] / (1. - out[0]);                                             // \bar{f}
     out[5] = ((1. - out[0]) * out[4] + out[1] * out[3]) * pow(1. - out[0], -2.); // \md{\bar{f}}
@@ -71,15 +83,9 @@ pod6 TableCDP::compute_compression_backbone(const double kappa) const {
                 break;
             }
 
-    out[4] = -c_table(c_table.n_rows - 1, 1) / (1. - c_table(c_table.n_rows - 1, 0)); // \md{f}
-    out[1] = std::min(0., (kappa - 1.) * out[4]);                                     // f
-
-    for(uword I{1}; I < c_table.n_rows; ++I)
-        if(kappa <= c_table(I, 0)) {
-            out[4] = (c_table(I, 1) - c_table(I - 1, 1)) / (c_table(I, 0) - c_table(I - 1, 0));
-            out[1] = out[4] * (kappa - c_table(I - 1, 0)) + c_table(I - 1, 1);
-            break;
-        }
+    const auto backbone = interpolate(kappa, c_table);
+    out[4] = backbone[1]; // \md{f}
+    out[1] = backbone[0]; // f
 
     out[2] = out[1] / (1. - out[0]);                                             // \bar{f}
     out[5] = ((1. - out[0]) * out[4] + out[1] * out[3]) * pow(1. - out[0], -2.); // \md{\bar{f}}

@@ -36,6 +36,8 @@
 class TableCDP final : public NonlinearCDP {
     mat t_table, c_table, dt_table, dc_table;
 
+    static pod2 interpolate(double, const mat&);
+
     [[nodiscard]] pod6 compute_tension_backbone(double) const override;
     [[nodiscard]] pod6 compute_compression_backbone(double) const override;
 
