@@ -22,7 +22,8 @@
 pod2 TableCDP::interpolate(const double kappa, const mat& table) {
     const auto indices = std::views::iota(uword{0}, table.n_rows);
 
-    const auto right = *std::ranges::lower_bound(indices, kappa, {}, [&](const uword idx) { return table(idx, 0); });
+    // guaranteed to exist since the backbone table is normalized between zero and one
+    const auto right = *std::ranges::upper_bound(indices, kappa, {}, [&](const uword idx) { return table(idx, 0); });
     const auto left = right - 1;
 
     const double x0 = table(left, 0);
