@@ -22,12 +22,13 @@
 pod2 TableCDP::interpolate(const double kappa, const mat& table) {
     const auto indices = std::views::iota(uword{0}, table.n_rows);
 
-    const auto it = std::ranges::lower_bound(indices, kappa, {}, [&](const uword idx) { return table(idx, 0); });
+    const auto right = *std::ranges::lower_bound(indices, kappa, {}, [&](const uword idx) { return table(idx, 0); });
+    const auto left = right - 1;
 
-    const double x0 = table(*it - 1, 0);
-    const double x1 = table(*it, 0);
-    const double y0 = table(*it - 1, 1);
-    const double y1 = table(*it, 1);
+    const double x0 = table(left, 0);
+    const double x1 = table(right, 0);
+    const double y0 = table(left, 1);
+    const double y1 = table(right, 1);
 
     const auto rate = (y1 - y0) / (x1 - x0);
     const auto value = rate * (kappa - x0) + y0;
