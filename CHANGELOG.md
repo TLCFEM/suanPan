@@ -7,6 +7,7 @@
 ## version 4.2
 
 1. update `MinGW-w64` with UCRT and GCC 15.3.0, see SDK [link](https://github.com/brechtsanders/winlibs_mingw/releases/download/15.3.0posix-14.0.0-ucrt-r1/winlibs-x86_64-posix-seh-gcc-15.3.0-mingw-w64ucrt-14.0.0-r1.7z)
+2. fix `TableCDP` implementation [#360](https://github.com/TLCFEM/suanPan/pull/360)
 
 ## version 4.1
 
