@@ -3212,16 +3212,14 @@ namespace {
         while(!command.eof() && idx < 2)
             if(get_input(command, para)) para_pool(idx++) = para;
 
-        mat c_table, t_table, dc_table, dt_table;
-
-        auto check_file = [&](mat& table) {
+        const auto check_file = [&](mat& table) {
             std::string table_name;
             if(!get_input(command, table_name)) {
                 suanpan_error("A valid parameter is required.\n");
                 return false;
             }
-            if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2) {
-                suanpan_error("Cannot load \"{}\".\n", table_name);
+            if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2 || table.n_rows < 2) {
+                suanpan_error("Cannot load \"{}\" or incorrect format.\n", table_name);
                 return false;
             }
             if(0. != table(0)) {
@@ -3231,15 +3229,46 @@ namespace {
             return true;
         };
 
-        if(!check_file(c_table)) return;
-        if(!check_file(t_table)) return;
-        if(!check_file(dc_table)) return;
-        if(!check_file(dt_table)) return;
+        mat t_table, c_table, dt_table, dc_table;
+        if(!check_file(t_table) || !check_file(c_table) || !check_file(dt_table) || !check_file(dc_table)) return;
 
         while(!command.eof() && idx < 6)
             if(get_input(command, para)) para_pool(idx++) = para;
 
-        return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), para_pool(2), para_pool(3), para_pool(4), para_pool(5));
+        const auto convert = [](mat& backbone, mat& damage, const double g) {
+            backbone = abs(backbone);
+
+            // convert plastic strain (first column) to kappa
+            vec kappa = backbone.col(0);
+            for(uword I{0}; I < backbone.n_rows; ++I) kappa(I) = as_scalar(trapz(backbone.col(0).rows(0, I), backbone.col(1).rows(0, I))) / g;
+
+            // convert damage table
+            vec d_kappa;
+            interp1(backbone.col(0), kappa, damage.col(0), d_kappa);
+            damage.col(0) = d_kappa;
+            damage.col(1).clamp(0., 1.);
+
+            // check-in kappa for backbone table
+            backbone.col(0) = kappa;
+        };
+
+        double g_t{}, g_c{};
+
+        convert(t_table, dt_table, g_t = as_scalar(trapz(t_table.col(0), t_table.col(1))));
+        if(!dt_table.col(0).is_finite()) {
+            suanpan_error("The tension damage table has a larger plastic strain range.\n");
+            return;
+        }
+
+        convert(c_table, dc_table, g_c = as_scalar(trapz(c_table.col(0), c_table.col(1))));
+        if(!dc_table.col(0).is_finite()) {
+            suanpan_error("The compression damage table has a larger plastic strain range.\n");
+            return;
+        }
+
+        c_table.col(1) *= -1.; // ensure compression table is negative
+
+        return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), g_t, g_c, para_pool(2), para_pool(3), para_pool(4), para_pool(5));
     }
 
     void new_tablegurson(unique_ptr<Material>& return_obj, std::istringstream& command) {
