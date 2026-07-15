@@ -34,7 +34,10 @@
 #include "NonlinearCDP.h"
 
 class TableCDP final : public NonlinearCDP {
-    mat t_table, c_table, dt_table, dc_table;
+    mat t_table, c_table, dt_table, dc_table; // all positive values
+
+    [[nodiscard]] static pod2 interpolate(double, const mat&);
+    [[nodiscard]] static pod6 compute_backbone(double, double, const mat&, const mat&);
 
     [[nodiscard]] pod6 compute_tension_backbone(double) const override;
     [[nodiscard]] pod6 compute_compression_backbone(double) const override;

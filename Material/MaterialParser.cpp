@@ -3215,7 +3215,7 @@ namespace {
         const auto check_file = [&](mat& table) {
             std::string table_name;
             if(!get_input(command, table_name)) {
-                suanpan_error("A valid parameter is required.\n");
+                suanpan_error("A valid file name is required.\n");
                 return false;
             }
             if(std::error_code code; !fs::exists(table_name, code) || !table.load(table_name, raw_ascii) || table.n_cols < 2 || table.n_rows < 2) {
@@ -3235,8 +3235,17 @@ namespace {
         while(!command.eof() && idx < 6)
             if(get_input(command, para)) para_pool(idx++) = para;
 
-        const auto convert = [](mat& backbone, mat& damage, const double g) {
+        const auto convert = [](mat& backbone, mat& damage) {
             backbone = abs(backbone);
+
+            const auto last_row = backbone.n_rows - 1;
+            const auto x1 = backbone(last_row - 1, 0), y1 = backbone(last_row - 1, 1), x2 = backbone(last_row, 0), y2 = backbone(last_row, 1);
+            const double slope = (y2 - y1) / (x2 - x1);
+
+            if(slope >= 0.) return datum::nan;
+
+            // append a smooth exponential decay to the end
+            const auto g = as_scalar(trapz(backbone.col(0), backbone.col(1))) - y2 * y2 / slope;
 
             // convert plastic strain (first column) to kappa
             vec kappa = backbone.col(0);
@@ -3245,28 +3254,23 @@ namespace {
             // convert damage table
             vec d_kappa;
             interp1(backbone.col(0), kappa, damage.col(0), d_kappa);
+            for(uword I{0}; I < d_kappa.n_rows; ++I)
+                if(std::isnan(d_kappa(I))) d_kappa(I) = kappa(last_row, 0) + y2 * y2 / slope / g * std::expm1(slope / y2 * (damage(I, 0) - x2));
+
             damage.col(0) = d_kappa;
             damage.col(1).clamp(0., 1.);
 
             // check-in kappa for backbone table
             backbone.col(0) = kappa;
+
+            return g;
         };
 
-        double g_t{}, g_c{};
-
-        convert(t_table, dt_table, g_t = as_scalar(trapz(t_table.col(0), t_table.col(1))));
-        if(!dt_table.col(0).is_finite()) {
-            suanpan_error("The tension damage table has a larger plastic strain range.\n");
+        const auto g_t = convert(t_table, dt_table), g_c = convert(c_table, dc_table);
+        if(!std::isfinite(g_t) || !std::isfinite(g_c)) {
+            suanpan_error("The backbone table should have a decaying tail.\n");
             return;
         }
-
-        convert(c_table, dc_table, g_c = as_scalar(trapz(c_table.col(0), c_table.col(1))));
-        if(!dc_table.col(0).is_finite()) {
-            suanpan_error("The compression damage table has a larger plastic strain range.\n");
-            return;
-        }
-
-        c_table.col(1) *= -1.; // ensure compression table is negative
 
         return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), g_t, g_c, para_pool(2), para_pool(3), para_pool(4), para_pool(5));
     }
