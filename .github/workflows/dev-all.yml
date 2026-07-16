@@ -332,10 +332,7 @@ jobs:
           ln -s /Applications "$staging/Applications"
           hdiutil create -volname "suanPan" -srcfolder "$staging" -ov -format UDZO "build/${{ env.ARTIFACT }}.dmg"
       - name: Test
-        run: ./build/dist/bin/suanPan -v
-      - name: Debug
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
+        run: ./build/dist/suanPan.sh -v
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
