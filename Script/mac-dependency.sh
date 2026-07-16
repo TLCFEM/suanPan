@@ -69,6 +69,7 @@ TMP_DIR="$(mktemp -d)"
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
+rm -rf "$TARGET_DIR/libtbb*"
 find "$TMP_DIR/tbb-install/lib" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
 rm -rf "$(dirname "$0")/../Include/tbb/*"
 cp -a "$TMP_DIR/tbb-install/include/." "$(dirname "$0")/../Include/tbb"
