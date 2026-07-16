@@ -42,7 +42,7 @@ namespace suanpan {
     template<typename T> constexpr T max_element(T start, T end) {
         return std::max_element(
 #ifdef __cpp_lib_execution
-            std::execution::par,
+            std::execution::par_unseq,
 #endif
             start, end
         );
