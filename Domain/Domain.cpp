@@ -933,7 +933,12 @@ int Domain::assign_color() {
     // count how many entries in the sparse form and preallocate memory
     if(is_sparse()) {
         auto& t_element_pool = element_pond.get();
-        factory->set_entry(std::transform_reduce(t_element_pool.cbegin(), t_element_pool.cend(), uword{1000}, std::plus(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }));
+        factory->set_entry(std::transform_reduce(
+#if defined(SUANPAN_MT) && !defined(SUANPAN_CLANG)
+            std::execution::par_unseq,
+#endif
+            t_element_pool.cbegin(), t_element_pool.cend(), uword{1000}, std::plus(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }
+        ));
     }
 
     return SUANPAN_SUCCESS;

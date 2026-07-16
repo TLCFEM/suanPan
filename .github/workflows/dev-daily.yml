@@ -81,7 +81,7 @@ jobs:
           export CC=gcc-15 && export CXX=g++-15 && export FC=gfortran-15
           cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
+          -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@15)" \
           -DSP_ENABLE_AVX2=OFF \
           -DCMAKE_INSTALL_PREFIX=build/dist
           cmake --build build --target install --config Debug -j 3

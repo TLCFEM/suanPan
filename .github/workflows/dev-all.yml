@@ -289,8 +289,9 @@ jobs:
             fi
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@13)" \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@15)" \
             -DCMAKE_INSTALL_PREFIX=build/dist \
+            -DSP_BUILD_PARALLEL=OFF \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
           else
@@ -298,8 +299,9 @@ jobs:
             export CXX=g++-15
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@13)" \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@15)" \
             -DCMAKE_INSTALL_PREFIX=build/dist \
+            -DSP_BUILD_PARALLEL=OFF \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
           fi
