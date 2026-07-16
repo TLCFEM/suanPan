@@ -82,6 +82,7 @@ TMP_DIR="$(mktemp -d)"
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
+rm -rf "$TARGET_DIR/libopenblas*"
 find "$TMP_DIR" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
 # cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
 
