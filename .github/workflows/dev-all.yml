@@ -351,9 +351,6 @@ jobs:
         compiler:
           - gcc
           - clang
-        exclude:
-          - compiler: gcc
-            vtk: 'ON'
         os:
           - macos-15-large
           - macos-15-xlarge
