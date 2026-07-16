@@ -290,7 +290,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.1.1
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.33
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.34
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
