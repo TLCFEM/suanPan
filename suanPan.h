@@ -373,21 +373,4 @@ namespace suanpan {
     template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
 } // namespace suanpan
 
-#if defined(SUANPAN_CLANG) && !defined(__cpp_lib_ranges)
-// as of clang 13, ranges support is not complete
-namespace std::ranges {
-    template<class IN, class OUT, class FN> OUT transform(IN& from, OUT to, FN&& func) { return std::transform(from.begin(), from.end(), to, std::forward<FN>(func)); }
-
-    template<class IN, class FN> FN for_each(IN& from, FN&& func) { return std::for_each(from.begin(), from.end(), std::forward<FN>(func)); }
-
-    template<class IN, class FN> bool any_of(const IN& from, FN&& func) { return std::any_of(from.cbegin(), from.cend(), std::forward<FN>(func)); }
-
-    template<class IN, class T> constexpr auto fill(IN& from, T value) { return std::fill(from.begin(), from.end(), value); }
-
-    template<class IN> constexpr auto max_element(const IN& from) { return std::max_element(from.cbegin(), from.cend()); }
-
-    template<class IN> constexpr auto min_element(const IN& from) { return std::min_element(from.cbegin(), from.cend()); }
-} // namespace std::ranges
-#endif
-
 #endif
