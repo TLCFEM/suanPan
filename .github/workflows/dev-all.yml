@@ -289,19 +289,24 @@ jobs:
             fi
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
             -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@15)" \
             -DCMAKE_INSTALL_PREFIX=build/dist \
-            -DSP_BUILD_PARALLEL=OFF \
+            -DSP_BUILD_PARALLEL=ON \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
           else
-            export CC=gcc-15
-            export CXX=g++-15
+            export CC=gcc-15 && export CXX=g++-15
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@15)" \
+            -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_Fortran_STANDARD_INCLUDE_DIRECTORIES=$(brew --prefix libomp)/include \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix libomp);$(brew --prefix gcc@15)" \
             -DCMAKE_INSTALL_PREFIX=build/dist \
-            -DSP_BUILD_PARALLEL=OFF \
+            -DSP_BUILD_PARALLEL=ON \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
             -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
           fi
@@ -327,7 +332,7 @@ jobs:
           ln -s /Applications "$staging/Applications"
           hdiutil create -volname "suanPan" -srcfolder "$staging" -ov -format UDZO "build/${{ env.ARTIFACT }}.dmg"
       - name: Test
-        run: ./build/dist/bin/suanPan -v
+        run: ./build/dist/suanPan.sh -v
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
