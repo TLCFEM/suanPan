@@ -6,19 +6,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          fetch-depth: 2
+          fetch-depth: 10
       - name: Python
         uses: actions/setup-python@v6
         with:
           python-version: 3.x
       - name: Compare
         run: |
-          CURRENT_SHA=$(git rev-parse HEAD)
-          PARENT_SHA=$(git rev-parse HEAD~1)
           echo "${{ secrets.STATIC_KEY }}" > key.pem
           chmod 600 key.pem
-          scp -i key.pem -o StrictHostKeyChecking=no ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan-results/Results-$CURRENT_SHA.tar.gz results-current.tar.gz
-          scp -i key.pem -o StrictHostKeyChecking=no ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan-results/Results-$PARENT_SHA.tar.gz results-parent.tar.gz
+          scp -i key.pem -o StrictHostKeyChecking=no ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan-results/Results-$(git rev-parse HEAD).tar.gz results-current.tar.gz
+
+          for i in $(seq 1 5); do
+            SHA=$(git rev-parse HEAD~$i)
+            [ -z "$SHA" ] && break
+            scp -i key.pem -o StrictHostKeyChecking=no ${{ secrets.STATIC_HOST }}:~/Documents/fleet/hub/suanpan-results/Results-$SHA.tar.gz results-parent.tar.gz && break
+          done
+
           rm -f key.pem
           python3 ./Script/compare.py results-current.tar.gz results-parent.tar.gz
 name: A/B Testing

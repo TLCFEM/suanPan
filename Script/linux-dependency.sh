@@ -89,13 +89,16 @@ find "$TMP_DIR/lib" -name "*.a" -exec cp {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/tbb-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/tbb-v2023.1.0-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
+rm -rf "$TARGET_DIR/libtbb*"
+rm -rf "$(dirname "$0")/../Include/tbb/*"
 find "$TMP_DIR/tbb-install/lib" -name "lib*so*" -exec cp -P {} "$TARGET_DIR" \;
+cp -a "$TMP_DIR/tbb-install/include/." "$(dirname "$0")/../Include/tbb"
 
 rm -rf "$TMP_DIR"
 
@@ -109,12 +112,13 @@ find "$TMP_DIR/lib" -name "lib*so*" -exec cp -P {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.33-$RUNNER_IMAGE_NAME-32.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.34-$RUNNER_IMAGE_NAME-32.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
+rm -rf "$TARGET_DIR/libopenblas*"
 cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
 
 rm -rf "$TMP_DIR"

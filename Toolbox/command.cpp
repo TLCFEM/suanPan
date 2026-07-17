@@ -58,6 +58,7 @@
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
+#include <ranges>
 #include <regex>
 #include <thread>
 
@@ -759,7 +760,7 @@ namespace {
         else if(is_equal(object_type, "solver"))
             for(auto& I : domain->get_solver_pool()) list.emplace_back(I->get_tag());
         else if(is_equal(object_type, "step"))
-            for(auto& I : domain->get_step_pool()) list.emplace_back(I.second->get_tag());
+            for(auto& I : domain->get_step_pool() | std::views::values) list.emplace_back(I->get_tag());
 
         suanpan_info("This domain has the following {}s:", object_type);
         for(const auto I : list)

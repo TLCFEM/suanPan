@@ -21,8 +21,8 @@
  * A 3D concrete material model that supports stiffness degradation.
  *
  * @author tlc
- * @date 01/02/2020
- * @version 1.0.0
+ * @date 14/07/2026
+ * @version 2.0.0
  * @file TableCDP.h
  * @addtogroup Material-3D
  * @{
@@ -34,7 +34,10 @@
 #include "NonlinearCDP.h"
 
 class TableCDP final : public NonlinearCDP {
-    mat t_table, c_table, dt_table, dc_table;
+    mat t_table, c_table, dt_table, dc_table; // all positive values
+
+    [[nodiscard]] static pod2 interpolate(double, const mat&);
+    [[nodiscard]] static pod6 compute_backbone(double, double, const mat&, const mat&);
 
     [[nodiscard]] pod6 compute_tension_backbone(double) const override;
     [[nodiscard]] pod6 compute_compression_backbone(double) const override;
@@ -48,6 +51,8 @@ public:
         mat&&,            // compression table
         mat&&,            // tension damage table
         mat&&,            // compression damage table
+        double,           // g_t
+        double,           // g_c
         double = .2,      // dilatancy parameter
         double = 1.16,    // biaxial compression strength ratio
         double = .5,      // stiffness recovery

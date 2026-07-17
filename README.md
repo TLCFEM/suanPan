@@ -208,7 +208,7 @@ They can be successfully executed on earlier versions of macOS.
 > It is necessary to run `sudo xattr -dr com.apple.quarantine <downloaded/archive/folder>` to remove extra attribute.
 >
 > ```bash
-> DOWNLOAD_URL="https://github.com/TLCFEM/suanPan/releases/download/suanPan-v3.9.3/suanPan-macos-14-amd64-openblas-avx.tar.gz"
+> DOWNLOAD_URL="https://github.com/TLCFEM/suanPan/releases/download/suanPan-v3.9.3/suanPan-macos-15-amd64-openblas-avx.tar.gz"
 > curl -L "$DOWNLOAD_URL" -o suanPan-latest.tar.gz
 > mkdir -p suanPan && tar -xzf suanPan-latest.tar.gz -C suanPan && cd suanPan
 > sudo xattr -dr com.apple.quarantine .
@@ -284,17 +284,17 @@ Additional libraries used in **suanPan** are listed as follows.
 
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.2
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 15.4.0
+- [**Armadillo**](http://arma.sourceforge.net/) version 15.4.1
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.15.0
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.15.2
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.1.1
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
-- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.33
+- [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.34
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
-- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2023.0.0
+- [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2023.1.0
 - [**VTK**](https://vtk.org/) version 9.6.2
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3

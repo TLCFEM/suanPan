@@ -17,112 +17,79 @@
 
 #include "TableCDP.h"
 
-pod6 TableCDP::compute_tension_backbone(const double kappa) const {
+#include <ranges>
+
+pod2 TableCDP::interpolate(const double kappa, const mat& table) {
+    const auto indices = std::views::iota(uword{0}, table.n_rows);
+
+    const auto right = *std::ranges::upper_bound(indices, kappa, {}, [&](const uword idx) { return table(idx, 0); }), left = right - 1;
+
+    const double x0 = table(left, 0), x1 = table(right, 0), y0 = table(left, 1), y1 = table(right, 1);
+
+    const auto rate = (y1 - y0) / (x1 - x0);
+
+    return {rate * (kappa - x0) + y0, rate};
+}
+
+pod6 TableCDP::compute_backbone(const double kappa, const double sign, const mat& stress_table, const mat& damage_table) {
     pod6 out;
 
-    if(kappa < dt_table(0, 0)) {
-        out[3] = dt_table(0, 1) / dt_table(0, 0); // \md{d}
-        out[0] = kappa * out[3];                  // d
+    if(kappa < 0.) {
+        out[3] = 0.; // \md{d}
+        out[0] = 0.; // d
     }
-    else if(kappa > dt_table(dt_table.n_rows - 1, 0)) {
-        out[3] = (1. - dt_table(dt_table.n_rows - 1, 1)) / (1. - dt_table(dt_table.n_rows - 1, 0)); // \md{d}
-        out[0] = std::min(1., 1. - (1. - kappa) * out[3]);                                          // d
+    else if(kappa >= 1.) {
+        out[3] = 0.;              // \md{d}
+        out[0] = 1. - datum::eps; // d
     }
-    else
-        for(uword I{1}; I < dt_table.n_rows; ++I) {
-            if(kappa <= dt_table(I, 0)) {
-                out[3] = (dt_table(I, 1) - dt_table(I - 1, 1)) / (dt_table(I, 0) - dt_table(I - 1, 0));
-                out[0] = out[3] * (kappa - dt_table(I - 1, 0)) + dt_table(I - 1, 1);
-            }
-        }
-
-    out[4] = -t_table(t_table.n_rows - 1, 1) / (1. - t_table(t_table.n_rows - 1, 0)); // \md{f}
-    out[1] = std::max(0., (kappa - 1.) * out[4]);                                     // f
-
-    for(uword I{1}; I < t_table.n_rows; ++I) {
-        if(kappa <= t_table(I, 0)) {
-            out[4] = (t_table(I, 1) - t_table(I - 1, 1)) / (t_table(I, 0) - t_table(I - 1, 0));
-            out[1] = out[4] * (kappa - t_table(I - 1, 0)) + t_table(I - 1, 1);
-        }
+    else if(const auto last_row = damage_table.n_rows - 1; kappa >= damage_table(last_row, 0)) {
+        // connecting the last point in the table to (1,1)
+        out[3] = (1. - damage_table(last_row, 1)) / (1. - damage_table(last_row, 0)); // \md{d}
+        out[0] = std::min(1. - datum::eps, 1. + (kappa - 1.) * out[3]);               // d
+    }
+    else {
+        const auto damage = interpolate(kappa, damage_table);
+        out[0] = damage[0]; // d
+        out[3] = damage[1]; // \md{d}
     }
 
-    out[2] = out[1] / (1. - out[0]);                                             // \bar{f}
-    out[5] = ((1. - out[0]) * out[4] + out[1] * out[3]) * pow(1. - out[0], -2.); // \md{\bar{f}}
+    if(kappa < 0.) {
+        out[1] = stress_table(0, 0); // f
+        out[4] = 0.;                 // \md{f}
+    }
+    else if(kappa >= 1.) {
+        out[1] = 0.; // f
+        out[4] = 0.; // \md{f}
+    }
+    else if(const auto last_row = stress_table.n_rows - 1; kappa >= stress_table(last_row, 0)) {
+        // connecting the last point in the table to (1,0)
+        out[4] = stress_table(last_row, 1) / (stress_table(last_row, 0) - 1.); // \md{f}
+        out[1] = out[4] * (kappa - 1.);                                        // f
+    }
+    else {
+        const auto stress = interpolate(kappa, stress_table);
+        out[1] = stress[0]; // f
+        out[4] = stress[1]; // \md{f}
+    }
+
+    out[1] *= sign;
+    out[4] *= sign;
+
+    out[2] = out[1] / (1. - out[0]);                                                  // \bar{f}
+    out[5] = ((1. - out[0]) * out[4] + out[1] * out[3]) * std::pow(1. - out[0], -2.); // \md{\bar{f}}
 
     return out;
 }
 
-pod6 TableCDP::compute_compression_backbone(const double kappa) const {
-    pod6 out;
+pod6 TableCDP::compute_tension_backbone(const double kappa) const { return compute_backbone(kappa, 1., t_table, dt_table); }
 
-    if(kappa < dc_table(0, 0)) {
-        out[3] = dc_table(0, 1) / dc_table(0, 0); // \md{d}
-        out[0] = kappa * out[3];                  // d
-    }
-    else if(kappa > dc_table(dc_table.n_rows - 1, 0)) {
-        out[3] = (1. - dc_table(dc_table.n_rows - 1, 1)) / (1. - dc_table(dc_table.n_rows - 1, 0)); // \md{d}
-        out[0] = std::min(1., 1. - (1. - kappa) * out[3]);                                          // d
-    }
-    else
-        for(uword I{1}; I < dc_table.n_rows; ++I) {
-            if(kappa <= dc_table(I, 0)) {
-                out[3] = (dc_table(I, 1) - dc_table(I - 1, 1)) / (dc_table(I, 0) - dc_table(I - 1, 0));
-                out[0] = out[3] * (kappa - dc_table(I - 1, 0)) + dc_table(I - 1, 1);
-            }
-        }
+pod6 TableCDP::compute_compression_backbone(const double kappa) const { return compute_backbone(kappa, -1., c_table, dc_table); }
 
-    for(uword I{1}; I < dc_table.n_rows; ++I) {
-        if(kappa <= dc_table(I, 0)) {
-            out[3] = (dc_table(I, 1) - dc_table(I - 1, 1)) / (dc_table(I, 0) - dc_table(I - 1, 0));
-            out[0] = out[3] * (kappa - dc_table(I - 1, 0)) + dc_table(I - 1, 1);
-        }
-    }
-
-    out[4] = -c_table(c_table.n_rows - 1, 1) / (1. - c_table(c_table.n_rows - 1, 0)); // \md{f}
-    out[1] = std::min(0., (kappa - 1.) * out[4]);                                     // f
-
-    for(uword I{1}; I < c_table.n_rows; ++I) {
-        if(kappa <= c_table(I, 0)) {
-            out[4] = (c_table(I, 1) - c_table(I - 1, 1)) / (c_table(I, 0) - c_table(I - 1, 0));
-            out[1] = out[4] * (kappa - c_table(I - 1, 0)) + c_table(I - 1, 1);
-        }
-    }
-
-    out[2] = out[1] / (1. - out[0]);                                             // \bar{f}
-    out[5] = ((1. - out[0]) * out[4] + out[1] * out[3]) * pow(1. - out[0], -2.); // \md{\bar{f}}
-
-    return out;
-}
-
-TableCDP::TableCDP(const unsigned T, const double E, const double V, mat&& TT, mat&& CT, mat&& TDT, mat&& CDT, const double AP, const double BC, const double S, const double R)
-    : NonlinearCDP(T, E, V, 0., 0., AP, BC, S, R)
+TableCDP::TableCDP(const unsigned T, const double E, const double V, mat&& TT, mat&& CT, mat&& TDT, mat&& CDT, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
+    : NonlinearCDP(T, E, V, GT, GC, AP, BC, S, R)
     , t_table(std::move(TT))
     , c_table(std::move(CT))
     , dt_table(std::move(TDT))
-    , dc_table(std::move(CDT)) {
-    t_table.col(0) = abs(t_table.col(0));
-    t_table.col(1) = abs(t_table.col(1));
-    c_table.col(0) = abs(c_table.col(0));
-    c_table.col(1) = -abs(c_table.col(1));
-    dt_table = clamp(abs(dt_table), 0., 1.);
-    dc_table = clamp(abs(dc_table), 0., 1.);
-
-    const auto TI = t_table.n_rows - 1, TJ = t_table.n_rows - 2;
-    const auto CI = c_table.n_rows - 1, CJ = c_table.n_rows - 2;
-
-    const auto lt_slope = (t_table(TI, 1) - t_table(TJ, 1)) / (t_table(TI, 0) - t_table(TJ, 0));
-    const auto lc_slope = (c_table(CI, 1) - c_table(CJ, 1)) / (c_table(CI, 0) - c_table(CJ, 0));
-
-    access::rw(g_t) = fabs(trapz(t_table.col(0), t_table.col(1)).eval().at(0)) - t_table(TI, 1) * t_table(TI, 1) / lt_slope;
-    access::rw(g_c) = fabs(trapz(c_table.col(0), c_table.col(1)).eval().at(0)) - c_table(TI, 1) * c_table(TI, 1) / lc_slope;
-
-    vec holder = t_table.col(0);
-    for(uword I{0}; I < t_table.n_rows; ++I) holder(I) = trapz(t_table.col(0).rows(0, I), t_table.col(1).rows(0, I)).eval().at(0) / g_t;
-    t_table.col(0) = holder;
-
-    holder = c_table.col(0);
-    for(uword I{0}; I < c_table.n_rows; ++I) holder(I) = trapz(c_table.col(0).rows(0, I), c_table.col(1).rows(0, I)).eval().at(0) / g_c;
-    c_table.col(0) = holder;
-}
+    , dc_table(std::move(CDT)) {}
 
 unique_ptr<Material> TableCDP::unique_copy() { return std::make_unique<TableCDP>(*this); }

@@ -19,6 +19,7 @@ package main
 
 import (
 	"archive/tar"
+	"bufio"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
@@ -111,17 +112,17 @@ func isArchive(name string) bool {
 }
 
 func getPackageList(release Release, platforms []string) []string {
-	var package_list []string
+	var packageList []string
 	for _, asset := range release.Assets {
 		for _, platform := range platforms {
 			if strings.Contains(asset.Name, platform) && isArchive(asset.Name) {
-				package_list = append(package_list, asset.Name)
+				packageList = append(packageList, asset.Name)
 				break
 			}
 		}
 	}
-	sort.Strings(package_list)
-	return package_list
+	sort.Strings(packageList)
+	return packageList
 }
 
 func downloadLatestVersion(release Release, fromMain bool) error {
@@ -132,11 +133,14 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 	}
 
 	fmt.Printf("Found new version %s, you can download it using this updater, or using package managers.\nDo you want to download now? [y/N] ", release.TagName)
-	var downloadSwitch string
-	_, err := fmt.Scanln(&downloadSwitch)
+
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
 	if err != nil {
 		return err
 	}
+
+	downloadSwitch := strings.TrimSpace(input)
 
 	if len(downloadSwitch) == 0 || (downloadSwitch[0] != 'y' && downloadSwitch[0] != 'Y') {
 		return nil
@@ -159,33 +163,45 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 	fmt.Printf("  `ilp64` enables 64-bit integer for indexing (default is 32-bit), not well tested, extensive testing is welcome.\n")
 	fmt.Printf("\nDownload the new version:\n")
 
-	var package_array []string
+	var packageArray []string
 
 	switch cos {
 	case "windows":
-		package_array = getPackageList(release, []string{"win"})
+		packageArray = getPackageList(release, []string{"win"})
 	case "linux":
-		package_array = getPackageList(release, []string{"linux"})
+		packageArray = getPackageList(release, []string{"linux"})
 	case "darwin":
-		package_array = getPackageList(release, []string{"macos"})
+		packageArray = getPackageList(release, []string{"macos"})
 	}
 
-	for i, v := range package_array {
+	for i, v := range packageArray {
 		fmt.Printf("    [%d] %s\n", i, v)
 	}
 
 	fmt.Printf("\nPlease select the version you want to download (leave empty to exit): ")
-	downloadOption := 0
-	_, err = fmt.Scanf("%d", &downloadOption)
+
+	reader = bufio.NewReader(os.Stdin)
+	input, err = reader.ReadString('\n')
 	if err != nil {
 		return err
 	}
 
-	if downloadOption >= len(package_array) || downloadOption < 0 {
+	input = strings.TrimSpace(input)
+
+	if input == "" {
 		return nil
 	}
 
-	fileName := package_array[downloadOption]
+	downloadOption, err := strconv.Atoi(input)
+	if err != nil {
+		return err
+	}
+
+	if downloadOption >= len(packageArray) || downloadOption < 0 {
+		return nil
+	}
+
+	fileName := packageArray[downloadOption]
 	link := URL + "/download/" + release.TagName + "/" + fileName
 
 	fmt.Printf("Downloading files...\n")
@@ -225,11 +241,14 @@ func downloadLatestVersion(release Release, fromMain bool) error {
 			fmt.Printf("You can manually extract the archive to overwrite the existing folder.\n")
 		} else {
 			fmt.Printf("Do you want me to unpack the archive? [y/N] ")
-			var unpackSwitch string
-			_, err := fmt.Scanln(&unpackSwitch)
+
+			reader := bufio.NewReader(os.Stdin)
+			input, err := reader.ReadString('\n')
 			if err != nil {
 				return err
 			}
+
+			unpackSwitch := strings.TrimSpace(input)
 
 			if len(unpackSwitch) == 0 || (unpackSwitch[0] != 'y' && unpackSwitch[0] != 'Y') {
 				return nil

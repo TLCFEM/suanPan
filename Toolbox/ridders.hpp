@@ -33,14 +33,17 @@
  * @param x2 The second initial guess for the root.
  * @param f2 The value of the function at x2 (i.e., func(x2)).
  * @param tolerance The tolerance for the root-finding process.
+ * @param max_iteration The maximum number of iterations to perform (default is 50).
  * @return The estimated root of the function within the specified tolerance.
  */
-template<std::invocable<double> T> double ridders(const T& func, double x1, double f1, double x2, double f2, const double tolerance) {
-    double target;
+template<std::invocable<double> T> double ridders(const T& func, double x1, double f1, double x2, double f2, const double tolerance, const unsigned max_iteration = 50) {
+    auto target = .5 * (x1 + x2);
 
     auto counter = 0u;
     while(true) {
         counter += 2u;
+
+        if(counter >= max_iteration) break;
 
         const auto x3 = .5 * (x1 + x2);
         const auto f3 = func(x3);
@@ -71,6 +74,8 @@ template<std::invocable<double> T> double ridders(const T& func, double x1, doub
 
         x2 = x4;
         f2 = f4;
+
+        if(!std::isfinite(x1) || !std::isfinite(f1) || !std::isfinite(x2) || !std::isfinite(f2)) break;
     }
 
     suanpan_debug("Ridders' method initial guess {:.5E} with {} iterations.\n", target, counter);
@@ -78,19 +83,19 @@ template<std::invocable<double> T> double ridders(const T& func, double x1, doub
     return target;
 }
 
-template<std::invocable<double> T> double ridders(const T& func, double x1, double x2, const double tolerance) { return ridders(func, x1, func(x1), x2, func(x2), tolerance); }
+template<std::invocable<double> T> double ridders(const T& func, double x1, double x2, const double tolerance, const unsigned max_iteration = 50) { return ridders(func, x1, func(x1), x2, func(x2), tolerance, max_iteration); }
 
-template<std::invocable<double> T> double ridders_guess(const T& func, double x1, double f1, double x2, double f2, const double tolerance) {
+template<std::invocable<double> T> double ridders_guess(const T& func, double x1, double f1, double x2, double f2, const double tolerance, const unsigned max_iteration = 50) {
     while(std::signbit(f1) == std::signbit(f2)) {
         x1 = x2;
         f1 = f2;
         f2 = func(x2 *= 2.);
     }
 
-    return ridders(func, x1, f1, x2, f2, tolerance);
+    return ridders(func, x1, f1, x2, f2, tolerance, max_iteration);
 }
 
-template<std::invocable<double> T> double ridders_guess(const T& func, double x1, double x2, const double tolerance) { return ridders_guess(func, x1, func(x1), x2, func(x2), tolerance); }
+template<std::invocable<double> T> double ridders_guess(const T& func, double x1, double x2, const double tolerance, const unsigned max_iteration = 50) { return ridders_guess(func, x1, func(x1), x2, func(x2), tolerance, max_iteration); }
 
 #endif
 

@@ -108,7 +108,7 @@ void Domain::update_current_inertial_force() const {
     factory->commit_inertial_force();
 }
 
-vec Domain::assemble_vector(std::function<vec(const shared_ptr<Element>&)> kernel) const {
+vec Domain::assemble_vector(const std::function<vec(const shared_ptr<Element>&)> kernel) const {
     vec result(factory->get_size(), fill::zeros);
 
     if(color_map.empty())

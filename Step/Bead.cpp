@@ -19,6 +19,7 @@
 
 #include <Domain/Domain.h>
 #include <Step/Step.h>
+#include <ranges>
 #include <regex>
 
 Bead::Bead() { insert(std::make_shared<Domain>(1)); }
@@ -55,16 +56,16 @@ const shared_ptr<DomainBase>& Bead::get_domain(const unsigned T) const { return 
 const shared_ptr<DomainBase>& Bead::get_current_domain() const { return domain_pool.at(current_domain_tag); }
 
 int Bead::precheck() {
-    for(const auto& [d_tag, t_domain] : domain_pool)
+    for(const auto& t_domain : domain_pool | std::views::values)
         if(t_domain->is_active())
-            for(const auto& [s_tag, t_step] : t_domain->get_step_pool()) {
+            for(const auto& t_step : t_domain->get_step_pool() | std::views::values) {
                 t_domain->set_current_step_tag(t_step->get_tag());
                 t_step->set_domain(t_domain);
                 if(SUANPAN_SUCCESS != t_step->Step::initialize()) return SUANPAN_FAIL;
                 if(SUANPAN_SUCCESS != t_step->initialize()) return SUANPAN_FAIL;
             }
 
-    for(const auto& [d_tag, t_domain] : domain_pool)
+    for(const auto& t_domain : domain_pool | std::views::values)
         if(t_domain->is_active()) t_domain->clear_status();
 
     return SUANPAN_SUCCESS;
@@ -73,10 +74,10 @@ int Bead::precheck() {
 int Bead::analyze() {
     wall_clock t_clock;
 
-    for(const auto& [d_tag, t_domain] : domain_pool) {
+    for(const auto& t_domain : domain_pool | std::views::values) {
         if(!t_domain->is_active()) continue;
         bool initial_record = true;
-        for(const auto& [s_tag, t_step] : t_domain->get_step_pool()) {
+        for(const auto& t_step : t_domain->get_step_pool() | std::views::values) {
             t_domain->set_current_step_tag(t_step->get_tag());
             t_step->set_domain(t_domain);
             t_clock.tic();

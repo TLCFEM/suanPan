@@ -4,6 +4,16 @@
 
 1. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 4.1.1
+
+1. update `MinGW-w64` with UCRT and GCC 15.3.0, see SDK [link](https://github.com/brechtsanders/winlibs_mingw/releases/download/15.3.0posix-14.0.0-ucrt-r1/winlibs-x86_64-posix-seh-gcc-15.3.0-mingw-w64ucrt-14.0.0-r1.7z)
+2. deprecate `macos-14` runners and default to `macos-15`
+3. default to `windows-2025` and Visual Studio 2026 toolkit
+4. update `Armadillo` to version `15.4.1`
+5. update `tbb` to version `v2023.1.0`
+6. update `OpenBLAS` to version `0.3.34`
+7. fix `TableCDP` implementation [#360](https://github.com/TLCFEM/suanPan/pull/360) with a robust handling of tables
+
 ## version 4.1
 
 1. add global uniform/universal damping model `UDDNewmark` [#348](https://github.com/TLCFEM/suanPan/pull/348)

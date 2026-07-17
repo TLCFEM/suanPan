@@ -10,7 +10,7 @@
 #   ./mac-dependency.sh <runner-image-name>
 #
 #   <runner-image-name>: The name of the GitHub Actions runner image
-#                        (one of macos-14-large, macos-14-xlarge, macos-15-large, macos-15-xlarge).
+#                        (one of macos-15-large, macos-15-xlarge, macos-26-large, macos-26-xlarge).
 #
 # What it does:
 #   1. Checks that exactly one argument is provided.
@@ -63,22 +63,26 @@ find "$TMP_DIR/lib" -name "*.a" -exec cp {} "$TARGET_DIR" \;
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/tbb-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/tbb-v2023.1.0-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
+rm -rf "$TARGET_DIR/libtbb*"
+rm -rf "$(dirname "$0")/../Include/tbb/*"
 find "$TMP_DIR/tbb-install/lib" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
+cp -a "$TMP_DIR/tbb-install/include/." "$(dirname "$0")/../Include/tbb"
 
 rm -rf "$TMP_DIR"
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.33-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/OpenBLAS-0.3.34-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
+rm -rf "$TARGET_DIR/libopenblas*"
 find "$TMP_DIR" -name "*.dylib" -exec cp -P {} "$TARGET_DIR" \;
 # cp "$TMP_DIR/libopenblas.a" "$TARGET_DIR"
 

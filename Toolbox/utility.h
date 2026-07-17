@@ -37,14 +37,15 @@ namespace suanpan {
 #endif
     }
 
-    template<sp_i IT, std::invocable<IT> F> void for_each(const IT end, F&& FN) { return for_each(static_cast<IT>(0), end, std::forward<F>(FN)); }
+    template<sp_i IT, std::invocable<IT> F> void for_each(const IT end, F&& FN) { return for_each(IT{0}, end, std::forward<F>(FN)); }
 
     template<typename T> constexpr T max_element(T start, T end) {
+        return std::max_element(
 #ifdef __cpp_lib_execution
-        return std::max_element(std::execution::par, start, end);
-#else
-        return std::max_element(start, end);
+            std::execution::par,
 #endif
+            start, end
+        );
     }
 
     template<typename T> [[maybe_unused]] const std::vector<T>& unique(std::vector<T>& container) {

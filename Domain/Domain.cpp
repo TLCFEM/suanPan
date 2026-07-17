@@ -40,6 +40,7 @@
 #include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
 #include <numeric>
+#include <ranges>
 
 Domain::Domain(const unsigned T)
     : DomainBase(T)
@@ -835,8 +836,7 @@ std::pair<std::vector<unsigned>, suanpan::graph<unsigned>> Domain::get_element_c
     };
 
     if(all_elements)
-        // ReSharper disable once CppUseElementsView
-        for(auto& [t_tag, t_element] : element_pond) populate(t_element);
+        for(auto& t_element : element_pond | std::views::values) populate(t_element);
     else
         for(auto& t_element : element_pond.get()) populate(t_element);
 
@@ -921,12 +921,7 @@ int Domain::assign_color() {
     if(ColorMethod::OFF != color_model) {
         const auto color_algorithm = ColorMethod::WP == color_model ? sort_color_wp<unsigned> : sort_color_mis<unsigned>;
 
-        std::vector<unsigned> element_map;
-        suanpan::graph<unsigned> element_register;
-
-        // Clang 13.0.1 does not allow capture structured bindings
-        // ReSharper disable once CppReplaceTieWithStructuredBinding
-        std::tie(element_map, element_register) = get_element_connectivity(false);
+        const auto [element_map, element_register] = get_element_connectivity(false);
 
         color_map = color_algorithm(element_register);
 
@@ -938,7 +933,12 @@ int Domain::assign_color() {
     // count how many entries in the sparse form and preallocate memory
     if(is_sparse()) {
         auto& t_element_pool = element_pond.get();
-        factory->set_entry(std::transform_reduce(t_element_pool.cbegin(), t_element_pool.cend(), uword{1000}, std::plus(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }));
+        factory->set_entry(std::transform_reduce(
+#if defined(SUANPAN_MT) && !defined(SUANPAN_CLANG)
+            std::execution::par_unseq,
+#endif
+            t_element_pool.cbegin(), t_element_pool.cend(), uword{1000}, std::plus(), [](const shared_ptr<Element>& t_element) { return t_element->get_total_number() * t_element->get_total_number(); }
+        ));
     }
 
     return SUANPAN_SUCCESS;
@@ -1005,8 +1005,8 @@ int Domain::initialize() {
     interaction_pond.update();
 
     // for restart analysis
-    suanpan::for_all(load_pond, [&](const dual<Load>& t_load) { t_load.second->deinitialize(); });
-    suanpan::for_all(constraint_pond, [&](const dual<Constraint>& t_constraint) { t_constraint.second->deinitialize(); });
+    suanpan::for_all(load_pond, [](const dual<Load>& t_load) { t_load.second->deinitialize(); });
+    suanpan::for_all(constraint_pond, [](const dual<Constraint>& t_constraint) { t_constraint.second->deinitialize(); });
 
     // amplitude should be updated before load
     suanpan::for_all(amplitude_pond, [&](const dual<Amplitude>& t_amplitude) {

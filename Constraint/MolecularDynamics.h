@@ -79,7 +79,12 @@ public:
         for(auto&& item : D->get_element_pool())
             if(item && item->is_active() && item->type() == Element::Type::DEM) elements.emplace_back(item);
 
-        space = 2. * std::transform_reduce(elements.cbegin(), elements.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); });
+        space = 2. * std::transform_reduce(
+#if defined(SUANPAN_MT) && !defined(SUANPAN_CLANG)
+                         std::execution::par_unseq,
+#endif
+                         elements.cbegin(), elements.cend(), 0., [](const double a, const double b) { return std::max(a, b); }, [](const std::shared_ptr<Element>& element) { return element->get(Element::Parameter::RADIUS); }
+                     );
 
         if(SUANPAN_SUCCESS != Constraint::initialize(D)) return SUANPAN_FAIL;
 
