@@ -74,6 +74,3 @@ name: Docker Latest
   schedule:
     - cron: 0 8 * * 4
   workflow_dispatch: null
-permissions:
-  contents: read
-  packages: write
