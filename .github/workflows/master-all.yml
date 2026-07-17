@@ -254,6 +254,7 @@ jobs:
           - 'ON'
     timeout-minutes: 100
   virustotal-scan:
+    if: github.event_name == 'push'
     needs:
       - linux-master
       - linux-master-mpi
