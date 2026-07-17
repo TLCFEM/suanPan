@@ -1,4 +1,4 @@
-FROM tlcfem/suanpan-env:amd64 AS build
+FROM tlcfem/suanpan-env:latest AS build
 
 RUN source /opt/intel/oneapi/setvars.sh && \
     git clone --recurse-submodules --branch dev --depth 1 https://github.com/TLCFEM/suanPan.git && cd suanPan && mkdir build && cd build && \

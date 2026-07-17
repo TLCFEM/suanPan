@@ -249,8 +249,6 @@ jobs:
       matrix:
         os:
           - macos-15-large
-          - macos-15-large
-          - macos-15-xlarge
           - macos-15-xlarge
         vtk:
           - 'ON'

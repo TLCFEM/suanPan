@@ -1,3 +1,5 @@
+env:
+  version: 4.1.1
 jobs:
   guard:
     if: github.repository == 'TLCFEM/suanPan'
@@ -28,7 +30,7 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           provenance: false
           push: true
-          tags: tlcfem/suanpan:stable-${{ matrix.arch }}
+          tags: tlcfem/suanpan:${{ env.version }}-${{ matrix.arch }}
     strategy:
       matrix:
         include:
@@ -49,7 +51,11 @@ jobs:
       - name: Buildx
         uses: docker/setup-buildx-action@v4
       - name: Combine
-        run: docker buildx imagetools create -t tlcfem/suanpan:stable tlcfem/suanpan:stable-amd64 tlcfem/suanpan:stable-arm64
+        run: |
+          docker buildx imagetools create -t tlcfem/suanpan:${{ env.version }} tlcfem/suanpan:${{ env.version }}-amd64 tlcfem/suanpan:${{ env.version }}-arm64
+          JWT=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
+          curl -X DELETE -H "Authorization: JWT $JWT" https://hub.docker.com/v2/repositories/tlcfem/suanpan/tags/${{ env.version }}-amd64/
+          curl -X DELETE -H "Authorization: JWT $JWT" https://hub.docker.com/v2/repositories/tlcfem/suanpan/tags/${{ env.version }}-arm64/
 name: Docker Stable
 'on':
   push:
