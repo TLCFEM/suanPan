@@ -4,6 +4,10 @@
 
 1. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 4.2
+
+1. (**breaking**) change the behaviour of criterion DoF tokens, similar to the change made in v4.0, use explicit tokens for unconventional DoFs [#368](https://github.com/TLCFEM/suanPan/pull/368)
+
 ## version 4.1.1
 
 1. update `MinGW-w64` with UCRT and GCC 15.3.0, see SDK [link](https://github.com/brechtsanders/winlibs_mingw/releases/download/15.3.0posix-14.0.0-ucrt-r1/winlibs-x86_64-posix-seh-gcc-15.3.0-mingw-w64ucrt-14.0.0-r1.7z)
@@ -24,7 +28,7 @@
 
 ## version 4.0
 
-1. (breaking) change the behaviour of constraint tokens, natural ordering (1, 2, 3, etc.) may break in this version, use more explicit tokens for unconventional DoFs
+1. (**breaking**) change the behaviour of constraint DoF tokens, natural ordering (1, 2, 3, etc.) may break in this version, use explicit tokens for unconventional DoFs
 2. fix implementation of UDL [#317](https://github.com/TLCFEM/suanPan/pull/317)
 3. bump up various dependencies
 4. add `Balloon` models for metals
@@ -53,11 +57,11 @@
 ## version 3.7
 
 1. update `Armadillo` to version `14.4.1`
-2. (breaking) remove general iterative solvers [#250](https://github.com/TLCFEM/suanPan/pull/250)
+2. (**breaking**) remove general iterative solvers [#250](https://github.com/TLCFEM/suanPan/pull/250)
 3. remove `MUMPS` and `lis` solvers for single-node binaries
 4. update `MinGW-w64` with UCRT and GCC 13.3.0, see SDK [link](https://github.com/brechtsanders/winlibs_mingw/releases/download/13.3.0posix-11.0.1-ucrt-r1/winlibs-x86_64-posix-seh-gcc-13.3.0-mingw-w64ucrt-11.0.1-r1.7z)
 5. add cluster support [#253](https://github.com/TLCFEM/suanPan/pull/253)
-6. (breaking) refactor argument parser, some arguments are changed [#257](https://github.com/TLCFEM/suanPan/pull/257)
+6. (**breaking**) refactor argument parser, some arguments are changed [#257](https://github.com/TLCFEM/suanPan/pull/257)
 
 ## version 3.6
 
@@ -93,7 +97,7 @@
 
 ## version 3.3
 
-1. (breaking) revise syntax for `ConcreteTsai`, `Concrete21` and `Concrete22` using a more consistent definition
+1. (**breaking**) revise syntax for `ConcreteTsai`, `Concrete21` and `Concrete22` using a more consistent definition
 2. fix tangent stiffness in `ConcreteK4` model [#171](https://github.com/TLCFEM/suanPan/pull/171)
 3. update `OpenBLAS` to version `0.3.25`
 4. update `SuperLU` to version `6.0.1`
@@ -243,7 +247,7 @@
 2. add porous media plane strain elements `PCPE4UC`, `PCPE8UC`, `PCPE4DC`, `PCPE8DC`
 3. add N-M interaction enabled beam element `NMB31` and `NMB21`
 4. add N-M interaction enabled section `NM2D1`, `NM3D1` (elastic) and `NM2D2`, `NM3D2` (inelastic)
-5. (breaking) change Rayleigh damping related syntax to include tangent stiffness term
+5. (**breaking**) change Rayleigh damping related syntax to include tangent stiffness term
 6. add different stiffness types to `LeeNewmarkFull`, add support of geometry nonlinearity
 7. revise section definition
 8. add `B3DC` corotational formulation support to 3D beams

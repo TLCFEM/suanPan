@@ -32,19 +32,23 @@
 #define NODEBASEDCRITERION_H
 
 #include <Constraint/Criterion/Criterion.h>
+#include <Domain/Node.h>
 
 class NodeBasedCriterion : public Criterion {
 protected:
-    const unsigned node, dof;
     const double limit;
+    const unsigned node;
+    const Node::DOF dof;
+
+    std::vector<uword> get_dof(const shared_ptr<DomainBase>&) const;
 
 public:
-    explicit NodeBasedCriterion(
-        unsigned = 0, // tag
-        unsigned = 0, // step tag
-        unsigned = 0, // node tag
-        unsigned = 0, // dof tag
-        double = 0.   // limit
+    NodeBasedCriterion(
+        unsigned,  // tag
+        unsigned,  // step tag
+        unsigned,  // node tag
+        Node::DOF, // dof tag
+        double     // limit
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

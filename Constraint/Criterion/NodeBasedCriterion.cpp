@@ -19,11 +19,13 @@
 
 #include <Domain/DomainBase.h>
 
-NodeBasedCriterion::NodeBasedCriterion(const unsigned T, const unsigned ST, const unsigned NT, const unsigned DT, const double MA)
+std::vector<uword> NodeBasedCriterion::get_dof(const shared_ptr<DomainBase>& D) const { return D->get_node(node)->get_dof({dof}); }
+
+NodeBasedCriterion::NodeBasedCriterion(const unsigned T, const unsigned ST, const unsigned NT, const Node::DOF DT, const double MA)
     : Criterion(T, ST)
+    , limit(MA)
     , node(NT)
-    , dof(DT)
-    , limit(MA) {}
+    , dof(DT) {}
 
 int NodeBasedCriterion::initialize(const shared_ptr<DomainBase>& D) {
     if(!D->find<Node>(node)) {

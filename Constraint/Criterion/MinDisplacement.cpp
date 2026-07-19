@@ -24,11 +24,7 @@
 unique_ptr<Criterion> MinDisplacement::unique_copy() { return std::make_unique<MinDisplacement>(*this); }
 
 int MinDisplacement::process(const shared_ptr<DomainBase>& D) {
-    const auto& t_vec = D->get_node(node)->get_reordered_dof();
+    if(const auto t_vec = get_dof(D); !t_vec.empty()) return D->get_factory()->get_current_displacement()(t_vec[0]) < limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
 
-    if(dof > t_vec.n_elem) return SUANPAN_SUCCESS;
-
-    const auto& t_disp = D->get_factory()->get_current_displacement();
-
-    return t_disp(t_vec.at(dof - 1)) < limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
+    return SUANPAN_SUCCESS;
 }
