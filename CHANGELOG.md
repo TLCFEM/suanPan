@@ -6,7 +6,7 @@
 
 ## version 4.2
 
-1. (**breaking**) change the behaviour of criterion DoF tokens, similar to the change made in v4.0, use explicit tokens for unconventional DoFs
+1. (**breaking**) change the behaviour of criterion DoF tokens, similar to the change made in v4.0, use explicit tokens for unconventional DoFs [#368](https://github.com/TLCFEM/suanPan/pull/368)
 
 ## version 4.1.1
 
