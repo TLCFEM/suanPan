@@ -24,11 +24,11 @@
 unique_ptr<Criterion> MaxDisplacement::unique_copy() { return std::make_unique<MaxDisplacement>(*this); }
 
 int MaxDisplacement::process(const shared_ptr<DomainBase>& D) {
-    const auto t_vec = get_dof(D);
+    if(const auto t_vec = get_dof(D); !t_vec.empty()) {
+        const auto& t_disp = D->get_factory()->get_current_displacement();
 
-    if(t_vec.empty()) return SUANPAN_SUCCESS;
+        return t_disp(t_vec[0]) > limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
+    }
 
-    const auto& t_disp = D->get_factory()->get_current_displacement();
-
-    return t_disp(t_vec[0]) > limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
+    return SUANPAN_SUCCESS;
 }
