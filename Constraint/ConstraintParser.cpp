@@ -498,16 +498,16 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        string dof_token;
+        std::string dof_token;
         if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return SUANPAN_SUCCESS;
         }
 
         auto dof_pool = parse_dof(dof_token);
-        if(dof_pool.empty()) {
+        if(1 != dof_pool.size()) {
             suanpan_error("A valid dof identifier is required.\n");
-            return;
+            return SUANPAN_SUCCESS;
         }
 
         double limit;
