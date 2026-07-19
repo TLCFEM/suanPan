@@ -30,8 +30,8 @@
 #define COMMAND_H
 
 constexpr auto SUANPAN_MAJOR = 4;
-constexpr auto SUANPAN_MINOR = 1;
-constexpr auto SUANPAN_PATCH = 2;
+constexpr auto SUANPAN_MINOR = 2;
+constexpr auto SUANPAN_PATCH = 0;
 constexpr auto SUANPAN_CODE = "Deneb";
 
 #ifndef SUANPAN_DATE
