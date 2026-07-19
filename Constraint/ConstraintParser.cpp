@@ -498,10 +498,16 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        unsigned dof;
-        if(!get_input(command, dof)) {
+        string dof_token;
+        if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
             return SUANPAN_SUCCESS;
+        }
+
+        auto dof_pool = parse_dof(dof_token);
+        if(dof_pool.empty()) {
+            suanpan_error("A valid dof identifier is required.\n");
+            return;
         }
 
         double limit;
@@ -510,10 +516,10 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(criterion_type, "MaxDisplacement")) flag = domain->insert(std::make_shared<MaxDisplacement>(tag, step_tag, node, dof, limit));
-        else if(is_equal(criterion_type, "MinDisplacement")) flag = domain->insert(std::make_shared<MinDisplacement>(tag, step_tag, node, dof, limit));
-        else if(is_equal(criterion_type, "MaxResistance")) flag = domain->insert(std::make_shared<MaxResistance>(tag, step_tag, node, dof, limit));
-        else if(is_equal(criterion_type, "MinResistance")) flag = domain->insert(std::make_shared<MinResistance>(tag, step_tag, node, dof, limit));
+        if(is_equal(criterion_type, "MaxDisplacement")) flag = domain->insert(std::make_shared<MaxDisplacement>(tag, step_tag, node, dof_pool[0], limit));
+        else if(is_equal(criterion_type, "MinDisplacement")) flag = domain->insert(std::make_shared<MinDisplacement>(tag, step_tag, node, dof_pool[0], limit));
+        else if(is_equal(criterion_type, "MaxResistance")) flag = domain->insert(std::make_shared<MaxResistance>(tag, step_tag, node, dof_pool[0], limit));
+        else if(is_equal(criterion_type, "MinResistance")) flag = domain->insert(std::make_shared<MinResistance>(tag, step_tag, node, dof_pool[0], limit));
     }
 
     if(!flag) suanpan_error("Fail to create new criterion via \"{}\".\n", command.str());

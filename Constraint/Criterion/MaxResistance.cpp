@@ -24,11 +24,11 @@
 unique_ptr<Criterion> MaxResistance::unique_copy() { return std::make_unique<MaxResistance>(*this); }
 
 int MaxResistance::process(const shared_ptr<DomainBase>& D) {
-    const auto& t_vec = D->get_node(node)->get_reordered_dof();
+    const auto t_vec = get_dof(D);
 
-    if(dof > t_vec.n_elem) return SUANPAN_SUCCESS;
+    if(t_vec.empty()) return SUANPAN_SUCCESS;
 
     const auto& t_force = D->get_factory()->get_current_resistance();
 
-    return t_force(t_vec.at(dof - 1)) > limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
+    return t_force(t_vec[0]) > limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
 }
