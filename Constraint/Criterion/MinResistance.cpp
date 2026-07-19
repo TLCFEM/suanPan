@@ -24,11 +24,7 @@
 unique_ptr<Criterion> MinResistance::unique_copy() { return std::make_unique<MinResistance>(*this); }
 
 int MinResistance::process(const shared_ptr<DomainBase>& D) {
-    if(const auto t_vec = get_dof(D); !t_vec.empty()) {
-        const auto& t_force = D->get_factory()->get_current_resistance();
-
-        return t_force(t_vec[0]) < limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
-    }
+    if(const auto t_vec = get_dof(D); !t_vec.empty()) return D->get_factory()->get_current_resistance()(t_vec[0]) < limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
 
     return SUANPAN_SUCCESS;
 }
