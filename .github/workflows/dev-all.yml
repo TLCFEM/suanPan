@@ -42,7 +42,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: MKL
@@ -217,7 +217,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Dependency
@@ -370,7 +370,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - if: matrix.mkl == 'ON'
@@ -446,7 +446,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: GCC

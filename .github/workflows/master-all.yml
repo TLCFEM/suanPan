@@ -19,7 +19,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Prepare
@@ -122,7 +122,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Prepare
@@ -281,7 +281,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Prepare
@@ -370,7 +370,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Prepare
