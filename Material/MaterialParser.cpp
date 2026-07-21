@@ -1005,7 +1005,7 @@ namespace {
         return_obj = std::make_unique<BWBN>(tag, para_pool.head(16), para_pool(16));
     }
 
-    void new_cdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    template<bool CHECK_INPUT> void new_cdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1019,7 +1019,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<CDP>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13));
+        return_obj = std::make_unique<CDP>(CHECK_INPUT, tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13));
     }
 
     void new_customcdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -3659,7 +3659,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
-    else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
+    else if(is_equal(material_id, "CDP")) new_cdp<true>(new_material, command);
     else if(if_startswith(material_id, "CDPM2")) {
         if(is_equal_any(material_id, "CDPM2", "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
         else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);

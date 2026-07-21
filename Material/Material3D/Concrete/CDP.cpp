@@ -53,7 +53,7 @@ pod6 CDP::compute_compression_backbone(const double kappa) const {
     return out;
 }
 
-CDP::CDP(const unsigned T, const double E, const double V, const double ST, const double SC, const double GT, const double GC, const double AT, const double AC, const double DT, const double DC, const double AP, const double BC, const double S, const double R)
+CDP::CDP(const bool CHECK_INPUT, const unsigned T, const double E, const double V, const double ST, const double SC, const double GT, const double GC, const double AT, const double AC, const double DT, const double DC, const double AP, const double BC, const double S, const double R)
     : NonlinearCDP(T, E, V, GT, GC, AP, BC, S, R)
     , a_t(AT < 1. ? AT : .5)
     , cb_t(0.)
@@ -62,20 +62,25 @@ CDP::CDP(const unsigned T, const double E, const double V, const double ST, cons
     , cb_c(0.)
     , f_c(-std::fabs(SC) * 4. * a_c * std::pow(1. + a_c, -2.)) {
     // tension
-    const auto half_stress = .5 * f_t;
-    // try to find the total strain at peak strain, eq. (20), eq. (24), eq. (27) and eq. (49)
-    const auto half_strain = std::log(1. + a_t + std::sqrt(1. + a_t * a_t)) / f_t / (1. + .5 * a_t) * g_t + half_stress / elastic_modulus;
-    // this defines a minimum stiffness degradation
-    const auto ratio_t = half_stress / half_strain / elastic_modulus;
-    if(ratio_t >= DT) suanpan_warning("A minimum tension degradation of {:.3f} is required, resetting.\n", ratio_t);
+    double ratio_t{};
+    if(CHECK_INPUT) {
+        const auto half_elastic_strain = .5 * f_t / elastic_modulus;
+        // try to find the total strain at half stress point, eq. (20), eq. (24), eq. (27) and eq. (49)
+        // this defines a minimum stiffness degradation
+        ratio_t = half_elastic_strain / (std::log(1. + a_t + std::sqrt(1. + a_t * a_t)) / f_t / (1. + .5 * a_t) * g_t + half_elastic_strain);
+        if(ratio_t >= DT) suanpan_warning("A minimum tension degradation of {:.3f} is required, resetting.\n", ratio_t);
+    }
     access::rw(cb_t) = std::log(std::clamp(DT, ratio_t, 1. - datum::eps)) / std::log(.5 * (1. + a_t - std::sqrt(1. + a_t * a_t)) / a_t);
+
     // compression
-    const auto peak_stress = -std::fabs(SC);
-    // try to find the total strain at peak strain, eq. (20), eq. (24), eq. (27) and eq. (46)
-    const auto peak_strain = std::log(2. * a_c / (1. + a_c)) / f_c / (1. + .5 * a_c) * g_c + peak_stress / elastic_modulus;
-    // this defines a minimum stiffness degradation
-    const auto ratio_c = peak_stress / peak_strain / elastic_modulus;
-    if(ratio_c >= DC) suanpan_warning("A minimum compression degradation of {:.3f} is required, resetting.\n", ratio_c);
+    double ratio_c{};
+    if(CHECK_INPUT) {
+        const auto peak_elastic_strain = -std::fabs(SC) / elastic_modulus;
+        // try to find the total strain at peak stress point, eq. (20), eq. (24), eq. (27) and eq. (46)
+        // this defines a minimum stiffness degradation
+        ratio_c = peak_elastic_strain / (std::log(2. * a_c / (1. + a_c)) / f_c / (1. + .5 * a_c) * g_c + peak_elastic_strain);
+        if(ratio_c >= DC) suanpan_warning("A minimum compression degradation of {:.3f} is required, resetting.\n", ratio_c);
+    }
     access::rw(cb_c) = std::log(std::clamp(DC, ratio_c, 1. - datum::eps)) / std::log(.5 + .5 / a_c);
 }
 

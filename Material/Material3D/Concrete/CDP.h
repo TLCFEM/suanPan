@@ -56,6 +56,7 @@ class CDP final : public NonlinearCDP {
 
 public:
     explicit CDP(
+        bool,
         unsigned = 0,     // tag
         double = 3E4,     // elastic modulus
         double = .2,      // poissons ratio
