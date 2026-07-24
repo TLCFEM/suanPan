@@ -75,8 +75,8 @@ pod6 TableCDP::compute_backbone(const double kappa, const double sign, const mat
     out[1] *= sign;
     out[4] *= sign;
 
-    out[2] = out[1] / (1. - out[0]);                                                  // \bar{f}
-    out[5] = ((1. - out[0]) * out[4] + out[1] * out[3]) * std::pow(1. - out[0], -2.); // \md{\bar{f}}
+    out[2] = out[1] / (1. - out[0]);                     // \bar{f}
+    out[5] = (out[4] + out[2] * out[3]) / (1. - out[0]); // \md{\bar{f}}
 
     return out;
 }
