@@ -28,7 +28,7 @@ const span DafaliasManzari::sm(14, 19);
 const mat DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 DafaliasManzari::DafaliasManzari(const unsigned T, const double G0, const double NU, const double AC, const double LC, const double E0, const double XI, const double M, const double H0, const double H1, const double CH, const double NB, const double A, const double ND, const double ZM, const double CZ, const double PC, const double GR, const double R)
-    : DataDafaliasManzari{std::fabs(G0), std::fabs(NU), std::fabs(AC), std::fabs(LC), std::fabs(E0), std::fabs(XI), std::fabs(M), std::fabs(H0), std::fabs(H1), std::fabs(CH), std::fabs(NB), A, std::fabs(ND), std::fabs(ZM), std::fabs(CZ), -std::fabs(PC), std::fabs(GR)}
+    : DataDafaliasManzari{.shear_modulus = std::fabs(G0), .poissons_ratio = std::fabs(NU), .ac = std::fabs(AC), .lc = std::fabs(LC), .e0 = std::fabs(E0), .xi = std::fabs(XI), .m = std::fabs(M), .h0 = std::fabs(H0), .h1 = std::fabs(H1), .ch = std::fabs(CH), .nb = std::fabs(NB), .a = A, .nd = std::fabs(ND), .zm = std::fabs(ZM), .cz = std::fabs(CZ), .pc = -std::fabs(PC), .gr = std::fabs(GR)}
     , Material3D(T, R) {}
 
 int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {

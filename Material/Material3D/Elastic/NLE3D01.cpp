@@ -42,7 +42,7 @@ vec NLE3D01::compute_derivative(const double m_strain, const double d_strain) {
 }
 
 NLE3D01::NLE3D01(const unsigned T, const double K, const double RE, const double RS, const double M, const double R)
-    : DataNLE3D01{9 * K, fabs(RE), fabs(RS), std::max(0., std::min(1., M))}
+    : DataNLE3D01{.bulk = 9 * K, .ref_strain = fabs(RE), .ref_stress = fabs(RS), .m = std::max(0., std::min(1., M))}
     , IsotropicNonlinearElastic3D(T, R) {}
 
 unique_ptr<Material> NLE3D01::unique_copy() { return std::make_unique<NLE3D01>(*this); }

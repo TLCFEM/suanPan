@@ -20,7 +20,7 @@
 #include <Domain/DomainBase.h>
 
 SectionShell::SectionShell(const unsigned T, const unsigned MT, vec&& E)
-    : SectionShellData{MT, std::move(E)}
+    : SectionShellData{.material_tag = MT, .eccentricity = std::move(E)}
     , CopyableTag(T) {}
 
 void SectionShell::set_initialized(const bool T) const { access::rw(initialized) = T; }

@@ -21,7 +21,7 @@
 #include <Recorder/OutputType.h>
 
 Material::Material(const unsigned T, const MaterialType MT, const double D)
-    : DataMaterial{fabs(D), MT}
+    : DataMaterial{.density = fabs(D), .material_type = MT}
     , DataCoupleMaterial{}
     , CopyableTag(T) {}
 

@@ -21,7 +21,7 @@
 #include <Toolbox/tensor.h>
 
 NonlinearGurson1D::NonlinearGurson1D(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
-    : DataNonlinearGurson1D{E, V, Q1, Q2, FN, SN, EN}
+    : DataNonlinearGurson1D{.elastic_modulus = E, .poissons_ratio = V, .q1 = Q1, .q2 = Q2, .fn = FN, .sn = SN, .en = EN}
     , Material1D(T, R) {}
 
 int NonlinearGurson1D::initialize(const shared_ptr<DomainBase>&) {

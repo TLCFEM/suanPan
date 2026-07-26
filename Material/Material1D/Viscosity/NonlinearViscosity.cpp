@@ -20,7 +20,7 @@
 #include <Recorder/OutputType.h>
 
 NonlinearViscosity::NonlinearViscosity(const unsigned T, const double A, const double L)
-    : DataNonlinearViscosity{fabs(A), fabs(L)}
+    : DataNonlinearViscosity{.alpha = fabs(A), .limit = fabs(L)}
     , Material1D(T, 0.) {}
 
 int NonlinearViscosity::initialize(const shared_ptr<DomainBase>&) {

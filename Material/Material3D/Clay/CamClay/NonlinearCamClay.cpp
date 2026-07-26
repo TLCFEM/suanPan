@@ -23,7 +23,7 @@ const double NonlinearCamClay::sqrt_three_two = std::sqrt(1.5);
 const mat NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearCamClay::NonlinearCamClay(const unsigned T, const double E, const double V, const double B, const double M, const double P, const double R)
-    : DataNonlinearCamClay{std::fabs(E), std::fabs(V), B * B, std::fabs(M), std::fabs(P)}
+    : DataNonlinearCamClay{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(V), .square_beta = B * B, .m = std::fabs(M), .pt = std::fabs(P)}
     , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {

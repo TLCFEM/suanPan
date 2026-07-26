@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 MPF::MPF(const unsigned T, const double E, const double Y, const double H, const double R, const double B1, const double B2, const double B3, const double B4, const bool ISO, const bool CON, const double D)
-    : DataMPF{std::fabs(E), H, std::fabs(Y), std::fabs(R), std::fabs(B1), std::fabs(B2), std::fabs(B3), std::fabs(B4), ISO, CON}
+    : DataMPF{.elastic_modulus = std::fabs(E), .hardening_ratio = H, .yield_stress = std::fabs(Y), .R0 = std::fabs(R), .A1 = std::fabs(B1), .A2 = std::fabs(B2), .A3 = std::fabs(B3), .A4 = std::fabs(B4), .isotropic_hardening = ISO, .constant_radius = CON}
     , Material1D(T, D) {}
 
 int MPF::initialize(const shared_ptr<DomainBase>&) {

@@ -62,7 +62,7 @@ pod2 MultilinearOO::compute_compression_backbone(const double t_strain) const {
 }
 
 MultilinearOO::MultilinearOO(const int T, mat&& TB, mat&& CB, const double R)
-    : DataMultilinearOO{std::move(TB), std::move(CB)}
+    : DataMultilinearOO{.t_backbone = std::move(TB), .c_backbone = std::move(CB)}
     , OriginOriented(T, R) {}
 
 int MultilinearOO::initialize(const shared_ptr<DomainBase>&) {

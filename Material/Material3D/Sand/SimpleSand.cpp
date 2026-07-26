@@ -24,7 +24,7 @@ const span SimpleSand::sd(8, 13);
 const mat SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 SimpleSand::SimpleSand(const unsigned T, const double E, const double V, const double M, const double A, const double H, const double AC, const double NB, const double ND, const double VC, const double PC, const double LC, const double V0, const double R)
-    : DataSimpleSand{E, V, std::fabs(M), A, H, AC, std::fabs(NB), std::fabs(ND), std::fabs(VC), -std::fabs(PC), std::fabs(LC), std::fabs(V0)}
+    : DataSimpleSand{.elastic_modulus = E, .poissons_ratio = V, .m = std::fabs(M), .a = A, .h = H, .ac = AC, .nb = std::fabs(NB), .nd = std::fabs(ND), .vc = std::fabs(VC), .pc = -std::fabs(PC), .lc = std::fabs(LC), .v0 = std::fabs(V0)}
     , Material3D(T, R) {}
 
 int SimpleSand::initialize(const shared_ptr<DomainBase>&) {

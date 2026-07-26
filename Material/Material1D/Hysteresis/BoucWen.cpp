@@ -20,7 +20,7 @@
 #include <Toolbox/ridders.hpp>
 
 BoucWen::BoucWen(const unsigned T, vec&& P)
-    : DataBoucWen{P(0), P(1), P(2), P(3), P(4)}
+    : DataBoucWen{.elastic_modulus = P(0), .yield_stress = P(1), .hardening = P(2), .beta = P(3), .n = P(4)}
     , Material1D(T, P(5)) {}
 
 int BoucWen::initialize(const shared_ptr<DomainBase>&) {

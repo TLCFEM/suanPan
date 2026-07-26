@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 RambergOsgood::RambergOsgood(const unsigned T, const double E, const double Y, const double O, const double N, const double R)
-    : DataRambergOsgood{fabs(E), fabs(Y), fabs(O), fabs(N)}
+    : DataRambergOsgood{.elastic_modulus = fabs(E), .yield_stress = fabs(Y), .offset = fabs(O), .n = fabs(N)}
     , Material1D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int RambergOsgood::initialize(const shared_ptr<DomainBase>&) {

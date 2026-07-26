@@ -75,7 +75,7 @@ void AFC::compute_degradation(const double yield_strain, const double stiffness)
 }
 
 AFC::AFC(const unsigned T, const double E, const double TYS, const double THK, const double TUK, const double CYS, const double CHK, const double CUK, const double DG, const double R)
-    : DataAFC{std::fabs(E), std::fabs(TYS), std::fabs(THK), std::fabs(TUK), std::fabs(CYS), std::fabs(CHK), std::fabs(CUK), std::fabs(DG)}
+    : DataAFC{.elastic_modulus = std::fabs(E), .t_yield_stress = std::fabs(TYS), .t_hardening = std::fabs(THK), .t_unloading = std::fabs(TUK), .c_yield_stress = std::fabs(CYS), .c_hardening = std::fabs(CHK), .c_unloading = std::fabs(CUK), .degrade = std::fabs(DG)}
     , Material1D(T, R) {}
 
 int AFC::initialize(const shared_ptr<DomainBase>&) {

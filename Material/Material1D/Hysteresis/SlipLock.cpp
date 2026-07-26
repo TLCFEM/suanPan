@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 SlipLock::SlipLock(const unsigned T, const double E, const double Y, const double H, const double R, const double D)
-    : DataSlipLock{fabs(E), 1. / H, fabs(Y), fabs(R)}
+    : DataSlipLock{.elastic_modulus = fabs(E), .hardening_ratio = 1. / H, .yield_strain = fabs(Y), .ini_r = fabs(R)}
     , Material1D(T, D) {}
 
 int SlipLock::initialize(const shared_ptr<DomainBase>&) {

@@ -22,7 +22,7 @@ double ExpCC::compute_a(const double hardening) const { return a0 * exp((1. + e0
 double ExpCC::compute_da(const double hardening) const { return compute_a(hardening) * factor * pow(lambda - hardening * kappa, -2.); }
 
 ExpCC::ExpCC(const unsigned T, const double E, const double V, const double B, const double M, const double P, const double A, const double VR, const double LAMBDA, const double KAPPA, const double R)
-    : DataExpCC{A, VR, LAMBDA, KAPPA}
+    : DataExpCC{.a0 = A, .e0 = VR, .lambda = LAMBDA, .kappa = KAPPA}
     , NonlinearCamClay(T, E, V, B, M, P, R) {}
 
 unique_ptr<Material> ExpCC::unique_copy() { return std::make_unique<ExpCC>(*this); }

@@ -35,7 +35,7 @@ constexpr double MooneyRivlin::five_three = 5. * one_three;
 constexpr double MooneyRivlin::eight_nine = two_three * four_three;
 
 MooneyRivlin::MooneyRivlin(const unsigned T, const double KK, const double AA, const double AB, const double R)
-    : DataMooneyRivlin{fabs(KK), fabs(AA), fabs(AB)}
+    : DataMooneyRivlin{.K = fabs(KK), .A10 = fabs(AA), .A01 = fabs(AB)}
     , Material3D(T, R) {}
 
 int MooneyRivlin::initialize(const shared_ptr<DomainBase>&) {

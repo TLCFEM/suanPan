@@ -18,7 +18,7 @@
 #include "AsymmElastic1D.h"
 
 AsymmElastic1D::AsymmElastic1D(const unsigned T, const double TE, const double CE, const double R)
-    : DataAsymmElastic1D{TE, CE}
+    : DataAsymmElastic1D{.t_elastic_modulus = TE, .c_elastic_modulus = CE}
     , Material1D(T, R) {}
 
 int AsymmElastic1D::initialize(const shared_ptr<DomainBase>&) {

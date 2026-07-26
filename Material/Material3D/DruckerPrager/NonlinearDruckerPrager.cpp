@@ -23,7 +23,7 @@ const mat NonlinearDruckerPrager::unit_dev_tensor = tensor::unit_deviatoric_tens
 const mat NonlinearDruckerPrager::unit_x_unit = tensor::unit_tensor2 * tensor::unit_tensor2.t();
 
 NonlinearDruckerPrager::NonlinearDruckerPrager(const unsigned T, const double E, const double V, const double ETAY, const double ETAF, const double XI, const double R)
-    : DataNonlinearDruckerPrager{E, V, ETAY, ETAF, XI}
+    : DataNonlinearDruckerPrager{.elastic_modulus = E, .poissons_ratio = V, .eta_yield = ETAY, .eta_flow = ETAF, .xi = XI}
     , Material3D(T, R) {}
 
 int NonlinearDruckerPrager::initialize(const shared_ptr<DomainBase>&) {

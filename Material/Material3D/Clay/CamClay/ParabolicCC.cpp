@@ -22,7 +22,7 @@ double ParabolicCC::compute_a(const double hardening) const { return a_slope < 0
 double ParabolicCC::compute_da(const double hardening) const { return a_slope < 0. && fabs(hardening) > limit ? 0. : 2. * a_slope * hardening; }
 
 ParabolicCC::ParabolicCC(const unsigned T, const double E, const double V, const double B, const double M, const double P, const double A, const double K, const double R)
-    : DataParabolicCC{A, K}
+    : DataParabolicCC{.a = A, .a_slope = K}
     , NonlinearCamClay(T, E, V, B, M, P, R) {}
 
 unique_ptr<Material> ParabolicCC::unique_copy() { return std::make_unique<ParabolicCC>(*this); }

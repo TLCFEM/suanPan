@@ -75,7 +75,7 @@ YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& 
 }
 
 YLD0418P::YLD0418P(const unsigned T, vec&& EE, vec&& VV, vec&& PP, const double M, const double RS, const unsigned HT, const double KR, const double KB, const double R)
-    : DataYLD0418P{std::move(EE), std::move(VV), std::move(PP), M, std::fabs(RS), {KR, KB}}
+    : DataYLD0418P{.modulus = std::move(EE), .ratio = std::move(VV), .parameter = std::move(PP), .exponent = M, .ref_stress = std::fabs(RS), .kin = {KR, KB}}
     , Material3D(T, R)
     , hardening_tag(HT) {
     C1.zeros();

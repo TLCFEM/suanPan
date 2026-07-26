@@ -112,7 +112,7 @@ double ConcreteExp::compute_compression_residual(const double reverse_c_strain, 
 double ConcreteExp::compute_tension_residual(const double reverse_t_strain, const double reverse_t_stress) const { return std::max(0., reverse_t_strain - reverse_t_stress * (reverse_t_strain / f_t + .67 / elastic_modulus) / (reverse_t_stress / f_t + .67)); }
 
 ConcreteExp::ConcreteExp(const unsigned T, const double E, const double FT, const double AT, const double GT, const double FC, const double AC, const double GC, const double M, const double R)
-    : DataConcreteExp{E, std::fabs(FT), -std::fabs(FC) * 4. * AC * std::pow(1. + AC, -2.), AT, AC, std::fabs(FT) / GT * (1. + .5 * AT), std::fabs(FC) * 4. * AC * std::pow(1. + AC, -2.) / GC * (1. + .5 * AC)}
+    : DataConcreteExp{.elastic_modulus = E, .f_t = std::fabs(FT), .f_c = -std::fabs(FC) * 4. * AC * std::pow(1. + AC, -2.), .a_t = AT, .a_c = AC, .b_t = std::fabs(FT) / GT * (1. + .5 * AT), .b_c = std::fabs(FC) * 4. * AC * std::pow(1. + AC, -2.) / GC * (1. + .5 * AC)}
     , SimpleHysteresis(T, M, R) {}
 
 int ConcreteExp::initialize(const shared_ptr<DomainBase>&) {

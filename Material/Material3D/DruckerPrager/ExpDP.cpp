@@ -28,7 +28,7 @@ double ExpDP::compute_dc(const double p_strain) const {
 }
 
 ExpDP::ExpDP(const unsigned T, const double E, const double V, const double ETAY, const double ETAF, const double XI, const double CO, const double PA, const double PB, const double R)
-    : DataExpDP({PA <= 1. ? CO : CO * 4. * PA / pow(1. + PA, 2.), PA, PB})
+    : DataExpDP({.cohesion = PA <= 1. ? CO : CO * 4. * PA / pow(1. + PA, 2.), .a = PA, .b = PB})
     , NonlinearDruckerPrager(T, E, V, ETAY, ETAF, XI, R) {}
 
 unique_ptr<Material> ExpDP::unique_copy() { return std::make_unique<ExpDP>(*this); }

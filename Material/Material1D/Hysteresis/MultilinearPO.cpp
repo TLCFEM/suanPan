@@ -80,7 +80,7 @@ pod2 MultilinearPO::compute_compression_backbone(const double t_strain) const {
 }
 
 MultilinearPO::MultilinearPO(const int T, mat&& TB, mat&& CB, const double R)
-    : DataMultilinearPO{std::move(TB), std::move(CB)}
+    : DataMultilinearPO{.t_backbone = std::move(TB), .c_backbone = std::move(CB)}
     , PeakOriented(T, R) {}
 
 int MultilinearPO::initialize(const shared_ptr<DomainBase>&) {

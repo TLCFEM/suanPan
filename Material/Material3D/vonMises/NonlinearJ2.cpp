@@ -23,7 +23,7 @@ const double NonlinearJ2::root_two_third = std::sqrt(two_third);
 const mat NonlinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearJ2::NonlinearJ2(const unsigned T, const double E, const double V, const double R)
-    : DataNonlinearJ2{E, V}
+    : DataNonlinearJ2{.elastic_modulus = E, .poissons_ratio = V}
     , Material3D(T, R) {}
 
 int NonlinearJ2::initialize(const shared_ptr<DomainBase>&) {

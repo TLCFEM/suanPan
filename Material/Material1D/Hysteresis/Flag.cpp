@@ -20,11 +20,11 @@
 #include <Toolbox/utility.h>
 
 Flag::Flag(const unsigned T, const double E, const double YT, const double RT, const double HT, const double YC, const double RC, const double HC, const double D)
-    : DataFlag{std::fabs(E), HT, std::fabs(YT), RT, HC, -std::fabs(YC), RC}
+    : DataFlag{.elastic_modulus = std::fabs(E), .t_hardening_ratio = HT, .t_yield_stress = std::fabs(YT), .t_residual_stress = RT, .c_hardening_ratio = HC, .c_yield_stress = -std::fabs(YC), .c_residual_stress = RC}
     , Material1D(T, D) {}
 
 Flag::Flag(const unsigned T, const double E, const double YT, const double RT, const double HT, const double D)
-    : DataFlag{std::fabs(E), HT, std::fabs(YT), RT, HT, -std::fabs(YT), -RT}
+    : DataFlag{.elastic_modulus = std::fabs(E), .t_hardening_ratio = HT, .t_yield_stress = std::fabs(YT), .t_residual_stress = RT, .c_hardening_ratio = HT, .c_yield_stress = -std::fabs(YT), .c_residual_stress = -RT}
     , Material1D(T, D) {}
 
 int Flag::initialize(const shared_ptr<DomainBase>&) {

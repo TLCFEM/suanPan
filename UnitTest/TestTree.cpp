@@ -20,9 +20,9 @@ TEST_CASE("Quadtree Benchmark", "[Utility.Tree]") {
         std::vector<tree_t::node_ptr_t> ptrs;
         ptrs.reserve(points.size());
         for(auto&& p : points) ptrs.push_back(&p);
-        tree_t tree({{0.0, 0.0}, {size, size}});
+        tree_t tree({.center = {.x = 0.0, .y = 0.0}, .dimension = {.x = size, .y = size}});
         tree.insert(std::move(ptrs));
-        tree.overlap({{dis(gen), dis(gen)}, {1, 1}});
+        tree.overlap({.center = {.x = dis(gen), .y = dis(gen)}, .dimension = {.x = 1, .y = 1}});
         return tree;
     };
 }

@@ -25,7 +25,7 @@ const double NonlinearPeric::root_three_two = std::sqrt(1.5);
 const mat NonlinearPeric::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearPeric::NonlinearPeric(const unsigned T, const double E, const double V, const double MU, const double EPS, const double R)
-    : DataNonlinearPeric{E, V, MU, EPS}
+    : DataNonlinearPeric{.elastic_modulus = E, .poissons_ratio = V, .mu = MU, .epsilon = EPS}
     , Material3D(T, R) {}
 
 int NonlinearPeric::initialize(const shared_ptr<DomainBase>& D) {

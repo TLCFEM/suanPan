@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 BilinearElastic1D::BilinearElastic1D(const unsigned T, const double E, const double Y, const double H, const double R, const double D)
-    : DataBilinearElastic1D{fabs(E), fabs(Y), fabs(E) * H, R}
+    : DataBilinearElastic1D{.elastic_modulus = fabs(E), .yield_stress = fabs(Y), .hardening_modulus = fabs(E) * H, .radius = R}
     , Material1D(T, D) {}
 
 int BilinearElastic1D::initialize(const shared_ptr<DomainBase>&) {

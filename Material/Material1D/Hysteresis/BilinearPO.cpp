@@ -60,7 +60,7 @@ pod2 BilinearPO::compute_compression_backbone(const double strain) const {
 }
 
 BilinearPO::BilinearPO(const int T, const double E, const double TEA, const double TH, const double CEA, const double CH, const double R)
-    : DataBilinearPO{fabs(E), fabs(TEA), TH * fabs(E), -fabs(CEA), CH * fabs(E)}
+    : DataBilinearPO{.elastic_modulus = fabs(E), .t_strain = fabs(TEA), .t_hardening = TH * fabs(E), .c_strain = -fabs(CEA), .c_hardening = CH * fabs(E)}
     , PeakOriented(T, R) {}
 
 int BilinearPO::initialize(const shared_ptr<DomainBase>&) {

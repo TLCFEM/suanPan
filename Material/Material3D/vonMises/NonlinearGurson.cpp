@@ -24,7 +24,7 @@ const double NonlinearGurson::sqrt_three_two = std::sqrt(1.5);
 const mat NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearGurson::NonlinearGurson(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
-    : DataNonlinearGurson{E, V, Q1, Q2, FN, SN, EN}
+    : DataNonlinearGurson{.elastic_modulus = E, .poissons_ratio = V, .q1 = Q1, .q2 = Q2, .fn = FN, .sn = SN, .en = EN}
     , Material3D(T, R) {}
 
 int NonlinearGurson::initialize(const shared_ptr<DomainBase>&) {

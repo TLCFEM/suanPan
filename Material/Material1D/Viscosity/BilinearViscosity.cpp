@@ -36,7 +36,7 @@ double BilinearViscosity::compute_damping_coefficient(double, const double strai
 }
 
 BilinearViscosity::BilinearViscosity(const unsigned T, const double C, const double S, const double H)
-    : DataBilinearViscosity{std::fabs(C), std::fabs(S), std::fabs(C) * H}
+    : DataBilinearViscosity{.damping = std::fabs(C), .yield_stress = std::fabs(S), .hardening = std::fabs(C) * H}
     , NonlinearViscosity(T, 0., 1.) {}
 
 unique_ptr<Material> BilinearViscosity::unique_copy() { return std::make_unique<BilinearViscosity>(*this); }

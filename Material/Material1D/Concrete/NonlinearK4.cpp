@@ -114,7 +114,7 @@ double NonlinearK4::objective_scale(const double a, const double zeta) const {
 }
 
 NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const bool FD, const bool FC, const bool OD)
-    : DataNonlinearK4{std::fabs(E), std::min(1., std::max(std::fabs(H), 1E-4)) * std::fabs(E)}
+    : DataNonlinearK4{.elastic_modulus = std::fabs(E), .hardening_k = std::min(1., std::max(std::fabs(H), 1E-4)) * std::fabs(E)}
     , Material1D(T, R)
     , apply_damage(FD)
     , apply_crack_closing(FC)
@@ -206,7 +206,7 @@ pod2 ConcreteK4::compute_compression_damage(double k) const {
 }
 
 ConcreteK4::ConcreteK4(const unsigned T, const double E, const double H, vec&& P, const double R, const bool FD, const bool FC, const bool OD)
-    : DataConcreteK4{std::fabs(E * P(0)), std::fabs(E * P(1)), perturb(std::fabs(P(2))), std::fabs(P(3)), std::fabs(P(4)), std::fabs(P(3) * P(5)), std::fabs(E * P(6)), std::fabs(E * P(7))}
+    : DataConcreteK4{.hardening_t = std::fabs(E * P(0)), .hardening_d = std::fabs(E * P(1)), .f_t = perturb(std::fabs(P(2))), .f_c = std::fabs(P(3)), .k_peak = std::fabs(P(4)), .f_y = std::fabs(P(3) * P(5)), .zeta_t = std::fabs(E * P(6)), .zeta_c = std::fabs(E * P(7))}
     , NonlinearK4(T, E, H, R, FD, FC, OD) {}
 
 unique_ptr<Material> ConcreteK4::unique_copy() { return std::make_unique<ConcreteK4>(*this); }

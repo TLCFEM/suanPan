@@ -44,7 +44,7 @@ vec3 NonlinearCDP::compute_dr(const vec3& in) {
 double NonlinearCDP::compute_s(const double r) const { return s0 + r - s0 * r; }
 
 NonlinearCDP::NonlinearCDP(const unsigned T, const double E, const double V, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
-    : DataNonlinearCDP{std::fabs(E), V < .5 ? V : .2, std::fabs(GT), std::fabs(GC), (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), std::fabs(AP), std::fabs(S)}
+    : DataNonlinearCDP{.elastic_modulus = std::fabs(E), .poissons_ratio = V < .5 ? V : .2, .g_t = std::fabs(GT), .g_c = std::fabs(GC), .alpha = (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), .alpha_p = std::fabs(AP), .s0 = std::fabs(S)}
     , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int NonlinearCDP::initialize(const shared_ptr<DomainBase>&) {

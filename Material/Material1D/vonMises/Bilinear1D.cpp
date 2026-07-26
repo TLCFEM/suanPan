@@ -18,7 +18,7 @@
 #include "Bilinear1D.h"
 
 Bilinear1D::Bilinear1D(const unsigned T, const double E, const double Y, const double H, const double B, const double R)
-    : DataBilinear1D{std::fabs(E), std::fabs(Y), std::fabs(B), std::fabs(B * E) * H / (1. - H), std::fabs((1. - B) * E) * H / (1. - H)}
+    : DataBilinear1D{.elastic_modulus = std::fabs(E), .yield_stress = std::fabs(Y), .beta = std::fabs(B), .isotropic_modulus = std::fabs(B * E) * H / (1. - H), .kinematic_modulus = std::fabs((1. - B) * E) * H / (1. - H)}
     , Material1D(T, R) {}
 
 int Bilinear1D::initialize(const shared_ptr<DomainBase>&) {

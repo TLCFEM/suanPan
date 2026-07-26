@@ -42,7 +42,7 @@ class ExpOrthotropic : protected DataExpOrthotropic, public NonlinearOrthotropic
 
 public:
     ExpOrthotropic(const unsigned T, const OrthotropicType TP, vec&& E, vec&& V, vec&& S, const double A, const double B, const double R)
-        : DataExpOrthotropic{A, B}
+        : DataExpOrthotropic{.a = A, .b = B}
         , NonlinearOrthotropic(T, TP, std::move(E), std::move(V), std::move(S), R) {}
 };
 

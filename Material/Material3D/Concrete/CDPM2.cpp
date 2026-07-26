@@ -354,7 +354,7 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 }
 
 CDPM2::CDPM2(const unsigned T, const double E, const double V, const double FT, const double FC, const double QH0, const double HP, const double DF, const double AH, const double BH, const double CH, const double DH, const double AS, const double EFT, const double EFC, const DamageType DT, const double R)
-    : DataCDPM2{std::fabs(E), std::fabs(V), std::fabs(FT), std::fabs(FC), std::fabs(QH0), std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), DF, AH, BH, CH, DH, AS, std::fabs(EFT), std::fabs(EFC)}
+    : DataCDPM2{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(V), .ft = std::fabs(FT), .fc = std::fabs(FC), .qh0 = std::fabs(QH0), .hp = std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), .df = DF, .ah = AH, .bh = BH, .ch = CH, .dh = DH, .as = AS, .eft = std::fabs(EFT), .efc = std::fabs(EFC)}
     , Material3D(T, R)
     , damage_type(DT) { access::rw(tolerance) = 1E-13; }
 

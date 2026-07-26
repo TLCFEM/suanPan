@@ -18,7 +18,7 @@
 #include "ElasticOS.h"
 
 ElasticOS::ElasticOS(const unsigned T, const double E, const double P, const double R)
-    : DataElasticOS{fabs(E), fabs(P)}
+    : DataElasticOS{.elastic_modulus = fabs(E), .poissons_ratio = fabs(P)}
     , MaterialOS(T, R) {}
 
 int ElasticOS::initialize(const shared_ptr<DomainBase>&) {

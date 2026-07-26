@@ -20,7 +20,7 @@
 #include <Toolbox/tensor.h>
 
 IsotropicElastic3D::IsotropicElastic3D(const unsigned T, const double E, const double P, const double R)
-    : DataIsotropicElastic3D{fabs(E), fabs(P)}
+    : DataIsotropicElastic3D{.elastic_modulus = fabs(E), .poissons_ratio = fabs(P)}
     , Material3D(T, R) {}
 
 int IsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {

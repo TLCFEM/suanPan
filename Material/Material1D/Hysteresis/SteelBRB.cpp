@@ -41,7 +41,7 @@ pod2 SteelBRB::compute_c_yield_stress(const double plastic_strain) const {
 }
 
 SteelBRB::SteelBRB(const unsigned T, vec&& P)
-    : DataSteelBRB{P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8)}
+    : DataSteelBRB{.elastic_modulus = P(0), .yield_stress = P(1), .plastic_modulus = P(2), .t_saturated_stress = P(3), .t_scalar = P(4), .t_exponent = P(5), .c_saturated_stress = P(6), .c_scalar = P(7), .c_exponent = P(8)}
     , Material1D(T, P(9)) {}
 
 int SteelBRB::initialize(const shared_ptr<DomainBase>&) {

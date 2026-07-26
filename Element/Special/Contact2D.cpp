@@ -52,12 +52,12 @@ Contact2D::Contact2D(const unsigned T, const unsigned M, const unsigned S, const
 int Contact2D::initialize(const shared_ptr<DomainBase>& D) {
     const auto& m_pool = D->get<Group>(master_tag)->get_pool();
     master.reserve(m_pool.n_elem);
-    for(auto& I : m_pool) master.emplace_back(MasterNode{D->get<Node>(I), {}, {}, {}});
+    for(auto& I : m_pool) master.emplace_back(MasterNode{.node = D->get<Node>(I), .position = {}, .axis = {}, .norm = {}});
     master.shrink_to_fit();
 
     const auto& s_pool = D->get<Group>(slave_tag)->get_pool();
     slave.reserve(s_pool.n_elem);
-    for(auto& I : s_pool) slave.emplace_back(SlaveNode{D->get<Node>(I), {}});
+    for(auto& I : s_pool) slave.emplace_back(SlaveNode{.node = D->get<Node>(I), .position = {}});
     slave.shrink_to_fit();
 
     return SUANPAN_SUCCESS;

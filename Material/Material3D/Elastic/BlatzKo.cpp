@@ -22,7 +22,7 @@
 const vec BlatzKo::weight{2., 2., 2., 1., 1., 1.};
 
 BlatzKo::BlatzKo(const unsigned T, const double E, const double V, const double R)
-    : DataBlatzKo{fabs(E), fabs(V), fabs(E) / (2. + 2. * fabs(V)), (1. - fabs(V)) / (1. - 2. * fabs(V))}
+    : DataBlatzKo{.elastic_modulus = fabs(E), .poissons_ratio = fabs(V), .shear_modulus = fabs(E) / (2. + 2. * fabs(V)), .half_beta_two = (1. - fabs(V)) / (1. - 2. * fabs(V))}
     , Material3D(T, R) {}
 
 int BlatzKo::initialize(const shared_ptr<DomainBase>&) {
