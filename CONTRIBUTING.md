@@ -34,3 +34,20 @@ Please use the file `.clang-format` to format the code.
 6. Check similar existing implemented code first.
 7. Apply early return if possible, avoid deep nesting of code.
 8. Branch-free code is preferred.
+
+## Project structure
+
+The repository uses the following top-level layout:
+
+- CMakeLists.txt — top-level CMake build file.
+- Include/ — public header files.
+- Libs/ — third-party or internal libraries.
+- UnitTest/ — unit tests and test harnesses.
+- Example/ — example models and usage samples.
+- Script/ — helper scripts for build/run/test tasks.
+- Resource/ — data and resource files used by examples/tests.
+- Solver/, Converger/, Constraint/, Element/, Material/, Checker/, Recorder/, Toolbox/, Step/, Load/ — core modules
+  grouped by functionality (see the matching directory for implementation details).
+
+When contributing, add or modify code in the appropriate module directory, update `CMakeLists.txt` as needed, and
+include tests or example models to demonstrate behavior. For large changes, open an issue first to discuss design.
