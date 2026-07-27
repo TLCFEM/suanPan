@@ -450,10 +450,17 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     auto counter{0u};
     auto ref_error{1.};
+    auto try_unit_kp{false};
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
+            if(try_unit_kp) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
+            }
+
+            try_unit_kp = true;
+            kp = 1.;      // start from unity
+            counter = 2u; // bypass elasticity check
         }
 
         compute_plasticity(lode, s, p, kp, data);
@@ -525,13 +532,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             break;
         }
 
-        gamma -= incre(0);
         s -= incre(1);
         p -= incre(2);
-        kp -= incre(3);
 
-        if(gamma < 0.) gamma = datum::eps;
-        if(kp < 0.) kp = datum::eps;
+        gamma = std::max(datum::eps, gamma - incre(0));
+        kp = std::max(datum::eps, kp - incre(3));
     }
 
     //
