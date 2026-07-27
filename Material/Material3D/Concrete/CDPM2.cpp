@@ -550,9 +550,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     std::vector<uword> tp, cp;
     tp.reserve(3);
     cp.reserve(3);
-    for(uword I{0}; I < uword{3}; ++I)
-        if(principal_stress(I) > 0.) tp.emplace_back(I);
-        else cp.emplace_back(I);
+    for(uword I{0}; I < uword{3}; ++I) (principal_stress(I) > 0. ? tp : cp).emplace_back(I);
 
     const uvec t_pattern(tp), c_pattern(cp);
 
