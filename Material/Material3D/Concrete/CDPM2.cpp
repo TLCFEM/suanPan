@@ -453,7 +453,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     auto try_unit_kp{false};
     while(true) {
         if(max_iteration == ++counter) {
-            if(try_unit_kp) {
+            if(try_unit_kp || current_kp > 1.) {
                 suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
                 return SUANPAN_FAIL;
             }
