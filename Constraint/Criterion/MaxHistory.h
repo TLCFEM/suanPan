@@ -36,15 +36,17 @@
 enum class OutputType;
 
 class MaxHistory final : public Criterion {
-    const OutputType history_type;
+    const uvec indices;
     const double max_history;
+    const OutputType history_type;
 
 public:
     MaxHistory(
         unsigned,   // tag
         unsigned,   // step tag
         OutputType, // history type
-        double      // maximum history
+        double,     // maximum history
+        uvec&&      // indices
     );
 
     unique_ptr<Criterion> unique_copy() override;

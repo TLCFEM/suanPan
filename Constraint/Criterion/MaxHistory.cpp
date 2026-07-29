@@ -20,22 +20,36 @@
 #include <Domain/DomainBase.h>
 #include <Element/Element.h>
 
-MaxHistory::MaxHistory(const unsigned T, const unsigned ST, const OutputType HT, const double MH)
+MaxHistory::MaxHistory(const unsigned T, const unsigned ST, const OutputType HT, const double MH, uvec&& IDX)
     : Criterion(T, ST)
-    , history_type(HT)
-    , max_history(MH) {}
+    , indices(IDX)
+    , max_history(MH)
+    , history_type(HT) {}
 
 unique_ptr<Criterion> MaxHistory::unique_copy() { return std::make_unique<MaxHistory>(*this); }
 
 int MaxHistory::process(const shared_ptr<DomainBase>& D) {
-    suanpan::for_all(D->get_element_pool(), [&](const shared_ptr<Element>& t_element) {
-        for(auto& I : t_element->record(history_type))
-            for(const auto& J : I)
-                if(J > max_history) {
+    if(indices.is_empty())
+        suanpan::for_all(D->get_element_pool(), [&](const shared_ptr<Element>& t_element) {
+            for(auto& I : t_element->record(history_type))
+                for(const auto J : I)
+                    if(J > max_history) {
+                        D->disable_element(t_element->get_tag());
+                        return;
+                    }
+        });
+    else
+        suanpan::for_all(D->get_element_pool(), [&](const shared_ptr<Element>& t_element) {
+            for(auto& I : t_element->record(history_type)) {
+                uword valid_count{0};
+                for(const auto J : indices)
+                    if(J < I.size() && I(J) > max_history) valid_count += 1;
+                if(valid_count == accu(indices < I.size())) {
                     D->disable_element(t_element->get_tag());
                     return;
                 }
-    });
+            }
+        });
 
     return D->soft_restart();
 }

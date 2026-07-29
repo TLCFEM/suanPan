@@ -489,7 +489,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        flag = domain->insert(std::make_shared<MaxHistory>(tag, step_tag, to_token(type), limit));
+        flag = domain->insert(std::make_shared<MaxHistory>(tag, step_tag, to_token(type), limit, get_remaining<uword>(command)));
     }
     else {
         unsigned node;
