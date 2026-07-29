@@ -1366,7 +1366,7 @@
       "trigger": "MaxHistory",
       "details": "max history criterion",
       "kind": "type",
-      "contents": "criterion MaxHistory ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique criterion tag\n# (2) string, history variable type\n# (3) double, limit"
+      "contents": "criterion MaxHistory ${1:(1)} ${2:(2)} ${3:(3)} ${4:[(4) ...]}\n# (1) int, unique criterion tag\n# (2) string, history variable type\n# (3) double, limit\n# (4) int, optional indices"
     },
     {
       "trigger": "MaxResistance",
