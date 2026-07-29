@@ -15,43 +15,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class MaxHistory
- * @brief A MaxHistory class.
+ * @class HistoryCriterion
+ * @brief A HistoryCriterion class.
  *
- * The MaxHistory class tests if the given variable in each element exceeds the given limit, if so, the element is disabled.
+ * The HistoryCriterion class tests if the given variable in each element exceeds the given limit, if so, the element is disabled.
  *
  * @author tlc
  * @date 15/09/2020
  * @version 0.1.0
- * @file MaxHistory.h
+ * @file MinMaxHistory.h
  * @addtogroup Criterion
  * @{
  */
 
-#ifndef MAXHISTORY_H
-#define MAXHISTORY_H
+#ifndef MINMAXHISTORY_H
+#define MINMAXHISTORY_H
 
 #include <Constraint/Criterion/Criterion.h>
 
 enum class OutputType;
 
-class MaxHistory final : public Criterion {
+class HistoryCriterion : public Criterion {
+    [[nodiscard]] virtual bool check(double) const = 0;
+
     const uvec indices;
-    const double max_history;
+
+protected:
+    const double limit;
+
+private:
     const OutputType history_type;
 
 public:
-    MaxHistory(
+    HistoryCriterion(
         unsigned,   // tag
         unsigned,   // step tag
         OutputType, // history type
-        double,     // maximum history
+        double,     // limit
         uvec&&      // indices
     );
 
-    unique_ptr<Criterion> unique_copy() override;
+    int process(const shared_ptr<DomainBase>&) final;
+};
 
-    int process(const shared_ptr<DomainBase>&) override;
+class MaxHistory final : public HistoryCriterion {
+    [[nodiscard]] bool check(double) const override;
+
+public:
+    using HistoryCriterion::HistoryCriterion;
+
+    unique_ptr<Criterion> unique_copy() override;
+};
+
+class MinHistory final : public HistoryCriterion {
+    [[nodiscard]] bool check(double) const override;
+
+public:
+    using HistoryCriterion::HistoryCriterion;
+
+    unique_ptr<Criterion> unique_copy() override;
 };
 
 #endif

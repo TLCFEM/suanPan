@@ -15,31 +15,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class MinResistance
- * @brief A MinResistance class.
+ * @class DisplacementCriterion
+ * @brief A DisplacementCriterion class.
  *
- * The MinResistance class.
+ * The DisplacementCriterion class.
  *
  * @author tlc
- * @date 12/02/2020
- * @version 0.1.0
- * @file MinResistance.h
+ * @date 29/07/2026
+ * @version 1.0.0
+ * @file MinMaxDisplacement.h
  * @addtogroup Criterion
  * @{
  */
 
-#ifndef MINRESISTANCE_H
-#define MINRESISTANCE_H
+#ifndef MINMAXDISPLACEMENT_H
+#define MINMAXDISPLACEMENT_H
 
 #include "NodeBasedCriterion.h"
 
-class MinResistance final : public NodeBasedCriterion {
+class DisplacementCriterion : public NodeBasedCriterion {
+    [[nodiscard]] virtual bool check(double) const = 0;
+
 public:
     using NodeBasedCriterion::NodeBasedCriterion;
 
-    unique_ptr<Criterion> unique_copy() override;
+    int process(const shared_ptr<DomainBase>&) final;
+};
 
-    int process(const shared_ptr<DomainBase>&) override;
+class MaxDisplacement final : public DisplacementCriterion {
+    [[nodiscard]] bool check(double) const override;
+
+public:
+    using DisplacementCriterion::DisplacementCriterion;
+
+    unique_ptr<Criterion> unique_copy() override;
+};
+
+class MinDisplacement final : public DisplacementCriterion {
+    [[nodiscard]] bool check(double) const override;
+
+public:
+    using DisplacementCriterion::DisplacementCriterion;
+
+    unique_ptr<Criterion> unique_copy() override;
 };
 
 #endif

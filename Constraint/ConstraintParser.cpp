@@ -491,6 +491,20 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
 
         flag = domain->insert(std::make_shared<MaxHistory>(tag, step_tag, to_token(type), limit, get_remaining<uword>(command)));
     }
+    else if(is_equal(criterion_type, "MinHistory")) {
+        std::string type;
+        double limit;
+        if(!get_input(command, type)) {
+            suanpan_error("A valid type is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+        if(!get_input(command, limit)) {
+            suanpan_error("A valid limit is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        flag = domain->insert(std::make_shared<MinHistory>(tag, step_tag, to_token(type), limit, get_remaining<uword>(command)));
+    }
     else {
         unsigned node;
         if(!get_input(command, node)) {

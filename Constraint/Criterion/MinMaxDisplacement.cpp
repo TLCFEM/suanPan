@@ -14,34 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-/**
- * @class MinDisplacement
- * @brief A MinDisplacement class.
- *
- * The MinDisplacement class.
- *
- * @author tlc
- * @date 27/09/2017
- * @version 0.1.0
- * @file MinDisplacement.h
- * @addtogroup Criterion
- * @{
- */
 
-#ifndef MINDISPLACEMENT_H
-#define MINDISPLACEMENT_H
+#include "MinMaxDisplacement.h"
 
-#include "NodeBasedCriterion.h"
+#include <Domain/DomainBase.h>
+#include <Domain/Factory.hpp>
 
-class MinDisplacement final : public NodeBasedCriterion {
-public:
-    using NodeBasedCriterion::NodeBasedCriterion;
+int DisplacementCriterion::process(const shared_ptr<DomainBase>& D) {
+    if(const auto t_vec = get_dof(D); !t_vec.empty()) return check(D->get_factory()->get_current_displacement()(t_vec[0])) ? SUANPAN_EXIT : SUANPAN_SUCCESS;
 
-    unique_ptr<Criterion> unique_copy() override;
+    return SUANPAN_SUCCESS;
+}
 
-    int process(const shared_ptr<DomainBase>&) override;
-};
+bool MaxDisplacement::check(const double target) const { return target > limit; }
 
-#endif
+unique_ptr<Criterion> MaxDisplacement::unique_copy() { return std::make_unique<MaxDisplacement>(*this); }
 
-//! @}
+bool MinDisplacement::check(const double target) const { return target < limit; }
+
+unique_ptr<Criterion> MinDisplacement::unique_copy() { return std::make_unique<MinDisplacement>(*this); }

@@ -15,16 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "MinDisplacement.h"
+#include "MinMaxResistance.h"
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 
-unique_ptr<Criterion> MinDisplacement::unique_copy() { return std::make_unique<MinDisplacement>(*this); }
-
-int MinDisplacement::process(const shared_ptr<DomainBase>& D) {
-    if(const auto t_vec = get_dof(D); !t_vec.empty()) return D->get_factory()->get_current_displacement()(t_vec[0]) < limit ? SUANPAN_EXIT : SUANPAN_SUCCESS;
+int ResistanceCriterion::process(const shared_ptr<DomainBase>& D) {
+    if(const auto t_vec = get_dof(D); !t_vec.empty()) return check(D->get_factory()->get_current_resistance()(t_vec[0])) ? SUANPAN_EXIT : SUANPAN_SUCCESS;
 
     return SUANPAN_SUCCESS;
 }
+
+bool MaxResistance::check(const double target) const { return target > limit; }
+
+unique_ptr<Criterion> MaxResistance::unique_copy() { return std::make_unique<MaxResistance>(*this); }
+
+bool MinResistance::check(const double target) const { return target < limit; }
+
+unique_ptr<Criterion> MinResistance::unique_copy() { return std::make_unique<MinResistance>(*this); }

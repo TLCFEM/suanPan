@@ -228,21 +228,6 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
       <Filter>Constraint\Criterion</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Criterion\MaxDisplacement.cpp">
-      <Filter>Constraint\Criterion</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Criterion\MaxHistory.cpp">
-      <Filter>Constraint\Criterion</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Criterion\MaxResistance.cpp">
-      <Filter>Constraint\Criterion</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Criterion\MinDisplacement.cpp">
-      <Filter>Constraint\Criterion</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Constraint\Criterion\MinResistance.cpp">
-      <Filter>Constraint\Criterion</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.cpp">
       <Filter>Constraint\Criterion</Filter>
     </ClCompile>
@@ -1567,24 +1552,18 @@
     <ClCompile Include="..\..\..\Solver\Integrator\Implicit\UDNewmark.cpp">
       <Filter>Solver\Integrator\Implicit</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\MinMaxDisplacement.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\MinMaxHistory.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Constraint\Criterion\MinMaxResistance.cpp">
+      <Filter>Constraint\Criterion</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
-      <Filter>Constraint\Criterion</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\Criterion\MaxDisplacement.h">
-      <Filter>Constraint\Criterion</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\Criterion\MaxHistory.h">
-      <Filter>Constraint\Criterion</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\Criterion\MaxResistance.h">
-      <Filter>Constraint\Criterion</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\Criterion\MinDisplacement.h">
-      <Filter>Constraint\Criterion</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Constraint\Criterion\MinResistance.h">
       <Filter>Constraint\Criterion</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\Criterion\NodeBasedCriterion.h">
@@ -2940,6 +2919,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Solver\Integrator\Implicit\UDNewmark.h">
       <Filter>Solver\Integrator\Implicit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\MinMaxDisplacement.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\MinMaxHistory.h">
+      <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Constraint\Criterion\MinMaxResistance.h">
+      <Filter>Constraint\Criterion</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
