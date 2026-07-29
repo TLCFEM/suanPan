@@ -15,25 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "MaxHistory.h"
+#include "MinMaxHistory.h"
 
 #include <Domain/DomainBase.h>
 #include <Element/Element.h>
 
-MaxHistory::MaxHistory(const unsigned T, const unsigned ST, const OutputType HT, const double MH, uvec&& IDX)
+HistoryCriterion::HistoryCriterion(const unsigned T, const unsigned ST, const OutputType HT, const double MH, uvec&& IDX)
     : Criterion(T, ST)
     , indices(IDX)
-    , max_history(MH)
+    , limit(MH)
     , history_type(HT) {}
 
-unique_ptr<Criterion> MaxHistory::unique_copy() { return std::make_unique<MaxHistory>(*this); }
-
-int MaxHistory::process(const shared_ptr<DomainBase>& D) {
+int HistoryCriterion::process(const shared_ptr<DomainBase>& D) {
     if(indices.is_empty())
         suanpan::for_all(D->get_element_pool(), [&](const shared_ptr<Element>& t_element) {
             for(auto& I : t_element->record(history_type))
                 for(const auto J : I)
-                    if(J > max_history) {
+                    if(check(J)) {
                         D->disable_element(t_element->get_tag());
                         return;
                     }
@@ -43,7 +41,7 @@ int MaxHistory::process(const shared_ptr<DomainBase>& D) {
             for(auto& I : t_element->record(history_type)) {
                 uword valid_count{0};
                 for(const auto J : indices)
-                    if(J < I.size() && I(J) > max_history) valid_count += 1;
+                    if(J < I.size() && check(I(J))) valid_count += 1;
                 if(valid_count == accu(indices < I.size())) {
                     D->disable_element(t_element->get_tag());
                     return;
@@ -53,3 +51,11 @@ int MaxHistory::process(const shared_ptr<DomainBase>& D) {
 
     return D->soft_restart();
 }
+
+bool MaxHistory::check(const double target) const { return target > limit; }
+
+unique_ptr<Criterion> MaxHistory::unique_copy() { return std::make_unique<MaxHistory>(*this); }
+
+bool MinHistory::check(const double target) const { return target < limit; }
+
+unique_ptr<Criterion> MinHistory::unique_copy() { return std::make_unique<MinHistory>(*this); }
