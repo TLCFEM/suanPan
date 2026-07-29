@@ -1,6 +1,6 @@
 name: suanpan
 title: suanpan
-base: core24
+base: core26
 confinement: strict
 contact: tlcfem@gmail.com
 donation: https://ko-fi.com/suanpan
