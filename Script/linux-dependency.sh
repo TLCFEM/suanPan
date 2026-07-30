@@ -66,11 +66,12 @@ fetch_archive() {
 RUNNER_IMAGE_NAME="$1"
 
 if [[ "$RUNNER_IMAGE_NAME" == *"arm"* ]]; then
-  TARGET_DIR="$(dirname "$0")/../Libs/linux-arm"
+  TOKEN="linux-arm"
 else
-  TARGET_DIR="$(dirname "$0")/../Libs/linux"
+  TOKEN="linux"
 fi
 
+TARGET_DIR="$(dirname "$0")/../Libs/$TOKEN"
 TARGET_DIR="$(realpath "$TARGET_DIR")"
 
 if [ -d "$TARGET_DIR" ]; then
@@ -79,13 +80,19 @@ else
   mkdir -p "$TARGET_DIR"
 fi
 
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-2.1.1-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-2.2.0-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 fetch_archive "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
 find "$TMP_DIR/lib" -name "*.a" -exec cp {} "$TARGET_DIR" \;
+
+INCLUDE_DIR="$(dirname "$0")/../Include/hdf"
+
+rm -rf "$INCLUDE_DIR/*" "$INCLUDE_DIR-$TOKEN/*"
+
+find "$TMP_DIR/include" -name "*.h" -exec cp {} "$INCLUDE_DIR" \;
 
 rm -rf "$TMP_DIR"
 

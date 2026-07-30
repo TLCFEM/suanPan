@@ -45,21 +45,29 @@ fi
 RUNNER_IMAGE_NAME="$1"
 
 if [[ "$RUNNER_IMAGE_NAME" == *"xlarge"* ]]; then
-  TARGET_DIR="$(dirname "$0")/../Libs/mac-arm"
+  TOKEN="mac-arm"
 else
-  TARGET_DIR="$(dirname "$0")/../Libs/mac"
+  TOKEN="mac"
 fi
 
-rm -rf "$TARGET_DIR"
-mkdir -p "$TARGET_DIR"
-
-TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-2.1.1-$RUNNER_IMAGE_NAME.tar.gz"
+TARBALL_URL="https://github.com/TLCFEM/prebuilds/releases/download/latest/HDF5-2.2.0-$RUNNER_IMAGE_NAME.tar.gz"
 TMP_DIR="$(mktemp -d)"
 
 wget -q -O "$TMP_DIR/archive.tar.gz" "$TARBALL_URL"
 tar -xzf "$TMP_DIR/archive.tar.gz" -C "$TMP_DIR"
 
+TARGET_DIR="$(dirname "$0")/../Libs/$TOKEN"
+
+rm -rf "$TARGET_DIR"
+mkdir -p "$TARGET_DIR"
+
 find "$TMP_DIR/lib" -name "*.a" -exec cp {} "$TARGET_DIR" \;
+
+INCLUDE_DIR="$(dirname "$0")/../Include/hdf"
+
+rm -rf "$INCLUDE_DIR/*" "$INCLUDE_DIR-$TOKEN/*"
+
+find "$TMP_DIR/include" -name "*.h" -exec cp {} "$INCLUDE_DIR" \;
 
 rm -rf "$TMP_DIR"
 
