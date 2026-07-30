@@ -1393,6 +1393,12 @@
       "contents": "material Maxwell ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]}\n# (1) int, unique tag\n# (2) int, damper tag\n# (3) int, spring tag\n# [4] bool string, if to use matrix formulation, default: false\n# [5] int, the maximum unconverged substep allowed, default: 1\n# [6] double, local time integration parameter, default: 0.0"
     },
     {
+      "trigger": "MinHistory",
+      "details": "min history criterion",
+      "kind": "type",
+      "contents": "criterion MinHistory ${1:(1)} ${2:(2)} ${3:(3)} ${4:[(4) ...]}\n# (1) int, unique criterion tag\n# (2) string, history variable type\n# (3) double, limit\n# (4) int, optional indices"
+    },
+    {
       "trigger": "MinDisplacement",
       "details": "min displacement criterion",
       "kind": "type",
