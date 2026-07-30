@@ -46,8 +46,8 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 
     std::vector<uword> pond;
 
-    // generate by two points
     if(-2 == dof)
+        // generate by line segment between two points
         for(auto& I : D->get_node_pool()) {
             auto& J = I->get_coordinate();
 
@@ -66,9 +66,11 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 
             const auto dot_ab = dot(line_a, line_b);
 
-            if(const auto proj_ab = dot_ab / dot_bb; std::sqrt(std::fabs(dot(line_a, line_a) - dot_ab * proj_ab)) <= datum::eps && proj_ab >= 0. && proj_ab <= 1.) pond.emplace_back(I->get_tag());
+            if(const auto proj_ab = dot_ab / dot_bb; std::fabs(dot(line_a, line_a) - dot_ab * proj_ab) <= datum::eps * dot_bb && proj_ab >= 0. && proj_ab <= 1.) pond.emplace_back(I->get_tag());
         }
-    else if(-3 == dof)
+    else if(-3 == dof) {
+        // generate by plane fitting
+        const auto ref_error = norm(rule);
         for(auto& I : D->get_node_pool()) {
             auto& J = I->get_coordinate();
 
@@ -76,12 +78,15 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
 
             if(0 == size) continue;
 
-            if(const vec part(rule.mem, size), m_point(J.mem, size); std::fabs(dot(part, m_point) + rule.back()) <= datum::eps) pond.emplace_back(I->get_tag());
+            if(const vec part(rule.mem, size), m_point(J.mem, size); std::fabs(dot(part, m_point) + rule.back()) <= datum::eps * ref_error) pond.emplace_back(I->get_tag());
         }
-    else
+    }
+    else {
         // generate by polynomial curve fitting
+        const auto ref_error = norm(rule);
         for(auto& I : D->get_node_pool())
-            if(auto& J = I->get_coordinate(); std::cmp_greater(J.n_elem, dof) && std::fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= datum::eps) pond.emplace_back(I->get_tag());
+            if(auto& J = I->get_coordinate(); std::cmp_greater(J.n_elem, dof) && std::fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= datum::eps * ref_error) pond.emplace_back(I->get_tag());
+    }
 
     suanpan_sort(pond.begin(), pond.end());
 
