@@ -19,45 +19,48 @@
 
 #include <Domain/DomainBase.h>
 
-LogicCriterion::LogicCriterion(const unsigned T, const unsigned TA, const unsigned TB)
+LogicCriterion::LogicCriterion(const unsigned T, std::vector<unsigned>&& TT)
     : Criterion(T)
-    , tag_a(TA)
-    , tag_b(TB) {}
+    , tags(std::move(TT)) {}
 
 int LogicCriterion::initialize(const shared_ptr<DomainBase>& D) {
-    const auto& t_criterion_a = D->get<Criterion>(tag_a);
-    const auto& t_criterion_b = D->get<Criterion>(tag_b);
+    criteria.clear();
+    criteria.reserve(tags.size());
 
-    if(nullptr == t_criterion_a || nullptr == t_criterion_b) {
-        suanpan_error("Cannot find criteria {} and/or {}.\n", tag_a, tag_b);
-        D->disable_criterion(get_tag());
-        return SUANPAN_SUCCESS;
-    }
+    for(const auto t_tag : tags) {
+        const auto& t_criterion = D->get<Criterion>(t_tag);
+        if(!t_criterion) {
+            suanpan_error("Cannot find criterion {}.\n", t_tag);
+            D->disable_criterion(get_tag());
+            return SUANPAN_SUCCESS;
+        }
 
-    criterion_a = t_criterion_a->unique_copy();
-    criterion_b = t_criterion_b->unique_copy();
-
-    if(SUANPAN_SUCCESS != criterion_a->initialize(D) || SUANPAN_SUCCESS != criterion_b->initialize(D)) {
-        suanpan_error("Fail to initialize criteria {} and/or {}.\n", tag_a, tag_b);
-        D->disable_criterion(get_tag());
+        if(const auto& t_copy = criteria.emplace_back(t_criterion->unique_copy()); SUANPAN_SUCCESS != t_copy->initialize(D)) {
+            suanpan_error("Fail to initialize criterion {}.\n", t_tag);
+            D->disable_criterion(get_tag());
+            return SUANPAN_SUCCESS;
+        }
     }
 
     return SUANPAN_SUCCESS;
 }
 
 int LogicCriterion::process(const shared_ptr<DomainBase>& D) {
-    const auto result_a = criterion_a->process(D);
-    const auto result_b = criterion_b->process(D);
+    std::vector<int> results;
+    for(const auto& t_criterion : criteria)
+        if(SUANPAN_FAIL == results.emplace_back(t_criterion->process(D))) return SUANPAN_FAIL;
 
-    if(SUANPAN_FAIL == result_a || SUANPAN_FAIL == result_b) return SUANPAN_FAIL;
-
-    return check(result_a, result_b);
+    return check(results);
 }
 
-int LogicCriterionAND::check(const int result_a, const int result_b) const { return SUANPAN_EXIT == result_a && SUANPAN_EXIT == result_b; }
+int LogicCriterionAll::check(const std::vector<int>& results) const {
+    return std::ranges::all_of(results, [](const int result) { return SUANPAN_EXIT == result; });
+}
 
-unique_ptr<Criterion> LogicCriterionAND::unique_copy() { return std::make_unique<LogicCriterionAND>(*this); }
+unique_ptr<Criterion> LogicCriterionAll::unique_copy() { return std::make_unique<LogicCriterionAll>(*this); }
 
-int LogicCriterionOR::check(const int result_a, const int result_b) const { return SUANPAN_EXIT == result_a || SUANPAN_EXIT == result_b; }
+int LogicCriterionAny::check(const std::vector<int>& results) const {
+    return std::ranges::any_of(results, [](const int result) { return SUANPAN_EXIT == result; });
+}
 
-unique_ptr<Criterion> LogicCriterionOR::unique_copy() { return std::make_unique<LogicCriterionOR>(*this); }
+unique_ptr<Criterion> LogicCriterionAny::unique_copy() { return std::make_unique<LogicCriterionAny>(*this); }

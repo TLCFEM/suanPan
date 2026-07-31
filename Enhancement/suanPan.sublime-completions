@@ -1273,16 +1273,16 @@
       "contents": "converger LogicXOR ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique converger tag\n# (2) int, tag of first converger in logical operation\n# (3) int, tag of second converger in logical operation"
     },
     {
-      "trigger": "LogicCriterionAND",
-      "details": "apply logical operations to two criteria.",
+      "trigger": "LogicCriterionAll",
+      "details": "apply logical operations to multiple criteria.",
       "kind": "type",
-      "contents": "criterion LogicAND ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique criterion tag\n# (2) int, tag of first criterion in logical operation\n# (3) int, tag of second criterion in logical operation"
+      "contents": "criterion LogicAll ${1:(1)} ${2:[(2)...]}\n# (1) int, unique criterion tag\n# (2) int, tags of criteria in logical operation"
     },
     {
-      "trigger": "LogicCriterionOR",
-      "details": "apply logical operations to two criteria.",
+      "trigger": "LogicCriterionAny",
+      "details": "apply logical operations to multiple criteria.",
       "kind": "type",
-      "contents": "criterion LogicOR ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique criterion tag\n# (2) int, tag of first criterion in logical operation\n# (3) int, tag of second criterion in logical operation"
+      "contents": "criterion LogicAny ${1:(1)} ${2:[(2)...]}\n# (1) int, unique criterion tag\n# (2) int, tags of criteria in logical operation"
     },
     {
       "trigger": "LumpedScale",

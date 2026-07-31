@@ -34,23 +34,23 @@
 #include "Criterion.h"
 
 class LogicCriterion : public Criterion {
-    const unsigned tag_a, tag_b;
+    const std::vector<unsigned> tags;
 
-    [[nodiscard]] virtual int check(int, int) const = 0;
+    [[nodiscard]] virtual int check(const std::vector<int>&) const = 0;
 
 protected:
-    shared_ptr<Criterion> criterion_a, criterion_b;
+    std::vector<shared_ptr<Criterion>> criteria;
 
 public:
-    LogicCriterion(unsigned, unsigned, unsigned);
+    LogicCriterion(unsigned, std::vector<unsigned>&&);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int process(const shared_ptr<DomainBase>&) final;
 };
 
-class LogicCriterionAND final : public LogicCriterion {
-    [[nodiscard]] int check(int, int) const override;
+class LogicCriterionAll final : public LogicCriterion {
+    [[nodiscard]] int check(const std::vector<int>&) const override;
 
 public:
     using LogicCriterion::LogicCriterion;
@@ -58,8 +58,8 @@ public:
     unique_ptr<Criterion> unique_copy() override;
 };
 
-class LogicCriterionOR final : public LogicCriterion {
-    [[nodiscard]] int check(int, int) const override;
+class LogicCriterionAny final : public LogicCriterion {
+    [[nodiscard]] int check(const std::vector<int>&) const override;
 
 public:
     using LogicCriterion::LogicCriterion;
