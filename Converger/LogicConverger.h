@@ -43,7 +43,7 @@ public:
     int initialize() override;
 };
 
-class LogicAND final : public LogicConverger {
+class LogicConvergerAND final : public LogicConverger {
 public:
     using LogicConverger::LogicConverger;
 
@@ -52,7 +52,7 @@ public:
     bool is_converged(unsigned) override;
 };
 
-class LogicOR final : public LogicConverger {
+class LogicConvergerOR final : public LogicConverger {
 public:
     using LogicConverger::LogicConverger;
 
@@ -61,7 +61,7 @@ public:
     bool is_converged(unsigned) override;
 };
 
-class LogicXOR final : public LogicConverger {
+class LogicConvergerXOR final : public LogicConverger {
 public:
     using LogicConverger::LogicConverger;
 

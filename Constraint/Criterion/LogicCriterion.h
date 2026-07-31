@@ -36,6 +36,8 @@
 class LogicCriterion : public Criterion {
     const unsigned tag_a, tag_b;
 
+    [[nodiscard]] virtual int check(int, int) const = 0;
+
 protected:
     shared_ptr<Criterion> criterion_a, criterion_b;
 
@@ -43,24 +45,26 @@ public:
     LogicCriterion(unsigned, unsigned, unsigned);
 
     int initialize(const shared_ptr<DomainBase>&) override;
+
+    int process(const shared_ptr<DomainBase>&) final;
 };
 
 class LogicCriterionAND final : public LogicCriterion {
+    [[nodiscard]] int check(int, int) const override;
+
 public:
     using LogicCriterion::LogicCriterion;
 
     unique_ptr<Criterion> unique_copy() override;
-
-    int process(const shared_ptr<DomainBase>&) override;
 };
 
 class LogicCriterionOR final : public LogicCriterion {
+    [[nodiscard]] int check(int, int) const override;
+
 public:
     using LogicCriterion::LogicCriterion;
 
     unique_ptr<Criterion> unique_copy() override;
-
-    int process(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

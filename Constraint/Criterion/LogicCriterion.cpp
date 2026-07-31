@@ -45,24 +45,19 @@ int LogicCriterion::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
+int LogicCriterion::process(const shared_ptr<DomainBase>& D) {
+    const auto result_a = criterion_a->process(D);
+    const auto result_b = criterion_b->process(D);
+
+    if(SUANPAN_FAIL == result_a || SUANPAN_FAIL == result_b) return SUANPAN_FAIL;
+
+    return check(result_a, result_b);
+}
+
+int LogicCriterionAND::check(const int result_a, const int result_b) const { return SUANPAN_EXIT == result_a && SUANPAN_EXIT == result_b; }
+
 unique_ptr<Criterion> LogicCriterionAND::unique_copy() { return std::make_unique<LogicCriterionAND>(*this); }
 
-int LogicCriterionAND::process(const shared_ptr<DomainBase>& D) {
-    const auto result_a = criterion_a->process(D);
-    const auto result_b = criterion_b->process(D);
-
-    if(SUANPAN_FAIL == result_a || SUANPAN_FAIL == result_b) return SUANPAN_FAIL;
-
-    return SUANPAN_EXIT == result_a && SUANPAN_EXIT == result_b;
-}
+int LogicCriterionOR::check(const int result_a, const int result_b) const { return SUANPAN_EXIT == result_a || SUANPAN_EXIT == result_b; }
 
 unique_ptr<Criterion> LogicCriterionOR::unique_copy() { return std::make_unique<LogicCriterionOR>(*this); }
-
-int LogicCriterionOR::process(const shared_ptr<DomainBase>& D) {
-    const auto result_a = criterion_a->process(D);
-    const auto result_b = criterion_b->process(D);
-
-    if(SUANPAN_FAIL == result_a || SUANPAN_FAIL == result_b) return SUANPAN_FAIL;
-
-    return SUANPAN_EXIT == result_a || SUANPAN_EXIT == result_b;
-}

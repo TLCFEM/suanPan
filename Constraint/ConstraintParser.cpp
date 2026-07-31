@@ -433,8 +433,8 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(criterion_type, "LogicCriterionAND")) new_criterion = std::make_unique<LogicCriterionAND>(tag, tag_a, tag_b);
-        else if(is_equal(criterion_type, "LogicCriterionOR")) new_criterion = std::make_unique<LogicCriterionOR>(tag, tag_a, tag_b);
+        if(is_equal_any(criterion_type, "LogicAND", "LogicCriterionAND")) new_criterion = std::make_unique<LogicCriterionAND>(tag, tag_a, tag_b);
+        else if(is_equal_any(criterion_type, "LogicOR", "LogicCriterionOR")) new_criterion = std::make_unique<LogicCriterionOR>(tag, tag_a, tag_b);
     }
     else if(is_equal(criterion_type, "StrainEnergyEvolution")) {
         unsigned incre_level, final_level;
