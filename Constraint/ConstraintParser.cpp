@@ -427,14 +427,14 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
     unique_ptr<Criterion> new_criterion = nullptr;
 
     if(is_equal(criterion_type.substr(0, 5), "Logic")) {
-        unsigned tag_a, tag_b;
-        if(!get_input(command, tag_a, tag_b)) {
-            suanpan_error("A valid tag is required.\n");
+        auto tags = get_remaining<unsigned>(command);
+        if(tags.empty()) {
+            suanpan_error("At least one valid tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal_any(criterion_type, "LogicAND", "LogicCriterionAND")) new_criterion = std::make_unique<LogicCriterionAND>(tag, tag_a, tag_b);
-        else if(is_equal_any(criterion_type, "LogicOR", "LogicCriterionOR")) new_criterion = std::make_unique<LogicCriterionOR>(tag, tag_a, tag_b);
+        if(is_equal_any(criterion_type, "LogicAll", "LogicCriterionAll")) new_criterion = std::make_unique<LogicCriterionAll>(tag, std::move(tags));
+        else if(is_equal_any(criterion_type, "LogicAny", "LogicCriterionAny")) new_criterion = std::make_unique<LogicCriterionAny>(tag, std::move(tags));
     }
     else if(is_equal(criterion_type, "StrainEnergyEvolution")) {
         unsigned incre_level, final_level;

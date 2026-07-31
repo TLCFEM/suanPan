@@ -35,9 +35,7 @@ int LogicCriterion::initialize(const shared_ptr<DomainBase>& D) {
             return SUANPAN_SUCCESS;
         }
 
-        const auto& t_copy = criteria.emplace_back(t_criterion->unique_copy());
-
-        if(SUANPAN_SUCCESS != t_copy->initialize(D)) {
+        if(const auto& t_copy = criteria.emplace_back(t_criterion->unique_copy()); SUANPAN_SUCCESS != t_copy->initialize(D)) {
             suanpan_error("Fail to initialize criterion {}.\n", t_tag);
             D->disable_criterion(get_tag());
             return SUANPAN_SUCCESS;
@@ -55,14 +53,14 @@ int LogicCriterion::process(const shared_ptr<DomainBase>& D) {
     return check(results);
 }
 
-int LogicCriterionAND::check(const std::vector<int>& results) const {
+int LogicCriterionAll::check(const std::vector<int>& results) const {
     return std::ranges::all_of(results, [](const int result) { return SUANPAN_EXIT == result; });
 }
 
-unique_ptr<Criterion> LogicCriterionAND::unique_copy() { return std::make_unique<LogicCriterionAND>(*this); }
+unique_ptr<Criterion> LogicCriterionAll::unique_copy() { return std::make_unique<LogicCriterionAll>(*this); }
 
-int LogicCriterionOR::check(const std::vector<int>& results) const {
+int LogicCriterionAny::check(const std::vector<int>& results) const {
     return std::ranges::any_of(results, [](const int result) { return SUANPAN_EXIT == result; });
 }
 
-unique_ptr<Criterion> LogicCriterionOR::unique_copy() { return std::make_unique<LogicCriterionOR>(*this); }
+unique_ptr<Criterion> LogicCriterionAny::unique_copy() { return std::make_unique<LogicCriterionAny>(*this); }

@@ -49,7 +49,7 @@ public:
     int process(const shared_ptr<DomainBase>&) final;
 };
 
-class LogicCriterionAND final : public LogicCriterion {
+class LogicCriterionAll final : public LogicCriterion {
     [[nodiscard]] int check(const std::vector<int>&) const override;
 
 public:
@@ -58,7 +58,7 @@ public:
     unique_ptr<Criterion> unique_copy() override;
 };
 
-class LogicCriterionOR final : public LogicCriterion {
+class LogicCriterionAny final : public LogicCriterion {
     [[nodiscard]] int check(const std::vector<int>&) const override;
 
 public:
