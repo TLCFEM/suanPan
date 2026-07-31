@@ -21,8 +21,8 @@
 
 std::vector<uword> NodeBasedCriterion::get_dof(const shared_ptr<DomainBase>& D) const { return D->get_node(node)->get_dof({dof}); }
 
-NodeBasedCriterion::NodeBasedCriterion(const unsigned T, const unsigned ST, const unsigned NT, const Node::DOF DT, const double MA)
-    : Criterion(T, ST)
+NodeBasedCriterion::NodeBasedCriterion(const unsigned T, const unsigned NT, const Node::DOF DT, const double MA)
+    : Criterion(T)
     , limit(MA)
     , node(NT)
     , dof(DT) {}

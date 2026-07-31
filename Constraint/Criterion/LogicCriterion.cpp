@@ -19,8 +19,8 @@
 
 #include <Domain/DomainBase.h>
 
-LogicCriterion::LogicCriterion(const unsigned T, const unsigned ST, const unsigned TA, const unsigned TB)
-    : Criterion(T, ST)
+LogicCriterion::LogicCriterion(const unsigned T, const unsigned TA, const unsigned TB)
+    : Criterion(T)
     , tag_a(TA)
     , tag_b(TB) {}
 

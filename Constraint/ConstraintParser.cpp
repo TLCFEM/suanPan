@@ -412,12 +412,6 @@ namespace {
 } // namespace
 
 int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    const auto step_tag = domain->get_current_step_tag();
-    if(0u == step_tag) {
-        suanpan_error("A valid step is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
     std::string criterion_type;
     if(!get_input(command, criterion_type)) {
         suanpan_error("A valid criterion type is required.\n");
@@ -430,7 +424,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
         return SUANPAN_SUCCESS;
     }
 
-    auto flag = true;
+    unique_ptr<Criterion> new_criterion = nullptr;
 
     if(is_equal(criterion_type.substr(0, 5), "Logic")) {
         unsigned tag_a, tag_b;
@@ -439,8 +433,8 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(criterion_type, "LogicCriterionAND")) flag = domain->insert(std::make_shared<LogicCriterionAND>(tag, step_tag, tag_a, tag_b));
-        else if(is_equal(criterion_type, "LogicCriterionOR")) flag = domain->insert(std::make_shared<LogicCriterionOR>(tag, step_tag, tag_a, tag_b));
+        if(is_equal(criterion_type, "LogicCriterionAND")) new_criterion = std::make_unique<LogicCriterionAND>(tag, tag_a, tag_b);
+        else if(is_equal(criterion_type, "LogicCriterionOR")) new_criterion = std::make_unique<LogicCriterionOR>(tag, tag_a, tag_b);
     }
     else if(is_equal(criterion_type, "StrainEnergyEvolution")) {
         unsigned incre_level, final_level;
@@ -475,7 +469,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        flag = domain->insert(std::make_shared<StrainEnergyEvolution>(tag, step_tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance));
+        new_criterion = std::make_unique<StrainEnergyEvolution>(tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance);
     }
     else if(is_equal(criterion_type, "MaxHistory")) {
         std::string type;
@@ -489,7 +483,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        flag = domain->insert(std::make_shared<MaxHistory>(tag, step_tag, to_token(type), limit, get_remaining<uword>(command)));
+        new_criterion = std::make_unique<MaxHistory>(tag, to_token(type), limit, get_remaining<uword>(command));
     }
     else if(is_equal(criterion_type, "MinHistory")) {
         std::string type;
@@ -503,7 +497,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        flag = domain->insert(std::make_shared<MinHistory>(tag, step_tag, to_token(type), limit, get_remaining<uword>(command)));
+        new_criterion = std::make_unique<MinHistory>(tag, to_token(type), limit, get_remaining<uword>(command));
     }
     else {
         unsigned node;
@@ -530,13 +524,15 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(criterion_type, "MaxDisplacement")) flag = domain->insert(std::make_shared<MaxDisplacement>(tag, step_tag, node, dof_pool[0], limit));
-        else if(is_equal(criterion_type, "MinDisplacement")) flag = domain->insert(std::make_shared<MinDisplacement>(tag, step_tag, node, dof_pool[0], limit));
-        else if(is_equal(criterion_type, "MaxResistance")) flag = domain->insert(std::make_shared<MaxResistance>(tag, step_tag, node, dof_pool[0], limit));
-        else if(is_equal(criterion_type, "MinResistance")) flag = domain->insert(std::make_shared<MinResistance>(tag, step_tag, node, dof_pool[0], limit));
+        if(is_equal(criterion_type, "MaxDisplacement")) new_criterion = std::make_unique<MaxDisplacement>(tag, node, dof_pool[0], limit);
+        else if(is_equal(criterion_type, "MinDisplacement")) new_criterion = std::make_unique<MinDisplacement>(tag, node, dof_pool[0], limit);
+        else if(is_equal(criterion_type, "MaxResistance")) new_criterion = std::make_unique<MaxResistance>(tag, node, dof_pool[0], limit);
+        else if(is_equal(criterion_type, "MinResistance")) new_criterion = std::make_unique<MinResistance>(tag, node, dof_pool[0], limit);
     }
 
-    if(!flag) suanpan_error("Fail to create new criterion via \"{}\".\n", command.str());
+    if(new_criterion) new_criterion->set_start_step(domain->get_current_step_tag());
+
+    if(!new_criterion || !domain->insert(std::move(new_criterion))) suanpan_error("Fail to create new criterion via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
@@ -614,10 +610,9 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
     else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve<3u>(new_constraint, command);
     else external_module::object(new_constraint, domain, constraint_id, command);
 
-    if(new_constraint != nullptr) new_constraint->set_start_step(domain->get_current_step_tag());
+    if(new_constraint) new_constraint->set_start_step(domain->get_current_step_tag());
 
-    if(new_constraint == nullptr || !domain->insert(std::move(new_constraint)))
-        suanpan_error("Fail to create new constraint via \"{}\".\n", command.str());
+    if(!new_constraint || !domain->insert(std::move(new_constraint))) suanpan_error("Fail to create new constraint via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

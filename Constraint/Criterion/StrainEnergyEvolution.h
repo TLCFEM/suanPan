@@ -37,7 +37,6 @@ class StrainEnergyEvolution final : public EnergyEvolution {
 public:
     StrainEnergyEvolution(
         unsigned,      // tag
-        unsigned,      // step tag
         unsigned,      // incre level
         unsigned,      // final level
         double = 1.,   // centre weight

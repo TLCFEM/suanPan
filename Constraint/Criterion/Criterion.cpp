@@ -19,12 +19,13 @@
 
 #include <Domain/DomainBase.h>
 
-Criterion::Criterion(const unsigned T, const unsigned ST)
-    : CopyableTag(T)
-    , step_tag(ST) {}
+void Criterion::set_start_step(const unsigned ST) { start_step = ST; }
 
-void Criterion::set_step_tag(const unsigned T) { step_tag = T; }
+void Criterion::set_end_step(const unsigned ST) { end_step = ST; }
 
-unsigned Criterion::get_step_tag() const { return step_tag; }
+bool Criterion::if_apply(const shared_ptr<DomainBase>& D) const {
+    const auto t_step = D->get_current_step_tag();
+    return start_step != 0u && t_step >= start_step && t_step < end_step && is_active();
+}
 
 int Criterion::initialize(const shared_ptr<DomainBase>&) { return SUANPAN_SUCCESS; }
