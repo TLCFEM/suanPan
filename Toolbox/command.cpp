@@ -857,6 +857,10 @@ namespace {
             while(!command.eof() && get_input(command, tag)) {
                 if(domain->find_load(tag)) domain->get_load(tag)->set_end_step(step_tag);
             }
+        else if(is_equal(object_type, "criterion"))
+            while(!command.eof() && get_input(command, tag)) {
+                if(domain->find_criterion(tag)) domain->get_criterion(tag)->set_end_step(step_tag);
+            }
 
         return SUANPAN_SUCCESS;
     }

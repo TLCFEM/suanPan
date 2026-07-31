@@ -20,8 +20,8 @@
 #include <Domain/DomainBase.h>
 #include <Element/Element.h>
 
-HistoryCriterion::HistoryCriterion(const unsigned T, const unsigned ST, const OutputType HT, const double MH, uvec&& IDX)
-    : Criterion(T, ST)
+HistoryCriterion::HistoryCriterion(const unsigned T, const OutputType HT, const double MH, uvec&& IDX)
+    : Criterion(T)
     , indices(IDX)
     , limit(MH)
     , history_type(HT) {}

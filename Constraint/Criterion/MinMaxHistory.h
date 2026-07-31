@@ -49,7 +49,6 @@ private:
 public:
     HistoryCriterion(
         unsigned,   // tag
-        unsigned,   // step tag
         OutputType, // history type
         double,     // limit
         uvec&&      // indices

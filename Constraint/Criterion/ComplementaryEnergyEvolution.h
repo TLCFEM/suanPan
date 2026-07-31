@@ -37,7 +37,6 @@ class ComplementaryEnergyEvolution final : public EnergyEvolution {
 public:
     ComplementaryEnergyEvolution(
         unsigned,      // tag
-        unsigned,      // step tag
         unsigned,      // incre level
         unsigned,      // final level
         double = 1.,   // centre weight

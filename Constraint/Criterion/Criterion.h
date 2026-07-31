@@ -36,13 +36,15 @@
 class DomainBase;
 
 class Criterion : public CopyableTag {
-    unsigned step_tag;
+    unsigned start_step{static_cast<unsigned>(-1)}, end_step{static_cast<unsigned>(-1)};
 
 public:
-    explicit Criterion(unsigned = 0, unsigned = 0);
+    using CopyableTag::CopyableTag;
 
-    void set_step_tag(unsigned);
-    [[nodiscard]] unsigned get_step_tag() const;
+    void set_start_step(unsigned);
+    void set_end_step(unsigned);
+
+    [[nodiscard]] bool if_apply(const shared_ptr<DomainBase>&) const;
 
     virtual unique_ptr<Criterion> unique_copy() = 0;
 

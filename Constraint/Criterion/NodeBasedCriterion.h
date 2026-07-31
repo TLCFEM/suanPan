@@ -40,12 +40,11 @@ protected:
     const unsigned node;
     const Node::DOF dof;
 
-    std::vector<uword> get_dof(const shared_ptr<DomainBase>&) const;
+    [[nodiscard]] std::vector<uword> get_dof(const shared_ptr<DomainBase>&) const;
 
 public:
     NodeBasedCriterion(
         unsigned,  // tag
-        unsigned,  // step tag
         unsigned,  // node tag
         Node::DOF, // dof tag
         double     // limit

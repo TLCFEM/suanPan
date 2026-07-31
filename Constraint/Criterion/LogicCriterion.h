@@ -40,7 +40,7 @@ protected:
     shared_ptr<Criterion> criterion_a, criterion_b;
 
 public:
-    explicit LogicCriterion(unsigned, unsigned, unsigned, unsigned);
+    LogicCriterion(unsigned, unsigned, unsigned);
 
     int initialize(const shared_ptr<DomainBase>&) override;
 };

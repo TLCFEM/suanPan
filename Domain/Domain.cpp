@@ -1320,7 +1320,8 @@ int Domain::process_constraint(const bool full) {
 
 int Domain::process_criterion() {
     auto code = 0;
-    for(auto& I : criterion_pond.get()) code += I->process(shared_from_this());
+    for(auto& I : criterion_pond.get())
+        if(I->if_apply(shared_from_this())) code += I->process(shared_from_this());
     return code;
 }
 
