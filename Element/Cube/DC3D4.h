@@ -31,7 +31,6 @@
 #define DC3D4_H
 
 #include <Element/MaterialElement.h>
-#include <Element/Utility/PhaseField.h>
 
 class DC3D4 final : public MaterialElement3D {
     static constexpr unsigned c_node = 4, c_dof = 4, c_size = c_dof * c_node;
@@ -43,8 +42,6 @@ class DC3D4 final : public MaterialElement3D {
     mat n_mat, pn_mat, b_mat;
 
     unique_ptr<Material> c_material;
-
-    PhaseField c_phase;
 
     double maximum_energy = 0.;
 

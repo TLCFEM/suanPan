@@ -30,17 +30,20 @@
 #define DC3D8_H
 
 #include <Element/MaterialElement.h>
-#include <Element/Utility/PhaseField.h>
 
 class DC3D8 final : public MaterialElement3D {
-    struct IntegrationPoint final : PhaseField {
+    struct IntegrationPoint {
         vec coor;
         double weight;
         double maximum_energy = 0.;
         unique_ptr<Material> c_material;
         mat n_mat, pn_mat;
         sp_mat strain_mat;
+
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, mat&&);
+
+        [[nodiscard]] int commit_status();
+        [[nodiscard]] int clear_status();
     };
 
     static constexpr unsigned c_node = 8, c_dof = 4, c_size = c_dof * c_node;

@@ -30,7 +30,6 @@
 #define DCP3_H
 
 #include <Element/MaterialElement.h>
-#include <Element/Utility/PhaseField.h>
 
 class DCP3 final : public MaterialElement2D {
     static constexpr unsigned m_node = 3, m_dof = 3, m_size = m_dof * m_node;
@@ -43,8 +42,6 @@ class DCP3 final : public MaterialElement2D {
     mat n_mat, pn_mat, b_mat;
 
     unique_ptr<Material> m_material; // store material model
-
-    PhaseField m_phase;
 
     double maximum_energy = 0.;
 
