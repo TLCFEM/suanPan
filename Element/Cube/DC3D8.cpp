@@ -101,11 +101,10 @@ int DC3D8::update_status() {
 
         trial_stiffness(u_dof, u_dof) += I.weight * damage * I.strain_mat.t() * I.c_material->get_trial_stiffness() * I.strain_mat;
         trial_stiffness(u_dof, d_dof) -= I.weight * 2. * pow_term * I.strain_mat.t() * I.c_material->get_trial_stress() * I.n_mat;
-        trial_stiffness(d_dof, d_dof) += I.weight * (2. * I.maximum_energy + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat;
-        trial_stiffness(d_dof, d_dof) += I.weight * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
+        trial_stiffness(d_dof, d_dof) += I.weight * (2. * I.maximum_energy + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat + I.weight * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
 
         trial_resistance(u_dof) += I.weight * damage * I.strain_mat.t() * I.c_material->get_trial_stress();
-        trial_resistance(d_dof) -= I.weight * 2. * I.n_mat.t() * I.maximum_energy;
+        trial_resistance(d_dof) -= I.weight * 2. * I.maximum_energy * I.n_mat.t();
     }
 
     trial_resistance(d_dof) += trial_stiffness(d_dof, d_dof) * t_damage;

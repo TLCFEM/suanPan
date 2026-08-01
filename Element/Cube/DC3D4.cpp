@@ -81,8 +81,7 @@ int DC3D4::update_status() {
     trial_stiffness(d_dof, d_dof) = n_mat.t() * n_mat * (2. * maximum_energy + release_rate / characteristic_length) + release_rate * characteristic_length * pn_mat.t() * pn_mat;
 
     trial_resistance(u_dof) = damage * b_mat.t() * c_material->get_trial_stress();
-    trial_resistance(d_dof) = trial_stiffness(d_dof, d_dof) * t_damage;
-    trial_resistance(d_dof) -= 2. * n_mat.t() * maximum_energy;
+    trial_resistance(d_dof) = trial_stiffness(d_dof, d_dof) * t_damage - 2. * maximum_energy * n_mat.t();
 
     trial_stiffness *= volume;
     trial_resistance *= volume;

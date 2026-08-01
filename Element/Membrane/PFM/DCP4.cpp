@@ -127,11 +127,10 @@ int DCP4::update_status() {
 
         trial_stiffness(u_dof, u_dof) += t_factor * damage * I.b_mat.t() * I.m_material->get_trial_stiffness() * I.b_mat;
         trial_stiffness(u_dof, d_dof) -= t_factor * 2. * pow_term * I.b_mat.t() * I.m_material->get_trial_stress() * I.n_mat;
-        trial_stiffness(d_dof, d_dof) += t_factor * (2. * I.maximum_energy + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat;
-        trial_stiffness(d_dof, d_dof) += t_factor * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
+        trial_stiffness(d_dof, d_dof) += t_factor * (2. * I.maximum_energy + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat + t_factor * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
 
         trial_resistance(u_dof) += t_factor * damage * I.b_mat.t() * I.m_material->get_trial_stress();
-        trial_resistance(d_dof) -= t_factor * 2. * I.n_mat.t() * I.maximum_energy;
+        trial_resistance(d_dof) -= t_factor * 2. * I.maximum_energy * I.n_mat.t();
     }
 
     trial_resistance(d_dof) += trial_stiffness(d_dof, d_dof) * t_damage;
