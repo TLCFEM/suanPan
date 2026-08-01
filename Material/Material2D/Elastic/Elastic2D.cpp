@@ -54,7 +54,7 @@ void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
     ConstantCoupleStiffness(this);
 }
 
-double Elastic2D::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double Elastic2D::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> Elastic2D::unique_copy() { return std::make_unique<Elastic2D>(*this); }
 

@@ -30,7 +30,7 @@ int ElasticOS::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double ElasticOS::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double ElasticOS::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> ElasticOS::unique_copy() { return std::make_unique<ElasticOS>(*this); }
 

@@ -37,7 +37,7 @@ int BilinearJ2::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> BilinearJ2::unique_copy() { return std::make_unique<BilinearJ2>(*this); }
 
-double BilinearJ2::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double BilinearJ2::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int BilinearJ2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

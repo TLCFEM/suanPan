@@ -36,7 +36,7 @@ int ArmstrongFrederick::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> ArmstrongFrederick::unique_copy() { return std::make_unique<ArmstrongFrederick>(*this); }
 
-double ArmstrongFrederick::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double ArmstrongFrederick::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;

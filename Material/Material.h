@@ -131,7 +131,8 @@ public:
         SHEAR,
         BULK,
         PEAKSTRAIN,
-        CRACKSTRAIN
+        CRACKSTRAIN,
+        STRAINENERGY,
     };
 
     explicit Material(
@@ -238,11 +239,11 @@ public:
     [[nodiscard]] virtual std::vector<vec> record(OutputType) const;
 
 protected:
-    class prop {
+    class MaterialProperty {
         const double e, v;
 
     public:
-        prop(const double E, const double P)
+        MaterialProperty(const double E, const double P)
             : e(E)
             , v(P) {}
 
@@ -256,8 +257,6 @@ protected:
                 return e / (2. + 2. * v);
             case Parameter::BULK:
                 return e / (3. - 6. * v);
-            case Parameter::PEAKSTRAIN:
-            case Parameter::CRACKSTRAIN:
             default:
                 return 0.;
             }

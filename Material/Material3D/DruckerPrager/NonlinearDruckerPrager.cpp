@@ -34,7 +34,7 @@ int NonlinearDruckerPrager::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearDruckerPrager::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double NonlinearDruckerPrager::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
