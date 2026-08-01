@@ -39,6 +39,16 @@ DC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
         strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = pn_mat(2, I);
     }
 }
+int DC3D8::IntegrationPoint::commit_status() {
+    const auto code = c_material->commit_status();
+    maximum_energy = std::max(maximum_energy, c_material->get(Material::Parameter::STRAINENERGY));
+    return code;
+}
+
+int DC3D8::IntegrationPoint::clear_status() {
+    maximum_energy = 0.;
+    return c_material->clear_status();
+}
 
 DC3D8::DC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
     : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE})
@@ -106,9 +116,8 @@ int DC3D8::update_status() {
 int DC3D8::commit_status() {
     auto code = 0;
     for(auto& I : int_pt) {
-        I.commit_status(I.c_material);
-        I.maximum_energy = std::max(I.maximum_energy, I.strain_energy);
         code += I.c_material->commit_status();
+        I.maximum_energy = std::max(I.maximum_energy, I.c_material->get(Material::Parameter::STRAINENERGY));
     }
     return code;
 }
@@ -116,9 +125,8 @@ int DC3D8::commit_status() {
 int DC3D8::clear_status() {
     auto code = 0;
     for(auto& I : int_pt) {
-        I.clear_status();
-        I.maximum_energy = 0.;
         code += I.c_material->clear_status();
+        I.maximum_energy = 0.;
     }
     return code;
 }

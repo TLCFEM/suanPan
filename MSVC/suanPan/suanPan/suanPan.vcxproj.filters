@@ -477,9 +477,6 @@
     <ClCompile Include="..\..\..\Element\Utility\Orientation.cpp">
       <Filter>Element\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Element\Utility\PhaseField.cpp">
-      <Filter>Element\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Element\Utility\T2DC.cpp">
       <Filter>Element\Utility</Filter>
     </ClCompile>
@@ -1846,9 +1843,6 @@
       <Filter>Element\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Utility\Orientation.h">
-      <Filter>Element\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Element\Utility\PhaseField.h">
       <Filter>Element\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Utility\T2DC.h">

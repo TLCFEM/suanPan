@@ -91,16 +91,13 @@ int DC3D4::update_status() {
 }
 
 int DC3D4::commit_status() {
-    c_phase.commit_status(c_material);
-    maximum_energy = std::max(maximum_energy, c_phase.strain_energy);
-
-    return c_material->commit_status();
+    const auto code = c_material->commit_status();
+    maximum_energy = std::max(maximum_energy, c_material->get(Material::Parameter::STRAINENERGY));
+    return code;
 }
 
 int DC3D4::clear_status() {
-    c_phase.clear_status();
     maximum_energy = 0.;
-
     return c_material->clear_status();
 }
 

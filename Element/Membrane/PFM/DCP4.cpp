@@ -35,6 +35,17 @@ DCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     , pn_mat(std::move(PNPXY))
     , b_mat(3, 8, fill::zeros) {}
 
+int DCP4::IntegrationPoint::commit_status() {
+    const auto code = m_material->commit_status();
+    maximum_energy = std::max(maximum_energy, m_material->get(Material::Parameter::STRAINENERGY));
+    return code;
+}
+
+int DCP4::IntegrationPoint::clear_status() {
+    maximum_energy = 0.;
+    return m_material->clear_status();
+}
+
 DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const double TH)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::DAMAGE})
     , release_rate(RR)
@@ -130,21 +141,13 @@ int DCP4::update_status() {
 
 int DCP4::commit_status() {
     auto code = 0;
-    for(auto& I : int_pt) {
-        I.commit_status(I.m_material);
-        I.maximum_energy = std::max(I.maximum_energy, I.strain_energy);
-        code += I.m_material->commit_status();
-    }
+    for(auto& I : int_pt) code += I.commit_status();
     return code;
 }
 
 int DCP4::clear_status() {
     auto code = 0;
-    for(auto& I : int_pt) {
-        I.clear_status();
-        I.maximum_energy = 0.;
-        code += I.m_material->clear_status();
-    }
+    for(auto& I : int_pt) code += I.clear_status();
     return code;
 }
 

@@ -98,16 +98,13 @@ int DCP3::update_status() {
 }
 
 int DCP3::commit_status() {
-    m_phase.commit_status(m_material);
-    maximum_energy = std::max(maximum_energy, m_phase.strain_energy);
-
-    return m_material->commit_status();
+    const auto code = m_material->commit_status();
+    maximum_energy = std::max(maximum_energy, m_material->get(Material::Parameter::STRAINENERGY));
+    return code;
 }
 
 int DCP3::clear_status() {
-    m_phase.clear_status();
     maximum_energy = 0.;
-
     return m_material->clear_status();
 }
 

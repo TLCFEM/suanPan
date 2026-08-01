@@ -31,16 +31,19 @@
 #define DCP4_H
 
 #include <Element/MaterialElement.h>
-#include <Element/Utility/PhaseField.h>
 
 class DCP4 final : public MaterialElement2D {
-    struct IntegrationPoint final : PhaseField {
+    struct IntegrationPoint {
         vec coor;
         double weight;
         double maximum_energy = 0.;
         unique_ptr<Material> m_material;
         mat n_mat, pn_mat, b_mat;
+
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, mat&&);
+
+        [[nodiscard]] int commit_status();
+        [[nodiscard]] int clear_status();
     };
 
     static constexpr unsigned m_node = 4, m_dof = 3, m_size = m_dof * m_node;

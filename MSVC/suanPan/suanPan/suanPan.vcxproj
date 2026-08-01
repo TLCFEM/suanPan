@@ -258,7 +258,6 @@
     <ClCompile Include="..\..\..\Element\Utility\IGA\NURBSSurface.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\IGA\NURBSVolume.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\Orientation.cpp" />
-    <ClCompile Include="..\..\..\Element\Utility\PhaseField.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\T2DC.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\T2DL.cpp" />
     <ClCompile Include="..\..\..\Element\Utility\T3DC.cpp" />
@@ -723,7 +722,6 @@
     <ClInclude Include="..\..\..\Element\Utility\IGA\NURBSVolume.h" />
     <ClInclude Include="..\..\..\Element\Utility\MatrixModifier.hpp" />
     <ClInclude Include="..\..\..\Element\Utility\Orientation.h" />
-    <ClInclude Include="..\..\..\Element\Utility\PhaseField.h" />
     <ClInclude Include="..\..\..\Element\Utility\T2DC.h" />
     <ClInclude Include="..\..\..\Element\Utility\T2DL.h" />
     <ClInclude Include="..\..\..\Element\Utility\T3DC.h" />
