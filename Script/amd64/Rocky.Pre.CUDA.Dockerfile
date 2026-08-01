@@ -11,9 +11,9 @@ RUN dnf install -y dnf-plugins-core && \
     dnf clean all
 
 # changes of mkl sparse utility names force to install an older version
-RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/17f37e16-768e-40d2-bcf8-c252dc6c5499/intel-onemkl-2026.1.0.237_offline.sh && \
-    bash ./intel-onemkl-2026.1.0.237_offline.sh -a --silent --eula accept && \
-    rm intel-onemkl-2026.1.0.237_offline.sh
+RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6a17080f-f0de-41b9-b587-52f92512c59a/intel-onemkl-2025.3.1.11_offline.sh && \
+    bash ./intel-onemkl-2025.3.1.11_offline.sh -a --silent --eula accept && \
+    rm intel-onemkl-2025.3.1.11_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.2.tar.gz && tar xf VTK-9.6.2.tar.gz && \
