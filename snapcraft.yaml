@@ -62,8 +62,8 @@ parts:
         amd64)
           wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-ubuntu-24.04.tar.gz
           tar xf VTK-9.6.2-ubuntu-24.04.tar.gz
-          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh
-          sh ./intel-onemkl-2026.0.0.909_offline.sh -a --silent --eula accept
+          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/17f37e16-768e-40d2-bcf8-c252dc6c5499/intel-onemkl-2026.1.0.237_offline.sh
+          sh ./intel-onemkl-2026.1.0.237_offline.sh -a --silent --eula accept
           ;;
         arm64)
           wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-ubuntu-24.04-arm.tar.gz
