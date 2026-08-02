@@ -202,8 +202,7 @@ jobs:
             export CC=$(brew --prefix llvm@18)/bin/clang
             export CXX=$(brew --prefix llvm@18)/bin/clang++
           else
-            export CC=$(brew --prefix llvm@15)/bin/clang
-            export CXX=$(brew --prefix llvm@15)/bin/clang++
+            exit 1
           fi
           export FC=gfortran-15
           cmake -S . -B build \
@@ -250,6 +249,8 @@ jobs:
         os:
           - macos-15-large
           - macos-15-xlarge
+          - macos-26-large
+          - macos-26-xlarge
         vtk:
           - 'ON'
     timeout-minutes: 100

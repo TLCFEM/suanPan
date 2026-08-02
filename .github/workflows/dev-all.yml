@@ -284,8 +284,7 @@ jobs:
               export CC=$(brew --prefix llvm@18)/bin/clang
               export CXX=$(brew --prefix llvm@18)/bin/clang++
             else
-              export CC=$(brew --prefix llvm@15)/bin/clang
-              export CXX=$(brew --prefix llvm@15)/bin/clang++
+              exit 1
             fi
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
