@@ -223,6 +223,9 @@
     <Filter Include="Element\Particle">
       <UniqueIdentifier>{a60da642-a634-4c7c-b2d5-bcdf0d8c08d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Element\Cube\PFM">
+      <UniqueIdentifier>{5f8b2273-cd82-480e-b416-1c43e24d71ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
@@ -352,12 +355,6 @@
       <Filter>Element\Cube</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Element\Cube\CIN3D8.cpp">
-      <Filter>Element\Cube</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Element\Cube\DC3D4.cpp">
-      <Filter>Element\Cube</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Element\Cube\DC3D8.cpp">
       <Filter>Element\Cube</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Element\Modifier\ElementalModal.cpp">
@@ -1558,6 +1555,12 @@
     <ClCompile Include="..\..\..\Constraint\Criterion\MinMaxResistance.cpp">
       <Filter>Constraint\Criterion</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\PFM\DC3D4.cpp">
+      <Filter>Element\Cube\PFM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\PFM\DC3D8.cpp">
+      <Filter>Element\Cube\PFM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
@@ -1717,12 +1720,6 @@
       <Filter>Element\Cube</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Cube\CIN3D8.h">
-      <Filter>Element\Cube</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Element\Cube\DC3D4.h">
-      <Filter>Element\Cube</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Element\Cube\DC3D8.h">
       <Filter>Element\Cube</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Modifier\ElementalModal.h">
@@ -2922,6 +2919,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Constraint\Criterion\MinMaxResistance.h">
       <Filter>Constraint\Criterion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\PFM\DC3D4.h">
+      <Filter>Element\Cube\PFM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\PFM\DC3D8.h">
+      <Filter>Element\Cube\PFM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

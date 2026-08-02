@@ -122,7 +122,7 @@ int DCP4::update_status() {
         if(I.m_material->update_trial_status(t_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
         const auto pow_term = 1. - dot(t_damage, I.n_mat);
-        const auto damage = pow(pow_term, 2.);
+        const auto damage = pow(pow_term, 2.) + std::numeric_limits<float>::epsilon();
         const auto t_factor = I.weight * thickness;
 
         trial_stiffness(u_dof, u_dof) += t_factor * damage * I.b_mat.t() * I.m_material->get_trial_stiffness() * I.b_mat;

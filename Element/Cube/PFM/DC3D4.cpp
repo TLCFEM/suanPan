@@ -71,7 +71,7 @@ int DC3D4::update_status() {
     if(c_material->update_trial_status(b_mat * t_disp(u_dof)) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     const auto pow_term = 1. - dot(t_damage, n_mat);
-    const auto damage = pow(pow_term, 2.);
+    const auto damage = pow(pow_term, 2.) + std::numeric_limits<float>::epsilon();
 
     trial_stiffness.zeros(c_size, c_size);
     trial_resistance.zeros(c_size);

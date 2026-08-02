@@ -175,8 +175,8 @@
     <ClCompile Include="..\..\..\Element\Cube\C3D8.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\C3D8I.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\CIN3D8.cpp" />
-    <ClCompile Include="..\..\..\Element\Cube\DC3D4.cpp" />
-    <ClCompile Include="..\..\..\Element\Cube\DC3D8.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\PFM\DC3D4.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\PFM\DC3D8.cpp" />
     <ClCompile Include="..\..\..\Element\Element.cpp" />
     <ClCompile Include="..\..\..\Element\ElementParser.cpp" />
     <ClCompile Include="..\..\..\Element\ElementTemplate.cpp" />
@@ -635,8 +635,8 @@
     <ClInclude Include="..\..\..\Element\Cube\C3D8.h" />
     <ClInclude Include="..\..\..\Element\Cube\C3D8I.h" />
     <ClInclude Include="..\..\..\Element\Cube\CIN3D8.h" />
-    <ClInclude Include="..\..\..\Element\Cube\DC3D4.h" />
-    <ClInclude Include="..\..\..\Element\Cube\DC3D8.h" />
+    <ClInclude Include="..\..\..\Element\Cube\PFM\DC3D4.h" />
+    <ClInclude Include="..\..\..\Element\Cube\PFM\DC3D8.h" />
     <ClInclude Include="..\..\..\Element\Element.h" />
     <ClInclude Include="..\..\..\Element\ElementBase.h" />
     <ClInclude Include="..\..\..\Element\ElementParser.h" />

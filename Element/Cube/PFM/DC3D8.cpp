@@ -97,7 +97,7 @@ int DC3D8::update_status() {
         if(I.c_material->update_trial_status(I.strain_mat * t_disp(u_dof)) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
         const auto pow_term = 1. - dot(t_damage, I.n_mat);
-        const auto damage = pow(pow_term, 2.);
+        const auto damage = pow(pow_term, 2.) + std::numeric_limits<float>::epsilon();
 
         trial_stiffness(u_dof, u_dof) += I.weight * damage * I.strain_mat.t() * I.c_material->get_trial_stiffness() * I.strain_mat;
         trial_stiffness(u_dof, d_dof) -= I.weight * 2. * pow_term * I.strain_mat.t() * I.c_material->get_trial_stress() * I.n_mat;
