@@ -34,7 +34,7 @@ def readlines(file_path: Path):
 def compare_folders(current: Path, parent: Path):
     error_flag: bool = False
 
-    for current_path in current.iterdir():
+    for current_path in current.rglob("*"):
         if not current_path.is_file():
             continue
 
@@ -72,7 +72,7 @@ def compare_folders(current: Path, parent: Path):
         except Exception as e:
             print(f"Error reading files: {e}.")
 
-        return error_flag
+    return error_flag
 
 
 def compare_commits(current: Path, parent: Path):
