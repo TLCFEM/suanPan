@@ -131,8 +131,7 @@ public:
         SHEAR,
         BULK,
         PEAKSTRAIN,
-        CRACKSTRAIN,
-        STRAINENERGY,
+        CRACKSTRAIN
     };
 
     explicit Material(

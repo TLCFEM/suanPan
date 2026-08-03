@@ -91,7 +91,7 @@ int DC3D4::update_status() {
 
 int DC3D4::commit_status() {
     const auto code = c_material->commit_status();
-    maximum_energy = std::max(maximum_energy, c_material->get(Material::Parameter::STRAINENERGY));
+    maximum_energy = std::max(maximum_energy, .5 * dot(c_material->get_current_strain(), c_material->get_current_stress()));
     return code;
 }
 

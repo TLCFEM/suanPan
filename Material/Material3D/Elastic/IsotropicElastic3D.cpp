@@ -31,11 +31,7 @@ int IsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double IsotropicElastic3D::get(const Parameter P) const {
-    if(Parameter::STRAINENERGY == P) return .5 * dot(current_strain, current_stress);
-
-    return MaterialProperty(elastic_modulus, poissons_ratio)(P);
-}
+double IsotropicElastic3D::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> IsotropicElastic3D::unique_copy() { return std::make_unique<IsotropicElastic3D>(*this); }
 

@@ -98,7 +98,7 @@ int DCP3::update_status() {
 
 int DCP3::commit_status() {
     const auto code = m_material->commit_status();
-    maximum_energy = std::max(maximum_energy, m_material->get(Material::Parameter::STRAINENERGY));
+    maximum_energy = std::max(maximum_energy, .5 * dot(m_material->get_current_strain(), m_material->get_current_stress()));
     return code;
 }
 
