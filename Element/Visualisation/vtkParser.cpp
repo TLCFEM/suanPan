@@ -41,14 +41,14 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkXMLMultiBlockDataWriter.h>
 
-vtkInfo vtk_process(std::istringstream& command) {
+static vtkInfo vtk_process(std::istringstream& command) {
     vtkInfo config;
 
     std::string keyword;
 
     while(!command.eof() && get_input(command, keyword))
         if(is_equal(keyword, "scale")) get_input(command, config.scale);
-        else if(is_equal(keyword, "type") && get_input(command, keyword)) config.set(to_token(keyword));
+        else if(is_equal(keyword, "type") && get_input(command, keyword)) config.set(to_token(std::string(keyword)));
         else if(is_equal(keyword, "fontsize")) get_input(command, config.font_size);
         else if(is_equal(keyword, "save")) get_input(command, config.file_name);
         else if(is_equal(keyword, "nobar")) config.color_bar = false;

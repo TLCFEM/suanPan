@@ -483,7 +483,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        new_criterion = std::make_unique<MaxHistory>(tag, to_token(type), limit, get_remaining<uword>(command));
+        new_criterion = std::make_unique<MaxHistory>(tag, to_token(std::move(type)), limit, get_remaining<uword>(command));
     }
     else if(is_equal(criterion_type, "MinHistory")) {
         std::string type;
@@ -497,7 +497,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
             return SUANPAN_SUCCESS;
         }
 
-        new_criterion = std::make_unique<MinHistory>(tag, to_token(type), limit, get_remaining<uword>(command));
+        new_criterion = std::make_unique<MinHistory>(tag, to_token(std::move(type)), limit, get_remaining<uword>(command));
     }
     else {
         unsigned node;

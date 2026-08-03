@@ -55,7 +55,6 @@ def compare_folders(current: Path, parent: Path):
                     readlines(parent_path),
                     fromfile=current_path.as_posix(),
                     tofile=parent_path.as_posix(),
-                    lineterm="",
                 )
             )
 

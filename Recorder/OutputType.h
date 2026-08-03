@@ -18,6 +18,7 @@
 #ifndef OUTPUTTYPE_H
 #define OUTPUTTYPE_H
 
+#include <algorithm>
 #include <magic_enum/magic_enum.hpp>
 
 enum class OutputType {
@@ -263,12 +264,15 @@ enum class OutputType {
 
 template<> struct magic_enum::customize::enum_range<OutputType> {
     static constexpr int min = 0;
-    static constexpr int max = 512;
+    static constexpr int max = 256;
 };
 
 constexpr std::string_view to_name(const OutputType L) { return magic_enum::enum_name(L); }
 
-constexpr OutputType to_token(const std::string_view L) { return magic_enum::enum_cast<OutputType>(L).value_or(OutputType::NL); }
+constexpr OutputType to_token(std::string&& L) {
+    std::ranges::transform(L, L.begin(), [](const char C) { return static_cast<char>(std::toupper(static_cast<int>(C))); });
+    return magic_enum::enum_cast<OutputType>(L).value_or(OutputType::NL);
+}
 
 std::string to_category(OutputType);
 
