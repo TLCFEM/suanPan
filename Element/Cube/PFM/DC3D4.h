@@ -43,7 +43,7 @@ class DC3D4 final : public MaterialElement3D {
 
     unique_ptr<Material> c_material;
 
-    double maximum_energy = 0.;
+    double current_h = 0., trial_h = 0.;
 
 public:
     DC3D4(

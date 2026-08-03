@@ -35,7 +35,7 @@ class DC3D8 final : public MaterialElement3D {
     struct IntegrationPoint {
         vec coor;
         double weight;
-        double maximum_energy = 0.;
+        double current_h = 0., trial_h = 0.;
         unique_ptr<Material> c_material;
         mat n_mat, pn_mat;
         sp_mat strain_mat;
@@ -44,6 +44,7 @@ class DC3D8 final : public MaterialElement3D {
 
         [[nodiscard]] int commit_status();
         [[nodiscard]] int clear_status();
+        [[nodiscard]] int reset_status();
     };
 
     static constexpr unsigned c_node = 8, c_dof = 4, c_size = c_dof * c_node;

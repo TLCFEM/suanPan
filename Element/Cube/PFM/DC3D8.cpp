@@ -39,15 +39,20 @@ DC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Ma
         strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = pn_mat(2, I);
     }
 }
+
 int DC3D8::IntegrationPoint::commit_status() {
-    const auto code = c_material->commit_status();
-    maximum_energy = std::max(maximum_energy, .5 * dot(c_material->get_current_strain(), c_material->get_current_stress()));
-    return code;
+    current_h = trial_h;
+    return c_material->commit_status();
 }
 
 int DC3D8::IntegrationPoint::clear_status() {
-    maximum_energy = 0.;
+    current_h = trial_h = 0.;
     return c_material->clear_status();
+}
+
+int DC3D8::IntegrationPoint::reset_status() {
+    trial_h = current_h;
+    return c_material->reset_status();
 }
 
 DC3D8::DC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
@@ -93,18 +98,30 @@ int DC3D8::update_status() {
     trial_stiffness.zeros(c_size, c_size);
     trial_resistance.zeros(c_size);
 
-    for(const auto& I : int_pt) {
+    for(auto& I : int_pt) {
         if(I.c_material->update_trial_status(I.strain_mat * t_disp(u_dof)) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
         const auto pow_term = 1. - dot(t_damage, I.n_mat);
-        const auto damage = pow(pow_term, 2.) + std::numeric_limits<float>::epsilon();
+        const auto damage = std::min(1., std::pow(pow_term, 2.) + std::numeric_limits<float>::epsilon());
+
+        I.trial_h = .5 * dot(I.c_material->get_trial_strain(), I.c_material->get_trial_stress());
+
+        if(I.trial_h < I.current_h) I.trial_h = I.current_h;
+        // 1. choose the following for a consistent monolithic implementation
+        // else {
+        //     const mat couple_mat = I.weight * 2. * pow_term * I.strain_mat.t() * I.c_material->get_trial_stress() * I.n_mat;
+        //     trial_stiffness(u_dof, d_dof) -= couple_mat;
+        //     trial_stiffness(d_dof, u_dof) -= couple_mat.t();
+        // }
+        // const auto actual_h = I.trial_h;
+        // 2. choose the following for a staggered implementation
+        const auto actual_h = I.current_h;
 
         trial_stiffness(u_dof, u_dof) += I.weight * damage * I.strain_mat.t() * I.c_material->get_trial_stiffness() * I.strain_mat;
-        trial_stiffness(u_dof, d_dof) -= I.weight * 2. * pow_term * I.strain_mat.t() * I.c_material->get_trial_stress() * I.n_mat;
-        trial_stiffness(d_dof, d_dof) += I.weight * (2. * I.maximum_energy + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat + I.weight * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
+        trial_stiffness(d_dof, d_dof) += I.weight * (2. * actual_h + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat + I.weight * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
 
         trial_resistance(u_dof) += I.weight * damage * I.strain_mat.t() * I.c_material->get_trial_stress();
-        trial_resistance(d_dof) -= I.weight * 2. * I.maximum_energy * I.n_mat.t();
+        trial_resistance(d_dof) -= I.weight * 2. * actual_h * I.n_mat.t();
     }
 
     trial_resistance(d_dof) += trial_stiffness(d_dof, d_dof) * t_damage;
@@ -126,7 +143,7 @@ int DC3D8::clear_status() {
 
 int DC3D8::reset_status() {
     auto code = 0;
-    for(const auto& I : int_pt) code += I.c_material->reset_status();
+    for(auto& I : int_pt) code += I.reset_status();
     return code;
 }
 

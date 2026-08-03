@@ -43,7 +43,7 @@ class DCP3 final : public MaterialElement2D {
 
     unique_ptr<Material> m_material; // store material model
 
-    double maximum_energy = 0.;
+    double current_h = 0., trial_h = 0.;
 
 public:
     DCP3(

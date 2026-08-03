@@ -36,14 +36,18 @@ DCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Mat
     , b_mat(3, 8, fill::zeros) {}
 
 int DCP4::IntegrationPoint::commit_status() {
-    const auto code = m_material->commit_status();
-    maximum_energy = std::max(maximum_energy, .5 * dot(m_material->get_current_strain(), m_material->get_current_stress()));
-    return code;
+    current_h = trial_h;
+    return m_material->commit_status();
 }
 
 int DCP4::IntegrationPoint::clear_status() {
-    maximum_energy = 0.;
+    current_h = trial_h = 0.;
     return m_material->clear_status();
+}
+
+int DCP4::IntegrationPoint::reset_status() {
+    trial_h = current_h;
+    return m_material->reset_status();
 }
 
 DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const double TH)
@@ -111,7 +115,7 @@ int DCP4::update_status() {
     trial_stiffness.zeros(m_size, m_size);
     trial_resistance.zeros(m_size);
 
-    for(const auto& I : int_pt) {
+    for(auto& I : int_pt) {
         vec t_strain(3, fill::zeros);
         for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
             t_strain(0) += t_disp(K) * I.pn_mat(0, J);
@@ -122,15 +126,27 @@ int DCP4::update_status() {
         if(I.m_material->update_trial_status(t_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
         const auto pow_term = 1. - dot(t_damage, I.n_mat);
-        const auto damage = pow(pow_term, 2.) + std::numeric_limits<float>::epsilon();
+        const auto damage = std::min(1., std::pow(pow_term, 2.) + std::numeric_limits<float>::epsilon());
         const auto t_factor = I.weight * thickness;
 
+        I.trial_h = .5 * dot(I.m_material->get_trial_strain(), I.m_material->get_trial_stress());
+
+        if(I.trial_h < I.current_h) I.trial_h = I.current_h;
+        // 1. choose the following for a consistent monolithic implementation
+        // else {
+        //     const mat couple_mat = t_factor * 2. * pow_term * I.b_mat.t() * I.m_material->get_trial_stress() * I.n_mat;
+        //     trial_stiffness(u_dof, d_dof) -= couple_mat;
+        //     trial_stiffness(d_dof, u_dof) -= couple_mat.t();
+        // }
+        // const auto actual_h = I.trial_h;
+        // 2. choose the following for a staggered implementation
+        const auto actual_h = I.current_h;
+
         trial_stiffness(u_dof, u_dof) += t_factor * damage * I.b_mat.t() * I.m_material->get_trial_stiffness() * I.b_mat;
-        trial_stiffness(u_dof, d_dof) -= t_factor * 2. * pow_term * I.b_mat.t() * I.m_material->get_trial_stress() * I.n_mat;
-        trial_stiffness(d_dof, d_dof) += t_factor * (2. * I.maximum_energy + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat + t_factor * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
+        trial_stiffness(d_dof, d_dof) += t_factor * (2. * actual_h + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat + t_factor * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
 
         trial_resistance(u_dof) += t_factor * damage * I.b_mat.t() * I.m_material->get_trial_stress();
-        trial_resistance(d_dof) -= t_factor * 2. * I.maximum_energy * I.n_mat.t();
+        trial_resistance(d_dof) -= t_factor * 2. * actual_h * I.n_mat.t();
     }
 
     trial_resistance(d_dof) += trial_stiffness(d_dof, d_dof) * t_damage;
@@ -152,7 +168,7 @@ int DCP4::clear_status() {
 
 int DCP4::reset_status() {
     auto code = 0;
-    for(const auto& I : int_pt) code += I.m_material->reset_status();
+    for(auto& I : int_pt) code += I.reset_status();
     return code;
 }
 
