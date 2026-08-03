@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from pathlib import Path
-from difflib import unified_diff
 import sys
 import tarfile
+from difflib import unified_diff
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 skip_files: tuple = (
@@ -20,10 +20,7 @@ skip_files: tuple = (
 def skip(line: str):
     if "Time Wasted" in line:
         return True
-    if "by tlc @" in line:
-        return True
-
-    return False
+    return "by tlc @" in line
 
 
 def readlines(file_path: Path):
@@ -66,9 +63,9 @@ def compare_folders(current: Path, parent: Path):
             print(f"\n{'=' * 80}\nComparing: {relative_path}...\n{'=' * 80}")
 
             for line in lines:
-                print(line)
+                print(line.rstrip())
 
-        except Exception as e:
+        except Exception as e:  # noqa
             print(f"Error reading files: {e}.")
 
     return error_flag
