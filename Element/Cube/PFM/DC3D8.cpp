@@ -55,8 +55,9 @@ int DC3D8::IntegrationPoint::reset_status() {
     return c_material->reset_status();
 }
 
-DC3D8::DC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
+DC3D8::DC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const bool MN)
     : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE})
+    , monolithic(MN)
     , release_rate(RR) { access::rw(characteristic_length) = CL; }
 
 int DC3D8::initialize(const shared_ptr<DomainBase>& D) {
@@ -106,16 +107,14 @@ int DC3D8::update_status() {
 
         I.trial_h = .5 * dot(I.c_material->get_trial_strain(), I.c_material->get_trial_stress());
 
+        auto actual_h = I.current_h;
         if(I.trial_h < I.current_h) I.trial_h = I.current_h;
-        // 1. choose the following for a consistent monolithic implementation
-        // else {
-        //     const mat couple_mat = I.weight * 2. * pow_term * I.strain_mat.t() * I.c_material->get_trial_stress() * I.n_mat;
-        //     trial_stiffness(u_dof, d_dof) -= couple_mat;
-        //     trial_stiffness(d_dof, u_dof) -= couple_mat.t();
-        // }
-        // const auto actual_h = I.trial_h;
-        // 2. choose the following for a staggered implementation
-        const auto actual_h = I.current_h;
+        else if(monolithic) {
+            const mat couple_mat = I.weight * 2. * pow_term * I.strain_mat.t() * I.c_material->get_trial_stress() * I.n_mat;
+            trial_stiffness(u_dof, d_dof) -= couple_mat;
+            trial_stiffness(d_dof, u_dof) -= couple_mat.t();
+            actual_h = I.trial_h;
+        }
 
         trial_stiffness(u_dof, u_dof) += I.weight * damage * I.strain_mat.t() * I.c_material->get_trial_stiffness() * I.strain_mat;
         trial_stiffness(d_dof, d_dof) += I.weight * (2. * actual_h + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat + I.weight * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;

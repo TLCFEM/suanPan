@@ -33,17 +33,18 @@
 #include <Element/MaterialElement.h>
 
 class DC3D4 final : public MaterialElement3D {
-    static constexpr unsigned c_node = 4, c_dof = 4, c_size = c_dof * c_node;
+    static constexpr unsigned c_node{4u}, c_dof{4u}, c_size = c_dof * c_node;
     static const uvec u_dof, d_dof;
 
+    const bool monolithic;
     const double release_rate;
     const double volume = 0.;
 
-    mat n_mat, pn_mat, b_mat;
+    double current_h = 0., trial_h = 0.;
 
     unique_ptr<Material> c_material;
 
-    double current_h = 0., trial_h = 0.;
+    mat n_mat, pn_mat, b_mat;
 
 public:
     DC3D4(
@@ -51,7 +52,8 @@ public:
         uvec&&,   // node tag
         unsigned, // material tag
         double,   // characteristic length
-        double    // energy release rate
+        double,   // energy release rate
+        bool      // monolithic
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

@@ -32,27 +32,29 @@
 #include <Element/MaterialElement.h>
 
 class DCP3 final : public MaterialElement2D {
-    static constexpr unsigned m_node = 3, m_dof = 3, m_size = m_dof * m_node;
+    static constexpr unsigned m_node{3u}, m_dof{3u}, m_size = m_dof * m_node;
     static const uvec u_dof, d_dof;
 
+    const bool monolithic;
     const double release_rate;
     const double thickness; // thickness
     const double area = 0.; // area
 
-    mat n_mat, pn_mat, b_mat;
+    double current_h = 0., trial_h = 0.;
 
     unique_ptr<Material> m_material; // store material model
 
-    double current_h = 0., trial_h = 0.;
+    mat n_mat, pn_mat, b_mat;
 
 public:
     DCP3(
-        unsigned,   // tag
-        uvec&&,     // node tag
-        unsigned,   // material tag
-        double,     // characteristic length
-        double,     // energy release rate
-        double = 1. // thickness
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // characteristic length
+        double,   // energy release rate
+        double,   // thickness
+        bool      // monolithic
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

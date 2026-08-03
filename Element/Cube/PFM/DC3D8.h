@@ -47,10 +47,11 @@ class DC3D8 final : public MaterialElement3D {
         [[nodiscard]] int reset_status();
     };
 
-    static constexpr unsigned c_node = 8, c_dof = 4, c_size = c_dof * c_node;
+    static constexpr unsigned c_node{8u}, c_dof{4u}, c_size = c_dof * c_node;
 
     static const uvec u_dof, d_dof;
 
+    const bool monolithic;
     const double release_rate;
 
     std::vector<IntegrationPoint> int_pt;
@@ -61,7 +62,8 @@ public:
         uvec&&,   // node tag
         unsigned, // material tag
         double,   // characteristic length
-        double    // release rate
+        double,   // release rate
+        bool      // monolithic
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

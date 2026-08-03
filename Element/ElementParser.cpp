@@ -1040,7 +1040,7 @@ namespace {
         return_obj = std::make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
-    void new_dc3d4(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    template<bool monolithic> void new_dc3d4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1071,10 +1071,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate);
+        return_obj = std::make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate, monolithic);
     }
 
-    void new_dc3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    template<bool monolithic> void new_dc3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1105,10 +1105,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate);
+        return_obj = std::make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate, monolithic);
     }
 
-    void new_dcp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    template<bool monolithic> void new_dcp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1145,10 +1145,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness);
+        return_obj = std::make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness, monolithic);
     }
 
-    void new_dcp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    template<bool monolithic> void new_dcp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1185,7 +1185,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness);
+        return_obj = std::make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness, monolithic);
     }
 
     void new_dkt3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2614,10 +2614,14 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "Damper04")) new_damper02(new_element, command, 3);
     else if(is_equal(element_id, "Damper05")) new_damper05(new_element, command, 2);
     else if(is_equal(element_id, "Damper06")) new_damper05(new_element, command, 3);
-    else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
-    else if(is_equal(element_id, "DC3D8")) new_dc3d8(new_element, command);
-    else if(is_equal(element_id, "DCP3")) new_dcp3(new_element, command);
-    else if(is_equal(element_id, "DCP4")) new_dcp4(new_element, command);
+    else if(is_equal(element_id, "DC3D4")) new_dc3d4<false>(new_element, command);
+    else if(is_equal(element_id, "DC3D4M")) new_dc3d4<true>(new_element, command);
+    else if(is_equal(element_id, "DC3D8")) new_dc3d8<false>(new_element, command);
+    else if(is_equal(element_id, "DC3D8M")) new_dc3d8<true>(new_element, command);
+    else if(is_equal(element_id, "DCP3")) new_dcp3<false>(new_element, command);
+    else if(is_equal(element_id, "DCP3M")) new_dcp3<true>(new_element, command);
+    else if(is_equal(element_id, "DCP4")) new_dcp4<false>(new_element, command);
+    else if(is_equal(element_id, "DCP4M")) new_dcp4<true>(new_element, command);
     else if(is_equal(element_id, "DKT3")) new_dkt3(new_element, command);
     else if(is_equal(element_id, "DKT4")) new_dkt4(new_element, command);
     else if(is_equal(element_id, "DKTS3")) new_dkts3(new_element, command);

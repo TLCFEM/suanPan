@@ -47,10 +47,11 @@ class DCP4 final : public MaterialElement2D {
         [[nodiscard]] int reset_status();
     };
 
-    static constexpr unsigned m_node = 4, m_dof = 3, m_size = m_dof * m_node;
+    static constexpr unsigned m_node{4u}, m_dof{3u}, m_size = m_dof * m_node;
 
     static const uvec u_dof, d_dof;
 
+    const bool monolithic;
     const double release_rate;
     const double thickness;
 
@@ -58,12 +59,13 @@ class DCP4 final : public MaterialElement2D {
 
 public:
     DCP4(
-        unsigned,   // tag
-        uvec&&,     // node tag
-        unsigned,   // material tag
-        double,     // characteristic length
-        double,     // energy release rate
-        double = 1. // thickness
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // characteristic length
+        double,   // energy release rate
+        double,   // thickness
+        bool      // monolithic
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

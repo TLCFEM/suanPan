@@ -50,8 +50,9 @@ int DCP4::IntegrationPoint::reset_status() {
     return m_material->reset_status();
 }
 
-DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const double TH)
+DCP4::DCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const double TH, const bool MN)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::DAMAGE})
+    , monolithic(MN)
     , release_rate(RR)
     , thickness(TH) { access::rw(characteristic_length) = CL; }
 
@@ -131,16 +132,14 @@ int DCP4::update_status() {
 
         I.trial_h = .5 * dot(I.m_material->get_trial_strain(), I.m_material->get_trial_stress());
 
+        auto actual_h = I.current_h;
         if(I.trial_h < I.current_h) I.trial_h = I.current_h;
-        // 1. choose the following for a consistent monolithic implementation
-        // else {
-        //     const mat couple_mat = t_factor * 2. * pow_term * I.b_mat.t() * I.m_material->get_trial_stress() * I.n_mat;
-        //     trial_stiffness(u_dof, d_dof) -= couple_mat;
-        //     trial_stiffness(d_dof, u_dof) -= couple_mat.t();
-        // }
-        // const auto actual_h = I.trial_h;
-        // 2. choose the following for a staggered implementation
-        const auto actual_h = I.current_h;
+        else if(monolithic) {
+            const mat couple_mat = t_factor * 2. * pow_term * I.b_mat.t() * I.m_material->get_trial_stress() * I.n_mat;
+            trial_stiffness(u_dof, d_dof) -= couple_mat;
+            trial_stiffness(d_dof, u_dof) -= couple_mat.t();
+            actual_h = I.trial_h;
+        }
 
         trial_stiffness(u_dof, u_dof) += t_factor * damage * I.b_mat.t() * I.m_material->get_trial_stiffness() * I.b_mat;
         trial_stiffness(d_dof, d_dof) += t_factor * (2. * actual_h + release_rate / characteristic_length) * I.n_mat.t() * I.n_mat + t_factor * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;

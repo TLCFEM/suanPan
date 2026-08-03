@@ -25,8 +25,9 @@
 const uvec DC3D4::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14};
 const uvec DC3D4::d_dof{3, 7, 11, 15};
 
-DC3D4::DC3D4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR)
+DC3D4::DC3D4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const bool MN)
     : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE})
+    , monolithic(MN)
     , release_rate(RR) { access::rw(characteristic_length) = CL; }
 
 int DC3D4::initialize(const shared_ptr<DomainBase>& D) {
@@ -78,15 +79,13 @@ int DC3D4::update_status() {
 
     trial_h = .5 * dot(c_material->get_trial_strain(), c_material->get_trial_stress());
 
+    auto actual_h = current_h;
     if(trial_h < current_h) trial_h = current_h;
-    // 1. choose the following for a consistent monolithic implementation
-    // else {
-    //     trial_stiffness(u_dof, d_dof) = -2. * pow_term * b_mat.t() * c_material->get_trial_stress() * n_mat;
-    //     trial_stiffness(d_dof, u_dof) = trial_stiffness(u_dof, d_dof).t();
-    // }
-    // const auto actual_h = trial_h;
-    // 2. choose the following for a staggered implementation
-    const auto actual_h = current_h;
+    else if(monolithic) {
+        trial_stiffness(u_dof, d_dof) = -2. * pow_term * b_mat.t() * c_material->get_trial_stress() * n_mat;
+        trial_stiffness(d_dof, u_dof) = trial_stiffness(u_dof, d_dof).t();
+        actual_h = trial_h;
+    }
 
     trial_stiffness(u_dof, u_dof) = damage * b_mat.t() * c_material->get_trial_stiffness() * b_mat;
     trial_stiffness(d_dof, d_dof) = n_mat.t() * n_mat * (2. * actual_h + release_rate / characteristic_length) + release_rate * characteristic_length * pn_mat.t() * pn_mat;
