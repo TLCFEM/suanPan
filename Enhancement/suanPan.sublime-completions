@@ -1228,13 +1228,13 @@
       "trigger": "LineUDL2D",
       "details": "2d linear udl",
       "kind": "keyword",
-      "contents": "lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "LineUDL3D",
       "details": "3d linear udl",
       "kind": "keyword",
-      "contents": "lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "Linear",
@@ -2242,7 +2242,7 @@
       "trigger": "acceleration",
       "details": "acceleration load",
       "kind": "keyword",
-      "contents": "acceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload acceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# [5...] int, node tags"
+      "contents": "acceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload acceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# [5...] int, node tags"
     },
     {
       "trigger": "band_mat",
@@ -2254,7 +2254,7 @@
       "trigger": "bodyforce",
       "details": "body force load",
       "kind": "keyword",
-      "contents": "bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, element tags"
+      "contents": "bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, element tags"
     },
     {
       "trigger": "clear",
@@ -2266,7 +2266,7 @@
       "trigger": "cload",
       "details": "concentrated nodal load",
       "kind": "keyword",
-      "contents": "cload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload cload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "cload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload cload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "color_model",
@@ -2302,7 +2302,7 @@
       "trigger": "displacement",
       "details": "prescribed displacement",
       "kind": "keyword",
-      "contents": "displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "domain",
@@ -2587,6 +2587,12 @@
       "contents": "recorder ${1:(1)} hdf5 ${2:(2)} ${3:(3)} ${4:[every 4]} ${5:[5...]}\nrecorder ${1:(1)} plain ${2:(2)} ${3:(3)} ${4:[every 4]} ${5:[5...]}\n# (1) int, unique recorder tag\n# (2) string, recorder type\n# (3) string, object type that needs to be recorded\n# [4] int, optional argument with leading keyword \"every\" to indicate the interval of recording\n# [5...] int, tags of elements/nodes, etc."
     },
     {
+      "trigger": "refload",
+      "details": "reference nodal load",
+      "kind": "keyword",
+      "contents": "refload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload refload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
+    },
+    {
       "trigger": "reset",
       "details": "reset domain",
       "kind": "keyword",
@@ -2632,19 +2638,19 @@
       "trigger": "supportacceleration",
       "details": "acceleration load on support",
       "kind": "keyword",
-      "contents": "supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "supportdisplacement",
       "details": "displacement load on support",
       "kind": "keyword",
-      "contents": "supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "supportvelocity",
       "details": "velocity load on support",
       "kind": "keyword",
-      "contents": "supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "symm_mat",
