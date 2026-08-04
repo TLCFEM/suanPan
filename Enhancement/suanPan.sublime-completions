@@ -1300,7 +1300,7 @@
       "trigger": "MPC",
       "details": "multi-point constraint",
       "kind": "keyword",
-      "contents": "mpc ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\nconstraint mpc ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique constraint tag\n# (2) int, amplitude tag, can be zero\n# (3) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (4) int, node tag\n# (5) int, dof tag\n# (6) double, weight"
+      "contents": "mpc ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\nconstraint mpc ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique constraint tag\n# (2) int, amplitude tag, can be zero\n# (3) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (4) int, node tag\n# (5) string, dof token\n# (6) double, weight"
     },
     {
       "trigger": "MPDC",
