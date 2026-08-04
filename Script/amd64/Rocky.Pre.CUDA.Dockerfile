@@ -3,7 +3,7 @@
 # Compared to the Rocky.Pre.Dockerfile, it adds the CUDA toolkit.
 # If you need the GPU related solvers, you should use this Dockerfile.
 
-FROM nvidia/cuda:12.9.1-devel-rockylinux9
+FROM nvidia/cuda:13.3.1-devel-rockylinux9
 
 RUN dnf install -y dnf-plugins-core && \
     dnf config-manager --enable crb && \
@@ -15,15 +15,15 @@ RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6a17080f
     bash ./intel-onemkl-2025.3.1.11_offline.sh -a --silent --eula accept && \
     rm intel-onemkl-2025.3.1.11_offline.sh
 
+RUN mkdir magma-build && cd magma-build && \
+    wget -q https://icl.utk.edu/projectsfiles/magma/downloads/magma-2.10.0.tar.gz && tar xf magma-2.10.0.tar.gz && \
+    source /opt/intel/oneapi/setvars.sh && cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGET="Turing Ampere Hopper" -DBUILD_SHARED_LIBS=OFF -DFORTRAN_CONVENTION="-DADD_" -DBLA_STATIC=ON -DBLA_VENDOR="Intel10_64lp" ./magma-2.10.0 && \
+    make install -j"$(nproc)" && cd .. && rm -r magma-build
+
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.6/VTK-9.6.2.tar.gz && tar xf VTK-9.6.2.tar.gz && \
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.6.2 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
-
-RUN mkdir magma-build && cd magma-build && \
-    wget -q https://icl.utk.edu/projectsfiles/magma/downloads/magma-2.9.0.tar.gz && tar xf magma-2.9.0.tar.gz && \
-    source /opt/intel/oneapi/setvars.sh && cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGET="Turing Ampere Hopper" -DBUILD_SHARED_LIBS=OFF -DFORTRAN_CONVENTION="-DADD_" -DBLA_STATIC=ON -DBLA_VENDOR="Intel10_64lp" ./magma-2.9.0 && \
-    make install -j"$(nproc)" && cd .. && rm -r magma-build
 
 ARG USERNAME=nonroot
 ARG USER_UID=1000
