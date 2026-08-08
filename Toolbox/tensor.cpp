@@ -163,8 +163,8 @@ double tensor::stress::invariant3(const vec& S) {
 double tensor::strain::lode(vec E) {
     E = dev(E);
 
-    if(3 == E.n_elem) return std::max(-1., std::min(1., sqrt(54.) * prod(normalise(E))));
-    if(6 == E.n_elem) return std::max(-1., std::min(1., sqrt(54.) * det(to_tensor(E) / norm(E))));
+    if(3 == E.n_elem) return std::clamp(sqrt(54.) * prod(normalise(E)), -1., 1.);
+    if(6 == E.n_elem) return std::clamp(sqrt(54.) * det(to_tensor(E) / norm(E)), -1., 1.);
 
     throw std::invalid_argument("need a valid strain vector");
 }
@@ -172,8 +172,8 @@ double tensor::strain::lode(vec E) {
 double tensor::stress::lode(vec S) {
     S = dev(S);
 
-    if(3 == S.n_elem) return std::max(-1., std::min(1., sqrt(54.) * prod(normalise(S))));
-    if(6 == S.n_elem) return std::max(-1., std::min(1., sqrt(54.) * det(to_tensor(S) / norm(S))));
+    if(3 == S.n_elem) return std::clamp(sqrt(54.) * prod(normalise(S)), -1., 1.);
+    if(6 == S.n_elem) return std::clamp(sqrt(54.) * det(to_tensor(S) / norm(S)), -1., 1.);
 
     throw std::invalid_argument("need a valid stress vector");
 }
