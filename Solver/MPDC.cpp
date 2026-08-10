@@ -46,11 +46,11 @@ int MPDC::analyze() {
         if(SUANPAN_SUCCESS != G->update_trial_status(false)) return SUANPAN_FAIL;
         // process modifiers
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
-        D->update<Statistics::UpdateStatus>(t_clock.toc());
+        D->update<Statistics::UpdateStatus>(t_clock);
         // assemble resistance
         t_clock.tic();
         G->assemble_resistance();
-        D->update<Statistics::AssembleVector>(t_clock.toc());
+        D->update<Statistics::AssembleVector>(t_clock);
 
         if(constant_matrix()) {
             // some loads may have resistance
@@ -58,25 +58,25 @@ int MPDC::analyze() {
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             // some constraints may have resistance
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
-            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+            D->update<Statistics::ProcessConstraint>(t_clock);
         }
         else {
             // assemble stiffness
             t_clock.tic();
             G->assemble_matrix();
-            D->update<Statistics::AssembleMatrix>(t_clock.toc());
+            D->update<Statistics::AssembleMatrix>(t_clock);
             // process loads
             t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             // process constraints
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
-            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+            D->update<Statistics::ProcessConstraint>(t_clock);
 
             // indicate the global matrix has been assembled
             t_clock.tic();
             G->assemble_effective_matrix();
             G->set_matrix_assembled_switch();
-            D->update<Statistics::AssembleEffectiveMatrix>(t_clock.toc());
+            D->update<Statistics::AssembleEffectiveMatrix>(t_clock);
         }
 
         t_clock.tic();
@@ -100,7 +100,7 @@ int MPDC::analyze() {
 
         samurai += disp_a * incre_lambda;
 
-        D->update<Statistics::SolveSystem>(t_clock.toc());
+        D->update<Statistics::SolveSystem>(t_clock);
 
         // avoid machine error accumulation
         G->erase_machine_error(samurai);

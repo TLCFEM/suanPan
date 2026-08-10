@@ -53,33 +53,33 @@ int Newton::analyze() {
         t_clock.tic();
         if(SUANPAN_SUCCESS != G->update_trial_status(false)) return SUANPAN_FAIL;
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
-        D->update<Statistics::UpdateStatus>(t_clock.toc());
+        D->update<Statistics::UpdateStatus>(t_clock);
 
         t_clock.tic();
         G->assemble_resistance();
-        D->update<Statistics::AssembleVector>(t_clock.toc());
+        D->update<Statistics::AssembleVector>(t_clock);
 
         if((initial_stiffness && counter != 0) || constant_matrix()) {
             t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
-            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+            D->update<Statistics::ProcessConstraint>(t_clock);
         }
         else {
             t_clock.tic();
             G->assemble_matrix();
-            D->update<Statistics::AssembleMatrix>(t_clock.toc());
+            D->update<Statistics::AssembleMatrix>(t_clock);
 
             t_clock.tic();
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
-            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+            D->update<Statistics::ProcessConstraint>(t_clock);
 
             // indicate the global matrix has been assembled
             t_clock.tic();
             G->assemble_effective_matrix();
             G->set_matrix_assembled_switch();
-            D->update<Statistics::AssembleEffectiveMatrix>(t_clock.toc());
+            D->update<Statistics::AssembleEffectiveMatrix>(t_clock);
         }
 
         // call solver
@@ -117,7 +117,7 @@ int Newton::analyze() {
             samurai -= aux_right * aux_lambda;
         }
 
-        D->update<Statistics::SolveSystem>(t_clock.toc());
+        D->update<Statistics::SolveSystem>(t_clock);
 
         if(initial_stiffness) {
             if(!aitken) {

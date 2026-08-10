@@ -58,29 +58,29 @@ int BFGS::analyze() {
         // update for nodes and elements
         if(SUANPAN_SUCCESS != G->update_trial_status(false)) return SUANPAN_FAIL;
         if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
-        D->update<Statistics::UpdateStatus>(t_clock.toc());
+        D->update<Statistics::UpdateStatus>(t_clock);
 
         t_clock.tic();
         G->assemble_resistance();
-        D->update<Statistics::AssembleVector>(t_clock.toc());
+        D->update<Statistics::AssembleVector>(t_clock);
 
         if(0 == counter) {
             t_clock.tic();
             // assemble stiffness for the first iteration
             G->assemble_matrix();
-            D->update<Statistics::AssembleMatrix>(t_clock.toc());
+            D->update<Statistics::AssembleMatrix>(t_clock);
 
             t_clock.tic();
             // process loads and constraints
             if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
-            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+            D->update<Statistics::ProcessConstraint>(t_clock);
 
             // indicate the global matrix has been assembled
             t_clock.tic();
             G->assemble_effective_matrix();
             G->set_matrix_assembled_switch();
-            D->update<Statistics::AssembleEffectiveMatrix>(t_clock.toc());
+            D->update<Statistics::AssembleEffectiveMatrix>(t_clock);
 
             if(0 != W->get_multiplier_size()) {
                 suanpan_error("(L-)BFGS solver does not support constraints implemented via the Lagrange multiplier method.\n");
@@ -90,14 +90,14 @@ int BFGS::analyze() {
             t_clock.tic();
             // solve the system and commit current displacement increment
             if(SUANPAN_SUCCESS != G->solve(samurai, residual = G->get_force_residual())) return SUANPAN_FAIL;
-            D->update<Statistics::SolveSystem>(t_clock.toc());
+            D->update<Statistics::SolveSystem>(t_clock);
         }
         else {
             t_clock.tic();
             // process resistance of loads and constraints
             if(SUANPAN_SUCCESS != G->process_load_resistance()) return SUANPAN_FAIL;
             if(SUANPAN_SUCCESS != G->process_constraint_resistance()) return SUANPAN_FAIL;
-            D->update<Statistics::ProcessConstraint>(t_clock.toc());
+            D->update<Statistics::ProcessConstraint>(t_clock);
 
             t_clock.tic();
 
@@ -118,7 +118,7 @@ int BFGS::analyze() {
             // left side loop
             for(size_t I = 0, J = hist_rho.size() - 1; I < hist_rho.size(); ++I, --J) samurai += (hist_alpha[J] - dot(hist_y[I], samurai)) / hist_rho[I] * hist_s[I];
 
-            D->update<Statistics::SolveSystem>(t_clock.toc());
+            D->update<Statistics::SolveSystem>(t_clock);
         }
 
         // commit current displacement increment

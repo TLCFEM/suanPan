@@ -83,7 +83,7 @@ int Bead::analyze() {
             t_clock.tic();
             if(SUANPAN_FAIL == t_step->Step::initialize()) return SUANPAN_FAIL;
             if(SUANPAN_FAIL == t_step->initialize()) return SUANPAN_FAIL;
-            t_domain->update<Statistics::Initialization>(t_clock.toc());
+            t_domain->update<Statistics::Initialization>(t_clock);
             if(initial_record) {
                 initial_record = false;
                 t_domain->record();
