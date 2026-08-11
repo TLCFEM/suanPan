@@ -41,6 +41,8 @@ int Newton::analyze() {
 
     inner_product = datum::eps;
 
+    auto last_residual_norm = datum::pos_inf;
+
     vec samurai, pre_samurai;
 
     auto aitken = false;
@@ -102,10 +104,16 @@ int Newton::analyze() {
             return flag;
         }
 
-        inner_product = std::max(inner_product, std::fabs(dot(samurai, residual)));
+        if(const auto current_residual_norm = norm(residual); current_residual_norm < last_residual_norm) {
+            // happy path
+            last_residual_norm = current_residual_norm;
 
-        if(0u < counter)
-            if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
+            inner_product = std::max(inner_product, std::fabs(dot(samurai, residual)));
+
+            if(0u < counter)
+                if(const auto amp = amplification(samurai, residual); amp > 0.) samurai *= amp;
+        }
+        else samurai *= .5; // residual is not decreasing, halve the increment
 
         // deal with mpc
         if(const auto n_size = W->get_size(); 0 != W->get_multiplier_size()) {
@@ -162,7 +170,7 @@ void Newton::print() {
 
 double AICN::amplification(const vec& x, const vec& r) const {
     const auto hessian_norm = dot(x, r);
-    if(hessian_norm <= 0.) return 0.;
+    if(hessian_norm <= 0.) return datum::neg_inf;
 
     static constexpr auto ratio = .9;
     static constexpr auto factor = 2. / ratio * (1. / ratio - 1.);

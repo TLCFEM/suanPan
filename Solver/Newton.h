@@ -33,7 +33,7 @@
 class Newton : public Solver {
     const bool initial_stiffness;
 
-    [[nodiscard]] virtual double amplification(const vec&, const vec&) const { return 0.; }
+    [[nodiscard]] virtual double amplification(const vec&, const vec&) const { return datum::neg_inf; }
 
 protected:
     double inner_product = 0.;
