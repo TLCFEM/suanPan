@@ -41,7 +41,7 @@ int DC3D4::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(volume) = det(ele_coor) / 6.;
 
-    if(0. >= characteristic_length) access::rw(characteristic_length) = 2. * pow(volume, 1. / 3.);
+    if(characteristic_length < 0.) access::rw(characteristic_length) = 2. * std::cbrt(volume);
 
     const mat inv_coor = inv(ele_coor);
 

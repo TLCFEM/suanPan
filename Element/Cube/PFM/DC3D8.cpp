@@ -63,26 +63,27 @@ DC3D8::DC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL, cons
 int DC3D8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    const auto ele_coor = get_coordinate(3);
-
-    auto& ini_stiffness = material_proto->get_initial_stiffness();
-
     const IntegrationPlan plan(3, 2, IntegrationPlan::Type::GAUSS);
-
-    initial_stiffness.zeros(c_size, c_size);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
+
+    const auto ele_coor = get_coordinate(3);
+    auto volume{0.};
     for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const auto pn = shape::cube(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), shape::cube(t_vec, 0), solve(jacob, pn));
+        volume += int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), shape::cube(t_vec, 0), solve(jacob, pn)).weight;
+    }
+    if(characteristic_length < 0.) access::rw(characteristic_length) = std::cbrt(volume);
 
-        const auto& c_pt = int_pt.back();
-        initial_stiffness(u_dof, u_dof) += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
-        initial_stiffness(d_dof, d_dof) += c_pt.weight * release_rate / characteristic_length * c_pt.n_mat.t() * c_pt.n_mat;
-        initial_stiffness(d_dof, d_dof) += c_pt.weight * release_rate * characteristic_length * c_pt.pn_mat.t() * c_pt.pn_mat;
+    auto& ini_stiffness = material_proto->get_initial_stiffness();
+    initial_stiffness.zeros(c_size, c_size);
+    for(const auto& I : int_pt) {
+        initial_stiffness(u_dof, u_dof) += I.weight * I.strain_mat.t() * ini_stiffness * I.strain_mat;
+        initial_stiffness(d_dof, d_dof) += I.weight * release_rate / characteristic_length * I.n_mat.t() * I.n_mat;
+        initial_stiffness(d_dof, d_dof) += I.weight * release_rate * characteristic_length * I.pn_mat.t() * I.pn_mat;
     }
     trial_stiffness = current_stiffness = initial_stiffness;
 
