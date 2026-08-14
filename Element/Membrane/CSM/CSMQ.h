@@ -31,12 +31,14 @@
 #define CSMQ_H
 
 #include <Element/MaterialElement.h>
+#include <Material/CoupleMaterial.h>
 
 class CSMQ : public MaterialElement2D {
     struct IntegrationPoint final {
         vec coor;
         double weight;
         unique_ptr<Material> m_material;
+        unique_ptr<IsotropicCouple> m_couple;
         mat b1, b2, b3;
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&);
     };
