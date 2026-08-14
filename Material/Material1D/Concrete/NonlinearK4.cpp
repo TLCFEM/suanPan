@@ -110,7 +110,7 @@ double NonlinearK4::objective_scale(const double a, const double zeta) const {
     if(!objective_damage) return zeta;
 
     const auto ratio = a / zeta;
-    return 2. * a / (std::sqrt(1. + 4. / get_characteristic_length() * (ratio * ratio + ratio)) - 1.);
+    return 2. * a / (std::sqrt(1. + 4. / characteristic_length * (ratio * ratio + ratio)) - 1.);
 }
 
 NonlinearK4::NonlinearK4(const unsigned T, const double E, const double H, const double R, const bool FD, const bool FC, const bool OD)

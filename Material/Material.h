@@ -59,6 +59,7 @@ struct DataMaterial {
     const PlaneType plane_type = PlaneType::N;
 
     const double tolerance = 1E-14;
+    const double characteristic_length = 1.;
 
     vec current_strain{}; // current status
     vec trial_strain{};   // trial status
@@ -137,6 +138,8 @@ public:
     void set_symmetric(bool) const;
     [[nodiscard]] bool is_initialized() const;
     [[nodiscard]] bool is_symmetric() const;
+
+    void set_characteristic_length(const double L) const { access::rw(characteristic_length) = std::max(datum::eps, std::fabs(L)); }
 
     [[nodiscard]] virtual double get(Parameter) const;
 

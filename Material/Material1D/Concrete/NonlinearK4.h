@@ -18,6 +18,8 @@
  * @class NonlinearK4
  * @brief A ConcreteK4 material class.
  *
+ * doi:10.1061/(ASCE)ST.1943-541X.0002592
+ *
  * @author tlc
  * @date 05/09/2023
  * @version 0.1.0
