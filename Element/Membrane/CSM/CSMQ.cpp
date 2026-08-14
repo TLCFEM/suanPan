@@ -37,12 +37,14 @@ CSMQ::CSMQ(const unsigned T, uvec&& N, const unsigned M, const unsigned NN, cons
 int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(!material_proto->is_support_couple()) {
-        suanpan_warning("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
-        return SUANPAN_FAIL;
-    }
+    auto elastic_modulus = material_proto->get(Material::Parameter::ELASTIC);
+    auto poissons_ratio = material_proto->get(Material::Parameter::POISSON);
 
-    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) {
+        suanpan::hacker(thickness) = 1.;
+        elastic_modulus /= 1. - poissons_ratio * poissons_ratio;
+        poissons_ratio /= 1. - poissons_ratio;
+    }
 
     const auto ele_coor = get_coordinate(2);
 
@@ -70,8 +72,8 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
 
         auto& c_pt = int_pt.back();
 
-        c_pt.m_material->set_characteristic_length(characteristic_length);
-        c_pt.m_material->initialize_couple(D);
+        c_pt.m_couple = std::make_unique<IsotropicCouple>(elastic_modulus, poissons_ratio, characteristic_length);
+        c_pt.m_couple->initialize(D);
 
         mat phi_s(2, t_size, fill::zeros), l_p(3, t_size, fill::zeros), j_p(1, t_size, fill::zeros), j_q(2, r_size, fill::zeros);
 
@@ -94,7 +96,7 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
         const mat phi_a = shape::stress11(location(0), location(1));
         const mat phi_b = solve(c_pt.m_material->get_initial_stiffness(), phi_a);
 
-        E1 += c_pt.weight * phi_r.t() * c_pt.m_material->get_initial_couple_stiffness() * phi_r;
+        E1 += c_pt.weight * phi_r.t() * c_pt.m_couple->get_initial_stiffness() * phi_r;
         E2 += c_pt.weight * phi_b.t() * c_pt.m_material->get_initial_stiffness() * phi_b;
         H1 -= 2. * c_pt.weight * j_p.t() * j_s;
         H2 += c_pt.weight * l_p.t() * phi_a;
@@ -160,15 +162,15 @@ int CSMQ::update_status() {
 
     for(const auto& I : int_pt) {
         if(SUANPAN_SUCCESS != I.m_material->update_trial_status(I.b1 * t_disp(t_dof))) return SUANPAN_FAIL;
-        if(SUANPAN_SUCCESS != I.m_material->update_couple_trial_status(I.b2 * t_disp(t_dof) + I.b3 * t_disp(r_dof))) return SUANPAN_FAIL;
+        if(SUANPAN_SUCCESS != I.m_couple->update_trial_status(I.b2 * t_disp(t_dof) + I.b3 * t_disp(r_dof))) return SUANPAN_FAIL;
 
-        trial_stiffness(t_dof, t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stiffness() * I.b1 + I.weight * I.b2.t() * I.m_material->get_trial_couple_stiffness() * I.b2;
-        trial_stiffness(t_dof, r_dof) += I.weight * I.b2.t() * I.m_material->get_trial_couple_stiffness() * I.b3;
-        trial_stiffness(r_dof, t_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stiffness() * I.b2;
-        trial_stiffness(r_dof, r_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stiffness() * I.b3;
+        trial_stiffness(t_dof, t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stiffness() * I.b1 + I.weight * I.b2.t() * I.m_couple->get_trial_stiffness() * I.b2;
+        trial_stiffness(t_dof, r_dof) += I.weight * I.b2.t() * I.m_couple->get_trial_stiffness() * I.b3;
+        trial_stiffness(r_dof, t_dof) += I.weight * I.b3.t() * I.m_couple->get_trial_stiffness() * I.b2;
+        trial_stiffness(r_dof, r_dof) += I.weight * I.b3.t() * I.m_couple->get_trial_stiffness() * I.b3;
 
-        trial_resistance(t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stress() + I.weight * I.b2.t() * I.m_material->get_trial_couple_stress();
-        trial_resistance(r_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stress();
+        trial_resistance(t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stress() + I.weight * I.b2.t() * I.m_couple->get_trial_moment();
+        trial_resistance(r_dof) += I.weight * I.b3.t() * I.m_couple->get_trial_moment();
     }
 
     return SUANPAN_SUCCESS;
@@ -176,19 +178,19 @@ int CSMQ::update_status() {
 
 int CSMQ::commit_status() {
     auto code = 0;
-    for(const auto& I : int_pt) code += I.m_material->commit_status() + I.m_material->commit_couple_status();
+    for(const auto& I : int_pt) code += I.m_material->commit_status() + I.m_couple->commit_status();
     return code;
 }
 
 int CSMQ::clear_status() {
     auto code = 0;
-    for(const auto& I : int_pt) code += I.m_material->clear_status() + I.m_material->clear_couple_status();
+    for(const auto& I : int_pt) code += I.m_material->clear_status() + I.m_couple->clear_status();
     return code;
 }
 
 int CSMQ::reset_status() {
     auto code = 0;
-    for(const auto& I : int_pt) code += I.m_material->reset_status() + I.m_material->reset_couple_status();
+    for(const auto& I : int_pt) code += I.m_material->reset_status() + I.m_couple->reset_status();
     return code;
 }
 
