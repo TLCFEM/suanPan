@@ -5,6 +5,7 @@ add_subdirectory(MaterialOS)
 add_subdirectory(Special)
 
 target_sources(${PROJECT_NAME} PRIVATE
+        CoupleMaterial.cpp
         ExternalMaterial.cpp
         Material.cpp
         MaterialParser.cpp
