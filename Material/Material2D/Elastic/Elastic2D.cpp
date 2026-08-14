@@ -23,7 +23,7 @@
 Elastic2D::Elastic2D(const unsigned T, const double E, const double P, const double R, const PlaneType PT)
     : Material2D(T, PT, R)
     , elastic_modulus(E)
-    , poissons_ratio(P) { set_support_couple(true); }
+    , poissons_ratio(P) {}
 
 int Elastic2D::initialize(const shared_ptr<DomainBase>&) {
     const auto EE = plane_type == PlaneType::S ? elastic_modulus : elastic_modulus / (1. - poissons_ratio * poissons_ratio);
@@ -38,20 +38,6 @@ int Elastic2D::initialize(const shared_ptr<DomainBase>&) {
     ConstantStiffness(this);
 
     return SUANPAN_SUCCESS;
-}
-
-void Elastic2D::initialize_couple(const shared_ptr<DomainBase>&) {
-    if(characteristic_length < 0.) {
-        access::rw(characteristic_length) = 1.;
-        suanpan_warning("Characteristic length is set to unity.\n");
-    }
-
-    initial_couple_stiffness = 2. * characteristic_length * characteristic_length * elastic_modulus / (1. + poissons_ratio) * eye(2, 2);
-
-    trial_curvature = current_curvature.zeros(2);
-    trial_couple_stress = current_couple_stress.zeros(2);
-
-    ConstantCoupleStiffness(this);
 }
 
 double Elastic2D::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
