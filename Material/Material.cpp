@@ -20,6 +20,54 @@
 #include <Domain/DomainBase.h>
 #include <Recorder/OutputType.h>
 
+void ConstantStiffness(DataMaterial* M) {
+    M->current_stiffness = mat(M->initial_stiffness.memptr(), M->initial_stiffness.n_rows, M->initial_stiffness.n_cols, false, true);
+    M->trial_stiffness = mat(M->initial_stiffness.memptr(), M->initial_stiffness.n_rows, M->initial_stiffness.n_cols, false, true);
+}
+
+void ConstantDamping(DataMaterial* M) {
+    M->current_damping = mat(M->initial_damping.memptr(), M->initial_damping.n_rows, M->initial_damping.n_cols, false, true);
+    M->trial_damping = mat(M->initial_damping.memptr(), M->initial_damping.n_rows, M->initial_damping.n_cols, false, true);
+}
+
+void ConstantInertial(DataMaterial* M) {
+    M->current_inertial = mat(M->initial_inertial.memptr(), M->initial_inertial.n_rows, M->initial_inertial.n_cols, false, true);
+    M->trial_inertial = mat(M->initial_inertial.memptr(), M->initial_inertial.n_rows, M->initial_inertial.n_cols, false, true);
+}
+
+void PureWrapper(DataMaterial* M) {
+    M->current_strain.reset();
+    M->current_strain_rate.reset();
+    M->current_strain_acc.reset();
+    M->current_stress.reset();
+
+    M->trial_strain.reset();
+    M->trial_strain_rate.reset();
+    M->trial_strain_acc.reset();
+    M->trial_stress.reset();
+
+    M->incre_strain.reset();
+    M->incre_strain_rate.reset();
+    M->incre_strain_acc.reset();
+    M->incre_stress.reset();
+
+    M->initial_history.reset();
+    M->current_history.reset();
+    M->trial_history.reset();
+
+    M->initial_stiffness.reset();
+    M->current_stiffness.reset();
+    M->trial_stiffness.reset();
+
+    M->initial_damping.reset();
+    M->current_damping.reset();
+    M->trial_damping.reset();
+
+    M->initial_inertial.reset();
+    M->current_inertial.reset();
+    M->trial_inertial.reset();
+}
+
 Material::Material(const unsigned T, const MaterialType MT, const double D)
     : DataMaterial{.density = fabs(D), .material_type = MT}
     , CopyableTag(T) {}
@@ -204,54 +252,6 @@ std::vector<vec> Material::record(const OutputType P) const {
     if(P == OutputType::YF) return {vec{any(current_history != 0.) ? 1. : 0.}};
 
     return {};
-}
-
-void ConstantStiffness(DataMaterial* M) {
-    M->current_stiffness = mat(M->initial_stiffness.memptr(), M->initial_stiffness.n_rows, M->initial_stiffness.n_cols, false, true);
-    M->trial_stiffness = mat(M->initial_stiffness.memptr(), M->initial_stiffness.n_rows, M->initial_stiffness.n_cols, false, true);
-}
-
-void ConstantDamping(DataMaterial* M) {
-    M->current_damping = mat(M->initial_damping.memptr(), M->initial_damping.n_rows, M->initial_damping.n_cols, false, true);
-    M->trial_damping = mat(M->initial_damping.memptr(), M->initial_damping.n_rows, M->initial_damping.n_cols, false, true);
-}
-
-void ConstantInertial(DataMaterial* M) {
-    M->current_inertial = mat(M->initial_inertial.memptr(), M->initial_inertial.n_rows, M->initial_inertial.n_cols, false, true);
-    M->trial_inertial = mat(M->initial_inertial.memptr(), M->initial_inertial.n_rows, M->initial_inertial.n_cols, false, true);
-}
-
-void PureWrapper(DataMaterial* M) {
-    M->current_strain.reset();
-    M->current_strain_rate.reset();
-    M->current_strain_acc.reset();
-    M->current_stress.reset();
-
-    M->trial_strain.reset();
-    M->trial_strain_rate.reset();
-    M->trial_strain_acc.reset();
-    M->trial_stress.reset();
-
-    M->incre_strain.reset();
-    M->incre_strain_rate.reset();
-    M->incre_strain_acc.reset();
-    M->incre_stress.reset();
-
-    M->initial_history.reset();
-    M->current_history.reset();
-    M->trial_history.reset();
-
-    M->initial_stiffness.reset();
-    M->current_stiffness.reset();
-    M->trial_stiffness.reset();
-
-    M->initial_damping.reset();
-    M->current_damping.reset();
-    M->trial_damping.reset();
-
-    M->initial_inertial.reset();
-    M->current_inertial.reset();
-    M->trial_inertial.reset();
 }
 
 unique_ptr<Material> suanpan::unique_copy(const shared_ptr<Material>& P) { return nullptr == P ? nullptr : P->unique_copy(); }
