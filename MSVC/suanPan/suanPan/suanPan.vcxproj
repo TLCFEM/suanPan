@@ -290,6 +290,7 @@
     <ClCompile Include="..\..\..\Load\NodalForce.cpp" />
     <ClCompile Include="..\..\..\Load\ReferenceForce.cpp" />
     <ClCompile Include="..\..\..\Load\SupportMotion.cpp" />
+    <ClCompile Include="..\..\..\Material\CoupleMaterial.cpp" />
     <ClCompile Include="..\..\..\Material\ExternalMaterial.cpp" />
     <ClCompile Include="..\..\..\Material\Material.cpp" />
     <ClCompile Include="..\..\..\Material\Material1D\Concrete\ConcreteCM.cpp" />
@@ -751,6 +752,7 @@
     <ClInclude Include="..\..\..\Load\NodalForce.h" />
     <ClInclude Include="..\..\..\Load\ReferenceForce.h" />
     <ClInclude Include="..\..\..\Load\SupportMotion.h" />
+    <ClInclude Include="..\..\..\Material\CoupleMaterial.h" />
     <ClInclude Include="..\..\..\Material\ExternalMaterial.h" />
     <ClInclude Include="..\..\..\Material\ExternalMaterialData.h" />
     <ClInclude Include="..\..\..\Material\Material.h" />

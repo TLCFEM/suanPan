@@ -1561,6 +1561,9 @@
     <ClCompile Include="..\..\..\Element\Cube\PFM\DC3D8.cpp">
       <Filter>Element\Cube\PFM</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\CoupleMaterial.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
@@ -2925,6 +2928,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Cube\PFM\DC3D8.h">
       <Filter>Element\Cube\PFM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\CoupleMaterial.h">
+      <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

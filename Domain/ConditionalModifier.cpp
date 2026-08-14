@@ -60,7 +60,7 @@ uvec ConditionalModifier::collect_node_dof(const shared_ptr<DomainBase>& D) cons
 
     std::vector<uword> active_dof;
 
-    const auto check = [&](const shared_ptr<Node>& node, const unsigned tag) {
+    const auto check = [&](const shared_ptr<Node>& node, const uword tag) {
         if(!node || !node->is_active()) {
             suanpan_warning("Node {} does not exist or is not active, skipped.\n", tag);
             return;
