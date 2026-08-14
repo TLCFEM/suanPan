@@ -44,7 +44,7 @@ int DCP3::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(area) = .5 * det(ele_coor);
 
-    if(0. >= characteristic_length) access::rw(characteristic_length) = 2. * sqrt(area);
+    if(characteristic_length < 0.) access::rw(characteristic_length) = 2. * std::sqrt(area);
 
     const mat inv_coor = inv(ele_coor);
     pn_mat = inv_coor.rows(1, 2);
