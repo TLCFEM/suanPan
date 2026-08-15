@@ -1485,6 +1485,9 @@ int process_command(const shared_ptr<Bead>& model, const std::string_view comman
     if(is_equal(command_id, "groupdisp")) return load_handler();
     if(is_equal(command_id, "groupdisplacement")) return load_handler();
     if(is_equal(command_id, "groupdispload")) return load_handler();
+    if(is_equal(command_id, "grouprefereceload")) return load_handler();
+    if(is_equal(command_id, "grouprefforce")) return load_handler();
+    if(is_equal(command_id, "grouprefload")) return load_handler();
     if(is_equal(command_id, "lineudl2d")) return load_handler();
     if(is_equal(command_id, "lineudl3d")) return load_handler();
     if(is_equal(command_id, "refereceload")) return load_handler();

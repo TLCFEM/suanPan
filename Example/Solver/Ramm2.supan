@@ -1,0 +1,82 @@
+# A TEST MODEL FOR ARCLENGTH SOLVER
+
+node 1 0 0
+node 2 0 1
+node 3 0 2
+node 4 0 3
+node 5 0 4
+node 6 0 5
+node 7 0 6
+node 8 0 7
+node 9 0 8
+node 10 1 8
+node 11 2 8
+node 12 3 8
+node 13 4 8
+node 14 5 8
+node 15 6 8
+node 16 7 8
+node 17 8 8
+
+material Elastic1D 1 1000
+
+element EB21 1 1 2 1000 1 1 1
+element EB21 2 2 3 1000 1 1 1
+element EB21 3 3 4 1000 1 1 1
+element EB21 4 4 5 1000 1 1 1
+element EB21 5 5 6 1000 1 1 1
+element EB21 6 6 7 1000 1 1 1
+element EB21 7 7 8 1000 1 1 1
+element EB21 8 8 9 1000 1 1 1
+element EB21 9 9 10 1000 1 1 1
+element EB21 10 10 11 1000 1 1 1
+element EB21 11 11 12 1000 1 1 1
+element EB21 12 12 13 1000 1 1 1
+element EB21 13 13 14 1000 1 1 1
+element EB21 14 14 15 1000 1 1 1
+element EB21 15 15 16 1000 1 1 1
+element EB21 16 16 17 1000 1 1 1
+
+fix 1 1 1 17
+fix 2 2 1 17
+
+recorder 1 hdf5 Node U 11
+
+group NodeGroup 1 11 12
+
+grouprefload 1 0 -20 2 1
+
+step arclength 1
+solver Ramm 1
+set ini_step_size .1
+set min_step_size .05
+set max_step_size .2
+
+criterion MinDisplacement 1 11 2 -5.5
+
+converger RelIncreDisp 1 1E-10 6 1
+
+analyze
+
+# Node 11:
+# Coordinate:
+#   2.0000e+00  8.0000e+00
+# Displacement:
+#   5.9221e+00 -5.5175e+00  6.8177e-01
+# Resistance:
+#   4.0993e-10 -7.5805e+00 -1.1937e-12
+
+# Node 12:
+# Coordinate:
+#   3.0000e+00  8.0000e+00
+# Displacement:
+#   5.5715e+00 -4.7571e+00  1.0439e+00
+# Resistance:
+#   2.3854e-10 -7.5805e+00  1.5916e-12
+peek node 11 12
+
+peek solver 1
+
+# save recorder 1
+
+exit

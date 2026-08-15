@@ -33,7 +33,7 @@
 
 #include "Load.h"
 
-class ReferenceForce final : public Load {
+class ReferenceForce : public Load {
 public:
     ReferenceForce(
         unsigned,                // tag
@@ -44,7 +44,19 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    int process(const shared_ptr<DomainBase>&) override;
+    int process(const shared_ptr<DomainBase>&) final;
+};
+
+class GroupReferenceForce final : protected GroupModifier, public ReferenceForce {
+public:
+    GroupReferenceForce(
+        unsigned,                // tag
+        double,                  // magnitude
+        uvec&&,                  // group tags
+        std::vector<Node::DOF>&& // dof tag
+    );
+
+    int initialize(const shared_ptr<DomainBase>&) override;
 };
 
 #endif

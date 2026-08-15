@@ -37,3 +37,13 @@ int ReferenceForce::process(const shared_ptr<DomainBase>& D) {
 
     return SUANPAN_SUCCESS;
 }
+
+GroupReferenceForce::GroupReferenceForce(const unsigned T, const double L, uvec&& G, std::vector<Node::DOF>&& D)
+    : GroupModifier(std::move(G))
+    , ReferenceForce(T, L, {}, std::move(D)) {}
+
+int GroupReferenceForce::initialize(const shared_ptr<DomainBase>& D) {
+    target_node = update_object_tag(D);
+
+    return ReferenceForce::initialize(D);
+}
