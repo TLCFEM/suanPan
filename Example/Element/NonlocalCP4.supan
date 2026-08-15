@@ -15,7 +15,7 @@ node 11 8 2
 node 12 10 2
 
 material PlaneStress 1 2
-material NonlocalElastic3D 2 1E4 .2 1e1 1e2
+material NonlocalElastic3D 2 1E4 .2 1e1 1e-2
 
 element NonlocalCP4 1 1 2 8 7 1 1
 element NonlocalCP4 2 2 3 9 8 1 1
@@ -32,7 +32,7 @@ hdf5recorder 1 Sum RF1 6 12
 
 step static 1
 set fixed_step_size 1
-set ini_step_size 1E-2
+set ini_step_size 1E-1
 
 converger RelIncreDisp 1 1E-10 20 1
 
