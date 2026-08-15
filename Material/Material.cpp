@@ -81,7 +81,7 @@ PlaneType Material::get_plane_type() const { return plane_type; }
 int Material::initialize_base(const shared_ptr<DomainBase>&) {
     if(initialized) return SUANPAN_SUCCESS;
 
-    const auto size = static_cast<unsigned>(material_type);
+    const auto size = static_cast<unsigned>(material_type) + nonlocal_size();
 
     if(current_strain.is_empty()) current_strain.zeros(size);
     if(trial_strain.is_empty()) trial_strain.zeros(size);
@@ -113,6 +113,8 @@ bool Material::is_initialized() const { return initialized; }
 bool Material::is_symmetric() const { return symmetric; }
 
 double Material::get(Parameter) const { return 0.; }
+
+unique_ptr<Material> Material::unique_copy() { throw std::invalid_argument("hidden method unique_copy() called"); }
 
 const vec& Material::get_trial_strain() { return trial_strain; }
 
@@ -159,8 +161,6 @@ const mat& Material::get_initial_stiffness() const { return initial_stiffness; }
 const mat& Material::get_initial_damping() const { return initial_damping; }
 
 const mat& Material::get_initial_inertial() const { return initial_inertial; }
-
-unique_ptr<Material> Material::unique_copy() { throw std::invalid_argument("hidden method unique_copy() called"); }
 
 int Material::update_incre_status(const double i_strain) { return update_incre_status(vec{i_strain}); }
 

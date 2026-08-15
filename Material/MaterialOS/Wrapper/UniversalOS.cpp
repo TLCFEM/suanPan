@@ -35,7 +35,7 @@ OS146::OS146(const unsigned T, const unsigned BT, const unsigned MI)
 unique_ptr<Material> OS146::unique_copy() { return std::make_unique<OS146>(*this); }
 
 OS146S::OS146S(const unsigned T, const unsigned BT, const double G)
-    : Material(T, MaterialType::OS)
+    : Material(T, MaterialType::OS, 0.)
     , base_tag(BT)
     , shear_modulus(G) {}
 
