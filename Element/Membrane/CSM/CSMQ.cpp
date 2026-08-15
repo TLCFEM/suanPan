@@ -68,9 +68,7 @@ int CSMQ::initialize(const shared_ptr<DomainBase>& D) {
         const auto n = compute_shape_function(t_vec, 0);
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->unique_copy());
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->unique_copy());
 
         c_pt.m_couple = std::make_unique<IsotropicCouple>(elastic_modulus, poissons_ratio, characteristic_length);
         c_pt.m_couple->initialize(D);

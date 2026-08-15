@@ -52,9 +52,8 @@ int C3D8I::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), mat_proto->unique_copy(), solve(jacob, pn));
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), mat_proto->unique_copy(), solve(jacob, pn));
 
-        auto& c_pt = int_pt.back();
         for(unsigned J{0}, K{0}, L{1}, M{2}; J < c_node; ++J, K += c_dof, L += c_dof, M += c_dof) {
             c_pt.B1(0, K) = c_pt.B1(3, L) = c_pt.B1(5, M) = c_pt.pn_pxyz(0, J);
             c_pt.B1(3, K) = c_pt.B1(1, L) = c_pt.B1(4, M) = c_pt.pn_pxyz(1, J);

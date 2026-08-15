@@ -77,9 +77,7 @@ int DCP4::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{plan(I, 0), plan(I, 1)};
         const auto pn = shape::quad(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->unique_copy(), shape::quad(t_vec, 0), solve(jacob, pn));
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), material_proto->unique_copy(), shape::quad(t_vec, 0), solve(jacob, pn));
 
         for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += 2, L += 2) {
             c_pt.b_mat(0, K) = c_pt.b_mat(2, L) = c_pt.pn_mat(0, J);

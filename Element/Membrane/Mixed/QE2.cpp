@@ -71,9 +71,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const auto det_jacob = det(jacob);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det_jacob * thickness, mat_proto->unique_copy());
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det_jacob * thickness, mat_proto->unique_copy());
 
         const auto &X = c_pt.coor(0), &Y = c_pt.coor(1);
 

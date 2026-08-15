@@ -94,9 +94,7 @@ int S4::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(m_plan.n_rows);
     for(unsigned I{0}; I < m_plan.n_rows; ++I) {
-        int_pt.emplace_back(vec{m_plan(I, 0), m_plan(I, 1)});
-
-        auto& m_ip = int_pt.back();
+        auto& m_ip = int_pt.emplace_back(vec{m_plan(I, 0), m_plan(I, 1)});
 
         pn = shape::quad(m_ip.coor, 1);
         jacob = pn * ele_coor;

@@ -155,9 +155,7 @@ int DKTS3::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(3);
     for(unsigned I{0}; I < 3; ++I) {
-        int_pt.emplace_back(vec{ele_coor(I + 3u, 1), ele_coor(I + 3u, 2)});
-
-        auto& m_ip = int_pt.back();
+        auto& m_ip = int_pt.emplace_back(vec{ele_coor(I + 3u, 1), ele_coor(I + 3u, 2)});
 
         const mat pn_pxy = shape::triangle(m_ip.coor, 1) * inv_coor;
         m_ip.BM.row(0) = pn_pxy.row(0) * BMX;
