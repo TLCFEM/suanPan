@@ -18,6 +18,7 @@
 #include "StressWrapper.h"
 
 #include <Domain/DomainBase.h>
+#include <set>
 
 mat StressWrapper::form_stiffness(const mat& full_stiffness) const { return full_stiffness(F1, F1) - full_stiffness(F1, F2) * solve(full_stiffness(F2, F2), full_stiffness(F2, F1)); }
 

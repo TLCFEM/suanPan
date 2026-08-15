@@ -35,7 +35,7 @@ NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique
         strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = P(0, I);
         strain_mat(3, J) = strain_mat(1, K) = strain_mat(4, L) = P(1, I);
         strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = P(2, I);
-        strain_mat(6, Q) = -N(I);
+        strain_mat(6, Q) = N(I);
     }
 }
 
@@ -71,9 +71,9 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
         auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), n_mat, pn_mat);
 
         volume += c_pt.weight;
+        const_a -= c_pt.weight * n_mat.t() * n_mat;
+        const_b -= c_pt.weight * pn_mat.t() * pn_mat;
 
-        const_a += c_pt.weight * n_mat.t() * n_mat;
-        const_b += c_pt.weight * pn_mat.t() * pn_mat;
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
     access::rw(characteristic_length) = std::cbrt(volume);
