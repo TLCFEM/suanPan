@@ -23,8 +23,8 @@ const uvec NonlocalIsotropicElastic3D::u_dof{0, 1, 2, 3, 4, 5};
 const uvec NonlocalIsotropicElastic3D::d_dof{6};
 
 NonlocalIsotropicElastic3D::NonlocalIsotropicElastic3D(const unsigned T, const double E, const double P, const double ME, const double ER, const double R)
-    : DataNonlocalIsotropicElastic3D{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(P), .maximum_energy = std::fabs(ME), .evolution_rate = std::fabs(ER / E)}
-    , Material3D(T, R) {}
+    : DataNonlocalIsotropicElastic3D{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(P), .maximum_energy = std::fabs(ME), .evolution_rate = std::fabs(ER)}
+    , NonlocalMaterial3D(T, R) {}
 
 int NonlocalIsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio, nonlocal_size());

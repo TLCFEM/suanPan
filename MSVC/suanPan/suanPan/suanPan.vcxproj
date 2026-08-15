@@ -197,6 +197,7 @@
     <ClCompile Include="..\..\..\Element\Membrane\Infinite\CINP4.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\Mixed\PS.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\Mixed\QE2.cpp" />
+    <ClCompile Include="..\..\..\Element\Membrane\Nonlocal\NonlocalCP4.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\PFM\DCP3.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\PFM\DCP4.cpp" />
     <ClCompile Include="..\..\..\Element\Membrane\Plane\CP3.cpp" />
@@ -662,6 +663,7 @@
     <ClInclude Include="..\..\..\Element\Membrane\Infinite\CINP4.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Mixed\PS.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Mixed\QE2.h" />
+    <ClInclude Include="..\..\..\Element\Membrane\Nonlocal\NonlocalCP4.h" />
     <ClInclude Include="..\..\..\Element\Membrane\PFM\DCP3.h" />
     <ClInclude Include="..\..\..\Element\Membrane\PFM\DCP4.h" />
     <ClInclude Include="..\..\..\Element\Membrane\Plane\CP3.h" />

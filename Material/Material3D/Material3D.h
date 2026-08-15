@@ -42,6 +42,16 @@ public:
     [[nodiscard]] std::vector<vec> record(OutputType) const override;
 };
 
+class NonlocalMaterial3D : public Material {
+public:
+    NonlocalMaterial3D(
+        unsigned, // tag
+        double    // density
+    );
+
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
+};
+
 #endif
 
 //! @}

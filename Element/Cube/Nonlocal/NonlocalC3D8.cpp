@@ -30,8 +30,8 @@ NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique
     : coor(std::move(C))
     , weight(W)
     , c_material(std::move(M))
-    , strain_mat(7, 32) {
-    for(auto I = 0u, J = 0u, K = 1u, L = 2u, Q = 3u; I < c_node; ++I, J += 4u, K += 4u, L += 4u, Q += 4u) {
+    , strain_mat(7, c_size) {
+    for(auto I = 0u, J = 0u, K = 1u, L = 2u, Q = 3u; I < c_node; ++I, J += c_dof, K += c_dof, L += c_dof, Q += c_dof) {
         strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = P(0, I);
         strain_mat(3, J) = strain_mat(1, K) = strain_mat(4, L) = P(1, I);
         strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = P(2, I);
@@ -39,8 +39,8 @@ NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique
     }
 }
 
-NonlocalC3D8::NonlocalC3D8(const unsigned T, uvec&& N, const unsigned M)
-    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE}) {}
+NonlocalC3D8::NonlocalC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL)
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE}) { access::rw(characteristic_length) = std::fabs(CL); }
 
 int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
@@ -76,9 +76,8 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
 
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
-    access::rw(characteristic_length) = std::cbrt(volume);
 
-    const_mat = const_a + const_b * characteristic_length * characteristic_length;
+    const_mat = const_a + const_b * std::pow(characteristic_length * std::cbrt(volume), 2.);
     initial_stiffness(d_dof, d_dof) = const_mat;
     trial_stiffness = current_stiffness = initial_stiffness;
 

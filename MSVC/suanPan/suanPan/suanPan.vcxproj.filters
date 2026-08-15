@@ -232,6 +232,9 @@
     <Filter Include="Material\Material3D\Nonlocal">
       <UniqueIdentifier>{5f9605fe-fc23-4003-b4ef-9b33fb2f2b4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Element\Membrane\Nonlocal">
+      <UniqueIdentifier>{1f4d209e-9d04-475f-ad7c-b7377c8cbb42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
@@ -1575,6 +1578,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Nonlocal\NonlocalIsotropicElastic3D.cpp">
       <Filter>Material\Material3D\Nonlocal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Membrane\Nonlocal\NonlocalCP4.cpp">
+      <Filter>Element\Membrane\Nonlocal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2949,6 +2955,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Nonlocal\NonlocalIsotropicElastic3D.h">
       <Filter>Material\Material3D\Nonlocal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Membrane\Nonlocal\NonlocalCP4.h">
+      <Filter>Element\Membrane\Nonlocal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

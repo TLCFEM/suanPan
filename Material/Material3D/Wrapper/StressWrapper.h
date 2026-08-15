@@ -57,7 +57,10 @@ public:
         MaterialType // material type
     );
 
+    int initialize_base(const shared_ptr<DomainBase>&) override;
     int initialize(const shared_ptr<DomainBase>&) override;
+
+    [[nodiscard]] unsigned nonlocal_size() const override;
 
     [[nodiscard]] double get(Parameter) const override;
 

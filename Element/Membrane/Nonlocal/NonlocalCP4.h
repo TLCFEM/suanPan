@@ -15,46 +15,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class NonlocalC3D8
- * @brief The NonlocalC3D8 class.
+ * @class NonlocalCP4
+ * @brief The NonlocalCP4 class.
+ *
  * @author tlc
- * @date 16/12/2020
+ * @date 15/08/2026
  * @version 0.1.0
- * @file NonlocalC3D8.h
- * @addtogroup Cube
+ * @file NonlocalCP4.h
+ * @addtogroup Membrane
  * @ingroup Element
  * @{
  */
 
-#ifndef NONLOCALC3D8_H
-#define NONLOCALC3D8_H
+#ifndef NONLOCALCP4_H
+#define NONLOCALCP4_H
 
 #include <Element/MaterialElement.h>
 
-class NonlocalC3D8 final : public MaterialElement3D {
+class NonlocalCP4 final : public MaterialElement2D {
     struct IntegrationPoint {
         vec coor;
         double weight;
-        unique_ptr<Material> c_material;
-        sp_mat strain_mat;
+        unique_ptr<Material> m_material;
+        mat n_mat, b_mat;
 
-        IntegrationPoint(vec&&, double, unique_ptr<Material>&&, const mat&, const mat&);
+        IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, const mat&);
     };
 
-    static constexpr unsigned c_node{8u}, c_dof{4u}, c_size = c_dof * c_node;
+    static constexpr unsigned m_node{4u}, m_dof{3u}, m_size = m_dof * m_node;
 
     static const uvec u_dof, d_dof;
+
+    const double thickness;
 
     std::vector<IntegrationPoint> int_pt;
 
     mat const_mat;
 
 public:
-    NonlocalC3D8(
+    NonlocalCP4(
         unsigned, // tag
         uvec&&,   // node tag
         unsigned, // material tag
-        double    // characteristic length
+        double,   // characteristic length
+        double    // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

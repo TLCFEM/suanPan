@@ -44,7 +44,7 @@ struct DataNonlocalIsotropicElastic3D {
     const double evolution_rate;
 };
 
-class NonlocalIsotropicElastic3D final : protected DataNonlocalIsotropicElastic3D, public Material3D {
+class NonlocalIsotropicElastic3D final : protected DataNonlocalIsotropicElastic3D, public NonlocalMaterial3D {
     static const uvec u_dof, d_dof;
 
 public:

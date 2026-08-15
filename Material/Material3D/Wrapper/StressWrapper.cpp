@@ -28,7 +28,7 @@ StressWrapper::StressWrapper(const unsigned T, const unsigned BT, const unsigned
     , base_tag(BT)
     , max_iteration(MI) {}
 
-int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
+int StressWrapper::initialize_base(const shared_ptr<DomainBase>& D) {
     base = D->initialized_material_copy(base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
@@ -36,15 +36,23 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
+    return Material::initialize_base(D);
+}
+
+int StressWrapper::initialize(const shared_ptr<DomainBase>&) {
     access::rw(density) = base->get_density();
 
-    const auto total_size = base->nonlocal_size() + 6u;
-
     const std::set nontrivial(F1.begin(), F1.end());
-    std::vector<uword> trivial;
-    for(auto I = 0u; I < total_size; ++I)
-        if(!nontrivial.contains(I)) trivial.emplace_back(I);
-    access::rw(F2) = trivial;
+
+    std::vector workspace(F1.begin(), F1.end());
+    const auto total_size = base->nonlocal_size() + 6u;
+    for(auto I = 6u; I < total_size; ++I) workspace.emplace_back(I);
+    access::rw(F1) = workspace;
+
+    workspace.clear();
+    for(auto I = 0u; I < 6u; ++I)
+        if(!nontrivial.contains(I)) workspace.emplace_back(I);
+    access::rw(F2) = workspace;
 
     trial_full_strain = current_full_strain.zeros(total_size);
 
@@ -52,6 +60,8 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
 
     return SUANPAN_SUCCESS;
 }
+
+unsigned StressWrapper::nonlocal_size() const { return base->nonlocal_size(); }
 
 double StressWrapper::get(const Parameter P) const { return base->get(P); }
 
