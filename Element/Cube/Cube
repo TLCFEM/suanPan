@@ -5,3 +5,4 @@
 #include "CIN3D8.h"
 #include "PFM/DC3D4.h"
 #include "PFM/DC3D8.h"
+#include "PFM/NonlocalC3D8.h"

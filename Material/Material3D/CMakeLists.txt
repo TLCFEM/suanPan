@@ -21,6 +21,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Elastic/IsotropicNonlinearElastic3D.cpp
         Elastic/MooneyRivlin.cpp
         Elastic/NLE3D01.cpp
+        Elastic/NonlocalIsotropicElastic3D.cpp
         Elastic/OrthotropicElastic3D.cpp
         Elastic/Yeoh.cpp
         Material3D.cpp

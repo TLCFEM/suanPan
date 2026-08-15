@@ -1,0 +1,178 @@
+/*******************************************************************************
+ * Copyright (C) 2017-2026 Theodore Chang
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
+#include "NonlocalC3D8.h"
+
+#include <Domain/DomainBase.h>
+#include <Material/Material3D/Material3D.h>
+#include <Recorder/OutputType.h>
+#include <Toolbox/IntegrationPlan.h>
+#include <Toolbox/shape.h>
+
+const uvec NonlocalC3D8::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 25, 26, 28, 29, 30};
+const uvec NonlocalC3D8::d_dof{3, 7, 11, 15, 19, 23, 27, 31};
+
+NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& N, mat&& P)
+    : coor(std::move(C))
+    , weight(W)
+    , c_material(std::move(M))
+    , n_mat(std::move(N))
+    , pn_mat(std::move(P))
+    , strain_mat(7, 32) {
+    for(auto I = 0u, J = 0u, K = 1u, L = 2u, Q = 3u; I < c_node; ++I, J += 4u, K += 4u, L += 4u, Q += 4u) {
+        strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = pn_mat(0, I);
+        strain_mat(3, J) = strain_mat(1, K) = strain_mat(4, L) = pn_mat(1, I);
+        strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = pn_mat(2, I);
+        strain_mat(6, Q) = -n_mat(I);
+    }
+}
+
+NonlocalC3D8::NonlocalC3D8(const unsigned T, uvec&& N, const unsigned M)
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE}) {}
+
+int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
+    auto& material_proto = D->get<Material>(material_tag(0));
+
+    if(material_proto->nonlocal_size() != 1u) {
+        suanpan_error("Element {} requires a nonlocal material with size 1, but got {}.\n", get_tag(), material_proto->nonlocal_size());
+        return SUANPAN_FAIL;
+    }
+
+    const IntegrationPlan plan(3, 2, IntegrationPlan::Type::GAUSS);
+
+    int_pt.clear();
+    int_pt.reserve(plan.n_rows);
+
+    const auto ele_coor = get_coordinate(3);
+    auto volume{0.};
+    for(unsigned I{0}; I < plan.n_rows; ++I) {
+        vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
+        const auto pn = shape::cube(t_vec, 1);
+        const mat jacob = pn * ele_coor;
+
+        volume += int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), shape::cube(t_vec, 0), solve(jacob, pn)).weight;
+    }
+    access::rw(characteristic_length) = std::cbrt(volume);
+
+    auto& ini_stiffness = material_proto->get_initial_stiffness();
+    initial_stiffness.zeros(c_size, c_size);
+    const_mat.zeros(d_dof.n_elem, d_dof.n_elem);
+    for(const auto& I : int_pt) {
+        initial_stiffness += I.weight * I.strain_mat.t() * ini_stiffness * I.strain_mat;
+        const_mat += I.weight * I.n_mat.t() * I.n_mat + I.weight * characteristic_length * characteristic_length * I.pn_mat.t() * I.pn_mat;
+    }
+    initial_stiffness(d_dof, d_dof) = const_mat;
+    trial_stiffness = current_stiffness = initial_stiffness;
+
+    ConstantMass(this);
+
+    return SUANPAN_SUCCESS;
+}
+
+int NonlocalC3D8::update_status() {
+    const auto t_disp = get_trial_displacement();
+
+    trial_stiffness.zeros(c_size, c_size);
+    trial_resistance.zeros(c_size);
+
+    for(const auto& I : int_pt) {
+        if(I.c_material->update_trial_status(I.strain_mat * t_disp) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+
+        trial_resistance += I.weight * I.strain_mat.t() * I.c_material->get_trial_stress();
+        trial_stiffness += I.weight * I.strain_mat.t() * I.c_material->get_trial_stiffness() * I.strain_mat;
+    }
+
+    trial_stiffness(d_dof, d_dof) = const_mat;
+    trial_resistance(d_dof) += const_mat * t_disp(d_dof);
+
+    return SUANPAN_SUCCESS;
+}
+
+int NonlocalC3D8::commit_status() {
+    auto code = 0;
+    for(const auto& I : int_pt) code += I.c_material->commit_status();
+    return code;
+}
+
+int NonlocalC3D8::clear_status() {
+    auto code = 0;
+    for(const auto& I : int_pt) code += I.c_material->clear_status();
+    return code;
+}
+
+int NonlocalC3D8::reset_status() {
+    auto code = 0;
+    for(const auto& I : int_pt) code += I.c_material->reset_status();
+    return code;
+}
+
+std::vector<vec> NonlocalC3D8::record(const OutputType P) const {
+    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
+
+    std::vector<vec> data;
+    for(const auto& I : int_pt) suanpan::append_to(data, I.c_material->record(P));
+    return data;
+}
+
+void NonlocalC3D8::print() {
+    suanpan_info("NonlocalC3D8 element connects:", node_encoding);
+    if(!is_initialized()) return;
+    suanpan_info("Material:\n");
+    for(const auto& t_pt : int_pt) {
+        t_pt.c_material->print();
+        suanpan_info("Strain:\t", t_pt.c_material->get_current_strain());
+        suanpan_info("Stress:\t", t_pt.c_material->get_current_stress());
+    }
+}
+
+#ifdef SUANPAN_VTK
+#include <vtkHexahedron.h>
+
+vtkSmartPointer<vtkCell> NonlocalC3D8::GetCell() const { return vtkSmartPointer<vtkHexahedron>::New(); }
+
+mat NonlocalC3D8::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 3, c_node), 6, c_node);
+
+    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
+
+    mat A(static_cast<uword>(int_pt.size()), 7);
+    mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
+
+    for(uword I{0}; I < int_pt.size(); ++I) {
+        if(auto C = int_pt[I].c_material->record(P); !C.empty()) B.col(I) = C[0].resize(6);
+        A.row(I) = interpolation::linear(int_pt[I].coor);
+    }
+
+    mat data(c_node, 7);
+
+    data.row(0) = interpolation::linear(-1., -1., -1.);
+    data.row(1) = interpolation::linear(1., -1., -1.);
+    data.row(2) = interpolation::linear(1., 1., -1.);
+    data.row(3) = interpolation::linear(-1., 1., -1.);
+    data.row(4) = interpolation::linear(-1., -1., 1.);
+    data.row(5) = interpolation::linear(1., -1., 1.);
+    data.row(6) = interpolation::linear(1., 1., 1.);
+    data.row(7) = interpolation::linear(-1., 1., 1.);
+
+    return (data * solve(A, B.t())).t();
+}
+
+mat NonlocalC3D8::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement()(u_dof), 3, c_node); }
+
+#endif

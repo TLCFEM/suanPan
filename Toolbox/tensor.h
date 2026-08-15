@@ -34,7 +34,7 @@
 template<typename T> class Quaternion;
 
 namespace tensor {
-    mat isotropic_stiffness(double, double);
+    mat isotropic_stiffness(double, double, unsigned = 0u);
     mat orthotropic_stiffness(const vec&, const vec&);
 
     mat unit_deviatoric_tensor4();

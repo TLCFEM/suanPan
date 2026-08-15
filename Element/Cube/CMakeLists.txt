@@ -6,4 +6,5 @@ target_sources(${PROJECT_NAME} PRIVATE
         CIN3D8.cpp
         PFM/DC3D4.cpp
         PFM/DC3D8.cpp
+        PFM/NonlocalC3D8.cpp
 )

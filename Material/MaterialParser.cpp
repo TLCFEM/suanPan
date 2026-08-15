@@ -2171,6 +2171,30 @@ namespace {
         return_obj = std::make_unique<IsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, density);
     }
 
+    void new_nonlocalisotropicelastic3d(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double elastic_modulus, poissons_ratio, maximum_energy, evolution_rate;
+        if(!get_input(command, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        auto density = 0.;
+        if(command.eof())
+            suanpan_debug("Zero density assumed.\n");
+        else if(!get_input(command, density)) {
+            suanpan_error("A valid density is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<NonlocalIsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, density);
+    }
+
     void new_elasticos(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -3694,6 +3718,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal_any(material_id, "Elastic3D", "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
+    else if(is_equal_any(material_id, "NonlocalElastic3D", "NonlocalIsotropicElastic3D")) new_nonlocalisotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "ElasticOS")) new_elasticos(new_material, command);
     else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
