@@ -127,8 +127,7 @@ public:
     [[nodiscard]] MaterialType get_material_type() const;
     [[nodiscard]] PlaneType get_plane_type() const;
 
-    int initialize_base(const shared_ptr<DomainBase>&);
-
+    virtual int initialize_base(const shared_ptr<DomainBase>&);
     virtual int initialize(const shared_ptr<DomainBase>&) = 0;
 
     virtual void initialize_history(unsigned);

@@ -28,7 +28,7 @@ StressWrapper::StressWrapper(const unsigned T, const unsigned BT, const unsigned
     , base_tag(BT)
     , max_iteration(MI) {}
 
-int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
+int StressWrapper::initialize_base(const shared_ptr<DomainBase>& D) {
     base = D->initialized_material_copy(base_tag);
 
     if(nullptr == base || base->get_material_type() != MaterialType::D3) {
@@ -36,6 +36,10 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
+    return Material::initialize_base(D);
+}
+
+int StressWrapper::initialize(const shared_ptr<DomainBase>&) {
     access::rw(density) = base->get_density();
 
     const std::set nontrivial(F1.begin(), F1.end());
