@@ -15,73 +15,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class UniversalOS
- * @brief A UniversalOS class.
+ * @class NonlocalC3D8
+ * @brief The NonlocalC3D8 class.
  * @author tlc
- * @date 21/09/2023
+ * @date 16/12/2020
  * @version 0.1.0
- * @file UniversalOS.h
- * @addtogroup Material-OS
+ * @file NonlocalC3D8.h
+ * @addtogroup Cube
+ * @ingroup Element
  * @{
  */
 
-#ifndef UNIVERSALOS_H
-#define UNIVERSALOS_H
+#ifndef NONLOCALC3D8_H
+#define NONLOCALC3D8_H
 
-#include <Material/Material3D/Wrapper/StressWrapper.h>
+#include <Element/MaterialElement.h>
 
-class UniversalOS : public StressWrapper {
-public:
-    UniversalOS(
-        unsigned, // tag
-        unsigned, // 3D material tag
-        unsigned, // max iteration
-        uvec&&
-    );
+class NonlocalC3D8 final : public MaterialElement3D {
+    struct IntegrationPoint {
+        vec coor;
+        double weight;
+        unique_ptr<Material> c_material;
+        sp_mat strain_mat;
 
-    void print() override;
-};
+        IntegrationPoint(vec&&, double, unique_ptr<Material>&&, const mat&, const mat&);
+    };
 
-class OS146 final : public UniversalOS {
-public:
-    OS146(
-        unsigned, // tag
-        unsigned, // 3D material tag
-        unsigned  // max iteration
-    );
+    static constexpr unsigned c_node{8u}, c_dof{4u}, c_size = c_dof * c_node;
 
-    unique_ptr<Material> unique_copy() override;
-};
+    static const uvec u_dof, d_dof;
 
-class OS146S final : public Material {
-    const unsigned base_tag;
+    std::vector<IntegrationPoint> int_pt;
 
-    const double shear_modulus;
-
-    ResourceHolder<Material> base;
+    mat const_mat;
 
 public:
-    OS146S(
+    NonlocalC3D8(
         unsigned, // tag
-        unsigned, // 3D material tag
-        double    // shear modulus
+        uvec&&,   // node tag
+        unsigned  // material tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    [[nodiscard]] double get(Parameter) const override;
+    int update_status() override;
 
-    unique_ptr<Material> unique_copy() override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
     int commit_status() override;
+    int clear_status() override;
     int reset_status() override;
 
     [[nodiscard]] std::vector<vec> record(OutputType) const override;
 
     void print() override;
+
+#ifdef SUANPAN_VTK
+    [[nodiscard]] vtkSmartPointer<vtkCell> GetCell() const override;
+
+    mat GetData(OutputType) override;
+    mat GetDeformation(double) override;
+#endif
 };
 
 #endif

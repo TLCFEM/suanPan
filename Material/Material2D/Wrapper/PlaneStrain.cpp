@@ -36,6 +36,10 @@ int PlaneStrain::initialize(const shared_ptr<DomainBase>& D) {
         suanpan_error("A valid 3D host material is required.\n");
         return SUANPAN_FAIL;
     }
+    if(base->nonlocal_size() > 0u) {
+        suanpan_error("Nonlocal 3D host material is not supported.\n");
+        return SUANPAN_FAIL;
+    }
 
     access::rw(density) = base->get_density();
 

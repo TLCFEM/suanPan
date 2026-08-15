@@ -19,8 +19,8 @@
 
 #include <Domain/DomainBase.h>
 
-UniversalOS::UniversalOS(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA, uvec&& FB)
-    : StressWrapper(T, BT, MI, std::move(FA), std::move(FB), MaterialType::OS) {}
+UniversalOS::UniversalOS(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA)
+    : StressWrapper(T, BT, MI, std::move(FA), MaterialType::OS) {}
 
 void UniversalOS::print() {
     suanpan_info("An open section material wrapper.\n");
@@ -30,12 +30,12 @@ void UniversalOS::print() {
 }
 
 OS146::OS146(const unsigned T, const unsigned BT, const unsigned MI)
-    : UniversalOS(T, BT, MI, uvec{0, 3, 5}, uvec{1, 2, 4}) {}
+    : UniversalOS(T, BT, MI, uvec{0, 3, 5}) {}
 
 unique_ptr<Material> OS146::unique_copy() { return std::make_unique<OS146>(*this); }
 
 OS146S::OS146S(const unsigned T, const unsigned BT, const double G)
-    : Material(T, MaterialType::OS)
+    : Material(T, MaterialType::OS, 0.)
     , base_tag(BT)
     , shear_modulus(G) {}
 

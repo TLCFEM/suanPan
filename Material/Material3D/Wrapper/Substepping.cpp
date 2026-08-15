@@ -20,7 +20,7 @@
 #include <Domain/DomainBase.h>
 
 Substepping::Substepping(const unsigned T, const unsigned MT, const unsigned MI)
-    : Material(T)
+    : Material(T, MaterialType::D0, 0.)
     , max_iteration(MI)
     , mat_tag(MT) {}
 

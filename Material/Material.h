@@ -118,9 +118,9 @@ public:
     };
 
     explicit Material(
-        unsigned = 0,                    // tag
-        MaterialType = MaterialType::D0, // material type
-        double = 0.                      // density
+        unsigned,     // tag
+        MaterialType, // material type
+        double        // density
     );
 
     [[nodiscard]] double get_density() const;
@@ -141,8 +141,13 @@ public:
 
     void set_characteristic_length(const double L) const { access::rw(characteristic_length) = std::max(datum::eps, std::fabs(L)); }
 
+    [[nodiscard]] virtual unsigned nonlocal_size() const { return 0; }
+
     [[nodiscard]] virtual double get(Parameter) const;
 
+    virtual unique_ptr<Material> unique_copy() = 0;
+
+    // conventional material interface
     virtual const vec& get_trial_strain();
     virtual const vec& get_trial_strain_rate();
     virtual const vec& get_trial_strain_acc();
@@ -166,8 +171,6 @@ public:
     [[nodiscard]] virtual const mat& get_initial_damping() const;
     [[nodiscard]] virtual const mat& get_initial_inertial() const;
 
-    virtual unique_ptr<Material> unique_copy() = 0;
-
     int update_incre_status(double);
     int update_incre_status(double, double);
     int update_incre_status(double, double, double);
@@ -182,6 +185,7 @@ public:
     virtual int update_trial_status(const vec&, const vec&);
     virtual int update_trial_status(const vec&, const vec&, const vec&);
 
+    // status control
     virtual int clear_status() = 0;
     virtual int commit_status() = 0;
     virtual int reset_status() = 0;

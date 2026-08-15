@@ -15,56 +15,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class UniversalOS
- * @brief A UniversalOS class.
+ * @class NonlocalIsotropicElastic3D
+ * @brief The NonlocalIsotropicElastic3D class defines a isotropic elastic material for 3-D
+ * problems.
+ *
+ * The Young's modulus is stored in `elastic_modulus`.
+ * The Poisson's ratio is stored in `poissons_ratio`.
+ *
+ * algorithm verified at 24 April 2019 by tlc
+ *
  * @author tlc
- * @date 21/09/2023
- * @version 0.1.0
- * @file UniversalOS.h
- * @addtogroup Material-OS
+ * @date 14/08/2026
+ * @version 1.0.0
+ * @file NonlocalIsotropicElastic3D.h
+ * @addtogroup Material-3D
  * @{
  */
 
-#ifndef UNIVERSALOS_H
-#define UNIVERSALOS_H
+#ifndef NONLOCALISOTROPICELASTIC3D_H
+#define NONLOCALISOTROPICELASTIC3D_H
 
-#include <Material/Material3D/Wrapper/StressWrapper.h>
+#include <Material/Material3D/Material3D.h>
 
-class UniversalOS : public StressWrapper {
-public:
-    UniversalOS(
-        unsigned, // tag
-        unsigned, // 3D material tag
-        unsigned, // max iteration
-        uvec&&
-    );
-
-    void print() override;
+struct DataNonlocalIsotropicElastic3D {
+    const double elastic_modulus;
+    const double poissons_ratio;
+    const double maximum_energy;
+    const double evolution_rate;
 };
 
-class OS146 final : public UniversalOS {
-public:
-    OS146(
-        unsigned, // tag
-        unsigned, // 3D material tag
-        unsigned  // max iteration
-    );
-
-    unique_ptr<Material> unique_copy() override;
-};
-
-class OS146S final : public Material {
-    const unsigned base_tag;
-
-    const double shear_modulus;
-
-    ResourceHolder<Material> base;
+class NonlocalIsotropicElastic3D final : protected DataNonlocalIsotropicElastic3D, public Material3D {
+    static const uvec u_dof, d_dof;
 
 public:
-    OS146S(
-        unsigned, // tag
-        unsigned, // 3D material tag
-        double    // shear modulus
+    NonlocalIsotropicElastic3D(
+        unsigned,   // tag
+        double,     // elastic modulus
+        double,     // poissons ratio
+        double,     // maximum energy
+        double,     // evolution rate
+        double = 0. // density
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
@@ -73,13 +63,13 @@ public:
 
     unique_ptr<Material> unique_copy() override;
 
+    [[nodiscard]] unsigned nonlocal_size() const override;
+
     int update_trial_status(const vec&) override;
 
     int clear_status() override;
     int commit_status() override;
     int reset_status() override;
-
-    [[nodiscard]] std::vector<vec> record(OutputType) const override;
 
     void print() override;
 };

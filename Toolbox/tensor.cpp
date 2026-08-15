@@ -17,11 +17,11 @@
 
 #include "tensor.h"
 
-mat tensor::isotropic_stiffness(const double modulus, const double poissons_ratio) {
+mat tensor::isotropic_stiffness(const double modulus, const double poissons_ratio, const unsigned extra) {
     const auto shear_modulus = modulus / (2. + 2. * poissons_ratio);
     const auto lambda = shear_modulus * poissons_ratio / (.5 - poissons_ratio);
 
-    mat stiffness(6, 6, fill::zeros);
+    mat stiffness(6 + extra, 6 + extra, fill::zeros);
 
     for(auto I = 0; I < 3; ++I)
         for(auto J = 0; J < 3; ++J) stiffness(I, J) = lambda;

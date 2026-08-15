@@ -54,7 +54,6 @@ public:
         unsigned,    // 3D material tag
         unsigned,    // max iteration
         uvec&&,      // non-trivial stress DoF
-        uvec&&,      // trivial stress DoF
         MaterialType // material type
     );
 

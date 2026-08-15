@@ -18,7 +18,7 @@
 #include "Uniaxial.h"
 
 Uniaxial::Uniaxial(const unsigned T, const unsigned BT, const unsigned MI)
-    : StressWrapper(T, BT, MI, uvec{0}, uvec{1, 2, 3, 4, 5}, MaterialType::D1) {}
+    : StressWrapper(T, BT, MI, uvec{0}, MaterialType::D1) {}
 
 unique_ptr<Material> Uniaxial::unique_copy() { return std::make_unique<Uniaxial>(*this); }
 
