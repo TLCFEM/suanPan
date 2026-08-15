@@ -26,18 +26,16 @@
 const uvec NonlocalC3D8::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 25, 26, 28, 29, 30};
 const uvec NonlocalC3D8::d_dof{3, 7, 11, 15, 19, 23, 27, 31};
 
-NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& N, mat&& P)
+NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, const mat& N, const mat& P)
     : coor(std::move(C))
     , weight(W)
     , c_material(std::move(M))
-    , n_mat(std::move(N))
-    , pn_mat(std::move(P))
     , strain_mat(7, 32) {
     for(auto I = 0u, J = 0u, K = 1u, L = 2u, Q = 3u; I < c_node; ++I, J += 4u, K += 4u, L += 4u, Q += 4u) {
-        strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = pn_mat(0, I);
-        strain_mat(3, J) = strain_mat(1, K) = strain_mat(4, L) = pn_mat(1, I);
-        strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = pn_mat(2, I);
-        strain_mat(6, Q) = -n_mat(I);
+        strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = P(0, I);
+        strain_mat(3, J) = strain_mat(1, K) = strain_mat(4, L) = P(1, I);
+        strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = P(2, I);
+        strain_mat(6, Q) = -N(I);
     }
 }
 
@@ -52,29 +50,35 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
         return SUANPAN_FAIL;
     }
 
+    auto& ini_stiffness = material_proto->get_initial_stiffness();
+    const auto ele_coor = get_coordinate(3);
+
     const IntegrationPlan plan(3, 2, IntegrationPlan::Type::GAUSS);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
 
-    const auto ele_coor = get_coordinate(3);
     auto volume{0.};
+    mat const_a(d_dof.n_elem, d_dof.n_elem, fill::zeros), const_b(d_dof.n_elem, d_dof.n_elem, fill::zeros);
+    initial_stiffness.zeros(c_size, c_size);
     for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const auto pn = shape::cube(t_vec, 1);
         const mat jacob = pn * ele_coor;
+        const auto n_mat = shape::cube(t_vec, 0);
+        const mat pn_mat = solve(jacob, pn);
 
-        volume += int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), shape::cube(t_vec, 0), solve(jacob, pn)).weight;
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), n_mat, pn_mat);
+
+        volume += c_pt.weight;
+
+        const_a += c_pt.weight * n_mat.t() * n_mat;
+        const_b += c_pt.weight * pn_mat.t() * pn_mat;
+        initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
     access::rw(characteristic_length) = std::cbrt(volume);
 
-    auto& ini_stiffness = material_proto->get_initial_stiffness();
-    initial_stiffness.zeros(c_size, c_size);
-    const_mat.zeros(d_dof.n_elem, d_dof.n_elem);
-    for(const auto& I : int_pt) {
-        initial_stiffness += I.weight * I.strain_mat.t() * ini_stiffness * I.strain_mat;
-        const_mat += I.weight * I.n_mat.t() * I.n_mat + I.weight * characteristic_length * characteristic_length * I.pn_mat.t() * I.pn_mat;
-    }
+    const_mat = const_a + const_b * characteristic_length * characteristic_length;
     initial_stiffness(d_dof, d_dof) = const_mat;
     trial_stiffness = current_stiffness = initial_stiffness;
 

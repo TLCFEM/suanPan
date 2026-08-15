@@ -36,10 +36,9 @@ class NonlocalC3D8 final : public MaterialElement3D {
         vec coor;
         double weight;
         unique_ptr<Material> c_material;
-        mat n_mat, pn_mat;
         sp_mat strain_mat;
 
-        IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, mat&&);
+        IntegrationPoint(vec&&, double, unique_ptr<Material>&&, const mat&, const mat&);
     };
 
     static constexpr unsigned c_node{8u}, c_dof{4u}, c_size = c_dof * c_node;
