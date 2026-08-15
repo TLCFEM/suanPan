@@ -45,6 +45,7 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
     for(auto I = 6u; I < total_size; ++I) workspace.emplace_back(I);
     access::rw(F1) = workspace;
 
+    workspace.clear();
     for(auto I = 0u; I < 6u; ++I)
         if(!nontrivial.contains(I)) workspace.emplace_back(I);
     access::rw(F2) = workspace;
