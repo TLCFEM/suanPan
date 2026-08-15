@@ -30,8 +30,8 @@ NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique
     : coor(std::move(C))
     , weight(W)
     , c_material(std::move(M))
-    , strain_mat(7, 32) {
-    for(auto I = 0u, J = 0u, K = 1u, L = 2u, Q = 3u; I < c_node; ++I, J += 4u, K += 4u, L += 4u, Q += 4u) {
+    , strain_mat(7, c_size) {
+    for(auto I = 0u, J = 0u, K = 1u, L = 2u, Q = 3u; I < c_node; ++I, J += c_dof, K += c_dof, L += c_dof, Q += c_dof) {
         strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = P(0, I);
         strain_mat(3, J) = strain_mat(1, K) = strain_mat(4, L) = P(1, I);
         strain_mat(5, J) = strain_mat(4, K) = strain_mat(2, L) = P(2, I);

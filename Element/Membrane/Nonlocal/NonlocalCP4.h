@@ -15,61 +15,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @class StressWrapper
- * @brief A StressWrapper class.
- *
- *  A universal wrapper that wraps 3D material models into other models by setting some stress components to zero.
+ * @class NonlocalCP4
+ * @brief The NonlocalCP4 class.
  *
  * @author tlc
- * @date 22/09/2023
+ * @date 15/08/2026
  * @version 0.1.0
- * @file StressWrapper.h
- * @addtogroup Material-3D
+ * @file NonlocalCP4.h
+ * @addtogroup Membrane
+ * @ingroup Element
  * @{
  */
 
-#ifndef StressWrapper_H
-#define StressWrapper_H
+#ifndef NONLOCALCP4_H
+#define NONLOCALCP4_H
 
-#include <Material/Material.h>
-#include <Toolbox/ResourceHolder.h>
+#include <Element/MaterialElement.h>
 
-class StressWrapper : public Material {
-    const uvec F1, F2;
+class NonlocalCP4 final : public MaterialElement2D {
+    struct IntegrationPoint {
+        vec coor;
+        double weight;
+        unique_ptr<Material> m_material;
+        mat n_mat, b_mat;
 
-    const unsigned base_tag;
+        IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, const mat&);
+    };
 
-    const unsigned max_iteration;
+    static constexpr unsigned m_node{4u}, m_dof{3u}, m_size = m_dof * m_node;
 
-    vec trial_full_strain, current_full_strain;
+    static const uvec u_dof, d_dof;
 
-    [[nodiscard]] mat form_stiffness(const mat&) const;
+    const double thickness;
 
-protected:
-    ResourceHolder<Material> base;
+    std::vector<IntegrationPoint> int_pt;
+
+    mat const_mat;
 
 public:
-    StressWrapper(
-        unsigned,    // tag
-        unsigned,    // 3D material tag
-        unsigned,    // max iteration
-        uvec&&,      // non-trivial stress DoF
-        MaterialType // material type
+    NonlocalCP4(
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double    // thickness
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    [[nodiscard]] unsigned nonlocal_size() const override;
+    int update_status() override;
 
-    [[nodiscard]] double get(Parameter) const override;
-
-    int update_trial_status(const vec&) override;
-
-    int clear_status() override;
     int commit_status() override;
+    int clear_status() override;
     int reset_status() override;
 
     [[nodiscard]] std::vector<vec> record(OutputType) const override;
+
+    void print() override;
+
+#ifdef SUANPAN_VTK
+    [[nodiscard]] vtkSmartPointer<vtkCell> GetCell() const override;
+
+    mat GetData(OutputType) override;
+    mat GetDeformation(double) override;
+#endif
 };
 
 #endif
