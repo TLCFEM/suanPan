@@ -175,6 +175,7 @@
     <ClCompile Include="..\..\..\Element\Cube\C3D8.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\C3D8I.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\CIN3D8.cpp" />
+    <ClCompile Include="..\..\..\Element\Cube\Nonlocal\NonlocalC3D8.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\PFM\DC3D4.cpp" />
     <ClCompile Include="..\..\..\Element\Cube\PFM\DC3D8.cpp" />
     <ClCompile Include="..\..\..\Element\Element.cpp" />
@@ -393,6 +394,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\Yeoh.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Material3D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Nonlocal\NonlocalIsotropicElastic3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\NonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\TimberPD.cpp" />
@@ -636,6 +638,7 @@
     <ClInclude Include="..\..\..\Element\Cube\C3D8.h" />
     <ClInclude Include="..\..\..\Element\Cube\C3D8I.h" />
     <ClInclude Include="..\..\..\Element\Cube\CIN3D8.h" />
+    <ClInclude Include="..\..\..\Element\Cube\Nonlocal\NonlocalC3D8.h" />
     <ClInclude Include="..\..\..\Element\Cube\PFM\DC3D4.h" />
     <ClInclude Include="..\..\..\Element\Cube\PFM\DC3D8.h" />
     <ClInclude Include="..\..\..\Element\Element.h" />
@@ -856,6 +859,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\Yeoh.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Material3D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Nonlocal\NonlocalIsotropicElastic3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\BilinearOrthotropic.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\ExpOrthotropic.h" />

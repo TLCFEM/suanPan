@@ -226,6 +226,12 @@
     <Filter Include="Element\Cube\PFM">
       <UniqueIdentifier>{5f8b2273-cd82-480e-b416-1c43e24d71ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Element\Cube\Nonlocal">
+      <UniqueIdentifier>{754ba21c-2946-4deb-bdf3-89ed876b8af8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Material3D\Nonlocal">
+      <UniqueIdentifier>{5f9605fe-fc23-4003-b4ef-9b33fb2f2b4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Constraint\Criterion\Criterion.cpp">
@@ -1563,6 +1569,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\CoupleMaterial.cpp">
       <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Element\Cube\Nonlocal\NonlocalC3D8.cpp">
+      <Filter>Element\Cube\Nonlocal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Nonlocal\NonlocalIsotropicElastic3D.cpp">
+      <Filter>Material\Material3D\Nonlocal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2931,6 +2943,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\CoupleMaterial.h">
       <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Element\Cube\Nonlocal\NonlocalC3D8.h">
+      <Filter>Element\Cube\Nonlocal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Nonlocal\NonlocalIsotropicElastic3D.h">
+      <Filter>Material\Material3D\Nonlocal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
