@@ -21,10 +21,9 @@
 
 mat StressWrapper::form_stiffness(const mat& full_stiffness) const { return full_stiffness(F1, F1) - full_stiffness(F1, F2) * solve(full_stiffness(F2, F2), full_stiffness(F2, F1)); }
 
-StressWrapper::StressWrapper(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA, uvec&& FB, const MaterialType MT)
+StressWrapper::StressWrapper(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA, const MaterialType MT)
     : Material(T, MT, 0.)
     , F1(std::move(FA))
-    , F2(std::move(FB))
     , base_tag(BT)
     , max_iteration(MI) {}
 
@@ -38,7 +37,15 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(density) = base->get_density();
 
-    trial_full_strain = current_full_strain.zeros(6);
+    const auto total_size = base->nonlocal_size() + 6u;
+
+    const std::set nontrivial(F1.begin(), F1.end());
+    std::vector<uword> trivial;
+    for(auto I = 0u; I < total_size; ++I)
+        if(!nontrivial.contains(I)) trivial.emplace_back(I);
+    access::rw(F2) = trivial;
+
+    trial_full_strain = current_full_strain.zeros(total_size);
 
     trial_stiffness = current_stiffness = initial_stiffness = form_stiffness(base->get_initial_stiffness());
 
@@ -88,7 +95,7 @@ int StressWrapper::update_trial_status(const vec& t_strain) {
 }
 
 int StressWrapper::clear_status() {
-    trial_full_strain = current_full_strain.zeros(6);
+    trial_full_strain = current_full_strain.zeros();
     trial_strain = current_strain.zeros();
     trial_stress = current_stress.zeros();
     trial_stiffness = current_stiffness = initial_stiffness;

@@ -20,7 +20,7 @@
 #include <Domain/DomainBase.h>
 
 PlaneStress::PlaneStress(const unsigned T, const unsigned BT, const unsigned MI)
-    : StressWrapper(T, BT, MI, uvec{0, 1, 3}, uvec{2, 4, 5}, MaterialType::D2) { access::rw(plane_type) = PlaneType::S; }
+    : StressWrapper(T, BT, MI, uvec{0, 1, 3}, MaterialType::D2) { access::rw(plane_type) = PlaneType::S; }
 
 unique_ptr<Material> PlaneStress::unique_copy() { return std::make_unique<PlaneStress>(*this); }
 
