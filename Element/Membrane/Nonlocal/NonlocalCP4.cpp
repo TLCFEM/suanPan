@@ -79,7 +79,7 @@ int NonlocalCP4::initialize(const shared_ptr<DomainBase>& D) {
 
         initial_stiffness += c_pt.weight * c_pt.b_mat.t() * ini_stiffness * c_pt.b_mat;
     }
-    initial_stiffness(d_dof, d_dof) = const_mat;
+    initial_stiffness(d_dof, d_dof) += const_mat;
     trial_stiffness = current_stiffness = initial_stiffness;
 
     if(const auto t_density = material_proto->get_density(); t_density > 0.) {
@@ -112,7 +112,7 @@ int NonlocalCP4::update_status() {
         trial_stiffness += I.weight * I.b_mat.t() * I.m_material->get_trial_stiffness() * I.b_mat;
     }
 
-    trial_stiffness(d_dof, d_dof) = const_mat;
+    trial_stiffness(d_dof, d_dof) += const_mat;
     trial_resistance(d_dof) += const_mat * t_disp(d_dof);
 
     return SUANPAN_SUCCESS;

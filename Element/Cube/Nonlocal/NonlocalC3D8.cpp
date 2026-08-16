@@ -78,7 +78,7 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     const_mat = const_a + const_b * std::pow(characteristic_length * std::cbrt(volume), 2.);
-    initial_stiffness(d_dof, d_dof) = const_mat;
+    initial_stiffness(d_dof, d_dof) += const_mat;
     trial_stiffness = current_stiffness = initial_stiffness;
 
     ConstantMass(this);
@@ -99,7 +99,7 @@ int NonlocalC3D8::update_status() {
         trial_stiffness += I.weight * I.strain_mat.t() * I.c_material->get_trial_stiffness() * I.strain_mat;
     }
 
-    trial_stiffness(d_dof, d_dof) = const_mat;
+    trial_stiffness(d_dof, d_dof) += const_mat;
     trial_resistance(d_dof) += const_mat * t_disp(d_dof);
 
     return SUANPAN_SUCCESS;
