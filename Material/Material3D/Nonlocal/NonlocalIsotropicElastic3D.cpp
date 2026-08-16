@@ -23,7 +23,7 @@ const uvec NonlocalIsotropicElastic3D::u_dof{0, 1, 2, 3, 4, 5};
 const uvec NonlocalIsotropicElastic3D::d_dof{6};
 
 NonlocalIsotropicElastic3D::NonlocalIsotropicElastic3D(const unsigned T, const double E, const double P, const double ME, const double ER, const double R)
-    : DataNonlocalIsotropicElastic3D{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(P), .maximum_energy = std::fabs(ME), .evolution_rate = std::fabs(ER / ME)}
+    : DataNonlocalIsotropicElastic3D{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(P), .maximum_energy = std::fabs(ME), .evolution_rate = std::fabs(ER)}
     , NonlocalMaterial3D(T, R) {}
 
 int NonlocalIsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
@@ -48,8 +48,9 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
 
     if(const auto excessive_energy = .5 * dot(trial_stress, trial_strain) - maximum_energy; excessive_energy > trial_history(0)) {
         trial_history(0) = excessive_energy;
-        trial_stress(6) = 1. - std::exp(-excessive_energy * evolution_rate);
-        trial_stiffness(d_dof, u_dof) = (1. - trial_stress(6)) * evolution_rate * trial_stress(u_dof).t();
+        const auto sqrt_term = std::sqrt(excessive_energy / maximum_energy + 1.);
+        trial_stress(6) = 1. - std::exp(evolution_rate * (1. - sqrt_term));
+        trial_stiffness(d_dof, u_dof) = (1. - trial_stress(6)) * evolution_rate * .5 / sqrt_term / maximum_energy * trial_stress(u_dof).t();
     }
     else trial_stress(6) = current_stress(6);
 

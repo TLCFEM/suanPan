@@ -15,7 +15,7 @@ node 11 8 2
 node 12 10 2
 
 material PlaneStress 1 2
-material NonlocalElastic3D 2 1E4 .2 1e1 1e-2 1e-8
+material NonlocalElastic3D 2 1E4 .2 1e1 2. 1e-8
 
 element NonlocalCP4 1 1 2 8 7 1 1.
 element NonlocalCP4 2 2 3 9 8 1 1.
