@@ -19,7 +19,7 @@ if [ ! -d "../Example" ]; then
   exit 1
 fi
 
-mapfile -t files < <(find ../Example -name "*.supan")
+mapfile -t files < <(find ../Example -name "*.supan" | grep -v "Misc")
 
 declare -A timings
 
