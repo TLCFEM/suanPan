@@ -93,7 +93,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           cmake --build build --target install --config ${{ matrix.build }} -j $(nproc)
           cmake --build build --target package
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
@@ -222,8 +222,8 @@ jobs:
           cache: false
       - name: Dependency
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-${{ matrix.os }}.tar.gz
-          tar xf VTK-9.6.2-${{ matrix.os }}.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-${{ matrix.os }}.tar.gz
+          tar xf VTK-9.7.0-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
@@ -242,7 +242,7 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.7/
           cmake --build build --target install --config RelWithDebInfo -j $(nproc)
           cmake --build build --target package
       - name: Pack
@@ -295,7 +295,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=build/dist \
             -DSP_BUILD_PARALLEL=ON \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           else
             export CC=gcc-15 && export CXX=g++-15
             cmake -S . -B build \
@@ -307,7 +307,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=build/dist \
             -DSP_BUILD_PARALLEL=ON \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           fi
           cmake --build build --target install --config ${{ matrix.build }} -j 3
       - name: Pack
@@ -385,8 +385,8 @@ jobs:
       - if: matrix.vtk == 'ON'
         name: VTK
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-win.7z
-          7z x VTK-9.6.2-win.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-win.7z
+          7z x VTK-9.7.0-win.7z
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -401,7 +401,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.6/
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.7/
           cmake --build build --target install --config ${{ matrix.build }} -j 4
           cp ./updater.exe build/dist/bin
       - name: Pack
@@ -457,8 +457,8 @@ jobs:
       - if: matrix.vtk == 'ON'
         name: VTK
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-win-gcc.7z
-          7z x VTK-9.6.2-win-gcc.7z -oVTK
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-win-gcc.7z
+          7z x VTK-9.7.0-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -470,7 +470,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=build/dist `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.7
           cmake --build build --target install --config ${{ matrix.build }} -j 4
           cp ./updater.exe build/dist/bin
           cmake -G "${{ matrix.compiler }}" -S . -B build-sm `
@@ -482,7 +482,7 @@ jobs:
           -DSP_ENABLE_ARMA_SMALL_MEMORY=ON `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.7
           cmake --build build-sm --target install --config ${{ matrix.build }} -j 4
           cp build-sm/dist/bin/suanPan.exe build/dist/bin/suanPan-sm.exe
       - name: Pack
