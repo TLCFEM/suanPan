@@ -91,41 +91,6 @@ mat tensor::unit_symmetric_tensor4() {
 }
 
 /**
- * \brief compute the first invariant of the given 3D strain tensor, could be either normal or deviatoric strain
- * \param E 3D strain tensor in Voigt notation
- * \return the first invariant trace(E)
- */
-double tensor::strain::invariant1(const vec& E) {
-    if(E.n_elem == 3 || E.n_elem == 6) return E(0) + E(1) + E(2);
-
-    throw std::invalid_argument("need a valid strain vector");
-}
-
-/**
- * \brief compute the second invariant of the given 3D strain tensor, could be either normal or deviatoric strain
- * \param E 3D strain tensor in Voigt notation
- * \return the second invariant 0.5*(trace(E^2)-trace(E)^2)
- */
-double tensor::strain::invariant2(const vec& E) {
-    if(E.n_elem == 3) return -E(0) * E(1) - E(1) * E(2) - E(2) * E(0);
-    if(E.n_elem == 6) return -E(0) * E(1) - E(1) * E(2) - E(2) * E(0) + .25 * (E(3) * E(3) + E(4) * E(4) + E(5) * E(5));
-
-    throw std::invalid_argument("need a valid strain vector");
-}
-
-/**
- * \brief compute the third invariant of the given 3D strain tensor, could be either normal or deviatoric strain
- * \param E 3D strain tensor in Voigt notation
- * \return the third invariant det(E)
- */
-double tensor::strain::invariant3(const vec& E) {
-    if(E.n_elem == 3) return prod(E);
-    if(E.n_elem == 6) return E(0) * E(1) * E(2) + .25 * (E(3) * E(4) * E(5) - E(0) * E(4) * E(4) - E(1) * E(5) * E(5) - E(2) * E(3) * E(3));
-
-    throw std::invalid_argument("need a valid strain vector");
-}
-
-/**
  * \brief compute the first invariant of the given 3D stress tensor, could be either normal or deviatoric stress
  * \param S 3D stress tensor in Voigt notation
  * \return the first invariant trace(S)
@@ -160,15 +125,6 @@ double tensor::stress::invariant3(const vec& S) {
     throw std::invalid_argument("need a valid stress vector");
 }
 
-double tensor::strain::lode(vec E) {
-    E = dev(E);
-
-    if(3 == E.n_elem) return std::clamp(sqrt(54.) * prod(normalise(E)), -1., 1.);
-    if(6 == E.n_elem) return std::clamp(sqrt(54.) * det(to_tensor(E) / norm(E)), -1., 1.);
-
-    throw std::invalid_argument("need a valid strain vector");
-}
-
 double tensor::stress::lode(vec S) {
     S = dev(S);
 
@@ -184,6 +140,50 @@ vec tensor::stress::lode_der(vec S) {
     const auto term = 2. / 3. * invariant2(S = dev(S));
 
     return sqrt(2.) * pow(term, -1.5) * (to_voigt(powmat(to_tensor(S), 2)) - term * unit_tensor2 - invariant3(S) / term * S);
+}
+
+/**
+ * \brief compute the first invariant of the given 3D strain tensor, could be either normal or deviatoric strain
+ * \param E 3D strain tensor in Voigt notation
+ * \return the first invariant trace(E)
+ */
+double tensor::strain::invariant1(const vec& E) {
+    if(E.n_elem == 3 || E.n_elem == 6) return E(0) + E(1) + E(2);
+
+    throw std::invalid_argument("need a valid strain vector");
+}
+
+/**
+ * \brief compute the second invariant of the given 3D strain tensor, could be either normal or deviatoric strain
+ * \param E 3D strain tensor in Voigt notation
+ * \return the second invariant 0.5*(trace(E^2)-trace(E)^2)
+ */
+double tensor::strain::invariant2(const vec& E) {
+    if(E.n_elem == 3) return -E(0) * E(1) - E(1) * E(2) - E(2) * E(0);
+    if(E.n_elem == 6) return -E(0) * E(1) - E(1) * E(2) - E(2) * E(0) + .25 * (E(3) * E(3) + E(4) * E(4) + E(5) * E(5));
+
+    throw std::invalid_argument("need a valid strain vector");
+}
+
+/**
+ * \brief compute the third invariant of the given 3D strain tensor, could be either normal or deviatoric strain
+ * \param E 3D strain tensor in Voigt notation
+ * \return the third invariant det(E)
+ */
+double tensor::strain::invariant3(const vec& E) {
+    if(E.n_elem == 3) return prod(E);
+    if(E.n_elem == 6) return E(0) * E(1) * E(2) + .25 * (E(3) * E(4) * E(5) - E(0) * E(4) * E(4) - E(1) * E(5) * E(5) - E(2) * E(3) * E(3));
+
+    throw std::invalid_argument("need a valid strain vector");
+}
+
+double tensor::strain::lode(vec E) {
+    E = dev(E);
+
+    if(3 == E.n_elem) return std::clamp(sqrt(54.) * prod(normalise(E)), -1., 1.);
+    if(6 == E.n_elem) return std::clamp(sqrt(54.) * det(to_tensor(E) / norm(E)), -1., 1.);
+
+    throw std::invalid_argument("need a valid strain vector");
 }
 
 /**
@@ -225,67 +225,6 @@ mat tensor::dev(mat&& in) {
     in.diag() -= mean(in.diag());
     return std::move(in);
 }
-
-// takes an arbitrary vector v and compute the differentiation of normalise(v).
-mat tensor::diff_unit(const vec& v) {
-    const auto n = normalise(v);
-    return (eye(v.n_elem, v.n_elem) - n * n.t()) / norm(v);
-}
-
-mat tensor::diff_triad(const vec3& x1, const vec3& x2, const vec3& x3) {
-    const vec3 e1 = x2 - x1;
-    const vec3 e2 = x3 - x1;
-    const vec3 e3 = cross(e1, e2);
-
-    const mat dn1 = diff_unit(e1);
-    const auto& dn1dx2 = dn1;
-    const mat dn1dx1 = -dn1;
-
-    const mat dn3 = diff_unit(e3);
-    const mat dn3de2 = dn3 * transform::skew_symm(e1);
-    const mat dn3de1 = dn3 * transform::skew_symm(-e2);
-
-    const mat dn3dx1 = -dn3de2 - dn3de1;
-    const auto& dn3dx2 = dn3de1;
-    const auto& dn3dx3 = dn3de2;
-
-    // const vec3 n2 = cross(n3, n1);
-    const mat dn2dn1 = transform::skew_symm(normalise(e3));
-    const mat dn2dn3 = transform::skew_symm(-normalise(e1));
-
-    mat triad(9, 9, fill::none);
-    static const span a(0, 2), b(3, 5), c(6, 8);
-    triad(a, a) = dn1dx1;
-    triad(a, b) = dn1dx2;
-    triad(a, c).fill(0.);
-
-    triad(b, a) = dn2dn1 * dn1dx1 + dn2dn3 * dn3dx1; // dn2dx1
-    triad(b, b) = dn2dn1 * dn1dx2 + dn2dn3 * dn3dx2; // dn2dx2
-    triad(b, c) = dn2dn3 * dn3dx3;                   // dn2dx3
-
-    triad(c, a) = dn3dx1;
-    triad(c, b) = dn3dx2;
-    triad(c, c) = dn3dx3;
-
-    return triad;
-}
-
-tensor::base::Base3D::Base3D(const vec3& G1, const vec3& G2, const vec3& G3)
-    : g1(G1)
-    , g2(G2)
-    , g3(G3) {
-    g.col(0) = g1;
-    g.col(1) = g2;
-    g.col(2) = g3;
-}
-
-std::tuple<vec3, vec3, vec3> tensor::base::Base3D::to_inverse() const {
-    const mat gmn = g * inv(g.t() * g);
-
-    return std::make_tuple(gmn.col(0), gmn.col(1), gmn.col(2));
-}
-
-vec3 tensor::base::unit_norm(const vec3& a1, const vec3& a2) { return normalise(cross(a1, a2)); }
 
 // transform deformation gradient to green strain
 mat tensor::strain::to_green(mat&& gradient) {
@@ -443,6 +382,67 @@ double tensor::stress::double_contraction(const vec& a) { return double_contract
 double tensor::stress::double_contraction(const vec& a, const vec& b) { return dot(a % b, norm_weight); }
 
 double tensor::stress::double_contraction(vec&& a, vec&& b) { return dot(a % b, norm_weight); }
+
+tensor::base::Base3D::Base3D(const vec3& G1, const vec3& G2, const vec3& G3)
+    : g1(G1)
+    , g2(G2)
+    , g3(G3) {
+    g.col(0) = g1;
+    g.col(1) = g2;
+    g.col(2) = g3;
+}
+
+std::tuple<vec3, vec3, vec3> tensor::base::Base3D::to_inverse() const {
+    const mat gmn = g * inv(g.t() * g);
+
+    return std::make_tuple(gmn.col(0), gmn.col(1), gmn.col(2));
+}
+
+vec3 tensor::base::unit_norm(const vec3& a1, const vec3& a2) { return normalise(cross(a1, a2)); }
+
+// takes an arbitrary vector v and compute the differentiation of normalise(v).
+mat tensor::diff_unit(const vec& v) {
+    const auto n = normalise(v);
+    return (eye(v.n_elem, v.n_elem) - n * n.t()) / norm(v);
+}
+
+mat tensor::diff_triad(const vec3& x1, const vec3& x2, const vec3& x3) {
+    const vec3 e1 = x2 - x1;
+    const vec3 e2 = x3 - x1;
+    const vec3 e3 = cross(e1, e2);
+
+    const mat dn1 = diff_unit(e1);
+    const auto& dn1dx2 = dn1;
+    const mat dn1dx1 = -dn1;
+
+    const mat dn3 = diff_unit(e3);
+    const mat dn3de2 = dn3 * transform::skew_symm(e1);
+    const mat dn3de1 = dn3 * transform::skew_symm(-e2);
+
+    const mat dn3dx1 = -dn3de2 - dn3de1;
+    const auto& dn3dx2 = dn3de1;
+    const auto& dn3dx3 = dn3de2;
+
+    // const vec3 n2 = cross(n3, n1);
+    const mat dn2dn1 = transform::skew_symm(normalise(e3));
+    const mat dn2dn3 = transform::skew_symm(-normalise(e1));
+
+    mat triad(9, 9, fill::none);
+    static const span a(0, 2), b(3, 5), c(6, 8);
+    triad(a, a) = dn1dx1;
+    triad(a, b) = dn1dx2;
+    triad(a, c).fill(0.);
+
+    triad(b, a) = dn2dn1 * dn1dx1 + dn2dn3 * dn3dx1; // dn2dx1
+    triad(b, b) = dn2dn1 * dn1dx2 + dn2dn3 * dn3dx2; // dn2dx2
+    triad(b, c) = dn2dn3 * dn3dx3;                   // dn2dx3
+
+    triad(c, a) = dn3dx1;
+    triad(c, b) = dn3dx2;
+    triad(c, c) = dn3dx3;
+
+    return triad;
+}
 
 namespace {
     void orthotropic_projection(const vec& yield_stress, mat& proj_a, mat& proj_b) {
