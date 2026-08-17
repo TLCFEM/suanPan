@@ -45,6 +45,7 @@ hdf5recorder 12 Element EE 1
 hdf5recorder 13 Element PE 1
 hdf5recorder 14 Element HIST 1
 hdf5recorder 15 Element YF 1
+hdf5recorder 16 Element Nonlocal 1
 
 step static 1
 set fixed_step_size 1

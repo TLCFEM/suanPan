@@ -41,7 +41,7 @@ NonlocalCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_
 }
 
 NonlocalCP4::NonlocalCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double TH)
-    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::DAMAGE})
+    : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::NL1})
     , thickness(TH) { access::rw(characteristic_length) = std::fabs(CL); }
 
 int NonlocalCP4::initialize(const shared_ptr<DomainBase>& D) {
@@ -137,7 +137,7 @@ int NonlocalCP4::reset_status() {
 }
 
 std::vector<vec> NonlocalCP4::record(const OutputType P) const {
-    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
+    if(OutputType::NONLOCAL == P) return {get_current_displacement()(d_dof)};
 
     std::vector<vec> data;
     for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
@@ -166,7 +166,7 @@ mat NonlocalCP4::GetData(const OutputType P) {
     if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 2, m_node), 6, m_node);
     if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 2, m_node), 6, m_node);
 
-    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
+    if(OutputType::NONLOCAL == P) return get_current_displacement()(d_dof).t();
 
     mat A(static_cast<uword>(int_pt.size()), 4);
     mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);

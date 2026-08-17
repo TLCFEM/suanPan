@@ -40,7 +40,7 @@ NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique
 }
 
 NonlocalC3D8::NonlocalC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL)
-    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE}) { access::rw(characteristic_length) = std::fabs(CL); }
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::NL1}) { access::rw(characteristic_length) = std::fabs(CL); }
 
 int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
@@ -124,7 +124,7 @@ int NonlocalC3D8::reset_status() {
 }
 
 std::vector<vec> NonlocalC3D8::record(const OutputType P) const {
-    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
+    if(OutputType::NONLOCAL == P) return {get_current_displacement()(d_dof)};
 
     std::vector<vec> data;
     for(const auto& I : int_pt) suanpan::append_to(data, I.c_material->record(P));
@@ -152,7 +152,7 @@ mat NonlocalC3D8::GetData(const OutputType P) {
     if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 3, c_node), 6, c_node);
     if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 3, c_node), 6, c_node);
 
-    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
+    if(OutputType::NONLOCAL == P) return get_current_displacement()(d_dof).t();
 
     mat A(static_cast<uword>(int_pt.size()), 7);
     mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);

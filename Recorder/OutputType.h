@@ -237,6 +237,9 @@ enum class OutputType {
     // compressive damage in material models
     DC,
 
+    // nonlocal
+    NONLOCAL,
+
     // pore pressure
     PP,
 
