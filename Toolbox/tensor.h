@@ -126,10 +126,6 @@ namespace transform {
     mat compute_jacobian_nominal_to_principal(const mat&);
     mat compute_jacobian_principal_to_nominal(const mat&);
 
-    mat66 eigen_to_tensor_base(const mat&);
-    vec eigen_to_tensile_stress(const vec&, const mat&);
-    std::pair<mat, mat> eigen_to_tensile_derivative(const vec&, const mat&);
-
     template<typename T> Mat<T> skew_symm(const Mat<T>& R) {
         suanpan_assert([&] { if(R.n_elem != 3) throw std::invalid_argument("need 3 element vector"); });
 
@@ -202,6 +198,10 @@ namespace transform {
         mat trans(double);
         vec principal(const vec&);
         vec rotate(const vec&, double);
+
+        mat66 eigen_to_tensor_base(const mat&);
+        vec eigen_to_tensile_stress(const vec&, const mat&);
+        std::pair<mat, mat> eigen_to_tensile_derivative(const vec&, const mat&);
     } // namespace stress
     namespace beam {
         mat global_to_local(double, double, double);

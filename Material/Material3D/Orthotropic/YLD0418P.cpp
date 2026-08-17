@@ -54,8 +54,8 @@ YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& 
     pfpbb *= factor;
     pfpab *= factor;
 
-    const mat66 proj_a = transform::eigen_to_tensor_base(pva).t() * C1;
-    const mat66 proj_b = transform::eigen_to_tensor_base(pvb).t() * C2;
+    const mat66 proj_a = transform::stress::eigen_to_tensor_base(pva).t() * C1;
+    const mat66 proj_b = transform::stress::eigen_to_tensor_base(pvb).t() * C2;
 
     const auto trans_a = proj_a.head_rows(3); // 3x6
     const auto trans_b = proj_b.head_rows(3); // 3x6

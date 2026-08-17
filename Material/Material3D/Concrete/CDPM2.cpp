@@ -589,7 +589,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         trial_stress *= damage_t * damage_c;
     }
     else if(DamageType::ANISOTROPIC == damage_type) {
-        const auto [tension_projector, tension_derivative] = transform::eigen_to_tensile_derivative(principal_stress, principal_direction);
+        const auto [tension_projector, tension_derivative] = transform::stress::eigen_to_tensile_derivative(principal_stress, principal_direction);
 
         const vec tension_stress = tension_projector * trial_stress;
 

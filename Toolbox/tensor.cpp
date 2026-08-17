@@ -444,30 +444,28 @@ mat tensor::diff_triad(const vec3& x1, const vec3& x2, const vec3& x3) {
     return triad;
 }
 
-namespace {
-    void orthotropic_projection(const vec& yield_stress, mat& proj_a, mat& proj_b) {
-        // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
-        // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
-        // S(4) = \sigma_{33}^t    S(5) = \sigma_{33}^c
-        // S(6) = \sigma_{12}^0    S(7) = \sigma_{23}^0    S(8) = \sigma_{13}^0
+static void orthotropic_projection(const vec& yield_stress, mat& proj_a, mat& proj_b) {
+    // S(0) = \sigma_{11}^t    S(1) = \sigma_{11}^c
+    // S(2) = \sigma_{22}^t    S(3) = \sigma_{22}^c
+    // S(4) = \sigma_{33}^t    S(5) = \sigma_{33}^c
+    // S(6) = \sigma_{12}^0    S(7) = \sigma_{23}^0    S(8) = \sigma_{13}^0
 
-        proj_a.zeros(6, 6);
-        proj_b.zeros(6, 1);
+    proj_a.zeros(6, 6);
+    proj_b.zeros(6, 1);
 
-        const auto T1 = 1. / yield_stress(0) / yield_stress(1);
-        const auto T2 = 1. / yield_stress(2) / yield_stress(3);
-        const auto T3 = 1. / yield_stress(4) / yield_stress(5);
+    const auto T1 = 1. / yield_stress(0) / yield_stress(1);
+    const auto T2 = 1. / yield_stress(2) / yield_stress(3);
+    const auto T3 = 1. / yield_stress(4) / yield_stress(5);
 
-        proj_b(0) = (yield_stress(1) - yield_stress(0)) * (proj_a(0, 0) = T1);
-        proj_b(1) = (yield_stress(3) - yield_stress(2)) * (proj_a(1, 1) = T2);
-        proj_b(2) = (yield_stress(5) - yield_stress(4)) * (proj_a(2, 2) = T3);
+    proj_b(0) = (yield_stress(1) - yield_stress(0)) * (proj_a(0, 0) = T1);
+    proj_b(1) = (yield_stress(3) - yield_stress(2)) * (proj_a(1, 1) = T2);
+    proj_b(2) = (yield_stress(5) - yield_stress(4)) * (proj_a(2, 2) = T3);
 
-        proj_a(3, 3) = 1. / yield_stress(6) / yield_stress(6);
-        proj_a(4, 4) = 1. / yield_stress(7) / yield_stress(7);
-        proj_a(5, 5) = 1. / yield_stress(8) / yield_stress(8);
-        proj_a *= 2.;
-    }
-} // namespace
+    proj_a(3, 3) = 1. / yield_stress(6) / yield_stress(6);
+    proj_a(4, 4) = 1. / yield_stress(7) / yield_stress(7);
+    proj_a(5, 5) = 1. / yield_stress(8) / yield_stress(8);
+    proj_a *= 2.;
+}
 
 /**
  * \brief Generate two projection matrix based on the given yield stress according to the Tsai-Wu yielding criterion
@@ -606,59 +604,6 @@ mat transform::compute_jacobian_principal_to_nominal(const mat& in) {
     throw std::invalid_argument("need a valid tensor");
 }
 
-mat66 transform::eigen_to_tensor_base(const mat& eig_vec) {
-    const mat n12 = eig_vec.col(0) * eig_vec.col(1).t();
-    const mat n23 = eig_vec.col(1) * eig_vec.col(2).t();
-    const mat n31 = eig_vec.col(2) * eig_vec.col(0).t();
-
-    mat66 pij(fill::none);
-
-    pij.col(0) = tensor::stress::to_voigt(eig_vec.col(0) * eig_vec.col(0).t());
-    pij.col(1) = tensor::stress::to_voigt(eig_vec.col(1) * eig_vec.col(1).t());
-    pij.col(2) = tensor::stress::to_voigt(eig_vec.col(2) * eig_vec.col(2).t());
-    pij.col(3) = tensor::stress::to_voigt(.5 * (n12 + n12.t()));
-    pij.col(4) = tensor::stress::to_voigt(.5 * (n23 + n23.t()));
-    pij.col(5) = tensor::stress::to_voigt(.5 * (n31 + n31.t()));
-
-    return pij;
-}
-
-vec transform::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
-    vec principal_tensile_stress(principal_stress.n_elem, fill::zeros);
-    for(uword I{0}; I < principal_stress.n_elem; ++I)
-        if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
-
-    return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;
-}
-
-namespace {
-    vec3 tensile_fraction(const vec& principal_stress) {
-        const auto compute = [&principal_stress](const unsigned i, const unsigned j) {
-            const auto a = principal_stress(i), b = principal_stress(j);
-
-            if(const auto fraction = (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); std::isfinite(fraction)) return 2. * suanpan::clamp_unit(fraction);
-
-            return a + b <= 0. ? 0. : 2.;
-        };
-
-        return {compute(0, 1), compute(1, 2), compute(2, 0)};
-    }
-} // namespace
-
-std::pair<mat, mat> transform::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
-    const mat pnn = eigen_to_tensor_base(principal_direction);
-
-    const uvec pattern = find(principal_stress > 0.);
-
-    mat eigen_projector = pnn.cols(pattern) * pnn.cols(pattern).t();
-    mat eigen_derivative = eigen_projector + pnn.tail_cols(3) * diagmat(tensile_fraction(principal_stress)) * pnn.tail_cols(3).t();
-
-    eigen_projector.tail_cols(3) *= 2.;
-    eigen_derivative.tail_cols(3) *= 2.;
-
-    return {std::move(eigen_projector), std::move(eigen_derivative)};
-}
-
 vec transform::triangle::to_area_coordinate(const vec& g_coord, const mat& nodes) {
     suanpan_assert([&] { if(nodes.n_cols != 2 || nodes.n_rows != 3) throw std::invalid_argument("need 3 by 2 mat"); });
 
@@ -741,6 +686,57 @@ vec transform::stress::principal(const vec& stress) {
 }
 
 vec transform::stress::rotate(const vec& stress, const double theta) { return trans(theta) * stress; }
+
+mat66 transform::stress::eigen_to_tensor_base(const mat& eig_vec) {
+    const mat n12 = eig_vec.col(0) * eig_vec.col(1).t();
+    const mat n23 = eig_vec.col(1) * eig_vec.col(2).t();
+    const mat n31 = eig_vec.col(2) * eig_vec.col(0).t();
+
+    mat66 pij(fill::none);
+
+    pij.col(0) = tensor::stress::to_voigt(eig_vec.col(0) * eig_vec.col(0).t());
+    pij.col(1) = tensor::stress::to_voigt(eig_vec.col(1) * eig_vec.col(1).t());
+    pij.col(2) = tensor::stress::to_voigt(eig_vec.col(2) * eig_vec.col(2).t());
+    pij.col(3) = tensor::stress::to_voigt(.5 * (n12 + n12.t()));
+    pij.col(4) = tensor::stress::to_voigt(.5 * (n23 + n23.t()));
+    pij.col(5) = tensor::stress::to_voigt(.5 * (n31 + n31.t()));
+
+    return pij;
+}
+
+vec transform::stress::eigen_to_tensile_stress(const vec& principal_stress, const mat& principal_direction) {
+    vec principal_tensile_stress(principal_stress.n_elem, fill::zeros);
+    for(uword I{0}; I < principal_stress.n_elem; ++I)
+        if(principal_stress(I) > 0.) principal_tensile_stress(I) = principal_stress(I);
+
+    return compute_jacobian_principal_to_nominal(principal_direction) * principal_tensile_stress;
+}
+
+static vec3 tensile_fraction(const vec& eig_val) {
+    const auto compute = [&eig_val](const unsigned i, const unsigned j) {
+        const auto a = eig_val(i), b = eig_val(j);
+
+        if(const auto fraction = (suanpan::ramp(a) - suanpan::ramp(b)) / (a - b); std::isfinite(fraction)) return 2. * suanpan::clamp_unit(fraction);
+
+        return a + b <= 0. ? 0. : 2.;
+    };
+
+    return {compute(0, 1), compute(1, 2), compute(2, 0)};
+}
+
+std::pair<mat, mat> transform::stress::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
+    const mat pnn = eigen_to_tensor_base(principal_direction);
+
+    const uvec pattern = find(principal_stress > 0.);
+
+    mat eigen_projector = pnn.cols(pattern) * pnn.cols(pattern).t();
+    mat eigen_derivative = eigen_projector + pnn.tail_cols(3) * diagmat(tensile_fraction(principal_stress)) * pnn.tail_cols(3).t();
+
+    eigen_projector.tail_cols(3) *= 2.;
+    eigen_derivative.tail_cols(3) *= 2.;
+
+    return {std::move(eigen_projector), std::move(eigen_derivative)};
+}
 
 mat transform::beam::global_to_local(const double cos, const double sin, const double length) {
     mat trans_mat(3, 6, fill::zeros);
