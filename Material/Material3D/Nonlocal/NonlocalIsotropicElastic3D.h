@@ -45,7 +45,17 @@ struct DataNonlocalIsotropicElastic3D {
 };
 
 class NonlocalIsotropicElastic3D final : protected DataNonlocalIsotropicElastic3D, public NonlocalMaterial3D {
+public:
+    enum class EnergyType {
+        TOTAL,
+        TENSILE,
+        DEV_TENSILE
+    };
+
+private:
     static const uvec u_dof, d_dof;
+
+    const EnergyType energy_type;
 
 public:
     NonlocalIsotropicElastic3D(
@@ -54,6 +64,7 @@ public:
         double,     // poissons ratio
         double,     // maximum energy
         double,     // evolution rate
+        EnergyType, // energy type
         double = 0. // density
     );
 

@@ -22,9 +22,10 @@
 const uvec NonlocalIsotropicElastic3D::u_dof{0, 1, 2, 3, 4, 5};
 const uvec NonlocalIsotropicElastic3D::d_dof{6};
 
-NonlocalIsotropicElastic3D::NonlocalIsotropicElastic3D(const unsigned T, const double E, const double P, const double ME, const double ER, const double R)
+NonlocalIsotropicElastic3D::NonlocalIsotropicElastic3D(const unsigned T, const double E, const double P, const double ME, const double ER, const EnergyType ET, const double R)
     : DataNonlocalIsotropicElastic3D{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(P), .maximum_energy = std::fabs(ME), .evolution_rate = std::fabs(ER)}
-    , NonlocalMaterial3D(T, R) {}
+    , NonlocalMaterial3D(T, R)
+    , energy_type(ET) {}
 
 int NonlocalIsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio, nonlocal_size());
@@ -46,11 +47,28 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
 
     trial_history = current_history;
 
-    if(const auto excessive_energy = .5 * dot(trial_stress, trial_strain) - maximum_energy; excessive_energy > trial_history(0)) {
+    vec target_stress = trial_stress.head(6);
+    rowvec target_der = target_stress.t();
+
+    if(EnergyType::TOTAL != energy_type) {
+        if(EnergyType::DEV_TENSILE == energy_type) target_stress = tensor::dev(target_stress);
+
+        vec principal_stress;    // 3
+        mat principal_direction; // 3x3
+        if(!eig_sym(principal_stress, principal_direction, tensor::stress::to_tensor(target_stress), "std")) return SUANPAN_FAIL;
+        const auto [tension_projector, tension_derivative] = transform::stress::eigen_to_tensile_derivative(principal_stress, principal_direction);
+
+        target_stress = tension_projector * target_stress;
+        target_der = solve(initial_stiffness(u_dof, u_dof), target_stress).t() * tension_derivative;
+        if(EnergyType::DEV_TENSILE == energy_type) target_der.head(3) -= sum(target_der.head(3)) / 3.;
+        target_der *= initial_stiffness(u_dof, u_dof);
+    }
+
+    if(const auto excessive_energy = .5 * dot(solve(initial_stiffness(u_dof, u_dof), target_stress), target_stress) - maximum_energy; excessive_energy > trial_history(0)) {
         trial_history(0) = excessive_energy;
         const auto sqrt_term = std::sqrt(excessive_energy / maximum_energy + 1.);
         trial_stress(6) = 1. - std::exp(evolution_rate * (1. - sqrt_term));
-        trial_stiffness(d_dof, u_dof) = (1. - trial_stress(6)) * evolution_rate * .5 / sqrt_term / maximum_energy * trial_stress(u_dof).t();
+        trial_stiffness(d_dof, u_dof) = (1. - trial_stress(6)) * evolution_rate * .5 / sqrt_term / maximum_energy * target_der;
     }
     else trial_stress(6) = current_stress(6);
 
