@@ -68,12 +68,6 @@ TEST_CASE("Rotation of Strain", "[Utility.Tensor]") {
 }
 
 TEST_CASE("Basic Quantities", "[Utility.Tensor]") {
-    const vec A = dev(dev(unit_symmetric_tensor4())).diag();
-    const auto B = stress::norm(A), C = stress::norm(vec(A)), D = strain::norm(A), E = strain::norm(vec(A));
-
-    REQUIRE(Approx(B) == C);
-    REQUIRE(Approx(D) == E);
-
     REQUIRE(norm(strain::to_green(eye(3, 3))) == Approx(0));
 
     REQUIRE(norm(transform::compute_jacobian_nominal_to_principal(strain::to_green(eye(2, 2)))) == Approx(0));

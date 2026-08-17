@@ -52,7 +52,7 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
 
     auto trial_s = tensor::dev(trial_stress);                            // trial deviatoric stress
     const auto trial_q = sqrt_three_two * tensor::stress::norm(trial_s); // trial von Mises stress
-    const auto trial_p = tensor::mean3(trial_stress);                    // trial hydrostatic stress
+    const auto trial_p = tensor::mean<3>(trial_stress);                  // trial hydrostatic stress
     auto p = trial_p;                                                    // hydrostatic stress
 
     mat44 jacobian(fill::none);

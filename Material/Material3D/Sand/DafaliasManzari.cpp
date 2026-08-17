@@ -48,9 +48,9 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
-    const auto current_p = tensor::mean3(current_stress);
+    const auto current_p = tensor::mean<3>(current_stress);
     const auto current_s = tensor::dev(current_stress);
-    const auto incre_ev = tensor::trace3(incre_strain);
+    const auto incre_ev = tensor::trace<3>(incre_strain);
     const vec incre_ed = unit_dev_tensor * incre_strain;
 
     // assume no plasticity
@@ -60,7 +60,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     vec s = current_s + 2. * gi * incre_ed;
 
     const auto dede = 1. + e0;
-    const auto void_ratio = e0 + dede * tensor::trace3(trial_strain);
+    const auto void_ratio = e0 + dede * tensor::trace<3>(trial_strain);
     const auto v_term_a = std::pow(2.97 - void_ratio, 2.) / (1. + void_ratio);
     const auto v_term_b = (void_ratio * (void_ratio + 2.) - 14.7609) * std::pow(1. + void_ratio, -2.) * dede;
 

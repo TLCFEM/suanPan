@@ -48,12 +48,12 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     const vec current_alpha(&current_history(0), 6);
     vec alpha(&trial_history(0), 6, false, true);
 
-    const auto state_const = v0 - vc + v0 * tensor::trace3(trial_strain);
+    const auto state_const = v0 - vc + v0 * tensor::trace<3>(trial_strain);
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
     const auto trial_s = tensor::dev(trial_stress);
-    const auto trial_p = tensor::mean3(trial_stress);
+    const auto trial_p = tensor::mean<3>(trial_stress);
     auto s = trial_s;
     auto p = trial_p;
 

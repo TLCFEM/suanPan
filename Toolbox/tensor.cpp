@@ -186,46 +186,6 @@ double tensor::strain::lode(vec E) {
     throw std::invalid_argument("need a valid strain vector");
 }
 
-/**
- * \brief Only accepts 2D tensor!
- * \param S 2D tensor
- * \return trace of tensor
- */
-double tensor::trace2(const vec& S) {
-    suanpan_assert([&] { if(S.n_elem < 2) throw std::invalid_argument("need a valid vector"); });
-
-    return S(0) + S(1);
-}
-
-/**
- * \brief Only accepts 3D tensor!
- * \param S 3D tensor
- * \return trace of tensor
- */
-double tensor::trace3(const vec& S) {
-    suanpan_assert([&] { if(S.n_elem < 3) throw std::invalid_argument("need a valid vector"); });
-
-    return S(0) + S(1) + S(2);
-}
-
-double tensor::mean3(const vec& S) { return trace3(S) / 3.; }
-
-vec tensor::dev(const vec& S) { return dev(vec(S)); }
-
-vec tensor::dev(vec&& S) {
-    S.head(3) -= mean3(S);
-    return std::move(S);
-}
-
-mat tensor::dev(const mat& in) { return dev(mat(in)); }
-
-mat tensor::dev(mat&& in) {
-    suanpan_assert([&] { if(in.n_rows != in.n_cols) throw std::invalid_argument("need square matrix"); });
-
-    in.diag() -= mean(in.diag());
-    return std::move(in);
-}
-
 // transform deformation gradient to green strain
 mat tensor::strain::to_green(mat&& gradient) {
     if(gradient.n_elem == 9) {

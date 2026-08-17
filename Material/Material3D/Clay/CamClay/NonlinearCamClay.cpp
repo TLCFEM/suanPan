@@ -49,7 +49,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
     auto trial_s = tensor::dev(trial_stress);
     const auto trial_q = sqrt_three_two * tensor::stress::norm(trial_s);
-    const auto p = tensor::mean3(trial_stress);
+    const auto p = tensor::mean<3>(trial_stress);
 
     auto ini_f = 0., gamma = 0.;
 

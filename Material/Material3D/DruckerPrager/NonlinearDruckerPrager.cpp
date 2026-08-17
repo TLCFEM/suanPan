@@ -47,7 +47,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
     auto& plastic_strain = trial_history(0);
 
     const auto dev_stress = tensor::dev(trial_stress);
-    const auto hydro_stress = tensor::mean3(trial_stress);
+    const auto hydro_stress = tensor::mean<3>(trial_stress);
     const auto sqrt_j2 = std::sqrt(std::max(datum::eps, tensor::stress::invariant2(dev_stress)));
 
     const auto yield_const = sqrt_j2 + eta_yield * hydro_stress;

@@ -71,14 +71,24 @@ namespace tensor {
 
         static const vec norm_weight{1., 1., 1., .5, .5, .5};
     } // namespace strain
-    double trace2(const vec&);
-    double trace3(const vec&);
-    double mean3(const vec&);
-    vec dev(const vec&);
-    vec dev(vec&&);
 
-    mat dev(const mat&);
-    mat dev(mat&&);
+    template<typename T, typename U> concept is_arma_vec = sp_d<T> && (std::same_as<std::remove_cvref_t<U>, Col<T>> || std::same_as<std::remove_cvref_t<U>, Row<T>>);
+    template<typename T, typename U> concept is_convertible_to_arma_vec = sp_d<T> && !is_arma_vec<T, U> && std::is_convertible_v<std::remove_cvref_t<U>, Col<T>>;
+
+    template<unsigned D, typename T> requires is_arma_vec<double, T> double trace(T&& in) {
+        suanpan_assert([&] { if(in.n_elem < D) throw std::invalid_argument("need a valid vector"); });
+
+        return sum(in.head(D));
+    }
+    template<unsigned D, typename T> requires is_convertible_to_arma_vec<double, T> double trace(T&& in) { return trace<D>(Col<double>{std::forward<T>(in)}); }
+    template<unsigned D, typename T> requires is_arma_vec<double, T> double mean(T&& in) { return trace<D>(std::forward<T>(in)) / static_cast<double>(D); }
+    template<unsigned D, typename T> requires is_convertible_to_arma_vec<double, T> double mean(T&& in) { return mean<D>(Col<double>{std::forward<T>(in)}); }
+    template<typename T> requires is_arma_vec<double, T> T dev(const T& in) {
+        auto out = in;
+        out.head(3) -= mean<3>(out);
+        return out;
+    }
+    template<typename T> requires is_convertible_to_arma_vec<double, T> Col<double> dev(T&& in) { return dev(Col<double>{std::forward<T>(in)}); }
 
     namespace strain {
         mat to_green(mat&&);

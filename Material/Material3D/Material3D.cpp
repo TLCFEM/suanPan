@@ -48,7 +48,7 @@ std::vector<vec> Material3D::record(const OutputType P) const {
     if(P == OutputType::EEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain)}};
     if(P == OutputType::EEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(solve(initial_stiffness, current_stress))}};
     if(P == OutputType::PEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain - solve(initial_stiffness, current_stress))}};
-    if(P == OutputType::HYDRO) return {vec{tensor::mean3(current_stress)}};
+    if(P == OutputType::HYDRO) return {vec{tensor::mean<3>(current_stress)}};
     if(P == OutputType::MISES) return {vec{sqrt(1.5) * tensor::stress::norm(tensor::dev(current_stress))}};
 
     return Material::record(P);
@@ -82,7 +82,7 @@ std::vector<vec> NonlocalMaterial3D::record(const OutputType P) const {
     if(P == OutputType::EEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain.head(6))}};
     if(P == OutputType::EEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(solve(initial_stiffness.submat(0, 0, 5, 5), current_stress.head(6)))}};
     if(P == OutputType::PEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain.head(6) - solve(initial_stiffness.submat(0, 0, 5, 5), current_stress.head(6)))}};
-    if(P == OutputType::HYDRO) return {vec{tensor::mean3(current_stress.head(6))}};
+    if(P == OutputType::HYDRO) return {vec{tensor::mean<3>(current_stress.head(6))}};
     if(P == OutputType::MISES) return {vec{sqrt(1.5) * tensor::stress::norm(tensor::dev(vec{current_stress.head(6)}))}};
 
     if(P == OutputType::S) return {current_stress.head(6)};

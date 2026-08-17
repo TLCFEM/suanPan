@@ -150,7 +150,7 @@ std::vector<vec> PCPE8UC::record(const OutputType P) const {
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
-        for(const auto& I : int_pt) data.emplace_back(vec{-alpha * q * tensor::trace2(I.strain_mat * t_disp)});
+        for(const auto& I : int_pt) data.emplace_back(vec{-alpha * q * tensor::trace<2>(I.strain_mat * t_disp)});
     }
     else
         for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));

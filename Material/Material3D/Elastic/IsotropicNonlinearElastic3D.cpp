@@ -46,7 +46,7 @@ int IsotropicNonlinearElastic3D::update_trial_status(const vec& t_strain) {
     const auto d_strain = tensor::dev(trial_strain);                                      // deviatoric strain
     const auto e_strain = two_third * dot(tensor::strain::norm_weight, square(d_strain)); // equivalent strain squared
 
-    const auto derivative = compute_derivative(tensor::trace3(trial_strain), e_strain);
+    const auto derivative = compute_derivative(tensor::trace<3>(trial_strain), e_strain);
 
     const auto& pwpm = derivative(0);
     const auto& pwpd = derivative(1);

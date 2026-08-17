@@ -50,8 +50,10 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
     vec target_stress = trial_stress.head(6);
     rowvec target_der = target_stress.t();
 
+    const auto dev = [](auto& in) { in.head(3) -= mean(in.head(3)); };
+
     if(EnergyType::TOTAL != energy_type) {
-        if(EnergyType::DEV_TENSILE == energy_type) target_stress = tensor::dev(target_stress);
+        if(EnergyType::DEV_TENSILE == energy_type) dev(target_stress);
 
         vec principal_stress;    // 3
         mat principal_direction; // 3x3
@@ -60,7 +62,7 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
 
         target_stress = tension_projector * target_stress;
         target_der = solve(initial_stiffness(u_dof, u_dof), target_stress).t() * tension_derivative;
-        if(EnergyType::DEV_TENSILE == energy_type) target_der.head(3) -= sum(target_der.head(3)) / 3.;
+        if(EnergyType::DEV_TENSILE == energy_type) dev(target_der);
         target_der *= initial_stiffness(u_dof, u_dof);
     }
 

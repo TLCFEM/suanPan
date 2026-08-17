@@ -185,7 +185,7 @@ std::vector<vec> PCPE8DC::record(const OutputType P) const {
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
-        for(const auto& I : int_pt) data.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
+        for(const auto& I : int_pt) data.emplace_back(vec{q * tensor::trace<2>(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
     }
     else
         for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));

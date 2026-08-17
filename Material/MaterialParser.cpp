@@ -2192,7 +2192,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<NonlocalIsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, NonlocalIsotropicElastic3D::EnergyType::TENSILE, density);
+        return_obj = std::make_unique<NonlocalIsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, NonlocalIsotropicElastic3D::EnergyType::DEV_TENSILE, density);
     }
 
     void new_elasticos(unique_ptr<Material>& return_obj, std::istringstream& command) {
