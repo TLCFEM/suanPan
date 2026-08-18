@@ -801,6 +801,28 @@ namespace {
         return_obj = std::make_unique<BilinearJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, hardening_ratio, beta, density);
     }
 
+    void new_nonlocalbilinearj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate;
+        if(!get_input(command, elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        auto hardening_ratio = 0., beta = 1., density = 0.;
+        if(!get_optional_input(command, hardening_ratio, beta, density)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<NonlocalBilinearJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate, hardening_ratio, beta, density);
+    }
+
     void new_bilinearmises1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -3674,6 +3696,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
     else if(is_equal(material_id, "BilinearHoffman")) new_bilinearorthotropic(new_material, command, true);
     else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
+    else if(is_equal(material_id, "NonlocalBilinearJ2")) new_nonlocalbilinearj2(new_material, command);
     else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
     else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
     else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
