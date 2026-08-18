@@ -24,6 +24,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Elastic/OrthotropicElastic3D.cpp
         Elastic/Yeoh.cpp
         Material3D.cpp
+        Nonlocal/NonlocalBilinearJ2.cpp
         Nonlocal/NonlocalIsotropicElastic3D.cpp
         Orthotropic/CustomOrthotropic.cpp
         Orthotropic/NonlinearOrthotropic.cpp
