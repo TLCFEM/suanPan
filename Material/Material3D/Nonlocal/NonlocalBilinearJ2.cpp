@@ -22,11 +22,11 @@
 constexpr double NonlocalBilinearJ2::two_third = 2. / 3.;
 const double NonlocalBilinearJ2::root_two_third = std::sqrt(two_third);
 const mat NonlocalBilinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
-const uvec NonlocalBilinearJ2::u_dof{0, 1, 2, 3, 4, 5};
-const uvec NonlocalBilinearJ2::d_dof{6};
+const uvec NonlocalBilinearJ2::UD{0, 1, 2, 3, 4, 5};
+const uvec NonlocalBilinearJ2::DD{6};
 
-NonlocalBilinearJ2::NonlocalBilinearJ2(const unsigned T, const double E, const double V, const double Y, const double ER, const double H, const double B, const double R)
-    : DataNonlocalBilinearJ2{.elastic_modulus = std::fabs(E), .poissons_ratio = V, .yield_stress = std::fabs(Y), .evolution_rate = std::fabs(ER), .hardening_ratio = H, .beta = std::clamp(B, 0., 1.)}
+NonlocalBilinearJ2::NonlocalBilinearJ2(const unsigned T, const double E, const double V, const double Y, const double PE, const double ER, const double H, const double B, const double R)
+    : DataNonlocalBilinearJ2{.elastic_modulus = std::fabs(E), .poissons_ratio = V, .yield_stress = std::fabs(Y), .plastic_strain_threshold = PE, .evolution_rate = std::fabs(ER), .hardening_ratio = H, .beta = std::clamp(B, 0., 1.)}
     , Material3D(T, R) {}
 
 int NonlocalBilinearJ2::initialize(const shared_ptr<DomainBase>&) {
@@ -52,27 +52,45 @@ int NonlocalBilinearJ2::update_trial_status(const vec& t_strain) {
     vec plastic_strain(&trial_history(7), 6, false, true);
 
     trial_stiffness = initial_stiffness;
-    trial_stress.head(6) = trial_stiffness(u_dof, u_dof) * (trial_strain.head(6) - plastic_strain);
+    trial_stress.head(6) = trial_stiffness(UD, UD) * (trial_strain.head(6) - plastic_strain);
 
     const vec shifted_stress = tensor::dev(trial_stress.head(6)) - back_stress;
 
     const auto norm_shifted_stress = tensor::stress::norm(shifted_stress);
 
     const auto yield_surf = yield_stress + isotropic_modulus * eqv_plastic_strain;
+    const auto yield_func = norm_shifted_stress - root_two_third * std::max(yield_surf, 0.);
+    const auto yield_flag = yield_func > 0.;
 
-    if(const auto yield_func = norm_shifted_stress - root_two_third * std::max(yield_surf, 0.); yield_func > 0.) {
+    rowvec ppepe;
+
+    if(yield_flag) {
         const auto tmp_a = double_shear + two_third * (kinematic_modulus + (yield_surf > 0. ? isotropic_modulus : 0.));
         const auto gamma = yield_func / tmp_a;
 
         auto tmp_b = double_shear * gamma / norm_shifted_stress;
         trial_stress.head(6) -= tmp_b * shifted_stress;
 
-        back_stress += two_third * kinematic_modulus * gamma / norm_shifted_stress * shifted_stress;
+        const vec unit_n = shifted_stress / norm_shifted_stress;
+
         eqv_plastic_strain += root_two_third * gamma;
+        back_stress += two_third * kinematic_modulus * gamma * unit_n;
+        plastic_strain += gamma * unit_n % tensor::stress::norm_weight;
+
+        ppepe = root_two_third * double_shear / tmp_a * unit_n.t();
 
         tmp_b *= double_shear;
-        trial_stiffness(u_dof, u_dof) += (tmp_b - square_double_shear / tmp_a) / norm_shifted_stress / norm_shifted_stress * shifted_stress * shifted_stress.t() - tmp_b * unit_dev_tensor;
+        trial_stiffness(UD, UD) += (tmp_b - square_double_shear / tmp_a) * unit_n * unit_n.t() - tmp_b * unit_dev_tensor;
     }
+
+    if(eqv_plastic_strain > plastic_strain_threshold) {
+        trial_stress(6) = 1. - std::exp(evolution_rate * (plastic_strain_threshold - eqv_plastic_strain));
+        if(yield_flag) trial_stiffness(DD, UD) = (1. - trial_stress(6)) * evolution_rate * ppepe;
+    }
+
+    trial_stiffness(UD, DD) = -trial_stress(UD);
+    trial_stress(UD) *= 1. - trial_strain(6);
+    trial_stiffness(UD, UD) *= 1. - trial_strain(6);
 
     return SUANPAN_SUCCESS;
 }

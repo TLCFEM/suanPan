@@ -33,19 +33,20 @@
 #include <Material/Material3D/Material3D.h>
 
 struct DataNonlocalBilinearJ2 {
-    const double elastic_modulus; // elastic modulus
-    const double poissons_ratio;  // poisson's ratio
-    const double yield_stress;    // initial yield stress
-    const double evolution_rate;  // evolution rate
-    const double hardening_ratio; // hardening ratio
-    const double beta;            // isotropic (1.0) / kinematic (0.0) hardening factor
+    const double elastic_modulus;          // elastic modulus
+    const double poissons_ratio;           // poisson's ratio
+    const double yield_stress;             // initial yield stress
+    const double plastic_strain_threshold; // threshold
+    const double evolution_rate;           // evolution rate
+    const double hardening_ratio;          // hardening ratio
+    const double beta;                     // isotropic (1.0) / kinematic (0.0) hardening factor
 };
 
 class NonlocalBilinearJ2 final : protected DataNonlocalBilinearJ2, public Material3D {
     static const double two_third;
     static const double root_two_third;
     static const mat unit_dev_tensor;
-    static const uvec u_dof, d_dof;
+    static const uvec UD, DD;
 
     const double shear_modulus = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus
     const double double_shear = 2. * shear_modulus;                            // double shear modulus
@@ -59,6 +60,7 @@ public:
         double,   // elastic modulus
         double,   // poisson's ratio
         double,   // initial yield stress
+        double,   // plastic strain threshold
         double,   // evolution rate
         double,   // hardening ratio
         double,   // isotropic (1.0) / kinematic (0.0) hardening factor
