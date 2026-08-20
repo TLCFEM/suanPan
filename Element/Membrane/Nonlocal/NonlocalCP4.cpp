@@ -56,8 +56,6 @@ int NonlocalCP4::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto ele_coor = get_coordinate(2);
 
-    const auto characteristic_scale = characteristic_length * std::sqrt(area::shoelace(ele_coor));
-
     auto& ini_stiffness = material_proto->get_initial_stiffness();
 
     const IntegrationPlan plan(2, 2, IntegrationPlan::Type::GAUSS);
@@ -75,7 +73,7 @@ int NonlocalCP4::initialize(const shared_ptr<DomainBase>& D) {
         const mat pn_mat = solve(jacob, pn);
         auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->unique_copy(), shape::quad(t_vec, 0), pn_mat);
 
-        const_mat -= c_pt.weight * c_pt.n_mat.t() * c_pt.n_mat + c_pt.weight * characteristic_scale * characteristic_scale * pn_mat.t() * pn_mat;
+        const_mat -= c_pt.weight * c_pt.n_mat.t() * c_pt.n_mat + c_pt.weight * characteristic_length * characteristic_length * pn_mat.t() * pn_mat;
 
         initial_stiffness += c_pt.weight * c_pt.b_mat.t() * ini_stiffness * c_pt.b_mat;
     }

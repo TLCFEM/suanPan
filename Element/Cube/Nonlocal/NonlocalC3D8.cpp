@@ -58,8 +58,7 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
 
-    auto volume{0.};
-    mat const_a(d_dof.n_elem, d_dof.n_elem, fill::zeros), const_b(d_dof.n_elem, d_dof.n_elem, fill::zeros);
+    const_mat.zeros(d_dof.n_elem, d_dof.n_elem);
     initial_stiffness.zeros(c_size, c_size);
     for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
@@ -70,14 +69,10 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
 
         auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), n_mat, pn_mat);
 
-        volume += c_pt.weight;
-        const_a -= c_pt.weight * n_mat.t() * n_mat;
-        const_b -= c_pt.weight * pn_mat.t() * pn_mat;
-
+        const_mat -= c_pt.weight * n_mat.t() * n_mat + c_pt.weight * characteristic_length * characteristic_length * pn_mat.t() * pn_mat;
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
 
-    const_mat = const_a + const_b * std::pow(characteristic_length * std::cbrt(volume), 2.);
     initial_stiffness(d_dof, d_dof) += const_mat;
     trial_stiffness = current_stiffness = initial_stiffness;
 
