@@ -65,11 +65,6 @@ done
   ./suanPan -nc -vb -np -t
   ./suanPan -v
   ./suanPan -ct ~"Large Mixed Precision" ~"Large Sparse Solve Type"
-  ./suanPan -c -f ../Example/Misc/Converter/TEST.inp
-  ./suanPan -s -f ../Example/Misc/Converter/TEST.inp
 } >>/dev/null 2>&1
-
-rm ../Example/Misc/Converter/TEST_out.inp
-rm ../Example/Misc/Converter/TEST_out.supan
 
 tar -czf Results.tar.gz Results
