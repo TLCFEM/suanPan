@@ -1621,6 +1621,24 @@
       "contents": "constraint NodeLine ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique constraint tag\n# (2) int, master node i tag\n# (3) int, master node j tag\n# (4) int, slave node k tag"
     },
     {
+      "trigger": "NonlocalBilinearJ2",
+      "details": "bilinear j2 material with nonlocal damage",
+      "kind": "type",
+      "contents": "material NonlocalBilinearJ2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]} ${8:[8]} ${9:[9]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, initial degradation threshold of equivalent plastic strain\n# (6) double, degradation rate\n# [7] double, hardening ratio, default: 0.0\n# [8] double, beta, default: 1.0\n# [9] double, density, default: 0.0"
+    },
+    {
+      "trigger": "NonlocalC3D8",
+      "details": "linear cube/brick with one nonlocal variable",
+      "kind": "type",
+      "contents": "element NonlocalC3D8 ${1:(1)} ${2:(2...9)} ${10:(10)} ${11:(11)}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag\n# (11) double, characteristic length"
+    },
+    {
+      "trigger": "NonlocalCP4",
+      "details": "bilinear quadrilateral with one nonlocal variable",
+      "kind": "type",
+      "contents": "element NonlocalCP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, characteristic length\n# [8] double, element thickness, default: 1.0"
+    },
+    {
       "trigger": "NonviscousNewmark",
       "details": "newmark method with nonviscous damping",
       "kind": "keyword",
