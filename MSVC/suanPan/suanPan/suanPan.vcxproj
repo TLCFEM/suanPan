@@ -395,6 +395,7 @@
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Elastic\Yeoh.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Material3D.cpp" />
+    <ClCompile Include="..\..\..\Material\Material3D\Nonlocal\NonlocalBilinearJ2.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Nonlocal\NonlocalIsotropicElastic3D.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.cpp" />
     <ClCompile Include="..\..\..\Material\Material3D\Orthotropic\NonlinearOrthotropic.cpp" />
@@ -860,6 +861,7 @@
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\OrthotropicElastic3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Elastic\Yeoh.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Material3D.h" />
+    <ClInclude Include="..\..\..\Material\Material3D\Nonlocal\NonlocalBilinearJ2.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Nonlocal\NonlocalIsotropicElastic3D.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\BilinearOrthotropic.h" />
     <ClInclude Include="..\..\..\Material\Material3D\Orthotropic\CustomOrthotropic.h" />

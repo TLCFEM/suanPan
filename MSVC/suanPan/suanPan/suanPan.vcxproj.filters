@@ -1579,6 +1579,9 @@
     <ClCompile Include="..\..\..\Element\Membrane\Nonlocal\NonlocalCP4.cpp">
       <Filter>Element\Membrane\Nonlocal</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Material\Material3D\Nonlocal\NonlocalBilinearJ2.cpp">
+      <Filter>Material\Material3D\Nonlocal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
@@ -2952,6 +2955,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Element\Membrane\Nonlocal\NonlocalCP4.h">
       <Filter>Element\Membrane\Nonlocal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Material\Material3D\Nonlocal\NonlocalBilinearJ2.h">
+      <Filter>Material\Material3D\Nonlocal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
