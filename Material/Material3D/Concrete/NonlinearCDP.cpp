@@ -45,7 +45,10 @@ double NonlinearCDP::compute_s(const double r) const { return s0 + r - s0 * r; }
 
 NonlinearCDP::NonlinearCDP(const unsigned T, const double E, const double V, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
     : DataNonlinearCDP{.elastic_modulus = std::fabs(E), .poissons_ratio = V < .5 ? V : .2, .g_t = std::fabs(GT), .g_c = std::fabs(GC), .alpha = (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), .alpha_p = std::fabs(AP), .s0 = std::clamp(std::fabs(S), 0., 1.)}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
+    , Material3D(T, R) {
+    access::rw(tolerance) = 1E-13;
+    if(alpha_p > 1.) suanpan_debug("The given dilatancy parameter {} corresponds an internal angle greater than 45 degrees which is uncommon for (reinforced) concrete.\n", alpha_p);
+}
 
 int NonlinearCDP::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
