@@ -82,6 +82,15 @@ CDP::CDP(const bool CHECK_INPUT, const unsigned T, const double E, const double 
         if(ratio_c >= DC) suanpan_warning("A minimum compression degradation of {:.3f} is required, resetting.\n", ratio_c);
     }
     access::rw(cb_c) = std::log(std::clamp(DC, ratio_c, 1. - datum::eps)) / std::log(.5 + .5 / a_c);
+
+    if(a_t < 1.) {
+        const auto min_g_t = f_t * f_t * (1. + .5 * a_t) * (1. - a_t) / elastic_modulus;
+        if(g_t < min_g_t) suanpan_warning("There is a risk of snap-back, the tension energy must be greater than {:.4e}.\n", min_g_t);
+    }
+    if(a_c < 1.) {
+        const auto min_g_c = f_c * f_c * (1. + .5 * a_c) * (1. - a_c) / elastic_modulus;
+        if(g_c < min_g_c) suanpan_warning("There is a risk of snap-back, the compression energy must be greater than {:.4e}.\n", min_g_c);
+    }
 }
 
 unique_ptr<Material> CDP::unique_copy() { return std::make_unique<CDP>(*this); }
