@@ -1639,6 +1639,12 @@
       "contents": "element NonlocalCP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, characteristic length\n# [8] double, element thickness, default: 1.0"
     },
     {
+      "trigger": "NonlocalElastic3D",
+      "details": "3d isotropic elastic material with one nonlocal variable",
+      "kind": "type",
+      "contents": "material NonlocalIsotropicElastic3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:[6]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, energy threshold\n# (5) double, degradation rate\n# [6] double, density, default: 0.0"
+    },
+    {
       "trigger": "NonviscousNewmark",
       "details": "newmark method with nonviscous damping",
       "kind": "keyword",
