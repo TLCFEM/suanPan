@@ -6,8 +6,8 @@
 
 // SPDX-License-Identifier: BSL-1.0
 
-//  Catch v3.15.3
-//  Generated: 2026-07-26 22:17:52.418168
+//  Catch v3.16.0
+//  Generated: 2026-08-25 09:29:23.172704
 //  ----------------------------------------------------------
 //  This file is an amalgamation of multiple different files.
 //  You probably shouldn't edit it directly.
@@ -34,6 +34,45 @@
 #endif // defined(CATCH_PLATFORM_WINDOWS)
 
 #endif // CATCH_WINDOWS_H_PROXY_HPP_INCLUDED
+
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+
+namespace Catch {
+    namespace Benchmark {
+        namespace Detail {
+
+            Environment measure_environment_default() {
+                return Detail::measure_environment<default_clock>();
+            }
+
+            ExecutionPlan prepare_default(const IConfig& cfg, Environment env, BenchmarkFunction&& fun) {
+                // This mirrors Benchmark::prepare<default_clock>(), but with the
+                // clock fixed so it is instantiated once here in the library.
+                auto min_time = env.clock_resolution.mean * Detail::minimum_ticks;
+                auto run_time = std::max(
+                    min_time,
+                    std::chrono::duration_cast<decltype(min_time)>(
+                        cfg.benchmarkWarmupTime()
+                    )
+                );
+                auto&& test = Detail::run_for_at_least<default_clock>(
+                    std::chrono::duration_cast<IDuration>(run_time), 1, fun
+                );
+                int new_iters = static_cast<int>(
+                    std::ceil(min_time * test.iterations / test.elapsed)
+                );
+                return {new_iters, test.elapsed / test.iterations * new_iters * cfg.benchmarkSamples(), CATCH_MOVE(fun), std::chrono::duration_cast<FDuration>(cfg.benchmarkWarmupTime()), Detail::warmup_iterations};
+            }
+
+            std::vector<FDuration> run_plan_default(ExecutionPlan const& plan, const IConfig& cfg, Environment env) {
+                return plan.run<default_clock>(cfg, env);
+            }
+
+        } // namespace Detail
+    } // namespace Benchmark
+} // namespace Catch
 
 namespace Catch {
     namespace Benchmark {
@@ -739,6 +778,7 @@ namespace Catch {
         return lhs.name == rhs.name &&
                lhs.outputFilename == rhs.outputFilename &&
                lhs.colourMode == rhs.colourMode &&
+               lhs.verbosity == rhs.verbosity &&
                lhs.customOptions == rhs.customOptions;
     }
 
@@ -798,7 +838,7 @@ namespace Catch {
                 defaultOutputUsed = true;
             }
 
-            m_processedReporterSpecs.push_back(ProcessedReporterSpec{reporterSpec.name(), reporterSpec.outputFile() ? *reporterSpec.outputFile() : data.defaultOutputFilename, reporterSpec.colourMode().valueOr(data.defaultColourMode), reporterSpec.customOptions()});
+            m_processedReporterSpecs.push_back(ProcessedReporterSpec{reporterSpec.name(), reporterSpec.outputFile() ? *reporterSpec.outputFile() : data.defaultOutputFilename, reporterSpec.colourMode().valueOr(data.defaultColourMode), reporterSpec.verbosity().valueOr(data.verbosity), reporterSpec.customOptions()});
         }
     }
 
@@ -847,6 +887,7 @@ namespace Catch {
     double Config::minDuration() const { return m_data.minDuration; }
     TestRunOrder Config::runOrder() const { return m_data.runOrder; }
     uint32_t Config::rngSeed() const { return m_data.rngSeed; }
+    bool Config::rngSeedWasFixed() const { return m_data.rngSeedWasFixed; }
     unsigned int Config::shardCount() const { return m_data.shardCount; }
     unsigned int Config::shardIndex() const { return m_data.shardIndex; }
     ColourMode Config::defaultColourMode() const { return m_data.defaultColourMode; }
@@ -872,7 +913,7 @@ namespace Catch {
 
         if(bazelOutputFile) {
             m_data.reporterSpecifications.push_back(
-                {"junit", std::string(bazelOutputFile), {}, {}}
+                {"junit", std::string(bazelOutputFile), {}, {}, {}}
             );
         }
 
@@ -912,6 +953,7 @@ namespace Catch {
             }
             else {
                 m_data.rngSeed = *parsedSeed;
+                m_data.rngSeedWasFixed = true;
             }
         }
     }
@@ -1081,6 +1123,10 @@ namespace Catch {
 #endif
             }
 
+            ITestCaseRegistry& getMutableTestCaseRegistry() override {
+                return m_testCaseRegistry;
+            }
+
         private:
             TestRegistry m_testCaseRegistry;
             ReporterRegistry m_reporterRegistry;
@@ -1129,7 +1175,7 @@ namespace Catch {
                 auto const& spec = config->getProcessedReporterSpecs()[0];
                 return createReporter(
                     spec.name,
-                    ReporterConfig(config, makeStream(spec.outputFilename), spec.colourMode, spec.customOptions)
+                    ReporterConfig(config, makeStream(spec.outputFilename), spec.colourMode, spec.verbosity, spec.customOptions)
                 );
             }
 
@@ -1143,7 +1189,7 @@ namespace Catch {
             for(auto const& reporterSpec : config->getProcessedReporterSpecs()) {
                 multi->addReporter(createReporter(
                     reporterSpec.name,
-                    ReporterConfig(config, makeStream(reporterSpec.outputFilename), reporterSpec.colourMode, reporterSpec.customOptions)
+                    ReporterConfig(config, makeStream(reporterSpec.outputFilename), reporterSpec.colourMode, reporterSpec.verbosity, reporterSpec.customOptions)
                 ));
             }
 
@@ -1211,9 +1257,7 @@ namespace Catch {
         };
 
         void applyFilenamesAsTags() {
-            for(auto const& testInfo : getRegistryHub().getTestCaseRegistry().getAllInfos()) {
-                testInfo->addFilenameTag();
-            }
+            getMutableRegistryHub().getMutableTestCaseRegistry().enableFilenameTags();
         }
 
         // Creates empty file at path. The path must be writable, we do not
@@ -1425,6 +1469,19 @@ namespace Catch {
 
         CATCH_TRY {
             config(); // Force config to be constructed
+
+            if(m_config->shardCount() > 1 &&
+               m_config->runOrder() == TestRunOrder::Randomized &&
+               !m_config->rngSeedWasFixed()) {
+                Catch::cerr()
+                    << "Warning: using sharding (--shard-count) with random "
+                       "order (--order rand, the default) and without a fixed "
+                       "numeric --rng-seed does not guarantee disjoint coverage "
+                       "between shard invocations. Pass the same numeric "
+                       "--rng-seed to every shard, or use --order decl or "
+                       "--order lex instead.\n"
+                    << std::flush;
+            }
 
             // We need to retrieve potential Bazel config with the full Config
             // constructor, so we have to create the guard file after it is created.
@@ -2267,7 +2324,7 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
-        static Version version(3, 15, 3, "", 0);
+        static Version version(3, 16, 0, "", 0);
         return version;
     }
 
@@ -2437,11 +2494,13 @@ namespace Catch {
         IConfig const* _fullConfig,
         Detail::unique_ptr<IStream> _stream,
         ColourMode colourMode,
+        Verbosity verbosity,
         std::map<std::string, std::string> customOptions
     )
         : m_stream(CATCH_MOVE(_stream))
         , m_fullConfig(_fullConfig)
         , m_colourMode(colourMode)
+        , m_verbosity(verbosity)
         , m_customOptions(CATCH_MOVE(customOptions)) {}
 
     Detail::unique_ptr<IStream> ReporterConfig::takeStream() && {
@@ -2450,6 +2509,7 @@ namespace Catch {
     }
     IConfig const* ReporterConfig::fullConfig() const { return m_fullConfig; }
     ColourMode ReporterConfig::colourMode() const { return m_colourMode; }
+    Verbosity ReporterConfig::verbosity() const { return m_verbosity; }
 
     std::map<std::string, std::string> const&
     ReporterConfig::customOptions() const {
@@ -3116,10 +3176,12 @@ namespace Catch {
         auto const setRngSeed = [&](std::string const& seed) {
             if(seed == "time") {
                 config.rngSeed = generateRandomSeed(GenerateFrom::Time);
+                config.rngSeedWasFixed = false;
                 return ParserResult::ok(ParseResultType::Matched);
             }
             else if(seed == "random-device") {
                 config.rngSeed = generateRandomSeed(GenerateFrom::RandomDevice);
+                config.rngSeedWasFixed = false;
                 return ParserResult::ok(ParseResultType::Matched);
             }
 
@@ -3130,6 +3192,7 @@ namespace Catch {
                 return ParserResult::runtimeError("Could not parse '" + seed + "' as seed");
             }
             config.rngSeed = *parsedSeed;
+            config.rngSeedWasFixed = true;
             return ParserResult::ok(ParseResultType::Matched);
         };
         auto const setDefaultColourMode = [&](std::string const& colourMode) {
@@ -5407,12 +5470,29 @@ namespace Catch {
                 return {};
             }
         }
+
+        Optional<Verbosity> stringToVerbosity(StringRef verbosity) {
+            if(verbosity == "quiet") {
+                return Verbosity::Quiet;
+            }
+            else if(verbosity == "normal") {
+                return Verbosity::Normal;
+            }
+            else if(verbosity == "high") {
+                return Verbosity::High;
+            }
+            else {
+                return {};
+            }
+        }
+
     } // namespace Detail
 
     bool operator==(ReporterSpec const& lhs, ReporterSpec const& rhs) {
         return lhs.m_name == rhs.m_name &&
                lhs.m_outputFileName == rhs.m_outputFileName &&
                lhs.m_colourMode == rhs.m_colourMode &&
+               lhs.m_verbosity == rhs.m_verbosity &&
                lhs.m_customOptions == rhs.m_customOptions;
     }
 
@@ -5424,6 +5504,7 @@ namespace Catch {
         std::map<std::string, std::string> kvPairs;
         Optional<std::string> outputFileName;
         Optional<ColourMode> colourMode;
+        Optional<Verbosity> verbosity;
 
         // First part is always reporter name, so we skip it
         for(size_t i = 1; i < parts.size(); ++i) {
@@ -5465,24 +5546,33 @@ namespace Catch {
                     return {};
                 }
             }
+            else if(key == "verbosity") {
+                // Duplicated key
+                if(verbosity) { return {}; }
+                verbosity = Detail::stringToVerbosity(value);
+                // Parsing failed
+                if(!verbosity) { return {}; }
+            }
             else {
                 // Unrecognized option
                 return {};
             }
         }
 
-        return ReporterSpec{CATCH_MOVE(parts[0]), CATCH_MOVE(outputFileName), CATCH_MOVE(colourMode), CATCH_MOVE(kvPairs)};
+        return ReporterSpec{CATCH_MOVE(parts[0]), CATCH_MOVE(outputFileName), CATCH_MOVE(colourMode), CATCH_MOVE(verbosity), CATCH_MOVE(kvPairs)};
     }
 
     ReporterSpec::ReporterSpec(
         std::string name,
         Optional<std::string> outputFileName,
         Optional<ColourMode> colourMode,
+        Optional<Verbosity> verbosity,
         std::map<std::string, std::string> customOptions
     )
         : m_name(CATCH_MOVE(name))
         , m_outputFileName(CATCH_MOVE(outputFileName))
         , m_colourMode(CATCH_MOVE(colourMode))
+        , m_verbosity(CATCH_MOVE(verbosity))
         , m_customOptions(CATCH_MOVE(customOptions)) {}
 
 } // namespace Catch
@@ -6837,6 +6927,9 @@ namespace Catch {
 namespace Catch {
 
     namespace {
+        // Picked small-ish number at random
+        static size_t kInitialTestCount = 120;
+
         static void enforceNoDuplicateTestCases(
             std::vector<TestCaseHandle> const& tests
         ) {
@@ -6931,17 +7024,25 @@ namespace Catch {
         return getRegistryHub().getTestCaseRegistry().getAllTestsSorted(config);
     }
 
+    TestRegistry::TestRegistry() {
+        // We pre-reserve some reasonable number of tests to avoid the
+        // initial geometric growth churning during test registration.
+        m_handles.reserve(kInitialTestCount);
+        m_test_infos.reserve(kInitialTestCount);
+        m_invokers.reserve(kInitialTestCount);
+    }
     TestRegistry::~TestRegistry() = default;
 
     void TestRegistry::registerTest(Detail::unique_ptr<TestCaseInfo> testInfo, Detail::unique_ptr<ITestInvoker> testInvoker) {
         m_handles.emplace_back(testInfo.get(), testInvoker.get());
-        m_viewed_test_infos.push_back(testInfo.get());
-        m_owned_test_infos.push_back(CATCH_MOVE(testInfo));
+        m_test_infos.push_back(CATCH_MOVE(testInfo));
         m_invokers.push_back(CATCH_MOVE(testInvoker));
     }
 
-    std::vector<TestCaseInfo*> const& TestRegistry::getAllInfos() const {
-        return m_viewed_test_infos;
+    void TestRegistry::enableFilenameTags() {
+        for(auto& info : m_test_infos) {
+            info->addFilenameTag();
+        }
     }
 
     std::vector<TestCaseHandle> const& TestRegistry::getAllTests() const {
@@ -8574,60 +8675,91 @@ namespace Catch {
 #include <regex>
 
 namespace Catch {
+
+    namespace {
+        constexpr StringRef caseSensitivitySuffix(CaseSensitive caseSensitivity) {
+            return caseSensitivity == CaseSensitive::Yes ? StringRef{} : " (case insensitive)"_sr;
+        }
+    } // namespace
+
     namespace Matchers {
 
-        CasedString::CasedString(std::string const& str, CaseSensitive caseSensitivity)
-            : m_caseSensitivity(caseSensitivity)
-            , m_str(adjustString(str)) {}
-        std::string CasedString::adjustString(std::string const& str) const {
-            return m_caseSensitivity == CaseSensitive::No ? toLower(str) : str;
-        }
-        StringRef CasedString::caseSensitivitySuffix() const {
-            return m_caseSensitivity == CaseSensitive::Yes ? StringRef() : " (case insensitive)"_sr;
-        }
-
-        StringMatcherBase::StringMatcherBase(StringRef operation, CasedString const& comparator)
-            : m_comparator(comparator)
-            , m_operation(operation) {
-        }
+        StringMatcherBase::StringMatcherBase(std::string target, StringRef operation, CaseSensitive caseSensitivity)
+            : m_target(CATCH_MOVE(target))
+            , m_operation(operation)
+            , m_caseSensitivity(caseSensitivity) {}
 
         std::string StringMatcherBase::describe() const {
             std::string description;
-            description.reserve(5 + m_operation.size() + m_comparator.m_str.size() + m_comparator.caseSensitivitySuffix().size());
+            description.reserve(5 + m_operation.size() + m_target.size() + caseSensitivitySuffix(m_caseSensitivity).size());
             description += m_operation;
             description += ": \"";
-            description += m_comparator.m_str;
+            description += m_target;
             description += '"';
-            description += m_comparator.caseSensitivitySuffix();
+            description += caseSensitivitySuffix(m_caseSensitivity);
             return description;
         }
 
-        StringEqualsMatcher::StringEqualsMatcher(CasedString const& comparator)
-            : StringMatcherBase("equals"_sr, comparator) {}
+        StringEqualsMatcher::StringEqualsMatcher(std::string comparator, CaseSensitive caseSensitivity)
+            : StringMatcherBase(CATCH_MOVE(comparator), "equals"_sr, caseSensitivity) {}
 
         bool StringEqualsMatcher::match(std::string const& source) const {
-            return m_comparator.adjustString(source) == m_comparator.m_str;
+            if(m_caseSensitivity == CaseSensitive::Yes) {
+                return m_target == source;
+            }
+            if(m_target.size() != source.size()) { return false; }
+            Catch::Detail::CaseInsensitiveEqualTo eq;
+            return eq(m_target, source);
         }
 
-        StringContainsMatcher::StringContainsMatcher(CasedString const& comparator)
-            : StringMatcherBase("contains"_sr, comparator) {}
+        StringContainsMatcher::StringContainsMatcher(
+            std::string comparator, CaseSensitive caseSensitivity
+        )
+            : StringMatcherBase(CATCH_MOVE(comparator), "contains"_sr, caseSensitivity) {}
 
         bool StringContainsMatcher::match(std::string const& source) const {
-            return contains(m_comparator.adjustString(source), m_comparator.m_str);
+            if(m_caseSensitivity == CaseSensitive::Yes) {
+                return contains(source, m_target);
+            }
+            if(source.size() < m_target.size()) { return false; }
+            StringRef as_ref(source);
+            // The worst case of this is O(m*n), which is terrible, BUT:
+            //  * The average case is much better, the worst case only happens rarely
+            //  * We can implement BMH/other better searchers later if it matters
+            Catch::Detail::CaseInsensitiveEqualTo eq;
+            for(size_t i = 0; i < source.size(); ++i) {
+                const auto substr = as_ref.substr(i, m_target.size());
+                bool found = eq(substr, m_target);
+                if(found) { return true; }
+            }
+            return false;
         }
 
-        StartsWithMatcher::StartsWithMatcher(CasedString const& comparator)
-            : StringMatcherBase("starts with"_sr, comparator) {}
+        StartsWithMatcher::StartsWithMatcher(std::string comparator, CaseSensitive caseSensitivity)
+            : StringMatcherBase(CATCH_MOVE(comparator), "starts with"_sr, caseSensitivity) {}
 
         bool StartsWithMatcher::match(std::string const& source) const {
-            return startsWith(m_comparator.adjustString(source), m_comparator.m_str);
+            if(m_caseSensitivity == CaseSensitive::Yes) {
+                return startsWith(source, m_target);
+            }
+            if(source.size() < m_target.size()) { return false; }
+            Catch::Detail::CaseInsensitiveEqualTo eq;
+            return eq(
+                StringRef(source).substr(0, m_target.size()), m_target
+            );
         }
 
-        EndsWithMatcher::EndsWithMatcher(CasedString const& comparator)
-            : StringMatcherBase("ends with"_sr, comparator) {}
+        EndsWithMatcher::EndsWithMatcher(std::string comparator, CaseSensitive caseSensitivity)
+            : StringMatcherBase(CATCH_MOVE(comparator), "ends with"_sr, caseSensitivity) {}
 
         bool EndsWithMatcher::match(std::string const& source) const {
-            return endsWith(m_comparator.adjustString(source), m_comparator.m_str);
+            if(m_caseSensitivity == CaseSensitive::Yes) {
+                return endsWith(source, m_target);
+            }
+            if(source.size() < m_target.size()) { return false; }
+            Catch::Detail::CaseInsensitiveEqualTo eq;
+            const size_t start_point = source.size() - m_target.size();
+            return eq(StringRef(source).substr(start_point, m_target.size()), m_target);
         }
 
         RegexMatcher::RegexMatcher(std::string regex, CaseSensitive caseSensitivity)
@@ -8647,21 +8779,21 @@ namespace Catch {
             return "matches " + ::Catch::Detail::stringify(m_regex) + ((m_caseSensitivity == CaseSensitive::Yes) ? " case sensitively" : " case insensitively");
         }
 
-        StringEqualsMatcher Equals(std::string const& str, CaseSensitive caseSensitivity) {
-            return StringEqualsMatcher(CasedString(str, caseSensitivity));
+        StringEqualsMatcher Equals(std::string str, CaseSensitive caseSensitivity) {
+            return StringEqualsMatcher(CATCH_MOVE(str), caseSensitivity);
         }
-        StringContainsMatcher ContainsSubstring(std::string const& str, CaseSensitive caseSensitivity) {
-            return StringContainsMatcher(CasedString(str, caseSensitivity));
+        StringContainsMatcher ContainsSubstring(std::string str, CaseSensitive caseSensitivity) {
+            return StringContainsMatcher(CATCH_MOVE(str), caseSensitivity);
         }
-        EndsWithMatcher EndsWith(std::string const& str, CaseSensitive caseSensitivity) {
-            return EndsWithMatcher(CasedString(str, caseSensitivity));
+        EndsWithMatcher EndsWith(std::string str, CaseSensitive caseSensitivity) {
+            return EndsWithMatcher(CATCH_MOVE(str), caseSensitivity);
         }
-        StartsWithMatcher StartsWith(std::string const& str, CaseSensitive caseSensitivity) {
-            return StartsWithMatcher(CasedString(str, caseSensitivity));
+        StartsWithMatcher StartsWith(std::string str, CaseSensitive caseSensitivity) {
+            return StartsWithMatcher(CATCH_MOVE(str), caseSensitivity);
         }
 
-        RegexMatcher Matches(std::string const& regex, CaseSensitive caseSensitivity) {
-            return RegexMatcher(regex, caseSensitivity);
+        RegexMatcher Matches(std::string regex, CaseSensitive caseSensitivity) {
+            return RegexMatcher(CATCH_MOVE(regex), caseSensitivity);
         }
 
     } // namespace Matchers
@@ -8754,6 +8886,7 @@ namespace Catch {
         , m_wrapped_stream(CATCH_MOVE(config).takeStream())
         , m_stream(m_wrapped_stream->stream())
         , m_colour(makeColourImpl(config.colourMode(), m_wrapped_stream.get()))
+        , m_verbosity(config.verbosity())
         , m_customOptions(config.customOptions()) {}
 
     ReporterBase::~ReporterBase() = default;
@@ -8761,21 +8894,21 @@ namespace Catch {
     void ReporterBase::listReporters(
         std::vector<ReporterDescription> const& descriptions
     ) {
-        defaultListReporters(m_stream, descriptions, m_config->verbosity());
+        defaultListReporters(m_stream, descriptions, m_verbosity);
     }
 
     void ReporterBase::listListeners(
         std::vector<ListenerDescription> const& descriptions
     ) {
-        defaultListListeners(m_stream, descriptions, m_config->verbosity());
+        defaultListListeners(m_stream, descriptions, m_verbosity);
     }
 
     void ReporterBase::listTests(std::vector<TestCaseHandle> const& tests) {
-        defaultListTests(m_stream, m_colour.get(), tests, m_config->hasTestFilters(), m_config->verbosity());
+        defaultListTests(m_stream, m_colour.get(), tests, m_config->hasTestFilters(), m_verbosity);
     }
 
     void ReporterBase::listTags(std::vector<TagInfo> const& tags) {
-        defaultListTags(m_stream, tags, m_config->hasTestFilters(), m_config->verbosity());
+        defaultListTags(m_stream, tags, m_config->hasTestFilters(), m_verbosity);
     }
 
 } // namespace Catch
@@ -10204,6 +10337,8 @@ namespace Catch {
 
 namespace Catch {
     namespace {
+        static size_t kJsonOutputVersion = 2;
+
         void writeSourceInfo(JsonObjectWriter& writer, SourceLineInfo const& sourceInfo) {
             auto source_location_writer =
                 writer.write("source-location"_sr).writeObject();
@@ -10243,7 +10378,7 @@ namespace Catch {
         m_writers.emplace(Writer::Object);
         auto& writer = m_objectWriters.top();
 
-        writer.write("version"_sr).write(1);
+        writer.write("version"_sr).write(kJsonOutputVersion);
 
         {
             auto metadata_writer = writer.write("metadata"_sr).writeObject();
@@ -10521,14 +10656,18 @@ namespace Catch {
             auto const& info = test.getTestCaseInfo();
 
             desc_writer.write("name"_sr).write(info.name);
-            desc_writer.write("class-name"_sr).write(info.className);
-            {
+            if(!info.className.empty()) {
+                desc_writer.write("class-name"_sr).write(info.className);
+            }
+            if(m_verbosity >= Verbosity::Normal) {
                 auto tag_writer = desc_writer.write("tags"_sr).writeArray();
                 for(auto const& tag : info.tags) {
                     tag_writer.write(tag.original);
                 }
             }
-            writeSourceInfo(desc_writer, info.lineInfo);
+            if(m_verbosity >= Verbosity::High) {
+                writeSourceInfo(desc_writer, info.lineInfo);
+            }
         }
     }
     void JsonReporter::listTags(std::vector<TagInfo> const& tags) {
