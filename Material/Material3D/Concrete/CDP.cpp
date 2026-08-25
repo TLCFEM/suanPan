@@ -71,6 +71,7 @@ CDP::CDP(const bool CHECK_INPUT, const unsigned T, const double E, const double 
         if(ratio_t >= DT) suanpan_warning("A minimum tension degradation of {:.3f} is required, resetting.\n", ratio_t);
     }
     access::rw(cb_t) = std::log(std::clamp(DT, ratio_t, 1. - datum::eps)) / std::log(.5 * (1. + a_t - std::sqrt(1. + a_t * a_t)) / a_t);
+    // if(cb_t < 1.) suanpan_warning("The tension exponent ({:.4f}) is smaller than unity, numerical robustness is impaired.\n", cb_t);
 
     // compression
     double ratio_c{};
@@ -82,6 +83,7 @@ CDP::CDP(const bool CHECK_INPUT, const unsigned T, const double E, const double 
         if(ratio_c >= DC) suanpan_warning("A minimum compression degradation of {:.3f} is required, resetting.\n", ratio_c);
     }
     access::rw(cb_c) = std::log(std::clamp(DC, ratio_c, 1. - datum::eps)) / std::log(.5 + .5 / a_c);
+    // if(cb_c < 1.) suanpan_warning("The compression exponent ({:.4f}) is smaller than unity, numerical robustness is impaired.\n", cb_c);
 
     if(a_t < 1.) {
         const auto min_g_t = f_t * f_t * (1. + .5 * a_t) * (1. - a_t) / elastic_modulus;
