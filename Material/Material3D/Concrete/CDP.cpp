@@ -17,41 +17,34 @@
 
 #include "CDP.h"
 
-pod6 CDP::compute_tension_backbone(const double kappa) const {
+pod6 CDP::compute_backbone(const double kappa, const double a_tc, const double cb_tc, const double f_tc) const {
     pod6 out;
 
-    const auto s_phi = std::sqrt(1. + a_t * (a_t + 2.) * kappa);
-    const auto t_phi = (1. + .5 * a_t) / s_phi;
-    const auto b_phi = (1. + a_t - s_phi) / a_t;
-    const auto p_phi = std::pow(b_phi, cb_t);
+    const auto s_phi = std::sqrt(1. + a_tc * (a_tc + 2.) * kappa);
+    const auto t_phi = (1. + .5 * a_tc) / s_phi;
+    const auto b_phi = (1. + a_tc - s_phi) / a_tc;
 
-    out[0] = 1. - p_phi;                                    // d
-    out[1] = f_t * s_phi * b_phi;                           // f
-    out[2] = out[1] / p_phi;                                // \bar{f}
-    out[3] = cb_t * t_phi * p_phi / b_phi;                  // \md{d}
-    out[4] = f_t * t_phi * (1. + a_t - 2. * s_phi);         // \md{f}
-    out[5] = (out[4] + f_t * t_phi * cb_t * s_phi) / p_phi; // \md{\bar{f}}
+    out[1] = f_tc * s_phi * b_phi;                    // f
+    out[4] = f_tc * t_phi * (1. + a_tc - 2. * s_phi); // \md{f}
+
+    if(const auto p_phi = std::pow(b_phi, cb_tc), segment = SLOPE_BOUND - SLOPE_BOUND * kappa; p_phi > segment) {
+        out[0] = 1. - segment;
+        out[3] = SLOPE_BOUND;
+    }
+    else {
+        out[0] = 1. - p_phi;                    // original d
+        out[3] = cb_tc * t_phi * p_phi / b_phi; // \md{d}
+    }
+
+    out[2] = out[1] / (1. - out[0]);                     // \bar{f}
+    out[5] = (out[4] + out[2] * out[3]) / (1. - out[0]); // \md{\bar{f}}
 
     return out;
 }
 
-pod6 CDP::compute_compression_backbone(const double kappa) const {
-    pod6 out;
+pod6 CDP::compute_tension_backbone(const double kappa) const { return compute_backbone(kappa, a_t, cb_t, f_t); }
 
-    const auto s_phi = std::sqrt(1. + a_c * (a_c + 2.) * kappa);
-    const auto t_phi = (1. + .5 * a_c) / s_phi;
-    const auto b_phi = (1. + a_c - s_phi) / a_c;
-    const auto p_phi = std::pow(b_phi, cb_c);
-
-    out[0] = 1. - p_phi;                                    // d
-    out[1] = f_c * s_phi * b_phi;                           // f
-    out[2] = out[1] / p_phi;                                // \bar{f}
-    out[3] = cb_c * t_phi * p_phi / b_phi;                  // \md{d}
-    out[4] = f_c * t_phi * (1. + a_c - 2. * s_phi);         // \md{f}
-    out[5] = (out[4] + f_c * t_phi * cb_c * s_phi) / p_phi; // \md{\bar{f}}
-
-    return out;
-}
+pod6 CDP::compute_compression_backbone(const double kappa) const { return compute_backbone(kappa, a_c, cb_c, f_c); }
 
 CDP::CDP(const bool CHECK_INPUT, const unsigned T, const double E, const double V, const double ST, const double SC, const double GT, const double GC, const double AT, const double AC, const double DT, const double DC, const double AP, const double BC, const double S, const double R)
     : NonlinearCDP(T, E, V, GT, GC, AP, BC, S, R)
