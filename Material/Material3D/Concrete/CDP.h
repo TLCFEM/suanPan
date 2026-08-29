@@ -48,12 +48,10 @@
 #include "NonlinearCDP.h"
 
 class CDP final : public NonlinearCDP {
-    static constexpr auto SLOPE_BOUND = 1e2;
-
     const double a_t, cb_t, f_t;
     const double a_c, cb_c, f_c;
 
-    [[nodiscard]] pod6 compute_backbone(double, double, double, double) const;
+    [[nodiscard]] static pod6 compute_backbone(double, double, double, double);
     [[nodiscard]] pod6 compute_tension_backbone(double) const override;
     [[nodiscard]] pod6 compute_compression_backbone(double) const override;
 
