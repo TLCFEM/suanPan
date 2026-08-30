@@ -19,7 +19,7 @@ done < <(find . -mindepth 1 -maxdepth 1 -type d -name "cmake-build*" -print0)
 
 while IFS= read -r -d '' folder; do
   folders+=("$folder")
-done < <([ -d ./build ] && find ./build -mindepth 1 -maxdepth 1 -type d -print0)
+done < <([ -d ./build ] && find ./build -mindepth 1 -maxdepth 1 -type d ! -name '.*' -print0)
 
 for folder in "${folders[@]}"; do
   (
