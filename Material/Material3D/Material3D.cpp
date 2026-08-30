@@ -23,6 +23,30 @@
 Material3D::Material3D(const unsigned T, const double R)
     : Material(T, MaterialType::D3, R) {}
 
+int Material3D::clear_status() {
+    current_strain.zeros();
+    current_stress.zeros();
+    current_history = initial_history;
+    current_stiffness = initial_stiffness;
+    return reset_status();
+}
+
+int Material3D::commit_status() {
+    current_strain = trial_strain;
+    current_stress = trial_stress;
+    current_history = trial_history;
+    current_stiffness = trial_stiffness;
+    return SUANPAN_SUCCESS;
+}
+
+int Material3D::reset_status() {
+    trial_strain = current_strain;
+    trial_stress = current_stress;
+    trial_history = current_history;
+    trial_stiffness = current_stiffness;
+    return SUANPAN_SUCCESS;
+}
+
 std::vector<vec> Material3D::record(const OutputType P) const {
     if(P == OutputType::SP) {
         vec principal_stress;

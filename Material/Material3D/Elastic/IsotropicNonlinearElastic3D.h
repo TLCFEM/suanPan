@@ -53,10 +53,6 @@ public:
 
     int update_trial_status(const vec&) override;
 
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
-
     void print() override;
 };
 

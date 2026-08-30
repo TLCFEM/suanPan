@@ -100,29 +100,6 @@ int MooneyRivlin::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int MooneyRivlin::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    trial_strain.zeros();
-    trial_stress.zeros();
-    trial_stiffness = current_stiffness = initial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int MooneyRivlin::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int MooneyRivlin::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void MooneyRivlin::print() {
     suanpan_info("A Mooney-Rivlin material model.\n");
 }

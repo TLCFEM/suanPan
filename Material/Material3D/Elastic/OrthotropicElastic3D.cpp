@@ -40,9 +40,9 @@ int OrthotropicElastic3D::update_trial_status(const vec& t_strain) {
 }
 
 int OrthotropicElastic3D::clear_status() {
-    current_strain = trial_strain.zeros();
-    current_stress = trial_stress.zeros();
-    return SUANPAN_SUCCESS;
+    current_strain.zeros();
+    current_stress.zeros();
+    return reset_status();
 }
 
 int OrthotropicElastic3D::commit_status() {

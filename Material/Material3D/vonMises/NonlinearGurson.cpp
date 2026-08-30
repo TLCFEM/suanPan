@@ -135,30 +135,6 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int NonlinearGurson::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearGurson::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearGurson::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 std::vector<vec> NonlinearGurson::record(const OutputType P) const {
     if(P == OutputType::VF) return {vec{current_history(1)}};
 

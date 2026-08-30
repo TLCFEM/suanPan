@@ -44,9 +44,9 @@ int IsotropicElastic3D::update_trial_status(const vec& t_strain) {
 }
 
 int IsotropicElastic3D::clear_status() {
-    trial_strain = current_strain.zeros();
-    trial_stress = current_stress.zeros();
-    return SUANPAN_SUCCESS;
+    current_strain.zeros();
+    current_stress.zeros();
+    return reset_status();
 }
 
 int IsotropicElastic3D::commit_status() {

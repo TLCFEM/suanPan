@@ -291,30 +291,6 @@ int YLD0418P::without_kinematic() {
     }
 }
 
-int YLD0418P::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int YLD0418P::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int YLD0418P::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void YLD0418P::print() {
     if(1u == modulus.n_elem && 1u == ratio.n_elem) suanpan_info("YLD2004-18P model with E={:.5E} and nu={:.5E}.\n", modulus(0), ratio(0));
     else suanpan_info("YLD2004-18P model with E_1={:.5E}, E_2={:.5E}, E_3={:.5E}, G_{{12}}={:.5E}, G_{{23}}={:.5E}, G_{{13}}={:.5E}, and nu_{{12}}={:.5E}, nu_{{23}}={:.5E}, nu_{{13}}={:.5E}.\n", modulus(0), modulus(1), modulus(2), modulus(3), modulus(4), modulus(5), ratio(0), ratio(1), ratio(2));

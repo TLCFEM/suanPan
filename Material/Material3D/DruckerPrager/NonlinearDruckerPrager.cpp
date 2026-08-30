@@ -116,30 +116,6 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int NonlinearDruckerPrager::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearDruckerPrager::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearDruckerPrager::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void NonlinearDruckerPrager::print() {
     suanpan_info("A 3D nonlinear model using Drucker-Prager yielding criterion.\n");
 }

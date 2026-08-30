@@ -243,30 +243,6 @@ int NonlinearOrthotropic::euler_return() {
     }
 }
 
-int NonlinearOrthotropic::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearOrthotropic::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearOrthotropic::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void NonlinearOrthotropic::print() { suanpan_info("A 3D nonlinear hardening model using an orthotropic yielding criterion with E_1={:.5E}, E_2={:.5E}, E_3={:.5E}, G_{{12}}={:.5E}, G_{{23}}={:.5E}, G_{{13}}={:.5E}, and nu_{{12}}={:.5E}, nu_{{23}}={:.5E}, nu_{{13}}={:.5E}.\n", modulus(0), modulus(1), modulus(2), modulus(3), modulus(4), modulus(5), ratio(0), ratio(1), ratio(2)); }
 
 NonlinearHill::NonlinearHill(const unsigned T, vec&& EE, vec&& VV, vec&& S, const double R)

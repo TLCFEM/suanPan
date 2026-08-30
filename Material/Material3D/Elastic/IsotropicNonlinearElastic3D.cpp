@@ -65,27 +65,6 @@ int IsotropicNonlinearElastic3D::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int IsotropicNonlinearElastic3D::clear_status() {
-    trial_strain = current_strain.zeros();
-    trial_stress = current_stress.zeros();
-    trial_stiffness = current_stiffness = initial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int IsotropicNonlinearElastic3D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int IsotropicNonlinearElastic3D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void IsotropicNonlinearElastic3D::print() {
     suanpan_info("A 3D isotropic nonlinear elastic material model.\n");
 }
