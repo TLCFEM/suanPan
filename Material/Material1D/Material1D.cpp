@@ -22,6 +22,30 @@
 Material1D::Material1D(const unsigned T, const double D)
     : Material(T, MaterialType::D1, D) { set_symmetric(true); }
 
+int Material1D::clear_status() {
+    current_strain.zeros();
+    current_stress.zeros();
+    current_history = initial_history;
+    current_stiffness = initial_stiffness;
+    return reset_status();
+}
+
+int Material1D::commit_status() {
+    current_strain = trial_strain;
+    current_stress = trial_stress;
+    current_history = trial_history;
+    current_stiffness = trial_stiffness;
+    return SUANPAN_SUCCESS;
+}
+
+int Material1D::reset_status() {
+    trial_strain = current_strain;
+    trial_stress = current_stress;
+    trial_history = current_history;
+    trial_stiffness = current_stiffness;
+    return SUANPAN_SUCCESS;
+}
+
 std::vector<vec> Material1D::record(OutputType P) const {
     if(P == OutputType::SP) P = OutputType::S;
     else if(P == OutputType::EP) P = OutputType::E;

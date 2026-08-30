@@ -63,30 +63,6 @@ int Gap01::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int Gap01::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_stiffness = initial_stiffness;
-    current_history = initial_history;
-    return reset_status();
-}
-
-int Gap01::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int Gap01::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
-    return SUANPAN_SUCCESS;
-}
-
 void Gap01::print() {
     suanpan_info("A gap material model.\n");
     Material1D::print();

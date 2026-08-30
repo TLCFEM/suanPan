@@ -152,30 +152,6 @@ int NonlinearK4::update_trial_status(const vec& t_strain) {
     return compute_plasticity();
 }
 
-int NonlinearK4::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearK4::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearK4::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void NonlinearK4::print() {
     suanpan_info("A concrete model. doi:10.1061/(ASCE)ST.1943-541X.000259\n");
     Material1D::print();

@@ -95,30 +95,6 @@ int MPF::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int MPF::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int MPF::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int MPF::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
-    return SUANPAN_SUCCESS;
-}
-
 void MPF::print() {
     suanpan_info("A Menegotto-Pinto-Filippou model with initial stiffness {:.3E} and yield stress {:.3E} with isotropic hardening {} and Bauschinger effect {}.\n", elastic_modulus, yield_stress, isotropic_hardening ? "enabled" : "disabled", constant_radius ? "disabled" : "enabled");
     Material1D::print();

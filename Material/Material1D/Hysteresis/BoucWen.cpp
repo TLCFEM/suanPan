@@ -103,30 +103,6 @@ int BoucWen::update_trial_status(const vec& t_strain) {
     }
 }
 
-int BoucWen::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int BoucWen::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int BoucWen::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
-    return SUANPAN_SUCCESS;
-}
-
 void BoucWen::print() {
     suanpan_info("A Bouc-Wen material model.\n");
     Material1D::print();

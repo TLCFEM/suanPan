@@ -51,27 +51,6 @@ int BilinearElastic1D::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int BilinearElastic1D::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int BilinearElastic1D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int BilinearElastic1D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void BilinearElastic1D::print() {
     suanpan_info("A bilinear elastic material model with an elastic modulus of {:.3E} and a hardening ratio of {:.2f}.\n", elastic_modulus, hardening_modulus / elastic_modulus);
     Material1D::print();

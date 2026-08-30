@@ -133,30 +133,6 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
     }
 }
 
-int SteelBRB::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int SteelBRB::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int SteelBRB::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
-    return SUANPAN_SUCCESS;
-}
-
 void SteelBRB::print() {
     suanpan_info("A steel model for BRB. doi:10.1016/j.jcsr.2011.07.017\n");
     Material1D::print();

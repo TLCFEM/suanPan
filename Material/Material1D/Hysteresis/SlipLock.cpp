@@ -61,27 +61,6 @@ int SlipLock::update_trial_status(const vec& t_strain) {
     }
 }
 
-int SlipLock::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int SlipLock::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int SlipLock::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void SlipLock::print() {
     suanpan_info("A slip lock material model using Menegotto-Pinto relationship.\n");
     Material1D::print();
