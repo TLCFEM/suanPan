@@ -60,6 +60,6 @@ int AxisymmetricElastic::reset_status() {
 std::vector<vec> AxisymmetricElastic::record(OutputType) const { return {}; }
 
 void AxisymmetricElastic::print() {
-    suanpan_info("Strain:\t", get_trial_strain());
-    suanpan_info("Stress:\t", get_trial_stress());
+    suanpan_info("Strain:\t", current_strain);
+    suanpan_info("Stress:\t", current_stress);
 }

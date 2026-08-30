@@ -142,6 +142,7 @@ int Concrete22::reset_status() {
 }
 
 void Concrete22::print() {
-    suanpan_info("Strain:", current_strain);
-    suanpan_info("Stress:", current_stress);
+    suanpan_info("A planar concrete model.\n");
+    suanpan_info("Strain:\t", current_strain);
+    suanpan_info("Stress:\t", current_stress);
 }
