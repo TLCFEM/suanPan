@@ -240,8 +240,8 @@ void GCMQ::print() {
     for(size_t I = 0; I < int_pt.size(); ++I) {
         suanpan_info("IP {}:\t", I + 1);
         suanpan_info(int_pt[I].coor);
-        suanpan_info("Strain:\t", vec{int_pt[I].poly_strain * current_beta});
-        suanpan_info("Stress:\t", vec{int_pt[I].poly_stress * current_alpha});
+        suanpan_info("Strain:", vec{int_pt[I].poly_strain * current_beta});
+        suanpan_info("Stress:", vec{int_pt[I].poly_stress * current_alpha});
     }
 }
 

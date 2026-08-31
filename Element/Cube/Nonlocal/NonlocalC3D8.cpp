@@ -132,8 +132,8 @@ void NonlocalC3D8::print() {
     suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        suanpan_info("Strain:\t", t_pt.c_material->get_current_strain());
-        suanpan_info("Stress:\t", t_pt.c_material->get_current_stress());
+        suanpan_info("Strain:", t_pt.c_material->get_current_strain());
+        suanpan_info("Stress:", t_pt.c_material->get_current_stress());
     }
 }
 

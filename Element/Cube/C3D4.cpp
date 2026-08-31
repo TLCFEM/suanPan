@@ -148,8 +148,8 @@ void C3D4::print() {
     if(!is_initialized()) return;
     suanpan_info("Material:\n");
     c_material->print();
-    suanpan_info("Strain:\t", c_material->get_trial_strain());
-    suanpan_info("Stress:\t", c_material->get_trial_stress());
+    suanpan_info("Strain:", c_material->get_current_strain());
+    suanpan_info("Stress:", c_material->get_current_stress());
 }
 
 #ifdef SUANPAN_VTK

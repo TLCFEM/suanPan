@@ -235,8 +235,8 @@ void QE2::print() {
     suanpan_info("Element Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
         suanpan_info("IP {}:\n", I + 1);
-        suanpan_info("Strain:\t", vec{int_pt[I].A * current_alpha});
-        suanpan_info("Stress:\t", vec{int_pt[I].P * current_beta});
+        suanpan_info("Strain:", vec{int_pt[I].A * current_alpha});
+        suanpan_info("Stress:", vec{int_pt[I].P * current_beta});
     }
 }
 
