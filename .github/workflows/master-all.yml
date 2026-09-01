@@ -47,7 +47,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           cmake --build build --target install --config Release -j $(nproc)
           cmake --build build --target package
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
@@ -149,7 +149,7 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.7/
           cmake --build build --target install --config Release -j $(nproc)
           cmake --build build --target package
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
@@ -214,7 +214,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           cmake --build build --target install --config Release -j 3
           cp updater build/dist/bin
           ./Script/mac-patcher.sh build/dist
@@ -307,7 +307,7 @@ jobs:
           -DSP_BUILD_PARALLEL=ON `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.7
           cmake --build build --target install --config Release -j 4
           cp ./updater.exe build/dist/bin
       - name: Name
@@ -404,7 +404,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.6/
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.7/
           cmake --build build --target install --config Release -j 4
           cp ./updater.exe build/dist/bin
       - name: Name

@@ -9,7 +9,7 @@ RUN echo "deb https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/source
 RUN apt-get update -y && apt-get install -y --no-install-recommends gcc g++ gfortran cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.6/VTK-9.7.0.tar.gz && tar xf VTK-9.7.0.tar.gz && \
+    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.0.tar.gz && tar xf VTK-9.7.0.tar.gz && \
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.0 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
