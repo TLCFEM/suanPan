@@ -83,10 +83,10 @@ MultilinearPO::MultilinearPO(const int T, mat&& TB, mat&& CB, const double R)
     : DataMultilinearPO{.t_backbone = std::move(TB), .c_backbone = std::move(CB)}
     , PeakOriented(T, R) {}
 
-int MultilinearPO::initialize(const shared_ptr<DomainBase>&) {
+int MultilinearPO::initialize(const shared_ptr<DomainBase>& D) {
     trial_stiffness = current_stiffness = initial_stiffness = t_backbone(0, 1) / t_backbone(0, 0);
 
-    return SUANPAN_SUCCESS;
+    return PeakOriented::initialize(D);
 }
 
 unique_ptr<Material> MultilinearPO::unique_copy() { return std::make_unique<MultilinearPO>(*this); }

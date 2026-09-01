@@ -65,10 +65,10 @@ MultilinearOO::MultilinearOO(const int T, mat&& TB, mat&& CB, const double R)
     : DataMultilinearOO{.t_backbone = std::move(TB), .c_backbone = std::move(CB)}
     , OriginOriented(T, R) {}
 
-int MultilinearOO::initialize(const shared_ptr<DomainBase>&) {
+int MultilinearOO::initialize(const shared_ptr<DomainBase>& D) {
     trial_stiffness = current_stiffness = initial_stiffness = t_backbone(0, 1) / t_backbone(0, 0);
 
-    return SUANPAN_SUCCESS;
+    return OriginOriented::initialize(D);
 }
 
 unique_ptr<Material> MultilinearOO::unique_copy() { return std::make_unique<MultilinearOO>(*this); }

@@ -73,25 +73,25 @@ SimpleHysteresis::SimpleHysteresis(const unsigned T, const double M, const doubl
     : DataSimpleHysteresis{std::min(std::max(datum::eps, M), 1.)}
     , Material1D(T, R) {}
 
+int SimpleHysteresis::initialize(const shared_ptr<DomainBase>&) {
+    initialize_history(8);
+
+    auto point = compute_compression_initial_reverse();
+    initial_history(2) = point[0];
+    initial_history(3) = point[1];
+    point = compute_tension_initial_reverse();
+    initial_history(4) = point[0];
+    initial_history(5) = point[1];
+
+    trial_history = current_history = initial_history;
+
+    return SUANPAN_SUCCESS;
+}
+
 int SimpleHysteresis::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
     if(fabs(incre_strain(0)) <= datum::eps) return SUANPAN_SUCCESS;
-
-    if(current_history.is_empty() || !any(current_history)) {
-        current_history.zeros(8);
-        auto point = compute_compression_initial_reverse();
-        current_history(2) = point[0];
-        current_history(3) = point[1];
-        point = compute_tension_initial_reverse();
-        current_history(4) = point[0];
-        current_history(5) = point[1];
-        initial_history = current_history;
-    }
-    else if(current_history.size() != 8) {
-        current_history.resize(8);
-        initial_history = current_history;
-    }
 
     trial_history = current_history;
     auto& max_c_strain = trial_history(0);      // maximum compression strain recorded

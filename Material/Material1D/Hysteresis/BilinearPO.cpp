@@ -20,7 +20,7 @@
 pod2 BilinearPO::compute_compression_initial_reverse() const {
     pod2 response;
 
-    response[1] = (response[0] = c_strain) * initial_stiffness(0);
+    response[1] = (response[0] = c_strain) * elastic_modulus;
 
     return response;
 }
@@ -28,7 +28,7 @@ pod2 BilinearPO::compute_compression_initial_reverse() const {
 pod2 BilinearPO::compute_tension_initial_reverse() const {
     pod2 response;
 
-    response[1] = (response[0] = t_strain) * initial_stiffness(0);
+    response[1] = (response[0] = t_strain) * elastic_modulus;
 
     return response;
 }
@@ -63,10 +63,10 @@ BilinearPO::BilinearPO(const int T, const double E, const double TEA, const doub
     : DataBilinearPO{.elastic_modulus = fabs(E), .t_strain = fabs(TEA), .t_hardening = TH * fabs(E), .c_strain = -fabs(CEA), .c_hardening = CH * fabs(E)}
     , PeakOriented(T, R) {}
 
-int BilinearPO::initialize(const shared_ptr<DomainBase>&) {
+int BilinearPO::initialize(const shared_ptr<DomainBase>& D) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
 
-    return SUANPAN_SUCCESS;
+    return PeakOriented::initialize(D);
 }
 
 unique_ptr<Material> BilinearPO::unique_copy() { return std::make_unique<BilinearPO>(*this); }

@@ -36,8 +36,6 @@ class PeakOriented : public SimpleHysteresis {
 
 public:
     PeakOriented(int, double);
-
-    void print() override;
 };
 
 #endif

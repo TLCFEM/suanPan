@@ -115,10 +115,10 @@ ConcreteExp::ConcreteExp(const unsigned T, const double E, const double FT, cons
     : DataConcreteExp{.elastic_modulus = E, .f_t = std::fabs(FT), .f_c = -std::fabs(FC) * 4. * AC * std::pow(1. + AC, -2.), .a_t = AT, .a_c = AC, .b_t = std::fabs(FT) / GT * (1. + .5 * AT), .b_c = std::fabs(FC) * 4. * AC * std::pow(1. + AC, -2.) / GC * (1. + .5 * AC)}
     , SimpleHysteresis(T, M, R) {}
 
-int ConcreteExp::initialize(const shared_ptr<DomainBase>&) {
+int ConcreteExp::initialize(const shared_ptr<DomainBase>& D) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
 
-    return SUANPAN_SUCCESS;
+    return SimpleHysteresis::initialize(D);
 }
 
 double ConcreteExp::get(const Parameter P) const {

@@ -23,8 +23,3 @@ double PeakOriented::compute_tension_residual(const double strain, const double 
 
 PeakOriented::PeakOriented(const int T, const double R)
     : SimpleHysteresis(T, 1., R) {}
-
-void PeakOriented::print() {
-    suanpan_info("A peak oriented hysteresis model.\n");
-    SimpleHysteresis::print();
-}
