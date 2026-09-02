@@ -20,6 +20,8 @@ skip_files: tuple = (
 def skip(line: str):
     if "Time Wasted" in line:
         return True
+    if " / __| | | | |_) / _` | '_ \\" in line:
+        return True
     return "by tlc @" in line
 
 
