@@ -9,7 +9,7 @@ node 6 .5 .5 .5
 node 7 -.5 .5 .5
 node 8 -.5 -.5 .5
 
-material NonlocalBilinearJ2 1 1e4 .2 200 1e-1 5. 1. 0. .02
+material NonlocalBilinearJ2 1 1e4 .2 200 1e-1 5. 1. 100. .02
 
 element NonlocalC3D8 1 1 2 3 4 5 6 7 8 1
 
