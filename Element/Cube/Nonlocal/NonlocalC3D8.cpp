@@ -39,8 +39,8 @@ NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique
     }
 }
 
-NonlocalC3D8::NonlocalC3D8(const unsigned T, uvec&& N, const unsigned M, const double CL)
-    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::NL1}) { access::rw(characteristic_length) = std::fabs(CL); }
+NonlocalC3D8::NonlocalC3D8(const unsigned T, uvec&& N, const unsigned M)
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::NL1}) {}
 
 int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
@@ -69,7 +69,7 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
 
         auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), n_mat, pn_mat);
 
-        const_mat -= c_pt.weight * n_mat.t() * n_mat + c_pt.weight * characteristic_length * characteristic_length * pn_mat.t() * pn_mat;
+        const_mat -= c_pt.weight * pn_mat.t() * pn_mat;
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
 

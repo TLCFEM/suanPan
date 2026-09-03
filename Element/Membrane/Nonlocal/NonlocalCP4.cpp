@@ -40,9 +40,9 @@ NonlocalCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_
     }
 }
 
-NonlocalCP4::NonlocalCP4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double TH)
+NonlocalCP4::NonlocalCP4(const unsigned T, uvec&& N, const unsigned M, const double TH)
     : MaterialElement2D(T, m_node, m_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::NL1})
-    , thickness(TH) { access::rw(characteristic_length) = std::fabs(CL); }
+    , thickness(TH) {}
 
 int NonlocalCP4::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
@@ -73,7 +73,7 @@ int NonlocalCP4::initialize(const shared_ptr<DomainBase>& D) {
         const mat pn_mat = solve(jacob, pn);
         auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->unique_copy(), shape::quad(t_vec, 0), pn_mat);
 
-        const_mat -= c_pt.weight * c_pt.n_mat.t() * c_pt.n_mat + c_pt.weight * characteristic_length * characteristic_length * pn_mat.t() * pn_mat;
+        const_mat -= c_pt.weight * pn_mat.t() * pn_mat;
 
         initial_stiffness += c_pt.weight * c_pt.b_mat.t() * ini_stiffness * c_pt.b_mat;
     }
