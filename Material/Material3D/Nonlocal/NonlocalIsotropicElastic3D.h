@@ -55,7 +55,7 @@ public:
     };
 
 private:
-    static const uvec u_dof, d_dof;
+    static const uvec UD, DD;
 
     const EnergyType energy_type;
 
