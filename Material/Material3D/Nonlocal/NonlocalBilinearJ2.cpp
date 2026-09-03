@@ -25,12 +25,15 @@ const mat NonlocalBilinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4(
 const uvec NonlocalBilinearJ2::UD{0, 1, 2, 3, 4, 5};
 const uvec NonlocalBilinearJ2::DD{6};
 
-NonlocalBilinearJ2::NonlocalBilinearJ2(const unsigned T, const double E, const double V, const double Y, const double PE, const double ER, const double H, const double B, const double R)
-    : DataNonlocalBilinearJ2{.elastic_modulus = std::fabs(E), .poissons_ratio = V, .yield_stress = std::fabs(Y), .plastic_strain_threshold = PE, .evolution_rate = std::fabs(ER), .hardening_ratio = H, .beta = std::clamp(B, 0., 1.)}
-    , Material3D(T, R) {}
+NonlocalBilinearJ2::NonlocalBilinearJ2(const unsigned T, const double E, const double V, const double Y, const double PE, const double ER, const double RL, const double DR, const double H, const double B, const double R)
+    : DataNonlocalBilinearJ2{.elastic_modulus = std::fabs(E), .poissons_ratio = V, .yield_stress = std::fabs(Y), .plastic_strain_threshold = PE, .evolution_rate = std::fabs(ER), .reference_length = std::fabs(RL), .diffusion_rate = std::fabs(DR), .hardening_ratio = H, .beta = std::clamp(B, 0., 1.)}
+    , NonlocalMaterial3D(T, R) {}
 
 int NonlocalBilinearJ2::initialize(const shared_ptr<DomainBase>&) {
-    trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio, nonlocal_size());
+    initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio, nonlocal_size());
+    const auto [s, ds] = compute_scale(0.);
+    initial_stiffness(DD, DD).fill(-s * s);
+    trial_stiffness = current_stiffness = initial_stiffness;
 
     initialize_history(13);
 
@@ -91,6 +94,11 @@ int NonlocalBilinearJ2::update_trial_status(const vec& t_strain) {
     trial_stiffness(UD, DD) = -trial_stress(UD);
     trial_stress(UD) *= 1. - trial_strain(6);
     trial_stiffness(UD, UD) *= 1. - trial_strain(6);
+
+    const auto [s, ds] = compute_scale(trial_stress(6));
+
+    trial_stiffness(DD, UD) *= s * s + 2. * s * ds * (trial_stress(6) - trial_strain(6));
+    trial_stiffness(DD, DD).fill(-s * s);
 
     return SUANPAN_SUCCESS;
 }

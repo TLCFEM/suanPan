@@ -90,30 +90,6 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int NonlocalIsotropicElastic3D::clear_status() {
-    current_strain = trial_strain.zeros();
-    current_stress = trial_stress.zeros();
-    current_stiffness = trial_stiffness = initial_stiffness;
-    current_history = trial_history = initial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlocalIsotropicElastic3D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlocalIsotropicElastic3D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
-    return SUANPAN_SUCCESS;
-}
-
 void NonlocalIsotropicElastic3D::print() {
     suanpan_info("A 3D isotropic elastic material with E={:.4E} and nu={:.4E}.\n", elastic_modulus, poissons_ratio);
 }
