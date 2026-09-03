@@ -62,7 +62,6 @@ private:
     [[nodiscard]] std::pair<double, double> compute_scale(const double k) const {
         const auto exp_term = std::exp(diffusion_rate * k);
         const auto s = exp_term / reference_length;
-
         return {s, diffusion_rate * s};
     }
 

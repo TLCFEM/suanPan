@@ -38,10 +38,10 @@ struct DataNonlocalBilinearJ2 {
     const double yield_stress;             // initial yield stress
     const double plastic_strain_threshold; // threshold
     const double evolution_rate;           // evolution rate
-    const double reference_length;
-    const double diffusion_rate;
-    const double hardening_ratio; // hardening ratio
-    const double beta;            // isotropic (1.0) / kinematic (0.0) hardening factor
+    const double reference_length;         // reference length
+    const double diffusion_rate;           // diffusion rate
+    const double hardening_ratio;          // hardening ratio
+    const double beta;                     // isotropic (1.0) / kinematic (0.0) hardening factor
 };
 
 class NonlocalBilinearJ2 final : protected DataNonlocalBilinearJ2, public NonlocalMaterial3D {
@@ -59,7 +59,6 @@ class NonlocalBilinearJ2 final : protected DataNonlocalBilinearJ2, public Nonloc
     [[nodiscard]] std::pair<double, double> compute_scale(const double k) const {
         const auto exp_term = std::exp(diffusion_rate * k);
         const auto s = exp_term / reference_length;
-
         return {s, diffusion_rate * s};
     }
 
