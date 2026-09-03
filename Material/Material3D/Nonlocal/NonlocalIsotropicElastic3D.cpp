@@ -87,6 +87,8 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
     trial_stiffness(d_dof, u_dof) *= s * s + 2. * s * ds * (trial_stress(6) - trial_strain(6));
     trial_stiffness(d_dof, d_dof).fill(-s * s);
 
+    trial_stress(6) = s * s * (trial_stress(6) - trial_strain(6));
+
     return SUANPAN_SUCCESS;
 }
 

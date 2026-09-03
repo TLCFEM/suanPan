@@ -100,6 +100,8 @@ int NonlocalBilinearJ2::update_trial_status(const vec& t_strain) {
     trial_stiffness(DD, UD) *= s * s + 2. * s * ds * (trial_stress(6) - trial_strain(6));
     trial_stiffness(DD, DD).fill(-s * s);
 
+    trial_stress(6) = s * s * (trial_stress(6) - trial_strain(6));
+
     return SUANPAN_SUCCESS;
 }
 
