@@ -27,7 +27,7 @@ const uvec NonlocalBilinearJ2::DD{6};
 
 NonlocalBilinearJ2::NonlocalBilinearJ2(const unsigned T, const double E, const double V, const double Y, const double PE, const double ER, const double H, const double B, const double R)
     : DataNonlocalBilinearJ2{.elastic_modulus = std::fabs(E), .poissons_ratio = V, .yield_stress = std::fabs(Y), .plastic_strain_threshold = PE, .evolution_rate = std::fabs(ER), .hardening_ratio = H, .beta = std::clamp(B, 0., 1.)}
-    , Material3D(T, R) {}
+    , NonlocalMaterial3D(T, R) {}
 
 int NonlocalBilinearJ2::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio, nonlocal_size());

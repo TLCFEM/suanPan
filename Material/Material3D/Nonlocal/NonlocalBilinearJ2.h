@@ -42,7 +42,7 @@ struct DataNonlocalBilinearJ2 {
     const double beta;                     // isotropic (1.0) / kinematic (0.0) hardening factor
 };
 
-class NonlocalBilinearJ2 final : protected DataNonlocalBilinearJ2, public Material3D {
+class NonlocalBilinearJ2 final : protected DataNonlocalBilinearJ2, public NonlocalMaterial3D {
     static const double two_third;
     static const double root_two_third;
     static const mat unit_dev_tensor;

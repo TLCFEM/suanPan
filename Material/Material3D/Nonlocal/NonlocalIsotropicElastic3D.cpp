@@ -19,8 +19,8 @@
 
 #include <Toolbox/tensor.h>
 
-const uvec NonlocalIsotropicElastic3D::u_dof{0, 1, 2, 3, 4, 5};
-const uvec NonlocalIsotropicElastic3D::d_dof{6};
+const uvec NonlocalIsotropicElastic3D::UD{0, 1, 2, 3, 4, 5};
+const uvec NonlocalIsotropicElastic3D::DD{6};
 
 NonlocalIsotropicElastic3D::NonlocalIsotropicElastic3D(const unsigned T, const double E, const double P, const double ME, const double ER, const EnergyType ET, const double R)
     : DataNonlocalIsotropicElastic3D{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(P), .maximum_energy = std::fabs(ME), .evolution_rate = std::fabs(ER)}
@@ -61,48 +61,24 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
         const auto [tension_projector, tension_derivative] = transform::stress::eigen_to_tensile_derivative(principal_stress, principal_direction);
 
         target_stress = tension_projector * target_stress;
-        target_der = solve(initial_stiffness(u_dof, u_dof), target_stress).t() * tension_derivative;
+        target_der = solve(initial_stiffness(UD, UD), target_stress).t() * tension_derivative;
         if(EnergyType::DEV_TENSILE == energy_type) dev(target_der);
-        target_der *= initial_stiffness(u_dof, u_dof);
+        target_der *= initial_stiffness(UD, UD);
     }
 
-    if(const auto excessive_energy = .5 * dot(solve(initial_stiffness(u_dof, u_dof), target_stress), target_stress) - maximum_energy; excessive_energy > trial_history(0)) {
+    if(const auto excessive_energy = .5 * dot(solve(initial_stiffness(UD, UD), target_stress), target_stress) - maximum_energy; excessive_energy > trial_history(0)) {
         trial_history(0) = excessive_energy;
         const auto sqrt_term = std::sqrt(excessive_energy / maximum_energy + 1.);
         trial_stress(6) = 1. - std::exp(evolution_rate * (1. - sqrt_term));
-        trial_stiffness(d_dof, u_dof) = (1. - trial_stress(6)) * evolution_rate * .5 / sqrt_term / maximum_energy * target_der;
+        trial_stiffness(DD, UD) = (1. - trial_stress(6)) * evolution_rate * .5 / sqrt_term / maximum_energy * target_der;
     }
     else trial_stress(6) = current_stress(6);
 
-    trial_stiffness(u_dof, d_dof) = -trial_stress(u_dof);
+    trial_stiffness(UD, DD) = -trial_stress(UD);
 
-    trial_stress(u_dof) *= 1. - trial_strain(6);
-    trial_stiffness(u_dof, u_dof) *= 1. - trial_strain(6);
+    trial_stress(UD) *= 1. - trial_strain(6);
+    trial_stiffness(UD, UD) *= 1. - trial_strain(6);
 
-    return SUANPAN_SUCCESS;
-}
-
-int NonlocalIsotropicElastic3D::clear_status() {
-    current_strain = trial_strain.zeros();
-    current_stress = trial_stress.zeros();
-    current_stiffness = trial_stiffness = initial_stiffness;
-    current_history = trial_history = initial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlocalIsotropicElastic3D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlocalIsotropicElastic3D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
     return SUANPAN_SUCCESS;
 }
 

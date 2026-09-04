@@ -53,7 +53,7 @@ public:
     };
 
 private:
-    static const uvec u_dof, d_dof;
+    static const uvec UD, DD;
 
     const EnergyType energy_type;
 
@@ -77,10 +77,6 @@ public:
     [[nodiscard]] unsigned nonlocal_size() const override;
 
     int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 
     void print() override;
 };
