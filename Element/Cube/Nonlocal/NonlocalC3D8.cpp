@@ -23,13 +23,13 @@
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
 
-const uvec NonlocalC3D8::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 25, 26, 28, 29, 30};
-const uvec NonlocalC3D8::d_dof{3, 7, 11, 15, 19, 23, 27, 31};
+const uvec NonlocalC3D8::UD{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 25, 26, 28, 29, 30};
+const uvec NonlocalC3D8::DD{3, 7, 11, 15, 19, 23, 27, 31};
 
-NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, const mat& N, const mat& P)
+NonlocalC3D8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, const shared_ptr<Material>& M, const mat& N, const mat& P)
     : coor(std::move(C))
     , weight(W)
-    , c_material(std::move(M))
+    , c_material(M->unique_copy())
     , strain_mat(7, c_size) {
     for(auto I = 0u, J = 0u, K = 1u, L = 2u, Q = 3u; I < c_node; ++I, J += c_dof, K += c_dof, L += c_dof, Q += c_dof) {
         strain_mat(0, J) = strain_mat(3, K) = strain_mat(5, L) = P(0, I);
@@ -58,7 +58,7 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
 
-    const_mat.zeros(d_dof.n_elem, d_dof.n_elem);
+    const_mat.zeros(DD.n_elem, DD.n_elem);
     initial_stiffness.zeros(c_size, c_size);
     for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
@@ -67,13 +67,13 @@ int NonlocalC3D8::initialize(const shared_ptr<DomainBase>& D) {
         const auto n_mat = shape::cube(t_vec, 0);
         const mat pn_mat = solve(jacob, pn);
 
-        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), n_mat, pn_mat);
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto, n_mat, pn_mat);
 
         const_mat -= c_pt.weight * pn_mat.t() * pn_mat;
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
 
-    initial_stiffness(d_dof, d_dof) += const_mat;
+    initial_stiffness(DD, DD) += const_mat;
     trial_stiffness = current_stiffness = initial_stiffness;
 
     ConstantMass(this);
@@ -94,8 +94,8 @@ int NonlocalC3D8::update_status() {
         trial_stiffness += I.weight * I.strain_mat.t() * I.c_material->get_trial_stiffness() * I.strain_mat;
     }
 
-    trial_stiffness(d_dof, d_dof) += const_mat;
-    trial_resistance(d_dof) += const_mat * t_disp(d_dof);
+    trial_stiffness(DD, DD) += const_mat;
+    trial_resistance(DD) += const_mat * t_disp(DD);
 
     return SUANPAN_SUCCESS;
 }
@@ -119,7 +119,7 @@ int NonlocalC3D8::reset_status() {
 }
 
 std::vector<vec> NonlocalC3D8::record(const OutputType P) const {
-    if(OutputType::NONLOCAL == P) return {get_current_displacement()(d_dof)};
+    if(OutputType::NONLOCAL == P) return {get_current_displacement()(DD)};
 
     std::vector<vec> data;
     for(const auto& I : int_pt) suanpan::append_to(data, I.c_material->record(P));
@@ -143,11 +143,11 @@ void NonlocalC3D8::print() {
 vtkSmartPointer<vtkCell> NonlocalC3D8::GetCell() const { return vtkSmartPointer<vtkHexahedron>::New(); }
 
 mat NonlocalC3D8::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 3, c_node), 6, c_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 3, c_node), 6, c_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(UD), 3, c_node), 6, c_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(UD), 3, c_node), 6, c_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(UD), 3, c_node), 6, c_node);
 
-    if(OutputType::NONLOCAL == P) return get_current_displacement()(d_dof).t();
+    if(OutputType::NONLOCAL == P) return get_current_displacement()(DD).t();
 
     mat A(static_cast<uword>(int_pt.size()), 7);
     mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
@@ -171,6 +171,6 @@ mat NonlocalC3D8::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-mat NonlocalC3D8::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement()(u_dof), 3, c_node); }
+mat NonlocalC3D8::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement()(UD), 3, c_node); }
 
 #endif

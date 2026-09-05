@@ -18,7 +18,7 @@
  * @class NonlocalC3D8
  * @brief The NonlocalC3D8 class.
  * @author tlc
- * @date 16/12/2020
+ * @date 15/08/2026
  * @version 0.1.0
  * @file NonlocalC3D8.h
  * @addtogroup Cube
@@ -38,12 +38,12 @@ class NonlocalC3D8 final : public MaterialElement3D {
         unique_ptr<Material> c_material;
         sp_mat strain_mat;
 
-        IntegrationPoint(vec&&, double, unique_ptr<Material>&&, const mat&, const mat&);
+        IntegrationPoint(vec&&, double, const shared_ptr<Material>&, const mat&, const mat&);
     };
 
     static constexpr unsigned c_node{8u}, c_dof{4u}, c_size = c_dof * c_node;
 
-    static const uvec u_dof, d_dof;
+    static const uvec UD, DD;
 
     std::vector<IntegrationPoint> int_pt;
 

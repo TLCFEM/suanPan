@@ -24,13 +24,13 @@
 #include <Toolbox/shape.h>
 #include <Toolbox/utility.h>
 
-const uvec NonlocalCP4::u_dof{0, 1, 3, 4, 6, 7, 9, 10};
-const uvec NonlocalCP4::d_dof{2, 5, 8, 11};
+const uvec NonlocalCP4::UD{0, 1, 3, 4, 6, 7, 9, 10};
+const uvec NonlocalCP4::DD{2, 5, 8, 11};
 
-NonlocalCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& N, const mat& PNPXY)
+NonlocalCP4::IntegrationPoint::IntegrationPoint(vec&& C, const double W, const shared_ptr<Material>& M, mat&& N, const mat& PNPXY)
     : coor(std::move(C))
     , weight(W)
-    , m_material(std::move(M))
+    , m_material(M->unique_copy())
     , n_mat(std::move(N))
     , b_mat(4, m_size, fill::zeros) {
     for(auto I{0u}, J{0u}, K{1u}, L{2u}; I < m_node; ++I, J += m_dof, K += m_dof, L += m_dof) {
@@ -62,7 +62,7 @@ int NonlocalCP4::initialize(const shared_ptr<DomainBase>& D) {
 
     initial_stiffness.zeros(m_size, m_size);
 
-    const_mat.zeros(d_dof.n_elem, d_dof.n_elem);
+    const_mat.zeros(DD.n_elem, DD.n_elem);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
@@ -71,13 +71,13 @@ int NonlocalCP4::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = shape::quad(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const mat pn_mat = solve(jacob, pn);
-        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto->unique_copy(), shape::quad(t_vec, 0), pn_mat);
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, material_proto, shape::quad(t_vec, 0), pn_mat);
 
         const_mat -= c_pt.weight * pn_mat.t() * pn_mat;
-
         initial_stiffness += c_pt.weight * c_pt.b_mat.t() * ini_stiffness * c_pt.b_mat;
     }
-    initial_stiffness(d_dof, d_dof) += const_mat;
+
+    initial_stiffness(DD, DD) += const_mat;
     trial_stiffness = current_stiffness = initial_stiffness;
 
     if(const auto t_density = material_proto->get_density(); t_density > 0.) {
@@ -110,8 +110,8 @@ int NonlocalCP4::update_status() {
         trial_stiffness += I.weight * I.b_mat.t() * I.m_material->get_trial_stiffness() * I.b_mat;
     }
 
-    trial_stiffness(d_dof, d_dof) += const_mat;
-    trial_resistance(d_dof) += const_mat * t_disp(d_dof);
+    trial_stiffness(DD, DD) += const_mat;
+    trial_resistance(DD) += const_mat * t_disp(DD);
 
     return SUANPAN_SUCCESS;
 }
@@ -135,7 +135,7 @@ int NonlocalCP4::reset_status() {
 }
 
 std::vector<vec> NonlocalCP4::record(const OutputType P) const {
-    if(OutputType::NONLOCAL == P) return {get_current_displacement()(d_dof)};
+    if(OutputType::NONLOCAL == P) return {get_current_displacement()(DD)};
 
     std::vector<vec> data;
     for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));
@@ -160,11 +160,11 @@ void NonlocalCP4::print() {
 vtkSmartPointer<vtkCell> NonlocalCP4::GetCell() const { return vtkSmartPointer<vtkQuad>::New(); }
 
 mat NonlocalCP4::GetData(const OutputType P) {
-    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 2, m_node), 6, m_node);
-    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 2, m_node), 6, m_node);
-    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 2, m_node), 6, m_node);
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(UD), 2, m_node), 6, m_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(UD), 2, m_node), 6, m_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(UD), 2, m_node), 6, m_node);
 
-    if(OutputType::NONLOCAL == P) return get_current_displacement()(d_dof).t();
+    if(OutputType::NONLOCAL == P) return get_current_displacement()(DD).t();
 
     mat A(static_cast<uword>(int_pt.size()), 4);
     mat B(6, static_cast<uword>(int_pt.size()), fill::zeros);
@@ -184,6 +184,6 @@ mat NonlocalCP4::GetData(const OutputType P) {
     return (data * solve(A, B.t())).t();
 }
 
-mat NonlocalCP4::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(u_dof), 2, m_node); }
+mat NonlocalCP4::GetDeformation(const double amplifier) { return get_coordinate(2).t() + amplifier * reshape(get_current_displacement()(UD), 2, m_node); }
 
 #endif

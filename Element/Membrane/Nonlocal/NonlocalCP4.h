@@ -39,12 +39,12 @@ class NonlocalCP4 final : public MaterialElement2D {
         unique_ptr<Material> m_material;
         mat n_mat, b_mat;
 
-        IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, const mat&);
+        IntegrationPoint(vec&&, double, const shared_ptr<Material>&, mat&&, const mat&);
     };
 
     static constexpr unsigned m_node{4u}, m_dof{3u}, m_size = m_dof * m_node;
 
-    static const uvec u_dof, d_dof;
+    static const uvec UD, DD;
 
     const double thickness;
 
