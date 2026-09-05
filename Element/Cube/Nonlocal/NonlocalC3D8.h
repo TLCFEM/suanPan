@@ -53,8 +53,7 @@ public:
     NonlocalC3D8(
         unsigned, // tag
         uvec&&,   // node tag
-        unsigned, // material tag
-        double    // characteristic length
+        unsigned  // material tag
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

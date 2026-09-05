@@ -808,8 +808,8 @@ namespace {
             return;
         }
 
-        double elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate;
-        if(!get_input(command, elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate)) {
+        double elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate, reference_length, diffusion_rate;
+        if(!get_input(command, elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate, reference_length, diffusion_rate)) {
             suanpan_error("A valid parameter is required.\n");
             return;
         }
@@ -820,7 +820,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<NonlocalBilinearJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate, hardening_ratio, beta, density);
+        return_obj = std::make_unique<NonlocalBilinearJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate, reference_length, diffusion_rate, hardening_ratio, beta, density);
     }
 
     void new_bilinearmises1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -2200,8 +2200,8 @@ namespace {
             return;
         }
 
-        double elastic_modulus, poissons_ratio, maximum_energy, evolution_rate;
-        if(!get_input(command, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate)) {
+        double elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, reference_length, diffusion_rate;
+        if(!get_input(command, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, reference_length, diffusion_rate)) {
             suanpan_error("A valid parameter is required.\n");
             return;
         }
@@ -2214,7 +2214,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<NonlocalIsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, NonlocalIsotropicElastic3D::EnergyType::DEV_TENSILE, density);
+        return_obj = std::make_unique<NonlocalIsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, reference_length, diffusion_rate, NonlocalIsotropicElastic3D::EnergyType::DEV_TENSILE, density);
     }
 
     void new_elasticos(unique_ptr<Material>& return_obj, std::istringstream& command) {

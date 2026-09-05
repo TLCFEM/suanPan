@@ -22,13 +22,16 @@
 const uvec NonlocalIsotropicElastic3D::UD{0, 1, 2, 3, 4, 5};
 const uvec NonlocalIsotropicElastic3D::DD{6};
 
-NonlocalIsotropicElastic3D::NonlocalIsotropicElastic3D(const unsigned T, const double E, const double P, const double ME, const double ER, const EnergyType ET, const double R)
-    : DataNonlocalIsotropicElastic3D{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(P), .maximum_energy = std::fabs(ME), .evolution_rate = std::fabs(ER)}
+NonlocalIsotropicElastic3D::NonlocalIsotropicElastic3D(const unsigned T, const double E, const double P, const double ME, const double ER, const double RL, const double DR, const EnergyType ET, const double R)
+    : DataNonlocalIsotropicElastic3D{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(P), .maximum_energy = std::fabs(ME), .evolution_rate = std::fabs(ER), .reference_length = std::fabs(RL), .diffusion_rate = std::fabs(DR)}
     , NonlocalMaterial3D(T, R)
     , energy_type(ET) {}
 
 int NonlocalIsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
-    trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio, nonlocal_size());
+    initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio, nonlocal_size());
+    const auto [s, ds] = compute_scale(0.);
+    initial_stiffness(DD, DD).fill(-s * s);
+    trial_stiffness = current_stiffness = initial_stiffness;
 
     initialize_history(1u);
 
@@ -72,12 +75,21 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
         trial_stress(6) = 1. - std::exp(evolution_rate * (1. - sqrt_term));
         trial_stiffness(DD, UD) = (1. - trial_stress(6)) * evolution_rate * .5 / sqrt_term / maximum_energy * target_der;
     }
-    else trial_stress(6) = current_stress(6);
+    else trial_stress(6) = 1. - std::exp(evolution_rate * (1. - std::sqrt(trial_history(0) / maximum_energy + 1.)));
 
     trial_stiffness(UD, DD) = -trial_stress(UD);
 
-    trial_stress(UD) *= 1. - trial_strain(6);
-    trial_stiffness(UD, UD) *= 1. - trial_strain(6);
+    auto t_factor = 1. - trial_strain(6);
+
+    trial_stress(UD) *= t_factor;
+    trial_stiffness(UD, UD) *= t_factor;
+
+    const auto [s, ds] = compute_scale(trial_stress(6));
+    const auto s2 = s * s;
+
+    trial_stress(6) = s2 * (t_factor = trial_stress(6) - trial_strain(6));
+    trial_stiffness(DD, UD) *= s2 + 2. * s * ds * t_factor;
+    trial_stiffness(DD, DD).fill(-s2);
 
     return SUANPAN_SUCCESS;
 }

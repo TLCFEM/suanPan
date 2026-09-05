@@ -57,7 +57,6 @@ public:
         unsigned, // tag
         uvec&&,   // node tag
         unsigned, // material tag
-        double,   // characteristic length
         double    // thickness
     );
 
