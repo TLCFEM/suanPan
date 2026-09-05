@@ -456,7 +456,7 @@ contexts:
       1: entity.name.tag
       2: support.constant
       3: variable
-  - match: (?i)^(var|variable)\s+(\S+)\s+(\S+)$
+  - match: (?i)^(var|variable)\s+(\S+)\s+(.+)$
     captures:
       1: entity.name.tag
       2: variable

@@ -1404,7 +1404,7 @@ int process_command(const shared_ptr<Bead>& model, const std::string_view comman
     }
 
     if(is_equal_any(command_id, "var", "variable")) {
-        if(std::string name, value; get_input(command, name, value)) model->variable(name) = std::move(value);
+        if(std::string name; get_input(command, name)) model->variable(name) = get_remaining(command);
         else suanpan_error("A valid file name is required.\n");
 
         return SUANPAN_SUCCESS;
@@ -2338,6 +2338,7 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 
     for(const auto& file : file_list) {
         const auto file_path = fs::path(file);
+        if(fs::is_directory(file_path)) continue;
         input_file.open(file_path);
         if(input_file.is_open()) {
             input_file_size = file_size(file_path);
