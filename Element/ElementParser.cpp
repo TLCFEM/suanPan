@@ -1127,13 +1127,7 @@ namespace {
             return;
         }
 
-        double characteristic_length;
-        if(!get_input(command, characteristic_length)) {
-            suanpan_error("A valid characteristic length is required.\n");
-            return;
-        }
-
-        return_obj = std::make_unique<NonlocalC3D8>(tag, std::move(node_tag), material_tag, characteristic_length);
+        return_obj = std::make_unique<NonlocalC3D8>(tag, std::move(node_tag), material_tag);
     }
 
     template<bool monolithic> void new_dcp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1235,19 +1229,13 @@ namespace {
             return;
         }
 
-        double characteristic_length;
-        if(!get_input(command, characteristic_length)) {
-            suanpan_error("A valid characteristic length is required.\n");
-            return;
-        }
-
         auto thickness = 1.;
         if(!get_optional_input(command, thickness)) {
             suanpan_error("A valid thickness is required.\n");
             return;
         }
 
-        return_obj = std::make_unique<NonlocalCP4>(tag, std::move(node_tag), material_tag, characteristic_length, thickness);
+        return_obj = std::make_unique<NonlocalCP4>(tag, std::move(node_tag), material_tag, thickness);
     }
 
     void new_dkt3(unique_ptr<Element>& return_obj, std::istringstream& command) {

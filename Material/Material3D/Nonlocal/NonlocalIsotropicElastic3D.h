@@ -42,6 +42,8 @@ struct DataNonlocalIsotropicElastic3D {
     const double poissons_ratio;
     const double maximum_energy;
     const double evolution_rate;
+    const double reference_length;
+    const double diffusion_rate;
 };
 
 class NonlocalIsotropicElastic3D final : protected DataNonlocalIsotropicElastic3D, public NonlocalMaterial3D {
@@ -57,12 +59,19 @@ private:
 
     const EnergyType energy_type;
 
+    [[nodiscard]] std::pair<double, double> compute_scale(const double k) const {
+        const auto s = std::exp(diffusion_rate * k) / reference_length;
+        return {s, diffusion_rate * s};
+    }
+
 public:
     NonlocalIsotropicElastic3D(
         unsigned,   // tag
         double,     // elastic modulus
         double,     // poissons ratio
         double,     // maximum energy
+        double,     // evolution rate
+        double,     // reference length
         double,     // evolution rate
         EnergyType, // energy type
         double = 0. // density
