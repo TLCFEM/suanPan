@@ -39,7 +39,7 @@ struct DataNLE3D01 {
 };
 
 class NLE3D01 final : protected DataNLE3D01, public IsotropicNonlinearElastic3D {
-    const double factor_a = (.5 * m + .5) * ref_stress / (1. + m) * pow(ref_strain, -m);
+    const double factor_a = (.5 * m + .5) * ref_stress / (1. + m) * std::pow(ref_strain, -m);
     const double factor_b = (.5 * m - .5) * factor_a;
 
     vec compute_derivative(double, double) override;

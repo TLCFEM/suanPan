@@ -37,10 +37,6 @@ int NonlocalIsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
 
 double NonlocalIsotropicElastic3D::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
-unique_ptr<Material> NonlocalIsotropicElastic3D::unique_copy() { return std::make_unique<NonlocalIsotropicElastic3D>(*this); }
-
-unsigned NonlocalIsotropicElastic3D::nonlocal_size() const { return 1u; }
-
 int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
     trial_stress = (trial_stiffness = initial_stiffness) * trial_strain;

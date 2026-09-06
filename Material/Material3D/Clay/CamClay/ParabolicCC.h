@@ -35,7 +35,7 @@
 
 struct DataParabolicCC {
     const double a, a_slope;
-    const double limit = sqrt(fabs(a / a_slope));
+    const double limit = std::sqrt(std::fabs(a / a_slope));
 };
 
 class ParabolicCC final : protected DataParabolicCC, public NonlinearCamClay {

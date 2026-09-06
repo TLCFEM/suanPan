@@ -69,11 +69,11 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
-    unique_ptr<Material> unique_copy() override;
-
     [[nodiscard]] unsigned nonlocal_size() const override { return 1u; }
 
     [[nodiscard]] double get(Parameter) const override;
+
+    unique_ptr<Material> unique_copy() override { return std::make_unique<NonlocalBilinearJ2>(*this); }
 
     int update_trial_status(const vec&) override;
 

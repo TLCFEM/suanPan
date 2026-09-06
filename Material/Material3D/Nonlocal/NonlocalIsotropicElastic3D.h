@@ -70,11 +70,11 @@ public:
 
     int initialize(const shared_ptr<DomainBase>&) override;
 
+    [[nodiscard]] unsigned nonlocal_size() const override { return 1u; }
+
     [[nodiscard]] double get(Parameter) const override;
 
-    unique_ptr<Material> unique_copy() override;
-
-    [[nodiscard]] unsigned nonlocal_size() const override;
+    unique_ptr<Material> unique_copy() override { return std::make_unique<NonlocalIsotropicElastic3D>(*this); }
 
     int update_trial_status(const vec&) override;
 

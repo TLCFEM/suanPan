@@ -37,8 +37,6 @@ int NonlocalBilinearJ2::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-unique_ptr<Material> NonlocalBilinearJ2::unique_copy() { return std::make_unique<NonlocalBilinearJ2>(*this); }
-
 double NonlocalBilinearJ2::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlocalBilinearJ2::update_trial_status(const vec& t_strain) {
