@@ -56,10 +56,7 @@ class NonlocalBilinearJ2 final : protected DataNonlocalBilinearJ2, public Nonloc
     const double isotropic_modulus = beta * elastic_modulus * hardening_ratio / (1. - hardening_ratio);
     const double kinematic_modulus = (1. - beta) * elastic_modulus * hardening_ratio / (1. - hardening_ratio);
 
-    [[nodiscard]] std::pair<double, double> compute_scale(const double k) const {
-        const auto s = std::exp(diffusion_rate * k) / reference_length;
-        return {s, diffusion_rate * s};
-    }
+    [[nodiscard]] std::pair<double, double> compute_scale(const double k) const { return {(diffusion_rate * std::log(1. + k) + 1.) / reference_length, diffusion_rate / reference_length / (1. + k)}; }
 
 public:
     NonlocalBilinearJ2(

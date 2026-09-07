@@ -59,10 +59,7 @@ private:
 
     const EnergyType energy_type;
 
-    [[nodiscard]] std::pair<double, double> compute_scale(const double k) const {
-        const auto s = std::exp(diffusion_rate * k) / reference_length;
-        return {s, diffusion_rate * s};
-    }
+    [[nodiscard]] std::pair<double, double> compute_scale(const double k) const { return {(diffusion_rate * std::log(1. + k) + 1.) / reference_length, diffusion_rate / reference_length / (1. + k)}; }
 
 public:
     NonlocalIsotropicElastic3D(
