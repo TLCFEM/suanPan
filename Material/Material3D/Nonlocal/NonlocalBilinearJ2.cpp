@@ -85,8 +85,10 @@ int NonlocalBilinearJ2::update_trial_status(const vec& t_strain) {
     }
 
     if(eqv_plastic_strain > plastic_strain_threshold) {
-        trial_stress(6) = 1. - std::exp(evolution_rate * (plastic_strain_threshold - eqv_plastic_strain));
-        if(yield_flag) trial_stiffness(DD, UD) = (1. - trial_stress(6)) * evolution_rate * ppepe;
+        const auto t_diff = evolution_rate * (eqv_plastic_strain - plastic_strain_threshold);
+        const auto t_denom = 1. + std::pow(t_diff, 2.);
+        trial_stress(6) = 1. - 1. / t_denom;
+        if(yield_flag) trial_stiffness(DD, UD) = 2. * t_diff / t_denom / t_denom * evolution_rate * ppepe;
     }
     else trial_stress(6) = 0.;
 
