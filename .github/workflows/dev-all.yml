@@ -139,13 +139,13 @@ jobs:
           lcov --capture --directory . --output-file coverage.info
           lcov --remove coverage.info '/usr/*' --output-file coverage.info
           lcov --list coverage.info
-      - if: ${{ matrix.os == 'ubuntu-24.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
+      - if: ${{ matrix.os == 'ubuntu-24.04-arm' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
         name: Result
         uses: actions/upload-artifact@v7
         with:
           name: Results-${{ github.sha }}
           path: ./build/Results
-      - if: ${{ matrix.os == 'ubuntu-24.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
+      - if: ${{ matrix.os == 'ubuntu-24.04-arm' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
         name: Cache
         run: |
           echo "${{ secrets.STATIC_KEY }}" > key.pem
@@ -206,7 +206,7 @@ jobs:
         vtk:
           - 'ON'
           - 'OFF'
-    timeout-minutes: 150
+    timeout-minutes: 120
   linux-dev-mpi:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     needs: guard
