@@ -67,11 +67,13 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
 
     if(const auto excessive_energy = .5 * dot(solve(initial_stiffness(UD, UD), target_stress), target_stress) - maximum_energy; excessive_energy > trial_history(0)) {
         trial_history(0) = excessive_energy;
-        const auto sqrt_term = std::sqrt(excessive_energy / maximum_energy + 1.);
-        trial_stress(6) = 1. - std::exp(evolution_rate * (1. - sqrt_term));
-        trial_stiffness(DD, UD) = (1. - trial_stress(6)) * evolution_rate * .5 / sqrt_term / maximum_energy * target_der;
+        const auto t_sqrt = std::sqrt(excessive_energy / maximum_energy + 1.);
+        const auto t_diff = evolution_rate * (t_sqrt - 1.);
+        const auto t_denom = 1. + std::pow(t_diff, 2.);
+        trial_stress(6) = 1. - 1. / t_denom;
+        trial_stiffness(DD, UD) = t_diff * evolution_rate / t_denom / t_denom / t_sqrt / maximum_energy * target_der;
     }
-    else trial_stress(6) = 1. - std::exp(evolution_rate * (1. - std::sqrt(trial_history(0) / maximum_energy + 1.)));
+    else trial_stress(6) = 1. - 1. / (1. + std::pow(evolution_rate * (std::sqrt(trial_history(0) / maximum_energy + 1.) - 1.), 2.));
 
     trial_stiffness(UD, DD) = -trial_stress(UD);
 
