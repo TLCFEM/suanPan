@@ -211,12 +211,12 @@ struct strip_op_find_default< mtOp<uword, T1, op_find_default> >
 
 
 template<typename T1>
-struct sp_strip_trans
+struct strip_xtrans
   {
   typedef T1 stored_type;
   
   inline
-  sp_strip_trans(const T1& X)
+  strip_xtrans(const T1& X)
     : M(X)
     {
     arma_debug_sigprint();
@@ -231,12 +231,12 @@ struct sp_strip_trans
 
 
 template<typename T1>
-struct sp_strip_trans< SpOp<T1, spop_htrans> >
+struct strip_xtrans< Op<T1, op_htrans> >
   {
   typedef T1 stored_type;
   
   inline
-  sp_strip_trans(const SpOp<T1, spop_htrans>& X)
+  strip_xtrans(const Op<T1, op_htrans>& X)
     : M(X.m)
     {
     arma_debug_sigprint();
@@ -251,12 +251,158 @@ struct sp_strip_trans< SpOp<T1, spop_htrans> >
 
 
 template<typename T1>
-struct sp_strip_trans< SpOp<T1, spop_strans> >
+struct strip_xtrans< Op<T1, op_strans> >
   {
   typedef T1 stored_type;
   
   inline
-  sp_strip_trans(const SpOp<T1, spop_strans>& X)
+  strip_xtrans(const Op<T1, op_strans>& X)
+    : M(X.m)
+    {
+    arma_debug_sigprint();
+    }
+  
+  static constexpr bool do_htrans = false;
+  static constexpr bool do_strans = true;
+  
+  const T1& M;
+  };
+
+
+
+template<typename T1>
+struct strip_xtrans< OpCube<T1, op_htrans> >
+  {
+  typedef T1 stored_type;
+  
+  inline
+  strip_xtrans(const OpCube<T1, op_htrans>& X)
+    : M(X.m)
+    {
+    arma_debug_sigprint();
+    }
+  
+  static constexpr bool do_htrans = true;
+  static constexpr bool do_strans = false;
+  
+  const T1& M;
+  };
+
+
+
+template<typename T1>
+struct strip_xtrans< OpCube<T1, op_strans> >
+  {
+  typedef T1 stored_type;
+  
+  inline
+  strip_xtrans(const OpCube<T1, op_strans>& X)
+    : M(X.m)
+    {
+    arma_debug_sigprint();
+    }
+  
+  static constexpr bool do_htrans = false;
+  static constexpr bool do_strans = true;
+  
+  const T1& M;
+  };
+
+
+
+//
+
+
+
+template<typename T1>
+struct strip_permute
+  {
+  typedef T1 stored_type;
+  
+  inline
+  strip_permute(const T1& X)
+    : M(X)
+    {
+    arma_debug_sigprint();
+    }
+  
+  static constexpr bool do_permute = false;
+  
+  const T1& M;
+  };
+
+
+
+template<typename T1>
+struct strip_permute< OpCube<T1, op_permute> >
+  {
+  typedef T1 stored_type;
+  
+  inline
+  strip_permute(const OpCube<T1, op_permute>& X)
+    : M(X.m)
+    {
+    arma_debug_sigprint();
+    }
+  
+  static constexpr bool do_permute = true;
+  
+  const T1& M;
+  };
+
+
+
+//
+
+
+
+template<typename T1>
+struct sp_strip_xtrans
+  {
+  typedef T1 stored_type;
+  
+  inline
+  sp_strip_xtrans(const T1& X)
+    : M(X)
+    {
+    arma_debug_sigprint();
+    }
+  
+  static constexpr bool do_htrans = false;
+  static constexpr bool do_strans = false;
+  
+  const T1& M;
+  };
+
+
+
+template<typename T1>
+struct sp_strip_xtrans< SpOp<T1, spop_htrans> >
+  {
+  typedef T1 stored_type;
+  
+  inline
+  sp_strip_xtrans(const SpOp<T1, spop_htrans>& X)
+    : M(X.m)
+    {
+    arma_debug_sigprint();
+    }
+  
+  static constexpr bool do_htrans = true;
+  static constexpr bool do_strans = false;
+  
+  const T1& M;
+  };
+
+
+
+template<typename T1>
+struct sp_strip_xtrans< SpOp<T1, spop_strans> >
+  {
+  typedef T1 stored_type;
+  
+  inline
+  sp_strip_xtrans(const SpOp<T1, spop_strans>& X)
     : M(X.m)
     {
     arma_debug_sigprint();
