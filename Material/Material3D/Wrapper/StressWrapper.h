@@ -43,7 +43,7 @@ class StressWrapper : public Material {
 
     vec trial_full_strain, current_full_strain;
 
-    [[nodiscard]] mat form_stiffness(const mat&) const;
+    [[nodiscard]] int form_stiffness(mat&, const mat&) const;
 
 protected:
     ResourceHolder<Material> base;

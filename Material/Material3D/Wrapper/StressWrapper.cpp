@@ -20,7 +20,14 @@
 #include <Domain/DomainBase.h>
 #include <set>
 
-mat StressWrapper::form_stiffness(const mat& full_stiffness) const { return full_stiffness(F1, F1) - full_stiffness(F1, F2) * solve(full_stiffness(F2, F2), full_stiffness(F2, F1)); }
+int StressWrapper::form_stiffness(mat& condensed_mat, const mat& full_stiffness) const {
+    if(mat aux_mat; solve(aux_mat, full_stiffness(F2, F2), full_stiffness(F2, F1))) {
+        condensed_mat = full_stiffness(F1, F1) - full_stiffness(F1, F2) * aux_mat;
+        return SUANPAN_SUCCESS;
+    }
+
+    return SUANPAN_FAIL;
+}
 
 StressWrapper::StressWrapper(const unsigned T, const unsigned BT, const unsigned MI, uvec&& FA, const MaterialType MT)
     : Material(T, MT, 0.)
@@ -56,7 +63,9 @@ int StressWrapper::initialize(const shared_ptr<DomainBase>&) {
 
     trial_full_strain = current_full_strain.zeros(total_size);
 
-    trial_stiffness = current_stiffness = initial_stiffness = form_stiffness(base->get_initial_stiffness());
+    if(form_stiffness(initial_stiffness, base->get_initial_stiffness()) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+
+    trial_stiffness = current_stiffness = initial_stiffness;
 
     return SUANPAN_SUCCESS;
 }
@@ -73,8 +82,12 @@ int StressWrapper::update_trial_status(const vec& t_strain) {
 
     trial_full_strain(F1) = trial_strain = t_strain;
 
+    vec t_incre;
+
     if(1u == max_iteration) {
-        trial_full_strain(F2) -= solve(t_stiffness(F2, F2), t_stress(F2) + t_stiffness(F2, F1) * incre_strain);
+        if(!solve(t_incre, t_stiffness(F2, F2), t_stress(F2) + t_stiffness(F2, F1) * incre_strain)) return SUANPAN_FAIL;
+
+        trial_full_strain(F2) -= t_incre;
 
         if(SUANPAN_SUCCESS != base->update_trial_status(trial_full_strain)) return SUANPAN_FAIL;
     }
@@ -88,21 +101,23 @@ int StressWrapper::update_trial_status(const vec& t_strain) {
 
             if(SUANPAN_SUCCESS != base->update_trial_status(trial_full_strain)) return SUANPAN_FAIL;
 
-            const vec incre = solve(t_stiffness(F2, F2), t_stress(F2));
-            const auto error = suanpan::inf_norm(incre);
+            if(!solve(t_incre, t_stiffness(F2, F2), t_stress(F2))) return SUANPAN_FAIL;
+
+            const auto error = suanpan::inf_norm(t_incre);
+
             if(1u == counter) ref_error = error;
             suanpan_debug("Local iteration error: {:.5E}.\n", error);
             if(error < tolerance * ref_error || (suanpan::inf_norm(t_stress(F2)) < tolerance && counter > 5u)) break;
 
-            trial_full_strain(F2) -= incre;
+            trial_full_strain(F2) -= t_incre;
         }
     }
 
-    trial_stress = t_stress(F1) - t_stiffness(F1, F2) * solve(t_stiffness(F2, F2), t_stress(F2));
+    if(!solve(t_incre, t_stiffness(F2, F2), t_stress(F2))) return SUANPAN_FAIL;
 
-    trial_stiffness = form_stiffness(t_stiffness);
+    trial_stress = t_stress(F1) - t_stiffness(F1, F2) * t_incre;
 
-    return SUANPAN_SUCCESS;
+    return form_stiffness(trial_stiffness, t_stiffness);
 }
 
 int StressWrapper::clear_status() {
