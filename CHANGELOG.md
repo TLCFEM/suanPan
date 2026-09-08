@@ -9,6 +9,8 @@
 1. (**breaking**) change the behaviour of criterion DoF tokens, similar to the change made in v4.0, use explicit tokens for unconventional DoFs [#368](https://github.com/TLCFEM/suanPan/pull/368)
 2. reduce memory footprint by isolating couple stress implementation [#378](https://github.com/TLCFEM/suanPan/pull/378)
 3. update `Armadillo` to version `15.6.0`
+4. update `VTK` to version `9.7.0`
+5. improve robustness of CDP concrete model
 
 ## version 4.1.1
 
