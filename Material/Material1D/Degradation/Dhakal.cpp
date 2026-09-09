@@ -45,7 +45,7 @@ vec Dhakal::compute_negative_degradation(double t_strain) const {
 }
 
 Dhakal::Dhakal(const unsigned T, const unsigned MT, const double EY, const double PP)
-    : DataDhakal{-fabs(EY), -fabs(EY) * std::max(55. - 2.3 * fabs(PP), 7.), std::min(1., std::max(1.1 - .016 * fabs(PP), .2))}
+    : DataDhakal{.yield_strain = -fabs(EY), .inter_strain = -fabs(EY) * std::max(55. - 2.3 * fabs(PP), 7.), .inter_factor = std::min(1., std::max(1.1 - .016 * fabs(PP), .2))}
     , StrainDegradation(T, MT) {}
 
 unique_ptr<Material> Dhakal::unique_copy() { return std::make_unique<Dhakal>(*this); }

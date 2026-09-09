@@ -98,10 +98,10 @@ ConcreteTable::ConcreteTable(const unsigned T, mat&& CT, mat&& TT, const double 
     , c_strain(c_table.col(0)(index_min(c_table.col(1))))
     , t_strain(t_table.col(0)(index_max(t_table.col(1)))) {}
 
-int ConcreteTable::initialize(const shared_ptr<DomainBase>&) {
+int ConcreteTable::initialize(const shared_ptr<DomainBase>& D) {
     trial_stiffness = current_stiffness = initial_stiffness = .5 * ((c_table(1, 1) - c_table(0, 1)) / (c_table(1, 0) - c_table(0, 0)) + (t_table(1, 1) - t_table(0, 1)) / (t_table(1, 0) - t_table(0, 0)));
 
-    return SUANPAN_SUCCESS;
+    return SimpleHysteresis::initialize(D);
 }
 
 double ConcreteTable::get(const Parameter P) const {

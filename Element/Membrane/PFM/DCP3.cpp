@@ -25,8 +25,9 @@
 const uvec DCP3::u_dof{0, 1, 3, 4, 6, 7};
 const uvec DCP3::d_dof{2, 5, 8};
 
-DCP3::DCP3(const unsigned T, uvec&& NT, const unsigned MT, const double CL, const double RR, const double TH)
+DCP3::DCP3(const unsigned T, uvec&& NT, const unsigned MT, const double CL, const double RR, const double TH, const bool MN)
     : MaterialElement2D(T, m_node, m_dof, std::move(NT), uvec{MT}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::DAMAGE})
+    , monolithic(MN)
     , release_rate(RR)
     , thickness(TH) { access::rw(characteristic_length) = CL; }
 
@@ -43,7 +44,7 @@ int DCP3::initialize(const shared_ptr<DomainBase>& D) {
 
     access::rw(area) = .5 * det(ele_coor);
 
-    if(0. >= characteristic_length) access::rw(characteristic_length) = 2. * sqrt(area);
+    if(characteristic_length < 0.) access::rw(characteristic_length) = 2. * std::sqrt(area);
 
     const mat inv_coor = inv(ele_coor);
     pn_mat = inv_coor.rows(1, 2);
@@ -78,18 +79,26 @@ int DCP3::update_status() {
     if(m_material->update_trial_status(t_strain) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
 
     const auto pow_term = 1. - dot(t_damage, n_mat);
-    const auto damage = pow(pow_term, 2.);
+    const auto damage = std::min(1., std::pow(pow_term, 2.) + std::numeric_limits<float>::epsilon());
 
     trial_stiffness.zeros(m_size, m_size);
     trial_resistance.zeros(m_size);
 
+    trial_h = .5 * dot(m_material->get_trial_strain(), m_material->get_trial_stress());
+
+    auto actual_h = current_h;
+    if(trial_h < current_h) trial_h = current_h;
+    else if(monolithic) {
+        trial_stiffness(u_dof, d_dof) = -2. * pow_term * b_mat.t() * m_material->get_trial_stress() * n_mat;
+        trial_stiffness(d_dof, u_dof) = trial_stiffness(u_dof, d_dof).t();
+        actual_h = trial_h;
+    }
+
     trial_stiffness(u_dof, u_dof) = damage * b_mat.t() * m_material->get_trial_stiffness() * b_mat;
-    trial_stiffness(u_dof, d_dof) = -2. * pow_term * b_mat.t() * m_material->get_trial_stress() * n_mat;
-    trial_stiffness(d_dof, d_dof) = n_mat.t() * n_mat * (2. * maximum_energy + release_rate / characteristic_length) + release_rate * characteristic_length * pn_mat.t() * pn_mat;
+    trial_stiffness(d_dof, d_dof) = n_mat.t() * n_mat * (2. * actual_h + release_rate / characteristic_length) + release_rate * characteristic_length * pn_mat.t() * pn_mat;
 
     trial_resistance(u_dof) = damage * b_mat.t() * m_material->get_trial_stress();
-    trial_resistance(d_dof) = trial_stiffness(d_dof, d_dof) * t_damage;
-    trial_resistance(d_dof) -= 2. * n_mat.t() * maximum_energy;
+    trial_resistance(d_dof) = trial_stiffness(d_dof, d_dof) * t_damage - 2. * actual_h * n_mat.t();
 
     trial_stiffness *= area * thickness;
     trial_resistance *= area * thickness;
@@ -98,20 +107,19 @@ int DCP3::update_status() {
 }
 
 int DCP3::commit_status() {
-    m_phase.commit_status(m_material);
-    maximum_energy = std::max(maximum_energy, m_phase.strain_energy);
-
+    current_h = trial_h;
     return m_material->commit_status();
 }
 
 int DCP3::clear_status() {
-    m_phase.clear_status();
-    maximum_energy = 0.;
-
+    current_h = trial_h = 0.;
     return m_material->clear_status();
 }
 
-int DCP3::reset_status() { return m_material->reset_status(); }
+int DCP3::reset_status() {
+    trial_h = current_h;
+    return m_material->reset_status();
+}
 
 std::vector<vec> DCP3::record(const OutputType P) const {
     if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};

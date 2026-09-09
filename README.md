@@ -27,6 +27,7 @@
 [![License: GNU General Public License v3.0 or later](https://www.gnu.org/graphics/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 [![VS Code Extension](https://vsmarketplacebadges.dev/version-short/tlc.suanpan.svg)](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan)
+[![Open VSX Version](https://img.shields.io/open-vsx/v/tlc/suanpan?color=44cc11)](https://open-vsx.org/extension/tlc/suanpan)
 
 > [!IMPORTANT]
 > - **Feature requests can be made via creating [new issues](https://github.com/TLCFEM/suanPan/issues/new/choose).**
@@ -282,11 +283,11 @@ It also adds a command alias `suanpan` to `~/.local/bin` and a desktop file to `
 
 Additional libraries used in **suanPan** are listed as follows.
 
-- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.2
+- [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.3
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 15.4.1
+- [**Armadillo**](http://arma.sourceforge.net/) version 15.6.0
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
-- [**Catch2**](https://github.com/catchorg/Catch2) version 3.15.2
+- [**Catch2**](https://github.com/catchorg/Catch2) version 3.16.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.1.1
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
@@ -295,13 +296,13 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2023.1.0
-- [**VTK**](https://vtk.org/) version 9.6.2
+- [**VTK**](https://vtk.org/) version 9.7.0
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**ezp**](https://github.com/TLCFEM/ezp)
 - [**fmt**](https://github.com/fmtlib/fmt) version 12.2.0
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.8
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2025.3.1
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2026.1.0
 - [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 

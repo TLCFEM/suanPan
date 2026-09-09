@@ -165,9 +165,8 @@ int CIN3D8::initialize(const shared_ptr<DomainBase>& D) {
     for(unsigned I{0}; I < plan.n_rows; ++I) {
         vec t_vec{plan(I, 0), plan(I, 1), plan(I, 2)};
         const mat jacob = compute_mapping(t_vec) * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), solve(jacob, compute_dn(t_vec)));
+        const auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 3) * det(jacob), material_proto->unique_copy(), solve(jacob, compute_dn(t_vec)));
 
-        const auto& c_pt = int_pt.back();
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
     trial_stiffness = current_stiffness = initial_stiffness;
@@ -242,8 +241,8 @@ void CIN3D8::print() {
     suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        suanpan_info("Strain:\t", t_pt.c_material->get_trial_strain());
-        suanpan_info("Stress:\t", t_pt.c_material->get_trial_stress());
+        suanpan_info("Strain:", t_pt.c_material->get_current_strain());
+        suanpan_info("Stress:", t_pt.c_material->get_current_stress());
     }
 }
 

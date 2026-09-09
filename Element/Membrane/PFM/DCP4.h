@@ -31,22 +31,27 @@
 #define DCP4_H
 
 #include <Element/MaterialElement.h>
-#include <Element/Utility/PhaseField.h>
 
 class DCP4 final : public MaterialElement2D {
-    struct IntegrationPoint final : PhaseField {
+    struct IntegrationPoint {
         vec coor;
         double weight;
-        double maximum_energy = 0.;
+        double current_h = 0., trial_h = 0.;
         unique_ptr<Material> m_material;
         mat n_mat, pn_mat, b_mat;
+
         IntegrationPoint(vec&&, double, unique_ptr<Material>&&, mat&&, mat&&);
+
+        [[nodiscard]] int commit_status();
+        [[nodiscard]] int clear_status();
+        [[nodiscard]] int reset_status();
     };
 
-    static constexpr unsigned m_node = 4, m_dof = 3, m_size = m_dof * m_node;
+    static constexpr unsigned m_node{4u}, m_dof{3u}, m_size = m_dof * m_node;
 
     static const uvec u_dof, d_dof;
 
+    const bool monolithic;
     const double release_rate;
     const double thickness;
 
@@ -54,12 +59,13 @@ class DCP4 final : public MaterialElement2D {
 
 public:
     DCP4(
-        unsigned,   // tag
-        uvec&&,     // node tag
-        unsigned,   // material tag
-        double,     // characteristic length
-        double,     // energy release rate
-        double = 1. // thickness
+        unsigned, // tag
+        uvec&&,   // node tag
+        unsigned, // material tag
+        double,   // characteristic length
+        double,   // energy release rate
+        double,   // thickness
+        bool      // monolithic
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;

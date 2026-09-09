@@ -71,9 +71,7 @@ int QE2::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const auto det_jacob = det(jacob);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det_jacob * thickness, mat_proto->unique_copy());
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det_jacob * thickness, mat_proto->unique_copy());
 
         const auto &X = c_pt.coor(0), &Y = c_pt.coor(1);
 
@@ -237,8 +235,8 @@ void QE2::print() {
     suanpan_info("Element Response:\n");
     for(size_t I = 0; I < int_pt.size(); ++I) {
         suanpan_info("IP {}:\n", I + 1);
-        suanpan_info("Strain:\t", vec{int_pt[I].A * current_alpha});
-        suanpan_info("Stress:\t", vec{int_pt[I].P * current_beta});
+        suanpan_info("Strain:", vec{int_pt[I].A * current_alpha});
+        suanpan_info("Stress:", vec{int_pt[I].P * current_beta});
     }
 }
 

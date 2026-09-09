@@ -25,7 +25,7 @@ const double NonlinearPeric::root_three_two = std::sqrt(1.5);
 const mat NonlinearPeric::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearPeric::NonlinearPeric(const unsigned T, const double E, const double V, const double MU, const double EPS, const double R)
-    : DataNonlinearPeric{E, V, MU, EPS}
+    : DataNonlinearPeric{.elastic_modulus = E, .poissons_ratio = V, .mu = MU, .epsilon = EPS}
     , Material3D(T, R) {}
 
 int NonlinearPeric::initialize(const shared_ptr<DomainBase>& D) {
@@ -38,7 +38,7 @@ int NonlinearPeric::initialize(const shared_ptr<DomainBase>& D) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearPeric::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double NonlinearPeric::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearPeric::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * (incre_strain = (trial_strain = t_strain) - current_strain);
@@ -92,30 +92,6 @@ int NonlinearPeric::update_trial_status(const vec& t_strain) {
 
     trial_stiffness += triple_shear * triple_shear * (gamma / eqv_stress - 1. / (triple_shear + dk / pow_term + factor_a / denom * (eqv_stress - triple_shear * gamma))) / eqv_stress / eqv_stress * dev_stress * dev_stress.t() - triple_shear * double_shear * gamma / eqv_stress * unit_dev_tensor;
 
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearPeric::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearPeric::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearPeric::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

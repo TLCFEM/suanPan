@@ -34,7 +34,7 @@
 template<typename T> class Quaternion;
 
 namespace tensor {
-    mat isotropic_stiffness(double, double);
+    mat isotropic_stiffness(double, double, unsigned = 0u);
     mat orthotropic_stiffness(const vec&, const vec&);
 
     mat unit_deviatoric_tensor4();
@@ -71,14 +71,24 @@ namespace tensor {
 
         static const vec norm_weight{1., 1., 1., .5, .5, .5};
     } // namespace strain
-    double trace2(const vec&);
-    double trace3(const vec&);
-    double mean3(const vec&);
-    vec dev(const vec&);
-    vec dev(vec&&);
 
-    mat dev(const mat&);
-    mat dev(mat&&);
+    template<typename T, typename U> concept is_arma_vec = sp_d<T> && (std::same_as<std::remove_cvref_t<U>, Col<T>> || std::same_as<std::remove_cvref_t<U>, Row<T>>);
+    template<typename T, typename U> concept is_convertible_to_arma_vec = sp_d<T> && !is_arma_vec<T, U> && std::is_convertible_v<std::remove_cvref_t<U>, Col<T>>;
+
+    template<unsigned D, typename T> requires is_arma_vec<double, T> double trace(T&& in) {
+        suanpan_assert([&] { if(in.n_elem < D) throw std::invalid_argument("need a valid vector"); });
+
+        return sum(in.head(D));
+    }
+    template<unsigned D, typename T> requires is_convertible_to_arma_vec<double, T> double trace(T&& in) { return trace<D>(Col<double>{std::forward<T>(in)}); }
+    template<unsigned D, typename T> requires is_arma_vec<double, T> double mean(T&& in) { return trace<D>(std::forward<T>(in)) / static_cast<double>(D); }
+    template<unsigned D, typename T> requires is_convertible_to_arma_vec<double, T> double mean(T&& in) { return mean<D>(Col<double>{std::forward<T>(in)}); }
+    template<typename T> requires is_arma_vec<double, T> T dev(const T& in) {
+        auto out = in;
+        out.head(3) -= mean<3>(out);
+        return out;
+    }
+    template<typename T> requires is_convertible_to_arma_vec<double, T> Col<double> dev(T&& in) { return dev(Col<double>{std::forward<T>(in)}); }
 
     namespace strain {
         mat to_green(mat&&);
@@ -125,10 +135,6 @@ namespace transform {
     double atan2(const vec&);
     mat compute_jacobian_nominal_to_principal(const mat&);
     mat compute_jacobian_principal_to_nominal(const mat&);
-
-    mat66 eigen_to_tensor_base(const mat&);
-    vec eigen_to_tensile_stress(const vec&, const mat&);
-    std::pair<mat, mat> eigen_to_tensile_derivative(const vec&, const mat&);
 
     template<typename T> Mat<T> skew_symm(const Mat<T>& R) {
         suanpan_assert([&] { if(R.n_elem != 3) throw std::invalid_argument("need 3 element vector"); });
@@ -202,6 +208,10 @@ namespace transform {
         mat trans(double);
         vec principal(const vec&);
         vec rotate(const vec&, double);
+
+        mat66 eigen_to_tensor_base(const mat&);
+        vec eigen_to_tensile_stress(const vec&, const mat&);
+        std::pair<mat, mat> eigen_to_tensile_derivative(const vec&, const mat&);
     } // namespace stress
     namespace beam {
         mat global_to_local(double, double, double);

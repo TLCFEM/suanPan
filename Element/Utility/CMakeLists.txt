@@ -12,7 +12,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         IGA/NURBSSurface.cpp
         IGA/NURBSVolume.cpp
         Orientation.cpp
-        PhaseField.cpp
         T2DC.cpp
         T2DL.cpp
         T3DC.cpp

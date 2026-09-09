@@ -43,7 +43,7 @@ vec TrilinearStrainDegradation::compute_negative_degradation(const double t_stra
 }
 
 TrilinearStrainDegradation::TrilinearStrainDegradation(const unsigned T, const unsigned MT, const double SE, const double EE, const double ED)
-    : DataTrilinearStrainDegradation{fabs(SE), fabs(EE), fabs(ED)}
+    : DataTrilinearStrainDegradation{.s_strain = fabs(SE), .e_strain = fabs(EE), .e_damage = fabs(ED)}
     , StrainDegradation(T, MT) {}
 
 unique_ptr<Material> TrilinearStrainDegradation::unique_copy() { return std::make_unique<TrilinearStrainDegradation>(*this); }

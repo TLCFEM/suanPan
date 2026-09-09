@@ -425,7 +425,7 @@ public:
     virtual void clear_status() = 0;
     virtual void reset_status() const = 0;
 
-    template<Statistics T> void update(const double value) const { update(T, value); }
+    template<Statistics T> void update(wall_clock& clock) const { update(T, clock.toc()); }
 
     template<Statistics T> [[nodiscard]] double stats() const { return stats(T); }
 

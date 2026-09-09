@@ -51,11 +51,13 @@ class CDP final : public NonlinearCDP {
     const double a_t, cb_t, f_t;
     const double a_c, cb_c, f_c;
 
+    [[nodiscard]] static pod6 compute_backbone(double, double, double, double);
     [[nodiscard]] pod6 compute_tension_backbone(double) const override;
     [[nodiscard]] pod6 compute_compression_backbone(double) const override;
 
 public:
     explicit CDP(
+        bool,
         unsigned = 0,     // tag
         double = 3E4,     // elastic modulus
         double = .2,      // poissons ratio

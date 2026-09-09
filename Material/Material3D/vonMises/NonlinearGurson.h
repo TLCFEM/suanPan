@@ -47,7 +47,7 @@ class NonlinearGurson : protected DataNonlinearGurson, public Material3D {
     const double bulk = elastic_modulus / (3. - 6. * poissons_ratio);      // bulk modulus
 
     const double para_a = 3. * bulk * q1 * q2;
-    const double para_b = fn / sn / sqrt(datum::tau);
+    const double para_b = fn / sn / std::sqrt(datum::tau);
 
     [[nodiscard]] virtual vec2 compute_hardening(double) const = 0;
 
@@ -69,10 +69,6 @@ public:
     [[nodiscard]] double get(Parameter) const override;
 
     int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 
     [[nodiscard]] std::vector<vec> record(OutputType) const override;
 

@@ -90,16 +90,15 @@ std::vector<std::pair<std::string, unsigned>> suanpan::expression::split(const s
     return variable_size_list;
 }
 
-void ignore_whitespace(std::istringstream& I) {
+std::istringstream& ignore_whitespace(std::istringstream& I) {
     while(true)
         if(const auto peek_value = I.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) I.ignore();
         else break;
+
+    return I;
 }
 
-std::string get_remaining(std::istringstream& I) {
-    if(const auto pos = I.tellg(); -1 != pos) return I.str().substr(pos);
-    return {};
-}
+std::string get_remaining(std::istringstream& I) { return {std::istreambuf_iterator<char>(ignore_whitespace(I)), std::istreambuf_iterator<char>()}; }
 
 bool is_equal(const char A, const char B) { return tolower(static_cast<int>(A)) == tolower(static_cast<int>(B)); }
 

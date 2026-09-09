@@ -1,6 +1,6 @@
 name: suanpan
 title: suanpan
-base: core24
+base: core26
 confinement: strict
 contact: tlcfem@gmail.com
 donation: https://ko-fi.com/suanpan
@@ -10,7 +10,7 @@ issues: https://github.com/TLCFEM/suanPan/issues
 license: GPL-3.0
 source-code: https://github.com/TLCFEM/suanPan
 summary: An Open Source, Parallel and Heterogeneous Finite Element Analysis Framework
-version: "4.1.1"
+version: "4.2.0"
 website: https://suanpan.tlcfem.top
 description: |
   [**suanPan**](https://github.com/TLCFEM/suanPan) is a finite element method (FEM) simulation platform for applications
@@ -50,7 +50,7 @@ parts:
       - -DSP_ENABLE_MKL=ON
       - -DSP_ENABLE_SHARED_MKL=OFF
       - -DSP_ENABLE_VTK=ON
-      - -DVTK_PATH=$CRAFT_PART_BUILD/lib/cmake/vtk-9.6/
+      - -DVTK_PATH=$CRAFT_PART_BUILD/lib/cmake/vtk-9.7/
     build-packages:
       - g++
       - gcc
@@ -60,14 +60,14 @@ parts:
     override-build: |
       case "$CRAFT_ARCH_BUILD_FOR" in
         amd64)
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-ubuntu-24.04.tar.gz
-          tar xf VTK-9.6.2-ubuntu-24.04.tar.gz
-          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh
-          sh ./intel-onemkl-2026.0.0.909_offline.sh -a --silent --eula accept
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-ubuntu-24.04.tar.gz
+          tar xf VTK-9.7.0-ubuntu-24.04.tar.gz
+          wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/17f37e16-768e-40d2-bcf8-c252dc6c5499/intel-onemkl-2026.1.0.237_offline.sh
+          sh ./intel-onemkl-2026.1.0.237_offline.sh -a --silent --eula accept
           ;;
         arm64)
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-ubuntu-24.04-arm.tar.gz
-          tar xf VTK-9.6.2-ubuntu-24.04-arm.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-ubuntu-24.04-arm.tar.gz
+          tar xf VTK-9.7.0-ubuntu-24.04-arm.tar.gz
           ;;
       esac
       craftctl default

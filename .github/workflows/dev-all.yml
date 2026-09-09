@@ -42,7 +42,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: MKL
@@ -93,13 +93,13 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           cmake --build build --target install --config ${{ matrix.build }} -j $(nproc)
           cmake --build build --target package
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.4.0
+        uses: sigstore/gh-action-sigstore-python@v3.5.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -139,13 +139,13 @@ jobs:
           lcov --capture --directory . --output-file coverage.info
           lcov --remove coverage.info '/usr/*' --output-file coverage.info
           lcov --list coverage.info
-      - if: ${{ matrix.os == 'ubuntu-24.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
+      - if: ${{ matrix.os == 'ubuntu-24.04-arm' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
         name: Result
         uses: actions/upload-artifact@v7
         with:
           name: Results-${{ github.sha }}
           path: ./build/Results
-      - if: ${{ matrix.os == 'ubuntu-24.04' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
+      - if: ${{ matrix.os == 'ubuntu-24.04-arm' && env.COVERAGE == 'ON' && matrix.aocl == 'OFF' }}
         name: Cache
         run: |
           echo "${{ secrets.STATIC_KEY }}" > key.pem
@@ -206,7 +206,7 @@ jobs:
         vtk:
           - 'ON'
           - 'OFF'
-    timeout-minutes: 150
+    timeout-minutes: 120
   linux-dev-mpi:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     needs: guard
@@ -217,13 +217,13 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Dependency
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-${{ matrix.os }}.tar.gz
-          tar xf VTK-9.6.2-${{ matrix.os }}.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-${{ matrix.os }}.tar.gz
+          tar xf VTK-9.7.0-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
@@ -242,7 +242,7 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.7/
           cmake --build build --target install --config RelWithDebInfo -j $(nproc)
           cmake --build build --target package
       - name: Pack
@@ -284,8 +284,7 @@ jobs:
               export CC=$(brew --prefix llvm@18)/bin/clang
               export CXX=$(brew --prefix llvm@18)/bin/clang++
             else
-              export CC=$(brew --prefix llvm@15)/bin/clang
-              export CXX=$(brew --prefix llvm@15)/bin/clang++
+              exit 1
             fi
             cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
@@ -296,7 +295,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=build/dist \
             -DSP_BUILD_PARALLEL=ON \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           else
             export CC=gcc-15 && export CXX=g++-15
             cmake -S . -B build \
@@ -308,7 +307,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=build/dist \
             -DSP_BUILD_PARALLEL=ON \
             -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+            -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           fi
           cmake --build build --target install --config ${{ matrix.build }} -j 3
       - name: Pack
@@ -357,6 +356,8 @@ jobs:
         os:
           - macos-15-large
           - macos-15-xlarge
+          - macos-26-large
+          - macos-26-xlarge
         vtk:
           - 'ON'
     timeout-minutes: 90
@@ -370,22 +371,22 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - if: matrix.mkl == 'ON'
         name: MKL
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/90d3404b-65cf-426d-8484-71e129454dba/intel-onemkl-2026.0.0.907_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/9af38d13-867b-45af-a950-0b42d9bac1ae/intel-fortran-compiler-2026.0.0.566_offline.exe
-          intel-onemkl-2026.0.0.907_offline.exe -s -a --silent --eula accept
-          intel-fortran-compiler-2026.0.0.566_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/838e2a31-c5db-429e-93d8-509c08d71ceb/intel-onemkl-2026.1.0.238_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a43777b7-be5a-4fb6-97f9-bf4ae49eeb33/intel-fortran-compiler-2026.1.1.20_offline.exe
+          intel-onemkl-2026.1.0.238_offline.exe -s -a --silent --eula accept
+          intel-fortran-compiler-2026.1.1.20_offline.exe -s -a --silent --eula accept
         shell: cmd
       - if: matrix.vtk == 'ON'
         name: VTK
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-win.7z
-          7z x VTK-9.6.2-win.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-win.7z
+          7z x VTK-9.7.0-win.7z
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -400,7 +401,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.6/
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.7/
           cmake --build build --target install --config ${{ matrix.build }} -j 4
           cp ./updater.exe build/dist/bin
       - name: Pack
@@ -446,7 +447,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: GCC
@@ -456,8 +457,8 @@ jobs:
       - if: matrix.vtk == 'ON'
         name: VTK
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-win-gcc.7z
-          7z x VTK-9.6.2-win-gcc.7z -oVTK
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-win-gcc.7z
+          7z x VTK-9.7.0-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -469,7 +470,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=build/dist `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.7
           cmake --build build --target install --config ${{ matrix.build }} -j 4
           cp ./updater.exe build/dist/bin
           cmake -G "${{ matrix.compiler }}" -S . -B build-sm `
@@ -481,7 +482,7 @@ jobs:
           -DSP_ENABLE_ARMA_SMALL_MEMORY=ON `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.7
           cmake --build build-sm --target install --config ${{ matrix.build }} -j 4
           cp build-sm/dist/bin/suanPan.exe build/dist/bin/suanPan-sm.exe
       - name: Pack

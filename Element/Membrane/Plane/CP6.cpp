@@ -65,9 +65,8 @@ int CP6::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.reserve(3);
     for(auto I = 0; I < 3; ++I) {
         vec coor{ele_coor(I + 3u, 1), ele_coor(I + 3u, 2)};
-        int_pt.emplace_back(std::move(coor), area * thickness / 3., material_proto->unique_copy(), shape::triangle(coor, 1) * inv_coor);
+        const auto& c_pt = int_pt.emplace_back(std::move(coor), area * thickness / 3., material_proto->unique_copy(), shape::triangle(coor, 1) * inv_coor);
 
-        const auto& c_pt = int_pt.back();
         initial_stiffness += c_pt.weight * c_pt.strain_mat.t() * ini_stiffness * c_pt.strain_mat;
     }
     trial_stiffness = current_stiffness = initial_stiffness;

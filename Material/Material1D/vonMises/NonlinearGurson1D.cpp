@@ -21,7 +21,7 @@
 #include <Toolbox/tensor.h>
 
 NonlinearGurson1D::NonlinearGurson1D(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
-    : DataNonlinearGurson1D{E, V, Q1, Q2, FN, SN, EN}
+    : DataNonlinearGurson1D{.elastic_modulus = E, .poissons_ratio = V, .q1 = Q1, .q2 = Q2, .fn = FN, .sn = SN, .en = EN}
     , Material1D(T, R) {}
 
 int NonlinearGurson1D::initialize(const shared_ptr<DomainBase>&) {
@@ -32,7 +32,7 @@ int NonlinearGurson1D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearGurson1D::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double NonlinearGurson1D::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -122,30 +122,6 @@ int NonlinearGurson1D::update_trial_status(const vec& t_strain) {
 
     trial_stiffness = left(3) * elastic_modulus;
 
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearGurson1D::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearGurson1D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearGurson1D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

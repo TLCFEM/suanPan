@@ -128,7 +128,7 @@ namespace {
         else return_obj = std::make_unique<NodalForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
-    void new_refload(unique_ptr<Load>& return_obj, std::istringstream& command) {
+    void new_refload(unique_ptr<Load>& return_obj, std::istringstream& command, const bool flag) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -158,7 +158,8 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<ReferenceForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool));
+        if(flag) return_obj = std::make_unique<GroupReferenceForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool));
+        else return_obj = std::make_unique<ReferenceForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool));
     }
 
     void new_lineudl(unique_ptr<Load>& return_obj, std::istringstream& command, const unsigned dimension) {
@@ -397,7 +398,8 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
     else if(is_equal_any(load_id, "GroupDisp", "GroupDisplacement", "GroupDispLoad")) new_displacement(new_load, command, true);
     else if(is_equal(load_id, "LineUDL2D")) new_lineudl(new_load, command, 2);
     else if(is_equal(load_id, "LineUDL3D")) new_lineudl(new_load, command, 3);
-    else if(is_equal_any(load_id, "ReferenceLoad", "RefLoad", "RefForce")) new_refload(new_load, command);
+    else if(is_equal_any(load_id, "ReferenceLoad", "RefLoad", "RefForce")) new_refload(new_load, command, false);
+    else if(is_equal_any(load_id, "GroupReferenceLoad", "GroupRefLoad", "GroupRefForce")) new_refload(new_load, command, true);
     else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion(new_load, command, 2);
     else if(is_equal(load_id, "SupportDisplacement")) new_supportmotion(new_load, command, 0);
     else if(is_equal(load_id, "SupportVelocity")) new_supportmotion(new_load, command, 1);

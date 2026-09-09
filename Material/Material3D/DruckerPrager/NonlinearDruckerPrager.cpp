@@ -23,7 +23,7 @@ const mat NonlinearDruckerPrager::unit_dev_tensor = tensor::unit_deviatoric_tens
 const mat NonlinearDruckerPrager::unit_x_unit = tensor::unit_tensor2 * tensor::unit_tensor2.t();
 
 NonlinearDruckerPrager::NonlinearDruckerPrager(const unsigned T, const double E, const double V, const double ETAY, const double ETAF, const double XI, const double R)
-    : DataNonlinearDruckerPrager{E, V, ETAY, ETAF, XI}
+    : DataNonlinearDruckerPrager{.elastic_modulus = E, .poissons_ratio = V, .eta_yield = ETAY, .eta_flow = ETAF, .xi = XI}
     , Material3D(T, R) {}
 
 int NonlinearDruckerPrager::initialize(const shared_ptr<DomainBase>&) {
@@ -34,7 +34,7 @@ int NonlinearDruckerPrager::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearDruckerPrager::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double NonlinearDruckerPrager::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -47,7 +47,7 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
     auto& plastic_strain = trial_history(0);
 
     const auto dev_stress = tensor::dev(trial_stress);
-    const auto hydro_stress = tensor::mean3(trial_stress);
+    const auto hydro_stress = tensor::mean<3>(trial_stress);
     const auto sqrt_j2 = std::sqrt(std::max(datum::eps, tensor::stress::invariant2(dev_stress)));
 
     const auto yield_const = sqrt_j2 + eta_yield * hydro_stress;
@@ -113,30 +113,6 @@ int NonlinearDruckerPrager::update_trial_status(const vec& t_strain) {
         trial_stiffness = (bulk - bulk * bulk / denominator) * unit_x_unit;
     }
 
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearDruckerPrager::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearDruckerPrager::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearDruckerPrager::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

@@ -36,7 +36,7 @@ int ArmstrongFrederick::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> ArmstrongFrederick::unique_copy() { return std::make_unique<ArmstrongFrederick>(*this); }
 
-double ArmstrongFrederick::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double ArmstrongFrederick::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -115,30 +115,6 @@ int ArmstrongFrederick::update_trial_status(const vec& t_strain) {
 
     trial_stiffness += (root_six_shear * root_six_shear * gamma / jacobian / norm_xi * sum_c + root_six_shear * (root_six_shear / jacobian + double_shear * gamma / norm_xi) * u) * u.t() - double_shear * root_six_shear * gamma / norm_xi * unit_dev_tensor;
 
-    return SUANPAN_SUCCESS;
-}
-
-int ArmstrongFrederick::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int ArmstrongFrederick::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int ArmstrongFrederick::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

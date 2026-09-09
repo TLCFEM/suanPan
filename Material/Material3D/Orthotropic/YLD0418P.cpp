@@ -54,8 +54,8 @@ YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& 
     pfpbb *= factor;
     pfpab *= factor;
 
-    const mat66 proj_a = transform::eigen_to_tensor_base(pva).t() * C1;
-    const mat66 proj_b = transform::eigen_to_tensor_base(pvb).t() * C2;
+    const mat66 proj_a = transform::stress::eigen_to_tensor_base(pva).t() * C1;
+    const mat66 proj_b = transform::stress::eigen_to_tensor_base(pvb).t() * C2;
 
     const auto trans_a = proj_a.head_rows(3); // 3x6
     const auto trans_b = proj_b.head_rows(3); // 3x6
@@ -75,7 +75,7 @@ YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& 
 }
 
 YLD0418P::YLD0418P(const unsigned T, vec&& EE, vec&& VV, vec&& PP, const double M, const double RS, const unsigned HT, const double KR, const double KB, const double R)
-    : DataYLD0418P{std::move(EE), std::move(VV), std::move(PP), M, std::fabs(RS), {KR, KB}}
+    : DataYLD0418P{.modulus = std::move(EE), .ratio = std::move(VV), .parameter = std::move(PP), .exponent = M, .ref_stress = std::fabs(RS), .kin = {KR, KB}}
     , Material3D(T, R)
     , hardening_tag(HT) {
     C1.zeros();
@@ -289,30 +289,6 @@ int YLD0418P::without_kinematic() {
         gamma = std::max(0., gamma - incre(sa));
         dev_s -= incre(sb);
     }
-}
-
-int YLD0418P::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int YLD0418P::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int YLD0418P::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
 }
 
 void YLD0418P::print() {

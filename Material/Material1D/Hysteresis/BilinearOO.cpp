@@ -44,13 +44,13 @@ pod2 BilinearOO::compute_compression_backbone(const double strain) const {
 }
 
 BilinearOO::BilinearOO(const int T, const double E, const double TEA, const double TH, const double CEA, const double CH, const double R)
-    : DataBilinearOO{fabs(E), fabs(TEA), TH * fabs(E), -fabs(CEA), CH * fabs(E)}
+    : DataBilinearOO{.elastic_modulus = fabs(E), .t_strain = fabs(TEA), .t_hardening = TH * fabs(E), .c_strain = -fabs(CEA), .c_hardening = CH * fabs(E)}
     , OriginOriented(T, R) {}
 
-int BilinearOO::initialize(const shared_ptr<DomainBase>&) {
+int BilinearOO::initialize(const shared_ptr<DomainBase>& D) {
     trial_stiffness = current_stiffness = initial_stiffness = elastic_modulus;
 
-    return SUANPAN_SUCCESS;
+    return OriginOriented::initialize(D);
 }
 
 unique_ptr<Material> BilinearOO::unique_copy() { return std::make_unique<BilinearOO>(*this); }

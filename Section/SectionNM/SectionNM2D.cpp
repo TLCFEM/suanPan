@@ -20,7 +20,7 @@
 #include <Domain/DomainBase.h>
 
 SectionNM2D::SectionNM2D(const unsigned T, const double EEA, const double EEIS, const double LD)
-    : DataSectionNM2D{EEA, EEIS}
+    : DataSectionNM2D{.EA = EEA, .EIS = EEIS}
     , SectionNM(T, SectionType::NM2D) { access::rw(linear_density) = LD; }
 
 int SectionNM2D::initialize(const shared_ptr<DomainBase>&) {

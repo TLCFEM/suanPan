@@ -43,7 +43,7 @@ class StressWrapper : public Material {
 
     vec trial_full_strain, current_full_strain;
 
-    [[nodiscard]] mat form_stiffness(const mat&) const;
+    [[nodiscard]] int form_stiffness(mat&, const mat&) const;
 
 protected:
     ResourceHolder<Material> base;
@@ -54,11 +54,13 @@ public:
         unsigned,    // 3D material tag
         unsigned,    // max iteration
         uvec&&,      // non-trivial stress DoF
-        uvec&&,      // trivial stress DoF
         MaterialType // material type
     );
 
+    int initialize_base(const shared_ptr<DomainBase>&) override;
     int initialize(const shared_ptr<DomainBase>&) override;
+
+    [[nodiscard]] unsigned nonlocal_size() const override;
 
     [[nodiscard]] double get(Parameter) const override;
 

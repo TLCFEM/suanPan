@@ -30,6 +30,7 @@
 #define CSMT3_H
 
 #include <Element/MaterialElement.h>
+#include <Material/CoupleMaterial.h>
 
 class CSMT3 final : public MaterialElement2D {
     static constexpr unsigned m_node = 3, m_dof = 3, m_size = m_dof * m_node;
@@ -41,6 +42,7 @@ class CSMT3 final : public MaterialElement2D {
         rowvec coor;
         double weight = 0.;
         unique_ptr<Material> m_material;
+        unique_ptr<IsotropicCouple> m_couple;
         mat b1, b2, b3;
         IntegrationPoint(rowvec&&, double, unique_ptr<Material>&&);
     };

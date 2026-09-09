@@ -62,7 +62,6 @@ protected:
 public:
     EnergyEvolution(
         unsigned,      // tag
-        unsigned,      // step tag
         unsigned,      // incre level
         unsigned,      // final level
         double = 1.,   // centre weight

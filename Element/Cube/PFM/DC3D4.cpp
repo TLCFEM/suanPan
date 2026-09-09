@@ -1,0 +1,151 @@
+/*******************************************************************************
+ * Copyright (C) 2017-2026 Theodore Chang
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
+#include "DC3D4.h"
+
+#include <Domain/DomainBase.h>
+#include <Material/Material3D/Material3D.h>
+#include <Recorder/OutputType.h>
+#include <Toolbox/shape.h>
+
+const uvec DC3D4::u_dof{0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14};
+const uvec DC3D4::d_dof{3, 7, 11, 15};
+
+DC3D4::DC3D4(const unsigned T, uvec&& N, const unsigned M, const double CL, const double RR, const bool MN)
+    : MaterialElement3D(T, c_node, c_dof, std::move(N), uvec{M}, false, {Node::DOF::U1, Node::DOF::U2, Node::DOF::U3, Node::DOF::DAMAGE})
+    , monolithic(MN)
+    , release_rate(RR) { access::rw(characteristic_length) = CL; }
+
+int DC3D4::initialize(const shared_ptr<DomainBase>& D) {
+    auto& material_proto = D->get<Material>(material_tag(0));
+
+    c_material = material_proto->unique_copy();
+
+    mat ele_coor(c_node, c_node);
+    ele_coor.col(0).fill(1.);
+    ele_coor.cols(1, 3) = get_coordinate(3);
+
+    access::rw(volume) = det(ele_coor) / 6.;
+
+    if(characteristic_length < 0.) access::rw(characteristic_length) = 2. * std::cbrt(volume);
+
+    const mat inv_coor = inv(ele_coor);
+
+    n_mat = mean(ele_coor) * inv_coor;
+
+    pn_mat = inv_coor.rows(1, 3);
+
+    b_mat.zeros(6, 12);
+    for(unsigned J{0}, K{0}, L{1}, M{2}; J < c_node; ++J, K += 3, L += 3, M += 3) {
+        b_mat(0, K) = b_mat(3, L) = b_mat(5, M) = pn_mat(0, J);
+        b_mat(3, K) = b_mat(1, L) = b_mat(4, M) = pn_mat(1, J);
+        b_mat(5, K) = b_mat(4, L) = b_mat(2, M) = pn_mat(2, J);
+    }
+    initial_stiffness.zeros(c_size, c_size);
+    initial_stiffness(u_dof, u_dof) = b_mat.t() * c_material->get_initial_stiffness() * b_mat;
+    initial_stiffness(d_dof, d_dof) = release_rate / characteristic_length * n_mat.t() * n_mat + release_rate * characteristic_length * pn_mat.t() * pn_mat;
+    trial_stiffness = current_stiffness = initial_stiffness *= volume;
+
+    ConstantMass(this);
+
+    return SUANPAN_SUCCESS;
+}
+
+int DC3D4::update_status() {
+    const auto t_disp = get_trial_displacement();
+    const vec t_damage = t_disp(d_dof);
+
+    if(c_material->update_trial_status(b_mat * t_disp(u_dof)) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
+
+    const auto pow_term = 1. - dot(t_damage, n_mat);
+    const auto damage = std::min(1., std::pow(pow_term, 2.) + std::numeric_limits<float>::epsilon());
+
+    trial_stiffness.zeros(c_size, c_size);
+    trial_resistance.zeros(c_size);
+
+    trial_h = .5 * dot(c_material->get_trial_strain(), c_material->get_trial_stress());
+
+    auto actual_h = current_h;
+    if(trial_h < current_h) trial_h = current_h;
+    else if(monolithic) {
+        trial_stiffness(u_dof, d_dof) = -2. * pow_term * b_mat.t() * c_material->get_trial_stress() * n_mat;
+        trial_stiffness(d_dof, u_dof) = trial_stiffness(u_dof, d_dof).t();
+        actual_h = trial_h;
+    }
+
+    trial_stiffness(u_dof, u_dof) = damage * b_mat.t() * c_material->get_trial_stiffness() * b_mat;
+    trial_stiffness(d_dof, d_dof) = n_mat.t() * n_mat * (2. * actual_h + release_rate / characteristic_length) + release_rate * characteristic_length * pn_mat.t() * pn_mat;
+
+    trial_resistance(u_dof) = damage * b_mat.t() * c_material->get_trial_stress();
+    trial_resistance(d_dof) = trial_stiffness(d_dof, d_dof) * t_damage - 2. * actual_h * n_mat.t();
+
+    trial_stiffness *= volume;
+    trial_resistance *= volume;
+
+    return SUANPAN_SUCCESS;
+}
+
+int DC3D4::commit_status() {
+    current_h = trial_h;
+    return c_material->commit_status();
+}
+
+int DC3D4::clear_status() {
+    current_h = trial_h = 0.;
+    return c_material->clear_status();
+}
+
+int DC3D4::reset_status() {
+    trial_h = current_h;
+    return c_material->reset_status();
+}
+
+std::vector<vec> DC3D4::record(const OutputType P) const {
+    if(OutputType::DAMAGE == P) return {get_current_displacement()(d_dof)};
+
+    return c_material->record(P);
+}
+
+void DC3D4::print() {
+    suanpan_info("DC3D4 element connects:", node_encoding);
+    if(!is_initialized()) return;
+    suanpan_info("Material:\n");
+    c_material->print();
+    suanpan_info("Strain:", c_material->get_current_strain());
+    suanpan_info("Stress:", c_material->get_current_stress());
+}
+
+#ifdef SUANPAN_VTK
+#include <vtkTetra.h>
+
+vtkSmartPointer<vtkCell> DC3D4::GetCell() const { return vtkSmartPointer<vtkTetra>::New(); }
+
+mat DC3D4::GetData(const OutputType P) {
+    if(OutputType::A == P) return resize(reshape(get_current_acceleration()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::V == P) return resize(reshape(get_current_velocity()(u_dof), 3, c_node), 6, c_node);
+    if(OutputType::U == P) return resize(reshape(get_current_displacement()(u_dof), 3, c_node), 6, c_node);
+
+    if(OutputType::DAMAGE == P) return get_current_displacement()(d_dof).t();
+
+    vec data;
+    if(const auto t_data = c_material->record(P); !t_data.empty()) data = t_data[0];
+    return repmat(data.resize(6), 1, c_node);
+}
+
+mat DC3D4::GetDeformation(const double amplifier) { return get_coordinate(3).t() + amplifier * reshape(get_current_displacement()(u_dof), 3, c_node); }
+
+#endif

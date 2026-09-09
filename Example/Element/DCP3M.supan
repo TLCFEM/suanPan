@@ -1,0 +1,205 @@
+node 1 0.000e+00 1.000e+01
+node 2 0.000e+00 8.000e+00
+node 3 0.000e+00 6.000e+00
+node 4 0.000e+00 4.000e+00
+node 5 0.000e+00 2.000e+00
+node 6 0.000e+00 0.000e+00
+node 7 2.000e+00 9.600e+00
+node 8 2.000e+00 7.760e+00
+node 9 2.000e+00 5.920e+00
+node 10 2.000e+00 4.080e+00
+node 11 2.000e+00 2.240e+00
+node 12 2.000e+00 4.000e-01
+node 13 4.000e+00 9.200e+00
+node 14 4.000e+00 7.520e+00
+node 15 4.000e+00 5.840e+00
+node 16 4.000e+00 4.160e+00
+node 17 4.000e+00 2.480e+00
+node 18 4.000e+00 8.000e-01
+node 19 6.000e+00 8.800e+00
+node 20 6.000e+00 7.280e+00
+node 21 6.000e+00 5.760e+00
+node 22 6.000e+00 4.240e+00
+node 23 6.000e+00 2.720e+00
+node 24 6.000e+00 1.200e+00
+node 25 8.000e+00 8.400e+00
+node 26 8.000e+00 7.040e+00
+node 27 8.000e+00 5.680e+00
+node 28 8.000e+00 4.320e+00
+node 29 8.000e+00 2.960e+00
+node 30 8.000e+00 1.600e+00
+node 31 1.000e+01 8.000e+00
+node 32 1.000e+01 6.800e+00
+node 33 1.000e+01 5.600e+00
+node 34 1.000e+01 4.400e+00
+node 35 1.000e+01 3.200e+00
+node 36 1.000e+01 2.000e+00
+node 37 1.200e+01 8.400e+00
+node 38 1.200e+01 7.040e+00
+node 39 1.200e+01 5.680e+00
+node 40 1.200e+01 4.320e+00
+node 41 1.200e+01 2.960e+00
+node 42 1.200e+01 1.600e+00
+node 43 1.400e+01 8.800e+00
+node 44 1.400e+01 7.280e+00
+node 45 1.400e+01 5.760e+00
+node 46 1.400e+01 4.240e+00
+node 47 1.400e+01 2.720e+00
+node 48 1.400e+01 1.200e+00
+node 49 1.600e+01 9.200e+00
+node 50 1.600e+01 7.520e+00
+node 51 1.600e+01 5.840e+00
+node 52 1.600e+01 4.160e+00
+node 53 1.600e+01 2.480e+00
+node 54 1.600e+01 8.000e-01
+node 55 1.800e+01 9.600e+00
+node 56 1.800e+01 7.760e+00
+node 57 1.800e+01 5.920e+00
+node 58 1.800e+01 4.080e+00
+node 59 1.800e+01 2.240e+00
+node 60 1.800e+01 4.000e-01
+node 61 2.000e+01 1.000e+01
+node 62 2.000e+01 8.000e+00
+node 63 2.000e+01 6.000e+00
+node 64 2.000e+01 4.000e+00
+node 65 2.000e+01 2.000e+00
+node 66 2.000e+01 0.000e+00
+
+element DCP3M 1 1 2 7 1 .01 3.
+element DCP3M 2 2 8 7 1 .01 3.
+element DCP3M 3 2 3 8 1 .01 3.
+element DCP3M 4 3 9 8 1 .01 3.
+element DCP3M 5 3 4 9 1 .01 3.
+element DCP3M 6 4 10 9 1 .01 3.
+element DCP3M 7 4 5 10 1 .01 3.
+element DCP3M 8 5 11 10 1 .01 3.
+element DCP3M 9 5 6 11 1 .01 3.
+element DCP3M 10 6 12 11 1 .01 3.
+element DCP3M 11 7 8 13 1 .01 3.
+element DCP3M 12 8 14 13 1 .01 3.
+element DCP3M 13 8 9 14 1 .01 3.
+element DCP3M 14 9 15 14 1 .01 3.
+element DCP3M 15 9 10 15 1 .01 3.
+element DCP3M 16 10 16 15 1 .01 3.
+element DCP3M 17 10 11 16 1 .01 3.
+element DCP3M 18 11 17 16 1 .01 3.
+element DCP3M 19 11 12 17 1 .01 3.
+element DCP3M 20 12 18 17 1 .01 3.
+element DCP3M 21 13 14 19 1 .01 3.
+element DCP3M 22 14 20 19 1 .01 3.
+element DCP3M 23 14 15 20 1 .01 3.
+element DCP3M 24 15 21 20 1 .01 3.
+element DCP3M 25 15 16 21 1 .01 3.
+element DCP3M 26 16 22 21 1 .01 3.
+element DCP3M 27 16 17 22 1 .01 3.
+element DCP3M 28 17 23 22 1 .01 3.
+element DCP3M 29 17 18 23 1 .01 3.
+element DCP3M 30 18 24 23 1 .01 3.
+element DCP3M 31 19 20 25 1 .01 3.
+element DCP3M 32 20 26 25 1 .01 3.
+element DCP3M 33 20 21 26 1 .01 3.
+element DCP3M 34 21 27 26 1 .01 3.
+element DCP3M 35 21 22 27 1 .01 3.
+element DCP3M 36 22 28 27 1 .01 3.
+element DCP3M 37 22 23 28 1 .01 3.
+element DCP3M 38 23 29 28 1 .01 3.
+element DCP3M 39 23 24 29 1 .01 3.
+element DCP3M 40 24 30 29 1 .01 3.
+element DCP3M 41 25 26 31 1 .01 3.
+element DCP3M 42 26 32 31 1 .01 3.
+element DCP3M 43 26 27 32 1 .01 3.
+element DCP3M 44 27 33 32 1 .01 3.
+element DCP3M 45 27 28 33 1 .01 3.
+element DCP3M 46 28 34 33 1 .01 3.
+element DCP3M 47 28 29 34 1 .01 3.
+element DCP3M 48 29 35 34 1 .01 3.
+element DCP3M 49 29 30 35 1 .01 3.
+element DCP3M 50 30 36 35 1 .01 3.
+element DCP3M 51 31 32 37 1 .01 3.
+element DCP3M 52 32 38 37 1 .01 3.
+element DCP3M 53 32 33 38 1 .01 3.
+element DCP3M 54 33 39 38 1 .01 3.
+element DCP3M 55 33 34 39 1 .01 3.
+element DCP3M 56 34 40 39 1 .01 3.
+element DCP3M 57 34 35 40 1 .01 3.
+element DCP3M 58 35 41 40 1 .01 3.
+element DCP3M 59 35 36 41 1 .01 3.
+element DCP3M 60 36 42 41 1 .01 3.
+element DCP3M 61 37 38 43 1 .01 3.
+element DCP3M 62 38 44 43 1 .01 3.
+element DCP3M 63 38 39 44 1 .01 3.
+element DCP3M 64 39 45 44 1 .01 3.
+element DCP3M 65 39 40 45 1 .01 3.
+element DCP3M 66 40 46 45 1 .01 3.
+element DCP3M 67 40 41 46 1 .01 3.
+element DCP3M 68 41 47 46 1 .01 3.
+element DCP3M 69 41 42 47 1 .01 3.
+element DCP3M 70 42 48 47 1 .01 3.
+element DCP3M 71 43 44 49 1 .01 3.
+element DCP3M 72 44 50 49 1 .01 3.
+element DCP3M 73 44 45 50 1 .01 3.
+element DCP3M 74 45 51 50 1 .01 3.
+element DCP3M 75 45 46 51 1 .01 3.
+element DCP3M 76 46 52 51 1 .01 3.
+element DCP3M 77 46 47 52 1 .01 3.
+element DCP3M 78 47 53 52 1 .01 3.
+element DCP3M 79 47 48 53 1 .01 3.
+element DCP3M 80 48 54 53 1 .01 3.
+element DCP3M 81 49 50 55 1 .01 3.
+element DCP3M 82 50 56 55 1 .01 3.
+element DCP3M 83 50 51 56 1 .01 3.
+element DCP3M 84 51 57 56 1 .01 3.
+element DCP3M 85 51 52 57 1 .01 3.
+element DCP3M 86 52 58 57 1 .01 3.
+element DCP3M 87 52 53 58 1 .01 3.
+element DCP3M 88 53 59 58 1 .01 3.
+element DCP3M 89 53 54 59 1 .01 3.
+element DCP3M 90 54 60 59 1 .01 3.
+element DCP3M 91 55 56 61 1 .01 3.
+element DCP3M 92 56 62 61 1 .01 3.
+element DCP3M 93 56 57 62 1 .01 3.
+element DCP3M 94 57 63 62 1 .01 3.
+element DCP3M 95 57 58 63 1 .01 3.
+element DCP3M 96 58 64 63 1 .01 3.
+element DCP3M 97 58 59 64 1 .01 3.
+element DCP3M 98 59 65 64 1 .01 3.
+element DCP3M 99 59 60 65 1 .01 3.
+element DCP3M 100 60 66 65 1 .01 3.
+
+recorder 1 plain Element DAMAGE 1
+recorder 2 plain Element S 1
+
+material Elastic3D 2 2E5 .3
+material PlaneStress 1 2
+
+generate nodegroup 1 1 1 6
+
+generate nodegroup 3 61 1 66
+
+groupmultiplierbc 1 E 1
+# groupmultiplierbc 2 damage 1
+
+step static 1 1.000e+00
+set ini_step_size 1.000e-1
+set fixed_step_size 1
+
+converger AbsIncreDisp 1 1E-10 7 1
+
+groupdisplacement 1 0 2e-1 1 3
+
+analyze
+
+peek element 1
+
+# Node 32:
+# Coordinate:
+#   1.0000e+01  6.8000e+00
+# Displacement:
+#   9.8787e-02 -2.6042e-03  9.5426e-02
+# Resistance:
+#  -1.1050e-07  1.1836e-08 -4.0406e-09
+peek node 32
+
+reset
+clear
+exit

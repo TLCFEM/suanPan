@@ -12,7 +12,6 @@
 #include "IGA/NURBSVolume.h"
 #include "MatrixModifier.hpp"
 #include "Orientation.h"
-#include "PhaseField.h"
 #include "T2DC.h"
 #include "T2DL.h"
 #include "T3DC.h"

@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 BilinearElastic1D::BilinearElastic1D(const unsigned T, const double E, const double Y, const double H, const double R, const double D)
-    : DataBilinearElastic1D{fabs(E), fabs(Y), fabs(E) * H, R}
+    : DataBilinearElastic1D{.elastic_modulus = fabs(E), .yield_stress = fabs(Y), .hardening_modulus = fabs(E) * H, .radius = R}
     , Material1D(T, D) {}
 
 int BilinearElastic1D::initialize(const shared_ptr<DomainBase>&) {
@@ -48,27 +48,6 @@ int BilinearElastic1D::update_trial_status(const vec& t_strain) {
 
     if(suanpan::sign(trial_strain(0)) < 0.) trial_stress = -trial_stress;
 
-    return SUANPAN_SUCCESS;
-}
-
-int BilinearElastic1D::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int BilinearElastic1D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int BilinearElastic1D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

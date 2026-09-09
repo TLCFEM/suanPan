@@ -22,7 +22,7 @@ double BilinearPeric::compute_k(const double p_strain) const { return hardening_
 double BilinearPeric::compute_dk(const double p_strain) const { return hardening_modulus >= 0. || p_strain <= -yield_stress / hardening_modulus ? hardening_modulus : 0.; }
 
 BilinearPeric::BilinearPeric(const unsigned T, const double E, const double V, const double Y, const double H, const double MU, const double EPS, const double R)
-    : DataBilinearPeric{Y, H}
+    : DataBilinearPeric{.yield_stress = Y, .hardening_modulus = H}
     , NonlinearPeric(T, E, V, MU, EPS, R) {}
 
 unique_ptr<Material> BilinearPeric::unique_copy() { return std::make_unique<BilinearPeric>(*this); }

@@ -137,9 +137,8 @@ int DKT3::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(3);
     for(auto I = 0; I < 3; ++I) {
-        int_pt.emplace_back(vec{ele_coor(I + 3u, 1), ele_coor(I + 3u, 2)});
+        auto& c_pt = int_pt.emplace_back(vec{ele_coor(I + 3u, 1), ele_coor(I + 3u, 2)});
 
-        auto& c_pt = int_pt.back();
         auto& strain_mat = c_pt.strain_mat;
 
         const mat pn_pxy = shape::triangle(c_pt.coor, 1) * inv_coor;

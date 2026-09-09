@@ -14,6 +14,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Infinite/CINP4.cpp
         Mixed/PS.cpp
         Mixed/QE2.cpp
+        Nonlocal/NonlocalCP4.cpp
         PFM/DCP3.cpp
         PFM/DCP4.cpp
         Plane/CP4I.cpp

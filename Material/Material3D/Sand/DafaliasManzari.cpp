@@ -28,7 +28,7 @@ const span DafaliasManzari::sm(14, 19);
 const mat DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 DafaliasManzari::DafaliasManzari(const unsigned T, const double G0, const double NU, const double AC, const double LC, const double E0, const double XI, const double M, const double H0, const double H1, const double CH, const double NB, const double A, const double ND, const double ZM, const double CZ, const double PC, const double GR, const double R)
-    : DataDafaliasManzari{std::fabs(G0), std::fabs(NU), std::fabs(AC), std::fabs(LC), std::fabs(E0), std::fabs(XI), std::fabs(M), std::fabs(H0), std::fabs(H1), std::fabs(CH), std::fabs(NB), A, std::fabs(ND), std::fabs(ZM), std::fabs(CZ), -std::fabs(PC), std::fabs(GR)}
+    : DataDafaliasManzari{.shear_modulus = std::fabs(G0), .poissons_ratio = std::fabs(NU), .ac = std::fabs(AC), .lc = std::fabs(LC), .e0 = std::fabs(E0), .xi = std::fabs(XI), .m = std::fabs(M), .h0 = std::fabs(H0), .h1 = std::fabs(H1), .ch = std::fabs(CH), .nb = std::fabs(NB), .a = A, .nd = std::fabs(ND), .zm = std::fabs(ZM), .cz = std::fabs(CZ), .pc = -std::fabs(PC), .gr = std::fabs(GR)}
     , Material3D(T, R) {}
 
 int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
@@ -41,16 +41,16 @@ int DafaliasManzari::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> DafaliasManzari::unique_copy() { return std::make_unique<DafaliasManzari>(*this); }
 
-double DafaliasManzari::get(const Parameter P) const { return prop(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
+double DafaliasManzari::get(const Parameter P) const { return MaterialProperty(gi * (2. + 2. * poissons_ratio), poissons_ratio)(P); }
 
 int DafaliasManzari::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
-    const auto current_p = tensor::mean3(current_stress);
+    const auto current_p = tensor::mean<3>(current_stress);
     const auto current_s = tensor::dev(current_stress);
-    const auto incre_ev = tensor::trace3(incre_strain);
+    const auto incre_ev = tensor::trace<3>(incre_strain);
     const vec incre_ed = unit_dev_tensor * incre_strain;
 
     // assume no plasticity
@@ -60,7 +60,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     vec s = current_s + 2. * gi * incre_ed;
 
     const auto dede = 1. + e0;
-    const auto void_ratio = e0 + dede * tensor::trace3(trial_strain);
+    const auto void_ratio = e0 + dede * tensor::trace<3>(trial_strain);
     const auto v_term_a = std::pow(2.97 - void_ratio, 2.) / (1. + void_ratio);
     const auto v_term_b = (void_ratio * (void_ratio + 2.) - 14.7609) * std::pow(1. + void_ratio, -2.) * dede;
 
@@ -351,30 +351,6 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     if(update_ini_alpha) ini_alpha = current_alpha;
 
-    return SUANPAN_SUCCESS;
-}
-
-int DafaliasManzari::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int DafaliasManzari::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int DafaliasManzari::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

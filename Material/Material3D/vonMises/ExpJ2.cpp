@@ -32,7 +32,7 @@ double ExpJ2::compute_h(const double) const { return 0.; }
 double ExpJ2::compute_dh(const double) const { return 0.; }
 
 ExpJ2::ExpJ2(const unsigned T, const double E, const double V, const double YS, const double PA, const double PB, const double R)
-    : DataExpJ2{fabs(YS), PA, PB}
+    : DataExpJ2{.yield_stress = fabs(YS), .a = PA, .b = PB}
     , NonlinearJ2(T, E, V, R) {}
 
 unique_ptr<Material> ExpJ2::unique_copy() { return std::make_unique<ExpJ2>(*this); }

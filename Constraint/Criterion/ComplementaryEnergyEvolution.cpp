@@ -19,7 +19,7 @@
 
 #include <Element/Element.h>
 
-ComplementaryEnergyEvolution::ComplementaryEnergyEvolution(const unsigned T, const unsigned ST, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
-    : EnergyEvolution(T, ST, IL, FL, WT, IT, RR, PW, TL) { get_energy = &Element::get_complementary_energy; }
+ComplementaryEnergyEvolution::ComplementaryEnergyEvolution(const unsigned T, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
+    : EnergyEvolution(T, IL, FL, WT, IT, RR, PW, TL) { get_energy = &Element::get_complementary_energy; }
 
 unique_ptr<Criterion> ComplementaryEnergyEvolution::unique_copy() { return std::make_unique<ComplementaryEnergyEvolution>(*this); }

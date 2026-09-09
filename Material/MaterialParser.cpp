@@ -202,7 +202,7 @@ namespace {
             bi.emplace_back(all.at(I++));
         }
 
-        return_obj = std::make_unique<ArmstrongFrederick>(tag, DataArmstrongFrederick{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), ai, bi}, density);
+        return_obj = std::make_unique<ArmstrongFrederick>(tag, DataArmstrongFrederick{.elastic_modulus = pool(0), .poissons_ratio = pool(1), .yield = pool(2), .hardening = pool(3), .saturation = pool(4), .ms = pool(5), .a = ai, .b = bi}, density);
     }
 
     void new_armstrongfrederick1d(unique_ptr<Material>& return_obj, std::istringstream& command, const bool memory = false) {
@@ -242,7 +242,7 @@ namespace {
             bi.emplace_back(all.at(I++));
         }
 
-        return_obj = std::make_unique<ArmstrongFrederick1D>(tag, DataArmstrongFrederick1D{pa(0), pa(1), pa(2), pa(3), pa(4), pb(0), pb(1), pb(2), ai, bi}, density);
+        return_obj = std::make_unique<ArmstrongFrederick1D>(tag, DataArmstrongFrederick1D{.elastic_modulus = pa(0), .yield = pa(1), .hardening = pa(2), .saturation = pa(3), .ms = pa(4), .memory = pb(0), .reduction = pb(1), .mr = pb(2), .a = ai, .b = bi}, density);
     }
 
     void new_axisymmetric(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -342,19 +342,19 @@ namespace {
         }
 
         DataBalloon1D para{
-            p(0),                         // elastic modulus
-            p(1),                         // split ratio
-            static_cast<unsigned>(p(2)),  // zr memory size
-            memory_type,                  // zr memory type
-            {p(3), p(4), p(5), p(6)},     // u
-            {p(7), p(8), p(9), p(10)},    // fm
-            {p(11), p(12), p(13), p(14)}, // fc
-            {p(15), p(16), p(17), p(18)}, // am
-            {p(19), p(20), p(21), p(22)}, // ac
-            std::move(bfc),
-            std::move(bac),
-            std::move(bna),
-            std::move(bnd)
+            .elastic = p(0),                          // elastic modulus
+            .kr = p(1),                               // split ratio
+            .zr_size = static_cast<unsigned>(p(2)),   // zr memory size
+            .zr_type = memory_type,                   // zr memory type
+            .bound_u = {p(3), p(4), p(5), p(6)},      // u
+            .bound_fm = {p(7), p(8), p(9), p(10)},    // fm
+            .bound_fc = {p(11), p(12), p(13), p(14)}, // fc
+            .bound_am = {p(15), p(16), p(17), p(18)}, // am
+            .bound_ac = {p(19), p(20), p(21), p(22)}, // ac
+            .bfc = std::move(bfc),
+            .bac = std::move(bac),
+            .bna = std::move(bna),
+            .bnd = std::move(bnd)
         };
 
         return_obj = std::make_unique<Balloon1D>(tag, std::move(para), density);
@@ -411,20 +411,20 @@ namespace {
         }
 
         DataBalloon para{
-            p(0),                         // elastic modulus
-            p(1),                         // poisson's ratio
-            p(2),                         // split ratio
-            static_cast<unsigned>(p(3)),  // zr memory size
-            memory_type,                  // zr memory type
-            {p(4), p(5), p(6), p(7)},     // u
-            {p(8), p(9), p(10), p(11)},   // fm
-            {p(12), p(13), p(14), p(15)}, // fc
-            {p(16), p(17), p(18), p(19)}, // am
-            {p(20), p(21), p(22), p(23)}, // ac
-            std::move(bfc),
-            std::move(bac),
-            std::move(bna),
-            std::move(bnd)
+            .elastic = p(0),                          // elastic modulus
+            .poisson = p(1),                          // poisson's ratio
+            .kr = p(2),                               // split ratio
+            .zr_size = static_cast<unsigned>(p(3)),   // zr memory size
+            .zr_type = memory_type,                   // zr memory type
+            .bound_u = {p(4), p(5), p(6), p(7)},      // u
+            .bound_fm = {p(8), p(9), p(10), p(11)},   // fm
+            .bound_fc = {p(12), p(13), p(14), p(15)}, // fc
+            .bound_am = {p(16), p(17), p(18), p(19)}, // am
+            .bound_ac = {p(20), p(21), p(22), p(23)}, // ac
+            .bfc = std::move(bfc),
+            .bac = std::move(bac),
+            .bna = std::move(bna),
+            .bnd = std::move(bnd)
         };
 
         return_obj = std::make_unique<Balloon>(tag, std::move(para), density);
@@ -801,6 +801,28 @@ namespace {
         return_obj = std::make_unique<BilinearJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, hardening_ratio, beta, density);
     }
 
+    void new_nonlocalbilinearj2(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate, reference_length, diffusion_rate;
+        if(!get_input(command, elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate, reference_length, diffusion_rate)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        auto hardening_ratio = 0., beta = 1., density = 0.;
+        if(!get_optional_input(command, hardening_ratio, beta, density)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<NonlocalBilinearJ2>(tag, elastic_modulus, poissons_ratio, yield_stress, plastic_strain_threshold, evolution_rate, reference_length, diffusion_rate, hardening_ratio, beta, density);
+    }
+
     void new_bilinearmises1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -1005,7 +1027,7 @@ namespace {
         return_obj = std::make_unique<BWBN>(tag, para_pool.head(16), para_pool(16));
     }
 
-    void new_cdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    template<bool CHECK_INPUT> void new_cdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1019,7 +1041,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<CDP>(tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13));
+        return_obj = std::make_unique<CDP>(CHECK_INPUT, tag, para_pool(0), para_pool(1), para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6), para_pool(7), para_pool(8), para_pool(9), para_pool(10), para_pool(11), para_pool(12), para_pool(13));
     }
 
     void new_customcdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -2171,6 +2193,30 @@ namespace {
         return_obj = std::make_unique<IsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, density);
     }
 
+    void new_nonlocalisotropicelastic3d(unique_ptr<Material>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, reference_length, diffusion_rate;
+        if(!get_input(command, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, reference_length, diffusion_rate)) {
+            suanpan_error("A valid parameter is required.\n");
+            return;
+        }
+
+        auto density = 0.;
+        if(command.eof())
+            suanpan_debug("Zero density assumed.\n");
+        else if(!get_input(command, density)) {
+            suanpan_error("A valid density is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<NonlocalIsotropicElastic3D>(tag, elastic_modulus, poissons_ratio, maximum_energy, evolution_rate, reference_length, diffusion_rate, NonlocalIsotropicElastic3D::EnergyType::DEV_TENSILE, density);
+    }
+
     void new_elasticos(unique_ptr<Material>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -2968,7 +3014,7 @@ namespace {
             return;
         }
 
-        DataSubloading1D para{p(0), {p(1), p(2), p(3), p(4)}, {p(5), p(6), p(7), p(8)}, p(9), 1., 0., 0., {{p(10), 1.}}, {{p(11), std::min(1. - datum::eps, p(12))}}};
+        DataSubloading1D para{.elastic = p(0), .iso_bound = {.initial = p(1), .linear = p(2), .saturation = p(3), .rate = p(4)}, .kin_bound = {.initial = p(5), .linear = p(6), .saturation = p(7), .rate = p(8)}, .u = p(9), .cv = 1., .mu = 0., .nv = 0., .b = {{p(10), 1.}}, .c = {{p(11), std::min(1. - datum::eps, p(12))}}};
         if(para.iso_bound.rate < 0. || para.kin_bound.rate < 0.) {
             suanpan_error("The evolution rate must be positive.\n");
             return;
@@ -3000,7 +3046,7 @@ namespace {
             return;
         }
 
-        DataSubloading1D para{p(0), {p(1), p(2), p(3), p(4)}, {p(5), p(6), p(7), p(8)}, p(9), p(10), p(11), p(12), {{p(13), 1.}}, {{p(14), std::min(1. - datum::eps, p(15))}}};
+        DataSubloading1D para{.elastic = p(0), .iso_bound = {.initial = p(1), .linear = p(2), .saturation = p(3), .rate = p(4)}, .kin_bound = {.initial = p(5), .linear = p(6), .saturation = p(7), .rate = p(8)}, .u = p(9), .cv = p(10), .mu = p(11), .nv = p(12), .b = {{p(13), 1.}}, .c = {{p(14), std::min(1. - datum::eps, p(15))}}};
         if(para.iso_bound.rate < 0. || para.kin_bound.rate < 0.) {
             suanpan_error("The evolution rate must be positive.\n");
             return;
@@ -3051,7 +3097,7 @@ namespace {
             }
         }
 
-        DataSubloading1D para{p(0), {p(1), p(2), p(3), p(4)}, {p(5), p(6), p(7), p(8)}, p(9), 1., 0., 0., std::move(back), std::move(core)};
+        DataSubloading1D para{.elastic = p(0), .iso_bound = {.initial = p(1), .linear = p(2), .saturation = p(3), .rate = p(4)}, .kin_bound = {.initial = p(5), .linear = p(6), .saturation = p(7), .rate = p(8)}, .u = p(9), .cv = 1., .mu = 0., .nv = 0., .b = std::move(back), .c = std::move(core)};
         if(para.iso_bound.rate < 0. || para.kin_bound.rate < 0.) {
             suanpan_error("The evolution rate must be positive.\n");
             return;
@@ -3083,7 +3129,7 @@ namespace {
             return;
         }
 
-        DataSubloading para{p(0), p(1), {p(2), p(3), p(4), p(5)}, {p(6), p(7), p(8), p(9)}, p(10), {p(11), 1.}, {p(12), std::min(1. - datum::eps, p(13))}};
+        DataSubloading para{.elastic = p(0), .poisson = p(1), .iso_bound = {.initial = p(2), .linear = p(3), .saturation = p(4), .rate = p(5)}, .kin_bound = {.initial = p(6), .linear = p(7), .saturation = p(8), .rate = p(9)}, .u = p(10), .b = {p(11), 1.}, .c = {p(12), std::min(1. - datum::eps, p(13))}};
         if(para.iso_bound.rate < 0. || para.kin_bound.rate < 0.) {
             suanpan_error("The evolution rate must be positive.\n");
             return;
@@ -3392,7 +3438,7 @@ namespace {
             bi.emplace_back(all.at(I++));
         }
 
-        return_obj = std::make_unique<VAFCRP>(tag, DataVAFCRP{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), pool(7), ai, bi}, density);
+        return_obj = std::make_unique<VAFCRP>(tag, DataVAFCRP{.elastic_modulus = pool(0), .poissons_ratio = pool(1), .yield = pool(2), .saturated = pool(3), .hardening = pool(4), .m = pool(5), .mu = pool(6), .epsilon = pool(7), .a = ai, .b = bi}, density);
     }
 
     void new_vafcrp1d(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -3423,7 +3469,7 @@ namespace {
             bi.emplace_back(all.at(I++));
         }
 
-        return_obj = std::make_unique<VAFCRP1D>(tag, DataVAFCRP1D{pool(0), pool(1), pool(2), pool(3), pool(4), pool(5), pool(6), ai, bi}, density);
+        return_obj = std::make_unique<VAFCRP1D>(tag, DataVAFCRP1D{.elastic_modulus = pool(0), .yield = pool(1), .hardening = pool(2), .saturated = pool(3), .m = pool(4), .mu = pool(5), .epsilon = pool(6), .a = ai, .b = bi}, density);
     }
 
     void new_viscosity01(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -3650,6 +3696,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
     else if(is_equal(material_id, "BilinearHoffman")) new_bilinearorthotropic(new_material, command, true);
     else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
+    else if(is_equal(material_id, "NonlocalBilinearJ2")) new_nonlocalbilinearj2(new_material, command);
     else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
     else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
     else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
@@ -3659,7 +3706,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
     else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
     else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
-    else if(is_equal(material_id, "CDP")) new_cdp(new_material, command);
+    else if(is_equal(material_id, "CDP")) new_cdp<true>(new_material, command);
     else if(if_startswith(material_id, "CDPM2")) {
         if(is_equal_any(material_id, "CDPM2", "CDPM2ISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ISOTROPIC);
         else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2(new_material, command, CDPM2::DamageType::ANISOTROPIC);
@@ -3694,6 +3741,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
     else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
     else if(is_equal_any(material_id, "Elastic3D", "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
+    else if(is_equal_any(material_id, "NonlocalElastic3D", "NonlocalIsotropicElastic3D")) new_nonlocalisotropicelastic3d(new_material, command);
     else if(is_equal(material_id, "ElasticOS")) new_elasticos(new_material, command);
     else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
     else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);

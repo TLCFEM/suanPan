@@ -19,7 +19,6 @@
 
 #include <Include/whereami/whereami.h>
 #include <Step/Bead.h>
-#include <Toolbox/Converter.h>
 #include <Toolbox/command.h>
 #include <Toolbox/revision.h>
 #include <Toolbox/utility.h>
@@ -124,57 +123,6 @@ namespace {
         execute_command(terminal);
     }
 
-    void strip_mode(const std::string& input_file_name, const std::string& output_file_name) {
-        ifstream input_file(input_file_name);
-
-        if(!input_file.is_open()) {
-            suanpan_error("Fail to open \"{}\".\n", input_file_name);
-            return;
-        }
-
-        ofstream output_file(output_file_name);
-
-        if(!output_file.is_open()) {
-            suanpan_error("Fail to open \"{}\".\n", output_file_name);
-            return;
-        }
-
-        output_file.setf(std::ios::scientific);
-        output_file << std::setprecision(3);
-
-        std::string line;
-
-        while(std::getline(input_file, line)) {
-            if(line.empty() || if_contain(line, "**")) continue;
-
-            for(auto& I : line) I = static_cast<char>(std::tolower(static_cast<int>(I)));
-
-            output_file << line << '\n';
-        }
-    }
-
-    void convert_mode(const std::string& input_file_name, const std::string& output_file_name) {
-        ifstream input_file(input_file_name);
-
-        if(!input_file.is_open()) {
-            suanpan_error("Fail to open \"{}\".\n", input_file_name);
-            return;
-        }
-
-        ofstream output_file(output_file_name);
-
-        if(!output_file.is_open()) {
-            suanpan_error("Fail to open \"{}\".\n", output_file_name);
-            return;
-        }
-
-        const auto pos = output_file_name.find_last_of('/');
-
-        Converter abaqus_converter(std::string::npos == pos ? "" : output_file_name.substr(0, pos + 1));
-
-        abaqus_converter.process(input_file, output_file);
-    }
-
     void print_header() {
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
         // ReSharper disable once CppDFAUnreachableCode
@@ -262,10 +210,6 @@ void argument_parser(const int argc, char** argv) {
     program.add_argument("-nu", "--no-update").help("skip new version check on startup").flag();
     program.add_argument("-vb", "--verbose").help("enable (very) verbose terminal output").flag();
 
-    auto& group = program.add_mutually_exclusive_group();
-    group.add_argument("-s", "--strip").help("!!!DO NOT USE!!!").flag();
-    group.add_argument("-c", "--convert").help("!!!DO NOT USE!!!").flag();
-
     program.add_argument("-f", "--input", "--input-file").help("specify path to the file containing input analysis").metavar("INPUT_FILE_PATH");
     program.add_argument("-o", "--output", "--output-file").help("specify path to the file for terminal output redirection").metavar("OUTPUT_FILE_PATH");
 
@@ -295,47 +239,24 @@ void argument_parser(const int argc, char** argv) {
 
         if(!program.get<bool>("-nu")) check_version(SUANPAN_EXE);
 
-        const auto strip = program.get<bool>("-s"), convert = program.get<bool>("-c");
-
-        const auto input_file_name = program.present("-f").value_or("");
-        auto output_file_name = program.present("-o").value_or("");
-
-        if(strip || convert) {
-            if(input_file_name.empty()) return;
-
-            if(output_file_name.empty()) {
-                output_file_name = input_file_name;
-
-                auto found = output_file_name.rfind(".inp");
-
-                if(std::string::npos == found) found = output_file_name.rfind(".INP");
-
-                if(std::string::npos != found) output_file_name.erase(found, 4);
-
-                output_file_name += strip ? "_out.inp" : "_out.supan";
-            }
-
-            for(auto& I : output_file_name)
-                if('\\' == I) I = '/';
-
-            return convert ? convert_mode(input_file_name, output_file_name) : strip_mode(input_file_name, output_file_name);
-        }
+        const auto file_in = program.present("-f").value_or("");
+        const auto file_out = program.present("-o").value_or("");
 
         const auto buffer_backup = SUANPAN_COUT.rdbuf();
 
         ofstream output_file;
 
-        if(!output_file_name.empty()) {
-            output_file.open(output_file_name);
+        if(!file_out.empty()) {
+            output_file.open(file_out);
             if(output_file.is_open()) SUANPAN_COUT.rdbuf(output_file.rdbuf());
             else
-                suanpan_error("Cannot open the output file \"{}\".\n", output_file_name);
+                suanpan_error("Cannot open the output file \"{}\".\n", file_out);
         }
 
         print_header();
         const auto model = std::make_shared<Bead>();
-        if(input_file_name.empty()) cli_mode(model);
-        else if(process_file(model, input_file_name.c_str()) != SUANPAN_EXIT) {
+        if(file_in.empty()) cli_mode(model);
+        else if(process_file(model, file_in.c_str()) != SUANPAN_EXIT) {
             if(output_file.is_open()) {
                 SUANPAN_COUT.rdbuf(buffer_backup);
                 print_header();
@@ -346,8 +267,7 @@ void argument_parser(const int argc, char** argv) {
     else {
         check_version(SUANPAN_EXE);
         print_header();
-        const auto model = std::make_shared<Bead>();
-        cli_mode(model);
+        cli_mode(std::make_shared<Bead>());
     }
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf

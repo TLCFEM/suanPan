@@ -18,7 +18,7 @@
 #include "Bilinear1D.h"
 
 Bilinear1D::Bilinear1D(const unsigned T, const double E, const double Y, const double H, const double B, const double R)
-    : DataBilinear1D{std::fabs(E), std::fabs(Y), std::fabs(B), std::fabs(B * E) * H / (1. - H), std::fabs((1. - B) * E) * H / (1. - H)}
+    : DataBilinear1D{.elastic_modulus = std::fabs(E), .yield_stress = std::fabs(Y), .beta = std::fabs(B), .isotropic_modulus = std::fabs(B * E) * H / (1. - H), .kinematic_modulus = std::fabs((1. - B) * E) * H / (1. - H)}
     , Material1D(T, R) {}
 
 int Bilinear1D::initialize(const shared_ptr<DomainBase>&) {
@@ -56,30 +56,6 @@ int Bilinear1D::update_trial_status(const vec& t_strain) {
         trial_stiffness *= dkdh / (elastic_modulus + dkdh);
     }
 
-    return SUANPAN_SUCCESS;
-}
-
-int Bilinear1D::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int Bilinear1D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int Bilinear1D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

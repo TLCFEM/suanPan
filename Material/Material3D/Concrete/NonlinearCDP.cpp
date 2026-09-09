@@ -44,8 +44,11 @@ vec3 NonlinearCDP::compute_dr(const vec3& in) {
 double NonlinearCDP::compute_s(const double r) const { return s0 + r - s0 * r; }
 
 NonlinearCDP::NonlinearCDP(const unsigned T, const double E, const double V, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
-    : DataNonlinearCDP{std::fabs(E), V < .5 ? V : .2, std::fabs(GT), std::fabs(GC), (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), std::fabs(AP), std::fabs(S)}
-    , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
+    : DataNonlinearCDP{.elastic_modulus = std::fabs(E), .poissons_ratio = V < .5 ? V : .2, .g_t = std::fabs(GT), .g_c = std::fabs(GC), .alpha = (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), .alpha_p = std::fabs(AP), .s0 = std::clamp(std::fabs(S), 0., 1.)}
+    , Material3D(T, R) {
+    access::rw(tolerance) = 1E-13;
+    if(alpha_p > 1.) suanpan_debug("The given dilatancy parameter {} corresponds an internal angle greater than 45 degrees which is uncommon for (reinforced) concrete.\n", alpha_p);
+}
 
 int NonlinearCDP::initialize(const shared_ptr<DomainBase>&) {
     trial_stiffness = current_stiffness = initial_stiffness = tensor::isotropic_stiffness(elastic_modulus, poissons_ratio);
@@ -55,7 +58,7 @@ int NonlinearCDP::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearCDP::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double NonlinearCDP::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearCDP::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -261,30 +264,6 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
     trial_stress *= damage;
 
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearCDP::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearCDP::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearCDP::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

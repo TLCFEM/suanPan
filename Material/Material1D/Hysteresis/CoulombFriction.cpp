@@ -18,7 +18,7 @@
 #include "CoulombFriction.h"
 
 CoulombFriction::CoulombFriction(const unsigned T, const double F, const double S)
-    : DataCoulombFriction{2. / datum::pi * std::fabs(F), std::fabs(S)}
+    : DataCoulombFriction{.friction_force = 2. / datum::pi * std::fabs(F), .factor = std::fabs(S)}
     , Material1D(T, 0.) {}
 
 int CoulombFriction::initialize(const shared_ptr<DomainBase>&) {

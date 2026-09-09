@@ -41,7 +41,7 @@ pod2 SteelBRB::compute_c_yield_stress(const double plastic_strain) const {
 }
 
 SteelBRB::SteelBRB(const unsigned T, vec&& P)
-    : DataSteelBRB{P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8)}
+    : DataSteelBRB{.elastic_modulus = P(0), .yield_stress = P(1), .plastic_modulus = P(2), .t_saturated_stress = P(3), .t_scalar = P(4), .t_exponent = P(5), .c_saturated_stress = P(6), .c_scalar = P(7), .c_exponent = P(8)}
     , Material1D(T, P(9)) {}
 
 int SteelBRB::initialize(const shared_ptr<DomainBase>&) {
@@ -131,30 +131,6 @@ int SteelBRB::update_trial_status(const vec& t_strain) {
 
         incre_plastic_strain = suanpan::clamp(incre_plastic_strain + incre, net_incre_strain, 0.);
     }
-}
-
-int SteelBRB::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int SteelBRB::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int SteelBRB::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
-    return SUANPAN_SUCCESS;
 }
 
 void SteelBRB::print() {

@@ -179,7 +179,7 @@ template<unsigned DIM> class MaxForce final : public FixedLength<DIM> {
 public:
     MaxForce(const unsigned T, const double MF, uvec&& N)
         : FixedLength<DIM>(T, std::move(N))
-        , max_force(MF) {}
+        , max_force(std::fabs(MF)) {}
 
     int process(const shared_ptr<DomainBase>& D) override {
         if(current_flag) {

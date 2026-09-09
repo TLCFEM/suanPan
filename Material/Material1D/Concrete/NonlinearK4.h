@@ -18,6 +18,8 @@
  * @class NonlinearK4
  * @brief A ConcreteK4 material class.
  *
+ * doi:10.1061/(ASCE)ST.1943-541X.0002592
+ *
  * @author tlc
  * @date 05/09/2023
  * @version 0.1.0
@@ -69,10 +71,6 @@ public:
     [[nodiscard]] double get(Parameter) const override;
 
     int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 
     void print() override;
 };

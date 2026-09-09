@@ -18,7 +18,7 @@
 #include "ExpGurson.h"
 
 ExpGurson::ExpGurson(const unsigned T, const double E, const double V, const double YS, const double N, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
-    : DataExpGurson{std::fabs(YS), std::min(1., N)}
+    : DataExpGurson{.yield_stress = std::fabs(YS), .n = std::min(1., N)}
     , NonlinearGurson(T, E, V, Q1, Q2, FN, SN, EN, R) {}
 
 vec2 ExpGurson::compute_hardening(const double plastic_strain) const {

@@ -204,9 +204,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
     for(unsigned I{0}; I < m_plan.n_rows; ++I) {
         const auto &X = m_plan(I, 0), &Y = m_plan(I, 1);
 
-        int_pt.emplace_back(vec{X, Y});
-
-        auto& c_ip = int_pt.back();
+        auto& c_ip = int_pt.emplace_back(vec{X, Y});
 
         const auto pn = shape::quad(c_ip.coor, 1);
         const mat jacob = pn * ele_coor;

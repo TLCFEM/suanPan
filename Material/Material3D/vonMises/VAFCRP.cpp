@@ -40,7 +40,7 @@ int VAFCRP::initialize(const shared_ptr<DomainBase>& D) {
 
 unique_ptr<Material> VAFCRP::unique_copy() { return std::make_unique<VAFCRP>(*this); }
 
-double VAFCRP::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double VAFCRP::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int VAFCRP::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * (incre_strain = (trial_strain = t_strain) - current_strain);
@@ -119,30 +119,6 @@ int VAFCRP::update_trial_status(const vec& t_strain) {
 
     trial_stiffness += (root_six_shear * (double_shear * gamma / norm_xi + root_six_shear * exp_gamma / jacobian) * u + root_six_shear * root_six_shear * exp_gamma * gamma / jacobian / norm_xi * sum_c) * u.t() - double_shear * root_six_shear * gamma / norm_xi * unit_dev_tensor;
 
-    return SUANPAN_SUCCESS;
-}
-
-int VAFCRP::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int VAFCRP::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int VAFCRP::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

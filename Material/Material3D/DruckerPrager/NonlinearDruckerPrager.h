@@ -53,7 +53,7 @@ class NonlinearDruckerPrager : protected DataNonlinearDruckerPrager, public Mate
 
     const double factor_a = shear + bulk * eta_flow * eta_yield;
     const double factor_b = xi * xi / eta_flow / eta_yield;
-    const double factor_c = sqrt(2.) * shear * bulk;
+    const double factor_c = std::sqrt(2.) * shear * bulk;
     const double factor_d = bulk * bulk * eta_flow * eta_yield;
 
     const bool associated = suanpan::approx_equal(eta_yield, eta_flow);
@@ -77,10 +77,6 @@ public:
     [[nodiscard]] double get(Parameter) const override;
 
     int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 
     void print() override;
 };

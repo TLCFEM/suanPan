@@ -367,18 +367,18 @@ int FEAST::analyze() {
 
     t_clock.tic();
     if(SUANPAN_SUCCESS != G->process_modifier()) return SUANPAN_FAIL;
-    D->update<Statistics::UpdateStatus>(t_clock.toc());
+    D->update<Statistics::UpdateStatus>(t_clock);
 
     t_clock.tic();
     D->assemble_trial_mass();
     D->assemble_trial_stiffness();
     if(quadratic) D->assemble_trial_damping();
-    D->update<Statistics::AssembleMatrix>(t_clock.toc());
+    D->update<Statistics::AssembleMatrix>(t_clock);
 
     t_clock.tic();
     // if(SUANPAN_SUCCESS != G->process_load()) return SUANPAN_FAIL;
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
-    D->update<Statistics::ProcessConstraint>(t_clock.toc());
+    D->update<Statistics::ProcessConstraint>(t_clock);
 
     return quadratic ? quadratic_solve(W) : linear_solve(W);
 }

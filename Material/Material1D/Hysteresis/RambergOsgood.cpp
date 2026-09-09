@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 RambergOsgood::RambergOsgood(const unsigned T, const double E, const double Y, const double O, const double N, const double R)
-    : DataRambergOsgood{fabs(E), fabs(Y), fabs(O), fabs(N)}
+    : DataRambergOsgood{.elastic_modulus = fabs(E), .yield_stress = fabs(Y), .offset = fabs(O), .n = fabs(N)}
     , Material1D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int RambergOsgood::initialize(const shared_ptr<DomainBase>&) {
@@ -87,30 +87,6 @@ int RambergOsgood::update_trial_status(const vec& t_strain) {
         }
         norm_stress -= incre;
     }
-}
-
-int RambergOsgood::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int RambergOsgood::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int RambergOsgood::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
 }
 
 void RambergOsgood::print() {

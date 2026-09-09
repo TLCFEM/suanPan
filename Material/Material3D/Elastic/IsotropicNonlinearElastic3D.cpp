@@ -46,7 +46,7 @@ int IsotropicNonlinearElastic3D::update_trial_status(const vec& t_strain) {
     const auto d_strain = tensor::dev(trial_strain);                                      // deviatoric strain
     const auto e_strain = two_third * dot(tensor::strain::norm_weight, square(d_strain)); // equivalent strain squared
 
-    const auto derivative = compute_derivative(tensor::trace3(trial_strain), e_strain);
+    const auto derivative = compute_derivative(tensor::trace<3>(trial_strain), e_strain);
 
     const auto& pwpm = derivative(0);
     const auto& pwpd = derivative(1);
@@ -62,27 +62,6 @@ int IsotropicNonlinearElastic3D::update_trial_status(const vec& t_strain) {
 
     trial_stiffness = pmpe * (ppwppm * pmpe.t() + ppwpmpd * pdpe.t()) + pdpe * (ppwppd * pdpe.t() + ppwpdpm * pmpe.t()) + 2. * pwpd * unit_unit;
 
-    return SUANPAN_SUCCESS;
-}
-
-int IsotropicNonlinearElastic3D::clear_status() {
-    trial_strain = current_strain.zeros();
-    trial_stress = current_stress.zeros();
-    trial_stiffness = current_stiffness = initial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int IsotropicNonlinearElastic3D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int IsotropicNonlinearElastic3D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

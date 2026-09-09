@@ -91,9 +91,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{X, Y};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, material_proto->unique_copy());
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, material_proto->unique_copy());
 
         c_pt.poly_stress = shape::stress11(iso_mapping * form_stress_mode(X, Y));
         c_pt.poly_strain = solve(mat_stiffness, c_pt.poly_stress);
@@ -242,8 +240,8 @@ void GCMQ::print() {
     for(size_t I = 0; I < int_pt.size(); ++I) {
         suanpan_info("IP {}:\t", I + 1);
         suanpan_info(int_pt[I].coor);
-        suanpan_info("Strain:\t", vec{int_pt[I].poly_strain * current_beta});
-        suanpan_info("Stress:\t", vec{int_pt[I].poly_stress * current_alpha});
+        suanpan_info("Strain:", vec{int_pt[I].poly_strain * current_beta});
+        suanpan_info("Stress:", vec{int_pt[I].poly_stress * current_alpha});
     }
 }
 

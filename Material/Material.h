@@ -53,28 +53,13 @@ enum class PlaneType : unsigned {
 class DomainBase;
 enum class OutputType;
 
-struct DataCoupleMaterial {
-    vec current_curvature{};
-    vec current_couple_stress{};
-
-    vec trial_curvature{};
-    vec trial_couple_stress{};
-
-    vec incre_curvature{};
-    vec incre_couple_stress{};
-
-    mat initial_couple_stiffness{}; // stiffness matrix
-    mat current_couple_stiffness{}; // stiffness matrix
-    mat trial_couple_stiffness{};   // stiffness matrix
-};
-
 struct DataMaterial {
     const double density = 0.;
     const MaterialType material_type = MaterialType::D0;
     const PlaneType plane_type = PlaneType::N;
 
     const double tolerance = 1E-14;
-    const double characteristic_length = -1.;
+    const double characteristic_length = 1.;
 
     vec current_strain{}; // current status
     vec trial_strain{};   // trial status
@@ -113,16 +98,14 @@ struct DataMaterial {
     mat trial_inertial{};   // inertial matrix
 };
 
-class Material : protected DataMaterial, protected DataCoupleMaterial, public CopyableTag {
+class Material : protected DataMaterial, public CopyableTag {
     const bool initialized = false;
     const bool symmetric = false;
-    const bool support_couple = false; // indicate if the material supports couple stress theory
 
     friend void ConstantStiffness(DataMaterial*);
     friend void ConstantDamping(DataMaterial*);
     friend void ConstantInertial(DataMaterial*);
-    friend void ConstantCoupleStiffness(DataCoupleMaterial*);
-    friend void PureWrapper(Material*);
+    friend void PureWrapper(DataMaterial*);
 
 public:
     enum class Parameter {
@@ -135,35 +118,35 @@ public:
     };
 
     explicit Material(
-        unsigned = 0,                    // tag
-        MaterialType = MaterialType::D0, // material type
-        double = 0.                      // density
+        unsigned,     // tag
+        MaterialType, // material type
+        double        // density
     );
 
     [[nodiscard]] double get_density() const;
     [[nodiscard]] MaterialType get_material_type() const;
     [[nodiscard]] PlaneType get_plane_type() const;
 
-    int initialize_base(const shared_ptr<DomainBase>&);
-
+    virtual int initialize_base(const shared_ptr<DomainBase>&);
     virtual int initialize(const shared_ptr<DomainBase>&) = 0;
-    virtual void initialize_couple(const shared_ptr<DomainBase>&);
 
     virtual void initialize_history(unsigned);
     virtual void set_initial_history(const vec&);
 
     void set_initialized(bool) const;
     void set_symmetric(bool) const;
-    void set_support_couple(bool) const;
     [[nodiscard]] bool is_initialized() const;
     [[nodiscard]] bool is_symmetric() const;
-    [[nodiscard]] bool is_support_couple() const;
 
-    void set_characteristic_length(double) const;
-    [[nodiscard]] double get_characteristic_length() const;
+    void set_characteristic_length(const double L) const { access::rw(characteristic_length) = std::max(datum::eps, std::fabs(L)); }
+
+    [[nodiscard]] virtual unsigned nonlocal_size() const { return 0; }
 
     [[nodiscard]] virtual double get(Parameter) const;
 
+    virtual unique_ptr<Material> unique_copy() = 0;
+
+    // conventional material interface
     virtual const vec& get_trial_strain();
     virtual const vec& get_trial_strain_rate();
     virtual const vec& get_trial_strain_acc();
@@ -187,18 +170,6 @@ public:
     [[nodiscard]] virtual const mat& get_initial_damping() const;
     [[nodiscard]] virtual const mat& get_initial_inertial() const;
 
-    virtual const vec& get_trial_curvature();
-    virtual const vec& get_trial_couple_stress();
-    virtual const mat& get_trial_couple_stiffness();
-
-    virtual const vec& get_current_curvature();
-    virtual const vec& get_current_couple_stress();
-    virtual const mat& get_current_couple_stiffness();
-
-    [[nodiscard]] virtual const mat& get_initial_couple_stiffness() const;
-
-    virtual unique_ptr<Material> unique_copy() = 0;
-
     int update_incre_status(double);
     int update_incre_status(double, double);
     int update_incre_status(double, double, double);
@@ -213,36 +184,19 @@ public:
     virtual int update_trial_status(const vec&, const vec&);
     virtual int update_trial_status(const vec&, const vec&, const vec&);
 
-    int update_couple_incre_status(double);
-    int update_couple_incre_status(double, double);
-    int update_couple_incre_status(double, double, double);
-    int update_couple_trial_status(double);
-    int update_couple_trial_status(double, double);
-    int update_couple_trial_status(double, double, double);
-
-    virtual int update_couple_incre_status(const vec&);
-    virtual int update_couple_incre_status(const vec&, const vec&);
-    virtual int update_couple_incre_status(const vec&, const vec&, const vec&);
-    virtual int update_couple_trial_status(const vec&);
-    virtual int update_couple_trial_status(const vec&, const vec&);
-    virtual int update_couple_trial_status(const vec&, const vec&, const vec&);
-
+    // status control
     virtual int clear_status() = 0;
     virtual int commit_status() = 0;
     virtual int reset_status() = 0;
 
-    virtual int clear_couple_status();
-    virtual int commit_couple_status();
-    virtual int reset_couple_status();
-
     [[nodiscard]] virtual std::vector<vec> record(OutputType) const;
 
 protected:
-    class prop {
+    class MaterialProperty {
         const double e, v;
 
     public:
-        prop(const double E, const double P)
+        MaterialProperty(const double E, const double P)
             : e(E)
             , v(P) {}
 
@@ -256,8 +210,6 @@ protected:
                 return e / (2. + 2. * v);
             case Parameter::BULK:
                 return e / (3. - 6. * v);
-            case Parameter::PEAKSTRAIN:
-            case Parameter::CRACKSTRAIN:
             default:
                 return 0.;
             }

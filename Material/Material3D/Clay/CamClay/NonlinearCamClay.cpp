@@ -23,7 +23,7 @@ const double NonlinearCamClay::sqrt_three_two = std::sqrt(1.5);
 const mat NonlinearCamClay::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearCamClay::NonlinearCamClay(const unsigned T, const double E, const double V, const double B, const double M, const double P, const double R)
-    : DataNonlinearCamClay{std::fabs(E), std::fabs(V), B * B, std::fabs(M), std::fabs(P)}
+    : DataNonlinearCamClay{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(V), .square_beta = B * B, .m = std::fabs(M), .pt = std::fabs(P)}
     , Material3D(T, R) { access::rw(tolerance) = 1E-13; }
 
 int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {
@@ -34,7 +34,7 @@ int NonlinearCamClay::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearCamClay::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double NonlinearCamClay::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearCamClay::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -49,7 +49,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
 
     auto trial_s = tensor::dev(trial_stress);
     const auto trial_q = sqrt_three_two * tensor::stress::norm(trial_s);
-    const auto p = tensor::mean3(trial_stress);
+    const auto p = tensor::mean<3>(trial_stress);
 
     auto ini_f = 0., gamma = 0.;
 
@@ -110,28 +110,4 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
         gamma -= incre(0);
         alpha -= incre(1);
     }
-}
-
-int NonlinearCamClay::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearCamClay::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearCamClay::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
 }

@@ -21,7 +21,7 @@
 #include <Recorder/Recorder>
 #include <Toolbox/utility.h>
 
-int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
+static int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
     std::string object_type;
     if(!get_input(command, object_type)) {
         suanpan_error("A valid object type is required.\n");
@@ -39,6 +39,7 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istrings
         suanpan_error("A valid recorder type is required.\n");
         return SUANPAN_SUCCESS;
     }
+    const auto variable_token = to_token(std::move(variable_type));
 
     while(true)
         if(const auto peek_value = command.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
@@ -52,7 +53,7 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istrings
     }
 
     if(is_equal(object_type, "Frame")) {
-        if(!domain->insert(std::make_shared<FrameRecorder>(tag, to_token(variable_type), interval)))
+        if(!domain->insert(std::make_shared<FrameRecorder>(tag, variable_token, interval)))
             suanpan_error("Fail to create new frame recorder.\n");
         return SUANPAN_SUCCESS;
     }
@@ -67,7 +68,7 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istrings
             else if(is_equal(para, "Scale")) {
                 if(!get_input(command, scale)) suanpan_error("A valid scale is required, using unity.\n");
             }
-        if(!domain->insert(std::make_shared<VisualisationRecorder>(tag, to_token(variable_type), interval, width, scale)))
+        if(!domain->insert(std::make_shared<VisualisationRecorder>(tag, variable_token, interval, width, scale)))
             suanpan_error("Fail to create new visualisation recorder.\n");
 #ifndef SUANPAN_VTK
         suanpan_warning("Visualisation recorders have no effect as the required VTK support is not available.\n");
@@ -75,25 +76,25 @@ int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istrings
         return SUANPAN_SUCCESS;
     }
 
-    if(const auto object_tag = get_remaining<uword>(command); is_equal(object_type, "Node") && !domain->insert(std::make_shared<NodeRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
+    if(const auto object_tag = get_remaining<uword>(command); is_equal(object_type, "Node") && !domain->insert(std::make_shared<NodeRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
         suanpan_error("Fail to create new node recorder.\n");
-    else if(is_equal(object_type, "GroupNode") && !domain->insert(std::make_shared<GroupNodeRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
+    else if(is_equal(object_type, "GroupNode") && !domain->insert(std::make_shared<GroupNodeRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
         suanpan_error("Fail to create new group node recorder.\n");
-    else if(is_equal(object_type, "Sum") && !domain->insert(std::make_shared<SumRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
+    else if(is_equal(object_type, "Sum") && !domain->insert(std::make_shared<SumRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
         suanpan_error("Fail to create new summation recorder.\n");
-    else if(is_equal(object_type, "GroupSum") && !domain->insert(std::make_shared<GroupSumRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
+    else if(is_equal(object_type, "GroupSum") && !domain->insert(std::make_shared<GroupSumRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
         suanpan_error("Fail to create new group summation recorder.\n");
-    else if(is_equal(object_type, "Element") && !domain->insert(std::make_shared<ElementRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
+    else if(is_equal(object_type, "Element") && !domain->insert(std::make_shared<ElementRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
         suanpan_error("Fail to create new element recorder.\n");
-    else if(is_equal(object_type, "GroupElement") && !domain->insert(std::make_shared<GroupElementRecorder>(tag, uvec(object_tag), to_token(variable_type), interval, use_hdf5)))
+    else if(is_equal(object_type, "GroupElement") && !domain->insert(std::make_shared<GroupElementRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
         suanpan_error("Fail to create new group element recorder.\n");
     else if(is_equal(object_type, "Amplitude") && !domain->insert(std::make_shared<AmplitudeRecorder>(tag, uvec(object_tag), OutputType::AMP, interval, use_hdf5)))
         suanpan_error("Fail to create new amplitude recorder.\n");
     else if(is_equal(object_type, "Global")) {
         bool flag;
-        if(OutputType::K == to_token(variable_type)) flag = domain->insert(std::make_shared<GlobalStiffnessRecorder>(tag, interval, use_hdf5));
-        else if(OutputType::M == to_token(variable_type)) flag = domain->insert(std::make_shared<GlobalMassRecorder>(tag, interval, use_hdf5));
-        else flag = domain->insert(std::make_shared<GlobalRecorder>(tag, to_token(variable_type), interval, use_hdf5));
+        if(OutputType::K == variable_token) flag = domain->insert(std::make_shared<GlobalStiffnessRecorder>(tag, interval, use_hdf5));
+        else if(OutputType::M == variable_token) flag = domain->insert(std::make_shared<GlobalMassRecorder>(tag, interval, use_hdf5));
+        else flag = domain->insert(std::make_shared<GlobalRecorder>(tag, variable_token, interval, use_hdf5));
         if(!flag)
             suanpan_error("Fail to create new global recorder.\n");
     }

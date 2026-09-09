@@ -30,45 +30,26 @@ struct get_pod_type< std::complex<T2> >
 
 
 
-template<typename T>
-struct is_Mat_fixed_only
-  {
-  using yes = char[1];
-  using no  = char[2];
-  
-  template<typename X> static yes& check(typename X::Mat_fixed_type*);
-  template<typename>   static  no& check(...);
-  
-  static constexpr bool value = ( sizeof(check<T>(0)) == sizeof(yes) );
-  };
+template<typename...>
+using arma_void_type = void;
 
+template<typename T, typename = void>
+struct is_Mat_fixed_only { static constexpr bool value = false; };
 
+template<typename T, typename = void>
+struct is_Row_fixed_only { static constexpr bool value = false; };
+
+template<typename T, typename = void>
+struct is_Col_fixed_only { static constexpr bool value = false; };
 
 template<typename T>
-struct is_Row_fixed_only
-  {
-  using yes = char[1];
-  using no  = char[2];
-  
-  template<typename X> static yes& check(typename X::Row_fixed_type*);
-  template<typename>   static  no& check(...);
-  
-  static constexpr bool value = ( sizeof(check<T>(0)) == sizeof(yes) );
-  };
-
-
+struct is_Mat_fixed_only< T, arma_void_type<typename T::Mat_fixed_type> > { static constexpr bool value = true; };
 
 template<typename T>
-struct is_Col_fixed_only
-  {
-  using yes = char[1];
-  using no  = char[2];
-  
-  template<typename X> static yes& check(typename X::Col_fixed_type*);
-  template<typename>   static  no& check(...);
-  
-  static constexpr bool value = ( sizeof(check<T>(0)) == sizeof(yes) );
-  };
+struct is_Row_fixed_only< T, arma_void_type<typename T::Row_fixed_type> > { static constexpr bool value = true; };
+
+template<typename T>
+struct is_Col_fixed_only< T, arma_void_type<typename T::Col_fixed_type> > { static constexpr bool value = true; };
 
 
 
@@ -293,11 +274,11 @@ struct is_subview_cube_slices< const subview_cube_slices<eT,T1> >
 template<typename T>
 struct is_Gen
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename gen_type>
 struct is_Gen< Gen<T1,gen_type> >
   { static constexpr bool value = true; };
- 
+
 template<typename T1, typename gen_type>
 struct is_Gen< const Gen<T1,gen_type> >
   { static constexpr bool value = true; };
@@ -306,11 +287,11 @@ struct is_Gen< const Gen<T1,gen_type> >
 template<typename T>
 struct is_Op
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename op_type>
 struct is_Op< Op<T1,op_type> >
   { static constexpr bool value = true; };
- 
+
 template<typename T1, typename op_type>
 struct is_Op< const Op<T1,op_type> >
   { static constexpr bool value = true; };
@@ -319,11 +300,11 @@ struct is_Op< const Op<T1,op_type> >
 template<typename T>
 struct is_CubeToMatOp
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename op_type>
 struct is_CubeToMatOp< CubeToMatOp<T1,op_type> >
   { static constexpr bool value = true; };
- 
+
 template<typename T1, typename op_type>
 struct is_CubeToMatOp< const CubeToMatOp<T1,op_type> >
   { static constexpr bool value = true; };
@@ -332,11 +313,11 @@ struct is_CubeToMatOp< const CubeToMatOp<T1,op_type> >
 template<typename T>
 struct is_SpToDOp
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename op_type>
 struct is_SpToDOp< SpToDOp<T1,op_type> >
   { static constexpr bool value = true; };
- 
+
 template<typename T1, typename op_type>
 struct is_SpToDOp< const SpToDOp<T1,op_type> >
   { static constexpr bool value = true; };
@@ -345,11 +326,11 @@ struct is_SpToDOp< const SpToDOp<T1,op_type> >
 template<typename T>
 struct is_SpToDGlue
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename T2, typename glue_type>
 struct is_SpToDGlue< SpToDGlue<T1,T2,glue_type> >
   { static constexpr bool value = true; };
- 
+
 template<typename T1, typename T2, typename glue_type>
 struct is_SpToDGlue< const SpToDGlue<T1,T2,glue_type> >
   { static constexpr bool value = true; };
@@ -358,11 +339,11 @@ struct is_SpToDGlue< const SpToDGlue<T1,T2,glue_type> >
 template<typename T>
 struct is_eOp
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename eop_type>
 struct is_eOp< eOp<T1,eop_type> >
   { static constexpr bool value = true; };
- 
+
 template<typename T1, typename eop_type>
 struct is_eOp< const eOp<T1,eop_type> >
   { static constexpr bool value = true; };
@@ -371,11 +352,11 @@ struct is_eOp< const eOp<T1,eop_type> >
 template<typename T>
 struct is_mtOp
   { static constexpr bool value = false; };
- 
+
 template<typename eT, typename T1, typename op_type>
 struct is_mtOp< mtOp<eT, T1, op_type> >
   { static constexpr bool value = true; };
- 
+
 template<typename eT, typename T1, typename op_type>
 struct is_mtOp< const mtOp<eT, T1, op_type> >
   { static constexpr bool value = true; };
@@ -384,7 +365,7 @@ struct is_mtOp< const mtOp<eT, T1, op_type> >
 template<typename T>
 struct is_Glue
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename T2, typename glue_type>
 struct is_Glue< Glue<T1,T2,glue_type> >
   { static constexpr bool value = true; };
@@ -397,7 +378,7 @@ struct is_Glue< const Glue<T1,T2,glue_type> >
 template<typename T>
 struct is_eGlue
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename T2, typename eglue_type>
 struct is_eGlue< eGlue<T1,T2,eglue_type> >
   { static constexpr bool value = true; };
@@ -410,7 +391,7 @@ struct is_eGlue< const eGlue<T1,T2,eglue_type> >
 template<typename T>
 struct is_mtGlue
   { static constexpr bool value = false; };
- 
+
 template<typename eT, typename T1, typename T2, typename glue_type>
 struct is_mtGlue< mtGlue<eT, T1, T2, glue_type> >
   { static constexpr bool value = true; };
@@ -453,7 +434,7 @@ struct is_glue_times_diag< const Glue<T1,T2,glue_times_diag> >
 template<typename T>
 struct is_op_diagmat
   { static constexpr bool value = false; };
- 
+
 template<typename T1>
 struct is_op_diagmat< Op<T1,op_diagmat> >
   { static constexpr bool value = true; };
@@ -470,16 +451,16 @@ struct is_op_diagmat< const Op<T1,op_diagmat> >
 template<typename T>
 struct is_GenCube
   { static constexpr bool value = false; };
- 
+
 template<typename eT, typename gen_type>
 struct is_GenCube< GenCube<eT,gen_type> >
   { static constexpr bool value = true; };
- 
+
 
 template<typename T>
 struct is_OpCube
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename op_type>
 struct is_OpCube< OpCube<T1,op_type> >
   { static constexpr bool value = true; };
@@ -488,25 +469,25 @@ struct is_OpCube< OpCube<T1,op_type> >
 template<typename T>
 struct is_eOpCube
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename eop_type>
 struct is_eOpCube< eOpCube<T1,eop_type> >
   { static constexpr bool value = true; };
- 
+
 
 template<typename T>
 struct is_mtOpCube
   { static constexpr bool value = false; };
- 
+
 template<typename eT, typename T1, typename op_type>
 struct is_mtOpCube< mtOpCube<eT, T1, op_type> >
   { static constexpr bool value = true; };
- 
+
 
 template<typename T>
 struct is_GlueCube
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename T2, typename glue_type>
 struct is_GlueCube< GlueCube<T1,T2,glue_type> >
   { static constexpr bool value = true; };
@@ -515,7 +496,7 @@ struct is_GlueCube< GlueCube<T1,T2,glue_type> >
 template<typename T>
 struct is_eGlueCube
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename T2, typename eglue_type>
 struct is_eGlueCube< eGlueCube<T1,T2,eglue_type> >
   { static constexpr bool value = true; };
@@ -524,7 +505,7 @@ struct is_eGlueCube< eGlueCube<T1,T2,eglue_type> >
 template<typename T>
 struct is_mtGlueCube
   { static constexpr bool value = false; };
- 
+
 template<typename eT, typename T1, typename T2, typename glue_type>
 struct is_mtGlueCube< mtGlueCube<eT, T1, T2, glue_type> >
   { static constexpr bool value = true; };
@@ -684,7 +665,7 @@ struct is_spdiagview< spdiagview<eT> >
 template<typename T>
 struct is_SpOp
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename op_type>
 struct is_SpOp< SpOp<T1,op_type> >
   { static constexpr bool value = true; };
@@ -693,16 +674,16 @@ struct is_SpOp< SpOp<T1,op_type> >
 template<typename T>
 struct is_SpGlue
   { static constexpr bool value = false; };
- 
+
 template<typename T1, typename T2, typename glue_type>
 struct is_SpGlue< SpGlue<T1,T2,glue_type> >
   { static constexpr bool value = true; };
- 
+
 
 template<typename T>
 struct is_mtSpOp
   { static constexpr bool value = false; };
- 
+
 template<typename eT, typename T1, typename spop_type>
 struct is_mtSpOp< mtSpOp<eT, T1, spop_type> >
   { static constexpr bool value = true; };
@@ -711,7 +692,7 @@ struct is_mtSpOp< mtSpOp<eT, T1, spop_type> >
 template<typename T>
 struct is_mtSpGlue
   { static constexpr bool value = false; };
- 
+
 template<typename eT, typename T1, typename T2, typename spglue_type>
 struct is_mtSpGlue< mtSpGlue<eT, T1, T2, spglue_type> >
   { static constexpr bool value = true; };
@@ -720,7 +701,7 @@ struct is_mtSpGlue< mtSpGlue<eT, T1, T2, spglue_type> >
 template<typename T>
 struct is_mtSpReduceOp
   { static constexpr bool value = false; };
- 
+
 template<typename eT, typename T1, typename op_type>
 struct is_mtSpReduceOp< mtSpReduceOp<eT, T1, op_type> >
   { static constexpr bool value = true; };
@@ -990,7 +971,7 @@ struct is_real<float>
   static constexpr bool yes   = true;
   static constexpr bool no    = false;
   };
-  
+
 template<>
 struct is_real<double>
   {
@@ -1026,7 +1007,7 @@ struct is_blas_real<float>
   static constexpr bool yes   = true;
   static constexpr bool no    = false;
   };
-  
+
 template<>
 struct is_blas_real<double>
   {
@@ -1231,7 +1212,7 @@ struct force_different_type
   typedef T1 T1_result;
   typedef T2 T2_result;
   };
-  
+
 
 template<typename T1>
 struct force_different_type<T1,T1>
@@ -1239,8 +1220,8 @@ struct force_different_type<T1,T1>
   typedef T1              T1_result;
   typedef arma_junk_class T2_result;
   };
-  
-  
+
+
 
 //
 
@@ -1473,6 +1454,28 @@ struct is_sym_expr< Op<T1, op_symmatl> >
   eval(const Op<T1, op_symmatl>&)
     {
     return true;
+    }
+  };
+
+
+//
+
+
+template<typename T1>
+struct is_permute_equiv_to_strans_expr
+  {
+  static constexpr bool eval(const T1&)  { return false; }
+  };
+
+template<typename T1>
+struct is_permute_equiv_to_strans_expr< OpCube<T1, op_permute> >
+  {
+  static
+  arma_inline
+  bool
+  eval(const OpCube<T1, op_permute>& expr)
+    {
+    return (expr.aux_uword_a == uword(1)) && (expr.aux_uword_b == uword(0)) && (expr.aux_uword_c == uword(2));
     }
   };
 

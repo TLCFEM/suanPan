@@ -76,9 +76,7 @@ int PatchCube::initialize(const shared_ptr<DomainBase>& D) {
                     const auto ders = net.evaluate_shape_function_derivative(x, y, z, polygon, 1, 1, 1);
                     const auto pn = join_cols(.5 * dx * vectorise(ders(1, 0, 0)).t(), .5 * dy * vectorise(ders(0, 1, 0)).t(), .5 * dz * vectorise(ders(0, 0, 1)).t());
                     const mat jacob = pn * ele_coor.head_cols(3);
-                    int_pt.emplace_back(vec{x, y, z}, plan(L, 3) * det(jacob), material_proto->unique_copy());
-
-                    auto& c_pt = int_pt.back();
+                    auto& c_pt = int_pt.emplace_back(vec{x, y, z}, plan(L, 3) * det(jacob), material_proto->unique_copy());
 
                     const mat pn_pxyz = solve(jacob, pn);
 
@@ -157,7 +155,7 @@ void PatchCube::print() {
     suanpan_info("Material:\n");
     for(const auto& t_pt : int_pt) {
         t_pt.c_material->print();
-        suanpan_info("Strain:\t", t_pt.c_material->get_trial_strain());
-        suanpan_info("Stress:\t", t_pt.c_material->get_trial_stress());
+        suanpan_info("Strain:", t_pt.c_material->get_current_strain());
+        suanpan_info("Stress:", t_pt.c_material->get_current_stress());
     }
 }

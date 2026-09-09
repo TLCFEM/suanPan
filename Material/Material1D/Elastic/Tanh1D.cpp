@@ -35,27 +35,6 @@ int Tanh1D::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int Tanh1D::clear_status() {
-    current_strain = trial_strain.zeros();
-    current_stress = trial_stress.zeros();
-    current_stiffness = trial_stiffness = elastic_modulus;
-    return 0;
-}
-
-int Tanh1D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return 0;
-}
-
-int Tanh1D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    return 0;
-}
-
 void Tanh1D::print() {
     suanpan_info("A uniaxial nonlinear elastic material using tanh function with an elastic modulus of {:.4E}.\n", elastic_modulus);
     Material1D::print();

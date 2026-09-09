@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 Gap01::Gap01(const unsigned T, const double E, const double Y, const double G, const double R)
-    : DataGap01{std::fabs(E), std::fabs(Y), std::fabs(G)}
+    : DataGap01{.elastic_modulus = std::fabs(E), .yield_stress = std::fabs(Y), .gap_strain = std::fabs(G)}
     , Material1D(T, R) {}
 
 int Gap01::initialize(const shared_ptr<DomainBase>&) {
@@ -60,30 +60,6 @@ int Gap01::update_trial_status(const vec& t_strain) {
         trial_stiffness(0) = 0.;
     }
 
-    return SUANPAN_SUCCESS;
-}
-
-int Gap01::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_stiffness = initial_stiffness;
-    current_history = initial_history;
-    return reset_status();
-}
-
-int Gap01::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int Gap01::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
     return SUANPAN_SUCCESS;
 }
 

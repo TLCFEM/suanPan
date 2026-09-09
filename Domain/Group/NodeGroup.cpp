@@ -44,60 +44,50 @@ void NodeGroup::initialize(const shared_ptr<DomainBase>& D) {
     // generate by direct assignment
     if(-1 == dof) return;
 
-    std::vector<uword> pond;
+    suanpan::set<uword> pond;
 
-    // generate by two points
     if(-2 == dof)
-        for(auto& I : D->get_node_pool()) {
+        // generate by line segment between two points
+        suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& I) {
             auto& J = I->get_coordinate();
 
-            const auto size = std::min(J.n_elem, s_node.n_elem);
+            const auto size = std::min(J.n_elem, std::min(s_node.n_elem, e_node.n_elem));
 
-            if(0 == size) continue;
+            if(0 == size) return;
 
-            const vec s_point(s_node.mem, size);
-            const vec e_point(e_node.mem, size);
+            const vec s_point(s_node.mem, size), e_point(e_node.mem, size);
+            const vec line_b = e_point - s_point;
+
+            const auto dot_bb = dot(line_b, line_b);
+            if(std::sqrt(dot_bb) <= datum::eps) return;
+
             const vec m_point(J.mem, size);
+            const vec line_a = m_point - s_point;
 
-            if(const auto denom = e_point(0) - s_point(0); std::fabs(denom) >= 1E-8) {
-                if(const auto T = (m_point(0) - s_point(0)) / denom; T >= 0. && T <= 1.) {
-                    // on inclined line
-                    auto flag = true;
-                    for(uword K{1}; K < size; ++K)
-                        if(std::fabs((T * ((e_point(K) - s_point(K))) - m_point(K) + s_point(K))) > 1E-8) {
-                            flag = false;
-                            break;
-                        }
-                    if(flag) pond.emplace_back(I->get_tag());
-                }
-            }
-            else if(std::fabs(m_point(0) - .5 * (e_point(0) + s_point(0))) < 1E-8) {
-                // on vertical line
-                auto flag = true;
-                for(uword K{1}; K < size; ++K)
-                    if(const auto T = (m_point(K) - s_point(K)) / (e_point(K) - s_point(K)); T < 0. || T > 1.) {
-                        flag = false;
-                        break;
-                    }
-                if(flag) pond.emplace_back(I->get_tag());
-            }
-        }
-    else if(-3 == dof)
-        for(auto& I : D->get_node_pool()) {
+            const auto dot_ab = dot(line_a, line_b);
+
+            if(const auto proj_ab = dot_ab / dot_bb; std::fabs(dot(line_a, line_a) - dot_ab * proj_ab) <= datum::eps * dot_bb && proj_ab >= 0. && proj_ab <= 1.) pond.insert(I->get_tag());
+        });
+    else if(-3 == dof) {
+        // generate by plane fitting
+        const auto ref_error = norm(rule);
+        suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& I) {
             auto& J = I->get_coordinate();
 
             const auto size = std::min(J.n_elem, rule.n_elem - 1);
 
-            if(0 == size) continue;
+            if(0 == size) return;
 
-            if(const vec part(rule.mem, size), m_point(J.mem, size); std::fabs(dot(part, m_point) + rule.back()) <= 1E-8) pond.emplace_back(I->get_tag());
-        }
-    else
+            if(const vec part(rule.mem, size), m_point(J.mem, size); std::fabs(dot(part, m_point) + rule.back()) <= datum::eps * ref_error) pond.insert(I->get_tag());
+        });
+    }
+    else {
         // generate by polynomial curve fitting
-        for(auto& I : D->get_node_pool())
-            if(auto& J = I->get_coordinate(); static_cast<int>(J.n_elem) > dof && std::fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= 1E-12) pond.emplace_back(I->get_tag());
+        const auto ref_error = norm(rule);
+        suanpan::for_all(D->get_node_pool(), [&](const shared_ptr<Node>& I) {
+            if(auto& J = I->get_coordinate(); std::cmp_greater(J.n_elem, dof) && std::fabs(as_scalar(polyval(rule, vec{J(dof)}))) <= datum::eps * ref_error) pond.insert(I->get_tag());
+        });
+    }
 
-    suanpan_sort(pond.begin(), pond.end());
-
-    pool = pond;
+    pool = to_uvec(pond);
 }

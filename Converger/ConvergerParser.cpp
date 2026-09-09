@@ -38,16 +38,15 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstrea
     auto code = 0;
     if(is_equal(converger_id.substr(0, 5), "Logic")) {
         unsigned tag_a, tag_b;
-        if(!get_input(command, tag_a) || !get_input(command, tag_b)) {
+        if(!get_input(command, tag_a, tag_b)) {
             suanpan_error("A valid tag is required.\n");
             return SUANPAN_SUCCESS;
         }
 
-        if(is_equal(converger_id, "LogicAND") && domain->insert(std::make_shared<LogicAND>(tag, tag_a, tag_b))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(is_equal(converger_id, "LogicOR") && domain->insert(std::make_shared<LogicOR>(tag, tag_a, tag_b))) code = 1;
-        else if(is_equal(converger_id, "LogicXOR") && domain->insert(std::make_shared<LogicXOR>(tag, tag_a, tag_b))) code = 1;
-        else
-            suanpan_error("Cannot identify converger type.\n");
+        if(is_equal_any(converger_id, "LogicAND", "LogicConvergerAND") && domain->insert(std::make_shared<LogicConvergerAND>(tag, tag_a, tag_b))) code = 1; // NOLINT(bugprone-branch-clone)
+        else if(is_equal_any(converger_id, "LogicOR", "LogicConvergerOR") && domain->insert(std::make_shared<LogicConvergerOR>(tag, tag_a, tag_b))) code = 1;
+        else if(is_equal_any(converger_id, "LogicXOR", "LogicConvergerXOR") && domain->insert(std::make_shared<LogicConvergerXOR>(tag, tag_a, tag_b))) code = 1;
+        else suanpan_error("Cannot identify converger type.\n");
     }
     else {
         auto tolerance = 1E-6;

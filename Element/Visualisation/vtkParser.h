@@ -43,7 +43,7 @@ struct vtkInfo {
     std::string title_name;
     unsigned font_size = 8;
 
-    void set(const OutputType in) { record_type = to_token(category = to_category(display_type = in)); }
+    void set(const OutputType in) { record_type = to_token(std::string(category = to_category(display_type = in))); }
 };
 
 void vtk_cell_plot(const shared_ptr<DomainBase>&, vtkInfo);

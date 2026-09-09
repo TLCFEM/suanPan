@@ -22,7 +22,7 @@
 const vec BlatzKo::weight{2., 2., 2., 1., 1., 1.};
 
 BlatzKo::BlatzKo(const unsigned T, const double E, const double V, const double R)
-    : DataBlatzKo{fabs(E), fabs(V), fabs(E) / (2. + 2. * fabs(V)), (1. - fabs(V)) / (1. - 2. * fabs(V))}
+    : DataBlatzKo{.elastic_modulus = fabs(E), .poissons_ratio = fabs(V), .shear_modulus = fabs(E) / (2. + 2. * fabs(V)), .half_beta_two = (1. - fabs(V)) / (1. - 2. * fabs(V))}
     , Material3D(T, R) {}
 
 int BlatzKo::initialize(const shared_ptr<DomainBase>&) {
@@ -32,7 +32,7 @@ int BlatzKo::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double BlatzKo::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double BlatzKo::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> BlatzKo::unique_copy() { return std::make_unique<BlatzKo>(*this); }
 
@@ -75,27 +75,6 @@ int BlatzKo::update_trial_status(const vec& t_strain) {
         for(auto J = I + 1; J < 6; ++J) trial_stiffness(J, I) = trial_stiffness(I, J) += factor_b * H(J);
     }
 
-    return SUANPAN_SUCCESS;
-}
-
-int BlatzKo::clear_status() {
-    trial_strain = current_strain.zeros();
-    trial_stress = current_stress.zeros();
-    trial_stiffness = current_stiffness = initial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int BlatzKo::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int BlatzKo::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

@@ -49,27 +49,6 @@ int CustomElastic1D::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int CustomElastic1D::clear_status() {
-    current_strain = trial_strain.zeros();
-    current_stress = trial_stress.zeros();
-    current_stiffness = trial_stiffness = initial_stiffness;
-    return 0;
-}
-
-int CustomElastic1D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return 0;
-}
-
-int CustomElastic1D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    return 0;
-}
-
 void CustomElastic1D::print() {
     suanpan_info("A uniaxial elastic model using custom constitutive equation.\n");
     if(expression) expression->print();

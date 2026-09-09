@@ -52,10 +52,6 @@ public:
     int initialize(const shared_ptr<DomainBase>&) override;
 
     int update_trial_status(const vec&) override;
-
-    int clear_status() override;
-    int commit_status() override;
-    int reset_status() override;
 };
 
 #endif

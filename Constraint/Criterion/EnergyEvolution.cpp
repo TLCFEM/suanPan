@@ -21,8 +21,8 @@
 #include <Element/Element.h>
 #include <Step/Step.h>
 
-EnergyEvolution::EnergyEvolution(const unsigned T, const unsigned ST, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
-    : Criterion(T, ST)
+EnergyEvolution::EnergyEvolution(const unsigned T, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
+    : Criterion(T)
     , iteration(IT)
     , reactive_ratio(RR)
     , incre_level(IL)

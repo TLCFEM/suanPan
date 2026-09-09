@@ -154,13 +154,13 @@ int Contact3D::initialize(const shared_ptr<DomainBase>& D) {
     }
 
     master.reserve(m_pool.n_elem / 3);
-    for(uword I{0}, J{1}, K{2}; K < m_pool.n_elem; I += 3, J += 3, K += 3) master.emplace_back(MasterFacet{{MasterNode{D->get<Node>(m_pool(I)), {}, {}, {}}, MasterNode{D->get<Node>(m_pool(J)), {}, {}, {}}, MasterNode{D->get<Node>(m_pool(K)), {}, {}, {}}}, {}, {}});
+    for(uword I{0}, J{1}, K{2}; K < m_pool.n_elem; I += 3, J += 3, K += 3) master.emplace_back(MasterFacet{.node = {MasterNode{.node = D->get<Node>(m_pool(I)), .local_span = {}, .position = {}, .outer_norm = {}}, MasterNode{.node = D->get<Node>(m_pool(J)), .local_span = {}, .position = {}, .outer_norm = {}}, MasterNode{.node = D->get<Node>(m_pool(K)), .local_span = {}, .position = {}, .outer_norm = {}}}, .facet_outer_norm = {}, .facet_area = {}});
 
     master.shrink_to_fit();
 
     const auto& s_pool = D->get<Group>(slave_tag)->get_pool();
     slave.reserve(s_pool.n_elem);
-    for(auto& I : s_pool) slave.emplace_back(SlaveNode{D->get<Node>(I), {}, {}});
+    for(auto& I : s_pool) slave.emplace_back(SlaveNode{.node = D->get<Node>(I), .local_span = {}, .position = {}});
     slave.shrink_to_fit();
 
     uword counter{0};

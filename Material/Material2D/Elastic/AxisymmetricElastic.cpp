@@ -30,7 +30,7 @@ int AxisymmetricElastic::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double AxisymmetricElastic::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double AxisymmetricElastic::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> AxisymmetricElastic::unique_copy() { return std::make_unique<AxisymmetricElastic>(*this); }
 
@@ -60,6 +60,6 @@ int AxisymmetricElastic::reset_status() {
 std::vector<vec> AxisymmetricElastic::record(OutputType) const { return {}; }
 
 void AxisymmetricElastic::print() {
-    suanpan_info("Strain:\t", get_trial_strain());
-    suanpan_info("Stress:\t", get_trial_stress());
+    suanpan_info("Strain:", current_strain);
+    suanpan_info("Stress:", current_stress);
 }

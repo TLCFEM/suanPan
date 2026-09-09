@@ -24,7 +24,7 @@ const double BilinearJ2::root_two_third = sqrt(two_third);
 const mat BilinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 BilinearJ2::BilinearJ2(const unsigned T, const double E, const double V, const double Y, const double H, const double B, const double R)
-    : DataBilinearJ2{fabs(E), V, fabs(Y), H, B}
+    : DataBilinearJ2{.elastic_modulus = fabs(E), .poissons_ratio = V, .yield_stress = fabs(Y), .hardening_ratio = H, .beta = B}
     , Material3D(T, R) {}
 
 int BilinearJ2::initialize(const shared_ptr<DomainBase>&) {
@@ -37,7 +37,7 @@ int BilinearJ2::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> BilinearJ2::unique_copy() { return std::make_unique<BilinearJ2>(*this); }
 
-double BilinearJ2::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double BilinearJ2::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int BilinearJ2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -70,30 +70,6 @@ int BilinearJ2::update_trial_status(const vec& t_strain) {
         trial_stiffness += (tmp_b - square_double_shear / tmp_a) / norm_shifted_stress / norm_shifted_stress * shifted_stress * shifted_stress.t() - tmp_b * unit_dev_tensor;
     }
 
-    return SUANPAN_SUCCESS;
-}
-
-int BilinearJ2::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int BilinearJ2::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int BilinearJ2::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

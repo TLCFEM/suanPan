@@ -19,7 +19,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Prepare
@@ -47,13 +47,13 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           cmake --build build --target install --config Release -j $(nproc)
           cmake --build build --target package
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.4.0
+        uses: sigstore/gh-action-sigstore-python@v3.5.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -122,7 +122,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Prepare
@@ -130,7 +130,7 @@ jobs:
           echo "SP_TIME=daily-$(date +''%y%m%d'')" >> $GITHUB_ENV
       - name: VTK
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-${{ matrix.os }}.tar.gz && tar xf VTK-9.6.2-${{ matrix.os }}.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-${{ matrix.os }}.tar.gz && tar xf VTK-9.7.0-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils patchelf
@@ -149,13 +149,13 @@ jobs:
           -DSP_ENABLE_MPI=ON \
           -DSP_ENABLE_SHARED_MKL=OFF \
           -DSP_ENABLE_VTK=ON \
-          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/home/runner/work/suanPan/suanPan/lib/cmake/vtk-9.7/
           cmake --build build --target install --config Release -j $(nproc)
           cmake --build build --target package
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
           cp updater build/dist/bin
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.4.0
+        uses: sigstore/gh-action-sigstore-python@v3.5.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -202,8 +202,7 @@ jobs:
             export CC=$(brew --prefix llvm@18)/bin/clang
             export CXX=$(brew --prefix llvm@18)/bin/clang++
           else
-            export CC=$(brew --prefix llvm@15)/bin/clang
-            export CXX=$(brew --prefix llvm@15)/bin/clang++
+            exit 1
           fi
           export FC=gfortran-15
           cmake -S . -B build \
@@ -215,12 +214,12 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_BUILD_PARALLEL=ON \
           -DSP_ENABLE_VTK=${{ matrix.vtk }} \
-          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.6/
+          -DVTK_PATH=/Users/runner/work/suanPan/suanPan/VTK/lib/cmake/vtk-9.7/
           cmake --build build --target install --config Release -j 3
           cp updater build/dist/bin
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
-        uses: sigstore/gh-action-sigstore-python@v3.4.0
+        uses: sigstore/gh-action-sigstore-python@v3.5.0
         with:
           inputs: build/dist/bin/*
       - name: Pack
@@ -250,6 +249,8 @@ jobs:
         os:
           - macos-15-large
           - macos-15-xlarge
+          - macos-26-large
+          - macos-26-xlarge
         vtk:
           - 'ON'
     timeout-minutes: 100
@@ -281,7 +282,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Prepare
@@ -292,8 +293,8 @@ jobs:
       - if: matrix.vtk == 'ON'
         name: VTK
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-win-gcc.7z
-          7z x VTK-9.6.2-win-gcc.7z -oVTK
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-win-gcc.7z
+          7z x VTK-9.7.0-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -306,7 +307,7 @@ jobs:
           -DSP_BUILD_PARALLEL=ON `
           -DSP_ENABLE_AVX2=${{ matrix.avx }} `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.6
+          -DVTK_PATH=D:/a/suanPan/suanPan/VTK/lib/cmake/vtk-9.7
           cmake --build build --target install --config Release -j 4
           cp ./updater.exe build/dist/bin
       - name: Name
@@ -370,7 +371,7 @@ jobs:
         with:
           submodules: recursive
       - name: Golang
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           cache: false
       - name: Prepare
@@ -379,16 +380,16 @@ jobs:
       - if: matrix.mkl == 'ON'
         name: MKL
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/90d3404b-65cf-426d-8484-71e129454dba/intel-onemkl-2026.0.0.907_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/9af38d13-867b-45af-a950-0b42d9bac1ae/intel-fortran-compiler-2026.0.0.566_offline.exe
-          intel-onemkl-2026.0.0.907_offline.exe -s -a --silent --eula accept
-          intel-fortran-compiler-2026.0.0.566_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/838e2a31-c5db-429e-93d8-509c08d71ceb/intel-onemkl-2026.1.0.238_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a43777b7-be5a-4fb6-97f9-bf4ae49eeb33/intel-fortran-compiler-2026.1.1.20_offline.exe
+          intel-onemkl-2026.1.0.238_offline.exe -s -a --silent --eula accept
+          intel-fortran-compiler-2026.1.1.20_offline.exe -s -a --silent --eula accept
         shell: cmd
       - if: matrix.vtk == 'ON'
         name: VTK
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.6.2-win.7z
-          7z x VTK-9.6.2-win.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-win.7z
+          7z x VTK-9.7.0-win.7z
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -403,7 +404,7 @@ jobs:
           -DSP_ENABLE_MKL=${{ matrix.mkl }} `
           -DSP_ENABLE_SHARED_MKL=OFF `
           -DSP_ENABLE_VTK=${{ matrix.vtk }} `
-          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.6/
+          -DVTK_PATH=D:/a/suanPan/suanPan/lib/cmake/vtk-9.7/
           cmake --build build --target install --config Release -j 4
           cp ./updater.exe build/dist/bin
       - name: Name
@@ -457,7 +458,7 @@ jobs:
           ls -halt
           if [ "${{ github.event_name }}" == "push" ]; then
             choco apikey --key ${{ secrets.CHOCO_KEY }} --source https://push.chocolatey.org/
-            choco push suanpan.4.1.1.nupkg --source https://push.chocolatey.org/
+            choco push suanpan.4.2.0.nupkg --source https://push.chocolatey.org/
           fi
         shell: bash
       - if: matrix.mkl == 'ON' && matrix.vtk == 'ON' && matrix.avx == 'ON'
@@ -476,10 +477,10 @@ jobs:
         name: Release NUPKG
         uses: svenstaro/upload-release-action@v2
         with:
-          asset_name: suanpan.4.1.1.nupkg
+          asset_name: suanpan.4.2.0.nupkg
           body: |
             This release is automatically generated by CI/CD pipelines.
-          file: suanpan.4.1.1.nupkg
+          file: suanpan.4.2.0.nupkg
           overwrite: true
           prerelease: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}

@@ -20,7 +20,7 @@
 #include <Toolbox/tensor.h>
 
 IsotropicElastic3D::IsotropicElastic3D(const unsigned T, const double E, const double P, const double R)
-    : DataIsotropicElastic3D{fabs(E), fabs(P)}
+    : DataIsotropicElastic3D{.elastic_modulus = fabs(E), .poissons_ratio = fabs(P)}
     , Material3D(T, R) {}
 
 int IsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
@@ -31,7 +31,7 @@ int IsotropicElastic3D::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double IsotropicElastic3D::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double IsotropicElastic3D::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 unique_ptr<Material> IsotropicElastic3D::unique_copy() { return std::make_unique<IsotropicElastic3D>(*this); }
 
@@ -44,9 +44,9 @@ int IsotropicElastic3D::update_trial_status(const vec& t_strain) {
 }
 
 int IsotropicElastic3D::clear_status() {
-    trial_strain = current_strain.zeros();
-    trial_stress = current_stress.zeros();
-    return SUANPAN_SUCCESS;
+    current_strain.zeros();
+    current_stress.zeros();
+    return reset_status();
 }
 
 int IsotropicElastic3D::commit_status() {

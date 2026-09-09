@@ -80,5 +80,5 @@ std::vector<vec> Rotation2D::record(const OutputType P) const { return mat_obj->
 
 void Rotation2D::print() {
     suanpan_info("A rotation wrapper with the underlying material.\n");
-    if(nullptr != mat_obj) mat_obj->print();
+    if(mat_obj) mat_obj->print();
 }

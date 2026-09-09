@@ -114,7 +114,7 @@ int Dynamic::analyze() {
         }
         // update incremental and trial time
         G->update_incre_time(step_time);
-        if(const auto code = S->analyze(); SUANPAN_SUCCESS == code) {
+        if(auto code = S->analyze(); SUANPAN_SUCCESS == code) {
             // success step
             // eat current increment
             set_time_left(remain_time -= W->get_incre_time());
@@ -130,6 +130,9 @@ int Dynamic::analyze() {
                 // check if time overflows
                 if(step_time > remain_time) step_time = remain_time;
             }
+            // some criteria may update the model
+            code = G->process_criterion();
+            if(SUANPAN_SUCCESS != code) return code;
         }
         else if(SUANPAN_FAIL == code) {
             // failed step

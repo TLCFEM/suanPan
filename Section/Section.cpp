@@ -22,7 +22,7 @@
 #include <Recorder/OutputType.h>
 
 Section::Section(const unsigned T, const SectionType ST, const unsigned MT, const double A, vec&& EC)
-    : DataSection{MT, ST, EC.head(2), A}
+    : DataSection{.material_tag = MT, .section_type = ST, .eccentricity = EC.head(2), .area = A}
     , CopyableTag(T) {}
 
 SectionType Section::get_section_type() const { return section_type; }

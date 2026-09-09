@@ -1040,7 +1040,7 @@ namespace {
         return_obj = std::make_unique<Damper05>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
-    void new_dc3d4(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    template<bool monolithic> void new_dc3d4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1071,10 +1071,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate);
+        return_obj = std::make_unique<DC3D4>(tag, std::move(node_tag), material_tag, length, rate, monolithic);
     }
 
-    void new_dc3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    template<bool monolithic> void new_dc3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1105,10 +1105,32 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate);
+        return_obj = std::make_unique<DC3D8>(tag, std::move(node_tag), material_tag, length, rate, monolithic);
     }
 
-    void new_dcp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    void new_nonlocalc3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(8);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<NonlocalC3D8>(tag, std::move(node_tag), material_tag);
+    }
+
+    template<bool monolithic> void new_dcp3(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1145,10 +1167,10 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness);
+        return_obj = std::make_unique<DCP3>(tag, std::move(node_tag), material_tag, length, rate, thickness, monolithic);
     }
 
-    void new_dcp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
+    template<bool monolithic> void new_dcp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1185,7 +1207,35 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness);
+        return_obj = std::make_unique<DCP4>(tag, std::move(node_tag), material_tag, length, rate, thickness, monolithic);
+    }
+
+    void new_nonlocalcp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        uvec node_tag(4);
+        if(!get_input(command, node_tag)) {
+            suanpan_error("Four valid nodes are required.\n");
+            return;
+        }
+
+        unsigned material_tag;
+        if(!get_input(command, material_tag)) {
+            suanpan_error("A valid material tag is required.\n");
+            return;
+        }
+
+        auto thickness = 1.;
+        if(!get_optional_input(command, thickness)) {
+            suanpan_error("A valid thickness is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<NonlocalCP4>(tag, std::move(node_tag), material_tag, thickness);
     }
 
     void new_dkt3(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -2578,11 +2628,11 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "B21H")) new_b21h(new_element, command);
     else if(is_equal(element_id, "B31")) new_b31(new_element, command, false);
     else if(is_equal(element_id, "B31OS")) new_b31(new_element, command, true);
-    else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
     else if(is_equal(element_id, "C3D4")) new_c3d4(new_element, command);
     else if(is_equal(element_id, "C3D8")) new_c3d8(new_element, command, false);
     else if(is_equal(element_id, "C3D8I")) new_c3d8i(new_element, command);
     else if(is_equal(element_id, "C3D8R")) new_c3d8(new_element, command, true);
+    else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
     else if(is_equal(element_id, "CAX3")) new_cax3(new_element, command);
     else if(is_equal(element_id, "CAX4")) new_cax4(new_element, command);
     else if(is_equal(element_id, "CAX8")) new_cax8(new_element, command);
@@ -2614,10 +2664,14 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "Damper04")) new_damper02(new_element, command, 3);
     else if(is_equal(element_id, "Damper05")) new_damper05(new_element, command, 2);
     else if(is_equal(element_id, "Damper06")) new_damper05(new_element, command, 3);
-    else if(is_equal(element_id, "DC3D4")) new_dc3d4(new_element, command);
-    else if(is_equal(element_id, "DC3D8")) new_dc3d8(new_element, command);
-    else if(is_equal(element_id, "DCP3")) new_dcp3(new_element, command);
-    else if(is_equal(element_id, "DCP4")) new_dcp4(new_element, command);
+    else if(is_equal(element_id, "DC3D4")) new_dc3d4<false>(new_element, command);
+    else if(is_equal(element_id, "DC3D4M")) new_dc3d4<true>(new_element, command);
+    else if(is_equal(element_id, "DC3D8")) new_dc3d8<false>(new_element, command);
+    else if(is_equal(element_id, "DC3D8M")) new_dc3d8<true>(new_element, command);
+    else if(is_equal(element_id, "DCP3")) new_dcp3<false>(new_element, command);
+    else if(is_equal(element_id, "DCP3M")) new_dcp3<true>(new_element, command);
+    else if(is_equal(element_id, "DCP4")) new_dcp4<false>(new_element, command);
+    else if(is_equal(element_id, "DCP4M")) new_dcp4<true>(new_element, command);
     else if(is_equal(element_id, "DKT3")) new_dkt3(new_element, command);
     else if(is_equal(element_id, "DKT4")) new_dkt4(new_element, command);
     else if(is_equal(element_id, "DKTS3")) new_dkts3(new_element, command);
@@ -2645,6 +2699,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "NMB21EH")) new_nmb21(new_element, command, 2);
     else if(is_equal(element_id, "NMB21EL")) new_nmb21(new_element, command, 1);
     else if(is_equal(element_id, "NMB31")) new_nmb31(new_element, command);
+    else if(is_equal(element_id, "NonlocalC3D8")) new_nonlocalc3d8(new_element, command);
+    else if(is_equal(element_id, "NonlocalCP4")) new_nonlocalcp4(new_element, command);
     else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
     else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
     else if(is_equal(element_id, "PCPE4DC")) new_pcpedc(new_element, command, 4);

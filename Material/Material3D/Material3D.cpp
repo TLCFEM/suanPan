@@ -23,6 +23,30 @@
 Material3D::Material3D(const unsigned T, const double R)
     : Material(T, MaterialType::D3, R) {}
 
+int Material3D::clear_status() {
+    current_strain.zeros();
+    current_stress.zeros();
+    current_history = initial_history;
+    current_stiffness = initial_stiffness;
+    return reset_status();
+}
+
+int Material3D::commit_status() {
+    current_strain = trial_strain;
+    current_stress = trial_stress;
+    current_history = trial_history;
+    current_stiffness = trial_stiffness;
+    return SUANPAN_SUCCESS;
+}
+
+int Material3D::reset_status() {
+    trial_strain = current_strain;
+    trial_stress = current_stress;
+    trial_history = current_history;
+    trial_stiffness = current_stiffness;
+    return SUANPAN_SUCCESS;
+}
+
 std::vector<vec> Material3D::record(const OutputType P) const {
     if(P == OutputType::SP) {
         vec principal_stress;
@@ -48,8 +72,72 @@ std::vector<vec> Material3D::record(const OutputType P) const {
     if(P == OutputType::EEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain)}};
     if(P == OutputType::EEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(solve(initial_stiffness, current_stress))}};
     if(P == OutputType::PEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain - solve(initial_stiffness, current_stress))}};
-    if(P == OutputType::HYDRO) return {vec{tensor::mean3(current_stress)}};
+    if(P == OutputType::HYDRO) return {vec{tensor::mean<3>(current_stress)}};
     if(P == OutputType::MISES) return {vec{sqrt(1.5) * tensor::stress::norm(tensor::dev(current_stress))}};
 
     return Material::record(P);
+}
+
+NonlocalMaterial3D::NonlocalMaterial3D(const unsigned T, const double R)
+    : Material(T, MaterialType::D3, R) {}
+
+int NonlocalMaterial3D::clear_status() {
+    current_strain.zeros();
+    current_stress.zeros();
+    current_history = initial_history;
+    current_stiffness = initial_stiffness;
+    return reset_status();
+}
+
+int NonlocalMaterial3D::commit_status() {
+    current_strain = trial_strain;
+    current_stress = trial_stress;
+    current_history = trial_history;
+    current_stiffness = trial_stiffness;
+    return SUANPAN_SUCCESS;
+}
+
+int NonlocalMaterial3D::reset_status() {
+    trial_strain = current_strain;
+    trial_stress = current_stress;
+    trial_history = current_history;
+    trial_stiffness = current_stiffness;
+    return SUANPAN_SUCCESS;
+}
+
+std::vector<vec> NonlocalMaterial3D::record(const OutputType P) const {
+    if(P == OutputType::SP) {
+        vec principal_stress;
+        eig_sym(principal_stress, tensor::stress::to_tensor(current_stress.head(6)));
+        return {principal_stress};
+    }
+    if(P == OutputType::EP) {
+        vec principal_strain;
+        eig_sym(principal_strain, tensor::strain::to_tensor(current_strain.head(6)));
+        return {principal_strain};
+    }
+    if(P == OutputType::EEP) {
+        vec principal_strain;
+        eig_sym(principal_strain, tensor::strain::to_tensor(solve(initial_stiffness.submat(0, 0, 5, 5), current_stress.head(6))));
+        return {principal_strain};
+    }
+    if(P == OutputType::PEP) {
+        vec principal_strain;
+        eig_sym(principal_strain, tensor::strain::to_tensor(current_strain.head(6) - solve(initial_stiffness.submat(0, 0, 5, 5), current_stress.head(6))));
+        return {principal_strain};
+    }
+
+    if(P == OutputType::EEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain.head(6))}};
+    if(P == OutputType::EEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(solve(initial_stiffness.submat(0, 0, 5, 5), current_stress.head(6)))}};
+    if(P == OutputType::PEEQ) return {vec{sqrt(2. / 3.) * tensor::strain::norm(current_strain.head(6) - solve(initial_stiffness.submat(0, 0, 5, 5), current_stress.head(6)))}};
+    if(P == OutputType::HYDRO) return {vec{tensor::mean<3>(current_stress.head(6))}};
+    if(P == OutputType::MISES) return {vec{sqrt(1.5) * tensor::stress::norm(tensor::dev(vec{current_stress.head(6)}))}};
+
+    if(P == OutputType::S) return {current_stress.head(6)};
+    if(P == OutputType::E) return {current_strain.head(6)};
+    if(P == OutputType::EE) return {solve(initial_stiffness.submat(0, 0, 5, 5), current_stress.head(6))};
+    if(P == OutputType::PE) return {current_strain.head(6) - solve(initial_stiffness.submat(0, 0, 5, 5), current_stress.head(6))};
+    if(P == OutputType::HIST) return {current_history};
+
+    return {};
 }

@@ -31,6 +31,12 @@
       "contents": "material AFCN ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, tension yield stress\n# (4) double, tension hardening modulus\n# (5) double, tension unloading modulus\n# (6) double, compression yield stress\n# (7) double, compression hardening modulus\n# (8) double, compression unloading modulus\n# [9] double, non-negative degradation parameter, default: 0.0\n# [10] double, density, default: 0.0"
     },
     {
+      "trigger": "AFCO1D",
+      "details": "uniaxial armstrong frederick material with chaboche type strain memory",
+      "kind": "type",
+      "contents": "material AFCO1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:[(10) (11)...]} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, linear isotropic hardening modulus\n# (5) double, saturation stress\n# (6) double, ms, saturation rate\n# (7) double, c, between 0 and 1\n# (8) double, isotropic hardening reduction\n# (9) double, mr, reduction rate\n# (10) double, a, kinematic hardening parameter\n# (11) double, b, kinematic hardening parameter\n# [12] double, density, default: 0.0"
+    },
+    {
       "trigger": "AFCS",
       "details": "symmetrical friction connection",
       "kind": "type",
@@ -101,12 +107,6 @@
       "details": "uniaxial armstrong frederick material (v3.6 and later)",
       "kind": "type",
       "contents": "material ArmstrongFrederick1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[(7) (8)...]} ${9:[9]}\n# the following applies to v3.6 and later only, see documentation for older syntax\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, linear isotropic hardening modulus\n# (5) double, saturation stress\n# (6) double, ms, saturation hardening rate\n# (7) double, a, kinematic hardening parameter\n# (8) double, b, kinematic hardening parameter\n# [9] double, density, default: 0.0"
-    },
-    {
-      "trigger": "AFCO1D",
-      "details": "uniaxial armstrong frederick material with chaboche type strain memory",
-      "kind": "type",
-      "contents": "material AFCO1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:(9)} ${10:[(10) (11)...]} ${12:[12]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, linear isotropic hardening modulus\n# (5) double, saturation stress\n# (6) double, ms, saturation rate\n# (7) double, c, between 0 and 1\n# (8) double, isotropic hardening reduction\n# (9) double, mr, reduction rate\n# (10) double, a, kinematic hardening parameter\n# (11) double, b, kinematic hardening parameter\n# [12] double, density, default: 0.0"
     },
     {
       "trigger": "AsymmElastic1D",
@@ -259,12 +259,6 @@
       "contents": "material BilinearHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
     },
     {
-      "trigger": "BilinearTsaiWu",
-      "details": "bilinear tsai-wu material",
-      "kind": "type",
-      "contents": "material BilinearTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
-    },
-    {
       "trigger": "BilinearJ2",
       "details": "bilinear j2 material",
       "kind": "type",
@@ -293,6 +287,12 @@
       "details": "bilinear peric viscoplastic material",
       "kind": "type",
       "contents": "material BilinearPeric ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, hardening modulus\n# (6) double, mu\n# (7) double, epsilon\n# [8] double, density, default: 0.0"
+    },
+    {
+      "trigger": "BilinearTsaiWu",
+      "details": "bilinear tsai-wu material",
+      "kind": "type",
+      "contents": "material BilinearTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:[20]} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stresses\n# [20] double, hardening ratio, default: 0.0\n# [21] double, density, default: 0.0"
     },
     {
       "trigger": "BilinearViscosity",
@@ -685,12 +685,6 @@
       "contents": "material CustomHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) int, hardening expression tag\n# [21] double, density, default: 0.0"
     },
     {
-      "trigger": "CustomTsaiWu",
-      "details": "tsai-wu model with custom isotropic hardening",
-      "kind": "type",
-      "contents": "material CustomTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) int, hardening expression tag\n# [21] double, density, default: 0.0"
-    },
-    {
       "trigger": "CustomJ2",
       "details": "j2 model with exponential isotropic hardening",
       "kind": "type",
@@ -713,6 +707,12 @@
       "details": "uniaxial degradation with custom rules",
       "kind": "type",
       "contents": "material CustomStressDegradation ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique material tag\n# (2) int, host material tag\n# (3) int, positive region degradation expression tag\n# [4] int, negative region degradation expression tag, default: (3)"
+    },
+    {
+      "trigger": "CustomTsaiWu",
+      "details": "tsai-wu model with custom isotropic hardening",
+      "kind": "type",
+      "contents": "material CustomTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:[21]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) int, hardening expression tag\n# [21] double, density, default: 0.0"
     },
     {
       "trigger": "CustomViscosity",
@@ -919,12 +919,6 @@
       "contents": "material ExpHoffman ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) double, a, saturation\n# (21) double, b, saturation rate\n# [22] double, density, default: 0.0"
     },
     {
-      "trigger": "ExpTsaiWu",
-      "details": "tsai-wu model with exponential isotropic hardening",
-      "kind": "type",
-      "contents": "material ExpTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) double, a, saturation\n# (21) double, b, saturation rate\n# [22] double, density, default: 0.0"
-    },
-    {
       "trigger": "ExpJ2",
       "details": "j2 model with exponential isotropic hardening",
       "kind": "type",
@@ -935,6 +929,12 @@
       "details": "uniaxial j2 material with exponential isotropic hardening",
       "kind": "type",
       "contents": "material ExpMises1D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:[7]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, yield stress\n# (4) double, a\n# (5) double, b\n# (6) double, c\n# [7] double, density, default: 0"
+    },
+    {
+      "trigger": "ExpTsaiWu",
+      "details": "tsai-wu model with exponential isotropic hardening",
+      "kind": "type",
+      "contents": "material ExpTsaiWu ${1:(1)} ${2:(2...7)} ${3:(8...10)} ${4:(11...19)} ${5:(20)} ${6:(21)} ${7:[22]}\n# (1) int, unique material tag\n# (2...7) double, six moduli: E_{xx}, E_{yy}, E_{zz}, G_{xy}, G_{yz}, G_{zx}\n# (8...10) double, three poissions ratios: v_{xy}, v_{yz}, v_{xz}\n# (11...19) double, nine yield stress\n# (20) double, a, saturation\n# (21) double, b, saturation rate\n# [22] double, density, default: 0.0"
     },
     {
       "trigger": "ExplicitDynamic",
@@ -1069,6 +1069,12 @@
       "contents": "element GQ12 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [7] double, element thickness, default: 1.0"
     },
     {
+      "trigger": "GSSE",
+      "details": "gsse explicit time integration",
+      "kind": "keyword",
+      "contents": "integrator GSSE ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
+    },
+    {
       "trigger": "GSSSSOptimal",
       "details": "optimal scheme for gssss",
       "kind": "keyword",
@@ -1127,6 +1133,12 @@
       "details": "2d h-section",
       "kind": "type",
       "contents": "section HSection2D ${1:(1)} ${2:(2...7)} ${8:(8)} ${9:[9]} ${10:[10]}\n# (1) int, unique tag\n# (2...7) double, section dimensions\n# (8) int, material tag\n# [9] int, number of integration points, default: 6\n# [10] double, eccentricity measured from the centre, default: 0.0"
+    },
+    {
+      "trigger": "ICL",
+      "details": "icl explicit time integration",
+      "kind": "keyword",
+      "contents": "integrator ICL ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
     },
     {
       "trigger": "ISection2D",
@@ -1216,13 +1228,13 @@
       "trigger": "LineUDL2D",
       "details": "2d linear udl",
       "kind": "keyword",
-      "contents": "lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl2d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "LineUDL3D",
       "details": "3d linear udl",
       "kind": "keyword",
-      "contents": "lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload lineudl3d ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "Linear",
@@ -1243,22 +1255,34 @@
       "contents": "modifier LinearViscosity ${1:(1)} ${2:(2)} ${3:(3...)}\n# (1) int, unique modifier tag\n# (2) double, \\mu\n# (3...) int, element tags"
     },
     {
-      "trigger": "LogicAND",
+      "trigger": "LogicConvergerAND",
       "details": "apply logical operations to two convergers.",
       "kind": "keyword",
       "contents": "converger LogicAND ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique converger tag\n# (2) int, tag of first converger in logical operation\n# (3) int, tag of second converger in logical operation"
     },
     {
-      "trigger": "LogicOR",
+      "trigger": "LogicConvergerOR",
       "details": "apply logical operations to two convergers.",
       "kind": "keyword",
       "contents": "converger LogicOR ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique converger tag\n# (2) int, tag of first converger in logical operation\n# (3) int, tag of second converger in logical operation"
     },
     {
-      "trigger": "LogicXOR",
+      "trigger": "LogicConvergerXOR",
       "details": "apply logical operations to two convergers.",
       "kind": "keyword",
       "contents": "converger LogicXOR ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique converger tag\n# (2) int, tag of first converger in logical operation\n# (3) int, tag of second converger in logical operation"
+    },
+    {
+      "trigger": "LogicCriterionAll",
+      "details": "apply logical operations to multiple criteria.",
+      "kind": "type",
+      "contents": "criterion LogicAll ${1:(1)} ${2:[(2)...]}\n# (1) int, unique criterion tag\n# (2) int, tags of criteria in logical operation"
+    },
+    {
+      "trigger": "LogicCriterionAny",
+      "details": "apply logical operations to multiple criteria.",
+      "kind": "type",
+      "contents": "criterion LogicAny ${1:(1)} ${2:[(2)...]}\n# (1) int, unique criterion tag\n# (2) int, tags of criteria in logical operation"
     },
     {
       "trigger": "LumpedScale",
@@ -1276,7 +1300,7 @@
       "trigger": "MPC",
       "details": "multi-point constraint",
       "kind": "keyword",
-      "contents": "mpc ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\nconstraint mpc ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique constraint tag\n# (2) int, amplitude tag, can be zero\n# (3) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (4) int, node tag\n# (5) int, dof tag\n# (6) double, weight"
+      "contents": "mpc ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\nconstraint mpc ${1:(1)} ${2:(2)} ${3:(3)} [${4:(4)} ${5:(5)} ${6:(6)}...]\n# (1) int, unique constraint tag\n# (2) int, amplitude tag, can be zero\n# (3) double, right hand side of the constraint equation, the constraint is homogeneous if this parameter is zero\n# (4) int, node tag\n# (5) string, dof token\n# (6) double, weight"
     },
     {
       "trigger": "MPDC",
@@ -1366,7 +1390,7 @@
       "trigger": "MaxHistory",
       "details": "max history criterion",
       "kind": "type",
-      "contents": "criterion MaxHistory ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique criterion tag\n# (2) string, history variable type\n# (3) double, limit"
+      "contents": "criterion MaxHistory ${1:(1)} ${2:(2)} ${3:(3)} ${4:[(4) ...]}\n# (1) int, unique criterion tag\n# (2) string, history variable type\n# (3) double, limit\n# (4) int, optional indices"
     },
     {
       "trigger": "MaxResistance",
@@ -1409,6 +1433,12 @@
       "details": "gap constraint",
       "kind": "type",
       "contents": "constraint MinGap3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique constraint tag\n# (2) int, node tag\n# (3) int, node tag\n# (4) double, gap"
+    },
+    {
+      "trigger": "MinHistory",
+      "details": "min history criterion",
+      "kind": "type",
+      "contents": "criterion MinHistory ${1:(1)} ${2:(2)} ${3:(3)} ${4:[(4) ...]}\n# (1) int, unique criterion tag\n# (2) string, history variable type\n# (3) double, limit\n# (4) int, optional indices"
     },
     {
       "trigger": "MinResistance",
@@ -1591,22 +1621,34 @@
       "contents": "constraint NodeLine ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique constraint tag\n# (2) int, master node i tag\n# (3) int, master node j tag\n# (4) int, slave node k tag"
     },
     {
+      "trigger": "NonlocalBilinearJ2",
+      "details": "bilinear j2 material with nonlocal damage",
+      "kind": "type",
+      "contents": "material NonlocalBilinearJ2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:(8)} ${9:[9]} ${10:[10]} ${11:[11]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, yield stress\n# (5) double, initial degradation threshold of equivalent plastic strain\n# (6) double, degradation rate\n# (7) double, reference length\n# (8) double, evolution rate\n# [9] double, hardening ratio, default: 0.0\n# [10] double, beta, default: 1.0\n# [11] double, density, default: 0.0"
+    },
+    {
+      "trigger": "NonlocalC3D8",
+      "details": "linear cube/brick with one nonlocal variable",
+      "kind": "type",
+      "contents": "element NonlocalC3D8 ${1:(1)} ${2:(2...9)} ${10:(10)}\n# (1) int, unique element tag\n# (2...9) int, eight corner nodes with conventional order\n# (10) int, material tag"
+    },
+    {
+      "trigger": "NonlocalCP4",
+      "details": "bilinear quadrilateral with one nonlocal variable",
+      "kind": "type",
+      "contents": "element NonlocalCP4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:[7]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# [] double, element thickness, default: 1.0"
+    },
+    {
+      "trigger": "NonlocalElastic3D",
+      "details": "3d isotropic elastic material with one nonlocal variable",
+      "kind": "type",
+      "contents": "material NonlocalIsotropicElastic3D ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique tag\n# (2) double, elastic modulus\n# (3) double, poissons ratio\n# (4) double, energy threshold\n# (5) double, degradation rate\n# (6) double, reference length\n# (7) double, evolution rate\n# [8] double, density, default: 0.0"
+    },
+    {
       "trigger": "NonviscousNewmark",
       "details": "newmark method with nonviscous damping",
       "kind": "keyword",
       "contents": "integrator NonviscousNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)}...)\n# (1) int, unique tag\n# (2) double, alpha, typical: 0.25\n# (3) double, beta, typical: 0.5\n# (4) double, real part of m\n# (5) double, imaginary part of m\n# (6) double, real part of s\n# (7) double, imaginary part of s"
-    },
-    {
-      "trigger": "UDDNewmark",
-      "details": "newmark method with uniform/universal damping (displacement)",
-      "kind": "keyword",
-      "contents": "integrator UDDNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)}...)\n# (1) int, unique tag\n# (2) double, alpha, typical: 0.25\n# (3) double, beta, typical: 0.5\n# (4) double, real part of m\n# (5) double, imaginary part of m\n# (6) double, real part of s\n# (7) double, imaginary part of s"
-    },
-    {
-      "trigger": "UDANewmark",
-      "details": "newmark method with uniform/universal damping (acceleration)",
-      "kind": "keyword",
-      "contents": "integrator UDANewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)}...)\n# (1) int, unique tag\n# (2) double, alpha, typical: 0.25\n# (3) double, beta, typical: 0.5\n# (4) double, real part of m\n# (5) double, imaginary part of m\n# (6) double, real part of s\n# (7) double, imaginary part of s"
     },
     {
       "trigger": "OALTS",
@@ -1747,16 +1789,16 @@
       "contents": "material PolyElastic1D ${1:(1)} ${2:(2...)}\n# (1) int, unique material tag\n# (2) double, polynomial parameters, a_n"
     },
     {
-      "trigger": "Prestrain",
-      "details": "prestrain wrapper for uniaxial materials",
-      "kind": "type",
-      "contents": "material Prestrain ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique material tag\n# (2) int, underlying material tag\n# (3) int, amplitude tag, set to 0 to use a ramp function\n# (4) double, maginutde"
-    },
-    {
       "trigger": "PolyJ2",
       "details": "j2 material with polynomial hardening",
       "kind": "type",
       "contents": "material PolyJ2 ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poisson's ratio\n# (4) double, density\n# (5...) double, parameters in polynomial"
+    },
+    {
+      "trigger": "Prestrain",
+      "details": "prestrain wrapper for uniaxial materials",
+      "kind": "type",
+      "contents": "material Prestrain ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)}\n# (1) int, unique material tag\n# (2) int, underlying material tag\n# (3) int, amplitude tag, set to 0 to use a ramp function\n# (4) double, maginutde"
     },
     {
       "trigger": "QE2",
@@ -1889,12 +1931,6 @@
       "details": "four node shell element",
       "kind": "type",
       "contents": "element S4 ${1:(1)} ${2:(2...5)} ${6:(6)} ${7:(7)} ${8:[8]}\n# (1) int, unique element tag\n# (2...5) int, node i, j, k, l\n# (6) int, material tag\n# (7) double, thickness\n# [8] bool, nonlinear geometry switch, default: false"
-    },
-    {
-      "trigger": "variable",
-      "details": "define variables",
-      "kind": "keyword",
-      "contents": "variable ${1:(1)} ${2:(2)}\n# (1) string, name\n# (2) any read as string, value"
     },
     {
       "trigger": "SGCMQ",
@@ -2113,18 +2149,6 @@
       "contents": "integrator Tchamwa ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
     },
     {
-      "trigger": "GSSE",
-      "details": "gsse explicit time integration",
-      "kind": "keyword",
-      "contents": "integrator GSSE ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
-    },
-    {
-      "trigger": "ICL",
-      "details": "icl explicit time integration",
-      "kind": "keyword",
-      "contents": "integrator ICL ${1:(1)} ${2:(2)}\n# (1) int, unique integrator tag\n# [2] double, spectral radius, default: 0.5"
-    },
-    {
       "trigger": "Tie",
       "details": "tie constraint",
       "kind": "type",
@@ -2167,6 +2191,18 @@
       "contents": "section TrussSection ${1:(1)} ${2:(2)} ${3:(3)}\n# (1) int, unique section tag\n# (2) double, section area\n# (3) int, material tag"
     },
     {
+      "trigger": "UDANewmark",
+      "details": "newmark method with uniform/universal damping (acceleration)",
+      "kind": "keyword",
+      "contents": "integrator UDANewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)}...)\n# (1) int, unique tag\n# (2) double, alpha, typical: 0.25\n# (3) double, beta, typical: 0.5\n# (4) double, real part of m\n# (5) double, imaginary part of m\n# (6) double, real part of s\n# (7) double, imaginary part of s"
+    },
+    {
+      "trigger": "UDDNewmark",
+      "details": "newmark method with uniform/universal damping (displacement)",
+      "kind": "keyword",
+      "contents": "integrator UDDNewmark ${1:(1)} ${2:(2)} ${3:(3)} (${4:(4)} ${5:(5)} ${6:(6)} ${7:(7)}...)\n# (1) int, unique tag\n# (2) double, alpha, typical: 0.25\n# (3) double, beta, typical: 0.5\n# (4) double, real part of m\n# (5) double, imaginary part of m\n# (6) double, real part of s\n# (7) double, imaginary part of s"
+    },
+    {
       "trigger": "Uniaxial",
       "details": "uniaxial wrapper",
       "kind": "type",
@@ -2197,22 +2233,16 @@
       "contents": "material Viscosity02 ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]} ${5:[5]} ${6:[6]} ${7:[7]} ${8:[8]}\n# (1) int, unique tag\n# (2) double, alpha\n# (3) double, damping coefficient \\eta_1\n# [4] double, damping coefficient \\eta_2, default: (3)\n# [5] double, damping coefficient \\eta_3, default: (3)\n# [6] double, damping coefficient \\eta_4, default: (3)\n# [7] double, steepness factor g_1, default: 1E3\n# [8] double, steepness factor g_2, default: 1E3"
     },
     {
-      "trigger": "WilsonPenzienNewmark",
-      "details": "newmark time integration with wilson penzien damping model",
-      "kind": "keyword",
-      "contents": "integrator WilsonPenzienNewmark ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4...]}\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark algorithm\n# (3) double, beta in Newmark algorithm\n# [4...] double, damping ratios on the first n modes"
-    },
-    {
       "trigger": "WAT2",
       "details": "generalized explicit RKN time integration",
       "kind": "keyword",
       "contents": "integrator WAT2 ${1:(1)} ${2:[2]}\n# (1) int, unique tag\n# [2] double, parameter, default: 1/3"
     },
     {
-      "trigger": "Yeoh",
-      "details": "yeoh material",
-      "kind": "type",
-      "contents": "material Yeoh ${1:(1)} ${2:(2...)}\n# (1) int, unique material tag\n# (2...) double, material constants with possible density"
+      "trigger": "WilsonPenzienNewmark",
+      "details": "newmark time integration with wilson penzien damping model",
+      "kind": "keyword",
+      "contents": "integrator WilsonPenzienNewmark ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4...]}\n# (1) int, unique integrator tag\n# (2) double, alpha in Newmark algorithm\n# (3) double, beta in Newmark algorithm\n# [4...] double, damping ratios on the first n modes"
     },
     {
       "trigger": "YLD0418P",
@@ -2227,10 +2257,16 @@
       "contents": "material YLD0418PISO ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4...21)} ${5:(22)} ${6:(23)} ${7:(24)} ${8:(25)} ${9:(26)} ${10:[27]}\n# (1) int, unique material tag\n# (2) double, elastic modulus\n# (3) double, poissions ratio\n# (4...21) double, 18 model parameters, see documentation for details\n# (22) double, exponent\n# (23) double, reference stress\n# (24) int, hardening backbone expression tag\n# (25) double, kinematic hardening rate\n# (26) double, kinematic hardening bound\n# [27] double, density, default: 0.0"
     },
     {
+      "trigger": "Yeoh",
+      "details": "yeoh material",
+      "kind": "type",
+      "contents": "material Yeoh ${1:(1)} ${2:(2...)}\n# (1) int, unique material tag\n# (2...) double, material constants with possible density"
+    },
+    {
       "trigger": "acceleration",
       "details": "acceleration load",
       "kind": "keyword",
-      "contents": "acceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload acceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# [5...] int, node tags"
+      "contents": "acceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload acceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# [5...] int, node tags"
     },
     {
       "trigger": "band_mat",
@@ -2242,7 +2278,7 @@
       "trigger": "bodyforce",
       "details": "body force load",
       "kind": "keyword",
-      "contents": "bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, element tags"
+      "contents": "bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload bodyforce ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, element tags"
     },
     {
       "trigger": "clear",
@@ -2254,7 +2290,7 @@
       "trigger": "cload",
       "details": "concentrated nodal load",
       "kind": "keyword",
-      "contents": "cload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload cload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "cload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload cload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "color_model",
@@ -2290,7 +2326,7 @@
       "trigger": "displacement",
       "details": "prescribed displacement",
       "kind": "keyword",
-      "contents": "displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload displacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "domain",
@@ -2575,6 +2611,12 @@
       "contents": "recorder ${1:(1)} hdf5 ${2:(2)} ${3:(3)} ${4:[every 4]} ${5:[5...]}\nrecorder ${1:(1)} plain ${2:(2)} ${3:(3)} ${4:[every 4]} ${5:[5...]}\n# (1) int, unique recorder tag\n# (2) string, recorder type\n# (3) string, object type that needs to be recorded\n# [4] int, optional argument with leading keyword \"every\" to indicate the interval of recording\n# [5...] int, tags of elements/nodes, etc."
     },
     {
+      "trigger": "refload",
+      "details": "reference nodal load",
+      "kind": "keyword",
+      "contents": "refload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\nload refload ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:[5...]}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
+    },
+    {
       "trigger": "reset",
       "details": "reset domain",
       "kind": "keyword",
@@ -2620,19 +2662,19 @@
       "trigger": "supportacceleration",
       "details": "acceleration load on support",
       "kind": "keyword",
-      "contents": "supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportacceleration ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "supportdisplacement",
       "details": "displacement load on support",
       "kind": "keyword",
-      "contents": "supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportdisplacement ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "supportvelocity",
       "details": "velocity load on support",
       "kind": "keyword",
-      "contents": "supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) int, dof tag\n# (5...) int, node tags"
+      "contents": "supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\nload supportvelocity ${1:(1)} ${2:(2)} ${3:(3)} ${4:(4)} ${5:(5...)}\n# (1) int, unique tag\n# (2) int, amplitude tag, 0 to use a default `Ramp` amplitude\n# (3) double, nominal magnitude\n# (4) string, dof token\n# (5...) int, node tags"
     },
     {
       "trigger": "symm_mat",
@@ -2669,6 +2711,12 @@
       "details": "upsample a given ground motion using a specific window type",
       "kind": "keyword",
       "contents": "upsampling ${1:(1)} ${2:(2)} ${3:(3)} ${4:[4]}\n# (1) string, file name\n# (2) int, upsampling ratio\n# (3) string, window type, one of Hamming, Hann, Blackman, BlackmanNuttall, BlackmanHarris and FlatTop\n# [4] int, window length, default: 8"
+    },
+    {
+      "trigger": "variable",
+      "details": "define variables",
+      "kind": "keyword",
+      "contents": "variable ${1:(1)} ${2:(2)}\n# (1) string, name\n# (2) any read as string, value"
     },
     {
       "trigger": "version",

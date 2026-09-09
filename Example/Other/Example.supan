@@ -19,7 +19,7 @@ set output_folder result
 set output_folder result/a
 set output_folder another_result/a
 
-peek 	output_folder
+peek output_folder
 
 peek,output_folder
 

@@ -146,7 +146,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     : Element(T, NN, ND, std::move(NT), {}, false, MaterialType::D0, std::move(DI)) {}
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& MT, const bool F, const MaterialType MTP, std::vector<Node::DOF>&& DI)
-    : DataElement{std::move(NT), std::move(MT), uvec{}, F}
+    : DataElement{.node_encoding = std::move(NT), .material_tag = std::move(MT), .section_tag = uvec{}, .nlgeom = F}
     , ElementBase(T)
     , Distributed(static_cast<int>(T))
     , num_node(NN)
@@ -156,7 +156,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
     , dof_identifier(std::move(DI)) { validate(); }
 
 Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& NT, uvec&& ST, const bool F, const SectionType STP, std::vector<Node::DOF>&& DI)
-    : DataElement{std::move(NT), uvec{}, std::move(ST), F}
+    : DataElement{.node_encoding = std::move(NT), .material_tag = uvec{}, .section_tag = std::move(ST), .nlgeom = F}
     , ElementBase(T)
     , Distributed(static_cast<int>(T))
     , num_node(NN)
@@ -167,7 +167,7 @@ Element::Element(const unsigned T, const unsigned NN, const unsigned ND, uvec&& 
 
 // for contact elements that use node groups
 Element::Element(const unsigned T, const unsigned ND, uvec&& GT, std::vector<Node::DOF>&& DI)
-    : DataElement{std::move(GT), {}, {}, false}
+    : DataElement{.node_encoding = std::move(GT), .material_tag = {}, .section_tag = {}, .nlgeom = false}
     , ElementBase(T)
     , Distributed(static_cast<int>(T))
     , num_node(static_cast<unsigned>(-1))
@@ -179,7 +179,7 @@ Element::Element(const unsigned T, const unsigned ND, uvec&& GT, std::vector<Nod
 
 // for elements that use other elements
 Element::Element(const unsigned T, const unsigned ND, const unsigned ET, const unsigned NT, std::vector<Node::DOF>&& DI)
-    : DataElement{{NT}, {}, {}, false}
+    : DataElement{.node_encoding = {NT}, .material_tag = {}, .section_tag = {}, .nlgeom = false}
     , ElementBase(T)
     , Distributed(static_cast<int>(ET))
     , num_node(static_cast<unsigned>(-1))
@@ -298,7 +298,7 @@ void Element::update_dof_encoding() {
     dof_mapping.reserve(num_size);
     const uvec dof_index = sort_index(dof_encoding), dof_reordered = dof_encoding(dof_index);
     for(uword I{0}; I < dof_index.n_elem; ++I)
-        for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{dof_reordered(J), dof_reordered(I), dof_index(J), dof_index(I)});
+        for(auto J = I; J < dof_index.n_elem; ++J) dof_mapping.emplace_back(MappingDOF{.g_row = dof_reordered(J), .g_col = dof_reordered(I), .l_row = dof_index(J), .l_col = dof_index(I)});
     std::ranges::sort(dof_mapping, [](const MappingDOF& A, const MappingDOF& B) { return A.l_col == B.l_col ? A.l_row < B.l_row : A.l_col < B.l_col; });
 }
 

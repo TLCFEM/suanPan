@@ -23,7 +23,7 @@ const double NonlinearJ2::root_two_third = std::sqrt(two_third);
 const mat NonlinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearJ2::NonlinearJ2(const unsigned T, const double E, const double V, const double R)
-    : DataNonlinearJ2{E, V}
+    : DataNonlinearJ2{.elastic_modulus = E, .poissons_ratio = V}
     , Material3D(T, R) {}
 
 int NonlinearJ2::initialize(const shared_ptr<DomainBase>&) {
@@ -34,7 +34,7 @@ int NonlinearJ2::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearJ2::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double NonlinearJ2::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearJ2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -94,30 +94,6 @@ int NonlinearJ2::update_trial_status(const vec& t_strain) {
     t_factor *= double_shear;
     trial_stiffness += (t_factor - square_double_shear / denom) / norm_rel_stress / norm_rel_stress * rel_stress * rel_stress.t() - t_factor * unit_dev_tensor;
 
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearJ2::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearJ2::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearJ2::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

@@ -193,9 +193,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{X, Y};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, mat_proto->unique_copy());
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, mat_proto->unique_copy());
 
         const auto poly_stress = shape::stress11(iso_mapping * form_stress_mode(X, Y));
         c_pt.poly_strain = solve(mat_stiff, poly_stress);

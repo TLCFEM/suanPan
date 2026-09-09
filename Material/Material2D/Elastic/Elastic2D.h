@@ -52,7 +52,6 @@ public:
     );
 
     int initialize(const shared_ptr<DomainBase>&) override;
-    void initialize_couple(const shared_ptr<DomainBase>&) override;
 
     [[nodiscard]] double get(Parameter) const override;
 

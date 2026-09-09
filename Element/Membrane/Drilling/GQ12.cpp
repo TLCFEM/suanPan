@@ -66,7 +66,7 @@ int GQ12::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const mat pn_pxy = solve(jacob, pn);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, mat_proto->unique_copy());
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob) * thickness, mat_proto->unique_copy());
 
         const auto TX = 2. * plan(I, 0);
         const auto TY = 2. * plan(I, 1);
@@ -94,8 +94,6 @@ int GQ12::initialize(const shared_ptr<DomainBase>& D) {
         pnt(1, 7) = -BB * (LY3 * AA + LY4 * TY);
 
         const mat pnt_pxy = solve(jacob, 625E-4 * pnt);
-
-        auto& c_pt = int_pt.back();
 
         for(unsigned J = 0, K = 0, L = 1, M = 2, N = 4; J < m_node; ++J, K += m_dof, L += m_dof, M += m_dof, ++N) {
             c_pt.strain_mat(0, K) = c_pt.strain_mat(2, L) = pn_pxy(0, J);

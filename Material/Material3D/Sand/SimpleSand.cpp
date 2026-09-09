@@ -24,7 +24,7 @@ const span SimpleSand::sd(8, 13);
 const mat SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 SimpleSand::SimpleSand(const unsigned T, const double E, const double V, const double M, const double A, const double H, const double AC, const double NB, const double ND, const double VC, const double PC, const double LC, const double V0, const double R)
-    : DataSimpleSand{E, V, std::fabs(M), A, H, AC, std::fabs(NB), std::fabs(ND), std::fabs(VC), -std::fabs(PC), std::fabs(LC), std::fabs(V0)}
+    : DataSimpleSand{.elastic_modulus = E, .poissons_ratio = V, .m = std::fabs(M), .a = A, .h = H, .ac = AC, .nb = std::fabs(NB), .nd = std::fabs(ND), .vc = std::fabs(VC), .pc = -std::fabs(PC), .lc = std::fabs(LC), .v0 = std::fabs(V0)}
     , Material3D(T, R) {}
 
 int SimpleSand::initialize(const shared_ptr<DomainBase>&) {
@@ -37,7 +37,7 @@ int SimpleSand::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> SimpleSand::unique_copy() { return std::make_unique<SimpleSand>(*this); }
 
-double SimpleSand::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double SimpleSand::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int SimpleSand::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -48,12 +48,12 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     const vec current_alpha(&current_history(0), 6);
     vec alpha(&trial_history(0), 6, false, true);
 
-    const auto state_const = v0 - vc + v0 * tensor::trace3(trial_strain);
+    const auto state_const = v0 - vc + v0 * tensor::trace<3>(trial_strain);
 
     trial_stress = current_stress + (trial_stiffness = initial_stiffness) * incre_strain;
 
     const auto trial_s = tensor::dev(trial_stress);
-    const auto trial_p = tensor::mean3(trial_stress);
+    const auto trial_p = tensor::mean<3>(trial_stress);
     auto s = trial_s;
     auto p = trial_p;
 
@@ -141,30 +141,6 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     trial_stiffness.row(1) += right.row(sb);
     trial_stiffness.row(2) += right.row(sb);
 
-    return SUANPAN_SUCCESS;
-}
-
-int SimpleSand::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int SimpleSand::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int SimpleSand::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

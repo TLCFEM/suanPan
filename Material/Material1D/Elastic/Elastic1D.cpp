@@ -36,21 +36,21 @@ int Elastic1D::update_trial_status(const vec& t_strain) {
 }
 
 int Elastic1D::clear_status() {
-    current_strain = trial_strain.zeros();
-    current_stress = trial_stress.zeros();
-    return 0;
+    current_strain.zeros();
+    current_stress.zeros();
+    return reset_status();
 }
 
 int Elastic1D::commit_status() {
     current_strain = trial_strain;
     current_stress = trial_stress;
-    return 0;
+    return SUANPAN_SUCCESS;
 }
 
 int Elastic1D::reset_status() {
     trial_strain = current_strain;
     trial_stress = current_stress;
-    return 0;
+    return SUANPAN_SUCCESS;
 }
 
 void Elastic1D::print() {

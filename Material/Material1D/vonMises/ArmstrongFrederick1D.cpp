@@ -127,30 +127,6 @@ int ArmstrongFrederick1D::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-int ArmstrongFrederick1D::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int ArmstrongFrederick1D::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int ArmstrongFrederick1D::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void ArmstrongFrederick1D::print() {
     suanpan_info("A uniaxial nonlinear hardening model using Armstrong-Frederick kinematic hardening rule.\n");
     Material1D::print();

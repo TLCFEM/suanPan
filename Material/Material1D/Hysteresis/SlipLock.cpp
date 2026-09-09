@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 SlipLock::SlipLock(const unsigned T, const double E, const double Y, const double H, const double R, const double D)
-    : DataSlipLock{fabs(E), 1. / H, fabs(Y), fabs(R)}
+    : DataSlipLock{.elastic_modulus = fabs(E), .hardening_ratio = 1. / H, .yield_strain = fabs(Y), .ini_r = fabs(R)}
     , Material1D(T, D) {}
 
 int SlipLock::initialize(const shared_ptr<DomainBase>&) {
@@ -59,27 +59,6 @@ int SlipLock::update_trial_status(const vec& t_strain) {
         trial_stress += incre_s;
         if(!suanpan::approx_equal(sign(trial_stress(0)), sign(trial_strain(0)))) trial_stress = 0.;
     }
-}
-
-int SlipLock::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int SlipLock::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int SlipLock::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
 }
 
 void SlipLock::print() {

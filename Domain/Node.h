@@ -99,7 +99,8 @@ public:
         DAMAGE,      // damage
         PRESSURE,    // pressure
         TEMPERATURE, // temperature
-        WARP         // warping
+        WARP,        // warping
+        NL1          // nonlocal 1
     };
 
 private:

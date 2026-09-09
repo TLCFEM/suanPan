@@ -64,7 +64,7 @@ vec Yeoh::compute_derivative(const double J1M3, const double J3M1) const {
 }
 
 Yeoh::Yeoh(const unsigned T, vec&& CC, vec&& KK, const double R)
-    : DataYeoh{std::move(CC), std::move(KK)}
+    : DataYeoh{.A0 = std::move(CC), .A1 = std::move(KK)}
     , Material3D(T, R) {}
 
 int Yeoh::initialize(const shared_ptr<DomainBase>&) {
@@ -115,29 +115,6 @@ int Yeoh::update_trial_status(const vec& t_strain) {
 
     trial_stiffness = (P1 + DDWDDJ3 - 2. * P4) * J3E * J3E.t() + (P4 - P3) * I3EE + (DDWDDJ1 * J1E - P2 * J3E) * J1E.t() - P2 * J1E * J3E.t();
 
-    return SUANPAN_SUCCESS;
-}
-
-int Yeoh::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    trial_strain.zeros();
-    trial_stress.zeros();
-    trial_stiffness = current_stiffness = initial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int Yeoh::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int Yeoh::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

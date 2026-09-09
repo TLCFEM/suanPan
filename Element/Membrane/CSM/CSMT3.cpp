@@ -36,12 +36,14 @@ CSMT3::CSMT3(const unsigned T, uvec&& NT, const unsigned MT, const double TH, co
 int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
     auto& material_proto = D->get<Material>(material_tag(0));
 
-    if(!material_proto->is_support_couple()) {
-        suanpan_warning("Element {} is assigned with a material that does not support couple stress.\n", get_tag());
-        return SUANPAN_FAIL;
-    }
+    auto elastic_modulus = material_proto->get(Material::Parameter::ELASTIC);
+    auto poissons_ratio = material_proto->get(Material::Parameter::POISSON);
 
-    if(PlaneType::E == material_proto->get_plane_type()) suanpan::hacker(thickness) = 1.;
+    if(PlaneType::E == material_proto->get_plane_type()) {
+        suanpan::hacker(thickness) = 1.;
+        elastic_modulus /= 1. - poissons_ratio * poissons_ratio;
+        poissons_ratio /= 1. - poissons_ratio;
+    }
 
     mat ele_coor(m_node, m_node);
     ele_coor.col(0).fill(1.);
@@ -107,8 +109,8 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
     mat E1(t_size, t_size, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros);
 
     for(auto& I : int_pt) {
-        I.m_material->set_characteristic_length(characteristic_length);
-        I.m_material->initialize_couple(D);
+        I.m_couple = std::make_unique<IsotropicCouple>(elastic_modulus, poissons_ratio, characteristic_length);
+        I.m_couple->initialize(D);
 
         const rowvec n = I.coor * inv_coor;
 
@@ -127,7 +129,7 @@ int CSMT3::initialize(const shared_ptr<DomainBase>& D) {
 
             phi_s(0, K) = phi_s(1, L) = n(J);
 
-        E1 += I.weight * phi_r.t() * I.m_material->get_initial_couple_stiffness() * phi_r;
+        E1 += I.weight * phi_r.t() * I.m_couple->get_initial_stiffness() * phi_r;
         H3 += 2. * I.weight * (phi_q.t() * j_s - j_q.t() * phi_s);
         H4 += I.weight * phi_r.t() * phi_s;
 
@@ -164,15 +166,15 @@ int CSMT3::update_status() {
 
     for(const auto& I : int_pt) {
         if(SUANPAN_SUCCESS != I.m_material->update_trial_status(I.b1 * t_disp(t_dof))) return SUANPAN_FAIL;
-        if(SUANPAN_SUCCESS != I.m_material->update_couple_trial_status(I.b2 * t_disp(t_dof) + I.b3 * t_disp(r_dof))) return SUANPAN_FAIL;
+        if(SUANPAN_SUCCESS != I.m_couple->update_trial_status(I.b2 * t_disp(t_dof) + I.b3 * t_disp(r_dof))) return SUANPAN_FAIL;
 
-        trial_stiffness(t_dof, t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stiffness() * I.b1 + I.weight * I.b2.t() * I.m_material->get_trial_couple_stiffness() * I.b2;
-        trial_stiffness(t_dof, r_dof) += I.weight * I.b2.t() * I.m_material->get_trial_couple_stiffness() * I.b3;
-        trial_stiffness(r_dof, t_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stiffness() * I.b2;
-        trial_stiffness(r_dof, r_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stiffness() * I.b3;
+        trial_stiffness(t_dof, t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stiffness() * I.b1 + I.weight * I.b2.t() * I.m_couple->get_trial_stiffness() * I.b2;
+        trial_stiffness(t_dof, r_dof) += I.weight * I.b2.t() * I.m_couple->get_trial_stiffness() * I.b3;
+        trial_stiffness(r_dof, t_dof) += I.weight * I.b3.t() * I.m_couple->get_trial_stiffness() * I.b2;
+        trial_stiffness(r_dof, r_dof) += I.weight * I.b3.t() * I.m_couple->get_trial_stiffness() * I.b3;
 
-        trial_resistance(t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stress() + I.weight * I.b2.t() * I.m_material->get_trial_couple_stress();
-        trial_resistance(r_dof) += I.weight * I.b3.t() * I.m_material->get_trial_couple_stress();
+        trial_resistance(t_dof) += I.weight * I.b1.t() * I.m_material->get_trial_stress() + I.weight * I.b2.t() * I.m_couple->get_trial_moment();
+        trial_resistance(r_dof) += I.weight * I.b3.t() * I.m_couple->get_trial_moment();
     }
 
     return SUANPAN_SUCCESS;
@@ -180,19 +182,19 @@ int CSMT3::update_status() {
 
 int CSMT3::commit_status() {
     auto code = 0;
-    for(const auto& I : int_pt) code += I.m_material->commit_status() + I.m_material->clear_couple_status();
+    for(const auto& I : int_pt) code += I.m_material->commit_status() + I.m_couple->commit_status();
     return code;
 }
 
 int CSMT3::clear_status() {
     auto code = 0;
-    for(const auto& I : int_pt) code += I.m_material->clear_status() + I.m_material->clear_couple_status();
+    for(const auto& I : int_pt) code += I.m_material->clear_status() + I.m_couple->clear_status();
     return code;
 }
 
 int CSMT3::reset_status() {
     auto code = 0;
-    for(const auto& I : int_pt) code += I.m_material->reset_status() + I.m_material->reset_couple_status();
+    for(const auto& I : int_pt) code += I.m_material->reset_status() + I.m_couple->reset_status();
     return code;
 }
 

@@ -22,7 +22,7 @@ double BilinearDP::compute_c(const double p_strain) const { return cohesion_slop
 double BilinearDP::compute_dc(const double p_strain) const { return cohesion_slope >= 0. || p_strain <= critical ? cohesion_slope : 0.; }
 
 BilinearDP::BilinearDP(const unsigned T, const double E, const double V, const double ETAY, const double ETAF, const double XI, const double CO, const double CS, const double R)
-    : DataBilinearDP{CO, CS}
+    : DataBilinearDP{.cohesion = CO, .cohesion_slope = CS}
     , NonlinearDruckerPrager(T, E, V, ETAY, ETAF, XI, R) {}
 
 unique_ptr<Material> BilinearDP::unique_copy() { return std::make_unique<BilinearDP>(*this); }

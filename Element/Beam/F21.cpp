@@ -52,10 +52,10 @@ int F21::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(int_pt_num);
     for(unsigned I{0}; I < int_pt_num; ++I) {
-        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->unique_copy());
-        int_pt[I].b_section->set_characteristic_length(int_pt[I].weight * length);
+        const auto& c_pt = int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->unique_copy());
+        c_pt.b_section->set_characteristic_length(c_pt.weight * length);
         // factor .5 moved to weight
-        initial_local_flexibility += int_pt[I].B.t() * t_flexibility * int_pt[I].B * int_pt[I].weight * length;
+        initial_local_flexibility += c_pt.B.t() * t_flexibility * c_pt.B * c_pt.weight * length;
     }
     trial_local_flexibility = current_local_flexibility = initial_local_flexibility;
 

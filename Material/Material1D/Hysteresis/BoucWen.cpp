@@ -20,7 +20,7 @@
 #include <Toolbox/ridders.hpp>
 
 BoucWen::BoucWen(const unsigned T, vec&& P)
-    : DataBoucWen{P(0), P(1), P(2), P(3), P(4)}
+    : DataBoucWen{.elastic_modulus = P(0), .yield_stress = P(1), .hardening = P(2), .beta = P(3), .n = P(4)}
     , Material1D(T, P(5)) {}
 
 int BoucWen::initialize(const shared_ptr<DomainBase>&) {
@@ -101,30 +101,6 @@ int BoucWen::update_trial_status(const vec& t_strain) {
 
         z -= incre;
     }
-}
-
-int BoucWen::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int BoucWen::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int BoucWen::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
-    return SUANPAN_SUCCESS;
 }
 
 void BoucWen::print() {

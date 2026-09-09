@@ -67,9 +67,7 @@ int CAX4::initialize(const shared_ptr<DomainBase>& D) {
         const mat jacob = pn * ele_coor;
         const mat pn_pxy = solve(jacob, pn);
         const auto gx = dot(vec{1., t_vec(0), t_vec(1), t_vec(0) * t_vec(1)}, isoparametric_mapping(ele_coor.col(0)));
-        int_pt.emplace_back(std::move(t_vec), 2. * datum::pi * gx * plan(I, 2) * det(jacob), material_proto->unique_copy());
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), 2. * datum::pi * gx * plan(I, 2) * det(jacob), material_proto->unique_copy());
 
         for(unsigned J{0}, K{0}, L{1}; J < m_node; ++J, K += m_dof, L += m_dof) {
             c_pt.strain_mat(0, K) = c_pt.strain_mat(3, L) = pn_pxy(0, J);

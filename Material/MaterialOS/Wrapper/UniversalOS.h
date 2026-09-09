@@ -36,7 +36,6 @@ public:
         unsigned, // tag
         unsigned, // 3D material tag
         unsigned, // max iteration
-        uvec&&,
         uvec&&
     );
 

@@ -21,7 +21,7 @@
 #include <Recorder/OutputType.h>
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const bool KK, const double LD, vec&& YF)
-    : DataNonlinearNM{EEA, EEIS, 0., std::move(YF)}
+    : DataNonlinearNM{.EA = EEA, .EIS = EEIS, .EIW = 0., .yield_force = std::move(YF)}
     , SectionNM(T, SectionType::NM2D)
     , yield_diag{yield_force(0), yield_force(1), yield_force(1)}
     , ti([] {
@@ -46,7 +46,7 @@ NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, 
     , ge{5} { access::rw(linear_density) = LD; }
 
 NonlinearNM::NonlinearNM(const unsigned T, const double EEA, const double EEIS, const double EEIW, const bool KK, const double LD, vec&& YF)
-    : DataNonlinearNM{EEA, EEIS, EEIW, std::move(YF)}
+    : DataNonlinearNM{.EA = EEA, .EIS = EEIS, .EIW = EEIW, .yield_force = std::move(YF)}
     , SectionNM(T, SectionType::NM3D)
     , yield_diag{yield_force(0), yield_force(1), yield_force(1), yield_force(2), yield_force(2)}
     , ti([] {

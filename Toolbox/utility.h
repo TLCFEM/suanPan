@@ -162,7 +162,7 @@ template<typename T> T get_input(std::istringstream& stream) {
     return output;
 }
 
-void ignore_whitespace(std::istringstream&);
+std::istringstream& ignore_whitespace(std::istringstream&);
 
 template<typename T> bool get_optional_input(std::istringstream& stream, T& output) { return stream.eof() || get_input(stream, output); }
 

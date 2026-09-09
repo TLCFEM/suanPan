@@ -124,9 +124,7 @@ int DKT4::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
     for(unsigned I{0}; I < plan.n_rows; ++I) {
-        int_pt.emplace_back(vec{plan(I, 0), plan(I, 1)});
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(vec{plan(I, 0), plan(I, 1)});
 
         const auto pn = shape::quad(c_pt.coor, 1, 8);
         const mat jacob = pn * ele_coor;

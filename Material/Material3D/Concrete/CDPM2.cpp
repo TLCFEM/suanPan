@@ -354,7 +354,7 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 }
 
 CDPM2::CDPM2(const unsigned T, const double E, const double V, const double FT, const double FC, const double QH0, const double HP, const double DF, const double AH, const double BH, const double CH, const double DH, const double AS, const double EFT, const double EFC, const DamageType DT, const double R)
-    : DataCDPM2{std::fabs(E), std::fabs(V), std::fabs(FT), std::fabs(FC), std::fabs(QH0), std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), DF, AH, BH, CH, DH, AS, std::fabs(EFT), std::fabs(EFC)}
+    : DataCDPM2{.elastic_modulus = std::fabs(E), .poissons_ratio = std::fabs(V), .ft = std::fabs(FT), .fc = std::fabs(FC), .qh0 = std::fabs(QH0), .hp = std::max(HP, static_cast<double>(std::numeric_limits<float>::epsilon())), .df = DF, .ah = AH, .bh = BH, .ch = CH, .dh = DH, .as = AS, .eft = std::fabs(EFT), .efc = std::fabs(EFC)}
     , Material3D(T, R)
     , damage_type(DT) { access::rw(tolerance) = 1E-13; }
 
@@ -368,7 +368,7 @@ int CDPM2::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> CDPM2::unique_copy() { return std::make_unique<CDPM2>(*this); }
 
-double CDPM2::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double CDPM2::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int CDPM2::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -387,7 +387,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     //
 
     const auto dev_stress = tensor::dev(trial_stress);
-    const auto hydro_stress = tensor::mean3(trial_stress);
+    const auto hydro_stress = tensor::mean<3>(trial_stress);
     const auto trial_s = tensor::stress::norm(dev_stress);
     const auto trial_p = hydro_stress;
     const vec n = dev_stress / trial_s;
@@ -450,10 +450,17 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     auto counter{0u};
     auto ref_error{1.};
+    auto try_unit_kp{false};
     while(true) {
         if(max_iteration == ++counter) {
-            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
+            if(try_unit_kp || current_kp > 1.) {
+                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                return SUANPAN_FAIL;
+            }
+
+            try_unit_kp = true;
+            kp = 1.;      // start from unity
+            counter = 2u; // bypass elasticity check
         }
 
         compute_plasticity(lode, s, p, kp, data);
@@ -525,13 +532,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             break;
         }
 
-        gamma -= incre(0);
         s -= incre(1);
         p -= incre(2);
-        kp -= incre(3);
 
-        if(gamma < 0.) gamma = datum::eps;
-        if(kp < 0.) kp = datum::eps;
+        gamma = std::max(datum::eps, gamma - incre(0));
+        kp = std::max(datum::eps, kp - incre(3));
     }
 
     //
@@ -545,9 +550,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     std::vector<uword> tp, cp;
     tp.reserve(3);
     cp.reserve(3);
-    for(uword I{0}; I < uword{3}; ++I)
-        if(principal_stress(I) > 0.) tp.emplace_back(I);
-        else cp.emplace_back(I);
+    for(uword I{0}; I < uword{3}; ++I) (principal_stress(I) > 0. ? tp : cp).emplace_back(I);
 
     const uvec t_pattern(tp), c_pattern(cp);
 
@@ -586,7 +589,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         trial_stress *= damage_t * damage_c;
     }
     else if(DamageType::ANISOTROPIC == damage_type) {
-        const auto [tension_projector, tension_derivative] = transform::eigen_to_tensile_derivative(principal_stress, principal_direction);
+        const auto [tension_projector, tension_derivative] = transform::stress::eigen_to_tensile_derivative(principal_stress, principal_direction);
 
         const vec tension_stress = tension_projector * trial_stress;
 
@@ -596,30 +599,6 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         trial_stress += (omegac - omegat) * tension_stress;
     }
 
-    return SUANPAN_SUCCESS;
-}
-
-int CDPM2::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int CDPM2::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int CDPM2::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

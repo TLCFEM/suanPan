@@ -10,6 +10,7 @@ $RECYCLE.BIN/
 
 # Windows Installer files
 .cache
+.clangd
 .dirty
 .idea
 .venv

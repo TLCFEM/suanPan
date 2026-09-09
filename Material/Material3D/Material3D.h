@@ -39,6 +39,24 @@ public:
         double    // density
     );
 
+    int clear_status() override;
+    int commit_status() override;
+    int reset_status() override;
+
+    [[nodiscard]] std::vector<vec> record(OutputType) const override;
+};
+
+class NonlocalMaterial3D : public Material {
+public:
+    NonlocalMaterial3D(
+        unsigned, // tag
+        double    // density
+    );
+
+    int clear_status() override;
+    int commit_status() override;
+    int reset_status() override;
+
     [[nodiscard]] std::vector<vec> record(OutputType) const override;
 };
 

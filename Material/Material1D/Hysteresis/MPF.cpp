@@ -20,7 +20,7 @@
 #include <Toolbox/utility.h>
 
 MPF::MPF(const unsigned T, const double E, const double Y, const double H, const double R, const double B1, const double B2, const double B3, const double B4, const bool ISO, const bool CON, const double D)
-    : DataMPF{std::fabs(E), H, std::fabs(Y), std::fabs(R), std::fabs(B1), std::fabs(B2), std::fabs(B3), std::fabs(B4), ISO, CON}
+    : DataMPF{.elastic_modulus = std::fabs(E), .hardening_ratio = H, .yield_stress = std::fabs(Y), .R0 = std::fabs(R), .A1 = std::fabs(B1), .A2 = std::fabs(B2), .A3 = std::fabs(B3), .A4 = std::fabs(B4), .isotropic_hardening = ISO, .constant_radius = CON}
     , Material1D(T, D) {}
 
 int MPF::initialize(const shared_ptr<DomainBase>&) {
@@ -92,30 +92,6 @@ int MPF::update_trial_status(const vec& t_strain) {
 
     suanpan_assert([&] { if(!trial_stress.is_finite() || !trial_stiffness.is_finite()) throw std::invalid_argument("infinite number detected"); });
 
-    return SUANPAN_SUCCESS;
-}
-
-int MPF::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int MPF::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    current_history = trial_history;
-    return SUANPAN_SUCCESS;
-}
-
-int MPF::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
-    trial_history = current_history;
     return SUANPAN_SUCCESS;
 }
 

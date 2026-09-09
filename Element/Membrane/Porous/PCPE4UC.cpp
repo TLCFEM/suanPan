@@ -83,9 +83,7 @@ int PCPE4UC::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const mat pn_pxy = solve(jacob, pn);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->unique_copy());
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->unique_copy());
 
         for(auto J = 0u; J < m_node; ++J) {
             const auto K = m_dof * J, L = K + 1;
@@ -152,7 +150,7 @@ std::vector<vec> PCPE4UC::record(const OutputType P) const {
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
-        for(const auto& I : int_pt) data.emplace_back(vec{-alpha * q * tensor::trace2(I.strain_mat * t_disp)});
+        for(const auto& I : int_pt) data.emplace_back(vec{-alpha * q * tensor::trace<2>(I.strain_mat * t_disp)});
     }
     else
         for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));

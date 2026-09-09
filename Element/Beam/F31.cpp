@@ -70,10 +70,10 @@ int F31::initialize(const shared_ptr<DomainBase>& D) {
     int_pt.clear();
     int_pt.reserve(int_pt_num);
     for(unsigned I{0}; I < int_pt_num; ++I) {
-        int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->unique_copy());
-        int_pt[I].b_section->set_characteristic_length(int_pt[I].weight * length);
+        const auto& c_pt = int_pt.emplace_back(plan(I, 0), .5 * plan(I, 1), section_proto->unique_copy());
+        c_pt.b_section->set_characteristic_length(c_pt.weight * length);
         // factor .5 moved to weight
-        initial_local_flexibility += int_pt[I].strain_mat.t() * solve(section_stiffness, int_pt[I].strain_mat * int_pt[I].weight * length);
+        initial_local_flexibility += c_pt.strain_mat.t() * solve(section_stiffness, c_pt.strain_mat * c_pt.weight * length);
     }
     access::rw(torsion_stiff) = 1E-3 * vec(initial_local_flexibility.diag()).head(5).min();
     initial_local_flexibility(5, 5) = torsion_stiff;

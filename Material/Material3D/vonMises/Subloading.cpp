@@ -179,30 +179,6 @@ int Subloading::update_trial_status(const vec& t_strain) {
     }
 }
 
-int Subloading::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int Subloading::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int Subloading::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
 void Subloading::print() {
     suanpan_info("A 3D combined hardening material using subloading surface model. doi:10.1007/s00707-025-04339-0\n");
 }

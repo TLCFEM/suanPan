@@ -93,9 +93,7 @@ int PCPE4DC::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
         const mat pn_pxy = solve(jacob, pn);
-        int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->unique_copy());
-
-        auto& c_pt = int_pt.back();
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), plan(I, 2) * det(jacob), s_mat->unique_copy());
 
         for(auto J = 0u; J < m_node; ++J) {
             const auto K = 2 * J, L = K + 1, M = 4 * J, N = M + 1, O = N + 1, P = O + 1;
@@ -187,7 +185,7 @@ std::vector<vec> PCPE4DC::record(const OutputType P) const {
 
     if(P == OutputType::PP) {
         const auto t_disp = get_current_displacement();
-        for(const auto& I : int_pt) data.emplace_back(vec{q * tensor::trace2(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
+        for(const auto& I : int_pt) data.emplace_back(vec{q * tensor::trace<2>(I.strain_mat * ((porosity - alpha) * t_disp(s_dof) - porosity * t_disp(f_dof)))});
     }
     else
         for(const auto& I : int_pt) suanpan::append_to(data, I.m_material->record(P));

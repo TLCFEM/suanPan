@@ -19,7 +19,7 @@
 
 #include <Element/Element.h>
 
-StrainEnergyEvolution::StrainEnergyEvolution(const unsigned T, const unsigned ST, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
-    : EnergyEvolution(T, ST, IL, FL, WT, IT, RR, PW, TL) { get_energy = &Element::get_strain_energy; }
+StrainEnergyEvolution::StrainEnergyEvolution(const unsigned T, const unsigned IL, const unsigned FL, const double WT, const unsigned IT, const unsigned RR, const double PW, const double TL)
+    : EnergyEvolution(T, IL, FL, WT, IT, RR, PW, TL) { get_energy = &Element::get_strain_energy; }
 
 unique_ptr<Criterion> StrainEnergyEvolution::unique_copy() { return std::make_unique<StrainEnergyEvolution>(*this); }

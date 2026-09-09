@@ -24,7 +24,7 @@ const double NonlinearGurson::sqrt_three_two = std::sqrt(1.5);
 const mat NonlinearGurson::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 NonlinearGurson::NonlinearGurson(const unsigned T, const double E, const double V, const double Q1, const double Q2, const double FN, const double SN, const double EN, const double R)
-    : DataNonlinearGurson{E, V, Q1, Q2, FN, SN, EN}
+    : DataNonlinearGurson{.elastic_modulus = E, .poissons_ratio = V, .q1 = Q1, .q2 = Q2, .fn = FN, .sn = SN, .en = EN}
     , Material3D(T, R) {}
 
 int NonlinearGurson::initialize(const shared_ptr<DomainBase>&) {
@@ -35,7 +35,7 @@ int NonlinearGurson::initialize(const shared_ptr<DomainBase>&) {
     return SUANPAN_SUCCESS;
 }
 
-double NonlinearGurson::get(const Parameter P) const { return prop(elastic_modulus, poissons_ratio)(P); }
+double NonlinearGurson::get(const Parameter P) const { return MaterialProperty(elastic_modulus, poissons_ratio)(P); }
 
 int NonlinearGurson::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
@@ -52,7 +52,7 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
 
     auto trial_s = tensor::dev(trial_stress);                            // trial deviatoric stress
     const auto trial_q = sqrt_three_two * tensor::stress::norm(trial_s); // trial von Mises stress
-    const auto trial_p = tensor::mean3(trial_stress);                    // trial hydrostatic stress
+    const auto trial_p = tensor::mean<3>(trial_stress);                  // trial hydrostatic stress
     auto p = trial_p;                                                    // hydrostatic stress
 
     mat44 jacobian(fill::none);
@@ -132,30 +132,6 @@ int NonlinearGurson::update_trial_status(const vec& t_strain) {
 
     trial_stiffness = six_shear / denom / 3. * unit_dev_tensor - six_shear / denom * trial_s * left.row(0) + tensor::unit_tensor2 * left.row(3);
 
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearGurson::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    current_history = initial_history;
-    current_stiffness = initial_stiffness;
-    return reset_status();
-}
-
-int NonlinearGurson::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_history = trial_history;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int NonlinearGurson::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_history = current_history;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 

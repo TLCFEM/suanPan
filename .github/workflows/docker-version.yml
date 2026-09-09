@@ -1,0 +1,64 @@
+jobs:
+  linux-base:
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Clone
+        run: |
+          curl -O https://raw.githubusercontent.com/TLCFEM/suanPan/suanPan-v${{ inputs.version }}/Script/${{ matrix.arch }}/Rocky.Dockerfile
+          sed -i "s/--branch dev/--branch suanPan-v${{ inputs.version }}/g" ./Rocky.Dockerfile
+      - name: Login
+        uses: docker/login-action@v4
+        with:
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Base ${{ matrix.arch }}
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Rocky.Dockerfile
+          platforms: linux/${{ matrix.arch }}
+          provenance: false
+          push: true
+          tags: tlcfem/suanpan:${{ inputs.version }}-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    timeout-minutes: 600
+  linux-combine:
+    needs: linux-base
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Login Docker
+        uses: docker/login-action@v4
+        with:
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+      - name: Login GitHub
+        uses: docker/login-action@v4
+        with:
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+      - name: Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Combine
+        run: |
+          docker buildx imagetools create -t tlcfem/suanpan:${{ inputs.version }} tlcfem/suanpan:${{ inputs.version }}-amd64 tlcfem/suanpan:${{ inputs.version }}-arm64
+          docker buildx imagetools create -t ghcr.io/tlcfem/suanpan:${{ inputs.version }} tlcfem/suanpan:${{ inputs.version }}
+          JWT=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
+          curl -X DELETE -H "Authorization: JWT $JWT" https://hub.docker.com/v2/repositories/tlcfem/suanpan/tags/${{ inputs.version }}-amd64/
+          curl -X DELETE -H "Authorization: JWT $JWT" https://hub.docker.com/v2/repositories/tlcfem/suanpan/tags/${{ inputs.version }}-arm64/
+name: Docker Version
+"on":
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The version to build.
+        required: true

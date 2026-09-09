@@ -35,7 +35,7 @@ constexpr double MooneyRivlin::five_three = 5. * one_three;
 constexpr double MooneyRivlin::eight_nine = two_three * four_three;
 
 MooneyRivlin::MooneyRivlin(const unsigned T, const double KK, const double AA, const double AB, const double R)
-    : DataMooneyRivlin{fabs(KK), fabs(AA), fabs(AB)}
+    : DataMooneyRivlin{.K = fabs(KK), .A10 = fabs(AA), .A01 = fabs(AB)}
     , Material3D(T, R) {}
 
 int MooneyRivlin::initialize(const shared_ptr<DomainBase>&) {
@@ -97,29 +97,6 @@ int MooneyRivlin::update_trial_status(const vec& t_strain) {
 
     trial_stiffness = (A10 * W2 + A01 * W5 + K - K * J3M1 * W8) * J3E * J3E.t() + (K * J3M1 * W9 - A10 * W3 - A01 * W7) * I3EE + A01 * W6 * I2EE - TB - TB.t();
 
-    return SUANPAN_SUCCESS;
-}
-
-int MooneyRivlin::clear_status() {
-    current_strain.zeros();
-    current_stress.zeros();
-    trial_strain.zeros();
-    trial_stress.zeros();
-    trial_stiffness = current_stiffness = initial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int MooneyRivlin::commit_status() {
-    current_strain = trial_strain;
-    current_stress = trial_stress;
-    current_stiffness = trial_stiffness;
-    return SUANPAN_SUCCESS;
-}
-
-int MooneyRivlin::reset_status() {
-    trial_strain = current_strain;
-    trial_stress = current_stress;
-    trial_stiffness = current_stiffness;
     return SUANPAN_SUCCESS;
 }
 
