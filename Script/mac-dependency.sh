@@ -65,7 +65,7 @@ find "$TMP_DIR/lib" -name "*.a" -exec cp {} "$TARGET_DIR" \;
 
 INCLUDE_DIR="$(dirname "$0")/../Include/hdf"
 
-rm -rf "$INCLUDE_DIR/*" "$INCLUDE_DIR-$TOKEN/*"
+rm -rf "${INCLUDE_DIR:?}/*" "$INCLUDE_DIR-$TOKEN/*"
 
 find "$TMP_DIR/include" -name "*.h" -exec cp {} "$INCLUDE_DIR" \;
 
