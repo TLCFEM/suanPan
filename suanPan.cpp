@@ -24,7 +24,7 @@
 #ifdef SUANPAN_MKL
 extern "C" void mkl_free_buffers();
 #else
-void mkl_free_buffers() {}
+static void mkl_free_buffers() {}
 #endif
 
 #ifdef SUANPAN_DISTRIBUTED
