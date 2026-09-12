@@ -289,7 +289,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.16.0
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
-- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.1.1
+- [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.2.0
 - [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.34
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
@@ -302,7 +302,7 @@ Additional libraries used in **suanPan** are listed as follows.
 - [**ezp**](https://github.com/TLCFEM/ezp)
 - [**fmt**](https://github.com/fmtlib/fmt) version 12.2.0
 - [**magic_enum**](https://github.com/Neargye/magic_enum) version 0.9.8
-- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2026.1.0
+- [**oneMKL**](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) version 2026.1.1
 - [**whereami**](https://github.com/gpakosz/whereami)
 - **thread_pool** abridged version of [`thread-pool`](https://github.com/bshoshany/thread-pool)
 
