@@ -28,7 +28,7 @@ def check_version(_major: int, _minor: int, _patch: int):
             data = json.load(response)
             tag_name = data["tag_name"]
             assets = [asset["name"] for asset in data["assets"]]
-    except Exception:
+    except Exception:  # noqa
         return
 
     if not (version := re.search(r"suanPan-v(\d)\.(\d)\.?(\d)?", tag_name)):
@@ -88,7 +88,7 @@ def check_version(_major: int, _minor: int, _patch: int):
             destination.write(source.read())
         print(f"\nDownloaded {abspath(file_name)}.")
         print("You can manually extract the archive to overwrite the existing folder.")
-    except Exception:
+    except Exception:  # noqa
         print("Download failed.")
 
 
