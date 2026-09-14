@@ -21,7 +21,7 @@
 
 const mat Balloon::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
-auto Balloon ::compute_isotropic_bound(const double gamma, const double km, const double dkm) {
+auto Balloon::compute_isotropic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
     const auto current_hfc = bfc.empty() ? vec{} : vec(&current_history(5), static_cast<uword>(bfc.size()), false, true);
@@ -51,7 +51,7 @@ auto Balloon ::compute_isotropic_bound(const double gamma, const double km, cons
     return std::make_tuple(0., 0., 0.);
 }
 
-auto Balloon ::compute_kinematic_bound(const double gamma, const double km, const double dkm) {
+auto Balloon::compute_kinematic_bound(const double gamma, const double km, const double dkm) {
     const auto& qm = trial_history(3);
 
     const auto current_hac = bac.empty() ? vec{} : vec(&current_history(5 + static_cast<uword>(bfc.size())), static_cast<uword>(bac.size()), false, true);

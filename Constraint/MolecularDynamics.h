@@ -138,7 +138,7 @@ class MolecularDynamics2D final : public MolecularDynamics<2u, false> {
     }
 
 public:
-    using MolecularDynamics ::MolecularDynamics;
+    using MolecularDynamics::MolecularDynamics;
 };
 
 class MolecularDynamics3D final : public MolecularDynamics<3u, false> {
@@ -183,7 +183,7 @@ class MolecularDynamics3D final : public MolecularDynamics<3u, false> {
     }
 
 public:
-    using MolecularDynamics ::MolecularDynamics;
+    using MolecularDynamics::MolecularDynamics;
 };
 
 #endif
