@@ -22,8 +22,6 @@ def skip(line: str):
         return True
     if " / __| | | | |_) / _` | '_ \\" in line:
         return True
-    if "This build lacks parallelization support." in line:
-        return True
     return "by tlc @" in line
 
 
