@@ -41,6 +41,10 @@ int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+#ifndef SUANPAN_MT
+    suanpan_highlight("This build lacks parallelization support.\n");
+#endif
+
 #ifdef SUANPAN_DISTRIBUTED
     ezp::blacs_env<>::do_not_manage_mpi();
 
