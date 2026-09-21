@@ -246,8 +246,8 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     left.row(2) = c_para[1] * lambda * ((1. - r) / g_c * trans.row(0) * dnde - dgdsigma_c * prpe);
 
     const mat::fixed<3, 6> right = -solve(jacobian, left);
-    const auto& dlambdade = right.row(0);
-    const auto& dkappade = right.rows(1, 2);
+    const auto dlambdade = right.row(0);
+    const auto dkappade = right.rows(1, 2);
 
     // \dfrac{\mathrm{d}\bar{\sigma}}{\mathrm{d}\varepsilon^{tr}}
     trial_stiffness -= (double_shear * n + three_alpha_p_bulk * tensor::unit_tensor2) * dlambdade;
