@@ -75,17 +75,6 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     const auto& current_kappa_t = current_history(2);
     const auto& current_kappa_c = current_history(3);
 
-    const auto bound_kappa_t = [&] {
-        if(kappa_t > 1.) kappa_t = 1. - std::numeric_limits<float>::epsilon(); // avoid overshoot
-        else if(kappa_t < current_kappa_t) kappa_t = current_kappa_t;
-        return kappa_t;
-    };
-    const auto bound_kappa_c = [&] {
-        if(kappa_c > 1.) kappa_c = 1. - std::numeric_limits<float>::epsilon(); // avoid overshoot
-        else if(kappa_c < current_kappa_c) kappa_c = current_kappa_c;
-        return kappa_c;
-    };
-
     trial_stress = (trial_stiffness = initial_stiffness) * (trial_strain - plastic_strain); // 6
 
     vec3 principal_stress;     // 3
@@ -209,12 +198,9 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         lambda -= incre(0);
-        kappa_t -= incre(1);
-        kappa_c -= incre(2);
+        kappa_t = suanpan::clamp(kappa_t - incre(1), current_kappa_t, 1., current_kappa_t, 1. - std::numeric_limits<float>::epsilon());
+        kappa_c = suanpan::clamp(kappa_c - incre(2), current_kappa_c, 1., current_kappa_c, 1. - std::numeric_limits<float>::epsilon());
         new_stress -= dsigmadlambda * incre(0);
-
-        bound_kappa_t();
-        bound_kappa_c();
     }
 
     // update damage indices

@@ -93,6 +93,12 @@ namespace suanpan {
         return std::max(a, std::min(b, c));
     }
 
+    template<std::floating_point T> constexpr T clamp(const T value, const T low_test, const T high_test, const T low_bound, const T high_bound) {
+        if(value > high_test) return high_bound;
+        if(value < low_test) return low_bound;
+        return value;
+    }
+
     template<std::floating_point T> constexpr T clamp_unit(const T c) { return clamp(c, T(0), T(1)); }
 
     template<std::floating_point T> bool approx_equal(const T x, const T y, int ulp = 2) { return std::fabs(x - y) <= std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp || std::fabs(x - y) < std::numeric_limits<T>::min(); }
