@@ -48,7 +48,7 @@
 struct DataNonlinearCDP {
     const double elastic_modulus, poissons_ratio;
     const double g_t, g_c;
-    const double alpha, alpha_p, s0;
+    const double alpha, zeta, alpha_p, s0;
 };
 
 class NonlinearCDP : protected DataNonlinearCDP, public Material3D {
@@ -109,6 +109,7 @@ public:
         double,   // normalized crush energy (+)
         double,   // dilatancy parameter
         double,   // biaxial compression strength ratio
+        double,   // meridian ratio
         double,   // stiffness recovery
         double    // density
     );

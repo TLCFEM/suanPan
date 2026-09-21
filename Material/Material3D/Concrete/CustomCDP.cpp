@@ -53,7 +53,7 @@ pod6 CustomCDP::compute_compression_backbone(const double kappa) const {
 }
 
 CustomCDP::CustomCDP(const unsigned T, const unsigned TT, const unsigned CT, const double E, const double V, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
-    : NonlinearCDP(T, E, V, GT, GC, AP, BC, S, R)
+    : NonlinearCDP(T, E, V, GT, GC, AP, BC, 1., S, R)
     , t_tag(TT)
     , c_tag(CT) {}
 

@@ -43,8 +43,8 @@ vec3 NonlinearCDP::compute_dr(const vec3& in) {
 
 double NonlinearCDP::compute_s(const double r) const { return s0 + r - s0 * r; }
 
-NonlinearCDP::NonlinearCDP(const unsigned T, const double E, const double V, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
-    : DataNonlinearCDP{.elastic_modulus = std::fabs(E), .poissons_ratio = V < .5 ? V : .2, .g_t = std::fabs(GT), .g_c = std::fabs(GC), .alpha = (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), .alpha_p = std::fabs(AP), .s0 = std::clamp(std::fabs(S), 0., 1.)}
+NonlinearCDP::NonlinearCDP(const unsigned T, const double E, const double V, const double GT, const double GC, const double AP, const double BC, const double KC, const double S, const double R)
+    : DataNonlinearCDP{.elastic_modulus = std::fabs(E), .poissons_ratio = V < .5 ? V : .2, .g_t = std::fabs(GT), .g_c = std::fabs(GC), .alpha = (std::fabs(BC) - 1.) / (2. * std::fabs(BC) - 1.), .zeta = 3. * (1. - KC) / (2. * KC - 1.), .alpha_p = std::fabs(AP), .s0 = std::clamp(std::fabs(S), 0., 1.)}
     , Material3D(T, R) {
     access::rw(tolerance) = 1E-13;
     if(alpha_p > 1.) suanpan_debug("The given dilatancy parameter {} corresponds an internal angle greater than 45 degrees which is uncommon for (reinforced) concrete.\n", alpha_p);
@@ -147,11 +147,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
                 ridders(approx_kappa_t, current_kappa_t, 1. - datum::eps, tolerance);
                 ridders(approx_kappa_c, current_kappa_c, 1. - datum::eps, tolerance);
 
-                auto f = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2];
-
-                if(new_stress(2) > 0.) f -= (one_minus_alpha * c_para[2] / t_para[2] + alpha + 1.) * new_stress(2);
-
-                return f;
+                return const_yield + pfplambda * lambda + one_minus_alpha * c_para[2] + (new_stress(2) > 0. ? -one_minus_alpha * c_para[2] / t_para[2] - alpha - 1. : zeta) * new_stress(2);
             };
 
             ridders_guess(approx_update, 0., .25 * tensor::strain::norm(incre_strain) / std::sqrt(1. + 3. * alpha_p * alpha_p), tolerance);
@@ -162,9 +158,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
 
         beta = -one_minus_alpha * c_para[2] / t_para[2] - alpha - 1.;
 
-        residual(0) = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2];
-
-        if(new_stress(2) > 0.) residual(0) += beta * new_stress(2);
+        residual(0) = const_yield + pfplambda * lambda + one_minus_alpha * c_para[2] + (new_stress(2) > 0. ? beta : zeta) * new_stress(2);
 
         r = compute_r(new_stress);
 
@@ -190,7 +184,7 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
             jacobian(0, 2) = (one_minus_alpha - tmp_term) * c_para[5];
         }
         else {
-            jacobian(0, 0) = pfplambda;
+            jacobian(0, 0) = pfplambda + zeta * dsigmadlambda(2);
             jacobian(0, 1) = 0.;
             jacobian(0, 2) = one_minus_alpha * c_para[5];
         }
@@ -246,14 +240,12 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     const rowvec6 prpe = drdsigma * trial_stiffness;
 
     // compute local derivatives
-    mat left(3, 6);
-    left.row(0) = 3. * alpha * bulk * tensor::unit_tensor2.t() + root_three_two * double_shear * n.t();
+    mat::fixed<3, 6> left;
+    left.row(0) = 3. * alpha * bulk * tensor::unit_tensor2.t() + root_three_two * double_shear * n.t() + (new_stress(2) > 0. ? beta : zeta) * trans.row(2) * trial_stiffness;
     left.row(1) = t_para[1] * lambda * (r / g_t * trans.row(2) * dnde + dgdsigma_t * prpe);
     left.row(2) = c_para[1] * lambda * ((1. - r) / g_c * trans.row(0) * dnde - dgdsigma_c * prpe);
 
-    if(new_stress(2) > 0.) left.row(0) += beta * trans.row(2) * trial_stiffness;
-
-    const mat right = -solve(jacobian, left);
+    const mat::fixed<3, 6> right = -solve(jacobian, left);
     const auto& dlambdade = right.row(0);
     const auto& dkappade = right.rows(1, 2);
 

@@ -86,7 +86,7 @@ pod6 TableCDP::compute_tension_backbone(const double kappa) const { return compu
 pod6 TableCDP::compute_compression_backbone(const double kappa) const { return compute_backbone(kappa, -1., c_table, dc_table); }
 
 TableCDP::TableCDP(const unsigned T, const double E, const double V, mat&& TT, mat&& CT, mat&& TDT, mat&& CDT, const double GT, const double GC, const double AP, const double BC, const double S, const double R)
-    : NonlinearCDP(T, E, V, GT, GC, AP, BC, S, R)
+    : NonlinearCDP(T, E, V, GT, GC, AP, BC, 1., S, R)
     , t_table(std::move(TT))
     , c_table(std::move(CT))
     , dt_table(std::move(TDT))

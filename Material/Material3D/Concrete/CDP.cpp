@@ -49,7 +49,7 @@ pod6 CDP::compute_tension_backbone(const double kappa) const { return compute_ba
 pod6 CDP::compute_compression_backbone(const double kappa) const { return compute_backbone(kappa, a_c, cb_c, f_c); }
 
 CDP::CDP(const bool CHECK_INPUT, const unsigned T, const double E, const double V, const double ST, const double SC, const double GT, const double GC, const double AT, const double AC, const double DT, const double DC, const double AP, const double BC, const double S, const double R)
-    : NonlinearCDP(T, E, V, GT, GC, AP, BC, S, R)
+    : NonlinearCDP(T, E, V, GT, GC, AP, BC, 1., S, R)
     , a_t(AT < 1. ? AT : .5)
     , cb_t(0.)
     , f_t(std::fabs(ST))
