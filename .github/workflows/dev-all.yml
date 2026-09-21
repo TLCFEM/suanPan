@@ -11,6 +11,15 @@ jobs:
     needs: linux-dev
     secrets: inherit
     uses: ./.github/workflows/compare.yml
+  cookbook:
+    if: github.event_name == 'push'
+    needs: guard
+    runs-on: ubuntu-slim
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.ALL }}
+        name: Cookbook
+        run: gh workflow run pdf.yml --repo TLCFEM/constitutive-modelling-cookbook --ref master
   delete:
     if: github.event_name == 'push'
     needs: linux-dev
