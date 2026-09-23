@@ -94,7 +94,9 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     const vec3 dsigmadlambda = -double_shear * pn - three_alpha_p_bulk; // 3
 
     const auto dgdsigma_t = (pn(2) + alpha_p) / g_t;
-    const auto dgdsigma_c = (pn(0) + alpha_p) / g_c;
+    auto dgdsigma_c = (pn(0) + alpha_p) / g_c;
+    const auto evolve_kappa_c = dgdsigma_c < 0.;
+    if(!evolve_kappa_c) dgdsigma_c = .0;
 
     auto new_stress = principal_stress; // converged principal stress
 
@@ -226,10 +228,10 @@ int NonlinearCDP::update_trial_status(const vec& t_strain) {
     const rowvec6 prpe = drdsigma * trial_stiffness;
 
     // compute local derivatives
-    mat::fixed<3, 6> left;
+    mat::fixed<3, 6> left(fill::zeros);
     left.row(0) = 3. * alpha * bulk * tensor::unit_tensor2.t() + root_three_two * double_shear * n.t() + (new_stress(2) > 0. ? beta : zeta) * trans.row(2) * trial_stiffness;
     left.row(1) = t_para[1] * lambda * (r / g_t * trans.row(2) * dnde + dgdsigma_t * prpe);
-    left.row(2) = c_para[1] * lambda * ((1. - r) / g_c * trans.row(0) * dnde - dgdsigma_c * prpe);
+    if(evolve_kappa_c) left.row(2) = c_para[1] * lambda * ((1. - r) / g_c * trans.row(0) * dnde - dgdsigma_c * prpe);
 
     const mat::fixed<3, 6> right = -solve(jacobian, left);
     const auto dlambdade = right.row(0);
