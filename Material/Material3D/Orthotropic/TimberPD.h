@@ -43,8 +43,8 @@ class TimberPD final : protected DataTimberPD, public BilinearHoffman {
 
     [[nodiscard]] double compute_damage_c(double) const;
     [[nodiscard]] double compute_damage_t(double) const;
-    [[nodiscard]] double update_damage_t(const vec&, mat&);
-    [[nodiscard]] double update_damage_c(const vec&, mat&);
+    [[nodiscard]] double update_damage_t(const vec&, mat66&);
+    [[nodiscard]] double update_damage_c(const vec&, mat66&);
 
 public:
     TimberPD(

@@ -46,8 +46,8 @@ int NonlocalIsotropicElastic3D::update_trial_status(const vec& t_strain) {
 
     trial_history = current_history;
 
-    vec target_stress = trial_stress.head(6);
-    rowvec target_der = target_stress.t();
+    vec6 target_stress = trial_stress.head(6);
+    rowvec6 target_der = target_stress.t();
 
     const auto dev = [](auto& in) { in.head(3) -= mean(in.head(3)); };
 
