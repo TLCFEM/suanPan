@@ -698,6 +698,14 @@ std::pair<mat66, mat66> transform::stress::eigen_to_tensile_derivative(const vec
     return {std::move(eigen_projector), std::move(eigen_derivative)};
 }
 
+std::pair<mat66, mat66> transform::stress::eigen_to_transformed_derivative(const vec& principal_stress, const mat& principal_direction, const mat66& transformation_t, const mat66& transformation_c) {
+    const auto [projector_t, derivative_t] = eigen_to_tensile_derivative(principal_stress, principal_direction);
+
+    const mat66 transformation_diff = transformation_t - transformation_c;
+
+    return {transformation_diff * projector_t + transformation_c, transformation_diff * derivative_t};
+}
+
 mat transform::beam::global_to_local(const double cos, const double sin, const double length) {
     mat trans_mat(3, 6, fill::zeros);
 

@@ -212,6 +212,7 @@ namespace transform {
         mat66 eigen_to_tensor_base(const mat&);
         vec eigen_to_tensile_stress(const vec&, const mat&);
         std::pair<mat66, mat66> eigen_to_tensile_derivative(const vec&, const mat&);
+        std::pair<mat66, mat66> eigen_to_transformed_derivative(const vec&, const mat&, const mat66&, const mat66&);
     } // namespace stress
     namespace beam {
         mat global_to_local(double, double, double);
