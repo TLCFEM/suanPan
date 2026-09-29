@@ -20,38 +20,39 @@
 
 #include <suanPan.h>
 
-template<typename T> requires std::invocable<T, const vec&> && std::same_as<std::invoke_result_t<T, const vec&>, std::pair<vec, mat>> int homotopy_solve(vec& x, T&& system, double incre_t, const double tolerance, const unsigned max_evaluation) {
+template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT> && is_arma_mat<double, FT> && std::invocable<ST, const FT&> && std::same_as<std::invoke_result_t<ST, const FT&>, std::pair<FT, JT>> int homotopy_solve(FT& x, ST&& system, double incre_t, const double tolerance, const unsigned max_evaluation) {
     const auto initial_f = system(x).first;
 
-    auto counter{0u};
-    vec f;
-    mat jacobian;
-    auto bounding_eval = [&](const vec& x) {
-        if(++counter >= max_evaluation) return false;
-        std::tie(f, jacobian) = system(x);
-        return true;
-    };
-
-    auto current_t{0.};
     constexpr auto min_incre{1e-8};
     constexpr auto max_iteration{20u};
 
+    auto counter{0u};
+    auto current_t{0.};
     auto current_x = x;
 
     while(current_t < 1.) {
         const auto trial_t = std::min(1., current_t + incre_t);
+        const FT target_f = (1. - trial_t) * initial_f;
         auto trial_x = current_x;
+
+        FT residual;
+        JT jacobian;
+
+        const auto bounding_eval = [&](const FT& in_x) {
+            if(++counter >= max_evaluation) return false;
+            std::tie(residual, jacobian) = system(in_x);
+            residual -= target_f;
+            return true;
+        };
 
         auto ref_error{1.};
         auto converged{false};
         auto iteration_used{0u};
 
         for(auto round{0u}; round < max_iteration; ++round) {
-            if(!bounding_eval(trial_x)) return -1;
+            if(!bounding_eval(trial_x)) return SUANPAN_FAIL;
 
-            const vec residual = f - (1. - trial_t) * initial_f;
-
-            vec incre_x;
+            FT incre_x;
             if(!solve(incre_x, jacobian, residual, solve_opts::equilibrate)) break;
 
             const auto error = suanpan::inf_norm(incre_x);
@@ -70,17 +71,15 @@ template<typename T> requires std::invocable<T, const vec&> && std::same_as<std:
         if(converged) {
             current_t = trial_t;
             current_x = trial_x;
-            suanpan_info("Homotopy solve with progress {:.3f}.\n", current_t);
-            current_x.t().print();
 
-            if(iteration_used <= 3) incre_t = std::min(1.0 - current_t, incre_t * 1.5);
+            if(iteration_used <= 3) incre_t = std::min(1. - current_t, incre_t * 1.5);
         }
-        else if((incre_t *= .5) < min_incre) return -1;
+        else if((incre_t *= .5) < min_incre) return SUANPAN_FAIL;
     }
 
     x = current_x;
 
-    return 0;
+    return SUANPAN_SUCCESS
 }
 
 #endif
