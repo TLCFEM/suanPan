@@ -100,7 +100,7 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
 
     pfpp = 2. * g1 * pg1pp + m0 * qh1 * qh1 * qh2 * pg4pp;
     pfps = 2. * g1 * pg1ps + m0 * qh1 * qh1 * qh2 * pg4ps;
-    pfpkp = 2. * g1 * pg1pkp + 2. * qh1 * qh2 * (m0 * g4 * dqh1dkp - qh1 * dqh2dkp - qh2 * dqh1dkp) + m0 * qh1 * qh1 * g4 * dqh2dkp;
+    pfpkp = std::min(0., 2. * g1 * pg1pkp + 2. * qh1 * qh2 * (m0 * g4 * dqh1dkp - qh1 * dqh2dkp - qh2 * dqh1dkp) + m0 * qh1 * qh1 * g4 * dqh2dkp); // pfpkp is strictly negative
     pfpl = m0 * qh1 * qh1 * qh2 * pg4pl;
 
     gp = 2. * g1 * pg1pp + qh1 * qh1 * pg2pp;
@@ -123,6 +123,11 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     pgspp /= sqrt_six * fc;
     pgsps /= sqrt_six * fc;
     pgspkp /= sqrt_six * fc;
+
+    if(kp > 1.) {
+        if(pgppkp < 0.) pgppkp = 0.;
+        if(pgspkp < 0.) pgspkp = 0.;
+    }
 
     if(const auto rh = -p / fc - 1. / 3.; rh >= 0.) {
         xh = (bh - ah) * std::exp(-rh / ch);
@@ -459,8 +464,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             }
 
             try_unit_kp = true;
-            kp = 1.;      // start from unity
             counter = 2u; // bypass elasticity check
+            kp = 1.;      // start from unity
+            gamma = 0.;
+            s = trial_s;
+            p = trial_p;
         }
 
         compute_plasticity(lode, s, p, kp, data);
