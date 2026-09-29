@@ -53,6 +53,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
 
             FT incre_x;
             if(!solve(incre_x, jacobian, residual, solve_opts::equilibrate)) break;
+            trial_x -= incre_x;
 
             const auto error = suanpan::inf_norm(incre_x);
             if(0u == round) ref_error = error;
@@ -68,8 +69,6 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
 
                 break;
             }
-
-            trial_x -= incre_x;
         }
 
         if(!converged && (incre_t *= .5) < min_incre) return SUANPAN_FAIL;
