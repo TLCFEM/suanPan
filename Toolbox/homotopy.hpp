@@ -77,7 +77,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
 
     x = current_x;
 
-    return SUANPAN_SUCCESS
+    return SUANPAN_SUCCESS;
 }
 
 #endif
