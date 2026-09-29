@@ -35,7 +35,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
         const FT target_f = (1. - trial_t) * initial_f;
         auto trial_x = current_x;
 
-        FT residual;
+        FT incre_x, residual;
         JT jacobian;
 
         const auto bounding_eval = [&](const FT& in_x) {
@@ -51,7 +51,6 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
         for(auto round{0u}; round < max_iteration; ++round) {
             if(!bounding_eval(trial_x)) return SUANPAN_FAIL;
 
-            FT incre_x;
             if(!solve(incre_x, jacobian, residual, solve_opts::equilibrate)) break;
             trial_x -= incre_x;
 
