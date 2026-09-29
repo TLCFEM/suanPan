@@ -23,8 +23,8 @@
 template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT> && is_arma_mat<double, FT> && std::invocable<ST, const FT&> && std::same_as<std::invoke_result_t<ST, const FT&>, std::pair<FT, JT>> int homotopy_solve(FT& x, ST&& system, double incre_t, const double tolerance, const unsigned max_evaluation) {
     const auto initial_f = system(x).first;
 
-    constexpr auto min_incre{1e-8};
-    constexpr auto max_iteration{20u};
+    static constexpr auto min_incre{1e-8};
+    static constexpr auto max_iteration{20u};
 
     auto counter{0u};
     auto current_t{0.};
@@ -47,7 +47,6 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
 
         auto ref_error{1.};
         auto converged{false};
-        auto iteration_used{0u};
 
         for(auto round{0u}; round < max_iteration; ++round) {
             if(!bounding_eval(trial_x)) return SUANPAN_FAIL;
@@ -60,21 +59,20 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
             suanpan_debug("Homotopy iteration error: {:.5E} at progress {:.3f}.\n", error, trial_t);
 
             if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && round > 5u)) {
+                current_t = trial_t;
+                current_x = trial_x;
+
+                if(round <= 3u) incre_t = std::min(1. - current_t, incre_t * 1.5);
+
                 converged = true;
-                iteration_used = round;
+
                 break;
             }
 
             trial_x -= incre_x;
         }
 
-        if(converged) {
-            current_t = trial_t;
-            current_x = trial_x;
-
-            if(iteration_used <= 3) incre_t = std::min(1. - current_t, incre_t * 1.5);
-        }
-        else if((incre_t *= .5) < min_incre) return SUANPAN_FAIL;
+        if(!converged && (incre_t *= .5) < min_incre) return SUANPAN_FAIL;
     }
 
     x = current_x;
