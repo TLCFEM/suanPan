@@ -20,15 +20,22 @@
 
 #include <suanPan.h>
 
-template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT> && is_arma_mat<double, FT> && std::invocable<ST, const FT&> && std::same_as<std::invoke_result_t<ST, const FT&>, std::pair<FT, JT>> int homotopy_solve(FT& x, ST&& system, double incre_t, const double tolerance, const unsigned max_evaluation) {
-    const auto initial_f = system(x).first;
+struct homotopy_config {
+    double incre_t = .5;
+    double tolerance = 1e-7;
+    double min_incre = 1e-3;
+    unsigned max_evaluation = 200u;
+    unsigned max_iteration = 10u;
+    unsigned scaling_counter = 3u;
+};
 
-    static constexpr auto min_incre{1e-3};
-    static constexpr auto max_iteration{10u};
+template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT> && is_arma_mat<double, FT> && std::invocable<ST, const FT&> && std::same_as<std::invoke_result_t<ST, const FT&>, std::pair<FT, JT>> int homotopy_solve(FT& x, ST&& system, const homotopy_config& config) {
+    const auto initial_f = system(x).first;
 
     auto counter{0u};
     auto current_t{0.};
     auto current_x = x;
+    auto incre_t = config.incre_t;
 
     while(current_t < 1.) {
         const auto trial_t = std::min(1., current_t + incre_t);
@@ -39,7 +46,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
         JT jacobian;
 
         const auto bounding_eval = [&](const FT& in_x) {
-            if(++counter >= max_evaluation) return false;
+            if(++counter >= config.max_evaluation) return false;
             std::tie(residual, jacobian) = system(in_x);
             residual -= target_f;
             return true;
@@ -48,7 +55,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
         auto ref_error{1.};
         auto converged{false};
 
-        for(auto round{0u}; round < max_iteration; ++round) {
+        for(auto round{0u}; round < config.max_iteration; ++round) {
             if(!bounding_eval(trial_x)) return SUANPAN_FAIL;
 
             if(!solve(incre_x, jacobian, residual, solve_opts::equilibrate)) break;
@@ -58,7 +65,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
             if(0u == round) ref_error = error;
             suanpan_debug("Homotopy iteration error: {:.5E} at progress {:.3f}.\n", error, trial_t);
 
-            if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && round > 5u)) {
+            if(error < config.tolerance * ref_error || ((error < config.tolerance || suanpan::inf_norm(residual) < config.tolerance) && round > 5u)) {
                 current_t = trial_t;
                 current_x = trial_x;
 
@@ -70,7 +77,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
             }
         }
 
-        if(!converged && (incre_t *= .5) < min_incre) return SUANPAN_FAIL;
+        if(!converged && (incre_t *= .5) < config.min_incre) return SUANPAN_FAIL;
     }
 
     x = current_x;
