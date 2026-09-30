@@ -455,7 +455,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     // const auto& drdl = data(17);
 
     const auto assemble_residual = [&] {
-        vec4 out_residual;
+        vec4 out_residual(fill::none);
 
         out_residual(0) = f;
         out_residual(1) = s + double_shear * gamma * gs - trial_s;
