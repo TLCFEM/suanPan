@@ -27,6 +27,7 @@ struct homotopy_config {
     unsigned max_evaluation = 200u;
     unsigned max_iteration = 10u;
     unsigned scaling_counter = 3u;
+    bool fixed_incre = false; // only for debug purpose
 };
 
 template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT> && is_arma_mat<double, FT> && std::invocable<ST, const FT&> && std::same_as<std::invoke_result_t<ST, const FT&>, std::pair<FT, JT>> int homotopy_solve(FT& x, ST&& system, const homotopy_config& config) {
@@ -77,7 +78,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
             }
         }
 
-        if(!converged && (incre_t *= .5) < config.min_incre) return SUANPAN_FAIL;
+        if(!converged && (config.fixed_incre || (incre_t *= .5) < config.min_incre)) return SUANPAN_FAIL;
     }
 
     x = current_x;
