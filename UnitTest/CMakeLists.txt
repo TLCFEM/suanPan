@@ -2,6 +2,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestColoring.cpp
         TestEigen.cpp
         TestExpression.cpp
+        TestHomotopy.cpp
         TestIntegration.cpp
         TestMatrix.cpp
         TestMode.cpp
