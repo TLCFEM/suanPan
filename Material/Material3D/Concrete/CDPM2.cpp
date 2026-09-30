@@ -499,7 +499,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
                 compute_plasticity(lode, s = in_x(1), p = in_x(2), kp = in_x(3), data);
 
-                return std::pair<vec4, mat44>{assemble_residual(), assemble_jacobian()};
+                return std::pair{assemble_residual(), assemble_jacobian()};
             };
 
             vec4 initial_x{0., trial_s, trial_p, current_kp};
