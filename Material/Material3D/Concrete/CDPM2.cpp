@@ -504,7 +504,6 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
             vec4 initial_x{0., trial_s, trial_p, current_kp};
             homotopy_config config{};
-            config.max_evaluation = 500u;
             if(SUANPAN_SUCCESS != homotopy_solve<mat44>(initial_x, system, config)) {
                 suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
                 return SUANPAN_FAIL;
