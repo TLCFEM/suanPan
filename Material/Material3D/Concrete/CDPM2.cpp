@@ -493,7 +493,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     auto counter{0u};
     auto ref_error{1.};
     while(true) {
-        if(max_iteration == ++counter) {
+        if(max_iteration <= ++counter) {
             const auto system = [&](const vec4& in_x) {
                 gamma = in_x(0);
 
@@ -509,6 +509,8 @@ int CDPM2::update_trial_status(const vec& t_strain) {
                 suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
                 return SUANPAN_FAIL;
             }
+
+            counter = 2u; // bypass elasticity check
         }
 
         compute_plasticity(lode, s, p, kp, data);
