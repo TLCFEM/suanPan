@@ -23,7 +23,7 @@
 template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT> && is_arma_mat<double, FT> && std::invocable<ST, const FT&> && std::same_as<std::invoke_result_t<ST, const FT&>, std::pair<FT, JT>> int homotopy_solve(FT& x, ST&& system, double incre_t, const double tolerance, const unsigned max_evaluation) {
     const auto initial_f = system(x).first;
 
-    static constexpr auto min_incre{1e-8};
+    static constexpr auto min_incre{1e-3};
     static constexpr auto max_iteration{10u};
 
     auto counter{0u};
