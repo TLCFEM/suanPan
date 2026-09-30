@@ -19,6 +19,7 @@
 #include "CDPM2.h"
 
 #include <Recorder/OutputType.h>
+#include <Toolbox/homotopy.hpp>
 #include <Toolbox/tensor.h>
 #include <Toolbox/utility.h>
 
@@ -453,22 +454,62 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     // const auto& r = data(16);
     // const auto& drdl = data(17);
 
+    const auto assemble_residual = [&] {
+        vec4 out_residual(fill::none);
+
+        out_residual(0) = f;
+        out_residual(1) = s + double_shear * gamma * gs - trial_s;
+        out_residual(2) = p + bulk * gamma * gp - trial_p;
+        out_residual(3) = xh * (current_kp - kp) + gamma * gg * square_lode;
+
+        return out_residual;
+    };
+    const auto assemble_jacobian = [&] {
+        mat44 out_jacobian(fill::none);
+
+        out_jacobian(0, 0) = 0.;
+        out_jacobian(0, 1) = pfps;
+        out_jacobian(0, 2) = pfpp;
+        out_jacobian(0, 3) = pfpkp;
+
+        out_jacobian(1, 0) = double_shear * gs;
+        out_jacobian(1, 1) = double_shear * gamma * pgsps + 1.;
+        out_jacobian(1, 2) = double_shear * gamma * pgspp;
+        out_jacobian(1, 3) = double_shear * gamma * pgspkp;
+
+        out_jacobian(2, 0) = bulk * gp;
+        out_jacobian(2, 1) = bulk * gamma * pgpps;
+        out_jacobian(2, 2) = bulk * gamma * pgppp + 1.;
+        out_jacobian(2, 3) = bulk * gamma * pgppkp;
+
+        out_jacobian(3, 0) = gg * square_lode;
+        out_jacobian(3, 1) = gamma * square_lode / gg * (gs * pgsps + gp / 3. * pgpps);
+        out_jacobian(3, 2) = gamma * square_lode / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
+        out_jacobian(3, 3) = gamma * square_lode / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
+
+        return out_jacobian;
+    };
+
     auto counter{0u};
     auto ref_error{1.};
-    auto try_unit_kp{false};
     while(true) {
-        if(max_iteration == ++counter) {
-            if(try_unit_kp || current_kp > 1.) {
+        if(max_iteration <= ++counter) {
+            const auto system = [&](const vec4& in_x) {
+                gamma = in_x(0);
+
+                compute_plasticity(lode, s = in_x(1), p = in_x(2), kp = in_x(3), data);
+
+                return std::pair{assemble_residual(), assemble_jacobian()};
+            };
+
+            vec4 initial_x{0., trial_s, trial_p, current_kp};
+            homotopy_config config{};
+            if(SUANPAN_SUCCESS != homotopy_solve<mat44>(initial_x, system, config)) {
                 suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
                 return SUANPAN_FAIL;
             }
 
-            try_unit_kp = true;
             counter = 2u; // bypass elasticity check
-            kp = 1.;      // start from unity
-            gamma = 0.;
-            s = trial_s;
-            p = trial_p;
         }
 
         compute_plasticity(lode, s, p, kp, data);
@@ -480,29 +521,8 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
         if(1u == counter && f < 0.) break;
 
-        residual(0) = f;
-        residual(1) = s + double_shear * gamma * gs - trial_s;
-        residual(2) = p + bulk * gamma * gp - trial_p;
-        residual(3) = xh * (current_kp - kp) + gamma * gg * square_lode;
-
-        jacobian(0, 1) = pfps;
-        jacobian(0, 2) = pfpp;
-        jacobian(0, 3) = pfpkp;
-
-        jacobian(1, 0) = double_shear * gs;
-        jacobian(1, 1) = double_shear * gamma * pgsps + 1.;
-        jacobian(1, 2) = double_shear * gamma * pgspp;
-        jacobian(1, 3) = double_shear * gamma * pgspkp;
-
-        jacobian(2, 0) = bulk * gp;
-        jacobian(2, 1) = bulk * gamma * pgpps;
-        jacobian(2, 2) = bulk * gamma * pgppp + 1.;
-        jacobian(2, 3) = bulk * gamma * pgppkp;
-
-        jacobian(3, 0) = gg * square_lode;
-        jacobian(3, 1) = gamma * square_lode / gg * (gs * pgsps + gp / 3. * pgpps);
-        jacobian(3, 2) = gamma * square_lode / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
-        jacobian(3, 3) = gamma * square_lode / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
+        residual = assemble_residual();
+        jacobian = assemble_jacobian();
 
         if(rcond(jacobian) < datum::eps) {
             // short-circuit and directly fail
@@ -510,7 +530,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             continue;
         }
 
-        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate + solve_opts::no_approx)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
