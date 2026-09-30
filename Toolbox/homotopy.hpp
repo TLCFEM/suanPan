@@ -58,7 +58,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
         for(auto round{0u}; round < config.max_iteration; ++round) {
             if(!bounding_eval(trial_x)) return SUANPAN_FAIL;
 
-            if(!solve(incre_x, jacobian, residual, solve_opts::equilibrate)) break;
+            if(!solve(incre_x, jacobian, residual, solve_opts::equilibrate + solve_opts::no_approx)) break;
             trial_x -= incre_x;
 
             const auto error = suanpan::inf_norm(incre_x);

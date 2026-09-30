@@ -529,7 +529,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             continue;
         }
 
-        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate + solve_opts::no_approx)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
