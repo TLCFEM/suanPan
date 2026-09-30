@@ -19,5 +19,5 @@ TEST_CASE("Arctan", "[Utility.Homotopy]") {
     const int status = homotopy_solve<mat>(x, arctan_system, config);
 
     REQUIRE(status == SUANPAN_SUCCESS);
-    REQUIRE_THAT(x(0), Catch::Matchers::WithinAbs(0.0, 1e-6));
+    REQUIRE_THAT(x(0), Catch::Matchers::WithinAbs(0., 1e-9));
 }
