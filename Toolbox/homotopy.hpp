@@ -24,7 +24,7 @@ struct homotopy_config {
     double incre_t = .5;
     double tolerance = 1e-7;
     double min_incre = 1e-3;
-    unsigned max_evaluation = 200u;
+    unsigned max_evaluation = 1000u;
     unsigned max_iteration = 10u;
     unsigned scaling_counter = 3u;
     bool fixed_incre = false; // only for debug purpose
@@ -70,7 +70,7 @@ template<typename JT, typename FT, typename ST> requires is_arma_mat<double, JT>
                 current_t = trial_t;
                 current_x = trial_x;
 
-                if(round <= 3u) incre_t = std::min(1. - current_t, incre_t * 1.5);
+                if(!config.fixed_incre && round <= config.scaling_counter) incre_t *= 1.5;
 
                 converged = true;
 
