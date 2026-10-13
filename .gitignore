@@ -37,6 +37,7 @@ MSVC/suanPan/.vs
 MSVC/suanPan/*/x64
 MSVC/suanPan/PredictedInputCache*.dat
 venv
+opencode.json
 
 # Windows shortcuts
 *.lnk
