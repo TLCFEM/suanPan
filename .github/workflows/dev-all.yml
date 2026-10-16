@@ -35,9 +35,16 @@ jobs:
     uses: ./.github/workflows/flatpak.yml
   guard:
     if: github.repository == 'TLCFEM/suanPan'
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-24.04
     steps:
-      - run: echo "Hello, World!"
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Formatting
+        run: |
+          wget -q -O /usr/local/bin/cf https://github.com/cpp-linter/clang-tools-static-binaries/releases/download/2026.09.01-5fb8802d/clang-format-23_linux-amd64
+          chmod +x /usr/local/bin/cf
+          bash Script/Format.sh
+          git diff --exit-code
   linux-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     needs: guard
