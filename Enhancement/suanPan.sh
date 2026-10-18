@@ -2,25 +2,35 @@
 # -----------------------------------------------------------------------------
 # suanPan.sh
 #
+# A wrapper script for suanPan that handles installation, execution, and uninstallation.
+# suanPan is a structural finite element analysis solver.
+#
 # Usage:
 #
-# 1. Setup mode:
-#      suanPan.sh --create-link
-#    - Creates symbolic links in ~/.local/bin (suanpan, sp)
-#    - Copies Sublime Text configuration files if Sublime Text is installed
+# 1. Setup/Install mode:
+#      suanPan.sh --create-link  (or --install)
+#    - Creates symbolic links in ~/.local/bin (suanpan, sp) pointing to this script
+#    - Detects Sublime Text installation and copies syntax/Build System configurations
 #    - Adds a desktop entry for suanPan in ~/.local/share/applications
 #
-# 2. Run mode:
+# 2. Run mode (default):
 #      suanPan.sh [suanPan arguments...]
-#    - Forwards all arguments to the suanPan executable in bin/
+#    - Sets up library paths (LD_LIBRARY_PATH/DYLD_LIBRARY_PATH) for the bundled libraries
+#    - Optionally loads libmimalloc for improved memory allocation performance
+#    - Forwards all arguments to the suanPan executable in bin/suanPan
 #    - Example: suanPan.sh -f input.supan
 #
 # 3. Uninstall mode:
 #      suanPan.sh --uninstall
-#    - Removes ~/.local/bin links (suanpan, sp)
+#    - Removes symbolic links from ~/.local/bin (suanpan, sp)
 #    - Removes Sublime Text suanPan configuration files
-#    - Removes ~/.local/share/applications/suanPan.desktop
-#    - Removes ~/.suanpan-history.sp
+#    - Removes the desktop entry (~/.local/share/applications/suanPan.desktop)
+#    - Removes the history file (~/.suanpan-history.sp)
+#
+# Notes:
+# - The script automatically detects the operating system (Linux/macOS) and sets
+#   appropriate library paths (LD_LIBRARY_PATH/DYLD_LIBRARY_PATH)
+# - libmimalloc integration is optional and used if the library file is present
 # -----------------------------------------------------------------------------
 
 set -e
@@ -29,7 +39,7 @@ CURRENT_PATH="$(dirname "$(readlink -f "$0")")"
 
 TARGET_PATH="$HOME/.local/bin"
 
-if [[ $# == 1 ]] && [[ $1 == "--create-link" ]]; then
+if [[ $# == 1 ]] && [[ $1 == "--create-link" || $1 == "--install" ]]; then
   echo "This script does the following tasks:"
   echo "    1. Create a link to suanPan in ~/.local/bin"
   echo "    2. Check Sublime Text and add corresponding files to ~/.config/sublime-text/Packages/User"
