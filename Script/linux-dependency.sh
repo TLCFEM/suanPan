@@ -1,34 +1,14 @@
 #!/usr/bin/env bash
 # -----------------------------------------------------------------------------
-# linux-dependency.sh
+# linux-dependency.sh - Download Linux dependencies for CI/CD
 #
-# Downloads and extracts prebuilt library dependencies for Linux runners,
-# organizing them into the appropriate target directory based on the runner
-# image name.
+# Downloads prebuilt library dependencies for Linux GitHub Actions runners
+# and organizes them by architecture (x86_64 vs ARM).
 #
-# Usage:
-#   ./linux-dependency.sh <runner-image-name>
+# Usage: ./linux-dependency.sh <runner-image-name>
+#   runner-image-name: GitHub Actions runner image (ubuntu-24.04, ubuntu-24.04-arm, etc.)
 #
-#   <runner-image-name>: The name of the GitHub Actions runner image
-#                        (one of ubuntu-24.04, ubuntu-24.04-arm).
-#
-# What it does:
-#   1. Checks that exactly one argument is provided.
-#   2. Sets the target directory:
-#        - If the runner image name contains "arm", uses ../Libs/linux-arm.
-#        - Otherwise, uses ../Libs/linux.
-#   3. Removes and recreates the target directory.
-#   4. Downloads and extracts:
-#        - HDF5: Copies all .a files from the extracted lib directory.
-#        - TBB:  Copies all .so files from the extracted tbb-install/lib directory.
-#        - mimalloc: Copies all .so files from the extracted lib directory.
-#        - OpenBLAS: Copies libopenblas.a file.
-#   5. Cleans up temporary directories.
-#
-# Requirements:
-#   - wget
-#   - tar
-#
+# Downloads: HDF5, TBB, mimalloc, OpenBLAS, VTK
 # -----------------------------------------------------------------------------
 
 set -e

@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+"""
+compare.py - Compare files across commits, ignoring timestamps and noise.
+
+Compares two commits (or directories) and outputs unified diffs for changed files.
+Excludes known non-deterministic files and timestamps from comparison.
+
+Usage: python3 compare.py <commit1> <commit2>
+       python3 compare.py <tarball1> <tarball2>
+       python3 compare.py <dir1> <dir2>
+"""
 
 import sys
 import tarfile

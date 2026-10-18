@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-
+# -----------------------------------------------------------------------------
+# CompileAll.sh - Compile all CMake build folders in parallel
+#
+# Discovers all cmake-build* and build/* folders and compiles them sequentially.
+# Sources Intel oneAPI environment if available.
+#
+# Usage: ./CompileAll.sh
+# -----------------------------------------------------------------------------
 set -e
 
 if [ -f "/opt/intel/oneapi/setvars.sh" ]; then

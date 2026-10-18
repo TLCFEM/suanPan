@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-
+# -----------------------------------------------------------------------------
+# Format.sh - Format source code with clang-format or cf
+#
+# Formats C/C++/Header files across the project using clang-format or cf.
+# Excludes third-party code and build directories.
+#
+# Usage: ./Format.sh
+# -----------------------------------------------------------------------------
 ROOT_DIR=$(dirname "$(dirname "$(realpath "$0")")")
 
 EXCLUDE_PATTERNS=("Include" "Toolbox/superlu*" "cmake*" "build*")

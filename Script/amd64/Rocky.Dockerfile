@@ -1,3 +1,9 @@
+# amd64/Rocky.Dockerfile - Build AMD64 suanPan binary with Intel MKL
+# 
+# Uses tlcfem/suanpan-env:latest as base, compiles suanPan with Intel MKL
+# and creates a minimal runtime RPM package for deployment on AMD64 systems.
+# 
+# Build: docker build -f amd64/Rocky.Dockerfile -t tlcfem/suanpan-amd64:latest .
 FROM tlcfem/suanpan-env:latest AS build
 
 RUN git clone --recurse-submodules --branch dev --depth 1 https://github.com/TLCFEM/suanPan.git && cd suanPan && mkdir build && cd build && \

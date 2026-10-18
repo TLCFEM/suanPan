@@ -1,3 +1,9 @@
+# Fedora.Dockerfile - Build suanPan on Fedora 44
+# 
+# Compiles suanPan with Intel oneAPI MKL and creates a Fedora RPM package.
+# Includes VTK for visualization support.
+# 
+# Build: docker build -f Fedora.Dockerfile -t tlcfem/suanpan-fedora:latest .
 FROM fedora:44 AS build
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \

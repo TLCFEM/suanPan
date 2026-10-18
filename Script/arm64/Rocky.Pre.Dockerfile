@@ -1,3 +1,9 @@
+# arm64/Rocky.Pre.Dockerfile - Build dependencies for ARM64 architecture
+# 
+# Creates a base image with ARM64-specific dependencies (OpenBLAS, TBB, VTK)
+# compiled for Rocky Linux 10 on ARM64.
+# 
+# Build: docker build -f arm64/Rocky.Pre.Dockerfile -t tlcfem/suanpan-env:latest .
 FROM almalinux:10
 
 RUN dnf install -y epel-release && crb enable

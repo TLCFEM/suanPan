@@ -1,22 +1,13 @@
 #!/usr/bin/env bash
 # -----------------------------------------------------------------------------
-# Version.sh
+# Version.sh - Update project version across all files
 #
-# Usage:
-#   Version.sh <major> <minor> <patch>
+# Updates version tags throughout the source tree for major.minor.patch releases.
+# Should be run from the project root.
 #
-# Description:
-#   - Updates all version tags in the source tree to the specified major, minor, and patch numbers.
-#   - Modifies CI/CD workflow files, Chocolatey spec, MSVC resource, application source, CPack config,
-#     Snapcraft config, and citation files.
-#   - Should be run from the root folder of the project.
+# Usage: ./Version.sh <major> <minor> <patch>
 #
-# Requirements:
-#   - bash, realpath, sed, find must be available in PATH.
-#
-# Example:
-#   ./Version.sh 2 1 0
-#
+# Example: ./Version.sh 2 1 0
 # -----------------------------------------------------------------------------
 
 set -e

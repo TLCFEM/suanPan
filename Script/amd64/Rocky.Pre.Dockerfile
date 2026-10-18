@@ -1,3 +1,9 @@
+# amd64/Rocky.Pre.Dockerfile - Build dependencies for AMD64 architecture
+# 
+# Creates a base image with Intel oneAPI MKL, VTK, and other dependencies
+# for compiling suanPan on x86_64 Rocky Linux.
+# 
+# Build: docker build -f amd64/Rocky.Pre.Dockerfile -t tlcfem/suanpan-env:latest .
 # This Dockerfile is creating a base image for compiling suanPan.
 # It preinstalls the MKL library, which is required as a fast linear algebra driver that does the heavy lifting.
 # It installs the VTK library, which is required to generate VTK files for visualization.

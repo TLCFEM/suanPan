@@ -1,33 +1,14 @@
 #!/usr/bin/env bash
 # -----------------------------------------------------------------------------
-# mac-dependency.sh
+# mac-dependency.sh - Download macOS dependencies for CI/CD
 #
-# Downloads and extracts prebuilt library dependencies for macOS runners,
-# organizing them into the appropriate target directory based on the runner
-# image name.
+# Downloads prebuilt library dependencies for macOS GitHub Actions runners
+# and organizes them by runner image type (standard vs xlarge).
 #
-# Usage:
-#   ./mac-dependency.sh <runner-image-name>
+# Usage: ./mac-dependency.sh <runner-image-name>
+#   runner-image-name: GitHub Actions runner image (macos-15-large, macos-15-xlarge, etc.)
 #
-#   <runner-image-name>: The name of the GitHub Actions runner image
-#                        (one of macos-15-large, macos-15-xlarge, macos-26-large, macos-26-xlarge).
-#
-# What it does:
-#   1. Checks that exactly one argument is provided.
-#   2. Sets the target directory:
-#        - If the runner image name contains "xlarge", uses ../Libs/mac-arm.
-#        - Otherwise, uses ../Libs/mac.
-#   3. Removes and recreates the target directory.
-#   4. Downloads and extracts:
-#        - HDF5: Copies all .a files from the extracted lib directory.
-#        - TBB:  Copies all .dylib files from the extracted tbb-install/lib directory.
-#        - OpenBLAS: Copies all .dylib files.
-#   5. Cleans up temporary directories.
-#
-# Requirements:
-#   - wget
-#   - tar
-#
+# Downloads: HDF5, TBB, OpenBLAS, VTK
 # -----------------------------------------------------------------------------
 
 set -e

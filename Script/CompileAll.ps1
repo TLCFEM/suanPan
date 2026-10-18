@@ -1,11 +1,11 @@
-# This script collects all cmake-build* folders and compile them in parallel.
-# It is mainly used to test different compilers and configurations.
-# The cmake-build* naming convention is used by CLion.
-# CLion also enables auto-reloading of CMakeLists.txt files, which means the cmake-build* folders are always up-to-date.
-# One can then invoke this script such that
-# ```ps
-# .\Script\CompileAll.ps1
-# ```
+# -----------------------------------------------------------------------------
+# CompileAll.ps1 - Compile all CMake build folders in parallel (Windows)
+#
+# Discovers all cmake-build* and build/* folders and compiles them in parallel
+# using multiple cores. Primarily used to test different compilers/configurations.
+#
+# Usage: .\CompileAll.ps1
+# -----------------------------------------------------------------------------
 
 if (Test-Path -Path "CompileAll.ps1") { Set-Location -Path .. }
 

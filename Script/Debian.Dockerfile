@@ -1,3 +1,9 @@
+# Debian.Dockerfile - Build suanPan on Debian 12
+# 
+# Compiles suanPan with Intel oneAPI MKL and creates a Debian DEB package.
+# Includes VTK for visualization support.
+# 
+# Build: docker build -f Debian.Dockerfile -t tlcfem/suanpan-debian:latest .
 FROM debian:12 AS build
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends wget gnupg && rm -rf /var/lib/apt/lists/*
