@@ -29,6 +29,9 @@
 <a href="https://chocolatey.org/packages/suanpan"><img src="https://img.shields.io/chocolatey/v/suanpan?color=44cc11" alt="Chocolatey"/></a>
 <a href="https://scoop.sh/#/apps?q=suanpan"><img src="https://img.shields.io/scoop/v/suanpan?color=44cc11" alt="Scoop Version"/></a>
 <a href="https://snapcraft.io/suanpan"><img src="https://snapcraft.io//suanpan/badge.svg" alt="Snap Store"/></a>
+<a href="https://marketplace.visualstudio.com/items?itemName=tlc.suanpan"><img src="https://vsmarketplacebadges.dev/version-short/tlc.suanpan.svg" alt="VS Code Extension"/></a>
+<a href="https://open-vsx.org/extension/tlc/suanpan"><img src="https://img.shields.io/open-vsx/v/tlc/suanpan?color=44cc11" alt="Open VSX Version"/></a>
+</br>
 <a href="https://github.com/TLCFEM/suanPan/releases"><img src="https://img.shields.io/github/downloads/TLCFEM/suanPan/total.svg?color=44cc11&label=github%20download" alt="GitHub Download"/></a>
 <a href="https://hub.docker.com/r/tlcfem/suanpan/tags"><img src="https://img.shields.io/docker/pulls/tlcfem/suanpan?color=44cc11" alt="Docker Image"/></a>
 <a href="https://flathub.org/apps/io.github.tlcfem.suanPan"><img src="https://img.shields.io/flathub/downloads/io.github.tlcfem.suanPan?label=flathub%20install" alt="Flathub"/></a>
@@ -38,9 +41,6 @@
 <a href="https://github.com/TLCFEM/suanPan"><img src="https://img.shields.io/github/languages/top/TLCFEM/suanPan.svg?color=44cc11&logo=c%2B%2B" alt="Main Language"/></a>
 <a href="https://github.com/TLCFEM/suanPan"><img src="https://img.shields.io/github/languages/code-size/TLCFEM/suanPan.svg?color=44cc11" alt="Repository Size"/></a>
 <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTLCFEM%2FsuanPan.svg?type=shield" alt="License Scan"/></a>
-</br>
-<a href="https://marketplace.visualstudio.com/items?itemName=tlc.suanpan"><img src="https://vsmarketplacebadges.dev/version-short/tlc.suanpan.svg" alt="VS Code Extension"/></a>
-<a href="https://open-vsx.org/extension/tlc/suanpan"><img src="https://img.shields.io/open-vsx/v/tlc/suanpan?color=44cc11" alt="Open VSX Version"/></a>
 </p>
 
 </div>
