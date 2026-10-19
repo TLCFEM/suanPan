@@ -10,8 +10,8 @@
 <a href="https://tlcfem.github.io/suanPan-manual/latest/SUMMARY/">📖 Documentation</a> ·
 <a href="Example/">🧪 Examples</a> ·
 <a href="https://github.com/TLCFEM/suanPan/releases">📦 Releases</a> ·
-<a href="https://github.com/TLCFEM/suanPan/issues/new/choose">💡 Request a Feature</a> ·
-<a href="https://github.com/TLCFEM/suanPan/issues">🐛 Report a Bug</a>
+<a href="https://github.com/TLCFEM/suanPan/issues/new?template=FEATURE_REQUEST.yml">💡 Request a Feature</a> ·
+<a href="https://github.com/TLCFEM/suanPan/issues/new?template=BUG_REPORT.yml">🐛 Report a Bug</a>
 </p>
 
 <p>
