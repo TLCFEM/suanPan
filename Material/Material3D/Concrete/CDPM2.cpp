@@ -21,7 +21,6 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/homotopy.hpp>
 #include <Toolbox/tensor.h>
-#include <Toolbox/utility.h>
 
 const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
