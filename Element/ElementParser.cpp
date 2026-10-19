@@ -1473,13 +1473,13 @@ namespace {
             return;
         }
 
-        auto nonlinear = 0u;
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = std::make_unique<F21>(tag, std::move(node_tag), section_id, int_pt, !!nonlinear);
+        return_obj = std::make_unique<F21>(tag, std::move(node_tag), section_id, int_pt, is_true(nonlinear));
     }
 
     void new_f21h(unique_ptr<Element>& return_obj, std::istringstream& command) {
@@ -1507,13 +1507,13 @@ namespace {
             return;
         }
 
-        unsigned nonlinear = 0;
+        std::string nonlinear = "false";
         if(command.eof())
             suanpan_debug("Linear geometry assumed.\n");
         else if(!get_input(command, nonlinear))
             suanpan_error("A valid nonlinear geometry switch is required.\n");
 
-        return_obj = std::make_unique<F21H>(tag, std::move(node_tag), section_id, elastic_length, !!nonlinear);
+        return_obj = std::make_unique<F21H>(tag, std::move(node_tag), section_id, elastic_length, is_true(nonlinear));
     }
 
     void new_f31(unique_ptr<Element>& return_obj, std::istringstream& command) {
