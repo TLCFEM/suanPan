@@ -16,6 +16,7 @@
  ******************************************************************************/
 /**
  * @class Interaction
+ * @brief A base class for pairwise interactions between elements.
  * @author tlc
  * @date 01/12/2025
  * @version 0.1.0

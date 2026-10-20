@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class EigenRecorder
- * @brief A EigenRecorder class.
+ * @brief An EigenRecorder class.
  *
  * @author tlc
  * @date 06/07/2018

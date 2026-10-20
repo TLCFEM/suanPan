@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file SubloadingUtil.h
+ * @brief Utilities for subloading surface material models.
+ *
+ * @author tlc
+ * @date 25/04/2026
+ * @version 0.1.0
+ * @addtogroup Material-3D
+ * @{
+ */
 
 #ifndef SUBLOADINGUTIL_H
 #define SUBLOADINGUTIL_H
@@ -58,3 +68,5 @@ protected:
 };
 
 #endif
+
+//! @}

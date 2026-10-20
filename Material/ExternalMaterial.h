@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ExternalMaterial
- * @brief A ExternalMaterial class.
+ * @brief An ExternalMaterial class.
  *
  * The ExternalMaterial class enables communication across DLL boundary via C style interface.
  * The function has such a signature:

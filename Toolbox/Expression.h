@@ -16,10 +16,11 @@
  ******************************************************************************/
 /**
  * @class Expression
- * @brief A Expression class represents a maths expression.
+ * @brief A mathematical expression.
  *
  * @author tlc
  * @date 12/01/2023
+ * @version 0.1.0
  * @file Expression.h
  * @addtogroup Utility
  * @{

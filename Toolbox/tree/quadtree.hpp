@@ -14,6 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class QuadTree
+ * @brief A bucketed quadtree for spatial queries.
+ *
+ * @author tlc
+ * @date 25/04/2026
+ * @version 0.1.0
+ * @file quadtree.hpp
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef QUADTREE_HPP
 #define QUADTREE_HPP
@@ -114,3 +125,5 @@ public:
 };
 
 #endif
+
+//! @}

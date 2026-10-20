@@ -21,7 +21,7 @@
  * For plane strain soil.
  *
  * @author tlc
- * @date 01/04/24
+ * @date 01/04/2024
  * @version 1.0.0
  * @file DuncanSelig.h
  * @addtogroup Material-2D

@@ -1,3 +1,14 @@
+/**
+ * @class thread_pool
+ * @brief A fixed-size thread pool for asynchronous task execution.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @file thread_pool.hpp
+ * @addtogroup Utility
+ * @{
+ */
 #ifndef THREAD_POOL_HPP
 #define THREAD_POOL_HPP
 
@@ -140,3 +151,5 @@ public:
 };
 
 #endif
+
+//! @}

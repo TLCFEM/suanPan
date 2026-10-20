@@ -17,10 +17,11 @@
 /**
  * @class Storage
  * @brief A candidate Storage class that stores FEM objects.
- * @author T
- * @date 12/20/2018
+ * @author tlc
+ * @date 20/12/2018
  * @version 0.3.0
  * @file Storage.hpp
+ * @addtogroup Domain
  * @{
  */
 

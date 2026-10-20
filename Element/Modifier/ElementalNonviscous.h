@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ElementalNonviscous
- * @brief A ElementalNonviscous damping class.
+ * @brief An ElementalNonviscous damping class.
  *
  * Reference: 10.1016/j.ymssp.2024.111156
  *

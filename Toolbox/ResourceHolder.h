@@ -16,8 +16,10 @@
  ******************************************************************************/
 /**
  * @class ResourceHolder
+ * @brief A copyable resource wrapper that clones its object via `unique_copy()`.
  * @author tlc
  * @date 15/02/2023
+ * @version 0.1.0
  * @file ResourceHolder.h
  * @addtogroup Utility
  * @{

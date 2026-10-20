@@ -16,9 +16,10 @@
  ******************************************************************************/
 /**
  * @class Elastic1D
- * @brief A 1-D Elastic class.
+ * @brief A 1-D linear elastic material.
  * @author tlc
  * @date 27/07/2017
+ * @version 0.1.0
  * @file Elastic1D.h
  * @addtogroup Material-1D
  * @{

@@ -16,9 +16,10 @@
  ******************************************************************************/
 /**
  * @class AsymmElastic1D
- * @brief A 1-D Elastic class.
+ * @brief A 1-D asymmetric elastic material.
  * @author tlc
  * @date 11/04/2023
+ * @version 0.1.0
  * @file AsymmElastic1D.h
  * @addtogroup Material-1D
  * @{

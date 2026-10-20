@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file LoadParser.h
+ * @brief Parses amplitude and load commands.
+ *
+ * @author tlc
+ * @date 17/06/2022
+ * @version 0.1.0
+ * @addtogroup Load
+ * @{
+ */
 
 #ifndef LOADPARSER_H
 #define LOADPARSER_H
@@ -27,3 +37,5 @@ int create_new_amplitude(const std::shared_ptr<DomainBase>&, std::istringstream&
 int create_new_load(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
+
+//! @}

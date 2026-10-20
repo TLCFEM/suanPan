@@ -16,6 +16,7 @@
  ******************************************************************************/
 /**
  * @class cuda_ptr
+ * @brief A RAII wrapper for CUDA device memory.
  * @author tlc
  * @date 17/05/2025
  * @version 0.1.0

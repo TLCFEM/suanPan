@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file vtkParser.h
+ * @brief Parses VTK visualisation commands.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Visualisation
+ * @{
+ */
 
 #ifndef VTKPARSER_H
 #define VTKPARSER_H

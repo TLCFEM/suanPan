@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class Arnoldi
- * @brief A Arnoldi class defines a solver using Arnoldi iteration.
+ * @brief An Arnoldi class defines a solver using Arnoldi iteration.
  * @author tlc
  * @date 19/10/2017
  * @version 0.1.0

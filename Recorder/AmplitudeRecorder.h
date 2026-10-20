@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class AmplitudeRecorder
- * @brief A AmplitudeRecorder class.
+ * @brief An AmplitudeRecorder class.
  *
  * @author tlc
  * @date 16/01/2021

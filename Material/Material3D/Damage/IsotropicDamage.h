@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class IsotropicDamage
- * @brief A IsotropicDamage material class.
+ * @brief An IsotropicDamage material class.
  * @author tlc
  * @date 09/06/2020
  * @version 0.1.0

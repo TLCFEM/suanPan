@@ -14,6 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class triplet_form
+ * @brief Triplet (coordinate) sparse matrix storage.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @file triplet_form.hpp
+ * @addtogroup MetaMat
+ * @{
+ */
 
 #ifndef TRIPLET_FORM_HPP
 #define TRIPLET_FORM_HPP
@@ -720,3 +731,5 @@ template<sp_d data_t, sp_i index_t> triplet_form<data_t, index_t> operator+(trip
 }
 
 #endif
+
+//! @}

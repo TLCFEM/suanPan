@@ -14,6 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class MappingDOF
+ * @brief Maps global and local DoF indices during element assembly.
+ *
+ * @author tlc
+ * @date 25/02/2023
+ * @version 0.1.0
+ * @file MappingDOF.h
+ * @addtogroup Element
+ * @{
+ */
 
 #ifndef MAPPINGDOF_H
 #define MAPPINGDOF_H

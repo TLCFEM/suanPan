@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file homotopy.hpp
+ * @brief Homotopy continuation solver with adaptive step control.
+ *
+ * @author tlc
+ * @date 30/09/2026
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef HOMOTOPY_HPP
 #define HOMOTOPY_HPP

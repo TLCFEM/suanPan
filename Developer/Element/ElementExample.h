@@ -14,6 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class ElementExample
+ * @brief An example element implementation for developers.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @file ElementExample.h
+ * @addtogroup Element
+ * @{
+ */
 
 #ifndef ELEMENTEXAMPLE_H
 #define ELEMENTEXAMPLE_H
@@ -44,3 +55,5 @@ public:
 };
 
 #endif
+
+//! @}

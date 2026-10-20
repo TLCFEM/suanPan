@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file utility.h
+ * @brief General-purpose utility functions used across the project.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef UTILITY_H
 #define UTILITY_H
@@ -201,3 +211,5 @@ bool is_integer(const std::string&);
 double perturb(double, double = 1E-5);
 
 #endif
+
+//! @}

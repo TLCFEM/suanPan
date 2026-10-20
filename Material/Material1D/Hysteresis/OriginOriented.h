@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class OriginOriented
- * @brief A OriginOriented material class.
+ * @brief An OriginOriented material class.
  * @author tlc
  * @date 13/10/2019
  * @version 0.1.0

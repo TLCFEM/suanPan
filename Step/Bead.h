@@ -21,6 +21,8 @@
  * @date 01/10/2017
  * @version 0.3.0
  * @file Bead.h
+ * @addtogroup Step
+ * @{
  */
 
 #ifndef BEAD_H
@@ -63,3 +65,5 @@ public:
 };
 
 #endif
+
+//! @}

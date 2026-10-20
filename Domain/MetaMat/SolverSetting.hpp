@@ -14,6 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class SolverSetting
+ * @brief Solver options shared by sparse and dense matrix solvers.
+ *
+ * @author tlc
+ * @date 13/08/2022
+ * @version 0.1.0
+ * @file SolverSetting.hpp
+ * @addtogroup MetaMat
+ * @{
+ */
 
 #ifndef SOLVERSETTING_HPP
 #define SOLVERSETTING_HPP
@@ -50,3 +61,5 @@ template<sp_d data_t> struct SolverSetting {
 };
 
 #endif
+
+//! @}

@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file ConvergerParser.h
+ * @brief Parses converger commands.
+ *
+ * @author tlc
+ * @date 17/06/2022
+ * @version 0.1.0
+ * @addtogroup Converger
+ * @{
+ */
 
 #ifndef CONVERGERPARSER_H
 #define CONVERGERPARSER_H
@@ -25,3 +35,5 @@ class DomainBase;
 int create_new_converger(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
+
+//! @}

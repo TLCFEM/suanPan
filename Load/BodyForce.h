@@ -17,6 +17,7 @@
 /**
  * @class BodyForce
  * @class GroupBodyForce
+ * @brief Applies body forces to elements and element groups.
  * @author tlc
  * @date 10/07/2020
  * @version 0.1.0

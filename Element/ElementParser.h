@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file ElementParser.h
+ * @brief Parses element, mass, modifier and orientation commands.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Element
+ * @{
+ */
 
 #ifndef ELEMENTPARSER_H
 #define ELEMENTPARSER_H
@@ -29,3 +39,5 @@ int create_new_modifier(const std::shared_ptr<DomainBase>&, std::istringstream&)
 int create_new_orientation(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
+
+//! @}

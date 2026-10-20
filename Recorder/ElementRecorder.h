@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ElementRecorder
- * @brief A ElementRecorder class.
+ * @brief An ElementRecorder class.
  *
  * @author tlc
  * @date 19/10/2017

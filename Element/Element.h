@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class Element
- * @brief A Element class.
+ * @brief The base class for all elements.
  * @author tlc
  * @date 12/01/2020
  * @version 0.3.0

@@ -16,9 +16,10 @@
  ******************************************************************************/
 /**
  * @class Sinh1D
- * @brief A 1D Elastic class.
+ * @brief A 1-D nonlinear elastic material using a sinh law.
  * @author tlc
  * @date 12/12/2022
+ * @version 0.1.0
  * @file Sinh1D.h
  * @addtogroup Material-1D
  * @{

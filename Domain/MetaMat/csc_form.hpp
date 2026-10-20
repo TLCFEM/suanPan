@@ -14,6 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class csc_form
+ * @brief Compressed sparse column storage.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @file csc_form.hpp
+ * @addtogroup MetaMat
+ * @{
+ */
 
 #ifndef CSC_FORM_HPP
 #define CSC_FORM_HPP
@@ -231,3 +242,5 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csc_form<da
 }
 
 #endif
+
+//! @}

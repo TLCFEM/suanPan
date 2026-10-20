@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
+ * @brief Container aliases that use parallel containers when multi-threading is enabled.
  * @author tlc
  * @date 30/05/2022
  * @version 0.1.0

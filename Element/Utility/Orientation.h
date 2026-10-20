@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class Orientation
- * @brief A Orientation class.
+ * @brief An Orientation class.
  *
  * The Orientation class handles transformations between coordinate systems.
  * Be sure to call set_element_ptr() before updating anything.

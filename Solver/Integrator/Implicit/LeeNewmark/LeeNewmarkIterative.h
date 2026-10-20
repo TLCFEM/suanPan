@@ -27,7 +27,7 @@
  * @author tlc
  * @date 15/01/2024
  * @version 0.1.0
- * @file LeeNewmark.h
+ * @file LeeNewmarkIterative.h
  * @addtogroup Integrator
  * @{
  */

@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file CatchHeader.h
+ * @brief Common Catch2 includes and aliases for unit tests.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef CATCHHEADER_H
 #define CATCHHEADER_H
@@ -23,3 +33,5 @@
 using Catch::Approx;
 
 #endif
+
+//! @}

@@ -1,3 +1,14 @@
+/**
+ * @file resource.h
+ * @brief Microsoft Visual C++ resource identifiers.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
+
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by suanPan.rc
@@ -17,3 +28,5 @@
 #define _APS_NEXT_SYMED_VALUE 101
 #endif
 #endif
+
+//! @}

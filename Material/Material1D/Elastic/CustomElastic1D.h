@@ -16,9 +16,10 @@
  ******************************************************************************/
 /**
  * @class CustomElastic1D
- * @brief A 1D Elastic class using custom constitutive equation.
+ * @brief A 1-D elastic material defined by a custom expression.
  * @author tlc
  * @date 12/01/2023
+ * @version 0.1.0
  * @file CustomElastic1D.h
  * @addtogroup Material-1D
  * @{

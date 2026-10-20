@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class AFC
- * @brief A AFC material class.
+ * @brief An AFC material class.
  * @author tlc
  * @date 30/03/2019
  * @version 0.1.0
