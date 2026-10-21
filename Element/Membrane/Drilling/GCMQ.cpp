@@ -40,7 +40,9 @@ mat GCMQ::form_transformation(const mat& jacobian) {
     trans_mat(1, 2) = 2. * jacobian(1, 0) * jacobian(1, 1);
     trans_mat(2, 2) = jacobian(0, 0) * jacobian(1, 1) + jacobian(0, 1) * jacobian(1, 0);
 
-    return trans_mat / accu(square(trans_mat));
+    trans_mat *= det(jacobian);
+
+    return trans_mat;
 }
 
 mat GCMQ::form_enhanced_strain(const vec& coor, const int num_enhanced_mode) {
@@ -49,10 +51,6 @@ mat GCMQ::form_enhanced_strain(const vec& coor, const int num_enhanced_mode) {
     if(auto &X = coor(0), &Y = coor(1); 1 == num_enhanced_mode) {
         poly(0, 0) = 3. * X * X - 1.;
         poly(1, 0) = 3. * Y * Y - 1.;
-    }
-    else if(2 == num_enhanced_mode) {
-        poly(2, 1) = poly(0, 0) = 3. * X * X - 1.;
-        poly(2, 0) = poly(1, 1) = 3. * Y * Y - 1.;
     }
     else throw std::invalid_argument("not supported");
 
@@ -93,12 +91,13 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
         vec t_vec{X, Y};
         const auto pn = compute_shape_function(t_vec, 1);
         const mat jacob = pn * ele_coor;
-        auto& c_pt = int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, material_proto->unique_copy());
+        const auto weight = plan(I, 2) * thickness;
+        auto& c_pt = int_pt.emplace_back(std::move(t_vec), det(jacob) * weight, material_proto->unique_copy());
 
         c_pt.poly_stress = shape::stress12(iso_mapping * form_stress_mode(X, Y));
         c_pt.poly_strain = solve(mat_stiffness, c_pt.poly_stress);
 
-        M += c_pt.factor * c_pt.poly_stress.t() * jacob_trans * form_enhanced_strain(c_pt.coor, enhanced_mode);
+        M += weight * c_pt.poly_stress.t() * jacob_trans * form_enhanced_strain(c_pt.coor, enhanced_mode);
         N += c_pt.factor * c_pt.poly_stress.t() * form_displacement_dn(solve(jacob, pn), solve(jacob, form_drilling_dn(c_pt.coor, diff_coor)));
         H += c_pt.factor * c_pt.poly_stress.t() * c_pt.poly_strain;
         HTT += c_pt.factor * c_pt.poly_strain.t() * mat_stiffness * c_pt.poly_strain;
