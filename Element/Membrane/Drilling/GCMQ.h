@@ -45,12 +45,11 @@ class GCMQ final : public SGCMQ {
 
     mat HT, NT, MT, N, M; // constant matrices
 
-    mat initial_viwt, trial_viwt, current_viwt;
+    mat initial_viz, trial_viz, current_viz;
     vec trial_vif, current_vif;
     vec trial_zeta, current_zeta;   // enhanced strain
     vec trial_beta, current_beta;   // strain
     vec trial_alpha, current_alpha; // stress
-    vec trial_q, current_q;
 
     vec pre_disp;
 
