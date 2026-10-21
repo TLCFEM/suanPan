@@ -113,7 +113,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     const mat T = HTT * MT, W = NT.t() * T;
 
-    trial_stiffness = current_stiffness = initial_stiffness = NT.t() * HTT * NT - W * (trial_viwt = current_viwt = initial_viwt = solve(MT.t() * T, W.t()));
+    trial_stiffness = current_stiffness = initial_stiffness = NT.t() * HTT * NT - W * (trial_viz = current_viz = initial_viz = solve(MT.t() * T, MT.t() * HTT * NT));
 
     pre_disp.zeros(m_size);
 
@@ -133,7 +133,7 @@ int GCMQ::update_status() {
     vec incre_disp = -pre_disp;
     incre_disp += pre_disp = get_incre_displacement();
 
-    const vec incre_zeta = -trial_viwt * incre_disp - trial_vif;
+    const vec incre_zeta = -trial_viz * incre_disp - trial_vif;
 
     trial_zeta += incre_zeta;
     trial_beta += NT * incre_disp + MT * incre_zeta;
@@ -151,11 +151,11 @@ int GCMQ::update_status() {
 
     trial_alpha = solve(HT, local_stress);
 
-    if(!solve(trial_viwt, V, W.t())) return SUANPAN_FAIL;
+    if(!solve(trial_viz, V, MT.t() * local_stiffness * NT)) return SUANPAN_FAIL;
     if(!solve(trial_vif, V, M.t() * trial_alpha)) return SUANPAN_FAIL;
 
     trial_resistance = N.t() * trial_alpha - W * trial_vif;
-    trial_stiffness = T * (NT - MT * trial_viwt);
+    trial_stiffness = T * (NT - MT * trial_viz);
 
     return SUANPAN_SUCCESS;
 }
@@ -165,7 +165,7 @@ int GCMQ::commit_status() {
     current_beta = trial_beta;
     current_alpha = trial_alpha;
     current_vif = trial_vif;
-    current_viwt = trial_viwt;
+    current_viz = trial_viz;
 
     pre_disp.zeros();
 
@@ -180,7 +180,7 @@ int GCMQ::clear_status() {
 
     pre_disp.zeros();
 
-    current_viwt = trial_viwt = initial_viwt;
+    current_viz = trial_viz = initial_viz;
 
     return SGCMQ::clear_status();
 }
@@ -190,7 +190,7 @@ int GCMQ::reset_status() {
     trial_beta = current_beta;
     trial_alpha = current_alpha;
     trial_vif = current_vif;
-    trial_viwt = current_viwt;
+    trial_viz = current_viz;
 
     pre_disp.zeros();
 
