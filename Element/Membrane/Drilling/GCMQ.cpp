@@ -78,10 +78,12 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto jacob_trans = form_transformation(shape::quad(vec{0., 0.}, 1) * ele_coor);
 
-    mat H(11, 11, fill::zeros), HTT(11, 11, fill::zeros);
+    constexpr auto l_size = 12u; // local size
 
-    N.zeros(11, 12);
-    M.zeros(11, enhanced_mode);
+    mat H(l_size, l_size, fill::zeros), HTT(l_size, l_size, fill::zeros);
+
+    N.zeros(l_size, m_size);
+    M.zeros(l_size, enhanced_mode);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
@@ -93,7 +95,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
         const mat jacob = pn * ele_coor;
         auto& c_pt = int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, material_proto->unique_copy());
 
-        c_pt.poly_stress = shape::stress11(iso_mapping * form_stress_mode(X, Y));
+        c_pt.poly_stress = shape::stress12(iso_mapping * form_stress_mode(X, Y));
         c_pt.poly_strain = solve(mat_stiffness, c_pt.poly_stress);
 
         M += c_pt.factor * c_pt.poly_stress.t() * jacob_trans * form_enhanced_strain(c_pt.coor, enhanced_mode);
@@ -117,9 +119,8 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_vif = current_vif.zeros(enhanced_mode);
     trial_zeta = current_zeta.zeros(enhanced_mode);
-    trial_beta = current_beta.zeros(11);
-    trial_alpha = current_alpha.zeros(11);
-    trial_q = current_q.zeros(11);
+    trial_beta = current_beta.zeros(l_size);
+    trial_alpha = current_alpha.zeros(l_size);
 
     form_mass(material_proto->get_density(), diff_coor);
 
@@ -137,8 +138,9 @@ int GCMQ::update_status() {
     trial_zeta += incre_zeta;
     trial_beta += NT * incre_disp + MT * incre_zeta;
 
-    vec local_stress(11, fill::zeros);
-    mat local_stiffness(11, 11, fill::zeros);
+    constexpr auto l_size = 12u;
+    vec local_stress(l_size, fill::zeros);
+    mat local_stiffness(l_size, l_size, fill::zeros);
     for(const auto& t_pt : int_pt) {
         if(t_pt.m_material->update_trial_status(t_pt.poly_strain * trial_beta) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
         local_stress += t_pt.factor * t_pt.poly_strain.t() * t_pt.m_material->get_trial_stress();
@@ -162,7 +164,6 @@ int GCMQ::commit_status() {
     current_zeta = trial_zeta;
     current_beta = trial_beta;
     current_alpha = trial_alpha;
-    current_q = trial_q;
     current_vif = trial_vif;
     current_viwt = trial_viwt;
 
@@ -175,7 +176,6 @@ int GCMQ::clear_status() {
     trial_zeta = current_zeta.zeros();
     trial_beta = current_beta.zeros();
     trial_alpha = current_alpha.zeros();
-    trial_q = current_q.zeros();
     trial_vif = current_vif.zeros();
 
     pre_disp.zeros();
@@ -189,7 +189,6 @@ int GCMQ::reset_status() {
     trial_zeta = current_zeta;
     trial_beta = current_beta;
     trial_alpha = current_alpha;
-    trial_q = current_q;
     trial_vif = current_vif;
     trial_viwt = current_viwt;
 
@@ -261,18 +260,18 @@ mat GCMQ::GetData(const OutputType P) {
 
     if(OutputType::S == P) {
         mat t_stress(6, m_node, fill::zeros);
-        t_stress(uvec{0, 1, 3}, uvec{0}) = shape::stress11(iso_mapping * form_stress_mode(-1., -1.)) * current_alpha;
-        t_stress(uvec{0, 1, 3}, uvec{1}) = shape::stress11(iso_mapping * form_stress_mode(1., -1.)) * current_alpha;
-        t_stress(uvec{0, 1, 3}, uvec{2}) = shape::stress11(iso_mapping * form_stress_mode(1., 1.)) * current_alpha;
-        t_stress(uvec{0, 1, 3}, uvec{3}) = shape::stress11(iso_mapping * form_stress_mode(-1., 1.)) * current_alpha;
+        t_stress(uvec{0, 1, 3}, uvec{0}) = shape::stress12(iso_mapping * form_stress_mode(-1., -1.)) * current_alpha;
+        t_stress(uvec{0, 1, 3}, uvec{1}) = shape::stress12(iso_mapping * form_stress_mode(1., -1.)) * current_alpha;
+        t_stress(uvec{0, 1, 3}, uvec{2}) = shape::stress12(iso_mapping * form_stress_mode(1., 1.)) * current_alpha;
+        t_stress(uvec{0, 1, 3}, uvec{3}) = shape::stress12(iso_mapping * form_stress_mode(-1., 1.)) * current_alpha;
         return t_stress;
     }
     if(OutputType::E == P) {
         mat t_strain(6, m_node, fill::zeros);
-        t_strain(uvec{0, 1, 3}, uvec{0}) = solve(mat_stiffness, shape::stress11(iso_mapping * form_stress_mode(-1., -1.)) * current_beta);
-        t_strain(uvec{0, 1, 3}, uvec{1}) = solve(mat_stiffness, shape::stress11(iso_mapping * form_stress_mode(1., -1.)) * current_beta);
-        t_strain(uvec{0, 1, 3}, uvec{2}) = solve(mat_stiffness, shape::stress11(iso_mapping * form_stress_mode(1., 1.)) * current_beta);
-        t_strain(uvec{0, 1, 3}, uvec{3}) = solve(mat_stiffness, shape::stress11(iso_mapping * form_stress_mode(-1., 1.)) * current_beta);
+        t_strain(uvec{0, 1, 3}, uvec{0}) = solve(mat_stiffness, shape::stress12(iso_mapping * form_stress_mode(-1., -1.)) * current_beta);
+        t_strain(uvec{0, 1, 3}, uvec{1}) = solve(mat_stiffness, shape::stress12(iso_mapping * form_stress_mode(1., -1.)) * current_beta);
+        t_strain(uvec{0, 1, 3}, uvec{2}) = solve(mat_stiffness, shape::stress12(iso_mapping * form_stress_mode(1., 1.)) * current_beta);
+        t_strain(uvec{0, 1, 3}, uvec{3}) = solve(mat_stiffness, shape::stress12(iso_mapping * form_stress_mode(-1., 1.)) * current_beta);
         return t_strain;
     }
 

@@ -50,7 +50,6 @@ class GCMQ final : public SGCMQ {
     vec trial_zeta, current_zeta;   // enhanced strain
     vec trial_beta, current_beta;   // strain
     vec trial_alpha, current_alpha; // stress
-    vec trial_q, current_q;
 
     vec pre_disp;
 
