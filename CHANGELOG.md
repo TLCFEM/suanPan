@@ -4,6 +4,10 @@
 
 1. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
+## version 4.2.1
+
+1. fix the tangent stiffness matrix formulation in GCMQ element [#389](https://github.com/TLCFEM/suanPan/pull/389)
+
 ## version 4.2
 
 1. (**breaking**) change the behaviour of criterion DoF tokens, similar to the change made in v4.0, use explicit tokens for unconventional DoFs [#368](https://github.com/TLCFEM/suanPan/pull/368)
