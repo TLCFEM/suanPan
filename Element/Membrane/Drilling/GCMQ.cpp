@@ -78,12 +78,10 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto jacob_trans = form_transformation(shape::quad(vec{0., 0.}, 1) * ele_coor);
 
-    constexpr auto l_size = 12u; // local size
+    mat H(local_size, local_size, fill::zeros), HTT(local_size, local_size, fill::zeros);
 
-    mat H(l_size, l_size, fill::zeros), HTT(l_size, l_size, fill::zeros);
-
-    N.zeros(l_size, m_size);
-    M.zeros(l_size, enhanced_mode);
+    N.zeros(local_size, m_size);
+    M.zeros(local_size, enhanced_mode);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
@@ -120,8 +118,8 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     trial_vif = current_vif.zeros(enhanced_mode);
     trial_zeta = current_zeta.zeros(enhanced_mode);
-    trial_beta = current_beta.zeros(l_size);
-    trial_alpha = current_alpha.zeros(l_size);
+    trial_beta = current_beta.zeros(local_size);
+    trial_alpha = current_alpha.zeros(local_size);
 
     form_mass(material_proto->get_density(), diff_coor);
 
@@ -139,9 +137,8 @@ int GCMQ::update_status() {
     trial_zeta += incre_zeta;
     trial_beta += NT * incre_disp + MT * incre_zeta;
 
-    constexpr auto l_size = 12u;
-    vec local_stress(l_size, fill::zeros);
-    mat local_stiffness(l_size, l_size, fill::zeros);
+    vec local_stress(local_size, fill::zeros);
+    mat local_stiffness(local_size, local_size, fill::zeros);
     for(const auto& t_pt : int_pt) {
         if(t_pt.m_material->update_trial_status(t_pt.poly_strain * trial_beta) != SUANPAN_SUCCESS) return SUANPAN_FAIL;
         local_stress += t_pt.factor * t_pt.poly_strain.t() * t_pt.m_material->get_trial_stress();
