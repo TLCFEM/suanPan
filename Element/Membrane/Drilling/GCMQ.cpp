@@ -45,24 +45,16 @@ mat GCMQ::form_transformation(const mat& jacobian) {
     return trans_mat;
 }
 
-mat GCMQ::form_enhanced_strain(const vec& coor, const int num_enhanced_mode) {
-    mat poly(3, num_enhanced_mode, fill::zeros);
+mat GCMQ::form_enhanced_strain(const vec& coor) {
+    mat poly(3, enhanced_mode, fill::zeros);
 
-    if(auto &X = coor(0), &Y = coor(1); 1 == num_enhanced_mode) {
+    auto &X = coor(0), &Y = coor(1);
+
+    if constexpr(1u <= enhanced_mode) {
         poly(0, 0) = 3. * X * X - 1.;
         poly(1, 0) = 3. * Y * Y - 1.;
     }
-    else if(2 == num_enhanced_mode) {
-        poly(2, 1) = poly(0, 0) = 3. * X * X - 1.;
-        poly(2, 0) = poly(1, 1) = 3. * Y * Y - 1.;
-    }
-    // else if(4 == num_enhanced_mode) {
-    //     poly(0, 0) = 3. * X * X - 1.;
-    //     poly(1, 0) = 3. * Y * Y - 1.;
-    //     poly(0, 2) = -(poly(1, 2) = poly(2, 1) = (X + Y) * (X - Y));
-    //     poly(0, 3) = poly(1, 3) = X * Y;
-    // }
-    else throw std::invalid_argument("not supported");
+    if constexpr(2u <= enhanced_mode) poly(2, 1) = (X + Y) * (X - Y);
 
     return poly;
 }
@@ -107,7 +99,7 @@ int GCMQ::initialize(const shared_ptr<DomainBase>& D) {
         c_pt.poly_stress = shape::stress12(iso_mapping * form_stress_mode(X, Y));
         c_pt.poly_strain = solve(mat_stiffness, c_pt.poly_stress);
 
-        M += weight * c_pt.poly_stress.t() * jacob_trans * form_enhanced_strain(c_pt.coor, enhanced_mode);
+        M += weight * c_pt.poly_stress.t() * jacob_trans * form_enhanced_strain(c_pt.coor);
         N += c_pt.factor * c_pt.poly_stress.t() * form_displacement_dn(solve(jacob, pn), solve(jacob, form_drilling_dn(c_pt.coor, diff_coor)));
         H += c_pt.factor * c_pt.poly_stress.t() * c_pt.poly_strain;
         HTT += c_pt.factor * c_pt.poly_strain.t() * mat_stiffness * c_pt.poly_strain;

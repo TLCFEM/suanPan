@@ -39,7 +39,7 @@
 class IntegrationPlan;
 
 class GCMQ final : public SGCMQ {
-    static constexpr int enhanced_mode = 2;
+    static constexpr unsigned enhanced_mode{2u};
 
     const mat mat_stiffness, iso_mapping;
 
@@ -54,7 +54,7 @@ class GCMQ final : public SGCMQ {
     vec pre_disp;
 
     static mat form_transformation(const mat&);
-    static mat form_enhanced_strain(const vec&, int);
+    static mat form_enhanced_strain(const vec&);
 
 public:
     using SGCMQ::SGCMQ;
