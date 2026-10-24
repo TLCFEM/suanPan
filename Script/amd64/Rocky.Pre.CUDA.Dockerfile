@@ -13,9 +13,9 @@ RUN dnf install -y dnf-plugins-core && \
     dnf clean all
 
 # changes of mkl sparse utility names force to install an older version
-RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6a17080f-f0de-41b9-b587-52f92512c59a/intel-onemkl-2025.3.1.11_offline.sh && \
-    bash ./intel-onemkl-2025.3.1.11_offline.sh -a --silent --eula accept && \
-    rm intel-onemkl-2025.3.1.11_offline.sh
+RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/97415287-271a-4d14-967f-72e2d9ceeb1e/intel-onemkl-2026.2.0.890_offline.sh && \
+    bash ./intel-onemkl-2026.2.0.890_offline.sh -a --silent --eula accept && \
+    rm intel-onemkl-2026.2.0.890_offline.sh
 
 RUN mkdir magma-build && cd magma-build && \
     wget -q https://icl.utk.edu/projectsfiles/magma/downloads/magma-2.10.0.tar.gz && tar xf magma-2.10.0.tar.gz && \
