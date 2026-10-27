@@ -186,7 +186,7 @@ template<sp_d data_t, sp_i index_t> void csc_form<data_t, index_t>::print() cons
 
     index_t c_idx = 1;
     for(index_t I = 0; I < n_elem; ++I) {
-        if(I >= col_ptr[c_idx]) ++c_idx;
+        while(I >= col_ptr[c_idx]) ++c_idx;
         suanpan_info("({}, {}) ===> {:+.8E}\n", row_idx[I], c_idx - 1, val_idx[I]);
     }
 }
@@ -206,38 +206,15 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csc_form<da
         val_idx[I] = data_t(in_mat.val_idx[I]);
     });
 
-    in_it current_pos = 0, current_col = 0;
-
-    while(current_pos < in_mat.n_elem)
-        if(in_mat.col_idx[current_pos] < current_col) ++current_pos;
-        else col_ptr[current_col++] = index_t(current_pos) + shift;
-
     col_ptr[0] = shift;
-    col_ptr[n_cols] = n_elem + shift;
+    index_t current_col{0};
+    for(index_t I{0}; I < index_t(in_mat.n_elem); ++I)
+        while(current_col < index_t(in_mat.col_idx[I])) col_ptr[++current_col] = I + shift;
+    while(current_col < n_cols) col_ptr[++current_col] = n_elem + shift;
 }
 
 template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csc_form<data_t, index_t>& csc_form<data_t, index_t>::operator=(triplet_form<in_dt, in_it>& in_mat) {
-    in_mat.csc_condense();
-
-    access::rw(n_rows) = index_t(in_mat.n_rows);
-    access::rw(n_cols) = index_t(in_mat.n_cols);
-
-    init(access::rw(n_elem) = index_t(in_mat.n_elem));
-
-    suanpan::for_each(in_mat.n_elem, [&](const in_it I) {
-        row_idx[I] = index_t(in_mat.row_idx[I]);
-        val_idx[I] = data_t(in_mat.val_idx[I]);
-    });
-
-    in_it current_pos = 0, current_col = 0;
-
-    while(current_pos < in_mat.n_elem)
-        if(in_mat.col_idx[current_pos] < current_col) ++current_pos;
-        else col_ptr[current_col++] = index_t(current_pos);
-
-    col_ptr[0] = index_t(0);
-    col_ptr[n_cols] = n_elem;
-
+    *this = csc_form(in_mat, SparseBase::ZERO, false);
     return *this;
 }
 

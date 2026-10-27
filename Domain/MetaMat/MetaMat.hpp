@@ -248,7 +248,7 @@ template<sp_d data_t, sp_i index_t> Mat<data_t> to_mat(const csr_form<data_t, in
 
     index_t c_idx = 1;
     for(index_t I = 0; I < in_mat.n_elem; ++I) {
-        if(I >= in_mat.row_mem()[c_idx]) ++c_idx;
+        while(I >= in_mat.row_mem()[c_idx]) ++c_idx;
         out_mat(c_idx - 1, in_mat.col_mem()[I]) += in_mat.val_mem()[I];
     }
 
@@ -260,7 +260,7 @@ template<sp_d data_t, sp_i index_t> Mat<data_t> to_mat(const csc_form<data_t, in
 
     index_t c_idx = 1;
     for(index_t I = 0; I < in_mat.n_elem; ++I) {
-        if(I >= in_mat.col_mem()[c_idx]) ++c_idx;
+        while(I >= in_mat.col_mem()[c_idx]) ++c_idx;
         out_mat(in_mat.row_mem()[I], c_idx - 1) += in_mat.val_mem()[I];
     }
 

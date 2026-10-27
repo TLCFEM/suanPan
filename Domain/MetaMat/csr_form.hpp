@@ -185,7 +185,7 @@ template<sp_d data_t, sp_i index_t> void csr_form<data_t, index_t>::print() cons
 
     index_t c_idx = 1;
     for(index_t I = 0; I < n_elem; ++I) {
-        if(I >= row_ptr[c_idx]) ++c_idx;
+        while(I >= row_ptr[c_idx]) ++c_idx;
         suanpan_info("({}, {}) ===> {:+.8E}\n", c_idx - 1, col_idx[I], val_idx[I]);
     }
 }
@@ -227,38 +227,15 @@ template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csr_form<da
         val_idx[I] = data_t(in_mat.val_idx[I]);
     });
 
-    in_it current_pos = 0, current_row = 0;
-
-    while(current_pos < in_mat.n_elem)
-        if(in_mat.row_idx[current_pos] < current_row) ++current_pos;
-        else row_ptr[current_row++] = index_t(current_pos) + shift;
-
     row_ptr[0] = shift;
-    row_ptr[n_rows] = n_elem + shift;
+    index_t current_row{0};
+    for(index_t I{0}; I < index_t(in_mat.n_elem); ++I)
+        while(current_row < index_t(in_mat.row_idx[I])) row_ptr[++current_row] = I + shift;
+    while(current_row < n_rows) row_ptr[++current_row] = n_elem + shift;
 }
 
 template<sp_d data_t, sp_i index_t> template<sp_d in_dt, sp_i in_it> csr_form<data_t, index_t>& csr_form<data_t, index_t>::operator=(triplet_form<in_dt, in_it>& in_mat) {
-    in_mat.csr_condense();
-
-    access::rw(n_rows) = index_t(in_mat.n_rows);
-    access::rw(n_cols) = index_t(in_mat.n_cols);
-
-    init(access::rw(n_elem) = index_t(in_mat.n_elem));
-
-    suanpan::for_each(in_mat.n_elem, [&](const in_it I) {
-        col_idx[I] = index_t(in_mat.col_idx[I]);
-        val_idx[I] = data_t(in_mat.val_idx[I]);
-    });
-
-    in_it current_pos = 0, current_row = 0;
-
-    while(current_pos < in_mat.n_elem)
-        if(in_mat.row_idx[current_pos] < current_row) ++current_pos;
-        else row_ptr[current_row++] = index_t(current_pos);
-
-    row_ptr[0] = index_t(0);
-    row_ptr[n_rows] = n_elem;
-
+    *this = csr_form(in_mat, SparseBase::ZERO, false);
     return *this;
 }
 
