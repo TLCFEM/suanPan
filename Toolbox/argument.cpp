@@ -25,6 +25,7 @@
 #include <UnitTest/CatchHeader.h>
 #include <argparse/argparse.hpp>
 #include <array>
+#include <replxx/replxx.hxx>
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
@@ -341,11 +342,19 @@ void print_version() {
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
-    const auto history_path = get_history_path();
-
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppRedundantBooleanExpressionArgument
-    if(!exists(history_path) and 0 == comm_rank) {
+    if(comm_size > 1) {
+        suanpan_error("CLI mode is only supported on non-distributed platforms.\n");
+        return;
+    }
+
+    std::string header{"suanPan ~<> "};
+    if(SUANPAN_COLOR) header = fmt::format(fg(fmt::color::green_yellow), "suanPan ~<> ");
+
+    const auto history_path = get_history_path();
+    const auto history_str = history_path.generic_string();
+
+    if(!exists(history_path)) {
         suanpan_info("To go through a brief introduction, use '");
         suanpan_highlight("overview");
         suanpan_info("'.\nTo check the build info, use '");
@@ -357,18 +366,21 @@ void cli_mode(const shared_ptr<Bead>& model) {
         suanpan_info("'.\n\n");
     }
 
-    ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
+    replxx::Replxx rx;
+    rx.install_window_change_handler();
+    rx.set_max_history_size(4096);
+    rx.history_sync(history_str);
 
     std::string all_line;
     while(true) {
-        std::string command_line;
-        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-        if(0 == comm_rank)
-            suanpan_info("suanPan ~<> ");
-        getline(std::cin, command_line);
-        if(!normalise_command(all_line, command_line)) continue;
+        const auto input = rx.input(header);
+        if(nullptr == input) return;
+
+        if(std::string command_line{input}; !normalise_command(all_line, command_line)) continue;
+
         // now process the command
-        if(output_file.is_open()) output_file << all_line << '\n';
+        rx.history_add(all_line);
+        rx.history_sync(history_str);
         if(process_command(model, all_line) == SUANPAN_EXIT) return;
         all_line.clear();
     }

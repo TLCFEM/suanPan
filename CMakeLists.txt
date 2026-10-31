@@ -502,6 +502,7 @@ else ()
     endif ()
 endif ()
 
+add_subdirectory(Include/replxx)
 add_subdirectory(Constraint)
 add_subdirectory(Converger)
 add_subdirectory(Database)
@@ -515,6 +516,8 @@ add_subdirectory(Solver)
 add_subdirectory(Step)
 add_subdirectory(Toolbox)
 add_subdirectory(UnitTest)
+
+target_link_libraries(${PROJECT_NAME} replxx)
 
 if (CMAKE_Fortran_COMPILER)
     find_package(OpenMP REQUIRED COMPONENTS Fortran)
