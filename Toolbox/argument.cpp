@@ -341,11 +341,17 @@ void print_version() {
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(comm_size > 1) {
+        suanpan_error("CLI mode is not available on distributed platforms.\n");
+        return;
+    }
+
     const auto history_path = get_history_path();
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     // ReSharper disable once CppRedundantBooleanExpressionArgument
-    if(!exists(history_path) and 0 == comm_rank) {
+    if(!exists(history_path)) {
         suanpan_info("To go through a brief introduction, use '");
         suanpan_highlight("overview");
         suanpan_info("'.\nTo check the build info, use '");
@@ -361,10 +367,8 @@ void cli_mode(const shared_ptr<Bead>& model) {
 
     std::string all_line;
     while(true) {
+        suanpan_info("suanPan ~<> ");
         std::string command_line;
-        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-        if(0 == comm_rank)
-            suanpan_info("suanPan ~<> ");
         getline(std::cin, command_line);
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
