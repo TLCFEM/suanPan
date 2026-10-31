@@ -367,7 +367,8 @@ void cli_mode(const shared_ptr<Bead>& model) {
     }
 
     replxx::Replxx rhs;
-
+    rhs.install_window_change_handler();
+    rhs.set_max_history_size(4096);
     rhs.history_sync(history_str);
 
     std::string all_line;
