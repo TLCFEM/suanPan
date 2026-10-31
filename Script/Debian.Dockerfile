@@ -15,7 +15,9 @@ RUN mkdir vtk-build && cd vtk-build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.1 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
-RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/suanPan.git && cd suanPan && mkdir build && cd build && \
+RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/suanPan.git && cd suanPan && \
+    ./Script/linux-dependency.sh ubuntu-22.04 && \
+    mkdir build && cd build && \
     cmake \
     -DBUILD_PACKAGE=DEB \
     -DCMAKE_BUILD_TYPE=Release \
@@ -29,7 +31,7 @@ RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/su
     -DCMAKE_INSTALL_PREFIX=/suanPan-debian12 \
     .. && \
     make package -j"$(nproc)" && cp suanPan*.deb / && \
-    tar -C /suanPan-debian12 -czf /suanPan-debian12.tar.gz . \
+    make install && tar -C /suanPan-debian12 -czf /suanPan-debian12.tar.gz . && \
     cd / && rm -r suanPan
 
 FROM debian:12
