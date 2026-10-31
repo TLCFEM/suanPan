@@ -373,11 +373,10 @@ void cli_mode(const shared_ptr<Bead>& model) {
 
     std::string all_line;
     while(true) {
-        auto input = rhs.input(header);
+        const auto input = rhs.input(header);
         if(nullptr == input) return;
 
-        std::string command_line{input};
-        if(!normalise_command(all_line, command_line)) continue;
+        if(std::string command_line{input}; !normalise_command(all_line, command_line)) continue;
 
         // now process the command
         rhs.history_add(all_line);

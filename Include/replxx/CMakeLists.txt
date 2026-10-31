@@ -1,5 +1,3 @@
-find_package(Threads REQUIRED)
-
 add_library(replxx STATIC
         ConvertUTF.cpp
         conversion.cxx
@@ -15,4 +13,7 @@ add_library(replxx STATIC
 )
 
 target_compile_definitions(replxx PUBLIC REPLXX_STATIC)
+
+find_package(Threads REQUIRED)
+
 target_link_libraries(replxx PUBLIC Threads::Threads)
