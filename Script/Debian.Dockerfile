@@ -6,13 +6,9 @@
 # Build: docker build -f Debian.Dockerfile -t tlcfem/suanpan-debian:latest .
 FROM debian:12 AS build
 
-RUN apt-get update -y && apt-get install -y --no-install-recommends wget gnupg && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y --no-install-recommends wget gnupg ca-certificates gcc g++ gfortran cmake git libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev && rm -rf /var/lib/apt/lists/*
 
-RUN wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-RUN echo "deb https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list
-
-RUN apt-get update -y && apt-get install -y --no-install-recommends gcc g++ gfortran cmake git intel-oneapi-mkl-devel libxt-dev freeglut3-dev libxcursor-dev file dpkg-dev
+RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/97415287-271a-4d14-967f-72e2d9ceeb1e/intel-onemkl-2026.2.0.890_offline.sh && sh ./intel-onemkl-2026.2.0.890_offline.sh -a --silent --eula accept && rm ./intel-onemkl-2026.2.0.890_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
     wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.1.tar.gz && tar xf VTK-9.7.1.tar.gz && \
@@ -30,13 +26,16 @@ RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/su
     -DSP_ENABLE_MKL=ON \
     -DSP_ENABLE_SHARED_MKL=OFF \
     -DSP_ENABLE_VTK=ON \
+    -DCMAKE_INSTALL_PREFIX=/suanPan-debian12 \
     .. && \
     make package -j"$(nproc)" && cp suanPan*.deb / && \
+    tar -C /suanPan-debian12 -czf /suanPan-debian12.tar.gz . \
     cd / && rm -r suanPan
 
 FROM debian:12
 
 COPY --from=build /suanPan*.deb /
+COPY --from=build /suanPan-debian12.tar.gz /
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends ./suanPan*.deb && rm ./suanPan*.deb && rm -rf /var/lib/apt/lists/*
 
