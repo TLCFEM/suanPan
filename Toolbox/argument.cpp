@@ -366,21 +366,21 @@ void cli_mode(const shared_ptr<Bead>& model) {
         suanpan_info("'.\n\n");
     }
 
-    replxx::Replxx rhs;
-    rhs.install_window_change_handler();
-    rhs.set_max_history_size(4096);
-    rhs.history_sync(history_str);
+    replxx::Replxx rx;
+    rx.install_window_change_handler();
+    rx.set_max_history_size(4096);
+    rx.history_sync(history_str);
 
     std::string all_line;
     while(true) {
-        const auto input = rhs.input(header);
+        const auto input = rx.input(header);
         if(nullptr == input) return;
 
         if(std::string command_line{input}; !normalise_command(all_line, command_line)) continue;
 
         // now process the command
-        rhs.history_add(all_line);
-        rhs.history_sync(history_str);
+        rx.history_add(all_line);
+        rx.history_sync(history_str);
         if(process_command(model, all_line) == SUANPAN_EXIT) return;
         all_line.clear();
     }
