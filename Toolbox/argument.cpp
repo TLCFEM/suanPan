@@ -25,6 +25,7 @@
 #include <UnitTest/CatchHeader.h>
 #include <argparse/argparse.hpp>
 #include <array>
+#include <replxx/replxx.hxx>
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
@@ -359,15 +360,32 @@ void cli_mode(const shared_ptr<Bead>& model) {
 
     ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
 
+    // line editing and history navigation is provided by replxx
+    replxx::Replxx rhs;
+    if(0 == comm_rank) {
+        // load the existing plain-text history into replxx so that up/down arrow
+        // keys can recall previously issued commands
+        ifstream history_file(history_path);
+        std::string history_line;
+        while(getline(history_file, history_line))
+            if(!history_line.empty() && 0 != history_line.compare(0, 3, "###")) rhs.history_add(history_line);
+    }
+
     std::string all_line;
     while(true) {
         std::string command_line;
-        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-        if(0 == comm_rank)
-            suanpan_info("suanPan ~<> ");
-        getline(std::cin, command_line);
+
+        if(0 == comm_rank) {
+            const char* input = rhs.input("suanPan ~<> ");
+            if(nullptr == input) return; // EOF
+            command_line.assign(input);
+        }
+        else
+            getline(std::cin, command_line);
+
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
+        if(0 == comm_rank) rhs.history_add(all_line);
         if(output_file.is_open()) output_file << all_line << '\n';
         if(process_command(model, all_line) == SUANPAN_EXIT) return;
         all_line.clear();
