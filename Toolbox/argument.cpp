@@ -371,6 +371,92 @@ void cli_mode(const shared_ptr<Bead>& model) {
     rx.set_max_history_size(4096);
     rx.history_sync(history_str);
 
+    static constexpr auto KEYWORDS = std::to_array({
+        "amplitude",
+        "analyse",
+        "analyze",
+        "benchmark",
+        "clear",
+        "command",
+        "constraint",
+        "converger",
+        "criterion",
+        "delete",
+        "disable",
+        "domain",
+        "element",
+        "enable",
+        "erase",
+        "example",
+        "exit",
+        "expression",
+        "file",
+        "fullname",
+        "generate",
+        "group",
+        "import",
+        "initial",
+        "integrator",
+        "license",
+        "list",
+        "load",
+        "material",
+        "materialtest1d",
+        "materialtest2d",
+        "materialtest3d",
+        "materialtestbyload1d",
+        "materialtestbyload2d",
+        "materialtestbyload3d",
+        "materialtestbyloadwithbase3d",
+        "materialtestbystrainhistory",
+        "materialtestbystresshistory",
+        "materialtestwithbase3d",
+        "modifier",
+        "mute",
+        "node",
+        "orientation",
+        "overview",
+        "peek",
+        "plot",
+        "precheck",
+        "protect",
+        "pwd",
+        "qrcode",
+        "quit",
+        "recorder",
+        "remove",
+        "reset",
+        "response_spectrum",
+        "save",
+        "sdof_response",
+        "section",
+        "sectiontest1d",
+        "sectiontest2d",
+        "sectiontest3d",
+        "sectiontestbydeformationhistory",
+        "set",
+        "sleep",
+        "solver",
+        "step",
+        "summary",
+        "suspend",
+        "t",
+        "terminal",
+        "upsampling",
+        "use",
+        "var",
+        "variable",
+        "version",
+    });
+
+    rx.set_completion_callback([](const std::string& trailing_context, int&) {
+        if(trailing_context.find(' ') != std::string::npos) return replxx::Replxx::completions_t{};
+        replxx::Replxx::completions_t completions;
+        for(const auto keyword : KEYWORDS)
+            if(if_startswith(keyword, trailing_context)) completions.emplace_back(keyword);
+        return completions;
+    });
+
     std::string all_line;
     while(true) {
         const auto input = rx.input(header);
