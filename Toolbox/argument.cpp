@@ -342,11 +342,19 @@ void print_version() {
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
-    const auto history_path = get_history_path();
-
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-    // ReSharper disable once CppRedundantBooleanExpressionArgument
-    if(!exists(history_path) and 0 == comm_rank) {
+    if(comm_size > 1) {
+        suanpan_error("CLI mode is only supported on non-distributed platforms.\n");
+        return;
+    }
+
+    std::string header{"suanPan ~<> "};
+    if(SUANPAN_COLOR) header = fmt::format(fg(fmt::color::green_yellow), "suanPan ~<> ");
+
+    const auto history_path = get_history_path();
+    const auto history_str = history_path.generic_string();
+
+    if(!exists(history_path)) {
         suanpan_info("To go through a brief introduction, use '");
         suanpan_highlight("overview");
         suanpan_info("'.\nTo check the build info, use '");
@@ -358,35 +366,21 @@ void cli_mode(const shared_ptr<Bead>& model) {
         suanpan_info("'.\n\n");
     }
 
-    ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
-
-    // line editing and history navigation is provided by replxx
     replxx::Replxx rhs;
-    if(0 == comm_rank) {
-        // load the existing plain-text history into replxx so that up/down arrow
-        // keys can recall previously issued commands
-        ifstream history_file(history_path);
-        std::string history_line;
-        while(getline(history_file, history_line))
-            if(!history_line.empty() && 0 != history_line.compare(0, 3, "###")) rhs.history_add(history_line);
-    }
+
+    rhs.history_sync(history_str);
 
     std::string all_line;
     while(true) {
-        std::string command_line;
+        auto input = rhs.input(header);
+        if(nullptr == input) return;
 
-        if(0 == comm_rank) {
-            const char* input = rhs.input("suanPan ~<> ");
-            if(nullptr == input) return; // EOF
-            command_line.assign(input);
-        }
-        else
-            getline(std::cin, command_line);
-
+        std::string command_line{input};
         if(!normalise_command(all_line, command_line)) continue;
+
         // now process the command
-        if(0 == comm_rank) rhs.history_add(all_line);
-        if(output_file.is_open()) output_file << all_line << '\n';
+        rhs.history_add(all_line);
+        rhs.history_sync(history_str);
         if(process_command(model, all_line) == SUANPAN_EXIT) return;
         all_line.clear();
     }
