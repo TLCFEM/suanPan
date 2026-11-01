@@ -358,6 +358,7 @@ Additional libraries used in **suanPan** are listed below.
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2023.1.0
 - [**VTK**](https://vtk.org/) version 9.7.1
 - [**argparse**](https://github.com/p-ranav/argparse)
+- [**cpp-linenoise**](https://github.com/yhirose/cpp-linenoise)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
 - [**ezp**](https://github.com/TLCFEM/ezp)
 - [**fmt**](https://github.com/fmtlib/fmt) version 12.2.0

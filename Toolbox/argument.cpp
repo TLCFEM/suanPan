@@ -28,7 +28,14 @@
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
+#ifdef SUANPAN_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
 #include <linenoise/linenoise.hpp>
+#ifdef SUANPAN_MSVC
+#pragma warning(pop)
+#endif
 
 #ifdef SUANPAN_MSVC
 #pragma warning(push)
