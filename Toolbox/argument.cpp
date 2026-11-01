@@ -28,6 +28,7 @@
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
+#include <linenoise/linenoise.hpp>
 
 #ifdef SUANPAN_MSVC
 #pragma warning(push)
@@ -363,17 +364,20 @@ void cli_mode(const shared_ptr<Bead>& model) {
         suanpan_info("'.\n\n");
     }
 
-    ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
+    linenoise::SetHistoryMaxLen(4096);
+    linenoise::LoadHistory(history_path.generic_string().c_str());
+
+    std::string prompt{"suanPan ~<> "};
+    if(SUANPAN_COLOR) prompt = fmt::format(fmt::emphasis::bold | fg(fmt::color::deep_sky_blue), "{}", prompt);
 
     std::string all_line;
     while(true) {
-        suanpan_info("suanPan ~<> ");
         std::string command_line;
-        getline(std::cin, command_line);
+        if(linenoise::Readline(prompt.c_str(), command_line)) break;
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
-        if(output_file.is_open()) output_file << all_line << '\n';
         if(process_command(model, all_line) == SUANPAN_EXIT) return;
+        linenoise::AddHistory(all_line.c_str());
         all_line.clear();
     }
 }
