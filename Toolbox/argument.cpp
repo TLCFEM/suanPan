@@ -371,6 +371,84 @@ void cli_mode(const shared_ptr<Bead>& model) {
         suanpan_info("'.\n\n");
     }
 
+    static constexpr std::array TOP_LEVEL_COMMANDS{
+        "amplitude",
+        "analyse",
+        "analyze",
+        "benchmark",
+        "clear",
+        "command",
+        "constraint",
+        "converger",
+        "criterion",
+        "delete",
+        "disable",
+        "domain",
+        "element",
+        "enable",
+        "erase",
+        "example",
+        "exit",
+        "expression",
+        "file",
+        "fullname",
+        "group",
+        "import",
+        "initial",
+        "integrator",
+        "interaction",
+        "license",
+        "list",
+        "load",
+        "material",
+        "modifier",
+        "mute",
+        "node",
+        "orientation",
+        "overview",
+        "peek",
+        "plot",
+        "precheck",
+        "protect",
+        "pwd",
+        "qrcode",
+        "quit",
+        "recorder",
+        "remove",
+        "reset",
+        "response_spectrum",
+        "save",
+        "sdof_response",
+        "section",
+        "set",
+        "sleep",
+        "solver",
+        "step",
+        "summary",
+        "suspend",
+        "t",
+        "terminal",
+        "upsampling",
+        "use",
+        "var",
+        "variable",
+        "version",
+    };
+
+    linenoise::SetCompletionCallback(
+        [](const char* buf, const size_t pos, std::vector<linenoise::Completion>& completions) {
+            const std::string line(buf);
+
+            const auto first_word_end = line.find(' ');
+            const auto boundary = first_word_end == std::string::npos ? line.length() : first_word_end;
+            if(pos > boundary) return;
+
+            const std::string prefix = line.substr(0, pos);
+            for(const auto& command : TOP_LEVEL_COMMANDS)
+                if(std::string_view(command).starts_with(prefix)) completions.push_back({.text = std::string(command), .start = 0, .end = boundary});
+        }
+    );
+
     linenoise::SetHistoryMaxLen(4096);
     linenoise::LoadHistory(history_path.generic_string().c_str());
 
