@@ -1,5 +1,7 @@
 target_sources(${PROJECT_NAME} PRIVATE
         TestColoring.cpp
+        TestColor.cpp
+        TestContainer.cpp
         TestEigen.cpp
         TestExpression.cpp
         TestHomotopy.cpp
@@ -8,6 +10,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestMode.cpp
         TestNURBS.cpp
         TestQuaternion.cpp
+        TestRootFinding.cpp
         TestSampling.cpp
         TestShape.cpp
         TestSolver.cpp
@@ -15,6 +18,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestString.cpp
         TestSurfaceNM.cpp
         TestTensor.cpp
+        TestThreadPool.cpp
         TestTree.cpp
         TestUtility.cpp
 )

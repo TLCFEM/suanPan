@@ -41,3 +41,34 @@ TEST_CASE("RCM", "[Utility.Sorting]") {
         BENCHMARK("RCM CSC") { return sort_rcm(csc_mat); };
     }
 }
+
+TEST_CASE("RCM Is A Valid Permutation", "[Utility.Sorting]") {
+    constexpr uword N = 100;
+
+    for(auto I = 0; I < 10; ++I) {
+        sp_mat B = sprandu(N, N, .02);
+        sp_mat A = B + B.t();
+
+        auto R = sort_rcm(A);
+
+        REQUIRE(N == R.n_elem);
+
+        // R must be a bijection of {0,...,N-1}: every value appears exactly once
+        uvec sorted = sort(R);
+        for(uword J = 0; J < N; ++J) REQUIRE(J == sorted(J));
+    }
+}
+
+TEST_CASE("RCM Of Dense Graph Is A Valid Permutation", "[Utility.Sorting]") {
+    // a fully connected small graph - only checks the permutation validity property
+    constexpr uword N = 30;
+    sp_mat A(N, N);
+    for(uword I = 0; I < N; ++I)
+        for(uword J = 0; J < N; ++J)
+            if(I != J) A(I, J) = 1.;
+
+    const auto R = sort_rcm(A);
+    REQUIRE(N == R.n_elem);
+    uvec sorted = sort(R);
+    for(uword J = 0; J < N; ++J) REQUIRE(J == sorted(J));
+}

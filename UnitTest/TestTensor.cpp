@@ -103,6 +103,138 @@ TEST_CASE("Base Conversion", "[Utility.Tensor]") {
     REQUIRE(Approx(g3_(2)).margin(1E-15) == 1. / 3.);
 }
 
+TEST_CASE("Suanpan Ramp", "[Utility.Tensor]") {
+    REQUIRE(Approx(0.) == suanpan::ramp(-3.));
+    REQUIRE(Approx(0.) == suanpan::ramp(0.));
+    REQUIRE(Approx(2.5) == suanpan::ramp(2.5));
+}
+
+TEST_CASE("Tensor Trace", "[Utility.Tensor]") {
+    const vec a{1., 2., 3., 4., 5., 6.};
+    REQUIRE(Approx(6.) == tensor::trace<3>(a));
+    REQUIRE(Approx(-6.) == tensor::trace<3>(-a));
+    REQUIRE(Approx(21.) == tensor::trace<6>(a));
+    REQUIRE(Approx(-21.) == tensor::trace<6>(-a));
+    // mean is trace divided by dimension
+    REQUIRE(Approx(2.) == tensor::mean<3>(a));
+    REQUIRE(Approx(3.5) == tensor::mean<6>(a));
+}
+
+TEST_CASE("Tensor Deviatoric", "[Utility.Tensor]") {
+    const vec a{3., 6., 9., 2., 4., 8.};
+    const auto m = tensor::mean<3>(a);
+    const auto d = tensor::dev(a);
+    REQUIRE(Approx(0.) == d(0) - (3. - m));
+    REQUIRE(Approx(0.) == d(1) - (6. - m));
+    REQUIRE(Approx(0.) == d(2) - (9. - m));
+    // first three deviatoric components must sum to zero
+    REQUIRE(Approx(0.) == sum(d.head(3)));
+}
+
+TEST_CASE("Tensor Unit Tensors", "[Utility.Tensor]") {
+    const auto I = tensor::unit_symmetric_tensor4();
+    REQUIRE(I.n_rows == I.n_cols);
+    REQUIRE(6 == I.n_rows);
+    // the symmetric fourth-order identity keeps normal (Voigt 0..2) components
+    // and halves shear (Voigt 3..5) components (Voigt factor of 2)
+    const vec strain = {1., 2., 3., 4., 5., 6.};
+    const vec out = I * strain;
+    for(auto J = 0u; J < 3u; ++J) REQUIRE(Approx(strain(J)) == out(J));
+    for(auto J = 3u; J < 6u; ++J) REQUIRE(Approx(.5 * strain(J)) == out(J));
+
+    const auto id = tensor::unit_deviatoric_tensor4();
+    // projecting a purely volumetric strain (equal normal, zero shear in Voigt) yields zero deviator
+    const vec volumetric = {1., 1., 1., 0., 0., 0.};
+    const auto devproj = id * volumetric;
+    REQUIRE(Approx(0.).margin(1E-12) == accu(devproj));
+
+    // projecting a purely deviatoric normal strain (trace-free, no shear) reproduces it
+    const vec deviatoric = {1., 1., -2., 0., 0., 0.};
+    const auto devproj2 = id * deviatoric;
+    REQUIRE(norm(devproj2 - deviatoric) == Approx(0.).margin(1E-12));
+
+    const auto id2 = tensor::unit_deviatoric_tensor4v2();
+    REQUIRE(id2.n_rows == id2.n_cols);
+    REQUIRE(6 == id2.n_rows);
+}
+
+TEST_CASE("Tensor Isotropic Stiffness", "[Utility.Tensor]") {
+    constexpr double E = 200E3, NU = .3;
+    const auto D = tensor::isotropic_stiffness(E, NU);
+    REQUIRE(6 == D.n_rows);
+    REQUIRE(6 == D.n_cols);
+    // symmetric modulus tensor
+    REQUIRE(Approx(0.).margin(1E-6) == accu(D - D.t()));
+
+    const double G = E / (2. + 2. * NU);
+    const double lambda = G * NU / (.5 - NU);
+    // verify a few closed-form entries
+    REQUIRE(Approx(2. * G + lambda) == D(0, 0));
+    REQUIRE(Approx(lambda) == D(0, 1));
+    REQUIRE(Approx(G) == D(3, 3));
+
+    // extra dimension padding
+    const auto D2 = tensor::isotropic_stiffness(E, NU, 2);
+    REQUIRE(8 == D2.n_rows);
+    REQUIRE(8 == D2.n_cols);
+    const auto D3 = tensor::isotropic_stiffness(E, NU, 3);
+    REQUIRE(9 == D3.n_rows);
+    REQUIRE(9 == D3.n_cols);
+}
+
+TEST_CASE("Tensor Orthotropic Stiffness", "[Utility.Tensor]") {
+    const vec mod = {100., 50., 30., 20., 10., 15.};
+    const vec ratio = {.2, .3, .1};
+    const auto D = tensor::orthotropic_stiffness(mod, ratio);
+    REQUIRE(6 == D.n_rows);
+    REQUIRE(6 == D.n_cols);
+    // symmetric compliance inverse construction => symmetric modulus
+    REQUIRE(Approx(0.).margin(1E-8) == accu(D - D.t()));
+    // shear moduli appear verbatim on the diagonal
+    REQUIRE(Approx(20.) == D(3, 3));
+    REQUIRE(Approx(10.) == D(4, 4));
+    REQUIRE(Approx(15.) == D(5, 5));
+}
+
+TEST_CASE("Skew Symmetric Matrix", "[Utility.Tensor]") {
+    const vec r{1., 2., 3.};
+    const auto S = transform::skew_symm(r);
+    REQUIRE(3 == S.n_rows);
+    REQUIRE(3 == S.n_cols);
+    // skew symmetric => S = -S.t()
+    REQUIRE(Approx(0.) == accu(S + S.t()));
+    REQUIRE(Approx(0.) == S(0, 0));
+    REQUIRE(Approx(0.) == S(1, 1));
+    REQUIRE(Approx(0.) == S(2, 2));
+    REQUIRE(Approx(-3.) == S(0, 1));
+    REQUIRE(Approx(3.) == S(1, 0));
+    REQUIRE(Approx(-1.) == S(1, 2));
+    REQUIRE(Approx(1.) == S(2, 1));
+    REQUIRE(Approx(2.) == S(0, 2));
+    REQUIRE(Approx(-2.) == S(2, 0));
+}
+
+TEST_CASE("Rodrigues Rotation", "[Utility.Tensor]") {
+    // a rotation of pi about z axis maps (1,0) to (-1,0)
+    const vec axis{0., 0., datum::pi};
+    const auto R = transform::rodrigues(axis);
+    REQUIRE(3 == R.n_rows);
+    REQUIRE(3 == R.n_cols);
+    REQUIRE(norm(R * vec{1., 0., 0.} - vec{-1., 0., 0.}) == Approx(0.).margin(1E-9));
+
+    // identity rotation about the zero axis
+    const vec zero{0., 0., 0.};
+    REQUIRE(norm(transform::rodrigues(zero) - eye(3, 3)) == Approx(0.).margin(1E-12));
+
+    // rotation matrices must be orthogonal
+    for(auto I = 0; I < 100; ++I) {
+        const vec axis = randn(3);
+        const auto R = transform::rodrigues(axis);
+        REQUIRE(norm(R * R.t() - eye(3, 3)) == Approx(0.).margin(1E-10));
+        REQUIRE(Approx(1.).margin(1E-9) == det(R));
+    }
+}
+
 TEST_CASE("Curvature Tensor", "[Utility.Tensor]") {
     for(auto I = 0; I < 100; ++I) {
         const auto z = randn(2);

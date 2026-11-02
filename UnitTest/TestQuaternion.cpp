@@ -62,4 +62,83 @@ TEST_CASE("Rodrigues Rotation", "[Utility.Rodrigues]") {
         REQUIRE(norm((B.inv() * A).to_pseudo()) < 1E-10);
     }
 }
+
+TEST_CASE("Quaternion Subtraction", "[Utility.Quaternion]") {
+    const Quaternion A(2., 3., 4., 5.);
+    const Quaternion B(1., 2., 3., 4.);
+
+    const auto C = A - B;
+    REQUIRE(Approx(1.) == C.real());
+    REQUIRE(Approx(1.) == C.imag()(0));
+    REQUIRE(Approx(1.) == C.imag()(1));
+    REQUIRE(Approx(1.) == C.imag()(2));
+
+    const auto D = A - A;
+    REQUIRE(Approx(0.) == D.norm());
+}
+
+TEST_CASE("Quaternion Division", "[Utility.Quaternion]") {
+    const Quaternion A(2., 3., 4., 5.);
+    const Quaternion B(1., -2., 6., 3.);
+
+    // A / B == A * inv(B)
+    const auto C = A / B;
+    const auto D = A * B.inv();
+    REQUIRE(Approx(C.real()).margin(1E-12) == D.real());
+    REQUIRE(norm(C.imag() - D.imag()) == Approx(0.).margin(1E-12));
+
+    // |A / B| == |A| / |B|
+    REQUIRE(Approx(std::sqrt(C.norm())) == std::sqrt(A.norm()) / std::sqrt(B.norm()));
+
+    const auto E = B / B;
+    REQUIRE(Approx(1.) == E.real());
+    REQUIRE(norm(E.imag()) == Approx(0.).margin(1E-12));
+}
+
+TEST_CASE("Quaternion Conjugate And Norm", "[Utility.Quaternion]") {
+    const Quaternion A(1., 2., 3., 4.);
+
+    const auto c = A.conj();
+    REQUIRE(Approx(1.) == c.real());
+    REQUIRE(Approx(-2.) == c.imag()(0));
+    REQUIRE(Approx(-3.) == c.imag()(1));
+    REQUIRE(Approx(-4.) == c.imag()(2));
+
+    const auto h = A * A.conj();
+    REQUIRE(Approx(1. + 4. + 9. + 16.) == h.real());
+    REQUIRE(norm(h.imag()) == Approx(0.).margin(1E-12));
+    REQUIRE(Approx(1. + 4. + 9. + 16.) == A.norm());
+}
+
+TEST_CASE("Quaternion Compound Assignment", "[Utility.Quaternion]") {
+    Quaternion A(1., 2., 3., 4.);
+    const Quaternion B(5., 6., 7., 8.);
+
+    A += B;
+    REQUIRE(Approx(6.) == A.real());
+    A -= B;
+    REQUIRE(Approx(1.) == A.real());
+
+    A *= B;
+    const auto expected = Quaternion(1., 2., 3., 4.) * B;
+    REQUIRE(Approx(expected.real()) == A.real());
+    REQUIRE(Approx(expected.imag()(0)) == A.imag()(0));
+
+    A /= B;
+    REQUIRE(Approx(1.).margin(1E-12) == A.real());
+    REQUIRE(Approx(2.).margin(1E-12) == A.imag()(0));
+}
+
+TEST_CASE("Quaternion Unary Minus And Rotating Vector", "[Utility.Quaternion]") {
+    const Quaternion A(1., 2., 3., 4.);
+    const auto neg = -A;
+    REQUIRE(Approx(-1.) == neg.real());
+
+    // rotating a vector by unit quaternion preserves its length
+    Quaternion Q(.5, vec{1., 0., 0.});
+    Q.normalise();
+    const vec v = {1., 2., 3.};
+    const auto rotated = Q * v;
+    REQUIRE(norm(rotated) == Approx(norm(v)).margin(1E-12));
+}
 #pragma GCC diagnostic pop
